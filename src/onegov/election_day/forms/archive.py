@@ -17,26 +17,26 @@ class ArchiveSearchForm(Form):
     request: 'ElectionDayRequest'
 
     term = StringField(
-        label=_("Term"),
+        label=_('Term'),
         render_kw={'size': 4, 'clear': False},
         description=_(
-            "Searches the title of the election/vote. "
-            "Use Wildcards (*) to find more results, e.g Nationalrat*."
+            'Searches the title of the election/vote. '
+            'Use Wildcards (`*`) to find more results, e.g `Nationalrat*`.'
         ),
     )
 
     from_date = DateField(
-        label=_("From date"),
+        label=_('From date'),
         render_kw={'size': 4, 'clear': False}
     )
 
     to_date = DateField(
-        label=_("To date"),
+        label=_('To date'),
         render_kw={'size': 4, 'clear': True}
     )
 
     domains = MultiCheckboxField(
-        label=_("Domain"),
+        label=_('Domain'),
         render_kw={'size': 4, 'clear': False},
         choices=[]
     )
@@ -63,11 +63,11 @@ class ArchiveSearchForm(Form):
 class ArchiveSearchFormVote(ArchiveSearchForm):
 
     answers = MultiCheckboxField(
-        label=_("Voting result"),
+        label=_('Voting result'),
         choices=(
-            ('accepted', _("Accepted")),
-            ('rejected', _("Rejected")),
-            ('counter_proposal', _("Counter Proposal"))
+            ('accepted', _('Accepted')),
+            ('rejected', _('Rejected')),
+            ('counter_proposal', _('Counter Proposal'))
         ),
         render_kw={'size': 4, 'clear': True}
     )
@@ -90,10 +90,10 @@ class ArchiveSearchFormElection(ArchiveSearchForm):
         domains = self.request.app.principal.domains_election
 
         self.domains.choices = [
-            ('federation', _("Federal")),
-            ('canton', _("Cantonal")),
+            ('federation', _('Federal')),
+            ('canton', _('Cantonal')),
         ]
         if 'region' in domains or 'region' in domains or 'none' in domains:
-            self.domains.choices.append(('region', _("Regional")))
+            self.domains.choices.append(('region', _('Regional')))
         if 'municipality' in domains:
-            self.domains.choices.append(('municipality', _("Communal")))
+            self.domains.choices.append(('municipality', _('Communal')))

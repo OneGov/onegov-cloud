@@ -5,18 +5,20 @@ import tempfile
 import textwrap
 import transaction
 
-from datetime import datetime, date
+from datetime import datetime, date, timedelta
 from freezegun import freeze_time
 from libres.db.models import Reservation
 from libres.modules.errors import AffectedReservationError
-from onegov.core.utils import normalize_for_url
+from onegov.core.utils import module_path, normalize_for_url
+from onegov.file import FileCollection
 from onegov.form import FormSubmission
 from onegov.org.models import ResourceRecipientCollection
-from onegov.reservation import ResourceCollection
+from onegov.reservation import Resource, ResourceCollection
 from onegov.ticket import TicketCollection
 from openpyxl import load_workbook
 from pathlib import Path
 from unittest.mock import patch
+from webtest import Upload
 
 from tests.shared.utils import add_reservation
 
@@ -147,6 +149,54 @@ def test_resources_person_link_extension(client):
     assert 'Franz Müller' in resource
 
 
+def test_resources_explicitly_link_referenced_files(client):
+    admin = client.spawn()
+    admin.login_admin()
+
+    path = module_path('tests.onegov.org', 'fixtures/sample.pdf')
+    with open(path, 'rb') as f:
+        page = admin.get('/files')
+        page.form['file'] = Upload('Sample.pdf', f.read(), 'application/pdf')
+        page.form.submit()
+
+    pdf_url = (
+        admin.get('/files')
+        .pyquery('[ic-trigger-from="#button-1"]')
+        .attr('ic-get-from')
+        .removesuffix('/details')
+    )
+    pdf_link = f'<a href="{pdf_url}">Sample.pdf</a>'
+
+    editor = client.spawn()
+    editor.login_editor()
+
+    # add resource
+    resources = editor.get('/resources')
+    new_item = resources.click('Gegenstand')
+    new_item.form['title'] = 'Dorf Bike'
+    new_item.form['text'] = pdf_link
+    resource = new_item.form.submit().follow()
+    assert 'Dorf Bike' in resource
+
+    session = client.app.session()
+    pdf = FileCollection(session).query().one()
+    resource = (
+        ResourceCollection(client.app.libres_context).query()
+        .filter(Resource.title == 'Dorf Bike').one()
+    )
+    assert resource.files == [pdf]
+    assert pdf.access == 'public'
+
+    resource.access = 'mtan'
+    session.flush()
+    assert pdf.access == 'mtan'
+
+    # link removed
+    resource.files = []
+    session.flush()
+    assert pdf.access == 'secret'
+
+
 @freeze_time("2020-01-01", tick=True)
 def test_find_your_spot(client):
     client.login_admin()
@@ -241,7 +291,11 @@ def test_resource_room_deletion(client):
 
     # Adds allocations and reservations in the past
     add_reservation(
-        foyer, client, datetime(2017, 1, 6, 12), datetime(2017, 1, 6, 16))
+        foyer,
+        client.app.session(),
+        datetime(2017, 1, 6, 12),
+        datetime(2017, 1, 6, 16),
+    )
     assert foyer.deletable
     transaction.commit()
 
@@ -255,6 +309,61 @@ def test_resource_room_deletion(client):
     tickets = TicketCollection(client.app.session())
     ticket = tickets.query().one()
     assert ticket.state == 'closed'
+
+
+def test_resource_room_deletion_with_future_allocation_and_payment(client):
+    resources = ResourceCollection(client.app.libres_context)
+    resource = resources.by_name('tageskarte')
+    resource.pricing_method = 'per_item'
+    resource.price_per_item = 15.00
+    resource.payment_method = 'manual'
+    resource.definition = 'Email = ___'
+
+    tomorrow = date.today() + timedelta(days=1)
+    scheduler = resource.get_scheduler(client.app.libres_context)
+    allocations = scheduler.allocate(
+        dates=(
+            datetime(tomorrow.year, tomorrow.month, tomorrow.day, 10),
+            datetime(tomorrow.year, tomorrow.month, tomorrow.day, 14),
+        ),
+    )
+
+    reserve = client.bound_reserve(allocations[0])
+    transaction.commit()
+
+    # create a reservation
+    assert reserve().json == {'success': True}
+
+    page = client.get('/resource/tageskarte/form')
+    page.form['email'] = 'info@example.org'
+
+    ticket = page.form.submit().follow().form.submit().follow()
+    assert 'RSV-' in ticket.text
+
+    # mark it as paid
+    client.login_admin()
+    page = client.get('/tickets/ALL/open').click("Annehmen").follow()
+
+    assert page.pyquery('.payment-state').text() == "Offen"
+
+    client.post(page.pyquery('.mark-as-paid').attr('ic-post-to'))
+    page = client.get(page.request.url)
+
+    assert page.pyquery('.payment-state').text() == "Bezahlt"
+
+    # delete resource
+    page = client.get('/resources').click('Tageskarte', index=1)
+    delete_link = page.pyquery('a.delete-link').attr('ic-delete-from')
+    assert delete_link
+    assert client.delete(delete_link, status=200)
+    page = client.get('/resources')
+    assert 'Tageskarte' not in page.pyquery('a.list-title').text()
+
+    # check if the tickets have been closed
+    tickets = TicketCollection(client.app.session())
+    for ticket in tickets.query().all():
+        assert ticket.state == 'closed'
+        assert ticket.snapshot is not None
 
 
 def test_reserved_resources_fields(client):
@@ -1129,9 +1238,6 @@ def test_delete_reservation_anonymous(client):
 
     reservations = client.get(reservations_url).json['reservations']
     url = reservations[0]['delete']
-
-    # the url does not have csrf (anonymous does not)
-    assert url.endswith('?csrf-token=')
 
     # other clients still can't use the link
     assert client.spawn().delete(url, status=403)

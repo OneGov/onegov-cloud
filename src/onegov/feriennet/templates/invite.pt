@@ -50,7 +50,7 @@
                         </button>
                         <ul id="add-possible" data-dropdown-content class="f-dropdown" aria-hidden="true">
                             <li tal:repeat="attendee possible">
-                                <tal:b replace="structure group_action(attendee, 'join')(layout)" />
+                                <tal:b replace="group_action(attendee, 'join')(layout)" />
                             </li>
                             <li>
                                 <a href="${signup_url()}" i18n:translate>
@@ -82,7 +82,7 @@
                             <div>
                                 ${attendee.name}<br>
                                 <i class="fa fa-fw fa-sign-out" aria-hidden="true"></i>
-                                <tal:b replace="structure group_action(attendee, 'leave')(layout)" />
+                                <tal:b replace="group_action(attendee, 'leave')(layout)" />
                             </div>
                         </div>
                     </li>

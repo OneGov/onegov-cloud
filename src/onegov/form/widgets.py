@@ -48,7 +48,7 @@ class OrderedListWidget(ListWidget):
         # require even more knowledge, so this is the better approach
 
         assert hasattr(field, '__iter__')
-        ordered: list['Field'] = list(field)
+        ordered: list[Field] = list(field)
         ordered.sort(key=lambda f: field.gettext(f.label.text))
 
         class FakeField:
@@ -105,7 +105,11 @@ class UploadWidget(FileInput):
     """)
     template = Markup("""
         <div class="upload-widget with-data{wrapper_css_class}">
-            <p>{existing_file_label}: {filename}{filesize} {icon}</p>
+                <p class="file-title">
+                    <b>
+                        {existing_file_label}: {filename}{filesize} {icon}
+                    </b>
+                </p>
 
             {preview}
 
@@ -152,7 +156,7 @@ class UploadWidget(FileInput):
         if not field.data:
             return None
 
-        if not field.data.get('mimetype', None) in IMAGE_MIME_TYPES_AND_SVG:
+        if field.data.get('mimetype', None) not in IMAGE_MIME_TYPES_AND_SVG:
             return None
 
         if not hasattr(field, 'object_data'):
@@ -213,9 +217,7 @@ class UploadWidget(FileInput):
             'previous': previous,
             'filesize': display_size,
             'filename': field.data['filename'],
-            'wrapper_css_class': wrapper_css_class,
             'name': field.id,
-            'input_html': input_html,
             'existing_file_label': field.gettext(_('Uploaded file')),
             'keep_label': field.gettext(_('Keep file')),
             'delete_label': field.gettext(_('Delete file')),
@@ -463,14 +465,14 @@ class ChosenSelectWidget(Select):
         kwargs['class_'] = '{} chosen-select'.format(
             kwargs.get('class_', '')
         ).strip()
-        kwargs['data-placeholder'] = field.gettext(_("Select an Option"))
-        kwargs['data-no_results_text'] = field.gettext(_("No results match"))
+        kwargs['data-placeholder'] = field.gettext(_('Select an Option'))
+        kwargs['data-no_results_text'] = field.gettext(_('No results match'))
         if self.multiple:
             kwargs['data-placeholder'] = field.gettext(
-                _("Select Some Options")
+                _('Select Some Options')
             )
 
-        return super(ChosenSelectWidget, self).__call__(field, **kwargs)
+        return super().__call__(field, **kwargs)
 
 
 class PreviewWidget:

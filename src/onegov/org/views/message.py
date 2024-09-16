@@ -1,4 +1,3 @@
-from collections import namedtuple
 from onegov.chat import Message
 from onegov.chat import MessageCollection
 from onegov.core.custom import json
@@ -12,15 +11,26 @@ from onegov.user import User
 from sqlalchemy import inspect
 
 
+from typing import NamedTuple, TYPE_CHECKING
+if TYPE_CHECKING:
+    from onegov.core.types import JSONObject_ro, RenderData
+    from onegov.org.request import OrgRequest
+
+
 # messages rendered by this view need to provide a 'message_[type].pt'
 # template and they should provide a link method that takes a
 # request and returns the link the message points (the subject of the message)
 #
 # for messages which are created outside onegov.org and descendants, the links
 # might have to be implemented in link_message below
-def render_message(message, request, owner, layout):
+def render_message(
+    message: Message,
+    request: 'OrgRequest',
+    owner: 'Owner',
+    layout: MessageCollectionLayout
+) -> str:
     return render_template(
-        template='message_{}'.format(message.type),
+        template=f'message_{message.type}',
         request=request,
         content={
             'layout': layout,
@@ -32,7 +42,7 @@ def render_message(message, request, owner, layout):
     )
 
 
-def link_message(message, request):
+def link_message(message: Message, request: 'OrgRequest') -> str:
     if hasattr(message, 'link'):
         return message.link(request)
 
@@ -44,23 +54,31 @@ def link_message(message, request):
     raise NotImplementedError
 
 
-class Owner(namedtuple('OwnerBase', ('username', 'realname'))):
+class Owner(NamedTuple):
+    username: str
+    realname: str | None
 
     @property
-    def initials(self):
+    def initials(self) -> str:
         return User.get_initials(self.username, self.realname)
 
     @property
-    def name(self):
+    def name(self) -> str:
         return self.realname or self.username
 
 
 @OrgApp.json(model=MessageCollection, permission=Private, name='feed')
-def view_messages_feed(self, request, layout=None):
+def view_messages_feed(
+    self: MessageCollection[Message],
+    request: 'OrgRequest',
+    layout: MessageCollectionLayout | None = None
+) -> 'JSONObject_ro':
+
     mapper = inspect(Message).polymorphic_map
     layout = layout or MessageCollectionLayout(self, request)
 
-    def cast(message):
+    # FIXME: Is this cast actually necessary?
+    def cast(message: Message) -> Message:
         message.__class__ = mapper[message.type].class_
         return message
 
@@ -91,14 +109,20 @@ def view_messages_feed(self, request, layout=None):
                     layout.format_date(m.created, 'weekday_long'),
                     layout.format_date(m.created, 'date_long')
                 )),
-                'owner': owners.get(m.owner).username,
+                'owner': owners[m.owner].username,
                 'html': render_message(
                     message=m,
                     request=request,
-                    owner=owners.get(m.owner),
+                    owner=owners[m.owner],
                     layout=layout
                 ),
-            } for m in messages
+            }
+            for m in messages
+            # FIXME: Currently it seems like we never have messages without
+            #        an owner, but if we ever do, we will crash and burn
+            #        either in the template or in this loop, so for now we
+            #        skip messages without owner
+            if m.owner
         ]
     }
 
@@ -108,7 +132,11 @@ def view_messages_feed(self, request, layout=None):
     permission=Private,
     template='timeline.pt'
 )
-def view_messages(self, request, layout=None):
+def view_messages(
+    self: MessageCollection[Message],
+    request: 'OrgRequest',
+    layout: MessageCollectionLayout | None = None
+) -> 'RenderData':
 
     # The initial load contains only the 25 latest message (the feed will
     # return the 25 oldest messages by default)
@@ -120,7 +148,7 @@ def view_messages(self, request, layout=None):
 
     return {
         'layout': layout or MessageCollectionLayout(self, request),
-        'title': _("Timeline"),
+        'title': _('Timeline'),
         'feed': request.link(self, 'feed'),
         'feed_data': json.dumps(
             view_messages_feed(self, request)

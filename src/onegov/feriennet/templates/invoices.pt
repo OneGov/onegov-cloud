@@ -14,7 +14,7 @@
             <tal:b
                     define="banner layout.app.banners(request)[0]"
                     condition="banner"
-                    replace="structure banner"
+                    replace="banner"
                 />
 
             <div class="bills" tal:condition="invoices">

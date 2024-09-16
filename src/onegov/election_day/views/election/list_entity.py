@@ -1,18 +1,18 @@
-from onegov.ballot import Election
-from onegov.ballot import List
-from onegov.core.security import Public
+from onegov.election_day import _
 from onegov.election_day import ElectionDayApp
 from onegov.election_day.layouts import ElectionLayout
+from onegov.election_day.models import Election
+from onegov.election_day.models import List
+from onegov.election_day.security import MaybePublic
 from onegov.election_day.utils import add_last_modified_header
-from sqlalchemy import func
 
 
 from typing import cast
 from typing import TYPE_CHECKING
 if TYPE_CHECKING:
-    from onegov.ballot.models import ProporzElection
     from onegov.core.types import JSON_ro
     from onegov.core.types import RenderData
+    from onegov.election_day.models import ProporzElection
     from onegov.election_day.request import ElectionDayRequest
     from webob.response import Response
 
@@ -27,6 +27,10 @@ def list_options(
 
     election = cast('ProporzElection', election)
     mandates = request.translate(request.app.principal.label('mandates'))
+
+    def ordering(list_: List) -> tuple[int, str]:
+        return (-list_.number_of_mandates, list_.name.lower())
+
     return [
         (
             request.link(list_, name='by-entity'),
@@ -38,17 +42,14 @@ def list_options(
                 )
             ).strip()
         )
-        for list_ in election.lists.order_by(None).order_by(
-            List.number_of_mandates.desc(),
-            func.lower(List.name)
-        )
+        for list_ in sorted(election.lists, key=ordering)
     ]
 
 
 @ElectionDayApp.json(
     model=List,
     name='by-entity',
-    permission=Public
+    permission=MaybePublic
 )
 def view_list_by_entity(
     self: List,
@@ -63,7 +64,7 @@ def view_list_by_entity(
     model=Election,
     name='list-by-entity',
     template='election/heatmap.pt',
-    permission=Public
+    permission=MaybePublic
 )
 def view_election_list_by_entity(
     self: Election,
@@ -75,6 +76,10 @@ def view_election_list_by_entity(
 
     options = list_options(request, self)
     data_url = options[0][0] if options else None
+    by = request.translate(layout.label('entity'))
+    by = by.lower() if request.locale != 'de_CH' else by
+
+    assert request.locale
 
     return {
         'election': self,
@@ -85,8 +90,12 @@ def view_election_list_by_entity(
         'embed_source': request.link(
             self,
             name='list-by-entity-chart',
-            # FIXME: Should we assert that the locale is set?
-            query_params={'locale': request.locale}  # type:ignore[dict-item]
+            query_params={'locale': request.locale}
+        ),
+        'figcaption': _(
+            'The map shows the percentage of votes for the selected list '
+            'by ${by}.',
+            mapping={'by': by}
         )
     }
 
@@ -95,7 +104,7 @@ def view_election_list_by_entity(
     model=Election,
     name='list-by-entity-chart',
     template='embed.pt',
-    permission=Public
+    permission=MaybePublic
 )
 def view_election_list_by_entity_chart(
     self: Election,

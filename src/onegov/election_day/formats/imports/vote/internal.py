@@ -1,4 +1,3 @@
-from onegov.ballot import BallotResult
 from onegov.election_day import _
 from onegov.election_day.formats.imports.common import BALLOT_TYPES
 from onegov.election_day.formats.imports.common import EXPATS
@@ -7,7 +6,7 @@ from onegov.election_day.formats.imports.common import get_entity_and_district
 from onegov.election_day.formats.imports.common import load_csv
 from onegov.election_day.formats.imports.common import STATI
 from onegov.election_day.formats.imports.common import validate_integer
-from sqlalchemy.orm import object_session
+from onegov.election_day.models import BallotResult
 
 
 from typing import cast
@@ -16,11 +15,11 @@ from typing import IO
 from typing import TYPE_CHECKING
 if TYPE_CHECKING:
     from collections.abc import Collection
-    from onegov.ballot.models import Vote
-    from onegov.ballot.types import BallotType
-    from onegov.ballot.types import Status
     from onegov.election_day.models import Canton
     from onegov.election_day.models import Municipality
+    from onegov.election_day.models import Vote
+    from onegov.election_day.types import BallotType
+    from onegov.election_day.types import Status
 
     # TODO: Add TypedDict for BallotResult
 
@@ -46,9 +45,6 @@ def import_vote_internal(
 ) -> list[FileImportError]:
     """ Tries to import the given csv, xls or xlsx file.
 
-    This function is typically called automatically every few minutes during
-    an election day - we use bulk inserts to speed up the import.
-
     :return:
         A list containing errors.
 
@@ -72,11 +68,13 @@ def import_vote_internal(
 
         status = line.status or 'unknown'
         if status not in STATI:
-            line_errors.append(_("Invalid status"))
+            line_errors.append(_('Invalid status'))
 
         ballot_type = line.type
         if ballot_type not in BALLOT_TYPES:
-            line_errors.append(_("Invalid ballot type"))
+            line_errors.append(_('Invalid ballot type'))
+        if vote.type == 'simple':
+            ballot_type = 'proposal'
 
         added_entity_ids.setdefault(ballot_type, set())
         ballot_results.setdefault(ballot_type, [])
@@ -95,13 +93,13 @@ def import_vote_internal(
 
             if entity_id in added_entity_ids[ballot_type]:
                 line_errors.append(
-                    _("${name} was found twice", mapping={
+                    _('${name} was found twice', mapping={
                         'name': entity_id
                     }))
 
             if entity_id and entity_id not in entities:
                 line_errors.append(
-                    _("${name} is unknown", mapping={
+                    _('${name} is unknown', mapping={
                         'name': entity_id
                     }))
             else:
@@ -163,10 +161,10 @@ def import_vote_internal(
         if counted:
             try:
                 if not eligible_voters:
-                    line_errors.append(_("No eligible voters"))
+                    line_errors.append(_('No eligible voters'))
                 if (yeas + nays + empty + invalid) > eligible_voters:
                     line_errors.append(
-                        _("More cast votes than eligible voters")
+                        _('More cast votes than eligible voters')
                     )
             except UnboundLocalError:
                 pass
@@ -200,7 +198,7 @@ def import_vote_internal(
         return errors
 
     if not any(ballot_results.values()):
-        return [FileImportError(_("No data found"))]
+        return [FileImportError(_('No data found'))]
 
     # if there were no errors we know we have a valid status and ballot_types
     status = cast('Status', status)
@@ -216,6 +214,8 @@ def import_vote_internal(
             name, district, superregion = get_entity_and_district(
                 entity_id, entities, vote, principal
             )
+            if vote.domain == 'none':
+                continue
             if vote.domain == 'municipality':
                 if principal.domain != 'municipality':
                     if name != vote.domain_segment:
@@ -226,26 +226,37 @@ def import_vote_internal(
                     'name': name,
                     'district': district,
                     'counted': False,
-                    'entity_id': entity_id
+                    'entity_id': entity_id,
+                    'yeas': 0,
+                    'nays': 0,
+                    'eligible_voters': 0,
+                    'expats': None,
+                    'empty': 0,
+                    'invalid': 0
                 }
             )
 
-    # Add the results to the DB
-    vote.clear_results()
     vote.last_result_change = vote.timestamp()
     vote.status = status
 
-    ballot_ids = {b: vote.ballot(b, create=True).id for b in ballot_types}
+    # Add the results to the DB
+    for ballot_type in ballot_types:
+        ballot = vote.ballot(ballot_type)
+        existing = {result.entity_id: result for result in ballot.results}
+        for result in ballot_results[ballot_type]:
+            entity_id = result['entity_id']
+            if entity_id in existing:
+                for key, value in result.items():
+                    setattr(existing[entity_id], key, value)
+            else:
+                ballot.results.append(BallotResult(**result))
 
-    session = object_session(vote)
-    session.flush()
-    session.bulk_insert_mappings(
-        BallotResult,
-        (
-            dict(**result, ballot_id=ballot_ids[ballot_type])
-            for ballot_type in ballot_types
-            for result in ballot_results[ballot_type]
+        # Remove obsolete results
+        obsolete = (
+            set(existing.keys())
+            - {result['entity_id'] for result in ballot_results[ballot_type]}
         )
-    )
+        for entity_id in obsolete:
+            ballot.results.remove(existing[entity_id])
 
     return []

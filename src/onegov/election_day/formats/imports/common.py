@@ -8,10 +8,12 @@ from onegov.core.errors import EmptyLineInFileError
 from onegov.core.errors import InvalidFormatError
 from onegov.core.errors import MissingColumnsError
 from onegov.election_day import _
+from onegov.election_day.models import Municipality
 from re import match
+from xsdata_ech.e_ch_0252_1_0 import DomainOfInfluenceType
+from xsdata_ech.e_ch_0252_1_0 import DomainOfInfluenceTypeType
 from xsdata.formats.dataclass.context import XmlContext
 from xsdata.formats.dataclass.parsers import XmlParser
-
 
 from typing import overload
 from typing import Any
@@ -19,18 +21,24 @@ from typing import IO
 from typing import TypeVar
 from typing import TYPE_CHECKING
 if TYPE_CHECKING:
-    from csv import Dialect
     from collections.abc import Sequence
-    from onegov.ballot.models import Election
-    from onegov.ballot.models import Vote
-    from onegov.ballot.types import BallotType
-    from onegov.ballot.types import Gender
-    from onegov.ballot.types import Status
-    from onegov.core.csv import DefaultRow
+    from csv import Dialect
     from onegov.core.csv import DefaultCSVFile
+    from onegov.core.csv import DefaultRow
     from onegov.election_day.models import Canton
-    from onegov.election_day.models import Municipality
+    from onegov.election_day.models import Election
+    from onegov.election_day.models import ElectionCompound
+    from onegov.election_day.models import Vote
+    from onegov.election_day.types import BallotType
+    from onegov.election_day.types import DomainOfInfluence
+    from onegov.election_day.types import Gender
+    from onegov.election_day.types import Status
 
+    ECHImportResultType = tuple[
+        list['FileImportError'],
+        set[ElectionCompound | Election | Vote],
+        set[ElectionCompound | Election | Vote]
+    ]
 
 _T = TypeVar('_T')
 
@@ -133,34 +141,34 @@ def load_csv(
             try:
                 csvfile = convert_excel_to_csv(file)
                 dialect = 'excel'
-            except IOError:
+            except OSError:
                 error = FileImportError(
-                    _("Not a valid xls/xlsx file."),
+                    _('Not a valid xls/xlsx file.'),
                     filename=filename
                 )
             except NotImplementedError:
                 error = FileImportError(
-                    _("The xls/xlsx file contains unsupported cells."),
+                    _('The xls/xlsx file contains unsupported cells.'),
                     filename=filename
                 )
             except Exception:
                 error = FileImportError(
-                    _("Not a valid csv/xls/xlsx file."),
+                    _('Not a valid csv/xls/xlsx file.'),
                     filename=filename
                 )
-        except IOError:
+        except OSError:
             error = FileImportError(
-                _("Not a valid xls/xlsx file."),
+                _('Not a valid xls/xlsx file.'),
                 filename=filename
             )
         except NotImplementedError:
             error = FileImportError(
-                _("The xls/xlsx file contains unsupported cells."),
+                _('The xls/xlsx file contains unsupported cells.'),
                 filename=filename
             )
         except Exception:
             error = FileImportError(
-                _("Not a valid csv/xls/xlsx file."),
+                _('Not a valid csv/xls/xlsx file.'),
                 filename=filename
             )
 
@@ -187,30 +195,30 @@ def load_csv(
     except AmbiguousColumnsError:
         error = FileImportError(
             _(
-                "Could not find the expected columns, "
-                "make sure all required columns exist and that there are no "
-                "extra columns."
+                'Could not find the expected columns, '
+                'make sure all required columns exist and that there are no '
+                'extra columns.'
             ),
             filename=filename
         )
     except DuplicateColumnNamesError:
         error = FileImportError(
-            _("Some column names appear twice."),
+            _('Some column names appear twice.'),
             filename=filename
         )
     except InvalidFormatError:
         error = FileImportError(
-            _("Not a valid csv/xls/xlsx file."),
+            _('Not a valid csv/xls/xlsx file.'),
             filename=filename
         )
     except EmptyFileError:
         error = FileImportError(
-            _("The csv/xls/xlsx file is empty."),
+            _('The csv/xls/xlsx file is empty.'),
             filename=filename
         )
     except EmptyLineInFileError:
         error = FileImportError(
-            _("The file contains an empty line."),
+            _('The file contains an empty line.'),
             filename=filename
         )
     except IndexError as e:
@@ -222,7 +230,7 @@ def load_csv(
         )
     except Exception:
         error = FileImportError(
-            _("Not a valid csv/xls/xlsx file."),
+            _('Not a valid csv/xls/xlsx file.'),
             filename=filename
         )
 
@@ -242,7 +250,7 @@ def load_xml(
         return parser.from_bytes(file.read()), None
     except Exception as exception:
         return None, FileImportError(_(
-            "Not a valid eCH xml file: ${error}",
+            'Not a valid eCH xml file: ${error}',
             mapping={'error': exception}
         ))
 
@@ -275,7 +283,7 @@ def get_entity_and_district(
             if election_or_vote.domain_segment != name:
                 if principal.domain != 'municipality':
                     errors.append(_(
-                        "${name} is not part of this business",
+                        '${name} is not part of this business',
                         mapping={
                             'name': entity_id,
                             'district': election_or_vote.domain_segment
@@ -284,7 +292,7 @@ def get_entity_and_district(
         if election_or_vote.domain in ('region', 'district'):
             if election_or_vote.domain_segment != district:
                 errors.append(_(
-                    "${name} is not part of ${district}",
+                    '${name} is not part of ${district}',
                     mapping={
                         'name': entity_id,
                         'district': election_or_vote.domain_segment
@@ -296,8 +304,6 @@ def get_entity_and_district(
 
 def line_is_relevant(
     line: 'DefaultRow',
-    # FIXME: is number perhaps optional? For now we have a bunch of
-    #        assertions that this shouldn't be None in the upload views...
     number: str,
     district: str | None = None
 ) -> bool:
@@ -372,69 +378,13 @@ def validate_integer(
 
 
 @overload
-def validate_float(
-    line: 'DefaultRow',
-    col: str,
-    treat_none_as_default: bool = True,
-    default: float = 0.0
-) -> float: ...
-
-
-@overload
-def validate_float(
-    line: 'DefaultRow',
-    col: str,
-    treat_none_as_default: bool,
-    default: _T
-) -> float | _T: ...
-
-
-@overload
-def validate_float(
-    line: 'DefaultRow',
-    col: str,
-    treat_none_as_default: bool = True,
-    *,
-    default: _T
-) -> float | _T: ...
-
-
-def validate_float(
-    line: 'DefaultRow',
-    col: str,
-    treat_none_as_default: bool = True,
-    default: float | _T = 0.0
-) -> float | _T:
-    """
-    Checks line of a csv file for a valid float number.
-    Raises an error if the attribute is not there.
-
-    :param line: line object from csv reader
-    :param col: attribute of line object
-    :param default: default to return if line.col is None
-    :param treat_none_as_default: raises ValueError if line.col is None
-    :return: float value of line.col
-    """
-    result = getattr(line, col)
-    if not result:
-        if treat_none_as_default:
-            return default
-        raise ValueError(_('Empty value: ${col}', mapping={'col': col}))
-    try:
-        return float(result)
-    except ValueError as exception:
-        raise ValueError(_('Invalid float number: ${col}',
-                           mapping={'col': col})) from exception
-
-
-@overload
 def validate_numeric(
     line: 'DefaultRow',
     col: str,
     precision: int,
     scale: int,
     treat_none_as_default: bool = True,
-    default: Decimal = Decimal(0),  # noqa: B008
+    default: Decimal = Decimal(0),
     optional: bool = False
 ) -> Decimal: ...
 
@@ -470,7 +420,7 @@ def validate_numeric(
     precision: int,
     scale: int,
     treat_none_as_default: bool = True,
-    default: Decimal | _T = Decimal(0),  # noqa: B008
+    default: Decimal | _T = Decimal(0),
     optional: bool = False
 ) -> Decimal | _T:
     """
@@ -569,3 +519,43 @@ def validate_color(line: 'DefaultRow', col: str) -> str:
             _('Invalid color: ${col}', mapping={'col': col})
         )
     return result
+
+
+def convert_ech_domain(
+    domain: DomainOfInfluenceType,
+    principal: 'Canton | Municipality',
+    entities: dict[int, dict[str, str]],
+) -> tuple[bool, 'DomainOfInfluence', str]:
+    """ Convert the given eCH domain to our internal domain and domain
+    segment.
+
+    Return True as first argument, if the domain is supported for the given
+    principal.
+
+    """
+    if domain.domain_of_influence_type == DomainOfInfluenceTypeType.CH:
+        return True, 'federation', ''
+    if domain.domain_of_influence_type == DomainOfInfluenceTypeType.CT:
+        return True, 'canton', ''
+    if domain.domain_of_influence_type == DomainOfInfluenceTypeType.BZ:
+        # BZ might refer to different domains. This might be for example
+        # DomainOfInfluenceMixin.region, DomainOfInfluenceMixin.district
+        # or even a different domain we don't know (yet) - such as a court
+        # district. Even if we know the district in case of "region" and
+        # "district", we don't know the indentifiation, as this is not (yet)
+        # standardized at this time.
+        # We therefore set the domain to "none" and rely on all the results
+        # (one for each municipality) being present, even if not counted yet.
+        return True, 'none', ''
+    if domain.domain_of_influence_type == DomainOfInfluenceTypeType.MU:
+        if isinstance(principal, Municipality):
+            return True, 'municipality', ''
+        assert domain.domain_of_influence_identification is not None
+        name = entities.get(
+            int(domain.domain_of_influence_identification), {}
+        ).get('name', '')
+        return True, 'municipality', name
+    if domain.domain_of_influence_type == DomainOfInfluenceTypeType.AN:
+        return True, 'none', ''
+
+    return False, 'none', ''

@@ -1,8 +1,8 @@
 from collections import OrderedDict
-from onegov.ballot import Election
-from onegov.ballot import ElectionCompound
-from onegov.ballot import ElectionCompoundPart
-from onegov.ballot import Vote
+from onegov.election_day.models.election import Election
+from onegov.election_day.models.election_compound import ElectionCompound
+from onegov.election_day.models.election_compound import ElectionCompoundPart
+from onegov.election_day.models.vote import Vote
 from onegov.core.orm import Base
 from onegov.core.orm.mixins import ContentMixin
 from onegov.core.orm.mixins import TimestampMixin
@@ -67,7 +67,7 @@ class Screen(Base, ContentMixin, TimestampMixin):
     )
     vote: 'relationship[Vote | None]' = relationship(
         'Vote',
-        backref='screens'
+        back_populates='screens'
     )
 
     #: The election
@@ -77,7 +77,7 @@ class Screen(Base, ContentMixin, TimestampMixin):
     )
     election: 'relationship[Election | None]' = relationship(
         'Election',
-        backref='screens'
+        back_populates='screens'
     )
 
     #: The election compound
@@ -87,7 +87,7 @@ class Screen(Base, ContentMixin, TimestampMixin):
     )
     election_compound: 'relationship[ElectionCompound | None]' = relationship(
         'ElectionCompound',
-        backref='screens'
+        back_populates='screens'
     )
 
     #: The domain of the election compound part.
@@ -152,9 +152,6 @@ class Screen(Base, ContentMixin, TimestampMixin):
     def next(self) -> 'Screen | None':
         if self.group:
             session = object_session(self)
-            # FIXME: This seems a little slow, we may be better off just
-            #        loading the numbers and then fetching the single Screen
-            #        we actually need, even if that means an additional query
             query = session.query(Screen.number, Screen)
             query = query.filter_by(group=self.group).order_by(Screen.number)
             screens = OrderedDict(query.all())

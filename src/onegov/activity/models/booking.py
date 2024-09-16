@@ -24,7 +24,7 @@ if TYPE_CHECKING:
     from onegov.activity.models import Attendee, OccasionDate, Period
     from onegov.user import User
     from sqlalchemy.sql import ColumnElement
-    from typing_extensions import TypeAlias
+    from typing import TypeAlias
 
     BookingState: TypeAlias = Literal[
         'open',
@@ -33,6 +33,11 @@ if TYPE_CHECKING:
         'denied',
         'cancelled',
     ]
+
+    # NOTE: Workaround to help with inference in case of tuple arguments
+    BookingStates: TypeAlias = (
+        tuple[BookingState, ...] | Collection[BookingState]
+    )
 
 
 class Booking(Base, TimestampMixin):
@@ -80,14 +85,14 @@ class Booking(Base, TimestampMixin):
     #: the attendee behind this booking
     attendee_id: 'Column[uuid.UUID]' = Column(
         UUID,  # type:ignore[arg-type]
-        ForeignKey("attendees.id"),
+        ForeignKey('attendees.id'),
         nullable=False
     )
 
     #: the occasion this booking belongs to
     occasion_id: 'Column[uuid.UUID]' = Column(
         UUID,  # type:ignore[arg-type]
-        ForeignKey("occasions.id"),
+        ForeignKey('occasions.id'),
         nullable=False
     )
 
@@ -110,7 +115,7 @@ class Booking(Base, TimestampMixin):
 
     #: the period this booking belongs to
     @aggregated('occasion', Column(  # type:ignore[no-redef]
-        UUID, ForeignKey("periods.id"), nullable=False)
+        UUID, ForeignKey('periods.id'), nullable=False)
     )
     def period_id(self) -> 'ColumnElement[uuid.UUID]':
         return func.coalesce(Occasion.period_id, None)
@@ -140,15 +145,27 @@ class Booking(Base, TimestampMixin):
     #: access the user linked to this booking
     user: 'relationship[User]' = relationship('User')
 
-    if TYPE_CHECKING:
-        # FIXME: Replace with explicit backref with back_populates
-        attendee: relationship[Attendee]
-        occasion: relationship[Occasion]
-        period: relationship[Period]
+    #: access the attendee linked to this booking
+    attendee: 'relationship[Attendee]' = relationship(
+        'Attendee',
+        back_populates='bookings'
+    )
+
+    #: access the occasion linked to this booking
+    occasion: 'relationship[Occasion]' = relationship(
+        Occasion,
+        back_populates='bookings'
+    )
+
+    #: access the period linked to this booking
+    period: 'relationship[Period]' = relationship(
+        'Period',
+        back_populates='bookings'
+    )
 
     def group_code_count(
         self,
-        states: 'Collection[str]' = ('open', 'accepted')
+        states: 'BookingStates | Literal["*"]' = ('open', 'accepted')
     ) -> int:
         """ Returns the number of bookings with the same group code. """
         query = object_session(self).query(Booking).with_entities(

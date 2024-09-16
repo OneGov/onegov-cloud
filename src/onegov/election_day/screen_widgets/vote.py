@@ -5,9 +5,9 @@ from onegov.election_day.screen_widgets.generic import ModelBoundWidget
 from typing import Any
 from typing import TYPE_CHECKING
 if TYPE_CHECKING:
-    from onegov.ballot import ComplexVote  # noqa: F401
-    from onegov.ballot import Vote  # noqa: F401
     from onegov.election_day.layouts import DefaultLayout
+    from onegov.election_day.models import ComplexVote  # noqa: F401
+    from onegov.election_day.models import Vote  # noqa: F401
 
 
 @ElectionDayApp.screen_widget(
@@ -130,7 +130,8 @@ class VoteProposalEntitiesTableWidget(ModelBoundWidget['Vote']):
             <div class="{@class}">
                 <tal:block
                     metal:use-macro="layout.macros['ballot-entities-table']"
-                    tal:define="ballot proposal"
+                    tal:define="ballot proposal;
+                                results proposal_results"
                     />
             </div>
         </xsl:template>
@@ -139,8 +140,11 @@ class VoteProposalEntitiesTableWidget(ModelBoundWidget['Vote']):
 
     def get_variables(self, layout: 'DefaultLayout') -> dict[str, Any]:
         model = self.model or layout.model
+        ballot = model.proposal
+        results = sorted(ballot.results, key=lambda x: x.name)
         return {
-            'proposal': model.proposal,
+            'proposal': ballot,
+            'proposal_results': results
         }
 
 
@@ -155,7 +159,8 @@ class VoteCounterProposalEntitiesTableWidget(ModelBoundWidget['ComplexVote']):
             <div class="{@class}">
                 <tal:block
                     metal:use-macro="layout.macros['ballot-entities-table']"
-                    tal:define="ballot counter_proposal"
+                    tal:define="ballot counter_proposal;
+                                results counter_proposal_results"
                     />
             </div>
         </xsl:template>
@@ -164,8 +169,11 @@ class VoteCounterProposalEntitiesTableWidget(ModelBoundWidget['ComplexVote']):
 
     def get_variables(self, layout: 'DefaultLayout') -> dict[str, Any]:
         model = self.model or layout.model
+        ballot = model.counter_proposal
+        results = sorted(ballot.results, key=lambda x: x.name)
         return {
-            'counter_proposal': model.counter_proposal,
+            'counter_proposal': ballot,
+            'counter_proposal_results': results,
         }
 
 
@@ -180,7 +188,8 @@ class VoteTieBreakerEntitiesTableWidget(ModelBoundWidget['ComplexVote']):
             <div class="{@class}">
                 <tal:block
                     metal:use-macro="layout.macros['ballot-entities-table']"
-                    tal:define="ballot tie_breaker"
+                    tal:define="ballot tie_breaker;
+                                results tie_breaker_results"
                     />
             </div>
         </xsl:template>
@@ -189,8 +198,11 @@ class VoteTieBreakerEntitiesTableWidget(ModelBoundWidget['ComplexVote']):
 
     def get_variables(self, layout: 'DefaultLayout') -> dict[str, Any]:
         model = self.model or layout.model
+        ballot = model.tie_breaker
+        results = sorted(ballot.results, key=lambda x: x.name)
         return {
-            'tie_breaker': model.tie_breaker,
+            'tie_breaker': ballot,
+            'tie_breaker_results': results,
         }
 
 

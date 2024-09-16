@@ -30,6 +30,10 @@ $footer-hover-color: $primary-fg-color;
         text-transform: none;
     }
 
+    h5.custom-links {
+        margin-top: .5rem;
+    }
+
     .cell {
 
         @include clean-ul;

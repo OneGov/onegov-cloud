@@ -39,7 +39,7 @@ class PayableBase:
         tablename = self.__tablename__
 
         keys = inspect(self.__class__).primary_key
-        values = '/'.join((str(getattr(self, key.name, None)) for key in keys))
+        values = '/'.join(str(getattr(self, key.name, None)) for key in keys)
 
         return f'{tablename}/{hash_primary_key(values)}'
 

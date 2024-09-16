@@ -1,8 +1,8 @@
-from onegov.ballot import Candidate
-from onegov.ballot import CandidateResult
-from onegov.ballot import ElectionResult
-from onegov.ballot import List
 from onegov.core.utils import groupbylist
+from onegov.election_day.models import Candidate
+from onegov.election_day.models import CandidateResult
+from onegov.election_day.models import ElectionResult
+from onegov.election_day.models import List
 from operator import itemgetter
 from sqlalchemy import desc
 from sqlalchemy import func
@@ -16,9 +16,9 @@ from typing import Any
 from typing import TYPE_CHECKING
 if TYPE_CHECKING:
     from collections.abc import Collection
-    from onegov.ballot.models import Election
-    from onegov.ballot.models import ProporzElection
     from onegov.core.types import JSONObject_ro
+    from onegov.election_day.models import Election
+    from onegov.election_day.models import ProporzElection
     from sqlalchemy.orm import Query
     from sqlalchemy.orm import Session
     from sqlalchemy.sql.elements import Label
@@ -59,9 +59,6 @@ def get_candidates_results(
     may contain rounding errors.
     """
     election_result_ids = []
-    # FIXME: All these if entities should probably be `if entities is not None`
-    #        passing in an empty collection of entities should probably result
-    #        in no results at all
     if entities:
         election_result_ids_q = session.query(ElectionResult.id).filter(
             ElectionResult.election_id == election.id,
@@ -69,7 +66,7 @@ def get_candidates_results(
         )
         election_result_ids = [result for result, in election_result_ids_q]
 
-    percentage: 'Label[Any]' = literal_column('0').label('percentage')
+    percentage: Label[Any] = literal_column('0').label('percentage')
     if election.type == 'majorz':
         accounted = session.query(func.sum(ElectionResult.accounted_ballots))
         accounted = accounted.filter(ElectionResult.election_id == election.id)
@@ -138,10 +135,11 @@ def get_candidates_data(
     """" Get the candidates as JSON. Used to for the candidates bar chart.
 
     Allows to optionally
-    - return only the first ``limit`` results.
-    - return only results for candidates within the given list names (proporz)
+
+    * return only the first ``limit`` results.
+    * return only results for candidates within the given list names (proporz)
       or party names (majorz).
-    - return only elected candidates. If not specified, only elected candidates
+    * return only elected candidates. If not specified, only elected candidates
       are returned for proporz elections, all for majorz elections.
 
     """
@@ -155,7 +153,7 @@ def get_candidates_data(
     if election.type == 'proporz':
         election = cast('ProporzElection', election)
         column = Candidate.list_id  # type:ignore[assignment]
-        names = dict(election.lists.with_entities(List.name, List.id))
+        names = {list_.name: str(list_.id) for list_ in election.lists}
         colors = {
             list_id: election.colors[name]
             for name, list_id in names.items()
@@ -238,7 +236,7 @@ def get_candidates_data(
                 ),
                 'color': (
                     colors.get(candidate.party)
-                    or colors.get(candidate.list_id)
+                    or colors.get(str(candidate.list_id))
                 )
             } for candidate in candidates
         ],

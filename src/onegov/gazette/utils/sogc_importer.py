@@ -143,7 +143,7 @@ class SogcImporter:
 
         MessageCollection(session, type='gazette_notice').add(
             channel_id=str(notice.id),
-            meta={'event': _("imported")}
+            meta={'event': _('imported')}
         )
 
     def __call__(self) -> int:
@@ -151,5 +151,5 @@ class SogcImporter:
         for id_ in publication_ids:
             self.get_publication(id_)
         count = len(publication_ids)
-        log.info(f"{count} notice(s) imported")
+        log.info(f'{count} notice(s) imported')
         return count

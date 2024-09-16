@@ -11,6 +11,7 @@ from onegov.activity.matching import PreferGroups
 from onegov.activity.matching import PreferInAgeBracket
 from onegov.activity.matching import PreferOrganiserChildren
 from onegov.activity.matching import Scoring
+from onegov.activity.matching import PreferMotivated
 from onegov.core.utils import Bunch
 from psycopg2.extras import NumericRange
 from uuid import uuid4
@@ -432,3 +433,31 @@ def test_prefer_groups_equal(session, owner, collections, prebooking_period):
     assert b2.state == 'accepted'
     assert b3.state == 'blocked'
     assert b4.state == 'blocked'
+
+
+def test_favorite_occasion(session, owner, collections, prebooking_period):
+    # make sure favorite occasions are preferred
+    o1 = new_occasion(collections, prebooking_period, 0, 1)
+    o2 = new_occasion(collections, prebooking_period, 0, 1)
+
+    a1 = new_attendee(collections, user=owner)
+    a2 = new_attendee(collections, user=owner)
+
+    b1 = collections.bookings.add(owner, a1, o1, priority=1)
+    b2 = collections.bookings.add(owner, a2, o1, priority=0)
+    b3 = collections.bookings.add(owner, a1, o2, priority=1)
+    b4 = collections.bookings.add(owner, a2, o2, priority=0)
+
+    b1.group_code = b2.group_code = 'foo'
+
+    b1.favorite_occasion_id = o2.id
+    b2.favorite_occasion_id = o2.id
+
+    match(session, prebooking_period.id, score_function=Scoring(
+        criteria=[PreferGroups.from_session(session), PreferMotivated()]
+    ))
+
+    assert round(b1.score) == 2
+    assert round(b2.score) == 1
+    assert round(b3.score) == 1
+    assert round(b4.score) == 0

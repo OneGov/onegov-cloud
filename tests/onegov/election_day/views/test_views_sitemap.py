@@ -3,22 +3,27 @@ from webtest import TestApp as Client
 
 
 def test_view_sitemap(election_day_app_zg):
+    principal = election_day_app_zg.principal
+    principal.email_notification = True
+    principal.sms_notification = True
+    election_day_app_zg.cache.set('principal', principal)
+
     client = Client(election_day_app_zg)
     client.get('/locale/de_CH').follow()
 
     login(client)
 
     new = client.get('/manage/votes/new-vote')
-    new.form['vote_de'] = 'Abstimmung 1. Januar 2013'
+    new.form['title_de'] = 'Abstimmung 1. Januar 2013'
     new.form['date'] = '2013-01-01'
     new.form['domain'] = 'federation'
     new.form.submit()
 
     new = client.get('/manage/elections/new-election')
-    new.form['election_de'] = 'Wahl 1. Januar 2013'
+    new.form['title_de'] = 'Wahl 1. Januar 2013'
     new.form['date'] = '2013-01-01'
     new.form['mandates'] = 1
-    new.form['election_type'] = 'majorz'
+    new.form['type'] = 'majorz'
     new.form['domain'] = 'federation'
     new.form.submit()
 
@@ -36,6 +41,27 @@ def test_view_sitemap(election_day_app_zg):
         'http://localhost/archive/2013-01-01',
         'http://localhost/election/wahl-1-januar-2013',
         'http://localhost/vote/abstimmung-1-januar-2013',
+        'http://localhost/unsubscribe-email',
+        'http://localhost/unsubscribe-sms',
+        'http://localhost/subscribe-email',
+        'http://localhost/subscribe-sms'
+    }
+
+    # JSON
+    json = client.get('/sitemap.json').json
+    assert json == {
+        'urls': [
+            'http://localhost/',
+            'http://localhost/archive-search/vote',
+            'http://localhost/archive/2013',
+            'http://localhost/archive/2013-01-01',
+            'http://localhost/election/wahl-1-januar-2013',
+            'http://localhost/subscribe-email',
+            'http://localhost/subscribe-sms',
+            'http://localhost/unsubscribe-email',
+            'http://localhost/unsubscribe-sms',
+            'http://localhost/vote/abstimmung-1-januar-2013'
+        ]
     }
 
     # HTML

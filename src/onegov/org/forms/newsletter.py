@@ -25,25 +25,30 @@ from markupsafe import Markup
 
 
 from typing import Any, TYPE_CHECKING
+
+from onegov.org.utils import extract_categories_and_subcategories
+
 if TYPE_CHECKING:
     from collections.abc import Iterable
     from onegov.core.csv import DefaultRow
+    from onegov.file import File
     from onegov.event.models import Occurrence
-    from onegov.org.models import GeneralFile, News
+    from onegov.org.models import News
     from onegov.org.request import OrgRequest
     from onegov.newsletter.models import Newsletter
-    from typing_extensions import Self
+    from typing import Self
+    from wtforms.fields.choices import _Choice
 
 
 class NewsletterForm(Form):
     title = StringField(
-        label=_("Title"),
-        description=_("Used in the overview and the e-mail subject"),
+        label=_('Title'),
+        description=_('Used in the overview and the e-mail subject'),
         validators=[InputRequired()])
 
     lead = TextAreaField(
-        label=_("Editorial"),
-        description=_("A few words about this edition of the newsletter"),
+        label=_('Editorial'),
+        description=_('A few words about this edition of the newsletter'),
         render_kw={'rows': 6})
 
     # FIXME: Why are we passing the request in? It should alread be stored on
@@ -92,12 +97,19 @@ class NewsletterForm(Form):
 
         class NewsletterWithNewsForm(cls):  # type:ignore
             news = MultiCheckboxField(
-                label=_("Latest news"),
+                label=_('Latest news'),
                 choices=choices,
                 render_kw={
                     'prefix_label': False,
                     'class_': 'recommended'
                 }
+            )
+            show_news_as_tiles = BooleanField(
+                label=_('Show news as tiles'),
+                description=_(
+                    'If checked, news are displayed as tiles. Otherwise, '
+                    'news are listed in full length.'),
+                default=True
             )
 
             def update_model(
@@ -108,10 +120,14 @@ class NewsletterForm(Form):
 
                 super().update_model(model, request)
                 model.content['news'] = self.news.data
+                model.content['show_news_as_tiles'] = (
+                    self.show_news_as_tiles.data)
 
             def apply_model(self, model: 'Newsletter') -> None:
                 super().apply_model(model)
                 self.news.data = model.content.get('news')
+                self.show_news_as_tiles.data = model.content.get(
+                    'show_news_as_tiles', True)
 
         return NewsletterWithNewsForm
 
@@ -144,7 +160,7 @@ class NewsletterForm(Form):
 
         class NewsletterWithOccurrencesForm(cls):  # type:ignore
             occurrences = MultiCheckboxField(
-                label=_("Events"),
+                label=_('Events'),
                 choices=choices,
                 render_kw={
                     'prefix_label': False,
@@ -171,7 +187,7 @@ class NewsletterForm(Form):
     def with_publications(
         cls,
         request: 'OrgRequest',
-        publications: 'Iterable[GeneralFile]'
+        publications: 'Iterable[File]'
     ) -> type['Self']:
 
         # FIXME: another use of layout for format_date
@@ -196,7 +212,7 @@ class NewsletterForm(Form):
 
         class NewsletterWithPublicationsForm(cls):  # type:ignore
             publications = MultiCheckboxField(
-                label=_("Publications"),
+                label=_('Publications'),
                 choices=choices,
                 render_kw={
                     'prefix_label': False,
@@ -225,17 +241,26 @@ class NewsletterSendForm(Form):
     if TYPE_CHECKING:
         request: OrgRequest
 
+    categories = MultiCheckboxField(
+        label=_('Categories'),
+        description=_('Select categories the newsletter reports on. The '
+                      'users will receive the newsletter only if it '
+                      'reports on at least one of the categories the user '
+                      'subscribed to.'),
+        choices=[]
+    )
+
     send = RadioField(
-        _("Send"),
+        _('Send'),
         choices=(
-            ('now', _("Now")),
-            ('specify', _("At a specified time"))
+            ('now', _('Now')),
+            ('specify', _('At a specified time'))
         ),
         default='now'
     )
 
     time = DateTimeLocalField(
-        label=_("Time"),
+        label=_('Time'),
         validators=[InputRequired()],
         depends_on=('send', 'specify')
     )
@@ -256,21 +281,33 @@ class NewsletterSendForm(Form):
 
             if time < (utcnow() + timedelta(seconds=60 * 5)):
                 raise ValidationError(_(
-                    "Scheduled time must be at least 5 minutes in the future"
+                    'Scheduled time must be at least 5 minutes in the future'
                 ))
 
             if time.minute != 0:
                 raise ValidationError(_(
-                    "Newsletters can only be sent on the hour "
-                    "(10:00, 11:00, etc.)"
+                    'Newsletters can only be sent on the hour '
+                    '(10:00, 11:00, etc.)'
                 ))
 
             self.time.data = time
 
+    def on_request(self) -> None:
+        choices: list[_Choice] = []
+        categories, subcategories = extract_categories_and_subcategories(
+            self.request.app.org.newsletter_categories)
+
+        for cat, sub in zip(categories, subcategories):
+            choices.append((cat, cat))
+            for s in sub:
+                choices.append((f'{s}', f'\xa0\xa0\xa0{s}'))
+
+        self.categories.choices = choices
+
 
 class NewsletterTestForm(Form):
     selected_recipient = ChosenSelectField(
-        label=_("Recipient"),
+        label=_('Recipient'),
         choices=[],
     )
 
@@ -294,29 +331,17 @@ class NewsletterTestForm(Form):
             for r in recipients
         ]
 
-    # FIXME: Stop using this function, we used it to dynamically fill
-    #        the choices, but we can already do this with `on_request`
-    #        so now this method does no longer do anything
-    @classmethod
-    def build(
-        cls,
-        newsletter: 'Newsletter',
-        request: 'OrgRequest'
-    ) -> type['Self']:
-
-        return cls
-
 
 class NewsletterSubscriberImportExportForm(Form):
 
     dry_run = BooleanField(
-        label=_("Dry Run"),
-        description=_("Do not actually import the newsletter subscribers"),
+        label=_('Dry Run'),
+        description=_('Do not actually import the newsletter subscribers'),
         default=False
     )
 
     file = UploadField(
-        label=_("Import"),
+        label=_('Import'),
         validators=[
             DataRequired(),
             WhitelistedMimeType({
@@ -340,20 +365,26 @@ class NewsletterSubscriberImportExportForm(Form):
     @property
     def headers(self) -> dict[str, str]:
         return {
-            'address': self.request.translate(_("Address")),
+            'address': self.request.translate(_('Address')),
+            'confirmed': self.request.translate(_('Confirmed')),
         }
 
     def run_export(self) -> list[dict[str, Any]]:
-        recipients = RecipientCollection(self.request.session)
+        recipients = RecipientCollection(
+            self.request.session).ordered_by_status_address()
         headers = self.headers
 
-        def get(recipient: Recipient, attribute: str) -> str:
+        def get(recipient: Recipient, attribute: str) -> str | bool:
             result = getattr(recipient, attribute, '')
-            result = result.strip()
-            return result
+            if isinstance(result, str):
+                return result.strip()
+            elif attribute == 'confirmed':
+                return bool(result)
+            else:
+                return result
 
         result = []
-        for recipient in recipients.query():
+        for recipient in recipients.all():
             result.append({
                 v: get(recipient, k)
                 for k, v in headers.items()

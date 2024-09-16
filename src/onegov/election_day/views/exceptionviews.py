@@ -32,9 +32,9 @@ def handle_forbidden(
 
     return {
         'layout': DefaultLayout(self, request),
-        'title': _("Access Denied"),
+        'title': _('Access Denied'),
         'message': _(
-            "You are trying to open a page for which you are not authorized."
+            'You are trying to open a page for which you are not authorized.'
         )
     }
 
@@ -57,8 +57,8 @@ def handle_notfound(
 
     return {
         'layout': DefaultLayout(self, request),
-        'title': _("Page not Found"),
-        'message': _("The page you are looking for could not be found."),
+        'title': _('Page not Found'),
+        'message': _('The page you are looking for could not be found.'),
     }
 
 
@@ -80,9 +80,9 @@ def handle_accepted(
 
     return {
         'layout': DefaultLayout(self, request),
-        'title': _("File not yet ready"),
+        'title': _('File not yet ready'),
         'message': _(
-            "The file you are looking for is not ready yet. "
-            "Please try again later."
+            'The file you are looking for is not ready yet. '
+            'Please try again later.'
         ),
     }

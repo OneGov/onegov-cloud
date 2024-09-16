@@ -1,12 +1,11 @@
 import requests
 from purl import URL
 
-from onegov.gis import Coordinates
-
 
 from typing import overload, ClassVar, Literal, TYPE_CHECKING
 if TYPE_CHECKING:
     from collections.abc import Collection, Iterable
+    from onegov.gis.models.coordinates import AnyCoordinates, RealCoordinates
 
 
 Endpoint = Literal['directions', 'geocoding']
@@ -34,7 +33,7 @@ class MapboxRequests:
     @overload
     def __init__(
         self,
-        access_token: str,
+        access_token: str | None,
         endpoint: Literal['geocoding'] = 'geocoding',
         profile: GeocodeProfile = 'places',
         api_version: str = 'v5'
@@ -43,7 +42,7 @@ class MapboxRequests:
     @overload
     def __init__(
         self,
-        access_token: str,
+        access_token: str | None,
         endpoint: Literal['directions'],
         profile: DirectionsProfile,
         api_version: str = 'v5'
@@ -51,7 +50,9 @@ class MapboxRequests:
 
     def __init__(
         self,
-        access_token: str,
+        # NOTE: This is technically not optional, but for testing purposes
+        #       we allow it to be optional
+        access_token: str | None,
         endpoint: Endpoint = 'geocoding',
         profile: str = 'places',
         api_version: str = 'v5'
@@ -73,8 +74,50 @@ class MapboxRequests:
     def base_url(self) -> URL:
         url = URL(
             f'{self.host}/{self.endpoint}/{self.api_version}/{self.profile}')
-        url = url.query_param('access_token', self.access_token)
+        if self.access_token is not None:
+            url = url.query_param('access_token', self.access_token)
         return url
+
+    @overload
+    def geocode(
+        self,
+        text: str | None = None,
+        street: str | None = None,
+        zip_code: str | None = None,
+        city: str | None = None,
+        # FIXME: Why is this abbreviated...
+        ctry: str | None = None,
+        locale: str | None = None,
+        as_url: Literal[False] = False
+    ) -> requests.Response: ...
+
+    @overload
+    def geocode(
+        self,
+        text: str | None = None,
+        street: str | None = None,
+        zip_code: str | None = None,
+        city: str | None = None,
+        # FIXME: Why is this abbreviated...
+        ctry: str | None = None,
+        locale: str | None = None,
+        *,
+        as_url: Literal[True]
+    ) -> URL: ...
+
+    @overload
+    def geocode(
+        self,
+        text: str | None = None,
+        street: str | None = None,
+        zip_code: str | None = None,
+        city: str | None = None,
+        # FIXME: Why is this abbreviated...
+        ctry: str | None = None,
+        locale: str | None = None,
+        *,
+        as_url: bool
+    ) -> requests.Response | URL: ...
 
     def geocode(
         self,
@@ -86,7 +129,7 @@ class MapboxRequests:
         ctry: str | None = None,
         locale: str | None = None,
         as_url: bool = False
-    ) -> requests.Response:
+    ) -> requests.Response | URL:
 
         if not ctry:
             ctry = 'Schweiz'
@@ -109,11 +152,32 @@ class MapboxRequests:
             return url
         return requests.get(url.as_string(), timeout=60)
 
+    @overload
     def directions(
         self,
-        coordinates: 'Iterable[tuple[str, str]]',
+        coordinates: 'Iterable[tuple[str | float, str | float]]',
+        as_url: Literal[False] = False
+    ) -> requests.Response: ...
+
+    @overload
+    def directions(
+        self,
+        coordinates: 'Iterable[tuple[str | float, str | float]]',
+        as_url: Literal[True]
+    ) -> URL: ...
+
+    @overload
+    def directions(
+        self,
+        coordinates: 'Iterable[tuple[str | float, str | float]]',
+        as_url: bool
+    ) -> requests.Response | URL: ...
+
+    def directions(
+        self,
+        coordinates: 'Iterable[tuple[str | float, str | float]]',
         as_url: bool = False
-    ) -> requests.Response:
+    ) -> requests.Response | URL:
         """
         coordinates: iterable of tuples of (lat, lon)
         """
@@ -126,25 +190,20 @@ class MapboxRequests:
 
 
 def outside_bbox(
-    coordinate: Coordinates | None,
-    bbox: 'Collection[Coordinates]'
+    coordinate: 'AnyCoordinates | None',
+    bbox: 'Collection[RealCoordinates] | None'
 ) -> bool:
     """Checks if the Coordinates instance is inside the bounding box defined
     by the most outward sitting points in an iterable of two+ Coordinates.
     """
     if not coordinate or not bbox:
         return False
-    if not isinstance(coordinate, Coordinates):
-        raise NotImplementedError
-    assert len(bbox) >= 2
 
-    assert coordinate.lat is not None
-    assert coordinate.lon is not None
-    # FIXME: lat/lon on Coordinates should not be optional...
-    max_lat: float = max(c.lat for c in bbox)  # type:ignore
-    min_lat: float = min(c.lat for c in bbox)  # type:ignore
-    max_lon: float = max(c.lon for c in bbox)  # type:ignore
-    min_lon: float = min(c.lon for c in bbox)  # type:ignore
+    assert len(bbox) >= 2
+    max_lat = max(c.lat for c in bbox)
+    min_lat = min(c.lat for c in bbox)
+    max_lon = max(c.lon for c in bbox)
+    min_lon = min(c.lon for c in bbox)
     return not (
         (max_lat >= coordinate.lat >= min_lat)
         and (max_lon >= coordinate.lon >= min_lon)

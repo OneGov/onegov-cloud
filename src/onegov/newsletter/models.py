@@ -1,7 +1,8 @@
 from email_validator import validate_email
 from onegov.core.crypto import random_token
 from onegov.core.orm import Base
-from onegov.core.orm.mixins import ContentMixin, TimestampMixin
+from onegov.core.orm.mixins import (
+    ContentMixin, TimestampMixin, content_property, dict_property)
 from onegov.core.orm.types import UTCDateTime, UUID
 from onegov.core.utils import normalize_for_url
 from onegov.search import SearchableContent
@@ -63,7 +64,7 @@ class Newsletter(Base, ContentMixin, TimestampMixin, SearchableContent):
     @validates('name')
     def validate_name(self, key: str, name: str) -> str:
         assert normalize_for_url(name) == name, (
-            "The given name was not normalized"
+            'The given name was not normalized'
         )
 
         return name
@@ -108,8 +109,13 @@ class Newsletter(Base, ContentMixin, TimestampMixin, SearchableContent):
             )
         ))
 
+    show_news_as_tiles: dict_property[bool] = content_property(default=True)
 
-class Recipient(Base, TimestampMixin):
+    #: categories the newsletter reports on
+    newsletter_categories: dict_property[list[str] | None] = content_property()
+
+
+class Recipient(Base, TimestampMixin, ContentMixin):
     """ Represents a single recipient.
 
     Recipients may be grouped by any kind of string. Only inside their groups
@@ -153,6 +159,10 @@ class Recipient(Base, TimestampMixin):
     #: one e-mail with a confirmation link. If they ignore said e-mail they
     #: should not get another one.
     confirmed: 'Column[bool]' = Column(Boolean, nullable=False, default=False)
+
+    #: subscribed newsletter categories. For legacy reasons, no selection
+    # means all topics are subscribed to.
+    subscribed_categories: dict_property[list[str] | None] = content_property()
 
     @declared_attr
     def __table_args__(cls) -> tuple[Index, ...]:

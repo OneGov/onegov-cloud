@@ -6,8 +6,8 @@ from typing import TYPE_CHECKING
 if TYPE_CHECKING:
     from collections.abc import Collection
     from decimal import Decimal
-    from onegov.ballot.models import ElectionCompound
-    from onegov.ballot.models import ProporzElection
+    from onegov.election_day.models import ElectionCompound
+    from onegov.election_day.models import ProporzElection
 
 
 def export_parties_internal(
@@ -136,7 +136,7 @@ def _export_parties(
             )
 
             # add the panachage results
-            if item.party_panachage_results.count():
+            if item.party_panachage_results:
                 for source in parties:
                     column = f'panachage_votes_from_{source}'
                     row[column] = result.get(source, None)

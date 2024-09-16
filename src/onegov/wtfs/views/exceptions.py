@@ -30,9 +30,9 @@ def handle_forbidden(
 
     return {
         'layout': DefaultLayout(self, request),
-        'title': _("Access Denied"),
+        'title': _('Access Denied'),
         'message': _(
-            "You are trying to open a page for which you are not authorized."
+            'You are trying to open a page for which you are not authorized.'
         )
     }
 
@@ -54,6 +54,6 @@ def handle_notfound(
 
     return {
         'layout': DefaultLayout(self, request),
-        'title': _("Page not Found"),
-        'message': _("The page you are looking for could not be found."),
+        'title': _('Page not Found'),
+        'message': _('The page you are looking for could not be found.'),
     }

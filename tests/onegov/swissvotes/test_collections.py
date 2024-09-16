@@ -1,3 +1,5 @@
+import pytest
+
 from csv import DictReader
 from datetime import date
 from datetime import datetime
@@ -11,6 +13,7 @@ from onegov.swissvotes.collections import TranslatablePageCollection
 from onegov.swissvotes.models import SwissVote
 from openpyxl import load_workbook
 from pytz import utc
+from tests.shared.utils import use_locale
 
 
 def test_pages(session):
@@ -121,7 +124,7 @@ def test_votes_default(swissvotes_app):
     assert votes.sort_order == 14
 
     votes = votes.default()
-    assert votes.page is None
+    assert votes.page == 0
     assert votes.from_date is None
     assert votes.to_date is None
     assert votes.legal_form is None
@@ -176,6 +179,17 @@ def test_votes_pagination(swissvotes_app):
     assert votes.next.previous == votes
 
 
+def test_votes_pagination_negative_page_index(swissvotes_app):
+    swissvotes = SwissVoteCollection(swissvotes_app, page=-9)
+    assert swissvotes.page == 0
+    assert swissvotes.page_index == 0
+    assert swissvotes.page_by_index(-2).page == 0
+    assert swissvotes.page_by_index(-3).page_index == 0
+
+    with pytest.raises(AssertionError):
+        SwissVoteCollection(swissvotes_app, page=None)
+
+
 def test_votes_term_filter(swissvotes_app):
     assert SwissVoteCollection(swissvotes_app).term_filter == []
     assert SwissVoteCollection(swissvotes_app, term='').term_filter == []
@@ -195,7 +209,8 @@ def test_votes_term_filter(swissvotes_app):
     c_short_title_fr = "to_tsvector('french', swissvotes.short_title_fr)"
     c_short_title_en = "to_tsvector('english', swissvotes.short_title_en)"
     c_keyword = "to_tsvector('german', swissvotes.keyword)"
-    c_initiator = "to_tsvector('german', swissvotes.initiator)"
+    c_initiator_de = "to_tsvector('german', swissvotes.initiator_de)"
+    c_initiator_fr = "to_tsvector('french', swissvotes.initiator_fr)"
     c_text_de = 'swissvotes."searchable_text_de_CH"'
     c_text_fr = 'swissvotes."searchable_text_fr_CH"'
     c_text_it = 'swissvotes."searchable_text_it_CH"'
@@ -257,7 +272,8 @@ def test_votes_term_filter(swissvotes_app):
         f"{c_short_title_fr} @@ to_tsquery('french', 'abc')",
         f"{c_short_title_en} @@ to_tsquery('english', 'abc')",
         f"{c_keyword} @@ to_tsquery('german', 'abc')",
-        f"{c_initiator} @@ to_tsquery('german', 'abc')",
+        f"{c_initiator_de} @@ to_tsquery('german', 'abc')",
+        f"{c_initiator_fr} @@ to_tsquery('french', 'abc')",
         f"{c_text_de} @@ to_tsquery('german', 'abc')",
         f"{c_text_fr} @@ to_tsquery('french', 'abc')",
         f"{c_text_it} @@ to_tsquery('italian', 'abc')",
@@ -364,7 +380,8 @@ def test_votes_query(swissvotes_app):
         short_title_fr="cette version",
         short_title_en="that version",
         keyword="Variant A of X",
-        initiator="The group that wants something",
+        initiator_de="Urheber",
+        initiator_fr="Initiant",
         _legal_form=2,
         descriptor_1_level_1=Decimal('10'),
         descriptor_1_level_2=Decimal('10.3'),
@@ -466,9 +483,9 @@ def test_votes_query(swissvotes_app):
     assert count(term='something') == 1
     assert count(term='riant') == 0
     assert count(term='A of X') == 1
-    assert count(term='group') == 0
-    assert count(term='group', full_text=True) == 1
-    assert count(term='The group that wants something', full_text=True) == 1
+    assert count(term='urheber') == 0
+    assert count(term='Urheber', full_text=True) == 1
+    assert count(term='Initiant', full_text=True) == 1
 
     # test tie-breaker
     vote_1._legal_form = 5
@@ -697,8 +714,8 @@ def test_votes_order(swissvotes_app):
     assert 'DESC' in str(votes.order_by)
     assert [vote.id for vote in votes.query()] == [3, 2, 1]
 
-    votes.app.session_manager.current_locale = 'fr_CH'
-    assert [vote.id for vote in votes.query()] == [1, 3, 2]
+    with use_locale(votes.app, 'fr_CH'):
+        assert [vote.id for vote in votes.query()] == [1, 3, 2]
 
     votes = votes.by_order(None)
     assert votes.current_sort_by == 'date'
@@ -909,7 +926,8 @@ def test_votes_export(swissvotes_app):
         keyword="Keyword",
         _legal_form=1,
         _parliamentary_initiated=1,
-        initiator="Initiator",
+        initiator_de="Initiator D",
+        initiator_fr="Initiator F",
         anneepolitique="anneepolitique",
         descriptor_1_level_1=Decimal('4'),
         descriptor_1_level_2=Decimal('4.2'),
@@ -1016,11 +1034,16 @@ def test_votes_export(swissvotes_app):
         'vcs': 9999,
         'voev': 9999,
     }
-    vote.recommendations_other_yes = "Pro Velo"
-    vote.recommendations_other_no = "Biosuisse"
-    vote.recommendations_other_free = "Pro Natura, Greenpeace"
-    vote.recommendations_other_counter_proposal = "Pro Juventute"
-    vote.recommendations_other_popular_initiative = "Pro Senectute"
+    vote.recommendations_other_yes_de = "Pro Velo D"
+    vote.recommendations_other_yes_fr = "Pro Velo F"
+    vote.recommendations_other_no_de = "Biosuisse D"
+    vote.recommendations_other_no_fr = "Biosuisse F"
+    vote.recommendations_other_free_de = "Pro Natura D, Greenpeace D"
+    vote.recommendations_other_free_fr = "Pro Natura F, Greenpeace F"
+    vote.recommendations_other_counter_proposal_de = "Pro Juventute D"
+    vote.recommendations_other_counter_proposal_fr = "Pro Juventute F"
+    vote.recommendations_other_popular_initiative_de = "Pro Senectute D"
+    vote.recommendations_other_popular_initiative_fr = "Pro Senectute F"
     vote.recommendations_divergent = {
         'bdp_ag': 1,
         'bdp_ai': 1,
@@ -1496,6 +1519,10 @@ def test_votes_export(swissvotes_app):
     vote.national_council_share_unknown = Decimal('28.20')
     vote.bfs_map_de = 'map de'
     vote.bfs_map_fr = 'map fr'
+    vote.bfs_map_en = 'map en'
+    vote.bfs_dashboard_de = "https://dashboard.de"
+    vote.bfs_dashboard_fr = "https://dashboard.fr"
+    vote.bfs_dashboard_en = "https://dashboard.en"
     vote.link_curia_vista_de = 'https://curia.vista/de'
     vote.link_curia_vista_fr = 'https://curia.vista/fr'
     vote.link_easyvote_de = 'https://easy.vote/de'
@@ -1513,6 +1540,18 @@ def test_votes_export(swissvotes_app):
     vote.link_federal_office_de = 'https://federal.office/de'
     vote.link_federal_office_fr = 'https://federal.office/fr'
     vote.link_federal_office_en = 'https://federal.office/en'
+    vote.link_campaign_yes_1_de = 'https://yes1.de'
+    vote.link_campaign_yes_2_de = 'https://yes2.de'
+    vote.link_campaign_yes_3_de = 'https://yes3.de'
+    vote.link_campaign_no_1_de = 'https://no1.de'
+    vote.link_campaign_no_2_de = 'https://no2.de'
+    vote.link_campaign_no_3_de = 'https://no3.de'
+    vote.link_campaign_yes_1_fr = 'https://yes1.fr'
+    vote.link_campaign_yes_2_fr = 'https://yes2.fr'
+    vote.link_campaign_yes_3_fr = 'https://yes3.fr'
+    vote.link_campaign_no_1_fr = 'https://no1.fr'
+    vote.link_campaign_no_2_fr = 'https://no2.fr'
+    vote.link_campaign_no_3_fr = 'https://no3.fr'
     vote.posters_mfg_yea = (
         'https://museum.ch/objects/1 '
         'https://museum.ch/objects/2'
@@ -1536,6 +1575,14 @@ def test_votes_export(swissvotes_app):
     vote.media_ads_yea_p = Decimal('10.06')
     vote.media_coverage_articles_total = 1007
     vote.media_coverage_tonality_total = Decimal('10.10')
+    vote.campaign_finances_yea_total = 10000
+    vote.campaign_finances_nay_total = 20000
+    vote.campaign_finances_yea_donors_de = 'Donor 1 D, Donor 2 D'
+    vote.campaign_finances_yea_donors_fr = 'Donor 1 F, Donor 2 F'
+    vote.campaign_finances_nay_donors_de = 'Donor D'
+    vote.campaign_finances_nay_donors_fr = 'Donor F'
+    vote.campaign_finances_link_de = 'https://finances.de'
+    vote.campaign_finances_link_fr = 'https://finances.fr'
 
     votes.session.flush()
     votes.session.expire_all()
@@ -1676,11 +1723,16 @@ def test_votes_export(swissvotes_app):
         'p-tcs': '9999',
         'p-vcs': '9999',
         'p-voev': '9999',
-        'p-others_yes': 'Pro Velo',
-        'p-others_no': 'Biosuisse',
-        'p-others_free': 'Pro Natura, Greenpeace',
-        'p-others_counterp': 'Pro Juventute',
-        'p-others_init': 'Pro Senectute',
+        'p-others_yes': 'Pro Velo D',
+        'p-others_yes-fr': 'Pro Velo F',
+        'p-others_no': 'Biosuisse D',
+        'p-others_no-fr': 'Biosuisse F',
+        'p-others_free': 'Pro Natura D, Greenpeace D',
+        'p-others_free-fr': 'Pro Natura F, Greenpeace F',
+        'p-others_counterp': 'Pro Juventute D',
+        'p-others_counterp-fr': 'Pro Juventute F',
+        'p-others_init': 'Pro Senectute D',
+        'p-others_init-fr': 'Pro Senectute F',
         'pdev-bdp_AG': '1',
         'pdev-bdp_AI': '1',
         'pdev-bdp_AR': '1',
@@ -2152,10 +2204,15 @@ def test_votes_export(swissvotes_app):
         'freigabe-summe': '27,2',
         'neutral-summe': '24,2',
         'unbekannt-summe': '28,2',
-        'urheber': 'Initiator',
+        'urheber': 'Initiator D',
+        'urheber-fr': 'Initiator F',
         'anneepolitique': 'anneepolitique',
         'bfsmap-de': 'map de',
         'bfsmap-fr': 'map fr',
+        'bfsmap-en': 'map en',
+        'bfsdash-de': 'https://dashboard.de',
+        'bfsdash-fr': 'https://dashboard.fr',
+        'bfsdash-en': 'https://dashboard.en',
         'poster_ja_mfg': (
             'https://museum.ch/objects/1 '
             'https://museum.ch/objects/2'
@@ -2179,6 +2236,26 @@ def test_votes_export(swissvotes_app):
         'inserate-jaanteil': '10,06',
         'mediares-tot': '1007',
         'mediaton-tot': '10,1',
+        'web-yes-1-de': 'https://yes1.de',
+        'web-yes-2-de': 'https://yes2.de',
+        'web-yes-3-de': 'https://yes3.de',
+        'web-no-1-de': 'https://no1.de',
+        'web-no-2-de': 'https://no2.de',
+        'web-no-3-de': 'https://no3.de',
+        'web-yes-1-fr': 'https://yes1.fr',
+        'web-yes-2-fr': 'https://yes2.fr',
+        'web-yes-3-fr': 'https://yes3.fr',
+        'web-no-1-fr': 'https://no1.fr',
+        'web-no-2-fr': 'https://no2.fr',
+        'web-no-3-fr': 'https://no3.fr',
+        'finanz-ja-tot': '10000',
+        'finanz-nein-tot': '20000',
+        'finanz-ja-gr-de': 'Donor 1 D, Donor 2 D',
+        'finanz-ja-gr-fr': 'Donor 1 F, Donor 2 F',
+        'finanz-nein-gr-de': 'Donor D',
+        'finanz-nein-gr-fr': 'Donor F',
+        'finanz-link-de': 'https://finances.de',
+        'finanz-link-fr': 'https://finances.fr',
     }
     assert csv == expected
 
@@ -2305,7 +2382,6 @@ def test_votes_export(swissvotes_app):
         'p-sgb': 3.0,
         'p-travs': 3.0,
         'p-vsa': 9999.0,
-        'p-vsa': 9999.0,
         'p-vpod': 9999.0,
         'p-ssv': 9999.0,
         'p-gem': 9999.0,
@@ -2324,11 +2400,16 @@ def test_votes_export(swissvotes_app):
         'p-tcs': 9999.0,
         'p-vcs': 9999.0,
         'p-voev': 9999.0,
-        'p-others_yes': 'Pro Velo',
-        'p-others_no': 'Biosuisse',
-        'p-others_free': 'Pro Natura, Greenpeace',
-        'p-others_counterp': 'Pro Juventute',
-        'p-others_init': 'Pro Senectute',
+        'p-others_yes': 'Pro Velo D',
+        'p-others_yes-fr': 'Pro Velo F',
+        'p-others_no': 'Biosuisse D',
+        'p-others_no-fr': 'Biosuisse F',
+        'p-others_free': 'Pro Natura D, Greenpeace D',
+        'p-others_free-fr': 'Pro Natura F, Greenpeace F',
+        'p-others_counterp': 'Pro Juventute D',
+        'p-others_counterp-fr': 'Pro Juventute F',
+        'p-others_init': 'Pro Senectute D',
+        'p-others_init-fr': 'Pro Senectute F',
         'pdev-bdp_AG': 1.0,
         'pdev-bdp_AI': 1.0,
         'pdev-bdp_AR': 1.0,
@@ -2800,10 +2881,15 @@ def test_votes_export(swissvotes_app):
         'freigabe-summe': 27.2,
         'neutral-summe': 24.2,
         'unbekannt-summe': 28.2,
-        'urheber': 'Initiator',
+        'urheber': 'Initiator D',
+        'urheber-fr': 'Initiator F',
         'anneepolitique': 'anneepolitique',
         'bfsmap-de': 'map de',
         'bfsmap-fr': 'map fr',
+        'bfsmap-en': 'map en',
+        'bfsdash-de': 'https://dashboard.de',
+        'bfsdash-fr': 'https://dashboard.fr',
+        'bfsdash-en': 'https://dashboard.en',
         'poster_ja_mfg': (
             'https://museum.ch/objects/1 '
             'https://museum.ch/objects/2'
@@ -2827,6 +2913,26 @@ def test_votes_export(swissvotes_app):
         'inserate-jaanteil': 10.06,
         'mediares-tot': 1007,
         'mediaton-tot': 10.10,
+        'web-yes-1-de': 'https://yes1.de',
+        'web-yes-2-de': 'https://yes2.de',
+        'web-yes-3-de': 'https://yes3.de',
+        'web-no-1-de': 'https://no1.de',
+        'web-no-2-de': 'https://no2.de',
+        'web-no-3-de': 'https://no3.de',
+        'web-yes-1-fr': 'https://yes1.fr',
+        'web-yes-2-fr': 'https://yes2.fr',
+        'web-yes-3-fr': 'https://yes3.fr',
+        'web-no-1-fr': 'https://no1.fr',
+        'web-no-2-fr': 'https://no2.fr',
+        'web-no-3-fr': 'https://no3.fr',
+        'finanz-ja-tot': 10000,
+        'finanz-nein-tot': 20000,
+        'finanz-ja-gr-de': 'Donor 1 D, Donor 2 D',
+        'finanz-ja-gr-fr': 'Donor 1 F, Donor 2 F',
+        'finanz-nein-gr-de': 'Donor D',
+        'finanz-nein-gr-fr': 'Donor F',
+        'finanz-link-de': 'https://finances.de',
+        'finanz-link-fr': 'https://finances.fr',
     }
     assert xlsx == expected
 

@@ -1,6 +1,8 @@
 import psycopg2
 
+from markupsafe import escape, Markup
 from onegov.core.orm.cache import orm_cached
+from onegov.core.orm.observer import observes
 from onegov.core.orm.session_manager import SessionManager, query_schemas
 from onegov.core.orm.sql import as_selectable, as_selectable_from_path
 from sqlalchemy import event, inspect
@@ -15,7 +17,9 @@ from sqlalchemy.exc import InterfaceError, OperationalError
 from typing import overload, Any, ClassVar, TypeVar, TYPE_CHECKING
 if TYPE_CHECKING:
     from collections.abc import Callable, Iterator
-    from typing_extensions import Self
+    from sqlalchemy import Column
+    from sqlalchemy_utils.i18n import _TranslatableColumn
+    from typing import Self
 
 _T = TypeVar('_T')
 
@@ -66,7 +70,7 @@ class ModelBase:
         mapper = inspect(cls).polymorphic_map.get(identity_value)
 
         if default is MISSING:
-            assert mapper, "No such polymorphic_identity: {}".format(
+            assert mapper, 'No such polymorphic_identity: {}'.format(
                 identity_value
             )
 
@@ -94,6 +98,62 @@ translation_hybrid = TranslationHybrid(
 )
 
 
+class TranslationMarkupHybrid(TranslationHybrid):
+    """ A TranslationHybrid that stores `markupsafe.Markup`. """
+
+    def getter_factory(
+        self,
+        attr: '_TranslatableColumn'
+    ) -> 'Callable[[object], Markup | None]':
+
+        original_getter = super().getter_factory(attr)
+
+        def getter(obj: object) -> Markup | None:
+            value = original_getter(obj)
+            if value is self.default_value and isinstance(value, str):
+                # NOTE: The default may be a plain string so we need
+                #       to escape it
+                return escape(self.default_value)
+            # NOTE: Need to wrap in Markup, we may consider sanitizing
+            #       this in the future, to guard against stored values
+            #       that somehow bypassed the sanitization, but this will
+            #       be expensive
+            return Markup(value)  # noqa: MS001
+
+        return getter
+
+    def setter_factory(
+        self,
+        attr: '_TranslatableColumn'
+    ) -> 'Callable[[object, str | None], None]':
+
+        original_setter = super().setter_factory(attr)
+
+        def setter(obj: object, value: str | None) -> None:
+            if value is not None:
+                value = escape(value)
+            original_setter(obj, value)
+
+        return setter
+
+    if TYPE_CHECKING:
+        # FIXME: In SQLAlchemy 2.0 this should return a hybrid_property
+        def __call__(  # type: ignore[override]
+            self,
+            attr: _TranslatableColumn
+        ) -> Column[Markup | None]:
+            pass
+
+
+#: A translation markup hybrid integrated with OneGov Core.
+translation_markup_hybrid = TranslationMarkupHybrid(
+    current_locale=lambda:
+        SessionManager.get_active().current_locale,  # type:ignore
+    default_locale=lambda:
+        SessionManager.get_active().default_locale,  # type:ignore
+)
+
+
 def find_models(
     base: type[_T],
     is_match: 'Callable[[type[_T]], bool]'
@@ -114,8 +174,7 @@ def find_models(
         if is_match(cls):
             yield cls
 
-        for subcls in find_models(cls, is_match):
-            yield subcls
+        yield from find_models(cls, is_match)
 
 
 def configure_listener(
@@ -160,6 +219,7 @@ __all__ = [
     'as_selectable_from_path',
     'translation_hybrid',
     'find_models',
+    'observes',
     'orm_cached',
     'query_schemas'
 ]

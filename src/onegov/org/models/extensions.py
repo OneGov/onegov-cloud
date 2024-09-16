@@ -1,41 +1,57 @@
-from collections import OrderedDict
+import re
 
+import json
+from collections import OrderedDict
+from functools import cached_property
+
+from onegov.core.orm.abstract import MoveDirection
 from onegov.core.orm.mixins import (
-    content_property, dict_property, meta_property)
+    content_property, dict_property, meta_property, UTCPublicationMixin)
 from onegov.core.utils import normalize_for_url, to_html_ul
+from onegov.form.utils import remove_empty_links
+from onegov.file import File, FileCollection
 from onegov.form import FieldDependency, WTFormsClassBuilder
+from onegov.form.fields import ChosenSelectField
 from onegov.gis import CoordinatesMixin
 from onegov.org import _
 from onegov.org.forms import ResourceForm
 from onegov.org.forms.extensions import CoordinatesFormExtension
 from onegov.org.forms.extensions import PublicationFormExtension
 from onegov.org.forms.fields import UploadOrSelectExistingMultipleFilesField
+from onegov.org.observer import observes
+from onegov.page import Page, PageCollection
 from onegov.people import Person, PersonCollection
 from onegov.reservation import Resource
-from sedate import to_timezone, utcnow
+from sqlalchemy import inspect
+from sqlalchemy.ext.declarative import declared_attr
 from sqlalchemy.orm import object_session
+from urlextract import URLExtract
 from wtforms.fields import BooleanField
 from wtforms.fields import RadioField
 from wtforms.fields import StringField
 from wtforms.fields import TextAreaField
-from wtforms.validators import ValidationError
+from wtforms.validators import InputRequired, ValidationError
 
 
-from typing import Any, TypeVar, TYPE_CHECKING
+from typing import Any, ClassVar, TypeVar, TYPE_CHECKING
 if TYPE_CHECKING:
-    from collections.abc import Iterable, Iterator
-    from onegov.form.types import _FormT
+    from collections.abc import Iterable, Iterator, Sequence
+    from datetime import datetime
+    from markupsafe import Markup
+    from onegov.form.types import FormT
+    from onegov.org.models import GeneralFile  # noqa: F401
     from onegov.org.request import OrgRequest
     from sqlalchemy import Column
+    from sqlalchemy.orm import relationship
     from typing import type_check_only, Protocol
     from wtforms import Field
 
     class SupportsExtendForm(Protocol):
         def extend_form(
             self,
-            form_class: type[_FormT],
+            form_class: type[FormT],
             request: OrgRequest
-        ) -> type[_FormT]: ...
+        ) -> type[FormT]: ...
 
     _ExtendedWithPersonLinkT = TypeVar(
         '_ExtendedWithPersonLinkT',
@@ -66,10 +82,10 @@ class ContentExtension:
 
     def with_content_extensions(
         self,
-        form_class: type['_FormT'],
+        form_class: type['FormT'],
         request: 'OrgRequest',
         extensions: 'Iterable[type[SupportsExtendForm]] | None' = None
-    ) -> type['_FormT']:
+    ) -> type['FormT']:
         """ Takes the given form and request and extends the form with
         all content extensions in the order in which they occur in the base
         class list.
@@ -87,9 +103,9 @@ class ContentExtension:
 
     def extend_form(
         self,
-        form_class: type['_FormT'],
+        form_class: type['FormT'],
         request: 'OrgRequest'
-    ) -> type['_FormT']:
+    ) -> type['FormT']:
         """ Must be implemented by each ContentExtension. Takes the form
         class without extension and adds the required fields to it.
 
@@ -120,33 +136,33 @@ class AccessExtension(ContentExtension):
 
     def extend_form(
         self,
-        form_class: type['_FormT'],
+        form_class: type['FormT'],
         request: 'OrgRequest'
-    ) -> type['_FormT']:
+    ) -> type['FormT']:
 
         access_choices = [
-            ('public', _("Public")),
-            ('secret', _("Through URL only (not listed)")),
-            ('private', _("Only by privileged users")),
-            ('member', _("Only by privileged users and members")),
+            ('public', _('Public')),
+            ('secret', _('Through URL only (not listed)')),
+            ('private', _('Only by privileged users')),
+            ('member', _('Only by privileged users and members')),
         ]
 
         if request.app.can_deliver_sms:
             # allowing mtan restricted models makes only sense
             # if we can deliver SMS
             access_choices.append(('mtan', _(
-                "Only by privileged users or after submitting a mTAN"
+                'Only by privileged users or after submitting a mTAN'
             )))
             access_choices.append(('secret_mtan', _(
-                "Through URL only after submitting a mTAN (not listed)"
+                'Through URL only after submitting a mTAN (not listed)'
             )))
 
-        fields: dict[str, 'Field'] = {
+        fields: dict[str, Field] = {
             'access': RadioField(
-                label=_("Access"),
+                label=_('Access'),
                 choices=access_choices,
                 default='public',
-                fieldset=_("Security")
+                fieldset=_('Security')
             )
         }
 
@@ -155,16 +171,16 @@ class AccessExtension(ContentExtension):
         #        not a better place for it...
         if issubclass(form_class, ResourceForm):
             fields['occupancy_is_visible_to_members'] = BooleanField(
-                label=_("Members may view occupancy"),
+                label=_('Members may view occupancy'),
                 description=_(
-                    "The occupancy view shows the e-mail addresses "
-                    "submitted with the reservations, so we only "
-                    "recommend enabling this for internal resources "
-                    "unless all members are sworn to uphold data privacy."
+                    'The occupancy view shows the e-mail addresses '
+                    'submitted with the reservations, so we only '
+                    'recommend enabling this for internal resources '
+                    'unless all members are sworn to uphold data privacy.'
                 ),
                 default=None,
                 depends_on=('access', '!private'),
-                fieldset=_("Security")
+                fieldset=_('Security')
             )
 
         return type('AccessForm', (form_class, ), fields)
@@ -178,9 +194,9 @@ class CoordinatesExtension(ContentExtension, CoordinatesMixin):
 
     def extend_form(
         self,
-        form_class: type['_FormT'],
+        form_class: type['FormT'],
         request: 'OrgRequest'
-    ) -> type['_FormT']:
+    ) -> type['FormT']:
         return CoordinatesFormExtension(form_class).create()
 
 
@@ -194,9 +210,9 @@ class VisibleOnHomepageExtension(ContentExtension):
 
     def extend_form(
         self,
-        form_class: type['_FormT'],
+        form_class: type['FormT'],
         request: 'OrgRequest'
-    ) -> type['_FormT']:
+    ) -> type['FormT']:
 
         # do not show on root pages
         if self.parent_id is None:  # type:ignore[attr-defined]
@@ -205,42 +221,46 @@ class VisibleOnHomepageExtension(ContentExtension):
         class VisibleOnHomepageForm(form_class):  # type:ignore
             # pass label by keyword to give the News model access
             is_visible_on_homepage = BooleanField(
-                label=_("Visible on homepage"),
-                fieldset=_("Visibility"))
+                label=_('Visible on homepage'),
+                fieldset=_('Visibility'))
 
         return VisibleOnHomepageForm
 
 
-class ContactExtension(ContentExtension):
-    """ Extends any class that has a content dictionary field with a simple
-    contacts field.
+class ContactExtensionBase:
+    """ Common base class for extensions that add a contact field.
 
     """
 
     contact: dict_property[str | None] = content_property()
 
-    # FIXME: This setter assumes the value can't be None, which it can
     @contact.setter  # type:ignore[no-redef]
     def contact(self, value: str | None) -> None:
-        assert value is not None
-        self.content['contact'] = value
-        self.content['contact_html'] = to_html_ul(
-            value, convert_dashes=True, with_title=True)
+        self.content['contact'] = value  # type:ignore[attr-defined]
+        # update cache
+        self.__dict__['contact_html'] = to_html_ul(
+            self.contact, convert_dashes=True, with_title=True
+        ) if self.contact is not None else None
 
-    @property
-    def contact_html(self) -> str | None:
-        return self.content.get('contact_html')
+    @cached_property
+    def contact_html(self) -> 'Markup | None':
+        if self.contact is None:
+            return None
+        return to_html_ul(self.contact, convert_dashes=True, with_title=True)
+
+    def get_contact_html(self, request: 'OrgRequest') -> 'Markup | None':
+        return self.contact_html
 
     def extend_form(
         self,
-        form_class: type['_FormT'],
+        form_class: type['FormT'],
         request: 'OrgRequest'
-    ) -> type['_FormT']:
+    ) -> type['FormT']:
 
         class ContactPageForm(form_class):  # type:ignore
             contact = TextAreaField(
-                label=_("Address"),
-                fieldset=_("Contact"),
+                label=_('Address'),
+                fieldset=_('Contact'),
                 render_kw={'rows': 5},
                 description=_("- '-' will be converted to a bulleted list\n"
                               "- Urls will be transformed into links\n"
@@ -248,6 +268,79 @@ class ContactExtension(ContentExtension):
             )
 
         return ContactPageForm
+
+
+class ContactExtension(ContactExtensionBase, ContentExtension):
+    """ Extends any class that has a content dictionary field with a simple
+    contacts field.
+
+    """
+
+
+class InheritableContactExtension(ContactExtensionBase, ContentExtension):
+    """ Extends any class that has a content dictionary field with a simple
+    contacts field, that can optionally be inherited from another topic.
+
+    """
+
+    inherit_contact: dict_property[bool] = content_property(default=False)
+    contact_inherited_from: dict_property[int | None] = content_property()
+
+    # TODO: If we end up calling this more than once per request
+    #       we may want to cache this
+    def get_contact_html(self, request: 'OrgRequest') -> 'Markup | None':
+        if self.inherit_contact:
+            if self.contact_inherited_from is None:
+                return None
+
+            pages = PageCollection(request.session)
+            page = pages.by_id(self.contact_inherited_from)
+            return getattr(page, 'contact_html', None)
+
+        return self.contact_html
+
+    def extend_form(
+        self,
+        form_class: type['FormT'],
+        request: 'OrgRequest'
+    ) -> type['FormT']:
+
+        query = PageCollection(request.session).query()
+        query = query.filter(Page.type == 'topic')
+        query = query.filter(Page.content['contact'].isnot(None))
+        if isinstance(self, Page):
+            # avoid circular reference
+            query = query.filter(Page.id != self.id)
+        query = query.order_by(Page.title)
+
+        class InheritableContactPageForm(form_class):  # type:ignore
+
+            contact = TextAreaField(
+                label=_('Address'),
+                fieldset=_('Contact'),
+                render_kw={'rows': 5},
+                description=_("- '-' will be converted to a bulleted list\n"
+                              "- Urls will be transformed into links\n"
+                              "- Emails and phone numbers as well"),
+                depends_on=('inherit_contact', '!y')
+            )
+
+            inherit_contact = BooleanField(
+                label=_('Inherit address from another topic'),
+                fieldset=_('Contact'),
+                default=False
+            )
+
+            contact_inherited_from = ChosenSelectField(
+                label=_('Topic to inherit from'),
+                fieldset=_('Contact'),
+                coerce=int,
+                choices=query.with_entities(Page.id, Page.title).all(),
+                depends_on=('inherit_contact', 'y'),
+                validators=[InputRequired()]
+            )
+
+        return InheritableContactPageForm
 
 
 class ContactHiddenOnPageExtension(ContentExtension):
@@ -260,16 +353,47 @@ class ContactHiddenOnPageExtension(ContentExtension):
 
     def extend_form(
         self,
-        form_class: type['_FormT'],
+        form_class: type['FormT'],
         request: 'OrgRequest'
-    ) -> type['_FormT']:
+    ) -> type['FormT']:
 
         class ContactHiddenOnPageForm(form_class):  # type:ignore
             hide_contact = BooleanField(
-                label=_("Hide contact info in sidebar"),
-                fieldset=_("Contact"))
+                label=_('Hide contact info in sidebar'),
+                fieldset=_('Contact'))
 
         return ContactHiddenOnPageForm
+
+
+class PeopleShownOnMainPageExtension(ContentExtension):
+    """ Extends any class that has a content dictionary field with a simple
+    contacts field where people will be shown on bottom of main page.
+
+    Note: Feature limited to org and town6
+    """
+
+    show_people_on_main_page: dict_property[bool] = (
+        meta_property(default=False))
+
+    def extend_form(
+        self,
+        form_class: type['FormT'],
+        request: 'OrgRequest'
+    ) -> type['FormT']:
+
+        class PeopleShownOnMainPageForm(form_class):  # type:ignore
+            show_people_on_main_page = BooleanField(
+                label=_('Show people on bottom of main page (instead of '
+                        'sidebar)'),
+                fieldset=_('People'))
+
+        from onegov.org.request import OrgRequest
+        # not using isinstance as e.g. FeriennetRequest inherits from
+        # OrgRequest
+        if type(request) is OrgRequest:
+            return PeopleShownOnMainPageForm
+
+        return form_class
 
 
 class NewsletterExtension(ContentExtension):
@@ -277,9 +401,9 @@ class NewsletterExtension(ContentExtension):
 
     def extend_form(
         self,
-        form_class: type['_FormT'],
+        form_class: type['FormT'],
         request: 'OrgRequest'
-    ) -> type['_FormT']:
+    ) -> type['FormT']:
 
         class NewsletterSettingsForm(form_class):  # type:ignore
             text_in_newsletter = BooleanField(
@@ -328,7 +452,7 @@ class PersonLinkExtension(ContentExtension):
 
         result = []
 
-        person: 'PersonWithFunction'
+        person: PersonWithFunction
         for person in query.all():  # type:ignore[assignment]
             function, show_function = people[person.id.hex]
             person.context_specific_function = function
@@ -358,7 +482,7 @@ class PersonLinkExtension(ContentExtension):
         self,
         subject: str,
         target: str,
-        direction: str
+        direction: MoveDirection
     ) -> None:
         """ Moves the subject below or above the target.
 
@@ -369,10 +493,9 @@ class PersonLinkExtension(ContentExtension):
             The key of the person above or below which the subject is moved.
 
         :direction:
-            The direction relative to the target. Either 'above' or 'below'.
+            The direction relative to the target.
 
         """
-        assert direction in ('above', 'below')
         assert subject != target
         assert self.content.get('people')
 
@@ -387,12 +510,12 @@ class PersonLinkExtension(ContentExtension):
                 if person == subject:
                     continue
 
-                if person == target and direction == 'above':
+                if person == target and direction is MoveDirection.above:
                     yield subject, (subject_function, show_subject_function)
                     yield target, (target_function, show_target_function)
                     continue
 
-                if person == target and direction == 'below':
+                if person == target and direction is MoveDirection.below:
                     yield target, (target_function, show_target_function)
                     yield subject, (subject_function, show_subject_function)
                     continue
@@ -403,13 +526,13 @@ class PersonLinkExtension(ContentExtension):
 
     def extend_form(
         self: '_ExtendedWithPersonLinkT',
-        form_class: type['_FormT'],
+        form_class: type['FormT'],
         request: 'OrgRequest'
-    ) -> type['_FormT']:
+    ) -> type['FormT']:
 
         # XXX this is kind of implicitly set by the builder
         fieldset_id = 'people'
-        fieldset_label = _("People")
+        fieldset_label = _('People')
 
         class PeoplePageForm(form_class):  # type:ignore
 
@@ -500,10 +623,7 @@ class PersonLinkExtension(ContentExtension):
                     # if the people are not ordered we keep the order of the
                     # existing list and add the new people at the end
                     existing = set()
-                    selected = {
-                        key: (func, show_fun) for key, (func, show_fun)
-                        in self.get_people_and_function()
-                    }
+                    selected = dict(self.get_people_and_function())
 
                     old_people_d = {}
                     new_people = []
@@ -547,9 +667,9 @@ class PersonLinkExtension(ContentExtension):
             builder.add_field(
                 field_class=BooleanField,
                 field_id='western_ordered',
-                label=_("Use Western ordered names"),
-                description=_("For instance Franz Müller instead of Müller "
-                              "Franz"),
+                label=_('Use Western ordered names'),
+                description=_('For instance Franz Müller instead of Müller '
+                              'Franz'),
                 required=False,
                 default=self.western_name_order,
             )
@@ -567,7 +687,7 @@ class PersonLinkExtension(ContentExtension):
             builder.add_field(
                 field_class=StringField,
                 field_id=field_id + '_function',
-                label=request.translate(_("Function")),
+                label=request.translate(_('Function')),
                 required=False,
                 dependency=FieldDependency(field_id, 'y'),
                 default=getattr(person, 'function', None),
@@ -578,7 +698,7 @@ class PersonLinkExtension(ContentExtension):
                 field_id=field_id + '_is_visible_function',
                 label=request.translate(
                     _(
-                        "List this function in the page of ${name}",
+                        'List this function in the page of ${name}',
                         mapping={'name': name},
                     )
                 ),
@@ -595,9 +715,9 @@ class ResourceValidationExtension(ContentExtension):
 
     def extend_form(
         self,
-        form_class: type['_FormT'],
+        form_class: type['FormT'],
         request: 'OrgRequest'
-    ) -> type['_FormT']:
+    ) -> type['FormT']:
 
         class WithResourceValidation(form_class):  # type:ignore
 
@@ -608,7 +728,7 @@ class ResourceValidationExtension(ContentExtension):
                 )
                 if existing and not self.model == existing:
                     raise ValidationError(
-                        _("A resource with this name already exists")
+                        _('A resource with this name already exists')
                     )
 
         return WithResourceValidation
@@ -618,9 +738,9 @@ class PublicationExtension(ContentExtension):
 
     def extend_form(
         self,
-        form_class: type['_FormT'],
+        form_class: type['FormT'],
         request: 'OrgRequest'
-    ) -> type['_FormT']:
+    ) -> type['FormT']:
         return PublicationFormExtension(form_class).create()
 
 
@@ -630,9 +750,9 @@ class HoneyPotExtension(ContentExtension):
 
     def extend_form(
         self,
-        form_class: type['_FormT'],
+        form_class: type['FormT'],
         request: 'OrgRequest'
-    ) -> type['_FormT']:
+    ) -> type['FormT']:
 
         class HoneyPotForm(form_class):  # type:ignore
 
@@ -653,14 +773,14 @@ class ImageExtension(ContentExtension):
 
     def extend_form(
         self,
-        form_class: type['_FormT'],
+        form_class: type['FormT'],
         request: 'OrgRequest'
-    ) -> type['_FormT']:
+    ) -> type['FormT']:
 
         class PageImageForm(form_class):  # type:ignore
             # pass label by keyword to give the News model access
             page_image = StringField(
-                label=_("Image"),
+                label=_('Image'),
                 render_kw={'class_': 'image-url'}
             )
 
@@ -675,70 +795,312 @@ class ImageExtension(ContentExtension):
             )
 
             position_choices = [
-                ('in_content', _("As first element of the content")),
-                ('header', _("As a full width header")),
+                ('in_content', _('As first element of the content')),
+                ('header', _('As a full width header')),
             ]
 
         return PageImageForm
+
+
+# FIXME: This is a bit of a hack because we don't have easy access to the
+#        current request inside @observes methods, so we just assume any
+#        urls that end with /storage/[0-9a-f]{64} are links to *our* files
+FILE_URL_RE = re.compile(r'/storage/([0-9a-f]{64})$')
+
+
+def _files_observer(
+    self: 'GeneralFileLinkExtension',
+    files: list[File],
+    meta: set[str],
+    publication_start: 'datetime | None' = None,
+    publication_end: 'datetime | None' = None
+) -> None:
+    # mainly we want to observe changes to the linked files
+    # but when the publication or access changes we may need
+    # to change the access we propagated to the linked files
+    # so we're observing those attributes too
+
+    key = str(self.id)
+
+    # remove ourselves if the link has been deleted
+    state = inspect(self)
+    for file in state.attrs.files.history.deleted:
+        if key in file.meta.get('linked_accesses', ()):
+            del file.linked_accesses[key]
+
+    # we could try to determine which accesses if any need to
+    # be updated using the SQLAlchemy inspect API, but it's
+    # probably faster to just update all the files.
+    published = getattr(self, 'published', True)
+    current_access = self.access if published else 'private'
+    for file in files:
+        if file.meta.get('linked_accesses', {}).get(key) != current_access:
+            # only trigger a DB update when necessary
+            file.meta.setdefault('linked_accesses', {})[key] = current_access
+
+
+def _content_file_link_observer(
+    self: 'GeneralFileLinkExtension',
+    content: set[str]
+) -> None:
+    # we don't automatically unlink files removed from the text to keep
+    # things simple, otherwise we would also have to parse the text
+    # prior to the change and compare the list of file ids to figure
+    # out which ones have been removed, and even then it's not obvious
+    # that the file was intended to be removed from the listing on the
+    # side of the page, it's better to make that step explicit
+    changed = self.content_fields_containing_links_to_files.intersection(
+        content or ()
+    )
+    if not changed:
+        return
+
+    extractor = URLExtract()
+    file_ids = [
+        match.group(1)
+        for changed_name in changed
+        if (text := self.content.get(changed_name))
+        for url in extractor.find_urls(text, only_unique=True)
+        if (match := FILE_URL_RE.search(url))
+    ]
+    if not file_ids:
+        return
+
+    # HACK: On insert the id may have not been generated yet, so we need
+    #       to generate it now, this assumes that the default argument
+    #       provided is a single callable without a context argument
+    if self.id is None:
+        # for now we assume all of our default callables don't require
+        # the execution context
+        self.id = type(self).id.default.arg(None)
+
+    key = str(self.id)
+    session = object_session(self)
+    collection = FileCollection['GeneralFile'](session, type='general')
+    files = collection.query().filter(File.id.in_(file_ids))
+    published = getattr(self, 'published', True)
+    current_access = self.access if published else 'private'
+    for file in files:
+        # we may do this redundantly for some files if both observers
+        # trigger, but it's easier to take the hit than to try to
+        # figure out whether or not both observers triggered and in
+        # which order
+        if file.meta.get('linked_accesses', {}).get(key) != current_access:
+            # only trigger a DB update when necessary
+            file.meta.setdefault('linked_accesses', {})[key] = current_access
+
+        # link any files that haven't already been linked
+        if file not in self.files:
+            self.files.append(file)
 
 
 class GeneralFileLinkExtension(ContentExtension):
     """ Extends any class that has a files relationship to reference files from
     :class:`onegov.org.models.file.GeneralFileCollection`.
 
+    Additionally any files linked within the object's content will be added to
+    the explicit list of linked files and access is propagated from the owner
+    of the link to the file.
     """
+
+    content_fields_containing_links_to_files: ClassVar[set[str]] = {'text'}
+
+    show_file_links_in_sidebar: dict_property[bool] = (
+        meta_property(default=True))
+
+    if TYPE_CHECKING:
+        # forward declare required attributes
+        id: Any
+        files: relationship[list[File]]
+        access: dict_property[str]
+
+        def files_observer(
+            self,
+            files: list[File],
+            meta: set[str],
+            publication_start: datetime | None,
+            publication_end: datetime | None
+        ) -> None: ...
+
+        def content_file_link_observer(self, content: set[str]) -> None: ...
+    else:
+        # in order for observes to trigger we need to use declared_attr
+        @declared_attr
+        def files_observer(cls):
+            if issubclass(cls, UTCPublicationMixin):
+                return observes(
+                    'files', 'meta', 'publication_start', 'publication_end'
+                )(_files_observer)
+
+            # we can't observe the publication if it doesn't exist
+            return observes('files', 'meta')(_files_observer)
+
+        @declared_attr
+        def content_file_link_observer(cls):
+            return observes('content')(_content_file_link_observer)
 
     def extend_form(
         self,
-        form_class: type['_FormT'],
+        form_class: type['FormT'],
         request: 'OrgRequest'
-    ) -> type['_FormT']:
+    ) -> type['FormT']:
 
         class GeneralFileForm(form_class):  # type:ignore
             files = UploadOrSelectExistingMultipleFilesField(
-                label=_("Documents"),
+                label=_('Documents'),
+                fieldset=_('Documents')
             )
+
+            def populate_obj(self, obj: 'GeneralFileLinkExtension',
+                             *args: Any, **kwargs: Any) -> None:
+                super().populate_obj(obj, *args, **kwargs)
+
+                for field_name in obj.content_fields_containing_links_to_files:
+                    if field_name in self:
+                        if self[field_name].data == self[
+                            field_name
+                        ].object_data:
+                            continue
+
+                        if (
+                            (text := obj.content.get(field_name))
+                            and (cleaned_text := remove_empty_links(
+                                text)) != text
+                        ):
+                            obj.content[field_name] = cleaned_text
+
+            show_file_links_in_sidebar = BooleanField(
+                label=_('Show file links in sidebar'),
+                fieldset=_('Documents'),
+                description=_(
+                    'Files linked in text and uploaded files are no '
+                    'longer displayed in the sidebar if this option is '
+                    'deselected.'
+                )
+            )
+
+        return GeneralFileForm
+
+
+class SidebarLinksExtension(ContentExtension):
+
+    sidepanel_links = content_property()
+
+    def extend_form(
+        self,
+        form_class: type['FormT'],
+        request: 'OrgRequest'
+    ) -> type['FormT']:
+
+        class SidebarLinksForm(form_class):  # type:ignore
+
+            sidepanel_links = StringField(
+                label=_('Sidebar links'),
+                fieldset=_('Sidebar links'),
+                render_kw={'class_': 'many many-links'}
+            )
+
+            if TYPE_CHECKING:
+                link_errors: dict[int, str]
+            else:
+                def __init__(self, *args, **kwargs) -> None:
+                    super().__init__(*args, **kwargs)
+                    self.link_errors = {}
+
+            def on_request(self) -> None:
+                if not self.sidepanel_links.data:
+                    self.sidepanel_links.data = self.links_to_json(None)
+
+            def process_obj(self, obj: 'SidebarLinksExtension') -> None:
+                super().process_obj(obj)
+                self.apply_model(obj)
+                if not obj.sidepanel_links:
+                    self.sidepanel_links.data = self.links_to_json(None)
+                else:
+                    self.sidepanel_links.data = self.links_to_json(
+                        obj.sidepanel_links
+                    )
 
             def populate_obj(
                 self,
-                obj: object,
-                *args: Any,
-                **kwargs: Any
+                obj: 'SidebarLinksExtension',
+                *args: Any, **kwargs: Any
             ) -> None:
                 super().populate_obj(obj, *args, **kwargs)
+                obj.sidepanel_links = self.json_to_links(
+                    self.sidepanel_links.data) or None
 
-                # transfer the publication settings to newly added files
-                # TODO: maybe we should take access into account as well?
-                if (
-                    self.files.added_files
-                    and 'publication_start' in self
-                    and 'publication_end' in self
-                ):
-                    start = self['publication_start'].data
-                    end = self['publication_end'].data
-                    if start is None and end is None:
-                        # nothing to do
-                        return
+            def validate_sidepanel_links(self, field: StringField) -> None:
+                for text, url in self.json_to_links(self.sidepanel_links.data):
+                    if text and not url:
+                        raise ValidationError(
+                            _('Please add an url to each link'))
+                    if url and not re.match(r'^(http://|https://|/)', url):
+                        raise ValidationError(
+                            _('Your URLs must start with http://,'
+                              ' https:// or /'
+                              ' (for internal links)')
+                        )
 
-                    now = utcnow()
-                    published = True
-                    if end is not None and to_timezone(end, 'UTC') < now:
-                        # clear both dates and set published to False
-                        published = False
-                        start = None
-                        end = None
+            def json_to_links(
+                self,
+                text: str | None = None
+            ) -> list[tuple[str | None, str | None]]:
+                result = []
 
-                    elif start is not None:
-                        if to_timezone(start, 'UTC') < now:
-                            # clear the date since we're already published
-                            start = None
-                        else:
-                            # otherwise set published to False
-                            published = False
+                for value in json.loads(text or '{}').get('values', []):
+                    if value['link'] or value['text']:
+                        result.append((value['text'], value['link']))
 
-                    for file in self.files.added_files:
-                        file.published = published
-                        file.publish_date = start
-                        file.publish_end_date = end
+                return result
 
-        return GeneralFileForm
+            def links_to_json(
+                self,
+                links: 'Sequence[tuple[str | None, str | None]] | None'
+            ) -> str:
+                sidepanel_links = links or []
+
+                return json.dumps({
+                    'labels': {
+                        'text': self.request.translate(_('Text')),
+                        'link': self.request.translate(_('URL')),
+                        'add': self.request.translate(_('Add')),
+                        'remove': self.request.translate(_('Remove')),
+                    },
+                    'values': [
+                        {
+                            'text': l[0],
+                            'link': l[1],
+                            'error': self.link_errors.get(ix, '')
+                        } for ix, l in enumerate(sidepanel_links)
+                    ]
+                })
+
+        return SidebarLinksForm
+
+
+class DeletableContentExtension(ContentExtension):
+    """ Extends any class that has a meta dictionary field with the ability to
+    mark the content as deletable after reaching the end date. A cronjob will
+    periodically check for 'deletable' content with expired end date and
+    delete it e.g. Directories.
+
+    """
+
+    delete_when_expired: dict_property[bool] = content_property(default=False)
+
+    def extend_form(
+        self,
+        form_class: type['FormT'],
+        request: 'OrgRequest'
+    ) -> type['FormT']:
+
+        class DeletableContentForm(form_class):  # type:ignore
+            delete_when_expired = BooleanField(
+                label=_('Delete content when expired'),
+                description=_('This content is automatically deleted if the '
+                              'end date is in the past'),
+                fieldset=_('Delete content')
+            )
+
+        return DeletableContentForm

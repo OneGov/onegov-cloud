@@ -1,11 +1,8 @@
 from freezegun import freeze_time
-from onegov.ballot import Vote
 from onegov.election_day.models import Canton
 from onegov.election_day.models import Municipality
 from onegov.election_day.models import Principal
 from textwrap import dedent
-from xsdata_ech.e_ch_0155_5_0 import DomainOfInfluenceType
-from xsdata_ech.e_ch_0155_5_0 import DomainOfInfluenceTypeType
 
 
 SUPPORTED_YEARS = list(range(2002, 2024 + 1))
@@ -51,7 +48,6 @@ def test_principal_load():
     assert principal.sms_notification is None
     assert principal.email_notification is None
     assert principal.wabsti_import is False
-    assert principal.pdf_signing == {}
     assert principal.open_data == {}
     assert principal.hidden_elements == {}
     assert principal.publish_intermediate_results == {
@@ -72,16 +68,11 @@ def test_principal_load():
             baar:
                 - municipality
         webhooks:
-            'http://abc.com/1':
-            'http://abc.com/2':
+            'https://example.org/1':
+            'https://example.org/2':
                 My-Header: My-Value
         sms_notification: 'https://wab.zg.ch'
         email_notification: true
-        pdf_signing:
-            url: 'http://abc.com/3'
-            login: user
-            password: pass
-            reason: election and vote results
         open_data:
             id: kanton-zug
             name: Staatskanzlei Kanton Zug
@@ -93,9 +84,6 @@ def test_principal_load():
           intermediate_results:
             connections:
               chart: True
-          tabs:
-            elections:
-              - lists
     """))
     assert isinstance(principal, Canton)
     assert principal.id == 'zg'
@@ -108,26 +96,19 @@ def test_principal_load():
     assert principal.analytics == '<script type="text/javascript"></script>'
     assert principal.use_maps is True
     assert principal.has_districts is False
-    assert principal.hidden_tabs == {'elections': ['lists']}
     assert principal.fetch == {
         'steinhausen': ['municipality'],
         'baar': ['municipality']
     }
     assert principal.webhooks == {
-        'http://abc.com/1': None,
-        'http://abc.com/2': {
+        'https://example.org/1': None,
+        'https://example.org/2': {
             'My-Header': 'My-Value'
         }
     }
     assert principal.sms_notification == 'https://wab.zg.ch'
     assert principal.email_notification is True
     assert principal.wabsti_import is True
-    assert principal.pdf_signing == {
-        'url': 'http://abc.com/3',
-        'login': 'user',
-        'password': 'pass',
-        'reason': 'election and vote results'
-    }
     assert principal.open_data == {
         'id': 'kanton-zug',
         'name': 'Staatskanzlei Kanton Zug',
@@ -141,7 +122,6 @@ def test_principal_load():
         'intermediate_results': {
             'connections': {'chart': True}
         },
-        'tabs': {'elections': ['lists']}
     }
 
     # Municipality with static data
@@ -179,7 +159,6 @@ def test_principal_load():
     assert principal.sms_notification is None
     assert principal.email_notification is None
     assert principal.wabsti_import is False
-    assert principal.pdf_signing == {}
 
     # Municipality without static data
     principal = Principal.from_yaml(dedent("""
@@ -216,7 +195,6 @@ def test_principal_load():
     assert principal.sms_notification is None
     assert principal.email_notification is None
     assert principal.wabsti_import is False
-    assert principal.pdf_signing == {}
 
 
 def test_canton():
@@ -234,6 +212,7 @@ def test_canton():
     assert list(canton.domains_election.keys()) == [
         'federation', 'canton', 'region', 'district', 'none', 'municipality'
     ]
+    assert canton.get_entities(2022)
     assert canton.get_districts(2022)
     assert canton.get_regions(2022)
     assert canton.get_superregions(2022)
@@ -250,6 +229,7 @@ def test_canton():
     assert list(canton.domains_election.keys()) == [
         'federation', 'canton', 'region', 'district', 'none', 'municipality'
     ]
+    assert canton.get_entities(2022)
     assert canton.get_districts(2022)
     assert canton.get_regions(2022)
     assert not canton.get_superregions(2022)
@@ -262,6 +242,7 @@ def test_canton():
     assert list(canton.domains_election.keys()) == [
         'federation', 'canton', 'district', 'none', 'municipality'
     ]
+    assert canton.get_entities(2022)
     assert canton.get_districts(2022)
     assert not canton.get_regions(2022)
     assert not canton.get_superregions(2022)
@@ -274,6 +255,7 @@ def test_canton():
     assert list(canton.domains_election.keys()) == [
         'federation', 'canton', 'district', 'none', 'municipality'
     ]
+    assert canton.get_entities(2022)
     assert canton.get_districts(2022)
     assert not canton.get_regions(2022)
     assert not canton.get_superregions(2022)
@@ -286,6 +268,7 @@ def test_canton():
     assert list(canton.domains_election.keys()) == [
         'federation', 'canton', 'none', 'municipality'
     ]
+    assert canton.get_entities(2022)
     assert not canton.get_districts(2022)
     assert not canton.get_regions(2022)
     assert not canton.get_superregions(2022)
@@ -590,44 +573,3 @@ def test_principal_label(election_day_app_zg):
         ('entities', 'de_CH', 'Stadtteile')
     ):
         assert translate(principal.label(label), locale) == result
-
-
-def test_principal_ech_domain():
-
-    def domain(domain, identification, name):
-        return DomainOfInfluenceType(
-            domain_of_influence_type=DomainOfInfluenceTypeType(domain),
-            domain_of_influence_identification=identification,
-            domain_of_influence_name=name
-        )
-
-    vote_f = Vote(domain='federation')
-    vote_c = Vote(domain='canton')
-    vote_r = Vote(domain='region', domain_segment='Chur')
-    vote_d = Vote(domain='district', domain_segment='Wil')
-    vote_m = Vote(domain='municipality', domain_segment='Mels')
-    vote_q = Vote(domain='district', domain_segment='Innere Stadt')
-    vote_n = Vote(domain='none')
-
-    # Canton
-    principal = Canton(name='St.Gallen', canton='sg')
-    assert principal.get_ech_domain() == domain('CT', 'SG', 'St.Gallen')
-    assert principal.get_ech_domain(vote_f) == domain('CH', '1', 'Bund')
-    assert principal.get_ech_domain(vote_d) == domain('BZ', '', 'Wil')
-    assert principal.get_ech_domain(vote_c) == domain('CT', 'SG', 'St.Gallen')
-    assert principal.get_ech_domain(vote_m) == domain('MU', '3293', 'Mels')
-    assert principal.get_ech_domain(vote_n) == domain('AN', '', '')
-
-    principal = Canton(name='Graubünden', canton='gr')
-    assert principal.get_ech_domain(vote_r) == domain('BZ', '', 'Chur')
-
-    # Bern
-    principal = Municipality(
-        name='Bern', municipality='351', canton='be', canton_name='Kt. Bern'
-    )
-    assert principal.get_ech_domain() == domain('MU', '351', 'Bern')
-    assert principal.get_ech_domain(vote_f) == domain('CH', '1', 'Bund')
-    assert principal.get_ech_domain(vote_q) == domain('SK', '', 'Innere Stadt')
-    assert principal.get_ech_domain(vote_c) == domain('CT', 'BE', 'Kt. Bern')
-    assert principal.get_ech_domain(vote_m) == domain('MU', '351', 'Bern')
-    assert principal.get_ech_domain(vote_n) == domain('AN', '', '')

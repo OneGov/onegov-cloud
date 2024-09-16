@@ -1,21 +1,24 @@
+import os.path
+from tempfile import TemporaryDirectory
+
 import pytest
 
-from dateutil.relativedelta import relativedelta
+from uuid import UUID
 from depot.manager import DepotManager
-from io import BytesIO
+
+from onegov.core.orm.abstract import MoveDirection
 from onegov.core.utils import Bunch
 from onegov.form import Form
 from onegov.form.extensions import Extendable
 from onegov.org.models.extensions import (
     PersonLinkExtension, ContactExtension, AccessExtension, HoneyPotExtension,
-    GeneralFileLinkExtension, PublicationExtension
+    SidebarLinksExtension, PeopleShownOnMainPageExtension,
 )
-from sedate import utcnow
-from uuid import UUID
+from onegov.people import Person
+from tests.shared.utils import create_pdf
 
 
 def test_disable_extension():
-
     class Topic(AccessExtension):
         meta = {}
 
@@ -42,7 +45,6 @@ def test_disable_extension():
 
 
 def test_access_extension():
-
     class Topic(AccessExtension):
         meta = {}
 
@@ -89,7 +91,6 @@ def test_access_extension():
 
 
 def test_person_link_extension():
-
     class Topic(PersonLinkExtension):
         content = {}
 
@@ -145,16 +146,15 @@ def test_person_link_extension():
 
     assert form.people_6d120102d90344868eb32614cf3acb1a.data is True
     assert form.people_6d120102d90344868eb32614cf3acb1a_function.data \
-        == 'The Truest Repairman'
+           == 'The Truest Repairman'
 
-    assert form.people_6d120102d90344868eb32614cf3acb1a_is_visible_function\
-        .data == False
+    assert form.people_6d120102d90344868eb32614cf3acb1a_is_visible_function \
+               .data == False
     assert not form.people_adad98ff74e2497a9e1dfbba0a6bbe96.data
     assert not form.people_adad98ff74e2497a9e1dfbba0a6bbe96_function.data
 
 
 def test_person_link_extension_duplicate_name():
-
     class Topic(PersonLinkExtension):
         content = {}
 
@@ -190,7 +190,6 @@ def test_person_link_extension_duplicate_name():
 
 
 def test_person_link_extension_order():
-
     class Topic(PersonLinkExtension):
         content = {}
 
@@ -232,7 +231,7 @@ def test_person_link_extension_order():
     # the people are kept sorted by lastname, firstname by default
     assert topic.content['people'] == [
         ('6d120102d90344868eb32614cf3acb1a', (None, False)),  # Troy _B_arnes
-        ('f0281b558a5f43f6ac81589d79538a87', (None, False))   # Britta _P_erry
+        ('f0281b558a5f43f6ac81589d79538a87', (None, False))  # Britta _P_erry
     ]
 
     form.people_aa37e9cc40ab402ea70b0d2b4d672de3.data = True
@@ -241,14 +240,14 @@ def test_person_link_extension_order():
     assert topic.content['people'] == [
         ('6d120102d90344868eb32614cf3acb1a', (None, False)),  # Troy _B_arnes
         ('aa37e9cc40ab402ea70b0d2b4d672de3', (None, False)),  # Annie _E_dison
-        ('f0281b558a5f43f6ac81589d79538a87', (None, False))   # Britta _P_erry
+        ('f0281b558a5f43f6ac81589d79538a87', (None, False))  # Britta _P_erry
     ]
 
     # once the order changes, people are added at the end
     topic.move_person(
         subject='f0281b558a5f43f6ac81589d79538a87',  # Britta
-        target='6d120102d90344868eb32614cf3acb1a',   # Troy
-        direction='above'
+        target='6d120102d90344868eb32614cf3acb1a',  # Troy
+        direction=MoveDirection.above
     )
 
     assert topic.content['people'] == [
@@ -259,8 +258,8 @@ def test_person_link_extension_order():
 
     topic.move_person(
         subject='6d120102d90344868eb32614cf3acb1a',  # Troy
-        target='aa37e9cc40ab402ea70b0d2b4d672de3',   # Annie
-        direction='below'
+        target='aa37e9cc40ab402ea70b0d2b4d672de3',  # Annie
+        direction=MoveDirection.below
     )
 
     assert topic.content['people'] == [
@@ -281,7 +280,6 @@ def test_person_link_extension_order():
 
 
 def test_person_link_move_function():
-
     class Topic(PersonLinkExtension):
         content = {}
 
@@ -325,7 +323,7 @@ def test_person_link_move_function():
     topic.move_person(
         subject='6d120102d90344868eb32614cf3acb1a',
         target='aa37e9cc40ab402ea70b0d2b4d672de3',
-        direction='above'
+        direction=MoveDirection.above
     )
 
     assert topic.content['people'] == [
@@ -335,7 +333,6 @@ def test_person_link_move_function():
 
 
 def test_contact_extension():
-
     class Topic(ContactExtension):
         content = {}
 
@@ -388,7 +385,6 @@ def test_contact_extension():
 
 
 def test_contact_extension_with_top_level_domain_agency():
-
     class Topic(ContactExtension):
         content = {}
 
@@ -423,8 +419,50 @@ def test_contact_extension_with_top_level_domain_agency():
     assert '<a href="mailto:hello@website.ag"' not in d
 
 
-def test_honeypot_extension():
+def test_people_shown_on_main_page_extension(client):
+    client.login_admin()
 
+    class Topic(PeopleShownOnMainPageExtension):
+        content = {}
+
+    class TopicForm(Form):
+        pass
+
+    people = client.get('/people')
+    assert "keine Personen" in people
+
+    new_person = people.click('Person', href='new')
+    new_person.form['first_name'] = 'Fritzli'
+    new_person.form['last_name'] = 'Müller'
+    new_person.form['function'] = 'Dorf-Clown'
+    new_person.form.submit().follow()
+
+    fritzli = client.app.session().query(Person) \
+        .filter(Person.last_name == 'Müller') \
+        .one()
+
+    # add person to side panel
+    page = client.get('/topics/themen')
+    page = page.click('Bearbeiten')
+    page.form['show_people_on_main_page'] = False
+    page.form['people_' + fritzli.id.hex] = True
+    page = page.form.submit().follow()
+    assert 'Fritzli' in page
+    assert 'Müller' in page
+    assert 'Dorf-Clown' in page
+
+    # show person on main page
+    page = client.get('/topics/themen')
+    page = page.click('Bearbeiten')
+    page.form['show_people_on_main_page'] = True
+    page.form['people_' + fritzli.id.hex + '_function'] = 'Super-Clown'
+    page = page.form.submit().follow()
+    assert 'Fritzli' in page
+    assert 'Müller' in page
+    assert 'Super-Clown' in page
+
+
+def test_honeypot_extension():
     class Submission(Extendable, HoneyPotExtension):
         meta = {}
 
@@ -491,16 +529,51 @@ def depot(temporary_directory):
     DepotManager._clear()
 
 
-def test_general_file_link_extension(depot, session):
+def test_general_file_link_extension(client):
+    client.login_admin()
 
-    class Topic(GeneralFileLinkExtension):
-        files = []
+    with TemporaryDirectory() as td:
+
+        root_page = client.get('/topics/themen')
+        new_page = root_page.click('Thema')
+
+        assert 'files' in new_page.form.fields
+
+        new_page.form['title'] = "Living in Govikon is Swell"
+        new_page.form['text'] = (
+            "## Living in Govikon is Really Great\n"
+            "*Experts say it's the fact that Govikon does not really exist.*"
+        )
+        filename = os.path.join(td, 'simple.pdf')
+        pdf = create_pdf(filename)
+        new_page.form.fields['files'][-1].value = [filename]
+        new_page.files = pdf
+        new_page.form['show_file_links_in_sidebar'] = True
+        page = new_page.form.submit().follow()
+
+        assert 'Living in Govikon is Swell' in page
+        assert 'Dokumente' in page
+        assert 'simple.pdf' in page
+
+        edit_page = page.click('Bearbeiten')
+        edit_page.form['show_file_links_in_sidebar'] = False
+        page = edit_page.form.submit().follow()
+
+        assert 'Living in Govikon is Swell' in page
+        assert 'Dokumente' not in page
+        assert 'simple.pdf' not in page
+
+
+def test_sidebar_links_extension(session):
+
+    class Topic(SidebarLinksExtension):
+        sidepanel_links = []
 
     class TopicForm(Form):
         pass
 
     topic = Topic()
-    assert topic.files == []
+    assert topic.sidepanel_links == []
 
     request = Bunch(**{
         'app.settings.org.disabled_extensions': [],
@@ -509,122 +582,26 @@ def test_general_file_link_extension(depot, session):
     form_class = topic.with_content_extensions(TopicForm, request=request)
     form = form_class(meta={'request': request})
 
-    assert 'files' in form._fields
-    assert form.files.data == []
+    assert 'sidepanel_links' in form._fields
+    assert form.sidepanel_links.data == None
 
-    form.files.append_entry()
-    form.files[0].file = BytesIO(b'hello world')
-    form.files[0].filename = 'test.txt'
-    form.files[0].action = 'replace'
-    form.populate_obj(topic)
-
-    assert len(topic.files) == 1
-    assert topic.files[0].name == 'test.txt'
-
-    form_class = topic.with_content_extensions(TopicForm, request=request)
-    form = form_class(meta={'request': request})
-
-    form.process(obj=topic)
-
-    assert form.files.data == [{
-        'filename': 'test.txt',
-        'size': 11,
-        'mimetype': 'text/plain'
-    }]
-    form.files[0].action = 'delete'
+    form.sidepanel_links.data = '''
+            {"labels":
+                {"text": "Text",
+                "link": "URL",
+                "add": "Hinzuf\\u00fcgen",
+                "remove": "Entfernen"},
+            "values": [
+                {"text": "Govikon School",
+                "link": "https://www.govikon-school.ch", "error": ""},
+                {"text": "Castle Govikon",
+                "link": "https://www.govikon-castle.ch", "error": ""}
+            ]
+            }
+        '''
 
     form.populate_obj(topic)
 
-    assert topic.files == []
-
-
-def test_general_file_link_extension_with_publication(depot, session):
-
-    class Topic(GeneralFileLinkExtension, PublicationExtension):
-        files = []
-        publication_start = None
-        publication_end = None
-
-    class TopicForm(Form):
-        pass
-
-    topic = Topic()
-    assert topic.files == []
-
-    request = Bunch(**{
-        'app.settings.org.disabled_extensions': [],
-        'session': session
-    })
-    form_class = topic.with_content_extensions(TopicForm, request=request)
-    form = form_class(meta={'request': request})
-
-    assert 'files' in form._fields
-    assert form.files.data == []
-
-    publish_date = utcnow() + relativedelta(days=+1)
-    form.publication_start.data = publish_date
-    form.files.append_entry()
-    form.files[0].file = BytesIO(b'hello world')
-    form.files[0].filename = 'test.txt'
-    form.files[0].action = 'replace'
-    form.populate_obj(topic)
-
-    assert len(topic.files) == 1
-    assert topic.files[0].name == 'test.txt'
-    assert topic.files[0].published is False
-    assert topic.files[0].publish_date == publish_date
-    assert topic.files[0].publish_end_date is None
-
-    # this should not change anything on already uploaded files
-    # even if it replaces an existing file
-    publish_end_date = publish_date + relativedelta(months=+1)
-    form.publication_end.data = publish_end_date
-    form.populate_obj(topic)
-    assert form.files.added_files == []
-    assert len(topic.files) == 1
-    assert topic.files[0].name == 'test.txt'
-    assert topic.files[0].published is False
-    assert topic.files[0].publish_date == publish_date
-    assert topic.files[0].publish_end_date is None
-
-    # but should on newly uploaded files
-    form.files.append_entry()
-    form.files[1].file = BytesIO(b'hello world 2')
-    form.files[1].filename = 'test2.txt'
-    form.files[1].action = 'replace'
-    form.populate_obj(topic)
-    assert len(topic.files) == 2
-    assert topic.files[1].name == 'test2.txt'
-    assert topic.files[1].published is False
-    assert topic.files[1].publish_date == publish_date
-    assert topic.files[1].publish_end_date == publish_end_date
-
-    # publish date in past
-    publish_date = utcnow() + relativedelta(days=-1)
-    form.publication_start.data = publish_date
-    # add another new entry
-    form.files.append_entry()
-    form.files[2].file = BytesIO(b'hello world 3')
-    form.files[2].filename = 'test3.txt'
-    form.files[2].action = 'replace'
-    form.populate_obj(topic)
-    assert len(topic.files) == 3
-    assert topic.files[2].name == 'test3.txt'
-    assert topic.files[2].published is True
-    assert topic.files[2].publish_date is None
-    assert topic.files[2].publish_end_date == publish_end_date
-
-    # publish end date in past
-    publish_end_date = utcnow()
-    form.publication_end.data = publish_end_date
-    # add another new entry
-    form.files.append_entry()
-    form.files[3].file = BytesIO(b'hello world 4')
-    form.files[3].filename = 'test4.txt'
-    form.files[3].action = 'replace'
-    form.populate_obj(topic)
-    assert len(topic.files) == 4
-    assert topic.files[3].name == 'test4.txt'
-    assert topic.files[3].published is False
-    assert topic.files[3].publish_date is None
-    assert topic.files[3].publish_end_date is None
+    assert topic.sidepanel_links == [
+        ('Govikon School', 'https://www.govikon-school.ch'),
+        ('Castle Govikon', 'https://www.govikon-castle.ch')]

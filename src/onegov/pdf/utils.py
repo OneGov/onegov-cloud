@@ -1,4 +1,4 @@
-from pdftotext import PDF
+from pdftotext import PDF  # type:ignore
 from onegov.pdf import log
 
 

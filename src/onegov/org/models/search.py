@@ -1,5 +1,5 @@
-from elasticsearch_dsl.function import SF
-from elasticsearch_dsl.query import FunctionScore
+from elasticsearch_dsl.function import SF  # type:ignore
+from elasticsearch_dsl.query import FunctionScore  # type:ignore
 from elasticsearch_dsl.query import Match
 from elasticsearch_dsl.query import MatchPhrase
 from elasticsearch_dsl.query import MultiMatch
@@ -20,9 +20,9 @@ class Search(Pagination[_M]):
     max_query_length = 100
 
     def __init__(self, request: 'OrgRequest', query: str, page: int) -> None:
+        super().__init__(page)
         self.request = request
         self.query = query
-        self.page = page
 
     @cached_property
     def available_documents(self) -> int:
@@ -116,7 +116,7 @@ class Search(Pagination[_M]):
 
         # make sure the title matches with a higher priority, otherwise the
         # "get lucky" functionality is not so lucky after all
-        match_title = MatchPhrase(title={"query": query, "boost": 3})
+        match_title = MatchPhrase(title={'query': query, 'boost': 3})
 
         # we *could* use Match here and include '_all' fields, but that
         # yields us less exact results, probably because '_all' includes some

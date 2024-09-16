@@ -28,10 +28,13 @@ import sys
 import traceback
 
 from base64 import b64encode
+from cryptography.hazmat.primitives.hashes import SHA256
+from cryptography.hazmat.primitives.kdf.hkdf import HKDF
 from datetime import datetime
 from dectate import directive
 from functools import cached_property, wraps
 from itsdangerous import BadSignature, Signer
+from libres.db.models import ORMBase
 from morepath.publish import resolve_model, get_view_name
 from more.content_security import ContentSecurityApp
 from more.content_security import ContentSecurityPolicy
@@ -46,8 +49,10 @@ from onegov.core import directives
 from onegov.core.crypto import stored_random_token
 from onegov.core.datamanager import FileDataManager
 from onegov.core.mail import prepare_email
-from onegov.core.orm import Base, SessionManager, debug, DB_CONNECTION_ERRORS
+from onegov.core.orm import (
+    Base, SessionManager, debug, DB_CONNECTION_ERRORS)
 from onegov.core.orm.cache import OrmCacheApp
+from onegov.core.orm.observer import ScopedPropertyObserver
 from onegov.core.request import CoreRequest
 from onegov.core.utils import batched, PostThread
 from onegov.server import Application as ServerApplication
@@ -138,10 +143,10 @@ class Framework(
         ) -> Iterable[bytes]: ...
 
     @morepath.reify  # type:ignore[no-redef]
-    def __call__(self) -> 'WSGIApplication':  # noqa:F811
+    def __call__(self) -> 'WSGIApplication':
         """ Intercept all wsgi calls so we can attach debug tools. """
 
-        fn: 'WSGIApplication' = super().__call__
+        fn: WSGIApplication = super().__call__
         fn = self.with_print_exceptions(fn)
         fn = self.with_request_cache(fn)
 
@@ -211,7 +216,7 @@ class Framework(
                 return fn(*args, **kwargs)
             except Exception:
                 if getattr(self, 'print_exceptions', False):
-                    print("=" * 80, file=sys.stderr)
+                    print('=' * 80, file=sys.stderr)
                     traceback.print_exc()
                 raise
 
@@ -436,6 +441,14 @@ class Framework(
 
         if self.dsn:
             self.session_manager = SessionManager(self.dsn, base)
+            # NOTE: We used to only add the ORMBase, when we derived
+            #       from LibresIntegration, however this leads to
+            #       issues when we add a backref from a model derived
+            #       from ORMBase to a model like File, since SQLAlchemy
+            #       will try to load this backref when inspecting
+            #       the state of an instance and fail, because the
+            #       referenced table doesn't exist
+            self.session_manager.bases.append(ORMBase)
 
     def configure_redis(
         self,
@@ -496,6 +509,26 @@ class Framework(
         self.yubikey_client_id = yubikey_client_id
         self.yubikey_secret_key = yubikey_secret_key
 
+    def configure_mtan_second_factor(
+        self,
+        *,
+        mtan_second_factor_enabled: bool = False,
+        mtan_automatic_setup: bool = False,
+        **cfg: Any
+    ) -> None:
+
+        self.mtan_second_factor_enabled = mtan_second_factor_enabled
+        self.mtan_automatic_setup = mtan_automatic_setup
+
+    def configure_totp(
+        self,
+        *,
+        totp_enabled: bool = True,
+        **cfg: Any
+    ) -> None:
+
+        self.totp_enabled = totp_enabled
+
     def configure_filestorage(self, **cfg: Any) -> None:
 
         if 'filestorage_object' in cfg:
@@ -508,8 +541,8 @@ class Framework(
 
             # legacy support for pyfilesystem 1.x parameters
             if 'dir_mode' in filestorage_options:
-                filestorage_options['create_mode'] \
-                    = filestorage_options.pop('dir_mode')
+                filestorage_options['create_mode'] = (
+                    filestorage_options.pop('dir_mode'))
         else:
             filestorage_class = None
 
@@ -635,6 +668,8 @@ class Framework(
         self.schema = application_id.replace('-', '_').replace('/', '-')
 
         if self.has_database_connection:
+            ScopedPropertyObserver.enter_scope(self)
+
             self.session_manager.set_current_schema(self.schema)
 
             if not self.is_orm_cache_setup:
@@ -716,9 +751,6 @@ class Framework(
 
         """
 
-        # strip host and scheme
-        path = URL(path).path()
-
         request = self.request_class(environ={
             'PATH_INFO': URL(path).path(),
             'SERVER_NAME': '',
@@ -763,7 +795,7 @@ class Framework(
             action, handler = next(query(self.__class__))
         except (StopIteration, RuntimeError) as exception:
             raise KeyError(
-                "{!r} has no view named {}".format(model, view_name)
+                '{!r} has no view named {}'.format(model, view_name)
             ) from exception
 
         return action.permission
@@ -1142,11 +1174,15 @@ class Framework(
         are automatically commited at the end.
 
         """
-        assert self.sms_directory, "No SMS directory configured"
+        assert self.sms_directory, 'No SMS directory configured'
 
         path = os.path.join(self.sms_directory, self.schema)
         if not os.path.exists(path):
             os.makedirs(path)
+
+        tmp_path = os.path.join(self.sms_directory, 'tmp')
+        if not os.path.exists(tmp_path):
+            os.makedirs(tmp_path)
 
         if isinstance(receivers, str):
             receivers = [receivers]
@@ -1173,7 +1209,12 @@ class Framework(
                 path, f'{index}.{len(receiver_batch)}.{timestamp}'
             )
 
-            FileDataManager.write_file(payload, dest_path)
+            tmp_dest_path = os.path.join(
+                tmp_path,
+                f'{self.schema}-{index}.{len(receiver_batch)}.{timestamp}'
+            )
+
+            FileDataManager.write_file(payload, dest_path, tmp_dest_path)
 
     def send_zulip(self, subject: str, content: str) -> PostThread | None:
         """ Sends a zulip chat message asynchronously.
@@ -1208,7 +1249,7 @@ class Framework(
             '{}:{}'.format(self.zulip_user, self.zulip_key).encode('ascii')
         )
         headers = (
-            ('Authorization', 'Basic {}'.format(auth.decode("ascii"))),
+            ('Authorization', 'Basic {}'.format(auth.decode('ascii'))),
             ('Content-Type', 'application/x-www-form-urlencoded'),
             ('Content-Length', str(len(data))),
         )
@@ -1255,6 +1296,7 @@ class Framework(
     def application_bound_identity(
         self,
         userid: str,
+        uid: str,
         groupid: str | None,
         role: str
     ) -> morepath.authentication.Identity:
@@ -1263,7 +1305,7 @@ class Framework(
 
         """
         return morepath.authentication.Identity(
-            userid, groupid=groupid, role=role,
+            userid, uid=uid, groupid=groupid, role=role,
             application_id=self.application_id_hash
         )
 
@@ -1388,9 +1430,17 @@ class Framework(
         application id.
 
         """
-        # FIXME: We should use a key derivation function here and
-        #        cache the result.
-        return self.unsafe_identity_secret + self.application_id_hash
+        return HKDF(
+            algorithm=SHA256(),
+            length=32,
+            # NOTE: salt should generally be left blank or use pepper
+            #       the better way to provide salt is to add it to info
+            #       see: https://soatok.blog/2021/11/17/understanding-hkdf/
+            salt=None,
+            info=self.application_id.encode('utf-8') + b'+identity'
+        ).derive(
+            self.unsafe_identity_secret.encode('utf-8')
+        ).hex()
 
     @property
     def csrf_secret(self) -> str:
@@ -1398,24 +1448,32 @@ class Framework(
         application id.
 
         """
-        # FIXME: We should use a key derivation function here and
-        #        cache the result.
-        return self.unsafe_csrf_secret + self.application_id_hash
+        return HKDF(
+            algorithm=SHA256(),
+            length=32,
+            # NOTE: salt should generally be left blank or use pepper
+            #       the better way to provide salt is to add it to info
+            #       see: https://soatok.blog/2021/11/17/understanding-hkdf/
+            salt=None,
+            info=self.application_id.encode('utf-8') + b'+csrf'
+        ).derive(
+            self.unsafe_csrf_secret.encode('utf-8')
+        ).hex()
 
-    def sign(self, text: str) -> str:
+    def sign(self, text: str, salt: str = 'generic-signer') -> str:
         """ Signs a text with the identity secret.
 
         The text is signed together with the application id, so if one
         application signs a text another won't be able to unsign it.
 
         """
-        signer = Signer(self.identity_secret, salt='generic-signer')
+        signer = Signer(self.identity_secret, salt=salt)
         return signer.sign(text.encode('utf-8')).decode('utf-8')
 
-    def unsign(self, text: str) -> str | None:
+    def unsign(self, text: str, salt: str = 'generic-signer') -> str | None:
         """ Unsigns a signed text, returning None if unsuccessful. """
         try:
-            signer = Signer(self.identity_secret, salt='generic-signer')
+            signer = Signer(self.identity_secret, salt=salt)
             return signer.unsign(text).decode('utf-8')
         except BadSignature:
             return None
@@ -1515,19 +1573,19 @@ def default_content_security_policy() -> ContentSecurityPolicy:
         default_src={SELF},
 
         # allow fonts from practically anywhere (no mixed content though)
-        font_src={SELF, "http:", "https:", "data:"},
+        font_src={SELF, 'http:', 'https:', 'data:'},
 
         # allow images from practically anywhere (no mixed content though)
-        img_src={SELF, "http:", "https:", "data:"},
+        img_src={SELF, 'http:', 'https:', 'data:'},
 
         # enable inline styles and external stylesheets
-        style_src={SELF, "https:", UNSAFE_INLINE},
+        style_src={SELF, 'https:', UNSAFE_INLINE},
 
         # enable inline scripts, eval and external scripts
         script_src={
             SELF,
-            "https://browser.sentry-cdn.com",
-            "https://js.sentry-cdn.com",
+            'https://browser.sentry-cdn.com',
+            'https://js.sentry-cdn.com',
             UNSAFE_INLINE,
             UNSAFE_EVAL
         },
@@ -1598,7 +1656,7 @@ def http_conflict_tween_factory(
             if not isinstance(e.orig, TransactionRollbackError):
                 raise
 
-            log.warning("A transaction failed because there was a conflict")
+            log.warning('A transaction failed because there was a conflict')
 
             return HTTPConflict()
 

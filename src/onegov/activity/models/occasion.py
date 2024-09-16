@@ -3,10 +3,10 @@ import sedate
 from datetime import date, datetime, timedelta
 from decimal import Decimal
 from onegov.activity.models.occasion_date import DAYS
-from onegov.core.orm import Base
+from onegov.core.orm import Base, observes
 from onegov.core.orm.mixins import TimestampMixin
 from onegov.core.orm.types import UUID
-from psycopg2.extras import NumericRange
+from onegov.activity.types import BoundedIntegerRange
 from sqlalchemy import Boolean
 from sqlalchemy import case
 from sqlalchemy import Column
@@ -19,7 +19,7 @@ from sqlalchemy.dialects.postgresql import ARRAY, INT4RANGE
 from sqlalchemy.ext.hybrid import hybrid_property
 from sqlalchemy.sql.functions import coalesce
 from sqlalchemy.orm import relationship, object_session, validates
-from sqlalchemy_utils import aggregated, observes
+from sqlalchemy_utils import aggregated
 from uuid import uuid4
 
 
@@ -59,17 +59,17 @@ class Occasion(Base, TimestampMixin):
     meeting_point: 'Column[str | None]' = Column(Text, nullable=True)
 
     #: The expected age of participants
-    age: 'Column[NumericRange]' = Column(
+    age: 'Column[BoundedIntegerRange]' = Column(
         INT4RANGE,
         nullable=False,
-        default=NumericRange(6, 17, bounds='[]')
+        default=BoundedIntegerRange(6, 17, bounds='[]')
     )
 
     #: The expected number of participants
-    spots: 'Column[NumericRange]' = Column(
+    spots: 'Column[BoundedIntegerRange]' = Column(
         INT4RANGE,
         nullable=False,
-        default=NumericRange(0, 10, bounds='[]')
+        default=BoundedIntegerRange(0, 10, bounds='[]')
     )
 
     #: A note about the occurrence
@@ -96,15 +96,32 @@ class Occasion(Base, TimestampMixin):
     #: The activity this occasion belongs to
     activity_id: 'Column[uuid.UUID]' = Column(
         UUID,  # type:ignore[arg-type]
-        ForeignKey("activities.id", use_alter=True),
+        ForeignKey('activities.id', use_alter=True),
         nullable=False
+    )
+    activity: 'relationship[Activity]' = relationship(
+        'Activity',
+        back_populates='occasions'
+    )
+
+    accepted: 'relationship[Sequence[Booking]]' = relationship(
+        'Booking',
+        primaryjoin=("""and_(
+            Booking.occasion_id == Occasion.id,
+            Booking.state == 'accepted'
+        )"""),
+        viewonly=True
     )
 
     #: The period this occasion belongs to
     period_id: 'Column[uuid.UUID]' = Column(
         UUID,  # type:ignore[arg-type]
-        ForeignKey("periods.id", use_alter=True),
+        ForeignKey('periods.id', use_alter=True),
         nullable=False
+    )
+    period: 'relationship[Period]' = relationship(
+        'Period',
+        back_populates='occasions'
     )
 
     #: True if the occasion has been cancelled
@@ -133,7 +150,8 @@ class Occasion(Base, TimestampMixin):
         default=False
     )
 
-    #: Days on which this occasion is active
+    #: Days of the year on which this occasion is active (1 - 365)
+    #: January 1st - 2nd would be [1, 2], February 1st would be [32]
     active_days: 'Column[list[int]]' = Column(
         ARRAY(Integer),
         nullable=False,
@@ -162,7 +180,7 @@ class Occasion(Base, TimestampMixin):
     bookings: 'relationship[list[Booking]]' = relationship(
         'Booking',
         order_by='Booking.created',
-        backref='occasion'
+        back_populates='occasion'
     )
 
     #: The dates associated with this occasion (loaded eagerly)
@@ -170,17 +188,8 @@ class Occasion(Base, TimestampMixin):
         'OccasionDate',
         cascade='all,delete',
         order_by='OccasionDate.start',
-        backref='occasion',
+        back_populates='occasion',
         lazy='joined',
-    )
-
-    accepted: 'relationship[Sequence[Booking]]' = relationship(
-        'Booking',
-        primaryjoin=("""and_(
-            Booking.occasion_id == Occasion.id,
-            Booking.state == 'accepted'
-        )"""),
-        viewonly=True
     )
 
     #: The needs associated with this occasion
@@ -188,13 +197,8 @@ class Occasion(Base, TimestampMixin):
         'OccasionNeed',
         cascade='all,delete',
         order_by='OccasionNeed.name',
-        backref='occasion',
+        back_populates='occasion',
     )
-
-    if TYPE_CHECKING:
-        # FIXME: Replace with explicit backrefs with back_populates
-        activity: relationship[Activity]
-        period: relationship[Period]
 
     def on_date_change(self) -> None:
         """ Date changes are not properly propagated to the observer for

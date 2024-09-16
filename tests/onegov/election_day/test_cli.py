@@ -6,12 +6,11 @@ from click.testing import CliRunner
 from datetime import date
 from datetime import datetime
 from datetime import timezone
-from onegov.ballot import Ballot
-from onegov.ballot import BallotResult
-from onegov.ballot import Vote
 from onegov.core.cli.commands import cli as core_cli
 from onegov.election_day.cli import cli
 from onegov.election_day.models import ArchivedResult
+from onegov.election_day.models import BallotResult
+from onegov.election_day.models import Vote
 
 
 def write_config(path, postgres_dsn, temporary_directory, redis_url):
@@ -210,7 +209,7 @@ def test_fetch(postgres_dsn, temporary_directory, session_manager, redis_url):
             vote = Vote.get_polymorphic_class(vote_type, Vote)(
                 id=id, title=title, domain=domain, date=then
             )
-            vote.ballots.append(Ballot(type='proposal'))
+            assert vote.proposal  # create
             get_session(entity).add(vote)
             get_session(entity).flush()
 
@@ -223,8 +222,8 @@ def test_fetch(postgres_dsn, temporary_directory, session_manager, redis_url):
                 )
 
             if vote_type == 'complex':
-                vote.ballots.append(Ballot(type='counter-proposal'))
-                vote.ballots.append(Ballot(type='tie-breaker'))
+                assert vote.counter_proposal  # create
+                assert vote.tie_breaker  # create
 
                 if with_result:
                     vote.counter_proposal.results.append(
@@ -312,7 +311,6 @@ def add_vote(number, session_manager):
     session.add(vote)
     session.flush()
 
-    vote.ballots.append(Ballot(type='proposal'))
     vote.proposal.results.append(
         BallotResult(
             name='x', entity_id=1, counted=True, yeas=30, nays=10
@@ -379,3 +377,39 @@ def test_generate_archive_total_package(postgres_dsn, temporary_directory,
         cfg_path, 'govikon', ['generate-archive']).exit_code == 0
     assert "archive.zip" in os.listdir(archive_path)
     assert not os.path.getsize(archive_path) == 0
+
+
+def test_update_archived_results(
+    postgres_dsn, temporary_directory, redis_url, session_manager
+):
+    cfg_path = os.path.join(temporary_directory, 'onegov.yml')
+    write_config(cfg_path, postgres_dsn, temporary_directory, redis_url)
+    write_principal(temporary_directory, 'Govikon', entity='1200')
+    assert run_command(cfg_path, 'govikon', ['add']).exit_code == 0
+
+    add_vote(1, session_manager)
+
+    assert run_command(
+        cfg_path,
+        'govikon',
+        ['update-archived-results']
+    ).exit_code == 0
+
+    session = session_manager.session()
+    assert session.query(ArchivedResult).one().url == (
+        'http://localhost:8080/onegov_election_day/govikon/vote/vote-1'
+    )
+
+    assert run_command(
+        cfg_path,
+        'govikon',
+        [
+            'update-archived-results',
+            '--host', 'wab.govikon.ch',
+            '--scheme', 'https'
+        ]
+    ).exit_code == 0
+
+    assert session.query(ArchivedResult).one().url == (
+        'https://wab.govikon.ch/onegov_election_day/govikon/vote/vote-1'
+    )

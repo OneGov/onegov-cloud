@@ -10,7 +10,7 @@ from typing import Any, TYPE_CHECKING
 if TYPE_CHECKING:
     from collections.abc import Callable
     from sqlalchemy.orm import Session
-    from typing_extensions import Self
+    from typing import Self
 
 
 class Scoring:
@@ -186,7 +186,7 @@ class PreferOrganiserChildren:
         return cls(get_is_organiser_child)
 
     def __call__(self, booking: Booking) -> float:
-        return self.get_is_organiser_child(booking) and 1.0 or 0.0
+        return 1.0 if self.get_is_organiser_child(booking) else 0.0
 
 
 class PreferAdminChildren:
@@ -283,5 +283,4 @@ class PreferGroups:
         return cls(get_group_score)
 
     def __call__(self, booking: Booking) -> float:
-        offset = 0 if booking.priority else 1
-        return self.get_group_score(booking) + offset
+        return self.get_group_score(booking)

@@ -1,5 +1,8 @@
+import pytest
+
 from datetime import datetime
 from datetime import timezone
+from markupsafe import Markup
 from onegov.notice import OfficialNoticeCollection
 from onegov.user import UserCollection
 from onegov.user import UserGroupCollection
@@ -12,7 +15,7 @@ def test_notice_collection(session):
 
     notice_1 = notices.add(
         title='Important Announcement',
-        text='<em>Important</em> things happened!',
+        text=Markup('<em>Important</em> things happened!'),
         category='important',
         organization='onegov'
     )
@@ -30,7 +33,7 @@ def test_notice_collection(session):
 
     notice_2 = notices.add(
         title='Important Announcement',
-        text='<em>Important</em> things happened!'
+        text=Markup('<em>Important</em> things happened!')
     )
     notice_2.submit()
 
@@ -486,3 +489,14 @@ def test_notice_collection_pagination(session):
     rejected = notices.for_state('rejected')
     assert rejected.subset_count == 12
     assert len(rejected.next.batch) == 12 - rejected.batch_size
+
+
+def test_notice_collection_pagination_negative_page_index(session):
+    notices = OfficialNoticeCollection(session, page=-1)
+    assert notices.page == 0
+    assert notices.page_index == 0
+    assert notices.page_by_index(-2).page == 0
+    assert notices.page_by_index(-3).page_index == 0
+
+    with pytest.raises(AssertionError):
+        OfficialNoticeCollection(session, None)

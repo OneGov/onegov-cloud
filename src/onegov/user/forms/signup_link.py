@@ -15,28 +15,28 @@ class SignupLinkForm(Form):
     """ A form to generate signup links for specific roles. """
 
     role = RadioField(
-        label=_("Role"),
+        label=_('Role'),
         validators=[InputRequired()],
         choices=[
-            ('member', ("Member")),
-            ('editor', _("Editor")),
-            ('admin', _("Admin"))
+            ('member', ('Member')),
+            ('editor', _('Editor')),
+            ('admin', _('Admin'))
         ]
     )
 
     max_age = RadioField(
-        label=_("Expires in"),
+        label=_('Expires in'),
         validators=[InputRequired()],
         choices=[
-            ('hour', _("1 hour")),
-            ('day', _("24 hours")),
-            ('week', _("7 days")),
-            ('month', _("30 days"))
+            ('hour', _('1 hour')),
+            ('day', _('24 hours')),
+            ('week', _('7 days')),
+            ('month', _('30 days'))
         ]
     )
 
     max_uses = IntegerField(
-        label=_("Number of Signups"),
+        label=_('Number of Signups'),
         validators=[
             InputRequired(),
             NumberRange(1, 10000)

@@ -11,7 +11,7 @@ if TYPE_CHECKING:
 def unsupported_year_error(year: int) -> FileImportError:
     return FileImportError(
         _(
-            "The year ${year} is not yet supported", mapping={'year': year}
+            'The year ${year} is not yet supported', mapping={'year': year}
         )
     )
 
@@ -24,29 +24,12 @@ def set_locale(request: 'ElectionDayRequest') -> None:
     request.locale = locale
 
 
-# FIXME: This is an inherently bad API for static type checking, this should
-#        return the translated errors instead, even if it is slightly less
-#        memory efficient
 def translate_errors(
-    errors: list[Any] | dict[str, list[Any]],
+    errors: dict[str, list[Any]],
     request: 'ElectionDayRequest'
 ) -> None:
 
     """ Translates and interpolates the given error messages. """
-    if isinstance(errors, list):
-        # List of line errors or FileImportErrors
-        for ix, value in enumerate(errors):
-            translation_string = getattr(value, 'error', value)
-            result = {
-                'message': request.translate(translation_string),
-            }
-            if hasattr(value, 'filename'):
-                result['filename'] = value.filename
-            if hasattr(value, 'line'):
-                result['line'] = value.line
-            errors[ix] = result
-        return
-
     for key, values in errors.items():
         errors[key] = new_values = []
         for value in values:

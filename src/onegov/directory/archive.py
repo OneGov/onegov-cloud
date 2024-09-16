@@ -29,8 +29,7 @@ if TYPE_CHECKING:
     from onegov.form.parser.core import MultipleFileinputField
     from onegov.form.parser.core import ParsedField
     from sqlalchemy.orm import Query, Session
-    from typing import Protocol
-    from typing_extensions import Self, TypeAlias
+    from typing import Protocol, Self, TypeAlias
 
     UnknownFieldType: TypeAlias = 'Literal[_Sentinel.UNKNOWN_FIELD]'
     DirectoryEntryFilter: TypeAlias = Callable[
@@ -364,7 +363,7 @@ class DirectoryArchiveWriter:
     def write_directory_metadata(self, directory: Directory) -> None:
         """ Writes the metadata. """
 
-        metadata: 'JSON_ro' = {
+        metadata: JSON_ro = {
             'configuration': directory.configuration.to_dict(),
             'structure': directory.structure.replace('\r\n', '\n'),
             'title': directory.title,
@@ -424,7 +423,7 @@ class DirectoryArchiveWriter:
                                 entry,
                                 field,
                                 val,
-                                f'_{idx+1}'
+                                f'_{idx + 1}'
                             )
                             fid_to_entry[file_id] = entry.name
                         # turn it into a scalar value
@@ -448,7 +447,7 @@ class DirectoryArchiveWriter:
 
             return data
 
-        entries: 'Iterable[DirectoryEntry]'
+        entries: Iterable[DirectoryEntry]
         entries = query.all() if query else directory.entries
         if entry_filter:
             entries = entry_filter(entries)
@@ -478,7 +477,7 @@ class DirectoryArchiveWriter:
             A dictionary with the mapping of the file id to the entry name
         """
 
-        files: 'Iterable[File]'
+        files: Iterable[File]
         if paths:
             files = session.query(File).filter(File.id.in_(paths))
         else:
@@ -505,7 +504,7 @@ class DirectoryArchiveWriter:
                         tempfiles.append(tmp)
                         src = tmp.name
 
-                except IOError as exception:
+                except OSError as exception:
                     if fid_to_entry is None:
                         entry_name = 'unknown'
                     else:

@@ -112,5 +112,7 @@
 
 .ticket-chat #message-area {
     border: 1px solid $gainsboro;
+    height: auto;
+    max-height: calc(60vh - 90px);
     padding: 1rem;
 }

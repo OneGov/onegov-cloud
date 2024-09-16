@@ -41,8 +41,14 @@ def extensions():
 def form_app(request):
 
     # we do not support react 16 yet, as it basically requires ES6
-    react = 'https://unpkg.com/react@15.6.2/dist/react-with-addons.js'
-    react_dom = 'https://unpkg.com/react-dom@15.6.2/dist/react-dom.js'
+    react = (
+        'https://cdnjs.cloudflare.com/ajax/libs/react/15.6.2/'
+        'react-with-addons.min.js'
+    )
+    react_dom = (
+        'https://cdnjs.cloudflare.com/ajax/libs/react-dom/15.6.2/'
+        'react-dom.min.js'
+    )
     fontawesome = (
         'https://maxcdn.bootstrapcdn.com/font-awesome/4.7.0'
         '/css/font-awesome.min.css'
@@ -57,7 +63,7 @@ def form_app(request):
     @TestApp.setting(section='content_security_policy', name='default')
     def get_content_security_policy():
         policy = default_content_security_policy()
-        policy.script_src.add('https://unpkg.com')
+        policy.script_src.add('cdnjs.cloudflare.com')
         return policy
 
     @TestApp.path(path='/snippets')

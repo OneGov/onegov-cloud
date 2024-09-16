@@ -1,4 +1,6 @@
-from onegov.core.orm.types import JSON
+from markupsafe import escape, Markup
+from onegov.core.orm.types import JSON, MarkupText
+from sqlalchemy import type_coerce
 from sqlalchemy.ext.declarative import declared_attr
 from sqlalchemy.ext.hybrid import ExprComparator
 from sqlalchemy.orm import deferred
@@ -12,7 +14,7 @@ if TYPE_CHECKING:
     from collections.abc import Callable
     from sqlalchemy.orm.attributes import QueryableAttribute
     from sqlalchemy.sql import ColumnElement
-    from typing_extensions import Self
+    from typing import Self
 
     class _dict_property_factory(Protocol):
 
@@ -78,6 +80,7 @@ if TYPE_CHECKING:
 
 
 _T = TypeVar('_T')
+_MarkupT = TypeVar('_MarkupT', Markup, Markup | None)
 
 
 IMMUTABLE_TYPES = (int, float, complex, str, tuple, frozenset, bytes)
@@ -349,8 +352,12 @@ class dict_property(InspectionAttrInfo, Generic[_T]):
         return wrapper
 
     def _expr(self, owner: type[Any]) -> 'QueryableAttribute | None':
-        if self.custom_getter is None:
-            column: 'Column[dict[str, Any]]' = getattr(owner, self.attribute)
+        # FIXME: We should be able to remove this Any in SQlAlchemy 2.0
+        expr: Any
+        if self.custom_expression is not None:
+            expr = self.custom_expression(owner)
+        elif self.custom_getter is None:
+            column: Column[dict[str, Any]] = getattr(owner, self.attribute)
             expr = column[self.key]
             if self.value_type is None:
                 pass
@@ -362,10 +369,8 @@ class dict_property(InspectionAttrInfo, Generic[_T]):
                 expr = expr.as_float()
             elif issubclass(self.value_type, int):
                 expr = expr.as_integer()
-        elif self.custom_expression is None:
-            return None
         else:
-            expr = self.custom_expression(owner)
+            return None
 
         # FIXME: This will need to change for SQLAlchemy 1.4/2.0
         comparator = ExprComparator(owner, expr, self)  # type:ignore[call-arg]
@@ -435,6 +440,110 @@ class dict_property(InspectionAttrInfo, Generic[_T]):
 
         # fallback to just removing the value
         del getattr(instance, self.attribute)[self.key]
+
+
+class dict_markup_property(dict_property[_MarkupT]):
+
+    @overload
+    def __init__(
+        self: 'dict_markup_property[Markup | None]',
+        attribute: str,
+        key: str | None = None,
+        default: None = None,
+    ): ...
+
+    @overload
+    def __init__(
+        self: 'dict_markup_property[Markup]',
+        attribute: str,
+        key: str | None,
+        default: Markup,
+    ): ...
+
+    @overload
+    def __init__(
+        self: 'dict_markup_property[Markup]',
+        attribute: str,
+        key: str | None = None,
+        *,
+        default: Markup,
+    ): ...
+
+    def __init__(
+        self,
+        attribute: str,
+        key: str | None = None,
+        default: Markup | None = None,
+    ):
+        super().__init__(
+            attribute,
+            key,
+            default,  # type:ignore[arg-type]
+            Markup  # type:ignore[arg-type]
+        )
+        # FIXME: This isn't super robust, we should instead
+        #        override _expr to perform the type coercion
+        #        but for that we should probably refactor
+        #        the entire thing a bit to make it more easily
+        #        extensible
+        self.custom_expression = lambda owner: type_coerce(
+            getattr(owner, self.attribute)[self.key].as_string(),
+            MarkupText()
+        )
+
+    @overload
+    def __get__(
+        self,
+        instance: None,
+        owner: type[object]
+    ) -> 'QueryableAttribute | None': ...
+
+    @overload
+    def __get__(
+        self,
+        instance: object,
+        owner: type[object]
+    ) -> _MarkupT: ...
+
+    def __get__(
+        self,
+        instance: object | None,
+        owner: type[object]
+    ) -> '_MarkupT | QueryableAttribute | None':
+
+        if instance is None:
+            return self._expr(owner)
+
+        # pass control wholly to the custom getter if available
+        if self.custom_getter:
+            # NOTE: It would be safer to sanitize the text, in case someone
+            #       bypassed this property to insert raw unsanitized markup
+            #       However, this would also add a ton of static overhead.
+            #       If we decide we want the additional safety, we should
+            #       use an approach like OCQMS' lazy Sanitized text type.
+            return Markup(self.custom_getter(instance))  # noqa: MS001
+
+        # get the value in the dictionary
+        data = getattr(instance, self.attribute, None)
+
+        if data is not None and self.key in data:
+            value = data[self.key]
+            # NOTE: It would be safer to sanitize the text, in case someone
+            #       bypassed this property to insert raw unsanitized markup
+            #       However, this would also add a ton of static overhead.
+            #       If we decide we want the additional safety, we should
+            #       use an approach like OCQMS' lazy Sanitized text type.
+            return None if value is None else Markup(value)  # noqa: MS001
+
+        # fallback to the default
+        return self.default() if callable(self.default) else self.default
+
+    def __set__(self, instance: object, value: _MarkupT) -> None:
+        super().__set__(
+            instance,
+            # escape when setting the value
+            None if value is None else escape(value)  # type:ignore[arg-type]
+        )
 
 
 def dict_property_factory(attribute: str) -> '_dict_property_factory':

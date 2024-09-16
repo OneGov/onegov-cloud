@@ -1,5 +1,6 @@
 from datetime import date
 from datetime import datetime
+from markupsafe import Markup
 from onegov.form import Form
 from onegov.form.fields import ChosenSelectField
 from onegov.form.fields import PhoneNumberField
@@ -9,7 +10,7 @@ from onegov.gazette.layout import Layout
 from onegov.gazette.models import Category
 from onegov.gazette.models import Issue
 from onegov.gazette.models import Organization
-from onegov.quill import QuillField
+from onegov.quill.fields import QuillField
 from onegov.quill.validators import HtmlDataRequired
 from sedate import as_datetime
 from sedate import standardize_date
@@ -42,7 +43,7 @@ class NoticeForm(Form):
     request: 'GazetteRequest'
 
     title = StringField(
-        label=_("Title (maximum 60 characters)"),
+        label=_('Title (maximum 60 characters)'),
         validators=[
             InputRequired(),
             DataRequired(),
@@ -52,7 +53,7 @@ class NoticeForm(Form):
     )
 
     organization = ChosenSelectField(
-        label=_("Organization"),
+        label=_('Organization'),
         choices=[],
         validators=[
             InputRequired()
@@ -60,7 +61,7 @@ class NoticeForm(Form):
     )
 
     category = ChosenSelectField(
-        label=_("Category"),
+        label=_('Category'),
         choices=[],
         validators=[
             InputRequired()
@@ -68,21 +69,21 @@ class NoticeForm(Form):
     )
 
     print_only = BooleanField(
-        label=_("Print only"),
+        label=_('Print only'),
         default=False
     )
 
     at_cost = RadioField(
-        label=_("Liable to pay costs"),
+        label=_('Liable to pay costs'),
         default='no',
         choices=[
-            ('no', _("No")),
-            ('yes', _("Yes"))
+            ('no', _('No')),
+            ('yes', _('Yes'))
         ]
     )
 
     billing_address = TextAreaField(
-        label=_("Billing address"),
+        label=_('Billing address'),
         render_kw={'rows': 3},
         depends_on=('at_cost', 'yes'),
         validators=[
@@ -92,7 +93,7 @@ class NoticeForm(Form):
     )
 
     issues = MultiCheckboxField(
-        label=_("Issue(s)"),
+        label=_('Issue(s)'),
         choices=[],
         validators=[
             InputRequired()
@@ -100,7 +101,7 @@ class NoticeForm(Form):
     )
 
     text = QuillField(
-        label=_("Text"),
+        label=_('Text'),
         tags=('strong', 'ol', 'ul'),
         validators=[
             InputRequired(),
@@ -109,7 +110,7 @@ class NoticeForm(Form):
     )
 
     author_place = StringField(
-        label=_("Place"),
+        label=_('Place'),
         validators=[
             InputRequired(),
             DataRequired(),
@@ -117,19 +118,19 @@ class NoticeForm(Form):
     )
 
     author_date = DateField(
-        label=_("Date (usually the date of the issue)"),
+        label=_('Date (usually the date of the issue)'),
         validators=[
             InputRequired()
         ]
     )
 
     phone_number = PhoneNumberField(
-        label=_("Phone number for enquiry"),
-        description="+41791112233",
+        label=_('Phone number for enquiry'),
+        description='+41791112233',
     )
 
     author_name = TextAreaField(
-        label=_("Author"),
+        label=_('Author'),
         validators=[
             InputRequired(),
             DataRequired(),
@@ -150,7 +151,7 @@ class NoticeForm(Form):
         # active children (but not their parents))
         self.organization.choices = []
         self.organization.choices.append(
-            ('', self.request.translate(_("Select one")))
+            ('', self.request.translate(_('Select one')))
         )
         query = session.query(Organization)
         query = query.filter(Organization.active.is_(True))
@@ -218,7 +219,7 @@ class NoticeForm(Form):
         self.title.data = model.title
         self.organization.data = model.organization_id
         self.category.data = model.category_id
-        self.text.data = model.text
+        self.text.data = model.text or Markup('')
         self.author_place.data = model.author_place
         self.author_date.data = model.author_date
         self.author_name.data = model.author_name
@@ -240,7 +241,7 @@ class UnrestrictedNoticeForm(NoticeForm):
     """
 
     note = TextAreaField(
-        label=_("Note"),
+        label=_('Note'),
         render_kw={'rows': 3},
     )
 
@@ -255,7 +256,7 @@ class UnrestrictedNoticeForm(NoticeForm):
         # (but not their parents))
         self.organization.choices = []
         self.organization.choices.append(
-            ('', self.request.translate(_("Select one")))
+            ('', self.request.translate(_('Select one')))
         )
         query = session.query(Organization)
         query = query.filter(Organization.parent_id.is_(None))

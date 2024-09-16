@@ -272,7 +272,11 @@ def test_sogc_converter_KK02(gazette_app, xml):
         "<p><strong>Ablauf der Frist</strong><br>02.08.2018</p>"
         "<p><strong>Kommentar zur Frist</strong><br>test_commentaire_delai</p>"
         "<p><strong>Anmeldestelle</strong><br>"
-        "Office des poursuites et faillites de l'Etat Genève - Faillites<br>"
+        # NOTE: MarkupSafe eagerly escapes `'` here, which is fine, but
+        #       not strictly necessary. If this comes back to haunt us
+        #       we may need to change how we escape things slightly
+        "Office des poursuites et faillites de l&#39;Etat Genève - Faillites"
+        "<br>"
         "Rue du Stand 46<br>1204 Genève</p>"
         "<p><strong>Rechtliche Hinweise und Fristen</strong><br>"
         "Notification selon LP 231, 232; ORFI, du 23 avril 1920, "

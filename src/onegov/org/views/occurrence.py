@@ -1,6 +1,7 @@
 """ The onegov org collection of images uploaded to the site. """
 from collections import defaultdict
 from datetime import date
+from markupsafe import Markup
 from morepath import redirect
 from morepath.request import Response
 from onegov.core.security import Public, Private, Secret
@@ -19,7 +20,14 @@ from onegov.org.views.utils import show_tags, show_filters
 from onegov.ticket import TicketCollection
 from sedate import as_datetime, replace_timezone
 
-from typing import NamedTuple
+
+from typing import NamedTuple, TYPE_CHECKING
+if TYPE_CHECKING:
+    from collections.abc import Mapping
+    from onegov.core.types import JSON_ro, RenderData
+    from onegov.event.collections.occurrences import DateRange
+    from onegov.org.request import OrgRequest
+    from webob import Response as BaseResponse
 
 
 class Filter(NamedTuple):
@@ -27,7 +35,13 @@ class Filter(NamedTuple):
     tags: tuple[CoreLink, ...]
 
 
-def get_filters(request, self, keyword_counts=None, view_name=None):
+def get_filters(
+    request: 'OrgRequest',
+    self: OccurrenceCollection,
+    keyword_counts: 'Mapping[str, Mapping[str, int]]',
+    view_name: str = ''
+) -> list[Filter]:
+
     filters = []
     empty = ()
 
@@ -35,12 +49,10 @@ def get_filters(request, self, keyword_counts=None, view_name=None):
         f.id for f in request.app.org.event_filter_fields if f.type == 'radio'
     }
 
-    def get_count(keyword, value):
+    def get_count(keyword: str, value: str) -> int:
         return keyword_counts.get(keyword, {}).get(value, 0)
 
-    def link_title(field_id, value):
-        if keyword_counts is None:
-            return value
+    def link_title(field_id: str, value: str) -> str:
         count = keyword_counts.get(field_id, {}).get(value, 0)
         return f'{value} ({count})'
 
@@ -49,10 +61,14 @@ def get_filters(request, self, keyword_counts=None, view_name=None):
             CoreLink(
                 text=link_title(keyword, value),
                 active=value in self.filter_keywords.get(keyword, empty),
-                url=request.link(self.for_filter(
-                    singular=keyword in radio_fields,
-                    **{keyword: value}
-                ), name=view_name),
+                url=request.link(
+                    self.for_toggled_keyword_value(
+                        keyword,
+                        value,
+                        singular=keyword in radio_fields,
+                    ),
+                    name=view_name
+                ),
                 rounded=keyword in radio_fields
             ) for value in values if get_count(keyword, value)
         )))
@@ -60,21 +76,37 @@ def get_filters(request, self, keyword_counts=None, view_name=None):
     return filters
 
 
-def keyword_count(request, collection):
+def keyword_count(
+    request: 'OrgRequest',
+    collection: OccurrenceCollection
+) -> dict[str, dict[str, int]]:
+
     self = collection
 
+    filter_config = request.app.org.event_filter_configuration
     keywords = tuple(
-        as_internal_id(k) for k in (
-            request.app.org.event_filter_configuration.get('keywords', set)
-        )
+        as_internal_id(keyword)
+        for keyword in filter_config.get('keywords', set())
     )
 
-    fields = {f.id: f for f in request.app.org.event_filter_fields if
-              f.id in keywords}
+    fields = {
+        field.id: field
+        for field in request.app.org.event_filter_fields
+        if field.id in keywords
+    }
 
-    counts = {}
-    for model in request.exclude_invisible(
-            self.without_keywords_and_tags().query()):
+    counts: dict[str, dict[str, int]] = {}
+
+    # NOTE: The counting can get incredibly expensive with many entries
+    #       so we should skip it when we know we can skip it
+    if not fields:
+        return counts
+
+    # FIXME: This is incredibly slow. We need to think of a better way.
+    for model in self.without_keywords_and_tags().query():
+        if not request.is_visible(model):
+            continue
+
         for keyword, values in model.filter_keywords.items() if (
                 model.filter_keywords) else ():
             if keyword in fields:
@@ -90,13 +122,17 @@ def keyword_count(request, collection):
 
 @OrgApp.html(model=OccurrenceCollection, template='occurrences.pt',
              permission=Public)
-def view_occurrences(self, request, layout=None):
+def view_occurrences(
+    self: OccurrenceCollection,
+    request: 'OrgRequest',
+    layout: OccurrencesLayout | None = None
+) -> 'RenderData':
     """ View all occurrences of all events. """
 
     filters = None
     tags = None
     filter_type = request.app.org.event_filter_type
-    filter_config = request.app.org.event_filter_configuration or {}
+    filter_config = request.app.org.event_filter_configuration
 
     layout = layout or OccurrencesLayout(self, request)
 
@@ -105,60 +141,61 @@ def view_occurrences(self, request, layout=None):
     ]
     translated_tags.sort(key=lambda i: i[1])
 
-    if (filter_type in ['filters', 'tags_and_filters']
-            and filter_config.get('keywords', None)):
+    if (
+        filter_type in ('filters', 'tags_and_filters')
+        and filter_config.get('keywords', None)
+    ):
         self.set_event_filter_configuration(filter_config)
         self.set_event_filter_fields(request.app.org.event_filter_fields)
 
         keyword_counts = keyword_count(request, self)
         filters = get_filters(request, self, keyword_counts)
 
-    if request.app.org.event_filter_type in ['tags', 'tags_and_filters']:
+    if filter_type in ('tags', 'tags_and_filters'):
         tags = [
             Link(
                 text=translation + f' ({self.tag_counts[tag]})',
                 url=request.link(self.for_filter(tag=tag)),
-                active=tag in self.tags and 'active' or ''
-            ) for tag, translation in translated_tags
+                active=tag in self.tags
+            ) for tag, translation in translated_tags if self.tag_counts[tag]
         ]
 
     locations = [
         Link(
             text=location,
             url=request.link(self.for_filter(location=location)),
-            active=location in self.locations and 'active' or ''
+            active=location in self.locations
         ) for location in sorted(
             request.app.org.event_locations,
             key=lambda l: normalize_for_url(l)
         )
     ]
 
+    range_labels: tuple[tuple[DateRange, str], ...] = (
+        ('today', _('Today')),
+        ('tomorrow', _('Tomorrow')),
+        ('weekend', _('This weekend')),
+        ('week', _('This week')),
+        ('month', _('This month')),
+        ('past', _('Past events')),
+    )
     ranges = [
         Link(
-            text=_("All"),
-            url=request.link(
-                self.for_filter(range=range, start=None, end=None)
-            ),
-            active=(
-                not self.range and not self.start and not self.end
-            ) and 'active' or ''
+            text=_('All'),
+            url=request.link(self.for_filter(start=None, end=None)),
+            active=not (self.range or self.start or self.end)
         )
     ] + [
         Link(
-            text=translation,
+            text=label,
             url=request.link(
                 self.for_filter(range=range, start=None, end=None)
             ),
-            active=range == self.range and 'active' or ''
-        ) for range, translation in (
-            ('today', _("Today")),
-            ('tomorrow', _("Tomorrow")),
-            ('weekend', _("This weekend")),
-            ('week', _("This week")),
-            ('month', _("This month")),
-            ('past', _("Past events")),
-        )
+            active=range == self.range
+        ) for range, label in range_labels
     ]
+
+    files = list(request.app.org.event_files)
 
     return {
         'active_tags': self.tags,
@@ -170,26 +207,33 @@ def view_occurrences(self, request, layout=None):
         'start': self.start.isoformat() if self.start else '',
         'ranges': ranges,
         'tags': tags,
+        'files': files,
         'filters': filters,
         'locations': locations,
         'title': _('Events'),
         'search_widget': self.search_widget,
         'show_tags': show_tags(request),
         'show_filters': show_filters(request),
-        'no_event_link': request.link(self.for_filter(
-            range='past', start=None, end=None)),
+        'no_event_link': request.link(
+            self.for_filter(range='past', start=None, end=None)
+        ),
     }
 
 
 @OrgApp.html(model=Occurrence, template='occurrence.pt', permission=Public)
-def view_occurrence(self, request, layout=None):
+def view_occurrence(
+    self: Occurrence,
+    request: 'OrgRequest',
+    layout: OccurrenceLayout | None = None
+) -> 'RenderData':
     """ View a single occurrence of an event. """
 
     layout = layout or OccurrenceLayout(self, request)
     today = replace_timezone(as_datetime(date.today()), self.timezone)
     occurrences = self.event.occurrence_dates(localize=True)
     occurrences = list(filter(lambda x: x >= today, occurrences))
-    description = linkify(self.event.description).replace('\n', '<br>')
+    description = linkify(
+        self.event.description or '').replace('\n', Markup('<br>'))
     session = request.session
     ticket = TicketCollection(session).by_handler_id(self.event.id.hex)
     framed = request.GET.get('framed')
@@ -215,17 +259,23 @@ def view_occurrence(self, request, layout=None):
 @OrgApp.form(model=OccurrenceCollection, name='edit',
              template='directory_form.pt', permission=Secret,
              form=EventConfigurationForm)
-def handle_edit_event_filters(self, request, form, layout=None):
+def handle_edit_event_filters(
+    self: OccurrenceCollection,
+    request: 'OrgRequest',
+    form: EventConfigurationForm,
+    layout: OccurrencesLayout | None = None
+) -> 'RenderData | BaseResponse':
+
     try:
         if form.submitted(request):
-            keywords = form.keyword_fields.data.splitlines()
+            keywords = (form.keyword_fields.data or '').splitlines()
             request.app.org.event_filter_configuration = {
                 'order': [],
                 'keywords': keywords
             }
             request.app.org.event_filter_definition = form.definition.data
 
-            request.success(_("Your changes were saved"))
+            request.success(_('Your changes were saved'))
             return request.redirect(request.link(self))
 
         elif not request.POST:
@@ -236,24 +286,24 @@ def handle_edit_event_filters(self, request, form, layout=None):
 
     except InvalidFormSyntax as e:
         request.warning(
-            _("Syntax Error in line ${line}", mapping={'line': e.line})
+            _('Syntax Error in line ${line}', mapping={'line': e.line})
         )
     except AttributeError:
-        request.warning(_("Syntax error in form"))
+        request.warning(_('Syntax error in form'))
 
     except MixedTypeError as e:
         request.warning(
-            _("Syntax error in field ${field_name}",
+            _('Syntax error in field ${field_name}',
               mapping={'field_name': e.field_name})
         )
     except DuplicateLabelError as e:
         request.warning(
-            _("Error: Duplicate label ${label}", mapping={'label': e.label})
+            _('Error: Duplicate label ${label}', mapping={'label': e.label})
         )
 
     layout = layout or OccurrencesLayout(self, request)
     layout.include_code_editor()
-    layout.breadcrumbs.append(Link(_("Edit"), '#'))
+    layout.breadcrumbs.append(Link(_('Edit'), '#'))
     layout.editbar_links = []
 
     return {
@@ -268,7 +318,7 @@ def handle_edit_event_filters(self, request, form, layout=None):
 
 
 @OrgApp.view(model=Occurrence, name='ical', permission=Public)
-def ical_export_occurence(self, request):
+def ical_export_occurence(self: Occurrence, request: 'OrgRequest') -> Response:
     """ Returns the occurrence as ics. """
 
     return Response(
@@ -279,7 +329,10 @@ def ical_export_occurence(self, request):
 
 
 @OrgApp.view(model=OccurrenceCollection, name='ical', permission=Public)
-def ical_export_occurences(self, request):
+def ical_export_occurences(
+    self: OccurrenceCollection,
+    request: 'OrgRequest'
+) -> Response:
     """ Returns the occurrences as ics. """
 
     return Response(
@@ -291,12 +344,17 @@ def ical_export_occurences(self, request):
 
 @OrgApp.form(model=OccurrenceCollection, name='export', permission=Public,
              form=ExportForm, template='export.pt')
-def export_occurrences(self, request, form, layout=None):
+def export_occurrences(
+    self: OccurrenceCollection,
+    request: 'OrgRequest',
+    form: ExportForm,
+    layout: OccurrencesLayout | None = None
+) -> 'RenderData | BaseResponse':
     """ Export the occurrences in various formats. """
 
     layout = layout or OccurrencesLayout(self, request)
-    layout.breadcrumbs.append(Link(_("Export"), '#'))
-    layout.editbar_links = None
+    layout.breadcrumbs.append(Link(_('Export'), '#'))
+    layout.editbar_links = None  # type:ignore[assignment]
 
     if form.submitted(request):
         import_form = EventImportForm()
@@ -304,19 +362,22 @@ def export_occurrences(self, request, form, layout=None):
         results = import_form.run_export()
 
         return form.as_export_response(results, title=request.translate(_(
-            "Events"
+            'Events'
         )))
 
     return {
         'layout': layout,
-        'title': _("Event Export"),
+        'title': _('Event Export'),
         'form': form,
-        'explanation': _("Exports all future events.")
+        'explanation': _('Exports all future events.')
     }
 
 
 @OrgApp.json(model=OccurrenceCollection, name='json', permission=Public)
-def json_export_occurences(self, request):
+def json_export_occurences(
+    self: OccurrenceCollection,
+    request: 'OrgRequest'
+) -> 'JSON_ro':
     """ Returns the occurrences as JSON.
 
     This is used for the senantis.dir.eventsportlet.
@@ -324,16 +385,16 @@ def json_export_occurences(self, request):
     """
 
     @request.after
-    def cors(response):
+    def cors(response: 'BaseResponse') -> None:
         response.headers.add('Access-Control-Allow-Origin', '*')
 
     query = self.for_filter(
-        tags=request.params.getall('cat1'),
-        locations=request.params.getall('cat2')
+        tags=request.params.getall('cat1'),  # type:ignore[arg-type]
+        locations=request.params.getall('cat2')  # type:ignore[arg-type]
     ).query()
 
     limit = request.params.get('max')
-    if limit and limit.isdigit():
+    if isinstance(limit, str) and limit.isdigit():
         query = query.limit(int(limit))
 
     return [
@@ -350,7 +411,10 @@ def json_export_occurences(self, request):
     name='xml',
     permission=Public
 )
-def xml_export_all_occurrences(self, request):
+def xml_export_all_occurrences(
+    self: OccurrenceCollection,
+    request: 'OrgRequest'
+) -> Response:
     """
     Returns events as xml.
     Url for xml view: ../events/xml
@@ -371,7 +435,13 @@ def xml_export_all_occurrences(self, request):
     form=EventImportForm,
     permission=Private
 )
-def import_occurrences(self, request, form, layout=None):
+def import_occurrences(
+    self: OccurrenceCollection,
+    request: 'OrgRequest',
+    form: EventImportForm,
+    layout: OccurrencesLayout | None = None
+) -> 'RenderData | BaseResponse':
+
     if form.submitted(request):
         count, errors = form.run_import()
         if errors:

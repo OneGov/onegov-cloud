@@ -9,7 +9,6 @@ from onegov.core.utils import Bunch
 from onegov.org import OrgApp
 from onegov.core.elements import Link
 from onegov.org.layout import (
-    EventBaseLayout,
     DefaultLayout,
     PageLayout
 )
@@ -173,6 +172,7 @@ def test_template_layout(postgres_dsn, redis_url):
         org.geo_provider = 'geo-mapbox'
         org.open_files_target_blank = True
         org.header_options = header_options
+        org.analytics_code = None
 
         # disable LibresIntegration for this test
         def configure_libres(self, **cfg):
@@ -223,17 +223,17 @@ def test_template_layout(postgres_dsn, redis_url):
     assert '<body id="page-model"' in response.text
 
 
-def test_events_layout_format_date():
+def test_default_layout_format_date():
     then = datetime(2015, 7, 5, 10, 15)
     request = MockRequest()
 
-    layout = EventBaseLayout(MockModel(), request)
+    layout = DefaultLayout(MockModel(), request)
     assert layout.format_date(then, 'weekday_long') == 'Sunday'
     assert layout.format_date(then, 'month_long') == 'July'
     assert layout.format_date(then, 'event') == 'Sunday, 5. July 2015'
 
     request.locale = 'de'
-    layout = EventBaseLayout(MockModel(), request)
+    layout = DefaultLayout(MockModel(), request)
     assert layout.format_date(then, 'date') == '05.07.2015'
     assert layout.format_date(then, 'datetime') == '05.07.2015 10:15'
     assert layout.format_date(then, 'time') == '10:15'

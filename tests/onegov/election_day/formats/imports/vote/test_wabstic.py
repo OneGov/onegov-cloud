@@ -2,12 +2,12 @@ import tarfile
 
 from datetime import date
 from io import BytesIO
-from onegov.ballot import Vote
-from onegov.ballot import ComplexVote
 from onegov.election_day.formats import import_vote_wabstic
 from onegov.election_day.models import Canton
+from onegov.election_day.models import ComplexVote
 from onegov.election_day.models import Municipality
-from tests.onegov.election_day.common import get_tar_file_path, print_errors
+from onegov.election_day.models import Vote
+from tests.onegov.election_day.common import get_tar_file_path
 
 
 def test_import_wabstic_vote(session):
@@ -48,7 +48,6 @@ def test_import_wabstic_vote(session):
             BytesIO(sg_geschaefte), 'text/plain',
             BytesIO(sg_gemeinden), 'text/plain'
         )
-        print_errors(errors)
         assert not errors
         assert vote.last_result_change
         assert vote.status == status
@@ -67,7 +66,7 @@ def test_import_wabstic_vote(session):
     assert not errors
     assert vote.last_result_change
     assert vote.completed
-    assert vote.ballots.one().results.count() == 78
+    assert len(vote.ballots[0].results) == 78
     assert vote.yeas == 57653
 
     # Test communal results
@@ -95,7 +94,7 @@ def test_import_wabstic_vote(session):
         assert vote.counted
         assert vote.status == 'unknown'
         assert vote.completed
-        assert vote.ballots.one().results.one().yeas == yeas
+        assert vote.ballots[0].results[0].yeas == yeas
 
     # Test communal results (missing)
     for district, number, entity_id, domain in (
@@ -116,7 +115,7 @@ def test_import_wabstic_vote(session):
         assert not errors
         assert vote.last_result_change
         assert not vote.completed
-        assert not vote.ballots.one().results.one().counted
+        assert not vote.ballots[0].results[0].counted
 
     # Test complex vote
     session.add(
@@ -138,7 +137,7 @@ def test_import_wabstic_vote(session):
     assert not errors
     assert vote.last_result_change
     assert vote.completed
-    assert vote.ballots.count() == 3
+    assert len(vote.ballots) == 3
     assert vote.proposal.yeas == 1596
     assert vote.counter_proposal.yeas == 0
     assert vote.tie_breaker.yeas == 0
@@ -382,10 +381,11 @@ def test_import_wabstic_vote_expats(session):
                 ).encode('utf-8')),
                 'text/plain'
             )
-            print_errors(errors)
             assert not errors
 
-            result = vote.proposal.results.filter_by(entity_id=0).first()
+            result = next(
+                (r for r in vote.proposal.results if r.entity_id == 0), None
+            )
             if has_expats:
                 assert result.empty == 1
             else:

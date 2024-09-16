@@ -11,13 +11,13 @@ from onegov.gazette.models.category import Category
 from onegov.gazette.models.issue import Issue
 from onegov.gazette.models.issue import IssueName
 from onegov.gazette.models.organization import Organization
+from onegov.gazette.observer import observes
 from onegov.notice import OfficialNotice
 from onegov.user import User
 from onegov.user import UserCollection
 from sedate import as_datetime
 from sedate import standardize_date
 from sedate import utcnow
-from sqlalchemy_utils import observes
 from sqlalchemy.orm import backref
 from sqlalchemy.orm import object_session
 from sqlalchemy.orm import relationship
@@ -33,16 +33,19 @@ if TYPE_CHECKING:
 
 
 class CachedUserNameMixin:
-    """ Mixin providing a cached version of the user name. There needs to be:
-    - a ``user`` relationship (which has no dynamic backref)
-    - a meta column
+    """ Mixin providing a cached version of the user name.
 
-    The observer needs to be registered in the children:
+    There needs to be:
 
-    @observes('user', 'user.realname', 'user.username')
-    def user_observer(self, user, realname, username):
-        if hasattr(self, '_user_observer'):
-            self._user_observer(user, realname, username)
+    * a ``user`` relationship (which has no dynamic backref)
+    * a meta column
+
+    The observer needs to be registered in the children::
+
+        @observes('user', 'user.realname', 'user.username')
+        def user_observer(self, user, realname, username):
+            if hasattr(self, '_user_observer'):
+                self._user_observer(user, realname, username)
 
     """
 
@@ -81,16 +84,19 @@ class CachedUserNameMixin:
 
 
 class CachedGroupNameMixin:
-    """ Mixin providing a cached version of the group name. There needs to be:
-    - a ``group`` relationship (which has no dynamic backref)
-    - a meta column
+    """ Mixin providing a cached version of the group name.
 
-    The observer needs to be registered in the children:
+    There needs to be:
 
-    @observes('group', 'group.name')
-    def group_observer(self, group, name):
-        if hasattr(self, '_group_observerr'):
-            self._group_observerr(user, realname, username)
+    * a ``group`` relationship (which has no dynamic backref)
+    * a meta column
+
+    The observer needs to be registered in the children::
+
+        @observes('group', 'group.name')
+        def group_observer(self, group, name):
+            if hasattr(self, '_group_observerr'):
+                self._group_observerr(user, realname, username)
 
     """
 
@@ -172,9 +178,17 @@ class GazetteNotice(
     billing_address: dict_property[str | None]
     billing_address = content_property('billing_address')
 
-    if TYPE_CHECKING:
-        # FIXME: Replace with explicit backref with back_populates
-        changes: relationship[AppenderQuery['GazetteNoticeChange']]
+    changes: 'relationship[AppenderQuery[GazetteNoticeChange]]' = relationship(
+        'GazetteNoticeChange',
+        back_populates='notice',
+        primaryjoin=(
+            'foreign(GazetteNoticeChange.channel_id)'
+            '== cast(GazetteNotice.id, TEXT)'
+        ),
+        lazy='dynamic',
+        cascade='all,delete-orphan',
+        order_by='desc(GazetteNoticeChange.id)'
+    )
 
     @observes('user', 'user.realname', 'user.username')
     def user_observer(
@@ -183,9 +197,7 @@ class GazetteNotice(
         realname: str | None,
         username: str | None
     ) -> None:
-        # FIXME: What is the point of this hasattr check?
-        if hasattr(self, '_user_observer'):
-            self._user_observer(user, realname, username)
+        self._user_observer(user, realname, username)
 
     @observes('group', 'group.name')
     def group_observer(
@@ -193,9 +205,7 @@ class GazetteNotice(
         group: 'UserGroup | None',
         name: str | None
     ) -> None:
-        # FIXME: What is the point of this hasattr check?
-        if hasattr(self, '_group_observer'):
-            self._group_observer(group, name)
+        self._group_observer(group, name)
 
     def add_change(
         self,
@@ -231,7 +241,7 @@ class GazetteNotice(
         """
 
         super().submit()
-        self.add_change(request, _("submitted"))
+        self.add_change(request, _('submitted'))
 
     def reject(  # type:ignore[override]
         self,
@@ -245,7 +255,7 @@ class GazetteNotice(
         """
 
         super().reject()
-        self.add_change(request, _("rejected"), comment)
+        self.add_change(request, _('rejected'), comment)
 
     def accept(self, request: 'GazetteRequest') -> None:  # type:ignore
         """ Accept a submitted notice.
@@ -255,7 +265,7 @@ class GazetteNotice(
         """
 
         super().accept()
-        self.add_change(request, _("accepted"))
+        self.add_change(request, _('accepted'))
 
     def publish(self, request: 'GazetteRequest') -> None:  # type:ignore
         """ Publish an accepted notice.
@@ -265,7 +275,7 @@ class GazetteNotice(
         """
 
         super().publish()
-        self.add_change(request, _("published"))
+        self.add_change(request, _('published'))
 
     @property
     def rejected_comment(self) -> str:
@@ -294,7 +304,7 @@ class GazetteNotice(
         if isinstance(value, dict):
             self._issues = value
         else:
-            self._issues = {item: None for item in value}
+            self._issues = dict.fromkeys(value, None)
 
     @property
     def issue_objects(self) -> list[Issue]:
@@ -441,9 +451,7 @@ class GazetteNoticeChange(Message, CachedUserNameMixin):
         realname: str | None,
         username: str | None
     ) -> None:
-        # FIXME: What is the point of this hasattr check?
-        if hasattr(self, '_user_observer'):
-            self._user_observer(user, realname, username)
+        self._user_observer(user, realname, username)
 
     #: the notice which this change belongs to
     notice: 'relationship[GazetteNotice]' = relationship(
@@ -452,12 +460,7 @@ class GazetteNoticeChange(Message, CachedUserNameMixin):
             'foreign(GazetteNoticeChange.channel_id)'
             '== cast(GazetteNotice.id, TEXT)'
         ),
-        backref=backref(
-            'changes',
-            lazy='dynamic',
-            cascade='all,delete-orphan',
-            order_by='desc(GazetteNoticeChange.id)'
-        )
+        back_populates='changes'
     )
 
     #: the event

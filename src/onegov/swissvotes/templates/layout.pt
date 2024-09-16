@@ -82,7 +82,7 @@
             <div class="row">
                 <div class="small-12 columns" id="alert-boxes">
                     <div tal:repeat="message request.consume_messages()" data-alert class="alert-box ${message.type}">
-                        <tal:block tal:content="structure message.text" />
+                        <tal:block tal:content="message.text" />
                         <a href="#" class="close">&times;</a>
                     </div>
                     <div i18n:translate tal:condition="request.agent['user_agent']['family'] == 'IE'" data-alert class="alert-box warning">
@@ -106,13 +106,13 @@
                 <div class="links">
                      <div class="row">
                         <div class="small-12 medium-4 columns small-only-text-center">
-                            <tal:block replace="structure layout.disclaimer_link(layout)" />
+                            <tal:block replace="layout.disclaimer_link(layout)" />
                         </div>
                         <div class="small-12 medium-4 columns text-center">
-                            <tal:block replace="structure layout.imprint_link(layout)" />
+                            <tal:block replace="layout.imprint_link(layout)" />
                         </div>
                         <div class="small-12 medium-4 columns small-only-text-center medium-text-right manage-links">
-                            <tal:block replace="structure layout.data_protection_link(layout)" />
+                            <tal:block replace="layout.data_protection_link(layout)" />
                         </div>
                     </div>
                      <div class="row">

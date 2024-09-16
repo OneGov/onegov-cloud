@@ -1,6 +1,8 @@
 import datetime
 import json
 import re
+import yaml
+
 from functools import cached_property
 from lxml import etree
 
@@ -10,13 +12,15 @@ from onegov.form import Form
 from onegov.form.fields import ChosenSelectField
 from onegov.form.fields import ColorField
 from onegov.form.fields import CssField
+from onegov.form.fields import MarkupField
 from onegov.form.fields import MultiCheckboxField
 from onegov.form.fields import PreviewField
 from onegov.form.fields import TagsField
 from onegov.gever.encrypt import encrypt_symmetric
 from onegov.gis import CoordinatesField
 from onegov.org import _
-from onegov.org.forms.fields import HtmlField
+from onegov.org.forms.fields import (HtmlField,
+                                     UploadOrSelectExistingMultipleFilesField)
 from onegov.org.forms.user import AVAILABLE_ROLES
 from onegov.org.forms.util import TIMESPANS
 from onegov.org.theme import user_options
@@ -61,25 +65,25 @@ class GeneralSettingsForm(Form):
         request: OrgRequest
 
     name = StringField(
-        label=_("Name"),
+        label=_('Name'),
         validators=[InputRequired()])
 
     logo_url = StringField(
-        label=_("Logo"),
-        description=_("URL pointing to the logo"),
+        label=_('Logo'),
+        description=_('URL pointing to the logo'),
         render_kw={'class_': 'image-url'})
 
     square_logo_url = StringField(
-        label=_("Logo (Square)"),
-        description=_("URL pointing to the logo"),
+        label=_('Logo (Square)'),
+        description=_('URL pointing to the logo'),
         render_kw={'class_': 'image-url'})
 
     reply_to = EmailField(
-        _("E-Mail Reply Address (Reply-To)"), [InputRequired()],
-        description=_("Replies to automated e-mails go to this address."))
+        _('E-Mail Reply Address (Reply-To)'), [InputRequired()],
+        description=_('Replies to automated e-mails go to this address.'))
 
     primary_color = ColorField(
-        label=_("Primary Color"))
+        label=_('Primary Color'))
 
     font_family_sans_serif = ChosenSelectField(
         label=_('Default Font Family'),
@@ -88,11 +92,11 @@ class GeneralSettingsForm(Form):
     )
 
     locales = RadioField(
-        label=_("Languages"),
+        label=_('Languages'),
         choices=(
-            ('de_CH', _("German")),
-            ('fr_CH', _("French")),
-            ('it_CH', _("Italian"))
+            ('de_CH', _('German')),
+            ('fr_CH', _('French')),
+            ('it_CH', _('Italian'))
         ),
         validators=[InputRequired()]
     )
@@ -106,7 +110,7 @@ class GeneralSettingsForm(Form):
         description=_(
             'Will be used if an image is needed, but none has been set'),
         fieldset=_('Images'),
-        label=_("Standard Image"),
+        label=_('Standard Image'),
         render_kw={'class_': 'image-url'}
     )
 
@@ -171,199 +175,213 @@ class GeneralSettingsForm(Form):
 class FooterSettingsForm(Form):
 
     footer_left_width = IntegerField(
-        label=_("Column width left side"),
-        fieldset=_("Footer Division"),
+        label=_('Column width left side'),
+        fieldset=_('Footer Division'),
         default=3,
         validators=[InputRequired()]
     )
 
     footer_center_width = IntegerField(
-        label=_("Column width for the center"),
-        fieldset=_("Footer Division"),
+        label=_('Column width for the center'),
+        fieldset=_('Footer Division'),
         default=5,
         validators=[InputRequired()]
     )
 
     footer_right_width = IntegerField(
-        label=_("Column width right side"),
-        fieldset=_("Footer Division"),
+        label=_('Column width right side'),
+        fieldset=_('Footer Division'),
         default=4,
         validators=[InputRequired()]
     )
 
     contact = TextAreaField(
-        label=_("Contact"),
-        description=_("The address and phone number of the municipality"),
+        label=_('Contact'),
+        description=_('The address and phone number of the municipality'),
         render_kw={'rows': 8},
-        fieldset=_("Information"))
+        fieldset=_('Information'))
 
     contact_url = URLField(
-        label=_("Contact Link"),
-        description=_("URL pointing to a contact page"),
-        fieldset=_("Information"),
+        label=_('Contact Link'),
+        description=_('URL pointing to a contact page'),
+        fieldset=_('Information'),
         render_kw={'class_': 'internal-url'},
         validators=[UrlRequired(), Optional()]
     )
 
     opening_hours = TextAreaField(
-        label=_("Opening Hours"),
-        description=_("The opening hours of the municipality"),
+        label=_('Opening Hours'),
+        description=_('The opening hours of the municipality'),
         render_kw={'rows': 8},
-        fieldset=_("Information"))
+        fieldset=_('Information'))
 
     opening_hours_url = URLField(
-        label=_("Opening Hours Link"),
-        description=_("URL pointing to an opening hours page"),
-        fieldset=_("Information"),
+        label=_('Opening Hours Link'),
+        description=_('URL pointing to an opening hours page'),
+        fieldset=_('Information'),
         render_kw={'class_': 'internal-url'},
         validators=[UrlRequired(), Optional()]
     )
 
     hide_onegov_footer = BooleanField(
-        label=_("Hide OneGov Cloud information"),
+        label=_('Hide OneGov Cloud information'),
         description=_(
-            "This includes the link to the marketing page, and the link "
-            "to the privacy policy."
+            'This includes the link to the marketing page, and the link '
+            'to the privacy policy.'
         ),
-        fieldset=_("Information")
+        fieldset=_('Information')
     )
 
     facebook_url = URLField(
-        label=_("Facebook"),
-        description=_("URL pointing to the Facebook site"),
-        fieldset=_("Social Media"),
+        label=_('Facebook'),
+        description=_('URL pointing to the Facebook site'),
+        fieldset=_('Social Media'),
         validators=[UrlRequired(), Optional()]
     )
 
     twitter_url = URLField(
-        label=_("Twitter"),
-        description=_("URL pointing to the Twitter site"),
-        fieldset=_("Social Media"),
+        label=_('Twitter'),
+        description=_('URL pointing to the Twitter site'),
+        fieldset=_('Social Media'),
         validators=[UrlRequired(), Optional()]
     )
 
     youtube_url = URLField(
-        label=_("YouTube"),
-        description=_("URL pointing to the YouTube site"),
-        fieldset=_("Social Media"),
+        label=_('YouTube'),
+        description=_('URL pointing to the YouTube site'),
+        fieldset=_('Social Media'),
         validators=[UrlRequired(), Optional()]
     )
 
     instagram_url = URLField(
-        label=_("Instagram"),
-        description=_("URL pointing to the Instagram site"),
-        fieldset=_("Social Media"),
+        label=_('Instagram'),
+        description=_('URL pointing to the Instagram site'),
+        fieldset=_('Social Media'),
+        validators=[UrlRequired(), Optional()]
+    )
+
+    linkedin_url = URLField(
+        label=_('Linkedin'),
+        description=_('URL pointing to the LinkedIn site'),
+        fieldset=_('Social Media'),
+        validators=[UrlRequired(), Optional()]
+    )
+
+    tiktok_url = URLField(
+        label=_('TikTok'),
+        description=_('URL pointing to the TikTok site'),
+        fieldset=_('Social Media'),
         validators=[UrlRequired(), Optional()]
     )
 
     custom_link_1_name = StringField(
-        label=_("Name"),
-        description="Name of the Label",
-        fieldset=_("Custom Link 1")
+        label=_('Name'),
+        description='Name of the Label',
+        fieldset=_('Custom Link 1')
     )
 
     custom_link_1_url = URLField(
-        label=_("URL"),
-        description=_("URL to internal/external site"),
-        fieldset=_("Custom Link 1"),
+        label=_('URL'),
+        description=_('URL to internal/external site'),
+        fieldset=_('Custom Link 1'),
         validators=[UrlRequired(), Optional()]
     )
 
     custom_link_2_name = StringField(
-        label=_("Name"),
-        description="Name of the Label",
-        fieldset=_("Custom Link 2")
+        label=_('Name'),
+        description='Name of the Label',
+        fieldset=_('Custom Link 2')
     )
 
     custom_link_2_url = URLField(
-        label=_("URL"),
-        description=_("URL to internal/external site"),
-        fieldset=_("Custom Link 2"),
+        label=_('URL'),
+        description=_('URL to internal/external site'),
+        fieldset=_('Custom Link 2'),
         validators=[UrlRequired(), Optional()]
     )
 
     custom_link_3_name = StringField(
-        label=_("Name"),
-        description="Name of the Label",
-        fieldset=_("Custom Link 3")
+        label=_('Name'),
+        description='Name of the Label',
+        fieldset=_('Custom Link 3')
     )
 
     custom_link_3_url = URLField(
-        label=_("URL"),
-        description=_("URL to internal/external site"),
-        fieldset=_("Custom Link 3"),
+        label=_('URL'),
+        description=_('URL to internal/external site'),
+        fieldset=_('Custom Link 3'),
         validators=[UrlRequired(), Optional()]
     )
 
     partner_1_name = StringField(
-        label=_("Name"),
-        description=_("Name of the partner"),
-        fieldset=_("First Partner"))
+        label=_('Name'),
+        description=_('Name of the partner'),
+        fieldset=_('First Partner'))
 
     partner_1_img = StringField(
-        label=_("Image"),
-        description=_("Logo of the partner"),
+        label=_('Image'),
+        description=_('Logo of the partner'),
         render_kw={'class_': 'image-url'},
-        fieldset=_("First Partner"))
+        fieldset=_('First Partner'))
 
     partner_1_url = URLField(
-        label=_("Website"),
+        label=_('Website'),
         description=_("The partner's website"),
-        fieldset=_("First Partner"),
+        fieldset=_('First Partner'),
         validators=[UrlRequired(), Optional()]
     )
 
     partner_2_name = StringField(
-        label=_("Name"),
-        description=_("Name of the partner"),
-        fieldset=_("Second Partner"))
+        label=_('Name'),
+        description=_('Name of the partner'),
+        fieldset=_('Second Partner'))
 
     partner_2_img = StringField(
-        label=_("Image"),
-        description=_("Logo of the partner"),
+        label=_('Image'),
+        description=_('Logo of the partner'),
         render_kw={'class_': 'image-url'},
-        fieldset=_("Second Partner"))
+        fieldset=_('Second Partner'))
 
     partner_2_url = URLField(
-        label=_("Website"),
+        label=_('Website'),
         description=_("The partner's website"),
-        fieldset=_("Second Partner"),
+        fieldset=_('Second Partner'),
         validators=[UrlRequired(), Optional()]
     )
 
     partner_3_name = StringField(
-        label=_("Name"),
-        description=_("Name of the partner"),
-        fieldset=_("Third Partner"))
+        label=_('Name'),
+        description=_('Name of the partner'),
+        fieldset=_('Third Partner'))
 
     partner_3_img = StringField(
-        label=_("Image"),
-        description=_("Logo of the partner"),
+        label=_('Image'),
+        description=_('Logo of the partner'),
         render_kw={'class_': 'image-url'},
-        fieldset=_("Third Partner"))
+        fieldset=_('Third Partner'))
 
     partner_3_url = URLField(
-        label=_("Website"),
+        label=_('Website'),
         description=_("The partner's website"),
-        fieldset=_("Third Partner"),
+        fieldset=_('Third Partner'),
         validators=[UrlRequired(), Optional()]
     )
 
     partner_4_name = StringField(
-        label=_("Name"),
-        description=_("Name of the partner"),
-        fieldset=_("Fourth Partner"))
+        label=_('Name'),
+        description=_('Name of the partner'),
+        fieldset=_('Fourth Partner'))
 
     partner_4_img = StringField(
-        label=_("Image"),
-        description=_("Logo of the partner"),
+        label=_('Image'),
+        description=_('Logo of the partner'),
         render_kw={'class_': 'image-url'},
-        fieldset=_("Fourth Partner"))
+        fieldset=_('Fourth Partner'))
 
     partner_4_url = URLField(
-        label=_("Website"),
+        label=_('Website'),
         description=_("The partner's website"),
-        fieldset=_("Fourth Partner"),
+        fieldset=_('Fourth Partner'),
         validators=[UrlRequired(), Optional()]
     )
 
@@ -390,7 +408,7 @@ class FooterSettingsForm(Form):
             for col in ('left', 'center', 'right'):
                 field = getattr(self, f'footer_{col}_width')
                 field.errors.append(
-                    _("The sum of all the footer columns must be equal to 12")
+                    _('The sum of all the footer columns must be equal to 12')
                 )
             return False
         return None
@@ -398,10 +416,10 @@ class FooterSettingsForm(Form):
 
 class SocialMediaSettingsForm(Form):
     og_logo_default = StringField(
-        label=_("Image"),
-        description=_("Default social media preview image for rich link "
-                      "previews. Optimal size is 1200:630 px."),
-        fieldset="OpenGraph",
+        label=_('Image'),
+        description=_('Default social media preview image for rich link '
+                      'previews. Optimal size is 1200:630 px.'),
+        fieldset='OpenGraph',
         render_kw={'class_': 'image-url'}
     )
 
@@ -409,33 +427,33 @@ class SocialMediaSettingsForm(Form):
 class FaviconSettingsForm(Form):
 
     favicon_win_url = StringField(
-        label=_("Icon 16x16 PNG (Windows)"),
-        description=_("URL pointing to the icon"),
+        label=_('Icon 16x16 PNG (Windows)'),
+        description=_('URL pointing to the icon'),
         render_kw={'class_': 'image-url'},
     )
 
     favicon_mac_url = StringField(
-        label=_("Icon 32x32 PNG (Mac)"),
-        description=_("URL pointing to the icon"),
+        label=_('Icon 32x32 PNG (Mac)'),
+        description=_('URL pointing to the icon'),
         render_kw={'class_': 'image-url'},
     )
 
     favicon_apple_touch_url = StringField(
-        label=_("Icon 57x57 PNG (iPhone, iPod, iPad)"),
-        description=_("URL pointing to the icon"),
+        label=_('Icon 57x57 PNG (iPhone, iPod, iPad)'),
+        description=_('URL pointing to the icon'),
         render_kw={'class_': 'image-url'},
     )
 
     favicon_pinned_tab_safari_url = StringField(
-        label=_("Icon SVG 20x20 (Safari)"),
-        description=_("URL pointing to the icon"),
+        label=_('Icon SVG 20x20 (Safari)'),
+        description=_('URL pointing to the icon'),
         render_kw={'class_': 'image-url'},
     )
 
 
 class LinksSettingsForm(Form):
     disable_page_refs = BooleanField(
-        label=_("Disable page references"),
+        label=_('Disable page references'),
         description=_(
             "Disable showing the copy link '#' for the site reference. "
             "The references themselves will still work. "
@@ -443,64 +461,64 @@ class LinksSettingsForm(Form):
     )
 
     open_files_target_blank = BooleanField(
-        label=_("Open files in separate window")
+        label=_('Open files in separate window')
     )
 
 
 class HeaderSettingsForm(Form):
 
     announcement = StringField(
-        label=_("Announcement"),
-        fieldset=_("Announcement"),
+        label=_('Announcement'),
+        fieldset=_('Announcement'),
     )
 
     announcement_url = StringField(
-        label=_("Announcement URL"),
-        fieldset=_("Announcement"),
+        label=_('Announcement URL'),
+        fieldset=_('Announcement'),
     )
 
     announcement_bg_color = ColorField(
-        label=_("Announcement bg color"),
-        fieldset=_("Announcement")
+        label=_('Announcement bg color'),
+        fieldset=_('Announcement')
     )
 
     announcement_font_color = ColorField(
-        label=_("Announcement font color"),
-        fieldset=_("Announcement")
+        label=_('Announcement font color'),
+        fieldset=_('Announcement')
     )
 
     announcement_is_private = BooleanField(
-        label=_("Only show Announcement for logged-in users"),
-        fieldset=_("Announcement")
+        label=_('Only show Announcement for logged-in users'),
+        fieldset=_('Announcement')
     )
 
     header_links = StringField(
-        label=_("Header links"),
-        fieldset=_("Header links"),
+        label=_('Header links'),
+        fieldset=_('Header links'),
         render_kw={'class_': 'many many-links'}
     )
 
     left_header_name = StringField(
-        label=_("Text"),
-        description=_(""),
-        fieldset=_("Text header left side")
+        label=_('Text'),
+        description=_(''),
+        fieldset=_('Text header left side')
     )
 
     left_header_url = URLField(
-        label=_("URL"),
-        description=_("Optional"),
-        fieldset=_("Text header left side"),
+        label=_('URL'),
+        description=_('Optional'),
+        fieldset=_('Text header left side'),
         validators=[UrlRequired(), Optional()]
     )
 
     left_header_color = ColorField(
-        label=_("Font color"),
-        fieldset=_("Text header left side")
+        label=_('Font color'),
+        fieldset=_('Text header left side')
     )
 
     left_header_rem = FloatField(
-        label=_("Relative font size"),
-        fieldset=_("Text header left side"),
+        label=_('Relative font size'),
+        fieldset=_('Text header left side'),
         validators=[
             NumberRange(0.5, 7)
         ],
@@ -509,8 +527,8 @@ class HeaderSettingsForm(Form):
 
     header_additions_fixed = BooleanField(
         label=_(
-            "Keep header links and/or header text fixed to top on scrolling"),
-        fieldset=_("Header fixation")
+            'Keep header links and/or header text fixed to top on scrolling'),
+        fieldset=_('Header fixation')
     )
 
     @property
@@ -575,6 +593,11 @@ class HeaderSettingsForm(Form):
         for text, url in self.json_to_links(self.header_links.data):
             if text and not url:
                 raise ValidationError(_('Please add an url to each link'))
+            if url and not re.match(r'^(http://|https://|/)', url):
+                raise ValidationError(
+                    _('Your URLs must start with http://,'
+                        ' https:// or / (for internal links)')
+                )
 
     def json_to_links(
         self,
@@ -596,10 +619,10 @@ class HeaderSettingsForm(Form):
 
         return json.dumps({
             'labels': {
-                'text': self.request.translate(_("Text")),
-                'link': self.request.translate(_("URL")),
-                'add': self.request.translate(_("Add")),
-                'remove': self.request.translate(_("Remove")),
+                'text': self.request.translate(_('Text')),
+                'link': self.request.translate(_('URL')),
+                'add': self.request.translate(_('Add')),
+                'remove': self.request.translate(_('Remove')),
             },
             'values': [
                 {
@@ -614,31 +637,31 @@ class HeaderSettingsForm(Form):
 class HomepageSettingsForm(Form):
 
     homepage_cover = HtmlField(
-        label=_("Homepage Cover"),
+        label=_('Homepage Cover'),
         render_kw={'rows': 10})
 
     homepage_structure = TextAreaField(
-        fieldset=_("Structure"),
-        label=_("Homepage Structure (for advanced users only)"),
-        description=_("The structure of the homepage"),
+        fieldset=_('Structure'),
+        label=_('Homepage Structure (for advanced users only)'),
+        description=_('The structure of the homepage'),
         render_kw={'rows': 32, 'data-editor': 'xml'})
 
     # see homepage.py
     redirect_homepage_to = RadioField(
-        label=_("Homepage redirect"),
+        label=_('Homepage redirect'),
         default='no',
         choices=[
-            ('no', _("No")),
-            ('directories', _("Yes, to directories")),
-            ('events', _("Yes, to events")),
-            ('forms', _("Yes, to forms")),
-            ('publications', _("Yes, to publications")),
-            ('reservations', _("Yes, to reservations")),
-            ('path', _("Yes, to a non-listed path")),
+            ('no', _('No')),
+            ('directories', _('Yes, to directories')),
+            ('events', _('Yes, to events')),
+            ('forms', _('Yes, to forms')),
+            ('publications', _('Yes, to publications')),
+            ('reservations', _('Yes, to reservations')),
+            ('path', _('Yes, to a non-listed path')),
         ])
 
     redirect_path = StringField(
-        label=_("Path"),
+        label=_('Path'),
         validators=[InputRequired()],
         depends_on=('redirect_homepage_to', 'path'))
 
@@ -650,7 +673,7 @@ class HomepageSettingsForm(Form):
 
         if url.scheme() or url.host():
             raise ValidationError(
-                _("Please enter a path without schema or host"))
+                _('Please enter a path without schema or host'))
 
     def validate_homepage_structure(self, field: TextAreaField) -> None:
         if field.data:
@@ -673,41 +696,27 @@ class HomepageSettingsForm(Form):
 class ModuleSettingsForm(Form):
 
     hidden_people_fields = MultiCheckboxField(
-        label=_("Hide these fields for non-logged-in users"),
-        fieldset=_("People"),
+        label=_('Hide these fields for non-logged-in users'),
+        fieldset=_('People'),
         choices=[
-            ('salutation', _("Salutation")),
-            ('academic_title', _("Academic Title")),
-            ('born', _("Born")),
-            ('profession', _("Profession")),
-            ('political_party', _("Political Party")),
-            ('parliamentary_group', _("Parliamentary Group")),
-            ('email', _("E-Mail")),
-            ('phone', _("Phone")),
-            ('phone_direct', _("Direct Phone Number or Mobile")),
-            ('website', _("Website")),
-            ('website_2', _("Website 2")),
-            ('location_address', _("Location address")),
-            ('location_code_city', _("Location Code and City")),
-            ('postal_address', _("Postal address")),
-            ('postal_code_city', _("Postal Code and City")),
-            ('notes', _("Notes")),
+            ('salutation', _('Salutation')),
+            ('academic_title', _('Academic Title')),
+            ('born', _('Born')),
+            ('profession', _('Profession')),
+            ('political_party', _('Political Party')),
+            ('parliamentary_group', _('Parliamentary Group')),
+            ('email', _('E-Mail')),
+            ('phone', _('Phone')),
+            ('phone_direct', _('Direct Phone Number or Mobile')),
+            ('organisation', _('Organisation')),
+            ('website', _('Website')),
+            ('website_2', _('Website 2')),
+            ('location_address', _('Location address')),
+            ('location_code_city', _('Location Code and City')),
+            ('postal_address', _('Postal address')),
+            ('postal_code_city', _('Postal Code and City')),
+            ('notes', _('Notes')),
         ])
-
-    event_locations = TagsField(
-        label=_("Values of the location filter"),
-        fieldset=_("Events"),)
-
-    event_filter_type = RadioField(
-        label=_('Choose the filter type for events (default is \'tags\')'),
-        choices=(
-            ('tags', _('A predefined set of tags')),
-            ('filters', _('Manually configurable filters')),
-            ('tags_and_filters', _('Both, predefined tags as well as '
-                                   'configurable filters')),
-        ),
-        default='tags'
-    )
 
     mtan_session_duration_seconds = IntegerField(
         label=_('Duration of mTAN session'),
@@ -740,73 +749,73 @@ class ModuleSettingsForm(Form):
 class MapSettingsForm(Form):
 
     default_map_view = CoordinatesField(
-        label=_("The default map view. This should show the whole town"),
+        label=_('The default map view. This should show the whole town'),
         render_kw={
             'data-map-type': 'crosshair'
         })
 
     geo_provider = RadioField(
-        label=_("Geo provider"),
+        label=_('Geo provider'),
         default='geo-mapbox',
         choices=[
-            ('geo-admin', _("Swisstopo (Default)")),
-            ('geo-admin-aerial', _("Swisstopo Aerial")),
-            ('geo-mapbox', "Mapbox"),
-            ('geo-vermessungsamt-winterthur', "Vermessungsamt Winterthur"),
-            ('geo-zugmap-basisplan', "ZugMap Basisplan Farbig"),
-            ('geo-zugmap-orthofoto', "ZugMap Orthofoto"),
-            ('geo-bs', "Geoportal Basel-Stadt"),
+            ('geo-admin', _('Swisstopo (Default)')),
+            ('geo-admin-aerial', _('Swisstopo Aerial')),
+            ('geo-mapbox', 'Mapbox'),
+            ('geo-vermessungsamt-winterthur', 'Vermessungsamt Winterthur'),
+            ('geo-zugmap-basisplan', 'ZugMap Basisplan Farbig'),
+            ('geo-zugmap-orthofoto', 'ZugMap Orthofoto'),
+            ('geo-bs', 'Geoportal Basel-Stadt'),
         ])
 
 
 class AnalyticsSettingsForm(Form):
 
-    analytics_code = TextAreaField(
-        label=_("Analytics Code"),
-        description=_("JavaScript for web statistics support"),
+    analytics_code = MarkupField(
+        label=_('Analytics Code'),
+        description=_('JavaScript for web statistics support'),
         render_kw={'rows': 10, 'data-editor': 'html'})
 
 
 class HolidaySettingsForm(Form):
 
     cantonal_holidays = MultiCheckboxField(
-        label=_("Cantonal holidays"),
+        label=_('Cantonal holidays'),
         choices=[
-            ('AG', 'Aargau'),
-            ('AR', 'Appenzell Ausserrhoden'),
-            ('AI', 'Appenzell Innerrhoden'),
-            ('BL', 'Basel-Landschaft'),
-            ('BS', 'Basel-Stadt'),
-            ('BE', 'Berne'),
-            ('FR', 'Fribourg'),
-            ('GE', 'Geneva'),
-            ('GL', 'Glarus'),
-            ('GR', 'Grisons'),
-            ('JU', 'Jura'),
-            ('LU', 'Lucerne'),
-            ('NE', 'Neuchâtel'),
-            ('NW', 'Nidwalden'),
-            ('OW', 'Obwalden'),
-            ('SH', 'Schaffhausen'),
-            ('SZ', 'Schwyz'),
-            ('SO', 'Solothurn'),
-            ('SG', 'St. Gallen'),
-            ('TG', 'Thurgau'),
-            ('TI', 'Ticino'),
-            ('UR', 'Uri'),
-            ('VS', 'Valais'),
-            ('VD', 'Vaud'),
-            ('ZG', 'Zug'),
-            ('ZH', 'Zürich'),
+            ('AG', _('Aargau')),
+            ('AR', _('Appenzell Ausserrhoden')),
+            ('AI', _('Appenzell Innerrhoden')),
+            ('BL', _('Basel-Landschaft')),
+            ('BS', _('Basel-Stadt')),
+            ('BE', _('Berne')),
+            ('FR', _('Fribourg')),
+            ('GE', _('Geneva')),
+            ('GL', _('Glarus')),
+            ('GR', _('Grisons')),
+            ('JU', _('Jura')),
+            ('LU', _('Lucerne')),
+            ('NE', _('Neuchâtel')),
+            ('NW', _('Nidwalden')),
+            ('OW', _('Obwalden')),
+            ('SH', _('Schaffhausen')),
+            ('SZ', _('Schwyz')),
+            ('SO', _('Solothurn')),
+            ('SG', _('St. Gallen')),
+            ('TG', _('Thurgau')),
+            ('TI', _('Ticino')),
+            ('UR', _('Uri')),
+            ('VS', _('Valais')),
+            ('VD', _('Vaud')),
+            ('ZG', _('Zug')),
+            ('ZH', _('Zürich')),
         ])
 
     other_holidays = TextAreaField(
-        label=_("Other holidays"),
-        description=("31.10 - Halloween"),
+        label=_('Other holidays'),
+        description=('31.10 - Halloween'),
         render_kw={'rows': 10})
 
     preview = PreviewField(
-        label=_("Preview"),
+        label=_('Preview'),
         fields=('cantonal_holidays', 'other_holidays'),
         events=('change', 'click', 'enter'),
         url=lambda meta: meta.request.link(
@@ -815,8 +824,8 @@ class HolidaySettingsForm(Form):
         ))
 
     school_holidays = TextAreaField(
-        label=_("School holidays"),
-        description=("12.03.2022 - 21.03.2022"),
+        label=_('School holidays'),
+        description=('12.03.2022 - 21.03.2022'),
         render_kw={'rows': 10})
 
     def validate_other_holidays(self, field: TextAreaField) -> None:
@@ -829,16 +838,16 @@ class HolidaySettingsForm(Form):
                 continue
 
             if line.count('-') < 1:
-                raise ValidationError(_("Format: Day.Month - Description"))
+                raise ValidationError(_('Format: Day.Month - Description'))
             if line.count('-') > 1:
-                raise ValidationError(_("Please enter one date per line"))
+                raise ValidationError(_('Please enter one date per line'))
 
             date, description = line.split('-')
 
             if date.count('.') < 1:
-                raise ValidationError(_("Format: Day.Month - Description"))
+                raise ValidationError(_('Format: Day.Month - Description'))
             if date.count('.') > 1:
-                raise ValidationError(_("Please enter only day and month"))
+                raise ValidationError(_('Please enter only day and month'))
 
     def parse_date(self, date: str) -> datetime.date:
         day, month, year = date.split('.')
@@ -846,7 +855,7 @@ class HolidaySettingsForm(Form):
             return datetime.date(int(year), int(month), int(day))
         except (ValueError, TypeError) as exception:
             raise ValidationError(_(
-                "${date} is not a valid date",
+                '${date} is not a valid date',
                 mapping={'date': date}
             )) from exception
 
@@ -861,26 +870,26 @@ class HolidaySettingsForm(Form):
 
             if line.count('-') < 1:
                 raise ValidationError(
-                    _("Format: Day.Month.Year - Day.Month.Year")
+                    _('Format: Day.Month.Year - Day.Month.Year')
                 )
             if line.count('-') > 1:
-                raise ValidationError(_("Please enter one date pair per line"))
+                raise ValidationError(_('Please enter one date pair per line'))
 
             start, end = line.split('-')
             if start.count('.') != 2:
                 raise ValidationError(
-                    _("Format: Day.Month.Year - Day.Month.Year")
+                    _('Format: Day.Month.Year - Day.Month.Year')
                 )
             if end.count('.') != 2:
                 raise ValidationError(
-                    _("Format: Day.Month.Year - Day.Month.Year")
+                    _('Format: Day.Month.Year - Day.Month.Year')
                 )
 
             start_date = self.parse_date(start)
             end_date = self.parse_date(end)
             if end_date <= start_date:
                 raise ValidationError(
-                    _("End date needs to be after start date")
+                    _('End date needs to be after start date')
                 )
 
     # FIXME: Use TypedDict?
@@ -952,23 +961,23 @@ class HolidaySettingsForm(Form):
 class OrgTicketSettingsForm(Form):
 
     email_for_new_tickets = StringField(
-        label=_("Email adress for notifications "
-                "about newly opened tickets"),
-        description=("info@example.ch")
+        label=_('Email adress for notifications '
+                'about newly opened tickets'),
+        description=('info@example.ch')
     )
 
     ticket_auto_accept_style = RadioField(
-        label=_("Accept request and close ticket automatically based on:"),
+        label=_('Accept request and close ticket automatically based on:'),
         choices=(
-            ('category', _("Ticket category")),
-            ('role', _("User role")),
+            ('category', _('Ticket category')),
+            ('role', _('User role')),
         ),
         default='category'
     )
 
     ticket_auto_accepts = MultiCheckboxField(
-        label=_("Accept request and close ticket automatically "
-                "for these ticket categories"),
+        label=_('Accept request and close ticket automatically '
+                'for these ticket categories'),
         description=_("If auto-accepting is not possible, the ticket will be "
                       "in state pending. Also note, that after the ticket is "
                       "closed, the submitter can't send any messages."),
@@ -977,8 +986,8 @@ class OrgTicketSettingsForm(Form):
     )
 
     ticket_auto_accept_roles = MultiCheckboxField(
-        label=_("Accept request and close ticket automatically "
-                "for these user roles"),
+        label=_('Accept request and close ticket automatically '
+                'for these user roles'),
         description=_("If auto-accepting is not possible, the ticket will be "
                       "in state pending. Also note, that after the ticket is "
                       "closed, the submitter can't send any messages."),
@@ -987,28 +996,28 @@ class OrgTicketSettingsForm(Form):
     )
 
     auto_closing_user = ChosenSelectField(
-        label=_("User used to auto-accept tickets"),
+        label=_('User used to auto-accept tickets'),
         choices=[]
     )
 
     tickets_skip_opening_email = MultiCheckboxField(
-        label=_("Block email confirmation when "
-                "this ticket category is opened"),
+        label=_('Block email confirmation when '
+                'this ticket category is opened'),
         choices=[],
-        description=_("This is enabled by default for tickets that get "
-                      "accepted automatically")
+        description=_('This is enabled by default for tickets that get '
+                      'accepted automatically')
     )
 
     tickets_skip_closing_email = MultiCheckboxField(
-        label=_("Block email confirmation when "
-                "this ticket category is closed"),
+        label=_('Block email confirmation when '
+                'this ticket category is closed'),
         choices=[],
-        description=_("This is enabled by default for tickets that get "
-                      "accepted automatically")
+        description=_('This is enabled by default for tickets that get '
+                      'accepted automatically')
     )
 
     mute_all_tickets = BooleanField(
-        label=_("Mute all tickets")
+        label=_('Mute all tickets')
     )
 
     ticket_always_notify = BooleanField(
@@ -1018,7 +1027,7 @@ class OrgTicketSettingsForm(Form):
     )
 
     permissions = MultiCheckboxField(
-        label=_('Categories restriced by user group settings'),
+        label=_('Categories restricted by user group settings'),
         choices=[],
         render_kw={'disabled': True}
     )
@@ -1030,8 +1039,8 @@ class OrgTicketSettingsForm(Form):
         ):
             assert isinstance(self.mute_all_tickets.errors, list)
             self.mute_all_tickets.errors.append(
-                _("Mute tickets individually if the auto-accept feature is "
-                  "enabled.")
+                _('Mute tickets individually if the auto-accept feature is '
+                  'enabled.')
             )
             return False
         return None
@@ -1054,7 +1063,7 @@ class OrgTicketSettingsForm(Form):
 
     def on_request(self) -> None:
 
-        choices: list['_Choice'] = [
+        choices: list[_Choice] = [
             (key, self.code_title(key)) for key in handlers.registry.keys()
         ]
         auto_accept_choices = ('RSV', 'FRM')
@@ -1064,15 +1073,19 @@ class OrgTicketSettingsForm(Form):
         self.tickets_skip_opening_email.choices = choices
         self.tickets_skip_closing_email.choices = choices
 
-        permissions: list['_Choice'] = sorted((
+        permissions: list[_Choice] = sorted((
             (
                 p.id.hex,
                 ': '.join(x for x in (p.handler_code, p.group) if x)
             )
             for p in self.request.session.query(TicketPermission)
         ), key=lambda x: x[1])
-        self.permissions.choices = permissions
-        self.permissions.default = [p[0] for p in permissions]
+
+        if not permissions:
+            self.delete_field('permissions')
+        else:
+            self.permissions.choices = permissions
+            self.permissions.default = [p[0] for p in permissions]
 
         user_q = self.request.session.query(User).filter_by(role='admin')
         user_q = user_q.order_by(User.created.desc())
@@ -1091,6 +1104,104 @@ class NewsletterSettingsForm(Form):
     logo_in_newsletter = BooleanField(
         label=_('Include logo in newsletter')
     )
+
+    secret_content_allowed = BooleanField(
+        label=_('Allow secret content in newsletter'),
+        default=False
+    )
+
+    newsletter_categories = TextAreaField(
+        label=_('Newsletter categories'),
+        description=_(
+            'Example for newsletter topics with subtopics in yaml format. '
+            'Note: Deeper structures are not supported.'
+            '\n'
+            '```\n'
+            'Organisation:\n'
+            '  - Topic 1:\n'
+            '    - Subtopic 1.1\n'
+            '    - Subtopic 1.2\n'
+            '  - Topic 2\n'
+            '  - Topic 3:\n'
+            '    - Subtopic 3.1\n'
+            '```'
+        ),
+        render_kw={
+            'rows': 16,
+        },
+    )
+
+    def ensure_categories(self) -> bool | None:
+        assert isinstance(self.newsletter_categories.errors, list)
+
+        if self.newsletter_categories.data:
+            try:
+                data = yaml.safe_load(self.newsletter_categories.data)
+            except yaml.YAMLError:
+                self.newsletter_categories.errors.append(
+                    _('Invalid YAML format. Please refer to the example.')
+                )
+                return False
+
+            if data:
+                if not isinstance(data, dict):
+                    self.newsletter_categories.errors.append(
+                        _('Invalid format. Please define an organisation name '
+                          'with topics and subtopics according the example.')
+                    )
+                    return False
+                for org_name, items in data.items():
+                    if not isinstance(items, list):
+                        self.newsletter_categories.errors.append(
+                            _('Invalid format. Please define topics and '
+                              'subtopics according to the example.')
+                        )
+                        return False
+                    for item in items:
+                        if not isinstance(item, (dict, str)):
+                            self.newsletter_categories.errors.append(
+                                _('Invalid format. Please define topics and '
+                                  'subtopics according to the example.')
+                            )
+                            return False
+
+                        if isinstance(item, dict):
+                            for topic, sub_topic in item.items():
+                                if not isinstance(sub_topic, list):
+                                    self.newsletter_categories.errors.append(
+                                        _(f'Invalid format. Please define '
+                                          f"subtopic(s) for '{topic}' "
+                                          f"or remove the ':'.")
+                                    )
+                                    return False
+                                if not all(isinstance(sub, str)
+                                           for sub in sub_topic):
+                                    self.newsletter_categories.errors.append(
+                                        _('Invalid format. Only topics '
+                                          'and subtopics are allowed - no '
+                                          'deeper structures supported.')
+                                    )
+                                    return False
+
+        return None
+
+    def populate_obj(self, model: 'Organisation') -> None:  # type:ignore
+        super().populate_obj(model)
+
+        yaml_data = self.newsletter_categories.data
+        data = yaml.safe_load(yaml_data) if yaml_data else {}
+        model.newsletter_categories = data
+
+    def process_obj(self, model: 'Organisation') -> None:  # type:ignore
+        super().process_obj(model)
+
+        categories = model.newsletter_categories or {}
+        if not categories:
+            self.newsletter_categories.data = ''
+            return
+
+        yaml_data = yaml.safe_dump(categories, default_flow_style=False)
+        self.newsletter_categories.data = yaml_data
 
 
 class LinkMigrationForm(Form):
@@ -1146,21 +1257,21 @@ class GeverSettingsForm(Form):
         request: OrgRequest
 
     gever_username = StringField(
-        _("Username"),
+        _('Username'),
         [InputRequired()],
-        description=_("Username for the associated Gever account"),
+        description=_('Username for the associated Gever account'),
     )
 
     gever_password = PasswordField(
-        _("Password"),
+        _('Password'),
         [InputRequired()],
-        description=_("Password for the associated Gever account"),
+        description=_('Password for the associated Gever account'),
     )
 
     gever_endpoint = URLField(
-        _("Gever API Endpoint where the documents are uploaded."),
+        _('Gever API Endpoint where the documents are uploaded.'),
         [InputRequired(), UrlRequired(), validate_https],
-        description=_("Website address including https://"),
+        description=_('Website address including https://'),
     )
 
     def populate_obj(self, model: 'Organisation') -> None:  # type:ignore
@@ -1187,9 +1298,14 @@ class OneGovApiSettingsForm(Form):
     """Provides a form to generate API keys (UUID'S) for the OneGov API."""
 
     name = StringField(
-        default=_("API Key"),
-        label=_("Name"),
+        label=_('Name'),
+        default=_('API Key'),
         validators=[InputRequired()],
+    )
+
+    read_only = BooleanField(
+        label=_('Read only'),
+        default=True,
     )
 
 
@@ -1199,6 +1315,33 @@ class EventSettingsForm(Form):
         label=_('Submit your event'),
         description=_('Enables website visitors to submit their own events'),
         default=True
+    )
+
+    delete_past_events = BooleanField(
+        label=_('Delete events in the past'),
+        description=_('Events are automatically deleted once they have '
+                      'occurred'),
+        default=False
+    )
+
+    event_locations = TagsField(
+        label=_('Values of the location filter'),
+    )
+
+    event_filter_type = RadioField(
+        label=_("Choose the filter type for events (default is 'Tags')"),
+        choices=(
+            ('tags', _('A predefined set of tags')),
+            ('filters', _('Manually configurable filters')),
+            ('tags_and_filters', _('Both, predefined tags as well as '
+                                   'configurable filters')),
+        ),
+        default='tags'
+    )
+
+    event_files = UploadOrSelectExistingMultipleFilesField(
+        label=_('Documents'),
+        fieldset=_('General event documents')
     )
 
 

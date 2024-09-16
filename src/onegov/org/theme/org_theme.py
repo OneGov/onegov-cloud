@@ -66,7 +66,7 @@ class OrgTheme(BaseTheme):
             'tooltips',
             'top-bar',
             'type',
-            'visibility',
+            'visibility'
         )
 
     @property
@@ -82,7 +82,8 @@ class OrgTheme(BaseTheme):
     def post_imports(self) -> list[str]:
         return [
             'org',
-            'chosen'
+            'chosen',
+            'bar-graph'
         ]
 
     @property

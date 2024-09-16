@@ -6,6 +6,7 @@
         <div class="grid-x grid-padding-x wrapper">
 
             <div class="medium-8 large-7 cell date-range-selector-target content">
+                <div metal:use-macro="layout.macros['pagination']" tal:define="collection layout.model; current_page layout.model; pagination_centered True" />
                 <div class="grid-x">
                     <div class="large-12 cell">
                         <div metal:use-macro="layout.macros['occurrences']" />
@@ -28,7 +29,7 @@
                         <div class="occurrences-filter-tags side-panel-with-bg">
                             <tal:b tal:repeat="tag tags">
                                 <span class="blank-label click-through ${tag.active and 'active' or ''}">
-                                    <tal:b replace="structure tag(request)"></tal:b>
+                                    <tal:b replace="tag(request)"></tal:b>
                                 </span>
                             </tal:b>
                         </div>
@@ -41,7 +42,7 @@
                                 <ul class="tags">
                                     <li tal:repeat="location locations">
                                         <span class="blank-label click-through ${location.active and 'active' or ''}">
-                                            <tal:b replace="structure location(request)"></tal:b>
+                                            <tal:b replace="location(request)"></tal:b>
                                         </span>
                                     </li>
                                 </ul>
@@ -57,7 +58,7 @@
                                     <ul class="tags">
                                         <li tal:repeat="range ranges">
                                             <span class="blank-label click-through rounded ${range.active and 'active' or ''}">
-                                                <tal:b replace="structure range(request)"></tal:b>
+                                                <tal:b replace="range(request)"></tal:b>
                                             </span>
                                         </li>
                                     </ul>
@@ -73,6 +74,18 @@
                                 </tal:b>
                             </metal:b>
                         </div>
+                    </div>
+
+                    <div class="side-panel files-panel occurrence-documents" tal:condition="files">
+                        <h3 i18n:translate>Documents</h3>
+                        <ul class="more-list">
+                            <li tal:repeat="file files">
+                                <a class="list-link" title="${file.name}" href="${request.link(file)}">
+                                    <i class="far ${layout.get_fa_file_icon(file.name)}" aria-hidden="true"></i>
+                                    <span class="list-title">${file.name.split('.')[0]}</span>
+                                </a>
+                            </li>
+                        </ul>
                     </div>
 
                     <div class="occurrence-actions side-panel" tal:condition="len(occurrences) > 1 or layout.org.meta.get('submit_events_visible', True)">

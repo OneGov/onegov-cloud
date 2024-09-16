@@ -1,4 +1,4 @@
-import pdftotext
+import pdftotext  # type:ignore
 
 from depot.fields.upload import UploadedFile
 from depot.io import utils
@@ -19,7 +19,7 @@ from onegov.pdf.utils import extract_pdf_info
 from typing import IO, TYPE_CHECKING
 if TYPE_CHECKING:
     from depot.io.interfaces import _FileContent
-    from typing_extensions import NotRequired, TypedDict
+    from typing import NotRequired, TypedDict
 
     class _ImageSaveOptionalParams(TypedDict):
         exif: NotRequired[Image.Exif]
@@ -71,7 +71,7 @@ def strip_exif_and_limit_and_store_image_size(
     has_exif = bool(hasattr(image, 'getexif') and image.getexif())
 
     if needs_resample or has_exif:
-        params: '_ImageSaveOptionalParams' = {}
+        params: _ImageSaveOptionalParams = {}
 
         if has_exif:
             # replace EXIF section with an empty one
@@ -149,7 +149,7 @@ class ProcessedUploadedFile(UploadedFile):
     ) -> None:
 
         filename, content_type = FileStorage.fileinfo(content)[1:]
-        content = utils.file_from_content(content)
+        _, content = utils.file_from_content(content)
 
         try:
             for processor in self.processors:

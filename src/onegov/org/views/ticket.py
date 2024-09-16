@@ -2,7 +2,7 @@ import morepath
 
 from datetime import date
 from morepath import Response
-from onegov.chat import MessageCollection
+from onegov.chat import Message, MessageCollection
 from onegov.core.custom import json
 from onegov.core.elements import Link, Intercooler, Confirm
 from onegov.core.html import html_to_text
@@ -14,6 +14,7 @@ from onegov.core.utils import normalize_for_url
 import zipfile
 import os
 from io import BytesIO
+from markupsafe import Markup
 from onegov.form import Form
 from onegov.gever.encrypt import decrypt_symmetric
 from onegov.org import _, OrgApp
@@ -31,7 +32,7 @@ from onegov.org.layout import TicketLayout
 from onegov.org.mail import send_ticket_mail
 from onegov.org.models import (
     TicketChatMessage, TicketMessage, TicketNote,
-    Organisation, ResourceRecipient, ResourceRecipientCollection)
+    ResourceRecipient, ResourceRecipientCollection)
 from onegov.org.models.resource import FindYourSpotCollection
 from onegov.org.models.ticket import ticket_submitter, ReservationHandler
 from onegov.org.pdf.ticket import TicketPdf
@@ -39,7 +40,7 @@ from onegov.org.views.message import view_messages_feed
 from onegov.org.views.utils import show_tags, show_filters
 from onegov.ticket import handlers as ticket_handlers
 from onegov.ticket import Ticket, TicketCollection
-from onegov.ticket.collection import ArchivedTicketsCollection
+from onegov.ticket.collection import ArchivedTicketCollection
 from onegov.ticket.errors import InvalidStateChange
 from onegov.gever.gever_client import GeverClientCAS
 from onegov.user import User, UserCollection
@@ -49,21 +50,33 @@ from urllib.parse import urlsplit
 
 
 from typing import TYPE_CHECKING
-
 if TYPE_CHECKING:
+    from _typeshed import StrPath
+    from collections.abc import Iterable, Iterator, Mapping
+    from email.headerregistry import Address
     from onegov.core.request import CoreRequest
-    from sqlalchemy.orm import Query
-    from onegov.org.request import OrgRequest
+    from onegov.core.types import EmailJsonDict, RenderData, SequenceOrScalar
     from onegov.form.fields import UploadFileWithORMSupport
+    from onegov.org.layout import Layout
+    from onegov.org.request import OrgRequest
+    from onegov.pay import Payment
+    from sqlalchemy.orm import Query, Session
+    from webob import Response as BaseResponse
 
 
 @OrgApp.html(model=Ticket, template='ticket.pt', permission=Private)
-def view_ticket(self, request, layout=None):
+def view_ticket(
+    self: Ticket,
+    request: 'OrgRequest',
+    layout: TicketLayout | None = None
+) -> 'RenderData':
 
     handler = self.handler
 
     if handler.deleted:
-        summary = self.snapshot.get('summary')
+        # NOTE: We store markup in the snapshot, but since it is JSON
+        #       it will be read as a plain string, so we have to wrap
+        summary = Markup(self.snapshot.get('summary', ''))  # noqa: MS001
     else:
         # XXX this is very to do here, much harder when the ticket is updated
         # because there's no good link to the ticket at that point - so when
@@ -149,19 +162,24 @@ def view_ticket(self, request, layout=None):
 
 @OrgApp.form(model=Ticket, permission=Secret, template='form.pt',
              name='delete', form=Form)
-def delete_ticket(self, request, form, layout=None):
+def delete_ticket(
+    self: Ticket,
+    request: 'OrgRequest',
+    form: Form,
+    layout: TicketLayout | None = None
+) -> 'RenderData | BaseResponse':
     """ Deleting a ticket means getting rid of all the data associated with it
     """
 
     layout = layout or TicketLayout(self, request)
-    layout.breadcrumbs.append(Link(_("Delete Ticket"), '#'))
+    layout.breadcrumbs.append(Link(_('Delete Ticket'), '#'))
     layout.editbar_links = None
 
     if not self.handler.ticket_deletable:
         return {
             'layout': layout,
-            'title': _("Delete Ticket"),
-            'callout': _("This ticket is not deletable."),
+            'title': _('Delete Ticket'),
+            'callout': _('This ticket is not deletable.'),
             'form': None
         }
 
@@ -172,26 +190,33 @@ def delete_ticket(self, request, form, layout=None):
         self.handler.prepare_delete_ticket()
 
         request.session.delete(self)
-        request.success(_("Ticket successfully deleted"))
+        request.success(_('Ticket successfully deleted'))
         return morepath.redirect(
             request.link(TicketCollection(request.session))
         )
 
     return {
         'layout': layout,
-        'title': _("Delete Ticket"),
+        'title': _('Delete Ticket'),
         'callout': _(
-            "Do you really want to delete this ticket? All data associated "
-            "with this ticket will be deleted. This cannot be undone."
+            'Do you really want to delete this ticket? All data associated '
+            'with this ticket will be deleted. This cannot be undone.'
         ),
         'form': form
     }
 
 
-def manual_payment_button(payment, layout):
+# FIXME: csrf_token and csrf_protected_url should probably be moved from Layout
+#        to CoreRequest making the original methods/attributes on the Layout a
+#        pure passthrough, then we can pass the request here
+def manual_payment_button(
+    payment: 'Payment',
+    layout: 'Layout'
+) -> Link:
+
     if payment.state == 'open':
         return Link(
-            text=_("Mark as paid"),
+            text=_('Mark as paid'),
             url=layout.csrf_protected_url(
                 layout.request.link(payment, 'mark-as-paid'),
             ),
@@ -205,7 +230,7 @@ def manual_payment_button(payment, layout):
         )
 
     return Link(
-        text=_("Mark as unpaid"),
+        text=_('Mark as unpaid'),
         url=layout.csrf_protected_url(
             layout.request.link(payment, 'mark-as-unpaid'),
         ),
@@ -219,23 +244,28 @@ def manual_payment_button(payment, layout):
     )
 
 
-def stripe_payment_button(payment, layout):
+# FIXME: same here as for manual_payment_button
+def stripe_payment_button(
+    payment: 'Payment',
+    layout: 'Layout'
+) -> Link | None:
+
     if payment.state == 'open':
         return Link(
-            text=_("Capture Payment"),
+            text=_('Capture Payment'),
             url=layout.csrf_protected_url(
                 layout.request.link(payment, 'capture')
             ),
             attrs={'class': 'payment-capture button small secondary'},
             traits=(
                 Confirm(
-                    _("Do you really want capture the payment?"),
+                    _('Do you really want capture the payment?'),
                     _(
-                        "This usually happens automatically, so there is "
-                        "no reason not do capture the payment."
+                        'This usually happens automatically, so there is '
+                        'no reason not do capture the payment.'
                     ),
-                    _("Capture payment"),
-                    _("Cancel")
+                    _('Capture payment'),
+                    _('Cancel')
                 ),
                 Intercooler(
                     request_method='POST',
@@ -245,24 +275,25 @@ def stripe_payment_button(payment, layout):
         )
 
     if payment.state == 'paid':
+        assert payment.amount is not None
         amount = '{:02f} {}'.format(payment.amount, payment.currency)
 
         return Link(
-            text=_("Refund Payment"),
+            text=_('Refund Payment'),
             url=layout.csrf_protected_url(
                 layout.request.link(payment, 'refund')
             ),
             attrs={'class': 'payment-refund button small secondary'},
             traits=(
                 Confirm(
-                    _("Do you really want to refund ${amount}?", mapping={
+                    _('Do you really want to refund ${amount}?', mapping={
                         'amount': amount
                     }),
-                    _("This cannot be undone."),
-                    _("Refund ${amount}", mapping={
+                    _('This cannot be undone.'),
+                    _('Refund ${amount}', mapping={
                         'amount': amount
                     }),
-                    _("Cancel")
+                    _('Cancel')
                 ),
                 Intercooler(
                     request_method='POST',
@@ -271,8 +302,16 @@ def stripe_payment_button(payment, layout):
             )
         )
 
+    return None
 
-def send_email_if_enabled(ticket, request, template, subject):
+
+def send_email_if_enabled(
+    ticket: Ticket,
+    request: 'OrgRequest',
+    template: str,
+    subject: str
+) -> bool:
+
     email = ticket.snapshot.get('email') or ticket.handler.email
     if not email:
         return True
@@ -283,34 +322,48 @@ def send_email_if_enabled(ticket, request, template, subject):
         receivers=(email, ),
         ticket=ticket
     )
+    return False
 
 
-def last_internal_message(session, ticket_number):
-    messages = MessageCollection(
+def last_internal_message(
+    session: 'Session',
+    ticket_number: str
+) -> Message | None:
+
+    messages = MessageCollection[Message](
         session,
         type='ticket_chat',
         channel_id=ticket_number,
         load='newer-first'
     )
 
-    return messages.query()\
-        .filter(TicketChatMessage.meta['origin'].astext == 'internal')\
+    return (
+        messages.query()
+        .filter(TicketChatMessage.meta['origin'].astext == 'internal')
         .first()
+    )
 
 
-def send_chat_message_email_if_enabled(ticket, request, message, origin,
-                                       bcc=None, attachments=None):
+def send_chat_message_email_if_enabled(
+    ticket: Ticket,
+    request: 'OrgRequest',
+    message: TicketChatMessage,
+    origin: str,
+    bcc: 'SequenceOrScalar[Address | str]' = (),
+    attachments: 'Iterable[Attachment | StrPath]' = ()
+) -> None:
+
     assert origin in ('internal', 'external')
-
-    messages = MessageCollection(
+    messages = MessageCollection[TicketChatMessage](
         request.session,
         channel_id=ticket.number,
         type='ticket_chat')
 
+    receiver: str | None
     if origin == 'internal':
 
         # if the messages is sent to the outside, we always send an e-mail
-        receivers = (ticket.snapshot.get('email') or ticket.handler.email, )
+        receiver = ticket.snapshot.get('email') or ticket.handler.email
         reply_to = request.current_username
 
     else:
@@ -319,19 +372,19 @@ def send_chat_message_email_if_enabled(ticket, request, message, origin,
         # we do not notify
         last_internal = last_internal_message(request.session, ticket.number)
 
-        receivers = None
+        receiver = None
         always_notify = request.app.org.ticket_always_notify
 
         if last_internal:
             if last_internal.meta.get('notify') or always_notify:
-                receivers = (last_internal.owner,)
+                receiver = last_internal.owner
         elif always_notify and ticket.user:
-            receivers = (ticket.user.username,)
-
-        if not receivers:
-            return
+            receiver = ticket.user.username
 
         reply_to = None  # default reply-to given by the application
+
+    if not receiver:
+        return
 
     # we show the previous messages by going back until we find a message
     # that is not from the same author as the new message (this should usually
@@ -339,7 +392,7 @@ def send_chat_message_email_if_enabled(ticket, request, message, origin,
     # of messages in succession without getting a reply)
     #
     # note that the resulting thread has to be reversed for the mail template
-    def thread():
+    def thread() -> 'Iterator[TicketChatMessage]':
         messages.older_than = message.id
         messages.load = 'newer-first'
 
@@ -352,14 +405,14 @@ def send_chat_message_email_if_enabled(ticket, request, message, origin,
     send_ticket_mail(
         request=request,
         template='mail_ticket_chat_message.pt',
-        subject=_("Your ticket has a new message"),
+        subject=_('Your ticket has a new message'),
         content={
             'model': ticket,
             'message': message,
             'thread': tuple(reversed(list(thread()))),
         },
         ticket=ticket,
-        receivers=receivers,
+        receivers=(receiver,),
         reply_to=reply_to,
         force=True,
         bcc=bcc,
@@ -385,7 +438,7 @@ def send_new_note_notification(
     if not isinstance(handler, ReservationHandler) or not handler.resource:
         return
 
-    def recipients_with_have_registered_for_mail():
+    def recipients_which_have_registered_for_mail() -> 'Iterator[str]':
         q = ResourceRecipientCollection(request.session).query()
         q = q.filter(ResourceRecipient.medium == 'email')
         q = q.order_by(None).order_by(ResourceRecipient.address)
@@ -397,16 +450,14 @@ def send_new_note_notification(
             ] and r.content.get('internal_notes', False):
                 yield r.address
 
-    title = (
-        request.translate(
-            _(
-                "${org} New Note in Reservation for ${resource_title}",
-                mapping={
-                    'org': request.app.org.title,
-                    'resource_title': handler.resource.title,
-                },
-            )
-        ),
+    title = request.translate(
+        _(
+            '${org} New Note in Reservation for ${resource_title}',
+            mapping={
+                'org': request.app.org.title,
+                'resource_title': handler.resource.title,
+            },
+        )
     )
     assert hasattr(ticket, 'reference')
     content = render_template(
@@ -426,8 +477,8 @@ def send_new_note_notification(
     )
     plaintext = html_to_text(content)
 
-    def email_iter():
-        for recipient_addr in recipients_with_have_registered_for_mail():
+    def email_iter() -> 'Iterator[EmailJsonDict]':
+        for recipient_addr in recipients_which_have_registered_for_mail():
 
             yield request.app.prepare_email(
                 receivers=(recipient_addr,),
@@ -445,13 +496,18 @@ def send_new_note_notification(
     model=Ticket, name='note', permission=Private,
     template='ticket_note_form.pt', form=TicketNoteForm
 )
-def handle_new_note(self, request, form, layout=None):
+def handle_new_note(
+    self: Ticket,
+    request: 'OrgRequest',
+    form: TicketNoteForm,
+    layout: TicketNoteLayout | None = None
+) -> 'RenderData | BaseResponse':
 
     if form.submitted(request):
-        message = form.text.data,
-        form: TicketNoteForm
+        message = form.text.data
+        assert message is not None
         note = TicketNote.create(self, request, message, form.file.create())
-        request.success(_("Your note was added"))
+        request.success(_('Your note was added'))
 
         if note.text and note.text[0]:
             send_new_note_notification(
@@ -464,34 +520,45 @@ def handle_new_note(self, request, form, layout=None):
         return request.redirect(request.link(self))
 
     return {
-        'title': _("New Note"),
-        'layout': layout or TicketNoteLayout(self, request, _("New Note")),
+        'title': _('New Note'),
+        'layout': layout or TicketNoteLayout(self, request, _('New Note')),
         'form': form,
         'hint': 'default'
     }
 
 
 @OrgApp.view(model=TicketNote, permission=Private)
-def view_ticket_note(self, request):
+def view_ticket_note(
+    self: TicketNote,
+    request: 'OrgRequest'
+) -> 'BaseResponse':
     return request.redirect(request.link(self.ticket))
 
 
 @OrgApp.view(model=TicketNote, permission=Private, request_method='DELETE')
-def delete_ticket_note(self, request):
+def delete_ticket_note(self: TicketNote, request: 'OrgRequest') -> None:
     request.assert_valid_csrf_token()
 
-    # force a change of the ticket to make sure that it gets reindexed
-    self.ticket.force_update()
+    if self.ticket:
+        # force a change of the ticket to make sure that it gets reindexed
+        self.ticket.force_update()
 
     request.session.delete(self)
-    request.success(_("The note was deleted"))
+    request.success(_('The note was deleted'))
 
 
 @OrgApp.form(
     model=TicketNote, name='edit', permission=Private,
     template='ticket_note_form.pt', form=TicketNoteForm
 )
-def handle_edit_note(self, request, form, layout=None):
+def handle_edit_note(
+    self: TicketNote,
+    request: 'OrgRequest',
+    form: TicketNoteForm,
+    layout: TicketNoteLayout | None = None
+) -> 'RenderData | BaseResponse':
+
+    assert self.ticket is not None
     if form.submitted(request):
         form.populate_obj(self)
         self.owner = request.current_username
@@ -499,15 +566,15 @@ def handle_edit_note(self, request, form, layout=None):
         # force a change of the ticket to make sure that it gets reindexed
         self.ticket.force_update()
 
-        request.success(_("Your changes were saved"))
+        request.success(_('Your changes were saved'))
         return request.redirect(request.link(self.ticket))
 
     elif not request.POST:
         form.process(obj=self)
 
-    layout = layout or TicketNoteLayout(self.ticket, request, _("New Note"))
+    layout = layout or TicketNoteLayout(self.ticket, request, _('New Note'))
     return {
-        'title': _("Edit Note"),
+        'title': _('Edit Note'),
         'layout': layout,
         'form': form,
         'hint': self.owner != request.current_username and 'owner'
@@ -515,9 +582,9 @@ def handle_edit_note(self, request, form, layout=None):
 
 
 @OrgApp.view(model=Ticket, name='accept', permission=Private)
-def accept_ticket(self, request):
-    user = UserCollection(request.session).by_username(
-        request.identity.userid)
+def accept_ticket(self: Ticket, request: 'OrgRequest') -> 'BaseResponse':
+    user = request.current_user
+    assert user is not None
 
     was_pending = self.state == 'open'
 
@@ -528,7 +595,7 @@ def accept_ticket(self, request):
     else:
         if was_pending:
             TicketMessage.create(self, request, 'accepted')
-            request.success(_("You have accepted ticket ${number}", mapping={
+            request.success(_('You have accepted ticket ${number}', mapping={
                 'number': self.number
             }))
 
@@ -536,7 +603,7 @@ def accept_ticket(self, request):
 
 
 @OrgApp.view(model=Ticket, name='close', permission=Private)
-def close_ticket(self, request):
+def close_ticket(self: Ticket, request: 'OrgRequest') -> 'BaseResponse':
 
     was_pending = self.state == 'pending'
 
@@ -549,7 +616,7 @@ def close_ticket(self, request):
     else:
         if was_pending:
             TicketMessage.create(self, request, 'closed')
-            request.success(_("You have closed ticket ${number}", mapping={
+            request.success(_('You have closed ticket ${number}', mapping={
                 'number': self.number
             }))
 
@@ -557,19 +624,19 @@ def close_ticket(self, request):
                 ticket=self,
                 request=request,
                 template='mail_ticket_closed.pt',
-                subject=_("Your request has been closed.")
+                subject=_('Your request has been closed.')
             )
             if email_missing:
-                request.alert(_("The submitter email is not available"))
+                request.alert(_('The submitter email is not available'))
 
     return morepath.redirect(
         request.link(TicketCollection(request.session)))
 
 
 @OrgApp.view(model=Ticket, name='reopen', permission=Private)
-def reopen_ticket(self, request):
-    user = UserCollection(request.session).by_username(
-        request.identity.userid)
+def reopen_ticket(self: Ticket, request: 'OrgRequest') -> 'BaseResponse':
+    user = request.current_user
+    assert user is not None
 
     was_closed = self.state == 'closed'
 
@@ -582,7 +649,7 @@ def reopen_ticket(self, request):
     else:
         if was_closed:
             TicketMessage.create(self, request, 'reopened')
-            request.success(_("You have reopened ticket ${number}", mapping={
+            request.success(_('You have reopened ticket ${number}', mapping={
                 'number': self.number
             }))
 
@@ -590,7 +657,7 @@ def reopen_ticket(self, request):
                 send_ticket_mail(
                     request=request,
                     template='mail_ticket_opened_info.pt',
-                    subject=_("New ticket"),
+                    subject=_('New ticket'),
                     ticket=self,
                     receivers=(request.email_for_new_tickets, ),
                     content={
@@ -602,21 +669,21 @@ def reopen_ticket(self, request):
                 ticket=self,
                 request=request,
                 template='mail_ticket_reopened.pt',
-                subject=_("Your ticket has been reopened")
+                subject=_('Your ticket has been reopened')
             )
             if email_missing:
-                request.alert(_("The submitter email is not available"))
+                request.alert(_('The submitter email is not available'))
 
     return morepath.redirect(request.link(self))
 
 
 @OrgApp.view(model=Ticket, name='mute', permission=Private)
-def mute_ticket(self, request):
+def mute_ticket(self: Ticket, request: 'OrgRequest') -> 'BaseResponse':
     self.muted = True
 
     TicketMessage.create(self, request, 'muted')
     request.success(
-        _("You have disabled e-mails for ticket ${number}", mapping={
+        _('You have disabled e-mails for ticket ${number}', mapping={
             'number': self.number
         }))
 
@@ -624,12 +691,12 @@ def mute_ticket(self, request):
 
 
 @OrgApp.view(model=Ticket, name='unmute', permission=Private)
-def unmute_ticket(self, request):
+def unmute_ticket(self: Ticket, request: 'OrgRequest') -> 'BaseResponse':
     self.muted = False
 
     TicketMessage.create(self, request, 'unmuted')
     request.success(
-        _("You have enabled e-mails for ticket ${number}", mapping={
+        _('You have enabled e-mails for ticket ${number}', mapping={
             'number': self.number
         }))
 
@@ -637,7 +704,7 @@ def unmute_ticket(self, request):
 
 
 @OrgApp.view(model=Ticket, name='archive', permission=Private)
-def archive_ticket(self, request):
+def archive_ticket(self: Ticket, request: 'OrgRequest') -> 'BaseResponse':
 
     try:
         self.archive_ticket()
@@ -646,7 +713,7 @@ def archive_ticket(self, request):
             _("The ticket cannot be archived because it's not closed"))
     else:
         TicketMessage.create(self, request, 'archived')
-        request.success(_("You archived ticket ${number}", mapping={
+        request.success(_('You archived ticket ${number}', mapping={
             'number': self.number
         }))
 
@@ -654,9 +721,9 @@ def archive_ticket(self, request):
 
 
 @OrgApp.view(model=Ticket, name='unarchive', permission=Private)
-def unarchive_ticket(self, request):
-    user = UserCollection(request.session).by_username(
-        request.identity.userid)
+def unarchive_ticket(self: Ticket, request: 'OrgRequest') -> 'BaseResponse':
+    user = request.current_user
+    assert user is not None
 
     try:
         self.unarchive_ticket(user)
@@ -669,7 +736,7 @@ def unarchive_ticket(self, request):
     else:
         TicketMessage.create(self, request, 'unarchived')
         request.success(
-            _("You recovered ticket ${number} from the archive", mapping={
+            _('You recovered ticket ${number} from the archive', mapping={
               'number': self.number
               }))
 
@@ -678,8 +745,15 @@ def unarchive_ticket(self, request):
 
 @OrgApp.form(model=Ticket, name='assign', permission=Private,
              form=TicketAssignmentForm, template='form.pt')
-def assign_ticket(self, request, form, layout=None):
+def assign_ticket(
+    self: Ticket,
+    request: 'OrgRequest',
+    form: TicketAssignmentForm,
+    layout: TicketLayout | None = None
+) -> 'RenderData | BaseResponse':
+
     if form.submitted(request):
+        assert form.username is not None
         TicketMessage.create(
             self, request, 'assigned',
             old_owner=self.user.username if self.user else '',
@@ -688,17 +762,17 @@ def assign_ticket(self, request, form, layout=None):
         send_ticket_mail(
             request=request,
             template='mail_ticket_assigned.pt',
-            subject=_("You have a new ticket"),
+            subject=_('You have a new ticket'),
             receivers=(form.username, ),
             ticket=self,
             force=True
         )
         self.user_id = form.user.data
-        request.success(_("Ticket assigned"))
+        request.success(_('Ticket assigned'))
         return morepath.redirect(request.link(self))
 
     return {
-        'title': _("Assign ticket"),
+        'title': _('Assign ticket'),
         'layout': layout or TicketLayout(self, request),
         'form': form,
     }
@@ -706,16 +780,24 @@ def assign_ticket(self, request, form, layout=None):
 
 @OrgApp.form(model=Ticket, name='message-to-submitter', permission=Private,
              form=ExtendedInternalTicketChatMessageForm, template='form.pt')
-def message_to_submitter(self, request, form, layout=None):
+def message_to_submitter(
+    self: Ticket,
+    request: 'OrgRequest',
+    form: ExtendedInternalTicketChatMessageForm,
+    layout: TicketChatMessageLayout | None = None
+) -> 'RenderData | BaseResponse':
+
     recipient = self.snapshot.get('email') or self.handler.email
 
     if not recipient:
-        request.alert(_("The submitter email is not available"))
+        request.alert(_('The submitter email is not available'))
         return request.redirect(request.link(self))
 
     if form.submitted(request):
+        assert form.text.data is not None
+        assert request.current_username is not None
         if self.state == 'closed':
-            request.alert(_("The ticket has already been closed"))
+            request.alert(_('The ticket has already been closed'))
         else:
             message = TicketChatMessage.create(
                 self, request,
@@ -725,18 +807,17 @@ def message_to_submitter(self, request, form, layout=None):
                 notify=form.notify.data,
                 origin='internal')
 
-            blind_copies = form.email_bcc.data or None
             fe = form.email_attachment
             send_chat_message_email_if_enabled(
                 self,
                 request,
                 message,
                 origin='internal',
-                bcc=blind_copies,
+                bcc=form.email_bcc.data or (),
                 attachments=create_attachment_from_uploaded(fe, request)
             )
 
-            request.success(_("Your message has been sent"))
+            request.success(_('Your message has been sent'))
             return morepath.redirect(request.link(self))
     elif not request.POST:
         # show the same notification setting as was selected with the
@@ -749,12 +830,12 @@ def message_to_submitter(self, request, form, layout=None):
             form.notify.data = False
 
     return {
-        'title': _("New Message"),
+        'title': _('New Message'),
         'layout': layout or TicketChatMessageLayout(self, request),
         'form': form,
         'helptext': _(
-            "The following message will be sent to ${address} and it will be "
-            "recorded for future reference.", mapping={
+            'The following message will be sent to ${address} and it will be '
+            'recorded for future reference.', mapping={
                 'address': recipient
             }
         )
@@ -762,8 +843,10 @@ def message_to_submitter(self, request, form, layout=None):
 
 
 def create_attachment_from_uploaded(
-    fe: 'UploadFileWithORMSupport', request: 'OrgRequest'
+    fe: 'UploadFileWithORMSupport',
+    request: 'OrgRequest'
 ) -> tuple[Attachment, ...]:
+
     filename, storage_path = (
         fe.data.get('filename') if fe.data else None,
         request.app.depot_storage_path,
@@ -785,7 +868,7 @@ def create_attachment_from_uploaded(
 
 
 @OrgApp.view(model=Ticket, name='pdf', permission=Private)
-def view_ticket_pdf(self, request):
+def view_ticket_pdf(self: Ticket, request: 'OrgRequest') -> Response:
     """ View the generated PDF. """
 
     content = TicketPdf.from_ticket(request, self)
@@ -801,7 +884,7 @@ def view_ticket_pdf(self, request):
 
 
 @OrgApp.view(model=Ticket, name='files', permission=Private)
-def view_ticket_files(self, request):
+def view_ticket_files(self: Ticket, request: 'OrgRequest') -> 'BaseResponse':
     """ Download the files associated with the ticket as zip. """
 
     form_submission = getattr(self.handler, 'submission', None)
@@ -815,7 +898,7 @@ def view_ticket_files(self, request):
         for f in form_submission.files:
             try:
                 zipf.writestr(f.name, f.reference.file.read())
-            except IOError:
+            except OSError:
                 not_existing.append(f.name)
 
         pdf = TicketPdf.from_ticket(request, self)
@@ -828,7 +911,7 @@ def view_ticket_files(self, request):
         request.alert(_(f"{count} file(s) not found:"
                         f" {', '.join(not_existing)}"))
     else:
-        request.info(_("Zip archive created successfully"))
+        request.info(_('Zip archive created successfully'))
 
     buffer.seek(0)
 
@@ -844,31 +927,37 @@ def view_ticket_files(self, request):
 
 @OrgApp.form(model=Ticket, name='status', template='ticket_status.pt',
              permission=Public, form=TicketChatMessageForm)
-def view_ticket_status(self, request, form, layout=None):
+def view_ticket_status(
+    self: Ticket,
+    request: 'OrgRequest',
+    form: TicketChatMessageForm,
+    layout: TicketChatMessageLayout | None = None
+) -> 'RenderData | BaseResponse':
 
     title = ''
     if self.state == 'open':
-        title = _("Your request has been submitted")
+        title = _('Your request has been submitted')
     elif self.state == 'pending':
-        title = _("Your request is currently pending")
+        title = _('Your request is currently pending')
     elif self.state == 'closed' or self.state == 'archived':
-        title = _("Your request has been processed")
+        title = _('Your request has been processed')
 
     if request.is_logged_in:
-        status_text = _("Ticket Status")
-        closed_text = _("The ticket has already been closed")
+        status_text = _('Ticket Status')
+        closed_text = _('The ticket has already been closed')
     else:
         # We adjust the wording for users that do not know what a ticket is
-        status_text = _("Request Status")
-        closed_text = _("The request has already been closed")
+        status_text = _('Request Status')
+        closed_text = _('The request has already been closed')
 
     layout = layout or TicketChatMessageLayout(self, request)
     layout.breadcrumbs = [
-        Link(_("Homepage"), layout.homepage_url),
+        Link(_('Homepage'), layout.homepage_url),
         Link(status_text, '#')
     ]
 
     if form.submitted(request):
+        assert form.text.data is not None
 
         if self.state == 'closed':
             request.alert(closed_text)
@@ -877,20 +966,20 @@ def view_ticket_status(self, request, form, layout=None):
             # recipients and have `current_username` in all cases. If we allow
             # external BCC recipients, we'll have to change this
             if request.current_username != self.handler.email:
-                owner = request.current_username or ''
+                owner = request.current_username
             else:
                 owner = self.handler.email
 
             message = TicketChatMessage.create(
                 self, request,
                 text=form.text.data,
-                owner=owner,
+                owner=owner or '',
                 origin='external')
 
             send_chat_message_email_if_enabled(
                 self, request, message, origin='external')
 
-            request.success(_("Your message has been received"))
+            request.success(_('Your message has been received'))
             return morepath.redirect(request.link(self, 'status'))
 
     messages = MessageCollection(
@@ -900,11 +989,11 @@ def view_ticket_status(self, request, form, layout=None):
     )
 
     pick_up_hint = None
-    if getattr(self.handler, 'resource', None):
-        pick_up_hint = self.handler.resource.pick_up
-    if getattr(self.handler, 'submission', None):
-        if getattr(self.handler.submission, 'form', None):
-            pick_up_hint = self.handler.submission.form.pick_up
+    if resource := getattr(self.handler, 'resource', None):
+        pick_up_hint = resource.pick_up
+    if submission := getattr(self.handler, 'submission', None):
+        if form_definition := getattr(submission, 'form', None):
+            pick_up_hint = form_definition.pick_up
 
     return {
         'title': title,
@@ -919,16 +1008,15 @@ def view_ticket_status(self, request, form, layout=None):
 
 
 @OrgApp.view(model=Ticket, name='send-to-gever', permission=Private)
-def view_send_to_gever(self, request):
-    query = request.session.query(Organisation)
-    org = query.first()
+def view_send_to_gever(self: Ticket, request: 'OrgRequest') -> 'BaseResponse':
+    org = request.app.org
     username = org.gever_username
     password = org.gever_password
     endpoint = org.gever_endpoint
 
     if not (username and password and endpoint):
-        request.alert(_("Could not find valid credentials. You can set them "
-                        "in Gever API Settings."))
+        request.alert(_('Could not find valid credentials. You can set them '
+                        'in Gever API Settings.'))
         return morepath.redirect(request.link(self))
 
     key = request.app.hashed_identity_key
@@ -940,35 +1028,40 @@ def view_send_to_gever(self, request):
         date.today().strftime('%Y%m%d')
     )
 
-    base_url = "{0.scheme}://{0.netloc}/".format(urlsplit(endpoint))
+    base_url = '{0.scheme}://{0.netloc}/'.format(urlsplit(endpoint))
     client = GeverClientCAS(username, password_dec, service_url=base_url)
     try:
         resp = client.upload_file(pdf.read(), filename, endpoint)
     except (KeyError, ValueError):
-        msg = _("Encountered an error while uploading to Gever.")
+        msg = _('Encountered an error while uploading to Gever.')
         request.alert(msg)
         return morepath.redirect(request.link(self))
 
     # server will respond with status 204 after a successful upload.
-    if not (resp.status_code == 204 and "Location" in resp.headers.keys()):
-        msg = _("Encountered an error while uploading to Gever. Response "
-                "status code is ${status}.", mapping={
-                    "status": resp.status_code})
+    if not (resp.status_code == 204 and 'Location' in resp.headers.keys()):
+        msg = _('Encountered an error while uploading to Gever. Response '
+                'status code is ${status}.', mapping={
+                    'status': resp.status_code})
         request.alert(msg)
         return morepath.redirect(request.link(self))
 
     TicketMessage.create(
         self,
         request,
-        "uploaded"
+        'uploaded'
     )
-    request.success(_("Successfully uploaded the PDF of this ticket to Gever"))
+    request.success(_('Successfully uploaded the PDF of this ticket to Gever'))
     return morepath.redirect(request.link(self))
 
 
-def get_filters(self, request):
+def get_filters(
+    self: TicketCollection,
+    request: 'OrgRequest'
+) -> 'Iterator[Link]':
+
+    assert request.current_user is not None
     yield Link(
-        text=_("My"),
+        text=_('My'),
         url=request.link(
             self.for_state('unfinished').for_owner(request.current_user.id)
         ),
@@ -979,13 +1072,27 @@ def get_filters(self, request):
         if id != 'archived':
             yield Link(
                 text=text,
-                url=request.link(self.for_state(id).for_owner(None)),
+                url=request.link(
+                    self.for_state(id)
+                    # FIXME: This is another case where we pass invalid
+                    #        state just so the generated URL is shorter
+                    #        we should make morepath aware of defaults
+                    #        so it can ellide parameters that have been
+                    #        set to their default value automatically
+                    .for_owner(None)  # type:ignore[arg-type]
+                ),
                 active=self.state == id,
                 attrs={'class': 'ticket-filter-' + id}
             )
 
 
-def get_groups(self, request, groups, handler):
+def get_groups(
+    self: TicketCollection | ArchivedTicketCollection,
+    request: 'OrgRequest',
+    groups: 'Mapping[str, Iterable[str]]',
+    handler: str
+) -> 'Iterator[Link]':
+
     base = self.for_handler(handler)
 
     for group in groups[handler]:
@@ -999,48 +1106,64 @@ def get_groups(self, request, groups, handler):
         )
 
 
-def get_handlers(self, request, groups):
+def get_handlers(
+    self: TicketCollection | ArchivedTicketCollection,
+    request: 'OrgRequest',
+    groups: 'Mapping[str, Iterable[str]]'
+) -> 'Iterator[Link]':
 
     handlers = []
 
     for key, handler in ticket_handlers.registry.items():
         if key in groups:
+            assert hasattr(handler, 'handler_title')
             handlers.append(
                 (key, request.translate(handler.handler_title)))
 
     handlers.sort(key=lambda item: item[1])
-    handlers.insert(0, ('ALL', _("All Tickets")))
+    handlers.insert(0, ('ALL', _('All Tickets')))
 
     for id, text in handlers:
-        grouplinks = id != 'ALL' and tuple(
-            get_groups(self, request, groups, id))
-        parent = grouplinks and len(grouplinks) > 1
-        classes = parent and (id + '-link', 'is-parent') or (id + '-link',)
+        grouplinks = (
+            tuple(get_groups(self, request, groups, id))
+            if id != 'ALL' else ()
+        )
+        css_class = id + '-link is-parent' if grouplinks else id + '-link'
 
         yield Link(
             text=text,
-            url=request.link(self.for_handler(id).for_group(None)),
+            url=request.link(
+                self.for_handler(id)
+                # FIXME: This is another case where we pass invalid
+                #        state just so the generated URL is shorter
+                #        we should make morepath aware of defaults
+                #        so it can ellide parameters that have been
+                #        set to their default value automatically
+                .for_group(None)  # type:ignore[arg-type]
+            ),
             active=self.handler == id and self.group is None,
-            attrs={'class': ' '.join(classes)}
+            attrs={'class': css_class}
         )
 
-        if parent:
-            yield from grouplinks
+        yield from grouplinks
 
 
-def get_owners(self, request):
+def get_owners(
+    self: TicketCollection | ArchivedTicketCollection,
+    request: 'OrgRequest'
+) -> 'Iterator[Link]':
 
     users = UserCollection(request.session)
-    users = users.by_roles(*request.app.settings.org.ticket_manager_roles)
-    users = users.order_by(User.title)
+    query = users.by_roles(*request.app.settings.org.ticket_manager_roles)
+    query = query.order_by(User.title)
 
     yield Link(
-        text=_("All Users"),
+        text=_('All Users'),
         url=request.link(self.for_owner('*')),
         active=self.owner == '*'
     )
 
-    for user in users:
+    for user in query:
         yield Link(
             text=user.title,
             url=request.link(self.for_owner(user.id)),
@@ -1049,7 +1172,7 @@ def get_owners(self, request):
         )
 
 
-def groups_by_handler_code(session):
+def groups_by_handler_code(session: 'Session') -> dict[str, list[str]]:
     query = as_selectable("""
             SELECT
                 handler_code,                         -- Text
@@ -1069,7 +1192,12 @@ def groups_by_handler_code(session):
 
 @OrgApp.html(model=TicketCollection, template='tickets.pt',
              permission=Private)
-def view_tickets(self, request, layout=None):
+def view_tickets(
+    self: TicketCollection,
+    request: 'OrgRequest',
+    layout: TicketsLayout | None = None
+) -> 'RenderData':
+
     groups = groups_by_handler_code(request.session)
     handlers = tuple(get_handlers(self, request, groups))
     owners = tuple(get_owners(self, request))
@@ -1078,11 +1206,11 @@ def view_tickets(self, request, layout=None):
     owner = next((o for o in owners if o.active), None)
     layout = layout or TicketsLayout(self, request)
 
-    def archive_link(ticket):
+    def archive_link(ticket: Ticket) -> str:
         return layout.csrf_protected_url(request.link(ticket, name='archive'))
 
     return {
-        'title': _("Tickets"),
+        'title': _('Tickets'),
         'layout': layout,
         'tickets': self.batch,
         'filters': filters,
@@ -1098,9 +1226,14 @@ def view_tickets(self, request, layout=None):
     }
 
 
-@OrgApp.html(model=ArchivedTicketsCollection, template='archived_tickets.pt',
+@OrgApp.html(model=ArchivedTicketCollection, template='archived_tickets.pt',
              permission=Private)
-def view_archived_tickets(self, request, layout=None):
+def view_archived_tickets(
+    self: ArchivedTicketCollection,
+    request: 'OrgRequest',
+    layout: ArchivedTicketsLayout | None = None
+) -> 'RenderData':
+
     groups = groups_by_handler_code(request.session)
     handlers = tuple(get_handlers(self, request, groups))
     owners = tuple(get_owners(self, request))
@@ -1108,11 +1241,11 @@ def view_archived_tickets(self, request, layout=None):
     owner = next((o for o in owners if o.active), None)
     layout = layout or ArchivedTicketsLayout(self, request)
 
-    def action_link(ticket):
+    def action_link(ticket: Ticket) -> str:
         return ''
 
     return {
-        'title': _("Archived Tickets"),
+        'title': _('Archived Tickets'),
         'layout': layout,
         'tickets': self.batch,
         'filters': [],
@@ -1128,22 +1261,26 @@ def view_archived_tickets(self, request, layout=None):
     }
 
 
-@OrgApp.html(model=ArchivedTicketsCollection, name='delete',
+@OrgApp.html(model=ArchivedTicketCollection, name='delete',
              request_method='DELETE', permission=Secret)
-def view_delete_all_archived_tickets(self, request):
+def view_delete_all_archived_tickets(
+    self: ArchivedTicketCollection,
+    request: 'OrgRequest'
+) -> None:
+
     tickets = self.query().filter_by(state='archived')
 
     errors, ok = delete_tickets_and_related_data(request, tickets)
     if errors:
         msg = request.translate(_(
-            "${success_count} tickets deleted, "
-            "${error_count} are not deletable",
+            '${success_count} tickets deleted, '
+            '${error_count} are not deletable',
             mapping={'success_count': len(ok), 'error_count': len(errors)},
         ))
         request.message(msg, 'warning')
     else:
         msg = request.translate(_(
-            "${success_count} tickets deleted.",
+            '${success_count} tickets deleted.',
             mapping={'success_count': len(ok)}
         ))
         request.message(msg, 'success')
@@ -1175,7 +1312,7 @@ def delete_tickets_and_related_data(
     return not_deletable, successfully_deleted
 
 
-def delete_messages_from_ticket(request: 'CoreRequest', number: str):
+def delete_messages_from_ticket(request: 'CoreRequest', number: str) -> None:
     messages = MessageCollection(
         request.session, channel_id=number
     )
@@ -1185,7 +1322,13 @@ def delete_messages_from_ticket(request: 'CoreRequest', number: str):
 
 @OrgApp.html(model=FindYourSpotCollection, name='tickets',
              template='pending_tickets.pt', permission=Public)
-def view_pending_tickets(self, request, layout=None):
+def view_pending_tickets(
+    self: FindYourSpotCollection,
+    request: 'OrgRequest',
+    layout: FindYourSpotLayout | None = None
+) -> 'RenderData':
+
+    pending: dict[str, list[str]]
     pending = request.browser_session.get('reservation_tickets', {})
     ticket_ids = pending.get(self.group or '', [])
     if not ticket_ids:
@@ -1196,7 +1339,7 @@ def view_pending_tickets(self, request, layout=None):
     tickets = query.all()
 
     return {
-        'title': _("Submitted Requests"),
+        'title': _('Submitted Requests'),
         'layout': layout or FindYourSpotLayout(self, request),
         'tickets': tickets,
     }

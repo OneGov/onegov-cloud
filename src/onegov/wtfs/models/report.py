@@ -191,7 +191,7 @@ class ReportFormsAllMunicipalities(ReportFormsByMunicipality):
 
     @cached_property
     def municipality_name(self) -> str:
-        return _("Report forms of all municipalities")
+        return _('Report forms of all municipalities')
 
 
 class ReportBoxesAndFormsByDelivery:

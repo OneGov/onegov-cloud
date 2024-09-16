@@ -39,5 +39,5 @@ class UserGroupCollection(GenericCollection[_G]):
             self.type, default=UserGroup)  # type:ignore[arg-type]
 
     def query(self) -> 'Query[_G]':
-        query = super(UserGroupCollection, self).query()
+        query = super().query()
         return query.order_by(self.model_class.name)

@@ -48,7 +48,7 @@ from markupsafe import escape, Markup
 from onegov.core.framework import Framework
 
 
-from typing import Any, TypeVar, TYPE_CHECKING
+from typing import Any, Literal, TypeVar, TYPE_CHECKING
 if TYPE_CHECKING:
     from _typeshed import StrPath
     from chameleon.zpt.template import Macro
@@ -66,18 +66,18 @@ BOOLEAN_HTML_ATTRS = frozenset(
         # List of Boolean attributes in HTML that should be rendered in
         # minimized form (e.g. <img ismap> rather than <img ismap="">)
         # From http://www.w3.org/TR/xhtml1/#guidelines (C.10)
-        "compact",
-        "nowrap",
-        "ismap",
-        "declare",
-        "noshade",
-        "checked",
-        "disabled",
-        "readonly",
-        "multiple",
-        "selected",
-        "noresize",
-        "defer",
+        'compact',
+        'nowrap',
+        'ismap',
+        'declare',
+        'noshade',
+        'checked',
+        'disabled',
+        'readonly',
+        'multiple',
+        'selected',
+        'noresize',
+        'defer',
     ]
 )
 
@@ -226,8 +226,8 @@ def render_template(
     template: str,
     request: 'CoreRequest',
     content: dict[str, Any],
-    suppress_global_variables: bool = True
-) -> str:
+    suppress_global_variables: bool | Literal['infer'] = 'infer'
+) -> Markup:
     """ Renders the given template. Use this if you need to get the rendered
     value directly. If oyu render a view, this is not needed!
 
@@ -246,7 +246,7 @@ def render_template(
     variables = get_default_vars(
         request, content, suppress_global_variables=suppress_global_variables)
 
-    return page_template.render(**variables)
+    return Markup(page_template.render(**variables))  # noqa: MS001
 
 
 def render_macro(
@@ -254,7 +254,7 @@ def render_macro(
     request: 'CoreRequest',
     content: dict[str, Any],
     suppress_global_variables: bool = True
-) -> str:
+) -> Markup:
     """ Renders a :class:`chameleon.zpt.template.Macro` like this::
 
         layout.render_macro(layout.macros['my_macro'], **vars)
@@ -292,4 +292,4 @@ def render_macro(
     stream: list[str] = []
     macro.include(stream, Scope(variables), {})
 
-    return ''.join(stream)
+    return Markup(''.join(stream))  # noqa: MS001

@@ -19,7 +19,7 @@ if TYPE_CHECKING:
     from onegov.form import Form
     from onegov.org.request import OrgRequest
     from onegov.page import Page
-    from typing_extensions import Self
+    from typing import Self
 
 
 class ModelsWithLinksMixin:
@@ -142,7 +142,7 @@ class PageNameChange(ModelsWithLinksMixin):
 
     @property
     def subpages(self) -> list['Page']:
-        pages: list['Page'] = []
+        pages: list[Page] = []
 
         def add(page: 'Page') -> None:
             nonlocal pages
@@ -168,9 +168,9 @@ class PageNameChange(ModelsWithLinksMixin):
         def run() -> int:
             # Make sure the order before and after is the same
             urls_before = tuple(
-                self.request.link(p) for p in subpages + [page])
+                self.request.link(p) for p in (*subpages, page))
             page.name = self.new_name
-            urls_after = tuple(self.request.link(p) for p in subpages + [page])
+            urls_after = tuple(self.request.link(p) for p in (*subpages, page))
             assert urls_before != urls_after
 
             count = 0
@@ -323,7 +323,7 @@ class LinkHealthCheck(ModelsWithLinksMixin):
                 not_okay_status += 1
             return check
 
-        urls: 'Sequence[LinkCheck]'
+        urls: Sequence[LinkCheck]
         if self.link_type == 'external':
             urls = async_aiohttp_get_all(
                 urls=tuple(self.url_list_generator()),

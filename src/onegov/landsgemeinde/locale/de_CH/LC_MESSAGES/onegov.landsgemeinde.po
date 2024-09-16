@@ -1,7 +1,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: OneGov Cloud 1.0\n"
-"POT-Creation-Date: 2023-10-17 10:54+0200\n"
+"POT-Creation-Date: 2024-06-05 08:20+0200\n"
 "PO-Revision-Date: 2021-03-03 16:24+0100\n"
 "Language-Team: German\n"
 "Language: de_CH\n"
@@ -69,11 +69,34 @@ msgstr ""
 msgid "Alternatively: Page from the Memorial"
 msgstr "Alternativ: Seite aus dem Memorial"
 
-msgid "Video timestamp"
-msgstr "Video-Zeitstempel"
+msgid "Start"
+msgstr "Start"
 
 msgid "Progress"
 msgstr "Ablauf"
+
+msgid "Automatically updated when agenda item changed to ongoing."
+msgstr ""
+"Automatisch aktualisiert, wenn das Traktandum auf 'laufend' gesetzt wird."
+
+msgid "Calculated video timestamp"
+msgstr "Berechneter Video-Zeitstempel"
+
+msgid ""
+"Calculated automatically based on the start time of the agenda item and the "
+"start time of of the livestream of the assembly ."
+msgstr ""
+"Automatisch berechnet anhand der Startzeit des Traktandums und der Startzeit "
+"des Livestreams der Landsgemeinde."
+
+msgid "Video timestamp"
+msgstr "Video-Zeitstempel"
+
+msgid "Manual video timestamp"
+msgstr "Manueller Video-Zeitstempel"
+
+msgid "Overrides the calculated video timestamp."
+msgstr "Übersteuert den berechneten Videozeitstempel."
 
 msgid "Text"
 msgstr "Text"
@@ -96,14 +119,34 @@ msgstr "Schlagworte"
 msgid "Number already used."
 msgstr "Nummer wird bereits verwendet."
 
+msgid "Invalid timestamp."
+msgstr "Ungültiger Zeitstempel."
+
 msgid "Date"
 msgstr "Datum"
 
 msgid "Extraordinary"
 msgstr "Ausserordentlich"
 
+msgid ""
+"To embed a youtube video first click on the \"share\" button then on the "
+"\"embed\" button. Copy the URL of the src attribute."
+msgstr ""
+"Um ein YouTube-Video einzubetten, klicken Sie zuerst auf die Schaltfläche "
+"\"share\" und dann auf die Schaltfläche \"einbetten\". Kopieren Sie die URL "
+"des src-Attributs."
+
+msgid "Video"
+msgstr "Video"
+
 msgid "Video URL"
 msgstr "Video URL"
+
+msgid "The URL to the video of the assembly."
+msgstr "Die URL zum Video der Landsgemeinde."
+
+msgid "Start time of the livestream"
+msgstr "Startzeit des Livestreams"
 
 msgid "Memorial part 1 (PDF)"
 msgstr "Memorial Teil 1 (PDF)"
@@ -129,6 +172,15 @@ msgstr "Audio (ZIP)"
 msgid "Date already used."
 msgstr "Datum wird bereits verwendet."
 
+msgid "E-Mail"
+msgstr "E-Mail"
+
+msgid "ID"
+msgstr "ID"
+
+msgid "Name"
+msgstr "Name"
+
 msgid "Person"
 msgstr "Person"
 
@@ -138,9 +190,6 @@ msgstr "Person aus Personenverzeichnis"
 msgid "Choosing a person will overwrite the fields below"
 msgstr ""
 "Die untenstehenden Felder werden mit der ausgewählten Person überschrieben"
-
-msgid "Name"
-msgstr "Name"
 
 msgid "Function"
 msgstr "Funktion"
@@ -153,6 +202,17 @@ msgstr "Ort"
 
 msgid "Picture"
 msgstr "Bild"
+
+msgid "Automatically updated when votum changed to ongoing."
+msgstr ""
+"Automatisch aktualisiert, wenn die Wortmeldung auf 'laufend' gesetzt wird."
+
+msgid ""
+"Calculated automatically based on the start time of the votum and the start "
+"time of of the livestream of the assembly."
+msgstr ""
+"Automatisch berechnet anhand der Startzeit der Wortmeldung und der Startzeit "
+"des Livestreams der Landsgemeinde."
 
 msgid "Motion"
 msgstr "Antrag"
@@ -245,9 +305,6 @@ msgstr "laufend"
 msgid "completed"
 msgstr "abgeschlossen"
 
-msgid "Video"
-msgstr "Video"
-
 msgid "Memorial (PDF)"
 msgstr "Memorial (PDF)"
 
@@ -260,8 +317,27 @@ msgstr "Audio"
 msgid "Download audio"
 msgstr "Audio herunterladen"
 
-msgid "Close"
-msgstr "Schliessen"
+msgid "Search term"
+msgstr "Suchbegriff"
+
+msgid "Skip navigation"
+msgstr "Navigation überspringen"
+
+msgid "Back to the homepage"
+msgstr "Zurück zur Startseite"
+
+msgid "Logo"
+msgstr "Logo"
+
+msgid "To the liveticker"
+msgstr "Zum Liveticker"
+
+msgid "The form contains errors. Please check the fields marked in red."
+msgstr ""
+"Das Formular enthält Fehler. Bitte die rot markierten Felder überprüfen."
+
+msgid "Copied to Clipboard!"
+msgstr "In die Zwischenablage kopiert!"
 
 msgid ""
 "Shows the status of each element of an assembly. The statuses of each "
@@ -292,11 +368,21 @@ msgstr "Neue Landsgemeinde hinzugefügt"
 msgid "New assembly"
 msgstr "Neue Landsgemeinde"
 
+#, python-format
+msgid "Results from the ${title}, structured as json"
+msgstr "Resultate der ${title}, strukturiert als JSON"
+
 msgid "Location"
 msgstr "Ort"
+
+msgid "Open Data"
+msgstr "Open Data"
 
 msgid "Added a new votum"
 msgstr "Neue Wortmeldung hinzugefügt"
 
 msgid "New votum"
 msgstr "Neue Wortmeldung"
+
+#~ msgid "Close"
+#~ msgstr "Schliessen"

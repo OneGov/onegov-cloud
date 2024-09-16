@@ -28,6 +28,9 @@
         [
             "*/tests/*",
         ],
+        "SublimeLinter.linters.ruff.disable": false,
+        "SublimeLinter.linters.ruff.executable": "${project_path}/../venv/bin/ruff",
+        "SublimeLinter.linters.ruff.python": "${project_path}/../venv/bin/python",
         "LSP.LSP-pylsp.settings": {
             "pylsp.plugins.jedi.environment": "${project_path}/venv"
         }

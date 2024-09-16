@@ -1,19 +1,31 @@
+import json
 import os
+from pathlib import Path
+
+import pytest
 import transaction
-from datetime import datetime
+from datetime import datetime, timedelta
 from freezegun import freeze_time
 from onegov.core.utils import Bunch
+from onegov.directory import (DirectoryEntryCollection,
+                              DirectoryConfiguration,
+                              DirectoryCollection)
+from onegov.event import EventCollection, OccurrenceCollection
+from onegov.event.utils import as_rdates
+from onegov.form import FormSubmissionCollection
+from onegov.org.models import ResourceRecipientCollection, News
 from onegov.org.models.resource import RoomResource
-from onegov.org.models.tan import TANCollection
+from onegov.org.models.ticket import ReservationHandler, DirectoryEntryHandler
+from onegov.page import PageCollection
 from onegov.ticket import Handler, Ticket, TicketCollection
 from onegov.user import UserCollection
 from onegov.newsletter import NewsletterCollection, RecipientCollection
 from onegov.reservation import ResourceCollection
+from onegov.user.collections import TANCollection
 from sedate import ensure_timezone, utcnow
-from onegov.form import FormSubmissionCollection
-from onegov.org.models import ResourceRecipientCollection
 from tests.onegov.org.common import get_cronjob_by_name, get_cronjob_url
 from tests.shared import Client
+from tests.shared.utils import add_reservation
 
 
 class EchoTicket(Ticket):
@@ -22,7 +34,6 @@ class EchoTicket(Ticket):
 
 
 class EchoHandler(Handler):
-
     handler_title = "Echo"
 
     @property
@@ -54,6 +65,14 @@ class EchoHandler(Handler):
 
 def register_echo_handler(handlers):
     handlers.register('EHO', EchoHandler)
+
+
+def register_reservation_handler(handlers):
+    handlers.register('RSV', ReservationHandler)
+
+
+def register_directory_handler(handlers):
+    handlers.register('DIR', DirectoryEntryHandler)
 
 
 def test_daily_ticket_statistics(org_app, handlers):
@@ -662,20 +681,52 @@ def test_daily_reservation_overview(org_app):
         assert 'day-reservation' in text
 
 
-def test_send_scheduled_newsletters(org_app):
-    newsletters = NewsletterCollection(org_app.session())
-    recipients = RecipientCollection(org_app.session())
+@pytest.mark.parametrize('secret_content_allowed', [False, True])
+def test_send_scheduled_newsletters(client, org_app, secret_content_allowed):
+    def create_scheduled_newsletter():
+        with freeze_time('2018-05-31 12:00'):
+            news_public = news.add(
+                news_parent, 'Public News', 'public-news',
+                type='news', access='public')
+            news_public_2 = news.add(
+                news_parent,
+                'Public News - not published',
+                'public-news-not-published',
+                type='news', access='public',
+                publication_start=utcnow() + timedelta(days=1),
+                publication_end=utcnow() + timedelta(days=2))
+            news_secret = news.add(
+                news_parent, 'Secret News', 'secret-news',
+                type='news', access='secret')
+            news_private = news.add(
+                news_parent, 'Private News', 'private-news',
+                type='news', access='private')
+            newsletters.add(
+                "Latest News",
+                "<h1>Latest News</h1>",
+                content={"news": [
+                    str(news_public.id),
+                    str(news_public_2.id),
+                    str(news_secret.id),
+                    str(news_private.id)
+                ]},
+                scheduled=utcnow()
+            )
+
+            transaction.commit()
+
+    session = org_app.session()
+    news = PageCollection(session)
+    news_parent = news.query().filter_by(name='news').one()
+    newsletters = NewsletterCollection(session)
+    recipients = RecipientCollection(session)
 
     recipient = recipients.add('info@example.org')
     recipient.confirmed = True
 
-    with freeze_time('2018-05-31 12:00'):
-        newsletters.add("Foo", "Bar", scheduled=utcnow())
+    org_app.org.secret_content_allowed = secret_content_allowed
 
-    transaction.commit()
-
-    newsletter = newsletters.query().one()
-    assert newsletter.scheduled
+    create_scheduled_newsletter()
 
     job = get_cronjob_by_name(org_app, 'hourly_maintenance_tasks')
     job.app = org_app
@@ -683,18 +734,30 @@ def test_send_scheduled_newsletters(org_app):
     with freeze_time('2018-05-31 11:00'):
         client = Client(org_app)
         client.get(get_cronjob_url(job))
-
         newsletter = newsletters.query().one()
-        assert newsletter.scheduled
+
+        assert newsletter.scheduled  # still scheduled, not sent yet
         assert len(os.listdir(client.app.maildir)) == 0
 
     with freeze_time('2018-05-31 12:00'):
         client = Client(org_app)
         client.get(get_cronjob_url(job))
-
         newsletter = newsletters.query().one()
+
         assert not newsletter.scheduled
         assert len(os.listdir(client.app.maildir)) == 1
+
+        mail_file = Path(client.app.maildir) / os.listdir(client.app.maildir)[
+            0]
+        with open(mail_file, 'r') as file:
+            mail = json.loads(file.read())[0]
+            assert "info@example.org" == mail['To']
+            assert "Latest News" in mail['Subject']
+            assert "Public News" in mail['TextBody']
+            assert "Public News - not published" not in mail['TextBody']
+            if secret_content_allowed:
+                assert "Secret News" in mail['TextBody']
+            assert "Private News" not in mail['TextBody']
 
 
 def test_auto_archive_tickets_and_delete(org_app, handlers):
@@ -738,8 +801,12 @@ def test_auto_archive_tickets_and_delete(org_app, handlers):
     # now we go forward a month for archival
     with freeze_time('2022-09-17 04:30'):
         org_app.org.auto_archive_timespan = 30  # days
+        org_app.org.auto_delete_timespan = 30  # days
+
         session.flush()
-        assert org_app.org.auto_archive_timespan is not None
+        # without this assert, the values are somehow not set?
+        assert org_app.org.auto_archive_timespan
+        assert org_app.org.auto_delete_timespan
 
         query = session.query(Ticket)
         query = query.filter_by(state='closed')
@@ -750,18 +817,19 @@ def test_auto_archive_tickets_and_delete(org_app, handlers):
         client = Client(org_app)
         client.get(get_cronjob_url(job))
 
-        session.flush()
+        # this delete cronjob should have no effect (yet), since archiving
+        # resets the `last_change`
+        job = get_cronjob_by_name(org_app, 'delete_old_tickets')
+        job.app = org_app
+        client = Client(org_app)
+        client.get(get_cronjob_url(job))
 
         query = session.query(Ticket)
-        assert query.count() == 2
-
         query = query.filter(Ticket.state == 'archived')
         assert query.count() == 2
 
     # and another month for deletion
-    with freeze_time('2022-10-17 04:30'):
-        # now for the deletion part
-        org_app.org.auto_delete_timespan = 30  # days
+    with freeze_time('2022-10-17 05:30'):
         session.flush()
         assert org_app.org.auto_delete_timespan is not None
 
@@ -771,8 +839,92 @@ def test_auto_archive_tickets_and_delete(org_app, handlers):
         client.get(get_cronjob_url(job))
 
         # should be deleted
-        query = session.query(Ticket)
-        assert query.count() == 0
+        assert session.query(Ticket).count() == 0
+
+
+def test_respect_recent_reservation_for_archive(org_app, handlers):
+    register_echo_handler(handlers)
+    register_reservation_handler(handlers)
+
+    transaction.begin()
+
+    resources = ResourceCollection(org_app.libres_context)
+    dailypass = resources.add(
+        'Dailypass',
+        'Europe/Zurich',
+        type='daypass'
+    )
+
+    recipients = ResourceRecipientCollection(org_app.session())
+    recipients.add(
+        name='John',
+        medium='email',
+        address='john@example.org',
+        rejected_reservations=True,
+        resources=[
+            dailypass.id.hex,
+        ],
+    )
+
+    with freeze_time('2022-06-06 01:00'):
+        # First we add some random ticket. Acts Kind of like a 'control
+        # group', this is not reservation)
+        collection = TicketCollection(org_app.session())
+        collection.open_ticket(
+            handler_id='1',
+            handler_code='EHO',
+            title="Control Ticket",
+            group="Group",
+            email="citizen@example.org",
+        )
+
+        # Secondly we add a reservation for one year in advance (indeed not
+        # uncommon in practice)
+        add_reservation(
+            dailypass,
+            org_app.session(),
+            start=datetime(2023, 6, 6, 4, 30),
+            end=datetime(2023, 6, 6, 5, 0),
+        )
+
+        # close all the tickets
+        tickets_query = TicketCollection(org_app.session()).query()
+        assert tickets_query.count() == 2
+        user = UserCollection(org_app.session()).query().first()
+        for ticket in tickets_query:
+            ticket.accept_ticket(user)
+            ticket.close_ticket()
+
+        transaction.commit()
+
+    # now go forward a year
+    with freeze_time('2023-06-06 02:00'):
+        org_app.org.auto_archive_timespan = 365  # days
+        org_app.org.auto_delete_timespan = 365  # days
+        org_app.session().flush()
+
+        # without this assert, the values are somehow not set?
+        assert org_app.org.auto_archive_timespan
+        assert org_app.org.auto_delete_timespan
+
+        q = TicketCollection(org_app.session()).query()
+        assert q.filter_by(state='open').count() == 0
+        assert q.filter_by(state='closed').count() == 2
+
+        job = get_cronjob_by_name(org_app, 'archive_old_tickets')
+        job.app = org_app
+        client = Client(org_app)
+        client.get(get_cronjob_url(job))
+
+        after_cronjob_tickets = TicketCollection(client.app.session()).query()
+        for ticket in after_cronjob_tickets:
+            if not isinstance(ticket.handler, ReservationHandler):
+                # the control ticket has been archived
+                assert ticket.state == 'archived'
+            else:
+                # but the ticket with reservations should not be archived
+                # because the lastest reservation is still fairly recent
+                assert ticket.state == 'closed'
 
 
 def test_monthly_mtan_statistics(org_app, handlers):
@@ -798,7 +950,7 @@ def test_monthly_mtan_statistics(org_app, handlers):
     transaction.begin()
 
     session = org_app.session()
-    collection = TANCollection(session)
+    collection = TANCollection(session, scope='test')
 
     collection.add(  # outside
         client='1.2.3.4',
@@ -884,3 +1036,244 @@ def test_monthly_mtan_statistics(org_app, handlers):
 
     # no additional mails have been sent
     assert len(os.listdir(client.app.maildir)) == 1
+
+
+def test_delete_content_marked_deletable__directory_entries(org_app, handlers):
+    register_echo_handler(handlers)
+    register_directory_handler(handlers)
+
+    client = Client(org_app)
+    job = get_cronjob_by_name(org_app, 'delete_content_marked_deletable')
+    job.app = org_app
+    tz = ensure_timezone('Europe/Zurich')
+
+    transaction.begin()
+
+    directories = DirectoryCollection(org_app.session(), type='extended')
+    directory_entries = directories.add(
+        title='Öffentliche Planauflage',
+        structure="""
+            Gesuchsteller/in *= ___
+            Grundeigentümer/in *= ___
+        """,
+        configuration=DirectoryConfiguration(
+            title="[Gesuchsteller/in]",
+            order=('Gesuchsteller/in'),
+        )
+    )
+
+    event = directory_entries.add(values=dict(
+        gesuchsteller_in='Anton Antoninio',
+        grundeigentumer_in='Berta Bertinio',
+        publication_start=datetime(2024, 4, 1, tzinfo=tz),
+        publication_end=datetime(2024, 4, 10, tzinfo=tz),
+        # delete_when_expired=True,
+    ))
+    event.delete_when_expired = True
+
+    directory_entries.add(values=dict(
+        gesuchsteller_in='Carmine Carminio',
+        grundeigentumer_in='Doris Dorinio',
+        publication_start=datetime(2024, 4, 3, tzinfo=tz),
+        publication_end=datetime(2024, 4, 10, tzinfo=tz),
+    ))
+
+    event = directory_entries.add(values=dict(
+        gesuchsteller_in='Emil Emilio',
+        grundeigentumer_in='Franco Francinio',
+        publication_start=datetime(2024, 4, 5, tzinfo=tz),
+        publication_end=datetime(2024, 4, 20, tzinfo=tz),
+    ))
+    event.delete_when_expired = True
+
+    event = directory_entries.add(values=dict(
+        gesuchsteller_in='Guido Guidinio',
+        grundeigentumer_in='Irene Irinio',
+        publication_start=datetime(2024, 4, 7, tzinfo=tz),
+        publication_end=datetime(2024, 4, 20, tzinfo=tz),
+    ))
+    event.delete_when_expired = True
+
+    event = directory_entries.add(values=dict(
+        gesuchsteller_in='Johanna Johanninio',
+        grundeigentumer_in='Karl Karlinio',
+        publication_start=datetime(2024, 4, 22, tzinfo=tz),
+        # no end date, never gets deleted
+    ))
+    event.delete_when_expired = True
+
+    transaction.commit()
+
+    def count_publications(directories):
+        applications = directories.by_name('offentliche-planauflage')
+        return (DirectoryEntryCollection(applications, type='extended').
+                query().count())
+
+    assert count_publications(directories) == 5
+
+    with freeze_time(datetime(2024, 4, 2, 4, 0, tzinfo=tz)):
+        client.get(get_cronjob_url(job))
+        assert count_publications(directories) == 5
+
+    with freeze_time(datetime(2024, 4, 3, 4, 0, tzinfo=tz)):
+        client.get(get_cronjob_url(job))
+        assert count_publications(directories) == 5
+
+    with freeze_time(datetime(2024, 4, 5, 4, 0, tzinfo=tz)):
+        client.get(get_cronjob_url(job))
+        assert count_publications(directories) == 5
+
+    with freeze_time(datetime(2024, 4, 11, 4, 0, tzinfo=tz)):
+        client.get(get_cronjob_url(job))
+        assert count_publications(directories) == 4  # one entry got deleted
+
+    with freeze_time(datetime(2024, 4, 21, 4, 0, tzinfo=tz)):
+        client.get(get_cronjob_url(job))
+        assert count_publications(directories) == 2  # two more entries got
+        # deleted
+
+    with freeze_time(datetime(2024, 4, 23, 4, 0, tzinfo=tz)):
+        client.get(get_cronjob_url(job))
+        assert count_publications(directories) == 2  # no end date,
+        # never gets deleted
+
+    assert count_publications(directories) == 2
+
+
+def test_delete_content_marked_deletable__news(org_app, handlers):
+    register_echo_handler(handlers)
+    register_directory_handler(handlers)
+
+    client = Client(org_app)
+    job = get_cronjob_by_name(org_app, 'delete_content_marked_deletable')
+    job.app = org_app
+    tz = ensure_timezone('Europe/Zurich')
+
+    transaction.begin()
+    collection = PageCollection(org_app.session())
+    news = collection.add_root('News', type='news')
+    first = collection.add(
+        news,
+        title='First News',
+        type='news',
+        lead='First News Lead',
+    )
+    first.publication_start = datetime(2024, 4, 1, tzinfo=tz)
+    first.publication_end = datetime(2024, 4, 2, 23, 59, tzinfo=tz)
+    first.delete_when_expired = True
+
+    two = collection.add(
+        news,
+        title='Second News',
+        type='news',
+        lead='Second News Lead'
+    )
+    two.publication_start = datetime(2024, 4, 5, tzinfo=tz)
+    two.publication_end = datetime(2024, 4, 6, tzinfo=tz)
+    two.delete_when_expired = True
+
+    transaction.commit()
+
+    def count_news():
+        c = PageCollection(org_app.session()).query()
+        c = c.filter(News.publication_start.isnot(None))
+        c = c.filter(News.publication_end.isnot(None))
+        return c.count()
+
+    with freeze_time(datetime(2024, 4, 1, tzinfo=tz)):
+        client.get(get_cronjob_url(job))
+        assert count_news() == 2
+
+    with freeze_time(datetime(2024, 4, 2, 23, 58, tzinfo=tz)):
+        client.get(get_cronjob_url(job))
+        assert count_news() == 2
+
+    with freeze_time(datetime(2024, 4, 3, tzinfo=tz)):
+        client.get(get_cronjob_url(job))
+        assert count_news() == 1
+
+    with freeze_time(datetime(2024, 4, 7, tzinfo=tz)):
+        client.get(get_cronjob_url(job))
+        assert count_news() == 0
+
+
+def test_delete_content_marked_deletable__events_occurrences(org_app,
+                                                             handlers):
+    register_echo_handler(handlers)
+    register_directory_handler(handlers)
+
+    client = Client(org_app)
+    job = get_cronjob_by_name(org_app, 'delete_content_marked_deletable')
+    job.app = org_app
+    tz = ensure_timezone('Europe/Zurich')
+
+    transaction.begin()
+
+    title = 'Antelope Canyon Tour'
+    events = EventCollection(org_app.session())
+    event = events.add(
+        title=title,
+        start=datetime(2024, 4, 18, 11, 0),
+        end=datetime(2024, 4, 18, 13, 0),
+        timezone='Europe/Zurich',
+        content={
+            'description': 'Antelope Canyon is a stunning and picturesque '
+                           'slot canyon known for its remarkable sandstone '
+                           'formations and light beams, located on Navajo '
+                           'land near Page, Arizona.'
+        },
+        location='Antelope Canyon, Page, Arizona',
+        tags=['nature', 'stunning', 'canyon'],
+    )
+    event.recurrence = as_rdates('FREQ=WEEKLY;COUNT=4', event.start)
+    event.submit()
+    event.publish()
+
+    transaction.commit()
+
+    def count_events():
+        return (EventCollection(org_app.session()).query()
+                .filter_by(title=title).count())
+
+    def count_occurrences():
+        return (OccurrenceCollection(org_app.session(), outdated=True)
+                .query().filter_by(title=title).count())
+
+    with (freeze_time(datetime(2024, 4, 18, tzinfo=tz))):
+        # default setting, no deletion of past event and past occurrences
+        assert org_app.org.delete_past_events is False
+
+        assert count_events() == 1
+        assert count_occurrences() == 4
+
+        client.get(get_cronjob_url(job))
+        assert count_events() == 1
+        assert count_occurrences() == 4
+
+    with (freeze_time(datetime(2024, 4, 19, 6, 0, tzinfo=tz))):
+        # an old occurrence could be deleted but the setting is not enabled
+        client.get(get_cronjob_url(job))
+        assert count_events() == 1
+        assert count_occurrences() == 4
+
+        # switch setting and see if past events and past occurrences are
+        # deleted
+        org_app.org.delete_past_events = True
+        assert org_app.org.delete_past_events is True
+
+        client.get(get_cronjob_url(job))
+        assert count_events() == 1
+        assert count_occurrences() == 3
+
+    with (freeze_time(datetime(2024, 5, 9, tzinfo=tz))):
+        client.get(get_cronjob_url(job))
+        assert count_events() == 1
+        assert count_occurrences() == 1
+
+    with (freeze_time(datetime(2024, 5, 10, tzinfo=tz))):
+        # finally after all occurrences took place, the event as well as all
+        # occurrences got deleted by the cronjob (April 18th + 3*7 days =
+        # May 10)
+        client.get(get_cronjob_url(job))
+        assert count_events() == 0
+        assert count_occurrences() == 0

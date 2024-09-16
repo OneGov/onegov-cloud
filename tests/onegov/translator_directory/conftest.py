@@ -1,12 +1,16 @@
 import pytest
 import transaction
+from os import path
+from yaml import dump
 
+from onegov.core.orm.observer import ScopedPropertyObserver
 from onegov.fsi.initial_content import create_new_organisation
 from onegov.translator_directory import TranslatorDirectoryApp
 from onegov.user import User
 from sqlalchemy.orm.session import close_all_sessions
 from tests.shared import Client as BaseClient
 from tests.shared.utils import create_app
+from pytest import fixture
 from onegov.core.crypto import hash_password
 
 
@@ -84,3 +88,48 @@ def create_translator_app(request, use_elasticsearch):
     close_all_sessions()
 
     return app
+
+
+@fixture(scope='function')
+def cfg_path(
+    postgres_dsn, session_manager, temporary_directory, redis_url
+):
+    cfg = {
+        'applications': [
+            {
+                'path': '/translator_directory/*',
+                'application': 'onegov.translator_directory.'
+                               'TranslatorDirectoryApp',
+                'namespace': 'translator_directory',
+                'configuration': {
+                    'dsn': postgres_dsn,
+                    'redis_url': redis_url,
+                    'depot_backend': 'depot.io.memory.MemoryFileStorage',
+                    'filestorage': 'fs.osfs.OSFS',
+                    'filestorage_options': {
+                        'root_path': '{}/file-storage'.format(
+                            temporary_directory
+                        ),
+                        'create': 'true',
+                    },
+                    'websockets': {
+                        'client_url': 'ws://localhost:8766',
+                        'manage_url': 'ws://localhost:8766',
+                        'manage_token': 'super-super-secret-token',
+                    },
+                },
+            }
+        ]
+    }
+
+    cfg_path = path.join(temporary_directory, 'onegov.yml')
+    with open(cfg_path, 'w') as f:
+        f.write(dump(cfg))
+
+    return cfg_path
+
+
+@fixture(scope="session", autouse=True)
+def enter_observer_scope():
+    """Ensures app specific observers are active"""
+    ScopedPropertyObserver.enter_class_scope(TranslatorDirectoryApp)

@@ -14,7 +14,7 @@ if TYPE_CHECKING:
     from sqlalchemy.orm import Query, Session
     from uuid import UUID
     from typing import NamedTuple
-    from typing_extensions import Self, TypeAlias
+    from typing import Self, TypeAlias
 
     class ReportRowWithVolunteer(NamedTuple):
         activity_id: UUID

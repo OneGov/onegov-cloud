@@ -124,51 +124,37 @@ def test_group_intervals():
 
     intervals = list(mixin.get_date_intervals(datetime(2016, 1, 1)))
 
-    assert intervals[0].name == 'This month'
-    assert intervals[0].start.date() == date(2016, 1, 1)
-    assert intervals[0].end.date() == date(2016, 1, 31)
-
-    assert intervals[1].name == 'Last month'
-    assert intervals[1].start.date() == date(2015, 12, 1)
-    assert intervals[1].end.date() == date(2015, 12, 31)
-
-    assert intervals[2].name == 'Last year'
-    assert intervals[2].start.date() == date(2015, 1, 1)
-    assert intervals[2].end.date() == date(2015, 11, 30)
-
-    assert intervals[3].name == 'Older'
-    assert intervals[3].start.date() == date(2000, 1, 1)
-    assert intervals[3].end.date() == date(2014, 12, 31)
-
-    intervals = list(mixin.get_date_intervals(datetime(2016, 2, 1)))
-
-    assert intervals[0].name == 'This month'
+    assert intervals[0].name == 'In future'
     assert intervals[0].start.date() == date(2016, 2, 1)
-    assert intervals[0].end.date() == date(2016, 2, 29)
+    assert intervals[0].end.date() == date(2116, 2, 1)
 
-    assert intervals[1].name == 'Last month'
+    assert intervals[1].name == 'This month'
     assert intervals[1].start.date() == date(2016, 1, 1)
     assert intervals[1].end.date() == date(2016, 1, 31)
 
-    assert intervals[2].name == 'Last year'
-    assert intervals[2].start.date() == date(2015, 1, 1)
+    assert intervals[2].name == 'Last month'
+    assert intervals[2].start.date() == date(2015, 12, 1)
     assert intervals[2].end.date() == date(2015, 12, 31)
 
-    assert intervals[3].name == 'Older'
-    assert intervals[3].start.date() == date(2000, 1, 1)
-    assert intervals[3].end.date() == date(2014, 12, 31)
+    assert intervals[3].name == 'Last year'
+    assert intervals[3].start.date() == date(2015, 1, 1)
+    assert intervals[3].end.date() == date(2015, 11, 30)
 
-    intervals = list(mixin.get_date_intervals(datetime(2016, 3, 1)))
+    assert intervals[4].name == 'Older'
+    assert intervals[4].start.date() == date(2000, 1, 1)
+    assert intervals[4].end.date() == date(2014, 12, 31)
 
-    assert intervals[0].name == 'This month'
+    intervals = list(mixin.get_date_intervals(datetime(2016, 2, 1)))
+
+    assert intervals[0].name == 'In future'
     assert intervals[0].start.date() == date(2016, 3, 1)
-    assert intervals[0].end.date() == date(2016, 3, 31)
+    assert intervals[0].end.date() == date(2116, 3, 1)
 
-    assert intervals[1].name == 'Last month'
+    assert intervals[1].name == 'This month'
     assert intervals[1].start.date() == date(2016, 2, 1)
     assert intervals[1].end.date() == date(2016, 2, 29)
 
-    assert intervals[2].name == 'This year'
+    assert intervals[2].name == 'Last month'
     assert intervals[2].start.date() == date(2016, 1, 1)
     assert intervals[2].end.date() == date(2016, 1, 31)
 
@@ -179,6 +165,32 @@ def test_group_intervals():
     assert intervals[4].name == 'Older'
     assert intervals[4].start.date() == date(2000, 1, 1)
     assert intervals[4].end.date() == date(2014, 12, 31)
+
+    intervals = list(mixin.get_date_intervals(datetime(2016, 3, 1)))
+
+    assert intervals[0].name == 'In future'
+    assert intervals[0].start.date() == date(2016, 4, 1)
+    assert intervals[0].end.date() == date(2116, 4, 1)
+
+    assert intervals[1].name == 'This month'
+    assert intervals[1].start.date() == date(2016, 3, 1)
+    assert intervals[1].end.date() == date(2016, 3, 31)
+
+    assert intervals[2].name == 'Last month'
+    assert intervals[2].start.date() == date(2016, 2, 1)
+    assert intervals[2].end.date() == date(2016, 2, 29)
+
+    assert intervals[3].name == 'This year'
+    assert intervals[3].start.date() == date(2016, 1, 1)
+    assert intervals[3].end.date() == date(2016, 1, 31)
+
+    assert intervals[4].name == 'Last year'
+    assert intervals[4].start.date() == date(2015, 1, 1)
+    assert intervals[4].end.date() == date(2015, 12, 31)
+
+    assert intervals[5].name == 'Older'
+    assert intervals[5].start.date() == date(2000, 1, 1)
+    assert intervals[5].end.date() == date(2014, 12, 31)
 
 
 def test_image_grouping(session):

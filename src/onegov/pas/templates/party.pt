@@ -1,0 +1,46 @@
+<div metal:use-macro="layout.base" i18n:domain="onegov.pas">
+    <tal:b metal:fill-slot="title">
+        ${title}
+    </tal:b>
+
+    <tal:b metal:fill-slot="content">
+        <dl class="field-display">
+            <div tal:condition="party.start">
+                <dt i18n:translate>Start</dt>
+                <dd>${layout.format_date(party.start, 'date')}</dd>
+            </div>
+            <div tal:condition="party.end">
+                <dt i18n:translate>End</dt>
+                <dd>${layout.format_date(party.end, 'date')}</dd>
+            </div>
+            <div tal:condition="party.portrait">
+                <dt i18n:translate>Portrait</dt>
+                <dd><div tal:content="party.portrait"></div></dd>
+            </div>
+            <div tal:condition="party.description">
+                <dt i18n:translate>Description</dt>
+                <dd><div tal:content="party.description"></div></dd>
+            </div>
+            <div tal:condition="party.roles">
+                <dt i18n:translate>Parliamentarians</dt>
+                <dd>
+                    <ul>
+                        <li tal:repeat="role party.roles">
+                            <span>
+                                <a href="${request.link(role.parliamentarian)}">${role.parliamentarian.title}</a>
+                                (<a href="${request.link(role)}">${role.party_role_label}</a>)
+                            </span>
+                            <span>
+                                <br>${layout.format_date(role.start, 'date')}
+                            </span>
+                            <span tal:condition="role.end">
+                                -
+                                ${layout.format_date(role.end, 'date')}
+                            </span>
+                        </li>
+                    </ul>
+                </dd>
+            </div>
+        </dl>
+    </tal:b>
+</div>

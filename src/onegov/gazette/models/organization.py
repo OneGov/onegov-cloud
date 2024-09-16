@@ -4,10 +4,10 @@ from onegov.core.orm.mixins import ContentMixin
 from onegov.core.orm.mixins import dict_property
 from onegov.core.orm.mixins import meta_property
 from onegov.core.orm.mixins import TimestampMixin
+from onegov.gazette.observer import observes
 from sqlalchemy import Boolean
 from sqlalchemy import Column
 from sqlalchemy import or_
-from sqlalchemy_utils import observes
 from sqlalchemy.orm import object_session
 
 
@@ -19,7 +19,6 @@ if TYPE_CHECKING:
     from sqlalchemy.orm import Query
     from sqlalchemy.orm import Session
     from sqlalchemy.orm import relationship
-    from typing_extensions import Self
 
 
 class Organization(AdjacencyList, ContentMixin, TimestampMixin):
@@ -97,19 +96,6 @@ class OrganizationMove:
         self.subject_id = subject_id
         self.target_id = target_id
         self.direction = direction
-
-    @classmethod
-    def for_url_template(cls) -> 'Self':
-        # FIXME: This is pretty weird, I think we should use
-        #        self.request.class_link so we don't have to
-        #        do this stupid hack where we return an object
-        #        that is not actually a valid OrganizationMove
-        return cls(
-            session=None,  # type:ignore[arg-type]
-            subject_id='{subject_id}',  # type:ignore[arg-type]
-            target_id='{target_id}',  # type:ignore[arg-type]
-            direction='{direction}'  # type:ignore[arg-type]
-        )
 
     def execute(self) -> None:
         from onegov.gazette.collections import OrganizationCollection

@@ -159,7 +159,7 @@ def test_translator_mutation(session):
         'self_employed': False,
         'gender': 'M',
         'date_of_birth': '1970-01-01',
-        'nationality': 'Nationality',
+        'nationalities': 'nationalities',
         'coordinates': Coordinates(1, 2),
         'address': 'Street and house number',
         'zip_code': '8000',
@@ -225,7 +225,7 @@ def test_translator_mutation(session):
     assert ticket.handler.message == 'Message'
     assert ticket.handler.proposed_changes == proposed_changes
     assert ticket.handler.state is None
-    assert ticket.handler.title == 'Benito, Hugo'
+    assert ticket.handler.title == 'BENITO, Hugo'
     assert ticket.handler.subtitle == 'Mutation'
     assert ticket.handler.group == 'Translator'
 
@@ -317,7 +317,8 @@ def test_translator_mutation(session):
             '_Italian',
             [str(l.id) for l in languages[2:3]]
         ),
-        'nationality': ('_Nationality', 'Nationality', 'Nationality'),
+        'nationalities': ('_Nationality(ies)', 'nationalities',
+                          'nationalities'),
         'operation_comments': (
             '_Comments on possible field of application',
             'Operation comments',
@@ -376,7 +377,7 @@ def test_translator_mutation(session):
     assert translator.self_employed is False
     assert translator.gender == 'M'
     assert translator.date_of_birth == date(1970, 1, 1)
-    assert translator.nationality == 'Nationality'
+    assert translator.nationalities == 'nationalities'
     assert translator.coordinates == Coordinates(1, 2)
     assert translator.address == 'Street and house number'
     assert translator.zip_code == '8000'
@@ -436,7 +437,6 @@ def test_accreditation(translator_app):
             'handler_data': {
                 'id': str(translator.id),
                 'submitter_email': 'translator@example.org',
-                'hometown': 'Luzern'
             }
         }
     )
@@ -449,7 +449,7 @@ def test_accreditation(translator_app):
     assert not ticket.handler.deleted
     assert ticket.handler.email == 'translator@example.org'
     assert ticket.handler.state is None
-    assert ticket.handler.title == 'Benito, Hugo'
+    assert ticket.handler.title == 'BENITO, Hugo'
     assert ticket.handler.subtitle == 'Request Accreditation'
     assert ticket.handler.group == 'Accreditation'
     assert accreditation.target == translator

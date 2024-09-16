@@ -50,8 +50,8 @@ class LibresIntegration:
 
         """
 
-        assert self.session_manager.bases, "Must be run after configure_dsn"
-        self.session_manager.bases.append(ORMBase)
+        assert ORMBase in self.session_manager.bases, (
+            'Must be run after configure_dsn')
 
         self.libres_registry = create_default_registry()
         self.libres_context = self.libres_context_from_session_manager(

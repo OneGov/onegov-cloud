@@ -5,11 +5,19 @@ from sortedcontainers import SortedSet
 
 from typing import Literal, TYPE_CHECKING
 if TYPE_CHECKING:
-    from _typeshed import SupportsRichComparison
     from collections.abc import Callable, Hashable, Iterable
     from decimal import Decimal
     from onegov.activity.models import Booking, Occasion
+    from sortedcontainers._typing import SupportsHashableAndRichComparison
+    from sortedcontainers.sortedset import SortedKeySet
+    from typing_extensions import TypeVar
     from uuid import UUID
+
+    OrderT = TypeVar(
+        'OrderT',
+        bound=SupportsHashableAndRichComparison,
+        default=tuple[Decimal, int, UUID]
+    )
 
 
 def overlaps(
@@ -74,7 +82,7 @@ class LoopBudget:
 
     def limit_reached(self, as_exception: bool = False) -> bool | None:
         if self.ticks >= self.max_ticks:
-            message = "Loop limit of {} has been reached".format(self.ticks)
+            message = 'Loop limit of {} has been reached'.format(self.ticks)
 
             if as_exception:
                 raise RuntimeError(message)
@@ -109,9 +117,12 @@ def booking_order(booking: 'Booking') -> tuple['Decimal', int, 'UUID']:
 def unblockable(
     accepted: 'Iterable[Booking]',
     blocked: 'Iterable[Booking]',
-    key: 'Callable[[Booking], SupportsRichComparison]' = booking_order,
+    # NOTE: value defaults don't yet have an exception for type params
+    #       with a default type. So we need to ignore here, despite the
+    #       types matching.
+    key: 'Callable[[Booking], OrderT]' = booking_order,  # type:ignore
     with_anti_affinity_check: bool = False
-) -> set['Booking']:
+) -> 'SortedKeySet[Booking, OrderT]':
     """ Returns a set of items in the blocked set which do not block
     with anything. The set is ordered using :func:`booking_order`.
 

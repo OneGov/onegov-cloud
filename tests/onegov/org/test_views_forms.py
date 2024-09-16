@@ -4,11 +4,13 @@ from io import BytesIO
 
 import transaction
 
-from datetime import date
+from datetime import date, timedelta
 from freezegun import freeze_time
 
+from onegov.core.utils import module_path
 from onegov.file import FileCollection
-from onegov.form import FormCollection, as_internal_id
+from onegov.form import (
+    FormCollection, FormDefinitionCollection, as_internal_id)
 from onegov.org.models import TicketNote
 from onegov.people import Person
 from onegov.ticket import TicketCollection, Ticket
@@ -357,6 +359,50 @@ def test_add_duplicate_form(client):
     form_page = form_page.form.submit()
 
     assert "Ein Formular mit diesem Namen existiert bereits" in form_page
+
+
+def test_forms_explicitly_link_referenced_files(client):
+    admin = client.spawn()
+    admin.login_admin()
+
+    path = module_path('tests.onegov.org', 'fixtures/sample.pdf')
+    with open(path, 'rb') as f:
+        page = admin.get('/files')
+        page.form['file'] = Upload('Sample.pdf', f.read(), 'application/pdf')
+        page.form.submit()
+
+    pdf_url = (
+        admin.get('/files')
+        .pyquery('[ic-trigger-from="#button-1"]')
+        .attr('ic-get-from')
+        .removesuffix('/details')
+    )
+    pdf_link = f'<a href="{pdf_url}">Sample.pdf</a>'
+
+    editor = client.spawn()
+    editor.login_editor()
+
+    form_page = editor.get('/forms/new')
+    form_page.form['title'] = "My Form"
+    form_page.form['lead'] = "This is a form"
+    form_page.form['text'] = pdf_link
+    form_page.form['definition'] = "email *= @@@"
+    form_page = form_page.form.submit().follow()
+
+    session = client.app.session()
+    pdf = FileCollection(session).query().one()
+    form = FormDefinitionCollection(session).by_name('my-form')
+    assert form.files == [pdf]
+    assert pdf.access == 'public'
+
+    form.access = 'mtan'
+    session.flush()
+    assert pdf.access == 'mtan'
+
+    # link removed
+    form.files = []
+    session.flush()
+    assert pdf.access == 'secret'
 
 
 def test_delete_builtin_form(client):
@@ -751,6 +797,55 @@ def test_registration_change_limit_after_submissions(client):
     assert "Ihre Änderungen wurden gespeichert" in page
 
 
+def test_registration_window_adjust_end_date(client):
+    collection = FormCollection(client.app.session())
+
+    form = collection.definitions.add(
+        'Meet Guido van Rossum', "E-Mail *= @@@", 'custom')
+    form.add_registration_window(
+        start=date(2024, 4, 1),
+        end=date(2024, 4, 2),
+        limit=None,
+        overflow=False
+    )
+    transaction.commit()
+
+    client.login_editor()
+
+    # change end date before first submission confirmed
+    with freeze_time('2024-04-01', tick=True):
+        # submit form prior adjusting end date
+        page = client.get('/form/meet-guido-van-rossum')
+        page.form['e_mail'] = 'guido_fan@example.org'
+        page.form.submit().follow().form.submit().follow()
+
+        # adjust end date
+        page = (client.get('/form/meet-guido-van-rossum').
+                click('01.04.2024 - 02.04.2024'))
+        page = page.click('Bearbeiten')
+        page.form['end'] = '2024-04-03'
+        result = page.form.submit().follow()
+        assert 'Anmeldezeitraum bearbeiten' not in result
+        assert 'Ihre Änderungen wurden gespeichert' in result
+
+    # confirm first submission and change registration end date
+    with freeze_time('2024-04-01', tick=True):
+        # accept ticket, confirm
+        accept_submission = (client.get('/tickets/ALL/open').
+                             click("Annehmen").follow())
+        accept_submission.click("Anmeldung bestätigen").follow()
+        assert accept_submission.status_code == 200
+
+        # change end date
+        page = (client.get('/form/meet-guido-van-rossum').
+                click('01.04.2024 - 03.04.2024'))
+        page = page.click('Bearbeiten')
+        page.form['end'] = '2024-04-04'
+        result = page.form.submit().follow()
+        assert 'Anmeldezeitraum bearbeiten' not in result
+        assert 'Ihre Änderungen wurden gespeichert' in result
+
+
 def test_registration_ticket_workflow(client):
     collection = FormCollection(client.app.session())
     users = UserCollection(client.app.session())
@@ -1048,7 +1143,7 @@ def test_honeypotted_forms(client):
     assert 'Das Formular enthält Fehler' not in preview_page
 
 
-def test_edit_page_people_function_is_displayed(client, session):
+def test_edit_page_people_function_is_displayed(client):
 
     client.login_admin()
 
@@ -1202,3 +1297,86 @@ def test_file_export_for_ticket(client, temporary_directory):
 
     # testing something like "Datei * = *.txt (multiple)" would require
     # webtest to support multiple file upload which will come on 3.0.1
+
+
+def test_create_and_fill_survey(client):
+    client.login_editor()
+    anonymous = client.spawn()
+
+    # Create a survey
+    page = client.get('/surveys/new')
+    page.form['title'] = 'Event Evaluation'
+    page.form['lead'] = 'Evaluation for the best event'
+    page.form['definition'] = textwrap.dedent("""
+        Name = ___
+        How was the event? =
+            (x) Good
+            ( ) Medium
+            ( ) Bad
+    """)
+    page = page.form.submit().follow()
+    assert "Event Evaluation" in page
+
+    # Fill out the survey
+    page = anonymous.get('/survey/event-evaluation')
+    page.form['name'] = 'Nicolas Thomas'
+    page.form['how_was_the_event_'] = 'Good'
+    page = page.form.submit().follow()
+
+    # Check the results
+    page = client.get('/survey/event-evaluation').click('Resultate')
+    assert 'Nicolas Thomas' in page
+    assert 'Good' in page
+    assert '(1/1)' in page
+
+    # Create submission window
+    yesterday = date.today() - timedelta(days=1)
+    tomorrow = date.today() + timedelta(days=1)
+    page = client.get('/survey/event-evaluation').click('Hinzufügen')
+    page.form['title'] = 'Team 1'
+    page.form['start'] = yesterday
+    page.form['end'] = tomorrow
+    page = page.form.submit().follow()
+    assert 'Der Anmeldezeitraum wurde erfolgreich hinzugefügt' in page
+
+    # Try to create a window with the same time without a title
+    page = client.get('/survey/event-evaluation').click('Hinzufügen')
+    page.form['title'] = ''
+    page.form['start'] = yesterday
+    page.form['end'] = tomorrow
+    page = page.form.submit()
+    y = yesterday.strftime('%d.%m.%Y')
+    t = tomorrow.strftime('%d.%m.%Y')
+    assert f"Befragungszeitraum ({y} - {t})." in page
+
+    # Give the window a title
+    page.form['title'] = 'Team 2'
+    page = page.form.submit().follow()
+    assert 'Der Anmeldezeitraum wurde erfolgreich hinzugefügt' in page
+    page = client.get('/survey/event-evaluation').click('Team 2')
+    url = page.request.url
+
+    # Try to access the survey without the window
+    page = anonymous.get('/survey/event-evaluation', expect_errors=True)
+    assert page.status_code == 403
+
+    # Try to access the survey with the window
+    page = anonymous.get(url)
+    page.form['name'] = 'Rubus Bubus'
+    page.form['how_was_the_event_'] = 'Medium'
+    page = page.form.submit().follow()
+
+    # Check the results
+    page = client.get('/survey/event-evaluation').click('Resultate')
+    assert 'Nicolas Thomas' in page
+    assert 'Good' in page
+    assert 'Rubus Bubus' in page
+    assert 'Medium' in page
+    assert '(1/2)' in page
+
+    # Check submission window results
+    page = page.click('Team 2')
+    assert 'Rubus Bubus' in page
+    assert 'Medium' in page
+    assert '(1/1)' in page
+    assert 'Nicolas Thomas' not in page

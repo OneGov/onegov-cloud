@@ -8,18 +8,24 @@ from onegov.newsletter import NewsletterCollection, Subscription
 from onegov.org import _, OrgApp
 
 
+from typing import TYPE_CHECKING
+if TYPE_CHECKING:
+    from onegov.org.request import OrgRequest
+    from webob import Response as BaseResponse
+
+
 # use an english name for this view, so robots know what we use it for
 @OrgApp.view(model=Subscription, name='confirm', permission=Public)
-def view_confirm(self, request):
+def view_confirm(self: Subscription, request: 'OrgRequest') -> 'BaseResponse':
     if self.confirm():
         request.success(_(
-            "the subscription for ${address} was successfully confirmed",
+            'the subscription for ${address} was successfully confirmed',
             mapping={'address': self.recipient.address}
         ))
     else:
         request.alert(_(
-            "the subscription for ${address} could not be confirmed, "
-            "wrong token",
+            'the subscription for ${address} could not be confirmed, '
+            'wrong token',
             mapping={'address': self.recipient.address}
         ))
 
@@ -30,7 +36,10 @@ def view_confirm(self, request):
 
 # use an english name for this view, so robots know what we use it for
 @OrgApp.view(model=Subscription, name='unsubscribe', permission=Public)
-def view_unsubscribe(self, request):
+def view_unsubscribe(
+    self: Subscription,
+    request: 'OrgRequest'
+) -> 'BaseResponse':
 
     # RFC-8058: just return an empty response on a POST request
     # don't check for success
@@ -42,12 +51,12 @@ def view_unsubscribe(self, request):
 
     if self.unsubscribe():
         request.success(_(
-            "${address} successfully unsubscribed",
+            '${address} successfully unsubscribed',
             mapping={'address': address}
         ))
     else:
         request.alert(_(
-            "${address} could not be unsubscribed, wrong token",
+            '${address} could not be unsubscribed, wrong token',
             mapping={'address': address}
         ))
 
@@ -63,7 +72,10 @@ def view_unsubscribe(self, request):
     permission=Public,
     request_method='POST'
 )
-def view_unsubscribe_rfc8058(self, request):
+def view_unsubscribe_rfc8058(
+    self: Subscription,
+    request: 'OrgRequest'
+) -> Response:
     # it doesn't really make sense to check for success here
     # since this is an automated action without verficiation
     self.unsubscribe()

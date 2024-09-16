@@ -73,7 +73,7 @@ from typing import Any, Generic, Literal, TypeVar, TYPE_CHECKING
 if TYPE_CHECKING:
     from collections.abc import Callable, Iterable, Iterator
     from sedate.types import TzInfo, TzInfoOrName
-    from typing_extensions import TypeAlias
+    from typing import TypeAlias
 
     from .request import CoreRequest
 
@@ -123,15 +123,15 @@ def parse_cron(
         return (int(value), )
 
     if not isinstance(value, str):
-        raise RuntimeError(f"Unexpected type for {value}: {type(value)}")
+        raise RuntimeError(f'Unexpected type for {value}: {type(value)}')
 
     if not CRONJOB_FORMAT.match(value):
-        raise RuntimeError(f"{value} did not match {CRONJOB_FORMAT}")
+        raise RuntimeError(f'{value} did not match {CRONJOB_FORMAT}')
 
     remainder = int(value.split('/')[-1])
 
     if remainder > size:
-        raise RuntimeError(f"The remainder in {value} is too big")
+        raise RuntimeError(f'The remainder in {value} is too big')
 
     return (v for v in range(0, size) if v % remainder == 0)
 
@@ -249,7 +249,7 @@ class Job(Generic[_JobFunc]):
         if not today:
             return self.next_runtime(date.today() + timedelta(days=1))
 
-        raise RuntimeError(f"Could not find a new runtime for job {self.name}")
+        raise RuntimeError(f'Could not find a new runtime for job {self.name}')
 
     @property
     def id(self) -> str:
@@ -263,7 +263,7 @@ class Job(Generic[_JobFunc]):
         See :meth:`as_request_call`.
 
         """
-        return quote_plus(self.app.sign(self.name))
+        return quote_plus(self.app.sign(self.name, 'cronjob-id'))
 
     def as_request_call(self, request: 'CoreRequest') -> 'Job[Scheduled]':
         """ Returns a new job which does the same as the old job, but it does
@@ -282,7 +282,7 @@ class Job(Generic[_JobFunc]):
             # urllib. In any case, using pycurl gets rid of this problem
             # without introducing a rather expensive subprocess.
             c = pycurl.Curl()
-            c.setopt(c.URL, url)  # type:ignore[attr-defined]
+            c.setopt(pycurl.URL, url)
             c.setopt(pycurl.WRITEFUNCTION, lambda bytes: len(bytes))
             c.perform()
             c.close()
@@ -345,14 +345,14 @@ class ApplicationBoundCronjobs(Thread):
         # has the lock, this thread will end immediately and be GC'd.
         with suppress(AlreadyLockedError):
             with local_lock('cronjobs-thread', self.application_id):
-                log.info(f"Started cronjob thread for {self.application_id}")
+                log.info(f'Started cronjob thread for {self.application_id}')
                 self.run_locked()
 
     # FIXME: This should probably not be public API if it's only supposed
     #        to run in a locked state
     def run_locked(self) -> None:
         for job in self.jobs:
-            log.info(f"Enabled {job.title}")
+            log.info(f'Enabled {job.title}')
             self.schedule(job)
 
         self.scheduler.run()
@@ -365,7 +365,7 @@ class ApplicationBoundCronjobs(Thread):
             priority=0)
 
     def process_job(self, job: Job['Scheduled']) -> None:
-        log.info(f"Executing {job.title}")
+        log.info(f'Executing {job.title}')
 
         try:
             start = time.perf_counter()
@@ -373,9 +373,9 @@ class ApplicationBoundCronjobs(Thread):
             duration = time.perf_counter() - start
 
             if duration > CRONJOB_MAX_DURATION:
-                log.warn(f"{job.title} took too long ({duration:.3f})s")
+                log.warn(f'{job.title} took too long ({duration:.3f})s')
             else:
-                log.info(f"{job.title} finished in {duration:.3f}s")
+                log.info(f'{job.title} finished in {duration:.3f}s')
 
         except Exception as e:
             # exceptions in OneGov Cloud are captured mostly automatically, but
@@ -392,7 +392,14 @@ class ApplicationBoundCronjobs(Thread):
 @Framework.path(model=Job, path='/cronjobs/{id}')
 def get_job(app: Framework, id: str) -> Job['Executor'] | None:
     """ The internal path to the cronjob. The id can't be guessed. """
-    name = app.unsign(unquote_plus(id))
+    # FIXME: This should really use a dynamic salt, but we will have to
+    #        be careful about race conditions between dispatch and
+    #        execution. While these urls should be virtually unguessable
+    #        if they leak through a log-file etc. they could be reused.
+    #        Or we could do something similar to OCQMS and only allow
+    #        local connections, although this may be difficult to ensure
+    #        for all possible deployments.
+    name = app.unsign(unquote_plus(id), 'cronjob-id')
 
     if name:
         return getattr(app.config.cronjob_registry, 'cronjobs', {}).get(name)

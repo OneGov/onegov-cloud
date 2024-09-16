@@ -10,7 +10,8 @@
     https://stackoverflow.com/questions/24646732/sec7118-xmlhttprequest-cors-ie-console-message
 */
 @media screen and (-ms-high-contrast: active), screen and (-ms-high-contrast: none) {
-    .leaflet-container .leaflet-control-container .leaflet-control-geocoder {
+    .leaflet-container .leaflet-control-container .leaflet-control-geocoder,
+    .leaflet-container .leaflet-control-container .leaflet-control-locate {
         display: none !important;
     }
 }
@@ -66,6 +67,7 @@
 }
 
 .leaflet-control-zoom > a,
+.leaflet-control-locate > a,
 .leaflet-disabled {
     background-color: black !important;
     border: 1px solid black !important;
@@ -96,6 +98,7 @@
 
 .leaflet-control-geocoder-icon:hover,
 .leaflet-control-zoom > a:hover,
+.leaflet-control-locate > a:hover,
 .add-point-active:hover,
 .remove-point-active:hover,
 .closed-active:hover {
@@ -103,6 +106,14 @@
     outline: 1px solid white;
     position: relative !important;
     z-index: 10 !important;
+}
+
+.leaflet-control-locate {
+    clear: none;
+}
+
+.leaflet-control-locate a .fa.fa-spinner {
+    animation: leaflet-control-locate-spin 2s linear infinite;
 }
 
 .add-point-active:hover,

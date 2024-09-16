@@ -1,13 +1,13 @@
 from base64 import b64encode
 from datetime import date
-from onegov.ballot import Ballot
-from onegov.ballot import Election
-from onegov.ballot import ElectionCompound
-from onegov.ballot import ElectionCompoundPart
-from onegov.ballot import Vote
 from onegov.election_day import _
+from onegov.election_day.models import Election
+from onegov.election_day.models import ElectionCompound
+from onegov.election_day.models import ElectionCompoundPart
+from onegov.election_day.models import Vote
 from onegov.election_day.utils.d3_renderer import D3Renderer
-from unittest.mock import patch, MagicMock
+from unittest.mock import MagicMock
+from unittest.mock import patch
 
 
 def test_d3_renderer_scripts(election_day_app_zg):
@@ -150,7 +150,7 @@ def test_d3_renderer_get_charts(election_day_app_zg):
         domain='federation',
         date=date(2011, 1, 1),
     )
-    vote.ballots.append(Ballot(type='proposal'))
+    assert vote.proposal  # create
     session = election_day_app_zg.session()
     session.add(election)
     session.add(compound)

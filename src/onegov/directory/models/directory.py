@@ -1,10 +1,11 @@
 import inspect
 
+from email_validator import validate_email
 from enum import Enum
 from onegov.core.cache import instance_lru_cache
 from onegov.core.cache import lru_cache
 from onegov.core.crypto import random_token
-from onegov.core.orm import Base
+from onegov.core.orm import Base, observes
 from onegov.core.orm.mixins import ContentMixin
 from onegov.core.orm.mixins import TimestampMixin
 from onegov.core.orm.types import UUID
@@ -12,19 +13,20 @@ from onegov.core.utils import normalize_for_url
 from onegov.directory.errors import ValidationError, DuplicateEntryError
 from onegov.directory.migration import DirectoryMigration
 from onegov.directory.types import DirectoryConfigurationStorage
-from onegov.file import File
+from onegov.file import File, MultiAssociatedFiles
 from onegov.file.utils import as_fileintent
 from onegov.form import flatten_fieldsets, parse_formcode, parse_form
 from onegov.search import SearchableContent
 from sedate import to_timezone
-from sqlalchemy import Column
+from sqlalchemy import Boolean, Column
 from sqlalchemy import func, exists, and_
 from sqlalchemy import Integer
 from sqlalchemy import Text
 from sqlalchemy.orm import object_session
 from sqlalchemy.orm import relationship
+from sqlalchemy.orm import validates
 from sqlalchemy.orm.attributes import InstrumentedAttribute
-from sqlalchemy_utils import aggregated, observes
+from sqlalchemy_utils import aggregated
 from uuid import uuid4
 from wtforms import FieldList
 
@@ -38,8 +40,7 @@ if TYPE_CHECKING:
     from onegov.form.parser.core import (
         BasicParsedField, FileParsedField, ParsedField)
     from sqlalchemy.sql import ColumnElement
-    from typing import type_check_only
-    from typing_extensions import TypeAlias
+    from typing import type_check_only, TypeAlias
     from .directory_entry import DirectoryEntry
     from ..types import DirectoryConfiguration
 
@@ -95,7 +96,8 @@ class DirectoryFile(File):
         return 'secret' if self.published else 'private'
 
 
-class Directory(Base, ContentMixin, TimestampMixin, SearchableContent):
+class Directory(Base, ContentMixin, TimestampMixin,
+                SearchableContent, MultiAssociatedFiles):
     """ A directory of entries that share a common data structure. For example,
     a directory of people, of emergency services or playgrounds.
 
@@ -160,7 +162,7 @@ class Directory(Base, ContentMixin, TimestampMixin, SearchableContent):
     entries: 'relationship[list[DirectoryEntry]]' = relationship(
         'DirectoryEntry',
         order_by='DirectoryEntry.order',
-        backref='directory'
+        back_populates='directory'
     )
 
     @property
@@ -584,3 +586,73 @@ class Directory(Base, ContentMixin, TimestampMixin, SearchableContent):
                         form_field.data = data
 
         return DirectoryEntryForm
+
+
+class EntryRecipient(Base, TimestampMixin):
+    """ Represents a single recipient.
+    """
+
+    __tablename__ = 'entry_recipients'
+
+    #: the id of the recipient, used in the url
+    id: 'Column[uuid.UUID]' = Column(
+        UUID,  # type:ignore[arg-type]
+        primary_key=True,
+        default=uuid4
+    )
+
+    #: the email address of the recipient
+    address: 'Column[str]' = Column(Text, nullable=False)
+
+    @validates('address')
+    def validate_address(self, key: str, address: str) -> str:
+        assert validate_email(address)
+        return address
+
+    #: this token is used for confirm and unsubscribe
+    token: 'Column[str]' = Column(Text, nullable=False, default=random_token)
+
+    #: when recipients are added, they are unconfirmed. At this point they get
+    #: one e-mail with a confirmation link. If they ignore said e-mail they
+    #: should not get another one.
+    confirmed: 'Column[bool]' = Column(Boolean, nullable=False, default=False)
+
+    @property
+    def subscription(self) -> 'EntrySubscription':
+        return EntrySubscription(self, self.token)
+
+    directory_id: 'Column[uuid.UUID]' = Column(
+        UUID,  # type:ignore[arg-type]
+        nullable=False
+    )
+
+
+class EntrySubscription:
+    """ Adds subscription management to a recipient. """
+
+    def __init__(self, recipient: EntryRecipient, token: str):
+        self.recipient = recipient
+        self.token = token
+
+    @property
+    def recipient_id(self) -> 'uuid.UUID':
+        # even though this seems redundant, we need this property
+        # for morepath, so it can match it to the path variable
+        return self.recipient.id
+
+    def confirm(self) -> bool:
+        if self.recipient.token != self.token:
+            return False
+
+        self.recipient.confirmed = True
+        return True
+
+    def unsubscribe(self) -> bool:
+        if self.recipient.token != self.token:
+            return False
+
+        session = object_session(self.recipient)
+        session.delete(self.recipient)
+        session.flush()
+
+        return True

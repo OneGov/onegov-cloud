@@ -50,15 +50,13 @@ def provider_title(
     id='payments',
     form_class=merge_forms(DateRangeForm, ExportForm),
     permission=Private,
-    title=_("Credit card payments"),
-    explanation=_("Exports payments and tickets")
+    title=_('Credit card payments'),
+    explanation=_('Exports payments and tickets')
 )
 class PaymentsExport(OrgExport):
-    """
-    Date Paid:
-    - for manual payments, we don't know exactly, assuming the last_modified
-      date is state is paid
-    """
+    # Date Paid:
+    # - for manual payments, we don't know exactly, assuming the last_modified
+    #   date is state is paid
 
     def query(
         self,

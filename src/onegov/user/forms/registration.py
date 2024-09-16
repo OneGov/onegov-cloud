@@ -13,24 +13,24 @@ class RegistrationForm(Form):
     """ A generic registration form for onegov.user """
 
     username = StringField(
-        label=_("E-Mail Address"),
+        label=_('E-Mail Address'),
         validators=[InputRequired(), Email()]
     )
 
     password = PasswordField(
-        label=_("Password"),
+        label=_('Password'),
         validators=[
             InputRequired(),
             Length(min=MIN_PASSWORD_LENGTH, message=_(
-                "The password must be at least eight characters long"
+                'The password must be at least eight characters long'
             ))
         ]
     )
 
     confirm = PasswordField(
-        label=_("Password Confirmation"),
+        label=_('Password Confirmation'),
         validators=[InputRequired(), EqualTo(
-            'password', message=_("Passwords must match")
+            'password', message=_('Passwords must match')
         )]
     )
 
@@ -41,8 +41,8 @@ class RegistrationForm(Form):
     # This however won't deterr a targeted attack. We'll have to see if we
     # need a more sophisticated approach in the future.
     roboter_falle = StringField(
-        label=_("Please leave this field empty"),
+        label=_('Please leave this field empty'),
         validators=[Length(max=0, message=_(
-            "The field is not empty"
+            'The field is not empty'
         ))]
     )

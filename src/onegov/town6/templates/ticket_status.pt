@@ -15,7 +15,7 @@
         <div class="field-display">
             <div tal:condition="pick_up_hint" class="field-display-label" i18n:translate>Pick-Up</div>
             <div tal:condition="pick_up_hint" class="field-display-data ticket-title">
-                <tal:b content="structure layout.linkify(pick_up_hint)" />
+                <tal:b content="layout.linkify(pick_up_hint)" />
             </div>
             <div class="field-display-label" i18n:translate>Request Reference</div>
             <div class="field-display-data ticket-number">

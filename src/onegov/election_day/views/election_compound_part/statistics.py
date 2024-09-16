@@ -1,11 +1,11 @@
-from onegov.ballot import ElectionCompoundPart
-from onegov.core.security import Public
 from onegov.election_day import ElectionDayApp
 from onegov.election_day.layouts import ElectionCompoundPartLayout
+from onegov.election_day.models import ElectionCompoundPart
 from onegov.election_day.utils import add_last_modified_header
 from onegov.election_day.utils.election_compound import (
     get_candidate_statistics)
 from onegov.election_day.utils.election_compound import get_elected_candidates
+from onegov.election_day.security import MaybePublic
 
 
 from typing import TYPE_CHECKING
@@ -19,7 +19,7 @@ if TYPE_CHECKING:
     model=ElectionCompoundPart,
     name='statistics',
     template='election_compound_part/statistics.pt',
-    permission=Public
+    permission=MaybePublic
 )
 def view_election_compound_part_statistics(
     self: ElectionCompoundPart,
@@ -41,7 +41,7 @@ def view_election_compound_part_statistics(
     model=ElectionCompoundPart,
     name='statistics-table',
     template='embed.pt',
-    permission=Public
+    permission=MaybePublic
 )
 def view_election_compound_part_statistics_table(
     self: ElectionCompoundPart,

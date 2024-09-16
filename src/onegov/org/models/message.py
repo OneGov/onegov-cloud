@@ -9,21 +9,19 @@ from onegov.ticket import Ticket, TicketCollection
 from sqlalchemy.orm import object_session
 
 
-from typing import Any, TypeVar, TYPE_CHECKING
+from typing import Any, TYPE_CHECKING
 if TYPE_CHECKING:
-    from collections.abc import Collection, Iterator
+    from collections.abc import Iterable, Iterator
+    from libres.db.models import Reservation
     from onegov.chat.collections import MessageCollection
     from onegov.directory import Directory
     from onegov.file import File
     from onegov.org.layout import DefaultLayout
     from onegov.org.request import OrgRequest
     from onegov.pay import Payment
-    from onegov.reservation.models import CustomReservation as Reservation
     from sqlalchemy import Column
     from sqlalchemy.orm import Session
-    from typing_extensions import Self
-
-    _MessageT = TypeVar('_MessageT', bound=Message)
+    from typing import Self
 
 # 👉 when adding new ticket messages be sure to evaluate if they should
 # be added to the ticket status page through the org.public_ticket_messages
@@ -111,18 +109,18 @@ class TicketNote(Message, TicketMessageMixin):
             layout.request, paragraphify(linkify(self.text)))
 
     def links(self, layout: 'DefaultLayout') -> 'Iterator[Link]':
-        yield Link(_("Edit"), layout.request.link(self, 'edit'))
+        yield Link(_('Edit'), layout.request.link(self, 'edit'))
         yield Link(
-            _("Delete"), layout.csrf_protected_url(layout.request.link(self)),
+            _('Delete'), layout.csrf_protected_url(layout.request.link(self)),
             traits=(
                 Confirm(
-                    _("Do you really want to delete this note?"),
-                    _("This cannot be undone."),
-                    _("Delete Note"),
-                    _("Cancel")
+                    _('Do you really want to delete this note?'),
+                    _('This cannot be undone.'),
+                    _('Delete Note'),
+                    _('Cancel')
                 ),
                 Intercooler(
-                    request_method="DELETE",
+                    request_method='DELETE',
                     redirect_after=layout.request.link(self.ticket)
                 )
             ))
@@ -200,7 +198,7 @@ class ReservationMessage(Message, TicketMessageMixin):
     @classmethod
     def create(  # type:ignore[override]
         cls,
-        reservations: 'Collection[Reservation]',
+        reservations: 'Iterable[Reservation]',
         ticket: Ticket,
         request: 'OrgRequest',
         change: str

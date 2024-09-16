@@ -71,7 +71,7 @@
                     <tal:b condition="len(group.links) <= 25">
                         <ul>
                             <li tal:repeat="link group.links">
-                                <tal:b replace="structure link(layout)" />
+                                <tal:b replace="link(layout)" />
                             </li>
                         </ul>
                     </tal:b>

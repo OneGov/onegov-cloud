@@ -2,6 +2,7 @@ from onegov.form.models import FormDefinition
 from onegov.org.models.extensions import AccessExtension
 from onegov.org.models.extensions import ContactExtension
 from onegov.org.models.extensions import CoordinatesExtension
+from onegov.org.models.extensions import GeneralFileLinkExtension
 from onegov.org.models.extensions import HoneyPotExtension
 from onegov.org.models.extensions import PersonLinkExtension
 from onegov.search import SearchableContent
@@ -18,7 +19,7 @@ if TYPE_CHECKING:
 class BuiltinFormDefinition(FormDefinition, AccessExtension,
                             ContactExtension, PersonLinkExtension,
                             CoordinatesExtension, SearchableContent,
-                            HoneyPotExtension):
+                            HoneyPotExtension, GeneralFileLinkExtension):
     __mapper_args__ = {'polymorphic_identity': 'builtin'}
 
     es_type_name = 'builtin_forms'
@@ -27,13 +28,13 @@ class BuiltinFormDefinition(FormDefinition, AccessExtension,
     # FIXME: should this have a setter?
     @property
     def extensions(self) -> tuple[str, ...]:  # type:ignore[override]
-        return tuple(set(super().extensions + ['honeypot']))
+        return tuple({*super().extensions, 'honeypot'})
 
 
 class CustomFormDefinition(FormDefinition, AccessExtension,
                            ContactExtension, PersonLinkExtension,
                            CoordinatesExtension, SearchableContent,
-                           HoneyPotExtension):
+                           HoneyPotExtension, GeneralFileLinkExtension):
     __mapper_args__ = {'polymorphic_identity': 'custom'}
 
     es_type_name = 'custom_forms'
@@ -43,7 +44,7 @@ class CustomFormDefinition(FormDefinition, AccessExtension,
     # FIXME: should this have a setter?
     @property
     def extensions(self) -> tuple[str, ...]:  # type:ignore[override]
-        return tuple(set(super().extensions + ['honeypot']))
+        return tuple({*super().extensions, 'honeypot'})
 
 
 def submission_deletable(

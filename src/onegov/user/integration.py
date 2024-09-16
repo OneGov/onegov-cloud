@@ -22,16 +22,13 @@ if TYPE_CHECKING:
         IntegratedAuthenticationProvider, OauthProvider,
         SeparateAuthenticationProvider)
     from sqlalchemy.orm import Session
-    from typing import Union
-    from typing_extensions import TypeAlias
+    from typing import TypeAlias
 
     # NOTE: In order for mypy to be able to type narrow to these more
     #       specific authentication providers we return a type union
     #       instead of the base type
-    _AuthenticationProvider: TypeAlias = Union[
-        SeparateAuthenticationProvider,
-        IntegratedAuthenticationProvider
-    ]
+    _AuthenticationProvider: TypeAlias = (
+        SeparateAuthenticationProvider | IntegratedAuthenticationProvider)
 
 
 class UserApp(WebassetsApp):
@@ -182,7 +179,7 @@ def handle_authentication(
             return HTTPUnauthorized()
 
     # the provider returned something illegal
-    raise RuntimeError(f"Invalid response from {self.name}: {response}")
+    raise RuntimeError(f'Invalid response from {self.name}: {response}')
 
 
 @UserApp.view(
@@ -221,7 +218,7 @@ def handle_provider_authorisation(
                 request.class_link(Auth, {'to': login_to}, name='login')
             )
 
-    raise RuntimeError(f"Invalid response from {self.name}: {response}")
+    raise RuntimeError(f'Invalid response from {self.name}: {response}')
 
 
 @UserApp.view(

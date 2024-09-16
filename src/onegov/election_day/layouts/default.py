@@ -1,21 +1,21 @@
 from babel import Locale
-from datetime import datetime
+from fs.errors import ResourceNotFound
 from functools import cached_property
-from onegov.ballot import VoteCollection
 from onegov.core.i18n import SiteLocale
 from onegov.core.layout import ChameleonLayout
 from onegov.core.static import StaticFile
 from onegov.election_day import _
 from onegov.election_day.collections import ArchivedResultCollection
 from onegov.election_day.collections import SearchableArchivedResultCollection
+from onegov.election_day.collections import VoteCollection
 from onegov.user import Auth
-from fs.errors import ResourceNotFound
+from sedate import utcnow
 
 
 from typing import Any
-from typing import Literal
 from typing import TYPE_CHECKING
 if TYPE_CHECKING:
+    from datetime import datetime
     from onegov.election_day.app import ElectionDayApp
     from onegov.election_day.models import Canton
     from onegov.election_day.models import Municipality
@@ -33,8 +33,8 @@ class DefaultLayout(ChameleonLayout):
     date_long_format = 'long'
     datetime_long_format = 'medium'
 
-    docs_base_url = 'https://github.com/OneGov/onegov-cloud/blob/master/src' \
-                    '/onegov/election_day/static/docs/api'
+    docs_base_url = ('https://github.com/OneGov/onegov-cloud/blob/master/src'
+                     '/onegov/election_day/static/docs/api')
 
     app: 'ElectionDayApp'
     request: 'ElectionDayRequest'
@@ -45,7 +45,6 @@ class DefaultLayout(ChameleonLayout):
         self.request.include('common')
         self.request.include('chosen')
         self.request.include('custom')
-        self.request.include('websockets')
 
         if 'headerless' in request.params:
             request.browser_session['headerless'] = True
@@ -85,7 +84,7 @@ class DefaultLayout(ChameleonLayout):
         return self.request.link(self.principal)
 
     def get_opendata_link(self, lang: str) -> str:
-        return f"{self.docs_base_url}/open_data_{lang}.md"
+        return f'{self.docs_base_url}/open_data_{lang}.md'
 
     @cached_property
     def opendata_link(self) -> str:
@@ -103,12 +102,12 @@ class DefaultLayout(ChameleonLayout):
     @cached_property
     def terms_link(self) -> str:
         lang = (self.request.locale or 'en')[:2]
-        return f"https://opendata.swiss/{lang}/terms-of-use"
+        return f'https://opendata.swiss/{lang}/terms-of-use'
 
     @cached_property
     def format_description_link(self) -> str:
         lang = (self.request.locale or 'en')[:2]
-        return f"{self.docs_base_url}/format__{lang}.md"
+        return f'{self.docs_base_url}/format__{lang}.md'
 
     @cached_property
     def font_awesome_path(self) -> str:
@@ -131,7 +130,7 @@ class DefaultLayout(ChameleonLayout):
 
     @cached_property
     def copyright_year(self) -> int:
-        return datetime.utcnow().year
+        return utcnow().year
 
     @cached_property
     def manage_link(self) -> str:
@@ -184,8 +183,8 @@ class DefaultLayout(ChameleonLayout):
 
     def format_name(self, item: 'HasName') -> str:
         if hasattr(item, 'entity_id'):
-            return item.name if item.entity_id else _("Expats")
-        return item.name or _("Expats")
+            return item.name if item.entity_id else _('Expats')
+        return item.name or _('Expats')
 
     @cached_property
     def logo_alt_text(self) -> str:
@@ -198,19 +197,17 @@ class DefaultLayout(ChameleonLayout):
 
     @cached_property
     def archive_download(self) -> str:
-        return self.request.link(self.principal, name="archive-download")
+        return self.request.link(self.principal, name='archive-download')
 
     @property
-    def last_archive_modification(self) -> datetime | Literal[""] | None:
+    def last_archive_modification(self) -> 'datetime | None':
         try:
             filestorage = self.request.app.filestorage
             assert filestorage is not None
             filestorage_info = filestorage.getinfo(
-                "archive/zip/archive.zip", namespaces="details"
+                'archive/zip/archive.zip', namespaces='details'
             )
             return filestorage_info.modified
         except ResourceNotFound:
-            # FIXME: Why are we returning an empty string here?
-            #        If it's for rendering, then we should do an
-            #        `or ''` above as well
-            return ''
+            pass
+        return None

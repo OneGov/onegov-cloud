@@ -32,11 +32,11 @@ class CoordinatesFormExtension(FormExtension[FormT], name='coordinates'):
     def create(self) -> type[FormT]:
         class CoordinatesForm(self.form_class):  # type:ignore
             coordinates = CoordinatesField(
-                label=_("Coordinates"),
+                label=_('Coordinates'),
                 description=_(
-                    "The marker can be moved by dragging it with the mouse"
+                    'The marker can be moved by dragging it with the mouse'
                 ),
-                fieldset=_("Map"),
+                fieldset=_('Map'),
                 render_kw={'data-map-type': 'marker'}
             )
 
@@ -49,26 +49,26 @@ class SubmitterFormExtension(FormExtension[FormT], name='submitter'):
         class SubmitterForm(self.form_class):  # type:ignore
 
             submitter = EmailField(
-                label=_("E-Mail"),
-                fieldset=_("Submitter"),
+                label=_('E-Mail'),
+                fieldset=_('Submitter'),
                 validators=[DataRequired()]
             )
 
             submitter_name = StringField(
                 label=_('Name'),
-                fieldset=_("Submitter"),
+                fieldset=_('Submitter'),
                 validators=[InputRequired()]
             )
 
             submitter_address = StringField(
                 label=_('Address'),
-                fieldset=_("Submitter"),
+                fieldset=_('Submitter'),
                 validators=[InputRequired()]
             )
 
             submitter_phone = StringField(
                 label=_('Phone'),
-                fieldset=_("Submitter"),
+                fieldset=_('Submitter'),
                 validators=[InputRequired(), ValidPhoneNumber()]
             )
 
@@ -80,7 +80,7 @@ class SubmitterFormExtension(FormExtension[FormT], name='submitter'):
                     super().on_request()
 
                 if not hasattr(self.model, 'directory'):
-                    fields: 'Collection[str]' = []
+                    fields: Collection[str] = []
                 else:
                     fields = self.model.directory.submitter_meta_fields or []
                 for field in ('name', 'address', 'phone'):
@@ -108,8 +108,8 @@ class CommentFormExtension(FormExtension[FormT], name='comment'):
     def create(self) -> type[FormT]:
         class CommentForm(self.form_class):  # type:ignore
             comment = TextAreaField(
-                label=_("Comment"),
-                fieldset=_("Submitter"),
+                label=_('Comment'),
+                fieldset=_('Submitter'),
                 render_kw={'rows': 7}
             )
 
@@ -234,7 +234,7 @@ class ChangeRequestFormExtension(FormExtension[FormT], name='change-request'):
                     if name == 'csrf_token':
                         continue
                     field.errors.append(
-                        _("Please provide at least one change")
+                        _('Please provide at least one change')
                     )
 
                 return False
@@ -273,7 +273,7 @@ class PublicationFormExtension(FormExtension[FormT], name='publication'):
                 if end.data and to_timezone(end.data, 'UTC') <= utcnow():
                     assert isinstance(self.publication_end.errors, list)
                     self.publication_end.errors.append(
-                        _("Publication end must be in the future"))
+                        _('Publication end must be in the future'))
                     return False
                 if not start.data or not end.data:
                     return None
@@ -282,7 +282,7 @@ class PublicationFormExtension(FormExtension[FormT], name='publication'):
                     for field_name in ('publication_start', 'publication_end'):
                         field = getattr(self, field_name)
                         field.errors.append(
-                            _("Publication start must be prior to end"))
+                            _('Publication start must be prior to end'))
                     return False
                 return None
 

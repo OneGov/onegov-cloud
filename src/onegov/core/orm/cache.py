@@ -32,7 +32,7 @@ if TYPE_CHECKING:
     from collections.abc import Callable, Iterator
     from sqlalchemy.orm import Session
     from typing import Protocol
-    from typing_extensions import Self
+    from typing import Self
 
     from . import Base
     from .session_manager import SessionManager
@@ -46,7 +46,7 @@ if TYPE_CHECKING:
     CachePolicy = str | Callable[[Base], bool]
 
     class _OrmCacheDecorator(Protocol):
-        @overload  # type:ignore[overload-overlap]
+        @overload
         def __call__(
             self,
             fn: 'Creator[Query[_T]]'
@@ -63,7 +63,7 @@ _T = TypeVar('_T')
 
 class OrmCacheApp:
     """ Integrates the orm cache handling into the application
-    (i.e. :class:`onegov.core.framework.Framework').
+    (i.e. :class:`onegov.core.framework.Framework`).
 
     In addition, the application needs to call :meth:`setup_orm_cache` inside
     of `:meth:onegov.server.application.Application.set_application_id` to
@@ -315,7 +315,7 @@ def orm_cached(policy: 'CachePolicy') -> '_OrmCacheDecorator':
     """
 
     @overload
-    def orm_cache_decorator(    # type:ignore[overload-overlap]
+    def orm_cache_decorator(
         fn: 'Creator[Query[_T]]'
     ) -> 'OrmCacheDescriptor[tuple[_T, ...]]': ...
 

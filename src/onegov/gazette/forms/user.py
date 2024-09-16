@@ -16,7 +16,7 @@ from wtforms.validators import InputRequired
 class UserForm(Form):
 
     role = RadioField(
-        label=_("Role"),
+        label=_('Role'),
         choices=[],
         default='member',
         validators=[
@@ -25,19 +25,19 @@ class UserForm(Form):
     )
 
     group = ChosenSelectField(
-        label=_("Group"),
+        label=_('Group'),
         choices=[('', '')]
     )
 
     name = StringField(
-        label=_("Name"),
+        label=_('Name'),
         validators=[
             InputRequired()
         ]
     )
 
     username = StringField(
-        label=_("E-Mail"),
+        label=_('E-Mail'),
         validators=[
             InputRequired(),
             Email(),
@@ -46,23 +46,23 @@ class UserForm(Form):
     )
 
     phone_number = PhoneNumberField(
-        label=_("Phone number"),
-        description="+41791112233",
+        label=_('Phone number'),
+        description='+41791112233',
     )
 
     def on_request(self) -> None:
         self.role.choices = []
         model = getattr(self, 'model', None)
         if self.request.is_private(model):
-            self.role.choices = [('member', _("Editor"))]
+            self.role.choices = [('member', _('Editor'))]
         if self.request.is_secret(model):
-            self.role.choices.append(('editor', _("Publisher")))
+            self.role.choices.append(('editor', _('Publisher')))
 
         self.group.choices = self.request.session.query(
             cast(UserGroup.id, String), UserGroup.name
         ).all()
         self.group.choices.insert(
-            0, ('', self.request.translate(_("- none -")))
+            0, ('', self.request.translate(_('- none -')))
         )
 
     def update_model(self, model: User) -> None:

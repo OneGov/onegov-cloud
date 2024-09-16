@@ -5,6 +5,7 @@ from onegov.core.orm.types import UTCDateTime
 from onegov.file import AssociatedFiles
 from onegov.file import File
 from onegov.file.utils import as_fileintent
+from onegov.gazette.observer import observes
 from sedate import as_datetime
 from sedate import standardize_date
 from sqlalchemy import Column
@@ -12,7 +13,6 @@ from sqlalchemy import Date
 from sqlalchemy import extract
 from sqlalchemy import Integer
 from sqlalchemy import Text
-from sqlalchemy_utils import observes
 from sqlalchemy.orm import object_session
 
 
@@ -26,7 +26,7 @@ if TYPE_CHECKING:
     from onegov.gazette.request import GazetteRequest
     from onegov.notice.models import NoticeState
     from sqlalchemy.orm import Query
-    from typing_extensions import Self
+    from typing import Self
 
 
 class IssueName(NamedTuple):
@@ -167,7 +167,7 @@ class Issue(Base, TimestampMixin, AssociatedFiles):
 
         """
 
-        query: 'Query[tuple[str, date_t]]'
+        query: Query[tuple[str, date_t]]
         query = object_session(self).query(Issue.name, Issue.date)
         issue_dates = dict(query.order_by(Issue.date))
         issue_dates[self.name] = date_
@@ -197,7 +197,8 @@ class Issue(Base, TimestampMixin, AssociatedFiles):
             notice.publish(request)
 
         from onegov.gazette.pdf import IssuePdf  # circular
-        self.pdf = IssuePdf.from_issue(
+        # FIXME: asymmetric property
+        self.pdf = IssuePdf.from_issue(  # type:ignore[assignment]
             issue=self,
             request=request,
             first_publication_number=self.first_publication_number,

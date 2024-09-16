@@ -1,6 +1,5 @@
 from onegov.core.elements import Link
 from onegov.core.security import Private
-from onegov.core.utils import normalize_for_url
 from onegov.fsi import _
 from onegov.fsi import FsiApp
 from onegov.fsi.collections.audit import AuditCollection
@@ -12,12 +11,21 @@ from sedate import utcnow
 from webob import Response
 
 
-def set_cached_choices(request, organisations):
+from typing import TYPE_CHECKING
+if TYPE_CHECKING:
+    from onegov.core.types import RenderData
+    from onegov.fsi.request import FsiRequest
+
+
+def set_cached_choices(
+    request: 'FsiRequest',
+    organisations: list[str] | None
+) -> None:
     browser_session = request.browser_session
-    browser_session['last_chosen_organisations'] = organisations or ''
+    browser_session['last_chosen_organisations'] = organisations or None
 
 
-def cached_org_choices(request):
+def cached_org_choices(request: 'FsiRequest') -> list[str] | None:
     return request.browser_session.get('last_chosen_organisations')
 
 
@@ -27,8 +35,12 @@ def cached_org_choices(request):
     permission=Private,
     form=AuditForm
 )
-def invite_attendees_for_event(self, request, form):
-    layout = AuditLayout(self, request)
+def invite_attendees_for_event(
+    self: AuditCollection,
+    request: 'FsiRequest',
+    form: AuditForm
+) -> 'RenderData | Response':
+
     now = utcnow()
 
     if form.submitted(request):
@@ -67,20 +79,21 @@ def invite_attendees_for_event(self, request, form):
     )
 
     next_subscriptions = self.next_subscriptions(request)
-
-    recipients = self.cached_subset if self.course_id else []
-    recipients = [r.id for r in recipients if not (
-        next_subscriptions.get(r.id, False) or r.event_completed)]
+    recipient_ids = [
+        r.id for r in self.cached_subset
+        if not (next_subscriptions.get(r.id) or r.event_completed)
+    ] if self.course_id else []
 
     all_attendees = self.session.query(CourseAttendee).filter(
-        CourseAttendee.id.in_(recipients)
-    ).all()
+        CourseAttendee.id.in_(recipient_ids)
+    ).all() if recipient_ids else []
 
-    email_recipients = ('; '.join([a.email for a in all_attendees])
+    email_recipients = ('; '.join(a.email for a in all_attendees)
                         if len(all_attendees) < 100 else False)
 
     subject = request.translate(_('Reminder due course registration'))
 
+    layout = AuditLayout(self, request)
     return {
         'layout': layout,
         'model': self,
@@ -100,12 +113,14 @@ def invite_attendees_for_event(self, request, form):
     name='pdf',
     permission=Private
 )
-def get_audit_pdf(self, request):
+def get_audit_pdf(self: AuditCollection, request: 'FsiRequest') -> Response:
     if not self.course_id:
+        # FIXME: Really, a 503 for this?
         return Response(status='503 Service Unavailable')
 
+    assert self.course is not None
     title = request.translate(
-        _("Audit for ${course_name}",
+        _('Audit for ${course_name}',
           mapping={'course_name': self.course.name})
 
     )
@@ -115,7 +130,5 @@ def get_audit_pdf(self, request):
     return Response(
         result.read(),
         content_type='application/pdf',
-        content_disposition='inline; filename={}.pdf'.format(
-            normalize_for_url("audit-fsi")
-        )
+        content_disposition='inline; filename=audit-fsi.pdf'
     )

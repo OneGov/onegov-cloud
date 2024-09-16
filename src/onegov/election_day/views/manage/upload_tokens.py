@@ -29,7 +29,7 @@ def view_upload_tokens(
 
     return {
         'layout': ManageUploadTokensLayout(self, request),
-        'title': _("Upload tokens"),
+        'title': _('Upload tokens'),
         'upload_tokens': self.query().all(),
         'new_token': request.link(self, 'create-token'),
     }
@@ -51,15 +51,15 @@ def create_upload_token(
 
     if form.submitted(request):
         self.create()
-        request.message(_("Upload token created."), 'success')
+        request.message(_('Upload token created.'), 'success')
         return morepath.redirect(layout.manage_model_link)
 
     return {
         'layout': layout,
         'form': form,
-        'message': _("Create a new upload token?"),
-        'button_text': _("Create"),
-        'title': _("Create token"),
+        'message': _('Create a new upload token?'),
+        'button_text': _('Create'),
+        'title': _('Create token'),
         'cancel': layout.manage_model_link
     }
 
@@ -80,7 +80,7 @@ def delete_upload_token(
     if form.submitted(request):
         upload_tokens = UploadTokenCollection(request.session)
         upload_tokens.delete(self)
-        request.message(_("Upload token deleted."), 'success')
+        request.message(_('Upload token deleted.'), 'success')
         return morepath.redirect(layout.manage_model_link)
 
     return {
@@ -91,8 +91,8 @@ def delete_upload_token(
         'layout': layout,
         'form': form,
         'title': self.token,
-        'subtitle': _("Delete upload token"),
-        'button_text': _("Delete upload token"),
+        'subtitle': _('Delete upload token'),
+        'button_text': _('Delete upload token'),
         'button_class': 'alert',
         'cancel': layout.manage_model_link
     }

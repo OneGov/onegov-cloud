@@ -20,7 +20,7 @@ def page_fn_footer(canvas: 'Canvas', doc: 'Template') -> None:
     """ A standard footer including the page numbers on the right and
     optionally a copyright with the author on the left.
 
-    Example:
+    Example::
 
         pdf = Pdf(file, author='OneGov')
         pdf.init_a4_portrait(page_fn=page_fn_footer)
@@ -32,12 +32,12 @@ def page_fn_footer(canvas: 'Canvas', doc: 'Template') -> None:
         canvas.drawString(
             doc.leftMargin,
             doc.bottomMargin / 2,
-            '© {} {}'.format(date.today().year, doc.author)
+            f'© {date.today().year} {doc.author}'
         )
     canvas.drawRightString(
         doc.pagesize[0] - doc.rightMargin,
         doc.bottomMargin / 2,
-        f'{canvas._pageNumber}'
+        f'{canvas.getPageNumber()}'
     )
     canvas.restoreState()
 
@@ -46,7 +46,7 @@ def page_fn_header(canvas: 'Canvas', doc: 'Template') -> None:
     """ A standard header consisting of a title and the creation string. The
     title is automatically wrapped and shortened.
 
-    Example:
+    Example::
 
         pdf = Pdf(file, author='OneGov', created='1.1.2000')
         pdf.init_a4_portrait(page_fn=page_fn_header)
@@ -66,11 +66,11 @@ def page_fn_header(canvas: 'Canvas', doc: 'Template') -> None:
         )
         text.textLines(lines)
         canvas.drawText(text)
-    if doc.created:
+    if created := getattr(doc, 'created', None):
         canvas.drawRightString(
             doc.pagesize[0] - doc.rightMargin,
             doc.pagesize[1] - doc.topMargin * 2 / 3,
-            doc.created
+            created
         )
     canvas.restoreState()
 
@@ -81,7 +81,7 @@ def page_fn_header_logo(canvas: 'Canvas', doc: 'Template') -> None:
     The logo is drawn in its original size placed at the bottom on the header,
     which allows to give extra margin at the bottom directly in the SVG.
 
-    Example:
+    Example::
 
         pdf = Pdf(
             file, author='OneGov', created='1.1.2000',
@@ -95,12 +95,12 @@ def page_fn_header_logo(canvas: 'Canvas', doc: 'Template') -> None:
     # morepath's scan - until we can teach that scanner to ignore certain
     # modules automatically we lazy load these modules here
     from reportlab.graphics import renderPDF
-    from svglib.svglib import SvgRenderer
+    from svglib.svglib import SvgRenderer  # type:ignore[import-untyped]
 
     canvas.saveState()
-    if doc.logo:
+    if logo := getattr(doc, 'logo', None):
         parser = etree.XMLParser(remove_comments=True, recover=True)
-        svg = etree.fromstring(doc.logo.encode('utf-8'), parser=parser)
+        svg = etree.fromstring(logo.encode('utf-8'), parser=parser)
         drawing = SvgRenderer(path=None).render(svg)
         renderPDF.draw(
             drawing,
@@ -114,7 +114,7 @@ def page_fn_header_logo(canvas: 'Canvas', doc: 'Template') -> None:
 def page_fn_header_and_footer(canvas: 'Canvas', doc: 'Template') -> None:
     """ A standard header and footer.
 
-    Example:
+    Example::
 
         pdf = Pdf(file, title='Title', created='1.1.2000', author='OneGov')
         pdf.init_a4_portrait(
@@ -131,7 +131,7 @@ def page_fn_header_and_footer(canvas: 'Canvas', doc: 'Template') -> None:
 def page_fn_header_logo_and_footer(canvas: 'Canvas', doc: 'Template') -> None:
     """ A standard header logo and footer.
 
-    Example:
+    Example::
 
         pdf = Pdf(
             file, title='Title', created='1.1.2000', author='OneGov',

@@ -17,9 +17,10 @@ if TYPE_CHECKING:
     import uuid
     from collections.abc import Mapping
     from decimal import Decimal
+    from markupsafe import Markup
     from onegov.pay import Price
     from onegov.pay.types import PaymentState
-    from typing_extensions import TypeAlias
+    from typing import TypeAlias
 
 # we are shadowing type in the class below, so we need to
 # create a generic TypeAlias that works as a stand-in
@@ -68,7 +69,7 @@ class PaymentProvider(Base, TimestampMixin, ContentMixin, Generic[_P]):
     payments: 'relationship[list[Payment]]' = relationship(
         'Payment',
         order_by='Payment.created',
-        backref='provider',
+        back_populates='provider',
         passive_deletes=True
     )
 
@@ -78,7 +79,7 @@ class PaymentProvider(Base, TimestampMixin, ContentMixin, Generic[_P]):
     else:
         @property
         def payment_class(self) -> _type[Payment]:
-            assert type(self) is PaymentProvider, "Override this in subclasses"
+            assert type(self) is PaymentProvider, 'Override this in subclasses'
             return Payment
 
     def payment(
@@ -167,7 +168,7 @@ class PaymentProvider(Base, TimestampMixin, ContentMixin, Generic[_P]):
         currency: str | None,
         action: str = 'submit',
         **extra: Any
-    ) -> str:
+    ) -> 'Markup':
         """ Renders a checkout button which will store the token for the
         checkout as its own value if clicked.
 

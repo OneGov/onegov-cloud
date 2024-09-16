@@ -788,8 +788,7 @@ ReservationSelection = React.createClass({
             <div className="reservation-selection-inner">
                 <h3>{locale("Dates")}</h3>
                 {
-                    this.props.reservations.length === 0 &&
-                        <p>{locale("Select allocations in the calendar to reserve them")}</p>
+                    <p>{locale("Select one ore more allocations in the calendar to reserve them.")}</p>
                 }
                 {
                     this.props.reservations.length > 0 &&

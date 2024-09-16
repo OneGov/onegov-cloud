@@ -1,6 +1,3 @@
-from onegov.ballot import Candidate
-from onegov.ballot import CandidateResult
-from onegov.ballot import ElectionResult
 from onegov.election_day import _
 from onegov.election_day.formats.imports.common import EXPATS
 from onegov.election_day.formats.imports.common import FileImportError
@@ -10,6 +7,9 @@ from onegov.election_day.formats.imports.common import STATI
 from onegov.election_day.formats.imports.common import validate_color
 from onegov.election_day.formats.imports.common import validate_gender
 from onegov.election_day.formats.imports.common import validate_integer
+from onegov.election_day.models import Candidate
+from onegov.election_day.models import CandidateResult
+from onegov.election_day.models import ElectionResult
 from sqlalchemy.orm import object_session
 from uuid import uuid4
 
@@ -18,11 +18,11 @@ from typing import Any
 from typing import IO
 from typing import TYPE_CHECKING
 if TYPE_CHECKING:
-    from onegov.ballot.models import Election
-    from onegov.ballot.types import Status
     from onegov.core.csv import DefaultRow
     from onegov.election_day.models import Canton
+    from onegov.election_day.models import Election
     from onegov.election_day.models import Municipality
+    from onegov.election_day.types import Status
 
     # TODO: Define TypedDict for the parsed results, so we can verify
     #       our parser ensures correct types
@@ -65,9 +65,9 @@ def parse_election(
         errors.append(e.args[0])
 
     except Exception:
-        errors.append(_("Invalid election values"))
+        errors.append(_('Invalid election values'))
     if status not in STATI:
-        errors.append(_("Invalid status"))
+        errors.append(_('Invalid status'))
     return majority, status  # type:ignore[return-value]
 
 
@@ -96,7 +96,7 @@ def parse_election_result(
         errors.append(e.args[0])
 
     except Exception:
-        errors.append(_("Invalid entity values"))
+        errors.append(_('Invalid entity values'))
 
     else:
         if entity_id not in entities and entity_id in EXPATS:
@@ -104,7 +104,7 @@ def parse_election_result(
 
         if entity_id and entity_id not in entities:
             errors.append(_(
-                "${name} is unknown",
+                '${name} is unknown',
                 mapping={'name': entity_id}
             ))
 
@@ -154,7 +154,7 @@ def parse_candidate(
     except ValueError as e:
         errors.append(e.args[0])
     except Exception:
-        errors.append(_("Invalid candidate values"))
+        errors.append(_('Invalid candidate values'))
     else:
         if party and color:
             colors[party] = color
@@ -205,7 +205,7 @@ def import_election_internal_majorz(
         A list containing errors.
 
     """
-    filename = _("Results")
+    filename = _('Results')
     csv, error = load_csv(
         file, mimetype, expected_headers=INTERNAL_MAJORZ_HEADERS,
         filename=filename,
@@ -264,7 +264,7 @@ def import_election_internal_majorz(
         candidate_results.append(candidate_result)
 
     if not errors and not results:
-        errors.append(FileImportError(_("No data found")))
+        errors.append(FileImportError(_('No data found')))
 
     if errors:
         return errors
@@ -298,7 +298,7 @@ def import_election_internal_majorz(
         }
 
     # Add the results to the DB
-    election.clear_results()
+    election.clear_results(True)
     election.last_result_change = election.timestamp()
     election.absolute_majority = absolute_majority
     election.status = status
@@ -308,5 +308,7 @@ def import_election_internal_majorz(
     session.bulk_insert_mappings(Candidate, candidates.values())
     session.bulk_insert_mappings(ElectionResult, results.values())
     session.bulk_insert_mappings(CandidateResult, candidate_results)
+    session.flush()
+    session.expire_all()
 
     return []

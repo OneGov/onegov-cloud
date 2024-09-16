@@ -1,4 +1,4 @@
-import msal
+import msal  # type:ignore[import-untyped]
 from attr import attrs, attrib
 from functools import cached_property
 
@@ -8,7 +8,7 @@ from onegov.user import log
 from typing import Any, TYPE_CHECKING
 if TYPE_CHECKING:
     from onegov.user.auth.provider import HasApplicationIdAndNamespace
-    from typing_extensions import Self
+    from typing import Self
 
 
 @attrs(auto_attribs=True)
@@ -48,7 +48,7 @@ class AzureADAttributes:
 
 
 @attrs()
-class MSALClient():
+class MSALClient:
 
     AUTHORITY_BASE = 'https://login.microsoftonline.com'
     SIGN_OUT_ENDPOINT = '/oauth2/v2.0/logout'
@@ -99,7 +99,7 @@ class MSALClient():
 
 
 @attrs
-class MSALConnections():
+class MSALConnections:
 
     # instantiated connections for every tenant
     connections: dict[str, MSALClient] = attrib()

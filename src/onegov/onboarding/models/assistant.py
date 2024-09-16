@@ -8,7 +8,7 @@ if TYPE_CHECKING:
     from onegov.core.request import CoreRequest
     from onegov.form import Form
     from onegov.onboarding.app import OnboardingApp
-    from typing_extensions import Self, TypeAlias
+    from typing import Self, TypeAlias
 
     _T = TypeVar('_T')
     _F = TypeVar('_F', bound='Callable[..., Any]')
@@ -31,10 +31,10 @@ class Assistant:
         self.steps = sorted(Step(fn, fn.order, fn.form) for fn in methods)
 
         if current_step_number < 1:
-            raise KeyError("Invalid current step")
+            raise KeyError('Invalid current step')
 
         if current_step_number > len(self.steps):
-            raise KeyError("Invalid current step")
+            raise KeyError('Invalid current step')
 
         self.current_step_number = current_step_number
 

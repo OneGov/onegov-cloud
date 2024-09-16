@@ -8,7 +8,6 @@ from sqlalchemy import Column
 from sqlalchemy import ForeignKey
 from sqlalchemy import Integer
 from sqlalchemy import Text
-from sqlalchemy.orm import backref
 from sqlalchemy.orm import object_session
 from sqlalchemy.orm import relationship
 from uuid import uuid4
@@ -19,7 +18,7 @@ if TYPE_CHECKING:
     import uuid
     from collections.abc import Collection
     from sqlalchemy.orm import Query
-    from typing_extensions import Self
+    from typing import Self
     from .agency import Agency
     from .person import Person
 
@@ -67,12 +66,7 @@ class AgencyMembership(Base, ContentMixin, TimestampMixin, ORMSearchable,
     #: the related agency (which may have any number of memberships)
     agency: 'relationship[Agency]' = relationship(
         'Agency',
-        backref=backref(
-            'memberships',
-            cascade='all, delete-orphan',
-            lazy='dynamic',
-            order_by='AgencyMembership.order_within_agency'
-        )
+        back_populates='memberships'
     )
 
     #: the id of the person
@@ -85,11 +79,7 @@ class AgencyMembership(Base, ContentMixin, TimestampMixin, ORMSearchable,
     #: the related person (which may have any number of memberships)
     person: 'relationship[Person]' = relationship(
         'Person',
-        backref=backref(
-            'memberships',
-            cascade='all, delete-orphan',
-            lazy='dynamic',
-        )
+        back_populates='memberships',
     )
 
     #: the position of the membership within the agency
@@ -110,9 +100,10 @@ class AgencyMembership(Base, ContentMixin, TimestampMixin, ORMSearchable,
         the item itself ordered by `order_within_agency`.
         """
         # FIXME: This has the same problem as AdjacencyList.siblings
-        query = object_session(self).query(self.__class__)
-        query = query.order_by(self.__class__.order_within_agency)
-        query = query.filter(self.__class__.agency == self.agency)
+        cls = self.__class__
+        query = object_session(self).query(cls)
+        query = query.order_by(cls.order_within_agency)
+        query = query.filter(cls.agency == self.agency)
         return query
 
     @property
@@ -121,9 +112,10 @@ class AgencyMembership(Base, ContentMixin, TimestampMixin, ORMSearchable,
         the item itself ordered by `order_within_person`.
         """
         # FIXME: This has the same problem as AdjacencyList.siblings
-        query = object_session(self).query(self.__class__)
-        query = query.order_by(self.__class__.order_within_person)
-        query = query.filter(self.__class__.person == self.person)
+        cls = self.__class__
+        query = object_session(self).query(cls)
+        query = query.order_by(cls.order_within_person)
+        query = query.filter(cls.person == self.person)
         return query
 
     def vcard(self, exclude: 'Collection[str] | None ' = None) -> str:

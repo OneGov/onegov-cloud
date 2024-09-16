@@ -82,15 +82,18 @@ def test_audit_for_course(client, scenario):
     assert 'class="next-subscription"' in page
 
     # Test pagination
-    assert page.pyquery('ul.pagination > li.current > a')[0].text == "1"
+    assert page.pyquery('ul.pagination > li.current > a > span:nth-child(2)'
+                        )[0].text == "1"
     page = page.click('2', index=-2)
-    assert page.pyquery('ul.pagination > li.current > a')[0].text == "2"
+    assert page.pyquery('ul.pagination > li.current > a > span:nth-child(2)'
+                        )[0].text == "2"
     assert page.form['organisations'].value is None
 
     # Test reset of pagination upon choosing letter
     page = page.click('M', index=-1)
     # Test reset of page when filtering with last name
-    assert page.pyquery('ul.pagination > li.current > a')[0].text == "1"
+    assert page.pyquery('ul.pagination > li.current > a > span:nth-child(2)'
+                        )[0].text == "1"
 
     # Test pdf
     page.click('PDF')

@@ -7,8 +7,8 @@ from wtforms.widgets.core import html_params
 from typing import Any, TYPE_CHECKING
 if TYPE_CHECKING:
     from collections.abc import Sequence
-    from onegov.form.types import PricingRules, Validators, _FormT
-    from typing_extensions import Self
+    from onegov.form.types import PricingRules, Validators, FormT
+    from typing import Self
     from wtforms.fields.core import _Filter, _Widget
     from wtforms.form import BaseForm
     from wtforms.meta import _SupportsGettextAndNgettext, DefaultMeta
@@ -41,7 +41,7 @@ class HintField(Field):
     def __init__(
         self,
         label: str | None = None,
-        validators: 'Validators[_FormT, Self] | None' = None,
+        validators: 'Validators[FormT, Self] | None' = None,
         filters: 'Sequence[_Filter]' = (),
         description: str = '',
         id: str | None = None,

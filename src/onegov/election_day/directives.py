@@ -22,7 +22,7 @@ if TYPE_CHECKING:
     from onegov.core.directives import _RequestT
     from onegov.core.request import CoreRequest
     from typing import Protocol
-    from typing_extensions import TypeAlias
+    from typing import TypeAlias
     from webob import Response as BaseResponse
     from wtforms import Form
 
@@ -157,16 +157,6 @@ def render_csv(content: dict[str, Any], request: 'CoreRequest') -> Response:
     )
 
 
-def render_xml(content: dict[str, Any], request: 'CoreRequest') -> Response:
-    data = content.get('data', {})
-    name = content.get('name', 'delivery')
-    return Response(
-        data,
-        content_type='application/xml',
-        content_disposition=f'inline; filename={name}.xml'
-    )
-
-
 class SvgFileViewAction(ViewAction):
 
     """ View directive for viewing SVG files from filestorage. The SVGs
@@ -265,30 +255,6 @@ class CsvFileAction(ViewAction):
         )
 
 
-class XmlFileAction(ViewAction):
-
-    """ View directive for viewing XML data as file. """
-
-    def __init__(
-        self,
-        model: type | str,
-        load: 'Callable[[_RequestT], Any] | str | None' = None,
-        permission: object | str = Public,
-        internal: bool = False,
-        **predicates: Any,
-    ) -> None:
-
-        super().__init__(
-            model,
-            render_xml,
-            None,
-            load,
-            permission,
-            internal,
-            **predicates
-        )
-
-
 class ScreenWidgetRegistry(dict[str, dict[str, 'ScreenWidget']]):
 
     def by_categories(
@@ -296,7 +262,7 @@ class ScreenWidgetRegistry(dict[str, dict[str, 'ScreenWidget']]):
         categories: 'Iterable[str]'
     ) -> dict[str, 'ScreenWidget']:
 
-        result: dict[str, 'ScreenWidget'] = {}
+        result: dict[str, ScreenWidget] = {}
         for category in categories:
             result.update(self.get(category, {}))
         return result

@@ -1,3 +1,4 @@
+from markupsafe import Markup
 from onegov.people import AgencyCollection
 from onegov.core.utils import Bunch
 from onegov.org.management import LinkHealthCheck
@@ -57,7 +58,7 @@ def test_link_health_check(org_app):
     agencies.add(
         title='Test',
         parent=None,
-        portrait='<a href="http://www.google.com"></a>'
+        portrait=Markup('<a href="http://www.google.com"></a>')
     )
 
     # check external

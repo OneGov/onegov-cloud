@@ -1,6 +1,11 @@
 import onegov
 import os
+import pyotp
+import transaction
+
 from lxml.html import document_fromstring
+from onegov.user import UserCollection
+from sqlalchemy.orm.session import close_all_sessions
 from tests.shared import Client, utils
 
 
@@ -87,3 +92,35 @@ def test_view_reset_password(swissvotes_app):
     login_page.form['password'] = 'password2'
     login_page = login_page.form.submit().maybe_follow()
     assert "Abmelden" in login_page.maybe_follow()
+
+
+def test_login_totp(swissvotes_app):
+    swissvotes_app.totp_enabled = True
+    client = Client(swissvotes_app)
+
+    totp_secret = pyotp.random_base32()
+    totp = pyotp.TOTP(totp_secret)
+
+    # configure TOTP for admin user
+    users = UserCollection(client.app.session())
+    admin = users.by_username('admin@example.org')
+    admin.second_factor = {'type': 'totp', 'data': totp_secret}
+    transaction.commit()
+    close_all_sessions()
+
+    login_page = client.get('/auth/login')
+    login_page.form['username'] = 'admin@example.org'
+    login_page.form['password'] = 'hunter2'
+
+    totp_page = login_page.form.submit().maybe_follow()
+    assert "Bitte geben Sie den sechsstelligen Code" in totp_page.text
+    totp_page.form['totp'] = 'bogus'
+    totp_page = totp_page.form.submit()
+    assert "Ungültige oder abgelaufenes TOTP eingegeben." in totp_page.text
+
+    totp_page.form['totp'] = totp.now()
+    page = totp_page.form.submit().maybe_follow()
+    assert 'Abmelden' in page
+
+    page = client.get('/').maybe_follow().click('Abmelden').maybe_follow()
+    assert 'Abmelden' not in page

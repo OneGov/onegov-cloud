@@ -62,13 +62,13 @@ def create_group(
 
     if form.submitted(request):
         self.add(name=form.name.data)
-        request.message(_("Group added."), 'success')
+        request.message(_('Group added.'), 'success')
         return redirect(layout.manage_groups_link)
 
     return {
         'layout': layout,
         'form': form,
-        'title': _("New Group"),
+        'title': _('New Group'),
         'cancel': layout.manage_groups_link
     }
 
@@ -95,7 +95,7 @@ def edit_group(
 
     if form.submitted(request):
         form.update_model(self)
-        request.message(_("Group modified."), 'success')
+        request.message(_('Group modified.'), 'success')
         return redirect(layout.manage_groups_link)
 
     if not form.errors:
@@ -105,7 +105,7 @@ def edit_group(
         'layout': layout,
         'form': form,
         'title': self.name,
-        'subtitle': _("Edit Group"),
+        'subtitle': _('Edit Group'),
         'cancel': layout.manage_groups_link
     }
 
@@ -133,7 +133,7 @@ def delete_group(
     # FIXME: This is a backref across module boundaries
     if self.official_notices:  # type: ignore[attr-defined]
         request.message(
-            _("There are official notices linked to this group!"),
+            _('There are official notices linked to this group!'),
             'warning'
         )
 
@@ -145,13 +145,13 @@ def delete_group(
         return {
             'layout': layout,
             'title': self.name,
-            'subtitle': _("Delete Group"),
+            'subtitle': _('Delete Group'),
             'show_form': False
         }
 
     if form.submitted(request):
         UserGroupCollection(request.session).delete(self)
-        request.message(_("Group deleted."), 'success')
+        request.message(_('Group deleted.'), 'success')
         return redirect(layout.manage_groups_link)
 
     return {
@@ -162,8 +162,8 @@ def delete_group(
         'layout': layout,
         'form': form,
         'title': self.name,
-        'subtitle': _("Delete Group"),
-        'button_text': _("Delete Group"),
+        'subtitle': _('Delete Group'),
+        'button_text': _('Delete Group'),
         'button_class': 'alert',
         'cancel': layout.manage_groups_link
     }

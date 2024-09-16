@@ -13,7 +13,7 @@ if TYPE_CHECKING:
     from decimal import Decimal
     from onegov.pay.types import AnyPayableBase, PaymentState
     from sqlalchemy.orm import Query, Session
-    from typing_extensions import Self
+    from typing import Self
     from uuid import UUID
 
 
@@ -36,9 +36,9 @@ class PaymentCollection(GenericCollection[Payment], Pagination[Payment]):
         start: 'datetime | None' = None,
         end: 'datetime | None' = None
     ):
-        super().__init__(session)
+        GenericCollection.__init__(self, session)
+        Pagination.__init__(self, page)
         self.source = source
-        self.page = page
         self.start = start
         self.end = end
 
@@ -126,7 +126,7 @@ class PaymentCollection(GenericCollection[Payment], Pagination[Payment]):
                 ))
             )
 
-            q: 'Query[AnyPayableBase]'
+            q: Query[AnyPayableBase]
             q = self.session.query(link.cls)
             q = q.filter(link.cls.id.in_(targets.subquery()))  # type:ignore
             q = q.options(joinedload(link.class_attribute))

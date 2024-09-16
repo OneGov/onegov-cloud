@@ -9,6 +9,7 @@ from onegov.core.orm import ModelBase
 from onegov.core.orm.mixins import content_property, dict_property
 from onegov.core.orm.mixins import ContentMixin, TimestampMixin
 from onegov.core.orm.types import UUID
+from onegov.file import MultiAssociatedFiles
 from onegov.form import parse_form
 from onegov.pay import Price, process_payment
 from sedate import align_date_to_day, utcnow
@@ -17,10 +18,11 @@ from sqlalchemy.orm import relationship
 from uuid import uuid4
 
 
-# type gets shadowed by type in model, so we use Type as an alias
-from typing import cast, Any, Literal, Type, TYPE_CHECKING
+from typing import cast, Any, Literal, TYPE_CHECKING
 if TYPE_CHECKING:
     import uuid
+    # type gets shadowed by type in model, so we use Type as an alias
+    from builtins import type as type_t
     from collections.abc import Sequence
     from libres.context.core import Context
     from libres.db.scheduler import Scheduler
@@ -29,7 +31,7 @@ if TYPE_CHECKING:
     from onegov.pay import Payment, PaymentError, PaymentProvider
     from onegov.pay.types import PaymentMethod
     from sqlalchemy.orm import Query
-    from typing_extensions import TypeAlias
+    from typing import TypeAlias
 
     DeadlineUnit: TypeAlias = Literal['d', 'h']
 
@@ -52,7 +54,8 @@ def extra_scheduler_arguments() -> dict[str, Any]:
     }
 
 
-class Resource(ORMBase, ModelBase, ContentMixin, TimestampMixin):
+class Resource(ORMBase, ModelBase, ContentMixin,
+               TimestampMixin, MultiAssociatedFiles):
     """ A resource holds a single calendar with allocations and reservations.
 
     Note that this resource is not defined on the onegov.core declarative base.
@@ -153,13 +156,13 @@ class Resource(ORMBase, ModelBase, ContentMixin, TimestampMixin):
     pick_up: dict_property[str | None] = content_property()
 
     __mapper_args__ = {
-        "polymorphic_on": 'type',
+        'polymorphic_on': 'type',
         'polymorphic_identity': 'generic'
     }
 
     allocations: 'relationship[list[Allocation]]' = relationship(
         Allocation,
-        cascade="all, delete-orphan",
+        cascade='all, delete-orphan',
         primaryjoin='Resource.id == Allocation.resource',
         foreign_keys='Allocation.resource'
     )
@@ -180,13 +183,13 @@ class Resource(ORMBase, ModelBase, ContentMixin, TimestampMixin):
 
         if value:
             if len(value) != 2:
-                raise ValueError("Deadline is not a tuple with two elements")
+                raise ValueError('Deadline is not a tuple with two elements')
 
             if not isinstance(value[0], int):
-                raise ValueError("Deadline value is not an int")
+                raise ValueError('Deadline value is not an int')
 
             if value[0] < 1:
-                raise ValueError("Deadline value is smaller than 1")
+                raise ValueError('Deadline value is smaller than 1')
 
             if value[1] not in ('d', 'h'):
                 raise ValueError("Deadline unit must be 'd' or 'h'")
@@ -211,8 +214,8 @@ class Resource(ORMBase, ModelBase, ContentMixin, TimestampMixin):
         self.date = allocations[0].start.date()
 
     def get_scheduler(self, libres_context: 'Context') -> '_OurScheduler':
-        assert self.id, "the id needs to be set"
-        assert self.timezone, "the timezone needs to be set"
+        assert self.id, 'the id needs to be set'
+        assert self.timezone, 'the timezone needs to be set'
 
         # HACK: we work around the name being a str in libres, but a
         #       UUID in onegov
@@ -225,14 +228,14 @@ class Resource(ORMBase, ModelBase, ContentMixin, TimestampMixin):
 
     @property
     def scheduler(self) -> '_OurScheduler':
-        assert hasattr(self, 'libres_context'), "not bound to libres context"
+        assert hasattr(self, 'libres_context'), 'not bound to libres context'
         return self.get_scheduler(self.libres_context)
 
     def bind_to_libres_context(self, libres_context: 'Context') -> None:
         self.libres_context = libres_context
 
     @property
-    def form_class(self) -> 'Type[Form] | None':
+    def form_class(self) -> 'type_t[Form] | None':
         """ Parses the form definition and returns a form class. """
 
         if not self.definition:
@@ -271,7 +274,7 @@ class Resource(ORMBase, ModelBase, ContentMixin, TimestampMixin):
 
     def process_payment(
         self,
-        price: Price,
+        price: Price | None,
         provider: 'PaymentProvider[Any] | None' = None,
         payment_token: str | None = None
     ) -> 'Payment | PaymentError | Literal[True] | None':
@@ -291,10 +294,10 @@ class Resource(ORMBase, ModelBase, ContentMixin, TimestampMixin):
             return False
 
         if not dt.tzinfo:
-            raise RuntimeError(f"The given date has no timezone: {dt}")
+            raise RuntimeError(f'The given date has no timezone: {dt}')
 
         if not self.timezone:
-            raise RuntimeError("No timezone set on the resource")
+            raise RuntimeError('No timezone set on the resource')
 
         n, unit = self.deadline
 
@@ -331,4 +334,4 @@ class Resource(ORMBase, ModelBase, ContentMixin, TimestampMixin):
         self.access_token = secrets.token_hex(16)
 
     def __repr__(self) -> str:
-        return f"{self.title}, {self.group}"
+        return f'{self.title}, {self.group}'

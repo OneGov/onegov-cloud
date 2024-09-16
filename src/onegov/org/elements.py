@@ -5,6 +5,7 @@ macros.
 from random import choice
 
 from lxml.html import builder, tostring
+from markupsafe import Markup
 
 from onegov.core.elements import AccessMixin, LinkGroup
 from onegov.core.elements import Link as BaseLink
@@ -86,12 +87,11 @@ class Link(_Base):
                 return False
         return True
 
-    # FIXME: Are we actually getting bytes? This seems a bit sus
-    def __call__(  # type:ignore[override]
+    def __call__(
         self,
         request: 'ChameleonLayout | CoreRequest',
         extra_classes: 'Iterable[str] | None' = None
-    ) -> bytes:
+    ) -> Markup:
         """ Renders the element. """
 
         # compatibility shim for new elements
@@ -125,7 +125,7 @@ class Link(_Base):
             # This snippet is duplicated in the access-hint macro!
             hint = builder.I()
             hint.attrib['class'] = 'private-hint'
-            hint.attrib['title'] = request.translate(_("This site is private"))
+            hint.attrib['title'] = request.translate(_('This site is private'))
 
             a.append(builder.I(' '))
             a.append(hint)
@@ -135,7 +135,7 @@ class Link(_Base):
             # This snippet is duplicated in the access-hint macro!
             hint = builder.I()
             hint.attrib['class'] = 'secret-hint'
-            hint.attrib['title'] = request.translate(_("This site is secret"))
+            hint.attrib['title'] = request.translate(_('This site is secret'))
 
             a.append(builder.I(' '))
             a.append(hint)
@@ -143,11 +143,11 @@ class Link(_Base):
         for key, value in self.attributes.items():
             a.attrib[key] = request.translate(value)
 
-        return tostring(a)
+        return Markup(tostring(a, encoding=str))  # noqa: MS001
 
 
 class QrCodeLink(BaseLink):
-    """ Implements a the qr code link that shows a modal with the QrCode.
+    """ Implements a qr code link that shows a modal with the QrCode.
         Thu url is sent to the qr endpoint url which generates the image
         and sends it back.
     """
@@ -218,7 +218,7 @@ class DeleteLink(Link):
         if no_button_text:
             attr['data-confirm-no'] = no_button_text
         else:
-            attr['data-confirm-no'] = _("Cancel")
+            attr['data-confirm-no'] = _('Cancel')
 
         if redirect_after:
             attr['redirect-after'] = redirect_after
@@ -276,3 +276,50 @@ __all__ = (
     'LinkGroup',
     'QrCodeLink'
 )
+
+
+class IFrameLink(BaseLink):
+    """ Implements an iframe link that shows a modal with the iframe.
+        The url is sent to the iframe endpoint url which generates the iframe
+        and sends it back.
+    """
+
+    id = 'iframe_link'
+
+    __slots__ = (
+        'active',
+        'attributes',
+        'classes',
+        'text',
+        'url',
+        'title'
+    )
+
+    def __init__(
+        self,
+        text: str,
+        url: str,
+        title: str | None = None,
+        attrs: dict[str, Any] | None = None,
+        traits: 'Iterable[Trait] | Trait' = (),
+        **props: Any
+    ) -> None:
+
+        attrs = attrs or {}
+        attrs['new-iframe-link'] = (
+            '<iframe src="'
+            + url
+            + '" width="100%" height="800" frameborder="0"></iframe>'
+        )
+        attrs['data-reveal-id'] = ''.join(
+            choice('abcdefghi') for i in range(8)  # nosec B311
+        )
+        # Foundation 6 Compatibility
+        attrs['data-open'] = attrs['data-reveal-id']
+        attrs['data-image-parent'] = f"iframe-{attrs['data-reveal-id']}"
+
+        super().__init__(text, '#', attrs, traits, **props)
+        self.title = title
+
+    def __repr__(self) -> str:
+        return f'<IFrameLink {self.text}>'

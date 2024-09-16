@@ -9,7 +9,9 @@ from datetime import datetime, time, timedelta
 from isodate import parse_date, parse_datetime
 from itertools import groupby
 from libres.modules import errors as libres_errors
+from lxml.etree import ParserError
 from lxml.html import fragments_fromstring, tostring
+from markupsafe import escape, Markup
 from onegov.core.cache import lru_cache
 from onegov.core.layout import Layout
 from onegov.core.orm import as_selectable
@@ -23,7 +25,6 @@ from purl import URL
 from sqlalchemy import nullsfirst, select  # type:ignore[attr-defined]
 from onegov.ticket import TicketCollection
 from onegov.user import User
-
 
 from typing import overload, Any, TYPE_CHECKING
 if TYPE_CHECKING:
@@ -39,8 +40,7 @@ if TYPE_CHECKING:
     from pytz.tzinfo import DstTzInfo, StaticTzInfo
     from sqlalchemy.orm import Query, Session
     from sqlalchemy import Column
-    from typing import TypeVar
-    from typing_extensions import Self, TypeAlias
+    from typing import Self, TypeAlias, TypeVar
 
     _T = TypeVar('_T')
     _DeltaT = TypeVar('_DeltaT')
@@ -58,11 +58,8 @@ EMPTY_PARAGRAPHS = re.compile(r'<p>\s*<br>\s*</p>')
 # regex module in in onegov.core
 #
 # additionally it is used in onegov.org's common.js in javascript variant
-#
-# note that this tag should be safe - i.e. it may not accept '<' or the like
-# to avoid js script injection further down the line
 HASHTAG = re.compile(r'#\w{3,}')
-IMG_URLS = re.compile(r'<img src="(.*?)"')
+IMG_URLS = re.compile(r'<img[^>]*?src="(.*?)"')
 
 
 def djb2_hash(text: str, size: int) -> int:
@@ -93,7 +90,7 @@ def get_random_color(seed: str, lightness: float, saturation: float) -> str:
     hue = 100 / (djb2_hash(seed, 360) or 1)
     r, g, b = colorsys.hls_to_rgb(hue, lightness, saturation)
 
-    return '#{0:02x}{1:02x}{2:02x}'.format(
+    return '#{:02x}{:02x}{:02x}'.format(
         int(round(r * 255)),
         int(round(g * 255)),
         int(round(b * 255))
@@ -132,18 +129,21 @@ def add_class_to_node(node: '_Element', classname: str) -> None:
 
 
 @overload
+def annotate_html(
+    html: Markup,
+    request: 'CoreRequest | None' = None
+) -> Markup: ...
+
+
+@overload
 def annotate_html(html: None, request: 'CoreRequest | None' = None) -> None:
     ...
 
 
-@overload
-def annotate_html(html: str, request: 'CoreRequest | None' = None) -> str: ...
-
-
 def annotate_html(
-    html: str | None,
+    html: Markup | None,
     request: 'CoreRequest | None' = None
-) -> str | None:
+) -> Markup | None:
     """ Takes the given html and annotates the following elements for some
     advanced styling:
 
@@ -161,18 +161,16 @@ def annotate_html(
     if not html:
         return html
 
-    fragments = fragments_fromstring(html)
+    try:
+        fragments = fragments_fromstring(html, no_leading_text=True)
+    except ParserError:
+        return html
     images = []
 
     # we perform a root xpath lookup, which will result in all paragraphs
     # being looked at - so we don't need to loop over all elements (yah, it's
     # a bit weird)
     for element in fragments[:1]:
-
-        # instead of failing, lxml will return strings instead of elements if
-        # they can't be parsed.. so we have to inspect the objects
-        if not hasattr(element, 'xpath'):
-            return html
 
         for paragraph in element.xpath('//p[img]'):
             add_class_to_node(paragraph, 'has-img')
@@ -214,20 +212,21 @@ def annotate_html(
     if request:
         set_image_sizes(images, request)
 
-    return ''.join(tostring(e).decode('utf-8') for e in fragments)
+    return Markup(  # noqa: MS001
+        ''.join(tostring(e, encoding=str) for e in fragments))
 
 
 @overload
 def remove_empty_paragraphs(html: None) -> None: ...
 @overload
-def remove_empty_paragraphs(html: str) -> str: ...
+def remove_empty_paragraphs(html: Markup) -> Markup: ...
 
 
-def remove_empty_paragraphs(html: str | None) -> str | None:
+def remove_empty_paragraphs(html: Markup | None) -> Markup | None:
     if not html:
         return html
 
-    return EMPTY_PARAGRAPHS.sub('', html)
+    return Markup(EMPTY_PARAGRAPHS.sub('', html))  # noqa: MS001
 
 
 def set_image_sizes(
@@ -247,7 +246,7 @@ def set_image_sizes(
     images_dict = {get_image_id(img): img for img in images}
 
     if images_dict:
-        q: 'Query[ImageFile]'
+        q: Query[ImageFile]
         q = FileCollection(request.session, type='image').query()
         q = q.with_entities(File.id, File.reference)
         q = q.filter(File.id.in_(images_dict))
@@ -346,8 +345,8 @@ class ReservationInfo:
 
             return self.request.translate(_(
                 (
-                    "You can only reserve this allocation before ${date} "
-                    "if you live in the following zipcodes: ${zipcodes}"
+                    'You can only reserve this allocation before ${date} '
+                    'if you live in the following zipcodes: ${zipcodes}'
                 ), mapping={
                     'date': layout.format_date(date, 'date_long'),
                     'zipcodes': ', '.join(zipcodes),
@@ -366,7 +365,7 @@ class ReservationInfo:
             self.reservation.end,
             self.reservation.timezone
         ):
-            return self.translate(_("Whole day"))
+            return self.translate(_('Whole day'))
         else:
             return render_time_range(
                 self.reservation.display_start(),
@@ -470,7 +469,7 @@ class AllocationEventInfo:
     @property
     def event_time(self) -> str:
         if self.allocation.whole_day:
-            return self.translate(_("Whole day"))
+            return self.translate(_('Whole day'))
         else:
             return render_time_range(
                 self.allocation.display_start(),
@@ -488,7 +487,7 @@ class AllocationEventInfo:
     @property
     def event_title(self) -> str:
         if self.allocation.partly_available:
-            available = self.translate(_("${percent}% Available", mapping={
+            available = self.translate(_('${percent}% Available', mapping={
                 'percent': int(self.availability)
             }))
         else:
@@ -498,12 +497,12 @@ class AllocationEventInfo:
 
             if quota == 1:
                 if quota_left:
-                    available = self.translate(_("Available"))
+                    available = self.translate(_('Available'))
                 else:
-                    available = self.translate(_("Unavailable"))
+                    available = self.translate(_('Unavailable'))
             else:
                 available = self.translate(
-                    _("${num} Available", mapping={
+                    _('${num} Available', mapping={
                         'num': quota_left
                     })
                 )
@@ -549,12 +548,12 @@ class AllocationEventInfo:
     def event_actions(self) -> 'Iterator[Link]':
         if self.request.is_manager:
             yield Link(
-                _("Edit"),
+                _('Edit'),
                 self.request.link(self.allocation, name='edit'),
             )
 
             yield Link(
-                _("Tickets"),
+                _('Tickets'),
                 self.request.link(TicketCollection(
                     session=self.request.session,
                     handler='RSV',
@@ -567,28 +566,28 @@ class AllocationEventInfo:
 
             if self.availability == 100.0:
                 yield DeleteLink(
-                    _("Delete"),
+                    _('Delete'),
                     self.request.link(self.allocation),
-                    confirm=_("Do you really want to delete this allocation?"),
+                    confirm=_('Do you really want to delete this allocation?'),
                     extra_information=self.event_identification,
-                    yes_button_text=_("Delete allocation")
+                    yes_button_text=_('Delete allocation')
                 )
             else:
                 yield Link(
-                    _("Occupancy"),
+                    _('Occupancy'),
                     self.occupancy_link
                 )
 
                 yield DeleteLink(
-                    _("Delete"),
+                    _('Delete'),
                     self.request.link(self.allocation),
                     confirm=_(
                         "This allocation can't be deleted because there are "
                         "existing reservations associated with it."
                     ),
                     extra_information=_(
-                        "To delete this allocation, all existing reservations "
-                        "need to be cancelled first."
+                        'To delete this allocation, all existing reservations '
+                        'need to be cancelled first.'
                     )
                 )
         elif self.availability < 100.0 and self.request.has_role('member'):
@@ -598,7 +597,7 @@ class AllocationEventInfo:
                 False
             ):
                 yield Link(
-                    _("Occupancy"),
+                    _('Occupancy'),
                     self.occupancy_link
                 )
 
@@ -615,7 +614,7 @@ class AllocationEventInfo:
             'className': ' '.join(self.event_classes),
             'partitions': self.allocation.availability_partitions(),
             'actions': [
-                link(self.request).decode('utf-8')
+                link(self.request)
                 for link in self.event_actions
             ],
             'editurl': self.request.link(self.allocation, name='edit'),
@@ -662,7 +661,7 @@ class FindYourSpotEventInfo:
             return render_time_range(*self.slot_time)
 
         if self.allocation.whole_day:
-            return self.translate(_("Whole day"))
+            return self.translate(_('Whole day'))
         else:
             return render_time_range(
                 self.allocation.display_start(),
@@ -690,7 +689,7 @@ class FindYourSpotEventInfo:
     @property
     def available(self) -> str:
         if self.allocation.partly_available:
-            available = self.translate(_("${percent}% Available", mapping={
+            available = self.translate(_('${percent}% Available', mapping={
                 'percent': int(self.availability)
             }))
         else:
@@ -700,12 +699,12 @@ class FindYourSpotEventInfo:
 
             if quota == 1:
                 if quota_left:
-                    available = self.translate(_("Available"))
+                    available = self.translate(_('Available'))
                 else:
-                    available = self.translate(_("Unavailable"))
+                    available = self.translate(_('Unavailable'))
             else:
                 available = self.translate(
-                    _("${num} Available", mapping={
+                    _('${num} Available', mapping={
                         'num': quota_left
                     })
                 )
@@ -743,61 +742,61 @@ class FindYourSpotEventInfo:
 
 libres_error_messages = {
     libres_errors.OverlappingAllocationError:
-    _("A conflicting allocation exists for the requested time period."),
+    _('A conflicting allocation exists for the requested time period.'),
 
     libres_errors.OverlappingReservationError:
-    _("A conflicting reservation exists for the requested time period."),
+    _('A conflicting reservation exists for the requested time period.'),
 
     libres_errors.AffectedReservationError:
-    _("An existing reservation would be affected by the requested change."),
+    _('An existing reservation would be affected by the requested change.'),
 
     libres_errors.AffectedPendingReservationError:
-    _("A pending reservation would be affected by the requested change."),
+    _('A pending reservation would be affected by the requested change.'),
 
     libres_errors.AlreadyReservedError:
-    _("The requested period is no longer available."),
+    _('The requested period is no longer available.'),
 
     libres_errors.NotReservableError:
-    _("No reservable slot found."),
+    _('No reservable slot found.'),
 
     libres_errors.ReservationTooLong:
     _("Reservations can't be made for more than 24 hours at a time."),
 
     libres_errors.ReservationParametersInvalid:
-    _("The given reservation paramters are invalid."),
+    _('The given reservation paramters are invalid.'),
 
     libres_errors.InvalidReservationToken:
-    _("The given reservation token is invalid."),
+    _('The given reservation token is invalid.'),
 
     libres_errors.InvalidReservationError:
-    _("The given reservation paramters are invalid."),
+    _('The given reservation paramters are invalid.'),
 
     libres_errors.QuotaOverLimit:
-    _("The requested number of reservations is higher than allowed."),
+    _('The requested number of reservations is higher than allowed.'),
 
     libres_errors.InvalidQuota:
-    _("The requested quota is invalid (must be at least one)."),
+    _('The requested quota is invalid (must be at least one).'),
 
     libres_errors.QuotaImpossible:
-    _("The allocation does not have enough free spots."),
+    _('The allocation does not have enough free spots.'),
 
     libres_errors.InvalidAllocationError:
-    _("The resulting allocation would be invalid."),
+    _('The resulting allocation would be invalid.'),
 
     libres_errors.NoReservationsToConfirm:
-    _("No reservations to confirm."),
+    _('No reservations to confirm.'),
 
     libres_errors.TimerangeTooLong:
-    _("The given timerange is longer than the existing allocation."),
+    _('The given timerange is longer than the existing allocation.'),
 
     libres_errors.ReservationTooShort:
-    _("Reservation too short. A reservation must last at least 5 minutes.")
+    _('Reservation too short. A reservation must last at least 5 minutes.')
 }
 
 
 def get_libres_error(e: Exception, request: 'OrgRequest') -> str:
     etype = type(e)
-    assert etype in libres_error_messages, f"Unknown libres error {etype}"
+    assert etype in libres_error_messages, f'Unknown libres error {etype}'
 
     return request.translate(libres_error_messages[etype])
 
@@ -893,9 +892,9 @@ def predict_next_daterange(
     )
 
 
-# FIXME: We could increase type safety by providing a _T that's bound
-#        to a protocol which implements subtraction and addition, but
-#        __add__ vs __radd__ and __sub__ vs __rsub__ makes this difficult
+# NOTE: We could increase type safety by providing a _T that's bound
+#       to a protocol which implements subtraction and addition, but
+#       __add__ vs __radd__ and __sub__ vs __rsub__ makes this difficult
 @overload
 def predict_next_value(
     values: 'Sequence[_T]',
@@ -1049,7 +1048,7 @@ def group_by_column(
 
     """
 
-    default_group = default_group or request.translate(_("General"))
+    default_group = default_group or request.translate(_('General'))
 
     query = query.order_by(nullsfirst(group_column))
     records = request.exclude_invisible(query)
@@ -1092,20 +1091,16 @@ def keywords_first(
     return sort_key
 
 
-def hashtag_elements(request: 'OrgRequest', text: str) -> str:
-    """ Takes a text and adds html around the hashtags found inside.
-
-    The safety of this hinges on the HASHTAG regex not allowing any
-    dangerous characters like '<'
-
-    """
+def hashtag_elements(request: 'OrgRequest', text: str) -> Markup:
+    """ Takes a text and adds html around the hashtags found inside. """
 
     def replace_tag(match: re.Match[str]) -> str:
         tag = match.group()
         link = request.link(Search(request, query=tag, page=0))
         return f'<a class="hashtag" href="{link}">{tag}</a>'
 
-    return HASHTAG.sub(replace_tag, text)
+    # NOTE: We need to restore Markup after re.sub call
+    return Markup(HASHTAG.sub(replace_tag, escape(text)))  # noqa: MS001
 
 
 def ticket_directory_groups(
@@ -1162,3 +1157,69 @@ def user_group_emails_for_new_ticket(
         and (dirs := user.group.meta.get('directories')) is not None
         and ticket.group in dirs
     }
+
+
+# from most narrow to widest
+ORDERED_ACCESS = (
+    'private',
+    'member',
+    'secret_mtan',
+    'mtan',
+    'secret',
+    'public'
+)
+
+
+def widest_access(*accesses: str) -> str:
+    index = 0
+    for access in accesses:
+        try:
+            # we only want to look at indexes starting with the one
+            # we're already at, otherwise we're lowering the access
+            index = ORDERED_ACCESS.index(access, index)
+        except ValueError:
+            pass
+    return ORDERED_ACCESS[index]
+
+
+def extract_categories_and_subcategories(
+    categories: dict[str, list[dict[str, list[str]] | str]],
+    flattened: bool = False
+) -> tuple[list[str], list[list[str]]] | list[str]:
+    """
+    Extracts categories and subcategories from the `newsletter categories`
+    dictionary in `newsletter settings`.
+
+    Example for categories dict:
+    {
+        'org_name': [
+            {'main_category_1'},
+            {'main_category_2': ['sub_category_21', 'sub_category_22']}
+        ]
+    }
+    returning a tuple of lists:
+        ['main_category_1', 'main_category_2'],
+        [[], ['sub_category_21', 'sub_category_22']]
+    if `flattened` is True, it returns a flat list of the above tuple:
+        ['main_category_1', 'main_category_2', 'sub_category_21',
+        'sub_category_22']
+
+    """
+    cats: list[str] = []
+    subcats: list[list[str]] = []
+
+    for org_name, items in categories.items():
+        for item in items:
+            if isinstance(item, dict):
+                for topic, subs in item.items():
+                    cats.append(topic)
+                    subcats.append(subs)
+            else:
+                cats.append(item)
+                subcats.append([])
+
+    if flattened:
+        cats.extend([item for sublist in subcats for item in sublist])
+        return cats
+
+    return cats, subcats

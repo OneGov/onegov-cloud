@@ -1,7 +1,7 @@
-from onegov.ballot import ElectionCompound
-from onegov.core.security import Public
 from onegov.election_day import ElectionDayApp
 from onegov.election_day.layouts import ElectionCompoundLayout
+from onegov.election_day.models import ElectionCompound
+from onegov.election_day.security import MaybePublic
 from onegov.election_day.utils import add_last_modified_header
 from onegov.election_day.utils.parties import get_party_results
 from onegov.election_day.utils.parties import get_party_results_seat_allocation
@@ -19,7 +19,7 @@ if TYPE_CHECKING:
 @ElectionDayApp.json(
     model=ElectionCompound,
     name='seat-allocation-data',
-    permission=Public
+    permission=MaybePublic
 )
 def view_election_compound_seat_allocation_data(
     self: ElectionCompound,
@@ -37,7 +37,7 @@ def view_election_compound_seat_allocation_data(
     model=ElectionCompound,
     name='seat-allocation-chart',
     template='embed.pt',
-    permission=Public
+    permission=MaybePublic
 )
 def view_election_compound_seat_allocation_chart(
     self: ElectionCompound,
@@ -60,7 +60,7 @@ def view_election_compound_seat_allocation_chart(
     model=ElectionCompound,
     name='seat-allocation',
     template='election_compound/seat_allocation.pt',
-    permission=Public
+    permission=MaybePublic
 )
 def view_election_compound_seat_allocation(
     self: ElectionCompound,
@@ -81,7 +81,11 @@ def view_election_compound_seat_allocation(
     }
 
 
-@ElectionDayApp.svg_file(model=ElectionCompound, name='seat-allocation-svg')
+@ElectionDayApp.svg_file(
+    model=ElectionCompound,
+    name='seat-allocation-svg',
+    permission=MaybePublic
+)
 def view_election_compound_seat_allocation_svg(
     self: ElectionCompound,
     request: 'ElectionDayRequest'
@@ -99,7 +103,7 @@ def view_election_compound_seat_allocation_svg(
     model=ElectionCompound,
     name='seat-allocation-table',
     template='embed.pt',
-    permission=Public
+    permission=MaybePublic
 )
 def view_election_compound_seat_allocation_table(
     self: ElectionCompound,

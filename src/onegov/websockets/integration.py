@@ -36,7 +36,7 @@ class WebsocketsApp(WebassetsApp):
         # we forward declare the attributes from Framework we need
         configuration: dict[str, Any]
         schema: str
-        def sign(self, text: str) -> str: ...
+        def sign(self, text: str, salt: str = ...) -> str: ...
 
     _websockets_client_url: str
     websockets_manage_url: str
@@ -56,14 +56,14 @@ class WebsocketsApp(WebassetsApp):
         manage_token = config.get('manage_token')
         assert (
             client_url and manage_url and manage_token
-        ), "Missing websockets configuration"
+        ), 'Missing websockets configuration'
         self._websockets_client_url = client_url
         self.websockets_manage_url = manage_url
         self.websockets_manage_token = manage_token
         not_default = (
             self.websockets_manage_token != 'super-secret-token'  # nosec: B105
         )
-        assert not_default, "Do not use the default websockets token"
+        assert not_default, 'Do not use the default websockets token'
 
     def websockets_client_url(self, request: 'CoreRequest') -> str:
         """ Returns the public websocket endpoint that can be used with JS.
@@ -92,10 +92,13 @@ class WebsocketsApp(WebassetsApp):
         """ An unguessable channel ID used for broadcasting notifications
         through websockets to logged-in users.
 
-        This is not meant to be save, do not broadcast sensible information!
+        This is not meant to be safe, do not broadcast sensitive information!
         """
 
-        return self.sign(self.schema).replace(self.schema, '')
+        # FIXME: Consider using a random salt that's stored in Redis
+        #        We will however need to be careful about what happens
+        #        when the salt rotates, so connections can stay active
+        return self.sign(self.schema, 'ws-channel').replace(self.schema, '')
 
     def send_websocket(
         self,

@@ -482,7 +482,9 @@ def test_paginated_agencies(session):
     assert collection.next.previous == collection
     assert len(collection.page_by_index(6).batch) == 1
 
-    collection = PaginatedAgencyCollection(session, joinedload=['organigram'])
+    collection = PaginatedAgencyCollection(
+        session, joinedload=['organigram'], undefer=['content']
+    )
     assert collection.subset_count == 61
 
     def count(**kwargs):

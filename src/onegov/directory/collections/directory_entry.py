@@ -8,29 +8,32 @@ from sqlalchemy.orm import object_session
 from sqlalchemy.dialects.postgresql import array
 
 
-from typing import TypeVar, TYPE_CHECKING
+from typing import Any, Protocol, TypeVar, TYPE_CHECKING
 if TYPE_CHECKING:
     from _typeshed import SupportsRichComparison
     from collections.abc import Callable, Iterable, Mapping
+    from markupsafe import Markup
     from onegov.directory.models import Directory
     from sqlalchemy.orm import Query
-    from typing import Protocol
-    from typing_extensions import Self
-
-    class DirectorySearchWidget(Protocol['DirectoryEntryT']):
-        @property
-        def name(self) -> str: ...
-        @property
-        def search_query(self) -> Query['DirectoryEntryT']: ...
-
-        def adapt(
-            self,
-            query: Query['DirectoryEntryT']
-        ) -> Query['DirectoryEntryT']: ...
+    from typing import Self
 
 
 T = TypeVar('T')
 DirectoryEntryT = TypeVar('DirectoryEntryT', bound=DirectoryEntry)
+
+
+class DirectorySearchWidget(Protocol[DirectoryEntryT]):
+    @property
+    def name(self) -> str: ...
+    @property
+    def search_query(self) -> 'Query[DirectoryEntryT]': ...
+
+    def adapt(
+        self,
+        query: 'Query[DirectoryEntryT]'
+    ) -> 'Query[DirectoryEntryT]': ...
+
+    def html(self, layout: Any) -> 'Markup': ...
 
 
 class DirectoryEntryCollection(
@@ -110,7 +113,7 @@ class DirectoryEntryCollection(
             return value.split(':')[0]
 
         values = [
-            ':'.join((keyword, value))
+            f'{keyword}:{value}'
             for keyword in keywords
             for value in keywords[keyword]
         ]

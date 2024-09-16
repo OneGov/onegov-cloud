@@ -1,6 +1,6 @@
 import pytest
 
-from datetime import datetime, timedelta
+from datetime import timedelta
 from io import BytesIO
 from onegov.file import File
 from onegov.form import CompleteFormSubmission
@@ -101,6 +101,34 @@ def test_submission_extra_data(session):
     assert submission.email == 'bill.lumbergh@initech.com'
 
 
+def test_submission_update(session):
+    collection = FormCollection(session)
+
+    form = collection.definitions.add('Whatever', definition=dedent("""
+        First Name * = ___
+        Last Name * = ___
+        E-Mail = @@@
+        Date = YYYY.MM.DD
+    """))
+
+    data = MultiDict([
+        ('first_name', 'Bill'),
+        ('last_name', 'Gate.'),
+        ('e_mail', 'bill.gates@microsoft.com'),
+        ('date', '1955-10-28')
+    ])
+
+    submitted_form = form.form_class(data)
+    submission = collection.submissions.add(
+        'whatever', submitted_form, state='complete')
+    assert submission.title == 'Bill, Gate.'
+
+    edited_form = submitted_form
+    edited_form.last_name.data = 'Gates'
+    collection.submissions.update(submission, edited_form)
+    assert submission.title == 'Bill, Gates'
+
+
 def test_definitions_with_submissions_count(session):
     collection = FormCollection(session)
 
@@ -186,12 +214,12 @@ def test_remove_old_pending_submissions(session):
     assert collection.submissions.query().count() == 2
 
     collection.submissions.remove_old_pending_submissions(
-        datetime.utcnow() - timedelta(hours=1))
+        utcnow() - timedelta(hours=1))
 
     assert collection.submissions.query().count() == 2
 
     collection.submissions.remove_old_pending_submissions(
-        datetime.utcnow() + timedelta(hours=1))
+        utcnow() + timedelta(hours=1))
 
     assert collection.submissions.query().count() == 1
 
@@ -407,7 +435,7 @@ def test_file_submissions_cascade(session):
     session.flush()
 
     collection.submissions.remove_old_pending_submissions(older_than=(
-        datetime.utcnow() + timedelta(seconds=60)))
+        utcnow() + timedelta(seconds=60)))
 
     session.flush()
 
@@ -446,7 +474,7 @@ def test_add_externally_defined_submission(session):
     assert stored_form.e_mail.data == form.e_mail.data
 
     # externally defined submission are not automatically removed
-    date = datetime.utcnow() + timedelta(seconds=60)
+    date = utcnow() + timedelta(seconds=60)
 
     collection.submissions.remove_old_pending_submissions(older_than=date)
     assert collection.submissions.query().count() == 1

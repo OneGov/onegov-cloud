@@ -8,11 +8,11 @@ from sqlalchemy.orm import joinedload, undefer
 from uuid import UUID
 
 
-from typing import Any, Literal, NamedTuple, TYPE_CHECKING
+from typing import Any, Literal, NamedTuple, Self, TYPE_CHECKING
 if TYPE_CHECKING:
     from onegov.ticket.model import TicketState
     from sqlalchemy.orm import Query, Session
-    from typing_extensions import Self, TypeAlias, TypedDict
+    from typing import TypeAlias, TypedDict
 
     ExtendedTicketState: TypeAlias = TicketState | Literal['all', 'unfinished']
 
@@ -39,8 +39,8 @@ class TicketCollectionPagination(Pagination[Ticket]):
         owner: str = '*',
         extra_parameters: dict[str, Any] | None = None
     ):
+        super().__init__(page)
         self.session = session
-        self.page = page
         self.state = state
         self.handler = handler
         self.handlers = global_handlers
@@ -72,7 +72,7 @@ class TicketCollectionPagination(Pagination[Ticket]):
             )
         elif self.state == 'all':
             query = query.filter(Ticket.state != 'archived')
-        elif self.state != 'all':
+        else:
             query = query.filter(Ticket.state == self.state)
 
         if self.group is not None:
@@ -96,7 +96,7 @@ class TicketCollectionPagination(Pagination[Ticket]):
     def page_index(self) -> int:
         return self.page
 
-    def page_by_index(self, index: int) -> 'Self':
+    def page_by_index(self, index: int) -> Self:
         return self.__class__(
             self.session, index, self.state, self.handler, self.group,
             self.owner, self.extra_parameters
@@ -111,25 +111,25 @@ class TicketCollectionPagination(Pagination[Ticket]):
 
         return tuple(r[0] for r in query.all())
 
-    def for_state(self, state: 'ExtendedTicketState') -> 'Self':
+    def for_state(self, state: 'ExtendedTicketState') -> Self:
         return self.__class__(
             self.session, 0, state, self.handler, self.group, self.owner,
             self.extra_parameters
         )
 
-    def for_handler(self, handler: str) -> 'Self':
+    def for_handler(self, handler: str) -> Self:
         return self.__class__(
             self.session, 0, self.state, handler, self.group, self.owner,
             self.extra_parameters
         )
 
-    def for_group(self, group: str) -> 'Self':
+    def for_group(self, group: str) -> Self:
         return self.__class__(
             self.session, 0, self.state, self.handler, group, self.owner,
             self.extra_parameters
         )
 
-    def for_owner(self, owner: str | UUID) -> 'Self':
+    def for_owner(self, owner: str | UUID) -> Self:
         if isinstance(owner, UUID):
             owner = owner.hex
 
@@ -245,7 +245,7 @@ class TicketCollection(TicketCollectionPagination):
         return self.query().filter(Ticket.handler_id == handler_id).first()
 
     def get_count(self, excl_archived: bool = True) -> TicketCount:
-        query: 'Query[tuple[str, int]]' = self.query().with_entities(
+        query: Query[tuple[str, int]] = self.query().with_entities(
             Ticket.state, func.count(Ticket.state)
         )
 
@@ -266,6 +266,6 @@ class TicketCollection(TicketCollectionPagination):
 
 # FIXME: Why is this its own subclass? shouldn't this at least override
 #        __init__ to pin state to 'archived'?!
-class ArchivedTicketsCollection(TicketCollectionPagination):
+class ArchivedTicketCollection(TicketCollectionPagination):
     def query(self) -> 'Query[Ticket]':
         return self.session.query(Ticket)

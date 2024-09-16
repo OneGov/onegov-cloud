@@ -16,7 +16,7 @@ if TYPE_CHECKING:
     from sqlalchemy.orm import Query, Session
     from sqlalchemy.sql.elements import ClauseElement
     from typing import Protocol
-    from typing_extensions import Self
+    from typing import Self
     from uuid import UUID
 
     from onegov.core.orm import Base
@@ -41,7 +41,7 @@ _M = TypeVar('_M', bound='Base')
 
 class GenericCollection(Generic[_M]):
 
-    def __init__(self, session: 'Session'):
+    def __init__(self, session: 'Session', **kwargs: Any):
         self.session = session
 
     @property
@@ -222,6 +222,10 @@ class Pagination(Generic[_M]):
 
     batch_size = 10
 
+    def __init__(self, page: int = 0):
+        assert page is not None
+        self.page = page if page >= 0 else 0
+
     def __eq__(self, other: object) -> bool:
         """ Returns True if the current and the other Pagination instance
         are equal. Used to find the current page in a list of pages.
@@ -297,6 +301,12 @@ class Pagination(Generic[_M]):
         if not self.batch_size:
             return 1
         return int(math.ceil(self.subset_count / self.batch_size))
+
+    @property
+    def name_of_view(self) -> str:
+        """The name of the view to link to. If omitted, the
+           the default view is looked up.."""
+        return ''
 
     @property
     def pages(self) -> 'Iterator[Self]':

@@ -1,4 +1,3 @@
-from datetime import datetime
 from icalendar import Calendar as vCalendar
 from icalendar import Event as vEvent
 from onegov.core.orm import Base
@@ -8,8 +7,10 @@ from onegov.event.models.mixins import OccurrenceMixin
 from onegov.gis import Coordinates
 from pytz import UTC
 from sedate import to_timezone
+from sedate import utcnow
 from sqlalchemy import Column
 from sqlalchemy import ForeignKey
+from sqlalchemy.orm import relationship
 from uuid import uuid4
 
 
@@ -17,7 +18,6 @@ from typing import TYPE_CHECKING
 if TYPE_CHECKING:
     import uuid
     from onegov.event.models import Event
-    from sqlalchemy.orm import relationship
 
 
 class Occurrence(Base, OccurrenceMixin, TimestampMixin):
@@ -39,14 +39,15 @@ class Occurrence(Base, OccurrenceMixin, TimestampMixin):
         nullable=False
     )
 
-    if TYPE_CHECKING:
-        # FIXME: replace with explicit backref with back_populates
-        event: relationship[Event]
+    event: 'relationship[Event]' = relationship(
+        'Event',
+        back_populates='occurrences',
+    )
 
-    def as_ical(self, url: str | None = None) -> str:
+    def as_ical(self, url: str | None = None) -> bytes:
         """ Returns the occurrence as iCalendar string. """
 
-        modified = self.modified or self.created or datetime.utcnow()
+        modified = self.modified or self.created or utcnow()
         event = self.event
 
         vevent = vEvent()

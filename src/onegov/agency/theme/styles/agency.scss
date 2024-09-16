@@ -189,3 +189,18 @@ ul.agency-nav {
     text-overflow: clip;
     white-space: normal;
 }
+
+
+/*
+    Agency Form
+*/
+
+// hide the organisation field
+.row.field-organisation {
+    display: none;
+}
+
+// hide the sub organisation field
+.row.field-sub_organisation {
+    display: none;
+}

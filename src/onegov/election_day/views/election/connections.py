@@ -1,9 +1,9 @@
-from onegov.ballot import Election
-from onegov.core.security import Public
 from onegov.election_day import ElectionDayApp
-from onegov.election_day.hidden_by_principal import \
-    hide_connections_chart
+from onegov.election_day.hidden_by_principal import (
+    hide_connections_chart)
 from onegov.election_day.layouts import ElectionLayout
+from onegov.election_day.models import Election
+from onegov.election_day.security import MaybePublic
 from onegov.election_day.utils import add_last_modified_header
 from onegov.election_day.utils.election import get_connection_results_api
 from onegov.election_day.utils.election import get_connections_data
@@ -28,7 +28,7 @@ election_incomplete_text = _(
 @ElectionDayApp.json(
     model=Election,
     name='connections-data',
-    permission=Public
+    permission=MaybePublic
 )
 def view_election_connections_data(
     self: Election,
@@ -39,14 +39,14 @@ def view_election_connections_data(
     Used to for the connection sankey chart.
 
     """
-    return get_connections_data(self, request)
+    return get_connections_data(self)
 
 
 @ElectionDayApp.html(
     model=Election,
     name='connections-chart',
     template='embed.pt',
-    permission=Public
+    permission=MaybePublic
 )
 def view_election_connections_chart(
     self: Election,
@@ -73,7 +73,7 @@ def view_election_connections_chart(
     model=Election,
     name='connections-table',
     template='embed.pt',
-    permission=Public
+    permission=MaybePublic
 )
 def view_election_connections_table(
     self: Election,
@@ -98,7 +98,7 @@ def view_election_connections_table(
     model=Election,
     name='connections',
     template='election/connections.pt',
-    permission=Public
+    permission=MaybePublic
 )
 def view_election_connections(
     self: Election,
@@ -116,7 +116,11 @@ def view_election_connections(
     }
 
 
-@ElectionDayApp.svg_file(model=Election, name='connections-svg')
+@ElectionDayApp.svg_file(
+    model=Election,
+    name='connections-svg',
+    permission=MaybePublic
+)
 def view_election_connections_svg(
     self: Election,
     request: 'ElectionDayRequest'

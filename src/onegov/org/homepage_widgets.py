@@ -2,7 +2,6 @@ from onegov.directory import DirectoryCollection
 from onegov.event import OccurrenceCollection
 from onegov.org import _, OrgApp
 from onegov.org.elements import Link, LinkGroup
-from onegov.org.layout import EventBaseLayout
 from onegov.org.models import ImageSet, ImageFile, News
 from onegov.file.models.fileset import file_to_set_associations
 from sqlalchemy import func
@@ -10,9 +9,10 @@ from sqlalchemy import func
 from onegov.org.models.directory import ExtendedDirectoryEntryCollection
 
 
-from typing import Any, NamedTuple, TYPE_CHECKING
+from typing import NamedTuple, TYPE_CHECKING
 if TYPE_CHECKING:
     from collections.abc import Iterable, Iterator, Sequence
+    from onegov.core.types import RenderData
     from onegov.org.layout import DefaultLayout
     from onegov.org.models import ExtendedDirectory
     from onegov.page import Page
@@ -29,9 +29,10 @@ def get_lead(
         if first_point_ix < 1 or not consider_sentences:
             return text[0:max_chars] + '...'
         elif first_point_ix >= max_chars:
-            # FIXME: Why not strip to the first point anyways?
-            return text
+            # still return the entire first sentence, but nothing more
+            return text[0:first_point_ix + 1]
         else:
+            # return up to the n'th sentence that is still below the limit
             end = text.rindex('.', 0, max_chars) + 1
             return text[0:end]
 
@@ -134,10 +135,10 @@ class DirectoriesWidget:
         </xsl:template>
     """
 
-    def get_variables(self, layout: 'DefaultLayout') -> dict[str, Any]:
-        directories: 'DirectoryCollection[ExtendedDirectory]'
+    def get_variables(self, layout: 'DefaultLayout') -> 'RenderData':
+        directories: DirectoryCollection[ExtendedDirectory]
         directories = DirectoryCollection(
-            layout.app.session(), type="extended")
+            layout.app.session(), type='extended')
 
         links = [
             Link(
@@ -152,7 +153,7 @@ class DirectoriesWidget:
 
         links.append(
             Link(
-                text=_("All directories"),
+                text=_('All directories'),
                 url=layout.request.class_link(DirectoryCollection),
                 classes=('more-link', )
             )
@@ -160,7 +161,7 @@ class DirectoriesWidget:
 
         return {
             'directory_panel': LinkGroup(
-                title=_("Directories"),
+                title=_('Directories'),
                 links=links,
             )
         }
@@ -178,7 +179,7 @@ class NewsWidget:
         </xsl:template>
     """
 
-    def get_variables(self, layout: 'DefaultLayout') -> dict[str, Any]:
+    def get_variables(self, layout: 'DefaultLayout') -> 'RenderData':
 
         if not layout.root_pages:
             return {'news': ()}
@@ -244,30 +245,29 @@ class EventsWidget:
         </xsl:template>
     """
 
-    def get_variables(self, layout: 'DefaultLayout') -> dict[str, Any]:
+    def get_variables(self, layout: 'DefaultLayout') -> 'RenderData':
         occurrences = OccurrenceCollection(layout.app.session()).query()
         occurrences = occurrences.limit(layout.org.event_limit_homepage)
 
-        event_layout = EventBaseLayout(layout.model, layout.request)
         event_links = [
             Link(
                 text=o.title,
                 url=layout.request.link(o),
-                subtitle=event_layout.format_date(o.localized_start, 'event')
+                subtitle=layout.format_date(o.localized_start, 'event')
                 .title()
             ) for o in occurrences
         ]
 
         event_links.append(
             Link(
-                text=_("All events"),
-                url=event_layout.events_url,
+                text=_('All events'),
+                url=layout.events_url,
                 classes=('more-link', )
             )
         )
 
         latest_events = LinkGroup(
-            title=_("Events"),
+            title=_('Events'),
             links=event_links,
         )
 
@@ -293,7 +293,7 @@ class TilesWidget:
         </xsl:template>
     """
 
-    def get_variables(self, layout: 'DefaultLayout') -> dict[str, Any]:
+    def get_variables(self, layout: 'DefaultLayout') -> 'RenderData':
         return {'tiles': tuple(self.get_tiles(layout))}
 
     class Tile(NamedTuple):
@@ -311,7 +311,7 @@ class TilesWidget:
         for ix, page in enumerate(layout.root_pages):
             if page.type == 'topic':
 
-                children: 'Iterable[Page]' = homepage_pages[page.id]
+                children: Iterable[Page] = homepage_pages[page.id]
 
                 if not request.is_manager:
                     children = (
@@ -357,7 +357,7 @@ class SliderWidget:
     def get_images_from_sets(
         self,
         layout: 'DefaultLayout'
-    ) -> 'Iterator[dict[str, Any]]':
+    ) -> 'Iterator[RenderData]':
 
         session = layout.app.session()
 
@@ -388,7 +388,7 @@ class SliderWidget:
                 'src': layout.request.link(image)
             }
 
-    def get_variables(self, layout: 'DefaultLayout') -> dict[str, Any]:
+    def get_variables(self, layout: 'DefaultLayout') -> 'RenderData':
         # if we don't have an album used for images, we use the images
         # shown on the homepage anyway to avoid having to show nothing
         images = tuple(self.get_images_from_sets(layout))

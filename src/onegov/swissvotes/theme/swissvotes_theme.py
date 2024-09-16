@@ -6,12 +6,13 @@ class SwissvotesTheme(BaseTheme):
     name = 'onegov.swissvotes.foundation'
 
     @property
-    def pre_imports(self):
+    def pre_imports(self) -> list[str]:
         return ['swissvotes-foundation-mods']
 
     @property
-    def post_imports(self):
-        return super().post_imports + [
+    def post_imports(self) -> list[str]:
+        return [
+            *super().post_imports,
             'mixin',
             'header',
             'mastodon',
@@ -24,6 +25,6 @@ class SwissvotesTheme(BaseTheme):
         ]
 
     @property
-    def extra_search_paths(self):
+    def extra_search_paths(self) -> list[str]:
         base_paths = super().extra_search_paths
-        return [module_path('onegov.swissvotes.theme', 'styles')] + base_paths
+        return [module_path('onegov.swissvotes.theme', 'styles'), *base_paths]

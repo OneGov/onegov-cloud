@@ -6,7 +6,7 @@ import openpyxl
 import re
 import sys
 import tempfile
-import xlrd
+import xlrd  # type:ignore[import-untyped]
 
 from collections import namedtuple, OrderedDict
 from csv import DictWriter, Sniffer, QUOTE_ALL
@@ -21,7 +21,7 @@ from onegov.core import errors
 from onegov.core.cache import lru_cache
 from ordered_set import OrderedSet
 from unidecode import unidecode
-from xlsxwriter.workbook import Workbook
+from xlsxwriter.workbook import Workbook  # type:ignore[import-untyped]
 from onegov.core.utils import normalize_for_url
 
 
@@ -31,8 +31,8 @@ if TYPE_CHECKING:
     from collections.abc import (
         Callable, Collection, Iterable, Iterator, Sequence)
     from csv import Dialect
-    from typing import Protocol
-    from typing_extensions import TypeAlias
+    from openpyxl.worksheet.worksheet import Worksheet
+    from typing import Protocol, TypeAlias
 
     _T = TypeVar('_T')
     _T_co = TypeVar('_T_co', covariant=True)
@@ -197,11 +197,11 @@ class CSVFile(Generic[_RowT]):
             rownumber can't be used as a header
         """
 
-        self.rowtype = rowtype or namedtuple(  # type:ignore[assignment]
-            "CSVFileRow", ['rownumber'] + [
+        self.rowtype = rowtype or namedtuple(  # type:ignore  # noqa: PYI024
+            'CSVFileRow', ['rownumber', *(
                 self.as_valid_identifier(k)
                 for k in self.headers.keys()
-            ]
+            )]
         )
 
     @staticmethod
@@ -321,17 +321,25 @@ def convert_xlsx_to_csv(
     try:
         excel = openpyxl.load_workbook(xlsx, data_only=True)
     except Exception as exception:
-        raise IOError("Could not read XLSX file") from exception
+        raise OSError('Could not read XLSX file') from exception
 
+    sheet: Worksheet
     if sheet_name:
         try:
             sheet = excel[sheet_name]
         except KeyError as exception:
             raise KeyError(
-                "Could not find the given sheet in this excel file!"
+                'Could not find the given sheet in this excel file!'
             ) from exception
     else:
         sheet = excel.worksheets[0]
+
+    # FIXME: We should probably do this check at runtime eventually since
+    # Workbook[name] might return a Worksheet, ReadOnlyWorksheet or a
+    # a WriteOnlyWorksheet. Workbook.worksheet[index] might additionaly return
+    # a Chartsheet.
+    if TYPE_CHECKING:
+        assert isinstance(sheet, Worksheet)
 
     text_output = StringIO()
     writecsv = csv_writer(text_output, quoting=QUOTE_ALL)
@@ -388,14 +396,14 @@ def convert_xls_to_csv(
     try:
         excel = xlrd.open_workbook(file_contents=xls.read())
     except Exception as exception:
-        raise IOError("Could not read XLS file") from exception
+        raise OSError('Could not read XLS file') from exception
 
     if sheet_name:
         try:
             sheet = excel.sheet_by_name(sheet_name)
         except xlrd.XLRDError as exception:
             raise KeyError(
-                "Could not find the given sheet in this excel file!"
+                'Could not find the given sheet in this excel file!'
             ) from exception
     else:
         sheet = excel.sheet_by_index(0)
@@ -451,7 +459,7 @@ def convert_excel_to_csv(
 
     try:
         return convert_xlsx_to_csv(file, sheet_name)
-    except IOError:
+    except OSError:
         return convert_xls_to_csv(file, sheet_name)
 
 
@@ -517,7 +525,7 @@ def get_keys_from_list_of_dicts(
     the reverse flag is ignored.
 
     """
-    fields_set: 'OrderedSet[str]' = OrderedSet()
+    fields_set: OrderedSet[str] = OrderedSet()
 
     for dictionary in rows:
         fields_set.update(dictionary.keys())
@@ -689,7 +697,7 @@ def normalize_sheet_titles(titles: 'Sequence[str]') -> list[str]:
         INVALID_TITLE_REGEX = re.compile(r'[\\*?:/\[\]]')
         m = INVALID_TITLE_REGEX.search(title)
         if m:
-            msg = f"Invalid character {m.group(0)} found in xlsx sheet title"
+            msg = f'Invalid character {m.group(0)} found in xlsx sheet title'
             raise ValueError(msg)
 
     titles = [normalize_for_url(title) for title in titles]
@@ -719,7 +727,7 @@ def avoid_duplicate_name(titles: 'Sequence[str]', title: str) -> str:
     # Check for an absolute match in which case we need to find an alternative
     match = [n for n in titles if n.lower() == title.lower()]
     if match:
-        titles = u",".join(titles)
+        titles = ','.join(titles)
         sheet_title_regex = re.compile(
             f'(?P<title>{re.escape(title)})(?P<count>\\d*),?', re.I
         )
@@ -730,7 +738,7 @@ def avoid_duplicate_name(titles: 'Sequence[str]', title: str) -> str:
             highest = 0
             if counts:
                 highest = max(counts)
-            title = u"{0}_{1}".format(title, highest + 1)
+            title = f'{title}_{highest + 1}'
     return title
 
 
@@ -748,7 +756,8 @@ def has_duplicates(a_list: 'Sequence[Any]') -> bool:
 def list_duplicates_index(a: 'Sequence[Any]') -> list[int]:
     """
         returns a list of indexes of duplicates in a list.
-        for example:
+        for example::
+
             a = [1, 2, 3, 2, 1, 5, 6, 5, 5, 5]
             list_duplicates_index(a) == [3, 4, 7, 8, 9]
     """

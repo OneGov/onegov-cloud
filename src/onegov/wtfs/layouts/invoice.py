@@ -15,16 +15,16 @@ class InvoiceLayout(DefaultLayout):
 
     @cached_property
     def title(self) -> str:
-        return _("Create invoice")
+        return _('Create invoice')
 
     @cached_property
     def editbar_links(self) -> list['Element']:
-        result: list['Element'] = []
+        result: list[Element] = []
         model = PaymentTypeCollection(self.request.session)
         if self.request.has_permission(model, EditModel):
             result.append(
                 Link(
-                    text=_("Manage payment types"),
+                    text=_('Manage payment types'),
                     url=self.request.link(model),
                     attrs={'class': 'payment-icon'}
                 )
@@ -34,7 +34,7 @@ class InvoiceLayout(DefaultLayout):
     @cached_property
     def breadcrumbs(self) -> list['Element']:
         return [
-            Link(_("Homepage"), self.homepage_url),
+            Link(_('Homepage'), self.homepage_url),
             Link(self.title, self.request.link(self.model))
         ]
 

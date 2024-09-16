@@ -1,11 +1,9 @@
 from morepath import redirect
-from onegov.ballot import Ballot
-from onegov.ballot import Vote
-from onegov.core.security import Public
-from onegov.election_day import _
 from onegov.election_day import ElectionDayApp
-from onegov.election_day.layouts import DefaultLayout
 from onegov.election_day.layouts import VoteLayout
+from onegov.election_day.models import Ballot
+from onegov.election_day.models import Vote
+from onegov.election_day.security import MaybePublic
 from onegov.election_day.utils import add_last_modified_header
 from onegov.election_day.utils.vote import get_ballot_data_by_district
 from webob.exc import HTTPNotFound
@@ -23,7 +21,7 @@ if TYPE_CHECKING:
     model=Vote,
     name='districts',
     template='vote/districts.pt',
-    permission=Public
+    permission=MaybePublic
 )
 def view_vote_districts(
     self: Vote,
@@ -43,7 +41,7 @@ def view_vote_districts(
     model=Vote,
     name='proposal-districts',
     template='vote/districts.pt',
-    permission=Public
+    permission=MaybePublic
 )
 def view_vote_districts_proposal(
     self: Vote,
@@ -63,7 +61,7 @@ def view_vote_districts_proposal(
     model=Vote,
     name='counter-proposal-districts',
     template='vote/districts.pt',
-    permission=Public
+    permission=MaybePublic
 )
 def view_vote_districts_counter_proposal(
     self: Vote,
@@ -83,7 +81,7 @@ def view_vote_districts_counter_proposal(
     model=Vote,
     name='tie-breaker-districts',
     template='vote/districts.pt',
-    permission=Public
+    permission=MaybePublic
 )
 def view_vote_districts_tie_breaker(
     self: Vote,
@@ -102,7 +100,7 @@ def view_vote_districts_tie_breaker(
 @ElectionDayApp.html(
     model=Vote,
     name='proposal-by-districts-map',
-    permission=Public
+    permission=MaybePublic
 )
 def view_vote_districts_map_proposal(
     self: Vote,
@@ -113,11 +111,10 @@ def view_vote_districts_map_proposal(
     ballot = getattr(self, 'proposal', None)
     if ballot:
         return redirect(
-            # FIXME: Shouldn't this use request.GET for query_params?
-            request.link(  # type:ignore[call-overload]
+            request.link(
                 ballot,
                 name='districts-map',
-                query_params=request.params
+                query_params=dict(request.GET)
             )
         )
 
@@ -127,7 +124,7 @@ def view_vote_districts_map_proposal(
 @ElectionDayApp.html(
     model=Vote,
     name='counter-proposal-by-districts-map',
-    permission=Public
+    permission=MaybePublic
 )
 def view_vote_districts_map_counter_proposal(
     self: Vote,
@@ -138,11 +135,10 @@ def view_vote_districts_map_counter_proposal(
     ballot = getattr(self, 'counter_proposal', None)
     if ballot:
         return redirect(
-            # FIXME: Shouldn't this use request.GET for query_params?
-            request.link(  # type:ignore[call-overload]
+            request.link(
                 ballot,
                 name='districts-map',
-                query_params=request.params
+                query_params=dict(request.GET)
             )
         )
 
@@ -152,7 +148,7 @@ def view_vote_districts_map_counter_proposal(
 @ElectionDayApp.html(
     model=Vote,
     name='tie-breaker-by-districts-map',
-    permission=Public
+    permission=MaybePublic
 )
 def view_vote_districts_map_tie_breaker(
     self: Vote,
@@ -163,11 +159,10 @@ def view_vote_districts_map_tie_breaker(
     ballot = getattr(self, 'tie_breaker', None)
     if ballot:
         return redirect(
-            # FIXME: Shouldn't this use request.GET for query_params?
-            request.link(  # type:ignore[call-overload]
+            request.link(
                 ballot,
                 name='districts-map',
-                query_params=request.params
+                query_params=dict(request.GET)
             )
         )
 
@@ -178,7 +173,7 @@ def view_vote_districts_map_tie_breaker(
     model=Ballot,
     name='districts-table',
     template='embed.pt',
-    permission=Public
+    permission=MaybePublic
 )
 def view_ballot_as_table(
     self: Ballot,
@@ -202,7 +197,7 @@ def view_ballot_as_table(
 @ElectionDayApp.html(
     model=Vote,
     name='proposal-by-districts-table',
-    permission=Public
+    permission=MaybePublic
 )
 def view_vote_districts_table_proposal(
     self: Vote,
@@ -213,11 +208,10 @@ def view_vote_districts_table_proposal(
     ballot = getattr(self, 'proposal', None)
     if ballot:
         return redirect(
-            # FIXME: Shouldn't this use request.GET for query_params?
-            request.link(  # type:ignore[call-overload]
+            request.link(
                 ballot,
                 name='districts-table',
-                query_params=request.params,
+                query_params=dict(request.GET)
             )
         )
 
@@ -227,7 +221,7 @@ def view_vote_districts_table_proposal(
 @ElectionDayApp.html(
     model=Vote,
     name='counter-proposal-by-districts-table',
-    permission=Public
+    permission=MaybePublic
 )
 def view_vote_districts_table_counter_proposal(
     self: Vote,
@@ -238,11 +232,10 @@ def view_vote_districts_table_counter_proposal(
     ballot = getattr(self, 'counter_proposal', None)
     if ballot:
         return redirect(
-            # FIXME: Shouldn't this use request.GET for query_params?
-            request.link(  # type:ignore[call-overload]
+            request.link(
                 ballot,
                 name='districts-table',
-                query_params=request.params,
+                query_params=dict(request.GET)
             )
         )
 
@@ -252,7 +245,7 @@ def view_vote_districts_table_counter_proposal(
 @ElectionDayApp.html(
     model=Vote,
     name='tie-breaker-by-districts-table',
-    permission=Public
+    permission=MaybePublic
 )
 def view_vote_districts_table_tie_breaker(
     self: Vote,
@@ -263,11 +256,10 @@ def view_vote_districts_table_tie_breaker(
     ballot = getattr(self, 'tie_breaker', None)
     if ballot:
         return redirect(
-            # FIXME: Shouldn't this use request.GET for query_params?
-            request.link(  # type:ignore[call-overload]
+            request.link(
                 ballot,
                 name='districts-table',
-                query_params=request.params,
+                query_params=dict(request.GET)
             )
         )
 
@@ -277,7 +269,7 @@ def view_vote_districts_table_tie_breaker(
 @ElectionDayApp.json(
     model=Ballot,
     name='by-district',
-    permission=Public
+    permission=MaybePublic
 )
 def view_ballot_by_district(
     self: Ballot,
@@ -292,7 +284,7 @@ def view_ballot_by_district(
     model=Ballot,
     name='districts-map',
     template='embed.pt',
-    permission=Public
+    permission=MaybePublic
 )
 def view_ballot_districts_as_map(
     self: Ballot,
@@ -304,21 +296,27 @@ def view_ballot_districts_as_map(
     def add_last_modified(response: 'Response') -> None:
         add_last_modified_header(response, self.vote.last_modified)
 
+    layout = VoteLayout(self.vote, request, f'{self.type}-districts')
+
     return {
         'model': self,
-        'layout': DefaultLayout(self, request),
+        'layout': layout,
         'type': 'map',
         'scope': 'districts',
         'year': self.vote.date.year,
         'thumbs': 'true',
         'color_scale': 'rb',
-        'label_left_hand': _("Nay"),
-        'label_right_hand': _("Yay"),
+        'label_left_hand': layout.label('Nay'),
+        'label_right_hand': layout.label('Yay'),
         'data_url': request.link(self, name='by-district'),
     }
 
 
-@ElectionDayApp.svg_file(model=Ballot, name='districts-map-svg')
+@ElectionDayApp.svg_file(
+    model=Ballot,
+    name='districts-map-svg',
+    permission=MaybePublic
+)
 def view_ballot_districts_svg(
     self: Ballot,
     request: 'ElectionDayRequest'

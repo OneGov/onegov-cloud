@@ -10,7 +10,7 @@ if TYPE_CHECKING:
     from libres.context.core import Context
     from libres.db.models import Allocation, Reservation
     from sqlalchemy.orm import Query
-    from typing_extensions import TypeAlias
+    from typing import TypeAlias
 
 
 _R = TypeVar('_R', bound=Resource)
@@ -94,7 +94,7 @@ class ResourceCollection:
         query = self.query().filter(Resource.id == id)
 
         if ensure_type is not any_type:
-            query = query.filter(Resource.type == type)
+            query = query.filter(Resource.type == ensure_type)
 
         return self.bind(query.first())
 
@@ -107,7 +107,7 @@ class ResourceCollection:
         query = self.query().filter(Resource.name == name)
 
         if ensure_type is not any_type:
-            query = query.filter(Resource.type == type)
+            query = query.filter(Resource.type == ensure_type)
 
         return self.bind(query.first())
 
@@ -137,6 +137,11 @@ class ResourceCollection:
                     # e.g. create a ticket snapshot
                     handle_reservation(res)
             scheduler.extinguish_managed_records()
+
+        if resource.files:
+            # unlink any linked files
+            resource.files = []
+            self.session.flush()
 
         self.session.delete(resource)
         self.session.flush()

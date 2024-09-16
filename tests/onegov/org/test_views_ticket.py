@@ -15,8 +15,14 @@ from onegov.form import FormCollection
 from onegov.reservation import ResourceCollection
 
 
+def get_data_feed_messages(page):
+    return json.loads(
+        page.pyquery('div.timeline').attr('data-feed-data'))['messages']
+
+
 def test_tickets(client):
 
+    # feed = ticket_page.pyquery('div.timeline').attr('data-feed-data')
     assert client.get(
         '/tickets/ALL/open', expect_errors=True).status_code == 403
 
@@ -85,6 +91,11 @@ def test_tickets(client):
     assert 'info@seantis.ch' in ticket_page
     assert 'In Bearbeitung' in ticket_page
     assert 'FRM-' in ticket_page
+    # ticket timeline
+    timeline_messages = get_data_feed_messages(ticket_page)
+    assert len(timeline_messages) == 2
+    assert 'Ticket eröffnet' in timeline_messages[0]['html']
+    assert 'Ticket angenommen' in timeline_messages[1]['html']
 
     # default is always enable email notifications
     send_msg = ticket_page.request.url + '/message-to-submitter'
@@ -129,6 +140,14 @@ def test_tickets(client):
 
     ticket_page = client.get(ticket_url)
     ticket_page = ticket_page.click('Ticket wieder öffnen').follow()
+    # ticket timeline
+    timeline_messages = get_data_feed_messages(ticket_page)
+    assert len(timeline_messages) == 5
+    assert 'Ticket eröffnet.' in timeline_messages[0]['html']
+    assert 'Ticket angenommen.' in timeline_messages[1]['html']
+    assert 'Testmessage' in timeline_messages[2]['html']
+    assert 'Ticket geschlossen.' in timeline_messages[3]['html']
+    assert 'Ticket wieder geöffnet.' in timeline_messages[4]['html']
 
     tickets_page = client.get('/tickets/ALL/pending')
     assert len(tickets_page.pyquery('tr.ticket')) == 1
@@ -151,8 +170,16 @@ def test_tickets(client):
 
     archived_ticket = client.get(ticket_url)
     assert 'Ticket wieder öffnen' not in archived_ticket
+    # ticket timeline
+    timeline_messages = get_data_feed_messages(archived_ticket)
+    assert len(timeline_messages) == 7
+    assert 'Ticket archiviert.' in timeline_messages[6]['html']
     archived_ticket = archived_ticket.click('Aus dem Archiv holen').follow()
     assert 'aus dem Archiv geholt' in archived_ticket
+    # ticket timeline
+    timeline_messages = get_data_feed_messages(archived_ticket)
+    assert len(timeline_messages) == 8
+    assert 'Ticket aus dem Archiv geholt.' in timeline_messages[7]['html']
     archived_ticket.click('Ticket archivieren').follow()
 
     # test security
@@ -166,7 +193,7 @@ def test_ticket_states_idempotent(client):
     page = client.get('/forms/new')
     page.form['title'] = "Newsletter"
     page.form['definition'] = "E-Mail *= @@@"
-    page = page.form.submit()
+    page.form.submit()
 
     page = client.get('/form/newsletter')
     page.form['e_mail'] = 'info@seantis.ch'
@@ -184,7 +211,7 @@ def test_ticket_states_idempotent(client):
 
     page.click('Ticket abschliessen')
     page.click('Ticket abschliessen')
-    page = page.click('Ticket abschliessen').follow()
+    page.click('Ticket abschliessen').follow()
     assert len(os.listdir(client.app.maildir)) == 2
     assert len(client.get('/timeline/feed').json['messages']) == 3
 
@@ -197,6 +224,107 @@ def test_ticket_states_idempotent(client):
     page = page.click('Ticket wieder öffnen').follow()
     assert len(os.listdir(client.app.maildir)) == 3
     assert len(client.get('/timeline/feed').json['messages']) == 4
+
+    page.click('Ticket abschliessen').follow()
+    assert len(os.listdir(client.app.maildir)) == 4
+    assert len(client.get('/timeline/feed').json['messages']) == 5
+
+    page = client.get(
+        client.get('/tickets/ALL/closed')
+        .pyquery('.ticket-number-plain a').attr('href'))
+
+    page.click('Ticket archivieren')
+    page = page.click('Ticket archivieren').follow()
+    assert len(os.listdir(client.app.maildir)) == 4  # no new mail
+    assert len(client.get('/timeline/feed').json['messages']) == 6
+
+    page.click('Aus dem Archiv holen')
+    page.click('Aus dem Archiv holen').follow()
+    assert len(os.listdir(client.app.maildir)) == 4  # no new mail
+    assert len(client.get('/timeline/feed').json['messages']) == 7
+
+    # check timeline messages of ticket
+    messages = client.get('/timeline/feed').json['messages']
+    expected_messages = [
+        'Ticket eröffnet',
+        'Ticket angenommen',
+        'Ticket geschlossen',
+        'Ticket wieder geöffnet',
+        'Ticket geschlossen',
+        'Ticket archiviert',
+        'Ticket aus dem Archiv geholt'
+    ]
+    for message, expected in zip(messages, expected_messages):
+        assert expected in message['html']
+
+
+def test_ticket_states_directory_entry(client):
+    client.login_admin()
+
+    page = client.get('/directories').click('Verzeichnis')
+    page.form['title'] = "Vereinsverzeichnis"
+    page.form['structure'] = "Vereinsname *= ___"
+    page.form['title_format'] = "[Vereinsname]"
+    page.form['enable_submissions'] = True
+    page.form.submit()
+
+    anon = client.spawn()
+    page = anon.get('/directories/vereinsverzeichnis').click('Eintrag '
+                                                             'vorschlagen')
+    page.form['vereinsname'] = 'Minions Fan Club'
+    page.form['submitter'] = "bob@minionworld.org"
+    page.form.submit().follow().form.submit().follow()
+
+    page = client.get('/tickets/ALL/open')
+    page = page.click('Annehmen').follow()
+
+    # reject
+    url = page.request.url
+    page.click('Eintrag abweisen')
+
+    # withdraw rejection
+    client.get(url).click('Ablehnung zurückziehen')
+
+    # accept entry after rejection withdrawal
+    client.get(url).click('Übernehmen')
+
+    client.get(url).click('Ticket abschliessen')
+
+    page = client.get(
+        client.get('/tickets/ALL/closed')
+        .pyquery('.ticket-number-plain a').attr('href'))
+
+    page = page.click('Ticket wieder öffnen').follow()
+
+    page.click('Ticket abschliessen').follow()
+
+    page = client.get(
+        client.get('/tickets/ALL/closed')
+        .pyquery('.ticket-number-plain a').attr('href'))
+
+    page.click('Ticket archivieren')
+    page = page.click('Ticket archivieren').follow()
+
+    page.click('Aus dem Archiv holen').follow()
+
+    # check timeline messages of ticket
+    assert len(client.get('/timeline/feed').json['messages']) == 10
+    messages = client.get('/timeline/feed').json['messages']
+    expected_messages = [
+        'Ticket eröffnet',
+        'Ticket angenommen',
+        'Verzeichniseintrag abgelehnt',
+        'Ablehnung des Verzeichniseintrags zurückgezogen',
+        'Verzeichniseintrag übernommen',
+        'Ticket geschlossen',
+        'Ticket wieder geöffnet',
+        'Ticket geschlossen',
+        'Ticket archiviert',
+        'Ticket aus dem Archiv geholt'
+    ]
+
+    for message, expected in zip(messages, expected_messages):
+        assert expected in message['html']
 
 
 def test_send_ticket_email(client):
@@ -696,7 +824,13 @@ def test_assign_tickets(client):
     manage = manage.click('E-Mails deaktivieren').follow()
     manage = manage.click('Ticket zuweisen')
     manage.form['user'].select(text='editor@example.org')
-    manage.form.submit()
+    page = manage.form.submit().follow()
+    # test timeline
+    timeline_messages = get_data_feed_messages(page)
+    assert len(timeline_messages) == 3
+    assert 'Ticket eröffnet.' in timeline_messages[0]['html']
+    assert 'Ticket E-Mails deaktiviert.' in timeline_messages[1]['html']
+    assert 'Ticket zugewiesen' in timeline_messages[2]['html']
 
     client.logout()
 

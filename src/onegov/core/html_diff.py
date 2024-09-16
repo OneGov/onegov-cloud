@@ -25,8 +25,8 @@ from difflib import SequenceMatcher
 from itertools import chain, zip_longest
 
 import html5lib
-from genshi.core import Stream, QName, Attrs, START, END, TEXT
-from genshi.input import ET
+from genshi.core import Stream, QName, Attrs, START, END, TEXT  # type:ignore
+from genshi.input import ET  # type:ignore[import-untyped]
 from markupsafe import Markup
 
 
@@ -34,7 +34,7 @@ from typing import Any, TYPE_CHECKING
 if TYPE_CHECKING:
     from collections.abc import Iterator
     from genshi.core import StreamEventKind
-    from typing_extensions import TypeAlias
+    from typing import TypeAlias
 
     Position: TypeAlias = tuple[str | None, int, int]
     StreamEvent: TypeAlias = tuple[StreamEventKind, Any, Position]
@@ -160,7 +160,7 @@ so the tags the `StreamDiffer` adds are also unnamespaced.
             elif tag == 'insert':
                 wrap('ins', new[j1:j2])
             else:
-                self.append(TEXT, u''.join(old[i1:i2]), pos)
+                self.append(TEXT, ''.join(old[i1:i2]), pos)
 
     def replace(
         self,

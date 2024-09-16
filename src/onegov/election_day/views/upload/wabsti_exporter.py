@@ -1,9 +1,6 @@
 import transaction
 
 from base64 import b64decode
-from onegov.ballot import Election
-from onegov.ballot import ProporzElection
-from onegov.ballot import Vote
 from onegov.core.security import Public
 from onegov.election_day import _
 from onegov.election_day import ElectionDayApp
@@ -15,7 +12,10 @@ from onegov.election_day.forms import UploadWabstiMajorzElectionForm
 from onegov.election_day.forms import UploadWabstiProporzElectionForm
 from onegov.election_day.forms import UploadWabstiVoteForm
 from onegov.election_day.models import DataSource
+from onegov.election_day.models import Election
 from onegov.election_day.models import Principal
+from onegov.election_day.models import ProporzElection
+from onegov.election_day.models import Vote
 from onegov.election_day.views.upload import set_locale
 from onegov.election_day.views.upload import translate_errors
 from onegov.election_day.views.upload import unsupported_year_error
@@ -71,7 +71,7 @@ def view_upload_wabsti_vote(
     data_source = authenticated_source(request)
     if (
         data_source.type != 'vote'
-        or not all((item.vote for item in data_source.items))
+        or not all(item.vote for item in data_source.items)
     ):
         return {
             'status': 'error',
@@ -98,7 +98,7 @@ def view_upload_wabsti_vote(
     assert form.sg_gemeinden.data is not None
     assert form.sg_gemeinden.file is not None
 
-    errors: dict[str, list['FileImportError']] = {}
+    errors: dict[str, list[FileImportError]] = {}
     session = request.session
     archive = ArchivedResultCollection(session)
     for item in data_source.items:
@@ -127,8 +127,7 @@ def view_upload_wabsti_vote(
         if not errors[vote.id]:
             archive.update(vote, request)
             request.app.send_zulip(
-                # FIXME: Should we assert that principal name is set?
-                self.name,  # type:ignore[arg-type]
+                self.name,
                 'New results available: [{}]({})'.format(
                     vote.title, request.link(vote)
                 )
@@ -172,7 +171,7 @@ def view_upload_wabsti_majorz(
     data_source = authenticated_source(request)
     if (
         data_source.type != 'majorz'
-        or not all((item.election for item in data_source.items))
+        or not all(item.election for item in data_source.items)
     ):
         return {
             'status': 'error',
@@ -206,7 +205,7 @@ def view_upload_wabsti_majorz(
     assert form.wm_kandidatengde.data is not None
     assert form.wm_kandidatengde.file is not None
 
-    errors: dict[str, list['FileImportError']] = {}
+    errors: dict[str, list[FileImportError]] = {}
     session = request.session
     archive = ArchivedResultCollection(session)
     for item in data_source.items:
@@ -242,9 +241,8 @@ def view_upload_wabsti_majorz(
         )
         if not errors[election.id]:
             archive.update(election, request)
-            # FIXME: Should we assert the principal name is set?
             request.app.send_zulip(
-                self.name,  # type:ignore[arg-type]
+                self.name,
                 'New results available: [{}]({})'.format(
                     election.title, request.link(election)
                 )
@@ -291,7 +289,7 @@ def view_upload_wabsti_proporz(
     data_source = authenticated_source(request)
     if (
         data_source.type != 'proporz'
-        or not all((item.election for item in data_source.items))
+        or not all(item.election for item in data_source.items)
     ):
         return {
             'status': 'error',
@@ -330,7 +328,7 @@ def view_upload_wabsti_proporz(
     assert form.wp_kandidatengde.data is not None
     assert form.wp_kandidatengde.file is not None
 
-    errors: dict[str, list['FileImportError']] = {}
+    errors: dict[str, list[FileImportError]] = {}
     session = request.session
     archive = ArchivedResultCollection(session)
     for item in data_source.items:
@@ -372,8 +370,7 @@ def view_upload_wabsti_proporz(
         if not errors[election.id]:
             archive.update(election, request)
             request.app.send_zulip(
-                # FIXME: Should we assert that principal name is set?
-                self.name,  # type:ignore[arg-type]
+                self.name,
                 'New results available: [{}]({})'.format(
                     election.title, request.link(election)
                 )

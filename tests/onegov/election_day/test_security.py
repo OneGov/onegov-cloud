@@ -1,0 +1,54 @@
+from morepath import Identity
+from morepath.authentication import NoIdentity
+from onegov.election_day.security import MaybePublic
+from onegov.user.models import User
+
+
+def test_security_permissions(election_day_app_zg):
+    session = election_day_app_zg.session()
+
+    # Remove existing users
+    session.query(User).delete()
+
+    # Add one user per role
+    users = {}
+    for role in ('admin', 'editor', 'member', 'anonymous'):
+        user = User(
+            realname=role,
+            username=f'{role}@example.org',
+            password_hash='hash',
+            role=role,
+            group_id=None
+        )
+        session.add(user)
+        users[role] = user
+
+    def permits(user, model, permission):
+        identity = NoIdentity()
+        if user:
+            identity = Identity(
+                userid=user.username,
+                groupid=user.group_id.hex if user.group_id else '',
+                role=user.role,
+                application_id=election_day_app_zg.application_id
+            )
+        return election_day_app_zg._permits(identity, model, permission)
+
+    model = election_day_app_zg.principal
+    assert permits(users['admin'], model, MaybePublic)
+    assert permits(users['editor'], model, MaybePublic)
+    assert permits(users['member'], model, MaybePublic)
+    assert permits(users['anonymous'], model, MaybePublic)
+    assert permits(users['anonymous'], model, MaybePublic)
+    assert permits(None, model, MaybePublic)
+
+    principal = election_day_app_zg.principal
+    principal.private = True
+    principal.reply_to = 'reply-to@example.org'
+    election_day_app_zg.cache.set('principal', principal)
+
+    assert permits(users['admin'], model, MaybePublic)
+    assert permits(users['editor'], model, MaybePublic)
+    assert not permits(users['member'], model, MaybePublic)
+    assert not permits(users['anonymous'], model, MaybePublic)
+    assert not permits(None, model, MaybePublic)

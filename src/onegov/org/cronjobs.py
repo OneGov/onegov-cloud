@@ -8,23 +8,28 @@ from onegov.core.cache import lru_cache
 from onegov.core.orm import find_models
 from onegov.core.orm.mixins.publication import UTCPublicationMixin
 from onegov.core.templates import render_template
+from onegov.event import Occurrence, Event
 from onegov.file import FileCollection
 from onegov.form import FormSubmission, parse_form
 from onegov.org.mail import send_ticket_mail
 from onegov.newsletter import Newsletter, NewsletterCollection
 from onegov.org import _, OrgApp
 from onegov.org.layout import DefaultMailLayout
-from onegov.org.models.ticket import ReservationHandler
 from onegov.org.models import (
-    ResourceRecipient, ResourceRecipientCollection, TAN, TANAccess)
+    ResourceRecipient, ResourceRecipientCollection, TANAccess, News)
+from onegov.org.models.extensions import (
+    GeneralFileLinkExtension, DeletableContentExtension)
+from onegov.org.models.ticket import ReservationHandler
 from onegov.org.views.allocation import handle_rules_cronjob
 from onegov.org.views.newsletter import send_newsletter
 from onegov.org.views.ticket import delete_tickets_and_related_data
 from onegov.reservation import Reservation, Resource, ResourceCollection
+from onegov.search import Searchable
 from onegov.ticket import Ticket, TicketCollection
-from onegov.org.models import TicketMessage
+from onegov.org.models import TicketMessage, ExtendedDirectoryEntry
 from onegov.user import User, UserCollection
-from sedate import replace_timezone, to_timezone, utcnow, align_date_to_day
+from onegov.user.models import TAN
+from sedate import to_timezone, utcnow, align_date_to_day
 from sqlalchemy import and_, or_, func
 from sqlalchemy.orm import undefer
 from uuid import UUID
@@ -34,6 +39,7 @@ from typing import Any, TYPE_CHECKING
 if TYPE_CHECKING:
     from collections.abc import Iterator
     from onegov.core.orm import Base
+    from onegov.core.types import RenderData
     from onegov.form import Form
     from onegov.org.request import OrgRequest
 
@@ -84,8 +90,11 @@ def publish_files(request: 'OrgRequest') -> None:
 
 def reindex_published_models(request: 'OrgRequest') -> None:
     """
-    Reindexes all recently published objects
+    Reindexes all recently published/unpublished objects
     in the elasticsearch database.
+
+    For pages it also updates the propagated access to any
+    associated files.
     """
 
     if not hasattr(request.app, 'es_client'):
@@ -120,7 +129,12 @@ def reindex_published_models(request: 'OrgRequest') -> None:
             objects.extend(query.all())
 
     for obj in objects:
-        request.app.es_orm_events.index(request.app.schema, obj)
+        if isinstance(obj, GeneralFileLinkExtension):
+            # manually invoke the files observer which updates access
+            obj.files_observer(obj.files, set(), None, None)
+
+        if isinstance(obj, Searchable):
+            request.app.es_orm_events.index(request.app.schema, obj)
 
 
 def delete_old_tans(request: 'OrgRequest') -> None:
@@ -149,7 +163,7 @@ def delete_old_tan_accesses(request: 'OrgRequest') -> None:
     """
 
     cutoff = utcnow() - timedelta(days=180)
-    query = request.session.query(TANAccess).filter(TAN.created < cutoff)
+    query = request.session.query(TANAccess).filter(TANAccess.created < cutoff)
     # cronjobs happen outside a regular request, so we don't need
     # to synchronize with the session
     query.delete(synchronize_session=False)
@@ -190,7 +204,7 @@ def ticket_statistics_common_template_args(
         collection.for_state('closed').for_owner(None))  # type:ignore
 
     args['title'] = request.translate(
-        _("${org} OneGov Cloud Status", mapping={
+        _('${org} OneGov Cloud Status', mapping={
             'org': request.app.org.title
         })
     )
@@ -211,8 +225,7 @@ def ticket_statistics_users(app: OrgApp) -> list[User]:
 @OrgApp.cronjob(hour=8, minute=30, timezone='Europe/Zurich')
 def send_daily_ticket_statistics(request: 'OrgRequest') -> None:
 
-    today = replace_timezone(datetime.utcnow(), 'UTC')
-    today = to_timezone(today, 'Europe/Zurich')
+    today = to_timezone(utcnow(), 'Europe/Zurich')
 
     if today.weekday() in (SAT, SUN):
         return
@@ -277,8 +290,7 @@ def send_daily_ticket_statistics(request: 'OrgRequest') -> None:
 @OrgApp.cronjob(hour=8, minute=45, timezone='Europe/Zurich')
 def send_weekly_ticket_statistics(request: 'OrgRequest') -> None:
 
-    today = replace_timezone(datetime.utcnow(), 'UTC')
-    today = to_timezone(today, 'Europe/Zurich')
+    today = to_timezone(utcnow(), 'Europe/Zurich')
 
     if today.weekday() != MON:
         return
@@ -339,8 +351,7 @@ def send_weekly_ticket_statistics(request: 'OrgRequest') -> None:
 @OrgApp.cronjob(hour=9, minute=0, timezone='Europe/Zurich')
 def send_monthly_ticket_statistics(request: 'OrgRequest') -> None:
 
-    today = replace_timezone(datetime.utcnow(), 'UTC')
-    today = to_timezone(today, 'Europe/Zurich')
+    today = to_timezone(utcnow(), 'Europe/Zurich')
 
     if today.weekday() != MON or today.day > 7:
         return
@@ -439,7 +450,7 @@ def send_daily_resource_usage_overview(request: 'OrgRequest') -> None:
     }
 
     # get the resource titles and ids
-    default_group = request.translate(_("General"))
+    default_group = request.translate(_('General'))
 
     all_resources = tuple(
         ResourceCollection(request.app.libres_context).query()
@@ -503,10 +514,10 @@ def send_daily_resource_usage_overview(request: 'OrgRequest') -> None:
     }
 
     # send out the e-mails
-    args = {
+    args: RenderData = {
         'layout': DefaultMailLayout(object(), request),
         'title': request.translate(
-            _("${org} Reservation Overview", mapping={
+            _('${org} Reservation Overview', mapping={
                 'org': request.app.org.title
             })
         ),
@@ -532,8 +543,7 @@ def send_daily_resource_usage_overview(request: 'OrgRequest') -> None:
 
 @OrgApp.cronjob(hour='*', minute='*/30', timezone='UTC')
 def end_chats_and_create_tickets(request: 'OrgRequest') -> None:
-    half_hour_ago = replace_timezone(
-        datetime.utcnow(), 'UTC') - timedelta(minutes=30)
+    half_hour_ago = utcnow() - timedelta(minutes=30)
 
     chats = ChatCollection(request.session).query().filter(
         Chat.active == True).filter(Chat.chat_history != []).filter(
@@ -550,7 +560,7 @@ def end_chats_and_create_tickets(request: 'OrgRequest') -> None:
             send_ticket_mail(
                 request=request,
                 template='mail_turned_chat_into_ticket.pt',
-                subject=_("Your Chat has been turned into a ticket"),
+                subject=_('Your Chat has been turned into a ticket'),
                 receivers=(chat.email, ),
                 ticket=ticket,
                 content={
@@ -566,7 +576,6 @@ def end_chats_and_create_tickets(request: 'OrgRequest') -> None:
 def archive_old_tickets(request: 'OrgRequest') -> None:
 
     archive_timespan = request.app.org.auto_archive_timespan
-
     session = request.session
 
     if archive_timespan is None:
@@ -579,10 +588,17 @@ def archive_old_tickets(request: 'OrgRequest') -> None:
     query = session.query(Ticket)
     query = query.filter(Ticket.state == 'closed')
     query = query.filter(Ticket.last_change <= cutoff_date)
-
+    further_back = cutoff_date - timedelta(days=712)
     for ticket in query:
         if isinstance(ticket.handler, ReservationHandler):
             if ticket.handler.has_future_reservation:
+                continue
+            most_future_reservation = ticket.handler.most_future_reservation
+            if (
+                most_future_reservation is not None
+                and most_future_reservation.end is not None
+                and most_future_reservation.end > further_back
+            ):
                 continue
         ticket.archive_ticket()
 
@@ -609,8 +625,7 @@ def delete_old_tickets(request: 'OrgRequest') -> None:
 @OrgApp.cronjob(hour=9, minute=30, timezone='Europe/Zurich')
 def send_monthly_mtan_statistics(request: 'OrgRequest') -> None:
 
-    today = replace_timezone(datetime.utcnow(), 'UTC')
-    today = to_timezone(today, 'Europe/Zurich')
+    today = to_timezone(utcnow(), 'Europe/Zurich')
 
     if today.weekday() != MON or today.day > 7:
         return
@@ -653,3 +668,46 @@ def send_monthly_mtan_statistics(request: 'OrgRequest') -> None:
             f'{mtan_count} mTAN SMS versendet'
         )
     )
+
+
+@OrgApp.cronjob(hour=4, minute=0, timezone='Europe/Zurich')
+def delete_content_marked_deletable(request: 'OrgRequest') -> None:
+    """ find all models inheriting from DeletableContentExtension, iterate
+    over objects marked as `deletable` and delete them if expired.
+
+    Currently extended directory entries, news, events and occurrences.
+
+    """
+
+    now = to_timezone(utcnow(), 'Europe/Zurich')
+    count = 0
+
+    for base in request.app.session_manager.bases:
+        for model in find_models(base, lambda cls: issubclass(
+                cls, DeletableContentExtension)):
+
+            query = request.session.query(model)
+            query = query.filter(model.delete_when_expired == True)
+            for obj in query:
+                # delete entry if end date passed
+                if isinstance(obj, (News, ExtendedDirectoryEntry)):
+                    if obj.publication_end and obj.publication_end < now:
+                        request.session.delete(obj)
+                        count += 1
+
+    # check on past events and its occurrences
+    if request.app.org.delete_past_events:
+        query = request.session.query(Occurrence)
+        query = query.filter(Occurrence.end < now)
+        for obj in query:
+            request.session.delete(obj)
+            count += 1
+
+        query = request.session.query(Event)
+        for obj in query:
+            if not obj.future_occurrences(limit=1).all():
+                request.session.delete(obj)
+                count += 1
+
+    if count:
+        print(f'Cron: Deleted {count} expired deletable objects in db')

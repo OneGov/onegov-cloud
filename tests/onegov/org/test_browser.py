@@ -22,6 +22,11 @@ from onegov.ticket import TicketCollection
 from tests.onegov.org.test_views_resources import add_reservation
 
 
+# FIXME: For some reason all the browser tests need to run on the same process
+#        in order to succeed. We should figure what breaks things here. Some
+#        wires are probably being crossed, but it's nothing too obvious, we
+#        already use separate application ports for every test.
+@pytest.mark.xdist_group(name="browser")
 def test_browse_activities(browser):
     # admins
     browser.login_admin()
@@ -42,6 +47,7 @@ def test_browse_activities(browser):
     'Photo = *.png|*.jpg',
     'Photo *= *.png|*.jpg',
 ))
+@pytest.mark.xdist_group(name="browser")
 def test_browse_directory_uploads(browser, org_app, field):
     DirectoryCollection(org_app.session(), type='extended').add(
         title="Crime Scenes",
@@ -112,6 +118,7 @@ def test_browse_directory_uploads(browser, org_app, field):
         assert browser.is_text_present("Dieses Feld wird benötigt")
 
 
+@pytest.mark.xdist_group(name="browser")
 def test_upload_image_with_error(browser, org_app):
     DirectoryCollection(org_app.session(), type='extended').add(
         title="Crime Scenes",
@@ -158,6 +165,7 @@ def test_upload_image_with_error(browser, org_app):
 
 
 @pytest.mark.skip('Picture upload is needed to check scaling')
+@pytest.mark.xdist_group(name="browser")
 def test_directory_thumbnail_views(browser, org_app):
 
     DirectoryCollection(org_app.session(), type='extended').add(
@@ -195,6 +203,7 @@ def test_directory_thumbnail_views(browser, org_app):
 
 
 @pytest.mark.skip("Passes locally, but not in CI, skip for now")
+@pytest.mark.xdist_group(name="browser")
 def test_browse_directory_editor(browser, org_app):
     browser.login_admin()
     browser.visit('/directories/+new')
@@ -260,6 +269,7 @@ def test_browse_directory_editor(browser, org_app):
     assert not browser.find_by_css('.formcode-select input')[1].checked
 
 
+@pytest.mark.xdist_group(name="browser")
 def test_browse_directory_coordinates(browser, org_app):
     DirectoryCollection(org_app.session(), type='extended').add(
         title="Restaurants",
@@ -321,6 +331,7 @@ def test_browse_directory_coordinates(browser, org_app):
         'page-directories-restaurants-city-wok')
 
 
+@pytest.mark.xdist_group(name="browser")
 def test_publication_workflow(browser, temporary_path, org_app):
     path = temporary_path / 'foo.txt'
 
@@ -386,6 +397,7 @@ def test_publication_workflow(browser, temporary_path, org_app):
     assert 'public' in r.headers['cache-control']
 
 
+@pytest.mark.xdist_group(name="browser")
 def test_signature_workflow(browser, temporary_path, org_app):
     path = module_path('tests.onegov.org', 'fixtures/sample.pdf')
     org_app.enable_yubikey = True
@@ -430,6 +442,7 @@ def test_signature_workflow(browser, temporary_path, org_app):
     assert browser.is_text_present('Digitales Siegel angewendet')
 
 
+@pytest.mark.xdist_group(name="browser")
 def test_external_map_link(browser, client):
     client.login_admin()
     settings = client.get('/map-settings')
@@ -450,6 +463,7 @@ def test_external_map_link(browser, client):
 
 
 @pytest.mark.flaky(reruns=3)
+@pytest.mark.xdist_group(name="browser")
 def test_context_specific_function_are_displayed_in_person_directory(browser,
                                                                      client):
 
@@ -479,6 +493,7 @@ def test_context_specific_function_are_displayed_in_person_directory(browser,
 
 
 @pytest.mark.flaky(reruns=3)
+@pytest.mark.xdist_group(name="browser")
 def test_rejected_reservation_sends_email_to_configured_recipients(browser,
                                                                    client):
     resources = ResourceCollection(client.app.libres_context)
@@ -496,7 +511,11 @@ def test_rejected_reservation_sends_email_to_configured_recipients(browser,
     )
 
     add_reservation(
-        dailypass, client, datetime(2017, 1, 6, 12), datetime(2017, 1, 6, 16))
+        dailypass,
+        client.app.session(),
+        datetime(2017, 1, 6, 12),
+        datetime(2017, 1, 6, 16),
+    )
     transaction.commit()
 
     tickets = TicketCollection(client.app.session())
@@ -544,6 +563,7 @@ def test_rejected_reservation_sends_email_to_configured_recipients(browser,
         )
 
 
+@pytest.mark.xdist_group(name="browser")
 def test_script_escaped_in_user_submitted_html(browser, org_app):
 
     # This test attempts to inject JS (should not succeed of course)

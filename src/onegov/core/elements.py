@@ -20,6 +20,7 @@ from onegov.core.templates import render_macro
 from typing import Any, ClassVar, Literal, TYPE_CHECKING
 if TYPE_CHECKING:
     from collections.abc import Callable, Collection, Iterable, Sequence
+    from markupsafe import Markup
 
     from .layout import ChameleonLayout
 
@@ -105,7 +106,7 @@ class Element:
         self,
         layout: 'ChameleonLayout',
         extra_classes: 'Iterable[str] | None' = None
-    ) -> str:
+    ) -> 'Markup':
 
         assert self.id is not None
 
@@ -118,9 +119,11 @@ class Element:
         else:
             del self.attrs['class']
 
-        return render_macro(layout.elements[self.id], layout.request, {
-            'e': self, 'layout': layout,
-        })
+        return render_macro(
+            layout.elements[self.id],
+            layout.request,
+            {'e': self, 'layout': layout}
+        )
 
 
 class AccessMixin:
@@ -171,6 +174,35 @@ class Link(Element, AccessMixin):
 
     def __repr__(self) -> str:
         return f'<Link {self.text}>'
+
+
+class Button(Link):
+    """ A generic button. """
+
+    id = 'button'
+
+    __slots__ = ()
+
+    def __repr__(self) -> str:
+        return f'<Button {self.text}>'
+
+
+class BackLink(Link):
+    """ A button that goes back in the history. """
+
+    id = 'back_link'
+
+    __slots__ = ()
+
+    def __init__(
+        self,
+        text: str = '',
+        **props: Any
+    ):
+        super().__init__(text, **props)
+
+    def __repr__(self) -> str:
+        return f'<BackButton {self.text}>'
 
 
 class LinkGroup(AccessMixin):
@@ -237,8 +269,8 @@ class Confirm(Trait):
         self,
         confirm: str,
         extra: str | None = None,
-        yes: str | None = "Yes",
-        no: str = "Cancel",
+        yes: str | None = 'Yes',
+        no: str = 'Cancel',
         **ignored: Any
     ):
         def apply(attrs: dict[str, Any]) -> dict[str, Any]:
@@ -261,7 +293,7 @@ class Block(Confirm):
         self,
         message: str,
         extra: str | None = None,
-        no: str = "Cancel",
+        no: str = 'Cancel',
         **ignored: Any
     ):
         super().__init__(message, extra, None, no)

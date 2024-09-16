@@ -42,7 +42,7 @@ def view_select_report(
     return {
         'layout': ReportLayout(self, request),
         'form': form,
-        'button_text': _("Show")
+        'button_text': _('Show')
     }
 
 

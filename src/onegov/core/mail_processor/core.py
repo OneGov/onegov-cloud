@@ -119,6 +119,10 @@ class MailQueueProcessor:
                 if f.name.startswith('.'):
                     continue
 
+                # ignore .tmp files created by safe_move
+                if f.name.endswith('.tmp'):
+                    continue
+
                 files.append(os.path.join(path, f))
 
         files.sort(key=lambda i: self.split(i)[-1])
@@ -135,7 +139,7 @@ class MailQueueProcessor:
         #       complain if we send them garbage
         #       But if we ever decide we want to perform some offline
         #       validation anyways, we can do it in here.
-        with open(filename, 'r') as f:
+        with open(filename) as f:
             return f.read()
 
     def send_messages(self) -> None:
@@ -242,14 +246,14 @@ class MailQueueProcessor:
             # and maybe will try again.
             status = self.send(filename, payload)
             if status is True:
-                log.info(f"Mail batch {filename} sent.")
+                log.info(f'Mail batch {filename} sent.')
             elif status is False:
                 os.link(filename, failed_filename)
         else:
             # this should cause stderr output, which
             # will write the cronjob output to chat
             log.error(
-                f"Discarding mail batch {filename} due to invalid payload"
+                f'Discarding mail batch {filename} due to invalid payload'
             )
             os.link(filename, rejected_filename)
 

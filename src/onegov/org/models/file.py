@@ -13,11 +13,11 @@ from onegov.file import SearchableFile
 from onegov.file.utils import IMAGE_MIME_TYPES_AND_SVG
 from onegov.org import _
 from onegov.org.models.extensions import AccessExtension
+from onegov.org.utils import widest_access
 from onegov.search import ORMSearchable
 from operator import itemgetter
 from sedate import standardize_date, utcnow
-from sqlalchemy import asc, desc, select
-
+from sqlalchemy import asc, desc, select, nullslast  # type: ignore
 
 from typing import (
     overload, Any, Generic, Literal, NamedTuple, TypeVar, TYPE_CHECKING)
@@ -25,7 +25,7 @@ if TYPE_CHECKING:
     from collections.abc import Callable, Iterable, Iterator
     from sqlalchemy.orm import Query, Session
     from sqlalchemy.sql import Select
-    from typing_extensions import Self
+    from typing import Self
 
     _T = TypeVar('_T')
     _RowT = TypeVar('_RowT')
@@ -40,6 +40,7 @@ if TYPE_CHECKING:
         order: str
         signed: bool
         upload_date: datetime
+        publish_end_date: datetime
         content_type: str
 
 
@@ -63,12 +64,18 @@ class GroupFilesByDateMixin(Generic[FileT]):
     ) -> 'Iterator[DateInterval]':
 
         today = standardize_date(today, 'UTC')
-
         month_end = today + relativedelta(day=31)
         month_start = today - relativedelta(day=1)
+        next_month_start = month_start + relativedelta(months=1)
+        in_distant_future = next_month_start + relativedelta(years=100)
 
         yield DateInterval(
-            name=_("This month"),
+            name=_('In future'),
+            start=next_month_start,
+            end=in_distant_future)
+
+        yield DateInterval(
+            name=_('This month'),
             start=month_start,
             end=month_end)
 
@@ -76,7 +83,7 @@ class GroupFilesByDateMixin(Generic[FileT]):
         last_month_start = month_start - relativedelta(months=1)
 
         yield DateInterval(
-            name=_("Last month"),
+            name=_('Last month'),
             start=last_month_start,
             end=last_month_end)
 
@@ -86,7 +93,7 @@ class GroupFilesByDateMixin(Generic[FileT]):
                 month=1, day=1, hour=0, minute=0, second=0, microsecond=0)
 
             yield DateInterval(
-                name=_("This year"),
+                name=_('This year'),
                 start=this_year_start,
                 end=this_year_end)
         else:
@@ -99,7 +106,7 @@ class GroupFilesByDateMixin(Generic[FileT]):
             month=1, day=1, hour=0, minute=0, second=0, microsecond=0)
 
         yield DateInterval(
-            name=_("Last year"),
+            name=_('Last year'),
             start=last_year_start,
             end=last_year_end)
 
@@ -107,7 +114,7 @@ class GroupFilesByDateMixin(Generic[FileT]):
         older_start = datetime(2000, 1, 1, tzinfo=today.tzinfo)
 
         yield DateInterval(
-            name=_("Older"),
+            name=_('Older'),
             start=older_start,
             end=older_end)
 
@@ -202,7 +209,7 @@ class GroupFilesByDateMixin(Generic[FileT]):
 
         intervals = tuple(self.get_date_intervals(today or utcnow()))
 
-        files: 'Iterator[tuple[str, str | FileT]]'
+        files: Iterator[tuple[str, str | FileT]]
         if id_only:
             def before_filter(query: 'Query[FileT]') -> 'Query[IdRow]':
                 return query.with_entities(File.id)
@@ -223,9 +230,25 @@ class GroupFilesByDateMixin(Generic[FileT]):
 class GeneralFile(File, SearchableFile):
     __mapper_args__ = {'polymorphic_identity': 'general'}
 
+    #: the access of all the linked models
+    linked_accesses: dict_property[dict[str, str]]
+    linked_accesses = meta_property(default=dict)
+
+    @property
+    def access(self) -> str:
+        if self.publication:
+            return 'public'
+
+        if not self.linked_accesses:
+            # a file which is not a publication and has no linked
+            # accesses is considered secret
+            return 'secret'
+
+        return widest_access(*self.linked_accesses.values())
+
     @property
     def es_public(self) -> bool:
-        return self.published and self.publication
+        return self.published and self.access == 'public'
 
 
 class ImageFile(File):
@@ -247,7 +270,7 @@ class ImageSet(FileSet, AccessExtension, ORMSearchable):
     @property
     def es_suggestions(self) -> dict[str, list[str]]:
         return {
-            "input": [self.title.lower()]
+            'input': [self.title.lower()]
         }
 
     lead: dict_property[str | None] = meta_property()
@@ -277,6 +300,7 @@ class GeneralFileCollection(
             "order",                        -- Text
             signed,                         -- Boolean
             created as upload_date,         -- UTCDateTime
+            publish_end_date,               -- UTCDateTime
             reference->>'content_type'
                 AS content_type             -- Text
         FROM files
@@ -304,35 +328,52 @@ class GeneralFileCollection(
 
         if self.order_by == 'name':
             order = self.file_list.c.order
-        else:
+        elif self.order_by == 'date':
             order = self.file_list.c.upload_date
+        elif self.order_by == 'publish_end_date':
+            order = self.file_list.c.publish_end_date
+        else:
+            order = self.file_list.c.order
 
         direction = asc if self.direction == 'ascending' else desc
 
-        return stmt.order_by(direction(order))
+        return stmt.order_by(nullslast(direction(order)))
 
     @property
     def files(self) -> 'Query[FileRow]':
         return self.session.execute(self.statement)
 
     def group(self, record: 'FileRow') -> str:
-        if self.order_by == 'name':
+
+        def get_first_character(record: 'FileRow') -> str:
             if record.order[0].isdigit():
                 return '0-9'
-
             return record.order[0].upper()
-        else:
-            intervals: 'Iterable[DateInterval]'
+
+        if self.order_by == 'name':
+            return get_first_character(record)
+        elif self.order_by == 'date' or self.order_by == 'publish_end_date':
+            intervals: Iterable[DateInterval]
             if self._last_interval:
                 intervals = chain((self._last_interval, ), self.intervals)
             else:
                 intervals = self.intervals
 
-            for interval in intervals:
-                if interval.start <= record.upload_date <= interval.end:
-                    break
-            else:
-                return _("Older")
+            if self.order_by == 'date':
+                for interval in intervals:
+                    if interval.start <= record.upload_date <= interval.end:
+                        break
+                else:
+                    return _('Older')
+            elif self.order_by == 'publish_end_date':
+                for interval in intervals:
+                    if not record.publish_end_date:
+                        return _('None')
+                    if (interval.start <= record.publish_end_date
+                            <= interval.end):
+                        break
+                else:
+                    return _('Older')
 
             # this method is usually called for each item in a sorted set,
             # we optimise for that by caching the last matching interval
@@ -341,13 +382,20 @@ class GeneralFileCollection(
 
             return interval.name
 
+        else:
+            # default ordering by name
+            return get_first_character(record)
 
-class ImageFileCollection(
-    FileCollection[ImageFile],
-    GroupFilesByDateMixin[ImageFile]
+
+class BaseImageFileCollection(
+    FileCollection[FileT],
+    GroupFilesByDateMixin[FileT]
 ):
 
     supported_content_types = IMAGE_MIME_TYPES_AND_SVG
+
+
+class ImageFileCollection(BaseImageFileCollection[ImageFile]):
 
     def __init__(self, session: 'Session') -> None:
         super().__init__(session, type='image', allow_duplicates=False)

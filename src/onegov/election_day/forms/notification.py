@@ -1,7 +1,7 @@
-from onegov.ballot.models import Election
-from onegov.ballot.models import ElectionCompound
-from onegov.ballot.models import Vote
 from onegov.election_day import _
+from onegov.election_day.models import Election
+from onegov.election_day.models import ElectionCompound
+from onegov.election_day.models import Vote
 from onegov.form import Form
 from onegov.form.fields import MultiCheckboxField
 from wtforms.validators import InputRequired
@@ -20,12 +20,12 @@ class TriggerNotificationForm(Form):
     request: 'ElectionDayRequest'
 
     notifications = MultiCheckboxField(
-        label=_("Notifications"),
+        label=_('Notifications'),
         choices=[],
         validators=[
             InputRequired()
         ],
-        default=['websocket', 'email', 'sms', 'webhooks']
+        default=['email', 'sms', 'webhooks']
     )
 
     def on_request(self) -> None:
@@ -34,29 +34,28 @@ class TriggerNotificationForm(Form):
         principal = self.request.app.principal
 
         self.notifications.choices = []
-        self.notifications.choices.append(('websocket', _("Browser")))
         if principal.email_notification:
-            self.notifications.choices.append(('email', _("Email")))
+            self.notifications.choices.append(('email', _('Email')))
         if principal.sms_notification:
-            self.notifications.choices.append(('sms', _("SMS")))
+            self.notifications.choices.append(('sms', _('SMS')))
         if principal.webhooks:
-            self.notifications.choices.append(('webhooks', _("Webhooks")))
+            self.notifications.choices.append(('webhooks', _('Webhooks')))
 
 
 class TriggerNotificationsForm(TriggerNotificationForm):
 
     votes = MultiCheckboxField(
-        label=_("Votes"),
+        label=_('Votes'),
         choices=[],
     )
 
     election_compounds = MultiCheckboxField(
-        label=_("Compounds of elections"),
+        label=_('Compounds of elections'),
         choices=[],
     )
 
     elections = MultiCheckboxField(
-        label=_("Elections"),
+        label=_('Elections'),
         choices=[],
     )
 
@@ -66,7 +65,7 @@ class TriggerNotificationsForm(TriggerNotificationForm):
             and not self.elections.data
             and not self.election_compounds.data
         ):
-            message = _("Select at least one election or vote.")
+            message = _('Select at least one election or vote.')
             assert isinstance(self.votes.errors, list)
             self.votes.errors.append(message)
             assert isinstance(self.elections.errors, list)
@@ -147,7 +146,7 @@ class TriggerNotificationsForm(TriggerNotificationForm):
     def on_request(self) -> None:
         """ Adjusts the form to the given principal. """
 
-        super(TriggerNotificationsForm, self).on_request()
+        super().on_request()
 
         session = self.request.session
         self.elections.choices = [

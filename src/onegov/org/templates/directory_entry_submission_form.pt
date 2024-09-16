@@ -7,7 +7,7 @@
             ${hint}
         </div>
         <div tal:condition="guideline|nothing" class="limit-line-width">
-            <tal:b replace="structure guideline" />
+            <tal:b replace="guideline" />
         </div>
         <div class="row">
             <div class="small-12 medium-8 large-6 columns">

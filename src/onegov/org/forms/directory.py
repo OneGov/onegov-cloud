@@ -1,5 +1,7 @@
 from functools import cached_property
-from onegov.core.utils import safe_format_keys
+
+from wtforms import EmailField
+from onegov.core.utils import safe_format_keys, normalize_for_url
 from onegov.directory import DirectoryConfiguration
 from onegov.directory import DirectoryZipArchive
 from onegov.form import as_internal_id
@@ -18,7 +20,7 @@ from onegov.form.validators import ValidFormDefinition
 from onegov.form.validators import WhitelistedMimeType
 from onegov.org import _
 from onegov.org.forms.fields import HtmlField
-from onegov.org.forms.generic import PaymentForm
+from onegov.org.forms.generic import PaymentForm, ChangeAdjacencyListUrlForm
 from onegov.org.theme.org_theme import user_options
 from sqlalchemy.orm import object_session
 from wtforms.fields import BooleanField
@@ -28,6 +30,7 @@ from wtforms.fields import StringField
 from wtforms.fields import TextAreaField
 from wtforms.validators import DataRequired
 from wtforms.validators import InputRequired
+from wtforms.validators import Email
 from wtforms.validators import Optional
 from wtforms.validators import ValidationError
 
@@ -49,40 +52,40 @@ class DirectoryBaseForm(Form):
         request: OrgRequest
 
     title = StringField(
-        label=_("Title"),
-        fieldset=_("General"),
+        label=_('Title'),
+        fieldset=_('General'),
         validators=[InputRequired()])
 
     lead = TextAreaField(
-        label=_("Lead"),
-        fieldset=_("General"),
-        description=_("Describes what this directory is about"),
+        label=_('Lead'),
+        fieldset=_('General'),
+        description=_('Describes what this directory is about'),
         render_kw={'rows': 4})
 
     title_further_information = StringField(
-        label=_("Title"),
-        fieldset=_("Further Information"),
+        label=_('Title'),
+        fieldset=_('Further Information'),
         description=_(
             'If left empty "Further Information" will be used as title')
     )
 
     text = HtmlField(
-        label=_("Text"),
-        fieldset=_("Further Information"))
+        label=_('Text'),
+        fieldset=_('Further Information'))
 
     position = RadioField(
-        label=_("Position"),
-        fieldset=_("Further Information"),
+        label=_('Position'),
+        fieldset=_('Further Information'),
         choices=[
-            ('above', _("Above the entries")),
-            ('below', _("Below the entries"))
+            ('above', _('Above the entries')),
+            ('below', _('Below the entries'))
         ],
         default='below'
     )
 
     structure = TextAreaField(
-        label=_("Definition"),
-        fieldset=_("General"),
+        label=_('Definition'),
+        fieldset=_('General'),
         validators=[
             InputRequired(),
             ValidFormDefinition(
@@ -93,57 +96,57 @@ class DirectoryBaseForm(Form):
         render_kw={'rows': 32, 'data-editor': 'form'})
 
     enable_map = RadioField(
-        label=_("Coordinates"),
-        fieldset=_("General"),
+        label=_('Coordinates'),
+        fieldset=_('General'),
         choices=[
             (
                 'no',
-                _("Entries have no coordinates")
+                _('Entries have no coordinates')
             ),
             (
                 'entry',
-                _("Coordinates are shown on each entry")
+                _('Coordinates are shown on each entry')
             ),
             (
                 'everywhere',
-                _("Coordinates are shown on the directory and on each entry")
+                _('Coordinates are shown on the directory and on each entry')
             ),
         ],
         default='everywhere')
 
     title_format = StringField(
-        label=_("Title-Format"),
-        fieldset=_("Display"),
+        label=_('Title-Format'),
+        fieldset=_('Display'),
         validators=[InputRequired()],
         render_kw={'class_': 'formcode-format'})
 
     lead_format = StringField(
-        label=_("Lead-Format"),
-        fieldset=_("Display"),
+        label=_('Lead-Format'),
+        fieldset=_('Display'),
         render_kw={'class_': 'formcode-format'})
 
     empty_notice = StringField(
-        label=_("Empty Directory Notice"),
-        fieldset=_("Display"),
+        label=_('Empty Directory Notice'),
+        fieldset=_('Display'),
         description=_(
-            "This text will be displayed when the directory "
-            "contains no (visible) entries. When left empty "
-            "a generic default text will be shown instead."
+            'This text will be displayed when the directory '
+            'contains no (visible) entries. When left empty '
+            'a generic default text will be shown instead.'
         ))
 
     numbering = RadioField(
-        label=_("Numbering"),
-        fieldset=_("Display"),
+        label=_('Numbering'),
+        fieldset=_('Display'),
         choices=[
-            ('none', _("None")),
-            ('standard', _("Standard")),
-            ('custom', _("Custom"))
+            ('none', _('None')),
+            ('standard', _('Standard')),
+            ('custom', _('Custom'))
         ],
         default='none')
 
     numbers = TextAreaField(
-        label=_("Custom Numbering"),
-        fieldset=_("Display"),
+        label=_('Custom Numbering'),
+        fieldset=_('Display'),
         depends_on=('numbering', 'custom'),
         render_kw={
             'class_': 'formcode-select',
@@ -151,191 +154,206 @@ class DirectoryBaseForm(Form):
         })
 
     content_fields = TextAreaField(
-        label=_("Main view"),
-        fieldset=_("Display"),
+        label=_('Main view'),
+        fieldset=_('Display'),
         render_kw={'class_': 'formcode-select'})
 
     content_hide_labels = TextAreaField(
-        label=_("Hide these labels on the main view"),
-        fieldset=_("Display"),
+        label=_('Hide these labels on the main view'),
+        fieldset=_('Display'),
         render_kw={'class_': 'formcode-select'})
 
     contact_fields = TextAreaField(
-        label=_("Address"),
-        fieldset=_("Display"),
+        label=_('Address'),
+        fieldset=_('Display'),
         render_kw={
             'class_': 'formcode-select',
             'data-fields-exclude': 'fileinput,radio,checkbox'
         })
 
     keyword_fields = TextAreaField(
-        label=_("Filters"),
-        fieldset=_("Display"),
+        label=_('Filters'),
+        fieldset=_('Display'),
         render_kw={
             'class_': 'formcode-select',
             'data-fields-include': 'radio,checkbox'
         })
 
     thumbnail = TextAreaField(
-        label=_("Thumbnail"),
-        fieldset=_("Display"),
+        label=_('Thumbnail'),
+        fieldset=_('Display'),
         render_kw={
             'class_': 'formcode-select',
             'data-fields-include': 'fileinput'
         })
 
     show_as_thumbnails = TextAreaField(
-        label=_("Pictures to be displayed as thumbnails on an entry"),
-        fieldset=_("Display"),
+        label=_('Pictures to be displayed as thumbnails on an entry'),
+        fieldset=_('Display'),
         render_kw={
             'class_': 'formcode-select',
             'data-fields-include': 'fileinput'
         })
 
     overview_two_columns = BooleanField(
-        label=_("Overview layout with tiles"),
-        fieldset=_("Display"),
+        label=_('Overview layout with tiles'),
+        fieldset=_('Display'),
         default=False)
 
     address_block_title_type = RadioField(
-        label=_("Address Block Title"),
-        fieldset=_("Address Block"),
+        label=_('Address Block Title'),
+        fieldset=_('Address Block'),
         default='auto',
         choices=(
-            ('auto', _("The first line of the address")),
-            ('fixed', _("Static title")),
+            ('auto', _('The first line of the address')),
+            ('fixed', _('Static title')),
         )
     )
 
     address_block_title = StringField(
-        label=_("Title"),
-        fieldset=_("Address Block"),
+        label=_('Title'),
+        fieldset=_('Address Block'),
         depends_on=('address_block_title_type', 'fixed'),
     )
 
     marker_icon = IconField(
-        label=_("Icon"),
-        fieldset=_("Marker"))
+        label=_('Icon'),
+        fieldset=_('Marker'))
 
     marker_color_type = RadioField(
-        label=_("Marker Color"),
-        fieldset=_("Marker"),
+        label=_('Marker Color'),
+        fieldset=_('Marker'),
         choices=[
-            ('default', _("Default")),
-            ('custom', _("Custom"))
+            ('default', _('Default')),
+            ('custom', _('Custom'))
         ],
         default='default')
 
     marker_color_value = ColorField(
-        label=_("Color"),
-        fieldset=_("Marker"),
+        label=_('Color'),
+        fieldset=_('Marker'),
         depends_on=('marker_color_type', 'custom'))
 
     order = RadioField(
-        label=_("Order"),
-        fieldset=_("Order"),
+        label=_('Order'),
+        fieldset=_('Order'),
         choices=[
-            ('by-title', _("By title")),
-            ('by-format', _("By format"))
+            ('by-title', _('By title')),
+            ('by-format', _('By format'))
         ],
         default='by-title')
 
     order_format = StringField(
-        label=_("Order-Format"),
-        fieldset=_("Order"),
+        label=_('Order-Format'),
+        fieldset=_('Order'),
         render_kw={'class_': 'formcode-format'},
         validators=[InputRequired()],
         depends_on=('order', 'by-format'))
 
     order_direction = RadioField(
-        label=_("Direction"),
-        fieldset=_("Order"),
+        label=_('Direction'),
+        fieldset=_('Order'),
         choices=[
-            ('asc', _("Ascending")),
-            ('desc', _("Descending"))
+            ('asc', _('Ascending')),
+            ('desc', _('Descending'))
         ],
         default='asc')
 
     link_pattern = StringField(
-        label=_("Pattern"),
-        fieldset=_("External Link"),
+        label=_('Pattern'),
+        fieldset=_('External Link'),
         render_kw={'class_': 'formcode-format'})
 
     link_title = StringField(
-        label=_("Title"),
-        fieldset=_("External Link"))
+        label=_('Title'),
+        fieldset=_('External Link'))
 
     link_visible = BooleanField(
-        label=_("Visible"),
-        fieldset=_("External Link"),
+        label=_('Visible'),
+        fieldset=_('External Link'),
         default=True)
 
     enable_submissions = BooleanField(
-        label=_("Users may propose new entries"),
-        fieldset=_("New entries"),
+        label=_('Users may propose new entries'),
+        fieldset=_('New entries'),
         default=False)
 
     submissions_guideline = HtmlField(
-        label=_("Guideline"),
-        fieldset=_("New entries"),
+        label=_('Guideline'),
+        fieldset=_('New entries'),
         depends_on=('enable_submissions', 'y'))
 
     price = RadioField(
-        label=_("Price"),
-        fieldset=_("New entries"),
+        label=_('Price'),
+        fieldset=_('New entries'),
         choices=[
-            ('free', _("Free of charge")),
-            ('paid', _("Paid"))
+            ('free', _('Free of charge')),
+            ('paid', _('Paid'))
         ],
         default='free',
         depends_on=('enable_submissions', 'y'))
 
     price_per_submission = DecimalField(
-        label=_("Price per submission"),
-        fieldset=_("New entries"),
+        label=_('Price per submission'),
+        fieldset=_('New entries'),
         filters=(as_float, ),
         validators=[Optional()],
         depends_on=('enable_submissions', 'y', 'price', 'paid'))
 
     currency = StringField(
-        label=_("Currency"),
-        fieldset=_("New entries"),
-        default="CHF",
+        label=_('Currency'),
+        fieldset=_('New entries'),
+        default='CHF',
         depends_on=('enable_submissions', 'y', 'price', 'paid'),
         validators=[InputRequired()])
 
     enable_change_requests = BooleanField(
-        label=_("Users may send change requests"),
-        fieldset=_("Change requests"),
+        label=_('Users may send change requests'),
+        fieldset=_('Change requests'),
         default=False)
 
     change_requests_guideline = HtmlField(
-        label=_("Guideline"),
-        fieldset=_("Change requests"),
+        label=_('Guideline'),
+        fieldset=_('Change requests'),
         depends_on=('enable_change_requests', 'y'))
 
     enable_publication = BooleanField(
-        label=_("Enable publication dates"),
-        description=_("Users may suggest publication start and/or end "
-                      "of the entry on submissions and change requests"),
-        fieldset=_("Publication"),
+        label=_('Enable publication dates'),
+        description=_('Users may suggest publication start and/or end '
+                      'of the entry on submissions and change requests'),
+        fieldset=_('Publication'),
+        default=False)
+
+    enable_update_notifications = BooleanField(
+        label=_('Enable registering for update notifications'),
+        description=_('Users can register for updates on new entries'),
+        fieldset=_('Notifications'),
         default=False)
 
     required_publication = BooleanField(
-        label=_("Required publication dates"),
-        fieldset=_("Publication"),
+        label=_('Required publication dates'),
+        fieldset=_('Publication'),
         depends_on=('enable_publication', 'y'),
         default=False)
 
     submitter_meta_fields = MultiCheckboxField(
-        label=_("Information to be provided in addition to the E-mail"),
+        label=_('Information to be provided in addition to the E-mail'),
         choices=(
-            ('submitter_name', _("Name")),
-            ('submitter_address', _("Address")),
-            ('submitter_phone', _("Phone")),
+            ('submitter_name', _('Name')),
+            ('submitter_address', _('Address')),
+            ('submitter_phone', _('Phone')),
         ),
-        fieldset=_("Submitter")
+        fieldset=_('Submitter')
     )
+
+    layout = RadioField(
+        label=_('Layout'),
+        fieldset=_('Layout'),
+        choices=[
+            ('default', _('Default')),
+            ('accordion', _('Accordion')),
+        ],
+        default='default')
 
     @cached_property
     def known_field_ids(self) -> set[str] | None:
@@ -378,21 +396,21 @@ class DirectoryBaseForm(Form):
     def validate_title_format(self, field: 'Field') -> None:
         if self.missing_fields and 'title' in self.missing_fields:
             raise ValidationError(
-                _("The following fields are unknown: ${fields}", mapping={
+                _('The following fields are unknown: ${fields}', mapping={
                     'fields': ', '.join(self.missing_fields['title'])
                 }))
 
     def validate_lead_format(self, field: 'Field') -> None:
         if self.missing_fields and 'lead' in self.missing_fields:
             raise ValidationError(
-                _("The following fields are unknown: ${fields}", mapping={
+                _('The following fields are unknown: ${fields}', mapping={
                     'fields': ', '.join(self.missing_fields['lead'])
                 }))
 
     def validate_thumbnail(self, field: 'Field') -> None:
         if field.data and '\n' in field.data:
             raise ValidationError(
-                _("Please select at most one thumbnail field")
+                _('Please select at most one thumbnail field')
             )
 
     def validate_numbers(self, field: 'Field') -> None:
@@ -400,7 +418,7 @@ class DirectoryBaseForm(Form):
             '\n' in field.data or field.data == ''
         ):
             raise ValidationError(
-                _("Please select exactly one numbering field")
+                _('Please select exactly one numbering field')
             )
 
     def ensure_public_fields_for_submissions(self) -> bool | None:
@@ -417,17 +435,17 @@ class DirectoryBaseForm(Form):
             self.enable_submissions
         )
 
-        if not any((i.data for i in inputs)):
+        if not any(i.data for i in inputs):
             return None
 
         hidden = self.first_hidden_field(self.configuration)
 
         if hidden:
             msg = _(
-                "User submissions are not possible, because «${field}» "
-                "is not visible. Only if all fields are visible are user "
-                "submission possible - otherwise users may see data that "
-                "they are not intended to see. ", mapping={
+                'User submissions are not possible, because «${field}» '
+                'is not visible. Only if all fields are visible are user '
+                'submission possible - otherwise users may see data that '
+                'they are not intended to see. ', mapping={
                     'field': hidden.label
                 }
             )
@@ -524,7 +542,7 @@ class DirectoryBaseForm(Form):
         file_fields = [
             f.human_id
             for f in (self.known_fields or ())
-            if f.type in ('fileinput', 'multiplefileinput', 'url')
+            if f.type in ('fileinput', 'multiplefileinput', 'url', 'video_url')
         ]
         searchable_content_fields = [
             f for f in content_fields if f not in file_fields
@@ -604,7 +622,7 @@ class DirectoryBaseForm(Form):
             self.address_block_title.data = cfg.address_block_title
         else:
             self.address_block_title_type.data = 'auto'
-            self.address_block_title.data = ""
+            self.address_block_title.data = ''
 
     def populate_obj(self, obj: 'ExtendedDirectory') -> None:  # type:ignore
         super().populate_obj(obj, exclude={
@@ -643,13 +661,13 @@ else:
     ):
 
         minimum_price_args = PaymentForm.minimum_price_total.kwargs.copy()
-        minimum_price_args['fieldset'] = _("New entries")
+        minimum_price_args['fieldset'] = _('New entries')
         minimum_price_args['depends_on'] = ('enable_submissions', 'y')
 
         minimum_price_total = DecimalField(**minimum_price_args)
 
         payment_method_args = PaymentForm.payment_method.kwargs.copy()
-        payment_method_args['fieldset'] = _("New entries")
+        payment_method_args['fieldset'] = _('New entries')
         payment_method_args['depends_on'] = ('enable_submissions', 'y')
 
         payment_method = RadioField(**payment_method_args)
@@ -664,27 +682,27 @@ else:
 class DirectoryImportForm(Form):
 
     import_config = RadioField(
-        label=_("Apply directory configuration"),
+        label=_('Apply directory configuration'),
         choices=(
-            ('yes', _("Yes, import configuration and entries")),
-            ('no', _("No, only import entries"))
+            ('yes', _('Yes, import configuration and entries')),
+            ('no', _('No, only import entries'))
         ),
         default='no',
         validators=[InputRequired()]
     )
 
     mode = RadioField(
-        label=_("Mode"),
+        label=_('Mode'),
         choices=(
-            ('new', _("Only import new entries")),
-            ('replace', _("Replace all entries")),
+            ('new', _('Only import new entries')),
+            ('replace', _('Replace all entries')),
         ),
         default='new',
         validators=[InputRequired()]
     )
 
     zip_file = UploadField(
-        label=_("Import"),
+        label=_('Import'),
         validators=[
             DataRequired(),
             WhitelistedMimeType({
@@ -727,3 +745,43 @@ class DirectoryImportForm(Form):
         )
 
         return count
+
+
+class DirectoryUrlForm(ChangeAdjacencyListUrlForm):
+    """For changing the URL of a directory independent of the title."""
+
+    def validate_name(self, field: StringField) -> None:
+        if not self.name.data:
+            raise ValidationError(_('The name field cannot be empty.'))
+
+        model = self.get_model()
+        if model.name == self.name.data:
+            raise ValidationError(_('Please fill out a new name'))
+
+        normalized_name = normalize_for_url(self.name.data)
+        if self.name.data != normalized_name:
+            raise ValidationError(
+                _('Invalid name. A valid suggestion is: ${name}',
+                  mapping={'name': normalized_name})
+            )
+
+        # Query to check if the normalized name already exists
+        cls = model.__class__
+        session = self.request.session
+        query = session.query(cls).filter(
+            cls.name == normalized_name
+        )
+        if session.query(query.exists()).scalar():
+            raise ValidationError(
+                _('An entry with the same name exists')
+            )
+
+
+class DirectoryRecipientForm(Form):
+    """Form for adding recipients of entry updates to the directory."""
+
+    address = EmailField(
+        label=_('E-Mail'),
+        description='peter.muster@example.org',
+        validators=[InputRequired(), Email()]
+    )

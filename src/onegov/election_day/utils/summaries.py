@@ -1,16 +1,16 @@
-from onegov.ballot import Election
-from onegov.ballot import ElectionCompound
-from onegov.ballot import Vote
 from onegov.election_day.models import ArchivedResult
+from onegov.election_day.models import Election
+from onegov.election_day.models import ElectionCompound
+from onegov.election_day.models import Vote
 
 
 from typing import TYPE_CHECKING
 if TYPE_CHECKING:
     from collections.abc import Iterable
-    from onegov.ballot.models import ElectionCompoundPart
     from onegov.core.types import JSONObject_ro
+    from onegov.election_day.models import ElectionCompoundPart
     from onegov.election_day.request import ElectionDayRequest
-    from typing_extensions import TypeAlias
+    from typing import TypeAlias
 
     ElectionCompoundOrPart: TypeAlias = ElectionCompound | ElectionCompoundPart
 
@@ -55,6 +55,7 @@ def get_election_compound_summary(
         'completed': election_compound.completed,
         'date': election_compound.date.isoformat(),
         'domain': election_compound.domain,
+        'elected': election_compound.elected_candidates,
         'last_modified': last_modified.isoformat() if last_modified else None,
         'progress': {
             'counted': election_compound.progress[0] or 0,
@@ -81,7 +82,7 @@ def get_vote_summary(
     seriazable dict. """
 
     try:
-        divider = vote.ballots.count() or 1  # type:ignore[union-attr]
+        divider = len(vote.ballots) or 1  # type:ignore[union-attr]
     except AttributeError:
         divider = 1
 
@@ -109,7 +110,7 @@ def get_vote_summary(
     }
     if 'local' in (vote.meta or {}):
         summary['local'] = {
-            'answer': vote.local_answer or "",  # type:ignore
+            'answer': vote.local_answer or '',  # type:ignore
             'nays_percentage': vote.local_nays_percentage,  # type:ignore
             'yeas_percentage': vote.local_yeas_percentage,  # type:ignore
         }

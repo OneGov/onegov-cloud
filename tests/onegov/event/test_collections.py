@@ -1,8 +1,9 @@
 from datetime import date
 from datetime import datetime
 from datetime import timedelta
+from functools import lru_cache
 
-from fastcache import lru_cache
+import pytest
 from freezegun import freeze_time
 from markupsafe import escape
 
@@ -151,6 +152,17 @@ def test_event_collection_pagination(session):
     assert len(events.next.batch) == 12 - events.batch_size
     assert all([e.start.year == 2010 for e in events.next.batch])
     assert all([e.start.month > 10 for e in events.next.batch])
+
+
+def test_event_pagination_negative_page_index(session):
+    events = EventCollection(session, page=-1)
+    assert events.page == 0
+    assert events.page_index == 0
+    assert events.page_by_index(-2).page == 0
+    assert events.page_by_index(-3).page_index == 0
+
+    with pytest.raises(AssertionError):
+        EventCollection(None, page=None)
 
 
 def test_occurrence_collection(session):
@@ -396,7 +408,7 @@ def test_occurrence_collection_pagination(session):
                 for o in occurrences.batch])
 
 
-def test_occurrence_collection_for_filter(session):
+def test_occurrence_collection_for_toggled_keyword_value(session):
     config = {'keywords': ['Filter'], 'order': []}
     definition = """Filter *=
     ( ) Filter A
@@ -412,8 +424,49 @@ def test_occurrence_collection_for_filter(session):
         collection.set_event_filter_configuration(config)
         collection.set_event_filter_fields(fields_from_definition(definition))
 
-    occurrences = OccurrenceCollection(session=session)
+    occurrences = OccurrenceCollection(
+        session=session,
+        filter_keywords={'filter': ['Filter A']}
+    )
+    set_event_filter_config_and_fields(occurrences, config, definition)
 
+    occurrences = occurrences.for_toggled_keyword_value(
+        'filter',
+        'Filter B',
+        singular=True
+    )
+    assert occurrences.filter_keywords == {'filter': ['Filter B']}
+
+    occurrences = occurrences.for_toggled_keyword_value(
+        'filter',
+        'Filter B',
+        singular=True
+    )
+    assert occurrences.filter_keywords == {}
+
+    occurrences = occurrences.for_toggled_keyword_value(
+        'filter',
+        'Filter C',
+        singular=True
+    )
+    assert occurrences.filter_keywords == {'filter': ['Filter C']}
+
+    occurrences = occurrences.for_toggled_keyword_value(
+        'filter',
+        'Filter X',
+        singular=False
+    )
+    assert occurrences.filter_keywords == {'filter': ['Filter C', 'Filter X']}
+    occurrences = occurrences.for_toggled_keyword_value(
+        'filter',
+        'Filter X',
+        singular=False
+    )
+    assert occurrences.filter_keywords == {'filter': ['Filter C']}
+
+
+def test_occurrence_collection_for_filter(session):
+    occurrences = OccurrenceCollection(session=session)
     occurrences = occurrences.for_filter()
     assert occurrences.range is None
     assert occurrences.start is None
@@ -431,7 +484,6 @@ def test_occurrence_collection_for_filter(session):
         locations=['Bar'],
         filter_keywords={'filter': ['Filter A']}
     )
-    set_event_filter_config_and_fields(occurrences, config, definition)
     occurrences = occurrences.for_filter()
     assert occurrences.range is None
     assert occurrences.start == date(2009, 5, 1)
@@ -439,7 +491,6 @@ def test_occurrence_collection_for_filter(session):
     assert occurrences.outdated is False
     assert occurrences.tags == ['month-6']
     assert occurrences.locations == ['Bar']
-    assert occurrences.filter_keywords == {'filter': ['Filter A']}
 
     occurrences = occurrences.for_filter(start=date(2010, 5, 1))
     assert occurrences.range is None
@@ -448,7 +499,6 @@ def test_occurrence_collection_for_filter(session):
     assert occurrences.outdated is False
     assert occurrences.tags == ['month-6']
     assert occurrences.locations == ['Bar']
-    assert occurrences.filter_keywords == {'filter': ['Filter A']}
 
     occurrences = occurrences.for_filter(end=None, outdated=True)
     assert occurrences.range is None
@@ -457,47 +507,38 @@ def test_occurrence_collection_for_filter(session):
     assert occurrences.outdated is True
     assert occurrences.tags == ['month-6']
     assert occurrences.locations == ['Bar']
-    assert occurrences.filter_keywords == {'filter': ['Filter A']}
 
-    occurrences = occurrences.for_filter(tags=[], locations=[],
-                                         filter='Filter B', singular=True)
+    occurrences = occurrences.for_filter(tags=[], locations=[])
     assert occurrences.range is None
     assert occurrences.start == date(2010, 5, 1)
     assert occurrences.end is None
     assert occurrences.outdated is True
     assert occurrences.tags == []
     assert occurrences.locations == []
-    assert occurrences.filter_keywords == {'filter': ['Filter B']}
 
-    occurrences = occurrences.for_filter(tags=['a', 'b'], locations=['A', 'B'],
-                                         filter='Filter B', singular=True)
+    occurrences = occurrences.for_filter(tags=['a', 'b'], locations=['A', 'B'])
     assert occurrences.range is None
     assert occurrences.start == date(2010, 5, 1)
     assert occurrences.end is None
     assert occurrences.outdated is True
     assert occurrences.tags == ['a', 'b']
     assert occurrences.locations == ['A', 'B']
-    assert occurrences.filter_keywords == {}
 
-    occurrences = occurrences.for_filter(tag='c', location='C', range='today',
-                                         filter='Filter C', singular=True)
+    occurrences = occurrences.for_filter(tag='c', location='C', range='today')
     assert occurrences.range == 'today'
     assert occurrences.start == date.today()
     assert occurrences.end == date.today()
     assert occurrences.outdated is True
     assert occurrences.tags == ['a', 'b', 'c']
     assert occurrences.locations == ['A', 'B', 'C']
-    assert occurrences.filter_keywords == {'filter': ['Filter C']}
 
-    occurrences = occurrences.for_filter(tag='a', location='A',
-                                         filter='Filter X', singular=True)
+    occurrences = occurrences.for_filter(tag='a', location='A')
     assert occurrences.range == 'today'
     assert occurrences.start == date.today()
     assert occurrences.end == date.today()
     assert occurrences.outdated is True
     assert occurrences.tags == ['b', 'c']
     assert occurrences.locations == ['B', 'C']
-    assert occurrences.filter_keywords == {'filter': ['Filter X']}
 
     occurrences = occurrences.for_filter(range='today', start=date(2010, 5, 1))
     assert occurrences.range == 'today'
@@ -506,7 +547,6 @@ def test_occurrence_collection_for_filter(session):
     assert occurrences.outdated is True
     assert occurrences.tags == ['b', 'c']
     assert occurrences.locations == ['B', 'C']
-    assert occurrences.filter_keywords == {'filter': ['Filter X']}
 
     occurrences = occurrences.for_filter(start=date(2010, 5, 1))
     assert occurrences.range is None
@@ -515,7 +555,6 @@ def test_occurrence_collection_for_filter(session):
     assert occurrences.outdated is True
     assert occurrences.tags == ['b', 'c']
     assert occurrences.locations == ['B', 'C']
-    assert occurrences.filter_keywords == {'filter': ['Filter X']}
 
     occurrences = occurrences.for_filter(range='-', end=date(2010, 5, 1))
     assert occurrences.range is None
@@ -524,32 +563,34 @@ def test_occurrence_collection_for_filter(session):
     assert occurrences.outdated is True
     assert occurrences.tags == ['b', 'c']
     assert occurrences.locations == ['B', 'C']
-    assert occurrences.filter_keywords == {'filter': ['Filter X']}
 
 
 def test_occurrence_collection_outdated(session):
-    today = date.today()
-    for year in (today.year - 1, today.year, today.year + 1):
-        event = EventCollection(session).add(
-            title='Event {0}-{1}'.format(year, today.month),
-            start=datetime(year, today.month, today.day, 0, 0),
-            end=datetime(year, today.month, today.day, 23, 59),
-            timezone='US/Eastern'
-        )
-        event.submit()
-        event.publish()
+    with freeze_time("2024-02-28"):
+        today = date.today()
+        for year in (today.year - 1, today.year, today.year + 1):
+            event = EventCollection(session).add(
+                title='Event {0}-{1}'.format(year, today.month),
+                start=datetime(year, today.month, today.day, 0, 0),
+                end=datetime(year, today.month, today.day, 23, 59),
+                timezone='US/Eastern'
+            )
+            event.submit()
+            event.publish()
 
-    def query(**kwargs):
-        return OccurrenceCollection(session, **kwargs).query()
+        def query(**kwargs):
+            return OccurrenceCollection(session, **kwargs).query()
 
-    assert query(outdated=False).count() == 2
-    assert query(outdated=True).count() == 3
+        assert query(outdated=False).count() == 2
+        assert query(outdated=True).count() == 3
 
-    assert query(start=date(today.year - 1, 1, 1), outdated=False).count() == 2
-    assert query(start=date(today.year - 1, 1, 1), outdated=True).count() == 3
+        assert query(start=date(today.year - 1, 1, 1),
+                     outdated=False).count() == 2
+        assert query(start=date(today.year - 1, 1, 1),
+                     outdated=True).count() == 3
 
-    assert query(end=date.today(), outdated=False).count() == 1
-    assert query(end=date.today(), outdated=True).count() == 2
+        assert query(end=date.today(), outdated=False).count() == 1
+        assert query(end=date.today(), outdated=True).count() == 2
 
 
 def test_occurrence_collection_range_to_dates():

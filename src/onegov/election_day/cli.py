@@ -1,20 +1,19 @@
 """ Provides commands used to initialize election day websites. """
-from onegov.ballot import Election
-from onegov.ballot import ElectionCompound
-from onegov.ballot import Vote
+import click
+import os
+
 from onegov.core.cli import abort
 from onegov.core.cli import command_group
 from onegov.core.cli import pass_group_context
 from onegov.core.sms_processor import SmsQueueProcessor
 from onegov.election_day.collections import ArchivedResultCollection
 from onegov.election_day.models import ArchivedResult
+from onegov.election_day.models import Subscriber
 from onegov.election_day.utils import add_local_results
 from onegov.election_day.utils.archive_generator import ArchiveGenerator
 from onegov.election_day.utils.d3_renderer import D3Renderer
 from onegov.election_day.utils.pdf_generator import PdfGenerator
 from onegov.election_day.utils.svg_generator import SvgGenerator
-import click
-import os
 
 
 from typing import TYPE_CHECKING
@@ -23,7 +22,7 @@ if TYPE_CHECKING:
     from onegov.core.cli.core import GroupContext
     from onegov.election_day.app import ElectionDayApp
     from onegov.election_day.request import ElectionDayRequest
-    from typing_extensions import TypeAlias
+    from typing import TypeAlias
 
     Processor: TypeAlias = Callable[[ElectionDayRequest, ElectionDayApp], None]
 
@@ -46,9 +45,9 @@ def add(group_context: 'GroupContext') -> 'Processor':
     ) -> None:
         app.cache.flush()
         if not app.principal:
-            click.secho("principal.yml not found", fg='yellow')
+            click.secho('principal.yml not found', fg='yellow')
 
-        click.echo("Instance was created successfully")
+        click.echo('Instance was created successfully')
 
     return add_instance
 
@@ -173,18 +172,18 @@ def generate_archive() -> 'Processor':
         archive_generator = ArchiveGenerator(app)
         archive_zip = archive_generator.generate_archive()
         if not archive_zip:
-            abort("generate_archive returned None.")
+            abort('generate_archive returned None.')
 
         archive_filesize = archive_generator.archive_dir.getinfo(
             archive_zip, namespaces=['details']).size
 
         if archive_filesize == 0:
-            click.secho("Generated archive is empty", fg='red')
+            click.secho('Generated archive is empty', fg='red')
         else:
-            click.secho("Archive generated successfully:", fg='green')
+            click.secho('Archive generated successfully:', fg='green')
         absolute_path = archive_generator.archive_system_path
         if absolute_path:
-            click.secho(f"file://{absolute_path}")
+            click.secho(f'file://{absolute_path}')
 
     return generate
 
@@ -205,43 +204,20 @@ def update_archived_results(host: str, scheme: str) -> 'Processor':
     return generate
 
 
-@cli.command('update-last-result-change')
-def update_last_result_change() -> 'Processor':
-    """ Update the last result changes. """
+@cli.command('migrate-subscribers')
+def migrate_subscribers() -> 'Processor':
+    def migrate(request: 'ElectionDayRequest', app: 'ElectionDayApp') -> None:
+        if not app.principal or not app.principal.segmented_notifications:
+            return
 
-    def update(request: 'ElectionDayRequest', app: 'ElectionDayApp') -> None:
-        click.secho(f'Updating {app.schema}', fg='yellow')
-
-        count = 0
+        click.secho(f'Migrating {app.schema}', fg='yellow')
 
         session = request.app.session()
-        for election in session.query(Election):
-            result = election.results.first()
-            if result:
-                election.last_result_change = result.last_change
-                count += 1
+        subscribers = session.query(Subscriber).filter_by(domain=None)
+        count = 0
+        for subscriber in subscribers:
+            subscriber.domain = 'canton'
+            count += 1
+        click.echo(f'Migrated {count} subscribers')
 
-        for compound in session.query(ElectionCompound):
-            changes = [
-                change
-                for x in compound.elections
-                if (change := x.last_result_change)
-            ]
-            if changes:
-                compound.last_result_change = max(changes)
-                count += 1
-
-        for vote in session.query(Vote):
-            changes = [
-                change
-                for ballot in vote.ballots
-                if (res := ballot.results.first())
-                and (change := res.last_change)
-            ]
-            if changes:
-                vote.last_result_change = max(changes)
-                count += 1
-
-        click.secho(f'Updated {count} items', fg='green')
-
-    return update
+    return migrate

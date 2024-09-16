@@ -7,8 +7,24 @@ from onegov.org.initial_content import add_events
 from onegov.org.models import Organisation
 
 
-def create_new_organisation(app, name, reply_to=None, forms=None,
-                            create_files=True, path=None, locale='de_CH'):
+from typing import TYPE_CHECKING
+if TYPE_CHECKING:
+    from collections.abc import Iterable
+    from libres.context.core import Context as LibresContext
+    from onegov.core.framework import Framework
+    from translationstring import TranslationString
+
+
+def create_new_organisation(
+    app: 'Framework',
+    name: str,
+    reply_to: str | None = None,
+    forms: 'Iterable[tuple[str, str, str]] | None' = None,
+    create_files: bool = True,
+    path: str | None = None,
+    locale: str = 'de_CH'
+) -> Organisation:
+
     session = app.session()
 
     locales = {
@@ -39,12 +55,15 @@ def create_new_organisation(app, name, reply_to=None, forms=None,
         module_path('onegov.town6', form_locales[locale]))
 
     translator = app.translations.get(locale)
+    assert translator is not None
 
-    def translate(text):
+    def translate(text: 'TranslationString') -> str:
         return text.interpolate(translator.gettext(text))
 
     add_pages(session, path)
     add_builtin_forms(session, forms)
+    # FIXME: Framework & LibresIntegration would be more accurate
+    assert hasattr(app, 'libres_context')
     add_resources(app.libres_context)
     add_events(session, name, translate, create_files)
 
@@ -52,12 +71,13 @@ def create_new_organisation(app, name, reply_to=None, forms=None,
         add_filesets(session, name, path)
 
     session.flush()
+    return org
 
 
-def add_resources(libres_context):
+def add_resources(libres_context: 'LibresContext') -> None:
     resource = ResourceCollection(libres_context)
     resource.add(
-        "SBB-Tageskarte",
+        'SBB-Tageskarte',
         'Europe/Zurich',
         type='daypass',
         name='sbb-tageskarte'

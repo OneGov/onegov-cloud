@@ -1,7 +1,7 @@
 from datetime import date
-from onegov.ballot import Vote
-from onegov.ballot import Election
 from onegov.election_day.layouts import MailLayout
+from onegov.election_day.models import Election
+from onegov.election_day.models import Vote
 from tests.onegov.election_day.common import DummyRequest
 
 

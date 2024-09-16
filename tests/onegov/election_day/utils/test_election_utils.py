@@ -12,7 +12,6 @@ from onegov.election_day.utils.parties import get_party_results
 from onegov.election_day.utils.parties import get_party_results_data
 from onegov.election_day.utils.parties import get_party_results_deltas
 from onegov.election_day.utils.parties import get_party_results_seat_allocation
-from tests.onegov.election_day.common import print_errors
 
 
 def test_election_utils_majorz(import_test_datasets, session):
@@ -1215,12 +1214,18 @@ def test_election_utils_parties(import_test_datasets, session):
     assert_node(True, '#3f841a', 14, 'SVP')
 
     # incomplete data (only check for exceptions)
-    party_result = election.party_results.filter_by(year=2011, name='AL').one()
+    party_result = next((
+        r for r in election.party_results if r.year == 2011 and r.name == 'AL'
+    ), None)
     party_result.party_id = 'AL11'
     party_result.party_id = '6'
-    election.party_results.filter_by(year=2011, name='FDP').delete()
-    election.party_results.filter_by(year=2015, name='CVP').delete()
-    session.flush()
+    election.party_results = [
+        result for result in election.party_results
+        if not (
+            (result.year == 2011 and result.name == 'FDP')
+            or (result.year == 2015 and result.name == 'CVP')
+        )
+    ]
 
     years, parties = get_party_results(election)
     get_party_results_deltas(election, years, parties)
@@ -1297,7 +1302,6 @@ def test_get_connection_results_subconn_ids(import_test_datasets, session):
         dataset_name='test_nonunique_subconn_ids',
         app_session=session
     )
-    print_errors(errors)
     assert not errors
     results = get_connection_results_api(election, session)
     assert results['1']['total_votes'] == 3

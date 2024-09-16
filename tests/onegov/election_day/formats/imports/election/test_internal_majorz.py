@@ -1,10 +1,10 @@
 from datetime import date
 from io import BytesIO
-from onegov.ballot import Election
 from onegov.core.csv import convert_list_of_dicts_to_csv
-from onegov.election_day.formats import import_election_internal_majorz
 from onegov.election_day.formats import export_election_internal_majorz
+from onegov.election_day.formats import import_election_internal_majorz
 from onegov.election_day.models import Canton
+from onegov.election_day.models import Election
 
 from tests.onegov.election_day.common import create_principal
 
@@ -152,7 +152,7 @@ def test_import_internal_majorz_municipality_bern(
     assert election.invalid_ballots == 51
     assert round(election.turnout, 2) == 36.16
     assert election.allocated_mandates == 0
-    assert election.candidates.count() == 4
+    assert len(election.candidates) == 4
 
     # ... roundtrip
     csv = convert_list_of_dicts_to_csv(
@@ -178,7 +178,7 @@ def test_import_internal_majorz_municipality_bern(
     assert election.invalid_ballots == 51
     assert round(election.turnout, 2) == 36.16
     assert election.allocated_mandates == 0
-    assert election.candidates.count() == 4
+    assert len(election.candidates) == 4
 
 
 def test_import_internal_majorz_municipality_kriens(
@@ -488,7 +488,9 @@ def test_import_internal_majorz_expats(session):
                 ).encode('utf-8')), 'text/plain',
             )
             errors = [(e.line, e.error.interpolate()) for e in errors]
-            result = election.results.filter_by(entity_id=0).first()
+            result = next(
+                (r for r in election.results if r.entity_id == 0), None
+            )
             if has_expats:
                 assert errors == []
                 assert result.invalid_votes == 1
@@ -581,7 +583,7 @@ def test_import_internal_majorz_temporary_results(session):
     assert election.blank_ballots == 1
     assert election.invalid_ballots == 1
     assert election.accounted_votes == 52
-    assert election.candidates.one().votes == 1
+    assert election.candidates[0].votes == 1
 
 
 def test_import_internal_majorz_regional(session):
@@ -805,8 +807,8 @@ def test_import_internal_majorz_optional_columns(session):
         ).encode('utf-8')), 'text/plain',
     )
     assert not errors
-    candidate = election.candidates.one()
-    assert candidate.gender == 'female'
-    assert candidate.year_of_birth == 1970
-    assert election.results.filter_by(entity_id='1701').one().expats == 30
+    assert election.candidates[0].gender == 'female'
+    assert election.candidates[0].year_of_birth == 1970
+    result = next((r for r in election.results if r.entity_id == 1701))
+    assert result.expats == 30
     assert election.colors == {'FDP': '#123456'}

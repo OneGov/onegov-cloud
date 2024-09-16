@@ -1,5 +1,4 @@
 from decimal import Decimal
-from onegov.ballot import PartyResult
 from onegov.election_day import _
 from operator import itemgetter
 
@@ -9,11 +8,11 @@ from typing import Any
 from typing import TYPE_CHECKING
 if TYPE_CHECKING:
     from collections.abc import Sequence
-    from onegov.ballot.models import Election
-    from onegov.ballot.models import ElectionCompound
-    from onegov.ballot.models import ElectionCompoundPart
-    from onegov.ballot.models import ProporzElection
     from onegov.core.types import JSONObject_ro
+    from onegov.election_day.models import Election
+    from onegov.election_day.models import ElectionCompound
+    from onegov.election_day.models import ElectionCompoundPart
+    from onegov.election_day.models import ProporzElection
     from onegov.election_day.request import ElectionDayRequest
 
 
@@ -36,10 +35,12 @@ def get_party_results(
         item.historical_party_results if item.use_historical_party_results
         else item.party_results
     )
-    results = party_results.filter(PartyResult.domain == item.domain)
+    results = [r for r in party_results if r.domain == item.domain]
     domain_segment = getattr(item, 'segment', None)
     if domain_segment:
-        results = results.filter(PartyResult.domain_segment == domain_segment)
+        results = [
+            r for r in party_results if r.domain_segment == domain_segment
+        ]
 
     # Get the totals votes per year
     totals_votes = {r.year: r.total_votes for r in results}
@@ -113,7 +114,7 @@ def get_party_results_deltas(
                 values.get('name', ''),
                 values.get('mandates', ''),
                 values.get(attribute, {}).get('total', ''),
-                f'{permille/10}%' if permille else ''
+                f'{permille / 10}%' if permille else ''
             ]
 
             if deltas:
@@ -314,8 +315,10 @@ def get_parties_panachage_data(
         item
     )
 
-    results = item.party_panachage_results.all()
-    party_results = item.party_results.filter_by(year=item.date.year).all()
+    results = item.party_panachage_results
+    party_results = [
+        r for r in item.party_results if r.year == item.date.year
+    ]
     if not results:
         return {}
 
@@ -340,7 +343,7 @@ def get_parties_panachage_data(
     }
 
     # Create the links
-    links: list['JSONObject_ro'] = []
+    links: list[JSONObject_ro] = []
     for result in results:
         if result.source == result.target:
             continue
@@ -354,8 +357,8 @@ def get_parties_panachage_data(
 
     # Create the nodes
     names = {r.party_id: r.name for r in party_results}
-    blank = request.translate(_("Blank list")) if request else '-'
-    nodes: list['JSONObject_ro'] = [
+    blank = request.translate(_('Blank list')) if request else '-'
+    nodes: list[JSONObject_ro] = [
         {
             'name': names.get(party_id, '') or blank,
             'id': count + 1,

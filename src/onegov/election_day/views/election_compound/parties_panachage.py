@@ -1,7 +1,7 @@
-from onegov.ballot import ElectionCompound
-from onegov.core.security import Public
 from onegov.election_day import ElectionDayApp
 from onegov.election_day.layouts import ElectionCompoundLayout
+from onegov.election_day.models import ElectionCompound
+from onegov.election_day.security import MaybePublic
 from onegov.election_day.utils import add_last_modified_header
 from onegov.election_day.utils.parties import get_parties_panachage_data
 
@@ -17,7 +17,7 @@ if TYPE_CHECKING:
 @ElectionDayApp.json(
     model=ElectionCompound,
     name='parties-panachage-data',
-    permission=Public
+    permission=MaybePublic
 )
 def view_election_compound_parties_panachage_data(
     self: ElectionCompound,
@@ -35,7 +35,7 @@ def view_election_compound_parties_panachage_data(
     model=ElectionCompound,
     name='parties-panachage-chart',
     template='embed.pt',
-    permission=Public
+    permission=MaybePublic
 )
 def view_election_compound_parties_panachage_chart(
     self: ElectionCompound,
@@ -58,7 +58,7 @@ def view_election_compound_parties_panachage_chart(
     model=ElectionCompound,
     name='parties-panachage',
     template='election_compound/parties_panachage.pt',
-    permission=Public
+    permission=MaybePublic
 )
 def view_election_compound_parties_panachage(
     self: ElectionCompound,
@@ -74,7 +74,11 @@ def view_election_compound_parties_panachage(
     }
 
 
-@ElectionDayApp.svg_file(model=ElectionCompound, name='parties-panachage-svg')
+@ElectionDayApp.svg_file(
+    model=ElectionCompound,
+    name='parties-panachage-svg',
+    permission=MaybePublic
+)
 def view_election_compound_parties_panachage_svg(
     self: ElectionCompound,
     request: 'ElectionDayRequest'

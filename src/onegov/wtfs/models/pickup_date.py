@@ -5,7 +5,6 @@ from onegov.wtfs.models.municipality import Municipality
 from sqlalchemy import Column
 from sqlalchemy import Date
 from sqlalchemy import ForeignKey
-from sqlalchemy.orm import backref
 from sqlalchemy.orm import relationship
 from uuid import uuid4
 
@@ -31,17 +30,15 @@ class PickupDate(Base, TimestampMixin):
     #: the date
     date: 'Column[date_t]' = Column(Date, nullable=False)
 
-    #: the municipality.
+    #: the id of the municipality
     municipality_id: 'Column[uuid.UUID]' = Column(
         UUID,  # type:ignore[arg-type]
         ForeignKey(Municipality.id),
         nullable=False
     )
+
+    #: the municipality
     municipality: 'relationship[Municipality]' = relationship(
         Municipality,
-        backref=backref(
-            'pickup_dates',
-            lazy='dynamic',
-            order_by='PickupDate.date'
-        )
+        back_populates='pickup_dates'
     )

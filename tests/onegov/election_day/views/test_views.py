@@ -1,8 +1,13 @@
+import pyotp
+import transaction
+
 from freezegun import freeze_time
 from onegov import election_day
-from onegov.ballot import Ballot
-from onegov.ballot import Vote
 from onegov.election_day import ElectionDayApp
+from onegov.election_day.models import Ballot
+from onegov.election_day.models import Vote
+from onegov.user import UserCollection
+from sqlalchemy.orm.session import close_all_sessions
 from tests.onegov.election_day.common import login
 from tests.onegov.election_day.common import upload_election_compound
 from tests.onegov.election_day.common import upload_majorz_election
@@ -10,8 +15,8 @@ from tests.onegov.election_day.common import upload_party_results
 from tests.onegov.election_day.common import upload_proporz_election
 from tests.onegov.election_day.common import upload_vote
 from tests.shared import utils
-from transaction import commit
 from transaction import begin
+from transaction import commit
 from unittest.mock import patch
 from webtest import TestApp as Client
 from webtest.forms import Upload
@@ -22,6 +27,54 @@ def test_view_permissions():
     utils.assert_explicit_permissions(election_day, ElectionDayApp)
 
 
+def test_view_private(election_day_app_zg):
+    client = Client(election_day_app_zg)
+    client.get('/')
+
+    principal = election_day_app_zg.principal
+    principal.private = True
+    principal.reply_to = 'reply-to@example.org'
+    election_day_app_zg.cache.set('principal', principal)
+
+    client.get('/', status=403)
+    client.get('/locale/de_CH').follow()
+    login(client)
+
+
+def test_login_totp(election_day_app_zg):
+    election_day_app_zg.totp_enabled = True
+    client = Client(election_day_app_zg)
+
+    totp_secret = pyotp.random_base32()
+    totp = pyotp.TOTP(totp_secret)
+
+    # configure TOTP for admin user
+    users = UserCollection(client.app.session())
+    admin = users.by_username('admin@example.org')
+    admin.second_factor = {'type': 'totp', 'data': totp_secret}
+    transaction.commit()
+    close_all_sessions()
+
+    login_page = client.get('/').maybe_follow().click('Anmelden')
+    login_page.form['username'] = 'admin@example.org'
+    login_page.form['password'] = 'hunter2'
+
+    totp_page = login_page.form.submit().maybe_follow()
+    assert "Bitte geben Sie den sechsstelligen Code" in totp_page.text
+    totp_page.form['totp'] = 'bogus'
+    totp_page = totp_page.form.submit()
+    assert "Ungültige oder abgelaufenes TOTP eingegeben." in totp_page.text
+
+    totp_page.form['totp'] = totp.now()
+    page = totp_page.form.submit().maybe_follow()
+    assert 'Abmelden' in page
+    assert 'Anmelden' not in page
+
+    page = client.get('/').maybe_follow().click('Abmelden').maybe_follow()
+    assert 'Abmelden' not in page
+    assert 'Anmelden' in page
+
+
 def test_i18n(election_day_app_zg):
     client = Client(election_day_app_zg)
     client.get('/locale/de_CH').follow()
@@ -29,10 +82,10 @@ def test_i18n(election_day_app_zg):
     login(client)
 
     new = client.get('/manage/votes/new-vote')
-    new.form['vote_de'] = 'Foo'
-    new.form['vote_fr'] = 'Bar'
-    new.form['vote_it'] = 'Baz'
-    new.form['vote_rm'] = 'Qux'
+    new.form['title_de'] = 'Foo'
+    new.form['title_fr'] = 'Bar'
+    new.form['title_it'] = 'Baz'
+    new.form['title_rm'] = 'Qux'
     new.form['date'] = '2015-01-01'
     new.form['domain'] = 'federation'
     new.form.submit()
@@ -45,13 +98,13 @@ def test_i18n(election_day_app_zg):
     assert "Qux" in client.get('/').click('Rumantsch').follow()
 
     new = client.get('/manage/elections/new-election')
-    new.form['election_de'] = 'Tick'
-    new.form['election_fr'] = 'Trick'
-    new.form['election_it'] = 'Track'
-    new.form['election_rm'] = 'Quack'
+    new.form['title_de'] = 'Tick'
+    new.form['title_fr'] = 'Trick'
+    new.form['title_it'] = 'Track'
+    new.form['title_rm'] = 'Quack'
     new.form['date'] = '2015-01-01'
     new.form['mandates'] = 1
-    new.form['election_type'] = 'majorz'
+    new.form['type'] = 'majorz'
     new.form['domain'] = 'federation'
     new.form.submit()
 
@@ -103,7 +156,7 @@ def test_content_security_policy(election_day_app_zg):
     login(client)
 
     new = client.get('/manage/votes/new-vote')
-    new.form['vote_de'] = 'vote'
+    new.form['title_de'] = 'vote'
     new.form['date'] = '2015-01-01'
     new.form['domain'] = 'federation'
     new.form.submit()
@@ -144,7 +197,7 @@ def test_pages_cache(election_day_app_zg):
     login(client)
 
     new = client.get('/manage/votes/new-vote')
-    new.form['vote_de'] = '0xdeadbeef'
+    new.form['title_de'] = '0xdeadbeef'
     new.form['date'] = '2015-01-01'
     new.form['domain'] = 'federation'
     new.form.submit()
@@ -181,7 +234,7 @@ def test_pages_cache(election_day_app_zg):
 
     # Modify with invalidating the cache
     edit = client.get('/vote/0xdeadbeef/edit')
-    edit.form['vote_de'] = '0xd3adc0d3'
+    edit.form['title_de'] = '0xd3adc0d3'
     edit.form.submit()
 
     assert '0xd3adc0d3' in anonymous.get('/vote/0xdeadbeef/entities')
@@ -200,22 +253,22 @@ def test_view_last_modified(election_day_app_sg):
         login(client)
 
         new = client.get('/manage/votes/new-vote')
-        new.form['vote_type'] = "complex"
-        new.form['vote_de'] = "Vote"
+        new.form['type'] = "complex"
+        new.form['title_de'] = "Vote"
         new.form['date'] = '2013-01-01'
         new.form['domain'] = 'federation'
         new.form.submit()
 
         new = client.get('/manage/elections/new-election')
-        new.form['election_de'] = "Election"
+        new.form['title_de'] = "Election"
         new.form['date'] = '2013-01-01'
         new.form['mandates'] = 1
-        new.form['election_type'] = 'proporz'
+        new.form['type'] = 'proporz'
         new.form['domain'] = 'municipality'
         new.form.submit()
 
         new = client.get('/manage/election-compounds/new-election-compound')
-        new.form['election_de'] = "Elections"
+        new.form['title_de'] = "Elections"
         new.form['date'] = '2013-01-01'
         new.form['municipality_elections'] = ['election']
         new.form['domain'] = 'canton'
@@ -308,11 +361,13 @@ def test_view_pdf(election_day_app_zg):
     upload_vote(client)
     upload_majorz_election(client, canton='zg')
     upload_proporz_election(client, canton='zg')
+    upload_election_compound(client, canton='zg')
 
     paths = (
         '/vote/vote/pdf',
         '/election/majorz-election/pdf',
         '/election/proporz-election/pdf',
+        '/elections/elections/pdf',
     )
     for path in paths:
         assert client.get(path, expect_errors=True).status_code == 202
@@ -358,8 +413,21 @@ def test_view_pdf(election_day_app_zg):
         filenames.append(
             result.headers['Content-Disposition'].split('filename=')[1]
         )
+    with patch('onegov.election_day.layouts.election_compound.pdf_filename',
+               return_value='test.pdf'):
+        result = client.get('/elections/elections/pdf')
+        assert result.body == pdf
+        assert result.headers['Content-Type'] == 'application/pdf'
+        assert result.headers['Content-Length'] == '8'
+        assert result.headers['Content-Disposition'].startswith(
+            'inline; filename='
+        )
+        filenames.append(
+            result.headers['Content-Disposition'].split('filename=')[1]
+        )
 
     assert sorted(filenames) == [
+        'elections.pdf',
         'majorz-election.pdf',
         'proporz-election.pdf',
         'vote.pdf'
@@ -375,6 +443,7 @@ def test_view_svg(election_day_app_zg):
     upload_vote(client)
     upload_majorz_election(client, canton='zg')
     upload_proporz_election(client, canton='zg')
+    upload_election_compound(client, canton='zg')
 
     ballot_id = election_day_app_zg.session().query(Ballot).one().id
     paths = (
@@ -386,6 +455,11 @@ def test_view_svg(election_day_app_zg):
         '/election/proporz-election/lists-panachage-svg',
         '/election/proporz-election/connections-svg',
         '/election/proporz-election/party-strengths-svg',
+        '/election/proporz-election/parties-panachage-svg',
+        '/elections/elections/list-groups-svg',
+        '/elections/elections/parties-panachage-svg',
+        '/elections/elections/party-strengths-svg',
+        '/elections/elections/seat-allocation-svg',
     )
     for path in paths:
         assert client.get(path, expect_errors=True).status_code == 202
@@ -416,7 +490,22 @@ def test_view_svg(election_day_app_zg):
             )
     with patch('onegov.election_day.layouts.election.svg_filename',
                return_value='test.svg'):
-        for path in paths[2:]:
+        for path in paths[2:9]:
+            result = client.get(path)
+            assert result.body == svg
+            assert result.headers['Content-Type'] == (
+                'application/svg; charset=utf-8'
+            )
+            assert result.headers['Content-Length'] == '99'
+            assert result.headers['Content-Disposition'].startswith(
+                'inline; filename='
+            )
+            filenames.append(
+                result.headers['Content-Disposition'].split('filename=')[1]
+            )
+    with patch('onegov.election_day.layouts.election_compound.svg_filename',
+               return_value='test.svg'):
+        for path in paths[9:]:
             result = client.get(path)
             assert result.body == svg
             assert result.headers['Content-Type'] == (
@@ -430,11 +519,16 @@ def test_view_svg(election_day_app_zg):
                 result.headers['Content-Disposition'].split('filename=')[1]
             )
     assert sorted(filenames) == [
+        'elections-listengruppen.svg',
+        'elections-panaschierstatistik.svg',
+        'elections-parteistaerken.svg',
+        'elections-sitzverteilung.svg',
         'majorz-election-kandidierende.svg',
         'proporz-election-kandidierende.svg',
         'proporz-election-listen-listenverbindungen.svg',
         'proporz-election-listen-panaschierstatistik.svg',
         'proporz-election-listen.svg',
+        'proporz-election-parteien-panaschierstatistik.svg',
         'proporz-election-parteien-parteistaerken.svg',
         'vote-vorlage-gemeinden.svg',
         'vote-vorlage-gemeinden.svg'
@@ -536,28 +630,46 @@ def test_view_screen(election_day_app_zg):
 
     login(client)
 
-    # Add two votes
-    new = client.get('/manage/votes').click('Neue Abstimmung')
-    new.form['vote_de'] = 'Einfache Vorlage'
-    new.form['vote_type'] = 'simple'
-    new.form['date'] = '2016-01-01'
-    new.form['domain'] = 'federation'
-    new.form.submit().follow()
+    with freeze_time("2014-01-01 12:00"):
+        # Add two votes
+        new = client.get('/manage/votes').click('Neue Abstimmung')
+        new.form['title_de'] = 'Einfache Vorlage'
+        new.form['type'] = 'simple'
+        new.form['date'] = '2016-01-01'
+        new.form['domain'] = 'federation'
+        new.form.submit().follow()
 
-    # Add a screen
-    new = client.get('/manage/screens').click('Neuer Screen')
-    new.form['number'] = '10'
-    new.form['description'] = 'Mein Screen'
-    new.form['type'] = 'simple_vote'
-    new.form['simple_vote'] = 'einfache-vorlage'
-    new.form['structure'] = '<title />'
-    new.form['css'] = '/* Custom CSS */'
-    manage = new.form.submit().follow()
+        # Add a screen
+        new = client.get('/manage/screens').click('Neuer Screen')
+        new.form['number'] = '10'
+        new.form['description'] = 'Mein Screen'
+        new.form['type'] = 'simple_vote'
+        new.form['simple_vote'] = 'einfache-vorlage'
+        new.form['structure'] = '<model-title />'
+        new.form['css'] = '/* Custom CSS */'
+        manage = new.form.submit().follow()
+
     assert 'Mein Screen' in manage
     assert 'Einfache Vorlage' in manage
 
     view = client.get('/screen/10')
     assert 'Einfache Vorlage' in view
+
+    assert client.head('/screen/10').headers['Last-Modified']
+
+    assert client.get('/screen/10/json').json == {
+        'css': '/* Custom CSS */',
+        'description': 'Mein Screen',
+        'domain': None,
+        'domain_segment': None,
+        'duration': None,
+        'last_modified': '2014-01-01T12:00:00+00:00',
+        'model': 'einfache-vorlage',
+        'next': None,
+        'number': 10,
+        'structure': '<model-title />',
+        'type': 'simple_vote'
+    }
 
 
 def test_view_custom_css(election_day_app_zg):
@@ -581,7 +693,7 @@ def test_view_attachments(
 
     # Vote
     new = client.get('/manage/votes').click('Neue Abstimmung')
-    new.form['vote_de'] = 'vote'
+    new.form['title_de'] = 'vote'
     new.form['date'] = '2016-01-01'
     new.form['domain'] = 'federation'
     new.form['explanations_pdf'] = Upload(
@@ -599,9 +711,9 @@ def test_view_attachments(
 
     # Election
     new = client.get('/manage/elections').click('Neue Wahl')
-    new.form['election_de'] = 'election'
+    new.form['title_de'] = 'election'
     new.form['date'] = '2016-01-01'
-    new.form['election_type'] = 'proporz'
+    new.form['type'] = 'proporz'
     new.form['domain'] = 'region'
     new.form['mandates'] = 1
     new.form['explanations_pdf'] = Upload(
@@ -619,7 +731,7 @@ def test_view_attachments(
 
     # Election Compound
     new = client.get('/manage/election-compounds').click('Neue Verbindung')
-    new.form['election_de'] = 'elections'
+    new.form['title_de'] = 'elections'
     new.form['date'] = '2016-01-01'
     new.form['domain'] = 'canton'
     new.form['domain_elections'] = 'region'

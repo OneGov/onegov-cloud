@@ -11,7 +11,7 @@ from wtforms.validators import DataRequired
 class UploadPartyResultsForm(Form):
 
     parties = UploadField(
-        label=_("Party results"),
+        label=_('Party results'),
         validators=[
             DataRequired(),
             WhitelistedMimeType(ALLOWED_MIME_TYPES),

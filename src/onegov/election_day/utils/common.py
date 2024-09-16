@@ -1,9 +1,8 @@
 from collections import OrderedDict
-from onegov.ballot import ComplexVote
-from onegov.ballot import Vote
 from onegov.core.utils import append_query_param
 from onegov.election_day import _
-from sqlalchemy import desc
+from onegov.election_day.models import ComplexVote
+from onegov.election_day.models import Vote
 from urllib.parse import urlsplit
 from urllib.parse import urlunsplit
 
@@ -13,11 +12,10 @@ from typing import TypeVar
 from typing import TYPE_CHECKING
 if TYPE_CHECKING:
     from datetime import datetime
-    from onegov.ballot.models import Election
-    from onegov.ballot.models import ElectionCompound
     from onegov.core.types import AppenderQuery
     from onegov.election_day.models import ArchivedResult
     from onegov.election_day.models import Canton
+    from onegov.election_day.models import Election
     from onegov.election_day.models import Municipality
     from onegov.election_day.models import Notification
     from onegov.election_day.request import ElectionDayRequest
@@ -37,12 +35,13 @@ _ParamT = TypeVar('_ParamT', int, bool, list[Any])
 
 def sublist_name_from_connection_id(conn_name: str, subconn_name: str) -> str:
     """
-    Removes prefixed parent_connection_id from connection_id
-    as introduced by sesam 2019.09
+    Removes prefixed parent_connection_id from connection_id as introduced by
+    sesam 2019.09
+
     :param conn_name: list connection name aka parent_connection_id
     :param subconn_name: subconnection name aka connection_id
     """
-    # FIXME: Should this be replaced with str.removeprefix?
+
     return conn_name.replace(subconn_name, '', 1) or conn_name
 
 
@@ -65,7 +64,7 @@ def add_last_modified_header(
     if last_modified:
         response.headers.add(
             'Last-Modified',
-            last_modified.strftime("%a, %d %b %Y %H:%M:%S GMT")
+            last_modified.strftime('%a, %d %b %Y %H:%M:%S GMT')
         )
 
 
@@ -103,32 +102,35 @@ def add_local_results(
             nays = None
             answer = None
 
-            proposal_q = vote.proposal.results
-            proposal_q = proposal_q.filter_by(entity_id=entity_id)
-            proposal = proposal_q.first()
+            proposal = None
+            for result in vote.proposal.results:
+                if str(result.entity_id) == entity_id:
+                    proposal = result
 
             if proposal and proposal.counted:
-                if vote.type == 'complex':
-                    assert isinstance(vote, ComplexVote)
-                    counter_q = vote.counter_proposal.results
-                    counter_q = counter_q.filter_by(entity_id=entity_id)
-                    counter = counter_q.first()
-                    assert counter is not None
+                if isinstance(vote, ComplexVote):
+                    counter_proposal = None
+                    for result in vote.counter_proposal.results:
+                        if str(result.entity_id) == entity_id:
+                            counter_proposal = result
+                    assert counter_proposal is not None
 
-                    tie_q = vote.tie_breaker.results
-                    tie_q = tie_q.filter_by(entity_id=entity_id)
-                    tie = tie_q.first()
+                    tie_breaker = None
+                    for result in vote.tie_breaker.results:
+                        if str(result.entity_id) == entity_id:
+                            tie_breaker = result
+                    assert tie_breaker is not None
 
                     answer = ComplexVote.get_answer(
-                        counter.counted,
+                        counter_proposal.counted,
                         proposal,
-                        counter,
-                        tie
+                        counter_proposal,
+                        tie_breaker
                     )
                     if answer:
                         if answer == 'counter-proposal':
-                            yeas = counter.yeas
-                            nays = counter.nays
+                            yeas = counter_proposal.yeas
+                            nays = counter_proposal.nays
                         else:
                             yeas = proposal.yeas
                             nays = proposal.nays
@@ -142,14 +144,6 @@ def add_local_results(
                 target.local_answer = answer
                 target.local_yeas_percentage = yeas_percentage
                 target.local_nays_percentage = 100 - yeas_percentage
-
-
-def get_last_notified(model: 'HasNotifications') -> str | None:
-    from onegov.election_day.models.notification import Notification
-
-    query = model.notifications.filter(Notification.type == 'websocket')
-    result = query.order_by(desc(Notification.created)).first()
-    return result.created.isoformat() if result else None
 
 
 def get_parameter(
@@ -190,13 +184,13 @@ def get_parameter(
 
 def get_entity_filter(
     request: 'ElectionDayRequest',
-    item: 'Election | ElectionCompound',
+    item: 'Election',
     view: str,
     selected: str | None
 ) -> list[tuple[str, bool, str]]:
 
     url = request.link(item, view)
-    result = sorted((
+    result = sorted(
         (
             entity,
             entity == selected,
@@ -204,7 +198,7 @@ def get_entity_filter(
         )
         for result in item.results
         if (entity := result.name)
-    ))
+    )
     result.insert(0, (_('All'), not selected, url))
     return result
 

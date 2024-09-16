@@ -1,9 +1,9 @@
 from onegov.activity.models.occasion import Occasion
 from onegov.activity.models.period import Period
 from onegov.activity.utils import extract_thumbnail, extract_municipality
-from onegov.core.orm import Base
+from onegov.core.orm import Base, observes
 from onegov.core.orm.mixins import (
-    content_property,
+    dict_markup_property,
     ContentMixin,
     meta_property,
     TimestampMixin,
@@ -16,7 +16,6 @@ from sqlalchemy import exists, and_, desc
 from sqlalchemy.dialects.postgresql import HSTORE
 from sqlalchemy.ext.mutable import MutableDict
 from sqlalchemy.orm import object_session, relationship
-from sqlalchemy_utils import observes
 from uuid import uuid4
 
 
@@ -28,7 +27,7 @@ if TYPE_CHECKING:
     from onegov.activity.models import PublicationRequest
     from onegov.core.orm.mixins import dict_property
     from typing import Literal
-    from typing_extensions import Self, TypeAlias
+    from typing import Self, TypeAlias
 
     ActivityState: TypeAlias = Literal[
         'preview',
@@ -78,7 +77,7 @@ class Activity(Base, ContentMixin, TimestampMixin):
     lead: 'dict_property[str | None]' = meta_property()
 
     #: Describes the activity in detail
-    text: 'dict_property[str | None]' = content_property()
+    text = dict_markup_property('content')
 
     #: The thumbnail shown in the overview
     thumbnail: 'dict_property[str | None]' = meta_property()
@@ -114,7 +113,7 @@ class Activity(Base, ContentMixin, TimestampMixin):
     occasions: 'relationship[list[Occasion]]' = relationship(
         Occasion,
         order_by='Occasion.order',
-        backref='activity'
+        back_populates='activity'
     )
 
     #: the type of the item, this can be used to create custom polymorphic
@@ -134,9 +133,12 @@ class Activity(Base, ContentMixin, TimestampMixin):
         default='preview'
     )
 
-    if TYPE_CHECKING:
-        # FIXME: replace with explicit backref with back_populates
-        publication_requests: relationship[list[PublicationRequest]]
+    #: The publication requests linked to this activity
+    publication_requests: 'relationship[list[PublicationRequest]]'
+    publication_requests = relationship(
+        'PublicationRequest',
+        back_populates='activity'
+    )
 
     __mapper_args__ = {
         'polymorphic_on': 'type',
@@ -172,7 +174,7 @@ class Activity(Base, ContentMixin, TimestampMixin):
     # FIXME: asymmetric property
     @tags.setter
     def tags(self, value: 'Iterable[str]') -> None:
-        self._tags = {k: '' for k in value} if value else None
+        self._tags = dict.fromkeys(value, '') if value else None
 
     def propose(self) -> 'Self':
         assert self.state in ('preview', 'proposed')
@@ -214,7 +216,11 @@ class Activity(Base, ContentMixin, TimestampMixin):
 
         return q.first()
 
-    def request_by_period(self, period: Period) -> 'PublicationRequest | None':
+    def request_by_period(
+        self,
+        period: Period | None
+    ) -> 'PublicationRequest | None':
+
         if not period:
             return None
         q = self.requests.query()

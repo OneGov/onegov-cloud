@@ -35,6 +35,6 @@
         </div>
 
         <tal:b metal:use-macro="layout.macros.page_content"
-         tal:define="lead page.content.get('lead');text page.content.get('text'); people page.people; contact page.contact_html; coordinates page.coordinates; files page.files" />
+         tal:define="lead page.content.get('lead');text page.text|None; people page.people; contact page.get_contact_html(request); coordinates page.coordinates; files page.files; sidepanel_links page.sidepanel_links|False;" />
     </tal:b>
 </div>

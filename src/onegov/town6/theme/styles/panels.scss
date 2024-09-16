@@ -128,10 +128,6 @@ $publications-icon: '\f1ea';
             padding-right: $panel-icon-padding-right;
         }
 
-        .callout {
-            border: 0;
-        }
-
         a {
             @include more-link-after;
             color: $primary-fg-color !important;
@@ -273,14 +269,7 @@ $checklist-icon: "\f0ae";
 }
 
 .people-panel {
-    li div:first-of-type {
-        margin-top: .3rem;
-    }
-
-    ul div {
-        color: #444;
-        margin-top: -10px !important;
-    }
+    margin-top: 2rem;
 }
 
 .page-content-sidebar {

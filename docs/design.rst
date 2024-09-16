@@ -75,12 +75,7 @@ framework based on Morepath, to find a path out of our reliance on Plone.
 Learning Morepath is essential to learn more about OneGov Cloud. Here are
 a few good starting points.
 
-First, a general overview over framework patterns, which nicely presents the
-case for Morepath:
-
-https://blog.startifact.com/posts/framework-patterns.html
-
-Second, an introductory video (25 mins):
+Here's an introductory video (25 mins):
 
 https://www.youtube.com/watch?v=gyDKMAWPyuY
 
