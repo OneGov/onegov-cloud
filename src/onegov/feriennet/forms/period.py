@@ -20,6 +20,7 @@ from wtforms.validators import InputRequired, Optional, NumberRange
 
 from typing import Any, TYPE_CHECKING
 if TYPE_CHECKING:
+    from onegov.activity.models import PeriodMeta
     from onegov.feriennet.request import FeriennetRequest
     from wtforms.fields.choices import _Choice
 
@@ -47,7 +48,7 @@ class PeriodSelectForm(Form):
             self.period.data)
 
     @property
-    def active_period(self) -> Period | None:
+    def active_period(self) -> 'PeriodMeta | None':
         return self.request.app.active_period
 
     def on_request(self) -> None:

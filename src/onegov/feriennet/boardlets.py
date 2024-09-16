@@ -13,7 +13,7 @@ from sqlalchemy import func
 from typing import Literal, TYPE_CHECKING
 if TYPE_CHECKING:
     from collections.abc import Iterator
-    from onegov.activity.models import Period
+    from onegov.activity.models import PeriodMeta
     from onegov.activity.models.booking import BookingState
     from onegov.feriennet.collections.match import OccasionState
     from onegov.feriennet.request import FeriennetRequest
@@ -29,7 +29,7 @@ class FeriennetBoardlet(Boardlet):
         return self.request.session
 
     @cached_property
-    def period(self) -> 'Period | None':
+    def period(self) -> 'PeriodMeta | None':
         return self.request.app.active_period
 
     @cached_property

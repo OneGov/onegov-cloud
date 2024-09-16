@@ -1,7 +1,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE 1.0\n"
-"POT-Creation-Date: 2024-09-11 10:07+0200\n"
+"POT-Creation-Date: 2024-09-16 11:07+0200\n"
 "PO-Revision-Date: 2022-03-15 10:21+0100\n"
 "Last-Translator: Marc Sommerhalder <marc.sommerhalder@seantis.ch>\n"
 "Language-Team: German\n"
@@ -1468,6 +1468,18 @@ msgstr "Instagram"
 msgid "URL pointing to the Instagram site"
 msgstr "Link zu Instagram"
 
+msgid "Linkedin"
+msgstr "LinkedIn"
+
+msgid "URL pointing to the LinkedIn site"
+msgstr "Link zu LinkedIn"
+
+msgid "TikTok"
+msgstr "TikTok"
+
+msgid "URL pointing to the TikTok site"
+msgstr "Link zu TikTok"
+
 msgid "Custom Link 1"
 msgstr "Benutzerdefinierter Link 1"
 
@@ -2637,8 +2649,14 @@ msgstr "Der Änderungsvorschlag wurde abgelehnt"
 msgid "The rejection was already withdrawn"
 msgstr "Die Ablehnung wurde bereits zurückgezogen"
 
+msgid "The directory entry submission rejection has been withdrawn"
+msgstr "Die Ablehnung Ihres Verzeichniseintrages wurde zurückgezogen"
+
 msgid "The rejection of the entry has been withdrawn"
 msgstr "Die Ablehnung des Verzeichniseintrags wurde zurückgezogen"
+
+msgid "The directory change submission rejection has been withdrawn"
+msgstr "Die Ablehnung Ihres Änderungsvorschlages wurde zurückgezogen"
 
 msgid "The rejection of the change has been withdrawn"
 msgstr "Die Ablehnung der Änderung wurde zurückgezogen"
@@ -2925,8 +2943,8 @@ msgstr "Die Absage von ${title} kann nicht rückgängig gemacht werden."
 msgid "Reject reservation"
 msgstr "Reservation absagen"
 
-#.
 #. Used in sentence: "${event} published."
+#.
 msgid "Event"
 msgstr "Veranstaltung"
 
@@ -3762,7 +3780,7 @@ msgstr ""
 "diese Nachricht ignorieren."
 
 msgid "Click here to unsubscribe."
-msgstr "Klicken Sie hier um sich abzumelden."
+msgstr "Klicken Sie hier, um sich abzumelden."
 
 msgid ""
 "You are receiving this mail because you subscribed to getting notifications "
@@ -3979,7 +3997,10 @@ msgstr ""
 "haben."
 
 msgid "Click here to view web version."
-msgstr "Klicken Sie hier um die Web-Version anzuzeigen."
+msgstr "Klicken Sie hier, um die Web-Version anzuzeigen."
+
+msgid "You no longer wish to receive the newsletter?"
+msgstr "Sie möchten den Newsletter nicht mehr erhalten?"
 
 msgid "Click the following link to set a new password:"
 msgstr "Klicken Sie auf den folgenden Link, um ein neues Passwort zu setzen:"
@@ -6114,12 +6135,6 @@ msgstr "Ein Konto wurde für Sie erstellt"
 
 msgid "The user was created successfully"
 msgstr "Der Benutzer wurde erfolgreich erstellt"
-
-msgid "The directory entry submission rejection has been withdrawn"
-msgstr "Die Ablehnung Ihres Verzeichniseintrages wurde zurückgezogen"
-
-msgid "The directory change submission rejection has been withdrawn"
-msgstr "Die Ablehnung Ihres Änderungsvorschlages wurde zurückgezogen"
 
 #~ msgid "Directory change rejected"
 #~ msgstr "Verzeichnisänderung abgelehnt"

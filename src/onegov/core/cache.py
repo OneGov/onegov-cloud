@@ -50,7 +50,7 @@ if TYPE_CHECKING:
     from collections.abc import Callable
     from dogpile.cache.api import NoValue
 
-    _F = TypeVar('_F', bound='Callable[..., Any]')
+    _F = TypeVar('_F', bound=Callable[..., Any])
 
 
 @overload

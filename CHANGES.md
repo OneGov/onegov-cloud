@@ -1,8 +1,123 @@
 # Changes
 
+## 2024.47
+
+`2024-09-13` | [4830594bc9...f8645321a0](https://github.com/OneGov/onegov-cloud/compare/4830594bc9^...f8645321a0)
+
+### Api
+
+##### Only log unexpected exceptions in `ApiException`
+
+`Bugfix` | [d64955e5c6](https://github.com/onegov/onegov-cloud/commit/d64955e5c68eec6fffefde7f9ce69f543e9be87c)
+
+### Fsi
+
+##### Hide OGC-Login in FSI in production
+
+`Feature` | [8d38490cfe](https://github.com/onegov/onegov-cloud/commit/8d38490cfea440623a679d744fa34b8b363b0913)
+
+##### Search Layout Error
+
+`Bugfix` | [ee376cdd14](https://github.com/onegov/onegov-cloud/commit/ee376cdd141391e40c46ad8a2f41cee69177c471)
+
+### Intranet
+
+##### Hide search form
+
+Hide search form if client isn't logged in
+
+`Bugfix` | [OGC-1793](https://linear.app/onegovcloud/issue/OGC-1793) | [7f16b0dd21](https://github.com/onegov/onegov-cloud/commit/7f16b0dd21518440c97ce67d0d53b0a63045c86e)
+
+### Landsgemeinde
+
+##### Remove extra titles for assembly items
+
+`Feature` | [OGC-1808](https://linear.app/onegovcloud/issue/OGC-1808) | [47768a5c28](https://github.com/onegov/onegov-cloud/commit/47768a5c28b629dabed535b962950c9b1ef244ea)
+
+### Org
+
+##### Avoids expensive query when no filters have been defined
+
+`Bugfix` | [5cb2d88abb](https://github.com/onegov/onegov-cloud/commit/5cb2d88abb3321827c2d866dd9a1fffc71732d41)
+
+##### Only sends directory entry notifications for public entries
+
+`Bugfix` | [OGC-1806](https://linear.app/onegovcloud/issue/OGC-1806) | [fb931d37bc](https://github.com/onegov/onegov-cloud/commit/fb931d37bca57c5edb93c5dc03b0715d4e5d5dc7)
+
+##### Also avoids sending a notification for unpublished entries
+
+`Bugfix` | [OGC-1806](https://linear.app/onegovcloud/issue/OGC-1806) | [291df80027](https://github.com/onegov/onegov-cloud/commit/291df80027dbea6d7ed7a3518adc819cf2fb5bd1)
+
+##### Avoids storing ORM objects in `orm_cached` properties
+
+This should improve reliability and should introduce less flaky
+behavior caused by incorrect merges of objects into the session.
+
+`Bugfix` | [OGC-1813](https://linear.app/onegovcloud/issue/OGC-1813) | [f8645321a0](https://github.com/onegov/onegov-cloud/commit/f8645321a0cd0bad94aaff4a1879fc98e8cedf6c)
+
+### People
+
+##### Vcard export fails if no zip code was provided in fields `location_code_city` or `postal_code_city`
+
+`Bugfix` | [OGC-1826](https://linear.app/onegovcloud/issue/OGC-1826) | [9254b4e9cf](https://github.com/onegov/onegov-cloud/commit/9254b4e9cf09442e2ea98a98609833f0910b1b9a)
+
+### Swissvotes
+
+##### Additional Column for LeeWas polls
+
+`Feature` | [SWI-50](https://linear.app/swissvotes/issue/SWI-50) | [f96344313f](https://github.com/onegov/onegov-cloud/commit/f96344313fbabfc5cd7fbec14598911eb2692531)
+
+### Ticket
+
+##### Directory Entry Handler allows to withdraw ticket rejection
+
+`Feature` | [OGC-1765](https://linear.app/onegovcloud/issue/OGC-1765) | [048124170c](https://github.com/onegov/onegov-cloud/commit/048124170cca270ced2a2f6fcde6ef78765ea9c1)
+
+### Town6
+
+##### Adds footer settings for linkedin and tiktok
+
+`Feature` | [OGC-1791](https://linear.app/onegovcloud/issue/OGC-1791) | [93f6678e46](https://github.com/onegov/onegov-cloud/commit/93f6678e465a911b327e24330886eebf37a68cad)
+
+##### Improve /files layout style
+
+`Feature` | [NONE](#NONE) | [7e7cd8987e](https://github.com/onegov/onegov-cloud/commit/7e7cd8987e111691fd24d5e19fc7fee8f38aa343)
+
+##### Field Display
+
+Remove field if there are no TicketPermissions
+
+`Bugfix` | [OGC-1766](https://linear.app/onegovcloud/issue/OGC-1766) | [4d97fe7ab3](https://github.com/onegov/onegov-cloud/commit/4d97fe7ab352fd3de906e5a4e72376fa976e98cc)
+
+##### Survey Export Town6
+
+`Bugfix` | [OGC-1821](https://linear.app/onegovcloud/issue/OGC-1821) | [541b6ae8b5](https://github.com/onegov/onegov-cloud/commit/541b6ae8b55583ca236d32b50673ccf3752f7874)
+
+### Translator
+
+##### Adjust template variable name for multiple nationalities
+
+`Bugfix` | [OGC-1805](https://linear.app/onegovcloud/issue/OGC-1805) | [19e3929e07](https://github.com/onegov/onegov-cloud/commit/19e3929e07ef2f7116c91d1ada934eeed2f4f52b)
+
+##### Fix missing translation in AKK ticket
+
+`Bugfix` | [OGC-1820](https://linear.app/onegovcloud/issue/OGC-1820) | [dc97c20907](https://github.com/onegov/onegov-cloud/commit/dc97c209071e320c310d10e8b3007f36c6b9ca33)
+
+### User
+
+##### Makes SLO with SAML2 optional
+
+`Feature` | [OGC-1751](https://linear.app/onegovcloud/issue/OGC-1751) | [60107a76d3](https://github.com/onegov/onegov-cloud/commit/60107a76d3343340a73a1ad574bfe4465fae7d2c)
+
+### Winterthur
+
+##### Roadwork show title
+
+`Bugfix` | [OGC-1706](https://linear.app/onegovcloud/issue/OGC-1706) | [7eca0726c1](https://github.com/onegov/onegov-cloud/commit/7eca0726c1f28b6a55fa38055601873fdf2b811c)
+
 ## 2024.46
 
-`2024-08-30` | [9346ca33c7...9346ca33c7](https://github.com/OneGov/onegov-cloud/compare/9346ca33c7^...9346ca33c7)
+`2024-08-30` | [9346ca33c7...bdcf6b6ed8](https://github.com/OneGov/onegov-cloud/compare/9346ca33c7^...bdcf6b6ed8)
 
 ## 2024.45
 
@@ -2080,28 +2195,4 @@ transaction and avoids eventual problems with postgres closing the
 connections.
 
 `Bugfix` | [8c67b2ec59](https://github.com/onegov/onegov-cloud/commit/8c67b2ec594123fe0968e986a3b99fe8a1800b37)
-
-## 2023.60
-
-`2023-11-17` | [971ba389e7...c6deafa7a4](https://github.com/OneGov/onegov-cloud/compare/971ba389e7^...c6deafa7a4)
-
-### Search
-
-##### Search results for events now also show the event start time
-
-`Bugfix` | [OGC-1331](https://linear.app/onegovcloud/issue/OGC-1331) | [fa0d2b9393](https://github.com/onegov/onegov-cloud/commit/fa0d2b9393a4ee822b0faac11fe8c0087e407485)
-
-### Tickets
-
-##### Condense ticket status message when closed
-
-`Feature` | [OGC-1330](https://linear.app/onegovcloud/issue/OGC-1330) | [971ba389e7](https://github.com/onegov/onegov-cloud/commit/971ba389e7fc561db09c07ff4591e3c6541ef0ff)
-
-### Town6
-
-##### Add Test Version of Chat-Function
-
-Town6: Add Test Version of Chat-Function
-
-`Feature` | [16c237773f](https://github.com/onegov/onegov-cloud/commit/16c237773f211243a82f6382ffdb17b8a71a962f)
 

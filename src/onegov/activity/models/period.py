@@ -22,22 +22,251 @@ from sqlalchemy.orm import validates
 from uuid import uuid4
 
 
-from typing import Any, ClassVar, TYPE_CHECKING
+from typing import Any, ClassVar, NamedTuple, NoReturn, TYPE_CHECKING
 if TYPE_CHECKING:
     import uuid
     from collections.abc import Iterator
     from decimal import Decimal
     from onegov.activity.matching.score import Scoring
     from onegov.activity.models import Invoice, PublicationRequest
+    from sqlalchemy.orm import Session
 
 
-class Period(Base, TimestampMixin):
-
-    __tablename__ = 'periods'
+class PeriodMixin:
 
     # It's doubtful that the Ferienpass would ever run anywhere else but
     # in Switzerland ;)
     timezone: ClassVar[str] = 'Europe/Zurich'
+
+    if TYPE_CHECKING:
+        # forward declare required attributes
+        @property
+        def active(self) -> Column[bool] | bool: ...
+        @property
+        def confirmed(self) -> Column[bool] | bool: ...
+        @property
+        def finalized(self) -> Column[bool] | bool: ...
+        @property
+        def prebooking_start(self) -> Column[date] | date: ...
+        @property
+        def prebooking_end(self) -> Column[date] | date: ...
+        @property
+        def booking_start(self) -> Column[date] | date: ...
+        @property
+        def booking_end(self) -> Column[date] | date: ...
+        @property
+        def execution_start(self) -> Column[date] | date: ...
+        @property
+        def execution_end(self) -> Column[date] | date: ...
+        @property
+        def book_finalized(self) -> Column[bool] | bool: ...
+        @property
+        def max_bookings_per_attendee(
+            self
+        ) -> Column[int | None] | int | None: ...
+
+    def as_local_datetime(
+        self,
+        day: date | datetime,
+        end_of_day: bool = False
+    ) -> datetime:
+        """ Returns the moment of midnight in terms of the timezone it UTC """
+        return sedate.standardize_date(
+            datetime(
+                day.year,
+                day.month,
+                day.day,
+                23 if end_of_day else 0,
+                59 if end_of_day else 0,
+                59 if end_of_day else 0
+            ),
+            self.timezone
+        )
+
+    @property
+    def phase(self) -> str | None:
+        local = self.as_local_datetime
+        now = sedate.utcnow()
+
+        if not self.active or now < local(self.prebooking_start):
+            return 'inactive'
+
+        if not self.confirmed:
+            return 'wishlist'
+
+        if now < local(self.booking_start):
+            return 'inactive'
+
+        if not self.finalized and local(self.booking_end, True) < now:
+            return 'inactive'
+
+        if not self.finalized:
+            return 'booking'
+
+        local_execution_start = local(self.execution_start)
+        if now < local_execution_start:
+            return 'payment'
+
+        local_execution_end = local(self.execution_end, end_of_day=True)
+        if local_execution_start <= now <= local_execution_end:
+            return 'execution'
+
+        if now > local_execution_end:
+            return 'archive'
+
+        # FIXME: Is this allowed?
+        return None
+
+    @property
+    def wishlist_phase(self) -> bool:
+        return self.phase == 'wishlist'
+
+    @property
+    def booking_phase(self) -> bool:
+        return self.phase == 'booking'
+
+    @property
+    def payment_phase(self) -> bool:
+        return self.phase == 'payment'
+
+    @property
+    def execution_phase(self) -> bool:
+        return self.phase == 'execution'
+
+    @property
+    def archive_phase(self) -> bool:
+        return self.phase == 'archive'
+
+    @property
+    def is_prebooking_in_future(self) -> bool:
+        now = sedate.utcnow()
+        start = self.as_local_datetime(self.prebooking_start)
+
+        return now < start
+
+    @property
+    def is_currently_prebooking(self) -> bool:
+        if not self.wishlist_phase:
+            return False
+
+        now = sedate.utcnow()
+        start = self.as_local_datetime(self.prebooking_start)
+        end = self.as_local_datetime(self.prebooking_end, end_of_day=True)
+
+        return start <= now <= end
+
+    @property
+    def is_prebooking_in_past(self) -> bool:
+        """Returns true if current date is after start of booking phase or if
+        current date is after prebooking end. """
+        now = sedate.utcnow()
+        start = self.as_local_datetime(self.prebooking_start)
+        end = self.as_local_datetime(self.prebooking_end, end_of_day=True)
+
+        if now > end:
+            return True
+
+        return start <= now and not self.wishlist_phase
+
+    @property
+    def is_booking_in_future(self) -> bool:
+        now = sedate.utcnow()
+        start = self.as_local_datetime(self.booking_start)
+
+        return now < start
+
+    @property
+    def is_currently_booking(self) -> bool:
+        if not self.booking_phase:
+            return False
+
+        now = sedate.utcnow()
+        start = self.as_local_datetime(self.booking_start)
+        end = self.as_local_datetime(self.booking_end, end_of_day=True)
+
+        return start <= now <= end
+
+    @property
+    def is_booking_in_past(self) -> bool:
+        now = sedate.utcnow()
+        start = self.as_local_datetime(self.booking_start)
+        end = self.as_local_datetime(self.booking_end, end_of_day=True)
+
+        if now > end:
+            return True
+
+        return start <= now and not (
+            self.booking_phase
+            or self.book_finalized)
+
+    @property
+    def is_execution_in_past(self) -> bool:
+        now = sedate.utcnow()
+        end = self.as_local_datetime(self.execution_end, end_of_day=True)
+
+        return now > end
+
+    @property
+    def booking_limit(self) -> int | None:
+        """ Returns the max_bookings_per_attendee limit if it applies. """
+        return self.max_bookings_per_attendee
+
+
+class PeriodMetaBase(NamedTuple):
+    id: 'uuid.UUID'
+    title: str
+    active: bool
+    confirmed: bool
+    confirmable: bool
+    finalized: bool
+    finalizable: bool
+    archived: bool
+    prebooking_start: date
+    prebooking_end: date
+    booking_start: date
+    booking_end: date
+    execution_start: date
+    execution_end: date
+    max_bookings_per_attendee: int | None
+    booking_cost: 'Decimal | None'
+    all_inclusive: bool
+    pay_organiser_directly: bool
+    minutes_between: int | None
+    alignment: str | None
+    deadline_days: int | None
+    book_finalized: bool
+    cancellation_date: date | None
+    cancellation_days: int | None
+    age_barrier_type: str
+
+
+class PeriodMeta(PeriodMetaBase, PeriodMixin):
+    # TODO: We would like to add a request scoped cache to
+    #       all the properties on PeriodMixin, since they would
+    #       likely not change within the time span of a single
+    #       request, but we can't use `cached_property`, since
+    #       that would risk staying around across multiple requests
+    #       alternatively we could add a time-based cache with
+    #       a short TTL like 60 seconds. That would already avoid
+    #       the many redundant calls to `phase`.
+
+    def materialize(self, session: 'Session') -> 'Period':
+        period = session.query(Period).get(self.id)
+        assert period is not None
+        return period
+
+    def __setattr__(self, name: str, value: object) -> NoReturn:
+        # NOTE: This is a guard against people setting attributes
+        #       that exist on Period but not on PeriodMeta and
+        #       getting silently dropped because of it.
+        raise ValueError(
+            'You are not allowed to set attributes on PeriodMeta.'
+        )
+
+
+class Period(Base, PeriodMixin, TimestampMixin):
+
+    __tablename__ = 'periods'
 
     #: The public id of this period
     id: 'Column[uuid.UUID]' = Column(
@@ -342,63 +571,6 @@ class Period(Base, TimestampMixin):
         for activity in a:
             activity.archive()
 
-    @property
-    def booking_limit(self) -> int | None:
-        """ Returns the max_bookings_per_attendee limit if it applies. """
-        return self.max_bookings_per_attendee
-
-    def as_local_datetime(
-        self,
-        day: date | datetime,
-        end_of_day: bool = False
-    ) -> datetime:
-        """ Returns the moment of midnight in terms of the timezone it UTC """
-        return sedate.standardize_date(
-            datetime(
-                day.year,
-                day.month,
-                day.day,
-                23 if end_of_day else 0,
-                59 if end_of_day else 0,
-                59 if end_of_day else 0
-            ),
-            self.timezone
-        )
-
-    @property
-    def phase(self) -> str | None:
-        local = self.as_local_datetime
-        now = sedate.utcnow()
-
-        if not self.active or now < local(self.prebooking_start):
-            return 'inactive'
-
-        if not self.confirmed:
-            return 'wishlist'
-
-        if now < local(self.booking_start):
-            return 'inactive'
-
-        if not self.finalized and local(self.booking_end, True) < now:
-            return 'inactive'
-
-        if not self.finalized:
-            return 'booking'
-
-        local_execution_start = local(self.execution_start)
-        if now < local_execution_start:
-            return 'payment'
-
-        local_execution_end = local(self.execution_end, end_of_day=True)
-        if local_execution_start <= now <= local_execution_end:
-            return 'execution'
-
-        if now > local_execution_end:
-            return 'archive'
-
-        # FIXME: Is this allowed?
-        return None
-
     def confirm_and_start_booking_phase(self) -> None:
         """ Confirms the period and sets the booking phase to now.
 
@@ -412,95 +584,6 @@ class Period(Base, TimestampMixin):
         self.booking_start = date.today()
 
     @property
-    def wishlist_phase(self) -> bool:
-        return self.phase == 'wishlist'
-
-    @property
-    def booking_phase(self) -> bool:
-        return self.phase == 'booking'
-
-    @property
-    def payment_phase(self) -> bool:
-        return self.phase == 'payment'
-
-    @property
-    def execution_phase(self) -> bool:
-        return self.phase == 'execution'
-
-    @property
-    def archive_phase(self) -> bool:
-        return self.phase == 'archive'
-
-    @property
-    def is_prebooking_in_future(self) -> bool:
-        now = sedate.utcnow()
-        start = self.as_local_datetime(self.prebooking_start)
-
-        return now < start
-
-    @property
-    def is_currently_prebooking(self) -> bool:
-        if not self.wishlist_phase:
-            return False
-
-        now = sedate.utcnow()
-        start = self.as_local_datetime(self.prebooking_start)
-        end = self.as_local_datetime(self.prebooking_end, end_of_day=True)
-
-        return start <= now <= end
-
-    @property
-    def is_prebooking_in_past(self) -> bool:
-        """Returns true if current date is after start of booking phase or if
-        current date is after prebooking end. """
-        now = sedate.utcnow()
-        start = self.as_local_datetime(self.prebooking_start)
-        end = self.as_local_datetime(self.prebooking_end, end_of_day=True)
-
-        if now > end:
-            return True
-
-        return start <= now and not self.wishlist_phase
-
-    @property
-    def is_booking_in_future(self) -> bool:
-        now = sedate.utcnow()
-        start = self.as_local_datetime(self.booking_start)
-
-        return now < start
-
-    @property
-    def is_currently_booking(self) -> bool:
-        if not self.booking_phase:
-            return False
-
-        now = sedate.utcnow()
-        start = self.as_local_datetime(self.booking_start)
-        end = self.as_local_datetime(self.booking_end, end_of_day=True)
-
-        return start <= now <= end
-
-    @property
-    def is_booking_in_past(self) -> bool:
-        now = sedate.utcnow()
-        start = self.as_local_datetime(self.booking_start)
-        end = self.as_local_datetime(self.booking_end, end_of_day=True)
-
-        if now > end:
-            return True
-
-        return start <= now and not (
-            self.booking_phase
-            or self.book_finalized)
-
-    @property
-    def is_execution_in_past(self) -> bool:
-        now = sedate.utcnow()
-        end = self.as_local_datetime(self.execution_end, end_of_day=True)
-
-        return now > end
-
-    @property
     def scoring(self) -> 'Scoring':
         # circular import
         from onegov.activity.matching.score import Scoring
@@ -512,3 +595,6 @@ class Period(Base, TimestampMixin):
     @scoring.setter
     def scoring(self, scoring: 'Scoring') -> None:
         self.data['match-settings'] = scoring.settings
+
+    def materialize(self, session: 'Session') -> 'Period':
+        return self

@@ -236,6 +236,7 @@ def get_common_asset() -> 'Iterator[str]':
     yield 'common.js'
     yield '_blank.js'
     yield 'homepage_video_or_slider.js'
+    yield 'file-table-row-toggler.js'
     yield 'animate.js'
     yield 'forms.js'
     yield 'internal_link_check.js'
