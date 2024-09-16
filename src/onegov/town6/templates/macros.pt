@@ -1707,67 +1707,63 @@
 
 
 <metal:testimonial_slider define-macro="testimonial_slider" i18n:domain="onegov.town6">
-<div class="grid-container full ${color}" tal:condition="description_1 and image_1 and quote_1"><div class="grid-x"><div class="small-12 medium-12 cell">
-    <div class="grid-container"><div class="grid-x grid-padding-x">
-        <div class="small-12 medium-12 cell">
-            <div class="orbit slider testimonial-slider" role="region" aria-label="Homepage Testimonal Slider" data-orbit data-timer-delay="7200">
-                <div class="orbit-wrapper">
-                    <ul class="orbit-container">
-                        <li class="orbit-slide">
-                            <div class="testimonial grid-x grid-padding-x" data-aos="fade">
-                                <div class="small-4 medium-2 cell"><div class="square-container">
-                                    <img src="${image_1}"/>
-                                </div></div>
-                                <div class="small-8 medium-10 cell"><div class="text">
-                                    <p class="description">${description_1}</p>
-                                    <p class="quote">
-                                    <i class="fas fa-angle-double-left"></i>
-                                    ${quote_1}
-                                    <i class="fas fa-angle-double-right"></i>
-                                    </p>
-                                </div></div>
-                            </div>
-                        </li>
-                        <li class="orbit-slide" tal:condition="description_2 and image_2 and quote_2">
-                            <div class="testimonial grid-x grid-padding-x" data-aos="fade">
-                                <div class="small-4 medium-2 cell"><div class="square-container">
-                                    <img src="${image_2}"/>
-                                </div></div>
-                                <div class="small-8 medium-10 cell"><div class="text">
-                                    <p class="description">${description_2}</p>
-                                    <p class="quote">
-                                    <i class="fas fa-angle-double-left"></i>
-                                    ${quote_2}
-                                    <i class="fas fa-angle-double-right"></i>
-                                    </p>
-                                </div></div>
-                            </div>
-                        </li>
-                        <li class="orbit-slide" tal:condition="description_3 and image_3 and quote_3">
-                            <div class="testimonial grid-x grid-padding-x" data-aos="fade">
-                                <div class="small-4 medium-2 cell"><div class="square-container">
-                                    <img src="${image_3}"/>
-                                </div></div>
-                                <div class="small-8 medium-10 cell"><div class="text">
-                                    <p class="description">${description_3}</p>
-                                    <p class="quote">
-                                    <i class="fas fa-angle-double-left"></i>
-                                    ${quote_3}
-                                    <i class="fas fa-angle-double-right"></i>
-                                    </p>
-                                </div></div>
-                            </div>
-                        </li>
-                    </ul>
-                    <div class="orbit-controls" tal:condition="image_2 and image_2 and quote_2">
-                        <button class="orbit-previous"><span class="show-for-sr">Previous Slide</span><i class="fa fa-chevron-left"></i></button>
-                        <button class="orbit-next"><span class="show-for-sr">Next Slide</span><i class="fa fa-chevron-right"></i></button>
+<tal:b tal:condition="description_1 and image_1 and quote_1">
+    <div class="orbit slider testimonial-slider" role="region" aria-label="Homepage Testimonal Slider" data-orbit data-timer-delay="7200">
+        <div class="orbit-wrapper">
+            <ul class="orbit-container">
+                <li class="orbit-slide">
+                    <div class="testimonial grid-x grid-padding-x" data-aos="fade">
+                        <div class="small-4 medium-2 cell"><div class="square-container">
+                            <img src="${image_1}"/>
+                        </div></div>
+                        <div class="small-8 medium-10 cell"><div class="text">
+                            <p class="description">${description_1}</p>
+                            <p class="quote">
+                            <i class="fas fa-angle-double-left"></i>
+                            ${quote_1}
+                            <i class="fas fa-angle-double-right"></i>
+                            </p>
+                        </div></div>
                     </div>
-                </div>
+                </li>
+                <li class="orbit-slide" tal:condition="description_2 and image_2 and quote_2">
+                    <div class="testimonial grid-x grid-padding-x" data-aos="fade">
+                        <div class="small-4 medium-2 cell"><div class="square-container">
+                            <img src="${image_2}"/>
+                        </div></div>
+                        <div class="small-8 medium-10 cell"><div class="text">
+                            <p class="description">${description_2}</p>
+                            <p class="quote">
+                            <i class="fas fa-angle-double-left"></i>
+                            ${quote_2}
+                            <i class="fas fa-angle-double-right"></i>
+                            </p>
+                        </div></div>
+                    </div>
+                </li>
+                <li class="orbit-slide" tal:condition="description_3 and image_3 and quote_3">
+                    <div class="testimonial grid-x grid-padding-x" data-aos="fade">
+                        <div class="small-4 medium-2 cell"><div class="square-container">
+                            <img src="${image_3}"/>
+                        </div></div>
+                        <div class="small-8 medium-10 cell"><div class="text">
+                            <p class="description">${description_3}</p>
+                            <p class="quote">
+                            <i class="fas fa-angle-double-left"></i>
+                            ${quote_3}
+                            <i class="fas fa-angle-double-right"></i>
+                            </p>
+                        </div></div>
+                    </div>
+                </li>
+            </ul>
+            <div class="orbit-controls" tal:condition="image_2 and image_2 and quote_2">
+                <button class="orbit-previous"><span class="show-for-sr">Previous Slide</span><i class="fa fa-chevron-left"></i></button>
+                <button class="orbit-next"><span class="show-for-sr">Next Slide</span><i class="fa fa-chevron-right"></i></button>
             </div>
         </div>
-    </div></div>
-</div></div></div>
+    </div>
+</tal:b>
 </metal:testimonial_slider>
 
 <metal:bullets define-macro="orbit-bullets" i18n:domain="onegov.town6">
