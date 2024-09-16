@@ -2,7 +2,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: \n"
-"POT-Creation-Date: 2024-09-11 10:07+0200\n"
+"POT-Creation-Date: 2024-09-16 11:07+0200\n"
 "PO-Revision-Date: 2022-03-15 10:52+0100\n"
 "Last-Translator: \n"
 "Language-Team: \n"
@@ -1469,6 +1469,18 @@ msgstr "Instagram"
 msgid "URL pointing to the Instagram site"
 msgstr "URL che punta al sito di Instagram"
 
+msgid "Linkedin"
+msgstr "LinkedIn"
+
+msgid "URL pointing to the LinkedIn site"
+msgstr "URL che punta al sito di LinkedIn"
+
+msgid "TikTok"
+msgstr "TikTok"
+
+msgid "URL pointing to the TikTok site"
+msgstr "URL che punta al sito di TikTok"
+
 msgid "Custom Link 1"
 msgstr "Collegamento personalizzato 1"
 
@@ -2648,6 +2660,9 @@ msgstr "Il rifiuto dell'inserimento nell'elenco è stato ritirato"
 msgid "The rejection of the entry has been withdrawn"
 msgstr "Il rifiuto della voce è stato ritirato"
 
+msgid "The directory change submission rejection has been withdrawn"
+msgstr "Il rifiuto dell'invio della modifica è stato ritirato"
+
 msgid "The rejection of the change has been withdrawn"
 msgstr "Il rifiuto della modifica è stato ritirato"
 
@@ -2935,8 +2950,8 @@ msgstr "Il rifiuto di ${title} non può essere annullato."
 msgid "Reject reservation"
 msgstr "Rifiuta prenotazione"
 
-#.
 #. Used in sentence: "${event} published."
+#.
 msgid "Event"
 msgstr "Evento"
 
@@ -2971,6 +2986,11 @@ msgid ""
 "This directory entry has been rejected. Do you want to withdraw the "
 "rejection?"
 msgstr "Questa voce dell'elenco è stata rifiutata. Volete ritirare il rifiuto?"
+
+msgid ""
+"This directory change has been rejected. Do you want to withdraw the "
+"rejection?"
+msgstr ""
 
 msgid "Reject change request"
 msgstr "Rifiuta la richiesta di modifica"
@@ -3970,6 +3990,9 @@ msgstr ""
 
 msgid "Click here to view web version."
 msgstr "Clicca qui per visualizzare la versione web."
+
+msgid "You no longer wish to receive the newsletter?"
+msgstr "Non desideri più ricevere la newsletter?"
 
 msgid "Click the following link to set a new password:"
 msgstr "Clicca sul collegamento seguente per impostare una nuova password:"

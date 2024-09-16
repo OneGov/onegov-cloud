@@ -2,7 +2,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE 1.0\n"
-"POT-Creation-Date: 2024-09-11 10:07+0200\n"
+"POT-Creation-Date: 2024-09-16 11:07+0200\n"
 "PO-Revision-Date: 2022-03-15 10:50+0100\n"
 "Last-Translator: Marc Sommerhalder <marc.sommerhalder@seantis.ch>\n"
 "Language-Team: French\n"
@@ -1467,6 +1467,18 @@ msgstr "Instagram"
 msgid "URL pointing to the Instagram site"
 msgstr "Lien vers la page Instagram"
 
+msgid "Linkedin"
+msgstr "LinkedIn"
+
+msgid "URL pointing to the LinkedIn site"
+msgstr "Lien vers la page LinkedIn"
+
+msgid "TikTok"
+msgstr "TikTok"
+
+msgid "URL pointing to the TikTok site"
+msgstr "Lien vers la page TikTok"
+
 msgid "Custom Link 1"
 msgstr "Lien personnalisé 1"
 
@@ -2642,6 +2654,9 @@ msgstr "Le rejet de la soumission d'entrée dans l'annuaire a été retiré"
 msgid "The rejection of the entry has been withdrawn"
 msgstr "Le rejet de l'entrée a été retiré"
 
+msgid "The directory change submission rejection has been withdrawn"
+msgstr "Le rejet de la demande de modification de l'annuaire a été retiré"
+
 msgid "The rejection of the change has been withdrawn"
 msgstr "Le rejet de la modification a été retiré "
 
@@ -2929,8 +2944,8 @@ msgstr "Refuser ${title} est irréversible."
 msgid "Reject reservation"
 msgstr "Refuser la réservation"
 
-#.
 #. Used in sentence: "${event} published."
+#.
 msgid "Event"
 msgstr "Événement"
 
@@ -2964,7 +2979,13 @@ msgstr "Retirer le refus"
 msgid ""
 "This directory entry has been rejected. Do you want to withdraw the "
 "rejection?"
-msgstr "Cette entrée de répertoire a été rejetée. Voulez-vous retirer le rejet?"
+msgstr ""
+"Cette entrée de répertoire a été rejetée. Voulez-vous retirer le rejet?"
+
+msgid ""
+"This directory change has been rejected. Do you want to withdraw the "
+"rejection?"
+msgstr ""
 
 msgid "Reject change request"
 msgstr "Rejeter la demande de modification"
@@ -3979,6 +4000,9 @@ msgstr ""
 
 msgid "Click here to view web version."
 msgstr "Cliquer ici pour voir la version internet."
+
+msgid "You no longer wish to receive the newsletter?"
+msgstr "Vous ne souhaitez plus recevoir la lettre d'informations ?"
 
 msgid "Click the following link to set a new password:"
 msgstr "Cliquer sur le lien suivant pour définir un nouveau mot de passe :"
