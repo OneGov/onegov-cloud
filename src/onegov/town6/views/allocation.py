@@ -67,6 +67,10 @@ def town_handle_allocation_rule(
 
 @TownApp.form(model=Resource, template='form.pt', name='edit-rule',
               permission=Private, form=get_allocation_rule_form_class)
-def town_handle_town_allocation_rule(self, request, form):
+def town_handle_edit_rule(
+    self: Resource,
+    request: 'TownRequest',
+    form: 'AllocationRuleForm',
+):
     return handle_edit_rule(
         self, request, form, AllocationRulesLayout(self, request))

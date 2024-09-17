@@ -165,7 +165,7 @@ def view_allocation_rules(
             )
         )
         yield Link(
-            text=_("Edit"),
+            text=_('Edit'),
             url=link_for_rule(rule, 'edit-rule'),
         )
 
@@ -447,48 +447,51 @@ def handle_edit_rule(
     request.assert_valid_csrf_token()
     layout = layout or AllocationRulesLayout(self, request)
 
-    if form.submitted(request):
-        # changes = form.apply(self)
-        # we probably don't want apply here
+    rule_id = rule_id_from_request(request)
 
-        # todo: this is where we update the rule, but we need to figure out
-        #  how to do that
+    if form.submitted(request):
         rules = self.content.get('rules', [])
         for i, existing_rule in enumerate(rules):
-            breakpoint()
-            # if existing_rule.id == form.rule.id:
-            #     rules[i] = form.rule
-            #     break
+            if existing_rule['id'] == rule_id:
+                updated_rule = form.rule
+                rules[i] = updated_rule
+                break
+        else:
+            request.messsage(_('Rule not found'), 'warning')
+            return request.redirect(request.link(self, name='rules'))
 
         self.content['rules'] = rules
-        # request.success(_(
-        #     "Rule updated, ${n} allocations modified", mapping={'n': changes}
-        # ))
+
+        # Apply the updated rule
+        changes = form.apply(self)
+        request.message(_(
+                "Rule updated, ${n} allocations created or modified",
+                mapping={'n': changes},), 'success'
+        )
 
         return request.redirect(request.link(self, name='rules'))
 
-    # todo: step 1 pre-populate the form with the existing rule
-    rule_id = rule_id_from_request(request)
-    this_rule = next(
-        (
-            rule
-            for rule in self.content.get('rules', ())
-            if rule['id'] == rule_id
-        ),
-        []
+    # Pre-populate the form with the existing rule data
+    existing_rule = next(
+        (rule for rule in self.content.get('rules', [])
+         if rule['id'] == rule_id),
+        None
     )
-    form.process(obj=this_rule)
 
-    layout.breadcrumbs.append(Link(_("Edit"), '#'))
+    if existing_rule is None:
+        request.message(_('Rule not found'), 'warning')
+        return request.redirect(request.link(self, name='rules'))
 
+    form.rule = existing_rule
+    layout.breadcrumbs.append(Link(_('Edit'), '#'))
     return {
         'layout': layout,
-        'title': _("Regel bearbeiten"),
+        'title': _('Edit Rule'),
         'form': form,
         'helptext': _(
-            "Rules ensure that the allocations between start/end exist and "
-            "that they are extended beyond those dates at the given "
-            "intervals. "
+            'Rules ensure that the allocations between start/end exist and '
+            'that they are extended beyond those dates at the given '
+            'intervals. Editing a rule may create new allocations.'
         )
     }
 
