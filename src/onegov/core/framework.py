@@ -129,6 +129,16 @@ class Framework(
     #: the request cache is initialised/emptied before each request
     request_cache: dict[str, Any]
 
+    #: the schema cache stays around for the entire runtime of the
+    #: application, but is switched, each time the schema changes
+    # NOTE: This cache should never be used to store ORM objects
+    #       In addition this should generally be backed by a Redis
+    #       cache to make sure the cache is synchronized between
+    #       all processes. Although there may be some cases where
+    #       it makes sense to use this cache on its own
+    schema_cache: dict[str, Any]
+    _all_schema_caches: dict[str, Any]
+
     @property
     def version(self) -> str:
         from onegov.core import __version__
@@ -666,6 +676,10 @@ class Framework(
         # then, replace the '/' with a '-' so the only dash left will be
         # the dash between namespace and id
         self.schema = application_id.replace('-', '_').replace('/', '-')
+        if not hasattr(self, '_all_schema_caches'):
+            self._all_schema_caches = {}
+
+        self.schema_cache = self._all_schema_caches.setdefault(self.schema, {})
 
         if self.has_database_connection:
             ScopedPropertyObserver.enter_scope(self)
