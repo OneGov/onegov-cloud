@@ -323,6 +323,14 @@ class OrmCacheDescriptor(Generic[_T]):
         # we use a secondary in-memory cache for more lookup speed
         ts, obj = app.schema_cache.get(cache_key, (float('-Inf'), unset))
         if obj is unset or ts != app.cache.get(key=ts_key):
+            # NOTE: Ideally we would create these values as a pair
+            #       but then we would have to start circumventing
+            #       most of dogpile's API, at which point we may
+            #       as well just use raw Redis, which would give us
+            #       even better possibilities.
+            #       A data race isn't really harmful here, but it is
+            #       kind of inefficient that we're sending two separate
+            #       Redis commands, when one would suffice.
             obj = app.cache.get_or_create(
                 key=cache_key,
                 creator=lambda: self.create(instance)

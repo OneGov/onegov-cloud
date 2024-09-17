@@ -131,6 +131,11 @@ class Framework(
 
     #: the schema cache stays around for the entire runtime of the
     #: application, but is switched, each time the schema changes
+    # NOTE: This cache should never be used to store ORM objects
+    #       In addition this should generally be backed by a Redis
+    #       cache to make sure the cache is synchronized between
+    #       all processes. Although there may be some cases where
+    #       it makes sense to use this cache on its own
     schema_cache: dict[str, Any]
     _all_schema_caches: dict[str, Any]
 
