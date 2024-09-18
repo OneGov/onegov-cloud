@@ -557,8 +557,8 @@ class PersonLinkExtension(ContentExtension):
             if chosen := selected.get(person.id.hex):
                 render_kw['data-function'], show = chosen
                 render_kw['data-show'] = 'true' if show else 'false'
-            else:
-                render_kw['data-function'] = getattr(person, 'function', None)
+            elif function := getattr(person, 'function', None):
+                render_kw['data-function'] = function
 
             return person.id.hex, name, render_kw
 
