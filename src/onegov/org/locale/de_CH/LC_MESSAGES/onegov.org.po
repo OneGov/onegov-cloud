@@ -1,7 +1,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE 1.0\n"
-"POT-Creation-Date: 2024-09-16 11:07+0200\n"
+"POT-Creation-Date: 2024-09-18 12:11+0200\n"
 "PO-Revision-Date: 2022-03-15 10:21+0100\n"
 "Last-Translator: Marc Sommerhalder <marc.sommerhalder@seantis.ch>\n"
 "Language-Team: German\n"
@@ -2713,15 +2713,20 @@ msgstr "Personen am unteren Rand der Hauptseite anzeigen (statt in Sidebar)"
 msgid "Use text instead of lead in the newsletter"
 msgstr "Text statt Einleitung im Newsletter benutzen"
 
+msgid "Select additional person"
+msgstr "Zusätzliche Person auswählen"
+
+msgid "No results match"
+msgstr "Keine Ergebnisse gefunden:"
+
+msgid "List this function in the page of this person"
+msgstr "Diese Funktion anzeigen auf der Seite von dieser Person"
+
 msgid "Use Western ordered names"
 msgstr "Westlich geordnete Namen verwenden"
 
 msgid "For instance Franz Müller instead of Müller Franz"
 msgstr "Zum Beispiel Franz Müller anstelle von Müller Franz"
-
-#, python-format
-msgid "List this function in the page of ${name}"
-msgstr "Diese Funktion anzeigen auf der Seite von ${name}"
 
 msgid "A resource with this name already exists"
 msgstr "Eine Resource mit diesem Namen existiert bereits"
@@ -2943,8 +2948,8 @@ msgstr "Die Absage von ${title} kann nicht rückgängig gemacht werden."
 msgid "Reject reservation"
 msgstr "Reservation absagen"
 
-#. Used in sentence: "${event} published."
 #.
+#. Used in sentence: "${event} published."
 msgid "Event"
 msgstr "Veranstaltung"
 

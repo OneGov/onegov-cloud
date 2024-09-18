@@ -250,7 +250,7 @@ def translation_chain(
 
 def get_translation_bound_meta(
     meta_class: type[_M],
-    translations: gettext.GNUTranslations
+    translations: gettext.GNUTranslations | None
 ) -> type[_M]:
     """ Takes a wtforms Meta class and combines our translate class with
     the one provided by WTForms itself.
@@ -264,7 +264,10 @@ def get_translation_bound_meta(
         # the request has been handled
         cache_translations = False
 
-        def get_translations(self, form: 'Form') -> gettext.GNUTranslations:
+        def get_translations(
+            self,
+            form: 'Form'
+        ) -> gettext.GNUTranslations | None:
             nonlocal translations
 
             try:
@@ -274,6 +277,8 @@ def get_translation_bound_meta(
                 # it might be worth revisiting in the future if we can
                 # enable caching here again, or introduce our own
                 wtf = super().get_translations(form)
+                if wtf is  None:
+                    wtf = gettext.NullTranslations()
                 wtf.is_wtforms = True
 
             except FileNotFoundError:
@@ -328,7 +333,7 @@ def get_translation_bound_meta(
             wtforms does support.
 
             """
-            if hasattr(field, 'label'):
+            if hasattr(field, 'label') and self._translations is not None:
                 if isinstance(field.label.text, TranslationString):
                     field.label.text = field.label.text.interpolate(
                         self._translations.gettext(field.label.text))
@@ -340,7 +345,7 @@ def get_translation_bound_meta(
 
 def get_translation_bound_form(
     form_class: type[_F],
-    translate: gettext.GNUTranslations
+    translate: gettext.GNUTranslations | None
 ) -> type[_F]:
     """ Returns a form setup with the given translate function. """
 

@@ -476,15 +476,21 @@ def test_context_specific_function_are_displayed_in_person_directory(browser,
     })
 
     browser.find_by_value("Absenden").click()
-    person = client.app.session().query(Person)\
-        .filter(Person.last_name == 'Boolean')\
+    person = (
+        client.app.session().query(Person)
+        .filter(Person.last_name == 'Boolean')
         .one()
+    )
 
     browser.visit('/editor/new/page/1')
+    chosen_input = browser.find_by_id('people_0_person_chosen')
+    chosen_input.click()
+    search_input = chosen_input.find_by_xpath('.//input').first
+    search_input.fill('Boolean Berry\t')
     browser.fill_form({
         'title': 'All About Berry',
-        'people_' + person.id.hex: True,
-        'people_' + person.id.hex + '_function': 'Logician'
+        'people-0-context_specific_function': 'Logician',
+        'people-0-display_function_in_person_directory': True,
     })
     browser.find_by_value("Absenden").click()
 

@@ -29,7 +29,10 @@
     form (jquery object).
 */
 var get_choices = function(form, field_name) {
-    var fields = form.find('input[name="' + field_name + '"]:checked');
+    var fields = form.find(
+        'input[name="' + field_name + '"]:checked, ' +
+        'select[name="' + field_name + '"]'
+    );
     if (fields.length === 0) {
         return null;
     }
@@ -75,7 +78,10 @@ var get_dependencies = function(input) {
 */
 
 var get_dependency_target = function(form, dependency) {
-    return form.find('input[name="' + dependency.name + '"]');
+    return form.find(
+        'input[name="' + dependency.name + '"], ' +
+        'select[name="' + dependency.name + '"]'
+    );
 };
 
 /*
@@ -124,7 +130,7 @@ var setup_depends_on = function(form) {
         evaluate_dependencies(form, input, dependencies);
 
         _.each(dependencies, function(dependency) {
-            get_dependency_target(form, dependency).on('click', function() {
+            get_dependency_target(form, dependency).on('change', function() {
                 evaluate_dependencies(form, input, dependencies);
             });
         });

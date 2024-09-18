@@ -4,13 +4,16 @@ import json
 from collections import OrderedDict
 from functools import cached_property
 
+from markupsafe import Markup
+from onegov.core.i18n import get_translation_bound_meta
 from onegov.core.orm.abstract import MoveDirection
 from onegov.core.orm.mixins import (
     content_property, dict_property, meta_property, UTCPublicationMixin)
+from onegov.core.templates import render_macro
 from onegov.core.utils import normalize_for_url, to_html_ul
 from onegov.form.utils import remove_empty_links
 from onegov.file import File, FileCollection
-from onegov.form import FieldDependency, WTFormsClassBuilder
+from onegov.form import Form
 from onegov.form.fields import ChosenSelectField
 from onegov.gis import CoordinatesMixin
 from onegov.org import _
@@ -28,8 +31,12 @@ from sqlalchemy.orm import object_session
 from urlextract import URLExtract
 from wtforms.fields import BooleanField
 from wtforms.fields import RadioField
+from wtforms.fields import FieldList
+from wtforms.fields import FormField
+from wtforms.fields import SelectField
 from wtforms.fields import StringField
 from wtforms.fields import TextAreaField
+from wtforms.utils import unset_value
 from wtforms.validators import InputRequired, ValidationError
 
 
@@ -37,7 +44,6 @@ from typing import Any, ClassVar, TypeVar, TYPE_CHECKING
 if TYPE_CHECKING:
     from collections.abc import Iterable, Iterator, Sequence
     from datetime import datetime
-    from markupsafe import Markup
     from onegov.form.types import FormT
     from onegov.org.models import GeneralFile  # noqa: F401
     from onegov.org.request import OrgRequest
@@ -45,6 +51,9 @@ if TYPE_CHECKING:
     from sqlalchemy.orm import relationship
     from typing import type_check_only, Protocol
     from wtforms import Field
+    from wtforms.fields.core import _Filter
+    from wtforms.meta import _MultiDictLikeWithGetlist
+    from wtforms.fields.choices import _Choice
 
     class SupportsExtendForm(Protocol):
         def extend_form(
@@ -52,6 +61,7 @@ if TYPE_CHECKING:
             form_class: type[FormT],
             request: OrgRequest
         ) -> type[FormT]: ...
+
 
     _ExtendedWithPersonLinkT = TypeVar(
         '_ExtendedWithPersonLinkT',
@@ -243,12 +253,12 @@ class ContactExtensionBase:
         ) if self.contact is not None else None
 
     @cached_property
-    def contact_html(self) -> 'Markup | None':
+    def contact_html(self) -> Markup | None:
         if self.contact is None:
             return None
         return to_html_ul(self.contact, convert_dashes=True, with_title=True)
 
-    def get_contact_html(self, request: 'OrgRequest') -> 'Markup | None':
+    def get_contact_html(self, request: 'OrgRequest') -> Markup | None:
         return self.contact_html
 
     def extend_form(
@@ -288,7 +298,7 @@ class InheritableContactExtension(ContactExtensionBase, ContentExtension):
 
     # TODO: If we end up calling this more than once per request
     #       we may want to cache this
-    def get_contact_html(self, request: 'OrgRequest') -> 'Markup | None':
+    def get_contact_html(self, request: 'OrgRequest') -> Markup | None:
         if self.inherit_contact:
             if self.contact_inherited_from is None:
                 return None
@@ -417,6 +427,7 @@ class NewsletterExtension(ContentExtension):
 if TYPE_CHECKING:
     @type_check_only
     class PersonWithFunction(Person):
+        person: str
         context_specific_function: str
         display_function_in_person_directory: bool
 
@@ -442,11 +453,10 @@ class PersonLinkExtension(ContentExtension):
 
         """
 
-        if not self.content.get('people'):
+        if not (people_items := self.content.get('people')):
             return None
 
-        people = OrderedDict(self.content['people'])
-
+        people = OrderedDict(people_items)
         query = PersonCollection(object_session(self)).query()
         query = query.filter(Person.id.in_(people.keys()))
 
@@ -455,6 +465,7 @@ class PersonLinkExtension(ContentExtension):
         person: PersonWithFunction
         for person in query.all():  # type:ignore[assignment]
             function, show_function = people[person.id.hex]
+            person.person = person.id.hex
             person.context_specific_function = function
             person.display_function_in_person_directory = show_function
             result.append(person)
@@ -502,8 +513,6 @@ class PersonLinkExtension(ContentExtension):
         def new_order() -> 'Iterator[tuple[str, tuple[str, bool]]]':
             subject_function, show_subject_function = (
                 self.get_person_function_by_id(subject))
-            target_function, show_target_function = (
-                self.get_person_function_by_id(target))
 
             for person, (function, show_function) in self.content['people']:
 
@@ -512,15 +521,11 @@ class PersonLinkExtension(ContentExtension):
 
                 if person == target and direction is MoveDirection.above:
                     yield subject, (subject_function, show_subject_function)
-                    yield target, (target_function, show_target_function)
-                    continue
-
-                if person == target and direction is MoveDirection.below:
-                    yield target, (target_function, show_target_function)
-                    yield subject, (subject_function, show_subject_function)
-                    continue
 
                 yield person, (function, show_function)
+
+                if person == target and direction is MoveDirection.below:
+                    yield subject, (subject_function, show_subject_function)
 
         self.content['people'] = list(new_order())
 
@@ -530,185 +535,192 @@ class PersonLinkExtension(ContentExtension):
         request: 'OrgRequest'
     ) -> type['FormT']:
 
-        # XXX this is kind of implicitly set by the builder
-        fieldset_id = 'people'
-        fieldset_label = _('People')
-
-        class PeoplePageForm(form_class):  # type:ignore
-
-            def get_people_fields(
-                self,
-                with_function: bool
-            ) -> 'Iterator[tuple[str, Field]]':
-
-                for field_id, field in self._fields.items():
-                    if field_id.startswith(fieldset_id):
-                        if with_function or not field_id.endswith('_function'):
-                            yield field_id, field
-
-            def get_people_and_function(
-                self,
-                selected_only: bool = True
-            ) -> 'Iterator[tuple[str, tuple[str, bool]]]':
-
-                fields = self.get_people_fields(with_function=False)
-
-                for field_id, field in fields:
-                    if not selected_only or field.data is True:
-                        person_id = field.id
-                        function = self._fields[field_id + '_function'].data
-                        show_function = self._fields[field_id + '_is_visible'
-                                                     + '_function'].data
-
-                        yield person_id, (function, show_function)
-
-            def is_ordered_people(
-                self,
-                existing_people: list[tuple[str, Any]]
-            ) -> bool:
-                """ Returns True if the current list of people is ordered
-                from A to Z.
-
-                """
-                if not existing_people:
-                    return True
-
-                ordered_people = OrderedDict(self.get_people_and_function(
-                    selected_only=False
-                ))
-
-                existing_people_keys = [
-                    key for key, value in existing_people
-                    if key in ordered_people
-                ]
-
-                sorted_existing_people_keys = sorted(
-                    existing_people_keys,
-                    key=list(ordered_people.keys()).index
-                )
-
-                return existing_people_keys == sorted_existing_people_keys
-
-            def populate_obj(
-                self,
-                obj: '_ExtendedWithPersonLinkT',
-                *args: Any,
-                **kwargs: Any
-            ) -> None:
-                # XXX this no longer be necessary once the person links
-                # have been turned into a field, see #74
-                super().populate_obj(obj, *args, **kwargs)
-                self.update_model(obj)
-
-            def process_obj(self, obj: '_ExtendedWithPersonLinkT') -> None:
-                # XXX this no longer be necessary once the person links
-                # have been turned into a field, see #74
-                super().process_obj(obj)
-                self.apply_model(obj)
-
-            def update_model(self, model: '_ExtendedWithPersonLinkT') -> None:
-                if 'western_ordered' in self._fields:
-                    model.western_name_order = self._fields[
-                        'western_ordered'].data
-
-                previous_people = model.content.get('people', [])
-
-                if self.is_ordered_people(previous_people):
-                    # if the people are ordered a-z, we take the ordering from
-                    # get_people_and_function, which comes by A-Z already
-                    model.content['people'] = list(
-                        self.get_people_and_function()
-                    )
-                else:
-                    # if the people are not ordered we keep the order of the
-                    # existing list and add the new people at the end
-                    existing = set()
-                    selected = dict(self.get_people_and_function())
-
-                    old_people_d = {}
-                    new_people = []
-
-                    for id, function in previous_people:
-                        if id in selected.keys():
-                            existing.add(id)
-                            old_people_d[id] = selected[id]
-
-                    old_people = list(old_people_d.items())
-
-                    for id, (func, show_fun) in self.get_people_and_function():
-                        if id not in existing:
-                            new_people.append((id, (func, show_fun)))
-
-                    model.content['people'] = old_people + new_people
-
-            def apply_model(self, model: '_ExtendedWithPersonLinkT') -> None:
-                if 'western_ordered' in self._fields:
-                    self._fields['western_ordered'].data = (
-                        model.western_name_order)
-
-                fields = self.get_people_fields(with_function=False)
-                people = dict(model.content.get('people', []))
-
-                for field_id, field in fields:
-                    person_id = field.id
-                    if person_id in people:
-                        self._fields[field_id].data = True
-                        function, show_function = people[person_id]
-                        self._fields[field_id + '_function'].data = function
-                        self._fields[
-                            field_id + '_is_visible' + '_function'
-                        ].data = show_function
-
-        builder = WTFormsClassBuilder(PeoplePageForm)
-        builder.set_current_fieldset(fieldset_label)
-
         selectable_people = self.get_selectable_people(request)
-        if selectable_people:
-            builder.add_field(
-                field_class=BooleanField,
-                field_id='western_ordered',
-                label=_('Use Western ordered names'),
-                description=_('For instance Franz Müller instead of Müller '
-                              'Franz'),
-                required=False,
-                default=self.western_name_order,
+        if not selectable_people:
+            # no need to extend the form
+            return form_class
+
+
+        selected = dict((self.content or {}).get('people', []))
+
+        def choice(person: Person) -> '_Choice':
+            if self.western_name_order:
+                name = f'{person.first_name} {person.last_name}'
+            else:
+                name = person.title
+
+            render_kw = {}
+
+            # prioritize existing function
+            if chosen := selected.get(person.id.hex):
+                render_kw['data-function'], show = chosen
+                render_kw['data-show'] = 'true' if show else 'false'
+            elif function := getattr(person, 'function', None):
+                render_kw['data-function'] = function
+
+            return person.id.hex, name, render_kw
+
+        choices: list[_Choice] = [
+            choice(person) for person in selectable_people
+        ]
+        choices.insert(0, ('', ''))
+
+        class PersonForm(Form):
+            person = SelectField(
+                label='',
+                choices=choices,
+                render_kw={
+                    'class_': 'people-select',
+                    'data-placeholder': request.translate(
+                        _('Select additional person')
+                    ),
+                    'data-no_results_text':request.translate(
+                        _('No results match')
+                    ),
+                }
             )
-        for person in selectable_people:
-            field_id = fieldset_id + '_' + person.id.hex
-            name = f'{person.first_name} {person.last_name}' if (
-                self.western_name_order) else person.title
-            builder.add_field(
-                field_class=BooleanField,
-                field_id=field_id,
-                label=name,
-                required=False,
-                id=person.id.hex,
+            context_specific_function = StringField(
+                label=_('Function'),
+                depends_on=('person', '!'),
+                render_kw={'class_': 'indent-context-specific-function'},
             )
-            builder.add_field(
-                field_class=StringField,
-                field_id=field_id + '_function',
-                label=request.translate(_('Function')),
-                required=False,
-                dependency=FieldDependency(field_id, 'y'),
-                default=getattr(person, 'function', None),
-                render_kw={'class_': 'indent-context-specific-function'}
-            )
-            builder.add_field(
-                field_class=BooleanField,
-                field_id=field_id + '_is_visible_function',
-                label=request.translate(
-                    _(
-                        'List this function in the page of ${name}',
-                        mapping={'name': name},
-                    )
-                ),
-                required=False,
-                dependency=FieldDependency(field_id, 'y'),
-                default=True if getattr(person, 'function', None) else False,
+            display_function_in_person_directory = BooleanField(
+                label=_('List this function in the page of this person'),
+                depends_on=('person', '!'),
                 render_kw={'class_': 'indent-context-specific-function'},
             )
 
-        return builder.form_class
+        # HACK: Get translations working in FormField
+        #       We should probably make our own FormField, that doesn't
+        #       need this workaround
+        meta = get_translation_bound_meta(
+            PersonForm.Meta,
+            request.get_translate(for_chameleon=False)
+        )
+        meta.locales = [request.locale, 'en'] if request.locale else []
+        PersonForm.Meta = meta
+
+        if TYPE_CHECKING:
+            FieldBase = FieldList[FormField[PersonForm]]
+        else:
+            FieldBase = FieldList
+
+        class PeopleField(FieldBase):
+            def is_ordered_people(self, people: list[tuple[str, Any]]) -> bool:
+                people_dict = dict(people)
+                return [
+                    person.id.hex
+                    for person in selectable_people
+                    if person.id.hex in people_dict
+                ] == list(people_dict.keys())
+
+            def process(
+                self,
+                formdata: '_MultiDictLikeWithGetlist | None',
+                data: Any = unset_value,
+                extra_filters: 'Sequence[_Filter] | None' = None
+            ) -> None:
+
+                # FIXME: I'm not quite sure why we need to do this
+                #        but it looks like the last_index gets updated
+                #        to 0 by something, so we start counting at 1
+                #        instead of 0, which breaks the field
+                self.last_index = -1
+                super().process(formdata, data, extra_filters)
+
+                # always have an empty extra entry
+                if formdata is None and self[-1].form.person.data is not None:
+                    self.append_entry()
+
+            def populate_obj(self, obj: object, name: str) -> None:
+                assert name == 'people'
+                assert hasattr(obj, 'content')
+
+                previous_people = obj.content.get('people', [])
+                people_values = {
+                    person_id: (
+                        item['context_specific_function'],
+                        item['display_function_in_person_directory']
+                    )
+                    for item in self.data
+                    # skip de-selected entries
+                    if (person_id := item['person'])
+                }
+
+                if self.is_ordered_people(previous_people):
+                    # if the people are ordered a-z, we take the ordering from
+                    # selectable_people, which is already ordered
+                    obj.content['people'] = [
+                        (person.id.hex, v)
+                        for person in selectable_people
+                        if (v := people_values.get(person.id.hex)) is not None
+                    ]
+                else:
+                    # if the people are not ordered we keep the order of the
+                    # existing list and add the new people at the end
+                    existing = dict(previous_people)
+                    new_people = previous_people.copy()
+
+                    for person_id, values in people_values.items():
+                        if person_id not in existing:
+                            new_people.append((person_id, values))
+
+                    obj.content['people'] = new_people
+
+
+        field_macro = request.template_loader.macros['field']
+        # FIXME: It is not ideal that we have to pass a dummy form along to
+        #        the field render macro, we should try to move the description
+        #        rendering either into the form meta, so it can be accessed
+        #        from the field or move it to the request, since it doesn't
+        #        actually depend on the specific form
+        dummy_form = request.get_form(Form, csrf_support=False)
+
+        def people_widget(field: FieldBase, **kwargs: Any) -> Markup:
+            request.include('people-select')
+            return Markup('<br>').join(
+                Markup('<div id="{}">{}</div>').format(f.id, f())
+                for f in field
+            )
+
+        class PeoplePageForm(form_class):  # type:ignore
+
+            western_name_order = BooleanField(
+                label=_('Use Western ordered names'),
+                description=_('For instance Franz Müller instead of Müller '
+                              'Franz'),
+                fieldset=_('People'),
+            )
+
+            people = PeopleField(
+                FormField(
+                    PersonForm,
+                    widget=lambda field, **kw: Markup('').join(
+                        Markup('<div><label>{}</label></div>').format(render_macro(
+                            field_macro,
+                            request,
+                            {
+                                'field': f,
+                                # FIXME: only used for rendering descriptions
+                                #        we should probably move this logic
+                                #        into a template macro or a method on
+                                #        CoreRequest, this doesn't really need
+                                #        to be part of Form, we could also move
+                                #        it to the form meta and access it
+                                #        through the field instead
+                                'form': dummy_form
+                            }
+                        )) for f in field
+                    )
+                ),
+                label=_('People'),
+                fieldset=_('People'),
+                # we always have at least one empty entry
+                min_entries=1,
+                widget=people_widget,
+            )
+
+        return PeoplePageForm
 
 
 class ResourceValidationExtension(ContentExtension):
@@ -1013,7 +1025,6 @@ class SidebarLinksExtension(ContentExtension):
 
             def process_obj(self, obj: 'SidebarLinksExtension') -> None:
                 super().process_obj(obj)
-                self.apply_model(obj)
                 if not obj.sidepanel_links:
                     self.sidepanel_links.data = self.links_to_json(None)
                 else:
