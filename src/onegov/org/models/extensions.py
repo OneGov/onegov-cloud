@@ -465,8 +465,6 @@ class PersonLinkExtension(ContentExtension):
         person: PersonWithFunction
         for person in query.all():  # type:ignore[assignment]
             function, show_function = people[person.id.hex]
-            if function is None:
-                function = getattr(person, 'function', None)
             person.person = person.id.hex
             person.context_specific_function = function
             person.display_function_in_person_directory = show_function
