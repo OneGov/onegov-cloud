@@ -423,15 +423,22 @@ def test_people_shown_on_main_page_extension(client):
     new_person.form['function'] = 'Dorf-Clown'
     new_person.form.submit().follow()
 
-    fritzli = client.app.session().query(Person) \
-        .filter(Person.last_name == 'Müller') \
+    fritzli = (
+        client.app.session().query(Person)
+        .filter(Person.last_name == 'Müller')
         .one()
+    )
 
     # add person to side panel
     page = client.get('/topics/themen')
     page = page.click('Bearbeiten')
     page.form['show_people_on_main_page'] = False
-    page.form['people_' + fritzli.id.hex] = True
+    page.form['people-0-person'] = fritzli.id.hex
+    # NOTE: defaults require JavaScript, so in order to test those
+    #       we would need to change this to a browser-test, for now
+    #       we set what would be the default value for this person
+    page.form['people-0-context_specific_function'] = 'Dorf-Clown'
+    page.form['people-0-display_function_in_person_directory'] = True
     page = page.form.submit().follow()
     assert 'Fritzli' in page
     assert 'Müller' in page
@@ -441,7 +448,7 @@ def test_people_shown_on_main_page_extension(client):
     page = client.get('/topics/themen')
     page = page.click('Bearbeiten')
     page.form['show_people_on_main_page'] = True
-    page.form['people_' + fritzli.id.hex + '_function'] = 'Super-Clown'
+    page.form['people-0-context_specific_function'] = 'Super-Clown'
     page = page.form.submit().follow()
     assert 'Fritzli' in page
     assert 'Müller' in page

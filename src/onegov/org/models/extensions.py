@@ -515,8 +515,6 @@ class PersonLinkExtension(ContentExtension):
         def new_order() -> 'Iterator[tuple[str, tuple[str, bool]]]':
             subject_function, show_subject_function = (
                 self.get_person_function_by_id(subject))
-            target_function, show_target_function = (
-                self.get_person_function_by_id(target))
 
             for person, (function, show_function) in self.content['people']:
 
@@ -525,15 +523,11 @@ class PersonLinkExtension(ContentExtension):
 
                 if person == target and direction is MoveDirection.above:
                     yield subject, (subject_function, show_subject_function)
-                    yield target, (target_function, show_target_function)
-                    continue
-
-                if person == target and direction is MoveDirection.below:
-                    yield target, (target_function, show_target_function)
-                    yield subject, (subject_function, show_subject_function)
-                    continue
 
                 yield person, (function, show_function)
+
+                if person == target and direction is MoveDirection.below:
+                    yield subject, (subject_function, show_subject_function)
 
         self.content['people'] = list(new_order())
 
@@ -549,7 +543,7 @@ class PersonLinkExtension(ContentExtension):
             return form_class
 
 
-        selected = dict(self.content.get('people', []))
+        selected = dict((self.content or {}).get('people', []))
 
         def choice(person: Person) -> '_Choice':
             if self.western_name_order:
@@ -693,7 +687,7 @@ class PersonLinkExtension(ContentExtension):
 
         class PeoplePageForm(form_class):  # type:ignore
 
-            western_ordered = BooleanField(
+            western_name_order = BooleanField(
                 label=_('Use Western ordered names'),
                 description=_('For instance Franz Müller instead of Müller '
                               'Franz'),

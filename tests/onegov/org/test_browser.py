@@ -483,8 +483,9 @@ def test_context_specific_function_are_displayed_in_person_directory(browser,
     browser.visit('/editor/new/page/1')
     browser.fill_form({
         'title': 'All About Berry',
-        'people_' + person.id.hex: True,
-        'people_' + person.id.hex + '_function': 'Logician'
+        'people-0-person': person.id.hex,
+        'people-0-context_specific_function': 'Logician',
+        'people-0-display_function_in_person_directory': True,
     })
     browser.find_by_value("Absenden").click()
 
