@@ -799,6 +799,11 @@ def get_all_blank_asset() -> 'Iterator[str]':
     yield 'all_blank.js'
 
 
+@OrgApp.webasset('people-select')
+def people_select_asset() -> 'Iterator[str]':
+    yield 'people-select.js'
+
+
 def wrap_with_mtan_hook(
     func: 'Callable[[OrgApp, Any, OrgRequest], Any]'
 ) -> 'Callable[[OrgApp, Any, OrgRequest], Any]':
