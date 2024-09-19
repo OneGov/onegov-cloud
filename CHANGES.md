@@ -1,8 +1,56 @@
 # Changes
 
+## 2024.48
+
+`2024-09-19` | [5f073ef498...95748406d2](https://github.com/OneGov/onegov-cloud/compare/5f073ef498^...95748406d2)
+
+### Core
+
+##### Improves performance of `orm_cached` with an in-memory cache
+
+This avoid deserialization overhead for potentially very large nested
+structures, such as the pages tree. While still properly invalidating
+the cache between multiple processes.
+
+`Performance` | [OGC-1827](https://linear.app/onegovcloud/issue/OGC-1827) | [0a9647dad4](https://github.com/onegov/onegov-cloud/commit/0a9647dad4984131ece0332457e142109972f1d9)
+
+### Org
+
+##### Newsletter Text
+
+Add "You no longer wish to receive the newsletter?" to the newsletter footer.
+
+`Feature` | [OGC-1817](https://linear.app/onegovcloud/issue/OGC-1817) | [1358e35fcd](https://github.com/onegov/onegov-cloud/commit/1358e35fcdef1a693ec1b23d025cdd4723671003)
+
+##### Avoids generating a giant list of fields in `PersonLinkExtension`
+
+Instead use a dynamic `FieldList` like with `GeneralFileLinkExtension`
+
+`Feature` | [OGC-1796](https://linear.app/onegovcloud/issue/OGC-1796) | [af229a696b](https://github.com/onegov/onegov-cloud/commit/af229a696bce71e4bb61498698259bf0efa30e05)
+
+##### Make sure anchors in URLs are not viewed as hashtags
+
+`Bugfix` | [OGC-1816](https://linear.app/onegovcloud/issue/OGC-1816) | [ece085a433](https://github.com/onegov/onegov-cloud/commit/ece085a433955db54faa921994c1684f5bfa03a5)
+
+##### Fixes incorrect news link in navigation
+
+`Bugfix` | [OGC-1843](https://linear.app/onegovcloud/issue/OGC-1843) | [95748406d2](https://github.com/onegov/onegov-cloud/commit/95748406d2d339acaabb8a1f44d0de3dd95de81d)
+
+### Town6
+
+##### Make file details closable
+
+`Feature` | [OGC-1822](https://linear.app/onegovcloud/issue/OGC-1822) | [201cba10da](https://github.com/onegov/onegov-cloud/commit/201cba10dafe2554e43ae2a0f2dab244aef38baf)
+
+##### Testimonial Slider Size
+
+Fix size of testimonial slider
+
+`Bugfix` | [OGC-1800](https://linear.app/onegovcloud/issue/OGC-1800) | [91aeb84c4f](https://github.com/onegov/onegov-cloud/commit/91aeb84c4f24f507f4e1822c193cd0eca2e3d16f)
+
 ## 2024.47
 
-`2024-09-13` | [4830594bc9...f8645321a0](https://github.com/OneGov/onegov-cloud/compare/4830594bc9^...f8645321a0)
+`2024-09-13` | [4830594bc9...10162c037d](https://github.com/OneGov/onegov-cloud/compare/4830594bc9^...10162c037d)
 
 ### Api
 
@@ -2165,34 +2213,4 @@ Fix position of toolbar according to header-size
 ##### Resizing of video and slider according to navigation height
 
 `Bugfix` | [2d75dd31ca](https://github.com/onegov/onegov-cloud/commit/2d75dd31cabb2239ecfc5699f546f9fb1e45578e)
-
-## 2023.61
-
-`2023-11-20` | [e4dc73f14a...1373c4a408](https://github.com/OneGov/onegov-cloud/compare/e4dc73f14a^...1373c4a408)
-
-### Town6
-
-##### Add translations and fix schema-problem with chat server
-
-`Bugfix` | [d6b36df22f](https://github.com/onegov/onegov-cloud/commit/d6b36df22fa4d2fa1b10e4ebf64fa52bd0b0b04e)
-
-##### Remove Gray line at top of page
-
-`Bugfix` | [OGC-1268](https://linear.app/onegovcloud/issue/OGC-1268) | [d4a73a454f](https://github.com/onegov/onegov-cloud/commit/d4a73a454f7fb7fad231cb13f9fad5919fd42bed)
-
-##### Fix opening times, use fresh session, explicitely commit transactions.
-
-In some cases, websocket-server was not able to find the Chats table
-because the schema was not present in this session. This seemed to be
-the case only for cached sessions (using SESSIONS). Using a fresh
-session obtained from session_manager works, because session_manager
-explicitely configures schema for each session.
-
-Outside of a morepath environment, transactions are not automatically
-committed (e.g., after a request). Hence, chat has had some open
-transactions in idle state. Explicitely commit()ing closes the
-transaction and avoids eventual problems with postgres closing the
-connections.
-
-`Bugfix` | [8c67b2ec59](https://github.com/onegov/onegov-cloud/commit/8c67b2ec594123fe0968e986a3b99fe8a1800b37)
 
