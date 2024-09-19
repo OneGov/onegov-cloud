@@ -177,6 +177,12 @@ class OrgRequest(CoreRequest):
             parent_to_child.setdefault(page.parent_id, []).append(page)
 
 
+        def extend_path(page: Page, path: str | None) -> str:
+            if page.type == 'news' and path is None:
+                # the root news page is not part of the path
+                return ''
+            return f'{path}/{page.name}' if path else page.name
+
         def generate_subtree(
             parent_id: int | None,
             path: str | None
@@ -188,10 +194,7 @@ class OrgRequest(CoreRequest):
                     title=page.title,
                     access=page.meta.get('access', 'public'),
                     published=published,
-                    path=(
-                        subpath := page.name
-                        if path is None else f'{path}/{page.name}'
-                    ),
+                    path=(subpath := extend_path(page, path)),
                     is_visible_on_homepage=page.meta.get('is_visible_on_homepage'),
                     children=tuple(generate_subtree(page.id, subpath))
                 )
