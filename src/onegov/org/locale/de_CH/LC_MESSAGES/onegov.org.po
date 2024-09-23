@@ -1,7 +1,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE 1.0\n"
-"POT-Creation-Date: 2024-09-18 12:11+0200\n"
+"POT-Creation-Date: 2024-09-24 00:27+0200\n"
 "PO-Revision-Date: 2022-03-15 10:21+0100\n"
 "Last-Translator: Marc Sommerhalder <marc.sommerhalder@seantis.ch>\n"
 "Language-Team: German\n"
@@ -2948,8 +2948,8 @@ msgstr "Die Absage von ${title} kann nicht rückgängig gemacht werden."
 msgid "Reject reservation"
 msgstr "Reservation absagen"
 
-#.
 #. Used in sentence: "${event} published."
+#.
 msgid "Event"
 msgstr "Veranstaltung"
 
@@ -5880,6 +5880,11 @@ msgstr "Chat"
 
 msgid "Topics"
 msgstr "Themen"
+
+#, python-format
+msgid "You have successfully unsubscribed from the newsletter at ${address}"
+msgstr ""
+"Sie haben die Mail-Adresse ${address} erfolgreich vom Newsletter abgemeldet"
 
 msgid "A survey with this name already exists"
 msgstr "Eine Umfrage mit diesem Namen existiert bereits"

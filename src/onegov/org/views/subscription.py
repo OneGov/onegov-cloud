@@ -51,7 +51,8 @@ def view_unsubscribe(
 
     if self.unsubscribe():
         request.success(_(
-            '${address} successfully unsubscribed',
+            'You have successfully unsubscribed from the newsletter '
+            'at ${address}',
             mapping={'address': address}
         ))
     else:

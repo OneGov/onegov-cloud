@@ -2,7 +2,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE 1.0\n"
-"POT-Creation-Date: 2024-09-18 12:11+0200\n"
+"POT-Creation-Date: 2024-09-24 00:27+0200\n"
 "PO-Revision-Date: 2022-03-15 10:50+0100\n"
 "Last-Translator: Marc Sommerhalder <marc.sommerhalder@seantis.ch>\n"
 "Language-Team: French\n"
@@ -2949,8 +2949,8 @@ msgstr "Refuser ${title} est irréversible."
 msgid "Reject reservation"
 msgstr "Refuser la réservation"
 
-#.
 #. Used in sentence: "${event} published."
+#.
 msgid "Event"
 msgstr "Événement"
 
@@ -3304,8 +3304,8 @@ msgid ""
 "filled-out form."
 msgstr ""
 "Veuillez vérifier vos données et appuyez sur « Compléter » pour finaliser le "
-"processus. S'il y a quelque chose que vous souhaitez modifier, cliquez sur "
-"« Modifier » pour retourner sur le formulaire complété."
+"processus. S'il y a quelque chose que vous souhaitez modifier, cliquez sur « "
+"Modifier » pour retourner sur le formulaire complété."
 
 msgid ""
 "The image shown in the list view is a square. To have your image shown fully "
@@ -5162,7 +5162,7 @@ msgstr ""
 
 #, python-format
 msgid "${address} successfully unsubscribed"
-msgstr "${address} a bien été désinscrite"
+msgstr "${address} désinscrit avec succès"
 
 #, python-format
 msgid "${address} could not be unsubscribed, wrong token"
@@ -5899,6 +5899,11 @@ msgstr "Chat"
 
 msgid "Topics"
 msgstr "Sujets"
+
+#, python-format
+msgid "You have successfully unsubscribed from the newsletter at ${address}"
+msgstr ""
+"Vous vous êtes désabonné avec succès de la lettre d'information à ${address}."
 
 msgid "A survey with this name already exists"
 msgstr "Une enquête avec ce nom existe déjà"
