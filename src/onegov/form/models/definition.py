@@ -362,7 +362,8 @@ class SurveyDefinition(Base, ContentMixin, TimestampMixin,
         all_fields = form._fields
         all_fields.pop('csrf_token', None)
         fields = all_fields.values()
-        q = request.session.query(SurveySubmission)
+        q = request.session.query(SurveySubmission).filter_by(
+                state='complete')
         q = q.filter_by(name=self.name)
         if sw_id:
             submissions = q.filter_by(submission_window_id=sw_id).all()

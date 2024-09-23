@@ -243,7 +243,11 @@ def delete_submission_window(
 
     request.assert_valid_csrf_token()
 
-    self.disassociate()
+    submissions = request.session.query(SurveySubmission)
+    submissions = submissions.filter(
+        SurveySubmission.submission_window_id == self.id)
+    submissions.delete()
     request.session.delete(self)
 
-    request.success(_('The submission window was deleted'))
+    request.success(_('The submission window and all associated submissions '
+                        'were deleted'))

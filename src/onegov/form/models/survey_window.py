@@ -108,12 +108,6 @@ class SurveySubmissionWindow(Base, TimestampMixin):
             ), self.timezone, 'up'
         )
 
-    def disassociate(self) -> None:
-        """ Disassociates all records linked to this window. """
-
-        for submission in self.submissions:
-            submission.submission_window_id = None
-
     @property
     def in_the_future(self) -> bool:
         return sedate.utcnow() <= self.localized_start
