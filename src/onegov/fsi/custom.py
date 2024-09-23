@@ -31,14 +31,14 @@ def get_base_tools(request: 'FsiRequest') -> 'Iterator[Link | LinkGroup]':
 
         profile_links = [
             Link(
-                _("Profile"), request.link(usr),
+                _('Profile'), request.link(usr),
                 attrs={'class': 'profile'}
             )
         ] if usr else []
         if request.is_admin:
             profile_links.append(
                 Link(
-                    _("User Profile"),
+                    _('User Profile'),
                     request.link(request.app.org, name='userprofile'),
                     attrs={'class': 'profile'}
                 )
@@ -46,7 +46,7 @@ def get_base_tools(request: 'FsiRequest') -> 'Iterator[Link | LinkGroup]':
 
         profile_links.append(
             Link(
-                _("Logout"), request.link(
+                _('Logout'), request.link(
                     Auth.from_request(
                         request, to=logout_path(request)), name='logout'
                 ), attrs={'class': 'logout'}
@@ -80,7 +80,7 @@ def get_base_tools(request: 'FsiRequest') -> 'Iterator[Link | LinkGroup]':
 
             links.append(
                 Link(
-                    _("Surveys"),
+                    _('Surveys'),
                     request.class_link(
                         SurveyCollection),
                     attrs={'class': 'surveys'}
@@ -90,21 +90,21 @@ def get_base_tools(request: 'FsiRequest') -> 'Iterator[Link | LinkGroup]':
         if request.is_admin:
             links.append(
                 Link(
-                    _("Files"), request.class_link(GeneralFileCollection),
+                    _('Files'), request.class_link(GeneralFileCollection),
                     attrs={'class': 'files'}
                 )
             )
 
             links.append(
                 Link(
-                    _("Images"), request.class_link(ImageFileCollection),
+                    _('Images'), request.class_link(ImageFileCollection),
                     attrs={'class': 'images'}
                 )
             )
 
             links.append(
                 Link(
-                    _("Settings"), request.link(
+                    _('Settings'), request.link(
                         request.app.org, 'settings'
                     ), attrs={'class': 'settings'}
                 )
@@ -112,12 +112,12 @@ def get_base_tools(request: 'FsiRequest') -> 'Iterator[Link | LinkGroup]':
 
             links.append(
                 Link(
-                    _("Users"), request.class_link(UserCollection),
+                    _('Users'), request.class_link(UserCollection),
                     attrs={'class': 'users'}
                 )
             )
         if request.is_manager:
-            yield LinkGroup(_("Management"), classes=('management',),
+            yield LinkGroup(_('Management'), classes=('management',),
                             links=links)
 
         if reservation_count:
@@ -126,8 +126,8 @@ def get_base_tools(request: 'FsiRequest') -> 'Iterator[Link | LinkGroup]':
             css = 'no-tickets'
 
         yield Link(
-            reservation_count == 1 and _("Event Subscription")
-            or _("Event Subscriptions"),
+            reservation_count == 1 and _('Event Subscription')
+            or _('Event Subscriptions'),
             request.link(
                 SubscriptionsCollection(
                     request.session,
@@ -142,14 +142,14 @@ def get_base_tools(request: 'FsiRequest') -> 'Iterator[Link | LinkGroup]':
         )
     else:
         yield Link(
-            _("Login"), request.link(
+            _('Login'), request.link(
                 Auth.from_request_path(request), name='login'
             ), attrs={'class': 'login'}
         )
 
         if request.app.enable_user_registration:
             yield Link(
-                _("Register"), request.link(
+                _('Register'), request.link(
                     Auth.from_request_path(request), name='register'
                 ), attrs={'class': 'register'})
 
@@ -172,7 +172,7 @@ def get_top_navigation(request: 'FsiRequest') -> 'Iterator[NavigationEntry]':
     yield (  # type:ignore[misc]
         Bunch(id=-3, access='public', published=True),
         Link(
-            text=_("Courses"),
+            text=_('Courses'),
             url=request.class_link(CourseCollection)
         ),
         ()
@@ -181,7 +181,7 @@ def get_top_navigation(request: 'FsiRequest') -> 'Iterator[NavigationEntry]':
         yield (  # type:ignore[misc]
             Bunch(id=-2, access='public', published=True),
             Link(
-                text=_("Audit"),
+                text=_('Audit'),
                 url=request.class_link(AuditCollection)
             ),
             ()
@@ -189,7 +189,7 @@ def get_top_navigation(request: 'FsiRequest') -> 'Iterator[NavigationEntry]':
         yield (  # type:ignore[misc]
             Bunch(id=-1, access='public', published=True),
             Link(
-                text=_("Attendee Check"),
+                text=_('Attendee Check'),
                 url=request.class_link(PastCourseEventCollection)
             ),
             ()

@@ -54,7 +54,7 @@ class AgencyPdfDefault(Pdf):
         pdf = cls(
             result,
             title=title,
-            created=f"{date.today():%d.%m.%Y}",
+            created=f'{date.today():%d.%m.%Y}',
             link_color=link_color or '#00538c',
             underline_links=underline_links
         )
@@ -242,7 +242,7 @@ class AgencyPdfZg(AgencyPdfDefault):
         with open(filename) as file:
             logo = file.read()
         kwargs['logo'] = logo
-        kwargs['author'] = "Kanton Zug"
+        kwargs['author'] = 'Kanton Zug'
         super().__init__(*args, **kwargs)
 
 
@@ -327,7 +327,7 @@ class AgencyPdfAr(AgencyPdfDefault):
             'canton-ar.png'
         )
         kwargs['logo'] = filename
-        kwargs['author'] = "Kanton Appenzell Ausserrhoden"
+        kwargs['author'] = 'Kanton Appenzell Ausserrhoden'
         super().__init__(*args, **kwargs)
 
 
@@ -352,7 +352,7 @@ class AgencyPdfBs(AgencyPdfDefault):
     margin_bottom = 2.4 * cm
     margin_left = 2.2 * cm
     margin_right = 2 * cm
-    font_name = "Helvetica"  # Arial not supported by now
+    font_name = 'Helvetica'  # Arial not supported by now
     font_size = 11
 
     @staticmethod
@@ -405,7 +405,7 @@ class AgencyPdfBs(AgencyPdfDefault):
         )
 
         kwargs['logo'] = filename
-        kwargs['author'] = "Kanton Basel-Stadt"
+        kwargs['author'] = 'Kanton Basel-Stadt'
 
         # These are not set like the frame and the table is indented by the
         # difference of the default margin on init of self.doc and the set

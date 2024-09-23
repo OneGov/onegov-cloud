@@ -12,7 +12,7 @@ if TYPE_CHECKING:
     from onegov.election_day.models import Election
     from onegov.election_day.models import ElectionCompound
     from onegov.election_day.models import Vote
-    from typing_extensions import TypeAlias
+    from typing import TypeAlias
 
     Entity: TypeAlias = Election | ElectionCompound | Vote
 

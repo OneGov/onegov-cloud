@@ -10,7 +10,7 @@ from typing import Any, TYPE_CHECKING
 if TYPE_CHECKING:
     from collections.abc import Callable
     from sqlalchemy.orm import Session
-    from typing_extensions import Self
+    from typing import Self
 
 
 class Scoring:

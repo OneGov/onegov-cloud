@@ -18,7 +18,7 @@ if TYPE_CHECKING:
     from onegov.form.types import PricingRules
     from onegov.form.types import Validators
     from onegov.form.types import Widget
-    from typing_extensions import Self
+    from typing import Self
     from wtforms.form import BaseForm
     from wtforms.meta import _SupportsGettextAndNgettext
     from wtforms.meta import DefaultMeta
@@ -99,10 +99,10 @@ class SwissvoteMetadataField(UploadField):
         try:
             workbook = load_workbook(self.file, data_only=True)
         except Exception as exception:
-            raise ValidationError(_("Not a valid XLSX file.")) from exception
+            raise ValidationError(_('Not a valid XLSX file.')) from exception
 
         if len(workbook.worksheets) < 1:
-            raise ValidationError(_("No data."))
+            raise ValidationError(_('No data.'))
 
         if 'Metadaten zu Scans' not in workbook.sheetnames:
             raise ValidationError(_("Sheet 'Metadaten zu Scans' is missing."))
@@ -114,13 +114,13 @@ class SwissvoteMetadataField(UploadField):
             assert isinstance(sheet, Worksheet)
 
         if sheet.max_row <= 1:
-            raise ValidationError(_("No data."))
+            raise ValidationError(_('No data.'))
 
         headers = [column.value for column in next(sheet.rows)]
         missing = set(mapper.columns.values()) - set(headers)  # type:ignore
         if missing:
             raise ValidationError(_(
-                "Some columns are missing: ${columns}.",
+                'Some columns are missing: ${columns}.',
                 mapping={'columns': ', '.join(missing)}
             ))
 
@@ -175,7 +175,7 @@ class SwissvoteMetadataField(UploadField):
 
                 else:
                     if not nullable and value is None:
-                        column_errors.append((index, column, "∅"))
+                        column_errors.append((index, column, '∅'))
                     mapper.set_value(metadata, attribute, value)
 
             if not all_columns_empty:
@@ -187,7 +187,7 @@ class SwissvoteMetadataField(UploadField):
 
         if errors:
             raise ValidationError(_(
-                "Some cells contain invalid values: ${errors}.",
+                'Some cells contain invalid values: ${errors}.',
                 mapping={
                     'errors': '; '.join(
                         '{}:{} {}'.format(*error) for error in errors

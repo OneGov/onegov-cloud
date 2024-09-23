@@ -42,7 +42,7 @@ def town_handle_new_resource_recipient(
     request: 'TownRequest',
     form: ResourceRecipientForm
 ) -> 'RenderData | Response':
-    title = _("New Recipient")
+    title = _('New Recipient')
     return handle_new_resource_recipient(
         self, request, form,
         ResourceRecipientsFormLayout(self, request, title)
@@ -61,7 +61,7 @@ def town_handle_edit_resource_recipient(
     request: 'TownRequest',
     form: ResourceRecipientForm
 ) -> 'RenderData | Response':
-    title = _("Edit Recipient")
+    title = _('Edit Recipient')
     return handle_edit_resource_recipient(
         self, request, form,
         ResourceRecipientsFormLayout(self, request, title)

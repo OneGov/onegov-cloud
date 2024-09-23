@@ -54,13 +54,13 @@ def add_notification(
     if form.submitted(request):
         notification = Notification.create(request)
         form.update_model(notification)
-        request.message(_("Notification added."), 'success')
+        request.message(_('Notification added.'), 'success')
         return redirect(layout.success_url)
 
     return {
         'layout': layout,
         'form': form,
-        'button_text': _("Save"),
+        'button_text': _('Save'),
         'cancel': layout.cancel_url
     }
 
@@ -97,7 +97,7 @@ def edit_notification(
 
     if form.submitted(request):
         form.update_model(self)
-        request.message(_("Notification modified."), 'success')
+        request.message(_('Notification modified.'), 'success')
         return redirect(layout.success_url)
 
     if not form.errors:
@@ -106,7 +106,7 @@ def edit_notification(
     return {
         'layout': layout,
         'form': form,
-        'button_text': _("Save"),
+        'button_text': _('Save'),
         'cancel': layout.cancel_url,
     }
 
@@ -124,4 +124,4 @@ def delete_notification(
 
     request.assert_valid_csrf_token()
     NotificationCollection(request.session).delete(self)
-    request.message(_("Notification deleted."), 'success')
+    request.message(_('Notification deleted.'), 'success')

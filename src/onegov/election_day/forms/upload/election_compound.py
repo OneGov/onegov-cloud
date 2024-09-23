@@ -13,9 +13,9 @@ from wtforms.validators import InputRequired
 class UploadElectionCompoundForm(Form):
 
     file_format = RadioField(
-        _("File format"),
+        _('File format'),
         choices=[
-            ('internal', _("OneGov Cloud")),
+            ('internal', _('OneGov Cloud')),
         ],
         validators=[
             InputRequired()
@@ -24,7 +24,7 @@ class UploadElectionCompoundForm(Form):
     )
 
     results = UploadField(
-        label=_("Results"),
+        label=_('Results'),
         validators=[
             DataRequired(),
             WhitelistedMimeType(ALLOWED_MIME_TYPES),

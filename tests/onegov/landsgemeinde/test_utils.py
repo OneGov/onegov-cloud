@@ -16,6 +16,11 @@ def test_update_ticker(landsgemeinde_app, assembly):
         is_manager = True
         url = 'http://localhost'
         locale = 'de_CH'
+        template_loader = (
+            landsgemeinde_app.config
+            .template_engine_registry
+            ._template_loaders['.pt']
+        )
 
         def include(self, asset):
             pass

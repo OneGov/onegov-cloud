@@ -53,7 +53,7 @@ def stored_random_token(namespace: str, name: str) -> str:
 
     path = os.path.join(namespace_dir, name)
     if os.path.isfile(path):
-        with open(path, mode='r') as f:
+        with open(path) as f:
             return f.read()
 
     token = random_token()

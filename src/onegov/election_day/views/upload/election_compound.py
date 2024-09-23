@@ -48,7 +48,7 @@ def view_upload_election_compound(
                     form.results.data['mimetype']
                 )
             else:
-                raise NotImplementedError("Unsupported import format")
+                raise NotImplementedError('Unsupported import format')
 
             archive = ArchivedResultCollection(request.session)
             archive.update(self, request)

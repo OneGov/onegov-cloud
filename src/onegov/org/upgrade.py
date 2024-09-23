@@ -78,20 +78,20 @@ def remove_official_notices_table(context: UpgradeContext) -> bool | None:
     # an incompatible release was accidentally left in, so we remove the
     # table in such instances, triggering a recreation on the next start
 
-    if not context.has_table("official_notices"):
+    if not context.has_table('official_notices'):
         return False
 
     session = context.app.session_manager.session()
 
-    organisations_count = session.execute("select count(*) from organisations")
+    organisations_count = session.execute('select count(*) from organisations')
     if organisations_count.scalar() != 1:
         return False
 
-    notices_count = session.execute("select count(*) from official_notices")
+    notices_count = session.execute('select count(*) from official_notices')
     if notices_count.scalar() != 0:
         return False
 
-    context.operations.drop_table("official_notices")
+    context.operations.drop_table('official_notices')
     return None
 
 

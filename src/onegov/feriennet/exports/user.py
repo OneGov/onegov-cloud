@@ -15,8 +15,8 @@ if TYPE_CHECKING:
     id='benutzer',
     form_class=ExportForm,
     permission=Secret,
-    title=_("Users"),
-    explanation=_("Exports user accounts."),
+    title=_('Users'),
+    explanation=_('Exports user accounts.'),
 )
 class UserExport(FeriennetExport):
 

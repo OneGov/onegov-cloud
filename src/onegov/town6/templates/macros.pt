@@ -1707,67 +1707,63 @@
 
 
 <metal:testimonial_slider define-macro="testimonial_slider" i18n:domain="onegov.town6">
-<div class="grid-container full ${color}" tal:condition="description_1 and image_1 and quote_1"><div class="grid-x"><div class="small-12 medium-12 cell">
-    <div class="grid-container"><div class="grid-x grid-padding-x">
-        <div class="small-12 medium-12 cell">
-            <div class="orbit slider testimonial-slider" role="region" aria-label="Homepage Testimonal Slider" data-orbit data-timer-delay="7200">
-                <div class="orbit-wrapper">
-                    <ul class="orbit-container">
-                        <li class="orbit-slide">
-                            <div class="testimonial grid-x grid-padding-x" data-aos="fade">
-                                <div class="small-4 medium-2 cell"><div class="square-container">
-                                    <img src="${image_1}"/>
-                                </div></div>
-                                <div class="small-8 medium-10 cell"><div class="text">
-                                    <p class="description">${description_1}</p>
-                                    <p class="quote">
-                                    <i class="fas fa-angle-double-left"></i>
-                                    ${quote_1}
-                                    <i class="fas fa-angle-double-right"></i>
-                                    </p>
-                                </div></div>
-                            </div>
-                        </li>
-                        <li class="orbit-slide" tal:condition="description_2 and image_2 and quote_2">
-                            <div class="testimonial grid-x grid-padding-x" data-aos="fade">
-                                <div class="small-4 medium-2 cell"><div class="square-container">
-                                    <img src="${image_2}"/>
-                                </div></div>
-                                <div class="small-8 medium-10 cell"><div class="text">
-                                    <p class="description">${description_2}</p>
-                                    <p class="quote">
-                                    <i class="fas fa-angle-double-left"></i>
-                                    ${quote_2}
-                                    <i class="fas fa-angle-double-right"></i>
-                                    </p>
-                                </div></div>
-                            </div>
-                        </li>
-                        <li class="orbit-slide" tal:condition="description_3 and image_3 and quote_3">
-                            <div class="testimonial grid-x grid-padding-x" data-aos="fade">
-                                <div class="small-4 medium-2 cell"><div class="square-container">
-                                    <img src="${image_3}"/>
-                                </div></div>
-                                <div class="small-8 medium-10 cell"><div class="text">
-                                    <p class="description">${description_3}</p>
-                                    <p class="quote">
-                                    <i class="fas fa-angle-double-left"></i>
-                                    ${quote_3}
-                                    <i class="fas fa-angle-double-right"></i>
-                                    </p>
-                                </div></div>
-                            </div>
-                        </li>
-                    </ul>
-                    <div class="orbit-controls" tal:condition="image_2 and image_2 and quote_2">
-                        <button class="orbit-previous"><span class="show-for-sr">Previous Slide</span><i class="fa fa-chevron-left"></i></button>
-                        <button class="orbit-next"><span class="show-for-sr">Next Slide</span><i class="fa fa-chevron-right"></i></button>
+<tal:b tal:condition="description_1 and image_1 and quote_1">
+    <div class="orbit slider testimonial-slider" role="region" aria-label="Homepage Testimonal Slider" data-orbit data-timer-delay="7200">
+        <div class="orbit-wrapper">
+            <ul class="orbit-container">
+                <li class="orbit-slide">
+                    <div class="testimonial grid-x grid-padding-x" data-aos="fade">
+                        <div class="small-4 medium-2 cell"><div class="square-container">
+                            <img src="${image_1}"/>
+                        </div></div>
+                        <div class="small-8 medium-10 cell"><div class="text">
+                            <p class="description">${description_1}</p>
+                            <p class="quote">
+                            <i class="fas fa-angle-double-left"></i>
+                            ${quote_1}
+                            <i class="fas fa-angle-double-right"></i>
+                            </p>
+                        </div></div>
                     </div>
-                </div>
+                </li>
+                <li class="orbit-slide" tal:condition="description_2 and image_2 and quote_2">
+                    <div class="testimonial grid-x grid-padding-x" data-aos="fade">
+                        <div class="small-4 medium-2 cell"><div class="square-container">
+                            <img src="${image_2}"/>
+                        </div></div>
+                        <div class="small-8 medium-10 cell"><div class="text">
+                            <p class="description">${description_2}</p>
+                            <p class="quote">
+                            <i class="fas fa-angle-double-left"></i>
+                            ${quote_2}
+                            <i class="fas fa-angle-double-right"></i>
+                            </p>
+                        </div></div>
+                    </div>
+                </li>
+                <li class="orbit-slide" tal:condition="description_3 and image_3 and quote_3">
+                    <div class="testimonial grid-x grid-padding-x" data-aos="fade">
+                        <div class="small-4 medium-2 cell"><div class="square-container">
+                            <img src="${image_3}"/>
+                        </div></div>
+                        <div class="small-8 medium-10 cell"><div class="text">
+                            <p class="description">${description_3}</p>
+                            <p class="quote">
+                            <i class="fas fa-angle-double-left"></i>
+                            ${quote_3}
+                            <i class="fas fa-angle-double-right"></i>
+                            </p>
+                        </div></div>
+                    </div>
+                </li>
+            </ul>
+            <div class="orbit-controls" tal:condition="image_2 and image_2 and quote_2">
+                <button class="orbit-previous"><span class="show-for-sr">Previous Slide</span><i class="fa fa-chevron-left"></i></button>
+                <button class="orbit-next"><span class="show-for-sr">Next Slide</span><i class="fa fa-chevron-right"></i></button>
             </div>
         </div>
-    </div></div>
-</div></div></div>
+    </div>
+</tal:b>
 </metal:testimonial_slider>
 
 <metal:bullets define-macro="orbit-bullets" i18n:domain="onegov.town6">
@@ -2216,108 +2212,107 @@
     </div>
     <div class="file-status">
 
-        <tal:b condition="request.app.enable_yubikey and file.reference['content_type'] == 'application/pdf'">
-            <h3 i18n:translate>Digital seal</h3>
-            <div class="signature">
-                <div class="file-status-tag">
-                    <metal:b use-macro="layout.macros['signature_status']" />
+        <tal:block tal:condition="not: hide_publication|False">
+
+            <h3 i18n:translate>Access</h3>
+            <div class="publication" tal:define="
+                post_url layout.csrf_protected_url(request.link(file, name='update-publish-date'));
+                publish_end_date file.publish_end_date and layout.to_timezone(file.publish_end_date, layout.timezone);
+                publish_date file.publish_date and layout.to_timezone(file.publish_date, layout.timezone);"
+                >
+                <div tal:condition="file.published" class="file-status-tag">
+                    <a ic-post-to="${layout.csrf_protected_url(request.link(file, name='unpublish'))}"
+                       ic-on-success="Intercooler.triggerRequest($(elt).closest('[ic-get-from]'))"
+                       class="is-published">
+                        <i class="far fa-fw fa-check-circle" aria-hidden="true"></i> <span i18n:translate>Public</span>
+                    </a>
                 </div>
-            </div>
-        </tal:b>
+                <div tal:condition="not:file.published" class="file-status-tag">
+                    <a ic-post-to="${layout.csrf_protected_url(request.link(file, name='publish'))}"
+                       ic-on-success="Intercooler.triggerRequest($(elt).closest('[ic-get-from]'))"
+                       class="is-not-published">
+                        <i class="far fa-fw fa-eye-slash" aria-hidden="true"></i> <span i18n:translate>Private</span>
+                    </a>
+                </div>
 
-            <tal:block tal:condition="not: hide_publication|False">
-
-                <h3 i18n:translate>Access</h3>
-                <div class="publication" tal:define="
-                    post_url layout.csrf_protected_url(request.link(file, name='update-publish-date'));
-                    publish_end_date file.publish_end_date and layout.to_timezone(file.publish_end_date, layout.timezone);
-                    publish_date file.publish_date and layout.to_timezone(file.publish_date, layout.timezone);"
-                    >
-                    <div tal:condition="file.published" class="file-status-tag">
-                        <a ic-post-to="${layout.csrf_protected_url(request.link(file, name='unpublish'))}"
-                           ic-on-success="Intercooler.triggerRequest($(elt).closest('[ic-get-from]'))"
-                           class="is-published">
-                            <i class="far fa-fw fa-check-circle" aria-hidden="true"></i> <span i18n:translate>Public</span>
-                        </a>
-                    </div>
-                    <div tal:condition="not:file.published" class="file-status-tag">
-                        <a ic-post-to="${layout.csrf_protected_url(request.link(file, name='publish'))}"
-                           ic-on-success="Intercooler.triggerRequest($(elt).closest('[ic-get-from]'))"
-                           class="is-not-published">
-                            <i class="far fa-fw fa-eye-slash" aria-hidden="true"></i> <span i18n:translate>Private</span>
-                        </a>
-                    </div>
-
-                    <div class="publication-settings publication-date-set">
-                        <form method="POST">
-                            <div tal:condition="not:file.published">
-                                <fieldset>
-                                    <legend tal:condition="publish_date" i18n:translate>Will be published on:</legend>
-                                    <legend tal:condition="not:publish_date" i18n:translate>Publication date:</legend>
-                                    <div class="publication-settings-input">
-                                        <input type="date" name="date" class="small" ic-post-to="${post_url}" ic-on-success="Intercooler.triggerRequest($(elt).closest('[ic-get-from]'))" value="${publish_date and publish_date.date().isoformat() or ''}" required="required">
-
-                                        <select name="hour" ic-post-to="${post_url}" ic-on-success="Intercooler.triggerRequest($(elt).closest('[ic-get-from]'))">
-                                            <option tal:condition="not:publish_date"></option>
-                                            <tal:b repeat="hour range(24)" tal:define="publish_time publish_date and '{:0>2}:00'.format(publish_date.hour)">
-                                                <option tal:define="time '{:0>2}:00'.format(hour)" tal:attributes="selected publish_time == time" value="${time}">${time}</option>
-                                            </tal:b>
-                                        </select>
-
-                                        <a ic-post-to="${post_url}&clear_start_date=1" ic-on-success="Intercooler.triggerRequest($(elt).closest('[ic-get-from]'))">
-                                            <i class="far fa-times-circle"></i>
-                                            <span class="show-for-sr" i18n:translate>Reset</span>
-                                        </a>
-                                    </div>
-                                </fieldset>
-                            </div>
+                <div class="publication-settings publication-date-set">
+                    <form method="POST">
+                        <div tal:condition="not:file.published">
                             <fieldset>
-                                <legend tal:condition="publish_end_date" i18n:translate>Will be published until:</legend>
-                                <legend tal:condition="not:publish_end_date" i18n:translate>Publication end date:</legend>
+                                <legend tal:condition="publish_date" i18n:translate>Will be published on:</legend>
+                                <legend tal:condition="not:publish_date" i18n:translate>Publication date:</legend>
                                 <div class="publication-settings-input">
-                                    <input type="date" name="end-date" class="small" ic-post-to="${post_url}" ic-on-success="Intercooler.triggerRequest($(elt).closest('[ic-get-from]'))" value="${publish_end_date and publish_end_date.date().isoformat() or ''}" required="required">
+                                    <input type="date" name="date" class="small" ic-post-to="${post_url}" ic-on-success="Intercooler.triggerRequest($(elt).closest('[ic-get-from]'))" value="${publish_date and publish_date.date().isoformat() or ''}" required="required">
 
-                                    <select name="end-hour" ic-post-to="${post_url}" ic-on-success="Intercooler.triggerRequest($(elt).closest('[ic-get-from]'))">
-                                        <option tal:condition="not:publish_end_date"></option>
-                                        <tal:b repeat="hour range(24)" tal:define="publish_end_time publish_end_date and '{:0>2}:00'.format(publish_end_date.hour)">
-                                            <option tal:define="end_time '{:0>2}:00'.format(hour)" tal:attributes="selected publish_end_time == end_time" value="${end_time}">${end_time}</option>
+                                    <select name="hour" ic-post-to="${post_url}" ic-on-success="Intercooler.triggerRequest($(elt).closest('[ic-get-from]'))">
+                                        <option tal:condition="not:publish_date"></option>
+                                        <tal:b repeat="hour range(24)" tal:define="publish_time publish_date and '{:0>2}:00'.format(publish_date.hour)">
+                                            <option tal:define="time '{:0>2}:00'.format(hour)" tal:attributes="selected publish_time == time" value="${time}">${time}</option>
                                         </tal:b>
                                     </select>
 
-                                    <a ic-post-to="${post_url}&clear_end_date=1" ic-on-success="Intercooler.triggerRequest($(elt).closest('[ic-get-from]'))">
+                                    <a ic-post-to="${post_url}&clear_start_date=1" ic-on-success="Intercooler.triggerRequest($(elt).closest('[ic-get-from]'))">
                                         <i class="far fa-times-circle"></i>
                                         <span class="show-for-sr" i18n:translate>Reset</span>
                                     </a>
                                 </div>
                             </fieldset>
-                        </form>
-                    </div>
+                        </div>
+                        <fieldset>
+                            <legend tal:condition="publish_end_date" i18n:translate>Will be published until:</legend>
+                            <legend tal:condition="not:publish_end_date" i18n:translate>Publication end date:</legend>
+                            <div class="publication-settings-input">
+                                <input type="date" name="end-date" class="small" ic-post-to="${post_url}" ic-on-success="Intercooler.triggerRequest($(elt).closest('[ic-get-from]'))" value="${publish_end_date and publish_end_date.date().isoformat() or ''}" required="required">
+
+                                <select name="end-hour" ic-post-to="${post_url}" ic-on-success="Intercooler.triggerRequest($(elt).closest('[ic-get-from]'))">
+                                    <option tal:condition="not:publish_end_date"></option>
+                                    <tal:b repeat="hour range(24)" tal:define="publish_end_time publish_end_date and '{:0>2}:00'.format(publish_end_date.hour)">
+                                        <option tal:define="end_time '{:0>2}:00'.format(hour)" tal:attributes="selected publish_end_time == end_time" value="${end_time}">${end_time}</option>
+                                    </tal:b>
+                                </select>
+
+                                <a ic-post-to="${post_url}&clear_end_date=1" ic-on-success="Intercooler.triggerRequest($(elt).closest('[ic-get-from]'))">
+                                    <i class="far fa-times-circle"></i>
+                                    <span class="show-for-sr" i18n:translate>Reset</span>
+                                </a>
+                            </div>
+                        </fieldset>
+                    </form>
+                </div>
+            </div>
+
+            <h3 i18n:translate>Publication</h3>
+            <div class="publication" tal:define="
+                post_url layout.csrf_protected_url(request.link(file, name='update-publish-date'));
+                publish_date file.publish_date and layout.to_timezone(file.publish_date, layout.timezone);
+                publish_end_date file.publish_end_date and layout.to_timezone(file.publish_end_date, layout.timezone);"
+                >
+                <div tal:condition="file.publication" class="file-status-tag">
+                    <a ic-post-to="${layout.csrf_protected_url(request.link(file, name='toggle-publication'))}"
+                       ic-on-success="Intercooler.triggerRequest($(elt).closest('[ic-get-from]'))"
+                       class="is-a-publication">
+                        <i class="far fa-fw fa-check-circle" aria-hidden="true"></i> <span i18n:translate>Publication</span>
+                    </a>
                 </div>
 
-                <h3 i18n:translate>Publication</h3>
-                <div class="publication" tal:define="
-                    post_url layout.csrf_protected_url(request.link(file, name='update-publish-date'));
-                    publish_date file.publish_date and layout.to_timezone(file.publish_date, layout.timezone);
-                    publish_end_date file.publish_end_date and layout.to_timezone(file.publish_end_date, layout.timezone);"
-                    >
-                    <div tal:condition="file.publication" class="file-status-tag">
-                        <a ic-post-to="${layout.csrf_protected_url(request.link(file, name='toggle-publication'))}"
-                           ic-on-success="Intercooler.triggerRequest($(elt).closest('[ic-get-from]'))"
-                           class="is-a-publication">
-                            <i class="far fa-fw fa-check-circle" aria-hidden="true"></i> <span i18n:translate>Publication</span>
-                        </a>
-                    </div>
-
-                    <div tal:condition="not:file.publication" class="file-status-tag">
-                        <a ic-post-to="${layout.csrf_protected_url(request.link(file, name='toggle-publication'))}"
-                           ic-on-success="Intercooler.triggerRequest($(elt).closest('[ic-get-from]'))"
-                           class="is-not-a-publication">
-                            <i class="far fa-fw fa-times-circle" aria-hidden="true"></i> <span i18n:translate>Not a publication</span>
-                        </a>
-                    </div>
+                <div tal:condition="not:file.publication" class="file-status-tag">
+                    <a ic-post-to="${layout.csrf_protected_url(request.link(file, name='toggle-publication'))}"
+                       ic-on-success="Intercooler.triggerRequest($(elt).closest('[ic-get-from]'))"
+                       class="is-not-a-publication">
+                        <i class="far fa-fw fa-times-circle" aria-hidden="true"></i> <span i18n:translate>Not a publication</span>
+                    </a>
                 </div>
+            </div>
+        </tal:block>
 
-            </tal:block>
+        <tal:b condition="request.app.enable_yubikey and file.reference['content_type'] == 'application/pdf'">
+            <h3 i18n:translate>Digital seal</h3>
+            <div class="signature">
+                <div class="file-status-tag">
+                    <metal:b use-macro="layout.macros['signature_status']"/>
+                </div>
+            </div>
+        </tal:b>
 
         <tal:b condition="file.reference['content_type'] == 'application/pdf'">
             <h3 i18n:translate>Content</h3>
@@ -2477,8 +2472,8 @@
                 ${file.name}
             </td>
             <td>
-                <a id="button-${file_number}">
-                    <i class="fa fa-chevron-down" aria-hidden="true"></i>
+                <a id="button-${file_number}" data-toggle="details-${file_number}">
+                    <i class="fa fa-chevron-down rotate" aria-hidden="true"></i>
                 </a>
             </td>
             <td>
@@ -2491,8 +2486,9 @@
                 ${format_date(file_publish_end)}
             </td>
         </tr>
-        <tr id="details-${file_number}">
-            <td colspan="4">
+        <!-- Hidden Detail-Row -->
+        <tr id="details-${file_number}" class="hidden">
+            <td colspan="5">
                 <div ic-trigger-from="#button-${file_number}"
                      ic-trigger-on="click once"
                      ic-get-from="${actions_url(file.id)}"
@@ -2501,7 +2497,6 @@
                 </div>
             </td>
         </tr>
-
     </tal:b>
 </metal:file_info>
 

@@ -57,9 +57,10 @@ def view_billing(
 
     if form.submitted(request) and not self.period.finalized:
         self.create_invoices(
-            all_inclusive_booking_text=request.translate(_("Passport")))
+            all_inclusive_booking_text=request.translate(_('Passport')))
 
         if form.finalize_period:
+            self.period = self.period.materialize(request.session)
             PeriodMessage.create(self.period, request, 'finalized')
             self.period.finalized = True
 
@@ -70,13 +71,13 @@ def view_billing(
     filters = {
         'state': [
             Link(
-                text=_("Paid"),
+                text=_('Paid'),
                 active=self.state == 'paid',
                 url=request.link(self.for_state('paid')),
                 rounded=True,
             ),
             Link(
-                text=_("Unpaid"),
+                text=_('Unpaid'),
                 active=self.state == 'unpaid',
                 url=request.link(self.for_state('unpaid')),
                 rounded=True,
@@ -105,7 +106,7 @@ def view_billing(
         url = f'{url}&for-user={quote_plus(username)}'
 
         return Link(
-            _("Add manual booking"),
+            _('Add manual booking'),
             attrs={'class': 'new-booking'},
             url=url
         )
@@ -124,7 +125,7 @@ def view_billing(
         )
 
         return Link(
-            _("Mark paid with specific date"),
+            _('Mark paid with specific date'),
             attrs={'class': 'paid-date'},
             url=url
         )
@@ -134,7 +135,7 @@ def view_billing(
             return
 
         yield Link(
-            _("Show invoice"),
+            _('Show invoice'),
             attrs={'class': 'show-invoice'},
             url=request.class_link(
                 InvoiceCollection, {
@@ -146,7 +147,7 @@ def view_billing(
 
         if details.has_online_payments:
             yield Link(
-                _("Show online payments"),
+                _('Show online payments'),
                 attrs={'class': 'show-online-payments'},
                 url=request.class_link(
                     InvoiceItem, {'id': details.first.id},
@@ -164,23 +165,23 @@ def view_billing(
         if details.disable_changes:
             traits = (
                 Block(_(
-                    "This bill or parts of it have been paid online. "
-                    "To change the state of the bill the payment "
-                    "needs to be charged back."
-                ), no=_("Cancel")),
+                    'This bill or parts of it have been paid online. '
+                    'To change the state of the bill the payment '
+                    'needs to be charged back.'
+                ), no=_('Cancel')),
             )
 
         elif details.discourage_changes:
             traits = (
                 Confirm(
                     _(
-                        "This bill or parts of it have been confirmed by "
-                        "the bank, do you really want to change the "
-                        "payment status?"
+                        'This bill or parts of it have been confirmed by '
+                        'the bank, do you really want to change the '
+                        'payment status?'
                     ),
                     None,
-                    _("Yes"),
-                    _("Cancel")
+                    _('Yes'),
+                    _('Cancel')
                 ),
             )
         else:
@@ -196,22 +197,22 @@ def view_billing(
         if item.changes == 'impossible':
             traits = (
                 Block(_(
-                    "This position has been paid online. To change "
-                    "the state of the position the payment needs to "
-                    "be charged back."
-                ), no=_("Cancel")),
+                    'This position has been paid online. To change '
+                    'the state of the position the payment needs to '
+                    'be charged back.'
+                ), no=_('Cancel')),
             )
 
         elif item.changes == 'discouraged':
             traits = (
                 Confirm(
                     _(
-                        "This position has been confirmed by the bank, do "
-                        "you really want to change the payment status?"
+                        'This position has been confirmed by the bank, do '
+                        'you really want to change the payment status?'
                     ),
                     None,
-                    _("Yes"),
-                    _("Cancel")
+                    _('Yes'),
+                    _('Cancel')
                 ),
             )
         else:
@@ -233,7 +234,7 @@ def view_billing(
                 id=details.first.id,
                 action='mark-unpaid',
                 extend_to='invoice',
-                text=_("Mark whole bill as unpaid")
+                text=_('Mark whole bill as unpaid')
             )
         else:
             yield InvoiceAction(
@@ -241,7 +242,7 @@ def view_billing(
                 id=details.first.id,
                 action='mark-paid',
                 extend_to='invoice',
-                text=_("Mark whole bill as paid")
+                text=_('Mark whole bill as paid')
             )
 
     def item_actions(item: 'InvoicesByPeriodRow') -> 'Iterator[InvoiceAction]':
@@ -250,14 +251,14 @@ def view_billing(
                 session=session,
                 id=item.id,
                 action='mark-unpaid',
-                text=_("Mark as unpaid")
+                text=_('Mark as unpaid')
             )
         else:
             yield InvoiceAction(
                 session=session,
                 id=item.id,
                 action='mark-paid',
-                text=_("Mark as paid")
+                text=_('Mark as paid')
             )
 
         if item.family:
@@ -265,19 +266,19 @@ def view_billing(
                 session=session,
                 id=item.id,
                 action='remove-manual',
-                text=_("Remove manual booking")
+                text=_('Remove manual booking')
             )
 
     return {
         'layout': layout,
-        'title': _("Billing for ${title}", mapping={
+        'title': _('Billing for ${title}', mapping={
             'title': self.period.title
         }),
         'model': self,
         'period': self.period,
         'periods': request.app.periods,
         'form': form,
-        'button_text': _("Create Bills"),
+        'button_text': _('Create Bills'),
         'invoice_links': invoice_links,
         'item_links': item_links,
         'filters': filters,
@@ -288,7 +289,7 @@ def view_billing(
     model=BillingCollection,
     name='reset',
     permission=Secret,
-    request_method="POST")
+    request_method='POST')
 def reset_billing(
     self: BillingCollection,
     request: 'FeriennetRequest'
@@ -296,7 +297,7 @@ def reset_billing(
 
     if not self.period.active:
         request.warning(
-            _("The period must be active in order to reset billing"))
+            _('The period must be active in order to reset billing'))
         return request.redirect(request.link(self))
 
     session = request.session
@@ -304,7 +305,7 @@ def reset_billing(
     for invoice in self.invoices.query():
         session.delete(invoice)
 
-    request.success(_("The billing was successfully reset."))
+    request.success(_('The billing was successfully reset.'))
     return None
 
 
@@ -339,7 +340,7 @@ def view_online_payments(
     }
 
     assert self.username is not None
-    title = _("Online Payments by ${name}", mapping={
+    title = _('Online Payments by ${name}', mapping={
         'name': request.app.user_titles_by_name[self.username]
     })
 
@@ -351,21 +352,21 @@ def view_online_payments(
             amount = f'{payment.amount:02f} {payment.currency}'
 
             yield Link(
-                text=_("Refund Payment"),
+                text=_('Refund Payment'),
                 url=layout.csrf_protected_url(
                     request.link(payment, 'refund')
                 ),
                 attrs={'class': 'payment-refund'},
                 traits=(
                     Confirm(
-                        _("Do you really want to refund ${amount}?", mapping={
+                        _('Do you really want to refund ${amount}?', mapping={
                             'amount': amount
                         }),
-                        _("This cannot be undone."),
-                        _("Refund ${amount}", mapping={
+                        _('This cannot be undone.'),
+                        _('Refund ${amount}', mapping={
                             'amount': amount
                         }),
-                        _("Cancel")
+                        _('Cancel')
                     ),
                     Intercooler(
                         request_method='POST',
@@ -423,7 +424,7 @@ def view_execute_import(
     request.assert_valid_csrf_token()
     cache = request.browser_session.get('account-statement')
     if not cache:
-        request.alert(_("Could not import payments. Check your import data."))
+        request.alert(_('Could not import payments. Check your import data.'))
         return
 
     binary = BytesIO(b64decode(cache['data']))
@@ -455,11 +456,11 @@ def view_execute_import(
                 item.paid = True
                 item.payment_date = payments[invoice.user_id].valuta_date
 
-        request.success(_("Imported ${count} payments", mapping={
+        request.success(_('Imported ${count} payments', mapping={
             'count': len(payments)
         }))
     else:
-        request.alert(_("No payments could be imported"))
+        request.alert(_('No payments could be imported'))
 
     del request.browser_session['account-statement']
 
@@ -503,7 +504,7 @@ def view_billing_import(
             xml = xml_b.decode('utf-8')
         except UnicodeDecodeError:
             # FIXME: Should we evict this from the browser session first?
-            request.alert(_("The submitted xml data could not be decoded"))
+            request.alert(_('The submitted xml data could not be decoded'))
             return request.redirect(request.link(self))
 
         schema, __ = request.app.invoice_schema_config()
@@ -519,7 +520,7 @@ def view_billing_import(
 
         if not transactions:
             del request.browser_session['account-statement']
-            request.alert(_("No transactions were found in the given file"))
+            request.alert(_('No transactions were found in the given file'))
             uploaded = False
             form.xml.data = None
         else:
@@ -537,9 +538,9 @@ def view_billing_import(
 
     return {
         'layout': layout,
-        'title': _("Import Bank Statement"),
+        'title': _('Import Bank Statement'),
         'form': form if not uploaded else None,
-        'button_text': _("Preview"),
+        'button_text': _('Preview'),
         'transactions': transactions,
         'uploaded': uploaded,
         'users': users,
@@ -574,9 +575,9 @@ def view_manual_booking_form(
         count = self.add_manual_position(form.users, form.text, form.amount)
 
         if not count:
-            request.alert(_("No manual bookings were created."))
+            request.alert(_('No manual bookings were created.'))
         else:
-            request.success(_("Created ${count} manual bookings", mapping={
+            request.success(_('Created ${count} manual bookings', mapping={
                 'count': count
             }))
 
@@ -584,7 +585,7 @@ def view_manual_booking_form(
 
     return {
         'layout': BillingCollectionManualBookingLayout(self, request),
-        'title': _("Add manual booking"),
+        'title': _('Add manual booking'),
         'form': form
     }
 
@@ -615,9 +616,9 @@ def view_paid_date_form(
             item.paid = True
 
         if self.request.params['item-id'] != 'all':
-            request.success(_("Invoice marked as paid"))
+            request.success(_('Invoice marked as paid'))
         else:
-            request.success(_("Invoice item(s) marked as paid"))
+            request.success(_('Invoice item(s) marked as paid'))
 
         return request.redirect(request.class_link(BillingCollection))
 
@@ -626,7 +627,7 @@ def view_paid_date_form(
     return {
         'layout': BillingCollectionPaymentWithDateLayout(
             self, request),
-        'title': _("Mark paid with specific date"),
-        'lead': _("Mark paid for ${user}", mapping={'user': user}),
+        'title': _('Mark paid with specific date'),
+        'lead': _('Mark paid for ${user}', mapping={'user': user}),
         'form': form
     }

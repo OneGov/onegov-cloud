@@ -24,10 +24,10 @@ if TYPE_CHECKING:
     import uuid
     from collections.abc import Iterable
     from onegov.activity.collections import PublicationRequestCollection
-    from onegov.activity.models import PublicationRequest
+    from onegov.activity.models import PeriodMeta, PublicationRequest
     from onegov.core.orm.mixins import dict_property
     from typing import Literal
-    from typing_extensions import Self, TypeAlias
+    from typing import Self, TypeAlias
 
     ActivityState: TypeAlias = Literal[
         'preview',
@@ -218,7 +218,7 @@ class Activity(Base, ContentMixin, TimestampMixin):
 
     def request_by_period(
         self,
-        period: Period | None
+        period: 'Period | PeriodMeta | None'
     ) -> 'PublicationRequest | None':
 
         if not period:
@@ -228,7 +228,7 @@ class Activity(Base, ContentMixin, TimestampMixin):
 
         return q.first()
 
-    def has_occasion_in_period(self, period: Period) -> bool:
+    def has_occasion_in_period(self, period: 'Period | PeriodMeta') -> bool:
         q = object_session(self).query(
             exists().where(and_(
                 Occasion.activity_id == self.id,

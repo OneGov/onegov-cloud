@@ -12,20 +12,20 @@ from wtforms.validators import InputRequired
 class CategoryForm(Form):
 
     title = StringField(
-        label=_("Title"),
+        label=_('Title'),
         validators=[
             InputRequired()
         ]
     )
 
     active = BooleanField(
-        label=_("Active"),
+        label=_('Active'),
         default=True
     )
 
     name = StringField(
-        label=_("ID"),
-        description=_("Leave blank to set the value automatically."),
+        label=_('ID'),
+        description=_('Leave blank to set the value automatically.'),
         validators=[
             UniqueColumnValue(Category),
             UnusedColumnKeyValue(GazetteNotice._categories)

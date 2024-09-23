@@ -1,5 +1,6 @@
 // Todo: Make the chosen select fields look like the others
-.field-type-chosenselectfield .chosen-select {
+.field-type-chosenselectfield .chosen-select,
+.field-type-peoplefield .people-select {
     display: none !important;
 }
 

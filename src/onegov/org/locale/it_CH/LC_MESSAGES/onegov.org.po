@@ -2,7 +2,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: \n"
-"POT-Creation-Date: 2024-08-29 15:08+0200\n"
+"POT-Creation-Date: 2024-09-18 12:11+0200\n"
 "PO-Revision-Date: 2022-03-15 10:52+0100\n"
 "Last-Translator: \n"
 "Language-Team: \n"
@@ -1469,6 +1469,18 @@ msgstr "Instagram"
 msgid "URL pointing to the Instagram site"
 msgstr "URL che punta al sito di Instagram"
 
+msgid "Linkedin"
+msgstr "LinkedIn"
+
+msgid "URL pointing to the LinkedIn site"
+msgstr "URL che punta al sito di LinkedIn"
+
+msgid "TikTok"
+msgstr "TikTok"
+
+msgid "URL pointing to the TikTok site"
+msgstr "URL che punta al sito di TikTok"
+
 msgid "Custom Link 1"
 msgstr "Collegamento personalizzato 1"
 
@@ -2627,8 +2639,32 @@ msgstr "La richiesta di modifica è stata applicata"
 msgid "The submission was rejected"
 msgstr "L'iscrizione è stata rifiutata"
 
-msgid "Your directory submission has been rejected"
-msgstr "L'invio della cartella è stato rifiutato"
+msgid "Your directory entry submission has been rejected"
+msgstr "L'inserimento nella directory è stato rifiutato"
+
+msgid "The entry submission has been rejected"
+msgstr "L'iscrizione è stata rifiutata"
+
+msgid "Your directory change submission has been rejected"
+msgstr "L'invio di una modifica alla directory è stato rifiutato"
+
+msgid "The change submission has been rejected"
+msgstr "'invio della modifica è stato rifiutato"
+
+msgid "The rejection was already withdrawn"
+msgstr "Il rifiuto è già stato ritirato"
+
+msgid "The directory entry submission rejection has been withdrawn"
+msgstr "Il rifiuto dell'inserimento nell'elenco è stato ritirato"
+
+msgid "The rejection of the entry has been withdrawn"
+msgstr "Il rifiuto della voce è stato ritirato"
+
+msgid "The directory change submission rejection has been withdrawn"
+msgstr "Il rifiuto dell'invio della modifica è stato ritirato"
+
+msgid "The rejection of the change has been withdrawn"
+msgstr "Il rifiuto della modifica è stato ritirato"
 
 msgid "Through URL only (not listed)"
 msgstr "Solo tramite URL (non elencato)"
@@ -2684,15 +2720,20 @@ msgstr ""
 msgid "Use text instead of lead in the newsletter"
 msgstr "Usa il testo invece dell'estratto nella newsletter"
 
+msgid "Select additional person"
+msgstr "Selezionare una persona aggiuntiva"
+
+msgid "No results match"
+msgstr "Nessun risultato corrisponde"
+
+msgid "List this function in the page of this person"
+msgstr "Mostra questa funzione nella pagina di questa persona"
+
 msgid "Use Western ordered names"
 msgstr "Utilizzare nomi ordinati all'occidentale"
 
 msgid "For instance Franz Müller instead of Müller Franz"
 msgstr "Per esempio Franz Müller invece di Müller Franz"
-
-#, python-format
-msgid "List this function in the page of ${name}"
-msgstr "Mostra questa funzione nella pagina di ${name}"
 
 msgid "A resource with this name already exists"
 msgstr "Esiste già una risorsa con questo nome"
@@ -2943,14 +2984,34 @@ msgstr "Adotta"
 msgid "View directory entry"
 msgstr "Visualizza elemento della cartella"
 
-msgid "Reject"
-msgstr "Rifiuta"
+msgid "Withdraw rejection"
+msgstr "Ritiro del rifiuto"
 
-msgid "Do you really want to reject this entry?"
-msgstr "Vuoi davvero rifiutare questo elemento?"
+msgid ""
+"This directory entry has been rejected. Do you want to withdraw the "
+"rejection?"
+msgstr "Questa voce dell'elenco è stata rifiutata. Volete ritirare il rifiuto?"
+
+msgid ""
+"This directory change has been rejected. Do you want to withdraw the "
+"rejection?"
+msgstr ""
+"Questa modifica della cartella è stata respinta. Volete ritirare il rifiuto?"
+
+msgid "Reject change request"
+msgstr "Rifiuta la richiesta di modifica"
+
+msgid "Do you really want to reject this change?"
+msgstr "Volete davvero rifiutare questa modifica?"
+
+msgid "Reject change"
+msgstr "Rifiutare la modifica"
 
 msgid "Reject entry"
 msgstr "Rifiuta elemento"
+
+msgid "Do you really want to reject this entry?"
+msgstr "Vuoi davvero rifiutare questo elemento?"
 
 msgid "Chats"
 msgstr "Chat"
@@ -3846,6 +3907,10 @@ msgstr "La richiesta di modifica è stata applicata:"
 msgid "Your directory submission has unfortunately been rejected:"
 msgstr "L'invio della cartella è stato rifiutato:"
 
+msgid "The rejection of your directory application has been withdrawn:"
+msgstr ""
+"Il rifiuto della vostra domanda di iscrizione all'elenco è stato ritirato:"
+
 msgid "Your event has been accepted:"
 msgstr "L'evento è stato accettato:"
 
@@ -3931,6 +3996,9 @@ msgstr ""
 
 msgid "Click here to view web version."
 msgstr "Clicca qui per visualizzare la versione web."
+
+msgid "You no longer wish to receive the newsletter?"
+msgstr "Non desideri più ricevere la newsletter?"
 
 msgid "Click the following link to set a new password:"
 msgstr "Clicca sul collegamento seguente per impostare una nuova password:"
@@ -4067,6 +4135,15 @@ msgstr "Richiesta di modifica applicata."
 
 msgid "Directory entry rejected."
 msgstr "Elemento della cartella rifiutato."
+
+msgid "Directory change rejected."
+msgstr "Modifica della directory rifiutata"
+
+msgid "Entry rejection withdrawn."
+msgstr "Rifiuto di iscrizione ritirato"
+
+msgid "Change rejection withdrawn."
+msgstr "Rifiuto di modifica ritirato"
 
 msgid "Event edited."
 msgstr "Evento montato."
@@ -6068,6 +6145,21 @@ msgstr "È stato creato un account per te"
 
 msgid "The user was created successfully"
 msgstr "Utente creato correttamente"
+
+#~ msgid "Your directory submission has been rejected"
+#~ msgstr "L'invio della cartella è stato rifiutato"
+
+#~ msgid "Your directory submission rejection has been withdrawn"
+#~ msgstr "Il rifiuto dell'invio della directory è stato ritirato"
+
+#~ msgid "The rejection was withdrawn"
+#~ msgstr "Il rifiuto è stato ritirato"
+
+#~ msgid "Rejection withdrawn."
+#~ msgstr "Rifiuto ritirato."
+
+#~ msgid "Reject"
+#~ msgstr "Rifiuta"
 
 #~ msgid "Update Subscription"
 #~ msgstr "Aggiornare l'abbonamento"

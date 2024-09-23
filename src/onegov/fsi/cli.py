@@ -1,10 +1,10 @@
-import json
-from datetime import date, datetime, timezone
-import transaction
-from sqlalchemy import or_, and_
-
 import click
+import json
+import transaction
+
+from datetime import date, datetime, UTC
 from sedate import replace_timezone
+from sqlalchemy import or_, and_
 from sqlalchemy import cast, Date
 
 from onegov.core.cli import command_group
@@ -95,7 +95,7 @@ def correct_ims_data_cli(path: str) -> 'Callable[[FsiRequest, FsiApp], None]':
                 dt.month,
                 dt.hour,
                 dt.minute,
-                tzinfo=timezone.utc)
+                tzinfo=UTC)
 
         @with_open
         def open_events_file(
@@ -174,7 +174,7 @@ def correct_ims_data_cli(path: str) -> 'Callable[[FsiRequest, FsiApp], None]':
               f'original file: {len(corrected_ids)}')
 
         with open('changed_events.log', 'w') as log_file:
-            print('\n'.join((str(i) for i in corrected_ids)), file=log_file)
+            print('\n'.join(str(i) for i in corrected_ids), file=log_file)
 
     return fix_original_ims_import
 
@@ -336,7 +336,7 @@ def fetch_users(
                     base, search_filter, attributes=attrs
                 )
                 if not success:
-                    log.error("Error importing events", exc_info=True)
+                    log.error('Error importing events', exc_info=True)
                     raise RuntimeError(
                         f"Could not query '{base}' "
                         f"with filter '{search_filter}'"
@@ -388,7 +388,7 @@ def fetch_users(
             source_id = None
             force_role = False
         else:
-            log.error("Unknown auth provider", exc_info=False)
+            log.error('Unknown auth provider', exc_info=False)
             raise NotImplementedError()
 
         user = ensure_user(

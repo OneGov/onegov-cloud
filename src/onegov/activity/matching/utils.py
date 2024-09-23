@@ -82,7 +82,7 @@ class LoopBudget:
 
     def limit_reached(self, as_exception: bool = False) -> bool | None:
         if self.ticks >= self.max_ticks:
-            message = "Loop limit of {} has been reached".format(self.ticks)
+            message = 'Loop limit of {} has been reached'.format(self.ticks)
 
             if as_exception:
                 raise RuntimeError(message)

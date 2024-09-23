@@ -22,7 +22,7 @@ if TYPE_CHECKING:
     from onegov.swissvotes.app import SwissvotesApp
     from sqlalchemy.orm import Query
     from sqlalchemy.sql import ColumnElement
-    from typing_extensions import Self
+    from typing import Self
 
 T = TypeVar('T')
 

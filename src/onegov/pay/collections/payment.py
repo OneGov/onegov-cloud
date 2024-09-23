@@ -13,7 +13,7 @@ if TYPE_CHECKING:
     from decimal import Decimal
     from onegov.pay.types import AnyPayableBase, PaymentState
     from sqlalchemy.orm import Query, Session
-    from typing_extensions import Self
+    from typing import Self
     from uuid import UUID
 
 

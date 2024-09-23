@@ -65,9 +65,9 @@ def parse_election(line: 'DefaultRow', errors: list[str]) -> 'Status | None':
     try:
         status = line.election_status or 'unknown'
     except ValueError:
-        errors.append(_("Invalid election values"))
+        errors.append(_('Invalid election values'))
     if status not in STATI:
-        errors.append(_("Invalid status"))
+        errors.append(_('Invalid status'))
     return status  # type:ignore[return-value]
 
 
@@ -102,7 +102,7 @@ def parse_election_result(
 
         if entity_id and entity_id not in entities:
             errors.append(_(
-                "${name} is unknown",
+                '${name} is unknown',
                 mapping={'name': entity_id}
             ))
 
@@ -221,7 +221,7 @@ def parse_list_panachage_results(
     except ValueError as e:
         errors.append(e.args[0])
     except Exception:
-        errors.append(_("Invalid list results"))
+        errors.append(_('Invalid list results'))
 
 
 def parse_candidate(
@@ -246,7 +246,7 @@ def parse_candidate(
     except ValueError as e:
         errors.append(e.args[0])
     except Exception:
-        errors.append(_("Invalid candidate values"))
+        errors.append(_('Invalid candidate values'))
     else:
         if party and color:
             colors[party] = color
@@ -320,7 +320,7 @@ def parse_candidate_panachage_results(
     except ValueError as e:
         errors.append(e.args[0])
     except Exception:
-        errors.append(_("Invalid candidate results"))
+        errors.append(_('Invalid candidate results'))
 
 
 def prefix_connection_id(connection_id: str, parent_connection_id: str) -> str:
@@ -347,7 +347,7 @@ def parse_connection(
             )
             connection_id = parent_connection_id
     except ValueError:
-        errors.append(_("Invalid list connection values"))
+        errors.append(_('Invalid list connection values'))
     else:
         connection = {
             'id': uuid4(),
@@ -381,7 +381,7 @@ def import_election_internal_proporz(
         A list containing errors.
 
     """
-    filename = _("Results")
+    filename = _('Results')
     csv, error = load_csv(
         file, mimetype, expected_headers=INTERNAL_PROPORZ_HEADERS,
         filename=filename,
@@ -489,7 +489,7 @@ def import_election_internal_proporz(
 
     # Additional checks
     if not errors and not results:
-        errors.append(FileImportError(_("No data found")))
+        errors.append(FileImportError(_('No data found')))
 
     for values in list_panachage.values():
         for list_id in values:

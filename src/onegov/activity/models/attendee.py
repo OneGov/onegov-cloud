@@ -218,7 +218,7 @@ class Attendee(Base, TimestampMixin, ORMSearchable):
         ]).where(and_(
             Booking.period_id == period_id,
             Booking.attendee_id == cls.id
-        )).label("happiness")
+        )).label('happiness')
 
     #: The bookings linked to this attendee
     bookings: 'relationship[list[Booking]]' = relationship(

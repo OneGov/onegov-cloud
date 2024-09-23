@@ -23,6 +23,7 @@ from onegov.newsletter import NewsletterCollection, RecipientCollection
 from onegov.reservation import ResourceCollection
 from onegov.user.collections import TANCollection
 from sedate import ensure_timezone, utcnow
+from sqlalchemy.orm import close_all_sessions
 from tests.onegov.org.common import get_cronjob_by_name, get_cronjob_url
 from tests.shared import Client
 from tests.shared.utils import add_reservation
@@ -796,17 +797,15 @@ def test_auto_archive_tickets_and_delete(org_app, handlers):
             t.accept_ticket(user)
             t.close_ticket()
 
-        transaction.commit()
-
-    # now we go forward a month for archival
-    with freeze_time('2022-09-17 04:30'):
         org_app.org.auto_archive_timespan = 30  # days
         org_app.org.auto_delete_timespan = 30  # days
 
-        session.flush()
-        # without this assert, the values are somehow not set?
-        assert org_app.org.auto_archive_timespan
-        assert org_app.org.auto_delete_timespan
+        transaction.commit()
+
+        close_all_sessions()
+
+    # now we go forward a month for archival
+    with freeze_time('2022-09-17 04:30'):
 
         query = session.query(Ticket)
         query = query.filter_by(state='closed')
@@ -816,6 +815,10 @@ def test_auto_archive_tickets_and_delete(org_app, handlers):
         job.app = org_app
         client = Client(org_app)
         client.get(get_cronjob_url(job))
+
+        query = session.query(Ticket)
+        query = query.filter(Ticket.state == 'archived')
+        assert query.count() == 2
 
         # this delete cronjob should have no effect (yet), since archiving
         # resets the `last_change`
@@ -895,17 +898,15 @@ def test_respect_recent_reservation_for_archive(org_app, handlers):
             ticket.accept_ticket(user)
             ticket.close_ticket()
 
+        org_app.org.auto_archive_timespan = 365  # days
+        org_app.org.auto_delete_timespan = 365  # days
+
         transaction.commit()
+
+        close_all_sessions()
 
     # now go forward a year
     with freeze_time('2023-06-06 02:00'):
-        org_app.org.auto_archive_timespan = 365  # days
-        org_app.org.auto_delete_timespan = 365  # days
-        org_app.session().flush()
-
-        # without this assert, the values are somehow not set?
-        assert org_app.org.auto_archive_timespan
-        assert org_app.org.auto_delete_timespan
 
         q = TicketCollection(org_app.session()).query()
         assert q.filter_by(state='open').count() == 0
@@ -1103,6 +1104,7 @@ def test_delete_content_marked_deletable__directory_entries(org_app, handlers):
     event.delete_when_expired = True
 
     transaction.commit()
+    close_all_sessions()
 
     def count_publications(directories):
         applications = directories.by_name('offentliche-planauflage')
@@ -1173,6 +1175,7 @@ def test_delete_content_marked_deletable__news(org_app, handlers):
     two.delete_when_expired = True
 
     transaction.commit()
+    close_all_sessions()
 
     def count_news():
         c = PageCollection(org_app.session()).query()
@@ -1230,6 +1233,7 @@ def test_delete_content_marked_deletable__events_occurrences(org_app,
     event.publish()
 
     transaction.commit()
+    close_all_sessions()
 
     def count_events():
         return (EventCollection(org_app.session()).query()
@@ -1258,8 +1262,10 @@ def test_delete_content_marked_deletable__events_occurrences(org_app,
 
         # switch setting and see if past events and past occurrences are
         # deleted
+        transaction.begin()
         org_app.org.delete_past_events = True
-        assert org_app.org.delete_past_events is True
+        transaction.commit()
+        close_all_sessions()
 
         client.get(get_cronjob_url(job))
         assert count_events() == 1

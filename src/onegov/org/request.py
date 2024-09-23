@@ -1,15 +1,47 @@
 from functools import cached_property
+from onegov.core.orm import orm_cached
 from onegov.core.request import CoreRequest
 from onegov.core.security import Private
-from onegov.org.models import TANAccessCollection
+from onegov.core.utils import normalize_for_url
+from onegov.org.models import News, TANAccessCollection, Topic
+from onegov.page import Page, PageCollection
 from onegov.user import User
 from sedate import utcnow
+from sqlalchemy.orm import noload
 
 
-from typing import TYPE_CHECKING
+from typing import Any, NamedTuple, TYPE_CHECKING
 if TYPE_CHECKING:
+    from collections.abc import Generator, Iterable
     from onegov.org.app import OrgApp
     from onegov.ticket import Ticket
+
+
+class PageMeta(NamedTuple):
+    id: int
+    type: str
+    title: str
+    access: str
+    published: bool
+    is_visible_on_homepage: bool | None
+    path: str
+    children: tuple['PageMeta', ...]
+
+    def link(
+        self,
+        request: 'OrgRequest',
+        variables: dict[str, Any] | None = None,
+        name: str = '',
+    ) -> str:
+        if variables is not None:
+            variables['absorb'] = self.path
+        else:
+            variables = {'absorb': self.path}
+        return request.class_link(
+            Topic if self.type == 'topic' else News,
+            variables,
+            name
+        )
 
 
 class OrgRequest(CoreRequest):
@@ -122,3 +154,97 @@ class OrgRequest(CoreRequest):
                 return False
             return self.has_role(*roles)
         return ticket.handler_code in (self.app.org.ticket_auto_accepts or ())
+
+    @orm_cached(policy='on-table-change:pages', by_role=True)
+    def pages_tree(self) -> tuple[PageMeta, ...]:
+        """
+        This is the entire pages tree preloaded into the individual
+        parent/children attributes. We optimize this as much as possible
+        by performing the recursive join in Python, rather than SQL.
+
+        """
+        query = PageCollection(self.session).query(ordered=False)
+        query = query.options(
+            # we populate these relationship ourselves
+            noload(Page.parent),
+            noload(Page.children),
+        )
+        query = query.order_by(Page.order)
+
+        # first we build a map from parent_ids to their children
+        parent_to_child: dict[int | None, list[Page]] = {}
+        for page in query:
+            parent_to_child.setdefault(page.parent_id, []).append(page)
+
+
+        def extend_path(page: Page, path: str | None) -> str:
+            if page.type == 'news' and path is None:
+                # the root news page is not part of the path
+                return ''
+            return f'{path}/{page.name}' if path else page.name
+
+        def generate_subtree(
+            parent_id: int | None,
+            path: str | None
+        ) -> tuple[PageMeta, ...]:
+            return tuple(
+                PageMeta(
+                    id=page.id,
+                    type=page.type,
+                    title=page.title,
+                    access=page.meta.get('access', 'public'),
+                    published=published,
+                    path=(subpath := extend_path(page, path)),
+                    is_visible_on_homepage=page.meta.get('is_visible_on_homepage'),
+                    children=tuple(generate_subtree(page.id, subpath))
+                )
+                for page in parent_to_child.get(parent_id, ())
+                if self.is_visible(page)
+                if (published := getattr(page, 'published', True))
+                or self.is_manager
+            )
+
+        # we return the root pages which should contain references to all
+        # the child pages
+        return generate_subtree(None, None)
+
+    @orm_cached(policy='on-table-change:pages', by_role=True)
+    def root_pages(self) -> tuple[PageMeta, ...]:
+
+        def include(page: PageMeta) -> bool:
+            if page.type != 'news':
+                return True
+
+            return True if page.children else False
+
+        return tuple(p for p in self.pages_tree if include(p))
+
+    @orm_cached(policy='on-table-change:pages', by_role=True)
+    def homepage_pages(self) -> dict[int, list[PageMeta]]:
+
+        def visit_topics(
+            pages: 'Iterable[PageMeta]',
+            root_id: int | None = None
+        ) -> 'Generator[tuple[int, PageMeta]]':
+            for page in pages:
+                if page.type != 'topic':
+                    continue
+
+                if root_id is not None and page.is_visible_on_homepage:
+                    yield root_id, page
+
+                yield from visit_topics(
+                    page.children,
+                    root_id=root_id or page.id
+                )
+
+        result: dict[int, list[PageMeta]] = {}
+        for root_id, meta in visit_topics(self.root_pages):
+            result.setdefault(root_id, []).append(meta)
+
+        for topics in result.values():
+            topics.sort(
+                key=lambda p: normalize_for_url(p.title)
+            )
+
+        return result

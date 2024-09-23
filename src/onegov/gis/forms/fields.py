@@ -13,7 +13,7 @@ if TYPE_CHECKING:
     from onegov.form.types import (
         FormT, PricingRules, RawFormValue, Validators)
     from onegov.gis.models.coordinates import AnyCoordinates
-    from typing_extensions import Self
+    from typing import Self
     from wtforms.fields.core import _Filter, _Widget
     from wtforms.form import BaseForm
     from wtforms.meta import _SupportsGettextAndNgettext, DefaultMeta

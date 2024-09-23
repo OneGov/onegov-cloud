@@ -3,7 +3,7 @@ if TYPE_CHECKING:
     from onegov.core.types import JSONObject
     from typing import Literal
     from typing import TypedDict
-    from typing_extensions import TypeAlias
+    from typing import TypeAlias
 
     DomainOfInfluence: TypeAlias = Literal[
         'federation',

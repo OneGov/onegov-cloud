@@ -20,7 +20,7 @@ if TYPE_CHECKING:
     from onegov.pas.models.attendence import Attendence
     from onegov.pas.models.commission_membership import CommissionMembership
     from typing import Literal
-    from typing_extensions import TypeAlias
+    from typing import TypeAlias
 
     CommissionType: TypeAlias = Literal[
         'normal',

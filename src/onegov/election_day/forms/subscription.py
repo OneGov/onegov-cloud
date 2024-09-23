@@ -26,10 +26,10 @@ class SubscriptionForm(Form):
     request: 'ElectionDayRequest'
 
     domain = RadioField(
-        label=_("Type"),
+        label=_('Type'),
         choices=(
-            ('canton', _("Cantonal")),
-            ('municipality', _("Communal")),
+            ('canton', _('Cantonal')),
+            ('municipality', _('Communal')),
         ),
         default='canton',
         validators=[
@@ -38,7 +38,7 @@ class SubscriptionForm(Form):
     )
 
     domain_segment = RadioField(
-        label=_("Municipality"),
+        label=_('Municipality'),
         validators=[
             InputRequired()
         ],
@@ -68,8 +68,8 @@ class SubscriptionForm(Form):
 class EmailSubscriptionForm(SubscriptionForm):
 
     email = EmailField(
-        label=_("Email Address"),
-        description="peter.muster@example.org",
+        label=_('Email Address'),
+        description='peter.muster@example.org',
         validators=[
             InputRequired(),
             Email()
@@ -83,8 +83,8 @@ class EmailSubscriptionForm(SubscriptionForm):
 class SmsSubscriptionForm(SubscriptionForm):
 
     phone_number = PhoneNumberField(
-        label=_("Phone number"),
-        description="+41791112233",
+        label=_('Phone number'),
+        description='+41791112233',
         validators=[
             InputRequired(),
             ValidPhoneNumber(country_whitelist={
@@ -105,18 +105,18 @@ class SubscribersCleanupForm(Form):
     )
 
     type = RadioField(
-        label=_("Type"),
+        label=_('Type'),
         validators=[
             InputRequired()
         ],
         choices=[
-            ('delete', _("Delete")),
-            ('deactivate', _("Deactivate")),
+            ('delete', _('Delete')),
+            ('deactivate', _('Deactivate')),
         ]
     )
 
     file = UploadField(
-        label=_("File"),
+        label=_('File'),
         validators=[
             DataRequired(),
             WhitelistedMimeType(ALLOWED_MIME_TYPES),

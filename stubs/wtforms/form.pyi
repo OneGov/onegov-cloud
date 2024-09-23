@@ -24,6 +24,7 @@ class BaseForm:
     # we document this, because it's the only efficient way to introspect
     # the field names of the form, it also seems to be stable API-wise
     _fields: dict[str, Field]
+    _prefix: str
     def __init__(
         self,
         fields: SupportsItems[str, UnboundField[Any]] | Iterable[tuple[str, UnboundField[Any]]],

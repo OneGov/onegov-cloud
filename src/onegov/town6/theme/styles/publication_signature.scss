@@ -33,7 +33,7 @@
     .publication-settings {
         display: flex;
         flex-wrap: wrap;
-        margin-top: -1rem;
+        margin-top: .3rem;
         width: 77.5%;
 
         legend {
@@ -51,6 +51,7 @@
         fieldset {
             border: 1px solid $silver;
             border-radius: 3px;
+            margin-bottom: .3rem;
 
             &::focus-within {
                 border-color: $silver;
@@ -59,7 +60,8 @@
 
         .publication-settings-input {
             display: flex;
-            padding: 0 0 0 1rem;
+            padding: 0 .5rem 0 .5rem;
+            margin: 0 .5rem 0 .5rem;
 
             > div {
                 flex: 2 0 40%;
@@ -67,6 +69,7 @@
 
             > select {
                 flex: 0 0 25%;
+                height: auto; /* keeps select height the same as input */
 
                 margin-left: .5rem;
                 margin-right: .5rem;

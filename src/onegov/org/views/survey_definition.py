@@ -42,7 +42,7 @@ def handle_new_survey_definition(
         assert form.definition.data is not None
 
         if self.definitions.by_name(normalize_for_url(form.title.data)):
-            request.alert(_("A survey with this name already exists"))
+            request.alert(_('A survey with this name already exists'))
         else:
             definition = self.definitions.add(
                 title=form.title.data,
@@ -50,20 +50,20 @@ def handle_new_survey_definition(
             )
             form.populate_obj(definition)
 
-            request.success(_("Added a new survey"))
+            request.success(_('Added a new survey'))
             return morepath.redirect(request.link(definition))
 
     layout = layout or FormEditorLayout(self, request)
     layout.breadcrumbs = [
-        Link(_("Homepage"), layout.homepage_url),
-        Link(_("Surveys"), request.class_link(SurveyCollection)),
-        Link(_("New Survey"), request.link(self, name='new'))
+        Link(_('Homepage'), layout.homepage_url),
+        Link(_('Surveys'), request.class_link(SurveyCollection)),
+        Link(_('New Survey'), request.link(self, name='new'))
     ]
     layout.edit_mode = True
 
     return {
         'layout': layout,
-        'title': _("New Survey"),
+        'title': _('New Survey'),
         'form': form,
         'form_width': 'large',
     }
@@ -89,7 +89,7 @@ def handle_defined_survey(
     collection = SurveyCollection(request.session)
 
     enabled = False
-    hint = [('stop', _("Please choose a submission window"))]
+    hint = [('stop', _('Please choose a submission window'))]
 
     if not self.current_submission_window:
         enabled = True
@@ -142,7 +142,7 @@ def handle_edit_survey_definition(
         form.populate_obj(self, exclude={'definition'})
         self.definition = form.definition.data
 
-        request.success(_("Your changes were saved"))
+        request.success(_('Your changes were saved'))
         return morepath.redirect(request.link(self))
     elif not request.POST:
         form.process(obj=self)
@@ -151,10 +151,10 @@ def handle_edit_survey_definition(
 
     layout = layout or FormEditorLayout(self, request)
     layout.breadcrumbs = [
-        Link(_("Homepage"), layout.homepage_url),
-        Link(_("Surveys"), request.link(collection)),
+        Link(_('Homepage'), layout.homepage_url),
+        Link(_('Surveys'), request.link(collection)),
         Link(self.title, request.link(self)),
-        Link(_("Edit"), request.link(self, name='edit'))
+        Link(_('Edit'), request.link(self, name='edit'))
     ]
     layout.edit_mode = True
 
@@ -188,14 +188,14 @@ def view_survey_results(
 
     layout.editbar_links = [
         Link(
-            text=_("Export"),
+            text=_('Export'),
             url=request.link(self, name='export'),
             attrs={'class': 'export-link'}
         )]
 
     return {
         'layout': layout,
-        'title': _("Results"),
+        'title': _('Results'),
         'results': results,
         'fields': fields,
         'aggregated': aggregated,

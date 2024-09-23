@@ -84,7 +84,7 @@ def type_by_string(
 def as_selectable_from_path(path: str) -> 'Alias':
     alias = os.path.basename(path).split('.', 1)[0]
 
-    with open(path, 'r') as f:
+    with open(path) as f:
         return as_selectable(f.read(), alias=alias)
 
 

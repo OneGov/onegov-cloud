@@ -50,9 +50,9 @@ def view_usermanagement(
         users[user.role].append(user)
 
     roles = roles or {
-        'admin': _("Administrator"),
-        'editor': _("Editor"),
-        'member': _("Member"),
+        'admin': _('Administrator'),
+        'editor': _('Editor'),
+        'member': _('Member'),
     }
 
     filters = {}
@@ -71,8 +71,8 @@ def view_usermanagement(
             active=value in self.filters.get('active', ()),
             url=request.link(self.for_filter(active=value))
         ) for title, value in (
-            (_("Active"), True),
-            (_("Inactive"), False)
+            (_('Active'), True),
+            (_('Inactive'), False)
         )
     ]
 
@@ -94,12 +94,12 @@ def view_usermanagement(
             }.get(value, value),
             active=value in self.filters.get('source', ()),
             url=request.link(self.for_filter(source=value))
-        ) for value in self.sources + ('', )
+        ) for value in (*self.sources, '')
     ]
 
     return {
         'layout': layout,
-        'title': _("User Management"),
+        'title': _('User Management'),
         'roles': roles.keys(),
         'users': users,
         'filters': filters
@@ -129,12 +129,12 @@ def handle_create_signup_link(
         link = request.link(auth, 'register')
 
     layout = layout or UserManagementLayout(self, request)
-    layout.breadcrumbs.append(Link(_("New Signup Link"), '#'))
+    layout.breadcrumbs.append(Link(_('New Signup Link'), '#'))
     layout.editbar_links = None  # type:ignore[assignment]
 
     return {
         'layout': layout,
-        'title': _("New Signup Link"),
+        'title': _('New Signup Link'),
         'link': link,
         'form': form
     }
@@ -171,7 +171,7 @@ def ticket_links(request: 'OrgRequest', user: User) -> LinkGroup:
         Ticket.id, Ticket.number, Ticket.handler_code)
 
     return LinkGroup(
-        title=_("Tickets"),
+        title=_('Tickets'),
         links=[
             Link(
                 ticket.number,
@@ -259,7 +259,7 @@ def handle_manage_user(
 
     if form.submitted(request):
         form.populate_obj(self)
-        request.success(_("Your changes were saved"))
+        request.success(_('Your changes were saved'))
 
         return request.redirect(request.class_link(UserCollection))
 
@@ -289,7 +289,7 @@ def handle_new_user(
         form.delete_field('yubikey')
 
     layout = layout or UserManagementLayout(self, request)
-    layout.breadcrumbs.append(Link(_("New User"), '#'))
+    layout.breadcrumbs.append(Link(_('New User'), '#'))
     layout.editbar_links = None  # type:ignore[assignment]
 
     if form.submitted(request):
@@ -315,11 +315,11 @@ def handle_new_user(
         except ExistingUserError:
             assert isinstance(form.username.errors, list)
             form.username.errors.append(
-                _("A user with this e-mail address already exists"))
+                _('A user with this e-mail address already exists'))
         else:
             if form.send_activation_email.data:
                 subject = request.translate(
-                    _("An account was created for you")
+                    _('An account was created for you')
                 )
 
                 content = render_template('mail_new_user.pt', request, {
@@ -335,11 +335,11 @@ def handle_new_user(
                     content=content,
                 )
 
-            request.info(_("The user was created successfully"))
+            request.info(_('The user was created successfully'))
 
             return {
                 'layout': layout,
-                'title': _("New User"),
+                'title': _('New User'),
                 'username': form.username.data,
                 'password': password,
                 'sent_email': form.send_activation_email.data
@@ -347,7 +347,7 @@ def handle_new_user(
 
     return {
         'layout': layout,
-        'title': _("New User"),
+        'title': _('New User'),
         'form': form,
         'password': None,
         'sent_email': False

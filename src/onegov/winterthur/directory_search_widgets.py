@@ -28,8 +28,7 @@ def lines(value: str | tuple[str, ...] | list[str]) -> 'Iterator[str]':
     if isinstance(value, (tuple, list)):
         yield from value
 
-    for line in str(value).split('\n'):
-        yield line
+    yield from str(value).split('\n')
 
 
 @WinterthurApp.directory_search_widget('inline')

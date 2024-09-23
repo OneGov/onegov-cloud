@@ -53,7 +53,7 @@ class FormExtension(Generic[_FormT]):
         super().__init_subclass__(**kwargs)
 
         assert name not in form_extensions, (
-            f"A form extension named {name} already exists"
+            f'A form extension named {name} already exists'
         )
 
         form_extensions[name] = cls
@@ -79,7 +79,7 @@ class Extendable:
 
         for extension in extensions:
             if extension not in form_extensions:
-                raise KeyError(f"Unknown form extension: {extension}")
+                raise KeyError(f'Unknown form extension: {extension}')
 
             form_class = form_extensions[extension](form_class).create()
 

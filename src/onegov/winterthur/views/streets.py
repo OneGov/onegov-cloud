@@ -40,7 +40,7 @@ def view_streets(
 
     return {
         'layout': AddressLayout(self, request),
-        'title': _("Streets Directory"),
+        'title': _('Streets Directory'),
         'streets': by_letter,
         'link_to_street': link_to_street,
         'last_updated': self.last_updated(),
@@ -52,7 +52,7 @@ def view_streets(
     model=AddressCollection,
     permission=Private,
     request_method='POST',
-    name="update"
+    name='update'
 )
 def update_streets(
     self: AddressCollection,
@@ -63,7 +63,7 @@ def update_streets(
 
     self.update()
 
-    request.success(_("The streets directory has been updated"))
+    request.success(_('The streets directory has been updated'))
 
 
 @WinterthurApp.html(

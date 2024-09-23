@@ -37,12 +37,12 @@ def view_votes(
             year == self.year,
             request.link(self.for_year(year))
         )
-        for year in [None] + self.get_years()
+        for year in [None, *self.get_years()]
     ]
 
     return {
         'layout': ManageVotesLayout(self, request),
-        'title': _("Votes"),
+        'title': _('Votes'),
         'groups': groupbylist(self.batch, key=lambda vote: vote.date),
         'new_vote': request.link(self, 'new-vote'),
         'redirect_filters': {_('Year'): years},
@@ -71,13 +71,13 @@ def create_vote(
         vote = Vote.get_polymorphic_class(form.type.data, Vote)()
         form.update_model(vote)
         archive.add(vote, request)
-        request.message(_("Vote added."), 'success')
+        request.message(_('Vote added.'), 'success')
         return redirect(layout.manage_model_link)
 
     return {
         'layout': layout,
         'form': form,
-        'title': _("New vote"),
+        'title': _('New vote'),
         'cancel': layout.manage_model_link
     }
 
@@ -101,7 +101,7 @@ def edit_vote(
         old = request.link(self)
         form.update_model(self)
         archive.update(self, request, old=old)
-        request.message(_("Vote modified."), 'success')
+        request.message(_('Vote modified.'), 'success')
         request.app.pages_cache.flush()
         return redirect(layout.manage_model_link)
 
@@ -113,7 +113,7 @@ def edit_vote(
         'form': form,
         'title': self.title,
         'shortcode': self.shortcode,
-        'subtitle': _("Edit vote"),
+        'subtitle': _('Edit vote'),
         'cancel': layout.manage_model_link
     }
 
@@ -135,7 +135,7 @@ def clear_vote(
 
     if form.submitted(request):
         archive.clear_results(self, request, form.clear_all.data)
-        request.message(_("Results deleted."), 'success')
+        request.message(_('Results deleted.'), 'success')
         request.app.pages_cache.flush()
         return redirect(layout.manage_model_link)
 
@@ -150,8 +150,8 @@ def clear_vote(
         'form': form,
         'title': self.title,
         'shortcode': self.shortcode,
-        'subtitle': _("Clear results"),
-        'button_text': _("Clear results"),
+        'subtitle': _('Clear results'),
+        'button_text': _('Clear results'),
         'button_class': 'alert',
         'cancel': layout.manage_model_link
     }
@@ -195,8 +195,8 @@ def clear_election_media(
         'form': form,
         'title': self.title,
         'shortcode': self.shortcode,
-        'subtitle': _("Clear media"),
-        'button_text': _("Clear media"),
+        'subtitle': _('Clear media'),
+        'button_text': _('Clear media'),
         'button_class': 'alert',
         'cancel': layout.manage_model_link
     }
@@ -218,7 +218,7 @@ def delete_vote(
 
     if form.submitted(request):
         archive.delete(self, request)
-        request.message(_("Vote deleted."), 'success')
+        request.message(_('Vote deleted.'), 'success')
         request.app.pages_cache.flush()
         return redirect(layout.manage_model_link)
 
@@ -233,8 +233,8 @@ def delete_vote(
         'form': form,
         'title': self.title,
         'shortcode': self.shortcode,
-        'subtitle': _("Delete vote"),
-        'button_text': _("Delete vote"),
+        'subtitle': _('Delete vote'),
+        'button_text': _('Delete vote'),
         'button_class': 'alert',
         'cancel': layout.manage_model_link
     }
@@ -260,23 +260,23 @@ def trigger_vote(
     if form.submitted(request):
         assert form.notifications.data is not None
         notifications.trigger(request, self, form.notifications.data)
-        request.message(_("Notifications triggered."), 'success')
+        request.message(_('Notifications triggered.'), 'success')
         request.app.pages_cache.flush()
         return redirect(layout.manage_model_link)
 
     callout = None
     message = ''
-    title = _("Trigger notifications")
+    title = _('Trigger notifications')
     button_class = 'primary'
     subject = MailLayout(None, request).subject(self)
 
     if notifications.by_model(self):
         callout = _(
-            "There are no changes since the last time the notifications "
-            "have been triggered!"
+            'There are no changes since the last time the notifications '
+            'have been triggered!'
         )
         message = _(
-            "Do you really want to retrigger the notfications?",
+            'Do you really want to retrigger the notfications?',
         )
         button_class = 'alert'
 

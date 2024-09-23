@@ -28,7 +28,7 @@ if TYPE_CHECKING:
     from onegov.election_day.models import Municipality
     from onegov.election_day.types import Gender
     from sqlalchemy.orm import Session
-    from typing_extensions import TypeAlias
+    from typing import TypeAlias
     from xsdata_ech.e_ch_0252_2_0 import Delivery
     from xsdata_ech.e_ch_0252_2_0 import ElectedType
     from xsdata_ech.e_ch_0252_2_0 import ElectionResultType

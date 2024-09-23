@@ -62,7 +62,7 @@ def get_js_path() -> str:
 @LandsgemeindeApp.setting(section='i18n', name='localedirs')
 def get_i18n_localedirs() -> list[str]:
     mine = module_path('onegov.landsgemeinde', 'locale')
-    return [mine] + get_i18n_localedirs_base()
+    return [mine, *get_i18n_localedirs_base()]
 
 
 @LandsgemeindeApp.setting(section='core', name='theme')
@@ -128,10 +128,10 @@ def pages_cache_tween_factory(
 
         if request.method == 'HEAD':
             # HEAD requests are cached with only the path
-            key = ':'.join((request.method, request.path))
+            key = f'{request.method}:{request.path}'
         else:
             # GET requests are cached with the path and query string
-            key = ':'.join((request.method, request.path_qs))
+            key = f'{request.method}:{request.path_qs}'
 
         return app.pages_cache.get_or_create(
             key,

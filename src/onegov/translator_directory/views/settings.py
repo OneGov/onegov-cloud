@@ -31,7 +31,7 @@ def view_locations_settings(
 
     if form.submitted(request):
         form.update_model(request.app)
-        request.success(_("Your changes were saved"))
+        request.success(_('Your changes were saved'))
         return request.redirect(request.link(self, 'directory-settings'))
 
     form.apply_model(request.app)

@@ -70,7 +70,7 @@ def check_rate_limit(request: 'CoreRequest') -> dict[str, str]:
     headers = {
         'X-RateLimit-Limit': str(limit),
         'X-RateLimit-Remaining': str(max(limit - requests, 0)),
-        'X-RateLimit-Reset': reset.strftime("%a, %d %b %Y %H:%M:%S GMT")
+        'X-RateLimit-Reset': reset.strftime('%a, %d %b %Y %H:%M:%S GMT')
     }
 
     @request.after

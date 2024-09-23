@@ -28,7 +28,7 @@ class BuiltinFormDefinition(FormDefinition, AccessExtension,
     # FIXME: should this have a setter?
     @property
     def extensions(self) -> tuple[str, ...]:  # type:ignore[override]
-        return tuple(set(super().extensions + ['honeypot']))
+        return tuple({*super().extensions, 'honeypot'})
 
 
 class CustomFormDefinition(FormDefinition, AccessExtension,
@@ -44,7 +44,7 @@ class CustomFormDefinition(FormDefinition, AccessExtension,
     # FIXME: should this have a setter?
     @property
     def extensions(self) -> tuple[str, ...]:  # type:ignore[override]
-        return tuple(set(super().extensions + ['honeypot']))
+        return tuple({*super().extensions, 'honeypot'})
 
 
 def submission_deletable(

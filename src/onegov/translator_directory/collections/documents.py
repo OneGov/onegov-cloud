@@ -35,7 +35,7 @@ class TranslatorDocumentCollection(FileCollection[File]):
         translator_id: 'UUID',
         category: str | None
     ) -> None:
-        super().__init__(session, type="*", allow_duplicates=True)
+        super().__init__(session, type='*', allow_duplicates=True)
 
         self.translator_id = translator_id
         self.category = category or DEFAULT_DOCUMENT_CATEGORIES[0]

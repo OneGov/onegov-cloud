@@ -44,7 +44,7 @@ class PostmarkMailQueueProcessor(MailQueueProcessor):
         code, body = self.send_request(payload)
 
         if 400 <= code < 600:
-            raise RuntimeError(f"{code} calling {self.url}: {body}")
+            raise RuntimeError(f'{code} calling {self.url}: {body}')
 
         result = json.loads(body)
 

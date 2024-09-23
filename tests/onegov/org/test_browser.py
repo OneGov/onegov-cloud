@@ -476,15 +476,21 @@ def test_context_specific_function_are_displayed_in_person_directory(browser,
     })
 
     browser.find_by_value("Absenden").click()
-    person = client.app.session().query(Person)\
-        .filter(Person.last_name == 'Boolean')\
+    person = (
+        client.app.session().query(Person)
+        .filter(Person.last_name == 'Boolean')
         .one()
+    )
 
     browser.visit('/editor/new/page/1')
+    chosen_input = browser.find_by_id('people_0_person_chosen')
+    chosen_input.click()
+    search_input = chosen_input.find_by_xpath('.//input').first
+    search_input.fill('Boolean Berry\t')
     browser.fill_form({
         'title': 'All About Berry',
-        'people_' + person.id.hex: True,
-        'people_' + person.id.hex + '_function': 'Logician'
+        'people-0-context_specific_function': 'Logician',
+        'people-0-display_function_in_person_directory': True,
     })
     browser.find_by_value("Absenden").click()
 
@@ -615,3 +621,53 @@ def test_script_escaped_in_user_submitted_html(browser, org_app):
     payload_h1_selector = 'h1#foo'  # CSS selector for the injected element
     time.sleep(1)
     assert not browser.find_by_css(payload_h1_selector)
+
+
+def test_link_hashtags(browser, org_app):
+    browser.login_admin()
+
+    DirectoryCollection(org_app.session(), type='extended').add(
+        title="Crime Scenes",
+        structure="""
+            Name *= ___
+            Description *= ...
+        """,
+        configuration="""
+            title:
+                - name
+            order:
+                - name
+            display:
+                content:
+                    - name
+                    - description
+        """,
+        type='extended'
+    )
+
+    transaction.commit()
+
+    browser.login_admin()
+    browser.visit('/directories/crime-scenes/+new')
+    browser.fill('name', "Seven Seas Motel")
+    browser.fill('description',
+                 """
+                 #hotel Our rooms are #amazing! Check them out here:
+                 https://www.seven-seas-motel.com/#rooms
+                 https://www.seven-seas-motel.com/rooms#luxury-suite
+                 #fantastic
+                 """)
+    browser.find_by_value("Absenden").click()
+    assert browser.is_text_present("Seven Seas Motel")
+
+    # Only hashtags should be links, URL anchors should not be seen as hashtags
+    assert ('<a class="hashtag" href="/search?q=%23amazing">#amazing</a>'
+            ) in browser.html
+    assert ('<a class="hashtag" href="/search?q=%23fantastic">#fantastic</a>'
+            ) in browser.html
+    assert ('<a class="hashtag" href="/search?q=%23hotel">#hotel</a>'
+            ) in browser.html
+    assert ('<a class="hashtag" href="/search?q=%23rooms">#rooms</a>'
+            ) not in browser.html
+    assert ('<a class="hashtag" href="/search?q=%23luxury-suite">'
+            '#luxury-suite</a>') not in browser.html

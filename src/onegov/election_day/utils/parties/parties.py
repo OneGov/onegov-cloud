@@ -357,7 +357,7 @@ def get_parties_panachage_data(
 
     # Create the nodes
     names = {r.party_id: r.name for r in party_results}
-    blank = request.translate(_("Blank list")) if request else '-'
+    blank = request.translate(_('Blank list')) if request else '-'
     nodes: list[JSONObject_ro] = [
         {
             'name': names.get(party_id, '') or blank,

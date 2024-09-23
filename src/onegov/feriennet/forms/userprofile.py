@@ -39,108 +39,108 @@ class UserProfileForm(Form):
     )
 
     ticket_statistics = RadioField(
-        label=_("Send a periodic status e-mail."),
-        fieldset=_("General"),
+        label=_('Send a periodic status e-mail.'),
+        fieldset=_('General'),
         default='weekly',
         validators=[InputRequired()],
         choices=(
             ('daily', _(
-                "Daily (exluding the weekend)")),
+                'Daily (exluding the weekend)')),
             ('weekly', _(
-                "Weekly (on mondays)")),
+                'Weekly (on mondays)')),
             ('monthly', _(
-                "Monthly (on first monday of the month)")),
+                'Monthly (on first monday of the month)')),
             ('never', _(
-                "Never")),
+                'Never')),
         )
     )
 
     salutation = RadioField(
-        label=_("Salutation"),
-        fieldset=_("Personal"),
+        label=_('Salutation'),
+        fieldset=_('Personal'),
         choices=[
-            ('mr', _("Mr.")),
-            ('ms', _("Ms.")),
+            ('mr', _('Mr.')),
+            ('ms', _('Ms.')),
         ],
         validators=[InputRequired()]
     )
 
     first_name = StringField(
-        label=_("First Name"),
-        fieldset=_("Personal"),
+        label=_('First Name'),
+        fieldset=_('Personal'),
         validators=[InputRequired()]
     )
 
     last_name = StringField(
-        label=_("Last Name"),
-        fieldset=_("Personal"),
+        label=_('Last Name'),
+        fieldset=_('Personal'),
         validators=[InputRequired()]
     )
 
     organisation = StringField(
-        label=_("Organisation"),
-        fieldset=_("Personal"),
+        label=_('Organisation'),
+        fieldset=_('Personal'),
     )
 
     address = TextAreaField(
-        label=_("Address"),
-        fieldset=_("Personal"),
+        label=_('Address'),
+        fieldset=_('Personal'),
         render_kw={'rows': 4},
         validators=[InputRequired()]
     )
 
     zip_code = StringField(
-        label=_("Zip Code"),
-        fieldset=_("Personal"),
+        label=_('Zip Code'),
+        fieldset=_('Personal'),
         validators=[InputRequired()]
     )
 
     place = StringField(
-        label=_("Place"),
-        fieldset=_("Personal"),
+        label=_('Place'),
+        fieldset=_('Personal'),
         validators=[InputRequired()]
     )
 
     political_municipality = StringField(
-        label=_("Political Municipality"),
-        fieldset=_("Personal"),
+        label=_('Political Municipality'),
+        fieldset=_('Personal'),
         validators=[InputRequired()]
     )
 
     email = StringField(
-        label=_("Public E-Mail Address"),
-        fieldset=_("Personal"),
-        description=_("If different than username")
+        label=_('Public E-Mail Address'),
+        fieldset=_('Personal'),
+        description=_('If different than username')
     )
 
     phone = StringField(
-        label=_("Phone"),
-        fieldset=_("Personal"),
+        label=_('Phone'),
+        fieldset=_('Personal'),
     )
 
     emergency = StringField(
-        label=_("Emergency Contact"),
-        fieldset=_("Personal"),
-        description=_("012 345 67 89 (Peter Muster)"),
+        label=_('Emergency Contact'),
+        fieldset=_('Personal'),
+        description=_('012 345 67 89 (Peter Muster)'),
         validators=[InputRequired()]
     )
 
     website = URLField(
-        label=_("Website"),
-        fieldset=_("Personal"),
-        description=_("Website address including http:// or https://"),
+        label=_('Website'),
+        fieldset=_('Personal'),
+        description=_('Website address including http:// or https://'),
         validators=[Optional(), URL()]
     )
 
     bank_account = StringField(
-        label=_("Bank Account (IBAN)"),
-        fieldset=_("Personal"),
+        label=_('Bank Account (IBAN)'),
+        fieldset=_('Personal'),
         validators=[Stdnum(format='iban')]
     )
 
     bank_beneficiary = StringField(
-        label=_("Beneficiary"),
-        fieldset=_("Personal"),
+        label=_('Beneficiary'),
+        fieldset=_('Personal'),
     )
 
     @property
@@ -186,13 +186,13 @@ class UserProfileForm(Form):
 
             if numbers < 9 or chars < 5:
                 raise ValidationError(
-                    _("Please enter both a phone number and a name"))
+                    _('Please enter both a phone number and a name'))
 
     def ensure_beneificary_if_bank_account(self) -> bool | None:
         if self.bank_account.data and not self.bank_beneficiary.data:
             assert isinstance(self.bank_beneficiary.errors, list)
             self.bank_beneficiary.errors.append(_(
-                "A beneficiary is required if a bank account is given."
+                'A beneficiary is required if a bank account is given.'
             ))
             return False
         return None

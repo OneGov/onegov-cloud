@@ -56,7 +56,7 @@ class TicketPdf(Pdf):
         self.layout: DefaultLayout = layout
 
         # Modification for the footer left on all pages
-        self.doc.author = self.translate(_("Source")) + f': {self.doc.author}'
+        self.doc.author = self.translate(_('Source')) + f': {self.doc.author}'
         self.doc.qr_payload = qr_payload  # type:ignore[attr-defined]
 
     def translate(self, text: str) -> str:
@@ -156,7 +156,7 @@ class TicketPdf(Pdf):
     def table(
         self,
         data: 'Sequence[Sequence[str | Paragraph]]',
-        columns: Literal["even"] | list[float] | None,
+        columns: Literal['even'] | list[float] | None,
         style: 'TableStyle | Iterable[_TableCommand] | None' = None,
         *,
         ratios: Literal[True],
@@ -168,7 +168,7 @@ class TicketPdf(Pdf):
     def table(
         self,
         data: 'Sequence[Sequence[str | Paragraph]]',
-        columns: Literal["even"] | list[float] | None,
+        columns: Literal['even'] | list[float] | None,
         style: 'TableStyle | Iterable[_TableCommand] | None',
         ratios: Literal[True],
         border: bool = True,
@@ -249,11 +249,11 @@ class TicketPdf(Pdf):
                     #        but we may be able to return an empty
                     #        dictionary or attrs instead of None
                     return None  # type:ignore[return-value]
-                attrs[(None, u'color')] = link_color
+                attrs[(None, 'color')] = link_color
                 if underline_links:
-                    attrs[(None, u'underline')] = '1'
-                    attrs[('a', u'underlineColor')] = link_color
-                    attrs[('a', u'underlineWidth')] = underline_width
+                    attrs[(None, 'underline')] = '1'
+                    attrs[('a', 'underlineColor')] = link_color
+                    attrs[('a', 'underlineWidth')] = underline_width
                 return attrs
 
             tags.append('a')
@@ -320,9 +320,9 @@ class TicketPdf(Pdf):
             return self.layout.format_seconds(time) if time else ''
 
         meta_fields = {
-            'submitter_name': _("Name"),
-            'submitter_address': _("Address"),
-            'submitter_phone': _("Phone")
+            'submitter_name': _('Name'),
+            'submitter_address': _('Address'),
+            'submitter_phone': _('Phone')
         }
 
         # pep572 still a cool thing
@@ -333,21 +333,21 @@ class TicketPdf(Pdf):
         ]
 
         data = [
-            [_("Subject"), subject],
-            [_("Submitter"), submitter],
+            [_('Subject'), subject],
+            [_('Submitter'), submitter],
             *submitter_meta,
-            [_("State"), ticket_state],
-            [_("Group"), group],
-            [_("Owner"), owner],
-            [_("Created"), created],
-            [_("Reaction Time"), seconds(self.ticket.reaction_time)],
-            [_("Process Time"), seconds(self.ticket.process_time)],
+            [_('State'), ticket_state],
+            [_('Group'), group],
+            [_('Owner'), owner],
+            [_('Created'), created],
+            [_('Reaction Time'), seconds(self.ticket.reaction_time)],
+            [_('Process Time'), seconds(self.ticket.process_time)],
         ]
 
         # In case of imported events..
         event_source = handler.data.get('source')
         if event_source and self.layout.request.is_manager:
-            data.append([self.translate(_("Event Source")), event_source])
+            data.append([self.translate(_('Event Source')), event_source])
 
         self.table(data, 'even')
 
@@ -452,7 +452,7 @@ class TicketPdf(Pdf):
         pdf = cls(
             result,
             title=ticket.number,
-            created=f"{date.today():%d.%m.%Y}",
+            created=f'{date.today():%d.%m.%Y}',
             link_color='#00538c',
             underline_links=True,
             author=request.host_url,
@@ -473,9 +473,9 @@ class TicketPdf(Pdf):
         deleted_message = None
         if handler.deleted:
             summary = ticket.snapshot.get('summary')
-            deleted_message = _("The record behind this ticket was removed. "
-                                "The following information is a snapshot "
-                                "kept for future reference.")
+            deleted_message = _('The record behind this ticket was removed. '
+                                'The following information is a snapshot '
+                                'kept for future reference.')
         else:
             summary = handler.get_summary(request)
 
@@ -496,7 +496,7 @@ class TicketPdf(Pdf):
         if not request.is_manager:
             messages.type = request.app.settings.org.public_ticket_messages
 
-        pdf.h1(request.translate(_("Timeline")))
+        pdf.h1(request.translate(_('Timeline')))
         pdf.ticket_timeline(view_messages_feed(messages, request))
 
         pdf.generate()

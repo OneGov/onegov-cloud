@@ -23,12 +23,12 @@ def get_site_collection(
     objects = self.get()
 
     groups = [
-        ('topics', request.translate(_("Topics"))),
-        ('news', request.translate(_("Latest news"))),
-        ('imagesets', request.translate(_("Photo Albums"))),
-        ('forms', request.translate(_("Forms"))),
-        ('directories', request.translate(_("Directories"))),
-        ('resources', request.translate(_("Resources"))),
+        ('topics', request.translate(_('Topics'))),
+        ('news', request.translate(_('Latest news'))),
+        ('imagesets', request.translate(_('Photo Albums'))),
+        ('forms', request.translate(_('Forms'))),
+        ('directories', request.translate(_('Directories'))),
+        ('resources', request.translate(_('Resources'))),
     ]
 
     links = []

@@ -13,6 +13,7 @@ from onegov.activity.models import (
     OccasionDate,
     OccasionNeed,
     Period,
+    PeriodMeta,
     PublicationRequest,
     Volunteer
 )
@@ -41,6 +42,7 @@ __all__ = (
     'OccasionDate',
     'OccasionNeed',
     'Period',
+    'PeriodMeta',
     'ActivityCollection',
     'AttendeeCollection',
     'BookingCollection',

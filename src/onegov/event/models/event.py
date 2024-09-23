@@ -45,7 +45,7 @@ if TYPE_CHECKING:
     from onegov.core.request import CoreRequest
     from sqlalchemy.orm import Query
     from typing import Literal
-    from typing_extensions import TypeAlias
+    from typing import TypeAlias
 
     EventState: TypeAlias = Literal[
         'initiated',
@@ -180,8 +180,8 @@ class Event(Base, OccurrenceMixin, TimestampMixin, SearchableContent,
 
     #: Occurrences of the event
     occurrences: 'relationship[list[Occurrence]]' = relationship(
-        "Occurrence",
-        cascade="all, delete-orphan",
+        'Occurrence',
+        cascade='all, delete-orphan',
         back_populates='event',
         lazy='joined',
     )
@@ -208,7 +208,7 @@ class Event(Base, OccurrenceMixin, TimestampMixin, SearchableContent,
             return None
 
         guidle_id = self.source.rsplit('-', 1)[-1].split('.', 1)[0]
-        return f"https://www.guidle.com/angebote/{guidle_id}"
+        return f'https://www.guidle.com/angebote/{guidle_id}'
 
     def __setattr__(self, name: str, value: object) -> None:
         """ Automatically update the occurrences if shared attributes change
@@ -286,7 +286,7 @@ class Event(Base, OccurrenceMixin, TimestampMixin, SearchableContent,
 
             # a rule must either have a frequency or be a list of rdates
             if not hasattr(rule, '_freq'):
-                if all((l.startswith('RDATE') for l in r.splitlines())):
+                if all(l.startswith('RDATE') for l in r.splitlines()):
                     return r
 
                 raise RuntimeError(f"'{r}' is too complex")
@@ -372,7 +372,7 @@ class Event(Base, OccurrenceMixin, TimestampMixin, SearchableContent,
         """ Create an occurrence at the given date, without storing it. """
 
         end = start + (self.end - self.start)
-        name = '{0}-{1}'.format(self.name, start.date().isoformat())
+        name = f'{self.name}-{start.date().isoformat()}'
 
         return Occurrence(  # type:ignore[misc]
             title=self.title,

@@ -19,7 +19,7 @@ if TYPE_CHECKING:
     import uuid
     from onegov.pay.models import PaymentProvider
     from onegov.pay.types import PaymentState
-    from typing_extensions import Self
+    from typing import Self
 
 
 class Payment(Base, TimestampMixin, ContentMixin, Associable):

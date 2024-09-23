@@ -46,11 +46,11 @@ class DefaultLayout(ChameleonLayout):
 
     @cached_property
     def title(self) -> str:
-        return ""
+        return ''
 
     @cached_property
     def top_navigation(self) -> list[Link]:
-        result = [Link(_("Votes"), self.votes_url)]
+        result = [Link(_('Votes'), self.votes_url)]
         for page in self.pages.query():
             if page.id not in self.request.app.static_content_pages:
                 result.append(
@@ -68,7 +68,7 @@ class DefaultLayout(ChameleonLayout):
 
     @cached_property
     def breadcrumbs(self) -> list[Link]:
-        return [Link(_("Homepage"), self.homepage_url)]
+        return [Link(_('Homepage'), self.homepage_url)]
 
     @cached_property
     def static_path(self) -> str:
@@ -156,10 +156,10 @@ class DefaultLayout(ChameleonLayout):
             paths.setdefault(path[0], []).append(path)
 
         translate = self.request.translate
-        return Markup(",<br>").join(
-            Markup("<span title=\"{}\">{}</span>").format(
-                Markup(" &#10;&#10;").join(
-                    Markup(" &gt; ").join(translate(part) for part in title)
+        return Markup(',<br>').join(
+            Markup('<span title="{}">{}</span>').format(
+                Markup(' &#10;&#10;').join(
+                    Markup(' &gt; ').join(translate(part) for part in title)
                     for title in titles
                 ),
                 translate(value)

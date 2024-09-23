@@ -19,13 +19,13 @@ if TYPE_CHECKING:
 def view_confirm(self: Subscription, request: 'OrgRequest') -> 'BaseResponse':
     if self.confirm():
         request.success(_(
-            "the subscription for ${address} was successfully confirmed",
+            'the subscription for ${address} was successfully confirmed',
             mapping={'address': self.recipient.address}
         ))
     else:
         request.alert(_(
-            "the subscription for ${address} could not be confirmed, "
-            "wrong token",
+            'the subscription for ${address} could not be confirmed, '
+            'wrong token',
             mapping={'address': self.recipient.address}
         ))
 
@@ -51,12 +51,12 @@ def view_unsubscribe(
 
     if self.unsubscribe():
         request.success(_(
-            "${address} successfully unsubscribed",
+            '${address} successfully unsubscribed',
             mapping={'address': address}
         ))
     else:
         request.alert(_(
-            "${address} could not be unsubscribed, wrong token",
+            '${address} could not be unsubscribed, wrong token',
             mapping={'address': address}
         ))
 

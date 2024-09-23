@@ -105,7 +105,7 @@ def view_upload_rest(
             )
         ).first()
         if item is None:
-            errors.setdefault('id', []).append(_("Invalid id"))
+            errors.setdefault('id', []).append(_('Invalid id'))
     elif form.type.data in ('election', 'parties'):
         item = session.query(ElectionCompound).filter(
             or_(
@@ -121,7 +121,7 @@ def view_upload_rest(
                 )
             ).first()
         if item is None:
-            errors.setdefault('id', []).append(_("Invalid id"))
+            errors.setdefault('id', []).append(_('Invalid id'))
 
     # Check the type
     if item is not None and form.type.data == 'parties':
@@ -130,7 +130,7 @@ def view_upload_rest(
             or isinstance(item, ProporzElection)
         ):
             errors.setdefault('id', []).append(
-                _("Use an election based on proportional representation")
+                _('Use an election based on proportional representation')
             )
 
     # Check if the year is supported

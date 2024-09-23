@@ -87,7 +87,7 @@ def view_edit_course_attendee(
 
         form.update_model(self)
 
-        request.success(_("Your changes were saved"))
+        request.success(_('Your changes were saved'))
         return request.redirect(request.link(self))
 
     if not form.errors:
@@ -117,7 +117,7 @@ def view_add_external_attendee(
 
     if form.submitted(request):
         attendee = self.add(**form.get_useful_data())
-        request.success(_("Added a new external attendee"))
+        request.success(_('Added a new external attendee'))
         return request.redirect(request.link(attendee))
 
     layout = CourseAttendeeCollectionLayout(self, request)

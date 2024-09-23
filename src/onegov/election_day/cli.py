@@ -22,7 +22,7 @@ if TYPE_CHECKING:
     from onegov.core.cli.core import GroupContext
     from onegov.election_day.app import ElectionDayApp
     from onegov.election_day.request import ElectionDayRequest
-    from typing_extensions import TypeAlias
+    from typing import TypeAlias
 
     Processor: TypeAlias = Callable[[ElectionDayRequest, ElectionDayApp], None]
 
@@ -45,9 +45,9 @@ def add(group_context: 'GroupContext') -> 'Processor':
     ) -> None:
         app.cache.flush()
         if not app.principal:
-            click.secho("principal.yml not found", fg='yellow')
+            click.secho('principal.yml not found', fg='yellow')
 
-        click.echo("Instance was created successfully")
+        click.echo('Instance was created successfully')
 
     return add_instance
 
@@ -172,18 +172,18 @@ def generate_archive() -> 'Processor':
         archive_generator = ArchiveGenerator(app)
         archive_zip = archive_generator.generate_archive()
         if not archive_zip:
-            abort("generate_archive returned None.")
+            abort('generate_archive returned None.')
 
         archive_filesize = archive_generator.archive_dir.getinfo(
             archive_zip, namespaces=['details']).size
 
         if archive_filesize == 0:
-            click.secho("Generated archive is empty", fg='red')
+            click.secho('Generated archive is empty', fg='red')
         else:
-            click.secho("Archive generated successfully:", fg='green')
+            click.secho('Archive generated successfully:', fg='green')
         absolute_path = archive_generator.archive_system_path
         if absolute_path:
-            click.secho(f"file://{absolute_path}")
+            click.secho(f'file://{absolute_path}')
 
     return generate
 

@@ -17,19 +17,19 @@ class UserProfileForm(Form):
         request: OrgRequest
 
     ticket_statistics = RadioField(
-        label=_("Send a periodic status e-mail."),
-        fieldset=_("General"),
+        label=_('Send a periodic status e-mail.'),
+        fieldset=_('General'),
         default='weekly',
         validators=[InputRequired()],
         choices=(
             ('daily', _(
-                "Daily (exluding the weekend)")),
+                'Daily (exluding the weekend)')),
             ('weekly', _(
-                "Weekly (on mondays)")),
+                'Weekly (on mondays)')),
             ('monthly', _(
-                "Monthly (on first monday of the month)")),
+                'Monthly (on first monday of the month)')),
             ('never', _(
-                "Never")),
+                'Never')),
         )
     )
 

@@ -52,8 +52,8 @@ class PersonMutationTicket(OrgTicketMixin, Ticket):
 @handlers.registered_handler('AGN')
 class AgencyMutationHandler(Handler):
 
-    handler_title = _("Agency")
-    code_title = _("Agencies")
+    handler_title = _('Agency')
+    code_title = _('Agencies')
 
     @cached_property
     def collection(self) -> ExtendedAgencyCollection:
@@ -101,11 +101,11 @@ class AgencyMutationHandler(Handler):
 
     @property
     def subtitle(self) -> str:
-        return _("Mutation")
+        return _('Mutation')
 
     @cached_property
     def group(self) -> str:
-        return _("Agency")
+        return _('Agency')
 
     def get_summary(
         self,
@@ -132,7 +132,7 @@ class AgencyMutationHandler(Handler):
         assert self.agency is not None
         links = [
             Link(
-                text=_("Edit agency"),
+                text=_('Edit agency'),
                 url=request.return_here(
                     request.link(self.agency.proxy(), 'edit')
                 ),
@@ -144,7 +144,7 @@ class AgencyMutationHandler(Handler):
             assert self.mutation is not None
             links.append(
                 Link(
-                    text=_("Apply proposed changes"),
+                    text=_('Apply proposed changes'),
                     url=request.return_here(
                         request.link(self.mutation, 'apply')
                     ),
@@ -158,8 +158,8 @@ class AgencyMutationHandler(Handler):
 @handlers.registered_handler('PER')
 class PersonMutationHandler(Handler):
 
-    handler_title = _("Person")
-    code_title = _("People")
+    handler_title = _('Person')
+    code_title = _('People')
 
     @cached_property
     def collection(self) -> ExtendedPersonCollection:
@@ -207,11 +207,11 @@ class PersonMutationHandler(Handler):
 
     @property
     def subtitle(self) -> str:
-        return _("Mutation")
+        return _('Mutation')
 
     @cached_property
     def group(self) -> str:
-        return _("Person")
+        return _('Person')
 
     def get_summary(
         self,
@@ -238,7 +238,7 @@ class PersonMutationHandler(Handler):
         assert self.person is not None
         links = [
             Link(
-                text=_("Edit person"),
+                text=_('Edit person'),
                 url=request.return_here(
                     request.link(self.person, 'edit')
                 ),
@@ -250,7 +250,7 @@ class PersonMutationHandler(Handler):
             assert self.mutation is not None
             links.append(
                 Link(
-                    text=_("Apply proposed changes"),
+                    text=_('Apply proposed changes'),
                     url=request.return_here(
                         request.link(self.mutation, 'apply')
                     ),

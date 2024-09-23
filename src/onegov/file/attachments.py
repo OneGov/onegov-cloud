@@ -19,7 +19,7 @@ from onegov.pdf.utils import extract_pdf_info
 from typing import IO, TYPE_CHECKING
 if TYPE_CHECKING:
     from depot.io.interfaces import _FileContent
-    from typing_extensions import NotRequired, TypedDict
+    from typing import NotRequired, TypedDict
 
     class _ImageSaveOptionalParams(TypedDict):
         exif: NotRequired[Image.Exif]

@@ -115,22 +115,22 @@ class Language(Base):
         )
 
     mother_tongues: 'relationship[list[Translator]]' = relationship(
-        "Translator",
+        'Translator',
         secondary=mother_tongue_association_table,
         back_populates='mother_tongues'
     )
     speakers: 'relationship[list[Translator]]' = relationship(
-        "Translator",
+        'Translator',
         secondary=spoken_association_table,
         back_populates='spoken_languages'
     )
     writers: 'relationship[list[Translator]]' = relationship(
-        "Translator",
+        'Translator',
         secondary=written_association_table,
         back_populates='written_languages'
     )
     monitors: 'relationship[list[Translator]]' = relationship(
-        "Translator",
+        'Translator',
         secondary=monitoring_association_table,
         back_populates='monitoring_languages'
     )

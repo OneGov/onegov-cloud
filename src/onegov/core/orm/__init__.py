@@ -1,7 +1,7 @@
 import psycopg2
 
 from markupsafe import escape, Markup
-from onegov.core.orm.cache import orm_cached
+from onegov.core.orm.cache import orm_cached, request_cached
 from onegov.core.orm.observer import observes
 from onegov.core.orm.session_manager import SessionManager, query_schemas
 from onegov.core.orm.sql import as_selectable, as_selectable_from_path
@@ -19,7 +19,7 @@ if TYPE_CHECKING:
     from collections.abc import Callable, Iterator
     from sqlalchemy import Column
     from sqlalchemy_utils.i18n import _TranslatableColumn
-    from typing_extensions import Self
+    from typing import Self
 
 _T = TypeVar('_T')
 
@@ -70,7 +70,7 @@ class ModelBase:
         mapper = inspect(cls).polymorphic_map.get(identity_value)
 
         if default is MISSING:
-            assert mapper, "No such polymorphic_identity: {}".format(
+            assert mapper, 'No such polymorphic_identity: {}'.format(
                 identity_value
             )
 
@@ -174,8 +174,7 @@ def find_models(
         if is_match(cls):
             yield cls
 
-        for subcls in find_models(cls, is_match):
-            yield subcls
+        yield from find_models(cls, is_match)
 
 
 def configure_listener(
@@ -222,5 +221,6 @@ __all__ = [
     'find_models',
     'observes',
     'orm_cached',
-    'query_schemas'
+    'query_schemas',
+    'request_cached'
 ]

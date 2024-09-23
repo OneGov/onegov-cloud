@@ -19,7 +19,7 @@ def dashboard(
 
     layout = layout or DashboardLayout(self, request)
     return {
-        'title': _("Dashboard"),
+        'title': _('Dashboard'),
         'model': self,
         'layout': layout
     }

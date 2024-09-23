@@ -16,7 +16,7 @@ if TYPE_CHECKING:
     from sqlalchemy.orm import Query, Session
     from sqlalchemy.sql.elements import ClauseElement
     from typing import Protocol
-    from typing_extensions import Self
+    from typing import Self
     from uuid import UUID
 
     from onegov.core.orm import Base

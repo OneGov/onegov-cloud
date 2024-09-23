@@ -44,8 +44,8 @@ def extract_person_data(session: 'Session') -> list[dict[str, object]]:
 
     for person in query:
         out_dict: dict[str, object] = OrderedDict()
-        memberships = "\n".join(
-            (f"{m.agency.title} - {m.title}" for m in person.memberships)
+        memberships = '\n'.join(
+            f'{m.agency.title} - {m.title}' for m in person.memberships
         )
         for col in column_mapper.keys():
             if col == 'memberships':

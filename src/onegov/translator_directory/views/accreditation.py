@@ -26,11 +26,13 @@ from onegov.translator_directory.layout import RefuseAccreditationLayout
 from onegov.translator_directory.layout import RequestAccreditationLayout
 from onegov.translator_directory.models.accreditation import Accreditation
 from onegov.translator_directory.models.message import AccreditationMessage
+from onegov.translator_directory.utils import get_custom_text
+
 from uuid import uuid4
 from webob import exc
 
-
 from typing import TYPE_CHECKING
+
 if TYPE_CHECKING:
     from onegov.core.types import RenderData
     from onegov.translator_directory.request import TranslatorAppRequest
@@ -74,7 +76,7 @@ def request_accreditation(
         send_ticket_mail(
             request=request,
             template='mail_ticket_opened.pt',
-            subject=_("Your ticket has been opened"),
+            subject=_('Your ticket has been opened'),
             receivers=(form.email.data, ),
             ticket=ticket
         )
@@ -82,7 +84,7 @@ def request_accreditation(
             send_ticket_mail(
                 request=request,
                 template='mail_ticket_opened_info.pt',
-                subject=_("New ticket"),
+                subject=_('New ticket'),
                 ticket=ticket,
                 receivers=(request.email_for_new_tickets, ),
                 content={
@@ -99,14 +101,14 @@ def request_accreditation(
             }
         )
 
-        request.success(_("Thank you for your submission!"))
+        request.success(_('Thank you for your submission!'))
         return redirect(request.link(ticket, 'status'))
 
     layout = RequestAccreditationLayout(self, request)
     locale = request.locale.split('_')[0] if request.locale else None
     locale = 'de' if locale == 'de' else 'en'
-    title = form.get_custom_text(
-        f'({locale}) Custom request accreditation title')
+    title = get_custom_text(
+        request, f'({locale}) Custom request accreditation title')
 
     return {
         'layout': layout,
@@ -134,7 +136,7 @@ def grant_accreditation(
     if form.submitted(request):
         self.grant()
         AccreditationMessage.create(self.ticket, request, 'granted')
-        request.success(_("Admission granted."))
+        request.success(_('Admission granted.'))
 
         # store a PDF of the ticket on the translator
         pdf_content = TicketPdf.from_ticket(request, self.ticket)
@@ -198,7 +200,7 @@ def refuse_accreditation(
 
     if form.submitted(request):
         self.refuse()
-        request.success(_("Admission refused."))
+        request.success(_('Admission refused.'))
         AccreditationMessage.create(self.ticket, request, 'refused')
         if 'return-to' in request.GET:
             return request.redirect(request.url)

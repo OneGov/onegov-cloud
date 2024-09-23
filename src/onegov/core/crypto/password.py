@@ -19,7 +19,7 @@ def hash_password(password: str) -> str:
 
     # be sure not to have this issue (some crypt bindings will):
     # blog.ircmaxell.com/2015/03/security-issue-combining-bcrypt-with.html
-    assert "\0" not in password
+    assert '\0' not in password
 
     # like bcrypt, but with the ability to support any password length
     return bcrypt_sha256.hash(password)
@@ -33,6 +33,6 @@ def verify_password(password: str, hash: str) -> bool:
 
     # be sure not to have this issue (some crypt bindings will):
     # blog.ircmaxell.com/2015/03/security-issue-combining-bcrypt-with.html
-    assert "\0" not in password
+    assert '\0' not in password
 
     return bcrypt_sha256.verify(password, hash)

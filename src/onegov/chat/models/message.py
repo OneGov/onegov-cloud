@@ -17,7 +17,7 @@ if TYPE_CHECKING:
     from onegov.chat.collections import MessageCollection
     from onegov.core.request import CoreRequest
     from sqlalchemy.orm import Session
-    from typing_extensions import Self
+    from typing import Self
 
 
 class MessageFile(File):

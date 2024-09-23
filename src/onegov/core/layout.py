@@ -165,7 +165,7 @@ class Layout:
             )
 
         locale = self.request.locale
-        assert locale is not None, "Cannot format date without a locale"
+        assert locale is not None, 'Cannot format date without a locale'
         if format == 'relative':
             adt = arrow.get(dt)
 
@@ -261,8 +261,7 @@ class ChameleonLayout(Layout):
     @cached_property
     def template_loader(self) -> 'TemplateLoader':
         """ Returns the chameleon template loader. """
-        registry = self.app.config.template_engine_registry
-        return registry._template_loaders['.pt']
+        return self.request.template_loader
 
     @cached_property
     def base(self) -> 'PageTemplateFile':

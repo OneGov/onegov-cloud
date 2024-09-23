@@ -25,7 +25,7 @@ class IssueForm(Form):
     request: 'GazetteRequest'
 
     number = IntegerField(
-        label=_("Number"),
+        label=_('Number'),
         validators=[
             InputRequired(),
             NumberRange(min=1)
@@ -33,14 +33,14 @@ class IssueForm(Form):
     )
 
     date_ = DateField(
-        label=_("Date"),
+        label=_('Date'),
         validators=[
             InputRequired()
         ]
     )
 
     deadline = DateTimeLocalField(
-        label=_("Deadline"),
+        label=_('Deadline'),
         validators=[
             InputRequired()
         ]

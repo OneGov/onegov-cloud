@@ -10,7 +10,7 @@ if TYPE_CHECKING:
     from onegov.pay import Payment
     from onegov.ticket.model import Ticket
     from sqlalchemy.orm import Query, Session
-    from typing_extensions import TypeAlias
+    from typing import TypeAlias
     from uuid import UUID
 
     _LinkOrCallback: TypeAlias = tuple[str, str] | Callable[[CoreRequest], str]

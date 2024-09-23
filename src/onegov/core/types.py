@@ -1,7 +1,7 @@
 from typing import TYPE_CHECKING
 if TYPE_CHECKING:
-    from typing import TypeVar, Union, Protocol, Any, Literal
-    from typing_extensions import NotRequired, TypedDict, TypeAlias
+    from typing import (
+        Any, Literal, NotRequired, Protocol, TypedDict, TypeAlias, TypeVar)
     from collections.abc import Iterable, Sequence
     from sqlalchemy.orm import Query
 
@@ -61,7 +61,7 @@ if TYPE_CHECKING:
         def role(self) -> str: ...
 
     _T = TypeVar('_T')
-    SequenceOrScalar: TypeAlias = Union[Sequence[_T], _T]
+    SequenceOrScalar: TypeAlias = Sequence[_T] | _T
 
     # TEMPORARY: sqlalchemy-stubs does not have good type annotations
     #            for AppenderQuery, so we define our own, we can get

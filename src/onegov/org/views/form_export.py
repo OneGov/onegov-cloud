@@ -55,7 +55,7 @@ def handle_form_submissions_export(
 ) -> 'RenderData | Response':
 
     layout = layout or FormSubmissionLayout(self, request)
-    layout.breadcrumbs.append(Link(_("Export"), '#'))
+    layout.breadcrumbs.append(Link(_('Export'), '#'))
     layout.editbar_links = None
 
     if form.submitted(request):
@@ -85,10 +85,10 @@ def handle_form_submissions_export(
         return form.as_export_response(results, self.title, key=field_order)
 
     return {
-        'title': _("Export"),
+        'title': _('Export'),
         'layout': layout,
         'form': form,
-        'explanation': _("Exports the submissions of the given date range.")
+        'explanation': _('Exports the submissions of the given date range.')
     }
 
 

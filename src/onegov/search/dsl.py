@@ -10,7 +10,7 @@ if TYPE_CHECKING:
     from onegov.search.mixins import Searchable
     from sqlalchemy.orm import Query, Session
     from typing import type_check_only
-    from typing_extensions import Self
+    from typing import Self
 
 
 def type_from_hit(hit: BaseHit) -> str:

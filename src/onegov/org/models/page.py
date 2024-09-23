@@ -28,8 +28,8 @@ from sqlalchemy.orm import undefer, object_session
 
 from typing import Any, TYPE_CHECKING
 if TYPE_CHECKING:
-    from onegov.org.request import OrgRequest
-    from sqlalchemy.orm import Query
+    from onegov.org.request import OrgRequest, PageMeta
+    from sqlalchemy.orm import Query, Session
 
 
 class Topic(Page, TraitInfo, SearchableContent, AccessExtension,
@@ -222,7 +222,7 @@ class News(Page, TraitInfo, SearchableContent, NewsletterExtension,
                 # the effect is not entirely the same (news may be shown on the
                 # homepage anyway)
                 form_class.is_visible_on_homepage.kwargs['label'] = _(
-                    "Always visible on homepage")
+                    'Always visible on homepage')
 
             form_class = move_fields(
                 form_class=form_class,
@@ -260,37 +260,46 @@ class News(Page, TraitInfo, SearchableContent, NewsletterExtension,
             filter_tags=sorted(tags)
         )
 
-    def news_query(
-        self,
+    @classmethod
+    def news_query_for(
+        cls,
+        self: 'News | PageMeta',
         limit: int | None = 2,
-        published_only: bool = True
+        published_only: bool = True,
+        session: 'Session | None' = None,
     ) -> 'Query[News]':
 
-        news = object_session(self).query(News)
-        news = news.filter(Page.parent == self)
+        if session is None:
+            session = object_session(self)
+
+        news = session.query(News)
+        if isinstance(self, News):
+            # avoid a redundant relationship load when we can
+            news = news.filter(Page.parent == self)
+        else:
+            news = news.filter(Page.parent_id == self.id)
+
         if published_only:
             news = news.filter(
                 News.publication_started == True,
                 News.publication_ended == False
             )
 
-        filter = []
-        for year in self.filter_years:
+        year_filters = []
+        for year in getattr(self, 'filter_years', ()):
             start = replace_timezone(datetime(year, 1, 1), 'UTC')
-            filter.append(
+            year_filters.append(
                 and_(
                     News.published_or_created >= start,
                     News.published_or_created < start.replace(year=year + 1)
                 )
             )
-        if filter:
-            news = news.filter(or_(*filter))
+        if year_filters:
+            news = news.filter(or_(*year_filters))
 
-        if self.filter_tags:
+        if filter_tags := getattr(self, 'filter_tags', None):
             news = news.filter(
-                News.meta['hashtags'].has_any(
-                    array(self.filter_tags)  # type:ignore[call-overload]
-                )
+                News.meta['hashtags'].has_any(array(filter_tags))
             )
 
         news = news.order_by(desc(News.published_or_created))
@@ -306,6 +315,14 @@ class News(Page, TraitInfo, SearchableContent, NewsletterExtension,
 
         return news.union(sticky_news).order_by(
             desc(News.published_or_created))
+
+    def news_query(
+        self,
+        limit: int | None = 2,
+        published_only: bool = True
+    ) -> 'Query[News]':
+
+        return self.news_query_for(self, limit, published_only)
 
     @property
     def all_years(self) -> list[int]:

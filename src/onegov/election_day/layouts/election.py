@@ -12,7 +12,7 @@ if TYPE_CHECKING:
     from onegov.election_day.models import Election
     from onegov.election_day.models import ElectionResult
     from onegov.election_day.request import ElectionDayRequest
-    from typing_extensions import TypeAlias
+    from typing import TypeAlias
 
     NestedMenu: TypeAlias = list[tuple[
         str,
@@ -91,15 +91,15 @@ class ElectionLayout(DetailLayout):
         tab = (self.tab if tab is None else tab) or ''
 
         if tab.startswith('list') or tab == 'connections':
-            return _("Lists")
+            return _('Lists')
         if tab.startswith('candidate'):
-            return _("Candidates")
+            return _('Candidates')
         if tab == 'party-strengths' or tab == 'parties-panachage':
-            return _("Parties")
+            return _('Parties')
         if tab == 'statistics':
-            return _("Election statistics")
+            return _('Election statistics')
         if tab == 'data':
-            return _("Downloads")
+            return _('Downloads')
 
         return ''
 
@@ -109,17 +109,17 @@ class ElectionLayout(DetailLayout):
         if tab.endswith('-by-entity'):
             by = self.request.translate(self.principal.label('entity'))
             by = by.lower() if self.request.locale != 'de_CH' else by
-            return _("By ${by}", mapping={'by': by})
+            return _('By ${by}', mapping={'by': by})
         if tab.endswith('-by-district'):
             by = self.request.translate(self.principal.label('district'))
             by = by.lower() if self.request.locale != 'de_CH' else by
-            return _("By ${by}", mapping={'by': by})
+            return _('By ${by}', mapping={'by': by})
         if tab.endswith('-panachage'):
-            return _("Panachage")
+            return _('Panachage')
         if tab == 'connections':
-            return _("List connections")
+            return _('List connections')
         if tab == 'party-strengths':
-            return _("Party strengths")
+            return _('Party strengths')
 
         return ''
 
@@ -248,11 +248,11 @@ class ElectionLayout(DetailLayout):
         result: NestedMenu = []
 
         submenus = (
-            (_("Lists"), ('lists', 'list-by-entity', 'list-by-district',
+            (_('Lists'), ('lists', 'list-by-entity', 'list-by-district',
                           'lists-panachage', 'connections')),
-            (_("Candidates"), ('candidates', 'candidate-by-entity',
+            (_('Candidates'), ('candidates', 'candidate-by-entity',
                                'candidate-by-district')),
-            (_("Parties"), ('party-strengths', 'parties-panachage'))
+            (_('Parties'), ('party-strengths', 'parties-panachage'))
         )
         for title, group in submenus:
             if any(self.tab_visible(tab) for tab in group):

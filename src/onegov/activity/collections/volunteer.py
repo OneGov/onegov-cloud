@@ -9,12 +9,12 @@ from typing import TYPE_CHECKING
 if TYPE_CHECKING:
     from collections.abc import Sequence
     from datetime import date, datetime
-    from onegov.activity.models import Period
+    from onegov.activity.models import Period, PeriodMeta
     from onegov.activity.models.volunteer import VolunteerState
     from sqlalchemy.orm import Query, Session
     from uuid import UUID
     from typing import NamedTuple
-    from typing_extensions import Self, TypeAlias
+    from typing import Self, TypeAlias
 
     class ReportRowWithVolunteer(NamedTuple):
         activity_id: UUID
@@ -73,7 +73,11 @@ if TYPE_CHECKING:
 
 class VolunteerCollection(GenericCollection[Volunteer]):
 
-    def __init__(self, session: 'Session', period: 'Period | None') -> None:
+    def __init__(
+        self,
+        session: 'Session',
+        period: 'Period | PeriodMeta | None'
+    ) -> None:
         super().__init__(session)
         self.period = period
 
@@ -93,5 +97,5 @@ class VolunteerCollection(GenericCollection[Volunteer]):
 
         return self.session.execute(query)
 
-    def for_period(self, period: 'Period | None') -> 'Self':
+    def for_period(self, period: 'Period | PeriodMeta | None') -> 'Self':
         return self.__class__(self.session, period)

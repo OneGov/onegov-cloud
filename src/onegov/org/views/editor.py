@@ -110,7 +110,7 @@ def handle_new_page(
 
     layout = layout or EditorLayout(self, request, site_title)
     layout.editmode_links[1] = Link(
-        text=_("Cancel"),
+        text=_('Cancel'),
         url=request.link(self.page),
         attrs={'class': 'cancel-link'}
     )
@@ -129,7 +129,7 @@ def handle_new_root_page(
     form: 'Form',
     layout: EditorLayout | PageLayout | None = None
 ) -> 'RenderData | Response':
-    site_title = _("New Topic")
+    site_title = _('New Topic')
 
     if layout:
         layout.site_title = site_title  # type:ignore[union-attr]
@@ -144,7 +144,7 @@ def handle_new_root_page(
         )
         form.populate_obj(page)
 
-        request.success(_("Added a new topic"))
+        request.success(_('Added a new topic'))
         return morepath.redirect(request.link(page))
 
     if not request.POST:
@@ -152,7 +152,7 @@ def handle_new_root_page(
     layout = layout or EditorLayout(self, request, site_title)
     layout.edit_mode = True
     layout.editmode_links[1] = Link(
-        text=_("Cancel"),
+        text=_('Cancel'),
         url=request.class_link(Organisation),
         attrs={'class': 'cancel-link'}
     )
@@ -179,15 +179,15 @@ def handle_edit_page(
     layout.edit_mode = True
     layout.editmode_links[1] = BackLink(attrs={'class': 'cancel-link'})
 
-    if self.page.deletable and self.page.trait == "link":
+    if self.page.deletable and self.page.trait == 'link':
         edit_links = self.page.get_edit_links(request)
         layout.editbar_links = list(filter(
-            lambda link: getattr(link, 'text', '') == _("Delete"), edit_links
+            lambda link: getattr(link, 'text', '') == _('Delete'), edit_links
         ))
 
     if form.submitted(request):
         form.populate_obj(self.page)
-        request.success(_("Your changes were saved"))
+        request.success(_('Your changes were saved'))
 
         return morepath.redirect(request.link(self.page))
     elif not request.POST:
@@ -215,15 +215,15 @@ def handle_move_page(
 
     if form.submitted(request):
         form.update_model(self.page)  # type:ignore[attr-defined]
-        request.success(_("Your changes were saved"))
+        request.success(_('Your changes were saved'))
 
         return morepath.redirect(request.link(self.page))
 
     return {
         'layout': layout,
         'title': site_title,
-        'helptext': _("Moves the topic and all its sub topics to the "
-                      "given destination."),
+        'helptext': _('Moves the topic and all its sub topics to the '
+                      'given destination.'),
         'form': form,
     }
 
@@ -263,10 +263,16 @@ def handle_change_page_url(
         migration = PageNameChange.from_form(page, form)
         link_count = migration.execute(test=form['test'].data)
         if not form['test'].data:
-            request.app.cache.delete(
-                f'{request.app.application_id}.root_pages'
-            )
-            request.success(_("Your changes were saved"))
+            # FIXME: I am not sure this is actually necessary
+            #        the execution of the migration should cause
+            #        a change in the pages tables, which in turn
+            #        will clear these caches. But I suppose it doesn't
+            #        hurt to clear them twice...
+            for prop_name in ('root_pages', 'pages_tree', 'homepage_pages'):
+                prop = getattr(request.__class__, prop_name)
+                for cache_key in prop.used_cache_keys:
+                    request.app.cache.delete(cache_key)
+            request.success(_('Your changes were saved'))
 
             @request.after
             def must_revalidate(response: 'Response') -> None:
@@ -289,7 +295,7 @@ def handle_change_page_url(
         'layout': layout or EditorLayout(self, request, site_title),
         'form': form,
         'title': site_title,
-        'callout': " ".join(request.translate(m) for m in messages)
+        'callout': ' '.join(request.translate(m) for m in messages)
     }
 
 
@@ -313,7 +319,7 @@ def view_topics_sort(
     layout = layout or EditorLayout(self, request, 'sort')
 
     return {
-        'title': _("Sort"),
+        'title': _('Sort'),
         'layout': layout,
         'page': page,
         'pages': page.children

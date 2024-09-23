@@ -32,7 +32,7 @@ def activity_links(request: 'FeriennetRequest', user: 'User') -> LinkGroup:
     )
 
     return LinkGroup(
-        title=_("Activities"),
+        title=_('Activities'),
         links=[
             Link(
                 title,
@@ -53,7 +53,7 @@ def attendee_links(request: 'FeriennetRequest', user: 'User') -> LinkGroup:
     )
 
     return LinkGroup(
-        title=_("Attendees"),
+        title=_('Attendees'),
         links=[
             Link(
                 name,
@@ -68,10 +68,10 @@ def attendee_links(request: 'FeriennetRequest', user: 'User') -> LinkGroup:
 @FeriennetApp.userlinks()
 def booking_links(request: 'FeriennetRequest', user: 'User') -> LinkGroup:
     return LinkGroup(
-        title=_("Bookings"),
+        title=_('Bookings'),
         links=[
             Link(
-                _("Bookings for ${period}", mapping={'period': period.title}),
+                _('Bookings for ${period}', mapping={'period': period.title}),
                 request.class_link(BookingCollection, {
                     'period_id': period.id,
                     'username': user.username
@@ -84,10 +84,10 @@ def booking_links(request: 'FeriennetRequest', user: 'User') -> LinkGroup:
 @FeriennetApp.userlinks()
 def billing_links(request: 'FeriennetRequest', user: 'User') -> LinkGroup:
     return LinkGroup(
-        title=_("Billing"),
+        title=_('Billing'),
         links=[
             Link(
-                _("Billing for ${period}", mapping={'period': period.title}),
+                _('Billing for ${period}', mapping={'period': period.title}),
                 request.class_link(BillingCollection, {
                     'period_id': period.id,
                     'username': user.username

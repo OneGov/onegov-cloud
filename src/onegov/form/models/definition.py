@@ -17,16 +17,16 @@ from sqlalchemy.ext.hybrid import hybrid_property
 from sqlalchemy.orm import object_session, relationship
 
 
-# type gets shadowed in the model so we need an alias
-from typing import Type, TYPE_CHECKING, Any
-
+from typing import TYPE_CHECKING, Any
 if TYPE_CHECKING:
+    # type gets shadowed in the model so we need an alias
+    from builtins import type as type_t
     from uuid import UUID
     from datetime import date
     from onegov.form import Form
     from onegov.form.types import SubmissionState
     from onegov.pay.types import PaymentMethod
-    from typing_extensions import Self
+    from typing import Self
     from onegov.core.request import CoreRequest
 
 
@@ -155,7 +155,7 @@ class FormDefinition(Base, ContentMixin, TimestampMixin,
     }
 
     @property
-    def form_class(self) -> Type['Form']:
+    def form_class(self) -> 'type_t[Form]':
         """ Parses the form definition and returns a form class. """
 
         return self.extend_form_class(
@@ -305,7 +305,7 @@ class SurveyDefinition(Base, ContentMixin, TimestampMixin,
     extensions: dict_property[list[str]] = meta_property(default=list)
 
     @property
-    def form_class(self) -> Type['Form']:
+    def form_class(self) -> type['Form']:
         """ Parses the survey definition and returns a form class. """
 
         return self.extend_form_class(

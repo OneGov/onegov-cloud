@@ -149,7 +149,7 @@ class TranslatorMutation:
         'gender': _('Gender'),
         'date_of_birth': _('Date of birth'),
         'nationalities': _('Nationality(ies)'),
-        'coordinates': _("Location"),
+        'coordinates': _('Location'),
         'address': _('Street and house number'),
         'zip_code': _('Zip Code'),
         'city': _('City'),

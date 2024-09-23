@@ -12,7 +12,7 @@ class EmptyForm(Form):
 class RejectForm(Form):
 
     comment = TextAreaField(
-        label=_("Comment"),
+        label=_('Comment'),
         validators=[
             InputRequired()
         ],

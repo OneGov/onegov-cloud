@@ -11,7 +11,7 @@ from sqlalchemy import and_, not_
 from typing import Any, TYPE_CHECKING
 if TYPE_CHECKING:
     from collections.abc import Iterator
-    from onegov.activity.models import Period
+    from onegov.activity.models import Period, PeriodMeta
     from sqlalchemy.orm import Query, Session
 
 
@@ -19,8 +19,8 @@ if TYPE_CHECKING:
     id='unlucky',
     form_class=merge_forms(ExportForm, PeriodSelectForm),
     permission=Secret,
-    title=_("Attendees without Bookings"),
-    explanation=_("Attendees who were not granted any of their wishes"),
+    title=_('Attendees without Bookings'),
+    explanation=_('Attendees who were not granted any of their wishes'),
 )
 class UnluckyExport(FeriennetExport):
 
@@ -33,7 +33,11 @@ class UnluckyExport(FeriennetExport):
         assert form.selected_period is not None
         return self.rows(session, form.selected_period)
 
-    def query(self, session: 'Session', period: 'Period') -> 'Query[Attendee]':
+    def query(
+        self,
+        session: 'Session',
+        period: 'Period | PeriodMeta'
+    ) -> 'Query[Attendee]':
 
         with_any_bookings = session.query(Booking.attendee_id).filter(
             Booking.period_id == period.id).subquery()
@@ -51,7 +55,7 @@ class UnluckyExport(FeriennetExport):
     def rows(
         self,
         session: 'Session',
-        period: 'Period'
+        period: 'Period | PeriodMeta'
     ) -> 'Iterator[Iterator[tuple[str, Any]]]':
 
         for user in self.query(session, period):

@@ -16,14 +16,14 @@ if TYPE_CHECKING:
 class BankStatementImportForm(Form):
 
     period = SelectField(
-        label=_("Period"),
+        label=_('Period'),
         validators=[
             InputRequired()
         ],
         default='0xdeadbeef')
 
     xml = UploadField(
-        label=_("ISO 20022 XML"),
+        label=_('ISO 20022 XML'),
         validators=[
             DataRequired(),
             WhitelistedMimeType({'text/plain', 'text/xml', 'application/xml'}),
@@ -64,5 +64,5 @@ class BankStatementImportForm(Form):
 
         if not period.finalized:
             raise ValidationError(
-                "The billing of this period has not been finalized yet"
+                'The billing of this period has not been finalized yet'
             )
