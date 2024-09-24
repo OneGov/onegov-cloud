@@ -27,6 +27,7 @@ var Upload = function(element) {
     var url = element.attr('action');
 
     var dropzone = $(element.find('.upload-dropzone'));
+    var drop_button = $(element.find('#fileElem'));
     var progress = $(element.find('.upload-progress'));
     var filelist = $(element.find('.upload-filelist'));
     var filelist_header = $(element.find('.upload-filelist-header'));
@@ -87,6 +88,15 @@ var Upload = function(element) {
         }
 
         return false;
+    });
+
+    drop_button.on('change', function() {
+        console.log('change');
+        var files = this.files;
+
+        for (var i = 0; i < files.length; i++) {
+            upload(files[i]);
+        }
     });
 };
 
