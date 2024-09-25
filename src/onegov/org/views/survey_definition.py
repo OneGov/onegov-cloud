@@ -146,8 +146,11 @@ def handle_edit_survey_definition(
         form.definition.render_kw = {
             'rows': 32, 'disabled': 'true', 'title': request.translate(info)
         }
+        form.definition.validators = []
 
     if form.submitted(request):
+        if self.submissions:
+            form.definition.data = self.definition
         assert form.definition.data is not None
         form.populate_obj(self)
 
