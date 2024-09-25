@@ -1,4 +1,3 @@
-from os import name
 import morepath
 
 from webob.exc import HTTPForbidden
@@ -16,7 +15,7 @@ from onegov.org.layout import (FormEditorLayout,
                                SurveySubmissionLayout)
 
 
-from typing import Self, TypeVar, TYPE_CHECKING
+from typing import TypeVar, TYPE_CHECKING
 
 if TYPE_CHECKING:
     from onegov.core.types import RenderData
