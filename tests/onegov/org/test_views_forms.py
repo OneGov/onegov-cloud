@@ -1338,6 +1338,9 @@ def test_create_and_fill_survey(client):
     page = anonymous.get('/survey/event-evaluation')
     page.form['name'] = 'Nicolas Thomas'
     page.form['how_was_the_event_'] = 'Good'
+    # Send information and review the submission
+    page = page.form.submit().follow()
+    # A second time to confirm the submission
     page = page.form.submit().follow()
 
     # Check the results
@@ -1381,6 +1384,9 @@ def test_create_and_fill_survey(client):
     page = anonymous.get(url)
     page.form['name'] = 'Rubus Bubus'
     page.form['how_was_the_event_'] = 'Medium'
+    # Send information and review the submission
+    page = page.form.submit().follow()
+    # A second time to confirm the submission
     page = page.form.submit().follow()
 
     # Check the results
