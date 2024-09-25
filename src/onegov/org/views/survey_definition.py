@@ -144,7 +144,7 @@ def handle_edit_survey_definition(
     if self.submissions:
         form.definition.description = info
         form.definition.render_kw = {
-            'rows': 32, 'disabled': 'true', 'title': info
+            'rows': 32, 'disabled': 'true', 'title': request.translate(info)
         }
 
     if form.submitted(request):
