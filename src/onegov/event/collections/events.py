@@ -321,7 +321,7 @@ class EventCollection(Pagination[Event]):
                     updated.append(existing)
 
             else:
-                if published_only and not event.state == 'published':
+                if published_only and event.state != 'published':
                     continue
                 event.id = uuid4()
                 event.name = self._get_unique_name(event.title)

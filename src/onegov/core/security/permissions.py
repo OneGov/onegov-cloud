@@ -10,7 +10,7 @@ may of course introduce its own byzantine permission system.
 
 class Intent:
     """ Base class of all intents. Should never be used directly.
-        This is only used for type checking.
+    This is only used for type checking.
     """
 
 

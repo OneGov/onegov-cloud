@@ -624,7 +624,6 @@ class Form(BaseForm):
         call ``form.process(obj=obj)`` instead.
 
         """
-        pass
 
     def delete_field(self, fieldname: str) -> None:
         """ Removes the given field from the form and all the fieldsets. """
@@ -707,8 +706,8 @@ class Form(BaseForm):
         length_limit: int = 54
     ) -> str | None:
         """ Returns the field description in modified form if
-         the description should be rendered separately in the field macro.
-         """
+        the description should be rendered separately in the field macro.
+        """
         if hasattr(field, 'long_description'):
             return field.long_description
         if 'long_description' in (getattr(field, 'render_kw', {}) or {}):

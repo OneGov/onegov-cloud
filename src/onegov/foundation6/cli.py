@@ -32,11 +32,11 @@ def pre_checks() -> None:
 })
 def update() -> None:
     """ Update helper for foundation6 using node and webpack.
-        By the time this cli is used, probabely things already changed and
-        it needs to be adapted.
-        Also some import might not work and have to be adapted manually.
-        The Backup files can always be consulted.
-     """
+    By the time this cli is used, probabely things already changed and
+    it needs to be adapted.
+    Also some import might not work and have to be adapted manually.
+    The Backup files can always be consulted.
+    """
 
     pre_checks()
     module = Path(module_path('onegov.foundation6', 'foundation')).parent

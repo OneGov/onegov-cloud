@@ -40,26 +40,25 @@ def import_dws_vk(request: 'WinterthurRequest') -> None:
 
     icon_name = 'Veranstaltung_breit.jpg'
     icon_path = module_path('onegov.winterthur', 'static') + os.sep + icon_name
-    file = open(icon_path, 'rb')
-
-    # import events from response
-    collection = EventCollection(request.session)
-    added, updated, purged = collection.from_ical(
-        # TODO: the ical stubs claim this needs to be `str`, but `bytes` seems
-        #       to work as well, so we'll leave it unchanged for now, but we
-        #       may want to try just passing `response.text` here.
-        response.content,  # type:ignore[arg-type]
-        future_events_only=True,
-        event_image=file,
-        default_categories=[],
-        # FIXME: I'm not super happy that we both allow a list of values and a
-        #        single value, what is the difference in behavior? Is there
-        #        even one? If not just make it always a list please.
-        default_filter_keywords={
-            'kalender': 'Sport Veranstaltungskalender',  # type:ignore
-            'veranstaltungstyp': 'DWS'  # type:ignore
-        }
-    )
-    log.info(f'Events successfully imported '
-             f'({len(added)} added, {len(updated)} updated, '
-             f'{len(purged)} deleted)')
+    with open(icon_path, 'rb') as file:
+        # import events from response
+        collection = EventCollection(request.session)
+        added, updated, purged = collection.from_ical(
+            # TODO: the ical stubs claim this needs to be `str`, but `bytes
+            #       seems to work as well, so we'll leave it unchanged for now
+            #       but we may want to try just passing `response.text` here.
+            response.content,  # type:ignore[arg-type]
+            future_events_only=True,
+            event_image=file,
+            default_categories=[],
+            # FIXME: I'm not super happy that we both allow a list of values
+            #        and a single value, what is the difference in behavior? Is
+            #        there even one? If not just make it always a list please.
+            default_filter_keywords={
+                'kalender': 'Sport Veranstaltungskalender',  # type:ignore
+                'veranstaltungstyp': 'DWS'  # type:ignore
+            }
+        )
+        log.info(f'Events successfully imported '
+                 f'({len(added)} added, {len(updated)} updated, '
+                 f'{len(purged)} deleted)')

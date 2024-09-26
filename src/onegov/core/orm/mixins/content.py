@@ -16,7 +16,7 @@ if TYPE_CHECKING:
     from sqlalchemy.sql import ColumnElement
     from typing import Self
 
-    class _dict_property_factory(Protocol):
+    class _dict_property_factory(Protocol):  # noqa: N801
 
         @overload
         def __call__(
@@ -121,7 +121,7 @@ def is_valid_default(default: object | None) -> bool:
     return False
 
 
-class dict_property(InspectionAttrInfo, Generic[_T]):
+class dict_property(InspectionAttrInfo, Generic[_T]):  # noqa: N801
     """ Enables access of dictionaries through properties.
 
     Usage::
@@ -442,7 +442,7 @@ class dict_property(InspectionAttrInfo, Generic[_T]):
         del getattr(instance, self.attribute)[self.key]
 
 
-class dict_markup_property(dict_property[_MarkupT]):
+class dict_markup_property(dict_property[_MarkupT]):  # noqa: N801
 
     @overload
     def __init__(

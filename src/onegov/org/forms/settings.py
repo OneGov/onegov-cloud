@@ -603,13 +603,15 @@ class HeaderSettingsForm(Form):
         self,
         text: str | None = None
     ) -> list[tuple[str | None, str | None]]:
-        result = []
 
-        for value in json.loads(text or '{}').get('values', []):
-            if value['link'] or value['text']:
-                result.append((value['text'], value['link']))
+        if not text:
+            return []
 
-        return result
+        return [
+            (value['text'], link)
+            for value in json.loads(text).get('values', [])
+            if (link := value['link']) or value['text']
+        ]
 
     def links_to_json(
         self,
@@ -1150,7 +1152,7 @@ class NewsletterSettingsForm(Form):
                           'with topics and subtopics according the example.')
                     )
                     return False
-                for org_name, items in data.items():
+                for items in data.values():
                     if not isinstance(items, list):
                         self.newsletter_categories.errors.append(
                             _('Invalid format. Please define topics and '

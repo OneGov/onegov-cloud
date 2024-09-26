@@ -473,20 +473,20 @@ class EventForm(Form):
                 if form_field is None:
                     continue
 
-                form_field.data = keywords[field.id] if (
-                    field.id in keywords) else None
+                form_field.data = keywords.get(field.id, None)
 
     @cached_property
     def parsed_dates(self) -> list[date]:
         return self.json_to_dates(self.dates.data)
 
     def json_to_dates(self, text: str | None = None) -> list[date]:
-        result = []
+        if not text:
+            return []
 
-        for value in json.loads(text or '{}').get('values', []):
-            result.append(date(*map(int, value['date'].split('-'))))
-
-        return result
+        return [
+            date.fromisoformat(value['date'])
+            for value in json.loads(text).get('values', [])
+        ]
 
     def dates_to_json(self, dates: 'Sequence[date] | None' = None) -> str:
         dates = dates or []
@@ -499,7 +499,7 @@ class EventForm(Form):
             },
             'values': [
                 {
-                    'date': d.strftime('%Y-%m-%d'),
+                    'date': d.isoformat(),
                     'error': self.date_errors.get(ix, '')
                 } for ix, d in enumerate(dates)
             ]
@@ -594,14 +594,14 @@ class EventImportForm(Form):
             result = result.strip()
             return result
 
-        result = []
-        for occurrence in occurrences.query():
-            result.append({
+        return [
+            {
                 title: get(occurrence, attribute)
                 for attribute, title in headers.items()
-            })
+            }
+            for occurrence in occurrences.query()
 
-        return result
+        ]
 
     def run_import(self) -> tuple[int, list[str]]:
         headers = self.headers

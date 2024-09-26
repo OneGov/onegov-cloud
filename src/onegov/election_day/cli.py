@@ -35,6 +35,8 @@ cli = command_group()
 def add(group_context: 'GroupContext') -> 'Processor':
     """ Adds an election day instance with to the database. For example:
 
+    .. code-block:: bash
+
         onegov-election-day --select '/onegov_election_day/zg' add
 
     """
@@ -56,7 +58,9 @@ def add(group_context: 'GroupContext') -> 'Processor':
 @pass_group_context
 def fetch(group_context: 'GroupContext') -> 'Processor':
     """ Fetches the results from other instances as defined in the
-        principal.yml. Only fetches results from the same namespace.
+    principal.yml. Only fetches results from the same namespace.
+
+    .. code-block:: bash
 
         onegov-election-day --select '/onegov_election_day/zg' fetch
 
@@ -111,10 +115,12 @@ def send_sms(
     password: str,
     originator: str | None
 ) -> 'Processor':
-    """ Sends the SMS in the smsdir for a given instance. For example:
+    r""" Sends the SMS in the smsdir for a given instance. For example:
 
-        onegov-election-day --select '/onegov_election_day/zg' send_sms
-            'info@seantis.ch' 'top-secret'
+    .. code-block:: bash
+
+        onegov-election-day --select '/onegov_election_day/zg' \
+            send_sms 'info@seantis.ch' 'top-secret'
 
     """
 
@@ -140,6 +146,8 @@ def send_sms(
 def generate_media() -> 'Processor':
     """ Generates the PDF and/or SVGs for the selected instances. For example:
 
+    .. code-block:: bash
+
         onegov-election-day --select '/onegov_election_day/zg' generate-media
 
     """
@@ -163,6 +171,8 @@ def generate_media() -> 'Processor':
 @cli.command('generate-archive')
 def generate_archive() -> 'Processor':
     """ Generates a zipped file of the entire archive.
+
+    .. code-block:: bash
         onegov-election-day --select '/onegov_election_day/zg' generate-archive
     """
     def generate(request: 'ElectionDayRequest', app: 'ElectionDayApp') -> None:

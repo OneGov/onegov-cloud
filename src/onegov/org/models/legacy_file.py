@@ -1,7 +1,7 @@
 """ Contains the legacy models of files for url redirect support. Going
 forward, onegov.file and onegov.org.models.file is used.
 
- """
+"""
 
 import base64
 
