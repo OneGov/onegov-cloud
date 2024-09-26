@@ -1,11 +1,11 @@
 """
-    Send E-Mail through Postmark
+Send E-Mail through Postmark
 
-    Adapted from repoze.sendmail: https://github.com/repoze/repoze.sendmail
+Adapted from `repoze.sendmail<https://github.com/repoze/repoze.sendmail>`_.
 
-    Usage:
-        qp = PostmarkQueueProcessor(token, maildir, maildir, ..., limit=x)
-        qp.send_messages()
+Usage::
+    qp = PostmarkQueueProcessor(token, maildir, maildir, ..., limit=x)
+    qp.send_messages()
 """
 
 import json

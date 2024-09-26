@@ -261,16 +261,16 @@ class Booking(Base, TimestampMixin):
         return self.priority & 1 << 0 != 0
 
     @starred.expression  # type:ignore[no-redef]
-    def starred(self) -> 'ColumnElement[bool]':
-        return self.priority.op('&')(1 << 0) != 0
+    def starred(cls) -> 'ColumnElement[bool]':
+        return cls.priority.op('&')(1 << 0) != 0
 
     @hybrid_property  # type:ignore[no-redef]
     def nobbled(self) -> bool:
         return self.priority & 1 << 1 != 0
 
     @nobbled.expression  # type:ignore[no-redef]
-    def nobbled(self) -> 'ColumnElement[bool]':
-        return self.priority.op('&')(1 << 1) != 0
+    def nobbled(cls) -> 'ColumnElement[bool]':
+        return cls.priority.op('&')(1 << 1) != 0
 
     @property
     def dates(self) -> list['OccasionDate']:

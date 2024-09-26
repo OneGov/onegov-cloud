@@ -1,13 +1,13 @@
 """ Use Markov chains to generate random text that sounds Japanese.
-    This makes random pronounceable passwords that are both strong and easy
-    to memorize.
+This makes random pronounceable passwords that are both strong and easy
+to memorize.
 
-    Of course English or any other language could be used in the sample text.
+Of course English or any other language could be used in the sample text.
 
-    See more details at http://exyr.org/2011/random-pronounceable-passwords/
+See more details at http://exyr.org/2011/random-pronounceable-passwords/
 
-    Author: Simon Sapin
-    License: BSD
+Author: Simon Sapin
+License: BSD
 """
 
 import string

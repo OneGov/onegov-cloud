@@ -573,11 +573,11 @@ class FormSubmissionCollection:
     ) -> FormSubmission | None:
         """ Return the submission by id.
 
-            :state:
-                Only if the submission matches the given state.
+        :state:
+            Only if the submission matches the given state.
 
-            :current_only:
-                Only if the submission is not older than one hour.
+        :current_only:
+            Only if the submission is not older than one hour.
         """
         query = self.query().filter(FormSubmission.id == id)
 
@@ -881,11 +881,11 @@ class SurveySubmissionCollection:
     ) -> SurveySubmission | None:
         """ Return the submission by id.
 
-            :state:
-                Only if the submission matches the given state.
+        :state:
+            Only if the submission matches the given state.
 
-            :current_only:
-                Only if the submission is not older than one hour.
+        :current_only:
+            Only if the submission is not older than one hour.
         """
         query = self.query().filter(SurveySubmission.id == id)
 

@@ -69,7 +69,7 @@ class InlineDirectorySearch:
 
         fields = tuple(
             f for f in DirectoryEntry.es_properties.keys()
-            if not f.startswith('es_') and not f == 'directory_id'
+            if not f.startswith('es_') and f != 'directory_id'
         )
 
         match = MultiMatch(query=self.term, fields=fields, fuzziness=1)

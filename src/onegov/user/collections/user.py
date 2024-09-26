@@ -151,8 +151,8 @@ class UserCollection:
     ) -> User:
         """ Add a user to the collection.
 
-            The arguments given to this function are the attributes of the
-            :class:`~onegov.user.models.User` class with the same name.
+        The arguments given to this function are the attributes of the
+        :class:`~onegov.user.models.User` class with the same name.
         """
         assert username
         assert password

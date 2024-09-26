@@ -58,7 +58,7 @@ class TranslatablePageFile(File):
 
 
 class FileSubCollection:
-    """ """
+    """ A subset of files prefixed by the descriptor's name. """
 
     def __set_name__(self, owner: type['HasFiles[FileT]'], name: str) -> None:
         self.name = name

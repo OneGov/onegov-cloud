@@ -265,8 +265,8 @@ def handle_new_event_without_workflow(
 ) -> 'RenderData | BaseResponse':
     """ Create and submit a new event.
 
-        The event is created and ticket workflow is skipped by setting
-        the state to 'submitted'.
+    The event is created and ticket workflow is skipped by setting
+    the state to 'submitted'.
 
     """
 

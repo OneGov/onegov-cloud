@@ -423,7 +423,7 @@ class Event(Base, OccurrenceMixin, TimestampMixin, SearchableContent,
         self.occurrences = []
 
         # do not create occurrences unless the event is published
-        if not self.state == 'published':
+        if self.state != 'published':
             return
 
         # do not create occurrences unless start and end is set

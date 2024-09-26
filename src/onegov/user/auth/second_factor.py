@@ -65,7 +65,7 @@ class SecondFactor(metaclass=ABCMeta):
 
     @classmethod
     @abstractmethod
-    def configure(self, **cfg: Any) -> Self | None:
+    def configure(cls, **cfg: Any) -> Self | None:
         """ Initialises the auth factor using a dictionary that may or may
         not contain the configuration values necessary for the auth factor.
 

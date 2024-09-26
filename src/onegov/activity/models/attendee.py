@@ -158,8 +158,8 @@ class Attendee(Base, TimestampMixin, ORMSearchable):
         return today.year - birth.year - extra
 
     @age.expression  # type:ignore[no-redef]
-    def age(self) -> 'ColumnElement[int]':
-        return func.extract('year', func.age(self.birth_date))
+    def age(cls) -> 'ColumnElement[int]':
+        return func.extract('year', func.age(cls.birth_date))
 
     @hybrid_method  # type:ignore[no-redef]
     def happiness(self, period_id: 'uuid.UUID') -> float | None:

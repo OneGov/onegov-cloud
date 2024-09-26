@@ -287,12 +287,11 @@ def get_party_results_seat_allocation(
 
     result = []
     for party_id, party in parties.items():
-        row = []
-        row.append(party_names.get(party_id, ''))
-        for year in years:
-            row.append(
-                parties.get(party_id, {}).get(year, {}).get('mandates', 0)
-            )
+        row = [
+            parties.get(party_id, {}).get(year, {}).get('mandates', 0)
+            for year in years
+        ]
+        row.insert(0, party_names.get(party_id, ''))
         result.append(row)
 
     return result

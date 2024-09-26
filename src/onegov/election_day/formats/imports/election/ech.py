@@ -332,7 +332,7 @@ def import_information_delivery(
                 for list_id in union.referenced_list:
                     lists[list_id].connection = connection
             for union in information.list_union:
-                if not union.list_union_type == ListRelationType.VALUE_2:
+                if union.list_union_type != ListRelationType.VALUE_2:
                     continue
                 assert union.list_union_identification
                 connection_id = union.list_union_identification

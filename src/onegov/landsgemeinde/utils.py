@@ -204,10 +204,10 @@ def ensure_states(
 def timestamp_to_seconds(timestamp: str | None) -> int | None:
     """Convert a timestamp to seconds.
 
-       Examples:
-       '1m30s' -> 90
-       '30s' -> 30
-       '1h2m30s' -> 3750
+    Examples:
+    '1m30s' -> 90
+    '30s' -> 30
+    '1h2m30s' -> 3750
     """
 
     if not timestamp:
@@ -228,10 +228,10 @@ def timestamp_to_seconds(timestamp: str | None) -> int | None:
 def seconds_to_timestamp(seconds: int | None) -> str | None:
     """Convert seconds to a timestamp.
 
-       Examples:
-       90 -> '1m30s'
-       30 -> '30s'
-       3750 -> '1h2m30s'
+    Examples:
+    90 -> '1m30s'
+    30 -> '30s'
+    3750 -> '1h2m30s'
     """
 
     if not seconds or seconds < 0:

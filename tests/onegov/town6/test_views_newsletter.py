@@ -281,7 +281,7 @@ def test_newsletter_signup(client):
     assert confirm.split('/confirm')[0] == unsubscribe.split('/unsubscribe')[0]
 
     # unsubscribing before the opt-in does nothing, no emails are sent
-    assert "erfolgreich abgemeldet" in client.get(unsubscribe).follow()
+    assert "vom Newsletter abgemeldet" in client.get(unsubscribe).follow()
 
     # try an illegal token first
     illegal_confirm = confirm.split('/confirm')[0] + 'x/confirm'
@@ -298,7 +298,7 @@ def test_newsletter_signup(client):
     # unsubscribing does not result in an e-mail either
     illegal_unsub = unsubscribe.split('/unsubscribe')[0] + 'x/unsubscribe'
     assert "falsches Token" in client.get(illegal_unsub).follow()
-    assert "erfolgreich abgemeldet" in client.get(unsubscribe).follow()
+    assert "vom Newsletter abgemeldet" in client.get(unsubscribe).follow()
 
     # no e-mail is sent when unsubscribing
     assert len(os.listdir(client.app.maildir)) == 1
@@ -447,7 +447,7 @@ def test_newsletter_subscribers_management(client):
 
     unsubscribe = subscribers.pyquery('a[ic-get-from]').attr('ic-get-from')
     result = client.get(unsubscribe).follow()
-    assert "info@example.org wurde erfolgreich abgemeldet" in result
+    assert "info@example.org erfolgreich vom Newsletter abgemeldet" in result
 
 
 def test_newsletter_subscribers_management_by_manager(client):
@@ -470,7 +470,7 @@ def test_newsletter_subscribers_management_by_manager(client):
 
         unsubscribe = subscribers.pyquery('a[ic-get-from]').attr('ic-get-from')
         result = client.get(unsubscribe).follow()
-        assert "info@govikon.org wurde erfolgreich abgemeldet" in result
+        assert "info@govikon.org erfolgreich vom Newsletter" in result
 
     client.login_admin()
     subscribe_by_manager(client)

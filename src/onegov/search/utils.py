@@ -88,7 +88,7 @@ def extract_hashtags(text: str) -> list[str]:
     return HASHTAG.findall(html.unescape(text))
 
 
-class classproperty(Generic[T_co]):
+class classproperty(Generic[T_co]):  # noqa: N801
     def __init__(self, f: 'Callable[[type[Any]], T_co]') -> None:
         if isinstance(f, classmethod):
             # unwrap classmethod decorator which is used for typing

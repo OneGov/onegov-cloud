@@ -50,16 +50,16 @@ class DefaultLayout(ChameleonLayout):
 
     @cached_property
     def top_navigation(self) -> list[Link]:
-        result = [Link(_('Votes'), self.votes_url)]
-        for page in self.pages.query():
-            if page.id not in self.request.app.static_content_pages:
-                result.append(
-                    Link(
-                        page.title,
-                        self.request.link(page),
-                        sortable_id=page.id,
-                    )
-                )
+        result = [
+            Link(
+                page.title,
+                self.request.link(page),
+                sortable_id=page.id,
+            )
+            for page in self.pages.query()
+            if page.id not in self.request.app.static_content_pages
+        ]
+        result.insert(0, Link(_('Votes'), self.votes_url))
         return result
 
     @cached_property

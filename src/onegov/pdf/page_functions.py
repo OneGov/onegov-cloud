@@ -13,7 +13,6 @@ if TYPE_CHECKING:
 def empty_page_fn(canvas: 'Canvas', doc: 'Template') -> None:
     """ An empty header/footer. """
 
-    pass
 
 
 def page_fn_footer(canvas: 'Canvas', doc: 'Template') -> None:

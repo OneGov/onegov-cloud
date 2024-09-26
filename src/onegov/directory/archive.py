@@ -54,7 +54,7 @@ UNKNOWN_FIELD = _Sentinel.UNKNOWN_FIELD
 
 class DirectoryFileNotFound(FileNotFoundError):
     def __init__(self, file_id: str, entry_name: str, filename: str) -> None:
-        self.file_id = file_id,
+        self.file_id = file_id
         self.entry_name = entry_name
         self.filename = filename
 

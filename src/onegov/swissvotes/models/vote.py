@@ -63,7 +63,7 @@ class Poster(NamedTuple):
     label: str
 
 
-class encoded_property:
+class encoded_property:  # noqa: N801
     """ A shorthand property to return the label of an encoded value. Requires
     the instance the have a `codes`-lookup function. Creates the SqlAlchemy
     Column (with a prefixed underline).
@@ -97,7 +97,7 @@ class encoded_property:
         return instance.codes(self.name).get(value)
 
 
-class localized_property(Generic[StrT]):
+class localized_property(Generic[StrT]):  # noqa: N801
     """ A shorthand property to return a localized attribute. Requires at least
     a `xxx_de` attribute and falls back to this.
 
@@ -686,10 +686,8 @@ class SwissVote(Base, TimestampMixin, LocalizedFiles, ContentMixin):
 
         """
         result = []
-        for slogan, actor_list in self.recommendations_parties.items():
+        for actor_list in self.recommendations_parties.values():
             actors = (d.name for d in actor_list)
-            # Filter out those who have None as share
-
             result.extend(
                 sorted(actors, key=self.get_actors_share, reverse=True)
             )
@@ -730,17 +728,19 @@ class SwissVote(Base, TimestampMixin, LocalizedFiles, ContentMixin):
             (Actor(name), recommendations_lookup.get(name))
             for name in Actor.associations()
         ]
-        for attribute, code in (
-            ('yes', 1),
-            ('no', 2),
-            ('free', 5),
-            ('counter_proposal', 8),
-            ('popular_initiative', 9),
-        ):
-            value = getattr(self, f'recommendations_other_{attribute}')
-            for name in (value or '').split(','):
-                if stripped := name.strip():
-                    recommendations.append((Actor(stripped), code))
+        recommendations.extend(
+            (Actor(stripped), code)
+            for attribute, code in (
+                ('yes', 1),
+                ('no', 2),
+                ('free', 5),
+                ('counter_proposal', 8),
+                ('popular_initiative', 9),
+            )
+            if (value := getattr(self, f'recommendations_other_{attribute}'))
+            for name in value.split(',')
+            if (stripped := name.strip())
+        )
 
         return self.group_recommendations(recommendations, ignore_unknown=True)
 
@@ -1037,10 +1037,10 @@ class SwissVote(Base, TimestampMixin, LocalizedFiles, ContentMixin):
     )
 
     # searchable attachment texts
-    searchable_text_de_CH = deferred(Column(TSVECTOR))
-    searchable_text_fr_CH = deferred(Column(TSVECTOR))
-    searchable_text_it_CH = deferred(Column(TSVECTOR))
-    searchable_text_en_US = deferred(Column(TSVECTOR))
+    searchable_text_de_CH = deferred(Column(TSVECTOR))  # noqa: N815
+    searchable_text_fr_CH = deferred(Column(TSVECTOR))  # noqa: N815
+    searchable_text_it_CH = deferred(Column(TSVECTOR))  # noqa: N815
+    searchable_text_en_US = deferred(Column(TSVECTOR))  # noqa: N815
 
     indexed_files = {
         'voting_text',

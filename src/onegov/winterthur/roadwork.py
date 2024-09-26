@@ -59,7 +59,7 @@ class RoadworkConfig:
         self.password = password
 
     @classmethod
-    def lookup_paths(self) -> 'Iterator[Path]':
+    def lookup_paths(cls) -> 'Iterator[Path]':
         yield Path('~/.pdb.secret').expanduser()
         yield Path('/etc/pdb.secret')
 
