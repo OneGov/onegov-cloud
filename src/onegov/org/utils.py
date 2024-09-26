@@ -26,7 +26,7 @@ from sqlalchemy import nullsfirst, select  # type:ignore[attr-defined]
 from onegov.ticket import TicketCollection
 from onegov.user import User
 
-from typing import overload, Any, TYPE_CHECKING
+from typing import overload, Any, Literal, TYPE_CHECKING
 if TYPE_CHECKING:
     from _typeshed import SupportsRichComparison
     from collections.abc import Callable, Iterable, Iterator, Sequence
@@ -190,7 +190,7 @@ def annotate_html(
             # find the closest paragraph in the ancestrage, but don't look far
             parent = a.getparent()
 
-            for i in range(0, 3):
+            for i in range(3):
                 if parent is None:
                     break
                 if parent.tag == 'p':
@@ -440,7 +440,7 @@ class AllocationEventInfo:
 
             for allocation in grouped:
                 if allocation.is_master:
-                    events.append(
+                    events.append(  # noqa: PERF401
                         cls(
                             resource,
                             allocation,
@@ -1027,24 +1027,24 @@ def group_by_column(
 ) -> dict[str, list[Any]]:
     """ Groups the given query by the given group.
 
-        :param request:
-            The current request used for translation and to exclude invisible
-            records.
+    :param request:
+        The current request used for translation and to exclude invisible
+        records.
 
-        :param query:
-            The query that should be grouped
+    :param query:
+        The query that should be grouped
 
-        :param group_column:
-            The column by which the grouping should happen.
+    :param group_column:
+        The column by which the grouping should happen.
 
-        :param sort_column:
-            The column by which the records should be sorted.
+    :param sort_column:
+        The column by which the records should be sorted.
 
-        :param default_group:
-            The group in use if the found group is empty (optional).
+    :param default_group:
+        The group in use if the found group is empty (optional).
 
-        :param transform:
-            Called with each record to transform the result (optional).
+    :param transform:
+        Called with each record to transform the result (optional).
 
     """
 
@@ -1182,6 +1182,18 @@ def widest_access(*accesses: str) -> str:
     return ORDERED_ACCESS[index]
 
 
+@overload
+def extract_categories_and_subcategories(
+    categories: dict[str, list[dict[str, list[str]] | str]],
+    flattened: Literal[False] = False
+) -> tuple[list[str], list[list[str]]]: ...
+
+@overload
+def extract_categories_and_subcategories(
+    categories: dict[str, list[dict[str, list[str]] | str]],
+    flattened: Literal[True]
+) -> list[str]: ...
+
 def extract_categories_and_subcategories(
     categories: dict[str, list[dict[str, list[str]] | str]],
     flattened: bool = False
@@ -1208,7 +1220,7 @@ def extract_categories_and_subcategories(
     cats: list[str] = []
     subcats: list[list[str]] = []
 
-    for org_name, items in categories.items():
+    for items in categories.values():
         for item in items:
             if isinstance(item, dict):
                 for topic, subs in item.items():

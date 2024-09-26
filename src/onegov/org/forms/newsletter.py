@@ -299,8 +299,7 @@ class NewsletterSendForm(Form):
 
         for cat, sub in zip(categories, subcategories):
             choices.append((cat, cat))
-            for s in sub:
-                choices.append((f'{s}', f'\xa0\xa0\xa0{s}'))
+            choices.extend((s, f'\xa0\xa0\xa0{s}') for s in sub)
 
         self.categories.choices = choices
 
@@ -374,7 +373,7 @@ class NewsletterSubscriberImportExportForm(Form):
             self.request.session).ordered_by_status_address()
         headers = self.headers
 
-        def get(recipient: Recipient, attribute: str) -> str | bool:
+        def get(recipient: Recipient, attribute: str) -> Any:
             result = getattr(recipient, attribute, '')
             if isinstance(result, str):
                 return result.strip()
@@ -383,13 +382,13 @@ class NewsletterSubscriberImportExportForm(Form):
             else:
                 return result
 
-        result = []
-        for recipient in recipients.all():
-            result.append({
+        return [
+            {
                 v: get(recipient, k)
                 for k, v in headers.items()
-            })
-        return result
+            }
+            for recipient in recipients
+        ]
 
     def run_import(self) -> tuple[int, list[str]]:
         headers = self.headers

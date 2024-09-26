@@ -37,6 +37,8 @@ def add(
 ) -> 'Callable[[CoreRequest, WtfsApp], None]':
     """ Adds an instance to the database. For example:
 
+    .. code-block:: bash
+
         onegov-wtfs --select '/onegov_wtfs/wtfs' add
 
     """
@@ -55,6 +57,8 @@ def delete(
     group_context: 'GroupContext'
 ) -> 'Callable[[CoreRequest, WtfsApp], None]':
     """ Deletes an instance from the database. For example:
+
+    .. code-block:: bash
 
         onegov-wtfs --select '/onegov_wtfs/wtfs' delete
 

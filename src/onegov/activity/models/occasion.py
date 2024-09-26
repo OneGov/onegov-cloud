@@ -248,7 +248,7 @@ class Occasion(Base, TimestampMixin):
         return base
 
     @total_cost.expression  # type:ignore[no-redef]
-    def total_cost(self) -> 'ColumnElement[Decimal]':
+    def total_cost(cls) -> 'ColumnElement[Decimal]':
         from onegov.activity.models.period import Period
 
         return coalesce(Occasion.cost, 0) + case([

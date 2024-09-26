@@ -30,6 +30,8 @@ def pdf_filename(
 ) -> str:
     """ Generates a filename from an election or vote:
 
+    .. code-block:: plain
+
         ['election' or 'vote']-[hash of id].[timestamp].[locale].pdf
 
     """
@@ -52,7 +54,9 @@ def svg_filename(
     locale: str,
     last_modified: 'datetime | None' = None
 ) -> str:
-    """ Generates a filename from an election, ballot or vote::
+    """ Generates a filename from an election, ballot or vote:
+
+    .. code-block:: plain
 
         ['election' or 'vote']-[hash of id].[type_].[timestamp].[locale].svg
 

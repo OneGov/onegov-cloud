@@ -601,9 +601,9 @@ class PersonLinkExtension(ContentExtension):
         PersonForm.Meta = meta
 
         if TYPE_CHECKING:
-            FieldBase = FieldList[FormField[PersonForm]]
+            FieldBase = FieldList[FormField[PersonForm]]  # noqa: N806
         else:
-            FieldBase = FieldList
+            FieldBase = FieldList  # noqa: N806
 
         class PeopleField(FieldBase):
             def is_ordered_people(self, people: list[tuple[str, Any]]) -> bool:
@@ -1057,13 +1057,15 @@ class SidebarLinksExtension(ContentExtension):
                 self,
                 text: str | None = None
             ) -> list[tuple[str | None, str | None]]:
-                result = []
 
-                for value in json.loads(text or '{}').get('values', []):
-                    if value['link'] or value['text']:
-                        result.append((value['text'], value['link']))
+                if not text:
+                    return []
 
-                return result
+                return [
+                    (value['text'], link)
+                    for value in json.loads(text).get('values', [])
+                    if (link := value['link']) or value['text']
+                ]
 
             def links_to_json(
                 self,

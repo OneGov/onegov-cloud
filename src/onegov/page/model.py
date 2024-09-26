@@ -44,5 +44,5 @@ class Page(AdjacencyList, ContentMixin, TimestampMixin,
             return self.publication_start or self.created
 
         @published_or_created.expression  # type:ignore[no-redef]
-        def published_or_created(self):
+        def published_or_created(cls):
             return func.coalesce(Page.publication_start, Page.created)

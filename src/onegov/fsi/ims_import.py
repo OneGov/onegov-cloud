@@ -167,7 +167,7 @@ def parse_email(email: str) -> str | None:
     email = email.strip().replace('.local', '').lower()
     if not email:
         return None
-    if not email[-3:] == '.ch' and email[-3:] == '@ẑg':
+    if email[-3:] != '.ch' and email[-3:] == '@ẑg':
         email += '.ch'
     return email
 
@@ -457,7 +457,7 @@ def parse_subscriptions(
 
             if current_email:
                 # just current_email
-                if not current_email == email:
+                if current_email != email:
                     # Assert full profile of the record in Personen.txt
                     assert complete_record
                 subscriptions.append({
@@ -618,7 +618,7 @@ def import_ims_data(
             ReminderTemplate(**data)
         ))
 
-    for obj_id, person in persons.items():
+    for person in persons.values():
         attendee = map_persons_to_known_ldap_user(person, session)
         if not attendee:
             statistics['LDAP_not_found'] += 1

@@ -76,6 +76,8 @@ def add(
 ) -> 'Callable[[OrgRequest, OrgApp], None]':
     """ Adds an org with the given name to the database. For example:
 
+    .. code-block:: bash
+
         onegov-org --select '/onegov_org/evilcorp' add "Evilcorp"
 
     """
@@ -107,6 +109,7 @@ def import_digirez(
     """ Imports a Digirez reservation database into onegov.org.
 
     Example:
+    .. code-block:: bash
 
         onegov-org --select '/orgs/govikon' import-digirez room_booking.mdb
 
@@ -313,7 +316,7 @@ def import_digirez(
 
             whole_day = (start_hour, end_hour) == (0, 24)
 
-            for day in range(0, days + 1):
+            for day in range(days + 1):
                 start = first_day_start + timedelta(days=day)
                 end = first_day_end + timedelta(days=day)
 
@@ -371,7 +374,6 @@ def import_digirez(
                         f'Booking conflict in {resource.title} '
                         f'at {booking.hour_start}'
                     )
-                    pass
 
             if found_conflict:
                 continue
@@ -426,13 +428,13 @@ def fix_tags(
         de_transl = app.translations.get('de_CH')
         assert de_transl is not None
 
-        DEFINED_TAGS = list(TAGS)
-        DEFINED_TAG_IDS = [str(s) for s in DEFINED_TAGS]
+        defined_tags = list(TAGS)
+        defined_tag_ids = [str(s) for s in defined_tags]
 
         def translate(text: 'TranslationString') -> str:
             return text.interpolate(de_transl.gettext(text))
 
-        form_de_to_en = {translate(text): str(text) for text in DEFINED_TAGS}
+        form_de_to_en = {translate(text): str(text) for text in defined_tags}
 
         predefined = {
             'Theater / Tanz': ('Dancing', 'Theater'),
@@ -465,7 +467,7 @@ def fix_tags(
             for tag in occurrence.tags:
                 if tag in predefined:
                     continue
-                if tag not in DEFINED_TAG_IDS:
+                if tag not in defined_tag_ids:
                     if tag in form_de_to_en:
                         tags.remove(tag)
                         tags.append(form_de_to_en[tag])
@@ -532,43 +534,46 @@ def fetch(
     published_only: bool,
     delete_orphaned_tickets: bool
 ) -> 'Callable[[OrgRequest, OrgApp], None]':
-    """ Fetches events from other instances.
+    r""" Fetches events from other instances.
 
     Only fetches events from the same namespace which have not been imported
     themselves.
 
     Example
+    .. code-block:: bash
 
         onegov-org --select '/veranstaltungen/zug' fetch \
-            --source menzingen --source steinhausen
-            --tag Sport --tag Konzert
+            --source menzingen --source steinhausen \
+            --tag Sport --tag Konzert \
             --location Zug
 
     Additional parameters:
 
-            --state-transfers published:withdrawn
+    - ``--state-transfers published:withdrawn``
 
-            Will update the local event.state from published to withdrawn
-            automatically. If there are any tickets associated with the event,
-            the will be closed automatically.
+        Will update the local event.state from published to withdrawn
+        automatically. If there are any tickets associated with the event,
+        the will be closed automatically.
 
-            --pusblished_only:
-            When passing the remote items to the EventCollection, only add
-            events if they are published.
+    - ``--pusblished-only``
 
-            --delete-orphaned-tickets
+        When passing the remote items to the EventCollection, only add
+        events if they are published.
 
-            Delete Tickets, TicketNotes and TicketMessasges if an
-            event gets deleted automatically.
+    - ``--delete-orphaned-tickets``
+
+        Delete Tickets, TicketNotes and TicketMessasges if an
+        event gets deleted automatically.
 
     The following example will close tickets automatically for
     submitted and published events that were withdrawn on the remote.
 
-    onegov-event --select '/veranstaltungen/zug' fetch \
-            --source menzingen --source steinhausen
-            --published-only
-            --create-tickets
-            --state-transfers published:withdrawn
+    .. code-block:: bash
+        onegov-event --select '/veranstaltungen/zug' fetch \
+            --source menzingen --source steinhausen \
+            --published-only \
+            --create-tickets \
+            --state-transfers published:withdrawn \
             --state-transfers submitted:withdrawm
 
     """
@@ -789,7 +794,7 @@ def fix_directory_files(
                     file_id = field_data['data'].lstrip('@')
                     file = request.session.query(File).filter_by(
                         id=file_id).first()
-                    if file and not file.type == 'directory':
+                    if file and file.type != 'directory':
                         new = DirectoryFile(  # type:ignore[misc]
                             id=random_token(),
                             name=file.name,
@@ -893,7 +898,8 @@ def migrate_publications(
 def delete_invisible_links() -> 'Callable[[OrgRequest, OrgApp], None]':
     """ Deletes all the data associated with a period, including:
 
-    Example::
+    Example:
+    .. code-block:: bash
 
         onegov-org --select /foo/bar delete-invisible-links
 
