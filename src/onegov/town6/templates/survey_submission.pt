@@ -12,7 +12,7 @@
         <div class="grid-x fieldset-display" tal:condition="completable">
             <div class="small-12 large-8 cell">
                 <div class="alert-box callout success" i18n:translate="">
-                    Thank you for filling out this survey.<br>
+                    Thank you for filling out this survey.
                     If there's anything you'd like to change, click on the "Edit"-Button below.
                 </div>
                 <br>
