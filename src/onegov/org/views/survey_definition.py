@@ -100,7 +100,7 @@ def handle_defined_survey(
 
     if enabled and request.POST:
         submission = collection.submissions.add(
-            self.name, form, state='pending')
+            self.name, form)
 
         return morepath.redirect(request.link(submission))
 
@@ -120,7 +120,6 @@ def handle_defined_survey(
         'coordinates': getattr(self, 'coordinates', Coordinates()),
         'hints': hint,
         'hints_callout': not enabled,
-        'button_text': _('Continue')
     }
 
 
@@ -186,8 +185,6 @@ def view_survey_results(
 ) -> 'RenderData':
 
     submissions = self.submissions
-    completed_submissions = [s for s in submissions if s.state == 'complete']
-    submission_count = len(completed_submissions)
     results = self.get_results(request)
     aggregated = ['MultiCheckboxField', 'CheckboxField', 'RadioField']
 
@@ -233,7 +230,7 @@ def view_survey_results(
         'results': results,
         'fields': fields,
         'aggregated': aggregated,
-        'submission_count': submission_count,
+        'submission_count': len(submissions),
         'submission_windows': self.submission_windows
     }
 
@@ -255,7 +252,6 @@ def delete_survey_definition(
 
     SurveyCollection(request.session).definitions.delete(
         self.name,
-        with_submissions=True,
         with_submission_windows=True,
     )
 

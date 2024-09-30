@@ -4,8 +4,7 @@ import morepath
 
 from onegov.core.security import Public, Private
 from onegov.form.collection import SurveyCollection
-from onegov.form.models.submission import (CompleteSurveySubmission,
-                                           PendingSurveySubmission)
+from onegov.form.models.submission import SurveySubmission
 from onegov.org.cli import close_ticket
 from onegov.org.models.organisation import Organisation
 from onegov.ticket import TicketCollection
@@ -468,20 +467,14 @@ def handle_submission_action(
     return request.redirect(request.link(self))
 
 
-@OrgApp.html(model=PendingSurveySubmission,
-             template='survey_submission.pt',
-             permission=Public, request_method='GET')
-@OrgApp.html(model=PendingSurveySubmission,
-             template='survey_submission.pt',
-             permission=Public, request_method='POST')
-@OrgApp.html(model=CompleteSurveySubmission,
+@OrgApp.html(model=SurveySubmission,
              template='survey_submission.pt',
              permission=Private, request_method='GET')
-@OrgApp.html(model=CompleteSurveySubmission,
+@OrgApp.html(model=SurveySubmission,
              template='survey_submission.pt',
              permission=Private, request_method='POST')
-def handle_pending_survey_submission(
-    self: PendingSurveySubmission | CompleteSurveySubmission,
+def handle_survey_submission(
+    self: SurveySubmission,
     request: 'OrgRequest',
     layout: SurveySubmissionLayout | None = None
 ) -> 'RenderData | Response':
@@ -530,7 +523,8 @@ def handle_pending_survey_submission(
     edit_url_obj = edit_url_obj.query_param('edit', '')
     edit_url = edit_url_obj.as_string()
 
-    checkout_button = None
+    layout = layout or SurveySubmissionLayout(self, request, title)
+    layout.editbar_links = []
 
     return {
         'layout': layout or SurveySubmissionLayout(self, request, title),
@@ -541,46 +535,5 @@ def handle_pending_survey_submission(
         'complete_link': request.link(self, 'complete'),
         'model': self,
         'price': None,
-        'checkout_button': checkout_button
     }
 
-
-@OrgApp.view(model=PendingSurveySubmission, name='complete',
-             permission=Public, request_method='POST')
-@OrgApp.view(model=CompleteSurveySubmission, name='complete',
-             permission=Private, request_method='POST')
-def handle_complete_survey_submission(
-    self: PendingSurveySubmission | CompleteSurveySubmission,
-    request: 'OrgRequest'
-) -> 'Response':
-
-    form = request.get_form(self.form_class)
-    form.process(data=self.data)
-    form.model = self
-
-    # we're not really using a csrf protected form here (the complete form
-    # button is basically just there so we can use a POST instead of a GET)
-    form.validate()
-    form.ignore_csrf_error()
-
-    if form.errors:
-        return morepath.redirect(request.link(self))
-    else:
-        if self.state == 'complete':
-            self.data.changed()  # type:ignore[attr-defined]  # trigger updates
-            request.success(_('Your changes were saved'))
-
-            assert self.name is not None
-            return morepath.redirect(request.link(
-                SurveyCollection(request.session).scoped_submissions(
-                    self.name, ensure_existance=False)
-            ))
-        else:
-            collection = SurveyCollection(request.session)
-
-            # Expunges the submission from the session
-            collection.submissions.complete_submission(self)
-
-            request.success(_('Thank you for your submission!'))
-
-            return morepath.redirect(request.class_link(Organisation))

@@ -2,7 +2,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: \n"
-"POT-Creation-Date: 2024-09-23 09:28+0200\n"
+"POT-Creation-Date: 2024-09-30 10:12+0200\n"
 "PO-Revision-Date: 2022-03-15 10:52+0100\n"
 "Last-Translator: \n"
 "Language-Team: \n"
@@ -2310,8 +2310,9 @@ msgstr "Nuovo modulo esterno"
 msgid "Do you really want to delete this submission window?"
 msgstr "Vuoi davvero eliminare questa finestra di invio?"
 
-msgid "Existing submissions will be disassociated."
-msgstr "Le iscrizioni esistenti verranno dissociate."
+msgid ""
+"Submissions associated with this submission window will be deleted as well."
+msgstr ""
 
 msgid "Delete submission window"
 msgstr "Elimina la finestra di invio"
@@ -4571,13 +4572,9 @@ msgid "Fields"
 msgstr "Campi"
 
 msgid ""
-"Please review your answers and press \"Complete\" to complete the survey. If "
-"there's anything you'd like to change, click on \"Edit\" to return to the "
-"filled-out survey."
+"Thank you for filling out this survey.<dynamic element> If there's anything "
+"you'd like to change, click on the \"Edit\"-Button below."
 msgstr ""
-"Rivedi le tue risposte e premi \"Completa\" per completare il sondaggio. Se "
-"desideri apportare modifiche, fai clic su \"Modifica\" per tornare al "
-"sondaggio compilato."
 
 msgid "No surveys defined yet."
 msgstr "Ancora nessun sondaggio definito."
@@ -5349,6 +5346,9 @@ msgstr ""
 msgid "Do you really want to delete this registration window?"
 msgstr "Vuoi davvero eliminare questa finestra di registrazione?"
 
+msgid "Existing submissions will be disassociated."
+msgstr "Le iscrizioni esistenti verranno dissociate."
+
 msgid "Delete registration window"
 msgstr "Elimina la finestra di registrazione"
 
@@ -5909,6 +5909,18 @@ msgstr ""
 "questa indagine. Se si desidera modificare la definizione, eliminare tutti "
 "gli invii."
 
+msgid "Delete Submissions"
+msgstr ""
+
+msgid "Do you really want to delete all submissions?"
+msgstr ""
+
+msgid "All submissions associated with this survey will be deleted."
+msgstr ""
+
+msgid "Delete submissions"
+msgstr ""
+
 msgid "Exports the submissions of the survey."
 msgstr "Esporta gli invii dell'indagine."
 
@@ -5934,8 +5946,8 @@ msgstr ""
 msgid "Edit Submission Window"
 msgstr "Modifica la finestra di invio"
 
-msgid "The submission window was deleted"
-msgstr "La finestra di invio è stata cancellata"
+msgid "The submission window and all associated submissions were deleted"
+msgstr ""
 
 msgid "Added a new text module"
 msgstr "Aggiunto un nuovo modulo di testo"
@@ -6154,6 +6166,18 @@ msgstr "È stato creato un account per te"
 
 msgid "The user was created successfully"
 msgstr "Utente creato correttamente"
+
+#~ msgid ""
+#~ "Please review your answers and press \"Complete\" to complete the survey. "
+#~ "If there's anything you'd like to change, click on \"Edit\" to return to "
+#~ "the filled-out survey."
+#~ msgstr ""
+#~ "Rivedi le tue risposte e premi \"Completa\" per completare il sondaggio. "
+#~ "Se desideri apportare modifiche, fai clic su \"Modifica\" per tornare al "
+#~ "sondaggio compilato."
+
+#~ msgid "The submission window was deleted"
+#~ msgstr "La finestra di invio è stata cancellata"
 
 #~ msgid "Your directory submission has been rejected"
 #~ msgstr "L'invio della cartella è stato rifiutato"
