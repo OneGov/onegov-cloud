@@ -6,7 +6,6 @@ from onegov.core.security import Public, Private
 from onegov.form.collection import SurveyCollection
 from onegov.form.models.submission import SurveySubmission
 from onegov.org.cli import close_ticket
-from onegov.org.models.organisation import Organisation
 from onegov.ticket import TicketCollection
 from onegov.form import (
     FormCollection,
