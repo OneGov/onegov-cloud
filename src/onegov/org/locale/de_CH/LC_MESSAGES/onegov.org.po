@@ -5883,6 +5883,11 @@ msgstr "Chat"
 msgid "Topics"
 msgstr "Themen"
 
+#, python-format
+msgid "You have successfully unsubscribed from the newsletter at ${address}"
+msgstr ""
+"Sie haben die Mail-Adresse ${address} erfolgreich vom Newsletter abgemeldet"
+
 msgid "A survey with this name already exists"
 msgstr "Eine Umfrage mit diesem Namen existiert bereits"
 

@@ -112,7 +112,7 @@ def force_lowercase_usernames(context: 'UpgradeContext') -> None:
         role='member',
     )
 
-    for username, users_ in users.items():
+    for users_ in users.values():
 
         # simply change usernames that don't conflict with others
         if len(users_) == 1:

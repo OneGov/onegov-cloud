@@ -70,7 +70,6 @@ class MultiCheckboxWidget(ListWidget):
 
 class OrderedMultiCheckboxWidget(MultiCheckboxWidget, OrderedListWidget):
     """ The sorted list widget with the label behind the checkbox. """
-    pass
 
 
 class CoordinateWidget(TextInput):
@@ -317,8 +316,8 @@ class UploadMultipleWidget(FileInput):
 
 class TextAreaWithTextModules(TextArea):
     """An extension of a regular textarea with a button that lets
-       you select and insert text modules. If no text modules have
-       been defined this will be no different from textarea.
+    you select and insert text modules. If no text modules have
+    been defined this will be no different from textarea.
     """
     template = PageTemplate("""
         <div class="textarea-widget">

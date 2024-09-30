@@ -135,26 +135,60 @@ select = [
     "B0",
     "B904",
     "C4",
+    "COM818",
+    "D2",
+    "D301",
+    "D4",
     "E",
     "F",
     "FLY002",
+    "ISC",
+    "N",
+    "PERF",
     "PGH004",
+    "PIE",
     "PYI",
     "Q",
     "RUF",
+    "SIM",
     "UP",
     "W"
 ]
 ignore = [
     "B007",
+    "D200",
+    "D201",
+    "D202",
+    "D204",
+    "D205",
+    "D209",
+    "D210",
+    "D211",
+    "D400",
+    "D401",
+    "D412",
     "E402",
     "E711",
     "E712",
     "E741",
+    "N818",
     "PYI019",
     "PYI041",
     "RUF012",
     "RUF013",
+    # TODO: We would like to enable some of these eventually
+    #       But there are a lot of violations
+    "SIM102",
+    "SIM103",
+    "SIM105",
+    "SIM108",
+    "SIM110",
+    "SIM113",
+    "SIM114",
+    "SIM118",
+    "SIM210",
+    "SIM211",
+    "SIM910",
     "UP009",
     "UP012",
     "UP032",
@@ -167,11 +201,14 @@ allowed-confusables = ["×"]
 
 [tool.ruff.lint.extend-per-file-ignores]
 "src/onegov/core/types.py" = ["B018"]
+"reportlab_settings.py" = ["N"]
 "*.pyi" = [
+    "D",
     "E501",
     # TODO: re-enable this one, I think it is smarter in Ruff
     "F401",
     "F403",
+    "N",
     "Q",
     # NOTE: We would prefer to set a different target version instead
     #       but there's no per-file-target-version
@@ -180,13 +217,39 @@ allowed-confusables = ["×"]
 "tests/**/*.py" = [
     "B018",
     "C4",
+    "D",
     "FLY002",
+    "ISC",
+    "N",
     "Q",
+    "PERF",
     "PGH",
+    "PIE",
     "PYI",
     "RUF",
+    "SIM",
     "UP",
 ]
+
+[tool.ruff.lint.pep8-naming]
+extend-ignore-names = [
+    "afterFlowable",
+    "HSTORE",
+    "sortKey",
+    "URL",
+    "UUID"
+]
+classmethod-decorators = [
+    # NOTE: We can potentially get rid some of these with SQLAlchemy 2.0
+    #       since they should cleanly combine with classmethod
+    "declared_attr",
+    "expression",
+    "comparator",
+]
+
+[tool.ruff.lint.pydocstyle]
+convention = "pep257"
+ignore-decorators = ["typing.overload"]
 
 [tool.ruff.lint.flake8-quotes]
 avoid-escape = true

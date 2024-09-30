@@ -1,11 +1,11 @@
 """
-    Send SMS through ASPSMS
+Send SMS through ASPSMS
 
-    Adapted from repoze.sendmail: https://github.com/repoze/repoze.sendmail
+Adapted from `repoze.sendmail<https://github.com/repoze/repoze.sendmail>`_.
 
-    Usage:
-        qp = SmsQueueProcessor(sms_directory)
-        qp.send_messages()
+Usage::
+    qp = SmsQueueProcessor(sms_directory)
+    qp.send_messages()
 """
 
 import errno
@@ -168,7 +168,7 @@ class SmsQueueProcessor:
     ) -> dict[str, Any] | None:
         """ Sends the SMS and returns the API response on error.
 
-            On success this returns None.
+        On success this returns None.
         """
         code, body = self.send_request({
             'UserName': self.username,

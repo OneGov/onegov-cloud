@@ -356,7 +356,7 @@ class ValidFilterFormDefinition(ValidFormDefinition):
 
 class ValidSurveyDefinition(ValidFormDefinition):
     """ Makes sure the given text is a valid onegov.form definition for
-        surveys.
+    surveys.
     """
 
     def __init__(self, require_email_field: bool = False):
@@ -586,11 +586,11 @@ class InputRequiredIf(InputRequired):
 
 class ValidDateRange:
     """
-        Makes sure the selected date is in a valid range.
+    Makes sure the selected date is in a valid range.
 
-        The default error message can be overriden and be parametrized
-        with ``min_date`` and ``max_date`` if both are supplied or just
-        with ``date`` if only one of them is specified.
+    The default error message can be overriden and be parametrized
+    with ``min_date`` and ``max_date`` if both are supplied or just
+    with ``date`` if only one of them is specified.
 
     """
 

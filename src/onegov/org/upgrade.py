@@ -204,7 +204,7 @@ def fix_directory_file_identity(context: UpgradeContext) -> None:
                 file_id = field_data['data'].lstrip('@')
                 file = context.session.query(File).filter_by(
                     id=file_id).first()
-                if file and not file.type == 'directory':
+                if file and file.type != 'directory':
                     new = DirectoryFile(  # type:ignore[misc]
                         id=random_token(),
                         name=file.name,

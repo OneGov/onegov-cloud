@@ -41,6 +41,8 @@ def add(
 ) -> 'Callable[[GazetteRequest, GazetteApp], None]':
     """ Adds a gazette instance to the database. For example:
 
+    .. code-block:: bash
+
         onegov-gazette --select '/onegov_gazette/zug' add
 
     """
@@ -67,6 +69,8 @@ def import_editors(
     locale: str
 ) -> 'Callable[[GazetteRequest, GazetteApp], None]':
     """ Imports editors and groups. For example:
+
+    .. code-block:: bash
 
         onegov-gazette --select '/onegov_gazette/zug' import-editors data.xlsx
 
@@ -150,7 +154,9 @@ def import_organizations(
     dry_run: bool,
     locale: str
 ) -> 'Callable[[GazetteRequest, GazetteApp], None]':
-    """ Imports Organizations. For example:
+    r""" Imports Organizations. For example:
+
+    .. code-block:: bash
 
         onegov-gazette --select '/onegov_gazette/zug' \
             import-organizations data.xlsx
@@ -233,7 +239,9 @@ def import_categories(
     dry_run: bool,
     locale: str
 ) -> 'Callable[[GazetteRequest, GazetteApp], None]':
-    """ Imports categories. For example:
+    r""" Imports categories. For example:
+
+    .. code-block:: bash
 
         onegov-gazette --select '/onegov_gazette/zug' \
             import-categories data.xlsx
@@ -312,6 +320,8 @@ def import_issues(
 ) -> 'Callable[[GazetteRequest, GazetteApp], None]':
     """ Imports issues. For example:
 
+    .. code-block:: bash
+
         onegov-gazette --select '/onegov_gazette/zug' import-issues data.xlsx
 
     """
@@ -386,6 +396,8 @@ def import_sogc(
     dry_run: bool
 ) -> 'Callable[[GazetteRequest, GazetteApp], None]':
     """ Imports from the SOGC. For example:
+
+    .. code-block:: bash
 
         onegov-gazette --select '/onegov_gazette/zug' import-sogc
 

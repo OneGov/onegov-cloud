@@ -73,8 +73,8 @@ class RecordsAccessor:
 
     def get_file(self, name: str) -> IO[bytes]:
         if name not in self.files:
-            path = os.path.join(self.csv_path, '{}.csv'.format(name))
-            self.files[name] = open(path, 'rb')
+            path = os.path.join(self.csv_path, f'{name}.csv')
+            self.files[name] = open(path, 'rb')  # noqa: SIM115
 
         return self.files[name]
 

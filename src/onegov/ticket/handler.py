@@ -175,7 +175,7 @@ class Handler:
 
     @classmethod
     def handle_extra_parameters(
-        self,
+        cls,
         session: 'Session',
         query: _Q,
         extra_parameters: dict[str, Any]
@@ -233,7 +233,6 @@ class Handler:
         """The handler knows best what to do when a ticket is called for
         deletion. """
         assert self.ticket_deletable
-        pass
 
 
 class HandlerRegistry:

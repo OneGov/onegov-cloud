@@ -32,7 +32,7 @@ class JsxFilter(BabelJSX):
         source_path: str | None = None,
         **kwargs: Any
     ) -> None:
-        """kwargs are actually babel options"""
+        """:param kwargs: are actually babel options"""
         options = self.babel_options.copy()
         if source_path:
             options['filename'] = os.path.basename(source_path)

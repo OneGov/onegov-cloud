@@ -17,7 +17,7 @@ else:
     # NOTE: We can probably get rid of this once we upgrade to SQLAlchemy 2.0
     #       since they provide their own Range value types that we can inherit
     #       from (if even necessary at that point).
-    def BoundedIntegerRange(
+    def BoundedIntegerRange(  # noqa: N802
         lower: int,
         upper: int,
         bounds: str = '[)'

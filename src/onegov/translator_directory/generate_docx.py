@@ -165,8 +165,8 @@ class Signature(NamedTuple):
 def parse_from_filename(abs_signature_filename: str) -> Signature:
     """ Parses information from the filename. The delimiter is '__'.
 
-     This is kind of implicit here, information about the user is stored in
-     the filename of the signature image of the user.
+    This is kind of implicit here, information about the user is stored in
+    the filename of the signature image of the user.
     """
     filename, _ = splitext(basename(abs_signature_filename))
     filename = filename.replace('Unterschrift__', '')

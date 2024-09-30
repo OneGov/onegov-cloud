@@ -100,7 +100,7 @@ class FormDefinitionUrlForm(Form):
             return False
 
         normalized_name = normalize_for_url(self.name.data)
-        if not self.name.data == normalized_name:
+        if self.name.data != normalized_name:
             self.name.errors.append(
                 _('Invalid name. A valid suggestion is: ${name}',
                   mapping={'name': normalized_name})

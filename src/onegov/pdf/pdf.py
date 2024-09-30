@@ -2,7 +2,7 @@ from bleach.linkifier import LinkifyFilter
 from bleach.sanitizer import Cleaner
 from copy import deepcopy
 from functools import partial
-from html5lib.filters.whitespace import Filter as whitespace_filter
+from html5lib.filters.whitespace import Filter as WhitespaceFilter
 from io import StringIO
 from lxml import etree
 from onegov.core.utils import module_path
@@ -556,7 +556,7 @@ class Pdf(PDFDocument):
         # Remove unwanted markup
         tags = ['p', 'br', 'strong', 'b', 'em', 'li', 'ol', 'ul', 'li']
         attributes = {}
-        filters: list[_Filter] = [whitespace_filter]
+        filters: list[_Filter] = [WhitespaceFilter]
 
         if linkify:
             link_color = self.link_color

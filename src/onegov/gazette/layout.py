@@ -202,31 +202,26 @@ class Layout(ChameleonLayout):
                 []
             ))
 
-            active = (
-                isinstance(self.model, IssueCollection)
-                or isinstance(self.model, OrganizationCollection)
-                or isinstance(self.model, CategoryCollection)
-                or (isinstance(self.model, UserCollection)
-                    and 'export' not in self.request.url)
-                or isinstance(self.model, UserGroupCollection)
-            )
             manage: NestedMenu = [
                 (
                     _('Issues'),
                     self.manage_issues_link,
-                    isinstance(self.model, IssueCollection),
+                    isinstance(self.model, IssueCollection)
+                    and 'export' not in self.request.url,
                     []
                 ),
                 (
                     _('Organizations'),
                     self.manage_organizations_link,
-                    isinstance(self.model, OrganizationCollection),
+                    isinstance(self.model, OrganizationCollection)
+                    and 'export' not in self.request.url,
                     []
                 ),
                 (
                     _('Categories'),
                     self.manage_categories_link,
-                    isinstance(self.model, CategoryCollection),
+                    isinstance(self.model, CategoryCollection)
+                    and 'export' not in self.request.url,
                     []
                 ),
                 (
@@ -238,11 +233,17 @@ class Layout(ChameleonLayout):
                 (
                     _('Users'),
                     self.manage_users_link,
-                    isinstance(self.model, UserCollection),
+                    isinstance(self.model, UserCollection)
+                    and 'export' not in self.request.url,
                     []
-                )
+                ),
             ]
-            result.append((_('Manage'), None, active, manage))
+            result.append((
+                _('Manage'),
+                None,
+                any(item[2] for item in manage),
+                manage
+            ))
 
             result.append((
                 _('Statistics'),
@@ -290,7 +291,7 @@ class Layout(ChameleonLayout):
             result.append((
                 _('Exports'),
                 None,
-                'export' in self.request.url,
+                any(item[2] for item in export_links),
                 export_links
             ))
 

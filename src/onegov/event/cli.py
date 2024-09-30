@@ -56,6 +56,8 @@ def clear(
 ) -> 'Callable[[CoreRequest, Framework], None]':
     """ Deletes all events.
 
+    .. code-block:: bash
+
         onegov-event --select '/veranstaltungen/zug' clear
 
     """
@@ -168,11 +170,12 @@ def import_json(
     tagmap_file: 'TextIOWrapper | None',
     clear: bool
 ) -> 'Callable[[CoreRequest, Framework], None]':
-    """ Fetches the events from a seantis.dir.events instance.
+    r""" Fetches the events from a seantis.dir.events instance.
 
     This command is intended for migration and to be removed in the future.
 
     Example:
+    .. code-block:: bash
 
         onegov-event --select '/veranstaltungen/zug' import-json \
         'https://veranstaltungen.zug.ch/veranstaltungen/?type=json&compact'
@@ -354,27 +357,33 @@ def import_ical(
     keyword_filters: 'dict[str, list[str]] | None' = None
 
 ) -> 'Callable[[CoreRequest, Framework], None]':
-    """ Imports events from an iCalendar file.
+    r""" Imports events from an iCalendar file.
 
-    Example:
+    Examples:
+    .. code-block:: bash
 
         onegov-event --select '/veranstaltungen/zug' import-ical import.ics
 
         onegov-event --select '/veranstaltungen/zug' import-ical import.ics
         --future-events-only
 
-        onegov-event --select '/veranstaltungen/zug' import-ical import.ics
+        onegov-event --select '/veranstaltungen/zug' import-ical import.ics \
         --event-image /path/to/image.jpg
 
-        onegov-event --select /onegov_winterthur/winterthur import-ical
-        ./basic.ics --future-events-only --event-image
+        onegov-event --select /onegov_winterthur/winterthur import-ical \
+        ./basic.ics --future-events-only --event-image \
         ~/Veranstaltung_breit.jpg -c Sport -c Fussball
 
-        onegov-event --select /onegov_winterthur/winterthur import-ical
-        ./basic.ics --future-events-only --event-image
-        ~/Veranstaltung_breit.jpg
+        onegov-event --select /onegov_winterthur/winterthur import-ical \
+        ./basic.ics --future-events-only --event-image \
+        ~/Veranstaltung_breit.jpg \
         -f "kalender" "Sport Veranstaltungskalender"
-        or
+
+    or comma-separated filter values:
+
+    .. code-block:: bash
+        onegov-event --select /onegov_winterthur/winterthur import-ical \
+        ./basic.ics --future-events-only --event-image image.jpg \
         -f "kalender" "Sport,Veranstaltungskalender"
 
     """
@@ -409,6 +418,7 @@ def import_guidle(
     """ Fetches the events from guidle.
 
     Example:
+    .. code-block:: bash
 
         onegov-event --select '/veranstaltungen/zug' import-guidle \
         'http://www.guidle.com/xxxx/'

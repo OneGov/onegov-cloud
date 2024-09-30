@@ -76,11 +76,6 @@ class AssemblyForm(NamedFileForm):
         ],
     )
 
-    extraordinary = BooleanField(
-        label=_('Extraordinary'),
-        fieldset=_('General'),
-    )
-
     memorial_pdf = UploadField(
         label=_('Memorial part 1 (PDF)'),
         fieldset=_('Downloads'),

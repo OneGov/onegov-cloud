@@ -5141,7 +5141,7 @@ msgstr ""
 
 #, python-format
 msgid "${address} successfully unsubscribed"
-msgstr "Iscrizione di ${address} annullata correttamente"
+msgstr "${address} disiscritto con successo"
 
 #, python-format
 msgid "${address} could not be unsubscribed, wrong token"
@@ -5889,6 +5889,11 @@ msgstr "Chat"
 
 msgid "Topics"
 msgstr "Argomenti"
+
+#, python-format
+msgid "You have successfully unsubscribed from the newsletter at ${address}"
+msgstr ""
+"L'iscrizione alla newsletter di ${address} è stata annullata con successo."
 
 msgid "A survey with this name already exists"
 msgstr "Esiste già un'indagine con questo nome"

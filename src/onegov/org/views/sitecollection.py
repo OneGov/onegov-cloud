@@ -31,16 +31,14 @@ def get_site_collection(
         ('resources', request.translate(_('Resources'))),
     ]
 
-    links = []
-
-    for id, label in groups:
-        for obj in objects[id]:
-            # in addition to the default url/name pairings we use a group
-            # label which will be used as optgroup label
-            links.append({
-                'group': label,
-                'name': obj.title,
-                'url': request.link(obj)
-            })
-
-    return links
+    # in addition to the default url/name pairings we use a group
+    # label which will be used as optgroup label
+    return [
+        {
+            'group': label,
+            'name': obj.title,
+            'url': request.link(obj)
+        }
+        for id, label in groups
+        for obj in objects[id]
+    ]

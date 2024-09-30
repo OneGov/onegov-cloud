@@ -273,7 +273,7 @@ def import_party_results_internal(
 
     if panachage_headers and parties:
         for list_id in panachage_headers.values():
-            if not list_id == '999' and list_id not in parties:
+            if list_id != '999' and list_id not in parties:
                 errors.append(FileImportError(
                     _('Panachage results ids and id not consistent'))
                 )

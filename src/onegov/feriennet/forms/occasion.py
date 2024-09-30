@@ -180,8 +180,6 @@ class OccasionForm(Form):
     def parsed_dates(self) -> list[DateRange]:
         result = []
 
-        DateRange = self.DateRange
-
         for date in json.loads(self.dates.data or '{}').get('values', []):
             try:
                 start = isodate.parse_datetime(date['start'].replace(' ', 'T'))
@@ -189,7 +187,7 @@ class OccasionForm(Form):
             except isodate.isoerror.ISO8601Error:
                 continue
 
-            result.append(DateRange(
+            result.append(self.DateRange(
                 start=standardize_date(start, self.timezone),
                 end=standardize_date(end, self.timezone)
             ))

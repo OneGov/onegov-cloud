@@ -62,7 +62,7 @@ class DirectoryCollection(GenericCollection[DirectoryT]):
 
         # add an upper limit to how many times increment_name can fail
         # to find a suitable name
-        for _ in range(0, 100):
+        for _ in range(100):
             if name not in names:
                 return name
 

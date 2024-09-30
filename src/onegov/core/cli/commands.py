@@ -700,7 +700,7 @@ class EnhancedInteractiveConsole(InteractiveConsole):
     - horizontal movement (e.g. arrow keys)
     - history (e.g. up and down keys)
     - very basic tab completion
-"""
+    """
 
     def __init__(self, locals: dict[str, Any] | None = None):
         super().__init__(locals)

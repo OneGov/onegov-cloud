@@ -86,7 +86,7 @@ class ExternalLinkCollection(GenericCollection[ExternalLink]):
     @staticmethod
     def translatable_name(model_class: type[object]) -> str:
         """ Most collections have a base model whose name can be guessed
-         from the collection name. """
+        from the collection name. """
         name = model_class.__name__.lower()
         name = name.replace('collection', '').rstrip('s')
         return f'{name.capitalize()}s'

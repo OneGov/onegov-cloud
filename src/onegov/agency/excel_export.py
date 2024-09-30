@@ -73,7 +73,7 @@ def export_person_xlsx(session: 'Session') -> BytesIO:
                 worksheet.write_string(row, col_ix, '')
             elif isinstance(value, str):
                 worksheet.write_string(row, col_ix, value)
-            elif isinstance(value, int) or isinstance(value, Decimal):
+            elif isinstance(value, (int, Decimal)):
                 worksheet.write_number(row, col_ix, value)
             else:
                 raise NotImplementedError()

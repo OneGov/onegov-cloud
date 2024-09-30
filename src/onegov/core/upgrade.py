@@ -143,7 +143,7 @@ def get_upgrade_modules() -> 'Iterator[tuple[str, ModuleType]]':
             yield entry.name, importlib.import_module(entry.module_name)
 
 
-class upgrade_task:
+class upgrade_task:  # noqa: N801
     """ Marks the decorated function as an upgrade task. Upgrade tasks should
     be defined outside classes (except for testing) - that is in the root of
     the module (directly in onegov/form/upgrades.py for example).

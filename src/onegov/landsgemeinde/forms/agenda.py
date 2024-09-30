@@ -113,15 +113,6 @@ class AgendaItemForm(NamedFileForm):
     )
 
     video_timestamp = StringField(
-        label=_('Video timestamp'),
-        fieldset=_('Progress'),
-        description='1h2m1s',
-        validators=[
-            Optional()
-        ],
-    )
-
-    video_timestamp = StringField(
         label=_('Manual video timestamp'),
         fieldset=_('Progress'),
         description='1h2m1s',

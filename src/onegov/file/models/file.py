@@ -277,7 +277,7 @@ class File(Base, Associable, TimestampMixin):
         return None
 
     @signature_timestamp.expression  # type:ignore[no-redef]
-    def signature_timestamp(self):
+    def signature_timestamp(cls):
         return type_coerce(case(
             [(
                 File.signed == True,
@@ -406,8 +406,8 @@ def metadata_lock(
     timeout: float = 0.0,
 ) -> 'Iterator[bool]':
     """ Locks the metadata from a ``filedepot.io.local.LocalStoredFile``.
-        Tries to acquire the lock repeatedly in a spin lock until timeout
-        expires, it will return whether or not it managed to acquire the lock
+    Tries to acquire the lock repeatedly in a spin lock until timeout
+    expires, it will return whether or not it managed to acquire the lock
     """
     lock_file = f'{metadata_path}.lock'
     start_time = monotonic()

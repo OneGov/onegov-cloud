@@ -117,7 +117,7 @@ def parse_cron(
         return (value, )
 
     if value == '*':
-        return range(0, size)
+        return range(size)
 
     if value.isdigit():
         return (int(value), )
@@ -133,7 +133,7 @@ def parse_cron(
     if remainder > size:
         raise RuntimeError(f'The remainder in {value} is too big')
 
-    return (v for v in range(0, size) if v % remainder == 0)
+    return (v for v in range(size) if v % remainder == 0)
 
 
 class Job(Generic[_JobFunc]):
@@ -343,10 +343,12 @@ class ApplicationBoundCronjobs(Thread):
         # the lock ensures that only one thread per application id is
         # in charge of running the scheduled jobs. If another thread already
         # has the lock, this thread will end immediately and be GC'd.
-        with suppress(AlreadyLockedError):
-            with local_lock('cronjobs-thread', self.application_id):
-                log.info(f'Started cronjob thread for {self.application_id}')
-                self.run_locked()
+        with (
+            suppress(AlreadyLockedError),
+            local_lock('cronjobs-thread', self.application_id)
+        ):
+            log.info(f'Started cronjob thread for {self.application_id}')
+            self.run_locked()
 
     # FIXME: This should probably not be public API if it's only supposed
     #        to run in a locked state

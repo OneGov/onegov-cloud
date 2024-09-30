@@ -1095,7 +1095,7 @@ def yubikey_otp_to_serial(otp: str) -> int | None:
     # https://docs.oracle.com/javase/specs/jls/se8/html/jls-15.html#jls-15.19
     mask_value = 0x1f
 
-    for i in range(0, 8):
+    for i in range(8):
         shift = (4 - 1 - i) * 8
         value += (bytesarray[i] & 255) << (shift & mask_value)
 
