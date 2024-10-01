@@ -88,7 +88,6 @@ jobs:
     - name: Measure test durations
       run: |
         run-as "$(id -u test)":test /app/bin/pytest \
-        --dist loadgroup \
         --store-durations \
         tests
       env:
