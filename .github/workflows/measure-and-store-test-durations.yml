@@ -14,7 +14,6 @@ jobs:
         sudo apt-get update
         sudo apt-get install \
           build-essential \
-          chromium-browser \
           git \
           gcc \
           g++ \
@@ -69,6 +68,12 @@ jobs:
         export LANG="C.UTF-8"
 
         redis-server --daemonize yes
+
+    - name: Install Chrome
+      uses: browser-actions/setup-chrome@v1
+      with:
+        chrome-version: stable
+        install-chromedriver: true
 
     - name: Checkout repo
       uses: actions/checkout@v4
