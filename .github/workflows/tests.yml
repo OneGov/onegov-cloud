@@ -183,6 +183,8 @@ jobs:
         # add unprivileged test user
         adduser --disabled-password --gecos "" test
         redis-server --daemonize yes
+        mkdir /tmp/chrome
+        chown test /tmp/chrome
 
     - name: Run tests
       run: |
@@ -205,3 +207,4 @@ jobs:
         LANG: C.UTF-8
         JAVA_HOME: /usr/lib/jvm/java-8-openjdk-amd64
         SKIP_DRIVER_MANAGER: '1'
+        CHROME_USER_DATA_DIR: /tmp/chrome
