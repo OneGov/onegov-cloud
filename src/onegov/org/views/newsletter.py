@@ -716,32 +716,28 @@ def import_newsletter_recipients(
     layout = layout or RecipientLayout(self, request)
     layout.breadcrumbs.append(Link(_('Import'), '#'))
     layout.editbar_links = None
-
     if form.submitted(request):
-        count, errors = form.run_import()
-        if errors:
+        count, results = form.run_import()
+
+        if len(results) > 1:  # There were errors
             request.alert(
-                _(
-                    'The following line(s) contain invalid data: ${lines}',
-                    mapping={'lines': ', '.join(errors)},
-                )
+                _('Import completed with errors: ${results}',
+                  mapping={'results': ', '.join(results)})
             )
         elif form.dry_run.data:
             request.success(
-                _(
-                    '${count} newsletter subscribers will be imported',
-                    mapping={'count': count},
-                )
+                _('Import preview: ${result}', mapping={'result': results[0]})
             )
         else:
             request.success(
                 _(
-                    '${count} newsletter subscribers imported',
-                    mapping={'count': count},
+                    'Import completed: ${result}',
+                    mapping={
+                        'result': results[0]
+                    },
                 )
             )
             return morepath.redirect(request.link(self))
-
     return {
         'layout': layout,
         'callout': _(
@@ -752,3 +748,4 @@ def import_newsletter_recipients(
         'form': form,
         'form_width': 'large',
     }
+

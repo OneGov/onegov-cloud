@@ -2,7 +2,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: \n"
-"POT-Creation-Date: 2024-09-24 00:27+0200\n"
+"POT-Creation-Date: 2024-09-24 01:30+0200\n"
 "PO-Revision-Date: 2022-03-15 10:52+0100\n"
 "Last-Translator: \n"
 "Language-Team: \n"
@@ -1086,9 +1086,6 @@ msgstr "Destinatario"
 
 msgid "Do not actually import the newsletter subscribers"
 msgstr "Non importare effettivamente gli iscritti alla newsletter"
-
-msgid ": (Address already exists)"
-msgstr ": (L'indirizzo esiste già)"
 
 msgid "Will be used as image in the page overview on the parent page"
 msgstr ""
@@ -5504,16 +5501,16 @@ msgid "Exports all newsletter recipients."
 msgstr "Esporta tutti i destinatari della newsletter."
 
 #, python-format
-msgid "The following line(s) contain invalid data: ${lines}"
-msgstr "La seguente riga (o righe) contiene dati non validi: ${lines}"
+msgid "Import completed with errors: ${results}"
+msgstr "Importazione completata con errori: ${results}"
 
 #, python-format
-msgid "${count} newsletter subscribers will be imported"
-msgstr "Gli iscritti alla newsletter di ${count} verranno importati"
+msgid "Import preview: ${result}"
+msgstr "Anteprima dell'importazione: ${result}"
 
 #, python-format
-msgid "${count} newsletter subscribers imported"
-msgstr "${count} iscritti alla newsletter importati"
+msgid "Import completed: ${result}"
+msgstr "Importazione completata: ${result}"
 
 msgid "The same format as the export (XLSX) can be used for the import."
 msgstr ""
@@ -5537,6 +5534,10 @@ msgstr "Esportazione degli eventi"
 
 msgid "Exports all future events."
 msgstr "Esporta tutti gli eventi futuri."
+
+#, python-format
+msgid "The following line(s) contain invalid data: ${lines}"
+msgstr "La seguente riga (o righe) contiene dati non validi: ${lines}"
 
 #, python-format
 msgid "${count} events will be imported"
@@ -6150,115 +6151,3 @@ msgstr "È stato creato un account per te"
 
 msgid "The user was created successfully"
 msgstr "Utente creato correttamente"
-
-#~ msgid "Your directory submission has been rejected"
-#~ msgstr "L'invio della cartella è stato rifiutato"
-
-#~ msgid "Your directory submission rejection has been withdrawn"
-#~ msgstr "Il rifiuto dell'invio della directory è stato ritirato"
-
-#~ msgid "The rejection was withdrawn"
-#~ msgstr "Il rifiuto è stato ritirato"
-
-#~ msgid "Rejection withdrawn."
-#~ msgstr "Rifiuto ritirato."
-
-#~ msgid "Reject"
-#~ msgstr "Rifiuta"
-
-#~ msgid "Update Subscription"
-#~ msgstr "Aggiornare l'abbonamento"
-
-#~ msgid "Update your newsletter subscription categories:"
-#~ msgstr "Aggiornare le categorie di abbonamento alla newsletter:"
-
-#~ msgid "Sign up to our newsletter to always stay up to date:"
-#~ msgstr "Iscriviti alla nostra newsletter per rimanere sempre aggiornato:"
-
-#~ msgid "Signup"
-#~ msgstr "Registrati"
-
-#, python-format
-#~ msgid ""
-#~ "The date range overlaps with an existing submission window (${range})."
-#~ msgstr ""
-#~ "L'intervallo di date si sovrappone a una finestra di presentazione "
-#~ "esistente (${range})."
-
-#~ msgid "Phone number"
-#~ msgstr "Numero di telefono"
-
-#~ msgid ""
-#~ "There are existing reservations associated with this resource that will "
-#~ "be deleted as well. This cannot be undone and will take a while depending "
-#~ "on the number of reservations."
-#~ msgstr ""
-#~ "Ci sono prenotazioni future associate a questa risorsa che saranno "
-#~ "anch'esse cancellate. Questa operazione non può essere annullata e "
-#~ "richiederà un certo tempo, a seconda del numero di prenotazioni."
-
-#~ msgid "A new entry has been added to the \"${directory.title}\" directory:"
-#~ msgstr ""
-#~ "Un nuovo elemento è stato aggiunto alla cartella \"${directory.title}\":"
-
-#~ msgid "New entry in directory"
-#~ msgstr "Nuovo elemento nella cartella"
-
-#~ msgid "has a new entry:"
-#~ msgstr "ha un nuovo elemento:"
-
-#, python-format
-#~ msgid ""
-#~ "Registration for notifications on updates in the directory "
-#~ "\"${directory}\""
-#~ msgstr ""
-#~ "Registrazione per le notifiche sugli aggiornamenti nella cartella "
-#~ "\"${directory}\""
-
-#~ msgid "The following entry have been added to the directory"
-#~ msgstr "I seguenti elementi sono stati aggiunti alla cartella"
-
-#~ msgid ""
-#~ "This is a notification for the new entries in \"${organisation}\". If you "
-#~ "no longer wish to receive these notifications, please contact an "
-#~ "administrator so they can remove you from the recipients list."
-#~ msgstr ""
-#~ "Questa è una notifica per i nuovi elementi in \"${organization}\". Se non "
-#~ "desideri più ricevere queste notifiche, contatta un amministratore in "
-#~ "modo che possa rimuoverti dall'elenco dei destinatari."
-
-#, python-format
-#~ msgid "${org} New Entry in ${directory}"
-#~ msgstr "Nuovo elemento in ${directory} di ${org}"
-
-#~ msgid "The email adress has been added to the recipients"
-#~ msgstr "L'indirizzo e-mail è stato aggiunto ai destinatari"
-
-#~ msgid ""
-#~ "This content is automatically deleted when the end date has passed. If no "
-#~ "end date is set, it will be deleted one day after start date."
-#~ msgstr ""
-#~ "Questo contenuto viene eliminato automaticamente quando la data di fine è "
-#~ "passata. Se non è stata impostata una data di fine, verrà eliminato un "
-#~ "giorno dopo la data di inizio."
-
-#~ msgid ""
-#~ "There are currently no allowed domains for iframes. To enable domains for "
-#~ "iframes, please contact info@seantis.ch."
-#~ msgstr ""
-#~ "Attualmente non ci sono domini consentiti per gli iframe. Per abilitare i "
-#~ "domini per gli iframe, contattare info@seantis.ch."
-
-#~ msgid ""
-#~ "The height of the iFrame in pixels. If not set, the iframe will have a "
-#~ "standard height of 800px."
-#~ msgstr ""
-#~ "L'altezza dell'iframe in pixel. Se non viene impostato, l'iframe avrà "
-#~ "un'altezza standard di 800px."
-
-#~ msgid "Chat with"
-#~ msgstr "Chat con"
-
-#, python-format
-#~ msgid "{success_count} tickets deleted."
-#~ msgstr "{success_count} biglietti cancellati."
