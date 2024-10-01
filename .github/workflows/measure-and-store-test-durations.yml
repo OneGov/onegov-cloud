@@ -66,9 +66,12 @@ jobs:
       run: |
         source /app/bin/activate
         python -m pip install --upgrade uv
-        uv pip install pytest-split pytest-cov pytest-codecov pytest-xdist psutil
+        uv pip install pytest-split
         # TEMPORARY: editable build so we don't need a path-fix in codecov
         uv pip install -e .[test]
+      env:
+        # NOTE: Suppress uv warning
+        UV_LINK_MODE: copy
 
     - name: Prepare test environment
       run: |
@@ -79,11 +82,12 @@ jobs:
         # add unprivileged test user
         adduser --disabled-password --gecos "" test
         redis-server --daemonize yes
+        # NOTE: Allow the test user to write to this file
+        chown test .test_durations
 
     - name: Measure test durations
       run: |
         run-as "$(id -u test)":test /app/bin/pytest \
-        -n logical \
         --dist loadgroup \
         --store-durations \
         tests
