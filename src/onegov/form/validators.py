@@ -38,6 +38,13 @@ if TYPE_CHECKING:
     from wtforms.form import BaseForm
 
 
+# HACK: We extend the default type map with additional entries for file endings
+#       that sometimes don't have a single agreed upon mimetype, we may need
+#       to do something more clever in the future and map single file endings
+#       to multiple mime types.
+types_map.setdefault('.mp3', 'audio/mpeg')
+
+
 class If(Generic[BaseFormT, FieldT]):
     """ Wraps a single validator or a list of validators, which will
     only be executed if the supplied condition callback returns `True`.
