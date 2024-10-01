@@ -96,7 +96,6 @@ def view_form_collection(
         lead = model.meta.get('lead')
         if not lead:
             lead = ''
-        lead = layout.linkify(lead)
         return lead
 
     # FIXME: Should the hint function be able to deal with ExternalLink?
@@ -152,7 +151,6 @@ def view_survey_collection(
         lead = model.meta.get('lead')
         if not lead:
             lead = ''
-        lead = layout.linkify(lead)
         return lead
 
     return {

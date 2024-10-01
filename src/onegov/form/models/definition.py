@@ -299,7 +299,7 @@ class SurveyDefinition(Base, ContentMixin, TimestampMixin,
     lead: dict_property[str | None] = meta_property()
 
     #: content associated with the Survey
-    text: dict_property[str | None] = content_property()
+    text = dict_markup_property('content')
 
     #: extensions
     extensions: dict_property[list[str]] = meta_property(default=list)
