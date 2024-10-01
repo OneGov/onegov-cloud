@@ -99,7 +99,7 @@
                         </div>
                     </div>
 
-                    <div class="date-filters side-panel">
+                    <div class="side-panel" tal:condition="layout.publication_filters">
                         <h3 i18n:translate>Publication</h3>
                         <div class="side-panel-with-bg">
                             <div class="filter-panel">
