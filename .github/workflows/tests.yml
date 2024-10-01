@@ -123,7 +123,6 @@ jobs:
           wget \
           apparmor \
           curl \
-          chromium-browser \
           git-core \
           postgresql \
           redis \
@@ -187,7 +186,7 @@ jobs:
 
     - name: Run tests
       run: |
-        run-as "$(id -u test)":test /app/bin/py.test \
+        run-as "$(id -u test)":test /app/bin/pytest \
           -n logical \
           -o cache_dir=/tmp/pytest \
           --dist loadgroup \

@@ -7,37 +7,26 @@ on:
 
 jobs:
   build:
+
     runs-on: ubuntu-24.04
+
+    # we always use the latest container from the master branch
+    # this is fine because we still run all our installs just in case
+    container:
+      image: ghcr.io/onegov/onegov-cloud:master
+      credentials:
+         username: ${{ github.actor }}
+         password: ${{ secrets.GITHUB_TOKEN }}
+
+    defaults:
+      run:
+        shell: bash
+
     steps:
     - name: Install packages
       run: |
-        sudo apt-get update
-        sudo apt-get install \
-          build-essential \
-          git \
-          gcc \
-          g++ \
-          libcurl4-openssl-dev \
-          libffi-dev \
-          libjpeg-dev \
-          libpq-dev \
-          libxml2-dev \
-          libxslt1-dev \
-          zlib1g-dev \
-          libev-dev \
-          libgnutls28-dev \
-          libkrb5-dev \
-          libpoppler-cpp-dev \
-          pv \
-          libzbar0 \
-          openssl \
-          libssl-dev \
-          xmlsec1 \
-          libxmlsec1-openssl \
-          ghostscript \
-          zip \
-          libev4 \
-          libmagic1 \
+        apt-get update
+        apt-get install -y \
           wget \
           apparmor \
           curl \
@@ -49,7 +38,7 @@ jobs:
           libc-dev \
           fonts-liberation \
           libappindicator3-1 \
-          libasound2t64  \
+          libasound2t64 \
           libdrm2 \
           libgbm1 \
           libnspr4 \
@@ -60,14 +49,8 @@ jobs:
           libxcb-dri3-0 \
           libxshmfence1 \
           libxss1 \
-          xdg-utils \
-          --fix-missing
-
-        export JAVA_HOME="/usr/lib/jvm/java-8-openjdk-amd64"
-        export LC_ALL="C.UTF-8"
-        export LANG="C.UTF-8"
-
-        redis-server --daemonize yes
+          unzip \
+          xdg-utils
 
     - name: Install Chrome
       uses: browser-actions/setup-chrome@v1
@@ -78,20 +61,36 @@ jobs:
     - name: Checkout repo
       uses: actions/checkout@v4
 
-    - name: Set up Python
-      uses: actions/setup-python@v5
-      with:
-        python-version: 3.11
-
     - name: Install dependencies
       run: |
+        source /app/bin/activate
         python -m pip install --upgrade uv
-        uv pip install psutil pytest-split pytest-xdist .[test]
-      env:
-        UV_SYSTEM_PYTHON: true
+        uv pip install pytest-split pytest-cov pytest-codecov pytest-xdist psutil
+        # TEMPORARY: editable build so we don't need a path-fix in codecov
+        uv pip install -e .[test]
+
+    - name: Prepare test environment
+      run: |
+        # reset the build asset permissions
+        # TEMPORARY: if we no longer do an editable install, then the base
+        #            path needs to change to /app/lib/
+        find . -type d -iname assets -print0 | xargs -0 chmod a+w -R
+        # add unprivileged test user
+        adduser --disabled-password --gecos "" test
+        redis-server --daemonize yes
 
     - name: Measure test durations
-      run: pytest -n logical --dist loadgroup --store-durations tests
+      run: |
+        run-as "$(id -u test)":test /app/bin/pytest \
+        -n logical \
+        --dist loadgroup \
+        --store-durations \
+        tests
+      env:
+        LC_ALL: C.UTF-8
+        LANG: C.UTF-8
+        JAVA_HOME: /usr/lib/jvm/java-8-openjdk-amd64
+        SKIP_DRIVER_MANAGER: '1'
 
     - uses: EndBug/add-and-commit@v9
       with:
