@@ -172,7 +172,7 @@ def import_votes_ech(
             ballot_results[entity_id] = ballot_result
 
             # name and district
-            name, district, superregion = get_entity_and_district(
+            name, district, _superregion = get_entity_and_district(
                 entity_id, entities, vote, principal
             )
             ballot_result.name = name
@@ -222,7 +222,7 @@ def import_votes_ech(
             remaining.add(0)
         remaining -= set(ballot_results.keys())
         for entity_id in remaining:
-            name, district, superregion = get_entity_and_district(
+            name, district, _superregion = get_entity_and_district(
                 entity_id, entities, vote, principal
             )
             if vote.domain == 'none':

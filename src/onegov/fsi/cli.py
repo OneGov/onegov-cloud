@@ -35,7 +35,7 @@ cli = command_group()
 
 
 def do_ims_import(path: str, request: 'FsiRequest') -> None:
-    errors, persons, courses, events, possible_ldap_users = parse_ims_data(
+    _errors, persons, courses, events, possible_ldap_users = parse_ims_data(
         f'{path}/Teilnehmer.txt',
         f'{path}/Ausführungen.txt',
         f'{path}/Kurse.txt',
@@ -167,7 +167,7 @@ def correct_ims_data_cli(path: str) -> 'Callable[[FsiRequest, FsiApp], None]':
         total, deleted_count = delete_events_without_subscriptions(session)
         session.flush()
         print(f'Deleted course events without subs: {deleted_count}/{total}')
-        corrected_ids, ctrl_msgs = open_events_file(path, session)
+        corrected_ids, _ctrl_msgs = open_events_file(path, session)
         session.flush()
 
         print(f'Corrected course events using '

@@ -235,7 +235,7 @@ def drive_distances_cli(
         app: 'TranslatorDirectoryApp'
     ) -> None:
 
-        tot, routes_found, distance_changed, no_routes, tolerance_failed = (
+        tot, routes_found, _distance_changed, no_routes, tolerance_failed = (
             update_drive_distances(
                 request,
                 only_empty,

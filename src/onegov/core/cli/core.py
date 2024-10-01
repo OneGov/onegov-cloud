@@ -214,6 +214,7 @@ if TYPE_CHECKING:
     #       exist in the mixed in class
     class _GroupContextAttrs(Protocol):
         selector: str | None
+
         @property
         def available_selectors(self) -> list[str]: ...
         @property
@@ -427,7 +428,7 @@ class GroupContext(GroupContextGuard):
     def match_to_appcfg(self, match: str) -> 'ApplicationConfig | None':
         """ Takes the given match and returns the maching appcfg object. """
 
-        namespace, id = self.split_match(match)
+        namespace, _id = self.split_match(match)
 
         for appcfg in self.config.applications:
             if appcfg.namespace == namespace:

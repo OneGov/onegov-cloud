@@ -838,6 +838,7 @@ class DefaultMailLayoutMixin:
     if TYPE_CHECKING:
         # forward declare required attributes
         request: OrgRequest
+
         @property
         def org(self) -> Organisation: ...
 
@@ -885,6 +886,7 @@ class AdjacencyListMixin:
     if TYPE_CHECKING:
         model: AdjacencyList
         request: OrgRequest
+
         def csrf_protected_url(self, url: str) -> str: ...
         @property
         def homepage_url(self) -> str: ...
@@ -2917,6 +2919,7 @@ class UserLayout(DefaultLayout):
 
     if TYPE_CHECKING:
         model: User
+
         def __init__(self, model: User, request: OrgRequest) -> None: ...
 
     @cached_property
@@ -2974,6 +2977,7 @@ class UserGroupLayout(DefaultLayout):
 
     if TYPE_CHECKING:
         model: UserGroup
+
         def __init__(self, model: UserGroup, request: OrgRequest) -> None: ...
 
     @cached_property

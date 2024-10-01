@@ -844,7 +844,7 @@ class HolidaySettingsForm(Form):
             if line.count('-') > 1:
                 raise ValidationError(_('Please enter one date per line'))
 
-            date, description = line.split('-')
+            date, _description = line.split('-', 1)
 
             if date.count('.') < 1:
                 raise ValidationError(_('Format: Day.Month - Description'))
@@ -852,7 +852,7 @@ class HolidaySettingsForm(Form):
                 raise ValidationError(_('Please enter only day and month'))
 
     def parse_date(self, date: str) -> datetime.date:
-        day, month, year = date.split('.')
+        day, month, year = date.split('.', 2)
         try:
             return datetime.date(int(year), int(month), int(day))
         except (ValueError, TypeError) as exception:
@@ -877,7 +877,7 @@ class HolidaySettingsForm(Form):
             if line.count('-') > 1:
                 raise ValidationError(_('Please enter one date pair per line'))
 
-            start, end = line.split('-')
+            start, end = line.split('-', 1)
             if start.count('.') != 2:
                 raise ValidationError(
                     _('Format: Day.Month.Year - Day.Month.Year')
@@ -899,7 +899,7 @@ class HolidaySettingsForm(Form):
     def holiday_settings(self) -> dict[str, Any]:
 
         def parse_other_holidays_line(line: str) -> tuple[int, int, str]:
-            date, desc = line.strip().split('-')
+            date, desc = line.strip().split('-', 1)
             day, month = date.split('.')
 
             return int(month), int(day), desc.strip()
@@ -908,9 +908,9 @@ class HolidaySettingsForm(Form):
             line: str
         ) -> tuple[int, int, int, int, int, int]:
 
-            start, end = line.strip().split('-')
-            start_day, start_month, start_year = start.split('.')
-            end_day, end_month, end_year = end.split('.')
+            start, end = line.strip().split('-', 1)
+            start_day, start_month, start_year = start.split('.', 2)
+            end_day, end_month, end_year = end.split('.', 2)
 
             return (
                 int(start_year), int(start_month), int(start_day),

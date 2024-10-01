@@ -176,7 +176,7 @@ class PageNameChange(ModelsWithLinksMixin):
             count = 0
             for before, after in zip(urls_before, urls_after):
                 migration = LinkMigration(self.request, before, after)
-                total, grouped = migration.migrate_site_collection(test=test)
+                total, _grouped = migration.migrate_site_collection(test=test)
                 count += total
             return count
 

@@ -179,7 +179,7 @@ class Ballot(Base, TimestampMixin, TitleTranslationsMixin,
         """
 
         return (
-            sum([1 for result in self.results if result.counted]),
+            sum(1 for result in self.results if result.counted),
             len(self.results)
         )
 

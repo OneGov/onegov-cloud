@@ -77,6 +77,7 @@ class TraitInfo:
         # forward declare Page attributes we rely on
         title: Column[str]
         meta: Column[dict[str, Any]]
+
         @property
         def editable(self) -> bool: ...
         @property

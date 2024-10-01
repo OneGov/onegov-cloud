@@ -17,7 +17,6 @@ class _UnboundFields(Protocol):
     @overload
     def __get__(self, obj: object, owner: type[object] | None = None) -> list[tuple[str, UnboundField[Any]]]: ...
 
-
 class BaseForm:
     meta: DefaultMeta
     form_errors: list[str]
