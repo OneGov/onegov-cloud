@@ -88,8 +88,9 @@ jobs:
     - name: Measure test durations
       run: |
         run-as "$(id -u test)":test /app/bin/pytest \
-        --store-durations \
-        tests
+          -o cache_dir=/tmp/pytest \
+          --store-durations \
+          tests
       env:
         LC_ALL: C.UTF-8
         LANG: C.UTF-8
