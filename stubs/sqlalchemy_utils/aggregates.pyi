@@ -7,7 +7,6 @@ from sqlalchemy.sql import Update
 
 _ColumnT = TypeVar('_ColumnT', bound=Column[Any])
 
-
 class AggregatedValue:
     # FIXME: should be type[DelarativeBase] in SQLAlchemy 2.0
     class_: type[Any]
@@ -20,7 +19,6 @@ class AggregatedValue:
     def aggregate_query(self) -> Query[Any]: ...
     # FIXME: This should be Iterable[DeclarativeBase] in SQLAlchemy 2.0
     def update_query(self, objects: Iterable[Any]) -> Update | None: ...
-
 
 class AggregationManager:
     # FIXME: should be type[DelarativeBase] in SQLAlchemy 2.0

@@ -73,6 +73,7 @@ class ExtendedAgency(Agency, AccessExtension, PublicationExtension):
         # we only allow relating to other ExtendedAgency
         parent: relationship['ExtendedAgency | None']
         children: relationship[list['ExtendedAgency']]  # type:ignore
+
         @property
         def root(self) -> 'ExtendedAgency': ...
         @property

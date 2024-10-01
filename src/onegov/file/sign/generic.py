@@ -118,7 +118,7 @@ class SigningService:
         if hasattr(file, 'name') and os.path.exists(file.name):
             yield file  # type:ignore[misc]
         else:
-            fd, path = mkstemp()
+            _fd, path = mkstemp()
 
             with open(path, 'rb+') as output:
                 for chunk in iter(lambda: file.read(4096), b''):

@@ -120,6 +120,7 @@ class Agency(AdjacencyList, ContentMixin, TimestampMixin, ORMSearchable,
         # override the attributes from AdjacencyList
         parent: relationship['Agency | None']
         children: relationship[list['Agency']]
+
         @property
         def root(self) -> 'Agency': ...
         @property

@@ -314,10 +314,10 @@ class PdfGenerator:
             pdf.table(
                 table,
                 [None, 2 * cm, 2 * cm],
-                style=pdf.style.table_results + tuple([
+                style=pdf.style.table_results + tuple(
                     ('TOPPADDING', (0, row), (-1, row), 15)
                     for row in spacers[:-1]
-                ])
+                )
             )
             pdf.pagebreak()
 
@@ -1116,7 +1116,7 @@ class PdfGenerator:
         def render_item(item: Election | ElectionCompound | Vote) -> bool:
             if item.completed:
                 return True
-            counted, total = item.progress
+            counted, _total = item.progress
             if counted == 0:
                 return False
             if not publish:

@@ -186,7 +186,7 @@ def import_vote_wabstic(
                 line_errors.append(
                     _('${name} is unknown', mapping={'name': entity_id}))
             else:
-                entity_name, entity_district, superregion = (
+                entity_name, entity_district, _superregion = (
                     get_entity_and_district(
                         entity_id, entities, vote, principal, line_errors
                     )
@@ -285,7 +285,7 @@ def import_vote_wabstic(
             remaining.add(0)
         remaining -= {r['entity_id'] for r in ballot_results[ballot_type]}
         for entity_id in remaining:
-            entity_name, entity_district, superregion = (
+            entity_name, entity_district, _superregion = (
                 get_entity_and_district(
                     entity_id, entities, vote, principal
                 )

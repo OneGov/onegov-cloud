@@ -62,7 +62,6 @@ if TYPE_CHECKING:
             request: OrgRequest
         ) -> type[FormT]: ...
 
-
     _ExtendedWithPersonLinkT = TypeVar(
         '_ExtendedWithPersonLinkT',
         bound='PersonLinkExtension'
@@ -540,7 +539,6 @@ class PersonLinkExtension(ContentExtension):
             # no need to extend the form
             return form_class
 
-
         selected = dict((self.content or {}).get('people', []))
 
         def choice(person: Person) -> '_Choice':
@@ -666,7 +664,6 @@ class PersonLinkExtension(ContentExtension):
                             new_people.append((person_id, values))
 
                     obj.content['people'] = new_people
-
 
         field_macro = request.template_loader.macros['field']
         # FIXME: It is not ideal that we have to pass a dummy form along to

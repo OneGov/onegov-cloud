@@ -176,7 +176,6 @@ class OrgRequest(CoreRequest):
         for page in query:
             parent_to_child.setdefault(page.parent_id, []).append(page)
 
-
         def extend_path(page: Page, path: str | None) -> str:
             if page.type == 'news' and path is None:
                 # the root news page is not part of the path

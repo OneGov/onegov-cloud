@@ -65,6 +65,7 @@ class StatusMixin:
 
         # forward declare required attributes
         counted: Column[bool]
+
         @property
         def progress(self) -> tuple[int, int]: ...
 

@@ -101,6 +101,7 @@ class OrmCacheApp:
         # forward declare the attributes we need from Framework
         session_manager: SessionManager
         schema: str
+
         @property
         def cache(self) -> RedisCacheRegion: ...
         request_cache: dict[str, Any]
@@ -286,7 +287,6 @@ class OrmCacheDescriptor(Generic[_T]):
 
         self.assert_no_orm_objects(result)
         return result
-
 
     def load(self, instance: 'OrmCacheApp | _HasApp') -> _T:
         """ Loads the object from the database or cache. """
