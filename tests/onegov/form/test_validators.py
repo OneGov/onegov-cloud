@@ -1,6 +1,7 @@
 from onegov.core.orm import SessionManager
-from onegov.form.validators import (
-    InputRequiredIf, ValidSwissSocialSecurityNumber)
+from onegov.form.validators import ExpectedExtensions
+from onegov.form.validators import InputRequiredIf
+from onegov.form.validators import ValidSwissSocialSecurityNumber
 from onegov.form.validators import UniqueColumnValue
 from onegov.form.validators import ValidPhoneNumber
 from pytest import raises
@@ -182,3 +183,8 @@ def test_swiss_ssn_validator():
 
     with raises(ValidationError):
         validator(None, Field('756.1234.5678.7 '))
+
+
+def test_mp3_extension_nonempty_whitelist():
+    validator = ExpectedExtensions(['.mp3'])
+    assert validator.whitelist
