@@ -384,10 +384,12 @@
 
 <metal:card define-macro="directory-card">
     <div  data-aos="fade" data-aos-duration="800" class="card" data-equalizer-watch>
+        <a tal:attributes="href link.url">
         <div class="card-section">
-            <tal:b tal:content="link(layout)" />
-            <small>${link.subtitle}</small>
-        </div>
+                <h5><i class="fa fa-list" aria-hidden="true"></i> ${link.text}</h5>
+                <p>${link.subtitle}</p>
+            </div>
+        </a>
     </div>
 </metal:card>
 
