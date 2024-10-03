@@ -1060,10 +1060,6 @@ class DecimalRangeField(Field):
 class FileinputBase:
     extensions: list[str]
 
-    if TYPE_CHECKING:
-        # forward declare __init__
-        __init__ = Field.__init__  # type:ignore[assignment]
-
     @classmethod
     def create(  # type:ignore[misc]
         cls: type[_FieldT],
@@ -1096,10 +1092,6 @@ class MultipleFileinputField(FileinputBase, Field):
 class OptionsField:
     choices: list[Choice]
     pricing: 'PricingRules'
-
-    if TYPE_CHECKING:
-        # forward declare __init__
-        __init__ = Field.__init__  # type:ignore[assignment]
 
     @classmethod
     def create(  # type:ignore[misc]
