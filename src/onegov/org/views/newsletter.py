@@ -188,11 +188,12 @@ def handle_newsletters(
     layout: NewsletterLayout | None = None,
     mail_layout: DefaultMailLayout | None = None,
     title: str = '',
+    update: bool = False,
 ) -> 'RenderData | Response':
 
     layout = layout or NewsletterLayout(self, request)
     title = title or _("Newsletter")
-    update_link = request.link(self, 'update')
+    update_link = request.link(self, 'update') if not update else None
 
     if not (request.is_manager or request.app.org.show_newsletter):
         raise HTTPNotFound()
@@ -334,7 +335,7 @@ def handle_update_newsletters_subscription(
 
     title = _("Update Newsletter Subscription")
     return handle_newsletters(
-        self, request, form, layout, mail_layout, title=title
+        self, request, form, layout, mail_layout, title=title, update=True
     )
 
 
