@@ -21,8 +21,8 @@ if TYPE_CHECKING:
     id='rechnungspositionen',
     form_class=PeriodExportForm,
     permission=Secret,
-    title=_("Invoice Items"),
-    explanation=_("Exports invoice items in the given period."),
+    title=_('Invoice Items'),
+    explanation=_('Exports invoice items in the given period.'),
 )
 class InvoiceItemExport(FeriennetExport):
 

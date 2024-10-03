@@ -10,12 +10,12 @@ from sqlalchemy import func
 from sqlalchemy import or_
 
 
+from typing import Self
 from typing import TYPE_CHECKING
 if TYPE_CHECKING:
     from sqlalchemy.orm import Query
     from sqlalchemy.orm import Session
     from typing import TypedDict
-    from typing_extensions import Self
     from typing_extensions import Unpack
 
     class FilterParams(TypedDict, total=False):
@@ -92,7 +92,7 @@ class ExtendedPersonCollection(
             and self.agency == other.agency
         )
 
-    def page_by_index(self, page: int) -> 'Self':
+    def page_by_index(self, page: int) -> Self:
         return self.__class__(
             self.session,
             page=page,
@@ -107,7 +107,7 @@ class ExtendedPersonCollection(
             updated_lt=self.updated_lt,
         )
 
-    def for_filter(self, **kwargs: 'Unpack[FilterParams]') -> 'Self':
+    def for_filter(self, **kwargs: 'Unpack[FilterParams]') -> Self:
         return self.__class__(
             session=self.session,
             letter=kwargs.get('letter', self.letter),

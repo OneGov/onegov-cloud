@@ -172,7 +172,6 @@ def test_export_election_internal_proporz(session):
             'election_absolute_majority': 144,
             'election_status': 'unknown',
             'entity_superregion': '',
-            'entity_superregion': '',
             'entity_district': '',
             'entity_name': 'name',
             'entity_id': 1,

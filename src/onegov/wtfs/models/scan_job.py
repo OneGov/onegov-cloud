@@ -266,6 +266,6 @@ class ScanJob(Base, TimestampMixin, ContentMixin):
     @property
     def title(self) -> str:
         return _(
-            "Scan job no. ${number}",
+            'Scan job no. ${number}',
             mapping={'number': self.delivery_number}
         )

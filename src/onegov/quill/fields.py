@@ -37,7 +37,7 @@ class QuillField(TextAreaField):
 
         self.widget = QuillInput(tags=tags)
 
-        tags = ['p', 'br'] + tags
+        tags = ['p', 'br', *tags]
         if 'ol' in tags or 'ul' in tags:
             tags.append('li')
 

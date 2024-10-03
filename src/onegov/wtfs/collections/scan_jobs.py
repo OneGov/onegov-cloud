@@ -11,7 +11,7 @@ if TYPE_CHECKING:
     from collections.abc import Collection
     from datetime import date
     from sqlalchemy.orm import Query, Session
-    from typing_extensions import Self
+    from typing import Self
     from uuid import UUID
 
 

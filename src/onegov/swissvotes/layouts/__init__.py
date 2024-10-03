@@ -38,7 +38,6 @@ __all__ = (
     'ManageCampaingMaterialYeaLayout',
     'ManagePageAttachmentsLayout',
     'ManagePageSliderImagesLayout',
-    'PageAttachmentsLayout',
     'PageLayout',
     'UpdateExternalResourcesLayout',
     'UpdateMetadataLayout',

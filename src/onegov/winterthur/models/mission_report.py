@@ -17,7 +17,7 @@ if TYPE_CHECKING:
     import uuid
     from datetime import datetime
     from decimal import Decimal
-    from typing_extensions import TypeAlias
+    from typing import TypeAlias
 
     MissionType: TypeAlias = Literal['single', 'multi']
 

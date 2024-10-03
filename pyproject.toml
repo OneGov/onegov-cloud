@@ -89,3 +89,197 @@ skips = [
     # ignore temp directory (SEA-1033)
     "B108"
 ]
+
+[tool.ruff]
+exclude = [
+    ".bzr",
+    ".direnv",
+    ".eggs",
+    ".git",
+    ".git-rewrite",
+    ".hg",
+    ".ipynb_checkpoints",
+    ".mypy_cache",
+    ".nox",
+    ".pants.d",
+    ".pyenv",
+    ".pytest_cache",
+    ".pytype",
+    ".ruff_cache",
+    ".svn",
+    ".tox",
+    ".venv",
+    ".vscode",
+    "__pypackages__",
+    "_build",
+    "buck-out",
+    "build",
+    "dist",
+    "node_modules",
+    "site-packages",
+    "venv",
+]
+src = ["src", "test", "stubs"]
+include = [
+    "pyproject.toml",
+    "src/**/*.py",
+    "tests/**/*.py",
+    "stubs/**/*.pyi"
+]
+line-length = 79
+indent-width = 4
+target-version = "py311"
+
+[tool.ruff.lint]
+select = [
+    "B0",
+    "B904",
+    "C4",
+    "COM818",
+    "D2",
+    "D301",
+    "D4",
+    "E",
+    "E301",
+    "E302",
+    "E303",
+    "E304",
+    "E305",
+    "E306",
+    "F",
+    "FLY002",
+    "ISC",
+    "N",
+    "PERF",
+    "PGH004",
+    "PIE",
+    "PYI",
+    "Q",
+    "RUF",
+    "SIM",
+    "UP",
+    "W"
+]
+ignore = [
+    "B007",
+    "D200",
+    "D201",
+    "D202",
+    "D204",
+    "D205",
+    "D209",
+    "D210",
+    "D211",
+    "D400",
+    "D401",
+    "D412",
+    "E402",
+    "E711",
+    "E712",
+    "E741",
+    "N818",
+    "PYI019",
+    "PYI041",
+    "RUF012",
+    "RUF013",
+    # TODO: We would like to enable some of these eventually
+    #       But there are a lot of violations
+    "SIM102",
+    "SIM103",
+    "SIM105",
+    "SIM108",
+    "SIM110",
+    "SIM113",
+    "SIM114",
+    "SIM118",
+    "SIM210",
+    "SIM211",
+    "SIM910",
+    "UP009",
+    "UP012",
+    "UP032",
+    "UP037",
+    "UP038",
+]
+unfixable = []
+external = ["MS", "TC"]
+allowed-confusables = ["×"]
+# NOTE: Enable preview rules, but only the ones we select explicitly
+preview = true
+explicit-preview-rules = true
+
+[tool.ruff.lint.extend-per-file-ignores]
+"src/onegov/core/types.py" = ["B018"]
+"reportlab_settings.py" = ["N"]
+"*.pyi" = [
+    "D",
+    "E501",
+    # TODO: re-enable this one, I think it is smarter in Ruff
+    "F401",
+    "F403",
+    "N",
+    "Q",
+    # NOTE: We would prefer to set a different target version instead
+    #       but there's no per-file-target-version
+    "UP",
+]
+"tests/**/*.py" = [
+    "B018",
+    "C4",
+    "D",
+    "E301",
+    "E302",
+    "E303",
+    "E304",
+    "E305",
+    "E306",
+    "F841",
+    "FLY002",
+    "ISC",
+    "N",
+    "Q",
+    "PERF",
+    "PGH",
+    "PIE",
+    "PYI",
+    "RUF",
+    "SIM",
+    "UP",
+]
+
+[tool.ruff.lint.pep8-naming]
+extend-ignore-names = [
+    "afterFlowable",
+    "HSTORE",
+    "sortKey",
+    "URL",
+    "UUID"
+]
+classmethod-decorators = [
+    # NOTE: We can potentially get rid some of these with SQLAlchemy 2.0
+    #       since they should cleanly combine with classmethod
+    "declared_attr",
+    "expression",
+    "comparator",
+]
+
+[tool.ruff.lint.pydocstyle]
+convention = "pep257"
+ignore-decorators = ["typing.overload"]
+
+[tool.ruff.lint.flake8-quotes]
+avoid-escape = true
+docstring-quotes = "double"
+inline-quotes = "single"
+multiline-quotes = "double"
+
+[tool.ruff.lint.pyupgrade]
+keep-runtime-typing = true
+
+[tool.ruff.format]
+quote-style = "single"
+indent-style = "space"
+skip-magic-trailing-comma = false
+line-ending = "lf"
+docstring-code-format = true
+docstring-code-line-length = "dynamic"

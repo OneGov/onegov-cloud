@@ -75,7 +75,7 @@ def get_create_new_organisation_factory(
 @FsiApp.setting(section='i18n', name='localedirs')
 def get_i18n_localedirs() -> list[str]:
     mine = utils.module_path('onegov.fsi', 'locale')
-    return [mine] + get_town6_i18n_localedirs()
+    return [mine, *get_town6_i18n_localedirs()]
 
 
 @FsiApp.webasset_path()

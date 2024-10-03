@@ -140,7 +140,7 @@ class WithPDFThumbnailFilter(WithThumbnailFilter):
             path = Path(directory)
 
             pdf_input = path / 'input.pdf'
-            png_output = path / "preview.png"
+            png_output = path / 'preview.png'
 
             with pdf_input.open('wb') as pdf:
                 pdf.write(fp.read())

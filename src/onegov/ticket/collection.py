@@ -8,11 +8,11 @@ from sqlalchemy.orm import joinedload, undefer
 from uuid import UUID
 
 
-from typing import Any, Literal, NamedTuple, TYPE_CHECKING
+from typing import Any, Literal, NamedTuple, Self, TYPE_CHECKING
 if TYPE_CHECKING:
     from onegov.ticket.model import TicketState
     from sqlalchemy.orm import Query, Session
-    from typing_extensions import Self, TypeAlias, TypedDict
+    from typing import TypeAlias, TypedDict
 
     ExtendedTicketState: TypeAlias = TicketState | Literal['all', 'unfinished']
 
@@ -96,7 +96,7 @@ class TicketCollectionPagination(Pagination[Ticket]):
     def page_index(self) -> int:
         return self.page
 
-    def page_by_index(self, index: int) -> 'Self':
+    def page_by_index(self, index: int) -> Self:
         return self.__class__(
             self.session, index, self.state, self.handler, self.group,
             self.owner, self.extra_parameters
@@ -111,25 +111,25 @@ class TicketCollectionPagination(Pagination[Ticket]):
 
         return tuple(r[0] for r in query.all())
 
-    def for_state(self, state: 'ExtendedTicketState') -> 'Self':
+    def for_state(self, state: 'ExtendedTicketState') -> Self:
         return self.__class__(
             self.session, 0, state, self.handler, self.group, self.owner,
             self.extra_parameters
         )
 
-    def for_handler(self, handler: str) -> 'Self':
+    def for_handler(self, handler: str) -> Self:
         return self.__class__(
             self.session, 0, self.state, handler, self.group, self.owner,
             self.extra_parameters
         )
 
-    def for_group(self, group: str) -> 'Self':
+    def for_group(self, group: str) -> Self:
         return self.__class__(
             self.session, 0, self.state, self.handler, group, self.owner,
             self.extra_parameters
         )
 
-    def for_owner(self, owner: str | UUID) -> 'Self':
+    def for_owner(self, owner: str | UUID) -> Self:
         if isinstance(owner, UUID):
             owner = owner.hex
 

@@ -36,8 +36,8 @@ class TranslatorMutationTicket(OrgTicketMixin, Ticket):
 @handlers.registered_handler('TRN')
 class TranslatorMutationHandler(Handler):
 
-    handler_title = _("Translator")
-    code_title = _("Translators")
+    handler_title = _('Translator')
+    code_title = _('Translators')
 
     @cached_property
     def translator(self) -> Translator | None:
@@ -87,11 +87,11 @@ class TranslatorMutationHandler(Handler):
 
     @property
     def subtitle(self) -> str:
-        return _("Mutation")
+        return _('Mutation')
 
     @cached_property
     def group(self) -> str:
-        return _("Translator")
+        return _('Translator')
 
     def get_summary(
         self,
@@ -123,14 +123,14 @@ class TranslatorMutationHandler(Handler):
 
         links: list[Link | LinkGroup] = [
             Link(
-                text=_("Edit translator"),
+                text=_('Edit translator'),
                 url=request.return_here(
                     request.link(self.translator, 'edit')
                 ),
                 attrs={'class': 'edit-link'}
             ),
             Link(
-                _("Mail templates"),
+                _('Mail templates'),
                 url=request.link(
                     self.translator, name='mail-templates'
                 ),
@@ -141,7 +141,7 @@ class TranslatorMutationHandler(Handler):
         if self.proposed_changes and self.state is None:
             links.append(
                 Link(
-                    text=_("Apply proposed changes"),
+                    text=_('Apply proposed changes'),
                     url=request.return_here(
                         request.link(self.mutation, 'apply')
                     ),
@@ -281,7 +281,7 @@ class AccreditationHandler(Handler):
             )
             links.append(
                 Link(
-                    _("Mail templates"),
+                    _('Mail templates'),
                     url=request.link(
                         self.translator, name='mail-templates'
                     ),

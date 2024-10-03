@@ -24,7 +24,7 @@ if TYPE_CHECKING:
     from onegov.activity.models import Attendee, OccasionDate, Period
     from onegov.user import User
     from sqlalchemy.sql import ColumnElement
-    from typing_extensions import TypeAlias
+    from typing import TypeAlias
 
     BookingState: TypeAlias = Literal[
         'open',
@@ -85,14 +85,14 @@ class Booking(Base, TimestampMixin):
     #: the attendee behind this booking
     attendee_id: 'Column[uuid.UUID]' = Column(
         UUID,  # type:ignore[arg-type]
-        ForeignKey("attendees.id"),
+        ForeignKey('attendees.id'),
         nullable=False
     )
 
     #: the occasion this booking belongs to
     occasion_id: 'Column[uuid.UUID]' = Column(
         UUID,  # type:ignore[arg-type]
-        ForeignKey("occasions.id"),
+        ForeignKey('occasions.id'),
         nullable=False
     )
 
@@ -115,7 +115,7 @@ class Booking(Base, TimestampMixin):
 
     #: the period this booking belongs to
     @aggregated('occasion', Column(  # type:ignore[no-redef]
-        UUID, ForeignKey("periods.id"), nullable=False)
+        UUID, ForeignKey('periods.id'), nullable=False)
     )
     def period_id(self) -> 'ColumnElement[uuid.UUID]':
         return func.coalesce(Occasion.period_id, None)
@@ -261,16 +261,16 @@ class Booking(Base, TimestampMixin):
         return self.priority & 1 << 0 != 0
 
     @starred.expression  # type:ignore[no-redef]
-    def starred(self) -> 'ColumnElement[bool]':
-        return self.priority.op('&')(1 << 0) != 0
+    def starred(cls) -> 'ColumnElement[bool]':
+        return cls.priority.op('&')(1 << 0) != 0
 
     @hybrid_property  # type:ignore[no-redef]
     def nobbled(self) -> bool:
         return self.priority & 1 << 1 != 0
 
     @nobbled.expression  # type:ignore[no-redef]
-    def nobbled(self) -> 'ColumnElement[bool]':
-        return self.priority.op('&')(1 << 1) != 0
+    def nobbled(cls) -> 'ColumnElement[bool]':
+        return cls.priority.op('&')(1 << 1) != 0
 
     @property
     def dates(self) -> list['OccasionDate']:

@@ -22,7 +22,7 @@ def view_roadwork_collection(
 
     return {
         'layout': RoadworkCollectionLayout(self, request),
-        'title': _("Roadworks"),
+        'title': _('Roadworks'),
         'model': self
     }
 

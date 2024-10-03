@@ -16,6 +16,7 @@ from sqlalchemy import Text
 from sqlalchemy.orm import backref
 from sqlalchemy.orm import relationship
 from uuid import uuid4
+from webob.exc import HTTPException
 from webob.multidict import MultiDict
 from wtforms import HiddenField
 
@@ -30,8 +31,7 @@ if TYPE_CHECKING:
     from onegov.core.request import CoreRequest
     from onegov.form import Form
     from sqlalchemy.orm import Query, Session
-    from typing import Protocol, TypeVar
-    from typing_extensions import Self
+    from typing import Protocol, Self, TypeVar
     from webob.request import _FieldStorageWithFile
 
     _DefaultT = TypeVar('_DefaultT')
@@ -43,6 +43,7 @@ if TYPE_CHECKING:
 
         # Pagination:
         batch_size: int
+
         def subset(self) -> Query[_M]: ...
         @property
         def cached_subset(self) -> Query[_M]: ...
@@ -96,7 +97,8 @@ class ApiException(Exception):
 
         self.headers = headers or {}
 
-        if exception:
+        # NOTE: only log unexpected exceptions
+        if not isinstance(exception, (HTTPException, ApiException)):
             log.exception(exception)
 
 
@@ -418,7 +420,7 @@ class ApiEndpoint(Generic[_M]):
     def assert_valid_filter(self, param: str) -> None:
         if param not in self.filters:
             raise ApiInvalidParamException(
-                f'Invalid url parameter \'{param}\'. Valid params are: '
+                f"Invalid url parameter '{param}'. Valid params are: "
                 f'{", ".join(sorted(self.filters))}')
 
 

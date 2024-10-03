@@ -26,5 +26,5 @@ def handle_roadwork_connection_error(
 
     return {
         'layout': DefaultLayout(self, request),
-        'title': _("Connection Error"),
+        'title': _('Connection Error'),
     }

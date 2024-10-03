@@ -15,9 +15,9 @@ if TYPE_CHECKING:
     from onegov.form.types import PricingRules
     from onegov.form.types import Validators
     from onegov.form.types import Widget
+    from typing import NotRequired
+    from typing import Self
     from typing import TypedDict
-    from typing_extensions import NotRequired
-    from typing_extensions import Self
     from markupsafe import Markup
     from wtforms.fields.choices import SelectFieldBase
     from wtforms.form import BaseForm
@@ -48,9 +48,9 @@ class PolicyAreaWidget(Select):
         kwargs['class_'] = 'policy-selector'
         kwargs['data-tree'] = dumps(field.tree)
         kwargs['data-placehoder-text'] = field.gettext(
-            _("Select Some Options")
+            _('Select Some Options')
         )
-        kwargs['data-no-matches-text'] = field.gettext(_("No results match"))
+        kwargs['data-no-matches-text'] = field.gettext(_('No results match'))
         return super().__call__(field, **kwargs)
 
     @classmethod
@@ -87,7 +87,7 @@ class PolicyAreaField(SelectMultipleField):
             *,
             tree: list['PolicyAreaTreeNode'] = ...,
             filters: Sequence[Filter] = (),
-            description: str = "",
+            description: str = '',
             id: str | None = None,
             default: object | None = None,
             widget: Widget[Self] | None = None,
@@ -95,7 +95,7 @@ class PolicyAreaField(SelectMultipleField):
             render_kw: dict[str, Any] | None = None,
             name: str | None = None,
             _form: BaseForm | None = None,
-            _prefix: str = "",
+            _prefix: str = '',
             _translations: _SupportsGettextAndNgettext | None = None,
             _meta: DefaultMeta | None = None,
             # onegov specific kwargs that get popped off

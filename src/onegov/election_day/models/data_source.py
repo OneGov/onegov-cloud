@@ -20,15 +20,15 @@ if TYPE_CHECKING:
     from onegov.core.types import AppenderQuery
     from sqlalchemy.orm import Query
     from typing import Literal
-    from typing_extensions import TypeAlias
+    from typing import TypeAlias
 
     UploadType: TypeAlias = Literal['vote', 'proporz', 'majorz']
 
 
 UPLOAD_TYPE_LABELS = (
-    ('vote', _("Vote")),
-    ('proporz', _("Election based on proportional representation")),
-    ('majorz', _("Election based on the simple majority system")),
+    ('vote', _('Vote')),
+    ('proporz', _('Election based on proportional representation')),
+    ('majorz', _('Election based on the simple majority system')),
 )
 
 
@@ -67,10 +67,10 @@ class DataSource(Base, TimestampMixin):
 
     #: A configuration may contain n items
     items: 'relationship[AppenderQuery[DataSourceItem]]' = relationship(
-        "DataSourceItem",
-        cascade="all, delete-orphan",
-        lazy="dynamic",
-        back_populates="source",
+        'DataSourceItem',
+        cascade='all, delete-orphan',
+        lazy='dynamic',
+        back_populates='source',
     )
 
     @property
@@ -135,7 +135,7 @@ class DataSourceItem(Base, TimestampMixin):
 
     election: 'relationship[Election | None]' = relationship(
         'Election',
-        back_populates="data_sources"
+        back_populates='data_sources'
     )
 
     #: the vote
@@ -147,7 +147,7 @@ class DataSourceItem(Base, TimestampMixin):
 
     vote: 'relationship[Vote | None]' = relationship(
         'Vote',
-        back_populates="data_sources"
+        back_populates='data_sources'
     )
 
     source: 'relationship[DataSource]' = relationship(

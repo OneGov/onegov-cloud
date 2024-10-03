@@ -39,7 +39,7 @@ class OccasionCollection(GenericCollection[Occasion]):
         age: 'Sequence[int] | None' = None,
         spots: 'Sequence[int] | None' = None,
         note: str | None = None,
-        cost: Decimal = Decimal(0),  # noqa: B008
+        cost: Decimal = Decimal(0),
         exclude_from_overlap_check: bool = False
     ) -> Occasion:
 

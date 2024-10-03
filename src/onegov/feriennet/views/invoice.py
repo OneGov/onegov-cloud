@@ -110,9 +110,9 @@ def view_my_invoices(
 
     assert request.current_user is not None
     if request.current_user.id == self.user_id:
-        title = _("Invoices")
+        title = _('Invoices')
     else:
-        title = _("Invoices of ${user}", mapping={
+        title = _('Invoices of ${user}', mapping={
             'user': user.title
         })
 
@@ -142,7 +142,7 @@ def view_my_invoices(
         price = payment_provider.adjust_price(price)
 
         label = ': '.join((
-            request.translate(_("Pay Online Now")),
+            request.translate(_('Pay Online Now')),
             render_macro(layout.macros['price'], layout.request, {
                 'layout': layout,
                 'price': price,
@@ -215,9 +215,9 @@ def handle_payment(
     payment = process_payment('cc', price, provider, token)
 
     if payment == INSUFFICIENT_FUNDS:
-        request.alert(_("Your card has insufficient funds"))
+        request.alert(_('Your card has insufficient funds'))
     elif payment is None:
-        request.alert(_("Your payment could not be processed"))
+        request.alert(_('Your payment could not be processed'))
     else:
         for item in invoice.items:
 
@@ -229,7 +229,7 @@ def handle_payment(
             item.payment_date = date.today()
             item.paid = True
 
-        request.success(_("Your payment has been received. Thank you!"))
+        request.success(_('Your payment has been received. Thank you!'))
 
     return request.redirect(request.link(self))
 
@@ -261,10 +261,10 @@ def handle_donation(
         ))
 
     if request.current_user.id == self.user_id:
-        title = _("Donation")
+        title = _('Donation')
     else:
         user = request.session.query(User).filter_by(id=self.user_id).one()
-        title = _("Donation of ${user}", mapping={'user': user.title})
+        title = _('Donation of ${user}', mapping={'user': user.title})
 
     period = request.app.periods_by_id[self.period_id.hex]
     bills = BillingCollection(request, period)
@@ -275,11 +275,11 @@ def handle_donation(
             bills.include_donation(
                 user_id=self.user_id,
                 amount=Decimal(form.amount.data),
-                text=request.translate(_("Donation")))
+                text=request.translate(_('Donation')))
         except NoResultFound:
-            request.alert(_("No invoice found"))
+            request.alert(_('No invoice found'))
         else:
-            request.success(_("Thank you for your donation"))
+            request.success(_('Thank you for your donation'))
             return request.redirect(request.link(self))
 
     elif not request.POST:
@@ -314,7 +314,7 @@ def handle_donation(
         'title': title,
         'layout': DonationLayout(self, request, title),
         'form': form,
-        'button_text': _("Donate"),
+        'button_text': _('Donate'),
         'description': description,
     }
 
@@ -336,6 +336,6 @@ def handle_delete_donation(
     bills = BillingCollection(request, period)
 
     if bills.exclude_donation(self.user_id):
-        request.success(_("Your donation was removed"))
+        request.success(_('Your donation was removed'))
     else:
-        request.alert(_("This donation has already been paid"))
+        request.alert(_('This donation has already been paid'))

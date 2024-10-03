@@ -4,9 +4,8 @@ from aiohttp import ClientSession, ClientTimeout
 
 from typing import overload, Any, TYPE_CHECKING
 if TYPE_CHECKING:
-    from collections.abc import Callable, Sequence
-    from typing import Awaitable, Protocol, TypeVar
-    from typing_extensions import TypeAlias
+    from collections.abc import Awaitable, Callable, Sequence
+    from typing import Protocol, TypeVar, TypeAlias
 
     class HasUrl(Protocol):
         url: str
@@ -144,7 +143,7 @@ async def fetch_many(
     timeout: ClientTimeout | None = None
 ) -> list[Any]:
     """ Registers a task per url using the coroutine fetch_func with correct
-        signature. """
+    signature. """
     timeout = timeout or ClientTimeout()
     async with ClientSession(timeout=timeout) as session:
 

@@ -19,7 +19,7 @@ if TYPE_CHECKING:
     from collections.abc import Callable, Iterable, Sequence
     from onegov.org.request import OrgRequest
     from onegov.reservation import Resource
-    from typing_extensions import TypeAlias
+    from typing import TypeAlias
     from .allocation import DateContainer
 
     StrKeyFunc: TypeAlias = Callable[[str], SupportsRichComparison]
@@ -33,7 +33,7 @@ class ReservationForm(Form):
     reserved_fields = RESERVED_FIELDS
 
     email = EmailField(
-        label=_("E-Mail"),
+        label=_('E-Mail'),
         validators=[InputRequired(), Email()]
     )
 
@@ -44,27 +44,27 @@ class FindYourSpotForm(Form):
         request: OrgRequest
 
     start = DateField(
-        label=_("From"),
+        label=_('From'),
         validators=[InputRequired()])
 
     end = DateField(
-        label=_("Until"),
+        label=_('Until'),
         validators=[InputRequired()])
 
     start_time = TimeField(
-        label=_("Start"),
-        description=_("HH:MM"),
+        label=_('Start'),
+        description=_('HH:MM'),
         default=time(7),
         validators=[DataRequired()])
 
     end_time = TimeField(
-        label=_("End"),
-        description=_("HH:MM"),
+        label=_('End'),
+        description=_('HH:MM'),
         default=time(22),
         validators=[DataRequired()])
 
     rooms = MultiCheckboxField(
-        label=_("Rooms"),
+        label=_('Rooms'),
         choices=(),
         coerce=lambda v: UUID(v) if isinstance(v, str) else v,
         validators=[InputRequired()],
@@ -74,7 +74,7 @@ class FindYourSpotForm(Form):
         })
 
     weekdays = MultiCheckboxField(
-        label=_("Weekdays"),
+        label=_('Weekdays'),
         choices=WEEKDAYS,
         coerce=int,
         default=[v for v, l in WEEKDAYS[:5]],
@@ -85,18 +85,18 @@ class FindYourSpotForm(Form):
         })
 
     on_holidays = RadioField(
-        label=_("On holidays"),
+        label=_('On holidays'),
         choices=(
-            ('yes', _("Yes")),
-            ('no', _("No"))
+            ('yes', _('Yes')),
+            ('no', _('No'))
         ),
         default='no')
 
     during_school_holidays = RadioField(
-        label=_("During school holidays"),
+        label=_('During school holidays'),
         choices=(
-            ('yes', _("Yes")),
-            ('no', _("No"))
+            ('yes', _('Yes')),
+            ('no', _('No'))
         ),
         default='no')
 
@@ -125,7 +125,7 @@ class FindYourSpotForm(Form):
         if self.start.data:
             if self.start.data < date.today():
                 assert isinstance(self.start.errors, list)
-                self.start.errors.append(_("Start date in past"))
+                self.start.errors.append(_('Start date in past'))
                 return False
         return None
 
@@ -133,7 +133,7 @@ class FindYourSpotForm(Form):
         if self.start.data and self.end.data:
             if self.start.data > self.end.data:
                 assert isinstance(self.start.errors, list)
-                self.start.errors.append(_("Start date before end date"))
+                self.start.errors.append(_('Start date before end date'))
                 return False
         return None
 
@@ -149,7 +149,7 @@ class FindYourSpotForm(Form):
                 )
             ):
                 assert isinstance(self.start_time.errors, list)
-                self.start_time.errors.append(_("Start time before end time"))
+                self.start_time.errors.append(_('Start time before end time'))
                 return False
         return None
 

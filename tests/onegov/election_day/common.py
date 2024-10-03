@@ -1,6 +1,7 @@
 import os
 import tarfile
 
+from functools import cached_property
 from io import BytesIO
 from onegov.core.utils import append_query_param
 from onegov.core.utils import module_path
@@ -255,6 +256,11 @@ class DummyRequest:
 
     def return_to(self, url, redirect):
         return f'{url}{redirect}'
+
+    @cached_property
+    def template_loader(self):
+        registry = self.app.config.template_engine_registry
+        return registry._template_loaders['.pt']
 
 
 def login(client, to=''):

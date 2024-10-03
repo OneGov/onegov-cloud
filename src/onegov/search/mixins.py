@@ -222,7 +222,7 @@ class SearchableContent(ORMSearchable):
     @property
     def es_suggestions(self) -> dict[str, list[str]]:
         return {
-            "input": [self.title.lower()]  # type:ignore[attr-defined]
+            'input': [self.title.lower()]  # type:ignore[attr-defined]
         }
 
     @property

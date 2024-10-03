@@ -10,7 +10,7 @@ from typing import overload, Any, Literal, TypeVar, TYPE_CHECKING
 if TYPE_CHECKING:
     from collections.abc import Collection, Iterator
     from onegov.form import Form
-    from typing_extensions import TypeGuard
+    from typing import TypeGuard
     from wtforms.fields.core import UnboundField
 
 _FormT = TypeVar('_FormT', bound='Form')

@@ -27,10 +27,10 @@ def view_usermanagement_custom(
 ) -> 'RenderData':
 
     roles = {
-        'admin': _("Administrator"),
-        'editor': _("Editor"),
-        'member': _("Member"),
-        'translator': _("Translator"),
+        'admin': _('Administrator'),
+        'editor': _('Editor'),
+        'member': _('Member'),
+        'translator': _('Translator'),
     }
     return town_view_usermanagement(self, request, roles=roles)
 

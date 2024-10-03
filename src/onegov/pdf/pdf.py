@@ -2,7 +2,7 @@ from bleach.linkifier import LinkifyFilter
 from bleach.sanitizer import Cleaner
 from copy import deepcopy
 from functools import partial
-from html5lib.filters.whitespace import Filter as whitespace_filter
+from html5lib.filters.whitespace import Filter as WhitespaceFilter
 from io import StringIO
 from lxml import etree
 from onegov.core.utils import module_path
@@ -37,11 +37,8 @@ if TYPE_CHECKING:
     from bleach.sanitizer import _Filter
     from collections.abc import Iterable, Sequence
     from reportlab.lib.styles import PropertySet
-    from reportlab.platypus.doctemplate import _PageCallback, BaseDocTemplate
+    from reportlab.platypus.doctemplate import _PageCallback
     from reportlab.platypus.tables import _TableCommand
-    from typing import TypeVar
-
-    _DocT = TypeVar('_DocT', bound=BaseDocTemplate, contravariant=True)
 
 
 TABLE_CELL_CHAR_LIMIT = 2000
@@ -422,7 +419,7 @@ class Pdf(PDFDocument):
     def table(
         self,
         data: 'Sequence[Sequence[str | Paragraph]]',
-        columns: Literal["even"] | list[float] | None,
+        columns: Literal['even'] | list[float] | None,
         style: 'TableStyle | Iterable[_TableCommand] | None' = None,
         *,
         ratios: Literal[True]
@@ -432,7 +429,7 @@ class Pdf(PDFDocument):
     def table(
         self,
         data: 'Sequence[Sequence[str | Paragraph]]',
-        columns: Literal["even"] | list[float] | None,
+        columns: Literal['even'] | list[float] | None,
         style: 'TableStyle | Iterable[_TableCommand] | None',
         ratios: Literal[True]
     ) -> None: ...
@@ -535,10 +532,10 @@ class Pdf(PDFDocument):
     def inner_html(element: 'etree._Element') -> str:
         return '{}{}{}'.format(
             Pdf.strip(element.text or ''),
-            ''.join((
+            ''.join(
                 Pdf.strip(etree.tostring(child, encoding='unicode'))
                 for child in element
-            )),
+            ),
             Pdf.strip(element.tail or '')
         )
 
@@ -559,7 +556,7 @@ class Pdf(PDFDocument):
         # Remove unwanted markup
         tags = ['p', 'br', 'strong', 'b', 'em', 'li', 'ol', 'ul', 'li']
         attributes = {}
-        filters: list[_Filter] = [whitespace_filter]
+        filters: list[_Filter] = [WhitespaceFilter]
 
         if linkify:
             link_color = self.link_color
@@ -575,11 +572,11 @@ class Pdf(PDFDocument):
                     # FIXME: bleach stubs seem to be incorrect here
                     #        but we may be able to just return attrs
                     return None  # type:ignore[return-value]
-                attrs[(None, u'color')] = link_color
+                attrs[(None, 'color')] = link_color
                 if underline_links:
-                    attrs[(None, u'underline')] = '1'
-                    attrs[('a', u'underlineColor')] = link_color
-                    attrs[('a', u'underlineWidth')] = underline_width
+                    attrs[(None, 'underline')] = '1'
+                    attrs[('a', 'underlineColor')] = link_color
+                    attrs[('a', 'underlineWidth')] = underline_width
                 return attrs
 
             tags.append('a')

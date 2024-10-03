@@ -41,12 +41,12 @@ def create_new_organisation(
     if locale == 'de_CH':
         forms.add(
             name='kontakt',
-            title="Kontakt",
+            title='Kontakt',
             meta={
                 'lead': (
-                    "Haben Sie Fragen oder eine Anregung? "
-                    "Rufen Sie uns einfach an oder benutzen Sie dieses "
-                    "Formular."
+                    'Haben Sie Fragen oder eine Anregung? '
+                    'Rufen Sie uns einfach an oder benutzen Sie dieses '
+                    'Formular.'
                 )
             },
             definition=textwrap.dedent("""\
@@ -61,12 +61,12 @@ def create_new_organisation(
     elif locale == 'fr_CH':
         forms.add(
             name='contact',
-            title="Contact",
+            title='Contact',
             meta={
                 'lead': (
-                    "Avez-vous des questions ou des commentaires ? "
-                    "Appelez-nous simplement, ou utilisez le formulaire "
-                    "suivant."
+                    'Avez-vous des questions ou des commentaires ? '
+                    'Appelez-nous simplement, ou utilisez le formulaire '
+                    'suivant.'
                 )
             },
             definition=textwrap.dedent("""\
@@ -81,11 +81,11 @@ def create_new_organisation(
     elif locale == 'it_CH':
         forms.add(
             name='contatto',
-            title="Contatto",
+            title='Contatto',
             meta={
                 'lead': (
-                    "Avete domande o suggerimenti? "
-                    "Potete telefonarci o riempire questo formulario."
+                    'Avete domande o suggerimenti? '
+                    'Potete telefonarci o riempire questo formulario.'
                 )
             },
             definition=textwrap.dedent("""\

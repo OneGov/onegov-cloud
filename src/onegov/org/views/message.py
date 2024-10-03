@@ -148,7 +148,7 @@ def view_messages(
 
     return {
         'layout': layout or MessageCollectionLayout(self, request),
-        'title': _("Timeline"),
+        'title': _('Timeline'),
         'feed': request.link(self, 'feed'),
         'feed_data': json.dumps(
             view_messages_feed(self, request)

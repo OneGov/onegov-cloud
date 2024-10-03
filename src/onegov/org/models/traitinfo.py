@@ -18,46 +18,46 @@ if TYPE_CHECKING:
 #: is the same). New traits need to adapt the same messages as the others.
 TRAIT_MESSAGES: dict[str, dict[str, str]] = {
     'link': {
-        'name': _("Link"),
-        'new_page_title': _("New Link"),
-        'new_page_added': _("Added a new link"),
-        'edit_page_title': _("Edit Link"),
-        'move_page_title': _("Move Link"),
-        'delete_message': _("The link was deleted"),
-        'delete_button': _("Delete link"),
+        'name': _('Link'),
+        'new_page_title': _('New Link'),
+        'new_page_added': _('Added a new link'),
+        'edit_page_title': _('Edit Link'),
+        'move_page_title': _('Move Link'),
+        'delete_message': _('The link was deleted'),
+        'delete_button': _('Delete link'),
         'delete_question': _(
-            "Do you really want to delete the link \"${title}\"?"),
+            'Do you really want to delete the link "${title}"?'),
     },
     'page': {
-        'name': _("Topic"),
-        'new_page_title': _("New Topic"),
-        'new_page_added': _("Added a new topic"),
-        'edit_page_title': _("Edit Topic"),
-        'move_page_title': _("Move Topic"),
-        'delete_message': _("The topic was deleted"),
-        'delete_button': _("Delete topic"),
+        'name': _('Topic'),
+        'new_page_title': _('New Topic'),
+        'new_page_added': _('Added a new topic'),
+        'edit_page_title': _('Edit Topic'),
+        'move_page_title': _('Move Topic'),
+        'delete_message': _('The topic was deleted'),
+        'delete_button': _('Delete topic'),
         'delete_question': _(
-            "Do you really want to delete the topic \"${title}\"?"),
+            'Do you really want to delete the topic "${title}"?'),
     },
     'news': {
-        'name': _("News"),
-        'new_page_title': _("Add News"),
-        'new_page_added': _("Added news"),
-        'edit_page_title': _("Edit News"),
-        'delete_message': _("The news was deleted"),
-        'delete_button': _("Delete news"),
+        'name': _('News'),
+        'new_page_title': _('Add News'),
+        'new_page_added': _('Added news'),
+        'edit_page_title': _('Edit News'),
+        'delete_message': _('The news was deleted'),
+        'delete_button': _('Delete news'),
         'delete_question': _(
-            "Do you really want to delete the news \"${title}\"?"),
+            'Do you really want to delete the news "${title}"?'),
     },
     'iframe': {
-        'name': _("iFrame"),
-        'new_page_title': _("Add iFrame"),
-        'new_page_added': _("Added iFrame"),
-        'edit_page_title': _("Edit iFrame"),
-        'delete_message': _("The iFrame was deleted"),
-        'delete_button': _("Delete iFrame"),
+        'name': _('iFrame'),
+        'new_page_title': _('Add iFrame'),
+        'new_page_added': _('Added iFrame'),
+        'edit_page_title': _('Edit iFrame'),
+        'delete_message': _('The iFrame was deleted'),
+        'delete_button': _('Delete iFrame'),
         'delete_question': _(
-            "Do you really want to delete the iFrame \"${title}\"?"),
+            'Do you really want to delete the iFrame "${title}"?'),
     }
 }
 
@@ -77,6 +77,7 @@ class TraitInfo:
         # forward declare Page attributes we rely on
         title: Column[str]
         meta: Column[dict[str, Any]]
+
         @property
         def editable(self) -> bool: ...
         @property
@@ -175,13 +176,13 @@ class TraitInfo:
 
         if self.editable:
             yield Link(
-                _("Edit"),
+                _('Edit'),
                 request.link(Editor('edit', self)),
                 classes=('edit-link', )
             )
             assert request.path_info is not None
             yield Link(
-                _("Copy"),
+                _('Copy'),
                 request.link(Clipboard.from_url(request, request.path_info)),
                 classes=('copy-link', )
             )
@@ -189,7 +190,7 @@ class TraitInfo:
         if request.browser_session.has('clipboard_url'):
 
             yield Link(
-                _("Paste"),
+                _('Paste'),
                 request.link(Editor('paste', self.paste_target)),
                 classes=('paste-link', 'show-new-content-placeholder'),
             )
@@ -205,14 +206,14 @@ class TraitInfo:
                 extra_warning: str
                 if not safe_delete:
                     extra_warning = _(
-                        "Please note that this page has subpages "
-                        "which will also be deleted!"
+                        'Please note that this page has subpages '
+                        'which will also be deleted!'
                     )
                 else:
-                    extra_warning = ""
+                    extra_warning = ''
 
                 yield DeleteLink(
-                    _("Delete"), request.link(self),
+                    _('Delete'), request.link(self),
                     confirm=_(trait_messages['delete_question'], mapping={
                         'title': self.title
                     }),
@@ -226,14 +227,14 @@ class TraitInfo:
                 )
             else:
                 yield DeleteLink(
-                    text=_("Delete"),
+                    text=_('Delete'),
                     url=request.link(self),
                     confirm=_("This page can't be deleted."),
                     extra_information=_(
-                        "This page has subpages. Only administrators can "
-                        "delete pages with subpages. To delete this page, "
-                        "delete all subpages first or ask an administrator "
-                        "to do it for you."
+                        'This page has subpages. Only administrators can '
+                        'delete pages with subpages. To delete this page, '
+                        'delete all subpages first or ask an administrator '
+                        'to do it for you.'
                     )
                 )
 
@@ -249,7 +250,7 @@ class TraitInfo:
                 self.trait == 'news' and not getattr(self, 'parent', None)
             ) or self.trait != 'news':
                 yield IFrameLink(
-                    text=_("iFrame"),
+                    text=_('iFrame'),
                     url=request.link(self),
                     attrs={'class': 'new-iframe'}
                 )

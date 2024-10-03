@@ -2,7 +2,7 @@ from typing import overload, Any, TypeVar, TYPE_CHECKING
 if TYPE_CHECKING:
     from collections.abc import Iterable, Iterator, Mapping, Sequence
     from ldap3 import Entry
-    from typing_extensions import NotRequired, TypedDict
+    from typing import NotRequired, TypedDict
 
     class UserSourceArgsWithoutName(TypedDict):
         bases: Sequence[str]
@@ -191,7 +191,7 @@ class ZugUserSource(UserSource):
     @property
     def ldap_attributes(self) -> list[str]:
         additional = ['groupMembership']
-        if any(('schulnet' in b.lower() for b in self.bases)):
+        if any('schulnet' in b.lower() for b in self.bases):
             additional.append('zgXServiceSubscription')
         return [
             *self.ldap_mapping.keys(),
@@ -235,17 +235,17 @@ class ZugUserSource(UserSource):
 
         if entry.entry_dn.count(',') <= 1:
             if self.verbose:
-                print(f'Excluded entry_dn.count(",") <= 1: {str(mail)}')
+                print(f'Excluded entry_dn.count(",") <= 1: {mail!s}')
             return True
 
         if 'ou=HRdeleted' in entry.entry_dn:
             if self.verbose:
-                print(f'Excluded HRdeleted: {str(mail)}')
+                print(f'Excluded HRdeleted: {mail!s}')
             return True
 
         if 'ou=Other' in entry.entry_dn:
             if self.verbose:
-                print(f'Excluded ou=Other: {str(mail)}')
+                print(f'Excluded ou=Other: {mail!s}')
             return True
 
         if not self.user_type(entry):

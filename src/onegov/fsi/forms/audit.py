@@ -21,7 +21,7 @@ class AuditForm(Form):
     request: 'FsiRequest'
 
     course_id = SelectField(
-        label=_("Course"),
+        label=_('Course'),
         choices=[],
         validators=[
             InputRequired()
@@ -31,12 +31,12 @@ class AuditForm(Form):
     )
 
     organisations = ChosenSelectMultipleField(
-        label=_("By Organisation"),
+        label=_('By Organisation'),
         choices=[],
     )
 
     letter = SelectField(
-        label="Always Hidden, used for redirection persistence",
+        label='Always Hidden, used for redirection persistence',
         choices=[]
     )
 

@@ -109,7 +109,7 @@ def newsletter_news_by_access(
         return None
 
     if access not in ORDERED_ACCESS:
-        raise ValueError(f"Invalid access level: {access}")
+        raise ValueError(f'Invalid access level: {access}')
 
     access_levels = ORDERED_ACCESS[ORDERED_ACCESS.index(access):]
 
@@ -192,7 +192,7 @@ def handle_newsletters(
 ) -> 'RenderData | Response':
 
     layout = layout or NewsletterLayout(self, request)
-    title = title or _("Newsletter")
+    title = title or _('Newsletter')
     update_link = request.link(self, 'update') if not update else None
 
     if not (request.is_manager or request.app.org.show_newsletter):
@@ -217,7 +217,7 @@ def handle_newsletters(
                 request.link(recipient.subscription, 'unsubscribe'))
 
             title = request.translate(
-                _("Welcome to the ${org} Newsletter", mapping={
+                _('Welcome to the ${org} Newsletter', mapping={
                     'org': request.app.org.title
                 })
             )
@@ -227,8 +227,8 @@ def handle_newsletters(
                 recipient.confirmed = True
 
                 request.success(_((
-                    "Success! We have added ${address} to the list of "
-                    "recipients. Subscribed categories are ${subscribed}."
+                    'Success! We have added ${address} to the list of '
+                    'recipients. Subscribed categories are ${subscribed}.'
                 ), mapping={
                     'address': form.address.data,
                     'subscribed': ', '.join(subscribed)
@@ -272,8 +272,8 @@ def handle_newsletters(
             request.success(
                 request.translate(_(
                     (
-                        "Success! We have updated your subscribed "
-                        "categories to ${subscribed}."
+                        'Success! We have updated your subscribed '
+                        'categories to ${subscribed}.'
                     ), mapping={
                         'subscribed': ', '.join(subscribed)
                     }
@@ -333,7 +333,7 @@ def handle_update_newsletters_subscription(
     mail_layout: DefaultMailLayout | None = None
 ) -> 'RenderData | Response':
 
-    title = _("Update Newsletter Subscription")
+    title = _('Update Newsletter Subscription')
     return handle_newsletters(
         self, request, form, layout, mail_layout, title=title, update=True
     )
@@ -384,7 +384,7 @@ def view_subscribers(
 ) -> 'RenderData':
     # i18n:attributes translations do not support variables, so we need
     # to do this ourselves
-    warning = request.translate(_("Do you really want to unsubscribe \"{}\"?"))
+    warning = request.translate(_('Do you really want to unsubscribe "{}"?'))
 
     recipients = self.query().order_by(Recipient.address).filter_by(
         confirmed=True
@@ -396,7 +396,7 @@ def view_subscribers(
 
     return {
         'layout': layout or RecipientLayout(self, request),
-        'title': _("Subscribers"),
+        'title': _('Subscribers'),
         'by_letter': by_letter,
         'count': len(by_letter),
         'warning': warning,
@@ -416,11 +416,11 @@ def handle_new_newsletter(
         try:
             newsletter = self.add(title=form.title.data, html=Markup(''))
         except AlreadyExistsError:
-            request.alert(_("A newsletter with this name already exists"))
+            request.alert(_('A newsletter with this name already exists'))
         else:
             form.update_model(newsletter, request)
 
-            request.success(_("Added a new newsletter"))
+            request.success(_('Added a new newsletter'))
             return morepath.redirect(request.link(newsletter))
 
     layout = layout or NewsletterLayout(self, request)
@@ -429,7 +429,7 @@ def handle_new_newsletter(
     return {
         'form': form,
         'layout': layout,
-        'title': _("New Newsletter"),
+        'title': _('New Newsletter'),
         'size': 'large'
     }
 
@@ -445,7 +445,7 @@ def edit_newsletter(
     if form.submitted(request):
         form.update_model(self, request)
 
-        request.success(_("Your changes were saved"))
+        request.success(_('Your changes were saved'))
         return morepath.redirect(request.link(self))
 
     elif request.method == 'GET':
@@ -457,7 +457,7 @@ def edit_newsletter(
     return {
         'layout': layout,
         'form': form,
-        'title': _("Edit Newsletter"),
+        'title': _('Edit Newsletter'),
         'size': 'large'
     }
 
@@ -467,7 +467,7 @@ def delete_newsletter(self: Newsletter, request: 'OrgRequest') -> None:
     request.assert_valid_csrf_token()
 
     NewsletterCollection(request.session).delete(self)
-    request.success(_("The newsletter was deleted"))
+    request.success(_('The newsletter was deleted'))
 
 
 def send_newsletter(
@@ -637,7 +637,7 @@ def handle_test_newsletter(
         'form': form,
         'title': self.title,
         'helptext': _(
-            "Sends a test newsletter to the given address"
+            'Sends a test newsletter to the given address'
         )
     }
 
@@ -682,7 +682,7 @@ def export_newsletter_recipients(
     layout: RecipientLayout | None = None
 ) -> 'RenderData | Response':
     layout = layout or RecipientLayout(self, request)
-    layout.breadcrumbs.append(Link(_("Export"), '#'))
+    layout.breadcrumbs.append(Link(_('Export'), '#'))
     layout.editbar_links = None
 
     if form.submitted(request):
@@ -691,14 +691,14 @@ def export_newsletter_recipients(
         results = import_form.run_export()
 
         return form.as_export_response(
-            results, title=request.translate(_("Newsletter Recipients"))
+            results, title=request.translate(_('Newsletter Recipients'))
         )
 
     return {
         'layout': layout,
-        'title': _("Newsletter recipient Export"),
+        'title': _('Newsletter recipient Export'),
         'form': form,
-        'explanation': _("Exports all newsletter recipients."),
+        'explanation': _('Exports all newsletter recipients.'),
     }
 
 
@@ -716,7 +716,7 @@ def import_newsletter_recipients(
     layout: RecipientLayout | None = None
 ) -> 'RenderData | Response':
     layout = layout or RecipientLayout(self, request)
-    layout.breadcrumbs.append(Link(_("Import"), '#'))
+    layout.breadcrumbs.append(Link(_('Import'), '#'))
     layout.editbar_links = None
 
     if form.submitted(request):

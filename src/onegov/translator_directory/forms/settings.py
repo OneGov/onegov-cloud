@@ -22,13 +22,13 @@ ALLOWED_MIME_TYPES = {
 class TranslatorDirectorySettingsForm(Form):
 
     coordinates = CoordinatesField(
-        fieldset=_("Home Location"),
+        fieldset=_('Home Location'),
         render_kw={'data-map-type': 'marker', 'data-undraggable': 1},
     )
 
     declaration_link = URLField(
-        label=_("Link to declaration of authorization"),
-        fieldset=_("Accreditation"),
+        label=_('Link to declaration of authorization'),
+        fieldset=_('Accreditation'),
         validators=[URL(), Optional()]
     )
 

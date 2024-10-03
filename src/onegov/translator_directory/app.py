@@ -84,7 +84,7 @@ class TranslatorDirectoryApp(TownApp):
             Translator.email)
         emails = q.distinct().all()
         bcc_addresses = '; '.join(str(email) for (email,) in emails if email)
-        mailto_link = f"mailto:?bcc={bcc_addresses}"
+        mailto_link = f'mailto:?bcc={bcc_addresses}'
         return mailto_link
 
 
@@ -112,7 +112,7 @@ def get_create_new_organisation_factory(
 @TranslatorDirectoryApp.setting(section='i18n', name='localedirs')
 def get_i18n_localedirs() -> list[str]:
     mine = utils.module_path('onegov.translator_directory', 'locale')
-    return [mine] + get_town_i18n_localedirs()
+    return [mine, *get_town_i18n_localedirs()]
 
 
 @TranslatorDirectoryApp.webasset_path()

@@ -15,25 +15,25 @@ from wtforms.validators import InputRequired
 class OrganizationForm(Form):
 
     parent = ChosenSelectField(
-        label=_("Parent Organization"),
+        label=_('Parent Organization'),
         choices=[('', '')]
     )
 
     title = StringField(
-        label=_("Title"),
+        label=_('Title'),
         validators=[
             InputRequired()
         ]
     )
 
     active = BooleanField(
-        label=_("Active"),
+        label=_('Active'),
         default=True
     )
 
     name = StringField(
-        label=_("ID"),
-        description=_("Leave blank to set the value automatically."),
+        label=_('ID'),
+        description=_('Leave blank to set the value automatically.'),
         validators=[
             UniqueColumnValue(Organization),
             UnusedColumnKeyValue(GazetteNotice._organizations)
@@ -41,7 +41,7 @@ class OrganizationForm(Form):
     )
 
     external_name = StringField(
-        label=_("External ID"),
+        label=_('External ID'),
     )
 
     def on_request(self) -> None:
@@ -54,7 +54,7 @@ class OrganizationForm(Form):
         query = query.order_by(Organization.order)
         self.parent.choices = query.all()
         self.parent.choices.insert(
-            0, ('', self.request.translate(_("- none -")))
+            0, ('', self.request.translate(_('- none -')))
         )
 
     def update_model(self, model: Organization) -> None:

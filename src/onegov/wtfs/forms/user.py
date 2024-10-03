@@ -17,14 +17,14 @@ from wtforms.validators import InputRequired
 class UserForm(Form):
 
     realname = StringField(
-        label=_("Name"),
+        label=_('Name'),
         validators=[
             InputRequired()
         ]
     )
 
     username = StringField(
-        label=_("E-Mail"),
+        label=_('E-Mail'),
         validators=[
             InputRequired(),
             Email(),
@@ -33,7 +33,7 @@ class UserForm(Form):
     )
 
     contact = BooleanField(
-        label=_("Contact"),
+        label=_('Contact'),
         depends_on=('role', '!admin'),
     )
 
@@ -70,11 +70,11 @@ class UserForm(Form):
 class UnrestrictedUserForm(UserForm):
 
     role = RadioField(
-        label=_("Role"),
+        label=_('Role'),
         choices=[
-            ('admin', _("Admin")),
-            ('editor', _("Editor")),
-            ('member', _("Member"))
+            ('admin', _('Admin')),
+            ('editor', _('Editor')),
+            ('member', _('Member'))
         ],
         default='member',
         validators=[
@@ -83,7 +83,7 @@ class UnrestrictedUserForm(UserForm):
     )
 
     municipality_id = ChosenSelectField(
-        label=_("Municipality"),
+        label=_('Municipality'),
         choices=[],
         validators=[
             InputRequiredIf('role', 'editor')
@@ -99,10 +99,10 @@ class UnrestrictedUserForm(UserForm):
         )
         query = query.order_by(unaccent(Municipality.name))
         self.municipality_id.choices = [
-            (r.id.hex, f"{r.name} ({r.bfs_number})") for r in query
+            (r.id.hex, f'{r.name} ({r.bfs_number})') for r in query
         ]
         self.municipality_id.choices.insert(
-            0, ('', self.request.translate(_("- none -")))
+            0, ('', self.request.translate(_('- none -')))
         )
 
     def update_model(self, model: User) -> bool:

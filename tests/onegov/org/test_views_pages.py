@@ -238,13 +238,13 @@ def test_pages_person_link_extension(client):
                              "Govikon does not really exist.</i>"
                              + embedded_img
                              )
-    new_page.form['western_ordered'] = False
-    new_page.form['_'.join(['people', person_uuid])] = True
+    new_page.form['western_name_order'] = False
+    new_page.form['people-0-person'] = person_uuid
     page = new_page.form.submit().follow()
     assert 'Müller Franz' in page
 
     edit_page = page.click("Bearbeiten")
-    edit_page.form['western_ordered'] = True
+    edit_page.form['western_name_order'] = True
     page = edit_page.form.submit().follow()
     assert 'Franz Müller' in page
 

@@ -16,48 +16,48 @@ if TYPE_CHECKING:
 class CreateInvoicesForm(Form):
 
     from_date = DateField(
-        label=_("From date"),
+        label=_('From date'),
         validators=[
             InputRequired(),
         ]
     )
 
     to_date = DateField(
-        label=_("To date"),
+        label=_('To date'),
         validators=[
             InputRequired(),
         ]
     )
 
     cs2_user = StringField(
-        label=_("CS2 User"),
+        label=_('CS2 User'),
         validators=[
             InputRequired(),
         ]
     )
 
     subject = StringField(
-        label=_("Subject"),
+        label=_('Subject'),
         validators=[
             InputRequired(),
         ]
     )
 
     municipality_id = SelectField(
-        label=_("Municipality"),
+        label=_('Municipality'),
         choices=[],
         validators=[InputRequired()]
     )
 
     accounting_unit = StringField(
-        label=_("Accounting unit"),
+        label=_('Accounting unit'),
         validators=[
             InputRequired(),
         ]
     )
 
     revenue_account = StringField(
-        label=_("Revenue account"),
+        label=_('Revenue account'),
         validators=[
             InputRequired(),
         ]
@@ -71,10 +71,10 @@ class CreateInvoicesForm(Form):
         )
         query = query.order_by(unaccent(Municipality.name))
         self.municipality_id.choices = [
-            ('-', self.request.translate(_("For all municipalities")))
+            ('-', self.request.translate(_('For all municipalities')))
         ]
         self.municipality_id.choices += [
-            (r.id.hex, f"{r.name} ({r.bfs_number})") for r in query
+            (r.id.hex, f'{r.name} ({r.bfs_number})') for r in query
         ]
 
     def update_model(self, model: 'Invoice') -> None:

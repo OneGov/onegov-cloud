@@ -35,6 +35,8 @@ def add(
 ) -> 'Callable[[SwissvotesRequest, SwissvotesApp], None]':
     """ Adds an instance to the database. For example:
 
+    .. code-block:: bash
+
         onegov-swissvotes --select '/onegov_swissvotes/swissvotes' add
 
     """
@@ -57,14 +59,16 @@ def import_attachments(
     group_context: 'GroupContext',
     folder: str
 ) -> 'Callable[[SwissvotesRequest, SwissvotesApp], None]':
-    """ Import a attachments from the given folder. For example:
+    r""" Import a attachments from the given folder. For example:
+
+    .. code-block:: bash
 
         onegov-swissvotes \
             --select '/onegov_swissvotes/swissvotes' \
             import-attachments data_folder
 
     Expects a data folder structure with the first level representing an
-    attachment and the second level a locale. The PDFs have to be name by
+    attachment and the second level a locale. The PDFs have to be named by
     BFS number (single number or range). For example:
 
         data/voting_text/de_CH/001.pdf
@@ -159,7 +163,9 @@ def import_campaign_material(
     group_context: 'GroupContext',
     folder: str
 ) -> 'Callable[[SwissvotesRequest, SwissvotesApp], None]':
-    """ Import a campaign material from the given folder. For example:
+    r""" Import a campaign material from the given folder. For example:
+
+    .. code-block:: bash
 
         onegov-swissvotes \
             --select '/onegov_swissvotes/swissvotes' \

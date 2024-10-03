@@ -72,7 +72,7 @@ VALID_PLAINTEXT_CHARACTERS = re.compile(r"""
 """, re.VERBOSE)
 
 # match empty link expressions
-EMPTY_LINK = re.compile(r"\[\]\([^)]+\)")
+EMPTY_LINK = re.compile(r'\[\]\([^)]+\)')
 
 
 cleaner = Cleaner(

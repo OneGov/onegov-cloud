@@ -28,7 +28,7 @@ if TYPE_CHECKING:
     from onegov.election_day.models import Municipality
     from onegov.election_day.types import Gender
     from sqlalchemy.orm import Session
-    from typing_extensions import TypeAlias
+    from typing import TypeAlias
     from xsdata_ech.e_ch_0252_2_0 import Delivery
     from xsdata_ech.e_ch_0252_2_0 import ElectedType
     from xsdata_ech.e_ch_0252_2_0 import ElectionResultType
@@ -180,7 +180,7 @@ def import_information_delivery(
         assert group_info.election_group
         group = group_info.election_group
         assert group.domain_of_influence
-        supported, domain, domain_segment = convert_ech_domain(
+        supported, domain, _domain_segment = convert_ech_domain(
             group.domain_of_influence, principal, entities
         )
         if not supported:
@@ -332,7 +332,7 @@ def import_information_delivery(
                 for list_id in union.referenced_list:
                     lists[list_id].connection = connection
             for union in information.list_union:
-                if not union.list_union_type == ListRelationType.VALUE_2:
+                if union.list_union_type != ListRelationType.VALUE_2:
                     continue
                 assert union.list_union_identification
                 connection_id = union.list_union_identification

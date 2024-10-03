@@ -20,7 +20,7 @@ if TYPE_CHECKING:
     from onegov.pas.models import Parliamentarian
     from onegov.town6.request import TownRequest
     from typing import Literal
-    from typing_extensions import TypeAlias
+    from typing import TypeAlias
 
     Action: TypeAlias = Literal[
         'add',

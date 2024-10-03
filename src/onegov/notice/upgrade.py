@@ -55,7 +55,7 @@ def add_author_fields(context: 'UpgradeContext') -> None:
 @upgrade_task('Add an imported state to official notices')
 def add_imported_state_to_notices(context: 'UpgradeContext') -> None:
     old = ['drafted', 'submitted', 'published', 'rejected', 'accepted']
-    new = old + ['imported']
+    new = [*old, 'imported']
     old_type = Enum(*old, name='official_notice_state')
     new_type = Enum(*new, name='official_notice_state')
     tmp_type = Enum(*new, name='_official_notice_state')

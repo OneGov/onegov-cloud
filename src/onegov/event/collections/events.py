@@ -3,7 +3,6 @@ import hashlib
 from datetime import date
 from datetime import datetime
 from datetime import timedelta
-from datetime import timezone
 from icalendar import Calendar as vCalendar
 from icalendar.prop import vCategory
 from lxml import etree
@@ -36,7 +35,7 @@ if TYPE_CHECKING:
     from onegov.event.models.event import EventState
     from sqlalchemy.orm import Query
     from sqlalchemy.orm import Session
-    from typing_extensions import Self
+    from typing import Self
     from uuid import UUID
 
 
@@ -96,7 +95,7 @@ class EventCollection(Pagination[Event]):
         """ Create a unique, URL-friendly name. """
 
         # it's possible for `normalize_for_url` to return an empty string...
-        name = normalize_for_url(name) or "event"
+        name = normalize_for_url(name) or 'event'
 
         session = self.session
         while session.query(Event.name).filter(Event.name == name).first():
@@ -252,8 +251,7 @@ class EventCollection(Pagination[Event]):
                 continue
 
             # skip past events if option is set
-            if future_events_only and (
-                    item.event.end < datetime.now(timezone.utc)):
+            if future_events_only and item.event.end < utcnow():
                 continue
 
             event = item.event
@@ -323,7 +321,7 @@ class EventCollection(Pagination[Event]):
                     updated.append(existing)
 
             else:
-                if published_only and not event.state == 'published':
+                if published_only and event.state != 'published':
                     continue
                 event.id = uuid4()
                 event.name = self._get_unique_name(event.title)
@@ -415,7 +413,7 @@ class EventCollection(Pagination[Event]):
                 end = start + timedelta(hours=1)
 
             if not start or not end:
-                raise (ValueError("Invalid date"))
+                raise (ValueError('Invalid date'))
 
             recurrence = vevent.get('rrule', '')
             if recurrence:

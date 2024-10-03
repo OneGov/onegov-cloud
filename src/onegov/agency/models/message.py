@@ -6,7 +6,7 @@ from typing import TYPE_CHECKING
 if TYPE_CHECKING:
     from onegov.agency.request import AgencyRequest
     from onegov.ticket import Ticket
-    from typing_extensions import Self
+    from typing import Self
 
 
 class AgencyMutationMessage(Message, TicketMessageMixin):

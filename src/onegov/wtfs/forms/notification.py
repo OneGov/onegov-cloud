@@ -13,14 +13,14 @@ if TYPE_CHECKING:
 class NotificationForm(Form):
 
     title = StringField(
-        label=_("Title"),
+        label=_('Title'),
         validators=[
             InputRequired()
         ]
     )
 
     text = TextAreaField(
-        label=_("Text"),
+        label=_('Text'),
         validators=[
             InputRequired()
         ]

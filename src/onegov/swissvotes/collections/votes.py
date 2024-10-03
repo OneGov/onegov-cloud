@@ -22,7 +22,7 @@ if TYPE_CHECKING:
     from onegov.swissvotes.app import SwissvotesApp
     from sqlalchemy.orm import Query
     from sqlalchemy.sql import ColumnElement
-    from typing_extensions import Self
+    from typing import Self
 
 T = TypeVar('T')
 
@@ -587,7 +587,7 @@ class SwissVoteCollection(Pagination[SwissVote]):
                     worksheet.write_string(row, column_, value)
                 elif isinstance(value, date):
                     worksheet.write_datetime(row, column_, value)
-                elif isinstance(value, int) or isinstance(value, Decimal):
+                elif isinstance(value, (int, Decimal)):
                     worksheet.write_number(row, column_, value)
 
         workbook.close()

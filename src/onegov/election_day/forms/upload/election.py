@@ -20,9 +20,9 @@ if TYPE_CHECKING:
 class UploadElectionBaseForm(Form):
 
     file_format = RadioField(
-        _("File format"),
+        _('File format'),
         choices=[
-            ('internal', "OneGov Cloud"),
+            ('internal', 'OneGov Cloud'),
         ],
         validators=[
             InputRequired()
@@ -31,7 +31,7 @@ class UploadElectionBaseForm(Form):
     )
 
     results = UploadField(
-        label=_("Results"),
+        label=_('Results'),
         validators=[
             DataRequired(),
             WhitelistedMimeType(ALLOWED_MIME_TYPES),
@@ -51,8 +51,8 @@ class UploadElectionBaseForm(Form):
         assert hasattr(election, 'data_sources')
         if election.data_sources:
             self.file_format.choices = [
-                ('internal', "OneGov Cloud"),
-                ('wabsti_c', "WabstiCExport")
+                ('internal', 'OneGov Cloud'),
+                ('wabsti_c', 'WabstiCExport')
             ]
 
 
@@ -92,7 +92,7 @@ class UploadMajorzElectionForm(UploadElectionBaseForm):
     )
 
     wm_wahl = UploadField(
-        label="WM_Wahl",
+        label='WM_Wahl',
         validators=[
             DataRequired(),
             WhitelistedMimeType(ALLOWED_MIME_TYPES),
@@ -117,7 +117,7 @@ class UploadMajorzElectionForm(UploadElectionBaseForm):
 class UploadProporzElectionForm(UploadElectionBaseForm):
 
     wp_gemeinden = UploadField(
-        label="WP_Gemeinden",
+        label='WP_Gemeinden',
         validators=[
             DataRequired(),
             WhitelistedMimeType(ALLOWED_MIME_TYPES),
@@ -128,7 +128,7 @@ class UploadProporzElectionForm(UploadElectionBaseForm):
     )
 
     wp_kandidaten = UploadField(
-        label="WP_Kandidaten",
+        label='WP_Kandidaten',
         validators=[
             DataRequired(),
             WhitelistedMimeType(ALLOWED_MIME_TYPES),
@@ -139,7 +139,7 @@ class UploadProporzElectionForm(UploadElectionBaseForm):
     )
 
     wp_kandidatengde = UploadField(
-        label="WP_KandidatenGde",
+        label='WP_KandidatenGde',
         validators=[
             DataRequired(),
             WhitelistedMimeType(ALLOWED_MIME_TYPES),
@@ -150,7 +150,7 @@ class UploadProporzElectionForm(UploadElectionBaseForm):
     )
 
     wp_listen = UploadField(
-        label="WP_Listen",
+        label='WP_Listen',
         validators=[
             DataRequired(),
             WhitelistedMimeType(ALLOWED_MIME_TYPES),
@@ -161,7 +161,7 @@ class UploadProporzElectionForm(UploadElectionBaseForm):
     )
 
     wp_listengde = UploadField(
-        label="WP_ListenGde",
+        label='WP_ListenGde',
         validators=[
             DataRequired(),
             WhitelistedMimeType(ALLOWED_MIME_TYPES),
@@ -172,7 +172,7 @@ class UploadProporzElectionForm(UploadElectionBaseForm):
     )
 
     wp_wahl = UploadField(
-        label="WP_Wahl",
+        label='WP_Wahl',
         validators=[
             DataRequired(),
             WhitelistedMimeType(ALLOWED_MIME_TYPES),
@@ -183,7 +183,7 @@ class UploadProporzElectionForm(UploadElectionBaseForm):
     )
 
     wpstatic_gemeinden = UploadField(
-        label="WPStatic_Gemeinden",
+        label='WPStatic_Gemeinden',
         validators=[
             DataRequired(),
             WhitelistedMimeType(ALLOWED_MIME_TYPES),
@@ -194,7 +194,7 @@ class UploadProporzElectionForm(UploadElectionBaseForm):
     )
 
     wpstatic_kandidaten = UploadField(
-        label="WPStatic_Kandidaten",
+        label='WPStatic_Kandidaten',
         validators=[
             DataRequired(),
             WhitelistedMimeType(ALLOWED_MIME_TYPES),

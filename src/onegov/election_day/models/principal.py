@@ -17,7 +17,7 @@ from typing import Literal
 from typing import TYPE_CHECKING
 if TYPE_CHECKING:
     from translationstring import TranslationString
-    from typing_extensions import Never
+    from typing import Never
     from yaml.reader import _ReadStream
 
 
@@ -302,28 +302,28 @@ class Canton(Principal):
         has_superregions = superregions != {None}
 
         domains_election: dict[str, TranslationString] = OrderedDict()
-        domains_election['federation'] = _("Federal")
-        domains_election['canton'] = _("Cantonal")
+        domains_election['federation'] = _('Federal')
+        domains_election['canton'] = _('Cantonal')
         if has_regions:
             domains_election['region'] = _(
-                "Regional (${on})",
+                'Regional (${on})',
                 mapping={'on': self.label('region')}
             )
         if has_districts:
             domains_election['district'] = _(
-                "Regional (${on})",
+                'Regional (${on})',
                 mapping={'on': self.label('district')}
             )
         domains_election['none'] = _(
-            "Regional (${on})",
-            mapping={'on': _("Other")}
+            'Regional (${on})',
+            mapping={'on': _('Other')}
         )
-        domains_election['municipality'] = _("Communal")
+        domains_election['municipality'] = _('Communal')
 
         domains_vote: dict[str, TranslationString] = OrderedDict()
-        domains_vote['federation'] = _("Federal")
-        domains_vote['canton'] = _("Cantonal")
-        domains_vote['municipality'] = _("Communal")
+        domains_vote['federation'] = _('Federal')
+        domains_vote['canton'] = _('Cantonal')
+        domains_vote['municipality'] = _('Communal')
 
         super().__init__(
             id_=canton,
@@ -340,45 +340,45 @@ class Canton(Principal):
 
     def label(self, value: str) -> str:
         if value == 'entity':
-            return _("Municipality")
+            return _('Municipality')
         if value == 'entities':
-            return _("Municipalities")
+            return _('Municipalities')
         if value == 'district':
             if self.id == 'bl':
-                return _("district_label_bl")
+                return _('district_label_bl')
             if self.id == 'gr':
-                return _("district_label_gr")
+                return _('district_label_gr')
             if self.id == 'sz':
-                return _("district_label_sz")
-            return _("District")
+                return _('district_label_sz')
+            return _('District')
         if value == 'districts':
             if self.id == 'bl':
-                return _("districts_label_bl")
+                return _('districts_label_bl')
             if self.id == 'gr':
-                return _("districts_label_gr")
+                return _('districts_label_gr')
             if self.id == 'sz':
-                return _("districts_label_sz")
-            return _("Districts")
+                return _('districts_label_sz')
+            return _('Districts')
         if value == 'region':
             if self.id == 'gr':
-                return _("region_label_gr")
-            return _("District")
+                return _('region_label_gr')
+            return _('District')
         if value == 'regions':
             if self.id == 'gr':
-                return _("regions_label_gr")
-            return _("Districts")
+                return _('regions_label_gr')
+            return _('Districts')
         if value == 'superregion':
             if self.id == 'bl':
-                return _("superregion_label_bl")
-            return _("District")
+                return _('superregion_label_bl')
+            return _('District')
         if value == 'superregions':
             if self.id == 'bl':
-                return _("superregions_label_bl")
-            return _("Districts")
+                return _('superregions_label_bl')
+            return _('Districts')
         if value == 'mandates':
             if self.id == 'gr':
-                return _("Seats")
-            return _("Mandates")
+                return _('Seats')
+            return _('Mandates')
         return ''
 
 
@@ -402,9 +402,9 @@ class Municipality(Principal):
         kwargs.pop('segmented_notifications', None)
 
         domains: dict[str, TranslationString] = OrderedDict((
-            ('federation', _("Federal")),
-            ('canton', _("Cantonal")),
-            ('municipality', _("Communal"))
+            ('federation', _('Federal')),
+            ('canton', _('Cantonal')),
+            ('municipality', _('Communal'))
         ))
 
         # Try to read the quarters for each year from our static data
@@ -449,7 +449,7 @@ class Municipality(Principal):
 
     def label(self, value: str) -> str:
         if value == 'entity':
-            return _("Quarter") if self.has_quarters else _("Municipality")
+            return _('Quarter') if self.has_quarters else _('Municipality')
         if value == 'entities':
-            return _("Quarters") if self.has_quarters else _("Municipalities")
+            return _('Quarters') if self.has_quarters else _('Municipalities')
         return ''

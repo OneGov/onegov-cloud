@@ -48,7 +48,7 @@ def delete_period(
         period = request.session.query(Period).filter_by(title=title).first()
 
         if not period:
-            print(f"Could not find period «{title}»")
+            print(f'Could not find period «{title}»')
             sys.exit(1)
 
         request.session.execute(text("""

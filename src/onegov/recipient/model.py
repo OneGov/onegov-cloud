@@ -9,7 +9,7 @@ from uuid import uuid4
 from typing import Literal, TYPE_CHECKING
 if TYPE_CHECKING:
     import uuid
-    from typing_extensions import TypeAlias
+    from typing import TypeAlias
 
     Medium: TypeAlias = Literal['phone', 'email', 'http']
 

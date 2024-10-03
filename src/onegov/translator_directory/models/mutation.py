@@ -113,15 +113,15 @@ class TranslatorMutation:
 
     @cached_property
     def translations(self) -> dict[str, 'Mapping[Any, str]']:
-        LANGUAGES = {
+        LANGUAGES = {  # noqa: N806
             str(language.id): language.name
             for language in self.language_collection.query()
         }
-        CERTIFICATES = {
+        CERTIFICATES = {  # noqa: N806
             str(cert.id): cert.name
             for cert in self.certificate_collection.query()
         }
-        BOOLS = {True: _('Yes'), False: _('No')}
+        BOOLS = {True: _('Yes'), False: _('No')}  # noqa: N806
 
         return {
             'admission': ADMISSIONS,
@@ -149,7 +149,7 @@ class TranslatorMutation:
         'gender': _('Gender'),
         'date_of_birth': _('Date of birth'),
         'nationalities': _('Nationality(ies)'),
-        'coordinates': _("Location"),
+        'coordinates': _('Location'),
         'address': _('Street and house number'),
         'zip_code': _('Zip Code'),
         'city': _('City'),

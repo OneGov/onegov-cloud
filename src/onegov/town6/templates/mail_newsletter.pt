@@ -55,7 +55,7 @@
                 <a href="${request.link(newsletter)}" i18n:translate>Click here to view web version.</a>
             </p>
             <p>
-                <a href="${unsubscribe}" i18n:translate>Click here to unsubscribe.</a>.
+                <tal:b i18n:translate="">You no longer wish to receive the newsletter?</tal:b> <a href="${unsubscribe}" i18n:translate>Click here to unsubscribe.</a>.
             </p>
         </p>
     </tal:b>

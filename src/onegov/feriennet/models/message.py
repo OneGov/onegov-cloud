@@ -5,9 +5,10 @@ from onegov.org.models.message import TicketMessageMixin
 
 from typing import Any, TYPE_CHECKING
 if TYPE_CHECKING:
+    from onegov.activity.models import PeriodMeta
     from onegov.feriennet.request import FeriennetRequest
     from onegov.ticket import Ticket
-    from typing_extensions import Self
+    from typing import Self
 
 
 class PeriodMessage(Message):
@@ -22,11 +23,11 @@ class PeriodMessage(Message):
     @classmethod
     def create(
         cls,
-        period: Period,
+        period: 'Period | PeriodMeta',
         request: 'FeriennetRequest',
         action: str
     ) -> 'Self':
-        assert request.current_username, "reserved for logged-in users"
+        assert request.current_username, 'reserved for logged-in users'
 
         return cls.bound_messages(request.session).add(
             channel_id=period.id.hex,

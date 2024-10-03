@@ -21,8 +21,8 @@ if TYPE_CHECKING:
     from elasticsearch import Elasticsearch
     from sqlalchemy.engine import Engine
     from sqlalchemy.orm import Session
+    from typing import TypeAlias
     from typing import TypedDict
-    from typing_extensions import TypeAlias
     from uuid import UUID
 
     class IndexTask(TypedDict):
@@ -55,97 +55,97 @@ ES_ANALYZER_MAP = {
 }
 
 ANALYSIS_CONFIG = {
-    "filter": {
-        "english_stop": {
-            "type": "stop",
-            "stopwords": "_english_"
+    'filter': {
+        'english_stop': {
+            'type': 'stop',
+            'stopwords': '_english_'
         },
-        "english_stemmer": {
-            "type": "stemmer",
-            "language": "english"
+        'english_stemmer': {
+            'type': 'stemmer',
+            'language': 'english'
         },
-        "english_possessive_stemmer": {
-            "type": "stemmer",
-            "language": "possessive_english"
+        'english_possessive_stemmer': {
+            'type': 'stemmer',
+            'language': 'possessive_english'
         },
-        "german_stop": {
-            "type": "stop",
-            "stopwords": "_german_"
+        'german_stop': {
+            'type': 'stop',
+            'stopwords': '_german_'
         },
-        "german_stemmer": {
-            "type": "stemmer",
-            "language": "light_german"
+        'german_stemmer': {
+            'type': 'stemmer',
+            'language': 'light_german'
         },
-        "french_elision": {
-            "type": "elision",
-            "articles_case": True,
-            "articles": [
-                "l", "m", "t", "qu", "n", "s",
-                "j", "d", "c", "jusqu", "quoiqu",
-                "lorsqu", "puisqu"
+        'french_elision': {
+            'type': 'elision',
+            'articles_case': True,
+            'articles': [
+                'l', 'm', 't', 'qu', 'n', 's',
+                'j', 'd', 'c', 'jusqu', 'quoiqu',
+                'lorsqu', 'puisqu'
             ]
         },
-        "french_stop": {
-            "type": "stop",
-            "stopwords": "_french_"
+        'french_stop': {
+            'type': 'stop',
+            'stopwords': '_french_'
         },
-        "french_keywords": {
-            "type": "keyword_marker",
-            "keywords": ["Exemple"]
+        'french_keywords': {
+            'type': 'keyword_marker',
+            'keywords': ['Exemple']
         },
-        "french_stemmer": {
-            "type": "stemmer",
-            "language": "light_french"
+        'french_stemmer': {
+            'type': 'stemmer',
+            'language': 'light_french'
         }
     },
-    "analyzer": {
-        "english_html": {
-            "tokenizer": "standard",
-            "char_filter": [
-                "html_strip"
+    'analyzer': {
+        'english_html': {
+            'tokenizer': 'standard',
+            'char_filter': [
+                'html_strip'
             ],
-            "filter": [
-                "english_possessive_stemmer",
-                "lowercase",
-                "english_stop",
-                "english_stemmer"
+            'filter': [
+                'english_possessive_stemmer',
+                'lowercase',
+                'english_stop',
+                'english_stemmer'
             ]
         },
-        "german_html": {
-            "tokenizer": "standard",
-            "char_filter": [
-                "html_strip"
+        'german_html': {
+            'tokenizer': 'standard',
+            'char_filter': [
+                'html_strip'
             ],
-            "filter": [
-                "lowercase",
-                "german_stop",
-                "german_normalization",
-                "german_stemmer"
+            'filter': [
+                'lowercase',
+                'german_stop',
+                'german_normalization',
+                'german_stemmer'
             ]
         },
-        "french_html": {
-            "tokenizer": "standard",
-            "char_filter": [
-                "html_strip"
+        'french_html': {
+            'tokenizer': 'standard',
+            'char_filter': [
+                'html_strip'
             ],
-            "filter": [
-                "french_elision",
-                "lowercase",
-                "french_stop",
-                "french_keywords",
-                "french_stemmer"
+            'filter': [
+                'french_elision',
+                'lowercase',
+                'french_stop',
+                'french_keywords',
+                'french_stemmer'
             ]
         },
-        "autocomplete": {
-            "type": "custom",
-            "char_filter": ["html_strip"],
-            "tokenizer": "standard",
-            "filter": ["lowercase"]
+        'autocomplete': {
+            'type': 'custom',
+            'char_filter': ['html_strip'],
+            'tokenizer': 'standard',
+            'filter': ['lowercase']
         },
-        "tags": {
-            "type": "custom",
-            "tokenizer": "keyword",
-            "filter": ["lowercase"]
+        'tags': {
+            'type': 'custom',
+            'tokenizer': 'keyword',
+            'filter': ['lowercase']
         },
     }
 }
@@ -442,7 +442,7 @@ class PostgresIndexer(IndexerBase):
                 with session.begin_nested():
                     session.execute(stmt, content)
         except Exception as ex:
-            index_log.error(f'Error \'{ex}\' indexing schema '
+            index_log.error(f"Error '{ex}' indexing schema "
                             f'{tasks[0]["schema"]} table '
                             f'{tasks[0]["tablename"]}')
             return False
@@ -473,7 +473,7 @@ class PostgresIndexer(IndexerBase):
             if action == 'index':
                 self.index(task_list, session)
             else:
-                raise NotImplementedError('Action \'{action}\' not '
+                raise NotImplementedError("Action '{action}' not "
                                           'implemented')
 
 
@@ -905,7 +905,7 @@ class ORMEventTranslator:
                 # we only need to provide index tasks for fts
                 self.psql_queue.put_nowait(translation)
         except Full:
-            log.error("The orm event translator queue is full!")
+            log.error('The orm event translator queue is full!')
 
     def index(self, schema: str, obj: Searchable) -> None:
         if obj.es_skip:

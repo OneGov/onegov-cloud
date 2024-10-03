@@ -62,13 +62,13 @@ class DirectoryCollection(GenericCollection[DirectoryT]):
 
         # add an upper limit to how many times increment_name can fail
         # to find a suitable name
-        for _ in range(0, 100):
+        for _ in range(100):
             if name not in names:
                 return name
 
             name = increment_name(name)
 
-        raise RuntimeError("Increment name failed to find a candidate")
+        raise RuntimeError('Increment name failed to find a candidate')
 
     def by_name(self, name: str) -> DirectoryT | None:
         return self.query().filter_by(name=name).first()

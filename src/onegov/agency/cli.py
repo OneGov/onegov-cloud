@@ -116,7 +116,7 @@ def consolidate_cli(
         assert count == count_after, f'before: {count}, after {count_after}'
         if dry_run:
             transaction.abort()
-            click.secho("Aborting transaction", fg='yellow')
+            click.secho('Aborting transaction', fg='yellow')
 
     return do_consolidate
 
@@ -146,7 +146,7 @@ def import_bs_function(
 
         if dry_run:
             transaction.abort()
-            click.secho("Aborting transaction", fg='yellow')
+            click.secho('Aborting transaction', fg='yellow')
     return execute
 
 
@@ -202,12 +202,12 @@ def import_bs_data_files(
         agencies, people = import_bs_data(
             agency_file, people_file, request, app)
 
-        click.secho(f"Imported {len(agencies.keys())} agencies "
-                    f"and {len(people)} persons",
+        click.secho(f'Imported {len(agencies.keys())} agencies '
+                    f'and {len(people)} persons',
                     fg='green')
         if dry_run:
             transaction.abort()
-            click.secho("Aborting transaction", fg='yellow')
+            click.secho('Aborting transaction', fg='yellow')
 
     return execute
 
@@ -239,7 +239,7 @@ def create_pdf(
                 underline_links=app.org.meta.get('pdf_underline_links', False)
             )
 
-            click.secho("Root PDF created", fg='green')
+            click.secho('Root PDF created', fg='green')
 
         if recursive:
             for agency in agencies.query():
@@ -287,7 +287,7 @@ def enable_yubikey(
     def _enable_yubikey(request: 'AgencyRequest', app: 'AgencyApp') -> None:
         if app.org:
             app.org.meta['enable_yubikey'] = True
-            click.secho("YubiKey enabled", fg='green')
+            click.secho('YubiKey enabled', fg='green')
 
     return _enable_yubikey
 
@@ -301,6 +301,6 @@ def disable_yubikey(
     def _disable_yubikey(request: 'AgencyRequest', app: 'AgencyApp') -> None:
         if app.org:
             app.org.meta['enable_yubikey'] = False
-            click.secho("YubiKey disabled", fg='green')
+            click.secho('YubiKey disabled', fg='green')
 
     return _disable_yubikey

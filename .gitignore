@@ -64,7 +64,10 @@ eggs/
 .tmontmp
 
 # mypy
-.mypy_cache/*
+.mypy_cache/
+
+# ruff
+.ruff_cache/
 
 # sublime
 *.sublime-workspace

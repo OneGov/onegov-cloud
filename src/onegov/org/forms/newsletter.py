@@ -36,19 +36,19 @@ if TYPE_CHECKING:
     from onegov.org.models import News
     from onegov.org.request import OrgRequest
     from onegov.newsletter.models import Newsletter
-    from typing_extensions import Self
+    from typing import Self
     from wtforms.fields.choices import _Choice
 
 
 class NewsletterForm(Form):
     title = StringField(
-        label=_("Title"),
-        description=_("Used in the overview and the e-mail subject"),
+        label=_('Title'),
+        description=_('Used in the overview and the e-mail subject'),
         validators=[InputRequired()])
 
     lead = TextAreaField(
-        label=_("Editorial"),
-        description=_("A few words about this edition of the newsletter"),
+        label=_('Editorial'),
+        description=_('A few words about this edition of the newsletter'),
         render_kw={'rows': 6})
 
     # FIXME: Why are we passing the request in? It should alread be stored on
@@ -97,7 +97,7 @@ class NewsletterForm(Form):
 
         class NewsletterWithNewsForm(cls):  # type:ignore
             news = MultiCheckboxField(
-                label=_("Latest news"),
+                label=_('Latest news'),
                 choices=choices,
                 render_kw={
                     'prefix_label': False,
@@ -105,10 +105,10 @@ class NewsletterForm(Form):
                 }
             )
             show_news_as_tiles = BooleanField(
-                label=_("Show news as tiles"),
+                label=_('Show news as tiles'),
                 description=_(
-                    "If checked, news are displayed as tiles. Otherwise, "
-                    "news are listed in full length."),
+                    'If checked, news are displayed as tiles. Otherwise, '
+                    'news are listed in full length.'),
                 default=True
             )
 
@@ -160,7 +160,7 @@ class NewsletterForm(Form):
 
         class NewsletterWithOccurrencesForm(cls):  # type:ignore
             occurrences = MultiCheckboxField(
-                label=_("Events"),
+                label=_('Events'),
                 choices=choices,
                 render_kw={
                     'prefix_label': False,
@@ -212,7 +212,7 @@ class NewsletterForm(Form):
 
         class NewsletterWithPublicationsForm(cls):  # type:ignore
             publications = MultiCheckboxField(
-                label=_("Publications"),
+                label=_('Publications'),
                 choices=choices,
                 render_kw={
                     'prefix_label': False,
@@ -242,25 +242,25 @@ class NewsletterSendForm(Form):
         request: OrgRequest
 
     categories = MultiCheckboxField(
-        label=_("Categories"),
-        description=_("Select categories the newsletter reports on. The "
-                      "users will receive the newsletter only if it "
-                      "reports on at least one of the categories the user "
-                      "subscribed to."),
+        label=_('Categories'),
+        description=_('Select categories the newsletter reports on. The '
+                      'users will receive the newsletter only if it '
+                      'reports on at least one of the categories the user '
+                      'subscribed to.'),
         choices=[]
     )
 
     send = RadioField(
-        _("Send"),
+        _('Send'),
         choices=(
-            ('now', _("Now")),
-            ('specify', _("At a specified time"))
+            ('now', _('Now')),
+            ('specify', _('At a specified time'))
         ),
         default='now'
     )
 
     time = DateTimeLocalField(
-        label=_("Time"),
+        label=_('Time'),
         validators=[InputRequired()],
         depends_on=('send', 'specify')
     )
@@ -281,13 +281,13 @@ class NewsletterSendForm(Form):
 
             if time < (utcnow() + timedelta(seconds=60 * 5)):
                 raise ValidationError(_(
-                    "Scheduled time must be at least 5 minutes in the future"
+                    'Scheduled time must be at least 5 minutes in the future'
                 ))
 
             if time.minute != 0:
                 raise ValidationError(_(
-                    "Newsletters can only be sent on the hour "
-                    "(10:00, 11:00, etc.)"
+                    'Newsletters can only be sent on the hour '
+                    '(10:00, 11:00, etc.)'
                 ))
 
             self.time.data = time
@@ -299,15 +299,14 @@ class NewsletterSendForm(Form):
 
         for cat, sub in zip(categories, subcategories):
             choices.append((cat, cat))
-            for s in sub:
-                choices.append((f'{s}', f'\xa0\xa0\xa0{s}'))
+            choices.extend((s, f'\xa0\xa0\xa0{s}') for s in sub)
 
         self.categories.choices = choices
 
 
 class NewsletterTestForm(Form):
     selected_recipient = ChosenSelectField(
-        label=_("Recipient"),
+        label=_('Recipient'),
         choices=[],
     )
 
@@ -335,13 +334,13 @@ class NewsletterTestForm(Form):
 class NewsletterSubscriberImportExportForm(Form):
 
     dry_run = BooleanField(
-        label=_("Dry Run"),
-        description=_("Do not actually import the newsletter subscribers"),
+        label=_('Dry Run'),
+        description=_('Do not actually import the newsletter subscribers'),
         default=False
     )
 
     file = UploadField(
-        label=_("Import"),
+        label=_('Import'),
         validators=[
             DataRequired(),
             WhitelistedMimeType({
@@ -365,8 +364,8 @@ class NewsletterSubscriberImportExportForm(Form):
     @property
     def headers(self) -> dict[str, str]:
         return {
-            'address': self.request.translate(_("Address")),
-            'confirmed': self.request.translate(_("Confirmed")),
+            'address': self.request.translate(_('Address')),
+            'confirmed': self.request.translate(_('Confirmed')),
         }
 
     def run_export(self) -> list[dict[str, Any]]:
@@ -374,7 +373,7 @@ class NewsletterSubscriberImportExportForm(Form):
             self.request.session).ordered_by_status_address()
         headers = self.headers
 
-        def get(recipient: Recipient, attribute: str) -> str | bool:
+        def get(recipient: Recipient, attribute: str) -> Any:
             result = getattr(recipient, attribute, '')
             if isinstance(result, str):
                 return result.strip()
@@ -383,13 +382,13 @@ class NewsletterSubscriberImportExportForm(Form):
             else:
                 return result
 
-        result = []
-        for recipient in recipients.all():
-            result.append({
+        return [
+            {
                 v: get(recipient, k)
                 for k, v in headers.items()
-            })
-        return result
+            }
+            for recipient in recipients
+        ]
 
     def run_import(self) -> tuple[int, list[str]]:
         headers = self.headers

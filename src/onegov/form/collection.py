@@ -30,7 +30,7 @@ if TYPE_CHECKING:
     from onegov.form.types import SubmissionState
     from onegov.pay.types import PaymentMethod
     from sqlalchemy.orm import Query, Session
-    from typing_extensions import TypeAlias
+    from typing import TypeAlias
 
     SubmissionHandler: TypeAlias = Callable[[Query[FormSubmission]], Any]
     SurveySubmissionHandler: TypeAlias = Callable[[Query[SurveySubmission]],
@@ -573,11 +573,11 @@ class FormSubmissionCollection:
     ) -> FormSubmission | None:
         """ Return the submission by id.
 
-            :state:
-                Only if the submission matches the given state.
+        :state:
+            Only if the submission matches the given state.
 
-            :current_only:
-                Only if the submission is not older than one hour.
+        :current_only:
+            Only if the submission is not older than one hour.
         """
         query = self.query().filter(FormSubmission.id == id)
 
@@ -881,11 +881,11 @@ class SurveySubmissionCollection:
     ) -> SurveySubmission | None:
         """ Return the submission by id.
 
-            :state:
-                Only if the submission matches the given state.
+        :state:
+            Only if the submission matches the given state.
 
-            :current_only:
-                Only if the submission is not older than one hour.
+        :current_only:
+            Only if the submission is not older than one hour.
         """
         query = self.query().filter(SurveySubmission.id == id)
 

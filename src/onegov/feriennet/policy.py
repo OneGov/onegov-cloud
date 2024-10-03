@@ -9,7 +9,7 @@ if TYPE_CHECKING:
     from morepath.authentication import Identity, NoIdentity
     from sqlalchemy.orm import Query
     from typing import TypeVar
-    from typing_extensions import Self
+    from typing import Self
 
     T = TypeVar('T')
 

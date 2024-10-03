@@ -22,7 +22,7 @@ if TYPE_CHECKING:
     from onegov.core.directives import _RequestT
     from onegov.core.request import CoreRequest
     from typing import Protocol
-    from typing_extensions import TypeAlias
+    from typing import TypeAlias
     from webob import Response as BaseResponse
     from wtforms import Form
 

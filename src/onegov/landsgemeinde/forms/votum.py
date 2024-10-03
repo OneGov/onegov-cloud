@@ -26,6 +26,7 @@ from typing import Any
 from typing import TYPE_CHECKING
 if TYPE_CHECKING:
     from onegov.landsgemeinde.request import LandsgemeindeRequest
+    from wtforms.fields.choices import _Choice
 
 
 class VotumForm(NamedFileForm):
@@ -44,7 +45,7 @@ class VotumForm(NamedFileForm):
         validators=[
             InputRequired()
         ],
-        default=list(STATES.keys())[0]
+        default=next(iter(STATES.keys()))
     )
 
     person_choices = ChosenSelectField(
@@ -164,7 +165,7 @@ class VotumForm(NamedFileForm):
 
     def populate_person_choices(self) -> None:
         people = PersonCollection(self.request.session).query()
-        people_choices = [(
+        people_choices: list[_Choice] = [(
             (
                 f'{p.first_name} {p.last_name}, {p.function}, '
                 f'{p.political_party}, {p.location_code_city}, '
@@ -176,9 +177,7 @@ class VotumForm(NamedFileForm):
                     p.location_code_city])))
         ) for p in people]
         people_choices.insert(0, (', , , , ', '...'))
-        self.person_choices.choices = [
-            (v, c) for v, c in people_choices
-        ]
+        self.person_choices.choices = people_choices
 
     def on_request(self) -> None:
         DefaultLayout(self.model, self.request)

@@ -174,7 +174,7 @@ def import_election_wabstic_majorz(
                 line, 'anzpendentgde', default=None)
         except Exception as e:
             line_errors.append(
-                _("Error in anzpendentgde: ${msg}",
+                _('Error in anzpendentgde: ${msg}',
                   mapping={'msg': e.args[0]}))
 
         # Pass the errors and continue to next line
@@ -204,11 +204,11 @@ def import_election_wabstic_majorz(
         else:
             if entity_id and entity_id not in entities:
                 line_errors.append(
-                    _("${name} is unknown", mapping={'name': entity_id}))
+                    _('${name} is unknown', mapping={'name': entity_id}))
 
             if entity_id in added_entities:
                 line_errors.append(
-                    _("${name} was found twice", mapping={'name': entity_id}))
+                    _('${name} was found twice', mapping={'name': entity_id}))
 
             # Skip expats if not enabled
             if entity_id == 0 and not election.has_expats:
@@ -257,7 +257,7 @@ def import_election_wabstic_majorz(
         else:
             if entity_id and entity_id not in entities:
                 line_errors.append(
-                    _("${name} is unknown", mapping={'name': entity_id}))
+                    _('${name} is unknown', mapping={'name': entity_id}))
 
             if entity_id not in added_entities:
                 # Only add it if present (there is there no SortGeschaeft)
@@ -372,11 +372,11 @@ def import_election_wabstic_majorz(
             candidate_id = line.knr
             votes = validate_integer(line, 'stimmen', default=None)
         except ValueError:
-            line_errors.append(_("Invalid candidate results"))
+            line_errors.append(_('Invalid candidate results'))
         else:
             if added_candidates and candidate_id not in added_candidates:
                 line_errors.append(
-                    _("Candidate with id ${id} not in wm_kandidaten",
+                    _('Candidate with id ${id} not in wm_kandidaten',
                       mapping={'id': candidate_id}))
             if entity_id == 0 and not election.has_expats:
                 # Skip expats if not enabled
@@ -384,7 +384,7 @@ def import_election_wabstic_majorz(
 
             if entity_id not in added_entities:
                 line_errors.append(
-                    _("Entity with id ${id} not in wmstatic_gemeinden",
+                    _('Entity with id ${id} not in wmstatic_gemeinden',
                         mapping={'id': entity_id}))
 
         # Pass the errors and continue to next line

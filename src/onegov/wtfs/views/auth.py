@@ -44,7 +44,7 @@ def handle_login(
 
     if form.submitted(request):
         response = self.login_to(request=request, **form.login_data)
-        form.error_message = _("Wrong username or password")  # type:ignore
+        form.error_message = _('Wrong username or password')  # type:ignore
     else:
         response = None
 
@@ -54,7 +54,7 @@ def handle_login(
 
     return response or {
         'layout': DefaultLayout(self, request),
-        'title': _("Login"),
+        'title': _('Login'),
         'form': form,
         'providers': request.app.providers,  # type:ignore[attr-defined]
         'provider_login': provider_login,
@@ -105,14 +105,14 @@ def handle_password_reset_request(
 
             assert request.app.mail is not None
             request.app.send_transactional_email(
-                subject=request.translate(_("Password reset")),
+                subject=request.translate(_('Password reset')),
                 receivers=(user.username, ),
                 reply_to=request.app.mail['transactional']['sender'],
                 content=render_template(
                     'mail_password_reset.pt',
                     request,
                     {
-                        'title': request.translate(_("Password reset")),
+                        'title': request.translate(_('Password reset')),
                         'model': None,
                         'url': url,
                         'layout': MailLayout(self, request)
@@ -120,7 +120,7 @@ def handle_password_reset_request(
                 )
             )
         else:
-            log.info(f"Failed password reset attempt by {request.client_addr}")
+            log.info(f'Failed password reset attempt by {request.client_addr}')
 
         message = _(
             'A password reset link has been sent to ${email}, provided an '
@@ -156,15 +156,15 @@ def handle_password_reset(
 
     if form.submitted(request):
         if form.update_password(request):
-            request.message(_("Password changed."), 'success')
+            request.message(_('Password changed.'), 'success')
             # FIXME: This won't work if the user is already logged in
             return request.redirect(layout.login_url)  # type:ignore
         else:
             form.error_message = _(  # type:ignore[attr-defined]
-                "Wrong username or password reset link not valid any more."
+                'Wrong username or password reset link not valid any more.'
             )
             log.info(
-                "Failed password reset attempt by {}".format(
+                'Failed password reset attempt by {}'.format(
                     request.client_addr
                 )
             )
@@ -210,7 +210,7 @@ def handle_totp_second_factor(
             return self.redirect(request, self.to)
 
         request.alert(
-            _("Failed to continue login, please ensure cookies are allowed.")
+            _('Failed to continue login, please ensure cookies are allowed.')
         )
         return redirect(request.link(self, name='login'))
 

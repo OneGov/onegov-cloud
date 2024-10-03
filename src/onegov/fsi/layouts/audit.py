@@ -36,7 +36,7 @@ class AuditLayout(DefaultLayout):
             return []
         return [
             Link(
-                text=_("PDF"),
+                text=_('PDF'),
                 url=self.request.link(self.model, name='pdf'),
                 attrs={'class': 'print-icon', 'target': '_blank'}
             ),
@@ -90,11 +90,11 @@ class AuditLayout(DefaultLayout):
         due_in = self.format_refresh_interval(
             self.model.course.refresh_interval)
         titles = (
-            _("Name"),
-            _("Shortcode"),
-            _("Last Event"),
-            _("Registered"),
-            _("Due by (every ${refresh_interval})", mapping={
+            _('Name'),
+            _('Shortcode'),
+            _('Last Event'),
+            _('Registered'),
+            _('Due by (every ${refresh_interval})', mapping={
                 'refresh_interval': due_in}
               )
         )

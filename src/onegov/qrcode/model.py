@@ -6,9 +6,8 @@ from qrcode.main import QRCode
 
 
 from typing import Literal
-from typing import TYPE_CHECKING
-if TYPE_CHECKING:
-    from qrcode.image.pil import PilImage
+from qrcode.image.pil import PilImage
+from qrcode.image.pure import PyPNGImage
 
 
 class QrCode:
@@ -48,7 +47,7 @@ class QrCode:
         """
         Create an image from the payload
         """
-        qr: QRCode[PilImage] = QRCode(
+        qr: QRCode[PilImage | PyPNGImage] = QRCode(
             error_correction=ERROR_CORRECT_H,
             box_size=self.box_size,
             border=self.border
@@ -61,7 +60,13 @@ class QrCode:
             back_color=self.back_color
         )
         file = BytesIO()
-        img.save(file, format=self.img_format)
+
+        if isinstance(img, PilImage):
+            img.save(file, format=self.img_format)
+        elif isinstance(img, PyPNGImage):
+            img.save(file)
+        else:
+            raise TypeError(f'Unsupported image type: {type(img)}')
         file.seek(0)
         return file
 

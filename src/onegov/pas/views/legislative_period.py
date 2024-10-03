@@ -34,8 +34,8 @@ def view_legislative_periods(
             active=self.active == value,
             url=request.link(self.for_filter(active=value))
         ) for title, value in (
-            (_("Active"), True),
-            (_("Inactive"), False)
+            (_('Active'), True),
+            (_('Inactive'), False)
         )
     ]
 
@@ -63,16 +63,16 @@ def add_legislative_period(
 
     if form.submitted(request):
         legislative_period = self.add(**form.get_useful_data())
-        request.success(_("Added a new legislative period"))
+        request.success(_('Added a new legislative period'))
 
         return request.redirect(request.link(legislative_period))
 
     layout = LegislativePeriodCollectionLayout(self, request)
-    layout.breadcrumbs.append(Link(_("New"), '#'))
+    layout.breadcrumbs.append(Link(_('New'), '#'))
 
     return {
         'layout': layout,
-        'title': _("New legislative period"),
+        'title': _('New legislative period'),
         'form': form,
         'form_width': 'large'
     }
@@ -112,13 +112,13 @@ def edit_legislative_period(
 
     if form.submitted(request):
         form.populate_obj(self)
-        request.success(_("Your changes were saved"))
+        request.success(_('Your changes were saved'))
         return request.redirect(request.link(self))
 
     form.process(obj=self)
 
     layout = LegislativePeriodLayout(self, request)
-    layout.breadcrumbs.append(Link(_("Edit"), '#'))
+    layout.breadcrumbs.append(Link(_('Edit'), '#'))
     layout.editbar_links = []
 
     return {

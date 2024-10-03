@@ -37,7 +37,7 @@ def add_votum(
         updated = ensure_states(votum)
         updated.add(votum)
         update_ticker(request, updated)
-        request.success(_("Added a new votum"))
+        request.success(_('Added a new votum'))
 
         return redirect(
             request.link(votum.agenda_item, fragment=f'votum-{votum.number}'),
@@ -46,14 +46,14 @@ def add_votum(
     form.number.data = form.next_number
 
     layout = VotumCollectionLayout(self, request)
-    layout.breadcrumbs.append(Link(_("New"), '#'))
+    layout.breadcrumbs.append(Link(_('New'), '#'))
     layout.include_editor()
     layout.edit_mode = True
     layout.editmode_links[1] = BackLink(attrs={'class': 'cancel-link'})
 
     return {
         'layout': layout,
-        'title': _("New votum"),
+        'title': _('New votum'),
         'form': form,
     }
 
@@ -76,7 +76,7 @@ def edit_votum(
         updated = ensure_states(self)
         updated.add(self)
         update_ticker(request, updated)
-        request.success(_("Your changes were saved"))
+        request.success(_('Your changes were saved'))
         return request.redirect(
             request.link(self.agenda_item, fragment=f'votum-{self.number}')
         )
@@ -84,7 +84,7 @@ def edit_votum(
     form.process(obj=self)
 
     layout = VotumLayout(self, request)
-    layout.breadcrumbs.append(Link(_("Edit"), '#'))
+    layout.breadcrumbs.append(Link(_('Edit'), '#'))
     layout.edit_mode = True
     layout.editmode_links[1] = BackLink(attrs={'class': 'cancel-link'})
 

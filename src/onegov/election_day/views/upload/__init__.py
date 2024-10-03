@@ -11,7 +11,7 @@ if TYPE_CHECKING:
 def unsupported_year_error(year: int) -> FileImportError:
     return FileImportError(
         _(
-            "The year ${year} is not yet supported", mapping={'year': year}
+            'The year ${year} is not yet supported', mapping={'year': year}
         )
     )
 

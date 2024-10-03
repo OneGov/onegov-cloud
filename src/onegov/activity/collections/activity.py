@@ -32,10 +32,12 @@ if TYPE_CHECKING:
     from collections.abc import Collection, Iterable, Iterator
     from datetime import date
     from markupsafe import Markup
+    from onegov.activity.models import PeriodMeta
     from onegov.activity.models.activity import ActivityState
     from onegov.user import User
     from sqlalchemy.orm import Query, Session
-    from typing_extensions import Self, TypeAlias, TypedDict, Unpack
+    from typing_extensions import TypedDict, Unpack
+    from typing import Self, TypeAlias
 
     AvailabilityType: TypeAlias = Literal['none', 'few', 'many']
     FilterKey: TypeAlias = Literal[
@@ -577,7 +579,7 @@ class ActivityCollection(RangedPagination[ActivityT]):
 
     def available_weeks(
         self,
-        period: Period | None
+        period: 'Period | PeriodMeta | None'
     ) -> 'Iterator[tuple[date, date]]':
         if not period:
             return

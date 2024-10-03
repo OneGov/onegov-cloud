@@ -61,13 +61,13 @@ def add_user_unrestricted(
         user = User()
         form.update_model(user)
         request.session.add(user)
-        request.message(_("User added."), 'success')
+        request.message(_('User added.'), 'success')
         return redirect(layout.success_url)
 
     return {
         'layout': layout,
         'form': form,
-        'button_text': _("Save"),
+        'button_text': _('Save'),
         'cancel': layout.cancel_url
     }
 
@@ -95,13 +95,13 @@ def add_user(
         user = User()
         form.update_model(user)
         request.session.add(user)
-        request.message(_("User added."), 'success')
+        request.message(_('User added.'), 'success')
         return redirect(layout.success_url)
 
     return {
         'layout': layout,
         'form': form,
-        'button_text': _("Save"),
+        'button_text': _('Save'),
         'cancel': layout.cancel_url
     }
 
@@ -138,7 +138,7 @@ def edit_user_unrestricted(
 
     if form.submitted(request):
         logged_out = form.update_model(self)
-        request.message(_("User modified."), 'success')
+        request.message(_('User modified.'), 'success')
         if logged_out:
             return redirect(layout.login_to_url(layout.success_url))
         return redirect(layout.success_url)
@@ -149,7 +149,7 @@ def edit_user_unrestricted(
     return {
         'layout': layout,
         'form': form,
-        'button_text': _("Save"),
+        'button_text': _('Save'),
         'cancel': layout.cancel_url,
     }
 
@@ -175,7 +175,7 @@ def edit_user(
 
     if form.submitted(request):
         logged_out = form.update_model(self)
-        request.message(_("User modified."), 'success')
+        request.message(_('User modified.'), 'success')
         if logged_out:
             return redirect(layout.login_to_url(layout.success_url))
         return redirect(layout.success_url)
@@ -186,7 +186,7 @@ def edit_user(
     return {
         'layout': layout,
         'form': form,
-        'button_text': _("Save"),
+        'button_text': _('Save'),
         'cancel': layout.cancel_url,
     }
 
@@ -202,4 +202,4 @@ def delete_user(self: User, request: 'CoreRequest') -> None:
     request.assert_valid_csrf_token()
     self.logout_all_sessions(request.app)
     UserCollection(request.session).delete(self.username)
-    request.message(_("User deleted."), 'success')
+    request.message(_('User deleted.'), 'success')

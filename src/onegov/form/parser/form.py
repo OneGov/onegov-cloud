@@ -107,8 +107,8 @@ def parse_form(
 def normalize_label_for_dependency(label: str) -> str:
     """ Removes all between '(' and ')' Parentheses (inclusive) """
     if '(' in label and ')' in label:
-        label = re.sub("([(]).*?([)])", "", label)
-        return label[:-1] if label[-1] == " " else label
+        label = re.sub('([(]).*?([)])', '', label)
+        return label[:-1] if label[-1] == ' ' else label
     else:
         return label
 
@@ -464,7 +464,7 @@ class WTFormsClassBuilder(Generic[_FormT]):
         field = getattr(self.form_class, field_id)
         if not field.kwargs.get('render_kw'):
             field.kwargs['render_kw'] = {}
-        field.kwargs['render_kw'].update(dependency.html_data)
+        field.kwargs['render_kw'].update(dependency.html_data(''))
 
     def get_unique_field_id(
         self,

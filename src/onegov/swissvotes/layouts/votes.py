@@ -24,7 +24,7 @@ class VotesLayout(DefaultLayout):
 
     @cached_property
     def title(self) -> str:
-        return _("Votes")
+        return _('Votes')
 
     @cached_property
     def editbar_links(self) -> list[Link | LinkGroup]:
@@ -32,14 +32,14 @@ class VotesLayout(DefaultLayout):
         if self.request.has_role('admin', 'editor'):
             result.append(
                 Link(
-                    text=_("Update dataset on the votes"),
+                    text=_('Update dataset on the votes'),
                     url=self.request.link(self.model.default(), name='update'),
                     attrs={'class': 'upload-icon'}
                 )
             )
             result.append(
                 Link(
-                    text=_("Update metadata on the campaign material"),
+                    text=_('Update metadata on the campaign material'),
                     url=self.request.link(
                         self.model.default(), name='update-metadata'
                     ),
@@ -48,7 +48,7 @@ class VotesLayout(DefaultLayout):
             )
             result.append(
                 Link(
-                    text=_("Update external sources for images"),
+                    text=_('Update external sources for images'),
                     url=self.request.link(
                         self.model.default(),
                         name='update-external-resources'
@@ -58,14 +58,14 @@ class VotesLayout(DefaultLayout):
             )
             result.append(
                 Link(
-                    text=_("Download dataset (CSV)"),
+                    text=_('Download dataset (CSV)'),
                     url=self.request.link(self.model.default(), name='csv'),
                     attrs={'class': 'export-icon'}
                 )
             )
             result.append(
                 Link(
-                    text=_("Download dataset (XLSX)"),
+                    text=_('Download dataset (XLSX)'),
                     url=self.request.link(self.model.default(), name='xlsx'),
                     attrs={'class': 'export-icon'}
                 )
@@ -73,7 +73,7 @@ class VotesLayout(DefaultLayout):
         if self.request.has_role('admin'):
             result.append(
                 Link(
-                    text=_("Delete all votes"),
+                    text=_('Delete all votes'),
                     url=self.request.link(self.model.default(), name='delete'),
                     attrs={'class': 'delete-icon'}
                 )
@@ -83,7 +83,7 @@ class VotesLayout(DefaultLayout):
     @cached_property
     def breadcrumbs(self) -> list[Link]:
         return [
-            Link(_("Homepage"), self.homepage_url),
+            Link(_('Homepage'), self.homepage_url),
             Link(self.title, self.votes_url),
         ]
 
@@ -97,8 +97,8 @@ class VotesActionLayout(DefaultLayout):
     @cached_property
     def breadcrumbs(self) -> list[Link]:
         return [
-            Link(_("Homepage"), self.homepage_url),
-            Link(_("Votes"), self.votes_url),
+            Link(_('Homepage'), self.homepage_url),
+            Link(_('Votes'), self.votes_url),
             Link(self.title, '#'),
         ]
 
@@ -107,25 +107,25 @@ class UpdateVotesLayout(VotesActionLayout):
 
     @cached_property
     def title(self) -> str:
-        return _("Update dataset on the votes")
+        return _('Update dataset on the votes')
 
 
 class UpdateMetadataLayout(VotesActionLayout):
 
     @cached_property
     def title(self) -> str:
-        return _("Update metadata on the campaign material")
+        return _('Update metadata on the campaign material')
 
 
 class UpdateExternalResourcesLayout(VotesActionLayout):
 
     @cached_property
     def title(self) -> str:
-        return _("Update external sources for images")
+        return _('Update external sources for images')
 
 
 class DeleteVotesLayout(VotesActionLayout):
 
     @cached_property
     def title(self) -> str:
-        return _("Delete all votes")
+        return _('Delete all votes')

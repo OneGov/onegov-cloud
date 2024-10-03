@@ -35,7 +35,7 @@ def apply_translator_mutation(
 
     if form.submitted(request):
         form.update_model()
-        request.success(_("Proposed changes applied"))
+        request.success(_('Proposed changes applied'))
         TranslatorMutationMessage.create(
             self.ticket,
             request,
@@ -52,6 +52,6 @@ def apply_translator_mutation(
 
     return {
         'layout': layout,
-        'title': _("Apply proposed changes"),
+        'title': _('Apply proposed changes'),
         'form': form
     }

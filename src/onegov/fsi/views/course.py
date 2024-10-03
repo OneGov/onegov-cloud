@@ -148,7 +148,7 @@ def view_add_course_event(
 
     if form.submitted(request):
         course = self.add(**form.get_useful_data())
-        request.success(_("Added a new course"))
+        request.success(_('Added a new course'))
         return request.redirect(request.link(course))
 
     layout = AddCourseLayout(self, request)
@@ -200,7 +200,7 @@ def view_edit_course_event(
     if form.submitted(request):
         form.update_model(self)
 
-        request.success(_("Your changes were saved"))
+        request.success(_('Your changes were saved'))
         return request.redirect(request.link(self))
 
     if not form.errors:

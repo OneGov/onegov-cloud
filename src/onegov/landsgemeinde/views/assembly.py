@@ -59,18 +59,18 @@ def add_assembly(
 
     if form.submitted(request):
         assembly = self.add(**form.get_useful_data())
-        request.success(_("Added a new assembly"))
+        request.success(_('Added a new assembly'))
 
         return redirect(request.link(assembly))
 
     layout = AssemblyCollectionLayout(self, request)
-    layout.breadcrumbs.append(Link(_("New"), '#'))
+    layout.breadcrumbs.append(Link(_('New'), '#'))
     layout.include_editor()
     layout.edit_mode = True
 
     return {
         'layout': layout,
-        'title': _("New assembly"),
+        'title': _('New assembly'),
         'form': form,
     }
 
@@ -141,7 +141,7 @@ def view_assembly_ticker_head(
         if last_modified:
             response.headers.add(
                 'Last-Modified',
-                last_modified.strftime("%a, %d %b %Y %H:%M:%S GMT")
+                last_modified.strftime('%a, %d %b %Y %H:%M:%S GMT')
             )
 
 
@@ -158,7 +158,7 @@ def view_assembly_states(
 
     layout = AssemblyLayout(self, request)
     layout.editbar_links = []
-    layout.breadcrumbs.append(Link(_("States"), '#'))
+    layout.breadcrumbs.append(Link(_('States'), '#'))
 
     agenda_items = (
         AgendaItemCollection(request.session)
@@ -191,13 +191,13 @@ def edit_assembly(
         updated = ensure_states(self)
         updated.add(self)
         update_ticker(request, updated)
-        request.success(_("Your changes were saved"))
+        request.success(_('Your changes were saved'))
         return request.redirect(request.link(self))
 
     form.process(obj=self)
 
     layout = AssemblyLayout(self, request)
-    layout.breadcrumbs.append(Link(_("Edit"), '#'))
+    layout.breadcrumbs.append(Link(_('Edit'), '#'))
     layout.edit_mode = True
 
     return {

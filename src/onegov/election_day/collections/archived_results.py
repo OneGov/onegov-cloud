@@ -41,7 +41,7 @@ if TYPE_CHECKING:
     from sqlalchemy.orm import Session
     from sqlalchemy.sql import ColumnElement
     from typing import TypeVar
-    from typing_extensions import Self
+    from typing import Self
 
     _T1 = TypeVar('_T1')
     _T2 = TypeVar('_T2')
@@ -358,11 +358,7 @@ class ArchivedResultCollection:
     ) -> None:
         """ Add a new election or vote and create a result entry.  """
 
-        assert (
-            isinstance(item, Election)
-            or isinstance(item, ElectionCompound)
-            or isinstance(item, Vote)
-        )
+        assert isinstance(item, (Election, ElectionCompound, Vote))
 
         self.session.add(item)
         self.session.flush()
@@ -378,11 +374,7 @@ class ArchivedResultCollection:
     ) -> None:
         """ Clears the result of an election or vote.  """
 
-        assert (
-            isinstance(item, Election)
-            or isinstance(item, ElectionCompound)
-            or isinstance(item, Vote)
-        )
+        assert isinstance(item, (Election, ElectionCompound, Vote))
 
         item.clear_results(clear_all)
         self.update(item, request)
@@ -398,11 +390,7 @@ class ArchivedResultCollection:
     ) -> None:
         """ Deletes an election or vote and the associated result entry.  """
 
-        assert (
-            isinstance(item, Election)
-            or isinstance(item, ElectionCompound)
-            or isinstance(item, Vote)
-        )
+        assert isinstance(item, (Election, ElectionCompound, Vote))
 
         url = request.link(item)
         url = replace_url(url, request.app.principal.official_host)
@@ -478,7 +466,7 @@ class SearchableArchivedResultCollection(
 
         def cleanup(word: str, whitelist_chars: str = ',.-_') -> str:
             result = ''.join(
-                (c for c in word if c.isalnum() or c in whitelist_chars)
+                c for c in word if c.isalnum() or c in whitelist_chars
             )
             return f'{result}:*' if word.endswith('*') else result
 
@@ -491,8 +479,12 @@ class SearchableArchivedResultCollection(
         language: str,
         term: str
     ) -> 'ColumnElement[TSVECTOR | None]':
-        """ Usage:
-         model.filter(match_term(model.col, 'german', 'my search term')) """
+        """ Generate a clause element for a given search term.
+
+        Usage::
+
+            model.filter(match_term(model.col, 'german', 'my search term'))
+        """
         document_tsvector = func.to_tsvector(language, column)
         ts_query_object = func.to_tsquery(language, term)
         return document_tsvector.op('@@')(ts_query_object)

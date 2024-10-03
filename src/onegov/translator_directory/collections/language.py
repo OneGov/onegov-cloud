@@ -8,7 +8,7 @@ from onegov.translator_directory.models.language import Language
 from typing import TYPE_CHECKING
 if TYPE_CHECKING:
     from sqlalchemy.orm import Query, Session
-    from typing_extensions import Self
+    from typing import Self
 
 
 class LanguageCollection(GenericCollection[Language], Pagination[Language]):

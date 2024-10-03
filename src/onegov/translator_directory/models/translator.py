@@ -30,7 +30,7 @@ if TYPE_CHECKING:
     from collections.abc import Sequence
     from datetime import date
     from onegov.user import User
-    from typing_extensions import TypeAlias
+    from typing import TypeAlias
 
     from .certificate import LanguageCertificate
     from .language import Language
@@ -149,25 +149,25 @@ class Translator(Base, TimestampMixin, AssociatedFiles, ContentMixin,
 
     # Language Information
     mother_tongues: 'relationship[list[Language]]' = relationship(
-        "Language",
+        'Language',
         secondary=mother_tongue_association_table,
         back_populates='mother_tongues'
     )
     # Arbeitssprache - Wort
     spoken_languages: 'relationship[list[Language]]' = relationship(
-        "Language",
+        'Language',
         secondary=spoken_association_table,
         back_populates='speakers'
     )
     # Arbeitssprache - Schrift
     written_languages: 'relationship[list[Language]]' = relationship(
-        "Language",
+        'Language',
         secondary=written_association_table,
         back_populates='writers'
     )
     # Arbeitssprache - Kommunikationsüberwachung
     monitoring_languages: 'relationship[list[Language]]' = relationship(
-        "Language",
+        'Language',
         secondary=monitoring_association_table,
         back_populates='monitors'
     )

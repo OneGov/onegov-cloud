@@ -18,7 +18,7 @@ if TYPE_CHECKING:
     from onegov.election_day.models import Election
     from sqlalchemy.orm import Query
     from sqlalchemy.orm import Session
-    from typing_extensions import TypeAlias
+    from typing import TypeAlias
     from uuid import UUID
 
     Sublist: TypeAlias = tuple[str, int, str]

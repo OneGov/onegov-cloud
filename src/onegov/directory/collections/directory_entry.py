@@ -15,7 +15,7 @@ if TYPE_CHECKING:
     from markupsafe import Markup
     from onegov.directory.models import Directory
     from sqlalchemy.orm import Query
-    from typing_extensions import Self
+    from typing import Self
 
 
 T = TypeVar('T')
@@ -113,7 +113,7 @@ class DirectoryEntryCollection(
             return value.split(':')[0]
 
         values = [
-            ':'.join((keyword, value))
+            f'{keyword}:{value}'
             for keyword in keywords
             for value in keywords[keyword]
         ]

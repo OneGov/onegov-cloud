@@ -26,8 +26,7 @@ from sqlalchemy import nullsfirst, select  # type:ignore[attr-defined]
 from onegov.ticket import TicketCollection
 from onegov.user import User
 
-from typing import overload, Any, TYPE_CHECKING
-
+from typing import overload, Any, Literal, TYPE_CHECKING
 if TYPE_CHECKING:
     from _typeshed import SupportsRichComparison
     from collections.abc import Callable, Iterable, Iterator, Sequence
@@ -41,8 +40,7 @@ if TYPE_CHECKING:
     from pytz.tzinfo import DstTzInfo, StaticTzInfo
     from sqlalchemy.orm import Query, Session
     from sqlalchemy import Column
-    from typing import TypeVar
-    from typing_extensions import Self, TypeAlias
+    from typing import Self, TypeAlias, TypeVar
 
     _T = TypeVar('_T')
     _DeltaT = TypeVar('_DeltaT')
@@ -60,7 +58,7 @@ EMPTY_PARAGRAPHS = re.compile(r'<p>\s*<br>\s*</p>')
 # regex module in in onegov.core
 #
 # additionally it is used in onegov.org's common.js in javascript variant
-HASHTAG = re.compile(r'#\w{3,}')
+HASHTAG = re.compile(r'(?<![\w/])#\w{3,}')
 IMG_URLS = re.compile(r'<img[^>]*?src="(.*?)"')
 
 
@@ -92,7 +90,7 @@ def get_random_color(seed: str, lightness: float, saturation: float) -> str:
     hue = 100 / (djb2_hash(seed, 360) or 1)
     r, g, b = colorsys.hls_to_rgb(hue, lightness, saturation)
 
-    return '#{0:02x}{1:02x}{2:02x}'.format(
+    return '#{:02x}{:02x}{:02x}'.format(
         int(round(r * 255)),
         int(round(g * 255)),
         int(round(b * 255))
@@ -192,7 +190,7 @@ def annotate_html(
             # find the closest paragraph in the ancestrage, but don't look far
             parent = a.getparent()
 
-            for i in range(0, 3):
+            for i in range(3):
                 if parent is None:
                     break
                 if parent.tag == 'p':
@@ -347,8 +345,8 @@ class ReservationInfo:
 
             return self.request.translate(_(
                 (
-                    "You can only reserve this allocation before ${date} "
-                    "if you live in the following zipcodes: ${zipcodes}"
+                    'You can only reserve this allocation before ${date} '
+                    'if you live in the following zipcodes: ${zipcodes}'
                 ), mapping={
                     'date': layout.format_date(date, 'date_long'),
                     'zipcodes': ', '.join(zipcodes),
@@ -367,7 +365,7 @@ class ReservationInfo:
             self.reservation.end,
             self.reservation.timezone
         ):
-            return self.translate(_("Whole day"))
+            return self.translate(_('Whole day'))
         else:
             return render_time_range(
                 self.reservation.display_start(),
@@ -442,7 +440,7 @@ class AllocationEventInfo:
 
             for allocation in grouped:
                 if allocation.is_master:
-                    events.append(
+                    events.append(  # noqa: PERF401
                         cls(
                             resource,
                             allocation,
@@ -471,7 +469,7 @@ class AllocationEventInfo:
     @property
     def event_time(self) -> str:
         if self.allocation.whole_day:
-            return self.translate(_("Whole day"))
+            return self.translate(_('Whole day'))
         else:
             return render_time_range(
                 self.allocation.display_start(),
@@ -489,7 +487,7 @@ class AllocationEventInfo:
     @property
     def event_title(self) -> str:
         if self.allocation.partly_available:
-            available = self.translate(_("${percent}% Available", mapping={
+            available = self.translate(_('${percent}% Available', mapping={
                 'percent': int(self.availability)
             }))
         else:
@@ -499,12 +497,12 @@ class AllocationEventInfo:
 
             if quota == 1:
                 if quota_left:
-                    available = self.translate(_("Available"))
+                    available = self.translate(_('Available'))
                 else:
-                    available = self.translate(_("Unavailable"))
+                    available = self.translate(_('Unavailable'))
             else:
                 available = self.translate(
-                    _("${num} Available", mapping={
+                    _('${num} Available', mapping={
                         'num': quota_left
                     })
                 )
@@ -550,12 +548,12 @@ class AllocationEventInfo:
     def event_actions(self) -> 'Iterator[Link]':
         if self.request.is_manager:
             yield Link(
-                _("Edit"),
+                _('Edit'),
                 self.request.link(self.allocation, name='edit'),
             )
 
             yield Link(
-                _("Tickets"),
+                _('Tickets'),
                 self.request.link(TicketCollection(
                     session=self.request.session,
                     handler='RSV',
@@ -568,28 +566,28 @@ class AllocationEventInfo:
 
             if self.availability == 100.0:
                 yield DeleteLink(
-                    _("Delete"),
+                    _('Delete'),
                     self.request.link(self.allocation),
-                    confirm=_("Do you really want to delete this allocation?"),
+                    confirm=_('Do you really want to delete this allocation?'),
                     extra_information=self.event_identification,
-                    yes_button_text=_("Delete allocation")
+                    yes_button_text=_('Delete allocation')
                 )
             else:
                 yield Link(
-                    _("Occupancy"),
+                    _('Occupancy'),
                     self.occupancy_link
                 )
 
                 yield DeleteLink(
-                    _("Delete"),
+                    _('Delete'),
                     self.request.link(self.allocation),
                     confirm=_(
                         "This allocation can't be deleted because there are "
                         "existing reservations associated with it."
                     ),
                     extra_information=_(
-                        "To delete this allocation, all existing reservations "
-                        "need to be cancelled first."
+                        'To delete this allocation, all existing reservations '
+                        'need to be cancelled first.'
                     )
                 )
         elif self.availability < 100.0 and self.request.has_role('member'):
@@ -599,7 +597,7 @@ class AllocationEventInfo:
                 False
             ):
                 yield Link(
-                    _("Occupancy"),
+                    _('Occupancy'),
                     self.occupancy_link
                 )
 
@@ -663,7 +661,7 @@ class FindYourSpotEventInfo:
             return render_time_range(*self.slot_time)
 
         if self.allocation.whole_day:
-            return self.translate(_("Whole day"))
+            return self.translate(_('Whole day'))
         else:
             return render_time_range(
                 self.allocation.display_start(),
@@ -691,7 +689,7 @@ class FindYourSpotEventInfo:
     @property
     def available(self) -> str:
         if self.allocation.partly_available:
-            available = self.translate(_("${percent}% Available", mapping={
+            available = self.translate(_('${percent}% Available', mapping={
                 'percent': int(self.availability)
             }))
         else:
@@ -701,12 +699,12 @@ class FindYourSpotEventInfo:
 
             if quota == 1:
                 if quota_left:
-                    available = self.translate(_("Available"))
+                    available = self.translate(_('Available'))
                 else:
-                    available = self.translate(_("Unavailable"))
+                    available = self.translate(_('Unavailable'))
             else:
                 available = self.translate(
-                    _("${num} Available", mapping={
+                    _('${num} Available', mapping={
                         'num': quota_left
                     })
                 )
@@ -744,61 +742,61 @@ class FindYourSpotEventInfo:
 
 libres_error_messages = {
     libres_errors.OverlappingAllocationError:
-    _("A conflicting allocation exists for the requested time period."),
+    _('A conflicting allocation exists for the requested time period.'),
 
     libres_errors.OverlappingReservationError:
-    _("A conflicting reservation exists for the requested time period."),
+    _('A conflicting reservation exists for the requested time period.'),
 
     libres_errors.AffectedReservationError:
-    _("An existing reservation would be affected by the requested change."),
+    _('An existing reservation would be affected by the requested change.'),
 
     libres_errors.AffectedPendingReservationError:
-    _("A pending reservation would be affected by the requested change."),
+    _('A pending reservation would be affected by the requested change.'),
 
     libres_errors.AlreadyReservedError:
-    _("The requested period is no longer available."),
+    _('The requested period is no longer available.'),
 
     libres_errors.NotReservableError:
-    _("No reservable slot found."),
+    _('No reservable slot found.'),
 
     libres_errors.ReservationTooLong:
     _("Reservations can't be made for more than 24 hours at a time."),
 
     libres_errors.ReservationParametersInvalid:
-    _("The given reservation paramters are invalid."),
+    _('The given reservation paramters are invalid.'),
 
     libres_errors.InvalidReservationToken:
-    _("The given reservation token is invalid."),
+    _('The given reservation token is invalid.'),
 
     libres_errors.InvalidReservationError:
-    _("The given reservation paramters are invalid."),
+    _('The given reservation paramters are invalid.'),
 
     libres_errors.QuotaOverLimit:
-    _("The requested number of reservations is higher than allowed."),
+    _('The requested number of reservations is higher than allowed.'),
 
     libres_errors.InvalidQuota:
-    _("The requested quota is invalid (must be at least one)."),
+    _('The requested quota is invalid (must be at least one).'),
 
     libres_errors.QuotaImpossible:
-    _("The allocation does not have enough free spots."),
+    _('The allocation does not have enough free spots.'),
 
     libres_errors.InvalidAllocationError:
-    _("The resulting allocation would be invalid."),
+    _('The resulting allocation would be invalid.'),
 
     libres_errors.NoReservationsToConfirm:
-    _("No reservations to confirm."),
+    _('No reservations to confirm.'),
 
     libres_errors.TimerangeTooLong:
-    _("The given timerange is longer than the existing allocation."),
+    _('The given timerange is longer than the existing allocation.'),
 
     libres_errors.ReservationTooShort:
-    _("Reservation too short. A reservation must last at least 5 minutes.")
+    _('Reservation too short. A reservation must last at least 5 minutes.')
 }
 
 
 def get_libres_error(e: Exception, request: 'OrgRequest') -> str:
     etype = type(e)
-    assert etype in libres_error_messages, f"Unknown libres error {etype}"
+    assert etype in libres_error_messages, f'Unknown libres error {etype}'
 
     return request.translate(libres_error_messages[etype])
 
@@ -1029,28 +1027,28 @@ def group_by_column(
 ) -> dict[str, list[Any]]:
     """ Groups the given query by the given group.
 
-        :param request:
-            The current request used for translation and to exclude invisible
-            records.
+    :param request:
+        The current request used for translation and to exclude invisible
+        records.
 
-        :param query:
-            The query that should be grouped
+    :param query:
+        The query that should be grouped
 
-        :param group_column:
-            The column by which the grouping should happen.
+    :param group_column:
+        The column by which the grouping should happen.
 
-        :param sort_column:
-            The column by which the records should be sorted.
+    :param sort_column:
+        The column by which the records should be sorted.
 
-        :param default_group:
-            The group in use if the found group is empty (optional).
+    :param default_group:
+        The group in use if the found group is empty (optional).
 
-        :param transform:
-            Called with each record to transform the result (optional).
+    :param transform:
+        Called with each record to transform the result (optional).
 
     """
 
-    default_group = default_group or request.translate(_("General"))
+    default_group = default_group or request.translate(_('General'))
 
     query = query.order_by(nullsfirst(group_column))
     records = request.exclude_invisible(query)
@@ -1184,6 +1182,19 @@ def widest_access(*accesses: str) -> str:
     return ORDERED_ACCESS[index]
 
 
+@overload
+def extract_categories_and_subcategories(
+    categories: dict[str, list[dict[str, list[str]] | str]],
+    flattened: Literal[False] = False
+) -> tuple[list[str], list[list[str]]]: ...
+
+@overload
+def extract_categories_and_subcategories(
+    categories: dict[str, list[dict[str, list[str]] | str]],
+    flattened: Literal[True]
+) -> list[str]: ...
+
+
 def extract_categories_and_subcategories(
     categories: dict[str, list[dict[str, list[str]] | str]],
     flattened: bool = False
@@ -1210,7 +1221,7 @@ def extract_categories_and_subcategories(
     cats: list[str] = []
     subcats: list[list[str]] = []
 
-    for org_name, items in categories.items():
+    for items in categories.values():
         for item in items:
             if isinstance(item, dict):
                 for topic, subs in item.items():

@@ -56,7 +56,7 @@ if TYPE_CHECKING:
     from onegov.form import Form
     from onegov.form.types import (
         FormT, Filter, PricingRules, RawFormValue, Validators, Widget)
-    from typing_extensions import Self, TypedDict
+    from typing import TypedDict, Self
     from webob.request import _FieldStorageWithFile
     from wtforms.form import BaseForm
     from wtforms.meta import (
@@ -276,13 +276,13 @@ class UploadFileWithORMSupport(UploadField):
             setattr(obj, name, self.create())
 
         else:
-            raise NotImplementedError(f"Unknown action: {self.action}")
+            raise NotImplementedError(f'Unknown action: {self.action}')
 
     def process_data(self, value: 'File | None') -> None:
         if value:
             try:
                 size = value.reference.file.content_length
-            except IOError:
+            except OSError:
                 # if the file doesn't exist on disk we try to fail
                 # silently for now
                 size = -1
@@ -621,7 +621,7 @@ class ChosenSelectMultipleEmailField(SelectMultipleField):
             try:
                 validate_email(email)
             except EmailNotValidError as e:
-                raise ValidationError(_("Not a valid email")) from e
+                raise ValidationError(_('Not a valid email')) from e
 
 
 class PreviewField(Field):
@@ -688,7 +688,7 @@ class DateTimeLocalField(DateTimeLocalFieldBase):
         format: str = '%Y-%m-%dT%H:%M',
         **kwargs: Any
     ):
-        super(DateTimeLocalField, self).__init__(
+        super().__init__(
             label=label,
             validators=validators,
             format=format,
@@ -699,7 +699,7 @@ class DateTimeLocalField(DateTimeLocalFieldBase):
         if valuelist:
             date_str = 'T'.join(valuelist).replace(' ', 'T')  # type:ignore
             valuelist = [date_str[:16]]
-        super(DateTimeLocalField, self).process_formdata(valuelist)
+        super().process_formdata(valuelist)
 
 
 class TimezoneDateTimeField(DateTimeLocalField):

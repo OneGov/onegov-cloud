@@ -87,21 +87,18 @@ def test_with_people(client):
         .filter(Person.last_name == 'Gordon') \
         .one()
 
-    ming = client.app.session().query(Person) \
-        .filter(Person.last_name == 'Ming') \
-        .one()
-
     new_page.form['title'] = 'About Flash'
-    new_page.form['people_' + gordon.id.hex] = True
-    new_page.form['people_' + gordon.id.hex + '_function'] = 'Astronaut'
+    new_page.form['people-0-person'] = gordon.id.hex
+    new_page.form['people-0-context_specific_function'] = 'Astronaut'
+    new_page.form['people-0-display_function_in_person_directory'] = True
     edit_page = new_page.form.submit().follow().click('Bearbeiten')
 
-    assert edit_page.form['people_' + gordon.id.hex].value == 'y'
-    assert edit_page.form['people_' + gordon.id.hex + '_function'].value \
-           == 'Astronaut'
+    assert edit_page.form['people-0-person'].value == gordon.id.hex
+    assert edit_page.form['people-0-context_specific_function'].value == (
+           'Astronaut')
 
-    assert edit_page.form['people_' + ming.id.hex].value is None
-    assert edit_page.form['people_' + ming.id.hex + '_function'].value == ''
+    assert edit_page.form['people-1-person'].value == ''
+    assert edit_page.form['people-1-context_specific_function'].value == ''
 
 
 def test_people_view_organisation_fiter(client):
@@ -289,8 +286,9 @@ def test_delete_linked_person_issue_149(client):
 
     new_page = client.get('/topics/organisation').click('Thema')
     new_page.form['title'] = 'About Flash'
-    new_page.form['people_' + gordon.id.hex] = True
-    new_page.form['people_' + gordon.id.hex + '_function'] = 'Astronaut'
+    new_page.form['people-0-person'] = gordon.id.hex
+    new_page.form['people-0-context_specific_function'] = 'Astronaut'
+    new_page.form['people-0-display_function_in_person_directory'] = True
     edit_page = new_page.form.submit().follow().click('Bearbeiten')
 
     person = client.get('/people').click('Gordon Flash')

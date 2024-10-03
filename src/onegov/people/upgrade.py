@@ -116,13 +116,11 @@ def add_order_within_person_column(context: UpgradeContext) -> None:
     def groupkey(result: Any) -> str:
         return result[0].person_id
 
-    agency_list = []
-    for result in session.query(
-            AgencyMembership.id,
-            AgencyMembership.agency_id,
-            AgencyMembership.person_id,
-    ):
-        agency_list.append(result)
+    agency_list = session.query(
+        AgencyMembership.id,
+        AgencyMembership.agency_id,
+        AgencyMembership.person_id,
+    ).all()
 
     title_list = []
     for result in agency_list:

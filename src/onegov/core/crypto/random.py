@@ -1,13 +1,13 @@
 """ Use Markov chains to generate random text that sounds Japanese.
-    This makes random pronounceable passwords that are both strong and easy
-    to memorize.
+This makes random pronounceable passwords that are both strong and easy
+to memorize.
 
-    Of course English or any other language could be used in the sample text.
+Of course English or any other language could be used in the sample text.
 
-    See more details at http://exyr.org/2011/random-pronounceable-passwords/
+See more details at http://exyr.org/2011/random-pronounceable-passwords/
 
-    Author: Simon Sapin
-    License: BSD
+Author: Simon Sapin
+License: BSD
 """
 
 import string
@@ -36,7 +36,7 @@ def random_password(length: int = 16) -> str:
 # by Murasaki Shikibu.
 # Source: http://etext.lib.virginia.edu/japanese/genji/roman.html
 
-japanese = '''
+japanese = """
 Idure no ohom-toki ni ka, nyougo, kaui amata saburahi tamahi keru naka ni,
 ito yamgotonaki kiha ni ha ara nu ga, sugurete tokimeki tamahu ari keri.
 
@@ -95,7 +95,7 @@ mo ohokari. Koto ni hure te kazu sira zu kurusiki koto nomi masare ba, ito itau
 omohi wabi taru wo, itodo ahare to go-ran-zi te, Kourau-den ni motoyori
 saburahi tamahu Kaui no zausi wo hoka ni utusa se tamahi te, Uhe-tubone ni
 tamaha su. Sono urami masite yara m kata nasi.
-'''
+"""
 
 
 class MarkovChain:
@@ -134,7 +134,7 @@ class MarkovChain:
         # Like random.choice() but with a different weight for each element
         rand = secrets.randbelow(self.totals[state])
         # Using bisection here could be faster, but simplicity prevailed.
-        # (Also it’s not that slow with 26 states or so.)
+        # (Also it's not that slow with 26 states or so.)
         for next_state, weight in nexts:
             if rand < weight:
                 return next_state

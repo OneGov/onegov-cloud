@@ -42,6 +42,7 @@ class Organization(AdjacencyList, ContentMixin, TimestampMixin):
         # we need to override these attributes to get the correct base class
         parent: relationship['Organization | None']
         children: relationship[Sequence['Organization']]
+
         @property
         def root(self) -> 'Organization': ...
         @property

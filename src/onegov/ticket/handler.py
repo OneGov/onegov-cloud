@@ -10,7 +10,7 @@ if TYPE_CHECKING:
     from onegov.pay import Payment
     from onegov.ticket.model import Ticket
     from sqlalchemy.orm import Query, Session
-    from typing_extensions import TypeAlias
+    from typing import TypeAlias
     from uuid import UUID
 
     _LinkOrCallback: TypeAlias = tuple[str, str] | Callable[[CoreRequest], str]
@@ -175,7 +175,7 @@ class Handler:
 
     @classmethod
     def handle_extra_parameters(
-        self,
+        cls,
         session: 'Session',
         query: _Q,
         extra_parameters: dict[str, Any]
@@ -233,7 +233,6 @@ class Handler:
         """The handler knows best what to do when a ticket is called for
         deletion. """
         assert self.ticket_deletable
-        pass
 
 
 class HandlerRegistry:

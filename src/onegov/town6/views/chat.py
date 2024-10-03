@@ -54,7 +54,7 @@ def view_chats_staff(
             args: RenderData = {
                 'layout': DefaultMailLayout(object(), request),
                 'title': request.translate(
-                    _("Chat History with ${org}", mapping={
+                    _('Chat History with ${org}', mapping={
                         'org': request.app.org.title
                     })
                 ),
@@ -80,7 +80,7 @@ def view_chats_staff(
                 send_ticket_mail(
                     request=request,
                     template='mail_turned_chat_into_ticket.pt',
-                    subject=_("Your Chat has been turned into a ticket"),
+                    subject=_('Your Chat has been turned into a ticket'),
                     receivers=(chat.email, ),
                     ticket=ticket,
                     content={

@@ -160,7 +160,7 @@ class TranslatorForm(Form, FormChoicesMixin, DrivingDistanceMixin):
         choices=tuple(
             (id_, label) for id_, label in ADMISSIONS.items()
         ),
-        default=list(ADMISSIONS)[0]
+        default=next(iter(ADMISSIONS))
     )
 
     withholding_tax = BooleanField(
@@ -212,12 +212,12 @@ class TranslatorForm(Form, FormChoicesMixin, DrivingDistanceMixin):
     )
 
     coordinates = CoordinatesField(
-        label=_("Location"),
+        label=_('Location'),
         description=_(
-            "Search for the exact address to set a marker. The address fields "
-            "beneath are filled out automatically."
+            'Search for the exact address to set a marker. The address fields '
+            'beneath are filled out automatically.'
         ),
-        fieldset=_("Address"),
+        fieldset=_('Address'),
         render_kw={'data-map-type': 'marker'}
     )
 
@@ -348,9 +348,7 @@ class TranslatorForm(Form, FormChoicesMixin, DrivingDistanceMixin):
 
     expertise_professional_guilds = MultiCheckboxField(
         label=_('Expertise by professional guild'),
-        choices=[
-            (id_, label) for id_, label in PROFESSIONAL_GUILDS.items()
-        ]
+        choices=list(PROFESSIONAL_GUILDS.items())
     )
 
     expertise_professional_guilds_other = TagsField(
@@ -359,9 +357,7 @@ class TranslatorForm(Form, FormChoicesMixin, DrivingDistanceMixin):
 
     expertise_interpreting_types = MultiCheckboxField(
         label=_('Expertise by interpreting type'),
-        choices=[
-            (id_, label) for id_, label in INTERPRETING_TYPES.items()
-        ]
+        choices=list(INTERPRETING_TYPES.items())
     )
 
     proof_of_preconditions = StringField(
@@ -482,7 +478,7 @@ class TranslatorForm(Form, FormChoicesMixin, DrivingDistanceMixin):
         trs = query(Translator).filter_by(email=field.data).first()
         if trs:
             raise ValidationError(
-                _("A translator with this email already exists"))
+                _('A translator with this email already exists'))
 
     def update_association(
         self,
@@ -609,10 +605,10 @@ class TranslatorSearchForm(Form, FormChoicesMixin):
     )
 
     order_desc = RadioField(
-        label=_("Order direction"),
+        label=_('Order direction'),
         choices=(
-            ('0', _("Ascending")),
-            ('1', _("Descending"))
+            ('0', _('Ascending')),
+            ('1', _('Descending'))
         ),
         default='0'
     )

@@ -39,7 +39,7 @@ def view_organizations(
     roots = self.query().filter(Organization.parent_id.is_(None))
 
     return {
-        'title': _("Organizations"),
+        'title': _('Organizations'),
         'layout': layout,
         'roots': roots,
         'export': request.link(self, name='export'),
@@ -67,7 +67,7 @@ def view_organizations_order(
     roots = self.query().filter(Organization.parent_id.is_(None))
 
     return {
-        'title': _("Organizations"),
+        'title': _('Organizations'),
         'layout': layout,
         'roots': roots
     }
@@ -115,14 +115,14 @@ def create_organization(
             external_name=form.external_name.data
         )
         organization.parent_id = form.parent.data or None
-        request.message(_("Organization added."), 'success')
+        request.message(_('Organization added.'), 'success')
         return redirect(layout.manage_organizations_link)
 
     return {
         'layout': layout,
         'form': form,
-        'title': _("New Organization"),
-        'button_text': _("Save"),
+        'title': _('New Organization'),
+        'button_text': _('Save'),
         'cancel': layout.manage_organizations_link
     }
 
@@ -148,7 +148,7 @@ def edit_organization(
     layout = Layout(self, request)
     if form.submitted(request):
         form.update_model(self)
-        request.message(_("Organization modified."), 'success')
+        request.message(_('Organization modified.'), 'success')
         return redirect(layout.manage_organizations_link)
 
     if not form.errors:
@@ -158,8 +158,8 @@ def edit_organization(
         'layout': layout,
         'form': form,
         'title': self.title,
-        'subtitle': _("Edit Organization"),
-        'button_text': _("Save"),
+        'subtitle': _('Edit Organization'),
+        'button_text': _('Save'),
         'cancel': layout.manage_organizations_link,
     }
 
@@ -187,22 +187,22 @@ def delete_organization(
     if self.children or self.in_use:
         request.message(
             _(
-                "Only unused organizations with no sub-organisations may be "
-                "deleted."
+                'Only unused organizations with no sub-organisations may be '
+                'deleted.'
             ),
             'alert'
         )
         return {
             'layout': layout,
             'title': self.title,
-            'subtitle': _("Delete Organization"),
+            'subtitle': _('Delete Organization'),
             'show_form': False
         }
 
     if form.submitted(request):
         collection = OrganizationCollection(session)
         collection.delete(self)
-        request.message(_("Organization deleted."), 'success')
+        request.message(_('Organization deleted.'), 'success')
         return redirect(layout.manage_organizations_link)
 
     return {
@@ -213,8 +213,8 @@ def delete_organization(
         'layout': layout,
         'form': form,
         'title': self.title,
-        'subtitle': _("Delete Organization"),
-        'button_text': _("Delete Organization"),
+        'subtitle': _('Delete Organization'),
+        'button_text': _('Delete Organization'),
         'button_class': 'alert',
         'cancel': layout.manage_organizations_link
     }
@@ -238,14 +238,14 @@ def export_organizations(
     workbook = Workbook(output)
 
     worksheet = workbook.add_worksheet()
-    worksheet.name = request.translate(_("Organizations"))
+    worksheet.name = request.translate(_('Organizations'))
     worksheet.write_row(0, 0, (
-        request.translate(_("ID")),
-        request.translate(_("Name")),
-        request.translate(_("Title")),
-        request.translate(_("Active")),
-        request.translate(_("External ID")),
-        request.translate(_("Parent Organization"))
+        request.translate(_('ID')),
+        request.translate(_('Name')),
+        request.translate(_('Title')),
+        request.translate(_('Active')),
+        request.translate(_('External ID')),
+        request.translate(_('Parent Organization'))
     ))
 
     index = 0
@@ -278,7 +278,7 @@ def export_organizations(
         'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'
     )
     response.content_disposition = 'inline; filename={}-{}.xlsx'.format(
-        request.translate(_("Organizations")).lower(),
+        request.translate(_('Organizations')).lower(),
         utcnow().strftime('%Y%m%d%H%M')
     )
     response.body = output.read()

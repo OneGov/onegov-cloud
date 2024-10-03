@@ -7,12 +7,10 @@ from typing_extensions import ParamSpec, Never, TypeAlias
 
 _CallbackArgs: TypeAlias = tuple[Any, Callable[..., Any], list[Any]]
 
-
 class Callback(NamedTuple):
     func: Callable[..., Any]
     backref: Incomplete | None
     fullpath: list[Incomplete]
-
 
 class PropertyObserver:
     listener_args: list[tuple[type[Any], str, Callable[..., Any]]]

@@ -68,7 +68,7 @@ class DefaultLayout(BaseLayout):
             url=self.request.class_link(
                 VacationActivity,
                 {'name': activity.name},
-                name="offer-again"
+                name='offer-again'
             ),
             traits=(
                 Confirm(
@@ -76,12 +76,12 @@ class DefaultLayout(BaseLayout):
                         'Do you really want to provide "${title}" again?',
                         mapping={'title': activity.title}
                     ),
-                    _("You will have to request publication again"),
-                    _("Provide Again"),
-                    _("Cancel")
+                    _('You will have to request publication again'),
+                    _('Provide Again'),
+                    _('Cancel')
                 ),
                 Intercooler(
-                    request_method="POST",
+                    request_method='POST',
                     redirect_after=self.request.class_link(
                         VacationActivity, {'name': activity.name},
                     )
@@ -111,8 +111,8 @@ class VacationActivityCollectionLayout(DefaultLayout):
     @cached_property
     def breadcrumbs(self) -> list[Link]:
         return [
-            Link(_("Homepage"), self.homepage_url),
-            Link(_("Activities"), self.request.class_link(
+            Link(_('Homepage'), self.homepage_url),
+            Link(_('Activities'), self.request.class_link(
                 VacationActivityCollection)),
         ]
 
@@ -120,7 +120,7 @@ class VacationActivityCollectionLayout(DefaultLayout):
     def organiser_links(self) -> 'Iterator[Link | LinkGroup]':
         if self.app.active_period:
             yield Link(
-                text=_("Submit Activity"),
+                text=_('Submit Activity'),
                 url=self.request.link(self.model, name='new'),
                 attrs={'class': 'new-activity'}
             )
@@ -144,7 +144,7 @@ class VacationActivityCollectionLayout(DefaultLayout):
 
         if activities:
             return LinkGroup(
-                _("Provide activity again"),
+                _('Provide activity again'),
                 tuple(self.offer_again_link(a, a.title) for a in activities),
                 right_side=False,
                 classes=('provide-activity-again', )
@@ -200,20 +200,20 @@ class BookingCollectionLayout(DefaultLayout):
                           and self.app.active_period.wishlist_phase)
 
         if self.user.username == self.request.current_username:
-            return wishlist_phase and _("Wishlist") or _("Bookings")
+            return wishlist_phase and _('Wishlist') or _('Bookings')
         elif wishlist_phase:
-            return _("Wishlist of ${user}", mapping={
+            return _('Wishlist of ${user}', mapping={
                 'user': self.user.title
             })
         else:
-            return _("Bookings of ${user}", mapping={
+            return _('Bookings of ${user}', mapping={
                 'user': self.user.title
             })
 
     @cached_property
     def breadcrumbs(self) -> list[Link]:
         return [
-            Link(_("Homepage"), self.homepage_url),
+            Link(_('Homepage'), self.homepage_url),
             Link(self.title, self.request.link(self.model))
         ]
 
@@ -227,17 +227,17 @@ class GroupInviteLayout(DefaultLayout):
 
         if self.request.is_logged_in:
             return [
-                Link(_("Homepage"), self.homepage_url),
+                Link(_('Homepage'), self.homepage_url),
                 Link(
-                    wishlist_phase and _("Wishlist") or _("Bookings"),
+                    wishlist_phase and _('Wishlist') or _('Bookings'),
                     self.request.class_link(BookingCollection)
                 ),
-                Link(_("Group"), '#')
+                Link(_('Group'), '#')
             ]
         else:
             return [
-                Link(_("Homepage"), self.homepage_url),
-                Link(_("Group"), '#')
+                Link(_('Homepage'), self.homepage_url),
+                Link(_('Group'), '#')
             ]
 
 
@@ -259,9 +259,9 @@ class VacationActivityFormLayout(DefaultLayout):
     @cached_property
     def breadcrumbs(self) -> list[Link]:
         return [
-            Link(_("Homepage"), self.homepage_url),
+            Link(_('Homepage'), self.homepage_url),
             # FIXME: This breadcrumb seems wrong for VacationActivity
-            Link(_("Activities"), self.request.link(self.model)),
+            Link(_('Activities'), self.request.link(self.model)),
             Link(self.title, '#')
         ]
 
@@ -288,8 +288,8 @@ class OccasionFormLayout(DefaultLayout):
     @cached_property
     def breadcrumbs(self) -> list[Link]:
         return [
-            Link(_("Homepage"), self.homepage_url),
-            Link(_("Activities"), self.request.class_link(
+            Link(_('Homepage'), self.homepage_url),
+            Link(_('Activities'), self.request.class_link(
                 VacationActivityCollection)),
             Link(self.model.title, self.request.link(self.model)),
             Link(self.title, '#')
@@ -314,8 +314,8 @@ class VacationActivityLayout(DefaultLayout):
     @cached_property
     def breadcrumbs(self) -> list[Link]:
         return [
-            Link(_("Homepage"), self.homepage_url),
-            Link(_("Activities"), self.request.class_link(
+            Link(_('Homepage'), self.homepage_url),
+            Link(_('Activities'), self.request.class_link(
                 VacationActivityCollection)),
             Link(self.model.title, self.request.link(self.model))
         ]
@@ -349,66 +349,66 @@ class VacationActivityLayout(DefaultLayout):
         if self.request.is_admin or self.is_owner:
             if self.model.state == 'archived' and period:
                 links.append(
-                    self.offer_again_link(self.model, _("Provide Again")))
+                    self.offer_again_link(self.model, _('Provide Again')))
 
         if self.is_editable:
 
             if self.model.state == 'preview':
                 if not period:
                     links.append(Link(
-                        text=_("Request Publication"),
+                        text=_('Request Publication'),
                         url='#',
                         attrs={'class': 'request-publication'},
                         traits=(
                             Block(
                                 _(
-                                    "There is currently no active period. "
-                                    "Please retry once a period has been "
-                                    "activated."
+                                    'There is currently no active period. '
+                                    'Please retry once a period has been '
+                                    'activated.'
                                 ),
-                                no=_("Cancel")
+                                no=_('Cancel')
                             ),
                         )
                     ))
                 elif self.model.has_occasion_in_period(period):
                     links.append(Link(
-                        text=_("Request Publication"),
+                        text=_('Request Publication'),
                         url=self.request.link(self.model, name='propose'),
                         attrs={'class': 'request-publication'},
                         traits=(
                             Confirm(
                                 _(
-                                    "Do you really want to request "
-                                    "publication?"
+                                    'Do you really want to request '
+                                    'publication?'
                                 ),
-                                _("This cannot be undone."),
-                                _("Request Publication")
+                                _('This cannot be undone.'),
+                                _('Request Publication')
                             ),
                             Intercooler(
-                                request_method="POST",
+                                request_method='POST',
                                 redirect_after=self.request.link(self.model)
                             )
                         )
                     ))
                 else:
                     links.append(Link(
-                        text=_("Request Publication"),
+                        text=_('Request Publication'),
                         url='#',
                         attrs={'class': 'request-publication'},
                         traits=(
                             Block(
                                 _(
-                                    "Please add at least one occasion "
-                                    "before requesting publication."
+                                    'Please add at least one occasion '
+                                    'before requesting publication.'
                                 ),
-                                no=_("Cancel")
+                                no=_('Cancel')
                             ),
                         )
                     ))
 
                 if not self.model.publication_requests:
                     links.append(Link(
-                        text=_("Discard"),
+                        text=_('Discard'),
                         url=self.csrf_protected_url(
                             self.request.link(self.model)
                         ),
@@ -418,14 +418,14 @@ class VacationActivityLayout(DefaultLayout):
                                 'Do you really want to discard "${title}"?',
                                 mapping={'title': self.model.title}
                             ), _(
-                                "This cannot be undone."
+                                'This cannot be undone.'
                             ), _(
-                                "Discard Activity"
+                                'Discard Activity'
                             ), _(
-                                "Cancel")
+                                'Cancel')
                             ),
                             Intercooler(
-                                request_method="DELETE",
+                                request_method='DELETE',
                                 redirect_after=self.request.class_link(
                                     VacationActivityCollection
                                 )
@@ -434,31 +434,31 @@ class VacationActivityLayout(DefaultLayout):
                     ))
 
             links.append(Link(
-                text=_("Edit"),
+                text=_('Edit'),
                 url=self.request.link(self.model, name='edit'),
                 attrs={'class': 'edit-link'}
             ))
 
             if not self.request.app.periods:
                 links.append(Link(
-                    text=_("New Occasion"),
+                    text=_('New Occasion'),
                     url='#',
                     attrs={'class': 'new-occasion'},
                     traits=(
                         Block(
-                            _("Occasions cannot be created yet"),
+                            _('Occasions cannot be created yet'),
                             _(
-                                "There are no periods defined yet. At least "
-                                "one period needs to be defined before "
-                                "occasions can be created."
+                                'There are no periods defined yet. At least '
+                                'one period needs to be defined before '
+                                'occasions can be created.'
                             ),
-                            _("Cancel")
+                            _('Cancel')
                         )
                     )
                 ))
             else:
                 links.append(Link(
-                    text=_("New Occasion"),
+                    text=_('New Occasion'),
                     url=self.request.link(self.model, 'new-occasion'),
                     attrs={'class': 'new-occasion'}
                 ))
@@ -466,7 +466,7 @@ class VacationActivityLayout(DefaultLayout):
         if self.request.is_admin or self.is_owner:
             if self.attendees:
                 links.append(Link(
-                    text=_("Attendees"),
+                    text=_('Attendees'),
                     url=self.request.link(self.attendees),
                     attrs={'class': 'show-attendees'}
                 ))
@@ -474,7 +474,7 @@ class VacationActivityLayout(DefaultLayout):
         if self.request.is_admin:
             if self.model.state != 'preview' and self.ticket:
                 links.append(Link(
-                    text=_("Show Ticket"),
+                    text=_('Show Ticket'),
                     url=self.request.link(self.ticket),
                     attrs={'class': 'show-ticket'}
                 ))
@@ -487,19 +487,19 @@ class PeriodCollectionLayout(DefaultLayout):
     @cached_property
     def breadcrumbs(self) -> list[Link]:
         return [
-            Link(_("Homepage"), self.homepage_url),
+            Link(_('Homepage'), self.homepage_url),
             Link(
-                _("Activities"),
+                _('Activities'),
                 self.request.class_link(VacationActivityCollection)
             ),
-            Link(_("Manage Periods"), '#')
+            Link(_('Manage Periods'), '#')
         ]
 
     @cached_property
     def editbar_links(self) -> list[Link | LinkGroup]:
         return [
             Link(
-                _("New Period"),
+                _('New Period'),
                 self.request.class_link(PeriodCollection, name='new'),
                 attrs={'class': 'new-period'}
             ),
@@ -522,13 +522,13 @@ class PeriodFormLayout(DefaultLayout):
     @cached_property
     def breadcrumbs(self) -> list[Link]:
         return [
-            Link(_("Homepage"), self.homepage_url),
+            Link(_('Homepage'), self.homepage_url),
             Link(
-                _("Activities"),
+                _('Activities'),
                 self.request.class_link(VacationActivityCollection)
             ),
             Link(
-                _("Manage Periods"),
+                _('Manage Periods'),
                 self.request.class_link(PeriodCollection)
             ),
             Link(self.title, '#')
@@ -544,12 +544,12 @@ class MatchCollectionLayout(DefaultLayout):
     @cached_property
     def breadcrumbs(self) -> list[Link]:
         return [
-            Link(_("Homepage"), self.homepage_url),
+            Link(_('Homepage'), self.homepage_url),
             Link(
-                _("Activities"),
+                _('Activities'),
                 self.request.class_link(VacationActivityCollection)
             ),
-            Link(_("Matches"), '#')
+            Link(_('Matches'), '#')
         ]
 
 
@@ -617,13 +617,13 @@ class BillingCollectionLayout(DefaultLayout):
                 traits = (
                     Block(
                         _(
-                            "This booking cannot be removed, at least one "
-                            "booking has been paid online."
+                            'This booking cannot be removed, at least one '
+                            'booking has been paid online.'
                         ),
                         _(
-                            "You may remove the bookings manually one by one."
+                            'You may remove the bookings manually one by one.'
                         ),
-                        _("Cancel")
+                        _('Cancel')
                     ),
                 )
             else:
@@ -632,13 +632,13 @@ class BillingCollectionLayout(DefaultLayout):
                         _('Do you really want to remove "${text}"?', mapping={
                             'text': record.text
                         }),
-                        _("${count} bookings will be removed", mapping={
+                        _('${count} bookings will be removed', mapping={
                             'count': record.count
                         }),
-                        _("Remove ${count} bookings", mapping={
+                        _('Remove ${count} bookings', mapping={
                             'count': record.count
                         }),
-                        _("Cancel")
+                        _('Cancel')
                     ),
                     Intercooler(request_method='POST')
                 )
@@ -648,34 +648,34 @@ class BillingCollectionLayout(DefaultLayout):
     @cached_property
     def breadcrumbs(self) -> list[Link]:
         return [
-            Link(_("Homepage"), self.homepage_url),
+            Link(_('Homepage'), self.homepage_url),
             Link(
-                _("Activities"),
+                _('Activities'),
                 self.request.class_link(VacationActivityCollection)
             ),
-            Link(_("Billing"), '#')
+            Link(_('Billing'), '#')
         ]
 
     @cached_property
     def editbar_links(self) -> list[Link | LinkGroup]:
         return [
             Link(
-                _("Import Bank Statement"),
+                _('Import Bank Statement'),
                 self.request.link(self.model, 'import'),
                 attrs={'class': 'import'}
             ),
             Link(
-                _("Synchronise Online Payments"),
+                _('Synchronise Online Payments'),
                 self.request.return_here(
                     self.request.class_link(
                         PaymentProviderCollection, name='sync')),
                 attrs={'class': 'sync'},
             ),
             LinkGroup(
-                title=_("Accounting"),
+                title=_('Accounting'),
                 links=[
                     Link(
-                        text=_("Manual Booking"),
+                        text=_('Manual Booking'),
                         url=self.request.link(
                             self.model,
                             name='booking'
@@ -683,9 +683,9 @@ class BillingCollectionLayout(DefaultLayout):
                         attrs={'class': 'new-booking'},
                         traits=(
                             Block(_(
-                                "Manual bookings can only be added "
-                                "once the billing has been confirmed."
-                            ), no=_("Cancel")),
+                                'Manual bookings can only be added '
+                                'once the billing has been confirmed.'
+                            ), no=_('Cancel')),
                         ) if not self.model.period.finalized else ()
                     ),
                     *self.family_removal_links
@@ -710,7 +710,7 @@ class OnlinePaymentsLayout(DefaultLayout):
     def editbar_links(self) -> list[Link | LinkGroup]:
         return [
             Link(
-                _("Synchronise Online Payments"),
+                _('Synchronise Online Payments'),
                 self.request.return_here(
                     self.request.class_link(
                         PaymentProviderCollection, name='sync')),
@@ -721,13 +721,13 @@ class OnlinePaymentsLayout(DefaultLayout):
     @cached_property
     def breadcrumbs(self) -> list[Link]:
         return [
-            Link(_("Homepage"), self.homepage_url),
+            Link(_('Homepage'), self.homepage_url),
             Link(
-                _("Activities"),
+                _('Activities'),
                 self.request.class_link(VacationActivityCollection)
             ),
             Link(
-                _("Billing"),
+                _('Billing'),
                 self.request.class_link(BillingCollection)
             ),
             Link(self.title, '#')
@@ -739,13 +739,13 @@ class BillingCollectionImportLayout(DefaultLayout):
     @cached_property
     def breadcrumbs(self) -> list[Link]:
         return [
-            Link(_("Homepage"), self.homepage_url),
+            Link(_('Homepage'), self.homepage_url),
             Link(
-                _("Activities"),
+                _('Activities'),
                 self.request.class_link(VacationActivityCollection)
             ),
-            Link(_("Billing"), self.request.link(self.model)),
-            Link(_("Import Bank Statement"), '#')
+            Link(_('Billing'), self.request.link(self.model)),
+            Link(_('Import Bank Statement'), '#')
         ]
 
 
@@ -754,13 +754,13 @@ class BillingCollectionManualBookingLayout(DefaultLayout):
     @cached_property
     def breadcrumbs(self) -> list[Link]:
         return [
-            Link(_("Homepage"), self.homepage_url),
+            Link(_('Homepage'), self.homepage_url),
             Link(
-                _("Activities"),
+                _('Activities'),
                 self.request.class_link(VacationActivityCollection)
             ),
-            Link(_("Billing"), self.request.link(self.model)),
-            Link(_("Manual Booking"), '#')
+            Link(_('Billing'), self.request.link(self.model)),
+            Link(_('Manual Booking'), '#')
         ]
 
 
@@ -769,13 +769,13 @@ class BillingCollectionPaymentWithDateLayout(DefaultLayout):
     @cached_property
     def breadcrumbs(self) -> list[Link]:
         return [
-            Link(_("Homepage"), self.homepage_url),
+            Link(_('Homepage'), self.homepage_url),
             Link(
-                _("Activities"),
+                _('Activities'),
                 self.request.class_link(VacationActivityCollection)
             ),
-            Link(_("Billing"), self.request.link(self.model)),
-            Link(_("Payment with date"), '#')
+            Link(_('Billing'), self.request.link(self.model)),
+            Link(_('Payment with date'), '#')
         ]
 
 
@@ -793,7 +793,7 @@ class InvoiceLayout(DefaultLayout):
     @cached_property
     def breadcrumbs(self) -> list[Link]:
         return [
-            Link(_("Homepage"), self.homepage_url),
+            Link(_('Homepage'), self.homepage_url),
             Link(self.title, '#')
         ]
 
@@ -812,9 +812,9 @@ class DonationLayout(DefaultLayout):
     @cached_property
     def breadcrumbs(self) -> list[Link]:
         return [
-            Link(_("Homepage"), self.homepage_url),
-            Link(_("Invoices"), self.request.link(self.model)),
-            Link(_("Donation"), self.title)
+            Link(_('Homepage'), self.homepage_url),
+            Link(_('Invoices'), self.request.link(self.model)),
+            Link(_('Donation'), self.title)
         ]
 
 
@@ -823,16 +823,16 @@ class OccasionAttendeeLayout(DefaultLayout):
     @cached_property
     def breadcrumbs(self) -> list[Link]:
         return [
-            Link(_("Homepage"), self.homepage_url),
+            Link(_('Homepage'), self.homepage_url),
             Link(
-                _("Activities"),
+                _('Activities'),
                 self.request.class_link(VacationActivityCollection)
             ),
             Link(
                 self.model.activity.title,
                 self.request.link(self.model.activity)
             ),
-            Link(_("Attendees"), '#')
+            Link(_('Attendees'), '#')
         ]
 
 
@@ -853,13 +853,13 @@ class NotificationTemplateCollectionLayout(DefaultLayout):
     @cached_property
     def breadcrumbs(self) -> list[Link]:
         links = [
-            Link(_("Homepage"), self.homepage_url),
+            Link(_('Homepage'), self.homepage_url),
             Link(
-                _("Activities"),
+                _('Activities'),
                 self.request.class_link(VacationActivityCollection)
             ),
             Link(
-                _("Notification Templates"),
+                _('Notification Templates'),
                 self.request.class_link(NotificationTemplateCollection)
             )
         ]
@@ -874,7 +874,7 @@ class NotificationTemplateCollectionLayout(DefaultLayout):
         if not self.subtitle:
             return [
                 Link(
-                    _("New Notification Template"),
+                    _('New Notification Template'),
                     self.request.link(self.model, 'new'),
                     attrs={'class': 'new-notification'}
                 ),
@@ -899,13 +899,13 @@ class NotificationTemplateLayout(DefaultLayout):
     @cached_property
     def breadcrumbs(self) -> list[Link]:
         links = [
-            Link(_("Homepage"), self.homepage_url),
+            Link(_('Homepage'), self.homepage_url),
             Link(
-                _("Activities"),
+                _('Activities'),
                 self.request.class_link(VacationActivityCollection)
             ),
             Link(
-                _("Notification Templates"),
+                _('Notification Templates'),
                 self.request.class_link(NotificationTemplateCollection)
             ),
             Link(
@@ -934,8 +934,8 @@ class VolunteerLayout(DefaultLayout):
     @cached_property
     def breadcrumbs(self) -> list[Link]:
         return [
-            Link(_("Homepage"), self.homepage_url),
-            Link(_("Volunteers"), self.request.link(self.model))
+            Link(_('Homepage'), self.homepage_url),
+            Link(_('Volunteers'), self.request.link(self.model))
         ]
 
 
@@ -944,15 +944,15 @@ class VolunteerFormLayout(DefaultLayout):
     @cached_property
     def breadcrumbs(self) -> list[Link]:
         return [
-            Link(_("Homepage"), self.homepage_url),
+            Link(_('Homepage'), self.homepage_url),
             Link(
-                _("Join as a Volunteer"),
+                _('Join as a Volunteer'),
                 self.request.class_link(
                     VacationActivityCollection, name='volunteer'
                 )
             ),
             Link(
-                _("Register as Volunteer"),
+                _('Register as Volunteer'),
                 '#'
             )
         ]
@@ -974,7 +974,7 @@ class HomepageLayout(DefaultLayout):
         if self.request.is_manager:
             return [
                 Link(
-                    _("Sort"),
+                    _('Sort'),
                     self.request.link(self.model, 'sort'),
                     attrs={'class': ('sort-link')}
                 )

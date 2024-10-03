@@ -43,7 +43,7 @@ class AssemblyForm(NamedFileForm):
         validators=[
             InputRequired()
         ],
-        default=list(STATES.keys())[0]
+        default=next(iter(STATES.keys()))
     )
 
     extraordinary = BooleanField(
@@ -74,11 +74,6 @@ class AssemblyForm(NamedFileForm):
         validators=[
             Optional()
         ],
-    )
-
-    extraordinary = BooleanField(
-        label=_('Extraordinary'),
-        fieldset=_('General'),
     )
 
     memorial_pdf = UploadField(

@@ -15,7 +15,6 @@ if TYPE_CHECKING:
     from onegov.core.types import RenderData
     from onegov.org.layout import DefaultLayout
     from onegov.org.models import ExtendedDirectory
-    from onegov.page import Page
 
 
 def get_lead(
@@ -138,7 +137,7 @@ class DirectoriesWidget:
     def get_variables(self, layout: 'DefaultLayout') -> 'RenderData':
         directories: DirectoryCollection[ExtendedDirectory]
         directories = DirectoryCollection(
-            layout.app.session(), type="extended")
+            layout.app.session(), type='extended')
 
         links = [
             Link(
@@ -153,7 +152,7 @@ class DirectoriesWidget:
 
         links.append(
             Link(
-                text=_("All directories"),
+                text=_('All directories'),
                 url=layout.request.class_link(DirectoryCollection),
                 classes=('more-link', )
             )
@@ -161,7 +160,7 @@ class DirectoriesWidget:
 
         return {
             'directory_panel': LinkGroup(
-                title=_("Directories"),
+                title=_('Directories'),
                 links=links,
             )
         }
@@ -181,27 +180,34 @@ class NewsWidget:
 
     def get_variables(self, layout: 'DefaultLayout') -> 'RenderData':
 
-        if not layout.root_pages:
+        root_pages = layout.root_pages
+        if not root_pages:
             return {'news': ()}
 
         news_index: int | None = None
-        for index, page in enumerate(layout.root_pages):
-            if isinstance(page, News):
-                news_index = index
+        for index, page in enumerate(root_pages):
+            if page.type == 'news':
+                if page.children:
+                    # only bother doing the query if there are children
+                    news_index = index
                 break
 
         if news_index is None:
             return {'news': ()}
 
+        # FIXME: We probably don't need full fat News objects for this
+        #        and could instead just use children on the root news page
+        #        if we need additional attributes, we can just add them
+        #        to PageMeta, then we can also get rid of `news_query_for`
+        #        and refactor it back into a pure instance method
+
         # request more than the required amount of news to account for hidden
         # items which might be in front of the queue
         news_limit = layout.org.news_limit_homepage
         news = layout.request.exclude_invisible(
-            # FIXME: This may indicate that we want root_pages to return
-            #        `News | Topic` rather than `Page`, which is not really
-            #        guaranteed at runtime right now, it just so happens that
-            #        those are the only two types of pages we use in org
-            layout.root_pages[news_index].news_query(  # type:ignore
+            News.news_query_for(
+                root_pages[news_index],
+                session=layout.request.session,
                 limit=news_limit + 2,
                 published_only=not layout.request.is_manager
             ).all()
@@ -260,14 +266,14 @@ class EventsWidget:
 
         event_links.append(
             Link(
-                text=_("All events"),
+                text=_('All events'),
                 url=layout.events_url,
                 classes=('more-link', )
             )
         )
 
         latest_events = LinkGroup(
-            title=_("Events"),
+            title=_('Events'),
             links=event_links,
         )
 
@@ -303,28 +309,27 @@ class TilesWidget:
 
     def get_tiles(self, layout: 'DefaultLayout') -> 'Iterator[Tile]':
 
-        homepage_pages = layout.request.app.homepage_pages
         request = layout.request
-        link = request.link
+        homepage_pages = request.homepage_pages
         classes = ('tile-sub-link', )
 
         for ix, page in enumerate(layout.root_pages):
             if page.type == 'topic':
 
-                children: Iterable[Page] = homepage_pages[page.id]
-
-                if not request.is_manager:
-                    children = (
-                        child for child in children
-                        if getattr(child, 'access', '') == 'public'
-                    )
-
                 yield self.Tile(
-                    page=Link(page.title, link(page)),
+                    page=Link(page.title, page.link(request)),
                     number=ix + 1,
                     links=tuple(
-                        Link(c.title, link(c), classes=classes, model=c)
-                        for c in children
+                        Link(
+                            child.title,
+                            child.link(request),
+                            classes=classes,
+                            # this only accesses the `access` attribute
+                            # which we have, so this is safe, even though
+                            # it's not the actual page model
+                            model=child,
+                        )
+                        for child in homepage_pages.get(page.id, ())
                     )
                 )
 

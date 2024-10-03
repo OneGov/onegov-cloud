@@ -15,7 +15,7 @@ if TYPE_CHECKING:
         TranslatorSearchForm)
     from sqlalchemy.orm import Query
     from sqlalchemy.sql import ColumnElement
-    from typing_extensions import Self
+    from typing import Self
 
 
 order_cols = (

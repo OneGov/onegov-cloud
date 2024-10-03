@@ -19,7 +19,7 @@ if TYPE_CHECKING:
     from onegov.form import Form
     from onegov.org.request import OrgRequest
     from onegov.page import Page
-    from typing_extensions import Self
+    from typing import Self
 
 
 class ModelsWithLinksMixin:
@@ -64,7 +64,7 @@ class LinkMigration(ModelsWithLinksMixin):
     ) -> tuple[int, dict[str, dict[str, int]]]:
         """Supports replacing url's and domain names.
 
-         """
+        """
         count = 0
         count_by_id = count_obj or {}
 
@@ -112,7 +112,7 @@ class LinkMigration(ModelsWithLinksMixin):
         grouped: dict[str, dict[str, int]] = {}
         total = 0
 
-        for name, entries in self.site_collection.get().items():
+        for entries in self.site_collection.get().values():
             for item in entries:
                 count, grouped_count = self.migrate_url(
                     item, self.fields_with_urls,
@@ -168,15 +168,15 @@ class PageNameChange(ModelsWithLinksMixin):
         def run() -> int:
             # Make sure the order before and after is the same
             urls_before = tuple(
-                self.request.link(p) for p in subpages + [page])
+                self.request.link(p) for p in (*subpages, page))
             page.name = self.new_name
-            urls_after = tuple(self.request.link(p) for p in subpages + [page])
+            urls_after = tuple(self.request.link(p) for p in (*subpages, page))
             assert urls_before != urls_after
 
             count = 0
             for before, after in zip(urls_before, urls_after):
                 migration = LinkMigration(self.request, before, after)
-                total, grouped = migration.migrate_site_collection(test=test)
+                total, _grouped = migration.migrate_site_collection(test=test)
                 count += total
             return count
 
@@ -261,7 +261,7 @@ class LinkHealthCheck(ModelsWithLinksMixin):
         return urls
 
     def find_urls(self) -> 'Iterator[tuple[str, str, Sequence[str]]]':
-        for name, entries in self.site_collection.get().items():
+        for entries in self.site_collection.get().values():
             for entry in entries:
                 urls = []
                 for field in self.fields_with_urls:
@@ -294,10 +294,10 @@ class LinkHealthCheck(ModelsWithLinksMixin):
 
     def unhealthy_urls(self) -> tuple[Statistic, 'Sequence[LinkCheck]']:
         """ We check the urls in the backend, unless they are internal.
-         In that case, we can not do that since we do not have async support.
-         Otherwise returns the LinkChecks with empty statistics for use in
-         the frontend.
-         """
+        In that case, we can not do that since we do not have async support.
+        Otherwise returns the LinkChecks with empty statistics for use in
+        the frontend.
+        """
         assert self.link_type, 'link_type must be set'
         started = time.time()
 
@@ -319,7 +319,7 @@ class LinkHealthCheck(ModelsWithLinksMixin):
             check.status = status
             check.message = f'Status {status}'
             total_count += 1
-            if not status == 200:
+            if status != 200:
                 not_okay_status += 1
             return check
 

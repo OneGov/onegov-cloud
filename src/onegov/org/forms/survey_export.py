@@ -21,7 +21,7 @@ class SurveySubmissionsExport(SurveySubmissionsExportBase):
         request: OrgRequest
 
     submission_window = MultiCheckboxField(
-        label=_("Submission Window"),
+        label=_('Submission Window'),
         choices=None,
     )
 

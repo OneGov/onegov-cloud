@@ -61,13 +61,13 @@ def import_municipality_data(
 
     if form.submitted(request):
         form.update_model(self)
-        request.message(_("Municipality data imported."), 'success')
+        request.message(_('Municipality data imported.'), 'success')
         return redirect(layout.success_url)
 
     return {
         'layout': layout,
         'form': form,
-        'button_text': _("Import"),
+        'button_text': _('Import'),
         'cancel': layout.cancel_url
     }
 
@@ -92,13 +92,13 @@ def add_municipality(
         municipality = Municipality()
         form.update_model(municipality)
         request.session.add(municipality)
-        request.message(_("Municipality added."), 'success')
+        request.message(_('Municipality added.'), 'success')
         return redirect(layout.success_url)
 
     return {
         'layout': layout,
         'form': form,
-        'button_text': _("Save"),
+        'button_text': _('Save'),
         'cancel': layout.cancel_url
     }
 
@@ -139,7 +139,7 @@ def edit_municipality(
 
     if form.submitted(request):
         form.update_model(self)
-        request.message(_("Municipality modified."), 'success')
+        request.message(_('Municipality modified.'), 'success')
         return redirect(layout.success_url)
 
     if not form.errors:
@@ -148,7 +148,7 @@ def edit_municipality(
     return {
         'layout': layout,
         'form': form,
-        'button_text': _("Save"),
+        'button_text': _('Save'),
         'cancel': layout.cancel_url,
     }
 
@@ -171,7 +171,7 @@ def delete_municipality_dates(
 
     if form.submitted(request):
         form.update_model(self)
-        request.message(_("Pick-up dates deleted."), 'success')
+        request.message(_('Pick-up dates deleted.'), 'success')
         return redirect(layout.success_url)
 
     if not form.errors:
@@ -180,7 +180,7 @@ def delete_municipality_dates(
     return {
         'layout': layout,
         'form': form,
-        'button_text': _("Delete"),
+        'button_text': _('Delete'),
         'cancel': layout.cancel_url,
     }
 
@@ -198,4 +198,4 @@ def delete_municipality(
 
     request.assert_valid_csrf_token()
     MunicipalityCollection(request.session).delete(self)
-    request.message(_("Municipality deleted."), 'success')
+    request.message(_('Municipality deleted.'), 'success')

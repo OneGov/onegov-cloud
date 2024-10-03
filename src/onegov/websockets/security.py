@@ -104,19 +104,19 @@ def consume_websocket_token(
         token = param_from_path('token', path)
     except ValueError:
         raise NoWebsocketTokenPresented(
-            "Connection did not present any token."
+            'Connection did not present any token.'
         ) from None
 
     stored = session.pop(session_key, None)
 
     if not stored:
         raise NoWebsocketTokenStored(
-            "There is no websocket token stored for this session. "
+            'There is no websocket token stored for this session. '
         )
 
     if stored != token:
         raise WebsocketTokenMismatch(
-            "Presented token does not match the token stored in the session."
+            'Presented token does not match the token stored in the session.'
         )
 
     return stored

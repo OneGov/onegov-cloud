@@ -16,11 +16,11 @@ from ulid import ULID
 from typing import Any, Literal, NamedTuple, TYPE_CHECKING
 if TYPE_CHECKING:
     from collections.abc import Collection, Iterator
-    from onegov.activity.models import Period
+    from onegov.activity.models import Period, PeriodMeta
     from onegov.feriennet.request import FeriennetRequest
     from sqlalchemy.orm import Query, Session
     from sqlalchemy.sql.selectable import Alias
-    from typing_extensions import Self
+    from typing import Self
     from uuid import UUID
 
     class InvoicesByPeriodRow(NamedTuple):
@@ -52,7 +52,7 @@ class BillingCollection:
     def __init__(
         self,
         request: 'FeriennetRequest',
-        period: 'Period',
+        period: 'Period | PeriodMeta',
         username: str | None = None,
         expand: bool = False,
         state: Literal['paid', 'unpaid'] | None = None
@@ -155,12 +155,12 @@ class BillingCollection:
     @property
     def total(self) -> Decimal:
         # bills can technically be negative, which is not useful for us
-        zero = Decimal("0.00")
+        zero = Decimal('0.00')
         return max(zero, self.invoices.total_amount or zero)
 
     @property
     def outstanding(self) -> Decimal:
-        zero = Decimal("0.00")
+        zero = Decimal('0.00')
         return max(zero, self.invoices.outstanding_amount or zero)
 
     def add_position(
@@ -179,7 +179,7 @@ class BillingCollection:
         )
 
         # each time we add a position, we group it uniquely using a family
-        family = f"{group}-{ULID()}"
+        family = f'{group}-{ULID()}'
         count = 0
 
         for invoice in invoices:
@@ -333,7 +333,11 @@ class BookingInvoiceBridge:
     processed_attendees: set['UUID']
     billed_attendees: set['UUID']
 
-    def __init__(self, session: 'Session', period: 'Period') -> None:
+    def __init__(
+        self,
+        session: 'Session',
+        period: 'Period | PeriodMeta'
+    ) -> None:
         # tracks attendees which had at least one booking added through the
         # bridge (even if said booking was free)
         self.processed_attendees = set()

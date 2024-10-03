@@ -54,7 +54,7 @@ class FormRegistrationWindow(Base, TimestampMixin):
     #: the name of the form to which this registration window belongs
     name: 'Column[str]' = Column(
         Text,
-        ForeignKey("forms.name"),
+        ForeignKey('forms.name'),
         nullable=False
     )
 
