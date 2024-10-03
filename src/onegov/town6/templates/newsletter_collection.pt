@@ -18,7 +18,7 @@
             </div>
         </div>
 
-        <p tal:condition="categories and 'sign up' in button_text.lower()">
+        <p tal:condition="categories and update_link and 'update' not in button_text.lower()">
             <span i18n:translate>To update your subscription, please use this <tal:b i18n:name="Link"><a href="${update_link}">Link</a></tal:b></span>
         </p>
 
