@@ -453,7 +453,7 @@ def test_external_map_link(browser, client):
     topic = topic.click('Bearbeiten')
 
     topic.form['coordinates'] = encode_map_value({
-        'lat': 47, 'lon': 8, 'zoom': 12
+        'lat': 47.5, 'lon': 7.58, 'zoom': 6
     })
     topic.form.submit()
 
