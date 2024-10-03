@@ -308,10 +308,14 @@ class SearchPostgres(Pagination[_M]):
             for model in searchable_sqlalchemy_models(base):
                 if model.es_public or self.request.is_logged_in:  # type:ignore
                     query = self.request.session.query(model)
+                    doc_count += query.count()
+
+                    if hasattr(model, 'access') or self.request.is_logged_in:
+                        query = query.filter(
+                            model.access  # type:ignore[attr-defined]
+                            == 'public')
 
                     if query.count():
-                        doc_count += query.count()
-
                         vector = self._create_weighted_vector(model, language)
                         rank_expression = func.coalesce(
                             func.ts_rank(
