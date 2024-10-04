@@ -5,7 +5,7 @@ from elasticsearch_dsl.query import MatchPhrase
 from elasticsearch_dsl.query import MultiMatch
 from functools import cached_property
 from sedate import utcnow
-from sqlalchemy import func
+from sqlalchemy import func, Text, cast
 from typing import TYPE_CHECKING, Any, List
 
 from onegov.core.collection import Pagination, _M
@@ -276,11 +276,11 @@ class SearchPostgres(Pagination[_M]):
         language: str = 'simple'
     ) -> Any:
         # for now weight the first field with 'A', the rest with 'B'
-        weighted_vector = [
+        weighted_vectors = [
             func.setweight(
                 func.to_tsvector(
                     language,
-                    getattr(model, field, '')
+                    func.unaccent(cast(getattr(model, field, ''), Text))
                 ),
                 weight
             )
@@ -289,9 +289,9 @@ class SearchPostgres(Pagination[_M]):
         ]
 
         # combine all weighted vectors
-        if weighted_vector:
-            combined_vector = weighted_vector[0]
-            for vector in weighted_vector[1:]:
+        if weighted_vectors:
+            combined_vector = weighted_vectors[0]
+            for vector in weighted_vectors[1:]:
                 combined_vector = combined_vector.op('||')(vector)
         else:
             combined_vector = func.to_tsvector(language, '')
@@ -302,7 +302,8 @@ class SearchPostgres(Pagination[_M]):
         doc_count = 0
         results: List[Any] = []
         language = locale_mapping(self.request.locale or 'de_CH')
-        ts_query = func.websearch_to_tsquery(language, self.web_search)
+        ts_query = func.websearch_to_tsquery(language,
+                                             func.unaccent(self.web_search))
 
         for base in self.request.app.session_manager.bases:
             for model in searchable_sqlalchemy_models(base):
@@ -316,16 +317,16 @@ class SearchPostgres(Pagination[_M]):
                             == 'public')
 
                     if query.count():
-                        vector = self._create_weighted_vector(model, language)
+                        weighted = (
+                            self._create_weighted_vector(model, language))
                         rank_expression = func.coalesce(
                             func.ts_rank(
-                                vector,
+                                weighted,
                                 ts_query,
-                                # 0  # normalization, ignore document length
+                                0  # normalization, ignore document length
                             ), 0).label('rank')
-                        query = query.filter(
-                            model.fts_idx.op('@@')(ts_query)
-                        ).add_columns(rank_expression)
+                        query = (query.filter(model.fts_idx.op('@@')(ts_query))
+                                 .add_columns(rank_expression))
 
                         results.extend(list(query.all()))
 

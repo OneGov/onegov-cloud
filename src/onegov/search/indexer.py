@@ -3,12 +3,14 @@ import re
 import sqlalchemy
 
 from copy import deepcopy
+
 from elasticsearch.exceptions import NotFoundError
 from elasticsearch.helpers import streaming_bulk
 from langdetect.lang_detect_exception import LangDetectException
 from itertools import groupby
 from operator import itemgetter
 from queue import Queue, Empty, Full
+from unidecode import unidecode
 
 from onegov.core.utils import is_non_string_iterable
 from onegov.search import index_log, log, Searchable, utils
@@ -403,12 +405,20 @@ class PostgresIndexer(IndexerBase):
 
         try:
             for task in tasks:
+                data = {}
+
                 language = (
                     self.idx_language_mapping.get(task['language'], 'simple'))
-                data = {
-                    k: str(v)
-                    for k, v in task['properties'].items()
-                    if not k.startswith('es_')}
+
+                for k, v in task['properties'].items():
+                    if not k.startswith('es_') and v:
+                        if isinstance(v, list):
+                            v = ' '.join(v)
+
+                        # 'unaccent' the index data in order to find works
+                        # with umlaut ect.
+                        data[k] = unidecode(v)
+
                 _id = task['id']
                 content.append(
                     {'language': language, 'data': data, '_id': _id})
