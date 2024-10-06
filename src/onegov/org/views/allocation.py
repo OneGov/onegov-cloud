@@ -438,49 +438,79 @@ def handle_allocation_rule(
 
 @OrgApp.form(model=Resource, template='form.pt', name='edit-rule',
              permission=Private, form=get_allocation_rule_form_class)
-def handle_edit_rule(
-    self: Resource,
-    request: 'OrgRequest',
-    form: AllocationRuleForm,
-    layout: AllocationRulesLayout | None = None,
-) -> 'RenderData | Response':
+def handle_edit_rule(self, request, form, layout=None):
     request.assert_valid_csrf_token()
     layout = layout or AllocationRulesLayout(self, request)
 
     rule_id = rule_id_from_request(request)
 
     if form.submitted(request):
+
+        # all the slots
+        slots = self.scheduler.managed_reserved_slots()
+        slots = slots.with_entities(ReservedSlot.allocation_id)
+
+        # all the reservations
+        reservations = self.scheduler.managed_reservations()
+        reservations = reservations.with_entities(Reservation.target)
+
+        candidates = self.scheduler.managed_allocations()
+        candidates = candidates.filter(
+            func.json_extract_path_text(
+                func.cast(Allocation.data, JSON), 'rule'
+            ) == rule_id
+        )
+        # .. without the ones with slots
+        candidates = candidates.filter(
+            not_(Allocation.id.in_(slots.subquery())))
+
+        # .. without the ones with reservations
+        candidates = candidates.filter(
+            not_(Allocation.group.in_(reservations.subquery())))
+
+        # delete the allocations
+        deleted_count = candidates.delete('fetch')
+
+        # Update the rule itself
         rules = self.content.get('rules', [])
-        for i, existing_rule in enumerate(rules):
-            if existing_rule['id'] == rule_id:
+        for i, rule in enumerate(rules):
+            if rule['id'] == rule_id:
                 updated_rule = form.rule
+                updated_rule['last_run'] = utcnow()  # Reset last_run
+                updated_rule['iteration'] = 0  # Reset iteration count
                 rules[i] = updated_rule
                 break
-        else:
-            request.messsage(_('Rule not found'), 'warning')
-            return request.redirect(request.link(self, name='rules'))
-
         self.content['rules'] = rules
 
         # Apply the updated rule
-        form.apply(self)
-        request.message(_('Rule updated'), 'success',)
+        new_allocations_count = form.apply(self)
 
+        request.success(
+            _(
+                'Rule updated. ${deleted} allocations removed, '
+                '${created} new allocations created.',
+                mapping={
+                    'deleted': deleted_count,
+                    'created': new_allocations_count,
+                },
+            )
+        )
         return request.redirect(request.link(self, name='rules'))
 
-    # Pre-populate the form with the existing rule data
+    # Pre-populate the form with existing rule data
     existing_rule = next(
-        (rule for rule in self.content.get('rules', [])
-         if rule['id'] == rule_id),
-        None
+        (
+            rule
+            for rule in self.content.get('rules', [])
+            if rule['id'] == rule_id
+        ),
+        None,
     )
-
     if existing_rule is None:
-        request.message(_('Rule not found'), 'warning')
+        request.error(_('Rule not found'))
         return request.redirect(request.link(self, name='rules'))
 
     form.rule = existing_rule
-    layout.breadcrumbs.append(Link(_('Edit'), '#'))
     return {
         'layout': layout,
         'title': _('Edit Rule'),
