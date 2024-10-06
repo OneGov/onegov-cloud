@@ -463,11 +463,8 @@ def handle_edit_rule(
         self.content['rules'] = rules
 
         # Apply the updated rule
-        changes = form.apply(self)
-        request.message(_(
-                "Rule updated, ${n} allocations created or modified",
-                mapping={'n': changes},), 'success'
-        )
+        form.apply(self)
+        request.message(_('Rule updated'), 'success',)
 
         return request.redirect(request.link(self, name='rules'))
 
@@ -491,7 +488,7 @@ def handle_edit_rule(
         'helptext': _(
             'Rules ensure that the allocations between start/end exist and '
             'that they are extended beyond those dates at the given '
-            'intervals. Editing a rule may create new allocations.'
+            'intervals. '
         )
     }
 

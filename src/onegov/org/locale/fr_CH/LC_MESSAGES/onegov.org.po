@@ -2,7 +2,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE 1.0\n"
-"POT-Creation-Date: 2024-09-16 11:07+0200\n"
+"POT-Creation-Date: 2024-10-01 16:49+0200\n"
 "PO-Revision-Date: 2022-03-15 10:50+0100\n"
 "Last-Translator: Marc Sommerhalder <marc.sommerhalder@seantis.ch>\n"
 "Language-Team: French\n"
@@ -4855,6 +4855,15 @@ msgstr ""
 "Les règles garantissent que les allocations entre le début et la fin "
 "existent et qu'elles sont prolongées au-delà de ces dates à des intervalles "
 "donnés."
+
+msgid "Rule not found"
+msgstr "Règle non trouvée"
+
+msgid "Rule updated"
+msgstr "Règle mise à jour"
+
+msgid "Edit Rule"
+msgstr "Modifier la règle"
 
 msgid "The rule was stopped"
 msgstr "La règle a été arrêtée"
