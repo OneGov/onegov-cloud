@@ -435,7 +435,12 @@ class EventCollection(Pagination[Event]):
                 if not hasattr(tags, '__iter__'):
                     tags = [tags]
 
-                tags = [str(c) for tag in tags for c in tag.cats if c]
+                # Filter out strings or invalid objects without 'cats'
+                tags = [str(c) for tag in tags
+                    if not isinstance(tag, str) and hasattr(tag, 'cats')
+                    for c in tag.cats
+                    if c
+                ]
 
             uid = str(vevent.get('uid', ''))
             title = str(escape(vevent.get('summary', '')))

@@ -4854,6 +4854,15 @@ msgstr ""
 "Le regole assicurano che le allocazioni tra inizio/fine esistano e che siano "
 "estese oltre tali date agli intervalli indicati. "
 
+msgid "Rule not found"
+msgstr "Regola non trovata"
+
+msgid "Rule updated"
+msgstr "Regola aggiornata"
+
+msgid "Edit Rule"
+msgstr "Modifica regola"
+
 msgid "The rule was stopped"
 msgstr "La regola è stata arrestata"
 
