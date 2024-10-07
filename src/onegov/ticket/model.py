@@ -143,7 +143,11 @@ class Ticket(Base, TimestampMixin, ORMSearchable):
     }
 
     # limit the search to the ticket number -> the rest can be found
-    es_public = False
+
+    @hybrid_property
+    def es_public(self) -> bool:
+        return False
+
     es_properties = {
         'number': {'type': 'text'},
         'title': {'type': 'text'},

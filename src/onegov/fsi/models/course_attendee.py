@@ -1,3 +1,5 @@
+from sqlalchemy.ext.hybrid import hybrid_property
+
 from onegov.core.orm import Base
 from onegov.core.orm.types import UUID, JSON
 from sqlalchemy import Boolean
@@ -49,7 +51,9 @@ class CourseAttendee(Base, ORMSearchable):
         'title': {'type': 'text'},
     }
 
-    es_public = False
+    @hybrid_property
+    def es_public(self) -> bool:
+        return False
 
     id: 'Column[uuid.UUID]' = Column(
         UUID,  # type:ignore[arg-type]

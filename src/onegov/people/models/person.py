@@ -46,7 +46,10 @@ class Person(Base, ContentMixin, TimestampMixin, ORMSearchable,
         'polymorphic_identity': 'generic',
     }
 
-    es_public = True
+    @hybrid_property
+    def es_public(self) -> bool:
+        return True
+
     es_properties = {
         'title': {'type': 'text'},
         'function': {'type': 'localized'},

@@ -431,7 +431,7 @@ class CompleteSurveySubmission(SurveySubmission):
 class FormFile(File):
     __mapper_args__ = {'polymorphic_identity': 'formfile'}
 
-    @property
+    @hybrid_property
     def access(self) -> str:
         # we don't want these files to show up in search engines
         return 'secret' if self.published else 'private'

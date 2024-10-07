@@ -4,6 +4,8 @@ from copy import copy
 from datetime import timedelta
 from functools import cached_property
 from markupsafe import Markup
+from sqlalchemy.ext.hybrid import hybrid_property
+
 from onegov.core.orm.mixins import (
     content_property, dict_markup_property, dict_property, meta_property)
 from onegov.core.utils import linkify
@@ -362,7 +364,7 @@ class ExtendedDirectory(Directory, AccessExtension, Extendable,
     def entry_cls_name(self) -> str:
         return 'ExtendedDirectoryEntry'
 
-    @property
+    @hybrid_property
     def es_public(self) -> bool:
         return self.access == 'public'
 
@@ -444,7 +446,7 @@ class ExtendedDirectoryEntry(DirectoryEntry, PublicationExtension,
         # technically not enforced, but it should be a given
         directory: relationship[ExtendedDirectory]
 
-    @property
+    @hybrid_property
     def es_public(self) -> bool:
         return self.access == 'public' and self.published
 

@@ -53,7 +53,10 @@ class User(Base, TimestampMixin, ORMSearchable):
         'realname': {'type': 'text'},
         'userprofile': {'type': 'text'}
     }
-    es_public = False
+
+    @hybrid_property
+    def es_public(self) -> bool:
+        return False
 
     @property
     def es_suggestion(self) -> tuple[str, str]:

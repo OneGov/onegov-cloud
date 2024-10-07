@@ -24,7 +24,8 @@ def search(
     return data
 
 
-@AgencyApp.html(model=SearchPostgres, template='search.pt', permission=Public)
+@AgencyApp.html(model=SearchPostgres, template='search_postgres.pt',
+                permission=Public)
 def agency_search_postgres(
     self: SearchPostgres['Base'],
     request: 'AgencyRequest'

@@ -307,7 +307,7 @@ class SearchPostgres(Pagination[_M]):
 
         for base in self.request.app.session_manager.bases:
             for model in searchable_sqlalchemy_models(base):
-                if model.es_public or self.request.is_logged_in:  # type:ignore
+                if model.es_public or self.request.is_logged_in:
                     query = self.request.session.query(model)
                     doc_count += query.count()
 
@@ -352,7 +352,7 @@ class SearchPostgres(Pagination[_M]):
             # skip certain tables for hashtag search for better performance
             if (model.es_type_name not in ['attendees', 'files', 'people',
                                            'tickets', 'users']):
-                if model.es_public or self.request.is_logged_in:  # type:ignore
+                if model.es_public or self.request.is_logged_in:
                     for doc in self.request.session.query(model).all():
                         if doc.es_tags and q in doc.es_tags:
                             results.append(doc)

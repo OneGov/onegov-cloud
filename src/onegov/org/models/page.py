@@ -1,4 +1,7 @@
 from datetime import datetime
+
+from sqlalchemy.ext.hybrid import hybrid_property
+
 from onegov.core.orm.mixins import (
     content_property, dict_markup_property, dict_property, meta_property)
 from onegov.form import Form, move_fields
@@ -56,7 +59,7 @@ class Topic(Page, TraitInfo, SearchableContent, AccessExtension,
     def es_skip(self) -> bool:
         return self.meta.get('trait') == 'link'  # do not index links
 
-    @property
+    @hybrid_property
     def es_public(self) -> bool:
         return self.access == 'public' and self.published
 
@@ -154,7 +157,7 @@ class News(Page, TraitInfo, SearchableContent, NewsletterExtension,
 
     hashtags: dict_property[list[str]] = meta_property(default=list)
 
-    @property
+    @hybrid_property
     def es_public(self) -> bool:
         return self.access == 'public' and self.published
 

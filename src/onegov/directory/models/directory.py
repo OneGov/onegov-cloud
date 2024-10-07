@@ -2,6 +2,9 @@ import inspect
 
 from email_validator import validate_email
 from enum import Enum
+
+from sqlalchemy.ext.hybrid import hybrid_property
+
 from onegov.core.cache import instance_lru_cache
 from onegov.core.cache import lru_cache
 from onegov.core.crypto import random_token
@@ -91,7 +94,7 @@ class DirectoryFile(File):
         entries = self.linked_directory_entries
         return entries[0] if entries else None
 
-    @property
+    @hybrid_property
     def access(self) -> str:
         # we don't want these files to show up in search engines
         return 'secret' if self.published else 'private'
@@ -111,7 +114,7 @@ class Directory(Base, ContentMixin, TimestampMixin,
         'lead': {'type': 'localized'}
     }
 
-    @property
+    @hybrid_property
     def es_public(self) -> bool:
         return False  # to be overridden downstream
 

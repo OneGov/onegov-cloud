@@ -1,15 +1,18 @@
+from sqlalchemy import case, func
+from sqlalchemy.ext.hybrid import hybrid_property
+
 from onegov.core.orm.mixins import dict_property
 from onegov.core.orm.mixins import meta_property
 from onegov.org.models.extensions import AccessExtension
 from onegov.org.models.extensions import PublicationExtension
 from onegov.people import AgencyMembership
 
-
 from typing import TYPE_CHECKING
 if TYPE_CHECKING:
     from onegov.agency.models import ExtendedAgency
     from onegov.agency.models import ExtendedPerson
     from sqlalchemy.orm import relationship
+    from sqlalchemy.sql import ClauseElement
 
 
 class ExtendedAgencyMembership(AgencyMembership, AccessExtension,
@@ -20,9 +23,10 @@ class ExtendedAgencyMembership(AgencyMembership, AccessExtension,
 
     es_type_name = 'extended_membership'
 
-    @property
-    def es_public(self) -> bool:  # type:ignore[override]
+    @hybrid_property
+    def es_public(self) -> bool:
         if self.agency:
+            # TO CHECK: is meta needed here? try self.agency.access instead
             if self.agency.meta.get('access', 'public') != 'public':
                 return False
             if not self.agency.published:
@@ -35,6 +39,28 @@ class ExtendedAgencyMembership(AgencyMembership, AccessExtension,
                 return False
 
         return self.access == 'public'
+
+    @es_public.expression  # type:ignore[no-redef]
+    def es_public(cls) -> 'ClauseElement':
+        return case(
+            [
+                (
+                    func.coalesce(
+                        func.json_extract_path_text(cls.agency, 'access'),
+                        'public'
+                    ) != 'public',
+                    False
+                ),
+                (
+                    func.coalesce(
+                        func.json_extract_path_text(cls.person, 'access'),
+                        'public'
+                    ) != 'public',
+                    False
+                ),
+            ],
+            else_=cls.access == 'public'
+        )
 
     # Todo: It is very unclear how this should be used. In the PDF rendering,
     # it is placed a middle column with 0.5 cm after the title.

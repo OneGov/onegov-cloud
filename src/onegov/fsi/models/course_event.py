@@ -121,7 +121,7 @@ class CourseEvent(Base, TimestampMixin, ORMSearchable):
         lazy='joined'
     )
 
-    @property
+    @hybrid_property
     def es_public(self) -> bool:
         return not self.hidden_from_public
 

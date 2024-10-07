@@ -25,7 +25,10 @@ class Course(Base, ORMSearchable):
         'name': {'type': 'localized'},
         'description': {'type': 'localized'},
     }
-    es_public = True
+
+    @hybrid_property
+    def es_public(self) -> bool:
+        return True
 
     id: 'Column[uuid.UUID]' = Column(
         UUID,  # type:ignore[arg-type]

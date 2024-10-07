@@ -1,3 +1,5 @@
+from sqlalchemy.ext.hybrid import hybrid_property
+
 from onegov.core.orm import Base
 from onegov.core.orm.mixins import ContentMixin
 from onegov.core.orm.mixins import TimestampMixin
@@ -44,7 +46,10 @@ class AgencyMembership(Base, ContentMixin, TimestampMixin, ORMSearchable,
         'polymorphic_identity': 'generic',
     }
 
-    es_public = True
+    @hybrid_property
+    def es_public(self) -> bool:
+        return True
+
     es_properties = {
         'title': {'type': 'text'},
     }

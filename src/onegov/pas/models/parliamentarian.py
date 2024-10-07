@@ -1,4 +1,7 @@
 from datetime import date
+
+from sqlalchemy.ext.hybrid import hybrid_property
+
 from onegov.core.orm import Base
 from onegov.core.orm.mixins import ContentMixin
 from onegov.core.orm.mixins import TimestampMixin
@@ -57,7 +60,10 @@ class Parliamentarian(
 
     __tablename__ = 'pas_parliamentarians'
 
-    es_public = False
+    @hybrid_property
+    def es_public(self) -> bool:
+        return False
+
     es_properties = {
         'first_name': {'type': 'text'},
         'last_name': {'type': 'text'},

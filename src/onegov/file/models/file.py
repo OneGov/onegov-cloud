@@ -113,7 +113,7 @@ class SearchableFile(ORMSearchable):
     def es_suggestion(self) -> str:
         return self.name
 
-    @property
+    @hybrid_property
     def es_public(self) -> bool:
         return self.published
 
@@ -311,7 +311,7 @@ class File(Base, Associable, TimestampMixin):
     def name_observer(self, name: str) -> None:
         self.order = normalize_for_url(name)
 
-    @property
+    @hybrid_property
     def access(self) -> str:
         return 'public' if self.published else 'private'
 

@@ -6,6 +6,9 @@ from datetime import datetime
 from dateutil.relativedelta import relativedelta
 from functools import cached_property
 from itertools import chain, groupby
+
+from sqlalchemy.ext.hybrid import hybrid_property
+
 from onegov.core.orm import as_selectable
 from onegov.core.orm.mixins import dict_property, meta_property
 from onegov.file import File, FileSet, FileCollection, FileSetCollection
@@ -234,7 +237,7 @@ class GeneralFile(File, SearchableFile):
     linked_accesses: dict_property[dict[str, str]]
     linked_accesses = meta_property(default=dict)
 
-    @property
+    @hybrid_property
     def access(self) -> str:
         if self.publication:
             return 'public'
@@ -246,7 +249,7 @@ class GeneralFile(File, SearchableFile):
 
         return widest_access(*self.linked_accesses.values())
 
-    @property
+    @hybrid_property
     def es_public(self) -> bool:
         return self.published and self.access == 'public'
 
@@ -263,7 +266,7 @@ class ImageSet(FileSet, AccessExtension, ORMSearchable):
         'lead': {'type': 'localized'}
     }
 
-    @property
+    @hybrid_property
     def es_public(self) -> bool:
         return self.access == 'public'
 

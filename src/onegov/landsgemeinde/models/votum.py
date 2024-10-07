@@ -1,3 +1,5 @@
+from sqlalchemy.ext.hybrid import hybrid_property
+
 from onegov.core.orm import Base
 from onegov.core.orm.mixins import ContentMixin
 from onegov.core.orm.mixins import dict_markup_property
@@ -43,7 +45,10 @@ class Votum(
 
     __tablename__ = 'landsgemeinde_vota'
 
-    es_public = True
+    @hybrid_property
+    def es_public(self) -> bool:
+        return True
+
     es_properties = {
         'text': {'type': 'localized_html'},
         'motion': {'type': 'localized_html'},

@@ -1,3 +1,8 @@
+from sqlalchemy import case
+from sqlalchemy.orm import object_session
+from sqlalchemy.orm import relationship
+from sqlalchemy.ext.hybrid import hybrid_property
+
 from onegov.agency.models.membership import ExtendedAgencyMembership
 from onegov.agency.utils import get_html_paragraph_with_line_breaks
 from onegov.core.crypto import random_token
@@ -11,9 +16,6 @@ from onegov.org.models.extensions import AccessExtension
 from onegov.org.models.extensions import PublicationExtension
 from onegov.people import Agency
 from onegov.user import RoleMapping
-from sqlalchemy.orm import object_session
-from sqlalchemy.orm import relationship
-
 
 from typing import Any
 from typing import IO
@@ -24,6 +26,7 @@ if TYPE_CHECKING:
     from markupsafe import Markup
     from onegov.agency.request import AgencyRequest
     from onegov.core.types import AppenderQuery
+    from sqlalchemy.sql import ClauseElement
     from uuid import UUID
 
 
@@ -40,9 +43,18 @@ class ExtendedAgency(Agency, AccessExtension, PublicationExtension):
 
     es_type_name = 'extended_agency'
 
-    @property
-    def es_public(self) -> bool:  # type:ignore[override]
+    @hybrid_property  # ignore[no-redef]
+    def es_public(self) -> bool:
         return self.access == 'public' and self.published
+
+    @es_public.expression  # ignore[no-redef]
+    def es_public(cls) -> 'ClauseElement':
+        return case(
+            [
+                (cls.access != 'public', False),
+                (cls.published == False, False)
+            ]
+        )
 
     #: Defines which fields of a membership and person should be exported to
     #: the PDF. The fields are expected to contain two parts seperated by a

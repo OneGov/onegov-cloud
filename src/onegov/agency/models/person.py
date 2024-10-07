@@ -1,9 +1,12 @@
+from sqlalchemy import func, select
+from sqlalchemy.orm import object_session
+from sqlalchemy.ext.hybrid import hybrid_property
+
 from onegov.agency.utils import get_html_paragraph_with_line_breaks
 from onegov.org.models import Organisation
 from onegov.org.models.extensions import AccessExtension
 from onegov.org.models.extensions import PublicationExtension
 from onegov.people import Person
-from sqlalchemy.orm import object_session
 
 
 from typing import TYPE_CHECKING
@@ -13,6 +16,7 @@ if TYPE_CHECKING:
     from onegov.agency.request import AgencyRequest
     from onegov.core.types import AppenderQuery
     from sqlalchemy.orm import relationship
+    from sqlalchemy.sql import ClauseElement
 
 
 class ExtendedPerson(Person, AccessExtension, PublicationExtension):
@@ -22,8 +26,8 @@ class ExtendedPerson(Person, AccessExtension, PublicationExtension):
 
     es_type_name = 'extended_person'
 
-    @property
-    def es_public(self) -> bool:  # type:ignore[override]
+    @hybrid_property
+    def es_public(self) -> bool:
         return self.access == 'public' and self.published
 
     es_properties = {
@@ -50,14 +54,28 @@ class ExtendedPerson(Person, AccessExtension, PublicationExtension):
             AppenderQuery[ExtendedAgencyMembership]
         ]
 
-    @property
+    @hybrid_property
     def phone_internal(self) -> str:
         org = object_session(self).query(Organisation).one()
         number = getattr(self, org.agency_phone_internal_field)
         digits = org.agency_phone_internal_digits
         return number.replace(' ', '')[-digits:] if number and digits else ''
 
-    @property
+    @phone_internal.expression
+    def phone_internal(cls) -> 'ClauseElement':
+        org_subquery = (
+            select([Organisation.agency_phone_internal_field,
+                    Organisation.agency_phone_internal_digits])
+            .limit(1)
+            .scalar_subquery()
+        )
+        return func.substr(
+            func.replace(getattr(
+                cls, org_subquery.c.agency_phone_internal_field), ' ', ''),
+            -org_subquery.c.agency_phone_internal_field_digits
+        ).label('phone_internal')
+
+    @hybrid_property
     def phone_es(self) -> list[str]:
         result = [self.phone_internal]
         for number in (self.phone, self.phone_direct):

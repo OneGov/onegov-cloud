@@ -43,7 +43,7 @@ class DirectoryEntry(Base, ContentMixin, CoordinatesMixin, TimestampMixin,
         'text': {'type': 'localized_html'}
     }
 
-    @property
+    @hybrid_property
     def es_public(self) -> bool:
         return False  # to be overridden downstream
 

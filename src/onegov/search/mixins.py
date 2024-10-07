@@ -1,6 +1,7 @@
 from sqlalchemy import Column
 from sqlalchemy.dialects.postgresql import TSVECTOR
 from sqlalchemy.ext.declarative import declared_attr
+from sqlalchemy.ext.hybrid import hybrid_property
 from sqlalchemy.orm import deferred
 
 from onegov.search.utils import classproperty
@@ -135,7 +136,7 @@ class Searchable:
         return 'auto'
 
     # TODO: rename to fts_public
-    @property
+    @hybrid_property
     def es_public(self) -> bool:
         """ Returns True if the model is available to be found by the public.
         If false, only editors/admins will see this object in the search
@@ -215,7 +216,7 @@ class SearchableContent(ORMSearchable):
         'text': {'type': 'localized_html'}
     }
 
-    @property
+    @hybrid_property
     def es_public(self) -> bool:
         return self.access == 'public'  # type:ignore[attr-defined]
 

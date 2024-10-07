@@ -1,4 +1,6 @@
 from functools import cached_property
+from sqlalchemy.ext.hybrid import hybrid_property
+
 from onegov.activity import Activity, ActivityCollection, Occasion
 from onegov.activity import PublicationRequestCollection
 from onegov.activity.models import DAYS
@@ -32,7 +34,7 @@ class VacationActivity(Activity, CoordinatesExtension, SearchableContent):
         'organiser': {'type': 'text'}
     }
 
-    @property
+    @hybrid_property
     def es_public(self) -> bool:
         return self.state == 'accepted'
 

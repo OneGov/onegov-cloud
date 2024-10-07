@@ -1,5 +1,7 @@
 from icalendar import Calendar as vCalendar
 from icalendar import Event as vEvent
+from sqlalchemy.ext.hybrid import hybrid_property
+
 from onegov.core.orm import Base
 from onegov.core.orm.mixins import TimestampMixin
 from onegov.core.orm.types import UUID
@@ -72,6 +74,6 @@ class Occurrence(Base, OccurrenceMixin, TimestampMixin):
         vcalendar.add_component(vevent)
         return vcalendar.to_ical()
 
-    @property
+    @hybrid_property
     def access(self) -> str:
         return self.event.access
