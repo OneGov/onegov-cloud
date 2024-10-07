@@ -112,7 +112,7 @@ def handle_defined_survey(
         'definition': self,
         'form_width': 'small',
         'lead': layout.linkify(self.meta.get('lead')),
-        'text': self.content.get('text'),
+        'text': self.text,
         'people': getattr(self, 'people', None),
         'files': getattr(self, 'files', None),
         'contact': getattr(self, 'contact_html', None),

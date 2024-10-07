@@ -2,7 +2,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: \n"
-"POT-Creation-Date: 2024-10-01 16:49+0200\n"
+"POT-Creation-Date: 2024-09-24 00:27+0200\n"
 "PO-Revision-Date: 2022-03-15 10:52+0100\n"
 "Last-Translator: \n"
 "Language-Team: \n"
@@ -2720,15 +2720,20 @@ msgstr ""
 msgid "Use text instead of lead in the newsletter"
 msgstr "Usa il testo invece dell'estratto nella newsletter"
 
+msgid "Select additional person"
+msgstr "Selezionare una persona aggiuntiva"
+
+msgid "No results match"
+msgstr "Nessun risultato corrisponde"
+
+msgid "List this function in the page of this person"
+msgstr "Mostra questa funzione nella pagina di questa persona"
+
 msgid "Use Western ordered names"
 msgstr "Utilizzare nomi ordinati all'occidentale"
 
 msgid "For instance Franz Müller instead of Müller Franz"
 msgstr "Per esempio Franz Müller invece di Müller Franz"
-
-#, python-format
-msgid "List this function in the page of ${name}"
-msgstr "Mostra questa funzione nella pagina di ${name}"
 
 msgid "A resource with this name already exists"
 msgstr "Esiste già una risorsa con questo nome"
@@ -2991,6 +2996,7 @@ msgid ""
 "This directory change has been rejected. Do you want to withdraw the "
 "rejection?"
 msgstr ""
+"Questa modifica della cartella è stata respinta. Volete ritirare il rifiuto?"
 
 msgid "Reject change request"
 msgstr "Rifiuta la richiesta di modifica"
@@ -5145,7 +5151,7 @@ msgstr ""
 
 #, python-format
 msgid "${address} successfully unsubscribed"
-msgstr "Iscrizione di ${address} annullata correttamente"
+msgstr "${address} disiscritto con successo"
 
 #, python-format
 msgid "${address} could not be unsubscribed, wrong token"
@@ -5890,6 +5896,11 @@ msgstr "Chat"
 
 msgid "Topics"
 msgstr "Argomenti"
+
+#, python-format
+msgid "You have successfully unsubscribed from the newsletter at ${address}"
+msgstr ""
+"L'iscrizione alla newsletter di ${address} è stata annullata con successo."
 
 msgid "A survey with this name already exists"
 msgstr "Esiste già un'indagine con questo nome"

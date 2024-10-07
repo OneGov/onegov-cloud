@@ -88,10 +88,10 @@ class ManageLayout(DefaultLayout):
             result.append((
                 _('Elections'),
                 '',
-                (
-                    isinstance(self.model, ElectionCollection)
-                    or isinstance(self.model, ElectionCompoundCollection)
-                ),
+                isinstance(self.model, (
+                    ElectionCollection,
+                    ElectionCompoundCollection
+                )),
                 submenu
             ))
 
@@ -106,20 +106,20 @@ class ManageLayout(DefaultLayout):
             submenu.append((
                 _('Wabsti data sources'),
                 self.request.link(DataSourceCollection(session)),
-                (
-                    isinstance(self.model, DataSourceCollection)
-                    or isinstance(self.model, DataSourceItemCollection)
-                ),
+                isinstance(self.model, (
+                    DataSourceCollection,
+                    DataSourceItemCollection
+                )),
                 []
             ))
         result.append((
             _('Import configuration'),
             '',
-            (
-                isinstance(self.model, UploadTokenCollection)
-                or isinstance(self.model, DataSourceCollection)
-                or isinstance(self.model, DataSourceItemCollection)
-            ),
+            isinstance(self.model, (
+                UploadTokenCollection,
+                DataSourceCollection,
+                DataSourceItemCollection
+            )),
             submenu
         ))
 
@@ -149,10 +149,10 @@ class ManageLayout(DefaultLayout):
         result.append((
             _('Notifications'),
             '',
-            (
-                isinstance(self.model, SmsSubscriberCollection)
-                or isinstance(self.model, EmailSubscriberCollection)
-            ),
+            isinstance(self.model, (
+                SmsSubscriberCollection,
+                EmailSubscriberCollection
+            )),
             submenu
         ))
 

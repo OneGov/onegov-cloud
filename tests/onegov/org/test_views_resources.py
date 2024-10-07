@@ -137,14 +137,14 @@ def test_resources_person_link_extension(client):
     resources = client.get('/resources')
     new_item = resources.click('Gegenstand')
     new_item.form['title'] = 'Dorf Bike'
-    new_item.form['western_ordered'] = False
-    new_item.form['_'.join(['people', person_uuid])] = True
+    new_item.form['western_name_order'] = False
+    new_item.form['people-0-person'] = person_uuid
     resource = new_item.form.submit().follow()
     assert 'Dorf Bike' in resource
     assert 'Müller Franz' in resource
 
     edit_resource = resource.click('Bearbeiten')
-    edit_resource.form['western_ordered'] = True
+    edit_resource.form['western_name_order'] = True
     resource = edit_resource.form.submit().follow()
     assert 'Franz Müller' in resource
 

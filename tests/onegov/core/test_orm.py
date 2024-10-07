@@ -1523,31 +1523,63 @@ def test_orm_cache(postgres_dsn, redis_url):
         'test_orm_cache.<locals>.App.untitled_documents': []
     }
 
+    ts1 = app.cache.get('test_orm_cache.<locals>.App.documents_ts')
+    ts2 = app.cache.get('test_orm_cache.<locals>.App.first_document_ts')
+    ts3 = app.cache.get('test_orm_cache.<locals>.App.secret_document_ts')
+    ts4 = app.cache.get('test_orm_cache.<locals>.App.untitled_documents_ts')
+
+    assert app.schema_cache == {
+        'test_orm_cache.<locals>.App.documents': (ts1, tuple()),
+        'test_orm_cache.<locals>.App.first_document': (ts2, None),
+        'test_orm_cache.<locals>.App.secret_document': (ts3, None),
+        'test_orm_cache.<locals>.App.untitled_documents': (ts4, [])
+    }
+
     assert app.cache.get('test_orm_cache.<locals>.App.documents') == tuple()
     assert app.cache.get('test_orm_cache.<locals>.App.first_document') is None
     assert app.cache.get('test_orm_cache.<locals>.App.secret_document') is None
-    assert app.cache.get('test_orm_cache.<locals>.App.untitled_documents')\
-        == []
+    assert app.cache.get(
+        'test_orm_cache.<locals>.App.untitled_documents') == []
 
     # if we add a non-secret document all caches update except for the last one
     app.session().add(Document(id=1, title='Public', body='Lorem Ipsum'))
     transaction.commit()
 
     assert app.cache.get('test_orm_cache.<locals>.App.documents') is NO_VALUE
-    assert app.cache.get('test_orm_cache.<locals>.App.first_document')\
-        is NO_VALUE
-    assert app.cache.get('test_orm_cache.<locals>.App.untitled_documents')\
-        is NO_VALUE
+    assert app.cache.get(
+        'test_orm_cache.<locals>.App.first_document') is NO_VALUE
+    assert app.cache.get(
+        'test_orm_cache.<locals>.App.untitled_documents') is NO_VALUE
     assert app.cache.get('test_orm_cache.<locals>.App.secret_document') is None
+    assert app.cache.get(
+        'test_orm_cache.<locals>.App.documents_ts') is NO_VALUE
+    assert app.cache.get(
+        'test_orm_cache.<locals>.App.first_document_ts') is NO_VALUE
+    assert app.cache.get(
+        'test_orm_cache.<locals>.App.untitled_documents_ts') is NO_VALUE
+    assert app.cache.get(
+        'test_orm_cache.<locals>.App.secret_document_ts') == ts3
 
     assert app.request_cache == {
         'test_orm_cache.<locals>.App.secret_document': None,
+    }
+    assert app.schema_cache == {
+        'test_orm_cache.<locals>.App.secret_document': (ts3, None),
     }
 
     assert app.secret_document is None
     assert app.first_document.title == 'Public'
     assert app.untitled_documents == []
     assert app.documents[0].title == 'Public'
+
+    # the timestamps for the changed caches should update, but the one
+    # that's still cached should stay the same
+    assert app.cache.get('test_orm_cache.<locals>.App.documents_ts') > ts1
+    assert app.cache.get('test_orm_cache.<locals>.App.first_document_ts') > ts2
+    assert app.cache.get(
+        'test_orm_cache.<locals>.App.secret_document_ts') == ts3
+    assert app.cache.get(
+        'test_orm_cache.<locals>.App.untitled_documents_ts') > ts4
 
     # if we add a secret document all caches change
     app.session().add(Document(id=2, title='Secret', body='Geheim'))

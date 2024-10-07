@@ -142,7 +142,7 @@ class TranslationMarkup(TranslationString):
         return self.interpolate()
 
 
-def TranslationStringFactory(factory_domain: str) -> 'TStrCallable':
+def TranslationStringFactory(factory_domain: str) -> 'TStrCallable':  # noqa: N802
     """
     Creates a TranslationMarkup for Markup and a TranslationString
     otherwise.

@@ -494,6 +494,7 @@ def org_content_security_policy() -> 'ContentSecurityPolicy':
     policy.connect_src.add('https://maps.zg.ch')
     policy.connect_src.add('https://api.mapbox.com')
     policy.connect_src.add('https://stats.seantis.ch')
+    policy.connect_src.add('https://analytics.seantis.ch')
     policy.connect_src.add('https://geodesy.geo.admin.ch')
     policy.connect_src.add('https://wms.geo.admin.ch/')
 
@@ -797,6 +798,11 @@ def get_scroll_to_username_asset() -> 'Iterator[str]':
 @OrgApp.webasset('all_blank')
 def get_all_blank_asset() -> 'Iterator[str]':
     yield 'all_blank.js'
+
+
+@OrgApp.webasset('people-select')
+def people_select_asset() -> 'Iterator[str]':
+    yield 'people-select.js'
 
 
 def wrap_with_mtan_hook(

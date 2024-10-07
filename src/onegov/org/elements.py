@@ -148,8 +148,8 @@ class Link(_Base):
 
 class QrCodeLink(BaseLink):
     """ Implements a qr code link that shows a modal with the QrCode.
-        Thu url is sent to the qr endpoint url which generates the image
-        and sends it back.
+    Thu url is sent to the qr endpoint url which generates the image
+    and sends it back.
     """
 
     id = 'qr_code_link'
@@ -280,8 +280,8 @@ __all__ = (
 
 class IFrameLink(BaseLink):
     """ Implements an iframe link that shows a modal with the iframe.
-        The url is sent to the iframe endpoint url which generates the iframe
-        and sends it back.
+    The url is sent to the iframe endpoint url which generates the iframe
+    and sends it back.
     """
 
     id = 'iframe_link'

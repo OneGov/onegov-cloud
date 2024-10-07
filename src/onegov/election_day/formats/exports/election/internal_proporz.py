@@ -39,7 +39,7 @@ def export_election_internal_proporz(
     ids = session.query(ElectionResult.id)
     ids = ids.filter(ElectionResult.election_id == election.id)
 
-    SubListConnection = aliased(ListConnection)
+    SubListConnection = aliased(ListConnection)  # noqa: N806
     results = session.query(
         CandidateResult.votes,
         ElectionResult.superregion,

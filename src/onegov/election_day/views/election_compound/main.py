@@ -127,7 +127,7 @@ def view_election_compound_json(
     for superregion in superregions.values():
         superregion['superregion'] = request.link(superregion['superregion'])
 
-    years, parties = get_party_results(self, json_serializable=True)
+    _years, parties = get_party_results(self, json_serializable=True)
 
     return {
         'completed': self.completed,

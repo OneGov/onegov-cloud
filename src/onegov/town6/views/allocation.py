@@ -71,6 +71,6 @@ def town_handle_edit_rule(
     self: Resource,
     request: 'TownRequest',
     form: 'AllocationRuleForm',
-):
+) -> 'RenderData | Response':
     return handle_edit_rule(
         self, request, form, AllocationRulesLayout(self, request))

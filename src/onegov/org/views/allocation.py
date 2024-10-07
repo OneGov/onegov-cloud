@@ -438,7 +438,10 @@ def handle_allocation_rule(
 
 @OrgApp.form(model=Resource, template='form.pt', name='edit-rule',
              permission=Private, form=get_allocation_rule_form_class)
-def handle_edit_rule(self, request, form, layout=None):
+def handle_edit_rule(
+    self: Resource, request: 'OrgRequest', form: AllocationRuleForm,
+    layout: AllocationRulesLayout | None = None
+) -> 'RenderData | Response':
     request.assert_valid_csrf_token()
     layout = layout or AllocationRulesLayout(self, request)
 

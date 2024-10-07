@@ -38,6 +38,13 @@ if TYPE_CHECKING:
     from wtforms.form import BaseForm
 
 
+# HACK: We extend the default type map with additional entries for file endings
+#       that sometimes don't have a single agreed upon mimetype, we may need
+#       to do something more clever in the future and map single file endings
+#       to multiple mime types.
+types_map.setdefault('.mp3', 'audio/mpeg')
+
+
 class If(Generic[BaseFormT, FieldT]):
     """ Wraps a single validator or a list of validators, which will
     only be executed if the supplied condition callback returns `True`.
@@ -356,7 +363,7 @@ class ValidFilterFormDefinition(ValidFormDefinition):
 
 class ValidSurveyDefinition(ValidFormDefinition):
     """ Makes sure the given text is a valid onegov.form definition for
-        surveys.
+    surveys.
     """
 
     def __init__(self, require_email_field: bool = False):
@@ -586,11 +593,11 @@ class InputRequiredIf(InputRequired):
 
 class ValidDateRange:
     """
-        Makes sure the selected date is in a valid range.
+    Makes sure the selected date is in a valid range.
 
-        The default error message can be overriden and be parametrized
-        with ``min_date`` and ``max_date`` if both are supplied or just
-        with ``date`` if only one of them is specified.
+    The default error message can be overriden and be parametrized
+    with ``min_date`` and ``max_date`` if both are supplied or just
+    with ``date`` if only one of them is specified.
 
     """
 

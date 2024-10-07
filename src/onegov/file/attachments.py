@@ -82,7 +82,7 @@ def strip_exif_and_limit_and_store_image_size(
                 (IMAGE_MAX_SIZE, IMAGE_MAX_SIZE), Image.Resampling.LANCZOS
             )
 
-        content = SpooledTemporaryFile(INMEMORY_FILESIZE)
+        content = SpooledTemporaryFile(INMEMORY_FILESIZE)  # noqa: SIM115
         try:
             # Quality is only supported by jpeg
             image.save(content, image.format, quality=IMAGE_QUALITY, **params)

@@ -838,6 +838,7 @@ class DefaultMailLayoutMixin:
     if TYPE_CHECKING:
         # forward declare required attributes
         request: OrgRequest
+
         @property
         def org(self) -> Organisation: ...
 
@@ -879,12 +880,13 @@ class DefaultMailLayout(Layout, DefaultMailLayoutMixin):  # type:ignore[misc]
 
 class AdjacencyListMixin:
     """ Provides layouts for models inheriting from
-        :class:`onegov.core.orm.abstract.AdjacencyList`
+    :class:`onegov.core.orm.abstract.AdjacencyList`
     """
 
     if TYPE_CHECKING:
         model: AdjacencyList
         request: OrgRequest
+
         def csrf_protected_url(self, url: str) -> str: ...
         @property
         def homepage_url(self) -> str: ...
@@ -2293,8 +2295,11 @@ class EventLayoutMixin:
     def format_recurrence(self, recurrence: str | None) -> str:
         """ Returns a human readable version of an RRULE used by us. """
 
-        WEEKDAYS = (_('Mo'), _('Tu'), _('We'), _('Th'), _('Fr'), _('Sa'),
-                    _('Su'))
+        # FIXME: We define a very similar constant in our forms, we should
+        #        move this to onegov.org.constants and use it for both.
+        WEEKDAYS = (  # noqa: N806
+            _('Mo'), _('Tu'), _('We'), _('Th'), _('Fr'), _('Sa'), _('Su')
+        )
 
         if recurrence:
             rule = rrulestr(recurrence)
@@ -2914,6 +2919,7 @@ class UserLayout(DefaultLayout):
 
     if TYPE_CHECKING:
         model: User
+
         def __init__(self, model: User, request: OrgRequest) -> None: ...
 
     @cached_property
@@ -2971,6 +2977,7 @@ class UserGroupLayout(DefaultLayout):
 
     if TYPE_CHECKING:
         model: UserGroup
+
         def __init__(self, model: UserGroup, request: OrgRequest) -> None: ...
 
     @cached_property

@@ -63,7 +63,7 @@ occasion_states AS (
     CASE
         WHEN cancelled = TRUE
             THEN 'cancelled'
-        WHEN total_bookings > max_spots
+        WHEN total_bookings > max_spots AND accepted_bookings = max_spots
             THEN 'overfull'
         WHEN accepted_bookings = 0
             THEN 'empty'

@@ -314,10 +314,31 @@ class Form(BaseForm):
                 if field_flags:
                     field.kwargs['validators'][0].field_flags = field_flags
 
-            field.kwargs['render_kw'] = field.kwargs.get('render_kw', {})
-            field.kwargs['render_kw'].update(field.depends_on.html_data)
+            field.kwargs.setdefault('render_kw', {}).update(
+                # NOTE: self._prefix does not exist yet, for the shared
+                #       default we assume that there is no prefix
+                field.depends_on.html_data('')
+            )
 
         yield
+
+        # NOTE: We currently assume that the only time we have different
+        #       prefixes for the same form is in a FieldList, technically
+        #       we would need to always do this step below to be fully
+        #       robust
+        if not self._prefix:
+            return
+
+        for field_id, field in self._unbound_fields:
+            if not hasattr(field, 'depends_on'):
+                continue
+
+            f = self[field_id]
+            assert f.render_kw is not None
+            f.render_kw = f.render_kw.copy()
+            f.render_kw.update(
+                field.depends_on.html_data(self._prefix)
+            )
 
     def process_pricing(self) -> 'Iterator[None]':
         """ Processes the pricing parameter on the fields, which adds the
@@ -603,7 +624,6 @@ class Form(BaseForm):
         call ``form.process(obj=obj)`` instead.
 
         """
-        pass
 
     def delete_field(self, fieldname: str) -> None:
         """ Removes the given field from the form and all the fieldsets. """
@@ -686,8 +706,8 @@ class Form(BaseForm):
         length_limit: int = 54
     ) -> str | None:
         """ Returns the field description in modified form if
-         the description should be rendered separately in the field macro.
-         """
+        the description should be rendered separately in the field macro.
+        """
         if hasattr(field, 'long_description'):
             return field.long_description
         if 'long_description' in (getattr(field, 'render_kw', {}) or {}):
@@ -770,6 +790,13 @@ class FieldDependency:
             else:
                 invert = False
 
+            # NOTE: Fields in WTForms can't store an empty string, they
+            #       will instead be normalized to None, the raw_choice
+            #       should stay the same however, since the input in the
+            #       form will have an empty string as its value
+            if raw_choice == '':
+                choice = None
+
             self.dependencies.append({
                 'field_id': field_id,
                 'raw_choice': raw_choice,
@@ -797,10 +824,11 @@ class FieldDependency:
     def field_id(self) -> str:
         return self.dependencies[0]['field_id']
 
-    @property
-    def html_data(self) -> dict[str, str]:
+    def html_data(self, prefix: str) -> dict[str, str]:
         value = ';'.join(
-            f"{d['field_id']}/{d['raw_choice']}" for d in self.dependencies)
+            f"{prefix}{d['field_id']}/{d['raw_choice']}"
+            for d in self.dependencies
+        )
 
         return {'data-depends-on': value}
 

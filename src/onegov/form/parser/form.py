@@ -464,7 +464,7 @@ class WTFormsClassBuilder(Generic[_FormT]):
         field = getattr(self.form_class, field_id)
         if not field.kwargs.get('render_kw'):
             field.kwargs['render_kw'] = {}
-        field.kwargs['render_kw'].update(dependency.html_data)
+        field.kwargs['render_kw'].update(dependency.html_data(''))
 
     def get_unique_field_id(
         self,

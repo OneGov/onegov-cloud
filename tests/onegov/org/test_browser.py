@@ -453,7 +453,7 @@ def test_external_map_link(browser, client):
     topic = topic.click('Bearbeiten')
 
     topic.form['coordinates'] = encode_map_value({
-        'lat': 47, 'lon': 8, 'zoom': 12
+        'lat': 47.5, 'lon': 7.58, 'zoom': 6
     })
     topic.form.submit()
 
@@ -476,15 +476,21 @@ def test_context_specific_function_are_displayed_in_person_directory(browser,
     })
 
     browser.find_by_value("Absenden").click()
-    person = client.app.session().query(Person)\
-        .filter(Person.last_name == 'Boolean')\
+    person = (
+        client.app.session().query(Person)
+        .filter(Person.last_name == 'Boolean')
         .one()
+    )
 
     browser.visit('/editor/new/page/1')
+    chosen_input = browser.find_by_id('people_0_person_chosen')
+    chosen_input.click()
+    search_input = chosen_input.find_by_xpath('.//input').first
+    search_input.fill('Boolean Berry\t')
     browser.fill_form({
         'title': 'All About Berry',
-        'people_' + person.id.hex: True,
-        'people_' + person.id.hex + '_function': 'Logician'
+        'people-0-context_specific_function': 'Logician',
+        'people-0-display_function_in_person_directory': True,
     })
     browser.find_by_value("Absenden").click()
 

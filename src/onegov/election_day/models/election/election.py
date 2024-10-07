@@ -128,7 +128,7 @@ class Election(Base, ContentMixin, LastModifiedMixin,
         if not self.completed:
             return 0
 
-        return sum([c.elected for c in self.candidates])
+        return sum(c.elected for c in self.candidates)
 
     #: Defines the type of majority (e.g. 'absolute', 'relative')
     majority_type: dict_property[str | None] = meta_property('majority_type')
@@ -166,7 +166,7 @@ class Election(Base, ContentMixin, LastModifiedMixin,
 
         """
 
-        return sum([r.counted for r in self.results]), len(self.results)
+        return sum(r.counted for r in self.results), len(self.results)
 
     @property
     def counted_entities(self) -> list[str]:

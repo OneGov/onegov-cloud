@@ -2,7 +2,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE 1.0\n"
-"POT-Creation-Date: 2024-10-01 16:49+0200\n"
+"POT-Creation-Date: 2024-09-24 00:27+0200\n"
 "PO-Revision-Date: 2022-03-15 10:50+0100\n"
 "Last-Translator: Marc Sommerhalder <marc.sommerhalder@seantis.ch>\n"
 "Language-Team: French\n"
@@ -2715,15 +2715,20 @@ msgstr ""
 msgid "Use text instead of lead in the newsletter"
 msgstr "Utiliser le texte au lieu de l'introduction dans le newsletter"
 
+msgid "Select additional person"
+msgstr "Sélectionnez une personne supplémentaire"
+
+msgid "No results match"
+msgstr "Aucun résultat ne correspond"
+
+msgid "List this function in the page of this person"
+msgstr "Afficher cette fonction sur la page de cette personne"
+
 msgid "Use Western ordered names"
 msgstr "Utiliser des noms occidentaux ordonnés"
 
 msgid "For instance Franz Müller instead of Müller Franz"
 msgstr "Par exemple Franz Müller au lieu de Müller Franz"
-
-#, python-format
-msgid "List this function in the page of ${name}"
-msgstr "Afficher cette fonction sur la page de ${name}"
 
 msgid "A resource with this name already exists"
 msgstr "Une ressource portant ce nom existe déjà"
@@ -2986,6 +2991,8 @@ msgid ""
 "This directory change has been rejected. Do you want to withdraw the "
 "rejection?"
 msgstr ""
+"Cette modification de répertoire a été rejetée. Voulez-vous retirer le "
+"rejet ?"
 
 msgid "Reject change request"
 msgstr "Rejeter la demande de modification"
@@ -5164,7 +5171,7 @@ msgstr ""
 
 #, python-format
 msgid "${address} successfully unsubscribed"
-msgstr "${address} a bien été désinscrite"
+msgstr "${address} désinscrit avec succès"
 
 #, python-format
 msgid "${address} could not be unsubscribed, wrong token"
@@ -5901,6 +5908,11 @@ msgstr "Chat"
 
 msgid "Topics"
 msgstr "Sujets"
+
+#, python-format
+msgid "You have successfully unsubscribed from the newsletter at ${address}"
+msgstr ""
+"Vous vous êtes désabonné avec succès de la lettre d'information à ${address}."
 
 msgid "A survey with this name already exists"
 msgstr "Une enquête avec ce nom existe déjà"

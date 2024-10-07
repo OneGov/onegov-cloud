@@ -45,6 +45,8 @@ if TYPE_CHECKING:
     from wtforms import Form
     from uuid import UUID
 
+    from .templates import TemplateLoader
+
     _BaseRequest = morepath.Request
 
     # NOTE: To avoid a dependency between onegov.core and onegov.user
@@ -817,3 +819,9 @@ class CoreRequest(IncludeRequest, ContentSecurityRequest, ReturnToMixin):
             return serializer.loads(data, salt=salt, max_age=max_age)
         except (SignatureExpired, BadSignature):
             return None
+
+    @cached_property
+    def template_loader(self) -> 'TemplateLoader':
+        """ Returns the chameleon template loader. """
+        registry = self.app.config.template_engine_registry
+        return registry._template_loaders['.pt']

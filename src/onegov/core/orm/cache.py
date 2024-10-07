@@ -27,6 +27,7 @@ from functools import wraps
 from libres.db.models import ORMBase
 from onegov.core.orm.utils import maybe_merge
 from sqlalchemy.orm.query import Query
+from time import time
 
 
 from typing import cast, overload, Any, Generic, TypeVar, TYPE_CHECKING
@@ -83,6 +84,7 @@ if TYPE_CHECKING:
 
 _T = TypeVar('_T')
 _QT = TypeVar('_QT')
+unset = object()
 
 
 class OrmCacheApp:
@@ -99,10 +101,12 @@ class OrmCacheApp:
         # forward declare the attributes we need from Framework
         session_manager: SessionManager
         schema: str
+
         @property
         def cache(self) -> RedisCacheRegion: ...
         request_cache: dict[str, Any]
         request_class: type[Request]
+        schema_cache: dict[str, Any]
 
     def configure_orm_cache(self, **cfg: Any) -> None:
         self.is_orm_cache_setup = getattr(self, 'is_orm_cache_setup', False)
@@ -163,6 +167,13 @@ class OrmCacheApp:
                 assert self.schema == schema
                 for cache_key in descriptor.used_cache_keys:
                     self.cache.delete(cache_key)
+                    # NOTE: We also need to delete the timestamp, so we don't
+                    #       get stuck on an old timestamp forever, we use
+                    #       get_or_create for the timestamp below in order to
+                    #       avoid data races in cache invalidation
+                    self.cache.delete(f'{cache_key}_ts')
+                    if cache_key in self.schema_cache:
+                        del self.schema_cache[cache_key]
                     if cache_key in self.request_cache:
                         del self.request_cache[cache_key]
 
@@ -277,7 +288,6 @@ class OrmCacheDescriptor(Generic[_T]):
         self.assert_no_orm_objects(result)
         return result
 
-
     def load(self, instance: 'OrmCacheApp | _HasApp') -> _T:
         """ Loads the object from the database or cache. """
 
@@ -297,17 +307,45 @@ class OrmCacheDescriptor(Generic[_T]):
         cache_key = self.cache_key(instance)
         self.used_cache_keys.add(cache_key)
 
-        # we use a secondary request cache for even more lookup speed and to
+        # we use a tertiary request cache for even more lookup speed and to
         # make sure that inside a request we always get the exact same instance
         # (otherwise we don't see changes reflected)
         if cache_key in app.request_cache:
             return app.request_cache[cache_key]
 
-        else:
+        # we separately store when the redis cache was last populated
+        # so we can detect when we need to invalidate the memory cache
+        # dogpile has its own time metadata, but we can't retrieve it
+        # without paying the deserialization overhead, defeating the
+        # entire purpose of this secondary cache
+        ts_key = f'{cache_key}_ts'
+
+        # we use a secondary in-memory cache for more lookup speed
+        ts, obj = app.schema_cache.get(cache_key, (float('-Inf'), unset))
+        if obj is unset or ts != app.cache.get(key=ts_key):
+            # NOTE: Ideally we would create these values as a pair
+            #       but then we would have to start circumventing
+            #       most of dogpile's API, at which point we may
+            #       as well just use raw Redis, which would give us
+            #       even better possibilities.
+            #       A data race isn't really harmful here, but it is
+            #       kind of inefficient that we're sending two separate
+            #       Redis commands, when one would suffice.
             obj = app.cache.get_or_create(
                 key=cache_key,
                 creator=lambda: self.create(instance)
             )
+            ts = app.cache.get_or_create(
+                key=ts_key,
+                # NOTE: There are some corner-cases where time can lead
+                #       to incorrect cache-invalidation, but we can't use
+                #       monotonic, since that will not lead to a meaningful
+                #       comparison between different processes, dogpile
+                #       also uses time for its own cache invalidation, so
+                #       we should be fine
+                creator=time
+            )
+            app.schema_cache[cache_key] = (ts, obj)
 
         app.request_cache[cache_key] = obj
 

@@ -11,10 +11,8 @@ __all__ = (
     'AgencyMutationForm',
     'ApplyMutationForm',
     'ExtendedAgencyForm',
-    'ExtendedPersonForm',
     'MembershipForm',
     'MoveAgencyForm',
-    'MutationForm',
     'PersonMutationForm',
     'UserGroupForm',
 )

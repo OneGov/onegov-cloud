@@ -1,11 +1,10 @@
 import textwrap
-import zipfile
-from io import BytesIO
-
 import transaction
+import zipfile
 
 from datetime import date, timedelta
 from freezegun import freeze_time
+from io import BytesIO
 
 from onegov.core.utils import module_path
 from onegov.file import FileCollection
@@ -1152,13 +1151,16 @@ def test_edit_page_people_function_is_displayed(client):
     new_person.form['first_name'] = 'Berry'
     new_person.form['last_name'] = 'Boolean'
     new_person.form.submit()
-    person = client.app.session().query(Person)\
-        .filter(Person.first_name == 'Berry')\
+    berry = (
+        client.app.session().query(Person)
+        .filter(Person.first_name == 'Berry')
         .one()
+    )
 
     new_page = client.get('/editor/new/page/1')
-    default_function = new_page.form['people_' + person.id.hex + '_function']
-    assert default_function.value == ""
+    option = new_page.pyquery(f'#people-0 option[value="{berry.id.hex}"]')
+    assert option.attr('data-function') is None
+    assert option.attr('data-show') is None
 
     people = client.get('/people')
     new_person = people.click('Person')
@@ -1166,13 +1168,28 @@ def test_edit_page_people_function_is_displayed(client):
     new_person.form['last_name'] = 'Doe'
     new_person.form['function'] = 'President'
     new_person.form.submit()
-    person = client.app.session().query(Person)\
-        .filter(Person.first_name == 'John')\
+    john = (
+        client.app.session().query(Person)
+        .filter(Person.first_name == 'John')
         .one()
+    )
 
     new_page = client.get('/editor/new/page/1')
-    default_function = new_page.form['people_' + person.id.hex + '_function']
-    assert default_function.value == 'President'
+    option = new_page.pyquery(f'#people-0 option[value="{john.id.hex}"]')
+    assert option.attr('data-function') == 'President'
+    assert option.attr('data-show') is None
+
+    new_page.form['title'] = "Living in Govikon is Swell"
+    new_page.form['people-0-person'] = john.id.hex
+    new_page.form['people-0-context_specific_function'] = 'Vice-President'
+    new_page.form['people-0-display_function_in_person_directory'] = True
+    page = new_page.form.submit().follow()
+
+    # once we have chosen something the chosen value takes precedence
+    edit_page = page.click("Bearbeiten")
+    option = edit_page.pyquery(f'#people-0 option[value="{john.id.hex}"]')
+    assert option.attr('data-function') == 'Vice-President'
+    assert option.attr('data-show') == 'true'
 
 
 def test_event_configuration_validation(client):

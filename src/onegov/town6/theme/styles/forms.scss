@@ -501,18 +501,6 @@ dl.field-display > dt {
     }
 }
 
-/*
-Fix for very long fieldset of people
-*/
-
-#fieldset-people .formfields {
-    max-height: 600px;
-    overflow-y: scroll;
-    @include breakpoint(small only) {
-        max-height: 300px;
-    }
-}
-
 a.category-anchor {
     display: block;
     position: relative;

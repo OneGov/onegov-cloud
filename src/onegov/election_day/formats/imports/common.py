@@ -488,9 +488,9 @@ def validate_list_id(
     default: str | _T = '0'
 ) -> str | _T:
     """ Used to validate list_id that can also be alphanumeric.
-     Example: 03B.04
-     Previously, the list_id was also 0 if it was empty.
-     """
+    Example: 03B.04
+    Previously, the list_id was also 0 if it was empty.
+    """
     result = getattr(line, col)
     if result:
         if match(r'^[A-Za-z0-9_\.]+$', result):

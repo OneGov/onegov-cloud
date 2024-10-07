@@ -670,7 +670,7 @@ class OccurrenceCollection(Pagination[Occurrence]):
             event = objectify.Element('event')
             event.id = e.id
             event.title = e.title
-            txs = tags(e.tags)
+            txs = Tags(e.tags)
             event.append(txs)  # type:ignore[arg-type]
             event.description = e.description
             event.start = e.localized_start
@@ -692,7 +692,7 @@ class OccurrenceCollection(Pagination[Occurrence]):
                               pretty_print=True)
 
 
-class tags(etree.ElementBase):
+class Tags(etree.ElementBase):
     """
     Custom class as 'tag' is a member of class Element and cannot be
     used as tag name.

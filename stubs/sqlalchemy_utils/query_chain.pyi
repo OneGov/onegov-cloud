@@ -6,7 +6,6 @@ from sqlalchemy.orm import Query
 
 _T = TypeVar('_T')
 
-
 class QueryChain(Generic[_T]):
     queries: Sequence[Query[_T]]
     def __init__(self: QueryChain[_T], queries: Sequence[Query[_T]], limit: int | None = None, offset: int | None = None): ...

@@ -162,19 +162,20 @@ def fetch_users_cli(
     skip_deactivate: bool,
     dry_run: bool
 ) -> 'Callable[[TranslatorAppRequest, TranslatorDirectoryApp], None]':
-    """ Updates the list of users by fetching matching users
+    r""" Updates the list of users by fetching matching users
     from a remote LDAP server.
 
     This is currently highly specific for the Canton of Zug and therefore most
     values are hard-coded.
 
     Example:
+    .. code-block:: bash
 
-        onegov-translator --select /translator_directory/zug fetch-users \\
-            --ldap-server 'ldaps://1.2.3.4' \\
-            --ldap-username 'foo' \\
-            --ldap-password 'bar' \\
-            --admin-group 'ou=Admins' \\
+        onegov-translator --select /translator_directory/zug fetch-users \
+            --ldap-server 'ldaps://1.2.3.4' \
+            --ldap-username 'foo' \
+            --ldap-password 'bar' \
+            --admin-group 'ou=Admins' \
             --editor-group 'ou=Editors'
 
     """
@@ -234,7 +235,7 @@ def drive_distances_cli(
         app: 'TranslatorDirectoryApp'
     ) -> None:
 
-        tot, routes_found, distance_changed, no_routes, tolerance_failed = (
+        tot, routes_found, _distance_changed, no_routes, tolerance_failed = (
             update_drive_distances(
                 request,
                 only_empty,
@@ -340,12 +341,13 @@ def update_accounts_cli(
 def migrate_nationalities(
     dry_run: bool
 ) -> 'Callable[[TranslatorAppRequest, TranslatorDirectoryApp], None]':
-    """ Migrates the nationalities column into content column.
+    r""" Migrates the nationalities column into content column.
 
     Example:
-        onegov-translator
-            --select /translator_directory/zug
-                migrate-nationalities --dry-run
+    .. code-block:: bash
+
+        onegov-translator --select /translator_directory/zug \
+            migrate-nationalities --dry-run
 
     """
 

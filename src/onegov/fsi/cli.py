@@ -35,7 +35,7 @@ cli = command_group()
 
 
 def do_ims_import(path: str, request: 'FsiRequest') -> None:
-    errors, persons, courses, events, possible_ldap_users = parse_ims_data(
+    _errors, persons, courses, events, possible_ldap_users = parse_ims_data(
         f'{path}/Teilnehmer.txt',
         f'{path}/Ausführungen.txt',
         f'{path}/Kurse.txt',
@@ -156,7 +156,7 @@ def correct_ims_data_cli(path: str) -> 'Callable[[FsiRequest, FsiApp], None]':
             )
             for event in by_created_query:
                 start = event.start
-                if start.day < 13 and not start.day == start.month:
+                if start.day < 13 and start.day != start.month:
                     to_change_ids.add(event.id)
             print(f'To correct by using created date: {len(to_change_ids)}')
             assert len(to_change_ids) == len(corrected_event_ids)
@@ -167,7 +167,7 @@ def correct_ims_data_cli(path: str) -> 'Callable[[FsiRequest, FsiApp], None]':
         total, deleted_count = delete_events_without_subscriptions(session)
         session.flush()
         print(f'Deleted course events without subs: {deleted_count}/{total}')
-        corrected_ids, ctrl_msgs = open_events_file(path, session)
+        corrected_ids, _ctrl_msgs = open_events_file(path, session)
         session.flush()
 
         print(f'Corrected course events using '
@@ -208,16 +208,19 @@ def test_ldap(
     ldap_password: str,
     sort_by: str
 ) -> None:
-    """
+    r"""
     Examples:
-    Search for an email: (mail=walter.roderer@zg.ch)
-    Search for names: (&(zgXGivenName=Vorname)(zgXSurname=Nachname))
-    Search for mail ending in: (mail=*@phgz.ch)
 
-    onegov-fsi --select /fsi/zug test-ldap --base 'ou=Kanton,o=KTZG' \
-      --ldap-server 'ldaps://.....' \
-      --ldap-username 'user' \
-      --ldap-password 'xxxx' --search-filter "(mail=*@zg.ch)"
+        * Search for an email: ``(mail=walter.roderer@zg.ch)``
+        * Search for names: ``(&(zgXGivenName=Vorname)(zgXSurname=Nachname))``
+        * Search for mail ending in: ``(mail=*@phgz.ch)``
+
+    .. code-block:: bash
+
+        onegov-fsi --select /fsi/zug test-ldap --base 'ou=Kanton,o=KTZG' \
+          --ldap-server 'ldaps://.....' \
+          --ldap-username 'user' \
+          --ldap-password 'xxxx' --search-filter "(mail=*@zg.ch)"
 
     """
 
@@ -270,7 +273,7 @@ def fetch_users_cli(
     skip_deactivate: bool,
     dry_run: bool
 ) -> 'Callable[[FsiRequest, FsiApp], None]':
-    """ Updates the list of users/course attendees by fetching matching users
+    r""" Updates the list of users/course attendees by fetching matching users
     from a remote LDAP server.
 
     This is currently highly specific for the Canton of Zug and therefore most
@@ -278,11 +281,13 @@ def fetch_users_cli(
 
     Example:
 
-        onegov-fsi --select /fsi/fsi fetch-users \\
-            --ldap-server 'ldaps://1.2.3.4' \\
-            --ldap-username 'foo' \\
-            --ldap-password 'bar' \\
-            --admin-group 'ou=Admins' \\
+    .. code-block:: bash
+
+        onegov-fsi --select /fsi/fsi fetch-users \
+            --ldap-server 'ldaps://1.2.3.4' \
+            --ldap-username 'foo' \
+            --ldap-password 'bar' \
+            --admin-group 'ou=Admins' \
             --editor-group 'ou=Editors'
 
     """

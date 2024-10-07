@@ -143,7 +143,7 @@ async def fetch_many(
     timeout: ClientTimeout | None = None
 ) -> list[Any]:
     """ Registers a task per url using the coroutine fetch_func with correct
-        signature. """
+    signature. """
     timeout = timeout or ClientTimeout()
     async with ClientSession(timeout=timeout) as session:
 
