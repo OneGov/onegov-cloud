@@ -5,7 +5,7 @@ from elasticsearch_dsl.query import MatchPhrase
 from elasticsearch_dsl.query import MultiMatch
 from functools import cached_property
 from sedate import utcnow
-from sqlalchemy import func, Text, cast
+from sqlalchemy import func
 from typing import TYPE_CHECKING, Any, List
 
 from onegov.core.collection import Pagination, _M
@@ -280,8 +280,7 @@ class SearchPostgres(Pagination[_M]):
             func.setweight(
                 func.to_tsvector(
                     language,
-                    getattr(model, field, '')
-        ),
+                    getattr(model, field, '')),
                 weight
             )
             for field, weight in zip(model.es_properties.keys(), 'ABBBBBBBBBB')
@@ -311,10 +310,9 @@ class SearchPostgres(Pagination[_M]):
                     query = self.request.session.query(model)
                     doc_count += query.count()
 
-                    if hasattr(model, 'access') or self.request.is_logged_in:
-                        query = query.filter(
-                            model.access  # type:ignore[attr-defined]
-                            == 'public')
+                    if (hasattr(model, 'access')
+                            and not self.request.is_logged_in):
+                        query = query.filter(model.access == 'public')
 
                     if query.count():
                         weighted = (
@@ -327,22 +325,17 @@ class SearchPostgres(Pagination[_M]):
                             ), 0).label('rank')
                         query = (query.filter(model.fts_idx.op('@@')(ts_query))
                                  .add_columns(rank_expression))
-
                         results.extend(list(query.all()))
 
-        # remove duplicates
+        # remove duplicates, sort by rank
         results = list(set(results))
-
-        # sort by rank
         results.sort(key=lambda x: x[1], reverse=True)
-
-        # remove rank from results
-        results = [r[0] for r in results]
 
         self.nbr_of_docs = doc_count
         self.nbr_of_results = len(results)
 
-        return results
+        # remove rank column from results and return
+        return [r[0] for r in results]
 
     def hashtag_search(self) -> list['Searchable']:
         q = self.web_search.lstrip('#')

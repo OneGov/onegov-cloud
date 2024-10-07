@@ -30,6 +30,7 @@ if TYPE_CHECKING:
     from onegov.ticket.handler import _Q
     from sqlalchemy import Column
     from sqlalchemy.orm import Query, Session
+    from sqlalchemy.sql import ClauseElement
     from uuid import UUID
 
 
@@ -95,7 +96,7 @@ class OrgTicketMixin:
         return result
 
     @extra_localized_text.expression  # type:ignore[no-redef]
-    def extra_localized_text(cls) -> str:
+    def extra_localized_text(cls) -> 'ClauseElement':
         return (
             select([func.string_agg(Message.text, ' ')])
             .where(Message.channel_id == cls.number)

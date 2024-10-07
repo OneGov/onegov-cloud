@@ -43,7 +43,7 @@ class ExtendedAgency(Agency, AccessExtension, PublicationExtension):
 
     es_type_name = 'extended_agency'
 
-    @hybrid_property  # ignore[no-redef]
+    @hybrid_property
     def es_public(self) -> bool:
         return self.access == 'public' and self.published
 
