@@ -280,8 +280,8 @@ class SearchPostgres(Pagination[_M]):
             func.setweight(
                 func.to_tsvector(
                     language,
-                    func.unaccent(cast(getattr(model, field, ''), Text))
-                ),
+                    getattr(model, field, '')
+        ),
                 weight
             )
             for field, weight in zip(model.es_properties.keys(), 'ABBBBBBBBBB')

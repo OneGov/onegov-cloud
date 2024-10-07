@@ -415,7 +415,7 @@ class PostgresIndexer(IndexerBase):
                         if isinstance(v, list):
                             v = ' '.join(v)
 
-                        # 'unaccent' the index data in order to find works
+                        # 'unaccent' the index data in order to find words
                         # with umlaut ect.
                         data[k] = unidecode(v)
 
