@@ -510,7 +510,7 @@ def handle_edit_rule(
         None,
     )
     if existing_rule is None:
-        request.error(_('Rule not found'))
+        request.message(_('Rule not found'), 'warning')
         return request.redirect(request.link(self, name='rules'))
 
     form.rule = existing_rule
