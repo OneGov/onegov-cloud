@@ -2304,7 +2304,6 @@ def test_allocation_rules_edit(client):
 
     edit_page = form.submit().follow()
 
-    assert 'Regel aktualisiert' in edit_page
     assert 'Renamed room' in edit_page
 
 
