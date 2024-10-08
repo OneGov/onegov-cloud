@@ -806,7 +806,7 @@ class Framework(
         )
 
         try:
-            action, handler = next(query(self.__class__))
+            action, _handler = next(query(self.__class__))
         except (StopIteration, RuntimeError) as exception:
             raise KeyError(
                 '{!r} has no view named {}'.format(model, view_name)

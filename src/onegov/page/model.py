@@ -31,6 +31,7 @@ class Page(AdjacencyList, ContentMixin, TimestampMixin,
         # we override these relationships to be more specific
         parent: relationship['Page | None']
         children: relationship[list['Page']]
+
         @property
         def root(self) -> 'Page': ...
         @property

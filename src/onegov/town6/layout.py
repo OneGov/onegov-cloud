@@ -194,6 +194,7 @@ class DefaultLayout(OrgDefaultLayout, Layout):
     if TYPE_CHECKING:
         app: TownApp
         request: TownRequest
+
         def __init__(self, model: Any, request: TownRequest) -> None: ...
 
     @cached_property

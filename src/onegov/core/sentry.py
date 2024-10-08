@@ -69,6 +69,8 @@ class OneGovCloudIntegration(Integration):
                 integration = get_client().get_integration(
                     OneGovCloudIntegration
                 )
+                if integration is None:
+                    return handler(request)
 
                 Scope.get_current_scope().set_transaction_name(
                     request.path,

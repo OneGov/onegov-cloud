@@ -36,6 +36,7 @@ class WebsocketsApp(WebassetsApp):
         # we forward declare the attributes from Framework we need
         configuration: dict[str, Any]
         schema: str
+
         def sign(self, text: str, salt: str = ...) -> str: ...
 
     _websockets_client_url: str

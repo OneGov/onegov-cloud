@@ -43,6 +43,7 @@ if TYPE_CHECKING:
         always_run: bool
         requires: str | None
         raw: bool
+
         def __call__(self, *args: _P.args, **kwargs: _P.kwargs) -> _T_co: ...
 
     RawFunc: TypeAlias = Callable[[Connection, Sequence[str]], Any]
@@ -305,7 +306,7 @@ def get_module_order_key(
         modules.add(task.split(':', 1)[0])
 
     def sortkey(task: str) -> 'SupportsRichComparison':
-        module, name = task.split(':', 1)
+        module = task.split(':', 1)[0]
         return (
             # sort by level (unknown models first)
             sorted_modules.get(module, float('-inf')),

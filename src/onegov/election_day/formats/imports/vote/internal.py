@@ -103,7 +103,7 @@ def import_vote_internal(
                         'name': entity_id
                     }))
             else:
-                name, district, superregion = get_entity_and_district(
+                name, district, _superregion = get_entity_and_district(
                     entity_id, entities, vote, principal, line_errors
                 )
 
@@ -211,7 +211,7 @@ def import_vote_internal(
             remaining.add(0)
         remaining -= added_entity_ids[ballot_type]
         for entity_id in remaining:
-            name, district, superregion = get_entity_and_district(
+            name, district, _superregion = get_entity_and_district(
                 entity_id, entities, vote, principal
             )
             if vote.domain == 'none':

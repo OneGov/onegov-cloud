@@ -104,7 +104,7 @@ def view_election_json(
         if layout.visible and (table_link := layout.table_link()):
             embed[tab].append(table_link)
 
-    years, parties = get_party_results(self, json_serializable=True)
+    _years, parties = get_party_results(self, json_serializable=True)
 
     data: JSONObject = {
         'completed': self.completed,

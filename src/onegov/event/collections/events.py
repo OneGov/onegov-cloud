@@ -432,10 +432,20 @@ class EventCollection(Pagination[Event]):
             if tags:
                 # categories may be in lists or they may be single values
                 # whose 'cats' member contains the texts
-                if not hasattr(tags, '__iter__'):
+                if (
+                    not hasattr(tags, '__iter__')
+                    # v6 added an __iter__ method to vCategory
+                    # but it's not what we want to ierate over
+                    or isinstance(tags, vCategory)
+                ):
                     tags = [tags]
 
-                tags = [str(c) for tag in tags for c in tag.cats if c]
+                tags = [
+                    str(c)
+                    for tag in tags
+                    for c in tag.cats
+                    if c
+                ]
 
             uid = str(vevent.get('uid', ''))
             title = str(escape(vevent.get('summary', '')))

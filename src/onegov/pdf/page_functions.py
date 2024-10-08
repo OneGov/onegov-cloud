@@ -14,7 +14,6 @@ def empty_page_fn(canvas: 'Canvas', doc: 'Template') -> None:
     """ An empty header/footer. """
 
 
-
 def page_fn_footer(canvas: 'Canvas', doc: 'Template') -> None:
     """ A standard footer including the page numbers on the right and
     optionally a copyright with the author on the left.

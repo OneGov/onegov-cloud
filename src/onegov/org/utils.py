@@ -1194,6 +1194,7 @@ def extract_categories_and_subcategories(
     flattened: Literal[True]
 ) -> list[str]: ...
 
+
 def extract_categories_and_subcategories(
     categories: dict[str, list[dict[str, list[str]] | str]],
     flattened: bool = False
