@@ -5,7 +5,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: OneGov Cloud 1.0\n"
-"POT-Creation-Date: 2024-10-01 14:57+0200\n"
+"POT-Creation-Date: 2024-09-30 10:20+0200\n"
 "PO-Revision-Date: 2021-03-03 14:04+0100\n"
 "Last-Translator: Lukas Burkhard <lukas.burkhard@seantis.ch>\n"
 "Language-Team: French\n"
@@ -1860,6 +1860,13 @@ msgstr "Champs"
 
 msgid "Submission Windows"
 msgstr "Fenêtres de soumission"
+
+msgid ""
+"Thank you for filling out this survey. If there's anything you'd like to "
+"change, click on the \"Edit\"-Button below."
+msgstr ""
+"Merci d'avoir rempli ce sondage. Si vous souhaitez apporter des "
+"modifications, cliquez sur \"Modifier\" ci-dessous."
 
 msgid "No surveys defined yet."
 msgstr "Aucun sondage n'est encore défini."

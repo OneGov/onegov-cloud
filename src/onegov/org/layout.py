@@ -1284,7 +1284,8 @@ class SurveySubmissionWindowLayout(DefaultLayout):
                                 'Do you really want to delete '
                                 'this submission window?'
                             ),
-                            _('Existing submissions will be disassociated.'),
+                            _('Submissions associated with this submission '
+                              'window will be deleted as well.'),
                             _('Delete submission window'),
                             _('Cancel')
                         ),
