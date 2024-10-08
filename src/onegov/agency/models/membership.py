@@ -1,4 +1,4 @@
-from sqlalchemy import case, func
+from sqlalchemy import case, select
 from sqlalchemy.ext.hybrid import hybrid_property
 
 from onegov.core.orm.mixins import dict_property
@@ -26,7 +26,6 @@ class ExtendedAgencyMembership(AgencyMembership, AccessExtension,
     @hybrid_property
     def es_public(self) -> bool:
         if self.agency:
-            # TO CHECK: is meta needed here? try self.agency.access instead
             if self.agency.meta.get('access', 'public') != 'public':
                 return False
             if not self.agency.published:
@@ -42,22 +41,30 @@ class ExtendedAgencyMembership(AgencyMembership, AccessExtension,
 
     @es_public.expression  # type:ignore[no-redef]
     def es_public(cls) -> 'ClauseElement':
+        from onegov.agency.models import ExtendedAgency, ExtendedPerson
+
+        person_meta = select([ExtendedPerson.meta]).where(
+            ExtendedPerson.id == cls.person_id
+        ).as_scalar()
+
+        person_published = select([ExtendedPerson.published]).where(
+            ExtendedPerson.id == cls.person_id
+        ).as_scalar()
+
+        agency_meta = select([ExtendedAgency.meta]).where(
+            ExtendedAgency.id == cls.agency_id
+        ).as_scalar()
+
+        agency_published = select([ExtendedAgency.published]).where(
+            ExtendedAgency.id == cls.agency_id
+        ).as_scalar()
+
         return case(
             [
-                (
-                    func.coalesce(
-                        func.json_extract_path_text(cls.agency, 'access'),
-                        'public'
-                    ) != 'public',
-                    False
-                ),
-                (
-                    func.coalesce(
-                        func.json_extract_path_text(cls.person, 'access'),
-                        'public'
-                    ) != 'public',
-                    False
-                ),
+                (person_meta['access'] != 'public', False),
+                (person_published != True, False),
+                (agency_meta['access'] != 'public', False),
+                (agency_published != True, False),
             ],
             else_=cls.access == 'public'
         )
