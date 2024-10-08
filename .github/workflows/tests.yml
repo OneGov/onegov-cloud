@@ -68,7 +68,8 @@ jobs:
       run: |
         source /app/bin/activate
         python -m pip install --upgrade uv
-        uv pip install .[mypy,lint]
+        uv pip compile setup.cfg -U \
+        | uv pip install .[mypy,lint] -r /dev/stdin
 
     - name: Linting
       run: |
@@ -173,7 +174,8 @@ jobs:
         python -m pip install --upgrade uv
         uv pip install pytest-split pytest-cov pytest-codecov pytest-xdist psutil
         # TEMPORARY: editable build so we don't need a path-fix in codecov
-        uv pip install -e .[test]
+        uv pip compile setup.cfg -U \
+        | uv pip install -e .[test] -r /dev/stdin
       env:
         # NOTE: Suppress uv warning
         UV_LINK_MODE: copy
