@@ -443,7 +443,7 @@ class EventCollection(Pagination[Event]):
                 tags = [
                     str(c)
                     for tag in tags
-                    for c in tag
+                    for c in tag.cats
                     if c
                 ]
 
