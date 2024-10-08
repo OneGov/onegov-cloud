@@ -43,6 +43,7 @@ if TYPE_CHECKING:
 
         # Pagination:
         batch_size: int
+
         def subset(self) -> Query[_M]: ...
         @property
         def cached_subset(self) -> Query[_M]: ...

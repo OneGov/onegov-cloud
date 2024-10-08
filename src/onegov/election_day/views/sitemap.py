@@ -31,7 +31,7 @@ def urls(
         yield request.link(layout.archive.for_date(str(year)))
 
         archive = ArchivedResultCollection(request.session, str(year))
-        results, last_modified = archive.by_date()
+        results, _last_modified = archive.by_date()
         grouped_results = archive.group_items(results, request) or {}
         for date_, domains in grouped_results.items():
             yield request.link(layout.archive.for_date(date_.isoformat()))

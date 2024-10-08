@@ -35,6 +35,7 @@ class Category(AdjacencyList, ContentMixin, TimestampMixin):
         # we need to override these attributes to get the correct base class
         parent: relationship['Category | None']
         children: relationship[Sequence['Category']]
+
         @property
         def root(self) -> 'Category': ...
         @property

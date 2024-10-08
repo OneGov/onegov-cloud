@@ -4849,6 +4849,15 @@ msgstr ""
 "Regeln stellen sicher dass die Einteilungen zwischen Start und Ende bestehen "
 "und dass sie im gewählten Interval verlängert werden."
 
+msgid "Rule not found"
+msgstr "Regel nicht gefunden"
+
+msgid "Rule updated"
+msgstr "Regel aktualisiert"
+
+msgid "Edit Rule"
+msgstr "Regel bearbeiten"
+
 msgid "The rule was stopped"
 msgstr "Die Regel wurde gestoppt"
 
@@ -6145,6 +6154,14 @@ msgstr "Ein Konto wurde für Sie erstellt"
 
 msgid "The user was created successfully"
 msgstr "Der Benutzer wurde erfolgreich erstellt"
+
+#~ msgid ""
+#~ "Rules ensure that the allocations between start/end exist and that they "
+#~ "are extended beyond those dates at the given intervals. Editing a rule "
+#~ "may create new allocations."
+#~ msgstr ""
+#~ "Regeln stellen sicher dass die Einteilungen zwischen Start und Ende "
+#~ "bestehen und dass sie im gewählten Interval verlängert werden."
 
 #~ msgid "Directory change rejected"
 #~ msgstr "Verzeichnisänderung abgelehnt"

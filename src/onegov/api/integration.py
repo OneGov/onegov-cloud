@@ -38,7 +38,7 @@ class ApiApp(App):
     def rate_limit_cache(self) -> 'cache.RedisCacheRegion':
         """ A cache for rate limits. """
 
-        limit, expiration = self.rate_limit
+        _limit, expiration = self.rate_limit
         return self.get_cache('rate_limits', expiration)
 
 

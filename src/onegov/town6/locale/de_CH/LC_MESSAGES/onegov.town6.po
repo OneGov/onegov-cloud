@@ -1552,6 +1552,13 @@ msgstr ""
 "Der Newsletter ist deaktiviert. Sie können diese Seite nur sehen, weil Sie "
 "eingeloggt sind."
 
+msgid "Sign up to our newsletter to always stay up to date:"
+msgstr ""
+"Abonnieren Sie unseren Newsletter um immer auf dem Laufenden zu bleiben:"
+
+msgid "To update your subscription, please use this ${Link}"
+msgstr "Um Ihr Abonnement zu aktualisieren, verwenden Sie bitte diesen ${Link}"
+
 msgid "There are currently ${count} recipients registered."
 msgstr "Zur Zeit sind ${count} Abonnenten registriert."
 

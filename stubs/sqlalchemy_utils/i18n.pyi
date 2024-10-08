@@ -8,7 +8,6 @@ from sqlalchemy import Column
 _TranslatableColumn: TypeAlias = Column[Mapping[str, str]] | Column[Mapping[str, str] | None]
 _Locale: TypeAlias = Callable[[Any, str], Locale | str] | Callable[[Any], Locale | str] | Callable[[], Locale | str] | Locale | str
 
-
 class TranslationHybrid:
     default_value: str | None
     def __init__(self, current_locale: Callable[[], _Locale | None], default_locale: Callable[[], _Locale | None], default_value: str | None = None) -> None: ...

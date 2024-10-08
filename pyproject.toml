@@ -140,6 +140,12 @@ select = [
     "D301",
     "D4",
     "E",
+    "E301",
+    "E302",
+    "E303",
+    "E304",
+    "E305",
+    "E306",
     "F",
     "FLY002",
     "ISC",
@@ -198,6 +204,9 @@ ignore = [
 unfixable = []
 external = ["MS", "TC"]
 allowed-confusables = ["×"]
+# NOTE: Enable preview rules, but only the ones we select explicitly
+preview = true
+explicit-preview-rules = true
 
 [tool.ruff.lint.extend-per-file-ignores]
 "src/onegov/core/types.py" = ["B018"]
@@ -218,6 +227,13 @@ allowed-confusables = ["×"]
     "B018",
     "C4",
     "D",
+    "E301",
+    "E302",
+    "E303",
+    "E304",
+    "E305",
+    "E306",
+    "F841",
     "FLY002",
     "ISC",
     "N",
