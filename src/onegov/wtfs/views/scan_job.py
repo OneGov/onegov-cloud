@@ -52,8 +52,8 @@ def view_scan_jobs(
     return {
         'layout': ScanJobsLayout(self, request),
         'form': form,
-        'button_text': _("Apply filter"),
-        'reset_text': _("Reset filter"),
+        'button_text': _('Apply filter'),
+        'reset_text': _('Reset filter'),
         'permission': ViewModel
     }
 
@@ -77,8 +77,8 @@ def view_scan_jobs_unrestricted(
     return {
         'layout': ScanJobsLayout(self, request),
         'form': form,
-        'button_text': _("Apply filter"),
-        'reset_text': _("Reset filter"),
+        'button_text': _('Apply filter'),
+        'reset_text': _('Reset filter'),
         'permission': ViewModel
     }
 
@@ -106,13 +106,13 @@ def add_scan_job_unrestricted(
         )
         request.session.add(scan_job)
         request.session.flush()
-        request.message(_("Scan job added."), 'success')
+        request.message(_('Scan job added.'), 'success')
 
         receivers = scan_job.municipality.contacts
         if receivers:
             assert request.app.mail is not None
             subject = request.translate(
-                _("Order confirmation for scanning your tax returns")
+                _('Order confirmation for scanning your tax returns')
             )
             request.app.send_transactional_email(
                 subject=subject,
@@ -134,7 +134,7 @@ def add_scan_job_unrestricted(
     return {
         'layout': layout,
         'form': form,
-        'button_text': _("Save"),
+        'button_text': _('Save'),
         'cancel': layout.cancel_url
     }
 
@@ -165,12 +165,12 @@ def add_scan_job(
             scan_job.municipality_id
         )
         request.session.add(scan_job)
-        request.message(_("Scan job added."), 'success')
+        request.message(_('Scan job added.'), 'success')
 
         assert request.app.mail is not None
         assert request.identity.userid is not None
         subject = request.translate(
-            _("Order confirmation for scanning your tax returns")
+            _('Order confirmation for scanning your tax returns')
         )
         request.app.send_transactional_email(
             subject=subject,
@@ -192,7 +192,7 @@ def add_scan_job(
     return {
         'layout': layout,
         'form': form,
-        'button_text': _("Save"),
+        'button_text': _('Save'),
         'cancel': layout.cancel_url
     }
 
@@ -229,7 +229,7 @@ def edit_scan_job_unrestricted(
 
     if form.submitted(request):
         form.update_model(self)
-        request.message(_("Scan job modified."), 'success')
+        request.message(_('Scan job modified.'), 'success')
         return redirect(layout.success_url)
 
     if not form.errors:
@@ -238,7 +238,7 @@ def edit_scan_job_unrestricted(
     return {
         'layout': layout,
         'form': form,
-        'button_text': _("Save"),
+        'button_text': _('Save'),
         'cancel': layout.cancel_url,
     }
 
@@ -264,7 +264,7 @@ def edit_scan_job(
 
     if form.submitted(request):
         form.update_model(self)
-        request.message(_("Scan job modified."), 'success')
+        request.message(_('Scan job modified.'), 'success')
         return redirect(layout.success_url)
 
     if not form.errors:
@@ -274,7 +274,7 @@ def edit_scan_job(
         'layout': layout,
         'form': form,
         'subtitle': layout.format_date(self.dispatch_date, 'date'),
-        'button_text': _("Save"),
+        'button_text': _('Save'),
         'cancel': layout.cancel_url,
     }
 
@@ -289,7 +289,7 @@ def delete_scan_job(self: ScanJob, request: 'CoreRequest') -> None:
 
     request.assert_valid_csrf_token()
     ScanJobCollection(request.session).delete(self)
-    request.message(_("Scan job deleted."), 'success')
+    request.message(_('Scan job deleted.'), 'success')
 
 
 @WtfsApp.html(

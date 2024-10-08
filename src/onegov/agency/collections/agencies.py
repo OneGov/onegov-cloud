@@ -1,29 +1,69 @@
 from onegov.agency.models import ExtendedAgency
 from onegov.agency.utils import filter_modified_or_created
 from onegov.core.collection import GenericCollection, Pagination
-from onegov.people import AgencyCollection
+from onegov.core.orm.abstract import AdjacencyListCollection
 from sqlalchemy import or_, func
 from sqlalchemy.orm import joinedload
 from sqlalchemy.orm import undefer
 
 
-class ExtendedAgencyCollection(AgencyCollection):
+from typing import Literal, Self
+from typing import TYPE_CHECKING
+if TYPE_CHECKING:
+    from collections.abc import Collection
+    from sqlalchemy.orm import Query
+    from sqlalchemy.orm import Session
+    from typing import TypedDict
+    from typing_extensions import Unpack
+
+    class FilterParams(TypedDict, total=False):
+        title: str | None
+        updated_gt: str | None
+        updated_ge: str | None
+        updated_eq: str | None
+        updated_le: str | None
+        updated_lt: str | None
+
+
+class ExtendedAgencyCollection(AdjacencyListCollection[ExtendedAgency]):
 
     __listclass__ = ExtendedAgency
 
     # Used to create link for root pdf based on timestamp
-    def __init__(self, session, root_pdf_modified=None, browse=None):
-        super(ExtendedAgencyCollection, self).__init__(session)
+    def __init__(
+        self,
+        session: 'Session',
+        # FIXME: These really should be float/int, we just need to add
+        #        convertes to the path configuration...
+        root_pdf_modified: str | None = None,
+        browse: str | None = None
+    ) -> None:
+        super().__init__(session)
         self.root_pdf_modified = root_pdf_modified
         self.browse = browse
 
 
-class PaginatedAgencyCollection(GenericCollection, Pagination):
+class PaginatedAgencyCollection(
+    GenericCollection[ExtendedAgency],
+    Pagination[ExtendedAgency]
+):
 
-    def __init__(self, session, page=0, parent=None, exclude_hidden=True,
-                 joinedload=None, title=None, updated_gt=None,
-                 updated_ge=None, updated_eq=None, updated_le=None,
-                 updated_lt=None, undefer=None):
+    def __init__(
+        self,
+        session: 'Session',
+        page: int = 0,
+        parent: str | Literal[False] | None = None,
+        exclude_hidden: bool = True,
+        joinedload: 'Collection[str] | None' = None,
+        title: str | None = None,
+        updated_gt: str | None = None,
+        updated_ge: str | None = None,
+        updated_eq: str | None = None,
+        updated_le: str | None = None,
+        updated_lt: str | None = None,
+        undefer: 'Collection[str] | None' = None
+    ) -> None:
+
         super().__init__(session)
         self.page = page
         # filter keywords
@@ -40,23 +80,24 @@ class PaginatedAgencyCollection(GenericCollection, Pagination):
         self.undefer = undefer or []
 
     @property
-    def model_class(self):
+    def model_class(self) -> type[ExtendedAgency]:
         return ExtendedAgency
 
-    def __eq__(self, other):
+    def __eq__(self, other: object) -> bool:
         return (
-            other.page == self.page
+            isinstance(other, self.__class__)
+            and other.page == self.page
             and other.parent == self.parent
         )
 
-    def subset(self):
+    def subset(self) -> 'Query[ExtendedAgency]':
         return self.query()
 
     @property
-    def page_index(self):
+    def page_index(self) -> int:
         return self.page
 
-    def page_by_index(self, index):
+    def page_by_index(self, index: int) -> Self:
         return self.__class__(
             self.session,
             page=index,
@@ -68,7 +109,7 @@ class PaginatedAgencyCollection(GenericCollection, Pagination):
             updated_lt=self.updated_lt,
         )
 
-    def for_filter(self, **kwargs):
+    def for_filter(self, **kwargs: 'Unpack[FilterParams]') -> Self:
         return self.__class__(
             session=self.session,
             title=kwargs.get('title', self.title),
@@ -79,7 +120,7 @@ class PaginatedAgencyCollection(GenericCollection, Pagination):
             updated_lt=kwargs.get('updated_lt', self.updated_lt),
         )
 
-    def query(self):
+    def query(self) -> 'Query[ExtendedAgency]':
         query = super().query()
 
         for attribute in self.undefer:
@@ -109,11 +150,11 @@ class PaginatedAgencyCollection(GenericCollection, Pagination):
         if self.title:
             # if multiple words in search filter for title we 'or' link
             # them using ilike
-            query = query.filter(or_(
+            query = query.filter(or_(*(
                 func.lower(
                     func.unaccent(ExtendedAgency.title)
                 ).ilike(f'%{element}%') for element in self.title.split()
-            ))
+            )))
         if self.updated_gt:
             query = filter_modified_or_created(query, '>', self.updated_gt,
                                                ExtendedAgency)

@@ -1,13 +1,16 @@
+import yaml
 from datetime import timedelta
 from freezegun import freeze_time
 from sedate import utcnow
 
 from onegov.core.utils import module_path
 from onegov.file import FileCollection
+from onegov.org.models import Topic
 from onegov.page import Page, PageCollection
 from tests.onegov.org.common import edit_bar_links
 from tests.onegov.town6.test_views_topics import get_select_option_id_by_text
-from tests.shared.utils import get_meta, create_image
+from tests.shared.utils import (get_meta, create_image,
+                                extract_intercooler_delete_link)
 from webtest import Upload
 
 
@@ -36,7 +39,6 @@ def test_pages_cache(client):
     root_page = client.get(root_url)
     links = edit_bar_links(root_page, 'text')
     assert 'URL ändern' in links
-    assert len(links) == 7
 
     # Test changing the url of the root page organisation
     assert 'URL ändern' not in editor.get(root_page.request.url)
@@ -236,13 +238,13 @@ def test_pages_person_link_extension(client):
                              "Govikon does not really exist.</i>"
                              + embedded_img
                              )
-    new_page.form['western_ordered'] = False
-    new_page.form['_'.join(['people', person_uuid])] = True
+    new_page.form['western_name_order'] = False
+    new_page.form['people-0-person'] = person_uuid
     page = new_page.form.submit().follow()
     assert 'Müller Franz' in page
 
     edit_page = page.click("Bearbeiten")
-    edit_page.form['western_ordered'] = True
+    edit_page.form['western_name_order'] = True
     page = edit_page.form.submit().follow()
     assert 'Franz Müller' in page
 
@@ -270,6 +272,51 @@ def test_delete_pages(client):
 
     assert client.delete(delete_link).status_code == 200
     assert client.delete(delete_link, expect_errors=True).status_code == 404
+
+
+def test_delete_root_page_with_nested_pages(client):
+
+    root_page_organisation = (
+        client.get('/').pyquery('.top-bar-section a').attr('href')
+    )
+
+    # root page contains single page:
+    client.login_admin()
+    root_page = client.get(root_page_organisation)
+    new_page = root_page.click('Thema')
+    new_page.form['title'] = "Child Page"
+    new_page.form['text'] = (
+        "## Living in Govikon is Really Great\n"
+        "*Experts say it's the fact that Govikon does not really exist.*"
+    )
+
+    new_page.form.submit().follow()
+    query = client.app.session().query(Topic)
+    # Check that the pages were created
+    for topic in ('organisation', 'themen', 'kontakt', 'child-page'):
+        assert query.filter_by(name=topic).count() == 1
+
+    #  Attempt to delete the root page as an editor
+    client.logout()
+    client.login_editor()
+    page = client.get(root_page_organisation)
+    assert "Diese Seite kann nicht gelöscht werden" in page
+
+    client.logout()
+    client.login_admin()
+
+    # finally delete root page
+    page = client.get(root_page_organisation)
+    delete_link = extract_intercooler_delete_link(client, page)
+    client.delete(delete_link)
+
+    query = client.app.session().query(Topic)
+    # Deleting root page 'organisation' should delete 'child-page' as well
+    for topic in ('themen', 'kontakt'):
+        assert query.filter_by(name=topic).count() == 1
+
+    assert query.filter_by(name='organisation').count() == 0
+    assert query.filter_by(name='child-page').count() == 0
 
 
 def test_hide_page(client):
@@ -529,3 +576,31 @@ def test_view_page_as_member(client):
     anon.get(page_url, status=403)
     page = anon.get('/topics/organisation')
     assert 'Test' not in page
+
+
+def test_add_iframe(client):
+
+    fs = client.app.filestorage
+    data = {
+        'allowed_domains': ['https://www.seantis.ch/']
+    }
+    with fs.open('allowed_iframe_domains.yml', 'w') as f:
+        yaml.dump(data, f)
+
+    client.login_admin()
+    page = client.get('/topics/organisation').click('iFrame')
+    page.form['title'] = "Success"
+    page.form['url'] = "https://www.seantis.ch/success-stories/"
+    page = page.form.submit()
+    assert 'iframe' in page
+    assert 'https://www.seantis.ch/success-stories/' in page
+
+    csp = page.headers['Content-Security-Policy']
+    csp = {v.split(' ')[0]: v.split(' ', 1)[-1] for v in csp.split(';')}
+    assert "https://www.seantis.ch/" in csp['child-src']
+
+    page = client.get('/topics/organisation').click('iFrame')
+    page.form['title'] = "Failure"
+    page.form['url'] = "https://www.organisation.org/success-stories/"
+    page = page.form.submit()
+    assert 'Die Domäne der URL ist für iFrames nicht zulässig.' in page

@@ -1,7 +1,8 @@
 import json
 from base64 import b64encode
+from unittest.mock import patch
 
-from collection_json import Collection
+from collection_json import Collection, Template
 from freezegun import freeze_time
 
 
@@ -12,7 +13,10 @@ def get_base64_encoded_json_string(data):
     return data
 
 
-def test_view_api(client):
+@patch('onegov.websockets.integration.connect')
+@patch('onegov.websockets.integration.broadcast')
+@patch('onegov.websockets.integration.authenticate')
+def test_view_api(authenticate, broadcast, connect, client):
     client.login_admin()  # prevent rate limit
 
     def collection(url):
@@ -24,17 +28,44 @@ def test_view_api(client):
     def links(item):
         return {x.rel: x.href for x in item.links}
 
+    def template(item):
+        return {x.name for x in item.template.data}
+
     # Endpoints with query hints
     endpoints = collection('/api')
     assert endpoints.queries[0].rel == 'agencies'
     assert endpoints.queries[0].href == 'http://localhost/api/agencies'
-    assert data(endpoints.queries[0]) == {'parent': None}
+    assert data(endpoints.queries[0]) == {
+        'parent': None,
+        'title': None,
+        'updated_eq': None,
+        'updated_ge': None,
+        'updated_gt': None,
+        'updated_le': None,
+        'updated_lt': None,
+    }
     assert endpoints.queries[1].rel == 'people'
     assert endpoints.queries[1].href == 'http://localhost/api/people'
-    assert data(endpoints.queries[1]) == {}
+    assert data(endpoints.queries[1]) == {
+        'first_name': None,
+        'last_name': None,
+        'updated_eq': None,
+        'updated_ge': None,
+        'updated_gt': None,
+        'updated_le': None,
+        'updated_lt': None
+    }
     assert endpoints.queries[2].rel == 'memberships'
     assert endpoints.queries[2].href == 'http://localhost/api/memberships'
-    assert data(endpoints.queries[2]) == {'agency': None, 'person': None}
+    assert data(endpoints.queries[2]) == {
+        'agency': None,
+        'person': None,
+        'updated_eq': None,
+        'updated_ge': None,
+        'updated_gt': None,
+        'updated_le': None,
+        'updated_lt': None,
+    }
 
     # No data yet
     assert not collection('/api/agencies').items
@@ -320,13 +351,23 @@ def test_view_api(client):
     assert set(agencies) == {'Hospital', 'School', 'School Board'}
 
     # People
+    people_collection = collection('/api/people')
     people = {
         data(item)['title']: item.href
-        for item in collection('/api/people').items
+        for item in people_collection.items
     }
     assert set(people) == {'Krabappel Edna', 'Rivera Nick'}
+    assert template(people_collection) >= {
+        'submitter_email',
+        'submitter_message',
+        'academic_title',
+        'salutation',
+        'first_name',
+        'last_name'
+    }
 
-    nick = collection(people['Rivera Nick']).items[0]
+    nick_collection = collection(people['Rivera Nick'])
+    nick = nick_collection.items[0]
     assert data(nick) == {
         'academic_title': 'Dr.',
         'location_address': '',
@@ -355,8 +396,17 @@ def test_view_api(client):
         'title': 'Doctor',
         'modified': '2023-05-08T01:02:00+00:00',
     }
+    assert template(nick_collection) >= {
+        'submitter_email',
+        'submitter_message',
+        'academic_title',
+        'salutation',
+        'first_name',
+        'last_name'
+    }
 
-    edna = collection(people['Krabappel Edna']).items[0]
+    edna_collection = collection(people['Krabappel Edna'])
+    edna = edna_collection.items[0]
     assert data(edna) == {
         'academic_title': '',
         'born': '',
@@ -385,6 +435,42 @@ def test_view_api(client):
         'title': 'Teacher',
         'modified': '2023-05-08T01:07:00+00:00',
     }
+    assert template(edna_collection) >= {
+        'submitter_email',
+        'submitter_message',
+        'academic_title',
+        'salutation',
+        'first_name',
+        'last_name'
+    }
+
+    # test submitting an invalid change (missing fields)
+    payload = Template(data=[
+        {'name': 'last_name', 'value': 'Riviera'}
+    ]).to_dict()
+    response = client.put_json(
+        people['Rivera Nick'],
+        payload,
+        expect_errors=True
+    )
+    assert response.status_code == 400
+    parsed = Collection.from_json(response.text)
+    assert 'submitter_email: Das ist ein Pflichtfeld' in parsed.error.message
+
+    # test submitting a valid change
+    payload = Template(data=[
+        {'name': 'submitter_email', 'value': 'submitter@example.org'},
+        {'name': 'last_name', 'value': 'Riviera'}
+    ]).to_dict()
+    response = client.put_json(people['Rivera Nick'], payload)
+    assert response.status_code == 200
+
+    assert connect.call_count == 1
+    assert authenticate.call_count == 1
+    assert broadcast.call_count == 1
+    assert broadcast.call_args[0][3]['event'] == 'browser-notification'
+    assert broadcast.call_args[0][3]['title'] == 'Neues Ticket'
+    assert broadcast.call_args[0][3]['created']
 
     # test 'first_name' url filter
     people = {

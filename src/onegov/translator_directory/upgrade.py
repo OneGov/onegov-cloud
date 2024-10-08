@@ -3,12 +3,12 @@ upgraded on the server. See :class:`onegov.core.upgrade.upgrade_task`.
 
 """
 from onegov.core.orm.types import JSON
-from onegov.core.upgrade import upgrade_task
+from onegov.core.upgrade import upgrade_task, UpgradeContext
 from sqlalchemy import Column, Boolean, Enum, Text
 
 
 @upgrade_task('Change withholding tax column to boolean')
-def change_withholding_tax_column_type(context):
+def change_withholding_tax_column_type(context: UpgradeContext) -> None:
     if not context.has_table('translators'):
         return
     if context.has_column('translators', 'withholding_tax'):
@@ -20,7 +20,7 @@ def change_withholding_tax_column_type(context):
 
 
 @upgrade_task('Adds meta and content columns')
-def add_meta_content_columns(context):
+def add_meta_content_columns(context: UpgradeContext) -> None:
     if not context.has_table('translators'):
         return
     table = 'translators'
@@ -35,7 +35,7 @@ def add_meta_content_columns(context):
 
 
 @upgrade_task('Adds imported tag for translators')
-def add_imported_column(context):
+def add_imported_column(context: UpgradeContext) -> None:
     if not context.has_table('translators'):
         return
     if not context.has_column('translators', 'imported'):
@@ -47,7 +47,7 @@ def add_imported_column(context):
 
 
 @upgrade_task('Add self-employed column')
-def add_self_employed_column(context):
+def add_self_employed_column(context: UpgradeContext) -> None:
     if not context.has_table('translators'):
         return
     if not context.has_column('translators', 'self_employed'):
@@ -59,7 +59,7 @@ def add_self_employed_column(context):
 
 
 @upgrade_task('Add unique constraint to translator email')
-def add_unique_constraint_to_translator_email(context):
+def add_unique_constraint_to_translator_email(context: UpgradeContext) -> None:
     if not context.has_table('translators'):
         return
     if context.has_column('translators', 'email'):
@@ -72,7 +72,7 @@ def add_unique_constraint_to_translator_email(context):
 
 
 @upgrade_task('Add translator type')
-def add_translator_type(context):
+def add_translator_type(context: UpgradeContext) -> None:
     if not context.has_table('translators'):
         return
     if not context.has_column('translators', 'state'):
@@ -87,11 +87,22 @@ def add_translator_type(context):
 
 
 @upgrade_task('Add translator profession')
-def add_translator_profession(context):
+def add_translator_profession(context: UpgradeContext) -> None:
     if not context.has_table('translators'):
         return
     if not context.has_column('translators', 'profession'):
         context.operations.add_column(
             'translators',
             Column('profession', Text)
+        )
+
+
+@upgrade_task('Moves the hometown field onto the translator itself.')
+def add_hometown(context: UpgradeContext) -> None:
+    if not context.has_table('translators'):
+        return
+    if not context.has_column('translators', 'hometown'):
+        context.operations.add_column(
+            'translators',
+            Column('hometown', Text)
         )

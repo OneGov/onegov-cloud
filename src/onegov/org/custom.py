@@ -1,11 +1,12 @@
 from onegov.chat import MessageCollection, TextModuleCollection
 from onegov.core.elements import Link, LinkGroup
+from onegov.form.collection import FormCollection, SurveyCollection
 from onegov.org import _, OrgApp
 from onegov.org.models import (
     GeneralFileCollection, ImageFileCollection, Organisation)
 from onegov.pay import PaymentProviderCollection, PaymentCollection
 from onegov.ticket import TicketCollection
-from onegov.ticket.collection import ArchivedTicketsCollection
+from onegov.ticket.collection import ArchivedTicketCollection
 from onegov.user import Auth, UserCollection, UserGroupCollection
 from purl import URL
 
@@ -25,21 +26,21 @@ def get_template_variables(request: 'OrgRequest') -> dict[str, Any]:
 
 def logout_path(request: 'OrgRequest') -> str:
     url = URL(request.link(request.app.org))
-    return url.path()
+    return url.path() or '/'
 
 
 def get_global_tools(request: 'OrgRequest') -> 'Iterator[Link | LinkGroup]':
 
     # Authentication / Userprofile
     if request.is_logged_in:
-        yield LinkGroup(_("Account"), classes=('user', ), links=(
+        yield LinkGroup(_('Account'), classes=('user', ), links=(
             Link(
-                _("User Profile"), request.link(
+                _('User Profile'), request.link(
                     request.app.org, name='userprofile'
                 ), attrs={'class': 'profile'}
             ),
             Link(
-                _("Logout"), request.link(
+                _('Logout'), request.link(
                     Auth.from_request(
                         request, to=logout_path(request)), name='logout'
                 ), attrs={'class': 'logout'}
@@ -48,14 +49,14 @@ def get_global_tools(request: 'OrgRequest') -> 'Iterator[Link | LinkGroup]':
 
     else:
         yield Link(
-            _("Login"), request.link(
+            _('Login'), request.link(
                 Auth.from_request_path(request), name='login'
             ), attrs={'class': 'login'}
         )
 
         if request.app.enable_user_registration:
             yield Link(
-                _("Register"), request.link(
+                _('Register'), request.link(
                     Auth.from_request_path(request), name='register'
                 ), attrs={'class': 'register'})
 
@@ -65,21 +66,21 @@ def get_global_tools(request: 'OrgRequest') -> 'Iterator[Link | LinkGroup]':
 
         links.append(
             Link(
-                _("Timeline"), request.class_link(MessageCollection),
+                _('Timeline'), request.class_link(MessageCollection),
                 attrs={'class': 'timeline'}
             )
         )
 
         links.append(
             Link(
-                _("Files"), request.class_link(GeneralFileCollection),
+                _('Files'), request.class_link(GeneralFileCollection),
                 attrs={'class': 'files'}
             )
         )
 
         links.append(
             Link(
-                _("Images"), request.class_link(ImageFileCollection),
+                _('Images'), request.class_link(ImageFileCollection),
                 attrs={'class': 'images'}
             )
         )
@@ -87,7 +88,7 @@ def get_global_tools(request: 'OrgRequest') -> 'Iterator[Link | LinkGroup]':
         if request.is_admin and request.app.payment_providers_enabled:
             links.append(
                 Link(
-                    _("Payment Provider"),
+                    _('Payment Provider'),
                     request.class_link(PaymentProviderCollection),
                     attrs={'class': 'payment-provider'}
                 )
@@ -95,7 +96,7 @@ def get_global_tools(request: 'OrgRequest') -> 'Iterator[Link | LinkGroup]':
 
         links.append(
             Link(
-                _("Payments"),
+                _('Payments'),
                 request.class_link(PaymentCollection),
                 attrs={'class': 'payment'}
             )
@@ -103,7 +104,7 @@ def get_global_tools(request: 'OrgRequest') -> 'Iterator[Link | LinkGroup]':
 
         links.append(
             Link(
-                _("Text modules"), request.class_link(TextModuleCollection),
+                _('Text modules'), request.class_link(TextModuleCollection),
                 attrs={'class': 'text-modules'}
             )
         )
@@ -111,7 +112,7 @@ def get_global_tools(request: 'OrgRequest') -> 'Iterator[Link | LinkGroup]':
         if request.is_admin:
             links.append(
                 Link(
-                    _("Settings"), request.link(
+                    _('Settings'), request.link(
                         request.app.org, 'settings'
                     ), attrs={'class': 'settings'}
                 )
@@ -119,7 +120,9 @@ def get_global_tools(request: 'OrgRequest') -> 'Iterator[Link | LinkGroup]':
 
             links.append(
                 Link(
-                    _("Users"), request.class_link(UserCollection),
+                    _('Users'), request.class_link(
+                        UserCollection,
+                        variables={'active': [True]}),
                     attrs={'class': 'user'}
                 )
             )
@@ -133,7 +136,7 @@ def get_global_tools(request: 'OrgRequest') -> 'Iterator[Link | LinkGroup]':
 
             links.append(
                 Link(
-                    _("Link Check"),
+                    _('Link Check'),
                     request.class_link(Organisation, name='link-check'),
                     attrs={'class': 'link-check'}
                 )
@@ -141,14 +144,32 @@ def get_global_tools(request: 'OrgRequest') -> 'Iterator[Link | LinkGroup]':
 
         links.append(
             Link(
-                _("Archived Tickets"),
+                _('Archived Tickets'),
                 request.class_link(
-                    ArchivedTicketsCollection, {'handler': 'ALL'}),
+                    ArchivedTicketCollection, {'handler': 'ALL'}),
                 attrs={'class': 'ticket-archive'}
             )
         )
 
-        yield LinkGroup(_("Management"), classes=('management', ), links=links)
+        links.append(
+            Link(
+                _('Forms'),
+                request.class_link(
+                    FormCollection),
+                attrs={'class': 'forms'}
+            )
+        )
+
+        links.append(
+            Link(
+                _('Surveys'),
+                request.class_link(
+                    SurveyCollection),
+                attrs={'class': 'surveys'}
+            )
+        )
+
+        yield LinkGroup(_('Management'), classes=('management', ), links=links)
 
     # Tickets
     if request.is_manager:
@@ -160,7 +181,7 @@ def get_global_tools(request: 'OrgRequest') -> 'Iterator[Link | LinkGroup]':
 
         links.append(
             Link(
-                _("My Tickets"),
+                _('My Tickets'),
                 request.class_link(
                     TicketCollection, {
                         'handler': 'ALL',
@@ -176,7 +197,7 @@ def get_global_tools(request: 'OrgRequest') -> 'Iterator[Link | LinkGroup]':
 
         links.append(
             Link(
-                _("Open Tickets"),
+                _('Open Tickets'),
                 request.class_link(
                     TicketCollection, {'handler': 'ALL', 'state': 'open'}
                 ),
@@ -189,7 +210,7 @@ def get_global_tools(request: 'OrgRequest') -> 'Iterator[Link | LinkGroup]':
 
         links.append(
             Link(
-                _("Pending Tickets"),
+                _('Pending Tickets'),
                 request.class_link(
                     TicketCollection, {'handler': 'ALL', 'state': 'pending'}
                 ),
@@ -202,7 +223,7 @@ def get_global_tools(request: 'OrgRequest') -> 'Iterator[Link | LinkGroup]':
 
         links.append(
             Link(
-                _("Closed Tickets"),
+                _('Closed Tickets'),
                 url=request.class_link(
                     TicketCollection, {'handler': 'ALL', 'state': 'closed'}
                 ),
@@ -219,7 +240,7 @@ def get_global_tools(request: 'OrgRequest') -> 'Iterator[Link | LinkGroup]':
             css = 'no-tickets'
 
         yield LinkGroup(
-            screen_count == 1 and _("Ticket") or _("Tickets"),
+            screen_count == 1 and _('Ticket') or _('Tickets'),
             classes=('with-count', css),
             links=links,
             attributes={'data-count': str(screen_count)}

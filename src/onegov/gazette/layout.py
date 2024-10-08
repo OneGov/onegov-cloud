@@ -1,5 +1,5 @@
 from functools import cached_property
-from datetime import datetime
+from markupsafe import Markup
 from onegov.core.layout import ChameleonLayout
 from onegov.core.static import StaticFile
 from onegov.gazette import _
@@ -14,6 +14,7 @@ from onegov.user import Auth
 from onegov.user import UserCollection
 from onegov.user import UserGroupCollection
 from sedate import to_timezone
+from sedate import utcnow
 
 
 from typing import Any
@@ -21,10 +22,11 @@ from typing import TYPE_CHECKING
 if TYPE_CHECKING:
     from chameleon import PageTemplateFile
     from datetime import date
+    from datetime import datetime
     from onegov.gazette.models import GazetteNotice
     from onegov.gazette.request import GazetteRequest
     from onegov.user import User
-    from typing_extensions import TypeAlias
+    from typing import TypeAlias
 
     NestedMenu: TypeAlias = list[tuple[
         str,
@@ -85,7 +87,7 @@ class Layout(ChameleonLayout):
 
     @cached_property
     def copyright_year(self) -> int:
-        return datetime.utcnow().year
+        return utcnow().year
 
     @cached_property
     def homepage_link(self) -> str:
@@ -166,7 +168,14 @@ class Layout(ChameleonLayout):
     @cached_property
     def sortable_url_template(self) -> str:
         return self.csrf_protected_url(
-            self.request.link(OrganizationMove.for_url_template())
+            self.request.class_link(
+                OrganizationMove,
+                {
+                    'subject_id': '{subject_id}',
+                    'target_id': '{target_id}',
+                    'direction': '{direction}'
+                }
+            )
         )
 
     @cached_property
@@ -179,12 +188,12 @@ class Layout(ChameleonLayout):
 
     @property
     def menu(self) -> 'NestedMenu':
-        result: 'NestedMenu' = []
+        result: NestedMenu = []
 
         if self.request.is_private(self.model):
             # Publisher and Admin
             result.append((
-                _("Official Notices"),
+                _('Official Notices'),
                 self.manage_notices_link,
                 (
                     isinstance(self.model, GazetteNoticeCollection)
@@ -193,50 +202,51 @@ class Layout(ChameleonLayout):
                 []
             ))
 
-            active = (
-                isinstance(self.model, IssueCollection)
-                or isinstance(self.model, OrganizationCollection)
-                or isinstance(self.model, CategoryCollection)
-                or (isinstance(self.model, UserCollection)
-                    and 'export' not in self.request.url)
-                or isinstance(self.model, UserGroupCollection)
-            )
-            manage: 'NestedMenu' = [
+            manage: NestedMenu = [
                 (
-                    _("Issues"),
+                    _('Issues'),
                     self.manage_issues_link,
-                    isinstance(self.model, IssueCollection),
+                    isinstance(self.model, IssueCollection)
+                    and 'export' not in self.request.url,
                     []
                 ),
                 (
-                    _("Organizations"),
+                    _('Organizations'),
                     self.manage_organizations_link,
-                    isinstance(self.model, OrganizationCollection),
+                    isinstance(self.model, OrganizationCollection)
+                    and 'export' not in self.request.url,
                     []
                 ),
                 (
-                    _("Categories"),
+                    _('Categories'),
                     self.manage_categories_link,
-                    isinstance(self.model, CategoryCollection),
+                    isinstance(self.model, CategoryCollection)
+                    and 'export' not in self.request.url,
                     []
                 ),
                 (
-                    _("Groups"),
+                    _('Groups'),
                     self.manage_groups_link,
                     isinstance(self.model, UserGroupCollection),
                     []
                 ),
                 (
-                    _("Users"),
+                    _('Users'),
                     self.manage_users_link,
-                    isinstance(self.model, UserCollection),
+                    isinstance(self.model, UserCollection)
+                    and 'export' not in self.request.url,
                     []
-                )
+                ),
             ]
-            result.append((_("Manage"), None, active, manage))
+            result.append((
+                _('Manage'),
+                None,
+                any(item[2] for item in manage),
+                manage
+            ))
 
             result.append((
-                _("Statistics"),
+                _('Statistics'),
                 self.request.link(
                     GazetteNoticeCollection(self.session, state='accepted'),
                     name='statistics'
@@ -247,7 +257,7 @@ class Layout(ChameleonLayout):
                 ),
                 []
             ))
-            export_links: 'NestedMenu' = [
+            export_links: NestedMenu = [
                 (
                     _('Issues'),
                     self.export_issues_link,
@@ -279,23 +289,23 @@ class Layout(ChameleonLayout):
 
             ]
             result.append((
-                _("Exports"),
+                _('Exports'),
                 None,
-                'export' in self.request.url,
+                any(item[2] for item in export_links),
                 export_links
             ))
 
         elif self.request.is_personal(self.model):
             # Editor
             result.append((
-                _("Dashboard"),
+                _('Dashboard'),
                 self.dashboard_link,
                 isinstance(self.model, Principal),
                 []
             ))
 
             result.append((
-                _("Published Official Notices"),
+                _('Published Official Notices'),
                 self.request.link(
                     GazetteNoticeCollection(
                         self.session,
@@ -338,7 +348,7 @@ class Layout(ChameleonLayout):
 
         if notice_number:
             return self.request.translate(_(
-                "No. ${issue_number}, ${issue_date} / ${notice_number}",
+                'No. ${issue_number}, ${issue_date} / ${notice_number}',
                 mapping={
                     'issue_number': issue_number,
                     'issue_date': issue_date,
@@ -347,7 +357,7 @@ class Layout(ChameleonLayout):
             ))
         else:
             return self.request.translate(_(
-                "No. ${issue_number}, ${issue_date}",
+                'No. ${issue_number}, ${issue_date}',
                 mapping={
                     'issue_number': issue_number,
                     'issue_date': issue_date
@@ -355,8 +365,7 @@ class Layout(ChameleonLayout):
             ))
 
     def format_text(self, text: str | None) -> str:
-        # FIXME: Markupsafe
-        return '<br>'.join((text or '').splitlines())
+        return Markup('<br>').join((text or '').splitlines())
 
 
 class MailLayout(Layout):

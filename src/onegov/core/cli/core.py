@@ -198,7 +198,7 @@ from onegov.server.core import Server
 from sqlalchemy.pool import NullPool
 from sqlalchemy import create_engine
 from uuid import uuid4
-from webtest import TestApp as Client
+from webtest import TestApp as Client  # type:ignore[import-untyped]
 
 
 from typing import Any, NoReturn, TYPE_CHECKING
@@ -214,6 +214,7 @@ if TYPE_CHECKING:
     #       exist in the mixed in class
     class _GroupContextAttrs(Protocol):
         selector: str | None
+
         @property
         def available_selectors(self) -> list[str]: ...
         @property
@@ -263,12 +264,12 @@ class GroupContextGuard(_GroupContextAttrs):
     ) -> None:
 
         if not self.selector:
-            click.secho("Available selectors:")
+            click.secho('Available selectors:')
 
             for selector in self.available_selectors:
-                click.secho(" - {}".format(selector))
+                click.secho(' - {}'.format(selector))
 
-            abort("No selector provided, aborting.")
+            abort('No selector provided, aborting.')
 
     def abort_if_no_subcommand(
         self,
@@ -277,12 +278,12 @@ class GroupContextGuard(_GroupContextAttrs):
     ) -> None:
 
         if click_context.invoked_subcommand is None:
-            click.secho("Paths matching the selector:")
+            click.secho('Paths matching the selector:')
 
             for match in matches:
-                click.secho(" - {}".format(match))
+                click.secho(' - {}'.format(match))
 
-            abort("No subcommand provided, aborting.")
+            abort('No subcommand provided, aborting.')
 
     def abort_if_no_match(
         self,
@@ -291,10 +292,10 @@ class GroupContextGuard(_GroupContextAttrs):
     ) -> None:
 
         if self.matches_required and not matches:
-            click.secho("Available selectors:")
+            click.secho('Available selectors:')
 
             for selector in self.available_selectors:
-                click.secho(" - {}".format(selector))
+                click.secho(' - {}'.format(selector))
 
             abort("Selector doesn't match any paths, aborting.")
 
@@ -305,12 +306,12 @@ class GroupContextGuard(_GroupContextAttrs):
     ) -> None:
 
         if self.singular and len(matches) > 1:
-            click.secho("Paths matching the selector:")
+            click.secho('Paths matching the selector:')
 
             for match in matches:
-                click.secho(" - {}".format(match))
+                click.secho(' - {}'.format(match))
 
-            abort("The selector must match a single path, aborting.")
+            abort('The selector must match a single path, aborting.')
 
     def abort_if_no_create_path(
         self,
@@ -320,16 +321,16 @@ class GroupContextGuard(_GroupContextAttrs):
 
         if self.creates_path:
             if len(matches) > 1:
-                abort("This selector may not reference an existing path")
+                abort('This selector may not reference an existing path')
 
             self.abort_if_no_selector(click_context, matches)
 
             assert self.selector is not None
             if len(self.selector.lstrip('/').split('/')) != 2:
-                abort("This selector must reference a full path")
+                abort('This selector must reference a full path')
 
             if '*' in self.selector:
-                abort("This selector may not contain a wildcard")
+                abort('This selector may not contain a wildcard')
 
 
 class GroupContext(GroupContextGuard):
@@ -427,7 +428,7 @@ class GroupContext(GroupContextGuard):
     def match_to_appcfg(self, match: str) -> 'ApplicationConfig | None':
         """ Takes the given match and returns the maching appcfg object. """
 
-        namespace, id = self.split_match(match)
+        namespace, _id = self.split_match(match)
 
         for appcfg in self.config.applications:
             if appcfg.namespace == namespace:
@@ -679,10 +680,10 @@ def command_group() -> click.Group:
     @click.group(invoke_without_command=True)
     @click.option(
         '--select', default=None,
-        help="Selects the applications this command should be applied to")
+        help='Selects the applications this command should be applied to')
     @click.option(
         '--config', default='onegov.yml',
-        help="The onegov config file")
+        help='The onegov config file')
     def command_group(select: str | None, config: str) -> None:
         try:
             context = click.get_current_context()
@@ -692,7 +693,7 @@ def command_group() -> click.Group:
             context.obj.config.logging.setdefault('version', 1)
             logging.config.dictConfig(context.obj.config.logging)
         except DB_CONNECTION_ERRORS as e:
-            print("Could not connect to database:")
+            print('Could not connect to database:')
             print(e)
             sys.exit(1)
 
@@ -712,7 +713,7 @@ def command_group() -> click.Group:
         if not processor:
             return
 
-        processors: 'Sequence[Callable[..., Any]]'
+        processors: Sequence[Callable[..., Any]]
         if callable(processor):
             processors = (processor, )
         else:

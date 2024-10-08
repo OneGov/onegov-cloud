@@ -60,7 +60,7 @@ class AllocationFormHelpers:
         start_dt = sedate.as_datetime(start)
         end_dt = sedate.as_datetime(end)
 
-        dates: 'Iterable[datetime]'
+        dates: Iterable[datetime]
         if start_dt == end_dt:
             dates = (start_dt, )
         else:
@@ -132,20 +132,20 @@ class AllocationRuleForm(Form):
         ) -> Sequence[tuple[datetime, datetime]]: ...
 
     title = StringField(
-        label=_("Title"),
-        description=_("General availability"),
+        label=_('Title'),
+        description=_('General availability'),
         validators=[InputRequired()],
-        fieldset=_("Rule"))
+        fieldset=_('Rule'))
 
     extend = RadioField(
-        label=_("Extend"),
+        label=_('Extend'),
         validators=[InputRequired()],
-        fieldset=_("Rule"),
+        fieldset=_('Rule'),
         default='daily',
         choices=(
-            ('daily', _("Extend by one day at midnight")),
-            ('monthly', _("Extend by one month at the end of the month")),
-            ('yearly', _("Extend by one year at the end of the year"))
+            ('daily', _('Extend by one day at midnight')),
+            ('monthly', _('Extend by one month at the end of the month')),
+            ('yearly', _('Extend by one year at the end of the year'))
         ))
 
     @cached_property
@@ -185,7 +185,8 @@ class AllocationRuleForm(Form):
 
         for k, v in value['options'].items():
             if hasattr(self, k):
-                getattr(self, k).data = v
+                if getattr(self, k) is not None:
+                    getattr(self, k).data = v
 
     @property
     def options(self) -> dict[str, Any]:
@@ -252,55 +253,55 @@ class AllocationForm(Form, AllocationFormHelpers):
         request: 'OrgRequest'
 
     start = DateField(
-        label=_("Start"),
+        label=_('Start'),
         validators=[InputRequired()],
-        fieldset=_("Date")
+        fieldset=_('Date')
     )
 
     end = DateField(
-        label=_("End"),
+        label=_('End'),
         validators=[InputRequired()],
-        fieldset=_("Date")
+        fieldset=_('Date')
     )
 
     except_for = MultiCheckboxField(
-        label=_("Except for"),
+        label=_('Except for'),
         choices=WEEKDAYS,
         coerce=int,
         render_kw={
             'prefix_label': False,
             'class_': 'oneline-checkboxes'
         },
-        fieldset=("Date")
+        fieldset=('Date')
     )
 
     on_holidays = RadioField(
-        label=_("On holidays"),
+        label=_('On holidays'),
         choices=(
-            ('yes', _("Yes")),
-            ('no', _("No"))
+            ('yes', _('Yes')),
+            ('no', _('No'))
         ),
         default='yes',
-        fieldset=_("Date"))
+        fieldset=_('Date'))
 
     during_school_holidays = RadioField(
-        label=_("During school holidays"),
+        label=_('During school holidays'),
         choices=(
-            ('yes', _("Yes")),
-            ('no', _("No"))
+            ('yes', _('Yes')),
+            ('no', _('No'))
         ),
         default='yes',
-        fieldset=_("Date"))
+        fieldset=_('Date'))
 
     access = RadioField(
-        label=_("Access"),
+        label=_('Access'),
         choices=(
-            ('public', _("Public")),
-            ('private', _("Only by privileged users")),
-            ('member', _("Only by privileged users and members")),
+            ('public', _('Public')),
+            ('private', _('Only by privileged users')),
+            ('member', _('Only by privileged users and members')),
         ),
         default='public',
-        fieldset=_("Security")
+        fieldset=_('Security')
     )
 
     def on_request(self) -> None:
@@ -313,7 +314,7 @@ class AllocationForm(Form, AllocationFormHelpers):
         if self.start.data and self.end.data:
             if self.start.data > self.end.data:
                 assert isinstance(self.start.errors, list)
-                self.start.errors.append(_("Start date before end date"))
+                self.start.errors.append(_('Start date before end date'))
                 return False
         return None
 
@@ -403,20 +404,20 @@ class AllocationEditForm(Form, AllocationFormHelpers):
     """
 
     date = DateField(
-        label=_("Date"),
+        label=_('Date'),
         validators=[InputRequired()],
-        fieldset=_("Date")
+        fieldset=_('Date')
     )
 
     access = RadioField(
-        label=_("Access"),
+        label=_('Access'),
         choices=(
-            ('public', _("Public")),
-            ('private', _("Only by privileged users")),
-            ('member', _("Only by privileged users and members")),
+            ('public', _('Public')),
+            ('private', _('Only by privileged users')),
+            ('member', _('Only by privileged users and members')),
         ),
         default='public',
-        fieldset=_("Security")
+        fieldset=_('Security')
     )
 
     # FIXME: same here
@@ -433,21 +434,21 @@ class AllocationEditForm(Form, AllocationFormHelpers):
 class Daypasses:
 
     daypasses = IntegerField(
-        label=_("Daypasses"),
+        label=_('Daypasses'),
         validators=[
             InputRequired(),
             NumberRange(1, 999)
         ],
-        fieldset=_("Daypasses")
+        fieldset=_('Daypasses')
     )
 
     daypasses_limit = IntegerField(
-        label=_("Daypasses Limit"),
+        label=_('Daypasses Limit'),
         validators=[
             InputRequired(),
             NumberRange(0, 999)
         ],
-        fieldset=_("Daypasses")
+        fieldset=_('Daypasses')
     )
 
 
@@ -509,49 +510,49 @@ class DaypassAllocationEditForm(AllocationEditForm, Daypasses):
 class RoomAllocationForm(AllocationForm):
 
     as_whole_day = RadioField(
-        label=_("Whole day"),
+        label=_('Whole day'),
         choices=[
-            ('yes', _("Yes")),
-            ('no', _("No"))
+            ('yes', _('Yes')),
+            ('no', _('No'))
         ],
         default='yes',
-        fieldset=_("Time")
+        fieldset=_('Time')
     )
 
     start_time = TimeField(
-        label=_("Each starting at"),
-        description=_("HH:MM"),
+        label=_('Each starting at'),
+        description=_('HH:MM'),
         validators=[InputRequired()],
-        fieldset=_("Time"),
+        fieldset=_('Time'),
         depends_on=('as_whole_day', 'no')
     )
 
     end_time = TimeField(
-        label=_("Each ending at"),
-        description=_("HH:MM"),
+        label=_('Each ending at'),
+        description=_('HH:MM'),
         validators=[InputRequired()],
-        fieldset=_("Time"),
+        fieldset=_('Time'),
         depends_on=('as_whole_day', 'no')
     )
 
     is_partly_available = RadioField(
-        label=_("May be partially reserved"),
+        label=_('May be partially reserved'),
         choices=[
-            ('yes', _("Yes")),
-            ('no', _("No"))
+            ('yes', _('Yes')),
+            ('no', _('No'))
         ],
         default='no',
-        fieldset=_("Options"),
+        fieldset=_('Options'),
         depends_on=('as_whole_day', 'no')
     )
 
     per_time_slot = IntegerField(
-        label=_("Reservations per time slot"),
+        label=_('Reservations per time slot'),
         validators=[
             InputRequired(),
             NumberRange(1, 999)
         ],
-        fieldset=_("Options"),
+        fieldset=_('Options'),
         default=1,
         depends_on=('as_whole_day', 'no', 'is_partly_available', 'no')
     )
@@ -587,22 +588,22 @@ class RoomAllocationForm(AllocationForm):
 class DailyItemFields:
 
     items = IntegerField(
-        label=_("Available items"),
+        label=_('Available items'),
         validators=[
             InputRequired(),
             NumberRange(1, 999)
         ],
-        fieldset=_("Options"),
+        fieldset=_('Options'),
         default=1,
     )
 
     item_limit = IntegerField(
-        label=_("Reservations per time slot and person"),
+        label=_('Reservations per time slot and person'),
         validators=[
             InputRequired(),
             NumberRange(1, 999)
         ],
-        fieldset=_("Options"),
+        fieldset=_('Options'),
         default=1,
     )
 
@@ -664,38 +665,38 @@ class DailyItemAllocationEditForm(AllocationEditForm, DailyItemFields):
 class RoomAllocationEditForm(AllocationEditForm):
 
     as_whole_day = RadioField(
-        label=_("Whole day"),
+        label=_('Whole day'),
         choices=[
-            ('yes', _("Yes")),
-            ('no', _("No"))
+            ('yes', _('Yes')),
+            ('no', _('No'))
         ],
         default='yes',
-        fieldset=_("Time")
+        fieldset=_('Time')
     )
 
     start_time = TimeField(
-        label=_("From"),
-        description=_("HH:MM"),
+        label=_('From'),
+        description=_('HH:MM'),
         validators=[DataRequired()],
-        fieldset=_("Time"),
+        fieldset=_('Time'),
         depends_on=('as_whole_day', 'no')
     )
 
     end_time = TimeField(
-        label=_("Until"),
-        description=_("HH:MM"),
+        label=_('Until'),
+        description=_('HH:MM'),
         validators=[DataRequired()],
-        fieldset=_("Time"),
+        fieldset=_('Time'),
         depends_on=('as_whole_day', 'no')
     )
 
     per_time_slot = IntegerField(
-        label=_("Slots per Reservation"),
+        label=_('Slots per Reservation'),
         validators=[
             InputRequired(),
             NumberRange(1, 999)
         ],
-        fieldset=_("Options"),
+        fieldset=_('Options'),
         default=1,
         depends_on=('as_whole_day', 'no')
     )
@@ -708,7 +709,7 @@ class RoomAllocationEditForm(AllocationEditForm):
         assert self.end_time.data is not None
         if self.start_time.data >= self.end_time.data:
             assert isinstance(self.start_time.errors, list)
-            self.start_time.errors.append(_("Start time before end time"))
+            self.start_time.errors.append(_('Start time before end time'))
             return False
         return None
 

@@ -12,12 +12,12 @@ from onegov.org.forms.form_export import FormSubmissionsExport
 from onegov.org.forms.form_registration import FormRegistrationWindowForm
 from onegov.org.forms.generic import ExportForm, DateRangeForm
 from onegov.org.forms.imageset import ImageSetForm
-from onegov.org.forms.mtan import MTANForm
-from onegov.org.forms.mtan import RequestMTANForm
+from onegov.org.forms.mtan import PublicMTANForm
+from onegov.org.forms.mtan import PublicRequestMTANForm
 from onegov.org.forms.newsletter import NewsletterForm
 from onegov.org.forms.newsletter import NewsletterSendForm
 from onegov.org.forms.newsletter import NewsletterTestForm
-from onegov.org.forms.page import LinkForm, PageForm
+from onegov.org.forms.page import LinkForm, PageForm, IframeForm
 from onegov.org.forms.person import PersonForm
 from onegov.org.forms.reservation import FindYourSpotForm
 from onegov.org.forms.reservation import ReservationForm
@@ -33,6 +33,7 @@ from onegov.org.forms.settings import HomepageSettingsForm
 from onegov.org.forms.settings import MapSettingsForm
 from onegov.org.forms.settings import ModuleSettingsForm
 from onegov.org.forms.signup import SignupForm
+from onegov.org.forms.survey_submission import SurveySubmissionWindowForm
 from onegov.org.forms.text_module import TextModuleForm
 from onegov.org.forms.ticket import (
     InternalTicketChatMessageForm, ExtendedInternalTicketChatMessageForm)
@@ -72,14 +73,14 @@ __all__ = (
     'ManageUserGroupForm',
     'MapSettingsForm',
     'ModuleSettingsForm',
-    'MTANForm',
     'NewsletterForm',
     'NewsletterSendForm',
     'NewsletterTestForm',
     'NewUserForm',
     'PageForm',
     'PersonForm',
-    'RequestMTANForm',
+    'PublicMTANForm',
+    'PublicRequestMTANForm',
     'ReservationForm',
     'ResourceCleanupForm',
     'ResourceExportForm',
@@ -88,9 +89,11 @@ __all__ = (
     'RoomAllocationEditForm',
     'RoomAllocationForm',
     'SignupForm',
+    'SurveySubmissionWindowForm',
     'TextModuleForm',
     'TicketAssignmentForm',
     'TicketChatMessageForm',
     'TicketNoteForm',
     'UserProfileForm',
+    'IframeForm',
 )

@@ -11,9 +11,9 @@ from onegov.election_day.utils.parties import get_party_results_deltas
 from typing import Any
 from typing import TYPE_CHECKING
 if TYPE_CHECKING:
-    from onegov.ballot import Election  # noqa: F401
-    from onegov.ballot import ProporzElection  # noqa: F401
     from onegov.election_day.layouts import DefaultLayout
+    from onegov.election_day.models import Election  # noqa: F401
+    from onegov.election_day.models import ProporzElection  # noqa: F401
 
 
 @ElectionDayApp.screen_widget(

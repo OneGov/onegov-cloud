@@ -1,7 +1,8 @@
 from dectate import Action
+from itertools import count
 
 
-from typing import cast, Any, TYPE_CHECKING
+from typing import cast, Any, ClassVar, TYPE_CHECKING
 if TYPE_CHECKING:
     from collections.abc import Callable
     from onegov.core.elements import LinkGroup
@@ -11,8 +12,7 @@ if TYPE_CHECKING:
     from onegov.org.request import OrgRequest
     from onegov.user import User
     from sqlalchemy.orm import Query
-    from typing import Protocol, TypeVar, TypedDict
-    from typing_extensions import TypeAlias
+    from typing import Protocol, TypeAlias, TypeVar, TypedDict
 
     DirectoryEntryT = TypeVar('DirectoryEntryT', bound=DirectoryEntry)
     DirectorySearchWidgetRegistry: TypeAlias = dict[
@@ -130,8 +130,7 @@ class UserlinkAction(Action):
         'linkgroup_registry': list
     }
 
-    # FIXME: Use itertools.count
-    counter = iter(range(1, 123456789))
+    counter: ClassVar = count(1)
 
     def __init__(self) -> None:
         self.name = next(self.counter)
@@ -229,7 +228,7 @@ class SettingsView(Action):
     ) -> None:
 
         self.name = name
-        self.setting: 'SettingsDict' = {
+        self.setting: SettingsDict = {
             'name': name,
             'title': title,
             'order': order,

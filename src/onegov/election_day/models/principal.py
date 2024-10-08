@@ -3,13 +3,12 @@ import onegov.election_day
 from functools import cached_property
 from collections import OrderedDict
 from datetime import date
+from markupsafe import Markup
 from onegov.core import utils
 from onegov.core.custom import json
 from onegov.election_day import _
 from pathlib import Path
 from urllib.parse import urlsplit
-from xsdata_ech.e_ch_0155_5_0 import DomainOfInfluenceType
-from xsdata_ech.e_ch_0155_5_0 import DomainOfInfluenceTypeType
 from yaml import safe_load
 
 
@@ -17,46 +16,9 @@ from typing import Any
 from typing import Literal
 from typing import TYPE_CHECKING
 if TYPE_CHECKING:
-    from onegov.ballot.types import DomainOfInfluence
-    from onegov.core.orm.mixins.content import dict_property
-    from sqlalchemy import Column
     from translationstring import TranslationString
-    from typing import overload
-    from typing import Protocol
-    from typing import TypeVar
-    from typing_extensions import Never
-    from typing_extensions import Self
-    from typing_extensions import TypeAlias
+    from typing import Never
     from yaml.reader import _ReadStream
-
-    _T_co = TypeVar('_T_co', covariant=True)
-
-    class ReadableDescriptor(Protocol[_T_co]):
-        @overload
-        def __get__(self, obj: None, owner: type[object], /) -> Self: ...
-        @overload
-        def __get__(self, obj: object, owner: type[object], /) -> _T_co: ...
-
-    class _HasDomainAndSegment(Protocol):
-        @property
-        def domain(self) -> str | None: ...
-        @property
-        def domain_segment(self) -> str | None: ...
-
-    class _ModelWithDomainAndSegment(Protocol):
-        domain: Column[DomainOfInfluence]
-        domain_segment: dict_property[str]
-
-    # HACK: To get around the fact that custom descriptors can't
-    #       fulfil a readable property, we could maybe fix this
-    #       by defining a covariant protocol for domain and domain_segment
-    #       but it seems pretty tough to do
-    HasDomainAndSegment: TypeAlias = (
-        _HasDomainAndSegment | _ModelWithDomainAndSegment)
-
-
-# FIXME: Since these are loaded from YAML it would probably be a good
-#        use-case for Pydantic, so we can properly validate our config
 
 
 class Principal:
@@ -138,6 +100,8 @@ class Principal:
         reply_to: str | None = None,
         custom_css: str | None = None,
         official_host: str | None = None,
+        segmented_notifications: bool = False,
+        private: bool = False,
         **kwargs: 'Never'
     ):
         assert all((id_, domain, domains_election, domains_vote, entities))
@@ -146,12 +110,16 @@ class Principal:
         self.domains_election = domains_election
         self.domains_vote = domains_vote
         self.entities = entities
-        self.name = name
+        self.name = name or id_
         self.logo = logo
         self.logo_position = logo_position
         self.color = color
         self.base = base
-        self.analytics = analytics
+        # NOTE: This is inherently unsafe, since we need to allow script tags
+        #       in order for most analytics to work. Eventually this may be
+        #       able to go away again or be reduced to support a few specific
+        #       providers.
+        self.analytics = Markup(analytics) if analytics else None  # noqa:MS001
         self.has_districts = has_districts
         self.has_regions = has_regions
         self.has_superregions = has_superregions
@@ -174,6 +142,8 @@ class Principal:
         self.reply_to = reply_to
         self.custom_css = custom_css
         self.official_host = official_host
+        self.segmented_notifications = segmented_notifications
+        self.private = private
 
     @classmethod
     def from_yaml(cls, yaml_source: '_ReadStream') -> 'Canton | Municipality':
@@ -205,6 +175,13 @@ class Principal:
             ).exists()
 
         return True
+
+    def get_entities(self, year: int) -> set[str]:
+        entities = {
+            entity.get('name', None)
+            for entity in self.entities.get(year, {}).values()
+        }
+        return {entity for entity in entities if entity}
 
     def get_districts(self, year: int) -> set[str]:
         if self.has_districts:
@@ -242,10 +219,6 @@ class Principal:
 
     def label(self, value: str) -> str:
         raise NotImplementedError()
-
-    @cached_property
-    def hidden_tabs(self) -> dict[str, dict[str, bool]]:
-        return self.hidden_elements.get('tabs', {})
 
 
 class Canton(Principal):
@@ -289,7 +262,6 @@ class Canton(Principal):
     ):
         assert canton in self.CANTONS
         self.id = canton
-        self.canton_id = self.CANTONS[canton]  # official BFS number
 
         kwargs.pop('use_maps', None)
 
@@ -329,31 +301,31 @@ class Canton(Principal):
         }
         has_superregions = superregions != {None}
 
-        domains_election: dict[str, 'TranslationString'] = OrderedDict()
-        domains_election['federation'] = _("Federal")
-        domains_election['canton'] = _("Cantonal")
+        domains_election: dict[str, TranslationString] = OrderedDict()
+        domains_election['federation'] = _('Federal')
+        domains_election['canton'] = _('Cantonal')
         if has_regions:
             domains_election['region'] = _(
-                "Regional (${on})",
+                'Regional (${on})',
                 mapping={'on': self.label('region')}
             )
         if has_districts:
             domains_election['district'] = _(
-                "Regional (${on})",
+                'Regional (${on})',
                 mapping={'on': self.label('district')}
             )
         domains_election['none'] = _(
-            "Regional (${on})",
-            mapping={'on': _("Other")}
+            'Regional (${on})',
+            mapping={'on': _('Other')}
         )
-        domains_election['municipality'] = _("Communal")
+        domains_election['municipality'] = _('Communal')
 
-        domains_vote: dict[str, 'TranslationString'] = OrderedDict()
-        domains_vote['federation'] = _("Federal")
-        domains_vote['canton'] = _("Cantonal")
-        domains_vote['municipality'] = _("Communal")
+        domains_vote: dict[str, TranslationString] = OrderedDict()
+        domains_vote['federation'] = _('Federal')
+        domains_vote['canton'] = _('Cantonal')
+        domains_vote['municipality'] = _('Communal')
 
-        super(Canton, self).__init__(
+        super().__init__(
             id_=canton,
             domain='canton',
             domains_election=domains_election,
@@ -368,108 +340,46 @@ class Canton(Principal):
 
     def label(self, value: str) -> str:
         if value == 'entity':
-            return _("Municipality")
+            return _('Municipality')
         if value == 'entities':
-            return _("Municipalities")
+            return _('Municipalities')
         if value == 'district':
             if self.id == 'bl':
-                return _("district_label_bl")
+                return _('district_label_bl')
             if self.id == 'gr':
-                return _("district_label_gr")
+                return _('district_label_gr')
             if self.id == 'sz':
-                return _("district_label_sz")
-            return _("District")
+                return _('district_label_sz')
+            return _('District')
         if value == 'districts':
             if self.id == 'bl':
-                return _("districts_label_bl")
+                return _('districts_label_bl')
             if self.id == 'gr':
-                return _("districts_label_gr")
+                return _('districts_label_gr')
             if self.id == 'sz':
-                return _("districts_label_sz")
-            return _("Districts")
+                return _('districts_label_sz')
+            return _('Districts')
         if value == 'region':
             if self.id == 'gr':
-                return _("region_label_gr")
-            return _("District")
+                return _('region_label_gr')
+            return _('District')
         if value == 'regions':
             if self.id == 'gr':
-                return _("regions_label_gr")
-            return _("Districts")
+                return _('regions_label_gr')
+            return _('Districts')
         if value == 'superregion':
             if self.id == 'bl':
-                return _("superregion_label_bl")
-            return _("District")
+                return _('superregion_label_bl')
+            return _('District')
         if value == 'superregions':
             if self.id == 'bl':
-                return _("superregions_label_bl")
-            return _("Districts")
+                return _('superregions_label_bl')
+            return _('Districts')
         if value == 'mandates':
             if self.id == 'gr':
-                return _("Seats")
-            return _("Mandates")
+                return _('Seats')
+            return _('Mandates')
         return ''
-
-    def get_ech_domain(
-        self,
-        item: 'HasDomainAndSegment | None' = None
-    ) -> DomainOfInfluenceType:
-        """ Returns the domain of influence according to eCH-155.
-
-        Returns the domain of the principal if no domain is given, else the
-        domain of the given election or vote.
-
-        """
-
-        if item is None or item.domain == 'canton':
-            # todo:
-            return DomainOfInfluenceType(
-                domain_of_influence_type=DomainOfInfluenceTypeType(
-                    DomainOfInfluenceTypeType.CT
-                ),
-                domain_of_influence_identification=str(self.canton_id),
-                domain_of_influence_name=self.name
-            )
-
-        if item.domain == 'federation':
-            return DomainOfInfluenceType(
-                domain_of_influence_type=DomainOfInfluenceTypeType(
-                    DomainOfInfluenceTypeType.CH
-                ),
-                domain_of_influence_identification='1',
-                domain_of_influence_name='Bund'
-            )
-        if item.domain in ('region', 'district'):
-            return DomainOfInfluenceType(
-                domain_of_influence_type=DomainOfInfluenceTypeType(
-                    DomainOfInfluenceTypeType.BZ
-                ),
-                domain_of_influence_identification='',
-                domain_of_influence_name=item.domain_segment or ''
-            )
-        if item.domain == 'municipality':
-            municipalities = {
-                entity.get('name', None): id_
-                for year in self.entities.values()
-                for id_, entity in year.items()
-                if entity.get('name', None)
-            }
-            ident = municipalities.get(item.domain_segment)
-            identification = str(ident) if ident else ''
-            return DomainOfInfluenceType(
-                domain_of_influence_type=DomainOfInfluenceTypeType(
-                    DomainOfInfluenceTypeType.MU
-                ),
-                domain_of_influence_identification=identification,
-                domain_of_influence_name=item.domain_segment or ''
-            )
-
-        return DomainOfInfluenceType(
-            domain_of_influence_type=DomainOfInfluenceTypeType(
-                DomainOfInfluenceTypeType.AN
-            ),
-            domain_of_influence_identification='',
-            domain_of_influence_name=item.domain_segment or ''
-        )
 
 
 class Municipality(Principal):
@@ -488,12 +398,13 @@ class Municipality(Principal):
 
         self.canton = canton
         self.canton_name = canton_name
-        self.canton_id = Canton.CANTONS[canton]  # official BFS number
 
-        domains: dict[str, 'TranslationString'] = OrderedDict((
-            ('federation', _("Federal")),
-            ('canton', _("Cantonal")),
-            ('municipality', _("Communal"))
+        kwargs.pop('segmented_notifications', None)
+
+        domains: dict[str, TranslationString] = OrderedDict((
+            ('federation', _('Federal')),
+            ('canton', _('Cantonal')),
+            ('municipality', _('Communal'))
         ))
 
         # Try to read the quarters for each year from our static data
@@ -526,7 +437,7 @@ class Municipality(Principal):
                 for year in range(2002, date.today().year + 1)
             }
 
-        super(Municipality, self).__init__(
+        super().__init__(
             id_=municipality,
             domain='municipality',
             domains_election=domains,
@@ -538,52 +449,7 @@ class Municipality(Principal):
 
     def label(self, value: str) -> str:
         if value == 'entity':
-            return _("Quarter") if self.has_quarters else _("Municipality")
+            return _('Quarter') if self.has_quarters else _('Municipality')
         if value == 'entities':
-            return _("Quarters") if self.has_quarters else _("Municipalities")
+            return _('Quarters') if self.has_quarters else _('Municipalities')
         return ''
-
-    def get_ech_domain(
-        self,
-        item: 'HasDomainAndSegment | None' = None
-    ) -> DomainOfInfluenceType:
-
-        if item is None or item.domain == 'municipality':
-            return DomainOfInfluenceType(
-                domain_of_influence_type=DomainOfInfluenceTypeType(
-                    DomainOfInfluenceTypeType.MU
-                ),
-                domain_of_influence_identification=self.id,
-                domain_of_influence_name=self.name
-            )
-        if item.domain == 'federation':
-            return DomainOfInfluenceType(
-                domain_of_influence_type=DomainOfInfluenceTypeType(
-                    DomainOfInfluenceTypeType.CH
-                ),
-                domain_of_influence_identification='1',
-                domain_of_influence_name='Bund'
-            )
-        if item.domain == 'canton':
-            return DomainOfInfluenceType(
-                domain_of_influence_type=DomainOfInfluenceTypeType(
-                    DomainOfInfluenceTypeType.CT
-                ),
-                domain_of_influence_identification=str(self.canton_id),
-                domain_of_influence_name=self.canton_name
-            )
-        if item.domain == 'district':
-            return DomainOfInfluenceType(
-                domain_of_influence_type=DomainOfInfluenceTypeType(
-                    DomainOfInfluenceTypeType.SK
-                ),
-                domain_of_influence_identification='',
-                domain_of_influence_name=item.domain_segment or ''
-            )
-        return DomainOfInfluenceType(
-            domain_of_influence_type=DomainOfInfluenceTypeType(
-                DomainOfInfluenceTypeType.AN
-            ),
-            domain_of_influence_identification='',
-            domain_of_influence_name=item.domain_segment or ''
-        )

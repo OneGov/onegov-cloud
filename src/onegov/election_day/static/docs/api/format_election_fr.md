@@ -4,43 +4,31 @@ En ce qui concerne les formats de fichiers, les fichiers XLS et XLSX sont accept
 
 ## Contenu
 
-<!-- https://atom.io/packages/atom-mdtoc -->
-<!-- MDTOC maxdepth:6 firsth1:2 numbering:1 flatten:0 bullets:1 updateOnSave:1 -->
+<!-- TOC updateonsave:false -->
 
-- 1. [Contenu](#contenu)
-- 2. [Avant-propos](#avant-propos)
-   - 2.1. [Entités](#entités)
-   - 2.2. [Élections tacites](#élections-tacites)
-   - 2.3. [Élections régionales](#élections-régionales)
-- 3. [Formats](#formats)
-   - 3.1. [Onegov](#onegov)
-      - 3.1.1. [Colonnes](#colonnes)
-      - 3.1.2. [Résultats du panachage de listes](#résultats-du-panachage-de-listes)
-      - 3.1.3. [Résultats temporaires](#résultats-temporaires)
-      - 3.1.4. [Composantes des élections](#composantes-des-élections)
-      - 3.1.5. [Modèle](#modèle)
-   - 3.2. [Wabsti Majorz](#wabsti-majorz)
-      - 3.2.1. [Exportation des données de colonnes](#exportation-des-données-de-colonnes)
-      - 3.2.2. [Résultats des candidats de colonnes](#résultats-des-candidats-de-colonnes)
-      - 3.2.3. [Résultats temporaires](#résultats-temporaires)
-      - 3.2.4. [Modèles](#modèles)
-   - 3.3. [Wabsti Proporz](#wabsti-proporz)
-      - 3.3.1. [Exportation des données de résultats pour les colonnes](#exportation-des-données-de-résultats-pour-les-colonnes)
-      - 3.3.2. [Résultats du panachage](#résultats-du-panachage)
-      - 3.3.3. [Exportation des données de statistiques pour les colonnes](#exportation-des-données-de-statistiques-pour-les-colonnes)
-      - 3.3.4. [Connexions de liste des colonnes](#connexions-de-liste-des-colonnes)
-      - 3.3.5. [Résultats de candidats des colonnes](#résultats-de-candidats-des-colonnes)
-      - 3.3.6. [Résultats temporaires](#résultats-temporaires)
-      - 3.3.7. [Modèles](#modèles)
-   - 3.4. [WabstiCExport Majorz](#wabsticexport-majorz)
-   - 3.5. [WabstiCExport Proporz](#wabsticexport-proporz)
-   - 3.6. [Résultats du parti](#résultats-du-parti)
-      - 3.6.1. [Domaine d'influence](#domaine-dinfluence)
-      - 3.6.2. [Résultats du panachage](#résultats-du-panachage)
-      - 3.6.3. [Modèles](#modèles)
-   - 3.7. [Création automatique des composantes des élections](#création-automatique-des-composantes-des-élections)
+- [Spécifications de format des élections](#sp%C3%A9cifications-de-format-des-%C3%A9lections)
+    - [Contenu](#contenu)
+    - [Avant-propos](#avant-propos)
+        - [Entités](#entit%C3%A9s)
+        - [Élections tacites](#%C3%A9lections-tacites)
+        - [Élections régionales](#%C3%A9lections-r%C3%A9gionales)
+    - [Formats](#formats)
+        - [Onegov](#onegov)
+            - [Colonnes](#colonnes)
+            - [Résultats du panachage de listes](#r%C3%A9sultats-du-panachage-de-listes)
+            - [Résultats du panachage de candidats](#r%C3%A9sultats-du-panachage-de-candidats)
+            - [Résultats temporaires](#r%C3%A9sultats-temporaires)
+            - [Composantes des élections](#composantes-des-%C3%A9lections)
+            - [Modèle](#mod%C3%A8le)
+        - [WabstiCExport Majorz](#wabsticexport-majorz)
+        - [WabstiCExport Proporz](#wabsticexport-proporz)
+        - [Résultats du parti](#r%C3%A9sultats-du-parti)
+            - [Domaine d'influence](#domaine-dinfluence)
+            - [Résultats du panachage](#r%C3%A9sultats-du-panachage)
+            - [Modèles](#mod%C3%A8les)
+        - [Création automatique des composantes des élections](#cr%C3%A9ation-automatique-des-composantes-des-%C3%A9lections)
 
-<!-- /MDTOC -->
+<!-- /TOC -->
 
 ## Avant-propos
 
@@ -133,109 +121,6 @@ Les résultats des composantes des élections peuvent être téléchargés de ma
 - [election_onegov_majorz.csv](https://github.com/OneGov/onegov-cloud/blob/master/src/onegov/election_day/static/docs/api/templates/election_onegov_majorz.csv)
 - [election_onegov_proporz.csv](https://github.com/OneGov/onegov-cloud/blob/master/src/onegov/election_day/static/docs/api/templates/election_onegov_proporz.csv)
 
-### Wabsti Majorz
-
-Le format de fichier nécessite deux diagrammes individuels : l'exportation des données et la liste des candidats élus.
-
-#### Exportation des données de colonnes
-
-Dans l'exportation des données, une ligne est présente pour chaque municipalité, les candidats sont disposés en colonnes. Les colonnes suivantes seront évaluées et on devrait au moins avoir celles-ci :
-- `AnzMandate`
-- `BFS`
-- `StimmBer`
-- `StimmAbgegeben`
-- `StimmLeer`
-- `StimmUngueltig`
-- `StimmGueltig`
-
-Ainsi que pour chaque candidat:
-- `KandID_{XX}`
-- `KandName_{XX}`
-- `KandVorname_{XX}`
-- `Stimmen_{XX}`
-
-De plus, les votes vides et non valides ainsi que les candidats seront saisis par les noms de candidats suivants :
-- `KandName_{XX} = 'Leere Zeilen` (Bulletins vides)
-- `KandName_{XX} = 'Ungültige Stimmen` (Bulletins non valides)
-
-#### Résultats des candidats de colonnes
-
-Comme le format de fichier peut ne pas fournir d'informations sur les candidats élus, ces informations peuvent être fournies dans un deuxième tableau. Chaque ligne est composée d'un candidat élu avec les colonnes suivantes :
-
-Nom|Description
----|---
-`KandID`|Identifiant du candidat (`KandID_{XX}`).
-
-#### Résultats temporaires
-
-Le format de fichier ne contient aucune information claire sur la situation du comptage complet de l'élection globale. Cette information sera fournie directement dans un formulaire destiné au téléchargement des données.
-
-Le format de fichier ne contient également aucune information sur l'état du comptage complet d'une municipalité individuelle. Si des municipalités manquent complètement dans les résultats, on les considèrera comme pas encore comptées.
-
-#### Modèles
-
-- [election_wabsti_majorz_results.csv](https://github.com/OneGov/onegov-cloud/blob/master/src/onegov/election_day/static/docs/api/templates/election_wabsti_majorz_results.csv)
-- [election_wabsti_majorz_candidates.csv](https://github.com/OneGov/onegov-cloud/blob/master/src/onegov/election_day/static/docs/api/templates/election_wabsti_majorz_candidates.csv)
-
-### Wabsti Proporz
-
-Le format de fichier nécessite quatre diagrammes individuels : l'exportation des données pour les résultats, l'exportation des données pour les statistiques, les connexions de liste et les candidats élus de liste.
-
-#### Exportation des données de résultats pour les colonnes
-
-Une ligne est présente par candidat et municipalité dans l'exportation des données. Les colonnes suivantes seront évaluées et devraient exister :
-- `Einheit_BFS`
-- `Kand_Nachname`
-- `Kand_Vorname`
-- `Liste_KandID`
-- `Liste_ID`
-- `Liste_Code`
-- `Kand_StimmenTotal`
-- `Liste_ParteistimmenTotal`
-
-#### Résultats du panachage
-
-Les résultats sont susceptibles de contenir les résultats du panachage, ce qui suppose une colonne supplémentaire par liste (`{List ID}.{List code}`: le nombre de votes que la liste a obtenu de la liste portant un `Liste_ID` donné). Le fait que `Liste_ID` comporte la valeur `99` (`99.WoP`) indique qu’il s’agit des votes de la liste vide.
-
-#### Exportation des données de statistiques pour les colonnes
-
-Le fichier avec les statistiques des municipalités individuelles devrait contenir les colonnes suivantes :
-- `Einheit_BFS`
-- `Einheit_Name`
-- `StimBerTotal`
-- `WZEingegangen`
-- `WZLeer`
-- `WZUngueltig`
-- `StmWZVeraendertLeerAmtlLeer`
-
-#### Connexions de liste des colonnes
-
-Le fichier avec les connexions de liste devrait contenir les colonnes suivantes :
-- `Liste`
-- `LV`
-- `LUV`
-
-#### Résultats de candidats des colonnes
-
-Étant donné que le format du fichier ne fournit pas d'informations concernant le candidat élu, celles-ci doivent être incluses dans une deuxième colonne. Chaque rangée se rapporte à un candidat élu et est composée des colonnes suivantes :
-
-Nom|Description
----|---
-`Liste_KandID`|L'identifiant du candidat.
-
-#### Résultats temporaires
-
-Le format de fichier ne contient aucune information claire sur la situation du comptage complet de l'élection globale. Cette information sera fournie directement dans un formulaire destiné au téléchargement des données.
-
-Le format de fichier ne contient également aucune information sur l'état du comptage complet d'une municipalité individuelle. Si des municipalités manquent complètement dans les résultats, on les considèrera comme pas encore comptées.
-
-#### Modèles
-
-- [election_wabsti_proporz_results.csv](https://github.com/OneGov/onegov-cloud/blob/master/src/onegov/election_day/static/docs/api/templates/election_wabsti_proporz_results.csv)
-- [election_wabsti_proporz_statistics.csv](https://github.com/OneGov/onegov-cloud/blob/master/src/onegov/election_day/static/docs/api/templates/election_wabsti_proporz_statistics.csv)
-- [election_wabsti_proporz_list_connections.csv](https://github.com/OneGov/onegov-cloud/blob/master/src/onegov/election_day/static/docs/api/templates/election_wabsti_proporz_list_connections.csv)
-- [election_wabsti_proporz_candidates.csv](https://github.com/OneGov/onegov-cloud/blob/master/src/onegov/election_day/static/docs/api/templates/election_wabsti_proporz_candidates.csv)
-
 
 ### WabstiCExport Majorz
 
@@ -287,19 +172,3 @@ Les résultats avec panachage sont uniquement ajoutés si :
 #### Modèles
 
 - [election_party_results.csv](https://github.com/OneGov/onegov-cloud/blob/master/src/onegov/election_day/static/docs/api/templates/election_party_results.csv)
-
-### Création automatique des composantes des élections
-
-Avec WabstiC Export version 2.4.3, les composantes des élections peuvent être créées en utilisant le fichier 'WP_Wahl.csv'.
-Le token est créé sous **Source de données Wabsti**.
-
-    curl https://[base_url]/create-wabsti-proporz \
-      --user :[token] \
-      --header "Accept-Language: de_CH" \
-      --form "wp_wahl=@WP_Wahl.csv"
-
-La demande précedant effectue ensuite les étapes suivantes:
-
-1. Tous les élections présent dans le fichier `WP_Wahl.csv`.
-2. la composante des élections
-3. Une cartopgraphie pour chaque election afin de mettre a jour les résultats.

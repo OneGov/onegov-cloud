@@ -1,20 +1,21 @@
 from datetime import datetime
 from onegov.core.orm.mixins import (
-    content_property, dict_property, meta_property)
+    content_property, dict_markup_property, dict_property, meta_property)
 from onegov.form import Form, move_fields
 from onegov.org import _
-from onegov.org.forms import LinkForm, PageForm
+from onegov.org.forms import LinkForm, PageForm, IframeForm
 from onegov.org.models.atoz import AtoZ
 from onegov.org.models.extensions import (
-    ContactExtension, ContactHiddenOnPageExtension,
+    InheritableContactExtension, ContactHiddenOnPageExtension,
     PeopleShownOnMainPageExtension, ImageExtension,
-    NewsletterExtension, PublicationExtension
+    NewsletterExtension, PublicationExtension, DeletableContentExtension
 )
 from onegov.org.models.extensions import AccessExtension
 from onegov.org.models.extensions import CoordinatesExtension
 from onegov.org.models.extensions import GeneralFileLinkExtension
 from onegov.org.models.extensions import PersonLinkExtension
 from onegov.org.models.extensions import VisibleOnHomepageExtension
+from onegov.org.models.extensions import SidebarLinksExtension
 from onegov.org.models.traitinfo import TraitInfo
 from onegov.org.observer import observes
 from onegov.page import Page
@@ -27,24 +28,26 @@ from sqlalchemy.orm import undefer, object_session
 
 from typing import Any, TYPE_CHECKING
 if TYPE_CHECKING:
-    from onegov.org.request import OrgRequest
-    from sqlalchemy.orm import Query
+    from onegov.org.request import OrgRequest, PageMeta
+    from sqlalchemy.orm import Query, Session
 
 
 class Topic(Page, TraitInfo, SearchableContent, AccessExtension,
             PublicationExtension, VisibleOnHomepageExtension,
-            ContactExtension, ContactHiddenOnPageExtension,
+            InheritableContactExtension, ContactHiddenOnPageExtension,
             PeopleShownOnMainPageExtension, PersonLinkExtension,
             CoordinatesExtension, ImageExtension,
-            GeneralFileLinkExtension):
+            GeneralFileLinkExtension, SidebarLinksExtension):
 
     __mapper_args__ = {'polymorphic_identity': 'topic'}
 
     es_type_name = 'topics'
 
     lead: dict_property[str | None] = content_property()
-    text: dict_property[str | None] = content_property()
+    text = dict_markup_property('content')
     url: dict_property[str | None] = content_property()
+    as_card: dict_property[str | None] = content_property()
+    height: dict_property[str | None] = content_property()
 
     # Show the lead on topics page
     lead_when_child: dict_property[bool] = content_property(default=True)
@@ -60,7 +63,7 @@ class Topic(Page, TraitInfo, SearchableContent, AccessExtension,
     @property
     def deletable(self) -> bool:
         """ Returns true if this page may be deleted. """
-        return self.parent is not None
+        return True
 
     @property
     def editable(self) -> bool:
@@ -87,19 +90,22 @@ class Topic(Page, TraitInfo, SearchableContent, AccessExtension,
             return ()
 
         if self.trait == 'page':
-            return ('page', 'link')
+            return ('page', 'link', 'iframe')
+
+        if self.trait == 'iframe':
+            return ()
 
         raise NotImplementedError
 
     def is_supported_trait(self, trait: str) -> bool:
-        return trait in {'link', 'page'}
+        return trait in {'link', 'page', 'iframe'}
 
     def get_form_class(
         self,
         trait: str,
         action: str,
         request: 'OrgRequest'
-    ) -> type[LinkForm | PageForm]:
+    ) -> type[LinkForm | PageForm | IframeForm]:
 
         if trait == 'link':
             return self.with_content_extensions(LinkForm, request, extensions=[
@@ -118,21 +124,29 @@ class Topic(Page, TraitInfo, SearchableContent, AccessExtension,
                 after='title'
             )
 
+        if trait == 'iframe':
+            return self.with_content_extensions(
+                IframeForm, request, extensions=[
+                    AccessExtension,
+                    VisibleOnHomepageExtension
+                ])
+
         raise NotImplementedError
 
 
 class News(Page, TraitInfo, SearchableContent, NewsletterExtension,
            AccessExtension, PublicationExtension, VisibleOnHomepageExtension,
-           ContactExtension, ContactHiddenOnPageExtension,
+           InheritableContactExtension, ContactHiddenOnPageExtension,
            PeopleShownOnMainPageExtension, PersonLinkExtension,
-           CoordinatesExtension, ImageExtension, GeneralFileLinkExtension):
+           CoordinatesExtension, ImageExtension, GeneralFileLinkExtension,
+           DeletableContentExtension):
 
     __mapper_args__ = {'polymorphic_identity': 'news'}
 
     es_type_name = 'news'
 
     lead: dict_property[str | None] = content_property()
-    text: dict_property[str | None] = content_property()
+    text = dict_markup_property('content')
     url: dict_property[str | None] = content_property()
 
     filter_years: list[int] = []
@@ -186,7 +200,7 @@ class News(Page, TraitInfo, SearchableContent, NewsletterExtension,
     def get_root_page_form_class(self, request: 'OrgRequest') -> type[Form]:
         return self.with_content_extensions(
             Form, request, extensions=(
-                ContactExtension, ContactHiddenOnPageExtension,
+                InheritableContactExtension, ContactHiddenOnPageExtension,
                 PersonLinkExtension, AccessExtension
             )
         )
@@ -208,7 +222,7 @@ class News(Page, TraitInfo, SearchableContent, NewsletterExtension,
                 # the effect is not entirely the same (news may be shown on the
                 # homepage anyway)
                 form_class.is_visible_on_homepage.kwargs['label'] = _(
-                    "Always visible on homepage")
+                    'Always visible on homepage')
 
             form_class = move_fields(
                 form_class=form_class,
@@ -246,37 +260,46 @@ class News(Page, TraitInfo, SearchableContent, NewsletterExtension,
             filter_tags=sorted(tags)
         )
 
-    def news_query(
-        self,
+    @classmethod
+    def news_query_for(
+        cls,
+        self: 'News | PageMeta',
         limit: int | None = 2,
-        published_only: bool = True
+        published_only: bool = True,
+        session: 'Session | None' = None,
     ) -> 'Query[News]':
 
-        news = object_session(self).query(News)
-        news = news.filter(Page.parent == self)
+        if session is None:
+            session = object_session(self)
+
+        news = session.query(News)
+        if isinstance(self, News):
+            # avoid a redundant relationship load when we can
+            news = news.filter(Page.parent == self)
+        else:
+            news = news.filter(Page.parent_id == self.id)
+
         if published_only:
             news = news.filter(
                 News.publication_started == True,
                 News.publication_ended == False
             )
 
-        filter = []
-        for year in self.filter_years:
+        year_filters = []
+        for year in getattr(self, 'filter_years', ()):
             start = replace_timezone(datetime(year, 1, 1), 'UTC')
-            filter.append(
+            year_filters.append(
                 and_(
                     News.published_or_created >= start,
                     News.published_or_created < start.replace(year=year + 1)
                 )
             )
-        if filter:
-            news = news.filter(or_(*filter))
+        if year_filters:
+            news = news.filter(or_(*year_filters))
 
-        if self.filter_tags:
+        if filter_tags := getattr(self, 'filter_tags', None):
             news = news.filter(
-                News.meta['hashtags'].has_any(
-                    array(self.filter_tags)  # type:ignore[call-overload]
-                )
+                News.meta['hashtags'].has_any(array(filter_tags))
             )
 
         news = news.order_by(desc(News.published_or_created))
@@ -292,6 +315,14 @@ class News(Page, TraitInfo, SearchableContent, NewsletterExtension,
 
         return news.union(sticky_news).order_by(
             desc(News.published_or_created))
+
+    def news_query(
+        self,
+        limit: int | None = 2,
+        published_only: bool = True
+    ) -> 'Query[News]':
+
+        return self.news_query_for(self, limit, published_only)
 
     @property
     def all_years(self) -> list[int]:

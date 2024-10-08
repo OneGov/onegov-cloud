@@ -2,24 +2,22 @@
 import morepath
 import transaction
 
-from onegov.ballot import Election
 from onegov.election_day import ElectionDayApp
 from onegov.election_day.collections import ArchivedResultCollection
 from onegov.election_day.formats import import_election_internal_majorz
 from onegov.election_day.formats import import_election_internal_proporz
-from onegov.election_day.formats import import_election_wabsti_majorz
-from onegov.election_day.formats import import_election_wabsti_proporz
 from onegov.election_day.formats import import_election_wabstic_majorz
 from onegov.election_day.formats import import_election_wabstic_proporz
 from onegov.election_day.forms import UploadMajorzElectionForm
 from onegov.election_day.forms import UploadProporzElectionForm
 from onegov.election_day.layouts import ManageElectionsLayout
+from onegov.election_day.models import Election
+from onegov.election_day.models import ProporzElection
 from onegov.election_day.views.upload import unsupported_year_error
 
 
 from typing import TYPE_CHECKING
 if TYPE_CHECKING:
-    from onegov.ballot.models import ProporzElection
     from onegov.core.types import RenderData
     from onegov.election_day.models import DataSourceItem
     from onegov.election_day.request import ElectionDayRequest
@@ -80,36 +78,9 @@ def view_upload_majorz_election(
                     form.results.file,
                     form.results.data['mimetype']
                 )
-            elif form.file_format.data == 'wabsti':
-                assert form.elected.data is not None
-                assert form.results.data is not None
-                assert form.results.file is not None
-                elected = len(form.elected.data)
-                errors = import_election_wabsti_majorz(
-                    self,
-                    principal,
-                    form.results.file,
-                    form.results.data['mimetype'],
-                    form.elected.file if elected else None,
-                    form.elected.data['mimetype'] if elected else None,
-                )
-                if form.majority.data:
-                    self.absolute_majority = form.majority.data
-                self.status = 'final' if form.complete.data else 'interim'
-            elif form.file_format.data == 'wabsti_m':
-                assert form.results.data is not None
-                assert form.results.file is not None
-                errors = import_election_wabsti_majorz(
-                    self,
-                    principal,
-                    form.results.file,
-                    form.results.data['mimetype'],
-                )
             elif form.file_format.data == 'wabsti_c':
-                # FIXME: This is another error due to dynamic backrefs created
-                #        across module boundaries, consider refactoring
-                source: 'DataSourceItem'
-                for source in self.data_sources:  # type:ignore[attr-defined]
+                source: DataSourceItem
+                for source in self.data_sources:
                     assert source.district is not None
                     assert source.number is not None
                     assert form.wm_wahl.data is not None
@@ -141,7 +112,7 @@ def view_upload_majorz_election(
                         )
                     )
             else:
-                raise NotImplementedError("Unsupported import format")
+                raise NotImplementedError('Unsupported import format')
 
             archive = ArchivedResultCollection(request.session)
             archive.update(self, request)
@@ -154,8 +125,7 @@ def view_upload_majorz_election(
                 last_change = self.last_result_change
                 request.app.pages_cache.flush()
                 request.app.send_zulip(
-                    # FIXME: Should we assert that the principal has a name?
-                    request.app.principal.name,  # type:ignore[arg-type]
+                    request.app.principal.name,
                     'New results available: '
                     f'[{self.title}]({request.link(self)})'
                 )
@@ -176,14 +146,13 @@ def view_upload_majorz_election(
 
 
 @ElectionDayApp.manage_form(
-    # FIXME: Why are we not using ProporzElection here?
-    model=Election,
+    model=ProporzElection,
     name='upload-proporz',
     template='upload_election.pt',
     form=UploadProporzElectionForm
 )
 def view_upload_proporz_election(
-    self: 'ProporzElection',
+    self: ProporzElection,
     request: 'ElectionDayRequest',
     form: UploadProporzElectionForm
 ) -> 'RenderData':
@@ -211,32 +180,9 @@ def view_upload_proporz_election(
                     form.results.file,
                     form.results.data['mimetype']
                 )
-            elif form.file_format.data == 'wabsti':
-                assert form.connections.data is not None
-                assert form.statistics.data is not None
-                assert form.elected.data is not None
-                assert form.results.data is not None
-                assert form.results.file is not None
-                connections = len(form.connections.data)
-                stats = len(form.statistics.data)
-                elected = len(form.elected.data)
-                errors = import_election_wabsti_proporz(
-                    self,
-                    principal,
-                    form.results.file,
-                    form.results.data['mimetype'],
-                    form.connections.file if connections else None,
-                    form.connections.data['mimetype'] if connections else None,
-                    form.elected.file if elected else None,
-                    form.elected.data['mimetype'] if elected else None,
-                    form.statistics.file if stats else None,
-                    form.statistics.data['mimetype'] if stats else None
-                )
-                self.status = 'final' if form.complete.data else 'interim'
             elif form.file_format.data == 'wabsti_c':
-                source: 'DataSourceItem'
-                # FIXME: Yet another dynamic backref across module boundaries
-                for source in self.data_sources:  # type:ignore[attr-defined]
+                source: DataSourceItem
+                for source in self.data_sources:
                     assert source.number is not None
                     assert form.wp_wahl.data is not None
                     assert form.wp_wahl.file is not None
@@ -279,7 +225,7 @@ def view_upload_proporz_election(
                         )
                     )
             else:
-                raise NotImplementedError("Unsupported import format")
+                raise NotImplementedError('Unsupported import format')
 
             archive = ArchivedResultCollection(request.session)
             archive.update(self, request)
@@ -292,8 +238,7 @@ def view_upload_proporz_election(
                 last_change = self.last_result_change
                 request.app.pages_cache.flush()
                 request.app.send_zulip(
-                    # FIXME: Should we assert that the principal has a name?
-                    request.app.principal.name,  # type:ignore[arg-type]
+                    request.app.principal.name,
                     'New results available: '
                     f'[{self.title}]({request.link(self)})'
                 )

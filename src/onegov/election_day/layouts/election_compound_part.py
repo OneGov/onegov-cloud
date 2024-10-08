@@ -7,8 +7,9 @@ from onegov.election_day.utils import svg_filename
 
 from typing import TYPE_CHECKING
 if TYPE_CHECKING:
-    from onegov.ballot.models import ElectionCompoundPart
-    from onegov.core.utils import Bunch
+    from onegov.election_day.models import ElectionCompoundPart
+    from onegov.election_day.models.election_compound.mixins import ResultRow
+    from onegov.election_day.models.election_compound.mixins import TotalRow
     from onegov.election_day.request import ElectionDayRequest
 
     from .election import NestedMenu
@@ -67,14 +68,12 @@ class ElectionCompoundPartLayout(DetailLayout):
             result.insert(0, 'party-strengths')
         return tuple(result)
 
-    # FIXME: Use NamedTuple
     @cached_property
-    def results(self) -> list['Bunch']:
+    def results(self) -> list['ResultRow']:
         return self.model.results
 
-    # FIXME: Use NamedTuple
     @cached_property
-    def totals(self) -> 'Bunch':
+    def totals(self) -> 'TotalRow':
         return self.model.totals
 
     def label(self, value: str) -> str:
@@ -82,12 +81,12 @@ class ElectionCompoundPartLayout(DetailLayout):
             if self.model.election_compound.domain_elections == 'region':
                 return self.principal.label('region')
             if self.model.election_compound.domain_elections == 'municipality':
-                return _("Municipality")
+                return _('Municipality')
         if value == 'districts':
             if self.model.election_compound.domain_elections == 'region':
                 return self.principal.label('regions')
             if self.model.election_compound.domain_elections == 'municipality':
-                return _("Municipalities")
+                return _('Municipalities')
         return self.principal.label(value)
 
     def title(self, tab: str | None = None) -> str:
@@ -96,19 +95,17 @@ class ElectionCompoundPartLayout(DetailLayout):
         if tab == 'districts':
             return self.label('districts')
         if tab == 'candidates':
-            return _("Elected candidates")
+            return _('Elected candidates')
         if tab == 'party-strengths':
-            return _("Party strengths")
+            return _('Party strengths')
         if tab == 'statistics':
-            return _("Election statistics")
+            return _('Election statistics')
 
         return ''
 
     def tab_visible(self, tab: str | None) -> bool:
 
         if not self.has_results:
-            return False
-        if self.hide_tab(tab):
             return False
         if tab == 'party-strengths':
             return (
@@ -147,12 +144,13 @@ class ElectionCompoundPartLayout(DetailLayout):
     def svg_path(self) -> str | None:
         """ Returns the path to the SVG or None, if it is not available. """
 
+        assert self.request.locale
+
         path = 'svg/{}'.format(
             svg_filename(
                 self.model,
-                # FIXME: Should we assert that tab and locale are set?
-                self.tab,  # type:ignore
-                self.request.locale,  # type:ignore
+                self.tab,
+                self.request.locale,
                 last_modified=self.last_modified
             )
         )

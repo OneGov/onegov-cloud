@@ -1,11 +1,12 @@
 from datetime import date
+from freezegun import freeze_time
 from lxml import etree
 from onegov.landsgemeinde.models import AgendaItem
 from onegov.landsgemeinde.models import Assembly
 from onegov.landsgemeinde.models import Votum
-from onegov.landsgemeinde.utils import ensure_states
+from onegov.landsgemeinde.utils import ensure_states, seconds_to_timestamp
+from onegov.landsgemeinde.utils import timestamp_to_seconds
 from onegov.landsgemeinde.utils import update_ticker
-from freezegun import freeze_time
 
 
 def test_update_ticker(landsgemeinde_app, assembly):
@@ -15,6 +16,11 @@ def test_update_ticker(landsgemeinde_app, assembly):
         is_manager = True
         url = 'http://localhost'
         locale = 'de_CH'
+        template_loader = (
+            landsgemeinde_app.config
+            .template_engine_registry
+            ._template_loaders['.pt']
+        )
 
         def include(self, asset):
             pass
@@ -53,7 +59,7 @@ def test_update_ticker(landsgemeinde_app, assembly):
     assert calls[5]['assembly'] == '2023-05-07'
     assert calls[5]['node'] == 'agenda-item-1'
     assert '__translated__ 1' in calls[5]['content']
-    etree.fromstring(calls[5]['content'])
+    etree.fromstring(calls[5]['content'], parser=etree.HTMLParser())
     assert {call['event'] for call in calls[5:]} == {'update'}
     assert sorted([call['node'] for call in calls[5:]]) == [
         'agenda-item-1', 'agenda-item-1', 'agenda-item-1', 'agenda-item-1',
@@ -87,7 +93,7 @@ def test_ensure_states():
             for a in assembly.agenda_items
         })
         result.update({
-            f'{a.number}.{v.number}': v.state
+            f'{a.number}.{v.number}': f'{v.state} {v.start_time or ""}'.strip()
             for a in assembly.agenda_items for v in a.vota
         })
         return {k: result[k] for k in sorted(result)}
@@ -223,6 +229,7 @@ def test_ensure_states():
     assembly.agenda_items[0].vota[1].state = 'ongoing'
     assert ensure_states(assembly.agenda_items[0].vota[1]) == {
         assembly.agenda_items[0],  # was completed
+        assembly.agenda_items[0].vota[1],  # start set
         assembly.agenda_items[0].vota[2],  # was completed
         assembly.agenda_items[1],  # was ongoing
         assembly.agenda_items[1].vota[0],  # was completed
@@ -232,7 +239,7 @@ def test_ensure_states():
         '': 'ongoing',
         '1': 'ongoing 12:00:00',
         '1.1': 'completed',
-        '1.2': 'ongoing',
+        '1.2': 'ongoing 12:00:00',
         '1.3': 'scheduled',
         '2': 'scheduled',
         '2.1': 'scheduled',
@@ -336,6 +343,7 @@ def test_ensure_states():
     assembly.agenda_items[1].vota[2].state = 'ongoing'
     assert ensure_states(assembly.agenda_items[1].vota[2]) == {
         assembly.agenda_items[1].vota[1],  # was ongoing
+        assembly.agenda_items[1].vota[2],  # start set
     }
     assert get(assembly) == {
         '': 'ongoing',
@@ -346,7 +354,7 @@ def test_ensure_states():
         '2': 'ongoing 12:00:00',
         '2.1': 'completed',
         '2.2': 'completed',
-        '2.3': 'ongoing',
+        '2.3': 'ongoing 12:00:00',
         '3': 'scheduled',
         '4': 'scheduled',
         '4.1': 'scheduled',
@@ -438,6 +446,7 @@ def test_ensure_states():
         assembly.agenda_items[1].vota[2],  # was scheduled
         assembly.agenda_items[2],  # was scheduled
         assembly.agenda_items[3],  # was scheduled, start set
+        assembly.agenda_items[3].vota[0],  # start set
     }
     assert get(assembly) == {
         '': 'ongoing',
@@ -451,7 +460,7 @@ def test_ensure_states():
         '2.3': 'completed',
         '3': 'completed',
         '4': 'ongoing 12:00:00',
-        '4.1': 'ongoing',
+        '4.1': 'ongoing 12:00:00',
         '4.2': 'scheduled'
     }
 
@@ -601,6 +610,7 @@ def test_ensure_states():
         assembly.agenda_items[3],  # was scheduled
         assembly.agenda_items[3].vota[0],  # was scheduled
         assembly.agenda_items[3].vota[1],  # was scheduled
+        assembly.agenda_items[3].vota[2],  # start set
     }
     assert get(assembly) == {
         '': 'ongoing',
@@ -616,7 +626,7 @@ def test_ensure_states():
         '4': 'ongoing 12:00:00',
         '4.1': 'completed',
         '4.2': 'completed',
-        '4.3': 'ongoing'
+        '4.3': 'ongoing 12:00:00'
     }
 
     # add 4.3 completed
@@ -684,3 +694,44 @@ def test_ensure_states():
         '4': 'scheduled',
         '4.1': 'scheduled',
     }
+
+
+def test_timestamps_to_seconds():
+    assert timestamp_to_seconds(None) is None
+    assert timestamp_to_seconds('') is None
+
+    assert timestamp_to_seconds('1h2m3s') == 3723
+    assert timestamp_to_seconds('1h1m') == 3660
+    assert timestamp_to_seconds('1h2s') == 3602
+    assert timestamp_to_seconds('1h') == 3600
+    assert timestamp_to_seconds('1m3s') == 63
+    assert timestamp_to_seconds('1m') == 60
+    assert timestamp_to_seconds('5s') == 5
+
+    assert timestamp_to_seconds('01h02m03s') == 3723
+    assert timestamp_to_seconds('02m03s') == 123
+    assert timestamp_to_seconds('05s') == 5
+
+    assert timestamp_to_seconds('10h20m30s') == 37230
+    assert timestamp_to_seconds('20m30s') == 1230
+    assert timestamp_to_seconds('50s') == 50
+
+    assert timestamp_to_seconds('-50s') is None
+    assert timestamp_to_seconds('100h200m300s') is None
+    assert timestamp_to_seconds('foo2m3s') is None
+    assert timestamp_to_seconds('2m3sfoo') is None
+    assert timestamp_to_seconds('s10') is None
+    assert timestamp_to_seconds('hms') is None
+    assert timestamp_to_seconds('foo') is None
+
+
+def test_seconds_to_timestamp():
+    assert seconds_to_timestamp(None) == '0s'
+    assert seconds_to_timestamp(0) == '0s'
+    assert seconds_to_timestamp(1) == '1s'
+    assert seconds_to_timestamp(60) == '1m'
+    assert seconds_to_timestamp(61) == '1m1s'
+    assert seconds_to_timestamp(1230) == '20m30s'
+    assert seconds_to_timestamp(37230) == '10h20m30s'
+    assert seconds_to_timestamp(3601) == '1h1s'
+    assert seconds_to_timestamp(-500) == '0s'

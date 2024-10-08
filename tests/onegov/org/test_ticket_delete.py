@@ -1,4 +1,5 @@
 import os
+import pytz
 from onegov.core.utils import normalize_for_url
 from onegov.reservation import ResourceCollection
 import textwrap
@@ -64,12 +65,12 @@ class EchoHandler(Handler, TicketDeletionMixin):
 
 # This is used implicitly to check for polymorphic identity
 class EchoTicket(Ticket):
-    __mapper_args__ = {'polymorphic_identity': 'FOO'}
+    __mapper_args__ = {'polymorphic_identity': 'ECH'}
     es_type_name = 'frr_tickets'
 
 
 def register_echo_handler(handlers):
-    handlers.register('FOO', EchoHandler)
+    handlers.register('ECH', EchoHandler)
 
 
 def archive_all_tickets(session, tickets, tz):
@@ -99,7 +100,7 @@ def test_delete_ticket_without_submission(org_app, handlers):
     tickets = [
         collection.open_ticket(
             handler_id='1',
-            handler_code='FOO',
+            handler_code='ECH',
             title="Title",
             group="Group",
             email="citizen@example.org",
@@ -107,7 +108,7 @@ def test_delete_ticket_without_submission(org_app, handlers):
         ),
         collection.open_ticket(
             handler_id='2',
-            handler_code='FOO',
+            handler_code='ECH',
             title="Title",
             group="Group",
             email="citizen@example.org",
@@ -382,3 +383,42 @@ def test_has_future_reservations(client):
         )
     ][0]
     assert not handler.has_future_reservation
+
+
+def test_most_future_reservation(client):
+    client.login_admin()
+
+    transaction.begin()
+
+    resource = client.app.libres_resources.by_name('tageskarte')
+    thursday = resource.scheduler.allocate(
+        dates=(datetime(2016, 4, 28), datetime(2016, 4, 28)),
+        whole_day=True
+    )[0]
+    friday = resource.scheduler.allocate(
+        dates=(datetime(2024, 4, 29), datetime(2024, 4, 29)),
+        whole_day=True
+    )[0]
+
+    reserve_thursday = client.bound_reserve(thursday)
+    reserve_friday = client.bound_reserve(friday)
+    transaction.commit()
+
+    reserve_thursday()
+    reserve_friday()
+    formular = client.get('/resource/tageskarte/form')
+    formular.form['email'] = "info@example.org"
+    confirmation = formular.form.submit().follow()
+    confirmation.form.submit().follow()
+    ticket = client.get('/tickets/ALL/open').click('Annehmen').follow()
+
+    # accept it
+    ticket.click('Alle Reservationen annehmen')
+
+    query = client.app.session().query(Ticket)
+    assert query.count() == 1
+    # 1 ticket with multiple allocations
+    ticket = query.one()
+    assert ticket.handler.most_future_reservation.start == datetime(
+        2024, 4, 28, 22, 0, tzinfo=pytz.utc
+    )

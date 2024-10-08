@@ -1,8 +1,10 @@
-from base64 import b64decode
-from datetime import timedelta, timezone, datetime
 import jwt
-from sedate import utcnow
+
+from base64 import b64decode
+from datetime import timedelta
 from onegov.api.models import ApiKey
+from sedate import utcnow
+from webob.exc import HTTPBadRequest
 
 
 from typing import Any, TYPE_CHECKING
@@ -16,10 +18,10 @@ def jwt_decode(request: 'CoreRequest', token: str | bytes) -> Any:
 
 def jwt_encode(request: 'CoreRequest', payload: dict[str, Any]) -> str:
 
-    iat = datetime.now(tz=timezone.utc)  # This has to be UTC,
+    iat = utcnow()  # This has to be UTC,
     # not local
     exp = iat + timedelta(hours=1)
-    claims = {"iat": iat, "exp": exp}
+    claims = {'iat': iat, 'exp': exp}
     payload.update(claims)
 
     return jwt.encode(payload, request.identity_secret, algorithm='HS512')
@@ -29,7 +31,7 @@ def get_token(request: 'CoreRequest') -> dict[str, str]:
 
     key = try_get_encoded_token(request)
 
-    api_key = request.session.query(ApiKey).filter_by(key=str(key)).one()
+    api_key = request.session.query(ApiKey).filter_by(key=key).one()
     today = utcnow()
     api_key.last_used = today
     payload = {
@@ -40,10 +42,14 @@ def get_token(request: 'CoreRequest') -> dict[str, str]:
 
 def try_get_encoded_token(request: 'CoreRequest') -> str:
     assert request.authorization is not None
-    assert request.authorization.authtype == 'Basic'
     assert isinstance(request.authorization.params, str)
-    auth = b64decode(
-        request.authorization.params.strip()
-    ).decode('utf-8')
-    auth, _ = auth.split(':', 1)
-    return auth
+    if request.authorization.authtype == 'Basic':
+        auth = b64decode(
+            request.authorization.params.strip()
+        ).decode('utf-8')
+        auth, _ = auth.split(':', 1)
+        return auth
+    elif request.authorization.authtype == 'Bearer':
+        return request.authorization.params
+    else:
+        raise HTTPBadRequest('Unsupported authorization scheme')

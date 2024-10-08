@@ -13,10 +13,10 @@
         </p>
         <p>
             <tal:b i18n:translate>You can find an overview of all bookings here:</tal:b><br>
-            <tal:b tal:content="structure bookings_link"></tal:b>
+            <tal:b tal:content="bookings_link"></tal:b>
         </p>
         <br>
-        <p i18n:translate>Best regards</p>                    
+        <p i18n:translate>Best regards</p>
         <metal:b use-macro="layout.macros['sender']|nothing" />
     </tal:b>
 </div>

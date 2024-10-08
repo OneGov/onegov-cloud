@@ -5,7 +5,18 @@ $person-website-icon: '\f0c1';
 $person-phone-icon: '\f095';
 $person-email-icon: '\f0e0';
 
+
+.people-panel ul {
+    margin-left: 0;
+
+    .person-card-portrait {
+        margin-left: 0;
+    }
+}
+
 .person-card {
+
+    padding: .5rem 0;
 
     .person-card-portrait {
         @include circle;
@@ -49,6 +60,14 @@ $person-email-icon: '\f0e0';
         margin-bottom: 1em;
     }
 
+    .person-card-organisation {
+        margin-bottom: 1em;
+
+        span:not(:last-child)::after {
+            content: ' -';
+        }
+    }
+
     .person-card-personal {
         margin-bottom: 1em;
 
@@ -62,6 +81,9 @@ $person-email-icon: '\f0e0';
 
         span {
             white-space: pre-line;
+        }
+        span:not(:last-child)::after {
+            content: ',';
         }
     }
 
@@ -144,7 +166,7 @@ Person card in lists
 
     .person-card-portrait {
         height: 5rem;
-        margin: 0.7rem 1.4rem 0.2rem 0.5rem;
+        margin-right: 1rem;
         position: relative;
         text-align: center;
         width: 5rem;

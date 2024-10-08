@@ -7,9 +7,11 @@ import shutil
 import sys
 import textwrap
 
+from bs4 import BeautifulSoup
 from collections import defaultdict
 from datetime import date, datetime, timedelta
 from io import BytesIO
+from onegov.core.orm.utils import QueryChain
 from libres.modules.errors import InvalidEmailAddress, AlreadyReservedError
 from onegov.chat import MessageCollection
 from onegov.core.cli import command_group, pass_group_context, abort
@@ -20,12 +22,15 @@ from onegov.directory.models.directory import DirectoryFile
 from onegov.event import Event, Occurrence, EventCollection
 from onegov.event.collections.events import EventImportItem
 from onegov.file import File
-from onegov.form import FormCollection
+from onegov.form import FormCollection, FormDefinition
 from onegov.org import log
 from onegov.org.formats import DigirezDB
 from onegov.org.forms.event import TAGS
 from onegov.org.management import LinkMigration
+from onegov.org.models.page import Page
+from onegov.org.models import ExtendedDirectory
 from onegov.org.models import Organisation, TicketNote, TicketMessage
+from onegov.org.models.resource import Resource
 from onegov.reservation import ResourceCollection
 from onegov.ticket import TicketCollection
 from onegov.town6.upgrade import migrate_homepage_structure_for_town6
@@ -71,6 +76,8 @@ def add(
 ) -> 'Callable[[OrgRequest, OrgApp], None]':
     """ Adds an org with the given name to the database. For example:
 
+    .. code-block:: bash
+
         onegov-org --select '/onegov_org/evilcorp' add "Evilcorp"
 
     """
@@ -78,12 +85,12 @@ def add(
     def add_org(request: 'OrgRequest', app: 'OrgApp') -> None:
 
         if app.session().query(Organisation).first():
-            abort("{} already contains an organisation".format(
+            abort('{} already contains an organisation'.format(
                 group_context.selector))
 
         app.settings.org.create_new_organisation(app, name, locale=locale)
 
-        click.echo("{} was created successfully".format(name))
+        click.echo('{} was created successfully'.format(name))
 
     return add_org
 
@@ -93,7 +100,7 @@ def add(
 @click.option('--min-date', default=None,
               help="Min date in the form '2016-12-31'")
 @click.option('--ignore-booking-conflicts', default=False, is_flag=True,
-              help="Ignore booking conflicts (TESTING ONlY)")
+              help='Ignore booking conflicts (TESTING ONlY)')
 def import_digirez(
     accessdb: str,
     min_date: str,
@@ -102,6 +109,7 @@ def import_digirez(
     """ Imports a Digirez reservation database into onegov.org.
 
     Example:
+    .. code-block:: bash
 
         onegov-org --select '/orgs/govikon' import-digirez room_booking.mdb
 
@@ -194,10 +202,8 @@ def import_digirez(
             einrichtungen.append('Office (Keller)')
 
         return {
-            'name': booking.anspname or ' '.join((
-                member.member_last_name,
-                member.member_first_name
-            )),
+            'name': booking.anspname or (
+                f'{member.member_last_name} {member.member_first_name}'),
             'telefon': booking.ansptel or member.member_phone,
             'zweck': booking.title,
             'bemerkungen': booking.description,
@@ -225,7 +231,7 @@ def import_digirez(
     def run_import(request: 'OrgRequest', app: 'OrgApp') -> None:
 
         # create all resources first, fails if at least one exists already
-        print("Creating resources")
+        print('Creating resources')
 
         resources = ResourceCollection(app.libres_context)
         floors = {f.id: f.floor_name for f in db.records.floors}
@@ -254,7 +260,7 @@ def import_digirez(
         reservations = defaultdict(list)
 
         for booking in relevant_bookings:
-            group = '-'.join((booking.room_id, booking.multi_id))
+            group = f'{booking.room_id}-{booking.multi_id}'
             reservations[group].append(booking)
 
         # get the max_date per resource
@@ -286,7 +292,7 @@ def import_digirez(
             members[member.member_id] = member
 
         # create an allocation for all days between min/max date
-        print("Creating allocations")
+        print('Creating allocations')
 
         for resource in resources_by_room.values():
 
@@ -310,7 +316,7 @@ def import_digirez(
 
             whole_day = (start_hour, end_hour) == (0, 24)
 
-            for day in range(0, days + 1):
+            for day in range(days + 1):
                 start = first_day_start + timedelta(days=day)
                 end = first_day_end + timedelta(days=day)
 
@@ -321,7 +327,7 @@ def import_digirez(
                 )
 
         # create the reservations
-        print("Creating reservations")
+        print('Creating reservations')
 
         booking_conflicts = 0
 
@@ -359,16 +365,15 @@ def import_digirez(
                     )
                     token = token_uuid.hex
                 except InvalidEmailAddress:
-                    abort(f"{email} is an invalid e-mail address")
+                    abort(f'{email} is an invalid e-mail address')
                 except AlreadyReservedError:
                     booking_conflicts += 1
                     found_conflict = True
 
                     print(
-                        f"Booking conflict in {resource.title} "
-                        f"at {booking.hour_start}"
+                        f'Booking conflict in {resource.title} '
+                        f'at {booking.hour_start}'
                     )
-                    pass
 
             if found_conflict:
                 continue
@@ -380,7 +385,7 @@ def import_digirez(
             form = resource.form_class(data=form_data)
 
             if not form.validate():
-                abort(f"{form_data} failed the form check with {form.errors}")
+                abort(f'{form_data} failed the form check with {form.errors}')
 
             submission = forms.submissions.add_external(
                 form=form,
@@ -402,7 +407,7 @@ def import_digirez(
 
         if not ignore_booking_conflicts and booking_conflicts:
             abort(
-                f"There were {booking_conflicts} booking conflicts, aborting"
+                f'There were {booking_conflicts} booking conflicts, aborting'
             )
 
     return run_import
@@ -410,7 +415,7 @@ def import_digirez(
 
 @cli.command(context_settings={'default_selector': '*'})
 @click.option('--dry-run', default=False, is_flag=True,
-              help="Do not write any changes into the database.")
+              help='Do not write any changes into the database.')
 @pass_group_context
 def fix_tags(
     group_context: 'GroupContext',
@@ -423,13 +428,13 @@ def fix_tags(
         de_transl = app.translations.get('de_CH')
         assert de_transl is not None
 
-        DEFINED_TAGS = list(TAGS)
-        DEFINED_TAG_IDS = [str(s) for s in DEFINED_TAGS]
+        defined_tags = list(TAGS)
+        defined_tag_ids = [str(s) for s in defined_tags]
 
         def translate(text: 'TranslationString') -> str:
             return text.interpolate(de_transl.gettext(text))
 
-        form_de_to_en = {translate(text): str(text) for text in DEFINED_TAGS}
+        form_de_to_en = {translate(text): str(text) for text in defined_tags}
 
         predefined = {
             'Theater / Tanz': ('Dancing', 'Theater'),
@@ -462,7 +467,7 @@ def fix_tags(
             for tag in occurrence.tags:
                 if tag in predefined:
                     continue
-                if tag not in DEFINED_TAG_IDS:
+                if tag not in defined_tag_ids:
                     if tag in form_de_to_en:
                         tags.remove(tag)
                         tags.append(form_de_to_en[tag])
@@ -481,7 +486,7 @@ def fix_tags(
             handle_occurrence_tags(occurrence)
 
         if dry_run:
-            print("\n".join(set(msg_log)))
+            print('\n'.join(set(msg_log)))
 
         assert not undefined_msg_ids, (
             f'Define {", ".join(undefined_msg_ids)}'
@@ -515,7 +520,7 @@ def close_ticket(ticket: 'Ticket', user: User, request: 'OrgRequest') -> None:
 @click.option('--location', multiple=True)
 @click.option('--create-tickets', is_flag=True, default=False)
 @click.option('--state-transfers', multiple=True,
-              help="Usage: local:remote, e.g. published:withdrawn")
+              help='Usage: local:remote, e.g. published:withdrawn')
 @click.option('--published-only', is_flag=True, default=False,
               help='Only add event is they are published on remote')
 @click.option('--delete-orphaned-tickets', is_flag=True)
@@ -529,43 +534,46 @@ def fetch(
     published_only: bool,
     delete_orphaned_tickets: bool
 ) -> 'Callable[[OrgRequest, OrgApp], None]':
-    """ Fetches events from other instances.
+    r""" Fetches events from other instances.
 
     Only fetches events from the same namespace which have not been imported
     themselves.
 
     Example
+    .. code-block:: bash
 
         onegov-org --select '/veranstaltungen/zug' fetch \
-            --source menzingen --source steinhausen
-            --tag Sport --tag Konzert
+            --source menzingen --source steinhausen \
+            --tag Sport --tag Konzert \
             --location Zug
 
     Additional parameters:
 
-            --state-transfers published:withdrawn
+    - ``--state-transfers published:withdrawn``
 
-            Will update the local event.state from published to withdrawn
-            automatically. If there are any tickets associated with the event,
-            the will be closed automatically.
+        Will update the local event.state from published to withdrawn
+        automatically. If there are any tickets associated with the event,
+        the will be closed automatically.
 
-            --pusblished_only:
-            When passing the remote items to the EventCollection, only add
-            events if they are published.
+    - ``--pusblished-only``
 
-            --delete-orphaned-tickets
+        When passing the remote items to the EventCollection, only add
+        events if they are published.
 
-            Delete Tickets, TicketNotes and TicketMessasges if an
-            event gets deleted automatically.
+    - ``--delete-orphaned-tickets``
+
+        Delete Tickets, TicketNotes and TicketMessasges if an
+        event gets deleted automatically.
 
     The following example will close tickets automatically for
     submitted and published events that were withdrawn on the remote.
 
-    onegov-event --select '/veranstaltungen/zug' fetch \
-            --source menzingen --source steinhausen
-            --published-only
-            --create-tickets
-            --state-transfers published:withdrawn
+    .. code-block:: bash
+        onegov-event --select '/veranstaltungen/zug' fetch \
+            --source menzingen --source steinhausen \
+            --published-only \
+            --create-tickets \
+            --state-transfers published:withdrawn \
             --state-transfers submitted:withdrawm
 
     """
@@ -574,7 +582,7 @@ def fetch(
         return list(map(add_op, a, b))
 
     if not len(source):
-        abort("Provide at least one source")
+        abort('Provide at least one source')
 
     valid_state_transfers = {}
     valid_choices = ('initiated', 'submitted', 'published', 'withdrawn')
@@ -685,7 +693,7 @@ def fetch(
                 )
 
                 if create_tickets and not local_admin:
-                    abort("Can not create tickets, no admin is registered")
+                    abort('Can not create tickets, no admin is registered')
 
                 def ticket_for_event(
                     event_id: 'UUID',
@@ -718,11 +726,11 @@ def fetch(
                         )
                         new_ticket.muted = True
                         TicketNote.create(new_ticket, request, (
-                            f"Importiert von Instanz {key}"
+                            f'Importiert von Instanz {key}'
 
                         ), owner=local_admin.username)
 
-                helper_request: 'OrgRequest' = Bunch(  # type:ignore
+                helper_request: OrgRequest = Bunch(  # type:ignore
                     current_username=local_admin and local_admin.username,
                     session=local_session)
 
@@ -732,8 +740,8 @@ def fetch(
                         if not delete_orphaned_tickets:
                             if local_admin is None:
                                 abort(
-                                    "Can not close orphaned ticket, "
-                                    "no admin is registered"
+                                    'Can not close orphaned ticket, '
+                                    'no admin is registered'
                                 )
                             close_ticket(ticket, local_admin, helper_request)
                         else:
@@ -751,14 +759,14 @@ def fetch(
                 )
 
             click.secho(
-                f"Events successfully fetched "
-                f"({result[0]} added, {result[1]} updated, "
-                f"{result[2]} deleted)",
+                f'Events successfully fetched '
+                f'({result[0]} added, {result[1]} updated, '
+                f'{result[2]} deleted)',
                 fg='green'
             )
 
         except Exception as e:
-            log.error("Error fetching events", exc_info=True)
+            log.error('Error fetching events', exc_info=True)
             raise (e)
 
     return _fetch
@@ -786,7 +794,7 @@ def fix_directory_files(
                     file_id = field_data['data'].lstrip('@')
                     file = request.session.query(File).filter_by(
                         id=file_id).first()
-                    if file and not file.type == 'directory':
+                    if file and file.type != 'directory':
                         new = DirectoryFile(  # type:ignore[misc]
                             id=random_token(),
                             name=file.name,
@@ -800,7 +808,7 @@ def fix_directory_files(
                         count += 1
         if count:
             click.secho(
-                f"{app.schema} - {count} files adapted with type `directory`",
+                f'{app.schema} - {count} files adapted with type `directory`',
                 fg='green'
             )
     return execute
@@ -817,7 +825,7 @@ def migrate_town(
     """
 
     def migrate_to_new_town(request: 'OrgRequest', app: 'OrgApp') -> None:
-        context: 'UpgradeContext' = Bunch(session=app.session())  # type:ignore
+        context: UpgradeContext = Bunch(session=app.session())  # type:ignore
         migrate_theme_options(context)
         migrate_homepage_structure_for_town6(context)
 
@@ -884,3 +892,65 @@ def migrate_publications(
             )
 
     return mark_as_published
+
+
+@cli.command(name='delete-invisible-links')
+def delete_invisible_links() -> 'Callable[[OrgRequest, OrgApp], None]':
+    """ Deletes all the data associated with a period, including:
+
+    Example:
+    .. code-block:: bash
+
+        onegov-org --select /foo/bar delete-invisible-links
+
+    """
+
+    def delete_invisible_links(request: 'OrgRequest', app: 'OrgApp') -> None:
+        session = request.session
+        query = QueryChain(
+            (session.query(Page),
+             session.query(Resource),
+             session.query(ExtendedDirectory),
+             session.query(FormDefinition))
+        )  # type:ignore
+        models = query.all()
+
+        click.echo(click.style(
+            {session.info['schema']},
+            fg='yellow'
+        ))
+
+        invisible_links = []
+        for page in models:
+            # Find links with no text, only br tags and/or whitespaces
+            for field in page.content_fields_containing_links_to_files:
+                if not page.content.get(field):
+                    continue
+                soup = BeautifulSoup(page.content.get(field), 'html.parser')
+                for link in soup.find_all('a'):
+                    if not any(
+                        tag.name != 'br' and (
+                            tag.name or not tag.isspace()
+                        ) for tag in link.contents
+                    ):
+                        invisible_links.append(link)
+                        if all(tag.name == 'br' for tag in link.contents):
+                            link.replace_with(
+                                BeautifulSoup('<br/>', 'html.parser')
+                            )
+                        else:
+                            link.decompose()
+
+                # Save the modified HTML back to page.text
+                if page.content[field] != str(soup):
+                    page.content[field] = str(soup)
+
+        click.echo(
+            click.style(
+                f'{session.info["schema"]}: '
+                f'Deleted {len(invisible_links)} invisible links',
+                fg='yellow'
+            )
+        )
+
+    return delete_invisible_links

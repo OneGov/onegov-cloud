@@ -1,5 +1,5 @@
 import os
-import pglast
+import pglast  # type:ignore[import-untyped]
 import re
 
 from onegov.core.cache import lru_cache
@@ -12,7 +12,7 @@ from uuid import uuid4
 from typing import Any, TYPE_CHECKING
 if TYPE_CHECKING:
     from collections.abc import Iterator
-    from pglast.ast import RawStmt
+    from pglast.ast import RawStmt  # type:ignore[import-untyped]
     from sqlalchemy.sql.selectable import Alias
     from sqlalchemy.types import TypeEngine
 
@@ -84,7 +84,7 @@ def type_by_string(
 def as_selectable_from_path(path: str) -> 'Alias':
     alias = os.path.basename(path).split('.', 1)[0]
 
-    with open(path, 'r') as f:
+    with open(path) as f:
         return as_selectable(f.read(), alias=alias)
 
 

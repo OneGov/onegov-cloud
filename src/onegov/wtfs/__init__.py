@@ -1,6 +1,6 @@
 import logging
 
-from translationstring import TranslationStringFactory
+from onegov.core.i18n.translation_string import TranslationStringFactory
 
 log = logging.getLogger('onegov.wtfs')
 log.addHandler(logging.NullHandler())

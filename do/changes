@@ -7,8 +7,7 @@ import sys
 
 from attr import attrs
 from datetime import date
-from git.objects.commit import Commit
-from itertools import groupby, islice, pairwise
+from itertools import groupby, pairwise
 from operator import attrgetter
 
 
@@ -16,10 +15,11 @@ from typing import TYPE_CHECKING
 if TYPE_CHECKING:
     from collections.abc import Iterator
     from datetime import datetime
+    from git.objects.commit import Commit
     from git.objects.tag import TagObject
     from git.repo import Repo
     from git.types import PathLike
-    from typing_extensions import Self
+    from typing import Self
 
 
 COMMIT_HEADER = re.compile(r'^[A-Z]{1}[A-Za-z6_\- ]{2,18}: ')
@@ -33,7 +33,7 @@ class ChangelogCommit:
     title: str
     type: str
 
-    commit: Commit
+    commit: 'Commit'
     link: str | None = None
     hint: str | None = None
     note: str | None = None
@@ -43,7 +43,7 @@ class ChangelogCommit:
         return self.type.lower()
 
     @classmethod
-    def is_match(cls, commit: Commit) -> bool:
+    def is_match(cls, commit: 'Commit') -> bool:
 
         message = commit.message
         if isinstance(message, bytes):
@@ -56,7 +56,7 @@ class ChangelogCommit:
         return COMMIT_HEADER.match(message) is not None
 
     @classmethod
-    def parse(cls, commit: Commit) -> 'Self':
+    def parse(cls, commit: 'Commit') -> 'Self':
         message = commit.message
         if isinstance(message, bytes):
             message = message.decode('utf-8')
@@ -80,7 +80,7 @@ class ChangelogCommit:
                 continue
 
             if line.lower().startswith('link'):
-                link = line.split(':', 1)[-1].strip()
+                link = line.split(':', 1)[-1].strip().upper()
                 continue
 
             if line.lower().startswith('hint'):
@@ -160,22 +160,22 @@ class ChangelogCommit:
             )
 
         if link.startswith('STAKA-'):
-            return f"https://ogc-ar.atlassian.net/projects/STAKA/issues/{link}"
+            return f'https://ogc-ar.atlassian.net/projects/STAKA/issues/{link}'
 
         if link.startswith('STAKABS-'):
-            return f"https://kt-bs.atlassian.net/browse/{link}"
+            return f'https://kt-bs.atlassian.net/browse/{link}'
 
         if link.startswith('SEA-'):
-            return f"https://linear.app/seantis/issue/{link}"
+            return f'https://linear.app/seantis/issue/{link}'
 
         if link.startswith('OGC-'):
-            return f"https://linear.app/onegovcloud/issue/{link}"
+            return f'https://linear.app/onegovcloud/issue/{link}'
 
         if link.startswith('SWI-'):
-            return f"https://linear.app/swissvotes/issue/{link}"
+            return f'https://linear.app/swissvotes/issue/{link}'
 
         if link.startswith('PRO-'):
-            return f"https://linear.app/projuventute/issue/{link}"
+            return f'https://linear.app/projuventute/issue/{link}'
 
         # default to a non-functioning link (they can be added later)
         return f'#{self.link}'
@@ -183,8 +183,8 @@ class ChangelogCommit:
 
 def commits_between(
     repository: 'Repo',
-    newer: Commit,
-    older: Commit
+    newer: 'Commit',
+    older: 'Commit'
 ) -> 'Iterator[Commit]':
 
     revisions = f'{older.hexsha}..{newer.hexsha}'
@@ -217,7 +217,7 @@ def release_date(tag: 'TagObject') -> 'datetime':
 
 
 def format_datetime(dt: 'date | datetime') -> str:
-    return dt.strftime("%Y-%m-%d")
+    return dt.strftime('%Y-%m-%d')
 
 
 def changelog(folder: 'PathLike', new: str) -> None:
@@ -230,22 +230,22 @@ def changelog(folder: 'PathLike', new: str) -> None:
     )
 
     # header
-    print("# Changes")
-    print("")
+    print('# Changes')
+    print('')
 
     # not yet released
     if new == 'Unreleased':
-        print("## Unreleased")
+        print('## Unreleased')
     else:
         print(f"## {new.rsplit('-', 1)[-1]}")
-    print("")
+    print('')
     changelog_commits(new, repository, repository.head.commit, tags[0].commit,
                       date.today())
 
     # last 50 releases (the last version is not included by design)
     for newer, older in pairwise(tags[:50]):
-        print(f"## {release_number(newer)}")
-        print("")
+        print(f'## {release_number(newer)}')
+        print('')
 
         changelog_commits(newer.name, repository, newer.commit, older.commit,
                           release_date(newer))
@@ -254,8 +254,8 @@ def changelog(folder: 'PathLike', new: str) -> None:
 def changelog_commits(
     release: str,
     repository: 'Repo',
-    newer: Commit,
-    older: Commit,
+    newer: 'Commit',
+    older: 'Commit',
     release_date: date
 ) -> None:
 
@@ -263,16 +263,16 @@ def changelog_commits(
 
     # quit if there are no commits
     if not commit_objs:
-        print("No changes since last release")
-        print("")
+        print('No changes since last release')
+        print('')
         return
 
     # print the release overview
     lo = commit_objs[0].hexsha[:10]
     hi = commit_objs[-1].hexsha[:10]
     url = f'https://github.com/OneGov/onegov-cloud/compare/{lo}^...{hi}'
-    print(f"`{format_datetime(release_date)}` | [{lo}...{hi}]({url})")
-    print("")
+    print(f'`{format_datetime(release_date)}` | [{lo}...{hi}]({url})')
+    print('')
 
     # parse the commit messages
     commits = [
@@ -282,38 +282,38 @@ def changelog_commits(
 
     hints = [commit.hint for commit in commits if commit.hint]
     if hints:
-        print("**Upgrade hints**")
+        print('**Upgrade hints**')
         for hint in hints:
-            print(f"- {hint}")
+            print(f'- {hint}')
 
     # sort the result by name and type
     commits.sort(key=lambda k: (k.module, k.type_order))
 
     # print the resulting information
     for module, commit in groupby(commits, key=attrgetter('module')):
-        print(f"### {module}")
-        print("")
+        print(f'### {module}')
+        print('')
 
         for c in commit:
-            print(f"##### {c.title}")
-            print("")
+            print(f'##### {c.title}')
+            print('')
 
             if c.note:
                 print(c.note)
-                print("")
+                print('')
 
-            print(f"`{c.type}`", end='')
+            print(f'`{c.type}`', end='')
 
             if c.link:
-                print(f" | [{c.link}]({c.link_url})", end='')
+                print(f' | [{c.link}]({c.link_url})', end='')
 
-            print(f" | [{c.short}]({c.url})")
-            print("")
+            print(f' | [{c.short}]({c.url})')
+            print('')
 
 
 if __name__ == '__main__':
     if len(sys.argv) == 1:
-        new = "Unreleased"
+        new = 'Unreleased'
     else:
         new = sys.argv[1]
 

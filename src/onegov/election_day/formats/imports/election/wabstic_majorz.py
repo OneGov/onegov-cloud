@@ -1,6 +1,3 @@
-from onegov.ballot import Candidate
-from onegov.ballot import CandidateResult
-from onegov.ballot import ElectionResult
 from onegov.election_day import _
 from onegov.election_day.formats.imports.common import EXPATS
 from onegov.election_day.formats.imports.common import FileImportError
@@ -8,6 +5,9 @@ from onegov.election_day.formats.imports.common import get_entity_and_district
 from onegov.election_day.formats.imports.common import line_is_relevant
 from onegov.election_day.formats.imports.common import load_csv
 from onegov.election_day.formats.imports.common import validate_integer
+from onegov.election_day.models import Candidate
+from onegov.election_day.models import CandidateResult
+from onegov.election_day.models import ElectionResult
 from sqlalchemy.orm import object_session
 from uuid import uuid4
 
@@ -16,9 +16,9 @@ from typing import Any
 from typing import IO
 from typing import TYPE_CHECKING
 if TYPE_CHECKING:
-    from onegov.ballot.models import Election
     from onegov.core.csv import DefaultRow
     from onegov.election_day.models import Canton
+    from onegov.election_day.models import Election
     from onegov.election_day.models import Municipality
 
 
@@ -174,7 +174,7 @@ def import_election_wabstic_majorz(
                 line, 'anzpendentgde', default=None)
         except Exception as e:
             line_errors.append(
-                _("Error in anzpendentgde: ${msg}",
+                _('Error in anzpendentgde: ${msg}',
                   mapping={'msg': e.args[0]}))
 
         # Pass the errors and continue to next line
@@ -204,11 +204,11 @@ def import_election_wabstic_majorz(
         else:
             if entity_id and entity_id not in entities:
                 line_errors.append(
-                    _("${name} is unknown", mapping={'name': entity_id}))
+                    _('${name} is unknown', mapping={'name': entity_id}))
 
             if entity_id in added_entities:
                 line_errors.append(
-                    _("${name} was found twice", mapping={'name': entity_id}))
+                    _('${name} was found twice', mapping={'name': entity_id}))
 
             # Skip expats if not enabled
             if entity_id == 0 and not election.has_expats:
@@ -257,7 +257,7 @@ def import_election_wabstic_majorz(
         else:
             if entity_id and entity_id not in entities:
                 line_errors.append(
-                    _("${name} is unknown", mapping={'name': entity_id}))
+                    _('${name} is unknown', mapping={'name': entity_id}))
 
             if entity_id not in added_entities:
                 # Only add it if present (there is there no SortGeschaeft)
@@ -372,11 +372,11 @@ def import_election_wabstic_majorz(
             candidate_id = line.knr
             votes = validate_integer(line, 'stimmen', default=None)
         except ValueError:
-            line_errors.append(_("Invalid candidate results"))
+            line_errors.append(_('Invalid candidate results'))
         else:
             if added_candidates and candidate_id not in added_candidates:
                 line_errors.append(
-                    _("Candidate with id ${id} not in wm_kandidaten",
+                    _('Candidate with id ${id} not in wm_kandidaten',
                       mapping={'id': candidate_id}))
             if entity_id == 0 and not election.has_expats:
                 # Skip expats if not enabled
@@ -384,7 +384,7 @@ def import_election_wabstic_majorz(
 
             if entity_id not in added_entities:
                 line_errors.append(
-                    _("Entity with id ${id} not in wmstatic_gemeinden",
+                    _('Entity with id ${id} not in wmstatic_gemeinden',
                         mapping={'id': entity_id}))
 
         # Pass the errors and continue to next line
@@ -414,7 +414,7 @@ def import_election_wabstic_majorz(
         return errors
 
     # Add the results to the DB
-    election.clear_results()
+    election.clear_results(True)
     election.last_result_change = election.timestamp()
     election.absolute_majority = absolute_majority
     election.status = 'unknown'
@@ -498,5 +498,7 @@ def import_election_wabstic_majorz(
             }
         )
     session.bulk_insert_mappings(ElectionResult, result_inserts)
+    session.flush()
+    session.expire_all()
 
     return []

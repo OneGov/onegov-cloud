@@ -1,11 +1,10 @@
 import textwrap
-import zipfile
-from io import BytesIO
-
 import transaction
+import zipfile
 
-from datetime import date
+from datetime import date, timedelta
 from freezegun import freeze_time
+from io import BytesIO
 
 from onegov.core.utils import module_path
 from onegov.file import FileCollection
@@ -797,6 +796,55 @@ def test_registration_change_limit_after_submissions(client):
     assert "Ihre Änderungen wurden gespeichert" in page
 
 
+def test_registration_window_adjust_end_date(client):
+    collection = FormCollection(client.app.session())
+
+    form = collection.definitions.add(
+        'Meet Guido van Rossum', "E-Mail *= @@@", 'custom')
+    form.add_registration_window(
+        start=date(2024, 4, 1),
+        end=date(2024, 4, 2),
+        limit=None,
+        overflow=False
+    )
+    transaction.commit()
+
+    client.login_editor()
+
+    # change end date before first submission confirmed
+    with freeze_time('2024-04-01', tick=True):
+        # submit form prior adjusting end date
+        page = client.get('/form/meet-guido-van-rossum')
+        page.form['e_mail'] = 'guido_fan@example.org'
+        page.form.submit().follow().form.submit().follow()
+
+        # adjust end date
+        page = (client.get('/form/meet-guido-van-rossum').
+                click('01.04.2024 - 02.04.2024'))
+        page = page.click('Bearbeiten')
+        page.form['end'] = '2024-04-03'
+        result = page.form.submit().follow()
+        assert 'Anmeldezeitraum bearbeiten' not in result
+        assert 'Ihre Änderungen wurden gespeichert' in result
+
+    # confirm first submission and change registration end date
+    with freeze_time('2024-04-01', tick=True):
+        # accept ticket, confirm
+        accept_submission = (client.get('/tickets/ALL/open').
+                             click("Annehmen").follow())
+        accept_submission.click("Anmeldung bestätigen").follow()
+        assert accept_submission.status_code == 200
+
+        # change end date
+        page = (client.get('/form/meet-guido-van-rossum').
+                click('01.04.2024 - 03.04.2024'))
+        page = page.click('Bearbeiten')
+        page.form['end'] = '2024-04-04'
+        result = page.form.submit().follow()
+        assert 'Anmeldezeitraum bearbeiten' not in result
+        assert 'Ihre Änderungen wurden gespeichert' in result
+
+
 def test_registration_ticket_workflow(client):
     collection = FormCollection(client.app.session())
     users = UserCollection(client.app.session())
@@ -1103,13 +1151,16 @@ def test_edit_page_people_function_is_displayed(client):
     new_person.form['first_name'] = 'Berry'
     new_person.form['last_name'] = 'Boolean'
     new_person.form.submit()
-    person = client.app.session().query(Person)\
-        .filter(Person.first_name == 'Berry')\
+    berry = (
+        client.app.session().query(Person)
+        .filter(Person.first_name == 'Berry')
         .one()
+    )
 
     new_page = client.get('/editor/new/page/1')
-    default_function = new_page.form['people_' + person.id.hex + '_function']
-    assert default_function.value == ""
+    option = new_page.pyquery(f'#people-0 option[value="{berry.id.hex}"]')
+    assert option.attr('data-function') is None
+    assert option.attr('data-show') is None
 
     people = client.get('/people')
     new_person = people.click('Person')
@@ -1117,13 +1168,28 @@ def test_edit_page_people_function_is_displayed(client):
     new_person.form['last_name'] = 'Doe'
     new_person.form['function'] = 'President'
     new_person.form.submit()
-    person = client.app.session().query(Person)\
-        .filter(Person.first_name == 'John')\
+    john = (
+        client.app.session().query(Person)
+        .filter(Person.first_name == 'John')
         .one()
+    )
 
     new_page = client.get('/editor/new/page/1')
-    default_function = new_page.form['people_' + person.id.hex + '_function']
-    assert default_function.value == 'President'
+    option = new_page.pyquery(f'#people-0 option[value="{john.id.hex}"]')
+    assert option.attr('data-function') == 'President'
+    assert option.attr('data-show') is None
+
+    new_page.form['title'] = "Living in Govikon is Swell"
+    new_page.form['people-0-person'] = john.id.hex
+    new_page.form['people-0-context_specific_function'] = 'Vice-President'
+    new_page.form['people-0-display_function_in_person_directory'] = True
+    page = new_page.form.submit().follow()
+
+    # once we have chosen something the chosen value takes precedence
+    edit_page = page.click("Bearbeiten")
+    option = edit_page.pyquery(f'#people-0 option[value="{john.id.hex}"]')
+    assert option.attr('data-function') == 'Vice-President'
+    assert option.attr('data-show') == 'true'
 
 
 def test_event_configuration_validation(client):
@@ -1248,3 +1314,86 @@ def test_file_export_for_ticket(client, temporary_directory):
 
     # testing something like "Datei * = *.txt (multiple)" would require
     # webtest to support multiple file upload which will come on 3.0.1
+
+
+def test_create_and_fill_survey(client):
+    client.login_editor()
+    anonymous = client.spawn()
+
+    # Create a survey
+    page = client.get('/surveys/new')
+    page.form['title'] = 'Event Evaluation'
+    page.form['lead'] = 'Evaluation for the best event'
+    page.form['definition'] = textwrap.dedent("""
+        Name = ___
+        How was the event? =
+            (x) Good
+            ( ) Medium
+            ( ) Bad
+    """)
+    page = page.form.submit().follow()
+    assert "Event Evaluation" in page
+
+    # Fill out the survey
+    page = anonymous.get('/survey/event-evaluation')
+    page.form['name'] = 'Nicolas Thomas'
+    page.form['how_was_the_event_'] = 'Good'
+    page = page.form.submit().follow()
+
+    # Check the results
+    page = client.get('/survey/event-evaluation').click('Resultate')
+    assert 'Nicolas Thomas' in page
+    assert 'Good' in page
+    assert '(1/1)' in page
+
+    # Create submission window
+    yesterday = date.today() - timedelta(days=1)
+    tomorrow = date.today() + timedelta(days=1)
+    page = client.get('/survey/event-evaluation').click('Hinzufügen')
+    page.form['title'] = 'Team 1'
+    page.form['start'] = yesterday
+    page.form['end'] = tomorrow
+    page = page.form.submit().follow()
+    assert 'Der Anmeldezeitraum wurde erfolgreich hinzugefügt' in page
+
+    # Try to create a window with the same time without a title
+    page = client.get('/survey/event-evaluation').click('Hinzufügen')
+    page.form['title'] = ''
+    page.form['start'] = yesterday
+    page.form['end'] = tomorrow
+    page = page.form.submit()
+    y = yesterday.strftime('%d.%m.%Y')
+    t = tomorrow.strftime('%d.%m.%Y')
+    assert f"Befragungszeitraum ({y} - {t})." in page
+
+    # Give the window a title
+    page.form['title'] = 'Team 2'
+    page = page.form.submit().follow()
+    assert 'Der Anmeldezeitraum wurde erfolgreich hinzugefügt' in page
+    page = client.get('/survey/event-evaluation').click('Team 2')
+    url = page.request.url
+
+    # Try to access the survey without the window
+    page = anonymous.get('/survey/event-evaluation', expect_errors=True)
+    assert page.status_code == 403
+
+    # Try to access the survey with the window
+    page = anonymous.get(url)
+    page.form['name'] = 'Rubus Bubus'
+    page.form['how_was_the_event_'] = 'Medium'
+    page = page.form.submit().follow()
+
+    # Check the results
+    page = client.get('/survey/event-evaluation').click('Resultate')
+    assert 'Nicolas Thomas' in page
+    assert 'Good' in page
+    assert 'Rubus Bubus' in page
+    assert 'Medium' in page
+    assert '(1/2)' in page
+
+    # Check submission window results
+    page = page.click('Team 2')
+    assert 'Rubus Bubus' in page
+    assert 'Medium' in page
+    assert '(1/1)' in page
+    assert 'Nicolas Thomas' not in page

@@ -3,7 +3,11 @@
 import morepath
 
 from onegov.core.security import Public, Private
+from onegov.form.collection import SurveyCollection
+from onegov.form.models.submission import (CompleteSurveySubmission,
+                                           PendingSurveySubmission)
 from onegov.org.cli import close_ticket
+from onegov.org.models.organisation import Organisation
 from onegov.ticket import TicketCollection
 from onegov.form import (
     FormCollection,
@@ -11,7 +15,7 @@ from onegov.form import (
     CompleteFormSubmission
 )
 from onegov.org import _, OrgApp
-from onegov.org.layout import FormSubmissionLayout
+from onegov.org.layout import FormSubmissionLayout, SurveySubmissionLayout
 from onegov.org.mail import send_ticket_mail
 from onegov.org.utils import user_group_emails_for_new_ticket
 from onegov.org.models import TicketMessage, SubmissionMessage
@@ -138,9 +142,9 @@ def handle_pending_submission(
         completable = False
         request.alert(
             _(
-                "The total amount for the currently entered data "
-                "is ${total} but has to be at least ${minimum}. "
-                "Please adjust your inputs.",
+                'The total amount for the currently entered data '
+                'is ${total} but has to be at least ${minimum}. '
+                'Please adjust your inputs.',
                 mapping={
                     'total': Price(current_total_amount, currency),
                     'minimum': Price(minimum_total_amount, currency)
@@ -151,7 +155,7 @@ def handle_pending_submission(
     if completable and 'return-to' in request.GET:
 
         if 'quiet' not in request.GET:
-            request.success(_("Your changes were saved"))
+            request.success(_('Your changes were saved'))
 
         # the default url should actually never be called
         return request.redirect(request.url)
@@ -166,19 +170,19 @@ def handle_pending_submission(
     form.action = copy_query(
         request, form.action, ('return-to', 'title', 'quiet'))
 
-    edit_link = URL(copy_query(
+    edit_url_obj = URL(copy_query(
         request, request.link(self), ('title', )))
 
-    # the edit link always points to the editable state
-    edit_link = edit_link.query_param('edit', '')
-    edit_link = edit_link.as_string()
+    # the edit url always points to the editable state
+    edit_url_obj = edit_url_obj.query_param('edit', '')
+    edit_url = edit_url_obj.as_string()
 
     email = self.email or self.get_email_field_data(form)
     if price:
         assert email is not None
         assert request.locale is not None
         checkout_button = request.app.checkout_button(
-            button_label=request.translate(_("Pay Online and Complete")),
+            button_label=request.translate(_('Pay Online and Complete')),
             title=title,
             price=price,
             email=email,
@@ -192,7 +196,7 @@ def handle_pending_submission(
         'title': title,
         'form': form,
         'completable': completable,
-        'edit_link': edit_link,
+        'edit_link': edit_url,
         'complete_link': request.link(self, 'complete'),
         'model': self,
         'price': price,
@@ -223,7 +227,7 @@ def handle_complete_submission(
     else:
         if self.state == 'complete':
             self.data.changed()  # type:ignore[attr-defined]  # trigger updates
-            request.success(_("Your changes were saved"))
+            request.success(_('Your changes were saved'))
 
             assert self.name is not None
             return morepath.redirect(request.link(
@@ -241,14 +245,14 @@ def handle_complete_submission(
 
             # FIXME: Custom error message for PaymentError?
             if not payment or isinstance(payment, PaymentError):
-                request.alert(_("Your payment could not be processed"))
+                request.alert(_('Your payment could not be processed'))
                 return morepath.redirect(request.link(self))
             elif payment is not True:
                 self.payment = payment
 
             window = self.registration_window
             if window and not window.accepts_submissions(self.spots):
-                request.alert(_("Registrations are no longer possible"))
+                request.alert(_('Registrations are no longer possible'))
                 return morepath.redirect(request.link(self))
 
             show_submission = request.params.get('send_by_email') == 'yes'
@@ -276,7 +280,7 @@ def handle_complete_submission(
             send_ticket_mail(
                 request=request,
                 template='mail_ticket_opened.pt',
-                subject=_("Your request has been registered"),
+                subject=_('Your request has been registered'),
                 ticket=ticket,
                 receivers=(self.email, ),
                 content={
@@ -292,7 +296,7 @@ def handle_complete_submission(
                 send_ticket_mail(
                     request=request,
                     template='mail_ticket_opened_info.pt',
-                    subject=_("New ticket"),
+                    subject=_('New ticket'),
                     ticket=ticket,
                     receivers=(
                         request.email_for_new_tickets,
@@ -331,14 +335,14 @@ def handle_complete_submission(
 
                 except ValueError:
                     if request.is_manager:
-                        request.warning(_("Your request could not be "
-                                          "accepted automatically!"))
+                        request.warning(_('Your request could not be '
+                                          'accepted automatically!'))
                 else:
                     close_ticket(
                         ticket, request.auto_accept_user, request
                     )
 
-            request.success(_("Thank you for your submission!"))
+            request.success(_('Thank you for your submission!'))
 
             return morepath.redirect(request.link(ticket, 'status'))
 
@@ -395,10 +399,10 @@ def handle_submission_action(
         request.assert_valid_csrf_token()
 
     if action == 'confirmed':
-        subject = _("Your registration has been confirmed")
-        success = _("The registration has been confirmed")
-        failure = _("The registration could not be confirmed because the "
-                    "maximum number of participants has been reached")
+        subject = _('Your registration has been confirmed')
+        success = _('The registration has been confirmed')
+        failure = _('The registration could not be confirmed because the '
+                    'maximum number of participants has been reached')
 
         def execute() -> bool:
             if self.registration_window and self.claimed is None:
@@ -406,9 +410,9 @@ def handle_submission_action(
             return False
 
     elif action == 'denied':
-        subject = _("Your registration has been denied")
-        success = _("The registration has been denied")
-        failure = _("The registration could not be denied")
+        subject = _('Your registration has been denied')
+        success = _('The registration has been denied')
+        failure = _('The registration could not be denied')
 
         def execute() -> bool:
             if self.registration_window and self.claimed is None:
@@ -417,9 +421,9 @@ def handle_submission_action(
             return False
 
     elif action == 'cancelled':
-        subject = _("Your registration has been cancelled")
-        success = _("The registration has been cancelled")
-        failure = _("The registration could not be cancelled")
+        subject = _('Your registration has been cancelled')
+        success = _('The registration has been cancelled')
+        failure = _('The registration could not be cancelled')
 
         def execute() -> bool:
             if self.registration_window and self.claimed:
@@ -462,3 +466,121 @@ def handle_submission_action(
             return None
 
     return request.redirect(request.link(self))
+
+
+@OrgApp.html(model=PendingSurveySubmission,
+             template='survey_submission.pt',
+             permission=Public, request_method='GET')
+@OrgApp.html(model=PendingSurveySubmission,
+             template='survey_submission.pt',
+             permission=Public, request_method='POST')
+@OrgApp.html(model=CompleteSurveySubmission,
+             template='survey_submission.pt',
+             permission=Private, request_method='GET')
+@OrgApp.html(model=CompleteSurveySubmission,
+             template='survey_submission.pt',
+             permission=Private, request_method='POST')
+def handle_pending_survey_submission(
+    self: PendingSurveySubmission | CompleteSurveySubmission,
+    request: 'OrgRequest',
+    layout: SurveySubmissionLayout | None = None
+) -> 'RenderData | Response':
+    """ Renders a pending submission, takes it's input and allows the
+    user to turn the submission into a complete submission, once all data
+    is valid.
+    """
+    collection = SurveyCollection(request.session)
+
+    form = request.get_form(self.form_class, data=self.data)
+    form.action = request.link(self)
+    form.model = self
+
+    if 'edit' not in request.GET:
+        form.validate()
+
+    if not request.POST:
+        form.ignore_csrf_error()
+    elif not form.errors:
+        collection.submissions.update(self, form)
+
+    completable = not form.errors and 'edit' not in request.GET
+
+    if completable and 'return-to' in request.GET:
+
+        if 'quiet' not in request.GET:
+            request.success(_('Your changes were saved'))
+
+        # the default url should actually never be called
+        return request.redirect(request.url)
+
+    if 'title' in request.GET:
+        title = request.GET['title']
+    else:
+        assert self.survey is not None
+        title = self.survey.title
+
+    # retain some parameters in links (the rest throw away)
+    form.action = copy_query(
+        request, form.action, ('return-to', 'title', 'quiet'))
+
+    edit_url_obj = URL(copy_query(
+        request, request.link(self), ('title', )))
+
+    # the edit url always points to the editable state
+    edit_url_obj = edit_url_obj.query_param('edit', '')
+    edit_url = edit_url_obj.as_string()
+
+    checkout_button = None
+
+    return {
+        'layout': layout or SurveySubmissionLayout(self, request, title),
+        'title': title,
+        'form': form,
+        'completable': completable,
+        'edit_link': edit_url,
+        'complete_link': request.link(self, 'complete'),
+        'model': self,
+        'price': None,
+        'checkout_button': checkout_button
+    }
+
+
+@OrgApp.view(model=PendingSurveySubmission, name='complete',
+             permission=Public, request_method='POST')
+@OrgApp.view(model=CompleteSurveySubmission, name='complete',
+             permission=Private, request_method='POST')
+def handle_complete_survey_submission(
+    self: PendingSurveySubmission | CompleteSurveySubmission,
+    request: 'OrgRequest'
+) -> 'Response':
+
+    form = request.get_form(self.form_class)
+    form.process(data=self.data)
+    form.model = self
+
+    # we're not really using a csrf protected form here (the complete form
+    # button is basically just there so we can use a POST instead of a GET)
+    form.validate()
+    form.ignore_csrf_error()
+
+    if form.errors:
+        return morepath.redirect(request.link(self))
+    else:
+        if self.state == 'complete':
+            self.data.changed()  # type:ignore[attr-defined]  # trigger updates
+            request.success(_('Your changes were saved'))
+
+            assert self.name is not None
+            return morepath.redirect(request.link(
+                SurveyCollection(request.session).scoped_submissions(
+                    self.name, ensure_existance=False)
+            ))
+        else:
+            collection = SurveyCollection(request.session)
+
+            # Expunges the submission from the session
+            collection.submissions.complete_submission(self)
+
+            request.success(_('Thank you for your submission!'))
+
+            return morepath.redirect(request.class_link(Organisation))

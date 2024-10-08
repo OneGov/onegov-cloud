@@ -26,11 +26,11 @@ class AgencyMembershipCollection(GenericCollection[AgencyMembership]):
         return AgencyMembership
 
     def by_id(self, id: 'UUID') -> AgencyMembership | None:  # type:ignore
-        return super(AgencyMembershipCollection, self).query().filter(
+        return super().query().filter(
             self.primary_key == id).first()
 
     def query(self, order_by: str | None = None) -> 'Query[AgencyMembership]':
-        query = super(AgencyMembershipCollection, self).query()
+        query = super().query()
         if not order_by:
             return query
         assert hasattr(self.model_class, order_by)

@@ -69,8 +69,10 @@ class Step:
         )
 
     def __repr__(self) -> str:
-        return f'Step({self.position}, {str(self.title)}, ' \
-               f'cls_after={self.cls_after}, cls_before={self.cls_before})'
+        return (
+            f'Step({self.position}, {self.title!s}, '
+            f'cls_after={self.cls_after}, cls_before={self.cls_before})'
+        )
 
 
 class StepCollection:
@@ -199,12 +201,14 @@ class StepSequenceRegistry:
         cls_after: str | None = None
     ) -> 'Callable[[type[_T]], type[_T]]':
 
-        """ A decorator to register part of a full step sequence as follows::
+        """ A decorator to register part of a full step sequence.
 
-        @step_sequences.registered_step(
-        1, _('Confirm'), cls_after='FormSubmission')
-        class MyDBModel(Base, StepsExtension):
-            pass
+        Use as follows::
+
+            @step_sequences.registered_step(
+            1, _('Confirm'), cls_after='FormSubmission')
+            class MyDBModel(Base, StepsExtension):
+                pass
 
         """
         def wrapper(model_class: type[_T]) -> type[_T]:

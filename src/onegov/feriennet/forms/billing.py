@@ -1,3 +1,4 @@
+from functools import cached_property
 from onegov.activity import Invoice
 from onegov.feriennet import _
 from onegov.form import Form
@@ -13,115 +14,126 @@ from wtforms.fields import StringField
 from wtforms.validators import InputRequired
 
 
+from typing import TYPE_CHECKING
+if TYPE_CHECKING:
+    from decimal import Decimal
+    from sqlalchemy.orm import Query
+
+
 class BillingForm(Form):
 
     confirm = RadioField(
-        label=_("Confirm billing:"),
+        label=_('Confirm billing:'),
         default='no',
         choices=[
-            ('no', _("No, preview only")),
-            ('yes', _("Yes, confirm billing"))
+            ('no', _('No, preview only')),
+            ('yes', _('Yes, confirm billing'))
         ]
     )
 
     sure = BooleanField(
         label=_(
-            "I know that after confirmation, bills are made visible to users."
+            'I know that after confirmation, bills are made visible to users.'
         ),
         default=False,
         depends_on=('confirm', 'yes')
     )
 
     @property
-    def finalize_period(self):
+    def finalize_period(self) -> bool:
         return self.confirm.data == 'yes' and self.sure.data is True
 
 
 class ManualBookingForm(Form):
 
     target = RadioField(
-        label=_("Target"),
+        label=_('Target'),
         choices=()
     )
 
     tags = MultiCheckboxField(
-        label=_("Tags"),
+        label=_('Tags'),
         validators=(InputRequired(), ),
         depends_on=('target', 'for-users-with-tags'),
         choices=()
     )
 
     username = SelectField(
-        label=_("User"),
+        label=_('User'),
         validators=(InputRequired(), ),
         depends_on=('target', 'for-user'),
     )
 
     booking_text = StringField(
-        label=_("Booking Text"),
+        label=_('Booking Text'),
         validators=(InputRequired(), )
     )
 
     kind = RadioField(
-        label=_("Kind"),
+        label=_('Kind'),
         default='discount',
         choices=(
-            ('discount', _("Discount")),
-            ('surcharge', _("Surcharge"))
+            ('discount', _('Discount')),
+            ('surcharge', _('Surcharge'))
         )
     )
 
     discount = DecimalField(
-        label=_("Discount"),
+        label=_('Discount'),
         validators=(InputRequired(), ),
         depends_on=('kind', 'discount')
     )
 
     surcharge = DecimalField(
-        label=_("Surcharge"),
+        label=_('Surcharge'),
         validators=(InputRequired(), ),
         depends_on=('kind', 'surcharge')
     )
 
     @property
-    def amount(self):
+    def amount(self) -> 'Decimal':
         if self.kind.data == 'discount':
+            assert self.discount.data is not None
             return -self.discount.data
         elif self.kind.data == 'surcharge':
+            assert self.surcharge.data is not None
             return self.surcharge.data
         else:
             raise NotImplementedError
 
     @property
-    def text(self):
+    def text(self) -> str | None:
         return self.booking_text.data
 
     @property
-    def available_usernames(self):
-        return self.usercollection.query()\
-            .with_entities(User.username, User.realname)\
-            .filter(func.trim(func.coalesce(User.realname, "")) != "")\
-            .filter(User.active == True)\
+    def available_usernames(self) -> 'Query[tuple[str, str]]':
+        return (
+            self.usercollection.query()
+            .with_entities(User.username, User.realname)
+            .filter(func.trim(func.coalesce(User.realname, '')) != '')
+            .filter(User.active == True)
             .order_by(func.unaccent(func.lower(User.realname)))
+        )
 
     @property
-    def users(self):
+    def users(self) -> tuple[str, ...]:
         if self.target.data == 'all':
-            return tuple(u.username for u in self.available_usernames)
+            return tuple(username for username, _ in self.available_usernames)
 
         elif self.target.data == 'for-user':
             return (self.username.data, )
 
         elif self.target.data == 'for-users-with-tags':
+            assert self.tags.data is not None
             return self.usercollection.usernames_by_tags(self.tags.data)
 
         else:
             raise NotImplementedError
 
-    def on_request(self):
+    def on_request(self) -> None:
         self.target.choices = [
-            ('all', _("All")),
-            ('for-user', _("For a specific user"))
+            ('all', _('All')),
+            ('for-user', _('For a specific user'))
         ]
 
         self.load_usernames()
@@ -129,7 +141,7 @@ class ManualBookingForm(Form):
 
         if self.tags.choices:
             self.target.choices.append(
-                ('for-users-with-tags', _("For users with tags")))
+                ('for-users-with-tags', _('For users with tags')))
 
         if (self.request.params.get('for-user')
                 and not self.target.data):
@@ -138,43 +150,40 @@ class ManualBookingForm(Form):
                 self.username.data = self.request.params['for-user']
 
     @property
-    def usercollection(self):
+    def usercollection(self) -> UserCollection:
         return UserCollection(self.request.session)
 
-    def load_user_tags(self):
-        self.tags.choices = tuple(
-            (t, t) for t in self.usercollection.tags)
+    def load_user_tags(self) -> None:
+        self.tags.choices = [(t, t) for t in self.usercollection.tags]
 
-    def load_usernames(self):
-        self.username.choices = tuple(
-            (u.username, u.realname) for u in self.available_usernames
-        )
+    def load_usernames(self) -> None:
+        self.username.choices = list(self.available_usernames)
 
 
 class PaymentWithDateForm(Form):
 
     payment_date = DateField(
-        label=_("Payment date"),
+        label=_('Payment date'),
         validators=(InputRequired(), ),
     )
 
     target = RadioField(
         validators=(InputRequired(), ),
-        label=_("Target"),
+        label=_('Target'),
         choices=(
-            ('all', _("Whole invoice")),
-            ('specific', _("Only for specific items"))
+            ('all', _('Whole invoice')),
+            ('specific', _('Only for specific items'))
         ),
     )
 
     items = MultiCheckboxField(
-        label=_("Items"),
+        label=_('Items'),
         validators=(InputRequired(), ),
         depends_on=('target', 'specific'),
         choices=()
     )
 
-    def on_request(self):
+    def on_request(self) -> None:
         self.items.choices = [
             (i.id.hex,
              f'{i.group} - {i.text} ({round(i.amount, 2)})')
@@ -203,7 +212,7 @@ class PaymentWithDateForm(Form):
             if self.target.data == 'all':
                 self.items.data = [i.id.hex for i in self.invoice.items]
 
-    @property
-    def invoice(self):
+    @cached_property
+    def invoice(self) -> Invoice:
         return self.request.session.query(
-            Invoice).filter_by(id=self.request.params['invoice-id']).first()
+            Invoice).filter_by(id=self.request.params['invoice-id']).one()

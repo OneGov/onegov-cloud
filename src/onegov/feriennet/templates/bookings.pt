@@ -54,7 +54,7 @@
                     <tal:b
                         define="banner layout.app.banners(request)[0]"
                         condition="banner"
-                        replace="structure banner"
+                        replace="banner"
                     />
 
                     <div class="row attendee-bookings-row" tal:repeat="attendee attendees" tal:condition="has_bookings" id="attendee-${attendee.id.hex}">
@@ -178,7 +178,7 @@
                                                     </div>
                                                     <div class="actions" tal:define="actions actions_by_booking(booking)">
                                                         <ul tal:condition="actions">
-                                                            <li tal:repeat="action actions" tal:content="structure action(layout)" />
+                                                            <li tal:repeat="action actions" tal:content="action(layout)" />
                                                         </ul>
                                                     </div>
                                                 </div>

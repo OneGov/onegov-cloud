@@ -1,10 +1,10 @@
-from onegov.ballot import BallotResult
 from onegov.election_day import _
 from onegov.election_day.formats.imports.common import EXPATS
 from onegov.election_day.formats.imports.common import FileImportError
 from onegov.election_day.formats.imports.common import get_entity_and_district
 from onegov.election_day.formats.imports.common import load_csv
 from onegov.election_day.formats.imports.common import validate_integer
+from onegov.election_day.models import BallotResult
 from sqlalchemy.orm import object_session
 
 
@@ -12,11 +12,11 @@ from typing import Any
 from typing import IO
 from typing import TYPE_CHECKING
 if TYPE_CHECKING:
-    from onegov.ballot.models import Vote
-    from onegov.ballot.types import BallotType
     from onegov.core.csv import DefaultRow
     from onegov.election_day.models import Canton
     from onegov.election_day.models import Municipality
+    from onegov.election_day.models import Vote
+    from onegov.election_day.types import BallotType
 
     # TODO: TypedDict for BallotResult
 
@@ -64,8 +64,6 @@ def parse_domain(domain: str) -> str | None:
 def line_is_relevant(
     line: 'DefaultRow',
     domain: str,
-    # FIXME: Are these allowed to be None? For now we have some assertions
-    #        that they shouldn't be
     district: str,
     number: str
 ) -> bool:
@@ -119,7 +117,7 @@ def import_vote_wabstic(
         return errors
 
     # Get the vote type
-    used_ballot_types: list['BallotType'] = ['proposal']
+    used_ballot_types: list[BallotType] = ['proposal']
     if vote.type == 'complex':
         used_ballot_types.extend(['counter-proposal', 'tie-breaker'])
 
@@ -144,7 +142,7 @@ def import_vote_wabstic(
                 )
         except Exception as e:
             line_errors.append(
-                _("Error in anzpendentgde/anzgdependent: ${msg}",
+                _('Error in anzpendentgde/anzgdependent: ${msg}',
                   mapping={'msg': e.args[0]}))
 
         if line_errors:
@@ -157,7 +155,7 @@ def import_vote_wabstic(
             continue
 
     # Parse the results
-    ballot_results: dict['BallotType', list[dict[str, Any]]]
+    ballot_results: dict[BallotType, list[dict[str, Any]]]
     ballot_results = {key: [] for key in used_ballot_types}
     added_entities = []
     assert sg_gemeinden is not None
@@ -180,15 +178,15 @@ def import_vote_wabstic(
 
             if entity_id in added_entities:
                 line_errors.append(
-                    _("${name} was found twice", mapping={'name': entity_id}))
+                    _('${name} was found twice', mapping={'name': entity_id}))
             else:
                 added_entities.append(entity_id)
 
             if entity_id and entity_id not in entities:
                 line_errors.append(
-                    _("${name} is unknown", mapping={'name': entity_id}))
+                    _('${name} is unknown', mapping={'name': entity_id}))
             else:
-                entity_name, entity_district, superregion = (
+                entity_name, entity_district, _superregion = (
                     get_entity_and_district(
                         entity_id, entities, vote, principal, line_errors
                     )
@@ -203,7 +201,7 @@ def import_vote_wabstic(
             counted_num = validate_integer(line, 'sperrung')
             counted = False if counted_num == 0 else True
         except ValueError:
-            line_errors.append(_("Invalid values"))
+            line_errors.append(_('Invalid values'))
         else:
             if not counted:
                 continue
@@ -248,7 +246,7 @@ def import_vote_wabstic(
             empty['counter-proposal'] = validate_integer(line, 'stmn1ohneaw')
             empty['tie-breaker'] = validate_integer(line, 'stmn2ohneaw')
         except ValueError:
-            line_errors.append(_("Could not read the empty votes"))
+            line_errors.append(_('Could not read the empty votes'))
 
         # Pass the line errors
         if line_errors:
@@ -287,7 +285,7 @@ def import_vote_wabstic(
             remaining.add(0)
         remaining -= {r['entity_id'] for r in ballot_results[ballot_type]}
         for entity_id in remaining:
-            entity_name, entity_district, superregion = (
+            entity_name, entity_district, _superregion = (
                 get_entity_and_district(
                     entity_id, entities, vote, principal
                 )
@@ -314,7 +312,7 @@ def import_vote_wabstic(
     if remaining_entities == 0:
         vote.status = 'final'
 
-    ballot_ids = {b: vote.ballot(b, create=True).id for b in used_ballot_types}
+    ballot_ids = {b: vote.ballot(b).id for b in used_ballot_types}
 
     session = object_session(vote)
     session.flush()
@@ -326,5 +324,6 @@ def import_vote_wabstic(
             for result in ballot_results[ballot_type]
         )
     )
+    session.expire(vote)
 
     return []

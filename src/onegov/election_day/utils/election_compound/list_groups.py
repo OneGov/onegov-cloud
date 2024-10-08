@@ -1,57 +1,46 @@
-from onegov.ballot import PartyResult
-from sqlalchemy import func
-from sqlalchemy import Integer
+from typing import NamedTuple, TYPE_CHECKING
 
-
-from typing import TYPE_CHECKING
 if TYPE_CHECKING:
     from decimal import Decimal
-    from onegov.ballot.models import ElectionCompound
+    from onegov.election_day.models import ElectionCompound
+    from onegov.election_day.models import PartyResult
     from onegov.core.types import JSONObject_ro
-    from sqlalchemy.orm import Query
-    from typing import NamedTuple
 
-    class ListGroupsRow(NamedTuple):
-        name: str | None
-        voters_count: Decimal | None
-        number_of_mandates: int
+
+class ListGroupsRow(NamedTuple):
+    name: str | None
+    voters_count: 'Decimal | int | None'
+    number_of_mandates: int
 
 
 def get_list_groups(
     election_compound: 'ElectionCompound'
-) -> list['ListGroupsRow']:
+) -> list[ListGroupsRow]:
     """" Get list groups data. """
 
     if not election_compound.pukelsheim:
         return []
 
-    base_query = election_compound.party_results
-    query: 'Query[ListGroupsRow]'
-    if election_compound.exact_voters_counts:
-        query = base_query.with_entities(
-            PartyResult.name.label('name'),
-            PartyResult.voters_count,
-            PartyResult.number_of_mandates,
-        )
-    else:
-        query = base_query.with_entities(
-            PartyResult.name.label('name'),
-            func.cast(
-                func.round(PartyResult.voters_count),
-                Integer
-            ).label('voters_count'),
-            PartyResult.number_of_mandates,
-        )
-    query = query.filter(
-        PartyResult.year == election_compound.date.year,
-        PartyResult.domain == election_compound.domain
-    )
-    query = query.order_by(
-        PartyResult.voters_count.desc(),
-        PartyResult.name,
-    )
+    def get_voters_count(result: 'PartyResult') -> 'Decimal | int | None':
+        if result.voters_count is None:
+            return result.voters_count
+        if election_compound.exact_voters_counts:
+            return result.voters_count
+        return round(result.voters_count)
 
-    return query.all()
+    results = [
+        ListGroupsRow(
+            name=result.name,
+            voters_count=get_voters_count(result),
+            number_of_mandates=result.number_of_mandates
+        )
+        for result in election_compound.party_results
+        if (
+            result.year == election_compound.date.year
+            and result.domain == election_compound.domain
+        )
+    ]
+    return sorted(results, key=lambda r: (-(r.voters_count or 0), r.name))
 
 
 def get_list_groups_data(

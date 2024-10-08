@@ -16,12 +16,10 @@ from onegov.user.auth.clients.msal import MSALConnections
 from onegov.user.auth.clients.saml2 import SAML2Connections
 from onegov.user.auth.clients.saml2 import finish_logout
 from saml2.ident import code
-from typing import Dict
-from typing import Optional
 from webob import Response
 
 
-from typing import Any, ClassVar, Literal, TypeVar, TYPE_CHECKING
+from typing import Any, ClassVar, Literal, Self, TypeVar, TYPE_CHECKING
 if TYPE_CHECKING:
     from collections.abc import Collection, Mapping
     from onegov.core.request import CoreRequest
@@ -29,7 +27,6 @@ if TYPE_CHECKING:
     from sqlalchemy.orm import Session
     from translationstring import TranslationString
     from typing import Protocol
-    from typing_extensions import Self
 
     class HasName(Protocol):
         @property
@@ -100,7 +97,7 @@ class AuthenticationProvider(metaclass=ABCMeta):
 
     # stores the 'to' attribute for the integration app
     # :class:`~onegov.user.integration.UserApp`.
-    to: Optional[str] = attrib(init=False)
+    to: str | None = attrib(init=False)
     primary: bool = attrib(init=False, default=False)
 
     if TYPE_CHECKING:
@@ -134,7 +131,8 @@ class AuthenticationProvider(metaclass=ABCMeta):
         super().__init_subclass__(**kwargs)
 
     @classmethod
-    def configure(cls, **kwargs: Any) -> 'Self | None':
+    @abstractmethod
+    def configure(cls, **kwargs: Any) -> Self | None:
         """ This function gets called with the per-provider configuration
         defined in onegov.yml. Authentication providers may optionally
         access these values.
@@ -267,7 +265,7 @@ def spawn_ldap_client(
     try:
         client.try_configuration()
     except Exception as exception:
-        raise ValueError(f"LDAP config error: {exception}") from exception
+        raise ValueError(f'LDAP config error: {exception}') from exception
 
     return client
 
@@ -308,7 +306,12 @@ def ensure_user(
         user.active = True
 
     # update the username
-    user.username = username
+    if user.username != username:
+        # ensure the new username is available
+        if users.by_username(username) is not None:
+            log.error(f'Cannot rename user {user.username} to {username}')
+        else:
+            user.username = username
 
     # update the role even if the user exists already
     if force_role:
@@ -342,7 +345,7 @@ class RolesMapping:
 
     """
 
-    roles: Dict[str, Dict[str, str]]
+    roles: dict[str, dict[str, str]]
 
     def app_specific(
         self,
@@ -404,7 +407,7 @@ class LDAPAttributes:
     uid: str
 
     @classmethod
-    def from_cfg(cls, cfg: dict[str, Any]) -> 'Self':
+    def from_cfg(cls, cfg: dict[str, Any]) -> Self:
         return cls(
             name=cfg.get('name_attribute', 'cn'),
             mails=cfg.get('mails_attribute', 'mail'),
@@ -417,7 +420,7 @@ class LDAPAttributes:
 @attrs(auto_attribs=True)
 class LDAPProvider(
         IntegratedAuthenticationProvider, metadata=ProviderMetadata(
-            name='ldap', title=_("LDAP"))):
+            name='ldap', title=_('LDAP'))):
 
     """ Generic LDAP Provider that includes authentication via LDAP. """
 
@@ -454,7 +457,7 @@ class LDAPProvider(
     custom_hint: str = ''
 
     @classmethod
-    def configure(cls, **cfg: Any) -> 'Self | None':
+    def configure(cls, **cfg: Any) -> Self | None:
 
         # Providers have to decide themselves if they spawn or not
         if not cfg:
@@ -507,7 +510,7 @@ class LDAPProvider(
 
         # onegov-cloud uses the e-mail as username, therefore we need to query
         # LDAP to get the designated name (actual LDAP username)
-        query = f"({self.attributes.mails}={username})"
+        query = f'({self.attributes.mails}={username})'
         query_attrs = (
             self.attributes.groups,
             self.attributes.mails,
@@ -520,7 +523,7 @@ class LDAPProvider(
 
         # as a fall back, we try to query the uid
         if not entries:
-            query = f"({self.attributes.uid}={username})"
+            query = f'({self.attributes.uid}={username})'
             entries = self.ldap.search(query, query_attrs)
 
             # if successful we need the e-mail address
@@ -535,12 +538,12 @@ class LDAPProvider(
 
         # then, we give up
         if not entries:
-            log.warning(f"No LDAP user with uid ore-mail {username}")
+            log.warning(f'No LDAP user with uid ore-mail {username}')
             return None
 
         if len(entries) > 1:
-            log.warning(f"Found more than one user for e-mail {username}")
-            log.warning("All but the first user will be ignored")
+            log.warning(f'Found more than one user for e-mail {username}')
+            log.warning('All but the first user will be ignored')
 
         for name, _attrs in entries.items():
             groups = _attrs[self.attributes.groups]
@@ -557,7 +560,7 @@ class LDAPProvider(
         time.sleep(0.25)
 
         if not self.ldap.compare(name, self.attributes.password, password):
-            log.warning(f"Wrong password for {username} ({name})")
+            log.warning(f'Wrong password for {username} ({name})')
             return None
 
         # finally check if we have a matching role
@@ -571,7 +574,7 @@ class LDAPProvider(
         role = self.roles.match(roles, groups)  # type:ignore[arg-type]
 
         if not role:
-            log.warning(f"Wrong role for {username} ({name})")
+            log.warning(f'Wrong role for {username} ({name})')
             return None
 
         return ensure_user(
@@ -585,7 +588,7 @@ class LDAPProvider(
 @attrs(auto_attribs=True)
 class LDAPKerberosProvider(
         SeparateAuthenticationProvider, metadata=ProviderMetadata(
-            name='ldap_kerberos', title=_("LDAP Kerberos"))):
+            name='ldap_kerberos', title=_('LDAP Kerberos'))):
 
     """ Combines LDAP with Kerberos. LDAP handles authorisation, Kerberos
     handles authentication.
@@ -605,10 +608,10 @@ class LDAPKerberosProvider(
     roles: RolesMapping = attrib()
 
     # Optional suffix that is removed from the Kerberos username if present
-    suffix: Optional[str] = None
+    suffix: str | None = None
 
     @classmethod
-    def configure(cls, **cfg: Any) -> 'Self | None':
+    def configure(cls, **cfg: Any) -> Self | None:
 
         # Providers have to decide themselves if they spawn or not
         if not cfg:
@@ -647,10 +650,10 @@ class LDAPKerberosProvider(
         """
         user_os = request.agent['os']['family']
 
-        if user_os == "Other":
-            return _("Login with operating system")
+        if user_os == 'Other':
+            return _('Login with operating system')
 
-        return _("Login with **${operating_system}**", mapping={
+        return _('Login with **${operating_system}**', mapping={
             'operating_system': user_os
         })
 
@@ -667,18 +670,18 @@ class LDAPKerberosProvider(
 
         # authentication failed
         if response is None:
-            return Failure(_("Authentication failed"))
+            return Failure(_('Authentication failed'))
 
         # we got authentication, do we also have authorization?
         name = response
         user = self.request_authorization(request=request, username=name)
 
         if user is None:
-            return Failure(_("User «${user}» is not authorized", mapping={
+            return Failure(_('User «${user}» is not authorized', mapping={
                 'user': name
             }))
 
-        return Success(user, _("Successfully logged in as «${user}»", mapping={
+        return Success(user, _('Successfully logged in as «${user}»', mapping={
             'user': user.username
         }))
 
@@ -696,24 +699,24 @@ class LDAPKerberosProvider(
             attributes=[self.attributes.mails, self.attributes.groups])
 
         if not entries:
-            log.warning(f"No LDAP entries for {username}")
+            log.warning(f'No LDAP entries for {username}')
             return None
 
         if len(entries) > 1:
             tip = ', '.join(entries.keys())
-            log.warning(f"Multiple LDAP entries for {username}: {tip}")
+            log.warning(f'Multiple LDAP entries for {username}: {tip}')
             return None
 
         attributes = next(v for v in entries.values())
 
         mails = attributes[self.attributes.mails]
         if not mails:
-            log.warning(f"No e-mail addresses for {username}")
+            log.warning(f'No e-mail addresses for {username}')
             return None
 
         groups = attributes[self.attributes.groups]
         if not groups:
-            log.warning(f"No groups for {username}")
+            log.warning(f'No groups for {username}')
             return None
 
         # get the common name of the groups
@@ -723,12 +726,12 @@ class LDAPKerberosProvider(
         roles = self.roles.app_specific(request.app)
 
         if not roles:
-            log.warning(f"No role map for {request.app.application_id}")
+            log.warning(f'No role map for {request.app.application_id}')
             return None
 
         role = self.roles.match(roles, groups)
         if not role:
-            log.warning(f"No authorized group for {username}")
+            log.warning(f'No authorized group for {username}')
             return None
 
         return ensure_user(
@@ -798,7 +801,7 @@ class OauthProvider(SeparateAuthenticationProvider):
 @attrs(auto_attribs=True)
 class AzureADProvider(
     OauthProvider,
-    metadata=ProviderMetadata(name='msal', title=_("AzureAD"))
+    metadata=ProviderMetadata(name='msal', title=_('AzureAD'))
 ):
     """
     Authenticates and authorizes a user in AzureAD for a specific AzureAD
@@ -835,7 +838,7 @@ class AzureADProvider(
     custom_hint: str = ''
 
     @classmethod
-    def configure(cls, **cfg: Any) -> 'Self | None':
+    def configure(cls, **cfg: Any) -> Self | None:
 
         if not cfg:
             return None
@@ -853,7 +856,7 @@ class AzureADProvider(
         )
 
     def button_text(self, request: 'CoreRequest') -> str:
-        return _("Login with Microsoft")
+        return _('Login with Microsoft')
 
     def do_logout(self, request: 'CoreRequest', user: 'User', to: str) -> None:
         # global logout is deactivated for AzureAD currently
@@ -881,7 +884,7 @@ class AzureADProvider(
 
         if not roles:
             # Considered as a misconfiguration of the app
-            log.error(f"No role map for {app.application_id}")
+            log.error(f'No role map for {app.application_id}')
             return Failure(_('Authorisation failed due to an error'))
 
         if not client:
@@ -890,7 +893,7 @@ class AzureADProvider(
                       f'{app.application_id} or {app.namespace}')
             return Failure(_('Authorisation failed due to an error'))
 
-        state = app.sign(str(uuid4()))
+        state = app.sign(str(uuid4()), 'azure-ad')
         nonce = str(uuid4())
         request.browser_session['state'] = state
         request.browser_session['login_to'] = self.to
@@ -983,7 +986,7 @@ class AzureADProvider(
             nonce=request.browser_session.pop('nonce')
         )
 
-        if "error" in token_result:
+        if 'error' in token_result:
             log.info(
                 f"Error in token result - "
                 f"{token_result['error']}: "
@@ -1005,15 +1008,15 @@ class AzureADProvider(
             client.attributes.preferred_username)
 
         if not username:
-            log.info("No username found in authorisation step")
+            log.info('No username found in authorisation step')
             return Failure(_('Authorisation failed due to an error'))
 
         if not source_id:
-            log.info(f"No source_id found for {username}")
+            log.info(f'No source_id found for {username}')
             return Failure(_('Authorisation failed due to an error'))
 
         if not groups:
-            log.info(f"No groups found for {username}")
+            log.info(f'No groups found for {username}')
             return Failure(_("Can't login because your user has no groups. "
                              "Contact your AzureAD system administrator"))
 
@@ -1041,7 +1044,7 @@ class AzureADProvider(
         # We set the path we wanted to go when starting the oauth flow
         self.to = request.browser_session.pop('login_to', '/')
 
-        return Success(user, _("Successfully logged in as «${user}»", mapping={
+        return Success(user, _('Successfully logged in as «${user}»', mapping={
             'user': user.username
         }))
 
@@ -1058,7 +1061,7 @@ class AzureADProvider(
 @attrs(auto_attribs=True)
 class SAML2Provider(
     OauthProvider,
-    metadata=ProviderMetadata(name='saml2', title=_("SAML2"))
+    metadata=ProviderMetadata(name='saml2', title=_('SAML2'))
 ):
     """
     Authenticates and authorizes a user on SAML2 IDP
@@ -1074,7 +1077,7 @@ class SAML2Provider(
     custom_hint: str = ''
 
     @classmethod
-    def configure(cls, **cfg: Any) -> 'Self | None':
+    def configure(cls, **cfg: Any) -> Self | None:
 
         if not cfg:
             return None
@@ -1164,7 +1167,7 @@ class SAML2Provider(
 
         if not roles:
             # Considered as a misconfiguration of the app
-            log.error(f"No role map for {app.application_id}")
+            log.error(f'No role map for {app.application_id}')
             return Failure(_('Authorisation failed due to an error'))
 
         if not client:
@@ -1248,15 +1251,15 @@ class SAML2Provider(
         groups = ava.get(client.attributes.groups)
 
         if not username:
-            log.info("No username found in authorisation step")
+            log.info('No username found in authorisation step')
             return Failure(_('Authorisation failed due to an error'))
 
         if not source_id:
-            log.info(f"No source_id found for {username}")
+            log.info(f'No source_id found for {username}')
             return Failure(_('Authorisation failed due to an error'))
 
         if not groups:
-            log.info(f"No groups found for {username}")
+            log.info(f'No groups found for {username}')
             return Failure(_("Can't login because your user has no groups. "
                              "Contact your SAML2 system administrator"))
 
@@ -1291,7 +1294,7 @@ class SAML2Provider(
         redirects = client.get_redirects(request.app)
         self.to = redirects.pop(session_id, '/')
 
-        return Success(user, _("Successfully logged in as «${user}»", mapping={
+        return Success(user, _('Successfully logged in as «${user}»', mapping={
             'user': user.username
         }))
 

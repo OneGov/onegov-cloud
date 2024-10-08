@@ -5,7 +5,7 @@ from datetime import date, datetime
 from libres.db.models import ReservedSlot
 
 from onegov.core.orm.mixins import (
-    content_property, dict_property, meta_property)
+    dict_markup_property, dict_property, meta_property)
 from onegov.core.orm.types import UUID
 from onegov.form.models import FormSubmission
 from onegov.org import _
@@ -40,11 +40,11 @@ class FindYourSpotCollection(ResourceCollection):
 
     @property
     def title(self) -> str:
-        return _("Find Your Spot")
+        return _('Find Your Spot')
 
     @property
     def meta(self) -> dict[str, Any]:
-        return {'lead': _("Search for available dates")}
+        return {'lead': _('Search for available dates')}
 
     def query(self) -> 'Query[Resource]':
         query = self.session.query(Resource)
@@ -63,12 +63,13 @@ class SharedMethods:
         date: date | None
         view: str | None
         timezone: Column[str]
+
         @property
         def scheduler(self) -> Scheduler: ...
         def get_scheduler(self, context: Context) -> Scheduler: ...
 
     lead: dict_property[str | None] = meta_property()
-    text: dict_property[str | None] = content_property()
+    text = dict_markup_property('content')
     occupancy_is_visible_to_members: dict_property[bool | None]
     occupancy_is_visible_to_members = meta_property()
 

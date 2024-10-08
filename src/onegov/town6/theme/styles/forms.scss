@@ -4,6 +4,8 @@
 
 small.error,
 span.error {
+    @include smooth-edges;
+
     background: $alert-color;
     color: $white;
     display: block;
@@ -36,11 +38,6 @@ form {
 
         &.error, .upload-widget.error {
             color: $alert-color;
-
-            & input,
-            & .button {
-                margin-bottom: 0;
-            }
         }
     }
 
@@ -78,11 +75,11 @@ form {
     .field-help {
         color: $steel;
         font-size: .8rem;
-        margin-left: 1.6rem;
+        margin-left: 25px;
     }
 
     input + .label-text + .field-help {
-        margin-left: 1.8rem;
+        margin-left: 25px;
     }
 
     .long-field-help,
@@ -504,18 +501,6 @@ dl.field-display > dt {
     }
 }
 
-/*
-Fix for very long fieldset of people
-*/
-
-#fieldset-people .formfields {
-    max-height: 600px;
-    overflow-y: scroll;
-    @include breakpoint(small only) {
-        max-height: 300px;
-    }
-}
-
 a.category-anchor {
     display: block;
     position: relative;
@@ -528,5 +513,23 @@ a.category-anchor {
 
     &:hover {
         margin-right: .5rem;
+    }
+}
+
+p.file-title {
+    margin-bottom: .5rem;
+    margin-top: 1.2rem;
+}
+
+.file-edit {
+    background: $smoke;
+    border-radius: .7rem;
+    margin-left: .5rem;
+    padding: .5rem;
+    transition: all 200ms linear;
+
+    &:hover {
+        background: $iron;
+        cursor: pointer !important;
     }
 }

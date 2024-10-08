@@ -1,5 +1,6 @@
 from onegov.org import _
-from onegov.org.elements import DeleteLink, Link, LinkGroup
+from onegov.org.elements import DeleteLink, Link, LinkGroup, IFrameLink
+from onegov.org.models import Organisation
 from onegov.org.models.clipboard import Clipboard
 from onegov.org.models.editor import Editor
 
@@ -7,6 +8,7 @@ from onegov.org.models.editor import Editor
 from typing import Any, TYPE_CHECKING
 if TYPE_CHECKING:
     from collections.abc import Iterator, Sequence
+    from onegov.core.elements import Link as BaseLink
     from onegov.form import Form
     from onegov.org.request import OrgRequest
     from sqlalchemy import Column
@@ -16,35 +18,46 @@ if TYPE_CHECKING:
 #: is the same). New traits need to adapt the same messages as the others.
 TRAIT_MESSAGES: dict[str, dict[str, str]] = {
     'link': {
-        'name': _("Link"),
-        'new_page_title': _("New Link"),
-        'new_page_added': _("Added a new link"),
-        'edit_page_title': _("Edit Link"),
-        'delete_message': _("The link was deleted"),
-        'delete_button': _("Delete link"),
+        'name': _('Link'),
+        'new_page_title': _('New Link'),
+        'new_page_added': _('Added a new link'),
+        'edit_page_title': _('Edit Link'),
+        'move_page_title': _('Move Link'),
+        'delete_message': _('The link was deleted'),
+        'delete_button': _('Delete link'),
         'delete_question': _(
-            "Do you really want to delete the link \"${title}\"?"),
+            'Do you really want to delete the link "${title}"?'),
     },
     'page': {
-        'name': _("Topic"),
-        'new_page_title': _("New Topic"),
-        'new_page_added': _("Added a new topic"),
-        'edit_page_title': _("Edit Topic"),
-        'move_page_title': _("Move Topic"),
-        'delete_message': _("The topic was deleted"),
-        'delete_button': _("Delete topic"),
+        'name': _('Topic'),
+        'new_page_title': _('New Topic'),
+        'new_page_added': _('Added a new topic'),
+        'edit_page_title': _('Edit Topic'),
+        'move_page_title': _('Move Topic'),
+        'delete_message': _('The topic was deleted'),
+        'delete_button': _('Delete topic'),
         'delete_question': _(
-            "Do you really want to delete the topic \"${title}\"?"),
+            'Do you really want to delete the topic "${title}"?'),
     },
     'news': {
-        'name': _("News"),
-        'new_page_title': _("Add News"),
-        'new_page_added': _("Added news"),
-        'edit_page_title': _("Edit News"),
-        'delete_message': _("The news was deleted"),
-        'delete_button': _("Delete news"),
+        'name': _('News'),
+        'new_page_title': _('Add News'),
+        'new_page_added': _('Added news'),
+        'edit_page_title': _('Edit News'),
+        'delete_message': _('The news was deleted'),
+        'delete_button': _('Delete news'),
         'delete_question': _(
-            "Do you really want to delete the news \"${title}\"?"),
+            'Do you really want to delete the news "${title}"?'),
+    },
+    'iframe': {
+        'name': _('iFrame'),
+        'new_page_title': _('Add iFrame'),
+        'new_page_added': _('Added iFrame'),
+        'edit_page_title': _('Edit iFrame'),
+        'delete_message': _('The iFrame was deleted'),
+        'delete_button': _('Delete iFrame'),
+        'delete_question': _(
+            'Do you really want to delete the iFrame "${title}"?'),
     }
 }
 
@@ -64,6 +77,7 @@ class TraitInfo:
         # forward declare Page attributes we rely on
         title: Column[str]
         meta: Column[dict[str, Any]]
+
         @property
         def editable(self) -> bool: ...
         @property
@@ -123,7 +137,7 @@ class TraitInfo:
     def get_editbar_links(
         self,
         request: 'OrgRequest'
-    ) -> 'Sequence[Link | LinkGroup]':
+    ) -> 'Sequence[BaseLink | LinkGroup]':
         """ Returns the editbar links on the private view of this trait. """
         links = list(self.get_edit_links(request))
         links.append(
@@ -138,7 +152,7 @@ class TraitInfo:
     def get_add_links(
         self,
         request: 'OrgRequest'
-    ) -> 'Iterator[Link]':
+    ) -> 'Iterator[BaseLink]':
         """ Yields the add links shown on the private view of this trait. """
 
         for trait in self.allowed_subtraits:
@@ -157,18 +171,18 @@ class TraitInfo:
     def get_edit_links(
         self,
         request: 'OrgRequest'
-    ) -> 'Iterator[Link | LinkGroup]':
+    ) -> 'Iterator[BaseLink | LinkGroup]':
         """ Yields the edit links shown on the private view of this trait. """
 
         if self.editable:
             yield Link(
-                _("Edit"),
+                _('Edit'),
                 request.link(Editor('edit', self)),
                 classes=('edit-link', )
             )
             assert request.path_info is not None
             yield Link(
-                _("Copy"),
+                _('Copy'),
                 request.link(Clipboard.from_url(request, request.path_info)),
                 classes=('copy-link', )
             )
@@ -176,7 +190,7 @@ class TraitInfo:
         if request.browser_session.has('clipboard_url'):
 
             yield Link(
-                _("Paste"),
+                _('Paste'),
                 request.link(Editor('paste', self.paste_target)),
                 classes=('paste-link', 'show-new-content-placeholder'),
             )
@@ -192,31 +206,35 @@ class TraitInfo:
                 extra_warning: str
                 if not safe_delete:
                     extra_warning = _(
-                        "Please note that this page has subpages "
-                        "which will also be deleted!"
+                        'Please note that this page has subpages '
+                        'which will also be deleted!'
                     )
                 else:
-                    extra_warning = ""
+                    extra_warning = ''
 
                 yield DeleteLink(
-                    _("Delete"), request.link(self),
+                    _('Delete'), request.link(self),
                     confirm=_(trait_messages['delete_question'], mapping={
                         'title': self.title
                     }),
                     yes_button_text=trait_messages['delete_button'],
                     extra_information=extra_warning,
-                    redirect_after=request.link(self.parent)  # type:ignore
+                    redirect_after=(
+                        request.link(self.parent)  # type:ignore[attr-defined]
+                        if self.parent is not None  # type:ignore[attr-defined]
+                        else request.class_link(Organisation)
+                    )
                 )
             else:
                 yield DeleteLink(
-                    text=_("Delete"),
+                    text=_('Delete'),
                     url=request.link(self),
                     confirm=_("This page can't be deleted."),
                     extra_information=_(
-                        "This page has subpages. Only administrators can "
-                        "delete pages with subpages. To delete this page, "
-                        "delete all subpages first or ask an administrator "
-                        "to do it for you."
+                        'This page has subpages. Only administrators can '
+                        'delete pages with subpages. To delete this page, '
+                        'delete all subpages first or ask an administrator '
+                        'to do it for you.'
                     )
                 )
 
@@ -226,3 +244,13 @@ class TraitInfo:
                 request.link(Editor('change-url', self)),
                 classes=('internal-url',)
             )
+
+        if self.trait is not None:
+            if (
+                self.trait == 'news' and not getattr(self, 'parent', None)
+            ) or self.trait != 'news':
+                yield IFrameLink(
+                    text=_('iFrame'),
+                    url=request.link(self),
+                    attrs={'class': 'new-iframe'}
+                )

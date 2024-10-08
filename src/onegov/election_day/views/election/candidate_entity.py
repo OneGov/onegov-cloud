@@ -1,13 +1,12 @@
-from onegov.ballot import Candidate
-from onegov.ballot import Election
-from onegov.core.security import Public
 from onegov.election_day import _
 from onegov.election_day import ElectionDayApp
-from onegov.election_day.hidden_by_principal import (
-    hide_candidate_entity_map_percentages)
+from onegov.election_day.hidden_by_principal import \
+    hide_candidate_entity_map_percentages
 from onegov.election_day.layouts import ElectionLayout
+from onegov.election_day.models import Candidate
+from onegov.election_day.models import Election
+from onegov.election_day.security import MaybePublic
 from onegov.election_day.utils import add_last_modified_header
-from sqlalchemy import func
 
 
 from typing import TYPE_CHECKING
@@ -24,23 +23,29 @@ def candidate_options(
 ) -> list[tuple[str, str]]:
 
     completed = election.completed
-    elected = request.translate(_("Elected")).lower()
-    ordering = [func.lower(Candidate.family_name),
-                func.lower(Candidate.first_name)]
-    if completed:
-        ordering.insert(0, Candidate.elected.desc())
+    elected = request.translate(_('Elected')).lower()
+
+    def ordering(candidate: Candidate) -> tuple[str, str]:
+        return (candidate.family_name.lower(), candidate.first_name.lower())
+
+    def ordering_completed(candidate: Candidate) -> tuple[bool, str, str]:
+        return (
+            not candidate.elected,
+            candidate.family_name.lower(),
+            candidate.first_name.lower()
+        )
 
     return [
         (
-            request.link(candidate_, name='by-entity'),
+            request.link(candidate, name='by-entity'),
             '{} {}'.format(
-                f'{candidate_.family_name} {candidate_.first_name}',
-                (f'({elected})' if completed
-                    and candidate_.elected else '')
+                f'{candidate.family_name} {candidate.first_name}',
+                (f'({elected})' if completed and candidate.elected else '')
             ).strip()
         )
-        for candidate_ in election.candidates.order_by(None).order_by(
-            *ordering
+        for candidate in sorted(
+            election.candidates,
+            key=ordering_completed if completed else ordering
         )
     ]
 
@@ -48,7 +53,7 @@ def candidate_options(
 @ElectionDayApp.json(
     model=Candidate,
     name='by-entity',
-    permission=Public
+    permission=MaybePublic
 )
 def view_candidate_by_entity(
     self: Candidate,
@@ -63,7 +68,7 @@ def view_candidate_by_entity(
     model=Election,
     name='candidate-by-entity',
     template='election/heatmap.pt',
-    permission=Public
+    permission=MaybePublic
 )
 def view_election_candidate_by_entity(
     self: Election,
@@ -78,6 +83,8 @@ def view_election_candidate_by_entity(
     by = request.translate(layout.label('entity'))
     by = by.lower() if request.locale != 'de_CH' else by
 
+    assert request.locale
+
     return {
         'election': self,
         'layout': layout,
@@ -87,8 +94,7 @@ def view_election_candidate_by_entity(
         'embed_source': request.link(
             self,
             name='candidate-by-entity-chart',
-            # FIXME: Should we assert that locale is set?
-            query_params={'locale': request.locale}  # type:ignore[dict-item]
+            query_params={'locale': request.locale}
         ),
         'hide_percentages': hide_candidate_entity_map_percentages(request),
         'figcaption': _(
@@ -103,7 +109,7 @@ def view_election_candidate_by_entity(
     model=Election,
     name='candidate-by-entity-chart',
     template='embed.pt',
-    permission=Public
+    permission=MaybePublic
 )
 def view_election_candidate_by_entity_chart(
     self: Election,

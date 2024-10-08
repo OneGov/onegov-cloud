@@ -1,6 +1,7 @@
 import warnings
 
 from datetime import datetime
+
 from dateutil import rrule
 from dateutil.rrule import rrulestr
 from icalendar import Calendar as vCalendar
@@ -23,14 +24,12 @@ from onegov.search import SearchableContent
 from PIL.Image import DecompressionBombError
 from pytz import UTC
 from sedate import standardize_date
-from sedate import to_timezone
+from sedate import to_timezone, utcnow
 from sqlalchemy import and_
 from sqlalchemy import Column
 from sqlalchemy import desc
 from sqlalchemy import Enum
-from sqlalchemy import func
 from sqlalchemy import Text
-from sqlalchemy.orm import backref
 from sqlalchemy.orm import object_session
 from sqlalchemy.orm import relationship
 from sqlalchemy.orm import validates
@@ -46,7 +45,7 @@ if TYPE_CHECKING:
     from onegov.core.request import CoreRequest
     from sqlalchemy.orm import Query
     from typing import Literal
-    from typing_extensions import TypeAlias
+    from typing import TypeAlias
 
     EventState: TypeAlias = Literal[
         'initiated',
@@ -181,9 +180,9 @@ class Event(Base, OccurrenceMixin, TimestampMixin, SearchableContent,
 
     #: Occurrences of the event
     occurrences: 'relationship[list[Occurrence]]' = relationship(
-        "Occurrence",
-        cascade="all, delete-orphan",
-        backref=backref("event"),
+        'Occurrence',
+        cascade='all, delete-orphan',
+        back_populates='event',
         lazy='joined',
     )
 
@@ -209,7 +208,7 @@ class Event(Base, OccurrenceMixin, TimestampMixin, SearchableContent,
             return None
 
         guidle_id = self.source.rsplit('-', 1)[-1].split('.', 1)[0]
-        return f"https://www.guidle.com/angebote/{guidle_id}"
+        return f'https://www.guidle.com/angebote/{guidle_id}'
 
     def __setattr__(self, name: str, value: object) -> None:
         """ Automatically update the occurrences if shared attributes change
@@ -233,18 +232,19 @@ class Event(Base, OccurrenceMixin, TimestampMixin, SearchableContent,
 
         """
 
+        now = utcnow()
         base = self.base_query
         current = base.filter(and_(
-            Occurrence.start <= func.now(),
-            Occurrence.end >= func.now()
+            Occurrence.start <= now,
+            Occurrence.end >= now
         )).order_by(Occurrence.start).limit(1)
 
         future = base.filter(
-            Occurrence.start >= func.now()
+            Occurrence.start >= now
         ).order_by(Occurrence.start).limit(1)
 
         past = base.filter(
-            Occurrence.end <= func.now()
+            Occurrence.end <= now
         ).order_by(desc(Occurrence.start))
 
         return current.union_all(future, past).first()
@@ -256,7 +256,7 @@ class Event(Base, OccurrenceMixin, TimestampMixin, SearchableContent,
     ) -> 'Query[Occurrence]':
 
         return self.base_query.filter(
-            Occurrence.start >= func.now()
+            Occurrence.start >= utcnow()
         ).order_by(Occurrence.start).offset(offset).limit(limit)
 
     @validates('recurrence')
@@ -286,7 +286,7 @@ class Event(Base, OccurrenceMixin, TimestampMixin, SearchableContent,
 
             # a rule must either have a frequency or be a list of rdates
             if not hasattr(rule, '_freq'):
-                if all((l.startswith('RDATE') for l in r.splitlines())):
+                if all(l.startswith('RDATE') for l in r.splitlines()):
                     return r
 
                 raise RuntimeError(f"'{r}' is too complex")
@@ -372,7 +372,7 @@ class Event(Base, OccurrenceMixin, TimestampMixin, SearchableContent,
         """ Create an occurrence at the given date, without storing it. """
 
         end = start + (self.end - self.start)
-        name = '{0}-{1}'.format(self.name, start.date().isoformat())
+        name = f'{self.name}-{start.date().isoformat()}'
 
         return Occurrence(  # type:ignore[misc]
             title=self.title,
@@ -423,7 +423,7 @@ class Event(Base, OccurrenceMixin, TimestampMixin, SearchableContent,
         self.occurrences = []
 
         # do not create occurrences unless the event is published
-        if not self.state == 'published':
+        if self.state != 'published':
             return
 
         # do not create occurrences unless start and end is set
@@ -469,8 +469,8 @@ class Event(Base, OccurrenceMixin, TimestampMixin, SearchableContent,
 
         """
 
-        modified = self.modified or self.created or datetime.utcnow()
-        rrule = ''
+        modified = self.modified or self.created or utcnow()
+        rrule = None
         if self.recurrence:
             rrule = vRecur.from_ical(self.recurrence.replace('RRULE:', ''))
 
@@ -499,7 +499,7 @@ class Event(Base, OccurrenceMixin, TimestampMixin, SearchableContent,
             if rrule:
                 break
 
-    def as_ical(self, url: str | None = None) -> str:
+    def as_ical(self, url: str | None = None) -> bytes:
         """ Returns the event and all its occurrences as iCalendar string.
 
         """

@@ -1,9 +1,9 @@
 import os.path
-from onegov.ballot import Ballot
-from onegov.ballot import Election
-from onegov.ballot import ElectionCompound
-from onegov.ballot import ElectionCompoundPart
 from onegov.election_day import log
+from onegov.election_day.models import Ballot
+from onegov.election_day.models import Election
+from onegov.election_day.models import ElectionCompound
+from onegov.election_day.models import ElectionCompoundPart
 from onegov.election_day.utils import svg_filename
 from onegov.election_day.utils.d3_renderer import D3Renderer
 from shutil import copyfileobj
@@ -87,7 +87,7 @@ class SvgGenerator:
             assert fs is not None
             with fs.open(path, 'w') as f:
                 copyfileobj(chart, f)
-            log.info(f"{filename} created")
+            log.info(f'{filename} created')
             return 1
 
         return 0

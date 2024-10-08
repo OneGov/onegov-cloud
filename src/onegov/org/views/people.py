@@ -1,5 +1,6 @@
 import morepath
 from morepath.request import Response
+from sqlalchemy.orm import undefer
 from onegov.core.security import Public, Private
 from onegov.org import _, OrgApp
 from onegov.org.elements import Link
@@ -12,10 +13,9 @@ from markupsafe import Markup
 
 from typing import TYPE_CHECKING
 if TYPE_CHECKING:
-    from collections.abc import Iterable, Iterator
+    from collections.abc import Iterable
     from onegov.core.types import RenderData
     from onegov.org.request import OrgRequest
-    from onegov.page import Page
     from webob import Response as BaseResponse
 
 
@@ -26,7 +26,12 @@ def view_people(
     layout: PersonCollectionLayout | None = None
 ) -> 'RenderData':
 
-    people = self.query().order_by(Person.last_name, Person.first_name).all()
+    selected_org = str(request.params.get('organisation', ''))
+    selected_sub_org = str(request.params.get('sub_organisation', ''))
+
+    people = self.people_by_organisation(selected_org, selected_sub_org)
+    orgs = self.unique_organisations()
+    sub_orgs = self.unique_sub_organisations(selected_org)
 
     class AtoZPeople(AtoZ[Person]):
 
@@ -37,9 +42,14 @@ def view_people(
             return people
 
     return {
-        'title': _("People"),
+        'title': _('People'),
+        'count': len(people),
         'people': AtoZPeople(request).get_items_by_letter().items(),
-        'layout': layout or PersonCollectionLayout(self, request)
+        'layout': layout or PersonCollectionLayout(self, request),
+        'organisations': orgs,
+        'sub_organisations': sub_orgs,
+        'selected_organisation': selected_org,
+        'selected_sub_organisation': selected_sub_org
     }
 
 
@@ -50,21 +60,9 @@ def view_person(
     layout: PersonLayout | None = None
 ) -> 'RenderData':
 
-    def visit_topics_with_people(
-        pages: 'Iterable[Page]',
-        root_id: int | None = None
-    ) -> 'Iterator[Topic]':
-        for page in pages:
-
-            if root_id is None:
-                root_id = page.id
-
-            if isinstance(page, Topic) and page.content.get('people'):
-                yield page
-            yield from visit_topics_with_people(page.children, root_id=root_id)
-
-    topics = visit_topics_with_people(request.app.pages_tree)
-    org_to_func = person_functions_by_organization(self, topics, request)
+    query = request.session.query(Topic)
+    query = query.options(undefer('content'))
+    org_to_func = person_functions_by_organization(self, query, request)
     return {
         'title': self.title,
         'person': self,
@@ -98,9 +96,9 @@ def person_functions_by_organization(
             for pers in (topic.people or [])
             if (
                 pers.id == subject_person.id
-                and (func := getattr(pers, "context_specific_function", None))
+                and (func := getattr(pers, 'context_specific_function', None))
                 is not None
-                and getattr(pers, "display_function_in_person_directory",
+                and getattr(pers, 'display_function_in_person_directory',
                             False) is not False
             )
         ),
@@ -135,17 +133,18 @@ def handle_new_person(
 
     if form.submitted(request):
         person = self.add(**form.get_useful_data())
-        request.success(_("Added a new person"))
+        request.success(_('Added a new person'))
 
         return morepath.redirect(request.link(person))
 
     layout = layout or PersonCollectionLayout(self, request)
-    layout.breadcrumbs.append(Link(_("New"), '#'))
+    layout.breadcrumbs.append(Link(_('New'), '#'))
     layout.include_editor()
+    layout.edit_mode = True
 
     return {
         'layout': layout,
-        'title': _("New person"),
+        'title': _('New person'),
         'form': form
     }
 
@@ -166,15 +165,16 @@ def handle_edit_person(
 
     if form.submitted(request):
         form.populate_obj(self)
-        request.success(_("Your changes were saved"))
+        request.success(_('Your changes were saved'))
 
         return morepath.redirect(request.link(self))
     else:
         form.process(obj=self)
 
     layout = layout or PersonLayout(self, request)
-    layout.breadcrumbs.append(Link(_("Edit"), '#'))
+    layout.breadcrumbs.append(Link(_('Edit'), '#'))
     layout.include_editor()
+    layout.edit_mode = True
 
     return {
         'layout': layout,
@@ -193,7 +193,7 @@ def handle_delete_person(self: Person, request: 'OrgRequest') -> None:
 def vcard_export_person(self: Person, request: 'OrgRequest') -> Response:
     """ Returns the persons vCard. """
 
-    exclude = request.app.org.excluded_person_fields(request) + ['notes']
+    exclude = [*request.app.org.excluded_person_fields(request), 'notes']
 
     return Response(
         self.vcard(exclude),

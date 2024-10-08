@@ -29,9 +29,9 @@ if TYPE_CHECKING:
 
 
 AVAILABLE_ROLES = [
-    ('admin', _("Admin")),
-    ('editor', _("Editor")),
-    ('member', _("Member"))
+    ('admin', _('Admin')),
+    ('editor', _('Editor')),
+    ('member', _('Member'))
 ]
 
 
@@ -42,31 +42,31 @@ class ManageUserForm(Form):
         request: OrgRequest
 
     state = RadioField(
-        label=_("State"),
-        fieldset=_("General"),
+        label=_('State'),
+        fieldset=_('General'),
         default='active',
         choices=(
-            ('active', _("Active")),
-            ('inactive', _("Inactive"))
+            ('active', _('Active')),
+            ('inactive', _('Inactive'))
         ),
     )
 
     role = RadioField(
-        label=_("Role"),
-        fieldset=_("General"),
+        label=_('Role'),
+        fieldset=_('General'),
         choices=AVAILABLE_ROLES,
         default='member',
     )
 
     tags = TagsField(
-        label=_("Tags"),
-        fieldset=_("General"),
+        label=_('Tags'),
+        fieldset=_('General'),
     )
 
     yubikey = StringField(
-        label=_("Yubikey"),
-        fieldset=_("General"),
-        description=_("Plug your YubiKey into a USB slot and press it."),
+        label=_('Yubikey'),
+        fieldset=_('General'),
+        description=_('Plug your YubiKey into a USB slot and press it.'),
         filters=(yubikey_identifier, ),
         render_kw={'autocomplete': 'off'}
     )
@@ -106,13 +106,13 @@ class ManageUserForm(Form):
 
             if self.role.data in ('admin', 'editor'):
                 raise ValidationError(_(
-                    "Administrators and editors must use a Yubikey"
+                    'Administrators and editors must use a Yubikey'
                 ))
             else:
                 return
 
         if not is_valid_yubikey_format(field.data):
-            raise ValidationError(_("Invalid Yubikey"))
+            raise ValidationError(_('Invalid Yubikey'))
 
         users = UserCollection(self.request.session)
         user = users.by_yubikey(field.data)
@@ -122,7 +122,7 @@ class ManageUserForm(Form):
 
         if user and user.username != self.current_username:
             raise ValidationError(
-                _("This Yubikey is already used by ${username}", mapping={
+                _('This Yubikey is already used by ${username}', mapping={
                     'username': user.username
                 })
             )
@@ -134,13 +134,13 @@ class PartialNewUserForm(Form):
     """
 
     username = EmailField(
-        label=_("E-Mail"),
-        description=_("The users e-mail address (a.k.a. username)"),
+        label=_('E-Mail'),
+        description=_('The users e-mail address (a.k.a. username)'),
         validators=[InputRequired(), Email()]
     )
 
     send_activation_email = BooleanField(
-        label=_("Send Activation E-Mail with Instructions"),
+        label=_('Send Activation E-Mail with Instructions'),
         default=True
     )
 
@@ -153,7 +153,7 @@ class PartialNewUserForm(Form):
         assert field.data is not None
         if UserCollection(self.request.session).by_username(field.data):
             raise ValidationError(
-                _("A user with this e-mail address exists already"))
+                _('A user with this e-mail address exists already'))
 
 
 if TYPE_CHECKING:
@@ -218,7 +218,7 @@ class ManageUserGroupForm(Form):
             (str(u.id), u.title)
             for u in UserCollection(self.request.session).query()
         ]
-        ticket_choices: list['_Choice'] = [
+        ticket_choices: list[_Choice] = [
             (f'{key}-', key)
             for key in handlers.registry.keys()
         ]

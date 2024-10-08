@@ -1,23 +1,23 @@
 import transaction
 
 from base64 import b64decode
-from onegov.ballot.models import Election
-from onegov.ballot.models import ElectionCompound
-from onegov.ballot.models import ProporzElection
-from onegov.ballot.models import Vote
 from onegov.core.security import Public
 from onegov.election_day import _
 from onegov.election_day import ElectionDayApp
 from onegov.election_day.collections import ArchivedResultCollection
+from onegov.election_day.formats import import_ech
 from onegov.election_day.formats import import_election_compound_internal
 from onegov.election_day.formats import import_election_internal_majorz
 from onegov.election_day.formats import import_election_internal_proporz
 from onegov.election_day.formats import import_party_results_internal
 from onegov.election_day.formats import import_vote_internal
-from onegov.election_day.formats import import_ech
 from onegov.election_day.forms import UploadRestForm
 from onegov.election_day.models import Principal
 from onegov.election_day.models import UploadToken
+from onegov.election_day.models import Election
+from onegov.election_day.models import ElectionCompound
+from onegov.election_day.models import ProporzElection
+from onegov.election_day.models import Vote
 from onegov.election_day.views.upload import set_locale
 from onegov.election_day.views.upload import translate_errors
 from onegov.election_day.views.upload import unsupported_year_error
@@ -81,7 +81,7 @@ def view_upload_rest(
         if status_code is not None:
             response.status_code = status_code
 
-    errors: dict[str, list['FileImportError | str']] = {}
+    errors: dict[str, list[FileImportError | str]] = {}
 
     form = request.get_form(UploadRestForm, model=self, csrf_support=False)
     if not form.validate():
@@ -105,7 +105,7 @@ def view_upload_rest(
             )
         ).first()
         if item is None:
-            errors.setdefault('id', []).append(_("Invalid id"))
+            errors.setdefault('id', []).append(_('Invalid id'))
     elif form.type.data in ('election', 'parties'):
         item = session.query(ElectionCompound).filter(
             or_(
@@ -121,16 +121,13 @@ def view_upload_rest(
                 )
             ).first()
         if item is None:
-            errors.setdefault('id', []).append(_("Invalid id"))
+            errors.setdefault('id', []).append(_('Invalid id'))
 
     # Check the type
     if item is not None and form.type.data == 'parties':
-        if not (
-            isinstance(item, ElectionCompound)
-            or isinstance(item, ProporzElection)
-        ):
+        if not isinstance(item, (ElectionCompound, ProporzElection)):
             errors.setdefault('id', []).append(
-                _("Use an election based on proportional representation")
+                _('Use an election based on proportional representation')
             )
 
     # Check if the year is supported
@@ -147,11 +144,12 @@ def view_upload_rest(
         mimetype = form.results.data['mimetype']
 
         err = []
-        updated: 'Collection[Election | ElectionCompound | Vote]'
+        updated: Collection[Election | ElectionCompound | Vote]
         # NOTE: Technically item should only be none for type xml
         #       which in turn replaces this list but it's better
         #       to be safe than sorry
         updated = [item] if item is not None else []
+        deleted: Collection[Election | ElectionCompound | Vote] = []
         if form.type.data == 'vote':
             item = cast('Vote', item)
             err = import_vote_internal(item, self, file, mimetype)
@@ -171,20 +169,22 @@ def view_upload_rest(
                 )
         elif form.type.data == 'parties':
             item = cast('ElectionCompound | ProporzElection', item)
+            assert request.app.default_locale
             err = import_party_results_internal(
                 item,
                 request.app.principal,
                 file,
                 mimetype,
                 request.app.locales,
-                # FIXME: Should we assert that default_locale is set?
-                request.app.default_locale  # type:ignore[arg-type]
+                request.app.default_locale
             )
         elif form.type.data == 'xml':
-            err, updated = import_ech(
+            assert request.app.default_locale
+            err, updated, deleted = import_ech(
                 request.app.principal,
                 file,
-                session
+                session,
+                request.app.default_locale
             )
         if err:
             errors.setdefault('results', []).extend(err)
@@ -197,12 +197,13 @@ def view_upload_rest(
                     for election in item.elections:
                         archive.update(election, request)
                 request.app.send_zulip(
-                    # FIXME: Should we assert that the principal has a name?
-                    self.name,  # type:ignore[arg-type]
+                    self.name,
                     'New results available: [{}]({})'.format(
                         item.title, request.link(item)
                     )
                 )
+            for item in deleted:
+                archive.delete(item, request)
 
     translate_errors(errors, request)
 

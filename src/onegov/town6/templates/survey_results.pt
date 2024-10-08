@@ -1,0 +1,35 @@
+<div metal:use-macro="layout.base" i18n:domain="onegov.town6">
+    <tal:b metal:fill-slot="title">
+        ${title}
+    </tal:b>
+    <tal:b metal:fill-slot="content">
+        <tal:b metal:use-macro="layout.macros.page_content"
+                 tal:define="lead None; text None; people None; coordinates None; contact None; show_side_panel True">
+            <tal:b metal:fill-slot="after-text">
+                <tal:b metal:use-macro="layout.macros['display-results']" />
+            </tal:b>
+            <tal:b metal:fill-slot="before-panels">
+                <div class="side-panel" tal:condition="results">
+                    <h3 i18n:translate="">Fields</h3>
+                    <div class="side-panel-with-bg">
+                        <ul class="more-list">
+                            <li tal:repeat="field fields">
+                                <a class="list-link" href="#${field.id}">${field.label.text}</a>
+                            </li>
+                        </ul>
+                    </div>                      
+                </div>
+                <div class="side-panel" tal:condition="submission_windows">
+                    <h3 i18n:translate="">Submission Windows</h3>
+                    <div class="side-panel-with-bg">
+                        <ul class="more-list">
+                            <li tal:repeat="window submission_windows">
+                                <a class="list-link" href="${request.link(window, 'results')}" tal:define="window_name window.title if window.title else layout.format_date_range(window.start, window.end)">${window_name}</a>
+                            </li>
+                        </ul>
+                    </div>                      
+                </div>
+            </tal:b>
+        </tal:b>
+    </tal:b>
+</div>

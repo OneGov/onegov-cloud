@@ -9,6 +9,7 @@ from sqlalchemy import ForeignKey
 from sqlalchemy import Numeric
 from sqlalchemy import Text
 from sqlalchemy.ext.hybrid import hybrid_property
+from sqlalchemy.orm import relationship
 from sqlalchemy.orm import validates
 from uuid import uuid4
 
@@ -19,7 +20,6 @@ if TYPE_CHECKING:
     from datetime import date
     from decimal import Decimal
     from onegov.activity.models import Invoice
-    from sqlalchemy.orm import relationship
     from sqlalchemy.sql import ColumnElement
 
 
@@ -47,6 +47,10 @@ class InvoiceItem(Base, TimestampMixin, PayableManyTimes):
     invoice_id: 'Column[uuid.UUID | None]' = Column(
         UUID,  # type:ignore[arg-type]
         ForeignKey('invoices.id')
+    )
+    invoice: 'relationship[Invoice]' = relationship(
+        'Invoice',
+        back_populates='items'
     )
 
     #: the attendee, if the item is connected to an attendee
@@ -95,8 +99,6 @@ class InvoiceItem(Base, TimestampMixin, PayableManyTimes):
     )
 
     if TYPE_CHECKING:
-        # FIXME: Use explicit backref with back_populates
-        invoice: relationship[Invoice]
         amount: Column[Decimal]
 
     #: ..together form the amount

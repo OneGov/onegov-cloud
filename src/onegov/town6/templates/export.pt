@@ -14,7 +14,7 @@
                 <div class="filter-panel" tal:condition="filters|nothing">
                     <div tal:repeat="filter filters" class="filter-periods">
                         <h2 class="filter-title">${filter.title}</h2>
-                        <div metal:use-macro="layout.macros['tags']" tal:define="tags filter.tags" />
+                        <div metal:use-macro="layout.macros['tags']" tal:define="form_id 'main-form'; tags filter.tags" />
                     </div>
                 </div>
             </div>

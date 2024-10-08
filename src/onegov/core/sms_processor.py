@@ -1,11 +1,11 @@
 """
-    Send SMS through ASPSMS
+Send SMS through ASPSMS
 
-    Adapted from repoze.sendmail: https://github.com/repoze/repoze.sendmail
+Adapted from `repoze.sendmail<https://github.com/repoze/repoze.sendmail>`_.
 
-    Usage:
-        qp = SmsQueueProcessor(sms_directory)
-        qp.send_messages()
+Usage::
+    qp = SmsQueueProcessor(sms_directory)
+    qp.send_messages()
 """
 
 import errno
@@ -168,18 +168,18 @@ class SmsQueueProcessor:
     ) -> dict[str, Any] | None:
         """ Sends the SMS and returns the API response on error.
 
-            On success this returns None.
+        On success this returns None.
         """
         code, body = self.send_request({
-            "UserName": self.username,
-            "Password": self.password,
-            "Originator": self.originator,
-            "Recipients": numbers,
-            "MessageText": content,
+            'UserName': self.username,
+            'Password': self.password,
+            'Originator': self.originator,
+            'Recipients': numbers,
+            'MessageText': content,
         })
 
         if 400 <= code < 600:
-            raise RuntimeError(f"{code} calling {self.url}: {body}")
+            raise RuntimeError(f'{code} calling {self.url}: {body}')
 
         result = json.loads(body)
 
@@ -326,21 +326,21 @@ class SmsQueueProcessor:
         if numbers and message:
             status = self.send(numbers, message)
             if status is None:
-                log.info("SMS to {} sent.".format(', '.join(numbers)))
+                log.info('SMS to {} sent.'.format(', '.join(numbers)))
             else:
                 # this should cause stderr output, which
                 # will write the cronjob output to chat
                 log.error(
-                    f"Failed sending SMS batch {filename} with "
-                    f"API response {status}"
+                    f'Failed sending SMS batch {filename} with '
+                    f'API response {status}'
                 )
                 os.link(filename, failed_filename)
         else:
             # this should cause stderr output, which
             # will write the cronjob output to chat
             log.error(
-                f"Discarding SMS batch {filename} due to invalid "
-                "content/numbers"
+                f'Discarding SMS batch {filename} due to invalid '
+                'content/numbers'
             )
             os.link(filename, rejected_filename)
 

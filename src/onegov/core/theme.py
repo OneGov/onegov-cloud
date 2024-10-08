@@ -135,7 +135,7 @@ def compile(
     if not force and storage.exists(filename):
         return filename
 
-    log.info(f"Compiling theme {theme.name}, {theme.version}")
+    log.info(f'Compiling theme {theme.name}, {theme.version}')
     storage.writebytes(filename, theme.compile(options).encode('utf-8'))
 
     return filename

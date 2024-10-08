@@ -1,3 +1,4 @@
+from onegov.core.elements import BackLink
 from onegov.org import _
 from onegov.core.security import Private
 from onegov.org import OrgApp
@@ -39,15 +40,18 @@ def handle_new_external_link(
 
     if form.submitted(request):
         external_link = self.add_by_form(form)
-        request.success(_("Added a new external link"))
+        request.success(_('Added a new external link'))
         return redirect(request.class_link(
             ExternalLinkCollection.target(external_link)
         ))
 
     layout = layout or DefaultLayout(self, request)
+    layout.edit_mode = True
+    layout.editmode_links[1] = BackLink(attrs={'class': 'cancel-link'})
+
     return {
         'layout': layout,
-        'title': request.params.get('title', _("New external link")),
+        'title': request.params.get('title', _('New external link')),
         'form': form,
     }
 
@@ -63,7 +67,7 @@ def edit_external_link(
 
     if form.submitted(request):
         form.populate_obj(self)
-        request.success(_("Your changes were saved"))
+        request.success(_('Your changes were saved'))
         to = request.params.get('to')
         if not isinstance(to, str):
             to = ''
@@ -72,9 +76,11 @@ def edit_external_link(
     form.process(obj=self)
 
     layout = layout or ExternalLinkLayout(self, request)
+    layout.edit_mode = True
+
     return {
         'layout': layout,
-        'title': request.params.get('title', _("Edit external link")),
+        'title': request.params.get('title', _('Edit external link')),
         'form': form,
     }
 

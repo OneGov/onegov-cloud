@@ -5,7 +5,7 @@ import tempfile
 import textwrap
 import transaction
 
-from datetime import datetime, date
+from datetime import datetime, date, timedelta
 from freezegun import freeze_time
 from libres.db.models import Reservation
 from libres.modules.errors import AffectedReservationError
@@ -137,14 +137,14 @@ def test_resources_person_link_extension(client):
     resources = client.get('/resources')
     new_item = resources.click('Gegenstand')
     new_item.form['title'] = 'Dorf Bike'
-    new_item.form['western_ordered'] = False
-    new_item.form['_'.join(['people', person_uuid])] = True
+    new_item.form['western_name_order'] = False
+    new_item.form['people-0-person'] = person_uuid
     resource = new_item.form.submit().follow()
     assert 'Dorf Bike' in resource
     assert 'Müller Franz' in resource
 
     edit_resource = resource.click('Bearbeiten')
-    edit_resource.form['western_ordered'] = True
+    edit_resource.form['western_name_order'] = True
     resource = edit_resource.form.submit().follow()
     assert 'Franz Müller' in resource
 
@@ -291,7 +291,11 @@ def test_resource_room_deletion(client):
 
     # Adds allocations and reservations in the past
     add_reservation(
-        foyer, client, datetime(2017, 1, 6, 12), datetime(2017, 1, 6, 16))
+        foyer,
+        client.app.session(),
+        datetime(2017, 1, 6, 12),
+        datetime(2017, 1, 6, 16),
+    )
     assert foyer.deletable
     transaction.commit()
 
@@ -305,6 +309,61 @@ def test_resource_room_deletion(client):
     tickets = TicketCollection(client.app.session())
     ticket = tickets.query().one()
     assert ticket.state == 'closed'
+
+
+def test_resource_room_deletion_with_future_allocation_and_payment(client):
+    resources = ResourceCollection(client.app.libres_context)
+    resource = resources.by_name('tageskarte')
+    resource.pricing_method = 'per_item'
+    resource.price_per_item = 15.00
+    resource.payment_method = 'manual'
+    resource.definition = 'Email = ___'
+
+    tomorrow = date.today() + timedelta(days=1)
+    scheduler = resource.get_scheduler(client.app.libres_context)
+    allocations = scheduler.allocate(
+        dates=(
+            datetime(tomorrow.year, tomorrow.month, tomorrow.day, 10),
+            datetime(tomorrow.year, tomorrow.month, tomorrow.day, 14),
+        ),
+    )
+
+    reserve = client.bound_reserve(allocations[0])
+    transaction.commit()
+
+    # create a reservation
+    assert reserve().json == {'success': True}
+
+    page = client.get('/resource/tageskarte/form')
+    page.form['email'] = 'info@example.org'
+
+    ticket = page.form.submit().follow().form.submit().follow()
+    assert 'RSV-' in ticket.text
+
+    # mark it as paid
+    client.login_admin()
+    page = client.get('/tickets/ALL/open').click("Annehmen").follow()
+
+    assert page.pyquery('.payment-state').text() == "Offen"
+
+    client.post(page.pyquery('.mark-as-paid').attr('ic-post-to'))
+    page = client.get(page.request.url)
+
+    assert page.pyquery('.payment-state').text() == "Bezahlt"
+
+    # delete resource
+    page = client.get('/resources').click('Tageskarte', index=1)
+    delete_link = page.pyquery('a.delete-link').attr('ic-delete-from')
+    assert delete_link
+    assert client.delete(delete_link, status=200)
+    page = client.get('/resources')
+    assert 'Tageskarte' not in page.pyquery('a.list-title').text()
+
+    # check if the tickets have been closed
+    tickets = TicketCollection(client.app.session())
+    for ticket in tickets.query().all():
+        assert ticket.state == 'closed'
+        assert ticket.snapshot is not None
 
 
 def test_reserved_resources_fields(client):
@@ -1179,9 +1238,6 @@ def test_delete_reservation_anonymous(client):
 
     reservations = client.get(reservations_url).json['reservations']
     url = reservations[0]['delete']
-
-    # the url does not have csrf (anonymous does not)
-    assert url.endswith('?csrf-token=')
 
     # other clients still can't use the link
     assert client.spawn().delete(url, status=403)
@@ -2204,10 +2260,51 @@ def test_allocation_rules_on_rooms(client):
 
     assert count_allocations() == 7
 
-    page = client.get('/resource/room').click("Regeln")
-    page.click('Löschen')
 
-    assert count_allocations() == 1
+
+def test_allocation_rules_edit(client):
+    client.login_admin()
+
+    resources = client.get('/resources')
+
+    page = resources.click('Raum')
+    page.form['title'] = 'Room'
+    page.form.submit()
+
+    def count_allocations():
+        s = '2000-01-01'
+        e = '2050-01-31'
+
+        return len(client.get(f'/resource/room/slots?start={s}&end={e}').json)
+
+    def run_cronjob():
+        client.get('/resource/room/process-rules')
+
+    page = client.get('/resource/room').click("Regeln").click("Regel")
+    page.form['title'] = 'Täglich'
+    page.form['extend'] = 'daily'
+    page.form['start'] = '2019-01-01'
+    page.form['end'] = '2019-01-02'
+    page.form['as_whole_day'] = 'yes'
+
+    page.select_checkbox('except_for', "Sa")
+    page.select_checkbox('except_for', "So")
+
+    page = page.form.submit().follow()
+
+    assert 'Regel aktiv, 2 Einteilungen erstellt' in page
+    assert count_allocations() == 2
+
+    # Modifying the rule applies changes where possible, but
+    # existing reserved slots remain unaffected.
+    edit_page = client.get('/resource/room')
+    edit_page = edit_page.click('Regeln').click('Bearbeiten')
+    form = edit_page.form
+    form['title'] = 'Renamed room'
+
+    edit_page = form.submit().follow()
+
+    assert 'Renamed room' in edit_page
 
 
 def test_allocation_rules_on_daypasses(client):

@@ -1,7 +1,8 @@
-import sqlalchemy
-
 from collections import defaultdict
 from datetime import date, timedelta, datetime
+
+
+import sqlalchemy
 from dateutil.relativedelta import relativedelta
 from enum import Enum
 from functools import cached_property
@@ -24,10 +25,12 @@ from onegov.event.models import Occurrence
 from onegov.form import as_internal_id
 
 
+from typing import assert_never
 from typing import Any
+from typing import Literal
 from typing import TypeVar
+from typing import Self
 from typing import TYPE_CHECKING
-from typing_extensions import assert_never
 if TYPE_CHECKING:
     from _typeshed import SupportsRichComparison
     from collections.abc import Callable
@@ -38,10 +41,8 @@ if TYPE_CHECKING:
     from onegov.form.parser.core import ParsedField
     from sqlalchemy.orm import Query
     from sqlalchemy.orm import Session
-    from typing import Literal
     from typing import Protocol
-    from typing_extensions import Self
-    from typing_extensions import TypeAlias
+    from typing import TypeAlias
 
     class OccurenceSearchWidget(Protocol):
         @property
@@ -55,15 +56,16 @@ if TYPE_CHECKING:
         ) -> Query[Occurrence]: ...
 
     T = TypeVar('T')
-    DateRange: TypeAlias = Literal[
-        'today',
-        'tomorrow',
-        'weekend',
-        'week',
-        'month',
-        'past'
-    ]
     MissingType: TypeAlias = 'Literal[_Sentinel.MISSING]'
+
+DateRange = Literal[
+    'today',
+    'tomorrow',
+    'weekend',
+    'week',
+    'month',
+    'past'
+]
 
 
 class _Sentinel(Enum):
@@ -90,7 +92,7 @@ class OccurrenceCollection(Pagination[Occurrence]):
 
     """
 
-    date_ranges: tuple['DateRange', ...] = (
+    date_ranges: tuple[DateRange, ...] = (
         'today',
         'tomorrow',
         'weekend',
@@ -103,7 +105,7 @@ class OccurrenceCollection(Pagination[Occurrence]):
         self,
         session: 'Session',
         page: int = 0,
-        range: 'DateRange | None' = None,
+        range: DateRange | None = None,
         start: date | None = None,
         end: date | None = None,
         outdated: bool = False,
@@ -116,8 +118,8 @@ class OccurrenceCollection(Pagination[Occurrence]):
         event_filter_fields: 'Sequence[ParsedField] | None' = None,
     ) -> None:
 
+        super().__init__(page=page)
         self.session = session
-        self.page = page
         self.range = range if range in self.date_ranges else None
         self.start, self.end = self.range_to_dates(range, start, end)
         self.outdated = outdated
@@ -147,7 +149,7 @@ class OccurrenceCollection(Pagination[Occurrence]):
     def page_index(self) -> int:
         return self.page
 
-    def page_by_index(self, index: int) -> 'Self':
+    def page_by_index(self, index: int) -> Self:
         return self.__class__(
             self.session,
             page=index,
@@ -166,7 +168,7 @@ class OccurrenceCollection(Pagination[Occurrence]):
 
     def range_to_dates(
         self,
-        range: 'DateRange | None',
+        range: DateRange | None,
         start: date | None = None,
         end: date | None = None
     ) -> tuple[date | None, date | None]:
@@ -217,7 +219,7 @@ class OccurrenceCollection(Pagination[Occurrence]):
         self,
         singular: bool = False,
         **keywords: list[str]
-    ) -> 'Self':
+    ) -> Self:
 
         return self.__class__(
             self.session,
@@ -240,7 +242,7 @@ class OccurrenceCollection(Pagination[Occurrence]):
         keyword: str,
         value: str,
         singular: bool = False,
-    ) -> 'Self':
+    ) -> Self:
 
         parameters = dict(self.filter_keywords)
 
@@ -275,7 +277,7 @@ class OccurrenceCollection(Pagination[Occurrence]):
     def for_filter(
         self,
         *,
-        range: 'DateRange | None' = None,
+        range: DateRange | None = None,
         start: 'date | None | MissingType' = MISSING,
         end: 'date | None | MissingType' = MISSING,
         outdated: bool | None = None,
@@ -283,7 +285,7 @@ class OccurrenceCollection(Pagination[Occurrence]):
         tag: str | None = None,
         locations: 'Sequence[str] | None' = None,
         location: str | None = None,
-    ) -> 'Self':
+    ) -> Self:
         """ Returns a new instance of the collection with the given filters
         and copies the current filters if not specified.
 
@@ -336,7 +338,7 @@ class OccurrenceCollection(Pagination[Occurrence]):
             event_filter_fields=self.event_filter_fields,
         )
 
-    def without_keywords_and_tags(self) -> 'Self':
+    def without_keywords_and_tags(self) -> Self:
         return self.__class__(
             self.session,
             page=self.page,
@@ -455,28 +457,12 @@ class OccurrenceCollection(Pagination[Occurrence]):
     def used_tags(self) -> set[str]:
         """ Returns a list of all the tags used by all future occurrences.
 
-        This could be solve possibly more effienciently with the skey function
-        currently not supported by SQLAlchemy (e.g.
-        ``select distinct(skeys(tags))``), see
-        http://stackoverflow.com/q/12015942/3690178
-
         """
-        base = self.session.query(
-            # FIXME: Shouldn't we just directly query the two attributes
-            #        below rather than use with_entities?
-            Occurrence._tags.keys()  # type:ignore[attr-defined]
-        ).with_entities(
-            sqlalchemy.func.skeys(Occurrence._tags).label('keys'),
-            Occurrence.end
-        )
-        base = base.filter(func.DATE(Occurrence.end) >= date.today())
 
-        query = sqlalchemy.select(
-            [sqlalchemy.func.array_agg(sqlalchemy.column('keys'))],
-            distinct=True
-        ).select_from(base.subquery())
-        keys = self.session.execute(query).scalar()
-        return set(keys) if keys else set()
+        query = self.session.query(
+            sqlalchemy.func.skeys(Occurrence._tags),
+        ).filter(func.DATE(Occurrence.end) >= date.today())
+        return {key[0] for key in query.distinct()}
 
     def query(self) -> 'Query[Occurrence]':
         """ Queries occurrences with the set parameters.
@@ -495,8 +481,10 @@ class OccurrenceCollection(Pagination[Occurrence]):
 
         """
 
-        query = self.session.query(Occurrence).join(Event) \
+        query = (
+            self.session.query(Occurrence).join(Event)
             .options(contains_eager(Occurrence.event).joinedload(Event.image))
+        )
 
         if self.only_public:
             query = query.filter(or_(
@@ -569,7 +557,7 @@ class OccurrenceCollection(Pagination[Occurrence]):
         if self.locations:
 
             def escape(qstring: str) -> str:
-                purge = "\\(),\"\'."
+                purge = "\\(),\"'."
                 for s in purge:
                     qstring = qstring.replace(s, '')
                 return qstring
@@ -608,7 +596,7 @@ class OccurrenceCollection(Pagination[Occurrence]):
         query = self.session.query(Occurrence).filter(Occurrence.name == name)
         return query.first()
 
-    def as_ical(self, request: 'CoreRequest') -> str:
+    def as_ical(self, request: 'CoreRequest') -> bytes:
         """ Returns the the events of the given occurrences as iCalendar
         string.
 
@@ -634,30 +622,31 @@ class OccurrenceCollection(Pagination[Occurrence]):
         Returns all published occurrences as xml.
 
         The xml format was Winterthur's wish (no specs behind). Their mobile
-        app will consume the events from xml
+        app will consume the events from.
 
-        Format:
-        <events>
-            <event>
-                <id></id>
-                <title></title>
-                <tags></tags>
-                    <tag></tag>
-                <description></description>
-                <start></start>
-                <end></end>
-                <location></location>
-                <price></price>
+        Format::
+
+            <events>
+                <event>
+                    <id></id>
+                    <title></title>
+                    <tags></tags>
+                        <tag></tag>
+                    <description></description>
+                    <start></start>
+                    <end></end>
+                    <location></location>
+                    <price></price>
+                    ..
+                </event>
+                <event>
+                    ..
+                </event>
                 ..
-            </event>
-            <event>
-                ..
-            </event>
-            ..
-        </events>
+            </events>
 
         :param future_events_only: if set, only future events will be
-        returned, all events otherwise
+            returned, all events otherwise
         :rtype: str
         :return: xml string
 
@@ -681,7 +670,7 @@ class OccurrenceCollection(Pagination[Occurrence]):
             event = objectify.Element('event')
             event.id = e.id
             event.title = e.title
-            txs = tags(e.tags)
+            txs = Tags(e.tags)
             event.append(txs)  # type:ignore[arg-type]
             event.description = e.description
             event.start = e.localized_start
@@ -703,7 +692,7 @@ class OccurrenceCollection(Pagination[Occurrence]):
                               pretty_print=True)
 
 
-class tags(etree.ElementBase):
+class Tags(etree.ElementBase):
     """
     Custom class as 'tag' is a member of class Element and cannot be
     used as tag name.

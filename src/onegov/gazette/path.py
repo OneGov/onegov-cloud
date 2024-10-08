@@ -1,7 +1,7 @@
 from onegov.core.converters import extended_date_converter
 from onegov.core.converters import move_direction_converter
 from onegov.core.converters import uuid_converter
-from onegov.file.integration import get_file
+from onegov.core.converters import LiteralConverter
 from onegov.gazette import GazetteApp
 from onegov.gazette.collections import CategoryCollection
 from onegov.gazette.collections import GazetteNoticeCollection
@@ -14,6 +14,7 @@ from onegov.gazette.models import Organization
 from onegov.gazette.models import OrganizationMove
 from onegov.gazette.models import Principal
 from onegov.gazette.models.issue import IssuePdfFile
+from onegov.notice.models import NoticeState
 from onegov.user import Auth
 from onegov.user import User
 from onegov.user import UserCollection
@@ -125,16 +126,15 @@ def get_issue_pdf(
 ) -> IssuePdfFile | None:
     issue = IssueCollection(app.session()).by_name(name.replace('.pdf', ''))
     if issue and issue.pdf:
-        # FIXME: Isn't this call to get_file redundant?
-        return get_file(app, issue.pdf.id)  # type: ignore[return-value]
+        return issue.pdf  # type:ignore[return-value]
     return None
 
 
-# FIXME: return None for invalid state? (i.e. return 404)
 @GazetteApp.path(
     model=GazetteNoticeCollection,
     path='/notices/{state}',
     converters={
+        'state': LiteralConverter(NoticeState),
         'from_date': extended_date_converter,
         'to_date': extended_date_converter,
         'categories': [str],
@@ -145,7 +145,7 @@ def get_issue_pdf(
 )
 def get_notices(
     app: GazetteApp,
-    state: str,
+    state: NoticeState,
     page: int = 0,
     term: str | None = None,
     order: str | None = None,
@@ -169,7 +169,7 @@ def get_notices(
     organizations = [c for c in organizations if c] if organizations else None
     return GazetteNoticeCollection(
         app.session(),
-        state=state,  # type:ignore[arg-type]
+        state=state,
         page=page,
         term=term,
         order=order,

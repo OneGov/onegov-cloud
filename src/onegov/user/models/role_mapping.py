@@ -7,7 +7,6 @@ from onegov.user.models.user import User
 from sqlalchemy import Column
 from sqlalchemy import ForeignKey
 from sqlalchemy import Text
-from sqlalchemy.orm import backref
 from sqlalchemy.orm import relationship
 from uuid import uuid4, UUID as UUIDType
 
@@ -39,7 +38,10 @@ class RoleMapping(Base, ContentMixin, TimestampMixin):
     #: `<https://docs.sqlalchemy.org/en/improve_toc/\
     #: orm/extensions/declarative/inheritance.html>`_.
     type: 'Column[str]' = Column(
-        Text, nullable=False, default=lambda: 'generic')
+        Text,
+        nullable=False,
+        default=lambda: 'generic'
+    )
 
     __mapper_args__ = {
         'polymorphic_on': type,
@@ -57,21 +59,30 @@ class RoleMapping(Base, ContentMixin, TimestampMixin):
     #: the role is relevant for security in onegov.core
     role: 'Column[str]' = Column(Text, nullable=False)
 
-    #: the group this mapping belongs to
+    #: the id of the group this mapping belongs to
     group_id: 'Column[UUIDType | None]' = Column(
         UUID,  # type:ignore[arg-type]
         ForeignKey(UserGroup.id),
         nullable=True
     )
+
+    #: the group this mapping belongs to
     group: 'relationship[UserGroup | None]' = relationship(
-        UserGroup, backref=backref('role_mappings', lazy='dynamic')
+        UserGroup,
+        back_populates='role_mappings'
+    )
+
+    #: the username of the user this mapping belongs to
+    username: 'Column[str | None]' = Column(
+        Text,
+        ForeignKey(User.username),
+        nullable=True
     )
 
     #: the user this mapping belongs to
-    username: 'Column[str | None]' = Column(
-        Text, ForeignKey(User.username), nullable=True)
     user: 'relationship[User | None]' = relationship(
-        User, backref=backref('role_mappings', lazy='dynamic')
+        User,
+        back_populates='role_mappings'
     )
 
     #: the content this mapping belongs to

@@ -16,7 +16,7 @@ from onegov.org.models.ticket import ticket_submitter
 from onegov.org.views.message import view_messages_feed
 from onegov.pdf import Pdf, page_fn_header
 from onegov.qrcode import QrCode
-from html5lib.filters.whitespace import Filter as whitespace_filter
+from html5lib.filters.whitespace import Filter as WhitespaceFilter
 from reportlab.lib import colors
 from reportlab.lib.units import cm
 from reportlab.lib.utils import ImageReader
@@ -24,16 +24,17 @@ from reportlab.lib.utils import ImageReader
 
 from typing import overload, Any, Literal, TYPE_CHECKING
 if TYPE_CHECKING:
-    from collections.abc import Callable, Mapping, Sequence
+    from collections.abc import Callable, Iterable, Mapping, Sequence
+    from bleach.callbacks import _HTMLAttrs
     from bleach.sanitizer import _Filter
     from gettext import GNUTranslations
     from onegov.org.layout import DefaultLayout
     from onegov.org.request import OrgRequest
+    from onegov.pdf.templates import Template
     from onegov.ticket import Ticket
-    from reportlab.lib.styles import ParagraphStyle
+    from reportlab.lib.styles import PropertySet
     from reportlab.pdfgen.canvas import Canvas
-    from reportlab.platypus.doctemplate import BaseDocTemplate
-    from reportlab.platypus.tables import TableStyle
+    from reportlab.platypus.tables import _TableCommand, TableStyle
 
 
 class TicketQrCode(QrCode):
@@ -48,15 +49,15 @@ class TicketPdf(Pdf):
         ticket = kwargs.pop('ticket')
         layout = kwargs.pop('layout')
         qr_payload = kwargs.pop('qr_payload')
-        super(TicketPdf, self).__init__(*args, **kwargs)
-        self.ticket: 'Ticket' = ticket
+        super().__init__(*args, **kwargs)
+        self.ticket: Ticket = ticket
         self.locale: str | None = locale
-        self.translations: dict[str, 'GNUTranslations'] = translations
-        self.layout: 'DefaultLayout' = layout
+        self.translations: dict[str, GNUTranslations] = translations
+        self.layout: DefaultLayout = layout
 
         # Modification for the footer left on all pages
-        self.doc.author = self.translate(_("Source")) + f': {self.doc.author}'
-        self.doc.qr_payload = qr_payload
+        self.doc.author = self.translate(_('Source')) + f': {self.doc.author}'
+        self.doc.qr_payload = qr_payload  # type:ignore[attr-defined]
 
     def translate(self, text: str) -> str:
         """ Translates the given string. """
@@ -89,7 +90,7 @@ class TicketPdf(Pdf):
     @staticmethod
     def page_fn_header_and_footer(
         canvas: 'Canvas',
-        doc: 'BaseDocTemplate'
+        doc: 'Template'
     ) -> None:
 
         page_fn_header(canvas, doc)
@@ -100,21 +101,22 @@ class TicketPdf(Pdf):
             canvas.drawString(
                 doc.leftMargin,
                 doc.bottomMargin / 2,
-                '{}'.format(doc.author)
+                f'{doc.author}'
             )
         canvas.drawRightString(
             doc.pagesize[0] - doc.rightMargin,
             doc.bottomMargin / 2,
-            f'{canvas._pageNumber}'
+            f'{canvas.getPageNumber()}'
         )
         canvas.restoreState()
 
     @staticmethod
     def page_fn_header_and_footer_qr(
         canvas: 'Canvas',
-        doc: 'BaseDocTemplate'
+        doc: 'Template'
     ) -> None:
 
+        assert hasattr(doc, 'qr_payload')
         TicketPdf.page_fn_header_and_footer(canvas, doc)
         height = 2 * cm
         width = height
@@ -131,20 +133,20 @@ class TicketPdf(Pdf):
         canvas.restoreState()
 
     @property
-    def page_fn(self) -> 'Callable[[Canvas, BaseDocTemplate], None]':
+    def page_fn(self) -> 'Callable[[Canvas, Template], None]':
         """ First page the same as later except Qr-Code ..."""
         return self.page_fn_header_and_footer_qr
 
     @property
-    def page_fn_later(self) -> 'Callable[[Canvas, BaseDocTemplate], None]':
+    def page_fn_later(self) -> 'Callable[[Canvas, Template], None]':
         return self.page_fn_header_and_footer
 
-    @overload
+    @overload  # type:ignore[override]
     def table(
         self,
         data: 'Sequence[Sequence[str | Paragraph]]',
         columns: 'Literal["even"] | Sequence[float | None] | None',
-        style: 'TableStyle | None' = None,
+        style: 'TableStyle | Iterable[_TableCommand] | None' = None,
         ratios: Literal[False] = False,
         border: bool = True,
         first_bold: bool = True
@@ -154,8 +156,8 @@ class TicketPdf(Pdf):
     def table(
         self,
         data: 'Sequence[Sequence[str | Paragraph]]',
-        columns: Literal["even"] | list[float] | None,
-        style: 'TableStyle | None' = None,
+        columns: Literal['even'] | list[float] | None,
+        style: 'TableStyle | Iterable[_TableCommand] | None' = None,
         *,
         ratios: Literal[True],
         border: bool = True,
@@ -166,8 +168,8 @@ class TicketPdf(Pdf):
     def table(
         self,
         data: 'Sequence[Sequence[str | Paragraph]]',
-        columns: Literal["even"] | list[float] | None,
-        style: 'TableStyle | None',
+        columns: Literal['even'] | list[float] | None,
+        style: 'TableStyle | Iterable[_TableCommand] | None',
         ratios: Literal[True],
         border: bool = True,
         first_bold: bool = True
@@ -178,7 +180,7 @@ class TicketPdf(Pdf):
         self,
         data: 'Sequence[Sequence[str | Paragraph]]',
         columns: 'Literal["even"] | Sequence[float | None] | None',
-        style: 'TableStyle | None' = None,
+        style: 'TableStyle | Iterable[_TableCommand] | None' = None,
         ratios: bool = False,
         border: bool = True,
         first_bold: bool = True
@@ -188,13 +190,14 @@ class TicketPdf(Pdf):
         self,
         data: 'Sequence[Sequence[str | Paragraph]]',
         columns: 'Literal["even"] | Sequence[float | None] | None',
-        style: 'TableStyle | None' = None,
+        style: 'TableStyle | Iterable[_TableCommand] | None' = None,
         ratios: bool = False,
         border: bool = True,
         first_bold: bool = True
     ) -> None:
 
         if border:
+            # FIXME: What if we want to pass a style in?
             style = list(self.style.table)
             style.append(('LINEBELOW', (0, 0), (-1, -1), 0.25, colors.black))
         if not first_bold:
@@ -227,7 +230,7 @@ class TicketPdf(Pdf):
         tags += ticket_summary_tags
 
         attributes: dict[str, list[str]] = {}
-        filters: list['_Filter'] = [whitespace_filter]
+        filters: list[_Filter] = [WhitespaceFilter]
 
         if linkify:
             link_color = self.link_color
@@ -235,18 +238,22 @@ class TicketPdf(Pdf):
             underline_width = self.underline_width
 
             def colorize(
-                attrs: dict[tuple[str | None, str], Any],
+                attrs: '_HTMLAttrs',
                 new: bool = False
-            ) -> dict[tuple[str | None, str], Any] | None:
+            ) -> '_HTMLAttrs':
 
                 # phone numbers appear here but are escaped, skip...
                 if not attrs.get((None, 'href')):
-                    return None
-                attrs[(None, u'color')] = link_color
+                    # FIXME: The bleach stubs appear to be incorrect
+                    #        since this definitely works at runtime
+                    #        but we may be able to return an empty
+                    #        dictionary or attrs instead of None
+                    return None  # type:ignore[return-value]
+                attrs[(None, 'color')] = link_color
                 if underline_links:
-                    attrs[(None, u'underline')] = '1'
-                    attrs[('a', u'underlineColor')] = link_color
-                    attrs[('a', u'underlineWidth')] = underline_width
+                    attrs[(None, 'underline')] = '1'
+                    attrs[('a', 'underlineColor')] = link_color
+                    attrs[('a', 'underlineWidth')] = underline_width
                 return attrs
 
             tags.append('a')
@@ -271,12 +278,12 @@ class TicketPdf(Pdf):
         assert body_element is not None
         for element in body_element:
             if element.tag == 'dl':
-                data = []
+                data: list[list[Paragraph | str]] = []
                 for item in element:
                     if item.tag == 'dt':
                         p = MarkupParagraph(
                             self.inner_html(item), self.style.bold)
-                        data.append([p, None])
+                        data.append([p, ''])
                     if item.tag == 'dd':
                         data[-1][1] = MarkupParagraph(self.inner_html(item))
                 if data:
@@ -313,9 +320,9 @@ class TicketPdf(Pdf):
             return self.layout.format_seconds(time) if time else ''
 
         meta_fields = {
-            'submitter_name': _("Name"),
-            'submitter_address': _("Address"),
-            'submitter_phone': _("Phone")
+            'submitter_name': _('Name'),
+            'submitter_address': _('Address'),
+            'submitter_phone': _('Phone')
         }
 
         # pep572 still a cool thing
@@ -326,21 +333,21 @@ class TicketPdf(Pdf):
         ]
 
         data = [
-            [_("Subject"), subject],
-            [_("Submitter"), submitter],
+            [_('Subject'), subject],
+            [_('Submitter'), submitter],
             *submitter_meta,
-            [_("State"), ticket_state],
-            [_("Group"), group],
-            [_("Owner"), owner],
-            [_("Created"), created],
-            [_("Reaction Time"), seconds(self.ticket.reaction_time)],
-            [_("Process Time"), seconds(self.ticket.process_time)],
+            [_('State'), ticket_state],
+            [_('Group'), group],
+            [_('Owner'), owner],
+            [_('Created'), created],
+            [_('Reaction Time'), seconds(self.ticket.reaction_time)],
+            [_('Process Time'), seconds(self.ticket.process_time)],
         ]
 
         # In case of imported events..
         event_source = handler.data.get('source')
         if event_source and self.layout.request.is_manager:
-            data.append([self.translate(_("Event Source")), event_source])
+            data.append([self.translate(_('Event Source')), event_source])
 
         self.table(data, 'even')
 
@@ -362,7 +369,7 @@ class TicketPdf(Pdf):
     def p_markup(
         self,
         text: str,
-        style: 'ParagraphStyle | None' = None
+        style: 'PropertySet | None' = None
     ) -> None:
 
         super().p_markup(self.translate(text), style)
@@ -384,7 +391,10 @@ class TicketPdf(Pdf):
 
         for date_, data in tables.items():
             self.h4(date_)
-            self.table(data, 'even', first_bold=False)
+            # FIXME: Why does `None` work? is it because of `MarkupParagraph`
+            #        internals? Why not use an empty string? Does that do
+            #        something different?
+            self.table(data, 'even', first_bold=False)  # type:ignore
 
     @staticmethod
     def extract_feed_info(html: str) -> list[str | None] | None:
@@ -400,7 +410,7 @@ class TicketPdf(Pdf):
         tags += ticket_summary_tags
 
         attributes = {}
-        filters = [whitespace_filter]
+        filters = [WhitespaceFilter]
         attributes['div'] = ['class']
 
         cleaner = Cleaner(
@@ -442,7 +452,7 @@ class TicketPdf(Pdf):
         pdf = cls(
             result,
             title=ticket.number,
-            created=f"{date.today():%d.%m.%Y}",
+            created=f'{date.today():%d.%m.%Y}',
             link_color='#00538c',
             underline_links=True,
             author=request.host_url,
@@ -463,9 +473,9 @@ class TicketPdf(Pdf):
         deleted_message = None
         if handler.deleted:
             summary = ticket.snapshot.get('summary')
-            deleted_message = _("The record behind this ticket was removed. "
-                                "The following information is a snapshot "
-                                "kept for future reference.")
+            deleted_message = _('The record behind this ticket was removed. '
+                                'The following information is a snapshot '
+                                'kept for future reference.')
         else:
             summary = handler.get_summary(request)
 
@@ -486,7 +496,7 @@ class TicketPdf(Pdf):
         if not request.is_manager:
             messages.type = request.app.settings.org.public_ticket_messages
 
-        pdf.h1(request.translate(_("Timeline")))
+        pdf.h1(request.translate(_('Timeline')))
         pdf.ticket_timeline(view_messages_feed(messages, request))
 
         pdf.generate()

@@ -8,11 +8,11 @@ from typing import Generic
 from typing import TypeVar
 from typing import TYPE_CHECKING
 if TYPE_CHECKING:
-    from onegov.ballot.models import Election
-    from onegov.ballot.models import ElectionCompound
-    from onegov.ballot.models import Vote
     from onegov.election_day.layouts import DefaultLayout
-    from typing_extensions import TypeAlias
+    from onegov.election_day.models import Election
+    from onegov.election_day.models import ElectionCompound
+    from onegov.election_day.models import Vote
+    from typing import TypeAlias
 
     Entity: TypeAlias = Election | ElectionCompound | Vote
 
@@ -59,17 +59,17 @@ class H3Widget:
     usage = '<h3 class=""></h3>'
 
 
-@ElectionDayApp.screen_widget(tag='text', category='generic')
-class TextWidget:
-    tag = 'text'
+@ElectionDayApp.screen_widget(tag='p', category='generic')
+class PWidget:
+    tag = 'p'
     template = """
-        <xsl:template match="text">
+        <xsl:template match="p">
             <p class="{@class}">
                 <xsl:apply-templates select="node()"/>
             </p>
         </xsl:template>
     """
-    usage = '<text class=""></text>'
+    usage = '<p class=""></p>'
 
 
 @ElectionDayApp.screen_widget(tag='hr', category='generic')
@@ -83,38 +83,38 @@ class HRWidget:
     usage = '<hr class=""/>'
 
 
-@ElectionDayApp.screen_widget(tag='row', category='generic')
-class RowWidget:
-    tag = 'row'
+@ElectionDayApp.screen_widget(tag='grid-row', category='generic')
+class GridRowWidget:
+    tag = 'grid-row'
     template = """
-        <xsl:template match="row">
+        <xsl:template match="grid-row">
             <div class="row {@class}" style="max-width: none">
                 <xsl:apply-templates select="node()"/>
             </div>
         </xsl:template>
     """
-    usage = '<row class=""></row>'
+    usage = '<grid-row class=""></grid-row>'
 
 
-@ElectionDayApp.screen_widget(tag='column', category='generic')
-class ColumnWidget:
-    tag = 'column'
+@ElectionDayApp.screen_widget(tag='grid-column', category='generic')
+class GridColumnWidget:
+    tag = 'grid-column'
     template = """
-        <xsl:template match="column">
+        <xsl:template match="grid-column">
             <div class="small-12 medium-{@span} columns {@class}">
                 <xsl:apply-templates select="node()"/>
                 &#160;
             </div>
         </xsl:template>
     """
-    usage = '<column span="" class=""></column>'
+    usage = '<grid-column span="" class=""></grid-column>'
 
 
-@ElectionDayApp.screen_widget(tag='logo', category='generic')
-class LogoWidget:
-    tag = 'logo'
+@ElectionDayApp.screen_widget(tag='principal-logo', category='generic')
+class PrincipalLogoWidget:
+    tag = 'principal-logo'
     template = """
-        <xsl:template match="logo">
+        <xsl:template match="principal-logo">
             <img
                 tal:attributes="src logo"
                 tal:condition="logo"
@@ -122,7 +122,7 @@ class LogoWidget:
                 />
         </xsl:template>
     """
-    usage = '<logo class=""/>'
+    usage = '<principal-logo class=""/>'
 
     def get_variables(self, layout: 'DefaultLayout') -> dict[str, Any]:
         logo = layout.app.logo
@@ -165,15 +165,15 @@ class ModelBoundWidget(Generic[_E]):
         }
 
 
-@ElectionDayApp.screen_widget(tag='title', category='generic')
-class TitleWidget(ModelBoundWidget['Entity']):
-    tag = 'title'
+@ElectionDayApp.screen_widget(tag='model-title', category='generic')
+class ModelTitleWidget(ModelBoundWidget['Entity']):
+    tag = 'model-title'
     template = """
-        <xsl:template match="title">
+        <xsl:template match="model-title">
             <span tal:content="model.title" class="{@class}" />
         </xsl:template>
     """
-    usage = '<title class=""/>'
+    usage = '<model-title class=""/>'
 
 
 @ElectionDayApp.screen_widget(tag='if-completed', category='generic')
@@ -202,11 +202,11 @@ class IfNotCompletedWidget(ModelBoundWidget['Entity']):
     usage = '<if-not-completed></if-not-completed>'
 
 
-@ElectionDayApp.screen_widget(tag='progress', category='generic')
-class ProgressWidget(ModelBoundWidget['Entity']):
-    tag = 'progress'
+@ElectionDayApp.screen_widget(tag='model-progress', category='generic')
+class ModelProgressWidget(ModelBoundWidget['Entity']):
+    tag = 'model-progress'
     template = """
-        <xsl:template match="progress">
+        <xsl:template match="model-progress">
             <span class="{@class}">
                 <tal:block
                     metal:use-macro="layout.macros['progress']"
@@ -215,7 +215,7 @@ class ProgressWidget(ModelBoundWidget['Entity']):
             </span>
         </xsl:template>
     """
-    usage = '<progress class=""/>'
+    usage = '<model-progress class=""/>'
 
 
 @ElectionDayApp.screen_widget(tag='counted-entities', category='generic')

@@ -20,7 +20,7 @@
                     <ul class="left">
                         <tal:block repeat="link links">
                             <li>
-                                <tal:block replace="structure link(layout)" />
+                                <tal:block replace="link(layout)" />
                             </li>
                         </tal:block>
                     </ul>
@@ -41,12 +41,12 @@
                             </button>
                             <ul id="${dropdown_id}" data-dropdown-content class="f-dropdown disable-scroll">
                                 <li tal:repeat="link group.links">
-                                    <tal:block replace="structure link(layout)" />
+                                    <tal:block replace="link(layout)" />
                                 </li>
                             </ul>
                         </tal:block>
                         <tal:block condition="group.url|group.attrs|nothing" define="link group">
-                            <tal:block replace="structure link(layout, ('tiny', 'button'))" />
+                            <tal:block replace="link(layout, ('tiny', 'button'))" />
                         </tal:block>
                     </tal:block>
                 </div>
@@ -59,7 +59,7 @@
             <ul class="breadcrumbs" tal:condition="layout.breadcrumbs">
                 <tal:block repeat="link layout.breadcrumbs">
                     <li tal:attributes="class repeat.link.end and 'current' or ''"
-                        tal:content="structure link(layout)">
+                        tal:content="link(layout)">
                     </li>
                 </tal:block>
             </ul>

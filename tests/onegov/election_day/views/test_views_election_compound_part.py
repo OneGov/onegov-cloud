@@ -35,6 +35,28 @@ def test_view_election_compound_part_districts(election_day_app_bl):
     assert '0 von 5' in districts
     assert "1 von 2" in districts
 
+    map = client.get(
+        '/elections-part/elections/superregion/region-1/districts-map'
+    )
+    assert (
+        '/elections-part/elections/superregion/region-1/by-district'
+    ) in map
+
+    data = client.get(
+        '/elections-part/elections/superregion/region-1/by-district'
+    ).json
+    assert data == {
+        'Allschwil': {
+            'counted': False,
+            'entities': [2762, 2774],
+            'link': 'http://localhost/election/regional-election-b',
+            'mandates': '0 / 5',
+            'percentage': 100.0,
+            'progress': '1 / 2',
+            'votes': 0
+        }
+    }
+
 
 def test_view_election_compound_part_elected_candidates(election_day_app_bl):
     client = Client(election_day_app_bl)
@@ -404,6 +426,7 @@ def test_view_election_compound_part_summary(election_day_app_bl):
             'completed': False,
             'date': '2022-01-01',
             'domain': 'superregion',
+            'elected': [['Hans', 'Sieger']],
             'elections': [
                 'http://localhost/election/regional-election-b'
             ],

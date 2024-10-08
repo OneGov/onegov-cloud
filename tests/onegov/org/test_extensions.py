@@ -1,21 +1,25 @@
+import os.path
 import pytest
 
-from uuid import UUID
+from collections import defaultdict
 from depot.manager import DepotManager
-from io import BytesIO
+from markupsafe import Markup
+from tempfile import TemporaryDirectory
+from uuid import UUID
 
+from onegov.core.orm.abstract import MoveDirection
 from onegov.core.utils import Bunch
 from onegov.form import Form
 from onegov.form.extensions import Extendable
 from onegov.org.models.extensions import (
     PersonLinkExtension, ContactExtension, AccessExtension, HoneyPotExtension,
-    GeneralFileLinkExtension, PeopleShownOnMainPageExtension
+    SidebarLinksExtension, PeopleShownOnMainPageExtension,
 )
 from onegov.people import Person
+from tests.shared.utils import create_pdf
 
 
 def test_disable_extension():
-
     class Topic(AccessExtension):
         meta = {}
 
@@ -42,7 +46,6 @@ def test_disable_extension():
 
 
 def test_access_extension():
-
     class Topic(AccessExtension):
         meta = {}
 
@@ -88,167 +91,155 @@ def test_access_extension():
     assert topic.access == 'member'
 
 
-def test_person_link_extension():
-
+# FIXME: There is a lot of mocking going on, we're probably better off
+#        actually using a real model with a database, instead of mocking
+#        that part.
+def setup_person_link_extension(people):
     class Topic(PersonLinkExtension):
         content = {}
 
         def get_selectable_people(self, request):
-            return [
-                Bunch(
-                    id=UUID('6d120102-d903-4486-8eb3-2614cf3acb1a'),
-                    title='Troy Barnes'
-                ),
-                Bunch(
-                    id=UUID('adad98ff-74e2-497a-9e1d-fbba0a6bbe96'),
-                    title='Abed Nadir'
-                )
-            ]
+            return people
 
-    class TopicForm(Form):
-        pass
+        @property
+        def people(self):
+            if not (people_items := self.content.get('people')):
+                return None
+
+            people = dict(people_items)
+            result = []
+            for person in self.get_selectable_people(None):
+                if item := people.get(person.id.hex):
+                    result.append(Bunch(
+                        id=person.id,
+                        title=person.title,
+                        person=person.id.hex,
+                        context_specific_function=item[0],
+                        display_function_in_person_directory=item[1]
+                    ))
+            return result
 
     topic = Topic()
     assert topic.people is None
 
     request = Bunch(**{
+        'locale': 'de',
         'translate': lambda text: text,
-        'app.settings.org.disabled_extensions': []
+        'get_translate': lambda *a, **kw: None,
+        'get_form': lambda form, *a, **kw: form,
+        'app.settings.org.disabled_extensions': [],
+        'template_loader.macros': defaultdict(Markup),
     })
+
+    return topic, request
+
+def test_person_link_extension():
+    class TopicForm(Form):
+        pass
+
+    topic, request = setup_person_link_extension([
+        Bunch(
+            id=UUID('6d120102-d903-4486-8eb3-2614cf3acb1a'),
+            title='Troy Barnes'
+        ),
+        Bunch(
+            id=UUID('adad98ff-74e2-497a-9e1d-fbba0a6bbe96'),
+            title='Abed Nadir'
+        )
+    ])
     form_class = topic.with_content_extensions(TopicForm, request=request)
-    form = form_class()
+    form = form_class(obj=topic)
 
-    assert 'people_6d120102d90344868eb32614cf3acb1a' in form._fields
-    assert 'people_6d120102d90344868eb32614cf3acb1a_function' in form._fields
-    assert 'people_adad98ff74e2497a9e1dfbba0a6bbe96' in form._fields
-    assert 'people_adad98ff74e2497a9e1dfbba0a6bbe96_function' in form._fields
+    assert 'people' in form
+    field = form.people
+    assert len(field) == 1
+    assert field[0].form.person.data is None
+    assert field[0].form.context_specific_function.data is None
+    assert field[0].form.display_function_in_person_directory.data is False
 
-    form.people_6d120102d90344868eb32614cf3acb1a.data = True
-    form.update_model(topic)
+    field[0].form.person.data = '6d120102d90344868eb32614cf3acb1a'
+    form.populate_obj(topic)
 
     assert topic.content['people'] == [
         ('6d120102d90344868eb32614cf3acb1a', (None, False))
     ]
 
-    form.people_6d120102d90344868eb32614cf3acb1a_function.data \
-        = 'The Truest Repairman'
+    field[0].form.context_specific_function.data = 'The Truest Repairman'
 
-    form.update_model(topic)
+    form.populate_obj(topic)
 
     assert topic.content['people'] == [
         ('6d120102d90344868eb32614cf3acb1a', ('The Truest Repairman', False))
     ]
 
     form_class = topic.with_content_extensions(TopicForm, request=request)
-    form = form_class()
-    form.apply_model(topic)
+    form = form_class(obj=topic)
 
-    assert form.people_6d120102d90344868eb32614cf3acb1a.data is True
-    assert form.people_6d120102d90344868eb32614cf3acb1a_function.data \
-        == 'The Truest Repairman'
+    field = form.people
+    assert len(field) == 2
+    assert field[0].form.person.data == '6d120102d90344868eb32614cf3acb1a'
+    assert field[0].form.context_specific_function.data == (
+        'The Truest Repairman')
 
-    assert form.people_6d120102d90344868eb32614cf3acb1a_is_visible_function\
-        .data == False
-    assert not form.people_adad98ff74e2497a9e1dfbba0a6bbe96.data
-    assert not form.people_adad98ff74e2497a9e1dfbba0a6bbe96_function.data
-
-
-def test_person_link_extension_duplicate_name():
-
-    class Topic(PersonLinkExtension):
-        content = {}
-
-        def get_selectable_people(self, request):
-            return [
-                Bunch(
-                    id=UUID('6d120102-d903-4486-8eb3-2614cf3acb1a'),
-                    title='Foo'
-                ),
-                Bunch(
-                    id=UUID('adad98ff-74e2-497a-9e1d-fbba0a6bbe96'),
-                    title='Foo'
-                )
-            ]
-
-    class TopicForm(Form):
-        pass
-
-    topic = Topic()
-    assert topic.people is None
-
-    request = Bunch(**{
-        'translate': lambda text: text,
-        'app.settings.org.disabled_extensions': []
-    })
-    form_class = topic.with_content_extensions(TopicForm, request=request)
-    form = form_class()
-
-    assert 'people_6d120102d90344868eb32614cf3acb1a' in form._fields
-    assert 'people_6d120102d90344868eb32614cf3acb1a_function' in form._fields
-    assert 'people_adad98ff74e2497a9e1dfbba0a6bbe96' in form._fields
-    assert 'people_adad98ff74e2497a9e1dfbba0a6bbe96_function' in form._fields
+    assert field[1].form.person.data is None
+    assert field[1].form.context_specific_function.data is None
+    assert field[1].form.display_function_in_person_directory.data is False
 
 
 def test_person_link_extension_order():
 
-    class Topic(PersonLinkExtension):
-        content = {}
-
-        def get_selectable_people(self, request):
-            return [
-                Bunch(
-                    id=UUID('6d120102-d903-4486-8eb3-2614cf3acb1a'),
-                    title='Troy Barnes'
-                ),
-                Bunch(
-                    id=UUID('aa37e9cc-40ab-402e-a70b-0d2b4d672de3'),
-                    title='Annie Edison'
-                ),
-                Bunch(
-                    id=UUID('adad98ff-74e2-497a-9e1d-fbba0a6bbe96'),
-                    title='Abed Nadir'
-                ),
-                Bunch(
-                    id=UUID('f0281b55-8a5f43f6-ac81-589d79538a87'),
-                    title='Britta Perry'
-                )
-            ]
-
     class TopicForm(Form):
         pass
 
-    request = Bunch(**{
-        'translate': lambda text: text,
-        'app.settings.org.disabled_extensions': []
-    })
-    topic = Topic()
+    topic, request = setup_person_link_extension([
+        Bunch(
+            id=UUID('6d120102-d903-4486-8eb3-2614cf3acb1a'),
+            title='Troy Barnes'
+        ),
+        Bunch(
+            id=UUID('aa37e9cc-40ab-402e-a70b-0d2b4d672de3'),
+            title='Annie Edison'
+        ),
+        Bunch(
+            id=UUID('adad98ff-74e2-497a-9e1d-fbba0a6bbe96'),
+            title='Abed Nadir'
+        ),
+        Bunch(
+            id=UUID('f0281b55-8a5f43f6-ac81-589d79538a87'),
+            title='Britta Perry'
+        )
+    ])
     form_class = topic.with_content_extensions(TopicForm, request=request)
-    form = form_class()
+    form = form_class(obj=topic)
 
-    form.people_6d120102d90344868eb32614cf3acb1a.data = True
-    form.people_f0281b558a5f43f6ac81589d79538a87.data = True
-    form.update_model(topic)
+    field = form.people
+    field.append_entry()
+    assert len(field) == 2
+    field[0].form.person.data ='6d120102d90344868eb32614cf3acb1a'
+    field[1].form.person.data ='f0281b558a5f43f6ac81589d79538a87'
+    form.populate_obj(topic)
 
     # the people are kept sorted by lastname, firstname by default
     assert topic.content['people'] == [
         ('6d120102d90344868eb32614cf3acb1a', (None, False)),  # Troy _B_arnes
-        ('f0281b558a5f43f6ac81589d79538a87', (None, False))   # Britta _P_erry
+        ('f0281b558a5f43f6ac81589d79538a87', (None, False))  # Britta _P_erry
     ]
 
-    form.people_aa37e9cc40ab402ea70b0d2b4d672de3.data = True
-    form.update_model(topic)
+    field.append_entry()
+    field[2].form.person.data = 'aa37e9cc40ab402ea70b0d2b4d672de3'
+    form.populate_obj(topic)
 
     assert topic.content['people'] == [
         ('6d120102d90344868eb32614cf3acb1a', (None, False)),  # Troy _B_arnes
         ('aa37e9cc40ab402ea70b0d2b4d672de3', (None, False)),  # Annie _E_dison
-        ('f0281b558a5f43f6ac81589d79538a87', (None, False))   # Britta _P_erry
+        ('f0281b558a5f43f6ac81589d79538a87', (None, False))  # Britta _P_erry
     ]
 
     # once the order changes, people are added at the end
     topic.move_person(
         subject='f0281b558a5f43f6ac81589d79538a87',  # Britta
-        target='6d120102d90344868eb32614cf3acb1a',   # Troy
-        direction='above'
+        target='6d120102d90344868eb32614cf3acb1a',  # Troy
+        direction=MoveDirection.above
     )
 
     assert topic.content['people'] == [
@@ -259,8 +250,8 @@ def test_person_link_extension_order():
 
     topic.move_person(
         subject='6d120102d90344868eb32614cf3acb1a',  # Troy
-        target='aa37e9cc40ab402ea70b0d2b4d672de3',   # Annie
-        direction='below'
+        target='aa37e9cc40ab402ea70b0d2b4d672de3',  # Annie
+        direction=MoveDirection.below
     )
 
     assert topic.content['people'] == [
@@ -269,8 +260,9 @@ def test_person_link_extension_order():
         ('6d120102d90344868eb32614cf3acb1a', (None, False)),  # Troy _B_arnes
     ]
 
-    form.people_adad98ff74e2497a9e1dfbba0a6bbe96.data = True
-    form.update_model(topic)
+    field.append_entry()
+    field[3].form.person.data = 'adad98ff74e2497a9e1dfbba0a6bbe96'
+    form.populate_obj(topic)
 
     assert topic.content['people'] == [
         ('f0281b558a5f43f6ac81589d79538a87', (None, False)),  # Britta _P_erry
@@ -282,60 +274,51 @@ def test_person_link_extension_order():
 
 def test_person_link_move_function():
 
-    class Topic(PersonLinkExtension):
-        content = {}
-
-        def get_selectable_people(self, request):
-            return [
-                Bunch(
-                    id=UUID('aa37e9cc-40ab-402e-a70b-0d2b4d672de3'),
-                    title="Joe Biden"
-                ),
-                Bunch(
-                    id=UUID('6d120102-d903-4486-8eb3-2614cf3acb1a'),
-                    title="Barack Obama"
-                ),
-            ]
-
     class TopicForm(Form):
         pass
 
-    topic = Topic()
-    request = Bunch(**{
-        'translate': lambda text: text,
-        'app.settings.org.disabled_extensions': []
-    })
+    topic, request = setup_person_link_extension([
+        Bunch(
+            id=UUID('aa37e9cc-40ab-402e-a70b-0d2b4d672de3'),
+            title="Joe Biden"
+        ),
+        Bunch(
+            id=UUID('6d120102-d903-4486-8eb3-2614cf3acb1a'),
+            title="Barack Obama"
+        ),
+    ])
     form_class = topic.with_content_extensions(TopicForm, request=request)
-    form = form_class()
+    form = form_class(obj=topic)
 
-    form.people_6d120102d90344868eb32614cf3acb1a.data = True
-    form.people_6d120102d90344868eb32614cf3acb1a_function.data = "President"
+    field = form.people
+    field.append_entry()
+    assert len(field) == 2
+    field[0].form.person.data = '6d120102d90344868eb32614cf3acb1a'
+    field[0].form.context_specific_function.data = 'President'
 
-    form.people_aa37e9cc40ab402ea70b0d2b4d672de3.data = True
-    form.people_aa37e9cc40ab402ea70b0d2b4d672de3_function.data = \
-        "Vice-President"
+    field[1].form.person.data = 'aa37e9cc40ab402ea70b0d2b4d672de3'
+    field[1].form.context_specific_function.data = 'Vice-President'
 
-    form.update_model(topic)
+    form.populate_obj(topic)
 
     assert topic.content['people'] == [
-        ('aa37e9cc40ab402ea70b0d2b4d672de3', ("Vice-President", False)),
-        ('6d120102d90344868eb32614cf3acb1a', ("President", False))
+        ('aa37e9cc40ab402ea70b0d2b4d672de3', ('Vice-President', False)),
+        ('6d120102d90344868eb32614cf3acb1a', ('President', False))
     ]
 
     topic.move_person(
         subject='6d120102d90344868eb32614cf3acb1a',
         target='aa37e9cc40ab402ea70b0d2b4d672de3',
-        direction='above'
+        direction=MoveDirection.above
     )
 
     assert topic.content['people'] == [
-        ('6d120102d90344868eb32614cf3acb1a', ("President", False)),
-        ('aa37e9cc40ab402ea70b0d2b4d672de3', ("Vice-President", False)),
+        ('6d120102d90344868eb32614cf3acb1a', ('President', False)),
+        ('aa37e9cc40ab402ea70b0d2b4d672de3', ('Vice-President', False)),
     ]
 
 
 def test_contact_extension():
-
     class Topic(ContactExtension):
         content = {}
 
@@ -388,7 +371,6 @@ def test_contact_extension():
 
 
 def test_contact_extension_with_top_level_domain_agency():
-
     class Topic(ContactExtension):
         content = {}
 
@@ -441,15 +423,22 @@ def test_people_shown_on_main_page_extension(client):
     new_person.form['function'] = 'Dorf-Clown'
     new_person.form.submit().follow()
 
-    fritzli = client.app.session().query(Person) \
-        .filter(Person.last_name == 'Müller') \
+    fritzli = (
+        client.app.session().query(Person)
+        .filter(Person.last_name == 'Müller')
         .one()
+    )
 
     # add person to side panel
     page = client.get('/topics/themen')
     page = page.click('Bearbeiten')
     page.form['show_people_on_main_page'] = False
-    page.form['people_' + fritzli.id.hex] = True
+    page.form['people-0-person'] = fritzli.id.hex
+    # NOTE: defaults require JavaScript, so in order to test those
+    #       we would need to change this to a browser-test, for now
+    #       we set what would be the default value for this person
+    page.form['people-0-context_specific_function'] = 'Dorf-Clown'
+    page.form['people-0-display_function_in_person_directory'] = True
     page = page.form.submit().follow()
     assert 'Fritzli' in page
     assert 'Müller' in page
@@ -459,7 +448,7 @@ def test_people_shown_on_main_page_extension(client):
     page = client.get('/topics/themen')
     page = page.click('Bearbeiten')
     page.form['show_people_on_main_page'] = True
-    page.form['people_' + fritzli.id.hex + '_function'] = 'Super-Clown'
+    page.form['people-0-context_specific_function'] = 'Super-Clown'
     page = page.form.submit().follow()
     assert 'Fritzli' in page
     assert 'Müller' in page
@@ -467,7 +456,6 @@ def test_people_shown_on_main_page_extension(client):
 
 
 def test_honeypot_extension():
-
     class Submission(Extendable, HoneyPotExtension):
         meta = {}
 
@@ -534,16 +522,51 @@ def depot(temporary_directory):
     DepotManager._clear()
 
 
-def test_general_file_link_extension(depot, session):
+def test_general_file_link_extension(client):
+    client.login_admin()
 
-    class Topic(GeneralFileLinkExtension):
-        files = []
+    with TemporaryDirectory() as td:
+
+        root_page = client.get('/topics/themen')
+        new_page = root_page.click('Thema')
+
+        assert 'files' in new_page.form.fields
+
+        new_page.form['title'] = "Living in Govikon is Swell"
+        new_page.form['text'] = (
+            "## Living in Govikon is Really Great\n"
+            "*Experts say it's the fact that Govikon does not really exist.*"
+        )
+        filename = os.path.join(td, 'simple.pdf')
+        pdf = create_pdf(filename)
+        new_page.form.fields['files'][-1].value = [filename]
+        new_page.files = pdf
+        new_page.form['show_file_links_in_sidebar'] = True
+        page = new_page.form.submit().follow()
+
+        assert 'Living in Govikon is Swell' in page
+        assert 'Dokumente' in page
+        assert 'simple.pdf' in page
+
+        edit_page = page.click('Bearbeiten')
+        edit_page.form['show_file_links_in_sidebar'] = False
+        page = edit_page.form.submit().follow()
+
+        assert 'Living in Govikon is Swell' in page
+        assert 'Dokumente' not in page
+        assert 'simple.pdf' not in page
+
+
+def test_sidebar_links_extension(session):
+
+    class Topic(SidebarLinksExtension):
+        sidepanel_links = []
 
     class TopicForm(Form):
         pass
 
     topic = Topic()
-    assert topic.files == []
+    assert topic.sidepanel_links == []
 
     request = Bunch(**{
         'app.settings.org.disabled_extensions': [],
@@ -552,30 +575,26 @@ def test_general_file_link_extension(depot, session):
     form_class = topic.with_content_extensions(TopicForm, request=request)
     form = form_class(meta={'request': request})
 
-    assert 'files' in form._fields
-    assert form.files.data == []
+    assert 'sidepanel_links' in form._fields
+    assert form.sidepanel_links.data == None
 
-    form.files.append_entry()
-    form.files[0].file = BytesIO(b'hello world')
-    form.files[0].filename = 'test.txt'
-    form.files[0].action = 'replace'
-    form.populate_obj(topic)
-
-    assert len(topic.files) == 1
-    assert topic.files[0].name == 'test.txt'
-
-    form_class = topic.with_content_extensions(TopicForm, request=request)
-    form = form_class(meta={'request': request})
-
-    form.process(obj=topic)
-
-    assert form.files.data == [{
-        'filename': 'test.txt',
-        'size': 11,
-        'mimetype': 'text/plain'
-    }]
-    form.files[0].action = 'delete'
+    form.sidepanel_links.data = '''
+            {"labels":
+                {"text": "Text",
+                "link": "URL",
+                "add": "Hinzuf\\u00fcgen",
+                "remove": "Entfernen"},
+            "values": [
+                {"text": "Govikon School",
+                "link": "https://www.govikon-school.ch", "error": ""},
+                {"text": "Castle Govikon",
+                "link": "https://www.govikon-castle.ch", "error": ""}
+            ]
+            }
+        '''
 
     form.populate_obj(topic)
 
-    assert topic.files == []
+    assert topic.sidepanel_links == [
+        ('Govikon School', 'https://www.govikon-school.ch'),
+        ('Castle Govikon', 'https://www.govikon-castle.ch')]

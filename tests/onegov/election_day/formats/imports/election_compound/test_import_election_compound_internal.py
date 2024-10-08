@@ -2,12 +2,12 @@ from datetime import date
 from datetime import datetime
 from freezegun import freeze_time
 from io import BytesIO
-from onegov.ballot import ElectionCompound
-from onegov.ballot import ProporzElection
 from onegov.core.csv import convert_list_of_dicts_to_csv
-from onegov.election_day.formats import import_election_compound_internal
 from onegov.election_day.formats import export_election_compound_internal
+from onegov.election_day.formats import import_election_compound_internal
 from onegov.election_day.models import Canton
+from onegov.election_day.models import ElectionCompound
+from onegov.election_day.models import ProporzElection
 from pytz import utc
 
 
@@ -113,10 +113,13 @@ def test_import_internal_compound_regional_gr(session, import_test_datasets):
     assert len(election_compound.elected_candidates) == 120
 
     election = election_compound.elections[0]
-    list_ = election.lists.filter_by(name='FDP').one()
-    candidate = election.candidates.filter_by(family_name='Crameri').one()
+    list_ = next((l for l in election.lists if l.name == 'FDP'))
+    candidate = next((
+        c for c in election.candidates if c.family_name == 'Crameri'
+    ))
+    result = next((r for r in list_.panachage_results if r.source_id is None))
     assert list_.votes == 360
-    assert list_.panachage_results.filter_by(source_id=None).one().votes == 61
+    assert result.votes == 61
     assert candidate.votes == 659
 
     # roundtrip
@@ -139,10 +142,13 @@ def test_import_internal_compound_regional_gr(session, import_test_datasets):
     assert len(election_compound.elected_candidates) == 120
 
     election = election_compound.elections[0]
-    list_ = election.lists.filter_by(name='FDP').one()
-    candidate = election.candidates.filter_by(family_name='Crameri').one()
+    list_ = next((l for l in election.lists if l.name == 'FDP'))
+    candidate = next((
+        c for c in election.candidates if c.family_name == 'Crameri'
+    ))
+    result = next((r for r in list_.panachage_results if r.source_id is None))
     assert list_.votes == 360
-    assert list_.panachage_results.filter_by(source_id=None).one().votes == 61
+    assert result.votes == 61
     assert candidate.votes == 659
 
 
@@ -480,8 +486,6 @@ def test_import_internal_compound_expats(session):
                 ]
             else:
                 assert not errors
-                assert election_1.results.filter_by(entity_id=0).count() == 0
-                assert election_2.results.filter_by(entity_id=0).count() == 0
 
 
 def test_import_internal_compound_temporary_results(session):
@@ -627,11 +631,11 @@ def test_import_internal_compound_temporary_results(session):
     assert compound.has_results
     assert compound.last_result_change == datetime(2022, 1, 1, tzinfo=utc)
     assert election_1.progress == (1, 9)
-    assert election_1.results.first()
+    assert election_1.results
     assert election_1.has_results
     assert election_1.last_result_change == datetime(2022, 1, 1, tzinfo=utc)
     assert election_2.progress == (0, 9)
-    assert election_2.results.first()
+    assert election_2.results
     assert not election_2.has_results
     assert election_2.last_result_change == datetime(2022, 1, 1, tzinfo=utc)
 
@@ -647,10 +651,10 @@ def test_import_internal_compound_temporary_results(session):
     assert compound.has_results
     assert compound.last_result_change == datetime(2022, 1, 2, tzinfo=utc)
     assert election_1.progress == (1, 9)
-    assert election_1.results.first()
+    assert election_1.results
     assert election_1.has_results
     assert election_1.last_result_change == datetime(2022, 1, 2, tzinfo=utc)
     assert election_2.progress == (0, 0)
-    assert not election_2.results.first()
+    assert not election_2.results
     assert not election_2.has_results
     assert election_2.last_result_change == datetime(2022, 1, 2, tzinfo=utc)

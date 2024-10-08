@@ -3,8 +3,14 @@ from io import BytesIO
 
 from onegov.agency.collections import ExtendedPersonCollection
 from onegov.agency.models import ExtendedPerson
-from xlsxwriter.workbook import Workbook
+from xlsxwriter.workbook import Workbook  # type:ignore[import-untyped]
 from decimal import Decimal
+
+
+from typing import TYPE_CHECKING
+if TYPE_CHECKING:
+    from sqlalchemy.orm import Session
+
 
 column_mapper = OrderedDict(
     salutation='Anrede',
@@ -29,7 +35,7 @@ column_mapper = OrderedDict(
 )
 
 
-def extract_person_data(session):
+def extract_person_data(session: 'Session') -> list[dict[str, object]]:
     collection = ExtendedPersonCollection(session)
     collection.exclude_hidden = False
     query = collection.query().outerjoin(ExtendedPerson.memberships)
@@ -37,9 +43,9 @@ def extract_person_data(session):
     write_out = []
 
     for person in query:
-        out_dict = OrderedDict()
-        memberships = "\n".join(
-            (f"{m.agency.title} - {m.title}" for m in person.memberships)
+        out_dict: dict[str, object] = OrderedDict()
+        memberships = '\n'.join(
+            f'{m.agency.title} - {m.title}' for m in person.memberships
         )
         for col in column_mapper.keys():
             if col == 'memberships':
@@ -50,7 +56,7 @@ def extract_person_data(session):
     return write_out
 
 
-def export_person_xlsx(session):
+def export_person_xlsx(session: 'Session') -> BytesIO:
     """ Exports every person with their memberships in xlsx format. """
     file = BytesIO()
     workbook = Workbook(file, {'default_date_format': 'dd.mm.yyyy'})
@@ -67,7 +73,7 @@ def export_person_xlsx(session):
                 worksheet.write_string(row, col_ix, '')
             elif isinstance(value, str):
                 worksheet.write_string(row, col_ix, value)
-            elif isinstance(value, int) or isinstance(value, Decimal):
+            elif isinstance(value, (int, Decimal)):
                 worksheet.write_number(row, col_ix, value)
             else:
                 raise NotImplementedError()

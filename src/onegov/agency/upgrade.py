@@ -2,14 +2,16 @@
 upgraded on the server. See :class:`onegov.core.upgrade.upgrade_task`.
 
 """
+from markupsafe import Markup
 from onegov.core.upgrade import upgrade_task
+from onegov.core.upgrade import UpgradeContext
 from onegov.core.utils import linkify
 from onegov.org.models import Organisation
 from onegov.people import Agency
 
 
-@upgrade_task("Add default values for page breaks of PDFs")
-def add_default_value_for_pagebreak_pdf(context):
+@upgrade_task('Add default values for page breaks of PDFs')
+def add_default_value_for_pagebreak_pdf(context: UpgradeContext) -> None:
 
     """ Adds the elected candidates to the archived results,
 
@@ -21,17 +23,17 @@ def add_default_value_for_pagebreak_pdf(context):
             org.meta['page_break_on_level_org_pdf'] = 1
 
 
-@upgrade_task("Convert Agency.portrait to a html")
-def convert_agency_portrait_to_html(context):
+@upgrade_task('Convert Agency.portrait to a html')
+def convert_agency_portrait_to_html(context: UpgradeContext) -> None:
     session = context.session
     if context.has_column('agencies', 'portrait'):
         for agency in session.query(Agency).all():
-            agency.portrait = '<p>{}</p>'.format(
-                linkify(agency.portrait).replace('\n', '<br>'))
+            agency.portrait = Markup('<p>{}</p>').format(
+                linkify(agency.portrait).replace('\n', Markup('<br>')))
 
 
-@upgrade_task("Replace person.address in Agency.export_fields")
-def replace_removed_export_fields(context):
+@upgrade_task('Replace person.address in Agency.export_fields')
+def replace_removed_export_fields(context: UpgradeContext) -> None:
     session = context.session
     if context.has_column('agencies', 'meta'):
         for agency in session.query(Agency).all():

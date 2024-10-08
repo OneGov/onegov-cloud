@@ -46,45 +46,46 @@ if TYPE_CHECKING:
 
 
 TAGS = [
-    _("Art"),
-    _("Cinema"),
-    _("Concert"),
-    _("Congress"),
-    _("Culture"),
-    _("Dancing"),
-    _("Education"),
-    _("Exhibition"),
-    _("Gastronomy"),
-    _("Health"),
-    _("Library"),
-    _("Literature"),
-    _("Market"),
-    _("Meetup"),
-    _("Misc"),
-    _("Music School"),
-    _("Music"),
-    _("Party"),
-    _("Politics"),
-    _("Reading"),
-    _("Religion"),
-    _("Sports"),
-    _("Talk"),
-    _("Theater"),
-    _("Tourism"),
-    _("Toy Library"),
-    _("Tradition"),
-    _("Youth"),
-    _("Elderly"),
+    _('Art'),
+    _('Cinema'),
+    _('Concert'),
+    _('Congress'),
+    _('Culture'),
+    _('Dancing'),
+    _('Education'),
+    _('Exhibition'),
+    _('Gastronomy'),
+    _('Health'),
+    _('Library'),
+    _('Literature'),
+    _('Market'),
+    _('Meetup'),
+    _('Misc'),
+    _('Music School'),
+    _('Nature'),
+    _('Music'),
+    _('Party'),
+    _('Politics'),
+    _('Reading'),
+    _('Religion'),
+    _('Sports'),
+    _('Talk'),
+    _('Theater'),
+    _('Tourism'),
+    _('Toy Library'),
+    _('Tradition'),
+    _('Youth'),
+    _('Elderly'),
 ]
 
 WEEKDAYS = (
-    ("MO", _("Mo")),
-    ("TU", _("Tu")),
-    ("WE", _("We")),
-    ("TH", _("Th")),
-    ("FR", _("Fr")),
-    ("SA", _("Sa")),
-    ("SU", _("Su")),
+    ('MO', _('Mo')),
+    ('TU', _('Tu')),
+    ('WE', _('We')),
+    ('TH', _('Th')),
+    ('FR', _('Fr')),
+    ('SA', _('Sa')),
+    ('SU', _('Su')),
 )
 
 
@@ -94,30 +95,28 @@ class EventForm(Form):
     if TYPE_CHECKING:
         request: OrgRequest
 
-    on_request_include: 'Sequence[str]' = ('common', 'many')
-
     timezone = 'Europe/Zurich'
 
     email = EmailField(
-        label=_("Submitter"),
-        description="max.muster@example.org",
+        label=_('Submitter'),
+        description='max.muster@example.org',
         validators=[InputRequired(), Email()]
     )
 
     title = StringField(
-        label=_("Title"),
-        description=_("Concerto in the castle garden"),
+        label=_('Title'),
+        description=_('Concerto in the castle garden'),
         validators=[InputRequired()]
     )
 
     description = TextAreaField(
-        label=_("Description"),
-        description=_("Enjoy a concerto in the castle garden."),
+        label=_('Description'),
+        description=_('Enjoy a concerto in the castle garden.'),
         render_kw={'rows': 12}
     )
 
     image = UploadFileWithORMSupport(
-        label=_("Image"),
+        label=_('Image'),
         file_class=EventFile,
         validators=[
             Optional(),
@@ -131,7 +130,7 @@ class EventForm(Form):
     )
 
     pdf = UploadFileWithORMSupport(
-        label=_("Additional Information (PDF)"),
+        label=_('Additional Information (PDF)'),
         file_class=EventFile,
         validators=[
             Optional(),
@@ -143,99 +142,99 @@ class EventForm(Form):
     )
 
     location = StringField(
-        label=_("Venue"),
-        description="Pilatusstrasse 3, 6000 Luzern",
+        label=_('Venue'),
+        description='Pilatusstrasse 3, 6000 Luzern',
         validators=[InputRequired()]
     )
 
     price = TextAreaField(
-        label=_("Price"),
-        description=_("10 CHF for adults"),
+        label=_('Price'),
+        description=_('10 CHF for adults'),
         render_kw={'rows': 2}
     )
 
     organizer = StringField(
-        label=_("Organizer"),
-        description=_("Music society"),
+        label=_('Organizer'),
+        description=_('Music society'),
         validators=[InputRequired()]
     )
 
     organizer_email = EmailField(
-        label=_("Organizer E-Mail address"),
-        description=_("Shown as contact E-Mail address"),
+        label=_('Organizer E-Mail address'),
+        description=_('Shown as contact E-Mail address'),
         validators=[Optional(), Email()]
     )
 
     organizer_phone = StringField(
-        label=_("Organizer phone number"),
-        description=_("Shown as contact phone number"),
+        label=_('Organizer phone number'),
+        description=_('Shown as contact phone number'),
         validators=[Optional(), ValidPhoneNumber()]
     )
 
     external_event_url = StringField(
-        label=_("External event URL"),
-        description="https://www.example.ch",
+        label=_('External event URL'),
+        description='https://www.example.ch',
     )
 
     event_registration_url = StringField(
-        label=_("Event Registration URL"),
-        description="/form/event-registration, https://www.example.ch",
+        label=_('Event Registration URL'),
+        description='/form/event-registration, https://www.example.ch',
     )
 
     coordinates = CoordinatesField(
-        label=_("Coordinates"),
-        description=_("The marker can be moved by dragging it with the mouse"),
+        label=_('Coordinates'),
+        description=_('The marker can be moved by dragging it with the mouse'),
         render_kw={'data-map-type': 'marker'}
     )
 
     tags = MultiCheckboxField(
-        label=_("Tags"),
+        label=_('Tags'),
         choices=[(tag, tag) for tag in TAGS],
     )
 
     start_date = DateField(
-        label=_("Date"),
+        label=_('Date'),
         validators=[InputRequired()],
         default=date.today
     )
 
     start_time = TimeField(
-        label=_("From"),
-        description="18:00",
+        label=_('From'),
+        description='18:00',
         validators=[InputRequired()]
     )
 
     end_time = TimeField(
-        label=_("To"),
-        description="19:15",
+        label=_('To'),
+        description='19:15',
         validators=[InputRequired()]
     )
 
     repeat = RadioField(
-        label=_("Repeat"),
+        label=_('Repeat'),
         default='without',
         choices=(
-            ('without', _("Without")),
-            ('weekly', _("Weekly")),
-            ('dates', _("On additional dates"))
+            ('without', _('Without')),
+            ('weekly', _('Weekly')),
+            ('dates', _('On additional dates'))
         )
     )
 
     weekly = MultiCheckboxField(
-        label=_("Repeats itself every"),
+        label=_('Repeats itself every'),
         choices=WEEKDAYS,
         render_kw={'prefix_label': False, 'class_': 'oneline-checkboxes'},
         depends_on=('repeat', 'weekly')
     )
 
     end_date = DateField(
-        label=_("Until date"),
+        label=_('Until date'),
         validators=[Optional()],
         depends_on=('repeat', 'weekly')
     )
 
     dates = TextAreaField(
-        label=_("Dates"),
+        label=_('Dates'),
         depends_on=('repeat', 'dates'),
         render_kw={'class_': 'many many-dates'},
     )
@@ -291,10 +290,6 @@ class EventForm(Form):
                                      self.custom_tags() or ()]
             self.sort_tags()
 
-        # load web assets for event form
-        for include in self.on_request_include:
-            self.request.include(include)
-
         if not self.dates.data:
             self.dates.data = self.dates_to_json(None)
         if not self.email.data:
@@ -312,7 +307,7 @@ class EventForm(Form):
             if self.start_date.data > self.end_date.data:
                 assert isinstance(self.end_date.errors, list)
                 self.end_date.errors.append(
-                    _("The end date must be later than the start date.")
+                    _('The end date must be later than the start date.')
                 )
                 return False
         return None
@@ -341,21 +336,21 @@ class EventForm(Form):
                 if weekday not in self.weekly.data:
                     assert isinstance(self.weekly.errors, list)
                     self.weekly.errors.append(
-                        _("The weekday of the start date must be selected.")
+                        _('The weekday of the start date must be selected.')
                     )
                     result = False
 
             if self.weekly.data and not self.end_date.data:
                 assert isinstance(self.end_date.errors, list)
                 self.end_date.errors.append(
-                    _("Please set and end date if the event is recurring.")
+                    _('Please set and end date if the event is recurring.')
                 )
                 result = False
 
             elif self.end_date.data and not self.weekly.data:
                 assert isinstance(self.weekly.errors, list)
                 self.weekly.errors.append(
-                    _("Please select a weekday if the event is recurring.")
+                    _('Please select a weekday if the event is recurring.')
                 )
                 result = False
             return result
@@ -365,7 +360,7 @@ class EventForm(Form):
                 assert self.json_to_dates(self.dates.data)
             except (AssertionError, ValueError):
                 assert isinstance(self.repeat.errors, list)
-                self.repeat.errors.append(_("Invalid dates."))
+                self.repeat.errors.append(_('Invalid dates.'))
                 return False
 
         return None
@@ -408,7 +403,7 @@ class EventForm(Form):
                     ), 'UTC'
                 )
                 model.recurrence = (
-                    "RRULE:FREQ=WEEKLY;WKST=MO;BYDAY={0};UNTIL={1}".format(
+                    'RRULE:FREQ=WEEKLY;WKST=MO;BYDAY={};UNTIL={}'.format(
                         ','.join(self.weekly.data),
                         until_date.strftime('%Y%m%dT%H%M%SZ')
                     )
@@ -478,34 +473,34 @@ class EventForm(Form):
                 if form_field is None:
                     continue
 
-                form_field.data = keywords[field.id] if (
-                    field.id in keywords) else None
+                form_field.data = keywords.get(field.id, None)
 
     @cached_property
     def parsed_dates(self) -> list[date]:
         return self.json_to_dates(self.dates.data)
 
     def json_to_dates(self, text: str | None = None) -> list[date]:
-        result = []
+        if not text:
+            return []
 
-        for value in json.loads(text or '{}').get('values', []):
-            result.append(date(*map(int, value['date'].split('-'))))
-
-        return result
+        return [
+            date.fromisoformat(value['date'])
+            for value in json.loads(text).get('values', [])
+        ]
 
     def dates_to_json(self, dates: 'Sequence[date] | None' = None) -> str:
         dates = dates or []
 
         return json.dumps({
             'labels': {
-                'date': self.request.translate(_("Date")),
-                'add': self.request.translate(_("Add")),
-                'remove': self.request.translate(_("Remove")),
+                'date': self.request.translate(_('Date')),
+                'add': self.request.translate(_('Add')),
+                'remove': self.request.translate(_('Remove')),
             },
             'values': [
                 {
-                    'date': d.strftime('%Y-%m-%d'),
-                    'error': self.date_errors.get(ix, "")
+                    'date': d.isoformat(),
+                    'error': self.date_errors.get(ix, '')
                 } for ix, d in enumerate(dates)
             ]
         })
@@ -517,22 +512,22 @@ class EventImportForm(Form):
         request: OrgRequest
 
     clear = BooleanField(
-        label=_("Clear"),
+        label=_('Clear'),
         description=_(
-            "Delete imported events before importing. This does not delete "
-            "otherwise imported events and submitted events."
+            'Delete imported events before importing. This does not delete '
+            'otherwise imported events and submitted events.'
         ),
         default=False
     )
 
     dry_run = BooleanField(
-        label=_("Dry Run"),
-        description=_("Do not actually import the events."),
+        label=_('Dry Run'),
+        description=_('Do not actually import the events.'),
         default=False
     )
 
     file = UploadField(
-        label=_("Import"),
+        label=_('Import'),
         validators=[
             DataRequired(),
             WhitelistedMimeType({
@@ -556,22 +551,22 @@ class EventImportForm(Form):
     @property
     def headers(self) -> dict[str, str]:
         return {
-            'title': self.request.translate(_("Title")),
-            'description': self.request.translate(_("Description")),
-            'location': self.request.translate(_("Venue")),
-            'price': self.request.translate(_("Price")),
-            'organizer': self.request.translate(_("Organizer")),
-            'organizer_email': self.request.translate(_("Organizer E-Mail "
-                                                        "address")),
-            'organizer_phone': self.request.translate(_("Organizer phone "
-                                                        "number")),
+            'title': self.request.translate(_('Title')),
+            'description': self.request.translate(_('Description')),
+            'location': self.request.translate(_('Venue')),
+            'price': self.request.translate(_('Price')),
+            'organizer': self.request.translate(_('Organizer')),
+            'organizer_email': self.request.translate(_('Organizer E-Mail '
+                                                        'address')),
+            'organizer_phone': self.request.translate(_('Organizer phone '
+                                                        'number')),
             'external_event_url': self.request.translate(
-                _("External event URL")),
+                _('External event URL')),
             'event_registration_url': self.request.translate(
-                _("Event Registration URL")),
-            'tags': self.request.translate(_("Tags")),
-            'start': self.request.translate(_("From")),
-            'end': self.request.translate(_("To")),
+                _('Event Registration URL')),
+            'tags': self.request.translate(_('Tags')),
+            'start': self.request.translate(_('From')),
+            'end': self.request.translate(_('To')),
         }
 
     def custom_tags(self) -> list[str] | None:
@@ -589,7 +584,7 @@ class EventImportForm(Form):
                 or getattr(occurrence.event, attribute, None)
             )
             if isinstance(result, datetime):
-                result = result.strftime("%d.%m.%Y %H:%M")
+                result = result.strftime('%d.%m.%Y %H:%M')
             if attribute == 'tags':
                 result = ', '.join(
                     self.request.translate(_(tag))
@@ -599,14 +594,14 @@ class EventImportForm(Form):
             result = result.strip()
             return result
 
-        result = []
-        for occurrence in occurrences.query():
-            result.append({
+        return [
+            {
                 title: get(occurrence, attribute)
                 for attribute, title in headers.items()
-            })
+            }
+            for occurrence in occurrences.query()
 
-        return result
+        ]
 
     def run_import(self) -> tuple[int, list[str]]:
         headers = self.headers
@@ -681,8 +676,8 @@ class EventConfigurationForm(Form):
     """ Form to configure filters for events view. """
 
     definition = TextAreaField(
-        label=_("Definition"),
-        fieldset=_("General"),
+        label=_('Definition'),
+        fieldset=_('General'),
         validators=[
             InputRequired(),
             ValidFilterFormDefinition(
@@ -695,8 +690,8 @@ class EventConfigurationForm(Form):
         render_kw={'rows': 32, 'data-editor': 'form'})
 
     keyword_fields = TextAreaField(
-        label=_("Filters"),
-        fieldset=_("Display"),
+        label=_('Filters'),
+        fieldset=_('Display'),
         render_kw={
             'class_': 'formcode-select',
             'data-fields-include': 'radio,checkbox'

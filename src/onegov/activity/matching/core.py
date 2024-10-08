@@ -21,7 +21,7 @@ if TYPE_CHECKING:
     from decimal import Decimal
     from onegov.activity.models.booking import BookingState
     from sqlalchemy.orm import Session
-    from typing_extensions import TypeAlias
+    from typing import TypeAlias
     from uuid import UUID
 
     ScoreFunction: TypeAlias = Callable[[Booking], Decimal]

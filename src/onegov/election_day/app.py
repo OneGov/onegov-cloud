@@ -19,14 +19,12 @@ from onegov.election_day.directives import ManageHtmlAction
 from onegov.election_day.directives import PdfFileViewAction
 from onegov.election_day.directives import ScreenWidgetAction
 from onegov.election_day.directives import SvgFileViewAction
-from onegov.election_day.directives import XmlFileAction
 from onegov.election_day.models import Principal
 from onegov.election_day.request import ElectionDayRequest
 from onegov.election_day.theme import ElectionDayTheme
 from onegov.file import DepotApp
 from onegov.form import FormApp
 from onegov.user import UserApp
-from onegov.websockets import WebsocketsApp
 
 
 from typing import Any
@@ -41,7 +39,7 @@ if TYPE_CHECKING:
     from webob import Response
 
 
-class ElectionDayApp(Framework, FormApp, UserApp, DepotApp, WebsocketsApp):
+class ElectionDayApp(Framework, FormApp, UserApp, DepotApp):
     """ The election day application. Include this in your onegov.yml to serve
     it with onegov-server.
 
@@ -52,17 +50,12 @@ class ElectionDayApp(Framework, FormApp, UserApp, DepotApp, WebsocketsApp):
 
     csv_file = directive(CsvFileAction)
     json_file = directive(JsonFileAction)
-    xml_file = directive(XmlFileAction)
     manage_form = directive(ManageFormAction)
     manage_html = directive(ManageHtmlAction)
     pdf_file = directive(PdfFileViewAction)
     svg_file = directive(SvgFileViewAction)
     screen_widget = directive(ScreenWidgetAction)
 
-    # FIXME: Technically this can be None as well, but since we 404
-    #        if we don't have a principal we pretend it's always there
-    #        for now this is easier than having assert self.principal
-    #        everywhere
     @property
     def principal(self) -> 'Canton | Municipality':
         """ Returns the principal of the election day app. See
@@ -318,7 +311,7 @@ def micro_cache_anonymous_pages_tween_factory(
 
         if request.method == 'HEAD':
             # HEAD requests are cached with only the path
-            key = ':'.join((request.method, request.path))
+            key = f'{request.method}:{request.path}'
         else:
             # each page is cached once per request method, host, path including
             # query string, language and headerless/headerful (and by
@@ -392,6 +385,7 @@ def get_common_asset() -> 'Iterator[str]':
 def get_custom_asset() -> 'Iterator[str]':
     # common code
     yield 'common.js'
+    yield 'form_dependencies.js'
 
     # D3 charts and maps
     yield 'd3.chart.bar.js'
@@ -410,9 +404,6 @@ def get_custom_asset() -> 'Iterator[str]':
     # Form
     yield 'error-focus.js'
 
-    # notifications
-    yield 'notifications.js'
-
 
 @ElectionDayApp.webasset('backend_common')
 def get_backend_common_asset() -> 'Iterator[str]':
@@ -420,7 +411,6 @@ def get_backend_common_asset() -> 'Iterator[str]':
     yield 'jquery.datetimepicker.css'
     yield 'jquery.datetimepicker.js'
     yield 'datetimepicker.js'
-    yield 'form_dependencies.js'
     yield 'doubleclick.js'
 
 

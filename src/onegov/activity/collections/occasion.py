@@ -1,7 +1,7 @@
 from decimal import Decimal
 from onegov.activity.models import Occasion, OccasionDate
+from onegov.activity.types import BoundedIntegerRange
 from onegov.core.collection import GenericCollection
-from psycopg2.extras import NumericRange
 from sedate import standardize_date
 
 
@@ -19,14 +19,14 @@ class OccasionCollection(GenericCollection[Occasion]):
         return Occasion
 
     @staticmethod
-    def to_half_open_interval(lower: int, upper: int) -> NumericRange:
+    def to_half_open_interval(lower: int, upper: int) -> BoundedIntegerRange:
         """ Postgres coerces ranges internally to be half-open in an effort
         to canonize these ranges. This function does the same by taking
         a closed interval and turning it into a half-open interval of
         the NumericRange type.
 
         """
-        return NumericRange(lower, upper + 1, bounds='[)')
+        return BoundedIntegerRange(lower, upper + 1, bounds='[)')
 
     def add(  # type:ignore[override]
         self,
@@ -39,7 +39,7 @@ class OccasionCollection(GenericCollection[Occasion]):
         age: 'Sequence[int] | None' = None,
         spots: 'Sequence[int] | None' = None,
         note: str | None = None,
-        cost: Decimal = Decimal(0),  # noqa: B008
+        cost: Decimal = Decimal(0),
         exclude_from_overlap_check: bool = False
     ) -> Occasion:
 

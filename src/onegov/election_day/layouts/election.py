@@ -2,19 +2,17 @@ from functools import cached_property
 from onegov.core.utils import normalize_for_url
 from onegov.election_day import _
 from onegov.election_day.layouts.detail import DetailLayout
+from onegov.election_day.models import ProporzElection
 from onegov.election_day.utils import pdf_filename
 from onegov.election_day.utils import svg_filename
 
 
-from typing import cast
 from typing import TYPE_CHECKING
 if TYPE_CHECKING:
-    from onegov.ballot.models import Election
-    from onegov.ballot.models import ElectionResult
-    from onegov.ballot.models import ProporzElection
-    from onegov.core.types import AppenderQuery
+    from onegov.election_day.models import Election
+    from onegov.election_day.models import ElectionResult
     from onegov.election_day.request import ElectionDayRequest
-    from typing_extensions import TypeAlias
+    from typing import TypeAlias
 
     NestedMenu: TypeAlias = list[tuple[
         str,
@@ -93,15 +91,15 @@ class ElectionLayout(DetailLayout):
         tab = (self.tab if tab is None else tab) or ''
 
         if tab.startswith('list') or tab == 'connections':
-            return _("Lists")
+            return _('Lists')
         if tab.startswith('candidate'):
-            return _("Candidates")
+            return _('Candidates')
         if tab == 'party-strengths' or tab == 'parties-panachage':
-            return _("Parties")
+            return _('Parties')
         if tab == 'statistics':
-            return _("Election statistics")
+            return _('Election statistics')
         if tab == 'data':
-            return _("Downloads")
+            return _('Downloads')
 
         return ''
 
@@ -111,28 +109,23 @@ class ElectionLayout(DetailLayout):
         if tab.endswith('-by-entity'):
             by = self.request.translate(self.principal.label('entity'))
             by = by.lower() if self.request.locale != 'de_CH' else by
-            return _("By ${by}", mapping={'by': by})
+            return _('By ${by}', mapping={'by': by})
         if tab.endswith('-by-district'):
             by = self.request.translate(self.principal.label('district'))
             by = by.lower() if self.request.locale != 'de_CH' else by
-            return _("By ${by}", mapping={'by': by})
+            return _('By ${by}', mapping={'by': by})
         if tab.endswith('-panachage'):
-            return _("Panachage")
+            return _('Panachage')
         if tab == 'connections':
-            return _("List connections")
+            return _('List connections')
         if tab == 'party-strengths':
-            return _("Party strengths")
+            return _('Party strengths')
 
         return ''
 
     def tab_visible(self, tab: str | None) -> bool:
-
-        if self.hide_tab(tab):
-            return False
-
         if not self.has_results:
             return False
-
         if tab == 'lists':
             return (
                 self.proporz
@@ -168,11 +161,7 @@ class ElectionLayout(DetailLayout):
             return (
                 self.proporz
                 and not self.tacit
-                # FIXME: We may want to use a TypeGuard instead
-                and cast(
-                    'ProporzElection',
-                    self.model
-                ).list_connections.first() is not None
+                and self.model.list_connections  # type:ignore[attr-defined]
             )
         if tab == 'party-strengths':
             return (
@@ -194,11 +183,10 @@ class ElectionLayout(DetailLayout):
             return (
                 self.proporz
                 and not self.tacit
-                # FIXME: We may want to use a TypeGuard instead
-                and cast(
-                    'ProporzElection',
+                and (
                     self.model
-                ).has_lists_panachage_data
+                    .has_lists_panachage_data  # type:ignore[attr-defined]
+                )
             )
 
         return True
@@ -208,8 +196,7 @@ class ElectionLayout(DetailLayout):
         return self.tab_visible(self.tab)
 
     @cached_property
-    def type(self) -> str | None:
-        # FIXME: This probably should not be optional
+    def type(self) -> str:
         return self.model.type
 
     @cached_property
@@ -228,51 +215,48 @@ class ElectionLayout(DetailLayout):
 
     @cached_property
     def has_candidates(self) -> bool:
-        if self.model.candidates.first():
+        if self.model.candidates:
             return True
         return False
 
     @cached_property
     def has_party_results(self) -> bool:
-        # FIXME: Turn this into a TypeGuard
-        if self.proporz:
-            return self.model.has_party_results  # type:ignore
+        if isinstance(self.model, ProporzElection):
+            return self.model.has_party_results
         return False
 
     @cached_property
     def has_party_panachage_results(self) -> bool:
-        # FIXME: Turn this into a TypeGuard
-        if self.proporz:
-            return self.model.has_party_panachage_results  # type:ignore
+        if isinstance(self.model, ProporzElection):
+            return self.model.has_party_panachage_results
         return False
 
     @cached_property
     def summarize(self) -> bool:
-        return self.model.results.count() != 1
+        return len(self.model.results) != 1
 
     @cached_property
     def main_view(self) -> str:
         if self.majorz or self.tacit:
             return self.request.link(self.model, 'candidates')
         for tab in self.all_tabs:
-            if not self.hide_tab(tab):
-                return self.request.link(self.model, tab)
+            return self.request.link(self.model, tab)
         return self.request.link(self.model, 'lists')
 
     @cached_property
     def menu(self) -> 'NestedMenu':
-        result: 'NestedMenu' = []
+        result: NestedMenu = []
 
         submenus = (
-            (_("Lists"), ('lists', 'list-by-entity', 'list-by-district',
+            (_('Lists'), ('lists', 'list-by-entity', 'list-by-district',
                           'lists-panachage', 'connections')),
-            (_("Candidates"), ('candidates', 'candidate-by-entity',
+            (_('Candidates'), ('candidates', 'candidate-by-entity',
                                'candidate-by-district')),
-            (_("Parties"), ('party-strengths', 'parties-panachage'))
+            (_('Parties'), ('party-strengths', 'parties-panachage'))
         )
         for title, group in submenus:
             if any(self.tab_visible(tab) for tab in group):
-                submenu: 'NestedMenu' = [
+                submenu: NestedMenu = [
                     (
                         self.subtitle(tab) or self.title(tab),
                         self.request.link(self.model, tab),
@@ -306,11 +290,11 @@ class ElectionLayout(DetailLayout):
         """ Returns the path to the PDF file or None, if it is not available.
         """
 
+        assert self.request.locale
         path = 'pdf/{}'.format(
             pdf_filename(
                 self.model,
-                # FIXME: Should we assert that locale is set?
-                self.request.locale,  # type:ignore
+                self.request.locale,
                 last_modified=self.last_modified
             )
         )
@@ -325,12 +309,12 @@ class ElectionLayout(DetailLayout):
     def svg_path(self) -> str | None:
         """ Returns the path to the SVG or None, if it is not available. """
 
+        assert self.request.locale
         path = 'svg/{}'.format(
             svg_filename(
                 self.model,
-                # FIXME: Should we assert that tab and locale are set?
-                self.tab,  # type:ignore
-                self.request.locale,  # type:ignore
+                self.tab,
+                self.request.locale,
                 last_modified=self.last_modified
             )
         )
@@ -368,5 +352,5 @@ class ElectionLayout(DetailLayout):
         return [(e.title, self.request.link(e)) for e in result]
 
     @cached_property
-    def results(self) -> 'AppenderQuery[ElectionResult]':
+    def results(self) -> 'list[ElectionResult]':
         return self.model.results

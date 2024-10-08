@@ -120,6 +120,14 @@ class ScopedPropertyObserver(sqlalchemy_utils.observer.PropertyObserver):
             else:
                 observer.deactivate()
 
+    @classmethod
+    def enter_class_scope(cls, application_cls: type['Framework']) -> None:
+        for observer in cls._scoped_observers.values():
+            if issubclass(application_cls, observer.scope):
+                observer.activate()
+            else:
+                observer.deactivate()
+
     def __repr__(self) -> str:
         return '<ScopedPropertyObserver>'
 

@@ -13,16 +13,26 @@ from onegov.user import Auth
 from onegov.user import UserCollection
 
 
-def get_global_tools(request):
+from typing import TYPE_CHECKING
+if TYPE_CHECKING:
+    from collections.abc import Iterator
+    from onegov.landsgemeinde.request import LandsgemeindeRequest
+    from onegov.town6.layout import NavigationEntry
+
+
+def get_global_tools(
+    request: 'LandsgemeindeRequest'
+) -> 'Iterator[Link | LinkGroup]':
 
     if request.is_logged_in:
+        assert request.current_username is not None
 
         # Logout
         yield LinkGroup(
             request.current_username, classes=('user',),
             links=(
                 Link(
-                    _("Logout"), request.link(
+                    _('Logout'), request.link(
                         Auth.from_request(
                             request, to=logout_path(request)), name='logout'
                     ),
@@ -34,49 +44,52 @@ def get_global_tools(request):
         # Management Dropdown
         if request.is_admin:
             yield LinkGroup(
-                _("Management"), classes=('management',),
+                _('Management'), classes=('management',),
                 links=(
                     Link(
-                        _("Files"),
+                        _('Files'),
                         request.class_link(GeneralFileCollection),
                         attrs={'class': 'files'}
                     ),
                     Link(
-                        _("Images"),
+                        _('Images'),
                         request.class_link(ImageFileCollection),
                         attrs={'class': 'images'}
                     ),
                     Link(
-                        _("Text modules"),
+                        _('Text modules'),
                         request.class_link(TextModuleCollection),
                         attrs={'class': 'text-modules'}
                     ),
                     Link(
-                        _("Users"), request.class_link(UserCollection),
+                        _('Users'), request.class_link(UserCollection),
                         attrs={'class': 'user'}
                     ),
                     Link(
-                        _("Settings"),
+                        _('Settings'),
                         request.link(request.app.org, 'settings'),
                         attrs={'class': 'settings'}
                     ),
                     Link(
-                        _("People"), request.class_link(PersonCollection),
+                        _('People'), request.class_link(PersonCollection),
                         attrs={'class': 'people'}
                     ),
                 )
             )
 
 
-def get_top_navigation(request):
-    yield (
+def get_top_navigation(
+    request: 'LandsgemeindeRequest'
+) -> 'Iterator[NavigationEntry]':
+
+    yield (  # type:ignore[misc]
         Bunch(id=-1, access='public', published=True),
         Link(
-            text=_("Assemblies"),
+            text=_('Assemblies'),
             url=request.class_link(AssemblyCollection)
         ),
-        None
+        ()
     )
 
     layout = DefaultLayout(request.app.org, request)
-    yield from layout.top_navigation
+    yield from layout.top_navigation or ()

@@ -1,9 +1,4 @@
 from copy import deepcopy
-from onegov.ballot import Election
-from onegov.ballot import ElectionCompound
-from onegov.ballot import Vote
-from onegov.ballot.models.mixins import DomainOfInfluenceMixin
-from onegov.ballot.models.mixins import TitleTranslationsMixin
 from onegov.core.orm import Base
 from onegov.core.orm import translation_hybrid
 from onegov.core.orm.mixins import ContentMixin
@@ -14,6 +9,11 @@ from onegov.core.orm.mixins.content import dictionary_based_property_factory
 from onegov.core.orm.types import HSTORE
 from onegov.core.orm.types import UTCDateTime
 from onegov.core.orm.types import UUID
+from onegov.election_day.models.election import Election
+from onegov.election_day.models.election_compound import ElectionCompound
+from onegov.election_day.models.mixins import DomainOfInfluenceMixin
+from onegov.election_day.models.mixins import TitleTranslationsMixin
+from onegov.election_day.models.vote import Vote
 from sqlalchemy import Boolean
 from sqlalchemy import Column
 from sqlalchemy import Date
@@ -32,8 +32,8 @@ if TYPE_CHECKING:
     from collections.abc import Mapping
     from onegov.election_day.request import ElectionDayRequest
     from typing import Literal
-    from typing_extensions import Self
-    from typing_extensions import TypeAlias
+    from typing import Self
+    from typing import TypeAlias
 
     ResultType: TypeAlias = Literal['election', 'election_compound', 'vote']
 
@@ -101,7 +101,7 @@ class ArchivedResult(Base, ContentMixin, TimestampMixin,
     #: The link to the detailed results
     url: 'Column[str]' = Column(Text, nullable=False)
 
-    #: Title of the election
+    #: Title of the election/vote
     title_translations: 'Column[Mapping[str, str]]' = Column(
         HSTORE,
         nullable=False
@@ -158,6 +158,12 @@ class ArchivedResult(Base, ContentMixin, TimestampMixin,
 
     #: Turnout (vote/elections)
     turnout: dict_property[float | None] = meta_property('turnout')
+
+    #: True, if this is direct complex vote
+    direct: dict_property[bool] = meta_property(
+        'direct',
+        default=True
+    )
 
     #: The local results (municipal results if fetched from cantonal instance)
     local: dict_property[dict[str, Any] | None] = meta_property('local')

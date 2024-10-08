@@ -1,23 +1,26 @@
 """
-    htmldiff
-    ~~~~~~~~
+htmldiff
+========
 
-    Diffs HTML fragments.  Nice to show what changed between two revisions
-    of a document for an arbitrary user.  Examples:
+Diffs HTML fragments.  Nice to show what changed between two revisions
+of a document for an arbitrary user.
+
+Examples:
+.. code-block:: pycon
 
     >>> from htmldiff import render_html_diff
 
     >>> render_html_diff('Foo <b>bar</b> baz', 'Foo <i>bar</i> baz')
-    u'<div class="diff">Foo <i class="tagdiff_replaced">bar</i> baz</div>'
+    '<div class="diff">Foo <i class="tagdiff_replaced">bar</i> baz</div>'
 
     >>> render_html_diff('Foo bar baz', 'Foo baz')
-    u'<div class="diff">Foo <del>bar</del> baz</div>'
+    '<div class="diff">Foo <del>bar</del> baz</div>'
 
     >>> render_html_diff('Foo baz', 'Foo blah baz')
-    u'<div class="diff">Foo <ins>blah</ins> baz</div>'
+    '<div class="diff">Foo <ins>blah</ins> baz</div>'
 
-    :copyright: (c) 2011 by Armin Ronacher, see AUTHORS for more details.
-    :license: BSD, see LICENSE for more details.
+:copyright: (c) 2011 by Armin Ronacher
+:license: BSD
 """
 import re
 from contextlib import contextmanager
@@ -25,8 +28,8 @@ from difflib import SequenceMatcher
 from itertools import chain, zip_longest
 
 import html5lib
-from genshi.core import Stream, QName, Attrs, START, END, TEXT
-from genshi.input import ET
+from genshi.core import Stream, QName, Attrs, START, END, TEXT  # type:ignore
+from genshi.input import ET  # type:ignore[import-untyped]
 from markupsafe import Markup
 
 
@@ -34,7 +37,7 @@ from typing import Any, TYPE_CHECKING
 if TYPE_CHECKING:
     from collections.abc import Iterator
     from genshi.core import StreamEventKind
-    from typing_extensions import TypeAlias
+    from typing import TypeAlias
 
     Position: TypeAlias = tuple[str | None, int, int]
     StreamEvent: TypeAlias = tuple[StreamEventKind, Any, Position]
@@ -80,12 +83,12 @@ def parse_html(
 
 class StreamDiffer:
     """A class that can diff a stream of Genshi events. It will inject
-``<ins>`` and ``<del>`` tags into the stream. It probably breaks
-in very ugly ways if you pass a random Genshi stream to it. I'm
-not exactly sure if it's correct what creoleparser is doing here,
-but it appears that it's not using a namespace. That's fine with me
-so the tags the `StreamDiffer` adds are also unnamespaced.
-"""
+    ``<ins>`` and ``<del>`` tags into the stream. It probably breaks
+    in very ugly ways if you pass a random Genshi stream to it. I'm
+    not exactly sure if it's correct what creoleparser is doing here,
+    but it appears that it's not using a namespace. That's fine with me
+    so the tags the `StreamDiffer` adds are also unnamespaced.
+    """
 
     _old: list['StreamEvent']
     _new: list['StreamEvent']
@@ -160,7 +163,7 @@ so the tags the `StreamDiffer` adds are also unnamespaced.
             elif tag == 'insert':
                 wrap('ins', new[j1:j2])
             else:
-                self.append(TEXT, u''.join(old[i1:i2]), pos)
+                self.append(TEXT, ''.join(old[i1:i2]), pos)
 
     def replace(
         self,

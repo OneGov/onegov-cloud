@@ -1,18 +1,17 @@
 from datetime import date
 from io import BytesIO
-from onegov.ballot import Candidate
-from onegov.ballot import CandidatePanachageResult
-from onegov.ballot import Election
-from onegov.ballot import ElectionResult
-from onegov.ballot import List
-from onegov.ballot import ListPanachageResult
-from onegov.ballot import ProporzElection
 from onegov.core.csv import convert_list_of_dicts_to_csv
 from onegov.election_day.formats import export_election_internal_proporz
 from onegov.election_day.formats import import_election_internal_proporz
+from onegov.election_day.models import Candidate
+from onegov.election_day.models import CandidatePanachageResult
 from onegov.election_day.models import Canton
+from onegov.election_day.models import Election
+from onegov.election_day.models import ElectionResult
+from onegov.election_day.models import List
+from onegov.election_day.models import ListPanachageResult
+from onegov.election_day.models import ProporzElection
 from tests.onegov.election_day.common import create_principal
-from tests.onegov.election_day.common import print_errors
 
 
 def test_import_internal_proporz_cantonal_zg(session, import_test_datasets):
@@ -112,7 +111,7 @@ def test_import_internal_proporz_cantonal_bl(session, import_test_datasets):
             0, 0, 6470, 19125, 28756, 46426, 90352, 98426, 119209, 137544
         ]
         lists = {list_.id: list_ for list_ in election.lists}
-        list_ = election.lists.filter_by(list_id='01').one()
+        list_ = next((l for l in election.lists if l.list_id == '01'))
         assert {
             lists[r.source_id].list_id if r.source_id else '00': r.votes
             for r in list_.panachage_results
@@ -138,13 +137,16 @@ def test_import_internal_proporz_cantonal_bl(session, import_test_datasets):
             '77': 7,
             '00': 16051
         }
-        candidate = election.candidates.filter_by(candidate_id='0101').one()
-        result_id = election.results.filter_by(entity_id='2761').one().id
+        candidate = next(
+            (c for c in election.candidates if c.candidate_id == '0101')
+        )
+        result_id = next(
+            (r for r in election.results if r.entity_id == 2761)
+        ).id
         assert {
             lists[r.source_id].list_id if r.source_id else '00': r.votes
-            for r in candidate.panachage_results.filter_by(
-                election_result_id=result_id
-            )
+            for r in candidate.panachage_results
+            if r.election_result_id == result_id
         } == {
             '01': 340,
             '02': 10,
@@ -194,10 +196,10 @@ def test_import_internal_proporz_regional_zg(session, import_test_datasets):
     ]
 
     # check panachage results
-    assert election.party_panachage_results.all() == []
+    assert election.party_panachage_results == []
 
     # check panachage result from list 3
-    list_ = election.lists.filter_by(list_id='3').one()
+    list_ = next((l for l in election.lists if l.list_id == '3'))
     assert list_.votes == 23653
     assert sum([p.votes for p in list_.panachage_results]) == (
         606 + 334 + 756 + 221 + 118 + 1048 + 2316
@@ -229,7 +231,7 @@ def test_import_internal_proporz_regional_zg(session, import_test_datasets):
     assert sorted([list.votes for list in election.lists]) == [
         1175, 9557, 15580, 23406, 23653, 27116, 31412
     ]
-    list_ = election.lists.filter_by(list_id='3').one()
+    list_ = next((l for l in election.lists if l.list_id == '3'))
     assert list_.votes == 23653
     assert sum([p.votes for p in list_.panachage_results]) == (
         606 + 334 + 756 + 221 + 118 + 1048 + 2316
@@ -533,7 +535,9 @@ def test_import_internal_proporz_expats(session):
                 ).encode('utf-8')), 'text/plain',
             )
             errors = [(e.line, e.error.interpolate()) for e in errors]
-            result = election.results.filter_by(entity_id=0).first()
+            result = next(
+                (r for r in election.results if r.entity_id == 0), None
+            )
             if has_expats:
                 assert errors == []
                 assert result.invalid_votes == 1
@@ -631,7 +635,7 @@ def test_import_internal_proporz_temporary_results(session):
             ))
         ).encode('utf-8')), 'text/plain',
     )
-    print_errors(errors)
+
     assert not errors
 
     # 1 Counted, 1 Uncounted, 10 Missing
@@ -642,8 +646,8 @@ def test_import_internal_proporz_temporary_results(session):
     assert election.blank_ballots == 1
     assert election.invalid_ballots == 1
     assert election.accounted_votes == 52
-    assert election.lists.one().votes == 1
-    assert election.candidates.one().votes == 1
+    assert election.lists[0].votes == 1
+    assert election.candidates[0].votes == 1
 
 
 def test_import_internal_proporz_regional(session):
@@ -910,7 +914,7 @@ def test_import_internal_proporz_panachage(session):
             ]
         )
     )
-    print_errors(errors)
+
     assert not errors
     assert lquery.count() == 0
     assert cquery.count() == 0
@@ -1143,8 +1147,8 @@ def test_import_internal_proproz_optional_columns(session):
         ).encode('utf-8')), 'text/plain',
     )
     assert not errors
-    candidate = election.candidates.one()
-    assert candidate.gender == 'female'
-    assert candidate.year_of_birth == 1970
-    assert election.results.filter_by(entity_id='1701').one().expats == 30
+    assert election.candidates[0].gender == 'female'
+    assert election.candidates[0].year_of_birth == 1970
+    result = next((r for r in election.results if r.entity_id == 1701))
+    assert result.expats == 30
     assert election.colors == {'FDP': '#123456', 'JFDP': '#112233'}

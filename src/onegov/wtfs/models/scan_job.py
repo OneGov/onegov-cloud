@@ -12,7 +12,6 @@ from sqlalchemy import func
 from sqlalchemy import Integer
 from sqlalchemy import Text
 from sqlalchemy.ext.hybrid import hybrid_property
-from sqlalchemy.orm import backref
 from sqlalchemy.orm import relationship
 from uuid import uuid4
 
@@ -35,19 +34,17 @@ class ScanJob(Base, TimestampMixin, ContentMixin):
         default=uuid4
     )
 
-    #: The municipality that owns the scan job.
+    #: The if of the municipality that owns the scan job.
     municipality_id: 'Column[uuid.UUID]' = Column(
         UUID,  # type:ignore[arg-type]
         ForeignKey(Municipality.id),
         nullable=False
     )
+
+    #: The municipality that owns the scan job.
     municipality: 'relationship[Municipality]' = relationship(
         Municipality,
-        backref=backref(
-            'scan_jobs',
-            lazy='dynamic',
-            order_by='ScanJob.dispatch_date'
-        )
+        back_populates='scan_jobs'
     )
 
     #: The scan job type.
@@ -269,6 +266,6 @@ class ScanJob(Base, TimestampMixin, ContentMixin):
     @property
     def title(self) -> str:
         return _(
-            "Scan job no. ${number}",
+            'Scan job no. ${number}',
             mapping={'number': self.delivery_number}
         )

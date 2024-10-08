@@ -1,8 +1,8 @@
+from dicttoxml import dicttoxml  # type:ignore[import-untyped]
 from morepath.request import Response
 from onegov.core.csv import convert_list_of_dicts_to_csv
 from onegov.core.csv import convert_list_of_dicts_to_xlsx
 from onegov.core.utils import normalize_for_url
-from onegov.event import OccurrenceCollection
 from onegov.form import Form
 from onegov.form.filters import as_float
 from onegov.org import _
@@ -27,12 +27,12 @@ class DateRangeForm(Form):
     """ A form providing a start/end date range. """
 
     start = DateField(
-        label=_("Start"),
+        label=_('Start'),
         validators=[InputRequired()]
     )
 
     end = DateField(
-        label=_("End"),
+        label=_('End'),
         validators=[InputRequired()]
     )
 
@@ -41,7 +41,7 @@ class DateRangeForm(Form):
 
         if self.start.data and self.end.data:
             if self.start.data > self.end.data:
-                message = _("The end date must be later than the start date")
+                message = _('The end date must be later than the start date')
                 assert isinstance(self.end.errors, list)
                 self.end.errors.append(message)
                 result = False
@@ -53,12 +53,12 @@ class ExportForm(Form):
     """ A form providing a choice of export formats. """
 
     file_format = RadioField(
-        label=_("Format"),
+        label=_('Format'),
         choices=[
-            ('csv', _("CSV File")),
-            ('xlsx', _("Excel File")),
-            ('json', _("JSON File")),
-            ('xml', _("XML File")),
+            ('csv', _('CSV File')),
+            ('xlsx', _('Excel File')),
+            ('json', _('JSON File')),
+            ('xml', _('XML File')),
         ],
         default='csv',
         validators=[
@@ -82,9 +82,7 @@ class ExportForm(Form):
         The additional keyword arguments are directly passed into the
         convert_list_of_dicts_to_* functions.
 
-        For json, these additional arguments are ignored.
-
-        For xml, we export all occurrences.
+        For json and xml, these additional arguments are ignored.
 
         """
         if self.format == 'json':
@@ -113,13 +111,11 @@ class ExportForm(Form):
 
         if self.format == 'xml':
             return Response(
-                # FIXME: This is a little sus, why are we exporting
-                #        occurences inside a generic ExportForm that
-                #        is supposed to work with anything?
-                OccurrenceCollection(self.request.session).as_xml(
-                    future_events_only=True),
+                dicttoxml(results),
                 content_type='text/xml',
-                content_disposition='inline; filename=occurences.xml',
+                content_disposition='inline; filename={}.xml'.format(
+                    normalize_for_url(title)
+                ),
             )
 
         raise NotImplementedError()
@@ -131,26 +127,26 @@ class PaymentForm(Form):
         request: OrgRequest
 
     minimum_price_total = DecimalField(
-        label=_("Minimum price total"),
-        fieldset=_("Payments"),
+        label=_('Minimum price total'),
+        fieldset=_('Payments'),
         filters=(as_float, ),
         validators=[Optional()])
 
     payment_method = RadioField(
-        label=_("Payment Method"),
-        fieldset=_("Payments"),
+        label=_('Payment Method'),
+        fieldset=_('Payments'),
         default='manual',
         validators=[InputRequired()],
         choices=[
-            ('manual', _("No credit card payments")),
-            ('free', _("Credit card payments optional")),
-            ('cc', _("Credit card payments required"))
+            ('manual', _('No credit card payments')),
+            ('free', _('Credit card payments optional')),
+            ('cc', _('Credit card payments required'))
         ])
 
     def validate_minimum_price_total(self, field: DecimalField) -> None:
         if not float(self.minimum_price_total.data or 0) >= 0:
             raise ValidationError(_(
-                "The price must be larger than zero"
+                'The price must be larger than zero'
             ))
 
     def validate_payment_method(self, field: RadioField) -> None:
@@ -159,8 +155,8 @@ class PaymentForm(Form):
 
         if not self.request.app.default_payment_provider:
             raise ValidationError(_(
-                "You need to setup a default payment provider to enable "
-                "credit card payments"
+                'You need to setup a default payment provider to enable '
+                'credit card payments'
             ))
 
 
@@ -205,7 +201,7 @@ class ChangeAdjacencyListUrlForm(Form):
             )
             if session.query(query.exists()).scalar():
                 raise ValidationError(
-                    _("An entry with the same name exists")
+                    _('An entry with the same name exists')
                 )
 
             return
@@ -216,5 +212,5 @@ class ChangeAdjacencyListUrlForm(Form):
                 continue
             if child.name == self.name.data:
                 raise ValidationError(
-                    _("An entry with the same name exists")
+                    _('An entry with the same name exists')
                 )

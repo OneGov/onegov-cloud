@@ -1,14 +1,15 @@
 from collections import OrderedDict
 from datetime import date
 from itertools import groupby
-from onegov.ballot import Election
-from onegov.ballot import ElectionCollection
-from onegov.ballot import ElectionCompound
-from onegov.ballot import ElectionCompoundCollection
-from onegov.ballot import Vote
-from onegov.ballot import VoteCollection
 from onegov.core.collection import Pagination
+from onegov.election_day.collections.elections import ElectionCollection
+from onegov.election_day.collections.election_compounds import \
+    ElectionCompoundCollection
+from onegov.election_day.collections.votes import VoteCollection
 from onegov.election_day.models import ArchivedResult
+from onegov.election_day.models import Election
+from onegov.election_day.models import ElectionCompound
+from onegov.election_day.models import Vote
 from onegov.election_day.utils import replace_url
 from sedate import as_datetime
 from sqlalchemy import cast
@@ -40,7 +41,7 @@ if TYPE_CHECKING:
     from sqlalchemy.orm import Session
     from sqlalchemy.sql import ColumnElement
     from typing import TypeVar
-    from typing_extensions import Self
+    from typing import Self
 
     _T1 = TypeVar('_T1')
     _T2 = TypeVar('_T2')
@@ -223,16 +224,12 @@ class ArchivedResultCollection:
             ArchivedResult.shortcode,
             ArchivedResult.title
         )
+        result = query.all()
 
-        # FIXME: This seems kind of dumb, why are we emitting a
-        #        second query for something that's part of the
-        #        result anyways, we can calculate the max in
-        #        Python...
-        last_modified = self.session.query(
-            func.max(query.subquery().c.last_modified)
-        )
+        last_modifieds = [r.last_modified for r in result if r.last_modified]
+        last_modified = max(last_modifieds) if last_modifieds else None
 
-        return query.all(), (last_modified.first() or [None])[0]
+        return result, last_modified
 
     def by_date(
         self,
@@ -264,15 +261,12 @@ class ArchivedResultCollection:
             ArchivedResult.title
         )
 
-        # FIXME: This seems kind of dumb, why are we emitting a
-        #        second query for something that's part of the
-        #        result anyways, we can calculate the max in
-        #        Python...
-        last_modified = self.session.query(
-            func.max(query.subquery().c.last_modified)
-        )
+        result = query.all()
 
-        return query.all(), (last_modified.first() or [None])[0]
+        last_modifieds = [r.last_modified for r in result if r.last_modified]
+        last_modified = max(last_modifieds) if last_modifieds else None
+
+        return result, last_modified
 
     def update(
         self,
@@ -298,10 +292,13 @@ class ArchivedResultCollection:
         result.url = url
         result.schema = self.session.info['schema']
         result.domain = item.domain
-        result.name = request.app.principal.name  # type:ignore[assignment]
+        result.name = request.app.principal.name
         result.date = item.date
         result.shortcode = item.shortcode
-        result.title_translations = item.title_translations
+        result.title_translations = (
+            item.short_title_translations
+            or item.title_translations
+        )
         result.last_modified = item.last_modified
         result.last_result_change = item.last_result_change
         result.external_id = item.id
@@ -315,8 +312,8 @@ class ArchivedResultCollection:
             result.type = 'election'
             result.turnout = item.turnout
             result.elected_candidates = item.elected_candidates
-            for association in item.associations:
-                self.update(association.election_compound, request)
+            if item.election_compound:
+                self.update(item.election_compound, request)
 
         if isinstance(item, ElectionCompound):
             result.type = 'election_compound'
@@ -330,6 +327,7 @@ class ArchivedResultCollection:
             result.answer = item.answer or ''
             result.nays_percentage = item.nays_percentage
             result.yeas_percentage = item.yeas_percentage
+            result.direct = item.direct
 
         if add_result:
             self.session.add(result)
@@ -360,11 +358,7 @@ class ArchivedResultCollection:
     ) -> None:
         """ Add a new election or vote and create a result entry.  """
 
-        assert (
-            isinstance(item, Election)
-            or isinstance(item, ElectionCompound)
-            or isinstance(item, Vote)
-        )
+        assert isinstance(item, (Election, ElectionCompound, Vote))
 
         self.session.add(item)
         self.session.flush()
@@ -372,20 +366,17 @@ class ArchivedResultCollection:
         self.update(item, request)
         self.session.flush()
 
-    def clear(
+    def clear_results(
         self,
         item: Election | ElectionCompound | Vote,
-        request: 'ElectionDayRequest'
+        request: 'ElectionDayRequest',
+        clear_all: bool = False
     ) -> None:
-        """ Clears an election or vote and the associated result entry.  """
+        """ Clears the result of an election or vote.  """
 
-        assert (
-            isinstance(item, Election)
-            or isinstance(item, ElectionCompound)
-            or isinstance(item, Vote)
-        )
+        assert isinstance(item, (Election, ElectionCompound, Vote))
 
-        item.clear_results()
+        item.clear_results(clear_all)
         self.update(item, request)
         for election in getattr(item, 'elections', []):
             self.update(election, request)
@@ -399,11 +390,7 @@ class ArchivedResultCollection:
     ) -> None:
         """ Deletes an election or vote and the associated result entry.  """
 
-        assert (
-            isinstance(item, Election)
-            or isinstance(item, ElectionCompound)
-            or isinstance(item, Vote)
-        )
+        assert isinstance(item, (Election, ElectionCompound, Vote))
 
         url = request.link(item)
         url = replace_url(url, request.app.principal.official_host)
@@ -479,7 +466,7 @@ class SearchableArchivedResultCollection(
 
         def cleanup(word: str, whitelist_chars: str = ',.-_') -> str:
             result = ''.join(
-                (c for c in word if c.isalnum() or c in whitelist_chars)
+                c for c in word if c.isalnum() or c in whitelist_chars
             )
             return f'{result}:*' if word.endswith('*') else result
 
@@ -492,8 +479,12 @@ class SearchableArchivedResultCollection(
         language: str,
         term: str
     ) -> 'ColumnElement[TSVECTOR | None]':
-        """ Usage:
-         model.filter(match_term(model.col, 'german', 'my search term')) """
+        """ Generate a clause element for a given search term.
+
+        Usage::
+
+            model.filter(match_term(model.col, 'german', 'my search term'))
+        """
         document_tsvector = func.to_tsvector(language, column)
         ts_query_object = func.to_tsquery(language, term)
         return document_tsvector.op('@@')(ts_query_object)

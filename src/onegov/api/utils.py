@@ -1,9 +1,11 @@
-from datetime import datetime, timedelta
 import jwt
-from webob.exc import HTTPUnauthorized, HTTPClientError
+
+from datetime import timedelta
+from onegov.api import ApiApp
 from onegov.api.models import ApiException, ApiKey
 from onegov.api.token import try_get_encoded_token, jwt_decode
-from onegov.api import ApiApp
+from sedate import utcnow
+from webob.exc import HTTPUnauthorized, HTTPClientError
 
 
 from typing import TYPE_CHECKING
@@ -12,17 +14,22 @@ if TYPE_CHECKING:
     from morepath.request import Response
 
 
-def authenticate(request: 'CoreRequest') -> None:
+def authenticate(request: 'CoreRequest') -> ApiKey:
+    if request.authorization is None:
+        raise HTTPUnauthorized()
+
     try:
         auth = try_get_encoded_token(request)
         data = jwt_decode(request, auth)
     except jwt.ExpiredSignatureError as exception:
         raise HTTPUnauthorized() from exception
     except Exception as e:
-        raise ApiException() from e
+        raise ApiException(exception=e) from e
 
-    if request.session.query(ApiKey).get(data['id']) is None:
+    api_key = request.session.query(ApiKey).get(data['id'])
+    if api_key is None:
         raise HTTPClientError()
+    return api_key
 
 
 def check_rate_limit(request: 'CoreRequest') -> dict[str, str]:
@@ -49,12 +56,12 @@ def check_rate_limit(request: 'CoreRequest') -> dict[str, str]:
     limit, expiration = request.app.rate_limit
     requests, timestamp = request.app.rate_limit_cache.get_or_create(
         addr,
-        creator=lambda: (0, datetime.utcnow()),
+        creator=lambda: (0, utcnow()),
     )
-    if (datetime.utcnow() - timestamp).seconds < expiration:
+    if (utcnow() - timestamp).seconds < expiration:
         requests += 1
     else:
-        timestamp = datetime.utcnow()
+        timestamp = utcnow()
         requests = 1
     request.app.rate_limit_cache.set(
         addr, (requests, timestamp)
@@ -63,7 +70,7 @@ def check_rate_limit(request: 'CoreRequest') -> dict[str, str]:
     headers = {
         'X-RateLimit-Limit': str(limit),
         'X-RateLimit-Remaining': str(max(limit - requests, 0)),
-        'X-RateLimit-Reset': reset.strftime("%a, %d %b %Y %H:%M:%S GMT")
+        'X-RateLimit-Reset': reset.strftime('%a, %d %b %Y %H:%M:%S GMT')
     }
 
     @request.after

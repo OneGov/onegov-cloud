@@ -27,16 +27,66 @@ from sqlalchemy.dialects.postgresql import array
 from uuid import UUID
 
 
-from typing import overload, Any, Literal, TypeVar, TYPE_CHECKING
+from typing import overload, Literal, TypeVar, TYPE_CHECKING
 if TYPE_CHECKING:
-    from collections.abc import Iterable, Iterator
+    from collections.abc import Collection, Iterable, Iterator
     from datetime import date
+    from markupsafe import Markup
+    from onegov.activity.models import PeriodMeta
     from onegov.activity.models.activity import ActivityState
     from onegov.user import User
     from sqlalchemy.orm import Query, Session
-    from typing_extensions import Self, TypeAlias
+    from typing_extensions import TypedDict, Unpack
+    from typing import Self, TypeAlias
 
     AvailabilityType: TypeAlias = Literal['none', 'few', 'many']
+    FilterKey: TypeAlias = Literal[
+        'age_ranges',
+        'available',
+        'price_ranges',
+        'dateranges',
+        'durations',
+        'municipalities',
+        'owners',
+        'period_ids',
+        'states',
+        'tags',
+        'timelines',
+        'weekdays',
+        'volunteers',
+    ]
+
+    # TODO: We may want to use PEP-728 for extra items once it's available
+    #       to use in mypy
+    class FilterArgs(TypedDict, total=False):
+        age_ranges: Collection[str] | None
+        available: Collection[str] | None
+        price_ranges: Collection[str] | None
+        dateranges: Collection[str] | None
+        durations: Collection[str] | None
+        municipalities: Collection[str] | None
+        owners: Collection[str] | None
+        period_ids: Collection[str] | None
+        states: Collection[str] | None
+        tags: Collection[str] | None
+        timelines: Collection[str] | None
+        weekdays: Collection[str] | None
+        volunteers: Collection[str] | None
+
+    class ToggledArgs(TypedDict, total=False):
+        age_range: tuple[int, int]
+        available: AvailabilityType
+        price_range: tuple[int, int]
+        daterange: tuple[date, date]
+        duration: int
+        municipality: str
+        owner: str
+        period_id: UUID
+        state: ActivityState
+        tag: str
+        timeline: str
+        weekday: int
+        volunteer: bool
 
 
 ActivityT = TypeVar('ActivityT', bound=Activity)
@@ -48,7 +98,7 @@ class ActivityFilter:
     # supported filters - should be named with a plural version that can
     # be turned into a singular with the removal of the last s
     # (i.e. slots => slot)
-    __slots__ = (
+    __slots__: tuple['FilterKey', ...] = (
         'age_ranges',
         'available',
         'price_ranges',
@@ -82,31 +132,7 @@ class ActivityFilter:
     weekdays: set[int]
     volunteers: set[bool]
 
-    if TYPE_CHECKING:
-        # let mypy know what arguments are allowed
-        def __init__(
-            self,
-            *,
-            age_ranges: set[str] | None = None,
-            available: set[str] | None = None,
-            price_ranges: set[str] | None = None,
-            dateranges: set[str] | None = None,
-            durations: set[str] | None = None,
-            municipalities: set[str] | None = None,
-            owners: set[str] | None = None,
-            period_ids: set[str] | None = None,
-            states: set[str] | None = None,
-            tags: set[str] | None = None,
-            timelines: set[str] | None = None,
-            weekdays: set[str] | None = None,
-            volunteers: set[str] | None = None,
-        ) -> None: ...
-
-    def __init__(  # type:ignore[no-redef]  # noqa: F811
-        self,
-        **keywords: set[str] | None
-    ) -> None:
-
+    def __init__(self, **keywords: 'Unpack[FilterArgs]') -> None:
         for key in self.__slots__:
             if key in keywords:
                 values = set(v) if (v := keywords[key]) else set()
@@ -122,39 +148,14 @@ class ActivityFilter:
                 setattr(self, key, set())
 
     @property
-    def keywords(self) -> dict[str, str | list[str]]:
-        keywords = {}
+    def keywords(self) -> dict['FilterKey', str | list[str]]:
+        return {
+            key: self.encode(key, value)
+            for key in self.__slots__
+            if (value := getattr(self, key))
+        }
 
-        for key in self.__slots__:
-            if getattr(self, key):
-                keywords[key] = self.encode(key, getattr(self, key))
-
-        return keywords
-
-    if TYPE_CHECKING:
-        # let mypy know what arguments are allowed
-        def toggled(
-            self,
-            *,
-            age_range: tuple[int, int] = ...,
-            available: AvailabilityType = ...,
-            price_range: tuple[int, int] = ...,
-            daterange: tuple[date, date] = ...,
-            duration: set[int] = ...,
-            municipality: str = ...,
-            owner: str = ...,
-            period_id: UUID = ...,
-            state: ActivityState = ...,
-            tag: str = ...,
-            timeline: str = ...,
-            weekday: int = ...,
-            volunteer: bool = ...,
-        ) -> 'Self': ...
-
-    def toggled(  # type:ignore[no-redef]  # noqa: F811
-        self,
-        **keywords: object
-    ) -> 'Self':
+    def toggled(self, **keywords: 'Unpack[ToggledArgs]') -> 'Self':
         # create a new filter with the toggled values
         toggled = copy(self)
 
@@ -167,9 +168,9 @@ class ActivityFilter:
                 singular = key
 
             if singular in keywords:
-                value = keywords[singular]
+                value = keywords[singular]  # type:ignore[literal-required]
             elif key in keywords:
-                value = keywords[key]
+                value = keywords[key]  # type:ignore[typeddict-item]
             else:
                 continue
 
@@ -457,29 +458,9 @@ class ActivityCollection(RangedPagination[ActivityT]):
 
         return query.order_by(self.model_class.order)
 
-    if TYPE_CHECKING:
-        # let mypy know what arguments are allowed
-        def for_filter(
-            self,
-            *,
-            age_range: tuple[int, int] = ...,
-            available: AvailabilityType = ...,
-            price_range: tuple[int, int] = ...,
-            daterange: tuple[date, date] = ...,
-            duration: set[int] = ...,
-            municipality: str = ...,
-            owner: str = ...,
-            period_id: UUID = ...,
-            state: ActivityState = ...,
-            tag: str = ...,
-            timeline: str = ...,
-            weekday: int = ...,
-            volunteer: bool = ...,
-        ) -> Self: ...
-
-    def for_filter(  # type:ignore[no-redef]  # noqa: F811
+    def for_filter(
         self,
-        **keywords: Any
+        **keywords: 'Unpack[ToggledArgs]'
     ) -> 'Self':
         """ Returns a new collection instance.
 
@@ -565,7 +546,7 @@ class ActivityCollection(RangedPagination[ActivityT]):
         title: str,
         username: str,
         lead: str | None = None,
-        text: str | None = None,
+        text: 'Markup | None' = None,
         tags: set[str] | None = None,
         name: str | None = None
     ) -> ActivityT:
@@ -598,7 +579,7 @@ class ActivityCollection(RangedPagination[ActivityT]):
 
     def available_weeks(
         self,
-        period: Period | None
+        period: 'Period | PeriodMeta | None'
     ) -> 'Iterator[tuple[date, date]]':
         if not period:
             return

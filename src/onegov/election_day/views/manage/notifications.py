@@ -9,10 +9,10 @@ from onegov.election_day.models import Principal
 
 from typing import TYPE_CHECKING
 if TYPE_CHECKING:
-    from onegov.ballot.models import Election
-    from onegov.ballot.models import Vote
     from onegov.core.types import RenderData
+    from onegov.election_day.models import Election
     from onegov.election_day.models import Notification
+    from onegov.election_day.models import Vote
     from onegov.election_day.request import ElectionDayRequest
     from webob.response import Response
 
@@ -44,7 +44,7 @@ def view_trigger_notficiations(
             form.vote_models(session),
             form.notifications.data
         )
-        request.message(_("Notifications triggered."), 'success')
+        request.message(_('Notifications triggered.'), 'success')
         request.app.pages_cache.flush()
         return redirect(layout.manage_link)
 
@@ -52,7 +52,7 @@ def view_trigger_notficiations(
     latest_date = layout.format_date(latest_date_d, 'date_long')
 
     warn = False
-    last_notifications: dict['Election | Vote', list['Notification']] = {}
+    last_notifications: dict[Election | Vote, list[Notification]] = {}
     for election in form.available_elections(session):
         last_notifications[election] = notifications.by_model(election, False)
         if notifications.by_model(election):
@@ -67,20 +67,20 @@ def view_trigger_notficiations(
     button_class = 'primary'
     if warn:
         callout = _(
-            "There are no changes since the last time the notifications "
-            "have been triggered!"
+            'There are no changes since the last time the notifications '
+            'have been triggered!'
         )
         message = _(
-            "Do you really want to retrigger the notfications?",
+            'Do you really want to retrigger the notfications?',
         )
         button_class = 'alert'
 
     return {
         'layout': layout,
         'form': form,
-        'title': _("Trigger notifications"),
+        'title': _('Trigger notifications'),
         'subtitle': _(
-            "Elections and votes on ${date}",
+            'Elections and votes on ${date}',
             mapping={'date': latest_date}
         ),
         'cancel': layout.manage_link,

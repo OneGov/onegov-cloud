@@ -1,7 +1,7 @@
 """ Contains the legacy models of files for url redirect support. Going
 forward, onegov.file and onegov.org.models.file is used.
 
- """
+"""
 
 import base64
 
@@ -13,7 +13,7 @@ from typing import Any, TYPE_CHECKING
 if TYPE_CHECKING:
     from datetime import date as date_t
     from onegov.org.app import OrgApp
-    from typing_extensions import Self
+    from typing import Self
 
 
 class LegacyFileCollection:

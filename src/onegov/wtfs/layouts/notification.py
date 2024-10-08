@@ -18,15 +18,15 @@ class NotificationsLayout(DefaultLayout):
 
     @cached_property
     def title(self) -> str:
-        return _("Notifications")
+        return _('Notifications')
 
     @cached_property
     def editbar_links(self) -> list['Element']:
-        result: list['Element'] = []
+        result: list[Element] = []
         if self.request.has_permission(self.model, AddModel):
             result.append(
                 Link(
-                    text=_("Add"),
+                    text=_('Add'),
                     url=self.request.link(
                         self.model,
                         name='add'
@@ -39,7 +39,7 @@ class NotificationsLayout(DefaultLayout):
     @cached_property
     def breadcrumbs(self) -> list['Element']:
         return [
-            Link(_("Homepage"), self.homepage_url),
+            Link(_('Homepage'), self.homepage_url),
             Link(self.title, self.notifications_url)
         ]
 
@@ -52,11 +52,11 @@ class NotificationLayout(DefaultLayout):
 
     @cached_property
     def editbar_links(self) -> list['Element']:
-        result: list['Element'] = []
+        result: list[Element] = []
         if self.request.has_permission(self.model, EditModel):
             result.append(
                 Link(
-                    text=_("Edit"),
+                    text=_('Edit'),
                     url=self.request.link(self.model, 'edit'),
                     attrs={'class': 'edit-icon'}
                 )
@@ -64,7 +64,7 @@ class NotificationLayout(DefaultLayout):
         if self.request.has_permission(self.model, DeleteModel):
             result.append(
                 Link(
-                    text=_("Delete"),
+                    text=_('Delete'),
                     url=self.csrf_protected_url(
                         self.request.link(self.model)
                     ),
@@ -72,12 +72,12 @@ class NotificationLayout(DefaultLayout):
                     traits=(
                         Confirm(
                             _(
-                                "Do you really want to delete this "
-                                "notification?"
+                                'Do you really want to delete this '
+                                'notification?'
                             ),
-                            _("This cannot be undone."),
-                            _("Delete"),
-                            _("Cancel")
+                            _('This cannot be undone.'),
+                            _('Delete'),
+                            _('Cancel')
                         ),
                         Intercooler(
                             request_method='DELETE',
@@ -91,8 +91,8 @@ class NotificationLayout(DefaultLayout):
     @cached_property
     def breadcrumbs(self) -> list['Element']:
         return [
-            Link(_("Homepage"), self.homepage_url),
-            Link(_("Notifications"), self.notifications_url),
+            Link(_('Homepage'), self.homepage_url),
+            Link(_('Notifications'), self.notifications_url),
             Link(self.title, '#')
         ]
 
@@ -101,14 +101,14 @@ class AddNotificationLayout(DefaultLayout):
 
     @cached_property
     def title(self) -> str:
-        return _("Add notification")
+        return _('Add notification')
 
     @cached_property
     def breadcrumbs(self) -> list['Element']:
         return [
-            Link(_("Homepage"), self.homepage_url),
-            Link(_("Notifications"), self.notifications_url),
-            Link(_("Add"), '#')
+            Link(_('Homepage'), self.homepage_url),
+            Link(_('Notifications'), self.notifications_url),
+            Link(_('Add'), '#')
         ]
 
     @cached_property
@@ -124,15 +124,15 @@ class EditNotificationLayout(DefaultLayout):
 
     @cached_property
     def title(self) -> str:
-        return _("Edit notification")
+        return _('Edit notification')
 
     @cached_property
     def breadcrumbs(self) -> list['Element']:
         return [
-            Link(_("Homepage"), self.homepage_url),
-            Link(_("Notifications"), self.notifications_url),
+            Link(_('Homepage'), self.homepage_url),
+            Link(_('Notifications'), self.notifications_url),
             Link(self.model.title, self.request.link(self.model)),
-            Link(_("Edit"), '#')
+            Link(_('Edit'), '#')
         ]
 
     @cached_property

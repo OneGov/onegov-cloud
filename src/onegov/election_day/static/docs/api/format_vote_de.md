@@ -6,30 +6,22 @@ Eine "Gemeinde" kann auch ein Bezirk, ein Wahlkreis etc. sein.
 
 ## Inhalt
 
-<!-- https://atom.io/packages/atom-mdtoc -->
-<!-- MDTOC maxdepth:6 firsth1:2 numbering:1 flatten:0 bullets:1 updateOnSave:1 -->
+<!-- TOC updateonsave:false -->
 
-- 1. [Inhalt](#inhalt)
-- 2. [Vorbemerkungen](#vorbemerkungen)
-   - 2.1. [Einheiten](#einheiten)
-- 3. [Formate](#formate)
-   - 3.1. [Standardformat](#standardformat)
-      - 3.1.1. [Spalten](#spalten)
-      - 3.1.2. [Temporäre Resultate](#temporäre-resultate)
-      - 3.1.3. [Vorlage](#vorlage)
-   - 3.2. [OneGov](#onegov)
-      - 3.2.1. [Spalten](#spalten)
-      - 3.2.2. [Temporäre Resultate](#temporäre-resultate)
-      - 3.2.3. [Vorlage](#vorlage)
-   - 3.3. [Wabsti](#wabsti)
-      - 3.3.1. [Spalten](#spalten)
-      - 3.3.2. [Temporäre Resultate](#temporäre-resultate)
-      - 3.3.3. [Vorlage](#vorlage)
-   - 3.4. [WabstiCExport](#wabsticexport)
-      - 3.4.1. [Ermittlung des Status einer Abstimmung](#ermittlung-des-status-einer-abstimmung)
-   - 3.5. [eCH-0252](#ech-0252)
+- [Format Spezifikation Abstimmungen](#format-spezifikation-abstimmungen)
+    - [Inhalt](#inhalt)
+    - [Vorbemerkungen](#vorbemerkungen)
+        - [Einheiten](#einheiten)
+    - [Formate](#formate)
+        - [OneGov](#onegov)
+            - [Spalten](#spalten)
+            - [Temporäre Resultate](#tempor%C3%A4re-resultate)
+            - [Vorlage](#vorlage)
+        - [WabstiCExport](#wabsticexport)
+            - [Ermittlung des Status einer Abstimmung](#ermittlung-des-status-einer-abstimmung)
+        - [eCH-0252](#ech-0252)
 
-<!-- /MDTOC -->
+<!-- /TOC -->
 
 
 
@@ -41,34 +33,10 @@ Eine Einheit entspricht einer Gemeinde (kantonale Instanzen, kommunale Instanzen
 
 ## Formate
 
-### Standardformat
-
-Pro Abstimmungsvorlage besteht in der Regel eine CSV/Excel Datei. Beinhaltet die Abstimmung jedoch ein Gegenvorschlag und eine Stichfrage, dann müssen drei Dateien geliefert werden: Eine Datei mit den Resultaten der Abstimmung, eine Datei mit den Resultaten des Gegenvorschlags und eine Datei mit den Resultaten der Stichfrage.
-
-#### Spalten
-
-Jede Zeile enthält das Resultat einer einzelnen Gemeinde, sofern diese vollständig ausgezählt wurde. Folgende Spalten werden dabei in der hier aufgelisteten Reihenfolge erwartet:
-
-Name|Beschreibung
----|---
-`ID`|Die BFS-Nummer der Gemeinde zum Zeitpunkt der Abstimmung. Der Wert `0` kann für Auslandslebende verwendet werden.
-`Ja Stimmen`|Die Anzahl Ja Stimmen zu der Abstimmung. Ist der Text `unbekannt`/`unknown` eingetragen, wird die Zeile ignoriert (noch nicht ausgezählt).
-`Nein Stimmen`|Die Anzahl Nein Stimmen der Abstimmung. Ist der Text `unbekannt`/`unknown` eingetragen, wird die Zeile ignoriert (noch nicht ausgezählt).
-`Stimmberechtigte`|Die Anzahl Stimmberechtigter. Ist der Text `unbekannt`/`unknown` eingetragen, wird die Zeile ignoriert (noch nicht ausgezählt).
-`Leere Stimmzettel`|Die Anzahl leer eingelegter Stimmzettel. Ist der Text `unbekannt`/`unknown` eingetragen, wird die Zeile ignoriert (noch nicht ausgezählt).
-`Ungültige Stimmzettel`|Die Anzahl ungültiger Stimmzettel. Ist der Text `unbekannt`/`unknown` eingetragen, wird die Zeile ignoriert (noch nicht ausgezählt).
-
-#### Temporäre Resultate
-
-Gemeinden gelten als noch nicht ausgezählt, falls die Gemeinde nicht in den Resultaten enthalten ist.
-
-#### Vorlage
-
-- [vote_standard.csv](https://github.com/OneGov/onegov-cloud/blob/master/src/onegov/election_day/static/docs/api/templates/vote_standard.csv)
 
 ### OneGov
 
-Das Format, welche von der Web-Applikation für den Export verwendet wird, besteht aus einer einzelnen Datei pro Abstimmung. Es gibt für jede Gemeinde und Abstimmungstyp (Vorschlag, Gegenvorschlag, Stichfrage) eine Zeile.
+Das Format, welche von der Web-Applikation für den Export verwendet wird, besteht aus einer einzelnen Datei pro Abstimmung. Es gibt für jede Gemeinde und Abstimmungstyp (Vorschlag, Gegenentwurf/Gegenvorschlag, Stichfrage) eine Zeile.
 
 #### Spalten
 
@@ -77,7 +45,7 @@ Es werden folgende Spalten ausgewertet und sollten vorhanden sein:
 Name|Beschreibung
 ---|---
 `status`|`unknown`, `interim` or `final`.
-`type`|`proposal` (Vorschlag), `counter-proposal` (Gegenvorschlag) or `tie-breaker` (Stichfrage).
+`type`|`proposal` (Vorschlag), `counter-proposal` (Gegenentwurf/Gegenvorschlag) or `tie-breaker` (Stichfrage).
 `entity_id`|Die ID der Gemeinde. Der Wert `0` steht für Auslandschweizer.
 `counted`|Wahr wenn das Resultat ausgezählt wurde. Falsch wenn das Resultat noch nicht bekannt ist (die Werte sind noch nicht korrekt).
 `yeas`|Die Anzahl Ja Stimmen
@@ -103,37 +71,6 @@ Falls der Status
 
 - [vote_onegov.csv](https://github.com/OneGov/onegov-cloud/blob/master/src/onegov/election_day/static/docs/api/templates/vote_onegov.csv)
 
-
-### Wabsti
-
-Das Format des Wahlprogrammes "Wabsti Wahlen und Abstimmungen (VRSG)" besteht aus einer einzelnen Datei, welche alle Daten für mehrere Abstimmungen enthält. Es gibt für jede Abstimmung und Gemeinde eine Zeile.
-
-#### Spalten
-
-Es werden folgende Spalten ausgewertet und sollten vorhanden sein:
-- `Vorlage-Nr.`
-- `Name`
-- `BfS-Nr.`
-- `Stimmberechtigte`
-- `leere SZ`
-- `ungültige SZ`
-- `Ja`
-- `Nein`
-- `GegenvJa`
-- `GegenvNein`
-- `StichfrJa`
-- `StichfrNein`
-- `StimmBet`
-
-#### Temporäre Resultate
-
-Gemeinden gelten als noch nicht ausgezählt, falls eine der beiden folgenden Bedingungen zutrifft:
-- `StimmBet = 0`
-- die Gemeinde ist nicht in den Resultaten enthalten
-
-#### Vorlage
-
-- [vote_wabsti.csv](https://github.com/OneGov/onegov-cloud/blob/master/src/onegov/election_day/static/docs/api/templates/vote_wabsti.csv)
 
 
 ### WabstiCExport

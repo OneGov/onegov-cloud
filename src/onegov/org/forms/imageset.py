@@ -8,20 +8,20 @@ from wtforms.validators import InputRequired
 
 
 class ImageSetForm(Form):
-    title = StringField(_("Title"), [InputRequired()])
+    title = StringField(_('Title'), [InputRequired()])
 
     lead = TextAreaField(
-        label=_("Lead"),
-        description=_("Describes what this photo album is about"),
+        label=_('Lead'),
+        description=_('Describes what this photo album is about'),
         render_kw={'rows': 4})
 
     view = RadioField(
-        label=_("View"),
+        label=_('View'),
         default='full',
         choices=[
-            ('full', _("Full size images")),
-            ('grid', _("Grid layout"))
+            ('full', _('Full size images')),
+            ('grid', _('Grid layout'))
         ])
 
     show_images_on_homepage = BooleanField(
-        label=_("Show images on homepage"))
+        label=_('Show images on homepage'))

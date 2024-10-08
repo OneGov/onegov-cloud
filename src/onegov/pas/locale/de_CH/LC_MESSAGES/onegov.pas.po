@@ -1,0 +1,595 @@
+msgid ""
+msgstr ""
+"Project-Id-Version: OneGov Cloud 1.0\n"
+"POT-Creation-Date: 2024-07-12 10:45+0200\n"
+"PO-Revision-Date: 2021-03-03 16:24+0100\n"
+"Language-Team: German\n"
+"Language: de_CH\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Generated-By: Lingua 3.12\n"
+"Plural-Forms: nplurals=2; plural=(n != 1);\n"
+
+msgid "User"
+msgstr "Benutzer"
+
+msgid "Logout"
+msgstr "Abmelden"
+
+msgid "Management"
+msgstr "Verwaltung"
+
+msgid "Attendences"
+msgstr "Anwesenheiten"
+
+msgid "Changes"
+msgstr "Aktivitäten"
+
+msgid "PAS settings"
+msgstr "PAS Einstellungen"
+
+msgid "More settings"
+msgstr "Weitere Einstellungen"
+
+msgid "No within an active settlement run."
+msgstr "Nicht in einem aktiven Abrechungslauf"
+
+msgid "Date"
+msgstr "Datum"
+
+msgid "Duration in hours"
+msgstr "Dauer in Stunden"
+
+msgid "Type"
+msgstr "Art"
+
+msgid "Parliamentarian"
+msgstr "Parlamentarier:in"
+
+msgid "Commission"
+msgstr "Kommission"
+
+msgid "Parliamentarian is not in this commission."
+msgstr "Parlamentarier:in ist nicht in dieser Kommission."
+
+msgid "Name"
+msgstr "Name"
+
+msgid "Start"
+msgstr "Start"
+
+msgid "End"
+msgstr "Ende"
+
+msgid "Description"
+msgstr "Beschreibung"
+
+msgid "Function"
+msgstr "Funktion"
+
+msgid "Personnel number"
+msgstr "Personalnummer"
+
+msgid "Basic properties"
+msgstr "Grundeigenschaften"
+
+msgid "Contract number"
+msgstr "Vertragsnummer"
+
+msgid "Gender"
+msgstr "Geschlecht"
+
+msgid "First name"
+msgstr "Vorname"
+
+msgid "Last name"
+msgstr "Nachname"
+
+msgid "Picture"
+msgstr "Bild"
+
+msgid "Shipping method"
+msgstr "Versandart"
+
+msgid "Shipping address"
+msgstr "Versandadresse"
+
+msgid "Address"
+msgstr "Adresse"
+
+msgid "Addition"
+msgstr "Adresszusatz"
+
+msgid "Zip code"
+msgstr "PLZ"
+
+msgid "City"
+msgstr "Stadt"
+
+msgid "Private address"
+msgstr "Privatadresse"
+
+msgid "Date of birth"
+msgstr "Geburtsdatum"
+
+msgid "Additional information"
+msgstr "Zusatzinformationen"
+
+msgid "Date of death"
+msgstr "Sterbedatum"
+
+msgid "Place of origin"
+msgstr "Bürgerort"
+
+msgid "Occupation"
+msgstr "Beruf"
+
+msgid "Academic title"
+msgstr "Akademischer Titel"
+
+msgid "Salutation"
+msgstr "Anrede"
+
+msgid "Salutation used in the address"
+msgstr "Adress-Anrede"
+
+msgid "Salutation used for letters"
+msgstr "Brief-Anrede"
+
+msgid "How bills should be delivered"
+msgstr "Spedition Vorlagen"
+
+msgid "Private phone number"
+msgstr "Telefon Privat"
+
+msgid "Mobile phone number"
+msgstr "Telefon Mobile"
+
+msgid "Business phone number"
+msgstr "Telefon Geschäft"
+
+msgid "Primary email address"
+msgstr "1. E-Mail"
+
+msgid "Secondary email address"
+msgstr "2. E-Mail"
+
+msgid "Website"
+msgstr "Webseite"
+
+msgid "Remarks"
+msgstr "Bemerkungen"
+
+msgid "Role"
+msgstr "Rolle"
+
+msgid "Party"
+msgstr "Partei"
+
+msgid "Party role"
+msgstr "Rolle in der Partei"
+
+msgid "Parliamentary group"
+msgstr "Fraktion"
+
+msgid "Parliamentary group role"
+msgstr "Rolle in der Fraktion"
+
+msgid "Portrait"
+msgstr "Portrait"
+
+msgid "Year"
+msgstr "Jahr"
+
+msgid "Cost of living adjustment"
+msgstr "Teuerungszulage"
+
+msgid "Percentage"
+msgstr "Prozent"
+
+msgid "President"
+msgstr "Präsident:in"
+
+msgid "Plenary session"
+msgstr "Plenarsitzung"
+
+msgid "half-day"
+msgstr "Halbtag"
+
+msgid "Member"
+msgstr "Mitglied"
+
+msgid "Commission meeting"
+msgstr "Kommissionsitzung"
+
+msgid "first 2h"
+msgstr "bis 2h"
+
+msgid "per additional 1/2h"
+msgstr "pro weitere 1/2h"
+
+msgid "President: File study"
+msgstr "Präsident:in: Aktenstudium"
+
+msgid "per 1/2h"
+msgstr "pro 1/2h"
+
+msgid "Member: File study"
+msgstr "Mitglied: Aktenstudium"
+
+msgid "intercantonal commission"
+msgstr "interkantonale Kommission"
+
+msgid "per 1h"
+msgstr "pro 1h"
+
+msgid "official mission"
+msgstr "amtliche Mission"
+
+msgid "full-day"
+msgstr "Ganztag"
+
+msgid "Vice president"
+msgstr "Vize-Präsident:in"
+
+msgid "Vice president: File study"
+msgstr "Vize-Präsident:in: Aktenstudium"
+
+msgid "Shortest meeting"
+msgstr "Kürzestsitzung"
+
+#, python-format
+msgid "Rate set for ${year} alredy exists"
+msgstr "Sätze für ${year} bereits erfasst"
+
+msgid "Active"
+msgstr "Aktiv"
+
+msgid "End must be after start"
+msgstr "Ende muss nach dem Start liegen"
+
+#, python-format
+msgid "Dates overlap with existing settlement run: ${start} - ${end}"
+msgstr ""
+"Daten überschneiden sich mit bestehendem Abrechnungslauf: ${start} - ${end}"
+
+msgid "Homepage"
+msgstr "Startseite"
+
+msgid "Add"
+msgstr "Hinzufügen"
+
+msgid "Attendence"
+msgstr "Anwesenheit"
+
+msgid "Edit"
+msgstr "Bearbeiten"
+
+msgid "Delete"
+msgstr "Löschen"
+
+msgid "Do you really want to delete this meeting?"
+msgstr "Diese Sitzung wirklich löschen?"
+
+msgid "This cannot be undone."
+msgstr "Dies kann nicht rückgängig gemacht werden."
+
+msgid "Delete meeting"
+msgstr "Sitzung löschen"
+
+msgid "Cancel"
+msgstr "Abbrechen"
+
+msgid "Commissions"
+msgstr "Kommissionen"
+
+msgid "Do you really want to delete this commission?"
+msgstr "Möchten Sie die Kommission wirklich löschen?"
+
+msgid "Delete commission"
+msgstr "Kommission löschen"
+
+msgid "Remove"
+msgstr "Entfernen"
+
+msgid "Do you really want to remove this parliamentarian?"
+msgstr "Diese:n Parlamentarier:in wirklich entfernen?"
+
+msgid "Remove parliamentarian"
+msgstr "Parlamentarier:in entfernen"
+
+#, python-format
+msgid "${hours} hours ${minutes} minutes"
+msgstr "${hours} Stunden ${minutes} Minuten"
+
+#, python-format
+msgid "${hours} hours"
+msgstr "${hours} Stunden"
+
+#, python-format
+msgid "${minutes} minutes"
+msgstr "${minutes} Minuten"
+
+msgid "Legislative periods"
+msgstr "Legislaturen"
+
+msgid "Legislative period"
+msgstr "Legislatur"
+
+msgid "Do you really want to delete this legislative period?"
+msgstr "Möchten Sie die Legislatur wirklich löschen?"
+
+msgid "Delete legislative period"
+msgstr "Legislatur löschen"
+
+msgid "Parliamentarians"
+msgstr "Parlamentarier:innen"
+
+msgid "Do you really want to delete this parliamentarian?"
+msgstr "Möchten Sie diese:n Parlamentarier:in wirklich löschen?"
+
+msgid "Delete parliamentarian"
+msgstr "Parlamentarier:in löschen"
+
+msgid "Do you really want to remove this role?"
+msgstr "Rolle wirklich entfernen?"
+
+msgid "Remove role"
+msgstr "Rolle entfernen"
+
+msgid "Parliamentary groups"
+msgstr "Fraktionen"
+
+msgid "Do you really want to delete this parliamentary group?"
+msgstr "Möchten Sie diese Fraktion wirklich löschen?"
+
+msgid "Delete parliamentary group"
+msgstr "Fraktion löschen"
+
+msgid "Parties"
+msgstr "Parteien"
+
+msgid "Do you really want to delete this party?"
+msgstr "Möchten Sie diese Partei wirklich löschen?"
+
+msgid "Delete party"
+msgstr "Partei löschen"
+
+msgid "Rate sets"
+msgstr "Sätze"
+
+msgid "Rate set"
+msgstr "Sätze"
+
+msgid "Do you really want to delete this rate set?"
+msgstr "Möchten Sie diesen Satz wirklich löschen?"
+
+msgid "Delete rate set"
+msgstr "Satz löschen"
+
+msgid "Settlement runs"
+msgstr "Abrechnungsläufe"
+
+msgid "Settlement run"
+msgstr "Abrechnungslauf"
+
+msgid "Do you really want to delete this settlement run?"
+msgstr "Möchten Sie diesen Abrechnungslauf wirklich löschen?"
+
+msgid "Delete settlement run"
+msgstr "Abrechnungslauf löschen"
+
+msgid "File study"
+msgstr "Aktenstudium"
+
+msgid "Attendence added"
+msgstr "Anwesenheit hinzugefügt"
+
+msgid "Attendence modified"
+msgstr "Anwesenheit bearbeitet"
+
+msgid "Attendence removed"
+msgstr "Anwesenheit gelöscht"
+
+msgid "normal"
+msgstr "normal"
+
+msgid "intercantonal"
+msgstr "interkantonal"
+
+msgid "Guest"
+msgstr "Gast"
+
+msgid "Extended Member"
+msgstr "erweitertes Mitglied"
+
+msgid "male"
+msgstr "männlich"
+
+msgid "female"
+msgstr "weiblich"
+
+msgid "A mail"
+msgstr "A-Post"
+
+msgid "A mail plus"
+msgstr "A-Post Plus"
+
+msgid "registered"
+msgstr "eingeschrieben"
+
+msgid "confidential"
+msgstr "vertraulich"
+
+msgid "personal / confidential"
+msgstr "persönlich / vertraulich"
+
+msgid "none"
+msgstr "keine"
+
+msgid "Vote counter"
+msgstr "Stimmenzähler"
+
+msgid "Media Manager"
+msgstr "Leiter Medien und Kampagnen"
+
+msgid "President of the parliamentary group"
+msgstr "Fraktionsschef"
+
+msgid "Duration"
+msgstr "Dauer"
+
+msgid "No meeting defined yet."
+msgstr "Noch keine Sitzung erfasst."
+
+msgid "Comission"
+msgstr "Kommission"
+
+msgid "Timestamp"
+msgstr "Zeitpunkt"
+
+msgid "No changes yet."
+msgstr "Noch keine Aktivitäten."
+
+msgid "Action"
+msgstr "Aktion"
+
+msgid "No commissions defined yet."
+msgstr "Noch keine Kommissionen erfasst."
+
+msgid "Filters"
+msgstr "Filter"
+
+msgid "Skip navigation"
+msgstr "Navigation überspringen"
+
+msgid "Search term"
+msgstr "Suchbegriff"
+
+msgid "Back to the homepage"
+msgstr "Zurück zur Startseite"
+
+msgid "Logo"
+msgstr "Logo"
+
+msgid "The form contains errors. Please check the fields marked in red."
+msgstr ""
+"Das Formular enthält Fehler. Bitte die rot markierten Felder überprüfen."
+
+msgid "Copied to Clipboard!"
+msgstr "In die Zwischenablage kopiert!"
+
+msgid "No legislative periods defined yet."
+msgstr "Noch keine Legislaturen erfasst."
+
+msgid "Roles"
+msgstr "Rollen"
+
+msgid "Parliament"
+msgstr "Parlament"
+
+msgid "No parliamentarians defined yet."
+msgstr "Noch keine Parlamentarier:innen erfasst."
+
+msgid "No parliamentary groups defined yet."
+msgstr "Noch keine Fraktionen erfasst."
+
+msgid "No parties defined yet."
+msgstr "Noch keine Parteien erfasst."
+
+msgid "Amount"
+msgstr "Betrag"
+
+msgid "No rate sets defined yet."
+msgstr "Noch keine Sätze erfasst."
+
+msgid "Yes"
+msgstr "Ja"
+
+msgid "No"
+msgstr "Nein"
+
+msgid "No settlement runs defined yet."
+msgstr "Noch keine Abrechnungsläufe erfasst"
+
+msgid "Added a new attendence"
+msgstr "Neue Anwesenheit hinzugefügt"
+
+msgid "New"
+msgstr "Neu"
+
+msgid "New attendence"
+msgstr "Neue Anwesenheit"
+
+msgid "Added plenary session"
+msgstr "Plenarsitzung hinzugefügt"
+
+msgid "New plenary session"
+msgstr "Neue Plenarsitzung"
+
+msgid "Your changes were saved"
+msgstr "Änderungen gespeichert"
+
+msgid "Inactive"
+msgstr "Inaktiv"
+
+msgid "Added a new commission"
+msgstr "Kommission hinzugefügt"
+
+msgid "New commission"
+msgstr "Neue Kommission"
+
+msgid "Added a new parliamentarian"
+msgstr "Parlamentarier:in hinzugefügt"
+
+msgid "New parliamentarian"
+msgstr "Neue:r Parlamentarier:in"
+
+msgid "Added commission meeting"
+msgstr "Kommissionsitzung hinzugefügt"
+
+msgid "New commission meeting"
+msgstr "Neue Kommissionsitzung"
+
+msgid "Dashboard"
+msgstr "Startseite"
+
+msgid "Added a new legislative period"
+msgstr "Legislatur hinzugefügt"
+
+msgid "New legislative period"
+msgstr "Neue Legislatur"
+
+msgid "Added a new role"
+msgstr "Neue Rolle hinzugefügt"
+
+msgid "New role"
+msgstr "Neue Rolle"
+
+msgid "Added a new parliamentary group"
+msgstr "Fraktion hinzugefügt"
+
+msgid "New parliamentary group"
+msgstr "Neue Fraktion"
+
+msgid "Added a new party"
+msgstr "Partei hinzugefügt"
+
+msgid "New party"
+msgstr "Neue Partei"
+
+msgid "Added a new rate set"
+msgstr "Neue Sätze hinzugefügt"
+
+msgid "New rate set"
+msgstr "Neue Sätze"
+
+msgid "Usermanagement"
+msgstr "Benutzerverwaltung"
+
+msgid "Added a new settlement run"
+msgstr "Neuer Abrechnungslauf hinzugefügt"
+
+msgid "New settlement run"
+msgstr "Neuer Abrechnungslauf"

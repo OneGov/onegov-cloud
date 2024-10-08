@@ -12,22 +12,31 @@ from onegov.core.elements import Link, LinkGroup
 from onegov.org.models import Dashboard, ExportCollection
 
 
+from typing import TYPE_CHECKING
+if TYPE_CHECKING:
+    from collections.abc import Iterator
+    from onegov.core.types import RenderData
+    from onegov.feriennet.request import FeriennetRequest
+
+
 @FeriennetApp.template_variables()
-def get_template_variables(request):
+def get_template_variables(request: 'FeriennetRequest') -> 'RenderData':
     return {
         'global_tools': tuple(get_global_tools(request)),
         'top_navigation': tuple(get_top_navigation(request))
     }
 
 
-def get_global_tools(request):
+def get_global_tools(
+    request: 'FeriennetRequest'
+) -> 'Iterator[Link | LinkGroup]':
     yield from get_base_tools(request)
     yield from get_personal_tools(request)
     yield from get_admin_tools(request)
 
     if request.app.show_volunteers(request):
         yield Link(
-            text=_("Help us"),
+            text=_('Help us'),
             url=request.class_link(
                 VacationActivityCollection, name='volunteer'
             ),
@@ -35,7 +44,9 @@ def get_global_tools(request):
         )
 
 
-def get_admin_tools(request):
+def get_admin_tools(
+    request: 'FeriennetRequest'
+) -> 'Iterator[Link | LinkGroup]':
     if request.is_organiser:
         period = request.app.active_period
         periods = request.app.periods
@@ -45,7 +56,7 @@ def get_admin_tools(request):
         if request.is_admin:
             links.append(
                 Link(
-                    text=_("Dashboard"),
+                    text=_('Dashboard'),
                     url=request.class_link(Dashboard),
                     attrs={'class': 'show-dashboard'}
                 )
@@ -53,7 +64,7 @@ def get_admin_tools(request):
 
             links.append(
                 Link(
-                    text=_("Periods"),
+                    text=_('Periods'),
                     url=request.class_link(PeriodCollection),
                     attrs={'class': 'manage-periods'}
                 )
@@ -62,7 +73,7 @@ def get_admin_tools(request):
             if periods:
                 links.append(
                     Link(
-                        text=_("Matching"),
+                        text=_('Matching'),
                         url=request.class_link(MatchCollection),
                         attrs={'class': 'manage-matches'}
                     )
@@ -70,7 +81,7 @@ def get_admin_tools(request):
 
                 links.append(
                     Link(
-                        text=_("Billing"),
+                        text=_('Billing'),
                         url=request.class_link(BillingCollection),
                         attrs={'class': 'manage-billing'}
                     )
@@ -81,7 +92,7 @@ def get_admin_tools(request):
                 if request.app.show_volunteers(request):
                     links.append(
                         Link(
-                            text=_("Volunteers"),
+                            text=_('Volunteers'),
                             url=request.link(
                                 VolunteerCollection(
                                     request.session,
@@ -94,7 +105,7 @@ def get_admin_tools(request):
 
                 links.append(
                     Link(
-                        text=_("Notifications"),
+                        text=_('Notifications'),
                         url=request.class_link(
                             NotificationTemplateCollection
                         ),
@@ -104,7 +115,7 @@ def get_admin_tools(request):
 
                 links.append(
                     Link(
-                        text=_("Exports"),
+                        text=_('Exports'),
                         url=request.class_link(
                             ExportCollection
                         ),
@@ -114,7 +125,7 @@ def get_admin_tools(request):
 
         if links:
             title = period and period.active and period.title
-            title = title or _("No active period")
+            title = title or _('No active period')
 
             if len(title) > 25:
                 title = f'{title[:25]}…'
@@ -126,11 +137,15 @@ def get_admin_tools(request):
             )
 
 
-def get_personal_tools(request):
+def get_personal_tools(
+    request: 'FeriennetRequest'
+) -> 'Iterator[Link | LinkGroup]':
     # for logged-in users show the number of open bookings
     if request.is_logged_in:
         session = request.session
         username = request.current_username
+        assert username is not None
+        assert request.current_user is not None
 
         period = request.app.active_period
         periods = request.app.periods
@@ -154,7 +169,7 @@ def get_personal_tools(request):
                 }
 
             yield Link(
-                text=_("Invoices"),
+                text=_('Invoices'),
                 url=request.link(invoices),
                 attrs=attributes
             )
@@ -162,6 +177,7 @@ def get_personal_tools(request):
         bookings = BookingCollection(session)
 
         if period:
+            states: tuple[str, ...]
             if period.confirmed:
                 states = ('open', 'accepted')
             else:
@@ -184,13 +200,13 @@ def get_personal_tools(request):
                 }
 
             yield Link(
-                text=period.confirmed and _("Bookings") or _("Wishlist"),
+                text=period.confirmed and _('Bookings') or _('Wishlist'),
                 url=request.link(bookings),
                 attrs=attributes
             )
         else:
             yield Link(
-                text=_("Wishlist"),
+                text=_('Wishlist'),
                 url=request.link(bookings),
                 attrs={
                     'data-count': '0',
@@ -199,13 +215,12 @@ def get_personal_tools(request):
             )
 
 
-def get_top_navigation(request):
-
+def get_top_navigation(request: 'FeriennetRequest') -> 'Iterator[Link]':
     # inject an activites link in front of all top navigation links
     yield Link(
-        text=_("Activities"),
+        text=_('Activities'),
         url=request.class_link(VacationActivityCollection)
     )
 
     layout = DefaultLayout(request.app.org, request)
-    yield from layout.top_navigation
+    yield from layout.top_navigation or ()

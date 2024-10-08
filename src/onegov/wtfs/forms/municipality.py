@@ -25,32 +25,32 @@ if TYPE_CHECKING:
 class MunicipalityForm(Form):
 
     name = StringField(
-        label=_("Name"),
+        label=_('Name'),
         validators=[
             InputRequired()
         ]
     )
 
     bfs_number = IntegerField(
-        label=_("BFS number"),
+        label=_('BFS number'),
         validators=[
             InputRequired()
         ]
     )
 
     address_supplement = StringField(
-        label=_("Address supplement"),
+        label=_('Address supplement'),
     )
 
     gpn_number = IntegerField(
-        label=_("GPN number"),
+        label=_('GPN number'),
         validators=[
             Optional()
         ]
     )
 
     payment_type = RadioField(
-        label=_("Payment type"),
+        label=_('Payment type'),
         validators=[InputRequired()]
     )
 
@@ -78,7 +78,7 @@ class MunicipalityForm(Form):
 class ImportMunicipalityDataForm(Form):
 
     file = MunicipalityDataUploadField(
-        label=_("File"),
+        label=_('File'),
         validators=[
             DataRequired()
         ]
@@ -91,14 +91,14 @@ class ImportMunicipalityDataForm(Form):
 class DeleteMunicipalityDatesForm(Form):
 
     start = DateField(
-        label=_("Start date"),
+        label=_('Start date'),
         validators=[
             DataRequired()
         ]
     )
 
     end = DateField(
-        label=_("End date"),
+        label=_('End date'),
         validators=[
             DataRequired()
         ]
@@ -126,7 +126,7 @@ class DeleteMunicipalityDatesForm(Form):
 class MunicipalityIdSelectionForm(Form):
 
     municipality_id = SelectField(
-        label=_("Municipality"),
+        label=_('Municipality'),
         choices=[],
         validators=[
             InputRequired()

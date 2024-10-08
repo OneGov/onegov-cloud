@@ -39,7 +39,7 @@ A single model may be associated to any number of other models. For example::
 Here, ``Payment`` is associable (through the ``Payable`` mixin).
 ``Reservation`` and ``Form`` in turn inherit from ``Payable``.
 
-This all is probably best understood in an example:
+This all is probably best understood in an example::
 
         class Payment(Base, Associable):
             __tablename__ == 'payments'
@@ -250,6 +250,20 @@ def associated(
                     nullable=False
                 )
             )
+            # The reference from the files class back to the target class fails
+            # to account for polymorphic identities.
+            #
+            # I think this cannot be fixed, as the file class would have to
+            # keep track of the polymorphic class in question through a
+            # separate column and a loading strategy that takes that into
+            # account.
+            #
+            # As a result we disable type-checks here. Note that the target
+            # class may have to override __eq__ and __hash__ to get cascades
+            # to work properly.
+            #
+            # Have a look at onegov.chat.models.Message to see how that has
+            # been done.
             file_backref = backref(
                 backref_name,
                 enable_typechecks=False
@@ -273,20 +287,6 @@ def associated(
         return relationship(
             argument=associated_cls,
             secondary=association_table,
-            # The reference from the files class back to the target class fails
-            # to account for polymorphic identities.
-            #
-            # I think this cannot be fixed, as the file class would have to
-            # keep track of the polymorphic class in question through a
-            # separate column and a loading strategy that takes that into
-            # account.
-            #
-            # As a result we disable type-checks here. Note that the target
-            # class may have to override __eq__ and __hash__ to get cascades
-            # to work properly.
-            #
-            # Have a look at onegov.chat.models.Message to see how that has
-            # been done.
             backref=file_backref,
             back_populates=back_populates,
             single_parent=single_parent,
@@ -369,7 +369,7 @@ class Associable:
         to the associable model.
 
         """
-        assert self.registered_links is not None, "No links registered"
+        assert self.registered_links is not None, 'No links registered'
 
         session = object_session(self)
 

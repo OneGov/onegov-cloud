@@ -11,7 +11,7 @@ if TYPE_CHECKING:
     from collections.abc import Collection
     from datetime import date
     from sqlalchemy.orm import Query, Session
-    from typing_extensions import Self
+    from typing import Self
     from uuid import UUID
 
 
@@ -36,7 +36,7 @@ class ScanJobCollection(Pagination[ScanJob]):
     def __init__(
         self,
         session: 'Session',
-        page: int | None = None,
+        page: int = 0,
         group_id: str | None = None,
         from_date: 'date | None' = None,
         to_date: 'date | None' = None,
@@ -46,8 +46,8 @@ class ScanJobCollection(Pagination[ScanJob]):
         sort_by: str | None = None,
         sort_order: str | None = None
     ):
+        super().__init__(page)
         self.session = session
-        self.page = page
         self.group_id = group_id
         self.from_date = from_date
         self.to_date = to_date
@@ -181,7 +181,7 @@ class ScanJobCollection(Pagination[ScanJob]):
 
         return self.__class__(
             self.session,
-            page=None,
+            page=0,
             group_id=self.group_id,
             from_date=self.from_date,
             to_date=self.to_date,

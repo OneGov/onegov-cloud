@@ -3,8 +3,9 @@ import sedate
 from copy import copy
 from datetime import timedelta
 from functools import cached_property
+from markupsafe import Markup
 from onegov.core.orm.mixins import (
-    content_property, dict_property, meta_property)
+    content_property, dict_markup_property, dict_property, meta_property)
 from onegov.core.utils import linkify
 from onegov.directory import (
     Directory, DirectoryEntry, DirectoryEntryCollection)
@@ -14,7 +15,8 @@ from onegov.form import as_internal_id, Extendable, FormSubmission
 from onegov.form.submissions import prepare_for_submission
 from onegov.org import _
 from onegov.org.models.extensions import (
-    CoordinatesExtension, GeneralFileLinkExtension, PublicationExtension)
+    CoordinatesExtension, GeneralFileLinkExtension, PublicationExtension,
+    DeletableContentExtension)
 from onegov.org.models.extensions import AccessExtension
 from onegov.org.models.message import DirectoryMessage
 from onegov.pay import Price
@@ -26,7 +28,6 @@ from sqlalchemy.orm import object_session
 from typing import Any, Literal, TYPE_CHECKING
 if TYPE_CHECKING:
     from collections.abc import Collection, Mapping
-    from markupsafe import Markup
     from onegov.directory.models.directory import DirectoryEntryForm
     from onegov.directory.collections.directory_entry import (
         DirectorySearchWidget)
@@ -36,7 +37,7 @@ if TYPE_CHECKING:
     from onegov.pay.types import PaymentMethod
     from sqlalchemy.orm import Query, Session, relationship
     from typing import type_check_only
-    from typing_extensions import TypeAlias
+    from typing import TypeAlias
     from uuid import UUID
     from wtforms import EmailField, Field, StringField, TextAreaField
 
@@ -138,10 +139,19 @@ class DirectorySubmissionAction:
     @property
     def valid(self) -> bool:
         return True if (
-            self.action in ('adopt', 'reject')
+            self.action in ('adopt', 'reject', 'withdraw_rejection')
             and self.directory
             and self.submission
         ) else False
+
+    @property
+    def is_entry(self) -> bool:
+        return not self.is_change
+
+    @property
+    def is_change(self) -> bool:
+        return ('change-request'
+                in self.submission.extensions)  # type:ignore[union-attr]
 
     def execute(self, request: 'OrgRequest') -> None:
         assert self.valid
@@ -160,7 +170,7 @@ class DirectorySubmissionAction:
 
         # be idempotent
         if self.ticket.handler_data.get('state') == 'adopted':
-            request.success(_("The submission was adopted"))
+            request.success(_('The submission was adopted'))
             return
 
         # the directory might have changed -> migrate what we can
@@ -177,23 +187,23 @@ class DirectorySubmissionAction:
         # if the migration fails, update the form on the submission
         # and redirect to it so it can be fixed
         if not migration.possible:
-            request.alert(_("The entry is not valid, please adjust it"))
+            request.alert(_('The entry is not valid, please adjust it'))
             return
 
         data = self.submission.data.copy()
         migration.migrate_values(data)
 
         try:
-            if 'change-request' in self.submission.meta['extensions']:
+            if 'change-request' in self.submission.extensions:
                 entry = self.apply_change_request(request, data)
             else:
                 entry = self.create_new_entry(request, data)
 
         except DuplicateEntryError:
-            request.alert(_("An entry with this name already exists"))
+            request.alert(_('An entry with this name already exists'))
             return
         except ValidationError:
-            request.alert(_("The entry is not valid, please adjust it"))
+            request.alert(_('The entry is not valid, please adjust it'))
             return
 
         self.ticket.handler_data['entry_name'] = entry.name
@@ -212,10 +222,10 @@ class DirectorySubmissionAction:
         self.send_mail_if_enabled(
             request=request,
             template='mail_directory_entry_adopted.pt',
-            subject=_("Your directory submission has been adopted"),
+            subject=_('Your directory submission has been adopted'),
         )
 
-        request.success(_("The submission was adopted"))
+        request.success(_('The submission was adopted'))
 
         assert self.ticket is not None
         DirectoryMessage.create(
@@ -279,10 +289,10 @@ class DirectorySubmissionAction:
         self.send_mail_if_enabled(
             request=request,
             template='mail_directory_entry_applied.pt',
-            subject=_("Your change request has been applied"),
+            subject=_('Your change request has been applied'),
         )
 
-        request.success(_("The change request was applied"))
+        request.success(_('The change request was applied'))
 
         assert self.ticket is not None
         DirectoryMessage.create(
@@ -295,21 +305,72 @@ class DirectorySubmissionAction:
 
         # be idempotent
         if self.ticket.handler_data.get('state') == 'rejected':
-            request.success(_("The submission was rejected"))
+            request.success(_('The submission was rejected'))
             return
 
         self.ticket.handler_data['state'] = 'rejected'
 
-        self.send_mail_if_enabled(
-            request=request,
-            template='mail_directory_entry_rejected.pt',
-            subject=_("Your directory submission has been rejected"),
-        )
+        extensions = self.submission.extensions  # type:ignore[union-attr]
+        type = 'change' if ('change-request' in extensions) else 'entry'
+        if type == 'entry':
+            self.send_mail_if_enabled(
+                request=request,
+                template='mail_directory_entry_rejected.pt',
+                subject=_(
+                    'Your directory entry submission has been rejected'),
+            )
+            request.success(_('The entry submission has been rejected'))
+            assert self.directory
+            DirectoryMessage.create(
+                self.directory, self.ticket, request, 'entry-rejected')
+        else:
+            self.send_mail_if_enabled(
+                request=request,
+                template='mail_directory_entry_rejected.pt',
+                subject=_(
+                    'Your directory change submission has been rejected'),
+            )
+            request.success(_('The change submission has been rejected'))
+            assert self.directory
+            DirectoryMessage.create(
+                self.directory, self.ticket, request, 'change-rejected')
+
+    def withdraw_rejection(self, request: 'OrgRequest') -> None:
+        assert self.ticket is not None
+
+        # be idempotent
+        if self.ticket.handler_data.get('state') == None:
+            request.success(_('The rejection was already withdrawn'))
+            return
+
+        self.ticket.handler_data['state'] = None
 
         assert self.directory is not None
-        request.success(_("The submission was rejected"))
-        DirectoryMessage.create(
-            self.directory, self.ticket, request, 'rejected')
+        if self.is_entry:
+            self.send_mail_if_enabled(
+                request=request,
+                template='mail_directory_entry_rejection_withdrawn.pt',
+                subject=_('The directory entry submission rejection '
+                          'has been withdrawn'),
+            )
+            request.success(
+                _('The rejection of the entry has been withdrawn'))
+            DirectoryMessage.create(
+                self.directory, self.ticket, request,
+                'entry-rejection-withdrawn')
+
+        elif self.is_change:
+            self.send_mail_if_enabled(
+                request=request,
+                template='mail_directory_entry_rejection_withdrawn.pt',
+                subject=_('The directory change submission rejection '
+                          'has been withdrawn'),
+            )
+            request.success(
+                _('The rejection of the change has been withdrawn'))
+            DirectoryMessage.create(
+                self.directory, self.ticket, request,
+                'change-rejection-withdrawn')
 
 
 class ExtendedDirectory(Directory, AccessExtension, Extendable,
@@ -328,13 +389,14 @@ class ExtendedDirectory(Directory, AccessExtension, Extendable,
     enable_submissions: dict_property[bool | None] = meta_property()
     enable_change_requests: dict_property[bool | None] = meta_property()
     enable_publication: dict_property[bool | None] = meta_property()
+    enable_update_notifications: dict_property[bool | None] = meta_property()
     required_publication: dict_property[bool | None] = meta_property()
     submitter_meta_fields: dict_property[list[str] | None] = meta_property()
 
-    submissions_guideline: dict_property[str | None] = content_property()
-    change_requests_guideline: dict_property[str | None] = content_property()
+    submissions_guideline = dict_markup_property('content')
+    change_requests_guideline = dict_markup_property('content')
 
-    text: dict_property[str | None] = content_property()
+    text = dict_markup_property('content')
     title_further_information: dict_property[str | None] = content_property()
     position: dict_property[str] = content_property(default='below')
     price: dict_property[Literal['free', 'paid'] | None] = content_property()
@@ -353,6 +415,8 @@ class ExtendedDirectory(Directory, AccessExtension, Extendable,
     overview_two_columns: dict_property[bool | None] = content_property()
     numbering: dict_property[str | None] = content_property()
     numbers: dict_property[str | None] = content_property()
+
+    layout: dict_property[str | None] = content_property(default='default')
 
     @property
     def entry_cls_name(self) -> str:
@@ -402,7 +466,7 @@ class ExtendedDirectory(Directory, AccessExtension, Extendable,
 
     def submission_action(
         self,
-        action: Literal['adopt', 'reject'],
+        action: Literal['adopt', 'reject', 'withdraw_rejection'],
         submission_id: 'UUID'
     ) -> DirectorySubmissionAction:
 
@@ -428,7 +492,8 @@ class ExtendedDirectory(Directory, AccessExtension, Extendable,
 
 
 class ExtendedDirectoryEntry(DirectoryEntry, PublicationExtension,
-                             CoordinatesExtension, AccessExtension):
+                             CoordinatesExtension, AccessExtension,
+                             DeletableContentExtension):
     __mapper_args__ = {'polymorphic_identity': 'extended'}
 
     es_type_name = 'extended_directory_entries'
@@ -447,9 +512,8 @@ class ExtendedDirectoryEntry(DirectoryEntry, PublicationExtension,
     def display_config(self) -> dict[str, Any]:
         return self.directory.configuration.display or {}
 
-    # FIXME: Use Markup
     @property
-    def contact(self) -> str | None:
+    def contact(self) -> Markup | None:
         contact_config = tuple(
             as_internal_id(name) for name in
             self.display_config.get('contact', ())
@@ -465,10 +529,10 @@ class ExtendedDirectoryEntry(DirectoryEntry, PublicationExtension,
             for name in contact_config:
                 values.append(self.values.get(name))
 
-            result = '\n'.join(linkify(v) for v in values if v)
+            result = Markup('\n').join(linkify(v) for v in values if v)
 
-            return '<ul><li>{}</li></ul>'.format(
-                '</li><li>'.join(result.splitlines())
+            return Markup('<ul><li>{}</li></ul>').format(
+                Markup('</li><li>').join(result.splitlines())
             )
         return None
 

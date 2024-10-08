@@ -11,7 +11,7 @@ if TYPE_CHECKING:
     from datetime import date
     from datetime import datetime
     from gettext import GNUTranslations
-    from reportlab.lib.styles import ParagraphStyle
+    from reportlab.lib.styles import PropertySet
 
 
 class Pdf(PdfBase):
@@ -59,16 +59,19 @@ class Pdf(PdfBase):
         self.style.indent_1.leftIndent = 1 * self.style.indent_1.fontSize
         self.style.indent_2.leftIndent = 2 * self.style.indent_2.fontSize
 
-        self.style.table_results = self.style.tableHead + (
+        self.style.table_results = (
+            *self.style.tableHead,
             ('ALIGN', (0, 0), (0, -1), 'LEFT'),
             ('ALIGN', (1, 0), (-1, -1), 'RIGHT'),
         )
-        self.style.table_factoids = self.style.table + (
+        self.style.table_factoids = (
+            *self.style.table,
             ('ALIGN', (0, 0), (1, -1), 'LEFT'),
             ('ALIGN', (1, 0), (-1, -1), 'CENTER'),
             ('ALIGN', (-2, 0), (-1, -1), 'RIGHT'),
         )
-        self.style.table_dates = self.style.table + (
+        self.style.table_dates = (
+            *self.style.table,
             ('ALIGN', (0, 0), (1, -1), 'LEFT'),
             ('ALIGN', (-2, 0), (-1, -1), 'RIGHT'),
         )
@@ -86,17 +89,17 @@ class Pdf(PdfBase):
                 translated = translator.gettext(text)
         return text.interpolate(translated)
 
-    def h1(self, title: str, style: 'ParagraphStyle | None' = None) -> None:
+    def h1(self, title: str, style: 'PropertySet | None' = None) -> None:
         """ Translated H1. """
 
         super().h1(self.translate(title), style=style)
 
-    def h2(self, title: str, style: 'ParagraphStyle | None' = None) -> None:
+    def h2(self, title: str, style: 'PropertySet | None' = None) -> None:
         """ Translated H2. """
 
         super().h2(self.translate(title), style=style)
 
-    def h3(self, title: str, style: 'ParagraphStyle | None' = None) -> None:
+    def h3(self, title: str, style: 'PropertySet | None' = None) -> None:
         """ Translated H3. """
 
         super().h3(self.translate(title), style=style)
@@ -104,7 +107,7 @@ class Pdf(PdfBase):
     def figcaption(
         self,
         text: str,
-        style: 'ParagraphStyle | None' = None
+        style: 'PropertySet | None' = None
     ) -> None:
         """ Translated Figcaption. """
 
@@ -150,7 +153,7 @@ class Pdf(PdfBase):
         assert not foot or len(foot) == len(head)
         assert not hide or len(hide) == len(head)
 
-        columns = [[self.translate(cell) for cell in head]] + body
+        columns = [[self.translate(cell) for cell in head], *body]
         if foot:
             columns += [foot]
         columns = [

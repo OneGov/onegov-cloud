@@ -28,8 +28,7 @@ if TYPE_CHECKING:
     from sqlalchemy.engine import Connection
     from sqlalchemy.orm import Query, Session
     from types import CodeType, ModuleType
-    from typing import Protocol
-    from typing_extensions import ParamSpec, TypeAlias, TypeGuard
+    from typing import ParamSpec, Protocol, TypeAlias, TypeGuard
 
     from .request import CoreRequest
 
@@ -44,6 +43,7 @@ if TYPE_CHECKING:
         always_run: bool
         requires: str | None
         raw: bool
+
         def __call__(self, *args: _P.args, **kwargs: _P.kwargs) -> _T_co: ...
 
     RawFunc: TypeAlias = Callable[[Connection, Sequence[str]], Any]
@@ -144,7 +144,7 @@ def get_upgrade_modules() -> 'Iterator[tuple[str, ModuleType]]':
             yield entry.name, importlib.import_module(entry.module_name)
 
 
-class upgrade_task:
+class upgrade_task:  # noqa: N801
     """ Marks the decorated function as an upgrade task. Upgrade tasks should
     be defined outside classes (except for testing) - that is in the root of
     the module (directly in onegov/form/upgrades.py for example).
@@ -223,8 +223,8 @@ class upgrade_task:
         raw: bool = False
     ):
         if raw:
-            assert always_run, "raw tasks must always run"
-            assert not requires, "raw tasks may not require other tasks"
+            assert always_run, 'raw tasks must always run'
+            assert not requires, 'raw tasks may not require other tasks'
 
         self.name = name
         self.always_run = always_run
@@ -274,14 +274,14 @@ def get_tasks_by_id(
     for distribution, upgrade_module in upgrade_modules:
 
         for function in get_module_tasks(upgrade_module):
-            task_id = ':'.join((distribution, function.task_name))
+            task_id = f'{distribution}:{function.task_name}'
 
-            assert task_id not in tasks, "Duplicate task"
+            assert task_id not in tasks, 'Duplicate task'
             tasks[task_id] = function
 
             # make sure we don't have duplicate function names - it works, but
             # it makes debugging harder
-            msg = f"Duplicate function name: {function.__name__}"
+            msg = f'Duplicate function name: {function.__name__}'
             assert function.__name__ not in fn_names, msg
 
             fn_names.add(function.__name__)
@@ -306,7 +306,7 @@ def get_module_order_key(
         modules.add(task.split(':', 1)[0])
 
     def sortkey(task: str) -> 'SupportsRichComparison':
-        module, name = task.split(':', 1)
+        module = task.split(':', 1)[0]
         return (
             # sort by level (unknown models first)
             sorted_modules.get(module, float('-inf')),
@@ -335,7 +335,7 @@ def get_tasks(
 
     for task_id, task in tasks.items():
         if task.requires:
-            assert not tasks[task.requires].raw, "Raw tasks cannot be required"
+            assert not tasks[task.requires].raw, 'Raw tasks cannot be required'
 
     graph: dict[str, set[str]] = {}
 
@@ -467,7 +467,7 @@ class UpgradeContext:
         #
         conn = session._connection_for_bind(  # type:ignore[attr-defined]
             session.bind)
-        self.operations_connection: 'Connection' = conn
+        self.operations_connection: Connection = conn
         self.operations = Operations(
             MigrationContext.configure(self.operations_connection))
 
@@ -537,7 +537,7 @@ class UpgradeContext:
 
     def is_empty_table(self, table: str) -> bool:
         return self.operations_connection.execute(
-            f"SELECT * FROM {table} LIMIT 1").rowcount == 0
+            f'SELECT * FROM {table} LIMIT 1').rowcount == 0
 
     def add_column_with_defaults(
         self,

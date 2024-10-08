@@ -18,7 +18,7 @@ from saml2.samlp import STATUS_REQUEST_DENIED
 from saml2.samlp import STATUS_UNKNOWN_PRINCIPAL
 
 
-from typing import overload, Any, TYPE_CHECKING
+from typing import overload, Any, Self, TYPE_CHECKING
 if TYPE_CHECKING:
     from onegov.core.cache import RedisCacheRegion
     from onegov.core.framework import Framework
@@ -27,7 +27,6 @@ if TYPE_CHECKING:
     from onegov.user.auth.provider import (
         HasApplicationIdAndNamespace, SAML2Provider)
     from webob import Response
-    from typing_extensions import Self
 
 
 def handle_logout_request(
@@ -48,13 +47,13 @@ def handle_logout_request(
                 success = True
             else:
                 status = status_message_factory(
-                    "Server error", STATUS_REQUEST_DENIED)
+                    'Server error', STATUS_REQUEST_DENIED)
         except KeyError:
             status = status_message_factory(
-                "Server error", STATUS_REQUEST_DENIED)
+                'Server error', STATUS_REQUEST_DENIED)
     else:
         status = status_message_factory(
-            "Wrong user", STATUS_UNKNOWN_PRINCIPAL)
+            'Wrong user', STATUS_UNKNOWN_PRINCIPAL)
 
     # construct the LogoutResponse
     args = conn.response_args(logout_req.message, supported_bindings)
@@ -111,7 +110,7 @@ class SAML2Attributes:
     groups: str
 
     @classmethod
-    def from_cfg(cls, cfg: dict[str, Any]) -> 'Self':
+    def from_cfg(cls, cfg: dict[str, Any]) -> Self:
         return cls(
             source_id=cfg.get('source_id', 'uid'),
             username=cfg.get('username', 'email'),
@@ -122,7 +121,7 @@ class SAML2Attributes:
 
 
 @attrs()
-class SAML2Client():
+class SAML2Client:
 
     metadata: str = attrib()
     """ Paths to the relevant idp metadata XML files """
@@ -135,13 +134,17 @@ class SAML2Client():
     as being created by LDAP instead. Necessary when using LDAP to
     sync the users periodically and deactivate old accounts. """
 
-    want_resonse_signed: bool = attrib()
+    want_response_signed: bool = attrib()
     """ Whether the response from the IdP should be signed """
 
     attributes: SAML2Attributes = attrib()
     """ Mapping of attribute names """
 
     primary: bool = attrib()
+    """ Whether or not this is the primary login provider """
+
+    slo_enabled: bool = attrib(default=True)
+    """ Whether or not to enable the SLO service """
 
     _connections: dict[str, Connection] = {}
 
@@ -183,7 +186,7 @@ class SAML2Client():
                     provider_cls, {'name': provider.name}, name='redirect')
                 slo_url = request.class_link(
                     provider_cls, {'name': provider.name}, name='logout')
-                saml_settings = {
+                saml_settings: dict[str, Any] = {
                     # TODO: Support metadata via remote/mdq, multiple idp?
                     'entityid': base_url,
                     'metadata': {'local': [self.metadata]},
@@ -193,10 +196,6 @@ class SAML2Client():
                                 'assertion_consumer_service': [
                                     (acs_url, BINDING_HTTP_REDIRECT),
                                     (acs_url, BINDING_HTTP_POST)
-                                ],
-                                'single_logout_service': [
-                                    (slo_url, BINDING_HTTP_REDIRECT),
-                                    (slo_url, BINDING_HTTP_POST)
                                 ],
                             },
                             'name_id_format': [NAMEID_FORMAT_TRANSIENT],
@@ -209,11 +208,19 @@ class SAML2Client():
                                 self.attributes.first_name,
                                 self.attributes.last_name,
                             ],
-                            'want_response_signed': self.want_resonse_signed,
+                            'want_response_signed': self.want_response_signed,
                             'allow_unsolicited': False,
                         },
                     },
                 }
+
+                if self.slo_enabled:
+                    saml_settings['service']['sp']['endpoints'][
+                        'single_logout_service'
+                    ] = [
+                        (slo_url, BINDING_HTTP_REDIRECT),
+                        (slo_url, BINDING_HTTP_POST)
+                    ]
 
                 config = Config()
                 config.load(saml_settings)
@@ -228,7 +235,7 @@ class SAML2Client():
                 self._connections[request.app.application_id] = conn
             except Exception as exception:
                 raise ValueError(
-                    f'SAML2 config error: {str(exception)}'
+                    f'SAML2 config error: {exception!s}'
                 ) from exception
         return conn
 
@@ -285,7 +292,7 @@ class SAML2Client():
         except KeyError:
             session_indexes = None
 
-        # FIXME: This would need to change to support signed requests
+        # TODO: This would need to change to support signed requests
         session_id, logout_req = conn.create_logout_request(
             service_location,
             entity_id,
@@ -389,7 +396,7 @@ class SAML2Client():
 
 
 @attrs
-class SAML2Connections():
+class SAML2Connections:
 
     # instantiated connections for every tenant
     connections: dict[str, SAML2Client] = attrib()
@@ -407,16 +414,17 @@ class SAML2Connections():
         return None
 
     @classmethod
-    def from_cfg(cls, config: dict[str, Any]) -> 'Self':
+    def from_cfg(cls, config: dict[str, Any]) -> Self:
         clients = {
             app_id: SAML2Client(
                 metadata=cfg['metadata'],
                 button_text=cfg['button_text'],
                 treat_as_ldap=cfg.get('treat_as_ldap', False),
-                want_resonse_signed=cfg.get('want_resonse_signed', True),
+                want_response_signed=cfg.get('want_resonse_signed', True),
                 attributes=SAML2Attributes.from_cfg(
                     cfg.get('attributes', {})),
                 primary=cfg.get('primary', False),
+                slo_enabled=cfg.get('slo_enabled', True),
             ) for app_id, cfg in config.items()
         }
         return cls(connections=clients)

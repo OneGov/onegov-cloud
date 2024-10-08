@@ -1,16 +1,14 @@
 from collections import OrderedDict
 from itertools import groupby
-from onegov.ballot.models.election.candidate import Candidate
-from onegov.ballot.models.election.candidate_panachage_result import (
-    CandidatePanachageResult)
-from onegov.ballot.models.election.candidate_result import CandidateResult
-from onegov.ballot.models.election.election import Election
-from onegov.ballot.models.election.election_result import ElectionResult
-from onegov.ballot.models.election.list import List
-from onegov.ballot.models.election.list_connection import ListConnection
-from onegov.ballot.models.election.list_panachage_result import (
-    ListPanachageResult)
-from onegov.ballot.models.election.list_result import ListResult
+from onegov.election_day.models import Candidate
+from onegov.election_day.models import CandidatePanachageResult
+from onegov.election_day.models import CandidateResult
+from onegov.election_day.models import Election
+from onegov.election_day.models import ElectionResult
+from onegov.election_day.models import List
+from onegov.election_day.models import ListConnection
+from onegov.election_day.models import ListPanachageResult
+from onegov.election_day.models import ListResult
 from sqlalchemy.orm import aliased
 from sqlalchemy.orm import object_session
 
@@ -41,17 +39,9 @@ def export_election_internal_proporz(
     ids = session.query(ElectionResult.id)
     ids = ids.filter(ElectionResult.election_id == election.id)
 
-    SubListConnection = aliased(ListConnection)
+    SubListConnection = aliased(ListConnection)  # noqa: N806
     results = session.query(
         CandidateResult.votes,
-        Election.id,
-        Election.title_translations,
-        Election.date,
-        Election.domain,
-        Election.type,
-        Election.number_of_mandates.label('election_mandates'),
-        Election.absolute_majority,
-        Election.status,
         ElectionResult.superregion,
         ElectionResult.district,
         ElectionResult.name.label('entity_name'),
@@ -155,20 +145,25 @@ def export_election_internal_proporz(
         candidate_panachage[entity].setdefault(target, {})
         candidate_panachage[entity][target][source] = result.votes
 
+    titles = election.title_translations or {}
+    short_titles = election.short_title_translations or {}
+
     rows: list[dict[str, Any]] = []
     for result in results:
-        row = OrderedDict()
-        row['election_id'] = result.id
-        translations = result.title_translations or {}
+        row: dict[str, Any] = OrderedDict()
+        row['election_id'] = election.id
         for locale in locales:
-            title = translations.get(locale, '') or ''
+            title = titles.get(locale, '') or ''
             row[f'election_title_{locale}'] = title.strip()
-        row['election_date'] = result.date.isoformat()
-        row['election_domain'] = result.domain
-        row['election_type'] = result.type
-        row['election_mandates'] = result.election_mandates
-        row['election_absolute_majority'] = result.absolute_majority
-        row['election_status'] = result.status or 'unknown'
+        for locale in locales:
+            title = short_titles.get(locale, '') or ''
+            row[f'election_short_title_{locale}'] = title.strip()
+        row['election_date'] = election.date.isoformat()
+        row['election_domain'] = election.domain
+        row['election_type'] = election.type
+        row['election_mandates'] = election.number_of_mandates
+        row['election_absolute_majority'] = election.absolute_majority
+        row['election_status'] = election.status or 'unknown'
         row['entity_superregion'] = result.superregion or ''
         row['entity_district'] = result.district or ''
         row['entity_name'] = result.entity_name

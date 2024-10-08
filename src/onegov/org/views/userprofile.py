@@ -15,6 +15,7 @@ from webob.exc import HTTPForbidden
 from typing import TYPE_CHECKING
 if TYPE_CHECKING:
     from onegov.core.types import RenderData
+    from onegov.form import Form
     from onegov.org.request import OrgRequest
     from webob import Response as BaseResponse
 
@@ -25,7 +26,7 @@ if TYPE_CHECKING:
 def handle_user_profile(
     self: Organisation,
     request: 'OrgRequest',
-    form: UserProfileForm,
+    form: 'Form',
     layout: DefaultLayout | None = None
 ) -> 'RenderData | BaseResponse':
     """ Handles the GET and POST login requests. """
@@ -37,7 +38,7 @@ def handle_user_profile(
 
     if form.submitted(request):
         form.populate_obj(user)
-        request.success(_("Your changes were saved"))
+        request.success(_('Your changes were saved'))
 
         if 'return-to' in request.GET:
             return request.redirect(request.link(self, 'userprofile'))
@@ -46,13 +47,13 @@ def handle_user_profile(
         form.process(obj=user)
 
     layout.breadcrumbs = [
-        Link(_("Homepage"), layout.homepage_url),
-        Link(_("User Profile"), request.link(self))
+        Link(_('Homepage'), layout.homepage_url),
+        Link(_('User Profile'), request.link(self))
     ]
 
     return {
         'layout': layout,
-        'title': _("User Profile"),
+        'title': _('User Profile'),
         'form': form,
         'username': user.username,
         'initials': user.initials,

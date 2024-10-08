@@ -4,7 +4,7 @@ import sedate
 import transaction
 
 from datetime import date, time, timedelta
-from dill import pickles
+from dill import pickles  # type:ignore[import-untyped]
 from libres.modules.errors import LibresError
 from onegov.core.custom import json
 from onegov.core.html import html_to_text
@@ -89,7 +89,7 @@ def respond_with_success(request: 'OrgRequest') -> 'JSON_ro':
 
 
 def respond_with_error(request: 'OrgRequest', error: str) -> 'JSON_ro':
-    message: 'JSON_ro' = {
+    message: JSON_ro = {
         'message': error,
         'success': False
     }
@@ -148,8 +148,8 @@ def reserve_allocation(self: Allocation, request: 'OrgRequest') -> 'JSON_ro':
             )
         except pytz.NonExistentTimeError:
             err = request.translate(_(
-                "The selected time does not exist on this date due to "
-                "the switch from standard time to daylight saving time."
+                'The selected time does not exist on this date due to '
+                'the switch from standard time to daylight saving time.'
             ))
             return respond_with_error(request, err)
     else:
@@ -166,22 +166,22 @@ def reserve_allocation(self: Allocation, request: 'OrgRequest') -> 'JSON_ro':
         n, unit = resource.deadline
 
         if unit == 'h' and n == 1:
-            unit = request.translate(_("hour"))
+            unit = request.translate(_('hour'))
 
         elif unit == 'h' and n > 1:
-            unit = request.translate(_("hours"))
+            unit = request.translate(_('hours'))
 
         elif unit == 'd' and n == 1:
-            unit = request.translate(_("day"))
+            unit = request.translate(_('day'))
 
         elif unit == 'd' and n > 1:
-            unit = request.translate(_("days"))
+            unit = request.translate(_('days'))
 
         else:
             raise NotImplementedError()
 
         err = request.translate(
-            _("Reservations must be made ${n} ${unit} in advance", mapping={
+            _('Reservations must be made ${n} ${unit} in advance', mapping={
                 'n': n,
                 'unit': unit
             })
@@ -191,7 +191,7 @@ def reserve_allocation(self: Allocation, request: 'OrgRequest') -> 'JSON_ro':
 
     # if the allocation is in the past, disable it for anonymous users...
     if not request.is_manager and end < sedate.utcnow():
-        err = request.translate(_("This date lies in the past"))
+        err = request.translate(_('This date lies in the past'))
 
         return respond_with_error(request, err)
 
@@ -218,6 +218,9 @@ def delete_reservation(self: Reservation, request: 'OrgRequest') -> 'JSON_ro':
     # anonymous users do not get a csrf token (it's bound to the identity)
     # therefore we can't check for it -> this is not a problem since
     # anonymous users do not really have much to lose here
+    # FIXME: We always generate a csrf token now, so we could reconsider
+    #        this, although it would mean, that people, that have blocked
+    #        cookies, will not be able to delete reservations at all.
     if request.is_logged_in:
         request.assert_valid_csrf_token()
 
@@ -352,13 +355,13 @@ def handle_reservation_form(
 
     if not form.errors and blocked:
         request.alert(_(
-            "The form contains errors. Please check the marked fields."
+            'The form contains errors. Please check the marked fields.'
         ))
 
     layout = layout or layout or ReservationLayout(self, request)
-    layout.breadcrumbs.append(Link(_("Reserve"), '#'))
+    layout.breadcrumbs.append(Link(_('Reserve'), '#'))
 
-    title = _("New dates for ${title}", mapping={
+    title = _('New dates for ${title}', mapping={
         'title': self.title,
     })
 
@@ -372,7 +375,7 @@ def handle_reservation_form(
             utils.ReservationInfo(self, r, request) for r in reservations
         ],
         'resource': self,
-        'button_text': _("Continue")
+        'button_text': _('Continue')
     }
 
 
@@ -490,7 +493,7 @@ def confirm_reservation(
         form = None
 
     layout = layout or ReservationLayout(self, request)
-    layout.breadcrumbs.append(Link(_("Confirm"), '#'))
+    layout.breadcrumbs.append(Link(_('Confirm'), '#'))
 
     failed_reservations_str = request.params.get('failed_reservations')
     if not isinstance(failed_reservations_str, str):
@@ -509,7 +512,7 @@ def confirm_reservation(
 
     assert request.locale is not None
     return {
-        'title': _("Confirm your reservation"),
+        'title': _('Confirm your reservation'),
         'layout': layout,
         'form': form,
         'resource': self,
@@ -521,7 +524,7 @@ def confirm_reservation(
         'edit_link': request.link(self, 'form'),
         'price': price,
         'checkout_button': price and request.app.checkout_button(
-            button_label=request.translate(_("Pay Online and Complete")),
+            button_label=request.translate(_('Pay Online and Complete')),
             title=self.title,
             price=price,
             email=reservations[0].email,
@@ -563,7 +566,7 @@ def finalize_reservation(self: Resource, request: 'OrgRequest') -> 'Response':
 
         # FIXME: Payment errors should probably have their own error message
         if not payment or isinstance(payment, PaymentError):
-            request.alert(_("Your payment could not be processed"))
+            request.alert(_('Your payment could not be processed'))
             return morepath.redirect(request.link(self))
 
         elif payment is not True:
@@ -577,10 +580,11 @@ def finalize_reservation(self: Resource, request: 'OrgRequest') -> 'Response':
         transaction.abort()
         utils.show_libres_error(e, request)
 
-        url = URL(request.link(self, name='confirmation'))
-        url = url.query_param('failed_reservations', e.reservation.id)
+        url_obj = URL(request.link(self, name='confirmation'))
+        url_obj = url_obj.query_param(
+            'failed_reservations', str(e.reservation.id))
 
-        return morepath.redirect(url.as_string())
+        return morepath.redirect(url_obj.as_string())
     else:
         if submission:
             forms.submissions.complete_submission(submission)
@@ -600,7 +604,7 @@ def finalize_reservation(self: Resource, request: 'OrgRequest') -> 'Response':
         send_ticket_mail(
             request=request,
             template='mail_ticket_opened.pt',
-            subject=_("Your request has been registered"),
+            subject=_('Your request has been registered'),
             receivers=(reservations[0].email,),
             ticket=ticket,
             content={
@@ -615,7 +619,7 @@ def finalize_reservation(self: Resource, request: 'OrgRequest') -> 'Response':
             send_ticket_mail(
                 request=request,
                 template='mail_ticket_opened_info.pt',
-                subject=_("New ticket"),
+                subject=_('New ticket'),
                 ticket=ticket,
                 receivers=(request.email_for_new_tickets, ),
                 content={
@@ -640,8 +644,8 @@ def finalize_reservation(self: Resource, request: 'OrgRequest') -> 'Response':
                 ticket.accept_ticket(request.auto_accept_user)
                 request.view(reservations[0], name='accept')
             except Exception:
-                request.warning(_("Your request could not be "
-                                  "accepted automatically!"))
+                request.warning(_('Your request could not be '
+                                  'accepted automatically!'))
             else:
                 close_ticket(ticket, request.auto_accept_user, request)
 
@@ -656,7 +660,7 @@ def finalize_reservation(self: Resource, request: 'OrgRequest') -> 'Response':
         }
 
         # by default we will redirect to the created ticket
-        message = _("Thank you for your reservation!")
+        message = _('Thank you for your reservation!')
         url = request.link(ticket, 'status')
 
         # retrieve remembered tickets
@@ -672,8 +676,8 @@ def finalize_reservation(self: Resource, request: 'OrgRequest') -> 'Response':
             request.browser_session.reservation_tickets = tickets
 
             message = _(
-                "Your reservation for ${room} has been submitted. "
-                "Please continue with your reservation for ${next_room}.",
+                'Your reservation for ${room} has been submitted. '
+                'Please continue with your reservation for ${next_room}.',
                 mapping={'room': self.title, 'next_room': resource.title})
             url = request.link(resource, 'form')
 
@@ -749,7 +753,7 @@ def accept_reservation(
         send_ticket_mail(
             request=request,
             template='mail_reservation_accepted.pt',
-            subject=_("Your reservations were accepted"),
+            subject=_('Your reservations were accepted'),
             receivers=(self.email,),
             ticket=ticket,
             content={
@@ -778,7 +782,7 @@ def accept_reservation(
 
         title = request.translate(
             _(
-                "${org} New Reservation(s)",
+                '${org} New Reservation(s)',
                 mapping={'org': request.app.org.title},
             )
         )
@@ -812,9 +816,9 @@ def accept_reservation(
 
         request.app.send_transactional_email_batch(email_iter())
 
-        request.success(_("The reservations were accepted"))
+        request.success(_('The reservations were accepted'))
     else:
-        request.warning(_("The reservations have already been accepted"))
+        request.warning(_('The reservations have already been accepted'))
 
     return request.redirect(request.link(self))
 
@@ -835,7 +839,7 @@ def accept_reservation_with_message(
 
     recipient = self.email
     if not recipient:
-        request.alert(_("The submitter email is not available"))
+        request.alert(_('The submitter email is not available'))
         return request.redirect(request.link(self))
 
     if form.submitted(request):
@@ -844,12 +848,12 @@ def accept_reservation_with_message(
 
     layout = layout or TicketChatMessageLayout(self, request)  # type:ignore
     return {
-        'title': _("Accept all reservation with message"),
+        'title': _('Accept all reservation with message'),
         'layout': layout,
         'form': form,
         'helptext': _(
-            "The following message will be sent to ${address} and it will be "
-            "recorded for future reference.", mapping={
+            'The following message will be sent to ${address} and it will be '
+            'recorded for future reference.', mapping={
                 'address': recipient
             }
         )
@@ -878,7 +882,7 @@ def reject_reservation(
         .order_by(Reservation.start).all()
     )
 
-    targeted: 'Sequence[Reservation]'
+    targeted: Sequence[Reservation]
     targeted = tuple(r for r in all_reservations if r.id == reservation_id)
     targeted = targeted or all_reservations
     excluded = tuple(r for r in all_reservations if r.id not in {
@@ -896,8 +900,8 @@ def reject_reservation(
     payment = ticket.handler.payment
     if payment and payment.state == 'paid':
         request.alert(_(
-            "The payment associated with this reservation needs "
-            "to be refunded before the reservation can be rejected"
+            'The payment associated with this reservation needs '
+            'to be refunded before the reservation can be rejected'
         ))
 
         if not request.headers.get('X-IC-Request'):
@@ -925,7 +929,7 @@ def reject_reservation(
     send_ticket_mail(
         request=request,
         template='mail_reservation_rejected.pt',
-        subject=_("The following reservations were rejected"),
+        subject=_('The following reservations were rejected'),
         receivers=(self.email, ),
         ticket=ticket,
         content={
@@ -956,7 +960,7 @@ def reject_reservation(
     if submission:
         title = request.translate(
             _(
-                "${org} Rejected Reservation",
+                '${org} Rejected Reservation',
                 mapping={'org': request.app.org.title},
             )
         )
@@ -1003,9 +1007,9 @@ def reject_reservation(
         forms.submissions.delete(submission)
 
     if len(targeted) > 1:
-        request.success(_("The reservations were rejected"))
+        request.success(_('The reservations were rejected'))
     else:
-        request.success(_("The reservation was rejected"))
+        request.success(_('The reservation was rejected'))
 
     # return none on intercooler js requests
     if not request.headers.get('X-IC-Request'):
@@ -1029,7 +1033,7 @@ def reject_reservation_with_message(
 
     recipient = self.email
     if not recipient:
-        request.alert(_("The submitter email is not available"))
+        request.alert(_('The submitter email is not available'))
         return request.redirect(request.link(self))
 
     if form.submitted(request):
@@ -1038,12 +1042,12 @@ def reject_reservation_with_message(
 
     layout = layout or TicketChatMessageLayout(self, request)  # type:ignore
     return {
-        'title': _("Reject all reservations with message"),
+        'title': _('Reject all reservations with message'),
         'layout': layout,
         'form': form,
         'helptext': _(
-            "The following message will be sent to ${address} and it will be "
-            "recorded for future reference.", mapping={
+            'The following message will be sent to ${address} and it will be '
+            'recorded for future reference.', mapping={
                 'address': recipient
             }
         )

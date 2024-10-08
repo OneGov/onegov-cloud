@@ -43,4 +43,4 @@ class UnusedColumnKeyValue:
                 self.column.has_key(data)  # type:ignore[attr-defined]
             )
             if session.query(query.exists()).scalar():
-                raise ValidationError(_("This value is in use."))
+                raise ValidationError(_('This value is in use.'))

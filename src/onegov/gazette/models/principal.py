@@ -4,7 +4,7 @@ from yaml import safe_load
 from typing import Any
 from typing import TYPE_CHECKING
 if TYPE_CHECKING:
-    from typing_extensions import Self
+    from typing import Self
 
 
 class Principal:

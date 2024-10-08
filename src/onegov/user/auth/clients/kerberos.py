@@ -1,4 +1,4 @@
-import kerberos
+import kerberos  # type:ignore
 import os
 
 from attr import attrs, attrib
@@ -14,7 +14,7 @@ if TYPE_CHECKING:
 
 
 @attrs()
-class KerberosClient():
+class KerberosClient:
     """ Kerberos is a computer-network authentication protocol that works on
     the basis of tickets to allow nodes communicating over a non-secure network
     to prove their identity to one another in a secure manner.

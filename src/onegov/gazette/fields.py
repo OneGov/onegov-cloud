@@ -16,8 +16,8 @@ class MultiCheckboxWidget(MultiCheckboxWidgetBase):
         field: 'MultiCheckboxField',  # type:ignore[override]
         **kwargs: Any
     ) -> 'Markup':
-        kwargs['data-expand-title'] = field.gettext(_("Show all"))
-        kwargs['data-fold-title'] = field.gettext(_("Show less"))
+        kwargs['data-expand-title'] = field.gettext(_('Show all'))
+        kwargs['data-fold-title'] = field.gettext(_('Show less'))
 
         return super().__call__(field, **kwargs)
 

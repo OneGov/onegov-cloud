@@ -1,6 +1,7 @@
 """ The onegov org collection of images uploaded to the site. """
 from collections import defaultdict
 from datetime import date
+from markupsafe import Markup
 from morepath import redirect
 from morepath.request import Response
 from onegov.core.security import Public, Private, Secret
@@ -95,6 +96,13 @@ def keyword_count(
     }
 
     counts: dict[str, dict[str, int]] = {}
+
+    # NOTE: The counting can get incredibly expensive with many entries
+    #       so we should skip it when we know we can skip it
+    if not fields:
+        return counts
+
+    # FIXME: This is incredibly slow. We need to think of a better way.
     for model in self.without_keywords_and_tags().query():
         if not request.is_visible(model):
             continue
@@ -149,7 +157,7 @@ def view_occurrences(
                 text=translation + f' ({self.tag_counts[tag]})',
                 url=request.link(self.for_filter(tag=tag)),
                 active=tag in self.tags
-            ) for tag, translation in translated_tags
+            ) for tag, translation in translated_tags if self.tag_counts[tag]
         ]
 
     locations = [
@@ -163,17 +171,17 @@ def view_occurrences(
         )
     ]
 
-    range_labels: tuple[tuple['DateRange', str], ...] = (
-        ('today', _("Today")),
-        ('tomorrow', _("Tomorrow")),
-        ('weekend', _("This weekend")),
-        ('week', _("This week")),
-        ('month', _("This month")),
-        ('past', _("Past events")),
+    range_labels: tuple[tuple[DateRange, str], ...] = (
+        ('today', _('Today')),
+        ('tomorrow', _('Tomorrow')),
+        ('weekend', _('This weekend')),
+        ('week', _('This week')),
+        ('month', _('This month')),
+        ('past', _('Past events')),
     )
     ranges = [
         Link(
-            text=_("All"),
+            text=_('All'),
             url=request.link(self.for_filter(start=None, end=None)),
             active=not (self.range or self.start or self.end)
         )
@@ -187,6 +195,8 @@ def view_occurrences(
         ) for range, label in range_labels
     ]
 
+    files = list(request.app.org.event_files)
+
     return {
         'active_tags': self.tags,
         'add_link': request.link(self, name='new'),
@@ -197,6 +207,7 @@ def view_occurrences(
         'start': self.start.isoformat() if self.start else '',
         'ranges': ranges,
         'tags': tags,
+        'files': files,
         'filters': filters,
         'locations': locations,
         'title': _('Events'),
@@ -221,7 +232,8 @@ def view_occurrence(
     today = replace_timezone(as_datetime(date.today()), self.timezone)
     occurrences = self.event.occurrence_dates(localize=True)
     occurrences = list(filter(lambda x: x >= today, occurrences))
-    description = linkify(self.event.description or '').replace('\n', '<br>')
+    description = linkify(
+        self.event.description or '').replace('\n', Markup('<br>'))
     session = request.session
     ticket = TicketCollection(session).by_handler_id(self.event.id.hex)
     framed = request.GET.get('framed')
@@ -263,7 +275,7 @@ def handle_edit_event_filters(
             }
             request.app.org.event_filter_definition = form.definition.data
 
-            request.success(_("Your changes were saved"))
+            request.success(_('Your changes were saved'))
             return request.redirect(request.link(self))
 
         elif not request.POST:
@@ -274,24 +286,24 @@ def handle_edit_event_filters(
 
     except InvalidFormSyntax as e:
         request.warning(
-            _("Syntax Error in line ${line}", mapping={'line': e.line})
+            _('Syntax Error in line ${line}', mapping={'line': e.line})
         )
     except AttributeError:
-        request.warning(_("Syntax error in form"))
+        request.warning(_('Syntax error in form'))
 
     except MixedTypeError as e:
         request.warning(
-            _("Syntax error in field ${field_name}",
+            _('Syntax error in field ${field_name}',
               mapping={'field_name': e.field_name})
         )
     except DuplicateLabelError as e:
         request.warning(
-            _("Error: Duplicate label ${label}", mapping={'label': e.label})
+            _('Error: Duplicate label ${label}', mapping={'label': e.label})
         )
 
     layout = layout or OccurrencesLayout(self, request)
     layout.include_code_editor()
-    layout.breadcrumbs.append(Link(_("Edit"), '#'))
+    layout.breadcrumbs.append(Link(_('Edit'), '#'))
     layout.editbar_links = []
 
     return {
@@ -341,7 +353,7 @@ def export_occurrences(
     """ Export the occurrences in various formats. """
 
     layout = layout or OccurrencesLayout(self, request)
-    layout.breadcrumbs.append(Link(_("Export"), '#'))
+    layout.breadcrumbs.append(Link(_('Export'), '#'))
     layout.editbar_links = None  # type:ignore[assignment]
 
     if form.submitted(request):
@@ -350,14 +362,14 @@ def export_occurrences(
         results = import_form.run_export()
 
         return form.as_export_response(results, title=request.translate(_(
-            "Events"
+            'Events'
         )))
 
     return {
         'layout': layout,
-        'title': _("Event Export"),
+        'title': _('Event Export'),
         'form': form,
-        'explanation': _("Exports all future events.")
+        'explanation': _('Exports all future events.')
     }
 
 

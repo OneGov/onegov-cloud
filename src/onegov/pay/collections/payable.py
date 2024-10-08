@@ -8,7 +8,7 @@ from typing import overload, Literal, TypeVar, TYPE_CHECKING
 if TYPE_CHECKING:
     from onegov.core.orm import Base
     from sqlalchemy.orm import Session
-    from typing_extensions import Self
+    from typing import Self
 
 
 # FIXME: This should be Intersection[Base, Payable] once this feature

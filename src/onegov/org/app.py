@@ -1,19 +1,21 @@
 """ Contains the base application used by other applications. """
 
+import re
 import yaml
 
 import base64
 import hashlib
 import morepath
-from collections import defaultdict
 from dectate import directive
 from email.headerregistry import Address
 from functools import wraps
 from more.content_security import SELF
+from more.content_security import NONE
+from more.content_security.core import content_security_policy_tween_factory
 from onegov.core import Framework, utils
 from onegov.core.framework import default_content_security_policy
 from onegov.core.i18n import default_locale_negotiator
-from onegov.core.orm import orm_cached
+from onegov.core.orm.cache import orm_cached, request_cached
 from onegov.core.templates import PageTemplate
 from onegov.core.widgets import transform_structure
 from onegov.file import DepotApp
@@ -22,11 +24,9 @@ from onegov.gis import MapboxApp
 from onegov.org import directives
 from onegov.org.auth import MTANAuth
 from onegov.org.initial_content import create_new_organisation
-from onegov.org.models import Dashboard
-from onegov.org.models import Topic, Organisation, PublicationCollection
+from onegov.org.models import Dashboard, Organisation, PublicationCollection
 from onegov.org.request import OrgRequest
 from onegov.org.theme import OrgTheme
-from onegov.page import Page, PageCollection
 from onegov.pay import PayApp
 from onegov.reservation import LibresIntegration
 from onegov.search import ElasticsearchApp
@@ -35,8 +35,6 @@ from onegov.ticket import TicketPermission
 from onegov.user import UserApp
 from onegov.websockets import WebsocketsApp
 from purl import URL
-from sqlalchemy.orm import noload, undefer
-from sqlalchemy.orm.attributes import set_committed_value
 from types import MethodType
 from webob.exc import WSGIHTTPException, HTTPTooManyRequests
 
@@ -53,6 +51,7 @@ if TYPE_CHECKING:
     from onegov.pay import Price
     from onegov.ticket.collection import TicketCount
     from reg.dispatch import _KeyLookup
+    from webob import Response
 
 
 class OrgApp(Framework, LibresIntegration, ElasticsearchApp, MapboxApp,
@@ -145,7 +144,7 @@ class OrgApp(Framework, LibresIntegration, ElasticsearchApp, MapboxApp,
         # per instance, and an unique instance of the function per class
         get_view_meth = self.get_view
         assert isinstance(get_view_meth, MethodType)
-        get_view = get_view_meth.__func__  # type:ignore[unreachable]
+        get_view = get_view_meth.__func__
         assert hasattr(get_view, 'key_lookup')
         key_lookup = get_view.key_lookup
         if not isinstance(key_lookup, KeyLookupWithMTANHook):
@@ -162,6 +161,7 @@ class OrgApp(Framework, LibresIntegration, ElasticsearchApp, MapboxApp,
             # this should be safe, since each class gets its own dispatch
             # but it is ugly that we have to access the dispatch using the
             # __self__ on one of the methods
+            assert hasattr(get_view, 'clean')
             dispatch = get_view.clean.__self__
             if not getattr(dispatch, '_mtan_hook_configured', False):
                 orig_get_key_lookup = dispatch.get_key_lookup
@@ -172,72 +172,17 @@ class OrgApp(Framework, LibresIntegration, ElasticsearchApp, MapboxApp,
                 dispatch.key_lookup = get_view.key_lookup
                 dispatch._mtan_hook_configured = True
 
-    @orm_cached(policy='on-table-change:organisations')
+    # NOTE: Organisation is probably the one model we could get away with
+    #       caching long-term without causing too many issues, but we
+    #       would first have to prove that we actually save a significant
+    #       amount of resources by skipping this query
+    @request_cached
     def org(self) -> Organisation:
         # even though this could return no Organisation, this can only
         # occur during setup, until after we added an Organisation, so
         # outside of this very narrow use-case this should always return
         # an organisation, so we pretend that it always does
         return self.session().query(Organisation).first()  # type:ignore
-
-    @orm_cached(policy='on-table-change:pages')
-    def root_pages(self) -> tuple[Page, ...]:
-
-        def include(page: Page) -> bool:
-            if page.type != 'news':
-                return True
-
-            return True if page.children else False
-
-        return tuple(p for p in self.pages_tree if include(p))
-
-    @orm_cached(policy='on-table-change:pages')
-    def pages_tree(self) -> tuple[Page, ...]:
-        """
-        This is the entire pages tree preloaded into the individual
-        parent/children attributes. We optimize this as much as possible
-        by performing the recursive join in Python, rather than SQL.
-
-        """
-        query = PageCollection(self.session()).query(ordered=False)
-        query = query.options(
-            # we populate these relationship ourselves
-            noload(Page.parent),
-            noload(Page.children),
-            # since we cache this result we should undefer loading the
-            # page meta, so we don't need to deserialize it every time
-            # this causes a fairly substantial overhead on uncached
-            # loads of pages_tree, but it's also a fairly big win
-            # once it is cached. There may be call-sites other than
-            # homepage_pages that benefit from this. If there aren't
-            # we can always go back on this decision
-            undefer(Page.meta)
-        )
-        query = query.order_by(Page.order)
-
-        # first we build a map from parent_ids to their children
-        parent_to_child = defaultdict(list)
-        for page in query:
-            parent_to_child[page.parent_id].append(page)
-
-        # then we populate the children and parent based on this information
-        # this should result in no pending modifications, because we use
-        # set_committed_value to set them
-        for page in (
-            page
-            for pages in parent_to_child.values()
-            for page in pages
-        ):
-            # even though this is a defaultdict, we need to use get()
-            # since otherwise we modifiy the dictionary
-            children = parent_to_child.get(page.id, [])
-            for child in children:
-                set_committed_value(child, 'parent', page)
-            set_committed_value(page, 'children', children)
-
-        # we return the root pages which should contain references to all
-        # the child pages
-        return tuple(p for p in parent_to_child.get(None, []))
 
     @orm_cached(policy='on-table-change:organisations')
     def homepage_template(self) -> PageTemplate:
@@ -255,38 +200,14 @@ class OrgApp(Framework, LibresIntegration, ElasticsearchApp, MapboxApp,
     @orm_cached(policy='on-table-change:ticket_permissions')
     def ticket_permissions(self) -> dict[str, dict[str | None, list[str]]]:
         result: dict[str, dict[str | None, list[str]]] = {}
-        for permission in self.session().query(TicketPermission):
+        for permission in self.session().query(TicketPermission).with_entities(
+            TicketPermission.handler_code,
+            TicketPermission.group,
+            TicketPermission.user_group_id
+        ):
             handler = result.setdefault(permission.handler_code, {})
             group = handler.setdefault(permission.group, [])
             group.append(permission.user_group_id.hex)
-        return result
-
-    @orm_cached(policy='on-table-change:pages')
-    def homepage_pages(self) -> dict[int, list[Topic]]:
-
-        def visit_topics(
-            pages: 'Iterable[Page]',
-            root_id: int | None = None
-        ) -> 'Iterator[tuple[int, Topic]]':
-            for page in pages:
-                if isinstance(page, Topic):
-                    yield root_id or page.id, page
-
-                yield from visit_topics(
-                    page.children,
-                    root_id=root_id or page.id
-                )
-
-        result = defaultdict(list)
-        for root_id, topic in visit_topics(self.root_pages):
-            if topic.is_visible_on_homepage:
-                result[root_id].append(topic)
-
-        for topics in result.values():
-            topics.sort(
-                key=lambda p: utils.normalize_for_url(p.title)
-            )
-
         return result
 
     @orm_cached(policy='on-table-change:files')
@@ -355,6 +276,52 @@ class OrgApp(Framework, LibresIntegration, ElasticsearchApp, MapboxApp,
 
         with fs.open('eventsettings.yml', 'r') as f:
             return yaml.safe_load(f).get('event_tags', None)
+
+    @property
+    def custom_texts(self) -> dict[str, str] | None:
+        return self.cache.get_or_create(
+            'custom_texts', self.load_custom_texts,
+            expiration_time=3600
+        )
+
+    def load_custom_texts(self) -> dict[str, str] | None:
+        """
+        Customer specific texts are specified in `puppet` repo, see loxo
+        https://gitea.seantis.ch/operations/puppet/src/branch/master/nodes/loxo.seantis.ch.yaml#L183,193
+
+        Remember to create customtexts.yml in your local dev setup
+        `/usr/local/var/onegov/files/<org>/customtexts.yml`
+
+        Example customtexts.yml:
+        ```yaml
+        custom texts:
+          (en) Custom admission course agreement: I agree to attend the ..
+          (de) Custom admission course agreement: Ich erkläre mich bereit, ..
+        ```
+
+        """
+        fs = self.filestorage
+        assert fs is not None
+        if not fs.exists('customtexts.yml'):
+            return {}
+
+        with fs.open('customtexts.yml', 'r') as f:
+            return yaml.safe_load(f).get('custom texts', {})
+
+    @property
+    def allowed_iframe_domains(self) -> list[str]:
+        return self.cache.get_or_create(
+            'allowed_iframe_domains', self.load_allowed_iframe_domains
+        )
+
+    def load_allowed_iframe_domains(self) -> list[str] | None:
+        fs = self.filestorage
+        assert fs is not None
+        if not fs.exists('allowed_iframe_domains.yml'):
+            return []
+
+        with fs.open('allowed_iframe_domains.yml', 'r') as f:
+            return yaml.safe_load(f).get('allowed_domains', [])
 
     @property
     def hashed_identity_key(self) -> bytes:
@@ -475,9 +442,9 @@ def get_i18n_default_locale() -> str:
 
 @OrgApp.setting(section='i18n', name='locale_negotiator')
 def get_locale_negotiator(
-) -> 'Callable[[Collection[str], OrgRequest], str | None]':
+) -> 'Callable[[Sequence[str], OrgRequest], str | None]':
     def locale_negotiator(
-        locales: 'Collection[str]',
+        locales: 'Sequence[str]',
         request: OrgRequest
     ) -> str | None:
 
@@ -527,6 +494,7 @@ def org_content_security_policy() -> 'ContentSecurityPolicy':
     policy.connect_src.add('https://maps.zg.ch')
     policy.connect_src.add('https://api.mapbox.com')
     policy.connect_src.add('https://stats.seantis.ch')
+    policy.connect_src.add('https://analytics.seantis.ch')
     policy.connect_src.add('https://geodesy.geo.admin.ch')
     policy.connect_src.add('https://wms.geo.admin.ch/')
 
@@ -603,6 +571,52 @@ def get_public_ticket_messages() -> 'Collection[str]':
 @OrgApp.setting(section='org', name='disabled_extensions')
 def get_disabled_extensions() -> 'Collection[str]':
     return ()
+
+
+@OrgApp.tween_factory(under=content_security_policy_tween_factory)
+def enable_iframes_tween_factory(
+    app: OrgApp,
+    handler: 'Callable[[OrgRequest], Response]'
+) -> 'Callable[[OrgRequest], Response]':
+
+    no_iframe_paths = (
+        r'/auth/.*',
+        r'/manage/.*'
+    )
+    no_iframe_paths_re = re.compile(rf"({'|'.join(no_iframe_paths)})")
+
+    iframe_paths = (
+        r'/events/.*',
+        r'/event/.*',
+        r'/news/.*',
+        r'/directories/.*',
+        r'/resources/.*',
+        r'/resource/.*',
+        r'/topics/.*',
+    )
+    iframe_paths_re = re.compile(rf"({'|'.join(iframe_paths)})")
+
+    def enable_iframes_tween(
+        request: OrgRequest
+    ) -> 'Response':
+        """ Enables iframes. """
+
+        result = handler(request)
+
+        # Allow iframes for other pages for certain paths
+        if no_iframe_paths_re.match(request.path_info or '/'):
+            request.content_security_policy.frame_ancestors = {NONE}
+        elif iframe_paths_re.match(request.path_info or '/'):
+            request.content_security_policy.frame_ancestors.add('http://*')
+            request.content_security_policy.frame_ancestors.add('https://*')
+
+        # Allow certain domains as iframes on our pages
+        for domain in (app.allowed_iframe_domains or []):
+            request.content_security_policy.child_src.add(domain)
+
+        return result
+
+    return enable_iframes_tween
 
 
 @OrgApp.webasset_path()
@@ -717,11 +731,6 @@ def get_filehash() -> 'Iterator[str]':
     yield 'filedigest.js'
 
 
-@OrgApp.webasset('many')
-def get_many() -> 'Iterator[str]':
-    yield 'many.jsx'
-
-
 @OrgApp.webasset('monthly-view')
 def get_monthly_view() -> 'Iterator[str]':
     yield 'daypicker.js'
@@ -750,16 +759,17 @@ def get_common_asset() -> 'Iterator[str]':
     yield 'form_dependencies.js'
     yield 'confirm.jsx'
     yield 'typeahead.jsx'
-    yield 'pay'
     yield 'moment.js'
     yield 'moment.de-ch.js'
     yield 'moment.fr-ch.js'
     yield 'jquery.datetimepicker.js'
+    yield 'datetimepicker.js'
+    yield 'many.jsx'
+    yield 'pay'
     yield 'jquery.mousewheel.js'
     yield 'jquery.popupoverlay.js'
     yield 'jquery.load.js'
     yield 'videoframe.js'
-    yield 'datetimepicker.js'
     yield 'url.js'
     yield 'date-range-selector.js'
     yield 'lazyalttext.js'
@@ -788,6 +798,11 @@ def get_scroll_to_username_asset() -> 'Iterator[str]':
 @OrgApp.webasset('all_blank')
 def get_all_blank_asset() -> 'Iterator[str]':
     yield 'all_blank.js'
+
+
+@OrgApp.webasset('people-select')
+def people_select_asset() -> 'Iterator[str]':
+    yield 'people-select.js'
 
 
 def wrap_with_mtan_hook(

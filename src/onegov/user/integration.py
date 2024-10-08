@@ -22,16 +22,13 @@ if TYPE_CHECKING:
         IntegratedAuthenticationProvider, OauthProvider,
         SeparateAuthenticationProvider)
     from sqlalchemy.orm import Session
-    from typing import Union
-    from typing_extensions import TypeAlias
+    from typing import TypeAlias
 
     # NOTE: In order for mypy to be able to type narrow to these more
     #       specific authentication providers we return a type union
     #       instead of the base type
-    _AuthenticationProvider: TypeAlias = Union[
-        SeparateAuthenticationProvider,
-        IntegratedAuthenticationProvider
-    ]
+    _AuthenticationProvider: TypeAlias = (
+        SeparateAuthenticationProvider | IntegratedAuthenticationProvider)
 
 
 class UserApp(WebassetsApp):
@@ -54,6 +51,7 @@ class UserApp(WebassetsApp):
         # we forward declare the Framework attributes we depend on
         application_id: str
         namespace: str
+
         @cached_property
         def session(self) -> Callable[[], Session]: ...
         @property
@@ -95,11 +93,12 @@ class UserApp(WebassetsApp):
     def configure_authentication_providers(self, **cfg: Any) -> None:
         providers_cfg = cfg.get('authentication_providers', {})
         self.available_providers = tuple(
-            obj
-            for cls in AUTHENTICATION_PROVIDERS.values()
-            if (obj := cls.configure(
-                **providers_cfg.get(cls.metadata.name, {})
+            provider
+            for name, provider_cfg in providers_cfg.items()
+            if (cls := AUTHENTICATION_PROVIDERS.get(
+                provider_cfg.get('provider', name)
             )) is not None
+            if (provider := cls.configure(**provider_cfg)) is not None
         )
 
         # enable auto login for the first provider that has it configured, and
@@ -182,7 +181,7 @@ def handle_authentication(
             return HTTPUnauthorized()
 
     # the provider returned something illegal
-    raise RuntimeError(f"Invalid response from {self.name}: {response}")
+    raise RuntimeError(f'Invalid response from {self.name}: {response}')
 
 
 @UserApp.view(
@@ -221,7 +220,7 @@ def handle_provider_authorisation(
                 request.class_link(Auth, {'to': login_to}, name='login')
             )
 
-    raise RuntimeError(f"Invalid response from {self.name}: {response}")
+    raise RuntimeError(f'Invalid response from {self.name}: {response}')
 
 
 @UserApp.view(

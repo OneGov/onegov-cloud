@@ -102,14 +102,19 @@ var tagselectors = [
     '.directory-fields .field-display dd',
     '.message .text'
 ];
-var tagexpr = new RegExp('(#[0-9a-zA-Zöäüéèà]{3,})', 'gi');
+// To avoid matching URLs, we need to make sure that the hashtag is not
+// preceded by a letter, number or /. This is done by including the character
+// before the hashtag. The character is then added back in the replacement.
+var tagexpr = new RegExp('(^|[^a-zA-Z0-9/])(#[0-9a-zA-Zöäüéèà]{3,})', 'gi');
 
 var highlightTags = function(target) {
     $(target).find(tagselectors.join(',')).each(function() {
-        this.innerHTML = this.innerHTML.replace(
-            tagexpr, function(match) {
-                return '<a class="hashtag" href="/search?q=' + encodeURIComponent(match) + '">' + match + '</a>';
-            });
+        this.innerHTML = this.innerHTML.replace(tagexpr, function(fullMatch, beforeChar, hashtag) {
+            // `beforeChar` captures the character before the hashtag
+            // `hashtag` captures the hashtag itself
+
+            return beforeChar + '<a class="hashtag" href="/search?q=' + encodeURIComponent(hashtag) + '">' + hashtag + '</a>';
+        });
     });
 };
 
@@ -303,4 +308,8 @@ page_refs.on('success', function(e) {
         1500
     )
     e.clearSelection();
+});
+
+$('a[data-back-link]').on('click', function(e) {
+    if(document.referrer) {window.open(document.referrer,'_self');} else {history.go(-1);} return false;
 });

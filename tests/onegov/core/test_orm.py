@@ -8,25 +8,28 @@ import uuid
 
 from datetime import datetime
 from dogpile.cache.api import NO_VALUE
+from markupsafe import Markup
 from onegov.core.framework import Framework
 from onegov.core.orm import (
-    ModelBase, SessionManager, as_selectable, translation_hybrid, find_models
-)
+    ModelBase, SessionManager, as_selectable, translation_hybrid,
+    translation_markup_hybrid, find_models)
 from onegov.core.orm.abstract import AdjacencyList
 from onegov.core.orm.abstract import Associable, associated
 from onegov.core.orm.func import unaccent
 from onegov.core.orm.mixins import meta_property
 from onegov.core.orm.mixins import content_property
 from onegov.core.orm.mixins import dict_property
+from onegov.core.orm.mixins import dict_markup_property
 from onegov.core.orm.mixins import ContentMixin
 from onegov.core.orm.mixins import TimestampMixin
-from onegov.core.orm import orm_cached
+from onegov.core.orm import orm_cached, request_cached
 from onegov.core.orm.types import HSTORE, JSON, UTCDateTime, UUID
-from onegov.core.orm.types import LowercaseText
+from onegov.core.orm.types import LowercaseText, MarkupText
 from onegov.core.security import Private
 from onegov.core.utils import scan_morepath_modules
 from psycopg2.extensions import TransactionRollbackError
 from pytz import timezone
+from sedate import utcnow
 from sqlalchemy import Column, Integer, Text, ForeignKey, func, select, and_
 from sqlalchemy.exc import OperationalError
 from sqlalchemy.ext.declarative import declarative_base
@@ -270,8 +273,8 @@ def test_orm_scenario(postgres_dsn, redis_url):
     scan_morepath_modules(App)
 
     app = App()
-    app.configure_application(dsn=postgres_dsn, base=Base, redis_url=redis_url)
     app.namespace = 'municipalities'
+    app.configure_application(dsn=postgres_dsn, base=Base, redis_url=redis_url)
     # remove ORMBase
     app.session_manager.bases.pop()
 
@@ -321,6 +324,8 @@ def test_i18n_with_request(postgres_dsn, redis_url):
 
         title_translations = Column(HSTORE, nullable=False)
         title = translation_hybrid(title_translations)
+        html_translations = Column(HSTORE, nullable=False)
+        html = translation_markup_hybrid(html_translations)
 
     @App.path(model=Document, path='document')
     def get_document(app):
@@ -328,11 +333,17 @@ def test_i18n_with_request(postgres_dsn, redis_url):
 
     @App.json(model=Document)
     def view_document(self, request):
-        return {'title': self.title}
+        # ensure we get the correct type
+        assert not self.html or isinstance(self.html, Markup)
+        return {'title': self.title, 'html': self.html}
 
     @App.json(model=Document, request_method='PUT')
     def put_document(self, request):
         self.title = request.params.get('title')
+        if 'unsafe' in request.params:
+            self.html = request.params['unsafe']
+        elif 'markup' in request.params:
+            self.html = Markup(request.params['markup'])
         app.session().merge(self)
 
     @App.setting(section='i18n', name='default_locale')
@@ -342,23 +353,32 @@ def test_i18n_with_request(postgres_dsn, redis_url):
     scan_morepath_modules(App)
 
     app = App()
-    app.configure_application(dsn=postgres_dsn, base=Base, redis_url=redis_url)
     app.namespace = 'municipalities'
+    app.configure_application(dsn=postgres_dsn, base=Base, redis_url=redis_url)
     # remove ORMBase
     app.session_manager.bases.pop()
     app.set_application_id('municipalities/new-york')
     app.locales = ['de_CH', 'en_US']
 
     c = Client(app)
-    c.put('/document?title=Dokument')
-    assert c.get('/document').json == {'title': 'Dokument'}
+    c.put('/document?title=Dokument&unsafe=<script>')
+    assert c.get('/document').json == {
+        'title': 'Dokument',
+        'html': '&lt;script&gt;'
+    }
 
     c.set_cookie('locale', 'en_US')
-    c.put('/document?title=Document')
-    assert c.get('/document').json == {'title': 'Document'}
+    c.put('/document?title=Document&markup=<b>bold</b>')
+    assert c.get('/document').json == {
+        'title': 'Document',
+        'html': '<b>bold</b>'
+    }
 
     c.set_cookie('locale', '')
-    assert c.get('/document').json == {'title': 'Dokument'}
+    assert c.get('/document').json == {
+        'title': 'Dokument',
+        'html': '&lt;script&gt;'
+    }
 
     app.session_manager.dispose()
 
@@ -551,6 +571,50 @@ def test_lowercase_text(postgres_dsn):
     mgr.dispose()
 
 
+def test_markup_text(postgres_dsn):
+    Base = declarative_base(cls=ModelBase)
+
+    class Test(Base):
+        __tablename__ = 'test'
+
+        id = Column(Integer, primary_key=True)
+        html = Column(MarkupText)
+
+    class Nbsp:
+        def __html__(self):
+            return '&nbsp;'
+
+    mgr = SessionManager(postgres_dsn, Base)
+    mgr.set_current_schema('testing')
+
+    session = mgr.session()
+
+    test1 = Test()
+    test1.id = 1
+    test1.html = '<script>unvetted</script>'
+    session.add(test1)
+    test2 = Test()
+    test2.id = 2
+    test2.html = Markup('<b>this is fine</b>')
+    session.add(test2)
+    # NOTE: This use-case will technically not pass type checking
+    #       but it still should work correctly
+    test3 = Test()
+    test3.id = 3
+    test3.html = Nbsp()
+    session.add(test3)
+    transaction.commit()
+
+    test1 = session.query(Test).get(1)
+    assert test1.html == Markup('&lt;script&gt;unvetted&lt;/script&gt;')
+    test2 = session.query(Test).get(2)
+    assert test2.html == Markup('<b>this is fine</b>')
+    test3 = session.query(Test).get(3)
+    assert test3.html == Markup('&nbsp;')
+
+    mgr.dispose()
+
+
 def test_utc_datetime_naive(postgres_dsn):
     Base = declarative_base(cls=ModelBase)
 
@@ -617,7 +681,7 @@ def test_timestamp_mixin(postgres_dsn):
     session.flush()
     transaction.commit()
 
-    now = datetime.utcnow()
+    now = utcnow()
 
     assert session.query(Test).one().created.year == now.year
     assert session.query(Test).one().created.month == now.month
@@ -816,6 +880,7 @@ def test_application_retries(postgres_dsn, number_of_retries, redis_url):
     scan_morepath_modules(App)
 
     app = App()
+    app.namespace = 'municipalities'
     app.configure_application(
         dsn=postgres_dsn,
         base=Base,
@@ -824,7 +889,6 @@ def test_application_retries(postgres_dsn, number_of_retries, redis_url):
     )
     # remove ORMBase
     app.session_manager.bases.pop()
-    app.namespace = 'municipalities'
 
     # make sure the schema exists already
     app.set_application_id('municipalities/new-york')
@@ -1182,6 +1246,8 @@ def test_dict_properties(postgres_dsn):
         users = Column(JSON, nullable=False, default=dict)
         group = dict_property('users', value_type=str)
         names = dict_property('users', default=list)
+        html1 = dict_markup_property('users')
+        html2 = dict_markup_property('users')
 
     mgr = SessionManager(postgres_dsn, Base)
     mgr.set_current_schema('testing')
@@ -1193,13 +1259,28 @@ def test_dict_properties(postgres_dsn):
     assert site.group is None
     site.names += ['foo', 'bar']
     site.group = 'test'
+    site.html1 = '<script>unvetted</script>'
+    site.html2 = Markup('<b>safe</b>')
     session.add(site)
-    assert site.users == {'group': 'test', 'names': ['foo', 'bar']}
+    assert site.users == {
+        'group': 'test',
+        'names': ['foo', 'bar'],
+        'html1': '&lt;script&gt;unvetted&lt;/script&gt;',
+        'html2': '<b>safe</b>'
+    }
 
     # try to query for a dict property
-    group, names = session.query(Site.group, Site.names).one()
+    group, names, html1, html2 = session.query(
+        Site.group,
+        Site.names,
+        Site.html1,
+        Site.html2
+    ).one()
     assert group == 'test'
     assert names == ['foo', 'bar']
+    assert isinstance(html1, Markup)
+    assert html1 == Markup('&lt;script&gt;unvetted&lt;/script&gt;')
+    assert html2 == Markup('<b>safe</b>')
 
     # try to filter by a dict property
     query = session.query(Site).filter(Site.names.contains('foo'))
@@ -1377,7 +1458,10 @@ def test_orm_cache(postgres_dsn, redis_url):
 
         @orm_cached(policy='on-table-change:documents')
         def documents(self):
-            return self.session().query(Document)
+            return self.session().query(Document).with_entities(
+                Document.id,
+                Document.title
+            )
 
         @orm_cached(policy='on-table-change:documents')
         def untitled_documents(self):
@@ -1395,6 +1479,194 @@ def test_orm_cache(postgres_dsn, redis_url):
             return q.first()
 
         @orm_cached(policy=lambda o: o.title == 'Secret')
+        def secret_document(self):
+            q = self.session().query(Document)
+            q = q.with_entities(Document.id)
+            q = q.filter(Document.title == 'Secret')
+
+            doc = q.first()
+            return doc.id if doc else None
+
+    class Document(Base):
+        __tablename__ = 'documents'
+
+        id = Column(Integer, primary_key=True)
+        title = Column(Text, nullable=True)
+        body = Column(Text, nullable=True)
+
+    # this is required for the transactions to actually work, usually this
+    # would be onegov.server's job
+    scan_morepath_modules(App)
+
+    app = App()
+    app.namespace = 'foo'
+    app.configure_application(
+        dsn=postgres_dsn,
+        base=Base,
+        redis_url=redis_url
+    )
+    # remove ORMBase
+    app.session_manager.bases.pop()
+    app.set_application_id('foo/bar')
+
+    # ensure that no results work
+    app.clear_request_cache()
+    assert app.documents == tuple()
+    assert app.untitled_documents == []
+    assert app.first_document is None
+    assert app.secret_document is None
+
+    assert app.request_cache == {
+        'test_orm_cache.<locals>.App.documents': tuple(),
+        'test_orm_cache.<locals>.App.first_document': None,
+        'test_orm_cache.<locals>.App.secret_document': None,
+        'test_orm_cache.<locals>.App.untitled_documents': []
+    }
+
+    ts1 = app.cache.get('test_orm_cache.<locals>.App.documents_ts')
+    ts2 = app.cache.get('test_orm_cache.<locals>.App.first_document_ts')
+    ts3 = app.cache.get('test_orm_cache.<locals>.App.secret_document_ts')
+    ts4 = app.cache.get('test_orm_cache.<locals>.App.untitled_documents_ts')
+
+    assert app.schema_cache == {
+        'test_orm_cache.<locals>.App.documents': (ts1, tuple()),
+        'test_orm_cache.<locals>.App.first_document': (ts2, None),
+        'test_orm_cache.<locals>.App.secret_document': (ts3, None),
+        'test_orm_cache.<locals>.App.untitled_documents': (ts4, [])
+    }
+
+    assert app.cache.get('test_orm_cache.<locals>.App.documents') == tuple()
+    assert app.cache.get('test_orm_cache.<locals>.App.first_document') is None
+    assert app.cache.get('test_orm_cache.<locals>.App.secret_document') is None
+    assert app.cache.get(
+        'test_orm_cache.<locals>.App.untitled_documents') == []
+
+    # if we add a non-secret document all caches update except for the last one
+    app.session().add(Document(id=1, title='Public', body='Lorem Ipsum'))
+    transaction.commit()
+
+    assert app.cache.get('test_orm_cache.<locals>.App.documents') is NO_VALUE
+    assert app.cache.get(
+        'test_orm_cache.<locals>.App.first_document') is NO_VALUE
+    assert app.cache.get(
+        'test_orm_cache.<locals>.App.untitled_documents') is NO_VALUE
+    assert app.cache.get('test_orm_cache.<locals>.App.secret_document') is None
+    assert app.cache.get(
+        'test_orm_cache.<locals>.App.documents_ts') is NO_VALUE
+    assert app.cache.get(
+        'test_orm_cache.<locals>.App.first_document_ts') is NO_VALUE
+    assert app.cache.get(
+        'test_orm_cache.<locals>.App.untitled_documents_ts') is NO_VALUE
+    assert app.cache.get(
+        'test_orm_cache.<locals>.App.secret_document_ts') == ts3
+
+    assert app.request_cache == {
+        'test_orm_cache.<locals>.App.secret_document': None,
+    }
+    assert app.schema_cache == {
+        'test_orm_cache.<locals>.App.secret_document': (ts3, None),
+    }
+
+    assert app.secret_document is None
+    assert app.first_document.title == 'Public'
+    assert app.untitled_documents == []
+    assert app.documents[0].title == 'Public'
+
+    # the timestamps for the changed caches should update, but the one
+    # that's still cached should stay the same
+    assert app.cache.get('test_orm_cache.<locals>.App.documents_ts') > ts1
+    assert app.cache.get('test_orm_cache.<locals>.App.first_document_ts') > ts2
+    assert app.cache.get(
+        'test_orm_cache.<locals>.App.secret_document_ts') == ts3
+    assert app.cache.get(
+        'test_orm_cache.<locals>.App.untitled_documents_ts') > ts4
+
+    # if we add a secret document all caches change
+    app.session().add(Document(id=2, title='Secret', body='Geheim'))
+    transaction.commit()
+
+    assert app.request_cache == {}
+    assert app.secret_document == 2
+    assert app.first_document.title == 'Public'
+    assert app.untitled_documents == []
+    assert len(app.documents) == 2
+
+
+def test_orm_cache_flush(postgres_dsn, redis_url):
+
+    Base = declarative_base(cls=ModelBase)
+
+    class App(Framework):
+
+        @property
+        def foo(self):
+            return self.session().query(Document).one()
+
+        @orm_cached(policy='on-table-change:documents')
+        def bar(self):
+            return self.session().query(Document)\
+                .with_entities(Document.title).one()
+
+    class Document(Base):
+        __tablename__ = 'documents'
+
+        id = Column(Integer, primary_key=True)
+        title = Column(Text, nullable=True)
+
+    scan_morepath_modules(App)
+
+    app = App()
+    app.namespace = 'foo'
+    app.configure_application(
+        dsn=postgres_dsn,
+        base=Base,
+        redis_url=redis_url
+    )
+    # remove ORMBase
+    app.session_manager.bases.pop()
+    app.set_application_id('foo/bar')
+    app.clear_request_cache()
+
+    app.session().add(Document(id=1, title='Yo'))
+    transaction.commit()
+
+    # both instances get cached
+    assert app.foo.title == 'Yo'
+    assert app.bar.title == 'Yo'
+
+    # one instance changes without an explicit flush
+    app.foo.title = 'Sup'
+
+    # accessing the bar instance *first* fetches it from the cache which at
+    # this point would contain stale entries because we didn't flush explicitly
+    # but thanks to our autoflush mechanism this doesn't happen
+    assert app.session().dirty
+    assert app.bar.title == 'Sup'
+    assert app.foo.title == 'Sup'
+
+
+def test_request_cache(postgres_dsn, redis_url):
+
+    Base = declarative_base(cls=ModelBase)
+
+    class App(Framework):
+
+        @request_cached
+        def untitled_documents(self):
+            q = self.session().query(Document)
+            q = q.with_entities(Document.id, Document.title)
+            q = q.filter(Document.title == None)
+
+            return q.all()
+
+        @request_cached
+        def first_document(self):
+            q = self.session().query(Document)
+            q = q.with_entities(Document.id, Document.title)
+
+            return q.first()
+
+        @request_cached
         def secret_document(self):
             q = self.session().query(Document)
             q = q.filter(Document.title == 'Secret')
@@ -1416,6 +1688,7 @@ def test_orm_cache(postgres_dsn, redis_url):
     scan_morepath_modules(App)
 
     app = App()
+    app.namespace = 'foo'
     app.configure_application(
         dsn=postgres_dsn,
         base=Base,
@@ -1423,76 +1696,57 @@ def test_orm_cache(postgres_dsn, redis_url):
     )
     # remove ORMBase
     app.session_manager.bases.pop()
-    app.namespace = 'foo'
     app.set_application_id('foo/bar')
 
     # ensure that no results work
     app.clear_request_cache()
-    assert app.documents == tuple()
     assert app.untitled_documents == []
     assert app.first_document is None
     assert app.secret_document is None
 
     assert app.request_cache == {
-        'test_orm_cache.<locals>.App.documents': tuple(),
-        'test_orm_cache.<locals>.App.first_document': None,
-        'test_orm_cache.<locals>.App.secret_document': None,
-        'test_orm_cache.<locals>.App.untitled_documents': []
+        'test_request_cache.<locals>.App.first_document': None,
+        'test_request_cache.<locals>.App.secret_document': None,
+        'test_request_cache.<locals>.App.untitled_documents': []
     }
 
-    assert app.cache.get('test_orm_cache.<locals>.App.documents') == tuple()
-    assert app.cache.get('test_orm_cache.<locals>.App.first_document') is None
-    assert app.cache.get('test_orm_cache.<locals>.App.secret_document') is None
-    assert app.cache.get('test_orm_cache.<locals>.App.untitled_documents')\
-        == []
-
-    # if we add a non-secret document all caches update except for the last one
     app.session().add(Document(id=1, title='Public', body='Lorem Ipsum'))
-    transaction.commit()
-
-    assert app.cache.get('test_orm_cache.<locals>.App.documents') is NO_VALUE
-    assert app.cache.get('test_orm_cache.<locals>.App.first_document')\
-        is NO_VALUE
-    assert app.cache.get('test_orm_cache.<locals>.App.untitled_documents')\
-        is NO_VALUE
-    assert app.cache.get('test_orm_cache.<locals>.App.secret_document') is None
-
-    assert app.request_cache == {
-        'test_orm_cache.<locals>.App.secret_document': None,
-    }
-
-    assert app.secret_document is None
-    assert app.first_document.title == 'Public'
-    assert app.untitled_documents == []
-    assert app.documents[0].body == 'Lorem Ipsum'
-
-    # if we add a secret document all caches change
     app.session().add(Document(id=2, title='Secret', body='Geheim'))
     transaction.commit()
+    # no influence on same request
+    assert app.request_cache == {
+        'test_request_cache.<locals>.App.first_document': None,
+        'test_request_cache.<locals>.App.secret_document': None,
+        'test_request_cache.<locals>.App.untitled_documents': []
+    }
+    assert app.untitled_documents == []
+    assert app.first_document is None
+    assert app.secret_document is None
+    app.clear_request_cache()
 
     assert app.request_cache == {}
     assert app.secret_document.body == "Geheim"
     assert app.first_document.title == 'Public'
     assert app.untitled_documents == []
-    assert len(app.documents) == 2
 
     # if we change something in a cached object it is reflected
+    # in the next request
     app.secret_document.title = None
     transaction.commit()
 
-    assert 'test_orm_cache.<locals>.App.secret_document' in app.request_cache
-    assert app.untitled_documents[0].title is None
-
     # the object in the request cache is now detached
     with pytest.raises(DetachedInstanceError):
-        key = 'test_orm_cache.<locals>.App.secret_document'
+        key = 'test_request_cache.<locals>.App.secret_document'
         assert app.request_cache[key].title
 
     # which we transparently undo
     assert app.secret_document.title is None
 
+    app.clear_request_cache()
+    assert app.untitled_documents[0].title is None
 
-def test_orm_cache_flush(postgres_dsn, redis_url):
+
+def test_request_cache_flush(postgres_dsn, redis_url):
 
     Base = declarative_base(cls=ModelBase)
 
@@ -1519,6 +1773,7 @@ def test_orm_cache_flush(postgres_dsn, redis_url):
     scan_morepath_modules(App)
 
     app = App()
+    app.namespace = 'foo'
     app.configure_application(
         dsn=postgres_dsn,
         base=Base,
@@ -1526,7 +1781,6 @@ def test_orm_cache_flush(postgres_dsn, redis_url):
     )
     # remove ORMBase
     app.session_manager.bases.pop()
-    app.namespace = 'foo'
     app.set_application_id('foo/bar')
     app.clear_request_cache()
 
@@ -1541,7 +1795,7 @@ def test_orm_cache_flush(postgres_dsn, redis_url):
     app.foo.title = 'Sup'
 
     # accessing the bar instance *first* fetches it from the cache which at
-    # this point would contain stale entries because we didn't flush eplicitly,
+    # this point would contain stale entries because we didn't flush explicitly
     # but thanks to our autoflush mechanism this doesn't happen
     assert app.session().dirty
     assert app.bar.title == 'Sup'
@@ -1932,6 +2186,7 @@ def test_i18n_translation_hybrid_independence(postgres_dsn, redis_url):
     scan_morepath_modules(App)
 
     freiburg = App()
+    freiburg.namespace = 'app'
     freiburg.configure_application(
         dsn=postgres_dsn,
         base=Base,
@@ -1939,11 +2194,11 @@ def test_i18n_translation_hybrid_independence(postgres_dsn, redis_url):
     )
     # remove ORMBase
     freiburg.session_manager.bases.pop()
-    freiburg.namespace = 'app'
     freiburg.set_application_id('app/freiburg')
     freiburg.locales = ['de_CH', 'fr_CH']
 
     biel = App()
+    biel.namespace = 'app'
     biel.configure_application(
         dsn=postgres_dsn,
         base=Base,
@@ -1951,7 +2206,6 @@ def test_i18n_translation_hybrid_independence(postgres_dsn, redis_url):
     )
     # remove ORMBase
     biel.session_manager.bases.pop()
-    biel.namespace = 'app'
     biel.set_application_id('app/biel')
     biel.locales = ['de_CH', 'fr_CH']
 

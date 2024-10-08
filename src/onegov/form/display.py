@@ -87,12 +87,9 @@ class StringFieldRenderer(BaseRenderer):
     def __call__(self, field: 'Field') -> Markup:
         if field.render_kw:
             if field.render_kw.get('data-editor') == 'markdown':
-                # FIXME: This utility function should return Markup
-                return Markup(  # noqa: MS001
-                    render_untrusted_markdown(field.data)
-                )
+                return render_untrusted_markdown(field.data)
 
-        return self.escape(str(field.data)).replace('\n', Markup('<br>'))
+        return self.escape(field.data or '').replace('\n', Markup('<br>'))
 
 
 @registry.register_for('PasswordField')
@@ -241,7 +238,7 @@ class RadioFieldRenderer(BaseRenderer):
 
     def __call__(self, field: 'Field') -> Markup:
         choices = dict(field.choices)  # type:ignore[attr-defined]
-        return self.escape("✓ " + self.translate(
+        return self.escape('✓ ' + self.translate(
             field, choices.get(field.data, '?')
         ))
 

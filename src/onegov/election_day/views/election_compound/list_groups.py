@@ -1,7 +1,7 @@
-from onegov.ballot import ElectionCompound
-from onegov.core.security import Public
 from onegov.election_day import ElectionDayApp
 from onegov.election_day.layouts import ElectionCompoundLayout
+from onegov.election_day.models import ElectionCompound
+from onegov.election_day.security import MaybePublic
 from onegov.election_day.utils import add_last_modified_header
 from onegov.election_day.utils.election_compound import get_list_groups
 from onegov.election_day.utils.election_compound import get_list_groups_data
@@ -18,7 +18,7 @@ if TYPE_CHECKING:
 @ElectionDayApp.json(
     model=ElectionCompound,
     name='list-groups-data',
-    permission=Public
+    permission=MaybePublic
 )
 def view_election_compound_list_groups_data(
     self: ElectionCompound,
@@ -33,7 +33,7 @@ def view_election_compound_list_groups_data(
     model=ElectionCompound,
     name='list-groups-chart',
     template='embed.pt',
-    permission=Public
+    permission=MaybePublic
 )
 def view_election_compound_list_groups_chart(
     self: ElectionCompound,
@@ -56,7 +56,7 @@ def view_election_compound_list_groups_chart(
     model=ElectionCompound,
     name='list-groups-table',
     template='embed.pt',
-    permission=Public
+    permission=MaybePublic
 )
 def view_election_compound_list_groups_table(
     self: ElectionCompound,
@@ -81,7 +81,7 @@ def view_election_compound_list_groups_table(
     model=ElectionCompound,
     name='list-groups',
     template='election_compound/list_groups.pt',
-    permission=Public
+    permission=MaybePublic
 )
 def view_election_compound_list_groups(
     self: ElectionCompound,
@@ -98,7 +98,11 @@ def view_election_compound_list_groups(
     }
 
 
-@ElectionDayApp.svg_file(model=ElectionCompound, name='list-groups-svg')
+@ElectionDayApp.svg_file(
+    model=ElectionCompound,
+    name='list-groups-svg',
+    permission=MaybePublic
+)
 def view_election_compound_list_groups_svg(
     self: ElectionCompound,
     request: 'ElectionDayRequest'

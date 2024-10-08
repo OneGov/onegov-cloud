@@ -44,7 +44,7 @@ from more.webassets.tweens import (
 from typing import TYPE_CHECKING
 if TYPE_CHECKING:
     from morepath import Response
-    from typing_extensions import Self
+    from typing import Self
 
     from .request import CoreRequest
 

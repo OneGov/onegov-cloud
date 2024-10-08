@@ -3,6 +3,7 @@ import morepath
 from onegov.core.security import Private, Public
 from onegov.core.utils import normalize_for_url
 from onegov.form import FormCollection, FormDefinition
+from onegov.form import FormRegistrationWindow
 from onegov.gis import Coordinates
 from onegov.org import _, OrgApp
 from onegov.org.cli import close_ticket
@@ -16,11 +17,12 @@ from webob import exc
 
 
 from typing import TypeVar, TYPE_CHECKING
+
 if TYPE_CHECKING:
     from collections.abc import Iterable, Iterator
     from onegov.core.layout import Layout
     from onegov.core.types import RenderData
-    from onegov.form import FormRegistrationWindow, FormSubmission
+    from onegov.form import Form, FormSubmission
     from onegov.org.request import OrgRequest
     from sqlalchemy.orm import Session
     from webob import Response
@@ -49,43 +51,43 @@ def get_form_class(
 #        where we don't actually always have one is weird
 def get_hints(
     layout: 'Layout',
-    window: 'FormRegistrationWindow | None'
+    window: FormRegistrationWindow | None
 ) -> 'Iterator[tuple[str, str]]':
 
     if not window:
         return
 
     if window.in_the_past:
-        yield 'stop', _("The registration has ended")
+        yield 'stop', _('The registration has ended')
     elif not window.enabled:
-        yield 'stop', _("The registration is closed")
+        yield 'stop', _('The registration is closed')
 
     if window.enabled and window.in_the_future:
-        yield 'date', _("The registration opens on ${day}, ${date}", mapping={
+        yield 'date', _('The registration opens on ${day}, ${date}', mapping={
             'day': layout.format_date(window.start, 'weekday_long'),
             'date': layout.format_date(window.start, 'date_long')
         })
 
     if window.enabled and window.in_the_present:
-        yield 'date', _("The registration closes on ${day}, ${date}", mapping={
+        yield 'date', _('The registration closes on ${day}, ${date}', mapping={
             'day': layout.format_date(window.end, 'weekday_long'),
             'date': layout.format_date(window.end, 'date_long')
         })
 
         if window.limit and window.overflow:
             yield 'count', _("There's a limit of ${count} attendees", mapping={
-                'count': window.limit
-            })
+                             'count': window.limit
+                             })
 
         if window.limit and not window.overflow:
             spots = window.available_spots
 
             if spots == 0:
-                yield 'stop', _("There are no spots left")
+                yield 'stop', _('There are no spots left')
             elif spots == 1:
-                yield 'count', _("There is one spot left")
+                yield 'count', _('There is one spot left')
             else:
-                yield 'count', _("There are ${count} spots left", mapping={
+                yield 'count', _('There are ${count} spots left', mapping={
                     'count': spots
                 })
 
@@ -162,7 +164,7 @@ def handle_change_form_name(
 def handle_defined_form(
     self: FormDefinition,
     request: 'OrgRequest',
-    form: FormDefinitionForm,
+    form: 'Form',
     layout: FormSubmissionLayout | None = None
 ) -> 'RenderData | Response':
     """ Renders the empty form and takes input, even if it's not valid, stores
@@ -195,8 +197,9 @@ def handle_defined_form(
         'definition': self,
         'form_width': 'small',
         'lead': layout.linkify(self.meta.get('lead')),
-        'text': self.content.get('text'),
+        'text': self.text,
         'people': getattr(self, 'people', None),
+        'files': getattr(self, 'files', None),
         'contact': getattr(self, 'contact_html', None),
         'coordinates': getattr(self, 'coordinates', Coordinates()),
         'hints': tuple(get_hints(layout, self.current_registration_window)),
@@ -222,7 +225,7 @@ def handle_new_definition(
         assert form.definition.data is not None
 
         if self.definitions.by_name(normalize_for_url(form.title.data)):
-            request.alert(_("A form with this name already exists"))
+            request.alert(_('A form with this name already exists'))
         else:
             definition = self.definitions.add(
                 title=form.title.data,
@@ -231,19 +234,20 @@ def handle_new_definition(
             )
             form.populate_obj(definition)
 
-            request.success(_("Added a new form"))
+            request.success(_('Added a new form'))
             return morepath.redirect(request.link(definition))
 
     layout = layout or FormEditorLayout(self, request)
     layout.breadcrumbs = [
-        Link(_("Homepage"), layout.homepage_url),
-        Link(_("Forms"), request.link(self)),
-        Link(_("New Form"), request.link(self, name='new'))
+        Link(_('Homepage'), layout.homepage_url),
+        Link(_('Forms'), request.link(self)),
+        Link(_('New Form'), request.link(self, name='new'))
     ]
+    layout.edit_mode = True
 
     return {
         'layout': layout,
-        'title': _("New Form"),
+        'title': _('New Form'),
         'form': form,
         'form_width': 'large',
     }
@@ -268,7 +272,7 @@ def handle_edit_definition(
         form.populate_obj(self, exclude={'definition'})
         self.definition = form.definition.data
 
-        request.success(_("Your changes were saved"))
+        request.success(_('Your changes were saved'))
         return morepath.redirect(request.link(self))
     elif not request.POST:
         form.process(obj=self)
@@ -277,11 +281,12 @@ def handle_edit_definition(
 
     layout = layout or FormEditorLayout(self, request)
     layout.breadcrumbs = [
-        Link(_("Homepage"), layout.homepage_url),
-        Link(_("Forms"), request.link(collection)),
+        Link(_('Homepage'), layout.homepage_url),
+        Link(_('Forms'), request.link(collection)),
         Link(self.title, request.link(self)),
-        Link(_("Edit"), request.link(self, name='edit'))
+        Link(_('Edit'), request.link(self, name='edit'))
     ]
+    layout.edit_mode = True
 
     return {
         'layout': layout,

@@ -93,7 +93,7 @@ def test_settings(client):
     ) in page
 
     # module settings
-    settings = client.get('/module-settings')
+    settings = client.get('/event-settings')
     assert client.app.org.event_filter_type == 'tags'
     assert settings.form['event_filter_type'].value == 'tags'
 

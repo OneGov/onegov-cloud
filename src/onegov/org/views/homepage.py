@@ -17,6 +17,7 @@ from onegov.reservation import ResourceCollection
 from typing import TYPE_CHECKING
 if TYPE_CHECKING:
     from onegov.core.types import RenderData
+    from onegov.org.layout import Layout
     from onegov.org.request import OrgRequest
     from webob import Response
 
@@ -51,7 +52,7 @@ def redirect_to(
 def view_org(
     self: Organisation,
     request: 'OrgRequest',
-    layout: HomepageLayout | None = None
+    layout: 'Layout | None' = None
 ) -> 'RenderData | Response':
     """ Renders the org's homepage. """
 
@@ -93,7 +94,7 @@ def view_pages_sort(
     layout = layout or HomepageLayout(self, request)
 
     return {
-        'title': _("Sort"),
+        'title': _('Sort'),
         'layout': layout,
         'page': self,
         'pages': layout.root_pages

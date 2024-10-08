@@ -22,10 +22,10 @@ def atoz(
     #        probably be a property of the AtoZ, rather than hardcoded
     layout = layout or DefaultLayout(self, request)
     assert isinstance(layout.breadcrumbs, list)
-    layout.breadcrumbs.append(Link(_("Topics A-Z"), '#'))
+    layout.breadcrumbs.append(Link(_('Topics A-Z'), '#'))
 
     return {
-        'title': _("Topics A-Z"),
+        'title': _('Topics A-Z'),
         'model': self,
         'layout': layout
     }

@@ -26,7 +26,7 @@ if TYPE_CHECKING:
     from onegov.gazette.request import GazetteRequest
     from onegov.notice.models import NoticeState
     from sqlalchemy.orm import Query
-    from typing_extensions import Self
+    from typing import Self
 
 
 class IssueName(NamedTuple):
@@ -167,7 +167,7 @@ class Issue(Base, TimestampMixin, AssociatedFiles):
 
         """
 
-        query: 'Query[tuple[str, date_t]]'
+        query: Query[tuple[str, date_t]]
         query = object_session(self).query(Issue.name, Issue.date)
         issue_dates = dict(query.order_by(Issue.date))
         issue_dates[self.name] = date_
@@ -197,7 +197,8 @@ class Issue(Base, TimestampMixin, AssociatedFiles):
             notice.publish(request)
 
         from onegov.gazette.pdf import IssuePdf  # circular
-        self.pdf = IssuePdf.from_issue(
+        # FIXME: asymmetric property
+        self.pdf = IssuePdf.from_issue(  # type:ignore[assignment]
             issue=self,
             request=request,
             first_publication_number=self.first_publication_number,

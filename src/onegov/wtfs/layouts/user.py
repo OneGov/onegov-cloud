@@ -20,15 +20,15 @@ class UsersLayout(DefaultLayout):
 
     @cached_property
     def title(self) -> str:
-        return _("Users")
+        return _('Users')
 
     @cached_property
     def editbar_links(self) -> list['Element']:
-        result: list['Element'] = []
+        result: list[Element] = []
         if self.request.has_permission(self.model, AddModelUnrestricted):
             result.append(
                 Link(
-                    text=_("Add"),
+                    text=_('Add'),
                     url=self.request.link(
                         self.model,
                         name='add-unrestricted'
@@ -39,7 +39,7 @@ class UsersLayout(DefaultLayout):
         elif self.request.has_permission(self.model, AddModel):
             result.append(
                 Link(
-                    text=_("Add"),
+                    text=_('Add'),
                     url=self.request.link(
                         self.model,
                         name='add'
@@ -52,7 +52,7 @@ class UsersLayout(DefaultLayout):
     @cached_property
     def breadcrumbs(self) -> list['Element']:
         return [
-            Link(_("Homepage"), self.homepage_url),
+            Link(_('Homepage'), self.homepage_url),
             Link(self.title, self.users_url)
         ]
 
@@ -65,11 +65,11 @@ class UserLayout(DefaultLayout):
 
     @cached_property
     def editbar_links(self) -> list['Element']:
-        result: list['Element'] = []
+        result: list[Element] = []
         if self.request.has_permission(self.model, EditModelUnrestricted):
             result.append(
                 Link(
-                    text=_("Edit"),
+                    text=_('Edit'),
                     url=self.request.link(self.model, 'edit-unrestricted'),
                     attrs={'class': 'edit-icon'}
                 )
@@ -77,7 +77,7 @@ class UserLayout(DefaultLayout):
         elif self.request.has_permission(self.model, EditModel):
             result.append(
                 Link(
-                    text=_("Edit"),
+                    text=_('Edit'),
                     url=self.request.link(self.model, 'edit'),
                     attrs={'class': 'edit-icon'}
                 )
@@ -85,7 +85,7 @@ class UserLayout(DefaultLayout):
         if self.request.has_permission(self.model, DeleteModel):
             result.append(
                 Link(
-                    text=_("Delete"),
+                    text=_('Delete'),
                     url=self.csrf_protected_url(
                         self.request.link(self.model)
                     ),
@@ -93,11 +93,11 @@ class UserLayout(DefaultLayout):
                     traits=(
                         Confirm(
                             _(
-                                "Do you really want to delete this user?"
+                                'Do you really want to delete this user?'
                             ),
-                            _("This cannot be undone."),
-                            _("Delete"),
-                            _("Cancel")
+                            _('This cannot be undone.'),
+                            _('Delete'),
+                            _('Cancel')
                         ),
                         Intercooler(
                             request_method='DELETE',
@@ -111,8 +111,8 @@ class UserLayout(DefaultLayout):
     @cached_property
     def breadcrumbs(self) -> list['Element']:
         return [
-            Link(_("Homepage"), self.homepage_url),
-            Link(_("Users"), self.users_url),
+            Link(_('Homepage'), self.homepage_url),
+            Link(_('Users'), self.users_url),
             Link(self.title, '#')
         ]
 
@@ -121,14 +121,14 @@ class AddUserLayout(DefaultLayout):
 
     @cached_property
     def title(self) -> str:
-        return _("Add user")
+        return _('Add user')
 
     @cached_property
     def breadcrumbs(self) -> list['Element']:
         return [
-            Link(_("Homepage"), self.homepage_url),
-            Link(_("Users"), self.users_url),
-            Link(_("Add"), '#')
+            Link(_('Homepage'), self.homepage_url),
+            Link(_('Users'), self.users_url),
+            Link(_('Add'), '#')
         ]
 
     @cached_property
@@ -144,15 +144,15 @@ class EditUserLayout(DefaultLayout):
 
     @cached_property
     def title(self) -> str:
-        return _("Edit user")
+        return _('Edit user')
 
     @cached_property
     def breadcrumbs(self) -> list['Element']:
         return [
-            Link(_("Homepage"), self.homepage_url),
-            Link(_("Users"), self.users_url),
+            Link(_('Homepage'), self.homepage_url),
+            Link(_('Users'), self.users_url),
             Link(self.model.title, self.request.link(self.model)),
-            Link(_("Edit"), '#')
+            Link(_('Edit'), '#')
         ]
 
     @cached_property

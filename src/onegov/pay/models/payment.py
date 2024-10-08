@@ -10,6 +10,7 @@ from sqlalchemy import ForeignKey
 from sqlalchemy import Numeric
 from sqlalchemy import Text
 from sqlalchemy.ext.hybrid import hybrid_property
+from sqlalchemy.orm import relationship
 from uuid import uuid4
 
 
@@ -18,8 +19,7 @@ if TYPE_CHECKING:
     import uuid
     from onegov.pay.models import PaymentProvider
     from onegov.pay.types import PaymentState
-    from sqlalchemy.orm import relationship
-    from typing_extensions import Self
+    from typing import Self
 
 
 class Payment(Base, TimestampMixin, ContentMixin, Associable):
@@ -61,17 +61,19 @@ class Payment(Base, TimestampMixin, ContentMixin, Associable):
         default='open'
     )
 
-    #: the payment provider associated with the payment, if it is missing it
-    #: means that the payment is out-of-band (say paid by cash)
+    #: the id of the payment provider associated with the payment
     provider_id: 'Column[uuid.UUID | None]' = Column(
         UUID,  # type:ignore[arg-type]
         ForeignKey('payment_providers.id'),
         nullable=True
     )
 
-    if TYPE_CHECKING:
-        # inserted via backref
-        provider: relationship[PaymentProvider['Self'] | None]
+    #: the payment provider associated with the payment, if it is missing it
+    #: means that the payment is out-of-band (say paid by cash)
+    provider: 'relationship[PaymentProvider[Self] | None]' = relationship(
+        'PaymentProvider',
+        back_populates='payments'
+    )
 
     __mapper_args__ = {
         'polymorphic_on': source,

@@ -17,8 +17,7 @@ from typing import overload, Any, Literal, NoReturn, TYPE_CHECKING
 if TYPE_CHECKING:
     from collections.abc import Mapping
     from sqlalchemy.engine import Dialect
-    from typing import TypeVar
-    from typing_extensions import Self
+    from typing import Self, TypeVar
 
     _Base = TypeDecorator['DirectoryConfiguration']
     _MutableT = TypeVar('_MutableT', bound=Mutable)
@@ -46,10 +45,10 @@ def pad_numbers_in_chunks(text: str, padding: int = 8) -> str:
         https://nedbatchelder.com/blog/200712/human_sorting.html
 
     """
-    return ''.join((
+    return ''.join(
         part.rjust(padding, '0') if part.isdigit() else part
         for part in number_chunks.split(text)
-    ))
+    )
 
 
 class DirectoryConfigurationStorage(_Base, ScalarCoercible):
@@ -299,12 +298,12 @@ class DirectoryConfiguration(Mutable, StoredConfiguration):
         for key in self.keywords:
             key = as_internal_id(key)
 
-            for value in collapse(data[key]):
+            for value in collapse(data.get(key, ())):
                 if isinstance(value, str):
                     value = value.strip()
 
                 if value:
-                    keywords.add(':'.join((key, value)))
+                    keywords.add(f'{key}:{value}')
 
         return keywords
 

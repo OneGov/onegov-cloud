@@ -20,8 +20,8 @@ def test_static_file(temporary_directory):
     morepath.commit(App)
 
     app = App()
-    app.configure_application()
     app.namespace = 'test'
+    app.configure_application()
     app.set_application_id('test/test')
 
     with open(os.path.join(temporary_directory, 'robots.txt'), 'w') as f:
@@ -51,8 +51,8 @@ def test_static_file_app(temporary_directory, redis_url):
         f.write('foobar')
 
     app = App()
-    app.configure_application(redis_url=redis_url)
     app.namespace = 'test'
+    app.configure_application(redis_url=redis_url)
     app.set_application_id('test/test')
 
     c = Client(app)
@@ -99,8 +99,8 @@ def test_root_file_app(temporary_directory, redis_url):
         f.write('foobar')
 
     app = App()
-    app.configure_application(redis_url=redis_url)
     app.namespace = 'test'
+    app.configure_application(redis_url=redis_url)
     app.set_application_id('test/test')
 
     c = Client(app)
@@ -142,8 +142,8 @@ def test_static_files_directive(temporary_directory, redis_url):
     app_b = B()
 
     for app in (app_a, app_b):
-        app.configure_application(redis_url=redis_url)
         app.namespace = 'test'
+        app.configure_application(redis_url=redis_url)
         app.set_application_id('test/test')
 
     assert app_a.static_files == [a]

@@ -13,7 +13,7 @@
                                     <dt class="show-for-sr" i18n:translate>State:</dt>
                                     <tal:b repeat="link filters">
                                         <dd class="${link.active and 'active' or ''}">
-                                            <tal:b replace="structure link(layout)"></tal:b>
+                                            <tal:b replace="link(layout)"></tal:b>
                                         </dd>
                                     </tal:b>
                                 </dl>
@@ -43,7 +43,7 @@
                                         <span class="${' '.join(handler.attrs['class'])}">${handler.text}</span>
                                     </button>
                                     <ul id="handlers" data-dropdown-content class="f-dropdown disable-scroll" aria-hidden="true">
-                                        <li tal:repeat="link handlers"><tal:b replace="structure link(layout)"></tal:b></li>
+                                        <li tal:repeat="link handlers"><tal:b replace="link(layout)"></tal:b></li>
                                     </ul>
                                 </span>
                             </div>

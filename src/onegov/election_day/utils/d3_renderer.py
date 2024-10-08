@@ -2,13 +2,13 @@ from base64 import b64decode
 from io import BytesIO
 from io import StringIO
 from json import dumps, loads
-from onegov.ballot import Ballot
-from onegov.ballot import Election
-from onegov.ballot import ElectionCompound
-from onegov.ballot import ElectionCompoundPart
 from onegov.core.custom import json
 from onegov.core.utils import module_path
 from onegov.election_day import _
+from onegov.election_day.models import Ballot
+from onegov.election_day.models import Election
+from onegov.election_day.models import ElectionCompound
+from onegov.election_day.models import ElectionCompoundPart
 from onegov.election_day.utils.election import get_candidates_data
 from onegov.election_day.utils.election import get_connections_data
 from onegov.election_day.utils.election import get_lists_data
@@ -20,7 +20,7 @@ from onegov.election_day.utils.parties import get_party_results_vertical_data
 from onegov.election_day.utils.vote import get_ballot_data_by_district
 from onegov.election_day.utils.vote import get_ballot_data_by_entity
 from requests import post
-from rjsmin import jsmin
+from rjsmin import jsmin  # type:ignore[import-untyped]
 
 
 from typing import overload
@@ -75,7 +75,7 @@ class D3Renderer:
                 path = module_path(
                     'onegov.election_day', 'assets/js/{}'.format(script)
                 )
-                with open(path, 'r') as f:
+                with open(path) as f:
                     self.scripts[chart].append(jsmin(f.read()))
 
     def translate(self, text: 'TranslationString', locale: str | None) -> str:
@@ -87,6 +87,8 @@ class D3Renderer:
             translator = None
         translated = translator.gettext(text) if translator else None
         return text.interpolate(translated)
+
+    # def label(self):
 
     @overload
     def get_chart(
@@ -146,7 +148,7 @@ class D3Renderer:
             json={
                 'scripts': self.scripts[chart],
                 'main': self.supported_charts[chart]['main'],
-                'params': loads(dumps(params).replace("'", '’'))
+                'params': loads(dumps(params).replace("'", '’'))  # noqa:RUF001
             },
             timeout=60
         )
@@ -209,7 +211,7 @@ class D3Renderer:
             'onegov.election_day',
             f'static/mapdata/{year}/{self.app.principal.id}.json'
         )
-        with open(path, 'r') as f:
+        with open(path) as f:
             mapdata = json.loads(f.read())
 
         params = params or {}
@@ -402,7 +404,7 @@ class D3Renderer:
         chart = None
         data = None
         if isinstance(item, Election):
-            data = get_connections_data(item, None)
+            data = get_connections_data(item)
             if data and data.get('links') and data.get('nodes'):
                 chart = self.get_chart(
                     'sankey', fmt, data, params={'inverse': True}
@@ -653,15 +655,25 @@ class D3Renderer:
     ) -> IO[Any] | tuple[IO[Any] | None, Any | None] | None:
 
         chart = None
-        data: 'JSONObject_ro | None' = None
+        data: JSONObject_ro | None = None
         if isinstance(item, Ballot):
-            # FIXME: It is a little bit fragile that this data uses integers
-            #        as dictionary keys, since that is technically invalid JSON
             data = get_ballot_data_by_entity(item)  # type:ignore[assignment]
             if data:
+                label_left = _('Nay')
+                label_right = _('Yay')
+                tie_breaker = (
+                    item.type == 'tie-breaker'
+                    or item.vote.tie_breaker_vocabulary
+                )
+                if tie_breaker:
+                    label_left = (
+                        _('Direct Counter Proposal') if item.vote.direct
+                        else _('Indirect Counter Proposal')
+                    )
+                    label_right = _('Proposal')
                 params = {
-                    'labelLeftHand': self.translate(_('Nay'), locale),
-                    'labelRightHand': self.translate(_('Yay'), locale),
+                    'labelLeftHand': self.translate(label_left, locale),
+                    'labelRightHand': self.translate(label_right, locale),
                 }
                 year = item.vote.date.year
                 chart = self.get_map(
@@ -714,13 +726,25 @@ class D3Renderer:
     ) -> IO[Any] | tuple[IO[Any] | None, Any | None] | None:
 
         chart = None
-        data: 'JSONObject_ro | None' = None
+        data: JSONObject_ro | None = None
         if isinstance(item, Ballot):
             data = get_ballot_data_by_district(item)  # type:ignore[assignment]
             if data:
+                label_left = _('Nay')
+                label_right = _('Yay')
+                tie_breaker = (
+                    item.type == 'tie-breaker'
+                    or item.vote.tie_breaker_vocabulary
+                )
+                if tie_breaker:
+                    label_left = (
+                        _('Direct Counter Proposal') if item.vote.direct
+                        else _('Indirect Counter Proposal')
+                    )
+                    label_right = _('Proposal')
                 params = {
-                    'labelLeftHand': self.translate(_('Nay'), locale),
-                    'labelRightHand': self.translate(_('Yay'), locale),
+                    'labelLeftHand': self.translate(label_left, locale),
+                    'labelRightHand': self.translate(label_right, locale),
                 }
                 year = item.vote.date.year
                 chart = self.get_map(

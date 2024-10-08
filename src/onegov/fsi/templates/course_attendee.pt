@@ -3,10 +3,9 @@
         ${title}
     </tal:b>
     <tal:b metal:fill-slot="content">
-        <div class="row">
-            <div class="columns small-12">
-                <div class="row">
-                    <div class="columns small-12 medium-6">
+
+    <div class="grid-x grid-padding-x wrapper">
+        <div class="medium-7 cell main-content content">
                         <tal:b tal:condition="model|nothing">
                             <dl class="field-display">
                                 <dt i18n:translate>E-Mail</dt>
@@ -62,13 +61,14 @@
                             </dl>
                        </tal:b>
                     </div>
-                    <div class="columns small-12 medium-6">
-                        <div class="info-panel">
-                            <metal:b use-macro="layout.macros['role_snippet']" />
+                    <div class="large-4 medium-4 cell medium-offset-1">
+                        <div class="sidebar-wrapper">
+                            <div class="info-panel">
+                                <metal:b use-macro="layout.macros['role_snippet']" />
+                            </div>
                         </div>
                     </div>
                 </div>
-            </div>
-        </div>
+
     </tal:b>
 </div>

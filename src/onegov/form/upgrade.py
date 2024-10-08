@@ -82,7 +82,7 @@ def migrate_form_submission_files_to_onegov_file(
         submission.files.append(replacement)
 
     context.session.flush()
-    context.session.execute("DROP TABLE IF EXISTS submission_files")
+    context.session.execute('DROP TABLE IF EXISTS submission_files')
 
 
 @upgrade_task('Add payment_method to definitions and submissions')
@@ -161,3 +161,26 @@ def make_form_polymorphic_type_non_nullable(context: 'UpgradeContext') -> None:
         """)
 
         context.operations.alter_column('forms', 'type', nullable=False)
+
+
+@upgrade_task('Add title to submission windows')
+def add_title_to_submission_windows(context: 'UpgradeContext') -> None:
+    if not context.has_column('submission_windows', 'title'):
+        context.add_column_with_defaults(
+            'submission_windows',
+            Column(
+                'title',
+                Text,
+                nullable=True
+            ),
+            default=None
+        )
+
+
+@upgrade_task('Remove no overlapping submission windows constraint')
+def remove_no_overlapping_submission_windows_constraint(
+    context: 'UpgradeContext'
+) -> None:
+    if context.has_table('submission_windows'):
+        context.operations.drop_constraint('no_overlapping_submission_windows',
+                                           'submission_windows')

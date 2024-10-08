@@ -5,41 +5,33 @@ from onegov.form import Form
 from onegov.form.fields import UploadField
 from onegov.form.validators import FileSizeLimit
 from onegov.form.validators import WhitelistedMimeType
-from wtforms.fields import BooleanField
-from wtforms.fields import IntegerField
 from wtforms.fields import RadioField
 from wtforms.validators import DataRequired
 from wtforms.validators import InputRequired
-from wtforms.validators import NumberRange
-from wtforms.validators import Optional
 
 
 from typing import TYPE_CHECKING
 if TYPE_CHECKING:
-    from onegov.ballot.models import Election
     from onegov.election_day.models import Canton
+    from onegov.election_day.models import Election
     from onegov.election_day.models import Municipality
 
 
 class UploadElectionBaseForm(Form):
 
     file_format = RadioField(
-        _("File format"),
-        choices=[],
+        _('File format'),
+        choices=[
+            ('internal', 'OneGov Cloud'),
+        ],
         validators=[
             InputRequired()
         ],
         default='internal'
     )
 
-    complete = BooleanField(
-        label=_("Complete"),
-        depends_on=('file_format', 'wabsti'),
-        render_kw={'force_simple': True}
-    )
-
     results = UploadField(
-        label=_("Results"),
+        label=_('Results'),
         validators=[
             DataRequired(),
             WhitelistedMimeType(ALLOWED_MIME_TYPES),
@@ -49,16 +41,6 @@ class UploadElectionBaseForm(Form):
         depends_on=('file_format', '!wabsti_c'),
     )
 
-    elected = UploadField(
-        label=_("Elected Candidates"),
-        validators=[
-            WhitelistedMimeType(ALLOWED_MIME_TYPES),
-            FileSizeLimit(MAX_FILE_SIZE)
-        ],
-        depends_on=('file_format', 'wabsti'),
-        render_kw={'force_simple': True}
-    )
-
     def adjust(
         self,
         principal: 'Canton | Municipality',
@@ -66,22 +48,12 @@ class UploadElectionBaseForm(Form):
     ) -> None:
         """ Adjusts the form to the given principal and election. """
 
-        if principal.domain == 'municipality':
-            self.file_format.choices = [
-                ('internal', _("OneGov Cloud")),
-            ]
-        else:
-            self.file_format.choices = [
-                ('internal', "OneGov Cloud"),
-                ('wabsti', "Wabsti"),
-            ]
-
-        # FIXME: We rely on a dynamic backref that only exists if ballot
-        #        and election_day are both used together, maybe this should
-        #        be factored diferently...
         assert hasattr(election, 'data_sources')
         if election.data_sources:
-            self.file_format.choices.append(('wabsti_c', "WabstiCExport"))
+            self.file_format.choices = [
+                ('internal', 'OneGov Cloud'),
+                ('wabsti_c', 'WabstiCExport')
+            ]
 
 
 class UploadMajorzElectionForm(UploadElectionBaseForm):
@@ -120,7 +92,7 @@ class UploadMajorzElectionForm(UploadElectionBaseForm):
     )
 
     wm_wahl = UploadField(
-        label="WM_Wahl",
+        label='WM_Wahl',
         validators=[
             DataRequired(),
             WhitelistedMimeType(ALLOWED_MIME_TYPES),
@@ -141,53 +113,11 @@ class UploadMajorzElectionForm(UploadElectionBaseForm):
         render_kw={'force_simple': True}
     )
 
-    majority = IntegerField(
-        label=_("Absolute majority"),
-        depends_on=('file_format', 'wabsti'),  # actually wabsti
-        validators=[
-            Optional(),
-            NumberRange(min=1)
-        ]
-    )
-
-    def adjust(
-        self,
-        principal: 'Canton | Municipality',
-        election: 'Election'
-    ) -> None:
-        """ Adjusts the form to the given principal and election. """
-
-        super().adjust(principal, election)
-
-        if principal.domain == 'municipality':
-            assert isinstance(self.file_format.choices, list)
-            self.file_format.choices.append(('wabsti_m', "Wabsti"))
-
 
 class UploadProporzElectionForm(UploadElectionBaseForm):
 
-    connections = UploadField(
-        label=_("List connections"),
-        validators=[
-            WhitelistedMimeType(ALLOWED_MIME_TYPES),
-            FileSizeLimit(MAX_FILE_SIZE)
-        ],
-        depends_on=('file_format', 'wabsti'),
-        render_kw={'force_simple': True}
-    )
-
-    statistics = UploadField(
-        label=_("Election statistics"),
-        validators=[
-            WhitelistedMimeType(ALLOWED_MIME_TYPES),
-            FileSizeLimit(MAX_FILE_SIZE)
-        ],
-        depends_on=('file_format', 'wabsti'),
-        render_kw={'force_simple': True}
-    )
-
     wp_gemeinden = UploadField(
-        label="WP_Gemeinden",
+        label='WP_Gemeinden',
         validators=[
             DataRequired(),
             WhitelistedMimeType(ALLOWED_MIME_TYPES),
@@ -198,7 +128,7 @@ class UploadProporzElectionForm(UploadElectionBaseForm):
     )
 
     wp_kandidaten = UploadField(
-        label="WP_Kandidaten",
+        label='WP_Kandidaten',
         validators=[
             DataRequired(),
             WhitelistedMimeType(ALLOWED_MIME_TYPES),
@@ -209,7 +139,7 @@ class UploadProporzElectionForm(UploadElectionBaseForm):
     )
 
     wp_kandidatengde = UploadField(
-        label="WP_KandidatenGde",
+        label='WP_KandidatenGde',
         validators=[
             DataRequired(),
             WhitelistedMimeType(ALLOWED_MIME_TYPES),
@@ -220,7 +150,7 @@ class UploadProporzElectionForm(UploadElectionBaseForm):
     )
 
     wp_listen = UploadField(
-        label="WP_Listen",
+        label='WP_Listen',
         validators=[
             DataRequired(),
             WhitelistedMimeType(ALLOWED_MIME_TYPES),
@@ -231,7 +161,7 @@ class UploadProporzElectionForm(UploadElectionBaseForm):
     )
 
     wp_listengde = UploadField(
-        label="WP_ListenGde",
+        label='WP_ListenGde',
         validators=[
             DataRequired(),
             WhitelistedMimeType(ALLOWED_MIME_TYPES),
@@ -242,7 +172,7 @@ class UploadProporzElectionForm(UploadElectionBaseForm):
     )
 
     wp_wahl = UploadField(
-        label="WP_Wahl",
+        label='WP_Wahl',
         validators=[
             DataRequired(),
             WhitelistedMimeType(ALLOWED_MIME_TYPES),
@@ -253,7 +183,7 @@ class UploadProporzElectionForm(UploadElectionBaseForm):
     )
 
     wpstatic_gemeinden = UploadField(
-        label="WPStatic_Gemeinden",
+        label='WPStatic_Gemeinden',
         validators=[
             DataRequired(),
             WhitelistedMimeType(ALLOWED_MIME_TYPES),
@@ -264,7 +194,7 @@ class UploadProporzElectionForm(UploadElectionBaseForm):
     )
 
     wpstatic_kandidaten = UploadField(
-        label="WPStatic_Kandidaten",
+        label='WPStatic_Kandidaten',
         validators=[
             DataRequired(),
             WhitelistedMimeType(ALLOWED_MIME_TYPES),

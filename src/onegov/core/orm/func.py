@@ -7,9 +7,9 @@ if TYPE_CHECKING:
     #        and will support cls.__getitem__
     _T = TypeVar('_T')
 
-    class unaccent(ReturnTypeFromArgs[_T]):
+    class unaccent(ReturnTypeFromArgs[_T]):  # noqa: N801
         ...
 else:
 
-    class unaccent(ReturnTypeFromArgs):
+    class unaccent(ReturnTypeFromArgs):  # noqa: N801
         """ Produce an UNACCENT expression. """

@@ -8,7 +8,8 @@ from onegov.file import AssociatedFiles, File
 from onegov.form.display import render_field
 from onegov.form.extensions import Extendable
 from onegov.form.parser import parse_form
-from onegov.form.utils import extract_text_from_html, hash_definition
+from onegov.form.utils import extract_text_from_html
+from onegov.form.utils import hash_definition
 from onegov.pay import Payable
 from onegov.pay import process_payment
 from sedate import utcnow
@@ -20,6 +21,7 @@ from sqlalchemy import ForeignKey
 from sqlalchemy import Integer
 from sqlalchemy import Text
 from sqlalchemy.ext.hybrid import hybrid_property
+from sqlalchemy.orm import relationship
 from uuid import uuid4
 from wtforms.fields import EmailField
 
@@ -30,15 +32,16 @@ if TYPE_CHECKING:
     from datetime import datetime
     from onegov.form import Form
     from onegov.form.models import FormDefinition, FormRegistrationWindow
+    from onegov.form.models import SurveyDefinition, SurveySubmissionWindow
     from onegov.form.types import RegistrationState, SubmissionState
     from onegov.pay import Payment, PaymentError, PaymentProvider, Price
     from onegov.pay.types import PaymentMethod
-    from sqlalchemy.orm import relationship
 
 
 class FormSubmission(Base, TimestampMixin, Payable, AssociatedFiles,
                      Extendable):
-    """ Defines a submitted form in the database. """
+
+    """ Defines a submitted form of any kind in the database. """
 
     __tablename__ = 'submissions'
 
@@ -52,8 +55,14 @@ class FormSubmission(Base, TimestampMixin, Payable, AssociatedFiles,
     #: name of the form this submission belongs to
     name: 'Column[str | None]' = Column(
         Text,
-        ForeignKey("forms.name"),
+        ForeignKey('forms.name'),
         nullable=True
+    )
+
+    #: the form this submission belongs to
+    form: 'relationship[FormDefinition | None]' = relationship(
+        'FormDefinition',
+        back_populates='submissions'
     )
 
     #: the title of the submission, generated from the submitted fields
@@ -79,11 +88,6 @@ class FormSubmission(Base, TimestampMixin, Payable, AssociatedFiles,
     #: metadata about this submission
     meta: 'Column[dict[str, Any]]' = Column(JSON, nullable=False)
 
-    #: Additional information about the submitee
-    submitter_name: dict_property[str | None] = meta_property()
-    submitter_address: dict_property[str | None] = meta_property()
-    submitter_phone: dict_property[str | None] = meta_property()
-
     #: the submission data
     data: 'Column[dict[str, Any]]' = Column(JSON, nullable=False)
 
@@ -107,11 +111,18 @@ class FormSubmission(Base, TimestampMixin, Payable, AssociatedFiles,
         default=None
     )
 
-    #: the registration window linked with this submission
+    #: the id of the registration window linked with this submission
     registration_window_id: 'Column[uuid.UUID | None]' = Column(
         UUID,  # type:ignore[arg-type]
-        ForeignKey("registration_windows.id"),
+        ForeignKey('registration_windows.id'),
         nullable=True
+    )
+
+    #: the registration window linked with this submission
+    registration_window: 'relationship[FormRegistrationWindow | None]'
+    registration_window = relationship(
+        'FormRegistrationWindow',
+        back_populates='submissions'
     )
 
     #: payment options -> copied from the definition at the moment of
@@ -127,29 +138,12 @@ class FormSubmission(Base, TimestampMixin, Payable, AssociatedFiles,
     #: extensions
     extensions: dict_property[list[str]] = meta_property(default=list)
 
-    if TYPE_CHECKING:
-        # forward declare backrefs
-        form: relationship[FormDefinition | None]
-        registration_window: relationship[FormRegistrationWindow | None]
-
-    __mapper_args__ = {
-        "polymorphic_on": 'state'
-    }
-
     __table_args__ = (
         CheckConstraint(
             'COALESCE(claimed, 0) <= spots',
             name='claimed_no_more_than_requested'
         ),
     )
-
-    @property
-    def payable_reference(self) -> str:
-        assert self.received is not None
-        if self.name:
-            return f'{self.name}/{self.title}@{self.received.isoformat()}'
-        else:
-            return f'{self.title}@{self.received.isoformat()}'
 
     @property
     def form_class(self) -> type['Form']:
@@ -164,6 +158,61 @@ class FormSubmission(Base, TimestampMixin, Payable, AssociatedFiles,
     def form_obj(self) -> 'Form':
         """ Returns a form instance containing the submission data. """
         return self.form_class(data=self.data)
+
+    def get_email_field_data(self, form: 'Form | None' = None) -> str | None:
+        form = form or self.form_obj
+
+        email_fields = form.match_fields(
+            include_classes=(EmailField, ),
+            required=True,
+            limit=1
+        )
+        email_fields += form.match_fields(
+            include_classes=(EmailField, ),
+            required=False,
+            limit=1
+        )
+
+        if email_fields:
+            return form._fields[email_fields[0]].data
+        return None
+
+    @observes('definition')
+    def definition_observer(self, definition: str) -> None:
+        self.checksum = hash_definition(definition)
+
+    @observes('state')
+    def state_observer(self, state: 'SubmissionState') -> None:
+        if self.state == 'complete':
+            form = self.form_class(data=self.data)
+
+            self.update_title(form)
+
+            if not self.email:
+                self.email = self.get_email_field_data(form=form)
+
+            # only set the date the first time around
+            if not self.received:
+                self.received = utcnow()
+
+    def update_title(self, form: 'Form') -> None:
+        title_fields = form.title_fields
+        if title_fields:
+            # NOTE: Since the title won't be rendered as Markup, it is
+            #       safe to unescape before extracting text, this will
+            #       avoid escaped html entities in the title
+            self.title = extract_text_from_html(', '.join(
+                html.unescape(render_field(form._fields[id]))
+                for id in title_fields
+            ))
+
+    #: Additional information about the submitee
+    submitter_name: dict_property[str | None] = meta_property()
+    submitter_address: dict_property[str | None] = meta_property()
+    submitter_phone: dict_property[str | None] = meta_property()
+    __mapper_args__ = {
+        'polymorphic_on': 'state'
+    }
 
     if TYPE_CHECKING:
         # HACK: hybrid_property won't work otherwise until 2.0
@@ -193,46 +242,13 @@ class FormSubmission(Base, TimestampMixin, Payable, AssociatedFiles,
                 (cls.claimed < cls.spots, 'partial')
             ), else_=None)
 
-    def get_email_field_data(self, form: 'Form | None' = None) -> str | None:
-        form = form or self.form_obj
-
-        email_fields = form.match_fields(
-            include_classes=(EmailField, ),
-            required=True,
-            limit=1
-        )
-        email_fields += form.match_fields(
-            include_classes=(EmailField, ),
-            required=False,
-            limit=1
-        )
-
-        if email_fields:
-            return form._fields[email_fields[0]].data
-        return None
-
-    @observes('definition')
-    def definition_observer(self, definition: str) -> None:
-        self.checksum = hash_definition(definition)
-
-    @observes('state')
-    def state_observer(self, state: 'SubmissionState') -> None:
-        if self.state == 'complete':
-            form = self.form_class(data=self.data)
-
-            title_fields = form.title_fields
-            if title_fields:
-                self.title = extract_text_from_html(', '.join(
-                    html.unescape(render_field(form._fields[id]))
-                    for id in title_fields
-                ))
-
-            if not self.email:
-                self.email = self.get_email_field_data(form=form)
-
-            # only set the date the first time around
-            if not self.received:
-                self.received = utcnow()
+    @property
+    def payable_reference(self) -> str:
+        assert self.received is not None
+        if self.name:
+            return f'{self.name}/{self.title}@{self.received.isoformat()}'
+        else:
+            return f'{self.title}@{self.received.isoformat()}'
 
     def process_payment(
         self,
@@ -251,7 +267,7 @@ class FormSubmission(Base, TimestampMixin, Payable, AssociatedFiles,
         """
 
         if price and price.amount > 0:
-            payment_method: 'PaymentMethod'
+            payment_method: PaymentMethod
             if price.credit_card_payment is True:
                 payment_method = 'cc'
             else:
@@ -300,11 +316,115 @@ class FormSubmission(Base, TimestampMixin, Payable, AssociatedFiles,
             self.claimed = max(0, self.claimed - spots)
 
 
+class SurveySubmission(Base, TimestampMixin, AssociatedFiles,
+                       Extendable):
+    """ Defines a submitted survey of any kind in the database. """
+
+    __tablename__ = 'survey_submissions'
+
+    __mapper_args__ = {
+        'polymorphic_on': 'state'
+    }
+
+    #: id of the form submission
+    id: 'Column[uuid.UUID]' = Column(
+        UUID,  # type:ignore[arg-type]
+        primary_key=True,
+        default=uuid4
+    )
+
+    #: name of the survey this submission belongs to
+    name: 'Column[str | None]' = Column(
+        Text,
+        ForeignKey('surveys.name'),
+        nullable=True
+    )
+
+    #: the survey this submission belongs to
+    survey: 'relationship[SurveyDefinition | None]' = relationship(
+        'SurveyDefinition',
+        back_populates='submissions'
+    )
+
+    #: the source code of the form at the moment of submission. This is stored
+    #: alongside the submission as the original form may change later. We
+    #: want to keep the old form around just in case.
+    definition: 'Column[str]' = Column(Text, nullable=False)
+
+    #: the checksum of the definition, forms and submissions with matching
+    #: checksums are guaranteed to have the exact same definition
+    checksum: 'Column[str]' = Column(Text, nullable=False)
+
+    #: metadata about this submission
+    meta: 'Column[dict[str, Any]]' = Column(JSON, nullable=False)
+
+    #: the submission data
+    data: 'Column[dict[str, Any]]' = Column(JSON, nullable=False)
+
+    #: the state of the submission
+    state: 'Column[SubmissionState]' = Column(
+        Enum('pending', 'complete', name='submission_state'),  # type:ignore
+        nullable=False
+    )
+
+    #: the id of the submission window linked with this submission
+    submission_window_id: 'Column[uuid.UUID | None]' = Column(
+        UUID,  # type:ignore[arg-type]
+        ForeignKey('submission_windows.id'),
+        nullable=True
+    )
+
+    #: the submission window linked with this submission
+    submission_window: 'relationship[SurveySubmissionWindow | None]'
+    submission_window = relationship(
+        'SurveySubmissionWindow',
+        back_populates='submissions'
+    )
+
+    #: extensions
+    extensions: dict_property[list[str]] = meta_property(default=list)
+
+    @property
+    def form_class(self) -> type['Form']:
+        """ Parses the form definition and returns a form class. """
+
+        return self.extend_form_class(
+            parse_form(self.definition),
+            self.extensions or []
+        )
+
+    @property
+    def form_obj(self) -> 'Form':
+        """ Returns a form instance containing the submission data. """
+        return self.form_class(data=self.data)
+
+    @observes('definition')
+    def definition_observer(self, definition: str) -> None:
+        self.checksum = hash_definition(definition)
+
+    def update_title(self, survey: 'Form') -> None:
+        title_fields = survey.title_fields
+        if title_fields:
+            # FIXME: Reconsider using unescape when consistently using Markup.
+            self.title = extract_text_from_html(', '.join(
+                html.unescape(render_field(survey._fields[id]))
+                for id in title_fields
+            ))
+
+
 class PendingFormSubmission(FormSubmission):
     __mapper_args__ = {'polymorphic_identity': 'pending'}
 
 
 class CompleteFormSubmission(FormSubmission):
+    __mapper_args__ = {'polymorphic_identity': 'complete'}
+
+
+class PendingSurveySubmission(SurveySubmission):
+    __mapper_args__ = {'polymorphic_identity': 'pending'}
+
+
+class CompleteSurveySubmission(SurveySubmission):
     __mapper_args__ = {'polymorphic_identity': 'complete'}
 
 

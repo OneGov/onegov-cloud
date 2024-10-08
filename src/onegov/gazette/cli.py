@@ -41,14 +41,16 @@ def add(
 ) -> 'Callable[[GazetteRequest, GazetteApp], None]':
     """ Adds a gazette instance to the database. For example:
 
+    .. code-block:: bash
+
         onegov-gazette --select '/onegov_gazette/zug' add
 
     """
 
     def add_instance(request: 'GazetteRequest', app: 'GazetteApp') -> None:
         if not app.principal:
-            click.secho("principal.yml not found", fg='yellow')
-        click.echo("Instance was created successfully")
+            click.secho('principal.yml not found', fg='yellow')
+        click.echo('Instance was created successfully')
 
     return add_instance
 
@@ -68,6 +70,8 @@ def import_editors(
 ) -> 'Callable[[GazetteRequest, GazetteApp], None]':
     """ Imports editors and groups. For example:
 
+    .. code-block:: bash
+
         onegov-gazette --select '/onegov_gazette/zug' import-editors data.xlsx
 
     """
@@ -79,9 +83,9 @@ def import_editors(
 
         request.locale = locale
         headers = {
-            'group': request.translate(_("Group")),
-            'name': request.translate(_("Name")),
-            'email': request.translate(_("E-Mail"))
+            'group': request.translate(_('Group')),
+            'name': request.translate(_('Name')),
+            'email': request.translate(_('E-Mail'))
         }
 
         session = app.session()
@@ -89,16 +93,16 @@ def import_editors(
         groups = UserGroupCollection(session)
 
         if clear:
-            click.secho("Deleting all editors", fg='yellow')
+            click.secho('Deleting all editors', fg='yellow')
             for user in users.query().filter(User.role == 'member'):
                 session.delete(user)
 
-            click.secho("Deleting all groups", fg='yellow')
+            click.secho('Deleting all groups', fg='yellow')
             for _group in groups.query():
                 session.delete(_group)
 
         csvfile = convert_excel_to_csv(
-            file, sheet_name=request.translate(_("Editors"))
+            file, sheet_name=request.translate(_('Editors'))
         )
         csv = CSVFile(csvfile, expected_headers=headers.values())
         lines = list(csv.lines)
@@ -111,7 +115,7 @@ def import_editors(
         for group_name in {line.gruppe for line in lines}:
             added_groups[group_name] = groups.add(name=group_name)
         count = len(added_groups)
-        click.secho(f"{count} group(s) imported", fg='green')
+        click.secho(f'{count} group(s) imported', fg='green')
 
         count = 0
         for line in lines:
@@ -128,11 +132,11 @@ def import_editors(
                 role='member',
             )
 
-        click.secho(f"{count} editor(s) imported", fg='green')
+        click.secho(f'{count} editor(s) imported', fg='green')
 
         if dry_run:
             transaction.abort()
-            click.secho("Aborting transaction", fg='yellow')
+            click.secho('Aborting transaction', fg='yellow')
 
     return import_editors_and_groups
 
@@ -150,7 +154,9 @@ def import_organizations(
     dry_run: bool,
     locale: str
 ) -> 'Callable[[GazetteRequest, GazetteApp], None]':
-    """ Imports Organizations. For example:
+    r""" Imports Organizations. For example:
+
+    .. code-block:: bash
 
         onegov-gazette --select '/onegov_gazette/zug' \
             import-organizations data.xlsx
@@ -164,24 +170,24 @@ def import_organizations(
 
         request.locale = locale
         headers = {
-            'id': request.translate(_("ID")),
-            'name': request.translate(_("Name")),
-            'title': request.translate(_("Title")),
-            'active': request.translate(_("Active")),
-            'external_name': request.translate(_("External ID")),
-            'parent': request.translate(_("Parent Organization"))
+            'id': request.translate(_('ID')),
+            'name': request.translate(_('Name')),
+            'title': request.translate(_('Title')),
+            'active': request.translate(_('Active')),
+            'external_name': request.translate(_('External ID')),
+            'parent': request.translate(_('Parent Organization'))
         }
 
         session = app.session()
         organizations = OrganizationCollection(session)
 
         if clear:
-            click.secho("Deleting organizations", fg='yellow')
+            click.secho('Deleting organizations', fg='yellow')
             for organization in organizations.query():
                 session.delete(organization)
 
         csvfile = convert_excel_to_csv(
-            file, sheet_name=request.translate(_("Organizations"))
+            file, sheet_name=request.translate(_('Organizations'))
         )
         csv = CSVFile(csvfile, expected_headers=headers.values())
         lines = list(csv.lines)
@@ -211,11 +217,11 @@ def import_organizations(
             )
             organization.parent_id = parent
 
-        click.secho(f"{count} organization(s) imported", fg='green')
+        click.secho(f'{count} organization(s) imported', fg='green')
 
         if dry_run:
             transaction.abort()
-            click.secho("Aborting transaction", fg='yellow')
+            click.secho('Aborting transaction', fg='yellow')
 
     return _import_organizations
 
@@ -233,7 +239,9 @@ def import_categories(
     dry_run: bool,
     locale: str
 ) -> 'Callable[[GazetteRequest, GazetteApp], None]':
-    """ Imports categories. For example:
+    r""" Imports categories. For example:
+
+    .. code-block:: bash
 
         onegov-gazette --select '/onegov_gazette/zug' \
             import-categories data.xlsx
@@ -247,22 +255,22 @@ def import_categories(
 
         request.locale = locale
         headers = {
-            'id': request.translate(_("ID")),
-            'name': request.translate(_("Name")),
-            'title': request.translate(_("Title")),
-            'active': request.translate(_("Active"))
+            'id': request.translate(_('ID')),
+            'name': request.translate(_('Name')),
+            'title': request.translate(_('Title')),
+            'active': request.translate(_('Active'))
         }
 
         session = app.session()
         categories = CategoryCollection(session)
 
         if clear:
-            click.secho("Deleting categories", fg='yellow')
+            click.secho('Deleting categories', fg='yellow')
             for category in categories.query():
                 session.delete(category)
 
         csvfile = convert_excel_to_csv(
-            file, sheet_name=request.translate(_("Categories"))
+            file, sheet_name=request.translate(_('Categories'))
         )
         csv = CSVFile(csvfile, expected_headers=headers.values())
         lines = list(csv.lines)
@@ -286,11 +294,11 @@ def import_categories(
                 order=count
             )
 
-        click.secho(f"{count} categorie(s) imported", fg='green')
+        click.secho(f'{count} categorie(s) imported', fg='green')
 
         if dry_run:
             transaction.abort()
-            click.secho("Aborting transaction", fg='yellow')
+            click.secho('Aborting transaction', fg='yellow')
 
     return _import_categories
 
@@ -312,6 +320,8 @@ def import_issues(
 ) -> 'Callable[[GazetteRequest, GazetteApp], None]':
     """ Imports issues. For example:
 
+    .. code-block:: bash
+
         onegov-gazette --select '/onegov_gazette/zug' import-issues data.xlsx
 
     """
@@ -326,21 +336,21 @@ def import_issues(
 
         request.locale = locale
         headers = {
-            'number': request.translate(_("Number")),
-            'date': request.translate(_("Date")),
-            'deadline': request.translate(_("Deadline"))
+            'number': request.translate(_('Number')),
+            'date': request.translate(_('Date')),
+            'deadline': request.translate(_('Deadline'))
         }
 
         session = app.session()
         issues = IssueCollection(session)
 
         if clear:
-            click.secho("Deleting issues", fg='yellow')
+            click.secho('Deleting issues', fg='yellow')
             for category in issues.query():
                 session.delete(category)
 
         csvfile = convert_excel_to_csv(
-            file, sheet_name=request.translate(_("Issues"))
+            file, sheet_name=request.translate(_('Issues'))
         )
         csv = CSVFile(csvfile, expected_headers=headers.values())
         lines = list(csv.lines)
@@ -367,11 +377,11 @@ def import_issues(
                 deadline=deadline
             )
 
-        click.secho(f"{count} categorie(s) imported", fg='green')
+        click.secho(f'{count} categorie(s) imported', fg='green')
 
         if dry_run:
             transaction.abort()
-            click.secho("Aborting transaction", fg='yellow')
+            click.secho('Aborting transaction', fg='yellow')
 
     return _import_issues
 
@@ -386,6 +396,8 @@ def import_sogc(
     dry_run: bool
 ) -> 'Callable[[GazetteRequest, GazetteApp], None]':
     """ Imports from the SOGC. For example:
+
+    .. code-block:: bash
 
         onegov-gazette --select '/onegov_gazette/zug' import-sogc
 
@@ -404,17 +416,17 @@ def import_sogc(
 
         session = request.session
         if clear:
-            click.secho("Deleting imported notices", fg='yellow')
+            click.secho('Deleting imported notices', fg='yellow')
             existing = session.query(GazetteNotice)
             existing = existing.filter(GazetteNotice.source.isnot(None))
             existing.delete()
 
         count = SogcImporter(session, request.app.principal.sogc_import)()
 
-        click.secho(f"{count} notice(s) imported", fg='green')
+        click.secho(f'{count} notice(s) imported', fg='green')
 
         if dry_run:
             transaction.abort()
-            click.secho("Aborting transaction", fg='yellow')
+            click.secho('Aborting transaction', fg='yellow')
 
     return _import_sogc

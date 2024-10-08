@@ -64,7 +64,10 @@ eggs/
 .tmontmp
 
 # mypy
-.mypy_cache/*
+.mypy_cache/
+
+# ruff
+.ruff_cache/
 
 # sublime
 *.sublime-workspace
@@ -92,3 +95,6 @@ package-lock.json
 # pytest-profiling
 prof
 /var
+
+# chamelon cache
+.chameleon_cache

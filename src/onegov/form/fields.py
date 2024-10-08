@@ -2,9 +2,10 @@ import inspect
 import phonenumbers
 import sedate
 
-from cssutils.css import CSSStyleSheet
+from cssutils.css import CSSStyleSheet  # type:ignore[import-untyped]
 from itertools import zip_longest
 from email_validator import validate_email, EmailNotValidError
+from markupsafe import escape, Markup
 from wtforms.fields.simple import URLField
 
 from onegov.core.html import sanitize_html
@@ -48,14 +49,14 @@ from wtforms.widgets import CheckboxInput, ColorInput
 
 from typing import Any, IO, Literal, TYPE_CHECKING
 if TYPE_CHECKING:
-    from collections.abc import Callable, Sequence
+    from collections.abc import Callable, Iterator, Sequence
     from datetime import datetime
     from onegov.core.types import FileDict as StrictFileDict
     from onegov.file import File
     from onegov.form import Form
     from onegov.form.types import (
-        _FormT, Filter, PricingRules, RawFormValue, Validators, Widget)
-    from typing_extensions import Self, TypedDict
+        FormT, Filter, PricingRules, RawFormValue, Validators, Widget)
+    from typing import TypedDict, Self
     from webob.request import _FieldStorageWithFile
     from wtforms.form import BaseForm
     from wtforms.meta import (
@@ -84,7 +85,7 @@ FIELDS_NO_RENDERED_PLACEHOLDER = (
 class TimeField(DefaultTimeField):
     """
     Fixes the case for MS Edge Browser that returns the 'valuelist'
-    as [08:00:000] instead of [08:00]. This is only the case of the time
+    as [08:00:000] instead of [08:00:00]. This is only the case of the time
     is set with the js popup, not when switching the time
     e.g. with the arrow keys on the form.
     """
@@ -93,8 +94,20 @@ class TimeField(DefaultTimeField):
         if not valuelist:
             return
 
-        valuelist = [t[:5] for t in valuelist]  # type:ignore[index]
+        valuelist = [t[:8] for t in valuelist]  # type:ignore[index]
         super().process_formdata(valuelist)
+
+
+class TranslatedSelectField(SelectField):
+    """ A select field which translates the option labels. """
+
+    def iter_choices(
+        self
+    ) -> 'Iterator[tuple[Any, str, bool, dict[str, Any]]]':
+        for choice in super().iter_choices():
+            result = list(choice)
+            result[1] = self.meta.request.translate(result[1])
+            yield tuple(result)
 
 
 class MultiCheckboxField(SelectMultipleField):
@@ -122,7 +135,7 @@ class UploadField(FileField):
         def __init__(
             self,
             label: str | None = None,
-            validators: 'Validators[_FormT, Self] | None' = None,
+            validators: 'Validators[FormT, Self] | None' = None,
             filters: 'Sequence[Filter]' = (),
             description: str = '',
             id: str | None = None,
@@ -179,8 +192,8 @@ class UploadField(FileField):
             self.data = {}
             return
 
-        fieldstorage: 'RawFormValue'
-        action: 'RawFormValue'
+        fieldstorage: RawFormValue
+        action: RawFormValue
         if len(valuelist) == 4:
             # resend_upload
             action = valuelist[0]
@@ -263,13 +276,13 @@ class UploadFileWithORMSupport(UploadField):
             setattr(obj, name, self.create())
 
         else:
-            raise NotImplementedError(f"Unknown action: {self.action}")
+            raise NotImplementedError(f'Unknown action: {self.action}')
 
     def process_data(self, value: 'File | None') -> None:
         if value:
             try:
                 size = value.reference.file.content_length
-            except IOError:
+            except OSError:
                 # if the file doesn't exist on disk we try to fail
                 # silently for now
                 size = -1
@@ -307,7 +320,7 @@ class UploadMultipleField(UploadMultipleBase, FileField):
     def __init__(
         self,
         label: str | None = None,
-        validators: 'Validators[_FormT, UploadField] | None' = None,
+        validators: 'Validators[FormT, UploadField] | None' = None,
         filters: 'Sequence[Filter]' = (),
         description: str = '',
         id: str | None = None,
@@ -334,7 +347,7 @@ class UploadMultipleField(UploadMultipleBase, FileField):
 
         # a lot of the arguments we just pass through to the subfield
         unbound_field = self.upload_field_class(
-            validators=validators,
+            validators=validators,  # type:ignore[arg-type]
             filters=filters,
             description=description,
             widget=upload_widget,
@@ -393,7 +406,7 @@ class UploadMultipleField(UploadMultipleBase, FileField):
         # we fake the formdata for the new field
         # we use a werkzeug MultiDict because the WebOb version
         # needs to get wrapped to be usable in WTForms
-        formdata: 'MultiDict[str, RawFormValue]' = MultiDict()
+        formdata: MultiDict[str, RawFormValue] = MultiDict()
         name = f'{self.short_name}{self._separator}{len(self)}'
         formdata.add(name, fs)
         return self._add_entry(formdata)
@@ -429,7 +442,7 @@ class UploadMultipleFilesWithORMSupport(UploadMultipleField):
     def populate_obj(self, obj: object, name: str) -> None:
         self.added_files = []
         files = getattr(obj, name, ())
-        output: list['File'] = []
+        output: list[File] = []
         for field, file in zip_longest(self.entries, files):
             if field is None:
                 # this generally shouldn't happen, but we should
@@ -469,7 +482,7 @@ class VideoURLField(URLField):
 class HtmlField(TextAreaField):
     """ A textfield with html with integrated sanitation. """
 
-    data: str
+    data: Markup | None
 
     def __init__(self, *args: Any, **kwargs: Any):
         self.form = kwargs.get('_form')
@@ -497,6 +510,29 @@ class CssField(TextAreaField):
                 CSSStyleSheet().cssText = self.data
             except Exception as exception:
                 raise ValidationError(str(exception)) from exception
+
+
+class MarkupField(TextAreaField):
+    """
+    A textfield with markup with no sanitation.
+
+    This field is inherently unsafe and should be avoided, use with care!
+    """
+
+    data: Markup | None
+
+    def process_formdata(self, valuelist: list['RawFormValue']) -> None:
+        if valuelist:
+            assert isinstance(valuelist[0], str)
+            self.data = Markup(valuelist[0])  # noqa: MS001
+        else:
+            self.data = None
+
+    def process_data(self, value: str | None) -> None:
+        # NOTE: For regular data we do the escape, just to ensure
+        #       that we use this field consistenly and don't pass
+        #       in raw strings
+        self.data = escape(value) if value is not None else None
 
 
 class TagsField(StringField):
@@ -585,7 +621,7 @@ class ChosenSelectMultipleEmailField(SelectMultipleField):
             try:
                 validate_email(email)
             except EmailNotValidError as e:
-                raise ValidationError(_("Not a valid email")) from e
+                raise ValidationError(_('Not a valid email')) from e
 
 
 class PreviewField(Field):
@@ -648,11 +684,11 @@ class DateTimeLocalField(DateTimeLocalFieldBase):
     def __init__(
         self,
         label: str | None = None,
-        validators: 'Validators[_FormT, Self] | None' = None,
+        validators: 'Validators[FormT, Self] | None' = None,
         format: str = '%Y-%m-%dT%H:%M',
         **kwargs: Any
     ):
-        super(DateTimeLocalField, self).__init__(
+        super().__init__(
             label=label,
             validators=validators,
             format=format,
@@ -663,7 +699,7 @@ class DateTimeLocalField(DateTimeLocalFieldBase):
         if valuelist:
             date_str = 'T'.join(valuelist).replace(' ', 'T')  # type:ignore
             valuelist = [date_str[:16]]
-        super(DateTimeLocalField, self).process_formdata(valuelist)
+        super().process_formdata(valuelist)
 
 
 class TimezoneDateTimeField(DateTimeLocalField):

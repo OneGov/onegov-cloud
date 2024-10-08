@@ -7,7 +7,7 @@ if TYPE_CHECKING:
     from .permissions import Intent
 
 
-@Framework.setting_section(section="roles")
+@Framework.setting_section(section='roles')
 def get_roles_setting() -> dict[str, set[type['Intent']]]:
     """ Returns the default roles available to onegov.core applications.
 

@@ -6,53 +6,59 @@ from onegov.form import Form
 from onegov.town6 import _
 
 
+from typing import TYPE_CHECKING
+if TYPE_CHECKING:
+    from onegov.town6.request import TownRequest
+
+
 class ChatInitiationForm(Form):
 
+    request: 'TownRequest'
+
     name = StringField(
-        label=_("Name"),
+        label=_('Name'),
         validators=[
             InputRequired()
         ],
     )
 
     email = EmailField(
-        label=_("E-mail"),
+        label=_('E-mail'),
         validators=[
             InputRequired()
         ],
     )
 
     topic = SelectField(
-        label=_("Topic"),
+        label=_('Topic'),
         choices=[]
     )
 
     confirmation = BooleanField(
-        label=_("Confirmation"),
+        label=_('Confirmation'),
         description=_(
-            "I confirm that I am aware that this chat will be saved and the "
-            "history will be sent to me by email."),
+            'I confirm that I am aware that this chat will be saved and the '
+            'history will be sent to me by email.'),
         validators=[
             InputRequired()
         ],
     )
 
-    def populate_topics(self):
+    def populate_topics(self) -> None:
         topics = self.request.app.org.chat_topics
         if topics:
-            for t in topics:
-                self.topic.choices.append((t, t))
-            self.topic.choices.append((self.request.translate(_('General')),
-                                       self.request.translate(_('General'))))
+            self.topic.choices = [(t, t) for t in topics]
+            general = self.request.translate(_('General'))
+            self.topic.choices.append((general, general))
         else:
             self.delete_field('topic')
 
-    def on_request(self):
+    def on_request(self) -> None:
         self.populate_topics()
 
 
 class ChatActionsForm(Form):
 
     chat_id = HiddenField(
-        label=_("Chat ID"),
+        label=_('Chat ID'),
     )

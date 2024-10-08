@@ -1,9 +1,9 @@
 from morepath import redirect
-from onegov.ballot import Ballot
-from onegov.ballot import Vote
-from onegov.core.security import Public
 from onegov.election_day import ElectionDayApp
 from onegov.election_day.layouts import VoteLayout
+from onegov.election_day.models import Ballot
+from onegov.election_day.models import Vote
+from onegov.election_day.security import MaybePublic
 from onegov.election_day.utils import add_last_modified_header
 from webob.exc import HTTPNotFound
 
@@ -19,7 +19,7 @@ if TYPE_CHECKING:
     model=Vote,
     name='statistics',
     template='vote/statistics.pt',
-    permission=Public
+    permission=MaybePublic
 )
 def view_vote_statistics(
     self: Vote,
@@ -37,7 +37,7 @@ def view_vote_statistics(
     model=Vote,
     name='proposal-statistics',
     template='vote/statistics.pt',
-    permission=Public
+    permission=MaybePublic
 )
 def view_vote_statistics_proposal(
     self: Vote,
@@ -55,7 +55,7 @@ def view_vote_statistics_proposal(
     model=Vote,
     name='counter-proposal-statistics',
     template='vote/statistics.pt',
-    permission=Public
+    permission=MaybePublic
 )
 def view_vote_statistics_counter_proposal(
     self: Vote,
@@ -73,7 +73,7 @@ def view_vote_statistics_counter_proposal(
     model=Vote,
     name='tie-breaker-statistics',
     template='vote/statistics.pt',
-    permission=Public
+    permission=MaybePublic
 )
 def view_vote_statistics_tie_breaker(
     self: Vote,
@@ -91,7 +91,7 @@ def view_vote_statistics_tie_breaker(
     model=Ballot,
     name='statistics-table',
     template='embed.pt',
-    permission=Public
+    permission=MaybePublic
 )
 def view_ballot_as_statistics_table(
     self: Ballot,
@@ -115,7 +115,7 @@ def view_ballot_as_statistics_table(
 @ElectionDayApp.html(
     model=Vote,
     name='proposal-statistics-table',
-    permission=Public
+    permission=MaybePublic
 )
 def view_vote_statistics_table_proposal(
     self: Vote,
@@ -127,11 +127,10 @@ def view_vote_statistics_table_proposal(
     ballot = getattr(self, 'proposal', None)
     if ballot:
         return redirect(
-            # FIXME: Shouldn't this use request.GET for query_params?
-            request.link(  # type:ignore[call-overload]
+            request.link(
                 ballot,
                 name='statistics-table',
-                query_params=request.params
+                query_params=dict(request.GET)
             )
         )
 
@@ -141,7 +140,7 @@ def view_vote_statistics_table_proposal(
 @ElectionDayApp.html(
     model=Vote,
     name='counter-proposal-statistics-table',
-    permission=Public
+    permission=MaybePublic
 )
 def view_vote_statistics_table_counter_proposal(
     self: Vote,
@@ -153,11 +152,10 @@ def view_vote_statistics_table_counter_proposal(
     ballot = getattr(self, 'counter_proposal', None)
     if ballot:
         return redirect(
-            # FIXME: Shouldn't this use request.GET for query_params?
-            request.link(  # type:ignore[call-overload]
+            request.link(
                 ballot,
                 name='statistics-table',
-                query_params=request.params
+                query_params=dict(request.GET)
             )
         )
 
@@ -167,7 +165,7 @@ def view_vote_statistics_table_counter_proposal(
 @ElectionDayApp.html(
     model=Vote,
     name='tie-breaker-statistics-table',
-    permission=Public
+    permission=MaybePublic
 )
 def view_vote_statistics_table_tie_breaker(
     self: Vote,
@@ -179,11 +177,10 @@ def view_vote_statistics_table_tie_breaker(
     ballot = getattr(self, 'tie_breaker', None)
     if ballot:
         return redirect(
-            # FIXME: Shouldn't this use request.GET for query_params?
-            request.link(  # type:ignore[call-overload]
+            request.link(
                 ballot,
                 name='statistics-table',
-                query_params=request.params
+                query_params=dict(request.GET)
             )
         )
 

@@ -1,4 +1,5 @@
 import re
+import stdnum.ch.esr as esr  # type: ignore[import-untyped]
 
 from collections import defaultdict
 from functools import cached_property
@@ -17,7 +18,6 @@ from sqlalchemy import func
 from typing import Any, TYPE_CHECKING
 if TYPE_CHECKING:
     from collections.abc import Iterator
-    from onegov.activity.models.invoice_reference import Schema
     from sqlalchemy.orm import Query, Session
     from uuid import UUID
 
@@ -129,9 +129,57 @@ def transaction_entries(root: 'etree._Element') -> 'Iterator[etree._Element]':
         yield entry
 
 
+def get_esr(booking_text: str) -> str | None:
+
+    """
+    Extracts the QR-bill reference number from the given text.
+    QR-bill reference numbers are usually 26 or 27 characters long but can
+    be of any length.
+    The 27-character version includes a check digit at the
+    end. The 26-character version doesn't include the check digit.
+    For any other length we don't know if the check digit is included or not.
+
+    For example:
+
+    input: 'Gutschrift QRR: 27 99029 05678 18860 27295 37059'
+    output: '269902905678188602729537059'
+
+    :returns: The extracted reference number or None if no reference number.
+    If the extracted reference number is only 26 characters long, the check
+    digit is appended to the end.
+    """
+
+    def format_esr(esr_ref: str) -> str:
+        """
+        For DB comparison we need the ESR number with leading zeros but no
+        spaces.
+
+        """
+        return esr.compact(esr_ref).zfill(27)
+
+    # Pattern for any length ESR numbers
+    pattern = r'(\d\s*){1,27}'
+
+    match = re.search(pattern, booking_text)
+    if match:
+        esr_ref = re.sub(r'\s', '', match.group(0))
+        if esr.is_valid(esr_ref):
+            return format_esr(esr_ref)
+
+        try:
+            esr.validate(esr_ref)
+        except esr.InvalidChecksum:
+            esr_ref = esr_ref[:26]
+            check = esr.calc_check_digit(esr_ref)
+            return format_esr(esr_ref + check)
+
+    # If no match found, return None
+    return None
+
+
 def extract_transactions(
     xml: str,
-    invoice_schema: 'Schema'
+    invoice_schema: str
 ) -> 'Iterator[Transaction]':
     root = etree.fromstring(normalize_xml(xml).encode('utf-8'))
 
@@ -153,6 +201,7 @@ def extract_transactions(
         valuta_date = as_date(first(entry, 'ValDt/Dt/text()'))
         booking_text = first(entry, 'AddtlNtryInf/text()')
 
+        # Usually there are multiple TxDtls per Ntry
         for d in entry.xpath('NtryDtls/TxDtls'):
             yield Transaction(
                 booking_date=booking_date,
@@ -165,7 +214,28 @@ def extract_transactions(
                 note=joined(d, 'RmtInf/Ustrd/text()'),
                 credit=first(d, 'CdtDbtInd/text()') == 'CRDT',
                 debitor=first(d, 'RltdPties/Dbtr/Nm/text()'),
-                debitor_account=first(d, 'RltdPties/DbtrAcct/Id/IBAN/text()'),
+                debitor_account=first(
+                    d, 'RltdPties/DbtrAcct/Id/IBAN/text()'),
+                invoice_schema=invoice_schema
+            )
+
+        # Postfinance QR entries have no TxDtls, but there reference number is
+        # in AddtlNtryInf
+        if not entry.xpath('NtryDtls/TxDtls') and entry.xpath('AddtlNtryInf'):
+            reference = get_esr(str(booking_text))
+            yield Transaction(
+                booking_date=booking_date,
+                valuta_date=valuta_date,
+                booking_text=booking_text,
+                tid=reference,
+                amount=as_decimal(first(entry, 'Amt/text()')),
+                currency=first(entry, 'Amt/@Ccy'),
+                reference=reference,
+                note=joined(entry, 'RmtInf/Ustrd/text()'),
+                credit=first(entry, 'CdtDbtInd/text()') == 'CRDT',
+                debitor=first(entry, 'RltdPties/Dbtr/Nm/text()'),
+                debitor_account=first(
+                    entry, 'RltdPties/DbtrAcct/Id/IBAN/text()'),
                 invoice_schema=invoice_schema
             )
 
@@ -174,7 +244,7 @@ def match_iso_20022_to_usernames(
     xml: str,
     session: 'Session',
     period_id: 'UUID',
-    schema: 'Schema',
+    schema: str,
     currency: str = 'CHF'
 ) -> 'Iterator[Transaction]':
     """ Takes an ISO20022 camt.053 file and matches it with the invoice
@@ -183,9 +253,9 @@ def match_iso_20022_to_usernames(
     Raises an error if the given xml cannot be processed.
 
     :return: An iterator of transactions found in the xml file, together with
-    the matching username and a confidence attribute indicating how
-    certain the match is (1.0 indicating a sure match, 0.5 a possible match
-    and 0.0 a non-match).
+        the matching username and a confidence attribute indicating how
+        certain the match is (1.0 indicating a sure match, 0.5 a possible match
+        and 0.0 a non-match).
 
     """
 

@@ -96,15 +96,32 @@ class Occasion(Base, TimestampMixin):
     #: The activity this occasion belongs to
     activity_id: 'Column[uuid.UUID]' = Column(
         UUID,  # type:ignore[arg-type]
-        ForeignKey("activities.id", use_alter=True),
+        ForeignKey('activities.id', use_alter=True),
         nullable=False
+    )
+    activity: 'relationship[Activity]' = relationship(
+        'Activity',
+        back_populates='occasions'
+    )
+
+    accepted: 'relationship[Sequence[Booking]]' = relationship(
+        'Booking',
+        primaryjoin=("""and_(
+            Booking.occasion_id == Occasion.id,
+            Booking.state == 'accepted'
+        )"""),
+        viewonly=True
     )
 
     #: The period this occasion belongs to
     period_id: 'Column[uuid.UUID]' = Column(
         UUID,  # type:ignore[arg-type]
-        ForeignKey("periods.id", use_alter=True),
+        ForeignKey('periods.id', use_alter=True),
         nullable=False
+    )
+    period: 'relationship[Period]' = relationship(
+        'Period',
+        back_populates='occasions'
     )
 
     #: True if the occasion has been cancelled
@@ -163,7 +180,7 @@ class Occasion(Base, TimestampMixin):
     bookings: 'relationship[list[Booking]]' = relationship(
         'Booking',
         order_by='Booking.created',
-        backref='occasion'
+        back_populates='occasion'
     )
 
     #: The dates associated with this occasion (loaded eagerly)
@@ -171,17 +188,8 @@ class Occasion(Base, TimestampMixin):
         'OccasionDate',
         cascade='all,delete',
         order_by='OccasionDate.start',
-        backref='occasion',
+        back_populates='occasion',
         lazy='joined',
-    )
-
-    accepted: 'relationship[Sequence[Booking]]' = relationship(
-        'Booking',
-        primaryjoin=("""and_(
-            Booking.occasion_id == Occasion.id,
-            Booking.state == 'accepted'
-        )"""),
-        viewonly=True
     )
 
     #: The needs associated with this occasion
@@ -189,13 +197,8 @@ class Occasion(Base, TimestampMixin):
         'OccasionNeed',
         cascade='all,delete',
         order_by='OccasionNeed.name',
-        backref='occasion',
+        back_populates='occasion',
     )
-
-    if TYPE_CHECKING:
-        # FIXME: Replace with explicit backrefs with back_populates
-        activity: relationship[Activity]
-        period: relationship[Period]
 
     def on_date_change(self) -> None:
         """ Date changes are not properly propagated to the observer for
@@ -245,7 +248,7 @@ class Occasion(Base, TimestampMixin):
         return base
 
     @total_cost.expression  # type:ignore[no-redef]
-    def total_cost(self) -> 'ColumnElement[Decimal]':
+    def total_cost(cls) -> 'ColumnElement[Decimal]':
         from onegov.activity.models.period import Period
 
         return coalesce(Occasion.cost, 0) + case([

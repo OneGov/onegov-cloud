@@ -406,13 +406,13 @@ from onegov.form.parser.grammar import video_url
 from onegov.form.utils import as_internal_id
 
 
-from typing import final, Any, ClassVar, Literal, Pattern, TypeVar
-from typing import TYPE_CHECKING
+from typing import final, Any, ClassVar, Literal, Self, TypeVar, TYPE_CHECKING
 if TYPE_CHECKING:
     from collections.abc import Callable, Iterable, Iterator, Sequence
     from onegov.form.types import PricingRules, RawPricing
     from onegov.form.utils import decimal_range
-    from typing_extensions import Self, TypeAlias
+    from re import Pattern
+    from typing import TypeAlias
     from yaml.nodes import ScalarNode
 
     # tagged unions so we can type narrow by type field
@@ -498,7 +498,7 @@ class CustomLoader(yaml.SafeLoader):
     """ Extends the default yaml loader with customized constructors. """
 
 
-class constructor:
+class constructor:  # noqa: N801
     """ Adds decorated functions to as constructors to the CustomLoader. """
 
     def __init__(self, tag: str):
@@ -891,7 +891,7 @@ class TimeField(Field):
 class StringField(Field):
     type: ClassVar[Literal['text']] = 'text'
     maxlength: int | None
-    regex: Pattern[str] | None
+    regex: 'Pattern[str] | None'
 
     @classmethod
     def create(
@@ -976,7 +976,7 @@ class StdnumField(Field):
         parent: 'ParsedField | None' = None,
         fieldset: Fieldset | None = None,
         field_help: str | None = None
-    ) -> 'Self':
+    ) -> Self:
         return cls(
             label=identifier.label,
             required=identifier.required,
@@ -1060,10 +1060,6 @@ class DecimalRangeField(Field):
 class FileinputBase:
     extensions: list[str]
 
-    if TYPE_CHECKING:
-        # forward declare __init__
-        __init__ = Field.__init__  # type:ignore[assignment]
-
     @classmethod
     def create(  # type:ignore[misc]
         cls: type[_FieldT],
@@ -1096,10 +1092,6 @@ class MultipleFileinputField(FileinputBase, Field):
 class OptionsField:
     choices: list[Choice]
     pricing: 'PricingRules'
-
-    if TYPE_CHECKING:
-        # forward declare __init__
-        __init__ = Field.__init__  # type:ignore[assignment]
 
     @classmethod
     def create(  # type:ignore[misc]
@@ -1156,23 +1148,24 @@ class CheckboxField(OptionsField, Field):
 @lru_cache(maxsize=1)
 def parse_formcode(
     formcode: str,
-    enable_indent_check: bool = False
+    enable_edit_checks: bool = False
 ) -> list[Fieldset]:
     """ Takes the given formcode and returns an intermediate representation
     that can be used to generate forms or do other things.
 
     :param formcode: string representing formcode to be parsed
-    :param enable_indent_check: bool to activate indent check while parsing.
-    Should only be active originating from forms.validators.py
+    :param enable_edit_checks: bool to activate additional check after
+    editing the form. Should only be active originating from
+    forms.validators.py
     """
     # CustomLoader is inherited from SafeLoader so no security issue here
     parsed = yaml.load(  # nosec B506
-        '\n'.join(translate_to_yaml(formcode, enable_indent_check)),
+        '\n'.join(translate_to_yaml(formcode, enable_edit_checks)),
         CustomLoader
     )
 
     fieldsets = []
-    field_classes: dict[str, type['ParsedField']] = {
+    field_classes: dict[str, type[ParsedField]] = {
         cls.type: cls  # type:ignore
         for cls in Field.__subclasses__()
     }
@@ -1188,6 +1181,8 @@ def parse_formcode(
             parse_field_block(block, field_classes, used_ids, fs)
             for block in (fieldset[label] or ())
         ]
+        if enable_edit_checks and not fs.fields:
+            raise errors.EmptyFieldsetError(label)
 
         fieldsets.append(fs)
 
@@ -1229,7 +1224,7 @@ def parse_field_block(
         if not len(types) == 1:
             raise errors.MixedTypeError(key)
 
-    result: 'ParsedField' = field_classes[field.type].create(
+    result: ParsedField = field_classes[field.type].create(
         field, identifier, parent, fieldset, field_help)
 
     if result.id in used_ids:
@@ -1328,14 +1323,14 @@ def validate_indent(indent: str) -> bool:
 
 def translate_to_yaml(
     text: str,
-    enable_indent_check: bool = False
+    enable_edit_checks: bool = False
 ) -> 'Iterator[str]':
     """ Takes the given form text and constructs an easier to parse yaml
     string.
 
     :param text: string to be parsed
-    :param enable_indent_check: bool to activate indent check while parsing.
-    Should only be active originating from forms.validators.py
+    :param enable_edit_checks: bool to activate additional checks after
+    editing a form. Should only be active originating from forms.validators.py
     """
 
     lines = ((ix, l) for ix, l in prepare(text))
@@ -1352,7 +1347,7 @@ def translate_to_yaml(
     for ix, line in lines:
 
         indent = ' ' * (4 + (len(line) - len(line.lstrip())))
-        if enable_indent_check and not validate_indent(indent):
+        if enable_edit_checks and not validate_indent(indent):
             raise errors.InvalidIndentSyntax(line=ix + 1)
 
         # the top level are the fieldsets
@@ -1395,7 +1390,7 @@ def translate_to_yaml(
             if not expect_nested:
                 raise errors.InvalidFormSyntax(line=ix + 1)
 
-            yield '{indent}- !{type} \'{definition}\':'.format(
+            yield "{indent}- !{type} '{definition}':".format(
                 indent=indent,
                 type=parse_result.type,
                 definition=escape_single(line.strip())

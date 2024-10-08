@@ -34,7 +34,10 @@
     }
 
     img {
+        height: auto;
+        margin-bottom: 10px;
         max-width: 100%;
+        width: auto;
     }
 
     body {
@@ -47,7 +50,7 @@
     }
 
     a {
-        color: <tal:b replace="primary_color" />;
+        color: ${primary_color};
     }
 
     a.hashtag {
@@ -57,8 +60,8 @@
     .btn-primary {
         text-decoration: none;
         color: #FFF;
-        background-color: <tal:b replace="primary_color" />;
-        border: solid <tal:b replace="primary_color" />;
+        background-color: ${primary_color};
+        border: solid ${primary_color};
         border-width: 10px 20px;
         line-height: 2;
         font-weight: bold;
@@ -190,9 +193,10 @@
     }
 
     hr {
-        border: 1px solid #ddd;
-        border-width: 1px 0 0 0;
+        border: 2px solid ${primary_color};
+        border-width: 2px 0 0 0;
         Margin-bottom: 20px;
+        margin-top: 20px;
     }
 
     hr.large {
@@ -244,7 +248,7 @@
 
     .current-message {
         Margin-bottom: 10px;
-        border-left: 4px solid <tal:b replace="primary_color" />;
+        border-left: 4px solid ${primary_color};
     }
 
     .inline-message p:last-child {
@@ -309,7 +313,7 @@
         place-self: end;
     }
     #message-area .card.right .card-section {
-        background: <tal:b replace="primary_color" />;
+        background: ${primary_color};
         color: #FFF;
     }
     #message-area .card.left {
@@ -377,7 +381,7 @@
                         <tr>
                             <td align="center">
                                 <p metal:define-slot="footer">
-                                    <tal:b replace="structure layout.contact_html|layout.org.title" />
+                                    <tal:b replace="layout.contact_html|layout.org.title" />
                                 </p>
                             </td>
                         </tr>

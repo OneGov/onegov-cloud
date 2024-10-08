@@ -21,6 +21,7 @@ def test_app_integration(es_url):
         pass
 
     app = App()
+    app.namespace = 'test'
     app.configure_application(elasticsearch_hosts=[es_url])
 
     assert app.es_client.ping()
@@ -68,6 +69,7 @@ def test_search_query(es_url, postgres_dsn):
     morepath.commit(App)
 
     app = App()
+    app.namespace = 'documents'
     app.configure_application(
         dsn=postgres_dsn,
         base=Base,
@@ -76,7 +78,6 @@ def test_search_query(es_url, postgres_dsn):
     # remove ORMBase
     app.session_manager.bases.pop()
 
-    app.namespace = 'documents'
     app.set_application_id('documents/home')
 
     session = app.session()
@@ -235,8 +236,8 @@ def test_orm_integration(es_url, postgres_dsn, redis_url):
         query = query.filter(Document.id == request.params.get('id'))
 
         document = query.one()
-        document.title = request.params.get('title'),
-        document.body = request.params.get('body'),
+        document.title = request.params.get('title')
+        document.body = request.params.get('body')
 
     @App.json(model=Root, name='delete')
     def view_delete_document(self, request):
@@ -249,6 +250,7 @@ def test_orm_integration(es_url, postgres_dsn, redis_url):
     morepath.commit(App)
 
     app = App()
+    app.namespace = 'documents'
     app.configure_application(
         dsn=postgres_dsn,
         base=Base,
@@ -258,7 +260,6 @@ def test_orm_integration(es_url, postgres_dsn, redis_url):
     # remove ORMBase
     app.session_manager.bases.pop()
 
-    app.namespace = 'documents'
     app.set_application_id('documents/home')
 
     client = Client(app)
@@ -324,6 +325,7 @@ def test_alternate_id_property(es_url, postgres_dsn):
     morepath.commit(App)
 
     app = App()
+    app.namespace = 'users'
     app.configure_application(
         dsn=postgres_dsn,
         base=Base,
@@ -332,7 +334,6 @@ def test_alternate_id_property(es_url, postgres_dsn):
     # remove ORMBase
     app.session_manager.bases.pop()
 
-    app.namespace = 'users'
     app.set_application_id('users/corporate')
 
     session = app.session()
@@ -404,6 +405,7 @@ def test_orm_polymorphic(es_url, postgres_dsn):
     morepath.commit()
 
     app = App()
+    app.namespace = 'pages'
     app.configure_application(
         dsn=postgres_dsn,
         base=Base,
@@ -412,7 +414,6 @@ def test_orm_polymorphic(es_url, postgres_dsn):
     # remove ORMBase
     app.session_manager.bases.pop()
 
-    app.namespace = 'pages'
     app.set_application_id('pages/site')
 
     session = app.session()
@@ -482,6 +483,7 @@ def test_orm_polymorphic_sublcass_only(es_url, postgres_dsn):
     morepath.commit()
 
     app = App()
+    app.namespace = 'pages'
     app.configure_application(
         dsn=postgres_dsn,
         base=Base,
@@ -490,7 +492,6 @@ def test_orm_polymorphic_sublcass_only(es_url, postgres_dsn):
     # remove ORMBase
     app.session_manager.bases.pop()
 
-    app.namespace = 'pages'
     app.set_application_id('pages/site')
 
     session = app.session()
@@ -558,6 +559,7 @@ def test_suggestions(es_url, postgres_dsn):
     morepath.commit()
 
     app = App()
+    app.namespace = 'documents'
     app.configure_application(
         dsn=postgres_dsn,
         base=Base,
@@ -566,7 +568,6 @@ def test_suggestions(es_url, postgres_dsn):
     # remove ORMBase
     app.session_manager.bases.pop()
 
-    app.namespace = 'documents'
     app.set_application_id('documents/home')
 
     session = app.session()
@@ -650,6 +651,7 @@ def test_language_detection(es_url, postgres_dsn):
     morepath.commit()
 
     app = App()
+    app.namespace = 'documents'
     app.configure_application(
         dsn=postgres_dsn,
         base=Base,
@@ -658,7 +660,6 @@ def test_language_detection(es_url, postgres_dsn):
     # remove ORMBase
     app.session_manager.bases.pop()
 
-    app.namespace = 'documents'
     app.set_application_id('documents/home')
 
     session = app.session()
@@ -706,6 +707,7 @@ def test_language_update(es_url, postgres_dsn):
     morepath.commit()
 
     app = App()
+    app.namespace = 'documents'
     app.configure_application(
         dsn=postgres_dsn,
         base=Base,
@@ -714,7 +716,6 @@ def test_language_update(es_url, postgres_dsn):
     # remove ORMBase
     app.session_manager.bases.pop()
 
-    app.namespace = 'documents'
     app.set_application_id('documents/home')
 
     session = app.session()
@@ -760,6 +761,7 @@ def test_date_decay(es_url, postgres_dsn):
     morepath.commit()
 
     app = App()
+    app.namespace = 'documents'
     app.configure_application(
         dsn=postgres_dsn,
         base=Base,
@@ -768,7 +770,6 @@ def test_date_decay(es_url, postgres_dsn):
     # remove ORMBase
     app.session_manager.bases.pop()
 
-    app.namespace = 'documents'
     app.set_application_id('documents/home')
 
     session = app.session()

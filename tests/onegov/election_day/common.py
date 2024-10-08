@@ -1,6 +1,7 @@
 import os
 import tarfile
 
+from functools import cached_property
 from io import BytesIO
 from onegov.core.utils import append_query_param
 from onegov.core.utils import module_path
@@ -10,25 +11,6 @@ from onegov.election_day.models import Municipality
 from pyquery import PyQuery as pq
 from unittest.mock import Mock
 from webtest.forms import Upload
-
-
-def print_errors(errors):
-    if not errors:
-        return
-
-    def message(error):
-        if hasattr(error, 'interpolate'):
-            return error.interpolate()
-        return error
-
-    error_list = [
-        (
-            e.filename,
-            e.line,
-            message(e.error)) for e in errors
-    ]
-    for fn, l, err in error_list:
-        print(f'{fn}:{l} {err}')
 
 
 def get_fixture_path(domain=None, principal=None):
@@ -43,19 +25,21 @@ def get_fixture_path(domain=None, principal=None):
     return os.path.join(fixture_path, domain, principal)
 
 
-def get_tar_archive_name(api_format, model, election_type=None):
+def get_tar_archive_name(api_format, model, type_=None):
     if model == 'vote':
         return f'{api_format}_vote.tar.gz'
     elif model == 'election':
-        assert election_type
-        return f'{api_format}_{election_type}.tar.gz'
+        assert type_
+        return f'{api_format}_{type_}.tar.gz'
+    return f'{api_format}.tar.gz'
 
 
 def get_tar_file_path(
-        domain=None, principal=None,
-        api_format=None,
-        model=None,
-        election_type=None
+    domain=None,
+    principal=None,
+    api_format=None,
+    model=None,
+    type_=None
 ):
     if model == 'vote' and api_format == 'wabstic' or api_format == 'wabstim':
         # This format can have all domains, the will be a separate archive
@@ -65,7 +49,7 @@ def get_tar_file_path(
         )
     return os.path.join(
         get_fixture_path(domain, principal),
-        get_tar_archive_name(api_format, model, election_type)
+        get_tar_archive_name(api_format, model, type_)
     )
 
 
@@ -146,8 +130,6 @@ class DummyPrincipal:
         2: {'name': 'Entity2', 'district': 'District'}
     } for year in all_years}
 
-    hidden_tabs = {}
-
     def __init__(self):
         self.name = 'name'
         self.webhooks = []
@@ -162,6 +144,7 @@ class DummyPrincipal:
         self.reply_to = None
         self.superregions = []
         self.official_host = None
+        self.segmented_notifications = False
 
     @property
     def notifications(self):
@@ -212,7 +195,8 @@ class DummyApp:
 class DummyRequest:
 
     def __init__(self, session=None, app=None, locale='de',
-                 is_logged_in=False, is_secret=False, url=''):
+                 is_logged_in=False, is_secret=False, url='',
+                 avoid_quotes_in_url=False):
         self.includes = []
         self.session = session
         self.app = app or DummyApp(session=self.session)
@@ -224,6 +208,7 @@ class DummyRequest:
         self.default_locale = 'de_CH'
         self.is_secret = lambda x: is_secret
         self.url = url
+        self.avoid_quotes_in_url = avoid_quotes_in_url
 
     def class_link(self, model, variables=None, name=''):
         return f'{model.__name__}/{name}/{variables or {}}'
@@ -256,7 +241,11 @@ class DummyRequest:
         self.includes = list(set(self.includes))
 
     def new_url_safe_token(self, data):
-        return str({key: data[key] for key in sorted(data)})
+        formatted = str({key: data[key] for key in sorted(data)})
+        if self.avoid_quotes_in_url:
+            # remove quotes
+            return formatted.replace("'", '')
+        return formatted
 
     def get_translate(self, for_chameleon=False):
         if not self.app.locales:
@@ -268,6 +257,11 @@ class DummyRequest:
     def return_to(self, url, redirect):
         return f'{url}{redirect}'
 
+    @cached_property
+    def template_loader(self):
+        registry = self.app.config.template_engine_registry
+        return registry._template_loaders['.pt']
+
 
 def login(client, to=''):
     login = client.get(f'/auth/login?to={to}')
@@ -276,41 +270,46 @@ def login(client, to=''):
     return login.form.submit()
 
 
+def logout(client, to=''):
+    client.get(f'/auth/logout?to={to}')
+
+
 def upload_vote(client, create=True, canton='zg'):
     if create:
         new = client.get('/manage/votes/new-vote')
-        new.form['vote_de'] = 'Vote'
+        new.form['title_de'] = 'Vote'
         new.form['date'] = '2022-01-01'
         new.form['domain'] = 'federation'
-        new.form['vote_type'] = 'simple'
+        new.form['type'] = 'simple'
         new.form.submit()
 
     csv = (
-        'ID,Ja Stimmen,Nein Stimmen,'
-        'Stimmberechtigte,Leere Stimmzettel,Ungültige Stimmzettel\n'
+        'entity_id,yeas,nays,eligible_voters,empty,invalid,status,type,'
+        'counted\n'
     )
+
     if canton == 'zg':
         csv += (
-            '1701,3049,5111,13828,54,3\n'
-            '1702,2190,3347,9687,60,\n'
-            '1703,1497,2089,5842,15,1\n'
-            '1704,599,1171,2917,17,\n'
-            '1705,307,522,1289,10,1\n'
-            '1706,811,1298,3560,18,\n'
-            '1707,1302,1779,6068,17,\n'
-            '1708,1211,2350,5989,17,\n'
-            '1709,1096,2083,5245,18,1\n'
-            '1710,651,743,2016,8,\n'
-            '1711,3821,7405,16516,80,1\n'
+            '1701,3049,5111,13828,54,3,final,proposal,true\n'
+            '1702,2190,3347,9687,60,,final,proposal,true\n'
+            '1703,1497,2089,5842,15,1,final,proposal,true\n'
+            '1704,599,1171,2917,17,,final,proposal,true\n'
+            '1705,307,522,1289,10,1,final,proposal,true\n'
+            '1706,811,1298,3560,18,,final,proposal,true\n'
+            '1707,1302,1779,6068,17,,final,proposal,true\n'
+            '1708,1211,2350,5989,17,,final,proposal,true\n'
+            '1709,1096,2083,5245,18,1,final,proposal,true\n'
+            '1710,651,743,2016,8,,final,proposal,true\n'
+            '1711,3821,7405,16516,80,1,final,proposal,true\n'
         )
     if canton == 'gr':
         csv += (
-            '3506,3049,5111,13828,54,3\n'
+            '3506,3049,5111,13828,54,3,final,proposal,true\n'
         )
     csv = csv.encode('utf-8')
 
     upload = client.get('/vote/vote/upload')
-    upload.form['type'] = 'simple'
+    upload.form
     upload.form['proposal'] = Upload('data.csv', csv, 'text/plain')
     upload = upload.form.submit()
 
@@ -321,41 +320,39 @@ def upload_vote(client, create=True, canton='zg'):
 def upload_complex_vote(client, create=True, canton='zg'):
     if create:
         new = client.get('/manage/votes/new-vote')
-        new.form['vote_de'] = 'Complex Vote'
+        new.form['title_de'] = 'Complex Vote'
         new.form['date'] = '2022-01-01'
         new.form['domain'] = 'federation'
-        new.form['vote_type'] = 'complex'
+        new.form['type'] = 'complex'
         new.form.submit()
 
     csv = (
-        'ID,Ja Stimmen,Nein Stimmen,'
-        'Stimmberechtigte,Leere Stimmzettel,Ungültige Stimmzettel\n'
+        'entity_id,yeas,nays,eligible_voters,empty,invalid,status,type,'
+        'counted\n'
     )
-    if canton == 'zg':
-        csv += (
-            '1701,3049,5111,13828,54,3\n'
-            '1702,2190,3347,9687,60,\n'
-            '1703,1497,2089,5842,15,1\n'
-            '1704,599,1171,2917,17,\n'
-            '1705,307,522,1289,10,1\n'
-            '1706,811,1298,3560,18,\n'
-            '1707,1302,1779,6068,17,\n'
-            '1708,1211,2350,5989,17,\n'
-            '1709,1096,2083,5245,18,1\n'
-            '1710,651,743,2016,8,\n'
-            '1711,3821,7405,16516,80,1\n'
-        )
-    if canton == 'gr':
-        csv += (
-            '3506,3049,5111,13828,54,3\n'
-        )
+    for type_ in ('proposal', 'counter-proposal', 'tie-breaker'):
+        if canton == 'zg':
+            csv += (
+                f'1701,3049,5111,13828,54,3,final,{type_},true\n'
+                f'1702,2190,3347,9687,60,,final,{type_},true\n'
+                f'1703,1497,2089,5842,15,1,final,{type_},true\n'
+                f'1704,599,1171,2917,17,,final,{type_},true\n'
+                f'1705,307,522,1289,10,1,final,{type_},true\n'
+                f'1706,811,1298,3560,18,,final,{type_},true\n'
+                f'1707,1302,1779,6068,17,,final,{type_},true\n'
+                f'1708,1211,2350,5989,17,,final,{type_},true\n'
+                f'1709,1096,2083,5245,18,1,final,{type_},true\n'
+                f'1710,651,743,2016,8,,final,{type_},true\n'
+                f'1711,3821,7405,16516,80,1,final,{type_},true\n'
+            )
+        if canton == 'gr':
+            csv += (
+                f'3506,3049,5111,13828,54,3,final,{type_},true\n'
+            )
     csv = csv.encode('utf-8')
 
     upload = client.get('/vote/complex-vote/upload')
-    upload.form['type'] = 'complex'
     upload.form['proposal'] = Upload('data.csv', csv, 'text/plain')
-    upload.form['counter_proposal'] = Upload('data.csv', csv, 'text/plain')
-    upload.form['tie_breaker'] = Upload('data.csv', csv, 'text/plain')
     upload = upload.form.submit()
 
     assert "Ihre Resultate wurden erfolgreich hochgeladen" in upload
@@ -365,10 +362,10 @@ def upload_complex_vote(client, create=True, canton='zg'):
 def upload_majorz_election(client, create=True, canton='gr', status='unknown'):
     if create:
         new = client.get('/manage/elections/new-election')
-        new.form['election_de'] = 'Majorz Election'
+        new.form['title_de'] = 'Majorz Election'
         new.form['date'] = '2022-01-01'
         new.form['mandates'] = 2
-        new.form['election_type'] = 'majorz'
+        new.form['type'] = 'majorz'
         new.form['domain'] = 'federation'
         new.form.submit()
 
@@ -416,10 +413,10 @@ def upload_proporz_election(client, create=True, canton='gr',
                             status='unknown'):
     if create:
         new = client.get('/manage/elections/new-election')
-        new.form['election_de'] = 'Proporz Election'
+        new.form['title_de'] = 'Proporz Election'
         new.form['date'] = '2022-01-01'
         new.form['mandates'] = 5
-        new.form['election_type'] = 'proporz'
+        new.form['type'] = 'proporz'
         new.form['domain'] = 'federation'
         new.form['show_party_strengths'] = True
         new.form['show_party_panachage'] = True
@@ -507,18 +504,18 @@ def create_election_compound(client, canton='gr', pukelsheim=False,
 
     # Add two elections
     new = client.get('/manage/elections').click('Neue Wahl')
-    new.form['election_de'] = 'Regional Election A'
+    new.form['title_de'] = 'Regional Election A'
     new.form['date'] = '2022-01-01'
-    new.form['election_type'] = 'proporz'
+    new.form['type'] = 'proporz'
     new.form['domain'] = domain[canton]
     new.form[domain[canton]] = segment[canton][0]
     new.form['mandates'] = 10
     new.form.submit()
 
     new = client.get('/manage/elections').click('Neue Wahl')
-    new.form['election_de'] = 'Regional Election B'
+    new.form['title_de'] = 'Regional Election B'
     new.form['date'] = '2022-01-01'
-    new.form['election_type'] = 'proporz'
+    new.form['type'] = 'proporz'
     new.form['domain'] = domain[canton]
     new.form[domain[canton]] = segment[canton][1]
     new.form['mandates'] = 5
@@ -526,7 +523,7 @@ def create_election_compound(client, canton='gr', pukelsheim=False,
 
     # Add a compound
     new = client.get('/manage/election-compounds').click('Neue Verbindung')
-    new.form['election_de'] = 'Elections'
+    new.form['title_de'] = 'Elections'
     new.form['date'] = '2022-01-01'
     new.form['domain'] = 'canton'
     new.form['domain_elections'] = domain[canton]
@@ -620,7 +617,6 @@ def import_wabstic_data(election, tar_file, principal, has_expats=False):
         BytesIO(regional_wp_kandidaten), 'text/plain',
         BytesIO(regional_wp_kandidatengde), 'text/plain',
     )
-    print_errors(errors)
     assert not errors
 
 

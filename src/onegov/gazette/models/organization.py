@@ -19,7 +19,6 @@ if TYPE_CHECKING:
     from sqlalchemy.orm import Query
     from sqlalchemy.orm import Session
     from sqlalchemy.orm import relationship
-    from typing_extensions import Self
 
 
 class Organization(AdjacencyList, ContentMixin, TimestampMixin):
@@ -43,6 +42,7 @@ class Organization(AdjacencyList, ContentMixin, TimestampMixin):
         # we need to override these attributes to get the correct base class
         parent: relationship['Organization | None']
         children: relationship[Sequence['Organization']]
+
         @property
         def root(self) -> 'Organization': ...
         @property
@@ -97,19 +97,6 @@ class OrganizationMove:
         self.subject_id = subject_id
         self.target_id = target_id
         self.direction = direction
-
-    @classmethod
-    def for_url_template(cls) -> 'Self':
-        # FIXME: This is pretty weird, I think we should use
-        #        self.request.class_link so we don't have to
-        #        do this stupid hack where we return an object
-        #        that is not actually a valid OrganizationMove
-        return cls(
-            session=None,  # type:ignore[arg-type]
-            subject_id='{subject_id}',  # type:ignore[arg-type]
-            target_id='{target_id}',  # type:ignore[arg-type]
-            direction='{direction}'  # type:ignore[arg-type]
-        )
 
     def execute(self) -> None:
         from onegov.gazette.collections import OrganizationCollection

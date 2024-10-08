@@ -1,4 +1,3 @@
-from datetime import datetime
 from io import BytesIO
 from morepath import redirect
 from morepath.request import Response
@@ -10,7 +9,8 @@ from onegov.gazette.forms import CategoryForm
 from onegov.gazette.forms import EmptyForm
 from onegov.gazette.layout import Layout
 from onegov.gazette.models import Category
-from xlsxwriter import Workbook
+from sedate import utcnow
+from xlsxwriter import Workbook  # type:ignore[import-untyped]
 
 
 from typing import TYPE_CHECKING
@@ -37,7 +37,7 @@ def view_categories(
     layout = Layout(self, request)
 
     return {
-        'title': _("Categories"),
+        'title': _('Categories'),
         'layout': layout,
         'categories': self.query().all(),
         'export': request.link(self, name='export'),
@@ -71,14 +71,14 @@ def create_category(
             active=form.active.data,
             name=form.name.data
         )
-        request.message(_("Category added."), 'success')
+        request.message(_('Category added.'), 'success')
         return redirect(layout.manage_categories_link)
 
     return {
         'layout': layout,
         'form': form,
-        'title': _("New Category"),
-        'button_text': _("Save"),
+        'title': _('New Category'),
+        'button_text': _('Save'),
         'cancel': layout.manage_categories_link
     }
 
@@ -104,7 +104,7 @@ def edit_category(
     layout = Layout(self, request)
     if form.submitted(request):
         form.update_model(self)
-        request.message(_("Category modified."), 'success')
+        request.message(_('Category modified.'), 'success')
         return redirect(layout.manage_categories_link)
 
     if not form.errors:
@@ -114,8 +114,8 @@ def edit_category(
         'layout': layout,
         'form': form,
         'title': self.title,
-        'subtitle': _("Edit Category"),
-        'button_text': _("Save"),
+        'subtitle': _('Edit Category'),
+        'button_text': _('Save'),
         'cancel': layout.manage_categories_link,
     }
 
@@ -142,20 +142,20 @@ def delete_category(
 
     if self.in_use:
         request.message(
-            _("Only unused categorys may be deleted."),
+            _('Only unused categorys may be deleted.'),
             'alert'
         )
         return {
             'layout': layout,
             'title': self.title,
-            'subtitle': _("Delete Category"),
+            'subtitle': _('Delete Category'),
             'show_form': False
         }
 
     if form.submitted(request):
         collection = CategoryCollection(session)
         collection.delete(self)
-        request.message(_("Category deleted."), 'success')
+        request.message(_('Category deleted.'), 'success')
         return redirect(layout.manage_categories_link)
 
     return {
@@ -166,8 +166,8 @@ def delete_category(
         'layout': layout,
         'form': form,
         'title': self.title,
-        'subtitle': _("Delete Category"),
-        'button_text': _("Delete Category"),
+        'subtitle': _('Delete Category'),
+        'button_text': _('Delete Category'),
         'button_class': 'alert',
         'cancel': layout.manage_categories_link
     }
@@ -191,12 +191,12 @@ def export_categories(
     workbook = Workbook(output)
 
     worksheet = workbook.add_worksheet()
-    worksheet.name = request.translate(_("Categories"))
+    worksheet.name = request.translate(_('Categories'))
     worksheet.write_row(0, 0, (
-        request.translate(_("ID")),
-        request.translate(_("Name")),
-        request.translate(_("Title")),
-        request.translate(_("Active"))
+        request.translate(_('ID')),
+        request.translate(_('Name')),
+        request.translate(_('Title')),
+        request.translate(_('Active'))
     ))
 
     for index, category in enumerate(self.query()):
@@ -215,8 +215,8 @@ def export_categories(
         'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'
     )
     response.content_disposition = 'inline; filename={}-{}.xlsx'.format(
-        request.translate(_("Categories")).lower(),
-        datetime.utcnow().strftime('%Y%m%d%H%M')
+        request.translate(_('Categories')).lower(),
+        utcnow().strftime('%Y%m%d%H%M')
     )
     response.body = output.read()
 

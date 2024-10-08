@@ -1,6 +1,6 @@
 from onegov.core.utils import normalize_for_url
 from onegov.form import Form, merge_forms, FormDefinitionCollection
-from onegov.form.validators import ValidFormDefinition
+from onegov.form.validators import ValidFormDefinition, ValidSurveyDefinition
 from onegov.org import _
 from onegov.org.forms.fields import HtmlField
 from onegov.org.forms.generic import PaymentForm
@@ -13,32 +13,31 @@ from typing import TYPE_CHECKING
 
 
 class FormDefinitionBaseForm(Form):
-    """ Form to edit defined forms. """
-
-    title = StringField(_("Title"), [InputRequired()])
+    title = StringField(_('Title'), [InputRequired()])
 
     lead = TextAreaField(
-        label=_("Lead"),
-        description=_("Describes what this form is about"),
+        label=_('Lead'),
+        description=_('Describes what this form is about'),
         render_kw={'rows': 4})
 
     text = HtmlField(
-        label=_("Text"))
+        label=_('Text'))
 
     group = StringField(
-        label=_("Group"),
-        description=_("Used to group the form in the overview"))
+        label=_('Group'),
+        description=_('Used to group the form in the overview'))
 
     definition = TextAreaField(
-        label=_("Definition"),
+        label=_('Definition'),
         validators=[InputRequired(), ValidFormDefinition()],
-        render_kw={'rows': 32, 'data-editor': 'form'})
+        render_kw={'rows': 32, 'data-editor': 'form'},
+        default='E-Mail *= @@@')
 
     pick_up = TextAreaField(
-        label=_("Pick-Up"),
-        description=_("Describes how this resource can be picked up. "
-                      "This text is used on the ticket status page to "
-                      "inform the user")
+        label=_('Pick-Up'),
+        description=_('Describes how this resource can be picked up. '
+                      'This text is used on the ticket status page to '
+                      'inform the user')
     )
 
 
@@ -54,6 +53,32 @@ else:
         PaymentForm
     )):
         pass
+
+
+class SurveyDefinitionForm(Form):
+    """ Form to create surveys. """
+
+    # This class is needed to hide forbidden fields from the form editor
+    css_class = 'survey-definition'
+
+    title = StringField(_('Title'), [InputRequired()])
+
+    lead = TextAreaField(
+        label=_('Lead'),
+        description=_('Short description of the survey'),
+        render_kw={'rows': 4})
+
+    text = HtmlField(
+        label=_('Text'))
+
+    group = StringField(
+        label=_('Group'),
+        description=_('Used to group the form in the overview'))
+
+    definition = TextAreaField(
+        label=_('Definition'),
+        validators=[InputRequired(), ValidSurveyDefinition()],
+        render_kw={'rows': 32, 'data-editor': 'form'})
 
 
 class FormDefinitionUrlForm(Form):
@@ -75,7 +100,7 @@ class FormDefinitionUrlForm(Form):
             return False
 
         normalized_name = normalize_for_url(self.name.data)
-        if not self.name.data == normalized_name:
+        if self.name.data != normalized_name:
             self.name.errors.append(
                 _('Invalid name. A valid suggestion is: ${name}',
                   mapping={'name': normalized_name})
@@ -85,6 +110,6 @@ class FormDefinitionUrlForm(Form):
         other_entry = FormDefinitionCollection(self.request.session).by_name(
             normalized_name)
         if other_entry:
-            self.name.errors.append(_("An entry with the same name exists"))
+            self.name.errors.append(_('An entry with the same name exists'))
             return False
         return None

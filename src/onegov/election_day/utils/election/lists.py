@@ -1,8 +1,8 @@
 from collections import OrderedDict
-from onegov.ballot import ElectionResult
-from onegov.ballot import List
-from onegov.ballot import ListResult
 from onegov.election_day import _
+from onegov.election_day.models import ElectionResult
+from onegov.election_day.models import List
+from onegov.election_day.models import ListResult
 from sqlalchemy import desc
 from sqlalchemy import func
 from sqlalchemy.orm import object_session
@@ -14,10 +14,10 @@ from typing import Any
 from typing import TYPE_CHECKING
 if TYPE_CHECKING:
     from collections.abc import Collection
-    from onegov.ballot.models import Election
-    from onegov.ballot.models import ProporzElection
     from onegov.core.types import JSONObject
     from onegov.core.types import JSONObject_ro
+    from onegov.election_day.models import Election
+    from onegov.election_day.models import ProporzElection
     from onegov.election_day.request import ElectionDayRequest
     from sqlalchemy.orm import Query
     from sqlalchemy.sql import ColumnElement
@@ -47,8 +47,6 @@ def get_list_results(
     )
     result = result.join(ListResult.list)
     result = result.filter(List.election_id == election.id)
-    # FIXME: both of these should probably check for None instead of
-    #        truthyness, empty collections should yield no results
     if names:
         result = result.filter(List.name.in_(names))
     if entities:
@@ -64,7 +62,7 @@ def get_list_results(
         List.name,
         List.number_of_mandates
     )
-    order: list['ColumnElement[Any]'] = [desc('votes')]
+    order: list[ColumnElement[Any]] = [desc('votes')]
     if names and sort_by_names:
         order.insert(0, case(
             [
@@ -138,18 +136,16 @@ def get_lists_panachage_data(
     if election.type == 'majorz':
         return {}
 
-    # FIXME: An assertion might be better, in case we need to add additional
-    #        election types in the future...
     election = cast('ProporzElection', election)
 
     if not election.has_lists_panachage_data:
         return {}
 
-    blank = request.translate(_("Blank list")) if request else '-'
+    blank = request.translate(_('Blank list')) if request else '-'
 
-    nodes: dict[str, 'JSONObject'] = OrderedDict()
+    nodes: dict[str, JSONObject] = OrderedDict()
     nodes['left.999'] = {'name': blank}
-    for list_ in election.lists.order_by(List.name):
+    for list_ in sorted(election.lists, key=lambda l: l.name):
         nodes[f'left.{list_.list_id}'] = {
             'name': list_.name,
             'color': election.colors.get(list_.name),
@@ -163,8 +159,8 @@ def get_lists_panachage_data(
         }
     node_keys = list(nodes.keys())
 
-    links: list['JSONObject_ro'] = []
-    list_ids: dict['UUID | None', str] = {
+    links: list[JSONObject_ro] = []
+    list_ids: dict[UUID | None, str] = {
         list.id: list.list_id for list in election.lists
     }
     list_ids[None] = '999'

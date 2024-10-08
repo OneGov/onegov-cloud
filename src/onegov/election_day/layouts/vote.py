@@ -8,8 +8,8 @@ from onegov.election_day.utils import svg_filename
 
 from typing import TYPE_CHECKING
 if TYPE_CHECKING:
-    from onegov.ballot.models import Ballot
-    from onegov.ballot.models import Vote
+    from onegov.election_day.models import Ballot
+    from onegov.election_day.models import Vote
     from onegov.election_day.request import ElectionDayRequest
 
     from .election import NestedMenu
@@ -70,15 +70,15 @@ class VoteLayout(DetailLayout):
         if tab == 'districts':
             return self.app.principal.label('districts')
         if tab == 'statistics':
-            return _("Statistics")
+            return _('Statistics')
         if tab.startswith('proposal'):
-            return _("Proposal")
+            return _('Proposal')
         if tab.startswith('counter-proposal'):
-            return _("Counter Proposal")
+            return self.label('Counter Proposal')
         if tab.startswith('tie-breaker'):
-            return _("Tie-Breaker")
+            return _('Tie-Breaker')
         if tab == 'data':
-            return _("Downloads")
+            return _('Downloads')
 
         return ''
 
@@ -90,14 +90,11 @@ class VoteLayout(DetailLayout):
         if tab.endswith('-districts'):
             return self.app.principal.label('districts')
         if tab.endswith('-statistics'):
-            return _("Statistics")
+            return _('Statistics')
 
         return ''
 
     def tab_visible(self, tab: str | None) -> bool:
-        if self.hide_tab(tab):
-            return False
-
         if not self.has_results:
             return False
 
@@ -130,13 +127,56 @@ class VoteLayout(DetailLayout):
 
         return True
 
+    def label(self, value: str) -> str:
+        tie_breaker = (
+            self.ballot.type == 'tie-breaker'
+            or self.model.tie_breaker_vocabulary
+        )
+        if value == 'Counter Proposal':
+            if self.direct:
+                return _('Direct Counter Proposal')
+            return _('Indirect Counter Proposal')
+        if value == 'Yay':
+            return _('Proposal') if tie_breaker else _('Yay')
+        if value == 'Nay':
+            if not tie_breaker:
+                return _('Nay')
+            if self.direct:
+                return _('Direct Counter Proposal')
+            return _('Indirect Counter Proposal')
+        if value == 'Yeas':
+            return _('Proposal') if tie_breaker else _('Yeas')
+        if value == 'Nays':
+            if not tie_breaker:
+                return _('Nays')
+            if self.direct:
+                return _('Direct Counter Proposal')
+            return _('Indirect Counter Proposal')
+        if value == 'Yes %':
+            return _('Proposal %') if tie_breaker else _('Yes %')
+        if value == 'No %':
+            if not tie_breaker:
+                return _('No %')
+            if self.direct:
+                return _('Direct Counter Proposal %')
+            return _('Indirect Counter Proposal %')
+        if value == 'Accepted':
+            return _('Proposal') if tie_breaker else _('Accepted')
+        if value == 'Rejected':
+            if not tie_breaker:
+                return _('Rejected')
+            if self.direct:
+                return _('Direct Counter Proposal')
+            return _('Indirect Counter Proposal')
+
+        return self.principal.label(value)
+
     @cached_property
     def visible(self) -> bool:
         return self.tab_visible(self.tab)
 
     @cached_property
-    def type(self) -> str | None:
-        # FIXME: This should probably not be optional
+    def type(self) -> str:
         return self.model.type
 
     @cached_property
@@ -158,20 +198,19 @@ class VoteLayout(DetailLayout):
     @cached_property
     def map_link(self) -> str | None:
 
+        assert self.request.locale
         if self.scope == 'entities':
             return self.request.link(
                 self.model,
                 f'{self.ballot.type}-by-entities-map',
-                # FIXME: Should we assert that locale is set?
-                query_params={'locale': self.request.locale}  # type:ignore
+                query_params={'locale': self.request.locale}
             )
 
         if self.scope == 'districts':
             return self.request.link(
                 self.model,
                 f'{self.ballot.type}-by-districts-map',
-                # FIXME: Should we assert that locale is set?
-                query_params={'locale': self.request.locale}  # type:ignore
+                query_params={'locale': self.request.locale}
             )
 
         return None
@@ -217,15 +256,14 @@ class VoteLayout(DetailLayout):
 
     @cached_property
     def summarize(self) -> bool:
-        return self.ballot.results.count() != 1
+        return len(self.ballot.results) != 1
 
     @cached_property
     def main_view(self) -> str:
         if self.type == 'complex':
             return self.request.link(self.model, 'proposal-entities')
         for tab in self.all_tabs:
-            if not self.hide_tab(tab):
-                return self.request.link(self.model, tab)
+            return self.request.link(self.model, tab)
         return self.request.link(self.model, 'entities')
 
     @cached_property
@@ -233,16 +271,20 @@ class VoteLayout(DetailLayout):
         return self.model.answer
 
     @cached_property
+    def direct(self) -> bool:
+        return self.model.direct
+
+    @cached_property
     def menu(self) -> 'NestedMenu':
         if self.type == 'complex':
-            result: 'NestedMenu' = []
+            result: NestedMenu = []
 
             for title, prefix in (
-                (_("Proposal"), 'proposal'),
-                (_("Counter Proposal"), 'counter-proposal'),
-                (_("Tie-Breaker"), 'tie-breaker')
+                (_('Proposal'), 'proposal'),
+                (self.label('Counter Proposal'), 'counter-proposal'),
+                (_('Tie-Breaker'), 'tie-breaker')
             ):
-                submenu: 'NestedMenu' = [
+                submenu: NestedMenu = [
                     (
                         self.subtitle(tab),
                         self.request.link(self.model, tab),
@@ -284,11 +326,11 @@ class VoteLayout(DetailLayout):
         """ Returns the path to the PDF file or None, if it is not available.
         """
 
+        assert self.request.locale
         path = 'pdf/{}'.format(
             pdf_filename(
                 self.model,
-                # FIXME: Should we assert that locale is set?
-                self.request.locale,  # type:ignore[arg-type]
+                self.request.locale,
                 last_modified=self.last_modified
             )
         )
@@ -311,12 +353,12 @@ class VoteLayout(DetailLayout):
         if not self.ballot:
             return None
 
+        assert self.request.locale
         path = 'svg/{}'.format(
             svg_filename(
                 self.ballot,
                 self.svg_prefix,
-                # FIXME: Should we assert that locale is set?
-                self.request.locale,  # type:ignore[arg-type]
+                self.request.locale,
                 last_modified=self.last_modified
             )
         )

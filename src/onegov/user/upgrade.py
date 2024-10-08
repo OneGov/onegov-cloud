@@ -112,7 +112,7 @@ def force_lowercase_usernames(context: 'UpgradeContext') -> None:
         role='member',
     )
 
-    for username, users_ in users.items():
+    for users_ in users.values():
 
         # simply change usernames that don't conflict with others
         if len(users_) == 1:
@@ -261,3 +261,20 @@ def make_user_models_polymorphic_type_non_nullable(
             """)
 
             context.operations.alter_column(table, 'type', nullable=False)
+
+
+@upgrade_task('Add scope column')
+def add_scope_column(context: 'UpgradeContext') -> None:
+    if not context.has_table('tans'):
+        return
+
+    context.operations.add_column(
+        'tans', Column('scope', Text, nullable=True, index=True)
+    )
+
+    context.operations.execute(
+        "UPDATE tans set scope = 'mtan_access' WHERE scope IS NULL;"
+    )
+
+    context.session.flush()
+    context.operations.alter_column('tans', 'scope', nullable=False)

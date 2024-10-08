@@ -3,7 +3,6 @@ from datetime import date
 from onegov.election_day.utils.common import LastUpdatedOrderedDict
 from onegov.election_day.utils.election.connections import \
     get_connection_results_api
-from tests.onegov.election_day.common import print_errors
 
 
 def test_get_connection_results_interal(import_test_datasets, session):
@@ -73,7 +72,6 @@ def test_get_connection_results_subconn_ids(import_test_datasets, session):
         dataset_name='test_nonunique_subconn_ids',
         app_session=session
     )
-    print_errors(errors)
     assert not errors
     results = get_connection_results_api(election, session)
     assert results['1']['total_votes'] == 3

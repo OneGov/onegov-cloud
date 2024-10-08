@@ -3,6 +3,7 @@ import hashlib
 import pycurl
 
 from csv import reader as csvreader
+from click_params import StringListParamType  # type: ignore[import-untyped]
 from datetime import date
 from datetime import datetime
 from datetime import timedelta
@@ -55,13 +56,15 @@ def clear(
 ) -> 'Callable[[CoreRequest, Framework], None]':
     """ Deletes all events.
 
+    .. code-block:: bash
+
         onegov-event --select '/veranstaltungen/zug' clear
 
     """
 
     def _clear(request: 'CoreRequest', app: 'Framework') -> None:
-        if not click.confirm("Do you really want to remove all events?"):
-            abort("Deletion process aborted")
+        if not click.confirm('Do you really want to remove all events?'):
+            abort('Deletion process aborted')
 
         session = app.session()
         for event in session.query(Event):
@@ -167,11 +170,12 @@ def import_json(
     tagmap_file: 'TextIOWrapper | None',
     clear: bool
 ) -> 'Callable[[CoreRequest, Framework], None]':
-    """ Fetches the events from a seantis.dir.events instance.
+    r""" Fetches the events from a seantis.dir.events instance.
 
     This command is intended for migration and to be removed in the future.
 
     Example:
+    .. code-block:: bash
 
         onegov-event --select '/veranstaltungen/zug' import-json \
         'https://veranstaltungen.zug.ch/veranstaltungen/?type=json&compact'
@@ -193,7 +197,7 @@ def import_json(
         events = EventCollection(session)
 
         if clear:
-            click.secho("Removing all events", fg='yellow')
+            click.secho('Removing all events', fg='yellow')
             session = app.session()
             for event in session.query(Event):
                 session.delete(event)
@@ -210,16 +214,16 @@ def import_json(
             if recurrence:
                 start, end = get_event_dates(item['url'], timezone)
 
-            organizer = ', '.join((line for line in (
+            organizer = ', '.join(line for line in (
                 item['organizer'] or '',
                 item['contact_name'] or '',
                 item['contact_phone'] or ''
-            ) if line))
+            ) if line)
 
             organizer_email = item['contact_email'] or None
             organizer_phone = item['contact_phone'] or None
 
-            location = ', '.join((line for line in (
+            location = ', '.join(line for line in (
                 item['locality'] or '',
                 ' '.join((
                     item['street'] or '',
@@ -229,15 +233,15 @@ def import_json(
                     item['zipcode'] or '',
                     item['town'] or '',
                 )).strip(),
-            ) if line))
+            ) if line)
 
-            description = '\n\n'.join((line for line in (
+            description = '\n\n'.join(line for line in (
                 item['short_description'] or '',
                 item['long_description'] or '',
                 item['event_url'] or '',
                 item['location_url'] or '',
                 item['registration']
-            ) if line))
+            ) if line)
 
             price = item['prices'] or None
 
@@ -316,11 +320,23 @@ def import_json(
 
         if unknown_tags:
             formatted_tags = ', '.join(f'"{tag}"' for tag in unknown_tags)
-            click.secho(f"Tags not in tagmap: {formatted_tags}!", fg='yellow')
+            click.secho(f'Tags not in tagmap: {formatted_tags}!', fg='yellow')
 
-        click.secho(f"Imported {len(data)} events", fg='green')
+        click.secho(f'Imported {len(data)} events', fg='green')
 
     return _import_json
+
+
+def filter_cb(
+    ctx: 'click.Context',
+    param: 'click.Parameter',
+    value: 'tuple[str, list[str]] | None'
+) -> dict[str, list[str]] | None:
+    if not value:
+        return {}
+
+    d = {value[0]: value[1]}
+    return d
 
 
 @cli.command('import-ical')
@@ -328,53 +344,61 @@ def import_json(
 @click.argument('ical', type=click.File())
 @click.option('--future-events-only', is_flag=True, default=False)
 @click.option('--event-image', type=click.File('rb'))
-@click.option("--cat", "-c", 'categories', type=str, multiple=True)
-@click.option("--fil", "-f", 'keyword_filters', type=(str, str),
-              multiple=True)
+@click.option('--cat', '-c', 'categories', type=str, multiple=True)
+@click.option('--fil', '-f', 'keyword_filters',
+              type=(str, StringListParamType(' ')), callback=filter_cb,
+              help='filter in the form: -f fil-name fil-val-1,fil-val-2')
 def import_ical(
     group_context: 'GroupContext',
     ical: 'TextIOWrapper',
     future_events_only: bool = False,
     event_image: 'FileIO | None' = None,
     categories: 'Sequence[str]' = (),
-    keyword_filters: 'Sequence[tuple[str, str]]' = ()
-) -> 'Callable[[CoreRequest, Framework], None]':
-    """ Imports events from an iCalendar file.
+    keyword_filters: 'dict[str, list[str]] | None' = None
 
-    Example:
+) -> 'Callable[[CoreRequest, Framework], None]':
+    r""" Imports events from an iCalendar file.
+
+    Examples:
+    .. code-block:: bash
 
         onegov-event --select '/veranstaltungen/zug' import-ical import.ics
 
         onegov-event --select '/veranstaltungen/zug' import-ical import.ics
         --future-events-only
 
-        onegov-event --select '/veranstaltungen/zug' import-ical import.ics
+        onegov-event --select '/veranstaltungen/zug' import-ical import.ics \
         --event-image /path/to/image.jpg
 
-        onegov-event --select /onegov_winterthur/winterthur import-ical
-        ./basic.ics --future-events-only --event-image
+        onegov-event --select /onegov_winterthur/winterthur import-ical \
+        ./basic.ics --future-events-only --event-image \
         ~/Veranstaltung_breit.jpg -c Sport -c Fussball
 
-        onegov-event --select /onegov_winterthur/winterthur import-ical
-        ./basic.ics --future-events-only --event-image
-        ~/Veranstaltung_breit.jpg -f "kalender" "Sport Veranstaltungskalender"
+        onegov-event --select /onegov_winterthur/winterthur import-ical \
+        ./basic.ics --future-events-only --event-image \
+        ~/Veranstaltung_breit.jpg \
+        -f "kalender" "Sport Veranstaltungskalender"
+
+    or comma-separated filter values:
+
+    .. code-block:: bash
+        onegov-event --select /onegov_winterthur/winterthur import-ical \
+        ./basic.ics --future-events-only --event-image image.jpg \
+        -f "kalender" "Sport,Veranstaltungskalender"
 
     """
     cat = list(categories)
-    # FIXME: We probably need a way to handle keywords that accept a list
-    #        rather than a single string value...
-    filters: dict[str, str | list[str]] = dict(keyword_filters)
 
     def _import_ical(request: 'CoreRequest', app: 'Framework') -> None:
         collection = EventCollection(app.session())
         added, updated, purged = collection.from_ical(
             ical.read(), future_events_only, event_image,
-            default_categories=cat, default_filter_keywords=filters,
+            default_categories=cat, default_filter_keywords=keyword_filters,
         )
         click.secho(
-            f"Events successfully imported "
-            f"({len(added)} added, {len(updated)} updated, "
-            f"{len(purged)} deleted)",
+            f'Events successfully imported '
+            f'({len(added)} added, {len(updated)} updated, '
+            f'{len(purged)} deleted)',
             fg='green')
 
     return _import_ical
@@ -394,6 +418,7 @@ def import_guidle(
     """ Fetches the events from guidle.
 
     Example:
+    .. code-block:: bash
 
         onegov-event --select '/veranstaltungen/zug' import-guidle \
         'http://www.guidle.com/xxxx/'
@@ -420,8 +445,10 @@ def import_guidle(
             collection = EventCollection(app.session())
 
             if clear:
-                events = request.session.query(Event)\
+                events = (
+                    request.session.query(Event)
                     .filter(Event.meta['source'].astext.startswith(prefix))
+                )
 
                 for event in events:
                     request.session.delete(event)
@@ -508,7 +535,7 @@ def import_guidle(
             if unknown_tags:
                 formatted_tags = ', '.join(f'"{tag}"' for tag in unknown_tags)
                 click.secho(
-                    f"Tags not in tagmap: {formatted_tags}!", fg='yellow'
+                    f'Tags not in tagmap: {formatted_tags}!', fg='yellow'
                 )
 
             click.secho(
@@ -518,7 +545,8 @@ def import_guidle(
                 fg='green'
             )
         except Exception as e:
-            log.error("Error importing events", exc_info=True)
+            log.error('Error importing events', exc_info=True)
+            click.secho(f'Error importing events: {e}', err=True, fg='red')
             raise (e)
 
     return _import_guidle

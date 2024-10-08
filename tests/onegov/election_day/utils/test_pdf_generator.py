@@ -1,8 +1,7 @@
 from datetime import date
 from datetime import timedelta
-from onegov.ballot import Ballot
-from onegov.ballot import BallotResult
-from onegov.ballot import Vote
+from onegov.election_day.models import BallotResult
+from onegov.election_day.models import Vote
 from onegov.election_day.utils.pdf_generator import PdfGenerator
 from pdfrw import PdfReader
 from tests.onegov.election_day.common import DummyRequest
@@ -157,7 +156,7 @@ def test_generate_pdf_long_title(session, election_day_app_zg):
     """
 
     vote = Vote(title=title, domain='federation', date=date(2015, 6, 18))
-    vote.ballots.append(Ballot(type='proposal'))
+    assert vote.proposal  # create
     session.add(vote)
     session.flush()
 

@@ -1,10 +1,10 @@
-from onegov.ballot import Election
-from onegov.core.security import Public
 from onegov.election_day import ElectionDayApp
 from onegov.election_day.layouts import ElectionLayout
+from onegov.election_day.models import Election
+from onegov.election_day.security import MaybePublic
 from onegov.election_day.utils import add_last_modified_header
-from onegov.election_day.utils import get_parameter
 from onegov.election_day.utils import get_entity_filter
+from onegov.election_day.utils import get_parameter
 from onegov.election_day.utils.election import get_list_results
 from onegov.election_day.utils.election import get_lists_data
 
@@ -20,7 +20,7 @@ if TYPE_CHECKING:
 @ElectionDayApp.json(
     model=Election,
     name='lists-data',
-    permission=Public
+    permission=MaybePublic
 )
 def view_election_lists_data(
     self: Election,
@@ -30,8 +30,7 @@ def view_election_lists_data(
 
     limit = get_parameter(request, 'limit', int, None)
     names = get_parameter(request, 'names', list, None)
-    # FIXME: Why is this a list?
-    sort_by_names = get_parameter(request, 'sort_by_names', list, None)
+    sort_by_names = get_parameter(request, 'sort_by_names', bool, None)
     entity = request.params.get('entity', '')
     assert isinstance(entity, str)
 
@@ -39,7 +38,7 @@ def view_election_lists_data(
         self,
         limit=limit,
         names=names,
-        sort_by_names=bool(sort_by_names),
+        sort_by_names=sort_by_names or False,
         entities=[entity] if entity else None
     )
 
@@ -48,7 +47,7 @@ def view_election_lists_data(
     model=Election,
     name='lists-chart',
     template='embed.pt',
-    permission=Public
+    permission=MaybePublic
 )
 def view_election_lists_chart(
     self: Election,
@@ -75,7 +74,7 @@ def view_election_lists_chart(
     model=Election,
     name='lists-table',
     template='embed.pt',
-    permission=Public
+    permission=MaybePublic
 )
 def view_election_lists_table(
     self: Election,
@@ -104,7 +103,7 @@ def view_election_lists_table(
     model=Election,
     name='lists',
     template='election/lists.pt',
-    permission=Public
+    permission=MaybePublic
 )
 def view_election_lists(
     self: Election,
@@ -127,7 +126,11 @@ def view_election_lists(
     }
 
 
-@ElectionDayApp.svg_file(model=Election, name='lists-svg')
+@ElectionDayApp.svg_file(
+    model=Election,
+    name='lists-svg',
+    permission=MaybePublic
+)
 def view_election_lists_svg(
     self: Election,
     request: 'ElectionDayRequest'

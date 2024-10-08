@@ -121,6 +121,7 @@ def app(request, glauth_binary, postgres_dsn, temporary_path, redis_url,
         ldap_port = ldap_server.context.port
 
         app = App()
+        app.namespace = 'apps'
         app.configure_application(
             dsn=postgres_dsn,
             redis_url=redis_url,
@@ -141,7 +142,6 @@ def app(request, glauth_binary, postgres_dsn, temporary_path, redis_url,
             }
         )
 
-        app.namespace = 'apps'
         app.set_application_id('apps/my-app')
 
         yield app

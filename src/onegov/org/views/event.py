@@ -3,6 +3,7 @@ import morepath
 
 from morepath.request import Response
 from onegov.core.crypto import random_token
+from onegov.core.elements import BackLink
 from onegov.core.security import Private, Public
 from onegov.event import Event, EventCollection, OccurrenceCollection
 from onegov.form import merge_forms, parse_form
@@ -158,7 +159,7 @@ def publish_event(
             OccurrenceCollection(request.session)
         ))
 
-    request.success(_("You have accepted the event ${title}", mapping={
+    request.success(_('You have accepted the event ${title}', mapping={
         'title': self.title
     }))
 
@@ -167,7 +168,7 @@ def publish_event(
         send_ticket_mail(
             request=request,
             template='mail_event_accepted.pt',
-            subject=_("Your event was accepted"),
+            subject=_('Your event was accepted'),
             receivers=(self.meta['submitter_email'], ),
             ticket=ticket,
             content={
@@ -201,7 +202,7 @@ def handle_new_event(
 
     """
 
-    self.title = title = _("Submit an event")  # type:ignore[attr-defined]
+    self.title = title = _('Submit an event')  # type:ignore[attr-defined]
 
     terms: str = _(
         "Only events taking place inside the town or events related to "
@@ -264,12 +265,12 @@ def handle_new_event_without_workflow(
 ) -> 'RenderData | BaseResponse':
     """ Create and submit a new event.
 
-        The event is created and ticket workflow is skipped by setting
-        the state to 'submitted'.
+    The event is created and ticket workflow is skipped by setting
+    the state to 'submitted'.
 
     """
 
-    self.title = title = _("Add event")  # type:ignore[attr-defined]
+    self.title = title = _('Add event')  # type:ignore[attr-defined]
 
     if form.submitted(request):
         assert form.title.data is not None
@@ -285,13 +286,12 @@ def handle_new_event_without_workflow(
         })
         event.state = 'submitted'
         form.populate_obj(event)
-        return morepath.redirect((request.link(event, 'publish')))
+        return morepath.redirect(request.link(event, 'publish'))
 
     # FIXME: same hack as in above view, add a proper layout
     layout = layout or EventLayout(self, request)  # type:ignore
     layout.editbar_links = []
-    # FIXME: This is town6 specific and should be set there
-    layout.hide_steps = True  # type:ignore[attr-defined]
+    layout.edit_mode = True
 
     return {
         'layout': layout,
@@ -348,7 +348,7 @@ def view_event(
                 send_ticket_mail(
                     request=request,
                     template='mail_ticket_opened.pt',
-                    subject=_("Your request has been registered"),
+                    subject=_('Your request has been registered'),
                     receivers=(self.meta['submitter_email'],),
                     ticket=ticket,
                 )
@@ -356,7 +356,7 @@ def view_event(
                     send_ticket_mail(
                         request=request,
                         template='mail_ticket_opened_info.pt',
-                        subject=_("New ticket"),
+                        subject=_('New ticket'),
                         ticket=ticket,
                         receivers=(request.email_for_new_tickets, ),
                         content={
@@ -379,12 +379,12 @@ def view_event(
                         ticket.accept_ticket(request.auto_accept_user)
                         request.view(self, name='publish')
                     except Exception:
-                        request.warning(_("Your request could not be "
-                                          "accepted automatically!"))
+                        request.warning(_('Your request could not be '
+                                          'accepted automatically!'))
                     else:
                         close_ticket(ticket, request.auto_accept_user, request)
 
-        request.success(_("Thank you for your submission!"))
+        request.success(_('Thank you for your submission!'))
 
         return morepath.redirect(request.link(ticket, 'status'))
 
@@ -428,14 +428,15 @@ def handle_edit_event(
         ticket = TicketCollection(request.session).by_handler_id(self.id.hex)
         if ticket:
             EventMessage.create(self, ticket, request, 'changed')
-        request.success(_("Your changes were saved"))
+        request.success(_('Your changes were saved'))
         return request.redirect(request.link(self))
 
     form.process(obj=self)
 
     layout = layout or EventLayout(self, request)
-    layout.breadcrumbs.append(Link(_("Edit"), '#'))
-    layout.editbar_links = []
+    layout.breadcrumbs.append(Link(_('Edit'), '#'))
+    layout.editmode_links[1] = BackLink(attrs={'class': 'cancel-link'})
+    layout.edit_mode = True
 
     return {
         'layout': layout,
@@ -486,7 +487,7 @@ def handle_delete_event(self: Event, request: 'OrgRequest') -> None:
         send_ticket_mail(
             request=request,
             template='mail_event_rejected.pt',
-            subject=_("Your event was rejected"),
+            subject=_('Your event was rejected'),
             receivers=(self.meta['submitter_email'], ),
             ticket=ticket,
             content={

@@ -13,12 +13,12 @@ class PaymentTypesLayout(DefaultLayout):
 
     @cached_property
     def title(self) -> str:
-        return _("Manage payment types")
+        return _('Manage payment types')
 
     @cached_property
     def breadcrumbs(self) -> list['Element']:
         return [
-            Link(_("Homepage"), self.homepage_url),
+            Link(_('Homepage'), self.homepage_url),
             Link(self.title, self.request.link(self.model))
         ]
 

@@ -10,7 +10,7 @@ from wtforms.validators import DataRequired
 class UploadWabstiMajorzElectionForm(Form):
 
     wm_gemeinden = UploadField(
-        label="WM_Gemeinden",
+        label='WM_Gemeinden',
         validators=[
             DataRequired(),
             WhitelistedMimeType(ALLOWED_MIME_TYPES),
@@ -20,7 +20,7 @@ class UploadWabstiMajorzElectionForm(Form):
     )
 
     wm_kandidaten = UploadField(
-        label="WM_Kandidaten",
+        label='WM_Kandidaten',
         validators=[
             DataRequired(),
             WhitelistedMimeType(ALLOWED_MIME_TYPES),
@@ -30,7 +30,7 @@ class UploadWabstiMajorzElectionForm(Form):
     )
 
     wm_kandidatengde = UploadField(
-        label="WM_KandidatenGde",
+        label='WM_KandidatenGde',
         validators=[
             DataRequired(),
             WhitelistedMimeType(ALLOWED_MIME_TYPES),
@@ -40,7 +40,7 @@ class UploadWabstiMajorzElectionForm(Form):
     )
 
     wm_wahl = UploadField(
-        label="WM_Wahl",
+        label='WM_Wahl',
         validators=[
             DataRequired(),
             WhitelistedMimeType(ALLOWED_MIME_TYPES),
@@ -50,7 +50,7 @@ class UploadWabstiMajorzElectionForm(Form):
     )
 
     wmstatic_gemeinden = UploadField(
-        label="WMStatic_Gemeinden",
+        label='WMStatic_Gemeinden',
         validators=[
             DataRequired(),
             WhitelistedMimeType(ALLOWED_MIME_TYPES),

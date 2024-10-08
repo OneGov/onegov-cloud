@@ -1,17 +1,17 @@
-from onegov.ballot import Vote
-from onegov.ballot.models import Election
-from onegov.ballot.models import ElectionCompound
-from onegov.election_day.formats.exports.election import (
-    export_election_internal)
-from onegov.election_day.formats.exports.election import (
-    export_election_internal_majorz)
-from onegov.election_day.formats.exports.election import (
-    export_election_internal_proporz)
-from onegov.election_day.formats.exports.election_compound import (
-    export_election_compound_internal)
-from onegov.election_day.formats.exports.party_result import (
-    export_parties_internal)
+from onegov.election_day.formats.exports.election import \
+    export_election_internal
+from onegov.election_day.formats.exports.election import \
+    export_election_internal_majorz
+from onegov.election_day.formats.exports.election import \
+    export_election_internal_proporz
+from onegov.election_day.formats.exports.election_compound import \
+    export_election_compound_internal
+from onegov.election_day.formats.exports.party_result import \
+    export_parties_internal
 from onegov.election_day.formats.exports.vote import export_vote_internal
+from onegov.election_day.models import Election
+from onegov.election_day.models import ElectionCompound
+from onegov.election_day.models import Vote
 
 
 from typing import Any

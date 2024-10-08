@@ -1,0 +1,80 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+GROUP=${1:-1}
+SPLITS=${2:-1}
+
+# automatically open the log output group if there's an error
+trap 'echo "^^^ +++"' ERR
+
+# install test requirements
+echo "--- Installing packages"
+apt-get install -y \
+    wget \
+    apparmor \
+    chromium-browser \
+    curl \
+    git-core \
+    postgresql \
+    redis \
+    openjdk-8-jre-headless \
+    gcc \
+    libc-dev \
+    fonts-liberation \
+    libappindicator3-1 \
+    libasound2t64 \
+    libdrm2 \
+    libgbm1 \
+    libnspr4 \
+    libnss3 \
+    libu2f-udev \
+    libvulkan1 \
+    libx11-xcb1 \
+    libxcb-dri3-0 \
+    libxshmfence1 \
+    libxss1 \
+    xdg-utils \
+    unzip
+export JAVA_HOME="/usr/lib/jvm/java-8-openjdk-amd64"
+redis-server --daemonize yes
+
+# switch to virtual env
+source /app/bin/activate
+
+# show installed versions
+echo "--- Showing versions"
+echo "Git commit $(cat .commit-long)"
+echo "$(python --version)"
+echo "$(lsb_release -d)"
+echo "$(redis-server --version)"
+echo "$(psql --version)"
+echo "$(java --version)"
+
+# download and install tests
+echo "--- Downloading code and installing dependencies"
+curl -L -o onegov-cloud.zip "https://github.com/OneGov/onegov-cloud/archive/$(cat .commit-long).zip"
+unzip -q onegov-cloud.zip
+cd "onegov-cloud-$(cat .commit-long)"
+pip install --upgrade uv
+uv pip install '.[test]' \
+    pytest-split \
+    pytest-xdist \
+    --quiet
+
+# reset the build assets again (like in the upstream container script),
+# because pip install will undo that change
+find /app/lib -type d -iname assets -print0 | xargs -0 chmod a+w -R
+
+# run the tests as a separate user
+echo "--- Running tests (group: $GROUP/$SPLITS)"
+export LC_ALL="C.UTF-8"
+export LANG="C.UTF-8"
+adduser --disabled-password --gecos "" test
+set +x
+run-as "$(id -u test)":test py.test \
+    -o cache_dir=/tmp/pytest \
+    -nauto \
+    --dist loadgroup \
+    --splits "$SPLITS" \
+    --group "$GROUP" \
+    tests

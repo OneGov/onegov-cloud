@@ -16,7 +16,7 @@
             </div>
         </div>
 
-        <p tal:condition="directory.lead" tal:content="structure layout.linkify(directory.lead)" />
+        <p tal:condition="directory.lead" tal:content="layout.linkify(directory.lead)" />
 
         <div class="row reverse-on-mobile">
             <div class="columns medium-8">
@@ -25,7 +25,28 @@
                     <p tal:case="False">${directory.configuration.empty_notice}</p>
                 </tal:b>
 
-                <ul class="directory-list with-lead ${show_thumbnails and 'with-thumbnails' or ''}  ${'row' if overview_two_columns else ''}" tal:condition="entries">
+                <!--? display in accordion mode -->
+                <ul tal:condition="directory.layout == 'accordion'" class="accordion" data-accordion>
+                    <li tal:repeat="entry entries" class="accordion-navigation small-12-cell" style="">
+                        <a tal:attributes="href python:'#panel'+str(repeat['entry'].index)">
+                            <span class="h5">${entry.title}</span>
+                        </a>
+                        <div tal:attributes="id python:'panel'+str(repeat['entry'].index)" class="content">
+                            <ul tal:repeat="item entry.values.items()" style="list-style: none; margin-left: 0">
+                                <li tal:define="key item[0].capitalize(); value item[1].replace('\r\n', Markup('<br>'))" tal:content="Markup('<strong>{}</strong>: {}').format(key, value)"></li>
+                            </ul>
+                            <ul style="list-style: none; margin-left: 0">
+                                <li>
+                                    <a tal:condition="request.is_manager" class="edit-link" tal:attributes="href request.link(entry, 'edit')">
+                                        <i class="fa fa-edit"></i>
+                                    </a>
+                                </li>
+                            </ul>
+                        </div>
+                    </li>
+                </ul>
+
+                <ul class="directory-list with-lead ${show_thumbnails and 'with-thumbnails' or ''}  ${'row' if overview_two_columns else ''}" tal:condition="entries and directory.layout == 'default'">
                     <li tal:repeat="entry entries" class="small-12 ${'medium-6' if overview_two_columns else ''} columns">
                         <div class="thumbnail" tal:condition="show_thumbnails">
                             <tal:b define="thumbnail thumbnail_link(entry)" condition="thumbnail">
@@ -40,17 +61,17 @@
 
                             <tal:b define="custom_lead search_widget.lead(layout, entry)|nothing">
                                 <div class="list-lead">
-                                    <tal:b condition="custom_lead" replace="structure custom_lead" />
-                                    <tal:b condition="not:custom_lead" replace="structure python: escape(entry.lead).replace('\\n', Markup('<br>'))" />
+                                    <tal:b condition="custom_lead" replace="custom_lead" />
+                                    <tal:b condition="not:custom_lead" replace="escape(entry.lead).replace('\\n', Markup('<br>'))" />
                                 </div>
                             </tal:b>
                         </div>
                     </li>
                 </ul>
 
-                <tal:b define="text directory.content.get('text')" condition="text">
+                <tal:b define="text directory.text|nothing" condition="text">
                     <h2 i18n:translate>Further Information</h2>
-                    <tal:b content="structure text" />
+                    <tal:b content="text" />
                 </tal:b>
 
             </div>
@@ -59,7 +80,7 @@
 
                 <div class="row" tal:condition="search_widget">
                     <div class="columns medium-12">
-                        <tal:b replace="structure search_widget.html(layout)" />
+                        <tal:b replace="search_widget.html(layout)" />
                     </div>
                 </div>
 
@@ -84,9 +105,30 @@
                 <div class="publication-nav" tal:condition="layout.publication_filters">
                     <button href="#" data-dropdown="pubnav" aria-controls="pubnav" aria-expanded="false" class="button small secondary dropdown" i18n:translate>${layout.publication_filter_title}</button><br>
                     <ul id="pubnav" data-dropdown-content class="f-dropdown" aria-hidden="true">
-                        <li tal:repeat="link layout.publication_links" tal:content="structure link(layout)"></li>
+                        <li tal:repeat="link layout.publication_links" tal:content="link(layout)"></li>
                     </ul>
                 </div>
+
+                <div class="side-panel files-panel" tal:condition="files and directory.show_file_links_in_sidebar|True">
+                    <h2 i18n:translate>Documents</h2>
+                    <ul class="panel-links">
+                        <li tal:repeat="file files">
+                            <a title="${file.name}" href="${request.link(file)}">${file.name}</a>
+                        </li>
+                    </ul>
+                </div>
+
+                <div class="side-panel" tal:condition="directory.enable_update_notifications|False">
+                    <h2 i18n:translate>Actions</h2>
+                    <ul class="panel-links">
+                        <li >
+                            <a class="list-link" href="${new_recipient_link}">
+                                <i class="fa fa-bell"></i> <span class="list-title" i18n:translate>Get notifications on new entries</span>
+                            </a>
+                        </li>
+                    </ul>
+                </div>
+
             </div>
 
         </div>

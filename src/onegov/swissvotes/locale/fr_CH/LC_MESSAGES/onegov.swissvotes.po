@@ -2,7 +2,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: \n"
-"POT-Creation-Date: 2022-01-13 07:05+0100\n"
+"POT-Creation-Date: 2024-08-28 15:13+0200\n"
 "PO-Revision-Date: 2021-01-07 09:13+0100\n"
 "Last-Translator: Marc Sommerhalder <marc.sommerhalder@seantis.ch>\n"
 "Language-Team: \n"
@@ -98,6 +98,9 @@ msgstr "Analyse des annonces de campagne"
 msgid "Fög Analysis"
 msgstr "Analyse fög"
 
+msgid "Campaign finances"
+msgstr "Financement de la campagne"
+
 msgid "Resolution"
 msgstr "Arrêté constatant le résultat"
 
@@ -107,23 +110,23 @@ msgstr "Votation"
 msgid "Result by canton, district and municipality"
 msgstr "Résultats par canton, district, commune"
 
-msgid "Full analysis of post-vote poll results"
-msgstr "Rapport d'analyse de l’enquête post-votation"
+msgid "Full analysis of VOX post-vote poll results"
+msgstr "Rapport d'analyse de l’enquête post-votation VOX"
 
-msgid "Post-vote poll"
-msgstr "Enquête post-votation"
+msgid "Post-vote polls"
+msgstr "Enquêtes post-votation"
 
-msgid "Questionnaire of the poll"
-msgstr "Questionnaire de l’enquête"
+msgid "Questionnaire of the VOX poll"
+msgstr "Questionnaire de l’enquête VOX"
 
-msgid "Dataset of the post-vote poll (CSV)"
-msgstr "Jeu de données de l’enquête (CSV)"
+msgid "Dataset of the VOX poll (CSV)"
+msgstr "Jeu de données de l’enquête VOX (CSV)"
 
-msgid "Dataset of the post-vote poll (SAV)"
-msgstr "Jeu de données de l’enquête (SAV)"
+msgid "Dataset of the VOX poll (SAV)"
+msgstr "Jeu de données de l’enquête VOX (SAV)"
 
-msgid "Dataset of the post-vote poll (DTA)"
-msgstr "Jeu de données de l’enquête (DTA)"
+msgid "Dataset of the VOX poll (DTA)"
+msgstr "Jeu de données de l’enquête VOX (DTA)"
 
 msgid "Codebook for the post-vote poll (PDF)"
 msgstr "Liste des codes de l’enquête (PDF)"
@@ -131,8 +134,11 @@ msgstr "Liste des codes de l’enquête (PDF)"
 msgid "Codebook for the post-vote poll (XLSX)"
 msgstr "Liste des codes de l’enquête (XLSX)"
 
-msgid "Technical report of the post-vote poll"
-msgstr "Rapport technique de l’enquête"
+msgid "Technical report on the VOX poll"
+msgstr "Rapport technique de l'enquête VOX"
+
+msgid "Results of the LeeWas post-vote poll"
+msgstr "Résultats de l'enquête post-votation LeeWas"
 
 msgid "Updating the external resources may take some time."
 msgstr "La mise à jour des ressources externes peut prendre un certain temps."
@@ -1527,6 +1533,12 @@ msgstr "Données statistiques"
 msgid "Website"
 msgstr "Site web"
 
+msgid "Campaign for a Yes"
+msgstr "Campagne pour le oui"
+
+msgid "Campaign for a No"
+msgstr "Campagne pour le non"
+
 msgid "Link eMuseum.ch"
 msgstr "Lien eMuseum.ch"
 
@@ -1548,11 +1560,11 @@ msgstr "Analyse APS des annonces de campagne"
 msgid "Media coverage: fög analysis"
 msgstr "Couverture médiatique: analyse fög"
 
-msgid "Dataset of the post-vote poll"
-msgstr "Jeu de données de l’enquête"
+msgid "Dataset of the VOX poll"
+msgstr "Jeu de données de l’enquête VOX"
 
-msgid "Codebook for the post-vote poll"
-msgstr "Liste des codes de l’enquête"
+msgid "Codebook for the VOX poll"
+msgstr "Liste des codes de l’enquête VOX"
 
 msgid "Attachment"
 msgstr "Pièce jointe"
@@ -1776,6 +1788,16 @@ msgstr ""
 msgid "Online information by the federal authorities"
 msgstr "Informations en ligne des autorités"
 
+msgid ""
+"For future votes, links to the current versions of the websites are provided "
+"here. For past votes, the links lead to the archived versions of the "
+"websites so as to show the status prior to the respective vote."
+msgstr ""
+"Pour les prochaines votations, les liens vers les versions actuelles des "
+"sites internet sont fournis ici. Pour les votations passées, les liens "
+"renvoient aux versions archivées des sites internet afin de refléter la "
+"situation avant le vote en question."
+
 msgid "Link Federal Council"
 msgstr "Lien Conseil fédéral"
 
@@ -1787,6 +1809,16 @@ msgstr "Lien office fédéral"
 
 msgid "Explainer video by easyvote"
 msgstr "Vidéo explicative d’easyvote"
+
+msgid "Campaign websites"
+msgstr "Sites web des campagnes"
+
+msgid ""
+"The links lead to the archived versions of the websites so as to show the "
+"status prior to the respective vote."
+msgstr ""
+"Les liens renvoient aux versions archivées des sites internet afin de "
+"refléter la situation avant le vote en question."
 
 msgid "Recommendations of the Parties"
 msgstr "Mots d'ordre des partis"
@@ -1880,6 +1912,28 @@ msgstr "(majoritairement en faveur)"
 msgid "(predominantly negative)"
 msgstr "(majoritairement en défaveur)"
 
+msgid ""
+"This information has been taken from the website of the Swiss Federal Audit "
+"Office, which for its part points out that the data is published in the form "
+"in which it was reported to the SFAO by the actors subject to disclosure "
+"requirements.<br><br>Total receipts and largest donors are shown according "
+"to the final statement, which is published 75 days after the vote"
+msgstr ""
+"Les données sont reprises du site internet du Contrôle fédéral des finances, "
+"qui indique pour sa part qu’il publie les données telles qu’elles lui ont "
+"été transmises par les acteurs·trices soumis·es à l'obligation de "
+"publication.<br><br>Recettes totales et principaux donateurs·trices selon le "
+"décompte final publié 75 jours après le vote."
+
+msgid "Total receipts of ‘yes’ campaign:"
+msgstr "Recettes totales de la campagne pour le oui :"
+
+msgid "largest donors:"
+msgstr "principaux donateurs·trices :"
+
+msgid "Total receipts of ‘no’ campaign:"
+msgstr "Recettes totales de la campagne pour le non :"
+
 msgid "Display the list of documents"
 msgstr "Afficher la liste des documents"
 
@@ -1895,17 +1949,32 @@ msgstr "Participation"
 msgid "Overview of voting result by the Federal Chancellery"
 msgstr "Tableau récapitulatif de la Chancellerie fédérale"
 
+msgid "Popular votes dashboard by the Swiss Federal Statistical Office"
+msgstr "Tableau de bord des votations par l’Office fédéral de la statistique"
+
 msgid "Interactive map of the Swiss Federal Statistical Office"
 msgstr "Carte interactive de l’Office fédéral de la statistique"
 
 msgid "Display the map"
 msgstr "Présenter la carte"
 
+msgid "Full analysis of VOTO post-vote poll results"
+msgstr "Rapport d'analyse de l’enquête post-votation VOTO"
+
 msgid "Technical report"
 msgstr "Rapport technique"
 
-msgid "Cockpit with selected results"
-msgstr "Cockpit avec des résultats d'analyse"
+msgid "Cockpit with selected VOX results"
+msgstr "Cockpit avec des résultats d'analyse VOX"
+
+msgid "Cockpit with selected VOTO results"
+msgstr "Cockpit avec des résultats d'analyse VOTO"
+
+msgid "Questionnaire of the VOTO poll"
+msgstr "Questionnaire de l’enquête VOTO"
+
+msgid "Dataset of the VOTO poll"
+msgstr "Jeu de données de l’enquête VOTO"
 
 msgid ""
 "Due to data protection requirements, Swissvotes publishes a slightly reduced "
@@ -1918,6 +1987,9 @@ msgstr ""
 "données est éventuellement possible à des fins de recherche; vous trouverez "
 "davantage d’informations à ce propos dans le codebook de Swissvotes (www."
 "swissvotes.ch/page/dataset/codebook-de.pdf)."
+
+msgid "Codebook for the VOTO poll"
+msgstr "Liste des codes de l’enquête VOTO"
 
 msgid "Full-text search in all documents on this vote"
 msgstr "Recherche plein texte dans tous les documents de cette votation"
@@ -1978,6 +2050,22 @@ msgstr "Le mot de passe a été changé."
 
 msgid "Wrong username or password reset link not valid any more."
 msgstr "E-Mail non valide ou expiration de la durée de validité du lien."
+
+msgid "Failed to continue login, please ensure cookies are allowed."
+msgstr ""
+"Échec de la poursuite de la connexion, veuillez vous assurer que les cookies "
+"sont autorisés."
+
+msgid "Invalid or expired TOTP provided."
+msgstr "TOTP fourni non valide ou expiré."
+
+msgid "Please enter the six digit code from your authenticator app"
+msgstr ""
+"Veuillez saisir le code à six chiffres de votre application "
+"d'authentification"
+
+msgid "Enter TOTP"
+msgstr "Entrer TOTP"
 
 msgid "Access Denied"
 msgstr "Accès refusé"

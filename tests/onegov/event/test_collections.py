@@ -1,8 +1,9 @@
 from datetime import date
 from datetime import datetime
 from datetime import timedelta
+from functools import lru_cache
 
-from fastcache import lru_cache
+import pytest
 from freezegun import freeze_time
 from markupsafe import escape
 
@@ -151,6 +152,17 @@ def test_event_collection_pagination(session):
     assert len(events.next.batch) == 12 - events.batch_size
     assert all([e.start.year == 2010 for e in events.next.batch])
     assert all([e.start.month > 10 for e in events.next.batch])
+
+
+def test_event_pagination_negative_page_index(session):
+    events = EventCollection(session, page=-1)
+    assert events.page == 0
+    assert events.page_index == 0
+    assert events.page_by_index(-2).page == 0
+    assert events.page_by_index(-3).page_index == 0
+
+    with pytest.raises(AssertionError):
+        EventCollection(None, page=None)
 
 
 def test_occurrence_collection(session):
@@ -554,28 +566,31 @@ def test_occurrence_collection_for_filter(session):
 
 
 def test_occurrence_collection_outdated(session):
-    today = date.today()
-    for year in (today.year - 1, today.year, today.year + 1):
-        event = EventCollection(session).add(
-            title='Event {0}-{1}'.format(year, today.month),
-            start=datetime(year, today.month, today.day, 0, 0),
-            end=datetime(year, today.month, today.day, 23, 59),
-            timezone='US/Eastern'
-        )
-        event.submit()
-        event.publish()
+    with freeze_time("2024-02-28"):
+        today = date.today()
+        for year in (today.year - 1, today.year, today.year + 1):
+            event = EventCollection(session).add(
+                title='Event {0}-{1}'.format(year, today.month),
+                start=datetime(year, today.month, today.day, 0, 0),
+                end=datetime(year, today.month, today.day, 23, 59),
+                timezone='US/Eastern'
+            )
+            event.submit()
+            event.publish()
 
-    def query(**kwargs):
-        return OccurrenceCollection(session, **kwargs).query()
+        def query(**kwargs):
+            return OccurrenceCollection(session, **kwargs).query()
 
-    assert query(outdated=False).count() == 2
-    assert query(outdated=True).count() == 3
+        assert query(outdated=False).count() == 2
+        assert query(outdated=True).count() == 3
 
-    assert query(start=date(today.year - 1, 1, 1), outdated=False).count() == 2
-    assert query(start=date(today.year - 1, 1, 1), outdated=True).count() == 3
+        assert query(start=date(today.year - 1, 1, 1),
+                     outdated=False).count() == 2
+        assert query(start=date(today.year - 1, 1, 1),
+                     outdated=True).count() == 3
 
-    assert query(end=date.today(), outdated=False).count() == 1
-    assert query(end=date.today(), outdated=True).count() == 2
+        assert query(end=date.today(), outdated=False).count() == 1
+        assert query(end=date.today(), outdated=True).count() == 2
 
 
 def test_occurrence_collection_range_to_dates():

@@ -15,7 +15,7 @@ if TYPE_CHECKING:
     from collections.abc import Collection
     from sqlalchemy.orm import Query, Session
     from sqlalchemy.sql import ColumnElement
-    from typing_extensions import Self
+    from typing import Self
 
 
 class InvoiceCollection(GenericCollection[Invoice]):
@@ -33,7 +33,7 @@ class InvoiceCollection(GenericCollection[Invoice]):
         self.period_id = period_id
 
         if schema not in KNOWN_SCHEMAS:
-            raise RuntimeError("Unknown schema: {schema}")
+            raise RuntimeError('Unknown schema: {schema}')
 
         self.schema_name = schema
         self.schema_config = (schema_config or {})
@@ -60,11 +60,11 @@ class InvoiceCollection(GenericCollection[Invoice]):
             )
         )
 
-    def for_user_id(self, user_id: UUID) -> 'Self':
+    def for_user_id(self, user_id: UUID | None) -> 'Self':
         return self.__class__(self.session, self.period_id, user_id,
                               self.schema_name, self.schema_config)
 
-    def for_period_id(self, period_id: UUID) -> 'Self':
+    def for_period_id(self, period_id: UUID | None) -> 'Self':
         return self.__class__(self.session, period_id, self.user_id,
                               self.schema_name, self.schema_config)
 

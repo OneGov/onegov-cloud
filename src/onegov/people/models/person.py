@@ -8,6 +8,7 @@ from onegov.search import ORMSearchable
 from sqlalchemy import Column
 from sqlalchemy import Text
 from sqlalchemy.orm import joinedload
+from sqlalchemy.orm import relationship
 from uuid import uuid4
 from vobject import vCard
 from vobject.vcard import Address
@@ -19,7 +20,6 @@ if TYPE_CHECKING:
     import uuid
     from collections.abc import Collection
     from onegov.core.types import AppenderQuery
-    from sqlalchemy.orm import relationship
     from vobject.base import Component
 
 
@@ -52,7 +52,7 @@ class Person(Base, ContentMixin, TimestampMixin, ORMSearchable,
     }
 
     @property
-    def es_suggestion(self) -> tuple[str, str]:
+    def es_suggestion(self) -> tuple[str, ...]:
         return (self.title, f'{self.first_name} {self.last_name}')
 
     @property
@@ -103,6 +103,12 @@ class Person(Base, ContentMixin, TimestampMixin, ORMSearchable,
     #: the function of the person
     function: 'Column[str | None]' = Column(Text, nullable=True)
 
+    #: an organisation the person belongs to
+    organisation: 'Column[str | None]' = Column(Text, nullable=True)
+
+    # a sub organisation the person belongs to
+    sub_organisation: 'Column[str | None]' = Column(Text, nullable=True)
+
     #: the political party the person belongs to
     political_party: 'Column[str | None]' = Column(Text, nullable=True)
 
@@ -148,9 +154,13 @@ class Person(Base, ContentMixin, TimestampMixin, ORMSearchable,
     #: some remarks about the person
     notes: 'Column[str | None]' = Column(Text, nullable=True)
 
-    if TYPE_CHECKING:
-        # FIXME: Replace with explicit backref with back_populates
-        memberships: relationship[AppenderQuery[AgencyMembership]]
+    memberships: 'relationship[AppenderQuery[AgencyMembership]]'
+    memberships = relationship(
+        AgencyMembership,
+        back_populates='person',
+        cascade='all, delete-orphan',
+        lazy='dynamic',
+    )
 
     def vcard_object(
         self,
@@ -164,6 +174,23 @@ class Person(Base, ContentMixin, TimestampMixin, ORMSearchable,
         name.
 
         """
+
+        def split_code_from_city(code_city: str) -> tuple[str, str]:
+            """
+            Splits a postal code and city into two parts. Supported are
+            formats like '1234 City Name' and '12345 City Name'.
+
+            """
+            import re
+
+            match = re.match(r'(\d{4,5})\s+(.*)', code_city)
+            if match:
+                code, city = match.groups()
+            else:
+                # assume no code is present
+                code, city = '', code_city
+            return code, city
+
         exclude = exclude or ['notes']
         result = vCard()
 
@@ -181,9 +208,7 @@ class Person(Base, ContentMixin, TimestampMixin, ORMSearchable,
         line.charset_param = 'utf-8'
 
         line = result.add('fn')
-        line.value = " ".join((
-            prefix, self.first_name, self.last_name
-        )).strip()
+        line.value = f'{prefix} {self.first_name} {self.last_name}'.strip()
         line.charset_param = 'utf-8'
 
         # optional fields
@@ -208,6 +233,15 @@ class Person(Base, ContentMixin, TimestampMixin, ORMSearchable,
             line = result.add('tel;type=work;type=pref')
             line.value = self.phone_direct
 
+        if 'organisation' not in exclude and self.organisation:
+            line = result.add('org')
+            line.value = [
+                '; '.join(
+                    o for o in (self.organisation, self.sub_organisation) if o
+                )
+            ]
+            line.charset_param = 'utf-8'
+
         if 'website' not in exclude and self.website:
             line = result.add('url')
             line.value = self.website
@@ -217,7 +251,7 @@ class Person(Base, ContentMixin, TimestampMixin, ORMSearchable,
             and 'postal_code_city' not in exclude and self.postal_code_city
         ):
             line = result.add('adr')
-            code, city = self.postal_code_city.split(' ', 1)
+            code, city = split_code_from_city(self.postal_code_city)
             line.value = Address(street=self.postal_address,
                                  code=code, city=city)
             line.charset_param = 'utf-8'
@@ -227,7 +261,7 @@ class Person(Base, ContentMixin, TimestampMixin, ORMSearchable,
             and 'location_code_city' not in exclude and self.location_code_city
         ):
             line = result.add('adr')
-            code, city = self.location_code_city.split(' ', 1)
+            code, city = split_code_from_city(self.location_code_city)
             line.value = Address(street=self.location_address,
                                  code=code, city=city)
             line.charset_param = 'utf-8'

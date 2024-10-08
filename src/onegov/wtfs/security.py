@@ -62,7 +62,7 @@ def same_group(model: object, identity: 'Identity') -> bool:
     return False
 
 
-@WtfsApp.setting_section(section="roles")
+@WtfsApp.setting_section(section='roles')
 def get_roles_setting() -> dict[str, set[type[Intent]]]:
     return {
         'admin': {

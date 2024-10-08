@@ -1,10 +1,13 @@
 """ Lists the custom forms. """
 
 import collections
-from onegov.core.security import Public
+from markupsafe import Markup
+from onegov.core.security import Public, Private
 from onegov.form import FormCollection, FormDefinition
+from onegov.form.collection import SurveyCollection
+from onegov.form.models.definition import SurveyDefinition
 from onegov.org import _, OrgApp
-from onegov.org.layout import FormCollectionLayout
+from onegov.org.layout import FormCollectionLayout, SurveyCollectionLayout
 from onegov.org.models.external_link import (
     ExternalLinkCollection, ExternalLink)
 from onegov.org.views.form_definition import get_hints
@@ -17,7 +20,7 @@ if TYPE_CHECKING:
     from collections.abc import Callable
     from onegov.core.types import RenderData
     from onegov.org.request import OrgRequest
-    from typing_extensions import TypeAlias
+    from typing import TypeAlias
 
     SortKey: TypeAlias = Callable[
         [FormDefinition | ExternalLink],
@@ -80,7 +83,7 @@ def view_form_collection(
 
     def edit_link(model: FormDefinition | ExternalLink) -> str | None:
         if isinstance(model, ExternalLink) and request.is_manager:
-            title = request.translate(_("Edit external form"))
+            title = request.translate(_('Edit external form'))
             to = request.class_link(FormCollection)
             return request.link(
                 model,
@@ -93,7 +96,6 @@ def view_form_collection(
         lead = model.meta.get('lead')
         if not lead:
             lead = ''
-        lead = layout.linkify(lead)
         return lead
 
     # FIXME: Should the hint function be able to deal with ExternalLink?
@@ -101,32 +103,58 @@ def view_form_collection(
         hints = dict(get_hints(layout, model.current_registration_window))
         if hints:
             if 'stop' in hints:
-                hint = (
-                    f'<div class="hint-stop">'
-                    f'{request.translate(hints["stop"])}'
-                    f'</div>'
-                )
+                hint = Markup(
+                    '<div class="hint-stop">{}</div>'
+                ).format(request.translate(hints['stop']))
             else:
                 if 'date' in hints:
-                    hint = (
-                        f'<div class="hint-date">'
-                        f'{request.translate(hints["date"])}'
-                        f'</div>'
-                    )
+                    hint = Markup(
+                        '<div class="hint-date">{}</div>'
+                    ).format(request.translate(hints['date']))
                 if 'count' in hints:
-                    hint += (
-                        f'<div class="hint-count">'
-                        f'{request.translate(hints["count"])}'
-                        f'</div>'
-                    )
+                    hint += Markup(
+                        '<div class="hint-count">{}</div>'
+                    ).format(request.translate(hints['count']))
         return hint
 
     return {
         'layout': layout,
-        'title': _("Forms"),
+        'title': _('Forms'),
         'forms': combine_grouped(forms, ext_forms, sort=lambda x: x.order),
         'link_func': link_func,
         'edit_link': edit_link,
         'lead_func': lead_func,
-        'hint': hint
+        'hint': hint,
+    }
+
+
+@OrgApp.html(model=SurveyCollection, template='surveys.pt', permission=Private)
+def view_survey_collection(
+    self: SurveyCollection,
+    request: 'OrgRequest',
+    layout: SurveyCollectionLayout | None = None
+) -> 'RenderData':
+
+    surveys = group_by_column(
+        request=request,
+        query=self.definitions.query(),
+        group_column=SurveyDefinition.group,
+        sort_column=SurveyDefinition.order
+    )
+
+    layout = layout or SurveyCollectionLayout(self, request)
+
+    def link_func(model: SurveyDefinition) -> str:
+        return request.link(model)
+
+    def lead_func(model: SurveyDefinition) -> str:
+        lead = model.meta.get('lead')
+        if not lead:
+            lead = ''
+        return lead
+
+    return {
+        'layout': layout,
+        'title': _('Surveys'),
+        'surveys': surveys,
     }

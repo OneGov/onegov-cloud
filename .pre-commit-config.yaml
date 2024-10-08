@@ -1,6 +1,6 @@
 repos:
   - repo: https://github.com/pre-commit/pre-commit-hooks
-    rev: v4.5.0
+    rev: v4.6.0
     hooks:
       - id: trailing-whitespace
       - id: mixed-line-ending
@@ -9,36 +9,38 @@ repos:
       - id: debug-statements
         exclude: '^src/onegov/server/core.py$'
   - repo: https://github.com/seantis/pre-commit-hooks
-    rev: v1.0.1
+    rev: v1.1.0
     hooks:
       - id: nocheckin
         exclude: .pre-commit-config.yaml
+      - id: pt_structure
+  - repo: https://github.com/astral-sh/ruff-pre-commit
+    rev: v0.6.8
+    hooks:
+      - id: ruff
+        args: [ "--fix" ]
   - repo: https://github.com/PyCQA/flake8
-    rev: 7.0.0
+    rev: 7.1.1
     hooks:
       - id: flake8
-        files: '^(src|stubs|tests).*\.py'
+        files: '^src.*\.py'
         additional_dependencies:
-        - flake8-bugbear>=23.11.28
-        - flake8-comprehensions
         - 'flake8-markupsafe@git+https://github.com/vmagamedov/flake8-markupsafe#egg=b391bd13df9330e01666d304b7f4403d67e5ceba'
-        - flake8-noqa
-        - flake8-pyi
-        - flake8-type-checking>=2.5.1
+        - flake8-type-checking>=2.9.1
   - repo: https://github.com/elidupuis/mirrors-sass-lint
     rev: '5cc45653263b423398e4af2561fae362903dd45d'
     hooks:
     - id: sass-lint
       files: '^src/.*\.scss'
   - repo: https://github.com/pre-commit/mirrors-eslint
-    rev: v9.0.0-alpha.2
+    rev: v9.11.1
     hooks:
     - id: eslint
       files: '^src/.*\.jsx?$'
       additional_dependencies:
       - eslint-react
   - repo: https://github.com/PyCQA/bandit
-    rev: 1.7.7
+    rev: 1.7.10
     hooks:
       - id: bandit
         args: ["-c", "pyproject.toml", "--quiet"]

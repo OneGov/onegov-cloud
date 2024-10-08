@@ -22,6 +22,11 @@ from onegov.ticket import TicketCollection
 from tests.onegov.org.test_views_resources import add_reservation
 
 
+# FIXME: For some reason all the browser tests need to run on the same process
+#        in order to succeed. We should figure what breaks things here. Some
+#        wires are probably being crossed, but it's nothing too obvious, we
+#        already use separate application ports for every test.
+@pytest.mark.xdist_group(name="browser")
 def test_browse_activities(browser):
     # admins
     browser.login_admin()
@@ -42,6 +47,7 @@ def test_browse_activities(browser):
     'Photo = *.png|*.jpg',
     'Photo *= *.png|*.jpg',
 ))
+@pytest.mark.xdist_group(name="browser")
 def test_browse_directory_uploads(browser, org_app, field):
     DirectoryCollection(org_app.session(), type='extended').add(
         title="Crime Scenes",
@@ -112,6 +118,7 @@ def test_browse_directory_uploads(browser, org_app, field):
         assert browser.is_text_present("Dieses Feld wird benötigt")
 
 
+@pytest.mark.xdist_group(name="browser")
 def test_upload_image_with_error(browser, org_app):
     DirectoryCollection(org_app.session(), type='extended').add(
         title="Crime Scenes",
@@ -158,6 +165,7 @@ def test_upload_image_with_error(browser, org_app):
 
 
 @pytest.mark.skip('Picture upload is needed to check scaling')
+@pytest.mark.xdist_group(name="browser")
 def test_directory_thumbnail_views(browser, org_app):
 
     DirectoryCollection(org_app.session(), type='extended').add(
@@ -195,6 +203,7 @@ def test_directory_thumbnail_views(browser, org_app):
 
 
 @pytest.mark.skip("Passes locally, but not in CI, skip for now")
+@pytest.mark.xdist_group(name="browser")
 def test_browse_directory_editor(browser, org_app):
     browser.login_admin()
     browser.visit('/directories/+new')
@@ -260,6 +269,7 @@ def test_browse_directory_editor(browser, org_app):
     assert not browser.find_by_css('.formcode-select input')[1].checked
 
 
+@pytest.mark.xdist_group(name="browser")
 def test_browse_directory_coordinates(browser, org_app):
     DirectoryCollection(org_app.session(), type='extended').add(
         title="Restaurants",
@@ -321,6 +331,7 @@ def test_browse_directory_coordinates(browser, org_app):
         'page-directories-restaurants-city-wok')
 
 
+@pytest.mark.xdist_group(name="browser")
 def test_publication_workflow(browser, temporary_path, org_app):
     path = temporary_path / 'foo.txt'
 
@@ -386,6 +397,7 @@ def test_publication_workflow(browser, temporary_path, org_app):
     assert 'public' in r.headers['cache-control']
 
 
+@pytest.mark.xdist_group(name="browser")
 def test_signature_workflow(browser, temporary_path, org_app):
     path = module_path('tests.onegov.org', 'fixtures/sample.pdf')
     org_app.enable_yubikey = True
@@ -430,6 +442,7 @@ def test_signature_workflow(browser, temporary_path, org_app):
     assert browser.is_text_present('Digitales Siegel angewendet')
 
 
+@pytest.mark.xdist_group(name="browser")
 def test_external_map_link(browser, client):
     client.login_admin()
     settings = client.get('/map-settings')
@@ -440,7 +453,7 @@ def test_external_map_link(browser, client):
     topic = topic.click('Bearbeiten')
 
     topic.form['coordinates'] = encode_map_value({
-        'lat': 47, 'lon': 8, 'zoom': 12
+        'lat': 47.5, 'lon': 7.58, 'zoom': 6
     })
     topic.form.submit()
 
@@ -450,6 +463,7 @@ def test_external_map_link(browser, client):
 
 
 @pytest.mark.flaky(reruns=3)
+@pytest.mark.xdist_group(name="browser")
 def test_context_specific_function_are_displayed_in_person_directory(browser,
                                                                      client):
 
@@ -462,15 +476,21 @@ def test_context_specific_function_are_displayed_in_person_directory(browser,
     })
 
     browser.find_by_value("Absenden").click()
-    person = client.app.session().query(Person)\
-        .filter(Person.last_name == 'Boolean')\
+    person = (
+        client.app.session().query(Person)
+        .filter(Person.last_name == 'Boolean')
         .one()
+    )
 
     browser.visit('/editor/new/page/1')
+    chosen_input = browser.find_by_id('people_0_person_chosen')
+    chosen_input.click()
+    search_input = chosen_input.find_by_xpath('.//input').first
+    search_input.fill('Boolean Berry\t')
     browser.fill_form({
         'title': 'All About Berry',
-        'people_' + person.id.hex: True,
-        'people_' + person.id.hex + '_function': 'Logician'
+        'people-0-context_specific_function': 'Logician',
+        'people-0-display_function_in_person_directory': True,
     })
     browser.find_by_value("Absenden").click()
 
@@ -479,6 +499,7 @@ def test_context_specific_function_are_displayed_in_person_directory(browser,
 
 
 @pytest.mark.flaky(reruns=3)
+@pytest.mark.xdist_group(name="browser")
 def test_rejected_reservation_sends_email_to_configured_recipients(browser,
                                                                    client):
     resources = ResourceCollection(client.app.libres_context)
@@ -496,7 +517,11 @@ def test_rejected_reservation_sends_email_to_configured_recipients(browser,
     )
 
     add_reservation(
-        dailypass, client, datetime(2017, 1, 6, 12), datetime(2017, 1, 6, 16))
+        dailypass,
+        client.app.session(),
+        datetime(2017, 1, 6, 12),
+        datetime(2017, 1, 6, 16),
+    )
     transaction.commit()
 
     tickets = TicketCollection(client.app.session())
@@ -544,6 +569,7 @@ def test_rejected_reservation_sends_email_to_configured_recipients(browser,
         )
 
 
+@pytest.mark.xdist_group(name="browser")
 def test_script_escaped_in_user_submitted_html(browser, org_app):
 
     # This test attempts to inject JS (should not succeed of course)
@@ -595,3 +621,53 @@ def test_script_escaped_in_user_submitted_html(browser, org_app):
     payload_h1_selector = 'h1#foo'  # CSS selector for the injected element
     time.sleep(1)
     assert not browser.find_by_css(payload_h1_selector)
+
+
+def test_link_hashtags(browser, org_app):
+    browser.login_admin()
+
+    DirectoryCollection(org_app.session(), type='extended').add(
+        title="Crime Scenes",
+        structure="""
+            Name *= ___
+            Description *= ...
+        """,
+        configuration="""
+            title:
+                - name
+            order:
+                - name
+            display:
+                content:
+                    - name
+                    - description
+        """,
+        type='extended'
+    )
+
+    transaction.commit()
+
+    browser.login_admin()
+    browser.visit('/directories/crime-scenes/+new')
+    browser.fill('name', "Seven Seas Motel")
+    browser.fill('description',
+                 """
+                 #hotel Our rooms are #amazing! Check them out here:
+                 https://www.seven-seas-motel.com/#rooms
+                 https://www.seven-seas-motel.com/rooms#luxury-suite
+                 #fantastic
+                 """)
+    browser.find_by_value("Absenden").click()
+    assert browser.is_text_present("Seven Seas Motel")
+
+    # Only hashtags should be links, URL anchors should not be seen as hashtags
+    assert ('<a class="hashtag" href="/search?q=%23amazing">#amazing</a>'
+            ) in browser.html
+    assert ('<a class="hashtag" href="/search?q=%23fantastic">#fantastic</a>'
+            ) in browser.html
+    assert ('<a class="hashtag" href="/search?q=%23hotel">#hotel</a>'
+            ) in browser.html
+    assert ('<a class="hashtag" href="/search?q=%23rooms">#rooms</a>'
+            ) not in browser.html
+    assert ('<a class="hashtag" href="/search?q=%23luxury-suite">'
+            '#luxury-suite</a>') not in browser.html

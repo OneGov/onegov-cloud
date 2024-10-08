@@ -15,6 +15,7 @@ class OpenGraphMixin:
     if TYPE_CHECKING:
         model: Any
         request: OrgRequest
+
         @property
         def org(self) -> Organisation: ...
 

@@ -132,6 +132,10 @@ configuration: &global-config
   # yubikey_client_id:
   # yubikey_secret_key:
 
+  # To test mTAN second factor, enable it here
+  # mtan_second_factor_enabled: true
+  # mtan_automatic_setup: true
+
   # To test mapbox integration, a mapbox token has to be provided
   # mapbox_token:
 
@@ -329,6 +333,12 @@ applications:
     configuration:
       <<: *global-config
 
+  - path: /onegov_pas/*
+    application: onegov.pas.PasApp
+    namespace: onegov_pas
+    configuration:
+      <<: *global-config
+
   - path: /onegov_onboarding
     application: onegov.onboarding.OnboardingApp
     namespace: onegov_onboarding
@@ -358,11 +368,21 @@ logging:
       formatter: default
       level: DEBUG
       stream: ext://sys.stdout
+    index_log:
+      class: logging.FileHandler
+      formatter: default
+      level: DEBUG
+      filename: /usr/local/var/onegov/logs/onegov-search-reindex.log
+      mode: w
 
   loggers:
     onegov:
       level: DEBUG
       handlers: [console]
+      propagate: False
+    onegov.search.index:
+      level: DEBUG
+      handlers: [index_log]
       propagate: False
     stripe:
       level: INFO

@@ -63,7 +63,7 @@ occasion_states AS (
     CASE
         WHEN cancelled = TRUE
             THEN 'cancelled'
-        WHEN total_bookings > max_spots
+        WHEN total_bookings > max_spots AND accepted_bookings = max_spots
             THEN 'overfull'
         WHEN accepted_bookings = 0
             THEN 'empty'
@@ -82,7 +82,7 @@ occasion_states AS (
 -- the resulting query
 SELECT
     "state",           -- Text
-    occasion_id,       -- Integer
+    occasion_id,       -- UUID
     title,             -- Text
     "start",           -- DateTime
     "end",             -- DateTime

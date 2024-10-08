@@ -14,15 +14,15 @@ class UserManualLayout(DefaultLayout):
 
     @cached_property
     def title(self) -> str:
-        return _("User manual")
+        return _('User manual')
 
     @cached_property
     def editbar_links(self) -> list['Element']:
-        result: list['Element'] = []
+        result: list[Element] = []
         if self.request.has_permission(self.model, EditModel):
             result.append(
                 Link(
-                    text=_("Edit"),
+                    text=_('Edit'),
                     url=self.request.link(self.model, 'edit'),
                     attrs={'class': 'edit-icon'}
                 )
@@ -32,7 +32,7 @@ class UserManualLayout(DefaultLayout):
     @cached_property
     def breadcrumbs(self) -> list['Element']:
         return [
-            Link(_("Homepage"), self.homepage_url),
+            Link(_('Homepage'), self.homepage_url),
             Link(self.title, '#')
         ]
 
@@ -41,14 +41,14 @@ class EditUserManualLayout(DefaultLayout):
 
     @cached_property
     def title(self) -> str:
-        return _("Edit user manual")
+        return _('Edit user manual')
 
     @cached_property
     def breadcrumbs(self) -> list['Element']:
         return [
-            Link(_("Homepage"), self.homepage_url),
-            Link(_("User manual"), self.user_manual_url),
-            Link(_("Edit"), '#')
+            Link(_('Homepage'), self.homepage_url),
+            Link(_('User manual'), self.user_manual_url),
+            Link(_('Edit'), '#')
         ]
 
     @cached_property

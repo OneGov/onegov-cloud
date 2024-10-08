@@ -3,6 +3,7 @@ import weakref
 from collections import OrderedDict
 from decimal import Decimal
 from itertools import chain, groupby
+from markupsafe import Markup
 from onegov.core.markdown import render_untrusted_markdown as render_md
 from onegov.form import utils
 from onegov.form.display import render_field
@@ -25,8 +26,7 @@ if TYPE_CHECKING:
         Callable, Collection, Iterable, Iterator, Mapping, Sequence)
     from onegov.core.request import CoreRequest
     from onegov.form.types import PricingRules
-    from markupsafe import Markup
-    from typing_extensions import Self, TypedDict
+    from typing import TypedDict, Self
     from weakref import CallableProxyType
     from webob.multidict import MultiDict
     from wtforms import Field
@@ -314,10 +314,31 @@ class Form(BaseForm):
                 if field_flags:
                     field.kwargs['validators'][0].field_flags = field_flags
 
-            field.kwargs['render_kw'] = field.kwargs.get('render_kw', {})
-            field.kwargs['render_kw'].update(field.depends_on.html_data)
+            field.kwargs.setdefault('render_kw', {}).update(
+                # NOTE: self._prefix does not exist yet, for the shared
+                #       default we assume that there is no prefix
+                field.depends_on.html_data('')
+            )
 
         yield
+
+        # NOTE: We currently assume that the only time we have different
+        #       prefixes for the same form is in a FieldList, technically
+        #       we would need to always do this step below to be fully
+        #       robust
+        if not self._prefix:
+            return
+
+        for field_id, field in self._unbound_fields:
+            if not hasattr(field, 'depends_on'):
+                continue
+
+            f = self[field_id]
+            assert f.render_kw is not None
+            f.render_kw = f.render_kw.copy()
+            f.render_kw.update(
+                field.depends_on.html_data(self._prefix)
+            )
 
     def process_pricing(self) -> 'Iterator[None]':
         """ Processes the pricing parameter on the fields, which adds the
@@ -345,7 +366,7 @@ class Form(BaseForm):
         for field_id, pricing in pricings.items():
             self._fields[field_id].pricing = pricing
 
-    def render_display(self, field: 'Field') -> 'Markup | None':
+    def render_display(self, field: 'Field') -> Markup | None:
         """ Renders the given field for display (no input). May be overwritten
         by descendants to return different html, or to return None.
 
@@ -412,7 +433,7 @@ class Form(BaseForm):
                 prices.append((field_id, price))
 
         currencies = {price.currency for _, price in prices}
-        assert len(currencies) <= 1, "Mixed currencies are not supported"
+        assert len(currencies) <= 1, 'Mixed currencies are not supported'
 
         return prices
 
@@ -603,7 +624,6 @@ class Form(BaseForm):
         call ``form.process(obj=obj)`` instead.
 
         """
-        pass
 
     def delete_field(self, fieldname: str) -> None:
         """ Removes the given field from the form and all the fieldsets. """
@@ -670,11 +690,11 @@ class Form(BaseForm):
                 if callable(member):
                     yield member
 
-    # FIXME: This should probably return Markup
     @staticmethod
     def as_maybe_markdown(raw_text: str) -> tuple[str, bool]:
         md = render_md(raw_text)
-        stripped = md.strip().replace('<p>', '').replace('</p>', '')
+        stripped = md.strip().replace(
+            Markup('<p>'), '').replace(Markup('</p>'), '')
         # has markdown elements
         if stripped != raw_text:
             return md, True
@@ -686,8 +706,8 @@ class Form(BaseForm):
         length_limit: int = 54
     ) -> str | None:
         """ Returns the field description in modified form if
-         the description should be rendered separately in the field macro.
-         """
+        the description should be rendered separately in the field macro.
+        """
         if hasattr(field, 'long_description'):
             return field.long_description
         if 'long_description' in (getattr(field, 'render_kw', {}) or {}):
@@ -706,6 +726,8 @@ class Form(BaseForm):
 
 class Fieldset:
     """ Defines a fieldset with a list of fields. """
+
+    fields: dict[str, 'CallableProxyType[Field]']
 
     def __init__(self, label: str | None, fields: 'Iterable[Field]'):
         """ Initializes the Fieldset.
@@ -768,6 +790,13 @@ class FieldDependency:
             else:
                 invert = False
 
+            # NOTE: Fields in WTForms can't store an empty string, they
+            #       will instead be normalized to None, the raw_choice
+            #       should stay the same however, since the input in the
+            #       form will have an empty string as its value
+            if raw_choice == '':
+                choice = None
+
             self.dependencies.append({
                 'field_id': field_id,
                 'raw_choice': raw_choice,
@@ -795,10 +824,11 @@ class FieldDependency:
     def field_id(self) -> str:
         return self.dependencies[0]['field_id']
 
-    @property
-    def html_data(self) -> dict[str, str]:
+    def html_data(self, prefix: str) -> dict[str, str]:
         value = ';'.join(
-            f"{d['field_id']}/{d['raw_choice']}" for d in self.dependencies)
+            f"{prefix}{d['field_id']}/{d['raw_choice']}"
+            for d in self.dependencies
+        )
 
         return {'data-depends-on': value}
 
@@ -897,7 +927,7 @@ def merge_forms(form: type[_FormT], /, *forms: type[Form]) -> type[_FormT]:
     class MergedForm(form, *forms):  # type:ignore
         pass
 
-    all_forms: 'Iterable[type[Form]]' = chain((form, ), forms)
+    all_forms: Iterable[type[Form]] = chain((form, ), forms)
     fields_in_order = (
         name
         for cls in all_forms

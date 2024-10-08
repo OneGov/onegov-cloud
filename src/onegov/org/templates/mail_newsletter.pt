@@ -7,7 +7,7 @@
     </tal:b>
     <tal:b metal:fill-slot="body">
         <h1>${title}</h1>
-        <p tal:condition="lead" tal:content="structure lead"></p>
+        <p tal:condition="lead" tal:content="lead"></p>
 
         <tal:b condition="news">
             <h2 i18n:translate>Latest news</h2>
@@ -18,7 +18,7 @@
                     <tal:b tal:case="False">
                         <p>${layout.with_hashtags(item.lead)}</p>
                     </tal:b>
-                    <tal:b tal:case="True" tal:content="structure item.text">
+                    <tal:b tal:case="True" tal:content="item.text">
                     </tal:b>
                 </tal:b>
 
@@ -58,7 +58,7 @@
                 <a href="${request.link(newsletter)}" i18n:translate>Click here to view web version.</a>
             </p>
             <p>
-                <a href="${unsubscribe}" i18n:translate>Click here to unsubscribe.</a>.
+                <tal:b i18n:translate="">You no longer wish to receive the newsletter?</tal:b> <a href="${unsubscribe}" i18n:translate>Click here to unsubscribe.</a>.
             </p>
         </p>
     </tal:b>

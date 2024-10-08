@@ -3,6 +3,7 @@ upgraded on the server. See :class:`onegov.core.upgrade.upgrade_task`.
 
 """
 from onegov.core.upgrade import upgrade_task
+from onegov.core.upgrade import UpgradeContext
 from onegov.core.orm.types import UTCDateTime
 from sqlalchemy import Column
 from sqlalchemy import Text
@@ -12,7 +13,7 @@ from onegov.core.utils import relative_url
 
 
 @upgrade_task('Add last modified column')
-def add_last_modified_to_assemblies(context):
+def add_last_modified_to_assemblies(context: UpgradeContext) -> None:
     if not context.has_column('landsgemeinde_assemblies', 'last_modified'):
         context.operations.add_column(
             'landsgemeinde_assemblies',
@@ -21,14 +22,16 @@ def add_last_modified_to_assemblies(context):
 
 
 @upgrade_task('Remove start time from agenda item and votum')
-def remove_start_time_from_agenda_item_and_votum(context):
+def remove_start_time_from_agenda_item_and_votum(
+    context: UpgradeContext
+) -> None:
     for table in ('landsgemeinde_agenda_items', 'landsgemeinde_vota'):
         if context.has_column(table, 'start'):
             context.operations.drop_column(table, 'start')
 
 
 @upgrade_task('Add last modified column to agenda items')
-def add_last_modified_to_agenda_items(context):
+def add_last_modified_to_agenda_items(context: UpgradeContext) -> None:
     if not context.has_column('landsgemeinde_agenda_items', 'last_modified'):
         context.operations.add_column(
             'landsgemeinde_agenda_items',
@@ -37,7 +40,7 @@ def add_last_modified_to_agenda_items(context):
 
 
 @upgrade_task('Add person picture url column')
-def add_person_picture_url_column(context):
+def add_person_picture_url_column(context: UpgradeContext) -> None:
     if not context.has_column('landsgemeinde_vota', 'person_picture'):
         context.operations.add_column(
             'landsgemeinde_vota',
@@ -55,9 +58,27 @@ def add_person_picture_url_column(context):
 
 
 @upgrade_task('Add start time to agenda item')
-def add_start_time_to_agenda_item(context):
+def add_start_time_to_agenda_item(context: UpgradeContext) -> None:
     if not context.has_column('landsgemeinde_agenda_items', 'start_time'):
         context.operations.add_column(
             'landsgemeinde_agenda_items',
+            Column('start_time', Time, nullable=True)
+        )
+
+
+@upgrade_task('Add start time to assembly')
+def add_start_time_to_assembly(context: UpgradeContext) -> None:
+    if not context.has_column('landsgemeinde_assemblies', 'start_time'):
+        context.operations.add_column(
+            'landsgemeinde_assemblies',
+            Column('start_time', Time, nullable=True)
+        )
+
+
+@upgrade_task('Add start time to votum')
+def add_start_time_to_votum(context: UpgradeContext) -> None:
+    if not context.has_column('landsgemeinde_vota', 'start_time'):
+        context.operations.add_column(
+            'landsgemeinde_vota',
             Column('start_time', Time, nullable=True)
         )

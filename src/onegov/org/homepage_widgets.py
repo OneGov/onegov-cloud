@@ -2,7 +2,6 @@ from onegov.directory import DirectoryCollection
 from onegov.event import OccurrenceCollection
 from onegov.org import _, OrgApp
 from onegov.org.elements import Link, LinkGroup
-from onegov.org.layout import EventBaseLayout
 from onegov.org.models import ImageSet, ImageFile, News
 from onegov.file.models.fileset import file_to_set_associations
 from sqlalchemy import func
@@ -10,12 +9,12 @@ from sqlalchemy import func
 from onegov.org.models.directory import ExtendedDirectoryEntryCollection
 
 
-from typing import Any, NamedTuple, TYPE_CHECKING
+from typing import NamedTuple, TYPE_CHECKING
 if TYPE_CHECKING:
     from collections.abc import Iterable, Iterator, Sequence
+    from onegov.core.types import RenderData
     from onegov.org.layout import DefaultLayout
     from onegov.org.models import ExtendedDirectory
-    from onegov.page import Page
 
 
 def get_lead(
@@ -29,9 +28,10 @@ def get_lead(
         if first_point_ix < 1 or not consider_sentences:
             return text[0:max_chars] + '...'
         elif first_point_ix >= max_chars:
-            # FIXME: Why not strip to the first point anyways?
-            return text
+            # still return the entire first sentence, but nothing more
+            return text[0:first_point_ix + 1]
         else:
+            # return up to the n'th sentence that is still below the limit
             end = text.rindex('.', 0, max_chars) + 1
             return text[0:end]
 
@@ -134,10 +134,10 @@ class DirectoriesWidget:
         </xsl:template>
     """
 
-    def get_variables(self, layout: 'DefaultLayout') -> dict[str, Any]:
-        directories: 'DirectoryCollection[ExtendedDirectory]'
+    def get_variables(self, layout: 'DefaultLayout') -> 'RenderData':
+        directories: DirectoryCollection[ExtendedDirectory]
         directories = DirectoryCollection(
-            layout.app.session(), type="extended")
+            layout.app.session(), type='extended')
 
         links = [
             Link(
@@ -152,7 +152,7 @@ class DirectoriesWidget:
 
         links.append(
             Link(
-                text=_("All directories"),
+                text=_('All directories'),
                 url=layout.request.class_link(DirectoryCollection),
                 classes=('more-link', )
             )
@@ -160,7 +160,7 @@ class DirectoriesWidget:
 
         return {
             'directory_panel': LinkGroup(
-                title=_("Directories"),
+                title=_('Directories'),
                 links=links,
             )
         }
@@ -178,29 +178,36 @@ class NewsWidget:
         </xsl:template>
     """
 
-    def get_variables(self, layout: 'DefaultLayout') -> dict[str, Any]:
+    def get_variables(self, layout: 'DefaultLayout') -> 'RenderData':
 
-        if not layout.root_pages:
+        root_pages = layout.root_pages
+        if not root_pages:
             return {'news': ()}
 
         news_index: int | None = None
-        for index, page in enumerate(layout.root_pages):
-            if isinstance(page, News):
-                news_index = index
+        for index, page in enumerate(root_pages):
+            if page.type == 'news':
+                if page.children:
+                    # only bother doing the query if there are children
+                    news_index = index
                 break
 
         if news_index is None:
             return {'news': ()}
 
+        # FIXME: We probably don't need full fat News objects for this
+        #        and could instead just use children on the root news page
+        #        if we need additional attributes, we can just add them
+        #        to PageMeta, then we can also get rid of `news_query_for`
+        #        and refactor it back into a pure instance method
+
         # request more than the required amount of news to account for hidden
         # items which might be in front of the queue
         news_limit = layout.org.news_limit_homepage
         news = layout.request.exclude_invisible(
-            # FIXME: This may indicate that we want root_pages to return
-            #        `News | Topic` rather than `Page`, which is not really
-            #        guaranteed at runtime right now, it just so happens that
-            #        those are the only two types of pages we use in org
-            layout.root_pages[news_index].news_query(  # type:ignore
+            News.news_query_for(
+                root_pages[news_index],
+                session=layout.request.session,
                 limit=news_limit + 2,
                 published_only=not layout.request.is_manager
             ).all()
@@ -244,30 +251,29 @@ class EventsWidget:
         </xsl:template>
     """
 
-    def get_variables(self, layout: 'DefaultLayout') -> dict[str, Any]:
+    def get_variables(self, layout: 'DefaultLayout') -> 'RenderData':
         occurrences = OccurrenceCollection(layout.app.session()).query()
         occurrences = occurrences.limit(layout.org.event_limit_homepage)
 
-        event_layout = EventBaseLayout(layout.model, layout.request)
         event_links = [
             Link(
                 text=o.title,
                 url=layout.request.link(o),
-                subtitle=event_layout.format_date(o.localized_start, 'event')
+                subtitle=layout.format_date(o.localized_start, 'event')
                 .title()
             ) for o in occurrences
         ]
 
         event_links.append(
             Link(
-                text=_("All events"),
-                url=event_layout.events_url,
+                text=_('All events'),
+                url=layout.events_url,
                 classes=('more-link', )
             )
         )
 
         latest_events = LinkGroup(
-            title=_("Events"),
+            title=_('Events'),
             links=event_links,
         )
 
@@ -293,7 +299,7 @@ class TilesWidget:
         </xsl:template>
     """
 
-    def get_variables(self, layout: 'DefaultLayout') -> dict[str, Any]:
+    def get_variables(self, layout: 'DefaultLayout') -> 'RenderData':
         return {'tiles': tuple(self.get_tiles(layout))}
 
     class Tile(NamedTuple):
@@ -303,28 +309,27 @@ class TilesWidget:
 
     def get_tiles(self, layout: 'DefaultLayout') -> 'Iterator[Tile]':
 
-        homepage_pages = layout.request.app.homepage_pages
         request = layout.request
-        link = request.link
+        homepage_pages = request.homepage_pages
         classes = ('tile-sub-link', )
 
         for ix, page in enumerate(layout.root_pages):
             if page.type == 'topic':
 
-                children: 'Iterable[Page]' = homepage_pages[page.id]
-
-                if not request.is_manager:
-                    children = (
-                        child for child in children
-                        if getattr(child, 'access', '') == 'public'
-                    )
-
                 yield self.Tile(
-                    page=Link(page.title, link(page)),
+                    page=Link(page.title, page.link(request)),
                     number=ix + 1,
                     links=tuple(
-                        Link(c.title, link(c), classes=classes, model=c)
-                        for c in children
+                        Link(
+                            child.title,
+                            child.link(request),
+                            classes=classes,
+                            # this only accesses the `access` attribute
+                            # which we have, so this is safe, even though
+                            # it's not the actual page model
+                            model=child,
+                        )
+                        for child in homepage_pages.get(page.id, ())
                     )
                 )
 
@@ -357,7 +362,7 @@ class SliderWidget:
     def get_images_from_sets(
         self,
         layout: 'DefaultLayout'
-    ) -> 'Iterator[dict[str, Any]]':
+    ) -> 'Iterator[RenderData]':
 
         session = layout.app.session()
 
@@ -388,7 +393,7 @@ class SliderWidget:
                 'src': layout.request.link(image)
             }
 
-    def get_variables(self, layout: 'DefaultLayout') -> dict[str, Any]:
+    def get_variables(self, layout: 'DefaultLayout') -> 'RenderData':
         # if we don't have an album used for images, we use the images
         # shown on the homepage anyway to avoid having to show nothing
         images = tuple(self.get_images_from_sets(layout))

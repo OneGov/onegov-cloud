@@ -1,20 +1,20 @@
-from onegov.core.custom import json
-import os
-import shutil
-import re
-
 import dectate
 import morepath
+import os
+import re
+import shutil
 import textwrap
 
+from base64 import b64decode, b64encode
+from contextlib import contextmanager
 from io import BytesIO
+from onegov.core.custom import json
 from onegov.core.utils import Bunch, scan_morepath_modules, module_path
+from onegov.ticket import TicketCollection
 from PIL import Image
 from random import randint
 from uuid import uuid4
-from base64 import b64decode, b64encode
-
-from onegov.ticket import TicketCollection
+from xml.etree.ElementTree import tostring
 
 
 def get_meta(page, property, returns='content', index=0):
@@ -41,6 +41,8 @@ def open_in_browser(response, browser='firefox'):
     path = f'/tmp/test-{str(uuid4())}.html'
     with open(path, 'w') as f:
         print(response.text, file=f)
+    # os.system(f'{browser} {path} &')
+    print(f'Opening file {path} ..')
     os.system(f'{browser} {path} &')
 
 
@@ -83,6 +85,16 @@ def create_image(width=50, height=50, output=None):
 
     im.seek(0)
     return im
+
+
+def create_pdf(filename='simple.pdf'):
+    from reportlab.pdfgen import canvas
+
+    c = canvas.Canvas(filename)
+    c.drawString(100, 750,
+                 "Hello, I am a PDF document created with Python!")
+    c.save()
+    return c
 
 
 def assert_explicit_permissions(module, app_class):
@@ -154,6 +166,8 @@ def create_app(app_class, request, use_elasticsearch=False,
         depot_backend=depot_backend,
         depot_storage_path=depot_storage_path,
         identity_secure=False,
+        identity_secret='test_identity_secret',
+        csrf_secret='test_csrf_secret',
         enable_elasticsearch=use_elasticsearch,
         elasticsearch_hosts=elasticsearch_hosts,
         redis_url=request.getfixturevalue('redis_url'),
@@ -213,7 +227,7 @@ def extract_filename_from_response(response):
 
 def add_reservation(
     resource,
-    client,
+    session,
     start,
     end,
     email=None,
@@ -239,9 +253,49 @@ def add_reservation(
     if reserve and approve:
         resource.scheduler.approve_reservations(resource_token)
         if add_ticket:
-            with client.app.session().no_autoflush:
-                tickets = TicketCollection(client.app.session())
+            with session.no_autoflush:
+                tickets = TicketCollection(session)
                 tickets.open_ticket(
                     handler_code='RSV', handler_id=resource_token.hex
                 )
     return resource
+
+
+def extract_intercooler_delete_link(client, page):
+    """ Returns the link that would be called by intercooler.js """
+    delete_link = tostring(page.pyquery('a.confirm')[0]).decode('utf-8')
+    href = client.extract_href(delete_link)
+    return href.replace("http://localhost", "")
+
+
+@contextmanager
+def use_locale(model, locale):
+    old_locale = model.session_manager.current_locale
+    model.session_manager.current_locale = locale
+    try:
+        yield
+    finally:
+        model.session_manager.current_locale = old_locale
+
+
+def href_ends_with(end):
+    """
+    Returns a function that checks if the href ends with the given string.
+
+    :argument end: The string to check for at the end of the href.
+
+    Usage:
+        response.html.find('a', href=href_ends_with('/newsletters/new'))
+    """
+    return lambda href: href and href.endswith(end)
+
+
+def find_link_by_href_end(response, href_end):
+    """
+    Returns the link that ends with the given href_end.
+    :param response: a response object
+    :param href_end: the string to check for at the end of the href.
+    :return: link object
+
+    """
+    return response.html.find('a', href=href_ends_with(href_end))

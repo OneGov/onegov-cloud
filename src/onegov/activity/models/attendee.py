@@ -23,8 +23,30 @@ from uuid import uuid4
 from typing import TYPE_CHECKING
 if TYPE_CHECKING:
     import uuid
+    from collections.abc import Callable
     from onegov.user import User
     from sqlalchemy.sql import ColumnElement
+    from typing import overload, Protocol, TypeVar
+    from typing_extensions import ParamSpec
+
+    P = ParamSpec('P')
+    T = TypeVar('T')
+
+    # FIXME: We should no longer need this once we upgrade to SQLAlchemy 2.0
+    class _HybridMethod(Protocol[P, T]):
+        @overload
+        def __get__(
+            self,
+            obj: None,
+            owner: type[object]
+        ) -> Callable[P, ColumnElement[T]]: ...
+
+        @overload
+        def __get__(
+            self,
+            obj: object,
+            owner: type[object]
+        ) -> Callable[P, T]: ...
 
 
 class Attendee(Base, TimestampMixin, ORMSearchable):
@@ -125,7 +147,7 @@ class Attendee(Base, TimestampMixin, ORMSearchable):
 
     if TYPE_CHECKING:
         age: Column[int]
-        happiness: Column[float | None]
+        happiness: _HybridMethod[[uuid.UUID], float | None]
 
     @hybrid_property  # type:ignore[no-redef]
     def age(self) -> int:
@@ -136,8 +158,8 @@ class Attendee(Base, TimestampMixin, ORMSearchable):
         return today.year - birth.year - extra
 
     @age.expression  # type:ignore[no-redef]
-    def age(self) -> 'ColumnElement[int]':
-        return func.extract('year', func.age(self.birth_date))
+    def age(cls) -> 'ColumnElement[int]':
+        return func.extract('year', func.age(cls.birth_date))
 
     @hybrid_method  # type:ignore[no-redef]
     def happiness(self, period_id: 'uuid.UUID') -> float | None:
@@ -196,13 +218,13 @@ class Attendee(Base, TimestampMixin, ORMSearchable):
         ]).where(and_(
             Booking.period_id == period_id,
             Booking.attendee_id == cls.id
-        )).label("happiness")
+        )).label('happiness')
 
     #: The bookings linked to this attendee
     bookings: 'relationship[list[Booking]]' = relationship(
         'Booking',
         order_by='Booking.created',
-        backref='attendee'
+        back_populates='attendee'
     )
 
     __table_args__ = (
