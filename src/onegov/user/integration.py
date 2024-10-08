@@ -1,7 +1,6 @@
 import morepath
 from more.webassets import WebassetsApp
 from more.webassets.core import webassets_injector_tween
-from onegov.core.cache import instance_lru_cache
 from onegov.core.security import Public
 from onegov.user.auth.core import Auth
 from onegov.user.auth.provider import (
@@ -65,7 +64,6 @@ class UserApp(WebassetsApp):
 
         return getattr(self, 'available_providers', {})
 
-    @instance_lru_cache(maxsize=32)
     def provider(self, name: str) -> AuthenticationProvider | None:
         return self.providers.get(name)
 
