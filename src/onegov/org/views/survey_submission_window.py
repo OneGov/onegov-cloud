@@ -170,7 +170,7 @@ def view_submission_window_survey(
 
     if enabled and request.POST:
         submission = collection.submissions.add(
-            self.name, form, state='pending',
+            self.name, form,
             submission_window=self)
 
         return morepath.redirect(request.link(submission))
@@ -191,7 +191,6 @@ def view_submission_window_survey(
         'coordinates': getattr(definition, 'coordinates', Coordinates()),
         'hints': tuple(get_hints(layout, self)),
         'hints_callout': not enabled,
-        'button_text': _('Continue')
     }
 
 
@@ -243,7 +242,11 @@ def delete_submission_window(
 
     request.assert_valid_csrf_token()
 
-    self.disassociate()
+    submissions = request.session.query(SurveySubmission)
+    submissions = submissions.filter(
+        SurveySubmission.submission_window_id == self.id)
+    submissions.delete()
     request.session.delete(self)
 
-    request.success(_('The submission window was deleted'))
+    request.success(_('The submission window and all associated submissions '
+                        'were deleted'))

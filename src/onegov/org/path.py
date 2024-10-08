@@ -30,8 +30,7 @@ from onegov.form import FormDefinition
 from onegov.form import FormRegistrationWindow
 from onegov.form import PendingFormSubmission
 from onegov.form.collection import SurveyCollection
-from onegov.form.models.submission import (CompleteSurveySubmission,
-                                           PendingSurveySubmission)
+from onegov.form.models.submission import SurveySubmission
 from onegov.form.models.survey_window import SurveySubmissionWindow
 from onegov.newsletter import Newsletter
 from onegov.newsletter import NewsletterCollection
@@ -249,24 +248,14 @@ def get_survey(app: OrgApp, name: str) -> SurveyDefinition | None:
     return SurveyCollection(app.session()).definitions.by_name(name)
 
 
-@OrgApp.path(model=PendingSurveySubmission, path='/survey-preview/{id}',
+@OrgApp.path(model=SurveySubmission, path='/survey-submission/{id}',
              converters={'id': UUID})
 def get_pending_survey_submission(
     app: OrgApp,
     id: UUID
-) -> PendingSurveySubmission | None:
-    return SurveyCollection(app.session()).submissions.by_id(  # type:ignore
-        id, state='pending', current_only=True)
-
-
-@OrgApp.path(model=CompleteSurveySubmission, path='/survey-submission/{id}',
-             converters={'id': UUID})
-def get_complete_survey_submission(
-    app: OrgApp,
-    id: UUID
-) -> CompleteSurveySubmission | None:
-    return SurveyCollection(app.session()).submissions.by_id(  # type:ignore
-        id, state='complete', current_only=False)
+) -> SurveySubmission | None:
+    return SurveyCollection(app.session()).submissions.by_id(
+        id, current_only=True)
 
 
 @OrgApp.path(model=PendingFormSubmission, path='/form-preview/{id}',

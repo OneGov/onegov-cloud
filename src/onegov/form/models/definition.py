@@ -323,15 +323,11 @@ class SurveyDefinition(Base, ContentMixin, TimestampMixin,
 
     def has_submissions(
         self,
-        with_state: 'SubmissionState | None' = None
     ) -> bool:
 
         session = object_session(self)
         query = session.query(SurveySubmission.id)
         query = query.filter(SurveySubmission.name == self.name)
-
-        if with_state is not None:
-            query = query.filter(SurveySubmission.state == with_state)
 
         return session.query(query.exists()).scalar()
 
@@ -362,8 +358,7 @@ class SurveyDefinition(Base, ContentMixin, TimestampMixin,
         all_fields = form._fields
         all_fields.pop('csrf_token', None)
         fields = all_fields.values()
-        q = request.session.query(SurveySubmission)
-        q = q.filter_by(name=self.name)
+        q = request.session.query(SurveySubmission).filter_by(name=self.name)
         if sw_id:
             submissions = q.filter_by(submission_window_id=sw_id).all()
         else:
