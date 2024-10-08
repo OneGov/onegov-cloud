@@ -96,7 +96,9 @@ class UserApp(WebassetsApp):
             if (cls := AUTHENTICATION_PROVIDERS.get(
                 provider_cfg.get('provider', name)
             )) is not None
-            if (provider := cls.configure(**provider_cfg)) is not None
+            if (
+                provider := cls.configure(name=name, **provider_cfg)
+            ) is not None
         }
 
         # enable auto login for the first provider that has it configured, and
