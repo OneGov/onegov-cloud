@@ -4848,6 +4848,15 @@ msgstr ""
 "Regeln stellen sicher dass die Einteilungen zwischen Start und Ende bestehen "
 "und dass sie im gewählten Interval verlängert werden."
 
+msgid "Rule not found"
+msgstr "Regel nicht gefunden"
+
+msgid "Rule updated"
+msgstr "Regel aktualisiert"
+
+msgid "Edit Rule"
+msgstr "Regel bearbeiten"
+
 msgid "The rule was stopped"
 msgstr "Die Regel wurde gestoppt"
 
@@ -6170,16 +6179,12 @@ msgid "The user was created successfully"
 msgstr "Der Benutzer wurde erfolgreich erstellt"
 
 #~ msgid ""
-#~ "Please review your answers and press \"Complete\" to complete the survey. "
-#~ "If there's anything you'd like to change, click on \"Edit\" to return to "
-#~ "the filled-out survey."
+#~ "Rules ensure that the allocations between start/end exist and that they "
+#~ "are extended beyond those dates at the given intervals. Editing a rule "
+#~ "may create new allocations."
 #~ msgstr ""
-#~ "Bitte überprüfen Sie Ihre Angaben und klicken Sie auf \"Abschliessen\" um "
-#~ "die Umfrage abzuschliessen. Wenn Sie Änderungen vornehmen möchten, "
-#~ "klicken Sie auf \"Bearbeiten\" um zur ausgefüllten Umfrage zurückzukehren."
-
-#~ msgid "The submission window was deleted"
-#~ msgstr "Der Befragungszeitraum wurde gelöscht"
+#~ "Regeln stellen sicher dass die Einteilungen zwischen Start und Ende "
+#~ "bestehen und dass sie im gewählten Interval verlängert werden."
 
 #~ msgid "Directory change rejected"
 #~ msgstr "Verzeichnisänderung abgelehnt"

@@ -21,6 +21,7 @@ if TYPE_CHECKING:
 
     class BoundCallable(Protocol):
         __doc__: str
+
         def __call__(self) -> str: ...
 
 

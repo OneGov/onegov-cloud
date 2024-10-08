@@ -68,7 +68,8 @@ jobs:
       run: |
         source /app/bin/activate
         python -m pip install --upgrade uv
-        uv pip install .[mypy,lint]
+        uv pip compile setup.cfg -U \
+        | uv pip install .[mypy,lint] -r /dev/stdin
 
     - name: Linting
       run: |
@@ -123,7 +124,6 @@ jobs:
           wget \
           apparmor \
           curl \
-          chromium-browser \
           git-core \
           postgresql \
           redis \
@@ -149,7 +149,7 @@ jobs:
     - name: Install Chrome
       uses: browser-actions/setup-chrome@v1
       with:
-        # FIXME: Unpin once selenium works with newer version
+        # FIXME: OGC-1857
         chrome-version: 127
         install-chromedriver: true
 
@@ -174,7 +174,11 @@ jobs:
         python -m pip install --upgrade uv
         uv pip install pytest-split pytest-cov pytest-codecov pytest-xdist psutil
         # TEMPORARY: editable build so we don't need a path-fix in codecov
-        uv pip install -e .[test]
+        uv pip compile setup.cfg -U \
+        | uv pip install -e .[test] -r /dev/stdin
+      env:
+        # NOTE: Suppress uv warning
+        UV_LINK_MODE: copy
 
     - name: Prepare test environment
       run: |
@@ -188,7 +192,7 @@ jobs:
 
     - name: Run tests
       run: |
-        run-as "$(id -u test)":test /app/bin/py.test \
+        run-as "$(id -u test)":test /app/bin/pytest \
           -n logical \
           -o cache_dir=/tmp/pytest \
           --dist loadgroup \

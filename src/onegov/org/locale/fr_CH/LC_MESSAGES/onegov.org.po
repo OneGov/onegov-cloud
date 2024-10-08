@@ -4862,6 +4862,15 @@ msgstr ""
 "existent et qu'elles sont prolongées au-delà de ces dates à des intervalles "
 "donnés."
 
+msgid "Rule not found"
+msgstr "Règle non trouvée"
+
+msgid "Rule updated"
+msgstr "Règle mise à jour"
+
+msgid "Edit Rule"
+msgstr "Modifier la règle"
+
 msgid "The rule was stopped"
 msgstr "La règle a été arrêtée"
 

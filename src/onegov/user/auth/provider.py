@@ -19,7 +19,7 @@ from saml2.ident import code
 from webob import Response
 
 
-from typing import Any, ClassVar, Literal, Self, TypeVar, TYPE_CHECKING
+from typing import Any, ClassVar, Literal, Self, TYPE_CHECKING
 if TYPE_CHECKING:
     from collections.abc import Collection, Mapping
     from onegov.core.request import CoreRequest
@@ -39,14 +39,7 @@ if TYPE_CHECKING:
         def namespace(self) -> str: ...
 
 
-_P = TypeVar('_P', bound='AuthenticationProvider')
-
-
 AUTHENTICATION_PROVIDERS = {}
-
-
-def provider_by_name(providers: 'Collection[_P]', name: str) -> _P | None:
-    return next((p for p in providers if p.metadata.name == name), None)
 
 
 class Conclusion:
@@ -99,16 +92,12 @@ class AuthenticationProvider(metaclass=ABCMeta):
     # :class:`~onegov.user.integration.UserApp`.
     to: str | None = attrib(init=False)
     primary: bool = attrib(init=False, default=False)
+    name: str = attrib()
 
     if TYPE_CHECKING:
         # forward declare for type checking
         metadata: ClassVar[HasName]
         kind: ClassVar[Literal['separate', 'integrated']]
-
-    @property
-    def name(self) -> str:
-        """ Needs to be available for the path in the integration app. """
-        return self.metadata.name
 
     def __init_subclass__(
         cls,
@@ -132,7 +121,7 @@ class AuthenticationProvider(metaclass=ABCMeta):
 
     @classmethod
     @abstractmethod
-    def configure(cls, **kwargs: Any) -> Self | None:
+    def configure(cls, name: str, **kwargs: Any) -> Self | None:
         """ This function gets called with the per-provider configuration
         defined in onegov.yml. Authentication providers may optionally
         access these values.
@@ -142,7 +131,7 @@ class AuthenticationProvider(metaclass=ABCMeta):
 
         """
 
-        return cls()
+        return cls(name=name)
 
     def is_primary(self, app: 'UserApp') -> bool:
         """ Returns whether the authentication provider is intended to be
@@ -457,7 +446,7 @@ class LDAPProvider(
     custom_hint: str = ''
 
     @classmethod
-    def configure(cls, **cfg: Any) -> Self | None:
+    def configure(cls, name: str, **cfg: Any) -> Self | None:
 
         # Providers have to decide themselves if they spawn or not
         if not cfg:
@@ -467,6 +456,7 @@ class LDAPProvider(
         ldap = spawn_ldap_client(**cfg)
 
         return cls(
+            name=name,
             ldap=ldap,
             auth_method=cfg.get('auth_method', 'compare'),
             attributes=LDAPAttributes.from_cfg(cfg),
@@ -611,7 +601,7 @@ class LDAPKerberosProvider(
     suffix: str | None = None
 
     @classmethod
-    def configure(cls, **cfg: Any) -> Self | None:
+    def configure(cls, name: str, **cfg: Any) -> Self | None:
 
         # Providers have to decide themselves if they spawn or not
         if not cfg:
@@ -627,6 +617,7 @@ class LDAPKerberosProvider(
             service=cfg.get('kerberos_service', None))
 
         provider = cls(
+            name=name,
             ldap=ldap,
             kerberos=kerberos,
             attributes=LDAPAttributes.from_cfg(cfg),
@@ -784,7 +775,7 @@ class OauthProvider(SeparateAuthenticationProvider):
         Should not contain any query parameters. """
         return request.class_link(
             AuthenticationProvider,
-            {'name': self.metadata.name},
+            {'name': self.name},
             name='logout'
         )
 
@@ -793,7 +784,7 @@ class OauthProvider(SeparateAuthenticationProvider):
         without query parameters."""
         return request.class_link(
             AuthenticationProvider,
-            {'name': self.metadata.name},
+            {'name': self.name},
             name='redirect'
         )
 
@@ -838,12 +829,13 @@ class AzureADProvider(
     custom_hint: str = ''
 
     @classmethod
-    def configure(cls, **cfg: Any) -> Self | None:
+    def configure(cls, name: str, **cfg: Any) -> Self | None:
 
         if not cfg:
             return None
 
         return cls(
+            name=name,
             tenants=MSALConnections.from_cfg(cfg.get('tenants', {})),
             custom_hint=cfg.get('hint', None),
             roles=RolesMapping(cfg.get('roles', {
@@ -1077,12 +1069,13 @@ class SAML2Provider(
     custom_hint: str = ''
 
     @classmethod
-    def configure(cls, **cfg: Any) -> Self | None:
+    def configure(cls, name: str, **cfg: Any) -> Self | None:
 
         if not cfg:
             return None
 
         return cls(
+            name=name,
             tenants=SAML2Connections.from_cfg(cfg.get('tenants', {})),
             custom_hint=cfg.get('hint', None),
             roles=RolesMapping(cfg.get('roles', {

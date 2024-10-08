@@ -89,6 +89,7 @@ class MoveAgencyMixin:
 
     if TYPE_CHECKING:
         request: AgencyRequest
+
         def csrf_protected_url(self, url: str) -> str: ...
 
     @cached_property

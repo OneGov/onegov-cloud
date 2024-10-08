@@ -441,7 +441,7 @@ class RangedPagination(Generic[_M]):
     @property
     def previous(self) -> 'Self | None':
         """ Returns the previous page or None. """
-        s, e = self.page_range
+        s, _e = self.page_range
 
         if s > 0:
             return self.by_page_range((s - 1, s - 1))
@@ -450,7 +450,7 @@ class RangedPagination(Generic[_M]):
     @property
     def next(self) -> 'Self | None':
         """ Returns the next page range or None. """
-        s, e = self.page_range
+        _s, e = self.page_range
 
         if e + 1 < self.pages_count:
             return self.by_page_range((e + 1, e + 1))

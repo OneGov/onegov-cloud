@@ -16,5 +16,4 @@ __all__ = (
     'import_election_wabstic_majorz',
     'import_election_wabstic_proporz',
     'import_elections_ech',
-    'import_party_results_internal',
 )
