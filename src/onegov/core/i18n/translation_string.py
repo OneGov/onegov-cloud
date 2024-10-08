@@ -8,9 +8,11 @@ from typing import Any
 from typing import Literal
 from typing import TYPE_CHECKING
 if TYPE_CHECKING:
-    from markupsafe import HasHTML
     from typing import Protocol
     from typing import Self
+
+    class HasHTML(Protocol):
+        def __html__(self, /) -> str: ...
 
     class TStrCallable(Protocol):
         @overload
