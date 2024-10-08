@@ -322,6 +322,24 @@ class InheritableContactExtension(ContactExtensionBase, ContentExtension):
             query = query.filter(Page.id != self.id)
         query = query.order_by(Page.title)
 
+        # Ancestor pages should appear first in the list
+        pinned = {
+            page.id: page.title
+            for page in self.ancestors
+            if page.content.get('contact')
+        } if isinstance(self, Page) else {}
+
+        choices: list[_Choice] = [
+            (page_id, title)
+            for page_id, title in query.with_entities(Page.id, Page.title)
+            if page_id not in pinned
+        ]
+
+        if pinned:
+            choices.insert(0, (-1, '-'*32, {'disabled': 'disabled'}))
+            for choice in reversed(pinned.items()):
+                choices.insert(0, choice)
+
         class InheritableContactPageForm(form_class):  # type:ignore
 
             contact = TextAreaField(
@@ -344,7 +362,7 @@ class InheritableContactExtension(ContactExtensionBase, ContentExtension):
                 label=_('Topic to inherit from'),
                 fieldset=_('Contact'),
                 coerce=int,
-                choices=query.with_entities(Page.id, Page.title).all(),
+                choices=choices,
                 depends_on=('inherit_contact', 'y'),
                 validators=[InputRequired()]
             )
