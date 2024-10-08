@@ -21,7 +21,7 @@
     Renders the zurb foundation reveal model. Takes question, yes and no
     as options (those are the texts for the respective elements).
 */
-var Confirmation = React.createClass({
+var Confirmation = createReactClass({
     render: function() {
         return (
             <div className="reveal-modal medium dialog" data-reveal role="dialog">
@@ -42,7 +42,7 @@ var Confirmation = React.createClass({
     The confirmation, if no 'yes' button is supplied (to inform the user
     why some action can't be taken).
 */
-var DenyConfirmation = React.createClass({
+var DenyConfirmation = createReactClass({
     render: function() {
         return (
             <div className="reveal-modal medium dialog" data-reveal role="dialog">
