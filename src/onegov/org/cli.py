@@ -847,7 +847,7 @@ def migrate_links_cli(
         else:
             new_uri = request.domain
         migration = LinkMigration(request, old_uri=old_uri, new_uri=new_uri)
-        total, grouped_count = migration.migrate_site_collection(
+        total, grouped_count = migration.migrate(
             test=dry_run
         )
 

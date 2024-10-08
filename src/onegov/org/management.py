@@ -1,17 +1,12 @@
 import re
 import time
 from collections import defaultdict
-
 import transaction
 from aiohttp import ClientTimeout
-from sqlalchemy.ext.mutable import MutableDict
 from sqlalchemy.orm import object_session
-from sqlalchemy.ext.declarative import declared_attr
 from urlextract import URLExtract
-from inspect import getmembers, isfunction
-
+from sqlalchemy import text, bindparam
 from onegov.async_http.fetch import async_aiohttp_get_all
-from onegov.core.orm.mixins import ContentMixin
 from onegov.core.utils import normalize_for_url
 from onegov.org.models import SiteCollection
 from onegov.people import AgencyCollection
@@ -77,7 +72,6 @@ class LinkMigration(ModelsWithLinksMixin):
         group_by = group_by or item.__class__.__name__
 
         def repl(matchobj: re.Match[str]) -> str:
-            # replaces it with a new URI.
             if self.use_domain:
                 return f'{matchobj.group(1)}{new_uri}'
             return new_uri
@@ -87,62 +81,6 @@ class LinkMigration(ModelsWithLinksMixin):
             pattern = re.compile(r'(https?://)' + f'({re.escape(old_uri)})')
         else:
             pattern = re.compile(re.escape(old_uri))
-
-        def predicate(attr) -> bool:
-            nonlocal item
-            return isinstance(attr, MutableDict)
-            # todo: can it be an iterable which contains MUtableDict?
-
-        # todo: refactor away from getmembers()
-        # this fails in some rare edge cases
-
-        # Migrate `meta` and `content`:
-        if isinstance(item, ContentMixin):
-            try:
-                kv = getmembers(item, predicate)
-            except NotImplementedError:
-                print('notimplementeed')
-                cal = "calendar_date_range"
-                # go with pdb into predicate and check for
-                try:
-                    kv = getmembers(item, predicate)
-                    breakpoint()
-                except Exception:
-                    breakpoint()
-
-            # if len(kv) > 2:
-            #     breakpoint()
-            kv: list[tuple[str, MutableDict]]
-            for el in kv:
-                if not el:
-                    continue
-                attribute_name = el[0]
-                if attribute_name not in ContentMixin.__dict__:
-                    continue
-                if attribute_name == 'calendar_date_range':
-                    breakpoint()
-
-                if len(el) != 2:
-                    breakpoint()
-
-                if el[0] == 'content' or el[0] == 'meta' and el[1]:
-                    content = el[1]
-                    for key, v in content.items():  # key might be 'lead'
-                        # 'text', 'people' etc.
-                        if not isinstance(v, str) or not v:
-                            continue
-                        new_val = pattern.sub(repl, v)
-                        if v != new_val:
-                            breakpoint()
-                            # get number of replacements so the count is
-                            # correct
-                            occurrences = len(pattern.findall(v))
-                            count += occurrences
-
-                            try:
-                                item.name[key] = new_val
-                            except AttributeError:
-                                pass
 
         for field in fields_with_urls:
             value = getattr(item, field, None)
@@ -165,19 +103,24 @@ class LinkMigration(ModelsWithLinksMixin):
                     )
         return count, count_by_id
 
-    def migrate_site_collection(
+    def migrate(
         self,
         test: bool = False
     ) -> tuple[int, dict[str, dict[str, int]]]:
+        total, grouped = self.migrate_site_collection(test=test)
 
+        if not test:
+            self.migrate_content_mixin()
+
+        return total, grouped
+
+    def migrate_site_collection(self, test):
         grouped: dict[str, dict[str, int]] = {}
         total = 0
-
         simple_count = 0
         for name, entries in self.site_collection.get().items():
             for _ in entries:
                 simple_count += 1
-
         for name, entries in self.site_collection.get().items():
             for entry in entries:
                 count, grouped_count = self.migrate_url(
@@ -188,6 +131,57 @@ class LinkMigration(ModelsWithLinksMixin):
                 grouped = grouped_count
                 total += count
         return total, grouped
+
+    def migrate_content_mixin(self):
+        """ Updates the JSON and text columns defined in models using the
+        ContentMixin to replace old URIs with new ones across multiple tables.
+
+        Generates SQL of the following form:
+
+        update pages set content = replace(content::text, 'old', 'new')::jsonb;
+        update forms set meta = replace(meta::text, 'old', 'new')::jsonb;
+
+        """
+
+        def replace_json(col: str) -> str:
+            return f"{col} = replace({col}::text, :old_uri, :new_uri)::jsonb"
+
+        def replace_text(col: str) -> str:
+            return f"{col} = replace({col}, :old_uri, :new_uri)"
+
+        updates = [
+            ('pages', ['meta', 'content']),
+            ('forms', ['meta', 'content']),
+            ('events', ['meta', 'content']),
+            ('resources', ['meta', 'content']),
+            ('people', ['meta', 'content', 'picture_url']),
+            ('organisations', ['meta', 'logo_url']),
+            ('directories', ['content']),
+            ('tickets', ['snapshot']),
+            ('external_links', ['url']),
+        ]
+
+        for table, columns in updates:
+            sql_parts = []
+            for col in columns:
+                if col in {'meta', 'content', 'snapshot'}:
+                    sql_parts.append(replace_json(col))
+                else:
+                    sql_parts.append(replace_text(col))
+
+            sql = text(
+                f"UPDATE {table} SET {', '.join(sql_parts)}"  # nosec:B608
+            )
+
+            self.request.session.execute(
+                sql,
+                {
+                    'old_uri': bindparam('old_uri', self.old_uri),
+                    'new_uri': bindparam('new_uri', self.new_uri)
+                }
+            )
+
+        self.request.session.commit()
 
 
 class PageNameChange(ModelsWithLinksMixin):
@@ -242,7 +236,7 @@ class PageNameChange(ModelsWithLinksMixin):
             count = 0
             for before, after in zip(urls_before, urls_after):
                 migration = LinkMigration(self.request, before, after)
-                total, grouped = migration.migrate_site_collection(test=test)
+                total, grouped = migration.migrate(test=test)
                 count += total
             return count
 

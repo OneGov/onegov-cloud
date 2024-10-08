@@ -357,7 +357,7 @@ def handle_migrate_links(
             old_uri=form.old_domain.data,
             new_uri=request.domain
         )
-        total, grouped = migration.migrate_site_collection(test_only)
+        total, grouped = migration.migrate(test_only)
 
         if not test_only:
             request.success(
