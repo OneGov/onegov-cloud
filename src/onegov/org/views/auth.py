@@ -126,7 +126,7 @@ def handle_login(
         'register_link': request.link(self, name='register'),
         'may_register': request.app.enable_user_registration,
         'button_text': _('Login'),
-        'providers': request.app.providers,
+        'providers': request.app.providers.values(),
         'provider_login': provider_login,
         'render_untrusted_markdown': render_untrusted_markdown,
         'title': _('Login to ${org}', mapping={
