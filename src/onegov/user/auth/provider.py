@@ -19,7 +19,7 @@ from saml2.ident import code
 from webob import Response
 
 
-from typing import Any, ClassVar, Literal, Self, TypeVar, TYPE_CHECKING
+from typing import Any, ClassVar, Literal, Self, TYPE_CHECKING
 if TYPE_CHECKING:
     from collections.abc import Collection, Mapping
     from onegov.core.request import CoreRequest
@@ -39,14 +39,7 @@ if TYPE_CHECKING:
         def namespace(self) -> str: ...
 
 
-_P = TypeVar('_P', bound='AuthenticationProvider')
-
-
 AUTHENTICATION_PROVIDERS = {}
-
-
-def provider_by_name(providers: 'Collection[_P]', name: str) -> _P | None:
-    return next((p for p in providers if p.metadata.name == name), None)
 
 
 class Conclusion:

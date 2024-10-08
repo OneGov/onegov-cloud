@@ -207,7 +207,7 @@ class Auth:
         source = None
 
         if isinstance(self.app, UserApp) and not skip_providers:
-            for provider in self.app.providers:
+            for provider in self.app.providers.values():
                 if not provider.available(self.app):
                     continue
                 if provider.kind == 'integrated':
