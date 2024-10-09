@@ -378,6 +378,8 @@ class SearchPostgres(Pagination[_M]):
             if element.es_type_name == 'files':
                 continue
             suggest = getattr(element, 'es_suggestion', '')
+            if isinstance(suggest, tuple):
+                suggest = suggest[0]
             suggestions.append(suggest)
 
         return tuple(suggestions[:15])
