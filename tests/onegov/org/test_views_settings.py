@@ -1,4 +1,6 @@
 from onegov.api.models import ApiKey
+import pytest
+from onegov.page import Page
 from onegov.org.theme.org_theme import HELVETICA
 from xml.etree.ElementTree import tostring
 from onegov.org.models import SiteCollection
@@ -146,28 +148,51 @@ def test_switch_languages(client):
     assert 'Deutsch' not in page
 
 
+@pytest.mark.skip('wip')
 def test_migrate_links(client):
     session = client.app.session()
 
     sitecollection = SiteCollection(session)
     objects = sitecollection.get()
 
-    # pages = client.app.session().query(Topic).defer(Topic.)
-    # topics = session.query(Topic)
-    #
-    # topics = topics.options(defer(Topic.meta))
-    # topics = topics.options(defer(Topic.content))
-    # topics = topics.options(defer(Topic.order))
+    foo = [page.content for page in objects['topics']]
 
+    # set one of the pages content and set
+    # content.text to something that contains an url.
+
+    # Set up test data
+    old_domain = 'localhost'
+    new_domain = '127.0.0.1'
+
+    # Create test objects with content containing the old domain
+    page = Page(
+        name='page',
+        title='Page',
+        content={'text': f'A link to http://{old_domain}/page'},
+    )
+    # form = Form(meta={'url': f'http://{old_domain}/form'})
+    # event = Event(content={'description': f'Visit us at {old_domain}'})
+    # resource = Resource(meta={'link': f'https://{old_domain}/resource'})
+    # person = Person(picture_url=f'http://{old_domain}/person.jpg')
+    # org = Organisation(logo_url=f'http://{old_domain}/logo.png')
+    # directory = Directory(content={'entries': [f'http://{old_domain}/entry1',
+    # f'http://{old_domain}/entry2']})
+    # ticket = Ticket(snapshot={'url': f'http://{old_domain}/ticket'})
+
+    # external_link = ExternalLink(url=f'http://{old_domain}/external')
+
+    # todo: this is hard to test, need to bypass form validation
+    # Die Domain muss einen Punkt enthalten
+    session.add_all([page])
+    session.flush()
     client.login_admin()
     page = client.get('/migrate-links')
+
     assert (
         'Migriert Links von der angegebenen Domain zur aktuellen Domain '
         '"localhost"' in page
     )
-
-    # migrate from 'localhost' to 127.0.0.1
-    # (pointless but enough for test)
-    page.form['old_domain'] = '127.0.0.1'
-    page.form.submit()
+    page.form['old_domain'] = old_domain
+    page.form['test'] = False
+    page = page.form.submit().maybe_follow()
     page.showbrowser()

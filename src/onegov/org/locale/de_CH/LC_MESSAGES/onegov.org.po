@@ -5858,9 +5858,9 @@ msgstr "Total ${number} Links gefunden"
 
 #, python-format
 msgid ""
-"Migrates links from the given domain to the current domain \"${domain}\"."
+"Migrates links from the given domain to the current domain \"${domain}\". The form must be used *after* the DNS changeover to \"${domain}\"."
 msgstr ""
-"Migriert Links von der angegebenen Domain zur aktuellen Domain \"${domain}\"."
+"Migriert Links von der angegebenen Domain zur aktuellen Domain \"${domain}\". Das Formular muss *nach* der DNS-Umstellung auf  \"${domain}\" verwendet werden."
 
 msgid "OneGov API"
 msgstr "OneGov API"

@@ -376,7 +376,8 @@ def handle_migrate_links(
         'button_text': button_text,
         'callout': _(
             'Migrates links from the given domain to the current domain '
-            '"${domain}".',
+            '"${domain}". The form must be used *after* the DNS changeover '
+            'to "${domain}".',
             mapping={'domain': domain}
         ),
     }

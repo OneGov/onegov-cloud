@@ -5,7 +5,7 @@ import transaction
 from aiohttp import ClientTimeout
 from sqlalchemy.orm import object_session
 from urlextract import URLExtract
-from sqlalchemy import text, bindparam
+from sqlalchemy import text, bindparam, String
 from onegov.async_http.fetch import async_aiohttp_get_all
 from onegov.core.utils import normalize_for_url
 from onegov.org.models import SiteCollection
@@ -135,8 +135,12 @@ class LinkMigration(ModelsWithLinksMixin):
         return total, grouped
 
     def migrate_content_mixin(self) -> None:
-        """ Updates the JSON and text columns defined in models using the
-        ContentMixin to replace old URIs with new ones across multiple tables.
+        """ A catch-all function to migrate content not covered by
+        migrate_site_collection.
+
+        This function was added to handle links that were not processed by the
+        migrate_site_collection function.
+
 
         Generates SQL of the following form:
 
@@ -173,17 +177,20 @@ class LinkMigration(ModelsWithLinksMixin):
 
             sql = text(
                 f"UPDATE {table} SET {', '.join(sql_parts)}"  # nosec:B608
+            ).bindparams(
+                bindparam('old_uri', type_=String),
+                bindparam('new_uri', type_=String)
             )
 
             self.request.session.execute(
                 sql,
                 {
-                    'old_uri': bindparam('old_uri', self.old_uri),
-                    'new_uri': bindparam('new_uri', self.new_uri)
+                    'old_uri': self.old_uri,
+                    'new_uri': self.new_uri
                 }
             )
 
-        self.request.session.commit()
+        transaction.commit()
 
 
 class PageNameChange(ModelsWithLinksMixin):
