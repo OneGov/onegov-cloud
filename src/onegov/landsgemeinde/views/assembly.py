@@ -236,7 +236,7 @@ def view_assembly_open_data(
 
     if not request.is_manager and layout.current_assembly() == self:
         return redirect(request.link(self, name='ticker'))
-    
+
     layout.breadcrumbs.append(Link(_('Open data'), '#'))
 
     return {
