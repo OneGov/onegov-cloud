@@ -855,12 +855,12 @@ def test_import_export_subscribers(client):
     page.form['dry_run'] = True
     page.form['file'] = file
     page = page.form.submit()
-    assert "2 Abonnenten werden importiert" in page
+    assert "Importvorschau: Imported: 2" in page
 
     # Import
     page = client.get('/subscribers/import-newsletter-recipients')
     page.form['dry_run'] = False
     page.form['file'] = file
     page = page.form.submit().follow()
-    assert "2 Abonnenten importiert" in page
+    assert "Import abgeschlossen: Imported: 2" in page
     assert recipients.query().count() == 4
