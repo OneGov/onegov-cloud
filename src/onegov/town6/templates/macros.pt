@@ -384,10 +384,12 @@
 
 <metal:card define-macro="directory-card">
     <div  data-aos="fade" data-aos-duration="800" class="card" data-equalizer-watch>
+        <a tal:attributes="href link.url">
         <div class="card-section">
-            <tal:b tal:content="link(layout)" />
-            <small>${link.subtitle}</small>
-        </div>
+                <h5><i class="fa fa-list" aria-hidden="true"></i> ${link.text}</h5>
+                <p>${link.subtitle}</p>
+            </div>
+        </a>
     </div>
 </metal:card>
 
@@ -720,6 +722,31 @@
                 <div tal:condition="coordinates" class="marker-map" data-map-type="thumbnail" data-lat="${coordinates.lat}" data-lon="${coordinates.lon}" data-zoom="${coordinates.zoom}" data-marker-icon="${marker_icon|nothing}" data-marker-color="${marker_color|nothing}"></div>
                 <div class="location" tal:condition="location">${location}</div>
             </div>
+            <div class="more-entries side-panel" tal:condition="more_entries|False">
+                <h3 i18n:translate="">Other Entries</h3>
+                <ul class="more-list">
+                    <li tal:condition="prev_entry">
+                        <a href="${request.link(prev_entry)}" class="list-link">
+                            <i class="fa fa-chevron-left"></i><span class="list-title" i18n:translate="">Previous Entry</span>
+                        </a>
+                        <a href="${request.link(prev_entry)}">
+                            <p class="list-lead preview">
+                                ${prev_entry.title}
+                            </p>
+                        </a>
+                    </li>
+                    <li tal:condition="next_entry">
+                        <a href="${request.link(next_entry)}" class="list-link">
+                            <i class="fa fa-chevron-right"></i><span class="list-title" i18n:translate="">Next Entry</span>
+                        </a>
+                        <a href="${request.link(next_entry)}">
+                            <p class="list-lead preview">
+                                ${next_entry.title}
+                            </p>
+                        </a>
+                    </li>
+                </ul>
+            </div>
             <div class="side-panel files-panel" tal:condition="files and page.show_file_links_in_sidebar|True">
                 <h3 i18n:translate>Documents</h3>
                 <ul class="more-list">
@@ -767,8 +794,6 @@
                     </li>
                 </ul>
             </div>
-            <tal:b metal:define-slot="after-panels"><div id="after-panels"></div></tal:b>
-
             <div class="more-news side-panel" tal:condition="siblings|False">
                 <h3 i18n:translate="">More news</h3>
                 <ul class="more-list">
@@ -785,30 +810,8 @@
                 </ul>
             </div>
 
-            <div class="more-entries side-panel" tal:condition="more_entries|False">
-                <ul class="more-list">
-                    <li tal:condition="prev_entry">
-                        <a href="${request.link(prev_entry)}" class="list-link">
-                            <i class="fa fa-chevron-left"></i><span class="list-title" i18n:translate="">Previous Entry</span>
-                        </a>
-                        <a href="${request.link(prev_entry)}">
-                            <p class="list-lead preview">
-                                ${prev_entry.title}
-                            </p>
-                        </a>
-                    </li>
-                    <li tal:condition="next_entry">
-                        <a href="${request.link(next_entry)}" class="list-link">
-                            <i class="fa fa-chevron-right"></i><span class="list-title" i18n:translate="">Next Entry</span>
-                        </a>
-                        <a href="${request.link(next_entry)}">
-                            <p class="list-lead preview">
-                                ${next_entry.title}
-                            </p>
-                        </a>
-                    </li>
-                </ul>
-            </div>
+            <tal:b metal:define-slot="after-panels"><div id="after-panels"></div></tal:b>
+
         </div>
     </div>
 </metal:page_content>
