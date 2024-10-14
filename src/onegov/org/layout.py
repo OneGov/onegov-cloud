@@ -3347,7 +3347,7 @@ class DirectoryEntryCollectionLayout(DefaultLayout, DirectoryEntryMixin):
         classes = []
         if filter:
             filter_data[filter] = True
-            if toggle_active and filter in self.request.params:
+            if toggle_active and self.request.params.get(filter) == '1':
                 classes.append('active')
 
         return Link(
