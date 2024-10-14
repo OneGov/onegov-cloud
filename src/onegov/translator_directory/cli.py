@@ -7,6 +7,7 @@ from onegov.core.cli import command_group
 from onegov.translator_directory.collections.translator import (
     TranslatorCollection)
 from onegov.translator_directory import log
+from onegov.translator_directory.models.language import Language
 from onegov.translator_directory.models.translator import Translator
 from onegov.translator_directory.utils import (
     update_drive_distances, geocode_translator_addresses, country_code_to_name)
@@ -422,3 +423,181 @@ def migrate_nationalities(
             request.session.flush()
 
     return do_migrate_nationalities
+
+
+LANGUAGES = (
+    'Afrikaans',
+    'Albanisch',
+    'Amharisch',
+    'Anyin',
+    'Arabisch',
+    'Arabisch (Dialekte)',
+    'Arabisch (Hocharabisch)',
+    'Arabisch (Masri)',
+    'Arabisch (Nahost)',
+    'Aramäisch',
+    'Armenisch',
+    'Aserbaidschanisch',
+    'Badini',
+    'Bangla',
+    'Bengalisch',
+    'Bilen',
+    'Bosnisch',
+    'Bulgarisch',
+    'Chinesisch',
+    'Chinesisch (Hokkien)',
+    'Chinesisch (Mandarin)',
+    'Dänisch',
+    'Dari',
+    'Dari (Afghanistan)',
+    'Deutsch',
+    'Diola',
+    'Edo',
+    'Englisch',
+    'Ewe',
+    'Farsi',
+    'Farsi (Persisch)',
+    'Farsi Persisch (Afghanistan Iran)',
+    'Flämisch',
+    'Französisch',
+    'Friesisch',
+    'Galicisch',
+    'Gebärdensprache',
+    'Georgisch',
+    'Griechisch',
+    'Gujarati',
+    'Hebräisch',
+    'Hindi',
+    'Ibo',
+    'Igbo',
+    'Ijaw',
+    'Indonesisch',
+    'Irakisch',
+    'Iranisch',
+    'Italienisch',
+    'Italienisch (Dialekte Süditalien)',
+    'Itsekiri',
+    'Japanisch',
+    'Kabyé',
+    'Kalabari',
+    'Kantonesisch',
+    'Kasachisch',
+    'Keine schriftlichen Übersetzungen',
+    'Keine Verdolmetschung',
+    'Kotokoli',
+    'Kreolisch',
+    'Kroatisch',
+    'Kurdisch',
+    'Kurdisch (Dialekte)',
+    'Kurmanci',
+    'Kyrillisch (Serbien)',
+    'Lettisch',
+    'Litauisch',
+    'Mandarin',
+    'Mandinka',
+    'Marathi',
+    'Marokkanisch',
+    'Mazedonisch',
+    'Mina',
+    'Moldauisch',
+    'Mongolisch',
+    'Montenegrinisch',
+    'Niederländisch',
+    'Oromo',
+    'Pakistanisch',
+    'Panjabi',
+    'Paschto (Afghanistan, Pakistan)',
+    'Paschtu',
+    'Patois',
+    'Persisch',
+    'Pidgin',
+    'Pidgin-Englisch',
+    'Pidgin-Französisch',
+    'Pidgin-Nigerianisch',
+    'Pilipino',
+    'Polnisch',
+    'Portugiesisch',
+    'Portugiesisch (Brasil)',
+    'Punjabi',
+    'Rumänisch',
+    'Russisch',
+    'Schwedisch',
+    'Serbisch',
+    'Serbokroatisch',
+    'Shandong-Dialekt',
+    'Shanghai-Dialekt',
+    'Singhalesisch',
+    'Slowakisch',
+    'Somali',
+    'Sorani',
+    'Spanisch',
+    'Suaheli',
+    'Tadschikisch',
+    'Tagalog',
+    'Tamil',
+    'Tamilisch',
+    'Telugu',
+    'Tem',
+    'Thailändisch',
+    'Tibetisch',
+    'Tigrinya',
+    'Tschechisch',
+    'Türkisch',
+    'Türkisch (Dialekte)',
+    'Turkmenisch',
+    'Uigurisch',
+    'Ukrainisch',
+    'Ungarisch',
+    'Urdu',
+    'Usbekisch',
+    'VG ZG',
+    'Vietnamesisch',
+    'Weissrussisch',
+    'Wolof',
+    'Yoruba',
+    'Yue-Chinesisch'
+)
+
+
+@cli.command(name='create-languages', context_settings={'singular': True})
+@click.option('--dry-run', is_flag=True, default=False)
+def create_languages(
+        dry_run: bool
+) -> 'Callable[[TranslatorAppRequest, TranslatorDirectoryApp], None]':
+    """
+    Create languages for the selected translator schema
+    NOTE: Each language will get a unique UUID, so all relations will be
+    lost if languages are recreated. This is a destructive operation.
+
+    Example:
+        onegov-translator --select /translator_directory/schaffhausen
+        create-languages --dry-run
+    """
+
+    def do_create_languages(
+        request: 'TranslatorAppRequest',
+        app: 'TranslatorDirectoryApp'
+    ) -> None:
+        # delete all existing languages
+        languages = request.session.query(Language).all()
+        click.secho(f'Deleting {len(languages)} languages..', fg='yellow')
+        for language in languages:
+            request.session.delete(language)
+
+        if dry_run:
+            transaction.abort()
+        else:
+            request.session.flush()
+
+        # create new languages
+        click.secho(f'Inserting {len(LANGUAGES)} languages..', fg='yellow')
+        for language_name in LANGUAGES:
+            lang = Language(name=language_name)
+            request.session.add(lang)
+
+        if dry_run:
+            transaction.abort()
+        else:
+            request.session.flush()
+
+    return do_create_languages
