@@ -191,7 +191,6 @@
         }
 
         p {
-            color: $charcoal;
             hyphens: none;
             margin-bottom: 0;
             padding: 1.5rem;
@@ -258,6 +257,9 @@
         margin-bottom: 2rem;
         transition: all 200ms linear !important;
 
+        p {
+            color: $charcoal;
+        }
 
         &:hover {
             border: 2px solid $primary-color !important;

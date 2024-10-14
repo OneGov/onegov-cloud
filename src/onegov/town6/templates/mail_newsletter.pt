@@ -11,35 +11,39 @@
 
         <tal:b condition="news">
             <h2 i18n:translate>Latest news</h2>
-
+            
             <tal:b repeat="item news">
-                <strong><a href="${request.link(item)}"><h3>${item.title}</h3></a></strong>
-                <img tal:condition="item.page_image and item.show_preview_image" style="width: 100%; padding-bottom: 55%; background-image: url(${item.page_image}); background-size: cover;"></img>
-                <p><strong>${layout.with_hashtags(item.lead)}</strong></p>
+                <hr>
+                    <strong><a href="${request.link(item)}"><h3>${item.title}</h3></a></strong>
+                    <img tal:condition="item.page_image and item.show_preview_image" style="width: 100%; padding-bottom: 55%; background-image: url(${item.page_image}); background-size: cover;"></img>
+                    <p><strong>${layout.with_hashtags(item.lead)}</strong></p>
                 <p tal:content="item.text">
 
-                <hr>
+                </tal:b>
             </tal:b>
-        </tal:b>
-
-        <tal:b condition="publications">
-            <h2 i18n:translate>Publications</h2>
-
-            <tal:b repeat="publication publications">
+            
+            <tal:b condition="publications">
+            <hr>
+                <h2 i18n:translate>Publications</h2>
+                
+                <tal:b repeat="publication publications">
                 <strong><a href="${request.link(publication)}">${name_without_extension(publication.name)}</a></strong>
                 <ul class="flat">
                     <li>${layout.format_date(publication.created, 'date')}</li>
                 </ul>
             </tal:b>
         </tal:b>
-
+        
         <tal:b condition="occurrences">
+            <hr>
             <h2 i18n:translate>Events</h2>
 
             <tal:b repeat="occurrence occurrences">
-                <strong><a href="${request.link(occurrence)}">${occurrence.title}</a></strong>
+                <hr class="gray">
+                <strong><a href="${request.link(occurrence)}"><h3>${occurrence.title}</h3></a></strong>
+                <img tal:condition="occurrence.event.image" style="width: 50%; padding-bottom: 30%; background-image: url(${request.link(occurrence.event.image)}); background-size: cover; border-radius: .7rem;"></img>
                 <ul class="flat">
-                    <li>${layout.format_date(occurrence.localized_start, 'date')} ${layout.format_date(occurrence.localized_start, 'time')} - ${layout.format_date(occurrence.localized_end, 'time')}</li>
+                    <li><b>${layout.format_date(occurrence.localized_start, 'date')} ${layout.format_date(occurrence.localized_start, 'time')} - ${layout.format_date(occurrence.localized_end, 'time')}</b></li>
                     <li>${occurrence.location}</li>
                 </ul>
             </tal:b>

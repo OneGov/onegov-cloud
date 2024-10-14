@@ -208,8 +208,7 @@ class Job(Generic[_JobFunc]):
         if not self.url:
             return self.name
 
-        scheme, _, url = self.url.partition('://')
-        return url
+        return self.url.partition('://')[-1]
 
     def runtimes(self, today: date) -> 'Iterator[datetime]':
         """ Generates the runtimes of this job on the given day, excluding

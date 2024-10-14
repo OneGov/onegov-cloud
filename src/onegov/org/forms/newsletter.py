@@ -409,6 +409,7 @@ class NewsletterSubscriberImportExportForm(Form):
             key: csv.as_valid_identifier(value)
             for key, value in headers.items()
         }
+
         def get(line: 'DefaultRow', column: str) -> Any:
             return getattr(line, column)
 

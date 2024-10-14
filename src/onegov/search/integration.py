@@ -129,6 +129,7 @@ class ElasticsearchApp(morepath.App):
         # forward declare required attributes
         schema: str
         session_manager: SessionManager
+
         @property
         def session(self) -> 'Callable[[], Session]': ...
         @property

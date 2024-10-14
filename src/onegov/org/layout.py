@@ -838,6 +838,7 @@ class DefaultMailLayoutMixin:
     if TYPE_CHECKING:
         # forward declare required attributes
         request: OrgRequest
+
         @property
         def org(self) -> Organisation: ...
 
@@ -885,6 +886,7 @@ class AdjacencyListMixin:
     if TYPE_CHECKING:
         model: AdjacencyList
         request: OrgRequest
+
         def csrf_protected_url(self, url: str) -> str: ...
         @property
         def homepage_url(self) -> str: ...
@@ -1282,7 +1284,8 @@ class SurveySubmissionWindowLayout(DefaultLayout):
                                 'Do you really want to delete '
                                 'this submission window?'
                             ),
-                            _('Existing submissions will be disassociated.'),
+                            _('Submissions associated with this submission '
+                              'window will be deleted as well.'),
                             _('Delete submission window'),
                             _('Cancel')
                         ),
@@ -2652,25 +2655,6 @@ class NewsletterLayout(DefaultLayout):
 
     @cached_property
     def editbar_links(self) -> list[Link | LinkGroup] | None:
-        update_subs_group = LinkGroup(
-            title=_('Edit'),
-            links=[
-                Link(
-                    text=_('Newsletter Subscription'),
-                    url=self.request.link(
-                        NewsletterCollection(self.app.session()),
-                        name='update'),
-                    attrs={'class': 'edit-link'},
-                )
-            ],
-            attributes={'class': 'edit-link'}
-        )
-
-        if not self.request.is_manager:
-            return [
-                update_subs_group
-            ]
-
         if self.is_collection:
             return [
                 Link(
@@ -2691,7 +2675,6 @@ class NewsletterLayout(DefaultLayout):
                         ),
                     ]
                 ),
-                update_subs_group,
             ]
         else:
             if self.view_name == 'send':
@@ -2917,6 +2900,7 @@ class UserLayout(DefaultLayout):
 
     if TYPE_CHECKING:
         model: User
+
         def __init__(self, model: User, request: OrgRequest) -> None: ...
 
     @cached_property
@@ -2974,6 +2958,7 @@ class UserGroupLayout(DefaultLayout):
 
     if TYPE_CHECKING:
         model: UserGroup
+
         def __init__(self, model: UserGroup, request: OrgRequest) -> None: ...
 
     @cached_property
@@ -3362,7 +3347,7 @@ class DirectoryEntryCollectionLayout(DefaultLayout, DirectoryEntryMixin):
         classes = []
         if filter:
             filter_data[filter] = True
-            if toggle_active and filter in self.request.params:
+            if toggle_active and self.request.params.get(filter) == '1':
                 classes.append('active')
 
         return Link(
