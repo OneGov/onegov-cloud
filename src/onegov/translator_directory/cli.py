@@ -565,9 +565,13 @@ def create_languages(
         dry_run: bool
 ) -> 'Callable[[TranslatorAppRequest, TranslatorDirectoryApp], None]':
     """
-    Create languages for the selected translator schema
-    NOTE: Each language will get a unique UUID, so all relations will be
-    lost if languages are recreated. This is a destructive operation.
+    Create languages for the selected translator schema. Languages get
+    created if they don't exist to prevent id changes.
+
+    This command is useful when new languages were added to the LANGUAGES list.
+
+    NOTE: No language will be deleted. If a language is not in the LANGUAGES
+    list the script will print a message.
 
     Example:
         onegov-translator --select /translator_directory/schaffhausen
@@ -578,22 +582,24 @@ def create_languages(
         request: 'TranslatorAppRequest',
         app: 'TranslatorDirectoryApp'
     ) -> None:
-        # delete all existing languages
-        languages = request.session.query(Language).all()
-        click.secho(f'Deleting {len(languages)} languages..', fg='yellow')
-        for language in languages:
-            request.session.delete(language)
+        # Compare existing languages
+        existing = request.session.query(Language).all()
+        existing_lang_names = [lang.name for lang in existing]
+        for language in existing:
+            if language.name not in LANGUAGES:
+                click.secho(f"Language '{language.name}' is "
+                            f'unknown. You may delete it if not in use from '
+                            f"'/languages'", fg='yellow')
 
-        if dry_run:
-            transaction.abort()
-        else:
-            request.session.flush()
-
-        # create new languages
-        click.secho(f'Inserting {len(LANGUAGES)} languages..', fg='yellow')
+        # create languages if not existing (to prevent id changes)
+        add_count = 0
         for language_name in LANGUAGES:
-            lang = Language(name=language_name)
-            request.session.add(lang)
+            if language_name not in existing_lang_names:
+                add_count += 1
+                lang = Language(name=language_name)
+                request.session.add(lang)
+        click.secho(f'Inserted {add_count} languages of total '
+                    f'{len(LANGUAGES)}', fg='green')
 
         if dry_run:
             transaction.abort()
