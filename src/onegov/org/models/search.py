@@ -13,7 +13,6 @@ from onegov.core.orm import Base
 from onegov.event.models import Event
 from onegov.search.utils import searchable_sqlalchemy_models
 
-
 if TYPE_CHECKING:
     from onegov.org.request import OrgRequest
     from onegov.search import Searchable
@@ -309,10 +308,8 @@ class SearchPostgres(Pagination[_M]):
                 if model.es_public or self.request.is_logged_in:
                     query = self.request.session.query(model)
                     doc_count += query.count()
-
-                    if (hasattr(model, 'access')
-                            and not self.request.is_logged_in):
-                        query = query.filter(model.access == 'public')
+                    if not self.request.is_logged_in:
+                        query = query.filter(model.es_public == True)
 
                     if query.count():
                         weighted = (
@@ -325,6 +322,7 @@ class SearchPostgres(Pagination[_M]):
                             ), 0).label('rank')
                         query = (query.filter(model.fts_idx.op('@@')(ts_query))
                                  .add_columns(rank_expression))
+
                         results.extend(list(query.all()))
 
         # remove duplicates, sort by rank

@@ -32,6 +32,7 @@ from sqlalchemy.orm import undefer, object_session
 from typing import Any, TYPE_CHECKING
 if TYPE_CHECKING:
     from onegov.org.request import OrgRequest
+    from sqlalchemy.sql import ClauseElement
     from sqlalchemy.orm import Query
 
 
@@ -160,6 +161,13 @@ class News(Page, TraitInfo, SearchableContent, NewsletterExtension,
     @hybrid_property
     def es_public(self) -> bool:
         return self.access == 'public' and self.published
+
+    @es_public.expression  # ignore[no-redef]
+    def es_public(cls) -> 'ClauseElement':
+        and_(
+            cls.access == 'public',
+            cls.published == True
+        )
 
     @observes('content')
     def content_observer(self, content: dict[str, Any]) -> None:

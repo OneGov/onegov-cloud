@@ -1,4 +1,4 @@
-from sqlalchemy import case
+from sqlalchemy import and_
 from sqlalchemy.orm import object_session
 from sqlalchemy.orm import relationship
 from sqlalchemy.ext.hybrid import hybrid_property
@@ -49,11 +49,9 @@ class ExtendedAgency(Agency, AccessExtension, PublicationExtension):
 
     @es_public.expression  # ignore[no-redef]
     def es_public(cls) -> 'ClauseElement':
-        return case(
-            [
-                (cls.access != 'public', False),
-                (cls.published == False, False)
-            ]
+        and_(
+            cls.access == 'public',
+            cls.published == True
         )
 
     #: Defines which fields of a membership and person should be exported to

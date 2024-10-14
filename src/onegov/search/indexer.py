@@ -912,7 +912,7 @@ class ORMEventTranslator:
         try:
             self.es_queue.put_nowait(translation)
             if translation['action'] == 'index':
-                # we only need to provide index tasks for fts
+                # we only need to provide index tasks for psql fts
                 self.psql_queue.put_nowait(translation)
         except Full:
             log.error("The orm event translator queue is full!")

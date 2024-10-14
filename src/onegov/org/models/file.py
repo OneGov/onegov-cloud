@@ -20,14 +20,14 @@ from onegov.org.utils import widest_access
 from onegov.search import ORMSearchable
 from operator import itemgetter
 from sedate import standardize_date, utcnow
-from sqlalchemy import asc, desc, select, nullslast  # type: ignore
+from sqlalchemy import asc, desc, select, nullslast, and_  # type: ignore
 
 from typing import (
     overload, Any, Generic, Literal, NamedTuple, TypeVar, TYPE_CHECKING)
 if TYPE_CHECKING:
     from collections.abc import Callable, Iterable, Iterator
     from sqlalchemy.orm import Query, Session
-    from sqlalchemy.sql import Select
+    from sqlalchemy.sql import Select, ClauseElement
     from typing_extensions import Self
 
     _T = TypeVar('_T')
@@ -252,6 +252,13 @@ class GeneralFile(File, SearchableFile):
     @hybrid_property
     def es_public(self) -> bool:
         return self.published and self.access == 'public'
+
+    @es_public.expression  # ignore[no-redef]
+    def es_public(cls) -> 'ClauseElement':
+        and_(
+            cls.published == True,
+            cls.access == 'public'
+        )
 
 
 class ImageFile(File):
