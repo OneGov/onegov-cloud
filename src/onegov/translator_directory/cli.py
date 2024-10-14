@@ -1,6 +1,5 @@
-import re
-
 import click
+import re
 import transaction
 
 from onegov.core.cli import command_group
@@ -603,7 +602,53 @@ def create_languages(
 
         if dry_run:
             transaction.abort()
+            click.secho('Aborting transaction', fg='yellow')
         else:
             request.session.flush()
 
     return do_create_languages
+
+
+@cli.command(name='force-delete-languages',
+             context_settings={'singular': True})
+@click.option('--dry-run', is_flag=True, default=False)
+def force_delete_languages(
+        dry_run: bool
+) -> 'Callable[[TranslatorAppRequest, TranslatorDirectoryApp], None]':
+    """
+    This command forcefully deletes all languages from the database and all
+    references will be lost.
+    This command is useful after the languages have changed and
+    assigned a lot for testing.
+
+    Example:
+        onegov-translator --select /translator_directory/schaffhausen
+        delete-languages --dry-run
+    """
+
+    def do_delete_languages(
+        request: 'TranslatorAppRequest',
+        app: 'TranslatorDirectoryApp'
+    ) -> None:
+
+        i = input('Are you sure you want to delete all languages and losing '
+                  'all references to it? [y/N]: ')
+        if i.lower() != 'y':
+            transaction.abort()
+            click.secho('Aborting transaction', fg='yellow')
+            return
+
+        del_count = 0
+        languages = request.session.query(Language)
+        for lang in languages:
+            del_count += 1
+            request.session.delete(lang)
+        click.secho(f'Deleted {del_count} languages', fg='green')
+
+        if dry_run:
+            transaction.abort()
+            click.secho('Aborting transaction', fg='yellow')
+        else:
+            request.session.flush()
+
+    return do_delete_languages
