@@ -2140,13 +2140,13 @@
     <tal:b repeat="group grouped" tal:define="link_func link_func|request.link; add_pagerefs add_pagerefs|False;">
         <tal:b tal:define="find_your_spot grouped[group][0] if grouped[group][0].title == 'Find Your Spot' else None">
             <a class="category-anchor" id="${group}"></a>
-            <h2 tal:condition="len(grouped) > 1">
-                ${group}
-                <metal:b tal:condition="add_pagerefs" use-macro="layout.macros['pageref']" tal:define="pageref_id group" />
-            <span tal:condition="find_your_spot" i18n:attributes="title" class="find-your-spot-link" data-tooltip tabindex="1" title="Find Your Spot">
-            <a tal:attributes="href link_func(find_your_spot)"><i class="fa fa-xs fa-calendar"></i></a>
-            </span>
-            </h2>
+            <div class="group-title align-justify">
+                <h2 tal:condition="len(grouped) > 1">
+                    ${group}
+                    <metal:b tal:condition="add_pagerefs" use-macro="layout.macros['pageref']" tal:define="pageref_id group" />
+                </h2>
+                <a tal:condition="find_your_spot" tal:attributes="href link_func(find_your_spot)" class="button hollow narrow find-your-spot-link"><i class="fa fa-calendar"></i> <span i18n:translate="">Find Your Spot</span></a>
+            </div>
             <ul class="forms-list more-list">
                 <tal:b tal:repeat="record grouped[group]">
                     <li tal:condition="record != find_your_spot">
