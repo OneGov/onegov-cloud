@@ -7,7 +7,8 @@ from icalendar import Calendar as vCalendar
 from icalendar import Event as vEvent
 from sedate import utcnow, to_timezone
 from sqlalchemy import (
-    Column, Boolean, SmallInteger, Enum, Text, Interval, ForeignKey, or_, and_)
+    Column, Boolean, SmallInteger, Enum, Text, Interval, ForeignKey, or_, and_,
+    select)
 from sqlalchemy.ext.hybrid import hybrid_property
 from sqlalchemy.orm import relationship, object_session
 from uuid import uuid4
@@ -31,6 +32,7 @@ if TYPE_CHECKING:
     from onegov.core.types import AppenderQuery
     from onegov.fsi.request import FsiRequest
     from sqlalchemy.orm import Query
+    from sqlalchemy.sql import ClauseElement
     from typing_extensions import Self, TypeAlias
     from wtforms.fields.choices import _Choice
     from .course import Course
@@ -129,9 +131,17 @@ class CourseEvent(Base, TimestampMixin, ORMSearchable):
     def title(self) -> str:
         return str(self)
 
-    @property
+    @hybrid_property
     def name(self) -> str:
         return self.course.name
+
+    @name.expression  # type:ignore
+    def name(cls) -> 'ClauseElement':
+        from .course import Course
+
+        return select([Course.name]).where(
+            Course.id == cls.course_id
+        ).as_scalar()
 
     @property
     def lead(self) -> str:
@@ -141,9 +151,17 @@ class CourseEvent(Base, TimestampMixin, ORMSearchable):
             f'{self.presenter_company}'
         )
 
-    @property
+    @hybrid_property
     def description(self) -> 'Markup':
         return self.course.description
+
+    @description.expression
+    def description(cls) -> 'ClauseElement':
+        from .course import Course
+
+        return select([Course.description]).where(
+            Course.id == cls.course_id
+        ).as_scalar()
 
     def __str__(self) -> str:
         start = to_timezone(

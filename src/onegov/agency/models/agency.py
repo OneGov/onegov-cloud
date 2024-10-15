@@ -49,7 +49,7 @@ class ExtendedAgency(Agency, AccessExtension, PublicationExtension):
 
     @es_public.expression  # ignore[no-redef]
     def es_public(cls) -> 'ClauseElement':
-        and_(
+        return and_(
             cls.access == 'public',
             cls.published == True
         )

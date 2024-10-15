@@ -1,4 +1,6 @@
 from functools import cached_property
+
+from sqlalchemy import func
 from sqlalchemy.ext.hybrid import hybrid_property
 
 from onegov.activity import Activity, ActivityCollection, Occasion
@@ -17,6 +19,8 @@ from typing import TYPE_CHECKING
 if TYPE_CHECKING:
     from collections.abc import Iterator, Sequence
     from markupsafe import Markup
+    from sqlalchemy.sql import ClauseElement
+
     from onegov.activity.models import PublicationRequest
     from onegov.feriennet.request import FeriennetRequest
 
@@ -42,7 +46,7 @@ class VacationActivity(Activity, CoordinatesExtension, SearchableContent):
     def es_skip(self) -> bool:
         return self.state == 'preview'
 
-    @property
+    @hybrid_property
     def organiser(self) -> list[str]:
         organiser: list[str] = [
             self.user.username,
@@ -72,6 +76,23 @@ class VacationActivity(Activity, CoordinatesExtension, SearchableContent):
                 organiser.append(value)
 
         return organiser
+
+    @organiser.expression  # ignore[no-redef]
+    def organizer(cls) -> 'ClauseElement':
+        return func.array([
+            cls.user.username,
+            cls.user.realname,
+            cls.user.data.get('organisation', ''),
+            cls.user.data.get('address', ''),
+            cls.user.data.get('zip_code', ''),
+            cls.user.data.get('place', ''),
+            cls.user.data.get('email', ''),
+            cls.user.data.get('phone', ''),
+            cls.user.data.get('emergency', ''),
+            cls.user.data.get('website', ''),
+            cls.user.data.get('bank_account', ''),
+            cls.user.data.get('bank_beneficiary', ''),
+        ])
 
     def ordered_tags(
         self,

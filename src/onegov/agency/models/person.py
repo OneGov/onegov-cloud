@@ -61,7 +61,7 @@ class ExtendedPerson(Person, AccessExtension, PublicationExtension):
         digits = org.agency_phone_internal_digits
         return number.replace(' ', '')[-digits:] if number and digits else ''
 
-    @phone_internal.expression
+    @phone_internal.expression  # type:ignore[no-redef]
     def phone_internal(cls) -> 'ClauseElement':
         org_subquery = (
             select([Organisation.agency_phone_internal_field,

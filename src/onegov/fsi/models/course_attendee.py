@@ -2,7 +2,7 @@ from sqlalchemy.ext.hybrid import hybrid_property
 
 from onegov.core.orm import Base
 from onegov.core.orm.types import UUID, JSON
-from sqlalchemy import Boolean
+from sqlalchemy import Boolean, case, and_
 from onegov.search import ORMSearchable
 from sedate import utcnow
 from sqlalchemy import Column, Text, ForeignKey, ARRAY, desc
@@ -16,6 +16,7 @@ if TYPE_CHECKING:
     from onegov.core.types import AppenderQuery
     from onegov.user import User
     from sqlalchemy.orm import Query
+    from sqlalchemy.sql import ClauseElement
     from .course_event import CourseEvent
     from .course_subscription import CourseSubscription
 
@@ -132,13 +133,22 @@ class CourseAttendee(Base, ORMSearchable):
         cascade='all, delete-orphan'
     )
 
-    @property
+    @hybrid_property
     def title(self) -> str:
         return ' '.join(
             part
             for part in (self.first_name, self.last_name)
             if part
         ) or self.email
+
+    @title.expression
+    def title(cls) -> 'ClauseElement':
+        has_name = and_(cls.first_name != None, cls.last_name != None)
+        return case([
+            (has_name, cls.first_name + ' ' + cls.last_name),
+            (cls.first_name != None, cls.first_name),
+            (cls.last_name != None, cls.last_name)
+        ], else_=cls._email)
 
     @property
     def lead(self) -> str | None:
@@ -156,7 +166,7 @@ class CourseAttendee(Base, ORMSearchable):
         assert self.user is not None
         return self.user.role
 
-    @property
+    @hybrid_property
     def email(self) -> str:
         """Needs a switch for external users"""
         if not self.user_id:
@@ -168,6 +178,12 @@ class CourseAttendee(Base, ORMSearchable):
             return self._email  # type:ignore[return-value]
         assert self.user is not None
         return self.user.username
+
+    @email.expression
+    def email(cls) -> 'ClauseElement':
+        return case([
+            (cls.user_id == None, cls._email)
+        ], else_=cls.user.username)
 
     @email.setter
     def email(self, value: str) -> None:

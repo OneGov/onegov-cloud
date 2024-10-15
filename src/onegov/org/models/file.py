@@ -255,7 +255,7 @@ class GeneralFile(File, SearchableFile):
 
     @es_public.expression  # ignore[no-redef]
     def es_public(cls) -> 'ClauseElement':
-        and_(
+        return and_(
             cls.published == True,
             cls.access == 'public'
         )
