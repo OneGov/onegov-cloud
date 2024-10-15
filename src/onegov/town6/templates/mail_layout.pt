@@ -199,6 +199,10 @@
         margin-top: 20px;
     }
 
+    hr.gray {
+        border: 1px solid #ddd;
+    }
+
     hr.large {
         Margin-top: 20px;
     }

@@ -126,7 +126,7 @@ def handle_login(
         'register_link': request.link(self, name='register'),
         'may_register': request.app.enable_user_registration,
         'button_text': _('Login'),
-        'providers': request.app.providers,
+        'providers': request.app.providers.values(),
         'provider_login': provider_login,
         'render_untrusted_markdown': render_untrusted_markdown,
         'title': _('Login to ${org}', mapping={
@@ -263,7 +263,7 @@ def do_logout_with_external_provider(
         return do_logout(self, request)
 
     if isinstance(self.app, UserApp) and user.source:
-        for provider in self.app.providers:
+        for provider in self.app.providers.values():
             if isinstance(provider, OauthProvider):
                 response = provider.do_logout(request, user, self.to)
                 # some providers may not need to redirect, in which

@@ -36,7 +36,8 @@ def app(postgres_dsn, redis_url):
 def configure_provider(app, metadata, primary=False):
     config = textwrap.dedent(f"""
         authentication_providers:
-          saml2:
+          idp:
+            provider: saml2
             tenants:
               "{app.application_id}":
                 primary: {'true' if primary else 'false'}
@@ -56,7 +57,7 @@ def test_saml2_configuration(app, idp_metadata):
 
     configure_provider(app, idp_metadata)
 
-    provider = app.providers[0]
+    provider = app.providers['idp']
     client = provider.tenants.client(app)
 
     # Test default configuration of the commented blocks
@@ -88,7 +89,7 @@ def test_saml2_configuration_multiple_providers(app, idp_metadata):
                 admins: 'ads'
                 editors: 'eds'
                 members: 'mems'
-          idp_sh:
+          idp_itsh:
             provider: saml2
             tenants:
               "{app.application_id}":
@@ -106,12 +107,12 @@ def test_saml2_configuration_multiple_providers(app, idp_metadata):
 
     assert len(app.providers) == 2
 
-    provider1 = app.providers[0]
+    provider1 = app.providers['idp_shpol']
     assert provider1.metadata.name == 'saml2'
     client1 = provider1.tenants.client(app)
     assert client1.button_text == 'Login with SHPOL'
 
-    provider2 = app.providers[1]
+    provider2 = app.providers['idp_itsh']
     assert provider2.metadata.name == 'saml2'
     client2 = provider2.tenants.client(app)
     assert client2.button_text == 'Login with SH'
@@ -121,7 +122,7 @@ def test_saml2_configuration_primary(app, idp_metadata):
 
     configure_provider(app, idp_metadata, primary=True)
 
-    provider = app.providers[0]
+    provider = app.providers['idp']
     client = provider.tenants.client(app)
 
     # Test default configuration of the commented blocks
@@ -142,14 +143,14 @@ def test_saml2_authenticate_request(app, idp_metadata):
 
     configure_provider(app, idp_metadata)
 
-    provider = app.providers[0]
+    provider = app.providers['idp']
     provider.to = '/'
 
     # test authenticate request (requires xmlsec1 to be installed)
     request = Bunch(
         app=app,
         application_url='http://example.com/',
-        url='http://example.com/auth/provider/saml2',
+        url='http://example.com/auth/provider/idp',
         class_link=lambda cls, args, name:
         f'http://example.com/auth/provider/{args["name"]}/{name}')
     response = provider.authenticate_request(request)

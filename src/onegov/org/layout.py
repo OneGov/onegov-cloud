@@ -1284,7 +1284,8 @@ class SurveySubmissionWindowLayout(DefaultLayout):
                                 'Do you really want to delete '
                                 'this submission window?'
                             ),
-                            _('Existing submissions will be disassociated.'),
+                            _('Submissions associated with this submission '
+                              'window will be deleted as well.'),
                             _('Delete submission window'),
                             _('Cancel')
                         ),
@@ -3346,7 +3347,7 @@ class DirectoryEntryCollectionLayout(DefaultLayout, DirectoryEntryMixin):
         classes = []
         if filter:
             filter_data[filter] = True
-            if toggle_active and filter in self.request.params:
+            if toggle_active and self.request.params.get(filter) == '1':
                 classes.append('active')
 
         return Link(

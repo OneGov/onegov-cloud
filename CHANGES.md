@@ -1,8 +1,63 @@
 # Changes
 
+## 2024.50
+
+`2024-10-11` | [3f9655c562...eb0d0926ed](https://github.com/OneGov/onegov-cloud/compare/3f9655c562^...eb0d0926ed)
+
+### Fsi
+
+##### Survey improvements
+
+-    Exports can be made for single or multiple submission windows
+-    Submissions can now be deleted
+-    Changes to the survey are now prevented if there are any submissions
+-    Once the submission is made it is automatically confirmed, but can still be edited
+
+`Feature` | [OGC-1821](https://linear.app/onegovcloud/issue/OGC-1821) | [eb0d0926ed](https://github.com/onegov/onegov-cloud/commit/eb0d0926edc51eb841747b8f31c16861628bc843)
+
+### Newsletter
+
+##### Move update subscription from edit bar to a link
+
+`Feature` | [NONE](#NONE) | [7a76ef78e9](https://github.com/onegov/onegov-cloud/commit/7a76ef78e976d3aac3247179ab5cf16c152ac0ce)
+
+### Org
+
+##### Make editing rule for allocations possible.
+
+`Feature` | [OGC-1397](https://linear.app/onegovcloud/issue/OGC-1397) | [3f9655c562](https://github.com/onegov/onegov-cloud/commit/3f9655c5627815d44a323795329c8c26114851b8)
+
+##### Pins ancestor choices in contact inheritance select
+
+`Feature` | [OGC-1853](https://linear.app/onegovcloud/issue/OGC-1853) | [5e97e3ee40](https://github.com/onegov/onegov-cloud/commit/5e97e3ee40cb61ecc22864cfc597262aa78c1d29)
+
+##### Fixes regression in `login.pt` due to different providers shape
+
+`Bugfix` | [5ab94875f5](https://github.com/onegov/onegov-cloud/commit/5ab94875f515ef8b36d62394c474f5863b3e8db6)
+
+### Swissvotes
+
+##### Update column name
+
+`Bugfix` | [SWI-50](https://linear.app/swissvotes/issue/SWI-50) | [3b733fb1ad](https://github.com/onegov/onegov-cloud/commit/3b733fb1adfe54add16c829bd4951b859de3c292)
+
+### Town6
+
+##### Restyling of newsletter
+
+Some style improvements of the newsletter and added images of events if there are any
+
+`Feature` | [OGC-1788](https://linear.app/onegovcloud/issue/OGC-1788) | [981242fcfa](https://github.com/onegov/onegov-cloud/commit/981242fcfa871e767bdfaa068bb300edc4d49939)
+
+### User
+
+##### Actually allows multiple providers of the same type to coexist
+
+`Bugfix` | [OGC-1750](https://linear.app/onegovcloud/issue/OGC-1750) | [59474454b8](https://github.com/onegov/onegov-cloud/commit/59474454b89a4ad3ac5cc7c1bc9c2c66a11d7285)
+
 ## 2024.49
 
-`2024-10-07` | [4b2186bb38...3cefa442f2](https://github.com/OneGov/onegov-cloud/compare/4b2186bb38^...3cefa442f2)
+`2024-10-07` | [4b2186bb38...1b5993f16a](https://github.com/OneGov/onegov-cloud/compare/4b2186bb38^...1b5993f16a)
 
 ### Feriennet
 
@@ -2098,55 +2153,4 @@ Use different script for fixed sidebar on scroll.
 ##### Extend feature 'western name order' to resources and default variable in template
 
 `Bugfix` | [OGC-1383](https://linear.app/onegovcloud/issue/OGC-1383) | [d67dbc756f](https://github.com/onegov/onegov-cloud/commit/d67dbc756f14d0756ca52c4af453191c64b8ce54)
-
-## 2023.63
-
-`2023-12-22` | [ceb6766745...e75dab14a2](https://github.com/OneGov/onegov-cloud/compare/ceb6766745^...e75dab14a2)
-
-### Directory
-
-##### Avoids `AttributeError` on entry with multiple files
-
-`Bugfix` | [OGC-1378](https://linear.app/onegovcloud/issue/OGC-1378) | [ff6bb2dbf8](https://github.com/onegov/onegov-cloud/commit/ff6bb2dbf8ad60ebf4b39ec1dafcaaf76aa56bf3)
-
-### Form
-
-##### Sorts files by name when displaying a `MultipleUploadField`
-
-`Feature` | [OGC-1392](https://linear.app/onegovcloud/issue/OGC-1392) | [682460c455](https://github.com/onegov/onegov-cloud/commit/682460c45597b4a0c8970501d60351762caea38f)
-
-### Org
-
-##### Show QRCode in directory entries
-
-`Feature` | [OGC-1333](https://linear.app/onegovcloud/issue/OGC-1333) | [b335d3b9a4](https://github.com/onegov/onegov-cloud/commit/b335d3b9a43e6e8f71442da6d7e25490bb34026c)
-
-##### Restrict mTAN access to numbers from CH, AT, DE, FR, IT, LI
-
-`Feature` | [OGC-1391](https://linear.app/onegovcloud/issue/OGC-1391) | [31a3dd260b](https://github.com/onegov/onegov-cloud/commit/31a3dd260bd7fb57d158ab1d11f1bdd5ed998779)
-
-##### Adds minimal mTAN reporting for billing purposes
-
-This also increases the data retention period on TAN objects
-
-`Feature` | [OGC-1340](https://linear.app/onegovcloud/issue/OGC-1340) | [bb51ef4c07](https://github.com/onegov/onegov-cloud/commit/bb51ef4c07fbe2a7e50b25d914f2cb94883509b5)
-
-##### Fix marker visibility in directories for new access types
-
-`Bugfix` | [OGC-1395](https://linear.app/onegovcloud/issue/OGC-1395) | [edf7be212d](https://github.com/onegov/onegov-cloud/commit/edf7be212db5ef1fc6a46e5f3d2b63be569a998a)
-
-### Topics
-
-##### For each topic, one can choose between 'eastern' and 'western' name order for listed persons
-
-eastern order: family name, given name
-western order: given name, family name
-
-`Feature` | [OGC-1383](https://linear.app/onegovcloud/issue/OGC-1383) | [3b3b08f5ce](https://github.com/onegov/onegov-cloud/commit/3b3b08f5ced9d8e142ef18174f32376a69dfc2f0)
-
-### Town
-
-##### Submissions are now ordered by name
-
-`Feature` | [OGC-1345](https://linear.app/onegovcloud/issue/OGC-1345) | [d6b4438fe0](https://github.com/onegov/onegov-cloud/commit/d6b4438fe038d16a980bee7973c7c566e67cf14e)
 

@@ -1,7 +1,7 @@
 # This file was generated from translations.town6.xlsx
 msgid ""
 msgstr ""
-"POT-Creation-Date: 2024-09-16 11:16+0200\n"
+"POT-Creation-Date: 2024-09-30 10:20+0200\n"
 "PO-Revision-Date: 2021-09-27 16:02+0200\n"
 "Language: it_CH\n"
 "Content-Type: text/plain; charset=UTF-8\n"
@@ -353,11 +353,8 @@ msgstr "Ulteriori informazioni"
 msgid "More"
 msgstr "Più"
 
-msgid "Propose entry"
-msgstr "Proponi un elemento"
-
-msgid "Something missing? Propose a new entry."
-msgstr "Manca qualcosa? Proponi un nuovo elemento."
+msgid "Publication"
+msgstr "Pubblicazione"
 
 msgid "Documents"
 msgstr "Documenti"
@@ -367,6 +364,9 @@ msgstr "Azioni"
 
 msgid "Get notifications on new entries"
 msgstr "Ricevi notifiche su nuovi elementi"
+
+msgid "Propose a new entry"
+msgstr "Proporre un nuovo elemento"
 
 msgid "Internal Notes"
 msgstr "Note interne"
@@ -378,11 +378,8 @@ msgstr "Collegamento esterno"
 msgid "More information"
 msgstr "Conferma"
 
-msgid "Change Request"
-msgstr "Richiesta di modifica"
-
-msgid "Found an error? Propose a change to this entry."
-msgstr "Trovato un errore? Proponi una modifica a questo elemento."
+msgid "Propose a change to this entry"
+msgstr "Suggerisci una modifica per questa voce"
 
 msgid ""
 "Subscribers may always unsubscribe themselves through a link shown at the "
@@ -637,17 +634,20 @@ msgstr ""
 msgid "Map"
 msgstr "Mappa"
 
-msgid "Links"
-msgstr "Collegamenti"
-
-msgid "More news"
-msgstr "Altre notizie"
+msgid "Other Entries"
+msgstr "Altri elementi"
 
 msgid "Previous Entry"
 msgstr "Voce precedente"
 
 msgid "Next Entry"
 msgstr "Prossima voce"
+
+msgid "Links"
+msgstr "Collegamenti"
+
+msgid "More news"
+msgstr "Altre notizie"
 
 msgid "Total Amount"
 msgstr "Importo totale"
@@ -940,9 +940,6 @@ msgstr "Sarà pubblicato fino a:"
 
 msgid "Publication end date:"
 msgstr "Data di fine pubblicazione:"
-
-msgid "Publication"
-msgstr "Pubblicazione"
 
 msgid "Not a publication"
 msgstr "Non una pubblicazione"
@@ -1858,6 +1855,13 @@ msgstr "Campi"
 msgid "Submission Windows"
 msgstr "Finestre di invio"
 
+msgid ""
+"Thank you for filling out this survey. If there's anything you'd like to "
+"change, click on the \"Edit\"-Button below."
+msgstr ""
+"Grazie per aver compilato questo sondaggio. Se c'è qualcosa che desideri "
+"cambiare, fai clic su \"Modifica\" qui sotto."
+
 msgid "No surveys defined yet."
 msgstr "Ancora nessun sondaggio definito."
 
@@ -2182,6 +2186,18 @@ msgstr ""
 
 msgid "New Note"
 msgstr "Nuova nota"
+
+#~ msgid "Change Request"
+#~ msgstr "Richiesta di modifica"
+
+#~ msgid "Found an error? Propose a change to this entry."
+#~ msgstr "Trovato un errore? Proponi una modifica a questo elemento."
+
+#~ msgid "Propose entry"
+#~ msgstr "Proponi un elemento"
+
+#~ msgid "Something missing? Propose a new entry."
+#~ msgstr "Manca qualcosa? Proponi un nuovo elemento."
 
 #~ msgid "Newsletter Subscription"
 #~ msgstr "Abbonamento alla newsletter "
