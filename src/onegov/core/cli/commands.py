@@ -190,7 +190,7 @@ class SmsEventHandler(PatternMatchingEventHandler):
         )
 
     def on_moved(self, event: 'FileSystemEvent') -> None:
-        dest_path = os.path.abspath(event.dest_path)
+        dest_path = os.path.abspath(event.dest_path)  # type:ignore[type-var]
         assert isinstance(dest_path, str)
         for qp in self.queue_processors:
             # only one queue processor should match
@@ -208,7 +208,7 @@ class SmsEventHandler(PatternMatchingEventHandler):
     #       moved. But we should also trigger when new files are created just
     #       in case this ever changes.
     def on_created(self, event: 'FileSystemEvent') -> None:
-        src_path = os.path.abspath(event.src_path)
+        src_path = os.path.abspath(event.src_path)  # type:ignore[type-var]
         assert isinstance(src_path, str)
         for qp in self.queue_processors:
             # only one queue processor should match
