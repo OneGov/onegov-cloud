@@ -190,7 +190,7 @@ class SmsEventHandler(PatternMatchingEventHandler):
         )
 
     def on_moved(self, event: 'FileSystemEvent') -> None:
-        dest_path = os.path.abspath(event.dest_path)
+        dest_path = os.path.abspath(str(event.dest_path))
         assert isinstance(dest_path, str)
         for qp in self.queue_processors:
             # only one queue processor should match
@@ -208,7 +208,7 @@ class SmsEventHandler(PatternMatchingEventHandler):
     #       moved. But we should also trigger when new files are created just
     #       in case this ever changes.
     def on_created(self, event: 'FileSystemEvent') -> None:
-        src_path = os.path.abspath(event.src_path)
+        src_path = os.path.abspath(str(event.src_path))
         assert isinstance(src_path, str)
         for qp in self.queue_processors:
             # only one queue processor should match
@@ -700,7 +700,7 @@ class EnhancedInteractiveConsole(InteractiveConsole):
     - horizontal movement (e.g. arrow keys)
     - history (e.g. up and down keys)
     - very basic tab completion
-"""
+    """
 
     def __init__(self, locals: dict[str, Any] | None = None):
         super().__init__(locals)

@@ -6,7 +6,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: OneGov Cloud 1.0\n"
-"POT-Creation-Date: 2024-09-24 09:04+0200\n"
+"POT-Creation-Date: 2024-09-30 10:20+0200\n"
 "PO-Revision-Date: 2021-03-03 16:24+0100\n"
 "Last-Translator: Lukas Burkhard <lukas.burkhard@seantis.ch>\n"
 "Language-Team: German\n"
@@ -357,12 +357,8 @@ msgstr "Weitere Informationen"
 msgid "More"
 msgstr "Mehr"
 
-msgid "Propose entry"
-msgstr "Eintrag vorschlagen"
-
-msgid "Something missing? Propose a new entry."
-msgstr ""
-"Fehlt ein Eintrag im Verzeichnis? Schlagen Sie einen neuen Eintrag vor."
+msgid "Publication"
+msgstr "Publikation"
 
 msgid "Documents"
 msgstr "Dokumente"
@@ -373,6 +369,9 @@ msgstr "Aktionen"
 msgid "Get notifications on new entries"
 msgstr "Benachrichtigungen bei neuen Einträgen erhalten"
 
+msgid "Propose a new entry"
+msgstr "Neuen Eintrag vorschlagen"
+
 msgid "Internal Notes"
 msgstr "Interne Notizen"
 
@@ -382,11 +381,8 @@ msgstr "Externe Verknüpfung"
 msgid "More information"
 msgstr "Weiterführende Informationen"
 
-msgid "Change Request"
-msgstr "Änderung vorschlagen"
-
-msgid "Found an error? Propose a change to this entry."
-msgstr "Haben Sie einen Fehler gefunden? Schlagen Sie eine Änderung vor."
+msgid "Propose a change to this entry"
+msgstr "Änderung für diesen Eintrag vorschlagen"
 
 msgid ""
 "Subscribers may always unsubscribe themselves through a link shown at the "
@@ -644,17 +640,20 @@ msgstr ""
 msgid "Map"
 msgstr "Karte"
 
-msgid "Links"
-msgstr "Links"
-
-msgid "More news"
-msgstr "Weitere News"
+msgid "Other Entries"
+msgstr "Weitere Einträge"
 
 msgid "Previous Entry"
 msgstr "Vorheriger Eintrag"
 
 msgid "Next Entry"
 msgstr "Nächster Eintrag"
+
+msgid "Links"
+msgstr "Links"
+
+msgid "More news"
+msgstr "Weitere News"
 
 msgid "Total Amount"
 msgstr "Totalbetrag"
@@ -944,9 +943,6 @@ msgstr "Wird publiziert bis:"
 
 msgid "Publication end date:"
 msgstr "Enddatum der Publikation:"
-
-msgid "Publication"
-msgstr "Publikation"
 
 msgid "Not a publication"
 msgstr "keine Publikation"
@@ -1559,6 +1555,13 @@ msgstr ""
 "Der Newsletter ist deaktiviert. Sie können diese Seite nur sehen, weil Sie "
 "eingeloggt sind."
 
+msgid "Sign up to our newsletter to always stay up to date:"
+msgstr ""
+"Abonnieren Sie unseren Newsletter um immer auf dem Laufenden zu bleiben:"
+
+msgid "To update your subscription, please use this ${Link}"
+msgstr "Um Ihr Abonnement zu aktualisieren, verwenden Sie bitte diesen ${Link}"
+
 msgid "There are currently ${count} recipients registered."
 msgstr "Zur Zeit sind ${count} Abonnenten registriert."
 
@@ -1856,6 +1859,13 @@ msgstr "Felder"
 
 msgid "Submission Windows"
 msgstr "Befragungszeiträume"
+
+msgid ""
+"Thank you for filling out this survey. If there's anything you'd like to "
+"change, click on the \"Edit\"-Button below."
+msgstr ""
+"Vielen Dank für Ihre Teilnahme an dieser Umfrage. Falls Sie noch etwas "
+"ändern möchten, klicken Sie auf den \"Bearbeiten\"-Button unten."
 
 msgid "No surveys defined yet."
 msgstr "Es wurden noch keine Umfragen definiert."
@@ -2177,6 +2187,19 @@ msgstr ""
 
 msgid "New Note"
 msgstr "Neue Notiz"
+
+#~ msgid "Change Request"
+#~ msgstr "Änderung vorschlagen"
+
+#~ msgid "Found an error? Propose a change to this entry."
+#~ msgstr "Haben Sie einen Fehler gefunden? Schlagen Sie eine Änderung vor."
+
+#~ msgid "Propose entry"
+#~ msgstr "Eintrag vorschlagen"
+
+#~ msgid "Something missing? Propose a new entry."
+#~ msgstr ""
+#~ "Fehlt ein Eintrag im Verzeichnis? Schlagen Sie einen neuen Eintrag vor."
 
 #~ msgid "Newsletter Subscription"
 #~ msgstr "Newsletter-Abonnement"

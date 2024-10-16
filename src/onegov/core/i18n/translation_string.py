@@ -8,9 +8,11 @@ from typing import Any
 from typing import Literal
 from typing import TYPE_CHECKING
 if TYPE_CHECKING:
-    from markupsafe import HasHTML
     from typing import Protocol
     from typing import Self
+
+    class HasHTML(Protocol):
+        def __html__(self, /) -> str: ...
 
     class TStrCallable(Protocol):
         @overload
@@ -142,7 +144,7 @@ class TranslationMarkup(TranslationString):
         return self.interpolate()
 
 
-def TranslationStringFactory(factory_domain: str) -> 'TStrCallable':
+def TranslationStringFactory(factory_domain: str) -> 'TStrCallable':  # noqa: N802
     """
     Creates a TranslationMarkup for Markup and a TranslationString
     otherwise.

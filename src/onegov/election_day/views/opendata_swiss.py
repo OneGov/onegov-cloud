@@ -322,12 +322,8 @@ def view_rdf(self: Principal, request: 'ElectionDayRequest') -> bytes:
             sub(dist, 'dcat:downloadURL', {'rdf:resource': url})
 
             # Legal
-            license = sub(
-                dist, 'dct:license',
-                {'rdf:about': 'http://dcat-ap.ch/vocabulary/licenses/terms_by'}
-            )
-            sub(license, 'rdf:type', {
-                'rdf:resource': 'http://purl.org/dc/terms/RightsStatement'
+            sub(dist, 'dct:license', {
+                'rdf:resource': 'http://dcat-ap.ch/vocabulary/licenses/terms_by'
             })
 
             # Media Type

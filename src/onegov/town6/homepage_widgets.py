@@ -548,7 +548,7 @@ class RSSItem(NamedTuple):
     title: str
     description: str
     guid: str
-    pubDate: datetime | None
+    pubDate: datetime | None  # noqa: N815
 
 
 class RSSChannel(NamedTuple):

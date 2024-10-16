@@ -2,7 +2,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: \n"
-"POT-Creation-Date: 2024-08-28 15:13+0200\n"
+"POT-Creation-Date: 2024-10-08 08:58+0200\n"
 "PO-Revision-Date: 2021-01-07 09:11+0100\n"
 "Last-Translator: Marc Sommerhalder <marc.sommerhalder@seantis.ch>\n"
 "Language-Team: \n"
@@ -2001,9 +2001,6 @@ msgstr "Display the map"
 msgid "Full analysis of VOTO post-vote poll results"
 msgstr "Full analysis of VOTO post-vote poll results"
 
-msgid "Technical report"
-msgstr "Technical report"
-
 msgid "Cockpit with selected VOX results"
 msgstr "Cockpit with selected VOX results"
 
@@ -2249,3 +2246,6 @@ msgstr "All votes have been deleted"
 
 msgid "Do you really want to delete all votes?!"
 msgstr "Do you really want to delete all votes?!"
+
+#~ msgid "Technical report"
+#~ msgstr "Technical report"

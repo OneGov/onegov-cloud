@@ -3,6 +3,8 @@ import pytest
 from datetime import date, datetime, time, timedelta
 from dateutil.rrule import MO, WE
 from onegov.core.utils import Bunch
+from onegov.directory.collections.directory import DirectoryCollection
+from onegov.directory import DirectoryConfiguration
 from onegov.event import Event
 from onegov.form import FormDefinition
 from onegov.org.forms import DaypassAllocationForm
@@ -603,15 +605,25 @@ def test_user_group_form(session):
     user_b.logout_all_sessions = MagicMock()
     user_c.logout_all_sessions = MagicMock()
 
-    session.add(
-        FormDefinition(
-            title='A-1',
-            name='a',
-            definition='# A',
-            order=0,
-            checksum='x'
+    formdefinition = FormDefinition(
+        title='A-1',
+        name='a',
+        definition='# A',
+        order=0,
+        checksum='x'
+    )
+
+    directories = DirectoryCollection(session, type='extended')
+    directory = directories.add(
+        title="Trainers",
+        structure="Name *= ___",
+        configuration=DirectoryConfiguration(
+            title="[name]",
+            order=['name']
         )
     )
+
+    session.add_all((formdefinition, directory))
     session.flush()
 
     request = Bunch(
@@ -631,6 +643,8 @@ def test_user_group_form(session):
     assert ('FRM-', 'FRM') in form.ticket_permissions.choices
     assert ('FRM-A-1', 'FRM: A-1') in form.ticket_permissions.choices
     assert ('PER-', 'PER') in form.ticket_permissions.choices
+    assert ('DIR-', 'DIR') in form.ticket_permissions.choices
+    assert ('DIR-Trainers', 'DIR: Trainers') in form.ticket_permissions.choices
 
     # apply / update
     groups = UserGroupCollection(session)

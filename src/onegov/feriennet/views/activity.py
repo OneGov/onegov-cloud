@@ -272,7 +272,7 @@ def filter_weekdays(
             text=WEEKDAYS[weekday],
             active=weekday in activity.filter.weekdays,
             url=request.link(activity.for_filter(weekday=weekday))
-        ) for weekday in range(0, 7)
+        ) for weekday in range(7)
     )
 
 
@@ -283,7 +283,7 @@ def filter_available(
 
     # NOTE: We're helping out mypy's inference here, since it won't
     #       infer the second tuple element as a literal
-    AVAILABILITIES: tuple[
+    availabilities: tuple[
         tuple[str, Literal['none', 'few', 'many']],
         ...
     ] = (
@@ -296,7 +296,7 @@ def filter_available(
             text=request.translate(text),
             active=available in activity.filter.available,
             url=request.link(activity.for_filter(available=available))
-        ) for text, available in AVAILABILITIES
+        ) for text, available in availabilities
     )
 
 
@@ -453,40 +453,31 @@ def exclude_filtered_dates(
     dates: 'Iterable[OccasionDate]'
 ) -> list['OccasionDate']:
 
-    # FIXME: We should be able to do this in a single pass, rather than
-    #        three separate passes
-    result = []
     today = date.today()
-    for dt in dates:
-        if dt.start.date() > today:
-            result.append(dt)
+    return [
+        dt
+        for dt in dates
 
-    dates = result
-    result = []
+        # only include future date ranges
+        if dt.start.date() > today
 
-    if not activities.filter.dateranges:
-        result = dates
-    else:
-        for dt in dates:
-            for s, e in activities.filter.dateranges:
-                if overlaps(dt.start.date(), dt.end.date(), s, e):
-                    result.append(dt)
-                    break
+        # .. that overlap with the selected date ranges
+        #    unless we didn't select any date ranges
+        if not activities.filter.dateranges or any(
+            overlaps(dt.start.date(), dt.end.date(), s, e)
+            for s, e in activities.filter.dateranges
+        )
 
-    dates = result
-    result = []
-
-    if not activities.filter.weekdays:
-        result = dates
-    else:
-        for dt in dates:
-            for day in dtrange(dt.start, dt.end):
-                if day.weekday() not in activities.filter.weekdays:
-                    break
-            else:
-                result.append(dt)
-
-    return result
+        # .. and don't contain a weekday that wasn't selected
+        #    unless we didn't select any weekdays
+        if not activities.filter.weekdays or all(
+            day.weekday() in activities.filter.weekdays
+            # NOTE: This is technically quite inefficient for date ranges
+            #       that are longer than a week, but realistically most
+            #       activities will be much shorter than that.
+            for day in dtrange(dt.start, dt.end)
+        )
+    ]
 
 
 @FeriennetApp.html(
@@ -946,10 +937,11 @@ def edit_activity(
             if ticket:
 
                 # ..note the change
-                ActivityMessage.create(ticket, request, 'reassign', **{
-                    'old_username': old_username,
-                    'new_username': new_username,
-                })
+                ActivityMessage.create(
+                    ticket, request, 'reassign',
+                    old_username=old_username,
+                    new_username=new_username
+                )
 
         request.success(_('Your changes were saved'))
 

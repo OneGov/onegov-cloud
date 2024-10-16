@@ -72,7 +72,7 @@ def configure_provider(app, primary=False):
 def test_msal_configuration(app):
     configure_provider(app)
 
-    provider = app.providers[0]
+    provider = app.providers['msal']
     client = provider.tenants.client(app)
     assert not client.validate_authority
 
@@ -94,7 +94,7 @@ def test_msal_configuration(app):
 def test_msal_configuration_primary(app):
     configure_provider(app, primary=True)
 
-    provider = app.providers[0]
+    provider = app.providers['msal']
     client = provider.tenants.client(app)
     assert not client.validate_authority
 

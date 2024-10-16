@@ -60,6 +60,7 @@ class DepotApp(App):
         yubikey_client_id: str | None
         yubikey_secret_key: str | None
         session_manager: SessionManager
+
         @cached_property
         def session(self) -> Callable[[], Session]: ...
         @property

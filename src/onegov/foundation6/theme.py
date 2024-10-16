@@ -129,7 +129,7 @@ class BaseTheme(CoreTheme):
     @property
     def foundation_grid(self) -> str:
         """Defines the settings that are grid related as in the mixin
-                foundation_everything. """
+        foundation_everything. """
         return textwrap.dedent("""
         @if not $flex {
           @include foundation-grid;

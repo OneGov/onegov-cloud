@@ -16,7 +16,7 @@ from onegov.org.models.ticket import ticket_submitter
 from onegov.org.views.message import view_messages_feed
 from onegov.pdf import Pdf, page_fn_header
 from onegov.qrcode import QrCode
-from html5lib.filters.whitespace import Filter as whitespace_filter
+from html5lib.filters.whitespace import Filter as WhitespaceFilter
 from reportlab.lib import colors
 from reportlab.lib.units import cm
 from reportlab.lib.utils import ImageReader
@@ -230,7 +230,7 @@ class TicketPdf(Pdf):
         tags += ticket_summary_tags
 
         attributes: dict[str, list[str]] = {}
-        filters: list[_Filter] = [whitespace_filter]
+        filters: list[_Filter] = [WhitespaceFilter]
 
         if linkify:
             link_color = self.link_color
@@ -410,7 +410,7 @@ class TicketPdf(Pdf):
         tags += ticket_summary_tags
 
         attributes = {}
-        filters = [whitespace_filter]
+        filters = [WhitespaceFilter]
         attributes['div'] = ['class']
 
         cleaner = Cleaner(

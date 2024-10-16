@@ -1,12 +1,12 @@
-import re
-
 import click
+import re
 import transaction
 
 from onegov.core.cli import command_group
 from onegov.translator_directory.collections.translator import (
     TranslatorCollection)
 from onegov.translator_directory import log
+from onegov.translator_directory.models.language import Language
 from onegov.translator_directory.models.translator import Translator
 from onegov.translator_directory.utils import (
     update_drive_distances, geocode_translator_addresses, country_code_to_name)
@@ -162,19 +162,20 @@ def fetch_users_cli(
     skip_deactivate: bool,
     dry_run: bool
 ) -> 'Callable[[TranslatorAppRequest, TranslatorDirectoryApp], None]':
-    """ Updates the list of users by fetching matching users
+    r""" Updates the list of users by fetching matching users
     from a remote LDAP server.
 
     This is currently highly specific for the Canton of Zug and therefore most
     values are hard-coded.
 
     Example:
+    .. code-block:: bash
 
-        onegov-translator --select /translator_directory/zug fetch-users \\
-            --ldap-server 'ldaps://1.2.3.4' \\
-            --ldap-username 'foo' \\
-            --ldap-password 'bar' \\
-            --admin-group 'ou=Admins' \\
+        onegov-translator --select /translator_directory/zug fetch-users \
+            --ldap-server 'ldaps://1.2.3.4' \
+            --ldap-username 'foo' \
+            --ldap-password 'bar' \
+            --admin-group 'ou=Admins' \
             --editor-group 'ou=Editors'
 
     """
@@ -234,7 +235,7 @@ def drive_distances_cli(
         app: 'TranslatorDirectoryApp'
     ) -> None:
 
-        tot, routes_found, distance_changed, no_routes, tolerance_failed = (
+        tot, routes_found, _distance_changed, no_routes, tolerance_failed = (
             update_drive_distances(
                 request,
                 only_empty,
@@ -340,12 +341,13 @@ def update_accounts_cli(
 def migrate_nationalities(
     dry_run: bool
 ) -> 'Callable[[TranslatorAppRequest, TranslatorDirectoryApp], None]':
-    """ Migrates the nationalities column into content column.
+    r""" Migrates the nationalities column into content column.
 
     Example:
-        onegov-translator
-            --select /translator_directory/zug
-                migrate-nationalities --dry-run
+    .. code-block:: bash
+
+        onegov-translator --select /translator_directory/zug \
+            migrate-nationalities --dry-run
 
     """
 
@@ -420,3 +422,233 @@ def migrate_nationalities(
             request.session.flush()
 
     return do_migrate_nationalities
+
+
+LANGUAGES = (
+    'Afrikaans',
+    'Albanisch',
+    'Amharisch',
+    'Anyin',
+    'Arabisch',
+    'Arabisch (Dialekte)',
+    'Arabisch (Hocharabisch)',
+    'Arabisch (Masri)',
+    'Arabisch (Nahost)',
+    'Aramäisch',
+    'Armenisch',
+    'Aserbaidschanisch',
+    'Badini',
+    'Bangla',
+    'Bengalisch',
+    'Bilen',
+    'Bosnisch',
+    'Bulgarisch',
+    'Chinesisch',
+    'Chinesisch (Hokkien)',
+    'Chinesisch (Mandarin)',
+    'Dänisch',
+    'Dari',
+    'Dari (Afghanistan)',
+    'Deutsch',
+    'Diola',
+    'Edo',
+    'Englisch',
+    'Ewe',
+    'Farsi',
+    'Farsi (Persisch)',
+    'Farsi Persisch (Afghanistan Iran)',
+    'Flämisch',
+    'Französisch',
+    'Friesisch',
+    'Galicisch',
+    'Gebärdensprache',
+    'Georgisch',
+    'Griechisch',
+    'Gujarati',
+    'Hebräisch',
+    'Hindi',
+    'Ibo',
+    'Igbo',
+    'Ijaw',
+    'Indonesisch',
+    'Irakisch',
+    'Iranisch',
+    'Italienisch',
+    'Italienisch (Dialekte Süditalien)',
+    'Itsekiri',
+    'Japanisch',
+    'Kabyé',
+    'Kalabari',
+    'Kantonesisch',
+    'Kasachisch',
+    'Keine schriftlichen Übersetzungen',
+    'Keine Verdolmetschung',
+    'Kotokoli',
+    'Kreolisch',
+    'Kroatisch',
+    'Kurdisch',
+    'Kurdisch (Dialekte)',
+    'Kurmanci',
+    'Kyrillisch (Serbien)',
+    'Lettisch',
+    'Litauisch',
+    'Mandarin',
+    'Mandinka',
+    'Marathi',
+    'Marokkanisch',
+    'Mazedonisch',
+    'Mina',
+    'Moldauisch',
+    'Mongolisch',
+    'Montenegrinisch',
+    'Niederländisch',
+    'Oromo',
+    'Pakistanisch',
+    'Panjabi',
+    'Paschto (Afghanistan, Pakistan)',
+    'Paschtu',
+    'Patois',
+    'Persisch',
+    'Pidgin',
+    'Pidgin-Englisch',
+    'Pidgin-Französisch',
+    'Pidgin-Nigerianisch',
+    'Pilipino',
+    'Polnisch',
+    'Portugiesisch',
+    'Portugiesisch (Brasil)',
+    'Punjabi',
+    'Rumänisch',
+    'Russisch',
+    'Schwedisch',
+    'Serbisch',
+    'Serbokroatisch',
+    'Shandong-Dialekt',
+    'Shanghai-Dialekt',
+    'Singhalesisch',
+    'Slowakisch',
+    'Somali',
+    'Sorani',
+    'Spanisch',
+    'Suaheli',
+    'Tadschikisch',
+    'Tagalog',
+    'Tamil',
+    'Tamilisch',
+    'Telugu',
+    'Tem',
+    'Thailändisch',
+    'Tibetisch',
+    'Tigrinya',
+    'Tschechisch',
+    'Türkisch',
+    'Türkisch (Dialekte)',
+    'Turkmenisch',
+    'Uigurisch',
+    'Ukrainisch',
+    'Ungarisch',
+    'Urdu',
+    'Usbekisch',
+    'VG ZG',
+    'Vietnamesisch',
+    'Weissrussisch',
+    'Wolof',
+    'Yoruba',
+    'Yue-Chinesisch'
+)
+
+
+@cli.command(name='create-languages', context_settings={'singular': True})
+@click.option('--dry-run', is_flag=True, default=False)
+def create_languages(
+        dry_run: bool
+) -> 'Callable[[TranslatorAppRequest, TranslatorDirectoryApp], None]':
+    """
+    Create languages for the selected translator schema. Languages get
+    created if they don't exist to prevent id changes.
+
+    This command is useful when new languages were added to the LANGUAGES list.
+
+    NOTE: No language will be deleted. If a language is not in the LANGUAGES
+    list the script will print a message.
+
+    Example:
+        onegov-translator --select /translator_directory/schaffhausen
+        create-languages --dry-run
+    """
+
+    def do_create_languages(
+        request: 'TranslatorAppRequest',
+        app: 'TranslatorDirectoryApp'
+    ) -> None:
+        # Compare existing languages
+        existing = request.session.query(Language).all()
+        existing_lang_names = [lang.name for lang in existing]
+        for language in existing:
+            if language.name not in LANGUAGES:
+                click.secho(f"Language '{language.name}' is "
+                            f'unknown. You may delete it if not in use from '
+                            f"'/languages'", fg='yellow')
+
+        # create languages if not existing (to prevent id changes)
+        add_count = 0
+        for language_name in LANGUAGES:
+            if language_name not in existing_lang_names:
+                add_count += 1
+                lang = Language(name=language_name)
+                request.session.add(lang)
+        click.secho(f'Inserted {add_count} languages of total '
+                    f'{len(LANGUAGES)}', fg='green')
+
+        if dry_run:
+            transaction.abort()
+            click.secho('Aborting transaction', fg='yellow')
+        else:
+            request.session.flush()
+
+    return do_create_languages
+
+
+@cli.command(name='force-delete-languages',
+             context_settings={'singular': True})
+@click.option('--dry-run', is_flag=True, default=False)
+def force_delete_languages(
+        dry_run: bool
+) -> 'Callable[[TranslatorAppRequest, TranslatorDirectoryApp], None]':
+    """
+    This command forcefully deletes all languages from the database and all
+    references will be lost.
+    This command is useful after the languages have changed and
+    assigned a lot for testing.
+
+    Example:
+        onegov-translator --select /translator_directory/schaffhausen
+        delete-languages --dry-run
+    """
+
+    def do_delete_languages(
+        request: 'TranslatorAppRequest',
+        app: 'TranslatorDirectoryApp'
+    ) -> None:
+
+        i = input('Are you sure you want to delete all languages and losing '
+                  'all references to it? [y/N]: ')
+        if i.lower() != 'y':
+            transaction.abort()
+            click.secho('Aborting transaction', fg='yellow')
+            return
+
+        del_count = 0
+        languages = request.session.query(Language)
+        for lang in languages:
+            del_count += 1
+            request.session.delete(lang)
+        click.secho(f'Deleted {del_count} languages', fg='green')
+
+        if dry_run:
+            transaction.abort()
+            click.secho('Aborting transaction', fg='yellow')
+        else:
+            request.session.flush()
+
+    return do_delete_languages

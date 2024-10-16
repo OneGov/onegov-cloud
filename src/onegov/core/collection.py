@@ -187,8 +187,8 @@ class SearcheableCollection(GenericCollection[_M]):
         @property
         def term_filter_cols(self) -> dict[str, 'TextColumn']:
             """ Returns a dict of column names to search in with term.
-             Must be attributes of self.model_class.
-             """
+            Must be attributes of self.model_class.
+            """
             raise NotImplementedError
 
     @property
@@ -305,13 +305,13 @@ class Pagination(Generic[_M]):
     @property
     def name_of_view(self) -> str:
         """The name of the view to link to. If omitted, the
-           the default view is looked up.."""
+        the default view is looked up.."""
         return ''
 
     @property
     def pages(self) -> 'Iterator[Self]':
         """ Yields all page objects of this Pagination. """
-        for page in range(0, self.pages_count):
+        for page in range(self.pages_count):
             yield self.page_by_index(page)
 
     @property
@@ -441,7 +441,7 @@ class RangedPagination(Generic[_M]):
     @property
     def previous(self) -> 'Self | None':
         """ Returns the previous page or None. """
-        s, e = self.page_range
+        s, _e = self.page_range
 
         if s > 0:
             return self.by_page_range((s - 1, s - 1))
@@ -450,7 +450,7 @@ class RangedPagination(Generic[_M]):
     @property
     def next(self) -> 'Self | None':
         """ Returns the next page range or None. """
-        s, e = self.page_range
+        _s, e = self.page_range
 
         if e + 1 < self.pages_count:
             return self.by_page_range((e + 1, e + 1))

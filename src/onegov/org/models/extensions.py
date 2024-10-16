@@ -62,7 +62,6 @@ if TYPE_CHECKING:
             request: OrgRequest
         ) -> type[FormT]: ...
 
-
     _ExtendedWithPersonLinkT = TypeVar(
         '_ExtendedWithPersonLinkT',
         bound='PersonLinkExtension'
@@ -323,6 +322,24 @@ class InheritableContactExtension(ContactExtensionBase, ContentExtension):
             query = query.filter(Page.id != self.id)
         query = query.order_by(Page.title)
 
+        # Ancestor pages should appear first in the list
+        pinned = {
+            page.id: page.title
+            for page in self.ancestors
+            if page.content.get('contact')
+        } if isinstance(self, Page) else {}
+
+        choices: list[_Choice] = [
+            (page_id, title)
+            for page_id, title in query.with_entities(Page.id, Page.title)
+            if page_id not in pinned
+        ]
+
+        if pinned:
+            choices.insert(0, (-1, '-'*32, {'disabled': 'disabled'}))
+            for choice in reversed(pinned.items()):
+                choices.insert(0, choice)
+
         class InheritableContactPageForm(form_class):  # type:ignore
 
             contact = TextAreaField(
@@ -345,7 +362,7 @@ class InheritableContactExtension(ContactExtensionBase, ContentExtension):
                 label=_('Topic to inherit from'),
                 fieldset=_('Contact'),
                 coerce=int,
-                choices=query.with_entities(Page.id, Page.title).all(),
+                choices=choices,
                 depends_on=('inherit_contact', 'y'),
                 validators=[InputRequired()]
             )
@@ -540,7 +557,6 @@ class PersonLinkExtension(ContentExtension):
             # no need to extend the form
             return form_class
 
-
         selected = dict((self.content or {}).get('people', []))
 
         def choice(person: Person) -> '_Choice':
@@ -601,9 +617,9 @@ class PersonLinkExtension(ContentExtension):
         PersonForm.Meta = meta
 
         if TYPE_CHECKING:
-            FieldBase = FieldList[FormField[PersonForm]]
+            FieldBase = FieldList[FormField[PersonForm]]  # noqa: N806
         else:
-            FieldBase = FieldList
+            FieldBase = FieldList  # noqa: N806
 
         class PeopleField(FieldBase):
             def is_ordered_people(self, people: list[tuple[str, Any]]) -> bool:
@@ -666,7 +682,6 @@ class PersonLinkExtension(ContentExtension):
                             new_people.append((person_id, values))
 
                     obj.content['people'] = new_people
-
 
         field_macro = request.template_loader.macros['field']
         # FIXME: It is not ideal that we have to pass a dummy form along to
@@ -1057,13 +1072,15 @@ class SidebarLinksExtension(ContentExtension):
                 self,
                 text: str | None = None
             ) -> list[tuple[str | None, str | None]]:
-                result = []
 
-                for value in json.loads(text or '{}').get('values', []):
-                    if value['link'] or value['text']:
-                        result.append((value['text'], value['link']))
+                if not text:
+                    return []
 
-                return result
+                return [
+                    (value['text'], link)
+                    for value in json.loads(text).get('values', [])
+                    if (link := value['link']) or value['text']
+                ]
 
             def links_to_json(
                 self,

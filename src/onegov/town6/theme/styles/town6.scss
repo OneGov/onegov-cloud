@@ -434,6 +434,15 @@ input[type="url"] {
         padding: 1rem 2rem !important;
         transition: all 200ms linear;
     }
+
+    &.narrow {
+        padding: .7rem 1rem !important;
+
+        &:hover {
+            padding: .7rem 1.5rem !important;
+        }
+    }
+
 }
 
 // like above, but no border, no hover effect
@@ -898,12 +907,24 @@ section#content th {
     text-align: left;
 }
 
-.find-your-spot-link {
-    border-bottom: 0 !important;
-    margin-left: 1rem;
+.group-title {
+    display: flex;
+    margin-top: 2rem;
+    align-items: center;
+
+    h2 {
+        margin-right: 1.5rem;
+    }
+}
+
+.button.hollow.find-your-spot-link {
+    margin-bottom: .5rem;
+    margin-top: .5rem;
+    height: fit-content;
+    white-space: nowrap;
 
     i {
-        margin-bottom: 2px;
+        margin-right: .5rem;
     }
 }
 

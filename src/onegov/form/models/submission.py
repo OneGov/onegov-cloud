@@ -322,10 +322,6 @@ class SurveySubmission(Base, TimestampMixin, AssociatedFiles,
 
     __tablename__ = 'survey_submissions'
 
-    __mapper_args__ = {
-        'polymorphic_on': 'state'
-    }
-
     #: id of the form submission
     id: 'Column[uuid.UUID]' = Column(
         UUID,  # type:ignore[arg-type]
@@ -360,12 +356,6 @@ class SurveySubmission(Base, TimestampMixin, AssociatedFiles,
 
     #: the submission data
     data: 'Column[dict[str, Any]]' = Column(JSON, nullable=False)
-
-    #: the state of the submission
-    state: 'Column[SubmissionState]' = Column(
-        Enum('pending', 'complete', name='submission_state'),  # type:ignore
-        nullable=False
-    )
 
     #: the id of the submission window linked with this submission
     submission_window_id: 'Column[uuid.UUID | None]' = Column(
@@ -417,14 +407,6 @@ class PendingFormSubmission(FormSubmission):
 
 
 class CompleteFormSubmission(FormSubmission):
-    __mapper_args__ = {'polymorphic_identity': 'complete'}
-
-
-class PendingSurveySubmission(SurveySubmission):
-    __mapper_args__ = {'polymorphic_identity': 'pending'}
-
-
-class CompleteSurveySubmission(SurveySubmission):
     __mapper_args__ = {'polymorphic_identity': 'complete'}
 
 

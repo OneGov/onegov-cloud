@@ -125,10 +125,7 @@ def view_upload_rest(
 
     # Check the type
     if item is not None and form.type.data == 'parties':
-        if not (
-            isinstance(item, ElectionCompound)
-            or isinstance(item, ProporzElection)
-        ):
+        if not isinstance(item, (ElectionCompound, ProporzElection)):
             errors.setdefault('id', []).append(
                 _('Use an election based on proportional representation')
             )

@@ -349,11 +349,9 @@ def get_translation_bound_form(
 ) -> type[_F]:
     """ Returns a form setup with the given translate function. """
 
-    MetaClass = get_translation_bound_meta(form_class.Meta, translate)
-
     class TranslationBoundForm(form_class):  # type:ignore
 
-        Meta = MetaClass
+        Meta = get_translation_bound_meta(form_class.Meta, translate)
 
     return TranslationBoundForm
 

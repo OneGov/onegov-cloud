@@ -806,7 +806,7 @@ class Framework(
         )
 
         try:
-            action, handler = next(query(self.__class__))
+            action, _handler = next(query(self.__class__))
         except (StopIteration, RuntimeError) as exception:
             raise KeyError(
                 '{!r} has no view named {}'.format(model, view_name)
@@ -831,8 +831,9 @@ class Framework(
         headers: dict[str, str] | None = None,
         plaintext: str | None = None
     ) -> None:
-        """ Sends an e-mail categorised as marketing. This includes but is not
-        limited to:
+        """ Sends an e-mail categorised as marketing.
+
+        This includes but is not limited to:
 
             * Announcements
             * Newsletters
@@ -863,8 +864,9 @@ class Framework(
         self,
         prepared_emails: 'Iterable[EmailJsonDict]'
     ) -> None:
-        """ Sends an e-mail batch categorised as marketing. This includes but
-        is not limited to:
+        """ Sends an e-mail batch categorised as marketing.
+
+        This includes but is not limited to:
 
             * Announcements
             * Newsletters
@@ -900,7 +902,9 @@ class Framework(
         headers: dict[str, str] | None = None,
         plaintext: str | None = None
     ) -> None:
-        """ Sends an e-mail categorised as transactional. This is limited to:
+        """ Sends an e-mail categorised as transactional.
+
+        This is limited to:
 
             * Welcome emails
             * Reset passwords emails
@@ -926,7 +930,9 @@ class Framework(
         self,
         prepared_emails: 'Iterable[EmailJsonDict]'
     ) -> None:
-        """  Sends an e-mail categorised as transactional. This is limited to:
+        """  Sends an e-mail categorised as transactional.
+
+        This is limited to:
 
             * Welcome emails
             * Reset passwords emails
@@ -959,8 +965,8 @@ class Framework(
         plaintext: str | None = None
     ) -> 'EmailJsonDict':
         """ Common path for batch and single mail sending. Use this the same
-         way you would use send_email then pass the prepared emails in a list
-         or another iterable to the batch send method.
+        way you would use send_email then pass the prepared emails in a list
+        or another iterable to the batch send method.
         """
 
         headers = headers or {}
@@ -1083,11 +1089,11 @@ class Framework(
         # transactional stream in Postmark is called outbound
         stream = 'marketing' if category == 'marketing' else 'outbound'
 
-        BATCH_LIMIT = 500
+        BATCH_LIMIT = 500  # noqa: N806
         # NOTE: The API specifies MB, so let's not chance it
         #       by assuming they meant MiB and just go with
         #       lower size limit.
-        SIZE_LIMIT = 50_000_000  # 50MB
+        SIZE_LIMIT = 50_000_000  # 50MB  # noqa: N806
         # NOTE: We use a buffer to be a bit more memory efficient
         #       we don't initialize the buffer, so tell gives us
         #       the exact size of the buffer.
@@ -1496,7 +1502,7 @@ class Framework(
 @Framework.webasset_url()
 def get_webasset_url() -> str:
     """ The webassets url needs to be unique so we can fix it before
-        returning the generated html. See :func:`fix_webassets_url_factory`.
+    returning the generated html. See :func:`fix_webassets_url_factory`.
 
     """
     return '7da9c72a3b5f9e060b898ef7cd714b8a'  # do *not* change this hash!

@@ -491,28 +491,28 @@ def import_election_internal_proporz(
     if not errors and not results:
         errors.append(FileImportError(_('No data found')))
 
-    for values in list_panachage.values():
-        for list_id in values:
-            if list_id != '999' and list_id not in lists:
-                errors.append(
-                    FileImportError(
-                        _(
-                            "Panachage results id ${id} not in list_id's",
-                            mapping={'id': list_id}
-                        )
-                    )
-                )
-
-    for values in candidate_panachage:
-        if values['list_id'] != '999' and values['list_id'] not in lists:
-            errors.append(
-                FileImportError(
-                    _(
-                        "Panachage results id ${id} not in list_id's",
-                        mapping={'id': values['list_id']}
-                    )
-                )
+    errors.extend(
+        FileImportError(
+            _(
+                "Panachage results id ${id} not in list_id's",
+                mapping={'id': list_id}
             )
+        )
+        for values in list_panachage.values()
+        for list_id in values
+        if list_id != '999' and list_id not in lists
+    )
+
+    errors.extend(
+        FileImportError(
+            _(
+                "Panachage results id ${id} not in list_id's",
+                mapping={'id': values['list_id']}
+            )
+        )
+        for values in candidate_panachage
+        if values['list_id'] != '999' and values['list_id'] not in lists
+    )
 
     if errors:
         return errors

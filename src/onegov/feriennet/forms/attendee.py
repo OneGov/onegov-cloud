@@ -444,7 +444,7 @@ class AttendeeSignupForm(AttendeeBase):
         return None
 
     def ensure_correct_activity_state(self) -> bool | None:
-        if not self.model.activity.state != 'approved':
+        if self.model.activity.state == 'approved':
             assert isinstance(self.attendee.errors, list)
             self.attendee.errors.append(_(
                 'This is an unapproved activity'

@@ -63,6 +63,7 @@ class SharedMethods:
         date: date | None
         view: str | None
         timezone: Column[str]
+
         @property
         def scheduler(self) -> Scheduler: ...
         def get_scheduler(self, context: Context) -> Scheduler: ...

@@ -316,7 +316,7 @@ def get_is_complete_userprofile_handler(
 
         form.process(obj=user)
 
-        for field_id, field in form._fields.items():
+        for field in form:
             field.raw_data = field.data
 
         return form.validate()

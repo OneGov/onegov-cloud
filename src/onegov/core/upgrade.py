@@ -43,6 +43,7 @@ if TYPE_CHECKING:
         always_run: bool
         requires: str | None
         raw: bool
+
         def __call__(self, *args: _P.args, **kwargs: _P.kwargs) -> _T_co: ...
 
     RawFunc: TypeAlias = Callable[[Connection, Sequence[str]], Any]
@@ -143,7 +144,7 @@ def get_upgrade_modules() -> 'Iterator[tuple[str, ModuleType]]':
             yield entry.name, importlib.import_module(entry.module_name)
 
 
-class upgrade_task:
+class upgrade_task:  # noqa: N801
     """ Marks the decorated function as an upgrade task. Upgrade tasks should
     be defined outside classes (except for testing) - that is in the root of
     the module (directly in onegov/form/upgrades.py for example).
@@ -305,7 +306,7 @@ def get_module_order_key(
         modules.add(task.split(':', 1)[0])
 
     def sortkey(task: str) -> 'SupportsRichComparison':
-        module, name = task.split(':', 1)
+        module = task.split(':', 1)[0]
         return (
             # sort by level (unknown models first)
             sorted_modules.get(module, float('-inf')),
