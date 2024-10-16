@@ -7,3 +7,11 @@ if ($('#current').length) {
     scrollTop: positionCurrent - listHeight/2 + currentHeight/2
     })
 }
+
+$('.video-link a').on('click', function() {
+    const timestamp = $(this).data('timestamp');
+    const iframe = document.querySelector('#assembly-video-iframe iframe');
+    var new_url = iframe.src.replace(/start=\d+/, `start=${timestamp}`);
+    new_url = new_url + '&autoplay=1&allow=autoplay&mute=0';
+    iframe.src = new_url;
+});
