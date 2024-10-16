@@ -67,7 +67,7 @@ class PeriodBoardlet(FeriennetBoardlet):
             return
 
         def icon(checked: bool) -> str:
-            return 'fa-check-square-o' if checked else 'fa-square-o'
+            return 'fa-check-square' if checked else 'fa-square'
 
         yield BoardletFact(
             text=_('Prebooking: ${dates}', mapping={
@@ -206,7 +206,7 @@ class ActivitiesBoardlet(FeriennetBoardlet):
             text=_('${count} full', mapping={
                 'count': states['full'],
             }),
-            icon='fa-circle',
+            icon='fa-dot-circle',
             css_class='' if states['full'] else 'zero'
         )
 
@@ -230,7 +230,7 @@ class ActivitiesBoardlet(FeriennetBoardlet):
             text=_('${count} empty', mapping={
                 'count': states['empty'],
             }),
-            icon='fa-circle-o',
+            icon='fa-circle',
             css_class='' if states['empty'] else 'zero'
         )
 
@@ -360,7 +360,7 @@ class BookingsBoardlet(FeriennetBoardlet):
                         self.counts['accepted'] / self.attendees_count, 1
                     ) or 0
                 }),
-                icon='fa-line-chart',
+                icon='fas fa-chart-line',
             )
 
 
@@ -488,14 +488,14 @@ class MatchingBoardlet(FeriennetBoardlet):
             text=_('${amount}% Happiness', mapping={
                 'amount': self.happiness
             }),
-            icon='fa-smile-o',
+            icon='fa-smile',
         )
 
         yield BoardletFact(
             text=_('${count} Attendees Without Occasion', mapping={
                 'count': self.unlucky_count
             }),
-            icon='fa-frown-o',
+            icon='fa-frown',
             css_class='' if self.unlucky_count else 'zero'
         )
 
