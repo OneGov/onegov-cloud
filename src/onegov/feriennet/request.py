@@ -1,5 +1,5 @@
 from functools import cached_property
-from onegov.org.request import OrgRequest
+from onegov.town6.request import TownRequest
 
 
 from typing import TYPE_CHECKING
@@ -7,7 +7,7 @@ if TYPE_CHECKING:
     from onegov.feriennet.app import FeriennetApp
 
 
-class FeriennetRequest(OrgRequest):
+class FeriennetRequest(TownRequest):
 
     app: 'FeriennetApp'
 

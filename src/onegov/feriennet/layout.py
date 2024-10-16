@@ -13,7 +13,7 @@ from onegov.feriennet.collections import OccasionAttendeeCollection
 from onegov.feriennet.collections import VacationActivityCollection
 from onegov.feriennet.const import OWNER_EDITABLE_STATES
 from onegov.feriennet.models import InvoiceAction, VacationActivity
-from onegov.org.layout import DefaultLayout as BaseLayout
+from onegov.town6.layout import DefaultLayout as BaseLayout
 from onegov.pay import PaymentProviderCollection
 from onegov.ticket import TicketCollection
 

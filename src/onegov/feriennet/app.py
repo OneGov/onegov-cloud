@@ -10,7 +10,7 @@ from onegov.feriennet.initial_content import create_new_organisation
 from onegov.feriennet.request import FeriennetRequest
 from onegov.feriennet.sponsors import load_sponsors
 from onegov.feriennet.theme import FeriennetTheme
-from onegov.org import OrgApp
+from onegov.town6 import TownApp
 from onegov.org.app import get_common_asset as default_common_asset
 from onegov.org.app import get_i18n_localedirs as default_i18n_localedirs
 from onegov.org.app import (
@@ -49,7 +49,7 @@ BANNER_TEMPLATE = Markup("""
 """)
 
 
-class FeriennetApp(OrgApp):
+class FeriennetApp(TownApp):
 
     request_class = FeriennetRequest
 

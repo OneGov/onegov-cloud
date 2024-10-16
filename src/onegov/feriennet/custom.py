@@ -1,6 +1,7 @@
 from onegov.activity import BookingCollection
 from onegov.activity import PeriodCollection
 from onegov.activity import VolunteerCollection
+from onegov.core.utils import Bunch
 from onegov.feriennet import _, FeriennetApp
 from onegov.feriennet.collections import BillingCollection
 from onegov.feriennet.collections import MatchCollection
@@ -17,6 +18,7 @@ if TYPE_CHECKING:
     from collections.abc import Iterator
     from onegov.core.types import RenderData
     from onegov.feriennet.request import FeriennetRequest
+    from onegov.town6.layout import NavigationEntry
 
 
 @FeriennetApp.template_variables()
@@ -215,11 +217,16 @@ def get_personal_tools(
             )
 
 
-def get_top_navigation(request: 'FeriennetRequest') -> 'Iterator[Link]':
+def get_top_navigation(
+        request: 'FeriennetRequest') -> 'Iterator[NavigationEntry]':
     # inject an activites link in front of all top navigation links
-    yield Link(
-        text=_('Activities'),
-        url=request.class_link(VacationActivityCollection)
+    yield (  # type:ignore[misc]
+        Bunch(id=-1, access='public', published=True),
+        Link(
+            text=_('Activities'),
+            url=request.class_link(VacationActivityCollection)
+        ),
+        ()
     )
 
     layout = DefaultLayout(request.app.org, request)

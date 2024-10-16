@@ -1,4 +1,10 @@
 /*
+    The maximum width of a line relative to the main font size. This limits textblocks
+    to a readable length.
+*/
+$max-line-width: 40rem;
+
+/*
     css animations keyframes
 */
 @keyframes oscillate-opacity {
@@ -68,7 +74,7 @@ svg {
     Hints in forms
 */
 form small {
-    color: $form-label-font-color;
+    color: $aluminum;
     display: block;
     font-size: .8rem;
 }
@@ -1021,7 +1027,7 @@ $booking-left-margin: 2rem;
 
             // 8.3333% is 1000 (row-width) / 12 (number of rows)
             // -> one column wide in percentage
-            padding: .75rem 1rem .75rem $column-gutter / 2;
+            padding: .75rem 1rem .75rem;
         }
 
         .panel {
@@ -1064,7 +1070,7 @@ $booking-left-margin: 2rem;
             background: $light-background;
             font-size: .875rem;
             line-height: .875rem;
-            padding: .5rem $column-gutter / 2;
+            padding: .5rem;
         }
 
         ul {
@@ -1078,7 +1084,7 @@ $booking-left-margin: 2rem;
         }
 
         .bookings-by-state {
-            padding-left: $column-gutter / 2;
+            padding-left: 5rem;
 
             > ul {
                 margin-bottom: 0;
@@ -1095,7 +1101,7 @@ $booking-left-margin: 2rem;
             font-family: $font-family-monospace;
             margin-bottom: 1.5rem;
             margin-top: 0;
-            padding: .75rem 1.2rem .75rem $booking-left-margin + $column-gutter / 2;
+            padding: .75rem 1.2rem .75rem ;
 
             .columns:last-child {
                 text-align: right;
@@ -1679,9 +1685,9 @@ $booking-left-margin: 2rem;
     Circular actions button
 */
 .actions-button {
-    background-color: $select-bg-color;
-    border: 1px solid $input-border-color;
-    color: $input-font-color;
+    background-color: $ghost;
+    border: 1px solid $aluminum;
+    color: $aluminum;
     float: right;
     font-size: 12px;
     height: 24px;
@@ -1691,9 +1697,9 @@ $booking-left-margin: 2rem;
     width: 24px;
 
     &:hover {
-        background-color: $select-hover-bg-color;
-        border-color: $input-focus-border-color;
-        color: $input-font-color;
+        background-color: $white-smoke;
+        border-color: $primary-color;
+        color: $aluminum;
     }
 
     + .f-dropdown {
@@ -2251,7 +2257,7 @@ li.unpaid {
 */
 
 .emergency-contact {
-    @include panel($bg: $callout-panel-bg);
+    
     border-color: scale-color($callout-panel-bg, $lightness: -11%);
 
     margin-bottom: 1.5rem;
@@ -2331,7 +2337,7 @@ li.unpaid {
 .notification-preview {
     background: $white-smoke;
     margin-bottom: 1rem;
-    max-width: $max-line-width + 13ex;
+    max-width: $max-line-width + 13rem;
     padding: .75rem 1rem;
     position: relative;
 
@@ -2633,12 +2639,12 @@ li.unpaid {
 }
 
 .attendees-table {
-    $column-width: grid-calc(1, $total-columns);
+    $column-width: grid-calc(1, 12);
 
     font-size: .8rem;
     margin-left: $booking-left-margin;
     padding: .75rem 0 1rem;
-    width: calc(100% - #{$booking-left-margin} - #{$column-gutter / 2});
+    width: calc(100% - #{$booking-left-margin});
 
     table {
         margin: 0;
@@ -3023,8 +3029,6 @@ li.unpaid {
     Donation button
 */
 .donation-button {
-    @include button($bg: $green-pastel, $padding: .4rem);
-
     border: 1px solid $green-light;
     border-radius: 4px;
     color: $green-dark;
