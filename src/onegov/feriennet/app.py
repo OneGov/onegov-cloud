@@ -11,9 +11,9 @@ from onegov.feriennet.request import FeriennetRequest
 from onegov.feriennet.sponsors import load_sponsors
 from onegov.feriennet.theme import FeriennetTheme
 from onegov.town6 import TownApp
-from onegov.org.app import get_common_asset as default_common_asset
-from onegov.org.app import get_i18n_localedirs as default_i18n_localedirs
-from onegov.org.app import (
+from onegov.town6.app import get_common_asset as default_common_asset
+from onegov.town6.app import get_i18n_localedirs as get_town6_i18n_localedirs
+from onegov.town6.app import (
     get_public_ticket_messages as default_public_ticket_messages)
 from onegov.user import User, UserCollection
 
@@ -328,7 +328,7 @@ def get_is_complete_userprofile_handler(
 def get_i18n_localedirs() -> list[str]:
     return [
         utils.module_path('onegov.feriennet', 'locale'),
-        *default_i18n_localedirs()
+        *get_town6_i18n_localedirs()
     ]
 
 

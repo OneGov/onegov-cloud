@@ -26,14 +26,12 @@
 </metal:favicon>
 
 <metal:footer define-macro="footer">
-    <footer>
-        <div>
-            <div class="row footer-content">
-                <div class="small-12 columns">
-                    <metal:b use-macro="layout.macros['footer_columns']" />
-                    <metal:b use-macro="layout.macros['footer_sponsors']" />
-                    <metal:b use-macro="layout.macros['footer_links']" />
-                </div>
+    <footer id="footer" class="footer-container">
+        <div class="grid-container">
+            <div class="grid-x grid-padding-x footer-content">
+                <metal:b use-macro="layout.macros['footer_columns']" />
+                <metal:b use-macro="layout.macros['footer_sponsors']" />
+                <metal:b use-macro="layout.macros['footer_links']" />
             </div>
         </div>
     </footer>
@@ -205,6 +203,11 @@
             <a href="https://www.projuventute.ch/it/condizioni-di-utilizzo">
                 Condizioni di utilizzo</a>
             </tal:b>
+        </span>
+        <span tal:condition="not request.is_logged_in">
+            <a href="${layout.login_from_path()}" i18n:translate>
+                Login
+            </a>
         </span>
       </div>
     </div>

@@ -1,10 +1,4 @@
 /*
-    The maximum width of a line relative to the main font size. This limits textblocks
-    to a readable length.
-*/
-$max-line-width: 40rem;
-
-/*
     css animations keyframes
 */
 @keyframes oscillate-opacity {
@@ -227,9 +221,9 @@ ul.single-line {
     .archive-activity::before { @include icon('\f187'); }
     .feriennet-management::before { @include icon('\f274'); }
     .import::before { @include icon('\f093'); }
-    .manage-billing::before { @include icon('\f0d6'); }
-    .manage-matches::before { @include icon('\f24e'); }
-    .manage-periods::before { @include icon('\f02d'); }
+    .manage-billing::before { @include icon-bold('\f0d6'); }
+    .manage-matches::before { @include icon-bold('\f24e'); }
+    .manage-periods::before { @include icon-bold('\f02d'); }
     .new-activity::before { @include icon('\f135'); }
     .new-booking::before { @include icon('\f1ec'); }
     .paid-date::before { @include icon('\f274'); }
@@ -244,11 +238,11 @@ ul.single-line {
     .run-matching::before { @include icon('\f0d0'); }
     .show-activity::before { @include icon('\f135'); }
     .show-attendees::before { @include icon('\f0c0'); }
-    .show-dashboard::before { @include icon('\f0e4'); }
-    .show-exports::before { @include icon('\f019'); }
-    .show-notifications::before { @include icon('\f003'); }
+    .show-dashboard::before { @include icon-bold('\f3fd'); }
+    .show-exports::before { @include icon-bold('\f019'); }
+    .show-notifications::before { @include icon-bold('\f0e0'); }
     .show-ticket::before { @include icon('\f145'); }
-    .show-volunteers::before { @include icon('\f164'); }
+    .show-volunteers::before { @include icon-bold('\f4fc'); }
     .volunteer::before { @include icon('\f164'); }
 }
 
@@ -629,7 +623,6 @@ ul.tags {
         p {
             font-size: .875rem;
             font-style: italic;
-            max-width: $max-line-width;
             white-space: pre-line;
         }
 
@@ -2265,7 +2258,6 @@ li.unpaid {
 
     div {
         margin-bottom: .5rem;
-        max-width: $max-line-width;
     }
 }
 
@@ -2337,7 +2329,6 @@ li.unpaid {
 .notification-preview {
     background: $white-smoke;
     margin-bottom: 1rem;
-    max-width: $max-line-width + 13rem;
     padding: .75rem 1rem;
     position: relative;
 
@@ -2350,7 +2341,6 @@ li.unpaid {
 
     p {
         margin-bottom: .75rem;
-        max-width: $max-line-width;
     }
 
     p:last-child {

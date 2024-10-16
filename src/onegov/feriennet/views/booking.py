@@ -22,7 +22,7 @@ from onegov.feriennet.layout import (
 from onegov.feriennet.models import AttendeeCalendar, GroupInvite
 from onegov.feriennet.utils import decode_name
 from onegov.feriennet.views.shared import users_for_select_element
-from onegov.org.layout import DefaultMailLayout
+from onegov.town6.layout import DefaultMailLayout
 from onegov.user import User
 from purl import URL
 from sortedcontainers import SortedList

@@ -1,6 +1,6 @@
 from onegov.core.security import Public
 from onegov.feriennet import FeriennetApp, _
-from onegov.org.views.auth import handle_registration
+from onegov.town6.views.auth import handle_registration
 from onegov.user import Auth
 from onegov.user.forms import RegistrationForm
 
