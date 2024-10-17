@@ -294,22 +294,21 @@
 
                 <!-- content -->
                 <div class="content">
-                <div class="logo">
-                    <tal:b metal:define-slot="logo" />
-                </div>
-
-                <table>
-                    <tr>
-                        <td>
-                            <div metal:define-slot="body"></div>
-                        </td>
-                    </tr>
-                    <tr tal:define="signature layout.macros['email_signature']|nothing" tal:condition="signature">
-                        <td>
-                            <metal:b use-macro="signature" />
-                        </td>
-                    </tr>
-                </table>
+                    <div class="logo">
+                        <img tal:condition="layout.org.logo_url" src="${layout.org.logo_url}" alt="Logo" title="${layout.org.title}" i18n:attributes="alt"/>
+                    </div>
+                    <table>
+                        <tr>
+                            <td>
+                                <div metal:define-slot="body"></div>
+                            </td>
+                        </tr>
+                        <tr tal:define="signature layout.macros['email_signature']|nothing" tal:condition="signature">
+                            <td>
+                                <metal:b use-macro="signature" />
+                            </td>
+                        </tr>
+                    </table>
                 </div>
             </td>
             <td></td>

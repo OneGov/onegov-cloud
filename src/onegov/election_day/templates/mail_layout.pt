@@ -168,13 +168,13 @@
 
                 <!-- content -->
                 <div class="content">
-                <table>
-                    <tr>
-                        <td>
-                            <div metal:define-slot="body"></div>
-                        </td>
-                    </tr>
-                </table>
+                    <table>
+                        <tr>
+                            <td>
+                                <div metal:define-slot="body"></div>
+                            </td>
+                        </tr>
+                    </table>
                 </div>
             </td>
             <td></td>

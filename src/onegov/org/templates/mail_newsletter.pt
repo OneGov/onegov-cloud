@@ -2,9 +2,6 @@
     <tal:b metal:fill-slot="title">
         ${title}
     </tal:b>
-    <tal:b metal:fill-slot="logo" tal:condition="layout.org.logo_in_newsletter">
-        <img src="${layout.org.logo_url}" alt="Logo" title="${layout.org.title}" i18n:attributes="alt"/>
-    </tal:b>
     <tal:b metal:fill-slot="body">
         <h1>${title}</h1>
         <p tal:condition="lead" tal:content="lead"></p>
