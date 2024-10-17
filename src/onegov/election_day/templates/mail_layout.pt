@@ -168,9 +168,6 @@
 
                 <!-- content -->
                 <div class="content">
-                    <div class="logo">
-                        <img tal:condition="layout.org.logo_url" src="${layout.org.logo_url}" alt="Logo" title="${layout.org.title}" i18n:attributes="alt"/>
-                    </div>
                     <table>
                         <tr>
                             <td>
