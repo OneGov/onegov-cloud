@@ -20,7 +20,7 @@ def landsgemeinde_search(
     return search(self, request, DefaultLayout(self, request))
 
 
-@LandsgemeindeApp.html(model=SearchPostgres, template='search.pt',
+@LandsgemeindeApp.html(model=SearchPostgres, template='search_postgres.pt',
                        permission=Public)
 def landsgemeinde_search_postgres(
     self: SearchPostgres['Base'],
