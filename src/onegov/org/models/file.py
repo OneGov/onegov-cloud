@@ -20,7 +20,7 @@ from onegov.org.utils import widest_access
 from onegov.search import ORMSearchable
 from operator import itemgetter
 from sedate import standardize_date, utcnow
-from sqlalchemy import asc, desc, select, nullslast, and_  # type: ignore
+from sqlalchemy import asc, desc, select, nullslast, and_, case  # type: ignore
 
 from typing import (
     overload, Any, Generic, Literal, NamedTuple, TypeVar, TYPE_CHECKING)
@@ -248,6 +248,19 @@ class GeneralFile(File, SearchableFile):
             return 'secret'
 
         return widest_access(*self.linked_accesses.values())
+
+    @access.expression
+    def access(cls):
+        return case([
+            (cls.publication == True, 'public'),
+            (cls.meta['linked_accesses'] == None, 'secret'),
+            (cls.meta['linked_accesses'].op('?')('public'), 'public'),
+            (cls.meta['linked_accesses'].op('?')('secret'), 'secret'),
+            (cls.meta['linked_accesses'].op('?')('mtan'), 'mtan'),
+            (cls.meta['linked_accesses'].op('?')('secret_mtan'),
+             'secret_mtan'),
+            (cls.meta['linked_accesses'].op('?')('member'), 'member'),
+        ], else_='private')
 
     @hybrid_property
     def es_public(self) -> bool:
