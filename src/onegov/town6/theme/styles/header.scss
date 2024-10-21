@@ -446,6 +446,7 @@ $editbar-fg-color-active: $white;
 
 .edit-bar-container {
     background-color: $editbar-bg-color;
+    padding: 0 !important;
 }
 
 .edit-bar {

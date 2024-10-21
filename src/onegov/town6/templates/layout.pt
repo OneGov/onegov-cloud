@@ -164,8 +164,6 @@
 
                             <tal:b define="editbar_links layout.editbar_links if not layout.edit_mode else layout.editmode_links|[]">
                                 <div class="grid-container fluid edit-bar-container" tal:condition="editbar_links">
-                                    <div class="grid-x">
-                                        <div class="cell small-12">
                                             <div class="grid-container">
                                                 <div class="grid-x grid-padding-x">
                                                     <div class="cell small-12">
@@ -173,8 +171,6 @@
                                                     </div>
                                                 </div>
                                             </div>
-                                        </div>
-                                    </div>
                                 </div>
                             </tal:b>
                         </div>

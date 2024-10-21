@@ -25,6 +25,9 @@ a > h6 {
     hide certain settings
 */
 .holiday-settings,
+.event-settings,
+.api-keys,
+.gever-credentials,
 .grid-x.field-geo_provider,
 .grid-x.field-about_url,
 .grid-x.field-hide_onegov_footer,
@@ -136,7 +139,7 @@ ul.single-line {
 @mixin generic-icon($icon) {
     &.before::before,
     &.after::after {
-        @include icon($icon);
+        @include icon-bold($icon);
     }
 }
 
@@ -201,7 +204,7 @@ ul.single-line {
 }
 
 .location-icon {
-    @include generic-icon('\f041');
+    @include generic-icon('\f3c5');
 }
 
 .child-icon {
@@ -225,7 +228,7 @@ ul.single-line {
     .manage-billing::before { @include icon-bold('\f0d6'); }
     .manage-matches::before { @include icon-bold('\f24e'); }
     .manage-periods::before { @include icon-bold('\f02d'); }
-    .new-activity::before { @include icon('\f135'); }
+    .new-activity::before { @include icon-bold('\f135'); }
     .new-booking::before { @include icon('\f1ec'); }
     .paid-date::before { @include icon('\f274'); }
     .new-notification::before { @include icon('\f003'); }
@@ -238,11 +241,11 @@ ul.single-line {
     .reset-matching::before { @include icon('\f12d'); }
     .run-matching::before { @include icon('\f0d0'); }
     .show-activity::before { @include icon('\f135'); }
-    .show-attendees::before { @include icon('\f0c0'); }
+    .show-attendees::before { @include icon-bold('\f0c0'); }
     .show-dashboard::before { @include icon-bold('\f3fd'); }
     .show-exports::before { @include icon-bold('\f019'); }
     .show-notifications::before { @include icon-bold('\f0e0'); }
-    .show-ticket::before { @include icon('\f145'); }
+    .show-ticket::before { @include icon-bold('\f3ff'); }
     .show-volunteers::before { @include icon-bold('\f4fc'); }
     .volunteer::before { @include icon('\f164'); }
 }
@@ -356,9 +359,10 @@ footer {
     .factoids > span {
         font-size: .875rem;
         line-height: .875rem;
+        margin-right: 3ex;
 
         + span {
-            margin-left: 3ex;
+            white-space: nowrap;
         }
 
         &::before {
@@ -455,28 +459,6 @@ ul.tags {
     }
 }
 
-.side-panel {
-    padding: .5rem 1rem 1rem;
-
-    .title,
-    h2 {
-        background: $primary-color;
-        color: $white;
-        display: block;
-        margin: -.5rem -1rem 1rem;
-        padding: .75rem 1rem;
-        text-transform: uppercase;
-    }
-
-    p {
-        margin-bottom: 0;
-    }
-
-    .organiser * {
-        font-weight: normal;
-    }
-}
-
 .activity-ticket-state > div {
     background: none;
     color: $body-font-color;
@@ -486,8 +468,6 @@ ul.tags {
 }
 
 .activity-status-panel {
-
-    padding: 1rem 1rem 0;
 
     .field-display-label {
         font-weight: normal;
@@ -507,8 +487,8 @@ ul.tags {
     .hint-booking.active::before { @include icon('\f274'); }
     .hint-booking.finish::before { @include icon('\f046'); }
 
-    .hint-max-activities::before { @include icon('\f2c3'); }
-    .hint-costs::before { @include icon('\f0d6'); }
+    .hint-max-activities::before { @include icon('\f2c2'); }
+    .hint-costs::before { @include icon-bold('\f0d6'); }
     .hint-favorites::before { @include icon('\f005'); }
     .hint-matching::before { @include icon('\f12e'); }
     .hint-fairness::before { @include icon('\f24e'); }
@@ -732,27 +712,28 @@ ul.tags {
     }
 
     .full::before {
-        @include icon('\f00d');
+        @include icon-bold('\f00d');
     }
 
     .available-spots::before {
-        @include icon('\f00c');
+        @include icon-bold('\f00c');
     }
 
     .location::before {
-        @include icon('\f041');
+        @include icon-bold('\f3c5');
     }
 
     .age::before {
-        @include icon('\f1ae');
+        @include icon-bold('\f1ae');
     }
 
     .spots::before {
-        @include icon('\f105');
+        @include icon-bold('\f05a');
+        content: "what";
     }
 
     .cost::before {
-        @include icon('\f0d6');
+        @include icon-bold('\f0d6');
     }
 
     .text-links::before {
@@ -931,7 +912,7 @@ ul.tags {
         top: -2.75rem;
 
         &::before {
-            @include icon('\f05a');
+            @include icon-bold('\f05a');
             margin-right: .5ex;
         }
 

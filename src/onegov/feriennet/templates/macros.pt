@@ -386,16 +386,16 @@
             </ul>
         </div>
 
-        <div metal:fill-slot="before-panels">
-            <div class="side-panel highlighted organiser-panel" tal:define="organiser activity.user; public request.app.public_organiser_data" tal:condition="public">
-                <h2 i18n:translate>Organiser</h2>
+        <tal:b metal:fill-slot="before-panels">
+            <div class="side-panel organiser-panel" tal:define="organiser activity.user; public request.app.public_organiser_data" tal:condition="public">
+                <h3 i18n:translate>Organiser</h3>
                 <metal:b use-macro="layout.macros.organiser" />
             </div>
-        </div>
+        </tal:b>
 
-        <div metal:fill-slot="after-panels" tal:condition="show_ticket_panel and request.is_organiser">
+        <tal:b metal:fill-slot="after-panels" tal:condition="show_ticket_panel and request.is_organiser">
             <div class="side-panel activity-status-panel">
-                <h2 class="show-for-sr" i18n:translate>Activity</h2>
+                <h3 i18n:translate>Activity</h3>
 
                 <dl>
                     <dt i18n:translate>
@@ -415,7 +415,7 @@
                     </tal:b>
                 </dl>
             </div>
-        </div>
+        </tal:b>
 
     </tal:b>
 </metal:activity_detailed>

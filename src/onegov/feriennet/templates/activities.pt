@@ -3,96 +3,100 @@
         ${title}
     </tal:b>
     <tal:b metal:fill-slot="content">
-        <div class="row">
-            <div class="columns medium-8">
+        <div class="grid-x grid-padding-x wrapper">
+            <div class="medium-8 large-7 cell content">
                 <div class="activity-list-item" tal:condition="not:activities">
                     <span i18n:translate>No activities found.</span>
                     <b><a tal:condition="filtered" href="${request.class_link(layout.model.__class__)}" i18n:translate>Reset filter.</a></b>
                 </div>
 
-                <div class="activities-list" tal:condition="activities">
+                <div class="activities-list grid-x grid-padding-x" tal:condition="activities">
                     <tal:b tal:repeat="activity activities">
-                        <tal:b tal:define="index activities.index(activity)%20">
-                            <div class="activity-list-item">
-                                <tal:b condition="index == 7">
-                                    <div class="banner">
-                                        <tal:b
-                                            condition="main_sponsor"
-                                            replace="main_sponsor"
-                                        />
-                                    </div>
-                                </tal:b>
-                                <tal:b condition="index == 14 and sponsors">
-                                    <div class="banner" tal:define="sponsor random.choice(sponsors)">
-                                        <tal:b
-                                            condition="sponsor"
-                                            replace="sponsor"
-                                        />
-                                    </div>
-                                </tal:b>
-                                <div class="row collapse">
-
-                                    <div class="columns small-2 thumbnail-column">
-                                        <a class="thumbnail" href="${request.link(activity)}">
-                                            <div tal:condition="activity.thumbnail|nothing"
-                                                style="background-image: url('${activity.thumbnail}');"></div>
-                                        </a>
-                                    </div>
-
-                                    <div class="columns small-10">
-                                        <h3><a href="${request.link(activity)}">${activity.title}</a></h3>
-                                        <span class="page-lead" tal:content="layout.paragraphify(layout.linkify(activity.lead))"/>
-
-                                        <div class="row collapse" tal:define="
-                                            ages activity_ages(activity, request);
-                                            min_cost activity_min_cost(activity, request);
-                                            available_spots activity_spots(activity, request);
-                                        ">
-                                            <div class="small-12 columns factoids">
-                                                <tal:b condition="ages">
-                                                    <span class="age" tal:define="
-                                                        min_age min(age.lower for age in ages);
-                                                        max_age max(age.upper - 1 for age in ages);
+                        <div class="subpage-cards cell" tal:define="index activities.index(activity)%20">
+                            <div class="activity-list-item card">
+                                <a href="${request.link(activity)}">
+                                    <div class="grid-x align-middle">
+                                        <div class="cell medium-7 card-section">
+                                            <h5>${activity.title}</h5>
+                                            <tal:b condition="index == 7">
+                                                <div class="banner">
+                                                    <tal:b
+                                                        condition="main_sponsor"
+                                                        replace="main_sponsor"
+                                                    />
+                                                </div>
+                                            </tal:b>
+                                            <tal:b condition="index == 14 and sponsors">
+                                                <div class="banner" tal:define="sponsor random.choice(sponsors)">
+                                                    <tal:b
+                                                        condition="sponsor"
+                                                        replace="sponsor"
+                                                    />
+                                                </div>
+                                            </tal:b>
+                                            <div class="row collapse">
+            
+            
+                                                <div class="columns small-10">
+                                                    <span class="page-lead" tal:content="layout.paragraphify(layout.linkify(activity.lead))"/>
+            
+                                                    <div class="row collapse" tal:define="
+                                                        ages activity_ages(activity, request);
+                                                        min_cost activity_min_cost(activity, request);
+                                                        available_spots activity_spots(activity, request);
                                                     ">
-                                                        <span i18n:translate class="show-for-sr">Age</span>
-                                                        <span i18n:translate>
-                                                            <tal:b replace="min_age" i18n:name='min_age' />
-                                                            -
-                                                            <tal:b replace="max_age" i18n:name='max_age' />
-                                                            years
-                                                        </span>
-                                                    </span>
-                                                </tal:b>
-                                                <tal:b condition="min_cost is not None">
-                                                    <span class="cost">
-                                                        <span i18n:translate class="show-for-sr">Cost</span>
-
-                                                        <span i18n:translate>
-                                                            starting at <tal:b i18n:name='price'>${'{:.2f}'.format(min_cost)}</tal:b> CHF
-                                                        </span>
-                                                    </span>
-                                                </tal:b>
-                                                <tal:b>
-                                                    <span class="${available_spots and 'available-spots' or 'full'}">
-                                                        <span i18n:translate class="show-for-sr">Free Spots</span>
-
-                                                        <span i18n:translate tal:condition="not available_spots">
-                                                            No free spots
-                                                        </span>
-                                                        <span i18n:translate tal:condition="available_spots == 1">
-                                                            1 free spot
-                                                        </span>
-                                                        <span i18n:translate tal:condition="available_spots > 1">
-                                                            <tal:b i18n:name="count">${available_spots}</tal:b> free spots
-                                                        </span>
-                                                    </span>
-                                                </tal:b>
+                                                        <div class="small-12 columns factoids">
+                                                            <tal:b condition="ages">
+                                                                <span class="age" tal:define="
+                                                                    min_age min(age.lower for age in ages);
+                                                                    max_age max(age.upper - 1 for age in ages);
+                                                                ">
+                                                                    <span i18n:translate class="show-for-sr">Age</span>
+                                                                    <span i18n:translate>
+                                                                        <tal:b replace="min_age" i18n:name='min_age' />
+                                                                        -
+                                                                        <tal:b replace="max_age" i18n:name='max_age' />
+                                                                        years
+                                                                    </span>
+                                                                </span>
+                                                            </tal:b>
+                                                            <tal:b condition="min_cost is not None">
+                                                                <span class="cost">
+                                                                    <span i18n:translate class="show-for-sr">Cost</span>
+            
+                                                                    <span i18n:translate>
+                                                                        starting at <tal:b i18n:name='price'>${'{:.2f}'.format(min_cost)}</tal:b> CHF
+                                                                    </span>
+                                                                </span>
+                                                            </tal:b>
+                                                            <tal:b>
+                                                                <span class="${available_spots and 'available-spots' or 'full'}">
+                                                                    <span i18n:translate class="show-for-sr">Free Spots</span>
+            
+                                                                    <span i18n:translate tal:condition="not available_spots">
+                                                                        No free spots
+                                                                    </span>
+                                                                    <span i18n:translate tal:condition="available_spots == 1">
+                                                                        1 free spot
+                                                                    </span>
+                                                                    <span i18n:translate tal:condition="available_spots > 1">
+                                                                        <tal:b i18n:name="count">${available_spots}</tal:b> free spots
+                                                                    </span>
+                                                                </span>
+                                                            </tal:b>
+                                                        </div>
+                                                    </div>
+                                                </div>
                                             </div>
                                         </div>
+                                        <div class="cell medium-5 align-self-top">
+                                            <div class="show-for-medium" tal:condition="activity.thumbnail|nothing" style="width: 100%; padding-bottom: 60%; background-image: url('${activity.thumbnail}'); background-size: cover; border-radius: 0 .7rem;"></div>
+                                            <span class="button hollow event-more-link" style="margin: 1.5rem 1rem 1.5rem 0.7rem; display: block;" i18n:translate="">Learn more</span>
+                                        </div>
                                     </div>
-                                </div>
+                                </a>
                             </div>
-                        </tal:b>
+                        </div>
                     </tal:b>
                 </div>
 
@@ -116,15 +120,19 @@
                 </div>
             </div>
 
-            <div class="columns medium-4 filter-panel" ic-target="#content" ic-push-url="true" ic-select-from-response="#content" ic-scroll-to-target="true">
-                <div tal:condition="filters['periods']|nothing" class="filter-periods">
-                    <h2 class="filter-title" i18n:translate>Periods</h2>
-                    <div metal:use-macro="layout.macros['tags']" tal:define="tags filters['periods']" />
+            <div class="large-4 medium-4 cell large-offset-1 sidebar" ic-target="#content" ic-push-url="true" ic-select-from-response="#content" ic-scroll-to-target="true">
+                <div class="side-panel" tal:condition="filters['periods']|nothing">
+                    <div class="filter-periods">
+                        <h3 class="filter-title" i18n:translate>Periods</h3>
+                        <div metal:use-macro="layout.macros['tags']" tal:define="tags filters['periods']" />
+                    </div>
                 </div>
 
-                <div tal:condition="filters['states']|nothing" class="filter-states">
-                    <h2 class="filter-title" i18n:translate>States</h2>
-                    <div metal:use-macro="layout.macros['tags']" tal:define="tags filters['states']" />
+                <div class="side-panel" tal:condition="filters['states']|nothing">
+                    <div class="filter-states">
+                        <h3 class="filter-title" i18n:translate>States</h3>
+                        <div metal:use-macro="layout.macros['tags']" tal:define="tags filters['states']" />
+                    </div>
                 </div>
 
                 <div tal:condition="filters['own']|nothing" class="filter-own">
