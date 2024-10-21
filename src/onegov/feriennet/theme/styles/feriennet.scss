@@ -24,11 +24,12 @@ a > h6 {
 /*
     hide certain settings
 */
-.homepage-settings,
 .holiday-settings,
-.field-geo_provider,
-.field-about_url,
-.field-hide_onegov_footer,
+.grid-x.field-geo_provider,
+.grid-x.field-about_url,
+.grid-x.field-hide_onegov_footer,
+#fieldset-footer-division,
+#fieldset-partner-display,
 #fieldset-first-partner,
 #fieldset-second-partner,
 #fieldset-third-partner,
@@ -282,6 +283,14 @@ ul.single-line {
 }
 
 .platform-promotion > div {
+
+    .fas.fa-external-link-alt.fa-xs {
+        display: inline;
+    }
+
+    a {
+        font-weight: bold;
+    }
     margin-bottom: .75rem;
     max-width: 70ex;
 }
@@ -318,8 +327,15 @@ ul.single-line {
 
 }
 
-footer .fa-external-link-alt {
-    display: none;
+footer {
+    .cell ul.social-media-links {
+        margin-bottom: 1.5rem;
+    }
+
+    .footer-content > .cell.footer-links {
+        text-align: center;
+        margin-top: 3rem;
+    }
 }
 
 /*

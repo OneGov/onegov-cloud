@@ -45,13 +45,62 @@
     <!-- End Google Tag Manager (noscript) -->
 </metal:footer>
 
-<metal:footer_sponsors define-macro="footer_sponsors" i18n:domain="onegov.feriennet">
-    <div class="row sponsor-footer">
-        <div class="columns small-12">
-            <h2 i18n:translate>Pro Juventute Feriennet</h2>
+<metal:footer_columns define-macro="footer_columns">
+    <tal:b define="contact layout.org.contact_html|nothing;
+        contact_url layout.org.contact_url|nothing;
+        opening_hours layout.org.opening_hours_html|nothing;
+        opening_hours_url layout.org.opening_hours_url|nothing;
+        facebook layout.org.facebook_url|nothing;
+        twitter layout.org.twitter_url|nothing;
+        instagram layout.org.instagram_url|nothing;
+        youtube layout.org.youtube_url|nothing;
+        linkedin layout.org.linkedin_url|nothing;
+        tiktok layout.org.tiktok_url|nothing;
+        custom_links layout.custom_links|nothing;">
+        <tal:b tal:condition="any((
+            contact,
+            contact_url,
+            opening_hours,
+            opening_hours_url,
+            facebook,
+            twitter,
+            instagram,
+            youtube,
+            linkedin,
+            tiktok,
+            custom_links
+        ))">
+            <div class="small-12 medium-3 cell">
+                <metal:b use-macro="layout.macros['footer_contact']" />
+            </div>
 
-            <div class="row">
-                <div class="columns small-12 medium-3">
+            <div class="small-12 medium-5 cell">
+                <metal:b use-macro="layout.macros['footer_opening_hours']" />
+            </div>
+
+            <div class="small-12 medium-4 cell">
+                <metal:b use-macro="layout.macros['footer_social_media']" />
+                <metal:b use-macro="layout.macros['footer_custom_links']" />
+            </div>
+        </tal:b>
+    </tal:b>
+</metal:footer_columns>
+
+<metal:footer_custom_links define-macro="footer_custom_links">
+    <tal:b define="custom_links layout.custom_links">
+        <tal:b tal:condition="custom_links" tal:repeat="link custom_links">
+            <h5 class="custom-links" i18n:translate="">Links</h5>
+            <a href="${link[1]}"><i class="fa fa-link fa-fw"></i> ${link[0]}</a>
+        </tal:b>
+    </tal:b>
+</metal:footer_custom_links>
+
+<metal:footer_sponsors define-macro="footer_sponsors" i18n:domain="onegov.feriennet">
+        <div class="cell small-12">
+            <h5 i18n:translate>Pro Juventute Feriennet</h5>
+
+            <div class="grid-x grid-padding-x">
+                <div class="cell small-12 medium-3">
                     <tal:b condition="request.locale.startswith('de')">
                         <a href="https://www.projuventute.ch/de/eltern/lehrpersonen-fachpersonen/feriennet" class="pro-juventute-logo">
                             <img src="${layout.static_file_path('projuventute.svg')}"
@@ -83,22 +132,21 @@
                         </a>
                     </tal:b>
                 </div>
-                <div class="columns small-12 medium-5 pro-juventute-ad-text">
+                <div class="cell small-12 medium-5 pro-juventute-ad-text">
                     <!--! This is not being translated with our translation machinery as the content of this is very explicitly specified. -->
 
                     <div class="platform-promotion">
                         <tal:b condition="request.locale.startswith('de')">
                             <div>
                                 <a href="https://www.projuventute.ch/de/eltern/lehrpersonen-fachpersonen/feriennet">
-                                    Feriennet ist die Buchungsplattform von Pro Juventute für betreute Ferienangebote.
-                                </a>
+                                    Feriennet</a> ist die Buchungsplattform von Pro Juventute für betreute Ferienangebote.
                                 <span>
                                     Weitere Angebote der Stiftung finden Sie <a href="https://www.projuventute.ch/de/angebote">hier</a>.
                                 </span>
                             </div>
 
                             <div>
-                                Sie möchten unsere Arbeit für Kinder und Jugendliche in der Schweiz unterstützen? Dann können Sie hier <a href="https://www.projuventute.ch/de/helfen/spenden" class="donate-link">spenden</a>. Herzlichen Dank.
+                                Sie möchten unsere Arbeit für Kinder und Jugendliche in der Schweiz unterstützen? Dann können Sie <a href="https://www.projuventute.ch/de/helfen/spenden" class="donate-link">hier</a> spenden. Herzlichen Dank.
                             </div>
 
                             <div>
@@ -143,7 +191,7 @@
                         </tal:b>
                     </div>
                 </div>
-                <div class="columns small-12 medium-4">
+                <div class="cell small-12 medium-4">
                     <div class="platform-awards">
                         <metal:b use-macro="layout.macros.bosw_award" />
                         <metal:b use-macro="layout.macros.onegov_award" />
@@ -151,13 +199,11 @@
                 </div>
             </div>
         </div>
-    </div>
-    <div class="row sponsor-footer">
-        <div class="columns small-12">
-            <h2 i18n:translate>Feriennet Partner</h2>
+        <div class="cell small-12 sponsor-footer">
+            <h5 i18n:translate>Feriennet Partner</h5>
 
-            <div tal:repeat="batch layout.batched(layout.app.sponsors, 4)" class="row sponsors-row">
-                <div tal:repeat="sponsor batch" class="columns small-12 medium-3 large-3 ${repeat.sponsor.end and 'end' or ''}">
+            <div tal:repeat="batch layout.batched(layout.app.sponsors, 4)" class="grid-x grid-padding-x">
+                <div tal:repeat="sponsor batch" class="cell small-12 medium-3 large-3 ${repeat.sponsor.end and 'end' or ''}">
                     <div tal:define="sponsor sponsor and sponsor.compiled(request)" tal:condition="sponsor and sponsor.logo|False" class="sponsor" style="background-color: ${sponsor.background};">
                         <a href="${sponsor.logo_url}" title="${sponsor.name}">
                             <div style="background-image: url('${sponsor.url_for(request, sponsor.logo)}')"></div>
@@ -166,12 +212,10 @@
                 </div>
             </div>
         </div>
-    </div>
 </metal:footer_sponsors>
 
 <metal:footer_links define-macro="footer_links" i18n:domain="onegov.org">
-    <div class="row footer-links">
-      <div class="small-12 columns">
+    <div class="small-12 cell footer-links">
         <span>&copy; Pro Juventute ${layout.today().year}</span>
         <span>
             <a href="https://github.com/OneGov/onegov-cloud/blob/master/CHANGES.md#release-${layout.app.version.replace('.', '')}">Feriennet ${layout.app.version}</a>
@@ -209,7 +253,6 @@
                 Login
             </a>
         </span>
-      </div>
     </div>
 </metal:footer_links>
 
@@ -289,7 +332,7 @@
         <dt i18n:translate>Phone</dt>
         <dd><a href="tel:${phone}">${phone}</a></dd>
     </div>
-</metal:b
+</metal:b>
 
 <metal:activity_ticket_summary define-macro="activity_ticket_summary" i18n:domain="onegov.feriennet">
     <tal:b define="user activity.user.data.organisation or activity.user.title|activity.user.title">
