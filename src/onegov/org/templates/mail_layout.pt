@@ -281,6 +281,7 @@
         display: block;
         height: 6em;
         margin: 0 auto;
+        padding-bottom: 20px;
     }
     </style>
 </head>
