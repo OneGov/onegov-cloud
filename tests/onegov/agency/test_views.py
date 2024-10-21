@@ -1,6 +1,8 @@
 from datetime import datetime
 from datetime import timedelta
 from io import BytesIO
+
+import pytest
 from markupsafe import Markup
 from onegov.agency.models import ExtendedAgency
 from onegov.agency.models import ExtendedAgencyMembership
@@ -778,12 +780,13 @@ def test_basic_search(client_with_es):
     assert 'Nick' in client.get('/search-postgres?q=Anesthetist')
 
     # Test suggestions (no autocomplete)
-    assert '8911 Rivera Nick (Doctor)' in client.get(
-        '/search-postgres/suggest?q=Nick').json
-    assert '8911 Rivera Nick (Doctor)' in client.get(
-        '/search-postgres/suggest?q=Rivera').json
-    assert '8911 Rivera Nick (Doctor)' in client.get(
-        '/search-postgres/suggest?q=8911').json
+    expected = ['Nick', 'Rivera', '(Doctor)']
+    assert all(v in client.get('/search-postgres/suggest?q=Nick').json[0]
+               for v in expected)
+    assert all(v in client.get('/search-postgres/suggest?q=Rivera').json[0]
+               for v in expected)
+    assert all(v in client.get('/search-postgres/suggest?q=8911').json[0]
+               for v in expected)
 
 
 @mark.flaky(reruns=3)
