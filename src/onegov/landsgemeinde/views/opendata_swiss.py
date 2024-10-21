@@ -187,12 +187,8 @@ def view_rdf(
         url = request.link(item, 'json')
         sub(dist, 'dcat:accessURL', {'rdf:resource': url})
         sub(dist, 'dcat:downloadURL', {'rdf:resource': url})
-        license = sub(
-            dist, 'dct:license',
-            {'rdf:about': 'http://dcat-ap.ch/vocabulary/licenses/terms_by'}
-        )
-        sub(license, 'rdf:type', {
-            'rdf:resource': 'http://purl.org/dc/terms/RightsStatement'
+        sub( dist, 'dct:license', {
+            'rdf:resource': 'http://dcat-ap.ch/vocabulary/licenses/terms_by'
         })
         sub(dist, 'dcat:mediaType', {
             'rdf:resource': 'https://www.iana.org/assignments/media-types/'
