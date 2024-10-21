@@ -71,7 +71,7 @@ var BUTTON_LABELS = {
     }
 };
 
-var MonthlyView = React.createClass({
+var MonthlyView = createReactClass({
     render: function() {
         var locale = $('html').attr('lang').substring(0, 2);
 
