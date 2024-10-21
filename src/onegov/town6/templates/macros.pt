@@ -531,8 +531,10 @@
 
 <metal:upload define-macro="upload" i18n:domain="onegov.town6">
     <form action="${upload_url}" class="upload" method="POST" enctype="multipart/form-data">
-        <div class="upload-dropzone dropzone" i18n:translate>
-            Drop files to upload
+        <div class="upload-dropzone dropzone">
+            <input type="file" id="fileElem" class="hidden" multiple>
+            <label class="button" for="fileElem" i18n:translate>Select files</label>
+            <p class="show-for-medium" i18n:translate>Drop files to upload</p>
         </div>
 
         <div class="upload-progress" metal:define-slot='upload-progress'></div>
