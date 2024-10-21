@@ -6,10 +6,12 @@ from datetime import date
 from datetime import datetime
 from datetime import timedelta
 
+from freezegun import freeze_time
+
 from onegov.core.utils import module_path
 from onegov.file import FileCollection
 from onegov.form import FormCollection
-from onegov.page.model import Page
+from onegov.org.models.page import Page
 
 from tests.onegov.org.common import get_cronjob_by_name
 from tests.onegov.org.common import get_cronjob_url
@@ -122,9 +124,12 @@ def test_search_recently_published_object(client_with_es):
 
     client.app.es_client.indices.refresh(index='_all')
 
-    assert session.query(Page).filter(
+    page = session.query(Page).filter(
         Page.title == "Now supporting fulltext search"
-    ).one().published == False
+    ).one()
+    assert page.access == 'public'
+    assert page.published == False
+    assert page.es_public == False
 
     # elasticsearch
     assert 'fulltext' in client.get('/search?q=wow')
@@ -146,16 +151,19 @@ def test_search_recently_published_object(client_with_es):
     ).one().publication_start = then
     transaction.commit()
 
+    # needed for ES
     job = get_cronjob_by_name(client.app, 'hourly_maintenance_tasks')
     job.app = client.app
     url = get_cronjob_url(job)
     client.get(url)
-
     sleep(5)
 
-    assert session.query(Page).filter(
+    page = session.query(Page).filter(
         Page.title == "Now supporting fulltext search"
-    ).one().published == True
+    ).one()
+    assert page.access == 'public'
+    assert page.published == True
+    assert page.es_public == True
 
     # elasticsearch
     assert 'fulltext' in client.get('/search?q=wow')
@@ -180,12 +188,14 @@ def test_search_recently_published_object(client_with_es):
     transaction.commit()
 
     client.get(url)
-
     sleep(5)
 
-    assert session.query(Page).filter(
+    page = session.query(Page).filter(
         Page.title == "Now supporting fulltext search"
-    ).one().published == False
+    ).one()
+    assert page.access == 'public'
+    assert page.published == False
+    assert page.es_public == False
 
     # elasticsearch
     assert 'fulltext' in client.get('/search-postgres?q=wow')
@@ -196,8 +206,67 @@ def test_search_recently_published_object(client_with_es):
     # postgres
     assert 'fulltext' in client.get('/search-postgres?q=wow')
     assert 'fulltext' not in anom.get('/search-postgres?q=wow')
+    assert 'fulltext' not in client.spawn().get('/search-postgres?q=wow')
     assert 'is pretty awesome' in client.get('/search-postgres?q=fulltext')
     assert 'is pretty awesome' not in anom.get('/search-postgres?q=fulltext')
+    assert 'is pretty awesome' not in client.spawn().get(
+        '/search-postgres?q=fulltext')
+
+
+def test_search_recently_published_object_freeze(client_with_es):
+    # this is the same as the test above, but with freeze_time with a
+    # predefined period of publication
+    client = client_with_es
+    client.login_admin()
+    anom = client.spawn()
+
+    # Create objects, not yet published
+    now = datetime.now()
+    start = now + timedelta(days=1)
+    end = now + timedelta(days=2)
+
+    add_news = client.get('/news').click('Nachricht')
+    add_news.form['title'] = "Now supporting fulltext search"
+    add_news.form['lead'] = "It is pretty awesome"
+    add_news.form['text'] = "Much <em>wow</em>"
+    add_news.form['publication_start'] = start.isoformat()
+    add_news.form['publication_end'] = end.isoformat()
+    assert add_news.form.submit().follow().status_code == 200
+
+    # not yet published
+    with freeze_time(now + timedelta(hours=1)):
+        assert 'fulltext' in client.get('/search-postgres?q=wow')
+        assert 'fulltext' not in anom.get('/search-postgres?q=wow')
+        assert 'pretty awesome' in client.get('/search-postgres?q=fulltext')
+        assert 'pretty awesome' not in anom.get('/search-postgres?q=fulltext')
+
+    # right before been published
+    with freeze_time(start - timedelta(seconds=1)):
+        assert 'fulltext' in client.get('/search-postgres?q=wow')
+        assert 'fulltext' not in anom.get('/search-postgres?q=wow')
+        assert 'pretty awesome' in client.get('/search-postgres?q=fulltext')
+        assert 'pretty awesome' not in anom.get('/search-postgres?q=fulltext')
+
+    # published start
+    with freeze_time(start + timedelta(seconds=1)):
+        assert 'fulltext' in client.get('/search-postgres?q=wow')
+        assert 'fulltext' in anom.get('/search-postgres?q=wow')
+        assert 'pretty awesome' in client.get('/search-postgres?q=fulltext')
+        assert 'pretty awesome' in anom.get('/search-postgres?q=fulltext')
+
+    # published before end
+    with freeze_time(end - timedelta(seconds=1)):
+        assert 'fulltext' in client.get('/search-postgres?q=wow')
+        assert 'fulltext' in anom.get('/search-postgres?q=wow')
+        assert 'pretty awesome' in client.get('/search-postgres?q=fulltext')
+        assert 'pretty awesome' in anom.get('/search-postgres?q=fulltext')
+
+    # not anymore published
+    with freeze_time(end + timedelta(seconds=1)):
+        assert 'fulltext' in client.get('/search-postgres?q=wow')
+        assert 'fulltext' not in anom.get('/search-postgres?q=wow')
+        assert 'pretty awesome' in client.get('/search-postgres?q=fulltext')
+        assert 'pretty awesome' not in anom.get('/search-postgres?q=fulltext')
 
 
 @pytest.mark.flaky(reruns=3)

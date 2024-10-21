@@ -751,7 +751,7 @@ def test_basic_search(client_with_es):
     client.app.es_client.indices.refresh(index='_all')
     client = client.spawn()
 
-    # Test search results
+    # Test search results elasticsearch
     assert 'Rivera' in client.get('/search?q=Nick')
     assert 'Nick' in client.get('/search?q=Rivera')
     assert 'Nick' in client.get('/search?q=Doctor')
@@ -765,8 +765,25 @@ def test_basic_search(client_with_es):
     assert 'Nick Rivera (Doctor)' in client.get('/search/suggest?q=Nic').json
     assert 'Rivera Nick (Doctor)' in client.get('/search/suggest?q=Riv').json
     assert '8911 Rivera Nick (Doctor)' in client.get(
-        '/search/suggest?q=89'
-    ).json
+        '/search/suggest?q=89').json
+
+    # postgres
+    assert 'Rivera' in client.get('/search-postgres?q=Nick')
+    assert 'Nick' in client.get('/search-postgres?q=Rivera')
+    assert 'Nick' in client.get('/search-postgres?q=Doctor')
+    assert 'Nick' in client.get('/search-postgres?q=345678901')
+    assert 'Nick' in client.get('/search-postgres?q=345678911')
+    assert 'Nick' in client.get('/search-postgres?q=8911')
+    assert 'Hospital Springfield' in client.get('/search-postgres?q=Hospital')
+    assert 'Nick' in client.get('/search-postgres?q=Anesthetist')
+
+    # Test suggestions (no autocomplete)
+    assert '8911 Rivera Nick (Doctor)' in client.get(
+        '/search-postgres/suggest?q=Nick').json
+    assert '8911 Rivera Nick (Doctor)' in client.get(
+        '/search-postgres/suggest?q=Rivera').json
+    assert '8911 Rivera Nick (Doctor)' in client.get(
+        '/search-postgres/suggest?q=8911').json
 
 
 @mark.flaky(reruns=3)
@@ -797,12 +814,22 @@ def test_search_recently_published_object(client_with_es):
 
     client.app.es_client.indices.refresh(index='_all')
 
+    # elasticsearch
     assert 'Nick' in client.get('/search?q=Rivera')
     assert 'Nick' not in anom.get('/search?q=Rivera')
     assert 'Hospital Springfield' in client.get('/search?q=Hospital')
     assert 'Hospital Springfield' not in anom.get('/search?q=Hospital')
     assert 'Nick' in client.get('/search?q=Anesthetist')
     assert 'Nick' not in anom.get('/search?q=Anesthetist')
+
+    # postgres
+    assert 'Nick' in client.get('/search-postgres?q=Rivera')
+    assert 'Nick' not in anom.get('/search-postgres?q=Rivera')
+    assert 'Hospital Springfield' in client.get('/search-postgres?q=Hospital')
+    assert 'Hospital Springfield' not in anom.get(
+        '/search-postgres?q=Hospital')
+    assert 'Nick' in client.get('/search-postgres?q=Anesthetist')
+    assert 'Nick' not in anom.get('/search-postgres?q=Anesthetist')
 
     # Publish
     then = utcnow() - timedelta(minutes=30)
@@ -819,12 +846,28 @@ def test_search_recently_published_object(client_with_es):
 
     sleep(5)
 
+    # elasticsearch
     assert 'Nick' in client.get('/search?q=Rivera')
     assert 'Nick' in anom.get('/search?q=Rivera')
+    assert 'Nick' in client.spawn().get('/search?q=Rivera')
     assert 'Hospital Springfield' in client.get('/search?q=Hospital')
     assert 'Hospital Springfield' in anom.get('/search?q=Hospital')
+    assert 'Hospital Springfield' in client.spawn().get('/search?q=Hospital')
     assert 'Nick' in client.get('/search?q=Anesthetist')
     assert 'Nick' in anom.get('/search?q=Anesthetist')
+    assert 'Nick' in client.spawn().get('/search?q=Anesthetist')
+
+    # postgres
+    assert 'Nick' in client.get('/search-postgres?q=Rivera')
+    assert 'Nick' in anom.get('/search-postgres?q=Rivera')
+    assert 'Nick' in client.spawn().get('/search-postgres?q=Rivera')
+    assert 'Hospital Springfield' in client.get('/search-postgres?q=Hospital')
+    assert 'Hospital Springfield' in anom.get('/search-postgres?q=Hospital')
+    assert 'Hospital Springfield' in client.spawn().get(
+        '/search-postgres?q=Hospital')
+    assert 'Nick' in client.get('/search-postgres?q=Anesthetist')
+    assert 'Nick' in anom.get('/search-postgres?q=Anesthetist')
+    assert 'Nick' in client.spawn().get('/search-postgres?q=Anesthetist')
 
     # Unpublish
     session.query(ExtendedPerson).one().publication_start = None
@@ -839,12 +882,24 @@ def test_search_recently_published_object(client_with_es):
 
     sleep(5)
 
+    # elasticsearch
     assert 'Nick' in client.get('/search?q=Rivera')
+    assert 'Nick' not in anom.get('/search?q=Rivera')
     assert 'Nick' not in client.spawn().get('/search?q=Rivera')
     assert 'Hospital Springfield' in client.get('/search?q=Hospital')
     assert 'Hospital Springfield' not in anom.get('/search?q=Hospital')
     assert 'Nick' in client.get('/search?q=Anesthetist')
     assert 'Nick' not in anom.get('/search?q=Anesthetist')
+
+    # postgres
+    assert 'Nick' in client.get('/search-postgres?q=Rivera')
+    assert 'Nick' not in anom.get('/search-postgres?q=Rivera')
+    assert 'Nick' not in client.spawn().get('/search-postgres?q=Rivera')
+    assert 'Hospital Springfield' in client.get('/search-postgres?q=Hospital')
+    assert 'Hospital Springfield' not in anom.get(
+        '/search-postgres?q=Hospital')
+    assert 'Nick' in client.get('/search-postgres?q=Anesthetist')
+    assert 'Nick' not in anom.get('/search-postgres?q=Anesthetist')
 
 
 def test_footer_settings_custom_links(client):

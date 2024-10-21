@@ -213,21 +213,37 @@ def test_views_manage(client_with_es):
     client.app.es_client.indices.refresh(index='_all')
     client = client.spawn()
 
+    # elasticsearch
     assert '0 Resultate' in client.get('/search?q=aa')
     assert '0 Resultate' in client.get('/search?q=bb')
     assert '0 Resultate' in client.get('/search?q=cc')
     assert '0 Resultate' in client.get('/search?q=first')
     assert '0 Resultate' in client.get('/search?q=2020-2024')
     assert '0 Resultate' in client.get('/search?q=Q1')
+    # postgres
+    assert '0 Resultate' in client.get('/search-postgres?q=aa')
+    assert '0 Resultate' in client.get('/search-postgres?q=bb')
+    assert '0 Resultate' in client.get('/search-postgres?q=cc')
+    assert '0 Resultate' in client.get('/search-postgres?q=first')
+    assert '0 Resultate' in client.get('/search-postgres?q=2020-2024')
+    assert '0 Resultate' in client.get('/search-postgres?q=Q1')
 
     client.login_admin()
 
+    # elasticsearch
     assert '1 Resultat' in client.get('/search?q=aa')
     assert '1 Resultat' in client.get('/search?q=bb')
     assert '1 Resultat' in client.get('/search?q=cc')
     assert '1 Resultat' in client.get('/search?q=first')
     assert '1 Resultat' in client.get('/search?q=2020-2024')
     assert '1 Resultat' in client.get('/search?q=Q1')
+    # postgres
+    assert '1 Resultat' in client.get('/search-postgres?q=aa')
+    assert '1 Resultat' in client.get('/search-postgres?q=bb')
+    assert '1 Resultat' in client.get('/search-postgres?q=cc')
+    assert '1 Resultat' in client.get('/search-postgres?q=first')
+    assert '1 Resultat' in client.get('/search-postgres?q=2020-2024')
+    assert '1 Resultat' in client.get('/search-postgres?q=Q1')
 
     # Delete
     for page in delete:
