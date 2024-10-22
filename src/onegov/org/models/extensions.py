@@ -675,7 +675,11 @@ class PersonLinkExtension(ContentExtension):
                     # if the people are not ordered we keep the order of the
                     # existing list and add the new people at the end
                     existing = dict(previous_people)
-                    new_people = previous_people.copy()
+                    new_people = [
+                        person
+                        for person in previous_people
+                        if person[0] in people_values
+                    ]
 
                     for person_id, values in people_values.items():
                         if person_id not in existing:
