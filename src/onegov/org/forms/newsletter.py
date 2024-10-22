@@ -1,6 +1,5 @@
 from datetime import timedelta
 import transaction
-from sqlalchemy.exc import IntegrityError
 from wtforms.validators import DataRequired
 from onegov.core.csv import convert_excel_to_csv, CSVFile
 from onegov.form.fields import UploadField
@@ -398,13 +397,12 @@ class NewsletterSubscriberImportExportForm(Form):
             assert self.file.file is not None
             csvfile = convert_excel_to_csv(self.file.file)
         except Exception:
-            return 0, ['0']
-
+            return 0, ['Error converting file']
         try:
             # dialect needs to be set, else error
             csv = CSVFile(csvfile, dialect='excel')
         except Exception:
-            return 0, ['0']
+            return 0, ['Error reading CSV file']
 
         lines = list(csv.lines)
         columns = {
@@ -416,6 +414,7 @@ class NewsletterSubscriberImportExportForm(Form):
             return getattr(line, column)
 
         count = 0
+        skipped = 0
         errors = []
         for number, line in enumerate(lines, start=1):
             try:
@@ -424,17 +423,23 @@ class NewsletterSubscriberImportExportForm(Form):
                     for attribute, column in columns.items()
                 }
                 kwargs['confirmed'] = True
+                address = next(iter(kwargs.values()))
+                if recipients.by_address(address):
+                    # silently skip duplicates
+                    skipped += 1
+                    continue
                 recipients.add(**kwargs)
                 count += 1
-            except IntegrityError:
-                message = str(number) + self.request.translate(
-                    _(': (Address already exists)')
-                )
-                errors.append(message)
-            except Exception:
-                errors.append(str(number))
+            except Exception as e:
+                error_msg = f'Error on line {number}: {e!s}'
+                errors.append(error_msg)
 
-        if self.dry_run.data or errors:
+        if self.dry_run.data:
             transaction.abort()
 
-        return count, errors
+        summary = [f'Imported: {count}, Skipped duplicates: {skipped}']
+        if errors:
+            summary.append(f'Errors: {len(errors)}')
+            summary.extend(errors)
+
+        return count, summary
