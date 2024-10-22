@@ -64,6 +64,14 @@ class Topic(Page, TraitInfo, SearchableContent, AccessExtension,
     def es_public(self) -> bool:
         return self.access == 'public' and self.published
 
+    @es_public.expression  # type:ignore[no-redef]
+    def es_public(cls) -> 'ClauseElement':
+        retval = and_(
+            cls.meta['access'] == 'public',
+            cls.published == True
+        )
+        return retval
+
     @property
     def deletable(self) -> bool:
         """ Returns true if this page may be deleted. """
@@ -164,7 +172,7 @@ class News(Page, TraitInfo, SearchableContent, NewsletterExtension,
 
     @es_public.expression  # type:ignore[no-redef]
     def es_public(cls) -> 'ClauseElement':
-        and_(
+        return and_(
             cls.access == 'public',
             cls.published == True
         )

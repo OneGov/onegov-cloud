@@ -1,4 +1,4 @@
-from sqlalchemy import func, select
+from sqlalchemy import func, select, and_
 from sqlalchemy.orm import object_session
 from sqlalchemy.ext.hybrid import hybrid_property
 
@@ -29,6 +29,13 @@ class ExtendedPerson(Person, AccessExtension, PublicationExtension):
     @hybrid_property
     def es_public(self) -> bool:
         return self.access == 'public' and self.published
+
+    @es_public.expression  # type:ignore[no-redef]
+    def es_public(cls) -> 'ClauseElement':
+        return and_(
+            cls.access == 'public',
+            cls.published == True
+        )
 
     es_properties = {
         'title': {'type': 'text'},

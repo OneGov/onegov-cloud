@@ -66,7 +66,7 @@ class ExtendedAgencyMembership(AgencyMembership, AccessExtension,
                 (agency_meta['access'] != 'public', False),
                 (agency_published != True, False),
             ],
-            else_=cls.access == 'public'
+            else_=cls.meta['access'] == 'public'
         )
 
     # Todo: It is very unclear how this should be used. In the PDF rendering,

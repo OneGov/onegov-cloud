@@ -5,12 +5,13 @@ from sqlalchemy.ext.hybrid import hybrid_property
 from onegov.core.orm import Base
 from onegov.core.orm.mixins import TimestampMixin
 from onegov.core.orm.types import UUID
+from onegov.event.models import Event
 from onegov.event.models.mixins import OccurrenceMixin
 from onegov.gis import Coordinates
 from pytz import UTC
 from sedate import to_timezone
 from sedate import utcnow
-from sqlalchemy import Column
+from sqlalchemy import Column, select
 from sqlalchemy import ForeignKey
 from sqlalchemy.orm import relationship
 from uuid import uuid4
@@ -19,7 +20,7 @@ from uuid import uuid4
 from typing import TYPE_CHECKING
 if TYPE_CHECKING:
     import uuid
-    from onegov.event.models import Event
+    from sqlalchemy.sql import ClauseElement
 
 
 class Occurrence(Base, OccurrenceMixin, TimestampMixin):
@@ -77,3 +78,9 @@ class Occurrence(Base, OccurrenceMixin, TimestampMixin):
     @hybrid_property
     def access(self) -> str:
         return self.event.access
+
+    @access.expression  # type:ignore[no-redef]
+    def access(cls) -> 'ClauseElement':
+        return select([Event.meta['access']]).where(
+            Event.id == cls.event_id
+        ).as_scalar()
