@@ -249,7 +249,7 @@ class GeneralFile(File, SearchableFile):
 
         return widest_access(*self.linked_accesses.values())
 
-    @access.expression
+    @access.expression  # type:ignore[no-redef]
     def access(cls):
         return case([
             (cls.publication == True, 'public'),
@@ -266,7 +266,7 @@ class GeneralFile(File, SearchableFile):
     def es_public(self) -> bool:
         return self.published and self.access == 'public'
 
-    @es_public.expression  # ignore[no-redef]
+    @es_public.expression  # type:ignore[no-redef]
     def es_public(cls) -> 'ClauseElement':
         return and_(
             cls.published == True,

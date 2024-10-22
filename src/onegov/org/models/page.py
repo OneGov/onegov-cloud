@@ -162,7 +162,7 @@ class News(Page, TraitInfo, SearchableContent, NewsletterExtension,
     def es_public(self) -> bool:
         return self.access == 'public' and self.published
 
-    @es_public.expression  # ignore[no-redef]
+    @es_public.expression  # type:ignore[no-redef]
     def es_public(cls) -> 'ClauseElement':
         and_(
             cls.access == 'public',

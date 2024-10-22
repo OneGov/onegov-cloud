@@ -155,7 +155,7 @@ class CourseEvent(Base, TimestampMixin, ORMSearchable):
     def description(self) -> 'Markup':
         return self.course.description
 
-    @description.expression
+    @description.expression  # type:ignore[no-redef]
     def description(cls) -> 'ClauseElement':
         from .course import Course
 

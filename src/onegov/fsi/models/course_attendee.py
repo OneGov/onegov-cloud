@@ -141,7 +141,7 @@ class CourseAttendee(Base, ORMSearchable):
             if part
         ) or self.email
 
-    @title.expression
+    @title.expression  # type:ignore[no-redef]
     def title(cls) -> 'ClauseElement':
         has_name = and_(cls.first_name != None, cls.last_name != None)
         return case([
@@ -175,17 +175,17 @@ class CourseAttendee(Base, ORMSearchable):
             #        where it isn't allowed to be None, so we should
             #        probably disallow it and properly deal with it
             #        in places where it's allowed to be None
-            return self._email  # type:ignore[return-value]
+            return self._email
         assert self.user is not None
         return self.user.username
 
-    @email.expression
+    @email.expression  # type:ignore[no-redef]
     def email(cls) -> 'ClauseElement':
         return case([
             (cls.user_id == None, cls._email)
         ], else_=cls.user.username)
 
-    @email.setter
+    @email.setter  # type:ignore[no-redef]
     def email(self, value: str) -> None:
         self._email = value
 

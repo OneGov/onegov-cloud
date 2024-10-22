@@ -359,7 +359,7 @@ class FormSubmissionHandler(Handler):
             url_obj = URL(request.link(self.submission))
             edit_url = url_obj.query_param('edit', '').as_string()
 
-            (links if not links else extra).append(  # type:ignore
+            (links if not links else extra).append(
                 Link(
                     text=_('Edit submission'),
                     url=request.return_here(edit_url),
