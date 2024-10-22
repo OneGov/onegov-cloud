@@ -5,7 +5,6 @@ from sqlalchemy.ext.hybrid import hybrid_property
 from onegov.core.orm import Base
 from onegov.core.orm.mixins import TimestampMixin
 from onegov.core.orm.types import UUID
-from onegov.event.models import Event
 from onegov.event.models.mixins import OccurrenceMixin
 from onegov.gis import Coordinates
 from pytz import UTC
@@ -20,6 +19,7 @@ from uuid import uuid4
 from typing import TYPE_CHECKING
 if TYPE_CHECKING:
     import uuid
+    from onegov.event.models import Event
     from sqlalchemy.sql import ClauseElement
 
 
