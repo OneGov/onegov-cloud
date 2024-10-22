@@ -7,6 +7,8 @@ from wtforms.meta import DefaultMeta, _SupportsGettextAndNgettext
 
 from onegov.form.types import PricingRules
 
+__all__ = ("FieldList",)
+
 _BoundFieldT = TypeVar("_BoundFieldT", bound=Field)
 
 class FieldList(Field, Generic[_BoundFieldT]):

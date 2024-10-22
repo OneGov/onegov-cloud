@@ -7,6 +7,8 @@ from wtforms.meta import DefaultMeta, _SupportsGettextAndNgettext
 
 from onegov.form.types import PricingRules
 
+__all__ = ("FormField",)
+
 _BoundFormT = TypeVar("_BoundFormT", bound=BaseForm)
 
 class FormField(Field, Generic[_BoundFormT]):
