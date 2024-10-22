@@ -672,20 +672,8 @@ class PersonLinkExtension(ContentExtension):
                         if (v := people_values.get(person.id.hex)) is not None
                     ]
                 else:
-                    # if the people are not ordered we keep the order of the
-                    # existing list and add the new people at the end
-                    existing = dict(previous_people)
-                    new_people = [
-                        person
-                        for person in previous_people
-                        if person[0] in people_values
-                    ]
-
-                    for person_id, values in people_values.items():
-                        if person_id not in existing:
-                            new_people.append((person_id, values))
-
-                    obj.content['people'] = new_people
+                    # otherwise we just use the given order
+                    obj.content['people'] = list(people_values.items())
 
         field_macro = request.template_loader.macros['field']
         # FIXME: It is not ideal that we have to pass a dummy form along to
