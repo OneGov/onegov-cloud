@@ -302,16 +302,16 @@ class SearchPostgres(Pagination[_M]):
         language = locale_mapping(self.request.locale or 'de_CH')
         ts_query = func.websearch_to_tsquery(language,
                                              func.unaccent(self.web_search))
+        session = self.request.session
 
         for base in self.request.app.session_manager.bases:
             for model in searchable_sqlalchemy_models(base):
                 if model.es_public or self.request.is_logged_in:
-                    query = self.request.session.query(model)
-                    doc_count += query.count()
+                    query = session.query(model)
                     if not self.request.is_logged_in:
                         query = query.filter(model.es_public == True)
 
-                    if query.count():
+                    if session.query(query.exists()).scalar():
                         weighted = (
                             self._create_weighted_vector(model, language))
                         rank_expression = func.coalesce(
@@ -323,7 +323,9 @@ class SearchPostgres(Pagination[_M]):
                         query = (query.filter(model.fts_idx.op('@@')(ts_query))
                                  .add_columns(rank_expression))
 
-                        results.extend(list(query.all()))
+                        res = list(query.all())
+                        doc_count += len(res)
+                        results.extend(res)
 
         # remove duplicates, sort by rank
         results = list(set(results))
