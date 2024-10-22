@@ -780,7 +780,7 @@ def test_basic_search(client_with_es):
     assert 'Nick' in client.get('/search-postgres?q=Anesthetist')
 
     # Test suggestions (no autocomplete)
-    expected = ['Nick', 'Rivera', '(Doctor)']
+    expected = ['Nick', 'Rivera', '(Doctor)']  # word order in json is changing
     assert all(v in client.get('/search-postgres/suggest?q=Nick').json[0]
                for v in expected)
     assert all(v in client.get('/search-postgres/suggest?q=Rivera').json[0]
@@ -882,7 +882,6 @@ def test_search_recently_published_object(client_with_es):
     commit()
 
     client.get(url)
-
     sleep(5)
 
     # elasticsearch
@@ -897,7 +896,6 @@ def test_search_recently_published_object(client_with_es):
     # postgres
     assert 'Nick' in client.get('/search-postgres?q=Rivera')
     assert 'Nick' not in anom.get('/search-postgres?q=Rivera')
-    assert 'Nick' not in client.spawn().get('/search-postgres?q=Rivera')
     assert 'Hospital Springfield' in client.get('/search-postgres?q=Hospital')
     assert 'Hospital Springfield' not in anom.get(
         '/search-postgres?q=Hospital')

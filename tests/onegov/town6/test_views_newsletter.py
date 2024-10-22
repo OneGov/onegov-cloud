@@ -755,7 +755,6 @@ def test_newsletter_schedule(client):
         send.form.submit().follow()
 
 
-# tschupre
 def test_newsletter_test_delivery(client):
     client.login_editor()
 

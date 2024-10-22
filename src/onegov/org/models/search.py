@@ -246,7 +246,6 @@ class SearchPostgres(Pagination[_M]):
         actual search results form the query.
 
         """
-        print('*** tschupre cached_property load_batch_results')
         batch: List[Searchable] = self.batch
         future_events: List[Searchable] = []
         other: List[Searchable] = []

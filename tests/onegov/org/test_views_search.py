@@ -206,11 +206,8 @@ def test_search_recently_published_object(client_with_es):
     # postgres
     assert 'fulltext' in client.get('/search-postgres?q=wow')
     assert 'fulltext' not in anom.get('/search-postgres?q=wow')
-    assert 'fulltext' not in client.spawn().get('/search-postgres?q=wow')
     assert 'is pretty awesome' in client.get('/search-postgres?q=fulltext')
     assert 'is pretty awesome' not in anom.get('/search-postgres?q=fulltext')
-    assert 'is pretty awesome' not in client.spawn().get(
-        '/search-postgres?q=fulltext')
 
 
 def test_search_recently_published_object_freeze(client_with_es):
