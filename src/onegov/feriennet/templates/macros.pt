@@ -770,8 +770,8 @@
 </metal:booking_state>
 
 <metal:periods define-macro="periods" i18n:domain="onegov.feriennet" i18n:domain="onegov.feriennet">
-    <div class="filter-panel" tal:condition="len(periods) > 1">
-        <h2 class="filter-title" i18n:translate tal:condition="not hide_title|True">Period</h2>
+    <div class="filter-panel side-panel" tal:condition="len(periods) > 1">
+        <h3 class="filter-title" i18n:translate tal:condition="not hide_title|True">Period</h3>
         <select onchange="location = this.value;" tal:define="view_name view_name|None">
             <option tal:repeat="p periods" value="${request.link(model.for_period(p), name=view_name)}" tal:attributes="selected p.id == period.id">
                 ${p.title}

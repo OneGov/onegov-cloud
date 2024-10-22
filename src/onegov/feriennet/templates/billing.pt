@@ -18,8 +18,8 @@
             </div>
         </div>
 
-        <div class="row">
-            <div class="columns small-12 medium-8">
+        <div class="grid-x grid-padding-x wrapper">
+            <div class="medium-8 large-7 cell content">
                 <tal:b condition="not: bills" i18n:translate>No bills found.</tal:b>
 
                 <div class="bills billing">
@@ -140,65 +140,67 @@
                     </div>
                 </div>
             </div>
-            <div class="columns small-12 medium-4">
-                <div class="side-panel form-panel">
-                    <h4 i18n:translate>Billing</h4>
+            <div class="large-4 medium-4 cell large-offset-1 sidebar">
+                <div class="sidebar-wrapper">
+                    <div class="side-panel form-panel">
+                        <h3 i18n:translate>Billing</h3>
 
-                    <div class="form-panel-block">
-                        <tal:b condition="period.active and period.confirmed and period.finalizable and not period.finalized">
-                            <div metal:use-macro="layout.macros['form']" />
+                        <div class="form-panel-block">
+                            <tal:b condition="period.active and period.confirmed and period.finalizable and not period.finalized">
+                                <div metal:use-macro="layout.macros['form']" />
 
-                            <a ic-post-to="${request.link(model, 'reset')}" redirect-after="${request.link(model)}" i18n:translate class="reset-billing" tal:condition="bills">
-                                Reset Billing
-                            </a>
-                        </tal:b>
+                                <a ic-post-to="${request.link(model, 'reset')}" redirect-after="${request.link(model)}" i18n:translate class="reset-billing" tal:condition="bills">
+                                    Reset Billing
+                                </a>
+                            </tal:b>
 
-                        <tal:b condition="not period.finalizable">
-                            <p>
-                                <i class="fa fa-lock fa-fw" aria-hidden="true"></i>
-                                <span i18n:translate>
-                                    Billing is disabled for this period.
-                                </span>
-                            </p>
-                        </tal:b>
+                            <tal:b condition="not period.finalizable">
+                                <p>
+                                    <i class="fa fa-lock fa-fw" aria-hidden="true"></i>
+                                    <span i18n:translate>
+                                        Billing is disabled for this period.
+                                    </span>
+                                </p>
+                            </tal:b>
 
-                        <tal:b condition="period.active and not period.confirmed">
-                            <p>
-                                <i class="fa fa-lock fa-fw" aria-hidden="true"></i>
-                                <span i18n:translate>
-                                    The matching of this period has not been confirmed yet.
-                                </span>
-                            </p>
-                        </tal:b>
+                            <tal:b condition="period.active and not period.confirmed">
+                                <p>
+                                    <i class="fa fa-lock fa-fw" aria-hidden="true"></i>
+                                    <span i18n:translate>
+                                        The matching of this period has not been confirmed yet.
+                                    </span>
+                                </p>
+                            </tal:b>
 
-                        <tal:b condition="not period.active and not period.finalized">
-                            <p>
-                                <i class="fa fa-lock fa-fw" aria-hidden="true"></i>
-                                <span i18n:translate>
-                                    This period is not active. Bills may only be created for the active period.
-                                </span>
-                            </p>
-                        </tal:b>
+                            <tal:b condition="not period.active and not period.finalized">
+                                <p>
+                                    <i class="fa fa-lock fa-fw" aria-hidden="true"></i>
+                                    <span i18n:translate>
+                                        This period is not active. Bills may only be created for the active period.
+                                    </span>
+                                </p>
+                            </tal:b>
 
-                        <tal:b condition="period.finalized">
-                            <p>
-                                <i class="fa fa-lock fa-fw" aria-hidden="true"></i>
-                                <span i18n:translate>
-                                    The billing for this period has been confirmed. You can still change the invoices manually but you can no longer generate them automatically.
-                                </span>
-                            </p>
-                        </tal:b>
+                            <tal:b condition="period.finalized">
+                                <p>
+                                    <i class="fa fa-lock fa-fw" aria-hidden="true"></i>
+                                    <span i18n:translate>
+                                        The billing for this period has been confirmed. You can still change the invoices manually but you can no longer generate them automatically.
+                                    </span>
+                                </p>
+                            </tal:b>
+                        </div>
                     </div>
-                </div>
 
-                <div class="filter-panel">
-                    <div class="filter-state">
-                        <h2 class="filter-title" i18n:translate>Payment State</h2>
-                        <div metal:use-macro="layout.macros['tags']" tal:define="tags filters['state']" />
+                    <div class="side-panel filter-panel">
+                        <div class="filter-state">
+                            <h3 class="filter-title" i18n:translate>Payment State</h3>
+                            <div metal:use-macro="layout.macros['tags']" tal:define="tags filters['state']" />
+                        </div>
                     </div>
-                </div>
 
-                <tal:b metal:use-macro="layout.macros.periods" />
+                    <tal:b metal:use-macro="layout.macros.periods" />
+                </div>
             </div>
         </div>
     </tal:b>

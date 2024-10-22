@@ -67,7 +67,8 @@
                     </td>
                     <td>
                         <ul class="small dense">
-                            <li tal:repeat="link links(period)" tal:content="link(layout)" />
+                            <li tal:repeat="link links(period)" tal:content="link(layout)"
+                            />
                         </ul>
                     </td>
                 </tr>
