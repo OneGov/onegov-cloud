@@ -21,7 +21,7 @@ if TYPE_CHECKING:
     from onegov.notice.models import NoticeState
     from sqlalchemy.orm import Query, Session
     from sqlalchemy.sql import ColumnElement
-    from typing_extensions import Self, TypeAlias
+    from typing import Self, TypeAlias
     from uuid import UUID
 
     _StrColumnLike: TypeAlias = (
@@ -43,7 +43,7 @@ def get_unique_notice_name(
     """ Create a unique, URL-friendly name. """
 
     # it's possible for `normalize_for_url` to return an empty string...
-    name = normalize_for_url(name) or "notice"
+    name = normalize_for_url(name) or 'notice'
 
     while session.query(
         session.query(model_class.name)

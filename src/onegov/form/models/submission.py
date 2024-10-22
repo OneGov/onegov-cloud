@@ -55,7 +55,7 @@ class FormSubmission(Base, TimestampMixin, Payable, AssociatedFiles,
     #: name of the form this submission belongs to
     name: 'Column[str | None]' = Column(
         Text,
-        ForeignKey("forms.name"),
+        ForeignKey('forms.name'),
         nullable=True
     )
 
@@ -114,7 +114,7 @@ class FormSubmission(Base, TimestampMixin, Payable, AssociatedFiles,
     #: the id of the registration window linked with this submission
     registration_window_id: 'Column[uuid.UUID | None]' = Column(
         UUID,  # type:ignore[arg-type]
-        ForeignKey("registration_windows.id"),
+        ForeignKey('registration_windows.id'),
         nullable=True
     )
 
@@ -211,7 +211,7 @@ class FormSubmission(Base, TimestampMixin, Payable, AssociatedFiles,
     submitter_address: dict_property[str | None] = meta_property()
     submitter_phone: dict_property[str | None] = meta_property()
     __mapper_args__ = {
-        "polymorphic_on": 'state'
+        'polymorphic_on': 'state'
     }
 
     if TYPE_CHECKING:
@@ -322,10 +322,6 @@ class SurveySubmission(Base, TimestampMixin, AssociatedFiles,
 
     __tablename__ = 'survey_submissions'
 
-    __mapper_args__ = {
-        "polymorphic_on": 'state'
-    }
-
     #: id of the form submission
     id: 'Column[uuid.UUID]' = Column(
         UUID,  # type:ignore[arg-type]
@@ -336,7 +332,7 @@ class SurveySubmission(Base, TimestampMixin, AssociatedFiles,
     #: name of the survey this submission belongs to
     name: 'Column[str | None]' = Column(
         Text,
-        ForeignKey("surveys.name"),
+        ForeignKey('surveys.name'),
         nullable=True
     )
 
@@ -361,16 +357,10 @@ class SurveySubmission(Base, TimestampMixin, AssociatedFiles,
     #: the submission data
     data: 'Column[dict[str, Any]]' = Column(JSON, nullable=False)
 
-    #: the state of the submission
-    state: 'Column[SubmissionState]' = Column(
-        Enum('pending', 'complete', name='submission_state'),  # type:ignore
-        nullable=False
-    )
-
     #: the id of the submission window linked with this submission
     submission_window_id: 'Column[uuid.UUID | None]' = Column(
         UUID,  # type:ignore[arg-type]
-        ForeignKey("submission_windows.id"),
+        ForeignKey('submission_windows.id'),
         nullable=True
     )
 
@@ -417,14 +407,6 @@ class PendingFormSubmission(FormSubmission):
 
 
 class CompleteFormSubmission(FormSubmission):
-    __mapper_args__ = {'polymorphic_identity': 'complete'}
-
-
-class PendingSurveySubmission(SurveySubmission):
-    __mapper_args__ = {'polymorphic_identity': 'pending'}
-
-
-class CompleteSurveySubmission(SurveySubmission):
     __mapper_args__ = {'polymorphic_identity': 'complete'}
 
 

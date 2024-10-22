@@ -34,16 +34,16 @@ def view_update_results(
     if form.submitted(request):
         archive = ArchivedResultCollection(request.session)
         archive.update_all(request)
-        request.message(_("Results updated."), 'success')
+        request.message(_('Results updated.'), 'success')
         return redirect(layout.manage_link)
 
     return {
         'layout': layout,
         'form': form,
-        'title': _("Update archived results"),
+        'title': _('Update archived results'),
         'callout': _(
-            "The results on the home page and in the archive are cached and "
-            "need to be updated after a domain change, for example."
+            'The results on the home page and in the archive are cached and '
+            'need to be updated after a domain change, for example.'
         ),
         'cancel': layout.manage_link
     }

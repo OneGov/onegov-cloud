@@ -21,7 +21,7 @@ if TYPE_CHECKING:
 T = TypeVar('T')
 
 
-class inherited_attribute(Generic[T]):
+class inherited_attribute(Generic[T]):  # noqa: N801
 
     def __set_name__(
         self,

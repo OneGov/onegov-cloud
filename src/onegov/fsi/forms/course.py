@@ -120,7 +120,7 @@ class CourseForm(Form):
     )
 
     mandatory_refresh = BooleanField(
-        label=_("Refresh mandatory"),
+        label=_('Refresh mandatory'),
         default=False
     )
 
@@ -135,7 +135,7 @@ class CourseForm(Form):
     )
 
     hidden_from_public = BooleanField(
-        label=_("Hidden"),
+        label=_('Hidden'),
         default=False,
     )
 

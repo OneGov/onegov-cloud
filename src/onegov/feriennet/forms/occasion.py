@@ -34,28 +34,28 @@ class OccasionForm(Form):
     timezone = 'Europe/Zurich'
 
     period_id = SelectField(
-        label=_("Period"),
+        label=_('Period'),
         validators=[InputRequired()],
         default='0xdeadbeef')
 
     dates = StringField(
-        label=_("Dates"),
+        label=_('Dates'),
         render_kw={'class_': 'many many-datetime-ranges'}
     )
 
     meeting_point = StringField(
-        label=_("Meeting Point"),
+        label=_('Meeting Point'),
         validators=[InputRequired()]
     )
 
     note = TextAreaField(
-        label=_("Note"),
+        label=_('Note'),
         render_kw={'rows': 4}
     )
 
     cost = DecimalField(
-        label=_("Cost"),
-        description=_("The amount paid to the organiser"),
+        label=_('Cost'),
+        description=_('The amount paid to the organiser'),
         validators=[
             Optional(),
             NumberRange(0.00, 10000.00)
@@ -63,77 +63,77 @@ class OccasionForm(Form):
     )
 
     min_spots = IntegerField(
-        label=_("Minimum Number of Participants"),
+        label=_('Minimum Number of Participants'),
         validators=[
             InputRequired(),
             NumberRange(0, 10000)
         ],
-        fieldset=_("Participants")
+        fieldset=_('Participants')
     )
 
     max_spots = IntegerField(
-        label=_("Maximum Number of Participants"),
+        label=_('Maximum Number of Participants'),
         validators=[
             InputRequired(),
             NumberRange(1, 10000)
         ],
-        fieldset=_("Participants")
+        fieldset=_('Participants')
     )
 
     min_age = IntegerField(
-        label=_("Minimum Age"),
+        label=_('Minimum Age'),
         validators=[
             InputRequired(),
             NumberRange(0, 99)
         ],
-        fieldset=_("Participants")
+        fieldset=_('Participants')
     )
 
     max_age = IntegerField(
-        label=_("Maximum Age"),
+        label=_('Maximum Age'),
         validators=[
             InputRequired(),
             NumberRange(0, 99)
         ],
-        fieldset=_("Participants")
+        fieldset=_('Participants')
     )
 
     exclude_from_overlap_check = BooleanField(
-        label=_("Allow overlap"),
+        label=_('Allow overlap'),
         description=_(
-            "Allows bookings to this occasion to overlap with other bookings."
+            'Allows bookings to this occasion to overlap with other bookings.'
         ),
-        fieldset=_("Advanced"),
+        fieldset=_('Advanced'),
         default=False
     )
 
     exempt_from_booking_limit = BooleanField(
-        label=_("Exempt from booking limit"),
+        label=_('Exempt from booking limit'),
         description=_(
-            "Allows bookings to this occasion to be excempt from booking "
-            "limits. Does not apply to matching."
+            'Allows bookings to this occasion to be excempt from booking '
+            'limits. Does not apply to matching.'
         ),
-        fieldset=_("Advanced"),
+        fieldset=_('Advanced'),
         default=False
     )
 
     administrative_cost = RadioField(
-        label=_("The administrative cost of each booking"),
+        label=_('The administrative cost of each booking'),
         choices=(
-            ('default', _("Use default costs defined by the period")),
-            ('custom', _("Use custom costs")),
+            ('default', _('Use default costs defined by the period')),
+            ('custom', _('Use custom costs')),
         ),
-        fieldset=_("Advanced"),
+        fieldset=_('Advanced'),
         default='default'
     )
 
     administrative_cost_amount = DecimalField(
-        label=_("Administrative cost"),
+        label=_('Administrative cost'),
         validators=[
             Optional(),
             NumberRange(0.00, 10000.00)
         ],
-        fieldset=_("Advanced"),
+        fieldset=_('Advanced'),
         depends_on=('administrative_cost', 'custom')
     )
 
@@ -180,8 +180,6 @@ class OccasionForm(Form):
     def parsed_dates(self) -> list[DateRange]:
         result = []
 
-        DateRange = self.DateRange
-
         for date in json.loads(self.dates.data or '{}').get('values', []):
             try:
                 start = isodate.parse_datetime(date['start'].replace(' ', 'T'))
@@ -189,7 +187,7 @@ class OccasionForm(Form):
             except isodate.isoerror.ISO8601Error:
                 continue
 
-            result.append(DateRange(
+            result.append(self.DateRange(
                 start=standardize_date(start, self.timezone),
                 end=standardize_date(end, self.timezone)
             ))
@@ -225,7 +223,7 @@ class OccasionForm(Form):
 
     def ensure_at_least_one_date(self) -> bool | None:
         if not self.parsed_dates:
-            self.dates.errors = [_("Must specify at least one date")]
+            self.dates.errors = [_('Must specify at least one date')]
             return False
         return None
 
@@ -244,8 +242,8 @@ class OccasionForm(Form):
             if self.model.bookings:
                 self.period_id.errors = [
                     _(
-                        "Cannot adjust period, there are bookings "
-                        "linked to this occassion"
+                        'Cannot adjust period, there are bookings '
+                        'linked to this occassion'
                     )
                 ]
                 return False
@@ -264,19 +262,19 @@ class OccasionForm(Form):
 
             if d.start > d.end:
                 self.date_errors[index] = self.request.translate(_(
-                    "The end date must be after the start date"
+                    'The end date must be after the start date'
                 ))
                 valid = False
 
             if start_date < min_start or min_end < start_date:
                 self.date_errors[index] = self.request.translate(_(
-                    "The date is outside the selected period"
+                    'The date is outside the selected period'
                 ))
                 valid = False
 
             if end_date < min_start or min_end < end_date:
                 self.date_errors[index] = self.request.translate(_(
-                    "The date is outside the selected period"
+                    'The date is outside the selected period'
                 ))
                 valid = False
 
@@ -284,12 +282,12 @@ class OccasionForm(Form):
                 if index != subindex:
                     if overlaps(d.start, d.end, subd.start, subd.end):
                         self.date_errors[index] = self.request.translate(_(
-                            "The date overlaps with another in this occasion."
+                            'The date overlaps with another in this occasion.'
                         ))
                         valid = False
 
         if not valid and not self.dates.errors:
-            self.dates.errors = [_("Date validation failed")]
+            self.dates.errors = [_('Date validation failed')]
 
         return valid
 
@@ -297,7 +295,7 @@ class OccasionForm(Form):
         if self.min_age.data is not None and self.max_age.data is not None:
             if self.min_age.data > self.max_age.data:
                 self.min_age.errors = [
-                    _("Minimum age must be lower than maximum age.")]
+                    _('Minimum age must be lower than maximum age.')]
                 return False
         return None
 
@@ -306,8 +304,8 @@ class OccasionForm(Form):
             if self.min_spots.data > self.max_spots.data:
                 assert isinstance(self.min_spots.errors, list)
                 self.min_spots.errors.append(_(
-                    "The minium number of participants cannot be higher "
-                    "than the maximum number of participants"
+                    'The minium number of participants cannot be higher '
+                    'than the maximum number of participants'
                 ))
                 return False
         return None
@@ -325,8 +323,8 @@ class OccasionForm(Form):
         if len(self.model.accepted) > self.max_spots.data:
             assert isinstance(self.max_spots.errors, list)
             self.max_spots.errors.append(_(
-                "The maximum number of spots is lower than the number "
-                "of already accepted bookings."
+                'The maximum number of spots is lower than the number '
+                'of already accepted bookings.'
             ))
             return False
         return None
@@ -349,16 +347,16 @@ class OccasionForm(Form):
 
         return json.dumps({
             'labels': {
-                'start': self.request.translate(_("Start")),
-                'end': self.request.translate(_("End")),
-                'add': self.request.translate(_("Add")),
-                'remove': self.request.translate(_("Remove")),
+                'start': self.request.translate(_('Start')),
+                'end': self.request.translate(_('End')),
+                'add': self.request.translate(_('Add')),
+                'remove': self.request.translate(_('Remove')),
             },
             'values': [
                 {
                     'start': as_json_date(d.start),
                     'end': as_json_date(d.end),
-                    'error': self.date_errors.get(ix, "")
+                    'error': self.date_errors.get(ix, '')
                 } for ix, d in enumerate(dates)
             ],
             'extra': {
@@ -383,7 +381,7 @@ class OccasionForm(Form):
             'max_age'
         })
 
-        assert self.parsed_dates, "should have been caught earlier"
+        assert self.parsed_dates, 'should have been caught earlier'
 
         occasions = OccasionCollection(self.request.session)
         occasions.clear_dates(model)

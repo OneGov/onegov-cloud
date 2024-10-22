@@ -33,7 +33,7 @@ if TYPE_CHECKING:
     from onegov.fsi.request import FsiRequest
     from sqlalchemy.orm import Query
     from sqlalchemy.sql import ClauseElement
-    from typing_extensions import Self, TypeAlias
+    from typing import Self, TypeAlias
     from wtforms.fields.choices import _Choice
     from .course import Course
     from .course_notification_template import (
@@ -88,7 +88,7 @@ def course_status_choices(
     zipped: zip[tuple[str, str]] = zip(COURSE_EVENT_STATUSES, translations)
     if as_dict:
         return [{val: key} for val, key in zipped]
-    return [(val, key) for val, key in zipped]  # type:ignore[return-value]
+    return list(zipped)  # type:ignore[return-value]
 
 
 class CourseEvent(Base, TimestampMixin, ORMSearchable):
@@ -166,7 +166,7 @@ class CourseEvent(Base, TimestampMixin, ORMSearchable):
     def __str__(self) -> str:
         start = to_timezone(
             self.start, 'Europe/Zurich').strftime('%d.%m.%Y %H:%M')
-        return f"{self.name} - {start}"
+        return f'{self.name} - {start}'
 
     @cached_property
     def localized_start(self) -> datetime.datetime:
@@ -222,13 +222,13 @@ class CourseEvent(Base, TimestampMixin, ORMSearchable):
     # The associated notification templates
     # FIXME: Are some of these optional?
     info_template: 'relationship[InfoTemplate]' = relationship(
-        "InfoTemplate", uselist=False)
+        'InfoTemplate', uselist=False)
     reservation_template: 'relationship[SubscriptionTemplate]' = relationship(
-        "SubscriptionTemplate", uselist=False)
+        'SubscriptionTemplate', uselist=False)
     cancellation_template: 'relationship[CancellationTemplate]' = relationship(
-        "CancellationTemplate", uselist=False)
+        'CancellationTemplate', uselist=False)
     reminder_template: 'relationship[ReminderTemplate]' = relationship(
-        "ReminderTemplate", uselist=False)
+        'ReminderTemplate', uselist=False)
 
     # hides for members/editors
     hidden_from_public: 'Column[bool]' = Column(

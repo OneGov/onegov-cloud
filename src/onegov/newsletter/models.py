@@ -66,7 +66,7 @@ class Newsletter(Base, ContentMixin, TimestampMixin, SearchableContent):
     @validates('name')
     def validate_name(self, key: str, name: str) -> str:
         assert normalize_for_url(name) == name, (
-            "The given name was not normalized"
+            'The given name was not normalized'
         )
 
         return name

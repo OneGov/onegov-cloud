@@ -70,7 +70,7 @@ def update_votes(
         added, updated = self.update(form.dataset.data)
         request.message(
             _(
-                "Dataset updated (${added} added, ${updated} updated)",
+                'Dataset updated (${added} added, ${updated} updated)',
                 mapping={'added': added, 'updated': updated}
             ),
             'success'
@@ -87,7 +87,7 @@ def update_votes(
         if missing:
             request.message(
                 _(
-                    "The dataset contains unknown descriptors: ${items}.",
+                    'The dataset contains unknown descriptors: ${items}.',
                     mapping={'items': ', '.join(sorted(missing))}
                 ),
                 'warning'
@@ -99,7 +99,7 @@ def update_votes(
         'layout': layout,
         'form': form,
         'cancel': request.link(self),
-        'button_text': _("Update"),
+        'button_text': _('Update'),
     }
 
 
@@ -124,7 +124,7 @@ def update_metadata(
         added, updated = self.update_metadata(form.metadata.data)
         request.message(
             _(
-                "Metadata updated (${added} added, ${updated} updated)",
+                'Metadata updated (${added} added, ${updated} updated)',
                 mapping={'added': added, 'updated': updated}
             ),
             'success'
@@ -136,7 +136,7 @@ def update_metadata(
         'layout': layout,
         'form': form,
         'cancel': request.link(self),
-        'button_text': _("Update"),
+        'button_text': _('Update'),
     }
 
 
@@ -208,7 +208,7 @@ def update_external_resources(
         'layout': layout,
         'form': form,
         'cancel': request.link(self),
-        'button_text': _("Update external sources for images"),
+        'button_text': _('Update external sources for images'),
     }
 
 
@@ -266,14 +266,14 @@ def delete_votes(
     if form.submitted(request):
         for vote in self.query():
             request.session.delete(vote)
-        request.message(_("All votes deleted"), 'success')
+        request.message(_('All votes deleted'), 'success')
         return request.redirect(layout.votes_url)
 
     return {
         'layout': layout,
         'form': form,
-        'message': _("Do you really want to delete all votes?!"),
-        'button_text': _("Delete"),
+        'message': _('Do you really want to delete all votes?!'),
+        'button_text': _('Delete'),
         'button_class': 'alert',
         'cancel': request.link(self)
     }

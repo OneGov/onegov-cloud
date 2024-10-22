@@ -204,7 +204,7 @@ def ticket_statistics_common_template_args(
         collection.for_state('closed').for_owner(None))  # type:ignore
 
     args['title'] = request.translate(
-        _("${org} OneGov Cloud Status", mapping={
+        _('${org} OneGov Cloud Status', mapping={
             'org': request.app.org.title
         })
     )
@@ -450,7 +450,7 @@ def send_daily_resource_usage_overview(request: 'OrgRequest') -> None:
     }
 
     # get the resource titles and ids
-    default_group = request.translate(_("General"))
+    default_group = request.translate(_('General'))
 
     all_resources = tuple(
         ResourceCollection(request.app.libres_context).query()
@@ -517,7 +517,7 @@ def send_daily_resource_usage_overview(request: 'OrgRequest') -> None:
     args: RenderData = {
         'layout': DefaultMailLayout(object(), request),
         'title': request.translate(
-            _("${org} Reservation Overview", mapping={
+            _('${org} Reservation Overview', mapping={
                 'org': request.app.org.title
             })
         ),
@@ -560,7 +560,7 @@ def end_chats_and_create_tickets(request: 'OrgRequest') -> None:
             send_ticket_mail(
                 request=request,
                 template='mail_turned_chat_into_ticket.pt',
-                subject=_("Your Chat has been turned into a ticket"),
+                subject=_('Your Chat has been turned into a ticket'),
                 receivers=(chat.email, ),
                 ticket=ticket,
                 content={

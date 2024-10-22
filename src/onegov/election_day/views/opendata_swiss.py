@@ -144,7 +144,7 @@ def view_rdf(self: Principal, request: 'ElectionDayRequest') -> bytes:
 
         # Keywords
         for keyword in (
-            _("Vote") if is_vote else _("Election"),
+            _('Vote') if is_vote else _('Election'),
             domains[item.domain]
         ):
             for locale, lang in locales.items():
@@ -162,9 +162,9 @@ def view_rdf(self: Principal, request: 'ElectionDayRequest') -> bytes:
             if is_vote:
                 if item.domain == 'canton':
                     des = _(
-                        "Final results of the cantonal vote \"${title}\", "
-                        "${date}, ${principal}, "
-                        "broken down by municipalities.",
+                        'Final results of the cantonal vote "${title}", '
+                        '${date}, ${principal}, '
+                        'broken down by municipalities.',
                         mapping={
                             'title': (
                                 item.get_title(locale, default_locale) or ''
@@ -177,9 +177,9 @@ def view_rdf(self: Principal, request: 'ElectionDayRequest') -> bytes:
                     )
                 else:
                     des = _(
-                        "Final results of the federal vote \"${title}\", "
-                        "${date}, ${principal}, "
-                        "broken down by municipalities.",
+                        'Final results of the federal vote "${title}", '
+                        '${date}, ${principal}, '
+                        'broken down by municipalities.',
                         mapping={
                             'title': (
                                 item.get_title(locale, default_locale) or ''
@@ -193,9 +193,9 @@ def view_rdf(self: Principal, request: 'ElectionDayRequest') -> bytes:
             else:
                 if item.domain == 'canton':
                     des = _(
-                        "Final results of the cantonal election \"${title}\", "
-                        "${date}, ${principal}, "
-                        "broken down by candidates and municipalities.",
+                        'Final results of the cantonal election "${title}", '
+                        '${date}, ${principal}, '
+                        'broken down by candidates and municipalities.',
                         mapping={
                             'title': (
                                 item.get_title(locale, default_locale) or ''
@@ -208,9 +208,9 @@ def view_rdf(self: Principal, request: 'ElectionDayRequest') -> bytes:
                     )
                 elif item.domain in ('region', 'district', 'none'):
                     des = _(
-                        "Final results of the regional election \"${title}\", "
-                        "${date}, ${principal}, "
-                        "broken down by candidates and municipalities.",
+                        'Final results of the regional election "${title}", '
+                        '${date}, ${principal}, '
+                        'broken down by candidates and municipalities.',
                         mapping={
                             'title': (
                                 item.get_title(locale, default_locale) or ''
@@ -223,9 +223,9 @@ def view_rdf(self: Principal, request: 'ElectionDayRequest') -> bytes:
                     )
                 else:
                     des = _(
-                        "Final results of the federal election \"${title}\", "
-                        "${date}, ${principal}, "
-                        "broken down by candidates and municipalities.",
+                        'Final results of the federal election "${title}", '
+                        '${date}, ${principal}, '
+                        'broken down by candidates and municipalities.',
                         mapping={
                             'title': (
                                 item.get_title(locale, default_locale) or ''
@@ -241,7 +241,7 @@ def view_rdf(self: Principal, request: 'ElectionDayRequest') -> bytes:
 
         # Format description
         for locale, lang in locales.items():
-            label = translate(_("Format Description"), locale)
+            label = translate(_('Format Description'), locale)
             url = layout.get_opendata_link(lang)
 
             fmt_des = sub(ds, 'dct:relation')
@@ -322,12 +322,8 @@ def view_rdf(self: Principal, request: 'ElectionDayRequest') -> bytes:
             sub(dist, 'dcat:downloadURL', {'rdf:resource': url})
 
             # Legal
-            license = sub(
-                dist, 'dct:license',
-                {'rdf:about': 'http://dcat-ap.ch/vocabulary/licenses/terms_by'}
-            )
-            sub(license, 'rdf:type', {
-                'rdf:resource': 'http://purl.org/dc/terms/RightsStatement'
+            sub(dist, 'dct:license', {
+                'rdf:resource': 'http://dcat-ap.ch/vocabulary/licenses/terms_by'
             })
 
             # Media Type

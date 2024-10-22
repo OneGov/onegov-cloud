@@ -64,7 +64,7 @@ def add_last_modified_header(
     if last_modified:
         response.headers.add(
             'Last-Modified',
-            last_modified.strftime("%a, %d %b %Y %H:%M:%S GMT")
+            last_modified.strftime('%a, %d %b %Y %H:%M:%S GMT')
         )
 
 
@@ -190,7 +190,7 @@ def get_entity_filter(
 ) -> list[tuple[str, bool, str]]:
 
     url = request.link(item, view)
-    result = sorted((
+    result = sorted(
         (
             entity,
             entity == selected,
@@ -198,7 +198,7 @@ def get_entity_filter(
         )
         for result in item.results
         if (entity := result.name)
-    ))
+    )
     result.insert(0, (_('All'), not selected, url))
     return result
 

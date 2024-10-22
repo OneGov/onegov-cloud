@@ -26,7 +26,7 @@ if TYPE_CHECKING:
     from fs.subfs import SubFS
     from onegov.election_day import ElectionDayApp
     from typing import TypeVar
-    from typing_extensions import TypeAlias
+    from typing import TypeAlias
 
     Entity: TypeAlias = Election | ElectionCompound | Vote
     EntityT = TypeVar('EntityT', bound=Entity)
@@ -34,10 +34,10 @@ if TYPE_CHECKING:
 
 class ArchiveGenerator:
     """
-        Iterates over all Votes, Election and ElectionCompounds and runs the
-        csv export function on each of them.
-        This creates a bunch of csv files, which are zipped and the path to
-        the zip is returned.
+    Iterates over all Votes, Election and ElectionCompounds and runs the
+    csv export function on each of them.
+    This creates a bunch of csv files, which are zipped and the path to
+    the zip is returned.
     """
     archive_dir: 'SubFS[FS]'
 
@@ -147,27 +147,29 @@ class ArchiveGenerator:
         zip_path = f'{self.archive_parent_dir}/archive.zip'
         self.archive_dir.create(zip_path)
 
-        with self.archive_dir.open(zip_path, mode='wb') as file:
-            with WriteZipFS(file) as zip_filesystem:  # type:ignore[arg-type]
-                counts = base_dir.glob('**/*.csv').count()
-                if counts.files != 0:
-                    if len(base_dir.listdir('/')) != 0:
-                        for entity in base_dir.listdir('/'):
-                            if base_dir.isdir(entity):
-                                copy_dir(
-                                    src_fs=base_dir,
-                                    src_path=entity,
-                                    dst_fs=zip_filesystem,
-                                    dst_path=entity,
-                                )
-                            if base_dir.isfile(entity):
-                                copy_file(
-                                    src_fs=base_dir,
-                                    src_path=entity,
-                                    dst_fs=zip_filesystem,
-                                    dst_path=entity,
-                                )
-                        return zip_path
+        with (
+            self.archive_dir.open(zip_path, mode='wb') as file,
+            WriteZipFS(file) as zip_filesystem  # type:ignore[arg-type]
+        ):
+            counts = base_dir.glob('**/*.csv').count()
+            if counts.files != 0:
+                if len(base_dir.listdir('/')) != 0:
+                    for entity in base_dir.listdir('/'):
+                        if base_dir.isdir(entity):
+                            copy_dir(
+                                src_fs=base_dir,
+                                src_path=entity,
+                                dst_fs=zip_filesystem,
+                                dst_path=entity,
+                            )
+                        if base_dir.isfile(entity):
+                            copy_file(
+                                src_fs=base_dir,
+                                src_path=entity,
+                                dst_fs=zip_filesystem,
+                                dst_path=entity,
+                            )
+                    return zip_path
         return None
 
     def all_counted_votes_with_results(self) -> list[Vote]:

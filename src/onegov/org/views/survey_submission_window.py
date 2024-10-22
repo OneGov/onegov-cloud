@@ -2,6 +2,7 @@ import morepath
 
 from onegov.core.security import Private
 from onegov.core.security.permissions import Public
+from onegov.core.utils import append_query_param
 from onegov.form.collection import SurveyCollection
 from onegov.form.models.definition import SurveyDefinition
 from onegov.form.models.submission import SurveySubmission
@@ -33,18 +34,18 @@ def get_hints(
         return
 
     if window.in_the_past:
-        yield 'stop', _("The survey timeframe has ended")
+        yield 'stop', _('The survey timeframe has ended')
 
     if window.in_the_future:
         yield 'date', _(
-            "The survey timeframe opens on ${day}, ${date}", mapping={
+            'The survey timeframe opens on ${day}, ${date}', mapping={
                 'day': layout.format_date(window.start, 'weekday_long'),
                 'date': layout.format_date(window.start, 'date_long')
             })
 
     if window.in_the_present:
         yield 'date', _(
-            "The survey timeframe closes on ${day}, ${date}", mapping={
+            'The survey timeframe closes on ${day}, ${date}', mapping={
                 'day': layout.format_date(window.end, 'weekday_long'),
                 'date': layout.format_date(window.end, 'date_long')
             })
@@ -63,7 +64,7 @@ def handle_new_submission_form(
     form: SurveySubmissionWindowForm,
     layout: SurveySubmissionLayout | None = None
 ) -> 'RenderData | Response':
-    title = _("New Submission Window")
+    title = _('New Submission Window')
 
     layout = layout or SurveySubmissionLayout(self, request)
     layout.edit_mode = True
@@ -77,7 +78,7 @@ def handle_new_submission_form(
             form.end.data
         ))
 
-        request.success(_("The registration window was added successfully"))
+        request.success(_('The registration window was added successfully'))
         return request.redirect(request.link(self))
 
     return {
@@ -85,8 +86,8 @@ def handle_new_submission_form(
         'title': title,
         'form': form,
         'helptext': _(
-            "Submissions windows limit survey submissions to a specific "
-            "time-range."
+            'Submissions windows limit survey submissions to a specific '
+            'time-range.'
         )
     }
 
@@ -109,7 +110,15 @@ def view_submission_window_results(
     date_range = layout.format_date_range(self.start, self.end)
     layout.breadcrumbs.append(Link(window_name, request.link(self)))
     layout.breadcrumbs.append(Link(_('Results'), '#'))
-    layout.editbar_links = []
+
+    layout.editbar_links = [
+        Link(
+            text=_('Export'),
+            url=append_query_param(
+                request.link(self.survey, name='export'),
+                'submission_window_id', self.id.hex),
+            attrs={'class': 'export-link'}
+        )]
 
     q = request.session.query(SurveySubmission)
     submissions = q.filter_by(submission_window_id=self.id).all()
@@ -161,7 +170,7 @@ def view_submission_window_survey(
 
     if enabled and request.POST:
         submission = collection.submissions.add(
-            self.name, form, state='pending',
+            self.name, form,
             submission_window=self)
 
         return morepath.redirect(request.link(submission))
@@ -182,7 +191,6 @@ def view_submission_window_survey(
         'coordinates': getattr(definition, 'coordinates', Coordinates()),
         'hints': tuple(get_hints(layout, self)),
         'hints_callout': not enabled,
-        'button_text': _('Continue')
     }
 
 
@@ -200,7 +208,7 @@ def handle_edit_submission_window(
     layout: SurveySubmissionLayout | None = None
 ) -> 'RenderData | Response':
 
-    title = _("Edit Submission Window")
+    title = _('Edit Submission Window')
 
     layout = layout or SurveySubmissionLayout(self.survey, request)
     layout.breadcrumbs.append(Link(title, '#'))
@@ -209,7 +217,7 @@ def handle_edit_submission_window(
     if form.submitted(request):
         form.populate_obj(self)
 
-        request.success(_("Your changes were saved"))
+        request.success(_('Your changes were saved'))
         return request.redirect(request.link(self.survey))
 
     elif not request.POST:
@@ -234,7 +242,11 @@ def delete_submission_window(
 
     request.assert_valid_csrf_token()
 
-    self.disassociate()
+    submissions = request.session.query(SurveySubmission)
+    submissions = submissions.filter(
+        SurveySubmission.submission_window_id == self.id)
+    submissions.delete()
     request.session.delete(self)
 
-    request.success(_("The submission window was deleted"))
+    request.success(_('The submission window and all associated submissions '
+                        'were deleted'))

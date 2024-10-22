@@ -21,7 +21,7 @@ if TYPE_CHECKING:
     from .course_subscription import CourseSubscription
 
 
-external_attendee_org = "Externe Kursteilnehmer"
+external_attendee_org = 'Externe Kursteilnehmer'
 
 
 class CourseAttendee(Base, ORMSearchable):
@@ -72,7 +72,7 @@ class CourseAttendee(Base, ORMSearchable):
     #        module boundaries here. This technically violates the
     #        separation of modules. Do we need this?
     user: 'relationship[User | None]' = relationship(
-        "User", backref=backref("attendee", uselist=False))
+        'User', backref=backref('attendee', uselist=False))
 
     # mirrors user active property
     active: 'Column[bool]' = Column(Boolean, nullable=False, default=True)

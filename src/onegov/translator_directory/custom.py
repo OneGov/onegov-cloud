@@ -35,7 +35,7 @@ def get_global_tools(
             classes=('user',),
             links=(
                 Link(
-                    _("Logout"), request.link(
+                    _('Logout'), request.link(
                         Auth.from_request(
                             request, to=logout_path(request)), name='logout'
                     ),
@@ -47,27 +47,27 @@ def get_global_tools(
         # Management Dropdown
         if request.is_admin:
             yield LinkGroup(
-                _("Management"),
+                _('Management'),
                 classes=('management',),
                 links=(
                     Link(
-                        _("Files"), request.class_link(GeneralFileCollection),
+                        _('Files'), request.class_link(GeneralFileCollection),
                         attrs={'class': 'files'}
                     ),
                     Link(
-                        _("Settings"), request.link(
+                        _('Settings'), request.link(
                             request.app.org, 'settings'
                         ),
                         attrs={'class': 'settings'}
                     ),
                     Link(
-                        _("Settings translator directory"), request.link(
+                        _('Settings translator directory'), request.link(
                             request.app.org, 'directory-settings'
                         ),
                         attrs={'class': 'settings'}
                     ),
                     Link(
-                        _("Users"), request.class_link(UserCollection),
+                        _('Users'), request.class_link(UserCollection),
                         attrs={'class': 'user'}
                     )
                 )
@@ -85,12 +85,12 @@ def get_global_tools(
                 css = 'no-tickets'
 
             yield LinkGroup(
-                screen_count == 1 and _("Ticket") or _("Tickets"),
+                screen_count == 1 and _('Ticket') or _('Tickets'),
                 classes=('with-count', css),
                 attributes={'data-count': str(screen_count)},
                 links=(
                     Link(
-                        _("My Tickets"),
+                        _('My Tickets'),
                         request.class_link(
                             TicketCollection, {
                                 'handler': 'ALL',
@@ -103,7 +103,7 @@ def get_global_tools(
                         }
                     ),
                     Link(
-                        _("Open Tickets"),
+                        _('Open Tickets'),
                         request.class_link(
                             TicketCollection,
                             {'handler': 'ALL', 'state': 'open'}
@@ -114,7 +114,7 @@ def get_global_tools(
                         }
                     ),
                     Link(
-                        _("Pending Tickets"),
+                        _('Pending Tickets'),
                         request.class_link(
                             TicketCollection,
                             {'handler': 'ALL', 'state': 'pending'}
@@ -125,7 +125,7 @@ def get_global_tools(
                         }
                     ),
                     Link(
-                        _("Closed Tickets"),
+                        _('Closed Tickets'),
                         url=request.class_link(
                             TicketCollection,
                             {'handler': 'ALL', 'state': 'closed'}
@@ -144,7 +144,7 @@ def get_global_tools(
     else:
         # Login
         yield Link(
-            _("Login"), request.link(
+            _('Login'), request.link(
                 Auth.from_request_path(request), name='login'
             ), attrs={'class': 'login'}
         )
@@ -158,7 +158,7 @@ def get_top_navigation(
         yield (  # type:ignore[misc]
             Bunch(id=-1, access='public', published=True),
             Link(
-                text=_("Translators"),
+                text=_('Translators'),
                 url=request.class_link(TranslatorCollection)
             ),
             ()
@@ -171,7 +171,7 @@ def get_top_navigation(
         yield (  # type:ignore[misc]
             Bunch(id=-1, access='public', published=True),
             Link(
-                text=_("Personal Information"),
+                text=_('Personal Information'),
                 url=request.link(translator)
             ),
             ()

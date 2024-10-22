@@ -99,21 +99,21 @@ def handle_login(
                 pass
             elif redirected_to_userprofile:
                 request.warning(_(
-                    "Your userprofile is incomplete. "
-                    "Please update it before you continue."
+                    'Your userprofile is incomplete. '
+                    'Please update it before you continue.'
                 ))
             else:
-                request.success(_("You have been logged in."))
+                request.success(_('You have been logged in.'))
 
             return response
 
-        request.alert(_("Wrong e-mail address, password or yubikey."))
+        request.alert(_('Wrong e-mail address, password or yubikey.'))
 
     layout = layout or DefaultLayout(self, request)
     request.include('scroll-to-username')
     layout.breadcrumbs = [
-        Link(_("Homepage"), layout.homepage_url),
-        Link(_("Login"), request.link(self, name='login'))
+        Link(_('Homepage'), layout.homepage_url),
+        Link(_('Login'), request.link(self, name='login'))
     ]
 
     def provider_login(provider: 'AuthenticationProvider') -> str:
@@ -125,8 +125,8 @@ def handle_login(
         'password_reset_link': request.link(self, name='request-password'),
         'register_link': request.link(self, name='register'),
         'may_register': request.app.enable_user_registration,
-        'button_text': _("Login"),
-        'providers': request.app.providers,
+        'button_text': _('Login'),
+        'providers': request.app.providers.values(),
         'provider_login': provider_login,
         'render_untrusted_markdown': render_untrusted_markdown,
         'title': _('Login to ${org}', mapping={
@@ -159,9 +159,9 @@ def handle_registration(
         try:
             user = self.register(form, request)
         except ExistingUserError:
-            request.alert(_("A user with this address already exists"))
+            request.alert(_('A user with this address already exists'))
         except ExpiredSignupLinkError:
-            request.alert(_("This signup link has expired"))
+            request.alert(_('This signup link has expired'))
         else:
             assert form.username.data is not None
             url = URL(request.link(self, 'activate'))
@@ -169,7 +169,7 @@ def handle_registration(
             url = url.query_param('token', user.data['activation_token'])
 
             subject = request.translate(
-                _("Your ${org} Registration", mapping={
+                _('Your ${org} Registration', mapping={
                     'org': request.app.org.title
                 })
             )
@@ -185,17 +185,17 @@ def handle_registration(
                 }
             )
             request.success(_(
-                "Thank you for registering. Please follow the instructions "
-                "on the activiation e-mail sent to you. Please check your "
-                "spam folder if you have not received the email."
+                'Thank you for registering. Please follow the instructions '
+                'on the activiation e-mail sent to you. Please check your '
+                'spam folder if you have not received the email.'
             ))
 
             return morepath.redirect(request.link(request.app.org))
 
     layout = layout or DefaultLayout(self, request)
     layout.breadcrumbs = [
-        Link(_("Homepage"), layout.homepage_url),
-        Link(_("Register"), request.link(self, name='register'))
+        Link(_('Homepage'), layout.homepage_url),
+        Link(_('Register'), request.link(self, name='register'))
     ]
     request.include('scroll-to-username')
 
@@ -222,15 +222,15 @@ def handle_activation(self: Auth, request: 'OrgRequest') -> 'Response':
     try:
         users.activate_with_token(username, token)
     except UnknownUserError:
-        request.warning(_("Unknown user"))
+        request.warning(_('Unknown user'))
     except InvalidActivationTokenError:
-        request.warning(_("Invalid activation token"))
+        request.warning(_('Invalid activation token'))
     except AlreadyActivatedError:
-        request.success(_("Your account has already been activated."))
+        request.success(_('Your account has already been activated.'))
     else:
         request.success(_(
-            "Your account has been activated. "
-            "You may now log in with your credentials"
+            'Your account has been activated. '
+            'You may now log in with your credentials'
         ))
 
     return morepath.redirect(request.link(request.app.org))
@@ -245,7 +245,7 @@ def do_logout(
     # clears all existing messages from the session
     @request.after
     def show_hint(response: 'Response') -> None:
-        request.success(_("You have been logged out."))
+        request.success(_('You have been logged out.'))
 
     return self.logout_to(request, to)
 
@@ -263,7 +263,7 @@ def do_logout_with_external_provider(
         return do_logout(self, request)
 
     if isinstance(self.app, UserApp) and user.source:
-        for provider in self.app.providers:
+        for provider in self.app.providers.values():
             if isinstance(provider, OauthProvider):
                 response = provider.do_logout(request, user, self.to)
                 # some providers may not need to redirect, in which
@@ -301,8 +301,8 @@ def handle_password_reset_request(
 
     layout = layout or DefaultLayout(self, request)
     layout.breadcrumbs = [
-        Link(_("Homepage"), layout.homepage_url),
-        Link(_("Reset password"), request.link(self, name='request-password'))
+        Link(_('Homepage'), layout.homepage_url),
+        Link(_('Reset password'), request.link(self, name='request-password'))
     ]
 
     if form.submitted(request):
@@ -316,13 +316,13 @@ def handle_password_reset_request(
             send_transactional_html_mail(
                 request=request,
                 template='mail_password_reset.pt',
-                subject=_("Password reset"),
+                subject=_('Password reset'),
                 receivers=(user.username, ),
                 content={'model': None, 'url': url}
             )
         else:
             log.info(
-                f"Failed password reset attempt by {request.client_addr}"
+                f'Failed password reset attempt by {request.client_addr}'
             )
 
         response = morepath.redirect(request.link(self, name='login'))
@@ -364,14 +364,14 @@ def handle_password_reset(
         # it easier to do it correctly.
 
         if form.update_password(request):
-            request.success(_("Password changed."))
+            request.success(_('Password changed.'))
             return morepath.redirect(request.link(self, name='login'))
         else:
             request.alert(
-                _("Wrong username or password reset link not valid any more.")
+                _('Wrong username or password reset link not valid any more.')
             )
             log.info(
-                "Failed password reset attempt by {}".format(
+                'Failed password reset attempt by {}'.format(
                     request.client_addr
                 )
             )
@@ -381,8 +381,8 @@ def handle_password_reset(
 
     layout = layout or DefaultLayout(self, request)
     layout.breadcrumbs = [
-        Link(_("Homepage"), layout.homepage_url),
-        Link(_("Reset password"), request.link(self, name='request-password'))
+        Link(_('Homepage'), layout.homepage_url),
+        Link(_('Reset password'), request.link(self, name='request-password'))
     ]
 
     return {
@@ -423,7 +423,7 @@ def handle_mtan_second_factor(
             return self.redirect(request, self.to)
 
         request.alert(
-            _("Failed to continue login, please ensure cookies are allowed.")
+            _('Failed to continue login, please ensure cookies are allowed.')
         )
         return morepath.redirect(request.link(self, name='login'))
 
@@ -455,11 +455,11 @@ def handle_mtan_second_factor(
                 request
             ):
                 request.warning(_(
-                    "Your userprofile is incomplete. "
-                    "Please update it before you continue."
+                    'Your userprofile is incomplete. '
+                    'Please update it before you continue.'
                 ))
             else:
-                request.success(_("You have been logged in."))
+                request.success(_('You have been logged in.'))
             return response
         else:
             request.alert(_('Invalid or expired mTAN provided.'))
@@ -468,16 +468,16 @@ def handle_mtan_second_factor(
 
     layout = layout or DefaultLayout(self, request)
     layout.breadcrumbs = [
-        Link(_("Homepage"), layout.homepage_url)
+        Link(_('Homepage'), layout.homepage_url)
     ]
 
     if is_mtan_setup:
         layout.breadcrumbs.append(
-            Link(_("Request mTAN"), request.link(self, name='mtan-setup'))
+            Link(_('Request mTAN'), request.link(self, name='mtan-setup'))
         )
     else:
         layout.breadcrumbs.append(
-            Link(_("Login"), request.link(self, name='login'))
+            Link(_('Login'), request.link(self, name='login'))
         )
 
     return {
@@ -521,7 +521,7 @@ def handle_mtan_second_factor_setup(
             return self.redirect(request, self.to)
 
         request.alert(
-            _("Failed to continue login, please ensure cookies are allowed.")
+            _('Failed to continue login, please ensure cookies are allowed.')
         )
         return morepath.redirect(request.link(self, name='login'))
 
@@ -538,8 +538,8 @@ def handle_mtan_second_factor_setup(
 
     layout = layout or DefaultLayout(self, request)
     layout.breadcrumbs = [
-        Link(_("Homepage"), layout.homepage_url),
-        Link(_("Enter mTAN"), request.link(self, name='mtan'))
+        Link(_('Homepage'), layout.homepage_url),
+        Link(_('Enter mTAN'), request.link(self, name='mtan'))
     ]
 
     return {
@@ -580,7 +580,7 @@ def handle_totp_second_factor(
             return self.redirect(request, self.to)
 
         request.alert(
-            _("Failed to continue login, please ensure cookies are allowed.")
+            _('Failed to continue login, please ensure cookies are allowed.')
         )
         return morepath.redirect(request.link(self, name='login'))
 
@@ -600,11 +600,11 @@ def handle_totp_second_factor(
                 request
             ):
                 request.warning(_(
-                    "Your userprofile is incomplete. "
-                    "Please update it before you continue."
+                    'Your userprofile is incomplete. '
+                    'Please update it before you continue.'
                 ))
             else:
-                request.success(_("You have been logged in."))
+                request.success(_('You have been logged in.'))
             return response
         else:
             request.alert(_('Invalid or expired TOTP provided.'))
@@ -617,8 +617,8 @@ def handle_totp_second_factor(
 
     layout = layout or DefaultLayout(self, request)
     layout.breadcrumbs = [
-        Link(_("Homepage"), layout.homepage_url),
-        Link(_("Login"), request.link(self, name='login'))
+        Link(_('Homepage'), layout.homepage_url),
+        Link(_('Login'), request.link(self, name='login'))
     ]
 
     return {
@@ -657,8 +657,8 @@ def handle_request_mtan(
 
     layout = layout or DefaultLayout(self, request)
     layout.breadcrumbs = [
-        Link(_("Homepage"), layout.homepage_url),
-        Link(_("Enter mTAN"), request.link(self, name='auth'))
+        Link(_('Homepage'), layout.homepage_url),
+        Link(_('Enter mTAN'), request.link(self, name='auth'))
     ]
 
     request.info(_(
@@ -708,8 +708,8 @@ def handle_authenticate_mtan(
 
     layout = layout or DefaultLayout(self, request)
     layout.breadcrumbs = [
-        Link(_("Homepage"), layout.homepage_url),
-        Link(_("Request mTAN"), request.link(self, name='request'))
+        Link(_('Homepage'), layout.homepage_url),
+        Link(_('Request mTAN'), request.link(self, name='request'))
     ]
 
     return {

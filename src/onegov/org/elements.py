@@ -125,7 +125,7 @@ class Link(_Base):
             # This snippet is duplicated in the access-hint macro!
             hint = builder.I()
             hint.attrib['class'] = 'private-hint'
-            hint.attrib['title'] = request.translate(_("This site is private"))
+            hint.attrib['title'] = request.translate(_('This site is private'))
 
             a.append(builder.I(' '))
             a.append(hint)
@@ -135,7 +135,7 @@ class Link(_Base):
             # This snippet is duplicated in the access-hint macro!
             hint = builder.I()
             hint.attrib['class'] = 'secret-hint'
-            hint.attrib['title'] = request.translate(_("This site is secret"))
+            hint.attrib['title'] = request.translate(_('This site is secret'))
 
             a.append(builder.I(' '))
             a.append(hint)
@@ -148,8 +148,8 @@ class Link(_Base):
 
 class QrCodeLink(BaseLink):
     """ Implements a qr code link that shows a modal with the QrCode.
-        Thu url is sent to the qr endpoint url which generates the image
-        and sends it back.
+    Thu url is sent to the qr endpoint url which generates the image
+    and sends it back.
     """
 
     id = 'qr_code_link'
@@ -218,7 +218,7 @@ class DeleteLink(Link):
         if no_button_text:
             attr['data-confirm-no'] = no_button_text
         else:
-            attr['data-confirm-no'] = _("Cancel")
+            attr['data-confirm-no'] = _('Cancel')
 
         if redirect_after:
             attr['redirect-after'] = redirect_after
@@ -280,8 +280,8 @@ __all__ = (
 
 class IFrameLink(BaseLink):
     """ Implements an iframe link that shows a modal with the iframe.
-        The url is sent to the iframe endpoint url which generates the iframe
-        and sends it back.
+    The url is sent to the iframe endpoint url which generates the iframe
+    and sends it back.
     """
 
     id = 'iframe_link'

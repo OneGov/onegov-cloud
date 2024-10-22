@@ -140,7 +140,7 @@ class ResourceTracker:
     def show_memory_usage(self) -> None:
         total = self.memory_usage / 1024 / 1024
         delta = self.memory_usage_delta / 1024 / 1024
-        print(f"Total memory used: {total:.3f}MiB ({delta:+.3f})")
+        print(f'Total memory used: {total:.3f}MiB ({delta:+.3f})')
         print()
 
     def show_monotonically_increasing_traces(self) -> None:
@@ -151,10 +151,10 @@ class ResourceTracker:
         traces.sort(key=itemgetter(1), reverse=True)
 
         if not traces:
-            print("No montonically increasing traces")
+            print('No montonically increasing traces')
             return
 
-        print(f"Monotonically increasing traces ({len(traces)}):")
+        print(f'Monotonically increasing traces ({len(traces)}):')
         for name, size, stable_for in traces:
             if stable_for >= 3:
                 continue
@@ -162,5 +162,5 @@ class ResourceTracker:
             name = self.condense_name(name)
             kib_size = size / 1024
 
-            print(f"{kib_size: >8.3f} KiB | {stable_for} | {name}")
+            print(f'{kib_size: >8.3f} KiB | {stable_for} | {name}')
         print()

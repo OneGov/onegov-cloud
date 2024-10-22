@@ -7,7 +7,7 @@ from wtforms.validators import InputRequired
 class TOTPForm(Form):
 
     totp = StringField(
-        label=_("Code"),
+        label=_('Code'),
         validators=[InputRequired()],
         render_kw={'autocomplete': 'one-time-code'}
     )

@@ -20,7 +20,7 @@ if TYPE_CHECKING:
     import uuid
     from collections.abc import Collection
     from sqlalchemy.orm import Query
-    from typing_extensions import Self
+    from typing import Self
     from .agency import Agency
     from .person import Person
 

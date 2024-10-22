@@ -215,7 +215,7 @@ class SessionManager:
                 print("Deleted {} @ {}".format(obj, schema))
 
         """
-        assert 'postgres' in dsn, "Onegov only supports Postgres!"
+        assert 'postgres' in dsn, 'Onegov only supports Postgres!'
 
         self.activate()
 
@@ -289,7 +289,7 @@ class SessionManager:
 
         """
 
-        @event.listens_for(engine, "before_cursor_execute")
+        @event.listens_for(engine, 'before_cursor_execute')
         def activate_schema(
             connection: 'Connection',
             cursor: Any,
@@ -311,9 +311,9 @@ class SessionManager:
                     schema = None
 
             if schema is not None:
-                cursor.execute("SET search_path TO %s, extensions", (schema, ))
+                cursor.execute('SET search_path TO %s, extensions', (schema, ))
 
-        @event.listens_for(engine, "before_cursor_execute")
+        @event.listens_for(engine, 'before_cursor_execute')
         def limit_session_lifetime(
             connection: 'Connection',
             cursor: Any,
@@ -323,7 +323,7 @@ class SessionManager:
             """ Kills idle sessions after a while, freeing up memory. """
 
             cursor.execute(
-                "SET SESSION idle_in_transaction_session_timeout = %s",
+                'SET SESSION idle_in_transaction_session_timeout = %s',
                 (f'{CONNECTION_LIFETIME}s', )
             )
 
@@ -622,8 +622,8 @@ class SessionManager:
 
         conn = self.engine.execution_options(schema=None)
         result = conn.execute(text(
-            "SELECT EXISTS(SELECT 1 FROM information_schema.schemata "
-            "WHERE schema_name = :schema)"
+            'SELECT EXISTS(SELECT 1 FROM information_schema.schemata '
+            'WHERE schema_name = :schema)'
         ), schema=schema)
 
         return result.first()[0]

@@ -57,10 +57,10 @@ def view_notice(
         return (label, request.link(self, name), class_, target)
 
     action = {
-        'accept': _action(_("Accept"), 'accept', 'primary'),
-        'attachments': _action(_("Attachments"), 'attachments', 'secondary'),
+        'accept': _action(_('Accept'), 'accept', 'primary'),
+        'attachments': _action(_('Attachments'), 'attachments', 'secondary'),
         'copy': (
-            _("Copy"),
+            _('Copy'),
             request.link(
                 GazetteNoticeCollection(
                     request.session,
@@ -71,12 +71,12 @@ def view_notice(
             'secondary',
             '_self'
         ),
-        'delete': _action(_("Delete"), 'delete', 'alert right'),
-        'edit_un': _action(_("Edit"), 'edit-unrestricted', 'secondary'),
-        'edit': _action(_("Edit"), 'edit', 'secondary'),
-        'preview': _action(_("Preview"), 'preview', 'secondary', '_blank'),
-        'reject': _action(_("Reject"), 'reject', 'alert right'),
-        'submit': _action(_("Submit"), 'submit', 'primary'),
+        'delete': _action(_('Delete'), 'delete', 'alert right'),
+        'edit_un': _action(_('Edit'), 'edit-unrestricted', 'secondary'),
+        'edit': _action(_('Edit'), 'edit', 'secondary'),
+        'preview': _action(_('Preview'), 'preview', 'secondary', '_blank'),
+        'reject': _action(_('Reject'), 'reject', 'alert right'),
+        'submit': _action(_('Submit'), 'submit', 'primary'),
     }
 
     actions = []
@@ -160,7 +160,7 @@ def preview_notice_pdf(
 
     filename = normalize_for_url(
         '{}-{}-{}'.format(
-            request.translate(_("Gazette")),
+            request.translate(_('Gazette')),
             request.app.principal.name,
             self.title
         )
@@ -206,9 +206,9 @@ def edit_notice(
         return {
             'layout': layout,
             'title': self.title,
-            'subtitle': _("Edit Official Notice"),
+            'subtitle': _('Edit Official Notice'),
             'callout': _(
-                "Accepted official notices may not be edited."
+                'Accepted official notices may not be edited.'
             ),
             'show_form': False
         }
@@ -216,39 +216,39 @@ def edit_notice(
     if self.expired_issues:
         request.message(
             _(
-                "The official notice has past issue. Please re-select issues."
+                'The official notice has past issue. Please re-select issues.'
             ),
             'warning'
         )
     elif self.overdue_issues and not is_private:
         request.message(
             _(
-                "The official notice has issues for which the deadlines are "
-                "reached. Please re-select valid issues."
+                'The official notice has issues for which the deadlines are '
+                'reached. Please re-select valid issues.'
             ),
             'warning'
         )
     if self.invalid_category:
         request.message(
             _(
-                "The official notice has an invalid category. "
-                "Please re-select the category."
+                'The official notice has an invalid category. '
+                'Please re-select the category.'
             ),
             'warning'
         )
     if self.invalid_organization:
         request.message(
             _(
-                "The official notice has an invalid organization. "
-                "Please re-select the organization."
+                'The official notice has an invalid organization. '
+                'Please re-select the organization.'
             ),
             'warning'
         )
 
     if form.submitted(request):
         form.update_model(self)
-        self.add_change(request, _("edited"))
-        request.message(_("Official notice modified."), 'success')
+        self.add_change(request, _('edited'))
+        request.message(_('Official notice modified.'), 'success')
         return redirect(request.link(self))
 
     if not form.errors:
@@ -258,11 +258,11 @@ def edit_notice(
         'layout': layout,
         'form': form,
         'title': self.title,
-        'subtitle': _("Edit Official Notice"),
+        'subtitle': _('Edit Official Notice'),
         'helptext': _(
-            "The fields marked with an asterisk * are mandatory fields."
+            'The fields marked with an asterisk * are mandatory fields.'
         ),
-        'button_text': _("Save"),
+        'button_text': _('Save'),
         'cancel': request.link(self),
         'current_issue': layout.current_issue
     }
@@ -293,17 +293,17 @@ def edit_notice_unrestricted(
 
     if form.submitted(request):
         form.update_model(self)
-        self.add_change(request, _("edited"))
-        request.message(_("Official notice modified."), 'success')
+        self.add_change(request, _('edited'))
+        request.message(_('Official notice modified.'), 'success')
         return redirect(request.link(self))
 
     if self.state == 'accepted':
         request.message(
-            _("This official notice has already been accepted!"), 'warning'
+            _('This official notice has already been accepted!'), 'warning'
         )
     elif self.state == 'published':
         request.message(
-            _("This official notice has already been published!"), 'warning'
+            _('This official notice has already been published!'), 'warning'
         )
 
     if not form.errors:
@@ -313,11 +313,11 @@ def edit_notice_unrestricted(
         'layout': layout,
         'form': form,
         'title': self.title,
-        'subtitle': _("Edit Official Notice"),
+        'subtitle': _('Edit Official Notice'),
         'helptext': _(
-            "The fields marked with an asterisk * are mandatory fields."
+            'The fields marked with an asterisk * are mandatory fields.'
         ),
-        'button_text': _("Save"),
+        'button_text': _('Save'),
         'cancel': request.link(self)
     }
 
@@ -359,26 +359,26 @@ def delete_notice(
     ):
         request.message(
             _(
-                "Only drafted or rejected official notices may be deleted."
+                'Only drafted or rejected official notices may be deleted.'
             ),
             'alert'
         )
         return {
             'layout': layout,
             'title': self.title,
-            'subtitle': _("Delete Official Notice"),
+            'subtitle': _('Delete Official Notice'),
             'show_form': False
         }
 
     if self.state == 'accepted':
         request.message(
-            _("This official notice has already been accepted!"), 'warning'
+            _('This official notice has already been accepted!'), 'warning'
         )
 
     if form.submitted(request):
         collection = GazetteNoticeCollection(request.session)
         collection.delete(self)
-        request.message(_("Official notice deleted."), 'success')
+        request.message(_('Official notice deleted.'), 'success')
         return redirect(layout.dashboard_or_notices_link)
 
     return {
@@ -389,8 +389,8 @@ def delete_notice(
         'layout': layout,
         'form': form,
         'title': self.title,
-        'subtitle': _("Delete Official Notice"),
-        'button_text': _("Delete Official Notice"),
+        'subtitle': _('Delete Official Notice'),
+        'button_text': _('Delete Official Notice'),
         'button_class': 'alert',
         'cancel': request.link(self)
     }

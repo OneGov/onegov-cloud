@@ -120,7 +120,7 @@ def get_audit_pdf(self: AuditCollection, request: 'FsiRequest') -> Response:
 
     assert self.course is not None
     title = request.translate(
-        _("Audit for ${course_name}",
+        _('Audit for ${course_name}',
           mapping={'course_name': self.course.name})
 
     )

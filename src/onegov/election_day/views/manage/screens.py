@@ -111,7 +111,7 @@ def edit_screen_item(
         'layout': layout,
         'form': form,
         'title': _(
-            "Screen ${number}",
+            'Screen ${number}',
             mapping={'number': self.number}
         ),
         'subtitle': _('Edit screen'),
@@ -148,7 +148,7 @@ def delete_screen(
         'layout': layout,
         'form': form,
         'title': _(
-            "Screen ${number}",
+            'Screen ${number}',
             mapping={'number': self.number}
         ),
         'subtitle': _('Delete screen'),

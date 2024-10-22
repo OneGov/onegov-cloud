@@ -83,6 +83,7 @@ class ExtendedAgency(Agency, AccessExtension, PublicationExtension):
         # we only allow relating to other ExtendedAgency
         parent: relationship['ExtendedAgency | None']
         children: relationship[list['ExtendedAgency']]  # type:ignore
+
         @property
         def root(self) -> 'ExtendedAgency': ...
         @property
@@ -119,7 +120,7 @@ class ExtendedAgency(Agency, AccessExtension, PublicationExtension):
     @property
     def portrait_html(self) -> 'Markup | None':
         """ Returns the portrait that is saved as HTML from the redactor js
-         plugin. """
+        plugin. """
 
         return self.portrait
 

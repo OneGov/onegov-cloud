@@ -32,14 +32,14 @@ def edit_attendee(
 
     if form.submitted(request):
         form.populate_obj(self)
-        request.success(_("Your changes were saved"))
+        request.success(_('Your changes were saved'))
 
         return request.redirect(request.link(bookings))
 
     elif not request.POST:
         form.process(obj=self)
 
-    title = _("Edit Attendee")
+    title = _('Edit Attendee')
 
     layout = BookingCollectionLayout(bookings, request, self.user)
     layout.breadcrumbs.append(Link(title, request.link(self)))
@@ -71,14 +71,14 @@ def edit_attendee_limit(
 
     if form.submitted(request):
         form.populate_obj(self)
-        request.success(_("Your changes were saved"))
+        request.success(_('Your changes were saved'))
 
         return request.redirect(request.link(bookings))
 
     elif not request.POST:
         form.process(obj=self)
 
-    title = _("Booking Limit of ${name}", mapping={
+    title = _('Booking Limit of ${name}', mapping={
         'name': self.name
     })
 

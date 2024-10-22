@@ -83,12 +83,12 @@ def view_add_reservation(
 
         if not course_event.can_book(attendee_id):
             request.warning(
-                _("There are other subscriptions for "
-                  "the same course in this year"))
+                _('There are other subscriptions for '
+                  'the same course in this year'))
             return request.redirect(request.link(self))
 
         self.add(**data)
-        request.success(_("Added a new subscription"))
+        request.success(_('Added a new subscription'))
         request = handle_send_email(
             course_event.reservation_template,
             request,
@@ -144,7 +144,7 @@ def view_edit_reservation(
                 return request.redirect(request.link(self))
 
             form.update_model(self)
-            request.success(_("Subscription was updated"))
+            request.success(_('Subscription was updated'))
             request = handle_send_email(
                 course_event.reservation_template,
                 request,
@@ -194,7 +194,7 @@ def view_edit_placeholder_reservation(
 
     if form.submitted(request):
         form.update_model(self)
-        request.success(_("Placeholder was updated"))
+        request.success(_('Placeholder was updated'))
         return request.redirect(request.link(SubscriptionsCollection(
             request.session,
             course_event_id=self.course_event_id,
@@ -242,7 +242,7 @@ def view_add_reservation_placeholder(
             data['dummy_desc'] = default_desc
 
         self.add(**data)
-        request.success(_("Added a new placeholder"))
+        request.success(_('Added a new placeholder'))
         return request.redirect(request.link(self))
 
     layout = SubscriptionCollectionLayout(self, request)

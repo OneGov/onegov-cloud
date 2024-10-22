@@ -39,21 +39,21 @@ def add_agenda_item(
         updated = ensure_states(agenda_item)
         updated.add(agenda_item.assembly)
         update_ticker(request, updated)
-        request.success(_("Added a new agenda item"))
+        request.success(_('Added a new agenda item'))
 
         return redirect(request.link(agenda_item))
 
     form.number.data = form.next_number
 
     layout = AgendaItemCollectionLayout(self, request)
-    layout.breadcrumbs.append(Link(_("New"), '#'))
+    layout.breadcrumbs.append(Link(_('New'), '#'))
     layout.include_editor()
     layout.edit_mode = True
     layout.editmode_links[1] = BackLink(attrs={'class': 'cancel-link'})
 
     return {
         'layout': layout,
-        'title': _("New agenda item"),
+        'title': _('New agenda item'),
         'form': form,
     }
 
@@ -109,13 +109,13 @@ def edit_agenda_item(
         updated = ensure_states(self)
         updated.add(self)
         update_ticker(request, updated)
-        request.success(_("Your changes were saved"))
+        request.success(_('Your changes were saved'))
         return request.redirect(request.link(self))
 
     form.process(obj=self)
 
     layout = AgendaItemLayout(self, request)
-    layout.breadcrumbs.append(Link(_("Edit"), '#'))
+    layout.breadcrumbs.append(Link(_('Edit'), '#'))
     layout.edit_mode = True
 
     return {

@@ -27,18 +27,18 @@ def search(
 
     layout = layout or DefaultLayout(self, request)
     assert isinstance(layout.breadcrumbs, list)
-    layout.breadcrumbs.append(Link(_("Search"), '#'))
+    layout.breadcrumbs.append(Link(_('Search'), '#'))
 
     try:
-        searchlabel = _("Search through ${count} indexed documents", mapping={
+        searchlabel = _('Search through ${count} indexed documents', mapping={
             'count': self.available_documents
         })
-        resultslabel = _("${count} Results", mapping={
+        resultslabel = _('${count} Results', mapping={
             'count': self.subset_count
         })
     except SearchOfflineError:
         return {
-            'title': _("Search Unavailable"),
+            'title': _('Search Unavailable'),
             'layout': layout,
             'connection': False
         }
@@ -50,7 +50,7 @@ def search(
             return morepath.redirect(url)
 
     return {
-        'title': _("Search"),
+        'title': _('Search'),
         'model': self,
         'layout': layout,
         'hide_search_header': True,

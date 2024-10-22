@@ -86,12 +86,10 @@ class TownTheme(BaseTheme):
 
     @property
     def pre_imports(self) -> list[str]:
-        imports = [
+        return [
             'foundation-mods',
+            *self.additional_font_families
         ]
-        for font_family in self.additional_font_families:
-            imports.append(font_family)
-        return imports
 
     @property
     def post_imports(self) -> list[str]:
@@ -147,7 +145,8 @@ class TownTheme(BaseTheme):
 
     @property
     def extra_search_paths(self) -> list[str]:
-        return super().extra_search_paths + [
+        return [
+            *super().extra_search_paths,
             module_path('onegov.town6.theme', 'styles'),
             self.font_search_path
         ]

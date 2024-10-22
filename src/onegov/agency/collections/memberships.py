@@ -8,12 +8,12 @@ from sqlalchemy import or_
 from sqlalchemy.orm import joinedload
 
 
+from typing import Self
 from typing import TYPE_CHECKING
 if TYPE_CHECKING:
     from sqlalchemy.orm import Query
     from sqlalchemy.orm import Session
     from typing import TypedDict
-    from typing_extensions import Self
     from typing_extensions import Unpack
 
     class FilterParams(TypedDict, total=False):
@@ -74,7 +74,7 @@ class PaginatedMembershipCollection(
     def page_index(self) -> int:
         return self.page
 
-    def page_by_index(self, index: int) -> 'Self':
+    def page_by_index(self, index: int) -> Self:
         return self.__class__(
             self.session,
             page=index,
@@ -85,7 +85,7 @@ class PaginatedMembershipCollection(
             updated_lt=self.updated_lt,
         )
 
-    def for_filter(self, **kwargs: 'Unpack[FilterParams]') -> 'Self':
+    def for_filter(self, **kwargs: 'Unpack[FilterParams]') -> Self:
         return self.__class__(
             session=self.session,
             updated_gt=kwargs.get('updated_gt', self.updated_gt),

@@ -54,16 +54,16 @@ def add_attendence(
     if form.submitted(request):
         attendence = self.add(**form.get_useful_data())
         Change.add(request, 'add', attendence)
-        request.success(_("Added a new attendence"))
+        request.success(_('Added a new attendence'))
 
         return request.redirect(request.link(attendence))
 
     layout = AttendenceCollectionLayout(self, request)
-    layout.breadcrumbs.append(Link(_("New"), '#'))
+    layout.breadcrumbs.append(Link(_('New'), '#'))
 
     return {
         'layout': layout,
-        'title': _("New attendence"),
+        'title': _('New attendence'),
         'form': form,
         'form_width': 'large'
     }
@@ -90,16 +90,16 @@ def add_plenary_attendence(
                 parliamentarian_id=parliamentarian_id, **data
             )
             Change.add(request, 'add', attendence)
-        request.success(_("Added plenary session"))
+        request.success(_('Added plenary session'))
 
         return request.redirect(request.link(self))
 
     layout = AttendenceCollectionLayout(self, request)
-    layout.breadcrumbs.append(Link(_("New plenary session"), '#'))
+    layout.breadcrumbs.append(Link(_('New plenary session'), '#'))
 
     return {
         'layout': layout,
-        'title': _("New plenary session"),
+        'title': _('New plenary session'),
         'form': form,
         'form_width': 'large'
     }
@@ -140,13 +140,13 @@ def edit_attendence(
     if form.submitted(request):
         form.populate_obj(self)
         Change.add(request, 'edit', self)
-        request.success(_("Your changes were saved"))
+        request.success(_('Your changes were saved'))
         return request.redirect(request.link(self))
 
     form.process(obj=self)
 
     layout = AttendenceLayout(self, request)
-    layout.breadcrumbs.append(Link(_("Edit"), '#'))
+    layout.breadcrumbs.append(Link(_('Edit'), '#'))
     layout.editbar_links = []
 
     return {

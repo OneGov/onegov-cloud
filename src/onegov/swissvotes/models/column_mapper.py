@@ -7,7 +7,7 @@ from typing import Any
 from typing import TYPE_CHECKING
 if TYPE_CHECKING:
     from collections.abc import Iterator
-    from typing_extensions import TypeAlias
+    from typing import TypeAlias
 
     ColumnItem: TypeAlias = tuple[
         str,         # attribute
@@ -697,7 +697,7 @@ class ColumnMapperDataset:
         """ Set the given value of a vote. """
 
         if attribute.startswith('!'):
-            unused, type_, attribute, key = attribute.split('!')
+            _, _type, attribute, key = attribute.split('!')
             if getattr(vote, attribute) is None:
                 setattr(vote, attribute, {})
             getattr(vote, attribute)[key] = value
@@ -708,7 +708,7 @@ class ColumnMapperDataset:
         """ Get the given value of a vote. """
 
         if attribute.startswith('!'):
-            unused, type_, attribute, key = attribute.split('!')
+            _, _type, attribute, key = attribute.split('!')
             return (getattr(vote, attribute) or {}).get(key)
         return getattr(vote, attribute)
 
@@ -832,10 +832,18 @@ class ColumnMapperMetadata:
         """
 
         for attribute, column in self.columns.items():
-            _type, _nullable, name = attribute.split(':')
-            nullable = {'t': True, 'f': False}.get(_nullable, True)
-            precision = {'n': 8}.get(_type, None)
-            scale = {'n': 2}.get(_type, None)
-            type_ = {'n': 'NUMERIC', 'i': 'INTEGER', 't': 'TEXT'}.get(_type)
+            type_hint, nullable_hint, _name = attribute.split(':')
+            nullable = nullable_hint != 'f'
+            precision = 8 if type_hint == 'n' else None
+            scale = 2 if type_hint == 'n' else None
+            match type_hint:
+                case 'n':
+                    type_ = 'NUMERIC'
+                case 'i':
+                    type_ = 'INTEGER'
+                case 't':
+                    type_ = 'TEXT'
+                case _:
+                    raise AssertionError('unreachable')
 
             yield attribute, column, type_, nullable, precision, scale

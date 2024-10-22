@@ -53,27 +53,27 @@ def view_notification_templates(
             return
 
         yield Link(
-            text=_("Mailing"),
+            text=_('Mailing'),
             url=request.link(notification, 'send')
         )
 
         yield Link(
-            text=_("Edit"),
+            text=_('Edit'),
             url=request.link(notification, 'edit')
         )
 
         yield DeleteLink(
-            text=_("Delete"),
+            text=_('Delete'),
             url=layout.csrf_protected_url(request.link(notification)),
             confirm=_('Do you really want to delete "${title}"?', mapping={
                 'title': notification.subject,
             }),
             target=f'#{notification.id.hex}',
-            yes_button_text=_("Delete Notification Template")
+            yes_button_text=_('Delete Notification Template')
         )
 
     return {
-        'title': _("Notification Templates"),
+        'title': _('Notification Templates'),
         'layout': layout,
         'notifications': self.query(),
         'get_links': get_links,
@@ -92,7 +92,7 @@ def view_notification_template_form(
     form: NotificationTemplateForm
 ) -> 'RenderData | Response':
 
-    title = _("New Notification Template")
+    title = _('New Notification Template')
 
     if form.submitted(request):
         self.add(
@@ -100,7 +100,7 @@ def view_notification_template_form(
             text=form.text.data
         )
 
-        request.success(_("Successfully added a new notification template"))
+        request.success(_('Successfully added a new notification template'))
         return request.redirect(request.link(self))
     layout = NotificationTemplateCollectionLayout(self, request, title)
     layout.edit_mode = True
@@ -127,7 +127,7 @@ def edit_notification(
 
     if form.submitted(request):
         form.populate_obj(self)
-        request.success(_("Your changes were saved"))
+        request.success(_('Your changes were saved'))
 
         return request.redirect(
             request.class_link(NotificationTemplateCollection))
@@ -139,7 +139,7 @@ def edit_notification(
     layout.editmode_links[1] = BackLink(attrs={'class': 'cancel-link'})
 
     return {
-        'title': _("Edit"),
+        'title': _('Edit'),
         'layout': layout,
         'form': form,
         'variables': get_variables(request)
@@ -188,7 +188,7 @@ def handle_send_notification(
         recipients = form.recipients
 
         if not recipients:
-            request.alert(_("There are no recipients matching the selection"))
+            request.alert(_('There are no recipients matching the selection'))
         else:
             content = render_template('mail_notification.pt', request, {
                 'layout': DefaultMailLayout(self, request),
@@ -221,7 +221,7 @@ def handle_send_notification(
             self.last_sent = utcnow()
 
             request.success(_(
-                "Successfully sent the e-mail to ${count} recipients",
+                'Successfully sent the e-mail to ${count} recipients',
                 mapping={
                     'count': len(recipients)
                 }
@@ -231,13 +231,13 @@ def handle_send_notification(
                 request.class_link(NotificationTemplateCollection))
 
     return {
-        'title': _("Mailing"),
+        'title': _('Mailing'),
         'layout': layout,
         'form': form,
         'preview_subject': subject,
         'preview_body': message,
         'edit_link': request.return_here(request.link(self, 'edit')),
-        'button_text': _("Send E-Mail Now"),
+        'button_text': _('Send E-Mail Now'),
         'model': self,
         'period': form.period,
     }

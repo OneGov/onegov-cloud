@@ -199,6 +199,10 @@
         margin-top: 20px;
     }
 
+    hr.gray {
+        border: 1px solid #ddd;
+    }
+
     hr.large {
         Margin-top: 20px;
     }
@@ -285,6 +289,7 @@
         display: block;
         height: 6em;
         margin: 0 auto;
+        padding-bottom: 20px;
     }
 
     #message-area .card {
@@ -346,20 +351,20 @@
                 <!-- content -->
                 <div class="content">
                     <div class="logo">
-                        <tal:b metal:define-slot="logo" />
+                        <img tal:condition="layout.org.logo_url" src="${layout.org.logo_url}" alt="Logo" title="${layout.org.title}" i18n:attributes="alt"/>
                     </div>
-                <table>
-                    <tr>
-                        <td>
-                            <div metal:define-slot="body"></div>
-                        </td>
-                    </tr>
-                    <tr tal:define="signature layout.macros['email_signature']|nothing" tal:condition="signature">
-                        <td>
-                            <metal:b use-macro="signature" />
-                        </td>
-                    </tr>
-                </table>
+                    <table>
+                        <tr>
+                            <td>
+                                <div metal:define-slot="body"></div>
+                            </td>
+                        </tr>
+                        <tr tal:define="signature layout.macros['email_signature']|nothing" tal:condition="signature">
+                            <td>
+                                <metal:b use-macro="signature" />
+                            </td>
+                        </tr>
+                    </table>
                 </div>
             </td>
             <td></td>

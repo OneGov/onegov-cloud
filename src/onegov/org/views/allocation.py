@@ -3,6 +3,7 @@ import morepath
 from datetime import timedelta
 from libres.db.models import ReservedSlot
 from libres.modules.errors import LibresError
+
 from onegov.core.security import Public, Private, Secret
 from onegov.core.utils import is_uuid
 from onegov.form import merge_forms
@@ -36,7 +37,7 @@ if TYPE_CHECKING:
     from onegov.core.types import JSON_ro, RenderData
     from onegov.org.request import OrgRequest
     from sqlalchemy.orm import Query
-    from typing_extensions import TypeAlias
+    from typing import TypeAlias
     from webob import Response
 
     AllocationForm: TypeAlias = (
@@ -119,7 +120,7 @@ def view_allocation_rules(
 
     def actions_for_rule(rule: dict[str, Any]) -> 'Iterator[Link]':
         yield Link(
-            text=_("Stop"),
+            text=_('Stop'),
             url=link_for_rule(rule, 'stop-rule'),
             traits=(
                 Confirm(
@@ -128,21 +129,21 @@ def view_allocation_rules(
                         mapping={'title': rule['title']}
                     ),
                     _(
-                        "The rule will be removed without affecting "
-                        "existing allocations."
+                        'The rule will be removed without affecting '
+                        'existing allocations.'
                     ),
-                    _("Stop rule"),
-                    _("Cancel")
+                    _('Stop rule'),
+                    _('Cancel')
                 ),
                 Intercooler(
-                    request_method="POST",
+                    request_method='POST',
                     redirect_after=request.link(self, 'rules')
                 )
             )
         )
 
         yield Link(
-            text=_("Delete"),
+            text=_('Delete'),
             url=link_for_rule(rule, 'delete-rule'),
             traits=(
                 Confirm(
@@ -154,14 +155,18 @@ def view_allocation_rules(
                         "All allocations created by the rule will be removed, "
                         "if they haven't been reserved yet."
                     ),
-                    _("Delete rule"),
-                    _("Cancel")
+                    _('Delete rule'),
+                    _('Cancel')
                 ),
                 Intercooler(
-                    request_method="POST",
+                    request_method='POST',
                     redirect_after=request.link(self, 'rules')
                 )
             )
+        )
+        yield Link(
+            text=_('Edit'),
+            url=link_for_rule(rule, 'edit-rule'),
         )
 
     def rules_with_actions() -> 'Iterator[RenderData]':
@@ -179,7 +184,7 @@ def view_allocation_rules(
 
     return {
         'layout': layout,
-        'title': _("Rules"),
+        'title': _('Rules'),
         'rules': tuple(rules_with_actions())
     }
 
@@ -266,10 +271,10 @@ def handle_new_allocation(
             utils.show_libres_error(e, request)
         else:
             if not allocations:
-                request.alert(_("No allocations to add"))
+                request.alert(_('No allocations to add'))
             else:
                 request.success(
-                    _("Successfully added ${n} allocations", mapping={
+                    _('Successfully added ${n} allocations', mapping={
                         'n': len(allocations)
                     }))
 
@@ -301,12 +306,12 @@ def handle_new_allocation(
                     form.end_time.data = end
 
     layout = layout or ResourceLayout(self, request)
-    layout.breadcrumbs.append(Link(_("New allocation"), '#'))
+    layout.breadcrumbs.append(Link(_('New allocation'), '#'))
     layout.editbar_links = None
 
     return {
         'layout': layout,
-        'title': _("New allocation"),
+        'title': _('New allocation'),
         'form': form
     }
 
@@ -356,7 +361,7 @@ def handle_edit_allocation(
             if self.data and 'rule' in self.data:
                 self.data = {k: v for k, v in self.data.items() if k != 'rule'}
 
-            request.success(_("Your changes were saved"))
+            request.success(_('Your changes were saved'))
             resource.highlight_allocations([self])
 
             return morepath.redirect(request.link(resource))
@@ -373,7 +378,7 @@ def handle_edit_allocation(
 
     return {
         'layout': layout,
-        'title': _("Edit allocation"),
+        'title': _('Edit allocation'),
         'form': form
     }
 
@@ -414,19 +419,109 @@ def handle_allocation_rule(
         self.content['rules'] = rules
 
         request.success(_(
-            "New rule active, ${n} allocations created", mapping={'n': changes}
+            'New rule active, ${n} allocations created', mapping={'n': changes}
         ))
 
         return request.redirect(request.link(self, name='rules'))
 
     return {
         'layout': layout,
-        'title': _("New Rule"),
+        'title': _('New Rule'),
         'form': form,
         'helptext': _(
-            "Rules ensure that the allocations between start/end exist and "
-            "that they are extended beyond those dates at the given "
-            "intervals. "
+            'Rules ensure that the allocations between start/end exist and '
+            'that they are extended beyond those dates at the given '
+            'intervals. '
+        )
+    }
+
+
+@OrgApp.form(model=Resource, template='form.pt', name='edit-rule',
+             permission=Private, form=get_allocation_rule_form_class)
+def handle_edit_rule(
+    self: Resource, request: 'OrgRequest', form: AllocationRuleForm,
+    layout: AllocationRulesLayout | None = None
+) -> 'RenderData | Response':
+    request.assert_valid_csrf_token()
+    layout = layout or AllocationRulesLayout(self, request)
+
+    rule_id = rule_id_from_request(request)
+
+    if form.submitted(request):
+
+        # all the slots
+        slots = self.scheduler.managed_reserved_slots()
+        slots = slots.with_entities(ReservedSlot.allocation_id)
+
+        # all the reservations
+        reservations = self.scheduler.managed_reservations()
+        reservations = reservations.with_entities(Reservation.target)
+
+        candidates = self.scheduler.managed_allocations()
+        candidates = candidates.filter(
+            func.json_extract_path_text(
+                func.cast(Allocation.data, JSON), 'rule'
+            ) == rule_id
+        )
+        # .. without the ones with slots
+        candidates = candidates.filter(
+            not_(Allocation.id.in_(slots.subquery())))
+
+        # .. without the ones with reservations
+        candidates = candidates.filter(
+            not_(Allocation.group.in_(reservations.subquery())))
+
+        # delete the allocations
+        deleted_count = candidates.delete('fetch')
+
+        # Update the rule itself
+        rules = self.content.get('rules', [])
+        for i, rule in enumerate(rules):
+            if rule['id'] == rule_id:
+                updated_rule = form.rule
+                updated_rule['last_run'] = utcnow()  # Reset last_run
+                updated_rule['iteration'] = 0  # Reset iteration count
+                rules[i] = updated_rule
+                break
+        self.content['rules'] = rules
+
+        # Apply the updated rule
+        new_allocations_count = form.apply(self)
+
+        request.success(
+            _(
+                'Rule updated. ${deleted} allocations removed, '
+                '${created} new allocations created.',
+                mapping={
+                    'deleted': deleted_count,
+                    'created': new_allocations_count,
+                },
+            )
+        )
+        return request.redirect(request.link(self, name='rules'))
+
+    # Pre-populate the form with existing rule data
+    existing_rule = next(
+        (
+            rule
+            for rule in self.content.get('rules', [])
+            if rule['id'] == rule_id
+        ),
+        None,
+    )
+    if existing_rule is None:
+        request.message(_('Rule not found'), 'warning')
+        return request.redirect(request.link(self, name='rules'))
+
+    form.rule = existing_rule
+    return {
+        'layout': layout,
+        'title': _('Edit Rule'),
+        'form': form,
+        'helptext': _(
+            'Rules ensure that the allocations between start/end exist and '
+            'that they are extended beyond those dates at the given '
+            'intervals. '
         )
     }
 
@@ -522,7 +617,7 @@ def handle_stop_rule(self: Resource, request: 'OrgRequest') -> None:
     rule_id = rule_id_from_request(request)
     delete_rule(self, rule_id)
 
-    request.success(_("The rule was stopped"))
+    request.success(_('The rule was stopped'))
 
 
 @OrgApp.view(model=Resource, request_method='POST', permission=Private,
@@ -562,7 +657,8 @@ def handle_delete_rule(self: Resource, request: 'OrgRequest') -> None:
     delete_rule(self, rule_id)
 
     request.success(
-        _("The rule was deleted, along with ${n} allocations", mapping={
+        _('The rule was deleted, along with ${n} allocations', mapping={
             'n': count
         })
     )
+

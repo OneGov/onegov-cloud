@@ -39,7 +39,7 @@ class DefaultLayout(ChameleonLayout):
 
     @cached_property
     def title(self) -> str:
-        return ""
+        return ''
 
     @cached_property
     def top_navigation(self) -> list['Element']:
@@ -47,21 +47,21 @@ class DefaultLayout(ChameleonLayout):
         session = self.request.session
         result: list[Element] = []
         if has_permission(ScanJobCollection(session), ViewModel):
-            result.append(Link(_("Scan jobs"), self.scan_jobs_url))
+            result.append(Link(_('Scan jobs'), self.scan_jobs_url))
         if has_permission(DailyList(), ViewModel):
-            result.append(Link(_("Daily list"), self.daily_list_url))
+            result.append(Link(_('Daily list'), self.daily_list_url))
         if has_permission(Report(session), ViewModel):
-            result.append(Link(_("Report"), self.report_url))
+            result.append(Link(_('Report'), self.report_url))
         if has_permission(Invoice(session), ViewModel):
-            result.append(Link(_("Invoices"), self.invoices_url))
+            result.append(Link(_('Invoices'), self.invoices_url))
         if has_permission(UserCollection(session), ViewModel):
-            result.append(Link(_("Users"), self.users_url))
+            result.append(Link(_('Users'), self.users_url))
         if has_permission(MunicipalityCollection(session), ViewModel):
-            result.append(Link(_("Municipalities"), self.municipalities_url))
+            result.append(Link(_('Municipalities'), self.municipalities_url))
         if has_permission(NotificationCollection(session), ViewModel):
-            result.append(Link(_("Notifications"), self.notifications_url))
+            result.append(Link(_('Notifications'), self.notifications_url))
         if has_permission(UserManual(self.app), ViewModel):
-            result.append(Link(_("User manual"), self.user_manual_url))
+            result.append(Link(_('User manual'), self.user_manual_url))
 
         return result
 
@@ -71,7 +71,7 @@ class DefaultLayout(ChameleonLayout):
 
     @cached_property
     def breadcrumbs(self) -> list['Element']:
-        return [Link(_("Homepage"), self.homepage_url)]
+        return [Link(_('Homepage'), self.homepage_url)]
 
     @cached_property
     def static_path(self) -> str:

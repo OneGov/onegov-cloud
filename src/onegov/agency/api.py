@@ -56,7 +56,7 @@ def filter_for_updated(
         isoparse(filter_value[:16])
     except Exception as ex:
         raise ApiInvalidParamException(f'Invalid iso timestamp for parameter'
-                                       f'\'{filter_operation}\': {ex}') from ex
+                                       f"'{filter_operation}': {ex}") from ex
     return result.for_filter(**{filter_operation: filter_value[:16]})
 
 

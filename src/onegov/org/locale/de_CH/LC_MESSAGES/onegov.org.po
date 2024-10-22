@@ -1,7 +1,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE 1.0\n"
-"POT-Creation-Date: 2024-08-29 15:08+0200\n"
+"POT-Creation-Date: 2024-10-01 13:17+0200\n"
 "PO-Revision-Date: 2022-03-15 10:21+0100\n"
 "Last-Translator: Marc Sommerhalder <marc.sommerhalder@seantis.ch>\n"
 "Language-Team: German\n"
@@ -1468,6 +1468,18 @@ msgstr "Instagram"
 msgid "URL pointing to the Instagram site"
 msgstr "Link zu Instagram"
 
+msgid "Linkedin"
+msgstr "LinkedIn"
+
+msgid "URL pointing to the LinkedIn site"
+msgstr "Link zu LinkedIn"
+
+msgid "TikTok"
+msgstr "TikTok"
+
+msgid "URL pointing to the TikTok site"
+msgstr "Link zu TikTok"
+
 msgid "Custom Link 1"
 msgstr "Benutzerdefinierter Link 1"
 
@@ -2289,8 +2301,9 @@ msgstr "Neues externes Formular"
 msgid "Do you really want to delete this submission window?"
 msgstr "Möchten Sie diesen Befragungszeitraum wirklich löschen?"
 
-msgid "Existing submissions will be disassociated."
-msgstr "Bestehende Eingaben werden vom Anmeldezeitraum losgelöst."
+msgid ""
+"Submissions associated with this submission window will be deleted as well."
+msgstr ""
 
 msgid "Delete submission window"
 msgstr "Befragungszeitraum löschen"
@@ -2614,16 +2627,40 @@ msgid "Your directory submission has been adopted"
 msgstr "Ihr Verzeichniseintrag wurde übernommen"
 
 msgid "Your change request has been applied"
-msgstr "Ihr Änderungswunsch wurde übernommen"
+msgstr "Ihr Änderungsvorschlag wurde übernommen"
 
 msgid "The change request was applied"
-msgstr "Der Änderungswunsch wurde übernommen"
+msgstr "Der Änderungsvorschlag wurde übernommen"
 
 msgid "The submission was rejected"
 msgstr "Die Eingabe wurde abgelehnt"
 
-msgid "Your directory submission has been rejected"
-msgstr "Ihre Eingabe wurde abgelehnt"
+msgid "Your directory entry submission has been rejected"
+msgstr "Ihr Verzeichniseintrag wurde abgelehnt"
+
+msgid "The entry submission has been rejected"
+msgstr "Der Verzeichniseintrag wurde abgelehnt"
+
+msgid "Your directory change submission has been rejected"
+msgstr "Ihre Verzeichnisänderung wurde abgelehnt"
+
+msgid "The change submission has been rejected"
+msgstr "Der Änderungsvorschlag wurde abgelehnt"
+
+msgid "The rejection was already withdrawn"
+msgstr "Die Ablehnung wurde bereits zurückgezogen"
+
+msgid "The directory entry submission rejection has been withdrawn"
+msgstr "Die Ablehnung Ihres Verzeichniseintrages wurde zurückgezogen"
+
+msgid "The rejection of the entry has been withdrawn"
+msgstr "Die Ablehnung des Verzeichniseintrags wurde zurückgezogen"
+
+msgid "The directory change submission rejection has been withdrawn"
+msgstr "Die Ablehnung Ihres Änderungsvorschlages wurde zurückgezogen"
+
+msgid "The rejection of the change has been withdrawn"
+msgstr "Die Ablehnung der Änderung wurde zurückgezogen"
 
 msgid "Through URL only (not listed)"
 msgstr "Nur wer die URL kennt (wird nicht gelistet)"
@@ -2677,15 +2714,20 @@ msgstr "Personen am unteren Rand der Hauptseite anzeigen (statt in Sidebar)"
 msgid "Use text instead of lead in the newsletter"
 msgstr "Text statt Einleitung im Newsletter benutzen"
 
+msgid "Select additional person"
+msgstr "Zusätzliche Person auswählen"
+
+msgid "No results match"
+msgstr "Keine Ergebnisse gefunden:"
+
+msgid "List this function in the page of this person"
+msgstr "Diese Funktion anzeigen auf der Seite von dieser Person"
+
 msgid "Use Western ordered names"
 msgstr "Westlich geordnete Namen verwenden"
 
 msgid "For instance Franz Müller instead of Müller Franz"
 msgstr "Zum Beispiel Franz Müller anstelle von Müller Franz"
-
-#, python-format
-msgid "List this function in the page of ${name}"
-msgstr "Diese Funktion anzeigen auf der Seite von ${name}"
 
 msgid "A resource with this name already exists"
 msgstr "Eine Resource mit diesem Namen existiert bereits"
@@ -2907,8 +2949,8 @@ msgstr "Die Absage von ${title} kann nicht rückgängig gemacht werden."
 msgid "Reject reservation"
 msgstr "Reservation absagen"
 
-#.
 #. Used in sentence: "${event} published."
+#.
 msgid "Event"
 msgstr "Veranstaltung"
 
@@ -2936,14 +2978,37 @@ msgstr "Übernehmen"
 msgid "View directory entry"
 msgstr "Verzeichniseintrag Anzeigen"
 
-msgid "Reject"
-msgstr "Abweisen"
+msgid "Withdraw rejection"
+msgstr "Ablehnung zurückziehen"
 
-msgid "Do you really want to reject this entry?"
-msgstr "Möchten Sie diesen Eintrag wirklich abweisen?"
+msgid ""
+"This directory entry has been rejected. Do you want to withdraw the "
+"rejection?"
+msgstr ""
+"Dieser Verzeichniseintrag wurde abgelehnt. Möchten Sie die Ablehnung "
+"zurückziehen?"
+
+msgid ""
+"This directory change has been rejected. Do you want to withdraw the "
+"rejection?"
+msgstr ""
+"Dieser Änderungsvorschlag wurde abgelehnt. Möchten Sie die Ablehnung "
+"zurückziehen?"
+
+msgid "Reject change request"
+msgstr "Änderungsvorschlag ablehnen"
+
+msgid "Do you really want to reject this change?"
+msgstr "Wollen Sie diese Änderung wirklich ablehnen?"
+
+msgid "Reject change"
+msgstr "Änderung ablehnen"
 
 msgid "Reject entry"
 msgstr "Eintrag abweisen"
+
+msgid "Do you really want to reject this entry?"
+msgstr "Möchten Sie diesen Eintrag wirklich abweisen?"
 
 msgid "Chats"
 msgstr "Chats"
@@ -3721,7 +3786,7 @@ msgstr ""
 "diese Nachricht ignorieren."
 
 msgid "Click here to unsubscribe."
-msgstr "Klicken Sie hier um sich abzumelden."
+msgstr "Klicken Sie hier, um sich abzumelden."
 
 msgid ""
 "You are receiving this mail because you subscribed to getting notifications "
@@ -3842,10 +3907,13 @@ msgid "Check request status"
 msgstr "Anfragestatus überprüfen"
 
 msgid "Your change request has been applied:"
-msgstr "Ihr Änderungswunsch wurde übernommen:"
+msgstr "Ihr Änderungsvorschlag wurde übernommen:"
 
 msgid "Your directory submission has unfortunately been rejected:"
-msgstr "Ihre Verzeichniseintrag Eingabe wurde leider abgelehnt:"
+msgstr "Die Eingabe Ihres Verzeichniseintrags wurde leider abgelehnt:"
+
+msgid "The rejection of your directory application has been withdrawn:"
+msgstr "Die Ablehnung Ihres Verzeichniseintrages wurde zurückgezogen:"
 
 msgid "Your event has been accepted:"
 msgstr "Ihre Veranstaltung wurde angenommen:"
@@ -3935,7 +4003,10 @@ msgstr ""
 "haben."
 
 msgid "Click here to view web version."
-msgstr "Klicken Sie hier um die Web-Version anzuzeigen."
+msgstr "Klicken Sie hier, um die Web-Version anzuzeigen."
+
+msgid "You no longer wish to receive the newsletter?"
+msgstr "Sie möchten den Newsletter nicht mehr erhalten?"
 
 msgid "Click the following link to set a new password:"
 msgstr "Klicken Sie auf den folgenden Link, um ein neues Passwort zu setzen:"
@@ -4068,10 +4139,19 @@ msgid "Directory entry adopted."
 msgstr "Verzeichniseintrag übernommen."
 
 msgid "Change request applied."
-msgstr "Änderungswunsch übernommen."
+msgstr "Änderungsvorschlag übernommen."
 
 msgid "Directory entry rejected."
 msgstr "Verzeichniseintrag abgelehnt."
+
+msgid "Directory change rejected."
+msgstr "Änderungsvorschlag abgelehnt."
+
+msgid "Entry rejection withdrawn."
+msgstr "Ablehnung des Verzeichniseintrags zurückgezogen."
+
+msgid "Change rejection withdrawn."
+msgstr "Ablehnung der Änderung zurückgezogen."
 
 msgid "Event edited."
 msgstr "Veranstaltung bearbeitet."
@@ -4494,13 +4574,11 @@ msgid "Fields"
 msgstr "Felder"
 
 msgid ""
-"Please review your answers and press \"Complete\" to complete the survey. If "
-"there's anything you'd like to change, click on \"Edit\" to return to the "
-"filled-out survey."
+"Thank you for filling out this survey. If there's anything you'd like to "
+"change, click on \"Edit\" below."
 msgstr ""
-"Bitte überprüfen Sie Ihre Angaben und klicken Sie auf \"Abschliessen\" um "
-"die Umfrage abzuschliessen. Wenn Sie Änderungen vornehmen möchten, klicken "
-"Sie auf \"Bearbeiten\" um zur ausgefüllten Umfrage zurückzukehren."
+"Vielen Dank für Ihre Teilnahme an dieser Umfrage. Falls Sie noch etwas "
+"ändern möchten, klicken Sie auf den \"Bearbeiten\"-Button unten."
 
 msgid "No surveys defined yet."
 msgstr "Es wurden noch keine Umfragen definiert."
@@ -4769,6 +4847,15 @@ msgid ""
 msgstr ""
 "Regeln stellen sicher dass die Einteilungen zwischen Start und Ende bestehen "
 "und dass sie im gewählten Interval verlängert werden."
+
+msgid "Rule not found"
+msgstr "Regel nicht gefunden"
+
+msgid "Rule updated"
+msgstr "Regel aktualisiert"
+
+msgid "Edit Rule"
+msgstr "Regel bearbeiten"
 
 msgid "The rule was stopped"
 msgstr "Die Regel wurde gestoppt"
@@ -5265,6 +5352,9 @@ msgstr ""
 
 msgid "Do you really want to delete this registration window?"
 msgstr "Möchten Sie den Anmeldezeitraum wirklich entfernen?"
+
+msgid "Existing submissions will be disassociated."
+msgstr "Bestehende Eingaben werden vom Anmeldezeitraum losgelöst."
 
 msgid "Delete registration window"
 msgstr "Anmeldezeitraum entfernen"
@@ -5802,6 +5892,11 @@ msgstr "Chat"
 msgid "Topics"
 msgstr "Themen"
 
+#, python-format
+msgid "You have successfully unsubscribed from the newsletter at ${address}"
+msgstr ""
+"Sie haben die Mail-Adresse ${address} erfolgreich vom Newsletter abgemeldet"
+
 msgid "A survey with this name already exists"
 msgstr "Eine Umfrage mit diesem Namen existiert bereits"
 
@@ -5813,6 +5908,27 @@ msgstr "Neue Umfrage"
 
 msgid "Please choose a submission window"
 msgstr "Bitte wählen Sie einen Befragungszeitraum"
+
+msgid ""
+"This field cannot be edited because there are submissions associated with "
+"this survey. If you want to edit the definition please delete all "
+"submissions."
+msgstr ""
+"Dieses Feld kann nicht bearbeitet werden, da diese Umfrage bereits Einträge "
+"hat. Wenn Sie die Definition bearbeiten möchten, löschen Sie bitte alle "
+"Einträge."
+
+msgid "Delete Submissions"
+msgstr ""
+
+msgid "Do you really want to delete all submissions?"
+msgstr ""
+
+msgid "All submissions associated with this survey will be deleted."
+msgstr ""
+
+msgid "Delete submissions"
+msgstr ""
 
 msgid "Exports the submissions of the survey."
 msgstr "Exportiert die Umfrageeinträge."
@@ -5838,8 +5954,8 @@ msgstr ""
 msgid "Edit Submission Window"
 msgstr "Befragungszeitraum bearbeiten"
 
-msgid "The submission window was deleted"
-msgstr "Der Befragungszeitraum wurde gelöscht"
+msgid "The submission window and all associated submissions were deleted"
+msgstr ""
 
 msgid "Added a new text module"
 msgstr "Textbaustein hinzugefügt"
@@ -6061,6 +6177,23 @@ msgstr "Ein Konto wurde für Sie erstellt"
 
 msgid "The user was created successfully"
 msgstr "Der Benutzer wurde erfolgreich erstellt"
+
+#~ msgid ""
+#~ "Rules ensure that the allocations between start/end exist and that they "
+#~ "are extended beyond those dates at the given intervals. Editing a rule "
+#~ "may create new allocations."
+#~ msgstr ""
+#~ "Regeln stellen sicher dass die Einteilungen zwischen Start und Ende "
+#~ "bestehen und dass sie im gewählten Interval verlängert werden."
+
+#~ msgid "Directory change rejected"
+#~ msgstr "Verzeichnisänderung abgelehnt"
+
+#~ msgid "Rejection withdrawn."
+#~ msgstr "Ablehnung zurückgezogen."
+
+#~ msgid "Reject"
+#~ msgstr "Abweisen"
 
 #~ msgid "Update your newsletter subscription categories:"
 #~ msgstr "Aktualisieren Sie Ihre Newsletter-Abonnementkategorien:"

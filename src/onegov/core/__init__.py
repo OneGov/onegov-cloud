@@ -5,7 +5,7 @@
 # version is to create release-dependent urls, artifacts and caches. During
 # development these dependencies do not need to be updated in lock-step.
 #
-__version__ = '2024.46'
+__version__ = '2024.50'
 
 # The module levels used for dependency tests and to have a well defined
 # onegov core upgrade order.
@@ -80,14 +80,14 @@ log.addHandler(logging.NullHandler())
 
 ignored_warnings = (
     # we will keep using psycopg2 instead of psycogp2-binary
-    "The psycopg2 wheel package will be renamed from release 2.8",
+    'The psycopg2 wheel package will be renamed from release 2.8',
 
     # SQLAlchemy-Utils installs its own array_agg function, which seems fine
     "The GenericFunction 'array_agg' is already registered"
 )
 
 for message in ignored_warnings:
-    warnings.filterwarnings("ignore", message=message)
+    warnings.filterwarnings('ignore', message=message)
 
 from onegov.core.framework import Framework
 from onegov.core.filestorage import get_filestorage_file  # noqa: F401

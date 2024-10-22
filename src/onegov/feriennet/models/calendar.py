@@ -17,7 +17,7 @@ if TYPE_CHECKING:
     from sqlalchemy.orm import Query, Session
     from sqlalchemy.sql.selectable import Alias
     from typing import NamedTuple
-    from typing_extensions import Self
+    from typing import Self
     from uuid import UUID
 
     class AttendeeCalendarRow(NamedTuple):
@@ -162,13 +162,13 @@ class AttendeeCalendar(Calendar, name='attendee'):
 
             if record.meeting_point and record.lat and record.lon:
                 event.add(
-                    "X-APPLE-STRUCTURED-LOCATION",
-                    f"geo:{record.lat},{record.lon}",
+                    'X-APPLE-STRUCTURED-LOCATION',
+                    f'geo:{record.lat},{record.lon}',
                     parameters={
-                        "VALUE": "URI",
-                        "X-ADDRESS": record.meeting_point,
-                        "X-APPLE-RADIUS": "50",
-                        "X-TITLE": record.meeting_point
+                        'VALUE': 'URI',
+                        'X-ADDRESS': record.meeting_point,
+                        'X-APPLE-RADIUS': '50',
+                        'X-TITLE': record.meeting_point
                     }
                 )
 

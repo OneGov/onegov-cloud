@@ -12,7 +12,7 @@ if TYPE_CHECKING:
     from datetime import date
     from onegov.activity.models import OccasionNeed
     from typing import Literal
-    from typing_extensions import TypeAlias
+    from typing import TypeAlias
 
     VolunteerState: TypeAlias = Literal[
         'open',

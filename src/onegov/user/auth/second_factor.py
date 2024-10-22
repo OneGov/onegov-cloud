@@ -7,14 +7,14 @@ from onegov.user.collections import TANCollection
 from onegov.user.i18n import _
 
 
-from typing import Any, ClassVar, Literal, TYPE_CHECKING
+from typing import Any, ClassVar, Literal, Self, TYPE_CHECKING
 if TYPE_CHECKING:
     from collections.abc import Mapping
     from morepath import App
     from onegov.core.request import CoreRequest
     from onegov.user import User
     from onegov.user.auth import Auth
-    from typing_extensions import Self, TypeAlias, TypedDict
+    from typing import TypeAlias, TypedDict
     from webob import Response
 
     class YubikeyConfig(TypedDict):
@@ -65,7 +65,7 @@ class SecondFactor(metaclass=ABCMeta):
 
     @classmethod
     @abstractmethod
-    def configure(self, **cfg: Any) -> 'Self | None':
+    def configure(cls, **cfg: Any) -> Self | None:
         """ Initialises the auth factor using a dictionary that may or may
         not contain the configuration values necessary for the auth factor.
 
@@ -158,7 +158,7 @@ class YubikeyFactor(SingleStepSecondFactor, type='yubikey'):
         self.yubikey_secret_key = yubikey_secret_key
 
     @classmethod
-    def configure(cls, **cfg: Any) -> 'Self | None':
+    def configure(cls, **cfg: Any) -> Self | None:
         yubikey_client_id = cfg.pop('yubikey_client_id', None)
         yubikey_secret_key = cfg.pop('yubikey_secret_key', None)
         if not yubikey_client_id or not yubikey_secret_key:
@@ -200,7 +200,7 @@ class MTANFactor(TwoStepSecondFactor, type='mtan'):
         self.self_activation = mtan_automatic_setup
 
     @classmethod
-    def configure(cls, **cfg: Any) -> 'Self | None':
+    def configure(cls, **cfg: Any) -> Self | None:
         if not cfg.pop('mtan_second_factor_enabled', False):
             return None
 
@@ -293,7 +293,7 @@ class TOTPFactor(TwoStepSecondFactor, type='totp'):
     """ Implements a TOTP factor for the :class:`Auth` class. """
 
     @classmethod
-    def configure(cls, **cfg: Any) -> 'Self | None':
+    def configure(cls, **cfg: Any) -> Self | None:
         if not cfg.pop('totp_enabled', False):
             return None
 

@@ -137,14 +137,14 @@ def test_resources_person_link_extension(client):
     resources = client.get('/resources')
     new_item = resources.click('Gegenstand')
     new_item.form['title'] = 'Dorf Bike'
-    new_item.form['western_ordered'] = False
-    new_item.form['_'.join(['people', person_uuid])] = True
+    new_item.form['western_name_order'] = False
+    new_item.form['people-0-person'] = person_uuid
     resource = new_item.form.submit().follow()
     assert 'Dorf Bike' in resource
     assert 'Müller Franz' in resource
 
     edit_resource = resource.click('Bearbeiten')
-    edit_resource.form['western_ordered'] = True
+    edit_resource.form['western_name_order'] = True
     resource = edit_resource.form.submit().follow()
     assert 'Franz Müller' in resource
 
@@ -2260,10 +2260,51 @@ def test_allocation_rules_on_rooms(client):
 
     assert count_allocations() == 7
 
-    page = client.get('/resource/room').click("Regeln")
-    page.click('Löschen')
 
-    assert count_allocations() == 1
+
+def test_allocation_rules_edit(client):
+    client.login_admin()
+
+    resources = client.get('/resources')
+
+    page = resources.click('Raum')
+    page.form['title'] = 'Room'
+    page.form.submit()
+
+    def count_allocations():
+        s = '2000-01-01'
+        e = '2050-01-31'
+
+        return len(client.get(f'/resource/room/slots?start={s}&end={e}').json)
+
+    def run_cronjob():
+        client.get('/resource/room/process-rules')
+
+    page = client.get('/resource/room').click("Regeln").click("Regel")
+    page.form['title'] = 'Täglich'
+    page.form['extend'] = 'daily'
+    page.form['start'] = '2019-01-01'
+    page.form['end'] = '2019-01-02'
+    page.form['as_whole_day'] = 'yes'
+
+    page.select_checkbox('except_for', "Sa")
+    page.select_checkbox('except_for', "So")
+
+    page = page.form.submit().follow()
+
+    assert 'Regel aktiv, 2 Einteilungen erstellt' in page
+    assert count_allocations() == 2
+
+    # Modifying the rule applies changes where possible, but
+    # existing reserved slots remain unaffected.
+    edit_page = client.get('/resource/room')
+    edit_page = edit_page.click('Regeln').click('Bearbeiten')
+    form = edit_page.form
+    form['title'] = 'Renamed room'
+
+    edit_page = form.submit().follow()
+
+    assert 'Renamed room' in edit_page
 
 
 def test_allocation_rules_on_daypasses(client):

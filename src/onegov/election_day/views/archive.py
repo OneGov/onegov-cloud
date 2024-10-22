@@ -192,12 +192,12 @@ def view_archive_download(
     filestorage = request.app.filestorage
     assert filestorage is not None
 
-    if not filestorage.isdir("archive"):
+    if not filestorage.isdir('archive'):
         raise HTTPNotFound()
     try:
-        zip_dir = filestorage.opendir("archive/zip")
+        zip_dir = filestorage.opendir('archive/zip')
         content = None
-        with zip_dir.open("archive.zip", mode="rb") as zipfile:
+        with zip_dir.open('archive.zip', mode='rb') as zipfile:
             content = zipfile.read()
         if not content:
             raise HTTPNotFound()

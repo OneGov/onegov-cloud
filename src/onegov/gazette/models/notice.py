@@ -241,7 +241,7 @@ class GazetteNotice(
         """
 
         super().submit()
-        self.add_change(request, _("submitted"))
+        self.add_change(request, _('submitted'))
 
     def reject(  # type:ignore[override]
         self,
@@ -255,7 +255,7 @@ class GazetteNotice(
         """
 
         super().reject()
-        self.add_change(request, _("rejected"), comment)
+        self.add_change(request, _('rejected'), comment)
 
     def accept(self, request: 'GazetteRequest') -> None:  # type:ignore
         """ Accept a submitted notice.
@@ -265,7 +265,7 @@ class GazetteNotice(
         """
 
         super().accept()
-        self.add_change(request, _("accepted"))
+        self.add_change(request, _('accepted'))
 
     def publish(self, request: 'GazetteRequest') -> None:  # type:ignore
         """ Publish an accepted notice.
@@ -275,7 +275,7 @@ class GazetteNotice(
         """
 
         super().publish()
-        self.add_change(request, _("published"))
+        self.add_change(request, _('published'))
 
     @property
     def rejected_comment(self) -> str:

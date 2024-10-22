@@ -26,16 +26,16 @@ _IdT_contra = TypeVar('_IdT_contra', bound='UUID | int')
 _NOT_FOUND = object()
 
 AGENCY_MUTATION_LABELS = {
-    'title': _("Title"),
-    'location_address': _("Location address"),
-    'location_code_city': _("Location Code and City"),
-    'postal_address': _("Postal address"),
-    'postal_code_city': _("Postal Code and City"),
-    'phone': _("Phone"),
-    'phone_direct': _("Alternate Phone Number or Fax"),
-    'email': _("E-Mail"),
-    'website': _("Website"),
-    'opening_hours': _("Opening hours"),
+    'title': _('Title'),
+    'location_address': _('Location address'),
+    'location_code_city': _('Location Code and City'),
+    'postal_address': _('Postal address'),
+    'postal_code_city': _('Postal Code and City'),
+    'phone': _('Phone'),
+    'phone_direct': _('Alternate Phone Number or Fax'),
+    'email': _('E-Mail'),
+    'website': _('Website'),
+    'opening_hours': _('Opening hours'),
 }
 
 
@@ -94,16 +94,16 @@ class AgencyMutation(Mutation['ExtendedAgency', int]):
     @property
     def labels(self) -> dict[str, str]:
         return {
-            'title': _("Title"),
-            'location_address': _("Location address"),
-            'location_code_city': _("Location Code and City"),
-            'postal_address': _("Postal address"),
-            'postal_code_city': _("Postal Code and City"),
-            'phone': _("Phone"),
-            'phone_direct': _("Alternate Phone Number or Fax"),
-            'email': _("E-Mail"),
-            'website': _("Website"),
-            'opening_hours': _("Opening hours"),
+            'title': _('Title'),
+            'location_address': _('Location address'),
+            'location_code_city': _('Location Code and City'),
+            'postal_address': _('Postal address'),
+            'postal_code_city': _('Postal Code and City'),
+            'phone': _('Phone'),
+            'phone_direct': _('Alternate Phone Number or Fax'),
+            'email': _('E-Mail'),
+            'website': _('Website'),
+            'opening_hours': _('Opening hours'),
         }
 
 
@@ -117,23 +117,23 @@ class PersonMutation(Mutation['ExtendedPerson', 'UUID']):
     @property
     def labels(self) -> dict[str, str]:
         return {
-            'title': _("Title"),
-            'salutation': _("Salutation"),
-            'academic_title': _("Academic Title"),
-            'first_name': _("First name"),
-            'last_name': _("Last name"),
-            'function': _("Function"),
-            'email': _("E-Mail"),
-            'phone': _("Phone"),
-            'phone_direct': _("Direct Phone Number or Mobile"),
-            'born': _("Born"),
-            'profession': _("Profession"),
-            'political_party': _("Political Party"),
-            'parliamentary_group': _("Parliamentary Group"),
-            'website': _("Website"),
-            'location_address': _("Location address"),
-            'location_code_city': _("Location Code and City"),
-            'postal_address': _("Postal address"),
-            'postal_code_city': _("Postal Code and City"),
-            'notes': _("Notes"),
+            'title': _('Title'),
+            'salutation': _('Salutation'),
+            'academic_title': _('Academic Title'),
+            'first_name': _('First name'),
+            'last_name': _('Last name'),
+            'function': _('Function'),
+            'email': _('E-Mail'),
+            'phone': _('Phone'),
+            'phone_direct': _('Direct Phone Number or Mobile'),
+            'born': _('Born'),
+            'profession': _('Profession'),
+            'political_party': _('Political Party'),
+            'parliamentary_group': _('Parliamentary Group'),
+            'website': _('Website'),
+            'location_address': _('Location address'),
+            'location_code_city': _('Location Code and City'),
+            'postal_address': _('Postal address'),
+            'postal_code_city': _('Postal Code and City'),
+            'notes': _('Notes'),
         }

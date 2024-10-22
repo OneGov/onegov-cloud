@@ -37,7 +37,7 @@ def handle_send_email(
     """Recipients must be a list of attendee id's or attendees"""
 
     if not recipients:
-        request.alert(_("There are no recipients matching the selection"))
+        request.alert(_('There are no recipients matching the selection'))
         return request
 
     att = request.attendee
@@ -79,7 +79,7 @@ def handle_send_email(
 
     if show_sent_count:
         request.success(_(
-            "Successfully sent the e-mail to ${count} recipients",
+            'Successfully sent the e-mail to ${count} recipients',
             mapping={
                 'count': len(recipients)
             }
@@ -137,7 +137,7 @@ def view_edit_notification(
 
     if form.submitted(request):
         form.update_model(self)
-        request.success(_("Your changes were saved"))
+        request.success(_('Your changes were saved'))
         return request.redirect(request.link(self))
 
     form.apply_model(self)
@@ -201,6 +201,6 @@ def handle_send_notification(
     return {
         'layout': layout,
         'form': form,
-        'button_text': _("Send E-Mail Now"),
+        'button_text': _('Send E-Mail Now'),
         'model': self,
     }

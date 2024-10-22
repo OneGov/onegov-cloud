@@ -270,8 +270,8 @@ class Confirm(Trait):
         self,
         confirm: str,
         extra: str | None = None,
-        yes: str | None = "Yes",
-        no: str = "Cancel",
+        yes: str | None = 'Yes',
+        no: str = 'Cancel',
         **ignored: Any
     ):
         def apply(attrs: dict[str, Any]) -> dict[str, Any]:
@@ -294,7 +294,7 @@ class Block(Confirm):
         self,
         message: str,
         extra: str | None = None,
-        no: str = "Cancel",
+        no: str = 'Cancel',
         **ignored: Any
     ):
         super().__init__(message, extra, None, no)

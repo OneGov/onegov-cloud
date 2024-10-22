@@ -62,7 +62,7 @@ def parse_domain(
             if domain_segment not in principal.get_superregions(election_year):
                 errors.append(
                     _(
-                        "Invalid domain_segment: ${domain_segment}",
+                        'Invalid domain_segment: ${domain_segment}',
                         mapping={'domain_segment': domain_segment}
                     )
                 )
@@ -136,7 +136,7 @@ def parse_party_result(
     except ValueError as e:
         errors.append(e.args[0])
     except AssertionError:
-        errors.append(_("Invalid values"))
+        errors.append(_('Invalid values'))
     else:
         key = f'{domain}/{domain_segment}/{year}/{party_id}'
         totals[year][totals_key] = total_votes
@@ -144,7 +144,7 @@ def parse_party_result(
             parties.add(party_id)
 
         if key in party_results:
-            errors.append(_("${name} was found twice", mapping={'name': key}))
+            errors.append(_('${name} was found twice', mapping={'name': key}))
         else:
             party_results[key] = PartyResult(
                 id=uuid4(),
@@ -266,16 +266,16 @@ def import_party_results_internal(
     if not parties:
         errors.append(FileImportError(
             _(
-                "No party results for year ${year}",
+                'No party results for year ${year}',
                 mapping={'year': election.date.year}
             )
         ))
 
     if panachage_headers and parties:
         for list_id in panachage_headers.values():
-            if not list_id == '999' and list_id not in parties:
+            if list_id != '999' and list_id not in parties:
                 errors.append(FileImportError(
-                    _("Panachage results ids and id not consistent"))
+                    _('Panachage results ids and id not consistent'))
                 )
                 break
 

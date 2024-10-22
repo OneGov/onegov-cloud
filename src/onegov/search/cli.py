@@ -79,13 +79,13 @@ def reindex(
         if not hasattr(request.app, 'es_client'):
             return
 
-        title = f"Reindexing {request.app.application_id}"
+        title = f'Reindexing {request.app.application_id}'
         click.secho(title, underline=True)
 
         start = utcnow()
         request.app.perform_reindex(fail)  # type:ignore[attr-defined]
 
-        click.secho(f"took {utcnow() - start}")
+        click.secho(f'took {utcnow() - start}')
 
     return run_reindex
 
@@ -101,7 +101,7 @@ def index_status(
         if not hasattr(request.app, 'es_client'):
             return
 
-        title = f"Index status of {request.app.application_id}"
+        title = f'Index status of {request.app.application_id}'
         click.secho(title, underline=True)
 
         psql_index_status(app)

@@ -63,7 +63,7 @@ class Poster(NamedTuple):
     label: str
 
 
-class encoded_property:
+class encoded_property:  # noqa: N801
     """ A shorthand property to return the label of an encoded value. Requires
     the instance the have a `codes`-lookup function. Creates the SqlAlchemy
     Column (with a prefixed underline).
@@ -97,7 +97,7 @@ class encoded_property:
         return instance.codes(self.name).get(value)
 
 
-class localized_property(Generic[StrT]):
+class localized_property(Generic[StrT]):  # noqa: N801
     """ A shorthand property to return a localized attribute. Requires at least
     a `xxx_de` attribute and falls back to this.
 
@@ -211,27 +211,27 @@ class SwissVote(Base, TimestampMixin, LocalizedFiles, ContentMixin):
 
         if attribute == 'legal_form':
             return OrderedDict((
-                (1, _("Mandatory referendum")),
-                (2, _("Optional referendum")),
-                (3, _("Popular initiative")),
-                (4, _("Direct counter-proposal")),
-                (5, _("Tie-breaker")),
+                (1, _('Mandatory referendum')),
+                (2, _('Optional referendum')),
+                (3, _('Popular initiative')),
+                (4, _('Direct counter-proposal')),
+                (5, _('Tie-breaker')),
             ))
 
         if attribute == 'parliamentary_initiated':
             return OrderedDict((
-                (0, _("No")),
-                (1, _("Yes")),
-                (None, _("No")),
+                (0, _('No')),
+                (1, _('Yes')),
+                (None, _('No')),
             ))
 
         if attribute == 'result' or attribute.endswith('_accepted'):
             return OrderedDict((
-                (0, _("Rejected")),
-                (1, _("Accepted")),
-                (3, _("Majority of the cantons not necessary")),
-                (8, _("Counter-proposal preferred")),
-                (9, _("Popular initiative preferred")),
+                (0, _('Rejected')),
+                (1, _('Accepted')),
+                (3, _('Majority of the cantons not necessary')),
+                (8, _('Counter-proposal preferred')),
+                (9, _('Popular initiative preferred')),
             ))
 
         if attribute in (
@@ -241,26 +241,26 @@ class SwissVote(Base, TimestampMixin, LocalizedFiles, ContentMixin):
             'position_parliament',
         ):
             return OrderedDict((
-                (1, _("Accepting")),
-                (2, _("Rejecting")),
-                (3, _("None")),
-                (8, _("Preference for the counter-proposal")),
-                (9, _("Preference for the popular initiative")),
+                (1, _('Accepting')),
+                (2, _('Rejecting')),
+                (3, _('None')),
+                (8, _('Preference for the counter-proposal')),
+                (9, _('Preference for the popular initiative')),
             ))
 
         if attribute == 'recommendation':
             # Sorted by how it should be displayed in strengths table
             return OrderedDict((
-                (1, _("Yea")),
-                (9, _("Preference for the popular initiative")),
-                (2, _("Nay")),
-                (8, _("Preference for the counter-proposal")),
-                (4, _("Empty")),
-                (5, _("Free vote")),
-                (3, _("None")),
-                (66, _("Neutral")),
-                (9999, _("Organization no longer exists")),
-                (None, _("unknown"))
+                (1, _('Yea')),
+                (9, _('Preference for the popular initiative')),
+                (2, _('Nay')),
+                (8, _('Preference for the counter-proposal')),
+                (4, _('Empty')),
+                (5, _('Free vote')),
+                (3, _('None')),
+                (66, _('Neutral')),
+                (9999, _('Organization no longer exists')),
+                (None, _('unknown'))
             ))
 
         raise RuntimeError(f"No codes available for '{attribute}'")
@@ -269,10 +269,10 @@ class SwissVote(Base, TimestampMixin, LocalizedFiles, ContentMixin):
     def metadata_codes(attribute: str) -> dict[str, str]:
         if attribute == 'position':
             return OrderedDict((
-                ('yes', _("Yes")),
-                ('mixed', _("Mixed")),
-                ('no', _("No")),
-                ('neutral', _("Neutral")),
+                ('yes', _('Yes')),
+                ('mixed', _('Mixed')),
+                ('no', _('No')),
+                ('neutral', _('Neutral')),
             ))
 
         if attribute == 'language':
@@ -686,10 +686,8 @@ class SwissVote(Base, TimestampMixin, LocalizedFiles, ContentMixin):
 
         """
         result = []
-        for slogan, actor_list in self.recommendations_parties.items():
+        for actor_list in self.recommendations_parties.values():
             actors = (d.name for d in actor_list)
-            # Filter out those who have None as share
-
             result.extend(
                 sorted(actors, key=self.get_actors_share, reverse=True)
             )
@@ -730,17 +728,19 @@ class SwissVote(Base, TimestampMixin, LocalizedFiles, ContentMixin):
             (Actor(name), recommendations_lookup.get(name))
             for name in Actor.associations()
         ]
-        for attribute, code in (
-            ('yes', 1),
-            ('no', 2),
-            ('free', 5),
-            ('counter_proposal', 8),
-            ('popular_initiative', 9),
-        ):
-            value = getattr(self, f'recommendations_other_{attribute}')
-            for name in (value or '').split(','):
-                if stripped := name.strip():
-                    recommendations.append((Actor(stripped), code))
+        recommendations.extend(
+            (Actor(stripped), code)
+            for attribute, code in (
+                ('yes', 1),
+                ('no', 2),
+                ('free', 5),
+                ('counter_proposal', 8),
+                ('popular_initiative', 9),
+            )
+            if (value := getattr(self, f'recommendations_other_{attribute}'))
+            for name in value.split(',')
+            if (stripped := name.strip())
+        )
 
         return self.group_recommendations(recommendations, ignore_unknown=True)
 
@@ -1037,10 +1037,10 @@ class SwissVote(Base, TimestampMixin, LocalizedFiles, ContentMixin):
     )
 
     # searchable attachment texts
-    searchable_text_de_CH = deferred(Column(TSVECTOR))
-    searchable_text_fr_CH = deferred(Column(TSVECTOR))
-    searchable_text_it_CH = deferred(Column(TSVECTOR))
-    searchable_text_en_US = deferred(Column(TSVECTOR))
+    searchable_text_de_CH = deferred(Column(TSVECTOR))  # noqa: N815
+    searchable_text_fr_CH = deferred(Column(TSVECTOR))  # noqa: N815
+    searchable_text_it_CH = deferred(Column(TSVECTOR))  # noqa: N815
+    searchable_text_en_US = deferred(Column(TSVECTOR))  # noqa: N815
 
     indexed_files = {
         'voting_text',

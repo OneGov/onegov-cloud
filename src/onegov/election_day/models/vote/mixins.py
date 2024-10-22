@@ -28,14 +28,14 @@ class DerivedAttributesMixin:
         return self.yeas / ((self.yeas + self.nays) or 1) * 100
 
     @yeas_percentage.expression  # type:ignore[no-redef]
-    def yeas_percentage(self) -> 'ColumnElement[float]':
+    def yeas_percentage(cls) -> 'ColumnElement[float]':
         # coalesce will pick the first non-null result
         # nullif will return null if division by zero
         # => when all yeas and nays are zero the yeas percentage is 0%
         return 100 * (
-            cast(self.yeas, Float) / cast(
+            cast(cls.yeas, Float) / cast(
                 func.coalesce(
-                    func.nullif(self.yeas + self.nays, 0), 1
+                    func.nullif(cls.yeas + cls.nays, 0), 1
                 ),
                 Float
             )

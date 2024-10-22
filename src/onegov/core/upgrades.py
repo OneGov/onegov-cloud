@@ -87,7 +87,7 @@ def migrate_to_jsonb(
 
     for schema in schemas:
         for column in columns:
-            identity = ':'.join((schema, column.table.name, column.name))
+            identity = f'{schema}:{column.table.name}:{column.name}'
 
             if identity not in text_columns:
                 continue

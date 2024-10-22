@@ -43,8 +43,7 @@ if TYPE_CHECKING:
     from onegov.form.parser.core import (
         BasicParsedField, FileParsedField, ParsedField)
     from sqlalchemy.sql import ColumnElement
-    from typing import type_check_only
-    from typing_extensions import TypeAlias
+    from typing import type_check_only, TypeAlias
     from .directory_entry import DirectoryEntry
     from ..types import DirectoryConfiguration
 

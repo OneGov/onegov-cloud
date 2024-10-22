@@ -110,7 +110,6 @@
             <tal:b tal:content="votum.text"/>
         </blockquote>
         <blockquote class="votum-motion" tal:condition="votum.motion">
-            <span i18n:translate="">Motion</span><br/>
             <tal:b tal:content="votum.motion"></tal:b>
         </blockquote>
         <blockquote class="votum-statement-of-reasons" tal:condition="votum.statement_of_reasons">

@@ -34,8 +34,8 @@ def view_rate_sets(
             active=self.active == value,
             url=request.link(self.for_filter(active=value))
         ) for title, value in (
-            (_("Active"), True),
-            (_("Inactive"), False)
+            (_('Active'), True),
+            (_('Inactive'), False)
         )
     ]
 
@@ -63,16 +63,16 @@ def add_rate_set(
 
     if form.submitted(request):
         rate_set = self.add(**form.get_useful_data())
-        request.success(_("Added a new rate set"))
+        request.success(_('Added a new rate set'))
 
         return request.redirect(request.link(rate_set))
 
     layout = RateSetCollectionLayout(self, request)
-    layout.breadcrumbs.append(Link(_("New"), '#'))
+    layout.breadcrumbs.append(Link(_('New'), '#'))
 
     return {
         'layout': layout,
-        'title': _("New rate set"),
+        'title': _('New rate set'),
         'form': form,
         'form_width': 'full'
     }
@@ -112,13 +112,13 @@ def edit_rate_set(
 
     if form.submitted(request):
         form.populate_obj(self)
-        request.success(_("Your changes were saved"))
+        request.success(_('Your changes were saved'))
         return request.redirect(request.link(self))
 
     form.process(obj=self)
 
     layout = RateSetLayout(self, request)
-    layout.breadcrumbs.append(Link(_("Edit"), '#'))
+    layout.breadcrumbs.append(Link(_('Edit'), '#'))
     layout.editbar_links = []
 
     return {

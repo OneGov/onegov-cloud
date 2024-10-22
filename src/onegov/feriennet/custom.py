@@ -36,7 +36,7 @@ def get_global_tools(
 
     if request.app.show_volunteers(request):
         yield Link(
-            text=_("Help us"),
+            text=_('Help us'),
             url=request.class_link(
                 VacationActivityCollection, name='volunteer'
             ),
@@ -56,7 +56,7 @@ def get_admin_tools(
         if request.is_admin:
             links.append(
                 Link(
-                    text=_("Dashboard"),
+                    text=_('Dashboard'),
                     url=request.class_link(Dashboard),
                     attrs={'class': 'show-dashboard'}
                 )
@@ -64,7 +64,7 @@ def get_admin_tools(
 
             links.append(
                 Link(
-                    text=_("Periods"),
+                    text=_('Periods'),
                     url=request.class_link(PeriodCollection),
                     attrs={'class': 'manage-periods'}
                 )
@@ -73,7 +73,7 @@ def get_admin_tools(
             if periods:
                 links.append(
                     Link(
-                        text=_("Matching"),
+                        text=_('Matching'),
                         url=request.class_link(MatchCollection),
                         attrs={'class': 'manage-matches'}
                     )
@@ -81,7 +81,7 @@ def get_admin_tools(
 
                 links.append(
                     Link(
-                        text=_("Billing"),
+                        text=_('Billing'),
                         url=request.class_link(BillingCollection),
                         attrs={'class': 'manage-billing'}
                     )
@@ -92,7 +92,7 @@ def get_admin_tools(
                 if request.app.show_volunteers(request):
                     links.append(
                         Link(
-                            text=_("Volunteers"),
+                            text=_('Volunteers'),
                             url=request.link(
                                 VolunteerCollection(
                                     request.session,
@@ -105,7 +105,7 @@ def get_admin_tools(
 
                 links.append(
                     Link(
-                        text=_("Notifications"),
+                        text=_('Notifications'),
                         url=request.class_link(
                             NotificationTemplateCollection
                         ),
@@ -115,7 +115,7 @@ def get_admin_tools(
 
                 links.append(
                     Link(
-                        text=_("Exports"),
+                        text=_('Exports'),
                         url=request.class_link(
                             ExportCollection
                         ),
@@ -125,7 +125,7 @@ def get_admin_tools(
 
         if links:
             title = period and period.active and period.title
-            title = title or _("No active period")
+            title = title or _('No active period')
 
             if len(title) > 25:
                 title = f'{title[:25]}…'
@@ -169,7 +169,7 @@ def get_personal_tools(
                 }
 
             yield Link(
-                text=_("Invoices"),
+                text=_('Invoices'),
                 url=request.link(invoices),
                 attrs=attributes
             )
@@ -200,13 +200,13 @@ def get_personal_tools(
                 }
 
             yield Link(
-                text=period.confirmed and _("Bookings") or _("Wishlist"),
+                text=period.confirmed and _('Bookings') or _('Wishlist'),
                 url=request.link(bookings),
                 attrs=attributes
             )
         else:
             yield Link(
-                text=_("Wishlist"),
+                text=_('Wishlist'),
                 url=request.link(bookings),
                 attrs={
                     'data-count': '0',
@@ -218,7 +218,7 @@ def get_personal_tools(
 def get_top_navigation(request: 'FeriennetRequest') -> 'Iterator[Link]':
     # inject an activites link in front of all top navigation links
     yield Link(
-        text=_("Activities"),
+        text=_('Activities'),
         url=request.class_link(VacationActivityCollection)
     )
 

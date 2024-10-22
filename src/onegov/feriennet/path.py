@@ -26,6 +26,7 @@ from uuid import UUID
 
 from typing import Literal, TYPE_CHECKING
 if TYPE_CHECKING:
+    from onegov.activity.models import PeriodMeta
     from onegov.feriennet.request import FeriennetRequest
 
 
@@ -156,6 +157,7 @@ def get_matches(
 ) -> MatchCollection | None:
 
     # the default period is the active period or the first we can find
+    period: Period | PeriodMeta | None
     if not period_id:
         period = app.default_period
     else:
@@ -186,6 +188,7 @@ def get_billing(
 ) -> BillingCollection | None:
 
     # the default period is the active period or the first we can find
+    period: Period | PeriodMeta | None
     if not period_id:
         period = app.default_period
     else:
@@ -290,6 +293,7 @@ def get_occasion_attendee_collection(
         return None
 
     # the default period is the active period or the first we can find
+    period: Period | PeriodMeta | None
     if not period_id:
         period = app.default_period
     else:

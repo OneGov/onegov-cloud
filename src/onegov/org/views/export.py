@@ -30,7 +30,7 @@ def view_export_collection(
 
     return {
         'layout': layout or ExportCollectionLayout(self, request),
-        'title': _("Exports"),
+        'title': _('Exports'),
         'exports': exports
     }
 

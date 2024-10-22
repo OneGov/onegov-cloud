@@ -17,16 +17,16 @@ from sqlalchemy.ext.hybrid import hybrid_property
 from sqlalchemy.orm import object_session, relationship
 
 
-# type gets shadowed in the model so we need an alias
-from typing import Type, TYPE_CHECKING, Any
-
+from typing import TYPE_CHECKING, Any
 if TYPE_CHECKING:
+    # type gets shadowed in the model so we need an alias
+    from builtins import type as type_t
     from uuid import UUID
     from datetime import date
     from onegov.form import Form
     from onegov.form.types import SubmissionState
     from onegov.pay.types import PaymentMethod
-    from typing_extensions import Self
+    from typing import Self
     from onegov.core.request import CoreRequest
 
 
@@ -155,7 +155,7 @@ class FormDefinition(Base, ContentMixin, TimestampMixin,
     }
 
     @property
-    def form_class(self) -> Type['Form']:
+    def form_class(self) -> 'type_t[Form]':
         """ Parses the form definition and returns a form class. """
 
         return self.extend_form_class(
@@ -299,13 +299,13 @@ class SurveyDefinition(Base, ContentMixin, TimestampMixin,
     lead: dict_property[str | None] = meta_property()
 
     #: content associated with the Survey
-    text: dict_property[str | None] = content_property()
+    text = dict_markup_property('content')
 
     #: extensions
     extensions: dict_property[list[str]] = meta_property(default=list)
 
     @property
-    def form_class(self) -> Type['Form']:
+    def form_class(self) -> type['Form']:
         """ Parses the survey definition and returns a form class. """
 
         return self.extend_form_class(
@@ -323,15 +323,11 @@ class SurveyDefinition(Base, ContentMixin, TimestampMixin,
 
     def has_submissions(
         self,
-        with_state: 'SubmissionState | None' = None
     ) -> bool:
 
         session = object_session(self)
         query = session.query(SurveySubmission.id)
         query = query.filter(SurveySubmission.name == self.name)
-
-        if with_state is not None:
-            query = query.filter(SurveySubmission.state == with_state)
 
         return session.query(query.exists()).scalar()
 
@@ -362,8 +358,7 @@ class SurveyDefinition(Base, ContentMixin, TimestampMixin,
         all_fields = form._fields
         all_fields.pop('csrf_token', None)
         fields = all_fields.values()
-        q = request.session.query(SurveySubmission)
-        q = q.filter_by(name=self.name)
+        q = request.session.query(SurveySubmission).filter_by(name=self.name)
         if sw_id:
             submissions = q.filter_by(submission_window_id=sw_id).all()
         else:

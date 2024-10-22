@@ -18,7 +18,8 @@ if TYPE_CHECKING:
     from onegov.core.request import CoreRequest
     from onegov.user import User, UserApp
     from onegov.user.forms import RegistrationForm
-    from typing_extensions import Self, TypedDict
+    from typing_extensions import TypedDict
+    from typing import Self
 
     class SignupToken(TypedDict):
         role: str
@@ -206,7 +207,7 @@ class Auth:
         source = None
 
         if isinstance(self.app, UserApp) and not skip_providers:
-            for provider in self.app.providers:
+            for provider in self.app.providers.values():
                 if not provider.available(self.app):
                     continue
                 if provider.kind == 'integrated':
@@ -223,7 +224,7 @@ class Auth:
         user = user or self.users.by_username_and_password(username, password)
 
         def fail() -> None:
-            log.info(f"Failed login by {client} ({username})")
+            log.info(f'Failed login by {client} ({username})')
             return None
 
         if user is None:
@@ -260,7 +261,7 @@ class Auth:
         if user.source != source:
             return fail()  # type:ignore[func-returns-value]
 
-        log.info(f"Successful login by {client} ({username})")
+        log.info(f'Successful login by {client} ({username})')
         return user
 
     def as_identity(self, user: 'User') -> 'Identity':

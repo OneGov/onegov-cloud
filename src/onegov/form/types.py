@@ -6,8 +6,7 @@ FieldT = TypeVar('FieldT', bound='Field', contravariant=True)
 
 if TYPE_CHECKING:
     from onegov.form import Form
-    from typing import Any, Literal, Protocol
-    from typing_extensions import TypeAlias
+    from typing import Any, Literal, Protocol, TypeAlias
     from webob.request import _FieldStorageWithFile
     from wtforms.fields.core import _Filter, _Validator, _Widget, Field
     from wtforms.form import BaseForm

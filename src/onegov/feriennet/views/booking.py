@@ -34,7 +34,7 @@ from uuid import UUID
 from typing import Literal, TYPE_CHECKING
 if TYPE_CHECKING:
     from collections.abc import Collection, Iterable
-    from onegov.activity.models import Period
+    from onegov.activity.models import Period, PeriodMeta
     from onegov.activity.models.booking import BookingState
     from onegov.core.elements import Trait
     from onegov.core.types import RenderData
@@ -83,7 +83,7 @@ def all_bookings(collection: BookingCollection) -> list[Booking]:
 
 
 def group_bookings(
-    period: 'Period',
+    period: 'Period | PeriodMeta',
     bookings: 'Iterable[Booking]'
 ) -> dict[Attendee, dict['BookingState', SortedList[Booking]]]:
     """ Takes a (small) list of bookings and groups them by attendee and state
@@ -125,7 +125,7 @@ def group_bookings(
 
 
 def total_by_bookings(
-    period: 'Period | None',
+    period: 'Period | PeriodMeta | None',
     bookings: 'Collection[Booking]'
 ) -> Decimal:
 
@@ -134,9 +134,9 @@ def total_by_bookings(
             b.cost for b in bookings
             if b.state == 'accepted' and b.cost
         )
-        total = total or Decimal("0.00")
+        total = total or Decimal('0.00')
     else:
-        return Decimal("0.00")
+        return Decimal('0.00')
 
     if period and period.all_inclusive and period.booking_cost:
         total += period.booking_cost
@@ -185,7 +185,7 @@ def attendees_by_username(
 
 
 def get_booking_title(layout: DefaultLayout, booking: Booking) -> str:
-    return "{} - {}".format(
+    return '{} - {}'.format(
         booking.occasion.activity.title,
         layout.format_datetime_range(
             booking.occasion.dates[0].localized_start,
@@ -194,7 +194,7 @@ def get_booking_title(layout: DefaultLayout, booking: Booking) -> str:
 
 def actions_by_booking(
     layout: DefaultLayout,
-    period: 'Period | None',
+    period: 'Period | PeriodMeta | None',
     booking: Booking
 ) -> list[Link]:
 
@@ -208,7 +208,7 @@ def actions_by_booking(
             if not booking.group_code:
                 actions.append(
                     Link(
-                        text=_("Invite a companion"),
+                        text=_('Invite a companion'),
                         url=layout.request.link(booking, 'invite'),
                         attrs={
                             'class': 'invite-link',
@@ -235,7 +235,7 @@ def actions_by_booking(
                     # the group code is not shown if the attendee is alone
                     actions.append(
                         Link(
-                            text=_("Invite a companion"),
+                            text=_('Invite a companion'),
                             url=layout.request.link(invite),
                             attrs={
                                 'class': 'invite-link',
@@ -245,7 +245,7 @@ def actions_by_booking(
                 elif count == 1:
                     actions.append(
                         Link(
-                            text=_("With 1 companion in a group"),
+                            text=_('With 1 companion in a group'),
                             url=layout.request.link(invite),
                             attrs={
                                 'class': 'invite-link',
@@ -256,7 +256,7 @@ def actions_by_booking(
                 elif count > 1:
                     actions.append(
                         Link(
-                            text=_("With ${n} companions in a group", mapping={
+                            text=_('With ${n} companions in a group', mapping={
                                 'n': count
                             }),
                             url=layout.request.link(invite),
@@ -272,8 +272,8 @@ def actions_by_booking(
 
         label = (
             period.wishlist_phase
-            and _("Remove wish")
-            or _("Remove booking")
+            and _('Remove wish')
+            or _('Remove booking')
         )
 
         actions.append(Link(
@@ -289,7 +289,7 @@ def actions_by_booking(
                     }),
                     None,
                     label,
-                    _("Cancel"),
+                    _('Cancel'),
                 ),
                 Intercooler(
                     request_method='DELETE',
@@ -309,7 +309,7 @@ def actions_by_booking(
 
         if may_cancel:
             actions.append(Link(
-                text=_("Cancel Booking"),
+                text=_('Cancel Booking'),
                 url=layout.csrf_protected_url(
                     layout.request.link(booking, 'cancel')
                 ),
@@ -321,9 +321,9 @@ def actions_by_booking(
                         _('Do you really want to cancel "${title}"?', mapping={
                             'title': get_booking_title(layout, booking)
                         }),
-                        _("This cannot be undone."),
-                        _("Cancel Booking"),
-                        _("Cancel"),
+                        _('This cannot be undone.'),
+                        _('Cancel Booking'),
+                        _('Cancel'),
                     ),
                     Intercooler(
                         request_method='POST',
@@ -466,7 +466,7 @@ def delete_booking(self: Booking, request: 'FeriennetRequest') -> None:
 
     if self.period.confirmed and self.state not in DELETABLE_STATES:
         show_error_on_attendee(request, self.attendee, _(
-            "Only open, cancelled, denied or blocked bookings may be deleted"))
+            'Only open, cancelled, denied or blocked bookings may be deleted'))
 
         return
 
@@ -489,7 +489,7 @@ def cancel_booking(self: Booking, request: 'FeriennetRequest') -> None:
         if not request.is_admin:
             if self.occasion.is_past_cancellation(date.today()):
                 request.alert(_(
-                    "Only admins may cancel bookings at this point."
+                    'Only admins may cancel bookings at this point.'
                 ))
 
                 return
@@ -499,13 +499,13 @@ def cancel_booking(self: Booking, request: 'FeriennetRequest') -> None:
         score_function=self.period.scoring,
         cascade=False)
 
-    request.success(_("The booking was cancelled successfully"))
+    request.success(_('The booking was cancelled successfully'))
 
     bookings_link = Markup('<a href="{}">{}</a>').format(
         request.class_link(BookingCollection, {
             'period_id': self.period.id
         }),
-        request.translate(_("Bookings"))
+        request.translate(_('Bookings'))
     )
 
     subject = request.translate(_(
@@ -548,12 +548,12 @@ def toggle_star(self: Booking, request: 'FeriennetRequest') -> str:
         if not self.starred:
             if not self.star(max_stars=3):
                 show_error_on_attendee(request, self.attendee, _(
-                    "Cannot select more than three favorites per child"))
+                    'Cannot select more than three favorites per child'))
         else:
             self.unstar()
     else:
         show_error_on_attendee(request, self.attendee, _(
-            "The period is not in the wishlist-phase"))
+            'The period is not in the wishlist-phase'))
 
     layout = DefaultLayout(self, request)
     return render_macro(layout.macros['star'], request, {'booking': self})
@@ -592,7 +592,7 @@ def view_mask(self: BookingCollection, request: 'FeriennetRequest') -> str:
     try:
         attendee = UUID(request.params.get('id', None)).hex  # type:ignore
     except (ValueError, TypeError):
-        return ""
+        return ''
 
     return f"""
         .attendee-bookings-row {{
@@ -720,7 +720,7 @@ def view_group_invite(
                 + attendee.name
             )
         else:
-            text = _("Leave Group")
+            text = _('Leave Group')
 
         return Link(
             text=text,
@@ -734,13 +734,13 @@ def view_group_invite(
     subject = occasion.activity.title
     message = _(
         (
-            "Hi!\n\n"
-            "${first_name} wants to take part in the \"${title}\" activity by "
-            "${organisation} and would be thrilled to go with a mate.\n\n"
-            "You can add the activity to the wishlist of your child through "
-            "the following link, if you are interested. This way the children "
-            "have a better chance of getting a spot together:\n\n"
-            "${link}"
+            'Hi!\n\n'
+            '${first_name} wants to take part in the "${title}" activity by '
+            '${organisation} and would be thrilled to go with a mate.\n\n'
+            'You can add the activity to the wishlist of your child through '
+            'the following link, if you are interested. This way the children '
+            'have a better chance of getting a spot together:\n\n'
+            '${link}'
         ), mapping={
             'first_name': first_name,
             'link': request.link(self.for_username(None)),
@@ -749,7 +749,7 @@ def view_group_invite(
         }
     )
 
-    mailto = "mailto:%20?subject={subject}&body={message}".format(
+    mailto = 'mailto:%20?subject={subject}&body={message}'.format(
         subject=urllib.parse.quote(subject),
         message=urllib.parse.quote(request.translate(message))
     )
@@ -792,7 +792,7 @@ def join_group(self: GroupInvite, request: 'FeriennetRequest') -> None:
     booking = request.session.query(Booking).filter_by(id=booking_id).first()
 
     if not booking:
-        request.warning(_("The booking does not exist"))
+        request.warning(_('The booking does not exist'))
         return
 
     own_children = {
@@ -801,11 +801,11 @@ def join_group(self: GroupInvite, request: 'FeriennetRequest') -> None:
     }
     if booking.attendee_id not in own_children:
         request.alert(
-            _("Not permitted to join this attendee to the group"))
+            _('Not permitted to join this attendee to the group'))
         return
 
     booking.group_code = self.group_code
-    request.success(_("Successfully joined the group"))
+    request.success(_('Successfully joined the group'))
 
 
 @FeriennetApp.view(
@@ -820,7 +820,7 @@ def leave_group(self: GroupInvite, request: 'FeriennetRequest') -> None:
     booking = request.session.query(Booking).filter_by(id=booking_id).first()
 
     if not booking:
-        request.warning(_("The booking does not exist"))
+        request.warning(_('The booking does not exist'))
         return
 
     own_children = {
@@ -830,8 +830,8 @@ def leave_group(self: GroupInvite, request: 'FeriennetRequest') -> None:
 
     if booking.attendee_id not in own_children:
         request.alert(
-            _("Not permitted to evict this attendee from the group"))
+            _('Not permitted to evict this attendee from the group'))
         return
 
     booking.group_code = None
-    request.success(_("Successfully left the group"))
+    request.success(_('Successfully left the group'))

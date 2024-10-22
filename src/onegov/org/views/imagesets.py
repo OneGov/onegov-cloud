@@ -48,7 +48,7 @@ def view_imagesets(
 
     return {
         'layout': layout or ImageSetCollectionLayout(self, request),
-        'title': _("Photo Albums"),
+        'title': _('Photo Albums'),
         'imagesets': request.exclude_invisible(imagesets)
     }
 
@@ -79,14 +79,14 @@ def select_images(
     ]
 
     layout = layout or ImageSetLayout(self, request)
-    layout.breadcrumbs.append(Link(_("Select"), '#'))
+    layout.breadcrumbs.append(Link(_('Select'), '#'))
 
     action = URL(request.link(self, 'select')).query_param(
         'csrf-token', request.new_csrf_token())
 
     return {
         'layout': layout,
-        'title': _("Select images"),
+        'title': _('Select images'),
         'images': images,
         'action': action
     }
@@ -111,7 +111,7 @@ def handle_select_images(self: ImageSet, request: 'OrgRequest') -> 'Response':
             .all()
         )
 
-    request.success(_("Your changes were saved"))
+    request.success(_('Your changes were saved'))
 
     return morepath.redirect(request.link(self))
 
@@ -129,17 +129,17 @@ def handle_new_imageset(
         assert form.title.data is not None
         imageset = self.add(title=form.title.data)
         form.populate_obj(imageset)
-        request.success(_("Added a new photo album"))
+        request.success(_('Added a new photo album'))
 
         return morepath.redirect(request.link(imageset))
 
     layout = layout or ImageSetCollectionLayout(self, request)
     layout.include_editor()
-    layout.breadcrumbs.append(Link(_("New"), '#'))
+    layout.breadcrumbs.append(Link(_('New'), '#'))
 
     return {
         'layout': layout,
-        'title': _("New Photo Album"),
+        'title': _('New Photo Album'),
         'form': form,
     }
 
@@ -156,7 +156,7 @@ def handle_edit_imageset(
     if form.submitted(request):
         form.populate_obj(self)
 
-        request.success(_("Your changes were saved"))
+        request.success(_('Your changes were saved'))
         return morepath.redirect(request.link(self))
 
     elif not request.POST:
@@ -164,7 +164,7 @@ def handle_edit_imageset(
 
     layout = layout or ImageSetLayout(self, request)
     layout.include_editor()
-    layout.breadcrumbs.append(Link(_("Edit"), '#'))
+    layout.breadcrumbs.append(Link(_('Edit'), '#'))
 
     return {
         'layout': layout,

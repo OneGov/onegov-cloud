@@ -42,21 +42,21 @@ class PageLayout(DefaultLayout):
         if self.request.has_role('admin', 'editor'):
             result.append(
                 Link(
-                    text=_("Edit page"),
+                    text=_('Edit page'),
                     url=self.request.link(self.model, name='edit'),
                     attrs={'class': 'edit-icon'}
                 )
             )
             result.append(
                 Link(
-                    text=_("Manage attachments"),
+                    text=_('Manage attachments'),
                     url=self.request.link(self.model, name='attachments'),
                     attrs={'class': 'upload-icon'}
                 )
             )
             result.append(
                 Link(
-                    text=_("Manage slider images"),
+                    text=_('Manage slider images'),
                     url=self.request.link(self.model, name='slider-images'),
                     attrs={'class': 'upload-icon'}
                 )
@@ -64,17 +64,17 @@ class PageLayout(DefaultLayout):
             if self.model.id not in self.app.static_content_pages:
                 result.append(
                     Link(
-                        text=_("Delete page"),
+                        text=_('Delete page'),
                         url=self.request.link(self.model, name='delete'),
                         attrs={'class': 'delete-icon'}
                     )
                 )
             result.append(
                 LinkGroup(
-                    title=_("Add"),
+                    title=_('Add'),
                     links=[
                         Link(
-                            text=_("Page"),
+                            text=_('Page'),
                             url=self.request.link(self.pages, name='add'),
                             attrs={'class': 'page-icon'}
                         )
@@ -86,10 +86,10 @@ class PageLayout(DefaultLayout):
     @cached_property
     def breadcrumbs(self) -> list[Link]:
         if self.model.id == 'home':
-            return [Link(_("Homepage"), self.homepage_url)]
+            return [Link(_('Homepage'), self.homepage_url)]
 
         return [
-            Link(_("Homepage"), self.homepage_url),
+            Link(_('Homepage'), self.homepage_url),
             Link(self.title, '#'),
         ]
 
@@ -130,12 +130,12 @@ class AddPageLayout(DefaultLayout):
 
     @cached_property
     def title(self) -> str:
-        return _("Add page")
+        return _('Add page')
 
     @cached_property
     def breadcrumbs(self) -> list[Link]:
         return [
-            Link(_("Homepage"), self.homepage_url),
+            Link(_('Homepage'), self.homepage_url),
             Link(self.title, '#'),
         ]
 
@@ -154,7 +154,7 @@ class PageDetailLayout(DefaultLayout):
     @cached_property
     def breadcrumbs(self) -> list[Link]:
         return [
-            Link(_("Homepage"), self.homepage_url),
+            Link(_('Homepage'), self.homepage_url),
             Link(self.model.title, self.request.link(self.model)),
             Link(self.title, '#'),
         ]
@@ -164,28 +164,28 @@ class EditPageLayout(PageDetailLayout):
 
     @cached_property
     def title(self) -> str:
-        return _("Edit page")
+        return _('Edit page')
 
 
 class DeletePageLayout(PageDetailLayout):
 
     @cached_property
     def title(self) -> str:
-        return _("Delete page")
+        return _('Delete page')
 
 
 class ManagePageAttachmentsLayout(PageDetailLayout):
 
     @cached_property
     def title(self) -> str:
-        return _("Manage attachments")
+        return _('Manage attachments')
 
 
 class ManagePageSliderImagesLayout(PageDetailLayout):
 
     @cached_property
     def title(self) -> str:
-        return _("Manage slider images")
+        return _('Manage slider images')
 
 
 class DeletePageAttachmentLayout(DefaultLayout):
@@ -201,7 +201,7 @@ class DeletePageAttachmentLayout(DefaultLayout):
 
     @cached_property
     def title(self) -> str:
-        return _("Delete attachment")
+        return _('Delete attachment')
 
     @cached_property
     def parent(self) -> 'TranslatablePage':
@@ -210,7 +210,7 @@ class DeletePageAttachmentLayout(DefaultLayout):
     @cached_property
     def breadcrumbs(self) -> list[Link]:
         return [
-            Link(_("Homepage"), self.homepage_url),
+            Link(_('Homepage'), self.homepage_url),
             Link(self.parent.title, self.request.link(self.parent)),
             Link(self.title, '#'),
         ]

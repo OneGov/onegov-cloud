@@ -28,8 +28,25 @@
         [
             "*/tests/*",
         ],
-        "LSP.LSP-pylsp.settings": {
-            "pylsp.plugins.jedi.environment": "${project_path}/venv"
-        }
+        "SublimeLinter.linters.ruff.executable": "${project_path}/../venv/bin/ruff",
+        "SublimeLinter.linters.ruff.python": "${project_path}/../venv/bin/python",
+        "LSP": {
+            "LSP-ruff": {
+                "initializationOptions": {
+                    "settings": {
+                        "lint.enable": true,
+                    }
+                },
+                "command": ["${project_path}/../venv/bin/ruff", "server"],
+            },
+            "LSP-pylsp": {
+                "settings": {
+                    "pylsp.plugins.jedi.environment": "${project_path}/../venv",
+                },
+            },
+            "formatters": {
+                "source.python": "LSP-ruff",
+            }
+        },
     },
 }

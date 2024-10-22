@@ -42,8 +42,8 @@ def view_formcode_snippets(
 ) -> 'JSON_ro':
     return {
         'labels': {
-            'required': request.translate(_("Required")),
-            'optional': request.translate(_("Optional")),
+            'required': request.translate(_('Required')),
+            'optional': request.translate(_('Optional')),
             'field_comment_example': request.translate(_(
                 'Place the field comment beneath the field or choices, '
                 'always using the same indentation'))

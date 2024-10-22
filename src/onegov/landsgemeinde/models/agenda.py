@@ -32,7 +32,7 @@ if TYPE_CHECKING:
     from onegov.landsgemeinde.models import Assembly
     from translationstring import TranslationString
     from typing import Literal
-    from typing_extensions import TypeAlias
+    from typing import TypeAlias
 
     AgendaItemState: TypeAlias = Literal['scheduled', 'ongoing', 'completed']
 

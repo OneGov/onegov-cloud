@@ -49,7 +49,7 @@ class SurveySubmissionWindow(Base, TimestampMixin):
     #: the name of the survey to which this submission window belongs
     name: 'Column[str]' = Column(
         Text,
-        ForeignKey("surveys.name"),
+        ForeignKey('surveys.name'),
         nullable=False
     )
 
@@ -107,12 +107,6 @@ class SurveySubmissionWindow(Base, TimestampMixin):
                 sedate.as_datetime(self.end), self.timezone
             ), self.timezone, 'up'
         )
-
-    def disassociate(self) -> None:
-        """ Disassociates all records linked to this window. """
-
-        for submission in self.submissions:
-            submission.submission_window_id = None
 
     @property
     def in_the_future(self) -> bool:

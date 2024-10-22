@@ -13,7 +13,7 @@ if TYPE_CHECKING:
 class UserManualForm(Form):
 
     pdf = UploadField(
-        label=_("PDF"),
+        label=_('PDF'),
         validators=[
             WhitelistedMimeType({'application/pdf'}),
             FileSizeLimit(50 * 1024 * 1024)

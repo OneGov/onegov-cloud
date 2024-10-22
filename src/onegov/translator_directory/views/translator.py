@@ -153,25 +153,23 @@ def export_translator_directory(
         return dt.strftime('%Y-%m-%d')
 
     def format_iterable(listlike: 'Iterable[str]') -> str:
-        return "|".join(listlike) if listlike else ''
+        return '|'.join(listlike) if listlike else ''
 
     def format_languages(
         langs: 'Iterable[Language | LanguageCertificate]'
     ) -> str:
-        return format_iterable((la.name for la in langs))
+        return format_iterable(la.name for la in langs)
 
     def format_guilds(guilds: 'Iterable[str]') -> str:
         return format_iterable(
-            (
-                request.translate(PROFESSIONAL_GUILDS[s])
-                if s in PROFESSIONAL_GUILDS else s
-                for s in guilds
-            )
+            request.translate(PROFESSIONAL_GUILDS[s])
+            if s in PROFESSIONAL_GUILDS else s
+            for s in guilds
         )
 
     def format_interpreting_types(types: 'Iterable[InterpretingType]') -> str:
         return format_iterable(
-            (request.translate(INTERPRETING_TYPES[t]) for t in types)
+            request.translate(INTERPRETING_TYPES[t]) for t in types
         )
 
     def format_admission(admission: 'AdmissionState | None') -> str:
@@ -191,50 +189,50 @@ def export_translator_directory(
         return ', '.join(mapping[n] for n in nationalities)
 
     worksheet = workbook.add_worksheet()
-    worksheet.name = request.translate(_("Translator directory"))
+    worksheet.name = request.translate(_('Translator directory'))
     worksheet.write_row(0, 0, (
-        request.translate(_("Personal ID")),
-        request.translate(_("Admission")),
-        request.translate(_("Withholding tax")),
-        request.translate(_("Self-employed")),
-        request.translate(_("Last name")),
-        request.translate(_("First name")),
-        request.translate(_("Gender")),
-        request.translate(_("Date of birth")),
-        request.translate(_("Nationality(ies)")),
-        request.translate(_("Location")),
-        request.translate(_("Address")),
-        request.translate(_("Zip Code")),
-        request.translate(_("City")),
-        request.translate(_("Drive distance")),
-        request.translate(_("Swiss social security number")),
-        request.translate(_("Bank name")),
-        request.translate(_("Bank address")),
-        request.translate(_("Account owner")),
-        request.translate(_("IBAN")),
-        request.translate(_("Email")),
-        request.translate(_("Private Phone Number")),
-        request.translate(_("Mobile Phone Number")),
-        request.translate(_("Office Phone Number")),
-        request.translate(_("Availability")),
-        request.translate(_("Comments on possible field of application")),
-        request.translate(_("Name reveal confirmation")),
-        request.translate(_("Date of application")),
-        request.translate(_("Date of decision")),
-        request.translate(_("Mother tongues")),
-        request.translate(_("Spoken languages")),
-        request.translate(_("Written languages")),
-        request.translate(_("Monitoring languages")),
-        request.translate(_("Learned profession")),
-        request.translate(_("Current professional activity")),
-        request.translate(_("Expertise by professional guild")),
-        request.translate(_("Expertise by interpreting type")),
-        request.translate(_("Proof of preconditions")),
-        request.translate(_("Agency references")),
-        request.translate(_("Education as interpreter")),
-        request.translate(_("Certificates")),
-        request.translate(_("Comments")),
-        request.translate(_("Hidden")),
+        request.translate(_('Personal ID')),
+        request.translate(_('Admission')),
+        request.translate(_('Withholding tax')),
+        request.translate(_('Self-employed')),
+        request.translate(_('Last name')),
+        request.translate(_('First name')),
+        request.translate(_('Gender')),
+        request.translate(_('Date of birth')),
+        request.translate(_('Nationality(ies)')),
+        request.translate(_('Location')),
+        request.translate(_('Address')),
+        request.translate(_('Zip Code')),
+        request.translate(_('City')),
+        request.translate(_('Drive distance')),
+        request.translate(_('Swiss social security number')),
+        request.translate(_('Bank name')),
+        request.translate(_('Bank address')),
+        request.translate(_('Account owner')),
+        request.translate(_('IBAN')),
+        request.translate(_('Email')),
+        request.translate(_('Private Phone Number')),
+        request.translate(_('Mobile Phone Number')),
+        request.translate(_('Office Phone Number')),
+        request.translate(_('Availability')),
+        request.translate(_('Comments on possible field of application')),
+        request.translate(_('Name reveal confirmation')),
+        request.translate(_('Date of application')),
+        request.translate(_('Date of decision')),
+        request.translate(_('Mother tongues')),
+        request.translate(_('Spoken languages')),
+        request.translate(_('Written languages')),
+        request.translate(_('Monitoring languages')),
+        request.translate(_('Learned profession')),
+        request.translate(_('Current professional activity')),
+        request.translate(_('Expertise by professional guild')),
+        request.translate(_('Expertise by interpreting type')),
+        request.translate(_('Proof of preconditions')),
+        request.translate(_('Agency references')),
+        request.translate(_('Education as interpreter')),
+        request.translate(_('Certificates')),
+        request.translate(_('Comments')),
+        request.translate(_('Hidden')),
     ))
 
     for ix, trs in enumerate(self.query()):
@@ -291,7 +289,7 @@ def export_translator_directory(
         'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'
     )
     response.content_disposition = 'inline; filename={}-{}.xlsx'.format(
-        request.translate(_("Translator directory")).lower(),
+        request.translate(_('Translator directory')).lower(),
         utcnow().strftime('%Y%m%d%H%M')
     )
     response.body = output.read()
@@ -311,8 +309,8 @@ def view_translator(
     layout = TranslatorLayout(self, request)
     if layout.translator_data_outdated():
         request.warning(_(
-            "Is your information still up do date? Please check and either "
-            "modify or confirm using the buttons above."))
+            'Is your information still up do date? Please check and either '
+            'modify or confirm using the buttons above.'))
 
     return {
         'layout': layout,
@@ -336,7 +334,7 @@ def edit_translator(
 
     if form.submitted(request):
         form.update_model(self)
-        request.success(_("Your changes were saved"))
+        request.success(_('Your changes were saved'))
         return request.redirect(request.link(self))
     if not form.errors:
         form.process(
@@ -380,7 +378,7 @@ def edit_translator_as_editor(
 
     if form.submitted(request):
         form.update_model(self)
-        request.success(_("Your changes were saved"))
+        request.success(_('Your changes were saved'))
         return request.redirect(request.link(self))
     if not form.errors:
         form.process(obj=self)
@@ -441,7 +439,7 @@ def report_translator_change(
         send_ticket_mail(
             request=request,
             template='mail_ticket_opened.pt',
-            subject=_("Your ticket has been opened"),
+            subject=_('Your ticket has been opened'),
             receivers=(request.current_username, ),
             ticket=ticket,
             send_self=True
@@ -450,7 +448,7 @@ def report_translator_change(
             send_ticket_mail(
                 request=request,
                 template='mail_ticket_opened_info.pt',
-                subject=_("New ticket"),
+                subject=_('New ticket'),
                 ticket=ticket,
                 receivers=(request.email_for_new_tickets, ),
                 content={
@@ -467,7 +465,7 @@ def report_translator_change(
             }
         )
 
-        request.success(_("Thank you for your submission!"))
+        request.success(_('Thank you for your submission!'))
         return redirect(request.link(ticket, 'status'))
 
     layout = ReportTranslatorChangesLayout(self, request)

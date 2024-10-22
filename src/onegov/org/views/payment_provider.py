@@ -38,14 +38,14 @@ def view_payment_providers(
     def links(provider: PaymentProvider[Payment]) -> 'Iterator[Link]':
         if not provider.default and provider.enabled:
             yield Link(
-                _("As default"),
+                _('As default'),
                 request.link(provider, 'default'),
                 traits=(
                     Confirm(
-                        _("Should this provider really be the new default?"),
-                        _("All future payments will be redirected."),
-                        _("Make Default"),
-                        _("Cancel")
+                        _('Should this provider really be the new default?'),
+                        _('All future payments will be redirected.'),
+                        _('Make Default'),
+                        _('Cancel')
                     ),
                     Intercooler(
                         request_method='POST',
@@ -55,20 +55,20 @@ def view_payment_providers(
             )
 
         yield Link(
-            _("Settings"),
+            _('Settings'),
             request.link(provider, 'settings'),
         )
 
         if not provider.enabled:
             yield Link(
-                _("Enable"),
+                _('Enable'),
                 request.link(provider, 'enable'),
                 traits=(
                     Confirm(
-                        _("Should this provider really be enabled?"),
+                        _('Should this provider really be enabled?'),
                         None,
-                        _("Enable"),
-                        _("Cancel")
+                        _('Enable'),
+                        _('Cancel')
                     ),
                     Intercooler(
                         request_method='POST',
@@ -78,14 +78,14 @@ def view_payment_providers(
             )
         else:
             yield Link(
-                _("Disable"),
+                _('Disable'),
                 request.link(provider, 'disable'),
                 traits=(
                     Confirm(
-                        _("Should this provider really be disabled?"),
+                        _('Should this provider really be disabled?'),
                         None,
-                        _("Disable"),
-                        _("Cancel")
+                        _('Disable'),
+                        _('Cancel')
                     ),
                     Intercooler(
                         request_method='POST',
@@ -96,14 +96,14 @@ def view_payment_providers(
 
         if not provider.payments:
             yield Link(
-                _("Delete"),
+                _('Delete'),
                 layout.csrf_protected_url(request.link(provider)),
                 traits=(
                     Confirm(
-                        _("Do you really want to delete this provider?"),
-                        _("This cannot be undone."),
-                        _("Delete"),
-                        _("Cancel")
+                        _('Do you really want to delete this provider?'),
+                        _('This cannot be undone.'),
+                        _('Delete'),
+                        _('Cancel')
                     ),
                     Intercooler(
                         request_method='DELETE',
@@ -117,7 +117,7 @@ def view_payment_providers(
         'layout': layout,
         'links': links,
         'providers': tuple(self.query().order_by(PaymentProvider.created)),
-        'title': _("Payment Provider"),
+        'title': _('Payment Provider'),
     }
 
 
@@ -192,7 +192,7 @@ def new_stripe_connection_success(
     request: 'OrgRequest'
 ) -> 'Response':
 
-    request.success(_("Your Stripe account was connected successfully."))
+    request.success(_('Your Stripe account was connected successfully.'))
     return morepath.redirect(request.link(self))
 
 
@@ -206,7 +206,7 @@ def new_stripe_connection_error(
     request: 'OrgRequest'
 ) -> 'Response':
 
-    request.alert(_("Your Stripe account could not be connected."))
+    request.alert(_('Your Stripe account could not be connected.'))
     return morepath.redirect(request.link(self))
 
 
@@ -224,7 +224,7 @@ def handle_default_provider(
     providers = PaymentProviderCollection(request.session)
     providers.as_default(self)
 
-    request.success(_("Changed the default payment provider."))
+    request.success(_('Changed the default payment provider.'))
 
 
 @OrgApp.view(
@@ -239,7 +239,7 @@ def enable_provider(
 
     self.enabled = True
 
-    request.success(_("Provider enabled."))
+    request.success(_('Provider enabled.'))
 
 
 @OrgApp.view(
@@ -254,7 +254,7 @@ def disable_provider(
 
     self.enabled = False
 
-    request.success(_("Provider disabled."))
+    request.success(_('Provider disabled.'))
 
 
 @OrgApp.view(
@@ -272,7 +272,7 @@ def delete_provider(
     providers = PaymentProviderCollection(request.session)
     providers.delete(self)
 
-    request.success(_("The payment provider was deleted."))
+    request.success(_('The payment provider was deleted.'))
 
 
 @OrgApp.view(
@@ -286,7 +286,7 @@ def sync_payments(
 ) -> 'Response':
 
     self.sync()
-    request.success(_("Successfully synchronised payments"))
+    request.success(_('Successfully synchronised payments'))
     return request.redirect(request.class_link(PaymentCollection))
 
 
@@ -298,7 +298,7 @@ def get_settings_form(
     if model.type == 'stripe_connect':
         class SettingsForm(Form):
             charge_fee_to_customer = BooleanField(
-                label=_("Charge fees to customer")
+                label=_('Charge fees to customer')
             )
     else:
         raise NotImplementedError
@@ -324,7 +324,7 @@ def handle_provider_settings(
         form.populate_obj(self)
         flag_modified(self, 'meta')
 
-        request.success(_("Your changes were saved"))
+        request.success(_('Your changes were saved'))
         return request.redirect(request.class_link(PaymentProviderCollection))
 
     elif not request.POST:

@@ -34,8 +34,8 @@ def view_parliamentary_groups(
             active=self.active == value,
             url=request.link(self.for_filter(active=value))
         ) for title, value in (
-            (_("Active"), True),
-            (_("Inactive"), False)
+            (_('Active'), True),
+            (_('Inactive'), False)
         )
     ]
 
@@ -63,17 +63,17 @@ def add_parliamentary_group(
 
     if form.submitted(request):
         parliamentary_group = self.add(**form.get_useful_data())
-        request.success(_("Added a new parliamentary group"))
+        request.success(_('Added a new parliamentary group'))
 
         return request.redirect(request.link(parliamentary_group))
 
     layout = ParliamentaryGroupCollectionLayout(self, request)
-    layout.breadcrumbs.append(Link(_("New"), '#'))
+    layout.breadcrumbs.append(Link(_('New'), '#'))
     layout.include_editor()
 
     return {
         'layout': layout,
-        'title': _("New parliamentary group"),
+        'title': _('New parliamentary group'),
         'form': form,
         'form_width': 'large'
     }
@@ -113,13 +113,13 @@ def edit_parliamentary_group(
 
     if form.submitted(request):
         form.populate_obj(self)
-        request.success(_("Your changes were saved"))
+        request.success(_('Your changes were saved'))
         return request.redirect(request.link(self))
 
     form.process(obj=self)
 
     layout = ParliamentaryGroupLayout(self, request)
-    layout.breadcrumbs.append(Link(_("Edit"), '#'))
+    layout.breadcrumbs.append(Link(_('Edit'), '#'))
     layout.editbar_links = []
     layout.include_editor()
 

@@ -24,15 +24,12 @@ from typing import overload, Any, ClassVar, Generic, TypeVar, TYPE_CHECKING
 if TYPE_CHECKING:
     from _typeshed import SupportsRead, SupportsWrite
     from collections.abc import Callable, Collection, Iterator, Iterable
-    from typing_extensions import TypeAlias
-    from typing import Union
+    from typing import TypeAlias
 
     from onegov.core.types import JSON_ro, JSONObject_ro
 
-    AnySerializer: TypeAlias = Union[
-        'PrefixSerializer[_T]',
-        'DictionarySerializer[_T]'
-    ]
+    AnySerializer: TypeAlias = (
+        'PrefixSerializer[_T] | DictionarySerializer[_T]')
 
 _T = TypeVar('_T')
 _ST = TypeVar('_ST', bound='JSON_ro')
@@ -45,7 +42,7 @@ class Serializer(Generic[_T, _ST]):
     """
 
     def __init__(self, target: type[_T]):
-        assert isinstance(target, type), "expects a class"
+        assert isinstance(target, type), 'expects a class'
         self.target = target
 
     def encode(self, obj: _T) -> _ST:

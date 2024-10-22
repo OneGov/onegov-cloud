@@ -50,7 +50,7 @@ def get_template_directory() -> str:
 @PasApp.setting(section='i18n', name='localedirs')
 def get_i18n_localedirs() -> list[str]:
     mine = module_path('onegov.pas', 'locale')
-    return [mine] + get_i18n_localedirs_base()
+    return [mine, *get_i18n_localedirs_base()]
 
 
 @PasApp.setting(section='core', name='theme')

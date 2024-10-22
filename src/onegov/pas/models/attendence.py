@@ -17,7 +17,7 @@ if TYPE_CHECKING:
     import uuid
     import datetime
     from typing import Literal
-    from typing_extensions import TypeAlias
+    from typing import TypeAlias
 
     AttendenceType: TypeAlias = Literal[
         'plenary',

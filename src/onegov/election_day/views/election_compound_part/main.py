@@ -100,7 +100,7 @@ def view_election_compound_part_json(
         for election in self.elections
     }
 
-    years, parties = get_party_results(self, json_serializable=True)
+    _years, parties = get_party_results(self, json_serializable=True)
 
     return {
         'completed': self.completed,

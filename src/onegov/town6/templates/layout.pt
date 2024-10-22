@@ -155,7 +155,7 @@
                                         </a>
                                     </div>
                                     <div class="large-2 small-2 cell right-side">
-                                        <button class="search-button" data-toggle="offCanvasSearch">
+                                        <button tal:condition="not:hide_search_header|nothing"  class="search-button" data-toggle="offCanvasSearch">
                                             <i class="fa fa-search"></i>
                                         </button>
                                     </div>

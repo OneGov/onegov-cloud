@@ -56,7 +56,7 @@ class SubscriptionCollectionLayout(DefaultLayout):
         if not self.request.view_name:
             links.append(
                 Link(
-                    text=_("PDF"),
+                    text=_('PDF'),
                     url=self.request.link(self.model, name='pdf'),
                     attrs={
                         'class': 'print-icon',
@@ -148,18 +148,18 @@ class SubscriptionCollectionLayout(DefaultLayout):
     ) -> Link:
 
         confirm = subscription.is_placeholder and Confirm(
-            _("Do you want to delete the placeholder ?"),
-            yes=_("Delete"),
-            no=_("Cancel")
+            _('Do you want to delete the placeholder ?'),
+            yes=_('Delete'),
+            no=_('Cancel')
         ) or Confirm(
-            _("Do you want to cancel the subscription ?"),
-            _("A confirmation email will be sent to the person."),
-            _("Cancel subscription for course event"),
-            _("Cancel")
+            _('Do you want to cancel the subscription ?'),
+            _('A confirmation email will be sent to the person.'),
+            _('Cancel subscription for course event'),
+            _('Cancel')
         )
 
         return Link(
-            text=_("Delete"),
+            text=_('Delete'),
             url=self.csrf_protected_url(
                 self.request.link(subscription)
             ),
@@ -194,18 +194,18 @@ class SubscriptionLayout(DefaultLayout):
             return []
         return [
             Link(
-                text=_("Delete"),
+                text=_('Delete'),
                 url=self.csrf_protected_url(
                     self.request.link(self.model)
                 ),
                 attrs={'class': 'button tiny alert'},
                 traits=(
                     Confirm(
-                        _("Do you want to cancel the subscription ?"),
+                        _('Do you want to cancel the subscription ?'),
                         _(
-                            "A confirmation email will be sent to you later."),
-                        _("Cancel subscription for course event"),
-                        _("Cancel")
+                            'A confirmation email will be sent to you later.'),
+                        _('Cancel subscription for course event'),
+                        _('Cancel')
                     ),
                     Intercooler(
                         request_method='DELETE',

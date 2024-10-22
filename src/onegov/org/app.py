@@ -6,7 +6,6 @@ import yaml
 import base64
 import hashlib
 import morepath
-from collections import defaultdict
 from dectate import directive
 from email.headerregistry import Address
 from functools import wraps
@@ -16,7 +15,7 @@ from more.content_security.core import content_security_policy_tween_factory
 from onegov.core import Framework, utils
 from onegov.core.framework import default_content_security_policy
 from onegov.core.i18n import default_locale_negotiator
-from onegov.core.orm import orm_cached
+from onegov.core.orm.cache import orm_cached, request_cached
 from onegov.core.templates import PageTemplate
 from onegov.core.widgets import transform_structure
 from onegov.file import DepotApp
@@ -25,11 +24,9 @@ from onegov.gis import MapboxApp
 from onegov.org import directives
 from onegov.org.auth import MTANAuth
 from onegov.org.initial_content import create_new_organisation
-from onegov.org.models import Dashboard
-from onegov.org.models import Topic, Organisation, PublicationCollection
+from onegov.org.models import Dashboard, Organisation, PublicationCollection
 from onegov.org.request import OrgRequest
 from onegov.org.theme import OrgTheme
-from onegov.page import Page, PageCollection
 from onegov.pay import PayApp
 from onegov.reservation import LibresIntegration
 from onegov.search import SearchApp
@@ -38,8 +35,6 @@ from onegov.ticket import TicketPermission
 from onegov.user import UserApp
 from onegov.websockets import WebsocketsApp
 from purl import URL
-from sqlalchemy.orm import noload, undefer
-from sqlalchemy.orm.attributes import set_committed_value
 from types import MethodType
 from webob.exc import WSGIHTTPException, HTTPTooManyRequests
 
@@ -177,72 +172,17 @@ class OrgApp(Framework, LibresIntegration, SearchApp, MapboxApp,
                 dispatch.key_lookup = get_view.key_lookup
                 dispatch._mtan_hook_configured = True
 
-    @orm_cached(policy='on-table-change:organisations')
+    # NOTE: Organisation is probably the one model we could get away with
+    #       caching long-term without causing too many issues, but we
+    #       would first have to prove that we actually save a significant
+    #       amount of resources by skipping this query
+    @request_cached
     def org(self) -> Organisation:
         # even though this could return no Organisation, this can only
         # occur during setup, until after we added an Organisation, so
         # outside of this very narrow use-case this should always return
         # an organisation, so we pretend that it always does
         return self.session().query(Organisation).first()  # type:ignore
-
-    @orm_cached(policy='on-table-change:pages')
-    def root_pages(self) -> tuple[Page, ...]:
-
-        def include(page: Page) -> bool:
-            if page.type != 'news':
-                return True
-
-            return True if page.children else False
-
-        return tuple(p for p in self.pages_tree if include(p))
-
-    @orm_cached(policy='on-table-change:pages')
-    def pages_tree(self) -> tuple[Page, ...]:
-        """
-        This is the entire pages tree preloaded into the individual
-        parent/children attributes. We optimize this as much as possible
-        by performing the recursive join in Python, rather than SQL.
-
-        """
-        query = PageCollection(self.session()).query(ordered=False)
-        query = query.options(
-            # we populate these relationship ourselves
-            noload(Page.parent),
-            noload(Page.children),
-            # since we cache this result we should undefer loading the
-            # page meta, so we don't need to deserialize it every time
-            # this causes a fairly substantial overhead on uncached
-            # loads of pages_tree, but it's also a fairly big win
-            # once it is cached. There may be call-sites other than
-            # homepage_pages that benefit from this. If there aren't
-            # we can always go back on this decision
-            undefer(Page.meta)
-        )
-        query = query.order_by(Page.order)
-
-        # first we build a map from parent_ids to their children
-        parent_to_child = defaultdict(list)
-        for page in query:
-            parent_to_child[page.parent_id].append(page)
-
-        # then we populate the children and parent based on this information
-        # this should result in no pending modifications, because we use
-        # set_committed_value to set them
-        for page in (
-            page
-            for pages in parent_to_child.values()
-            for page in pages
-        ):
-            # even though this is a defaultdict, we need to use get()
-            # since otherwise we modifiy the dictionary
-            children = parent_to_child.get(page.id, [])
-            for child in children:
-                set_committed_value(child, 'parent', page)
-            set_committed_value(page, 'children', children)
-
-        # we return the root pages which should contain references to all
-        # the child pages
-        return tuple(p for p in parent_to_child.get(None, []))
 
     @orm_cached(policy='on-table-change:organisations')
     def homepage_template(self) -> PageTemplate:
@@ -260,38 +200,14 @@ class OrgApp(Framework, LibresIntegration, SearchApp, MapboxApp,
     @orm_cached(policy='on-table-change:ticket_permissions')
     def ticket_permissions(self) -> dict[str, dict[str | None, list[str]]]:
         result: dict[str, dict[str | None, list[str]]] = {}
-        for permission in self.session().query(TicketPermission):
+        for permission in self.session().query(TicketPermission).with_entities(
+            TicketPermission.handler_code,
+            TicketPermission.group,
+            TicketPermission.user_group_id
+        ):
             handler = result.setdefault(permission.handler_code, {})
             group = handler.setdefault(permission.group, [])
             group.append(permission.user_group_id.hex)
-        return result
-
-    @orm_cached(policy='on-table-change:pages')
-    def homepage_pages(self) -> dict[int, list[Topic]]:
-
-        def visit_topics(
-            pages: 'Iterable[Page]',
-            root_id: int | None = None
-        ) -> 'Iterator[tuple[int, Topic]]':
-            for page in pages:
-                if isinstance(page, Topic):
-                    yield root_id or page.id, page
-
-                yield from visit_topics(
-                    page.children,
-                    root_id=root_id or page.id
-                )
-
-        result = defaultdict(list)
-        for root_id, topic in visit_topics(self.root_pages):
-            if topic.is_visible_on_homepage:
-                result[root_id].append(topic)
-
-        for topics in result.values():
-            topics.sort(
-                key=lambda p: utils.normalize_for_url(p.title)
-            )
-
         return result
 
     @orm_cached(policy='on-table-change:files')
@@ -365,6 +281,7 @@ class OrgApp(Framework, LibresIntegration, SearchApp, MapboxApp,
     def custom_texts(self) -> dict[str, str] | None:
         return self.cache.get_or_create(
             'custom_texts', self.load_custom_texts,
+            expiration_time=3600
         )
 
     def load_custom_texts(self) -> dict[str, str] | None:
@@ -378,9 +295,8 @@ class OrgApp(Framework, LibresIntegration, SearchApp, MapboxApp,
         Example customtexts.yml:
         ```yaml
         custom texts:
-          Custom admission course agreement: Ich erkläre mich bereit, den
-          Zulassungskurs des Obergerichts des Kantons Zürich zu absolvieren
-          (Kostenbeteiligung Dolmetscher:in CHF 300).
+          (en) Custom admission course agreement: I agree to attend the ..
+          (de) Custom admission course agreement: Ich erkläre mich bereit, ..
         ```
 
         """
@@ -578,6 +494,7 @@ def org_content_security_policy() -> 'ContentSecurityPolicy':
     policy.connect_src.add('https://maps.zg.ch')
     policy.connect_src.add('https://api.mapbox.com')
     policy.connect_src.add('https://stats.seantis.ch')
+    policy.connect_src.add('https://analytics.seantis.ch')
     policy.connect_src.add('https://geodesy.geo.admin.ch')
     policy.connect_src.add('https://wms.geo.admin.ch/')
 
@@ -881,6 +798,11 @@ def get_scroll_to_username_asset() -> 'Iterator[str]':
 @OrgApp.webasset('all_blank')
 def get_all_blank_asset() -> 'Iterator[str]':
     yield 'all_blank.js'
+
+
+@OrgApp.webasset('people-select')
+def people_select_asset() -> 'Iterator[str]':
+    yield 'people-select.js'
 
 
 def wrap_with_mtan_hook(

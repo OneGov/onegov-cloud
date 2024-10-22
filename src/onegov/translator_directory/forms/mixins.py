@@ -47,8 +47,8 @@ class DrivingDistanceMixin:
         if not self.request.app.coordinates:
             assert isinstance(self.coordinates.errors, list)
             self.coordinates.errors.append(
-                _("Home location is not configured. "
-                  "Please complete location settings first")
+                _('Home location is not configured. '
+                  'Please complete location settings first')
             )
             return False
 

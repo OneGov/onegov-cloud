@@ -178,10 +178,12 @@ class WinterthurApp(OrgApp):
 
                 process.check_returncode()
 
-                with (path / 'preview.png').open('rb') as input:
-                    with fs.open(filename, 'wb') as output:
-                        # NOTE: Bug in type hints of FS
-                        output.write(input.read())  # type:ignore
+                with (
+                    (path / 'preview.png').open('rb') as input,
+                    fs.open(filename, 'wb') as output
+                ):
+                    # NOTE: Bug in type hints of FS
+                    output.write(input.read())  # type:ignore
 
         with fs.open(filename, 'rb') as input:
             # NOTE: Bug in type hints of FS
@@ -253,7 +255,7 @@ def get_default_event_search_widget() -> str:
 @WinterthurApp.setting(section='i18n', name='localedirs')
 def get_i18n_localedirs() -> list[str]:
     mine = utils.module_path('onegov.winterthur', 'locale')
-    return [mine] + get_org_i18n_localedirs()
+    return [mine, *get_org_i18n_localedirs()]
 
 
 @WinterthurApp.webasset_path()

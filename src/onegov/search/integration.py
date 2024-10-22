@@ -77,7 +77,7 @@ class TolerantTransport(Transport):
 
     def perform_request(self, *args: Any, **kwargs: Any) -> Any:
         if self.skip_request:
-            log.info(f"Elasticsearch down, retry in {self.seconds_remaining}s")
+            log.info(f'Elasticsearch down, retry in {self.seconds_remaining}s')
             raise SearchOfflineError()
 
         try:
@@ -96,7 +96,7 @@ class TolerantTransport(Transport):
             self.failures += 1
             self.failure_time = utcnow()
 
-            log.exception("Elasticsearch cluster is offline")
+            log.exception('Elasticsearch cluster is offline')
             raise SearchOfflineError() from exception
 
         else:
@@ -129,6 +129,7 @@ class SearchApp(morepath.App):
         # forward declare required attributes
         schema: str
         session_manager: SessionManager
+
         @property
         def session(self) -> 'Callable[[], Session]': ...
         @property
@@ -284,7 +285,7 @@ class SearchApp(morepath.App):
         )
 
         if not include_private:
-            search = search.filter("term", es_public=True)
+            search = search.filter('term', es_public=True)
 
         # by default, do not include any fields (this will still include
         # the id and the type, which is enough for the orm querying)
@@ -467,7 +468,7 @@ class SearchApp(morepath.App):
                     self.es_orm_events.index(schema, obj)
 
             except Exception as e:
-                print(f'Error psql indexing model \'{model}\': {e}')
+                print(f"Error psql indexing model '{model}': {e}")
             finally:
                 session.invalidate()
                 session.bind.dispose()

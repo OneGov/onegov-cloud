@@ -123,7 +123,7 @@ class Search(Pagination[_M]):
 
         # make sure the title matches with a higher priority, otherwise the
         # "get lucky" functionality is not so lucky after all
-        match_title = MatchPhrase(title={"query": query, "boost": 3})
+        match_title = MatchPhrase(title={'query': query, 'boost': 3})
 
         # we *could* use Match here and include '_all' fields, but that
         # yields us less exact results, probably because '_all' includes some

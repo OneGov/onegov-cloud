@@ -108,12 +108,12 @@ class WebSocketServer(WebSocketServerProtocol):
             session_id = cookie['session_id'].value
         except KeyError:
             log.error(
-                "No session cookie found in request. "
-                "Check that you sent the request from the same origin as "
-                f"the WebSocket server ({self.host})"
+                'No session cookie found in request. '
+                'Check that you sent the request from the same origin as '
+                f'the WebSocket server ({self.host})'
             )
 
-            return http.HTTPStatus.BAD_REQUEST, [], b""
+            return http.HTTPStatus.BAD_REQUEST, [], b''
 
         self.signed_session_id = session_id
 
@@ -121,13 +121,13 @@ class WebSocketServer(WebSocketServerProtocol):
             self.schema = param_from_path('schema', path)
         except ValueError as err:
             log.error(
-                f"Unable to retrieve schema from path: {path}",
+                f'Unable to retrieve schema from path: {path}',
                 exc_info=err
             )
-            return http.HTTPStatus.BAD_REQUEST, [], b""
+            return http.HTTPStatus.BAD_REQUEST, [], b''
 
         # browser_session requires self.schema
-        self.user_id = self.browser_session.get("userid")
+        self.user_id = self.browser_session.get('userid')
 
         try:
             # Consume the presented token or deny the connection. The token
@@ -135,8 +135,8 @@ class WebSocketServer(WebSocketServerProtocol):
             # Hijacks.
             consume_websocket_token(path, self.browser_session)
         except WebsocketSecurityError as err:
-            log.error("Rejecting WebSocket connection.", exc_info=err)
-            return http.HTTPStatus.UNAUTHORIZED, [], b""
+            log.error('Rejecting WebSocket connection.', exc_info=err)
+            return http.HTTPStatus.UNAUTHORIZED, [], b''
 
         try:
             # Checking the origin is done at a later stage by handshake(), this
@@ -148,7 +148,7 @@ class WebSocketServer(WebSocketServerProtocol):
             # origins?
             self.process_origin(headers, self.origins)
         except InvalidOrigin as err:
-            log.debug("WebSocket connection will be rejected.", exc_info=err)
+            log.debug('WebSocket connection will be rejected.', exc_info=err)
 
         self.populate_staff()
 
@@ -465,13 +465,13 @@ async def handle_customer_chat(
         await error(websocket, f'invalid schema: {schema}')
         return
 
-    if "active_chat_id" not in websocket.browser_session:
+    if 'active_chat_id' not in websocket.browser_session:
         log.error(
-            "Unable to find active_chat_id in session, aborting."
+            'Unable to find active_chat_id in session, aborting.'
         )
         return None
 
-    channel = websocket.browser_session["active_chat_id"]
+    channel = websocket.browser_session['active_chat_id']
 
     await acknowledge(websocket)
 
@@ -498,7 +498,7 @@ async def handle_customer_chat(
                 stored = ChatCollection(websocket.session).by_id(channel)
 
                 if not stored:
-                    log.error(f"Unable to find stored chat with {channel=}")
+                    log.error(f'Unable to find stored chat with {channel=}')
                     continue
 
                 chat = stored
@@ -510,13 +510,13 @@ async def handle_customer_chat(
 
                     try:
                         await client.send(dumps({
-                            'type': "notification",
+                            'type': 'notification',
                             'message': message,
                         }))
                     except ConnectionClosed as err:
                         log.error(
-                            "Attempting to communicate with a closed"
-                            "connection, removing client from channels.",
+                            'Attempting to communicate with a closed'
+                            'connection, removing client from channels.',
                             exc_info=err
                         )
 
@@ -530,7 +530,7 @@ async def handle_customer_chat(
                     log.debug('only client in channel, sending request.')
                     for client in staff_connections:
                         await client.send(dumps({
-                            'type': "notification",
+                            'type': 'notification',
                             'message': dumps({
                                 'type': 'request',
                                 'text': content['text'],
@@ -552,7 +552,7 @@ async def handle_customer_chat(
                 chat.chat_history = chat_history
 
         except Exception as e:
-            log.exception("The debugged error message is -", exc_info=e)
+            log.exception('The debugged error message is -', exc_info=e)
             channel_connections.remove(websocket)
             log.debug(f'removed {websocket.id} from channel-connections')
         finally:
@@ -574,7 +574,7 @@ async def handle_staff_chat(
         await error(websocket, f'invalid schema: {schema}')
         return
 
-    websocket.session
+    _ = websocket.session
     await acknowledge(websocket)
 
     if websocket.user_id in STAFF[schema]:
@@ -607,13 +607,13 @@ async def handle_staff_chat(
 
                     try:
                         await client.send(dumps({
-                            'type': "notification",
+                            'type': 'notification',
                             'message': message,
                         }))
                     except ConnectionClosed as err:
                         log.error(
-                            "Attempting to communicate with a closed"
-                            "connection, removing client from channels.",
+                            'Attempting to communicate with a closed'
+                            'connection, removing client from channels.',
                             exc_info=err
                         )
 
@@ -632,7 +632,7 @@ async def handle_staff_chat(
 
                     if not chat:
                         log.error(
-                            f"Unable to find stored chat with {open_channel=}"
+                            f'Unable to find stored chat with {open_channel=}'
                         )
                         continue
 
@@ -650,7 +650,7 @@ async def handle_staff_chat(
                 elif content['type'] == 'reconnect':
                     log.debug(f'reconnecting to channel {content["channel"]}')
                     channel_connections = all_channels.setdefault(
-                        content["channel"], set()
+                        content['channel'], set()
                     )
                     channel_connections.add(websocket)
 
@@ -682,8 +682,8 @@ async def handle_staff_chat(
                         open_channel)
                     if not chat:
                         log.error(
-                            "Unable to find stored chat"
-                            f"with {open_channel=}"
+                            'Unable to find stored chat'
+                            f'with {open_channel=}'
                         )
                         continue
 
@@ -695,7 +695,7 @@ async def handle_staff_chat(
                                 'channel': open_channel
                             })
                             await client.send(dumps({
-                                'type': "notification",
+                                'type': 'notification',
                                 'message': inner,
                             }))
 
@@ -705,7 +705,7 @@ async def handle_staff_chat(
                         'channel': open_channel
                     })
                     await websocket.send(dumps({
-                        'type': "notification",
+                        'type': 'notification',
                         'message': inner,
                     }))
                     log.debug('sent chat history')
@@ -722,8 +722,8 @@ async def handle_staff_chat(
 
                     if not chat:
                         log.error(
-                            "Unable to find stored chat"
-                            f"with {open_channel=}"
+                            'Unable to find stored chat'
+                            f'with {open_channel=}'
                         )
 
                         continue
@@ -738,12 +738,12 @@ async def handle_staff_chat(
                         'channel': open_channel
                     })
                     await websocket.send(dumps({
-                        'type': "notification",
+                        'type': 'notification',
                         'message': inner,
                     }))
 
             except Exception as e:
-                log.exception("The debugged error message is -", exc_info=e)
+                log.exception('The debugged error message is -', exc_info=e)
                 if websocket in staff_connections:
                     staff_connections.remove(websocket)
                 log.debug(f'removed {websocket.id} from staff-connections')

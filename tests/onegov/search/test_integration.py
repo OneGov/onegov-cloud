@@ -238,8 +238,8 @@ def test_orm_integration(es_url, postgres_dsn, redis_url):
         query = query.filter(Document.id == request.params.get('id'))
 
         document = query.one()
-        document.title = request.params.get('title'),
-        document.body = request.params.get('body'),
+        document.title = request.params.get('title')
+        document.body = request.params.get('body')
 
     @App.json(model=Root, name='delete')
     def view_delete_document(self, request):

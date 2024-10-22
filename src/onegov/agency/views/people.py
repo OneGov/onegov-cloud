@@ -1,4 +1,3 @@
-from collections import namedtuple
 from collections import OrderedDict
 from datetime import datetime, timedelta
 from itertools import groupby
@@ -28,12 +27,19 @@ from unidecode import unidecode
 from uuid import uuid4
 
 
+from typing import NamedTuple
 from typing import TYPE_CHECKING
 if TYPE_CHECKING:
     from onegov.agency.request import AgencyRequest
     from onegov.core.types import RenderData
     from onegov.ticket import Ticket
     from webob import Response as BaseResponse
+
+
+class FilterOption(NamedTuple):
+    title: str
+    value: str
+    selected: bool
 
 
 def get_person_form_class(
@@ -81,9 +87,8 @@ def view_people(
         ) for letter in self.used_letters
     ]
 
-    Option = namedtuple('Option', ['title', 'value', 'selected'])
     agencies = [
-        Option(
+        FilterOption(
             title=agency,
             value=request.link(self.for_filter(agency=agency)),
             selected=(agency == self.agency),
@@ -91,7 +96,7 @@ def view_people(
     ]
     agencies.insert(
         0,
-        Option(
+        FilterOption(
             title='',
             value=request.link(self.for_filter(agency=None)),
             selected=(self.agency is None),
@@ -117,7 +122,7 @@ def view_people(
     people_by_letter = AtoZPeople(request).get_items_by_letter()
 
     return {
-        'title': _("People"),
+        'title': _('People'),
         'layout': ExtendedPersonCollectionLayout(self, request),
         'letters': letters,
         'agencies': agencies,
@@ -144,20 +149,20 @@ def create_people_xlsx(
             request.session
         ).getvalue()
         if request.app.people_xlsx_exists:
-            request.success(_("Excel file created"))
+            request.success(_('Excel file created'))
             return redirect(request.link(self))
         else:
-            request.success(_("Excel could not be created"))
+            request.success(_('Excel could not be created'))
             return redirect(request.link(self, name='create-people-xlsx'))
 
     layout = ExtendedPersonCollectionLayout(self, request)
 
     return {
         'layout': layout,
-        'title': _("Create Excel"),
+        'title': _('Create Excel'),
         'helptext': _(
-            "Create an Excel of persons and their memberships. "
-            "This may take a while."
+            'Create an Excel of persons and their memberships. '
+            'This may take a while.'
         ),
         'form': form
     }
@@ -229,7 +234,7 @@ def view_sort_person(
     layout = ExtendedPersonLayout(self, request)
 
     return {
-        'title': _("Sort"),
+        'title': _('Sort'),
         'layout': layout,
         'items': (
             (
@@ -262,18 +267,18 @@ def add_person(
 
     if form.submitted(request):
         person = self.add(**form.get_useful_data())
-        request.success(_("Added a new person"))
+        request.success(_('Added a new person'))
 
         return redirect(request.link(person))
 
     layout = ExtendedPersonCollectionLayout(self, request)
-    layout.breadcrumbs.append(Link(_("New"), '#'))
+    layout.breadcrumbs.append(Link(_('New'), '#'))
     layout.include_editor()
     layout.edit_mode = True
 
     return {
         'layout': layout,
-        'title': _("New person"),
+        'title': _('New person'),
         'form': form
     }
 
@@ -293,7 +298,7 @@ def edit_person(
 
     if form.submitted(request):
         form.populate_obj(self)
-        request.success(_("Your changes were saved"))
+        request.success(_('Your changes were saved'))
         if 'return-to' in request.GET:
             return request.redirect(request.url)
         return redirect(request.link(self))
@@ -301,7 +306,7 @@ def edit_person(
         form.process(obj=self)
 
     layout = ExtendedPersonLayout(self, request)
-    layout.breadcrumbs.append(Link(_("Edit"), '#'))
+    layout.breadcrumbs.append(Link(_('Edit'), '#'))
     layout.include_editor()
     layout.edit_mode = True
 
@@ -352,7 +357,7 @@ def do_report_person_change(
     send_ticket_mail(
         request=request,
         template='mail_ticket_opened.pt',
-        subject=_("Your ticket has been opened"),
+        subject=_('Your ticket has been opened'),
         receivers=(form.submitter_email.data, ),
         ticket=ticket
     )
@@ -361,7 +366,7 @@ def do_report_person_change(
         send_ticket_mail(
             request=request,
             template='mail_ticket_opened_info.pt',
-            subject=_("New ticket"),
+            subject=_('New ticket'),
             ticket=ticket,
             receivers=(email, ),
             content={
@@ -396,15 +401,15 @@ def report_person_change(
 
     if form.submitted(request):
         ticket = do_report_person_change(self, request, form)
-        request.success(_("Thank you for your submission!"))
+        request.success(_('Thank you for your submission!'))
         return redirect(request.link(ticket, 'status'))
 
     layout = ExtendedPersonLayout(self, request)
-    layout.breadcrumbs.append(Link(_("Report change"), '#'))
+    layout.breadcrumbs.append(Link(_('Report change'), '#'))
 
     return {
         'layout': layout,
-        'title': _("Report change"),
+        'title': _('Report change'),
         'lead': self.title,
         'form': form
     }

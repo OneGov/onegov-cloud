@@ -23,7 +23,7 @@ T_co = TypeVar('T_co', covariant=True)
 
 # XXX this is doubly defined in onegov.org.utils, maybe move to a common
 # regex module in in onegov.core
-HASHTAG = re.compile(r'#\w{3,}')
+HASHTAG = re.compile(r'(?<![\w/])#\w{3,}')
 
 
 def searchable_sqlalchemy_models(
@@ -88,7 +88,7 @@ def extract_hashtags(text: str) -> list[str]:
     return HASHTAG.findall(html.unescape(text))
 
 
-class classproperty(Generic[T_co]):
+class classproperty(Generic[T_co]):  # noqa: N801
     def __init__(self, f: 'Callable[[type[Any]], T_co]') -> None:
         if isinstance(f, classmethod):
             # unwrap classmethod decorator which is used for typing
@@ -104,8 +104,7 @@ def iter_subclasses(baseclass: type[T]) -> 'Iterator[type[T]]':
         yield subclass
 
         # FIXME: Why are we only iterating two levels of inheritance?
-        for subsubclass in subclass.__subclasses__():
-            yield subsubclass
+        yield from subclass.__subclasses__()
 
 
 def related_types(model: type[object]) -> set[str]:
@@ -155,7 +154,7 @@ class LanguageDetector:
         for ix, language in enumerate(supported_languages):
             path = os.path.join(PROFILES_DIRECTORY, language)
 
-            with open(path, 'r', encoding='utf-8') as f:
+            with open(path, encoding='utf-8') as f:
                 profile = LangProfile(**json.load(f))
                 self.factory.add_profile(profile, ix, len(supported_languages))
 

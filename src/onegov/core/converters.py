@@ -15,7 +15,7 @@ from uuid import UUID
 from typing import get_args, get_origin, overload, Any, Literal, TYPE_CHECKING
 if TYPE_CHECKING:
     from collections.abc import Mapping
-    from typing_extensions import LiteralString
+    from typing import LiteralString
 
 
 @overload

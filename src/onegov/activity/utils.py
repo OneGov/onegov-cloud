@@ -12,8 +12,7 @@ from typing import Any, Literal, TYPE_CHECKING
 if TYPE_CHECKING:
     from _typeshed import SupportsGetItem, SupportsRichComparison
     from collections.abc import Iterable
-    from typing import TypeVar
-    from typing_extensions import TypeAlias, TypeGuard
+    from typing import TypeAlias, TypeVar, TypeGuard
 
     SupportsRichComparisonT = TypeVar(
         'SupportsRichComparisonT',

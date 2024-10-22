@@ -19,7 +19,7 @@ from onegov.pdf.utils import extract_pdf_info
 from typing import IO, TYPE_CHECKING
 if TYPE_CHECKING:
     from depot.io.interfaces import _FileContent
-    from typing_extensions import NotRequired, TypedDict
+    from typing import NotRequired, TypedDict
 
     class _ImageSaveOptionalParams(TypedDict):
         exif: NotRequired[Image.Exif]
@@ -82,7 +82,7 @@ def strip_exif_and_limit_and_store_image_size(
                 (IMAGE_MAX_SIZE, IMAGE_MAX_SIZE), Image.Resampling.LANCZOS
             )
 
-        content = SpooledTemporaryFile(INMEMORY_FILESIZE)
+        content = SpooledTemporaryFile(INMEMORY_FILESIZE)  # noqa: SIM115
         try:
             # Quality is only supported by jpeg
             image.save(content, image.format, quality=IMAGE_QUALITY, **params)

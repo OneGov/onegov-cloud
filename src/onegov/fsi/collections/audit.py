@@ -13,7 +13,7 @@ if TYPE_CHECKING:
     from onegov.fsi.request import FsiRequest
     from sqlalchemy.orm import Query, Session
     from typing import NamedTuple, TypeVar
-    from typing_extensions import Self
+    from typing import Self
     from uuid import UUID
 
     T = TypeVar('T')

@@ -6,7 +6,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: OneGov Cloud 1.0\n"
-"POT-Creation-Date: 2024-07-09 08:40+0200\n"
+"POT-Creation-Date: 2024-09-30 10:20+0200\n"
 "PO-Revision-Date: 2021-03-03 16:24+0100\n"
 "Last-Translator: Lukas Burkhard <lukas.burkhard@seantis.ch>\n"
 "Language-Team: German\n"
@@ -269,7 +269,7 @@ msgid "Entry"
 msgstr "Eintrag"
 
 msgid "iFrame"
-msgstr ""
+msgstr "iFrame"
 
 msgid "Homepage"
 msgstr "Startseite"
@@ -294,7 +294,7 @@ msgid "The chat request got accepted."
 msgstr "Die Chat-Anfrage wurde angenommen."
 
 msgid "<dynamic element> <dynamic element>"
-msgstr ""
+msgstr "<dynamic element> <dynamic element>"
 
 #. Used in sentence: "<dynamic element> <dynamic element>"
 msgid "Connect to chatserver ..."
@@ -357,12 +357,8 @@ msgstr "Weitere Informationen"
 msgid "More"
 msgstr "Mehr"
 
-msgid "Propose entry"
-msgstr "Eintrag vorschlagen"
-
-msgid "Something missing? Propose a new entry."
-msgstr ""
-"Fehlt ein Eintrag im Verzeichnis? Schlagen Sie einen neuen Eintrag vor."
+msgid "Publication"
+msgstr "Publikation"
 
 msgid "Documents"
 msgstr "Dokumente"
@@ -373,6 +369,9 @@ msgstr "Aktionen"
 msgid "Get notifications on new entries"
 msgstr "Benachrichtigungen bei neuen Einträgen erhalten"
 
+msgid "Propose a new entry"
+msgstr "Neuen Eintrag vorschlagen"
+
 msgid "Internal Notes"
 msgstr "Interne Notizen"
 
@@ -382,11 +381,8 @@ msgstr "Externe Verknüpfung"
 msgid "More information"
 msgstr "Weiterführende Informationen"
 
-msgid "Change Request"
-msgstr "Änderung vorschlagen"
-
-msgid "Found an error? Propose a change to this entry."
-msgstr "Haben Sie einen Fehler gefunden? Schlagen Sie eine Änderung vor."
+msgid "Propose a change to this entry"
+msgstr "Änderung für diesen Eintrag vorschlagen"
 
 msgid ""
 "Subscribers may always unsubscribe themselves through a link shown at the "
@@ -594,6 +590,9 @@ msgstr "mehr"
 msgid "Submit"
 msgstr "Absenden"
 
+msgid "Select files"
+msgstr "Dateien auswählen"
+
 msgid "Drop files to upload"
 msgstr "Dateien hierhin ziehen um sie hochzuladen"
 
@@ -641,17 +640,20 @@ msgstr ""
 msgid "Map"
 msgstr "Karte"
 
-msgid "Links"
-msgstr "Links"
-
-msgid "More news"
-msgstr "Weitere News"
+msgid "Other Entries"
+msgstr "Weitere Einträge"
 
 msgid "Previous Entry"
 msgstr "Vorheriger Eintrag"
 
 msgid "Next Entry"
 msgstr "Nächster Eintrag"
+
+msgid "Links"
+msgstr "Links"
+
+msgid "More news"
+msgstr "Weitere News"
 
 msgid "Total Amount"
 msgstr "Totalbetrag"
@@ -918,9 +920,6 @@ msgstr "Ausbezahlt"
 msgid "Find Your Spot"
 msgstr "Terminsuche"
 
-msgid "Digital seal"
-msgstr "Digitales Siegel"
-
 msgid "Access"
 msgstr "Zugriff"
 
@@ -945,11 +944,11 @@ msgstr "Wird publiziert bis:"
 msgid "Publication end date:"
 msgstr "Enddatum der Publikation:"
 
-msgid "Publication"
-msgstr "Publikation"
-
 msgid "Not a publication"
 msgstr "keine Publikation"
+
+msgid "Digital seal"
+msgstr "Digitales Siegel"
 
 msgid "Content"
 msgstr "Inhalt"
@@ -1079,6 +1078,9 @@ msgstr ""
 "Sie erhalten diese E-Mail weil Sie sich für den folgenden Newsletter "
 "angemeldet haben:"
 
+msgid "You subscribed to the following newsletter categories:"
+msgstr "Sie haben folgende Newsletter-Kategorien abonniert:"
+
 msgid "Please click the following link to confirm your subscription:"
 msgstr ""
 "Bitte klicken Sie auf den folgenden Link um Ihre Anmeldung zu bestätigen:"
@@ -1086,20 +1088,11 @@ msgstr ""
 msgid "Confirm subscription"
 msgstr "Anmeldung bestätigen"
 
-msgid "Newsletter Subscription"
-msgstr "Newsletter-Abonnement"
-
-msgid "Update Newsletter Subscription"
-msgstr "Newsletter-Abonnement aktualisieren"
-
-msgid "Update subscription"
-msgstr "Abonnement aktualisieren"
-
 msgid "To update your subscription categories click here:"
 msgstr "Um Ihre Abonnementkategorien zu aktualisieren, klicken Sie hier:"
 
-msgid "Update your newsletter subscription categories:"
-msgstr "Aktualisieren Sie Ihre Newsletter-Abonnementkategorien:"
+msgid "Update subscription"
+msgstr "Abonnement aktualisieren"
 
 msgid ""
 "If you did not subscribe to this newsletter you can simply ignore this e-"
@@ -1109,7 +1102,7 @@ msgstr ""
 "diese Nachricht ignorieren."
 
 msgid "Click here to unsubscribe."
-msgstr "Klicken Sie hier um sich abzumelden."
+msgstr "Klicken Sie hier, um sich abzumelden."
 
 msgid ""
 "You are receiving this mail because you subscribed to getting notifications "
@@ -1207,10 +1200,13 @@ msgid "Check request status"
 msgstr "Anfragestatus überprüfen"
 
 msgid "Your change request has been applied:"
-msgstr "Ihr Änderungswunsch wurde übernommen:"
+msgstr "Ihr Änderungsvorschlag wurde übernommen:"
 
 msgid "Your directory submission has unfortunately been rejected:"
-msgstr "Ihre Verzeichniseintrag Eingabe wurde leider abgelehnt:"
+msgstr "Die Eingabe Ihres Verzeichniseintrags wurde leider abgelehnt:"
+
+msgid "The rejection of your directory application has been withdrawn:"
+msgstr "Die Ablehnung Ihres Verzeichniseintrages wurde zurückgezogen:"
 
 msgid "Your event has been accepted:"
 msgstr "Ihre Veranstaltung wurde angenommen:"
@@ -1288,7 +1284,10 @@ msgstr ""
 "haben."
 
 msgid "Click here to view web version."
-msgstr "Klicken Sie hier um die Web-Version anzuzeigen."
+msgstr "Klicken Sie hier, um die Web-Version anzuzeigen."
+
+msgid "You no longer wish to receive the newsletter?"
+msgstr "Sie möchten den Newsletter nicht mehr erhalten?"
 
 msgid "Click the following link to set a new password:"
 msgstr "Klicken Sie auf den folgenden Link, um ein neues Passwort zu setzen:"
@@ -1403,10 +1402,19 @@ msgid "Directory entry adopted."
 msgstr "Verzeichniseintrag übernommen."
 
 msgid "Change request applied."
-msgstr "Änderungswunsch übernommen."
+msgstr "Änderungsvorschlag übernommen."
 
 msgid "Directory entry rejected."
 msgstr "Verzeichniseintrag abgelehnt."
+
+msgid "Directory change rejected."
+msgstr "Änderungsvorschlag abgelehnt."
+
+msgid "Entry rejection withdrawn."
+msgstr "Ablehnung des Verzeichniseintrags zurückgezogen."
+
+msgid "Change rejection withdrawn."
+msgstr "Ablehnung der Änderung zurückgezogen."
 
 msgid "Event edited."
 msgstr "Veranstaltung bearbeitet."
@@ -1472,6 +1480,9 @@ msgstr "Ticket geschlossen."
 msgid "Ticket reopened."
 msgstr "Ticket wieder geöffnet."
 
+msgid "Ticket assigned"
+msgstr "Ticket zugewiesen"
+
 msgid "Ticket e-mails disabled."
 msgstr "Ticket E-Mails deaktiviert."
 
@@ -1508,47 +1519,6 @@ msgstr "RSS Feed mit Ihrer aktuellen Auswahl an Hashtags"
 msgid "Subscribe to newsletter"
 msgstr "Newsletter abonnieren"
 
-msgid "Select newsletter categories your are interested in. You will receive "
-"the newsletter if it reports on at least one of the subscribed categories."
-msgstr "Wählen Sie die Newsletter-Kategorien aus, an denen Sie interessiert "
-"sind. Sie werden den Newsletter erhalten, wenn er über mindestens eine der "
-"abonnierten Kategorien berichtet."
-
-msgid "Select categories the newsletter reports on. The users will receive the "
-"newsletter only if it reports on at least one of the categories the user "
-"subscribed to."
-msgstr "Wählen Sie die Kategorien aus, über die der Newsletter berichtet. Die "
-"Benutzer erhalten den Newsletter nur, wenn er über mindestens eine der "
-"Kategorien berichtet, die der Benutzer abonniert hat."
-
-msgid "Newsletter categories"
-msgstr "Newsletter-Kategorien"
-
-msgid "Example for newsletter topics with subtopics in yaml format. "
-"Note: Deeper structures are not supported."
-"\n"
-"```\n"
-"Organisation:\n"
-"  - Topic 1:\n"
-"    - Subtopic 1.1\n"
-"    - Subtopic 1.2\n"
-"  - Topic 2\n"
-"  - Topic 3:\n"
-"    - Subtopic 3.1\n"
-"```"
-msgstr "Beispiel für Newsletter-Themen mit Unterthemen im yaml-Format. "
-"Hinweis: Tiefere Strukturen werden nicht unterstützt."
-"\n"
-"```\n"
-"Organisation:\n"
-"  - Thema 1:\n"
-"    - Unterthema 1.1\n"
-"    - Unterthema 1.2\n"
-"  - Thema 2\n"
-"  - Thema 3:\n"
-"    - Unterthema 3.1\n"
-"```"
-
 msgid "Receive the newsletter by email"
 msgstr "Newsletter per E-Mail erhalten"
 
@@ -1561,9 +1531,9 @@ msgstr "Achtung geheimer Inhalt"
 msgid ""
 "You selected 'secret' content for your newsletter. Secret content will not "
 "be visible unless you enable it in"
-msgstr "Sie haben 'geheime' Inhalte für Ihren Newsletter ausgewählt. "
-"Geheime Inhalte werden nicht sichtbar sein, es sei denn, Sie aktivieren sie "
-"in"
+msgstr ""
+"Sie haben 'geheime' Inhalte für Ihren Newsletter ausgewählt. Geheime Inhalte "
+"werden nicht sichtbar sein, es sei denn, Sie aktivieren sie in"
 
 msgid "newsletter settings"
 msgstr "Newsletter Einstellungen"
@@ -1588,6 +1558,9 @@ msgstr ""
 msgid "Sign up to our newsletter to always stay up to date:"
 msgstr ""
 "Abonnieren Sie unseren Newsletter um immer auf dem Laufenden zu bleiben:"
+
+msgid "To update your subscription, please use this ${Link}"
+msgstr "Um Ihr Abonnement zu aktualisieren, verwenden Sie bitte diesen ${Link}"
 
 msgid "There are currently ${count} recipients registered."
 msgstr "Zur Zeit sind ${count} Abonnenten registriert."
@@ -1724,7 +1697,7 @@ msgid "Drop files to verify them"
 msgstr "Dateien zur Prüfung hierhin ziehen"
 
 msgid "No subscribers yet"
-msgstr ""
+msgstr "Noch keine Abonnenten"
 
 msgid "submitted"
 msgstr "angemeldet"
@@ -1877,6 +1850,25 @@ msgid ""
 msgstr ""
 "Ihr Registrationslink wurde wie folgt erstellt. Bitte kopieren Sie diesen "
 "bevor Sie weiterfahren, der Link wird Ihnen nicht wieder angezeigt:"
+
+msgid "Submission Window"
+msgstr "Befragungszeitraum"
+
+msgid "Fields"
+msgstr "Felder"
+
+msgid "Submission Windows"
+msgstr "Befragungszeiträume"
+
+msgid ""
+"Thank you for filling out this survey. If there's anything you'd like to "
+"change, click on the \"Edit\"-Button below."
+msgstr ""
+"Vielen Dank für Ihre Teilnahme an dieser Umfrage. Falls Sie noch etwas "
+"ändern möchten, klicken Sie auf den \"Bearbeiten\"-Button unten."
+
+msgid "No surveys defined yet."
+msgstr "Es wurden noch keine Umfragen definiert."
 
 msgid "Text"
 msgstr "Text"
@@ -2071,6 +2063,9 @@ msgstr "Verzeichnisse"
 msgid "Yubikey"
 msgstr "YubiKey"
 
+msgid "mTAN"
+msgstr "mTAN"
+
 msgid "Username"
 msgstr "Benutzername"
 
@@ -2193,11 +2188,89 @@ msgstr ""
 msgid "New Note"
 msgstr "Neue Notiz"
 
-#~ msgid "Subscribe to Selection as RSS"
-#~ msgstr "Hashtags abonnieren"
+#~ msgid "Change Request"
+#~ msgstr "Änderung vorschlagen"
+
+#~ msgid "Found an error? Propose a change to this entry."
+#~ msgstr "Haben Sie einen Fehler gefunden? Schlagen Sie eine Änderung vor."
+
+#~ msgid "Propose entry"
+#~ msgstr "Eintrag vorschlagen"
+
+#~ msgid "Something missing? Propose a new entry."
+#~ msgstr ""
+#~ "Fehlt ein Eintrag im Verzeichnis? Schlagen Sie einen neuen Eintrag vor."
 
 #~ msgid "Newsletter Subscription"
-#~ msgstr "Anmeldung Newsletter"
+#~ msgstr "Newsletter-Abonnement"
+
+#~ msgid "Update Newsletter Subscription"
+#~ msgstr "Newsletter-Abonnement aktualisieren"
+
+#~ msgid "Update your newsletter subscription categories:"
+#~ msgstr "Aktualisieren Sie Ihre Newsletter-Abonnementkategorien:"
+
+#~ msgid "Rejection withdrawn."
+#~ msgstr "Ablehnung zurückgezogen."
+
+#~ msgid ""
+#~ "Select newsletter categories your are interested in. You will receive the "
+#~ "newsletter if it reports on at least one of the subscribed categories."
+#~ msgstr ""
+#~ "Wählen Sie die Newsletter-Kategorien aus, an denen Sie interessiert sind. "
+#~ "Sie werden den Newsletter erhalten, wenn er über mindestens eine der "
+#~ "abonnierten Kategorien berichtet."
+
+#~ msgid ""
+#~ "Select categories the newsletter reports on. The users will receive the "
+#~ "newsletter only if it reports on at least one of the categories the user "
+#~ "subscribed to."
+#~ msgstr ""
+#~ "Wählen Sie die Kategorien aus, über die der Newsletter berichtet. Die "
+#~ "Benutzer erhalten den Newsletter nur, wenn er über mindestens eine der "
+#~ "Kategorien berichtet, die der Benutzer abonniert hat."
+
+#~ msgid "Newsletter categories"
+#~ msgstr "Newsletter-Kategorien"
+
+#~ msgid ""
+#~ "Example for newsletter topics with subtopics in yaml format. Note: Deeper "
+#~ "structures are not supported.\n"
+#~ "```\n"
+#~ "Organisation:\n"
+#~ "  - Topic 1:\n"
+#~ "    - Subtopic 1.1\n"
+#~ "    - Subtopic 1.2\n"
+#~ "  - Topic 2\n"
+#~ "  - Topic 3:\n"
+#~ "    - Subtopic 3.1\n"
+#~ "```"
+#~ msgstr ""
+#~ "Beispiel für Newsletter-Themen mit Unterthemen im yaml-Format. Hinweis: "
+#~ "Tiefere Strukturen werden nicht unterstützt.\n"
+#~ "```\n"
+#~ "Organisation:\n"
+#~ "  - Thema 1:\n"
+#~ "    - Unterthema 1.1\n"
+#~ "    - Unterthema 1.2\n"
+#~ "  - Thema 2\n"
+#~ "  - Thema 3:\n"
+#~ "    - Unterthema 3.1\n"
+#~ "```"
+
+#~ msgid "Sign up to our newsletter to always stay up to date:"
+#~ msgstr ""
+#~ "Abonnieren Sie unseren Newsletter um immer auf dem Laufenden zu bleiben:"
+
+#~ msgid "Error: No custom texts found"
+#~ msgstr "Fehler: Keine benutzerdefinierten Texte gefunden"
+
+#, python-format
+#~ msgid "Error: No custom text found for '${key}'"
+#~ msgstr "Fehler: Kein benutzerdefinierter Text gefunden für '${key}'"
+
+#~ msgid "Subscribe to Selection as RSS"
+#~ msgstr "Hashtags abonnieren"
 
 #~ msgid "Save"
 #~ msgstr "Speichern"

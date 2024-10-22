@@ -193,7 +193,7 @@ class EventsWidget:
                 url=layout.request.link(o),
                 subtitle=(
                     layout.format_date(
-                        o.localized_start, 'event_short').title() + ", "
+                        o.localized_start, 'event_short').title() + ', '
                     + layout.format_time_range(
                         o.localized_start, o.localized_end).title()),
                 image_url=(
@@ -206,14 +206,14 @@ class EventsWidget:
         ]
 
         latest_events = LinkGroup(
-            title=_("Events"),
+            title=_('Events'),
             links=event_links,  # type:ignore[arg-type]
         ) if event_links else None
 
         return {
             'event_panel': latest_events,
             'all_events_link': Link(
-                text=_("All events"),
+                text=_('All events'),
                 url=layout.events_url,
                 classes=('more-link', )
             ),
@@ -289,11 +289,11 @@ class ServicesWidget:
     def get_service_links(self, layout: 'DefaultLayout') -> 'Iterator[Link]':
         if not layout.org.hide_online_counter:
             yield Link(
-                text=_("Online Counter"),
+                text=_('Online Counter'),
                 url=layout.request.class_link(FormCollection),
                 subtitle=(
                     layout.org.meta.get('online_counter_label')
-                    or _("Forms and applications")
+                    or _('Forms and applications')
                 ),
                 classes=('online-counter', 'h5')
             )
@@ -301,33 +301,33 @@ class ServicesWidget:
         # only if there are publications, will we enable the link to them
         if not layout.org.hide_publications and layout.app.publications_count:
             yield Link(
-                text=_("Publications"),
+                text=_('Publications'),
                 url=layout.request.class_link(PublicationCollection),
                 subtitle=_(
                     layout.org.meta.get('publications_label')
-                    or _("Official Documents")
+                    or _('Official Documents')
                 ),
                 classes=('publications', 'h5')
             )
 
         if not layout.org.hide_reservations:
             yield Link(
-                text=_("Reservations"),
+                text=_('Reservations'),
                 url=layout.request.class_link(ResourceCollection),
                 subtitle=(
                     layout.org.meta.get('reservations_label')
-                    or _("Daypasses and rooms")
+                    or _('Daypasses and rooms')
                 ),
                 classes=('reservations', 'h5')
             )
 
         if move_url := layout.org.meta.get('e_move_url'):
             yield Link(
-                text=_("E-Move"),
+                text=_('E-Move'),
                 url=move_url,
                 subtitle=(
                     layout.org.meta.get('e_move_label')
-                    or _("Move with eMovingCH")
+                    or _('Move with eMovingCH')
                 ),
                 classes=('e-move', 'h5')
             )
@@ -342,18 +342,18 @@ class ServicesWidget:
 
         if sbb_daypass:
             yield Link(
-                text=_("SBB Daypass"),
+                text=_('SBB Daypass'),
                 url=layout.request.link(sbb_daypass),
                 subtitle=(
                     layout.org.meta.get('daypass_label')
-                    or _("Generalabonnement for Towns")
+                    or _('Generalabonnement for Towns')
                 ),
                 classes=('sbb-daypass', 'h5')
             )
 
     def get_variables(self, layout: 'DefaultLayout') -> 'RenderData':
         return {
-            'services_panel': LinkGroup(_("Services"), links=tuple(
+            'services_panel': LinkGroup(_('Services'), links=tuple(
                 self.get_service_links(layout)
             ))
         }
@@ -378,12 +378,12 @@ class ContactsAndAlbumsWidget:
 
         return {
             'contacts_and_albums_panel': LinkGroup(
-                title=_("Contacts"),
+                title=_('Contacts'),
                 links=[
                     Link(
-                        text=_("People"),
+                        text=_('People'),
                         url=request.class_link(PersonCollection),
-                        subtitle=_("All contacts"),
+                        subtitle=_('All contacts'),
                         classes=('list-link list-title',)
                     )
                 ]
@@ -548,7 +548,7 @@ class RSSItem(NamedTuple):
     title: str
     description: str
     guid: str
-    pubDate: datetime | None
+    pubDate: datetime | None  # noqa: N815
 
 
 class RSSChannel(NamedTuple):
@@ -591,7 +591,7 @@ def parsed_rss(rss: bytes) -> RSSChannel:
             )
 
     root = lxml.etree.fromstring(rss)
-    channel = root.find(".//channel")
+    channel = root.find('.//channel')
     assert channel is not None
 
     return RSSChannel(

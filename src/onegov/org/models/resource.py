@@ -40,11 +40,11 @@ class FindYourSpotCollection(ResourceCollection):
 
     @property
     def title(self) -> str:
-        return _("Find Your Spot")
+        return _('Find Your Spot')
 
     @property
     def meta(self) -> dict[str, Any]:
-        return {'lead': _("Search for available dates")}
+        return {'lead': _('Search for available dates')}
 
     def query(self) -> 'Query[Resource]':
         query = self.session.query(Resource)
@@ -63,6 +63,7 @@ class SharedMethods:
         date: date | None
         view: str | None
         timezone: Column[str]
+
         @property
         def scheduler(self) -> Scheduler: ...
         def get_scheduler(self, context: Context) -> Scheduler: ...

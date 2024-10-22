@@ -20,8 +20,8 @@ if TYPE_CHECKING:
 class UploadVoteForm(Form):
 
     file_format = RadioField(
-        _("File format"),
-        choices=[('internal', "OneGov Cloud")],
+        _('File format'),
+        choices=[('internal', 'OneGov Cloud')],
         validators=[
             InputRequired()
         ],
@@ -29,7 +29,7 @@ class UploadVoteForm(Form):
     )
 
     proposal = UploadField(
-        label=_("Proposal / Results"),
+        label=_('Proposal / Results'),
         validators=[
             DataRequired(),
             WhitelistedMimeType(ALLOWED_MIME_TYPES),
@@ -40,7 +40,7 @@ class UploadVoteForm(Form):
     )
 
     sg_gemeinden = UploadField(
-        label="SG_Gemeinden.csv",
+        label='SG_Gemeinden.csv',
         validators=[
             DataRequired(),
             WhitelistedMimeType(ALLOWED_MIME_TYPES),
@@ -51,7 +51,7 @@ class UploadVoteForm(Form):
     )
 
     sg_geschaefte = UploadField(
-        label="SG_Geschaefte.csv",
+        label='SG_Geschaefte.csv',
         validators=[
             DataRequired(),
             WhitelistedMimeType(ALLOWED_MIME_TYPES),
@@ -67,6 +67,6 @@ class UploadVoteForm(Form):
         assert hasattr(vote, 'data_sources')
         if vote.data_sources:
             self.file_format.choices = [
-                ('internal', "OneGov Cloud"),
-                ('wabsti_c', "WabstiCExport")
+                ('internal', 'OneGov Cloud'),
+                ('wabsti_c', 'WabstiCExport')
             ]

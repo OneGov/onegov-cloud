@@ -13,7 +13,7 @@ if TYPE_CHECKING:
     from decimal import Decimal
     from onegov.pay.types import AnyPayableBase, PaymentState
     from sqlalchemy.orm import Query, Session
-    from typing_extensions import Self
+    from typing import Self
     from uuid import UUID
 
 
@@ -111,7 +111,7 @@ class PaymentCollection(GenericCollection[Payment], Pagination[Payment]):
         items: 'Iterable[Payment]'
     ) -> dict['UUID', list['AnyPayableBase']]:
         """ A more efficient way of loading all links of the given batch
-              (compared to loading payment.links one by one).
+        (compared to loading payment.links one by one).
 
         """
         payment_links = defaultdict(list)

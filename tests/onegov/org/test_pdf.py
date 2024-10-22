@@ -68,6 +68,9 @@ def test_ticket_pdf(org_app):
         name = kwargs.pop('name')
         return f'https://seantis.ch/{name or ""}'
 
+    template_loader = (
+        org_app.config.template_engine_registry._template_loaders['.pt'])
+
     host_url = '127.0.0.1:8080'
 
     request = Bunch(
@@ -82,7 +85,8 @@ def test_ticket_pdf(org_app):
         host_url=host_url,
         class_link=class_link,
         link=link,
-        url=''
+        url='',
+        template_loader=template_loader
     )
     collection = ResourceCollection(libres_context)
     forms = FormCollection(session)

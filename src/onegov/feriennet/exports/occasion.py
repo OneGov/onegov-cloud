@@ -17,8 +17,8 @@ if TYPE_CHECKING:
     id='durchfuehrungen',
     form_class=PeriodExportForm,
     permission=Secret,
-    title=_("Occasions"),
-    explanation=_("Exports activities with an occasion in the given period."),
+    title=_('Occasions'),
+    explanation=_('Exports activities with an occasion in the given period.'),
 )
 class OccasionExport(FeriennetExport):
 
@@ -60,8 +60,8 @@ class OccasionExport(FeriennetExport):
     id='bedarf',
     form_class=PeriodExportForm,
     permission=Secret,
-    title=_("Needs"),
-    explanation=_("Exports occasion needs."),
+    title=_('Needs'),
+    explanation=_('Exports occasion needs.'),
 )
 class OccasionNeedExport(FeriennetExport):
 

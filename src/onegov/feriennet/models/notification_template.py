@@ -17,10 +17,11 @@ if TYPE_CHECKING:
     from onegov.activity.models import Period
     from onegov.feriennet.request import FeriennetRequest
     from typing import Protocol
-    from typing_extensions import Self
+    from typing import Self
 
     class BoundCallable(Protocol):
         __doc__: str
+
         def __call__(self) -> str: ...
 
 
@@ -76,28 +77,28 @@ class TemplateVariables:
 
         self.bound = {}
         self.bind(
-            _("Period"),
-            _("Title of the period."),
+            _('Period'),
+            _('Title of the period.'),
             self.period_title,
         )
         self.bind(
-            _("Invoices"),
+            _('Invoices'),
             _("Link to the user's invoices."),
             self.invoices_link,
         )
         self.bind(
-            _("Bookings"),
+            _('Bookings'),
             _("Link to the user's bookings."),
             self.bookings_link
         )
         self.bind(
-            _("Activities"),
-            _("Link to the activities."),
+            _('Activities'),
+            _('Link to the activities.'),
             self.activities_link
         )
         self.bind(
-            _("Homepage"),
-            _("Link to the homepage."),
+            _('Homepage'),
+            _('Link to the homepage.'),
             self.homepage_link
         )
 
@@ -132,23 +133,23 @@ class TemplateVariables:
             self.request.class_link(BookingCollection, {
                 'period_id': self.period.id if self.period else None
             }),
-            self.request.translate(_("Bookings"))
+            self.request.translate(_('Bookings'))
         )
 
     def invoices_link(self) -> Markup:
         return Markup('<a href="{}">{}</a>').format(
             self.request.class_link(InvoiceCollection),
-            self.request.translate(_("Invoices"))
+            self.request.translate(_('Invoices'))
         )
 
     def activities_link(self) -> Markup:
         return Markup('<a href="{}">{}</a>').format(
             self.request.class_link(VacationActivityCollection),
-            self.request.translate(_("Activities"))
+            self.request.translate(_('Activities'))
         )
 
     def homepage_link(self) -> Markup:
         return Markup('<a href="{}">{}</a>').format(
             self.request.link(self.request.app.org),
-            self.request.translate(_("Homepage"))
+            self.request.translate(_('Homepage'))
         )

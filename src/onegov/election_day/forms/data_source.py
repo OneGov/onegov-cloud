@@ -18,14 +18,14 @@ if TYPE_CHECKING:
 class DataSourceForm(Form):
 
     name = StringField(
-        label=_("Name"),
+        label=_('Name'),
         validators=[
             InputRequired()
         ],
     )
 
     upload_type = RadioField(
-        _("Type"),
+        _('Type'),
         choices=list(UPLOAD_TYPE_LABELS),
         validators=[
             InputRequired()
@@ -49,7 +49,7 @@ class DataSourceItemForm(Form):
     request: 'ElectionDayRequest'
 
     item = ChosenSelectField(
-        label="",
+        label='',
         choices=[],
         validators=[
             InputRequired()
@@ -79,19 +79,19 @@ class DataSourceItemForm(Form):
         self.item.choices = [
             (
                 item.id,
-                "{} {} {}".format(
+                '{} {} {}'.format(
                     layout.format_date(item.date, 'date'),
                     item.shortcode or '',
                     item.title
-                ).replace("  ", " ")
+                ).replace('  ', ' ')
             ) for item in source.query_candidates()
         ]
         self.callout = ''
         if not self.item.choices:
             if self.type == 'vote':
-                self.callout = _("No votes yet.")
+                self.callout = _('No votes yet.')
             else:
-                self.callout = _("No elections yet.")
+                self.callout = _('No elections yet.')
 
     def update_model(self, model: 'DataSourceItem') -> None:
         if self.type == 'vote':

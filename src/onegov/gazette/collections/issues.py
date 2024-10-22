@@ -17,7 +17,7 @@ class IssueCollection(GenericCollection[Issue]):
         return Issue
 
     def query(self) -> 'Query[Issue]':
-        query = super(IssueCollection, self).query()
+        query = super().query()
         query = query.order_by(None).order_by(Issue.date)
         return query
 

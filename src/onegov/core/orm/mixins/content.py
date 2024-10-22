@@ -14,9 +14,9 @@ if TYPE_CHECKING:
     from collections.abc import Callable
     from sqlalchemy.orm.attributes import QueryableAttribute
     from sqlalchemy.sql import ColumnElement
-    from typing_extensions import Self
+    from typing import Self
 
-    class _dict_property_factory(Protocol):
+    class _dict_property_factory(Protocol):  # noqa: N801
 
         @overload
         def __call__(
@@ -78,32 +78,6 @@ if TYPE_CHECKING:
             value_type: 'type[_T]'
         ) -> 'dict_property[_T]': ...
 
-    class _dict_markup_property_factory(Protocol):
-        @overload
-        def __call__(
-            self,
-            attribute: str,
-            key: str | None = None,
-            default: None = None,
-        ) -> 'dict_markup_property[Markup | None]': ...
-
-        @overload
-        def __call__(
-            self,
-            attribute: str,
-            key: str | None,
-            default: Markup,
-        ) -> 'dict_markup_property[Markup]': ...
-
-        @overload
-        def __call__(
-            self,
-            attribute: str,
-            key: str | None = None,
-            *,
-            default: Markup,
-        ) -> 'dict_markup_property[Markup]': ...
-
 
 _T = TypeVar('_T')
 _MarkupT = TypeVar('_MarkupT', Markup, Markup | None)
@@ -147,7 +121,7 @@ def is_valid_default(default: object | None) -> bool:
     return False
 
 
-class dict_property(InspectionAttrInfo, Generic[_T]):
+class dict_property(InspectionAttrInfo, Generic[_T]):  # noqa: N801
     """ Enables access of dictionaries through properties.
 
     Usage::
@@ -468,7 +442,7 @@ class dict_property(InspectionAttrInfo, Generic[_T]):
         del getattr(instance, self.attribute)[self.key]
 
 
-class dict_markup_property(dict_property[_MarkupT]):
+class dict_markup_property(dict_property[_MarkupT]):  # noqa: N801
 
     @overload
     def __init__(

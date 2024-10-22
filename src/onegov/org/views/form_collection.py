@@ -20,7 +20,7 @@ if TYPE_CHECKING:
     from collections.abc import Callable
     from onegov.core.types import RenderData
     from onegov.org.request import OrgRequest
-    from typing_extensions import TypeAlias
+    from typing import TypeAlias
 
     SortKey: TypeAlias = Callable[
         [FormDefinition | ExternalLink],
@@ -83,7 +83,7 @@ def view_form_collection(
 
     def edit_link(model: FormDefinition | ExternalLink) -> str | None:
         if isinstance(model, ExternalLink) and request.is_manager:
-            title = request.translate(_("Edit external form"))
+            title = request.translate(_('Edit external form'))
             to = request.class_link(FormCollection)
             return request.link(
                 model,
@@ -96,7 +96,6 @@ def view_form_collection(
         lead = model.meta.get('lead')
         if not lead:
             lead = ''
-        lead = layout.linkify(lead)
         return lead
 
     # FIXME: Should the hint function be able to deal with ExternalLink?
@@ -106,21 +105,21 @@ def view_form_collection(
             if 'stop' in hints:
                 hint = Markup(
                     '<div class="hint-stop">{}</div>'
-                ).format(request.translate(hints["stop"]))
+                ).format(request.translate(hints['stop']))
             else:
                 if 'date' in hints:
                     hint = Markup(
                         '<div class="hint-date">{}</div>'
-                    ).format(request.translate(hints["date"]))
+                    ).format(request.translate(hints['date']))
                 if 'count' in hints:
                     hint += Markup(
                         '<div class="hint-count">{}</div>'
-                    ).format(request.translate(hints["count"]))
+                    ).format(request.translate(hints['count']))
         return hint
 
     return {
         'layout': layout,
-        'title': _("Forms"),
+        'title': _('Forms'),
         'forms': combine_grouped(forms, ext_forms, sort=lambda x: x.order),
         'link_func': link_func,
         'edit_link': edit_link,
@@ -152,11 +151,10 @@ def view_survey_collection(
         lead = model.meta.get('lead')
         if not lead:
             lead = ''
-        lead = layout.linkify(lead)
         return lead
 
     return {
         'layout': layout,
-        'title': _("Surveys"),
+        'title': _('Surveys'),
         'surveys': surveys,
     }

@@ -9,7 +9,7 @@ def encrypt_symmetric(plaintext: str, key_base64: bytes) -> bytes:
 
     Returns: the encrypted data in bytes.
     """
-    text_to_encrypt = plaintext.encode("utf-8")
+    text_to_encrypt = plaintext.encode('utf-8')
     f = Fernet(key_base64)
     encrypted = f.encrypt(text_to_encrypt)
     return encrypted
@@ -24,5 +24,5 @@ def decrypt_symmetric(fernet_token: bytes, key_base64: bytes) -> str:
     Returns the decrypted text.
     """
     f = Fernet(key_base64)
-    decrypted = f.decrypt(fernet_token).decode("utf-8")
+    decrypted = f.decrypt(fernet_token).decode('utf-8')
     return decrypted

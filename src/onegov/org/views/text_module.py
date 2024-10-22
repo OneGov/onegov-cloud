@@ -30,7 +30,7 @@ def view_text_modules(
     layout = layout or TextModulesLayout(self, request)
 
     return {
-        'title': _("Text modules"),
+        'title': _('Text modules'),
         'layout': layout,
         'text_modules': self.query().all(),
     }
@@ -131,4 +131,4 @@ def delete_text_module(self: TextModule, request: 'OrgRequest') -> None:
     request.assert_valid_csrf_token()
 
     request.session.delete(self)
-    request.success(_("The text module was deleted"))
+    request.success(_('The text module was deleted'))

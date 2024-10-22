@@ -35,7 +35,7 @@ def apply_agency_mutation(
     if form.submitted(request):
         form.update_model()
         assert self.ticket is not None
-        request.success(_("Proposed changes applied."))
+        request.success(_('Proposed changes applied.'))
         AgencyMutationMessage.create(self.ticket, request, 'applied')
         if 'return-to' in request.GET:
             return request.redirect(request.url)
@@ -44,11 +44,11 @@ def apply_agency_mutation(
         form.apply_model()
 
     layout = AgencyLayout(self.target, request)
-    layout.breadcrumbs.append(Link(_("Apply proposed changes"), '#'))
+    layout.breadcrumbs.append(Link(_('Apply proposed changes'), '#'))
 
     return {
         'layout': layout,
-        'title': _("Apply proposed changes"),
+        'title': _('Apply proposed changes'),
         'form': form
     }
 
@@ -69,7 +69,7 @@ def apply_person_mutation(
     if form.submitted(request):
         form.update_model()
         assert self.ticket is not None
-        request.success(_("Proposed changes applied."))
+        request.success(_('Proposed changes applied.'))
         PersonMutationMessage.create(self.ticket, request, 'applied')
         if 'return-to' in request.GET:
             return request.redirect(request.url)
@@ -78,10 +78,10 @@ def apply_person_mutation(
         form.apply_model()
 
     layout = ExtendedPersonLayout(self.target, request)
-    layout.breadcrumbs.append(Link(_("Apply proposed changes"), '#'))
+    layout.breadcrumbs.append(Link(_('Apply proposed changes'), '#'))
 
     return {
         'layout': layout,
-        'title': _("Apply proposed changes"),
+        'title': _('Apply proposed changes'),
         'form': form
     }

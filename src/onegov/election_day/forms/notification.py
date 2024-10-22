@@ -20,7 +20,7 @@ class TriggerNotificationForm(Form):
     request: 'ElectionDayRequest'
 
     notifications = MultiCheckboxField(
-        label=_("Notifications"),
+        label=_('Notifications'),
         choices=[],
         validators=[
             InputRequired()
@@ -35,27 +35,27 @@ class TriggerNotificationForm(Form):
 
         self.notifications.choices = []
         if principal.email_notification:
-            self.notifications.choices.append(('email', _("Email")))
+            self.notifications.choices.append(('email', _('Email')))
         if principal.sms_notification:
-            self.notifications.choices.append(('sms', _("SMS")))
+            self.notifications.choices.append(('sms', _('SMS')))
         if principal.webhooks:
-            self.notifications.choices.append(('webhooks', _("Webhooks")))
+            self.notifications.choices.append(('webhooks', _('Webhooks')))
 
 
 class TriggerNotificationsForm(TriggerNotificationForm):
 
     votes = MultiCheckboxField(
-        label=_("Votes"),
+        label=_('Votes'),
         choices=[],
     )
 
     election_compounds = MultiCheckboxField(
-        label=_("Compounds of elections"),
+        label=_('Compounds of elections'),
         choices=[],
     )
 
     elections = MultiCheckboxField(
-        label=_("Elections"),
+        label=_('Elections'),
         choices=[],
     )
 
@@ -65,7 +65,7 @@ class TriggerNotificationsForm(TriggerNotificationForm):
             and not self.elections.data
             and not self.election_compounds.data
         ):
-            message = _("Select at least one election or vote.")
+            message = _('Select at least one election or vote.')
             assert isinstance(self.votes.errors, list)
             self.votes.errors.append(message)
             assert isinstance(self.elections.errors, list)

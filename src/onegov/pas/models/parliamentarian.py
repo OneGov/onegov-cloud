@@ -24,7 +24,7 @@ if TYPE_CHECKING:
     from onegov.pas.models.commission_membership import CommissionMembership
     from onegov.pas.models.parliamentarian_role import ParliamentarianRole
     from typing import Literal
-    from typing_extensions import TypeAlias
+    from typing import TypeAlias
 
     Gender: TypeAlias = Literal[
         'male',

@@ -25,12 +25,12 @@ class GeneralSettingsForm(OrgGeneralSettingsForm):
     page_image_position = RadioField(
         fieldset=_('Images'),
         description=_(
-            "Choose the position of the page images on the content pages"),
-        label=_("Page image position"),
+            'Choose the position of the page images on the content pages'),
+        label=_('Page image position'),
         choices=(
-            ('as_content', _("As a content image (between the title and text "
-                             "of a content page)")),
-            ('header', _("As header image (wide above the page content)"))
+            ('as_content', _('As a content image (between the title and text '
+                             'of a content page)')),
+            ('header', _('As header image (wide above the page content)'))
         ),
     )
 
@@ -131,7 +131,7 @@ class ChatSettingsForm(Form):
     )
 
     chat_topics = TagsField(
-        label=_("Chat Topics"),
+        label=_('Chat Topics'),
         description=_(
             "The topics can be chosen on the form at the start of the chat. "
             "Example topics are 'Social', 'Clubs' or 'Planning & Construction'"
@@ -139,14 +139,14 @@ class ChatSettingsForm(Form):
     )
 
     specific_opening_hours = BooleanField(
-        label=_("Specific Opening Hours"),
-        description=_("If unchecked, the chat is open 24/7."),
-        fieldset=_("Opening Hours"),
+        label=_('Specific Opening Hours'),
+        description=_('If unchecked, the chat is open 24/7.'),
+        fieldset=_('Opening Hours'),
     )
 
     opening_hours_chat = StringField(
-        label=_("Opening Hours"),
-        fieldset=_("Opening Hours"),
+        label=_('Opening Hours'),
+        fieldset=_('Opening Hours'),
         depends_on=('specific_opening_hours', 'y'),
         render_kw={'class_': 'many many-opening-hours'}
     )
@@ -193,9 +193,7 @@ class ChatSettingsForm(Form):
         staff_members = [(
             (p.id.hex, p.username)
         ) for p in people]
-        self.chat_staff.choices = [
-            (v, k) for v, k in staff_members
-        ]
+        self.chat_staff.choices = list(staff_members)
 
     def ensure_valid_opening_hours(self) -> bool:
         if not self.specific_opening_hours.data:
@@ -223,7 +221,7 @@ class ChatSettingsForm(Form):
             if start > end:
                 assert isinstance(self.opening_hours_chat.errors, list)
                 self.opening_hours_chat.errors.append(
-                    _("Start time cannot be later than end time.")
+                    _('Start time cannot be later than end time.')
                 )
                 result = False
         return result
@@ -249,28 +247,28 @@ class ChatSettingsForm(Form):
         opening_hours = opening_hours or []
         return json.dumps({
             'labels': {
-                'day': self.request.translate(_("day")),
-                'start': self.request.translate(_("Start")),
-                'end': self.request.translate(_("End")),
-                'add': self.request.translate(_("Add")),
-                'remove': self.request.translate(_("Remove")),
+                'day': self.request.translate(_('day')),
+                'start': self.request.translate(_('Start')),
+                'end': self.request.translate(_('End')),
+                'add': self.request.translate(_('Add')),
+                'remove': self.request.translate(_('Remove')),
             },
             'values': [
                 {
                     'day': o[0],
                     'start': o[1],
                     'end': o[2],
-                    'error': self.time_errors.get(ix, "")
+                    'error': self.time_errors.get(ix, '')
                 } for ix, o in enumerate(opening_hours)
             ],
             'days': {
-                0: self.request.translate(_("Mo")),
-                1: self.request.translate(_("Tu")),
-                2: self.request.translate(_("We")),
-                3: self.request.translate(_("Th")),
-                4: self.request.translate(_("Fr")),
-                5: self.request.translate(_("Sa")),
-                6: self.request.translate(_("Su"))
+                0: self.request.translate(_('Mo')),
+                1: self.request.translate(_('Tu')),
+                2: self.request.translate(_('We')),
+                3: self.request.translate(_('Th')),
+                4: self.request.translate(_('Fr')),
+                5: self.request.translate(_('Sa')),
+                6: self.request.translate(_('Su'))
             }
         })
 

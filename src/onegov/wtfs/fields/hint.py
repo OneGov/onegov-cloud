@@ -8,7 +8,7 @@ from typing import Any, TYPE_CHECKING
 if TYPE_CHECKING:
     from collections.abc import Sequence
     from onegov.form.types import PricingRules, Validators, FormT
-    from typing_extensions import Self
+    from typing import Self
     from wtforms.fields.core import _Filter, _Widget
     from wtforms.form import BaseForm
     from wtforms.meta import _SupportsGettextAndNgettext, DefaultMeta

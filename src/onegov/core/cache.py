@@ -50,7 +50,7 @@ if TYPE_CHECKING:
     from collections.abc import Callable
     from dogpile.cache.api import NoValue
 
-    _F = TypeVar('_F', bound='Callable[..., Any]')
+    _F = TypeVar('_F', bound=Callable[..., Any])
 
 
 @overload
@@ -82,7 +82,7 @@ def instance_lru_cache(
     def decorator(wrapped: '_F') -> '_F':
         def wrapper(self: Any) -> Any:
             return lru_cache(maxsize=maxsize)(
-                update_wrapper(partial(wrapped, self), wrapped)  # type:ignore
+                update_wrapper(partial(wrapped, self), wrapped)
             )
 
         # NOTE: we are doing some oddball stuff here that the type

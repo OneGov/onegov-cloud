@@ -84,7 +84,7 @@ class WithThumbnailFilter(FileFilter):
     ) -> tuple[BytesIO, tuple[str, str]]:
         output = BytesIO()
 
-        thumbnail = Image.open(fp)
+        thumbnail: Image.Image = Image.open(fp)
         thumbnail.thumbnail(self.size, Image.Resampling.LANCZOS)
         thumbnail = thumbnail.convert('RGBA')
 
@@ -140,7 +140,7 @@ class WithPDFThumbnailFilter(WithThumbnailFilter):
             path = Path(directory)
 
             pdf_input = path / 'input.pdf'
-            png_output = path / "preview.png"
+            png_output = path / 'preview.png'
 
             with pdf_input.open('wb') as pdf:
                 pdf.write(fp.read())

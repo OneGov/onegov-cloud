@@ -19,7 +19,7 @@ from onegov.translator_directory.constants import (
     GENDERS, ADMISSIONS, PROFESSIONAL_GUILDS, INTERPRETING_TYPES)
 
 
-from typing import TYPE_CHECKING
+from typing import TYPE_CHECKING, Any
 if TYPE_CHECKING:
     from collections.abc import Iterable
     from onegov.translator_directory.models.language import Language
@@ -52,7 +52,7 @@ class DefaultLayout(BaseLayout):
 
     def format_boolean(self, val: bool | None) -> str:
         assert isinstance(val, bool) or val is None
-        return self.request.translate((_('Yes') if val else _('No')))
+        return self.request.translate(_('Yes') if val else _('No'))
 
     def format_admission(self, val: 'AdmissionState') -> str:
         return self.request.translate(ADMISSIONS[val])
@@ -127,7 +127,7 @@ class TranslatorLayout(DefaultLayout):
                     title=_('Add'),
                     links=(
                         Link(
-                            text=_("Add translator"),
+                            text=_('Add translator'),
                             url=self.request.class_link(
                                 TranslatorCollection, name='new'
                             ),
@@ -136,7 +136,7 @@ class TranslatorLayout(DefaultLayout):
                     )
                 ),
                 Link(
-                    text=_("Edit"),
+                    text=_('Edit'),
                     url=self.request.link(
                         self.model, name='edit'
                     ),
@@ -150,11 +150,11 @@ class TranslatorLayout(DefaultLayout):
                     attrs={'class': 'delete-link'},
                     traits=(
                         Confirm(
-                            _("Do you really want to delete "
-                              "this translator?"),
-                            _("This cannot be undone."),
-                            _("Delete translator"),
-                            _("Cancel")
+                            _('Do you really want to delete '
+                              'this translator?'),
+                            _('This cannot be undone.'),
+                            _('Delete translator'),
+                            _('Cancel')
                         ),
                         Intercooler(
                             request_method='DELETE',
@@ -180,7 +180,7 @@ class TranslatorLayout(DefaultLayout):
         elif self.request.is_editor:
             return [
                 Link(
-                    text=_("Edit"),
+                    text=_('Edit'),
                     url=self.request.link(
                         self.model, name='edit-restricted'
                     ),
@@ -303,7 +303,8 @@ class MailTemplatesLayout(TranslatorLayout):
 
     @property
     def breadcrumbs(self) -> list[Link]:
-        return super().breadcrumbs + [
+        return [
+            *super().breadcrumbs,
             Link(
                 text=_('Mail templates'),
                 url=self.request.link(
@@ -321,7 +322,8 @@ class TranslatorCollectionLayout(DefaultLayout):
 
     @cached_property
     def breadcrumbs(self) -> list[Link]:
-        return super().breadcrumbs + [  # type:ignore[operator]
+        return [  # type:ignore[misc]
+            *super().breadcrumbs,
             Link(
                 text=_('Translators'),
                 url=self.request.class_link(TranslatorCollection)
@@ -336,7 +338,7 @@ class TranslatorCollectionLayout(DefaultLayout):
                     _('Add'),
                     links=(
                         Link(
-                            text=_("Add translator"),
+                            text=_('Add translator'),
                             url=self.request.class_link(
                                 TranslatorCollection, name='new'
                             ),
@@ -352,7 +354,7 @@ class TranslatorCollectionLayout(DefaultLayout):
                     attrs={'class': 'export-link'},
                 ),
                 Link(
-                    _("Mail to all translators"),
+                    _('Mail to all translators'),
                     url=self.request.app.mailto_link,
                     attrs={'class': 'envelope'},
                 )
@@ -381,9 +383,15 @@ class AddTranslatorLayout(TranslatorCollectionLayout):
 
 class TranslatorDocumentsLayout(DefaultLayout):
 
+    def __init__(self, model: Any, request: 'TranslatorAppRequest') -> None:
+        super().__init__(model, request)
+        request.include('upload')
+        request.include('prompt')
+
     @cached_property
     def breadcrumbs(self) -> list[Link]:
-        return super().breadcrumbs + [  # type:ignore[operator]
+        return [  # type:ignore[misc]
+            *super().breadcrumbs,
             Link(
                 text=_('Translators'),
                 url=self.request.class_link(TranslatorCollection)
@@ -423,7 +431,7 @@ class LanguageCollectionLayout(DefaultLayout):
             _('Add'),
             links=(
                 Link(
-                    text=_("Add language"),
+                    text=_('Add language'),
                     url=self.request.class_link(
                         LanguageCollection, name='new'
                     ),
@@ -470,7 +478,7 @@ class EditLanguageLayout(LanguageLayout):
                             Block(
                                 _("This language is used and can't be "
                                   "deleted."),
-                                no=_("Cancel")
+                                no=_('Cancel')
                             ),
                         )
                     ),
@@ -484,11 +492,11 @@ class EditLanguageLayout(LanguageLayout):
                     attrs={'class': 'delete-link'},
                     traits=(
                         Confirm(
-                            _("Do you really want to delete "
-                              "this language?"),
-                            _("This cannot be undone."),
-                            _("Delete language"),
-                            _("Cancel")
+                            _('Do you really want to delete '
+                              'this language?'),
+                            _('This cannot be undone.'),
+                            _('Delete language'),
+                            _('Cancel')
                         ),
                         Intercooler(
                             request_method='DELETE',

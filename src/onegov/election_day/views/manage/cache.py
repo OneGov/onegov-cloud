@@ -32,18 +32,18 @@ def view_clear_pages_cache(
 
     if form.submitted(request):
         request.app.pages_cache.flush()
-        request.message(_("Cache cleared."), 'success')
+        request.message(_('Cache cleared.'), 'success')
         return redirect(layout.manage_link)
 
     return {
         'layout': layout,
         'form': form,
-        'title': _("Clear cache"),
+        'title': _('Clear cache'),
         'callout': _(
-            "Elections and votes are cached for ${expiration} seconds. The "
-            "cache is automatically cleared for new results and other "
-            "updates. It is not normally necessary to clear the cache "
-            "yourself.",
+            'Elections and votes are cached for ${expiration} seconds. The '
+            'cache is automatically cleared for new results and other '
+            'updates. It is not normally necessary to clear the cache '
+            'yourself.',
             mapping={'expiration': self.cache_expiration_time}
         ),
         'cancel': layout.manage_link

@@ -75,7 +75,7 @@ class D3Renderer:
                 path = module_path(
                     'onegov.election_day', 'assets/js/{}'.format(script)
                 )
-                with open(path, 'r') as f:
+                with open(path) as f:
                     self.scripts[chart].append(jsmin(f.read()))
 
     def translate(self, text: 'TranslationString', locale: str | None) -> str:
@@ -148,7 +148,7 @@ class D3Renderer:
             json={
                 'scripts': self.scripts[chart],
                 'main': self.supported_charts[chart]['main'],
-                'params': loads(dumps(params).replace("'", '’'))
+                'params': loads(dumps(params).replace("'", '’'))  # noqa:RUF001
             },
             timeout=60
         )
@@ -211,7 +211,7 @@ class D3Renderer:
             'onegov.election_day',
             f'static/mapdata/{year}/{self.app.principal.id}.json'
         )
-        with open(path, 'r') as f:
+        with open(path) as f:
             mapdata = json.loads(f.read())
 
         params = params or {}

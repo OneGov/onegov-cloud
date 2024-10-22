@@ -174,7 +174,7 @@ class Schema:
 
         """
 
-        assert invoice.id, "the invoice id must be konwn"
+        assert invoice.id, 'the invoice id must be konwn'
 
         q = None if optimistic else session.query(InvoiceReference)
 
@@ -184,7 +184,7 @@ class Schema:
                 return None
 
         # find an unused reference
-        for i in range(0, 10):
+        for i in range(10):
             candidate = self.new()
 
             if q is not None:
@@ -193,7 +193,7 @@ class Schema:
 
             break
         else:
-            raise RuntimeError("No unique reference after 10 tries")
+            raise RuntimeError('No unique reference after 10 tries')
 
         reference = InvoiceReference(
             invoice_id=invoice.id,
@@ -282,7 +282,7 @@ class ESRSchema(Schema, name='esr-v1'):
     """
 
     def new(self) -> str:
-        number = ''.join(secrets.choice(string.digits) for _ in range(0, 26))
+        number = ''.join(secrets.choice(string.digits) for _ in range(26))
         return number + self.checksum(number)
 
     def checksum(self, number: str) -> str:
@@ -332,7 +332,7 @@ class RaiffeisenSchema(ESRSchema, name='raiffeisen-v1'):
         assert 3 <= len(ident) <= 7
 
         rest = 26 - len(ident)
-        random = ''.join(secrets.choice(string.digits) for _ in range(0, rest))
+        random = ''.join(secrets.choice(string.digits) for _ in range(rest))
         number = f'{self.esr_identification_number}{random}'
 
         return number + self.checksum(number)

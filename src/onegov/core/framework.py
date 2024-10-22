@@ -129,6 +129,16 @@ class Framework(
     #: the request cache is initialised/emptied before each request
     request_cache: dict[str, Any]
 
+    #: the schema cache stays around for the entire runtime of the
+    #: application, but is switched, each time the schema changes
+    # NOTE: This cache should never be used to store ORM objects
+    #       In addition this should generally be backed by a Redis
+    #       cache to make sure the cache is synchronized between
+    #       all processes. Although there may be some cases where
+    #       it makes sense to use this cache on its own
+    schema_cache: dict[str, Any]
+    _all_schema_caches: dict[str, Any]
+
     @property
     def version(self) -> str:
         from onegov.core import __version__
@@ -143,7 +153,7 @@ class Framework(
         ) -> Iterable[bytes]: ...
 
     @morepath.reify  # type:ignore[no-redef]
-    def __call__(self) -> 'WSGIApplication':  # noqa:F811
+    def __call__(self) -> 'WSGIApplication':
         """ Intercept all wsgi calls so we can attach debug tools. """
 
         fn: WSGIApplication = super().__call__
@@ -216,7 +226,7 @@ class Framework(
                 return fn(*args, **kwargs)
             except Exception:
                 if getattr(self, 'print_exceptions', False):
-                    print("=" * 80, file=sys.stderr)
+                    print('=' * 80, file=sys.stderr)
                     traceback.print_exc()
                 raise
 
@@ -666,6 +676,10 @@ class Framework(
         # then, replace the '/' with a '-' so the only dash left will be
         # the dash between namespace and id
         self.schema = application_id.replace('-', '_').replace('/', '-')
+        if not hasattr(self, '_all_schema_caches'):
+            self._all_schema_caches = {}
+
+        self.schema_cache = self._all_schema_caches.setdefault(self.schema, {})
 
         if self.has_database_connection:
             ScopedPropertyObserver.enter_scope(self)
@@ -792,10 +806,10 @@ class Framework(
         )
 
         try:
-            action, handler = next(query(self.__class__))
+            action, _handler = next(query(self.__class__))
         except (StopIteration, RuntimeError) as exception:
             raise KeyError(
-                "{!r} has no view named {}".format(model, view_name)
+                '{!r} has no view named {}'.format(model, view_name)
             ) from exception
 
         return action.permission
@@ -817,8 +831,9 @@ class Framework(
         headers: dict[str, str] | None = None,
         plaintext: str | None = None
     ) -> None:
-        """ Sends an e-mail categorised as marketing. This includes but is not
-        limited to:
+        """ Sends an e-mail categorised as marketing.
+
+        This includes but is not limited to:
 
             * Announcements
             * Newsletters
@@ -849,8 +864,9 @@ class Framework(
         self,
         prepared_emails: 'Iterable[EmailJsonDict]'
     ) -> None:
-        """ Sends an e-mail batch categorised as marketing. This includes but
-        is not limited to:
+        """ Sends an e-mail batch categorised as marketing.
+
+        This includes but is not limited to:
 
             * Announcements
             * Newsletters
@@ -886,7 +902,9 @@ class Framework(
         headers: dict[str, str] | None = None,
         plaintext: str | None = None
     ) -> None:
-        """ Sends an e-mail categorised as transactional. This is limited to:
+        """ Sends an e-mail categorised as transactional.
+
+        This is limited to:
 
             * Welcome emails
             * Reset passwords emails
@@ -912,7 +930,9 @@ class Framework(
         self,
         prepared_emails: 'Iterable[EmailJsonDict]'
     ) -> None:
-        """  Sends an e-mail categorised as transactional. This is limited to:
+        """  Sends an e-mail categorised as transactional.
+
+        This is limited to:
 
             * Welcome emails
             * Reset passwords emails
@@ -945,8 +965,8 @@ class Framework(
         plaintext: str | None = None
     ) -> 'EmailJsonDict':
         """ Common path for batch and single mail sending. Use this the same
-         way you would use send_email then pass the prepared emails in a list
-         or another iterable to the batch send method.
+        way you would use send_email then pass the prepared emails in a list
+        or another iterable to the batch send method.
         """
 
         headers = headers or {}
@@ -1069,11 +1089,11 @@ class Framework(
         # transactional stream in Postmark is called outbound
         stream = 'marketing' if category == 'marketing' else 'outbound'
 
-        BATCH_LIMIT = 500
+        BATCH_LIMIT = 500  # noqa: N806
         # NOTE: The API specifies MB, so let's not chance it
         #       by assuming they meant MiB and just go with
         #       lower size limit.
-        SIZE_LIMIT = 50_000_000  # 50MB
+        SIZE_LIMIT = 50_000_000  # 50MB  # noqa: N806
         # NOTE: We use a buffer to be a bit more memory efficient
         #       we don't initialize the buffer, so tell gives us
         #       the exact size of the buffer.
@@ -1174,7 +1194,7 @@ class Framework(
         are automatically commited at the end.
 
         """
-        assert self.sms_directory, "No SMS directory configured"
+        assert self.sms_directory, 'No SMS directory configured'
 
         path = os.path.join(self.sms_directory, self.schema)
         if not os.path.exists(path):
@@ -1249,7 +1269,7 @@ class Framework(
             '{}:{}'.format(self.zulip_user, self.zulip_key).encode('ascii')
         )
         headers = (
-            ('Authorization', 'Basic {}'.format(auth.decode("ascii"))),
+            ('Authorization', 'Basic {}'.format(auth.decode('ascii'))),
             ('Content-Type', 'application/x-www-form-urlencoded'),
             ('Content-Length', str(len(data))),
         )
@@ -1482,7 +1502,7 @@ class Framework(
 @Framework.webasset_url()
 def get_webasset_url() -> str:
     """ The webassets url needs to be unique so we can fix it before
-        returning the generated html. See :func:`fix_webassets_url_factory`.
+    returning the generated html. See :func:`fix_webassets_url_factory`.
 
     """
     return '7da9c72a3b5f9e060b898ef7cd714b8a'  # do *not* change this hash!
@@ -1573,19 +1593,19 @@ def default_content_security_policy() -> ContentSecurityPolicy:
         default_src={SELF},
 
         # allow fonts from practically anywhere (no mixed content though)
-        font_src={SELF, "http:", "https:", "data:"},
+        font_src={SELF, 'http:', 'https:', 'data:'},
 
         # allow images from practically anywhere (no mixed content though)
-        img_src={SELF, "http:", "https:", "data:"},
+        img_src={SELF, 'http:', 'https:', 'data:'},
 
         # enable inline styles and external stylesheets
-        style_src={SELF, "https:", UNSAFE_INLINE},
+        style_src={SELF, 'https:', UNSAFE_INLINE},
 
         # enable inline scripts, eval and external scripts
         script_src={
             SELF,
-            "https://browser.sentry-cdn.com",
-            "https://js.sentry-cdn.com",
+            'https://browser.sentry-cdn.com',
+            'https://js.sentry-cdn.com',
             UNSAFE_INLINE,
             UNSAFE_EVAL
         },
@@ -1656,7 +1676,7 @@ def http_conflict_tween_factory(
             if not isinstance(e.orig, TransactionRollbackError):
                 raise
 
-            log.warning("A transaction failed because there was a conflict")
+            log.warning('A transaction failed because there was a conflict')
 
             return HTTPConflict()
 

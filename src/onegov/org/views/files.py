@@ -42,7 +42,7 @@ from webob import exc
 from uuid import uuid4
 
 
-from typing import overload, Any, Literal, TYPE_CHECKING
+from typing import overload, Any, Literal, Self, TYPE_CHECKING
 if TYPE_CHECKING:
     from collections.abc import Callable
     from depot.io.interfaces import StoredFile
@@ -50,7 +50,6 @@ if TYPE_CHECKING:
     from onegov.org.models.file import BaseImageFileCollection
     from onegov.org.request import OrgRequest
     from typing import TypeVar
-    from typing_extensions import Self
     from webob import Response
 
     FileT = TypeVar('FileT', bound=File)
@@ -104,7 +103,7 @@ class Img:
         cls,
         layout: DefaultLayout,
         image: ImageFile
-    ) -> 'Self':
+    ) -> Self:
 
         request = layout.request
         width, height = get_thumbnail_size(image)
@@ -129,8 +128,8 @@ def view_get_file_collection(
 
     layout = layout or GeneralFileCollectionLayout(self, request)
     layout.breadcrumbs = [
-        Link(_("Homepage"), layout.homepage_url),
-        Link(_("Files"), '#')
+        Link(_('Homepage'), layout.homepage_url),
+        Link(_('Files'), '#')
     ]
 
     files = tuple(self.files)
@@ -164,7 +163,7 @@ def view_get_file_collection(
             f.name
         ),
         'actions_url': lambda file_id: request.class_link(
-            GeneralFile, name="details", variables={'id': file_id}
+            GeneralFile, name='details', variables={'id': file_id}
         ),
         'upload_url': layout.csrf_protected_url(
             request.link(self, name='upload')
@@ -337,13 +336,13 @@ def view_get_image_collection(
     )
 
     layout.breadcrumbs = [
-        Link(_("Homepage"), layout.homepage_url),
-        Link(_("Images"), request.link(self))
+        Link(_('Homepage'), layout.homepage_url),
+        Link(_('Images'), request.link(self))
     ]
 
     layout.editbar_links = [
         Link(
-            text=_("Manage Photo Albums"),
+            text=_('Manage Photo Albums'),
             url=request.class_link(ImageSetCollection),
             attrs={'class': 'new-photo-album'}
         )
@@ -475,7 +474,7 @@ def view_upload_general_file(
         'file': uploaded_file,
         'format_date': lambda dt: layout.format_date(dt, 'datetime'),
         'actions_url': lambda file_id: request.class_link(
-            GeneralFile, name="details", variables={'id': file_id}
+            GeneralFile, name='details', variables={'id': file_id}
         ),
         'extension': lambda file: extension_for_content_type(
             file.reference.content_type,
@@ -524,17 +523,17 @@ def view_upload_file_by_json(
     except exc.HTTPUnsupportedMediaType:
         return {
             'error': True,
-            'message': request.translate(_("This file type is not supported"))
+            'message': request.translate(_('This file type is not supported'))
         }
     except exc.HTTPRequestHeaderFieldsTooLarge:
         return {
             'error': True,
-            'message': request.translate(_("The file name is too long"))
+            'message': request.translate(_('The file name is too long'))
         }
     except ValueError:
         return {
             'error': True,
-            'message': request.translate(_("The file cannot be processed"))
+            'message': request.translate(_('The file cannot be processed'))
         }
 
     return {
@@ -554,10 +553,10 @@ def view_file_digest(
     digest = request.params.get('digest')
 
     if not isinstance(name, str) or not name:
-        raise exc.HTTPBadRequest("missing filename")
+        raise exc.HTTPBadRequest('missing filename')
 
     if not isinstance(digest, str) or not digest:
-        raise exc.HTTPBadRequest("missing digest")
+        raise exc.HTTPBadRequest('missing digest')
 
     metadata = self.locate_signature_metadata(digest)
     layout = layout or DefaultLayout(self, request)
@@ -589,13 +588,13 @@ def handle_sign(
     assert user is not None
 
     if not isinstance(token, str) or not token:
-        request.alert(_("Please submit your yubikey"))
+        request.alert(_('Please submit your yubikey'))
 
     elif not user.second_factor:
-        request.alert(_("Your account is not linked to a Yubikey"))
+        request.alert(_('Your account is not linked to a Yubikey'))
 
     elif not token.startswith(user.second_factor['data']):
-        request.alert(_("The used Yubikey is not linked to your account"))
+        request.alert(_('The used Yubikey is not linked to your account'))
 
     else:
         try:
@@ -605,9 +604,9 @@ def handle_sign(
                 token=token)
 
         except AlreadySignedError:
-            request.alert(_("This file already has a digital seal"))
+            request.alert(_('This file already has a digital seal'))
         except InvalidTokenError:
-            request.alert(_("Your Yubikey could not be validated"))
+            request.alert(_('Your Yubikey could not be validated'))
 
     layout = layout or DefaultLayout(self, request)
 

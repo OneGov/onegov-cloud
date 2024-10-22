@@ -11,8 +11,17 @@
                 <tal:b case="'applied'" i18n:translate>
                     Change request applied.
                 </tal:b>
-                <tal:b case="'rejected'" i18n:translate>
+                <tal:b case="'entry-rejected'" i18n:translate>
                     Directory entry rejected.
+                </tal:b>
+                <tal:b case="'change-rejected'" i18n:translate>
+                    Directory change rejected.
+                </tal:b>
+                <tal:b case="'entry-rejection-withdrawn'" i18n:translate>
+                    Entry rejection withdrawn.
+                </tal:b>
+                <tal:b case="'change-rejection-withdrawn'" i18n:translate>
+                    Change rejection withdrawn.
                 </tal:b>
             </tal:b>
         </metal:b>

@@ -1,3 +1,4 @@
+from functools import cached_property
 from onegov.core.templates import render_macro
 from onegov.core.utils import Bunch
 from onegov.form import Form
@@ -30,6 +31,11 @@ class DummyRequest:
 
     def new_csrf_token(self):
         return ''
+
+    @cached_property
+    def template_loader(self):
+        registry = self.app.config.template_engine_registry
+        return registry._template_loaders['.pt']
 
 
 def test_form_field_long_description_markdown(org_app):

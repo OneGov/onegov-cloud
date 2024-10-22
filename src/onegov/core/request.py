@@ -38,13 +38,14 @@ if TYPE_CHECKING:
     from sqlalchemy import Column
     from sqlalchemy.orm import Session
     from translationstring import _ChameleonTranslate
-    from typing import Literal, Protocol
-    from typing_extensions import TypeGuard
+    from typing import Literal, Protocol, TypeGuard
     from webob import Response
     from webob.multidict import MultiDict
     from webob.request import _FieldStorageWithFile
     from wtforms import Form
     from uuid import UUID
+
+    from .templates import TemplateLoader
 
     _BaseRequest = morepath.Request
 
@@ -333,7 +334,7 @@ class CoreRequest(IncludeRequest, ContentSecurityRequest, ReturnToMixin):
 
         """
         theme = self.app.settings.core.theme
-        assert theme is not None, "Do not call if no theme is used"
+        assert theme is not None, 'Do not call if no theme is used'
 
         force = self.app.always_compile_theme or (
             self.app.allow_shift_f5_compile
@@ -570,7 +571,8 @@ class CoreRequest(IncludeRequest, ContentSecurityRequest, ReturnToMixin):
         else:
             # this is a bit akward, but I don't see an easy way for this atm.
             # (otoh, usually there's going to be one message only)
-            self.browser_session.messages = self.browser_session.messages + [
+            self.browser_session.messages = [
+                *self.browser_session.messages,
                 Message(text, type)
             ]
 
@@ -608,7 +610,7 @@ class CoreRequest(IncludeRequest, ContentSecurityRequest, ReturnToMixin):
     @cached_property
     def agent(self) -> Any:
         """ Returns the user agent, parsed by ua-parser. """
-        return user_agent_parser.Parse(self.user_agent or "")
+        return user_agent_parser.Parse(self.user_agent or '')
 
     def has_permission(
         self,
@@ -817,3 +819,9 @@ class CoreRequest(IncludeRequest, ContentSecurityRequest, ReturnToMixin):
             return serializer.loads(data, salt=salt, max_age=max_age)
         except (SignatureExpired, BadSignature):
             return None
+
+    @cached_property
+    def template_loader(self) -> 'TemplateLoader':
+        """ Returns the chameleon template loader. """
+        registry = self.app.config.template_engine_registry
+        return registry._template_loaders['.pt']

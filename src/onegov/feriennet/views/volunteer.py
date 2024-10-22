@@ -58,7 +58,7 @@ def view_volunteers(
 
     return {
         'layout': layout,
-        'title': _("Volunteers"),
+        'title': _('Volunteers'),
         'records': records,
         'grouped': grouped,
         'periods': request.app.periods,
@@ -192,7 +192,7 @@ def submit_volunteer(
     return {
         'layout': layout,
         'form': form,
-        'title': _("Register as Volunteer"),
+        'title': _('Register as Volunteer'),
         'complete': complete,
         'cart_url': request.class_link(VolunteerCart),
         'cart_submit_url': request.class_link(VolunteerCart, name='submit'),

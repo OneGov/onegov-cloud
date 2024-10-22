@@ -16,7 +16,7 @@ header.addEventListener('onegov.header-resized', function (event) {
 
     // Slider
     if ($('.orbit.slider').length) {
-        var orbit_slider = $('.orbit-container');
+        var orbit_slider = $('.homepage-image-slider .orbit-container');
         var current_mobile_height = orbit_slider.data('height-m');
         var current_desktop_height = orbit_slider.data('height-d');
 

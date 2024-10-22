@@ -13,13 +13,12 @@ class TranslatorDirectoryTheme(TownTheme):
 
     @property
     def post_imports(self) -> list[str]:
-        return super().post_imports + [
-            'translator_directory'
-        ]
+        return [*super().post_imports, 'translator_directory']
 
     @property
     def extra_search_paths(self) -> list[str]:
         base_paths = super().extra_search_paths
         return [
-            module_path('onegov.translator_directory.theme', 'styles')
-        ] + base_paths
+            module_path('onegov.translator_directory.theme', 'styles'),
+            *base_paths
+        ]
