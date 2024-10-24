@@ -1,5 +1,7 @@
 from uuid import uuid4
 
+from sqlalchemy.ext.hybrid import hybrid_property
+
 from onegov.core.orm.mixins import TimestampMixin
 from sqlalchemy import Column, Text, Enum, Date, Integer, Boolean, Float
 from sqlalchemy.orm import backref, relationship
@@ -56,7 +58,9 @@ class Translator(Base, TimestampMixin, AssociatedFiles, ContentMixin,
         'email': {'type': 'text'}
     }
 
-    es_public = False
+    @hybrid_property
+    def es_public(self) -> bool:
+        return False
 
     id: 'Column[uuid.UUID]' = Column(
         UUID,  # type:ignore[arg-type]

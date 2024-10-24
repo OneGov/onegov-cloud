@@ -1,3 +1,5 @@
+from sqlalchemy.ext.hybrid import hybrid_property
+
 from onegov.core.orm import Base
 from onegov.core.orm.mixins import TimestampMixin
 from onegov.core.orm.types import UUID
@@ -17,7 +19,10 @@ class LegislativePeriod(Base, TimestampMixin, ORMSearchable):
 
     __tablename__ = 'pas_legislative_periods'
 
-    es_public = False
+    @hybrid_property
+    def es_public(self) -> bool:
+        return False
+
     es_properties = {'name': {'type': 'text'}}
 
     @property

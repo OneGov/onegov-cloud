@@ -65,7 +65,10 @@ class Attendee(Base, TimestampMixin, ORMSearchable):
         'name': {'type': 'text'},
         'notes': {'type': 'localized'}
     }
-    es_public = False
+
+    @hybrid_property
+    def es_public(self) -> bool:
+        return False
 
     @property
     def es_suggestion(self) -> str:

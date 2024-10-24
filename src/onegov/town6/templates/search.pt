@@ -15,7 +15,7 @@
                 <form class="searchbox" action="${request.link(model).split('?')[0]}" method="GET" data-typeahead="on" data-typeahead-source="${layout.suggestions_url}" data-typeahead-target="${layout.search_url}">
                 <label>${searchlabel}</label>
                 <div class="input-group">
-                    <input class="input-group-field" id="search" data-typeahead-subject type="search" name="q" value="${model.query}" autocomplete="off" autocorrect="off" required autofocus />
+                    <input class="input-group-field" id="search" data-typeahead-subject type="search" name="q" value="${model.web_search}" autocomplete="off" autocorrect="off" required autofocus />
                     <div class="input-group-button">
                         <button type="submit" class="button" aria-label="Search" i18n:attributes="aria-label">
                             <i class="fa fa-fw fa-search"></i>
@@ -29,7 +29,7 @@
             </div>
         </div>
 
-        <tal:b condition="connection and model.query">
+        <tal:b condition="connection and model.web_search">
             <h2 i18n:translate>${resultslabel}</h2>
             <div class="grid-x">
                 <div class="cell medium-8 small-12">

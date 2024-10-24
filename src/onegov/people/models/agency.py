@@ -1,3 +1,5 @@
+from sqlalchemy.ext.hybrid import hybrid_property
+
 from onegov.core.crypto import random_token
 from onegov.core.orm.abstract import AdjacencyList
 from onegov.core.orm.abstract import associated
@@ -64,7 +66,10 @@ class Agency(AdjacencyList, ContentMixin, TimestampMixin, ORMSearchable,
         'polymorphic_identity': 'generic',
     }
 
-    es_public = True
+    @hybrid_property
+    def es_public(self) -> bool:
+        return True
+
     es_properties = {
         'title': {'type': 'text'},
         'description': {'type': 'localized'},

@@ -1,3 +1,5 @@
+from sqlalchemy.ext.hybrid import hybrid_property
+
 from onegov.core.orm import Base
 from onegov.core.orm.mixins import dict_markup_property
 from onegov.core.orm.mixins import ContentMixin
@@ -21,7 +23,10 @@ class ParliamentaryGroup(Base, ContentMixin, TimestampMixin, ORMSearchable):
 
     __tablename__ = 'pas_parliamentary_groups'
 
-    es_public = False
+    @hybrid_property
+    def es_public(self) -> bool:
+        return False
+
     es_properties = {'name': {'type': 'text'}}
 
     @property

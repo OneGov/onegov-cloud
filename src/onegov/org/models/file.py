@@ -6,6 +6,9 @@ from datetime import datetime
 from dateutil.relativedelta import relativedelta
 from functools import cached_property
 from itertools import chain, groupby
+
+from sqlalchemy.ext.hybrid import hybrid_property
+
 from onegov.core.orm import as_selectable
 from onegov.core.orm.mixins import dict_property, meta_property
 from onegov.file import File, FileSet, FileCollection, FileSetCollection
@@ -17,14 +20,14 @@ from onegov.org.utils import widest_access
 from onegov.search import ORMSearchable
 from operator import itemgetter
 from sedate import standardize_date, utcnow
-from sqlalchemy import asc, desc, select, nullslast  # type: ignore
+from sqlalchemy import asc, desc, select, nullslast, and_, case  # type: ignore
 
 from typing import (
     overload, Any, Generic, Literal, NamedTuple, TypeVar, TYPE_CHECKING)
 if TYPE_CHECKING:
     from collections.abc import Callable, Iterable, Iterator
     from sqlalchemy.orm import Query, Session
-    from sqlalchemy.sql import Select
+    from sqlalchemy.sql import Select, ClauseElement
     from typing import Self
 
     _T = TypeVar('_T')
@@ -234,7 +237,7 @@ class GeneralFile(File, SearchableFile):
     linked_accesses: dict_property[dict[str, str]]
     linked_accesses = meta_property(default=dict)
 
-    @property
+    @hybrid_property
     def access(self) -> str:
         if self.publication:
             return 'public'
@@ -246,9 +249,29 @@ class GeneralFile(File, SearchableFile):
 
         return widest_access(*self.linked_accesses.values())
 
-    @property
+    @access.expression  # type:ignore[no-redef]
+    def access(cls):
+        return case([
+            (cls.publication == True, 'public'),
+            (cls.meta['linked_accesses'] == None, 'secret'),
+            (cls.meta['linked_accesses'].op('?')('public'), 'public'),
+            (cls.meta['linked_accesses'].op('?')('secret'), 'secret'),
+            (cls.meta['linked_accesses'].op('?')('mtan'), 'mtan'),
+            (cls.meta['linked_accesses'].op('?')('secret_mtan'),
+             'secret_mtan'),
+            (cls.meta['linked_accesses'].op('?')('member'), 'member'),
+        ], else_='private')
+
+    @hybrid_property
     def es_public(self) -> bool:
         return self.published and self.access == 'public'
+
+    @es_public.expression  # type:ignore[no-redef]
+    def es_public(cls) -> 'ClauseElement':
+        return and_(
+            cls.published == True,
+            cls.access == 'public'
+        )
 
 
 class ImageFile(File):
@@ -263,7 +286,7 @@ class ImageSet(FileSet, AccessExtension, ORMSearchable):
         'lead': {'type': 'localized'}
     }
 
-    @property
+    @hybrid_property
     def es_public(self) -> bool:
         return self.access == 'public'
 

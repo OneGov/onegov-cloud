@@ -1,4 +1,7 @@
 from datetime import datetime
+
+from sqlalchemy.ext.hybrid import hybrid_property
+
 from onegov.core.orm.mixins import (
     content_property, dict_markup_property, dict_property, meta_property)
 from onegov.form import Form, move_fields
@@ -28,6 +31,7 @@ from sqlalchemy.orm import undefer, object_session
 
 from typing import Any, TYPE_CHECKING
 if TYPE_CHECKING:
+    from sqlalchemy.sql import ClauseElement
     from onegov.org.request import OrgRequest, PageMeta
     from sqlalchemy.orm import Query, Session
 
@@ -56,9 +60,17 @@ class Topic(Page, TraitInfo, SearchableContent, AccessExtension,
     def es_skip(self) -> bool:
         return self.meta.get('trait') == 'link'  # do not index links
 
-    @property
+    @hybrid_property
     def es_public(self) -> bool:
         return self.access == 'public' and self.published
+
+    @es_public.expression  # type:ignore[no-redef]
+    def es_public(cls) -> 'ClauseElement':
+        retval = and_(
+            cls.meta['access'] == 'public',
+            cls.published == True
+        )
+        return retval
 
     @property
     def deletable(self) -> bool:
@@ -154,9 +166,16 @@ class News(Page, TraitInfo, SearchableContent, NewsletterExtension,
 
     hashtags: dict_property[list[str]] = meta_property(default=list)
 
-    @property
+    @hybrid_property
     def es_public(self) -> bool:
         return self.access == 'public' and self.published
+
+    @es_public.expression  # type:ignore[no-redef]
+    def es_public(cls) -> 'ClauseElement':
+        return and_(
+            cls.access == 'public',
+            cls.published == True
+        )
 
     @observes('content')
     def content_observer(self, content: dict[str, Any]) -> None:

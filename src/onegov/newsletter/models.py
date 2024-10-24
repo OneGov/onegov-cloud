@@ -1,4 +1,6 @@
 from email_validator import validate_email
+from sqlalchemy.ext.hybrid import hybrid_property
+
 from onegov.core.crypto import random_token
 from onegov.core.orm import Base
 from onegov.core.orm.mixins import (
@@ -54,7 +56,7 @@ class Newsletter(Base, ContentMixin, TimestampMixin, SearchableContent):
         'html': {'type': 'localized_html'}
     }
 
-    @property
+    @hybrid_property
     def es_public(self) -> bool:
         return self.sent is not None
 
