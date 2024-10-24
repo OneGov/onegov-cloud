@@ -1,5 +1,4 @@
 import pytest
-
 from depot.manager import DepotManager
 from onegov.core import Framework
 from onegov.core.framework import default_content_security_policy
@@ -59,6 +58,25 @@ def form_app(request):
 
     class Content:
         pass
+
+    @TestApp.webasset_path()
+    def get_js_path() -> str:
+        return 'assets'
+
+    @TestApp.webasset_path()
+    def get_css_path() -> str:
+        return 'assets'
+
+    @TestApp.webasset_output()
+    def get_webasset_output() -> str:
+        return 'assets'
+
+    @TestApp.webasset('react')
+    def get_react_asset():
+        yield 'react.production.min.js'
+        yield 'react-dom.production.min.js'
+        yield 'create-react-class.min.js'
+        yield 'font-awesome.min.css'
 
     @TestApp.setting(section='content_security_policy', name='default')
     def get_content_security_policy():

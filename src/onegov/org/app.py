@@ -684,6 +684,7 @@ def get_editor_asset() -> 'Iterator[str]':
 
 @OrgApp.webasset('timeline')
 def get_timeline_asset() -> 'Iterator[str]':
+    yield 'react-transition-group.js'
     yield 'timeline.jsx'
 
 
@@ -754,8 +755,9 @@ def get_common_asset() -> 'Iterator[str]':
     yield 'foundation.topbar.js'
     yield 'intercooler.js'
     yield 'underscore.js'
-    yield 'react.js'
-    yield 'react-dom.js'
+    yield 'react.min.js'
+    yield 'react-dom.min.js'
+    yield 'create-react-class.min.js'
     yield 'form_dependencies.js'
     yield 'confirm.jsx'
     yield 'typeahead.jsx'
