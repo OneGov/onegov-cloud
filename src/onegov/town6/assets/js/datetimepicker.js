@@ -65,7 +65,7 @@ var attach_button = function(input) {
     var small_column = 'small-1';
 
     if (input.is('.small')) {
-        large_column = 'small-10';
+        large_column = 'small-9';
         small_column = 'small-2';
     }
 

@@ -295,10 +295,6 @@ class OccasionFormLayout(DefaultLayout):
             Link(self.title, '#')
         ]
 
-    @cached_property
-    def editbar_links(self) -> None:
-        return None
-
 
 class VacationActivityLayout(DefaultLayout):
 

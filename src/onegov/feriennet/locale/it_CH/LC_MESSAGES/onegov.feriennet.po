@@ -2,7 +2,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: \n"
-"POT-Creation-Date: 2024-05-07 08:34+0200\n"
+"POT-Creation-Date: 2024-10-24 11:18+0200\n"
 "PO-Revision-Date: 2021-11-11 09:07+0100\n"
 "Last-Translator: Marc Sommerhalder <marc.sommerhalder@seantis.ch>\n"
 "Language-Team: \n"
@@ -1626,17 +1626,23 @@ msgstr "Durata"
 msgid "Municipalities"
 msgstr "Comuni"
 
+msgid "States"
+msgstr "Stato"
+
 msgid "Age"
 msgstr "Età"
+
+msgid "Price"
+msgstr "Prezzo"
+
+msgid "Free Spots"
+msgstr "Posti liberi"
 
 msgid "${min_age} - ${max_age} years"
 msgstr "${min_age} - ${max_age} anni"
 
 msgid "starting at ${price} CHF"
 msgstr "da ${price} CHF"
-
-msgid "Free Spots"
-msgstr "Posti liberi"
 
 msgid "No free spots"
 msgstr "Nessun posto libero"
@@ -1646,12 +1652,6 @@ msgstr "1 posto libero"
 
 msgid "${count} free spots"
 msgstr "${count} posti liberi"
-
-msgid "States"
-msgstr "Stato"
-
-msgid "Price"
-msgstr "Prezzo"
 
 msgid ""
 "This is a preview. Please edit it until you are satisifed with the result "
@@ -1678,6 +1678,9 @@ msgstr "Questa attività è stata archiviata."
 
 msgid "There are currently no occasions planned."
 msgstr "Attualmente non ci sono eventi pianificati."
+
+msgid "Other Occasions"
+msgstr "Altri eventi"
 
 msgid "The total amount is ${amount} CHF."
 msgstr "L'importo totale è di ${amount} CHF."
@@ -1999,6 +2002,9 @@ msgstr "Partner Feriennet"
 
 msgid "Privacy Protection"
 msgstr "Tutela della privacy"
+
+msgid "Login"
+msgstr ""
 
 msgid "Best of Swiss Web Award 2019"
 msgstr "Premio Best of Swiss Web 2019"
@@ -2860,20 +2866,6 @@ msgstr "La sua donazione è stata rimossa"
 msgid "This donation has already been paid"
 msgstr "La donazione è già stata pagata"
 
-msgid "Can not do matchings for an inactive period"
-msgstr "Le assegnazioni possono essere fatte solo in un periodo attivo"
-
-msgid "Can not do matchings for an confirmed period"
-msgstr ""
-"Le assegnazioni possono essere fatte solo in un periodo che non è stato "
-"confermato"
-
-msgid "The matching was confirmed successfully"
-msgstr "L'assegnazione è stata completata con successo"
-
-msgid "The matching run executed successfully"
-msgstr "La fase delle assegnazioni è stata completata con successo"
-
 msgid "Too many attendees"
 msgstr "Troppi partecipanti"
 
@@ -2888,6 +2880,20 @@ msgstr "Troppo pochi partecipanti"
 
 msgid "No attendees"
 msgstr "Nessun partecipante"
+
+msgid "Can not do matchings for an inactive period"
+msgstr "Le assegnazioni possono essere fatte solo in un periodo attivo"
+
+msgid "Can not do matchings for an confirmed period"
+msgstr ""
+"Le assegnazioni possono essere fatte solo in un periodo che non è stato "
+"confermato"
+
+msgid "The matching was confirmed successfully"
+msgstr "L'assegnazione è stata completata con successo"
+
+msgid "The matching run executed successfully"
+msgstr "La fase delle assegnazioni è stata completata con successo"
 
 #, python-format
 msgid "Matches for ${title}"

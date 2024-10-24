@@ -86,7 +86,8 @@ def occasions_by_period(
     session: 'Session',
     activity: Activity,
     show_inactive: bool,
-    show_archived: bool
+    show_archived: bool,
+    show_only_inactive: bool = False
 ) -> tuple[tuple[str, tuple[Occasion, ...]], ...]:
 
     query = OccasionCollection(session).query()
@@ -100,6 +101,9 @@ def occasions_by_period(
 
     if not show_archived:
         query = query.filter(Period.archived == False)
+
+    if show_only_inactive:
+        query = query.filter(Period.active == False)
 
     query = query.order_by(
         desc(Period.active),
@@ -867,6 +871,12 @@ def view_activity(
         'activity': self,
         'show_enroll': show_enroll,
         'occasion_links': occasion_links,
+        'occasions_current_period': occasions_by_period(
+            session=session,
+            activity=self,
+            show_inactive=False,
+            show_archived=False
+        ),
         'occasions_by_period': occasions_by_period(
             session=session,
             activity=self,
@@ -874,7 +884,8 @@ def view_activity(
             show_archived=request.is_admin or (
                 request.is_organiser
                 and self.username == request.current_username
-            )
+            ),
+            show_only_inactive=True
         ),
     }
 

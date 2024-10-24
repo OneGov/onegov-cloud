@@ -644,6 +644,21 @@
     </div>
 </metal:occasion>
 
+<metal:occasions-by-period define-macro="occasions_by_period" i18n:domain="onegov.feriennet">
+    <ul class="occasions">
+        <li tal:repeat="occasion occasions">
+            <h4><tal:b>${repeat.occasion.number}.</tal:b> <tal:b i18n:translate>Occasion</tal:b></h4>
+            <tal:b metal:use-macro="layout.macros.occasion" tal:define="show_links True; show_enroll show_enroll(occasion); show_needs request.is_admin" />
+        </li>
+    </ul>
+
+    <div class="panel">
+        <div class="hints">
+            <tal:b metal:use-macro="layout.macros.period_hints" />
+        </div>
+    </div>
+</metal:occasions-by-period>
+
 <metal:star define-macro="star" i18n:domain="onegov.feriennet">
     <tal:b condition="not booking.starred">
         <i id="star-${booking.id}" class="fa fa-star-o" aria-hidden="true"></i>

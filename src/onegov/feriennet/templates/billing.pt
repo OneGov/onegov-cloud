@@ -140,7 +140,7 @@
                     </div>
                 </div>
             </div>
-            <div class="large-4 medium-4 cell large-offset-1 sidebar">
+            <div class="medium-4 cell large-offset-1 sidebar">
                 <div class="sidebar-wrapper">
                     <div class="side-panel form-panel">
                         <h3 i18n:translate>Billing</h3>

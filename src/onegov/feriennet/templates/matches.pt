@@ -22,8 +22,8 @@
             </div>
         </div>
 
-        <div class="row">
-            <div class="columns small-12 medium-8">
+        <div class="grid-x grid-padding-x">
+            <div class="medium-8 large-7 cell content">
                 <tal:b repeat="occasion occasions">
                     <tal:b define="oid occasion.occasion_id">
                         <div class="matched-occasion matched-state-${occasion.state}"
@@ -95,16 +95,16 @@
                     </tal:b>
                 </tal:b>
             </div>
-            <div class="columns small-12 medium-4">
-                <div class="filter-panel">
-                    <div>
-                        <h4 class="filter-title" i18n:translate>State</h4>
+            <div class="medium-4 cell large-offset-1 sidebar">
+                <div class="side-panel">
+                    <div class="filter-panel">
+                        <h3 class="filter-title" i18n:translate>State</h3>
                         <div metal:use-macro="layout.macros['tags']" tal:define="tags filters['states']" />
                     </div>
                 </div>
 
                 <div class="side-panel form-panel">
-                    <h4 i18n:translate>Automatic Matching</h4>
+                    <h3 i18n:translate>Automatic Matching</h3>
 
                     <div class="form-panel-block">
                         <tal:b condition="period.active and period.wishlist_phase">

@@ -26,6 +26,7 @@ a > h6 {
 */
 .holiday-settings,
 .event-settings,
+.chat-settings,
 .api-keys,
 .gever-credentials,
 .grid-x.field-geo_provider,
@@ -233,18 +234,18 @@ ul.single-line {
     .accept-activity::before { @include icon('\f087'); }
     .archive-activity::before { @include icon('\f187'); }
     .feriennet-management::before { @include icon('\f274'); }
-    .import::before { @include icon('\f093'); }
+    .import::before { @include icon-bold('\f093'); }
     .manage-billing::before { @include icon-bold('\f0d6'); }
     .manage-matches::before { @include icon-bold('\f24e'); }
     .manage-periods::before { @include icon-bold('\f02d'); }
     .new-activity::before { @include icon-bold('\f135'); }
     .new-booking::before { @include icon-bold('\f1ec'); }
     .paid-date::before { @include icon('\f274'); }
-    .new-notification::before { @include icon('\f003'); }
+    .new-notification::before { @include icon-bold('\f0e0'); }
     .new-occasion::before { @include icon('\f133'); }
     .new-period::before { @include icon-bold('\f055'); }
-    .offer-again::before { @include icon('\f087'); }
-    .remove-manual::before { @include icon('\f014'); }
+    .offer-again::before { @include icon('\f164'); }
+    .remove-manual::before { @include icon-bold('\f1f8'); }
     .request-publication::before { @include icon('\f087'); }
     .reset-billing::before { @include icon('\f12d'); }
     .reset-matching::before { @include icon('\f12d'); }
@@ -359,6 +360,7 @@ footer {
     .page-lead {
         font-size: 1rem;
         margin-bottom: .5rem;
+        color: $charcoal;
     }
 
     ul.tags {
@@ -369,6 +371,7 @@ footer {
         font-size: .875rem;
         line-height: .875rem;
         margin-right: 3ex;
+        color: $charcoal;
 
         + span {
             white-space: nowrap;
@@ -399,15 +402,6 @@ footer {
         &.available-spots::before {
             margin-right: 3px;
         }
-    }
-}
-
-.filter-periods ul.tags li,
-.filter-weeks ul.tags li {
-    display: block;
-
-    &:first-child {
-        padding-top: 1px;
     }
 }
 
@@ -503,8 +497,8 @@ ul.tags {
     .hint-fairness::before { @include icon('\f24e'); }
     .hint-happiness::before { @include icon('\f118'); }
     .hint-operability::before { @include icon('\f058'); }
-    .hint-nobble::before { @include icon('\f046'); }
-    .hint-outstanding::before { @include icon('\f200'); }
+    .hint-nobble::before { @include icon-bold('\f14a'); }
+    .hint-outstanding::before { @include icon-bold('\f200'); }
     .hint-finalized::before { @include icon('\f256'); }
     .hint-minutes::before { @include icon('\f017'); }
     .hint-deadline::before { @include icon('\f05a'); }
@@ -581,7 +575,7 @@ ul.tags {
     }
 
     .organiser-website a::before {
-        @include icon('\f0c1');
+        @include icon-bold('\f0c1');
     }
 
     .organiser-phone,
@@ -639,6 +633,11 @@ ul.tags {
             display: inline-block;
             font-size: .875rem;
         }
+
+    }
+
+    > li {
+        margin-bottom: 2rem;
     }
 
     .call-to-action {
@@ -732,30 +731,10 @@ ul.tags {
         @include icon-bold('\f3c5');
     }
 
-    .age::before {
-        @include icon-bold('\f1ae');
-    }
-
-    .spots::before {
-        @include icon-bold('\f05a');
-        content: "what";
-    }
-
-    .cost::before {
-        @include icon-bold('\f0d6');
-    }
-
-    .text-links::before {
-        @include icon('\f192');
-    }
-
     .overlap-check::before {
         @include icon('\f017');
     }
 
-    .note::before {
-        @include icon('\f24a');
-    }
 
     .bring-cash::before {
         @include icon('\f0a2');
@@ -893,7 +872,6 @@ ul.tags {
 }
 
 .occasion {
-    margin-bottom: 2rem;
     padding-bottom: .5rem;
     position: relative;
 
@@ -1631,7 +1609,7 @@ $booking-left-margin: 2rem;
         }
 
         .meter-text::before {
-            @include icon('\f00d');
+            @include icon-bold('\f00d');
             color: $red;
             margin-right: 1ex;
         }
@@ -1697,8 +1675,13 @@ $booking-left-margin: 2rem;
 /*
     Billing View
 */
-#page-billing .f-dropdown {
-    max-width: 350px;
+#page-billing .is-submenu-item {
+    max-width: 400px;
+    a {
+        overflow: hidden;
+        text-overflow: ellipsis;
+        white-space: nowrap;
+    }
 }
 
 .billing {
@@ -1843,7 +1826,7 @@ $booking-left-margin: 2rem;
     }
 
     .mark-unpaid::before {
-        @include icon('\f071');
+        @include icon-bold('\f071');
         margin-right: 1.25ex;
     }
 
@@ -1853,22 +1836,22 @@ $booking-left-margin: 2rem;
     }
 
     .remove-manual::before {
-        @include icon('\f014');
+        @include icon('\f1f8');
         margin-right: 1.25ex;
     }
 
     .remove-manual.extend-to-family::before {
-        @include icon-bold('\f1f8');
+        @include icon('\f1f8');
         margin-right: 1.25ex;
     }
 
     .show-invoice::before {
-        @include icon('\f002');
+        @include icon-bold('\f002');
         margin-right: 1.25ex;
     }
 
     .new-booking::before {
-        @include icon('\f1ec');
+        @include icon-bold('\f1ec');
         margin-right: 1.25ex;
     }
 
@@ -2266,7 +2249,7 @@ li.unpaid {
     margin-bottom: .5rem;
 
     &::before {
-        @include icon('\f003');
+        @include icon-bold('\f0e0');
         display: inline-block;
         font-size: 1.1rem;
         margin-right: .5rem;
@@ -2642,39 +2625,17 @@ li.unpaid {
 }
 
 /*
-    Occasions toggle
+    Occasions
 */
 .occasions-by-period {
     margin-bottom: .5rem;
-}
-
-.title-with-toggle {
-    display: flex;
-
-    .toggle {
-        color: $anchor-font-color;
-        font-size: 1.25rem;
-        line-height: 2.5rem;
-        margin-right: .5rem;
-        width: 1.25rem;
-    }
-
-    .fa {
-        cursor: pointer;
-    }
-
-    .toggle-off {
-        display: none;
-    }
-
-    .toggled .toggle-on {
-        display: none;
-    }
-
-    .toggled .toggle-off {
-        display: inline-block;
+    .accordion-title {
+        font-size: 1rem;
+        padding-right: 2.5rem;
+        line-height: 1.5;
     }
 }
+
 
 /*
     Group invites
@@ -2878,8 +2839,7 @@ li.unpaid {
     }
 
     h5 {
-        border-bottom: 1px solid $gray;
-        padding-bottom: .5rem;
+        font-size: 1rem;
     }
 
     > ul {
@@ -2996,10 +2956,6 @@ li.unpaid {
         display: block;
         font-size: .875rem;
         margin-bottom: 1rem;
-
-        &::before {
-            @include icon('\f176');
-        }
     }
 }
 
@@ -3288,4 +3244,11 @@ li.unpaid {
 */
 .visually-hidden {
     @include element-invisible;
+}
+
+/*
+    Images
+*/
+.page-text img {
+    border-radius: .7rem;
 }

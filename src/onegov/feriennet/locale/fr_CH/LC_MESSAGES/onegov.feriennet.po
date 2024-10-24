@@ -2,7 +2,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE 1.0\n"
-"POT-Creation-Date: 2024-05-07 08:34+0200\n"
+"POT-Creation-Date: 2024-10-24 11:18+0200\n"
 "PO-Revision-Date: 2021-11-11 09:07+0100\n"
 "Last-Translator: Marc Sommerhalder <marc.sommerhalder@seantis.ch>\n"
 "Language-Team: French\n"
@@ -1632,17 +1632,23 @@ msgstr "Durée"
 msgid "Municipalities"
 msgstr "Communes"
 
+msgid "States"
+msgstr "États"
+
 msgid "Age"
 msgstr "Âge"
+
+msgid "Price"
+msgstr "Prix"
+
+msgid "Free Spots"
+msgstr "Places disponibles"
 
 msgid "${min_age} - ${max_age} years"
 msgstr "${min_age} - ${max_age} ans"
 
 msgid "starting at ${price} CHF"
 msgstr "supplément de ${price} CHF"
-
-msgid "Free Spots"
-msgstr "Places disponibles"
 
 msgid "No free spots"
 msgstr "Pas de places disponibles"
@@ -1652,12 +1658,6 @@ msgstr "1 place disponible"
 
 msgid "${count} free spots"
 msgstr "${count} places disponibles"
-
-msgid "States"
-msgstr "États"
-
-msgid "Price"
-msgstr "Prix"
 
 msgid ""
 "This is a preview. Please edit it until you are satisifed with the result "
@@ -1686,6 +1686,9 @@ msgstr "Cette activité a été archivée."
 
 msgid "There are currently no occasions planned."
 msgstr "Il n'y a actuellement aucun événement programmé."
+
+msgid "Other Occasions"
+msgstr "Autres événements"
 
 msgid "The total amount is ${amount} CHF."
 msgstr "Le montant total est de ${amount} CHF."
@@ -2014,6 +2017,9 @@ msgstr "Partenaire de Réseau vacances"
 
 msgid "Privacy Protection"
 msgstr "Protection des données"
+
+msgid "Login"
+msgstr ""
 
 msgid "Best of Swiss Web Award 2019"
 msgstr "Prix du Best of Swiss Web 2019"
@@ -2877,21 +2883,6 @@ msgstr "Votre don a été supprimé"
 msgid "This donation has already been paid"
 msgstr "Ce don a déjà été payé"
 
-msgid "Can not do matchings for an inactive period"
-msgstr ""
-"L'attribution par l'algorithme est seulement possible pour une période active"
-
-msgid "Can not do matchings for an confirmed period"
-msgstr ""
-"L'attribution par l'algorithme n'est pas possible pour une période non "
-"confirmée"
-
-msgid "The matching was confirmed successfully"
-msgstr "L'attribution par l'algorithme est terminée avec succès"
-
-msgid "The matching run executed successfully"
-msgstr "Les attributions ont été effectuées avec succès"
-
 msgid "Too many attendees"
 msgstr "Trop de participants"
 
@@ -2906,6 +2897,21 @@ msgstr "Pas assez de participant·e·s"
 
 msgid "No attendees"
 msgstr "Pas de participant·e·s"
+
+msgid "Can not do matchings for an inactive period"
+msgstr ""
+"L'attribution par l'algorithme est seulement possible pour une période active"
+
+msgid "Can not do matchings for an confirmed period"
+msgstr ""
+"L'attribution par l'algorithme n'est pas possible pour une période non "
+"confirmée"
+
+msgid "The matching was confirmed successfully"
+msgstr "L'attribution par l'algorithme est terminée avec succès"
+
+msgid "The matching run executed successfully"
+msgstr "Les attributions ont été effectuées avec succès"
 
 #, python-format
 msgid "Matches for ${title}"
