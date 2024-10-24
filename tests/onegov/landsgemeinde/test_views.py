@@ -117,7 +117,7 @@ def test_views(client_with_es):
     assert '<p>Nisi ut aliquip.</p>' in page
     assert '<p>Ex ea commodo consequat.</p>' in page
     assert '2m3s' in page
-    assert 'start=123' in page
+    assert 'data-timestamp="123"' in page
     assert_last_modified()
 
     # edit votum
@@ -128,7 +128,7 @@ def test_views(client_with_es):
         page = page.form.submit().follow()
     assert 'Joe Quimby' in page
     assert '1h2m5s' in page
-    assert 'start=3725' in page
+    assert 'data-timestamp="3725"' in page
     assert_last_modified()
 
     # open data

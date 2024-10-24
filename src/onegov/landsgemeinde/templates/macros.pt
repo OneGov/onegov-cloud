@@ -100,7 +100,7 @@
                 </ul>
             </div>
             <div class="video-link" tal:define="votum_timestamp (votum.video_timestamp or votum.calculated_timestamp)">
-                <a tal:condition="votum_timestamp" href="${append_query_param(request.url, 'start', timestamp_to_seconds(votum_timestamp))}">
+                <a tal:condition="votum_timestamp" data-timestamp="${timestamp_to_seconds(votum_timestamp)}" href="#content">
                     <i class="far fa-play-circle"></i>
                     <tal:b i18n:translate="">${votum_timestamp}</tal:b>
                 </a>
