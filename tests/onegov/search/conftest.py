@@ -3,7 +3,7 @@ from pytest import fixture
 from yaml import dump
 
 from onegov.core import Framework
-from onegov.search import ElasticsearchApp
+from onegov.search import SearchApp
 
 from tests.shared.utils import create_app
 
@@ -46,7 +46,7 @@ def cfg_path(postgres_dsn, session_manager, temporary_directory, redis_url):
     return cfg_path
 
 
-class TestApp(Framework, ElasticsearchApp):
+class TestApp(Framework, SearchApp):
     pass
 
 

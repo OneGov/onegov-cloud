@@ -52,7 +52,7 @@ class Searchable:
     """
 
     TEXT_SEARCH_COLUMN_NAME = 'fts_idx'
-    TEXT_SEARCH_DATA_COLUMN_NAME = 'fts_idx_data'
+    # TEXT_SEARCH_DATA_COLUMN_NAME = 'fts_idx_data'
 
     if TYPE_CHECKING:
         # NOTE: This doesn't really have a Python representation, unless
