@@ -23,7 +23,7 @@ from sqlalchemy.orm import undefer
 from urllib3.exceptions import HTTPError
 
 
-from typing import Any, Literal, TYPE_CHECKING, List
+from typing import Any, Literal, TYPE_CHECKING
 
 if TYPE_CHECKING:
     from collections.abc import Callable, Iterable
@@ -431,7 +431,7 @@ class SearchApp(morepath.App):
 
         """
         # prevent tables get re-indexed twice
-        index_done: List[str] = []
+        index_done: list[str] = []
         schema = self.schema
         index_log.info(f'Indexing schema {schema}..')
 

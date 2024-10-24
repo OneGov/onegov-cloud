@@ -1,6 +1,7 @@
 from sqlalchemy import Column
-from sqlalchemy.dialects.postgresql import TSVECTOR
+from sqlalchemy.dialects.postgresql import TSVECTOR, JSONB
 from sqlalchemy.ext.declarative import declared_attr
+from sqlalchemy.ext.hybrid import hybrid_property
 from sqlalchemy.orm import deferred
 
 from onegov.search.utils import classproperty
@@ -52,7 +53,7 @@ class Searchable:
     """
 
     TEXT_SEARCH_COLUMN_NAME = 'fts_idx'
-    # TEXT_SEARCH_DATA_COLUMN_NAME = 'fts_idx_data'
+    TEXT_SEARCH_DATA_COLUMN_NAME = 'fts_idx_data'
 
     if TYPE_CHECKING:
         # NOTE: This doesn't really have a Python representation, unless
@@ -74,6 +75,17 @@ class Searchable:
         if hasattr(cls, '__table__') and hasattr(cls.__table__.c, col_name):
             return deferred(cls.__table__.c.fts_idx)
         return deferred(Column(col_name, TSVECTOR))
+
+    @declared_attr  # type:ignore[no-redef]
+    def fts_idx_data(cls) -> 'Column[object]':
+        """ This column holds all the properties including its values
+        important for full text search.
+        """
+
+        col_name = Searchable.TEXT_SEARCH_DATA_COLUMN_NAME
+        if hasattr(cls, '__table__') and hasattr(cls.__table__.c, col_name):
+            return deferred(cls.__table__.c.fts_idx_data)
+        return deferred(Column(col_name, JSONB, default={}))
 
     # TODO: rename to fts_properties
     @classproperty  # type:ignore[no-redef]
@@ -135,7 +147,7 @@ class Searchable:
         return 'auto'
 
     # TODO: rename to fts_public
-    @property
+    @hybrid_property
     def es_public(self) -> bool:
         """ Returns True if the model is available to be found by the public.
         If false, only editors/admins will see this object in the search
@@ -210,12 +222,13 @@ class SearchableContent(ORMSearchable):
     """
 
     es_properties = {
+        'es_public': {'type': 'boolean'},
         'title': {'type': 'localized'},
         'lead': {'type': 'localized'},
         'text': {'type': 'localized_html'}
     }
 
-    @property
+    @hybrid_property
     def es_public(self) -> bool:
         return self.access == 'public'  # type:ignore[attr-defined]
 

@@ -69,18 +69,18 @@ def search_postgres(
 ) -> 'RenderData | Response':
     layout = layout or DefaultLayout(self, request)
     assert isinstance(layout.breadcrumbs, list)
-    layout.breadcrumbs.append(Link(_("Search"), '#'))
+    layout.breadcrumbs.append(Link(_('Search'), '#'))
 
     try:
-        searchlabel = _("Search through ${count} indexed documents", mapping={
+        searchlabel = _('Search through ${count} indexed documents', mapping={
             'count': self.available_documents
         })
-        resultslabel = _("${count} Results", mapping={
+        resultslabel = _('${count} Results', mapping={
             'count': self.available_results
         })
     except SearchOfflineError:
         return {
-            'title': _("Search Unavailable"),
+            'title': _('Search Unavailable'),
             'layout': layout,
             'connection': False
         }
@@ -93,7 +93,7 @@ def search_postgres(
 
     return {
         # TODO switch back to 'Search' once es is gone
-        'title': _("Org Search Postgres"),
+        'title': _('Org Search Postgres'),
         'model': self,
         'layout': layout,
         'hide_search_header': True,

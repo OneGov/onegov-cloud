@@ -362,6 +362,8 @@ class Indexer(IndexerBase):
 class PostgresIndexer(IndexerBase):
 
     TEXT_SEARCH_COLUMN_NAME = 'fts_idx'
+    TEXT_SEARCH_DATA_COLUMN_NAME = 'fts_idx_data'
+
     idx_language_mapping = {
         'de': 'german',
         'fr': 'french',
@@ -411,15 +413,22 @@ class PostgresIndexer(IndexerBase):
                     self.idx_language_mapping.get(task['language'], 'simple'))
 
                 for k, v in task['properties'].items():
-                    if not k.startswith('es_') and v:
+                    if (not k.startswith('es_') or k == 'es_public') and v:
                         if isinstance(v, list):
                             v = ' '.join(v)
+                        if isinstance(v, bool):
+                            v = str(v)
 
                         # 'unaccent' the index data in order to find words
                         # with umlaut ect.
                         data[k] = unidecode(v)
 
                 _id = task['id']
+                if 'es_public' in data:
+                    pass
+                    print('*** tschupre data[es_public]:', data['es_public'])
+                else:
+                    print('*** tschupre data[es_public]:', 'not found')
                 content.append(
                     {'language': language, 'data': data, '_id': _id})
 
@@ -431,6 +440,7 @@ class PostgresIndexer(IndexerBase):
                 (id_col := sqlalchemy
                     .column(id_key)),  # type: ignore[var-annotated]
                 sqlalchemy.column(self.TEXT_SEARCH_COLUMN_NAME),
+                sqlalchemy.column(self.TEXT_SEARCH_DATA_COLUMN_NAME),
                 schema=schema  # type: ignore
             )
             tsvector_expr = sqlalchemy.text(
@@ -438,11 +448,18 @@ class PostgresIndexer(IndexerBase):
                 sqlalchemy.bindparam('language', type_=sqlalchemy.String),
                 sqlalchemy.bindparam('data', type_=sqlalchemy.JSON)
             )
+
             stmt = (
                 sqlalchemy.update(table)
                 .where(id_col == sqlalchemy.bindparam('_id'))
-                .values({self.TEXT_SEARCH_COLUMN_NAME: tsvector_expr})
+                .values({
+                    self.TEXT_SEARCH_COLUMN_NAME: tsvector_expr,
+                    self.TEXT_SEARCH_DATA_COLUMN_NAME:
+                    sqlalchemy.bindparam('data', type_=sqlalchemy.JSON)
+                })
             )
+            print('*** tschupre stmt:', stmt)
+
             if session is None:
                 connection = self.engine.connect()
                 with connection.begin():
@@ -920,6 +937,9 @@ class ORMEventTranslator:
     def index(self, schema: str, obj: Searchable) -> None:
         if obj.es_skip:
             return
+        # tschupre for testing
+        if not obj.__tablename__ in ['pages']:
+            return
 
         if obj.es_language == 'auto':
             language = self.detector.detect_object_language(obj)
@@ -941,7 +961,7 @@ class ORMEventTranslator:
 
         for prop, mapping in mapping_.items():
 
-            if prop == 'es_suggestion':
+            if prop in ['es_last_change', 'es_tags', 'es_suggestion']:
                 continue
 
             convert = self.converters.get(mapping['type'], lambda v: v)
@@ -970,6 +990,7 @@ class ORMEventTranslator:
                 'contexts': contexts
             }
 
+        assert 'es_public' in translation['properties']
         self.put(translation)
 
     def delete(self, schema: str, obj: Searchable) -> None:

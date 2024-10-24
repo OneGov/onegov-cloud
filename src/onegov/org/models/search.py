@@ -6,7 +6,7 @@ from elasticsearch_dsl.query import MultiMatch
 from functools import cached_property
 from sedate import utcnow
 from sqlalchemy import func
-from typing import TYPE_CHECKING, Any, List
+from typing import TYPE_CHECKING, Any
 
 from onegov.core.collection import Pagination, _M
 from onegov.core.orm import Base
@@ -216,7 +216,7 @@ class SearchPostgres(Pagination[_M]):
             return NotImplemented
         return self.page == other.page and self.web_search == other.web_search
 
-    def subset(self) -> 'List[Searchable] | None':  # type:ignore[override]
+    def subset(self) -> 'list[Searchable] | None':  # type:ignore[override]
         return self.batch
 
     @property
@@ -227,7 +227,7 @@ class SearchPostgres(Pagination[_M]):
         return SearchPostgres(self.request, self.web_search, index)
 
     @cached_property
-    def batch(self) -> 'List[Searchable]':  # type:ignore[override]
+    def batch(self) -> 'list[Searchable]':  # type:ignore[override]
         if not self.web_search:
             return []
 
@@ -246,9 +246,9 @@ class SearchPostgres(Pagination[_M]):
         actual search results form the query.
 
         """
-        batch: List[Searchable] = self.batch
-        future_events: List[Searchable] = []
-        other: List[Searchable] = []
+        batch: list[Searchable] = self.batch
+        future_events: list[Searchable] = []
+        other: list[Searchable] = []
 
         for search_result in batch:
             if (isinstance(search_result, Event)
@@ -297,7 +297,7 @@ class SearchPostgres(Pagination[_M]):
 
     def generic_search(self) -> list['Searchable']:
         doc_count = 0
-        results: List[Any] = []
+        results: list[Any] = []
         language = locale_mapping(self.request.locale or 'de_CH')
         ts_query = func.websearch_to_tsquery(language,
                                              func.unaccent(self.web_search))
@@ -305,10 +305,12 @@ class SearchPostgres(Pagination[_M]):
 
         for base in self.request.app.session_manager.bases:
             for model in searchable_sqlalchemy_models(base):
-                if model.es_public or self.request.is_logged_in:
+                if model.es_public or self.request.is_logged_in:  # needed?
                     query = session.query(model)
                     if not self.request.is_logged_in:
-                        query = query.filter(model.es_public == True)
+                        # query = query.filter(model.es_public == True)
+                        query = query.filter(
+                            model.fts_idx_data['es_public'].astext == 'True')
 
                     if session.query(query.exists()).scalar():
                         weighted = (

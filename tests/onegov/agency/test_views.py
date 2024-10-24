@@ -2,7 +2,6 @@ from datetime import datetime
 from datetime import timedelta
 from io import BytesIO
 
-import pytest
 from markupsafe import Markup
 from onegov.agency.models import ExtendedAgency
 from onegov.agency.models import ExtendedAgencyMembership

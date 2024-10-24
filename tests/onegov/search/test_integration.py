@@ -5,7 +5,6 @@ import transaction
 from datetime import timedelta
 from elasticsearch_dsl.function import SF
 from elasticsearch_dsl.query import MatchPhrase, FunctionScore
-from sqlalchemy.ext.hybrid import hybrid_property
 
 from onegov.core import Framework
 from onegov.core.orm.mixins import TimestampMixin
@@ -59,7 +58,7 @@ def test_search_query(es_url, postgres_dsn):
         def es_suggestion(self):
             return self.title
 
-        @property
+        @hybrid_property
         def es_public(self):
             return self.public
 
@@ -528,7 +527,7 @@ def test_suggestions(es_url, postgres_dsn):
             'title': {'type': 'localized'}
         }
 
-        @property
+        @hybrid_property
         def es_public(self):
             return self.public
 
