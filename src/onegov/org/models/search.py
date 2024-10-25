@@ -341,7 +341,7 @@ class SearchPostgres(Pagination[_M]):
         q = self.web_search.lstrip('#')
         results = []
 
-        # Skip certain tables for hashtag search
+        # Skip certain tables for hashtag search for better performance
         results = [
             doc for model in searchable_sqlalchemy_models(Base)
             if model.es_type_name not in

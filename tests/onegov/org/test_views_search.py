@@ -6,7 +6,6 @@ from datetime import date
 from datetime import datetime
 from datetime import timedelta
 
-
 from onegov.core.utils import module_path
 from onegov.file import FileCollection
 from onegov.form import FormCollection
