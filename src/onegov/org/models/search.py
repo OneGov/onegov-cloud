@@ -97,23 +97,23 @@ class Search(Pagination[_M]):
 
         assert self.batch is not None
         batch = self.batch.load()
-        events = []
-        non_events = []
+        future_events = []
+        others = []
 
         for search_result in batch:
             if isinstance(search_result, Event):
-                events.append(search_result)
+                future_events.append(search_result)
             else:
-                non_events.append(search_result)
+                others.append(search_result)
 
-        if not events:
+        if not future_events:
             return batch
 
         sorted_events = sorted(
-            events,
+            future_events,
             key=get_sort_key
         )
-        return sorted_events + non_events
+        return sorted_events + others
 
     def generic_search(
         self,
