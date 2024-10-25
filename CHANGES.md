@@ -1,8 +1,81 @@
 # Changes
 
+## 2024.51
+
+`2024-10-25` | [70697c790f...e8a804f646](https://github.com/OneGov/onegov-cloud/compare/70697c790f^...e8a804f646)
+
+### Electionday
+
+##### Fixes license portion of catalog.rdf for Open Data Swiss
+
+This also fixes the same bug for Landsgemeinde
+
+`Bugfix` | [OGC-1729](https://linear.app/onegovcloud/issue/OGC-1729) | [0d5f068dd1](https://github.com/onegov/onegov-cloud/commit/0d5f068dd19aebddbad08fc231f0ace19db81d84)
+
+### Fsi
+
+##### Fix link pointing to 404.
+
+`Bugfix` | [OGC-1885](https://linear.app/onegovcloud/issue/OGC-1885) | [4ee63be294](https://github.com/onegov/onegov-cloud/commit/4ee63be2945871f8c4c5ccc382954110aeea21a4)
+
+### Landsgemeinde
+
+##### Remove Label "Antrag"
+
+`Feature` | [OGC-1846](https://linear.app/onegovcloud/issue/OGC-1846) | [54af2cd666](https://github.com/onegov/onegov-cloud/commit/54af2cd66613bf3165ea7b7a3974a2420f47bf18)
+
+##### Open Data Page
+
+`Feature` | [OGC-1704](https://linear.app/onegovcloud/issue/OGC-1704) | [8b5e7a7c85](https://github.com/onegov/onegov-cloud/commit/8b5e7a7c850fa2e9905cf5525b2c648ce4070fcd)
+
+### Org
+
+##### Ticket Permissions for Directories
+
+Ticket permissions can now be set for single directories.
+
+`Feature` | [OGC-1775](https://linear.app/onegovcloud/issue/OGC-1775) | [6f9d132a3e](https://github.com/onegov/onegov-cloud/commit/6f9d132a3e772fdae4253529f53794df51038bca)
+
+##### Fixes removing linked people from an unordered list
+
+`Bugfix` | [OGC-1883](https://linear.app/onegovcloud/issue/OGC-1883) | [bdc57edeb2](https://github.com/onegov/onegov-cloud/commit/bdc57edeb23e20d6a09dbe0bd5f079648263872f)
+
+##### Make newsletters subscribers import more robust.
+
+`Bugfix` | [OGC-1829](https://linear.app/onegovcloud/issue/OGC-1829) | [6b8516b668](https://github.com/onegov/onegov-cloud/commit/6b8516b668608f87acc0a9f4c259c0d494d76c71)
+
+### Town6
+
+##### Unify the look of the side-panel actions
+
+`Feature` | [OGC-1855](https://linear.app/onegovcloud/issue/OGC-1855) | [70697c790f](https://github.com/onegov/onegov-cloud/commit/70697c790f43597461a02657950728ab36b38020)
+
+##### Redesign the find your spot option
+
+`Feature` | [OGC-1831](https://linear.app/onegovcloud/issue/OGC-1831) | [ad4def92d1](https://github.com/onegov/onegov-cloud/commit/ad4def92d1958368d17811fe376b9f1dd659d501)
+
+##### Add Upload Button to Dropzone
+
+`Feature` | [OGC-1848](https://linear.app/onegovcloud/issue/OGC-1848) | [4dbbbbe6a2](https://github.com/onegov/onegov-cloud/commit/4dbbbbe6a2fd9f0a9adff5241d6378cd98c3d4a8)
+
+##### Adds organisation logo to transactional emails if available
+
+`Feature` | [OGC-1733](https://linear.app/onegovcloud/issue/OGC-1733) | [f0388158f2](https://github.com/onegov/onegov-cloud/commit/f0388158f2208af9f3bb7146aaa6bac05f661d4a)
+
+### Translator
+
+##### Add command to recreate languages
+
+```
+onegov-translator --select /translator_directory/schaffhausen create-languages --dry-run
+onegov-translator --select /translator_directory/schaffhausen force-delete-languages --dry-run
+```
+
+`Feature` | [OGC-1873](https://linear.app/onegovcloud/issue/OGC-1873) | [b2870a79a1](https://github.com/onegov/onegov-cloud/commit/b2870a79a113533ec17cdd43a192c30d27759941)
+
 ## 2024.50
 
-`2024-10-11` | [3f9655c562...eb0d0926ed](https://github.com/OneGov/onegov-cloud/compare/3f9655c562^...eb0d0926ed)
+`2024-10-11` | [3f9655c562...6d17e690a8](https://github.com/OneGov/onegov-cloud/compare/3f9655c562^...6d17e690a8)
 
 ### Fsi
 
@@ -2137,20 +2210,4 @@ Use two columns to display people and don't display icons if person has no image
 Use different script for fixed sidebar on scroll.
 
 `Bugfix` | [OGC-1390](https://linear.app/onegovcloud/issue/OGC-1390) | [d6ccc6b274](https://github.com/onegov/onegov-cloud/commit/d6ccc6b2746c508f60e089259a1e5a50cd098fa2)
-
-## 2024.1
-
-`2024-01-05` | [3e39a88295...42efb33f07](https://github.com/OneGov/onegov-cloud/compare/3e39a88295^...42efb33f07)
-
-### Org
-
-##### Don't send an mTAN report if no mTANs have been created
-
-`Bugfix` | [OGC-1340](https://linear.app/onegovcloud/issue/OGC-1340) | [1d92659e8b](https://github.com/onegov/onegov-cloud/commit/1d92659e8b79f5de8b82e6f087c6719922fa3070)
-
-### Topics
-
-##### Extend feature 'western name order' to resources and default variable in template
-
-`Bugfix` | [OGC-1383](https://linear.app/onegovcloud/issue/OGC-1383) | [d67dbc756f](https://github.com/onegov/onegov-cloud/commit/d67dbc756f14d0756ca52c4af453191c64b8ce54)
 
