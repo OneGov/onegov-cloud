@@ -407,28 +407,14 @@ class PostgresIndexer(IndexerBase):
 
         try:
             for task in tasks:
-                data = {}
-
                 language = (
                     self.idx_language_mapping.get(task['language'], 'simple'))
-
-                for k, v in task['properties'].items():
-                    if (not k.startswith('es_') or k == 'es_public') and v:
-                        if isinstance(v, list):
-                            v = ' '.join(v)
-                        if isinstance(v, bool):
-                            v = str(v)
-
-                        # 'unaccent' the index data in order to find words
-                        # with umlaut ect.
-                        data[k] = unidecode(v)
-
+                data = {
+                    k: unidecode(str(v))
+                    for k, v in task['properties'].items()
+                    if not k.startswith('es_')}
                 _id = task['id']
-                if 'es_public' in data:
-                    pass
-                    print('*** tschupre data[es_public]:', data['es_public'])
-                else:
-                    print('*** tschupre data[es_public]:', 'not found')
+
                 content.append(
                     {'language': language, 'data': data, '_id': _id})
 
