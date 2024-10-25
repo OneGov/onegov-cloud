@@ -458,7 +458,6 @@ class PostgresIndexer(IndexerBase):
                     sqlalchemy.bindparam('data', type_=sqlalchemy.JSON)
                 })
             )
-            print('*** tschupre stmt:', stmt)
 
             if session is None:
                 connection = self.engine.connect()
@@ -928,17 +927,16 @@ class ORMEventTranslator:
     def put(self, translation: 'Task') -> None:
         try:
             self.es_queue.put_nowait(translation)
+
             if translation['action'] == 'index':
                 # we only need to provide index tasks for psql fts
                 self.psql_queue.put_nowait(translation)
         except Full:
             log.error('The orm event translator queue is full!')
 
+
     def index(self, schema: str, obj: Searchable) -> None:
         if obj.es_skip:
-            return
-        # tschupre for testing
-        if not obj.__tablename__ in ['pages']:
             return
 
         if obj.es_language == 'auto':
@@ -961,7 +959,7 @@ class ORMEventTranslator:
 
         for prop, mapping in mapping_.items():
 
-            if prop in ['es_last_change', 'es_tags', 'es_suggestion']:
+            if prop == 'es_suggestion':
                 continue
 
             convert = self.converters.get(mapping['type'], lambda v: v)
@@ -990,7 +988,6 @@ class ORMEventTranslator:
                 'contexts': contexts
             }
 
-        assert 'es_public' in translation['properties']
         self.put(translation)
 
     def delete(self, schema: str, obj: Searchable) -> None:

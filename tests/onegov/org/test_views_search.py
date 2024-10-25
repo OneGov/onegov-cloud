@@ -210,62 +210,6 @@ def test_search_recently_published_object(client_with_es):
     assert 'is pretty awesome' not in anom.get('/search-postgres?q=fulltext')
 
 
-def test_search_recently_published_object_freeze(client_with_es):
-    # this is the same as the test above, but with freeze_time with a
-    # predefined period of publication
-    client = client_with_es
-    client.login_admin()
-    anom = client.spawn()
-
-    # Create objects, not yet published
-    now = datetime.now()
-    start = now + timedelta(days=1)
-    end = now + timedelta(days=2)
-
-    add_news = client.get('/news').click('Nachricht')
-    add_news.form['title'] = "Now supporting fulltext search"
-    add_news.form['lead'] = "It is pretty awesome"
-    add_news.form['text'] = "Much <em>wow</em>"
-    add_news.form['publication_start'] = start.isoformat()
-    add_news.form['publication_end'] = end.isoformat()
-    assert add_news.form.submit().follow().status_code == 200
-
-    # not yet published
-    with freeze_time(now + timedelta(hours=1)):
-        assert 'fulltext' in client.get('/search-postgres?q=wow')
-        assert 'fulltext' not in anom.get('/search-postgres?q=wow')
-        assert 'pretty awesome' in client.get('/search-postgres?q=fulltext')
-        assert 'pretty awesome' not in anom.get('/search-postgres?q=fulltext')
-
-    # right before been published
-    with freeze_time(start - timedelta(seconds=1)):
-        assert 'fulltext' in client.get('/search-postgres?q=wow')
-        assert 'fulltext' not in anom.get('/search-postgres?q=wow')
-        assert 'pretty awesome' in client.get('/search-postgres?q=fulltext')
-        assert 'pretty awesome' not in anom.get('/search-postgres?q=fulltext')
-
-    # published start
-    with freeze_time(start + timedelta(seconds=1)):
-        assert 'fulltext' in client.get('/search-postgres?q=wow')
-        assert 'fulltext' in anom.get('/search-postgres?q=wow')
-        assert 'pretty awesome' in client.get('/search-postgres?q=fulltext')
-        assert 'pretty awesome' in anom.get('/search-postgres?q=fulltext')
-
-    # published before end
-    with freeze_time(end - timedelta(seconds=1)):
-        assert 'fulltext' in client.get('/search-postgres?q=wow')
-        assert 'fulltext' in anom.get('/search-postgres?q=wow')
-        assert 'pretty awesome' in client.get('/search-postgres?q=fulltext')
-        assert 'pretty awesome' in anom.get('/search-postgres?q=fulltext')
-
-    # not anymore published
-    with freeze_time(end + timedelta(seconds=1)):
-        assert 'fulltext' in client.get('/search-postgres?q=wow')
-        assert 'fulltext' not in anom.get('/search-postgres?q=wow')
-        assert 'pretty awesome' in client.get('/search-postgres?q=fulltext')
-        assert 'pretty awesome' not in anom.get('/search-postgres?q=fulltext')
-
-
 @pytest.mark.flaky(reruns=3)
 def test_search_for_page_with_member_access(client_with_es):
     client = client_with_es

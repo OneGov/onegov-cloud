@@ -222,7 +222,6 @@ class SearchableContent(ORMSearchable):
     """
 
     es_properties = {
-        'es_public': {'type': 'boolean'},
         'title': {'type': 'localized'},
         'lead': {'type': 'localized'},
         'text': {'type': 'localized_html'}
