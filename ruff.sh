@@ -10,4 +10,4 @@ if [[ -z "${VIRTUAL_ENV:-}" && "${SKIP_VENV:-}" -ne "1" ]]; then
 fi
 
 echo "Running 'ruff' linter on onegov package"
-ruff check --fix src/ tests/ stubs/
+ruff check --config ./pyproject.toml
