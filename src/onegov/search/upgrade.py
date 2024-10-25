@@ -27,8 +27,9 @@ def adds_index_data_columns(context: UpgradeContext) -> None:
                 )
             )
 
-@upgrade_task('Adds fts data column (json) to all searchable models 4')
-def adds_index_data_columns(context: UpgradeContext) -> None:
+
+@upgrade_task('Adds fts data column (json) to all searchable models')
+def adds_fts_index_data_column(context: UpgradeContext) -> None:
     models = (
         model
         for base in context.app.session_manager.bases

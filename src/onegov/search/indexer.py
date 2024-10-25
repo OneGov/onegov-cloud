@@ -920,7 +920,6 @@ class ORMEventTranslator:
         except Full:
             log.error('The orm event translator queue is full!')
 
-
     def index(self, schema: str, obj: Searchable) -> None:
         if obj.es_skip:
             return

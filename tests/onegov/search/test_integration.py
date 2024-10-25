@@ -58,7 +58,7 @@ def test_search_query(es_url, postgres_dsn):
         def es_suggestion(self):
             return self.title
 
-        @hybrid_property
+        @property
         def es_public(self):
             return self.public
 
@@ -527,7 +527,7 @@ def test_suggestions(es_url, postgres_dsn):
             'title': {'type': 'localized'}
         }
 
-        @hybrid_property
+        @property
         def es_public(self):
             return self.public
 

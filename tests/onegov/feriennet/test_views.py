@@ -289,9 +289,12 @@ def test_activity_search(client_with_es, scenario):
     assert 'search-result-vacation' not in editor.get('/search?q=Learn')
     assert 'search-result-vacation' not in client.get('/search?q=Learn')
     # postgres
-    assert 'search-result-vacation' not in admin.get('/search-postgres?q=Learn')
-    assert 'search-result-vacation' not in editor.get('/search-postgres?q=Learn')
-    assert 'search-result-vacation' not in client.get('/search-postgres?q=Learn')
+    assert ('search-result-vacation' not in
+            admin.get('/search-postgres?q=Learn'))
+    assert ('search-result-vacation' not in
+            editor.get('/search-postgres?q=Learn'))
+    assert ('search-result-vacation' not in
+            client.get('/search-postgres?q=Learn'))
 
     url = '/activity/learn-how-to-program'
     editor.get(url).click("Publikation beantragen")
@@ -304,8 +307,10 @@ def test_activity_search(client_with_es, scenario):
     assert 'search-result-vacation' not in client.get('/search?q=Learn')
     # postgres
     assert 'search-result-vacation' in admin.get('/search-postgres?q=Learn')
-    assert 'search-result-vacation' not in editor.get('/search-postgres?q=Learn')
-    assert 'search-result-vacation' not in client.get('/search-postgres?q=Learn')
+    assert ('search-result-vacation' not in
+            editor.get('/search-postgres?q=Learn'))
+    assert ('search-result-vacation' not in
+            client.get('/search-postgres?q=Learn'))
 
     ticket = admin.get('/tickets/ALL/open').click("Annehmen").follow()
     ticket.click("Veröffentlichen")
@@ -332,8 +337,10 @@ def test_activity_search(client_with_es, scenario):
     assert 'search-result-vacation' not in client.get('/search?q=Learn')
     # postgres
     assert 'search-result-vacation' in admin.get('/search-postgres?q=Learn')
-    assert 'search-result-vacation' not in editor.get('/search-postgres?q=Learn')
-    assert 'search-result-vacation' not in client.get('/search-postgres?q=Learn')
+    assert ('search-result-vacation' not in
+            editor.get('/search-postgres?q=Learn'))
+    assert ('search-result-vacation' not in
+            client.get('/search-postgres?q=Learn'))
 
 
 def test_activity_filter_tags(client, scenario):

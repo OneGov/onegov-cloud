@@ -194,13 +194,13 @@ class SearchPostgres(Pagination[_M]):
     @cached_property
     def available_documents(self) -> int:
         if not self.nbr_of_docs:
-            self.load_batch_results
+            _ = self.load_batch_results
         return self.nbr_of_docs
 
     @cached_property
     def available_results(self) -> int:
         if not self.nbr_of_results:
-            self.load_batch_results
+            _ = self.load_batch_results
         return self.nbr_of_results
 
     @property
@@ -341,14 +341,15 @@ class SearchPostgres(Pagination[_M]):
         q = self.web_search.lstrip('#')
         results = []
 
-        for model in searchable_sqlalchemy_models(Base):
-            # skip certain tables for hashtag search for better performance
-            if (model.es_type_name not in ['attendees', 'files', 'people',
-                                           'tickets', 'users']):
-                if model.es_public or self.request.is_logged_in:
-                    for doc in self.request.session.query(model).all():
-                        if doc.es_tags and q in doc.es_tags:
-                            results.append(doc)
+        # Skip certain tables for hashtag search
+        results = [
+            doc for model in searchable_sqlalchemy_models(Base)
+            if model.es_type_name not in
+               ['attendees', 'files', 'people', 'tickets', 'users']
+            if model.es_public or self.request.is_logged_in
+            for doc in self.request.session.query(model).all()
+            if doc.es_tags and q in doc.es_tags
+        ]
 
         # remove duplicates
         results = list(set(results))
