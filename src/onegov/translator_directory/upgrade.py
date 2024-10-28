@@ -106,3 +106,11 @@ def add_hometown(context: UpgradeContext) -> None:
             'translators',
             Column('hometown', Text)
         )
+
+
+@upgrade_task('Remove old unused column translator nationality')
+def remove_nationality_column(context: UpgradeContext) -> None:
+    if not context.has_table('translators'):
+        return
+    if context.has_column('translators', 'nationality'):
+        context.operations.drop_column('translators', 'nationality')

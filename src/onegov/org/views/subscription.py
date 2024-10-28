@@ -5,8 +5,7 @@ import morepath
 from morepath.request import Response
 from onegov.core.security import Public
 from onegov.newsletter import NewsletterCollection, Subscription
-from onegov.org import _, OrgApp
-
+from onegov.org import _, OrgApp, log
 
 from typing import TYPE_CHECKING
 if TYPE_CHECKING:
@@ -41,13 +40,14 @@ def view_unsubscribe(
     request: 'OrgRequest'
 ) -> 'BaseResponse':
 
+    address = self.recipient.address
+
     # RFC-8058: just return an empty response on a POST request
     # don't check for success
     if request.method == 'POST':
+        log.debug(f'Unsubscribed POST: {address}')
         self.unsubscribe()
         return Response()
-
-    address = self.recipient.address
 
     if self.unsubscribe():
         request.success(_(
@@ -55,6 +55,7 @@ def view_unsubscribe(
             'at ${address}',
             mapping={'address': address}
         ))
+        log.debug(f'Unsubscribed: {address}')
     else:
         request.alert(_(
             '${address} could not be unsubscribed, wrong token',
