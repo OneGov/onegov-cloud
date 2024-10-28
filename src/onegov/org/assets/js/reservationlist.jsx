@@ -332,7 +332,7 @@ rl.roundNumber = function(num) {
 /*
     Shows the list of reservations to be confirmed.
 */
-var ReservationSelection = React.createClass({
+var ReservationSelection = createReactClass({
     handleClick: function(reservation) {
         rl.delete($(this.props.list), reservation.delete);
     },
@@ -410,7 +410,7 @@ ReservationSelection.render = function(element, list, reservations, prediction, 
 /*
     Allows to fine-adjust the reservation before adding it.
 */
-var ReservationForm = React.createClass({
+var ReservationForm = createReactClass({
     getInitialState: function() {
         var state = {
             quota: 1
