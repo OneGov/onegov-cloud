@@ -412,7 +412,7 @@ class PostgresIndexer(IndexerBase):
                 data = {
                     k: unidecode(str(v))
                     for k, v in task['properties'].items()
-                    if not k.startswith('es_')}
+                    if not k.startswith('es_') or k == 'es_public'}
                 _id = task['id']
 
                 content.append(

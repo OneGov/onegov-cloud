@@ -306,6 +306,9 @@ class SearchPostgres(Pagination[_M]):
         for base in self.request.app.session_manager.bases:
             for model in searchable_sqlalchemy_models(base):
                 query = session.query(model)
+                if not self.request.is_logged_in:
+                    query = query.filter(
+                        model.fts_idx_data['es_public'].astext == 'True')
                 if session.query(query.exists()).scalar():
                     weighted = (
                         self._create_weighted_vector(model, language))
@@ -320,12 +323,6 @@ class SearchPostgres(Pagination[_M]):
                     res = list(query.all())
                     doc_count += len(res)
                     results.extend(res)
-
-        # exclude non-public documents if user is not logged in
-        # we do this on python level as using hybrid properties and sql
-        # expressions did not work as expected
-        if not self.request.is_logged_in:
-            results = [r for r in results if r[0].es_public == True]
 
         # remove duplicates, sort by rank
         results = list(set(results))

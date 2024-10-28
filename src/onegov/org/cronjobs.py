@@ -91,7 +91,7 @@ def publish_files(request: 'OrgRequest') -> None:
 def reindex_published_models(request: 'OrgRequest') -> None:
     """
     Reindexes all recently published/unpublished objects
-    in the elasticsearch database.
+    in the elasticsearch and postgres database.
 
     For pages it also updates the propagated access to any
     associated files.
