@@ -68,7 +68,6 @@ LEVELS = (
         'onegov.town6',
         'onegov.translator_directory',
         'onegov.winterthur',
-        'onegov.wtfs',
     ),
 )
 
