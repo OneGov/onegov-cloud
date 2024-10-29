@@ -306,7 +306,8 @@ class SearchPostgres(Pagination[_M]):
         for base in self.request.app.session_manager.bases:
             for model in searchable_sqlalchemy_models(base):
                 query = session.query(model)
-                if not self.request.is_logged_in:
+
+                if not self.request.is_manager:
                     query = query.filter(
                         model.fts_idx_data['es_public'].astext == 'True')
                 if session.query(query.exists()).scalar():
