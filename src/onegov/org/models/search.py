@@ -310,6 +310,11 @@ class SearchPostgres(Pagination[_M]):
                 if not self.request.is_manager:
                     query = query.filter(
                         model.fts_idx_data['es_public'].astext == 'True')
+
+                if self.request.is_member and hasattr(model, 'meta'):
+                    query = query.filter(
+                        model.meta['access'].in_['public', 'member'])
+
                 if session.query(query.exists()).scalar():
                     weighted = (
                         self._create_weighted_vector(model, language))

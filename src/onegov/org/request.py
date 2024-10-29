@@ -77,6 +77,14 @@ class OrgRequest(CoreRequest):
 
         return self.has_role('editor')
 
+    @cached_property
+    def is_member(self) -> bool:
+        """ Returns true if the current user is a member.
+
+        """
+
+        return self.has_role('member')
+
     @property
     def current_username(self) -> str | None:
         return self.identity .userid if self.identity else None
