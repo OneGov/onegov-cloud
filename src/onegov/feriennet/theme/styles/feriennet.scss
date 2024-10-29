@@ -456,9 +456,21 @@ footer {
 .activity-active-period {
     margin-bottom: 2rem;
 
+
+    @mixin arrow-hint {
+        @include icon-bold('\f061');
+
+    }
+
+
     .hint {
         font-size: inherit;
-        span {
+
+        > span {
+            &::before {
+                @include arrow-hint;
+                margin-right: 1rem;
+            }
             display: flex;
             flex-wrap: wrap;
         }
@@ -2505,6 +2517,7 @@ li.unpaid {
     Occasions
 */
 .occasions {
+
     list-style: none;
     margin: 0;
     position: relative;
@@ -2590,16 +2603,16 @@ li.unpaid {
                     flex-grow: 10;
                 }
             }
+
+            p:last-child {
+                margin-bottom: 0;
+            }
     
             &:last-child {
                 padding-bottom: 1.5rem !important;
 
                 &.enroll {
                     text-align: right;
-                }
-
-                p:last-child {
-                    margin-bottom: 0;
                 }
             }
         }
@@ -2641,7 +2654,6 @@ li.unpaid {
     .need-add {
         color: $grayest;
         display: block;
-        font-size: .8rem;
         font-style: normal;
         font-weight: bold;
         margin-top: .75rem;
@@ -2655,10 +2667,10 @@ li.unpaid {
 
     h5 {
         font-size: 1rem;
+        margin-bottom: .5rem;
     }
 
     > ul {
-        font-size: .8rem;
         margin: 0;
 
         li {
@@ -2669,6 +2681,12 @@ li.unpaid {
             padding: 1rem;
             border-radius: .7rem;
         }
+    }
+
+    .need-info {
+        background: $smoke;
+        padding: 1rem;
+        border-radius: .7rem;
     }
 
     .need-number {
@@ -2692,14 +2710,12 @@ li.unpaid {
 
         p,
         p * {
-            font-size: .8rem !important;
             font-style: normal;
             margin-bottom: 0 !important;
         }
     }
 
     a {
-        font-size: .8rem;
         margin-left: 1rem;
         margin-right: 0;
         
