@@ -246,7 +246,7 @@ ul.single-line {
     .new-period::before { @include icon-bold('\f055'); }
     .offer-again::before { @include icon('\f164'); }
     .remove-manual::before { @include icon-bold('\f1f8'); }
-    .request-publication::before { @include icon('\f087'); }
+    .request-publication::before { @include icon('\f164'); }
     .reset-billing::before { @include icon('\f12d'); }
     .reset-matching::before { @include icon('\f12d'); }
     .run-matching::before { @include icon('\f0d0'); }
@@ -453,6 +453,45 @@ footer {
     margin-bottom: 1rem;
 }
 
+.activity-active-period {
+    margin-bottom: 2rem;
+
+    .hint {
+        font-size: inherit;
+        span {
+            display: flex;
+            flex-wrap: wrap;
+        }
+
+        b {
+            margin-right: .5rem;
+        }
+    }
+}
+
+.panel.period-hint-panel {
+    border: none;
+    padding: 0;
+    background-color: $smoke;
+
+    .hints .hint {
+        padding: .4rem 1rem;
+
+        &:last-child {
+            padding-bottom: 1rem;
+        }
+
+        &:first-child {
+            padding-top: 1rem;
+        }
+
+        &::before {
+            margin-left: 1rem;
+            @include icon-bold('\f061'); 
+        }
+    }
+}
+
 ul.tags {
     margin: 0 0 2rem;
 
@@ -479,30 +518,6 @@ ul.tags {
     .activity-state {
         font-size: .875rem;
     }
-}
-
-.hints {
-    .hint-prebooking::before { @include icon-bold('\f133'); }
-    .hint-prebooking.active::before { @include icon-bold('\f274'); }
-    .hint-prebooking.finish::before { @include icon-bold('\f046'); }
-
-    .hint-booking::before { @include icon('\f133'); }
-    .hint-booking.active::before { @include icon('\f274'); }
-    .hint-booking.finish::before { @include icon('\f046'); }
-
-    .hint-max-activities::before { @include icon('\f2c2'); }
-    .hint-costs::before { @include icon-bold('\f0d6'); }
-    .hint-favorites::before { @include icon('\f005'); }
-    .hint-matching::before { @include icon('\f12e'); }
-    .hint-fairness::before { @include icon('\f24e'); }
-    .hint-happiness::before { @include icon('\f118'); }
-    .hint-operability::before { @include icon('\f058'); }
-    .hint-nobble::before { @include icon-bold('\f14a'); }
-    .hint-outstanding::before { @include icon-bold('\f200'); }
-    .hint-finalized::before { @include icon('\f256'); }
-    .hint-minutes::before { @include icon('\f017'); }
-    .hint-deadline::before { @include icon('\f05a'); }
-    .hint-cancellation::before { @include icon('\f1da'); }
 }
 
 /*
@@ -571,7 +586,7 @@ ul.tags {
     }
 
     .organiser-phone a::before {
-        @include icon('\f095');
+        @include icon-bold('\f095');
     }
 
     .organiser-website a::before {
@@ -593,71 +608,11 @@ ul.tags {
     }
 }
 
-/*
-    Occasions
-*/
-.occasions {
-    list-style: none;
-    margin: 0;
-    position: relative;
-
-    h2,
-    h3,
-    h4 {
-        font-size: 1.2rem;
-        font-weight: bold;
-        margin: 0 0 1rem;
-    }
-
-    h3 {
-        margin-bottom: 1rem;
-    }
-
-    h4 {
-        border-bottom: 1px solid transparentize($primary-color, .85);
-        padding-bottom: .5rem;
-    }
-
-    > * {
-        p {
-            font-size: .875rem;
-            font-style: italic;
-            white-space: pre-line;
-        }
-
-        div {
-            font-size: .875rem;
-        }
-
-        a {
-            display: inline-block;
-            font-size: .875rem;
-        }
-
-    }
-
-    > li {
-        margin-bottom: 2rem;
-    }
-
-    .call-to-action {
-        margin-bottom: 1.5rem;
-    }
-}
-
-.field-attendee {
-    margin-bottom: 1rem !important;
-}
 
 /*
     Factoids
 */
 .factoids {
-    margin: 0 0 .5rem;
-
-    span {
-        font-size: .875rem;
-    }
 
     > div {
         margin-left: 1.5rem;
@@ -669,33 +624,6 @@ ul.tags {
             position: absolute;
             text-align: center;
             width: 1rem;
-        }
-    }
-
-    @media #{$medium-up} {
-        > div {
-            max-width: 70%;
-        }
-
-        &.spacer {
-            min-height: 2.5rem;
-        }
-
-        &.right-align {
-            position: absolute;
-            right: 1.25rem;
-            text-align: right;
-            top: 0;
-
-            > div {
-                max-width: 100%;
-            }
-
-            > div::before {
-                left: 0;
-                margin-right: 1ex;
-                position: relative;
-            }
         }
     }
 
@@ -868,58 +796,6 @@ ul.tags {
         border-bottom: 1px solid transparentize($primary-color, .85);
         margin-bottom: 1rem;
         padding-bottom: 0;
-    }
-}
-
-.occasion {
-    padding-bottom: .5rem;
-    position: relative;
-
-    .note p {
-        margin-bottom: 0;
-    }
-
-    .call-to-action {
-        margin-top: 1rem;
-    }
-
-    .overlap-check + .note,
-    .location + .note {
-        margin-top: .5rem;
-    }
-
-    .state > div {
-        @include smooth-edges;
-
-        background-color: $blue-pastel;
-        color: $blue-dark;
-        padding: 2px 9px;
-        position: absolute;
-        right: 1.25rem;
-        top: -2.75rem;
-
-        &::before {
-            @include icon-bold('\f05a');
-            margin-right: .5ex;
-        }
-
-        &.cancelled {
-            background-color: $red-pastel;
-            color: $red-dark;
-
-            &::before {
-                content: '\f00d';
-            }
-        }
-
-        &.available-spots {
-            background-color: $green-pastel;
-            color: $green-dark;
-
-            &::before {
-                content: '\f00c';
-            }
-        }
     }
 }
 
@@ -2624,9 +2500,118 @@ li.unpaid {
     }
 }
 
+
 /*
     Occasions
 */
+.occasions {
+    list-style: none;
+    margin: 0;
+    position: relative;
+
+    .state > div {
+        background-color: $blue-pastel;
+        color: $blue-dark;
+        padding: 2px 9px;
+        border-radius: .7rem;
+        margin-bottom: .5rem;
+
+        &::before {
+            @include icon-bold('\f05a');
+            margin-right: .5ex;
+        }
+
+        &.cancelled {
+            background-color: $red-pastel;
+            color: $red-dark;
+
+            &::before {
+                content: '\f00d';
+            }
+        }
+
+        &.available-spots {
+            background-color: $green-pastel;
+            color: $green-dark;
+
+            &::before {
+                content: '\f00c';
+            }
+        }
+    }
+
+    .occasion-title {
+        display: flex;
+        justify-content: space-between;
+        align-items: end;
+    }
+
+    h2,
+    h3,
+    h4 {
+        font-size: 1.2rem;
+        font-weight: bold;
+        margin: 0 0 .5rem;
+    }
+
+    > * {
+
+        div {
+            font-size: .875rem;
+        }
+
+        a {
+            display: inline-block;
+            font-size: .875rem;
+            margin-right: 1rem;
+        }
+
+    }
+
+    > li {
+        margin-bottom: 2rem;
+    }
+
+    .call-to-action {
+        margin-bottom: 1.5rem;
+    }
+
+    .occasion.occasion-card {
+        .card-section {
+            padding-bottom: 0 !important;
+            p, ul {
+                margin-bottom: .5rem;
+            }
+    
+            &.info {
+                display:flex;
+                flex-wrap: wrap;
+                .factoids:first-child {
+                    flex-grow: 10;
+                }
+            }
+    
+            &:last-child {
+                padding-bottom: 1.5rem !important;
+
+                &.enroll {
+                    text-align: right;
+                }
+
+                p:last-child {
+                    margin-bottom: 0;
+                }
+            }
+        }
+    }
+    
+}
+
+.field-attendee {
+    margin-bottom: 1rem !important;
+}
+
+
 .occasions-by-period {
     margin-bottom: .5rem;
     .accordion-title {
@@ -2635,6 +2620,123 @@ li.unpaid {
         line-height: 1.5;
     }
 }
+
+.occasion-needs {
+    $gray: $silver;
+    $grayer: $gainsboro;
+    $grayest: $steel;
+
+    margin: 1.25rem 0 1.75rem;
+    position: relative;
+
+    .need-info span {
+        font-style: italic;
+    }
+
+    .need-info .fa {
+        margin-left: .1rem;
+        margin-right: .4rem;
+    }
+
+    .need-add {
+        color: $grayest;
+        display: block;
+        font-size: .8rem;
+        font-style: normal;
+        font-weight: bold;
+        margin-top: .75rem;
+        padding-bottom: .75rem;
+        padding-right: 1.25rem;
+        position: absolute;
+        right: 0;
+        text-align: right;
+        top: -.75rem;
+    }
+
+    h5 {
+        font-size: 1rem;
+    }
+
+    > ul {
+        font-size: .8rem;
+        margin: 0;
+
+        li {
+            display: flex;
+            flex-wrap: wrap;
+            margin: 1rem 0 0;
+            background: $smoke;
+            padding: 1rem;
+            border-radius: .7rem;
+        }
+    }
+
+    .need-number {
+        background: $monsoon;
+        color: $white;
+        border-radius: .7rem;
+        flex: 1 0 8ex;
+        text-align: center;
+        height: fit-content;
+    }
+
+    .need-name {
+        flex: 1 0 calc(70% - 10ex);
+        font-weight: bold;
+        margin-left: 2ex;
+    }
+
+    .need-description {
+        flex: 1 0;
+        margin-left: 10ex;
+
+        p,
+        p * {
+            font-size: .8rem !important;
+            font-style: normal;
+            margin-bottom: 0 !important;
+        }
+    }
+
+    a {
+        font-size: .8rem;
+        margin-left: 1rem;
+        margin-right: 0;
+        
+    }
+
+    .need-actions {
+        flex: 1 0 30%;
+        text-align: right;
+        margin-bottom: .5rem;
+    }
+
+    .need-description p:last-child {
+        margin-bottom: 0;
+    }
+
+    @media #{$small-only} {
+        .need-name {
+            flex: 1 0 calc(100% - 10ex);
+        }
+
+        .need-actions {
+            flex: 1 0 100%;
+            margin-top: .5rem;
+            text-align: left;
+
+            a::before {
+                content: '';
+            }
+        }
+
+        .need-description {
+            margin-left: 0;
+            margin-top: .5rem;
+        }
+    }
+}
+
 
 
 /*
@@ -2654,22 +2756,6 @@ li.unpaid {
         }
     }
 
-    .occasion {
-        margin-bottom: 0;
-        margin-top: .75rem;
-
-        .state {
-            > div {
-                display: inline-block;
-                margin-bottom: 1rem;
-                position: static;
-            }
-        }
-
-        .state + .factoids + .factoids.right-align {
-            top: 2.35rem;
-        }
-    }
 }
 
 .with-icon {
@@ -2804,123 +2890,6 @@ li.unpaid {
 }
 
 /*
-    Occasion Needs
-*/
-.occasion-needs {
-    $gray: $silver;
-    $grayer: $gainsboro;
-    $grayest: $steel;
-
-    margin: 1.25rem 0 1.75rem;
-    position: relative;
-
-    .need-info span {
-        font-style: italic;
-    }
-
-    .need-info .fa {
-        margin-left: .1rem;
-        margin-right: .4rem;
-    }
-
-    .need-add {
-        color: $grayest;
-        display: block;
-        font-size: .8rem;
-        font-style: normal;
-        font-weight: bold;
-        margin-top: .75rem;
-        padding-bottom: .75rem;
-        padding-right: 1.25rem;
-        position: absolute;
-        right: 0;
-        text-align: right;
-        top: -.75rem;
-    }
-
-    h5 {
-        font-size: 1rem;
-    }
-
-    > ul {
-        font-size: .8rem;
-        margin: 0;
-        padding: 0 1.25rem 0 .75rem;
-
-        li {
-            display: flex;
-            flex-wrap: wrap;
-            margin: 1rem 0 0;
-
-            &:hover {
-                background: $gray;
-                outline: .5rem solid $gray;
-            }
-        }
-    }
-
-    .need-number {
-        background: $gray;
-        border: 1px solid $grayer;
-        border-radius: 2px;
-        flex: 1 0 8ex;
-        text-align: center;
-    }
-
-    .need-name {
-        flex: 1 0 calc(70% - 10ex);
-        font-weight: bold;
-        margin-left: 2ex;
-    }
-
-    .need-description {
-        flex: 1 0 100%;
-        margin-left: 10ex;
-
-        p,
-        p * {
-            font-size: .8rem !important;
-            font-style: normal;
-            margin-bottom: 0 !important;
-        }
-    }
-
-    .need-actions {
-        flex: 1 0 30%;
-        text-align: right;
-
-        a {
-            font-size: .8rem;
-        }
-    }
-
-    .need-description p:last-child {
-        margin-bottom: 0;
-    }
-
-    @media #{$small-only} {
-        .need-name {
-            flex: 1 0 calc(100% - 10ex);
-        }
-
-        .need-actions {
-            flex: 1 0 100%;
-            margin-top: .5rem;
-            text-align: left;
-
-            a::before {
-                content: '';
-            }
-        }
-
-        .need-description {
-            margin-left: 0;
-            margin-top: .5rem;
-        }
-    }
-}
-
-/*
     Hide advanced occasion toggles from non-admins, show warning for admins
 */
 .occasion-form-layout {
@@ -2928,7 +2897,7 @@ li.unpaid {
         display: none;
 
         .label-text::after {
-            @include icon('\f071');
+            @include icon-bold('\f071');
             margin-left: 1ex;
         }
     }

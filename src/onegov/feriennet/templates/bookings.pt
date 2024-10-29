@@ -33,7 +33,7 @@
                 <div class="my-bookings" tal:condition="period">
                     <h2>${period.title}</h2>
 
-                    <div class="panel">
+                    <div class="panel period-hint-panel">
                         <div class="hints">
                             <tal:b metal:use-macro="layout.macros.period_hints"></tal:b>
 

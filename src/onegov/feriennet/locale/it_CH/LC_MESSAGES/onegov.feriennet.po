@@ -2,7 +2,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: \n"
-"POT-Creation-Date: 2024-10-24 11:18+0200\n"
+"POT-Creation-Date: 2024-10-28 14:14+0100\n"
 "PO-Revision-Date: 2021-11-11 09:07+0100\n"
 "Last-Translator: Marc Sommerhalder <marc.sommerhalder@seantis.ch>\n"
 "Language-Team: \n"
@@ -1670,7 +1670,7 @@ msgstr ""
 "selezionate  \"Richiesta pubblicazione\" nella barra del menu. Lei o un "
 "altro amministratore controllerà e pubblicherà l'attività."
 
-msgid "This activity is currently being reviewd by an administrator."
+msgid "This activity is currently being reviewed by an administrator."
 msgstr "Questa attività è attualmente in fase di controllo."
 
 msgid "This activity has been archived."
@@ -1678,6 +1678,12 @@ msgstr "Questa attività è stata archiviata."
 
 msgid "There are currently no occasions planned."
 msgstr "Attualmente non ci sono eventi pianificati."
+
+msgid "Prebooking"
+msgstr "Fase dei desideri"
+
+msgid "Booking"
+msgstr "Fase di prenotazione"
 
 msgid "Other Occasions"
 msgstr "Altri eventi"
@@ -2039,18 +2045,6 @@ msgstr ""
 msgid "Ticket State"
 msgstr "Stato del biglietto"
 
-msgid "Fully booked"
-msgstr "Al completo"
-
-msgid "Rescinded"
-msgstr "Annullato"
-
-msgid "${count} spots available"
-msgstr "Ancora ${count} posti disponibili"
-
-msgid "${count} attendees"
-msgstr "${count} Partecipante"
-
 msgid "${min_spots} - ${max_spots} participants"
 msgstr "${min_spots} - ${max_spots} Partecipanti"
 
@@ -2084,11 +2078,20 @@ msgstr "Cancellare richiesta"
 msgid "Delete"
 msgstr "Cancellare"
 
-msgid "Enroll your child now."
-msgstr "Iscriva ora suo figlio/a."
-
 msgid "Enroll"
 msgstr "Iscrizione"
+
+msgid "Fully booked"
+msgstr "Al completo"
+
+msgid "Rescinded"
+msgstr "Annullato"
+
+msgid "${count} spots available"
+msgstr "Ancora ${count} posti disponibili"
+
+msgid "${count} attendees"
+msgstr "${count} Partecipante"
 
 msgid "Mark activity as favorite"
 msgstr "Segnare l'attività come preferita"
@@ -2101,24 +2104,6 @@ msgstr "Aumentare la priorità della prenotazione"
 
 msgid "Decrease the bookings priority"
 msgstr "Abbassare la priorità della prenotazione"
-
-msgid "Prebooking begins on ${date}."
-msgstr "La fase dei desideri inizia il ${date}."
-
-msgid "Prebooking is now active until ${date}."
-msgstr "La fase dei desideri è ora attiva fino a ${date}."
-
-msgid "Prebooking has ended."
-msgstr "La fase dei desideri è finita."
-
-msgid "Booking begins on ${date}."
-msgstr "La fase di prenotazione inizia il ${date}."
-
-msgid "Booking is now active until ${date}."
-msgstr "La fase di prenotazione è ora attiva fino a ${date}."
-
-msgid "Booking has ended."
-msgstr "La fase di prenotazione è finita."
 
 msgid "There cannot be any more bookings."
 msgstr "Non si possono fare altre prenotazioni."
@@ -2168,6 +2153,24 @@ msgid ""
 "Between each booking we enforce ${minutes} minutes of block-time in which no "
 "other booking is permitted."
 msgstr "Tempo di trasferta richiesto tra due eventi: ${minutes} minuti."
+
+msgid "Prebooking begins on ${date}."
+msgstr "La fase dei desideri inizia il ${date}."
+
+msgid "Prebooking is now active until ${date}."
+msgstr "La fase dei desideri è ora attiva fino a ${date}."
+
+msgid "Prebooking has ended."
+msgstr "La fase dei desideri è finita."
+
+msgid "Booking begins on ${date}."
+msgstr "La fase di prenotazione inizia il ${date}."
+
+msgid "Booking is now active until ${date}."
+msgstr "La fase di prenotazione è ora attiva fino a ${date}."
+
+msgid "Booking has ended."
+msgstr "La fase di prenotazione è finita."
 
 msgid ""
 "Your request will be processed shortly. To see the state of your process "
@@ -2384,12 +2387,6 @@ msgstr "Costi amministrativi"
 msgid "Status"
 msgstr "Stato"
 
-msgid "Prebooking"
-msgstr "Fase dei desideri"
-
-msgid "Booking"
-msgstr "Fase di prenotazione"
-
 msgid "${cost} for ${count} bookings"
 msgstr "${cost} per ${count} prenotazioni"
 
@@ -2572,6 +2569,12 @@ msgstr ""
 
 msgid "Delete Occasion"
 msgstr "Cancellare l'evento"
+
+msgid "Until"
+msgstr "Fino a"
+
+msgid "Starts at"
+msgstr "Inizio il"
 
 msgid "New Activity"
 msgstr "Nuova attività"
@@ -3190,6 +3193,9 @@ msgstr "Prenotazioni ${period}"
 #, python-format
 msgid "Billing for ${period}"
 msgstr "Fatturazione ${period}"
+
+#~ msgid "Enroll your child now."
+#~ msgstr "Iscriva ora suo figlio/a."
 
 #~ msgid "Invoice items marked as paid"
 #~ msgstr "Voci di fattura contrassegnate come pagate"

@@ -864,6 +864,30 @@ def view_activity(
             return False
 
         return True
+    
+    phases = []
+    active_period = request.app.active_period
+    text_until = request.translate(_('Until'))
+    text_from = request.translate(_('Starts at'))
+
+    # Booking date
+    if active_period and not active_period.book_finalized:
+        text = text_until
+        date = active_period.booking_end
+        if active_period.is_booking_in_future:
+            text = text_from
+            date = active_period.booking_start
+        phases.append(
+            f'{text} {layout.format_date(date, "date_long")}')
+    # Pre booking date
+    if active_period and active_period.wishlist_phase:
+        text = text_until
+        date = active_period.prebooking_end
+        if active_period.is_prebooking_in_future:
+            text = text_from
+            date = active_period.prebooking_start
+        phases.append(
+            f'{text} {layout.format_date(date, "date_long")}')
 
     return {
         'layout': layout,
@@ -887,6 +911,7 @@ def view_activity(
             ),
             show_only_inactive=True
         ),
+        'phases_date': phases
     }
 
 

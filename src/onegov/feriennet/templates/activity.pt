@@ -16,7 +16,7 @@
 
         <tal:b condition="activity.state == 'proposed' and request.is_organiser_only">
             <div class="panel callout" i18n:translate>
-                This activity is currently being reviewd by an administrator.
+                This activity is currently being reviewed by an administrator.
             </div>
         </tal:b>
 
@@ -38,7 +38,21 @@
 
                 <tal:b condition="occasions_current_period">
                     <tal:b tal:define="(title, occasions) occasions_current_period[0]; period occasions[0].period">
-                        <h3>${title}</h3>
+                        <div  class="activity-active-period">
+                            <h3>${title}</h3>
+                            <p class="hint">
+                                <tal:b tal:condition="len(phases_date) == 2">
+                                    <span>
+                                        <b><tal:b i18n:translate>Prebooking</tal:b>: </b><span>${phases_date[1]}</span>
+                                    </span>
+                                </tal:b>
+                                <tal:b tal:condition="len(phases_date)">
+                                    <span>
+                                        <b><tal:b i18n:translate>Booking</tal:b>: </b><span>${phases_date[0]}</span>
+                                    </span>
+                                </tal:b>
+                            </p>
+                        </div>
                         <tal:b metal:use-macro="layout.macros['occasions-by-period']" />
                     </tal:b>
                 </tal:b>
