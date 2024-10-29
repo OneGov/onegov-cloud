@@ -76,7 +76,7 @@ class Searchable:
             return deferred(cls.__table__.c.fts_idx)
         return deferred(Column(col_name, TSVECTOR))
 
-    @declared_attr  # type:ignore[no-redef]
+    @declared_attr
     def fts_idx_data(cls) -> 'Column[object]':
         """ This column holds all the properties including its values
         important for full text search.
@@ -147,7 +147,7 @@ class Searchable:
         return 'auto'
 
     # TODO: rename to fts_public
-    @hybrid_property
+    @property
     def es_public(self) -> bool:
         """ Returns True if the model is available to be found by the public.
         If false, only editors/admins will see this object in the search
@@ -227,7 +227,7 @@ class SearchableContent(ORMSearchable):
         'text': {'type': 'localized_html'}
     }
 
-    @hybrid_property
+    @property
     def es_public(self) -> bool:
         return self.access == 'public'  # type:ignore[attr-defined]
 
