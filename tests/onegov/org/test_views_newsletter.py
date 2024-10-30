@@ -358,6 +358,36 @@ def test_newsletter_subscribers_management_by_manager(client):
     client.logout()
 
 
+def test_newsletter_creation_limited_to_logged_in_users(client):
+    # enable the newsletter
+    client.login_admin()
+    page = client.get('/newsletter-settings')
+    page.form['show_newsletter'] = True
+    page.form['newsletter_categories'] = ''
+    page.form.submit().follow()
+
+    # admin can create newsletters
+    page = client.get('/newsletters/new')
+    assert 'Neuer Newsletter' in page
+    assert page.status_code == 200
+
+    # editor can create newsletters
+    client.logout()
+    client.login_editor()
+    assert 'Neuer Newsletter' in page
+    assert page.status_code == 200
+
+    # member can create newsletters
+    client.logout()
+    client.login_member()
+    assert 'Neuer Newsletter' in page
+    assert page.status_code == 200
+
+    # anonymous users can't create newsletters
+    anom = client.spawn()
+    assert anom.get('/newsletters/new', expect_errors=True).status_code == 403
+
+
 def test_newsletter_send(client):
 
     client.login_admin()
