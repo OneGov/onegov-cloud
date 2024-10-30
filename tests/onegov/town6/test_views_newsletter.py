@@ -421,6 +421,44 @@ def test_newsletter_rfc8058(client):
     assert len(os.listdir(client.app.maildir)) == 2
 
 
+def test_newsletter_subscribers_only_by_managers(client):
+    client.login_admin()
+    page = client.get('/newsletter-settings')
+    page.form['show_newsletter'] = True
+    page.form.submit().follow()
+    client.logout()
+
+    client.login_admin()
+    assert client.get('/subscribers').status_code == 200
+    page = client.get('/newsletters')
+    assert 'Abonnenten' in page
+    assert page.pyquery('a.manage-subscribers')
+    assert page.pyquery('a.new-newsletter')
+
+    client.logout()
+    client.login_editor()
+    assert client.get('/subscribers').status_code == 200
+    page = client.get('/newsletters')
+    assert 'Abonnenten' in page
+    assert page.pyquery('a.manage-subscribers')
+    assert page.pyquery('a.new-newsletter')
+
+    client.logout()
+    client.login_member()
+    assert client.get('/subscribers', expect_errors=True).status_code == 403
+    page = client.get('/newsletters')
+    assert 'Abonnenten' not in page
+    assert not page.pyquery('a.manage-subscribers')
+    assert not page.pyquery('a.new-newsletter')
+
+    anom = client.spawn()
+    assert anom.get('/subscribers', expect_errors=True).status_code == 403
+    page = anom.get('/newsletters')
+    assert 'Abonnenten' not in page
+    assert not page.pyquery('a.manage-subscribers')
+    assert not page.pyquery('a.new-newsletter')
+
+
 def test_newsletter_subscribers_management(client):
 
     client.login_admin()
@@ -482,6 +520,8 @@ def test_newsletter_subscribers_management_by_manager(client):
 
 
 def test_newsletter_creation_limited_to_logged_in_users(client):
+    # verify adding a new newsletter view is set to private
+
     # enable the newsletter
     client.login_admin()
     page = client.get('/newsletter-settings')
