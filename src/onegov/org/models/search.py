@@ -307,13 +307,13 @@ class SearchPostgres(Pagination[_M]):
             for model in searchable_sqlalchemy_models(base):
                 query = session.query(model)
 
-                if not self.request.is_manager:
+                if not self.request.is_logged_in:
                     query = query.filter(
                         model.fts_idx_data['es_public'].astext == 'True')
 
                 if self.request.is_member and hasattr(model, 'meta'):
                     query = query.filter(
-                        model.meta['access'].in_['public', 'member'])
+                        model.meta['access'].astext.in_(('public', 'member')))
 
                 if session.query(query.exists()).scalar():
                     weighted = (
