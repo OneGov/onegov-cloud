@@ -1,7 +1,6 @@
 from sqlalchemy import Column
 from sqlalchemy.dialects.postgresql import TSVECTOR, JSONB
 from sqlalchemy.ext.declarative import declared_attr
-from sqlalchemy.ext.hybrid import hybrid_property
 from sqlalchemy.orm import deferred
 
 from onegov.search.utils import classproperty
