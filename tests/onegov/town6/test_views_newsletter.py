@@ -421,42 +421,37 @@ def test_newsletter_rfc8058(client):
     assert len(os.listdir(client.app.maildir)) == 2
 
 
-def test_newsletter_subscribers_only_by_managers(client):
+def test_newsletter_subscribers_and_edit_bar(client):
     client.login_admin()
     page = client.get('/newsletter-settings')
     page.form['show_newsletter'] = True
     page.form.submit().follow()
     client.logout()
 
-    client.login_admin()
-    assert client.get('/subscribers').status_code == 200
-    page = client.get('/newsletters')
-    assert 'Abonnenten' in page
-    assert page.pyquery('a.manage-subscribers')
-    assert page.pyquery('a.new-newsletter')
+    admin = client.spawn()
+    admin.login_admin()
+    editor = client.spawn()
+    editor.login_editor()
 
-    client.logout()
-    client.login_editor()
-    assert client.get('/subscribers').status_code == 200
-    page = client.get('/newsletters')
-    assert 'Abonnenten' in page
-    assert page.pyquery('a.manage-subscribers')
-    assert page.pyquery('a.new-newsletter')
+    # only managers can see the subscribers and edit bar
+    for current_client in (admin, editor):
+        assert current_client.get('/subscribers').status_code == 200
+        page = current_client.get('/newsletters')
+        assert 'Abonnenten' in page
+        assert page.pyquery('a.manage-subscribers')
+        assert page.pyquery('a.new-newsletter')
 
-    client.logout()
-    client.login_member()
-    assert client.get('/subscribers', expect_errors=True).status_code == 403
-    page = client.get('/newsletters')
-    assert 'Abonnenten' not in page
-    assert not page.pyquery('a.manage-subscribers')
-    assert not page.pyquery('a.new-newsletter')
-
+    member = client.spawn()
+    member.login_member()
     anom = client.spawn()
-    assert anom.get('/subscribers', expect_errors=True).status_code == 403
-    page = anom.get('/newsletters')
-    assert 'Abonnenten' not in page
-    assert not page.pyquery('a.manage-subscribers')
-    assert not page.pyquery('a.new-newsletter')
+
+    for current_client in (member, anom):
+        assert current_client.get(
+            '/subscribers', expect_errors=True).status_code == 403
+        page = current_client.get('/newsletters')
+        assert 'Abonnenten' not in page
+        assert not page.pyquery('a.manage-subscribers')
+        assert not page.pyquery('a.new-newsletter')
 
 
 def test_newsletter_subscribers_management(client):
@@ -529,26 +524,22 @@ def test_newsletter_creation_limited_to_logged_in_users(client):
     page.form['newsletter_categories'] = ''
     page.form.submit().follow()
 
-    # admin can create newsletters
-    page = client.get('/newsletters/new')
-    assert 'Neuer Newsletter' in page
-    assert page.status_code == 200
+    admin = client.spawn()
+    admin.login_admin()
+    editor = client.spawn()
+    editor.login_editor()
+    member = client.spawn()
+    member.login_member()
 
-    # editor can create newsletters
-    client.logout()
-    client.login_editor()
-    assert 'Neuer Newsletter' in page
-    assert page.status_code == 200
-
-    # member can create newsletters
-    client.logout()
-    client.login_member()
-    assert 'Neuer Newsletter' in page
-    assert page.status_code == 200
+    for current_client in (admin, editor, member):
+        page = current_client.get('/newsletters/new')
+        assert 'Neuer Newsletter' in page
+        assert page.status_code == 200
 
     # anonymous users can't create newsletters
     anom = client.spawn()
-    assert anom.get('/newsletters/new', expect_errors=True).status_code == 403
+    assert anom.get(
+        '/newsletters/new', expect_errors=True).status_code == 403
 
 
 def test_newsletter_send(client):
