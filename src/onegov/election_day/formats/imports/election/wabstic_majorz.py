@@ -268,8 +268,7 @@ def import_election_wabstic_majorz(
 
         # Check if the entity is counted
         try:
-            entity['counted'] = False if validate_integer(
-                line, 'sperrung') == 0 else True
+            entity['counted'] = validate_integer(line, 'sperrung') != 0
         except ValueError as e:
             line_errors.append(e.args[0])
 

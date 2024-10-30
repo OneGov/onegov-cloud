@@ -320,7 +320,7 @@ def get_data_source_item(
 
 @ElectionDayApp.path(
     model=ArchivedResultCollection,
-    path='/archive/{date}'
+    path='/archive/{date}'  # noqa: RUF027
 )
 def get_archive_by_year(
     app: ElectionDayApp,

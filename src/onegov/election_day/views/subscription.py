@@ -58,7 +58,7 @@ def subscribe_email(
         'message': message,
         'cancel': layout.homepage_link,
         'callout': callout,
-        'show_form': False if callout else True
+        'show_form': not callout
     }
 
 
@@ -145,7 +145,7 @@ def unsubscribe_email(
         'title': _('Stop email subscription'),
         'cancel': layout.homepage_link,
         'callout': callout,
-        'show_form': False if callout else True
+        'show_form': not callout
     }
 
 
@@ -246,7 +246,7 @@ def subscribe_sms(
         ),
         'cancel': layout.homepage_link,
         'callout': callout,
-        'show_form': False if callout else True
+        'show_form': not callout
     }
 
 
@@ -288,5 +288,5 @@ def unsubscribe_sms(
         'title': _('Stop SMS subscription'),
         'cancel': layout.homepage_link,
         'callout': callout,
-        'show_form': False if callout else True
+        'show_form': not callout
     }

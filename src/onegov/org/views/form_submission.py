@@ -535,4 +535,3 @@ def handle_survey_submission(
         'model': self,
         'price': None,
     }
-

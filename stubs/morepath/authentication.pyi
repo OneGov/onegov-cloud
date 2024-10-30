@@ -1,7 +1,4 @@
 import abc
-from typing import Any
-from typing_extensions import TypeAlias
-from uuid import UUID
 
 from .request import Request, Response
 

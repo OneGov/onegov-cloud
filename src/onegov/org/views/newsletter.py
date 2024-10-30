@@ -750,4 +750,3 @@ def import_newsletter_recipients(
         'form': form,
         'form_width': 'large',
     }
-

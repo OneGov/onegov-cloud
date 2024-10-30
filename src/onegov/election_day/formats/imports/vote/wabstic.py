@@ -199,7 +199,7 @@ def import_vote_wabstic(
         # Check if the entity is counted
         try:
             counted_num = validate_integer(line, 'sperrung')
-            counted = False if counted_num == 0 else True
+            counted = counted_num != 0
         except ValueError:
             line_errors.append(_('Invalid values'))
         else:

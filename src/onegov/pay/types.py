@@ -15,10 +15,11 @@ if TYPE_CHECKING:
         credit_card_payment: bool
 
     class FeePolicy(Protocol):
-        def from_amount(self, __amount: Decimal | float) -> Decimal | float:
+        def from_amount(self, amount: Decimal | float, /) -> Decimal | float:
             ...
 
-        def compensate(self, __amount: Decimal | float) -> Decimal | float: ...
+        def compensate(self, amount: Decimal | float, /) -> Decimal | float:
+            ...
 
     # NOTE: We would like to use intersections here than pseudo classes
     @type_check_only

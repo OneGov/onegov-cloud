@@ -277,7 +277,7 @@ def get_translation_bound_meta(
                 # it might be worth revisiting in the future if we can
                 # enable caching here again, or introduce our own
                 wtf = super().get_translations(form)
-                if wtf is  None:
+                if wtf is None:
                     wtf = gettext.NullTranslations()
                 wtf.is_wtforms = True
 

@@ -419,7 +419,7 @@ class ReservationHandler(Handler):
 
     @property
     def deleted(self) -> bool:
-        return False if self.reservations else True
+        return not self.reservations
 
     @property
     def extra_data(self) -> list[str]:
