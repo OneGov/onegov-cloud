@@ -55,7 +55,7 @@ def handle_form_submissions_export(
                 submissions=submissions,
                 window_ids=form.data['submission_window'])
         else:
-            query = submissions.query().filter_by(state='complete')
+            query = submissions.query()
 
         subset = configure_subset(query)
 
@@ -80,7 +80,6 @@ def subset_by_window(
 ) -> 'Query[SurveySubmission]':
     return (
         submissions.query()
-        .filter_by(state='complete')
         .filter(SurveySubmission.submission_window_id.in_(window_ids))
     )
 
