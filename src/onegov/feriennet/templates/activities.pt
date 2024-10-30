@@ -7,12 +7,15 @@
 
             <div class="cell small-12">
                 
-                <div ic-target="#activities" ic-push-url="true" ic-select-from-response="#activities" ic-scroll-to-target="true">
+                <div ic-push-url="true">
 
                     <button class="button hollow" type="button" data-toggle="period-filter" tal:condition="filters['periods']|nothing"
                      i18n:translate>Periods</button>
-                    <div class="dropdown-pane" id="period-filter" data-dropdown tal:condition="filters['periods']|nothing">
+                    <div class="dropdown-pane filter-pane" data-close-on-click="true" id="period-filter" ic-select-from-response="#period-filter" ic-target="#period-filter" data-dropdown tal:condition="filters['periods']|nothing">
                         <div metal:use-macro="layout.macros['tags']" tal:define="tags filters['periods']" />
+                        <div class="grid-x grid-padding-x align-center">
+                            <button  ic-select-from-response="#activities" ic-target="#activities" ic-get-from="${request.url}" class="button apply-filters" type="button" data-toggle="period-filter" i18n:translate>Apply filters</button>
+                        </div>
                     </div>
 
                     <button class="button hollow" type="button" data-toggle="the-rest">De Rest</button>

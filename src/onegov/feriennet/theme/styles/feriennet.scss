@@ -482,23 +482,15 @@ footer {
 }
 
 .panel.period-hint-panel {
-    border: none;
-    padding: 0;
-    background-color: $smoke;
+
+    &:not(:has(.hint)) {
+        display: none;
+    }
 
     .hints .hint {
-        padding: .4rem 1rem;
-
-        &:last-child {
-            padding-bottom: 1rem;
-        }
-
-        &:first-child {
-            padding-top: 1rem;
-        }
+        margin-left: 2rem;
 
         &::before {
-            margin-left: 1rem;
             @include icon-bold('\f061'); 
         }
     }
@@ -2062,7 +2054,7 @@ li.unpaid {
         }
 
         h2 {
-            font-size: $h3-font-size - $h3-font-reduction;
+            font-size: 2rem;
         }
 
         .print-icon {
@@ -2074,9 +2066,16 @@ li.unpaid {
         }
     }
 
+    .occurence-info {
+        margin-bottom: 1rem;
+    }
+
     .attendees {
         font-size: .9em;  // em for correct scaling in print
-        max-width: 70%;
+
+        @media #{$large-up} {
+            column-count: 2;
+        }
 
         li {
             margin-bottom: .5rem;
@@ -2084,12 +2083,12 @@ li.unpaid {
         }
 
         strong.male::after {
-            @include icon('\f222');
+            @include icon-bold('\f222');
             margin-left: 1ex;
         }
 
         strong.female::after {
-            @include icon('\f221');
+            @include icon-bold('\f221');
             margin-left: 1ex;
         }
     }
