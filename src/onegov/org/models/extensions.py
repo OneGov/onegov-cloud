@@ -590,7 +590,7 @@ class PersonLinkExtension(ContentExtension):
                     'data-placeholder': request.translate(
                         _('Select additional person')
                     ),
-                    'data-no_results_text':request.translate(
+                    'data-no_results_text': request.translate(
                         _('No results match')
                     ),
                 }

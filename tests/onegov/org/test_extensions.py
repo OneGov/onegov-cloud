@@ -215,8 +215,8 @@ def test_person_link_extension_order():
     field = form.people
     field.append_entry()
     assert len(field) == 2
-    field[0].form.person.data ='6d120102d90344868eb32614cf3acb1a'
-    field[1].form.person.data ='f0281b558a5f43f6ac81589d79538a87'
+    field[0].form.person.data = '6d120102d90344868eb32614cf3acb1a'
+    field[1].form.person.data = 'f0281b558a5f43f6ac81589d79538a87'
     form.populate_obj(topic)
 
     # the people are kept sorted by lastname, firstname by default

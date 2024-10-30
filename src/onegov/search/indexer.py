@@ -473,8 +473,7 @@ class PostgresIndexer(IndexerBase):
             if action == 'index':
                 self.index(task_list, session)
             else:
-                raise NotImplementedError("Action '{action}' not "
-                                          'implemented')
+                raise NotImplementedError(f"Action '{action}' not implemented")
 
 
 class TypeMapping:

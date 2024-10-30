@@ -2,8 +2,8 @@ from _typeshed import Incomplete
 from collections.abc import Callable, Collection, Iterable, Iterator
 from sqlalchemy.orm import Mapper, Session
 from sqlalchemy.orm.session import UOWTransaction  # type:ignore[attr-defined]
-from typing import Any, NamedTuple, TypeVar
-from typing_extensions import ParamSpec, Never, TypeAlias
+from typing import Any, NamedTuple
+from typing_extensions import Never, TypeAlias
 
 _CallbackArgs: TypeAlias = tuple[Any, Callable[..., Any], list[Any]]
 

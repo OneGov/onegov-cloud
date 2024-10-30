@@ -1,6 +1,5 @@
 from _typeshed import StrOrBytesPath
 from collections.abc import Callable, Collection, Iterator, Mapping, Sequence
-from typing import Any
 from typing_extensions import Self, TypeAlias
 
 from dectate import Action

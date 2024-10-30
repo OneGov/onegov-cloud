@@ -284,7 +284,7 @@ def import_teacher_data(
 
 
 def parse_completed(val: str | None) -> bool:
-    return False if val == 'N' else True
+    return val != 'N'
 
 
 @with_open

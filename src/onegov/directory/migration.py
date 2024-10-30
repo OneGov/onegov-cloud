@@ -365,16 +365,14 @@ class StructuralChanges:
     def detect_changed_fields(self) -> None:
         self.changed_fields = []
 
-        for old in self.old:
-            if old in self.renamed_fields:
-                new = self.renamed_fields[old]
-            elif old in self.new:
-                new = old
+        for old_id, old in self.old.items():
+            if old_id in self.renamed_fields:
+                new_id = self.renamed_fields[old_id]
+            elif old_id in self.new:
+                new_id = old_id
             else:
                 continue
 
-            if self.old[old].required != self.new[new].required:
-                self.changed_fields.append(new)
-
-            elif self.old[old].type != self.new[new].type:
-                self.changed_fields.append(new)
+            new = self.new[new_id]
+            if old.required != new.required or old.type != new.type:
+                self.changed_fields.append(new_id)
