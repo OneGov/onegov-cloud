@@ -72,22 +72,13 @@ exclude_dirs = [
 skips = [
     # ignore asserts
     "B101",
-    # ignore pickle (SEA-1030)
-    "B301",
-    "B403",
-    # ignore XML (SEA-1031)
-    "B314",
+    # ignore lxml.etree.fromstring (we may want to revisit this in the future)
     "B320",
+    # ignore meta-codes, we are aware of the implications
+    "B403",
+    "B404",
     "B405",
     "B410",
-    # ignore subprocesses (SEA-1032)
-    "B404",
-    "B602",
-    "B603",
-    "B605",
-    "B607",
-    # ignore temp directory (SEA-1033)
-    "B108"
 ]
 
 [tool.ruff]

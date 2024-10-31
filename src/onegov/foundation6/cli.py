@@ -11,7 +11,7 @@ cli = command_group()
 
 
 def pre_checks() -> None:
-    node_version = check_output('node --version', shell=True)
+    node_version = check_output('node --version', shell=True)  # nosec
     if 'v10' not in node_version.decode('utf-8'):
         click.secho('Foundation CLI currently works with node version 10')
         sys.exit()
@@ -50,15 +50,15 @@ def update() -> None:
 
     foundation_js_files = ('foundation.min.js', 'foundation.js')
 
-    os.chdir('/tmp')
-    if not os.path.exists('/tmp/foundation-update'):
-        os.system(
+    os.chdir('/tmp')  # nosec:B108
+    if not os.path.exists('/tmp/foundation-update'):  # nosec:B108
+        os.system(  # nosec
             'echo foundation-update | '
             'foundation new --framework sites --template zurb'
         )
 
     os.chdir('foundation-update')
-    node_root = Path('/tmp/foundation-update/node_modules/foundation-sites')
+    node_root = Path('/tmp/foundation-update/node_modules/foundation-sites')  # nosec:B108
 
     # click.secho('Create a backup', fg='green')
     # shutil.copytree(src, src_bckp)

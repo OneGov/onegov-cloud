@@ -28,7 +28,8 @@ class DigirezDB:
 
     @property
     def tables(self) -> list[str]:
-        output = subprocess.check_output(('mdb-tables', self.accessdb_path))
+        output = subprocess.check_output(  # nosec:B603
+            ('mdb-tables', self.accessdb_path))
         output_str = output.decode('utf-8').rstrip('\n ')
 
         return output_str.split(' ')
@@ -50,7 +51,7 @@ class DigirezDB:
             output_path = os.path.join(self.csv_path, f'{table}.csv')
 
             with open(output_path, 'w') as output_file:
-                subprocess.check_call(
+                subprocess.check_call(  # nosec:B603
                     args=(
                         'mdb-export', '-D', '%Y-%m-%dT%T',
                         self.accessdb_path, table
