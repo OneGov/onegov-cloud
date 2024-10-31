@@ -244,11 +244,12 @@ class DepotApp(App):
         if not self.frontend_cache_buster:
             return
 
+        delay = shlex.quote(str(self.frontend_cache_bust_delay))
         bin = shlex.quote(self.frontend_cache_buster)
         fid = shlex.quote(file_id)
-        cmd = f'sleep {self.frontend_cache_bust_delay} && {bin} {fid}'
+        cmd = f'sleep {delay} && {bin} {fid}'
 
-        subprocess.Popen(cmd, close_fds=True, shell=True)
+        subprocess.Popen(cmd, close_fds=True, shell=True)  # nosec:B602
 
     def sign_file(  # nosec: B105,B107
         self,
