@@ -405,18 +405,20 @@ def test_newsletter_creation_limited_to_logged_in_users(client):
     admin.login_admin()
     editor = client.spawn()
     editor.login_editor()
-    member = client.spawn()
-    member.login_member()
 
-    for current_client in (admin, editor, member):
+    for current_client in (admin, editor):
         page = current_client.get('/newsletters/new')
         assert 'Neuer Newsletter' in page
         assert page.status_code == 200
 
-    # anonymous users can't create newsletters
+    # member and anonymous users can't create newsletters
     anom = client.spawn()
-    assert anom.get(
-        '/newsletters/new', expect_errors=True).status_code == 403
+    member = client.spawn()
+    member.login_member()
+
+    for current_client in (member, anom):
+        assert current_client.get(
+            '/newsletters/new', expect_errors=True).status_code == 403
 
 
 def test_newsletter_send(client):
