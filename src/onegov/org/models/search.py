@@ -311,9 +311,15 @@ class SearchPostgres(Pagination[_M]):
                     query = query.filter(
                         model.fts_idx_data['es_public'].astext == 'True')
 
+                # as a member we only want to see public and member content
                 if self.request.is_member and hasattr(model, 'meta'):
                     query = query.filter(
                         model.meta['access'].astext.in_(('public', 'member')))
+
+                # as non-manager we only want to see public content
+                elif not self.request.is_manager:
+                    query = query.filter(
+                        model.fts_idx_data['es_public'].astext == 'True')
 
                 if session.query(query.exists()).scalar():
                     weighted = (
