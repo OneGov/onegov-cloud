@@ -421,6 +421,39 @@ def test_newsletter_rfc8058(client):
     assert len(os.listdir(client.app.maildir)) == 2
 
 
+def test_newsletter_subscribers_and_edit_bar(client):
+    client.login_admin()
+    page = client.get('/newsletter-settings')
+    page.form['show_newsletter'] = True
+    page.form.submit().follow()
+    client.logout()
+
+    admin = client.spawn()
+    admin.login_admin()
+    editor = client.spawn()
+    editor.login_editor()
+
+    # only managers can see the subscribers and edit bar
+    for current_client in (admin, editor):
+        assert current_client.get('/subscribers').status_code == 200
+        page = current_client.get('/newsletters')
+        assert 'Abonnenten' in page
+        assert page.pyquery('a.manage-subscribers')
+        assert page.pyquery('a.new-newsletter')
+
+    member = client.spawn()
+    member.login_member()
+    anom = client.spawn()
+
+    for current_client in (member, anom):
+        assert current_client.get(
+            '/subscribers', expect_errors=True).status_code == 403
+        page = current_client.get('/newsletters')
+        assert 'Abonnenten' not in page
+        assert not page.pyquery('a.manage-subscribers')
+        assert not page.pyquery('a.new-newsletter')
+
+
 def test_newsletter_subscribers_management(client):
 
     client.login_admin()
@@ -479,6 +512,36 @@ def test_newsletter_subscribers_management_by_manager(client):
     client.login_editor()
     subscribe_by_manager(client)
     client.logout()
+
+
+def test_newsletter_creation_limited_to_logged_in_users(client):
+    # verify adding a new newsletter view is set to private
+
+    # enable the newsletter
+    client.login_admin()
+    page = client.get('/newsletter-settings')
+    page.form['show_newsletter'] = True
+    page.form['newsletter_categories'] = ''
+    page.form.submit().follow()
+
+    admin = client.spawn()
+    admin.login_admin()
+    editor = client.spawn()
+    editor.login_editor()
+
+    for current_client in (admin, editor):
+        page = current_client.get('/newsletters/new')
+        assert 'Neuer Newsletter' in page
+        assert page.status_code == 200
+
+    # member and anonymous users can't create newsletters
+    anom = client.spawn()
+    member = client.spawn()
+    member.login_member()
+
+    for current_client in (member, anom):
+        assert current_client.get(
+            '/newsletters/new', expect_errors=True).status_code == 403
 
 
 def test_newsletter_send(client):

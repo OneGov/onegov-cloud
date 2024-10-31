@@ -2656,6 +2656,9 @@ class NewsletterLayout(DefaultLayout):
 
     @cached_property
     def editbar_links(self) -> list[Link | LinkGroup] | None:
+        if not self.request.is_manager:
+            return None
+
         if self.is_collection:
             return [
                 Link(
