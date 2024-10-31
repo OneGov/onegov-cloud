@@ -1,3 +1,12 @@
+/* Mixins */
+
+@mixin rotate {
+    -ms-transform: rotate(180deg);
+    -moz-transform: rotate(180deg);
+    -webkit-transform: rotate(180deg);
+    transform: rotate(180deg);
+}
+
 /*
     The maximum width of a line relative to the main font size. This limits textblocks
     to a readable length.
@@ -428,6 +437,10 @@ input[type="url"] {
     padding: 1rem 1.5rem !important;
     transition: all 200ms linear !important;
 
+    i.fa:first-child {
+        margin-right: .5rem;
+    }
+
     &:hover {
         margin-left: -.5rem;
         margin-right: -.5rem;
@@ -442,7 +455,6 @@ input[type="url"] {
             padding: .7rem 1.5rem !important;
         }
     }
-
 }
 
 // like above, but no border, no hover effect
@@ -1024,10 +1036,7 @@ ul.recipients {
 }
 
 .rotate.down {
-    -ms-transform: rotate(180deg);
-    -moz-transform: rotate(180deg);
-    -webkit-transform: rotate(180deg);
-    transform: rotate(180deg);
+    @include rotate;
 }
 
 .icon-left-of-text {
@@ -1173,6 +1182,50 @@ ul.recipients {
             border: 0 !important;
             box-shadow: none !important;
             float: none;
+        }
+    }
+}
+
+/* Filters */
+.filters-top {
+    display:flex;
+    align-items: start;
+    margin-bottom: 3rem;
+    flex-wrap: wrap;
+    gap: 1rem;
+
+    .button.dropdown-button {
+        padding: .7rem 1rem !important;
+        margin-bottom: 0;
+        border-radius: .7rem !important;
+
+        &.hover {
+            border: 1px solid darken($primary-color, 10%) !important;
+            .fa-chevron-down {
+                @include rotate;
+            }
+        }
+        
+        &:hover {
+            padding: .7rem 1rem !important;
+            margin-left: 0;
+            margin-right: 0;
+        }
+    }  
+    .dropdown-pane {
+        background: transparent;
+        padding: .5rem 0 0;
+        border: none;
+    }
+    .filter-panel {
+        background: $white;
+        border: 1px solid $primary-color;
+        padding: 1rem;
+        border-radius: .7rem;
+        width: clamp(300px, calc(100% - 2rem), 450px);
+
+        .apply-filters{
+            margin-bottom: 0;
         }
     }
 }

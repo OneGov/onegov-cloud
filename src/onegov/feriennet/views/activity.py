@@ -432,9 +432,9 @@ def activity_max_cost(
     return max(o.total_cost for o in occasions)
 
 
-def is_filtered(filters: dict[str, 'Sequence[Link]']) -> bool:
+def is_filtered(filters: dict[str, tuple[str, 'Sequence[Link]']]) -> bool:
     for links in filters.values():
-        for link in links:
+        for link in links[1]:
             if link.active:
                 return True
 
@@ -447,7 +447,7 @@ def adjust_filter_path(
 ) -> None:
 
     for links in filters.values():
-        for link in links:
+        for link in links[1]:
             link.attrs['href'] = link.attrs['ic-get-from'] = URL(
                 link.attrs['href']).add_path_segment(suffix).as_string()
 
@@ -497,28 +497,28 @@ def view_activities(
     show_activities = bool(active_period or request.is_organiser)
     layout = VacationActivityCollectionLayout(self, request)
 
-    filters: dict[str, Sequence[Link]] = {}
+    filters: dict[str, tuple[str, Sequence[Link]]] = {}
 
     if show_activities:
-        filters['timelines'] = filter_timelines(self, request)
-        filters['tags'] = filter_tags(self, request)
-        filters['durations'] = filter_durations(self, request)
-        filters['ages'] = filter_ages(self, request)
-        filters['price_range'] = filter_price_range(self, request)
+        filters['timelines'] = (_('Occasion'), filter_timelines(self, request))
+        filters['tags'] = (_('Tags'), filter_tags(self, request))
+        filters['durations'] = (_('Duration'), filter_durations(self, request))
+        filters['ages'] = (_('Age'), filter_ages(self, request))
+        filters['price_range'] = (_('Price'), filter_price_range(self, request))
 
         if active_period:
-            filters['weeks'] = filter_weeks(self, request)
+            filters['weeks'] = (_('Weeks'), filter_weeks(self, request))
 
-        filters['weekdays'] = filter_weekdays(self, request)
-        filters['available'] = filter_available(self, request)
-        filters['municipalities'] = filter_municipalities(self, request)
+        filters['weekdays'] = (_('Weekdays'), filter_weekdays(self, request))
+        filters['available'] = (_('Free Spots'), filter_available(self, request))
+        filters['municipalities'] = (_('Municipalities'), filter_municipalities(self, request))
 
         if request.is_organiser:
             if request.app.periods:
-                filters['periods'] = filter_periods(self, request)
+                filters['periods'] = (_('Periods'), filter_periods(self, request))
 
-            filters['own'] = filter_own(self, request)
-            filters['states'] = filter_states(self, request)
+            filters['own'] = (_('Advanced'), filter_own(self, request))
+            filters['states'] = (_('State'), filter_states(self, request))
 
     filters = {k: v for k, v in filters.items() if v}
 
@@ -679,19 +679,19 @@ def view_activities_for_volunteers(
     # include javascript part
     request.include('volunteer-cart')
 
-    filters: dict[str, Sequence[Link]] = {}
+    filters: dict[str, tuple[str, Sequence[Link]]] = {}
 
     if show_activities:
 
-        filters['tags'] = filter_tags(self, request)
-        filters['durations'] = filter_durations(self, request)
+        filters['tags'] = (_('Tags'), filter_tags(self, request))
+        filters['durations'] = (_('Duration'), filter_durations(self, request))
 
         if active_period:
-            filters['weeks'] = filter_weeks(self, request)
+            filters['weeks'] = (_('Weeks'), filter_weeks(self, request))
             self.filter.period_ids = {active_period.id}
 
-        filters['weekdays'] = filter_weekdays(self, request)
-        filters['municipalities'] = filter_municipalities(self, request)
+        filters['weekdays'] = (_('Weekday'), filter_weekdays(self, request))
+        filters['municipalities'] = (_('Municipalities'), filter_municipalities(self, request))
 
     filters = {k: v for k, v in filters.items() if v}
     adjust_filter_path(filters, suffix='volunteer')

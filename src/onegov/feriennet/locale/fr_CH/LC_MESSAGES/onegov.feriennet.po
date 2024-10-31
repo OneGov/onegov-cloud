@@ -2,7 +2,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE 1.0\n"
-"POT-Creation-Date: 2024-10-28 14:14+0100\n"
+"POT-Creation-Date: 2024-10-31 10:05+0100\n"
 "PO-Revision-Date: 2021-11-11 09:07+0100\n"
 "Last-Translator: Marc Sommerhalder <marc.sommerhalder@seantis.ch>\n"
 "Language-Team: French\n"
@@ -1632,23 +1632,20 @@ msgstr "Durée"
 msgid "Municipalities"
 msgstr "Communes"
 
-msgid "States"
-msgstr "États"
+msgid "Apply filters"
+msgstr "Appliquer les filtres"
 
 msgid "Age"
 msgstr "Âge"
-
-msgid "Price"
-msgstr "Prix"
-
-msgid "Free Spots"
-msgstr "Places disponibles"
 
 msgid "${min_age} - ${max_age} years"
 msgstr "${min_age} - ${max_age} ans"
 
 msgid "starting at ${price} CHF"
 msgstr "supplément de ${price} CHF"
+
+msgid "Free Spots"
+msgstr "Places disponibles"
 
 msgid "No free spots"
 msgstr "Pas de places disponibles"
@@ -2059,6 +2056,12 @@ msgstr "Pour cacher cette activité du site publique, vous pouvez l'archiver."
 msgid "Ticket State"
 msgstr "Statut du ticket"
 
+msgid "Independent of other occasions"
+msgstr "Indépendant d'autres événements"
+
+msgid "<dynamic element>"
+msgstr ""
+
 msgid "${min_spots} - ${max_spots} participants"
 msgstr "${min_spots} – ${max_spots} participant·e·s"
 
@@ -2067,12 +2070,6 @@ msgstr "jusqu'à ${max_spots} participant·e·s"
 
 msgid "${cost} CHF"
 msgstr "${cost} CHF"
-
-msgid "Independent of other occasions"
-msgstr "Indépendant d'autres événements"
-
-msgid "Please bring ${cost} CHF in cash."
-msgstr "Veuillez payer ${cost} CHF au prestataire sur place."
 
 msgid "Enter a need"
 msgstr "Saisir un besoin"
@@ -2544,6 +2541,12 @@ msgstr "Beaucoup"
 
 msgid "Own"
 msgstr "Mes saisies"
+
+msgid "Price"
+msgstr "Prix"
+
+msgid "Weekday"
+msgstr ""
 
 msgid "Clone"
 msgstr "Copier"
@@ -3210,6 +3213,12 @@ msgstr "Réservations pour ${period}"
 #, python-format
 msgid "Billing for ${period}"
 msgstr "Facturation pour ${period}"
+
+#~ msgid "States"
+#~ msgstr "États"
+
+#~ msgid "Please bring ${cost} CHF in cash."
+#~ msgstr "Veuillez payer ${cost} CHF au prestataire sur place."
 
 #~ msgid "Enroll your child now."
 #~ msgstr "Inscrivez votre enfant maintenant."

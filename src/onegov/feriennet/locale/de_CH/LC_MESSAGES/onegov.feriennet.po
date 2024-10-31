@@ -1,7 +1,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE 1.0\n"
-"POT-Creation-Date: 2024-10-28 14:14+0100\n"
+"POT-Creation-Date: 2024-10-31 10:05+0100\n"
 "PO-Revision-Date: 2021-11-11 09:08+0100\n"
 "Last-Translator: Marc Sommerhalder <marc.sommerhalder@seantis.ch>\n"
 "Language-Team: German\n"
@@ -1626,23 +1626,20 @@ msgstr "Dauer"
 msgid "Municipalities"
 msgstr "Gemeinden"
 
-msgid "States"
-msgstr "Status"
+msgid "Apply filters"
+msgstr "Filter anwenden"
 
 msgid "Age"
 msgstr "Alter"
-
-msgid "Price"
-msgstr "Preis"
-
-msgid "Free Spots"
-msgstr "Freie Plätze"
 
 msgid "${min_age} - ${max_age} years"
 msgstr "${min_age} - ${max_age} Jahre"
 
 msgid "starting at ${price} CHF"
 msgstr "ab ${price} CHF"
+
+msgid "Free Spots"
+msgstr "Freie Plätze"
 
 msgid "No free spots"
 msgstr "Keine freien Plätze"
@@ -2049,6 +2046,12 @@ msgstr ""
 msgid "Ticket State"
 msgstr "Ticketstatus"
 
+msgid "Independent of other occasions"
+msgstr "Unabhängig von anderen Durchführungen"
+
+msgid "<dynamic element>"
+msgstr ""
+
 msgid "${min_spots} - ${max_spots} participants"
 msgstr "${min_spots} - ${max_spots} Teilnehmende"
 
@@ -2057,12 +2060,6 @@ msgstr "bis zu ${max_spots} Teilnehmende"
 
 msgid "${cost} CHF"
 msgstr "${cost} CHF"
-
-msgid "Independent of other occasions"
-msgstr "Unabhängig von anderen Durchführungen"
-
-msgid "Please bring ${cost} CHF in cash."
-msgstr "Bitte CHF ${cost} der/dem Veranstaltenden vor Ort bezahlen."
 
 msgid "Enter a need"
 msgstr "Bedarf erfassen"
@@ -2529,6 +2526,12 @@ msgstr "Viele"
 
 msgid "Own"
 msgstr "Eigene"
+
+msgid "Price"
+msgstr "Preis"
+
+msgid "Weekday"
+msgstr ""
 
 msgid "Clone"
 msgstr "Duplizieren"
@@ -3198,6 +3201,12 @@ msgstr "Buchungen ${period}"
 #, python-format
 msgid "Billing for ${period}"
 msgstr "Fakturierung ${period}"
+
+#~ msgid "States"
+#~ msgstr "Status"
+
+#~ msgid "Please bring ${cost} CHF in cash."
+#~ msgstr "Bitte CHF ${cost} der/dem Veranstaltenden vor Ort bezahlen."
 
 #~ msgid "Enroll your child now."
 #~ msgstr "Jetzt anmelden."
