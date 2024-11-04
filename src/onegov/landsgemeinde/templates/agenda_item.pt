@@ -11,7 +11,7 @@
             <div class="medium-7 cell main-content content">
                 <div class="video" tal:condition="video_url">
                     <h2 i18n:translate="" class="visually-hidden">Video</h2>
-                    <div class="videowrapper">
+                    <div class="videowrapper" id="assembly-video-iframe">
                         <iframe allow="fullscreen" width="100%" frameborder="0" src="${video_url}"></iframe>
                     </div>
                 </div>
