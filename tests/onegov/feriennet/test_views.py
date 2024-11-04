@@ -264,6 +264,22 @@ def test_activity_communication(broadcast, authenticate, connect, client,
     assert "Using a Raspberry Pi we will learn Python" in message
 
 
+def test_basic_search(client_with_es):
+    client = client_with_es
+    anom = client.spawn()
+
+    # basic test
+    assert 'Resultate' in client.get('/search?q=test')
+    assert client.get('/search/suggest?q=test').json == []
+    assert 'Resultate' in anom.get('/search?q=test')
+    assert anom.get('/search/suggest?q=test').json == []
+
+    assert 'Resultate' in client.get('/search-postgres?q=test')
+    assert client.get('/search-postgres/suggest?q=test').json == []
+    assert 'Resultate' in anom.get('/search-postgres?q=test')
+    assert anom.get('/search-postgres/suggest?q=test').json == []
+
+
 def test_activity_search(client_with_es, scenario):
     client = client_with_es
 

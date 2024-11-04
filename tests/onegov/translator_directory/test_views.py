@@ -1762,4 +1762,11 @@ def test_basic_search(client_with_es):
     anom = client.spawn()
 
     assert 'Resultate' in client.get('/search?q=test')
+    assert client.get('/search/suggest?q=test').json == []
     assert 'Resultate' in anom.get('/search?q=test')
+    assert anom.get('/search/suggest?q=test').json == []
+
+    assert 'Resultate' in client.get('/search-postgres?q=test')
+    assert client.get('/search-postgres/suggest?q=test').json == []
+    assert 'Resultate' in anom.get('/search-postgres?q=test')
+    assert anom.get('/search-postgres/suggest?q=test').json == []
