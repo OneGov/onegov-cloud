@@ -5,7 +5,7 @@ from urllib.parse import urlparse
 
 import click
 from sentry_sdk import init as init_sentry
-from websockets.legacy.client import connect
+from websockets.asyncio.client import connect
 
 from onegov.core.cli import command_group, pass_group_context
 from onegov.websockets.client import authenticate

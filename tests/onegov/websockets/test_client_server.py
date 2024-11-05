@@ -7,7 +7,7 @@ from onegov.websockets.client import register
 from onegov.websockets.client import status
 from pytest import mark
 from pytest import raises
-from websockets import connect
+from websockets.asyncio.client import connect
 
 
 @mark.asyncio
