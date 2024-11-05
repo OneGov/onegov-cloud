@@ -89,7 +89,7 @@ def test_create_languages(cfg_path, session_manager):
     assert languages().count() == len(LANGUAGES)
 
 
-def test_delete_languages(cfg_path, session_manager, translator_app):
+def test_delete_languages(cfg_path, session_manager):
     runner = CliRunner()
     session_manager.ensure_schema_exists('translator_directory')
     session_manager.set_current_schema('translator_directory-deadbeef')
