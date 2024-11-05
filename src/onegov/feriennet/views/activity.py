@@ -1,3 +1,4 @@
+import copy
 import sedate
 import random
 
@@ -442,7 +443,7 @@ def is_filtered(filters: dict[str, tuple[str, 'Sequence[Link]']]) -> bool:
 
 
 def adjust_filter_path(
-    filters: dict[str, 'Sequence[Link]'],
+    filters: dict[str, tuple[str, 'Sequence[Link]']],
     suffix: str
 ) -> None:
 
@@ -521,6 +522,7 @@ def view_activities(
             filters['states'] = (_('State'), filter_states(self, request))
 
     filters = {k: v for k, v in filters.items() if v}
+    mobile_filters = {k: v for k, v in copy.deepcopy(filters).items() if v}
 
     all_sponsors = layout.app.banners(request)
     main_sponsor = all_sponsors[0]
@@ -536,6 +538,7 @@ def view_activities(
         'layout': layout,
         'title': _('Activities'),
         'filters': filters,
+        'mobile_filters': mobile_filters,
         'filtered': is_filtered(filters),
         'period': active_period,
         'activity_ages': activity_ages,
