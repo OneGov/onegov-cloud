@@ -70,6 +70,11 @@
     }
 }
 
+.card.news-card {
+    height: calc(100% - 2rem);
+    margin-bottom: 2rem;
+}
+
 .news-card .card-section a:first-child {
     display: block;
     height: 100%;

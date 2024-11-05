@@ -24,7 +24,7 @@ def test_create_languages(cfg_path, session_manager, translator_app):
         '--config', cfg_path,
         '--select', '/translator_directory/deadbeef',
         'create-languages'
-    ])
+    ], catch_exceptions=False)
     assert result.exit_code == 0
     assert f'Inserted {len(LANGUAGES)} languages' in result.output
     assert languages().count() == len(LANGUAGES)
@@ -39,7 +39,7 @@ def test_create_languages(cfg_path, session_manager, translator_app):
         '--config', cfg_path,
         '--select', '/translator_directory/deadbeef',
         'create-languages'
-    ])
+    ], catch_exceptions=False)
     assert result.exit_code == 0
     assert 'Inserted 0 languages' in result.output
     assert 'Language \'Lorem\' is unknown' in result.output
@@ -52,7 +52,7 @@ def test_create_languages(cfg_path, session_manager, translator_app):
         '--config', cfg_path,
         '--select', '/translator_directory/deadbeef',
         'create-languages'
-    ])
+    ], catch_exceptions=False)
     assert result.exit_code == 0
     assert 'Inserted 1 languages' in result.output
     assert 'Language \'Afrikaans RENAMED\' is unknown' in result.output
@@ -69,7 +69,7 @@ def test_create_languages(cfg_path, session_manager, translator_app):
         '--config', cfg_path,
         '--select', '/translator_directory/deadbeef',
         'create-languages'
-    ])
+    ], catch_exceptions=False)
     assert result.exit_code == 0
     assert 'Inserted 2 languages' in result.output
     assert 'unknown' not in result.output
@@ -81,7 +81,7 @@ def test_create_languages(cfg_path, session_manager, translator_app):
         '--select', '/translator_directory/deadbeef',
         'create-languages',
         '--dry-run'
-    ])
+    ], catch_exceptions=False)
     assert result.exit_code == 0
     assert 'Inserted 0 languages' in result.output
     assert 'unknown' not in result.output
@@ -115,7 +115,7 @@ def test_delete_languages(cfg_path, session_manager, translator_app):
         '--select', '/translator_directory/deadbeef',
         'force-delete-languages',
         '--dry-run',
-    ], input='y')
+    ], input='y', catch_exceptions=False)
     assert result.exit_code == 0
     assert 'Aborting transaction' in result.output
     assert languages().count() == 3
@@ -125,7 +125,7 @@ def test_delete_languages(cfg_path, session_manager, translator_app):
         '--config', cfg_path,
         '--select', '/translator_directory/deadbeef',
         'force-delete-languages',
-    ], input='panic!')
+    ], input='panic!', catch_exceptions=False)
     assert result.exit_code == 0
     assert 'Aborting transaction' in result.output
     assert languages().count() == 3
@@ -135,6 +135,6 @@ def test_delete_languages(cfg_path, session_manager, translator_app):
         '--config', cfg_path,
         '--select', '/translator_directory/deadbeef',
         'force-delete-languages',
-    ], input='y')
+    ], input='y', catch_exceptions=False)
     assert result.exit_code == 0
     assert languages().count() == 0
