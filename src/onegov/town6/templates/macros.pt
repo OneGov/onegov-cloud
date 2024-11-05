@@ -346,7 +346,7 @@
                     <i class="far fa-calendar-alt" aria-hidden="true"></i>
                 </div>
                 <div class="card-section" tal:condition="with_lead|False">
-                    <h5 data-equalizer-watch="events">${item.lead}</h5>
+                    <h5>${item.lead}</h5>
                     <div class="date-place">
                         <div class="grid-x">
                             <div class="cell small-1 medium-2">
@@ -372,7 +372,7 @@
 </metal:events>
 
 <metal:panel define-macro="event-cards">
-    <div tal:condition="event_panel|nothing" class="events grid-x grid-padding-x  align-center" data-equalizer="events" data-equalize-on="medium">
+    <div tal:condition="event_panel|nothing" class="events grid-x grid-padding-x  align-center">
         <div class="cell small-12 medium-4 event-item flex-container" tal:repeat="item event_panel.links">
             <metal:b use-macro="layout.macros['event-item-card']" />
         </div>
@@ -383,7 +383,7 @@
 </metal:panel>
 
 <metal:card define-macro="directory-card">
-    <div  data-aos="fade" data-aos-duration="800" class="card" data-equalizer-watch>
+    <div  data-aos="fade" data-aos-duration="800" class="card">
         <a tal:attributes="href link.url">
         <div class="card-section">
                 <h5><i class="fa fa-list" aria-hidden="true"></i> ${link.text}</h5>
@@ -473,7 +473,7 @@
 </metal:fields>
 
 <metal:homepage-tiles define-macro="homepage-tile-card" i18n:domain="onegov.town6">
-    <div class="card" data-aos="fade" data-aos-duration="800"  id="homepage-tile-${item.number}" data-equalizer-watch tal:condition="item.links">
+    <div class="card" data-aos="fade" data-aos-duration="800"  id="homepage-tile-${item.number}" tal:condition="item.links">
         <div class="card-divider">
             <a tal:condition="item.page.url" href="${item.page.url}"><h5>${item.page.text}</h5></a>
             <h5 tal:condition="not item.page.url">${item.page.text}</h5>
@@ -488,7 +488,7 @@
 
 <metal:homepage-tiles define-macro="homepage-tiles">
     <div>
-        <div class="grid-x grid-padding-x align-center" data-equalizer data-equalize-on="medium">
+        <div class="grid-x grid-padding-x align-center" >
             <tal:block tal:repeat="item tiles">
                 <div class="cell small-12 medium-6 large-4 homepage-tile" tal:condition="item.links">
                     <metal:homepage-tiles use-macro="layout.macros['homepage-tile-card']" />
@@ -550,7 +550,7 @@
 </metal:upload>
 
 <metal:newslist define-macro="news-item-card" i18n:domain="onegov.town6">
-    <div class="card news-card" data-aos="fade" data-aos-duration="800" data-equalizer-watch tal:define="url request.link(item)">
+    <div class="card news-card" data-aos="fade" data-aos-duration="800" tal:define="url request.link(item)">
         <a href="${url}">
             <div tal:condition="item.page_image and item.show_preview_image" style="width: 100%; padding-bottom: 55%; background-image: url(${item.page_image}); background-size: cover;"></div>
         </a>
@@ -569,7 +569,7 @@
 
 
 <metal:newslist define-macro="news-item-full" i18n:domain="onegov.town6">
-    <div class="news-item cell small-8" data-aos="fade" data-aos-duration="800" data-equalizer-watch tal:define="url request.link(item)">
+    <div class="news-item cell small-8" data-aos="fade" data-aos-duration="800" tal:define="url request.link(item)">
         <hr>
         <a href="${url}">
             <h3>${item.title} <metal:hint use-macro="layout.macros['access_hint']"/> <metal:hint use-macro="layout.macros['publication_hint']"/></h3>
@@ -583,7 +583,7 @@
 
 
 <metal:newslist define-macro="newslist" i18n:domain="onegov.town6">
-    <div tal:condition="newsletter.show_news_as_tiles|True and news" class="newslist grid-x grid-padding-x align-center" data-equalizer data-equalize-on="medium">
+    <div tal:condition="newsletter.show_news_as_tiles|True and news" class="newslist grid-x grid-padding-x align-center" >
         <div class="cell small-12 medium-${md_span|6} large-${lg_span|4} news-list-item" tal:repeat="item news">
             <metal:newlist use-macro="layout.macros['news-item-card']" tal:define="heading 'h4'" />
         </div>
@@ -1427,7 +1427,7 @@
 </metal:calendar_day_content>
 
 <metal:occurrences define-macro="occurrences" i18n:domain="onegov.town6">
-        <div class="grid-x grid-padding-x events" data-equalizer="events">
+        <div class="grid-x grid-padding-x events" >
     <tal:b repeat="occurrence occurrences">
             <metal:b use-macro="layout.macros['occurrence_list_view']" />
     </tal:b>
