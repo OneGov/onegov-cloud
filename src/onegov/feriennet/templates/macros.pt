@@ -86,19 +86,52 @@
     </tal:b>
 </metal:footer_columns>
 
+<metal:footer_social_media define-macro="footer_social_media">
+    <tal:b condition="any((
+            facebook,
+            twitter,
+            instagram,
+            youtube,
+            linkedin,
+            tiktok,
+        ))">
+
+        <h5 i18n:translate>Follow us on</h5>
+        <ul class="social-media-links">
+            <a tal:condition="facebook" tal:attributes="href facebook">
+                <i class="fab fa-facebook fa-fw fa-2x"></i>
+            </a>
+            <a tal:condition="twitter" tal:attributes="href twitter">
+                <i class="fab fa-twitter fa-fw fa-2x"></i>
+            </a>
+            <a tal:condition="instagram" tal:attributes="href instagram">
+                <i class="fab fa-instagram fa-fw fa-2x"></i>
+            </a>
+            <a tal:condition="youtube" tal:attributes="href youtube">
+                <i class="fab fa-youtube fa-fw fa-2x"></i>
+            </a>
+            <a tal:condition="linkedin" tal:attributes="href linkedin">
+                <i class="fab fa-linkedin fa-fw fa-2x"></i>
+            </a>
+            <a tal:condition="tiktok" tal:attributes="href tiktok">
+                <i class="fab fa-tiktok fa-fw fa-2x"></i>
+            </a>
+        </ul>
+    </tal:b>
+</metal:footer_social_media>
+
+
 <metal:footer_custom_links define-macro="footer_custom_links">
     <tal:b define="custom_links layout.custom_links">
         <tal:b tal:condition="custom_links" tal:repeat="link custom_links">
             <h5 class="custom-links" i18n:translate="">Links</h5>
-            <a href="${link[1]}"><i class="fa fa-link fa-fw"></i> ${link[0]}</a>
+            <a class="footer-link" href="${link[1]}"><i class="fa fa-link fa-fw"></i> ${link[0]}</a>
         </tal:b>
     </tal:b>
 </metal:footer_custom_links>
 
 <metal:footer_sponsors define-macro="footer_sponsors" i18n:domain="onegov.feriennet">
         <div class="cell small-12">
-            <h5 i18n:translate>Pro Juventute Feriennet</h5>
-
             <div class="grid-x grid-padding-x">
                 <div class="cell small-12 medium-3">
                     <tal:b condition="request.locale.startswith('de')">
@@ -132,66 +165,72 @@
                         </a>
                     </tal:b>
                 </div>
-                <div class="cell small-12 medium-5 pro-juventute-ad-text">
+                <div class="cell small-12 medium-3 pro-juventute-ad-text">
+                    <h5 i18n:translate>Pro Juventute Feriennet</h5>
                     <!--! This is not being translated with our translation machinery as the content of this is very explicitly specified. -->
 
                     <div class="platform-promotion">
                         <tal:b condition="request.locale.startswith('de')">
-                            <div>
-                                <a href="https://www.projuventute.ch/de/eltern/lehrpersonen-fachpersonen/feriennet">
-                                    Feriennet</a> ist die Buchungsplattform von Pro Juventute für betreute Ferienangebote.
-                                <span>
-                                    Weitere Angebote der Stiftung finden Sie <a href="https://www.projuventute.ch/de/angebote">hier</a>.
-                                </span>
-                            </div>
-
-                            <div>
-                                Sie möchten unsere Arbeit für Kinder und Jugendliche in der Schweiz unterstützen? Dann können Sie <a href="https://www.projuventute.ch/de/helfen/spenden" class="donate-link">hier</a> spenden. Herzlichen Dank.
-                            </div>
-
-                            <div>
-                                Diese Plattform wurde dank der grosszügigen Unterstützung unserer <a href="https://www.projuventute.ch/de/eltern/lehrpersonen-fachpersonen/feriennet">Partner</a> realisiert und von <a href="https://www.seantis.ch">Seantis GmbH</a> mit <a href="https://www.admin.digital">Onegov Cloud</a>, unterstützt von <a href="https://www.netcetera.com">Netcetera AG</a> entwickelt.
-                            </div>
+                            <ul>
+                                <li>
+                                    <a class="footer-link" href="https://www.projuventute.ch/de/eltern/lehrpersonen-fachpersonen/feriennet">Über das Feriennet</a>
+                                </li>
+                                <li>
+                                    <a class="footer-link" href="https://www.projuventute.ch/de/angebote">Weitere Angebote</a>
+                                </li>
+                                <li>
+                                    <a href="https://www.projuventute.ch/de/helfen/spenden" class="donate-link footer-link">Spenden</a>
+                                </li>
+                            </ul>
                         </tal:b>
                         <tal:b condition="request.locale.startswith('fr')">
-                            <div>
-                                <a href="https://www.projuventute.ch/fr/parents/enseignantes-et-specialistes/reseau-vacances">
-                                    Réseau vacances est une plateforme, développée par Pro Juventute, qui permet de mettre en ligne des passeports vacances et d’en assurer la gestion et l’utilisation complète.
-                                </a>
-                                <span>
-                                    Pour de plus amples informations sur les offres de la Fondation Pro Juventute : <a href="https://www.projuventute.ch/fr/prestations">Programmes</a>.
-                                </span>
-                            </div>
-
-                            <div>
-                                Vous souhaitez soutenir notre travail auprès des enfants et des jeunes en Suisse? Pour faire un don : <a href="https://www.projuventute.ch/fr/soutenir/dons" class="donate-link">Dons</a>. Nous vous remercions.
-                            </div>
-
-                            <div>
-                                Cette plateforme a été réalisée grâce au soutien généreux de nos <a href="https://www.projuventute.ch/fr/parents/enseignantes-et-specialistes/reseau-vacances">partenaires</a> et développée par <a href="https://www.seantis.ch">Seantis GmbH</a> et <a href="https://www.admin.digital">Onegov Cloud</a>, avec le soutien de <a href="https://www.netcetera.com">Netcetera SA</a>.
-                            </div>
+                            <ul>
+                                <li>
+                                    <a class="footer-link" href="https://www.projuventute.ch/fr/parents/enseignantes-et-specialistes/reseau-vacances">À propos de Feriennet</a>
+                                </li>
+                                <li>
+                                    <a class="footer-link" href="https://www.projuventute.ch/fr/prestations">Programmes</a>
+                                </li>
+                                <li>
+                                    <a href="https://www.projuventute.ch/fr/soutenir/dons" class="donate-link footer-link">Dons</a>
+                                </li>
+                            </ul>
                         </tal:b>
                         <tal:b condition="request.locale.startswith('it')">
                             <div>
-                                <a href="https://www.projuventute.ch/it">
+                                <a class="footer-link" href="https://www.projuventute.ch/it">
                                     Feriennet è la piattaforma di prenotazione di Pro Juventute per campi e colonie di vacanza.
                                 </a>
                                 <span>
-                                    Potete trovare altri progetti della fondazione <a href="https://www.projuventute.ch/it/servizi">qui</a>.
+                                    Potete trovare altri progetti della fondazione <a class="footer-link" href="https://www.projuventute.ch/it/servizi">qui</a>.
                                 </span>
                             </div>
 
                             <div>
-                                Volete sostenere il nostro lavoro per i bambini e i giovani in Svizzera? Allora potete effettuare una donazione <a href="https://www.projuventute.ch/it/supporto/donare?utm_source=spendenLink&utm_medium=spendenLinkFooter&utm_campaign=feriennet" class="donate-link">qui</a>. Grazie mille.
+                                Volete sostenere il nostro lavoro per i bambini e i giovani in Svizzera? Allora potete effettuare una donazione <a href="https://www.projuventute.ch/it/supporto/donare?utm_source=spendenLink&utm_medium=spendenLinkFooter&utm_campaign=feriennet" class="donate-link footer-link">qui</a>. Grazie mille.
                             </div>
 
                             <div>
-                                Questa piattaforma è stata realizzata grazie al generoso sostegno dei nostri <a href="https://www.projuventute.ch/it">partner</a> e sviluppata da <a href="https://www.seantis.ch">Seantis GmbH</a> con <a href="https://www.admin.digital">Onegov Cloud</a>, supportata da <a href="https://www.netcetera.com">Netcetera AG</a>.
+                                Questa piattaforma è stata realizzata grazie al generoso sostegno dei nostri <a class="footer-link" href="https://www.projuventute.ch/it">partner</a> e sviluppata da <a class="footer-link" href="https://www.seantis.ch">Seantis GmbH</a> con <a class="footer-link" href="https://www.admin.digital">Onegov Cloud</a>, supportata da <a class="footer-link" href="https://www.netcetera.com">Netcetera AG</a>.
                             </div>
                         </tal:b>
                     </div>
                 </div>
-                <div class="cell small-12 medium-4">
+                <div class="cell small-12 medium-3">
+                    <h5 i18n:translate>Implementation</h5>
+                    <ul>
+                        <li>
+                            <a class="footer-link" href="https://www.seantis.ch">Seantis GmbH</a>
+                        </li>
+                        <li>
+                            <a class="footer-link" href="https://www.admin.digital">Onegov Cloud</a>
+                        </li>
+                        <li>
+                            <a class="footer-link" href="https://www.netcetera.com">Netcetera AG</a>
+                        </li>
+                    </ul>
+                </div>
+                <div class="cell small-12 medium-3">
                     <div class="platform-awards">
                         <metal:b use-macro="layout.macros.bosw_award" />
                         <metal:b use-macro="layout.macros.onegov_award" />
@@ -218,38 +257,38 @@
     <div class="small-12 cell footer-links">
         <span>&copy; Pro Juventute ${layout.today().year}</span>
         <span>
-            <a href="https://github.com/OneGov/onegov-cloud/blob/master/CHANGES.md#release-${layout.app.version.replace('.', '')}">Feriennet ${layout.app.version}</a>
+            <a class="footer-link" href="https://github.com/OneGov/onegov-cloud/blob/master/CHANGES.md#release-${layout.app.version.replace('.', '')}">Feriennet ${layout.app.version}</a>
         </span>
         <span>
             <tal:b condition="request.locale.startswith('de')">
-            <a href="https://www.projuventute.ch/de/datenschutz" i18n:translate>
+            <a class="footer-link" href="https://www.projuventute.ch/de/datenschutz" i18n:translate>
                 Privacy Protection</a>
             </tal:b>
             <tal:b condition="request.locale.startswith('fr')">
-            <a href="https://www.projuventute.ch/fr/protection-des-donnees" i18n:translate>
+            <a class="footer-link" href="https://www.projuventute.ch/fr/protection-des-donnees" i18n:translate>
                 Privacy Protection</a>
             </tal:b>
             <tal:b condition="request.locale.startswith('it')">
-            <a href="https://www.projuventute.ch/it/protezione-dei-dati" i18n:translate>
+            <a class="footer-link" href="https://www.projuventute.ch/it/protezione-dei-dati" i18n:translate>
                 Privacy Protection</a>
             </tal:b>
         </span>
         <span>
             <tal:b condition="request.locale.startswith('de')">
-            <a href="https://www.projuventute.ch/de/nutzungsbestimmungen">
+            <a class="footer-link" href="https://www.projuventute.ch/de/nutzungsbestimmungen">
                 Nutzungsbestimmungen</a>
             </tal:b>
             <tal:b condition="request.locale.startswith('fr')">
-            <a href="https://www.projuventute.ch/fr/conditions-dutilisation">
+            <a class="footer-link" href="https://www.projuventute.ch/fr/conditions-dutilisation">
                 Conditions d'utilisation</a>
             </tal:b>
             <tal:b condition="request.locale.startswith('it')">
-            <a href="https://www.projuventute.ch/it/condizioni-di-utilizzo">
+            <a class="footer-link" href="https://www.projuventute.ch/it/condizioni-di-utilizzo">
                 Condizioni di utilizzo</a>
             </tal:b>
         </span>
         <span tal:condition="not request.is_logged_in">
-            <a href="${layout.login_from_path()}" i18n:translate>
+            <a class="footer-link" href="${layout.login_from_path()}" i18n:translate>
                 Login
             </a>
         </span>

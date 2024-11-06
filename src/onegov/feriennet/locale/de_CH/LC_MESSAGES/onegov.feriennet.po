@@ -1,7 +1,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE 1.0\n"
-"POT-Creation-Date: 2024-10-31 10:05+0100\n"
+"POT-Creation-Date: 2024-11-06 10:42+0100\n"
 "PO-Revision-Date: 2021-11-11 09:08+0100\n"
 "Last-Translator: Marc Sommerhalder <marc.sommerhalder@seantis.ch>\n"
 "Language-Team: German\n"
@@ -1602,9 +1602,6 @@ msgstr "Keine Angebote gefunden."
 msgid "Reset filter."
 msgstr "Filter zurücksetzen."
 
-msgid "To my list"
-msgstr "Zu meiner Liste"
-
 msgid "Show more"
 msgstr "Mehr anzeigen"
 
@@ -1614,20 +1611,11 @@ msgstr "Nach oben"
 msgid "My list"
 msgstr "Meine Liste"
 
-msgid "Weeks"
-msgstr "Wochen"
-
-msgid "Weekdays"
-msgstr "Wochentage"
-
-msgid "Duration"
-msgstr "Dauer"
-
-msgid "Municipalities"
-msgstr "Gemeinden"
-
 msgid "Apply filters"
 msgstr "Filter anwenden"
+
+msgid "Filters"
+msgstr "Filter"
 
 msgid "Age"
 msgstr "Alter"
@@ -1996,11 +1984,14 @@ msgstr "Zahlung"
 msgid "Purpose of Payment"
 msgstr "Zahlungszweck"
 
+msgid "Pro Juventute Logo"
+msgstr "Pro Juventute Logo"
+
 msgid "Pro Juventute Feriennet"
 msgstr "Pro Juventute Feriennet"
 
-msgid "Pro Juventute Logo"
-msgstr "Pro Juventute Logo"
+msgid "Implementation"
+msgstr "Umsetzung"
 
 msgid "Feriennet Partner"
 msgstr "Feriennet Partner"
@@ -2527,8 +2518,20 @@ msgstr "Viele"
 msgid "Own"
 msgstr "Eigene"
 
+msgid "Duration"
+msgstr "Dauer"
+
 msgid "Price"
 msgstr "Preis"
+
+msgid "Weeks"
+msgstr "Wochen"
+
+msgid "Weekdays"
+msgstr "Wochentage"
+
+msgid "Municipalities"
+msgstr "Gemeinden"
 
 msgid "Weekday"
 msgstr ""
@@ -3201,6 +3204,9 @@ msgstr "Buchungen ${period}"
 #, python-format
 msgid "Billing for ${period}"
 msgstr "Fakturierung ${period}"
+
+#~ msgid "To my list"
+#~ msgstr "Zu meiner Liste"
 
 #~ msgid "States"
 #~ msgstr "Status"

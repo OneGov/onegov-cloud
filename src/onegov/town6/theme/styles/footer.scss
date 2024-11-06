@@ -25,10 +25,10 @@ $footer-hover-color: $primary-fg-color;
         border-radius: .7rem;
     }
 
-    a:hover {
+    .footer-link:hover {
         background: rgba(255, 255, 255, .2);
-        padding: .3rem .5rem;
-        margin: -.3rem -.5rem;
+        padding: .1rem 0rem;
+        margin: -.1rem 0rem;
     }
 
     h2 {

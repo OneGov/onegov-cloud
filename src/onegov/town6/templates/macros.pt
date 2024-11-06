@@ -220,31 +220,31 @@
 <metal:footer_custom_links define-macro="footer_custom_links">
     <tal:b define="custom_links layout.custom_links">
         <tal:b tal:condition="custom_links" tal:repeat="link custom_links">
-            <h5 class="custom-links"><a href="${link[1]}">${link[0]}</a></h5>
+            <h5 class="custom-links"><a class="footer-link" href="${link[1]}">${link[0]}</a></h5>
         </tal:b>
     </tal:b>
 </metal:footer_custom_links>
 
 <metal:footer_links define-macro="footer_links" i18n:domain="onegov.town6">
 <div class="medium-4 cell"></div>
-<div class="small-12 medium-4 cell footer-links">
+<div class="small-12 medium-6 cell footer-links">
     <tal:b condition="not request.app.org.hide_onegov_footer|True">
         <span>
-            <a href="https://www.admin.digital">OneGov Cloud</a> | <a href="https://github.com/OneGov/onegov-cloud/blob/master/CHANGES.md#release-${layout.app.version.replace('.', '')}">${layout.app.version}</a>
+            <a class="footer-link" href="https://www.admin.digital">OneGov Cloud</a> | <a href="https://github.com/OneGov/onegov-cloud/blob/master/CHANGES.md#release-${layout.app.version.replace('.', '')}">${layout.app.version}</a>
         </span>
         <span>
-            <a href="https://www.admin.digital/datenschutz" i18n:translate>
+            <a class="footer-link" href="https://www.admin.digital/datenschutz" i18n:translate>
                 Privacy Protection
             </a>
         </span>
     </tal:b>
     <span tal:condition="not request.is_logged_in">
-        <a href="${layout.login_from_path()}" i18n:translate>
+        <a class="footer-link" href="${layout.login_from_path()}" i18n:translate>
             Login
         </a>
     </span>
     <span tal:define="about_url layout.org.meta.about_url|nothing" tal:condition="about_url">
-        <a href="${about_url}" i18n:translate>
+        <a class="footer-link" href="${about_url}" i18n:translate>
             About
         </a>
     </span>
@@ -254,13 +254,13 @@
 <metal:footer_contact define-macro="footer_contact" i18n:domain="onegov.town6">
     <h5 i18n:translate tal:condition="contact or contact_url">Contact</h5>
     <div tal:content="layout.org.contact_html" />
-    <a tal:condition="contact_url" tal:attributes="href contact_url"><strong><tal:b i18n:translate>more</tal:b>…</strong></a>
+    <a class="footer-link" tal:condition="contact_url" tal:attributes="href contact_url"><strong><tal:b i18n:translate>more</tal:b>…</strong></a>
 </metal:footer_contact>
 
 <metal:footer_opening_hours define-macro="footer_opening_hours" i18n:domain="onegov.town6">
     <h5 i18n:translate tal:condition="opening_hours or opening_hours_url">Opening Hours</h5>
     <div tal:content="opening_hours" />
-    <a tal:condition="opening_hours_url" tal:attributes="href opening_hours_url"><strong><tal:b i18n:translate>more</tal:b>…</strong></a>
+    <a class="footer-link" tal:condition="opening_hours_url" tal:attributes="href opening_hours_url"><strong><tal:b i18n:translate>more</tal:b>…</strong></a>
 </metal:footer_opening_hours>
 
 <metal:footer_social_media define-macro="footer_social_media">
@@ -276,32 +276,32 @@
         <h5 i18n:translate>Social Media</h5>
         <ul class="social-media-links">
             <li tal:condition="facebook">
-                <a tal:attributes="href facebook">
+                <a class="footer-link" tal:attributes="href facebook">
                     <i class="fab fa-facebook fa-fw"></i> Facebook
                 </a>
             </li>
             <li tal:condition="twitter">
-                <a tal:attributes="href twitter">
+                <a class="footer-link" tal:attributes="href twitter">
                     <i class="fab fa-twitter fa-fw"></i> Twitter
                 </a>
             </li>
             <li tal:condition="instagram">
-                <a tal:attributes="href instagram">
+                <a class="footer-link" tal:attributes="href instagram">
                     <i class="fab fa-instagram fa-fw"></i> Instagram
                 </a>
             </li>
             <li tal:condition="youtube">
-                <a tal:attributes="href youtube">
+                <a class="footer-link" tal:attributes="href youtube">
                     <i class="fab fa-youtube fa-fw"></i> YouTube
                 </a>
             </li>
             <li tal:condition="linkedin">
-                <a tal:attributes="href linkedin">
+                <a class="footer-link" tal:attributes="href linkedin">
                     <i class="fab fa-linkedin fa-fw"></i> LinkedIn
                 </a>
             </li>
             <li tal:condition="tiktok">
-                <a tal:attributes="href tiktok">
+                <a class="footer-link" tal:attributes="href tiktok">
                     <i class="fab fa-tiktok fa-fw"></i> TikTok
                 </a>
             </li>
@@ -314,8 +314,8 @@
         <h5>Languages</h5>
         <div class="text-links">
             <tal:b repeat="(name, url) layout.locales">
-                <a tal:condition="request.locale not in url" href="${url}">${name}</a>
-                <a tal:condition="request.locale in url" style="cursor: default"><strong>${name}</strong></a>
+                <a class="footer-link" tal:condition="request.locale not in url" href="${url}">${name}</a>
+                <a class="footer-link" tal:condition="request.locale in url" style="cursor: default"><strong>${name}</strong></a>
             </tal:b>
         </div>
     </div>
