@@ -441,6 +441,9 @@ def is_filtered(filters: dict[str, tuple[str, 'Sequence[Link]']]) -> bool:
 
     return False
 
+def count_active(filter: tuple[str, 'Sequence[Link]']) -> int:
+    return sum(1 for link in filter[1] if link.active)
+
 
 def adjust_filter_path(
     filters: dict[str, tuple[str, 'Sequence[Link]']],
@@ -529,6 +532,7 @@ def view_activities(
     sponsors = all_sponsors[1:len(all_sponsors)]
 
     activities = list(self.batch) if show_activities else []
+    active_filter = request.params.get('active-filter', None)
 
     return {
         'activities': activities,
@@ -537,8 +541,10 @@ def view_activities(
         'random': random,
         'layout': layout,
         'title': _('Activities'),
+        'count_active': count_active,
         'filters': filters,
         'mobile_filters': mobile_filters,
+        'active_filter': active_filter,
         'filtered': is_filtered(filters),
         'period': active_period,
         'activity_ages': activity_ages,

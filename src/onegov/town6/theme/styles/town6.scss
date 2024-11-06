@@ -1187,7 +1187,7 @@ ul.recipients {
 }
 
 /* Filters */
-.filters-top {
+#filters-top {
     display:flex;
     align-items: start;
     margin-bottom: 3rem;
@@ -1198,6 +1198,11 @@ ul.recipients {
         padding: .7rem 1rem !important;
         margin-bottom: 0;
         border-radius: .7rem !important;
+
+        &.active {
+            background: $primary-color !important;
+            color: $white !important;
+        }
 
         &.hover {
             border: 1px solid darken($primary-color, 10%) !important;
@@ -1216,6 +1221,11 @@ ul.recipients {
         background: transparent;
         padding: .5rem 0 0;
         border: none;
+
+        &.ic-transitioning .filter-panel * {
+            opacity: .7;
+        }
+
     }
     .filter-panel {
         background: $white;
@@ -1227,5 +1237,29 @@ ul.recipients {
         .apply-filters{
             margin-bottom: 0;
         }
+
+        li span:focus,
+        li span:focus-visible,
+        li span:focus-within {
+            background: $primary-color !important;
+            a {
+                color: $white !important;
+            }
+        }
     }
+}
+
+.filter-panel .blank-label {
+    border-radius: .7rem;
+    background: $smoke;
+    border: 1px solid $smoke;
+
+    &.active {
+        background: $primary-color;
+    }
+}
+
+#mobile-filters-button {
+    margin-left: auto;
+    display: flex;
 }

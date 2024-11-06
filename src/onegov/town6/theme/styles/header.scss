@@ -725,28 +725,36 @@ $editbar-fg-color-active: $white;
 }
 
 #offCanvasFilters {
+    background: $white;
+
     .navigation-area {
         padding: 2rem 0;
         
         .menu-wrapper {
-            // max-height: calc(100vh - 15rem);
-            // overflow-y: scroll;
-            // box-shadow: inset 0 10px 8px -10px rgba(0,0,0,0.07),inset 0 -10px 8px -10px rgba(0,0,0,0.07);
-
-            .is-drilldown {
-                min-height: 100% !important;
-            }
+            height: calc(100vh - 240px);
+            overflow: scroll;
         }
-    }
 
-    .drilldown .is-drilldown-submenu {
-        background: $light-gray;
-    }
+        .accordion {
+            background: transparent;
 
-    .is-drilldown-submenu-parent {
-        border-top: 1px solid $iron;
-        a {
-            color: $oil;
+            .accordion-content {
+                margin: 0;
+                border: 0;
+                background: transparent;
+            }
+
+            .accordion-title {
+                color: $oil;
+                font-size: 1rem;
+                border: 0;
+                border-top: 1px solid $gainsboro;
+                border-radius: 0;
+            }
+
+            @media #{$small-only} {min-width: 90vw;}
+            @media #{$medium-up} {min-width: 60vw;}
+            @media #{$large-up} {min-width: 30vw;}
         }
     }
 }
