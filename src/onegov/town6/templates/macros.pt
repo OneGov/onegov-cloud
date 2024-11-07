@@ -2355,7 +2355,6 @@
             ic-on-success="
                 var info = $(elt).closest('tr');
                 info.prev().remove();
-                info.next().remove();
                 info.remove();
             "
             data-confirm="Do you really want to delete this file?"
