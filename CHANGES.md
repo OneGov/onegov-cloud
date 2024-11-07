@@ -1,8 +1,78 @@
 # Changes
 
+## 2024.52
+
+`2024-11-07` | [057ee170cf...612b2af593](https://github.com/OneGov/onegov-cloud/compare/057ee170cf^...612b2af593)
+
+### Core
+
+##### Reviews silenced bandit errors and increases robustness
+
+`Bugfix` | [SEA-1010](https://linear.app/seantis/issue/SEA-1010) | [aac58babb9](https://github.com/onegov/onegov-cloud/commit/aac58babb93843cc99bebf245db3bb95764c487b)
+
+### Directory
+
+##### Ensure all values can be displayed in accordion layout
+
+`Bugfix` | [OGC-1895](https://linear.app/onegovcloud/issue/OGC-1895) | [3d6aa4d218](https://github.com/onegov/onegov-cloud/commit/3d6aa4d218a53c3246ebf1c7a02847d969c083fe)
+
+### Feriennet
+
+##### Add piwik to the feriennet CSP
+
+`Feature` | [PRO-1264](https://linear.app/projuventute/issue/PRO-1264) | [48163dd50a](https://github.com/onegov/onegov-cloud/commit/48163dd50aa321067717fc978f85c4d9d2b6391a)
+
+### Fsi
+
+##### Remove invalid state filter for survey export
+
+`Bugfix` | [OGC-1889](https://linear.app/onegovcloud/issue/OGC-1889) | [5d8df83efb](https://github.com/onegov/onegov-cloud/commit/5d8df83efb88918c5743b6ded5f0f08910310729)
+
+##### Make Survey Submission Public
+
+The SurveySubmission is finished, but it can still be edited.
+
+`Bugfix` | [OGC-1850](https://linear.app/onegovcloud/issue/OGC-1850) | [612b2af593](https://github.com/onegov/onegov-cloud/commit/612b2af5932f72bb28c8a8d3ec0de9e2c38e8111)
+
+### Landsgemeinde
+
+##### Update timestamp in iframe via js
+
+We now update the timestamp in the iframe video via js, which enables us to turn on autoplay without muting in certrain browsers.
+
+`Feature` | [OGC-1668](https://linear.app/onegovcloud/issue/OGC-1668) | [403b5285c4](https://github.com/onegov/onegov-cloud/commit/403b5285c4f0c8909ad5d4e170900ddd77cfa7c3)
+
+### Org
+
+##### Only managers can add newsletters and see subscribers
+
+`Bugfix` | [OGC-1890](https://linear.app/onegovcloud/issue/OGC-1890) | [a117d6bcc6](https://github.com/onegov/onegov-cloud/commit/a117d6bcc626f02a5eb702967950a5940b52b23e)
+
+### Town6
+
+##### Remove equalizer from cards
+
+`Feature` | [476538ed18](https://github.com/onegov/onegov-cloud/commit/476538ed1801bb4f5efdfdde827db17cfe220d2f)
+
+##### Reduce Export title size for person
+
+`Bugfix` | [OGC-1887](https://linear.app/onegovcloud/issue/OGC-1887) | [5cce1360de](https://github.com/onegov/onegov-cloud/commit/5cce1360de7af9f76c3848ec5ae4d06831d61b26)
+
+### Translator
+
+##### Remove nationality column after migrating to meta
+
+`Feature` | [OGC-1805](https://linear.app/onegovcloud/issue/OGC-1805) | [057ee170cf](https://github.com/onegov/onegov-cloud/commit/057ee170cf44f0768eff6a864aee9e3b0773b081)
+
+### Wtfs
+
+##### Remove wtfs application from code base
+
+`Feature` | [OGC-1792](https://linear.app/onegovcloud/issue/OGC-1792) | [1154c6c0e9](https://github.com/onegov/onegov-cloud/commit/1154c6c0e932e680829e582ae14df54e87474647)
+
 ## 2024.51
 
-`2024-10-25` | [70697c790f...e8a804f646](https://github.com/OneGov/onegov-cloud/compare/70697c790f^...e8a804f646)
+`2024-10-25` | [70697c790f...41a2fd0aad](https://github.com/OneGov/onegov-cloud/compare/70697c790f^...41a2fd0aad)
 
 ### Electionday
 
@@ -2184,30 +2254,4 @@ Use two columns to display people and don't display icons if person has no image
 ##### Fix missing `MTANAuth` view
 
 `Bugfix` | [OGC-1401](https://linear.app/onegovcloud/issue/OGC-1401) | [3c51955881](https://github.com/onegov/onegov-cloud/commit/3c5195588146cf47616d549d7089b2a7b63500c9)
-
-## 2024.2
-
-`2024-01-12` | [f1d8178342...bafd66f93e](https://github.com/OneGov/onegov-cloud/compare/f1d8178342^...bafd66f93e)
-
-### Org
-
-##### Adds an internal notes field to directory entries
-
-`Feature` | [OGC-1403](https://linear.app/onegovcloud/issue/OGC-1403) | [bbeb771f86](https://github.com/onegov/onegov-cloud/commit/bbeb771f86a1933c7b73958ef1357fecaa3a7c4c)
-
-##### Shortens URL used in mTAN SMS
-
-`Bugfix` | [OGC-1401](https://linear.app/onegovcloud/issue/OGC-1401) | [06f489d75f](https://github.com/onegov/onegov-cloud/commit/06f489d75fa5739a83bf2e30c713ab216507fe28)
-
-### Town6
-
-##### Make newlines possible in lead.
-
-`Feature` | [OGC-1328](https://linear.app/onegovcloud/issue/OGC-1328) | [11cf90d104](https://github.com/onegov/onegov-cloud/commit/11cf90d1041d17ebb7aa4b11ad7289bc6a726521)
-
-##### Sidebar fix
-
-Use different script for fixed sidebar on scroll.
-
-`Bugfix` | [OGC-1390](https://linear.app/onegovcloud/issue/OGC-1390) | [d6ccc6b274](https://github.com/onegov/onegov-cloud/commit/d6ccc6b2746c508f60e089259a1e5a50cd098fa2)
 
