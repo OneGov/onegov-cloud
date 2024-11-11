@@ -6,6 +6,7 @@ from onegov.pas.collections import AttendenceCollection
 from onegov.pas.forms import AttendenceAddForm
 from onegov.pas.forms import AttendenceAddPlenaryForm
 from onegov.pas.forms import AttendenceForm
+from onegov.pas.forms.attendence_filter import AttendenceFilterForm
 from onegov.pas.layouts import AttendenceCollectionLayout
 from onegov.pas.layouts import AttendenceLayout
 from onegov.pas.models import Attendence
@@ -29,12 +30,20 @@ def view_attendences(
 ) -> 'RenderData':
 
     layout = AttendenceCollectionLayout(self, request)
+    form = AttendenceFilterForm(data=dict(request.params))
+    form.request = request
+    form.on_request()
+
+    if form.submitted(request):
+        collection = self.for_filter(**form.data)
+    else:
+        collection = self
 
     return {
-        'add_link': request.link(self, name='new'),
         'layout': layout,
-        'attendences': self.query().all(),
-        'title': layout.title,
+        'attendences': collection.query(),
+        'form': form,
+        'title': _('Attendences'),
     }
 
 

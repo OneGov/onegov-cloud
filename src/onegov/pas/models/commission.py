@@ -13,6 +13,7 @@ from uuid import uuid4
 from sqlalchemy import Enum
 from sqlalchemy.orm import relationship
 
+
 from typing import TYPE_CHECKING
 if TYPE_CHECKING:
     import uuid

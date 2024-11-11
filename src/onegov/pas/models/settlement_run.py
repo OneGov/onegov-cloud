@@ -18,6 +18,7 @@ if TYPE_CHECKING:
 
 
 class SettlementRun(Base, ContentMixin, TimestampMixin, ORMSearchable):
+    """ Abrechnungslauf """
 
     __tablename__ = 'pas_settlements'
 

@@ -97,3 +97,63 @@ class Attendence(Base, TimestampMixin):
         Commission,
         back_populates='attendences'
     )
+
+    def calculate_value(self) -> str:
+        """Calculate the value (in days/hours) for an attendance record.
+
+        The calculation follows these business rules:
+        - Plenary sessions (Kantonsratsitzung):
+            * Always counted as 0.5 (half day), regardless of actual duration
+
+        - Commission meetings and file study sessions:
+            * First 2 hours are counted as given
+            * After 2 hours, time is rounded to nearest 30-minute increment
+            * Example: 2h 40min would be calculated as 2.5 hours
+
+        Args:
+            attendence: The Attendence record containing:
+                - type: The type of session (plenary, commission, or study)
+                - duration: Duration in minutes
+
+        Returns:
+            str: The calculated value formatted with one decimal place:
+                - '0.5' for plenary sessions
+                - Actual hours (e.g., '2.5') for commission/study sessions
+
+        Examples:
+            >>> # Plenary session
+            >>> attendence.type = 'plenary'
+            >>> _calculate_value(attendence)
+            '0.5'
+
+            >>> # Commission meeting, 2 hours
+            >>> attendence.type = 'commission'
+            >>> attendence.duration = 120  # minutes
+            >>> _calculate_value(attendence)
+            '2.0'
+
+            >>> # Study session, 2h 40min
+            >>> attendence.type = 'study'
+            >>> attendence.duration = 160  # minutes
+            >>> _calculate_value(attendence)
+            '2.5'
+        """
+        if self.type == 'plenary':
+            return '0.5'  # Always half day for plenary sessions
+
+        # For commission meetings and study sessions, calculate based on
+        # duration
+        if self.type in ('commission', 'study'):
+            duration_hours = self.duration / 60  # Convert minutes to hours
+
+            if duration_hours <= 2:
+                return f'{duration_hours:.1f}'
+            else:
+                base_hours = 2
+                additional_hours = (duration_hours - 2)
+                # Round additional time to nearest 0.5
+                additional_hours = round(additional_hours * 2) / 2
+                total_hours = base_hours + additional_hours
+                return f'{total_hours:.1f}'
+
+        return '0.0'  # Default case

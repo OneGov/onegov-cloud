@@ -36,9 +36,21 @@ class ParliamentarianCollectionLayout(DefaultLayout):
                         Link(
                             text=_('Parliamentarian'),
                             url=self.request.link(self.model, 'new'),
-                            attrs={'class': 'new-parliamentarian'}
+                            attrs={'class': 'new-parliamentarian'},
                         ),
-                    ]
+                    ],
+                ),
+                LinkGroup(
+                    title=_('Export'),
+                    links=[
+                        Link(
+                            text=_('Export All (xlsx)'),
+                            url=self.request.link(
+                                self.model,
+                                'xlsx-billing-export-all',
+                            ),
+                        ),
+                    ],
                 ),
             ]
         return None
@@ -112,6 +124,20 @@ class ParliamentarianLayout(DefaultLayout):
                             )
                         )
                     )
-                )
+                ),
+                LinkGroup(
+                    title=_('Export'),
+                    links=[
+                        Link(
+                            text=_('CSV billing export'),
+                            url=self.request.link(
+                                self.model,
+                                'csv-billing-export',
+                                query_params={'format': 'csv'},
+                            ),
+                            attrs={'class': 'csv-billing-export'}
+                        ),
+                    ]
+                ),
             ]
         return None

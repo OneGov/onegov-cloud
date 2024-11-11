@@ -300,6 +300,20 @@ class Parliamentarian(
                 return True
         return False
 
+    def active_during(self, start: date, end: date) -> bool:
+        if not self.roles:
+            return True
+        for role in self.roles:
+            role_start = role.start if role.start is not None else date.min
+            role_end = role.end if role.end is not None else date.max
+            if role_end >= start and role_start <= end:
+                return True
+        return False
+
+    @property
+    def display_name(self) -> str:
+        return f'{self.first_name} {self.last_name}'
+
     #: A parliamentarian may be part of n commissions
     commission_memberships: 'relationship[list[CommissionMembership]]'
     commission_memberships = relationship(

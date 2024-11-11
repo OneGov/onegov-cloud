@@ -1,7 +1,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: OneGov Cloud 1.0\n"
-"POT-Creation-Date: 2024-07-12 10:45+0200\n"
+"POT-Creation-Date: 2024-11-10 21:30+0100\n"
 "PO-Revision-Date: 2021-03-03 16:24+0100\n"
 "Language-Team: German\n"
 "Language: de_CH\n"
@@ -52,6 +52,27 @@ msgstr "Kommission"
 
 msgid "Parliamentarian is not in this commission."
 msgstr "Parlamentarier:in ist nicht in dieser Kommission."
+
+msgid "Settlement run"
+msgstr "Abrechnungslauf"
+
+msgid "Date from"
+msgstr "Datum von"
+
+msgid "Date to"
+msgstr "Datum bis"
+
+msgid "All Settlement runs"
+msgstr "Alle Abrechnungsläufe"
+
+msgid "All Parliamentarians"
+msgstr "Alle Parlamentarier:innen"
+
+msgid "All Commissions"
+msgstr "Alle Kommissionen"
+
+msgid "All Types"
+msgstr "Alle Arten"
 
 msgid "Name"
 msgstr "Name"
@@ -326,11 +347,20 @@ msgstr "Legislatur löschen"
 msgid "Parliamentarians"
 msgstr "Parlamentarier:innen"
 
+msgid "Export"
+msgstr "Export"
+
+msgid "Export All (xlsx)"
+msgstr "Alle exportieren (xlsx)"
+
 msgid "Do you really want to delete this parliamentarian?"
 msgstr "Möchten Sie diese:n Parlamentarier:in wirklich löschen?"
 
 msgid "Delete parliamentarian"
 msgstr "Parlamentarier:in löschen"
+
+msgid "CSV billing export"
+msgstr "Abrechnungsexport (CSV)"
 
 msgid "Do you really want to remove this role?"
 msgstr "Rolle wirklich entfernen?"
@@ -370,9 +400,6 @@ msgstr "Satz löschen"
 
 msgid "Settlement runs"
 msgstr "Abrechnungsläufe"
-
-msgid "Settlement run"
-msgstr "Abrechnungslauf"
 
 msgid "Do you really want to delete this settlement run?"
 msgstr "Möchten Sie diesen Abrechnungslauf wirklich löschen?"
@@ -443,11 +470,17 @@ msgstr "Dauer"
 msgid "No meeting defined yet."
 msgstr "Noch keine Sitzung erfasst."
 
-msgid "Comission"
-msgstr "Kommission"
+msgid "Filter"
+msgstr "Filter"
+
+msgid "Apply Filter"
+msgstr "Filter anwenden"
 
 msgid "Timestamp"
 msgstr "Zeitpunkt"
+
+msgid "Comission"
+msgstr "Kommission"
 
 msgid "No changes yet."
 msgstr "Noch keine Aktivitäten."
@@ -455,8 +488,8 @@ msgstr "Noch keine Aktivitäten."
 msgid "Action"
 msgstr "Aktion"
 
-msgid "No commissions defined yet."
-msgstr "Noch keine Kommissionen erfasst."
+msgid "No active commissions."
+msgstr "Keine aktiven Kommissionen."
 
 msgid "Filters"
 msgstr "Filter"
@@ -509,6 +542,9 @@ msgstr "Ja"
 
 msgid "No"
 msgstr "Nein"
+
+msgid "Exports Settlement runs"
+msgstr "Exporte Abrechnungsläufe"
 
 msgid "No settlement runs defined yet."
 msgstr "Noch keine Abrechnungsläufe erfasst"
@@ -593,3 +629,15 @@ msgstr "Neuer Abrechnungslauf hinzugefügt"
 
 msgid "New settlement run"
 msgstr "Neuer Abrechnungslauf"
+
+msgid "Settlements by Party"
+msgstr "Abrechnungen nach Partei"
+
+msgid "All Settlements"
+msgstr "Gesamtabrechnung"
+
+msgid "All Parties"
+msgstr "Alle Parteien"
+
+msgid "Total all parties"
+msgstr "Total Alle Parteien"
