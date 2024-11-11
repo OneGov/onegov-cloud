@@ -26,7 +26,7 @@ class Search(Pagination[_M]):
     def __init__(self, request: 'OrgRequest', query: str, page: int) -> None:
         super().__init__(page)
         self.request = request
-        self.web_search = query
+        self.query = query
 
     @cached_property
     def available_documents(self) -> int:
@@ -39,13 +39,13 @@ class Search(Pagination[_M]):
 
     @property
     def q(self) -> str:
-        return self.web_search
+        return self.query
 
     def __eq__(self, other: object) -> bool:
         return (
             isinstance(other, self.__class__)
             and self.page == other.page
-            and self.web_search == other.web_search
+            and self.query == other.query
         )
 
     if TYPE_CHECKING:
@@ -60,11 +60,11 @@ class Search(Pagination[_M]):
         return self.page
 
     def page_by_index(self, index: int) -> 'Search[_M]':
-        return Search(self.request, self.web_search, index)
+        return Search(self.request, self.query, index)
 
     @cached_property
     def batch(self) -> 'Response | None':  # type:ignore[override]
-        if not self.web_search:
+        if not self.query:
             return None
 
         search = self.request.app.es_search_by_request(
@@ -74,7 +74,7 @@ class Search(Pagination[_M]):
 
         # queries need to be cut at some point to make sure we're not
         # pushing the elasticsearch cluster to the brink
-        query = self.web_search[:self.max_query_length]
+        query = self.query[:self.max_query_length]
 
         if query.startswith('#'):
             search = self.hashtag_search(search, query)
@@ -166,7 +166,7 @@ class Search(Pagination[_M]):
 
     def suggestions(self) -> tuple[str, ...]:
         return tuple(self.request.app.es_suggestions_by_request(
-            self.request, self.web_search
+            self.request, self.query
         ))
 
 
@@ -185,7 +185,7 @@ class SearchPostgres(Pagination[_M]):
 
     def __init__(self, request: 'OrgRequest', query: str, page: int):
         self.request = request
-        self.web_search = query
+        self.query = query
         self.page = page  # page index
 
         self.nbr_of_docs = 0
@@ -209,12 +209,12 @@ class SearchPostgres(Pagination[_M]):
         Returns the user's query term from the search field of the UI
 
         """
-        return self.web_search
+        return self.query
 
     def __eq__(self, other: object) -> bool:
         if not isinstance(other, SearchPostgres):
             return NotImplemented
-        return self.page == other.page and self.web_search == other.web_search
+        return self.page == other.page and self.query == other.query
 
     def subset(self) -> 'list[Searchable] | None':  # type:ignore[override]
         return self.batch
@@ -224,14 +224,14 @@ class SearchPostgres(Pagination[_M]):
         return self.page
 
     def page_by_index(self, index: int) -> 'SearchPostgres[_M]':
-        return SearchPostgres(self.request, self.web_search, index)
+        return SearchPostgres(self.request, self.query, index)
 
     @cached_property
     def batch(self) -> 'list[Searchable]':  # type:ignore[override]
-        if not self.web_search:
+        if not self.query:
             return []
 
-        if self.web_search.startswith('#'):
+        if self.query.startswith('#'):
             results = self.hashtag_search()
         else:
             results = self.generic_search()
@@ -300,7 +300,7 @@ class SearchPostgres(Pagination[_M]):
         results: list[Any] = []
         language = locale_mapping(self.request.locale or 'de_CH')
         ts_query = func.websearch_to_tsquery(language,
-                                             func.unaccent(self.web_search))
+                                             func.unaccent(self.query))
         session = self.request.session
 
         for base in self.request.app.session_manager.bases:
@@ -347,7 +347,7 @@ class SearchPostgres(Pagination[_M]):
         return [r[0] for r in results]
 
     def hashtag_search(self) -> list['Searchable']:
-        q = self.web_search.lstrip('#')
+        q = self.query.lstrip('#')
 
         # Skip certain tables for hashtag search for better performance
         results = [
