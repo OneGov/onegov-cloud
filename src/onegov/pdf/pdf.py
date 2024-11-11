@@ -603,7 +603,7 @@ class Pdf(PDFDocument):
         for element in body:
             if element.tag == 'p':
                 self.p_markup(self.inner_html(element), self.style.paragraph)
-            elif element.tag in 'ol':
+            elif element.tag == 'ol':
                 style = deepcopy(self.style.li)
                 style.leftIndent += self.style.ol.leftIndent
                 items = [
