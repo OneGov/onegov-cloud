@@ -370,7 +370,7 @@ class SearchPostgres(Pagination[_M]):
             first_entry = self.batch[0]
 
             # XXX the default view to the event should be doing the redirect
-            if first_entry.es_type_name == 'events':
+            if isinstance(first_entry, Event):
                 return self.request.link(first_entry, 'latest')
             else:
                 return self.request.link(first_entry)
