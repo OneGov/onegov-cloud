@@ -188,20 +188,20 @@ class SearchPostgres(Pagination[_M]):
         self.query = query
         self.page = page  # page index
 
-        self.nbr_of_docs = 0
-        self.nbr_of_results = 0
+        self.number_of_docs = 0
+        self.number_of_results = 0
 
     @cached_property
     def available_documents(self) -> int:
-        if not self.nbr_of_docs:
+        if not self.number_of_docs:
             _ = self.load_batch_results
-        return self.nbr_of_docs
+        return self.number_of_docs
 
     @cached_property
     def available_results(self) -> int:
-        if not self.nbr_of_results:
+        if not self.number_of_results:
             _ = self.load_batch_results
-        return self.nbr_of_results
+        return self.number_of_results
 
     @property
     def q(self) -> str:
@@ -340,8 +340,8 @@ class SearchPostgres(Pagination[_M]):
         results = list(set(results))
         results.sort(key=lambda x: x[1], reverse=True)
 
-        self.nbr_of_docs = doc_count
-        self.nbr_of_results = len(results)
+        self.number_of_docs = doc_count
+        self.number_of_results = len(results)
 
         # remove rank column from results and return
         return [r[0] for r in results]
@@ -362,7 +362,7 @@ class SearchPostgres(Pagination[_M]):
         # remove duplicates
         results = list(set(results))
 
-        self.nbr_of_results = len(results)
+        self.number_of_results = len(results)
         return results
 
     def feeling_lucky(self) -> str | None:
