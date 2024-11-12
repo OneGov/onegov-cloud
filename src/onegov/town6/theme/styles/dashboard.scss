@@ -4,21 +4,11 @@
 
 
 .boardlet {
-    .card {
         background: $gray-pastel;
         margin-bottom: 1.5rem;
-        border: 3px solid $green-light;
-        box-shadow: none;
-
-        .card-section {
-            padding-bottom: 2rem !important;
-            padding-top:1.4rem !important;
-        }
-
-        &:hover {
-            border: 3px solid $green-light !important;
-        }
-    }
+        border-top: 5px solid $green-light;
+        padding: 1rem;
+        border-radius: .7rem;
 
     h2.h4 {
         margin-bottom: 1rem;
@@ -29,18 +19,23 @@
         font-size: .9rem;
     }
 
-    &.boardlet-warning .card {
+    &.boardlet-warning {
         border-top-color: $yellow-light;
-        .h4 {
-            color: $yellow-dark;
-        }
     }
 
-    &.boardlet-failure .card {
-        .h4 {
-            color: $red-dark;
-        }
+    &.boardlet-failure {
         border-top-color: $red-light;
+    }
+
+    h2.h4 {
+        padding: .5rem;
+        background: $white;
+        text-align: center;
+        border-radius: .7rem;
+    }
+
+    .title {
+        font-weight: normal;
     }
 }
 

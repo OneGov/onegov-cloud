@@ -3,6 +3,7 @@ from itertools import groupby
 
 
 from typing import Literal, TYPE_CHECKING
+
 if TYPE_CHECKING:
     from collections.abc import Iterator
     from onegov.org.request import OrgRequest
@@ -96,7 +97,6 @@ class BoardletFact:
     # the text of the fact (includes the metric)
     text: str
 
-    # the font awesome (fa-*) icon to use, if any
-    icon: str | None = None
+    number: str | None = None
 
     css_class: str | None = None
