@@ -355,7 +355,7 @@ class SearchPostgres(Pagination[_M]):
             if model.es_type_name not in
                ['attendees', 'files', 'people', 'tickets', 'users']
             if model.es_public or self.request.is_logged_in  # type:ignore
-            for doc in self.request.session.query(model).all()
+            for doc in self.request.session.query(model)
             if doc.es_tags and q in doc.es_tags
         ]
 
