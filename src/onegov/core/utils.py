@@ -109,7 +109,12 @@ def local_lock(namespace: str, key: str) -> 'Iterator[None]':
     """
     name = f'{namespace}-{key}'.replace('/', '-')
 
-    with open(f'/tmp/{name}', 'w+') as f:
+    # NOTE: hardcoding /tmp is a bit piggy, but on the other hand we
+    #       don't want different processes to miss each others locks
+    #       just because one of them has a different TMPDIR, can we
+    #       come up with a more robust way of doing this, e.g. with
+    #       named semaphores?
+    with open(f'/tmp/{name}', 'w+') as f:  # nosec:B108
         try:
             fcntl.flock(f, fcntl.LOCK_EX | fcntl.LOCK_NB)
             yield

@@ -4,6 +4,7 @@ from onegov.activity import (
     Period, PeriodCollection, PeriodMeta, InvoiceCollection)
 from onegov.activity.models.invoice_reference import Schema
 from onegov.core import utils
+from onegov.org.app import org_content_security_policy
 from onegov.core.orm import orm_cached
 from onegov.feriennet.const import DEFAULT_DONATION_AMOUNTS
 from onegov.feriennet.initial_content import create_new_organisation
@@ -25,6 +26,7 @@ if TYPE_CHECKING:
     from onegov.org.models import Organisation
     from sqlalchemy.orm import Query
     from uuid import UUID
+    from more.content_security import ContentSecurityPolicy
 
 
 # FIXME: Get rid of inline JavaScript
@@ -360,3 +362,10 @@ def get_common_asset() -> 'Iterator[str]':
     yield 'print.js'
     yield 'click-to-load.js'
     yield 'tracking.js'
+
+
+@FeriennetApp.setting(section='content_security_policy', name='default')
+def feriennet_content_security_policy() -> 'ContentSecurityPolicy':
+    policy = org_content_security_policy()
+    policy.connect_src.add('https://*.piwik.pro')
+    return policy

@@ -1,3 +1,5 @@
+from functools import cached_property
+from onegov.core.static import StaticFile
 from onegov.landsgemeinde import _
 from onegov.landsgemeinde.collections import AssemblyCollection
 from onegov.town6.layout import DefaultLayout as BaseDefaultLayout
@@ -67,3 +69,11 @@ class DefaultLayout(BaseDefaultLayout):
         return AssemblyCollection(self.request.session).query().filter(
             Assembly.state == 'ongoing').order_by(
             Assembly.date.desc()).first()
+
+    @cached_property
+    def terms_icon(self) -> str:
+        static_file = StaticFile.from_application(
+            self.app, 'terms_by.svg'
+        )
+
+        return self.request.link(static_file)

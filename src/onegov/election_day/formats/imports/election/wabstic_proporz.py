@@ -324,7 +324,7 @@ def import_election_wabstic_proporz(
             # From wabstic export docs: Einheit ist grün-gesperrt
             # (1442=14:42 Uhr von der Oberbehörde gesperrt), sonst leer
             locking_time = validate_integer(line, 'sperrung', default=False)
-            entity['counted'] = False if not locking_time else True
+            entity['counted'] = locking_time != 0
         except ValueError as e:
             line_errors.append(e.args[0])
 

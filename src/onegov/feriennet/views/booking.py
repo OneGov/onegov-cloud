@@ -300,14 +300,12 @@ def actions_by_booking(
         ))
 
     if period.active and period.confirmed and booking.state == 'accepted':
-        if layout.request.is_admin:
-            may_cancel = True
-        elif not booking.occasion.is_past_cancellation(layout.today()):
-            may_cancel = True
-        else:
-            may_cancel = False
-
-        if may_cancel:
+        if (
+            # admins can always cancel bookings
+            layout.request.is_admin
+            # other users can if it isn't past its cancellation deadline
+            or not booking.occasion.is_past_cancellation(layout.today())
+        ):
             actions.append(Link(
                 text=_('Cancel Booking'),
                 url=layout.csrf_protected_url(

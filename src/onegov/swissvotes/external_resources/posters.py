@@ -1,7 +1,7 @@
+import lxml.etree
 import requests
 from onegov.swissvotes import log
 from onegov.swissvotes.models import SwissVote
-from xml.etree import ElementTree
 
 
 from typing import Any
@@ -24,7 +24,7 @@ class Posters:
         raise NotImplementedError()
 
     def parse_xml(self, response: requests.Response) -> str:
-        tree = ElementTree.fromstring(response.content)
+        tree = lxml.etree.fromstring(response.content)
         element = tree.find("./field[@name='primaryMedia']/value")
         if element is None or not element.text:
             raise ValueError('No primary media found')

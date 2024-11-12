@@ -1,5 +1,5 @@
 from collections.abc import Iterable, Iterator
-from typing import Any, Generic, Literal
+from typing import Any, Literal
 
 from wtforms.meta import _MultiDictLikeWithGetall
 

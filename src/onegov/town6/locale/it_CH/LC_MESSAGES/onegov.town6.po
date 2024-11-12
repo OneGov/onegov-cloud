@@ -589,6 +589,9 @@ msgstr "più"
 msgid "Submit"
 msgstr "Invia"
 
+msgid "Select files"
+msgstr "Seleziona i file"
+
 msgid "Drop files to upload"
 msgstr "Trascina e rilascia il file da caricare"
 

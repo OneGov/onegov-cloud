@@ -1,5 +1,5 @@
 import abc
-from collections.abc import Callable, Iterable, Iterator, Mapping, Sequence
+from collections.abc import Callable, Iterable, Iterator
 from types import FrameType, TracebackType
 from typing import Any, ClassVar, TypeVar
 from typing_extensions import ParamSpec

@@ -90,7 +90,10 @@ class ExtendedAgency(Agency, AccessExtension, PublicationExtension):
 
         """
 
-        return self.pdf.reference.file if self.pdf else None
+        try:
+            return self.pdf.reference.file if self.pdf else None
+        except (OSError, Exception):
+            return None
 
     # FIXME: asymmetric property
     @pdf_file.setter

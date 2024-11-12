@@ -136,3 +136,12 @@ def rename_associated_tables(context: 'UpgradeContext') -> None:
 
             if context.has_table(old_name) and not context.has_table(new_name):
                 context.operations.rename_table(old_name, new_name)
+
+
+@upgrade_task('OGC-1792 Remove all wtfs tables')
+def remove_all_wtfs_tables(context: 'UpgradeContext') -> None:
+    tables = ['wtfs_payment_type', 'wtfs_pickup_dates', 'wtfs_scan_jobs']
+
+    for table in tables:
+        if context.has_table(table):
+            context.operations.drop_table(table)

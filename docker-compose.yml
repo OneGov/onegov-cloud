@@ -51,9 +51,9 @@ services:
         image: rnwood/smtp4dev:latest
         restart: always
         ports:
-            - "8081:80"
-            - "1025:25"
-            - "143:143"
+            - "8081:80"  # Web UI
+            - "1025:25"  # forwarding to port 25; configure your smtp4dev to listen on port 25
+            - "143:143"  # IMAP
         volumes:
             - smtp4dev-data:/smtp4dev
 

@@ -592,6 +592,9 @@ msgstr "plus"
 msgid "Submit"
 msgstr "Envoyer"
 
+msgid "Select files"
+msgstr "Sélectionner des fichiers"
+
 msgid "Drop files to upload"
 msgstr "Déposez des fichiers pour télécharger"
 
