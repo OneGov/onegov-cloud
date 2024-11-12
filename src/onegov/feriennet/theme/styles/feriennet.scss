@@ -483,6 +483,8 @@ footer {
 
 .panel.period-hint-panel {
 
+    margin-bottom: 4rem;
+
     &:not(:has(.hint)) {
         display: none;
     }
@@ -1489,7 +1491,7 @@ $booking-left-margin: 2rem;
         }
 
         .meter-text::before {
-            @include icon-bold('\f00d');
+            @include icon-bold('\f058');
             color: $red;
             margin-right: 1ex;
         }
@@ -1500,13 +1502,13 @@ $booking-left-margin: 2rem;
     }
 
     &.success .meter-text::before {
-        @include icon('\f058');
+        @include icon-bold('\f058');
         color: $green;
         margin-right: 1ex;
     }
 
     &.alert .meter-text::before {
-        @include icon('\f06a');
+        @include icon-bold('\f058');
         color: $red;
         margin-right: 1ex;
     }
@@ -2631,6 +2633,10 @@ li.unpaid {
         font-size: 1rem;
         padding-right: 2.5rem;
         line-height: 1.5;
+    }
+
+    .panel.period-hint-panel {
+        margin-bottom: 0;
     }
 }
 

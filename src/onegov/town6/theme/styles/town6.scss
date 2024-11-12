@@ -709,13 +709,6 @@ $pageref-color-hover: $iron;
     }
 }
 
-.side-panel .more-list {
-    li .list-title {
-        display: inline;
-        position: inherit;
-    }
-}
-
 .read-more-link {
     display: block;
     width: 100%;
@@ -732,18 +725,30 @@ $pageref-color-hover: $iron;
     padding-right: 0;
 }
 
-.side-panel .more-list {
-    li {
-        .list-link::after,
-        .list-title::after {
-            opacity: 0;
-            transition: all 200ms linear;
-        }
+.side-panel {
+    h3 {
+        hyphens: none;
+    }
 
-        &:hover .list-link::after,
-        &:hover .list-title::after {
-            opacity: 1 !important;
-            padding-right: 0;
+    .more-list {
+
+        li {
+            .list-title {
+                display: inline;
+                position: inherit;
+            }
+
+            .list-link::after,
+            .list-title::after {
+                opacity: 0;
+                transition: all 200ms linear;
+            }
+
+            &:hover .list-link::after,
+            &:hover .list-title::after {
+                opacity: 1 !important;
+                padding-right: 0;
+            }
         }
     }
 }

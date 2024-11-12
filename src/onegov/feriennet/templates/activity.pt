@@ -56,7 +56,6 @@
                         <tal:b metal:use-macro="layout.macros['occasions-by-period']" />
                     </tal:b>
                 </tal:b>
-                <br></br>
                 <h3 i18n:translate tal:condition="occasions_by_period">Other Occasions</h3>
                 <ul class="accordion" data-accordion data-allow-all-closed="true">
 
