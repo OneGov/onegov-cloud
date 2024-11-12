@@ -243,7 +243,7 @@ class SearchPostgres(Pagination[_M]):
         """
         Load search results and sort upcoming events by occurrence start date.
         This methods is a wrapper around `batch.load()`, which returns the
-        actual search results form the query.
+        actual search results from the query.
 
         """
         batch: list[Searchable] = self.batch
