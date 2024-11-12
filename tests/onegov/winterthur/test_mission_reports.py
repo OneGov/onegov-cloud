@@ -1,4 +1,9 @@
 from datetime import datetime as dt
+
+from dateutil.relativedelta import relativedelta
+from freezegun import freeze_time
+from transaction import commit
+
 from onegov.winterthur.collections import MissionReportCollection
 from onegov.winterthur.models import MissionReport
 from onegov.winterthur.models import MissionReportVehicle
@@ -107,6 +112,17 @@ def test_view_mission_reports(winterthur_app):
     # Test mission count
     assert missions.mission_count() == 1
 
+    last_year = date - relativedelta(years=1)
+    mission_2 = missions.add(
+        date=last_year, duration=1.5, nature='Brand im Dachstock',
+        location='Luzern', personnel=8, backup=5, mission_count=3
+    )
+    assert mission_2.mission_count == 3
+
+    assert missions.mission_count() == 1  # current year
+    assert MissionReportCollection(
+        session, year=last_year.year).mission_count() == 3
+
     new_url = '/mission-reports/+new'
     client = Client(winterthur_app)
     client.login_admin()
@@ -142,6 +158,132 @@ def test_view_mission_reports(winterthur_app):
 
     page = client.get(f'/mission-reports?year={date.year}')
     assert page.pyquery('.total-missions b')[0].text == '5'
+
+
+def test_view_mission_report_json(winterthur_app):
+    with freeze_time('2024-11-12 08:31'):
+        session = winterthur_app.session()
+        client = Client(winterthur_app)
+
+        now = replace_timezone(dt.now(), timezone='Europe/Zurich')
+        last_week = now - relativedelta(weeks=1, hours=5, minutes=19)
+        last_month = now - relativedelta(months=1, hours=1, minutes=10)
+        last_year = now - relativedelta(years=1, hours=3, minutes=30)
+
+        missions = MissionReportCollection(session, year=now.year)
+        for m in ((now, 2, 'Brand', 'Luzern', 10, 5),
+                  (last_week, 0.5, 'Rauchmelder', 'Kriens', 3, 2),
+                  (last_month, 1, 'Kellerbrand', 'Reussbühl', 6, 8)):
+            missions.add(
+                date=m[0], duration=m[1], nature=m[2],
+                location=m[3], personnel=m[4], backup=m[5]
+            )
+        assert missions.mission_count() == 3
+        commit()
+
+        expected_2024 = {
+            "name": "Mission Reports",
+            "report_count": 3,
+            "reports": [
+                {
+                    "date": "12.11.2024",
+                    "alarm": "08:31",
+                    "duration": "2h",
+                    "nature": "Brand",
+                    "mission_type": "single",
+                    "mission_count": 1,
+                    "vehicles": [],
+                    "vehicles_icons": [],
+                    "location": "Luzern",
+                    "personnel_active": 10,
+                    "personnel_backup": 5,
+                    "civil_defence_involved": False
+                },
+                {
+                    "date": "05.11.2024",
+                    "alarm": "03:12",
+                    "duration": "0.5h",
+                    "nature": "Rauchmelder",
+                    "mission_type": "single",
+                    "mission_count": 1,
+                    "vehicles": [],
+                    "vehicles_icons": [],
+                    "location": "Kriens",
+                    "personnel_active": 3,
+                    "personnel_backup": 2,
+                    "civil_defence_involved": False
+                },
+                {
+                    "date": "12.10.2024",
+                    "alarm": "08:21",
+                    "duration": "1h",
+                    "nature": "Kellerbrand",
+                    "mission_type": "single",
+                    "mission_count": 1,
+                    "vehicles": [],
+                    "vehicles_icons": [],
+                    "location": "Reussbühl",
+                    "personnel_active": 6,
+                    "personnel_backup": 8,
+                    "civil_defence_involved": False
+                }
+            ]
+        }
+
+        assert client.get('/mission-reports/json').json == expected_2024
+        assert client.get(
+            '/mission-reports/json?year=2024').json == expected_2024
+        assert client.get('/mission-reports/json?year=2023').json == {
+            'name': 'Mission Reports', 'report_count': 0, 'reports': []}
+        assert client.get(
+            '/mission-reports/json?all=true').json['report_count'] == 3
+
+        # add a mission for last year
+        missions.add(
+            date=last_year, duration=4.2, nature="Wohnhausbrand",
+            location="Tribschen", personnel=20, backup=1, mission_count=2
+        )
+        assert missions.mission_count() == 3  # current year only
+        assert MissionReportCollection(
+            session, year=last_year.year).mission_count() == 2
+        commit()
+
+        expected_2023 = {
+            "name": "Mission Reports",
+            "report_count": 1,
+            "reports": [
+                {
+                    "date": "12.11.2023",
+                    "alarm": "05:01",
+                    "duration": "4.2h",
+                    "nature": "Wohnhausbrand",
+                    "mission_type": "single",
+                    "mission_count": 2,
+                    "vehicles": [],
+                    "vehicles_icons": [],
+                    "location": "Tribschen",
+                    "personnel_active": 20,
+                    "personnel_backup": 1,
+                    "civil_defence_involved": False
+                },
+            ]
+        }
+
+        assert client.get('/mission-reports/json').json == expected_2024
+        assert client.get(
+            '/mission-reports/json?year=2024').json == expected_2024
+        assert client.get(
+            '/mission-reports/json?year=2023').json == expected_2023
+        assert client.get('/mission-reports/json?year=2022').json == {
+            'name': 'Mission Reports', 'report_count': 0, 'reports': []}
+        assert client.get(
+            '/mission-reports/json?all=true').json['report_count'] == 4
+
+        assert missions.mission_count() == 3
+        assert missions.query_current_year().count() == 3
+        assert missions.query_all().count() == 4
+        assert MissionReportCollection(
+            session, year=last_year.year).mission_count() == 2
 
 
 def test_mission_reports_validating_integer_fields(winterthur_app):
