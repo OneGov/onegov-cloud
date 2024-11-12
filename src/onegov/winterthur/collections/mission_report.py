@@ -104,10 +104,9 @@ class MissionReportCollection(
                 MissionReport.meta['access'] == None
             ))
 
-        return query.order_by(desc(MissionReport.date))
+        query = self.filter_by_year(query)
 
-    def query_current_year(self) -> 'Query[MissionReport]':
-        return self.filter_by_year(super().query())
+        return query.order_by(desc(MissionReport.date))
 
     def subset(self) -> 'Query[MissionReport]':
         return self.query()
