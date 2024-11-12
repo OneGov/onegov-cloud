@@ -21,9 +21,10 @@ from wtforms.validators import NumberRange
 
 from typing import TYPE_CHECKING
 if TYPE_CHECKING:
-    from onegov.core.types import RenderData
-    from onegov.winterthur.request import WinterthurRequest
     from webob import Response
+
+    from onegov.core.types import JSON_ro, RenderData
+    from onegov.winterthur.request import WinterthurRequest
 
 
 def mission_report_form(
@@ -164,6 +165,44 @@ def view_mission(
             Link(self.title, '#')
         ),
         'model': self
+    }
+
+
+@WinterthurApp.json(
+    model=MissionReportCollection,
+    name='json',
+    permission=Public
+)
+def view_mission_reports_as_json(
+    self: MissionReportCollection,
+    request: 'WinterthurRequest'
+) -> 'JSON_ro':
+
+    return {
+        'name': 'Mission Reports',
+        'reports': [
+            {
+                'date': mission.date.strftime('%d.%m.%Y'),
+                'alarm': mission.date.strftime('%H:%M'),
+                'duration': mission.readable_duration,
+                'nature': mission.nature,
+                'mission_type': mission.mission_type,
+                'mission_count': mission.mission_count,
+                'vehicles': [
+                    use.vehicle.name for use in mission.used_vehicles
+                    for _ in range(use.count)
+                ],
+                'vehicles_icons': [
+                    request.link(use.vehicle.symbol) for use in
+                    mission.used_vehicles
+                    for _ in range(use.count)
+                ],
+                'location': mission.location,
+                'personnel_active': mission.personnel,
+                'personnel_backup': mission.backup,
+                'civil_defence_involved': mission.civil_defence,
+            } for mission in self.query()
+        ]
     }
 
 
