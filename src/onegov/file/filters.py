@@ -1,3 +1,4 @@
+import shlex
 import subprocess
 
 from depot.fields.interfaces import FileFilter
@@ -145,7 +146,7 @@ class WithPDFThumbnailFilter(WithThumbnailFilter):
             with pdf_input.open('wb') as pdf:
                 pdf.write(fp.read())
 
-            process = subprocess.run((
+            process = subprocess.run((  # nosec:B603
                 'gs',
 
                 # disable read/writes outside of the given files
@@ -173,7 +174,7 @@ class WithPDFThumbnailFilter(WithThumbnailFilter):
 
                 # output to png
                 '-sDEVICE=png16m',
-                f'-sOutputFile={png_output}',
+                '-sOutputFile={}'.format(shlex.quote(str(png_output))),
 
                 # from pdf
                 str(pdf_input)

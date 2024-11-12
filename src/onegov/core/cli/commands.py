@@ -1,6 +1,7 @@
 import click
 import os
 import platform
+import shlex
 import shutil
 import smtplib
 import ssl
@@ -190,7 +191,7 @@ class SmsEventHandler(PatternMatchingEventHandler):
         )
 
     def on_moved(self, event: 'FileSystemEvent') -> None:
-        dest_path = os.path.abspath(event.dest_path)
+        dest_path = os.path.abspath(str(event.dest_path))
         assert isinstance(dest_path, str)
         for qp in self.queue_processors:
             # only one queue processor should match
@@ -208,7 +209,7 @@ class SmsEventHandler(PatternMatchingEventHandler):
     #       moved. But we should also trigger when new files are created just
     #       in case this ever changes.
     def on_created(self, event: 'FileSystemEvent') -> None:
-        src_path = os.path.abspath(event.src_path)
+        src_path = os.path.abspath(str(event.src_path))
         assert isinstance(src_path, str)
         for qp in self.queue_processors:
             # only one queue processor should match
@@ -376,8 +377,11 @@ def transfer(
 
     try:
         remote_cfg = Config.from_yaml_string(
-            subprocess.check_output([
-                'ssh', server, '-C', "sudo cat '{}'".format(remote_config)
+            # NOTE: Using an absolute path is more trouble than it's worth
+            subprocess.check_output([  # nosec
+                'ssh', server, '-C', 'sudo cat {}'.format(
+                    shlex.quote(remote_config)
+                )
             ])
         )
     except subprocess.CalledProcessError:
@@ -397,15 +401,45 @@ def transfer(
         count = remote.count('/')
         count += platform.system() == 'Darwin' and 1 or 0
 
-        send = f"ssh {server} -C 'sudo nice -n 10 tar cz {remote}/{glob}'"
-        send = f'{send} --absolute-names'
-        recv = f'tar xz  --strip-components {count} -C {local}'
+        send = shlex.join([
+            'ssh',
+            server,
+            '-C',
+            shlex.join([
+                'sudo',
+                'nice',
+                '-n',
+                '10',
+                'tar',
+                'cz',
+                f'{remote}/{glob}',
+                '--absolute-names',
+            ]),
+        ])
+        recv = shlex.join([
+            'tar',
+            'xz',
+            '--strip-components',
+            str(count),
+            '-C',
+            local,
+        ])
 
         if shutil.which('pv'):
-            recv = f'pv -L 5m --name "{remote}/{glob}" -r -b | {recv}'
+            track_progress = shlex.join([
+                'pv',
+                '-L',
+                '5m',
+                '--name',
+                f'{remote}/{glob}',
+                '-r',
+                '-b',
+            ])
+            recv = f'{track_progress} | {recv}'
 
         click.echo(f'Copying {remote}/{glob}')
-        subprocess.check_output(f'{send} | {recv}', shell=True)
+        # NOTE: We took extra care that this is safe with shlex.join
+        subprocess.check_output(f'{send} | {recv}', shell=True)  # nosec:B602
 
     @lru_cache(maxsize=None)
     def transfer_delta_storage(
@@ -419,22 +453,44 @@ def transfer(
         # not it's contents.
         glob += '/***'
 
-        dry_run = (
-            f"rsync -a --include='*/' --include='{glob}' --exclude='*' "
-            f"--dry-run --itemize-changes "
-            f"{server}:{remote}/ {local}/"
-        )
-        subprocess.run(dry_run, shell=True, capture_output=False)
+        dry_run = shlex.join([
+            'rsync',
+            '-a',
+            "--include='*/'",
+            '--include={}'.format(shlex.quote(glob)),
+            "--exclude='*'",
+            '--dry-run',
+            '--itemize-changes',
+            f'{server}:{remote}/',
+            f'{local}/',
+        ])
+        # NOTE: We took extra care that this is safe with shlex.join
+        subprocess.run(dry_run, shell=True, capture_output=False)  # nosec:B602
 
-        send = (
-            f"rsync -av --include='*/' --include='{glob}' --exclude='*' "
-            f"{server}:{remote}/ {local}/"
-        )
+        send = shlex.join([
+            'rsync',
+            '-av',
+            "--include='*/'",
+            '--include={}'.format(shlex.quote(glob)),
+            "--exclude='*'",
+            f'{server}:{remote}/',
+            f'{local}/',
+        ])
 
         if shutil.which('pv'):
-            send = f"{send} | pv -L 5m --name '{remote}/{glob}' -r -b"
+            track_progress = shlex.join([
+                'pv',
+                '-L',
+                '5m',
+                '--name',
+                f'{remote}/{glob}',
+                '-r',
+                '-b',
+            ])
+            send = f'{send} | {track_progress}'
         click.echo(f'Copying {remote}/{glob}')
-        subprocess.check_output(send, shell=True)
+        # NOTE: We took extra care that this is safe with shlex.join
+        subprocess.check_output(send, shell=True)  # nosec:B602
 
     def transfer_database(
         remote_db: str,
@@ -445,10 +501,26 @@ def transfer(
         # Get available schemas
         query = 'SELECT schema_name FROM information_schema.schemata'
 
-        lst = f'sudo -u postgres psql {remote_db} -t -c "{query}"'
-        lst = f"ssh {server} '{lst}'"
+        lst = shlex.join([
+            'sudo',
+            '-u',
+            'postgres',
+            'psql',
+            remote_db,
+            '-t',
+            '-c',
+            query,
+        ])
+        lst = shlex.join([
+            'ssh',
+            server,
+            lst,
+        ])
 
-        schemas_str = subprocess.check_output(lst, shell=True).decode('utf-8')
+        # NOTE: We took extra care that this is safe with shlex.join
+        schemas_str = subprocess.check_output(
+            lst, shell=True  # nosec:B602
+        ).decode('utf-8')
         schemas_iter = (s.strip() for s in schemas_str.splitlines())
         schemas_iter = (s for s in schemas_iter if s)
         schemas_iter = (s for s in schemas_iter if fnmatch(s, schema_glob))
@@ -459,24 +531,58 @@ def transfer(
             return schemas
 
         # Prepare send command
-        send = f'ssh {server} sudo -u postgres nice -n 10 pg_dump {remote_db}'
-        send = f'{send} --no-owner --no-privileges'
-        send = f'{send} --quote-all-identifiers --no-sync'
-        send = f'{send} --schema {" --schema ".join(schemas)}'
+        send_parts = [
+            'sudo',
+            '-u',
+            'postgres',
+            'nice',
+            '-n',
+            '10',
+            'pg_dump',
+            remote_db,
+            '--no-owner',
+            '--no-privileges',
+            '--quote-all-identifiers',
+            '--no-sync',
+        ]
+        for schema in schemas:
+            send_parts.extend(('--schema', schema))
+
+        send = shlex.join(send_parts)
+        send = shlex.join([
+            'ssh',
+            server,
+            send,
+        ])
 
         # Prepare receive command
-        recv = f'psql -d {local_db} -v ON_ERROR_STOP=1'
+        recv_parts = [
+            'psql',
+            '-d',
+            local_db,
+            '-v',
+            'ON_ERROR_STOP=1',
+        ]
         if platform.system() == 'Linux':
-            recv = f'sudo -u postgres {recv}'
+            recv_parts = [
+                'sudo',
+                '-u',
+                'postgres',
+                *recv_parts,
+            ]
+
+        recv = shlex.join(recv_parts)
 
         # Drop existing schemas
         for schema in schemas:
             click.echo(f'Drop local database schema {schema}')
+            assert "'" not in schema and '"' not in schema
             drop = f'DROP SCHEMA IF EXISTS "{schema}" CASCADE'
             drop = f"echo '{drop}' | {recv}"
 
-            subprocess.check_call(
-                drop, shell=True,
+            subprocess.check_call(  # nosec:B602
+                drop,
+                shell=True,
                 stdout=subprocess.DEVNULL,
                 stderr=subprocess.DEVNULL
             )
@@ -484,8 +590,16 @@ def transfer(
         # Transfer
         click.echo('Transfering database')
         if shutil.which('pv'):
-            recv = f'pv --name "{remote_db}@postgres" -r -b | {recv}'
-        subprocess.check_output(f'{send} | {recv}', shell=True)
+            track_progress = shlex.join([
+                'pv',
+                '--name',
+                f'{remote_db}@postgres',
+                '-r',
+                '-b',
+            ])
+            recv = f'{track_progress} | {recv}'
+        # NOTE: We took extra care that this is safe with shlex.join
+        subprocess.check_output(f'{send} | {recv}', shell=True)  # nosec:B602
 
         return schemas
 
@@ -554,6 +668,7 @@ def transfer(
     def do_add_admins(local_cfg: 'ApplicationConfig', schema: str) -> None:
         id_ = str(uuid4())
         password_hash = hash_password('test').replace('$', '\\$')
+        assert '"' not in schema and "'" not in schema
         query = (
             f'INSERT INTO \\"{schema}\\".users '  # nosec: B608
             f"(type, id, username, password_hash, role, active, realname) "
@@ -561,9 +676,19 @@ def transfer(
             f"'{password_hash}', 'admin', true, 'John Doe');"
         )
         local_db = local_cfg.configuration['dsn'].split('/')[-1]
-        command = f'sudo -u postgres psql {local_db} -c "{query}"'
-        subprocess.check_call(
-            command, shell=True,
+        command = shlex.join([
+            'sudo',
+            '-u',
+            'postgres',
+            'psql',
+            local_db,
+            '-c',
+            query,
+        ])
+        # NOTE: We took extra care that this is safe with shlex.join
+        subprocess.check_call(  # nosec:B602
+            command,
+            shell=True,
             stdout=subprocess.DEVNULL,
             stderr=subprocess.DEVNULL
         )

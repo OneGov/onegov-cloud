@@ -1087,9 +1087,6 @@ msgstr "Destinataire"
 msgid "Do not actually import the newsletter subscribers"
 msgstr "Ne pas importer les abonnés à la newsletter"
 
-msgid ": (Address already exists)"
-msgstr ": (L'adresse existe déjà)"
-
 msgid "Will be used as image in the page overview on the parent page"
 msgstr "Sera utilisé comme image dans la vue d'ensemble de la page parent"
 
@@ -5527,17 +5524,16 @@ msgid "Exports all newsletter recipients."
 msgstr "Exporte tous les destinataires de la newsletter."
 
 #, python-format
-msgid "The following line(s) contain invalid data: ${lines}"
-msgstr ""
-"La ou les lignes suivantes contiennent des données invalides : ${lines}"
+msgid "Import completed with errors: ${results}"
+msgstr "Importation terminée avec des erreurs : ${results}"
 
 #, python-format
-msgid "${count} newsletter subscribers will be imported"
-msgstr "Les abonnés à la newsletter de ${count} seront importés"
+msgid "Import preview: ${result}"
+msgstr "Aperçu de l'importation : ${result}"
 
 #, python-format
-msgid "${count} newsletter subscribers imported"
-msgstr "${count} abonnés à la lettre d'information importés"
+msgid "Import completed: ${result}"
+msgstr "Importation terminée : ${result}"
 
 msgid "The same format as the export (XLSX) can be used for the import."
 msgstr ""
@@ -5560,6 +5556,11 @@ msgstr "Exporter un événement"
 
 msgid "Exports all future events."
 msgstr "Exporte tous les événements futurs."
+
+#, python-format
+msgid "The following line(s) contain invalid data: ${lines}"
+msgstr ""
+"La ou les lignes suivantes contiennent des données invalides : ${lines}"
 
 #, python-format
 msgid "${count} events will be imported"
@@ -6195,123 +6196,3 @@ msgstr "Un compte a été créé pour vous"
 
 msgid "The user was created successfully"
 msgstr "L'utilisateur a bien été créé"
-
-#~ msgid ""
-#~ "Please review your answers and press \"Complete\" to complete the survey. "
-#~ "If there's anything you'd like to change, click on \"Edit\" to return to "
-#~ "the filled-out survey."
-#~ msgstr ""
-#~ "Veuillez vérifier vos réponses et appuyez sur \"Compléter\" pour terminer "
-#~ "le sondage. Si vous souhaitez modifier quelque chose, cliquez sur "
-#~ "\"Modifier\" pour revenir au sondage rempli."
-
-#~ msgid "The submission window was deleted"
-#~ msgstr "La fenêtre de soumission a été supprimée"
-
-#~ msgid "Your directory submission has been rejected"
-#~ msgstr "Votre proposition de répertoire a été rejetée"
-
-#~ msgid "Your directory submission rejection has been withdrawn"
-#~ msgstr "Le rejet de votre soumission d'annuaire a été retiré"
-
-#~ msgid "The rejection was withdrawn"
-#~ msgstr "Le rejet a été retiré"
-
-#~ msgid "Rejection withdrawn."
-#~ msgstr "Retrait du rejet."
-
-#~ msgid "Reject"
-#~ msgstr "Rejeter"
-
-#~ msgid "Update Subscription"
-#~ msgstr "Mise à jour de l'abonnement"
-
-#~ msgid "Update your newsletter subscription categories:"
-#~ msgstr "Mettre à jour les catégories d'abonnement à la newsletter:"
-
-#~ msgid "Sign up to our newsletter to always stay up to date:"
-#~ msgstr ""
-#~ "Abonnez-vous à notre lettre d'informations pour rester au courant en "
-#~ "permanence :"
-
-#~ msgid "Signup"
-#~ msgstr "S'abonner"
-
-#, python-format
-#~ msgid ""
-#~ "The date range overlaps with an existing submission window (${range})."
-#~ msgstr ""
-#~ "La période donnée chevauche une fenêtre de soumission existante "
-#~ "(${range})."
-
-#~ msgid "Phone number"
-#~ msgstr "Numéro de téléphone"
-
-#~ msgid "A new entry has been added to the \"${directory.title}\" directory:"
-#~ msgstr ""
-#~ "Une nouvelle entrée a été ajoutée au répertoire « ${directory.title} » :"
-
-#~ msgid "New entry in directory"
-#~ msgstr "Nouvelle entrée dans le répertoire"
-
-#~ msgid "has a new entry:"
-#~ msgstr "a une nouvelle entrée :"
-
-#, python-format
-#~ msgid ""
-#~ "Registration for notifications on updates in the directory "
-#~ "\"${directory}\""
-#~ msgstr ""
-#~ "Inscription pour les notifications sur les mises à jour dans le dossier "
-#~ "\"${directory}\""
-
-#~ msgid ""
-#~ "This is a notification for the new entries in \"${organisation}\". If you "
-#~ "no longer wish to receive these notifications, please contact an "
-#~ "administrator so they can remove you from the recipients list."
-#~ msgstr ""
-#~ "Il s'agit d'une notification pour les nouvelles entrées dans "
-#~ "\"${organisation\". Si vous ne souhaitez plus recevoir ces notifications, "
-#~ "veuillez contacter un administrateur afin qu'il vous retire de la liste "
-#~ "des destinataires."
-
-#, python-format
-#~ msgid "${org} New Entry in ${directory}"
-#~ msgstr "Nouvelle entrée dans ${directory} de ${org}"
-
-#~ msgid "The email adress has been added to the recipients"
-#~ msgstr "L'adresse e-mail a été ajoutée aux destinataires"
-
-#~ msgid ""
-#~ "This content is automatically deleted when the end date has passed. If no "
-#~ "end date is set, it will be deleted one day after start date."
-#~ msgstr ""
-#~ "Ce contenu est automatiquement supprimé lorsque la date de fin est "
-#~ "dépassée. Si aucune date de fin n'est définie, il sera supprimé un jour "
-#~ "après la date de début."
-
-#~ msgid ""
-#~ "There are currently no allowed domains for iframes. To enable domains for "
-#~ "iframes, please contact info@seantis.ch."
-#~ msgstr ""
-#~ "Aucun domaine n'est actuellement autorisé pour les iframes. Pour activer "
-#~ "les domaines pour les iframes, veuillez contacter info@seantis.ch"
-
-#~ msgid ""
-#~ "The height of the iframe in pixels. If not set, the iframe will have a "
-#~ "standard height of 800px."
-#~ msgstr ""
-#~ "La hauteur de l'iframe en pixels. Si elle n'est pas définie, l'iframe "
-#~ "aura une hauteur standard de 800 pixels."
-
-#~ msgid "Display the iframe as a card with a border"
-#~ msgstr "Afficher l'iframe comme une carte avec une bordure"
-
-#~ msgid "The following domains are allowed for iframes:"
-#~ msgstr "Les domaines suivants sont autorisés pour les iframes:"
-
-#~ msgid "The domain of the URL is not allowed for iframes."
-#~ msgstr "Le domaine de l'URL n'est pas autorisé pour les iframes"
-
-#~ msgid "Chat with"
-#~ msgstr "Chat avec"

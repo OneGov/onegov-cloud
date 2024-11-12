@@ -1,6 +1,6 @@
 from _typeshed import StrPath
 from _typeshed.wsgi import WSGIApplication
-from typing import Any, Protocol
+from typing import Any
 
 from depot.io.interfaces import FileStorage, StoredFile
 from depot.middleware import DepotMiddleware

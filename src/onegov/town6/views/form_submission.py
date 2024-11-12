@@ -39,9 +39,9 @@ def town_handle_pending_submission(
 
 
 @TownApp.html(model=SurveySubmission, template='survey_submission.pt',
-              permission=Private, request_method='GET')
+              permission=Public, request_method='GET')
 @TownApp.html(model=SurveySubmission, template='survey_submission.pt',
-              permission=Private, request_method='POST')
+              permission=Public, request_method='POST')
 def town_handle_survey_submission(
     self: SurveySubmission,
     request: 'TownRequest'

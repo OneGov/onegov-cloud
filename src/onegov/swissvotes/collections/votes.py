@@ -577,17 +577,15 @@ class SwissVoteCollection(Pagination[SwissVote]):
         query = self.query()
         query = query.order_by(None).order_by(SwissVote.bfs_number)
 
-        row = 0
-        for vote in query:
-            row += 1
-            for column_, value in enumerate(mapper.get_values(vote)):
+        for row, vote in enumerate(query, start=1):
+            for column, value in enumerate(mapper.get_values(vote)):
                 if value is None:
                     pass
                 elif isinstance(value, str):
-                    worksheet.write_string(row, column_, value)
+                    worksheet.write_string(row, column, value)
                 elif isinstance(value, date):
-                    worksheet.write_datetime(row, column_, value)
+                    worksheet.write_datetime(row, column, value)
                 elif isinstance(value, (int, Decimal)):
-                    worksheet.write_number(row, column_, value)
+                    worksheet.write_number(row, column, value)
 
         workbook.close()

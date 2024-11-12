@@ -661,4 +661,3 @@ def handle_delete_rule(self: Resource, request: 'OrgRequest') -> None:
             'n': count
         })
     )
-

@@ -346,7 +346,7 @@
                     <i class="far fa-calendar-alt" aria-hidden="true"></i>
                 </div>
                 <div class="card-section" tal:condition="with_lead|False">
-                    <h5 data-equalizer-watch="events">${item.lead}</h5>
+                    <h5>${item.lead}</h5>
                     <div class="date-place">
                         <div class="grid-x">
                             <div class="cell small-1 medium-2">
@@ -372,7 +372,7 @@
 </metal:events>
 
 <metal:panel define-macro="event-cards">
-    <div tal:condition="event_panel|nothing" class="events grid-x grid-padding-x  align-center" data-equalizer="events" data-equalize-on="medium">
+    <div tal:condition="event_panel|nothing" class="events grid-x grid-padding-x  align-center">
         <div class="cell small-12 medium-4 event-item flex-container" tal:repeat="item event_panel.links">
             <metal:b use-macro="layout.macros['event-item-card']" />
         </div>
@@ -383,11 +383,13 @@
 </metal:panel>
 
 <metal:card define-macro="directory-card">
-    <div  data-aos="fade" data-aos-duration="800" class="card" data-equalizer-watch>
+    <div  data-aos="fade" data-aos-duration="800" class="card">
+        <a tal:attributes="href link.url">
         <div class="card-section">
-            <tal:b tal:content="link(layout)" />
-            <small>${link.subtitle}</small>
-        </div>
+                <h5><i class="fa fa-list" aria-hidden="true"></i> ${link.text}</h5>
+                <p>${link.subtitle}</p>
+            </div>
+        </a>
     </div>
 </metal:card>
 
@@ -471,7 +473,7 @@
 </metal:fields>
 
 <metal:homepage-tiles define-macro="homepage-tile-card" i18n:domain="onegov.town6">
-    <div class="card" data-aos="fade" data-aos-duration="800"  id="homepage-tile-${item.number}" data-equalizer-watch tal:condition="item.links">
+    <div class="card" data-aos="fade" data-aos-duration="800"  id="homepage-tile-${item.number}" tal:condition="item.links">
         <div class="card-divider">
             <a tal:condition="item.page.url" href="${item.page.url}"><h5>${item.page.text}</h5></a>
             <h5 tal:condition="not item.page.url">${item.page.text}</h5>
@@ -486,7 +488,7 @@
 
 <metal:homepage-tiles define-macro="homepage-tiles">
     <div>
-        <div class="grid-x grid-padding-x align-center" data-equalizer data-equalize-on="medium">
+        <div class="grid-x grid-padding-x align-center" >
             <tal:block tal:repeat="item tiles">
                 <div class="cell small-12 medium-6 large-4 homepage-tile" tal:condition="item.links">
                     <metal:homepage-tiles use-macro="layout.macros['homepage-tile-card']" />
@@ -529,8 +531,10 @@
 
 <metal:upload define-macro="upload" i18n:domain="onegov.town6">
     <form action="${upload_url}" class="upload" method="POST" enctype="multipart/form-data">
-        <div class="upload-dropzone dropzone" i18n:translate>
-            Drop files to upload
+        <div class="upload-dropzone dropzone">
+            <input type="file" id="fileElem" class="hidden" multiple>
+            <label class="button" for="fileElem" i18n:translate>Select files</label>
+            <p class="show-for-medium" i18n:translate>Drop files to upload</p>
         </div>
 
         <div class="upload-progress" metal:define-slot='upload-progress'></div>
@@ -546,7 +550,7 @@
 </metal:upload>
 
 <metal:newslist define-macro="news-item-card" i18n:domain="onegov.town6">
-    <div class="card news-card" data-aos="fade" data-aos-duration="800" data-equalizer-watch tal:define="url request.link(item)">
+    <div class="card news-card" data-aos="fade" data-aos-duration="800" tal:define="url request.link(item)">
         <a href="${url}">
             <div tal:condition="item.page_image and item.show_preview_image" style="width: 100%; padding-bottom: 55%; background-image: url(${item.page_image}); background-size: cover;"></div>
         </a>
@@ -565,7 +569,7 @@
 
 
 <metal:newslist define-macro="news-item-full" i18n:domain="onegov.town6">
-    <div class="news-item cell small-8" data-aos="fade" data-aos-duration="800" data-equalizer-watch tal:define="url request.link(item)">
+    <div class="news-item cell small-8" data-aos="fade" data-aos-duration="800" tal:define="url request.link(item)">
         <hr>
         <a href="${url}">
             <h3>${item.title} <metal:hint use-macro="layout.macros['access_hint']"/> <metal:hint use-macro="layout.macros['publication_hint']"/></h3>
@@ -579,7 +583,7 @@
 
 
 <metal:newslist define-macro="newslist" i18n:domain="onegov.town6">
-    <div tal:condition="newsletter.show_news_as_tiles|True and news" class="newslist grid-x grid-padding-x align-center" data-equalizer data-equalize-on="medium">
+    <div tal:condition="newsletter.show_news_as_tiles|True and news" class="newslist grid-x grid-padding-x align-center" >
         <div class="cell small-12 medium-${md_span|6} large-${lg_span|4} news-list-item" tal:repeat="item news">
             <metal:newlist use-macro="layout.macros['news-item-card']" tal:define="heading 'h4'" />
         </div>
@@ -720,6 +724,31 @@
                 <div tal:condition="coordinates" class="marker-map" data-map-type="thumbnail" data-lat="${coordinates.lat}" data-lon="${coordinates.lon}" data-zoom="${coordinates.zoom}" data-marker-icon="${marker_icon|nothing}" data-marker-color="${marker_color|nothing}"></div>
                 <div class="location" tal:condition="location">${location}</div>
             </div>
+            <div class="more-entries side-panel" tal:condition="more_entries|False">
+                <h3 i18n:translate="">Other Entries</h3>
+                <ul class="more-list">
+                    <li tal:condition="prev_entry">
+                        <a href="${request.link(prev_entry)}" class="list-link">
+                            <i class="fa fa-chevron-left"></i><span class="list-title" i18n:translate="">Previous Entry</span>
+                        </a>
+                        <a href="${request.link(prev_entry)}">
+                            <p class="list-lead preview">
+                                ${prev_entry.title}
+                            </p>
+                        </a>
+                    </li>
+                    <li tal:condition="next_entry">
+                        <a href="${request.link(next_entry)}" class="list-link">
+                            <i class="fa fa-chevron-right"></i><span class="list-title" i18n:translate="">Next Entry</span>
+                        </a>
+                        <a href="${request.link(next_entry)}">
+                            <p class="list-lead preview">
+                                ${next_entry.title}
+                            </p>
+                        </a>
+                    </li>
+                </ul>
+            </div>
             <div class="side-panel files-panel" tal:condition="files and page.show_file_links_in_sidebar|True">
                 <h3 i18n:translate>Documents</h3>
                 <ul class="more-list">
@@ -767,8 +796,6 @@
                     </li>
                 </ul>
             </div>
-            <tal:b metal:define-slot="after-panels"><div id="after-panels"></div></tal:b>
-
             <div class="more-news side-panel" tal:condition="siblings|False">
                 <h3 i18n:translate="">More news</h3>
                 <ul class="more-list">
@@ -785,30 +812,8 @@
                 </ul>
             </div>
 
-            <div class="more-entries side-panel" tal:condition="more_entries|False">
-                <ul class="more-list">
-                    <li tal:condition="prev_entry">
-                        <a href="${request.link(prev_entry)}" class="list-link">
-                            <i class="fa fa-chevron-left"></i><span class="list-title" i18n:translate="">Previous Entry</span>
-                        </a>
-                        <a href="${request.link(prev_entry)}">
-                            <p class="list-lead preview">
-                                ${prev_entry.title}
-                            </p>
-                        </a>
-                    </li>
-                    <li tal:condition="next_entry">
-                        <a href="${request.link(next_entry)}" class="list-link">
-                            <i class="fa fa-chevron-right"></i><span class="list-title" i18n:translate="">Next Entry</span>
-                        </a>
-                        <a href="${request.link(next_entry)}">
-                            <p class="list-lead preview">
-                                ${next_entry.title}
-                            </p>
-                        </a>
-                    </li>
-                </ul>
-            </div>
+            <tal:b metal:define-slot="after-panels"><div id="after-panels"></div></tal:b>
+
         </div>
     </div>
 </metal:page_content>
@@ -1422,7 +1427,7 @@
 </metal:calendar_day_content>
 
 <metal:occurrences define-macro="occurrences" i18n:domain="onegov.town6">
-        <div class="grid-x grid-padding-x events" data-equalizer="events">
+        <div class="grid-x grid-padding-x events" >
     <tal:b repeat="occurrence occurrences">
             <metal:b use-macro="layout.macros['occurrence_list_view']" />
     </tal:b>
@@ -2137,13 +2142,13 @@
     <tal:b repeat="group grouped" tal:define="link_func link_func|request.link; add_pagerefs add_pagerefs|False;">
         <tal:b tal:define="find_your_spot grouped[group][0] if grouped[group][0].title == 'Find Your Spot' else None">
             <a class="category-anchor" id="${group}"></a>
-            <h2 tal:condition="len(grouped) > 1">
-                ${group}
-                <metal:b tal:condition="add_pagerefs" use-macro="layout.macros['pageref']" tal:define="pageref_id group" />
-            <span tal:condition="find_your_spot" i18n:attributes="title" class="find-your-spot-link" data-tooltip tabindex="1" title="Find Your Spot">
-            <a tal:attributes="href link_func(find_your_spot)"><i class="fa fa-xs fa-calendar"></i></a>
-            </span>
-            </h2>
+            <div class="group-title align-justify">
+                <h2 tal:condition="len(grouped) > 1">
+                    ${group}
+                    <metal:b tal:condition="add_pagerefs" use-macro="layout.macros['pageref']" tal:define="pageref_id group" />
+                </h2>
+                <a tal:condition="find_your_spot" tal:attributes="href link_func(find_your_spot)" class="button hollow narrow find-your-spot-link"><i class="fa fa-calendar"></i> <span i18n:translate="">Find Your Spot</span></a>
+            </div>
             <ul class="forms-list more-list">
                 <tal:b tal:repeat="record grouped[group]">
                     <li tal:condition="record != find_your_spot">

@@ -459,7 +459,7 @@ class WsgiProcess(multiprocessing.Process):
 
         # reset the tty every time, fixing problems that might occur if
         # the process is restarted during a pdb session
-        os.system('stty sane')
+        os.system('stty sane')  # nosec
 
         try:
             if sys.platform == 'darwin':

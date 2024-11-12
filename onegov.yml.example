@@ -321,12 +321,6 @@ applications:
     configuration:
       <<: *global-config
 
-  - path: /onegov_wtfs/*
-    application: onegov.wtfs.WtfsApp
-    namespace: onegov_wtfs
-    configuration:
-      <<: *global-config
-
   - path: /onegov_translator_directory/*
     application: onegov.translator_directory.TranslatorDirectoryApp
     namespace: translator_directory

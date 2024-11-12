@@ -95,14 +95,13 @@ class decimal_range:  # noqa: N801
         assert self.step != Decimal(0)
 
     def __repr__(self) -> str:
-        if self.start <= self.stop and self.step == Decimal('1.0'):
-            return "decimal_range('{}', '{}')".format(self.start, self.stop)
-        elif self.start >= self.stop and self.step == Decimal('-1.0'):
-            return "decimal_range('{}', '{}')".format(self.start, self.stop)
-        else:
-            return "decimal_range('{}', '{}', '{}')".format(
-                self.start, self.stop, self.step
-            )
+        if (
+            (self.start <= self.stop and self.step == Decimal('1.0'))
+            or (self.start >= self.stop and self.step == Decimal('-1.0'))
+        ):
+            return f"decimal_range('{self.start}', '{self.stop}')"
+
+        return f"decimal_range('{self.start}', '{self.stop}', '{self.step}')"
 
     def __eq__(self, other: object) -> bool:
         if not isinstance(other, self.__class__):

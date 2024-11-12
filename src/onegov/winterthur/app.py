@@ -1,4 +1,5 @@
 import re
+import shlex
 import subprocess
 
 from functools import cached_property
@@ -137,7 +138,7 @@ class WinterthurApp(OrgApp):
                 with (path / 'input.pdf').open('wb') as pdf:
                     pdf.write(file.reference.file.read())
 
-                process = subprocess.run((
+                process = subprocess.run((  # nosec:B603
                     'gs',
 
                     # disable read/writes outside of the given files
@@ -157,15 +158,17 @@ class WinterthurApp(OrgApp):
                     '-dPDFFitPage',
 
                     # render in high resolution before downscaling to 300 dpi
-                    f'-r{300}',
-                    f'-dDownScaleFactor={1}',
+                    '-r300',
+                    '-dDownScaleFactor=1',
 
                     # only use the first page
                     '-dLastPage=1',
 
                     # output to png
                     '-sDEVICE=png16m',
-                    f'-sOutputFile={path / "preview.png"}',
+                    '-sOutputFile={}'.format(
+                        shlex.quote(str(path / 'preview.png'))
+                    ),
 
                     # force landscape orientation in postscript
                     '-c',

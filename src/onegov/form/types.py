@@ -12,7 +12,7 @@ if TYPE_CHECKING:
     from wtforms.form import BaseForm
 
     class FieldCondition(Protocol[BaseFormT, FieldT]):
-        def __call__(self, __form: BaseFormT, __field: FieldT) -> bool: ...
+        def __call__(self, form: BaseFormT, field: FieldT, /) -> bool: ...
 
     Widget: TypeAlias = _Widget
     Filter: TypeAlias = _Filter

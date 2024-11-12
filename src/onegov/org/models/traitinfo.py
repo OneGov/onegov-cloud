@@ -199,7 +199,7 @@ class TraitInfo:
 
             assert self.trait is not None
             trait_messages = self.trait_messages[self.trait]
-            safe_delete = False if self.children else True  # type:ignore
+            safe_delete = not self.children  # type:ignore
 
             if safe_delete or request.current_role == 'admin':
 

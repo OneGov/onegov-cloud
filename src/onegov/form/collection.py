@@ -749,10 +749,10 @@ class SurveySubmissionCollection:
             submission_window = submission_window
 
         submission = SurveySubmission(
-            id = id or uuid4(),
-            name = name,
-            meta = meta or {},
-            submission_window = submission_window
+            id=id or uuid4(),
+            name=name,
+            meta=meta or {},
+            submission_window=submission_window
         )
 
         # extensions are inherited from definitions
