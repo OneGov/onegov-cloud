@@ -178,8 +178,19 @@ def view_mission_reports_as_json(
     request: 'WinterthurRequest'
 ) -> 'JSON_ro':
 
+    query = None
+    if request.params.get('all', False):
+        query = self.query_all()
+    elif request.params.get('year'):
+        self.year = int(request.params['year'])
+        query = self.filter_by_year(self.query())
+    else:
+        # default
+        query = self.query()
+
     return {
         'name': 'Mission Reports',
+        'report_count': query.count(),
         'reports': [
             {
                 'date': mission.local_date.strftime('%d.%m.%Y'),
@@ -201,7 +212,7 @@ def view_mission_reports_as_json(
                 'personnel_active': mission.personnel,
                 'personnel_backup': mission.backup,
                 'civil_defence_involved': mission.civil_defence,
-            } for mission in self.query()
+            } for mission in query
         ]
     }
 
