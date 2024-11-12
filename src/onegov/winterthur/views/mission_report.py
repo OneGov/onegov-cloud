@@ -182,8 +182,8 @@ def view_mission_reports_as_json(
         'name': 'Mission Reports',
         'reports': [
             {
-                'date': mission.date.strftime('%d.%m.%Y'),
-                'alarm': mission.date.strftime('%H:%M'),
+                'date': mission.local_date.strftime('%d.%m.%Y'),
+                'alarm': mission.local_date.strftime('%H:%M'),
                 'duration': mission.readable_duration,
                 'nature': mission.nature,
                 'mission_type': mission.mission_type,
