@@ -18,8 +18,6 @@ if TYPE_CHECKING:
     from webob import Response
 
 
-
-
 @PasApp.html(
     model=AttendenceCollection,
     template='attendences.pt',
@@ -38,8 +36,6 @@ def view_attendences(
         'attendences': self.query().all(),
         'title': layout.title,
     }
-
-
 
 
 @PasApp.form(

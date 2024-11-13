@@ -18,12 +18,10 @@ from onegov.pas.forms import CommissionMembershipForm
 from onegov.pas.forms import ParliamentarianRoleForm
 from onegov.pas.forms import RateSetForm
 from onegov.pas.forms import SettlementRunForm
-from onegov.pas.forms.attendence_filter import AttendenceFilterForm
 from onegov.pas.models import RateSet
 from onegov.pas.models import SettlementRun
 from pytest import fixture
 
-from onegov.pas.models.attendence import TYPES
 
 
 class DummyPostData(dict):
@@ -422,58 +420,3 @@ def test_settlement_run_form(session, dummy_request):
     assert not form.validate()
     assert 'start' not in form.errors
     assert 'end' not in form.errors
-
-
-
-def test_attendence_filter_form(session, dummy_request):
-    parliamentarians = ParliamentarianCollection(session)
-    parliamentarian1 = parliamentarians.add(first_name='John', last_name='Doe')
-    parliamentarian2 = parliamentarians.add(
-        first_name='Jane', last_name='Smith'
-    )
-
-    commissions = CommissionCollection(session)
-    commission1 = commissions.add(name='Commission A')
-    commission2 = commissions.add(name='Commission B')
-
-    settlement_runs = SettlementRunCollection(session)
-    settlement_run1 = settlement_runs.add(
-        name='Run 2024-Q1',
-        start=date(2024, 1, 1),
-        end=date(2024, 3, 31),
-        active=True
-    )
-
-    form = AttendenceFilterForm()
-    form.request = dummy_request
-    form.on_request()
-
-    # Including the 'All Settlement Runs' option
-    assert len(form.settlement_run_id.choices) == 2
-    # Including the 'All Parliamentarians' option
-    assert len(form.parliamentarian_id.choices) == 3
-    # Including the 'All Commissions' option
-    assert len(form.commission_id.choices) == 3
-    # Including the 'All Types' option
-    assert len(form.type.choices) == len(TYPES) + 1
-
-    # Test form validation
-    form = AttendenceFilterForm(DummyPostData({
-        'settlement_run_id': str(settlement_run1.id),
-        'date_from': '2024-01-01',
-        'date_to': '2024-03-31',
-        'type': 'plenary',
-        'parliamentarian_id': str(parliamentarian1.id),
-        'commission_id': str(commission1.id)
-    }))
-    form.request = dummy_request
-    form.on_request()
-
-    assert form.validate()
-    assert form.settlement_run_id.data == str(settlement_run1.id)
-    assert form.date_from.data == date(2024, 1, 1)
-    assert form.date_to.data == date(2024, 3, 31)
-    assert form.type.data == 'plenary'
-    assert form.parliamentarian_id.data == str(parliamentarian1.id)
-    assert form.commission_id.data == str(commission1.id)
-

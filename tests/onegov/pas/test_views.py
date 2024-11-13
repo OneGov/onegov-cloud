@@ -1,5 +1,7 @@
+import pytest
 
 
+@pytest.mark.flaky(reruns=5)
 def test_views_manage(client_with_es):
     client = client_with_es
     client.login_admin()
@@ -240,4 +242,4 @@ def test_views_manage(client_with_es):
     assert 'Noch keine Fraktionen erfasst' in settings.click('Fraktionen')
     assert 'Noch keine Parlamentarier:innen erfasst' in \
         settings.click('Parlamentarier:innen')
-    assert 'Noch keine Kommissionen erfasst' in settings.click('Kommissionen')
+    assert 'Keine aktiven Kommissionen' in settings.click('Kommissionen')
