@@ -1303,6 +1303,12 @@ $booking-left-margin: 2rem;
 .matched-occasion {
     margin-bottom: 1rem;
 
+    h3 {
+        color: $oil;
+        border-top: 1px solid $gainsboro;
+        padding-top: 1rem;
+    }
+
     h4 {
         margin-top: 1rem;
     }
@@ -1348,8 +1354,7 @@ $booking-left-margin: 2rem;
         td {
             position: relative;
 
-            span,
-            div {
+            span {
                 display: inline-block;
                 left: 10px;
                 overflow: hidden;
@@ -1416,35 +1421,65 @@ $booking-left-margin: 2rem;
     .matching-details {
         display: inline-block;
         width: 100%;
+        
+        > a {
 
-        > button {
-            float: right;
-            font-size: 1.2rem;
-            height: 2.5rem;
-            line-height: 1.2rem;
-            margin-bottom: 0;
-            outline: 0;
-            padding: 0;
-            width: 2.5rem;
-
-            &.alert,
             &.cancelled {
-                background-color: $red-light;
-
-                &:hover,
-                &.toggled {
-                    background-color: $red;
+                background: repeating-linear-gradient(
+                    45deg,
+                    $red-pastel,
+                    $red-pastel 15px,
+                    $gray-pastel 15px,
+                    $gray-pastel 30px
+                );
+        
+                .meter {
+                    background-color: $red-light;
+                }
+        
+                .meter-text::before {
+                    @include icon-bold('\f058');
+                    color: $red;
+                    margin-right: 1ex;
+                }
+        
+                .meter-text-inner {
+                    color: $red-dark;
                 }
             }
 
-            &.success {
-                background-color: $green-light;
+            display: flex;
+            align-items: center;
+            background-color: $white-smoke;
+            border-radius: .7rem;
+            margin-bottom: 1rem;
+            color: $oil;
 
-                &:hover,
-                &.toggled {
-                    background-color: $green;
+            .down-button {
+                border-radius: 100%;
+                padding: .43rem 0.5rem;
+                color: $white;
+
+                &.alert,
+                &.cancelled {
+                    background-color: $red-light;
+    
+                    &:hover,
+                    &.down {
+                        background-color: $red;
+                    }
+                }
+    
+                &.success {
+                    background-color: $green-light;
+    
+                    &:hover,
+                    &.down {
+                        background-color: $green;
+                    }
                 }
             }
+
         }
 
         > button:not(.ic-use-transition) {
@@ -1477,29 +1512,6 @@ $booking-left-margin: 2rem;
         background-color: $red-pastel;
     }
 
-    &.cancelled {
-        background: repeating-linear-gradient(
-            45deg,
-            $red-pastel,
-            $red-pastel 15px,
-            $gray-pastel 15px,
-            $gray-pastel 30px
-        );
-
-        .meter {
-            background-color: $red-light;
-        }
-
-        .meter-text::before {
-            @include icon-bold('\f058');
-            color: $red;
-            margin-right: 1ex;
-        }
-
-        .meter-text-inner {
-            color: $red-dark;
-        }
-    }
 
     &.success .meter-text::before {
         @include icon-bold('\f058');
@@ -1508,7 +1520,7 @@ $booking-left-margin: 2rem;
     }
 
     &.alert .meter-text::before {
-        @include icon-bold('\f058');
+        @include icon-bold('\f06a');
         color: $red;
         margin-right: 1ex;
     }
@@ -1527,20 +1539,20 @@ $booking-left-margin: 2rem;
     Circular actions button
 */
 .actions-button {
-    background-color: $ghost;
-    border: 1px solid $aluminum;
-    color: $aluminum;
+    background-color: $aluminum !important;
     float: right;
     font-size: 12px;
     height: 24px;
     line-height: 12px;
-    margin: 0;
+    margin: 0 !important;
     padding: 5px !important;
     width: 24px;
-
+    
     &:hover {
+        margin: 0 !important;
         background-color: $white-smoke;
         border-color: $primary-color;
+        padding: 5px !important;
         color: $aluminum;
     }
 

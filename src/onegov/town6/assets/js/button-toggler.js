@@ -4,20 +4,20 @@ $(document).ready(function () {
         e.preventDefault();
 
         // Get the corresponding file number and detail row
-        var fileNumber = $(this).attr('id').split('-')[1];
-        var detailRow = $('#details-' + fileNumber);
+        var id = $(this).attr('id').split('-').slice(1).join('-');
+        var detailElement = $('#details-' + id);
 
-        // Close all other detail rows
-        $('tr[id^="details-"]').not(detailRow).addClass('hidden');
+        // Close all other detail elements
+        $('*[id^="details-"]').not(detailElement).addClass('hidden');
 
         // Remove "down" class from all other chevron icons in the .files table
-        $('.files i.fa-chevron-down').removeClass('down');
+        $('i.fa-chevron-down').removeClass('down');
 
-        // Toggle the visibility of the clicked detail row
-        detailRow.toggleClass('hidden');
+        // Toggle the visibility of the clicked detail element
+        detailElement.toggleClass('hidden');
 
         // Add "down" class to the clicked chevron icon only if the row is now visible
-        if (!detailRow.hasClass('hidden')) {
+        if (!detailElement.hasClass('hidden')) {
             $(this).find('i.fa-chevron-down').addClass('down');
         }
     });
