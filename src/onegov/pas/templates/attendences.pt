@@ -9,33 +9,26 @@
                 <table tal:condition="attendences" class="attendences">
                     <thead>
                     <tr>
-                        <th i18n:translate="">Date</th>
-                        <th i18n:translate="">Type</th>
-                        <th i18n:translate="">Parliamentarian</th>
-                        <th i18n:translate="">Commission</th>
-                    </tr>
+                        <th i18n:translate>Date</th>
+                            <th i18n:translate>Type</th>
+                            <th i18n:translate>Parliamentarian</th>
+                            <th i18n:translate>Comission</th>
+                        </tr>
                     </thead>
                     <tbody>
-                    <tr tal:repeat="attendence attendences">
-                        <td>
-                            <a href="${request.link(attendence)}" i18n:translate="">${layout.format_date(attendence.date, 'date')}</a>
-                        </td>
-                        <td>${attendence.type_label}</td>
-                        <td>${attendence.parliamentarian.title}</td>
-                        <td>
-                            <tal:block tal:condition="attendence.commission">${attendence.commission.title}</tal:block>
-                        </td>
+                        <tr tal:repeat="attendence attendences">
+                        <td><a href="${request.link(attendence)}" i18n:translate>${layout.format_date(attendence.date, 'date')}</a></td>
+                            <td>${attendence.type_label}</td>
+                            <td>${attendence.parliamentarian.title}</td>
+                            <td><tal:block tal:condition="attendence.commission">${attendence.commission.title}</tal:block></td>
                     </tr>
                     </tbody>
                 </table>
             </div>
+
             <div class="large-4 medium-4 cell medium-offset-1 sidebar">
-                <h2 i18n:translate="">Filter</h2>
-                <form method="GET" action="${request.link(layout.model)}">
-                    <metal:fields use-macro="layout.macros['fields']" tal:define="fields form._fields.values()" />
-                    <button type="submit" class="button" i18n:translate="">Apply Filter</button>
-                </form>
             </div>
         </div>
+
     </tal:b>
 </div>
