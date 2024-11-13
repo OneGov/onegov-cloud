@@ -90,7 +90,7 @@ class ParliamentarianLayout(DefaultLayout):
                     title=_('Add'),
                     links=[
                         Link(
-                            text=_('Role'),
+                            text=_('Role (as a party or group member)'),
                             url=self.request.link(self.model, 'new-role'),
                             attrs={'class': 'new-role'}
                         ),

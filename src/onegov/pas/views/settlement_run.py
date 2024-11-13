@@ -11,7 +11,7 @@ from onegov.pas.layouts import SettlementRunLayout
 from onegov.pas.models import (
     SettlementRun,
     Party,
-    Parliamentarian, RateSet,
+    RateSet,
 )
 from webob import Response
 from sqlalchemy import or_
@@ -174,6 +174,112 @@ def view_settlement_run(
     }
 
 
+def _get_party_totals(
+    self: SettlementRun,
+    request: 'TownRequest'
+) -> list[tuple[str, Decimal, Decimal, Decimal, Decimal, Decimal]]:
+    """Get totals grouped by party."""
+    session = request.session
+
+    # Get rate set for the year
+    rate_set = (
+        session.query(RateSet)
+        .filter(RateSet.year == self.start.year)
+        .first()
+    )
+
+    if not rate_set:
+        return []
+
+    # Get all attendences in period
+    attendences = AttendenceCollection(
+        session,
+        date_from=self.start,
+        date_to=self.end
+    )
+
+    cola_multiplier = Decimal(
+        str(1 + (rate_set.cost_of_living_adjustment / 100))
+    )
+
+    # Initialize party totals
+    party_totals: dict[str, dict[str, Decimal]] = {}
+
+    # Calculate totals for each party
+    for attendence in attendences.query():
+        # Get parliamentarian's party
+        current_party = None
+        for role in attendence.parliamentarian.roles:
+            if role.party and (role.end is None or role.end >= self.start):
+                current_party = role.party
+                break
+
+        if not current_party:
+            continue
+
+        party_name = current_party.name
+
+        if party_name not in party_totals:
+            # Name Sitzungen Spesen Total Einträge Teuerungszulagen Auszahlung
+            party_totals[party_name] = {
+                'Meetings': Decimal('0'),
+                'Expenses': Decimal('0'),  # Always 0 for now (Spesen)
+                'Total': Decimal('0'),  # Expenses + Meetings
+                'Cost-of-living Allowance': Decimal('0'),  # Teuerungszulagen
+                'Final': Decimal('0')  # Auszahlung
+            }
+
+        # Calculate base rate
+        is_president = any(r.role == 'president'
+                           for r in attendence.parliamentarian.roles)
+
+        base_rate = calculate_rate(
+            rate_set=rate_set,
+            attendence_type=attendence.type,
+            duration_minutes=int(attendence.duration),
+            is_president=is_president,
+            commission_type=(
+                attendence.commission.type if attendence.commission else None
+            ),
+        )
+
+        # Update totals
+        party_totals[party_name]['Meetings'] += Decimal(str(base_rate))
+        base_total = party_totals[party_name]['Meetings']
+        cola_amount = base_total * (cola_multiplier - 1)
+
+        expenses = party_totals[party_name]['Expenses'] + base_total
+        party_totals[party_name]['Total'] = base_total + expenses
+        party_totals[party_name]['Cost-of-living Allowance'] = cola_amount
+        party_totals[party_name]['Final'] = base_total + cola_amount
+
+    # Convert to sorted list of tuples
+    result = [
+        (
+            name,
+            data['Meetings'],
+            data['Expenses'],
+            data['Total'],
+            data['Cost-of-living Allowance'],
+            data['Final']
+        )
+        for name, data in sorted(party_totals.items())
+    ]
+
+    # Add total row
+    totals = (
+        Decimal(sum(r[1] for r in result)),  # Sessions
+        Decimal(sum(r[2] for r in result)),  # Expenses
+        Decimal(sum(r[3] for r in result)),  # Total
+        Decimal(sum(r[4] for r in result)),  # COLA
+        Decimal(sum(r[5] for r in result)),  # Final
+    )
+
+    result.append(('Total Parteien', *totals))
+
+    return result
+
+
 def generate_pdf_all_settlements(
     self: SettlementRun,
     request: 'TownRequest'
@@ -198,36 +304,56 @@ body {
     line-height: 1.2;
 }
 
-th:nth-child(1), /* Datum */
-td:nth-child(1) {
-    width: 40pt;
-}
-/* Add width control for specific columns */
-th:nth-child(4), /* Wert  */
-td:nth-child(4) {
-    width: 40pt;
-}
-th:nth-child(5), /* CHF column */
-td:nth-child(5) {
-    width: 40pt;
+table {
+    border-collapse: collapse;
+    margin-top: 1cm;
+    width: 100%;
+    table-layout: auto;
 }
 
-th:nth-child(6), /* CHF + TZ column */
-td:nth-child(6) {
-    width: 40pt;
+/* Journal entries table */
+.journal-table th:nth-child(1), /* Date */
+.journal-table td:nth-child(1) {
+    width: 20pt;
 }
 
-th:nth-child(6), /* Person */
-td:nth-child(6) {
+.journal-table th:nth-child(2), /* Person */
+.journal-table td:nth-child(2) {
+    width: 100pt;
+}
+
+.journal-table th:nth-child(3), /* Type */
+.journal-table td:nth-child(3) {
+    width: 170pt;
+}
+
+.journal-table th:nth-child(4), /* Value */
+.journal-table td:nth-child(4),
+.journal-table th:nth-child(5), /* CHF */
+.journal-table td:nth-child(5),
+.journal-table th:nth-child(6), /* CHF + TZ */
+.journal-table td:nth-child(6) {
+    width: 30pt;
+}
+
+/* Party summary table */
+.summary-table th:nth-child(1), /* Name */
+.summary-table td:nth-child(1) {
     width: 120pt;
 }
 
-table {
-    width: 100%;
-    border-collapse: collapse;
-    margin-top: 1cm;
+.summary-table th:nth-child(2), /* Meetings */
+.summary-table td:nth-child(2),
+.summary-table th:nth-child(3), /* Expenses */
+.summary-table td:nth-child(3),
+.summary-table th:nth-child(4), /* Total */
+.summary-table td:nth-child(4),
+.summary-table th:nth-child(5), /* COLA */
+.summary-table td:nth-child(5),
+.summary-table th:nth-child(6), /* Final */
+.summary-table td:nth-child(6) {
+    width: 60pt;
 }
-
 
 /* Dark header for title row */
 th[colspan="6"] {
@@ -239,7 +365,6 @@ th[colspan="6"] {
     border: 1pt solid #000;
 }
 
-/* Column headers */
 th:not([colspan]) {
     background-color: #d5d7d9;
     font-weight: bold;
@@ -253,34 +378,29 @@ td {
     border: 1pt solid #000;
 }
 
-/* Alternating row colors */
 tr:nth-child(even):not(.total-row) td {
-    background-color: #f2f2f2;
+    background-color: #f3f3f3;
 }
 
 .numeric {
     text-align: right;
 }
 
-h1 {
-    font-size: 14pt;
-    margin-bottom: 0.5cm;
-}
-
-.subtitle {
-    font-size: 11pt;
-    color: #666;
-    margin-bottom: 1cm;
-}
-
 .total-row {
     font-weight: bold;
-    background-color: #f2f2f2;
+    background-color: #d5d7d9;
+}
+
+.summary-table {
+    margin-top: 2cm;
+    page-break-before: always;
 }
     """
     )
 
     settlement_data = _get_settlement_data(self, request)
+    party_totals = _get_party_totals(self, request)
+
     html = """
         <!DOCTYPE html>
         <html>
@@ -288,8 +408,7 @@ h1 {
             <meta charset="utf-8">
         </head>
         <body>
-
-            <table>
+            <table class="journal-table">
                 <thead>
                     <tr>
                         <th colspan="6">Einträge Journal</th>
@@ -304,7 +423,7 @@ h1 {
                     </tr>
                 </thead>
                 <tbody>
-"""
+    """
 
     for row in settlement_data:
         is_total = row[1].startswith('Total')
@@ -316,6 +435,40 @@ h1 {
                 <td>{row[1]}</td>
                 <td>{row[2]}</td>
                 <td class="numeric">{row[3]}</td>
+                <td class="numeric">{row[4]:,.2f}</td>
+                <td class="numeric">{row[5]:,.2f}</td>
+            </tr>
+        """
+
+    # Add summary table
+    html += """
+            </tbody>
+        </table>
+
+        <table class="summary-table">
+            <thead>
+                <tr>
+                    <th>Name</th>
+                    <th>Sitzungen</th>
+                    <th>Spesen</th>
+                    <th>Total Einträge</th>
+                    <th>Teuerungszulagen</th>
+                    <th>Auszahlung</th>
+                </tr>
+            </thead>
+            <tbody>
+    """
+
+    for row in party_totals:
+        is_total = row[0] == 'Total Parteien'
+        row_class = ' class="total-row"' if is_total else ''
+
+        html += f"""
+            <tr{row_class}>
+                <td>{row[0]}</td>
+                <td class="numeric">{row[1]:,.2f}</td>
+                <td class="numeric">{row[2]:,.2f}</td>
+                <td class="numeric">{row[3]:,.2f}</td>
                 <td class="numeric">{row[4]:,.2f}</td>
                 <td class="numeric">{row[5]:,.2f}</td>
             </tr>
@@ -387,12 +540,7 @@ def _get_settlement_data(
 
         if attendence.type == 'plenary':
             type_desc = translated_type
-        elif attendence.type == 'commission':
-            commission_name = (
-                attendence.commission.name if attendence.commission else ''
-            )
-            type_desc = f'{translated_type} - {commission_name}'
-        elif attendence.type == 'study':
+        elif attendence.type == 'commission' or attendence.type == 'study':
             commission_name = (
                 attendence.commission.name if attendence.commission else ''
             )
@@ -421,37 +569,6 @@ def _get_settlement_data(
 
     # Sort by date
     settlement_data.sort(key=lambda x: x[0])
-
-    # Add summary rows at end
-    settlement_data.append(
-        (
-            self.end,  # Use end date for summary rows
-            'TOTAL',
-            '',
-            '',
-            Decimal(str(sum(row[4] for row in settlement_data[:-1]))),
-            Decimal(str(sum(row[5] for row in settlement_data[:-1]))),
-        )
-    )
-
-    # Add per-parliamentarian totals
-    for parliamentarian_id, total in parliamentarian_totals.items():
-        parliamentarian = session.query(Parliamentarian).get(
-            parliamentarian_id
-        )
-        if parliamentarian:
-            settlement_data.append(
-                (
-                    self.end,
-                    f'Total {parliamentarian.first_name}'
-                    f' {parliamentarian.last_name}',
-                    '',
-                    '',
-                    total / cola_multiplier,  # Base amount
-                    total,  # With COLA
-                )
-            )
-
     return settlement_data
 
 
