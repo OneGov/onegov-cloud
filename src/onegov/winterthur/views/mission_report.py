@@ -186,8 +186,8 @@ def view_mission_reports_as_json(
     if request.params.get('all', False):
         query = self.query_all()
     elif request.params.get('year'):
-        year_param = request.params['year']
-        if isinstance(year_param, str):
+        year_param = str(request.params['year'])
+        if year_param.isdigit():
             self.year = int(year_param)
             query = self.filter_by_year(self.query())
 
@@ -234,8 +234,8 @@ def view_mission_reports_as_csv(
     if request.params.get('all', False):
         query = self.query_all()
     elif request.params.get('year'):
-        year_param = request.params['year']
-        if isinstance(year_param, str):
+        year_param = str(request.params['year'])
+        if year_param.isdigit():
             self.year = int(year_param)
             query = self.filter_by_year(self.query())
 
