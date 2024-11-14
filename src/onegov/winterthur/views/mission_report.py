@@ -182,15 +182,14 @@ def view_mission_reports_as_json(
     request: 'WinterthurRequest'
 ) -> 'JSON_ro':
 
-    query = None
+    query = self.query()
     if request.params.get('all', False):
         query = self.query_all()
     elif request.params.get('year'):
-        self.year = int(request.params['year'])
-        query = self.filter_by_year(self.query())
-    else:
-        # default
-        query = self.query()
+        year_param = request.params['year']
+        if isinstance(year_param, str):
+            self.year = int(year_param)
+            query = self.filter_by_year(self.query())
 
     return {
         'name': 'Mission Reports',
@@ -231,14 +230,14 @@ def view_mission_reports_as_csv(
     request: 'WinterthurRequest'
 ) -> Response:
 
-    query = None
+    query = self.query()
     if request.params.get('all', False):
         query = self.query_all()
     elif request.params.get('year'):
-        self.year = int(request.params['year'])
-        query = self.filter_by_year(self.query())
-    else:
-        query = self.query()
+        year_param = request.params['year']
+        if isinstance(year_param, str):
+            self.year = int(year_param)
+            query = self.filter_by_year(self.query())
 
     output = StringIO()
     writer = csv.writer(output)
