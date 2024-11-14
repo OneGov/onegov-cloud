@@ -423,11 +423,211 @@ def _get_party_totals(
     return result
 
 
+def generate_parliamentarian_settlement_pdf(
+    settlement_run: SettlementRun,
+    request: 'TownRequest',
+    parliamentarian: Parliamentarian,
+) -> bytes:
+    """Generate PDF for parliamentarian settlement data."""
+    font_config = FontConfiguration()
+    css = CSS(string="""
+        @page {
+            size: A4;
+            margin: 2.5cm 0.75cm 2cm 0.75cm;  /* top right bottom left */
+            @top-right {
+                content: "Staatskanzlei";
+                font-family: Helvetica, Arial, sans-serif;
+                font-size: 8pt;
+            }
+        }
+
+        body {
+            font-family: Helvetica, Arial, sans-serif;
+            font-size: 7pt;
+            line-height: 1.2;
+        }
+
+        .address {
+            margin-bottom: 2cm;
+            font-size: 8pt;
+            line-height: 1.4;
+        }
+
+        .header {
+            margin-bottom: 1cm;
+        }
+
+        table {
+            border-collapse: collapse;
+            width: 100%;
+            margin-bottom: 1cm;
+            table-layout: fixed;
+        }
+
+        /* Title row */
+        th[colspan] {
+            background-color: #707070;
+            color: white;
+            font-weight: bold;
+            text-align: left;
+            padding: 2pt;
+            border: 1pt solid #000;
+        }
+
+        th {
+            background-color: #d5d7d9;
+            font-weight: bold;
+            text-align: left;
+            padding: 2pt;
+            border: 1pt solid #000;
+        }
+
+        td {
+            padding: 2pt;
+            border: 1pt solid #000;
+        }
+
+        .numeric {
+            text-align: right;
+        }
+
+        tr:nth-child(even) td {
+            background-color: #f3f3f3;
+        }
+
+        .total-row td {
+            font-weight: bold;
+            background-color: #d5d7d9;
+        }
+
+        .summary-table {
+            page-break-inside: avoid;
+            margin-top: 1cm;
+        }
+
+        .summary-table td {
+            font-weight: bold;
+        }
+    """)
+
+    settlement_data = _get_parliamentarian_settlement_data(
+        settlement_run, request, parliamentarian
+    )
+
+    html = f"""
+        <!DOCTYPE html>
+        <html>
+        <head><meta charset="utf-8"></head>
+        <body>
+            <div class="address">
+                Staatskanzlei<br>
+                {parliamentarian.shipping_address}<br>
+                {parliamentarian.shipping_address_zip_code} {parliamentarian.shipping_address_city}
+            </div>
+
+            <div class="header">
+                <strong>Abrechnung vom {settlement_run.start.strftime('%d.%m.%Y')} bis {settlement_run.end.strftime('%d.%m.%Y')}</strong>
+            </div>
+
+            <table>
+                <thead>
+                    <tr>
+                        <th colspan="5">{parliamentarian.first_name} {parliamentarian.last_name} - Nr. {parliamentarian.id}</th>
+                    </tr>
+                    <tr>
+                        <th style="width: 15%">Datum</th>
+                        <th style="width: 45%">Typ</th>
+                        <th style="width: 10%">Wert</th>
+                        <th style="width: 15%">CHF</th>
+                        <th style="width: 15%">CHF ohne TZ</th>
+                    </tr>
+                </thead>
+                <tbody>
+    """
+
+    # Add individual attendences
+    type_totals = {
+        'plenary': Decimal('0'),
+        'commission': Decimal('0'),
+        'study': Decimal('0'),
+        'shortest': Decimal('0')
+    }
+    type_totals_without_cola = {
+        'plenary': Decimal('0'),
+        'commission': Decimal('0'),
+        'study': Decimal('0'),
+        'shortest': Decimal('0')
+    }
+
+    for entry in settlement_data['entries']:
+        html += f"""
+            <tr>
+                <td>{entry[0].strftime('%d.%m.%Y')}</td>
+                <td>{entry[1]}</td>
+                <td class="numeric">{entry[2]}</td>
+                <td class="numeric">{entry[3]:,.2f}</td>
+                <td class="numeric">{entry[4]:,.2f}</td>
+            </tr>
+        """
+        if entry[1] not in ['Total', 'Auszahlung']:
+            type_totals[entry[5]] += entry[3]  # With COLA
+            type_totals_without_cola[entry[5]] += entry[4]  # Without COLA
+
+    html += """
+                </tbody>
+            </table>
+
+            <table class="summary-table">
+                <thead>
+                    <tr>
+                        <th colspan="3">Zusammenfassung</th>
+                    </tr>
+                </thead>
+                <tbody>
+    """
+
+    # Add type totals
+    for type_name, type_key in [
+        ('Total aller Plenarsitzungen', 'plenary'),
+        ('Total aller Kommissionssitzungen', 'commission'),
+        ('Total aller Aktenstudium', 'study'),
+        ('Total aller Kürzestsitzungen', 'shortest')
+    ]:
+        if type_totals[type_key] > 0:
+            html += f"""
+                <tr>
+                    <td style="width: 70%">{type_name}</td>
+                    <td class="numeric" style="width: 15%">{type_totals[type_key]:,.2f}</td>
+                    <td class="numeric" style="width: 15%">{type_totals_without_cola[type_key]:,.2f}</td>
+                </tr>
+            """
+
+    # Add final total
+    total_with_cola = sum(type_totals.values())
+    total_without_cola = sum(type_totals_without_cola.values())
+    html += f"""
+                <tr class="total-row">
+                    <td>Total Auszahlung</td>
+                    <td class="numeric">{total_with_cola:,.2f}</td>
+                    <td class="numeric">{total_without_cola:,.2f}</td>
+                </tr>
+            </tbody>
+        </table>
+    </body>
+    </html>
+    """
+
+    # Convert numbers to Swiss format
+    html = html.replace(',', "'")
+
+    return HTML(string=html).write_pdf(stylesheets=[css], font_config=font_config)
+
+
 def _get_parliamentarian_settlement_data(
     settlement_run: SettlementRun,
     request: 'TownRequest',
-    parliamentarian: Parliamentarian
-) -> list[tuple['date', str, str, str | int, Decimal, Decimal]]:
+    parliamentarian: Parliamentarian,
+) -> dict[str, list[tuple]]:
     """Get settlement data for a specific parliamentarian."""
     session = request.session
     rate_set = (
@@ -437,7 +637,7 @@ def _get_parliamentarian_settlement_data(
     )
 
     if not rate_set:
-        return []
+        return {'entries': []}
 
     cola_multiplier = Decimal(
         str(1 + (rate_set.cost_of_living_adjustment / 100))
@@ -451,23 +651,8 @@ def _get_parliamentarian_settlement_data(
         Attendence.parliamentarian_id == parliamentarian.id
     )
 
-    # First get all individual attendences
     result = []
-    type_totals = {
-        'plenary': Decimal('0'),
-        'commission': Decimal('0'),
-        'study': Decimal('0'),
-        'shortest': Decimal('0')
-    }
 
-    type_totals_with_cola = {
-        'plenary': Decimal('0'),
-        'commission': Decimal('0'),
-        'study': Decimal('0'),
-        'shortest': Decimal('0')
-    }
-
-    # Add individual attendences
     for attendence in attendences:
         is_president = any(r.role == 'president'
                            for r in parliamentarian.roles)
@@ -491,88 +676,19 @@ def _get_parliamentarian_settlement_data(
 
         result.append((
             attendence.date,
-            f"{parliamentarian.first_name} {parliamentarian.last_name}",
             type_desc,
             attendence.calculate_value(),
-            Decimal(str(base_rate)),
-            rate_with_cola
+            rate_with_cola,  # With COLA
+            Decimal(str(base_rate)),  # Without COLA
+            attendence.type  # Store type for totals calculation
         ))
 
-        # Update totals
-        type_totals[attendence.type] += Decimal(str(base_rate))
-        type_totals_with_cola[attendence.type] += rate_with_cola
-
-    # Sort attendences by date
+    # Sort by date
     result.sort(key=lambda x: x[0])
 
-    # Add summary rows
-    summary_date = settlement_run.end  # Use end date for summary rows
-
-    # Add type subtotals if they have values
-    if type_totals['plenary'] > 0:
-        result.append((
-            summary_date,
-            parliamentarian.last_name,
-            'Total aller Plenarsitzungen inkl. Teuerungszulage',
-            type_totals['plenary'],
-            type_totals['plenary'],
-            type_totals_with_cola['plenary']
-        ))
-
-    if type_totals['commission'] > 0:
-        result.append((
-            summary_date,
-            parliamentarian.last_name,
-            'Total aller Kommissionssitzungen inkl. Teuerungszulage',
-            type_totals['commission'],
-            type_totals['commission'],
-            type_totals_with_cola['commission']
-        ))
-
-    if type_totals['study'] > 0:
-        result.append((
-            summary_date,
-            parliamentarian.last_name,
-            'Total aller Aktenstudium inkl. Teuerungszulage',
-            type_totals['study'],
-            type_totals['study'],
-            type_totals_with_cola['study']
-        ))
-
-    if type_totals['shortest'] > 0:
-        result.append((
-            summary_date,
-            parliamentarian.last_name,
-            'Total aller Kürzestsitzungen inkl. Teuerungszulage',
-            type_totals['shortest'],
-            type_totals['shortest'],
-            type_totals_with_cola['shortest']
-        ))
-
-    # Add expenses row (always zero but required for consistency)
-    result.append((
-        summary_date,
-        parliamentarian.last_name,
-        'Total aller Spesen inkl. Teuerungszulage',
-        Decimal('0'),
-        Decimal('0'),
-        Decimal('0')
-    ))
-
-    # Add final total row
-    total_base = sum(type_totals.values())
-    total_with_cola = sum(type_totals_with_cola.values())
-    result.append((
-        summary_date,
-        parliamentarian.last_name,
-        'Auszahlung',
-        total_base,
-        total_base,
-        total_with_cola
-    ))
-
-    return result
-
+    return {
+        'entries': result
+    }
 
 def get_parliamentarian_totals(
     settlement_run: SettlementRun,
@@ -683,14 +799,6 @@ def generate_settlement_pdf(
             settlement_run, request, entity
         )
         totals = _get_party_specific_totals(settlement_run, request, entity)
-
-    elif entity_type == 'parliamentarian' and isinstance(
-        entity, Parliamentarian
-    ):
-        settlement_data = _get_parliamentarian_settlement_data(
-            settlement_run, request, entity
-        )
-        totals = []
 
     elif entity_type == 'all':
         settlement_data = _get_settlement_data(settlement_run, request)
@@ -1298,15 +1406,16 @@ def view_settlement_run_export(
     elif self.category == 'parliamentarian':
         if not isinstance(self.entity, Parliamentarian):
             raise TypeError('Entity must be a Parliamentarian')
-        pdf_bytes =  s
+        pdf_bytes = generate_parliamentarian_settlement_pdf(
+            self.settlement_run, request, self.entity
+        )
+        filename = (
+            f'parliamentarian_{self.entity.last_name}_{self.entity.first_name}'
+        )
         return Response(
             pdf_bytes,
             content_type='application/pdf',
             content_disposition=f'attachment; filename={filename}.pdf'
-        )
-
-        filename = (
-            f'parliamentarian_{self.entity.last_name}_{self.entity.first_name}'
         )
 
     else:
