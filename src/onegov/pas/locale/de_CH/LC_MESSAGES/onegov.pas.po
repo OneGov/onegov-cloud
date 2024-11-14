@@ -1,7 +1,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: OneGov Cloud 1.0\n"
-"POT-Creation-Date: 2024-11-13 21:22+0100\n"
+"POT-Creation-Date: 2024-11-14 01:27+0100\n"
 "PO-Revision-Date: 2021-03-03 16:24+0100\n"
 "Language-Team: German\n"
 "Language: de_CH\n"
@@ -623,6 +623,12 @@ msgstr "Gesamtabrechnung"
 
 msgid "All Parties"
 msgstr "Alle Parteien"
+
+msgid "Settlements by Commission"
+msgstr "Abrechnungen nach Kommission"
+
+msgid "Settlements by Parliamentarian"
+msgstr "Abrechnungen nach Parlamentarier:in"
 
 msgid "Total all parties"
 msgstr "Total Alle Parteien"
