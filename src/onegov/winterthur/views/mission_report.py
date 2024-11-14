@@ -1,4 +1,7 @@
+import csv
+
 from datetime import date
+from io import StringIO
 from onegov.core.elements import Link
 from onegov.core.security import Public, Private
 from onegov.form import FieldDependency, WTFormsClassBuilder, move_fields
@@ -14,6 +17,7 @@ from onegov.winterthur.models import MissionReport
 from onegov.winterthur.models import MissionReportVehicle
 from onegov.winterthur.models import MissionReportVehicleUse
 from uuid import UUID
+from webob import Response
 from wtforms.fields import BooleanField
 from wtforms.fields import IntegerField
 from wtforms.validators import NumberRange
@@ -215,6 +219,62 @@ def view_mission_reports_as_json(
             } for mission in query
         ]
     }
+
+
+@WinterthurApp.view(
+    model=MissionReportCollection,
+    name='csv',
+    permission=Public
+)
+def view_mission_reports_as_csv(
+    self: MissionReportCollection,
+    request: 'WinterthurRequest'
+) -> Response:
+
+    query = None
+    if request.params.get('all', False):
+        query = self.query_all()
+    elif request.params.get('year'):
+        self.year = int(request.params['year'])
+        query = self.filter_by_year(self.query())
+    else:
+        query = self.query()
+
+    output = StringIO()
+    writer = csv.writer(output)
+
+    # Write CSV header
+    writer.writerow([
+        'date', 'alarm', 'duration', 'nature', 'mission_type', 'mission_count',
+        'vehicles', 'vehicles_icons', 'location', 'personnel_active',
+        'personnel_backup', 'civil_defence_involved'
+    ])
+
+    # Write CSV rows
+    for mission in query:
+        writer.writerow([
+            mission.local_date.strftime('%d.%m.%Y'),
+            mission.local_date.strftime('%H:%M'),
+            mission.readable_duration,
+            mission.nature,
+            mission.mission_type,
+            mission.mission_count,
+            ', '.join([
+                use.vehicle.name for use in mission.used_vehicles for _ in
+                range(use.count)]),
+            ', '.join([
+                request.link(use.vehicle.symbol) for use in
+                mission.used_vehicles for _ in range(use.count)]),
+            mission.location,
+            mission.personnel,
+            mission.backup,
+            mission.civil_defence
+        ])
+
+    response = Response(content_type='text/csv')
+    response.text = output.getvalue()
+    response.content_disposition = 'attachment; filename="mission_reports.csv"'
+    return response
 
 
 @WinterthurApp.html(
