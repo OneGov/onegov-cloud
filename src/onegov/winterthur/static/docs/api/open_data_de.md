@@ -13,8 +13,8 @@ Die Einsatzberichte der Feuerwehr Winterthur sind im JSON- und CSV-Format
 verfügbar.
 
 ```
-URL mission-reports/json
-URL mission-reports/csv
+URL /mission-reports/json
+URL /mission-reports/csv
 ```
 
 ### Datenfelder
@@ -85,12 +85,12 @@ Mit den folgenden Parametern können die Einsatzberichte gefiltert werden.
 
 URL Beispiele:
 ```
-URL mission-reports/json
-URL mission-reports/json?all=true
-URL mission-reports/json?year=2023
+URL /mission-reports/json
+URL /mission-reports/json?all=true
+URL /mission-reports/json?year=2023
 
-URL mission-reports/csv
-URL mission-reports/csv?all=true
-URL mission-reports/csv?year=2024
+URL /mission-reports/csv
+URL /mission-reports/csv?all=true
+URL /mission-reports/csv?year=2024
 ```
 
