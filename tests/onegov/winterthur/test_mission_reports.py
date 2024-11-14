@@ -1,4 +1,6 @@
+import csv
 from datetime import datetime as dt
+from io import StringIO
 
 from dateutil.relativedelta import relativedelta
 from freezegun import freeze_time
@@ -230,6 +232,10 @@ def test_view_mission_report_json(winterthur_app):
             ]
         }
 
+        response = client.get('/mission-reports/json')
+        assert response.status_code == 200
+        assert response.content_type == 'application/json'
+
         assert client.get('/mission-reports/json').json == expected_2024
         assert client.get(
             '/mission-reports/json?year=2024').json == expected_2024
@@ -284,6 +290,116 @@ def test_view_mission_report_json(winterthur_app):
         assert missions.query_all().count() == 4
         assert MissionReportCollection(
             session, year=last_year.year).mission_count() == 2
+
+
+def test_view_mission_report_csv(winterthur_app):
+    with freeze_time('2024-11-12 08:31'):
+        session = winterthur_app.session()
+        client = Client(winterthur_app)
+
+        now = replace_timezone(dt.now(), timezone='Europe/Zurich')
+        last_week = now - relativedelta(weeks=1, hours=5, minutes=19)
+        last_month = now - relativedelta(months=1, hours=1, minutes=10)
+        last_year = now - relativedelta(years=1, hours=3, minutes=30)
+
+        missions = MissionReportCollection(session, year=now.year)
+        for m in ((now, 2, 'Brand', 'Luzern', 10, 5),
+                  (last_week, 0.5, 'Rauchmelder', 'Kriens', 3, 2),
+                  (last_month, 1, 'Kellerbrand', 'Reussbühl', 6, 8),
+                  (last_year, 4.2, 'Wohnhausbrand', 'Tribschen', 20, 1, 2)):
+            missions.add(
+                date=m[0], duration=m[1], nature=m[2],
+                location=m[3], personnel=m[4], backup=m[5]
+            )
+        assert missions.mission_count() == 3
+        commit()
+
+        response = client.get('/mission-reports/csv')
+        assert response.status_code == 200
+        assert response.content_type == 'text/csv'
+
+        row_headers = ['date', 'alarm', 'duration', 'nature', 'mission_type',
+                       'mission_count', 'vehicles', 'vehicles_icons',
+                       'location', 'personnel_active', 'personnel_backup',
+                       'civil_defence_involved']
+        csv_content = StringIO(response.text)
+        reader = csv.reader(csv_content)
+        rows = list(reader)
+
+        assert rows[0] == row_headers
+        assert rows[1] == [
+            '12.11.2024', '08:31', '2h', 'Brand', 'single', '1', '',
+            '', 'Luzern', '10', '5', 'False'
+        ]
+        assert rows[2] == [
+            '05.11.2024', '03:12', '0.5h', 'Rauchmelder', 'single', '1', '',
+            '', 'Kriens', '3', '2', 'False'
+        ]
+        assert rows[3] == [
+            '12.10.2024', '08:21', '1h', 'Kellerbrand', 'single', '1', '',
+            '', 'Reussbühl', '6', '8', 'False'
+        ]
+        assert len(rows) == 4
+
+        response = client.get('/mission-reports/csv?year=2024')
+        csv_content = StringIO(response.text)
+        reader = csv.reader(csv_content)
+        rows = list(reader)
+        assert rows[0] == row_headers
+        assert rows[1] == [
+            '12.11.2024', '08:31', '2h', 'Brand', 'single', '1', '',
+            '', 'Luzern', '10', '5', 'False'
+        ]
+        assert rows[2] == [
+            '05.11.2024', '03:12', '0.5h', 'Rauchmelder', 'single', '1', '',
+            '', 'Kriens', '3', '2', 'False'
+        ]
+        assert rows[3] == [
+            '12.10.2024', '08:21', '1h', 'Kellerbrand', 'single', '1', '',
+            '', 'Reussbühl', '6', '8', 'False'
+        ]
+        assert len(rows) == 4
+
+        response = client.get('/mission-reports/csv?year=2023')
+        csv_content = StringIO(response.text)
+        reader = csv.reader(csv_content)
+        rows = list(reader)
+        assert rows[0] == row_headers
+        assert rows[1] == [
+            '12.11.2023', '05:01', '4.2h', 'Wohnhausbrand', 'single', '1', '',
+            '', 'Tribschen', '20', '1', 'False'
+        ]
+        assert len(rows) == 2
+
+        response = client.get('/mission-reports/csv?year=2022')
+        csv_content = StringIO(response.text)
+        reader = csv.reader(csv_content)
+        rows = list(reader)
+        assert rows[0] == row_headers
+        assert len(rows) == 1
+
+        response = client.get('/mission-reports/csv?all=true')
+        csv_content = StringIO(response.text)
+        reader = csv.reader(csv_content)
+        rows = list(reader)
+        assert rows[0] == row_headers
+        assert rows[1] == [
+            '12.11.2024', '08:31', '2h', 'Brand', 'single', '1', '',
+            '', 'Luzern', '10', '5', 'False'
+        ]
+        assert rows[2] == [
+            '05.11.2024', '03:12', '0.5h', 'Rauchmelder', 'single', '1', '',
+            '', 'Kriens', '3', '2', 'False'
+        ]
+        assert rows[3] == [
+            '12.10.2024', '08:21', '1h', 'Kellerbrand', 'single', '1', '',
+            '', 'Reussbühl', '6', '8', 'False'
+        ]
+        assert rows[4] == [
+            '12.11.2023', '05:01', '4.2h', 'Wohnhausbrand', 'single', '1', '',
+            '', 'Tribschen', '20', '1', 'False'
+        ]
+        assert len(rows) == 5
 
 
 def test_mission_reports_validating_integer_fields(winterthur_app):
