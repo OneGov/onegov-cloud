@@ -1,4 +1,15 @@
+from datetime import date
+from decimal import Decimal
 import pytest
+from onegov.pas.models import (
+    Parliamentarian,
+    RateSet,
+    Party,
+    Commission,
+    ParliamentarianRole,
+    Attendence,
+    SettlementRun,
+)
 
 
 @pytest.mark.flaky(reruns=5)

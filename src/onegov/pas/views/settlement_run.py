@@ -448,13 +448,10 @@ def generate_parliamentarian_settlement_pdf(
         }
 
         .address {
+            margin-left: 4cm; 
             margin-bottom: 2cm;
             font-size: 8pt;
             line-height: 1.4;
-        }
-
-        .header {
-            margin-bottom: 1cm;
         }
 
         table {
@@ -464,8 +461,9 @@ def generate_parliamentarian_settlement_pdf(
             table-layout: fixed;
         }
 
-        /* Title row */
-        th[colspan] {
+        /* Column widths for the first row */
+        .header-row td {
+            width: 25%;  /* 4 equal columns */
             background-color: #707070;
             color: white;
             font-weight: bold;
@@ -474,6 +472,21 @@ def generate_parliamentarian_settlement_pdf(
             border: 1pt solid #000;
         }
 
+        /* Column widths for data rows */
+        .data-column-date {
+            width: 10%;
+        }
+        
+        .data-column-type {
+            width: 60%;  /* Much wider type column */
+        }
+        .data-column-value,
+        .data-column-chf,
+        .data-column-chf-no-cola {
+            width: 10%;  /* Equal width for numeric columns */
+        }
+
+        /* Standard table formatting */
         th {
             background-color: #d5d7d9;
             font-weight: bold;
@@ -487,12 +500,27 @@ def generate_parliamentarian_settlement_pdf(
             border: 1pt solid #000;
         }
 
+        tr:nth-child(even):not(.total-row) td {
+            background-color: #f3f3f3;
+        }
+
         .numeric {
             text-align: right;
         }
-
-        tr:nth-child(even) td {
+        
+       */ not this  */
+        .total-rows {
             background-color: #f3f3f3;
+        }
+
+        /* Summary table specific */
+        .summary-table {
+            page-break-inside: avoid;
+            margin-top: 1cm;
+        }
+
+        .summary-table tr td {
+            font-weight: bold;
         }
 
         .total-row td {
@@ -500,19 +528,44 @@ def generate_parliamentarian_settlement_pdf(
             background-color: #d5d7d9;
         }
 
-        .summary-table {
-            page-break-inside: avoid;
-            margin-top: 1cm;
-        }
-
         .summary-table td {
             font-weight: bold;
+            background-color: #707070;
         }
-    """)
 
-    settlement_data = _get_parliamentarian_settlement_data(
-        settlement_run, request, parliamentarian
-    )
+        .summary-table th[colspan] {
+            background-color: #707070;
+        }
+        
+/* Make both tables full width */
+table {
+    width: 100%;
+}
+
+/* Fixed column widths for data table */
+.data-column-date {
+    width: 8%;
+}
+.data-column-type {
+    width: 68%;
+}
+.data-column-value, 
+.data-column-chf,
+.data-column-chf-no-cola {
+    width: 8%;
+}
+
+/* Summary table - all rows light gray, black text */
+.summary-table td {
+    font-weight: bold;
+    background-color: #d5d7d9;
+}
+
+.summary-table th[colspan] {
+    background-color: #d5d7d9;
+}
+        
+    """)
 
     html = f"""
         <!DOCTYPE html>
@@ -522,24 +575,23 @@ def generate_parliamentarian_settlement_pdf(
             <div class="address">
                 Staatskanzlei<br>
                 {parliamentarian.shipping_address}<br>
-                {parliamentarian.shipping_address_zip_code} {parliamentarian.shipping_address_city}
-            </div>
-
-            <div class="header">
-                <strong>Abrechnung vom {settlement_run.start.strftime('%d.%m.%Y')} bis {settlement_run.end.strftime('%d.%m.%Y')}</strong>
+                {parliamentarian.shipping_address_zip_code} 
+                {parliamentarian.shipping_address_city}
             </div>
 
             <table>
                 <thead>
-                    <tr>
-                        <th colspan="5">{parliamentarian.first_name} {parliamentarian.last_name} - Nr. {parliamentarian.id}</th>
+                    <tr class="header-row">
+                        <td>Name</td>
+                        <td>Zug</td>
+                        <td>Alg</td>
+                        <td>KR-{settlement_run.start.year}-{(settlement_run.start.month-1)//3 + 1:02d}</td>
                     </tr>
                     <tr>
-                        <th style="width: 15%">Datum</th>
-                        <th style="width: 45%">Typ</th>
-                        <th style="width: 10%">Wert</th>
-                        <th style="width: 15%">CHF</th>
-                        <th style="width: 15%">CHF ohne TZ</th>
+                        <th class="data-column-date">Datum</th>
+                        <th class="data-column-type">Typ</th>
+                        <th class="data-column-value">Wert</th>
+                        <th class="data-column-chf-no-cola">CHF ohne TZ</th>
                     </tr>
                 </thead>
                 <tbody>
@@ -559,31 +611,27 @@ def generate_parliamentarian_settlement_pdf(
         'shortest': Decimal('0')
     }
 
-    for entry in settlement_data['entries']:
+    data = _get_parliamentarian_settlement_data(
+        settlement_run, request, parliamentarian
+    )
+    for entry in data['entries']:
         html += f"""
             <tr>
                 <td>{entry[0].strftime('%d.%m.%Y')}</td>
                 <td>{entry[1]}</td>
                 <td class="numeric">{entry[2]}</td>
                 <td class="numeric">{entry[3]:,.2f}</td>
-                <td class="numeric">{entry[4]:,.2f}</td>
             </tr>
         """
         if entry[1] not in ['Total', 'Auszahlung']:
-            type_totals[entry[5]] += entry[3]  # With COLA
-            type_totals_without_cola[entry[5]] += entry[4]  # Without COLA
+            type_totals_without_cola[entry[3]] += entry[4]  # Without COLA
 
     html += """
                 </tbody>
             </table>
 
             <table class="summary-table">
-                <thead>
-                    <tr>
-                        <th colspan="3">Zusammenfassung</th>
-                    </tr>
-                </thead>
-                <tbody>
+             <tbody>
     """
 
     # Add type totals
@@ -596,8 +644,7 @@ def generate_parliamentarian_settlement_pdf(
         if type_totals[type_key] > 0:
             html += f"""
                 <tr>
-                    <td style="width: 70%">{type_name}</td>
-                    <td class="numeric" style="width: 15%">{type_totals[type_key]:,.2f}</td>
+                    <td>{type_name}</td>
                     <td class="numeric" style="width: 15%">{type_totals_without_cola[type_key]:,.2f}</td>
                 </tr>
             """
@@ -608,7 +655,6 @@ def generate_parliamentarian_settlement_pdf(
     html += f"""
                 <tr class="total-row">
                     <td>Total Auszahlung</td>
-                    <td class="numeric">{total_with_cola:,.2f}</td>
                     <td class="numeric">{total_without_cola:,.2f}</td>
                 </tr>
             </tbody>
@@ -619,6 +665,9 @@ def generate_parliamentarian_settlement_pdf(
 
     # Convert numbers to Swiss format
     html = html.replace(',', "'")
+
+    with open('/tmp/test.html', 'w') as f:
+        f.write(html)
 
     return HTML(string=html).write_pdf(stylesheets=[css], font_config=font_config)
 
@@ -667,8 +716,6 @@ def _get_parliamentarian_settlement_data(
             )
         )
 
-        rate_with_cola = Decimal(str(base_rate)) * cola_multiplier
-
         # Build type description
         type_desc = request.translate(TYPES[attendence.type])
         if attendence.commission:
@@ -678,7 +725,6 @@ def _get_parliamentarian_settlement_data(
             attendence.date,
             type_desc,
             attendence.calculate_value(),
-            rate_with_cola,  # With COLA
             Decimal(str(base_rate)),  # Without COLA
             attendence.type  # Store type for totals calculation
         ))
@@ -689,6 +735,7 @@ def _get_parliamentarian_settlement_data(
     return {
         'entries': result
     }
+
 
 def get_parliamentarian_totals(
     settlement_run: SettlementRun,
