@@ -10,6 +10,7 @@ from langdetect.lang_detect_exception import LangDetectException
 from itertools import groupby
 from operator import itemgetter
 from queue import Queue, Empty, Full
+from sqlalchemy.dialects.postgresql import JSONB
 from unidecode import unidecode
 
 from onegov.core.utils import is_non_string_iterable
@@ -432,7 +433,7 @@ class PostgresIndexer(IndexerBase):
             tsvector_expr = sqlalchemy.text(
                 'to_tsvector(:language, :data)').bindparams(
                 sqlalchemy.bindparam('language', type_=sqlalchemy.String),
-                sqlalchemy.bindparam('data', type_=sqlalchemy.JSON)
+                sqlalchemy.bindparam('data', type_=JSONB)
             )
 
             stmt = (
@@ -441,7 +442,7 @@ class PostgresIndexer(IndexerBase):
                 .values({
                     self.TEXT_SEARCH_COLUMN_NAME: tsvector_expr,
                     self.TEXT_SEARCH_DATA_COLUMN_NAME:
-                    sqlalchemy.bindparam('data', type_=sqlalchemy.JSON)
+                    sqlalchemy.bindparam('data', type_=JSONB)
                 })
             )
 
