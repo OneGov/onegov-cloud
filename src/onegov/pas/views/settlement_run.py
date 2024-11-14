@@ -53,7 +53,7 @@ table {
     border-collapse: collapse;
     margin-top: 1cm;
     width: 100%;
-    table-layout: auto;
+    table-layout: fixed;
 }
 
 /* Journal entries table */
@@ -448,22 +448,27 @@ def generate_parliamentarian_settlement_pdf(
         }
 
         .address {
-            margin-left: 4cm; 
-            margin-bottom: 2cm;
+            margin-left: 1.0cm;
+            margin-bottom: 0.5cm;
             font-size: 8pt;
             line-height: 1.4;
+        }
+
+        .date {
+            margin-left: 1.0cm;
+            margin-bottom: 2cm;
+            font-size: 8pt;
         }
 
         table {
             border-collapse: collapse;
             width: 100%;
-            margin-bottom: 1cm;
             table-layout: fixed;
+            white-space: nowrap;
         }
 
         /* Column widths for the first row */
         .header-row td {
-            width: 25%;  /* 4 equal columns */
             background-color: #707070;
             color: white;
             font-weight: bold;
@@ -472,100 +477,47 @@ def generate_parliamentarian_settlement_pdf(
             border: 1pt solid #000;
         }
 
-        /* Column widths for data rows */
-        .data-column-date {
-            width: 10%;
+        th, td {
+            padding: 2pt;
+            border: 1pt solid #000;
         }
         
-        .data-column-type {
-            width: 60%;  /* Much wider type column */
-        }
-        .data-column-value,
-        .data-column-chf,
-        .data-column-chf-no-cola {
-            width: 10%;  /* Equal width for numeric columns */
-        }
-
-        /* Standard table formatting */
-        th {
+        
+        /* Fixed column widths for main table */
+        .first-table td:first-child { width: 30pt; }
+        .first-table td:nth-child(2){ width: 305pt;}
+        .first-table td:nth-child(3){ width: 50pt; }
+        .first-table td:last-child { width: 50pt; }
+        
+        /* Fixed column widths for parliamentarian summary table */
+        .parliamentarian-summary-table td:first-child { width: 360pt; }
+        .parliamentarian-summary-table td:nth-child(2) { width: 50pt; }
+        .parliamentarian-summary-table td:last-child { width: 50pt; }
+        
+        .numeric { text-align: right; }
+        
+        .first-table tr:nth-child(2) td {
             background-color: #d5d7d9;
-            font-weight: bold;
-            text-align: left;
-            padding: 2pt;
-            border: 1pt solid #000;
         }
-
-        td {
-            padding: 2pt;
-            border: 1pt solid #000;
-        }
-
-        tr:nth-child(even):not(.total-row) td {
+            
+        .first-table tr:nth-child(even):not(.total-row) td {
             background-color: #f3f3f3;
         }
 
-        .numeric {
-            text-align: right;
-        }
-        
-       */ not this  */
-        .total-rows {
-            background-color: #f3f3f3;
-        }
-
-        /* Summary table specific */
-        .summary-table {
+        .parliamentarian-summary-table {
             page-break-inside: avoid;
             margin-top: 1cm;
         }
 
-        .summary-table tr td {
-            font-weight: bold;
-        }
-
-        .total-row td {
+        .parliamentarian-summary-table td {
             font-weight: bold;
             background-color: #d5d7d9;
         }
-
-        .summary-table td {
-            font-weight: bold;
-            background-color: #707070;
-        }
-
-        .summary-table th[colspan] {
-            background-color: #707070;
-        }
-        
-/* Make both tables full width */
-table {
-    width: 100%;
-}
-
-/* Fixed column widths for data table */
-.data-column-date {
-    width: 8%;
-}
-.data-column-type {
-    width: 68%;
-}
-.data-column-value, 
-.data-column-chf,
-.data-column-chf-no-cola {
-    width: 8%;
-}
-
-/* Summary table - all rows light gray, black text */
-.summary-table td {
-    font-weight: bold;
-    background-color: #d5d7d9;
-}
-
-.summary-table th[colspan] {
-    background-color: #d5d7d9;
-}
-        
     """)
+
+    data = _get_parliamentarian_settlement_data(
+        settlement_run, request, parliamentarian
+    )
 
     html = f"""
         <!DOCTYPE html>
@@ -575,100 +527,95 @@ table {
             <div class="address">
                 Staatskanzlei<br>
                 {parliamentarian.shipping_address}<br>
-                {parliamentarian.shipping_address_zip_code} 
-                {parliamentarian.shipping_address_city}
+                {parliamentarian.shipping_address_zip_code} {parliamentarian.shipping_address_city}
             </div>
 
-            <table>
+            <div class="date">
+                {settlement_run.end.strftime('%d.%m.%Y')}
+            </div>
+
+            <table class="first-table">
                 <thead>
                     <tr class="header-row">
                         <td>Name</td>
                         <td>Zug</td>
-                        <td>Alg</td>
-                        <td>KR-{settlement_run.start.year}-{(settlement_run.start.month-1)//3 + 1:02d}</td>
+                        <td>ALG</td>
+                        <td colspan="2">KR-{settlement_run.start.year}
+                        -{(settlement_run.start.month-1)//3 + 1:02d}</td>
                     </tr>
                     <tr>
                         <th class="data-column-date">Datum</th>
                         <th class="data-column-type">Typ</th>
                         <th class="data-column-value">Wert</th>
-                        <th class="data-column-chf-no-cola">CHF ohne TZ</th>
+                        <th class="data-column-chf">CHF ohne Tz</th>
                     </tr>
                 </thead>
                 <tbody>
     """
 
-    # Add individual attendences
     type_totals = {
-        'plenary': Decimal('0'),
-        'commission': Decimal('0'),
-        'study': Decimal('0'),
-        'shortest': Decimal('0')
-    }
-    type_totals_without_cola = {
-        'plenary': Decimal('0'),
-        'commission': Decimal('0'),
-        'study': Decimal('0'),
-        'shortest': Decimal('0')
+        'plenary': {'entries': [], 'total': Decimal('0')},
+        'commission': {'entries': [], 'total': Decimal('0')},
+        'study': {'entries': [], 'total': Decimal('0')},
+        'shortest': {'entries': [], 'total': Decimal('0')},
+        'expenses': {'entries': [], 'total': Decimal('0')}
     }
 
-    data = _get_parliamentarian_settlement_data(
-        settlement_run, request, parliamentarian
-    )
     for entry in data['entries']:
         html += f"""
             <tr>
                 <td>{entry[0].strftime('%d.%m.%Y')}</td>
                 <td>{entry[1]}</td>
                 <td class="numeric">{entry[2]}</td>
-                <td class="numeric">{entry[3]:,.2f}</td>
+                <td class="numeric">{entry[4]:,.2f}</td>
             </tr>
         """
         if entry[1] not in ['Total', 'Auszahlung']:
-            type_totals_without_cola[entry[3]] += entry[4]  # Without COLA
+            type_totals[entry[5]]['entries'].append(entry)
+            type_totals[entry[5]]['total'] += entry[4]
 
     html += """
-                </tbody>
-            </table>
-
-            <table class="summary-table">
-             <tbody>
+        </tbody>
+    </table>
+    
+    <table class="parliamentarian-summary-table">
+        <tbody>
     """
 
-    # Add type totals
+    total = Decimal('0')
     for type_name, type_key in [
-        ('Total aller Plenarsitzungen', 'plenary'),
-        ('Total aller Kommissionssitzungen', 'commission'),
-        ('Total aller Aktenstudium', 'study'),
-        ('Total aller Kürzestsitzungen', 'shortest')
+        ('Total aller Plenarsitzungen inkl. Teuerungszulage', 'plenary'),
+        ('Total aller Kommissionssitzungen inkl. Teuerungszulage',
+         'commission'),
+        ('Total aller Aktenstudium inkl. Teuerungszulage', 'study'),
+        ('Total aller Kürzestsitzungen inkl. Teuerungszulage', 'shortest'),
+            ('Total Spesen inkl. Teuerungszulage', 'expenses')
     ]:
-        if type_totals[type_key] > 0:
-            html += f"""
-                <tr>
-                    <td>{type_name}</td>
-                    <td class="numeric" style="width: 15%">{type_totals_without_cola[type_key]:,.2f}</td>
-                </tr>
-            """
+        total_value = sum(Decimal(str(e[2])) for e in type_totals[type_key]['entries'])
+        total_chf = type_totals[type_key]['total']
+        total += total_chf
+        html += f"""
+            <tr>
+                <td>{type_name}</td>
+                <td class="numeric">{total_value:,.2f}</td>
+                <td class="numeric">{total_chf:,.2f}</td>
+            </tr>
+        """
 
-    # Add final total
-    total_with_cola = sum(type_totals.values())
-    total_without_cola = sum(type_totals_without_cola.values())
     html += f"""
-                <tr class="total-row">
-                    <td>Total Auszahlung</td>
-                    <td class="numeric">{total_without_cola:,.2f}</td>
-                </tr>
-            </tbody>
-        </table>
+            <tr>
+                <td>Total Auszahlung</td>
+                <td class="numeric">-</td>
+                <td class="numeric">{total:,.2f}</td>
+            </tr>
+        </tbody>
+    </table>
     </body>
     </html>
     """
 
     # Convert numbers to Swiss format
     html = html.replace(',', "'")
-
-    with open('/tmp/test.html', 'w') as f:
-        f.write(html)
-
     return HTML(string=html).write_pdf(stylesheets=[css], font_config=font_config)
 
 
@@ -676,8 +623,10 @@ def _get_parliamentarian_settlement_data(
     settlement_run: SettlementRun,
     request: 'TownRequest',
     parliamentarian: Parliamentarian,
-) -> dict[str, list[tuple]]:
+) -> dict[str, list['ParliamentarianEntry']]:
     """Get settlement data for a specific parliamentarian."""
+    # todo: Here we'll have to add 'Spense' in the future
+
     session = request.session
     rate_set = (
         session.query(RateSet)
@@ -687,10 +636,6 @@ def _get_parliamentarian_settlement_data(
 
     if not rate_set:
         return {'entries': []}
-
-    cola_multiplier = Decimal(
-        str(1 + (rate_set.cost_of_living_adjustment / 100))
-    )
 
     attendences = AttendenceCollection(
         session,
@@ -725,7 +670,8 @@ def _get_parliamentarian_settlement_data(
             attendence.date,
             type_desc,
             attendence.calculate_value(),
-            Decimal(str(base_rate)),  # Without COLA
+            Decimal('0'),  # Placeholder value to maintain tuple structure
+            Decimal(str(base_rate)),  # Base rate without COLA
             attendence.type  # Store type for totals calculation
         ))
 
@@ -735,94 +681,6 @@ def _get_parliamentarian_settlement_data(
     return {
         'entries': result
     }
-
-
-def get_parliamentarian_totals(
-    settlement_run: SettlementRun,
-    request: 'TownRequest',
-    parliamentarian: Parliamentarian
-) -> list[tuple[str, Decimal, Decimal, Decimal, Decimal, Decimal]]:
-    """Get totals for a specific parliamentarian."""
-    session = request.session
-    rate_set = (
-        session.query(RateSet)
-        .filter(RateSet.year == settlement_run.start.year)
-        .first()
-    )
-    if not rate_set:
-        return []
-    cola_multiplier = Decimal(
-        str(1 + (rate_set.cost_of_living_adjustment / 100))
-    )
-    attendences = AttendenceCollection(
-        session,
-        date_from=settlement_run.start,
-        date_to=settlement_run.end
-    ).query().filter(
-        Attendence.parliamentarian_id == parliamentarian.id
-    )
-    # Initialize totals
-    category_totals: dict[str, dict[str, Decimal]] = {
-        'Plenarsitzungen': {'base': Decimal('0'), 'cola': Decimal('0')},
-        'Kommissionen': {'base': Decimal('0'), 'cola': Decimal('0')},
-        'Aktenstudium': {'base': Decimal('0'), 'cola': Decimal('0')},
-        'Kürzeste Sitzungen': {'base': Decimal('0'), 'cola': Decimal('0')},
-    }
-    for attendence in attendences:
-        is_president = any(r.role == 'president'
-                           for r in parliamentarian.roles)
-        base_rate = calculate_rate(
-            rate_set=rate_set,
-            attendence_type=attendence.type,
-            duration_minutes=int(attendence.duration),
-            is_president=is_president,
-            commission_type=(
-                attendence.commission.type if attendence.commission else None
-            )
-        )
-        # Map types to categories
-        category_map = {
-            'plenary': 'Plenarsitzungen',
-            'commission': 'Kommissionen',
-            'study': 'Aktenstudium',
-            'shortest': 'Kürzeste Sitzungen'
-        }
-        category = category_map[attendence.type]
-        category_totals[category]['base'] += Decimal(str(base_rate))
-        category_totals[category]['cola'] += (
-                Decimal(str(base_rate)) * (cola_multiplier - 1)
-        )
-    # Convert to result format
-    result = []
-    for category, totals in category_totals.items():
-        base = totals['base']
-        if base > 0:
-            result.append((
-                category,
-                base,  # Meetings
-                Decimal('0'),  # Expenses (always 0 for now)
-                base,  # Total entries
-                totals['cola'],  # COLA
-                base + totals['cola']  # Final
-            ))
-
-    # Calculate total row using list comprehension to maintain type safety
-    meetings_total = sum(row[1] for row in result)
-    expenses_total = sum(row[2] for row in result)
-    entries_total = sum(row[3] for row in result)
-    cola_total = sum(row[4] for row in result)
-    final_total = sum(row[5] for row in result)
-
-    # Add the total row
-    result.append((
-        f'Total {parliamentarian.first_name} {parliamentarian.last_name}',
-        Decimal(str(meetings_total)),
-        Decimal(str(expenses_total)),
-        Decimal(str(entries_total)),
-        Decimal(str(cola_total)),
-        Decimal(str(final_total))
-    ))
-    return result
 
 
 def generate_settlement_pdf(
