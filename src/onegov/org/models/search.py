@@ -295,33 +295,40 @@ class SearchPostgres(Pagination[_M]):
 
         return combined_vector
 
+    def filter_user_level(self, model, query):
+        """ Filters search content according user level """
+
+        if not self.request.is_logged_in:  # maybe not needed
+            query = query.filter(
+                model.fts_idx_data.contains({'es_public': True}))
+
+        # as a member we only want to see public and member content
+        if self.request.is_member and hasattr(model, 'meta'):
+            query = query.filter(
+                model.meta['access'].astext.in_(('public', 'member')))
+
+        # as non-manager we only want to see public content
+        elif not self.request.is_manager:
+            query = query.filter(
+                model.fts_idx_data.contains({'es_public': True}))
+
+        return query
+
     def generic_search(self) -> list['Searchable']:
         doc_count = 0
         results: list[Any] = []
         language = locale_mapping(self.request.locale or 'de_CH')
         ts_query = func.websearch_to_tsquery(language,
                                              func.unaccent(self.query))
-        session = self.request.session
 
         for base in self.request.app.session_manager.bases:
             for model in searchable_sqlalchemy_models(base):
-                query = session.query(model)
+                query = self.request.session.query(model)
+                doc_count += query.count()
 
-                if not self.request.is_logged_in:
-                    query = query.filter(
-                        model.fts_idx_data['es_public'].astext == 'True')
+                query = self.filter_user_level(model, query)
 
-                # as a member we only want to see public and member content
-                if self.request.is_member and hasattr(model, 'meta'):
-                    query = query.filter(
-                        model.meta['access'].astext.in_(('public', 'member')))
-
-                # as non-manager we only want to see public content
-                elif not self.request.is_manager:
-                    query = query.filter(
-                        model.fts_idx_data['es_public'].astext == 'True')
-
-                if session.query(query.exists()).scalar():
+                if self.request.session.query(query.exists()).scalar():
                     weighted = (
                         self._create_weighted_vector(model, language))
                     rank_expression = func.coalesce(
@@ -332,8 +339,7 @@ class SearchPostgres(Pagination[_M]):
                         ), 0).label('rank')
                     query = (query.filter(model.fts_idx.op('@@')(ts_query))
                              .add_columns(rank_expression))
-                    res = list(query.all())
-                    doc_count += len(res)
+                    res = query.all()
                     results.extend(res)
 
         # remove duplicates, sort by rank
@@ -347,21 +353,26 @@ class SearchPostgres(Pagination[_M]):
         return [r[0] for r in results]
 
     def hashtag_search(self) -> list['Searchable']:
+        doc_count = 0
+        results: list[Any] = []
         q = self.query.lstrip('#')
 
-        # Skip certain tables for hashtag search for better performance
-        results = [
-            doc for model in searchable_sqlalchemy_models(Base)
-            if model.es_type_name not in
-               ['attendees', 'files', 'people', 'tickets', 'users']
-            if model.es_public or self.request.is_logged_in  # type:ignore
-            for doc in self.request.session.query(model)
-            if doc.es_tags and q in doc.es_tags
-        ]
+        for base in self.request.app.session_manager.bases:
+            for model in searchable_sqlalchemy_models(Base):
+                query = self.request.session.query(model)
+                doc_count += query.count()
+                query = self.filter_user_level(model, query)
+                query = query.filter(
+                    model.fts_idx_data['es_tags'].contains([q]))
+
+                if self.request.session.query(query.exists()).scalar():
+                    res = query.all()
+                    results.extend(res)
 
         # remove duplicates
         results = list(set(results))
 
+        self.number_of_docs = doc_count
         self.number_of_results = len(results)
         return results
 
@@ -380,15 +391,43 @@ class SearchPostgres(Pagination[_M]):
     def subset_count(self) -> int:
         return self.available_results
 
+    @cached_property
+    def get_all_hashtags(self) -> list[str]:
+        """ Returns all hashtags from the database in alphabetical order. """
+        all_tags: set[str] = set()
+
+        for base in self.request.app.session_manager.bases:
+            for model in searchable_sqlalchemy_models(base):
+                query = self.request.session.query(
+                    model.fts_idx_data['es_tags'].distinct())
+                for tag_list in query.all():
+                    all_tags.update(tag_list[0]) if tag_list[0] else None
+
+        # mark tags as hashtags; it also helps ot remain with the hashtag
+        # search (url) when clicking on a suggestion
+        all_tags = {f'#{tag}' for tag in all_tags}
+        return sorted(all_tags)
+
     def suggestions(self) -> tuple[str, ...]:
         suggestions = []
+        number_of_suggestions = 15
 
-        for element in self.generic_search():
-            if element.es_type_name == 'files':
-                continue
-            suggest = getattr(element, 'es_suggestion', '')
-            if isinstance(suggest, tuple):
-                suggest = suggest[0]
-            suggestions.append(suggest)
+        if self.query.startswith('#'):  # hashtag search
+            q = self.query.lstrip('#').lower()
+            tags = self.get_all_hashtags
 
-        return tuple(suggestions[:15])
+            if len(q) == 0:
+                return tuple(tags[:number_of_suggestions])
+
+            suggestions = [tag for tag in tags if q in tag]
+
+        else:
+            for element in self.generic_search():
+                if element.es_type_name == 'files':
+                    continue
+                suggest = getattr(element, 'es_suggestion', '')
+                if isinstance(suggest, tuple):
+                    suggest = suggest[0]
+                suggestions.append(suggest)
+
+        return tuple(suggestions[:number_of_suggestions])

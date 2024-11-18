@@ -85,7 +85,7 @@ def hash_mapping(mapping: dict[str, Any]) -> str:
 
 
 def extract_hashtags(text: str) -> list[str]:
-    return HASHTAG.findall(html.unescape(text))
+    return [t.lower() for t in HASHTAG.findall(html.unescape(text))]
 
 
 class classproperty(Generic[T_co]):  # noqa: N801
