@@ -93,7 +93,7 @@
                                                             Actions
                                                         </span>
                                                     </button>
-                                                    <ul id="dropdown-${record.volunteer_id.hex}" data-position="bottom" data-alignment="right" data-auto-focus="true" class="dropdown-pane dropdown-options volunteer-actions" aria-hidden="true" data-dropdown>
+                                                    <ul id="dropdown-${record.volunteer_id.hex}" data-position="bottom" data-alignment="right" data-auto-focus="true" class="dropdown-pane dropdown-options volunteer-actions" aria-hidden="true" data-close-on-click="true" data-dropdown>
                                                         <li>
                                                             <a href="mailto:${record.email}">
                                                                 <i class="fa fa-fw fa-envelope" aria-hidden="true"></i>

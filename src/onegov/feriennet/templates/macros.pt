@@ -864,11 +864,11 @@
 
 <metal:actions_button define-macro="actions-button" i18n:domain="onegov.feriennet" i18n:domain="onegov.feriennet">
 
-    <button type="button" data-toggle="${action_id}" aria-expanded="false" class="tiny button actions-button">
+    <button type="button" data-toggle="${action_id}" aria-expanded="false" class="tiny button dropdown-button actions-button">
         <span class="show-for-sr" i18n:translate>Actions</span>
         <i class="fa fa-ellipsis-h" aria-hidden="true"></i>
     </button>
-    <ul id="${action_id}" data-dropdown data-auto-focus="true" class="dropdown-pane dropdown-options" data-position="bottom" data-alignment="right" data-auto-focus="true" aria-hidden="true">
+    <ul id="${action_id}" data-dropdown data-auto-focus="true" class="dropdown-pane dropdown-options" data-position="bottom" data-alignment="right" data-auto-focus="true" aria-hidden="true" data-close-on-click="true" >
         <li
             tal:repeat="link links"
             tal:content="link(layout)"

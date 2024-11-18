@@ -1426,6 +1426,7 @@ $booking-left-margin: 2rem;
             display: flex;
             align-items: center;
             color: $oil;
+            margin-bottom: .5rem;
 
             .details-button {
                 padding: .75rem;
@@ -3138,7 +3139,6 @@ li.unpaid {
 */
 .volunteer-actions {
     .state-transitions {
-        background: $snow;
         border-top: 1px solid $gray;
 
         &:nth-last-child(1),
