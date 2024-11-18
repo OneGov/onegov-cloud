@@ -761,9 +761,7 @@ def view_group_invite(
 
     return {
         'layout': layout,
-        'title': _('Group for "${title}"', mapping={
-            'title': occasion.activity.title
-        }),
+        'title': _('Group'),
         'occasion': occasion,
         'model': self,
         'group_action': group_action,

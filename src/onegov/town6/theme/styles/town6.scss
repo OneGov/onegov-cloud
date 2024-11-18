@@ -590,7 +590,7 @@ $pageref-color-hover: $iron;
 */
 
 .hidden {
-    display: none;
+    display: none !important;
 }
 
 .flash-message {
@@ -1269,3 +1269,24 @@ ul.recipients {
     display: flex;
 }
 
+
+/* Dropdown Menu */
+.dropdown-pane.dropdown-options {
+    list-style: none;
+    padding: 0;
+    width: auto;
+    
+    li a {
+        display: block;
+        padding: .5rem 1rem;
+        cursor: pointer;
+        border-radius: .7rem;
+        white-space: nowrap;
+        color: $body-font-color;
+        font-weight: normal;
+
+        &:hover {
+            background: $smoke;
+        }
+    }
+}

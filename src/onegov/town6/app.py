@@ -251,6 +251,7 @@ def get_common_asset() -> 'Iterator[str]':
     yield 'ResizeSensor.js'
     yield 'theia-sticky-sidebar.js'
     yield 'apply-filters.js'
+    yield 'foundation-intercooler.js'
 
 
 @TownApp.webasset('editor')

@@ -849,7 +849,7 @@
 
 <metal:users define-macro="users" i18n:domain="onegov.feriennet">
     <div class="filter-panel" tal:condition="request.is_admin and users">
-        <h2 class="filter-title" i18n:translate>User</h2>
+        <h3 class="filter-title" i18n:translate>User</h3>
         <select onchange="location = this.value;">
             <tal:b repeat="u users">
                 <option tal:condition="u.username == request.current_username or u.realname"
@@ -863,11 +863,12 @@
 </metal:users>
 
 <metal:actions_button define-macro="actions-button" i18n:domain="onegov.feriennet" i18n:domain="onegov.feriennet">
-    <a href="#" data-toggle="${action_id}" aria-expanded="false" class="tiny button actions-button">
+
+    <button type="button" data-toggle="${action_id}" aria-expanded="false" class="tiny button actions-button">
         <span class="show-for-sr" i18n:translate>Actions</span>
         <i class="fa fa-ellipsis-h" aria-hidden="true"></i>
-    </a>
-    <ul id="${action_id}" data-dropdown class="dropdown-pane" data-auto-focus="true" aria-hidden="true">
+    </button>
+    <ul id="${action_id}" data-dropdown data-auto-focus="true" class="dropdown-pane dropdown-options" data-position="bottom" data-alignment="right" data-auto-focus="true" aria-hidden="true">
         <li
             tal:repeat="link links"
             tal:content="link(layout)"

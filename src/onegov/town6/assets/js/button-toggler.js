@@ -2,6 +2,7 @@ $(document).ready(function () {
     // Handle click on the button to toggle the detail row
     $('a[id^="button-"]').on('click', function (e) {
         e.preventDefault();
+        console.log('toggler clicked')
 
         // Get the corresponding file number and detail row
         var id = $(this).attr('id').split('-').slice(1).join('-');

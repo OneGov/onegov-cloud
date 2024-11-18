@@ -23,17 +23,17 @@
         </div>
 
         <div class="grid-x grid-padding-x">
-            <div class="medium-8 cell content">
+            <div class="medium-8 cell content occasion-list">
 
                 <tal:b repeat="occasion occasions">
                     <tal:b define="oid occasion.occasion_id">
-                        <div class="matched-occasion matched-state-${occasion.state}"
+                        <div class="matched-occasion matched-state-${occasion.state} occasion"
                              data-reload-from="${request.url}"
                              data-reload-from-selector="#${oid}" id="${oid}">
 
-                            <a href="${activity_link(oid)}">
-                                <h3 class="h4">${occasion.title}</h3>
-                            </a>
+                            <h2 class="title">
+                                <a href="${activity_link(oid)}">${occasion.title}</a>
+                            </h2>
 
                             <span class="subtitle">${
                                     layout.format_datetime_range(occasion.start, occasion.end)
@@ -72,8 +72,10 @@
                                             </span>
                                         </span>
                                     </div>
+                                    <div class="details-button">
                                         <span i18n:translate class="show-for-sr">Show Details</span>
                                         <i class="fa fa-chevron-down rotate down-button ${state}" aria-hidden="true"></i>
+                                    </div>
                                     </a>
 
                                     <div id="details-${oid}" class="hidden" >
@@ -84,6 +86,7 @@
                                             ic-trigger-on="click once"
                                             ic-get-from="${occasion_table_link(oid)}"
                                             ic-indicator="#button-${oid}"
+                                            data-reinit-foundation
                                             >
                                         </div>
                                     </div>  

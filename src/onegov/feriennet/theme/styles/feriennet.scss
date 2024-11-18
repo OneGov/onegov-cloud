@@ -1301,7 +1301,7 @@ $booking-left-margin: 2rem;
     Matching view
 */
 .matched-occasion {
-    margin-bottom: 1rem;
+    margin-bottom: 3rem;
 
     h3 {
         color: $oil;
@@ -1423,45 +1423,20 @@ $booking-left-margin: 2rem;
         width: 100%;
         
         > a {
-
-            &.cancelled {
-                background: repeating-linear-gradient(
-                    45deg,
-                    $red-pastel,
-                    $red-pastel 15px,
-                    $gray-pastel 15px,
-                    $gray-pastel 30px
-                );
-        
-                .meter {
-                    background-color: $red-light;
-                }
-        
-                .meter-text::before {
-                    @include icon-bold('\f058');
-                    color: $red;
-                    margin-right: 1ex;
-                }
-        
-                .meter-text-inner {
-                    color: $red-dark;
-                }
-            }
-
             display: flex;
             align-items: center;
-            background-color: $white-smoke;
-            border-radius: .7rem;
-            margin-bottom: 1rem;
             color: $oil;
 
-            .down-button {
-                border-radius: 100%;
-                padding: .43rem 0.5rem;
-                color: $white;
+            .details-button {
+                padding: .75rem;
+                border-radius: .7rem;
 
-                &.alert,
-                &.cancelled {
+                .down-button {
+                    color: $white;
+                }
+
+                &:has(.alert),
+                &:has(.cancelled) {
                     background-color: $red-light;
     
                     &:hover,
@@ -1470,7 +1445,7 @@ $booking-left-margin: 2rem;
                     }
                 }
     
-                &.success {
+                &:has(.success) {
                     background-color: $green-light;
     
                     &:hover,
@@ -1493,15 +1468,43 @@ $booking-left-margin: 2rem;
 */
 .progress {
     border: 0;
-    cursor: pointer;
     display: inline-block;
     height: 2.5rem;
     padding: 0;
     position: relative;
     width: calc(100% - 2.5rem);
+    background-color: $white-smoke;
+    border-radius: .7rem;
+    margin-right: .2rem;
+
+    &.cancelled {
+        background: repeating-linear-gradient(
+            45deg,
+            $red-pastel,
+            $red-pastel 15px,
+            $gray-pastel 15px,
+            $gray-pastel 30px
+        );
+
+        .meter {
+            background-color: $red-light;
+        }
+
+        .meter-text::before {
+            @include icon-bold('\f058');
+            color: $red;
+            margin-right: 1ex;
+        }
+
+        .meter-text-inner {
+            color: $red-dark;
+        }
+    }
 
     .meter {
         width: 100%;
+        height: 100%;
+        border-radius: .7rem;
     }
 
     &.success .meter {
@@ -1550,8 +1553,7 @@ $booking-left-margin: 2rem;
     
     &:hover {
         margin: 0 !important;
-        background-color: $white-smoke;
-        border-color: $primary-color;
+        background-color: $monsoon !important;
         padding: 5px !important;
         color: $aluminum;
     }
@@ -1582,6 +1584,11 @@ $booking-left-margin: 2rem;
     .bill {
         > button:not(.ic-use-transition) {
             animation: oscillate-opacity 1s infinite;
+
+        .bill-header {
+            display: flex;
+            align-items: center;
+        }
         }
     }
 }
@@ -1593,16 +1600,14 @@ $booking-left-margin: 2rem;
     position: relative;
 
     h3 {
-        color: $red-dark;
         display: inline-block;
         font-size: 1rem;
         font-weight: bold;
         line-height: 1.5rem;
-        margin: .5rem .25rem .5rem .75rem;
+        flex-grow: 1;
     }
 
     > button {
-        float: right;
         height: 40px;
         margin: 0;
         padding: .25rem;
@@ -1795,7 +1800,6 @@ $booking-left-margin: 2rem;
     }
 
     > .outstanding {
-        float: right;
         line-height: 1.5rem;
         margin: .5rem calc(48px + .5rem) .5rem 0;
 
@@ -3134,7 +3138,7 @@ li.unpaid {
 */
 .volunteer-actions {
     .state-transitions {
-        background: $gray-light;
+        background: $snow;
         border-top: 1px solid $gray;
 
         &:nth-last-child(1),
@@ -3145,7 +3149,7 @@ li.unpaid {
 
     .show-details {
         a::before {
-            @include icon('\f05a');
+            @include icon-bold('\f05a');
             margin-right: 1.25ex;
         }
     }
@@ -3153,33 +3157,28 @@ li.unpaid {
 
 .volunteers-list {
 
-    h2 {
-        font-size: $h3-font-size;
-        margin-bottom: 1rem;
-    }
-
-    h3 {
-        color: $tuatara;
-        font-size: 1.1rem;
-        margin-bottom: .5rem;
-        margin-top: 1.5rem;
-    }
-
-    h2 + h3 {
-        margin-top: 0;
-    }
-
     .right-aligned {
         float: right;
         font-weight: normal;
     }
 
     table {
-        margin-top: -1rem;
+        border-radius: 0;
+        margin-top: -.5rem;
         width: 100%;
+        background: $snow;
 
         th:last-child {
-            width: 22.5%;
+            width: 10%;
+        }
+
+        tbody tr:nth-last-child(2) {
+            td:first-child {
+                border-bottom-left-radius: .7rem;
+            }
+            td:last-child {
+                border-bottom-right-radius: .7rem;
+            }
         }
     }
 
@@ -3187,38 +3186,28 @@ li.unpaid {
         margin-top: 1.5rem;
     }
 
-    .progress + h2 {
-        margin-top: .5rem;
-    }
-
     .progress {
         width: 100%;
+        margin-bottom: .5rem;
+
+        &:has(+ table) .meter{
+            border-radius: .7rem .7rem 0 0;
+        }
 
         & + .progress {
             margin-top: -1rem;
         }
     }
 
-    .success + table {
-        border-top: 1px solid $green-light;
-    }
-
-    .alert + table {
-        border-top: 1px solid $gray-dark;
-    }
-
     .state-cell {
         font-weight: bold;
     }
 
-    .volunteer-details {
-        * {
-            font-size: .875rem;
-        }
-    }
 
     .volunteer-confirmed {
-        background: lighten($green-pastel, 6%);
+        td {
+            background: lighten($green-pastel, 6%);
+        }
 
         .state-cell {
             color: $green-dark;
@@ -3249,9 +3238,36 @@ li.unpaid {
     @include element-invisible;
 }
 
-/*
-    Images
-*/
+/* Occasion List */
+.occasion-list {
+    .occasion {
+        margin-bottom: 2rem;
+    }
+
+    div > * {
+        max-width: 40rem;
+        display: block;
+    }
+
+    h2.title {
+        font-size: 1.2rem;
+        margin-bottom: 1rem;
+        border-top: 1px solid $smoke;
+        padding-top: .5rem;
+
+        &:first-child {
+            margin-top: 0;
+        }
+    }
+
+    .occasion-title {
+        margin-top: 1rem;
+    }
+}
+
+
+// Images
+
 .page-text img {
     border-radius: .7rem;
 }

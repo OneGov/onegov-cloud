@@ -3,8 +3,8 @@
         ${title}
     </tal:b>
     <tal:b metal:fill-slot="content">
-        <div class="row">
-            <div class="columns medium-7 small-12">
+        <div class="grid-x grid-padding-x">
+            <div class="cell medium-7 small-12">
 
                 <div class="panel callout" tal:condition="model.username != request.current_username">
                     <i class="fa fa-warning" aria-hidden="true"></i>
@@ -13,16 +13,14 @@
                     </tal:b>
                 </div>
 
-                <div class="occasion-panel">
-                    <h3>
-                        <a href="${request.link(model.occasion.activity)}">
-                            ${model.occasion.activity.title}
-                        </a>
-                    </h3>
+                <h3 class="h4">
+                    <a href="${request.link(model.occasion.activity)}">
+                        ${model.occasion.activity.title}
+                    </a>
+                </h3>
 
-                    <div class="occasions">
-                        <metal:b use-macro="layout.macros['occasion']" tal:define="show_enroll False"/>
-                    </div>
+                <div class="occasions">
+                    <metal:b use-macro="layout.macros['occasion']" tal:define="show_enroll False"/>
                 </div>
 
                 <p i18n:translate class="panel" tal:condition="model.occasion.period.active|False">
@@ -36,7 +34,7 @@
                 </div>
 
                 <div class="inline-top-bar">
-                    <h2 class="h3-size" i18n:translate>
+                    <h2 class="h3" i18n:translate>
                         Own Children
                     </h2>
 
@@ -89,7 +87,7 @@
                 </ul>
 
                 <div class="inline-top-bar">
-                    <h2 class="h3-size" i18n:translate>
+                    <h2 class="h3" i18n:translate>
                         Other Children
                     </h2>
                     <a href="${mailto}" class="button small secondary">
@@ -111,8 +109,10 @@
                     </ul>
                 </p>
             </div>
-            <div class="columns medium-4 small-12 end">
-                <tal:b metal:use-macro="layout.macros.users" />
+            <div class="cell medium-3 medium-offset-1 small-12 sidebar">
+                <div class="sidebar-wrapper">
+                    <tal:b metal:use-macro="layout.macros.users" />
+                </div>
             </div>
         </div>
     </tal:b>
