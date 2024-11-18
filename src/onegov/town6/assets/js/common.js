@@ -31,7 +31,7 @@ var processCommonNodes = function(elements, out_of_band) {
     targets.find('.page-text a[href*="/datei/"]').attr('target', '_blank');
 
     // generic toggle button
-    // targets.find('[data-toggle]').not('header *').toggleButton();
+    targets.find('[data-ogc-toggle]').toggleButton();
 
     // send an event to allow optional scripts to hook themselves up
     // (we only do out of band updates since it's not guaranteed that these
@@ -316,7 +316,6 @@ $('.reveal[data-reveal-width]').on('open.zf.reveal', function() {
 // Height of header images
 var w = window.matchMedia("(max-width: 700px)");
 var header_height = $('#header').height();
-console.log(header_height)
 
 if ($('.header-image .page-image').length) {
     var page_image = $('.header-image .page-image');

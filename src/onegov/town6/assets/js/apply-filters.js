@@ -1,8 +1,12 @@
 // Desktop: Apply filters when dropdown is closed
-$('#filters-top .dropdown-pane').on('hide.zf.dropdown', function() {
-    console.log('hide')
-    Intercooler.triggerRequest($(this).find('.apply-filters'))
-})
+$('body').on('hide.zf.dropdown', function(event) {
+    const target = event.target;
+    const filtersTop = document.getElementById('filters-top');
+
+    if (filtersTop.contains(target) && target.matches('.dropdown-pane')) {
+        Intercooler.triggerRequest($(target).find('.apply-filters'))
+    }
+});
 
 // Mobile: Apply filters when dropdown is closed
 $('#offCanvasFilters').on('close.zf.offCanvas', function() {

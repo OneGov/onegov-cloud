@@ -60,7 +60,7 @@
                                 cancelled occasion.state == 'cancelled';
                             ">
                                 <tal:b define="state cancelled and 'cancelled' or accepted >= min_spots and 'success' or 'alert'">
-                                    <a id="button-${oid}" data-toggle="details-${oid}" class="title-toggler untoggled ic-use-transition ${state}" >
+                                    <a id="button-${oid}" data-ogc-toggle="#details-${oid}" class="title-toggler untoggled ic-use-transition ${state}" >
                                     <div class="progress ${state}">
                                         <span class="meter" style="width: ${accepted / max_spots * 100}%;"></span>
                                         <span class="meter-text" tal:condition="state != 'cancelled'">

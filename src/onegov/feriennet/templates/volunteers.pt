@@ -111,7 +111,7 @@
                                                             </a>
                                                         </li>
                                                         <li class="show-details">
-                                                            <a data-toggle="details-${record.volunteer_id.hex}" id="button-${record.volunteer_id.hex}" data-prevent-default="false" data-alt-text="Hide Details" i18n:attributes="data-alt-text" i18n:translate>
+                                                            <a data-ogc-toggle="#details-${record.volunteer_id.hex}" data-toggle="dropdown-${record.volunteer_id.hex}" id="button-${record.volunteer_id.hex}" data-prevent-default="false" data-alt-text="Hide Details" i18n:attributes="data-alt-text" i18n:translate>
                                                                 Show Details
                                                             </a>
                                                         </li>
