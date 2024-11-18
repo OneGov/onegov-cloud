@@ -121,7 +121,7 @@ class AttendeeForm(AttendeeBase):
     )
 
     notes = TextAreaField(
-        label=_('Health Information'),
+        label=_('Is there anything the course instructor should know?'),
         description=_('Allergies, Disabilities, Particulars'),
     )
 
