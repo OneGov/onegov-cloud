@@ -2353,10 +2353,21 @@
         <a class="button secondary confirm delete" role="button"
             ic-delete-from="${request.link(file)}?csrf-token=${layout.csrf_token}"
             ic-on-success="
-                var info = $(elt).closest('tr');
-                info.prev().remove();
-                info.next().remove();
-                info.remove();
+                var cfd = $(elt).closest('tr');  // current file details row
+                var cfi = cfd.prev();  // current file info row
+                var rbfi = cfi.prev();  // row before current file info
+                var rafd = cfd.next();  // row after current file details
+
+                cfi.remove();  // remove current file info row
+                cfd.remove();  // remove current file details row
+
+                // if file is last in group, remove the group tr as well
+                if (!rbfi.is('[id^=\'details-\']') &&
+                    !rbfi.hasClass('file-info') &&
+                    !rafd.is('[id^=\'details-\']') &&
+                    !rafd.hasClass('file-info')) {
+                    rbfi.remove();  // remove line before file-info row
+                }
             "
             data-confirm="Do you really want to delete this file?"
             data-confirm-extra="${file.name}"
