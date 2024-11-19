@@ -918,6 +918,65 @@
 </metal:accept_tos>
 
 
+<metal:filters define-macro="filters" i18n:domain="onegov.feriennet">
+
+    <div class="show-for-medium" id="filters-top" ic-push-url="true">
+        <tal:b tal:repeat="filter filters.keys()">
+            <button class="button hollow dropdown-button ${'active' if count_active(filters[filter]) else ''}" type="button" data-toggle="filter-${filter}" tal:condition="filters[filter]">
+                <i class="fa fa-chevron-down"></i>${filters[filter][0]} (${count_active(filters[filter])})
+            </button>
+            <div class="dropdown-pane" data-close-on-click="true" id="filter-${filter}" ic-select-from-response="#filter-${filter}" ic-target="#filter-${filter}" data-dropdown tal:condition="filters[filter][1]">
+                <div class="filter-panel">
+                    <div metal:use-macro="layout.macros['tags']" tal:define="tags filters[filter][1]" />
+                    <div class="grid-x grid-padding-x align-center">
+                        <button  ic-select-from-response="#content" ic-target="#content" ic-get-from="${request.url.replace('/filters','',1)}" class="button apply-filters" type="button" data-toggle="filter-${filter}" i18n:translate>Apply filters</button>
+                    </div>
+                </div>
+            </div>
+        </tal:b>
+    </div>
+
+    <button id="mobile-filters-button" class="button hollow show-for-small-only" type="button" data-toggle="offCanvasFilters">
+        <i class="fas fa-sliders-h"></i><tal:b i18n:translate>Filters</tal:b>
+    </button>
+
+    <div data-transition="overlap" data-off-canvas data-auto-focus="false" class="off-canvas position-right filters-mobile" id="offCanvasFilters" ic-push-url="true">
+        <!-- Close button -->
+        <div class="button-area">
+            <button class="off-canvas-close-button" aria-label="Close menu" type="button" data-close>
+                <i class="fa fa-times"></i>
+            </button>
+        </div>
+        <div class="grid-x grid-padding-x align-center">
+            <h3><i class="fas fa-sliders-h"></i> <tal:b i18n:translate>Filters</tal:b></h3>
+        </div>
+        
+        <div class="navigation-area">
+            <div class="menu-wrapper">
+                <ul class="accordion" data-accordion data-allow-all-closed="true" data-slide-speed="0">
+                    <tal:b tal:repeat="filter mobile_filters.keys()">
+                        <li class="accordion-item ${'is-active' if f'mobile-filter-{filter}' == active_filter else ''}" data-accordion-item>
+                            <a href="#" class="accordion-title">
+                                ${mobile_filters[filter][0]} (${count_active(filters[filter])})
+                            </a>
+                            <ul class="filter-panel accordion-content" data-tab-content id="mobile-filter-${filter}" ic-select-from-response="#offCanvasFilters" ic-target="#offCanvasFilters" data-tab-content >
+                                <div metal:use-macro="layout.macros['tags']" tal:define="tags mobile_filters[filter][1]"/>
+                            </ul>
+                        </li>
+                    </tal:b>
+                </ul>
+            </div>
+        </div>
+        
+        <div class="grid-x grid-padding-x align-center">
+            <button ic-select-from-response="#activities" ic-target="#activities" ic-get-from="${request.url.replace('/filters','',1)}" class="button apply-filters" type="button" i18n:translate data-close>Apply filters</button>
+        </div>
+    </div>
+
+</metal:filters>
+
+
+
 <metal:user_panel define-macro="user_panel" i18n:domain="onegov.feriennet">
     <div class="borderless-side-panel without-title highlighted filter-panel">
         <h2 class="filter-title" i18n:translate>Contact</h2>

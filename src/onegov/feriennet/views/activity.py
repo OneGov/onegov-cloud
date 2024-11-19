@@ -123,7 +123,8 @@ def filter_link(
     url: str,
     rounded: bool = False
 ) -> Link:
-    return Link(text=text, active=active, url=url, rounded=rounded, attrs={
+    return Link(text=text, active=active, url=url,
+                rounded=rounded, attrs={
         'ic-get-from': url
     })
 
@@ -137,17 +138,17 @@ def filter_timelines(
         filter_link(
             text=request.translate(_('Elapsed')),
             active='past' in activity.filter.timelines,
-            url=request.link(activity.for_filter(timeline='past'))
+            url=request.link(activity.for_filter(timeline='past'), 'filters')
         ),
         filter_link(
             text=request.translate(_('Now')),
             active='now' in activity.filter.timelines,
-            url=request.link(activity.for_filter(timeline='now'))
+            url=request.link(activity.for_filter(timeline='now'), 'filters')
         ),
         filter_link(
             text=request.translate(_('Scheduled')),
             active='future' in activity.filter.timelines,
-            url=request.link(activity.for_filter(timeline='future'))
+            url=request.link(activity.for_filter(timeline='future'), 'filters')
         ),
     ]
 
@@ -155,7 +156,8 @@ def filter_timelines(
         links.insert(0, filter_link(
             text=request.translate(_('Without')),
             active='undated' in activity.filter.timelines,
-            url=request.link(activity.for_filter(timeline='undated'))
+            url=request.link(activity.for_filter(timeline='undated'),
+                             'filters')
         ))
 
     return links
@@ -170,7 +172,7 @@ def filter_tags(
         filter_link(
             text=request.translate(_(tag)),
             active=tag in activity.filter.tags,
-            url=request.link(activity.for_filter(tag=tag)),
+            url=request.link(activity.for_filter(tag=tag), 'filters'),
         ) for tag in activity.used_tags
     ]
     links.sort(key=lambda l: l.text)  # type:ignore
@@ -187,7 +189,7 @@ def filter_durations(
         filter_link(
             text=request.translate(text),
             active=duration in activity.filter.durations,
-            url=request.link(activity.for_filter(duration=duration))
+            url=request.link(activity.for_filter(duration=duration), 'filters')
         ) for text, duration in (
             (_('Half day'), DAYS.half),
             (_('Full day'), DAYS.full),
@@ -218,7 +220,8 @@ def filter_ages(
         filter_link(
             text=request.translate(text),
             active=activity.filter.contains_age_range(age_range),
-            url=request.link(activity.for_filter(age_range=age_range))
+            url=request.link(activity.for_filter(age_range=age_range),
+                             'filters')
         ) for text, age_range in age_filters()
     )
 
@@ -232,7 +235,8 @@ def filter_price_range(
         filter_link(
             text=request.translate(text),
             active=activity.filter.contains_price_range(price_range),
-            url=request.link(activity.for_filter(price_range=price_range))
+            url=request.link(activity.for_filter(price_range=price_range),
+                             'filters')
         ) for text, price_range in (
             (_('Free of Charge'), (0, 0)),
             (_('Up to 25 CHF'), (1, 25)),
@@ -259,7 +263,8 @@ def filter_weeks(
                 layout.format_date(daterange[1], 'date')
             ),
             active=daterange in activity.filter.dateranges,
-            url=request.link(activity.for_filter(daterange=daterange))
+            url=request.link(activity.for_filter(daterange=daterange),
+                             'filters')
         ) for nth, daterange in enumerate(
             activity.available_weeks(request.app.active_period),
             start=1
@@ -276,7 +281,7 @@ def filter_weekdays(
         filter_link(
             text=WEEKDAYS[weekday],
             active=weekday in activity.filter.weekdays,
-            url=request.link(activity.for_filter(weekday=weekday))
+            url=request.link(activity.for_filter(weekday=weekday), 'filters')
         ) for weekday in range(7)
     )
 
@@ -300,7 +305,8 @@ def filter_available(
         filter_link(
             text=request.translate(text),
             active=available in activity.filter.available,
-            url=request.link(activity.for_filter(available=available))
+            url=request.link(activity.for_filter(available=available),
+                             'filters')
         ) for text, available in availabilities
     )
 
@@ -314,7 +320,8 @@ def filter_municipalities(
         filter_link(
             text=municipality,
             active=municipality in activity.filter.municipalities,
-            url=request.link(activity.for_filter(municipality=municipality))
+            url=request.link(activity.for_filter(municipality=municipality),
+                             'filters')
         ) for municipality in activity.used_municipalities
     ]
 
@@ -332,7 +339,8 @@ def filter_periods(
         filter_link(
             text=period.title,
             active=period.id in activity.filter.period_ids,
-            url=request.link(activity.for_filter(period_id=period.id))
+            url=request.link(activity.for_filter(period_id=period.id),
+                             'filters')
         ) for period in request.app.periods if period
     ]
     links.sort(key=lambda l: l.text)  # type:ignore
@@ -351,7 +359,7 @@ def filter_own(
             text=request.translate(_('Own')),
             active=request.current_username in activity.filter.owners,
             url=request.link(
-                activity.for_filter(owner=request.current_username)
+                activity.for_filter(owner=request.current_username), 'filters'
             )
         ),
     )
@@ -366,7 +374,7 @@ def filter_states(
         filter_link(
             text=ACTIVITY_STATE_TRANSLATIONS[state],
             active=state in activity.filter.states,
-            url=request.link(activity.for_filter(state=state))
+            url=request.link(activity.for_filter(state=state), 'filters')
         ) for state in ACTIVITY_STATES
     )
 
@@ -553,6 +561,63 @@ def view_activities(
         'current_location': request.link(
             self.by_page_range((0, self.pages[-1])))
     }
+
+
+@FeriennetApp.html(
+    model=VacationActivityCollection,
+    template='activity-filters.pt',
+    permission=Public,
+    name='filters')
+def view_activity_filters(
+    self: VacationActivityCollection,
+    request: 'FeriennetRequest'
+) -> 'RenderData':
+
+    active_period = request.app.active_period
+    show_activities = bool(active_period or request.is_organiser)
+    layout = VacationActivityCollectionLayout(self, request)
+
+    filters: dict[str, tuple[str, Sequence[Link]]] = {}
+
+    if show_activities:
+        filters['timelines'] = (_('Occasion'), filter_timelines(self, request))
+        filters['tags'] = (_('Tags'), filter_tags(self, request))
+        filters['durations'] = (_('Duration'), filter_durations(self, request))
+        filters['ages'] = (_('Age'), filter_ages(self, request))
+        filters['price_range'] = (_('Price'), filter_price_range(self, request))
+
+        if active_period:
+            filters['weeks'] = (_('Weeks'), filter_weeks(self, request))
+
+        filters['weekdays'] = (_('Weekdays'), filter_weekdays(self, request))
+        filters['available'] = (_('Free Spots'), filter_available(self, request))
+        filters['municipalities'] = (_('Municipalities'), filter_municipalities(self, request))
+
+        if request.is_organiser:
+            if request.app.periods:
+                filters['periods'] = (_('Periods'), filter_periods(self, request))
+
+            filters['own'] = (_('Advanced'), filter_own(self, request))
+            filters['states'] = (_('State'), filter_states(self, request))
+
+    filters = {k: v for k, v in filters.items() if v}
+    mobile_filters = {k: v for k, v in copy.deepcopy(filters).items() if v}
+
+    active_filter = request.params.get('active-filter', None)
+
+    return {
+        'layout': layout,
+        'count_active': count_active,
+        'filters': filters,
+        'mobile_filters': mobile_filters,
+        'active_filter': active_filter,
+        'filtered': is_filtered(filters),
+        'period': active_period,
+        'activity_ages': activity_ages,
+        'activity_min_cost': activity_min_cost,
+        'activity_spots': activity_spots,
+    }
+
 
 
 @FeriennetApp.json(
