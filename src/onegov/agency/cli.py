@@ -258,7 +258,7 @@ def import_lu_data_files(
             click.secho('Exiting...')
             return
 
-        people, agencies = import_lu_data(data_file, request, app)
+        agencies, people = import_lu_data(data_file, request, app)
         click.secho(f'Imported {len(people)} persons and '
                     f'{len(agencies)} agencies', fg='green')
 

@@ -307,7 +307,7 @@ def import_bs_data(
     return agencies, persons
 
 
-def get_plz_city(plz: str|None, ort: str|None) -> str | None:
+def get_plz_city(plz: str | None, ort: str | None) -> str | None:
     if plz and ort:
         return f'{plz} {ort}'
 
@@ -409,7 +409,8 @@ def import_lu_agencies(
     csvfile: CSVFile['DefaultRow'],
     session: 'Session',
     app: 'AgencyApp'
-) -> list['ExtendedPerson']:
+) -> dict[str, 'ExtendedAgency']:
+
     added_agencies = {}
     agencies = ExtendedAgencyCollection(session)
 
@@ -423,34 +424,36 @@ def import_lu_agencies(
         if check_skip(line):
             continue
 
-        department_name = v_(line.department)
+        dienststelle, abteilung, unterabteilung, unterabteilung_2 = (
+            None, None, None, None)
+        department_name = v_(line.department) or ''
         department = agencies.add_or_get(None, department_name)
         added_agencies[department_name] = department
         export_fields = ['person.title', 'person.phone']
 
         dienststellen_name = v_(line.dienststelle)
         if dienststellen_name:
-            dienstelle = agencies.add_or_get(
+            dienststelle = agencies.add_or_get(
                 department, dienststellen_name, export_fields=export_fields)
-            added_agencies[dienststellen_name] = dienstelle
+            added_agencies[dienststellen_name] = dienststelle
 
         abteilungs_name = v_(line.abteilung)
         if abteilungs_name:
             abteilung = agencies.add_or_get(
-                dienstelle, abteilungs_name, export_fields=export_fields)
+                dienststelle, abteilungs_name, export_fields=export_fields)
             added_agencies[abteilungs_name] = abteilung
 
         unterabteilungs_name = v_(line.unterabteilung)
         if unterabteilungs_name:
-            unter_abteilung = (
+            unterabteilung = (
                 agencies.add_or_get(abteilung, unterabteilungs_name,
                                     export_fields=export_fields))
-            added_agencies[unterabteilungs_name] = unter_abteilung
+            added_agencies[unterabteilungs_name] = unterabteilung
 
         unterabteilung_2_name = v_(line.unterabteilung_2)
         if unterabteilung_2_name:
             unterabteilung_2 = (
-                agencies.add_or_get(unter_abteilung, unterabteilung_2_name,
+                agencies.add_or_get(unterabteilung, unterabteilung_2_name,
                                     export_fields=export_fields))
             added_agencies[unterabteilung_2_name] = unterabteilung_2
 
@@ -461,13 +464,13 @@ def import_lu_data(
     data_file: 'StrOrBytesPath',
     request: 'AgencyRequest',
     app: 'AgencyApp'
-) -> list['ExtendedPerson']:
+) -> tuple[dict[str, 'ExtendedAgency'], list['ExtendedPerson']]:
 
     session = request.session
     agencies = import_lu_agencies(data_file, session, app)
     people = import_lu_people(data_file, agencies, session, app)
 
-    return people, agencies
+    return agencies, people
 
 
 @with_open
