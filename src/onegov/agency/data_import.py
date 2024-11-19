@@ -389,7 +389,8 @@ def import_lu_people(
         if agency_id:
             agency = agencies.get(agency_id)
             if agency:
-                agency.add_person(person_.id, title='Mitglied')
+                agency.add_person(person_.id,
+                                  title=person_.function or 'Mitglied')
             else:
                 print(f'Error agency id {agency_id} not found')
 
