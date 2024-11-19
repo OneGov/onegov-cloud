@@ -2,7 +2,9 @@ import click
 import transaction
 
 from onegov.agency.collections import ExtendedAgencyCollection
-from onegov.agency.data_import import import_bs_data, import_membership_titles
+from onegov.agency.data_import import (import_bs_data,
+                                       import_membership_titles,
+                                       import_lu_data)
 from onegov.agency.excel_export import export_person_xlsx
 from onegov.agency.models import ExtendedAgencyMembership, ExtendedPerson
 from onegov.core.cli import command_group
@@ -162,11 +164,11 @@ def import_bs_data_files(
     clean: bool
 ) -> 'Callable[[AgencyRequest, AgencyApp], None]':
     """
+
     Usage:
 
         onegov-agency  --select /onegov_agency/bs import-bs-data \
-        $agency_file \
-        $people_file \
+        $agency_file $people_file
     """
 
     buffer = 100
@@ -205,6 +207,61 @@ def import_bs_data_files(
         click.secho(f'Imported {len(agencies.keys())} agencies '
                     f'and {len(people)} persons',
                     fg='green')
+        if dry_run:
+            transaction.abort()
+            click.secho('Aborting transaction', fg='yellow')
+
+    return execute
+
+
+@cli.command('import-lu-data', context_settings={'singular': True})
+@click.argument('data-file', type=click.Path(exists=True))
+@click.option('--dry-run', is_flag=True, default=False)
+@click.option('--clean', is_flag=True, default=False)
+def import_lu_data_files(
+    data_file: str,
+    dry_run: bool,
+    clean: bool
+) -> 'Callable[[AgencyRequest, AgencyApp], None]':
+    """
+
+    Usage:
+
+        onegov-agency --select /onegov_agency/lu import-lu-data $people_file
+    """
+
+    buffer = 100
+
+    def execute(request: 'AgencyRequest', app: 'AgencyApp') -> None:
+
+        if clean:
+            session = request.session
+
+            for ix, person in enumerate(session.query(Person)):
+                session.delete(person)
+                if ix % buffer == 0:
+                    app.es_indexer.process()
+                    app.psql_indexer.bulk_process(session)
+
+            session.flush()
+            click.secho('All Persons removed', fg='green')
+
+            for ix, agency in enumerate(session.query(Agency)):
+                session.delete(agency)
+                if ix % buffer == 0:
+                    app.es_indexer.process()
+                    app.psql_indexer.bulk_process(session)
+
+            session.flush()
+            click.secho('All Agencies removed', fg='green')
+
+            click.secho('Exiting...')
+            return
+
+        people, agencies = import_lu_data(data_file, request, app)
+        click.secho(f'Imported {len(people)} persons and '
+                    f'{len(agencies)} agencies', fg='green')
+
         if dry_run:
             transaction.abort()
             click.secho('Aborting transaction', fg='yellow')
