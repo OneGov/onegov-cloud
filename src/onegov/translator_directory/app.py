@@ -64,7 +64,9 @@ class TranslatorDirectoryApp(TownApp):
             return None
         return URL(request.class_link(Organisation)).path()
 
-    # FIXME: Should this perhaps use orm_cached?
+    # We deliberately do not use @orm_cached here, because if the user
+    # uploads a new file, it's not immediately visible in the list of
+    # available templates.
     @property
     def mail_templates(self) -> list[str]:
         """ Templates are special docx files which are filled with
