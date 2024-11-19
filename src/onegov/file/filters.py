@@ -9,6 +9,9 @@ from pathlib import Path
 from PIL import Image
 from tempfile import TemporaryDirectory
 
+import logging
+log = logging.getLogger('onegov.file')
+
 
 from typing import IO, TYPE_CHECKING
 if TYPE_CHECKING:
@@ -139,51 +142,40 @@ class WithPDFThumbnailFilter(WithThumbnailFilter):
     def generate_preview(self, fp: 'SupportsRead[bytes]') -> BytesIO:
         with TemporaryDirectory() as directory:
             path = Path(directory)
-
             pdf_input = path / 'input.pdf'
             png_output = path / 'preview.png'
 
             with pdf_input.open('wb') as pdf:
                 pdf.write(fp.read())
 
-            process = subprocess.run((  # nosec:B603
+            cmd = (
                 'gs',
-
-                # disable read/writes outside of the given files
                 '-dSAFER',
                 '-dPARANOIDSAFER',
-
-                # do not block for any reason
                 '-dBATCH',
                 '-dNOPAUSE',
                 '-dNOPROMPT',
-
-                # limit output messages
-                '-dQUIET',
-                '-sstdout=/dev/null',
-
-                # format the page for thumbnails
                 '-dPDFFitPage',
-
-                # render in high resolution before downscaling to 72 dpi
                 f'-r{self.downscale_factor * 72}',
                 f'-dDownScaleFactor={self.downscale_factor}',
-
-                # only use the first page
                 '-dLastPage=1',
-
-                # output to png
                 '-sDEVICE=png16m',
                 '-sOutputFile={}'.format(shlex.quote(str(png_output))),
-
-                # from pdf
                 str(pdf_input)
-            ))
+            )
 
-            process.check_returncode()
+            process = subprocess.run(cmd, capture_output=True, text=True)
+            if process.returncode != 0:
+                error_msg = f"[DEBUG] GS Thumbnail Generation Failed:\nstderr: {process.stderr}\nstdout: {process.stdout}\nCommand: {' '.join(cmd)}"
+                log.error(error_msg)
+                raise RuntimeError(error_msg)
 
-            with png_output.open('rb') as png:
-                return BytesIO(png.read())
+            if not png_output.exists():
+                error_msg = f"[DEBUG] GS Output Missing:\nstderr: {process.stderr}\nstdout: {process.stdout}\nCommand: {' '.join(cmd)}"
+                log.error(error_msg)
+                raise FileNotFoundError(error_msg)
+
+            return BytesIO(png_output.read_bytes())
 
     def generate_thumbnail(
         self,
