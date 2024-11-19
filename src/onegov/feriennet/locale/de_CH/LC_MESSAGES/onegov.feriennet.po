@@ -3205,8 +3205,8 @@ msgstr "Buchungen ${period}"
 msgid "Billing for ${period}"
 msgstr "Fakturierung ${period}"
 
-#~ msgid "To my list"
-#~ msgstr "Zu meiner Liste"
+msgid "To my list"
+msgstr "Zu meiner Liste"
 
 #~ msgid "States"
 #~ msgstr "Status"

@@ -3200,8 +3200,8 @@ msgstr "Prenotazioni ${period}"
 msgid "Billing for ${period}"
 msgstr "Fatturazione ${period}"
 
-#~ msgid "To my list"
-#~ msgstr "La mia lista"
+msgid "To my list"
+msgstr "La mia lista"
 
 #~ msgid "States"
 #~ msgstr "Stato"

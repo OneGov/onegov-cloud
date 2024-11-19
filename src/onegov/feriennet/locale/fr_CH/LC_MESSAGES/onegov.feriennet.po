@@ -3217,8 +3217,8 @@ msgstr "Réservations pour ${period}"
 msgid "Billing for ${period}"
 msgstr "Facturation pour ${period}"
 
-#~ msgid "To my list"
-#~ msgstr "Vers ma liste"
+msgid "To my list"
+msgstr "Vers ma liste"
 
 #~ msgid "States"
 #~ msgstr "États"
