@@ -4,19 +4,16 @@
     </tal:b>
     <tal:b metal:fill-slot="content">
         <div class="grid-x grid-padding-x content">
-            <div class="cell small-12">
-                Filters
+            <div class="cell small-12 medium-9">
+                <tal:b metal:use-macro="layout.macros['filters']" />
             </div>
-
-            <div class="small-12 cell" ic-target="#content" ic-push-url="true" ic-select-from-response="#content" ic-scroll-to-target="true">
-                <div class="volunteer-cart-panel">
-                    <h2 class="filter-title" i18n:translate>My list</h2>
-
+            <div class="cell small-12 medium-3">
+                <button class="button" type="button" data-toggle="my-list">
+                    <i class="fa fa-chevron-down"></i><tal:b i18n:translate>My list</tal:b> (0)
+                </button>
+                <div class="dropdown-pane" id="my-list" data-dropdown data-auto-focus="true">
                     <tal:b metal:use-macro="layout.macros['volunteer-cart']" />
                 </div>
-
-                
-
             </div>
 
             <div class="small-12 cell content">
@@ -34,47 +31,43 @@
                     <tal:b tal:repeat="activity activities" tal:condition="activities">
                         <div class="subpage-cards small-12 medium-6 large-4 cell">
                             <div class="activity-list-item card">
-                                
-                                    <div class="grid-x align-middle">
-                                        <div tal:condition="activity.thumbnail|nothing" style="width: 100%; padding-bottom: 60%; background-image: url('${activity.thumbnail}'); background-size: cover;"></div>
-                                        <div class="cell small-12 card-section">
-                                            <a href="${request.link(activity)}">
-                                            <h5>${activity.title}</h5>
-                                            <span class="page-lead" tal:content="layout.paragraphify(layout.linkify(activity.lead))"/></a>
+                                <div class="grid-x align-middle">
+                                    <div tal:condition="activity.thumbnail|nothing" style="width: 100%; padding-bottom: 60%; background-image: url('${activity.thumbnail}'); background-size: cover;"></div>
+                                    <div class="cell small-12 card-section">
+                                        <a href="${request.link(activity)}">
+                                        <h5>${activity.title}</h5>
+                                        <span class="page-lead" tal:content="layout.paragraphify(layout.linkify(activity.lead))"/></a>
 
-                                            <div class="columns small-10">
-                                                <tal:b repeat="occasion activity.occasions">
-                                                    <div class="call-for-volunteers" tal:define="dates exclude_filtered_dates(layout.model, occasion.dates)" tal:condition="occasion.seeking_volunteers and dates">
-                
-                                                        <h3 i18n:translate>Occasion</h3>
-                                                        <ul class="dense">
-                                                            <li tal:repeat="date dates">
-                                                                ${layout.format_datetime_range(date.localized_start, date.localized_end)}
+                                        <div class="columns small-10">
+                                            <tal:b repeat="occasion activity.occasions">
+                                                <div class="call-for-volunteers" tal:define="dates exclude_filtered_dates(layout.model, occasion.dates)" tal:condition="occasion.seeking_volunteers and dates">
+            
+                                                    <h3 i18n:translate>Occasion</h3>
+                                                    <ul class="dense">
+                                                        <li tal:repeat="date dates">
+                                                            ${layout.format_datetime_range(date.localized_start, date.localized_end)}
+                                                        </li>
+                                                    </ul>
+            
+                                                    <h3 i18n:translate tal:condition="occasion.needs">Needs</h3>
+                                                    <ul class="dense needs">
+                                                        <tal:b repeat="need occasion.needs">
+                                                            <li tal:condition="need.accept_signups">
+                                                                <span>${need.name}</span>
+                                                                <a class="button narrow" onclick="volunteerCart.append('${need.id.hex}', '#error-for-${occasion.id.hex}')">
+                                                                    <i class="fa fa-plus" aria-hidden="true"></i>
+                                                                    <span><tal:b i18n:translate>To my list</tal:b></span>
+                                                                </a>
                                                             </li>
-                                                        </ul>
-                
-                                                        <h3 i18n:translate tal:condition="occasion.needs">Needs</h3>
-                                                        <ul class="dense needs">
-                                                            <tal:b repeat="need occasion.needs">
-                                                                <li tal:condition="need.accept_signups">
-                                                                    <span>${need.name}</span>
-                                                                    <a class="button narrow" onclick="volunteerCart.append('${need.id.hex}', '#error-for-${occasion.id.hex}')">
-                                                                        <i class="fa fa-plus" aria-hidden="true"></i>
-                                                                        <span><tal:b i18n:translate>To my list</tal:b></span>
-                                                                    </a>
-                                                                </li>
-                                                            </tal:b>
-                                                        </ul>
-                
-                                                        <div id="error-for-${occasion.id.hex}" class="alert" style="display: none;"></div>
-                                                    </div>
-                                                </tal:b>
-                                            </div>
-
-
+                                                        </tal:b>
+                                                    </ul>
+            
+                                                    <div id="error-for-${occasion.id.hex}" class="alert" style="display: none;"></div>
+                                                </div>
+                                            </tal:b>
                                         </div>
                                     </div>
-                                
+                                </div>
                             </div>
                         </div>
                     </tal:b>
@@ -103,7 +96,7 @@
                     
                     <div class="cell small-12" tal:condition="not:activities">
                         <p i18n:translate>No activities found.</p>
-                        <b><a tal:condition="filtered" href="${request.class_link(layout.model.__class__)}" i18n:translate>Reset filter.</a></b>
+                        <b><a class="button hollow" tal:condition="filtered" href="${request.class_link(layout.model.__class__)}/volunteers" i18n:translate>Reset filter.</a></b>
                     </div>
                 </div>
                 <div id="click-to-load-target"></div>

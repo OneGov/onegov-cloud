@@ -108,3 +108,5 @@ jQuery.fn.volunteerCart = function() {
 $(document).ready(function() {
     $('.volunteer-cart-widget').volunteerCart();
 });
+
+
