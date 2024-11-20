@@ -1,7 +1,7 @@
 import os
 import shlex
 import subprocess
-import logging
+
 from depot.fields.interfaces import FileFilter
 from depot.io.utils import file_from_content
 from io import BytesIO
@@ -17,9 +17,6 @@ from typing import IO, TYPE_CHECKING
 if TYPE_CHECKING:
     from _typeshed import SupportsRead
     from depot.fields.upload import UploadedFile
-
-
-log = logging.getLogger('onegov.file')
 
 
 class ConditionalFilter(FileFilter):
@@ -130,82 +127,43 @@ class WithThumbnailFilter(FileFilter):
 
 
 class WithPDFThumbnailFilter(WithThumbnailFilter):
-    """
-    Uploads a preview thumbnail as PNG together with the file.
+    """ Uploads a preview thumbnail as PNG together with the file.
 
     This is basically the PDF implementation for `WithThumbnailFilter`.
 
     .. warning::
 
         Requires the presence of ghostscript (gs binary) on the PATH.
-        Requires qpdf for repairing corrupted PDFs.
+
     """
 
     downscale_factor = 4
 
-    def repair_pdf(self, pdf_input: Path, repaired_pdf: Path) -> None:
-        breakpoint()
-        """
-        Attempts to repairs a PDF. Requires qpdf.
-        """
-        cmd = (f'qpdf --linearize {shlex.quote(str(pdf_input))} '
-               f'{shlex.quote(str(repaired_pdf))}')
-        process = subprocess.run(
-            cmd,
-            capture_output=True,
-            text=True,
-        )  # nosec B603
-        if process.returncode != 0:
-            print(f'Failed to repair {pdf_input}:\n{process.stderr}')
-            log.error(
-                f'PDF repair failed for {pdf_input}:\n{process.stderr}'
-            )
-
     def generate_preview(self, fp: 'SupportsRead[bytes]') -> BytesIO:
-        """
-        Generates a PNG preview for the first page of the given PDF. Attempts
-        to repair the PDF if needed.
-        """
         with TemporaryDirectory() as directory:
             path = Path(directory)
+
             pdf_input = path / 'input.pdf'
-            repaired_pdf = path / 'repaired.pdf'
             png_output = path / 'preview.png'
 
             with pdf_input.open('wb') as pdf:
                 pdf.write(fp.read())
 
-            try:
-                # Run Ghostscript to generate preview
-                self._run_ghostscript(pdf_input, png_output)
-                if not png_output.exists():
-                    breakpoint()
-                    print('Ghostscript failed')
-                    log.error(f'Output file was not created: {png_output}')
-                    raise RuntimeError('Output file not created')
-            except subprocess.CalledProcessError:
-                breakpoint()
-                # Attempt to repair and re-run Ghostscript
-                self.repair_pdf(pdf_input, repaired_pdf)
-                self._run_ghostscript(repaired_pdf, png_output)
+            process = subprocess.run((  # nosec:B603
+                'gs',
 
-            with png_output.open('rb') as png:
-                return BytesIO(png.read())
-
-    def _run_ghostscript(self, pdf_input: Path, png_output: Path) -> None:
-        """
-        Runs Ghostscript to generate a PNG preview of the first page of a PDF.
-        """
-        process = subprocess.run((  # nosec:B603
-                # FIXME: change 'gs'
-                '/usr/local/bin/gs',
                 # disable read/writes outside of the given files
                 '-dSAFER',
+                '-dPARANOIDSAFER',
 
                 # do not block for any reason
                 '-dBATCH',
                 '-dNOPAUSE',
                 '-dNOPROMPT',
+
+                # limit output messages
+                '-dQUIET',
+                '-sstdout=/dev/null',
 
                 # format the page for thumbnails
                 '-dPDFFitPage',
@@ -223,23 +181,12 @@ class WithPDFThumbnailFilter(WithThumbnailFilter):
 
                 # from pdf
                 str(pdf_input)
-            ),
-            capture_output=True,
-            text=True,
-        )
-        if process.returncode != 0:
-            breakpoint()
-            # Log both stdout and stderr if there was an error
-            code = process.returncode
-            log.error(f'gs failed for {pdf_input} with return code {code}')
-            log.error(f'Ghostscript stdout: {process.stdout}')
-            log.error(f'Ghostscript stderr: {process.stderr}')
+            ))
 
-            print(f'gs failed for {pdf_input} with return code {code}')
-            print(f'Ghostscript stdout: {process.stdout}')
-            print(f'Ghostscript stderr: {process.stderr}')
+            process.check_returncode()
 
-        process.check_returncode()
+            with png_output.open('rb') as png:
+                return BytesIO(png.read())
 
     def generate_thumbnail(
         self,
