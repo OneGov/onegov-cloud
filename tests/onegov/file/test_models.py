@@ -246,11 +246,7 @@ def test_pdf_preview_creation_with_erroneous_pdf(session, monkeypatch):
             + 'thumbnail_medium_pdf_preview_fallback.png'
         ).read_bytes()
     )
-    # write the bytes to a file to manually inspect it:
-    # with open('/tmp/thumbnail_medium_pdf_preview_fallback.png', 'wb') as f:
-    #     f.write(thumb.read())
 
-    # well, we just compare the bytes here
     assert thumb.read() == thumbnail_medium_pdf_preview_fallback.read()
 
 
