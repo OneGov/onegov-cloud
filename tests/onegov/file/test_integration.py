@@ -10,17 +10,27 @@ import transaction
 import vcr
 
 from datetime import timedelta
+
+from depot.fields.upload import UploadedFile
+from depot.io.memory import MemoryFileStorage
+from depot.io.utils import FileIntent
 from depot.manager import DepotManager
+from reportlab.pdfgen import canvas
+from pdfrw import PdfWriter, PdfReader, IndirectPdfDict
 from io import BytesIO
+
+from reportlab.pdfgen import canvas
+
 from onegov.core import Framework
 from onegov.core.security.rules import has_permission_not_logged_in
 from onegov.core.utils import Bunch
 from onegov.core.utils import scan_morepath_modules, module_path, is_uuid
 from onegov.file import DepotApp, File, FileCollection
+from onegov.file.filters import WithPDFThumbnailFilter, OnlyIfPDF
 from onegov.file.integration import SUPPORTED_STORAGE_BACKENDS, delete_file
 from onegov.file.models.file_message import FileMessage
 from sedate import utcnow
-from tests.shared.utils import create_image
+from tests.shared.utils import create_image, create_pdf
 from time import sleep
 from unittest.mock import patch
 from webtest import TestApp as Client
@@ -199,6 +209,41 @@ def test_serve_thumbnail(app):
         '/storage/{}/thumbnail'.format(readme.id), expect_errors=True)
 
     assert thumb.status_code == 302
+
+
+def test_malicious_pdf_thumbnail(pdf_example, app):
+    pdf_filter = OnlyIfPDF(
+        WithPDFThumbnailFilter(
+            name='medium',
+            size=(512, 512),
+            format='png'
+        )
+    )
+
+    # uploaded_file = UploadedFile({
+    #     'filename': 'malicious.pdf',
+    #     'content_type': 'application/pdf',
+    #     'original_content': malicious_pdf
+    # })
+    #
+    # pdf_filter.on_save(uploaded_file)
+    # assert hasattr(uploaded_file, 'thumbnail_medium')
+    # assert uploaded_file.thumbnail_medium['format'] == 'png'
+
+    ensure_correct_depot(app)
+
+    transaction.begin()
+    files = FileCollection(app.session())
+    fid = files.add('malicious.pdf', pdf_example)
+    transaction.commit()
+
+    client = Client(app)
+
+    avatar = files.query().one()
+    breakpoint()
+
+    # response = client.get('/storage/{}'.format(fid))
+    # assert response.content_type == 'application/pdf'
 
 
 def test_file_note_header(app):
