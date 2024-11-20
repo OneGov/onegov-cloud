@@ -1,3 +1,5 @@
+import os
+
 import sedate
 import transaction
 import pytest
@@ -8,6 +10,7 @@ from onegov.core.orm import Base
 from onegov.core.orm.abstract import associated
 from onegov.core.utils import module_path
 from onegov.file import File, FileSet, AssociatedFiles, NamedFile
+from onegov.file.filters import WithPDFThumbnailFilter
 from onegov.file.models.fileset import file_to_set_associations
 from tests.shared.utils import create_image
 from pathlib import Path
@@ -193,7 +196,7 @@ def test_pdf_preview_creation(session):
     transaction.commit()
 
     pdf = session.query(File).one()
-    pdf.reference['thumbnail_medium']
+    assert pdf.reference.get('thumbnail_medium', None) is not None
 
     # our example file contains a blue backgorund so we can verify that
     # the thumbnail for the pdf is generated correctly
@@ -210,6 +213,45 @@ def test_pdf_preview_creation(session):
     # version difference - not a big deal though, just keep an eye on it
     # if the values should change some more
     assert w in (362, 396)
+
+
+def test_pdf_preview_creation_with_erroneous_pdf(session, monkeypatch):
+    # There was a pdf which made ghostscript fail with stderr: "circular
+    # reference to indirect object".
+    # However, we can't upload the original pdf due to sensitive information.
+    # So we have to kind of mock the error here.
+    mock = Mock(side_effect=ValueError)
+    monkeypatch.setattr(
+        WithPDFThumbnailFilter,
+        'generate_preview',
+       mock
+    )
+
+    filname = 'example.pdf'
+    path = module_path('tests.onegov.file', f'fixtures/{filname}')
+
+    with open(path, 'rb') as f:
+        session.add(File(name=f'{filname}', reference=f))
+    transaction.commit()
+    pdf = session.query(File).one()
+    assert pdf.reference.get('thumbnail_medium', None) is not None
+    thumb = DepotManager.get().get(pdf.reference['thumbnail_medium']['id'])
+
+    # expect to be the default one
+
+    thumbnail_medium_pdf_preview_fallback = BytesIO(
+        Path(
+            module_path('onegov.org', 'static/pdf_preview')
+            + os.sep
+            + 'thumbnail_medium_pdf_preview_fallback.png'
+        ).read_bytes()
+    )
+    # write the bytes to a file to manually inspect it:
+    # with open('/tmp/thumbnail_medium_pdf_preview_fallback.png', 'wb') as f:
+    #     f.write(thumb.read())
+
+    # well, we just compare the bytes here
+    assert thumb.read() == thumbnail_medium_pdf_preview_fallback.read()
 
 
 def test_max_image_size(session):

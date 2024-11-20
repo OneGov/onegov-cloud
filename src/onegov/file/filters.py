@@ -199,11 +199,9 @@ class WithPDFThumbnailFilter(WithThumbnailFilter):
         # FIXME: This is kinda slow. We should be able to render the
         #        PDF directly at the thumbnail size. Maybe we should
         #        use pdf2image rather than roll our own?
-        breakpoint()
         try:
             return super().generate_thumbnail(self.generate_preview(fp))
         except Exception as e:
-            breakpoint()
             log.warning(f'Thumbnail generation failed: {e!s}')
             fallback = BytesIO()
             icon_path = (
