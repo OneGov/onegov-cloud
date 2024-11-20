@@ -330,9 +330,22 @@ def get_web_address(internet_adresse: str) -> str | None:
     return f'http://{internet_adresse}'
 
 
-def check_skip(line: 'DefaultRow') -> bool:
-    skip = False
+def get_email(email: str | None) -> str | None:
+    if not email:
+        return None
 
+    # only keep valid generic email address, but not `vorname.nachname@lu.ch`
+    addr = email.split(' ')
+    for a in addr:
+        if a == 'vorname.name@lu.ch':
+            pass
+        if '@' in a:
+            return a
+
+    return None
+
+
+def check_skip(line: 'DefaultRow') -> bool:
     if line.department == 'zNeu':
         skip = True
 
@@ -372,7 +385,7 @@ def import_lu_people(
             salutation=None,
             academic_title=v_(line.akad__titel),
             function=v_(line.funktion),
-            email=v_(line.e_mail_adresse),
+            email=get_email(v_(line.e_mail_adresse)),
             phone=get_phone(line.isdn_nummer),
             phone_direct=get_phone(line.mobil),
             website=v_(get_web_address(line.internet_adresse)),
