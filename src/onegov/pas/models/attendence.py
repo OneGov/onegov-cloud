@@ -110,11 +110,6 @@ class Attendence(Base, TimestampMixin):
             * After 2 hours, time is rounded to nearest 30-minute increment
             * Example: 2h 40min would be calculated as 2.5 hours
 
-        Args:
-            attendence: The Attendence record containing:
-                - type: The type of session (plenary, commission, or study)
-                - duration: Duration in minutes
-
         Returns:
             str: The calculated value formatted with one decimal place:
                 - '0.5' for plenary sessions
