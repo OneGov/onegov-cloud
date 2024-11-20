@@ -1,5 +1,8 @@
 from collections import defaultdict
 from datetime import datetime
+
+from email_validator import validate_email, EmailNotValidError, \
+    EmailUndeliverableError
 from markupsafe import Markup
 
 from onegov.agency.collections import (
@@ -8,10 +11,10 @@ from onegov.core.csv import CSVFile
 from onegov.core.orm.abstract.adjacency_list import numeric_priority
 from onegov.core.utils import linkify
 
-
 from typing import TypeVar
 from typing import TypeVarTuple
 from typing import TYPE_CHECKING
+
 if TYPE_CHECKING:
     from _typeshed import StrOrBytesPath
     from collections.abc import Callable
@@ -330,16 +333,27 @@ def get_web_address(internet_adresse: str) -> str | None:
     return f'http://{internet_adresse}'
 
 
-def get_email(email: str | None) -> str | None:
+def get_email(line: 'DefaultRow') -> str | None:
+    email = v_(line.e_mail_adresse)
+
     if not email:
         return None
 
     # only keep valid generic email address, but not `vorname.nachname@lu.ch`
     addr = email.split(' ')
     for a in addr:
-        if a == 'vorname.name@lu.ch':
-            pass
+        if a in ['vorname.name@lu.ch', '@lu.ch']:
+            continue
         if '@' in a:
+            try:
+                validate_email(a)
+            except EmailUndeliverableError:
+                continue
+            except EmailNotValidError:
+                print(f'Error importing person with invalid email {a}; line '
+                      f'{line.rownumber}')
+                continue
+
             return a
 
     return None
@@ -386,7 +400,7 @@ def import_lu_people(
             salutation=None,
             academic_title=v_(line.akad__titel),
             function=v_(line.funktion),
-            email=get_email(v_(line.e_mail_adresse)),
+            email=get_email(line),
             phone=get_phone(line.isdn_nummer),
             phone_direct=get_phone(line.mobil),
             website=v_(get_web_address(line.internet_adresse)),
