@@ -37,7 +37,8 @@ def with_open(
         with open(filename, 'rb') as f:
             file = CSVFile(
                 f,
-                encoding='iso-8859-1'
+                # encoding='iso-8859-1'
+                encoding='utf-8',  # lu
             )
             return func(file, *args)
 
@@ -70,6 +71,9 @@ def get_phone(string: str) -> str:
     if not string.startswith('+'):
         if len(string.replace(' ', '')) == 10:  # be sure #digits fit CH
             return string.replace('0', '+41 ', 1)
+        # lu adds country digits
+        if len(string.replace(' ', '')) == 9:
+            return f'+41{string}'
     return string
 
 
@@ -301,6 +305,179 @@ def import_bs_data(
         agency.sort_relationships()
 
     return agencies, persons
+
+
+def get_plz_city(plz: str | None, ort: str | None) -> str | None:
+    if plz and ort:
+        return f'{plz} {ort}'
+
+    if ort:
+        return ort
+
+    if plz:
+        return plz
+
+    return None
+
+
+def get_web_address(internet_adresse: str) -> str | None:
+    if not internet_adresse:
+        return None
+
+    if internet_adresse.startswith('http'):
+        return internet_adresse
+
+    return f'http://{internet_adresse}'
+
+
+def check_skip(line: 'DefaultRow') -> bool:
+    skip = False
+
+    if line.department == 'zNeu':
+        skip = True
+
+    if any(s in line.vorname for s in ('Zi.', 'Korr.', 'test')):
+        skip = True
+
+    if any(s in line.nachname for s in ('WG', 'WH', 'W3', 'W5',
+                                        'frei neuer MA', 'frei  neuer MA',
+                                        'AAL Picket')):
+        skip = True
+
+    if line.nachname == '' and line.vorname == '':
+        skip = True  # empty lines in file
+
+    if skip:
+        print(f'Skipping {str(line)[:120]}..')
+        return True
+
+    return False
+
+
+@with_open
+def import_lu_people(
+    csvfile: CSVFile['DefaultRow'],
+    agencies: 'Mapping[str, ExtendedAgency]',
+    session: 'Session',
+    app: 'AgencyApp'
+) -> list['ExtendedPerson']:
+
+    people = ExtendedPersonCollection(session)
+    persons = []
+
+    def parse_person(line: 'DefaultRow') -> None:
+        person_ = people.add(
+            last_name=v_(line.nachname) or ' ',
+            first_name=v_(line.vorname) or ' ',
+            salutation=None,
+            academic_title=v_(line.akad__titel),
+            function=v_(line.funktion),
+            email=v_(line.e_mail_adresse),
+            phone=get_phone(line.isdn_nummer),
+            phone_direct=get_phone(line.mobil),
+            website=v_(get_web_address(line.internet_adresse)),
+            notes=v_(line.bemerkungen),
+            location_address=v_(line.adresse),
+            location_code_city=v_(get_plz_city(line.plz, line.ort)),
+            access='public'
+        )
+        persons.append(person_)
+
+        # A person has only one membership
+        agency_id = (line.unterabteilung_2 or line.unterabteilung or
+                     line.abteilung)
+        hi_code = v_(line.hi_code)
+        order = 0 if not hi_code else int(hi_code)
+        if agency_id:
+            agency = agencies.get(agency_id)
+            if agency and order:
+                agency.add_person(person_.id,
+                                  title=person_.function or 'Mitglied',
+                                  order_within_agency=order)
+            elif agency:
+                agency.add_person(person_.id,
+                                  title=person_.function or 'Mitglied')
+            else:
+                print(f'Error agency id {agency_id} not found')
+
+    for ix, line in enumerate(csvfile.lines):
+        if ix % 100 == 0:
+            app.es_indexer.process()
+            app.psql_indexer.bulk_process(session)
+
+        if not check_skip(line):
+            parse_person(line)
+
+    return persons
+
+
+@with_open
+def import_lu_agencies(
+    csvfile: CSVFile['DefaultRow'],
+    session: 'Session',
+    app: 'AgencyApp'
+) -> dict[str, 'ExtendedAgency']:
+
+    added_agencies = {}
+    agencies = ExtendedAgencyCollection(session)
+
+    # Hierarchy: Hierarchie: Department, Dienststelle, Abteilung,
+    # Unterabteilung, Unterabteilung 2, Unterabteilung 3
+    for ix, line in enumerate(csvfile.lines):
+        if ix % 100 == 0:
+            app.es_indexer.process()
+            app.psql_indexer.bulk_process(session)
+
+        if check_skip(line):
+            continue
+
+        dienststelle, abteilung, unterabteilung, unterabteilung_2 = (
+            None, None, None, None)
+        department_name = v_(line.department) or ''
+        department = agencies.add_or_get(None, department_name)
+        added_agencies[department_name] = department
+        export_fields = ['person.title', 'person.phone']
+
+        dienststellen_name = v_(line.dienststelle)
+        if dienststellen_name:
+            dienststelle = agencies.add_or_get(
+                department, dienststellen_name, export_fields=export_fields)
+            added_agencies[dienststellen_name] = dienststelle
+
+        abteilungs_name = v_(line.abteilung)
+        if abteilungs_name:
+            abteilung = agencies.add_or_get(
+                dienststelle, abteilungs_name, export_fields=export_fields)
+            added_agencies[abteilungs_name] = abteilung
+
+        unterabteilungs_name = v_(line.unterabteilung)
+        if unterabteilungs_name:
+            unterabteilung = (
+                agencies.add_or_get(abteilung, unterabteilungs_name,
+                                    export_fields=export_fields))
+            added_agencies[unterabteilungs_name] = unterabteilung
+
+        unterabteilung_2_name = v_(line.unterabteilung_2)
+        if unterabteilung_2_name:
+            unterabteilung_2 = (
+                agencies.add_or_get(unterabteilung, unterabteilung_2_name,
+                                    export_fields=export_fields))
+            added_agencies[unterabteilung_2_name] = unterabteilung_2
+
+    return added_agencies
+
+
+def import_lu_data(
+    data_file: 'StrOrBytesPath',
+    request: 'AgencyRequest',
+    app: 'AgencyApp'
+) -> tuple[dict[str, 'ExtendedAgency'], list['ExtendedPerson']]:
+
+    session = request.session
+    agencies = import_lu_agencies(data_file, session, app)
+    people = import_lu_people(data_file, agencies, session, app)
+
+    return agencies, people
 
 
 @with_open
