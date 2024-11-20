@@ -27,11 +27,14 @@ from onegov.pas.path import SettlementRunExport, SettlementRunAllExport
 from onegov.pas.models import Parliamentarian
 
 
-from typing import TYPE_CHECKING, Any, Literal
+from typing import TYPE_CHECKING, Literal
 if TYPE_CHECKING:
     from onegov.core.types import RenderData
     from onegov.town6.request import TownRequest
     from datetime import date
+
+    SettlementDataRow = tuple['date', str, str, str | int, Decimal, Decimal]
+    TotalRow = tuple[str, Decimal, Decimal, Decimal, Decimal, Decimal]
 
 
 PDF_CSS = """
@@ -425,12 +428,11 @@ def _get_party_totals(
     return result
 
 
-
 def generate_settlement_pdf(
     settlement_run: SettlementRun,
     request: 'TownRequest',
     entity_type: Literal['all', 'commission', 'party', 'parliamentarian'],
-    entity: 'Commission | Party | Parliamentarian | None' = None,
+    entity: Commission | Party | Parliamentarian | None = None,
 ) -> bytes:
     """Generate PDF for settlement data."""
     font_config = FontConfiguration()
@@ -469,7 +471,7 @@ def _get_commission_settlement_data(
     settlement_run: SettlementRun,
     request: 'TownRequest',
     commission: Commission
-) -> list[tuple['date', str, str, str | int, Decimal, Decimal]]:
+) -> list['SettlementDataRow']:
     """Get settlement data for a specific commission."""
     session = request.session
     rate_set = (
@@ -522,92 +524,101 @@ def _get_commission_settlement_data(
 
 
 def _generate_settlement_html(
-    settlement_data: list[
-        tuple['date', str, str, str | int, Decimal, Decimal]
-    ],
-    totals: list[tuple[str, Decimal, Decimal, Decimal, Decimal, Decimal]],
+    settlement_data: list['SettlementDataRow'],
+    totals: list['TotalRow'],
     subtitle: str,
 ) -> str:
     """Generate HTML for settlement PDF."""
     html = f"""
-        <!DOCTYPE html>
-        <html>
-        <head><meta charset="utf-8"></head>
-        <body>
-            <table class="journal-table">
-                <thead>
-                    <tr>
-                        <th colspan="6">{subtitle}</th>
-                    </tr>
-                    <tr>
-                        <th>Datum</th>
-                        <th>Person</th>
-                        <th>Typ</th>
-                        <th>Wert</th>
-                        <th>CHF</th>
-                        <th>CHF + TZ</th>
-                    </tr>
-                </thead>
-                <tbody>
-    """
+       <!DOCTYPE html>
+       <html>
+       <head><meta charset="utf-8"></head>
+       <body>
+           <table class="journal-table">
+               <thead>
+                   <tr>
+                       <th colspan="6">{subtitle}</th>
+                   </tr>
+                   <tr>
+                       <th>Datum</th>
+                       <th>Person</th>
+                       <th>Typ</th>
+                       <th>Wert</th>
+                       <th>CHF</th>
+                       <th>CHF + TZ</th>
+                   </tr>
+               </thead>
+               <tbody>
+   """
 
-    for row in settlement_data:
+    for settlement_row in settlement_data:
         html += f"""
-            <tr>
-                <td>{row[0].strftime('%d.%m.%Y')}</td>
-                <td>{row[1]}</td>
-                <td>{row[2]}</td>
-                <td class="numeric">{row[3]}</td>
-                <td class="numeric">{row[4]:,.2f}</td>
-                <td class="numeric">{row[5]:,.2f}</td>
-            </tr>
-        """
+           <tr>
+               <td>{settlement_row[0].strftime('%d.%m.%Y')}</td>
+               <td>{settlement_row[1]}</td>
+               <td>{settlement_row[2]}</td>
+               <td class="numeric">{settlement_row[3]}</td>
+               <td class="numeric">{settlement_row[4]:,.2f}</td>
+               <td class="numeric">{settlement_row[5]:,.2f}</td>
+           </tr>
+       """
 
     html += """
-            </tbody>
-        </table>
-        <table class="summary-table">
-            <thead>
-                <tr>
-                    <th>Name</th>
-                    <th>Sitzungen</th>
-                    <th>Spesen</th>
-                    <th>Total Einträge</th>
-                    <th>Teuerungszulagen</th>
-                    <th>Auszahlung</th>
-                </tr>
-            </thead>
-            <tbody>
-    """
+           </tbody>
+       </table>
+       <table class="summary-table">
+           <thead>
+               <tr>
+                   <th>Name</th>
+                   <th>Sitzungen</th>
+                   <th>Spesen</th>
+                   <th>Total Einträge</th>
+                   <th>Teuerungszulagen</th>
+                   <th>Auszahlung</th>
+               </tr>
+           </thead>
+           <tbody>
+   """
 
-    for i, row in enumerate(totals):
-        is_last = (i == len(totals) - 1)
-        is_total = is_last
-        row_class = ' class="total-row"' if is_total else ''
+    for total_row in totals[:-1]:  # All but last
         html += f"""
-            <tr{row_class}>
-                <td>{row[0]}</td>
-                <td class="numeric">{row[1]:,.2f}</td>
-                <td class="numeric">{row[2]:,.2f}</td>
-                <td class="numeric">{row[3]:,.2f}</td>
-                <td class="numeric">{row[4]:,.2f}</td>
-                <td class="numeric">{row[5]:,.2f}</td>
-            </tr>
-        """
+           <tr>
+               <td>{total_row[0]}</td>
+               <td class="numeric">{total_row[1]:,.2f}</td>
+               <td class="numeric">{total_row[2]:,.2f}</td>
+               <td class="numeric">{total_row[3]:,.2f}</td>
+               <td class="numeric">{total_row[4]:,.2f}</td>
+               <td class="numeric">{total_row[5]:,.2f}</td>
+           </tr>
+       """
+
+    # Handle last row separately with total-row class
+    if totals:
+        final_row = totals[-1]
+        html += f"""
+           <tr class="total-row">
+               <td>{final_row[0]}</td>
+               <td class="numeric">{final_row[1]:,.2f}</td>
+               <td class="numeric">{final_row[2]:,.2f}</td>
+               <td class="numeric">{final_row[3]:,.2f}</td>
+               <td class="numeric">{final_row[4]:,.2f}</td>
+               <td class="numeric">{final_row[5]:,.2f}</td>
+           </tr>
+       """
 
     html += """
-            </tbody>
-        </table>
-        </body>
-        </html>
-    """
+           </tbody>
+       </table>
+       </body>
+       </html>
+   """
 
     return html
 
 
 def _get_settlement_data(
     self: SettlementRun, request: 'TownRequest'
-) -> list[Any]:
+) -> list['SettlementDataRow']:
 
     session = request.session
     # Get rate set for the year
@@ -631,7 +642,7 @@ def _get_settlement_data(
         str(1 + (rate_set.cost_of_living_adjustment / 100))
     )
 
-    settlement_data = []
+    settlement_data: list[SettlementDataRow] = []  # Add type hint here
 
     # Group by parliamentarian for summary
     parliamentarian_totals: dict[str, Decimal] = {}
@@ -695,7 +706,7 @@ def _get_commission_totals(
     settlement_run: SettlementRun,
     request: 'TownRequest',
     commission: Commission
-) -> list[tuple[str, Decimal, Decimal, Decimal, Decimal, Decimal]]:
+) -> list['TotalRow']:
     """Get totals for a specific commission grouped by party."""
     session = request.session
 
@@ -805,7 +816,7 @@ def _get_party_settlement_data(
     settlement_run: SettlementRun,
     request: 'TownRequest',
     party: Party
-) -> list[tuple['date', str, str, str | int, Decimal, Decimal]]:
+) -> list['SettlementDataRow']:
     """Get settlement data for a specific party."""
     session = request.session
     rate_set = (
@@ -875,7 +886,7 @@ def _get_party_settlement_data(
 
 def _get_party_specific_totals(
     settlement_run: SettlementRun, request: 'TownRequest', party: Party
-) -> list[tuple[str, Decimal, Decimal, Decimal, Decimal, Decimal]]:
+) -> list['TotalRow']:
     """Get totals for a specific party."""
     session = request.session
     rate_set = (
