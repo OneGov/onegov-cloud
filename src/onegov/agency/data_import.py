@@ -347,21 +347,22 @@ def get_email(email: str | None) -> str | None:
 
 def check_skip(line: 'DefaultRow') -> bool:
     if line.department == 'zNeu':
-        skip = True
+        return True
 
     if any(s in line.vorname for s in ('Zi.', 'Korr.', 'test')):
-        skip = True
+        return True
 
     if any(s in line.nachname for s in ('WG', 'WH', 'W3', 'W5',
                                         'frei neuer MA', 'frei  neuer MA',
                                         'AAL Picket')):
-        skip = True
+        return True
 
     if line.nachname == '' and line.vorname == '':
-        skip = True  # empty lines in file
+        return True  # skip empty lines
 
-    if skip:
-        print(f'Skipping {str(line)[:120]}..')
+    if line.vorname and line.vorname[-1].isdigit():
+        print(f'Error importing person with digit in first name; line '
+              f'{line.rownumber}, {line.vorname}')
         return True
 
     return False
@@ -453,18 +454,27 @@ def import_lu_agencies(
 
         dienststellen_name = v_(line.dienststelle)
         if dienststellen_name:
+            if not department:
+                print(f'Error adding agency with no department; '
+                      f'line {line.rownumber}, {line.nachname}')
             dienststelle = agencies.add_or_get(
                 department, dienststellen_name, export_fields=export_fields)
             added_agencies[dienststellen_name] = dienststelle
 
         abteilungs_name = v_(line.abteilung)
         if abteilungs_name:
+            if not dienststelle:
+                print(f'Error adding agency with no dienststelle; '
+                      f'line {line.rownumber}, {line.nachname}')
             abteilung = agencies.add_or_get(
                 dienststelle, abteilungs_name, export_fields=export_fields)
             added_agencies[abteilungs_name] = abteilung
 
         unterabteilungs_name = v_(line.unterabteilung)
         if unterabteilungs_name:
+            if not abteilung:
+                print(f'Error adding agency with no abteilung; '
+                      f'line {line.rownumber}, {line.nachname}')
             unterabteilung = (
                 agencies.add_or_get(abteilung, unterabteilungs_name,
                                     export_fields=export_fields))
@@ -472,6 +482,9 @@ def import_lu_agencies(
 
         unterabteilung_2_name = v_(line.unterabteilung_2)
         if unterabteilung_2_name:
+            if not unterabteilung:
+                print(f'Error adding agency with no unterabteilung; '
+                      f'line {line.rownumber}, {line.nachname}')
             unterabteilung_2 = (
                 agencies.add_or_get(unterabteilung, unterabteilung_2_name,
                                     export_fields=export_fields))
