@@ -1,5 +1,6 @@
 import os
 import shlex
+import logging
 import subprocess
 
 from depot.fields.interfaces import FileFilter
@@ -17,6 +18,9 @@ from typing import IO, TYPE_CHECKING
 if TYPE_CHECKING:
     from _typeshed import SupportsRead
     from depot.fields.upload import UploadedFile
+
+
+log = logging.getLogger('onegov.file')
 
 
 class ConditionalFilter(FileFilter):
@@ -198,7 +202,7 @@ class WithPDFThumbnailFilter(WithThumbnailFilter):
         try:
             return super().generate_thumbnail(self.generate_preview(fp))
         except Exception as e:
-            log.warning(f"Thumbnail generation failed: {str(e)}")
+            log.warning(f'Thumbnail generation failed: {e!s}')
             fallback = BytesIO()
             icon_path = (
                     module_path('onegov.org', 'static/pdf_preview')
