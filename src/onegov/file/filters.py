@@ -1,9 +1,13 @@
+import os
 import shlex
+import logging
 import subprocess
 
 from depot.fields.interfaces import FileFilter
 from depot.io.utils import file_from_content
 from io import BytesIO
+
+from onegov.core.utils import module_path
 from onegov.file.utils import IMAGE_MIME_TYPES, get_image_size
 from pathlib import Path
 from PIL import Image
@@ -14,6 +18,9 @@ from typing import IO, TYPE_CHECKING
 if TYPE_CHECKING:
     from _typeshed import SupportsRead
     from depot.fields.upload import UploadedFile
+
+
+log = logging.getLogger('onegov.file')
 
 
 class ConditionalFilter(FileFilter):
@@ -192,4 +199,17 @@ class WithPDFThumbnailFilter(WithThumbnailFilter):
         # FIXME: This is kinda slow. We should be able to render the
         #        PDF directly at the thumbnail size. Maybe we should
         #        use pdf2image rather than roll our own?
-        return super().generate_thumbnail(self.generate_preview(fp))
+        try:
+            return super().generate_thumbnail(self.generate_preview(fp))
+        except Exception as e:
+            log.warning(f'Thumbnail generation failed: {e!s}')
+            fallback = BytesIO()
+            icon_path = (
+                    module_path('onegov.org', 'static/pdf_preview')
+                    + os.sep
+                    + 'thumbnail_medium_pdf_preview_fallback.png'
+            )
+            with open(icon_path, 'rb') as f:
+                fallback.write(f.read())
+            fallback.seek(0)
+            return super().generate_thumbnail(fallback)
