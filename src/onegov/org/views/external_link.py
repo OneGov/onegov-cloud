@@ -77,7 +77,7 @@ def edit_external_link(
 
     layout = layout or ExternalLinkLayout(self, request)
     layout.edit_mode = True
-    links = layout.editmode_links + layout.editbar_links # type:ignore
+    links = layout.editmode_links + layout.editbar_links  # type:ignore
     layout.editmode_links = links
 
     return {
