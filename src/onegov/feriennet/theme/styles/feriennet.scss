@@ -1243,6 +1243,12 @@ $booking-left-margin: 2rem;
     }
 }
 
+.legend-panel {
+    .legend {
+        margin-left: 1.6em;
+    }
+}
+
 /*
     Form panel on the right
 */
@@ -2304,15 +2310,11 @@ li.unpaid {
     padding-bottom: .5rem;
 
     > div:first-child {
-        padding-left: 2rem !important;
 
         &::before {
-            font-family: 'FontAwesome';
-            font-size: 1.5rem;
             font-weight: normal;
             left: .25rem;
             line-height: 1.7rem;
-            position: absolute;
         }
     }
 
@@ -2327,7 +2329,7 @@ li.unpaid {
 
         > div:first-child::before {
             color: $green;
-            content: '\f058';
+            @include icon('\f058');
         }
     }
 }
@@ -2338,7 +2340,7 @@ li.unpaid {
 
         > div:first-child::before {
             color: $orange;
-            content: '\f071';
+            @include icon('\f071');
         }
     }
 }
@@ -2349,7 +2351,7 @@ li.unpaid {
 
         > div:first-child::before {
             color: $gray-dark;
-            content: '\f05d';
+            @include icon('\f05d');
         }
     }
 }
@@ -2360,7 +2362,7 @@ li.unpaid {
 
         > div:first-child::before {
             color: $blue;
-            content: '\f24d';
+            @include icon('\f24d');
         }
     }
 }
@@ -2371,7 +2373,7 @@ li.unpaid {
 
         > div:first-child::before {
             color: $red;
-            content: '\f059';
+            @include icon('\f059');
         }
 
         > div:last-child {
