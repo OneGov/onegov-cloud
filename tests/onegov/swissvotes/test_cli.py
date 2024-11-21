@@ -7,7 +7,7 @@ from datetime import date
 from decimal import Decimal
 from onegov.pdf import Pdf
 from onegov.swissvotes.cli import cli
-from onegov.swissvotes.external_resources.posters import MfgPosters
+from onegov.swissvotes.external_resources.posters import MfgPosters, BsPosters
 from onegov.swissvotes.external_resources.posters import SaPosters
 from onegov.swissvotes.models import SwissVote
 from pathlib import Path
@@ -17,7 +17,7 @@ from unittest.mock import patch
 
 
 def write_config(path, postgres_dsn, temporary_directory, redis_url,
-                 mfg_api_token=None):
+                 mfg_api_token=None, bs_api_token=None):
     cfg = {
         'applications': [
             {
@@ -38,6 +38,7 @@ def write_config(path, postgres_dsn, temporary_directory, redis_url,
                         'create': 'true'
                     },
                     'mfg_api_token': mfg_api_token,
+                    'bs_api_token': bs_api_token,
                 },
             }
         ]
@@ -362,10 +363,11 @@ def test_cli_reindex(session_manager, temporary_directory, redis_url,
 
 
 @patch.object(MfgPosters, 'fetch', return_value=(1, 2, 3, set((4, 5))))
+@patch.object(BsPosters, 'fetch', return_value=(2, 3, 4, set((5, 6))))
 @patch.object(SaPosters, 'fetch', return_value=(6, 7, 8, set((9, ))))
 @pytest.mark.xdist_group(name="swissvotes-cli")
 def test_cli_update_resources(
-    mfg, sa, session_manager, temporary_directory, redis_url, sample_vote
+    mfg, sa, bs, session_manager, temporary_directory, redis_url, sample_vote
 ):
     cfg_path = os.path.join(temporary_directory, 'onegov.yml')
     write_config(cfg_path, session_manager.dsn, temporary_directory, redis_url)
@@ -397,17 +399,20 @@ def test_cli_update_resources(
 
     # All fine
     write_config(
-        cfg_path, session_manager.dsn, temporary_directory, redis_url, 'x'
+        cfg_path, session_manager.dsn, temporary_directory, redis_url, 'x', 'y'
     )
     result = run_command(
         cfg_path,
         'govikon',
-        ['update-resources', '--mfg', '--sa', '--details']
+        ['update-resources', '--mfg', '--sa', '--bs', '--details']
     )
     assert result.exit_code == 0
     assert 'Updating MfG posters' in result.output
+    assert 'Updating BS posters' in result.output
     assert 'Updating SA posters' in result.output
     assert '1 added, 2 updated, 3 removed, 2 failed' in result.output
     assert 'Failed: 4, 5\n' in result.output
+    assert '2 added, 3 updated, 4 removed, 2 failed' in result.output
+    assert 'Failed: 5, 6\n' in result.output
     assert '6 added, 7 updated, 8 removed, 1 failed' in result.output
     assert 'Failed: 9\n' in result.output

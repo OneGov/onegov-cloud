@@ -386,6 +386,20 @@ def sample_vote():
     vote.posters_mfg_yea_imgs = {
         'https://yes.com/objects/1': 'https://detail.com/1'
     }
+    vote.posters_bs_yea = (
+        'https://yes.com/objects/5 '
+        'https://yes.com/objects/6'
+    )
+    vote.posters_bs_nay = (
+        'https://no.com/objects/5 '
+        'https://no.com/objects/6'
+    )
+    vote.posters_bs_yea_imgs = {
+        'https://yes.com/objects/5': 'https://detail.com/5'
+    }
+    vote.posters_bs_nay_imgs = {
+        'https://no.com/objects/6': 'https://detail.com/6'
+    }
     vote.posters_sa_yea = (
         'https://yes.com/objects/3 '
         'https://yes.com/objects/4'
