@@ -140,7 +140,24 @@ class MfgPosters(Posters):
         return f'{base}{object_id}/xml'
 
 
+class BsPosters(Posters):
+    """ Plakatsammlung Basel """
+
+    def __init__(self, api_key: str) -> None:
+        self.yea_attribute = 'posters_bs_yea'
+        self.nay_attribute = 'posters_bs_nay'
+        self.yea_img_attribute = 'posters_bs_yea_imgs'
+        self.nay_img_attribute = 'posters_bs_nay_imgs'
+        self.headers = {'X-API-KEY': api_key}
+
+    def meta_data_url(self, url: str) -> str:
+        base = 'https://www.recherche-plakatsammlungbasel.ch/objects/'
+        object_id = url.split(base)[-1].rstrip('/')
+        return f'{base}{object_id}/xml'
+
+
 class SaPosters(Posters):
+    """ Sozial Archiv Zürich """
 
     def __init__(self) -> None:
         self.yea_attribute = 'posters_sa_yea'
