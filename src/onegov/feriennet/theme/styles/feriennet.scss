@@ -1,3 +1,5 @@
+$max-line-width: 40rem;
+
 /*
     css animations keyframes
 */
@@ -1427,35 +1429,6 @@ $booking-left-margin: 2rem;
             align-items: center;
             color: $oil;
             margin-bottom: .5rem;
-
-            .details-button {
-                padding: .75rem;
-                border-radius: .7rem;
-
-                .down-button {
-                    color: $white;
-                }
-
-                &:has(.alert),
-                &:has(.cancelled) {
-                    background-color: $red-light;
-    
-                    &:hover,
-                    &.down {
-                        background-color: $red;
-                    }
-                }
-    
-                &:has(.success) {
-                    background-color: $green-light;
-    
-                    &:hover,
-                    &.down {
-                        background-color: $green;
-                    }
-                }
-            }
-
         }
 
         > button:not(.ic-use-transition) {
@@ -1463,6 +1436,40 @@ $booking-left-margin: 2rem;
         }
     }
 }
+
+/* 
+    Buttons
+*/
+.details-button {
+    padding: .75rem;
+    border-radius: .7rem;
+
+    .fa-chevron-down {
+        color: $white;
+    }
+
+    &:has(.unpaid),
+    &:has(.alert),
+    &:has(.cancelled) {
+        background-color: $red-light;
+
+        &:hover,
+        &.down {
+            background-color: $red;
+        }
+    }
+
+    &:has(.paid),
+    &:has(.success) {
+        background-color: $green-light;
+
+        &:hover,
+        &.down {
+            background-color: $green;
+        }
+    }
+}
+
 
 /*
     Progress bar
@@ -1573,7 +1580,8 @@ $booking-left-margin: 2rem;
     Billing View
 */
 #page-billing .is-submenu-item {
-    max-width: 400px;
+    max-width: $max-line-width;
+
     a {
         overflow: hidden;
         text-overflow: ellipsis;
@@ -1582,6 +1590,9 @@ $booking-left-margin: 2rem;
 }
 
 .billing {
+
+    max-width: $max-line-width;
+
     .bill {
         > button:not(.ic-use-transition) {
             animation: oscillate-opacity 1s infinite;
@@ -1595,17 +1606,18 @@ $booking-left-margin: 2rem;
 }
 
 .bill {
-    border-radius: 2px;
     margin-bottom: 1rem;
     padding: 0;
     position: relative;
 
-    h3 {
-        display: inline-block;
-        font-size: 1rem;
-        font-weight: bold;
-        line-height: 1.5rem;
-        flex-grow: 1;
+    .bill-header {
+        display: flex;
+        align-content: center;
+        margin-bottom: .5rem;
+    }
+
+    a {
+        line-height: 1;
     }
 
     > button {
@@ -1618,20 +1630,108 @@ $booking-left-margin: 2rem;
         width: 40px;
     }
 
+    .bill-header-bar {
+        border-radius: .7rem;
+        flex-grow: 1;
+        align-items: center;
+        display: flex;
+        margin-right: .2rem;
+
+        h3 {
+            display: inline-block;
+            font-size: .9rem;
+            font-weight: bold;
+            line-height: 1rem;
+            margin-bottom: 0;
+            padding: .75rem;
+        }
+    
+        span.outstanding {
+            font-size: .9rem;
+            flex-grow: 1;
+        }
+
+        button {
+            margin-right: .5rem !important;
+        }
+    
+    }
+
+    @mixin payment-state-color($pastel, $light, $dark) {
+        .bill-header-bar {
+            background-color: $pastel;
+            border: 1px solid $pastel;
+        }
+
+        > .amount,
+        > .payment-status {
+            color: $dark;
+        }
+
+        .details-button {
+            background-color: $light;
+            color: $white;
+
+            &:has(.down),
+            &:hover {
+                background-color: $dark;
+            }
+        }
+
+
+        .total td {
+            color: $dark;
+            font-weight: bold;
+            text-decoration: none;
+            border-top: 1px solid $black;
+
+        }
+    }
+
+    &.paid {
+        @include payment-state-color($green-pastel, $green-light, $green-dark);
+    }
+
+    &.unpaid {
+        @include payment-state-color($red-pastel, $red-light, $red-dark);
+    }
+
+    &.overpaid {
+        @include payment-state-color($yellow-pastel, $yellow-light, $yellow-dark);
+    }
+
+    > .outstanding {
+        line-height: 1.5rem;
+        margin: .5rem calc(48px + .5rem) .5rem 0;
+
+        .button {
+            margin-left: 1rem;
+        }
+    }
+
+    div:not(.bill-details) .bill-details-table > div:not(.hidden) {
+        border: 1px solid $iron;
+        border-radius: .7rem;
+        padding: 0 1rem;
+        margin-bottom: 2rem;
+
+    }
+
     table {
         margin: 1px 0 0;
         position: relative;
         width: 100%;
 
         tr {
-            background-color: transparent;
+            border-bottom: 1px solid $smoke !important;
+            background-color: transparent !important;
 
-            &.paid:hover {
-                background-color: $green-pastel !important;
+            td:first-child {
+                padding-left: 0;
             }
 
-            &.unpaid:hover {
-                background-color: $red-pastel !important;
+            td:last-child {
+                padding-right: 0;
             }
         }
 
@@ -1642,8 +1742,8 @@ $booking-left-margin: 2rem;
         }
 
         .group td {
-            padding-bottom: .75rem;
-            padding-top: .75rem;
+            padding-bottom: .25rem;
+            padding-top: 1rem;
         }
 
         .payment-status,
@@ -1684,7 +1784,6 @@ $booking-left-margin: 2rem;
 
         .total td,
         .group td:first-child {
-            font-weight: bold;
             text-decoration: underline;
             text-decoration-color: $body-font-color;
         }
@@ -1760,54 +1859,6 @@ $booking-left-margin: 2rem;
         margin-right: 1.25ex;
     }
 
-    @mixin payment-state-color($pastel, $light, $dark) {
-        background-color: $pastel;
-        border: 1px solid $pastel;
-
-        > * {
-            color: $dark;
-        }
-
-        button {
-            background-color: $light;
-            color: $white;
-            outline: 1px solid $light;
-        }
-
-        button.toggled,
-        button:hover {
-            background-color: $dark;
-            outline: 1px solid $dark;
-        }
-
-        .total td {
-            background-color: $pastel;
-            color: $dark;
-            font-size: 1rem;
-            text-decoration: none;
-        }
-    }
-
-    &.paid {
-        @include payment-state-color($green-pastel, $green-light, $green-dark);
-    }
-
-    &.unpaid {
-        @include payment-state-color($red-pastel, $red-light, $red-dark);
-    }
-
-    &.overpaid {
-        @include payment-state-color($yellow-pastel, $yellow-light, $yellow-dark);
-    }
-
-    > .outstanding {
-        line-height: 1.5rem;
-        margin: .5rem calc(48px + .5rem) .5rem 0;
-
-        .button {
-            margin-left: 1rem;
-        }
-    }
 
     .print-area {
         display: block;
@@ -3223,7 +3274,7 @@ li.unpaid {
     }
 
     div > * {
-        max-width: 40rem;
+        max-width: $max-line-width;
         display: block;
     }
 
