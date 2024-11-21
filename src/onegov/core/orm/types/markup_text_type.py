@@ -45,4 +45,4 @@ class MarkupText(_Base):
         #       also add a ton of static overhead. If we decide we want
         #       the additional safety, we should use an approach like
         #       OCQMS' lazy Sanitized text type.
-        return None if value is None else Markup(value)  # noqa: MS001
+        return None if value is None else Markup(value)  # noqa: RUF035

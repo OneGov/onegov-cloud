@@ -192,7 +192,7 @@ ignore = [
     "UP038",
 ]
 unfixable = []
-external = ["MS", "TC"]
+external = ["TC"]
 allowed-confusables = ["×"]
 preview = true
 

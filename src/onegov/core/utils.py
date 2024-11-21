@@ -399,7 +399,7 @@ def linkify_phone(text: str) -> Markup:
         return match.group(0)
 
     # NOTE: re.sub isn't Markup aware, so we need to re-wrap
-    return Markup(  # noqa: MS001
+    return Markup(  # noqa: RUF035
         _phone_ch_html_safe.sub(handle_match, escape(text)))
 
 
@@ -451,14 +451,14 @@ def linkify(text: str | None) -> Markup:
         )
         # NOTE: bleach's linkify always returns a plain string
         #       so we need to re-wrap
-        linkified = linkify_phone(Markup(  # noqa: MS001
+        linkified = linkify_phone(Markup(  # noqa: RUF035
             bleach_linker.linkify(escape(text)))
         )
 
     else:
         # NOTE: bleach's linkify always returns a plain string
         #       so we need to re-wrap
-        linkified = linkify_phone(Markup(  # noqa: MS001
+        linkified = linkify_phone(Markup(  # noqa: RUF035
             bleach.linkify(escape(text), parse_email=True))
         )
 
@@ -466,7 +466,7 @@ def linkify(text: str | None) -> Markup:
     if isinstance(text, Markup):
         return linkified
 
-    return Markup(bleach.clean(  # noqa: MS001
+    return Markup(bleach.clean(  # noqa: RUF035
         linkified,
         tags=['a'],
         attributes={'a': ['href', 'rel']},
@@ -497,7 +497,7 @@ def paragraphify(text: str) -> Markup:
             (
                 # NOTE: re.split returns a plain str, so we need to restore
                 #       markup based on whether it was markup before
-                Markup(p) if was_markup  # noqa: MS001
+                Markup(p) if was_markup  # noqa: RUF035
                 else escape(p)
             ).replace('\n', Markup('<br>'))
         )

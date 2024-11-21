@@ -133,7 +133,7 @@ class WinterthurDaycareSettingsForm(Form):
                     #       but we should probably consider creating
                     #       something like a DaycareSettingsProxy class
                     #       which contains all the fields as dict_property
-                    v = Markup(v)  # noqa: MS001
+                    v = Markup(v)  # noqa: RUF035
                 self[k].data = v
 
         if not self.services.data or not self.services.data.strip():
@@ -218,7 +218,7 @@ class WinterthurMissionReportSettingsForm(Form):
         #       but we should probably consider creating
         #       something like a MissionReportSettingsProxy class
         #       which contains all the fields as dict_property
-        self.legend.data = Markup(  # noqa: MS001
+        self.legend.data = Markup(  # noqa: RUF035
             d.get('legend', DEFAULT_LEGEND))
 
 
