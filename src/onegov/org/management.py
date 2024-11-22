@@ -1,12 +1,11 @@
 import re
 import time
 from collections import defaultdict
-
 import transaction
 from aiohttp import ClientTimeout
 from sqlalchemy.orm import object_session
 from urlextract import URLExtract
-
+from sqlalchemy import text, bindparam, String
 from onegov.async_http.fetch import async_aiohttp_get_all
 from onegov.core.utils import normalize_for_url
 from onegov.org.models import SiteCollection
@@ -15,7 +14,8 @@ from onegov.people import AgencyCollection
 
 from typing import Literal, NamedTuple, TYPE_CHECKING
 if TYPE_CHECKING:
-    from collections.abc import Iterable, Iterator, Sequence
+    from collections.abc import Iterator
+    from collections.abc import Iterable, Sequence
     from onegov.form import Form
     from onegov.org.request import OrgRequest
     from onegov.page import Page
@@ -57,7 +57,7 @@ class LinkMigration(ModelsWithLinksMixin):
     def migrate_url(
         self,
         item: object,
-        fields: 'Iterable[str]',
+        fields_with_urls: 'Iterable[str]',
         test: bool = False,
         group_by: str | None = None,
         count_obj: dict[str, dict[str, int]] | None = None
@@ -83,7 +83,7 @@ class LinkMigration(ModelsWithLinksMixin):
         else:
             pattern = re.compile(re.escape(old_uri))
 
-        for field in fields:
+        for field in fields_with_urls:
             value = getattr(item, field, None)
             if not value:
                 continue
@@ -104,6 +104,17 @@ class LinkMigration(ModelsWithLinksMixin):
                     )
         return count, count_by_id
 
+    def migrate(
+        self,
+        test: bool = False
+    ) -> tuple[int, dict[str, dict[str, int]]]:
+        total, grouped = self.migrate_site_collection(test=test)
+
+        if not test:
+            self.migrate_content_mixin()
+
+        return total, grouped
+
     def migrate_site_collection(
         self,
         test: bool = False
@@ -122,6 +133,64 @@ class LinkMigration(ModelsWithLinksMixin):
                 grouped = grouped_count
                 total += count
         return total, grouped
+
+    def migrate_content_mixin(self) -> None:
+        """ A catch-all function to migrate content not covered by
+        migrate_site_collection.
+
+        This function was added to handle links that were not processed by the
+        migrate_site_collection function.
+
+
+        Generates SQL of the following form:
+
+        update pages set content = replace(content::text, 'old', 'new')::jsonb;
+        update forms set meta = replace(meta::text, 'old', 'new')::jsonb;
+
+        """
+
+        def replace_json(col: str) -> str:
+            return f'{col} = replace({col}::text, :old_uri, :new_uri)::jsonb'
+
+        def replace_text(col: str) -> str:
+            return f'{col} = replace({col}, :old_uri, :new_uri)'
+
+        updates = [
+            ('pages', ['meta', 'content']),
+            ('forms', ['meta', 'content']),
+            ('events', ['meta', 'content']),
+            ('resources', ['meta', 'content']),
+            ('people', ['meta', 'content', 'picture_url']),
+            ('organisations', ['meta', 'logo_url']),
+            ('directories', ['content']),
+            ('tickets', ['snapshot']),
+            ('external_links', ['url']),
+        ]
+
+        for table, columns in updates:
+            sql_parts = []
+            for col in columns:
+                if col in {'meta', 'content', 'snapshot'}:
+                    sql_parts.append(replace_json(col))
+                else:
+                    sql_parts.append(replace_text(col))
+
+            sql = text(
+                f"UPDATE {table} SET {', '.join(sql_parts)}"  # nosec:B608
+            ).bindparams(
+                bindparam('old_uri', type_=String),
+                bindparam('new_uri', type_=String)
+            )
+
+            self.request.session.execute(
+                sql,
+                {
+                    'old_uri': self.old_uri,
+                    'new_uri': self.new_uri
+                }
+            )
+
+        transaction.commit()
 
 
 class PageNameChange(ModelsWithLinksMixin):
@@ -176,7 +245,7 @@ class PageNameChange(ModelsWithLinksMixin):
             count = 0
             for before, after in zip(urls_before, urls_after):
                 migration = LinkMigration(self.request, before, after)
-                total, _grouped = migration.migrate_site_collection(test=test)
+                total, _ = migration.migrate(test=test)
                 count += total
             return count
 

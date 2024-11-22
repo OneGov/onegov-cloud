@@ -358,7 +358,7 @@ def handle_migrate_links(
             old_uri=form.old_domain.data,
             new_uri=request.domain
         )
-        total, _grouped = migration.migrate_site_collection(test_only)
+        total, __ = migration.migrate(test_only)
 
         if not test_only:
             request.success(
@@ -376,7 +376,8 @@ def handle_migrate_links(
         'button_text': button_text,
         'callout': _(
             'Migrates links from the given domain to the current domain '
-            '"${domain}".',
+            '"${domain}". The form must be used *after* the DNS changeover '
+            'to "${domain}".',
             mapping={'domain': domain}
         ),
     }
