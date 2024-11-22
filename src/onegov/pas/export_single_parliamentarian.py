@@ -4,6 +4,7 @@ from typing import cast
 from onegov.pas.collections import (
     AttendenceCollection,
 )
+from onegov.pas.custom import get_current_rate_set
 from onegov.pas.models import (
     SettlementRun,
     RateSet,
@@ -15,6 +16,8 @@ from weasyprint.text.fonts import (  # type: ignore[import-untyped]
 )
 from onegov.pas.models.attendence import TYPES, Attendence
 from onegov.pas.models import Parliamentarian
+from datetime import date  # noqa: TC003
+from typing import Literal, TypedDict
 
 
 @dataclass
@@ -27,19 +30,20 @@ class ParliamentarianEntry:
     attendance_type: 'AttendenceType'
 
 
-from typing import TYPE_CHECKING, Any, Literal, TypedDict
-if TYPE_CHECKING:
-    from onegov.town6.request import TownRequest
-    from datetime import date
-
-
 AttendenceType = Literal['plenary', 'commission', 'study', 'shortest']
+
 
 class TypeTotal(TypedDict):
     entries: list[ParliamentarianEntry]
     total: Decimal
 
+
 TotalType = Literal['plenary', 'commission', 'study', 'shortest', 'expenses']
+
+
+from typing import TYPE_CHECKING
+if TYPE_CHECKING:
+    from onegov.town6.request import TownRequest
 
 
 def generate_parliamentarian_settlement_pdf(
@@ -175,11 +179,12 @@ def generate_parliamentarian_settlement_pdf(
     """
 
     type_totals: dict[TotalType, TypeTotal] = {
-        cast(TotalType, 'plenary'): {'entries': [], 'total': Decimal('0')},
-        cast(TotalType, 'commission'): {'entries': [], 'total': Decimal('0')},
-        cast(TotalType, 'study'): {'entries': [], 'total': Decimal('0')},
-        cast(TotalType, 'shortest'): {'entries': [], 'total': Decimal('0')},
-        cast(TotalType, 'expenses'): {'entries': [], 'total': Decimal('0')},
+        cast('TotalType', 'plenary'): {'entries': [], 'total': Decimal('0')},
+        cast('TotalType', 'commission'): {'entries': [],
+                                          'total': Decimal('0')},
+        cast('TotalType', 'study'): {'entries': [], 'total': Decimal('0')},
+        cast('TotalType', 'shortest'): {'entries': [], 'total': Decimal('0')},
+        cast('TotalType', 'expenses'): {'entries': [], 'total': Decimal('0')},
     }
 
     for entry in data['entries']:
@@ -204,13 +209,19 @@ def generate_parliamentarian_settlement_pdf(
     """
 
     total = Decimal('0')
-    for type_name, type_key in [
-        ('Total aller Plenarsitzungen inkl. Teuerungszulage', cast(TotalType, 'plenary')),
-        ('Total aller Kommissionssitzungen inkl. Teuerungszulage', cast(TotalType, 'commission')),
-        ('Total aller Aktenstudium inkl. Teuerungszulage', cast(TotalType, 'study')),
-        ('Total aller Kürzestsitzungen inkl. Teuerungszulage', cast(TotalType, 'shortest')),
-        ('Total Spesen inkl. Teuerungszulage', cast(TotalType, 'expenses')),
-    ]:
+    type_mappings = [
+        ('Total aller Plenarsitzungen inkl. Teuerungszulage',
+         cast('TotalType', 'plenary')),
+        ('Total aller Kommissionssitzungen inkl. Teuerungszulage',
+         cast('TotalType', 'commission')),
+        ('Total aller Aktenstudium inkl. Teuerungszulage',
+         cast('TotalType', 'study')),
+        ('Total aller Kürzestsitzungen inkl. Teuerungszulage',
+         cast('TotalType', 'shortest')),
+        ('Total Spesen inkl. Teuerungszulage',
+         cast('TotalType', 'expenses')),
+    ]
+    for type_name, type_key in type_mappings:
         total_value = sum(
             entry.calculated_value
             for entry in type_totals[type_key]['entries']
@@ -252,13 +263,7 @@ def get_parliamentarian_settlement_data(
     """Get settlement data for a specific parliamentarian."""
     # todo: Here we'll have to add 'Spense' in the future
     session = request.session
-    rate_set = (
-        session.query(RateSet)
-        .filter(RateSet.year == settlement_run.start.year)
-        .first()
-    )
-    if not rate_set:
-        return {'entries': []}
+    rate_set = get_current_rate_set(session, settlement_run)
 
     attendences = (
         AttendenceCollection(
@@ -295,7 +300,7 @@ def get_parliamentarian_settlement_data(
         entry = ParliamentarianEntry(
             date=attendence.date,
             type_description=type_desc,
-            calculated_value=Decimal(str(attendence.calculate_value())),  # Convert to Decimal
+            calculated_value=Decimal(str(attendence.calculate_value())),
             additional_value=Decimal('0'),
             base_rate=Decimal(str(base_rate)),
             attendance_type=attendence.type,

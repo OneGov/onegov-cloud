@@ -5,8 +5,7 @@ from onegov.pas import _
 from onegov.pas.collections import AttendenceCollection
 from onegov.pas.collections import ChangeCollection
 from onegov.user import Auth
-from onegov.pas.models import SettlementRun
-
+from onegov.pas.models import SettlementRun, RateSet
 
 from typing import TYPE_CHECKING
 if TYPE_CHECKING:
@@ -71,3 +70,13 @@ def get_current_settlement_run(session: 'Session') -> SettlementRun:
     query = session.query(SettlementRun)
     query = query.filter(SettlementRun.active == True)
     return query.one()
+
+
+def get_current_rate_set(session: 'Session', run: SettlementRun) -> RateSet:
+    # this works because we are only allowing to create one rate set per year
+    rat_set = (
+        session.query(RateSet).filter(RateSet.year == run.start.year).first()
+    )
+    if rat_set is None:
+        raise ValueError('No rate set found for the current year')
+    return rat_set

@@ -5,6 +5,7 @@ from onegov.pas import PasApp
 from onegov.pas.calculate_pay import calculate_rate
 from onegov.pas.collections import SettlementRunCollection,\
     AttendenceCollection, CommissionCollection
+from onegov.pas.custom import get_current_rate_set
 from onegov.pas.export_single_parliamentarian import\
     generate_parliamentarian_settlement_pdf
 from onegov.pas.forms import SettlementRunForm
@@ -328,16 +329,7 @@ def _get_party_totals(
 ) -> list[tuple[str, Decimal, Decimal, Decimal, Decimal, Decimal]]:
     """Get totals grouped by party."""
     session = request.session
-
-    # Get rate set for the year
-    rate_set = (
-        session.query(RateSet)
-        .filter(RateSet.year == self.start.year)
-        .first()
-    )
-
-    if not rate_set:
-        return []
+    rate_set = get_current_rate_set(session, self)
 
     # Get all attendences in period
     attendences = AttendenceCollection(
@@ -474,11 +466,7 @@ def _get_commission_settlement_data(
 ) -> list['SettlementDataRow']:
     """Get settlement data for a specific commission."""
     session = request.session
-    rate_set = (
-        session.query(RateSet)
-        .filter(RateSet.year == settlement_run.start.year)
-        .first()
-    )
+    rate_set = get_current_rate_set(request.session, settlement_run)
 
     if not rate_set:
         return []
@@ -490,7 +478,6 @@ def _get_commission_settlement_data(
     ).query().filter(
         Attendence.commission_id == commission.id
     )
-
     cola_multiplier = Decimal(
         str(1 + (rate_set.cost_of_living_adjustment / 100))
     )
@@ -621,12 +608,7 @@ def _get_settlement_data(
 ) -> list['SettlementDataRow']:
 
     session = request.session
-    # Get rate set for the year
-    rate_set = (
-        session.query(RateSet)
-        .filter(RateSet.year == self.start.year)
-        .first()
-    )
+    rate_set = get_current_rate_set(session, self)
 
     if not rate_set:
         return []
@@ -709,12 +691,7 @@ def _get_commission_totals(
 ) -> list['TotalRow']:
     """Get totals for a specific commission grouped by party."""
     session = request.session
-
-    rate_set = (
-        session.query(RateSet)
-        .filter(RateSet.year == settlement_run.start.year)
-        .first()
-    )
+    rate_set = get_current_rate_set(session, settlement_run)
 
     if not rate_set:
         return []
@@ -818,15 +795,9 @@ def _get_party_settlement_data(
     party: Party
 ) -> list['SettlementDataRow']:
     """Get settlement data for a specific party."""
-    session = request.session
-    rate_set = (
-        session.query(RateSet)
-        .filter(RateSet.year == settlement_run.start.year)
-        .first()
-    )
 
-    if not rate_set:
-        return []
+    session = request.session
+    rate_set = get_current_rate_set(session, settlement_run)
 
     # Get all attendences in period
     attendences = AttendenceCollection(
@@ -889,14 +860,7 @@ def _get_party_specific_totals(
 ) -> list['TotalRow']:
     """Get totals for a specific party."""
     session = request.session
-    rate_set = (
-        session.query(RateSet)
-        .filter(RateSet.year == settlement_run.start.year)
-        .first()
-    )
-
-    if not rate_set:
-        return []
+    rate_set = get_current_rate_set(session, settlement_run)
 
     cola_multiplier = Decimal(
         str(1 + (rate_set.cost_of_living_adjustment / 100))
@@ -1034,7 +998,9 @@ def view_settlement_run_export(
     self: SettlementRunExport,
     request: 'TownRequest'
 ) -> Response:
-    """Generate export data for a specific entity in a settlement run."""
+    """Generate export data for a specific entity (commission, party or
+    parliamentarian) in a settlement run."""
+
     if self.category == 'party':
         if not isinstance(self.entity, Party):
             raise TypeError('Entity must be a Party for party settlements')

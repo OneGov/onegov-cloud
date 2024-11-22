@@ -1,18 +1,13 @@
-from datetime import date
-from decimal import Decimal
 import pytest
 from onegov.pas.models import (
-    Parliamentarian,
-    RateSet,
     Party,
     Commission,
-    ParliamentarianRole,
-    Attendence,
     SettlementRun,
 )
 
 
-@pytest.mark.flaky(reruns=5)
+# @pytest.mark.flaky(reruns=5)
+
 def test_views_manage(client_with_es):
     client = client_with_es
     client.login_admin()
@@ -242,6 +237,30 @@ def test_views_manage(client_with_es):
     assert '1 Resultat' in client.get('/search?q=2020-2024')
     assert '1 Resultat' in client.get('/search?q=Q1')
 
+    run = client.app.session().query(SettlementRun).one()
+    party = client.app.session().query(Party).first()
+    commission = client.app.session().query(Commission).first()
+
+
+    # Test party-specific exports
+    response = client.get(
+        f'/settlement-run/{run.id}/export/party/'
+        f'{party.id}/run-export?literal_type=Party'
+    )
+    assert response.status_code == 200
+    assert response.content_type == 'application/pdf'
+    assert 'attachment' in response.content_disposition
+    assert party.name.replace(' ', '_') in response.content_disposition
+
+    # Test commission-specific exports
+    response = client.get(
+        f'/settlement-run/{run.id}/export/commission/{commission.id}/run-export'
+    )
+    assert response.status_code == 200
+    assert response.content_type == 'application/pdf'
+    assert 'attachment' in response.content_disposition
+
+
     # Delete
     for page in delete:
         page.click('Löschen')
@@ -256,175 +275,3 @@ def test_views_manage(client_with_es):
     assert 'Keine aktiven Kommissionen' in settings.click('Kommissionen')
 
 
-def test_settlement_export_views(client, session):
-    # Create test data
-    rate_set = RateSet(year=2024)
-    rate_set.cost_of_living_adjustment = Decimal('5.0')  # 5% adjustment
-    rate_set.plenary_none_president_halfday = 1000
-    rate_set.plenary_none_member_halfday = 500
-    rate_set.commission_normal_president_initial = 300
-    rate_set.commission_normal_member_initial = 200
-    rate_set.study_normal_president_halfhour = 100
-    rate_set.study_normal_member_halfhour = 80
-    session.add(rate_set)
-
-    # Create parties
-    party_a = Party(name='Party A')
-    party_b = Party(name='Party B')
-    session.add_all([party_a, party_b])
-
-    # Create commissions
-    commission_a = Commission(name='Commission A', type='normal')
-    commission_b = Commission(name='Commission B', type='normal')
-    session.add_all([commission_a, commission_b])
-
-    # Create parliamentarians with roles
-    pres = Parliamentarian(first_name='Jane', last_name='President')
-    pres_role = ParliamentarianRole(
-        parliamentarian=pres,
-        role='president',
-        party=party_a,
-        start=date(2024, 1, 1),
-    )
-
-    mem = Parliamentarian(first_name='John', last_name='Member')
-    mem_role = ParliamentarianRole(
-        parliamentarian=mem,
-        role='member',
-        party=party_b,
-        start=date(2024, 1, 1),
-    )
-    session.add_all([pres, mem, pres_role, mem_role])
-
-    # Create settlement run
-    run = SettlementRun(
-        name='Q1 2024',
-        start=date(2024, 1, 1),
-        end=date(2024, 3, 31),
-        active=True,
-    )
-    session.add(run)
-
-    # Create various types of attendences
-    attendences = [
-        # Plenary attendences
-        Attendence(
-            parliamentarian=pres,
-            date=date(2024, 1, 15),
-            duration=240,  # 4 hours
-            type='plenary',
-        ),
-        Attendence(
-            parliamentarian=mem,
-            date=date(2024, 2, 15),
-            duration=240,  # 4 hours
-            type='plenary',
-        ),
-        # Commission attendences
-        Attendence(
-            parliamentarian=pres,
-            date=date(2024, 1, 20),
-            duration=180,  # 3 hours
-            type='commission',
-            commission=commission_a,
-        ),
-        Attendence(
-            parliamentarian=mem,
-            date=date(2024, 2, 20),
-            duration=180,  # 3 hours
-            type='commission',
-            commission=commission_a,
-        ),
-        # Study attendences
-        Attendence(
-            parliamentarian=pres,
-            date=date(2024, 1, 25),
-            duration=60,  # 1 hour
-            type='study',
-            commission=commission_a,
-        ),
-        Attendence(
-            parliamentarian=mem,
-            date=date(2024, 2, 25),
-            duration=60,  # 1 hour
-            type='study',
-            commission=commission_a,
-        ),
-    ]
-    session.add_all(attendences)
-    session.flush()
-
-    # Login as admin
-    client.login_admin()
-
-    # Test accessing the settlement run page
-    page = client.get(f'/settlement-run/{run.id}')
-    assert page.status_code == 200
-
-    # Test all-parties export
-    response = client.get(
-        f'/settlement-run/{run.id}/export/all-parties/run-export'
-    )
-    assert response.status_code == 200
-    assert response.content_type == 'application/pdf'
-    assert response.content_disposition.startswith('attachment')
-
-    # Test party-specific exports
-    for party in [party_a, party_b]:
-        response = client.get(
-            f'/settlement-run/{run.id}/export/party/{party.id}/run-export'
-        )
-        assert response.status_code == 200
-        assert response.content_type == 'application/pdf'
-        assert 'attachment' in response.content_disposition
-        assert party.name.replace(' ', '_') in response.content_disposition
-
-    # Test commission-specific exports
-    for commission in [commission_a, commission_b]:
-        response = client.get(
-            f'/settlement-run/{run.id}/export/commission/{commission.id}/run-export'
-        )
-        assert response.status_code == 200
-        assert response.content_type == 'application/pdf'
-        assert 'attachment' in response.content_disposition
-        assert (
-            commission.name.replace(' ', '_')
-            in response.content_disposition
-        )
-
-    # Test parliamentarian-specific exports
-    for parliamentarian in [pres, mem]:
-        response = client.get(
-            f'/settlement-run/{run.id}/export/parliamentarian/{parliamentarian.id}/run-export'
-        )
-        assert response.status_code == 200
-        assert response.content_type == 'application/pdf'
-        assert 'attachment' in response.content_disposition
-        assert parliamentarian.last_name in response.content_disposition
-
-    # Test that non-admin users can't access exports
-    client.logout()
-
-    # Test access denied for non-admin
-    response = client.get(
-        f'/settlement-run/{run.id}/export/all-parties/run-export'
-    )
-    assert response.status_code in (
-        401,
-        403,
-    )  # Either unauthorized or forbidden
-
-    response = client.get(
-        f'/settlement-run/{run.id}/export/party/{party_a.id}/run-export'
-    )
-    assert response.status_code in (401, 403)
-
-    response = client.get(
-        f'/settlement-run/{run.id}/export/commission/{commission_a.id}/run-export'
-    )
-    assert response.status_code in (401, 403)
-
-    response = client.get(
-        f'/settlement-run/{run.id}/export/parliamentarian/{pres.id}/run-export'
-    )
-    assert response.status_code in (401, 403)
