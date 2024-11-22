@@ -1,4 +1,6 @@
 from libres.db.models import Allocation
+from sqlalchemy.ext.hybrid import hybrid_property
+
 from onegov.core.orm import ModelBase
 from onegov.reservation.models.resource import Resource
 from sqlalchemy.orm import object_session
@@ -12,6 +14,6 @@ class CustomAllocation(Allocation, ModelBase):
         return object_session(self).query(
             Resource).filter_by(id=self.resource).one()
 
-    @property
+    @hybrid_property
     def access(self) -> str:
         return (self.data or {}).get('access', 'public')

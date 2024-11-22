@@ -3,6 +3,9 @@ import pytest
 import transaction
 
 from datetime import datetime
+
+from sqlalchemy.ext.hybrid import hybrid_property
+
 from onegov.people import Person, PersonCollection
 from onegov.search import Searchable, SearchOfflineError, utils
 from onegov.search.indexer import parse_index_name, PostgresIndexer
@@ -332,7 +335,7 @@ def test_orm_event_translator_properties():
         def es_language(self):
             return self.language
 
-        @property
+        @hybrid_property
         def es_public(self):
             return self.public
 

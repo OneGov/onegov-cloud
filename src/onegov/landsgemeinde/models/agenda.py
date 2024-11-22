@@ -1,3 +1,5 @@
+from sqlalchemy.ext.hybrid import hybrid_property
+
 from onegov.core.orm import Base
 from onegov.core.orm.mixins import content_property
 from onegov.core.orm.mixins import dict_markup_property
@@ -49,7 +51,10 @@ class AgendaItem(
 
     __tablename__ = 'landsgemeinde_agenda_items'
 
-    es_public = True
+    @hybrid_property
+    def es_public(self) -> bool:
+        return True
+
     es_properties = {
         'title': {'type': 'text'},
         'overview': {'type': 'localized_html'},

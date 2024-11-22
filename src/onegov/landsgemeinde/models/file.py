@@ -1,3 +1,5 @@
+from sqlalchemy.ext.hybrid import hybrid_property
+
 from onegov.file.models.file import File
 from onegov.file.models.file import SearchableFile
 
@@ -9,6 +11,6 @@ class LandsgemeindeFile(File, SearchableFile):
 
     es_type_name = 'landsgemeinde_file'
 
-    @property
+    @hybrid_property
     def es_public(self) -> bool:
         return True

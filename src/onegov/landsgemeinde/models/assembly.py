@@ -1,3 +1,5 @@
+from sqlalchemy.ext.hybrid import hybrid_property
+
 from onegov.core.orm import Base
 from onegov.core.orm.mixins import dict_markup_property
 from onegov.core.orm.mixins import ContentMixin
@@ -46,10 +48,13 @@ class Assembly(
 
     __tablename__ = 'landsgemeinde_assemblies'
 
-    es_public = True
     es_properties = {
         'overview': {'type': 'localized_html'},
     }
+
+    @hybrid_property
+    def es_public(self) -> bool:
+        return True
 
     @property
     def es_suggestion(self) -> tuple[str, ...]:

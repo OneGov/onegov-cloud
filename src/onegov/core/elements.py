@@ -13,6 +13,7 @@ templates directly is faster.
 This module should eventually replace the elements.py module.
 
 """
+from sqlalchemy.ext.hybrid import hybrid_property
 
 from onegov.core.templates import render_macro
 
@@ -137,7 +138,7 @@ class AccessMixin:
 
     __slots__ = ()
 
-    @property
+    @hybrid_property
     def access(self) -> str:
         """ Wraps model.access, ensuring it is always available, even if the
         model does not use it.

@@ -1,15 +1,18 @@
+from sqlalchemy import case, select
+from sqlalchemy.ext.hybrid import hybrid_property
+
 from onegov.core.orm.mixins import dict_property
 from onegov.core.orm.mixins import meta_property
 from onegov.org.models.extensions import AccessExtension
 from onegov.org.models.extensions import PublicationExtension
 from onegov.people import AgencyMembership
 
-
 from typing import TYPE_CHECKING
 if TYPE_CHECKING:
     from onegov.agency.models import ExtendedAgency
     from onegov.agency.models import ExtendedPerson
     from sqlalchemy.orm import relationship
+    from sqlalchemy.sql import ClauseElement
 
 
 class ExtendedAgencyMembership(AgencyMembership, AccessExtension,
@@ -20,8 +23,8 @@ class ExtendedAgencyMembership(AgencyMembership, AccessExtension,
 
     es_type_name = 'extended_membership'
 
-    @property
-    def es_public(self) -> bool:  # type:ignore[override]
+    @hybrid_property
+    def es_public(self) -> bool:
         if self.agency:
             if self.agency.meta.get('access', 'public') != 'public':
                 return False
@@ -35,6 +38,36 @@ class ExtendedAgencyMembership(AgencyMembership, AccessExtension,
                 return False
 
         return self.access == 'public'
+
+    @es_public.expression  # type:ignore[no-redef]
+    def es_public(cls) -> 'ClauseElement':
+        from onegov.agency.models import ExtendedAgency, ExtendedPerson
+
+        person_meta = select([ExtendedPerson.meta]).where(
+            ExtendedPerson.id == cls.person_id
+        ).as_scalar()
+
+        person_published = select([ExtendedPerson.published]).where(
+            ExtendedPerson.id == cls.person_id
+        ).as_scalar()
+
+        agency_meta = select([ExtendedAgency.meta]).where(
+            ExtendedAgency.id == cls.agency_id
+        ).as_scalar()
+
+        agency_published = select([ExtendedAgency.published]).where(
+            ExtendedAgency.id == cls.agency_id
+        ).as_scalar()
+
+        return case(
+            [
+                (person_meta['access'] != 'public', False),
+                (person_published != True, False),
+                (agency_meta['access'] != 'public', False),
+                (agency_published != True, False),
+            ],
+            else_=cls.meta['access'] == 'public'
+        )
 
     # Todo: It is very unclear how this should be used. In the PDF rendering,
     # it is placed a middle column with 0.5 cm after the title.

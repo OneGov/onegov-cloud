@@ -1,3 +1,5 @@
+from sqlalchemy.ext.hybrid import hybrid_property
+
 from onegov.core.orm import Base
 from onegov.core.orm.mixins import TimestampMixin
 from onegov.core.orm.types import JSON, UUID
@@ -8,7 +10,7 @@ from onegov.ticket.errors import InvalidStateChange
 from onegov.user import User
 from onegov.user import UserGroup
 from sedate import utcnow
-from sqlalchemy import Boolean, Column, Enum, ForeignKey, Integer, Text
+from sqlalchemy import Boolean, Column, Enum, ForeignKey, Integer, Text, text
 from sqlalchemy.ext.declarative import declared_attr
 from sqlalchemy.orm import backref, deferred, relationship
 from uuid import uuid4
@@ -141,7 +143,11 @@ class Ticket(Base, TimestampMixin, ORMSearchable):
     }
 
     # limit the search to the ticket number -> the rest can be found
-    es_public = False
+
+    @hybrid_property
+    def es_public(self) -> bool:
+        return False
+
     es_properties = {
         'number': {'type': 'text'},
         'title': {'type': 'text'},
@@ -152,13 +158,17 @@ class Ticket(Base, TimestampMixin, ORMSearchable):
         'extra_localized_text': {'type': 'localized'}
     }
 
-    @property
-    def extra_localized_text(self) -> str | None:
+    @hybrid_property
+    def extra_localized_text(self) -> str:
         """ Maybe used by child-classes to return localized extra data that
         should be indexed as well.
 
         """
-        return None
+        return ''
+
+    @extra_localized_text.expression  # type:ignore[no-redef]
+    def extra_localized_text(cls) -> str:
+        return text('')
 
     @property
     def es_suggestion(self) -> list[str]:
@@ -167,14 +177,14 @@ class Ticket(Base, TimestampMixin, ORMSearchable):
             self.number.replace('-', '')
         ]
 
-    @property
+    @hybrid_property
     def ticket_email(self) -> str | None:
         if self.handler.deleted:
             return self.snapshot.get('email')
         else:
             return self.handler.email
 
-    @property
+    @hybrid_property
     def ticket_data(self) -> 'Sequence[str] | None':
         if self.handler.deleted:
             return self.snapshot.get('summary')
