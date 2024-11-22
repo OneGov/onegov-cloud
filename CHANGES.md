@@ -1,8 +1,62 @@
 # Changes
 
+## 2024.53
+
+`2024-11-22` | [1ca7a1ced0...feafd8879d](https://github.com/OneGov/onegov-cloud/compare/1ca7a1ced0^...feafd8879d)
+
+### Agency
+
+##### Adds import command for staka lu
+
+`Feature` | [OGC-1891](https://linear.app/onegovcloud/issue/OGC-1891) | [1e8ddc14bb](https://github.com/onegov/onegov-cloud/commit/1e8ddc14bbd10cbe53a4e5dad2b9fec0d30dfbb6)
+
+##### Import Staka Luzern: Filter email addresses, log errors while importing
+
+`Feature` | [OGC-1891](https://linear.app/onegovcloud/issue/OGC-1891) | [b20dfa40b3](https://github.com/onegov/onegov-cloud/commit/b20dfa40b3aa999b346b5960fb00100bae6ccff4)
+
+##### Ensure a failing pdf file access does not crash application
+
+`Bugfix` | [OGC-1906](https://linear.app/onegovcloud/issue/OGC-1906) | [c85c47ea7e](https://github.com/onegov/onegov-cloud/commit/c85c47ea7ecda50b85c4a26cd24377a7f1c637bc)
+
+### File
+
+##### Should Ghostscript go astray, our fallback saves the day.
+
+`Bugfix` | [OGC-1911](https://linear.app/onegovcloud/issue/OGC-1911) | [6859effbbb](https://github.com/onegov/onegov-cloud/commit/6859effbbbe47dd9dce642644817311a915fadf8)
+
+### Files
+
+##### Fix ajax request removing to many elements for action delete
+
+`Bugfix` | [OGC-1851](https://linear.app/onegovcloud/issue/OGC-1851) | [6b23b2e7a0](https://github.com/onegov/onegov-cloud/commit/6b23b2e7a03b4bcfe1158cf40f897788c29c4a9c)
+
+### Fsi
+
+##### Condition for mail reminders
+
+`Bugfix` | [OGC-1898](https://linear.app/onegovcloud/issue/OGC-1898) | [feafd8879d](https://github.com/onegov/onegov-cloud/commit/feafd8879d0eede6178cce40bc50c78ed8f4850e)
+
+### Landsgemeinde
+
+##### Footer Text
+
+`Feature` | [24b85f82ed](https://github.com/onegov/onegov-cloud/commit/24b85f82ed196099dab2ceca27c8786b2e6c3dd9)
+
+### Winterthur
+
+##### Adds json and csv view to mission reports
+
+`/mission-reports/json` resp. `/mission-reports/csv`
+
+`Feature` | [OGC-1907](https://linear.app/onegovcloud/issue/OGC-1907) | [c55eb564a8](https://github.com/onegov/onegov-cloud/commit/c55eb564a849acb40927f1f02a7d8ab961dcacfc)
+
+##### Adds open data description for mission reports
+
+`Feature` | [OGC-1908](https://linear.app/onegovcloud/issue/OGC-1908) | [04d072f339](https://github.com/onegov/onegov-cloud/commit/04d072f339a572ae4bda06c65bb47e7090802407)
+
 ## 2024.52
 
-`2024-11-07` | [057ee170cf...612b2af593](https://github.com/OneGov/onegov-cloud/compare/057ee170cf^...612b2af593)
+`2024-11-07` | [057ee170cf...b896c374ce](https://github.com/OneGov/onegov-cloud/compare/057ee170cf^...b896c374ce)
 
 ### Core
 
@@ -2222,36 +2276,4 @@ Cleaning up CSS and HTML Templates, removing unused code.
 ##### Increases logging for roadworks PDB curl request.
 
 `Bugfix` | [OGC-1370](https://linear.app/onegovcloud/issue/OGC-1370) | [82800c6d50](https://github.com/onegov/onegov-cloud/commit/82800c6d501ca9542a49f64d20585542f6a60897)
-
-## 2024.3
-
-`2024-01-16` | [67940f955e...9ed1e1a708](https://github.com/OneGov/onegov-cloud/compare/67940f955e^...9ed1e1a708)
-
-### Org
-
-##### Sorts rendered `UploadMultipleField` in template macros
-
-Previous solution caused labels and links to go out of sync
-
-`Bugfix` | [OGC-1410](https://linear.app/onegovcloud/issue/OGC-1410) | [4490106343](https://github.com/onegov/onegov-cloud/commit/4490106343bd57daf1f530699ff19c0e1963dbf1)
-
-### Topics
-
-##### Prevents topics can be moved under a news page
-
-`Bugfix` | [OGC-1282](https://linear.app/onegovcloud/issue/OGC-1282) | [67940f955e](https://github.com/onegov/onegov-cloud/commit/67940f955e98c2c2290ea9bdebe8d536f42fe644)
-
-### Town 6
-
-##### People Display
-
-Use two columns to display people and don't display icons if person has no image.
-
-`Feature` | [OGC-1353](https://linear.app/onegovcloud/issue/OGC-1353) | [afac081def](https://github.com/onegov/onegov-cloud/commit/afac081def7c83cb130e868e9eb1e6658415d3c2)
-
-### Town6
-
-##### Fix missing `MTANAuth` view
-
-`Bugfix` | [OGC-1401](https://linear.app/onegovcloud/issue/OGC-1401) | [3c51955881](https://github.com/onegov/onegov-cloud/commit/3c5195588146cf47616d549d7089b2a7b63500c9)
 
