@@ -819,7 +819,7 @@
 </metal:page_content>
 
 <metal:page_content define-macro="page_content" i18n:domain="onegov.town6">
-    <div class="grid-x grid-padding-x wrapper" tal:define="show_side_panel show_side_panel|False; location location|False; show_page_image page.show_page_image|None; files files|None; sidepanel_links sidepanel_links|None; news page.type == 'news'|False;">
+    <div class="grid-x grid-padding-x wrapper" tal:define="show_side_panel show_side_panel|False; location location|False; show_page_image page.show_page_image|None; files files|None; sidepanel_links sidepanel_links|None; news page.type == 'news'|False; imageset page.photo_album|None; ">
         <tal:b condition="not: people or files or contact or coordinates or location or show_side_panel or more_entries|False">
             <div class="small-12 cell page-content-main">
                 <img class="page-image" tal:condition="news or show_page_image and layout.org.theme_options.get('page-image-position', 'as_content') ==  'as_content' and page.page_image" src="${page.page_image}">
@@ -830,7 +830,10 @@
                 <div metal:define-slot="after-lead"></div>
 
                 <div class="page-text" tal:condition="text" tal:content="text" />
+                <metal:b tal:condition="imageset" use-macro="layout.macros['render_inline_photo_album']"
+                         tal:define="imageset imageset" />
                 <div metal:define-slot="after-text"></div>
+
             </div>
         </tal:b>
         <tal:b condition="people or files or contact or coordinates or show_side_panel or more_entries|False">
@@ -843,7 +846,11 @@
                     <div metal:define-slot="after-lead"></div>
 
                     <div class="page-text" tal:condition="text" tal:content="text" />
+                    <metal:b tal:condition="imageset" use-macro="layout.macros['render_inline_photo_album']"
+                             tal:define="imageset imageset" />
+
                     <div metal:define-slot="after-text"></div>
+
 
                     <div class="people-panel" tal:condition="people and show_people_on_main_page" tal:define="show_people_on_main_page page.show_people_on_main_page|resource.show_people_on_main_page|False; western_name_order page.western_name_order|resource.western_name_order|False">
                         <h3 i18n:translate>People</h3>
@@ -2971,3 +2978,23 @@
         </div>
     </div>
 </metal:display_results>
+
+<metal:b define-macro="render_inline_photo_album">
+    <tal:b tal:condition="imageset and imageset.files">
+        <!--! Inline imagesets are always renderd as grid -->
+        <div class="page-text grid-imageset photoswipe">
+            <div class="image-grid">
+                <div tal:repeat="image imageset.files" class="image-container">
+                    <tal:b define="width image.reference.thumbnail_small.size[0]|image.reference.size[0]; height image.reference.thumbnail_small.size[1]|image.reference.size[1]">
+                        <!--! the first eight images are loaded conventionally, the rest are loaded lazily -->
+                        <img src="${request.link(image, 'thumbnail')}" alt="${image.note}" width="${width}" height="${height}" tal:condition="repeat.image.number <= 8" data-full-width="${image.reference.size[0]}" data-full-height="${image.reference.size[1]}" />
+                        <img src="${request.link(image, 'thumbnail')}" alt="${image.note}" width="${width}" height="${height}" class="lazyload" tal:condition="repeat.image.number > 8" data-full-width="${image.reference.size[0]}" data-full-height="${image.reference.size[1]}" />
+                    </tal:b>
+                </div>
+            </div>
+        </div>
+
+    <tal:b metal:use-macro="layout.macros.photoswipe" />
+
+    </tal:b>
+</metal:b>

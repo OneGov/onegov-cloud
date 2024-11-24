@@ -47,6 +47,7 @@ if TYPE_CHECKING:
     from onegov.form.types import FormT
     from onegov.org.models import GeneralFile  # noqa: F401
     from onegov.org.request import OrgRequest
+    from onegov.org.models import ImageSet
     from sqlalchemy import Column
     from sqlalchemy.orm import relationship
     from typing import type_check_only, Protocol
@@ -1124,3 +1125,41 @@ class DeletableContentExtension(ContentExtension):
             )
 
         return DeletableContentForm
+
+
+class InlinePhotoAlbumExtension(ContentExtension):
+    """ Adds ability to reference photo albums (ImageSets) and show them
+    inline at the end of the content of the page.
+
+    """
+
+    photo_album_id: dict_property[str | None] = content_property()
+
+    @property
+    def photo_album(self) -> 'ImageSet | None':
+        from onegov.org.models import ImageSetCollection
+        return ImageSetCollection(object_session(self)).by_id(
+            self.photo_album_id
+        )
+
+    def extend_form(
+        self, form_class: type['FormT'], request: 'OrgRequest'
+    ) -> type['FormT']:
+
+        from onegov.org.models import ImageSetCollection
+        albums: list['ImageSet'] = (
+            ImageSetCollection(request.session).query().all()
+        )
+
+        choices = [('', '')] + [
+            (album.id, album.title) for album in albums
+        ]
+
+        class PhotoAlbumForm(form_class):  # type:ignore
+            photo_album_id = SelectField(
+                label=_('Photo Album'),
+                choices=choices,
+                fieldset=_('Photos'),
+            )
+
+        return PhotoAlbumForm

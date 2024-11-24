@@ -145,3 +145,15 @@ def test_view_page_as_member(client):
     anon.get(page_url, status=403)
     page = anon.get('/topics/organisation')
     assert 'Test' not in page
+
+
+def test_inline_photo_album(client):
+    admin = client
+    client.login_admin()
+
+    new_page = admin.get('/topics/organisation').click('Thema')
+    new_page.form['title'] = "Test"
+    new_page.form['access'] = 'member'
+    page = new_page.form.submit().follow()
+
+    # edit_page = page.click('Bearbeiten')
