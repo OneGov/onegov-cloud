@@ -154,6 +154,5 @@ def test_inline_photo_album(client):
     new_page = admin.get('/topics/organisation').click('Thema')
     new_page.form['title'] = 'Test'
     new_page.form['access'] = 'member'
-    page = new_page.form.submit().follow()
-
-    # edit_page = page.click('Bearbeiten')
+    page = new_page.form.submit().maybe_follow()
+    edit_page = page.click('Bearbeiten')
