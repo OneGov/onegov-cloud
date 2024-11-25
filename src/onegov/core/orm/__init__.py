@@ -118,7 +118,7 @@ class TranslationMarkupHybrid(TranslationHybrid):
             #       this in the future, to guard against stored values
             #       that somehow bypassed the sanitization, but this will
             #       be expensive
-            return Markup(value)  # noqa: MS001
+            return Markup(value)  # noqa: RUF035
 
         return getter
 

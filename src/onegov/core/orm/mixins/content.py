@@ -521,7 +521,7 @@ class dict_markup_property(dict_property[_MarkupT]):  # noqa: N801
             #       However, this would also add a ton of static overhead.
             #       If we decide we want the additional safety, we should
             #       use an approach like OCQMS' lazy Sanitized text type.
-            return Markup(self.custom_getter(instance))  # noqa: MS001
+            return Markup(self.custom_getter(instance))  # noqa: RUF035
 
         # get the value in the dictionary
         data = getattr(instance, self.attribute, None)
@@ -533,7 +533,7 @@ class dict_markup_property(dict_property[_MarkupT]):  # noqa: N801
             #       However, this would also add a ton of static overhead.
             #       If we decide we want the additional safety, we should
             #       use an approach like OCQMS' lazy Sanitized text type.
-            return None if value is None else Markup(value)  # noqa: MS001
+            return None if value is None else Markup(value)  # noqa: RUF035
 
         # fallback to the default
         return self.default() if callable(self.default) else self.default

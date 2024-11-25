@@ -79,7 +79,7 @@ def view_publications(
         File.name,
         File.stats,
         File.created.op('AT TIME ZONE')(
-            literal(layout.timezone.zone)  # noqa: MS001
+            literal(layout.timezone.zone)
         ).label('created'),
     ).order_by(desc(File.created))
 
