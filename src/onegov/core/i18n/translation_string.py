@@ -73,7 +73,7 @@ class TranslationMarkup(TranslationString):
         if default is None:
             _default = None
         else:
-            _default = Markup(default)  # noqa: MS001
+            _default = Markup(default)  # noqa: RUF035
 
         # NOTE: We prepare everything in the mapping with escape
         #       because interpolate uses re.sub, which is not
@@ -85,25 +85,25 @@ class TranslationMarkup(TranslationString):
             _mapping = {k: escape(v) for k, v in mapping.items()}
 
         if not isinstance(msgid, str) and hasattr(msgid, '__html__'):
-            msgid = Markup(msgid)  # noqa: MS001
+            msgid = Markup(msgid)  # noqa: RUF035
 
         elif isinstance(msgid, TranslationString):
             domain = domain or msgid.domain and msgid.domain[:]
             context = context or msgid.context and msgid.context[:]
-            _default = _default or Markup(msgid.default)  # noqa: MS001
+            _default = _default or Markup(msgid.default)  # noqa: RUF035
             if msgid.mapping:
                 if _mapping:
                     for k, v in msgid.mapping.items():
                         _mapping.setdefault(k, escape(v))
                 else:
                     _mapping = {k: escape(v) for k, v in msgid.mapping.items()}
-            msgid = Markup(msgid)  # noqa: MS001
+            msgid = Markup(msgid)  # noqa: RUF035
 
         instance: Self = str.__new__(cls, msgid)
         instance.domain = domain
         instance.context = context
         if _default is None:
-            _default = Markup(msgid)  # noqa: MS001
+            _default = Markup(msgid)  # noqa: RUF035
         instance.default = _default
 
         instance.mapping = _mapping
@@ -116,9 +116,9 @@ class TranslationMarkup(TranslationString):
         return type(self)(super().__mod__(options))
 
     def interpolate(self, translated: str | None = None) -> Markup:
-        return Markup(  # noqa: MS001
+        return Markup(  # noqa: RUF035
             super().interpolate(
-                translated and Markup(translated)  # noqa: MS001
+                translated and Markup(translated)  # noqa: RUF035
             )
         )
 
