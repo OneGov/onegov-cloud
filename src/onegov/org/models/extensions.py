@@ -1147,7 +1147,7 @@ class InlinePhotoAlbumExtension(ContentExtension):
     ) -> type['FormT']:
 
         from onegov.org.models import ImageSetCollection
-        albums: list['ImageSet'] = (
+        albums: list[ImageSet] = (
             ImageSetCollection(request.session).query().all()
         )
 
