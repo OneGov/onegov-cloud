@@ -107,7 +107,7 @@ def parse_form(
 def normalize_label_for_dependency(label: str) -> str:
     """ Removes all between '(' and ')' Parentheses (inclusive) """
     if '(' in label and ')' in label:
-        label = re.sub('([(]).*?([)])', '', label)
+        label = re.sub(r'([(]).*?([)])', '', label)
         return label[:-1] if label[-1] == ' ' else label
     else:
         return label
