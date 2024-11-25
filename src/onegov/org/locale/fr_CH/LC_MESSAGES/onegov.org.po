@@ -2,7 +2,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE 1.0\n"
-"POT-Creation-Date: 2024-09-30 10:16+0200\n"
+"POT-Creation-Date: 2024-11-25 19:53+0100\n"
 "PO-Revision-Date: 2022-03-15 10:50+0100\n"
 "Last-Translator: Marc Sommerhalder <marc.sommerhalder@seantis.ch>\n"
 "Language-Team: French\n"
@@ -1862,9 +1862,6 @@ msgstr ""
 msgid "Enable newsletter"
 msgstr "Activer la newsletter"
 
-msgid "Include logo in newsletter"
-msgstr "Afficher le logo dans la newsletter"
-
 msgid "Allow secret content in newsletter"
 msgstr "Autoriser le contenu secret dans la newsletter"
 
@@ -2304,7 +2301,7 @@ msgstr "Voulez-vous vraiment supprimer cette fenêtre de soumission ?"
 
 msgid ""
 "Submissions associated with this submission window will be deleted as well."
-msgstr ""
+msgstr "Les soumissions associées à cette fenêtre de soumission seront "
 
 msgid "Delete submission window"
 msgstr "Supprimer la fenêtre de soumission"
@@ -2515,9 +2512,6 @@ msgstr "Newsletter"
 
 msgid "New"
 msgstr "Nouveau"
-
-msgid "Newsletter Subscription"
-msgstr "Abonnement à la newsletter "
 
 msgid "Subscribers"
 msgstr "Abonnés"
@@ -2771,6 +2765,12 @@ msgstr ""
 
 msgid "Delete content"
 msgstr "Supprimer le contenu"
+
+msgid "Photo album. Will be shown at the end of content."
+msgstr "Album photo. Sera affiché à la fin du contenu."
+
+msgid "Photo album"
+msgstr "Album photo"
 
 msgid "In future"
 msgstr "Dans le futur"
@@ -4270,6 +4270,9 @@ msgstr ""
 msgid "There are currently ${count} recipients registered."
 msgstr "Il y a actuellement ${count} destinataires enregistrés."
 
+msgid "To update your subscription, please use this ${Link}"
+msgstr ""
+
 msgid "Archive"
 msgstr "Archiver"
 
@@ -4581,10 +4584,8 @@ msgstr "Champs"
 
 msgid ""
 "Thank you for filling out this survey. If there's anything you'd like to "
-"change, click on \"Edit\" below."
+"change, click on the \"Edit\"-Button below."
 msgstr ""
-"Merci d'avoir rempli ce sondage. Si vous souhaitez apporter des "
-"modifications, cliquez sur \"Modifier\" ci-dessous."
 
 msgid "No surveys defined yet."
 msgstr "Aucun sondage n'est encore défini."
@@ -4859,11 +4860,16 @@ msgstr ""
 "existent et qu'elles sont prolongées au-delà de ces dates à des intervalles "
 "donnés."
 
+#, python-format
+msgid ""
+"Rule updated. ${deleted} allocations removed, ${created} new allocations "
+"created."
+msgstr ""
+"La règle a été mise à jour. ${deleted} allocations supprimées, ${created} "
+"nouvelles allocations créées."
+
 msgid "Rule not found"
 msgstr "Règle non trouvée"
-
-msgid "Rule updated"
-msgstr "Règle mise à jour"
 
 msgid "Edit Rule"
 msgstr "Modifier la règle"
@@ -5969,8 +5975,8 @@ msgstr "Nouvelle fenêtre de soumission"
 
 msgid "Submissions windows limit survey submissions to a specific time-range."
 msgstr ""
-"Les fenêtres de soumission limitent les soumissions d'enquêtes à une période "
-"spécifique."
+"Merci d'avoir rempli ce sondage. Si vous souhaitez apporter des "
+"modifications, cliquez sur \"Modifier\" ci-dessous."
 
 msgid "Edit Submission Window"
 msgstr "Modifier la fenêtre de soumission"

@@ -1150,17 +1150,23 @@ class InlinePhotoAlbumExtension(ContentExtension):
         request: 'OrgRequest'
     ) -> type['FormT']:
 
+        from onegov.org.models import ImageSetCollection
+        albums: list['ImageSet'] = (  # noqa: TC201
+            ImageSetCollection(request.session).query().all()
+        )
+        if not albums:
+            return form_class
+
         class PhotoAlbumForm(form_class):  # type:ignore
-            from onegov.org.models import ImageSetCollection
-            albums: list['ImageSet'] = (
-                ImageSetCollection(request.session).query().all()
-            )
+
             choices = [('', '')] + [
                 (album.id, album.title) for album in albums
             ]
             photo_album_id = SelectField(
-                label='',
+                label=_('Photo album'),
+                # fieldset=_('Photo album'),
                 choices=choices,
+                name='photo_album_id',
                 default=''  # By default don't show any album
             )
 

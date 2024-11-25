@@ -141,7 +141,7 @@ class News(Page, TraitInfo, SearchableContent, NewsletterExtension,
            InheritableContactExtension, ContactHiddenOnPageExtension,
            PeopleShownOnMainPageExtension, PersonLinkExtension,
            CoordinatesExtension, ImageExtension, GeneralFileLinkExtension,
-           DeletableContentExtension):
+           DeletableContentExtension, InlinePhotoAlbumExtension):
 
     __mapper_args__ = {'polymorphic_identity': 'news'}
 
