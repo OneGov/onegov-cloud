@@ -830,8 +830,7 @@
                 <div metal:define-slot="after-lead"></div>
 
                 <div class="page-text" tal:condition="text" tal:content="text" />
-                <metal:b tal:condition="imageset" use-macro="layout.macros['render_inline_photo_album']"
-                         tal:define="imageset imageset" />
+                <metal:b tal:condition="imageset" use-macro="layout.macros['render_inline_photo_album']"/>
                 <div metal:define-slot="after-text"></div>
 
             </div>
@@ -846,8 +845,7 @@
                     <div metal:define-slot="after-lead"></div>
 
                     <div class="page-text" tal:condition="text" tal:content="text" />
-                    <metal:b tal:condition="imageset" use-macro="layout.macros['render_inline_photo_album']"
-                             tal:define="imageset imageset" />
+                    <metal:b tal:condition="imageset" use-macro="layout.macros['render_inline_photo_album']"/>
 
                     <div metal:define-slot="after-text"></div>
 
