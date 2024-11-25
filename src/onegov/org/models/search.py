@@ -1,3 +1,5 @@
+import itertools
+
 from elasticsearch_dsl.function import SF  # type:ignore
 from elasticsearch_dsl.query import FunctionScore  # type:ignore
 from elasticsearch_dsl.query import Match
@@ -281,7 +283,9 @@ class SearchPostgres(Pagination[_M]):
                     getattr(model.fts_idx_data, field, '')),
                 weight
             )
-            for field, weight in zip(model.es_properties.keys(), 'ABBBBBBBBBB')
+            for field, weight in zip(
+                model.es_properties.keys(),
+                itertools.chain('A', itertools.repeat('B')))
             if not field.startswith('es_')  # TODO: rename to fts_
         ]
 
