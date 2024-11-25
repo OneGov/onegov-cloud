@@ -260,6 +260,9 @@ multiline-quotes = "double"
 [tool.ruff.lint.pyupgrade]
 keep-runtime-typing = true
 
+[tool.ruff.lint.ruff]
+extend-markup-names = ["chameleon.utils.Markup"]
+
 [tool.ruff.format]
 quote-style = "single"
 indent-style = "space"
