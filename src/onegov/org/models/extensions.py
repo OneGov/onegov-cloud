@@ -1162,12 +1162,12 @@ class InlinePhotoAlbumExtension(ContentExtension):
             choices = [('', '')] + [
                 (album.id, album.title) for album in albums
             ]
-            photo_album_id = SelectField(
+            photo_album_id = ChosenSelectField(
                 label=_('Photo album'),
-                # fieldset=_('Photo album'),
+                fieldset=_('Photo album'),
                 choices=choices,
                 name='photo_album_id',
-                default=''  # By default don't show any album
+                # default=''  # By default don't show any album
             )
 
             def process_obj(self, obj: 'InlinePhotoAlbumExtension') -> None:
