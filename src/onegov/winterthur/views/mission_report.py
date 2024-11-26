@@ -210,6 +210,7 @@ def view_mission_reports_as_json(
                     request.link(use.vehicle.symbol) for use in
                     mission.used_vehicles
                     for _ in range(use.count)
+                    if use.vehicle.symbol
                 ],
                 'location': mission.location,
                 'personnel_active': mission.personnel,
@@ -263,7 +264,8 @@ def view_mission_reports_as_csv(
                 range(use.count)]),
             ', '.join([
                 request.link(use.vehicle.symbol) for use in
-                mission.used_vehicles for _ in range(use.count)]),
+                mission.used_vehicles for _ in range(use.count)
+                if use.vehicle.symbol]),
             mission.location,
             mission.personnel,
             mission.backup,
