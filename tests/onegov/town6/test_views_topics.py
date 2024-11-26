@@ -1,8 +1,3 @@
-from webtest import Upload
-
-from tests.shared.utils import create_image
-
-
 def test_sort_topics(client):
     client.login_admin().follow()
 
@@ -150,4 +145,3 @@ def test_view_page_as_member(client):
     anon.get(page_url, status=403)
     page = anon.get('/topics/organisation')
     assert 'Test' not in page
-
