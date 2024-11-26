@@ -404,7 +404,6 @@ def import_lu_people(
             phone=get_phone(line.isdn_nummer),
             phone_direct=get_phone(line.mobil),
             website=v_(get_web_address(line.internet_adresse)),
-            notes=v_(line.bemerkungen),
             location_address=v_(line.adresse),
             location_code_city=v_(get_plz_city(line.plz, line.ort)),
             access='public'
