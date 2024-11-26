@@ -196,7 +196,7 @@ def view_mission_reports_as_json(
         'report_count': query.count(),
         'reports': [
             {
-                'date': mission.local_date.strftime('%d.%m.%Y'),
+                'date': mission.local_date.strftime('%d-%m-%Y'),
                 'alarm': mission.local_date.strftime('%H:%M'),
                 'duration': mission.readable_duration,
                 'nature': mission.nature,
@@ -252,7 +252,7 @@ def view_mission_reports_as_csv(
     # Write CSV rows
     for mission in query:
         writer.writerow([
-            mission.local_date.strftime('%d.%m.%Y'),
+            mission.local_date.strftime('%d-%m-%Y'),
             mission.local_date.strftime('%H:%M'),
             mission.readable_duration,
             mission.nature,
