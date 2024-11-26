@@ -1,8 +1,12 @@
 # Changes
 
+## 2024.56
+
+`2024-11-26` | [d8727155ea...7d2451b3fd](https://github.com/OneGov/onegov-cloud/compare/d8727155ea^...7d2451b3fd)
+
 ## 2024.55
 
-`2024-11-26` | [75d4cff3cf...1700d7cabd](https://github.com/OneGov/onegov-cloud/compare/75d4cff3cf^...1700d7cabd)
+`2024-11-26` | [75d4cff3cf...0121dbe21d](https://github.com/OneGov/onegov-cloud/compare/75d4cff3cf^...0121dbe21d)
 
 ## 2024.54
 
@@ -2094,82 +2098,4 @@ max age higher than min age check can be omitted by setting max age to 0 (zero)
 News with a start date in the future were completely hidden in the news overview. Even admins couldn't see them.
 
 `Bugfix` | [PRO-1246](https://linear.app/projuventute/issue/PRO-1246) | [c3b208846d](https://github.com/onegov/onegov-cloud/commit/c3b208846d42d59ac7e6e4bfdfdbae57b158e7fa)
-
-## 2024.7
-
-`2024-02-07` | [8e2c4fa844...5532e11628](https://github.com/OneGov/onegov-cloud/compare/8e2c4fa844^...5532e11628)
-
-### Agency
-
-##### Load agency content in API.
-
-Avoids N+1 queries.
-
-`Bugfix` | [c1334efee4](https://github.com/onegov/onegov-cloud/commit/c1334efee4fbef92e7749ad827e05a2e43221864)
-
-### Election Day
-
-##### Use official municipalitites and maps for 2024.
-
-`Feature` | [OGC-1280](https://linear.app/onegovcloud/issue/OGC-1280) | [8e2c4fa844](https://github.com/onegov/onegov-cloud/commit/8e2c4fa844585c47764eb7a2bd8b269dcd90bf70)
-
-##### Remove lexwork PDF signing.
-
-`Feature` | [OGC-1421](https://linear.app/onegovcloud/issue/OGC-1421) | [df88a84a8a](https://github.com/onegov/onegov-cloud/commit/df88a84a8a285b51c4b193edad130e097071d6b3)
-
-##### Add ID to internal exports.
-
-`Feature` | [OGC-1459](https://linear.app/onegovcloud/issue/OGC-1459) | [d4c6e2092d](https://github.com/onegov/onegov-cloud/commit/d4c6e2092d7d507cee00bafa27d2078a147c6e84)
-
-##### Add country validator to SMS subscriber form.
-
-`Feature` | [OGC-1460](https://linear.app/onegovcloud/issue/OGC-1460) | [712915c63c](https://github.com/onegov/onegov-cloud/commit/712915c63c51df32b5f68041173c9d26f6aaae36)
-
-##### Update translations.
-
-`Feature` | [OGC-905](https://linear.app/onegovcloud/issue/OGC-905) | [901dcd7b10](https://github.com/onegov/onegov-cloud/commit/901dcd7b102f0c7d9075238681cc045fb8c32f4b)
-
-##### Add heatmap captions and clearify the related view titles.
-
-`Feature` | [OGC-1279](https://linear.app/onegovcloud/issue/OGC-1279) | [0437d9a422](https://github.com/onegov/onegov-cloud/commit/0437d9a422549fb28a594fc01dbb77495339a4b6)
-
-##### Add answer to internal export.
-
-`Feature` | [OGC-1461](https://linear.app/onegovcloud/issue/OGC-1461) | [79ef61c250](https://github.com/onegov/onegov-cloud/commit/79ef61c250cf54f2443c110fb19c9e459fb081c2)
-
-##### Add party results to archive.
-
-`Feature` | [OGC-877](https://linear.app/onegovcloud/issue/OGC-877) | [9191b9d9a1](https://github.com/onegov/onegov-cloud/commit/9191b9d9a10c463f723778835e5ce17777a1cc90)
-
-### Event
-
-##### Load event content before ical export.
-
-Avoids N+1 queries.
-
-`Bugfix` | [7bba1f5c4e](https://github.com/onegov/onegov-cloud/commit/7bba1f5c4ed8c0c47f16cd778da0612036fe3867)
-
-### Feriennet
-
-##### Fix day labels
-
-Add CLI for re-calculating occasion durations, filter for current period only.
-
-`Bugfix` | [PRO-1237](https://linear.app/projuventute/issue/PRO-1237) | [9de9ee1262](https://github.com/onegov/onegov-cloud/commit/9de9ee1262b09752850c89e016f35c75c1b9c8e3)
-
-### Org
-
-##### Don't redirect to the mTAN view if the view cannot be accessed
-
-E.g. in the case of a view with a publication the mTAN check would
-happen even when the object isn't published, so you would do the
-authentication only to then be greeted with a 403 error.
-
-`Bugfix` | [OGC-1451](https://linear.app/onegovcloud/issue/OGC-1451) | [0df1b828e0](https://github.com/onegov/onegov-cloud/commit/0df1b828e066e38228aad5a978541eae7eb07cc7)
-
-### Town6
-
-##### Add Chat Archive
-
-`Feature` | [9d9f0c516c](https://github.com/onegov/onegov-cloud/commit/9d9f0c516ce54823557b86523453534b5018ab2c)
 
