@@ -413,7 +413,7 @@ def import_lu_people(
 
         # A person has only one membership
         agency_id = (line.unterabteilung_2 or line.unterabteilung or
-                     line.abteilung)
+                     line.abteilung or line.dienststelle)
         hi_code = v_(line.hi_code)
         order = 0 if not hi_code else int(hi_code)
         if agency_id:
