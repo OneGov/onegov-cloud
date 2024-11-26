@@ -1907,7 +1907,6 @@
                 ic-on-success="
                     var info = $(elt).closest('tr');
                     info.prev().remove();
-                    info.next().remove();
                     info.remove();
                 "
                 data-confirm="Do you really want to delete this file?"
@@ -2231,7 +2230,7 @@
                 <p tal:repeat="value results.get(field.id, [])">"${value}"</p>
             </tal:b>
         </p>
-        <tal:b tal:condition="field.type in aggregated">      
+        <tal:b tal:condition="field.type in aggregated">
             <div class="chart-wrap" tal:condition="field.type == 'MultiCheckboxField'">
                 <div tal:define="maximum max(results[field.id].values())" class="grid horizontal">
                     <tal:b tal:repeat="choice field.choices">
@@ -2249,7 +2248,7 @@
                         </tal:b>
                     </tal:b>
                 </div>
-            </div> 
+            </div>
         </tal:b>
     </tal:b>
 </metal:display_results>

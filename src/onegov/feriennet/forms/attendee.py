@@ -1,5 +1,4 @@
 from functools import cached_property
-from chameleon.utils import Markup
 from onegov.activity import Attendee, AttendeeCollection
 from onegov.activity import Booking, BookingCollection, Occasion
 from onegov.activity import InvoiceCollection
@@ -318,8 +317,8 @@ class AttendeeSignupForm(AttendeeBase):
 
         layout = DefaultLayout(self.model, self.request)
 
-        self.accept_tos.description = Markup(render_macro(  # noqa: MS001
-            layout.macros['accept_tos'], self.request, {'url': url}))
+        self.accept_tos.description = render_macro(
+            layout.macros['accept_tos'], self.request, {'url': url})
 
     def on_request(self) -> None:
         self.populate_attendees()

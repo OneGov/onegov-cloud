@@ -47,6 +47,7 @@ if TYPE_CHECKING:
     from onegov.form.types import FormT
     from onegov.org.models import GeneralFile  # noqa: F401
     from onegov.org.request import OrgRequest
+    from onegov.org.models import ImageSet
     from sqlalchemy import Column
     from sqlalchemy.orm import relationship
     from typing import type_check_only, Protocol
@@ -1124,3 +1125,63 @@ class DeletableContentExtension(ContentExtension):
             )
 
         return DeletableContentForm
+
+
+class InlinePhotoAlbumExtension(ContentExtension):
+    """ Adds ability to reference photo albums (ImageSets) and show them
+    inline at the end of the content of the page.
+
+    """
+
+    photo_album_id: dict_property[str | None] = content_property(default=None)
+
+    @property
+    def photo_album(self) -> 'ImageSet | None':
+        from onegov.org.models import ImageSetCollection
+        if not self.photo_album_id:
+            return None
+        return ImageSetCollection(object_session(self)).by_id(
+            self.photo_album_id
+        )
+
+    def extend_form(
+        self,
+        form_class: type['FormT'],
+        request: 'OrgRequest'
+    ) -> type['FormT']:
+
+        from onegov.org.models import ImageSetCollection
+        albums: list['ImageSet'] = (  # noqa: TC201
+            ImageSetCollection(request.session).query().all()
+        )
+        if not albums:
+            return form_class
+
+        class PhotoAlbumForm(form_class):  # type:ignore
+
+            choices = [('', '')] + [
+                (album.id, album.title) for album in albums
+            ]
+            photo_album_id = ChosenSelectField(
+                label=_('Photo album'),
+                fieldset=_('Photo album'),
+                choices=choices,
+                name='photo_album_id',
+                # default=''  # By default don't show any album
+            )
+
+            def process_obj(self, obj: 'InlinePhotoAlbumExtension') -> None:
+                super().process_obj(obj)
+                if obj.photo_album_id:
+                    self.photo_album_id.data = obj.photo_album_id
+
+            def populate_obj(
+                self,
+                obj: 'InlinePhotoAlbumExtension',
+                *args: Any,
+                **kwargs: Any
+            ) -> None:
+                super().populate_obj(obj, *args, **kwargs)
+                obj.photo_album_id = self.photo_album_id.data or None
+
+        return PhotoAlbumForm

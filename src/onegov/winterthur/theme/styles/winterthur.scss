@@ -552,9 +552,10 @@ table.responsive {
 /*
     Mission reports legend
 */
-.mission-report-legend {
+.mission-report-legend, .mission-report-open-data {
     background: $gray-pastel;
     padding: 1rem 1rem .5rem;
+    margin-bottom: .5rem;
 
     * {
         font-size: .8rem;

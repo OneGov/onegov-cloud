@@ -88,11 +88,31 @@ def test_add_or_get_page(session):
 
     assert root.title == 'Wurzel'
     assert root.name == 'root'
+    assert family.query().count() == 1
 
     root = family.add_or_get_root(title='Wurzel', name='root')
 
     assert root.title == 'Wurzel'
     assert root.name == 'root'
+    assert family.query().count() == 1
+
+    # test case-insensitive
+    test = family.add_or_get_root(title='Test')
+    assert test.title == 'Test'
+    assert test.name == 'test'
+    assert family.query().count() == 2
+
+    test = family.add_or_get_root(title='test')
+    assert test.title == 'Test'
+    assert test.name == 'test'
+    assert family.query().count() == 2
+
+    # invalid name (not normalized)
+    with pytest.raises(AssertionError) as assertion_info:
+        family.add_or_get_root(title='Test', name='Test')
+        assert 'The given name was not normalized' in assertion_info.value
+
+    assert family.query().count() == 2
 
 
 def test_page_by_path(session):

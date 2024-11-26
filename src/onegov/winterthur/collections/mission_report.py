@@ -96,6 +96,10 @@ class MissionReportCollection(
         return super().query().filter(self.primary_key == id).first()
 
     def query(self) -> 'Query[MissionReport]':
+        # default behavior is to show the current year
+        return self.query_current_year()
+
+    def query_all(self) -> 'Query[MissionReport]':
         query = super().query()
 
         if not self.include_hidden:
@@ -104,9 +108,10 @@ class MissionReportCollection(
                 MissionReport.meta['access'] == None
             ))
 
-        query = self.filter_by_year(query)
-
         return query.order_by(desc(MissionReport.date))
+
+    def query_current_year(self) -> 'Query[MissionReport]':
+        return self.filter_by_year(self.query_all())
 
     def subset(self) -> 'Query[MissionReport]':
         return self.query()
