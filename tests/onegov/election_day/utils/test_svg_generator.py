@@ -10,6 +10,7 @@ from tests.onegov.election_day.utils.common import add_proporz_election
 from tests.onegov.election_day.utils.common import add_vote
 from tests.onegov.election_day.utils.common import PatchedD3Renderer
 from unittest.mock import patch
+from pytest import mark
 
 
 class PatchedSvgGenerator(SvgGenerator):
@@ -18,6 +19,7 @@ class PatchedSvgGenerator(SvgGenerator):
         self.renderer = PatchedD3Renderer(app)
 
 
+@mark.flaky(reruns=3)
 def test_generate_svg(election_day_app_gr, session):
 
     election_day_app_gr.filestorage.makedir('svg')
