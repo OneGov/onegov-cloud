@@ -968,6 +968,8 @@ class SettingsLayout(DefaultLayout):
 
         self.setting = setting
 
+    edit_mode = True
+
     @cached_property
     def breadcrumbs(self) -> list[Link]:
         bc = [

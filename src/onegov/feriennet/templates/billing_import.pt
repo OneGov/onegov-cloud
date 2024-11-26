@@ -13,10 +13,12 @@
             </div>
             <div class="cell small-12 medium-4 large-offset-1 sidebar">
                 <div class="sidebar-wrapper">
-                    <div class="panel">
-                        <p i18n:translate>
-                            Your statement is required to be in "ISO-20022 format (without picture)". Banks may also refer to it as "camt.054" or "camt.053". Be sure to ask your bank to switch your account to this format or to select this format in your online banking profile.
-                        </p>
+                    <div class="side-panel">
+                        <div class="panel">
+                            <p i18n:translate>
+                                Your statement is required to be in "ISO-20022 format (without picture)". Banks may also refer to it as "camt.054" or "camt.053". Be sure to ask your bank to switch your account to this format or to select this format in your online banking profile.
+                            </p>
+                        </div>
                     </div>
                 </div>
             </div>

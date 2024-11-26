@@ -713,7 +713,7 @@
 
 <metal:star define-macro="star" i18n:domain="onegov.feriennet">
     <tal:b condition="not booking.starred">
-        <i id="star-${booking.id}" class="fa fa-star-o" aria-hidden="true"></i>
+        <i id="star-${booking.id}" class="far fa-star" aria-hidden="true"></i>
         <span class="show-for-sr" i18n:translate>Mark activity as favorite</span>
     </tal:b>
     <tal:b condition="booking.starred">
@@ -848,7 +848,7 @@
 </metal:periods>
 
 <metal:users define-macro="users" i18n:domain="onegov.feriennet">
-    <div class="filter-panel" tal:condition="request.is_admin and users">
+    <div class="filter-panel side-panel" tal:condition="request.is_admin and users">
         <h3 class="filter-title" i18n:translate>User</h3>
         <select onchange="location = this.value;">
             <tal:b repeat="u users">
@@ -976,10 +976,9 @@
 </metal:filters>
 
 
-
 <metal:user_panel define-macro="user_panel" i18n:domain="onegov.feriennet">
-    <div class="borderless-side-panel without-title highlighted filter-panel">
-        <h2 class="filter-title" i18n:translate>Contact</h2>
+    <div class="side-panel filter-panel">
+        <h3 class="filter-title" i18n:translate>Contact</h3>
         <dl class="field-display">
             <div>
                 <dt i18n:translate>Name</dt>
@@ -1002,7 +1001,7 @@
                 <dd><a href="tel:${phone}">${phone}</a></dd>
             </div>
             <div tal:condition="request.is_admin">
-                <a href="${request.link(user)}" i18n:translate class="button radius secondary" style="width: 100%">
+                <a href="${request.link(user)}" i18n:translate class="button radius secondary">
                     Manage user
                 </a>
             </div>
