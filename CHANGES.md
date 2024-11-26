@@ -1,8 +1,12 @@
 # Changes
 
+## 2024.55
+
+`2024-11-26` | [75d4cff3cf...1700d7cabd](https://github.com/OneGov/onegov-cloud/compare/75d4cff3cf^...1700d7cabd)
+
 ## 2024.54
 
-`2024-11-26` | [896b8619c2...ea171ca8b1](https://github.com/OneGov/onegov-cloud/compare/896b8619c2^...ea171ca8b1)
+`2024-11-26` | [896b8619c2...d7b7a777f5](https://github.com/OneGov/onegov-cloud/compare/896b8619c2^...d7b7a777f5)
 
 ### Org
 
@@ -2168,14 +2172,4 @@ authentication only to then be greeted with a 403 error.
 ##### Add Chat Archive
 
 `Feature` | [9d9f0c516c](https://github.com/onegov/onegov-cloud/commit/9d9f0c516ce54823557b86523453534b5018ab2c)
-
-## 2024.6
-
-`2024-02-05` | [a97af2900a...5d723fdb5d](https://github.com/OneGov/onegov-cloud/compare/a97af2900a^...5d723fdb5d)
-
-### Town6
-
-##### Adds option to Topics and News to show people on bottom of main page instead of sidebar
-
-`Feature` | [OGC-1454](https://linear.app/onegovcloud/issue/OGC-1454) | [a97af2900a](https://github.com/onegov/onegov-cloud/commit/a97af2900a49c8d45498985873d58dec7ca941f3)
 
