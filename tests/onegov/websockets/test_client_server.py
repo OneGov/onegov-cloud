@@ -157,7 +157,7 @@ async def test_client_invalid(websocket_server):
 
 
 @mark.asyncio
-@mark.disabled(reason='This test seems to not work in a release build')
+@mark.skip(reason='This test seems to not work in a release build')
 async def test_manage(websocket_server):
     async with connect(websocket_server.url) as manage:
         await authenticate(manage, 'super-super-secret-token')
