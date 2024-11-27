@@ -4,9 +4,8 @@ import re
 
 from functools import cached_property
 from pyquery import PyQuery as pq
-from webtest import TestApp, TestResponse
+from webtest import TestApp
 
-from onegov.form.parser.core import Field
 
 EXTRACT_HREF = re.compile(
     r'(?:href|ic-get-from|ic-post-to|ic-delete-from)="([^"]+)')
@@ -245,14 +244,3 @@ class IntercoolerClickExtension:
             return attrs[attr]
         except IndexError:
             return None
-
-class MyTestResponse(TestResponse):
-    # The core issue is that WebTest's form parsing is failing for your select
-    # field if it has no name
-    def _make_form(self, form):
-        f = super()._make_form(form)
-        # Force include any missing select fields
-        for select in form.findAll('select'):
-            if select.get('name') and select['name'] not in f.fields:
-                f.fields[select['name']] = [Field(f, 'select', select['name'], 0)]
-        return f

@@ -404,7 +404,6 @@ def import_lu_people(
             phone=get_phone(line.isdn_nummer),
             phone_direct=get_phone(line.mobil),
             website=v_(get_web_address(line.internet_adresse)),
-            notes=v_(line.bemerkungen),
             location_address=v_(line.adresse),
             location_code_city=v_(get_plz_city(line.plz, line.ort)),
             access='public'
@@ -413,7 +412,7 @@ def import_lu_people(
 
         # A person has only one membership
         agency_id = (line.unterabteilung_2 or line.unterabteilung or
-                     line.abteilung)
+                     line.abteilung or line.dienststelle)
         hi_code = v_(line.hi_code)
         order = 0 if not hi_code else int(hi_code)
         if agency_id:
