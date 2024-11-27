@@ -1162,7 +1162,7 @@ class InlinePhotoAlbumExtension(ContentExtension):
             choices = [('', '')] + [
                 (album.id, album.title) for album in albums
             ]
-            photo_album_id = SelectField(
+            photo_album_id = ChosenSelectField(
                 label=_('Photo album'),
                 fieldset=_('Photo album'),
                 choices=choices,
