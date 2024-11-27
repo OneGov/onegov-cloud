@@ -2979,7 +2979,7 @@
 
 <metal:b define-macro="render_inline_photo_album">
     <tal:b tal:condition="imageset and imageset.files">
-        <!--! Inline imagesets are always renderd as grid -->
+        <!--! Inline imagesets are always rendered as grid -->
         <div class="page-text grid-imageset photoswipe">
             <div class="image-grid">
                 <div tal:repeat="image imageset.files" class="image-container">
