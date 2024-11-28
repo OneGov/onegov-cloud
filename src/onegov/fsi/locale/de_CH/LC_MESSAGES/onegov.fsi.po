@@ -205,7 +205,7 @@ msgstr ""
 "Die letzte Kursdurchführung für diesen Teilnehmer war am ${date}."
 
 msgid "This course event can't be booked (anymore)."
-msgstr "Diese Durchführung kann (nicht) mehr gebucht werden."
+msgstr "Diese Durchführung kann nicht (mehr) gebucht werden."
 
 msgid "Placeholder Description (optional)"
 msgstr "Platzhalter-Beschreibung (optional)"
@@ -629,7 +629,7 @@ msgid "Attendee should have attended the course already, but didn't."
 msgstr "Der nächste Kursbesuch ist ausstehend."
 
 msgid "Logo"
-msgstr ""
+msgstr "Logo"
 
 msgid "Dear ${first_name} ${last_name}"
 msgstr "Sehr geehrte(r) ${first_name} ${last_name}"

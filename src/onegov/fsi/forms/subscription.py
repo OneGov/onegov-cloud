@@ -162,7 +162,7 @@ class AddFsiSubscriptionForm(Form, SubscriptionFormMixin):
                 CourseSubscription.attendee_id == self.attendee_id.data
                 ).order_by(desc(CourseEvent.start)).first()
             if last_subscribed_event and self.event_from_form and (
-                # Chosen event need to start at least 6 years after the last
+                # Chosen event needs to start at least 6 years after the last
                 # subscribed event
                 self.event_from_form.start < datetime(
                 last_subscribed_event.start.year + 6, 1, 1,

@@ -136,7 +136,7 @@ def parse_structure(
 
         if element.tag not in valid_tags:
             raise ValidationError(
-                "Invalid element '<{}>'".format(element.tag))  # type:ignore
+                "Invalid element '<{}>'".format(element.tag))
 
     return xml_tree
 
