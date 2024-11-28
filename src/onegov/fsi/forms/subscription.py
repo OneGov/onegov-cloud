@@ -1,3 +1,6 @@
+from datetime import datetime
+import pytz
+from sqlalchemy import desc
 from onegov.form import Form
 from onegov.form.fields import ChosenSelectField
 from onegov.fsi import _
@@ -5,23 +8,24 @@ from onegov.fsi.collections.attendee import CourseAttendeeCollection
 from onegov.fsi.collections.course_event import CourseEventCollection
 from wtforms.fields import StringField
 from wtforms.validators import InputRequired
+from onegov.fsi.models import CourseEvent, CourseSubscription
 
 
 from typing import TYPE_CHECKING
 if TYPE_CHECKING:
     from onegov.fsi.models import (
-        CourseAttendee, CourseEvent, CourseSubscription)
+        CourseAttendee)
     from onegov.fsi.request import FsiRequest
     from wtforms.fields.choices import _Choice
 
 
 class SubscriptionFormMixin:
 
-    model: 'CourseSubscription'
+    model: CourseSubscription
     request: 'FsiRequest'
 
     @property
-    def event(self) -> 'CourseEvent':
+    def event(self) -> CourseEvent:
         return self.model.course_event
 
     @property
@@ -37,7 +41,7 @@ class SubscriptionFormMixin:
     def attendee(self) -> 'CourseAttendee | None':
         return self.model.attendee
 
-    def event_choice(self, event: 'CourseEvent') -> tuple[str, str]:
+    def event_choice(self, event: CourseEvent) -> tuple[str, str]:
         return str(event.id), str(event)
 
     def attendee_choice(
@@ -125,7 +129,7 @@ class AddFsiSubscriptionForm(Form, SubscriptionFormMixin):
         self.course_event_id.choices = self.get_event_choices()
 
     @property
-    def event_from_form(self) -> 'CourseEvent | None':
+    def event_from_form(self) -> CourseEvent | None:
         return self.course_event_id.data and CourseEventCollection(
             self.request.session,
             show_hidden=True,
@@ -147,6 +151,32 @@ class AddFsiSubscriptionForm(Form, SubscriptionFormMixin):
                 self.attendee_id.errors.append(
                     _('There are other subscriptions for '
                       'the same course in this year')
+                )
+                return False
+        return True
+
+    def ensure_6_year_time_interval(self) -> bool:
+        if self.attendee_id.data and self.course_event_id.data:
+            last_subscribed_event = self.request.session.query(
+                CourseEvent).join(CourseSubscription).filter(
+                CourseSubscription.attendee_id == self.attendee_id.data
+                ).order_by(desc(CourseEvent.start)).first()
+            if last_subscribed_event and self.event_from_form and (
+                # Chosen event need to start at least 6 years after the last
+                # subscribed event
+                self.event_from_form.start < datetime(
+                last_subscribed_event.start.year + 6, 1, 1,
+                tzinfo=pytz.utc)
+            ):
+                assert isinstance(self.course_event_id.errors, list)
+                self.course_event_id.errors.append(
+                    _('The selected course must take place at least 6 years '
+                      'after the last course for which the attendee was '
+                      'registered. The last course for this attendee was '
+                      'on ${date}.', mapping={
+                          'date': last_subscribed_event.start.strftime(
+                                '%d.%m.%Y')}
+                          )
                 )
                 return False
         return True
@@ -235,11 +265,11 @@ class EditFsiSubscriptionForm(Form, SubscriptionFormMixin):
         the whole list of attendees"""
         return CourseAttendeeCollection(self.request.session)
 
-    def update_model(self, model: 'CourseSubscription') -> None:
+    def update_model(self, model: CourseSubscription) -> None:
         model.attendee_id = self.attendee_id.data
         model.course_event_id = self.course_event_id.data
 
-    def apply_model(self, model: 'CourseSubscription') -> None:
+    def apply_model(self, model: CourseSubscription) -> None:
         self.course_event_id.data = model.course_event_id
         self.attendee_id.data = model.attendee_id
 
@@ -273,7 +303,7 @@ class EditFsiPlaceholderSubscriptionForm(Form, SubscriptionFormMixin):
         label=_('Placeholder Description (optional)'),
     )
 
-    def update_model(self, model: 'CourseSubscription') -> None:
+    def update_model(self, model: CourseSubscription) -> None:
         desc = self.dummy_desc.data
         if not desc:
             default_desc = self.request.translate(
@@ -282,7 +312,7 @@ class EditFsiPlaceholderSubscriptionForm(Form, SubscriptionFormMixin):
         model.course_event_id = self.course_event_id.data
         model.dummy_desc = desc
 
-    def apply_model(self, model: 'CourseSubscription') -> None:
+    def apply_model(self, model: CourseSubscription) -> None:
         self.course_event_id.data = model.course_event_id
         self.dummy_desc.data = model.dummy_desc
 
