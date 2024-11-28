@@ -374,11 +374,6 @@ def check_skip(line: 'DefaultRow') -> bool:
     if line.nachname == '' and line.vorname == '':
         return True  # skip empty lines
 
-    if line.vorname and line.vorname[-1].isdigit():
-        print(f'Error importing person with digit in first name; line '
-              f'{line.rownumber}, {line.vorname}')
-        return True
-
     return False
 
 
@@ -411,16 +406,13 @@ def import_lu_people(
     persons = []
 
     def parse_person(line: 'DefaultRow') -> None:
-        agency_id = agency_id_person_lu(line)
-        hi_code = v_(line.hi_code)
-        order = 0 if not hi_code else int(hi_code)
-
-        person_ = people.add(
+        function = v_(line.funktion) or ''
+        person_ = people.add_or_get(
             last_name=v_(line.nachname) or ' ',
             first_name=v_(line.vorname) or ' ',
             salutation=None,
             academic_title=v_(line.akad__titel),
-            function=v_(line.funktion),
+            function=function,
             email=get_email(line),
             phone=get_phone(line.isdn_nummer),
             phone_direct=get_phone(line.mobil),
@@ -430,18 +422,48 @@ def import_lu_people(
             access='public'
         )
         persons.append(person_)
+        parse_membership(line, person_, function)
+
+    def parse_membership(
+            line: 'DefaultRow',
+            person: 'ExtendedPerson',
+            function: str
+    ) -> None:
+        agency_id = agency_id_person_lu(line)
+        hi_code = v_(line.hi_code)
+        order = 0 if not hi_code else int(hi_code)
 
         if agency_id:
-            agency = agencies.get(agency_id, None)
+            agency = agencies.get(agency_id)
             if agency and order:
-                agency.add_person(person_.id,
-                                  title=person_.function or 'Mitglied',
+                agency.add_person(person.id,
+                                  title=function or 'Mitglied',
                                   order_within_agency=order)
             elif agency:
-                agency.add_person(person_.id,
-                                  title=person_.function or 'Mitglied')
+                agency.add_person(person.id,
+                                  title=function or 'Mitglied')
             else:
                 print(f'Error agency id {agency_id} not found')
+
+    def parse_additional_membership(line: 'DefaultRow') -> None:
+        vorname = v_(line.vorname) or ''
+        vorname = ' '.join(vorname.split(' ')[:-1])
+        function = v_(line.funktion) or ''
+        person = people.add_or_get(
+            first_name=vorname,
+            last_name=v_(line.nachname) or ' ',
+            salutation=None,
+            academic_title=v_(line.akad__titel),
+            function=function,
+            email=get_email(line),
+            phone=get_phone(line.isdn_nummer),
+            phone_direct=get_phone(line.mobil),
+            website=v_(get_web_address(line.internet_adresse)),
+            location_address=v_(line.adresse),
+            location_code_city=v_(get_plz_city(line.plz, line.ort)),
+            access='public'
+        )
+        parse_membership(line, person, function)
 
     for ix, line in enumerate(csvfile.lines):
         if ix % 100 == 0:
@@ -449,7 +471,10 @@ def import_lu_people(
             app.psql_indexer.bulk_process(session)
 
         if not check_skip(line):
-            parse_person(line)
+            if line.vorname and line.vorname[-1].isdigit():
+                parse_additional_membership(line)
+            else:
+                parse_person(line)
 
     return persons
 

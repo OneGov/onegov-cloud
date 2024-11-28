@@ -34,6 +34,25 @@ class BasePersonCollection(GenericCollection[PersonT]):
 
         return person
 
+    def add_or_get(
+        self,
+        first_name: str,
+        last_name: str,
+        **optional: Any
+    ) -> PersonT:
+        query = self.query()
+        query = query.filter(self.model_class.first_name == first_name)
+        query = query.filter(self.model_class.last_name == last_name)
+        for key, value in optional.items():
+            query = query.filter(getattr(self.model_class, key) == value)
+
+        item = query.first()
+
+        if item:
+            return item
+        else:
+            return self.add(first_name, last_name, **optional)
+
     def by_id(self, id: 'UUID') -> PersonT | None:  # type:ignore[override]
         if utils.is_uuid(id):
             return self.query().filter(self.model_class.id == id).first()
