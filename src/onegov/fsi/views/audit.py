@@ -81,7 +81,9 @@ def invite_attendees_for_event(
     next_subscriptions = self.next_subscriptions(request)
     recipient_ids = [
         r.id for r in self.cached_subset
-        if not (next_subscriptions.get(r.id) or r.event_completed)
+        if not (next_subscriptions.get(r.id) or (
+            r.start and r.refresh_interval and r.start.replace
+            (year=r.start.year + r.refresh_interval) >= now))
     ] if self.course_id else []
 
     all_attendees = self.session.query(CourseAttendee).filter(

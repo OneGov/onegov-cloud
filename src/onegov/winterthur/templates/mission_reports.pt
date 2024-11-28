@@ -84,7 +84,7 @@
                 </ol>
 
                 <p>
-                    <span>Das Datenformat ist hier beschrieben:</span> <a href="https://github.com/OneGov/onegov-cloud/blob/master/src/onegov /winterthur/static/docs/api/open_data_de.md"><span>Formatbeschreibung</span></a>
+                    <span>Das Datenformat ist hier beschrieben:</span> <a href="https://github.com/OneGov/onegov-cloud/blob/master/src/onegov/winterthur/static/docs/api/open_data_de.md"><span>Formatbeschreibung</span></a>
                 </p>
 
                 <h3>Nutzungsbedingungen</h3>

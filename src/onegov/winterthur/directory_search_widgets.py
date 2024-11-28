@@ -134,7 +134,7 @@ class InlineDirectorySearch:
 
         for key in hit.meta.highlight:
             for fragment in hit.meta.highlight[key]:
-                return Markup(fragment)  # noqa: MS001
+                return Markup(fragment)  # noqa: RUF035
         return None
 
     def adapt(self, query: 'Query[T]') -> 'Query[T]':

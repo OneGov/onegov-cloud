@@ -749,7 +749,7 @@ class Framework(
         self,
         path: str,
         with_view_name: bool = False
-    ) -> object | None | tuple[object | None, str | None]:
+    ) -> object | tuple[object | None, str | None] | None:
         """ Takes a path and returns the object associated with it. If a
         scheme or a host is passed it is ignored.
 

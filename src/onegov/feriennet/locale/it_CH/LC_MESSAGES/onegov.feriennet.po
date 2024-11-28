@@ -2,7 +2,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: \n"
-"POT-Creation-Date: 2024-05-07 08:34+0200\n"
+"POT-Creation-Date: 2024-11-18 10:17+0100\n"
 "PO-Revision-Date: 2021-11-11 09:07+0100\n"
 "Last-Translator: Marc Sommerhalder <marc.sommerhalder@seantis.ch>\n"
 "Language-Team: \n"
@@ -684,8 +684,8 @@ msgstr "Data di nascita"
 msgid "Gender"
 msgstr "Genere"
 
-msgid "Health Information"
-msgstr "Informazioni salute"
+msgid "Is there anything the course instructor should know?"
+msgstr "C'è qualcosa che l'istruttore dovrebbe sapere?"
 
 msgid "Allergies, Disabilities, Particulars"
 msgstr "Allergie, disabilità, caratteristiche speciali"
@@ -2860,20 +2860,6 @@ msgstr "La sua donazione è stata rimossa"
 msgid "This donation has already been paid"
 msgstr "La donazione è già stata pagata"
 
-msgid "Can not do matchings for an inactive period"
-msgstr "Le assegnazioni possono essere fatte solo in un periodo attivo"
-
-msgid "Can not do matchings for an confirmed period"
-msgstr ""
-"Le assegnazioni possono essere fatte solo in un periodo che non è stato "
-"confermato"
-
-msgid "The matching was confirmed successfully"
-msgstr "L'assegnazione è stata completata con successo"
-
-msgid "The matching run executed successfully"
-msgstr "La fase delle assegnazioni è stata completata con successo"
-
 msgid "Too many attendees"
 msgstr "Troppi partecipanti"
 
@@ -2888,6 +2874,20 @@ msgstr "Troppo pochi partecipanti"
 
 msgid "No attendees"
 msgstr "Nessun partecipante"
+
+msgid "Can not do matchings for an inactive period"
+msgstr "Le assegnazioni possono essere fatte solo in un periodo attivo"
+
+msgid "Can not do matchings for an confirmed period"
+msgstr ""
+"Le assegnazioni possono essere fatte solo in un periodo che non è stato "
+"confermato"
+
+msgid "The matching was confirmed successfully"
+msgstr "L'assegnazione è stata completata con successo"
+
+msgid "The matching run executed successfully"
+msgstr "La fase delle assegnazioni è stata completata con successo"
 
 #, python-format
 msgid "Matches for ${title}"
@@ -3184,6 +3184,9 @@ msgstr "Prenotazioni ${period}"
 #, python-format
 msgid "Billing for ${period}"
 msgstr "Fatturazione ${period}"
+
+#~ msgid "Health Information"
+#~ msgstr "Informazioni salute"
 
 #~ msgid "Invoice items marked as paid"
 #~ msgstr "Voci di fattura contrassegnate come pagate"

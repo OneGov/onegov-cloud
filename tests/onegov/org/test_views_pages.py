@@ -236,7 +236,6 @@ def test_pages_person_link_extension(client):
     new_page.form['text'] = ("<h2>Living in Govikon is Really "
                              "Great</h2><i>Experts say it's the fact that "
                              "Govikon does not really exist.</i>"
-                             + embedded_img
                              )
     new_page.form['western_name_order'] = False
     new_page.form['people-0-person'] = person_uuid

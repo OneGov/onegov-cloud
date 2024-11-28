@@ -246,7 +246,7 @@ def render_template(
     variables = get_default_vars(
         request, content, suppress_global_variables=suppress_global_variables)
 
-    return Markup(page_template.render(**variables))  # noqa: MS001
+    return Markup(page_template.render(**variables))  # noqa: RUF035
 
 
 def render_macro(
@@ -292,4 +292,4 @@ def render_macro(
     stream: list[str] = []
     macro.include(stream, Scope(variables), {})
 
-    return Markup(''.join(stream))  # noqa: MS001
+    return Markup(''.join(stream))  # noqa: RUF035

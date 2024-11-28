@@ -30,20 +30,20 @@ Datensatz:
 
 Einsatzbericht (`report`):
 
-| Name                    | Typ          | Beschreibung                                            |
-|-------------------------|--------------|---------------------------------------------------------|
-| `date`                  | string       | Datum des Einsatzes                                     |
-| `alarm`                 | string       | Alarmzeit                                               |
-| `duration`              | string       | Dauer des Einsatzes im Format `1.2h`                    |
-| `nature`                | string       | Beschreibung des Einsatzes                              |
-| `mission_type`          | string       | Art des Einsatzes (`single`, `multiple`)                |
-| `mission_count`         | int          | Anzahl der Einsätze falls `mission_type==multi`         |
-| `vehicles`              | list[string] | Liste der eingesetzten Fahrzeuge                        |
+| Name                    | Typ          | Beschreibung                                      |
+|-------------------------|--------------|---------------------------------------------------|
+| `date`                  | string       | Datum des Einsatzes im iso-Format                 |
+| `alarm`                 | string       | Alarmzeit                                         |
+| `duration`              | string       | Dauer des Einsatzes im Format `1.2h`              |
+| `nature`                | string       | Beschreibung des Einsatzes                        |
+| `mission_type`          | string       | Art des Einsatzes (`single`, `multiple`)          |
+| `mission_count`         | int          | Anzahl der Einsätze falls `mission_type==multi`   |
+| `vehicles`              | list[string] | Liste der eingesetzten Fahrzeuge                  |
 | `vehicle_icons`         | list[string] | Liste der Icons der Einsatzfahrzeuge im Einsatz als URL |
-| `location`              | string       | Einsatzort                                              |
-| `personnel_active`      | int          | Anzahl der aktiven Einsatzkräfte                        |
-| `personnel_backup`      | int          | Anzahl der Einsatzkräfte nicht im Einsatz (Backup)      |
-| `civil_defense_involved`| bool         | Zivilschutz involviert (true, false)                    |
+| `location`              | string       | Einsatzort                                        |
+| `personnel_active`      | int          | Anzahl der aktiven Einsatzkräfte                  |
+| `personnel_backup`      | int          | Anzahl der Einsatzkräfte nicht im Einsatz (Backup) |
+| `civil_defense_involved`| bool         | Zivilschutz involviert (true, false)              |
 
 ### Beispiel JSON
 ```json
@@ -70,8 +70,8 @@ Einsatzbericht (`report`):
 Die erste Zeile enthält die Spaltennamen. Die weiteren Zeilen enthalten die einzelnen Einsatzberichte.
 ```
 date,alarm,duration,nature,mission_type,mission_count,vehicles,vehicles_icons,location,personnel_active,personnel_backup,civil_defence_involved
-12.11.2024,08:30,2.4h,Fehlalarm Rauchmelder,single,1,Drehleiter DL,http://../storage/345e..db80,Luzern,3,8,False
-31.10.2024,12:01,4h,Schwehlbrand im Dachgeschoss,multi,2,"Drehleiter DL, Drehleiter DL, Tanklöschfahrzeug TLF","http://../storage/345e..db80, http://. ./storage/345e..db80, http://../storage/15e6..0530","Pilatusstrasse 3, 6003 Luzern",6,2,False
+12-11-2024,08:30,2.4h,Fehlalarm Rauchmelder,single,1,Drehleiter DL,http://../storage/345e..db80,Luzern,3,8,False
+31-10-2024,12:01,4h,Schwehlbrand im Dachgeschoss,multi,2,"Drehleiter DL, Drehleiter DL, Tanklöschfahrzeug TLF","http://../storage/345e..db80, http://. ./storage/345e..db80, http://../storage/15e6..0530","Pilatusstrasse 3, 6003 Luzern",6,2,False
 ```
 
 ### URL Parameter
