@@ -11,13 +11,13 @@ from onegov.core.csv import CSVFile
 from onegov.core.orm.abstract.adjacency_list import numeric_priority
 from onegov.core.utils import linkify
 
-from typing import TypeVar
+from typing import TypeVar, Any
 from typing import TypeVarTuple
 from typing import TYPE_CHECKING
 
 if TYPE_CHECKING:
     from _typeshed import StrOrBytesPath
-    from collections.abc import Callable
+    from collections.abc import Callable, Iterable
     from collections.abc import Mapping
     from datetime import date
     from onegov.agency.app import AgencyApp
@@ -382,6 +382,23 @@ def check_skip(line: 'DefaultRow') -> bool:
     return False
 
 
+def agency_id_agency_lu(words: 'Iterable[Any]') -> str:
+    """
+    Generates an agency id based on each organisation and sub organisation word
+    """
+    return '__'.join(str(word).lower() for word in words if word)
+
+
+def agency_id_person_lu(line: 'DefaultRow') -> str:
+    """
+    Generates an agency id based on each organisation and sub organisation
+    name for a person.
+    """
+    words = [line.department, line.dienststelle, line.abteilung,
+             line.unterabteilung, line.unterabteilung_2]
+    return agency_id_agency_lu(words)
+
+
 @with_open
 def import_lu_people(
     csvfile: CSVFile['DefaultRow'],
@@ -394,6 +411,10 @@ def import_lu_people(
     persons = []
 
     def parse_person(line: 'DefaultRow') -> None:
+        agency_id = agency_id_person_lu(line)
+        hi_code = v_(line.hi_code)
+        order = 0 if not hi_code else int(hi_code)
+
         person_ = people.add(
             last_name=v_(line.nachname) or ' ',
             first_name=v_(line.vorname) or ' ',
@@ -410,13 +431,8 @@ def import_lu_people(
         )
         persons.append(person_)
 
-        # A person has only one membership
-        agency_id = (line.unterabteilung_2 or line.unterabteilung or
-                     line.abteilung or line.dienststelle)
-        hi_code = v_(line.hi_code)
-        order = 0 if not hi_code else int(hi_code)
         if agency_id:
-            agency = agencies.get(agency_id)
+            agency = agencies.get(agency_id, None)
             if agency and order:
                 agency.add_person(person_.id,
                                   title=person_.function or 'Mitglied',
@@ -460,48 +476,64 @@ def import_lu_agencies(
 
         dienststelle, abteilung, unterabteilung, unterabteilung_2 = (
             None, None, None, None)
-        department_name = v_(line.department) or ''
-        department = agencies.add_or_get(None, department_name)
-        added_agencies[department_name] = department
         export_fields = ['person.title', 'person.phone']
+
+        department_name = v_(line.department)
+        if department_name:
+            department = agencies.add_or_get(
+                None, department_name, export_fields=export_fields)
+            agency_id = agency_id_agency_lu([department_name])
+            if agency_id not in added_agencies:
+                added_agencies[agency_id] = department
 
         dienststellen_name = v_(line.dienststelle)
         if dienststellen_name:
-            if not department:
-                print(f'Error adding agency with no department; '
-                      f'line {line.rownumber}, {line.nachname}')
+            assert department, (f'Error adding agency with no department; '
+                                f'line {line.rownumber}, {line.nachname}')
             dienststelle = agencies.add_or_get(
                 department, dienststellen_name, export_fields=export_fields)
-            added_agencies[dienststellen_name] = dienststelle
+            agency_id = agency_id_agency_lu([
+                department_name, dienststellen_name])
+            if agency_id not in added_agencies:
+                added_agencies[agency_id] = dienststelle
 
         abteilungs_name = v_(line.abteilung)
         if abteilungs_name:
-            if not dienststelle:
-                print(f'Error adding agency with no dienststelle; '
-                      f'line {line.rownumber}, {line.nachname}')
+            assert dienststelle, (f'Error adding agency with no dienststelle; '
+                                  f'line {line.rownumber}, {line.nachname}')
             abteilung = agencies.add_or_get(
                 dienststelle, abteilungs_name, export_fields=export_fields)
-            added_agencies[abteilungs_name] = abteilung
+            agency_id = agency_id_agency_lu([
+                department_name, dienststellen_name, abteilungs_name])
+            if agency_id not in added_agencies:
+                added_agencies[agency_id] = abteilung
 
         unterabteilungs_name = v_(line.unterabteilung)
         if unterabteilungs_name:
-            if not abteilung:
-                print(f'Error adding agency with no abteilung; '
-                      f'line {line.rownumber}, {line.nachname}')
+            assert abteilung, (f'Error adding agency with no abteilung; '
+                               f'line {line.rownumber}, {line.nachname}')
             unterabteilung = (
                 agencies.add_or_get(abteilung, unterabteilungs_name,
                                     export_fields=export_fields))
-            added_agencies[unterabteilungs_name] = unterabteilung
+            agency_id = agency_id_agency_lu([
+                department_name, dienststellen_name, abteilungs_name,
+                 unterabteilungs_name])
+            if agency_id not in added_agencies:
+                added_agencies[agency_id] = unterabteilung
 
         unterabteilung_2_name = v_(line.unterabteilung_2)
         if unterabteilung_2_name:
-            if not unterabteilung:
-                print(f'Error adding agency with no unterabteilung; '
-                      f'line {line.rownumber}, {line.nachname}')
+            assert unterabteilung, \
+                (f'Error adding agency with no unterabteilung; '
+                 f'line {line.rownumber}, {line.nachname}')
             unterabteilung_2 = (
                 agencies.add_or_get(unterabteilung, unterabteilung_2_name,
                                     export_fields=export_fields))
-            added_agencies[unterabteilung_2_name] = unterabteilung_2
+            agency_id = agency_id_agency_lu([
+                department_name, dienststellen_name, abteilungs_name,
+                unterabteilungs_name, unterabteilung_2_name])
+            if agency_id not in added_agencies:
+                added_agencies[agency_id] = unterabteilung_2
 
     return added_agencies
 
