@@ -188,7 +188,7 @@ def test_view_mission_report_json(winterthur_app):
             "report_count": 3,
             "reports": [
                 {
-                    "date": "12.11.2024",
+                    "date": "12-11-2024",
                     "alarm": "08:31",
                     "duration": "2h",
                     "nature": "Brand",
@@ -202,7 +202,7 @@ def test_view_mission_report_json(winterthur_app):
                     "civil_defence_involved": False
                 },
                 {
-                    "date": "05.11.2024",
+                    "date": "05-11-2024",
                     "alarm": "03:12",
                     "duration": "0.5h",
                     "nature": "Rauchmelder",
@@ -216,7 +216,7 @@ def test_view_mission_report_json(winterthur_app):
                     "civil_defence_involved": False
                 },
                 {
-                    "date": "12.10.2024",
+                    "date": "12-10-2024",
                     "alarm": "08:21",
                     "duration": "1h",
                     "nature": "Kellerbrand",
@@ -259,7 +259,7 @@ def test_view_mission_report_json(winterthur_app):
             "report_count": 1,
             "reports": [
                 {
-                    "date": "12.11.2023",
+                    "date": "12-11-2023",
                     "alarm": "05:01",
                     "duration": "4.2h",
                     "nature": "Wohnhausbrand",
@@ -326,19 +326,27 @@ def test_view_mission_report_csv(winterthur_app):
         reader = csv.reader(csv_content)
         rows = list(reader)
 
-        assert rows[0] == row_headers
-        assert rows[1] == [
-            '12.11.2024', '08:31', '2h', 'Brand', 'single', '1', '',
+        expected_row_luzern = [
+            '12-11-2024', '08:31', '2h', 'Brand', 'single', '1', '',
             '', 'Luzern', '10', '5', 'False'
         ]
-        assert rows[2] == [
-            '05.11.2024', '03:12', '0.5h', 'Rauchmelder', 'single', '1', '',
+        expected_row_kriens = [
+            '05-11-2024', '03:12', '0.5h', 'Rauchmelder', 'single', '1', '',
             '', 'Kriens', '3', '2', 'False'
         ]
-        assert rows[3] == [
-            '12.10.2024', '08:21', '1h', 'Kellerbrand', 'single', '1', '',
+        expected_row_reussbuehl = [
+            '12-10-2024', '08:21', '1h', 'Kellerbrand', 'single', '1', '',
             '', 'Reussbühl', '6', '8', 'False'
         ]
+        expected_row_tribschen = [
+            '12-11-2023', '05:01', '4.2h', 'Wohnhausbrand', 'single', '1', '',
+            '', 'Tribschen', '20', '1', 'False'
+        ]
+
+        assert rows[0] == row_headers
+        assert rows[1] == expected_row_luzern
+        assert rows[2] == expected_row_kriens
+        assert rows[3] == expected_row_reussbuehl
         assert len(rows) == 4
 
         response = client.get('/mission-reports/csv?year=2024')
@@ -346,18 +354,9 @@ def test_view_mission_report_csv(winterthur_app):
         reader = csv.reader(csv_content)
         rows = list(reader)
         assert rows[0] == row_headers
-        assert rows[1] == [
-            '12.11.2024', '08:31', '2h', 'Brand', 'single', '1', '',
-            '', 'Luzern', '10', '5', 'False'
-        ]
-        assert rows[2] == [
-            '05.11.2024', '03:12', '0.5h', 'Rauchmelder', 'single', '1', '',
-            '', 'Kriens', '3', '2', 'False'
-        ]
-        assert rows[3] == [
-            '12.10.2024', '08:21', '1h', 'Kellerbrand', 'single', '1', '',
-            '', 'Reussbühl', '6', '8', 'False'
-        ]
+        assert rows[1] == expected_row_luzern
+        assert rows[2] == expected_row_kriens
+        assert rows[3] == expected_row_reussbuehl
         assert len(rows) == 4
 
         response = client.get('/mission-reports/csv?year=2023')
@@ -365,10 +364,7 @@ def test_view_mission_report_csv(winterthur_app):
         reader = csv.reader(csv_content)
         rows = list(reader)
         assert rows[0] == row_headers
-        assert rows[1] == [
-            '12.11.2023', '05:01', '4.2h', 'Wohnhausbrand', 'single', '1', '',
-            '', 'Tribschen', '20', '1', 'False'
-        ]
+        assert rows[1] == expected_row_tribschen
         assert len(rows) == 2
 
         response = client.get('/mission-reports/csv?year=2022')
@@ -383,22 +379,10 @@ def test_view_mission_report_csv(winterthur_app):
         reader = csv.reader(csv_content)
         rows = list(reader)
         assert rows[0] == row_headers
-        assert rows[1] == [
-            '12.11.2024', '08:31', '2h', 'Brand', 'single', '1', '',
-            '', 'Luzern', '10', '5', 'False'
-        ]
-        assert rows[2] == [
-            '05.11.2024', '03:12', '0.5h', 'Rauchmelder', 'single', '1', '',
-            '', 'Kriens', '3', '2', 'False'
-        ]
-        assert rows[3] == [
-            '12.10.2024', '08:21', '1h', 'Kellerbrand', 'single', '1', '',
-            '', 'Reussbühl', '6', '8', 'False'
-        ]
-        assert rows[4] == [
-            '12.11.2023', '05:01', '4.2h', 'Wohnhausbrand', 'single', '1', '',
-            '', 'Tribschen', '20', '1', 'False'
-        ]
+        assert rows[1] == expected_row_luzern
+        assert rows[2] == expected_row_kriens
+        assert rows[3] == expected_row_reussbuehl
+        assert rows[4] == expected_row_tribschen
         assert len(rows) == 5
 
 
