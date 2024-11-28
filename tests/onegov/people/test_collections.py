@@ -23,6 +23,27 @@ def test_people(session):
     people.delete(tom)
     assert people.query().count() == 1
 
+    # try to add rachel again
+    rachel_2 = people.add_or_get(
+        first_name='Rachel',
+        last_name='Scott',
+        salutation='Dr.'
+    )
+    assert rachel_2 == rachel
+    assert people.query().count() == 1
+
+    fritz = people.add(
+        first_name='Fritz',
+        last_name='Fischer',
+        email='fritz@teich.ch'
+    )
+    fritz_2 = people.add(
+        first_name='Fritz',
+        last_name='Fischer',
+        email='fritz@lake.ch'
+    )
+    assert people.query().count() == 3
+
 
 def test_agencies(session):
     agencies = AgencyCollection(session)
