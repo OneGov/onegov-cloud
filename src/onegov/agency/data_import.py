@@ -406,10 +406,17 @@ def import_lu_people(
     persons = []
 
     def parse_person(line: 'DefaultRow') -> None:
+        vorname = v_(line.vorname) or ''
+
+        if vorname and vorname[-1].isdigit():
+            # some people have a number at the end of their first name
+            # indicating another membership
+            vorname = ' '.join(vorname.split(' ')[:-1])
+
         function = v_(line.funktion) or ''
-        person_ = people.add_or_get(
+        person = people.add_or_get(
             last_name=v_(line.nachname) or ' ',
-            first_name=v_(line.vorname) or ' ',
+            first_name=vorname,
             salutation=None,
             academic_title=v_(line.akad__titel),
             function=function,
@@ -419,10 +426,11 @@ def import_lu_people(
             website=v_(get_web_address(line.internet_adresse)),
             location_address=v_(line.adresse),
             location_code_city=v_(get_plz_city(line.plz, line.ort)),
-            access='public'
+            access='public',
+            compare_names_only=True
         )
-        persons.append(person_)
-        parse_membership(line, person_, function)
+        persons.append(person)
+        parse_membership(line, person, function)
 
     def parse_membership(
         line: 'DefaultRow',
@@ -445,37 +453,13 @@ def import_lu_people(
             else:
                 print(f'Error agency id {agency_id} not found')
 
-    def parse_additional_membership(line: 'DefaultRow') -> None:
-        vorname = v_(line.vorname) or ''
-        vorname = ' '.join(vorname.split(' ')[:-1])
-        function = v_(line.funktion) or ''
-        person = people.add_or_get(
-            first_name=vorname,
-            last_name=v_(line.nachname) or ' ',
-            salutation=None,
-            academic_title=v_(line.akad__titel),
-            function=function,
-            email=get_email(line),
-            phone=get_phone(line.isdn_nummer),
-            phone_direct=get_phone(line.mobil),
-            website=v_(get_web_address(line.internet_adresse)),
-            location_address=v_(line.adresse),
-            location_code_city=v_(get_plz_city(line.plz, line.ort)),
-            access='public',
-            compare_names_only=True
-        )
-        parse_membership(line, person, function)
-
     for ix, line in enumerate(csvfile.lines):
         if ix % 100 == 0:
             app.es_indexer.process()
             app.psql_indexer.bulk_process(session)
 
         if not check_skip(line):
-            if line.vorname and line.vorname[-1].isdigit():
-                parse_additional_membership(line)
-            else:
-                parse_person(line)
+            parse_person(line)
 
     return persons
 
