@@ -384,8 +384,7 @@ def check_skip(line: 'DefaultRow') -> bool:
 
 def check_skip_people(line: 'DefaultRow') -> bool:
     kw = 'Telefon'
-    if kw in line.name or kw in line.vorname or kw in line.funktion:
-        print(f'*** tschupre skip Telefon {line.rownumber}')
+    if kw in line.nachname or kw in line.vorname or kw in line.funktion:
         return True
 
     return False
@@ -457,7 +456,7 @@ def import_lu_people(
             app.es_indexer.process()
             app.psql_indexer.bulk_process(session)
 
-        if not check_skip(line) and not check_skip_people():
+        if not check_skip(line) and not check_skip_people(line):
             parse_person(line)
 
     return persons
@@ -487,10 +486,35 @@ def import_lu_agencies(
             None, None, None, None)
         export_fields = ['person.title', 'person.phone']
 
+        adr, pc, loc = None, None, None
+        phone, phone_u2, phone_u, phone_a, phone_ds, phone_dep = \
+            None, None, None, None, None, None
+        kw = 'Telefon'
+        if kw in line.nachname or kw in line.vorname or kw in line.funktion:
+            print(f'*** tschupre found org phone on csv line {line.rownumber}')
+            phone = get_phone(line.isdn_nummer)
+            if v_(line.unterabteilung_2):
+                phone_u2 = phone
+            elif v_(line.unterabteilung):
+                phone_u = phone
+            elif v_(line.abteilung):
+                phone_a = phone
+            elif v_(line.dienststelle):
+                phone_ds = phone
+            elif v_(line.department):
+                phone_dep = phone
+            adr = v_(line.adresse)
+            pc = v_(line.plz)
+            loc = v_(line.ort)
+
         department_name = v_(line.department)
         if department_name:
             department = agencies.add_or_get(
                 None, department_name, export_fields=export_fields)
+            if phone_dep:
+                department.phone = phone_dep
+                department.location_address = adr
+                department.location_code_city = get_plz_city(pc, loc)
             agency_id = agency_id_agency_lu([department_name])
             if agency_id not in added_agencies:
                 added_agencies[agency_id] = department
@@ -501,6 +525,10 @@ def import_lu_agencies(
                                 f'line {line.rownumber}, {line.nachname}')
             dienststelle = agencies.add_or_get(
                 department, dienststellen_name, export_fields=export_fields)
+            if phone_ds:
+                dienststelle.phone = phone_ds
+                dienststelle.location_address = adr
+                dienststelle.location_code_city = get_plz_city(pc, loc)
             agency_id = agency_id_agency_lu([
                 department_name, dienststellen_name])
             if agency_id not in added_agencies:
@@ -512,6 +540,10 @@ def import_lu_agencies(
                                   f'line {line.rownumber}, {line.nachname}')
             abteilung = agencies.add_or_get(
                 dienststelle, abteilungs_name, export_fields=export_fields)
+            if phone_a:
+                abteilung.phone = phone_a
+                abteilung.location_address = adr
+                abteilung.location_code_city = get_plz_city(pc, loc)
             agency_id = agency_id_agency_lu([
                 department_name, dienststellen_name, abteilungs_name])
             if agency_id not in added_agencies:
@@ -524,6 +556,10 @@ def import_lu_agencies(
             unterabteilung = (
                 agencies.add_or_get(abteilung, unterabteilungs_name,
                                     export_fields=export_fields))
+            if phone_u:
+                unterabteilung.phone = phone_u
+                unterabteilung.location_address = adr
+                unterabteilung.location_code_city = get_plz_city(pc, loc)
             agency_id = agency_id_agency_lu([
                 department_name, dienststellen_name, abteilungs_name,
                  unterabteilungs_name])
@@ -538,6 +574,10 @@ def import_lu_agencies(
             unterabteilung_2 = (
                 agencies.add_or_get(unterabteilung, unterabteilung_2_name,
                                     export_fields=export_fields))
+            if phone_u2:
+                unterabteilung_2.phone = phone_u2
+                unterabteilung_2.location_address = adr
+                unterabteilung_2.location_code_city = get_plz_city(pc, loc)
             agency_id = agency_id_agency_lu([
                 department_name, dienststellen_name, abteilungs_name,
                 unterabteilungs_name, unterabteilung_2_name])
