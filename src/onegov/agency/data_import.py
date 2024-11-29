@@ -76,7 +76,8 @@ def get_phone(string: str) -> str:
             return string.replace('0', '+41 ', 1)
         # lu adds country digits
         if len(string.replace(' ', '')) == 9:
-            return f'+41{string}'
+            return (f'+41 {string[0:2]} {string[2:5]} '
+                    f'{string[5:7]} {string[7:9]}')
     return string
 
 
