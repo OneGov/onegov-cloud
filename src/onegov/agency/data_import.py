@@ -382,6 +382,15 @@ def check_skip(line: 'DefaultRow') -> bool:
     return False
 
 
+def check_skip_people(line: 'DefaultRow') -> bool:
+    kw = 'Telefon'
+    if kw in line.name or kw in line.vorname or kw in line.funktion:
+        print(f'*** tschupre skip Telefon {line.rownumber}')
+        return True
+
+    return False
+
+
 def agency_id_agency_lu(words: 'Iterable[Any]') -> str:
     """
     Generates an agency id based on each organisation and sub organisation word
@@ -448,7 +457,7 @@ def import_lu_people(
             app.es_indexer.process()
             app.psql_indexer.bulk_process(session)
 
-        if not check_skip(line):
+        if not check_skip(line) and not check_skip_people():
             parse_person(line)
 
     return persons
