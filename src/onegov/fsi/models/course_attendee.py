@@ -1,3 +1,5 @@
+import datetime
+import pytz
 from onegov.core.orm import Base
 from onegov.core.orm.types import UUID, JSON
 from sqlalchemy import Boolean
@@ -255,8 +257,22 @@ class CourseAttendee(Base, ORMSearchable):
         excl = session.query(CourseEvent.id).join(CourseSubscription)
         excl = excl.filter(CourseSubscription.attendee_id == self.id)
         excl = excl.subquery('excl')
+
+        last_subscribed_event = session.query(
+            CourseEvent).join(CourseSubscription).filter(
+            CourseSubscription.attendee_id == self.id).order_by(
+            desc(CourseEvent.start)).first()
+
         result = session.query(CourseEvent).filter(CourseEvent.id.notin_(excl))
         result = result.filter(CourseEvent.start > utcnow())
+        if last_subscribed_event:
+            # Suggested events need to start at least 6 years after the last
+            # subscribed event
+            result = result.filter(
+                CourseEvent.start > datetime.datetime(
+                    last_subscribed_event.start.year + 6, 1, 1,
+                    tzinfo=pytz.utc))
+
         if not show_hidden:
             result = result.filter(CourseEvent.hidden_from_public == False)
         if not show_locked:

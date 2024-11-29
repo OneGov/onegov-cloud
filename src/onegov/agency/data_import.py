@@ -375,11 +375,6 @@ def check_skip(line: 'DefaultRow') -> bool:
     if line.nachname == '' and line.vorname == '':
         return True  # skip empty lines
 
-    if line.vorname and line.vorname[-1].isdigit():
-        print(f'Error importing person with digit in first name; line '
-              f'{line.rownumber}, {line.vorname}')
-        return True
-
     return False
 
 
@@ -420,35 +415,50 @@ def import_lu_people(
     persons = []
 
     def parse_person(line: 'DefaultRow') -> None:
-        agency_id = agency_id_person_lu(line)
-        hi_code = v_(line.hi_code)
-        order = 0 if not hi_code else int(hi_code)
+        vorname = v_(line.vorname) or ''
 
-        person_ = people.add(
+        if vorname and vorname[-1].isdigit():
+            # some people have a number at the end of their first name
+            # indicating another membership
+            vorname = ' '.join(vorname.split(' ')[:-1])
+
+        function = v_(line.funktion) or ''
+        person = people.add_or_get(
             last_name=v_(line.nachname) or ' ',
-            first_name=v_(line.vorname) or ' ',
+            first_name=vorname,
             salutation=None,
             academic_title=v_(line.akad__titel),
-            function=v_(line.funktion),
+            function=function,
             email=get_email(line),
             phone=get_phone(line.isdn_nummer),
             phone_direct=get_phone(line.mobil),
             website=v_(get_web_address(line.internet_adresse)),
             location_address=v_(line.adresse),
             location_code_city=v_(get_plz_city(line.plz, line.ort)),
-            access='public'
+            access='public',
+            compare_names_only=True
         )
-        persons.append(person_)
+        persons.append(person)
+        parse_membership(line, person, function)
+
+    def parse_membership(
+        line: 'DefaultRow',
+        person: 'ExtendedPerson',
+        function: str
+    ) -> None:
+        agency_id = agency_id_person_lu(line)
+        hi_code = v_(line.hi_code)
+        order = 0 if not hi_code else int(hi_code)
 
         if agency_id:
-            agency = agencies.get(agency_id, None)
+            agency = agencies.get(agency_id)
             if agency and order:
-                agency.add_person(person_.id,
-                                  title=person_.function or 'Mitglied',
+                agency.add_person(person.id,
+                                  title=function or 'Mitglied',
                                   order_within_agency=order)
             elif agency:
-                agency.add_person(person_.id,
-                                  title=person_.function or 'Mitglied')
+                agency.add_person(person.id,
+                                  title=function or 'Mitglied')
             else:
                 print(f'Error agency id {agency_id} not found')
 
