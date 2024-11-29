@@ -1,3 +1,5 @@
+from uuid import uuid4
+
 from onegov.core.orm.abstract import MoveDirection
 from onegov.people.collections import AgencyCollection
 from onegov.people.collections import AgencyMembershipCollection
@@ -29,20 +31,43 @@ def test_people(session):
         last_name='Scott',
         salutation='Dr.'
     )
-    assert rachel_2 == rachel
+    assert rachel_2 is rachel
     assert people.query().count() == 1
 
+    # add Fritz twice with different email and phone
     fritz = people.add(
         first_name='Fritz',
         last_name='Fischer',
-        email='fritz@teich.ch'
+        email='fritz@teich.ch',
+        phone='1234567890',
     )
-    fritz_2 = people.add(
+    fritz_2 = people.add_or_get(
         first_name='Fritz',
         last_name='Fischer',
-        email='fritz@lake.ch'
+        email='fritz@lake.ch',
+        phone='1234567891',
     )
     assert people.query().count() == 3
+    assert fritz_2 is not fritz
+
+    # add george twice option compare_names_only
+    george = people.add(
+        first_name='George',
+        last_name='Washington',
+        function='President'
+    )
+    george_2 = people.add_or_get(
+        first_name='George',
+        last_name='Washington',
+        function='Founder',
+        compare_names_only=True
+    )
+    assert people.query().count() == 4
+    assert george_2 is george
+
+    assert people.by_id(george.id) is george_2
+    assert people.by_id('123') is None
+    assert people.by_id(uuid4()) is None
 
 
 def test_agencies(session):

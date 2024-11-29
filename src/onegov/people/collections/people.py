@@ -38,13 +38,20 @@ class BasePersonCollection(GenericCollection[PersonT]):
         self,
         first_name: str,
         last_name: str,
+        compare_names_only: bool = False,
         **optional: Any
     ) -> PersonT:
+        """
+        Adds a person if it does not exist yet, otherwise returns the
+        existing.
+
+        """
         query = self.query()
         query = query.filter(self.model_class.first_name == first_name)
         query = query.filter(self.model_class.last_name == last_name)
-        for key, value in optional.items():
-            query = query.filter(getattr(self.model_class, key) == value)
+        if not compare_names_only:
+            for key, value in optional.items():
+                query = query.filter(getattr(self.model_class, key) == value)
 
         item = query.first()
 

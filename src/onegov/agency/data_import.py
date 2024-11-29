@@ -425,9 +425,9 @@ def import_lu_people(
         parse_membership(line, person_, function)
 
     def parse_membership(
-            line: 'DefaultRow',
-            person: 'ExtendedPerson',
-            function: str
+        line: 'DefaultRow',
+        person: 'ExtendedPerson',
+        function: str
     ) -> None:
         agency_id = agency_id_person_lu(line)
         hi_code = v_(line.hi_code)
@@ -461,7 +461,8 @@ def import_lu_people(
             website=v_(get_web_address(line.internet_adresse)),
             location_address=v_(line.adresse),
             location_code_city=v_(get_plz_city(line.plz, line.ort)),
-            access='public'
+            access='public',
+            compare_names_only=True
         )
         parse_membership(line, person, function)
 
