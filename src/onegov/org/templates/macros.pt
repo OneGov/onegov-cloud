@@ -309,21 +309,23 @@
             </tal:b>
         </tal:b>
         <metal:b define-slot="before-submit" />
-        <tal:b condition="cancel|nothing">
-            <a class="button secondary cancel-button" href="${cancel}" i18n:translate="" role="button">
-                <tal:b condition="not:cancel_text|nothing">
-                    Cancel
-                </tal:b>
-                <tal:b condition="cancel_text|nothing">
-                    ${cancel_text}
-                </tal:b>
-            </a>
-        </tal:b>
-        <tal:b condition="not: button_text|nothing">
-            <input type="submit" value="Submit" class="button" i18n:attributes="value">
-        </tal:b>
-        <tal:b condition="button_text|nothing">
-            <input type="submit" value="${button_text}" class="button" role="button">
+        <tal:b condition="not: layout.edit_mode|False">
+            <tal:b condition="cancel|nothing">
+                <a class="button secondary cancel-button" href="${cancel}" i18n:translate="" role="button">
+                    <tal:b condition="not:cancel_text|nothing">
+                        Cancel
+                    </tal:b>
+                    <tal:b condition="cancel_text|nothing">
+                        ${cancel_text}
+                    </tal:b>
+                </a>
+            </tal:b>
+            <tal:b condition="not: button_text|nothing">
+                <input type="submit" value="Submit" class="button" i18n:attributes="value">
+            </tal:b>
+            <tal:b condition="button_text|nothing">
+                <input type="submit" value="${button_text}" class="button" role="button">
+            </tal:b>
         </tal:b>
     </form>
 </metal:form>
@@ -1907,7 +1909,6 @@
                 ic-on-success="
                     var info = $(elt).closest('tr');
                     info.prev().remove();
-                    info.next().remove();
                     info.remove();
                 "
                 data-confirm="Do you really want to delete this file?"
@@ -2231,7 +2232,7 @@
                 <p tal:repeat="value results.get(field.id, [])">"${value}"</p>
             </tal:b>
         </p>
-        <tal:b tal:condition="field.type in aggregated">      
+        <tal:b tal:condition="field.type in aggregated">
             <div class="chart-wrap" tal:condition="field.type == 'MultiCheckboxField'">
                 <div tal:define="maximum max(results[field.id].values())" class="grid horizontal">
                     <tal:b tal:repeat="choice field.choices">
@@ -2249,7 +2250,7 @@
                         </tal:b>
                     </tal:b>
                 </div>
-            </div> 
+            </div>
         </tal:b>
     </tal:b>
 </metal:display_results>

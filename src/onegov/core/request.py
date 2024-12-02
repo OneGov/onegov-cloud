@@ -17,7 +17,7 @@ from morepath.authentication import NO_IDENTITY
 from morepath.request import SAME_APP
 from onegov.core import utils
 from onegov.core.crypto import random_token
-from ua_parser import user_agent_parser  # type:ignore[import-untyped]
+from ua_parser import user_agent_parser
 from webob.exc import HTTPForbidden
 from wtforms.csrf.session import SessionCSRF
 
@@ -58,7 +58,7 @@ if TYPE_CHECKING:
         @property
         def username(self) -> str | Column[str]: ...
         @property
-        def group_id(self) -> UUID | None | Column[UUID | None]: ...
+        def group_id(self) -> UUID | Column[UUID | None] | None: ...
         @property
         def role(self) -> str | Column[str]: ...
 

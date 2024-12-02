@@ -1,6 +1,6 @@
 from _typeshed import SupportsItems
 from collections.abc import Iterable, Iterator, Mapping, Sequence
-from typing import Any, ClassVar, Protocol, TypeVar, overload
+from typing import Any, Protocol, TypeVar, overload
 from typing_extensions import TypeAlias
 
 from wtforms.fields.core import Field, UnboundField

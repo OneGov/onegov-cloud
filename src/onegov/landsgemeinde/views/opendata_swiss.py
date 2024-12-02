@@ -187,7 +187,7 @@ def view_rdf(
         url = request.link(item, 'json')
         sub(dist, 'dcat:accessURL', {'rdf:resource': url})
         sub(dist, 'dcat:downloadURL', {'rdf:resource': url})
-        sub( dist, 'dct:license', {
+        sub(dist, 'dct:license', {
             'rdf:resource': 'http://dcat-ap.ch/vocabulary/licenses/terms_by'
         })
         sub(dist, 'dcat:mediaType', {

@@ -135,7 +135,8 @@ def parse_structure(
                 raise ValidationError('Namespaced attributes are not allowed')
 
         if element.tag not in valid_tags:
-            raise ValidationError("Invalid element '<{}>'".format(element.tag))
+            raise ValidationError(
+                "Invalid element '<{}>'".format(element.tag))  # type:ignore
 
     return xml_tree
 

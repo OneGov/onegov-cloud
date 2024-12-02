@@ -100,7 +100,7 @@
                 </ul>
             </div>
             <div class="video-link" tal:define="votum_timestamp (votum.video_timestamp or votum.calculated_timestamp)">
-                <a tal:condition="votum_timestamp" href="${append_query_param(request.url, 'start', timestamp_to_seconds(votum_timestamp))}">
+                <a tal:condition="votum_timestamp" data-timestamp="${timestamp_to_seconds(votum_timestamp)}" href="#content">
                     <i class="far fa-play-circle"></i>
                     <tal:b i18n:translate="">${votum_timestamp}</tal:b>
                 </a>
@@ -242,6 +242,12 @@
         </p>
     </a>
 </metal:search_result_files>
+
+<metal:footer_contact define-macro="footer_contact" i18n:domain="onegov.landsgemeinde">
+    <h5 tal:condition="contact or contact_url">Auskunft</h5>
+    <div tal:content="layout.org.contact_html" />
+    <a tal:condition="contact_url" tal:attributes="href contact_url"><strong><tal:b i18n:translate>more</tal:b>…</strong></a>
+</metal:footer_contact>
 
 </body>
 <html>

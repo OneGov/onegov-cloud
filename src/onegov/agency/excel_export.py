@@ -65,16 +65,14 @@ def export_person_xlsx(session: 'Session') -> BytesIO:
 
     write_out = extract_person_data(session)
 
-    row = 0
-    for entry in write_out:
-        row += 1
-        for col_ix, value in enumerate(entry.values()):
+    for row, entry in enumerate(write_out, start=1):
+        for column, value in enumerate(entry.values()):
             if value is None:
-                worksheet.write_string(row, col_ix, '')
+                worksheet.write_string(row, column, '')
             elif isinstance(value, str):
-                worksheet.write_string(row, col_ix, value)
+                worksheet.write_string(row, column, value)
             elif isinstance(value, (int, Decimal)):
-                worksheet.write_number(row, col_ix, value)
+                worksheet.write_number(row, column, value)
             else:
                 raise NotImplementedError()
 

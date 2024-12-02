@@ -33,7 +33,7 @@ class InvoiceCollection(GenericCollection[Invoice]):
         self.period_id = period_id
 
         if schema not in KNOWN_SCHEMAS:
-            raise RuntimeError('Unknown schema: {schema}')
+            raise RuntimeError(f'Unknown schema: {schema}')
 
         self.schema_name = schema
         self.schema_config = (schema_config or {})

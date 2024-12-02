@@ -404,7 +404,7 @@ def view_subscribers(
 
 
 @OrgApp.form(model=NewsletterCollection, name='new', template='form.pt',
-             permission=Public, form=get_newsletter_form)
+             permission=Private, form=get_newsletter_form)
 def handle_new_newsletter(
     self: NewsletterCollection,
     request: 'OrgRequest',
@@ -750,4 +750,3 @@ def import_newsletter_recipients(
         'form': form,
         'form_width': 'large',
     }
-

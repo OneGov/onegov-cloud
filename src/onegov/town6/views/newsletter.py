@@ -85,7 +85,7 @@ def town_view_subscribers(
     model=NewsletterCollection,
     name='new',
     template='form.pt',
-    permission=Public,
+    permission=Private,
     form=get_newsletter_form
 )
 def town_handle_new_newsletter(

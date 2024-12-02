@@ -66,7 +66,7 @@ jobs:
       run: |
         source /app/bin/activate
         python -m pip install --upgrade uv
-        uv pip install pytest-split
+        uv pip install pytest-split pytest-xdist
         # TEMPORARY: editable build so we don't need a path-fix in codecov
         uv pip install -e .[test]
       env:
@@ -84,6 +84,8 @@ jobs:
         redis-server --daemonize yes
         # NOTE: Allow the test user to write to this file
         chown test .test_durations
+        # NOTE: Avoid dubious ownership error when commiting
+        git config --global --add safe.directory $PWD
 
     - name: Measure test durations
       run: |

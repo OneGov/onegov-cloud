@@ -16,8 +16,8 @@ def test_locked_course_event_reservations(client_with_db):
     page.form['presenter_company'] = 'Presenter'
     page.form['presenter_email'] = 'presenter@example.org'
     page.form['locked_for_subscriptions'] = True
-    page.form['start'] = '2050-10-04 10:00'
-    page.form['end'] = '2050-10-04 12:00'
+    page.form['start'] = '2056-10-04 10:00'
+    page.form['end'] = '2056-10-04 12:00'
     page.form['location'] = 'location'
     page.form['max_attendees'] = 20
     # goes to the event created
@@ -28,13 +28,56 @@ def test_locked_course_event_reservations(client_with_db):
     # Hinzufügen - Teilnehmer als editor
     add_subscription = new.click('Teilnehmer', href='reservations', index=0)
     page = add_subscription.form.submit()
-    assert 'Diese Durchführung kann (nicht) mehr gebucht werden.' in page
+    assert 'Diese Durchführung kann nicht (mehr) gebucht werden.' in page
 
     client.login_admin()
     add_subscription = new.click('Teilnehmer', href='reservations', index=0)
     page = add_subscription.form.submit().follow()
     assert 'Neue Anmeldung wurde hinzugefügt' in page
-    assert 'Diese Durchführung kann (nicht) mehr gebucht werden.' not in page
+    assert 'Diese Durchführung kann nicht (mehr) gebucht werden.' not in page
+
+
+def test_subscription_to_a_course_event(client_with_db):
+    client = client_with_db
+    client.login_admin()
+    session = client.app.session()
+    course = session.query(Course).first()
+
+    attendee = session.query(CourseAttendee).first()
+    assert attendee.user_id == session.query(User).filter_by(
+        role='member').first().id
+    assert attendee.organisation == 'ORG'
+
+    # Add a new course event
+    page = client.get(f'/fsi/events/add?course_id={course.id}')
+    page.form['presenter_name'] = 'Presenter'
+    page.form['presenter_company'] = 'Presenter'
+    page.form['presenter_email'] = 'presenter@example.org'
+    page.form['locked_for_subscriptions'] = True
+    page.form['start'] = '2054-10-04 10:00'
+    page.form['end'] = '2054-10-04 12:00'
+    page.form['location'] = 'location'
+    page.form['max_attendees'] = 20
+    # goes to the event created
+    new = page.form.submit().follow()
+    assert 'Eine neue Durchführung wurde hinzugefügt' in new
+
+    coll = CourseEventCollection(session, upcoming_only=True)
+    events = coll.query().all()
+    assert len(events) == 3
+
+    form = client.get('/fsi/reservations/add')
+    form.form['attendee_id'] = str(attendee.id)
+    form.form['course_event_id'] = str(events[1].id)
+    page = form.form.submit()
+    assert 'Die gewählte Kursdurchführung muss mindestens 6 Jahre' in page
+    assert 'Für dieses Jahr gibt es bereits andere Anmeldungen ' not in page
+
+    form = client.get('/fsi/reservations/add')
+    form.form['attendee_id'] = str(attendee.id)
+    form.form['course_event_id'] = str(events[2].id)
+    page = form.form.submit().follow()
+    assert 'Neue Anmeldung wurde hinzugefügt' in page
 
 
 def test_reservation_collection_view(client_with_db):

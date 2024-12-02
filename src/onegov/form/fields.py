@@ -311,7 +311,7 @@ class UploadMultipleField(UploadMultipleBase, FileField):
     if TYPE_CHECKING:
         _separator: str
 
-        def _add_entry(self, __d: _MultiDictLikeWithGetlist) -> UploadField:
+        def _add_entry(self, d: _MultiDictLikeWithGetlist, /) -> UploadField:
             ...
 
     upload_field_class: type[UploadField] = UploadField
@@ -524,7 +524,7 @@ class MarkupField(TextAreaField):
     def process_formdata(self, valuelist: list['RawFormValue']) -> None:
         if valuelist:
             assert isinstance(valuelist[0], str)
-            self.data = Markup(valuelist[0])  # noqa: MS001
+            self.data = Markup(valuelist[0])  # noqa: RUF035
         else:
             self.data = None
 

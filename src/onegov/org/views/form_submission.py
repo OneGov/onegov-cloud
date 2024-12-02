@@ -468,10 +468,10 @@ def handle_submission_action(
 
 @OrgApp.html(model=SurveySubmission,
              template='survey_submission.pt',
-             permission=Private, request_method='GET')
+             permission=Public, request_method='GET')
 @OrgApp.html(model=SurveySubmission,
              template='survey_submission.pt',
-             permission=Private, request_method='POST')
+             permission=Public, request_method='POST')
 def handle_survey_submission(
     self: SurveySubmission,
     request: 'OrgRequest',
@@ -535,4 +535,3 @@ def handle_survey_submission(
         'model': self,
         'price': None,
     }
-

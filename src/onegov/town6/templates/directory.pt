@@ -36,7 +36,7 @@
                         </a>
                         <div class="accordion-content" data-tab-content>
                             <ul tal:repeat="item entry.values.items()" style="list-style: none; margin-left: 0">
-                                <li tal:define="key item[0].capitalize(); value item[1].replace('\r\n', Markup('<br>'))" tal:content="Markup('<strong>{}</strong>: {}').format(key, value)"></li>
+                                <li tal:define="key item[0].capitalize(); value str(item[1]).replace ('\r\n', Markup('<br>'))" tal:content="Markup('<strong>{}</strong>: {}').format(key, value)"></li>
                             </ul>
                             <ul style="list-style: none; margin-left: 0">
                                 <li>
@@ -132,8 +132,7 @@
                             </li>
                         </ul>
                     </div>
-
-                    <div class="side-panel" tal:condition="directory.enable_update_notifications|False or directory.enable_submissions">
+                    <div class="side-panel" tal:condition="directory.enable_submissions or directory.enable_update_notifications|False">
                         <h3 i18n:translate>Actions</h3>
                         <div class="side-panel-with-bg">
                             <ul class="more-list">
@@ -144,7 +143,7 @@
                                     </a>
                                 </li>
                                 <li class="icon-item" tal:condition="directory.enable_submissions">
-                                    <a class="list-link multi-line" href="${submit}">
+                                    <a class="list-link" href="${submit}">
                                         <i class="fa fa-folder-plus"></i>
                                         <span class="list-title" i18n:translate>Propose a new entry</span>
                                     </a>

@@ -104,6 +104,11 @@ def cfg_path(
                 'configuration': {
                     'dsn': postgres_dsn,
                     'redis_url': redis_url,
+                    # FIXME: For some reason some of the tests crash on the CI
+                    #        under certain circumstances, if we try to
+                    #        configure an indexer, eventually we should try
+                    #        to get rid of this hack
+                    'enable_elasticsearch': False,
                     'depot_backend': 'depot.io.memory.MemoryFileStorage',
                     'filestorage': 'fs.osfs.OSFS',
                     'filestorage_options': {

@@ -1,4 +1,5 @@
 import os.path
+
 import pytest
 
 from collections import defaultdict
@@ -14,6 +15,7 @@ from onegov.form.extensions import Extendable
 from onegov.org.models.extensions import (
     PersonLinkExtension, ContactExtension, AccessExtension, HoneyPotExtension,
     SidebarLinksExtension, PeopleShownOnMainPageExtension,
+    InlinePhotoAlbumExtension,
 )
 from onegov.people import Person
 from tests.shared.utils import create_pdf
@@ -215,8 +217,8 @@ def test_person_link_extension_order():
     field = form.people
     field.append_entry()
     assert len(field) == 2
-    field[0].form.person.data ='6d120102d90344868eb32614cf3acb1a'
-    field[1].form.person.data ='f0281b558a5f43f6ac81589d79538a87'
+    field[0].form.person.data = '6d120102d90344868eb32614cf3acb1a'
+    field[1].form.person.data = 'f0281b558a5f43f6ac81589d79538a87'
     form.populate_obj(topic)
 
     # the people are kept sorted by lastname, firstname by default
@@ -615,3 +617,33 @@ def test_sidebar_links_extension(session):
     assert topic.sidepanel_links == [
         ('Govikon School', 'https://www.govikon-school.ch'),
         ('Castle Govikon', 'https://www.govikon-castle.ch')]
+
+
+def test_inline_photo_album_extension():
+    class Topic(InlinePhotoAlbumExtension):
+        meta = {}
+        content = {}
+
+    class TopicForm(Form):
+        pass
+
+    # Mock database-related classes
+    class MockQuery:
+        def all(self):
+            return []
+
+    class MockSession:
+        def query(self, *args):
+            return MockQuery()
+
+    topic = Topic()
+    assert topic.photo_album_id is None
+
+    request = Bunch(
+        session=MockSession(),
+        app=Bunch(**{'settings.org.disabled_extensions': []}),
+        translate=lambda text: text
+    )
+
+    form_class = topic.with_content_extensions(TopicForm, request=request)
+    assert form_class == TopicForm  # No albums = no form extension
