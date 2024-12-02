@@ -299,7 +299,7 @@ class SearchPostgres(Pagination[_M]):
 
         return combined_vector
 
-    def filter_user_level(self, model, query):
+    def filter_user_level(self, model: Any, query: Any) -> Any:
         """ Filters search content according user level """
 
         if not self.request.is_logged_in:  # maybe not needed
