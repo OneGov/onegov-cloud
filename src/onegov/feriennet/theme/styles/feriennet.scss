@@ -209,10 +209,14 @@ ul.single-line {
 
 .calendar-add-icon {
     @include generic-icon('\f271');
+
+    .fa-external-link-alt {
+        display: none;
+    }
 }
 
 .calendar-edit-icon {
-    @include generic-icon('\f040');
+    @include generic-icon('\f044');
 }
 
 .location-icon {
@@ -233,8 +237,8 @@ ul.single-line {
 #global-tools,
 .globals,
 .edit-bar {
-    .accept-activity::before { @include icon('\f087'); }
-    .archive-activity::before { @include icon('\f187'); }
+    .accept-activity::before { @include icon-bold('\f164'); }
+    .archive-activity::before { @include icon-bold('\f187'); }
     .feriennet-management::before { @include icon('\f274'); }
     .import::before { @include icon-bold('\f093'); }
     .manage-billing::before { @include icon-bold('\f0d6'); }
@@ -252,7 +256,7 @@ ul.single-line {
     .reset-billing::before { @include icon('\f12d'); }
     .reset-matching::before { @include icon('\f12d'); }
     .run-matching::before { @include icon('\f0d0'); }
-    .show-activity::before { @include icon('\f135'); }
+    .show-activity::before { @include icon-bold('\f135'); }
     .show-attendees::before { @include icon-bold('\f0c0'); }
     .show-dashboard::before { @include icon-bold('\f3fd'); }
     .show-exports::before { @include icon-bold('\f019'); }
@@ -455,6 +459,13 @@ footer {
     margin-bottom: 1rem;
 }
 
+.vacation-activity-layout {
+    .hint-prebooking,
+    .hint-booking {
+        display: none;
+    }
+}
+
 .activity-active-period {
     margin-bottom: 2rem;
 
@@ -495,7 +506,7 @@ footer {
         margin-left: 2rem;
 
         &::before {
-            @include icon-bold('\f061'); 
+            @include icon-bold('\f061');
         }
     }
 }
@@ -860,27 +871,7 @@ $booking-left-margin: 1.6rem;
             }
         }
 
-        .icons {
-            position: absolute;
-            right: 32px;
-            top: 24px;
 
-            a {
-                cursor: pointer;
-            }
-
-            a::before {
-                background-color: $light-background;
-                border-radius: 50px;
-                display: inline-block;
-                height: 24px;
-                line-height: 24px;
-                margin: 0;
-                padding-left: 2px;
-                text-align: center;
-                width: 24px;
-            }
-        }
 
         h3 {
             font-weight: 500;
@@ -942,10 +933,6 @@ $booking-left-margin: 1.6rem;
             }
         }
 
-        .last-state {
-            padding-bottom: 1rem;
-        }
-
         .total-costs {
             border: 1px solid $gainsboro;
             border-left: 0;
@@ -954,7 +941,7 @@ $booking-left-margin: 1.6rem;
             margin-top: 0;
             padding: .75rem 1.2rem .75rem ;
 
-            .columns:last-child {
+            .cell:last-child {
                 text-align: right;
             }
         }
@@ -967,7 +954,7 @@ $booking-left-margin: 1.6rem;
             font-family: $font-family-monospace;
             font-size: .875rem;
             position: absolute;
-            right: 1rem;
+            right: 0;
             top: .5rem;
         }
 
@@ -979,9 +966,37 @@ $booking-left-margin: 1.6rem;
 
     }
 
-    .attendee-title {
-        padding: .5rem 1.5rem !important;
+    .title-section {
+        display: flex;
         background: $gainsboro;
+        padding: .5rem 1.5rem !important;
+        align-items: center;
+
+        .attendee-title {
+            flex-grow: 1;
+        }
+
+        .icons {
+            display: block;
+            font-size: .9em;
+
+            a:hover:before {
+                background-color: $white;
+            }
+
+            a::before {
+                background-color: $white-smoke;
+                border-radius: 50px;
+                display: inline-block;
+                height: 2rem;
+                line-height: 2rem;
+                margin: 0;
+                padding-left: 2px;
+                text-align: center;
+                width: 2rem;
+                transition: background linear .2s;
+            }
+        }
     }
 
     .state-title {
@@ -1392,7 +1407,7 @@ $booking-left-margin: 1.6rem;
     .matching-details {
         display: inline-block;
         width: 100%;
-        
+
         > a {
             display: flex;
             align-items: center;
@@ -1406,7 +1421,7 @@ $booking-left-margin: 1.6rem;
     }
 }
 
-/* 
+/*
     Buttons
 */
 .details-button {
@@ -1527,7 +1542,7 @@ $booking-left-margin: 1.6rem;
     margin: 0 !important;
     padding: 5px !important;
     width: 24px;
-    
+
     &:hover {
         margin: 0 !important;
         background-color: $monsoon !important;
@@ -1614,7 +1629,7 @@ $booking-left-margin: 1.6rem;
             margin-bottom: 0;
             padding: .75rem;
         }
-    
+
         span.outstanding {
             font-size: .9rem;
             flex-grow: 1;
@@ -1623,7 +1638,7 @@ $booking-left-margin: 1.6rem;
         button {
             margin-right: .5rem !important;
         }
-    
+
     }
 
     @mixin payment-state-color($pastel, $light, $dark) {
@@ -2141,7 +2156,7 @@ li.unpaid {
 */
 
 .emergency-contact {
-    
+
     border-color: scale-color($callout-panel-bg, $lightness: -11%);
 
     margin-bottom: 1.5rem;
@@ -2413,7 +2428,7 @@ li.unpaid {
 
     div > img,
     div > a > img {
-        border-radius: 2px;
+        border-radius: .7rem;
     }
 
     a {
@@ -2421,6 +2436,10 @@ li.unpaid {
         display: block;
         text-decoration: none;
         z-index: 2;
+
+        .fa-external-link-alt {
+            display: none;
+        }
     }
 
     p.banner-info {
@@ -2603,7 +2622,7 @@ li.unpaid {
             p, ul {
                 margin-bottom: .5rem;
             }
-    
+
             &.info {
                 display:flex;
                 flex-wrap: wrap;
@@ -2615,7 +2634,7 @@ li.unpaid {
             p:last-child {
                 margin-bottom: 0;
             }
-    
+
             &:last-child {
                 padding-bottom: 1.5rem !important;
 
@@ -2625,7 +2644,7 @@ li.unpaid {
             }
         }
     }
-    
+
 }
 
 .field-attendee {
@@ -2730,7 +2749,7 @@ li.unpaid {
     a {
         margin-left: 1rem;
         margin-right: 0;
-        
+
     }
 
     .need-actions {
