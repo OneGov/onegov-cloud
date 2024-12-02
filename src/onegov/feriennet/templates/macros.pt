@@ -583,7 +583,7 @@
                     <div class="cost">
                         <p>
                             <span i18n:translate class="show-for-sr">Cost</span>
-    
+
                             <tal:b i18n:translate>
                                 <tal:b i18n:name="cost" replace="occasion.cost" /> CHF
                             </tal:b>
@@ -595,7 +595,7 @@
                     <div class="cost" tal:define="cost occasion.total_cost">
                         <p>
                             <span i18n:translate class="show-for-sr">Cost</span>
-    
+
                             <tal:b condition="cost" i18n:translate>
                                 <tal:b i18n:name="cost" replace="cost" /> CHF
                             </tal:b>
@@ -736,6 +736,7 @@
 </metal:star>
 
 <metal:hints define-macro="period_hints" i18n:domain="onegov.feriennet">
+
     <div tal:condition="period.finalized and not period.book_finalized"
          class="hint hint-finalized" i18n:translate>
             There cannot be any more bookings.
@@ -950,7 +951,7 @@
         <div class="grid-x grid-padding-x align-center">
             <h3><i class="fas fa-sliders-h"></i> <tal:b i18n:translate>Filters</tal:b></h3>
         </div>
-        
+
         <div class="navigation-area">
             <div class="menu-wrapper">
                 <ul class="accordion" data-accordion data-allow-all-closed="true" data-slide-speed="0">
@@ -967,7 +968,7 @@
                 </ul>
             </div>
         </div>
-        
+
         <div class="grid-x grid-padding-x align-center">
             <button ic-select-from-response="#activities" ic-target="#activities" ic-get-from="${request.url.replace('/filters','',1)}" class="button apply-filters" type="button" i18n:translate data-close>Apply filters</button>
         </div>

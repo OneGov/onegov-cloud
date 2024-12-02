@@ -490,10 +490,8 @@ def test_activity_filter_age_ranges(client, scenario):
 
     scenario.commit()
 
-    preschool = client.get('/activities').click(
-        '5', href='filter=age', index=0)
-    highschool = client.get('/activities').click(
-        '15', href='filter=age', index=0)
+    preschool = client.get('/activities?filter=age_ranges%3A5-5')
+    highschool = client.get('/activities?filter=age_ranges%3A15-15')
 
     assert "Retreat" in preschool
     assert "Meeting" in preschool
@@ -505,8 +503,7 @@ def test_activity_filter_age_ranges(client, scenario):
     with scenario.update():
         scenario.occasions[1].age = NumericRange(15, 20)
 
-    preschool = client.get('/activities').click(
-        '5', href='filter=age', index=0)
+    preschool = client.get('/activities?filter=age_ranges%3A5-5')
 
     assert "Retreat" in preschool
     assert "Meeting" not in preschool
@@ -1557,13 +1554,13 @@ def test_deadline(client, scenario):
         assert period.wishlist_phase
         assert period.is_prebooking_in_past is False
         page = client.get('/activity/foo')
-        assert 'Anmelden' in page.pyquery('.call-to-action a')[0].text
+        assert 'Anmelden' in page.pyquery('.enroll a')[0].text
 
     with freeze_time(prebook_midnight - timedelta(minutes=30)):
         assert not period.wishlist_phase
         assert period.is_prebooking_in_past is False
         page = client.get('/activity/foo')
-        assert not page.pyquery('.call-to-action')
+        assert not page.pyquery('.enroll')
 
     with freeze_time(scenario.latest_period.booking_end + timedelta(days=1)):
 

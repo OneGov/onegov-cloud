@@ -733,6 +733,7 @@ $pageref-color-hover: $iron;
             transition: all 200ms linear;
             position: absolute;
         }
+    }
 
     .more-list {
 
@@ -1219,13 +1220,13 @@ ul.recipients {
                 @include rotate;
             }
         }
-        
+
         &:hover {
             padding: .7rem 1rem !important;
             margin-left: 0;
             margin-right: 0;
         }
-    }  
+    }
     .dropdown-pane {
         background: transparent;
         padding: .5rem 0 0;
@@ -1279,7 +1280,7 @@ ul.recipients {
     list-style: none;
     padding: 0;
     width: auto;
-    
+
     li a {
         display: block;
         padding:.5rem .7rem;

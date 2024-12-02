@@ -441,6 +441,7 @@ def is_filtered(filters: dict[str, tuple[str, 'Sequence[Link]']]) -> bool:
 
     return False
 
+
 def count_active(filter: tuple[str, 'Sequence[Link]']) -> int:
     return sum(1 for link in filter[1] if link.active)
 
@@ -508,18 +509,22 @@ def view_activities(
         filters['tags'] = (_('Tags'), filter_tags(self, request))
         filters['durations'] = (_('Duration'), filter_durations(self, request))
         filters['ages'] = (_('Age'), filter_ages(self, request))
-        filters['price_range'] = (_('Price'), filter_price_range(self, request))
+        filters['price_range'] = (_('Price'),
+                                  filter_price_range(self, request))
 
         if active_period:
             filters['weeks'] = (_('Weeks'), filter_weeks(self, request))
 
         filters['weekdays'] = (_('Weekdays'), filter_weekdays(self, request))
-        filters['available'] = (_('Free Spots'), filter_available(self, request))
-        filters['municipalities'] = (_('Municipalities'), filter_municipalities(self, request))
+        filters['available'] = (_('Free Spots'),
+                                filter_available(self, request))
+        filters['municipalities'] = (_('Municipalities'),
+                                     filter_municipalities(self, request))
 
         if request.is_organiser:
             if request.app.periods:
-                filters['periods'] = (_('Periods'), filter_periods(self, request))
+                filters['periods'] = (_('Periods'),
+                                      filter_periods(self, request))
 
             filters['own'] = (_('Advanced'), filter_own(self, request))
             filters['states'] = (_('State'), filter_states(self, request))
@@ -535,7 +540,6 @@ def view_activities(
     active_filter = request.params.get('active-filter', None)
     adjust_filter_path(filters, suffix='filters')
     adjust_filter_path(mobile_filters, suffix='filters')
-    
 
     return {
         'activities': activities,
@@ -575,22 +579,28 @@ def view_activity_filters(
     filters: dict[str, tuple[str, Sequence[Link]]] = {}
 
     if show_activities:
-        filters['timelines'] = (_('Occasion'), filter_timelines(self, request))
+        filters['timelines'] = (_('Occasion'), filter_timelines(self,
+                                                                request))
         filters['tags'] = (_('Tags'), filter_tags(self, request))
-        filters['durations'] = (_('Duration'), filter_durations(self, request))
+        filters['durations'] = (_('Duration'), filter_durations(self,
+                                                                request))
         filters['ages'] = (_('Age'), filter_ages(self, request))
-        filters['price_range'] = (_('Price'), filter_price_range(self, request))
+        filters['price_range'] = (_('Price'), filter_price_range(self,
+                                                                 request))
 
         if active_period:
             filters['weeks'] = (_('Weeks'), filter_weeks(self, request))
 
         filters['weekdays'] = (_('Weekdays'), filter_weekdays(self, request))
-        filters['available'] = (_('Free Spots'), filter_available(self, request))
-        filters['municipalities'] = (_('Municipalities'), filter_municipalities(self, request))
+        filters['available'] = (_('Free Spots'),
+                                filter_available(self, request))
+        filters['municipalities'] = (_('Municipalities'),
+                                     filter_municipalities(self, request))
 
         if request.is_organiser:
             if request.app.periods:
-                filters['periods'] = (_('Periods'), filter_periods(self, request))
+                filters['periods'] = (_('Periods'),
+                                      filter_periods(self, request))
 
             filters['own'] = (_('Advanced'), filter_own(self, request))
             filters['states'] = (_('State'), filter_states(self, request))
@@ -612,7 +622,6 @@ def view_activity_filters(
         'activity_min_cost': activity_min_cost,
         'activity_spots': activity_spots,
     }
-
 
 
 @FeriennetApp.json(
@@ -753,14 +762,16 @@ def view_activities_for_volunteers(
     if show_activities:
 
         filters['tags'] = (_('Tags'), filter_tags(self, request))
-        filters['durations'] = (_('Duration'), filter_durations(self, request))
+        filters['durations'] = (_('Duration'),
+                                filter_durations(self, request))
 
         if active_period:
             filters['weeks'] = (_('Weeks'), filter_weeks(self, request))
             self.filter.period_ids = {active_period.id}
 
         filters['weekdays'] = (_('Weekday'), filter_weekdays(self, request))
-        filters['municipalities'] = (_('Municipalities'), filter_municipalities(self, request))
+        filters['municipalities'] = (_('Municipalities'),
+                                     filter_municipalities(self, request))
 
     filters = {k: v for k, v in filters.items() if v}
     mobile_filters = {k: v for k, v in copy.deepcopy(filters).items() if v}
@@ -939,7 +950,7 @@ def view_activity(
             return False
 
         return True
-    
+
     phases = []
     active_period = request.app.active_period
     text_until = request.translate(_('Until'))

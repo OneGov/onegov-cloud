@@ -31,11 +31,11 @@
                 </div>
 
                 <div class="my-bookings limit-line-width" tal:condition="period">
-                    <h2>${period.title}</h2>
+                    <h2 class="h3">${period.title}</h2>
 
                     <div class="panel period-hint-panel">
                         <div class="hints">
-                            <tal:b metal:use-macro="layout.macros.period_hints"></tal:b>
+                            <tal:b metal:use-macro="layout.macros.period_hints" tal:define="activity_view False"></tal:b>
 
                             <div class="hint hint-favorites" tal:condition="period.wishlist_phase" i18n:translate>
                                 Mark up to three occasions per child as favorites.
@@ -54,26 +54,27 @@
                     <div class="row attendee-bookings-row" tal:repeat="attendee attendees" tal:condition="has_bookings" id="attendee-${attendee.id.hex}">
                         <div class="columns small-12">
                             <div class="attendee-bookings card">
-                                <div class="attendee-title">
-                                    <h3>${attendee.name} ${'👦' if attendee.gender == 'male' else '👧'}</h3>
+                                <div class="title-section">
+                                    <div class="attendee-title">
+                                        <h3>${attendee.name} ${'👦' if attendee.gender == 'male' else '👧'}</h3>
+                                    </div>
+
+                                    <div class="icons">
+                                        <a class="calendar-edit-icon before hide-for-print" href="${request.link(attendee)}" title="Edit" i18n:attributes="title">
+                                            <span class="show-for-sr" i18n:translate>Edit</span>
+                                        </a>
+
+                                        <a class="print print-icon before hide-for-print"
+                                            data-print-selector="html" data-print-title="${title}"
+                                            data-print-css="${request.link(model, 'mask') + '&id=' + attendee.id.hex}" title="Print" i18n:attributes="title">
+                                            <span class="show-for-sr" i18n:translate>Print</span>
+                                        </a>
+
+                                        <a href="${subscribe_link(attendee)}" class="calendar-add-icon before hide-for-print" title="Add to calendar" i18n:attributes="title">
+                                            <span class="show-for-sr" i18n:translate>Add to calendar</span>
+                                        </a>
+                                    </div>
                                 </div>
-
-                                <div class="icons">
-                                    <a class="calendar-edit-icon before hide-for-print" href="${request.link(attendee)}" title="Edit" i18n:attributes="title">
-                                        <span class="show-for-sr" i18n:translate>Edit</span>
-                                    </a>
-
-                                    <a class="print print-icon before hide-for-print"
-                                        data-print-selector="html" data-print-title="${title}"
-                                        data-print-css="${request.link(model, 'mask') + '&id=' + attendee.id.hex}" title="Print" i18n:attributes="title">
-                                        <span class="show-for-sr" i18n:translate>Print</span>
-                                    </a>
-
-                                    <a href="${subscribe_link(attendee)}" class="calendar-add-icon before hide-for-print" title="Add to calendar" i18n:attributes="title">
-                                        <span class="show-for-sr" i18n:translate>Add to calendar</span>
-                                    </a>
-                                </div>
-
                                 <div id="alert-boxes-for-${attendee.id}"></div>
                                 <div class="card-section">
 

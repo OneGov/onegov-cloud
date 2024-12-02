@@ -38,7 +38,7 @@
 
                 <tal:b condition="occasions_current_period">
                     <tal:b tal:define="(title, occasions) occasions_current_period[0]; period occasions[0].period">
-                        <div  class="activity-active-period">
+                        <div class="activity-active-period">
                             <h3>${title}</h3>
                             <p class="hint">
                                 <tal:b tal:condition="len(phases_date) == 2">
