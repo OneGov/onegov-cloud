@@ -1,5 +1,8 @@
 from collections import defaultdict
 from datetime import datetime
+
+from email_validator import validate_email, EmailNotValidError, \
+    EmailUndeliverableError
 from markupsafe import Markup
 
 from onegov.agency.collections import (
@@ -8,13 +11,13 @@ from onegov.core.csv import CSVFile
 from onegov.core.orm.abstract.adjacency_list import numeric_priority
 from onegov.core.utils import linkify
 
-
-from typing import TypeVar
+from typing import TypeVar, Any
 from typing import TypeVarTuple
 from typing import TYPE_CHECKING
+
 if TYPE_CHECKING:
     from _typeshed import StrOrBytesPath
-    from collections.abc import Callable
+    from collections.abc import Callable, Iterable
     from collections.abc import Mapping
     from datetime import date
     from onegov.agency.app import AgencyApp
@@ -37,7 +40,8 @@ def with_open(
         with open(filename, 'rb') as f:
             file = CSVFile(
                 f,
-                encoding='iso-8859-1'
+                # encoding='iso-8859-1'
+                encoding='utf-8',  # lu
             )
             return func(file, *args)
 
@@ -70,6 +74,9 @@ def get_phone(string: str) -> str:
     if not string.startswith('+'):
         if len(string.replace(' ', '')) == 10:  # be sure #digits fit CH
             return string.replace('0', '+41 ', 1)
+        # lu adds country digits
+        if len(string.replace(' ', '')) == 9:
+            return f'+41{string}'
     return string
 
 
@@ -301,6 +308,247 @@ def import_bs_data(
         agency.sort_relationships()
 
     return agencies, persons
+
+
+def get_plz_city(plz: str | None, ort: str | None) -> str | None:
+    if plz and ort:
+        return f'{plz} {ort}'
+
+    if ort:
+        return ort
+
+    if plz:
+        return plz
+
+    return None
+
+
+def get_web_address(internet_adresse: str) -> str | None:
+    if not internet_adresse:
+        return None
+
+    if internet_adresse.startswith('http'):
+        return internet_adresse
+
+    return f'http://{internet_adresse}'
+
+
+def get_email(line: 'DefaultRow') -> str | None:
+    email = v_(line.e_mail_adresse)
+
+    if not email:
+        return None
+
+    # only keep valid generic email address, but not `vorname.nachname@lu.ch`
+    addr = email.split(' ')
+    for a in addr:
+        if a in ['vorname.name@lu.ch', '@lu.ch']:
+            continue
+        if '@' in a:
+            try:
+                validate_email(a)
+            except EmailUndeliverableError:
+                continue
+            except EmailNotValidError:
+                print(f'Error importing person with invalid email {a}; line '
+                      f'{line.rownumber}')
+                continue
+
+            return a
+
+    return None
+
+
+def check_skip(line: 'DefaultRow') -> bool:
+    if line.department == 'zNeu':
+        return True
+
+    if any(s in line.vorname for s in ('Zi.', 'Korr.', 'test')):
+        return True
+
+    if any(s in line.nachname for s in ('WG', 'WH', 'W3', 'W5',
+                                        'frei neuer MA', 'frei  neuer MA',
+                                        'AAL Picket')):
+        return True
+
+    if line.nachname == '' and line.vorname == '':
+        return True  # skip empty lines
+
+    if line.vorname and line.vorname[-1].isdigit():
+        print(f'Error importing person with digit in first name; line '
+              f'{line.rownumber}, {line.vorname}')
+        return True
+
+    return False
+
+
+def agency_id_agency_lu(words: 'Iterable[Any]') -> str:
+    """
+    Generates an agency id based on each organisation and sub organisation word
+    """
+    return '__'.join(str(word).lower() for word in words if word)
+
+
+def agency_id_person_lu(line: 'DefaultRow') -> str:
+    """
+    Generates an agency id based on each organisation and sub organisation
+    name for a person.
+    """
+    words = [line.department, line.dienststelle, line.abteilung,
+             line.unterabteilung, line.unterabteilung_2]
+    return agency_id_agency_lu(words)
+
+
+@with_open
+def import_lu_people(
+    csvfile: CSVFile['DefaultRow'],
+    agencies: 'Mapping[str, ExtendedAgency]',
+    session: 'Session',
+    app: 'AgencyApp'
+) -> list['ExtendedPerson']:
+
+    people = ExtendedPersonCollection(session)
+    persons = []
+
+    def parse_person(line: 'DefaultRow') -> None:
+        agency_id = agency_id_person_lu(line)
+        hi_code = v_(line.hi_code)
+        order = 0 if not hi_code else int(hi_code)
+
+        person_ = people.add(
+            last_name=v_(line.nachname) or ' ',
+            first_name=v_(line.vorname) or ' ',
+            salutation=None,
+            academic_title=v_(line.akad__titel),
+            function=v_(line.funktion),
+            email=get_email(line),
+            phone=get_phone(line.isdn_nummer),
+            phone_direct=get_phone(line.mobil),
+            website=v_(get_web_address(line.internet_adresse)),
+            location_address=v_(line.adresse),
+            location_code_city=v_(get_plz_city(line.plz, line.ort)),
+            access='public'
+        )
+        persons.append(person_)
+
+        if agency_id:
+            agency = agencies.get(agency_id, None)
+            if agency and order:
+                agency.add_person(person_.id,
+                                  title=person_.function or 'Mitglied',
+                                  order_within_agency=order)
+            elif agency:
+                agency.add_person(person_.id,
+                                  title=person_.function or 'Mitglied')
+            else:
+                print(f'Error agency id {agency_id} not found')
+
+    for ix, line in enumerate(csvfile.lines):
+        if ix % 100 == 0:
+            app.es_indexer.process()
+            app.psql_indexer.bulk_process(session)
+
+        if not check_skip(line):
+            parse_person(line)
+
+    return persons
+
+
+@with_open
+def import_lu_agencies(
+    csvfile: CSVFile['DefaultRow'],
+    session: 'Session',
+    app: 'AgencyApp'
+) -> dict[str, 'ExtendedAgency']:
+
+    added_agencies = {}
+    agencies = ExtendedAgencyCollection(session)
+
+    # Hierarchy: Hierarchie: Department, Dienststelle, Abteilung,
+    # Unterabteilung, Unterabteilung 2, Unterabteilung 3
+    for ix, line in enumerate(csvfile.lines):
+        if ix % 100 == 0:
+            app.es_indexer.process()
+            app.psql_indexer.bulk_process(session)
+
+        if check_skip(line):
+            continue
+
+        dienststelle, abteilung, unterabteilung, unterabteilung_2 = (
+            None, None, None, None)
+        export_fields = ['person.title', 'person.phone']
+
+        department_name = v_(line.department)
+        if department_name:
+            department = agencies.add_or_get(
+                None, department_name, export_fields=export_fields)
+            agency_id = agency_id_agency_lu([department_name])
+            if agency_id not in added_agencies:
+                added_agencies[agency_id] = department
+
+        dienststellen_name = v_(line.dienststelle)
+        if dienststellen_name:
+            assert department, (f'Error adding agency with no department; '
+                                f'line {line.rownumber}, {line.nachname}')
+            dienststelle = agencies.add_or_get(
+                department, dienststellen_name, export_fields=export_fields)
+            agency_id = agency_id_agency_lu([
+                department_name, dienststellen_name])
+            if agency_id not in added_agencies:
+                added_agencies[agency_id] = dienststelle
+
+        abteilungs_name = v_(line.abteilung)
+        if abteilungs_name:
+            assert dienststelle, (f'Error adding agency with no dienststelle; '
+                                  f'line {line.rownumber}, {line.nachname}')
+            abteilung = agencies.add_or_get(
+                dienststelle, abteilungs_name, export_fields=export_fields)
+            agency_id = agency_id_agency_lu([
+                department_name, dienststellen_name, abteilungs_name])
+            if agency_id not in added_agencies:
+                added_agencies[agency_id] = abteilung
+
+        unterabteilungs_name = v_(line.unterabteilung)
+        if unterabteilungs_name:
+            assert abteilung, (f'Error adding agency with no abteilung; '
+                               f'line {line.rownumber}, {line.nachname}')
+            unterabteilung = (
+                agencies.add_or_get(abteilung, unterabteilungs_name,
+                                    export_fields=export_fields))
+            agency_id = agency_id_agency_lu([
+                department_name, dienststellen_name, abteilungs_name,
+                 unterabteilungs_name])
+            if agency_id not in added_agencies:
+                added_agencies[agency_id] = unterabteilung
+
+        unterabteilung_2_name = v_(line.unterabteilung_2)
+        if unterabteilung_2_name:
+            assert unterabteilung, \
+                (f'Error adding agency with no unterabteilung; '
+                 f'line {line.rownumber}, {line.nachname}')
+            unterabteilung_2 = (
+                agencies.add_or_get(unterabteilung, unterabteilung_2_name,
+                                    export_fields=export_fields))
+            agency_id = agency_id_agency_lu([
+                department_name, dienststellen_name, abteilungs_name,
+                unterabteilungs_name, unterabteilung_2_name])
+            if agency_id not in added_agencies:
+                added_agencies[agency_id] = unterabteilung_2
+
+    return added_agencies
+
+
+def import_lu_data(
+    data_file: 'StrOrBytesPath',
+    request: 'AgencyRequest',
+    app: 'AgencyApp'
+) -> tuple[dict[str, 'ExtendedAgency'], list['ExtendedPerson']]:
+
+    session = request.session
+    agencies = import_lu_agencies(data_file, session, app)
+    people = import_lu_people(data_file, agencies, session, app)
+
+    return agencies, people
 
 
 @with_open

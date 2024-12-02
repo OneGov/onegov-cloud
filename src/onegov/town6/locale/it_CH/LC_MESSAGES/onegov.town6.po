@@ -1,7 +1,7 @@
 # This file was generated from translations.town6.xlsx
 msgid ""
 msgstr ""
-"POT-Creation-Date: 2024-09-30 10:20+0200\n"
+"POT-Creation-Date: 2024-11-25 19:48+0100\n"
 "PO-Revision-Date: 2021-09-27 16:02+0200\n"
 "Language: it_CH\n"
 "Content-Type: text/plain; charset=UTF-8\n"
@@ -1547,14 +1547,11 @@ msgstr ""
 "La newsletter è disabilitata. Puoi vedere questa pagina solo perché hai "
 "fatto il login."
 
-msgid "Sign up to our newsletter to always stay up to date:"
-msgstr "Iscriviti alla nostra newsletter per rimanere sempre aggiornato:"
+msgid "There are currently ${count} recipients registered."
+msgstr "Al momento ci sono ${count} destinatari registrati."
 
 msgid "To update your subscription, please use this ${Link}"
 msgstr "Per aggiornare l'abbonamento, utilizzare questo ${Link}"
-
-msgid "There are currently ${count} recipients registered."
-msgstr "Al momento ci sono ${count} destinatari registrati."
 
 #, fuzzy
 msgid "Archive"
@@ -2190,6 +2187,9 @@ msgstr ""
 msgid "New Note"
 msgstr "Nuova nota"
 
+#~ msgid "Sign up to our newsletter to always stay up to date:"
+#~ msgstr "Iscriviti alla nostra newsletter per rimanere sempre aggiornato:"
+
 #~ msgid "Change Request"
 #~ msgstr "Richiesta di modifica"
 
@@ -2255,9 +2255,6 @@ msgstr "Nuova nota"
 #~ " - Argomento 3:\n"
 #~ "   - Sottotema 3.1\n"
 #~ "```"
-
-#~ msgid "Sign up to our newsletter to always stay up to date:"
-#~ msgstr "Iscriviti alla nostra newsletter per rimanere sempre aggiornato:"
 
 #~ msgid "Error: No custom texts found"
 #~ msgstr "Errore: Nessun testo personalizzato trovato"

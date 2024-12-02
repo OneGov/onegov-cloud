@@ -6,7 +6,6 @@ from functools import cached_property
 from pyquery import PyQuery as pq
 from webtest import TestApp
 
-
 EXTRACT_HREF = re.compile(
     r'(?:href|ic-get-from|ic-post-to|ic-delete-from)="([^"]+)')
 

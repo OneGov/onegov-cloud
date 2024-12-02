@@ -819,7 +819,7 @@
 </metal:page_content>
 
 <metal:page_content define-macro="page_content" i18n:domain="onegov.town6">
-    <div class="grid-x grid-padding-x wrapper" tal:define="show_side_panel show_side_panel|False; location location|False; show_page_image page.show_page_image|None; files files|None; sidepanel_links sidepanel_links|None; news page.type == 'news'|False;">
+    <div class="grid-x grid-padding-x wrapper" tal:define="show_side_panel show_side_panel|False; location location|False; show_page_image page.show_page_image|None; files files|None; sidepanel_links sidepanel_links|None; news page.type == 'news'|False; imageset page.photo_album|None; ">
         <tal:b condition="not: people or files or contact or coordinates or location or show_side_panel or more_entries|False">
             <div class="small-12 cell page-content-main">
                 <img class="page-image" tal:condition="news or show_page_image and layout.org.theme_options.get('page-image-position', 'as_content') ==  'as_content' and page.page_image" src="${page.page_image}">
@@ -830,7 +830,9 @@
                 <div metal:define-slot="after-lead"></div>
 
                 <div class="page-text" tal:condition="text" tal:content="text" />
+                <metal:b tal:condition="imageset" use-macro="layout.macros['render_inline_photo_album']"/>
                 <div metal:define-slot="after-text"></div>
+
             </div>
         </tal:b>
         <tal:b condition="people or files or contact or coordinates or show_side_panel or more_entries|False">
@@ -843,7 +845,10 @@
                     <div metal:define-slot="after-lead"></div>
 
                     <div class="page-text" tal:condition="text" tal:content="text" />
+                    <metal:b tal:condition="imageset" use-macro="layout.macros['render_inline_photo_album']"/>
+
                     <div metal:define-slot="after-text"></div>
+
 
                     <div class="people-panel" tal:condition="people and show_people_on_main_page" tal:define="show_people_on_main_page page.show_people_on_main_page|resource.show_people_on_main_page|False; western_name_order page.western_name_order|resource.western_name_order|False">
                         <h3 i18n:translate>People</h3>
@@ -2353,10 +2358,21 @@
         <a class="button secondary confirm delete" role="button"
             ic-delete-from="${request.link(file)}?csrf-token=${layout.csrf_token}"
             ic-on-success="
-                var info = $(elt).closest('tr');
-                info.prev().remove();
-                info.next().remove();
-                info.remove();
+                var cfd = $(elt).closest('tr');  // current file details row
+                var cfi = cfd.prev();  // current file info row
+                var rbfi = cfi.prev();  // row before current file info
+                var rafd = cfd.next();  // row after current file details
+
+                cfi.remove();  // remove current file info row
+                cfd.remove();  // remove current file details row
+
+                // if file is last in group, remove the group tr as well
+                if (!rbfi.is('[id^=\'details-\']') &&
+                    !rbfi.hasClass('file-info') &&
+                    !rafd.is('[id^=\'details-\']') &&
+                    !rafd.hasClass('file-info')) {
+                    rbfi.remove();  // remove line before file-info row
+                }
             "
             data-confirm="Do you really want to delete this file?"
             data-confirm-extra="${file.name}"
@@ -2960,3 +2976,23 @@
         </div>
     </div>
 </metal:display_results>
+
+<metal:b define-macro="render_inline_photo_album">
+    <tal:b tal:condition="imageset and imageset.files">
+        <!--! Inline imagesets are always rendered as grid -->
+        <div class="page-text grid-imageset photoswipe">
+            <div class="image-grid">
+                <div tal:repeat="image imageset.files" class="image-container">
+                    <tal:b define="width image.reference.thumbnail_small.size[0]|image.reference.size[0]; height image.reference.thumbnail_small.size[1]|image.reference.size[1]">
+                        <!--! the first eight images are loaded conventionally, the rest are loaded lazily -->
+                        <img src="${request.link(image, 'thumbnail')}" alt="${image.note}" width="${width}" height="${height}" tal:condition="repeat.image.number <= 8" data-full-width="${image.reference.size[0]}" data-full-height="${image.reference.size[1]}" />
+                        <img src="${request.link(image, 'thumbnail')}" alt="${image.note}" width="${width}" height="${height}" class="lazyload" tal:condition="repeat.image.number > 8" data-full-width="${image.reference.size[0]}" data-full-height="${image.reference.size[1]}" />
+                    </tal:b>
+                </div>
+            </div>
+        </div>
+
+    <tal:b metal:use-macro="layout.macros.photoswipe" />
+
+    </tal:b>
+</metal:b>

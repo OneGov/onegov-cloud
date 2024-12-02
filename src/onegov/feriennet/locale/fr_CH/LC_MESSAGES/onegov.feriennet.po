@@ -685,8 +685,8 @@ msgstr "Date de naissance"
 msgid "Gender"
 msgstr "Sexe"
 
-msgid "Health Information"
-msgstr "Informations santé et autres"
+msgid "Is there anything the course instructor should know?"
+msgstr "Y a-t-il quelque chose que l'instructeur devrait savoir ?"
 
 msgid "Allergies, Disabilities, Particulars"
 msgstr "Allergies, handicaps, particularités"

@@ -725,10 +725,14 @@ $pageref-color-hover: $iron;
     padding-right: 0;
 }
 
-.side-panel {
-    h3 {
-        hyphens: none;
-    }
+.side-panel .more-list {
+    li {
+        .list-link::after,
+        .list-title::after {
+            opacity: 0;
+            transition: all 200ms linear;
+            position: absolute;
+        }
 
     .more-list {
 

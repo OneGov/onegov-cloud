@@ -209,7 +209,7 @@ class CSVFile(Generic[_RowT]):
     @lru_cache(maxsize=128)
     def as_valid_identifier(value: str) -> str:
         result = normalize_header(value)
-        for invalid in '- .%/,;':
+        for invalid in '- .%/,;()':
             result = result.replace(invalid, '_')
         while result and result[0] in '_0123456789':
             result = result[1:]

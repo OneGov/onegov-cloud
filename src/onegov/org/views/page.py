@@ -58,6 +58,8 @@ def view_topic(
             return morepath.redirect(self.content['url'])
 
     layout = layout or PageLayout(self, request)
+    if self.photo_album_id:
+        request.include('photoswipe')
 
     if request.is_manager:
         layout.editbar_links = self.get_editbar_links(request)
@@ -209,6 +211,8 @@ def view_news(
 
     if request.is_manager:
         layout.editbar_links = list(self.get_editbar_links(request))
+    if self.photo_album_id:
+        request.include('photoswipe')
 
     assert self.trait is not None
     return {

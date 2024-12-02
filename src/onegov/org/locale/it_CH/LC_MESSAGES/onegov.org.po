@@ -2,7 +2,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: \n"
-"POT-Creation-Date: 2024-09-30 10:16+0200\n"
+"POT-Creation-Date: 2024-11-25 19:53+0100\n"
 "PO-Revision-Date: 2022-03-15 10:52+0100\n"
 "Last-Translator: \n"
 "Language-Team: \n"
@@ -1865,9 +1865,6 @@ msgstr ""
 msgid "Enable newsletter"
 msgstr "Attiva la newsletter"
 
-msgid "Include logo in newsletter"
-msgstr "Includi il logo nella newsletter"
-
 msgid "Allow secret content in newsletter"
 msgstr "Consentire contenuti segreti nella newsletter"
 
@@ -2522,9 +2519,6 @@ msgstr "Newsletter"
 msgid "New"
 msgstr "Nuovo"
 
-msgid "Newsletter Subscription"
-msgstr "Abbonamento alla newsletter "
-
 msgid "Subscribers"
 msgstr "Iscritti"
 
@@ -2777,6 +2771,12 @@ msgstr ""
 
 msgid "Delete content"
 msgstr "Cancellare il contenuto"
+
+msgid "Photo album. Will be shown at the end of content."
+msgstr "Album fotografico. Sarà mostrato alla fine del contenuto."
+
+msgid "Photo album"
+msgstr "Album fotografico"
 
 msgid "In future"
 msgstr "in futuro"
@@ -4258,6 +4258,9 @@ msgstr ""
 msgid "There are currently ${count} recipients registered."
 msgstr "Al momento ci sono ${count} destinatari registrati."
 
+msgid "To update your subscription, please use this ${Link}"
+msgstr "Per aggiornare la tua iscrizione, utilizza questo ${Link}"
+
 msgid "Archive"
 msgstr "Archivia"
 
@@ -4570,10 +4573,8 @@ msgstr "Campi"
 
 msgid ""
 "Thank you for filling out this survey. If there's anything you'd like to "
-"change, click on \"Edit\" below."
+"change, click on the \"Edit\"-Button below."
 msgstr ""
-"Grazie per aver compilato questo sondaggio. Se c'è qualcosa che desideri "
-"cambiare, fai clic su \"Modifica\" qui sotto."
 
 msgid "No surveys defined yet."
 msgstr "Ancora nessun sondaggio definito."
@@ -4850,11 +4851,16 @@ msgstr ""
 "Le regole assicurano che le allocazioni tra inizio/fine esistano e che siano "
 "estese oltre tali date agli intervalli indicati. "
 
+#, python-format
+msgid ""
+"Rule updated. ${deleted} allocations removed, ${created} new allocations "
+"created."
+msgstr ""
+"La regola è stata aggiornata. ${deleted} allocazioni rimosse, ${created} "
+"nuove allocazioni create."
+
 msgid "Rule not found"
 msgstr "Regola non trovata"
-
-msgid "Rule updated"
-msgstr "Regola aggiornata"
 
 msgid "Edit Rule"
 msgstr "Modifica regola"
@@ -5927,16 +5933,16 @@ msgstr ""
 "gli invii."
 
 msgid "Delete Submissions"
-msgstr ""
+msgstr "Elimina invii"
 
 msgid "Do you really want to delete all submissions?"
-msgstr ""
+msgstr "Vuoi davvero eliminare tutti gli invii?"
 
 msgid "All submissions associated with this survey will be deleted."
-msgstr ""
+msgstr "Tutti gli invii associati a questa indagine verranno eliminati."
 
 msgid "Delete submissions"
-msgstr ""
+msgstr "Elimina invii"
 
 msgid "Exports the submissions of the survey."
 msgstr "Esporta gli invii dell'indagine."
