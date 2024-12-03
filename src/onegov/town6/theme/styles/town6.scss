@@ -655,6 +655,8 @@ $pageref-color-hover: $iron;
 
                 &.preview {
                     color: $monsoon;
+                    background-color: yellow;
+                    padding-right: 0;
                 }
             }
 
@@ -674,6 +676,7 @@ $pageref-color-hover: $iron;
                 padding-top: .5rem;
                 transition: border-top 200ms linear;
                 width: 100%;
+                background-color: #fba7fb;
 
                 &.multi-line {
                     display: flex;
