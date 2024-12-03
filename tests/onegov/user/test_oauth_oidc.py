@@ -101,7 +101,7 @@ def test_oidc_configuration_primary(app):
 
 
 def test_oidc_static_metadata(app):
-    metadata = {
+    static_metadata = {
         'issuer': 'https://oidc.test/',
         'authorization_endpoint': 'https://oidc.test/authorize',
         'jwks_uri': 'https://oidc.test/jwks',
@@ -121,11 +121,14 @@ def test_oidc_static_metadata(app):
             'S256'
         ],
     }
-    configure_provider(app, metadata)
+    configure_provider(app, static_metadata)
 
     provider = app.providers['idp']
     client = provider.tenants.client(app)
-    assert client.metadata(Bunch(app=app)) == metadata
+    metadata = client.metadata(Bunch(app=app))
+    # not technically part of the metadata...
+    metadata.pop('jwks_client')
+    assert static_metadata == metadata
 
 
 def test_oicd_authenticate_request(app):
