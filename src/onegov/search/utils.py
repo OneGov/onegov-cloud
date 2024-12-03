@@ -8,7 +8,6 @@ from langdetect import DetectorFactory, PROFILES_DIRECTORY
 from langdetect.utils.lang_profile import LangProfile
 from onegov.core.orm import find_models
 
-
 from typing import Any, Generic, TypeVar, TYPE_CHECKING
 if TYPE_CHECKING:
     from collections.abc import Callable, Iterator, Sequence
@@ -43,7 +42,9 @@ def searchable_sqlalchemy_models(
     )
 
 
-def filter_non_base_models(models: 'set[type[T]]') -> 'set[type[T]]':
+def filter_non_base_models(
+    models: 'set[type[T]]'
+) -> 'set[type[T]]':
     """ Remove model classes that are base classes of other models in the set.
     Args: models: set of model classes to filter
     Returns: set: Model classes that are not base classes of any other model
@@ -55,7 +56,8 @@ def filter_non_base_models(models: 'set[type[T]]') -> 'set[type[T]]':
     for model in models:
         is_base = False
         for other_model in models:
-            if model is not other_model and issubclass(other_model, model):
+            if (model is not other_model and issubclass(other_model, model)
+                    and model.__tablename__ == other_model.__tablename__):  # type:ignore[attr-defined]
                 is_base = True
                 break
 
