@@ -11,9 +11,9 @@ from sqlalchemy import func
 from typing import TYPE_CHECKING, Any
 
 from onegov.core.collection import Pagination, _M
-from onegov.core.orm import Base
 from onegov.event.models import Event
-from onegov.search.utils import searchable_sqlalchemy_models
+from onegov.search.utils import (searchable_sqlalchemy_models,
+                                 filter_non_base_models)
 
 if TYPE_CHECKING:
     from onegov.org.request import OrgRequest
@@ -193,6 +193,10 @@ class SearchPostgres(Pagination[_M]):
         self.number_of_docs = 0
         self.number_of_results = 0
 
+        models = (model for base in self.request.app.session_manager.bases
+                  for model in searchable_sqlalchemy_models(base))
+        self.search_models = filter_non_base_models(set(models))
+
     @cached_property
     def available_documents(self) -> int:
         if not self.number_of_docs:
@@ -325,35 +329,31 @@ class SearchPostgres(Pagination[_M]):
         ts_query = func.websearch_to_tsquery(language,
                                              func.unaccent(self.query))
 
-        for base in self.request.app.session_manager.bases:
-            for model in searchable_sqlalchemy_models(base):
-                query = self.request.session.query(model)
-                doc_count += query.count()
+        for model in self.search_models:
+            query = self.request.session.query(model)
+            doc_count += query.count()
+            query = self.filter_user_level(model, query)
 
-                query = self.filter_user_level(model, query)
+            if self.request.session.query(query.exists()).scalar():
+                weighted = (
+                    self._create_weighted_vector(model, language))
+                rank_expression = func.coalesce(
+                    func.ts_rank(
+                        weighted,
+                        ts_query,
+                        0  # normalization, ignore document length
+                    ), 0).label('rank')
+                query = (query.filter(model.fts_idx.op('@@')(ts_query))
+                         .add_columns(rank_expression))
+                results.extend(query)
 
-                if self.request.session.query(query.exists()).scalar():
-                    weighted = (
-                        self._create_weighted_vector(model, language))
-                    rank_expression = func.coalesce(
-                        func.ts_rank(
-                            weighted,
-                            ts_query,
-                            0  # normalization, ignore document length
-                        ), 0).label('rank')
-                    query = (query.filter(model.fts_idx.op('@@')(ts_query))
-                             .add_columns(rank_expression))
-                    res = query.all()
-                    results.extend(res)
-
-        # remove duplicates, sort by rank
-        results = list(set(results))
+        # sort by rank
         results.sort(key=lambda x: x[1], reverse=True)
 
         self.number_of_docs = doc_count
         self.number_of_results = len(results)
 
-        # remove rank column from results and return
+        # return results without rank column
         return [r[0] for r in results]
 
     def hashtag_search(self) -> list['Searchable']:
@@ -361,20 +361,15 @@ class SearchPostgres(Pagination[_M]):
         results: list[Any] = []
         q = self.query.lstrip('#')
 
-        for base in self.request.app.session_manager.bases:
-            for model in searchable_sqlalchemy_models(Base):
-                query = self.request.session.query(model)
-                doc_count += query.count()
-                query = self.filter_user_level(model, query)
-                query = query.filter(
-                    model.fts_idx_data['es_tags'].contains([q]))
+        for model in self.search_models:
+            query = self.request.session.query(model)
+            doc_count += query.count()
+            query = self.filter_user_level(model, query)
+            query = query.filter(
+                model.fts_idx_data['es_tags'].contains([q]))
 
-                if self.request.session.query(query.exists()).scalar():
-                    res = query.all()
-                    results.extend(res)
-
-        # remove duplicates
-        results = list(set(results))
+            if self.request.session.query(query.exists()).scalar():
+                results.extend(query)
 
         self.number_of_docs = doc_count
         self.number_of_results = len(results)

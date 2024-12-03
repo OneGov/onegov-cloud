@@ -43,6 +43,28 @@ def searchable_sqlalchemy_models(
     )
 
 
+def filter_non_base_models(models: 'set[type[T]]') -> 'set[type[T]]':
+    """ Remove model classes that are base classes of other models in the set.
+    Args: models: set of model classes to filter
+    Returns: set: Model classes that are not base classes of any other model
+    in the set.
+
+    """
+    non_base_models = set()
+
+    for model in models:
+        is_base = False
+        for other_model in models:
+            if model is not other_model and issubclass(other_model, model):
+                is_base = True
+                break
+
+        if not is_base:
+            non_base_models.add(model)
+
+    return non_base_models
+
+
 _invalid_index_characters = re.compile(r'[\\/?"<>|\s,A-Z:]+')
 
 

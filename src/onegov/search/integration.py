@@ -15,7 +15,8 @@ from onegov.search.errors import SearchOfflineError
 from onegov.search.indexer import Indexer, PostgresIndexer
 from onegov.search.indexer import ORMEventTranslator
 from onegov.search.indexer import TypeMappingRegistry
-from onegov.search.utils import searchable_sqlalchemy_models
+from onegov.search.utils import (searchable_sqlalchemy_models,
+                                 filter_non_base_models)
 from sortedcontainers import SortedSet
 from sedate import utcnow
 from sqlalchemy import inspect
@@ -473,13 +474,12 @@ class SearchApp(morepath.App):
                 session.invalidate()
                 session.bind.dispose()
 
+        models = (model for base in self.session_manager.bases
+                  for model in searchable_sqlalchemy_models(base))
         with ThreadPoolExecutor() as executor:
             results = executor.map(
                 reindex_model, (
-                    model
-                    for base in self.session_manager.bases
-                    for model in searchable_sqlalchemy_models(base)
-                )
+                    model for model in filter_non_base_models(set(models)))
             )
             if fail:
                 print(tuple(results))
