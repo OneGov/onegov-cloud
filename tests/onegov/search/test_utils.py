@@ -4,7 +4,7 @@ from sqlalchemy import Column, Integer, Text
 from sqlalchemy.ext.declarative import declarative_base
 
 
-def test_get_searchable_sqlalchemy_models(postgres_dsn):
+def test_get_searchable_sqlalchemy_models():
     Foo = declarative_base()
     Bar = declarative_base()
 
@@ -28,7 +28,7 @@ def test_get_searchable_sqlalchemy_models(postgres_dsn):
     assert list(utils.searchable_sqlalchemy_models(Bar)) == [D]
 
 
-def test_get_searchable_sqlalchemy_models_inheritance(postgres_dsn):
+def test_get_searchable_sqlalchemy_models_inheritance():
 
     Base = declarative_base()
 

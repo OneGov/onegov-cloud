@@ -31,7 +31,6 @@ if TYPE_CHECKING:
     from datetime import datetime
     from onegov.core.orm import Base, SessionManager
     from onegov.core.request import CoreRequest
-    from onegov.search.mixins import Searchable
     from sqlalchemy.orm import Session
     from webob import Response
 
@@ -416,13 +415,6 @@ class SearchApp(morepath.App):
         """
         return request.is_logged_in
 
-    def get_searchable_models(self) -> list[type['Searchable']]:
-        return [
-            model
-            for base in self.session_manager.bases
-            for model in searchable_sqlalchemy_models(base)
-        ]
-
     def perform_reindex(self, fail: bool = False) -> None:
         """ Re-indexes all content.
 
@@ -431,8 +423,6 @@ class SearchApp(morepath.App):
         By default, all exceptions during reindex are silently ignored.
 
         """
-        # prevent tables get re-indexed twice
-        index_done: list[str] = []
         schema = self.schema
         index_log.info(f'Indexing schema {schema}..')
 
@@ -452,11 +442,6 @@ class SearchApp(morepath.App):
 
         def reindex_model(model: type['Base']) -> None:
             """ Load all database objects and index them. """
-            if model.__name__ in index_done:
-                return
-
-            index_done.append(model.__name__)
-
             session = self.session()
             try:
                 q = session.query(model).options(undefer('*'))
