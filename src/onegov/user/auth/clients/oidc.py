@@ -132,6 +132,9 @@ class OIDCClient:
                 raise ValueError('key jwks_uri is a mandatory metadata.')
             if metadata['issuer'] != self.issuer:
                 raise InvalidIssuerError(metadata['issuer'])
+            # TODO: Should we make our own subclass that caches the JWK
+            #       key set in redis rather than just in RAM?
+            metadata['jwks_client'] = PyJWKClient(metadata['jwks_uri'])
             self._provider_metadata[request.app.application_id] = metadata
         return metadata
 
@@ -144,9 +147,7 @@ class OIDCClient:
         metadata = self.metadata(request)
         access_token = token.get('access_token')
         id_token = token['id_token']
-        # TODO: Should we make our own subclass that caches the JWK
-        #       key set in redis rather than just in RAM?
-        jwks_client = PyJWKClient(metadata['jwks_uri'])
+        jwks_client = metadata['jwks_client']
         signing_key = jwks_client.get_signing_key_from_jwt(id_token)
         # TODO: Should we provide some configurable leeway for exp?
         data = decode_complete(
