@@ -30,6 +30,11 @@ def app(postgres_dsn, redis_url):
     return app
 
 
+@pytest.fixture(autouse=True)
+def no_requests(monkeypatch):
+    monkeypatch.delattr("requests.sessions.Session.request")
+
+
 def configure_provider(app, metadata=None, primary=False):
     config = textwrap.dedent(f"""
         authentication_providers:
