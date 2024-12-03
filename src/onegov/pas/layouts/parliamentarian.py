@@ -40,18 +40,6 @@ class ParliamentarianCollectionLayout(DefaultLayout):
                         ),
                     ],
                 ),
-                LinkGroup(
-                    title=_('Export'),
-                    links=[
-                        Link(
-                            text=_('Export All (xlsx)'),
-                            url=self.request.link(
-                                self.model,
-                                'xlsx-billing-export-all',
-                            ),
-                        ),
-                    ],
-                ),
             ]
         return None
 

@@ -1,4 +1,3 @@
-import pytest
 from onegov.pas.models import (
     Party,
     Commission,
@@ -273,5 +272,3 @@ def test_views_manage(client_with_es):
     assert 'Noch keine Parlamentarier:innen erfasst' in \
         settings.click('Parlamentarier:innen')
     assert 'Keine aktiven Kommissionen' in settings.click('Kommissionen')
-
-

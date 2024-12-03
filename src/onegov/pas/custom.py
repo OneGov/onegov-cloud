@@ -73,10 +73,11 @@ def get_current_settlement_run(session: 'Session') -> SettlementRun:
 
 
 def get_current_rate_set(session: 'Session', run: SettlementRun) -> RateSet:
-    # this works because we are only allowing to create one rate set per year
     rat_set = (
         session.query(RateSet).filter(RateSet.year == run.start.year).first()
     )
+    # We get the first one we find by year. This works because we are only
+    # allowing to create one rate set per year
     if rat_set is None:
         raise ValueError('No rate set found for the current year')
     return rat_set

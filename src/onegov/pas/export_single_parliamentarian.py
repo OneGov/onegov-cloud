@@ -7,7 +7,6 @@ from onegov.pas.collections import (
 from onegov.pas.custom import get_current_rate_set
 from onegov.pas.models import (
     SettlementRun,
-    RateSet,
 )
 from decimal import Decimal
 from weasyprint import HTML, CSS  # type: ignore[import-untyped]

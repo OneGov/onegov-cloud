@@ -107,7 +107,8 @@ class Attendence(Base, TimestampMixin):
 
         - Commission meetings and file study sessions:
             * First 2 hours are counted as given
-            * After 2 hours, time is rounded to nearest 30-minute increment
+            * After 2 hours, time is rounded to nearest 30-minute increment,
+            * and
             * Example: 2h 40min would be calculated as 2.5 hours
 
         Returns:

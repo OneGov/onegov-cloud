@@ -11,8 +11,10 @@ from onegov.pas.models import (
     SettlementRun,
     Attendence,
 )
-from onegov.pas.views.settlement_run import generate_settlement_pdf,\
-    _get_commission_settlement_data, _get_commission_totals
+from onegov.pas.views.settlement_run import (
+    _get_commission_settlement_data,
+    _get_commission_totals,
+)
 
 
 def test_business_rules_export_data(session):
@@ -60,7 +62,7 @@ def test_business_rules_export_data(session):
         run = SettlementRun(
             name='Q1 2024',
             start=date(2024, 1, 1),
-            end=date(2024, 3, 31),
+            end=date(2024, 12, 31),
             active=True,
         )
         session.add(run)
@@ -118,24 +120,65 @@ def test_business_rules_export_data(session):
 
 
     # Test commission-specific exports
-
-    # Let's write this test
-
     request = Bunch(session=session, translate=lambda x: str(x))
     settlement_data = _get_commission_settlement_data(
         run, request, commission_b
     )
+    # commission_b has no entries
+    assert settlement_data == []
+
+    settlement_data = _get_commission_settlement_data(
+        run, request, commission_a
+    )
+    res = [
+        (
+            date(2024, 1, 20),
+            'Jane President',
+            'Commission meeting',
+            '3.0',
+            Decimal('300'),
+            Decimal('315.00'),
+        ),
+        (
+            date(2024, 1, 25),
+            'Jane President',
+            'File study',
+            '1.0',
+            Decimal('200'),
+            Decimal('210.00'),
+        ),
+        (
+            date(2024, 2, 20),
+            'John Member',
+            'Commission meeting',
+            '3.0',
+            Decimal('200'),
+            Decimal('210.00'),
+        ),
+        (
+            date(2024, 2, 25),
+            'John Member',
+            'File study',
+            '1.0',
+            Decimal('160'),
+            Decimal('168.00'),
+        ),
+    ]
+
     totals = _get_commission_totals(run, request, commission_b)
+
+    # settlement_data is empty??
+
+    # totaols is just all zeros
     breakpoint()
 
-    # Test parliamentarian-specific exports
-
+    # todo: Test parliamentarian-specific exports
     # Test party-specific exports
 
 
 
 
-# # fixme: complete writing thi test
+# # fixme: complete writing this test
 # def test_settlement_export(session):
 #     # Create test data
 #     rate_set = RateSet(year=2024)

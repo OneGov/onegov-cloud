@@ -14,7 +14,6 @@ from onegov.pas.layouts import SettlementRunLayout
 from onegov.pas.models import (
     SettlementRun,
     Party,
-    RateSet,
     Commission,
 )
 from webob import Response
@@ -440,10 +439,11 @@ def generate_settlement_pdf(
         settlement_data = _get_party_settlement_data(
             settlement_run, request, entity
         )
+        breakpoint()
         totals = _get_party_specific_totals(settlement_run, request, entity)
 
     elif entity_type == 'all':
-        settlement_data = _get_settlement_data(settlement_run, request)
+        settlement_data = _get_data_export_all(settlement_run, request)
         totals = _get_party_totals(settlement_run, request)
     else:
         raise ValueError(f'Unsupported entity type: {entity_type}')
@@ -603,7 +603,7 @@ def _generate_settlement_html(
     return html
 
 
-def _get_settlement_data(
+def _get_data_export_all(
     self: SettlementRun, request: 'TownRequest'
 ) -> list['SettlementDataRow']:
 
