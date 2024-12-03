@@ -3,8 +3,9 @@ from attr import attrs, attrib
 from base64 import urlsafe_b64encode
 from jwt import PyJWKClient, decode_complete
 from jwt.exceptions import InvalidIssuerError, InvalidSignatureError
-from oauthlib.oauth2.rfc6749.endpoints.metadata import MetadataEndpoint
-from oauthlib.openid import Server as OpenIDServer
+from oauthlib.oauth2.rfc6749.endpoints import AuthorizationEndpoint
+from oauthlib.oauth2.rfc6749.endpoints import MetadataEndpoint
+from oauthlib.oauth2.rfc6749.grant_types import AuthorizationCodeGrant
 from requests_oauthlib import OAuth2Session
 from secrets import compare_digest
 
@@ -112,9 +113,23 @@ class OIDCClient:
 
             claims.update(self.fixed_metadata)
 
-            # We can validate the metadata by checking if the metadata
-            # endpoint of a generic OpenID server would accept it
-            metadata = MetadataEndpoint([OpenIDServer(None)], claims).claims
+            # The only endpoint we need our server to support for sure
+            # is the authorization_endpoint, so we pretend the server
+            # only implements that, so that's the only thing we validate
+            # NOTE: Technically MetadataEndpoint will pull default values
+            #       from AuthorizationEndpoint, but since we don't currently
+            #       use those properties, this should be fine. If we ever
+            #       do end up using them, we may want to create a subclass
+            #       so we only run the validation step.
+            endpoints = [AuthorizationEndpoint(
+                'code',
+                None,
+                {'code': AuthorizationCodeGrant(None)}
+            )]
+            metadata = MetadataEndpoint(endpoints, claims).claims
+            if 'jwks_uri' not in metadata:
+                # TODO: Support manually specifying a static signing key?
+                raise ValueError('key jwks_uri is a mandatory metadata.')
             if metadata['issuer'] != self.issuer:
                 raise InvalidIssuerError(metadata['issuer'])
             self._provider_metadata[request.app.application_id] = metadata
@@ -133,7 +148,7 @@ class OIDCClient:
         #       key set in redis rather than just in RAM?
         jwks_client = PyJWKClient(metadata['jwks_uri'])
         signing_key = jwks_client.get_signing_key_from_jwt(id_token)
-        # TODO: Should we provide some configurable leeway for exp/nbf?
+        # TODO: Should we provide some configurable leeway for exp?
         data = decode_complete(
             id_token,
             key=signing_key,

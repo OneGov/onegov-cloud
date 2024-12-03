@@ -39,3 +39,8 @@ def keytab():
 @pytest.fixture(scope='session')
 def idp_metadata():
     return module_path('tests.onegov.user', '/fixtures/idp.xml')
+
+
+@pytest.fixture(autouse=True)
+def no_requests(monkeypatch):
+    monkeypatch.delattr("requests.sessions.Session.request")
