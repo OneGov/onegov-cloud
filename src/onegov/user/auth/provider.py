@@ -642,7 +642,7 @@ class LDAPKerberosProvider(
         LDAP/Kerberos, but for them it's basically their local OS login).
 
         """
-        user_os = request.agent['os']['family']
+        user_os = request.agent.os.family
 
         if user_os == 'Other':
             return _('Login with operating system')

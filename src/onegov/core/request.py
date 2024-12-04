@@ -1,4 +1,5 @@
 import morepath
+import ua_parser
 
 from datetime import timedelta
 from functools import cached_property
@@ -17,7 +18,6 @@ from morepath.authentication import NO_IDENTITY
 from morepath.request import SAME_APP
 from onegov.core import utils
 from onegov.core.crypto import random_token
-from ua_parser import user_agent_parser
 from webob.exc import HTTPForbidden
 from wtforms.csrf.session import SessionCSRF
 
@@ -605,12 +605,10 @@ class CoreRequest(IncludeRequest, ContentSecurityRequest, ReturnToMixin):
         """ Returns True if the current request is logged in at all. """
         return self.identity is not NO_IDENTITY
 
-    # FIXME: ua_parser will add types in a future version, we should
-    #        fix this return type then.
     @cached_property
-    def agent(self) -> Any:
+    def agent(self) -> ua_parser.DefaultedResult:
         """ Returns the user agent, parsed by ua-parser. """
-        return user_agent_parser.Parse(self.user_agent or '')
+        return ua_parser.parse(self.user_agent or '').with_defaults()
 
     def has_permission(
         self,
