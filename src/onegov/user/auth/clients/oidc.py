@@ -5,6 +5,7 @@ from jwt import PyJWKClient, decode_complete
 from jwt.exceptions import InvalidIssuerError, InvalidSignatureError
 from oauthlib.oauth2.rfc6749.endpoints import AuthorizationEndpoint
 from oauthlib.oauth2.rfc6749.endpoints import MetadataEndpoint
+from oauthlib.oauth2.rfc6749.endpoints import TokenEndpoint
 from oauthlib.oauth2.rfc6749.grant_types import AuthorizationCodeGrant
 from requests_oauthlib import OAuth2Session
 from secrets import compare_digest
@@ -113,18 +114,25 @@ class OIDCClient:
 
             claims.update(self.fixed_metadata)
 
-            # The only endpoint we need our server to support for sure
-            # is the authorization_endpoint, so we pretend the server
-            # only implements that, so that's the only thing we validate
+            # The only endpoints we need our server to support for sure
+            # are the authorization and token endpoints, so we pretend the
+            # server only implements those, so that's the only thing we
+            # validate
             # NOTE: Technically MetadataEndpoint will pull default values
-            #       from AuthorizationEndpoint, but since we don't currently
-            #       use those properties, this should be fine. If we ever
-            #       do end up using them, we may want to create a subclass
-            #       so we only run the validation step.
+            #       for these two endpoints, but since we don't currently
+            #       use the affected properties, this should be fine.
+            #       If we ever do end up using them, we may want to create
+            #       a subclass so we only run the validation step.
+            #       That should also allow us to get away without having
+            #       to create these dummy endpoints
             endpoints = [AuthorizationEndpoint(
                 'code',
                 None,
                 {'code': AuthorizationCodeGrant(None)}
+            ), TokenEndpoint(
+                'authorization_code',
+                None,
+                {'authorization_code': AuthorizationCodeGrant(None)}
             )]
             metadata = MetadataEndpoint(endpoints, claims).claims
             if 'jwks_uri' not in metadata:

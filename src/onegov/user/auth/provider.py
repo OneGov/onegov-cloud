@@ -1383,7 +1383,15 @@ class OIDCProvider(
                       f'{app.application_id} or {app.namespace}')
             return Failure(_('Authorisation failed due to an error'))
 
-        metadata = client.metadata(request)
+        try:
+            metadata = client.metadata(request)
+        except Exception as error:
+            # Usually a misconfiguration, but could also be a temporary
+            # failure if the identity provider is down
+            log.error(f'Failed to retrieve/validate OIDC metadata in '
+                      f'{app.application_id}: {error}')
+            return Failure(_('Authorisation failed due to an error'))
+
         session = client.session(self, request)
         auth_url, _state = session.authorization_url(
             metadata['authorization_endpoint'],
@@ -1437,8 +1445,16 @@ class OIDCProvider(
                       f'{app.application_id} or {app.namespace}')
             return Failure(_('Authorisation failed due to an error'))
 
+        try:
+            metadata = client.metadata(request)
+        except Exception as error:
+            # Usually a misconfiguration, but could also be a temporary
+            # failure if the identity provider is down
+            log.error(f'Failed to retrieve/validate OIDC metadata in '
+                      f'{app.application_id}: {error}')
+            return Failure(_('Authorisation failed due to an error'))
+
         session = client.session(self, request)
-        metadata = client.metadata(request)
         try:
             token = session.fetch_token(
                 metadata['token_endpoint'],
@@ -1495,6 +1511,16 @@ class OIDCProvider(
                 last_name = last_name or claims.get(
                     client.attributes.last_name, None)
                 group = group or claims.get(client.attributes.group, None)
+
+                if realname:
+                    # already set
+                    pass
+                elif first_name and last_name:
+                    realname = f'{first_name} {last_name}'
+                else:
+                    realname = claims.get(
+                        client.attributes.preferred_username, None)
+
             except Exception as error:
                 log.info(f'Failed to retrieve OIDC userinfo: {error}')
 

@@ -32,7 +32,7 @@ def app(postgres_dsn, redis_url):
 
 @pytest.fixture(autouse=True)
 def no_requests(monkeypatch):
-    monkeypatch.delattr("requests.sessions.Session.request")
+    monkeypatch.delattr('requests.sessions.Session.request')
 
 
 def configure_provider(app, metadata=None, primary=False):
@@ -104,6 +104,7 @@ def test_oidc_static_metadata(app):
     static_metadata = {
         'issuer': 'https://oidc.test/',
         'authorization_endpoint': 'https://oidc.test/authorize',
+        'token_endpoint': 'https://oidc.test/token',
         'jwks_uri': 'https://oidc.test/jwks',
         'response_types_supported': [
             'code'
@@ -119,6 +120,9 @@ def test_oidc_static_metadata(app):
         'code_challenge_methods_supported': [
             'plain',
             'S256'
+        ],
+        'token_endpoint_auth_methods_supported': [
+            'client_secret_basic'
         ],
     }
     configure_provider(app, static_metadata)
@@ -136,6 +140,7 @@ def test_oicd_authenticate_request(app):
     configure_provider(app, {
         'issuer': 'https://oidc.test/',
         'authorization_endpoint': 'https://oidc.test/authorize',
+        'token_endpoint': 'https://oidc.test/token',
         'jwks_uri': 'https://oidc.test/jwks',
         'response_types_supported': [
             'code'
@@ -151,6 +156,9 @@ def test_oicd_authenticate_request(app):
         'code_challenge_methods_supported': [
             'plain',
             'S256'
+        ],
+        'token_endpoint_auth_methods_supported': [
+            'client_secret_basic'
         ],
     })
 
