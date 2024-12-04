@@ -80,7 +80,7 @@ def test_browse_directory_uploads(browser, org_app, field):
     browser.fill('name', "Seven Seas Motel")
     browser.fill('description', "First victim of Ice Truck Killer")
     browser.fill('photo', photo.name)
-    browser.find_by_value("Absenden").click()
+    browser.find_by_value("Speichern").click()
 
     assert browser.is_text_present("Seven Seas Motel")
     assert browser.is_element_present_by_css('.field-display img')
@@ -90,7 +90,7 @@ def test_browse_directory_uploads(browser, org_app, field):
     # elect to keep the picture (default)
     browser.find_by_css('.edit-link').click()
     browser.fill('name', "Seven Seas Motel, Miami")
-    browser.find_by_value("Absenden").click()
+    browser.find_by_value("Speichern").click()
 
     assert browser.is_text_present("Seven Seas Motel, Miami")
     assert browser.is_element_present_by_css('.field-display img')
@@ -102,7 +102,7 @@ def test_browse_directory_uploads(browser, org_app, field):
     browser.find_by_css('.edit-link').click()
     browser.choose('photo', 'replace')
     browser.find_by_name('photo')[3].value = photo.name
-    browser.find_by_value("Absenden").click()
+    browser.find_by_value("Speichern").click()
 
     assert browser.is_element_present_by_css('.field-display img')
     assert browser.find_by_css('.field-display img')['src'] != src
@@ -110,7 +110,7 @@ def test_browse_directory_uploads(browser, org_app, field):
     # elect to delete the picture
     browser.find_by_css('.edit-link').click()
     browser.choose('photo', 'delete')
-    browser.find_by_value("Absenden").click()
+    browser.find_by_value("Speichern").click()
 
     if field.startswith('Photo ='):
         assert not browser.is_element_present_by_css('.field-display img')
@@ -150,13 +150,13 @@ def test_upload_image_with_error(browser, org_app):
     browser.visit('/directories/crime-scenes/+new')
     browser.fill('name', "Seven Seas Motel")
     browser.fill('photo', photo.name)
-    browser.find_by_value("Absenden").click()
+    browser.find_by_value("Speichern").click()
 
     assert browser.is_text_present("Dieses Feld wird benötigt")
 
     # try again with the missing field present
     browser.fill('description', "First victim of Ice Truck Killer")
-    browser.find_by_value("Absenden").click()
+    browser.find_by_value("Speichern").click()
 
     assert browser.is_text_present("Seven Seas Motel")
 
@@ -302,7 +302,7 @@ def test_browse_directory_coordinates(browser, org_app):
     assert browser.is_element_present_by_css('.add-point-active', wait_time=5)
     browser.execute_script('document.leafletmaps[0].panBy([-100, 100]);')
     browser.find_by_css('.add-point-active').click()
-    browser.find_by_value("Absenden").click()
+    browser.find_by_value("Speichern").click()
 
     browser.visit('/directories/restaurants/+new')
     browser.fill('name', "City Sushi")
@@ -310,7 +310,7 @@ def test_browse_directory_coordinates(browser, org_app):
     assert browser.is_element_present_by_css('.add-point-active', wait_time=5)
     browser.execute_script('document.leafletmaps[0].panBy([100, -100]);')
     browser.find_by_css('.add-point-active').click()
-    browser.find_by_value("Absenden").click()
+    browser.find_by_value("Speichern").click()
 
     # make sure the restaurants are visible in the overview
     browser.visit('/directories/restaurants')
@@ -475,7 +475,7 @@ def test_context_specific_function_are_displayed_in_person_directory(browser,
         'last_name': 'Boolean'
     })
 
-    browser.find_by_value("Absenden").click()
+    browser.find_by_value("Speichern").click()
     person = (
         client.app.session().query(Person)
         .filter(Person.last_name == 'Boolean')
@@ -492,7 +492,7 @@ def test_context_specific_function_are_displayed_in_person_directory(browser,
         'people-0-context_specific_function': 'Logician',
         'people-0-display_function_in_person_directory': True,
     })
-    browser.find_by_value("Absenden").click()
+    browser.find_by_value("Speichern").click()
 
     browser.visit(f"/person/{person.id.hex}")
     browser.find_by_text('All About Berry: Logician')
@@ -610,7 +610,7 @@ def test_script_escaped_in_user_submitted_html(browser, org_app):
     browser.find_by_css(new_directory_button).click()
 
     browser.fill('name', "Seven Seas Motel")
-    browser.find_by_value("Absenden").click()
+    browser.find_by_value("Speichern").click()
 
     browser.visit('/directories/clubs')
     browser.find_by_value("Konfigurieren").click()
@@ -657,7 +657,7 @@ def test_link_hashtags(browser, org_app):
                  https://www.seven-seas-motel.com/rooms#luxury-suite
                  #fantastic
                  """)
-    browser.find_by_value("Absenden").click()
+    browser.find_by_value("Speichern").click()
     assert browser.is_text_present("Seven Seas Motel")
 
     # Only hashtags should be links, URL anchors should not be seen as hashtags
