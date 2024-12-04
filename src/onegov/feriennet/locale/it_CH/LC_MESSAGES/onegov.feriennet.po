@@ -2,7 +2,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: \n"
-"POT-Creation-Date: 2024-11-18 10:17+0100\n"
+"POT-Creation-Date: 2024-12-04 10:33+0100\n"
 "PO-Revision-Date: 2021-11-11 09:07+0100\n"
 "Last-Translator: Marc Sommerhalder <marc.sommerhalder@seantis.ch>\n"
 "Language-Team: \n"
@@ -60,17 +60,23 @@ msgstr "${count} con nessun partecipante"
 msgid "${count} cancelled"
 msgstr "${count} annullato"
 
+msgid "Wishes"
+msgstr "Desideri"
+
+msgid "Bookings"
+msgstr "Prenotazioni"
+
 #, python-format
 msgid "${count} Wishes"
 msgstr "${count} Desideri"
 
 #, python-format
-msgid "${count} Bookings"
-msgstr "${count} prenotazioni"
-
-#, python-format
 msgid "${count} Wishes per Attendee"
 msgstr "${count} desideri per partecipante"
+
+#, python-format
+msgid "${count} Bookings"
+msgstr "${count} prenotazioni"
 
 #, python-format
 msgid "${count} accepted"
@@ -92,9 +98,8 @@ msgstr "${count} bloccato"
 msgid "${count} Bookings per Attendee"
 msgstr "${count} prenotazioni per partecipante"
 
-#, python-format
-msgid "${count} Attendees"
-msgstr "${count} partecipante"
+msgid "Attendees"
+msgstr "Partecipante"
 
 #, python-format
 msgid "${count} Girls"
@@ -108,6 +113,9 @@ msgstr "${count} maschio"
 msgid "${count} of which without accepted bookings"
 msgstr "${count} dei quali senza prenotazioni accettate"
 
+msgid "Happiness"
+msgstr "Soddisfazione"
+
 #, python-format
 msgid "${amount}% Happiness"
 msgstr "${amount}% soddisfazione"
@@ -116,9 +124,8 @@ msgstr "${amount}% soddisfazione"
 msgid "${count} Attendees Without Occasion"
 msgstr "${count} Partecipante senza eventi"
 
-#, python-format
-msgid "${amount} CHF outstanding"
-msgstr "${amount} CHF scoperti"
+msgid "CHF outstanding"
+msgstr "CHF scoperti"
 
 #, python-format
 msgid "${amount} CHF total"
@@ -127,6 +134,10 @@ msgstr "${amount} CHF totale"
 #, python-format
 msgid "${amount} CHF paid"
 msgstr "${amount} CHF pagato"
+
+#, python-format
+msgid "${amount} CHF outstanding"
+msgstr "${amount} CHF scoperti"
 
 msgid "Help us"
 msgstr "Aiutare"
@@ -157,9 +168,6 @@ msgstr "Fatture"
 
 msgid "Wishlist"
 msgstr "Lista dei desideri"
-
-msgid "Bookings"
-msgstr "Prenotazioni"
 
 msgid "Activities"
 msgstr "Attività"
@@ -1443,9 +1451,6 @@ msgstr ""
 "Attualmente non ci sono periodi di tempo. Deve esistere almeno un periodo "
 "prima che gli eventi possano essere registrati."
 
-msgid "Attendees"
-msgstr "Partecipante"
-
 msgid "Show Ticket"
 msgstr "Ticket"
 
@@ -1580,6 +1585,9 @@ msgstr ""
 "La voce non può essere aggiunta. C'è una sovrapposizione con un'altra voce "
 "della lista."
 
+msgid "My list"
+msgstr "La mia lista"
+
 msgid ""
 "Join us as a volunteer. Select the activities you are interested in and fill "
 "out the volunteer form. We will contact you afterwards. Activities not "
@@ -1596,11 +1604,8 @@ msgstr ""
 "Vi preghiamo di notare che non possiamo garantire che possiate partecipare "
 "alla stessa attività."
 
-msgid "No activities found."
-msgstr "Nessuna attività trovata."
-
-msgid "Reset filter."
-msgstr "Azzerare il filtro."
+msgid "To my list"
+msgstr "La mia lista"
 
 msgid "Show more"
 msgstr "Mostra di più"
@@ -1608,14 +1613,11 @@ msgstr "Mostra di più"
 msgid "Navigate up"
 msgstr "Verso l'alto"
 
-msgid "My list"
-msgstr "La mia lista"
+msgid "No activities found."
+msgstr "Nessuna attività trovata."
 
-msgid "Apply filters"
-msgstr "Applicare i filtri"
-
-msgid "Filters"
-msgstr ""
+msgid "Reset filter."
+msgstr "Azzerare il filtro."
 
 msgid "Age"
 msgstr "Età"
@@ -1958,6 +1960,12 @@ msgstr "Nessuna fattura è stata ancora emessa."
 msgid "Your donation"
 msgstr "La sua donazione"
 
+msgid "paid"
+msgstr "pagato"
+
+msgid "amount unpaid"
+msgstr "non pagato"
+
 msgid "Adjust"
 msgstr "Modificare"
 
@@ -1989,7 +1997,7 @@ msgid "Pro Juventute Feriennet"
 msgstr "Pro Juventute Feriennet"
 
 msgid "Implementation"
-msgstr ""
+msgstr "Realizzazione"
 
 msgid "Feriennet Partner"
 msgstr "Partner Feriennet"
@@ -1998,7 +2006,7 @@ msgid "Privacy Protection"
 msgstr "Tutela della privacy"
 
 msgid "Login"
-msgstr ""
+msgstr "Login"
 
 msgid "Best of Swiss Web Award 2019"
 msgstr "Premio Best of Swiss Web 2019"
@@ -2036,8 +2044,8 @@ msgstr "Stato del biglietto"
 msgid "Independent of other occasions"
 msgstr "Indipendente da altri eventi"
 
-msgid "<dynamic element>"
-msgstr ""
+msgid "Please bring ${cost} CHF in cash."
+msgstr "Si prega di pagare CHF ${cost} all'organizzatore sul posto."
 
 msgid "${min_spots} - ${max_spots} participants"
 msgstr "${min_spots} - ${max_spots} Partecipanti"
@@ -2175,6 +2183,12 @@ msgstr "La sua richiesta è stata completata con successo."
 #. Canonical text for ${tos} is: "TOS"
 msgid "I have read the ${tos} and accept them."
 msgstr "Ho letto e sono d'accordo con i ${tos}."
+
+msgid "Apply filters"
+msgstr "Applicare i filtri"
+
+msgid "Filters"
+msgstr "Filtri"
 
 msgid "Manage user"
 msgstr "Gestione utente"
@@ -2530,7 +2544,7 @@ msgid "Municipalities"
 msgstr "Comuni"
 
 msgid "Weekday"
-msgstr ""
+msgstr "Giorno della settimana"
 
 msgid "Clone"
 msgstr "Duplicare"
@@ -2738,7 +2752,7 @@ msgid "Invoice marked as paid"
 msgstr "Fattura contrassegnata come pagata"
 
 msgid "Invoice item(s) marked as paid"
-msgstr ""
+msgstr "Articolo(i) della fattura contrassegnato come pagato"
 
 #, python-format
 msgid "Mark paid for ${user}"
@@ -2820,10 +2834,6 @@ msgstr ""
 "partecipare insieme:\n"
 "\n"
 "${link}"
-
-#, python-format
-msgid "Group for \"${title}\""
-msgstr "Gruppo per \"${title}\""
 
 msgid "The booking does not exist"
 msgstr "Questa prenotazione non esiste"
@@ -3200,14 +3210,19 @@ msgstr "Prenotazioni ${period}"
 msgid "Billing for ${period}"
 msgstr "Fatturazione ${period}"
 
-msgid "To my list"
-msgstr "La mia lista"
+#~ msgid "<dynamic element>"
+#~ msgstr "<dynamic element>"
+
+#, python-format
+#~ msgid "${count} Attendees"
+#~ msgstr "${count} partecipante"
+
+#, python-format
+#~ msgid "Group for \"${title}\""
+#~ msgstr "Gruppo per \"${title}\""
 
 #~ msgid "States"
 #~ msgstr "Stato"
-
-#~ msgid "Please bring ${cost} CHF in cash."
-#~ msgstr "Si prega di pagare CHF ${cost} all'organizzatore sul posto."
 
 #~ msgid "Enroll your child now."
 #~ msgstr "Iscriva ora suo figlio/a."

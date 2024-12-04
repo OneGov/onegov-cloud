@@ -3,23 +3,17 @@
         ${title}
     </tal:b>
     <tal:b metal:fill-slot="content">
-    <div class="row">
-        <div class="columns small-12 medium-8">
+    <div class="grid-x grid-padding-x">
+        <div class="cell small-12 medium-8">
             <tal:b condition="not: invoices">
                 <p i18n:translate>
                 No bills created yet.
                 </p>
             </tal:b>
 
-            <tal:b
-                    define="banner layout.app.banners(request)[0]"
-                    condition="banner"
-                    replace="banner"
-                />
-
-            <div class="bills" tal:condition="invoices">
-                <div class="bill ${invoice.paid and 'paid' or 'unpaid'}" id="${invoice.id}" tal:repeat="invoice invoices">
-                    <div class="bills-header show-for-print">
+            <div class="bills limit-line-width" tal:condition="invoices">
+                <div class="bill item-wrapper ${invoice.paid and 'item-green' or 'item-red'}" id="${invoice.id}" tal:repeat="invoice invoices">
+                    <div class="bill-header show-for-print">
                         <div class="bill-creditor"
                              tal:define="contact layout.org.meta.contact_html|nothing; contact_url None"
                              condition="contact">
@@ -45,22 +39,25 @@
                             <br tal:condition="user.data.get('zip_code') or user.data.get('place')">
                         </div>
                     </div>
+                    <div class="item-header">
+                        <div class="item-header-bar">
+                            <h3>${invoice.period.title}</h3>
 
-                    <h3>${invoice.period.title}</h3>
+                            <span class="outstanding">
+                                <tal:b condition="invoice.paid" i18n:translate>Paid</tal:b>
+                                <tal:b condition="not: invoice.paid" i18n:translate>
+                                    <tal:b i18n:name="amount" tal:replace="'{:.2f}'.format(invoice.outstanding_amount)" /> unpaid
+                                </tal:b>
+                            </span>
+                        </div>
 
-                    <strong class="outstanding">
-                        <tal:b condition="invoice.paid" i18n:translate>Paid</tal:b>
-                        <tal:b condition="not: invoice.paid" i18n:translate>
-                            <tal:b i18n:name="amount" tal:replace="'{:.2f}'.format(invoice.outstanding_amount)" /> unpaid
-                        </tal:b>
-                    </strong>
+                        <a id="button-${invoice.id}" data-ogc-toggle="#details-${invoice.id}" class="hide-for-print details-button">
+                            <span i18n:translate class="show-for-sr">Show Details</span>
+                            <i class="fa fa-chevron-down rotate ${'' if invoice.paid else 'down'}" aria-hidden="true"></i>
+                        </a>
 
-                    <button id="button-${invoice.id}" data-toggle="#details-${invoice.id}" class="${invoice.paid and 'untoggled' or 'toggled'} hide-for-print">
-                        <span i18n:translate class="show-for-sr">Show Details</span>
-                        <i class="fa fa-angle-double-down" aria-hidden="true"></i>
-                    </button>
-
-                    <div id="details-${invoice.id}" class="invoice-items-list" style="${invoice.paid and 'display: none;' or ''}">
+                    </div>
+                    <div id="details-${invoice.id}" class="invoice-items-list ${'hidden' if invoice.paid else ''}">
                         <ul>
                             <tal:b repeat="item invoice.items">
                                 <li class="item-group" tal:condition="repeat.item.index == 0 or invoice.items[repeat.item.index - 1].group != item.group">
@@ -75,7 +72,7 @@
                                         <strong tal:case="default">${item.group}</strong>
                                     </tal:b>
                                 </li>
-                                <li class="${(invoice.paid or item.paid) and 'paid' or 'unpaid'} ${item.source and item.source or ''}">
+                                <li class="${(invoice.paid or item.paid) and 'item-green' or 'item-red'} ${item.source and item.source or ''}">
                                     <div class="text-amount">
                                         <span class="item-text">
                                             <tal:b switch="item.group">
@@ -89,6 +86,8 @@
                                                 </tal:b>
                                             </tal:b>
                                         </span>
+                                        <span tal:condition="invoice.paid or item.paid" class="item-payment-status" i18n:translate>paid</span>
+                                        <span tal:condition="not invoice.paid and not item.paid" class="item-payment-status" i18n:translate>amount unpaid</span>
                                         <span class="item-amount" tal:content="'{:.2f}'.format(item.amount)"></span>
                                     </div>
                                         <span class="item-organizer" tal:condition="item.organizer">
@@ -127,9 +126,13 @@
                                     </div>
                                 </li>
                             </tal:b>
-                            <li class="item-total ${invoice.paid and 'paid' or 'unpaid'}">
-                                <span class="item-text"><strong i18n:translate="">Total</strong><span>
-                                <strong class="item-amount" tal:content="'{:.2f}'.format(invoice.total_amount)"></strong>
+                            <li class="item-total ${invoice.paid and 'item-green' or 'item-red'}">
+                            <strong>
+                                <span class="item-text" i18n:translate="">Total</span>
+                                <span tal:condition="invoice.paid" class="item-payment-status" i18n:translate>paid</span>
+                                <span tal:condition="not invoice.paid" class="item-payment-status" i18n:translate>amount unpaid</span>
+                                <span class="item-amount" tal:content="'{:.2f}'.format(invoice.total_amount)"></span>
+                            </strong>
                             </li>
                         </ul>
                         <div class="print-area">
@@ -206,9 +209,18 @@
             </div>
         </div>
 
-        <div class="columns small-12 medium-4 hide-for-print">
-            <tal:b metal:use-macro="layout.macros.users" define="model model.for_period_id(period_id=None)"/>
-            <tal:b metal:use-macro="layout.macros.user_panel" />
+        <div class="cell small-12 medium-4 hide-for-print sidebar">
+            <div class="sidebar-wrapper">
+                <div class="side-panel">
+                    <tal:b
+                        define="banner layout.app.banners(request)[0]"
+                        condition="banner"
+                        replace="banner"
+                    />
+                </div>
+                <tal:b metal:use-macro="layout.macros.users" define="model model.for_period_id(period_id=None)"/>
+                <tal:b metal:use-macro="layout.macros.user_panel" />
+            </div>
         </div>
 
     </div>

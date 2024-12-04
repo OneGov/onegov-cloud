@@ -1,7 +1,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE 1.0\n"
-"POT-Creation-Date: 2024-11-18 10:17+0100\n"
+"POT-Creation-Date: 2024-12-04 10:33+0100\n"
 "PO-Revision-Date: 2021-11-11 09:08+0100\n"
 "Last-Translator: Marc Sommerhalder <marc.sommerhalder@seantis.ch>\n"
 "Language-Team: German\n"
@@ -60,17 +60,23 @@ msgstr "${count} unbelegt"
 msgid "${count} cancelled"
 msgstr "${count} abgesagt"
 
+msgid "Wishes"
+msgstr "Wünsche"
+
+msgid "Bookings"
+msgstr "Buchungen"
+
 #, python-format
 msgid "${count} Wishes"
 msgstr "${count} Wünsche"
 
 #, python-format
-msgid "${count} Bookings"
-msgstr "${count} Buchungen"
-
-#, python-format
 msgid "${count} Wishes per Attendee"
 msgstr "${count} Wünsche pro Person"
+
+#, python-format
+msgid "${count} Bookings"
+msgstr "${count} Buchungen"
 
 #, python-format
 msgid "${count} accepted"
@@ -92,9 +98,8 @@ msgstr "${count} blockiert"
 msgid "${count} Bookings per Attendee"
 msgstr "${count} Buchungen pro Person"
 
-#, python-format
-msgid "${count} Attendees"
-msgstr "${count} Teilnehmer"
+msgid "Attendees"
+msgstr "Teilnehmende"
 
 #, python-format
 msgid "${count} Girls"
@@ -108,6 +113,9 @@ msgstr "${count} Männlich"
 msgid "${count} of which without accepted bookings"
 msgstr "${count} davon ohne akzeptierte Buchungen"
 
+msgid "Happiness"
+msgstr "Zufriedenheit"
+
 #, python-format
 msgid "${amount}% Happiness"
 msgstr "${amount}% Zufriedenheit"
@@ -116,9 +124,8 @@ msgstr "${amount}% Zufriedenheit"
 msgid "${count} Attendees Without Occasion"
 msgstr "${count} Person(en) ohne Durchführung"
 
-#, python-format
-msgid "${amount} CHF outstanding"
-msgstr "${amount} CHF offen"
+msgid "CHF outstanding"
+msgstr "CHF offen"
 
 #, python-format
 msgid "${amount} CHF total"
@@ -127,6 +134,10 @@ msgstr "${amount} CHF total"
 #, python-format
 msgid "${amount} CHF paid"
 msgstr "${amount} CHF bezahlt"
+
+#, python-format
+msgid "${amount} CHF outstanding"
+msgstr "${amount} CHF offen"
 
 msgid "Help us"
 msgstr "Helfen"
@@ -157,9 +168,6 @@ msgstr "Rechnungen"
 
 msgid "Wishlist"
 msgstr "Wunschliste"
-
-msgid "Bookings"
-msgstr "Buchungen"
 
 msgid "Activities"
 msgstr "Angebote"
@@ -1443,9 +1451,6 @@ msgstr ""
 "Es existieren zur Zeit keine Zeiträume. Mindestens ein Zeitraum muss "
 "bestehen bevor Durchführungen erfasst werden können."
 
-msgid "Attendees"
-msgstr "Teilnehmende"
-
 msgid "Show Ticket"
 msgstr "Zum Ticket"
 
@@ -1582,6 +1587,9 @@ msgstr ""
 "Eintrag konnte nicht hinzugefügt werden. Es besteht eine Überlappung mit "
 "einem anderen Eintrag in der Liste."
 
+msgid "My list"
+msgstr "Meine Liste"
+
 msgid ""
 "Join us as a volunteer. Select the activities you are interested in and fill "
 "out the volunteer form. We will contact you afterwards. Activities not "
@@ -1596,11 +1604,8 @@ msgid ""
 "as your children."
 msgstr "Beachten Sie, dass wir eine Teilnahme nicht garantieren können."
 
-msgid "No activities found."
-msgstr "Keine Angebote gefunden."
-
-msgid "Reset filter."
-msgstr "Filter zurücksetzen."
+msgid "To my list"
+msgstr "Zu meiner Liste"
 
 msgid "Show more"
 msgstr "Mehr anzeigen"
@@ -1608,14 +1613,11 @@ msgstr "Mehr anzeigen"
 msgid "Navigate up"
 msgstr "Nach oben"
 
-msgid "My list"
-msgstr "Meine Liste"
+msgid "No activities found."
+msgstr "Keine Angebote gefunden."
 
-msgid "Apply filters"
-msgstr "Filter anwenden"
-
-msgid "Filters"
-msgstr "Filter"
+msgid "Reset filter."
+msgstr "Filter zurücksetzen."
 
 msgid "Age"
 msgstr "Alter"
@@ -1959,6 +1961,12 @@ msgstr "Es wurden noch keine Rechnungen erstellt."
 msgid "Your donation"
 msgstr "Ihre Spende"
 
+msgid "paid"
+msgstr "bezahlt"
+
+msgid "amount unpaid"
+msgstr "offen"
+
 msgid "Adjust"
 msgstr "Anpassen"
 
@@ -2000,7 +2008,7 @@ msgid "Privacy Protection"
 msgstr "Datenschutz"
 
 msgid "Login"
-msgstr ""
+msgstr "Login"
 
 msgid "Best of Swiss Web Award 2019"
 msgstr "Best of Swiss Web Award 2019"
@@ -2040,8 +2048,8 @@ msgstr "Ticketstatus"
 msgid "Independent of other occasions"
 msgstr "Unabhängig von anderen Durchführungen"
 
-msgid "<dynamic element>"
-msgstr ""
+msgid "Please bring ${cost} CHF in cash."
+msgstr "Bitte CHF ${cost} der/dem Veranstaltenden vor Ort bezahlen."
 
 msgid "${min_spots} - ${max_spots} participants"
 msgstr "${min_spots} - ${max_spots} Teilnehmende"
@@ -2179,6 +2187,12 @@ msgstr "Ihr Anliegen wurde erfolgreich abgeschlossen."
 #. Canonical text for ${tos} is: "TOS"
 msgid "I have read the ${tos} and accept them."
 msgstr "Ich habe die ${tos} gelesen und stimme diesen zu."
+
+msgid "Apply filters"
+msgstr "Filter anwenden"
+
+msgid "Filters"
+msgstr "Filter"
 
 msgid "Manage user"
 msgstr "Benutzende verwalten"
@@ -2534,7 +2548,7 @@ msgid "Municipalities"
 msgstr "Gemeinden"
 
 msgid "Weekday"
-msgstr ""
+msgstr "Wochentag"
 
 msgid "Clone"
 msgstr "Duplizieren"
@@ -2824,10 +2838,6 @@ msgstr ""
 "teilnehmen zu können:\n"
 "\n"
 "${link}"
-
-#, python-format
-msgid "Group for \"${title}\""
-msgstr "Gruppe für \"${title}\""
 
 msgid "The booking does not exist"
 msgstr "Diese Buchung existiert nicht"
@@ -3205,14 +3215,16 @@ msgstr "Buchungen ${period}"
 msgid "Billing for ${period}"
 msgstr "Fakturierung ${period}"
 
-msgid "To my list"
-msgstr "Zu meiner Liste"
+#, python-format
+#~ msgid "${count} Attendees"
+#~ msgstr "${count} Teilnehmer"
+
+#, python-format
+#~ msgid "Group for \"${title}\""
+#~ msgstr "Gruppe für \"${title}\""
 
 #~ msgid "States"
 #~ msgstr "Status"
-
-#~ msgid "Please bring ${cost} CHF in cash."
-#~ msgstr "Bitte CHF ${cost} der/dem Veranstaltenden vor Ort bezahlen."
 
 #~ msgid "Enroll your child now."
 #~ msgstr "Jetzt anmelden."

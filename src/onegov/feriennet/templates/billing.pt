@@ -23,9 +23,9 @@
                 <tal:b condition="not: bills" i18n:translate>No bills found.</tal:b>
 
                 <div class="bills billing">
-                    <div class="bill ${details.outstanding == 0 and 'paid'} ${details.outstanding > 0 and 'unpaid'} ${details.outstanding < 0 and 'overpaid'}" id="${details.invoice_id}" tal:repeat="(username, details) bills.items()" data-reload-from="${request.link(model.for_username(username).for_expand(True))}" data-reload-from-selector=".bill">
-                        <div class="bill-header">
-                            <div class="bill-header-bar">
+                    <div class="bill item-wrapper ${details.outstanding == 0 and 'item-green'} ${details.outstanding > 0 and 'item-red'} ${details.outstanding < 0 and 'item-yellow'}" id="${details.invoice_id}" tal:repeat="(username, details) bills.items()" data-reload-from="${request.link(model.for_username(username).for_expand(True))}" data-reload-from-selector=".bill">
+                        <div class="item-header">
+                            <div class="item-header-bar">
                                 <h3>${details.title}</h3>
 
                                 <span class="outstanding">
@@ -48,7 +48,7 @@
                                     </tal:b>
                                 </span>
                             </div>
-                        
+
                             <a href="#" id="button-${details.id}" data-ogc-toggle="#details-${details.id}" class="details-button ${model.expand and 'toggled' or 'untoggled'} ic-use-transition">
                                 <span i18n:translate class="show-for-sr">Show Details</span>
                                 <i class="fa fa-chevron-down rotate" aria-hidden="true"></i>
@@ -89,7 +89,7 @@
                                                     <!-- show the discounts/surcharges text if the previous booking was a normal booking and the current is a donation, ensuring that both the normal discounts/surcharges and the donation show up under this label -->
                                                     <td colspan="4" tal:condition="item.family or details.items[repeat.item.index - 1].family is None and item.group == 'donation'" i18n:translate>Discounts / Surcharges</td>
                                                 </tr>
-                                                <tr class="${item.paid and 'paid' or 'unpaid'}" tal:define="groupid hash(str(item.group) + str(repeat.item.index))">
+                                                <tr class="${item.paid and 'item-green' or 'item-red'}" tal:define="groupid hash(str(item.group) + str(repeat.item.index))">
                                                     <td>
                                                         <tal:b condition="item.group == 'donation'">
                                                             <tal:b i18n:translate>Donation</tal:b> ❤

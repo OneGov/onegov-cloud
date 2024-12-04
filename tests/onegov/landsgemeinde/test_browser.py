@@ -1,4 +1,4 @@
-from onegov.landsgemeinde.models import Assembly
+from onegov.landsgemeinde.models import Assembly, Votum
 from transaction import commit
 
 
@@ -63,3 +63,22 @@ def test_ticker(browser, assembly):
     assert 'Adipiscing elit' in browser.html
     assert 'Eiusmod tempor' not in browser.html
     assert 'Consectetur' in browser.html
+
+
+def test_timestamp_update_in_iframe(browser, assembly):
+    app = browser.wsgi_server.app
+    app.session().add(assembly)
+    commit()
+
+    assembly = app.session().query(Assembly).one()
+    assembly.state = 'completed'
+    assembly.video_url = 'https://example.com'
+    votum = app.session().query(Votum).filter_by(number=3).one()
+    votum.state = 'completed'
+    votum.video_timestamp = "1h2m3s"
+    commit()
+
+    browser.visit('/traktandum/2023-05-07/2')
+    assert '1h2m3s' in browser.html
+    browser.find_by_css('.video-link a').first.click()
+    # browser.find_by_value('1h2m3s').click()

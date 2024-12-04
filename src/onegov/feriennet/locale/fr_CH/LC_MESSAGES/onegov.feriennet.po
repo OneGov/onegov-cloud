@@ -2,7 +2,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE 1.0\n"
-"POT-Creation-Date: 2024-11-06 10:42+0100\n"
+"POT-Creation-Date: 2024-12-04 10:33+0100\n"
 "PO-Revision-Date: 2021-11-11 09:07+0100\n"
 "Last-Translator: Marc Sommerhalder <marc.sommerhalder@seantis.ch>\n"
 "Language-Team: French\n"
@@ -61,17 +61,23 @@ msgstr "${count} pas de participants"
 msgid "${count} cancelled"
 msgstr "${count} annulés"
 
+msgid "Wishes"
+msgstr "Souhaits"
+
+msgid "Bookings"
+msgstr "Réservations"
+
 #, python-format
 msgid "${count} Wishes"
 msgstr "${count} souhaits"
 
 #, python-format
-msgid "${count} Bookings"
-msgstr "${count} réservation(s)"
-
-#, python-format
 msgid "${count} Wishes per Attendee"
 msgstr "${count} souhaits par participant·e"
+
+#, python-format
+msgid "${count} Bookings"
+msgstr "${count} réservation(s)"
 
 #, python-format
 msgid "${count} accepted"
@@ -93,9 +99,8 @@ msgstr "${count} bloqués"
 msgid "${count} Bookings per Attendee"
 msgstr "${count} réservation(s) par participant·e"
 
-#, python-format
-msgid "${count} Attendees"
-msgstr "${count} participant·e"
+msgid "Attendees"
+msgstr "Participant·e·s"
 
 #, python-format
 msgid "${count} Girls"
@@ -109,6 +114,9 @@ msgstr "${count} garçons"
 msgid "${count} of which without accepted bookings"
 msgstr "${count} dont sans réservations acceptées"
 
+msgid "Happiness"
+msgstr "Satisfaction"
+
 #, python-format
 msgid "${amount}% Happiness"
 msgstr "${amount}% de satisfaits"
@@ -117,9 +125,8 @@ msgstr "${amount}% de satisfaits"
 msgid "${count} Attendees Without Occasion"
 msgstr "${count} participant·e·s sans réservations"
 
-#, python-format
-msgid "${amount} CHF outstanding"
-msgstr "${amount} CHF impayés"
+msgid "CHF outstanding"
+msgstr "CHF impayés"
 
 #, python-format
 msgid "${amount} CHF total"
@@ -128,6 +135,10 @@ msgstr "Total de ${amount} CHF"
 #, python-format
 msgid "${amount} CHF paid"
 msgstr "${amount} CHF payés"
+
+#, python-format
+msgid "${amount} CHF outstanding"
+msgstr "${amount} CHF impayés"
 
 msgid "Help us"
 msgstr "Aidez-nous"
@@ -158,9 +169,6 @@ msgstr "Factures"
 
 msgid "Wishlist"
 msgstr "Liste des souhaits"
-
-msgid "Bookings"
-msgstr "Réservations"
 
 msgid "Activities"
 msgstr "Activités"
@@ -1450,9 +1458,6 @@ msgstr ""
 "Actuellement aucune période n'est active. Vous devez d'abord ouvrir une "
 "période avant de saisir des événements."
 
-msgid "Attendees"
-msgstr "Participant·e·s"
-
 msgid "Show Ticket"
 msgstr "Afficher le ticket"
 
@@ -1588,6 +1593,9 @@ msgstr ""
 "Cet élément ne peut pas être ajouté. Il se chevauche avec un autre élément "
 "de votre liste."
 
+msgid "My list"
+msgstr "Ma liste"
+
 msgid ""
 "Join us as a volunteer. Select the activities you are interested in and fill "
 "out the volunteer form. We will contact you afterwards. Activities not "
@@ -1602,11 +1610,8 @@ msgid ""
 "as your children."
 msgstr "Nous ne pouvons pas garantir la confirmation de l'inscription."
 
-msgid "No activities found."
-msgstr "Aucune activité trouvée."
-
-msgid "Reset filter."
-msgstr "Réinitialiser le filtre."
+msgid "To my list"
+msgstr "Vers ma liste"
 
 msgid "Show more"
 msgstr "Afficher davantage"
@@ -1614,14 +1619,11 @@ msgstr "Afficher davantage"
 msgid "Navigate up"
 msgstr "Naviguer vers le haut"
 
-msgid "My list"
-msgstr "Ma liste"
+msgid "No activities found."
+msgstr "Aucune activité trouvée."
 
-msgid "Apply filters"
-msgstr "Appliquer les filtres"
-
-msgid "Filters"
-msgstr "Filtres"
+msgid "Reset filter."
+msgstr "Réinitialiser le filtre."
 
 msgid "Age"
 msgstr "Âge"
@@ -1971,6 +1973,12 @@ msgstr "Aucune facture n'a été créée pour le moment."
 msgid "Your donation"
 msgstr "Votre don"
 
+msgid "paid"
+msgstr "payé"
+
+msgid "amount unpaid"
+msgstr "non payé"
+
 msgid "Adjust"
 msgstr "Modifier"
 
@@ -2013,7 +2021,7 @@ msgid "Privacy Protection"
 msgstr "Protection des données"
 
 msgid "Login"
-msgstr ""
+msgstr "Login"
 
 msgid "Best of Swiss Web Award 2019"
 msgstr "Prix du Best of Swiss Web 2019"
@@ -2050,8 +2058,8 @@ msgstr "Statut du ticket"
 msgid "Independent of other occasions"
 msgstr "Indépendant d'autres événements"
 
-msgid "<dynamic element>"
-msgstr ""
+msgid "Please bring ${cost} CHF in cash."
+msgstr "Veuillez payer ${cost} CHF au prestataire sur place."
 
 msgid "${min_spots} - ${max_spots} participants"
 msgstr "${min_spots} – ${max_spots} participant·e·s"
@@ -2193,6 +2201,12 @@ msgstr "Votre demande a été traitée."
 #. Canonical text for ${tos} is: "TOS"
 msgid "I have read the ${tos} and accept them."
 msgstr "J'ai lu les ${tos} et je les accepte."
+
+msgid "Apply filters"
+msgstr "Appliquer les filtres"
+
+msgid "Filters"
+msgstr "Filtres"
 
 msgid "Manage user"
 msgstr "Gérer les utilisateurs·trices"
@@ -2549,7 +2563,7 @@ msgid "Municipalities"
 msgstr "Communes"
 
 msgid "Weekday"
-msgstr ""
+msgstr "Jour de la semaine"
 
 msgid "Clone"
 msgstr "Copier"
@@ -2837,10 +2851,6 @@ msgstr ""
 "chance de pouvoir partager cette activité :\n"
 "\n"
 "${link}"
-
-#, python-format
-msgid "Group for \"${title}\""
-msgstr "Groupe pour \"${title}\""
 
 msgid "The booking does not exist"
 msgstr "Cette réservation n'existe pas"
@@ -3217,14 +3227,19 @@ msgstr "Réservations pour ${period}"
 msgid "Billing for ${period}"
 msgstr "Facturation pour ${period}"
 
-msgid "To my list"
-msgstr "Vers ma liste"
+#~ msgid "<dynamic element>"
+#~ msgstr "<dynamic element>"
+
+#, python-format
+#~ msgid "${count} Attendees"
+#~ msgstr "${count} participant·e"
+
+#, python-format
+#~ msgid "Group for \"${title}\""
+#~ msgstr "Groupe pour \"${title}\""
 
 #~ msgid "States"
 #~ msgstr "États"
-
-#~ msgid "Please bring ${cost} CHF in cash."
-#~ msgstr "Veuillez payer ${cost} CHF au prestataire sur place."
 
 #~ msgid "Enroll your child now."
 #~ msgstr "Inscrivez votre enfant maintenant."

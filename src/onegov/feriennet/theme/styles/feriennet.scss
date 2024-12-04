@@ -1134,6 +1134,7 @@ $booking-left-margin: 1.6rem;
         display: flex;
         justify-content: space-between;
         margin-top: 1rem;
+        flex-wrap: wrap;
     }
 }
 
@@ -1421,39 +1422,6 @@ $booking-left-margin: 1.6rem;
     }
 }
 
-/*
-    Buttons
-*/
-.details-button {
-    padding: .75rem;
-    border-radius: .7rem;
-
-    .fa-chevron-down {
-        color: $white;
-    }
-
-    &:has(.unpaid),
-    &:has(.alert),
-    &:has(.cancelled) {
-        background-color: $red-light;
-
-        &:hover,
-        &.down {
-            background-color: $red;
-        }
-    }
-
-    &:has(.paid),
-    &:has(.success) {
-        background-color: $green-light;
-
-        &:hover,
-        &.down {
-            background-color: $green;
-        }
-    }
-}
-
 
 /*
     Progress bar
@@ -1561,88 +1529,17 @@ $booking-left-margin: 1.6rem;
 }
 
 /*
-    Billing View
+    Item list
 */
-#page-billing .is-submenu-item {
-    max-width: $max-line-width;
 
-    a {
-        overflow: hidden;
-        text-overflow: ellipsis;
-        white-space: nowrap;
-    }
-}
-
-.billing {
-
-    max-width: $max-line-width;
-
-    .bill {
-        > button:not(.ic-use-transition) {
-            animation: oscillate-opacity 1s infinite;
-
-        .bill-header {
-            display: flex;
-            align-items: center;
-        }
-        }
-    }
-}
-
-.bill {
+.item-wrapper{
     margin-bottom: 1rem;
     padding: 0;
     position: relative;
-
-    .bill-header {
-        display: flex;
-        align-content: center;
-        margin-bottom: .5rem;
-    }
-
-    a {
-        line-height: 1;
-    }
-
-    > button {
-        height: 40px;
-        margin: 0;
-        padding: .25rem;
-        position: absolute;
-        right: 0;
-        top: 0;
-        width: 40px;
-    }
-
-    .bill-header-bar {
-        border-radius: .7rem;
-        flex-grow: 1;
-        align-items: center;
-        display: flex;
-        margin-right: .2rem;
-
-        h3 {
-            display: inline-block;
-            font-size: .9rem;
-            font-weight: bold;
-            line-height: 1rem;
-            margin-bottom: 0;
-            padding: .75rem;
-        }
-
-        span.outstanding {
-            font-size: .9rem;
-            flex-grow: 1;
-        }
-
-        button {
-            margin-right: .5rem !important;
-        }
-
-    }
+    color: $body-font-color;
 
     @mixin payment-state-color($pastel, $light, $dark) {
-        .bill-header-bar {
+        .item-header-bar {
             background-color: $pastel;
             border: 1px solid $pastel;
         }
@@ -1662,7 +1559,6 @@ $booking-left-margin: 1.6rem;
             }
         }
 
-
         .total td {
             color: $dark;
             font-weight: bold;
@@ -1672,15 +1568,15 @@ $booking-left-margin: 1.6rem;
         }
     }
 
-    &.paid {
+    &.item-green {
         @include payment-state-color($green-pastel, $green-light, $green-dark);
     }
 
-    &.unpaid {
+    &.item-red {
         @include payment-state-color($red-pastel, $red-light, $red-dark);
     }
 
-    &.overpaid {
+    &.item-yellow {
         @include payment-state-color($yellow-pastel, $yellow-light, $yellow-dark);
     }
 
@@ -1693,12 +1589,112 @@ $booking-left-margin: 1.6rem;
         }
     }
 
-    div:not(.bill-details) .bill-details-table > div:not(.hidden) {
-        border: 1px solid $iron;
-        border-radius: .7rem;
-        padding: 0 1rem;
-        margin-bottom: 2rem;
+    .item-header {
+        display: flex;
+        align-items: center;
+        margin-bottom: .5rem;
 
+        > button {
+            height: 40px;
+            margin: 0;
+            padding: .25rem;
+            position: absolute;
+            right: 0;
+            top: 0;
+            width: 40px;
+        }
+    }
+
+    a {
+        line-height: 1;
+    }
+
+    .item-header-bar {
+        border-radius: .7rem;
+        flex-grow: 1;
+        align-items: center;
+        display: flex;
+        margin-right: .2rem;
+
+        h3 {
+            display: inline-block;
+            font-size: .9rem;
+            font-weight: bold;
+            line-height: 1rem;
+            margin-bottom: 0;
+            padding: .75rem;
+        }
+
+        span {
+            font-size: .9rem;
+            flex-grow: 1;
+        }
+
+        button {
+            margin-right: .5rem !important;
+        }
+    }
+
+    .details-button {
+        padding: .75rem;
+        border-radius: .7rem;
+
+        .fa-chevron-down {
+            color: $white;
+        }
+
+    }
+
+    li {
+        &.item-group {
+            margin-top: 1rem;
+        }
+
+        &.item-red, &.item-green {
+            border-top: 1px solid $smoke;
+        }
+
+        &.item-group + .item-red,
+        &.item-group + .item-green {
+            border-top: 1px solid $iron;
+        }
+
+        &.item-red .text-amount {
+            .item-amount,
+            .item-payment-status {
+                color: $red-dark;
+            }
+        }
+
+        &.item-green .text-amount {
+            .item-amount,
+            .item-payment-status {
+                color: $green-dark;
+            }
+        }
+
+        &.item-total.item-red {
+            .item-amount,
+            .item-payment-status {
+                color: $red-dark;
+            }
+        }
+
+        &.item-total.item-green {
+            .item-amount,
+            .item-payment-status {
+                color: $green-dark;
+            }
+        }
+
+        &.item-total {
+            margin-top: 3rem;
+            border-top: 1px solid $oil;
+        }
+    }
+
+    .item-total > *{
+        display: flex;
     }
 
     table {
@@ -1780,7 +1776,7 @@ $booking-left-margin: 1.6rem;
             padding-bottom: 1rem;
         }
 
-        .unpaid {
+        .item-red {
             .payment-status {
                 color: $red-dark;
                 text-align: left;
@@ -1791,7 +1787,7 @@ $booking-left-margin: 1.6rem;
             }
         }
 
-        .paid {
+        .item-green {
             .payment-status {
                 color: $green-dark;
                 text-align: left;
@@ -1801,6 +1797,34 @@ $booking-left-margin: 1.6rem;
                 color: $green-dark;
             }
         }
+    }
+
+}
+
+/*
+    Billing View
+*/
+#page-billing .is-submenu-item {
+    max-width: $max-line-width;
+
+    a {
+        overflow: hidden;
+        text-overflow: ellipsis;
+        white-space: nowrap;
+    }
+}
+
+.billing {
+    max-width: $max-line-width;
+}
+
+.bill {
+
+    div:not(.bill-details) .bill-details-table > div:not(.hidden) {
+        border: 1px solid $iron;
+        border-radius: .7rem;
+        padding: 0 1rem;
+        margin-bottom: 2rem;
     }
 
     .mark-paid::before {
@@ -1916,7 +1940,8 @@ $booking-left-margin: 1.6rem;
         }
 
         .invoice-items-list {
-            border-bottom-color: $black;
+            border: 1px solid $iron;
+            border-radius: .7rem;
         }
 
         .invoice-items-payment {
@@ -1934,29 +1959,14 @@ $booking-left-margin: 1.6rem;
     Invoices View
 */
 
-.paid .invoice-items-list {
-    border-bottom: 1px solid $green-pastel;
-}
-
-.unpaid .invoice-items-list {
-    border-bottom: 1px solid $red-pastel;
-}
-
-li.paid {
-    border-top: 1px solid $green-pastel;
-    padding-top: .2rem;
-}
-
-li.unpaid {
-    border-top: 1px solid $red-pastel;
-    padding-top: .2rem;
-}
-
 .invoice-items-list {
     background: $white;
-    padding: 1rem 3.5rem 1rem 1.5rem;
+    padding: 2rem;
     position: relative;
     top: 1px;
+    border: 1px solid $iron;
+    border-radius: .7rem;
+    margin-bottom: 2rem;
 
     ul {
         color: $body-font-color;
@@ -1967,6 +1977,11 @@ li.unpaid {
             align-items: end;
             display: flex;
             flex-wrap: wrap;
+
+            span:not(.item-text) {
+                margin-left: .5rem;
+
+            }
         }
 
         .item-organizer {
@@ -1989,11 +2004,6 @@ li.unpaid {
         right: -.5rem;
     }
 
-    .item-group,
-    .item-total {
-        margin-top: 1rem;
-    }
-
     .item-group:first-child {
         margin-top: 0;
     }
@@ -2002,22 +2012,15 @@ li.unpaid {
         display: relative;
         float: right;
         font-family: $font-family-monospace;
+        margin-left: .5rem;
     }
 
-    li.paid .item-amount::after {
-        @include icon('\f05d');
+    li.paid .text-amount > span:not(.item-text) {
         color: $green-dark;
-        font-weight: normal;
-        position: absolute;
-        right: 33px;
     }
 
-    li.unpaid .item-amount::after {
-        @include icon('\f06a');
+    li.unpaid .text-amount > span:not(.item-text) {
         color: $red-dark;
-        font-weight: normal;
-        position: absolute;
-        right: 33px;
     }
 
     li.paid.stripe_connect .item-amount::after {
