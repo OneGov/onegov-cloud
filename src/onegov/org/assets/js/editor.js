@@ -29,6 +29,10 @@ $(function() {
                 {
                     tag: 'h3',
                     title: translation.subtitle
+                },
+                {
+                    tag: 'h4',
+                    title: translation.subsubtitle
                 }
             ],
             /* defined in input_with_button.js */
