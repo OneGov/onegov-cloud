@@ -261,6 +261,7 @@ multiline-quotes = "double"
 keep-runtime-typing = true
 
 [tool.ruff.lint.ruff]
+extend-markup-names = ["chameleon.utils.Markup"]
 
 [tool.ruff.format]
 quote-style = "single"
