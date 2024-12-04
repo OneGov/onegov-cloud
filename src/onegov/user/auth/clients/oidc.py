@@ -84,19 +84,14 @@ class OIDCClient:
         request: 'CoreRequest'
     ) -> OAuth2Session:
         """ Returns a requests session tied to a OAuth2 client """
-        try:
-            provider_cls = type(provider)
-            redirect_url = request.class_link(
-                provider_cls, {'name': provider.name}, name='redirect')
-            return OAuth2Session(
-                self.client_id,
-                scope=['openid'],
-                redirect_uri=redirect_url,
-            )
-        except Exception as exception:
-            raise ValueError(
-                f'OIDC config error: {exception!s}'
-            ) from exception
+        provider_cls = type(provider)
+        redirect_url = request.class_link(
+            provider_cls, {'name': provider.name}, name='redirect')
+        return OAuth2Session(
+            self.client_id,
+            scope=['openid'],
+            redirect_uri=redirect_url,
+        )
 
     def metadata(self, request: 'CoreRequest') -> dict[str, Any]:
         metadata = self._provider_metadata.get(request.app.application_id)
