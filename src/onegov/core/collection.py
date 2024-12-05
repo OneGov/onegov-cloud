@@ -300,7 +300,7 @@ class Pagination(Generic[_M]):
         """ Returns the number of pages. """
         if not self.batch_size:
             return 1
-        return int(math.ceil(self.subset_count / self.batch_size))
+        return math.ceil(self.subset_count / self.batch_size)
 
     @property
     def name_of_view(self) -> str:
@@ -436,7 +436,7 @@ class RangedPagination(Generic[_M]):
         if not self.batch_size:
             return 1
 
-        return int(math.ceil(self.subset_count / self.batch_size))
+        return math.ceil(self.subset_count / self.batch_size)
 
     @property
     def previous(self) -> 'Self | None':

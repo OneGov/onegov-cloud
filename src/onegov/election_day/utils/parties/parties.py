@@ -60,7 +60,7 @@ def get_party_results(
         total_votes = totals_votes.get(result.year) or 0
         votes_permille = 0
         if total_votes:
-            votes_permille = int(round(1000 * (votes / total_votes)))
+            votes_permille = round(1000 * (votes / total_votes))
         year['votes'] = {
             'total': votes,
             'permille': votes_permille
@@ -68,7 +68,7 @@ def get_party_results(
 
         voters_count: Decimal | float = result.voters_count or Decimal(0)
         if not item.exact_voters_counts:
-            voters_count = int(round(voters_count))
+            voters_count = round(voters_count)
         elif json_serializable:
             voters_count = float(voters_count)
 
