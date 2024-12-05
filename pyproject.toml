@@ -175,6 +175,7 @@ ignore = [
     "RUF022",
     "RUF023",
     "RUF031",
+    "RUF052",
     # TODO: We would like to enable SIM102, but it has a ton of
     #       violations, so it's a big job to clean it up
     "SIM102",
