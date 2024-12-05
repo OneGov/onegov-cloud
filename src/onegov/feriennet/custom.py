@@ -25,7 +25,14 @@ if TYPE_CHECKING:
 def get_template_variables(request: 'FeriennetRequest') -> 'RenderData':
     return {
         'global_tools': tuple(get_global_tools(request)),
-        'top_navigation': tuple(get_top_navigation(request))
+        'top_navigation': tuple(get_top_navigation(request)),
+        'volunteer_link': Link(
+            text=_('Help us'),
+            url=request.class_link(
+                VacationActivityCollection, name='volunteer'
+            ),
+            attrs={'id': ('help-us')}
+        )
     }
 
 
@@ -35,15 +42,6 @@ def get_global_tools(
     yield from get_base_tools(request)
     yield from get_personal_tools(request)
     yield from get_admin_tools(request)
-
-    if request.app.show_volunteers(request):
-        yield Link(
-            text=_('Help us'),
-            url=request.class_link(
-                VacationActivityCollection, name='volunteer'
-            ),
-            attrs={'class': ('volunteer', 'highlighted')}
-        )
 
 
 def get_admin_tools(

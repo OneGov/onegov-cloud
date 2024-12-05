@@ -1020,3 +1020,25 @@
         data-cart-action-url="${cart_action_url}"
         i18n:attributes="data-empty-label;data-button-label;data-remove-label"></div>
 </metal:volunteer_cart>
+
+<metal:feriennet_links define-macro="feriennet_links">
+    <div id="feriennet-links" class="text-center">
+        <div class="grid-container">
+            <div class="top-bar-left">
+                <ul class="menu align-right">
+                    <li tal:condition="volunteer_link">
+                        <tal:b replace="volunteer_link(layout)" />
+                    </li>
+                    <li tal:condition="not request.is_logged_in">
+                        <a href="./auth/register" i18n:translate>
+                            Register
+                        </a>
+                    </li>
+                    <li tal:condition="not request.is_logged_in">
+                        <a href="${layout.login_from_path()}" i18n:translate>Login</a>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </div>
+</metal:feriennet_links>

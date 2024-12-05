@@ -72,6 +72,57 @@ svg {
 }
 
 /*
+    Header
+*/
+#feriennet-links {
+    background: $primary-color;
+
+    ul {
+        padding: .5rem 0;
+    }
+
+    li {
+        border-left: 1px solid scale-color($primary-color, $lightness: 30%, $saturation: -40%);
+        font-size: .9rem;
+
+        &:first-child {
+            border-left: 0;
+        }
+
+        &:nth-child(2) {
+            margin-left: 1rem;
+        }
+
+        a#help-us {
+            background: $smoke;
+            border-radius: 1rem;
+            color: $primary-color;
+
+            &:hover {
+                box-shadow: 0 0 0.3rem .1rem rgba(0,0,0,0.28) inset;
+            }
+        }
+
+        a {
+            color: white;
+            border-radius: 1rem;
+            padding: .3rem 1rem;
+            transition: all 200ms linear ;
+        }
+
+        &:hover a {
+            background: rgba(250, 250, 250, .15);
+        }
+    }
+}
+
+#header_links + #feriennet-links,
+#header_text + #feriennet-links {
+    border-top: 1px solid darken($primary-color, 5%);
+    box-shadow: 0 15px 10px -15px rgba(0,0,0,0.15) inset;
+}
+
+/*
     Forms
 */
 @media #{$medium-up} {
@@ -266,19 +317,6 @@ ul.single-line {
     .volunteer::before { @include icon('\f164'); }
 }
 
-.globals .highlighted {
-    background: $success-color;
-    border: 1px solid darken($success-color, 5%);
-    border-radius: 3px;
-    height: 1.4rem !important;
-    line-height: 1.5 !important;
-    margin-top: .6rem;
-
-    &:hover,
-    &:active {
-        background: darken($success-color, 5%) !important;
-    }
-}
 
 /*
     Footer logo

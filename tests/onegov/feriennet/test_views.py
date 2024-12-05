@@ -850,7 +850,7 @@ def test_enroll_child(client, scenario):
     assert "Ihr Benutzerprofil ist unvollständig" in enroll
 
     # now that we're logged in, the login link automatically skips ahead
-    enroll = activity.click("Anmelden", index=0).follow()
+    enroll = activity.click("Anmelden", index=1).follow()
     assert "Teilnehmende anmelden" in enroll
 
     # the link changes, but the result stays the same
