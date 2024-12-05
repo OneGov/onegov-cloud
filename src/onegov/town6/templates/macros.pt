@@ -724,53 +724,6 @@
                 <div tal:condition="coordinates" class="marker-map" data-map-type="thumbnail" data-lat="${coordinates.lat}" data-lon="${coordinates.lon}" data-zoom="${coordinates.zoom}" data-marker-icon="${marker_icon|nothing}" data-marker-color="${marker_color|nothing}"></div>
                 <div class="location" tal:condition="location">${location}</div>
             </div>
-            <div class="more-entries side-panel" tal:condition="more_entries|False">
-                <h3 i18n:translate="">Other Entries</h3>
-                <ul class="more-list">
-                    <li tal:condition="prev_entry">
-                        <a href="${request.link(prev_entry)}" class="list-link">
-                            <i class="fa fa-chevron-left"></i><span class="list-title" i18n:translate="">Previous Entry</span>
-                        </a>
-                        <a href="${request.link(prev_entry)}">
-                            <p class="list-lead preview">
-                                ${prev_entry.title}
-                            </p>
-                        </a>
-                    </li>
-                    <li tal:condition="next_entry">
-                        <a href="${request.link(next_entry)}" class="list-link">
-                            <i class="fa fa-chevron-right"></i><span class="list-title" i18n:translate="">Next Entry</span>
-                        </a>
-                        <a href="${request.link(next_entry)}">
-                            <p class="list-lead preview">
-                                ${next_entry.title}
-                            </p>
-                        </a>
-                    </li>
-                </ul>
-            </div>
-            <div class="side-panel files-panel" tal:condition="files and page.show_file_links_in_sidebar|True">
-                <h3 i18n:translate>Documents</h3>
-                <ul class="more-list">
-                    <li tal:repeat="file files">
-                        <a class="list-link" title="${file.name}" href="${request.link(file)}">
-                            <i class="far ${layout.get_fa_file_icon(file.name)}" aria-hidden="true"></i>
-                            <span class="list-title">${file.name.split('.')[0]}</span>
-                        </a>
-                    </li>
-                </ul>
-            </div>
-            <div class="side-panel links-panel" tal:condition="sidepanel_links|False">
-                <h3 i18n:translate>Links</h3>
-                <ul class="more-list">
-                    <li tal:repeat="sl sidepanel_links">
-                        <a class="list-link" title="${sl[0] if sl[0] else sl[1]}" href="${sl[1]}">
-                            <i class="fa fa-link" aria-hidden="true"></i>
-                            <span class="list-title">${sl[0] if sl[0] else sl[1]}</span>
-                        </a>
-                    </li>
-                </ul>
-            </div>
             <div class="side-panel people-panel" tal:condition="people and not show_people_on_main_page" tal:define="show_people_on_main_page page.show_people_on_main_page|resource.show_people_on_main_page|False; western_name_order page.western_name_order|resource.western_name_order|False">
                 <h3 i18n:translate>People</h3>
                 <ul class="more-list" data-sortable data-sortable-url="${layout.move_person_url_template}">
@@ -796,6 +749,28 @@
                     </li>
                 </ul>
             </div>
+            <div class="side-panel files-panel" tal:condition="files and page.show_file_links_in_sidebar|True">
+                <h3 i18n:translate>Documents</h3>
+                <ul class="more-list">
+                    <li tal:repeat="file files">
+                        <a class="list-link" title="${file.name}" href="${request.link(file)}">
+                            <i class="far ${layout.get_fa_file_icon(file.name)}" aria-hidden="true"></i>
+                            <span class="list-title">${file.name.split('.')[0]}</span>
+                        </a>
+                    </li>
+                </ul>
+            </div>
+            <div class="side-panel links-panel" tal:condition="sidepanel_links|False">
+                <h3 i18n:translate>Links</h3>
+                <ul class="more-list">
+                    <li tal:repeat="sl sidepanel_links">
+                        <a class="list-link" title="${sl[0] if sl[0] else sl[1]}" href="${sl[1]}">
+                            <i class="fa fa-link" aria-hidden="true"></i>
+                            <span class="list-title">${sl[0] if sl[0] else sl[1]}</span>
+                        </a>
+                    </li>
+                </ul>
+            </div>
             <div class="more-news side-panel" tal:condition="siblings|False">
                 <h3 i18n:translate="">More news</h3>
                 <ul class="more-list">
@@ -811,6 +786,33 @@
                     </li>
                 </ul>
             </div>
+            <div class="more-entries side-panel" tal:condition="more_entries|False">
+                <h3 i18n:translate="">Other Entries</h3>
+                <ul class="more-list">
+                    <li tal:condition="prev_entry">
+                        <a href="${request.link(prev_entry)}" class="list-link">
+                            <i class="fa fa-chevron-left"></i><span
+                                class="list-title" i18n:translate="">Previous Entry</span>
+                        </a>
+                        <a href="${request.link(prev_entry)}">
+                            <p class="list-lead preview">
+                                    ${prev_entry.title}
+                            </p>
+                        </a>
+                    </li>
+                    <li tal:condition="next_entry">
+                        <a href="${request.link(next_entry)}" class="list-link">
+                            <i class="fa fa-chevron-right"></i><span
+                                class="list-title" i18n:translate="">Next Entry</span>
+                        </a>
+                        <a href="${request.link(next_entry)}">
+                            <p class="list-lead preview">
+                                    ${next_entry.title}
+                            </p>
+                        </a>
+                    </li>
+                </ul>
+            </div>
 
             <tal:b metal:define-slot="after-panels"><div id="after-panels"></div></tal:b>
 
@@ -819,7 +821,7 @@
 </metal:page_content>
 
 <metal:page_content define-macro="page_content" i18n:domain="onegov.town6">
-    <div class="grid-x grid-padding-x wrapper" tal:define="show_side_panel show_side_panel|False; location location|False; show_page_image page.show_page_image|None; files files|None; sidepanel_links sidepanel_links|None; news page.type == 'news'|False;">
+    <div class="grid-x grid-padding-x wrapper" tal:define="show_side_panel show_side_panel|False; location location|False; show_page_image page.show_page_image|None; files files|None; sidepanel_links sidepanel_links|None; news page.type == 'news'|False; imageset page.photo_album|None; ">
         <tal:b condition="not: people or files or contact or coordinates or location or show_side_panel or more_entries|False">
             <div class="small-12 cell page-content-main">
                 <img class="page-image" tal:condition="news or show_page_image and layout.org.theme_options.get('page-image-position', 'as_content') ==  'as_content' and page.page_image" src="${page.page_image}">
@@ -830,7 +832,9 @@
                 <div metal:define-slot="after-lead"></div>
 
                 <div class="page-text" tal:condition="text" tal:content="text" />
+                <metal:b tal:condition="imageset" use-macro="layout.macros['render_inline_photo_album']"/>
                 <div metal:define-slot="after-text"></div>
+
             </div>
         </tal:b>
         <tal:b condition="people or files or contact or coordinates or show_side_panel or more_entries|False">
@@ -843,7 +847,10 @@
                     <div metal:define-slot="after-lead"></div>
 
                     <div class="page-text" tal:condition="text" tal:content="text" />
+                    <metal:b tal:condition="imageset" use-macro="layout.macros['render_inline_photo_album']"/>
+
                     <div metal:define-slot="after-text"></div>
+
 
                     <div class="people-panel" tal:condition="people and show_people_on_main_page" tal:define="show_people_on_main_page page.show_people_on_main_page|resource.show_people_on_main_page|False; western_name_order page.western_name_order|resource.western_name_order|False">
                         <h3 i18n:translate>People</h3>
@@ -1033,6 +1040,9 @@
             </li>
             <li tal:condition="person.phone and 'phone' not in exclude" class="person-card-phone">
                 <a href="tel:${person.phone}">${person.phone}</a>
+            </li>
+            <li tal:condition="person.phone_direct and 'phone_direct' not in exclude" class="person-card-phone_direct">
+                <a href="tel:${person.phone_direct}">${person.phone_direct}</a>
             </li>
         </ul>
         <a href="${link}"><i class="fa fa-chevron-right"></i></a>
@@ -2971,3 +2981,23 @@
         </div>
     </div>
 </metal:display_results>
+
+<metal:b define-macro="render_inline_photo_album">
+    <tal:b tal:condition="imageset and imageset.files">
+        <!--! Inline imagesets are always rendered as grid -->
+        <div class="page-text grid-imageset photoswipe">
+            <div class="image-grid">
+                <div tal:repeat="image imageset.files" class="image-container">
+                    <tal:b define="width image.reference.thumbnail_small.size[0]|image.reference.size[0]; height image.reference.thumbnail_small.size[1]|image.reference.size[1]">
+                        <!--! the first eight images are loaded conventionally, the rest are loaded lazily -->
+                        <img src="${request.link(image, 'thumbnail')}" alt="${image.note}" width="${width}" height="${height}" tal:condition="repeat.image.number <= 8" data-full-width="${image.reference.size[0]}" data-full-height="${image.reference.size[1]}" />
+                        <img src="${request.link(image, 'thumbnail')}" alt="${image.note}" width="${width}" height="${height}" class="lazyload" tal:condition="repeat.image.number > 8" data-full-width="${image.reference.size[0]}" data-full-height="${image.reference.size[1]}" />
+                    </tal:b>
+                </div>
+            </div>
+        </div>
+
+    <tal:b metal:use-macro="layout.macros.photoswipe" />
+
+    </tal:b>
+</metal:b>

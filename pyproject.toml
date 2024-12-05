@@ -175,6 +175,7 @@ ignore = [
     "RUF022",
     "RUF023",
     "RUF031",
+    "RUF052",
     # TODO: We would like to enable SIM102, but it has a ton of
     #       violations, so it's a big job to clean it up
     "SIM102",
@@ -192,7 +193,7 @@ ignore = [
     "UP038",
 ]
 unfixable = []
-external = ["MS", "TC"]
+external = ["TC"]
 allowed-confusables = ["×"]
 preview = true
 
@@ -259,6 +260,9 @@ multiline-quotes = "double"
 
 [tool.ruff.lint.pyupgrade]
 keep-runtime-typing = true
+
+[tool.ruff.lint.ruff]
+extend-markup-names = ["chameleon.utils.Markup"]
 
 [tool.ruff.format]
 quote-style = "single"

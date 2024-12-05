@@ -2,7 +2,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE 1.0\n"
-"POT-Creation-Date: 2024-05-07 08:34+0200\n"
+"POT-Creation-Date: 2024-11-18 10:17+0100\n"
 "PO-Revision-Date: 2021-11-11 09:07+0100\n"
 "Last-Translator: Marc Sommerhalder <marc.sommerhalder@seantis.ch>\n"
 "Language-Team: French\n"
@@ -685,8 +685,8 @@ msgstr "Date de naissance"
 msgid "Gender"
 msgstr "Sexe"
 
-msgid "Health Information"
-msgstr "Informations santé et autres"
+msgid "Is there anything the course instructor should know?"
+msgstr "Y a-t-il quelque chose que l'instructeur devrait savoir ?"
 
 msgid "Allergies, Disabilities, Particulars"
 msgstr "Allergies, handicaps, particularités"
@@ -2877,21 +2877,6 @@ msgstr "Votre don a été supprimé"
 msgid "This donation has already been paid"
 msgstr "Ce don a déjà été payé"
 
-msgid "Can not do matchings for an inactive period"
-msgstr ""
-"L'attribution par l'algorithme est seulement possible pour une période active"
-
-msgid "Can not do matchings for an confirmed period"
-msgstr ""
-"L'attribution par l'algorithme n'est pas possible pour une période non "
-"confirmée"
-
-msgid "The matching was confirmed successfully"
-msgstr "L'attribution par l'algorithme est terminée avec succès"
-
-msgid "The matching run executed successfully"
-msgstr "Les attributions ont été effectuées avec succès"
-
 msgid "Too many attendees"
 msgstr "Trop de participants"
 
@@ -2906,6 +2891,21 @@ msgstr "Pas assez de participant·e·s"
 
 msgid "No attendees"
 msgstr "Pas de participant·e·s"
+
+msgid "Can not do matchings for an inactive period"
+msgstr ""
+"L'attribution par l'algorithme est seulement possible pour une période active"
+
+msgid "Can not do matchings for an confirmed period"
+msgstr ""
+"L'attribution par l'algorithme n'est pas possible pour une période non "
+"confirmée"
+
+msgid "The matching was confirmed successfully"
+msgstr "L'attribution par l'algorithme est terminée avec succès"
+
+msgid "The matching run executed successfully"
+msgstr "Les attributions ont été effectuées avec succès"
 
 #, python-format
 msgid "Matches for ${title}"
@@ -3201,6 +3201,9 @@ msgstr "Réservations pour ${period}"
 #, python-format
 msgid "Billing for ${period}"
 msgstr "Facturation pour ${period}"
+
+#~ msgid "Health Information"
+#~ msgstr "Informations santé et autres"
 
 #~ msgid "Invoice items marked as paid"
 #~ msgstr "Éléments de la facture marqués comme payés"

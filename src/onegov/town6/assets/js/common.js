@@ -316,7 +316,6 @@ $('.reveal[data-reveal-width]').on('open.zf.reveal', function() {
 // Height of header images
 var w = window.matchMedia("(max-width: 700px)");
 var header_height = $('#header').height();
-console.log(header_height)
 
 if ($('.header-image .page-image').length) {
     var page_image = $('.header-image .page-image');
