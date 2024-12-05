@@ -1109,6 +1109,9 @@ class SAML2Provider(
         # if the source isn't what we expect then it doesn't apply
         client = self.tenants.client(request.app)
         assert client is not None
+        if not client.slo_enabled:
+            return None
+
         if client.treat_as_ldap:
             if user.source != 'ldap':
                 return None
