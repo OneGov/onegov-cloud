@@ -32,8 +32,8 @@
                             <span class="h5">${entry.title}</span>
                         </a>
                         <div tal:attributes="id python:'panel'+str(repeat['entry'].index)" class="content">
-                            <ul tal:repeat="item entry.values.items()" style="list-style: none; margin-left: 0">
-                                <li tal:define="key item[0].capitalize(); value str(item[1]).replace('\r\n', Markup('<br>'))" tal:content="Markup('<strong>{}</strong>: {}').format(key, value)"></li>
+                            <ul tal:repeat="field directory.fields" style="list-style: none; margin-left: 0">
+                                <li tal:define="key field.human_id; value entry.values[field.id].replace('\r\n', Markup('<br>'))" tal:content="Markup('<strong>{}</strong>: {}').format(key, value)"></li>
                             </ul>
                             <ul style="list-style: none; margin-left: 0">
                                 <li>
