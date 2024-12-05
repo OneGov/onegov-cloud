@@ -148,12 +148,13 @@ class BsPosters(Posters):
         self.nay_attribute = 'posters_bs_nay'
         self.yea_img_attribute = 'posters_bs_yea_imgs'
         self.nay_img_attribute = 'posters_bs_nay_imgs'
-        self.headers = {'X-API-KEY': api_key}
+        self.api_key = api_key
+        self.headers = {}
 
     def meta_data_url(self, url: str) -> str:
         base = 'https://www.recherche-plakatsammlungbasel.ch/objects/'
         object_id = url.split(base)[-1].rstrip('/')
-        return f'{base}{object_id}/xml'
+        return f'{base}{object_id}/xml?key={self.api_key}'
 
 
 class SaPosters(Posters):
