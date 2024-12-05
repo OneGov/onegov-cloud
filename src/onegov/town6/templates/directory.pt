@@ -35,8 +35,8 @@
                             <span class="h5">${entry.title}</span>
                         </a>
                         <div class="accordion-content" data-tab-content>
-                            <ul tal:repeat="item entry.values.items()" style="list-style: none; margin-left: 0">
-                                <li tal:define="key item[0].replace('_', ' ').title(); value str(item[1]).replace('\r\n', Markup('<br>'))" tal:content="Markup('<strong>{}</strong>: {}').format(key, value)"></li>
+                            <ul tal:repeat="field directory.fields" style="list-style: none; margin-left: 0">
+                                <li tal:define="key field.id.replace('_', ' ').title(); value entry.values[field.id].replace('\r\n', Markup('<br>'))" tal:content="Markup('<strong>{}</strong>: {}').format(key, value)"></li>
                             </ul>
                             <ul style="list-style: none; margin-left: 0">
                                 <li>
