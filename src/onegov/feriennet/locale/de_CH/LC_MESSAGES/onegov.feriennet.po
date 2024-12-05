@@ -2008,7 +2008,7 @@ msgid "Privacy Protection"
 msgstr "Datenschutz"
 
 msgid "Login"
-msgstr "Login"
+msgstr "Anmelden"
 
 msgid "Best of Swiss Web Award 2019"
 msgstr "Best of Swiss Web Award 2019"

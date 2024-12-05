@@ -36,8 +36,8 @@
             <metal:hint use-macro="layout.macros['empty_page_lead_hint']" />
         </tal:b>
 
-        <div class="panel callout" tal:condition="callout|nothing">
-             <p>${callout}</p>
+        <div class="panel callout" tal:condition="form.callout|callout|nothing">
+             <p>${form.callout|callout}</p>
         </div>
 
         <div class="panel" tal:condition="helptext|nothing">

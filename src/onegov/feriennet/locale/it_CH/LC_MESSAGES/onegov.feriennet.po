@@ -2006,7 +2006,7 @@ msgid "Privacy Protection"
 msgstr "Tutela della privacy"
 
 msgid "Login"
-msgstr "Login"
+msgstr "Accedi"
 
 msgid "Best of Swiss Web Award 2019"
 msgstr "Premio Best of Swiss Web 2019"

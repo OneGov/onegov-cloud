@@ -1,6 +1,6 @@
 from onegov.core.security import Public
 from onegov.feriennet import FeriennetApp, _
-from onegov.town6.views.auth import handle_registration
+from onegov.town6.views.auth import town_handle_registration
 from onegov.user import Auth
 from onegov.user.forms import RegistrationForm
 
@@ -27,4 +27,4 @@ def custom_handle_registration(
             'The user account must be opened by a parent or guardian of '
             'full age.'
         )
-    return handle_registration(self, request, form)
+    return town_handle_registration(self, request, form)

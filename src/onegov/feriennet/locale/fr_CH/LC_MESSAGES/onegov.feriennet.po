@@ -2021,7 +2021,7 @@ msgid "Privacy Protection"
 msgstr "Protection des données"
 
 msgid "Login"
-msgstr "Login"
+msgstr "Connexion"
 
 msgid "Best of Swiss Web Award 2019"
 msgstr "Prix du Best of Swiss Web 2019"

@@ -850,7 +850,7 @@ def test_enroll_child(client, scenario):
     assert "Ihr Benutzerprofil ist unvollständig" in enroll
 
     # now that we're logged in, the login link automatically skips ahead
-    enroll = activity.click("Anmelden", index=1).follow()
+    enroll = activity.click("Anmelden", index=0).follow()
     assert "Teilnehmende anmelden" in enroll
 
     # the link changes, but the result stays the same
@@ -2843,17 +2843,18 @@ def test_booking_after_finalization_for_anonymous(client, scenario):
 
     scenario.commit()
 
-    # this is now possible for anyone
+    # "Anmelden" is there two times, once for ogc-login and once for the
+    # occasion
     assert client.get('/activity/fishing').body.count(b"Anmelden") == 2
-    assert client.get('/activity/fishing').body.count(b"Anmelden") == 2
+    assert client.get('/activity/hunting').body.count(b"Anmelden") == 2
 
     client.login_editor()
     assert client.get('/activity/fishing').body.count(b"Anmelden") == 1
-    assert client.get('/activity/fishing').body.count(b"Anmelden") == 1
+    assert client.get('/activity/hunting').body.count(b"Anmelden") == 1
 
     client.login_admin()
     assert client.get('/activity/fishing').body.count(b"Anmelden") == 1
-    assert client.get('/activity/fishing').body.count(b"Anmelden") == 1
+    assert client.get('/activity/hunting').body.count(b"Anmelden") == 1
 
 
 @pytest.mark.parametrize('attendee_owner', [
