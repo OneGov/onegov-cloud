@@ -33,7 +33,8 @@
                         </a>
                         <div tal:attributes="id python:'panel'+str(repeat['entry'].index)" class="content">
                             <ul tal:repeat="field directory.fields" style="list-style: none; margin-left: 0">
-                                <li tal:define="key field.human_id; value entry.values[field.id].replace('\r\n', Markup('<br>'))" tal:content="Markup('<strong>{}</strong>: {}').format(key, value)"></li>
+                                <li tal:condition="field.type == 'textarea'" tal:define="key field.human_id; value entry.values[field.id]" tal:content="Markup('<strong>{}</strong>: <br>{}').format(key, value)" style="white-space: pre-wrap;"></li>
+                                <li tal:condition="field.type != 'textarea'" tal:define="key field.human_id; value entry.values[field.id]" tal:content="Markup('<strong>{}</strong>: {}').format(key, value)"></li>
                             </ul>
                             <ul style="list-style: none; margin-left: 0">
                                 <li>
