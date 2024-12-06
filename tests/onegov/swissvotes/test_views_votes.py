@@ -2,6 +2,7 @@ from datetime import date
 from decimal import Decimal
 from io import BytesIO
 from onegov.core.utils import module_path
+from onegov.swissvotes.external_resources import BsPosters
 from onegov.swissvotes.external_resources.posters import MfgPosters
 from onegov.swissvotes.external_resources.posters import SaPosters
 from onegov.swissvotes.models import ColumnMapperDataset
@@ -255,10 +256,15 @@ def test_view_update_metadata(swissvotes_app, file, sample_vote):
     assert "Metadaten aktualisiert (0 hinzugefügt, 0 geändert)" in manage
 
 
-@patch.object(MfgPosters, 'fetch', return_value=(1, 2, 3, {Decimal('4')}))
-@patch.object(SaPosters, 'fetch', return_value=(5, 6, 7, {Decimal('8')}))
-def test_view_update_external_resources(mfg, sa, swissvotes_app):
+@patch.object(MfgPosters, 'fetch',
+              return_value=(1, 2, 3, {(Decimal('4'), 'id-4')}))
+@patch.object(SaPosters, 'fetch',
+              return_value=(5, 6, 7, {(Decimal('8'), 'id-8')}))
+@patch.object(BsPosters, 'fetch',
+              return_value=(9, 9, 9, {(Decimal('9'), 'id-9')}))
+def test_view_update_external_resources(mfg, sa, bs, swissvotes_app):
     swissvotes_app.mfg_api_token = 'xxx'
+    swissvotes_app.bs_api_token = 'yyy'
 
     client = Client(swissvotes_app)
     client.get('/locale/de_CH').follow()
@@ -270,8 +276,8 @@ def test_view_update_external_resources(mfg, sa, swissvotes_app):
 
     manage = client.get('/').maybe_follow().click('Abstimmungen')
     manage = manage.click('Bildquellen aktualisieren')
-    manage.form['resources'] = ['mfg', 'sa']
+    manage.form['resources'] = ['mfg', 'sa', 'bs']
     manage = manage.form.submit().follow()
 
-    assert '6 hinzugefügt, 8 geändert, 10 gelöscht' in manage
-    assert 'Quellen konnten nicht aktualisiert werden: 4, 8' in manage
+    assert '15 hinzugefügt, 17 geändert, 19 gelöscht' in manage
+    assert 'Quellen konnten nicht aktualisiert werden: 4, 8, 9' in manage
