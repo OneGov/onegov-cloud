@@ -229,7 +229,8 @@ def test_posters_meta_data_url():
         'https://www.emuseum.ch/objects/object/xml'
     )
     assert BsPosters('yyy').meta_data_url('object') == (
-        'https://www.recherche-plakatsammlungbasel.ch/objects/object/xml'
+        'https://www.recherche-plakatsammlungbasel.ch/objects/object/xml?key'
+        '=yyy'
     )
     assert SaPosters().meta_data_url('object') == (
         'https://swissvotes.sozialarchiv.ch/object'
