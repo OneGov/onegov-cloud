@@ -153,3 +153,6 @@ class Attendence(Base, TimestampMixin):
                 return f'{total_hours:.1f}'
 
         return '0.0'  # Default case
+
+    def __repr__(self) -> str:
+        return f'<Attendence {self.date} {self.type}>'

@@ -5,18 +5,20 @@ from onegov.pas.collections import (
     AttendenceCollection,
 )
 from onegov.pas.custom import get_current_rate_set
-from onegov.pas.models import (
-    SettlementRun,
-)
 from decimal import Decimal
 from weasyprint import HTML, CSS  # type: ignore[import-untyped]
 from weasyprint.text.fonts import (  # type: ignore[import-untyped]
     FontConfiguration,
 )
 from onegov.pas.models.attendence import TYPES, Attendence
-from onegov.pas.models import Parliamentarian
 from datetime import date  # noqa: TC003
 from typing import Literal, TypedDict
+
+
+from typing import TYPE_CHECKING
+if TYPE_CHECKING:
+    from onegov.pas.models import Parliamentarian
+    from onegov.pas.models.settlement_run import SettlementRun
 
 
 @dataclass
@@ -46,9 +48,9 @@ if TYPE_CHECKING:
 
 
 def generate_parliamentarian_settlement_pdf(
-    settlement_run: SettlementRun,
+    settlement_run: 'SettlementRun',
     request: 'TownRequest',
-    parliamentarian: Parliamentarian,
+    parliamentarian: 'Parliamentarian',
 ) -> bytes:
     """Generate PDF for parliamentarian settlement data."""
     font_config = FontConfiguration()
@@ -255,12 +257,11 @@ def generate_parliamentarian_settlement_pdf(
 
 
 def get_parliamentarian_settlement_data(
-    settlement_run: SettlementRun,
+    settlement_run: 'SettlementRun',
     request: 'TownRequest',
-    parliamentarian: Parliamentarian,
+    parliamentarian: 'Parliamentarian',
 ) -> dict[str, list[ParliamentarianEntry]]:
     """Get settlement data for a specific parliamentarian."""
-    # todo: Here we'll have to add 'Spense' in the future
     session = request.session
     rate_set = get_current_rate_set(session, settlement_run)
 

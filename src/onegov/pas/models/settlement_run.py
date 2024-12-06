@@ -66,3 +66,6 @@ class SettlementRun(Base, ContentMixin, TimestampMixin, ORMSearchable):
 
     #: The description
     description: 'dict_property[str | None]' = content_property()
+
+    def __repr__(self) -> str:
+        return f'<SettlementRun {self.name} {self.start} {self.end} >'

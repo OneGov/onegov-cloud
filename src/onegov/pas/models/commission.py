@@ -116,3 +116,6 @@ class Commission(Base, ContentMixin, TimestampMixin, ORMSearchable):
             for membership in self.memberships:
                 if not membership.end:
                     membership.end = end
+
+    def __repr__(self) -> str:
+        return f'<Commission {self.name}>'

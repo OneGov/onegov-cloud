@@ -1,6 +1,11 @@
 from onegov.core.collection import GenericCollection
-from onegov.pas.models import Attendence, SettlementRun
-from sqlalchemy import desc
+from onegov.pas.models import (
+    Attendence,
+    SettlementRun,
+    Parliamentarian,
+    ParliamentarianRole,
+)
+from sqlalchemy import desc, or_
 
 
 from typing import TYPE_CHECKING, Self
@@ -19,6 +24,7 @@ class AttendenceCollection(GenericCollection[Attendence]):
         type: str | None = None,
         parliamentarian_id: str | None = None,
         commission_id: str | None = None,
+        party_id: str | None = None,  # New parameter
     ):
         super().__init__(session)
         self.settlement_run_id = settlement_run_id
@@ -27,6 +33,7 @@ class AttendenceCollection(GenericCollection[Attendence]):
         self.type = type
         self.parliamentarian_id = parliamentarian_id
         self.commission_id = commission_id
+        self.party_id = party_id
 
     @property
     def model_class(self) -> type[Attendence]:
@@ -43,7 +50,7 @@ class AttendenceCollection(GenericCollection[Attendence]):
                 query = query.filter(
                     Attendence.date >= settlement_run.start,
                     Attendence.date <= settlement_run.end,
-                )
+                    )
 
         if self.date_from:
             query = query.filter(Attendence.date >= self.date_from)
@@ -60,6 +67,24 @@ class AttendenceCollection(GenericCollection[Attendence]):
                 Attendence.commission_id == self.commission_id
             )
 
+        # Check for any overlap in party membership period
+        if self.party_id:
+            query = (
+                query.join(Attendence.parliamentarian)
+                .join(Parliamentarian.roles)
+                .filter(
+                    ParliamentarianRole.party_id == self.party_id,
+                    or_(
+                        ParliamentarianRole.start.is_(None),
+                        ParliamentarianRole.start <= Attendence.date
+                    ),
+                    or_(
+                        ParliamentarianRole.end.is_(None),
+                        ParliamentarianRole.end >= Attendence.date
+                    )
+                )
+            )
+
         return query.order_by(desc(Attendence.date))
 
     def for_filter(
@@ -70,6 +95,7 @@ class AttendenceCollection(GenericCollection[Attendence]):
         type: str | None = None,
         parliamentarian_id: str | None = None,
         commission_id: str | None = None,
+        party_id: str | None = None,  # New parameter
     ) -> Self:
         return self.__class__(
             self.session,
@@ -79,4 +105,26 @@ class AttendenceCollection(GenericCollection[Attendence]):
             type=type,
             parliamentarian_id=parliamentarian_id,
             commission_id=commission_id,
+            party_id=party_id,
+        )
+
+    def by_party(
+        self,
+        party_id: str,
+        start_date: 'date',
+        end_date: 'date'
+    ) -> Self:
+        """
+        Filter attendances by party membership during a period.
+        Returns attendances where the parliamentarian belonged to the party
+        at any point during the period.
+        """
+        return self.for_filter(
+            settlement_run_id=self.settlement_run_id,
+            date_from=start_date,
+            date_to=end_date,
+            type=self.type,
+            parliamentarian_id=self.parliamentarian_id,
+            commission_id=self.commission_id,
+            party_id=party_id,
         )

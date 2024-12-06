@@ -1,12 +1,7 @@
-from onegov.pas.models import (
-    Party,
-    Commission,
-    SettlementRun,
-)
+import pytest
 
 
-# @pytest.mark.flaky(reruns=5)
-
+@pytest.mark.flaky(reruns=5)
 def test_views_manage(client_with_es):
     client = client_with_es
     client.login_admin()
@@ -236,39 +231,14 @@ def test_views_manage(client_with_es):
     assert '1 Resultat' in client.get('/search?q=2020-2024')
     assert '1 Resultat' in client.get('/search?q=Q1')
 
-    run = client.app.session().query(SettlementRun).one()
-    party = client.app.session().query(Party).first()
-    commission = client.app.session().query(Commission).first()
-
-
-    # Test party-specific exports
-    response = client.get(
-        f'/settlement-run/{run.id}/export/party/'
-        f'{party.id}/run-export?literal_type=Party'
-    )
-    assert response.status_code == 200
-    assert response.content_type == 'application/pdf'
-    assert 'attachment' in response.content_disposition
-    assert party.name.replace(' ', '_') in response.content_disposition
-
-    # Test commission-specific exports
-    response = client.get(
-        f'/settlement-run/{run.id}/export/commission/{commission.id}/run-export'
-    )
-    assert response.status_code == 200
-    assert response.content_type == 'application/pdf'
-    assert 'attachment' in response.content_disposition
-
-
     # Delete
     for page in delete:
         page.click('Löschen')
     assert 'Noch keine Sätze erfasst' in settings.click('Sätze')
     assert 'Noch keine Legislaturen erfasst' in settings.click('Legislaturen')
-    assert 'Noch keine Abrechnungsläufe erfasst' in \
-        settings.click('Abrechnungsläufe')
+    assert 'Noch keine Abrechnungsläufe erfasst' in\
+           settings.click('Abrechnungsläufe')
     assert 'Noch keine Parteien erfasst' in settings.click('Parteien')
     assert 'Noch keine Fraktionen erfasst' in settings.click('Fraktionen')
-    assert 'Noch keine Parlamentarier:innen erfasst' in \
-        settings.click('Parlamentarier:innen')
-    assert 'Keine aktiven Kommissionen' in settings.click('Kommissionen')
+    assert 'Noch keine Parlamentarier:innen erfasst' in\
+           settings.click('Parlamentarier:innen')

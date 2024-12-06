@@ -14,13 +14,6 @@ def calculate_rate(
     commission_type: str | None = None,
 ) -> Decimal:
     """Calculate the rate for an attendance based on type, duration and role.
-
-    Args:
-        rate_set: The RateSet containing the base rates
-        attendence_type: Type of the attendance
-        duration_minutes: Duration in minutes
-        is_president: Whether the person is president
-        commission_type: Type of commission if applicable
     """
 
     if attendence_type == 'plenary':
