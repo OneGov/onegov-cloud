@@ -177,7 +177,13 @@ def test_posters_fetch(swissvotes_app):
         side_effect=Exception()
     ):
         assert mfg_posters.fetch(session) == (
-            0, 0, 0, {vote_1.bfs_number, vote_2.bfs_number}
+            0, 0, 0, {
+                (vote_1.bfs_number, '1.1'),
+                (vote_1.bfs_number, '1.2'),
+                (vote_1.bfs_number, '1.9'),
+                (vote_1.bfs_number, '1.10'),
+                (vote_2.bfs_number, '2.1'),
+                (vote_2.bfs_number, '2.2')}
         )
         assert vote_1.posters_mfg_yea_imgs == {
             '1.1': 'https://source/yyy',
@@ -193,7 +199,13 @@ def test_posters_fetch(swissvotes_app):
         assert vote_3.posters_mfg_nay_imgs == {}
 
         assert bs_posters.fetch(session) == (
-            0, 0, 0, {vote_1.bfs_number, vote_2.bfs_number}
+            0, 0, 0, {
+                (vote_1.bfs_number, '1.9'),
+                (vote_1.bfs_number, '1.10'),
+                (vote_1.bfs_number, '1.11'),
+                (vote_1.bfs_number, '1.12'),
+                (vote_2.bfs_number, '2.5'),
+                (vote_2.bfs_number, '2.6')}
         )
         assert vote_1.posters_bs_yea_imgs == {
             '1.9': 'https://source/yyy',
@@ -208,7 +220,13 @@ def test_posters_fetch(swissvotes_app):
         assert vote_3.posters_bs_nay_imgs == {}
 
         assert sa_posters.fetch(session) == (
-            0, 0, 0, {vote_1.bfs_number, vote_2.bfs_number}
+            0, 0, 0, {
+                (vote_1.bfs_number, '1.5'),
+                (vote_1.bfs_number, '1.6'),
+                (vote_1.bfs_number, '1.11'),
+                (vote_1.bfs_number, '1.12'),
+                (vote_2.bfs_number, '2.3'),
+                (vote_2.bfs_number, '2.4')}
         )
         assert vote_1.posters_sa_yea_imgs == {
             '1.5': 'https://source/yyy',
