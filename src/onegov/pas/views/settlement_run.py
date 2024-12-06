@@ -31,8 +31,9 @@ if TYPE_CHECKING:
     from onegov.core.types import RenderData
     from onegov.town6.request import TownRequest
     from datetime import date
-
-    SettlementDataRow = tuple['date', str, str, str | int, Decimal, Decimal]
+    SettlementDataRow = tuple[
+        'date', Parliamentarian, str, str | int, Decimal, Decimal
+    ]
     TotalRow = tuple[str, Decimal, Decimal, Decimal, Decimal, Decimal]
 
 
@@ -60,28 +61,33 @@ table {
     table-layout: fixed;
 }
 
-/* Journal entries table */
+/* Journal entries table - updated column widths */
 .journal-table th:nth-child(1), /* Date */
 .journal-table td:nth-child(1) {
     width: 20pt;
 }
 
-.journal-table th:nth-child(2), /* Person */
+.journal-table th:nth-child(2), /* Personnel Number */
 .journal-table td:nth-child(2) {
-    width: 100pt;
+    width: 20pt;
 }
 
-.journal-table th:nth-child(3), /* Type */
+.journal-table th:nth-child(3), /* Person */
 .journal-table td:nth-child(3) {
+    width: 80pt;
+}
+
+.journal-table th:nth-child(4), /* Type */
+.journal-table td:nth-child(4) {
     width: 170pt;
 }
 
-.journal-table th:nth-child(4), /* Value */
-.journal-table td:nth-child(4),
-.journal-table th:nth-child(5), /* CHF */
+.journal-table th:nth-child(5), /* Value */
 .journal-table td:nth-child(5),
-.journal-table th:nth-child(6), /* CHF + TZ */
-.journal-table td:nth-child(6) {
+.journal-table th:nth-child(6), /* CHF */
+.journal-table td:nth-child(6),
+.journal-table th:nth-child(7), /* CHF + TZ */
+.journal-table td:nth-child(7) {
     width: 30pt;
 }
 
@@ -142,7 +148,7 @@ tr:nth-child(even):not(.total-row) td {
 
 .summary-table {
     margin-top: 2cm;
-    page-break-before: always;
+    /* page-break-before: always; */
 }
     """
 
@@ -608,8 +614,7 @@ def _get_commission_settlement_data(
 
         result.append((
             attendence.date,
-            f'{attendence.parliamentarian.first_name} '
-            f'{attendence.parliamentarian.last_name}',
+            attendence.parliamentarian,
             request.translate(TYPES[attendence.type]),
             attendence.calculate_value(),
             Decimal(str(base_rate)),
@@ -633,10 +638,11 @@ def _generate_settlement_html(
            <table class="journal-table">
                <thead>
                    <tr>
-                       <th colspan="6">{subtitle}</th>
+                       <th colspan="7">{subtitle}</th>
                    </tr>
                    <tr>
                        <th>Datum</th>
+                       <th>Pers-Nr</th>
                        <th>Person</th>
                        <th>Typ</th>
                        <th>Wert</th>
@@ -648,10 +654,12 @@ def _generate_settlement_html(
    """
 
     for settlement_row in settlement_data:
+        name = f'{settlement_row[1].first_name} {settlement_row[1].last_name}'
         html += f"""
            <tr>
                <td>{settlement_row[0].strftime('%d.%m.%Y')}</td>
-               <td>{settlement_row[1]}</td>
+               <td>{settlement_row[1].personnel_number}</td>
+               <td>{name}</td>
                <td>{settlement_row[2]}</td>
                <td class="numeric">{settlement_row[3]}</td>
                <td class="numeric">{settlement_row[4]:,.2f}</td>
@@ -773,8 +781,7 @@ def _get_data_export_all(
         settlement_data.append(
             (
                 attendence.date,
-                f'{attendence.parliamentarian.first_name} '
-                f'{attendence.parliamentarian.last_name}',
+                attendence.parliamentarian,
                 type_desc,
                 attendence.calculate_value(),
                 base_rate,
@@ -1034,8 +1041,7 @@ def _get_party_settlement_data(
 
         result.append((
             attendence.date,
-            f'{attendence.parliamentarian.first_name}'
-            f' {attendence.parliamentarian.last_name}',
+            attendence.parliamentarian,
             type_desc,
             attendence.calculate_value(),
             Decimal(str(base_rate)),

@@ -102,14 +102,19 @@ def generate_parliamentarian_settlement_pdf(
             border: 1pt solid #000;
         }
 
+        .custom-header td:nth-child(1) { width: 100pt; }  /* Parl. Name */
+        .custom-header td:nth-child(2) { width: 100pt; }  /* Zug */
+        .custom-header td:nth-child(3) { width: 100pt; }  /* Partei */
+        .custom-header td:nth-child(4) { width: 135pt; }  /* KR- column */
+
         th, td {
             padding: 2pt;
             border: 1pt solid #000;
         }
 
         /* Fixed column widths for main table */
-        .first-table td:first-child { width: 30pt; }
-        .first-table td:nth-child(2){ width: 305pt;}
+        .first-table td:first-child { width: 40pt; }
+        .first-table td:nth-child(2){ width: 295pt;}
         .first-table td:nth-child(3){ width: 50pt; }
         .first-table td:last-child { width: 50pt; }
 
@@ -137,6 +142,7 @@ def generate_parliamentarian_settlement_pdf(
             font-weight: bold;
             background-color: #d5d7d9;
         }
+
     """
     )
 
@@ -157,17 +163,19 @@ def generate_parliamentarian_settlement_pdf(
             </div>
 
             <div class="date">
-                {settlement_run.end.strftime('%d.%m.%Y')}
+                Zug {settlement_run.end.strftime('%d.%m.%Y')}
             </div>
 
             <table class="first-table">
                 <thead>
                     <tr class="header-row">
                         <td>Name</td>
+                        <td></td>
                         <td>Zug</td>
                         <td>ALG</td>
-                        <td colspan="2">KR-{settlement_run.start.year}
-                        -{(settlement_run.start.month-1)//3 + 1:02d}</td>
+                        <td></td>
+                        <td>KR-{settlement_run.start.year}-
+                        {(settlement_run.start.month-1)//3 + 1:02d}</td>
                     </tr>
                     <tr>
                         <th class="data-column-date">Datum</th>
@@ -238,10 +246,10 @@ def generate_parliamentarian_settlement_pdf(
         """
 
     html += f"""
-            <tr>
-                <td>Total Auszahlung</td>
-                <td class="numeric">-</td>
-                <td class="numeric">{total:,.2f}</td>
+            <tr class="merge-cells">
+                <td>Auszahlung</td>
+                <td colspan="2" class="numeric">{total:,.2f}</td>
+                <td>&nbsp;</td>
             </tr>
         </tbody>
     </table>
