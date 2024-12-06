@@ -606,6 +606,8 @@ class ColumnMapperDataset:
             ('national_council_share_unknown', 'unbekannt-summe'),
             ('posters_mfg_yea', 'poster_ja_mfg'),
             ('posters_mfg_nay', 'poster_nein_mfg'),
+            ('posters_bs_yea', 'poster_ja_bs'),
+            ('posters_bs_nay', 'poster_nein_bs'),
             ('posters_sa_yea', 'poster_ja_sa'),
             ('posters_sa_nay', 'poster_nein_sa'),
             ('_result_people_accepted', 'volk'),

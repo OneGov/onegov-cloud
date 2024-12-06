@@ -390,6 +390,14 @@ def test_model_vote_properties(session, sample_vote):
         'https://no.com/objects/1 '
         'https://no.com/objects/2'
     )
+    assert vote.posters_bs_yea == (
+        'https://yes.com/objects/5 '
+        'https://yes.com/objects/6'
+    )
+    assert vote.posters_bs_nay == (
+        'https://no.com/objects/5 '
+        'https://no.com/objects/6'
+    )
     assert vote.posters_sa_yea == (
         'https://yes.com/objects/3 '
         'https://yes.com/objects/4'
@@ -402,6 +410,12 @@ def test_model_vote_properties(session, sample_vote):
         'https://yes.com/objects/1': 'https://detail.com/1'
     }
     assert vote.posters_mfg_nay_imgs == {}
+    assert vote.posters_bs_yea_imgs == {
+        'https://yes.com/objects/5': 'https://detail.com/5',
+    }
+    assert vote.posters_bs_nay_imgs == {
+        'https://no.com/objects/6': 'https://detail.com/6',
+    }
     assert vote.posters_sa_yea_imgs == {}
     assert vote.posters_sa_nay_imgs == {
         'https://no.com/objects/3': 'https://detail.com/3',
@@ -858,6 +872,12 @@ def test_model_vote_properties(session, sample_vote):
     assert vote.posters(DummyRequest()) == {
         'nay': [
             Poster(
+                thumbnail='https://detail.com/6',
+                image='https://detail.com/6',
+                url='https://no.com/objects/6',
+                label='Link Plakatsammlung Basel'
+            ),
+            Poster(
                 thumbnail='https://detail.com/4',
                 image='https://detail.com/4',
                 url='https://no.com/objects/4',
@@ -876,6 +896,12 @@ def test_model_vote_properties(session, sample_vote):
                 image='https://detail.com/1',
                 url='https://yes.com/objects/1',
                 label='Link eMuseum.ch'
+            ),
+            Poster(
+                thumbnail='https://detail.com/5',
+                image='https://detail.com/5',
+                url='https://yes.com/objects/5',
+                label='Link Plakatsammlung Basel'
             )
         ]
     }

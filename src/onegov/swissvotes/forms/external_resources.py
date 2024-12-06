@@ -20,9 +20,10 @@ class UpdateExternalResourcesForm(Form):
         label=_('Resource'),
         choices=(
             ('mfg', _('eMuseum.ch')),
+            ('bs', _('Plakatsammlung Basel')),
             ('sa', _('Social Archives')),
         ),
-        default=('mfg', 'sa'),
+        default=('mfg', 'bs', 'sa'),
         validators=[
             InputRequired()
         ],
@@ -32,3 +33,5 @@ class UpdateExternalResourcesForm(Form):
         assert self.resources.data is not None
         if 'mfg' in self.resources.data and not self.request.app.mfg_api_token:
             raise ValidationError(_('No eMuseum API key available.'))
+        if 'bs' in self.resources.data and not self.request.app.bs_api_token:
+            raise ValidationError(_('No Plakatsammlung API key available.'))
