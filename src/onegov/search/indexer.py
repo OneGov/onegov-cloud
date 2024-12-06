@@ -3,12 +3,15 @@ import re
 import sqlalchemy
 
 from copy import deepcopy
+
 from elasticsearch.exceptions import NotFoundError
 from elasticsearch.helpers import streaming_bulk
 from langdetect.lang_detect_exception import LangDetectException
 from itertools import groupby
 from operator import itemgetter
 from queue import Queue, Empty, Full
+from sqlalchemy.dialects.postgresql import JSONB
+from unidecode import unidecode
 
 from onegov.core.utils import is_non_string_iterable
 from onegov.search import index_log, log, Searchable, utils
@@ -360,6 +363,8 @@ class Indexer(IndexerBase):
 class PostgresIndexer(IndexerBase):
 
     TEXT_SEARCH_COLUMN_NAME = 'fts_idx'
+    TEXT_SEARCH_DATA_COLUMN_NAME = 'fts_idx_data'
+
     idx_language_mapping = {
         'de': 'german',
         'fr': 'french',
@@ -406,10 +411,14 @@ class PostgresIndexer(IndexerBase):
                 language = (
                     self.idx_language_mapping.get(task['language'], 'simple'))
                 data = {
-                    k: str(v)
+                    k: unidecode(str(v))
                     for k, v in task['properties'].items()
                     if not k.startswith('es_')}
+                for k in ('es_public', 'es_tags'):
+                    if k in task['properties']:
+                        data[k] = task['properties'][k]
                 _id = task['id']
+
                 content.append(
                     {'language': language, 'data': data, '_id': _id})
 
@@ -421,18 +430,25 @@ class PostgresIndexer(IndexerBase):
                 (id_col := sqlalchemy
                     .column(id_key)),  # type: ignore[var-annotated]
                 sqlalchemy.column(self.TEXT_SEARCH_COLUMN_NAME),
+                sqlalchemy.column(self.TEXT_SEARCH_DATA_COLUMN_NAME),
                 schema=schema  # type: ignore
             )
             tsvector_expr = sqlalchemy.text(
                 'to_tsvector(:language, :data)').bindparams(
                 sqlalchemy.bindparam('language', type_=sqlalchemy.String),
-                sqlalchemy.bindparam('data', type_=sqlalchemy.JSON)
+                sqlalchemy.bindparam('data', type_=JSONB)
             )
+
             stmt = (
                 sqlalchemy.update(table)
                 .where(id_col == sqlalchemy.bindparam('_id'))
-                .values({self.TEXT_SEARCH_COLUMN_NAME: tsvector_expr})
+                .values({
+                    self.TEXT_SEARCH_COLUMN_NAME: tsvector_expr,
+                    self.TEXT_SEARCH_DATA_COLUMN_NAME:
+                    sqlalchemy.bindparam('data', type_=JSONB)
+                })
             )
+
             if session is None:
                 connection = self.engine.connect()
                 with connection.begin():
@@ -900,8 +916,9 @@ class ORMEventTranslator:
     def put(self, translation: 'Task') -> None:
         try:
             self.es_queue.put_nowait(translation)
+
             if translation['action'] == 'index':
-                # we only need to provide index tasks for fts
+                # we only need to provide index tasks for psql fts
                 self.psql_queue.put_nowait(translation)
         except Full:
             log.error('The orm event translator queue is full!')
