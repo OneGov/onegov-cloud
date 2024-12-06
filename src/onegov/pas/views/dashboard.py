@@ -22,6 +22,7 @@ def view_dashboard(
     self: Organisation,
     request: 'TownRequest'
 ) -> 'RenderData':
+
     layout = DefaultLayout(self, request)
 
     shortcuts = [

@@ -70,3 +70,6 @@ class Party(Base, ContentMixin, TimestampMixin, ORMSearchable):
         cascade='all, delete-orphan',
         back_populates='party'
     )
+
+    def __repr__(self) -> str:
+        return f'<Party {self.name}>'

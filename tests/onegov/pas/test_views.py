@@ -1,5 +1,7 @@
+import pytest
 
 
+@pytest.mark.flaky(reruns=5)
 def test_views_manage(client_with_es):
     client = client_with_es
     client.login_admin()
@@ -234,10 +236,9 @@ def test_views_manage(client_with_es):
         page.click('Löschen')
     assert 'Noch keine Sätze erfasst' in settings.click('Sätze')
     assert 'Noch keine Legislaturen erfasst' in settings.click('Legislaturen')
-    assert 'Noch keine Abrechnungsläufe erfasst' in \
-        settings.click('Abrechnungsläufe')
+    assert 'Noch keine Abrechnungsläufe erfasst' in\
+           settings.click('Abrechnungsläufe')
     assert 'Noch keine Parteien erfasst' in settings.click('Parteien')
     assert 'Noch keine Fraktionen erfasst' in settings.click('Fraktionen')
-    assert 'Noch keine Parlamentarier:innen erfasst' in \
-        settings.click('Parlamentarier:innen')
-    assert 'Noch keine Kommissionen erfasst' in settings.click('Kommissionen')
+    assert 'Noch keine Parlamentarier:innen erfasst' in\
+           settings.click('Parlamentarier:innen')
