@@ -196,12 +196,23 @@ def update_external_resources(
         )
         if failed_total:
             failed_total_str = ', '.join(
-                layout.format_bfs_number(item) for item in sorted(failed_total)
+                layout.format_bfs_number(item[0]) for item in sorted(
+                    failed_total)
             )
             request.message(
                 _(
                     'Some external resources could not be updated: ${failed}',
                     mapping={'failed': failed_total_str}
+                ),
+                'warning'
+            )
+            details = ', '.join(
+                f'[{layout.format_bfs_number(item[0])}: obj {item[1]}]'
+                for item in sorted(failed_total)
+            )
+            request.message(
+                _(
+                    'Details ${details}', mapping={'details': details}
                 ),
                 'warning'
             )
