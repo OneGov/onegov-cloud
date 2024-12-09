@@ -1,7 +1,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: OneGov Cloud 1.0\n"
-"POT-Creation-Date: 2024-07-12 10:45+0200\n"
+"POT-Creation-Date: 2024-11-14 01:27+0100\n"
 "PO-Revision-Date: 2021-03-03 16:24+0100\n"
 "Language-Team: German\n"
 "Language: de_CH\n"
@@ -260,8 +260,11 @@ msgstr "Startseite"
 msgid "Add"
 msgstr "Hinzufügen"
 
-msgid "Attendence"
-msgstr "Anwesenheit"
+msgid "New Attendence"
+msgstr "Sitzung"
+
+msgid "Plenary session (bulk)"
+msgstr "Massenbuchung Plenarsitzung"
 
 msgid "Edit"
 msgstr "Bearbeiten"
@@ -326,11 +329,23 @@ msgstr "Legislatur löschen"
 msgid "Parliamentarians"
 msgstr "Parlamentarier:innen"
 
+msgid "Export"
+msgstr "Export"
+
+msgid "Export All (xlsx)"
+msgstr "Alle exportieren (xlsx)"
+
+msgid "Role (as a party or group member)"
+msgstr "Rolle (als Partei- oder Fraktionsmitglied)"
+
 msgid "Do you really want to delete this parliamentarian?"
 msgstr "Möchten Sie diese:n Parlamentarier:in wirklich löschen?"
 
 msgid "Delete parliamentarian"
 msgstr "Parlamentarier:in löschen"
+
+msgid "CSV billing export"
+msgstr "Abrechnungsexport (CSV)"
 
 msgid "Do you really want to remove this role?"
 msgstr "Rolle wirklich entfernen?"
@@ -449,14 +464,17 @@ msgstr "Kommission"
 msgid "Timestamp"
 msgstr "Zeitpunkt"
 
+msgid "Attendence"
+msgstr "Anwesenheit"
+
 msgid "No changes yet."
 msgstr "Noch keine Aktivitäten."
 
 msgid "Action"
 msgstr "Aktion"
 
-msgid "No commissions defined yet."
-msgstr "Noch keine Kommissionen erfasst."
+msgid "No active commissions."
+msgstr "Keine aktiven Kommissionen."
 
 msgid "Filters"
 msgstr "Filter"
@@ -509,6 +527,9 @@ msgstr "Ja"
 
 msgid "No"
 msgstr "Nein"
+
+msgid "Exports Settlement runs"
+msgstr "Exporte Abrechnungsläufe"
 
 msgid "No settlement runs defined yet."
 msgstr "Noch keine Abrechnungsläufe erfasst"
@@ -593,3 +614,45 @@ msgstr "Neuer Abrechnungslauf hinzugefügt"
 
 msgid "New settlement run"
 msgstr "Neuer Abrechnungslauf"
+
+msgid "Settlements by Party"
+msgstr "Abrechnungen nach Partei"
+
+msgid "All Settlements"
+msgstr "Gesamtabrechnung"
+
+msgid "All Parties"
+msgstr "Alle Parteien"
+
+msgid "Settlements by Commission"
+msgstr "Abrechnungen nach Kommission"
+
+msgid "Settlements by Parliamentarian"
+msgstr "Abrechnungen nach Parlamentarier:in"
+
+msgid "Total all parties"
+msgstr "Total Alle Parteien"
+
+#~ msgid "Date from"
+#~ msgstr "Datum von"
+
+#~ msgid "Date to"
+#~ msgstr "Datum bis"
+
+#~ msgid "All Settlement runs"
+#~ msgstr "Alle Abrechnungsläufe"
+
+#~ msgid "All Parliamentarians"
+#~ msgstr "Alle Parlamentarier:innen"
+
+#~ msgid "All Commissions"
+#~ msgstr "Alle Kommissionen"
+
+#~ msgid "All Types"
+#~ msgstr "Alle Arten"
+
+#~ msgid "Filter"
+#~ msgstr "Filter"
+
+#~ msgid "Apply Filter"
+#~ msgstr "Filter anwenden"

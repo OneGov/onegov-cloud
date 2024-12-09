@@ -5,11 +5,13 @@ from onegov.pas import _
 from onegov.pas.collections import AttendenceCollection
 from onegov.pas.collections import ChangeCollection
 from onegov.user import Auth
+from onegov.pas.models import SettlementRun, RateSet
 
 from typing import TYPE_CHECKING
 if TYPE_CHECKING:
     from collections.abc import Iterator
     from onegov.town6.request import TownRequest
+    from sqlalchemy.orm import Session
 
 
 def get_global_tools(request: 'TownRequest') -> 'Iterator[Link | LinkGroup]':
@@ -62,3 +64,20 @@ def get_global_tools(request: 'TownRequest') -> 'Iterator[Link | LinkGroup]':
 
 def get_top_navigation(request: 'TownRequest') -> 'list[Link]':
     return []
+
+
+def get_current_settlement_run(session: 'Session') -> SettlementRun:
+    query = session.query(SettlementRun)
+    query = query.filter(SettlementRun.active == True)
+    return query.one()
+
+
+def get_current_rate_set(session: 'Session', run: SettlementRun) -> RateSet:
+    rat_set = (
+        session.query(RateSet).filter(RateSet.year == run.start.year).first()
+    )
+    # We get the first one we find by year. This works because we are only
+    # allowing to create one rate set per year
+    if rat_set is None:
+        raise ValueError('No rate set found for the current year')
+    return rat_set

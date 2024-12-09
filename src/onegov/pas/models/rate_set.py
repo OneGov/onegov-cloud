@@ -14,6 +14,7 @@ if TYPE_CHECKING:
 
 
 class RateSet(Base, ContentMixin, TimestampMixin):
+    """ Sätze """
 
     __tablename__ = 'pas_rate_sets'
 

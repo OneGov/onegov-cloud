@@ -23,6 +23,7 @@ from onegov.pas.models import SettlementRun
 from pytest import fixture
 
 
+
 class DummyPostData(dict):
     def getlist(self, key):
         v = self[key]

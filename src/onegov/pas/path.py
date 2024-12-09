@@ -1,5 +1,5 @@
-from onegov.pas.app import PasApp
 from onegov.pas.collections import AttendenceCollection
+from onegov.pas.app import PasApp
 from onegov.pas.collections import ChangeCollection
 from onegov.pas.collections import CommissionCollection
 from onegov.pas.collections import CommissionMembershipCollection
@@ -22,16 +22,45 @@ from onegov.pas.models import Party
 from onegov.pas.models import RateSet
 from onegov.pas.models import SettlementRun
 from uuid import UUID
+from datetime import date
+
+
+from typing import TYPE_CHECKING
+if TYPE_CHECKING:
+    from onegov.town6.request import TownRequest
 
 
 @PasApp.path(
     model=AttendenceCollection,
-    path='/attendences'
+    path='/attendences',
+    converters={
+        'page': int,
+        'settlement_run_id': str,
+        'date_from': date,
+        'date_to': date,
+        'type': str,
+        'parliamentarian_id': str,
+        'commission_id': str
+    }
 )
 def get_attendences(
-    app: PasApp
+    request: 'TownRequest',
+    settlement_run_id: str | None = None,
+    date_from: date | None = None,
+    date_to: date | None = None,
+    type: str | None = None,
+    parliamentarian_id: str | None = None,
+    commission_id: str | None = None
 ) -> AttendenceCollection:
-    return AttendenceCollection(app.session())
+    return AttendenceCollection(
+        session=request.session,
+        settlement_run_id=settlement_run_id,
+        date_from=date_from,
+        date_to=date_to,
+        type=type,
+        parliamentarian_id=parliamentarian_id,
+        commission_id=commission_id
+    )
 
 
 @PasApp.path(
@@ -278,3 +307,92 @@ def get_settlement_run(
     id: UUID
 ) -> SettlementRun | None:
     return SettlementRunCollection(app.session()).by_id(id)
+
+
+class SettlementRunExport:
+    """ Tiny wrapper class for easing the morepath Path Linking
+    (Acts as a container to pass multiple models in the morepath link.)
+
+    """
+
+    def __init__(
+        self,
+        settlement_run: SettlementRun,
+        entity: Party | Commission | Parliamentarian,
+        category: str | None = None
+    ):
+        self.settlement_run = settlement_run
+        self.entity = entity
+        self.category = category
+        self.id = settlement_run.id
+        self.entity_id = entity.id
+        self.literal_type = type(entity).__name__
+
+
+class SettlementRunAllExport:
+    """Special model for 'all' exports without entity """
+    def __init__(
+        self,
+        settlement_run: SettlementRun,
+        category: str,
+    ):
+        self.settlement_run = settlement_run
+        self.category = category
+        self.id = settlement_run.id
+
+
+@PasApp.path(
+    model=SettlementRunExport,
+    path='/run-export/{id}/{category}/{entity_id}',
+    converters={'id': UUID, 'entity_id': UUID},
+)
+def get_settlement_run_export(
+    request: 'TownRequest',
+    id: UUID,
+    category: str,
+    entity_id: UUID,
+    literal_type: str,
+) -> SettlementRunExport | None:
+    session = request.session
+    settlement_run = session.query(SettlementRun).filter_by(id=id).first()
+    if not settlement_run:
+        return None
+
+    model_map: dict[str, type] = {
+        'Party': Party,
+        'Commission': Commission,
+        'Parliamentarian': Parliamentarian,
+    }
+    entity = (
+        session.query(model_map.get(literal_type))
+        .filter_by(id=entity_id)
+        .first()
+    )
+    if not entity:
+        return None
+
+    return SettlementRunExport(
+        settlement_run=settlement_run, entity=entity, category=category
+    )
+
+
+@PasApp.path(
+    model=SettlementRunAllExport,
+    path='/run-export/{id}/all/{category}',
+    converters={'id': UUID}
+)
+def get_settlement_run_export_all(
+    request: 'TownRequest',
+    id: UUID,
+    category: str
+) -> SettlementRunAllExport | None:
+    """Path for 'all' exports without specific entity"""
+    session = request.session
+    settlement_run = session.query(SettlementRun).filter_by(id=id).first()
+    if not settlement_run:
+        return None
+
+    return SettlementRunAllExport(
+        settlement_run=settlement_run,
+        category=category
+    )

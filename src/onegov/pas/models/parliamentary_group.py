@@ -67,3 +67,6 @@ class ParliamentaryGroup(Base, ContentMixin, TimestampMixin, ORMSearchable):
         cascade='all, delete-orphan',
         back_populates='parliamentary_group'
     )
+
+    def __repr__(self) -> str:
+        return f'<ParliamentaryGroup {self.name}>'
