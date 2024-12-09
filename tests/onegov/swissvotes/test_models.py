@@ -872,12 +872,6 @@ def test_model_vote_properties(session, sample_vote):
     assert vote.posters(DummyRequest()) == {
         'nay': [
             Poster(
-                thumbnail='https://detail.com/6',
-                image='https://detail.com/6',
-                url='https://no.com/objects/6',
-                label='Link Plakatsammlung Basel'
-            ),
-            Poster(
                 thumbnail='https://detail.com/4',
                 image='https://detail.com/4',
                 url='https://no.com/objects/4',
@@ -888,6 +882,12 @@ def test_model_vote_properties(session, sample_vote):
                 image='https://detail.com/3',
                 url='https://no.com/objects/3',
                 label='Link Social Archives'
+            ),
+            Poster(
+                thumbnail='https://detail.com/6',
+                image='https://detail.com/6',
+                url='https://no.com/objects/6',
+                label='Link Basel Poster Collection'
             )
         ],
         'yea': [
@@ -901,7 +901,7 @@ def test_model_vote_properties(session, sample_vote):
                 thumbnail='https://detail.com/5',
                 image='https://detail.com/5',
                 url='https://yes.com/objects/5',
-                label='Link Plakatsammlung Basel'
+                label='Link Basel Poster Collection'
             )
         ]
     }

@@ -457,13 +457,14 @@ class SwissVote(Base, TimestampMixin, LocalizedFiles, ContentMixin):
     def posters(self, request: 'SwissvotesRequest') -> dict[str, list[Poster]]:
         result: dict[str, list[Poster]] = {'yea': [], 'nay': []}
 
+        # order: MfG, SA, BS
         for key, attribute, label in (
             ('yea', 'posters_mfg_yea', _('Link eMuseum.ch')),
             ('nay', 'posters_mfg_nay', _('Link eMuseum.ch')),
-            ('yea', 'posters_bs_yea', _('Link Plakatsammlung Basel')),
-            ('nay', 'posters_bs_nay', _('Link Plakatsammlung Basel')),
             ('yea', 'posters_sa_yea', _('Link Social Archives')),
             ('nay', 'posters_sa_nay', _('Link Social Archives')),
+            ('yea', 'posters_bs_yea', _('Link Basel Poster Collection')),
+            ('nay', 'posters_bs_nay', _('Link Basel Poster Collection')),
         ):
             images = getattr(self, f'{attribute}_imgs')
             urls = (getattr(self, attribute) or '').strip().split(' ')
