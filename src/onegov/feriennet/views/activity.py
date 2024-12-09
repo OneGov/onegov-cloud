@@ -985,7 +985,10 @@ def view_activity(
             session=session,
             activity=self,
             show_inactive=False,
-            show_archived=False
+            show_archived=request.is_admin or (
+                request.is_organiser
+                and self.username == request.current_username
+            )
         ),
         'occasions_by_period': occasions_by_period(
             session=session,
