@@ -11,8 +11,7 @@ import transaction
 from itsdangerous import BadSignature, Signer
 from markupsafe import escape
 from websockets.exceptions import ConnectionClosed, InvalidOrigin
-from websockets.legacy.protocol import broadcast
-from websockets.legacy.server import WebSocketServerProtocol, serve
+from websockets.server import WebSocketServerProtocol, serve, broadcast
 
 from onegov.chat.collections import ChatCollection
 from onegov.chat.utils import param_from_path
@@ -30,7 +29,7 @@ if TYPE_CHECKING:
 
     from sqlalchemy.orm import Session
     from websockets import Headers
-    from websockets.legacy.server import HTTPResponse
+    from websockets.asyncio.server import HTTPResponse
 
     from onegov.chat.models import Chat
     from onegov.core.types import JSONObject, JSONObject_ro

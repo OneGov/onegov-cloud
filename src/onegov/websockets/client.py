@@ -6,7 +6,7 @@ from onegov.websockets import log
 from typing import TYPE_CHECKING
 if TYPE_CHECKING:
     from onegov.core.types import JSON_ro
-    from websockets.legacy.client import WebSocketClientProtocol
+    from websockets.client import WebSocketClientProtocol
 
 
 async def acknowledged(websocket: 'WebSocketClientProtocol') -> None:
