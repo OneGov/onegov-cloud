@@ -127,8 +127,8 @@ class Parliamentarian(
     def formal_greeting(self) -> str:
         """Returns the formal German greeting based on gender."""
         if self.gender == 'female':
-            return 'Frau'
-        return 'Herr'
+            return 'Frau ' + self.first_name + ' ' + self.last_name
+        return 'Herr' + self.first_name + ' ' + self.last_name
 
     #: The shipping method value
     shipping_method: 'Column[ShippingMethod]' = Column(
