@@ -7,6 +7,7 @@ from onegov.swissvotes import _
 from onegov.swissvotes import SwissvotesApp
 from onegov.swissvotes.collections import SwissVoteCollection
 from onegov.swissvotes.external_resources import MfgPosters
+from onegov.swissvotes.external_resources import BsPosters
 from onegov.swissvotes.external_resources import SaPosters
 from onegov.swissvotes.forms import SearchForm
 from onegov.swissvotes.forms import UpdateDatasetForm
@@ -162,10 +163,13 @@ def update_external_resources(
         updated_total = 0
         removed_total = 0
         failed_total = set()
-        source: SaPosters | MfgPosters
+        source: SaPosters | BsPosters | MfgPosters
         for resource in form.resources.data or ():
             if resource == 'sa':
                 source = SaPosters()
+            elif resource == 'bs':
+                assert request.app.bs_api_token is not None
+                source = BsPosters(request.app.bs_api_token)
             elif resource == 'mfg':
                 assert request.app.mfg_api_token is not None
                 source = MfgPosters(request.app.mfg_api_token)
@@ -192,12 +196,23 @@ def update_external_resources(
         )
         if failed_total:
             failed_total_str = ', '.join(
-                layout.format_bfs_number(item) for item in sorted(failed_total)
+                layout.format_bfs_number(item[0]) for item in sorted(
+                    failed_total)
             )
             request.message(
                 _(
                     'Some external resources could not be updated: ${failed}',
                     mapping={'failed': failed_total_str}
+                ),
+                'warning'
+            )
+            details = ', '.join(
+                f'[{layout.format_bfs_number(item[0])}: obj {item[1]}]'
+                for item in sorted(failed_total)
+            )
+            request.message(
+                _(
+                    'Details ${details}', mapping={'details': details}
                 ),
                 'warning'
             )

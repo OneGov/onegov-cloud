@@ -1560,6 +1560,14 @@ def test_votes_export(swissvotes_app):
         'https://museum.ch/objects/3 '
         'https://museum.ch/objects/4'
     )
+    vote.posters_bs_yea = (
+        'https://plakatsammlungbasel.ch/objects/1 '
+        'https://plakatsammlungbasel.ch/objects/2'
+    )
+    vote.posters_bs_nay = (
+        'https://plakatsammlungbasel.ch/objects/3 '
+        'https://plakatsammlungbasel.ch/objects/4'
+    )
     vote.posters_sa_yea = (
         'https://sozialarchiv.ch/objects/1 '
         'https://sozialarchiv.ch/objects/2'
@@ -2220,6 +2228,14 @@ def test_votes_export(swissvotes_app):
         'poster_nein_mfg': (
             'https://museum.ch/objects/3 '
             'https://museum.ch/objects/4'
+        ),
+        'poster_ja_bs': (
+            'https://plakatsammlungbasel.ch/objects/1 '
+            'https://plakatsammlungbasel.ch/objects/2'
+        ),
+        'poster_nein_bs': (
+            'https://plakatsammlungbasel.ch/objects/3 '
+            'https://plakatsammlungbasel.ch/objects/4'
         ),
         'poster_ja_sa': (
             'https://sozialarchiv.ch/objects/1 '
@@ -2897,6 +2913,14 @@ def test_votes_export(swissvotes_app):
         'poster_nein_mfg': (
             'https://museum.ch/objects/3 '
             'https://museum.ch/objects/4'
+        ),
+        'poster_ja_bs': (
+            'https://plakatsammlungbasel.ch/objects/1 '
+            'https://plakatsammlungbasel.ch/objects/2'
+        ),
+        'poster_nein_bs': (
+            'https://plakatsammlungbasel.ch/objects/3 '
+            'https://plakatsammlungbasel.ch/objects/4'
         ),
         'poster_ja_sa': (
             'https://sozialarchiv.ch/objects/1 '

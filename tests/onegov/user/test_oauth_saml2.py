@@ -147,10 +147,12 @@ def test_saml2_authenticate_request(app, idp_metadata):
     provider.to = '/'
 
     # test authenticate request (requires xmlsec1 to be installed)
+    browser_session = {}
     request = Bunch(
         app=app,
         application_url='http://example.com/',
         url='http://example.com/auth/provider/idp',
+        browser_session=browser_session,
         class_link=lambda cls, args, name:
         f'http://example.com/auth/provider/{args["name"]}/{name}')
     response = provider.authenticate_request(request)
@@ -158,6 +160,7 @@ def test_saml2_authenticate_request(app, idp_metadata):
     location = response.headers['Location']
     assert location.startswith('https://testidp.zg.ch/login/sls/auth')
     assert 'SAMLRequest=' in location
+    assert browser_session['login_to'] == '/'
 
 
 @pytest.mark.skipif(IDP_METADATA, reason='Running in CI/CD')
