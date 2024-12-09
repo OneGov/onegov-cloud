@@ -72,6 +72,13 @@ def generate_parliamentarian_settlement_pdf(
             line-height: 1.2;
         }
 
+        .first-line {
+            font-size: 7pt;
+            text-decoration: underline;
+            margin-left: 1.0cm;
+            margin-bottom: 0.5cm;
+        }
+        
         .address {
             margin-left: 1.0cm;
             margin-bottom: 0.5cm;
@@ -101,6 +108,11 @@ def generate_parliamentarian_settlement_pdf(
             padding: 2pt;
             border: 1pt solid #000;
         }
+        
+        /* Remove right border of first column in header row */
+        .header-row td:first-child {
+            border-right: none;
+        }
 
         .custom-header td:nth-child(1) { width: 100pt; }  /* Parl. Name */
         .custom-header td:nth-child(2) { width: 100pt; }  /* Zug */
@@ -113,10 +125,12 @@ def generate_parliamentarian_settlement_pdf(
         }
 
         /* Fixed column widths for main table */
-        .first-table td:first-child { width: 40pt; }
-        .first-table td:nth-child(2){ width: 295pt;}
-        .first-table td:nth-child(3){ width: 50pt; }
-        .first-table td:last-child { width: 50pt; }
+            
+        .first-table td:first-child { width: 60pt; }  /* Date column */
+        .first-table td:nth-child(2) { width: 300pt; } /* Type - maximum 
+        space */
+        .first-table td:nth-child(3) { width: 70pt; }  /* Value column */
+        .first-table td:last-child { width: 70pt; }    /* CHF column */
 
         /* Fixed column widths for parliamentarian summary table */
         .parliamentarian-summary-table td:first-child { width: 360pt; }
@@ -142,7 +156,6 @@ def generate_parliamentarian_settlement_pdf(
             font-weight: bold;
             background-color: #d5d7d9;
         }
-
     """
     )
 
@@ -150,13 +163,17 @@ def generate_parliamentarian_settlement_pdf(
         settlement_run, request, parliamentarian
     )
 
+    name = f'{parliamentarian.first_name} {parliamentarian.last_name}'
     html = f"""
         <!DOCTYPE html>
         <html>
         <head><meta charset="utf-8"></head>
         <body>
+            <div class="first-line">
+                <p> Staatskanzlei, Seestrasse 2, 6300 Zug</p><br>
+            </div>
             <div class="address">
-                Staatskanzlei<br>
+                {parliamentarian.formal_greeting}<br>
                 {parliamentarian.shipping_address}<br>
                 {parliamentarian.shipping_address_zip_code}
                 {parliamentarian.shipping_address_city}
@@ -166,10 +183,11 @@ def generate_parliamentarian_settlement_pdf(
                 Zug {settlement_run.end.strftime('%d.%m.%Y')}
             </div>
 
+            
             <table class="first-table">
                 <thead>
                     <tr class="header-row">
-                        <td>Name</td>
+                        <td>{name}</td>
                         <td></td>
                         <td>Zug</td>
                         <td>ALG</td>

@@ -123,6 +123,13 @@ class Parliamentarian(
     def gender_label(self) -> str:
         return GENDERS.get(self.gender, '')
 
+    @property
+    def formal_greeting(self) -> str:
+        """Returns the formal German greeting based on gender."""
+        if self.gender == 'female':
+            return 'Frau'
+        return 'Herr'
+
     #: The shipping method value
     shipping_method: 'Column[ShippingMethod]' = Column(
         Enum(
