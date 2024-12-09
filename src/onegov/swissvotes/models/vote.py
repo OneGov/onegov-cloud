@@ -460,8 +460,8 @@ class SwissVote(Base, TimestampMixin, LocalizedFiles, ContentMixin):
         for key, attribute, label in (
             ('yea', 'posters_mfg_yea', _('Link eMuseum.ch')),
             ('nay', 'posters_mfg_nay', _('Link eMuseum.ch')),
-            ('yea', 'posters_bs_yea', _('Link Plakatsammlung Basel')),
-            ('nay', 'posters_bs_nay', _('Link Plakatsammlung Basel')),
+            ('yea', 'posters_bs_yea', _('Link Basel Poster Collection')),
+            ('nay', 'posters_bs_nay', _('Link Basel Poster Collection')),
             ('yea', 'posters_sa_yea', _('Link Social Archives')),
             ('nay', 'posters_sa_nay', _('Link Social Archives')),
         ):
