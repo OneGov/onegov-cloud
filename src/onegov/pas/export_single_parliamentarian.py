@@ -1,4 +1,5 @@
 from onegov.pas.calculate_pay import calculate_rate
+from babel.numbers import format_decimal
 from dataclasses import dataclass
 from typing import cast
 from onegov.pas.collections import (
@@ -48,8 +49,7 @@ if TYPE_CHECKING:
 
 
 def format_swiss_number(value: Decimal) -> str:
-    """Format number with Swiss formatting (1'000.00)"""
-    return f"{value:,.2f}".replace(',', "'")
+    return format_decimal(value, format='#,##0.00', locale='de_CH')
 
 
 def generate_parliamentarian_settlement_pdf(
@@ -58,19 +58,6 @@ def generate_parliamentarian_settlement_pdf(
     parliamentarian: 'Parliamentarian',
 ) -> bytes:
     """Generate PDF for parliamentarian settlement data."""
-
-    # I'll put this have to put this manually
-    old_value = """
-                     <tr class="header-row">
-                         <td>{name}</td>
-                         <td></td>
-                         <td>Zug</td>
-                         <td>ALG</td>
-                         <td></td>
-                         <td>KR-{settlement_run.start.year}-
-                         {(settlement_run.start.month-1)//3 + 1:02d}</td>
-                     </tr> """
-
     font_config = FontConfiguration()
     css = CSS(
         string="""
@@ -96,7 +83,7 @@ def generate_parliamentarian_settlement_pdf(
             margin-left: 1.0cm;
             margin-bottom: 0.5cm;
         }
-        
+
         .address {
             margin-left: 1.0cm;
             margin-bottom: 0.5cm;
@@ -125,12 +112,12 @@ def generate_parliamentarian_settlement_pdf(
             padding: 2pt;
             border: 1pt solid #000;
         }
-        
+
         .header-row td:nth-child(1) { width: 50pt; }  /* Parl. Name */
         .header-row td:nth-child(2) { width: 100pt; }  /* Zug */
         .header-row td:nth-child(3) { width: 100pt; }  /* Partei */
         .header-row td:nth-child(4) { width: 135pt; }  /* KR- column */
-        
+
         .header-row td:first-child {
             border-right: none!,important;
         }
@@ -141,9 +128,9 @@ def generate_parliamentarian_settlement_pdf(
         }
 
         /* column widths for main table */
-            
+
         .first-table td:first-child { width: 60pt; }  /* Date column */
-        .first-table td:nth-child(2) { width: 316pt; } /* Type - maximum 
+        .first-table td:nth-child(2) { width: 316pt; } /* Type - maximum
         space (Very specific value to align  the table below) */
         .first-table td:nth-child(3) { width: 70pt; }  /* Value column */
         .first-table td:last-child { width: 70pt; }    /* CHF column */
@@ -175,9 +162,9 @@ def generate_parliamentarian_settlement_pdf(
     """
     )
 
-    data = get_parliamentarian_settlement_data(settlement_run, request, parliamentarian)
-
-    name = f'{parliamentarian.first_name} {parliamentarian.last_name}'
+    data = get_parliamentarian_settlement_data(
+        settlement_run, request, parliamentarian
+    )
     html = f"""
         <!DOCTYPE html>
         <html>
@@ -282,7 +269,9 @@ def generate_parliamentarian_settlement_pdf(
     </html>
     """
 
-    return HTML(string=html).write_pdf(stylesheets=[css], font_config=font_config)
+    return HTML(string=html).write_pdf(
+        stylesheets=[css], font_config=font_config
+    )
 
 
 def get_parliamentarian_settlement_data(
