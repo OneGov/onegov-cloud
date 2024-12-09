@@ -379,8 +379,16 @@ def check_skip(line: 'DefaultRow') -> bool:
 
 
 def check_skip_people(line: 'DefaultRow') -> bool:
-    kw = 'Telefon'
-    if kw in line.nachname or kw in line.vorname or kw in line.funktion:
+    kw_1 = 'Telefon'
+    kw_2 = 'Telefonist'
+
+    # skip 'Telefon' but don't skip 'Telefonist' 'Telefonistin' resp.
+    if kw_2 in line.nachname or kw_2 in line.vorname or kw_2 in line.funktion:
+        return False
+
+    if kw_1 in line.nachname or kw_1 in line.vorname or kw_1 in line.funktion:
+        # print(f'Skipping person on line {line.rownumber} with keyword '
+        #       f'{kw_1} {line.nachname}, {line.vorname}, {line.funktion}')
         return True
 
     return False
