@@ -510,7 +510,6 @@ def import_lu_agencies(
             None, None, None, None, None, None
         kw = 'Telefon'
         if kw in line.nachname or kw in line.vorname or kw in line.funktion:
-            print(f'*** tschupre found org phone on csv line {line.rownumber}')
             phone = get_phone(line.isdn_nummer)
             if v_(line.unterabteilung_2):
                 phone_u2 = phone
