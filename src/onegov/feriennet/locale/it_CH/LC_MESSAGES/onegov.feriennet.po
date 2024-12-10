@@ -2,7 +2,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: \n"
-"POT-Creation-Date: 2024-12-04 10:33+0100\n"
+"POT-Creation-Date: 2024-12-10 15:43+0100\n"
 "PO-Revision-Date: 2021-11-11 09:07+0100\n"
 "Last-Translator: Marc Sommerhalder <marc.sommerhalder@seantis.ch>\n"
 "Language-Team: \n"
@@ -1936,14 +1936,14 @@ msgstr "Questo è un gruppo di un periodo inattivo."
 msgid "Own Children"
 msgstr "Figli propri"
 
+msgid "None of own children in group."
+msgstr "Nessun figlio proprio nel gruppo."
+
 msgid "Add own child"
 msgstr "Aggiungere il proprio bambino"
 
 msgid "Add new own child"
 msgstr "Registrare un nuovo figlio proprio"
-
-msgid "None of own children in group."
-msgstr "Nessun figlio proprio nel gruppo."
 
 msgid "Other Children"
 msgstr "Altri bambini"
@@ -1989,6 +1989,24 @@ msgstr "Bonifico bancario"
 
 msgid "Purpose of Payment"
 msgstr "Scopo del pagamento"
+
+msgid "Search term"
+msgstr "Termine di ricerca"
+
+msgid "Skip navigation"
+msgstr "Migrazione dei link"
+
+msgid "Back to the homepage"
+msgstr "Torna alla pagina principale"
+
+msgid "Logo"
+msgstr "Logo"
+
+msgid "The form contains errors. Please check the fields marked in red."
+msgstr "Il modulo contiene degli errori. Verifica i campi segnalati in rosso."
+
+msgid "Copied to Clipboard!"
+msgstr "Copiato negli appunti!"
 
 msgid "Pro Juventute Logo"
 msgstr "Logo Pro Juventute"
@@ -2411,9 +2429,6 @@ msgstr ""
 "Grazie mille per averci offerto il vostro aiuto! Esamineremo la sua "
 "richiesta e le faremo sapere."
 
-msgid "Back to the homepage"
-msgstr "Torna alla homepage"
-
 msgid "No activities needing volunteers found."
 msgstr "Nessuna attività trovata che abbia bisogno di aiutanti."
 
@@ -2808,8 +2823,11 @@ msgstr "Si possono scegliere un massimo di tre preferenze per bambino"
 msgid "The period is not in the wishlist-phase"
 msgstr "Il periodo non è nella fase desiderata"
 
-msgid "Leave Group"
-msgstr "Lasciare il gruppo"
+msgid "add to group"
+msgstr "aggiungere al gruppo"
+
+msgid "remove from group"
+msgstr "rimuovere dal gruppo"
 
 #, python-format
 msgid ""
@@ -3209,6 +3227,9 @@ msgstr "Prenotazioni ${period}"
 #, python-format
 msgid "Billing for ${period}"
 msgstr "Fatturazione ${period}"
+
+#~ msgid "Leave Group"
+#~ msgstr "Lasciare il gruppo"
 
 #~ msgid "<dynamic element>"
 #~ msgstr "<dynamic element>"

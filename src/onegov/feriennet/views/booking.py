@@ -713,17 +713,17 @@ def view_group_invite(
             traits = ()
 
         if action == 'join':
-            text = (
-                ('👦 ' if attendee.gender == 'male' else '👧 ')
-                + attendee.name
-            )
+            text = _('add to group')
+            icon = 'plus-icon'
         else:
-            text = _('Leave Group')
+            text = _('remove from group')
+            icon = 'minus-icon'
 
         return Link(
             text=text,
             url=layout.csrf_protected_url(url),
-            traits=traits
+            traits=traits,
+            attrs={'class': (icon, 'before')}
         )
 
     # https://stackoverflow.com/a/23847977/138103

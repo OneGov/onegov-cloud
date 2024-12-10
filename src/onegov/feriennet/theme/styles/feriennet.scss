@@ -99,7 +99,7 @@ svg {
             color: $primary-color;
 
             &:hover {
-                box-shadow: 0 0 0.3rem .1rem rgba(0,0,0,0.28) inset;
+                box-shadow: 0 0 .3rem .1rem rgba(0, 0, 0, .28) inset;
             }
         }
 
@@ -280,6 +280,14 @@ ul.single-line {
 
 .print-icon {
     @include generic-icon('\f02f');
+}
+
+.plus-icon {
+    @include generic-icon('\f067');
+}
+
+.minus-icon {
+    @include generic-icon('\f068');
 }
 
 /*
@@ -1129,9 +1137,9 @@ $booking-left-margin: 1.6rem;
     }
 
     .actions {
-        display:flex;
-        padding-bottom: 1rem;
+        display: flex;
         margin-left: calc(#{$booking-left-margin} + 1px);
+        padding-bottom: 1rem;
 
         .invite-link[data-group]::after {
             @include group-code;
@@ -2852,43 +2860,26 @@ $booking-left-margin: 1.6rem;
     margin-bottom: 1.5rem;
 }
 
-.inline-top-bar {
-    border-bottom: 2px solid $primary-color;
-    margin-bottom: 1rem;
-    padding-left: .5rem;
-    position: relative;
+.children-group {
+    margin-top: 2rem;
 
-    .button {
-        border-radius: 5px;
-        margin-top: .25rem;
-        padding-bottom: .5rem !important;
-        padding-top: .5rem !important;
-        width: 100%;
+    .more-list {
+        margin-bottom: 1rem;
 
-        i.fa-plus-circle {
-            color: $primary-color;
+        li {
+            border-top: 1px solid $white-smoke;
+            padding: .5rem;
+            display: flex;
+            justify-content: space-between;
+
+            a {
+                white-space: nowrap;
+            }
+
+            &.add-own-child {
+                text-align: center;
+            }
         }
-
-        i.fa-envelope {
-            color: $success-color;
-        }
-    }
-
-    @media #{$large-only} {
-        .button {
-            min-width: 15rem;
-            position: absolute !important;
-            right: .25rem;
-            width: auto;
-        }
-
-        h2 {
-            display: inline-block;
-        }
-    }
-
-    li + li {
-        border-top: 1px dashed $gray;
     }
 }
 

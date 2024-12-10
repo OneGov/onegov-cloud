@@ -2,7 +2,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE 1.0\n"
-"POT-Creation-Date: 2024-12-04 10:33+0100\n"
+"POT-Creation-Date: 2024-12-10 15:43+0100\n"
 "PO-Revision-Date: 2021-11-11 09:07+0100\n"
 "Last-Translator: Marc Sommerhalder <marc.sommerhalder@seantis.ch>\n"
 "Language-Team: French\n"
@@ -1949,14 +1949,14 @@ msgstr "Ce groupe est issu d'une période inactive."
 msgid "Own Children"
 msgstr "Propres enfants"
 
+msgid "None of own children in group."
+msgstr "Aucun de ses propres enfants dans le groupe."
+
 msgid "Add own child"
 msgstr "Ajouter son propre enfant"
 
 msgid "Add new own child"
 msgstr "Ajouter un autre enfant à soi"
-
-msgid "None of own children in group."
-msgstr "Aucun de ses propres enfants dans le groupe."
 
 msgid "Other Children"
 msgstr "Autres enfants"
@@ -2004,6 +2004,26 @@ msgstr "Paiement"
 
 msgid "Purpose of Payment"
 msgstr "Raison du paiement"
+
+msgid "Search term"
+msgstr "Terme de recherche"
+
+msgid "Skip navigation"
+msgstr "Ignorez la navigation"
+
+msgid "Back to the homepage"
+msgstr "Retour à la page d'accueil"
+
+msgid "Logo"
+msgstr "Logo"
+
+msgid "The form contains errors. Please check the fields marked in red."
+msgstr ""
+"Le formulaire contient des erreurs. Veuillez vérifier les champs marqués en "
+"rouge."
+
+msgid "Copied to Clipboard!"
+msgstr "Copié dans le presse-papiers!"
 
 msgid "Pro Juventute Logo"
 msgstr "Logo Pro Juventute"
@@ -2430,9 +2450,6 @@ msgstr ""
 "Merci de proposer de faire du bénévolat ! Nous examinerons votre demande et "
 "nous vous contacterons."
 
-msgid "Back to the homepage"
-msgstr "Retour à la page d'accueil"
-
 msgid "No activities needing volunteers found."
 msgstr "Aucune activité nécessitant des bénévoles n'a été trouvée."
 
@@ -2825,8 +2842,11 @@ msgid "The period is not in the wishlist-phase"
 msgstr ""
 "Les dates ne correspondent pas à celles de la période de pré-réservation"
 
-msgid "Leave Group"
-msgstr "Quitter le groupe"
+msgid "add to group"
+msgstr "ajouter au groupe"
+
+msgid "remove from group"
+msgstr "retirer du groupe"
 
 #, python-format
 msgid ""
@@ -3226,6 +3246,9 @@ msgstr "Réservations pour ${period}"
 #, python-format
 msgid "Billing for ${period}"
 msgstr "Facturation pour ${period}"
+
+#~ msgid "Leave Group"
+#~ msgstr "Quitter le groupe"
 
 #~ msgid "<dynamic element>"
 #~ msgstr "<dynamic element>"
