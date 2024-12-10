@@ -1107,7 +1107,9 @@
                         <span i18n:translate="">Functions:</span>
                         <ul>
                             <li tal:repeat="item organization_to_function">
-                                ${item}
+                                <tal:block tal:repeat="line python: item.split('\n')">
+                                    <span tal:content="line"></span><br tal:condition="not:repeat['line'].index == repeat['line'].length - 1" />
+                                </tal:block>
                             </li>
                         </ul>
                     </div>

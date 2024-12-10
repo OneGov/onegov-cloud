@@ -567,7 +567,7 @@
                                     <span tal:condition="not western_name_order">${person.title}</span>
                                 </a>
                                 <a href="${request.link(person)}">
-                                    <p>${person.context_specific_function}</p>
+                                    <p class="list-lead preview">${Markup(person.context_specific_function).replace('\n', '<br/>')}</p>
                                 </a>
                             </div>
                         </li>
