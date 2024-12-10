@@ -248,6 +248,85 @@ def test_emails_for_new_ticket_PER(agency_app):
     }
 
 
+def test_emails_for_new_ticket_parent_agency(agency_app):
+    session = agency_app.session()
+
+    parent_agency = ExtendedAgency(
+        title="Test Parent Agency",
+        name="test-parent-agency",
+        portrait="This is a test\nparent agency."
+    )
+    agency = ExtendedAgency(
+        title="Test Agency",
+        name="test-agency",
+        portrait="This is a test\nagency.",
+    )
+    user_1 = User(
+        username='user1@example.org',
+        password_hash='password_hash',
+        role='member',
+    )
+    user_2 = User(
+        username='user2@example.org',
+        password_hash='password_hash',
+        role='member',
+    )
+    user_3 = User(
+        username='user3@example.org',
+        password_hash='password_hash',
+        role='member',
+    )
+    group_1 = UserGroup(name='group1')
+    group_2 = UserGroup(name='group2')
+    session.add_all(
+        (parent_agency, agency, user_1, user_2, user_3, group_1, group_2)
+    )
+    session.flush()
+
+    agency.parent = parent_agency
+    group_1.meta = {'immediate_notification': 'yes'}
+    group_2.meta = {'immediate_notification': 'yes'}
+    user_1.group = group_1
+    user_2.group = group_1
+    user_3.group = group_2
+
+    request = Bunch(
+        app=agency_app,
+        email_for_new_tickets=None
+    )
+    assert condense(emails_for_new_ticket(agency, request)) == set()
+
+    group_mapping = RoleMapping(
+        group_id=group_1.id,
+        content_type='agencies',
+        content_id=str(parent_agency.id),
+        role='editor'
+    )
+    session.add(group_mapping)
+    session.flush()
+
+    # since no groups are mapped to agency, the tickets should
+    # go to the group mapped to agency.parent instead
+    assert condense(emails_for_new_ticket(agency, request)) == {
+        'user1@example.org', 'user2@example.org'
+    }
+
+    # but if we map group 2 to the affected agency then
+    # they should get the notification without the parent
+    # agency being notified
+    group_mapping = RoleMapping(
+        group_id=group_2.id,
+        content_type='agencies',
+        content_id=str(agency.id),
+        role='editor'
+    )
+    session.add(group_mapping)
+    session.flush()
+    assert condense(emails_for_new_ticket(agency, request)) == {
+        'user3@example.org'
+    }
+
+
 def test_get_html_paragraph_with_line_breaks():
     assert get_html_paragraph_with_line_breaks(None) == ''
     assert get_html_paragraph_with_line_breaks('') == ''
