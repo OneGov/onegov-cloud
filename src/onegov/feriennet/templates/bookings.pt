@@ -6,12 +6,12 @@
         <div class="grid-x grid-padding-x">
             <div class="cell small-12 medium-8">
                 <tal:b condition="show_emergency_info">
-                    <div class="emergency-contact-missing emergency-contact" tal:condition="not:has_emergency_contact">
+                    <div class="emergency-contact-missing emergency-contact panel" tal:condition="not:has_emergency_contact">
                         <div i18n:translate>
                             You haven't added an emergency contact to your profile yet.
                             Please add this information in your userprofile so we can reach you in an emergency!
                         </div>
-                        <a i18n:translate href="${request.return_here(request.link(request.app.org, 'userprofile'))}">Add in Userprofile</a>
+                        <a class="button narrow" href="${request.return_here(request.link(request.app.org, 'userprofile'))}"><i class="fa fa-plus"></i><tal:b i18n:translate>Add in Userprofile</tal:b></a>
                     </div>
                     <div class="emergency-contact" tal:condition="has_emergency_contact">
                         <div i18n:translate>

@@ -1146,16 +1146,17 @@ $booking-left-margin: 1.6rem;
         }
 
         .delete-link::before {
-            @include icon('\f014');
+            @include icon-bold('\f00d');
         }
 
         .invite-link::before {
+            margin-right: .2rem;
             @include icon('\f004');
         }
 
 
         a {
-            margin-right: 1rem;
+            margin-right: 1.5rem;
             font-size: .875rem;
             display: block;
             margin-bottom: 0;
