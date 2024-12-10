@@ -3,15 +3,16 @@ $('body').on('hide.zf.dropdown', function(event) {
     const target = event.target;
     const filtersTop = document.getElementById('filters-top');
 
-    if (filtersTop.contains(target) && target.matches('.dropdown-pane')) {
-        Intercooler.triggerRequest($(target).find('.apply-filters'))
+    if (filtersTop && filtersTop.contains(
+        target) && target.matches('.dropdown-pane')) {
+        Intercooler.triggerRequest($(target).find('.apply-filters'));
     }
 });
 
 // Mobile: Apply filters when dropdown is closed
 $('#offCanvasFilters').on('close.zf.offCanvas', function() {
-    Intercooler.triggerRequest($(this).find('.apply-filters'))
-})
+    Intercooler.triggerRequest($(this).find('.apply-filters'));
+});
 
 $(function () {
     const config = { attributes: true };

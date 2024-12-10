@@ -634,7 +634,7 @@
                 <h5 i18n:translate>Needs</h5>
 
                 <div class="need-add">
-                    <a href="${request.link(occasion, 'add-need')}" i18n:translate>Enter a need</a>
+                    <a href="${request.link(occasion, 'add-need')}"><i class="fa fa-plus"></i> <tal:b i18n:translate>Enter a need</tal:b></a>
                 </div>
 
                 <div tal:condition="not:occasion.needs" class="need-info">
@@ -819,21 +819,21 @@
 
 <metal:booking_state define-macro="booking_state" i18n:domain="onegov.feriennet">
     <tal:b switch="state">
-        <div tal:case="'open'" class="state ${state}" i18n:translate>
+        <span tal:case="'open'" class="state ${state}" i18n:translate>
             Open
-        </div>
-        <div tal:case="'accepted'" class="state ${state}" i18n:translate>
+        </span>
+        <span tal:case="'accepted'" class="state ${state}" i18n:translate>
             Accepted
-        </div>
-        <div tal:case="'cancelled'" class="state ${state}" i18n:translate>
+        </span>
+        <span tal:case="'cancelled'" class="state ${state}" i18n:translate>
             Cancelled
-        </div>
-        <div tal:case="'denied'" class="state ${state}" i18n:translate>
+        </span>
+        <span tal:case="'denied'" class="state ${state}" i18n:translate>
             Denied
-        </div>
-        <div tal:case="'blocked'" class="state ${state}" i18n:translate>
+        </span>
+        <span tal:case="'blocked'" class="state ${state}" i18n:translate>
             Blocked
-        </div>
+        </span>
     </tal:b>
 </metal:booking_state>
 

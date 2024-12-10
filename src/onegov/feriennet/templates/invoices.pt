@@ -115,12 +115,12 @@
                                 <li class="item-group hide-for-print">
                                     <strong i18n:translate>Donation</strong>
                                 </li>
-                                <li class="row hide-for-print">
-                                    <div class="small-8 columns">
+                                <li class="grid-x hide-for-print">
+                                    <div class="small-8 cell">
                                         <span class="item-text" i18n:translate>I would like to make a donation to support children and teenagers.</span>
                                     </div>
-                                    <div class="small-4 columns">
-                                        <a class="donation-button" href="${request.link(layout.model.for_period_id(invoice.period_id), name='donation')}">
+                                    <div class="small-4 cell donate">
+                                        <a class="donation-button button hollow narrow" href="${request.link(layout.model.for_period_id(invoice.period_id), name='donation')}">
                                             <span i18n:translate>Donate now</span>
                                         </a>
                                     </div>

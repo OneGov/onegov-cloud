@@ -90,7 +90,7 @@
 </metal:navigation>
 
 <metal:navigation define-macro="side-navigation">
-    <ul class="vertical menu side-navigation drilldown" data-drilldown data-auto-height="true" data-responsive-menu="drilldown medium-accordion" data-back-button="${layout.drilldown_back}" tal:define="links top_navigation|layout.top_navigation">
+    <ul class="vertical menu side-navigation drilldown" data-auto-height="true" data-responsive-menu="drilldown medium-accordion" data-back-button="${layout.drilldown_back}" tal:define="links top_navigation|layout.top_navigation">
         <li tal:repeat="(nav_page, link, children) links" data-sortable-id="${nav_page.id}">
             <metal:b use-macro="layout.macros['side_navigation_nested']" />
         </li>

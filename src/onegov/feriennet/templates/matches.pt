@@ -60,37 +60,38 @@
                                 cancelled occasion.state == 'cancelled';
                             ">
                                 <tal:b define="state cancelled and 'cancelled' or accepted >= min_spots and 'success' or 'alert'">
-                                    <a id="button-${oid}" data-ogc-toggle="#details-${oid}" class="title-toggler untoggled ic-use-transition ${state}" >
-                                    <div class="progress ${state}">
-                                        <span class="meter" style="width: ${accepted / max_spots * 100}%;"></span>
-                                        <span class="meter-text" tal:condition="state != 'cancelled'">
-                                            ${accepted} / ${max_spots} <span i18n:translate>Attendees</span>
-                                        </span>
-                                        <span class="meter-text" tal:condition="state == 'cancelled'">
-                                            <span class="meter-text-inner" i18n:translate>
-                                                Rescinded
-                                            </span>
-                                        </span>
-                                    </div>
-                                    <div class="details-button">
-                                        <span i18n:translate class="show-for-sr">Show Details</span>
-                                        <i class="fa fa-chevron-down rotate ${state}" aria-hidden="true"></i>
-                                    </div>
-                                    </a>
-
-                                    <div id="details-${oid}" class="hidden" >
-                                        <!--! loads the table when the button is clicked and replaces itself with the result -->
-                                        <div
-                                            id="ic-${oid}"
-                                            ic-trigger-from="#button-${oid}"
-                                            ic-trigger-on="click once"
-                                            ic-get-from="${occasion_table_link(oid)}"
-                                            ic-indicator="#button-${oid}"
-                                            data-reinit-foundation
-                                            >
+                                    <div class="item-wrapper ${'item-green' if state == 'success' else 'item-red'}">
+                                        <div class="item-header">
+                                            <div class="progress ${state}">
+                                                <span class="meter" style="width: ${accepted / max_spots * 100}%;"></span>
+                                                <span class="meter-text" tal:condition="state != 'cancelled'">
+                                                    ${accepted} / ${max_spots} <span i18n:translate>Attendees</span>
+                                                </span>
+                                                <span class="meter-text" tal:condition="state == 'cancelled'">
+                                                    <span class="meter-text-inner" i18n:translate>
+                                                        Rescinded
+                                                    </span>
+                                                </span>
+                                            </div>
+                                            <a id="button-${oid}" data-ogc-toggle="#details-${oid}" class="title-toggler untoggled ic-use-transition ${state} details-button" >
+                                                <span i18n:translate class="show-for-sr">Show Details</span>
+                                                <i class="fa fa-chevron-down rotate ${state}" aria-hidden="true"></i>
+                                            </a>
                                         </div>
-                                    </div>  
 
+                                        <div id="details-${oid}" class="hidden" >
+                                            <!--! loads the table when the button is clicked and replaces itself with the result -->
+                                            <div
+                                                id="ic-${oid}"
+                                                ic-trigger-from="#button-${oid}"
+                                                ic-trigger-on="click once"
+                                                ic-get-from="${occasion_table_link(oid)}"
+                                                ic-indicator="#button-${oid}"
+                                                data-reinit-foundation
+                                                >
+                                            </div>
+                                        </div>
+                                    </div>
                                     <div class="clearfix"></div>
                                 </tal:b>
                             </div>
