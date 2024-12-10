@@ -596,7 +596,7 @@ class PersonLinkExtension(ContentExtension):
                     ),
                 }
             )
-            context_specific_function = StringField(
+            context_specific_function = TextAreaField(
                 label=_('Function'),
                 depends_on=('person', '!'),
                 render_kw={'class_': 'indent-context-specific-function'},
@@ -1162,12 +1162,11 @@ class InlinePhotoAlbumExtension(ContentExtension):
             choices = [('', '')] + [
                 (album.id, album.title) for album in albums
             ]
-            photo_album_id = ChosenSelectField(
+            photo_album_id = SelectField(
                 label=_('Photo album'),
                 fieldset=_('Photo album'),
                 choices=choices,
                 name='photo_album_id',
-                # default=''  # By default don't show any album
             )
 
             def process_obj(self, obj: 'InlinePhotoAlbumExtension') -> None:

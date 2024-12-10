@@ -50,16 +50,16 @@ class AttendeeBase(Form):
         model.name = self.name
 
         # Update name changes on invoice items of current period
-        assert self.request.app.active_period is not None
-        invoice_collection = InvoiceCollection(
-            session=self.request.session,
-            period_id=self.request.app.active_period.id)
+        if self.request.app.active_period is not None:
+            invoice_collection = InvoiceCollection(
+                session=self.request.session,
+                period_id=self.request.app.active_period.id)
 
-        invoice_items = invoice_collection.query_items()
+            invoice_items = invoice_collection.query_items()
 
-        for item in invoice_items:
-            if item.attendee_id == self.model.id:
-                item.group = self.name
+            for item in invoice_items:
+                if item.attendee_id == self.model.id:
+                    item.group = self.name
 
     def process_obj(self, model: Attendee) -> None:  # type:ignore[override]
         super().process_obj(model)
@@ -120,7 +120,7 @@ class AttendeeForm(AttendeeBase):
     )
 
     notes = TextAreaField(
-        label=_('Health Information'),
+        label=_('Is there anything the course instructor should know?'),
         description=_('Allergies, Disabilities, Particulars'),
     )
 

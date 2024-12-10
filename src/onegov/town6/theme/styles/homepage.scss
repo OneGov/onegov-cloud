@@ -190,16 +190,6 @@
             height: 100%;
         }
 
-        p {
-            hyphens: none;
-            margin-bottom: 0;
-            padding: 1.5rem;
-        }
-
-        .fa-external-link-alt {
-            display: none;
-        }
-
         .icon {
             background: $primary-color;
             color: $white;
@@ -226,7 +216,22 @@
             display: flex;
             font-weight: bold;
             padding: 1.5rem;
-            padding-bottom: 0;
+            margin-bottom: 0;
+
+            &:has(+ p) {
+                margin-bottom: .5rem;
+                padding-bottom: 0;
+            }
+        }
+
+        p {
+            hyphens: none;
+            margin-bottom: 0;
+            padding: 1.5rem;
+        }
+
+        .fa-external-link-alt {
+            display: none;
         }
     }
 

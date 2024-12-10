@@ -12,6 +12,7 @@ from onegov.file.utils import as_fileintent
 from onegov.swissvotes.collections import SwissVoteCollection
 from onegov.swissvotes.external_resources import MfgPosters
 from onegov.swissvotes.external_resources import SaPosters
+from onegov.swissvotes.external_resources import BsPosters
 from onegov.swissvotes.models import SwissVote
 from onegov.swissvotes.models import SwissVoteFile
 from onegov.swissvotes.models.file import LocalizedFile
@@ -252,12 +253,14 @@ def reindex_attachments(
 @click.option('--details', is_flag=True, default=False)
 @click.option('--mfg', is_flag=True, default=False)
 @click.option('--sa', is_flag=True, default=False)
+@click.option('--bs', is_flag=True, default=False)
 @pass_group_context
 def update_resources(
     group_context: 'GroupContext',
     details: bool,
     sa: bool,
-    mfg: bool
+    bs: bool,
+    mfg: bool,
 ) -> 'Callable[[SwissvotesRequest, SwissvotesApp], None]':
     """ Updates external resources. """
 
@@ -266,12 +269,27 @@ def update_resources(
         app: 'SwissvotesApp'
     ) -> None:
 
-        posters: MfgPosters | SaPosters
+        posters: MfgPosters | BsPosters | SaPosters
         if mfg:
             click.echo('Updating MfG posters')
             if not app.mfg_api_token:
                 abort('No token configured, aborting')
             posters = MfgPosters(app.mfg_api_token)
+            added, updated, removed, failed = posters.fetch(app.session())
+            click.secho(
+                f'{added} added, {updated} updated, {removed} removed, '
+                f'{len(failed)} failed',
+                fg='green' if not failed else 'yellow'
+            )
+            if failed and details:
+                failed_str = ', '.join(str(item) for item in sorted(failed))
+                click.secho(f'Failed: {failed_str}', fg='yellow')
+
+        if bs:
+            click.echo('Updating BS posters')
+            if not app.bs_api_token:
+                abort('No token configured, aborting')
+            posters = BsPosters(app.bs_api_token)
             added, updated, removed, failed = posters.fetch(app.session())
             click.secho(
                 f'{added} added, {updated} updated, {removed} removed, '

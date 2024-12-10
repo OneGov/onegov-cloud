@@ -91,9 +91,9 @@ def get_random_color(seed: str, lightness: float, saturation: float) -> str:
     r, g, b = colorsys.hls_to_rgb(hue, lightness, saturation)
 
     return '#{:02x}{:02x}{:02x}'.format(
-        int(round(r * 255)),
-        int(round(g * 255)),
-        int(round(b * 255))
+        round(r * 255),
+        round(g * 255),
+        round(b * 255)
     )
 
 

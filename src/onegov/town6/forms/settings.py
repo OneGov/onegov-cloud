@@ -32,6 +32,7 @@ class GeneralSettingsForm(OrgGeneralSettingsForm):
                              'of a content page)')),
             ('header', _('As header image (wide above the page content)'))
         ),
+        default='as_content'
     )
 
     body_font_family_ui = ChosenSelectField(

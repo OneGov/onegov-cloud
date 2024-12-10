@@ -152,6 +152,9 @@ msgstr "eMuseum.ch"
 msgid "Social Archives"
 msgstr "Archives Sociales"
 
+msgid "Basel Poster Collection"
+msgstr "Lien Plakatsammlung Basel"
+
 msgid "No eMuseum API key available."
 msgstr "Aucune clé API eMuseum n’est disponible."
 
@@ -1544,6 +1547,9 @@ msgstr "Lien eMuseum.ch"
 
 msgid "Link Social Archives"
 msgstr "Lien Archives Sociales"
+
+msgid "Link Basel Poster Collection"
+msgstr "Lien Plakatsammmlung Basel"
 
 msgid "Swissvotes database"
 msgstr "Base de données Swissvotes"

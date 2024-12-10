@@ -425,6 +425,8 @@ class SwissVote(Base, TimestampMixin, LocalizedFiles, ContentMixin):
     # space-separated poster URLs coming from the dataset
     posters_mfg_yea: 'Column[str | None]' = Column(Text)
     posters_mfg_nay: 'Column[str | None]' = Column(Text)
+    posters_bs_yea: 'Column[str | None]' = Column(Text)
+    posters_bs_nay: 'Column[str | None]' = Column(Text)
     posters_sa_yea: 'Column[str | None]' = Column(Text)
     posters_sa_nay: 'Column[str | None]' = Column(Text)
 
@@ -433,6 +435,14 @@ class SwissVote(Base, TimestampMixin, LocalizedFiles, ContentMixin):
         default=dict
     )
     posters_mfg_nay_imgs: dict_property[dict[str, Any]] = content_property(
+        default=dict
+    )
+
+    # Fetched list of image urls using bs API
+    posters_bs_yea_imgs: dict_property[dict[str, Any]] = content_property(
+        default=dict
+    )
+    posters_bs_nay_imgs: dict_property[dict[str, Any]] = content_property(
         default=dict
     )
 
@@ -447,11 +457,14 @@ class SwissVote(Base, TimestampMixin, LocalizedFiles, ContentMixin):
     def posters(self, request: 'SwissvotesRequest') -> dict[str, list[Poster]]:
         result: dict[str, list[Poster]] = {'yea': [], 'nay': []}
 
+        # order: MfG, SA, BS
         for key, attribute, label in (
             ('yea', 'posters_mfg_yea', _('Link eMuseum.ch')),
             ('nay', 'posters_mfg_nay', _('Link eMuseum.ch')),
             ('yea', 'posters_sa_yea', _('Link Social Archives')),
             ('nay', 'posters_sa_nay', _('Link Social Archives')),
+            ('yea', 'posters_bs_yea', _('Link Basel Poster Collection')),
+            ('nay', 'posters_bs_nay', _('Link Basel Poster Collection')),
         ):
             images = getattr(self, f'{attribute}_imgs')
             urls = (getattr(self, attribute) or '').strip().split(' ')
