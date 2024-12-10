@@ -3,7 +3,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE 1.0\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2024-08-08 12:33+0200\n"
+"POT-Creation-Date: 2024-12-10 16:58+0100\n"
 "PO-Revision-Date: 2022-03-24 15:35+0100\n"
 "Last-Translator: Marc Sommerhalder <marc.sommerhalder@seantis.ch>\n"
 "Language-Team: German\n"
@@ -1427,6 +1427,12 @@ msgstr "Noch keine Abonnenten."
 
 msgid "Locale"
 msgstr "Gebietsschema"
+
+msgid "Subscribed"
+msgstr "Abonnierung"
+
+msgid "Unsubscribed"
+msgstr "Abbestellung"
 
 msgid "Active"
 msgstr "Aktiv"

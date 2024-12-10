@@ -254,3 +254,26 @@ def add_short_title(context: UpgradeContext) -> None:
                 table,
                 Column('short_title_translations', HSTORE, nullable=True)
             )
+
+
+@upgrade_task('Add active/inactive since columns to subscribers')
+def add_active_inactive_since_columns(context: UpgradeContext) -> None:
+    if not context.has_column('subscribers', 'active_since'):
+        assert not context.has_column('subscribers', 'inactive_since')
+        context.operations.add_column(
+            'subscribers', Column('active_since', UTCDateTime, default=None)
+        )
+        context.operations.add_column(
+            'subscribers', Column('inactive_since', UTCDateTime, default=None)
+        )
+        # pre-fill the dates where we can make an educated guess
+        context.operations.execute("""
+            UPDATE subscribers SET inactive_since = modified
+             WHERE modified >= TIMESTAMP '2022-02-07'
+               AND active IS FALSE
+        """)
+        context.operations.execute("""
+            UPDATE subscribers SET active_since = created
+             WHERE modified IS NOT NULL
+               AND type = 'sms'
+        """)

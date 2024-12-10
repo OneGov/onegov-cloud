@@ -6,6 +6,7 @@ from onegov.election_day.formats.imports.common import load_csv
 from onegov.election_day.models import EmailSubscriber
 from onegov.election_day.models import SmsSubscriber
 from onegov.election_day.models import Subscriber
+from sedate import utcnow
 from sqlalchemy import func
 
 
@@ -190,7 +191,9 @@ class SubscriberCollection(Pagination[_S]):
                 'domain': subscriber.domain,
                 'domain_segment': subscriber.domain_segment,
                 'locale': subscriber.locale,
-                'active': subscriber.active
+                'active_since': subscriber.active_since,
+                'inactive_since': subscriber.inactive_since,
+                'active': subscriber.active,
             }
             for subscriber in self.query()
         ]
@@ -298,6 +301,9 @@ class EmailSubscriberCollection(SubscriberCollection[EmailSubscriber]):
 
         subscriber = self.by_address(address, domain, domain_segment)
         if subscriber:
+            if not subscriber.active:
+                subscriber.active_since = utcnow()
+                subscriber.inactive_since = None
             subscriber.active = True
             subscriber.locale = locale
             return True
@@ -359,6 +365,8 @@ class EmailSubscriberCollection(SubscriberCollection[EmailSubscriber]):
 
         subscriber = self.by_address(address, domain, domain_segment)
         if subscriber:
+            if subscriber.active:
+                subscriber.inactive_since = utcnow()
             subscriber.active = False
             return True
         return False
@@ -384,6 +392,9 @@ class SmsSubscriberCollection(SubscriberCollection[SmsSubscriber]):
 
         if not subscriber.active or subscriber.locale != request.locale:
             assert request.locale is not None
+            if not subscriber.active:
+                subscriber.active_since = utcnow()
+                subscriber.inactive_since = None
             subscriber.locale = request.locale
             subscriber.active = True
             content = request.translate(_(
@@ -401,4 +412,6 @@ class SmsSubscriberCollection(SubscriberCollection[SmsSubscriber]):
         subscribers.
 
         """
+        if subscriber.active:
+            subscriber.inactive_since = utcnow()
         subscriber.active = False
