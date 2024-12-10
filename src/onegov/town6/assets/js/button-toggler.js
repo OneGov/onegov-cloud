@@ -45,7 +45,7 @@ var ensureToggled = function(button, target, toggled) {
     } else {
         button.attr('aria-pressed', 'false');
     }
-    
+
     if (typeof button.attr('data-toggle-initialised') !== 'undefined') {
         if (typeof button.attr('data-original-text') !== 'undefined') {
             button.attr('data-alt-text', button.text());
@@ -58,9 +58,9 @@ var ensureToggled = function(button, target, toggled) {
             button.removeAttr('data-alt-text');
         }
     }
-    
+
     button.attr('data-toggle-initialised', true);
-    
+
     target.toggleClass('hidden', !toggled)
 };
 
