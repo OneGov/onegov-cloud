@@ -19,7 +19,6 @@ from onegov.pas.views.settlement_run import (
 )
 
 
-
 def test_business_rules_export_data_for_party(session):
     """Test the business rules for party-specific exports."""
 

@@ -99,8 +99,6 @@ def generate_parliamentarian_settlement_pdf(
 
         table {
             border-collapse: collapse;
-            width: 100%;
-            table-layout: fixed;
             white-space: nowrap;
         }
 
@@ -113,32 +111,24 @@ def generate_parliamentarian_settlement_pdf(
             border: 1pt solid #000;
         }
 
-        .header-row td:nth-child(1) { width: 50pt; }  /* Parl. Name */
-        .header-row td:nth-child(2) { width: 100pt; }  /* Zug */
-        .header-row td:nth-child(3) { width: 100pt; }  /* Partei */
-        .header-row td:nth-child(4) { width: 135pt; }  /* KR- column */
 
-        .header-row td:first-child {
-            border-right: none!,important;
-        }
 
         th, td {
             padding: 2pt;
             border: 1pt solid #000;
         }
 
-        /* column widths for main table */
-
-        .first-table td:first-child { width: 60pt; }  /* Date column */
-        .first-table td:nth-child(2) { width: 316pt; } /* Type - maximum
+        /* Column widths for main table */
+        .first-table td:first-child { width: 80.0pt; }  /* Date column */
+        .first-table td:nth-child(2) { width: 280.0pt; } /* Type - maximum
         space (Very specific value to align  the table below) */
-        .first-table td:nth-child(3) { width: 70pt; }  /* Value column */
-        .first-table td:last-child { width: 70pt; }    /* CHF column */
+        .first-table td:nth-child(3) { width: 70.0pt; }  /* Value column */
+        .first-table td:last-child { width: 70.0pt; }    /* CHF column */
 
         /* Fixed column widths for parliamentarian summary table */
-        .parliamentarian-summary-table td:first-child { width: 360pt; }
-        .parliamentarian-summary-table td:nth-child(2) { width: 50pt; }
-        .parliamentarian-summary-table td:last-child { width: 50pt; }
+        .parliamentarian-summary-table td:first-child { width: 380.0pt; }
+        .parliamentarian-summary-table td:nth-child(2) { width: 70.0pt; }
+        .parliamentarian-summary-table td:last-child { width: 70.0pt; }
 
         .numeric { text-align: right; }
 
