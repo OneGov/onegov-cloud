@@ -1670,15 +1670,14 @@ $booking-left-margin: 1.6rem;
 
         h3 {
             display: inline-block;
-            font-size: .9rem;
             font-weight: bold;
             line-height: 1rem;
             margin-bottom: 0;
             padding: .75rem;
+            font-size: 1rem;
         }
 
         span {
-            font-size: .9rem;
             flex-grow: 1;
         }
 
@@ -1702,8 +1701,13 @@ $booking-left-margin: 1.6rem;
             margin-top: 1rem;
         }
 
+        .item-organizer {
+            font-style: italic;
+        }
+
         &.item-red, &.item-green {
             border-top: 1px solid $smoke;
+            font-size: .9rem;
         }
 
         &.item-group + .item-red,
@@ -1755,8 +1759,15 @@ $booking-left-margin: 1.6rem;
         width: 100%;
 
         tr {
-            border-bottom: 1px solid $smoke !important;
-            background-color: transparent !important;
+            background: transparent !important;
+
+            &.group + .invoice-item {
+                border-top: 1px solid $iron;
+            }
+
+            &.invoice-item {
+                border-top: 1px solid $smoke;
+            }
 
             td:first-child {
                 padding-left: 0;
@@ -1783,7 +1794,6 @@ $booking-left-margin: 1.6rem;
         .actions {
             padding-left: 0;
             padding-right: 0;
-            width: 1%;
         }
 
         .total .amount {
@@ -1815,8 +1825,8 @@ $booking-left-margin: 1.6rem;
 
         .total td,
         .group td:first-child {
-            text-decoration: underline;
-            text-decoration-color: $body-font-color;
+            font-weight: bold;
+            font-size: 1rem;
         }
 
         .item-red {
