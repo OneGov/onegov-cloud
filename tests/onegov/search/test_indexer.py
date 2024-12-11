@@ -3,6 +3,7 @@ import pytest
 import transaction
 
 from datetime import datetime
+
 from onegov.people import Person, PersonCollection
 from onegov.search import Searchable, SearchOfflineError, utils
 from onegov.search.indexer import parse_index_name, PostgresIndexer
