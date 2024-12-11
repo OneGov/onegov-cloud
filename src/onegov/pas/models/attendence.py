@@ -1,3 +1,5 @@
+from decimal import ROUND_HALF_UP, Decimal
+
 from onegov.core.orm import Base
 from onegov.core.orm.mixins import TimestampMixin
 from onegov.core.orm.types import UUID
@@ -97,3 +99,67 @@ class Attendence(Base, TimestampMixin):
         Commission,
         back_populates='attendences'
     )
+
+    def calculate_value(self) -> Decimal:
+        """Calculate the value (in hours) for an attendance record.
+
+        The calculation follows these business rules:
+        - Plenary sessions:
+            * Always counted as 0.5 (half day), regardless of actual duration
+            This is the special case!
+
+        - Everything else is counted as actual hours:
+            * First 2 hours are counted as given
+            * After 2 hours, time is rounded to nearest 30-minute increment,
+            * and there is another rate applied for the additional time
+            * Example: 2h 40min would be calculated as 2.5 hours
+
+        Examples:
+            >>> # Plenary session
+            >>> attendence.type = 'plenary'
+            >>> calculate_value(attendence)
+            '0.5'
+
+            >>> # Commission meeting, 2 hours
+            >>> attendence.type = 'commission'
+            >>> attendence.duration = 120  # minutes
+            >>> calculate_value(attendence)
+            '2.0'
+
+            >>> # Study session, 2h 40min
+            >>> attendence.type = 'study'
+            >>> attendence.duration = 160  # minutes
+            >>> calculate_value(attendence)
+            '2.5'
+        """
+        if self.duration < 0:
+            raise ValueError('Duration cannot be negative')
+
+        if self.type == 'plenary':
+            return Decimal('0.5')
+
+        if self.type in ('commission', 'study', 'shortest'):
+            # Convert minutes to hours with Decimal for precise calculation
+            duration_hours = Decimal(str(self.duration)) / Decimal('60')
+
+            if duration_hours <= Decimal('2'):
+                # Round to 1 decimal place
+                return duration_hours.quantize(
+                    Decimal('0.1'), rounding=ROUND_HALF_UP
+                )
+            else:
+                base_hours = Decimal('2')
+                additional_hours = (duration_hours - base_hours)
+                # Round additional time to nearest 0.5
+                additional_hours = (additional_hours * 2).quantize(
+                    Decimal('1.0'), rounding=ROUND_HALF_UP
+                ) / 2
+                total_hours = base_hours + additional_hours
+                return total_hours.quantize(
+                    Decimal('0.1'), rounding=ROUND_HALF_UP
+                )
+
+        raise ValueError(f'Unknown attendance type: {self.type}')
+
+    def __repr__(self) -> str:
+        return f'<Attendence {self.date} {self.type}>'

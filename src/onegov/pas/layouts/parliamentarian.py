@@ -36,9 +36,9 @@ class ParliamentarianCollectionLayout(DefaultLayout):
                         Link(
                             text=_('Parliamentarian'),
                             url=self.request.link(self.model, 'new'),
-                            attrs={'class': 'new-parliamentarian'}
+                            attrs={'class': 'new-parliamentarian'},
                         ),
-                    ]
+                    ],
                 ),
             ]
         return None
@@ -78,7 +78,7 @@ class ParliamentarianLayout(DefaultLayout):
                     title=_('Add'),
                     links=[
                         Link(
-                            text=_('Role'),
+                            text=_('Role (as a party or group member)'),
                             url=self.request.link(self.model, 'new-role'),
                             attrs={'class': 'new-role'}
                         ),
@@ -112,6 +112,20 @@ class ParliamentarianLayout(DefaultLayout):
                             )
                         )
                     )
-                )
+                ),
+                LinkGroup(
+                    title=_('Export'),
+                    links=[
+                        Link(
+                            text=_('CSV billing export'),
+                            url=self.request.link(
+                                self.model,
+                                'csv-billing-export',
+                                query_params={'format': 'csv'},
+                            ),
+                            attrs={'class': 'csv-billing-export'}
+                        ),
+                    ]
+                ),
             ]
         return None
