@@ -566,7 +566,7 @@ def test_file_security(client):
     # Add a published general, an unpublished general and a translator file
     client.login_admin()
     page = client.get('/files')
-    page.form['file'] = upload_pdf('p.pdf')
+    page.form['file'] = [upload_pdf('p.pdf')]
     page = page.form.submit()
     url = page.pyquery('div[ic-get-from]')[0].attrib['ic-get-from']
     published_file = url.replace('/details', '')
@@ -575,7 +575,7 @@ def test_file_security(client):
     assert content_disposition(published_file, 'p.pdf')
 
     page = client.get('/files')
-    page.form['file'] = upload_pdf('u.pdf')
+    page.form['file'] = [upload_pdf('u.pdf')]
     page = page.form.submit()
     url = page.pyquery('div[ic-get-from]')[0].attrib['ic-get-from']
     unpublished_file = url.replace('/details', '')
@@ -598,7 +598,7 @@ def test_file_security(client):
         assert 'public' not in header_val
 
     page = client.get(f'/translator/{trs_id}').click('Dokumente')
-    page.form['file'] = upload_pdf('t.pdf')
+    page.form['file'] = [upload_pdf('t.pdf')]
     page = page.form.submit()
     translator_file = page.pyquery('div[ic-get-from]')[0].attrib['ic-get-from']
     translator_file = translator_file.replace('/details', '')
