@@ -7,11 +7,13 @@ from depot.manager import DepotManager
 from markupsafe import Markup
 from tempfile import TemporaryDirectory
 from uuid import UUID
+from webtest import Upload
 
 from onegov.core.orm.abstract import MoveDirection
 from onegov.core.utils import Bunch
 from onegov.form import Form
 from onegov.form.extensions import Extendable
+from onegov.org.models import Topic
 from onegov.org.models.extensions import (
     PersonLinkExtension, ContactExtension, AccessExtension, HoneyPotExtension,
     SidebarLinksExtension, PeopleShownOnMainPageExtension,
@@ -557,9 +559,8 @@ def test_general_file_link_extension(client):
             "*Experts say it's the fact that Govikon does not really exist.*"
         )
         filename = os.path.join(td, 'simple.pdf')
-        pdf = create_pdf(filename)
-        new_page.form.fields['files'][-1].value = [filename]
-        new_page.files = pdf
+        create_pdf(filename)
+        new_page.form.fields['files'][-1].value = [Upload(filename)]
         new_page.form['show_file_links_in_sidebar'] = True
         page = new_page.form.submit().follow()
 
@@ -574,6 +575,51 @@ def test_general_file_link_extension(client):
         assert 'Living in Govikon is Swell' in page
         assert 'Dokumente' not in page
         assert 'simple.pdf' not in page
+
+
+def test_general_file_link_extension_deduplication(client):
+    client.login_admin()
+
+    with TemporaryDirectory() as td:
+
+        root_page = client.get('/topics/themen')
+        new_page = root_page.click('Thema')
+
+        assert 'files' in new_page.form.fields
+
+        new_page.form['title'] = "Living in Govikon is Swell"
+        new_page.form['text'] = (
+            "## Living in Govikon is Really Great\n"
+            "*Experts say it's the fact that Govikon does not really exist.*"
+        )
+        filename = os.path.join(td, 'simple.pdf')
+        create_pdf(filename)
+        new_page.form.fields['files'][-1].value = [
+            Upload(filename),
+            Upload(filename)
+        ]
+        new_page.form['show_file_links_in_sidebar'] = True
+        page = new_page.form.submit().follow()
+
+        assert 'Living in Govikon is Swell' in page
+        assert 'Dokumente' in page
+        assert 'simple.pdf' in page
+
+        session = client.app.session()
+        topic = session.query(Topic).filter(
+            Topic.title == "Living in Govikon is Swell").one()
+        assert len(topic.files) == 1
+
+        pages_id = topic.id
+        file_id = topic.files[0].id
+
+        count, = session.execute("""
+            SELECT COUNT(*)
+              FROM files_for_pages_files
+             WHERE pages_id = :pages_id
+               AND file_id = :file_id
+        """, {'pages_id': pages_id, 'file_id': file_id}).fetchone()
+        assert count == 1
 
 
 def test_sidebar_links_extension(session):

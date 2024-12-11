@@ -453,7 +453,8 @@ class UploadMultipleFilesWithORMSupport(UploadMultipleField):
             dummy = _DummyFile()
             dummy.file = file
             field.populate_obj(dummy, 'file')
-            if dummy.file is not None:
+            # avoid generating multiple links to the same file
+            if dummy.file is not None and dummy.file not in output:
                 output.append(dummy.file)
                 if (
                     dummy.file is not file
