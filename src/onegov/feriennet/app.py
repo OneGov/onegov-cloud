@@ -357,7 +357,6 @@ def get_volunteer_cart() -> 'Iterator[str]':
 @FeriennetApp.webasset('common')
 def get_common_asset() -> 'Iterator[str]':
     yield from default_common_asset()
-    yield 'reloadfrom.js'
     yield 'printthis.js'
     yield 'print.js'
     yield 'click-to-load.js'

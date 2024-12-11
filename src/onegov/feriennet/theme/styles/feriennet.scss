@@ -1863,11 +1863,11 @@ $booking-left-margin: 1.6rem;
 
 .bill {
 
-    div:not(.bill-details) .bill-details-table > div:not(.hidden) {
+    .bill-details {
         border: 1px solid $iron;
         border-radius: .7rem;
-        padding: 0 1rem;
         margin-bottom: 2rem;
+        padding: 0 1rem;
     }
 
     .mark-paid::before {
