@@ -2,6 +2,8 @@
 upgraded on the server. See :class:`onegov.core.upgrade.upgrade_task`.
 
 """
+from itertools import chain
+from libres.db.models import ORMBase
 from onegov.core.upgrade import upgrade_task
 from onegov.core.orm import Base, find_models
 from onegov.core.orm.abstract import Associable
@@ -13,6 +15,7 @@ from sqlalchemy.exc import NoInspectionAvailable
 from typing import Any, TYPE_CHECKING
 if TYPE_CHECKING:
     from collections.abc import Iterator, Sequence
+    from onegov.core.orm.abstract.associable import RegisteredLink
     from sqlalchemy import Column
     from sqlalchemy.engine import Connection
 
@@ -145,3 +148,66 @@ def remove_all_wtfs_tables(context: 'UpgradeContext') -> None:
     for table in tables:
         if context.has_table(table):
             context.operations.drop_table(table)
+
+
+@upgrade_task('Remove redundant page to general file links')
+def remove_redundant_page_to_general_file_links(
+    context: 'UpgradeContext'
+) -> None:
+
+    if not context.has_table('files_for_pages_files'):
+        return
+
+    duplicate_pairs = [
+        {'file_id': file_id, 'pages_id': pages_id}
+        for file_id, pages_id in context.session.execute("""
+            SELECT file_id, pages_id FROM (
+                SELECT COUNT(*) as cnt, file_id, pages_id
+                  FROM files_for_pages_files
+                 GROUP BY file_id, pages_id
+            ) AS t
+            WHERE t.cnt > 1
+        """)
+    ]
+
+    if not duplicate_pairs:
+        return
+
+    # delete all the links with duplicate entries
+    context.session.execute("""
+        DELETE
+          FROM files_for_pages_files
+         WHERE file_id = :file_id
+           AND pages_id = :pages_id
+    """, duplicate_pairs)
+
+    # then reinsert a single link per duplicate entry
+    context.session.execute("""
+        INSERT INTO files_for_pages_files (file_id, pages_id)
+        VALUES (:file_id, :pages_id)
+    """, duplicate_pairs)
+
+
+@upgrade_task('Add unique constraint to association tables')
+def unique_constraint_in_association_tables(context: 'UpgradeContext') -> None:
+    bases = set()
+
+    for cls in chain(
+        find_models(Base, lambda cls: issubclass(cls, Associable)),
+        find_models(ORMBase, lambda cls: issubclass(cls, Associable))
+    ):
+        bases.add(cls.association_base())  # type:ignore[attr-defined]
+
+    link: RegisteredLink
+    for base in bases:
+        for link in base.registered_links.values():
+            if context.has_table(table := link.table.name):
+                key, association_key = link.table.c.keys()
+                # NOTE: We can't use operations.create_index
+                #       because we want to emit IF NOT EXISTS
+                #       and we're currently on SQLAlchemy <1.4
+                context.operations.execute(f"""
+                    CREATE UNIQUE INDEX
+                    IF NOT EXISTS "uq_assoc_{table}"
+                    ON "{table}" ("{key}", "{association_key}")
+                """)
