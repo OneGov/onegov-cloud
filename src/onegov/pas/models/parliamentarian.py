@@ -365,6 +365,3 @@ class Parliamentarian(
         cascade='all, delete-orphan',
         back_populates='parliamentarian'
     )
-
-    def __repr__(self) -> str:
-        return f'<Parliamentarian {self.first_name} {self.last_name}>'
