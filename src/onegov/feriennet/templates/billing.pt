@@ -31,7 +31,6 @@
                         ic-get-from="${request.link(model.for_username(username).for_expand(True))}"
                         ic-trigger-on="reload-from"
                     >
-                    ${details.id}
                         <div class="item-header">
                             <div class="item-header-bar">
                                 <h3>${details.title}</h3>
