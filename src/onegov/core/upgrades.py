@@ -170,6 +170,6 @@ def unique_constraint_in_association_tables(context: 'UpgradeContext') -> None:
                 #       and we're currently on SQLAlchemy <1.4
                 context.operations.execute(f"""
                     CREATE UNIQUE INDEX
-                    IF NOT EXISTS "uq_{key}_{association_key}"
+                    IF NOT EXISTS "uq_assoc_{table}"
                     ON "{table}" ("{key}", "{association_key}")
                 """)

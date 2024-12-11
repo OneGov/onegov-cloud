@@ -253,7 +253,7 @@ def associated(
                 UniqueConstraint(
                     key,
                     association_key,
-                    name=f'uq_{key}_{association_key}'
+                    name=f'uq_assoc_{name}'
                 )
             )
             # The reference from the files class back to the target class fails
