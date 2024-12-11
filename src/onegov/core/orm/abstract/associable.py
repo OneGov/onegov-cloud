@@ -60,6 +60,7 @@ table. The link between the two is established in the automatically created
 from onegov.core.orm.utils import QueryChain
 from sqlalchemy import Column
 from sqlalchemy import ForeignKey
+from sqlalchemy import UniqueConstraint
 from sqlalchemy import Table
 from sqlalchemy.ext.declarative import declared_attr
 from sqlalchemy.orm import joinedload
@@ -248,6 +249,11 @@ def associated(
                     association_key,
                     ForeignKey(association_id),
                     nullable=False
+                ),
+                UniqueConstraint(
+                    key,
+                    association_key,
+                    name=f'uq_{key}_{association_key}'
                 )
             )
             # The reference from the files class back to the target class fails
