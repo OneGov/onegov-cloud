@@ -97,7 +97,7 @@ def test_view_shift_schedule(winterthur_app):
     # Private file
     with freeze_time('2021-01-01'):
         page = client.get('/files')
-        page.form['file'] = Upload('test-1.pdf', pdf('Some content.'))
+        page.form['file'] = [Upload('test-1.pdf', pdf('Some content.'))]
         page = page.form.submit()
         url = page.pyquery('div[ic-get-from]')[0].attrib['ic-get-from']
         assert '01.01.2021 01:00' in client.get('/files')

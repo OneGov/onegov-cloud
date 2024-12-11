@@ -56,7 +56,9 @@ def check_pdf(page, filename, link):
 def upload_file(filename, client, content_type=None):
     with open(filename, 'rb') as f:
         page = client.get('/files')
-        page.form['file'] = Upload(basename(filename), f.read(), content_type)
+        page.form['file'] = [
+            Upload(basename(filename), f.read(), content_type)
+        ]
         page.form.submit()
 
 

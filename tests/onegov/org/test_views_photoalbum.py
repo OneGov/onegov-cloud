@@ -23,7 +23,7 @@ def test_manage_album(client):
     assert "noch keine Bilder" in album
 
     images = albums.click("Bilder verwalten")
-    images.form['file'] = Upload('test.jpg', create_image().read())
+    images.form['file'] = [Upload('test.jpg', create_image().read())]
     images.form.submit()
 
     select = album.click("Bilder auswählen")

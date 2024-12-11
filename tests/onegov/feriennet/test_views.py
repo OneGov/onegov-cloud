@@ -2380,7 +2380,7 @@ def test_send_email_with_link_and_attachment(client, scenario):
     client.login_admin()
 
     page = client.get('/files')
-    page.form['file'] = Upload('Test.txt', b'File content.')
+    page.form['file'] = [Upload('Test.txt', b'File content.')]
     page.form.submit()
 
     file_id = FileCollection(scenario.session).query().one().id

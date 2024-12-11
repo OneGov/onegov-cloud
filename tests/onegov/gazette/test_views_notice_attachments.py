@@ -35,15 +35,15 @@ def test_view_notice_attachments(gazette_app, temporary_path, pdf_1, pdf_2):
         assert "Keine Anhänge." in manage
 
         # Try to upload an invalid file
-        manage.form['file'] = Upload(
+        manage.form['file'] = [Upload(
             'fake.pdf', 'PDF'.encode('utf-8'), 'application/pdf'
-        )
+        )]
         manage.form.submit(status=415)
 
         # Upload two attachment (with the same name!)
         with open(pdf_1, 'rb') as file:
             content_1 = file.read()
-        manage.form['file'] = Upload('1.pdf', content_1, 'application/pdf')
+        manage.form['file'] = [Upload('1.pdf', content_1, 'application/pdf')]
         manage = manage.form.submit().maybe_follow()
         assert "Anhang hinzugefügt" in manage
         assert "1.pdf" in manage
@@ -51,7 +51,7 @@ def test_view_notice_attachments(gazette_app, temporary_path, pdf_1, pdf_2):
 
         with open(pdf_2, 'rb') as file:
             content_2 = file.read()
-        manage.form['file'] = Upload('1.pdf', content_2, 'application/pdf')
+        manage.form['file'] = [Upload('1.pdf', content_2, 'application/pdf')]
         manage = manage.form.submit().maybe_follow()
         assert "Anhang hinzugefügt" in manage
         assert "1.pdf" in manage
