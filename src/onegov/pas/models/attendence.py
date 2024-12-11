@@ -1,3 +1,5 @@
+from decimal import ROUND_HALF_UP, Decimal
+
 from onegov.core.orm import Base
 from onegov.core.orm.mixins import TimestampMixin
 from onegov.core.orm.types import UUID
@@ -98,61 +100,66 @@ class Attendence(Base, TimestampMixin):
         back_populates='attendences'
     )
 
-    def calculate_value(self) -> str:
-        """Calculate the value (in days/hours) for an attendance record.
+    def calculate_value(self) -> Decimal:
+        """Calculate the value (in hours) for an attendance record.
 
         The calculation follows these business rules:
-        - Plenary sessions (Kantonsratsitzung):
+        - Plenary sessions:
             * Always counted as 0.5 (half day), regardless of actual duration
+            This is the special case!
 
-        - Commission meetings and file study sessions:
+        - Everything else is counted as actual hours:
             * First 2 hours are counted as given
             * After 2 hours, time is rounded to nearest 30-minute increment,
-            * and
+            * and there is another rate applied for the additional time
             * Example: 2h 40min would be calculated as 2.5 hours
-
-        Returns:
-            str: The calculated value formatted with one decimal place:
-                - '0.5' for plenary sessions
-                - Actual hours (e.g., '2.5') for commission/study sessions
 
         Examples:
             >>> # Plenary session
             >>> attendence.type = 'plenary'
-            >>> _calculate_value(attendence)
+            >>> calculate_value(attendence)
             '0.5'
 
             >>> # Commission meeting, 2 hours
             >>> attendence.type = 'commission'
             >>> attendence.duration = 120  # minutes
-            >>> _calculate_value(attendence)
+            >>> calculate_value(attendence)
             '2.0'
 
             >>> # Study session, 2h 40min
             >>> attendence.type = 'study'
             >>> attendence.duration = 160  # minutes
-            >>> _calculate_value(attendence)
+            >>> calculate_value(attendence)
             '2.5'
         """
+        if self.duration < 0:
+            raise ValueError('Duration cannot be negative')
+
         if self.type == 'plenary':
-            return '0.5'  # Always half day for plenary sessions
+            return Decimal('0.5')
 
-        # For commission meetings and study sessions, calculate based on
-        # duration
-        if self.type in ('commission', 'study'):
-            duration_hours = self.duration / 60  # Convert minutes to hours
+        if self.type in ('commission', 'study', 'shortest'):
+            # Convert minutes to hours with Decimal for precise calculation
+            duration_hours = Decimal(str(self.duration)) / Decimal('60')
 
-            if duration_hours <= 2:
-                return f'{duration_hours:.1f}'
+            if duration_hours <= Decimal('2'):
+                # Round to 1 decimal place
+                return duration_hours.quantize(
+                    Decimal('0.1'), rounding=ROUND_HALF_UP
+                )
             else:
-                base_hours = 2
-                additional_hours = (duration_hours - 2)
+                base_hours = Decimal('2')
+                additional_hours = (duration_hours - base_hours)
                 # Round additional time to nearest 0.5
-                additional_hours = round(additional_hours * 2) / 2
+                additional_hours = (additional_hours * 2).quantize(
+                    Decimal('1.0'), rounding=ROUND_HALF_UP
+                ) / 2
                 total_hours = base_hours + additional_hours
-                return f'{total_hours:.1f}'
+                return total_hours.quantize(
+                    Decimal('0.1'), rounding=ROUND_HALF_UP
+                )
 
-        return '0.0'  # Default case
+        raise ValueError(f'Unknown attendance type: {self.type}')
 
     def __repr__(self) -> str:
         return f'<Attendence {self.date} {self.type}>'

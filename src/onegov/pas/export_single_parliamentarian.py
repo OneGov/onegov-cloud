@@ -1,5 +1,4 @@
 from onegov.pas.calculate_pay import calculate_rate
-from babel.numbers import format_decimal
 from dataclasses import dataclass
 from typing import cast
 from onegov.pas.collections import (
@@ -13,10 +12,10 @@ from weasyprint.text.fonts import (  # type: ignore[import-untyped]
 )
 from onegov.pas.models.attendence import TYPES, Attendence
 from datetime import date  # noqa: TC003
-from typing import Literal, TypedDict
+from onegov.pas.utils import format_swiss_number
 
 
-from typing import TYPE_CHECKING
+from typing import TYPE_CHECKING, Literal, TypedDict
 if TYPE_CHECKING:
     from onegov.pas.models import Parliamentarian
     from onegov.pas.models.settlement_run import SettlementRun
@@ -48,10 +47,6 @@ if TYPE_CHECKING:
     from onegov.town6.request import TownRequest
 
 
-def format_swiss_number(value: Decimal) -> str:
-    return format_decimal(value, format='#,##0.00', locale='de_CH')
-
-
 def generate_parliamentarian_settlement_pdf(
     settlement_run: 'SettlementRun',
     request: 'TownRequest',
@@ -59,96 +54,105 @@ def generate_parliamentarian_settlement_pdf(
 ) -> bytes:
     """Generate PDF for parliamentarian settlement data."""
     font_config = FontConfiguration()
+
+    session = request.session
+    year = settlement_run.end.year
+    quarter = settlement_run.get_run_number_for_year(session, year)
     css = CSS(
         string="""
-        @page {
-            size: A4;
-            margin: 2.5cm 0.75cm 2cm 0.75cm;  /* top right bottom left */
-            @top-right {
-                content: "Staatskanzlei";
-                font-family: Helvetica, Arial, sans-serif;
-                font-size: 8pt;
-            }
-        }
+@page {
+    size: A4;
+    margin: 2.5cm 0.75cm 2cm 0.75cm;  /* top right bottom left */
+    @top-right {
+        content: "Staatskanzlei";
+        font-family: Helvetica, Arial, sans-serif;
+        font-size: 8pt;
+    }
+}
 
-        body {
-            font-family: Helvetica, Arial, sans-serif;
-            font-size: 7pt;
-            line-height: 1.2;
-        }
+body {
+    font-family: Helvetica, Arial, sans-serif;
+    font-size: 7pt;
+    line-height: 1.0;
+}
 
-        .first-line {
-            font-size: 7pt;
-            text-decoration: underline;
-            margin-left: 1.0cm;
-            margin-bottom: 0.5cm;
-        }
+.first-line {
+    font-size: 7pt;
+    text-decoration: underline;
+    margin-left: 1.0cm;
+    margin-bottom: 0.2cm;
+}
 
-        .address {
-            margin-left: 1.0cm;
-            margin-bottom: 0.5cm;
-            font-size: 8pt;
-            line-height: 1.4;
-        }
+.address {
+    margin-left: 1.0cm;
+    margin-bottom: 0.5cm;
+    font-size: 8pt;
+    line-height: 1.4;
+}
 
-        .date {
-            margin-left: 1.0cm;
-            margin-bottom: 2cm;
-            font-size: 8pt;
-        }
+.date {
+    margin-left: 1.0cm;
+    margin-bottom: 2cm;
+    font-size: 8pt;
+}
 
-        table {
-            border-collapse: collapse;
-            white-space: nowrap;
-        }
+table {
+    border-collapse: collapse;
+    width: 100%;
+    table-layout: auto;
+    white-space: nowrap;
+}
 
-        .header-row td {
-            background-color: #707070;
-            color: white;
-            font-weight: bold;
-            text-align: left;
-            padding: 2pt;
-            border: 1pt solid #000;
-        }
+.col-types {
+    background-color: #d5d7d9;
+}
 
+.header-row td {
+    background-color: #d5d7d9;
+    font-weight: bold;
+}
 
+*/ Makes the text sit on the line of the cell.
+Workaround for `vertical-align` not working. */
+table td th {
+    padding-top: 7pt;
+    padding-bottom: 1pt;
+}
 
-        th, td {
-            padding: 2pt;
-            border: 1pt solid #000;
-        }
+th, td {
+    padding: 2pt;
+    border: 1pt solid #000;
+}
 
-        /* Column widths for main table */
-        .first-table td:first-child { width: 80.0pt; }  /* Date column */
-        .first-table td:nth-child(2) { width: 280.0pt; } /* Type - maximum
-        space (Very specific value to align  the table below) */
-        .first-table td:nth-child(3) { width: 70.0pt; }  /* Value column */
-        .first-table td:last-child { width: 70.0pt; }    /* CHF column */
+/* Column widths for main table */
+.first-table td:first-child { width: 20%; }
+.first-table td:nth-child(2) { width: 50%; } /* Type  */
+.first-table td:nth-child(3) { width: 15%; }  /* Value column */
+.first-table td:last-child { width: 15%; }    /* CHF column */
 
-        /* Fixed column widths for parliamentarian summary table */
-        .parliamentarian-summary-table td:first-child { width: 380.0pt; }
-        .parliamentarian-summary-table td:nth-child(2) { width: 70.0pt; }
-        .parliamentarian-summary-table td:last-child { width: 70.0pt; }
+.parliamentarian-summary-table td:first-child { width: 70%; }
+.parliamentarian-summary-table td:nth-child(2) { width: 15%; }
+.parliamentarian-summary-table td:last-child { width: 15%; }
 
-        .numeric { text-align: right; }
+.numeric { text-align: right; }
 
-        .first-table tr:nth-child(2) td {
-            background-color: #d5d7d9;
-        }
+.first-table tr:nth-child(2) td {
+    background-color: #d5d7d9;
+}
 
-        .first-table tr:nth-child(even):not(.total-row) td {
-            background-color: #f3f3f3;
-        }
+.first-table tr:nth-child(even):not(.total-row) td {
+    background-color: #f3f3f3;
+}
 
-        .parliamentarian-summary-table {
-            page-break-inside: avoid;
-            margin-top: 1cm;
-        }
+.parliamentarian-summary-table {
+    page-break-inside: avoid;
+    margin-top: 1cm;
+}
 
-        .parliamentarian-summary-table td {
-            font-weight: bold;
-            background-color: #d5d7d9;
-        }
+.parliamentarian-summary-table td {
+    font-weight: bold;
+    background-color: #d5d7d9;
+}
     """
     )
 
@@ -174,10 +178,13 @@ def generate_parliamentarian_settlement_pdf(
                 Zug {settlement_run.end.strftime('%d.%m.%Y')}
             </div>
 
+            <h2 class="title">
+                Abrechnung {quarter}. Quartal {year}
+            </h2>
             <table class="first-table">
                 <thead>
 
-                    <tr>
+                    <tr class="col-types">
                         <th class="data-column-date">Datum</th>
                         <th class="data-column-type">Typ</th>
                         <th class="data-column-value">Wert</th>
@@ -237,21 +244,24 @@ def generate_parliamentarian_settlement_pdf(
             entry.calculated_value
             for entry in type_totals[type_key]['entries']
         )
+        total_value_str = (
+            format_swiss_number(total_value) if type_key != 'expenses' else '-'
+        )
         total_chf = type_totals[type_key]['total']
         total += total_chf
         html += f"""
             <tr>
                 <td>{type_name}</td>
-                <td class="numeric">{total_value:,.2f}</td>
-                <td class="numeric">{total_chf:,.2f}</td>
+                <td class="numeric">{total_value_str}</td>
+                <td class="numeric">{format_swiss_number(total_chf)}</td>
             </tr>
         """
 
     html += f"""
             <tr class="merge-cells">
                 <td>Auszahlung</td>
-                <td colspan="2" class="numeric">{total:,.2f}</td>
-                <td>&nbsp;</td>
+                <td colspan="2" class="numeric">{format_swiss_number(total)}
+                </td>
             </tr>
         </tbody>
     </table>
@@ -308,7 +318,7 @@ def get_parliamentarian_settlement_data(
         entry = ParliamentarianEntry(
             date=attendence.date,
             type_description=type_desc,
-            calculated_value=Decimal(str(attendence.calculate_value())),
+            calculated_value=attendence.calculate_value(),
             additional_value=Decimal('0'),
             base_rate=Decimal(str(base_rate)),
             attendance_type=attendence.type,

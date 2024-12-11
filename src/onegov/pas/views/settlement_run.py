@@ -24,6 +24,7 @@ from weasyprint.text.fonts import (  # type: ignore[import-untyped]
 from onegov.pas.models.attendence import TYPES, Attendence
 from onegov.pas.path import SettlementRunExport, SettlementRunAllExport
 from onegov.pas.models import Parliamentarian
+from onegov.pas.utils import format_swiss_number
 
 
 from typing import TYPE_CHECKING, Literal
@@ -32,7 +33,7 @@ if TYPE_CHECKING:
     from onegov.town6.request import TownRequest
     from datetime import date
     SettlementDataRow = tuple[
-        'date', Parliamentarian, str, str | int, Decimal, Decimal
+        'date', Parliamentarian, str, Decimal, Decimal, Decimal
     ]
     TotalRow = tuple[str, Decimal, Decimal, Decimal, Decimal, Decimal]
 
@@ -688,11 +689,11 @@ def _generate_settlement_html(
         html += f"""
            <tr>
                <td>{total_row[0]}</td>
-               <td class="numeric">{total_row[1]:,.2f}</td>
-               <td class="numeric">{total_row[2]:,.2f}</td>
-               <td class="numeric">{total_row[3]:,.2f}</td>
-               <td class="numeric">{total_row[4]:,.2f}</td>
-               <td class="numeric">{total_row[5]:,.2f}</td>
+               <td class="numeric">{format_swiss_number(total_row[1])}</td>
+               <td class="numeric">{format_swiss_number(total_row[2])}</td>
+               <td class="numeric">{format_swiss_number(total_row[3])}</td>
+               <td class="numeric">{format_swiss_number(total_row[4])}</td>
+               <td class="numeric">{format_swiss_number(total_row[5])}</td>
            </tr>
        """
 
@@ -702,11 +703,11 @@ def _generate_settlement_html(
         html += f"""
            <tr class="total-row">
                <td>{final_row[0]}</td>
-               <td class="numeric">{final_row[1]:,.2f}</td>
-               <td class="numeric">{final_row[2]:,.2f}</td>
-               <td class="numeric">{final_row[3]:,.2f}</td>
-               <td class="numeric">{final_row[4]:,.2f}</td>
-               <td class="numeric">{final_row[5]:,.2f}</td>
+               <td class="numeric">{format_swiss_number(final_row[1])}</td>
+               <td class="numeric">{format_swiss_number(final_row[2])}</td>
+               <td class="numeric">{format_swiss_number(final_row[3])}</td>
+               <td class="numeric">{format_swiss_number(final_row[4])}</td>
+               <td class="numeric">{format_swiss_number(final_row[5])}</td>
            </tr>
        """
 

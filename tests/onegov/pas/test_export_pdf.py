@@ -341,26 +341,25 @@ def test_parliamentarian_settlement_calculations(session):
         if attendence.type == 'plenary':
             # Plenary sessions always count as half day
             assert base_rate == Decimal('1000')
-            assert attendence.calculate_value() == '0.5'
-
+            assert attendence.calculate_value() == Decimal('0.5')
         elif attendence.type == 'commission':
             if attendence.duration == 120:  # 2 hour meeting
                 assert base_rate == Decimal('300')  # Initial rate only
-                assert attendence.calculate_value() == '2.0'
+                assert attendence.calculate_value() == Decimal('2.0')
             elif attendence.duration == 180:  # 3 hour meeting
                 # Initial rate (300) + 2 additional half hours (2 * 100)
                 assert base_rate == Decimal('500')
-                assert attendence.calculate_value() == '3.0'
-
+                assert attendence.calculate_value() == Decimal('3.0')
         elif attendence.type == 'study':
             if attendence.duration == 60:  # 1 hour
                 # 2 half-hour periods at 100 each
                 assert base_rate == Decimal('200')
-                assert attendence.calculate_value() == '1.0'
+                assert attendence.calculate_value() == Decimal('1.0')
             elif attendence.duration == 90:  # 1.5 hours
                 # 3 half-hour periods at 100 each
                 assert base_rate == Decimal('300')
-                assert attendence.calculate_value() == '1.5'
+                assert attendence.calculate_value() == Decimal('1.5')
+
 
     # Test total calculations for the settlement period
     session.expire_all()  # Ensure all instances are refreshed from the db
