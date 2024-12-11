@@ -9,6 +9,7 @@ from datetime import date, timedelta
 from onegov.event import Event
 from tests.onegov.town6.common import step_class
 from unittest.mock import patch
+from webtest import Upload
 
 from tests.shared.utils import create_pdf
 
@@ -282,9 +283,8 @@ def test_view_occurrences_event_documents(client):
         client.login_admin()
         settings = client.get('/event-settings')
         filename_1 = os.path.join(td, 'zoo-programm-saison-2024.pdf')
-        pdf_1 = create_pdf(filename_1)
-        settings.form.fields['event_files'][-1].value = [filename_1]
-        settings.files = [pdf_1]
+        create_pdf(filename_1)
+        settings.form.fields['event_files'][-1].value = [Upload(filename_1)]
         settings = settings.form.submit().follow()
         assert settings.status_code == 200
 
