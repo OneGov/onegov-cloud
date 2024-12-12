@@ -2550,9 +2550,6 @@ $person-email-icon: '\f003';
     ul {
         > li {
             font-size: .875rem;
-            max-width: calc(100vw - 7.5rem);
-            overflow: hidden;
-            text-overflow: ellipsis;
         }
     }
 
