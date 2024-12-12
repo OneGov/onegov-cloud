@@ -1,8 +1,18 @@
 # Changes
 
+## 2024.59
+
+`2024-12-12` | [0e99c5e925...04ab5ae76d](https://github.com/OneGov/onegov-cloud/compare/0e99c5e925^...04ab5ae76d)
+
+### Files
+
+##### Sort sidebar documents alphabetically (org and town6)
+
+`Feature` | [OGC-1797](https://linear.app/onegovcloud/issue/OGC-1797) | [0e99c5e925](https://github.com/onegov/onegov-cloud/commit/0e99c5e92511685250f051c15dcdf952d182c2c9)
+
 ## 2024.58
 
-`2024-12-11` | [5925b224b9...96f09cfc20](https://github.com/OneGov/onegov-cloud/compare/5925b224b9^...96f09cfc20)
+`2024-12-11` | [5925b224b9...cfd97aa9b7](https://github.com/OneGov/onegov-cloud/compare/5925b224b9^...cfd97aa9b7)
 
 **Upgrade hints**
 - On the off-chance that we have some duplicate `Payment` associations this upgrade task will fail, in which case we would need to write another migration to remove duplicates for all links on `Payment`.
@@ -2113,50 +2123,4 @@ Uses lazy relationships for election models.
 ##### Per page option to switch off showing files in the sidebar
 
 `Feature` | [OGC-1477](https://linear.app/onegovcloud/issue/OGC-1477) | [1d64c923a1](https://github.com/onegov/onegov-cloud/commit/1d64c923a12c9236447887c8c5511f9f309c51a1)
-
-## 2024.11
-
-`2024-03-07` | [fa71605125...cb806d1926](https://github.com/OneGov/onegov-cloud/compare/fa71605125^...cb806d1926)
-
-### Core
-
-##### Avoids SMS spooler stopping after encountering exceptions
-
-`Bugfix` | [fb47347bc8](https://github.com/onegov/onegov-cloud/commit/fb47347bc8dde8ea26cd7ca280fd88565190bbb2)
-
-### Election Day
-
-##### Improves relationship loading for votes, ballots and ballots result.
-
-Uses joined loading for ballots, lazy loading for ballot results.
-
-`Feature` | [OGC-1478](https://linear.app/onegovcloud/issue/OGC-1478) | [fa71605125](https://github.com/onegov/onegov-cloud/commit/fa71605125f4dd5a7f00ccb71f93ca1a1d8786f9)
-
-##### Updates experimental eCH-0252 Import for Votes.
-
-`Feature` | [OGC-1152](https://linear.app/onegovcloud/issue/OGC-1152) | [43a93acde2](https://github.com/onegov/onegov-cloud/commit/43a93acde29038f272997eafeca68fbfd65243de)
-
-##### Remove obsolete election compound creation.
-
-`Feature` | [OGC-168](https://linear.app/onegovcloud/issue/OGC-168) | [42836e725e](https://github.com/onegov/onegov-cloud/commit/42836e725e2e97d311dce312b3c8402b68ee215b)
-
-##### Remove websocket notifications.
-
-`Feature` | [OGC-1494](https://linear.app/onegovcloud/issue/OGC-1494) | [50af518e2d](https://github.com/onegov/onegov-cloud/commit/50af518e2dd565459b4272a6760732190dd2f331)
-
-##### Optionally keep candidates, lists and list connections when clearing results.
-
-`Feature` | [OGC-1478](https://linear.app/onegovcloud/issue/OGC-1478) | [0c920edfd2](https://github.com/onegov/onegov-cloud/commit/0c920edfd28dedd52ddaaa2a7198c7f34f5b0cb8)
-
-### Form
-
-##### Increase Upload limit to 50MB
-
-`Bugfix` | [OGC-1498](https://linear.app/onegovcloud/issue/OGC-1498) | [07dce87114](https://github.com/onegov/onegov-cloud/commit/07dce87114d35391f456cf555f80b61828f83245)
-
-### Town6
-
-##### Add description for all homepage widgets
-
-`Feature` | [ae473461d4](https://github.com/onegov/onegov-cloud/commit/ae473461d435487f97775eafe110b038fb383985)
 
