@@ -16,10 +16,9 @@ from onegov.search.indexer import Indexer, PostgresIndexer
 from onegov.search.indexer import ORMEventTranslator
 from onegov.search.indexer import TypeMappingRegistry
 from onegov.search.utils import (searchable_sqlalchemy_models,
-                                 filter_non_base_models)
+                                 filter_for_base_models)
 from sortedcontainers import SortedSet
 from sedate import utcnow
-from sqlalchemy import inspect
 from sqlalchemy.orm import undefer
 from urllib3.exceptions import HTTPError
 
@@ -444,28 +443,24 @@ class SearchApp(morepath.App):
             """ Load all database objects and index them. """
             session = self.session()
             try:
-                q = session.query(model).options(undefer('*'))
-                i = inspect(model)
-
-                if i.polymorphic_on is not None:
-                    q = q.filter(i.polymorphic_on == i.polymorphic_identity)
-
-                for obj in q:
+                for obj in session.query(model).options(undefer('*')):
                     self.es_orm_events.index(schema, obj)
 
             except Exception as e:
-                print(f"Error psql indexing model '{model}': {e}")
+                print(f"Error psql indexing model '{model.__name__}': {e}")
             finally:
                 session.invalidate()
                 session.bind.dispose()
 
-        models = (model for base in self.session_manager.bases
-                  for model in searchable_sqlalchemy_models(base))
+        models = {
+            model
+            for base in self.session_manager.bases
+            for model in searchable_sqlalchemy_models(base)
+        }
+        base_models = filter_for_base_models(models)
+
         with ThreadPoolExecutor() as executor:
-            results = executor.map(
-                reindex_model, (
-                    model for model in filter_non_base_models(set(models)))
-            )
+            results = executor.map(reindex_model, base_models)
             if fail:
                 print(tuple(results))
 

@@ -1,4 +1,4 @@
-from onegov.search import ORMSearchable, Searchable
+from onegov.search import ORMSearchable, Searchable, SearchableContent
 from onegov.search import utils
 from sqlalchemy import Column, Integer, Text, ForeignKey
 from sqlalchemy.ext.declarative import declarative_base
@@ -50,42 +50,66 @@ def test_get_searchable_sqlalchemy_models_inheritance():
     ]
 
 
-def test_filter_non_base_models():
+def test_filter_for_base_models():
     Base = declarative_base()
 
-    class Page(Base, Searchable):
+    class Ticket(Base, ORMSearchable):
+        __tablename__ = 'tickets'
         id = Column(Integer, primary_key=True)
-        __tablename__ = 'pages'
 
-    class Topic(Page):
-        pass
+    class XTicket(Ticket):
+        __mapper_args__ = {'polymorphic_identity': 'X'}  # type:ignore
 
-    class News(Page):
-        pass
+    class YTicket(Ticket):
+        __mapper_args__ = {'polymorphic_identity': 'Y'}  # type:ignore
 
-    assert utils.filter_non_base_models({Page, Topic, News}) == {Topic, News}
+    assert utils.filter_for_base_models({XTicket, YTicket, Ticket}) == {Ticket}
 
     class A(Base, Searchable):
+        __mapper_args__ = {'polymorphic_identity': 'a'}  # type:ignore
         id = Column(Integer, primary_key=True)
         __tablename__ = 'a'
 
     class AA(A):
+        __mapper_args__ = {'polymorphic_identity': 'aa'}  # type:ignore
         pass
 
     class B(Base, Searchable):
+        __mapper_args__ = {'polymorphic_identity': 'b'}  # type:ignore
         id = Column(Integer, primary_key=True)
         __tablename__ = 'b'
 
     class C(Base, Searchable):
+        __mapper_args__ = {'polymorphic_identity': 'c'}  # type:ignore
         id = Column(Integer, primary_key=True)
         __tablename__ = 'c'
 
     class CC(C):
+        __mapper_args__ = {'polymorphic_identity': 'cc'}  # type:ignore
         id_2 = Column(Integer, primary_key=True)
         c_id = Column(Integer, ForeignKey('c.id'))
         __tablename__ = 'cc'
 
-    assert utils.filter_non_base_models({A, AA, B, C, CC}) == {AA, B, C, CC}
+    assert utils.filter_for_base_models({A, AA, B, C, CC}) == {A, B, C}
+
+    class AdjacencyList(Base):
+        __abstract__ = True
+        __mapper_args__ = {'polymorphic_identity': 'generic'}
+
+    class Page(AdjacencyList):
+        __tablename__ = 'pages'
+        id = Column(Integer, primary_key=True)
+
+    class Topic(Page, SearchableContent):
+        __mapper_args__ = {'polymorphic_identity': 'topic'}
+
+    class News(Page, SearchableContent):
+        __mapper_args__ = {'polymorphic_identity': 'news'}
+
+    searchable_models = {
+        m for m in utils.searchable_sqlalchemy_models(Base)}
+    assert utils.filter_for_base_models(searchable_models) == {
+        Topic, News, Ticket, A, B, C}
 
 
 def test_related_types():

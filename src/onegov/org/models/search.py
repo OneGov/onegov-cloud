@@ -1,11 +1,10 @@
-import itertools
-
 from elasticsearch_dsl.function import SF  # type:ignore
 from elasticsearch_dsl.query import FunctionScore  # type:ignore
 from elasticsearch_dsl.query import Match
 from elasticsearch_dsl.query import MatchPhrase
 from elasticsearch_dsl.query import MultiMatch
 from functools import cached_property
+from itertools import chain, repeat
 from sedate import utcnow
 from sqlalchemy import func
 from typing import TYPE_CHECKING, Any
@@ -13,7 +12,7 @@ from typing import TYPE_CHECKING, Any
 from onegov.core.collection import Pagination, _M
 from onegov.event.models import Event
 from onegov.search.utils import (searchable_sqlalchemy_models,
-                                 filter_non_base_models)
+                                 filter_for_base_models)
 
 if TYPE_CHECKING:
     from onegov.org.request import OrgRequest
@@ -193,9 +192,10 @@ class SearchPostgres(Pagination[_M]):
         self.number_of_docs = 0
         self.number_of_results = 0
 
-        models = (model for base in self.request.app.session_manager.bases
-                  for model in searchable_sqlalchemy_models(base))
-        self.search_models = filter_non_base_models(set(models))
+        self.search_models = {
+            model for base in self.request.app.session_manager.bases
+            for model in searchable_sqlalchemy_models(base)}
+        self.search_models = filter_for_base_models(self.search_models)
 
     @cached_property
     def available_documents(self) -> int:
@@ -289,7 +289,7 @@ class SearchPostgres(Pagination[_M]):
             )
             for field, weight in zip(
                 model.es_properties.keys(),
-                itertools.chain('A', itertools.repeat('B')))
+                chain('A', repeat('B')))
             if not field.startswith('es_')  # TODO: rename to fts_
         ]
 

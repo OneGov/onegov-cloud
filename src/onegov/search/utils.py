@@ -3,14 +3,17 @@ import html
 import os
 import re
 
+from sqlalchemy import inspect
+
 from onegov.core.custom import json
 from langdetect import DetectorFactory, PROFILES_DIRECTORY
 from langdetect.utils.lang_profile import LangProfile
 from onegov.core.orm import find_models
 
 from typing import Any, Generic, TypeVar, TYPE_CHECKING
+
 if TYPE_CHECKING:
-    from collections.abc import Callable, Iterator, Sequence
+    from collections.abc import Callable, Iterable, Iterator, Sequence
     from langdetect.detector import Detector
     from langdetect.language import Language
     from onegov.search.mixins import Searchable
@@ -42,29 +45,34 @@ def searchable_sqlalchemy_models(
     )
 
 
-def filter_non_base_models(
-    models: 'set[type[T]]'
-) -> 'set[type[T]]':
-    """ Remove model classes that are base classes of other models in the set.
-    Args: models: set of model classes to filter
-    Returns: set: Model classes that are not base classes of any other model
-    in the set.
+def filter_for_base_models(
+    models: 'Iterable[type[Searchable]]'
+) -> 'set[type[Searchable]]':
+    """
+    Filter out models that are polymorphic subclasses of other
+    models in order to save on queries.
 
     """
-    non_base_models = set()
+    from onegov.search.mixins import Searchable
+
+    new_models = set()
 
     for model in models:
-        is_base = False
-        for other_model in models:
-            if (model is not other_model and issubclass(other_model, model)
-                    and model.__tablename__ == other_model.__tablename__):  # type:ignore[attr-defined]
-                is_base = True
-                break
+        i = inspect(model)
+        base_classes = {
+            e.base_mapper.class_ for e in
+            i.base_mapper.self_and_descendants
+            if issubclass(e.base_mapper.class_, Searchable)
+            if e.polymorphic_identity is not None
+            if e.base_mapper.class_ != model
+        }
+        if base_classes:
+            for base in base_classes:
+                new_models.add(base)
+        else:
+            new_models.add(model)
 
-        if not is_base:
-            non_base_models.add(model)
-
-    return non_base_models
+    return new_models
 
 
 _invalid_index_characters = re.compile(r'[\\/?"<>|\s,A-Z:]+')
