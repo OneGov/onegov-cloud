@@ -768,7 +768,6 @@ def handle_submit_directory_entry(
     layout = layout or DirectoryEntryCollectionLayout(self, request)
     layout.include_code_editor()
     layout.breadcrumbs.append(Link(title, '#'))
-    layout.edit_mode = True
 
     return {
         'directory': self.directory,
