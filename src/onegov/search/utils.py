@@ -59,18 +59,7 @@ def filter_for_base_models(
 
     for model in models:
         i = inspect(model)
-        base_classes = {
-            e.base_mapper.class_ for e in
-            i.base_mapper.self_and_descendants
-            if issubclass(e.base_mapper.class_, Searchable)
-            if e.polymorphic_identity is not None
-            if e.base_mapper.class_ != model
-        }
-        if base_classes:
-            for base in base_classes:
-                new_models.add(base)
-        else:
-            new_models.add(model)
+        new_models.add(model if i.polymorphic_on is None else i.base_mapper.class_)
 
     return new_models
 
