@@ -9,8 +9,9 @@ from elasticsearch import Transport
 from elasticsearch import TransportError
 from elasticsearch.connection import create_ssl_context
 from more.transaction.main import transaction_tween_factory
+from sqlalchemy import inspect
 
-from onegov.search import Search, log, index_log
+from onegov.search import Search, log, index_log, Searchable
 from onegov.search.errors import SearchOfflineError
 from onegov.search.indexer import Indexer, PostgresIndexer
 from onegov.search.indexer import ORMEventTranslator
@@ -447,9 +448,9 @@ class SearchApp(morepath.App):
                 i = inspect(model)
 
                 if i.polymorphic_on is not None:
-                    q = q.filter(i.polymorphic_on.in({
+                    q = q.filter(i.polymorphic_on.in_({
                         m.polymorphic_identity for m in i.self_and_descendants
-                        if issubclass(m.class_, Searchable)})
+                        if issubclass(m.class_, Searchable)}))
 
                 for obj in q:
                     self.es_orm_events.index(schema, obj)

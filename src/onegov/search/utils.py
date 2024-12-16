@@ -53,13 +53,12 @@ def filter_for_base_models(
     models in order to save on queries.
 
     """
-    from onegov.search.mixins import Searchable
-
     new_models = set()
 
     for model in models:
         i = inspect(model)
-        new_models.add(model if i.polymorphic_on is None else i.base_mapper.class_)
+        new_models.add(
+            model if i.polymorphic_on is None else i.base_mapper.class_)
 
     return new_models
 
