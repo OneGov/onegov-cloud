@@ -41,14 +41,14 @@
                                         <div class="columns small-10">
                                             <tal:b repeat="occasion activity.occasions">
                                                 <div class="call-for-volunteers" tal:define="dates exclude_filtered_dates(layout.model, occasion.dates)" tal:condition="occasion.seeking_volunteers and dates">
-            
+
                                                     <h3 i18n:translate>Occasion</h3>
                                                     <ul class="dense">
                                                         <li tal:repeat="date dates">
                                                             ${layout.format_datetime_range(date.localized_start, date.localized_end)}
                                                         </li>
                                                     </ul>
-            
+
                                                     <h3 i18n:translate tal:condition="occasion.needs">Needs</h3>
                                                     <ul class="dense needs">
                                                         <tal:b repeat="need occasion.needs">
@@ -61,7 +61,7 @@
                                                             </li>
                                                         </tal:b>
                                                     </ul>
-            
+
                                                     <div id="error-for-${occasion.id.hex}" class="alert" style="display: none;"></div>
                                                 </div>
                                             </tal:b>
@@ -71,9 +71,9 @@
                             </div>
                         </div>
                     </tal:b>
-
+                </div>
+                <div class="grid-x grid-padding-x">
                     <div class="cell small-12">
-
                         <div id="click-to-load-target"></div>
 
                         <div class="show-more" tal:condition="activities">
@@ -93,10 +93,10 @@
                                 ><i class="fa fa-chevron-up"></i> <span i18n:translate>Navigate up</span></a>
                         </div>
                     </div>
-                    
+
                     <div class="cell small-12" tal:condition="not:activities">
                         <p i18n:translate>No activities found.</p>
-                        <b><a class="button hollow" tal:condition="filtered" href="${request.class_link(layout.model.__class__)}/volunteers" i18n:translate>Reset filter.</a></b>
+                        <b><a class="button hollow" tal:condition="filtered" href="${request.class_link(layout.model.__class__)}/volunteer" i18n:translate>Reset filter.</a></b>
                     </div>
                 </div>
                 <div id="click-to-load-target"></div>

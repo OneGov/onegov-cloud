@@ -9,11 +9,12 @@ from onegov.feriennet.collections import NotificationTemplateCollection
 from onegov.feriennet.collections import VacationActivityCollection
 from onegov.feriennet.layout import DefaultLayout
 from onegov.org.custom import get_global_tools as get_base_tools
-from onegov.core.elements import Link, LinkGroup
+from onegov.core.elements import LinkGroup, Link
 from onegov.org.models import Dashboard, ExportCollection
 
 
 from typing import TYPE_CHECKING
+
 if TYPE_CHECKING:
     from collections.abc import Iterator
     from onegov.core.types import RenderData
@@ -23,17 +24,22 @@ if TYPE_CHECKING:
 
 @FeriennetApp.template_variables()
 def get_template_variables(request: 'FeriennetRequest') -> 'RenderData':
-    return {
+    links = {
         'global_tools': tuple(get_global_tools(request)),
         'top_navigation': tuple(get_top_navigation(request)),
-        'volunteer_link': Link(
+        'volunteer_link': None
+    }
+
+    if request.app.show_volunteers(request):
+        links['volunteer_link'] = Link(
             text=_('Help us'),
             url=request.class_link(
                 VacationActivityCollection, name='volunteer'
             ),
             attrs={'id': ('help-us')}
-        )
-    }
+        )  # type:ignore[assignment]
+
+    return links
 
 
 def get_global_tools(
