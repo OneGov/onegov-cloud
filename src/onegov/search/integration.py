@@ -443,7 +443,15 @@ class SearchApp(morepath.App):
             """ Load all database objects and index them. """
             session = self.session()
             try:
-                for obj in session.query(model).options(undefer('*')):
+                q = session.query(model).options(undefer('*'))
+                i = inspect(model)
+
+                if i.polymorphic_on is not None:
+                    q = q.filter(i.polymorphic_on.in({
+                        m.polymorphic_identity for m in i.self_and_descendants
+                        if issubclass(m.class_, Searchable)})
+
+                for obj in q:
                     self.es_orm_events.index(schema, obj)
 
             except Exception as e:
