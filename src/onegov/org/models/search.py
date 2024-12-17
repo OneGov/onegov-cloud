@@ -11,8 +11,7 @@ from typing import TYPE_CHECKING, Any
 
 from onegov.core.collection import Pagination, _M
 from onegov.event.models import Event
-from onegov.search.utils import (searchable_sqlalchemy_models,
-                                 filter_for_base_models)
+from onegov.search.utils import searchable_sqlalchemy_models
 
 if TYPE_CHECKING:
     from onegov.org.request import OrgRequest
@@ -195,7 +194,6 @@ class SearchPostgres(Pagination[_M]):
         self.search_models = {
             model for base in self.request.app.session_manager.bases
             for model in searchable_sqlalchemy_models(base)}
-        self.search_models = filter_for_base_models(self.search_models)
 
     @cached_property
     def available_documents(self) -> int:
