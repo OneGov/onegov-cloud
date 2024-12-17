@@ -1,7 +1,7 @@
 from onegov.search import ORMSearchable, Searchable, SearchableContent
 from onegov.search import utils
-from sqlalchemy import Column, Integer, Text, ForeignKey
-from sqlalchemy.ext.declarative import declarative_base
+from sqlalchemy import Column, Integer, Text
+from sqlalchemy.ext.declarative import declarative_base, declared_attr
 
 
 def test_get_searchable_sqlalchemy_models():
@@ -56,49 +56,71 @@ def test_filter_for_base_models():
     class Ticket(Base, ORMSearchable):
         __tablename__ = 'tickets'
         id = Column(Integer, primary_key=True)
+        type: 'Column[str]' = Column(
+            Text, nullable=False, default=lambda: 'ticketi')
+
+        @declared_attr
+        def __mapper_args__(cls):  # type:ignore
+            return {
+                'polymorphic_on': cls.type,
+                'polymorphic_identity': 'ticketi'
+            }
 
     class XTicket(Ticket):
-        __mapper_args__ = {'polymorphic_identity': 'X'}  # type:ignore
+        __mapper_args__ = {'polymorphic_identity': 'ticketi-x'}  # type:ignore
 
     class YTicket(Ticket):
-        __mapper_args__ = {'polymorphic_identity': 'Y'}  # type:ignore
+        __mapper_args__ = {'polymorphic_identity': 'ticketi-y'}  # type:ignore
 
     assert utils.filter_for_base_models({XTicket, YTicket, Ticket}) == {Ticket}
 
-    class A(Base, Searchable):
-        __mapper_args__ = {'polymorphic_identity': 'a'}  # type:ignore
+    class Letter(Base, Searchable):
+        __tablename__ = 'letter'
+
         id = Column(Integer, primary_key=True)
-        __tablename__ = 'a'
+        type: 'Column[str]' = Column(
+            Text, nullable=False, default=lambda: 'type')
+
+        @declared_attr
+        def __mapper_args__(cls):  # type:ignore
+            return {
+                'polymorphic_on': 'type',
+                'polymorphic_identity': 'letter'
+            }
+
+    class A(Letter):
+        __mapper_args__ = {'polymorphic_identity': 'a'}
 
     class AA(A):
         __mapper_args__ = {'polymorphic_identity': 'aa'}  # type:ignore
-        pass
 
-    class B(Base, Searchable):
+    class B(Letter, Searchable):
         __mapper_args__ = {'polymorphic_identity': 'b'}  # type:ignore
-        id = Column(Integer, primary_key=True)
-        __tablename__ = 'b'
 
-    class C(Base, Searchable):
+    class C(Letter, Searchable):
         __mapper_args__ = {'polymorphic_identity': 'c'}  # type:ignore
-        id = Column(Integer, primary_key=True)
-        __tablename__ = 'c'
 
     class CC(C):
         __mapper_args__ = {'polymorphic_identity': 'cc'}  # type:ignore
-        id_2 = Column(Integer, primary_key=True)
-        c_id = Column(Integer, ForeignKey('c.id'))
-        __tablename__ = 'cc'
 
-    assert utils.filter_for_base_models({A, AA, B, C, CC}) == {A, B, C}
+    assert utils.filter_for_base_models({Letter, A, AA, B, C, CC}) == {Letter}
 
     class AdjacencyList(Base):
         __abstract__ = True
-        __mapper_args__ = {'polymorphic_identity': 'generic'}
+
+        id: 'Column[int]' = Column(Integer, primary_key=True)
+        type: 'Column[str]' = Column(
+            Text, nullable=False, default=lambda: 'generic')
+
+        @declared_attr
+        def __mapper_args__(cls):  # type:ignore
+            return {
+                'polymorphic_on': cls.type,
+                'polymorphic_identity': 'generic'
+            }
 
     class Page(AdjacencyList):
         __tablename__ = 'pages'
-        id = Column(Integer, primary_key=True)
 
     class Topic(Page, SearchableContent):
         __mapper_args__ = {'polymorphic_identity': 'topic'}
@@ -106,10 +128,12 @@ def test_filter_for_base_models():
     class News(Page, SearchableContent):
         __mapper_args__ = {'polymorphic_identity': 'news'}
 
+    assert utils.filter_for_base_models({Page, Topic, News}) == {Page}
+
     searchable_models = {
         m for m in utils.searchable_sqlalchemy_models(Base)}
     assert utils.filter_for_base_models(searchable_models) == {
-        Topic, News, Ticket, A, B, C}
+        Ticket, Letter, Page}
 
 
 def test_related_types():
