@@ -3,7 +3,7 @@ from onegov.websockets.client import broadcast
 from onegov.websockets.client import status
 from pytest import mark
 from tests.onegov.websockets.conftest import WebsocketsRoot
-from websockets import connect
+from websockets.asyncio.client import connect
 
 
 @mark.asyncio
