@@ -2197,14 +2197,14 @@ def test_group_codes(client, scenario):
     assert "Foo" in page.pyquery('#add-possible').text()
 
     # we can sign-up Foo
-    page = page.click("Foo").form.submit().follow()
+    page = page.click("zur Gruppe hinzufügen").form.submit().follow()
 
     # we end up at the group view again, where Foo is in the group now
     assert "Bar" in page.pyquery('.own-children').text()
     assert "Foo" in page.pyquery('.own-children').text()
 
     # we can remove Bar from the group
-    page = page.click("Gruppe verlassen", index=0)
+    page = page.click("aus Gruppe entfernen", index=0)
     page = usr1.get(group_url)
 
     assert "Bar" not in page.pyquery('.own-children').text()
@@ -2220,7 +2220,7 @@ def test_group_codes(client, scenario):
 
     assert "Sawyer" in page.pyquery('.own-children').text()
 
-    page = page.click("Gruppe verlassen", index=1)
+    page = page.click("aus Gruppe entfernen", index=1)
 
     # other users can see the group view, but cannot execute actions and
     # they only see the active attendees
@@ -2229,22 +2229,20 @@ def test_group_codes(client, scenario):
     page = usr2.get(group_url)
     assert "Foo" in page
     assert "Bar" not in page
-    assert "Gruppe verlassen" not in page.pyquery('a').text()
-    assert "Gruppe beitreten" not in page.pyquery('a').text()
+    assert "aus Gruppe entfernen" not in page.pyquery('a').text()
+    assert "zur Gruppe hinzufügen" not in page.pyquery('a').text()
 
     usr2.login('qux@example.org', 'hunter2')
 
     page = usr2.get(group_url)
     assert "Foo" in page
     assert "Bar" not in page
-    assert "Gruppe verlassen" not in page.pyquery('a').text()
-    assert "Gruppe beitreten" not in page.pyquery('a').text()
 
     # the second user's child should be listed now
     assert "Qux" in page.pyquery('#add-possible').text()
 
     # let's join the group
-    page = page.click("Qux").form.submit().follow()
+    page = page.click("zur Gruppe hinzufügen").form.submit().follow()
 
     # now we can do the matching, and we should have Foo and Qux in the group
     admin = client.spawn()
