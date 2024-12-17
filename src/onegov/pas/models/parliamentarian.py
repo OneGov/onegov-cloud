@@ -7,19 +7,22 @@ from onegov.file import AssociatedFiles
 from onegov.file import NamedFile
 from onegov.pas import _
 from onegov.search import ORMSearchable
-from sqlalchemy import Column
+from sqlalchemy import Column, or_
 from sqlalchemy import Date
 from sqlalchemy import Enum
 from sqlalchemy import Text
 from sqlalchemy.orm import relationship
 from uuid import uuid4
 
+
 from typing import TYPE_CHECKING
 if TYPE_CHECKING:
     import uuid
     from onegov.pas.models.attendence import Attendence
+    from onegov.pas.models import ParliamentarianRole
+    from sqlalchemy.orm import Session
     from onegov.pas.models.commission_membership import CommissionMembership
-    from onegov.pas.models.parliamentarian_role import ParliamentarianRole
+    from onegov.pas.models.party import Party
     from typing import Literal
     from typing import TypeAlias
 
@@ -119,6 +122,13 @@ class Parliamentarian(
     @property
     def gender_label(self) -> str:
         return GENDERS.get(self.gender, '')
+
+    @property
+    def formal_greeting(self) -> str:
+        """Returns the formal German greeting based on gender."""
+        if self.gender == 'female':
+            return 'Frau ' + self.first_name + ' ' + self.last_name
+        return 'Herr' + self.first_name + ' ' + self.last_name
 
     #: The shipping method value
     shipping_method: 'Column[ShippingMethod]' = Column(
@@ -291,6 +301,33 @@ class Parliamentarian(
         order_by='desc(ParliamentarianRole.start)'
     )
 
+    def get_party_during_period(
+        self, start_date: date, end_date: date, session: 'Session'
+    ) -> 'Party | None':
+        """Get the party this parliamentarian belonged to during a specific
+        period."""
+
+        from onegov.pas.models.parliamentarian_role import ParliamentarianRole
+        role = (
+            session.query(ParliamentarianRole)
+            .filter(
+                ParliamentarianRole.parliamentarian_id == self.id,
+                ParliamentarianRole.party_id.isnot(
+                    None
+                ),
+                or_(
+                    ParliamentarianRole.end.is_(None),
+                    ParliamentarianRole.end >= start_date,
+                ),
+                ParliamentarianRole.start
+                <= end_date,
+            )
+            .order_by(ParliamentarianRole.start.desc())
+            .first()
+        )
+
+        return role.party if role else None
+
     @property
     def active(self) -> bool:
         if not self.roles:
@@ -299,6 +336,20 @@ class Parliamentarian(
             if role.end is None or role.end >= date.today():
                 return True
         return False
+
+    def active_during(self, start: date, end: date) -> bool:
+        if not self.roles:
+            return True
+        for role in self.roles:
+            role_start = role.start if role.start is not None else date.min
+            role_end = role.end if role.end is not None else date.max
+            if role_end >= start and role_start <= end:
+                return True
+        return False
+
+    @property
+    def display_name(self) -> str:
+        return f'{self.first_name} {self.last_name}'
 
     #: A parliamentarian may be part of n commissions
     commission_memberships: 'relationship[list[CommissionMembership]]'

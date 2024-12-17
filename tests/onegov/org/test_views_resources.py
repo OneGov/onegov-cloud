@@ -156,7 +156,7 @@ def test_resources_explicitly_link_referenced_files(client):
     path = module_path('tests.onegov.org', 'fixtures/sample.pdf')
     with open(path, 'rb') as f:
         page = admin.get('/files')
-        page.form['file'] = Upload('Sample.pdf', f.read(), 'application/pdf')
+        page.form['file'] = [Upload('Sample.pdf', f.read(), 'application/pdf')]
         page.form.submit()
 
     pdf_url = (

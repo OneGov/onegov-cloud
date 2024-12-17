@@ -1,5 +1,6 @@
 from onegov.core.orm import Base
 from onegov.core.orm.mixins import TimestampMixin
+from onegov.core.orm.types import UTCDateTime
 from onegov.core.orm.types import UUID
 from sqlalchemy import Boolean
 from sqlalchemy import Column
@@ -10,6 +11,7 @@ from uuid import uuid4
 from typing import TYPE_CHECKING
 if TYPE_CHECKING:
     import uuid
+    from datetime import datetime
 
 
 class Subscriber(Base, TimestampMixin):
@@ -54,6 +56,18 @@ class Subscriber(Base, TimestampMixin):
 
     #: The domain segment of the election compound part.
     domain_segment: 'Column[str | None]' = Column(Text, nullable=True)
+
+    #: When has this subscriber last been (explicitly) activated.
+    active_since: 'Column[datetime | None]' = Column(
+        UTCDateTime,
+        nullable=True
+    )
+
+    #: When has this subscriber last been (explicitly) deactivated.
+    inactive_since: 'Column[datetime | None]' = Column(
+        UTCDateTime,
+        nullable=True
+    )
 
 
 class SmsSubscriber(Subscriber):

@@ -596,7 +596,7 @@ class PersonLinkExtension(ContentExtension):
                     ),
                 }
             )
-            context_specific_function = StringField(
+            context_specific_function = TextAreaField(
                 label=_('Function'),
                 depends_on=('person', '!'),
                 render_kw={'class_': 'indent-context-specific-function'},

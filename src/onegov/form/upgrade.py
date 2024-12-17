@@ -13,6 +13,7 @@ from onegov.form import FormDefinitionCollection
 from onegov.form import FormFile
 from onegov.form import FormSubmission
 from sqlalchemy import Column, Integer, Text
+from sqlalchemy.engine.reflection import Inspector
 
 
 from typing import TYPE_CHECKING
@@ -181,9 +182,25 @@ def add_title_to_submission_windows(context: 'UpgradeContext') -> None:
 def remove_no_overlapping_submission_windows_constraint(
     context: 'UpgradeContext'
 ) -> None:
-    if context.has_table('submission_windows'):
-        context.operations.drop_constraint('no_overlapping_submission_windows',
-                                           'submission_windows')
+    if not context.has_table('submission_windows'):
+        return
+
+    inspector = Inspector(context.operations_connection)
+    # Check unique constraints
+    unique_constraints = inspector.get_unique_constraints('submission_windows')
+    # Check check constraints
+    check_constraints = inspector.get_check_constraints('submission_windows')
+
+    constraint_exists = any(
+        const['name'] == 'no_overlapping_submission_windows'
+        for const in unique_constraints + check_constraints
+    )
+
+    if constraint_exists:
+        context.operations.drop_constraint(
+            'no_overlapping_submission_windows',
+            'submission_windows'
+        )
 
 
 @upgrade_task('Remove state column form survey submissions')

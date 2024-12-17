@@ -10,7 +10,7 @@ def test_view_files(client):
 
     assert "Noch keine Dateien hochgeladen" in files_page
 
-    files_page.form['file'] = Upload('Test.txt', b'File content.')
+    files_page.form['file'] = [Upload('Test.txt', b'File content.')]
     files_page.form.submit()
 
     files_page = client.get('/files')
