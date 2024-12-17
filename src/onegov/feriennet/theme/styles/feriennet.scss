@@ -2086,33 +2086,29 @@ $booking-left-margin: 1.6rem;
     }
 }
 
-.toggled + .invoice-items-list + .invoice-items-payment > div {
-    border-top: 1px dashed $red-pastel;
+.invoice-items-list:has( + .invoice-items-payment) {
+    margin-bottom: 0;
+    border-radius: .7rem .7rem 0 0;
 }
 
 .invoice-items-payment {
-    padding: 0 calc(1rem - 1px);
-
-    > div {
-        background-color: lighten($red-pastel, 8%);
-        padding: 1rem .5rem 1.25rem;
-        position: relative;
-    }
+    background-color: lighten($red-pastel, 8%);
+    padding: 1rem;
+    border-radius: 0 0 .7rem .7rem;
+    margin-bottom: 2rem;
+    border: 1px solid $iron;
 
     h4 {
         font-size: 1rem;
         font-weight: bold;
     }
 
-    ul {
-        color: $body-font-color;
-        font-size: 1rem;
-        list-style: none;
-        margin: 0;
 
-        li span:first-child {
-            display: inline-block;
-            min-width: 9rem;
+    .bank-transfer{
+        font-size: .9rem;
+
+        .medium-4 {
+            font-weight: bold;
         }
     }
 
@@ -2532,7 +2528,6 @@ $booking-left-margin: 1.6rem;
         border: 1px solid $oil;
         border-radius: 2px;
         color: $body-font-color;
-        margin: .5rem 0 -.5rem;
         outline: none;
 
         &:hover {
