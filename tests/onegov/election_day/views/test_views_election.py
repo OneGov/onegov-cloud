@@ -37,13 +37,22 @@ def test_view_election_candidates(election_day_app_gr):
 
     login(client)
 
-    # Majorz election
+    # Majorz election intermediate results
+    upload_majorz_election(client, status='interim')
+
+    # ... main
+    candidates = client.get('/election/majorz-election/candidates')
+    assert all((expected in candidates for expected in (
+        "Engler Stefan", "20", "Pendent", "Schmid Martin", "18", "Pendent"
+    )))
+
+    # Majorz election final results
     upload_majorz_election(client, status='final')
 
     # ... main
     candidates = client.get('/election/majorz-election/candidates')
     assert all((expected in candidates for expected in (
-        "Engler Stefan", "20", "Schmid Martin", "18"
+        "Engler Stefan", "20", "Ja", "Schmid Martin", "18", "Ja"
     )))
 
     # ... bar chart data (with filters)
@@ -78,7 +87,7 @@ def test_view_election_candidates(election_day_app_gr):
     )
     assert 'entity=Filisur' in chart
 
-    # ... ebmedded table (with filters)
+    # ... embedded table (with filters)
     table = client.get('/election/majorz-election/candidates-table')
     assert 'data-text="20"' in table
 
@@ -92,13 +101,22 @@ def test_view_election_candidates(election_day_app_gr):
     )
     assert 'data-text=' not in table
 
-    # Proporz election
+    # Proporz election intermediate results
+    upload_proporz_election(client, status='interim')
+
+    # ....main
+    candidates = client.get('/election/proporz-election/candidates')
+    assert all((expected in candidates for expected in (
+        "Caluori Corina", "1", "Pendent", "Casanova Angela", "0", "Pendent"
+    )))
+
+    # Proporz election final results
     upload_proporz_election(client, status='final')
 
     # ....main
     candidates = client.get('/election/proporz-election/candidates')
     assert all((expected in candidates for expected in (
-        "Caluori Corina", "1", "Casanova Angela", "0"
+        "Caluori Corina", "1", "Nein", "Casanova Angela", "0", "Nein"
     )))
 
     # ... bar chart data (with filters)

@@ -3,7 +3,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: \n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2024-08-08 12:33+0200\n"
+"POT-Creation-Date: 2024-12-10 16:58+0100\n"
 "PO-Revision-Date: 2022-03-22 08:01+0100\n"
 "Last-Translator: Marc Sommerhalder <marc.sommerhalder@seantis.ch>\n"
 "Language-Team: \n"
@@ -1146,6 +1146,9 @@ msgstr "Gea"
 msgid "No"
 msgstr "Na"
 
+msgid "Pending"
+msgstr "Pendent"
+
 msgid "All candidates"
 msgstr "Tut las candidatas e candidats"
 
@@ -1440,6 +1443,12 @@ msgstr "Anc nagins abunents."
 
 msgid "Locale"
 msgstr "Regiun linguistica"
+
+msgid "Subscribed"
+msgstr "Abunament"
+
+msgid "Unsubscribed"
+msgstr "Annullaziun"
 
 msgid "Active"
 msgstr "Activ"

@@ -767,8 +767,9 @@
                     <td tal:condition="layout.majorz" class="column-party right-aligned">${candidate.party}</td>
                     <td tal:condition="layout.proporz" class="column-list right-aligned">${candidate.list_name}</td>
                     <td tal:condition="layout.majorz and show_percentage" class="column-votes-percentage right-aligned">${layout.format_number(candidate.percentage, 1)}%</td>
-                    <td class="column-elected answer accepted right-aligned" tal:condition="candidate.elected is True" i18n:translate="">Yes</td>
-                    <td class="column-elected answer rejected right-aligned" tal:condition="candidate.elected is False" i18n:translate="">No</td>
+                    <td class="column-elected answer accepted right-aligned" tal:condition="election.completed and candidate.elected is True" i18n:translate="">Yes</td>
+                    <td class="column-elected answer rejected right-aligned" tal:condition="election.completed and candidate.elected is False" i18n:translate="">No</td>
+                    <td class="column-elected answer right-aligned" tal:condition="not election.completed" i18n:translate="">Pending</td>
                     <td class="column-elected answer right-aligned" tal:condition="candidate.elected is None" i18n:translate=""></td>
                 </tr>
             </tal:block>

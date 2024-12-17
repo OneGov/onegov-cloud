@@ -79,7 +79,7 @@ def test_pages(client):
     admin.login_admin()
 
     images = admin.get('/images')
-    images.form['file'] = Upload('Test.jpg', create_image().read())
+    images.form['file'] = [Upload('Test.jpg', create_image().read())]
     images.form.submit()
     img_url = admin.get('/images').pyquery('.image-box a').attr('href')
 
@@ -147,7 +147,7 @@ def test_pages_explicitly_link_referenced_files(client):
     path = module_path('tests.onegov.org', 'fixtures/sample.pdf')
     with open(path, 'rb') as f:
         page = admin.get('/files')
-        page.form['file'] = Upload('Sample.pdf', f.read(), 'application/pdf')
+        page.form['file'] = [Upload('Sample.pdf', f.read(), 'application/pdf')]
         page.form.submit()
 
     pdf_url = (
@@ -200,7 +200,7 @@ def test_pages_person_link_extension(client):
     admin.login_admin()
 
     images = admin.get('/images')
-    images.form['file'] = Upload('Test.jpg', create_image().read())
+    images.form['file'] = [Upload('Test.jpg', create_image().read())]
     images.form.submit()
     img_url = admin.get('/images').pyquery('.image-box a').attr('href')
 
@@ -262,7 +262,7 @@ def test_delete_pages(client):
     )
     # we add a file attachment to ensure we can delete a page, even if
     # it contains file attachments
-    new_page.form.fields['files'][-1] = Upload('test.txt')
+    new_page.form.fields['files'][-1] = [Upload('test.txt')]
     page = new_page.form.submit().follow()
     delete_link = page.pyquery('a[ic-delete-from]')[0].attrib['ic-delete-from']
 

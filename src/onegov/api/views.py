@@ -258,6 +258,9 @@ def get_time_restricted_token(
     self: AuthEndpoint, request: 'CoreRequest'
 ) -> dict[str, str]:
     try:
+        if request.authorization is None:
+            raise HTTPUnauthorized()
+
         return get_token(request)
     except Exception as exception:
         raise ApiException(exception=exception) from exception

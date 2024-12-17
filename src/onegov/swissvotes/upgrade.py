@@ -669,3 +669,10 @@ def add_bfs_dashboard(context: UpgradeContext) -> None:
         column = f'bfs_dashboard_{locale}'
         if not context.has_column('swissvotes', column):
             context.operations.add_column('swissvotes', Column(column, Text))
+
+
+@upgrade_task('Add poster columns basel 2')
+def add_poster_columns_basel(context: UpgradeContext) -> None:
+    for column in ('posters_bs_yea', 'posters_bs_nay'):
+        if not context.has_column('swissvotes', column):
+            context.operations.add_column('swissvotes', Column(column, Text))
