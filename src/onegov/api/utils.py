@@ -14,6 +14,8 @@ if TYPE_CHECKING:
     from morepath.request import Response
 
 
+# TODO: Do we allow this to update request.identity, so we can elevate
+#       privileges for what a given API token is allowed to see?
 def authenticate(request: 'CoreRequest') -> ApiKey:
     if request.authorization is None:
         raise HTTPUnauthorized()
