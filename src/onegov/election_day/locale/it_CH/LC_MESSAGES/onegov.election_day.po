@@ -1133,6 +1133,9 @@ msgstr "Si"
 msgid "No"
 msgstr "No"
 
+msgid "Pending"
+msgstr "In attesa"
+
 msgid "All candidates"
 msgstr "Tutti i candidati"
 

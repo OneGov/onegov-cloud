@@ -544,7 +544,7 @@ def test_election_status(session):
     session.flush()
     assert election.status is None
 
-    # Test completed calcuation
+    # Test completed calculation
     # ... empty election
     for status, completed in (
         (None, False), ('unknown', False), ('interim', False), ('final', True)

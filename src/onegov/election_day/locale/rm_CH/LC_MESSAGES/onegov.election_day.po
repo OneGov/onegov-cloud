@@ -1146,6 +1146,9 @@ msgstr "Gea"
 msgid "No"
 msgstr "Na"
 
+msgid "Pending"
+msgstr "Pendent"
+
 msgid "All candidates"
 msgstr "Tut las candidatas e candidats"
 
