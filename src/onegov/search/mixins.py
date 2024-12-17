@@ -1,5 +1,5 @@
 from sqlalchemy import Column
-from sqlalchemy.dialects.postgresql import TSVECTOR
+from sqlalchemy.dialects.postgresql import TSVECTOR, JSONB
 from sqlalchemy.ext.declarative import declared_attr
 from sqlalchemy.orm import deferred
 
@@ -74,6 +74,17 @@ class Searchable:
         if hasattr(cls, '__table__') and hasattr(cls.__table__.c, col_name):
             return deferred(cls.__table__.c.fts_idx)
         return deferred(Column(col_name, TSVECTOR))
+
+    @declared_attr
+    def fts_idx_data(cls) -> 'Column[object]':
+        """ This column holds all the properties including its values
+        important for full text search.
+        """
+
+        col_name = Searchable.TEXT_SEARCH_DATA_COLUMN_NAME
+        if hasattr(cls, '__table__') and hasattr(cls.__table__.c, col_name):
+            return deferred(cls.__table__.c.fts_idx_data)
+        return deferred(Column(col_name, JSONB, default={}))
 
     # TODO: rename to fts_properties
     @classproperty  # type:ignore[no-redef]
