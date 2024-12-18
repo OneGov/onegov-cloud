@@ -11,7 +11,7 @@ from onegov.file.utils import get_image_size
 from onegov.file.utils import get_svg_size
 from onegov.file.utils import IMAGE_MIME_TYPES
 from onegov.file.utils import word_count
-from PIL import Image, UnidentifiedImageError
+from PIL import Image, ImageOps, UnidentifiedImageError
 from tempfile import SpooledTemporaryFile
 from onegov.pdf.utils import extract_pdf_info
 
@@ -74,6 +74,9 @@ def strip_exif_and_limit_and_store_image_size(
         params: _ImageSaveOptionalParams = {}
 
         if has_exif:
+            # bake EXIF orientation into the image
+            ImageOps.exif_transpose(image, in_place=True)
+
             # replace EXIF section with an empty one
             params['exif'] = Image.Exif()
 
