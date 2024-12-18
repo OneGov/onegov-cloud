@@ -107,7 +107,8 @@ def test_api_endpoint(app, endpoint_class):
     # ... by_id
     assert endpoint_class(app).by_id(1).id == 1
     assert endpoint_class(app).by_id(2).id == 2
-    assert endpoint_class(app).by_id(3) is None
+    assert endpoint_class(app).by_id(3).id == 3
+    assert endpoint_class(app).by_id(4) is None
 
     # .... item_data
     assert endpoint_class(app).item_data(Bunch(title=1, a=2)) == {
