@@ -1,9 +1,26 @@
+import transaction
+
 from freezegun import freeze_time
 from collection_json import Collection
+from onegov.api.models import ApiKey
+from onegov.user import UserCollection
 from unittest.mock import patch
+from uuid import uuid4
 
 
 def test_view_api(client):
+
+    user = UserCollection(client.app.session()).add(
+        username='a@a.a', password='a', role='admin'
+    )
+    # create an access key with write access
+    uuid = uuid4()
+    key = ApiKey(
+        name='key', read_only=False, last_used=None, key=uuid, user=user
+    )
+    client.app.session().add(key)
+    transaction.commit()
+
     # Collection
     response = client.get('/api')
     headers = response.headers
@@ -58,7 +75,12 @@ def test_view_api(client):
                         {'href': '6', 'rel': 'b'}
                     ]
                 }
-            ]
+            ],
+            'template': {
+                'data': [
+                    {'name': 'title', 'prompt': 'Title'},
+                ],
+            }
         }
     }
     assert len(Collection.from_json(response.body).links) == 2
@@ -87,10 +109,48 @@ def test_view_api(client):
                         {'href': '2', 'rel': 'b'}
                     ]
                 },
-            ]
+            ],
+            'template': {
+                'data': [
+                    {'name': 'title', 'prompt': 'Title'},
+                ],
+            }
         }
     }
     assert len(Collection.from_json(response.body).items) == 1
+
+    # Edit Item
+    with freeze_time('2020-02-02 20:20'):
+        # Without a token that has write permissions we can't change anything
+        response = client.put(
+            '/api/endpoint/1',
+            params='title=Changed',
+            status=401
+        )
+        headers = response.headers
+        assert headers['Content-Type'] == 'application/vnd.collection+json'
+        assert response.json == {
+            'collection': {
+                'version': '1.0',
+                'href': 'http://localhost/api/endpoint/1',
+                'error': {'message': 'Unauthorized'}
+            }
+        }
+        assert Collection.from_json(response.body).version == '1.0'
+
+    # Hidden Item
+    with freeze_time('2020-02-02 20:20'):
+        response = client.get('/api/endpoint/3', status=404)
+        headers = response.headers
+        assert headers['Content-Type'] == 'application/vnd.collection+json'
+        assert response.json == {
+            'collection': {
+                'version': '1.0',
+                'href': 'http://localhost/api/endpoint/3',
+                'error': {'message': 'Not Found'}
+            }
+        }
+        assert Collection.from_json(response.body).version == '1.0'
 
     # Rate Limit
     client.app.rate_limit = (2, 900)
@@ -139,3 +199,40 @@ def test_view_api(client):
                 }
             }
             assert Collection.from_json(response.body).version == '1.0'
+
+
+    # Authorize
+    headers = {"Authorization": f"Bearer {uuid}"}
+    response = client.get('/api/authenticate', headers=headers)
+    assert response.status_code == 200
+    resp = response.body.decode('utf-8')
+    assert resp.startswith('{"token":')
+
+    token = resp.split('"')[3]
+    headers = {"Authorization": f"Bearer {token}"}
+
+    # Edit Item
+    response = client.put(
+        '/api/endpoint/1',
+        params='title=Changed',
+        headers=headers
+    )
+    assert response.status_code == 200
+
+    # Edit Hidden Item
+    response = client.put(
+        '/api/endpoint/3',
+        params='title=Changed',
+        headers=headers,
+        status=404
+    )
+    headers = response.headers
+    assert headers['Content-Type'] == 'application/vnd.collection+json'
+    assert response.json == {
+        'collection': {
+            'version': '1.0',
+            'href': 'http://localhost/api/endpoint/3',
+            'error': {'message': 'Not Found'}
+        }
+    }
+    assert Collection.from_json(response.body).version == '1.0'
