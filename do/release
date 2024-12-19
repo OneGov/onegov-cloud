@@ -106,7 +106,7 @@ function configure-sentry() {
 }
 
 function current-version() {
-    git tag --sort=-version:refname --merged master | head -n 1
+    git tag --sort=version:refname --merged master | tail -n 1
 }
 
 function announce-release-on-sentry-io() {
