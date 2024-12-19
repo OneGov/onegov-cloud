@@ -388,6 +388,21 @@ def test_parse_checkbox():
     ]
     assert form.extras.default == ['Priority Seating', 'Early Boarding']
 
+    # handling of hyphens and dashes in label text
+    text = dedent("""
+        Choices =
+            [ ] Meal A - vegetarian
+            [x] Meal B – non-vegetarian
+    """)
+
+    form = parse_form(text)()
+
+    assert len(form._fields) == 1
+    assert form.choices.choices == [
+        ('Meal A - vegetarian', 'Meal A - vegetarian'),
+        ('Meal B – non-vegetarian', 'Meal B – non-vegetarian'),
+    ]
+
 
 def test_parse_radio_with_pricing():
 

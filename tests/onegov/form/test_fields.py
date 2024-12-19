@@ -353,6 +353,22 @@ def test_upload_multiple_field():
     assert dictionary_to_binary(field.data[0]) == b'baz'
 
 
+def test_multi_checkbox_field():
+    form = Form()
+    field = MultiCheckboxField(
+        choices=(
+            ('First - Second', 'First - Second'),  # hyphen
+            ('Pre – Post', 'Pre – Post'),  # dash
+        ),
+    )
+    field = field.bind(form, 'choice')
+
+    field.data = ''
+    assert field.validate(form)
+    assert 'First - Second' in field()
+    assert 'Pre – Post' in field()
+
+
 def test_multi_checkbox_field_disabled():
     form = Form()
     field = MultiCheckboxField(
