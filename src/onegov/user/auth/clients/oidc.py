@@ -73,6 +73,9 @@ class OIDCClient:
 
     primary: bool = attrib()
 
+    # Required OAuth scope in addition to "openid"
+    scope: list[str] = attrib(factory=list)
+
     # Override/amend discovered metadata
     fixed_metadata: dict[str, Any] = attrib(factory=dict)
 
@@ -84,12 +87,13 @@ class OIDCClient:
         request: 'CoreRequest'
     ) -> OAuth2Session:
         """ Returns a requests session tied to a OAuth2 client """
+        assert isinstance(self.scope, list), 'Invalid scope, expected list'
         provider_cls = type(provider)
         redirect_url = request.class_link(
             provider_cls, {'name': provider.name}, name='redirect')
         return OAuth2Session(
             self.client_id,
-            scope=['openid'],
+            scope=['openid', *self.scope],
             redirect_uri=redirect_url,
         )
 
@@ -206,6 +210,7 @@ class OIDCConnections:
                 issuer=cfg['issuer'],
                 client_id=cfg['client_id'],
                 client_secret=cfg['client_secret'],
+                scope=cfg.get('scope', []),
                 attributes=OIDCAttributes.from_cfg(
                     cfg.get('attributes', {})
                 ),

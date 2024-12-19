@@ -46,6 +46,9 @@ def configure_provider(app, metadata=None, primary=False):
                 issuer: https://oidc.test/
                 client_id: test
                 client_secret: secret
+                scope:
+                  - profile
+                  - email
                 button_text: Login with OIDC
                 fixed_metadata: {json.dumps(metadata or {})}
             roles:
@@ -72,6 +75,7 @@ def test_oidc_configuration(app):
     assert client.attributes.last_name == 'family_name'
     assert client.attributes.preferred_username == 'preferred_username'
     assert client.primary is False
+    assert client.scope == ['profile', 'email']
 
     assert provider.roles.app_specific(app) == {
         'admins': 'ads', 'editors': 'eds', 'members': 'mems'
@@ -93,6 +97,7 @@ def test_oidc_configuration_primary(app):
     assert client.attributes.last_name == 'family_name'
     assert client.attributes.preferred_username == 'preferred_username'
     assert client.primary is True
+    assert client.scope == ['profile', 'email']
 
     assert provider.roles.app_specific(app) == {
         'admins': 'ads', 'editors': 'eds', 'members': 'mems'
@@ -181,7 +186,7 @@ def test_oicd_authenticate_request(app):
     location = response.headers['Location']
     assert location.startswith('https://oidc.test/authorize')
     assert 'state=oauth_state' in location
-    assert 'scope=openid' in location
+    assert 'scope=openid+profile+email' in location
     assert browser_session['login_to'] == '/'
 
 
