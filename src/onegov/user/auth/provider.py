@@ -1395,7 +1395,7 @@ class OIDCProvider(
                       f'{app.application_id}: {error}')
             return Failure(_('Authorisation failed due to an error'))
 
-        session = client.session(self, request)
+        session = client.session(self, request, with_openid_scope=True)
         auth_url, _state = session.authorization_url(
             metadata['authorization_endpoint'],
             request.new_url_safe_token(
@@ -1490,14 +1490,14 @@ class OIDCProvider(
         username = payload.get(client.attributes.username, None)
         first_name = payload.get(client.attributes.first_name, None)
         last_name = payload.get(client.attributes.last_name, None)
-        group = payload.get(client.attributes.group, None)
+        groups = payload.get(client.attributes.group, None)
         if first_name and last_name:
             realname = f'{first_name} {last_name}'
         else:
             realname = payload.get(client.attributes.preferred_username, None)
 
         # try to retrieve any missing claims from the userinfo endpoint
-        if not (source_id and username and group and realname) and (
+        if not (source_id and username and groups and realname) and (
             user_url := metadata.get('userinfo_endpoint')
         ):
             try:
@@ -1513,7 +1513,7 @@ class OIDCProvider(
                     client.attributes.first_name, None)
                 last_name = last_name or claims.get(
                     client.attributes.last_name, None)
-                group = group or claims.get(client.attributes.group, None)
+                groups = groups or claims.get(client.attributes.group, None)
 
                 if realname:
                     # already set
@@ -1535,16 +1535,16 @@ class OIDCProvider(
             log.info(f'No source_id found for {username}')
             return Failure(_('Authorisation failed due to an error'))
 
-        if not group:
-            log.info(f'No group found for {username}')
+        if not groups:
+            log.info(f'No groups found for {username}')
             return Failure(_("Can't login because your user has no group. "
                              "Contact your OpenID system administrator"))
 
-        role = self.roles.match(roles, [group])
+        role = self.roles.match(roles, groups)
 
         if not role:
             log.info(f'No authorized group for {username}, '
-                     f'having group: {group}')
+                     f'having groups: {", ".join(groups)}')
             return Failure(_('Authorisation failed due to an error'))
 
         user = ensure_user(
