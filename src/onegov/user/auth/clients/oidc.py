@@ -1,7 +1,7 @@
 import requests
 from attr import attrs, attrib
 from base64 import urlsafe_b64encode
-from jwt import PyJWKClient, decode_complete
+from jwt import PyJWKClient, decode_complete, get_algorithm_by_name
 from jwt.exceptions import InvalidIssuerError, InvalidSignatureError
 from oauthlib.oauth2.rfc6749.endpoints import AuthorizationEndpoint
 from oauthlib.oauth2.rfc6749.endpoints import MetadataEndpoint
@@ -84,7 +84,9 @@ class OIDCClient:
     def session(
         self,
         provider: 'OIDCProvider',
-        request: 'CoreRequest'
+        request: 'CoreRequest',
+        *,
+        with_openid_scope: bool = False,
     ) -> OAuth2Session:
         """ Returns a requests session tied to a OAuth2 client """
         assert isinstance(self.scope, list), 'Invalid scope, expected list'
@@ -93,7 +95,7 @@ class OIDCClient:
             provider_cls, {'name': provider.name}, name='redirect')
         return OAuth2Session(
             self.client_id,
-            scope=['openid', *self.scope],
+            scope=['openid', *self.scope] if with_openid_scope else self.scope,
             redirect_uri=redirect_url,
         )
 
@@ -180,7 +182,8 @@ class OIDCClient:
 
         if access_token:
             # validate the access_token using at_hash
-            digest = header['alg'].compute_hash_digest(access_token)
+            alg = get_algorithm_by_name(header['alg'])
+            digest = alg.compute_hash_digest(access_token.encode('utf-8'))
             at_hash = urlsafe_b64encode(digest[:len(digest) // 2])
             given_at_hash = payload.get('at_hash', '').encode('utf-8')
             if not compare_digest(at_hash, given_at_hash):
