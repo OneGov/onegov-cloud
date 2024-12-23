@@ -4,7 +4,6 @@ from elasticsearch_dsl.query import Match
 from elasticsearch_dsl.query import MatchPhrase
 from elasticsearch_dsl.query import MultiMatch
 from functools import cached_property
-from itertools import chain, repeat
 from sedate import utcnow
 from sqlalchemy import func
 from typing import TYPE_CHECKING, Any
@@ -271,35 +270,6 @@ class SearchPostgres(Pagination[_M]):
             reverse=True)
 
         return sorted_events + other
-
-    def _create_weighted_vector(
-        self,
-        model: Any,
-        language: str = 'simple'
-    ) -> Any:
-        # for now weight the first field with 'A', the rest with 'B'
-        weighted_vectors = [
-            func.setweight(
-                func.to_tsvector(
-                    language,
-                    getattr(model.fts_idx_data, field, '')),
-                weight
-            )
-            for field, weight in zip(
-                model.es_properties.keys(),
-                chain('A', repeat('B')))
-            if not field.startswith('es_')  # TODO: rename to fts_
-        ]
-
-        # combine all weighted vectors
-        if weighted_vectors:
-            combined_vector = weighted_vectors[0]
-            for vector in weighted_vectors[1:]:
-                combined_vector = combined_vector.op('||')(vector)
-        else:
-            combined_vector = func.to_tsvector(language, '')
-
-        return combined_vector
 
     def filter_user_level(self, model: Any, query: Any) -> Any:
         """ Filters search content according user level """

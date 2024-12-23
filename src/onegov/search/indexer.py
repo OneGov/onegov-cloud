@@ -7,9 +7,11 @@ from copy import deepcopy
 from elasticsearch.exceptions import NotFoundError
 from elasticsearch.helpers import streaming_bulk
 from langdetect.lang_detect_exception import LangDetectException
-from itertools import groupby
+from itertools import groupby, chain, repeat
 from operator import itemgetter
 from queue import Queue, Empty, Full
+
+from sqlalchemy import func
 from sqlalchemy.dialects.postgresql import JSONB
 from unidecode import unidecode
 
@@ -401,7 +403,8 @@ class PostgresIndexer(IndexerBase):
         :param session: Supply an active session
         :return: True if the indexing was successful, False otherwise
         """
-        content = []
+        combined_vector = None
+        params = []
 
         if not isinstance(tasks, list):
             tasks = [tasks]
@@ -419,8 +422,31 @@ class PostgresIndexer(IndexerBase):
                         data[k] = task['properties'][k]
                 _id = task['id']
 
-                content.append(
-                    {'language': language, 'data': data, '_id': _id})
+                # prefix all fields with '_' to avoid conflicts with
+                # reserved names in `bindparam` function below
+                params.append(
+                    {'language': language, 'data': data, '_id': _id, **{
+                        f'_{k}': v for k, v in data.items()
+                    }})
+
+                weighted_vector = [
+                    func.setweight(
+                        func.to_tsvector(
+                            sqlalchemy.bindparam('language',
+                                                 type_=sqlalchemy.String),
+                            sqlalchemy.bindparam(f'_{field}',
+                                                 type_=sqlalchemy.String)
+                        ),
+                        weight
+                    )
+                    for field, weight in zip(
+                        task['properties'].keys(),
+                        chain('A', repeat('B')))
+                    if not field.startswith('es_')  # TODO: rename to fts_
+                ]
+                combined_vector = weighted_vector[0]
+                for vector in weighted_vector[1:]:
+                    combined_vector = combined_vector.op('||')(vector)
 
             schema = tasks[0]['schema']
             tablename = tasks[0]['tablename']
@@ -433,17 +459,12 @@ class PostgresIndexer(IndexerBase):
                 sqlalchemy.column(self.TEXT_SEARCH_DATA_COLUMN_NAME),
                 schema=schema  # type: ignore
             )
-            tsvector_expr = sqlalchemy.text(
-                'to_tsvector(:language, :data)').bindparams(
-                sqlalchemy.bindparam('language', type_=sqlalchemy.String),
-                sqlalchemy.bindparam('data', type_=JSONB)
-            )
 
             stmt = (
                 sqlalchemy.update(table)
                 .where(id_col == sqlalchemy.bindparam('_id'))
                 .values({
-                    self.TEXT_SEARCH_COLUMN_NAME: tsvector_expr,
+                    self.TEXT_SEARCH_COLUMN_NAME: combined_vector,
                     self.TEXT_SEARCH_DATA_COLUMN_NAME:
                     sqlalchemy.bindparam('data', type_=JSONB)
                 })
@@ -452,11 +473,11 @@ class PostgresIndexer(IndexerBase):
             if session is None:
                 connection = self.engine.connect()
                 with connection.begin():
-                    connection.execute(stmt, content)
+                    connection.execute(stmt, params)
             else:
                 # use a savepoint instead
                 with session.begin_nested():
-                    session.execute(stmt, content)
+                    session.execute(stmt, params)
         except Exception as ex:
             index_log.error(f"Error '{ex}' indexing schema "
                             f'{tasks[0]["schema"]} table '
