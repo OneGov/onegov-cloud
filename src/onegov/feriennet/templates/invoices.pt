@@ -57,8 +57,8 @@
                         </a>
 
                     </div>
-                    <div id="details-${invoice.id}">
-                        <div class="invoice-items-list ${'hidden' if invoice.paid else ''}">
+                    <div id="details-${invoice.id}" class="${'hidden' if invoice.paid else ''}">
+                        <div class="invoice-items-list">
                             <ul>
                                 <tal:b repeat="item invoice.items">
                                     <li class="item-group" tal:condition="repeat.item.index == 0 or invoice.items[repeat.item.index - 1].group != item.group">
