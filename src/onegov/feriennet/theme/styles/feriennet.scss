@@ -823,6 +823,23 @@ ul.tags {
         }
     }
 
+    thead tr {
+        background: $gainsboro !important;
+    }
+
+    tr {
+        background: $white !important;
+        border-top: 1px solid $gainsboro;
+    }
+
+    .archived {
+        background: $white-smoke !important;
+
+        td {
+            color: $aluminum;
+        }
+    }
+
     .active {
         td {
             color: $jet;
