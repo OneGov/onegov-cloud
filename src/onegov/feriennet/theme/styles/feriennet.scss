@@ -1746,21 +1746,26 @@ $booking-left-margin: 1.6rem;
             }
         }
 
-        &.item-total.item-red {
+        &.amount-total {
+            font-weight: bold;
+            border-top: 0;
+        }
+
+        &.amount-total.item-red {
             .item-amount,
             .item-payment-status {
                 color: $red-dark;
             }
         }
 
-        &.item-total.item-green {
+        &.amount-total.item-green {
             .item-amount,
             .item-payment-status {
                 color: $green-dark;
             }
         }
 
-        &.item-total {
+        &.invoice-total {
             margin-top: 3rem;
             border-top: 1px solid $oil;
         }

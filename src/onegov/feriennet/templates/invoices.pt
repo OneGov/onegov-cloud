@@ -127,13 +127,15 @@
                                         </div>
                                     </li>
                                 </tal:b>
-                                <li class="item-total ${invoice.paid and 'item-green' or 'item-red'}">
+                                <li class="invoice-total">
                                 <strong>
                                     <span class="item-text" i18n:translate="">Total</span>
-                                    <span tal:condition="invoice.paid" class="item-payment-status" i18n:translate>paid</span>
-                                    <span tal:condition="not invoice.paid" class="item-payment-status" i18n:translate>amount unpaid</span>
                                     <span class="item-amount" tal:content="'{:.2f}'.format(invoice.total_amount)"></span>
                                 </strong>
+                                </li>
+                                <li class="amount-total ${invoice.paid and 'item-green' or 'item-red'}" tal:condition="not invoice.paid">
+                                    <span class="item-payment-status item-amount">${'{:.2f}'.format(invoice.outstanding_amount)}</span>
+                                    <span class="item-payment-status item-amount" i18n:translate>amount unpaid</span>
                                 </li>
                             </ul>
                             <div class="print-area">
