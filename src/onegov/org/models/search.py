@@ -5,7 +5,7 @@ from elasticsearch_dsl.query import MatchPhrase
 from elasticsearch_dsl.query import MultiMatch
 from functools import cached_property
 from sedate import utcnow
-from sqlalchemy import func
+from sqlalchemy import func, Numeric, cast, DateTime
 from typing import TYPE_CHECKING, Any
 
 from onegov.core.collection import Pagination, _M
@@ -298,9 +298,24 @@ class SearchPostgres(Pagination[_M]):
                                              func.unaccent(self.query))
 
         for model in self.search_models:
-            query = self.request.session.query(
-                model,
-                func.ts_rank_cd(model.fts_idx, ts_query, 0).label('rank'))
+            # rank results after its text search relevance multiplied by a
+            # time decay function based on the last change to prioritize
+            # more recent documents
+            decay_rank = (
+                func.ts_rank_cd(model.fts_idx, ts_query, 0) *
+                    cast(func.pow(0.9,
+                        func.extract('epoch',
+                            func.now() - func.coalesce(
+                                cast(
+                                    model.fts_idx_data[
+                                        'es_last_change'].astext,
+                                    DateTime),
+                                func.now())
+                        ) / 86400),
+                        Numeric)
+            ).label('rank')
+
+            query = self.request.session.query(model, decay_rank)
             doc_count += query.count()
             query = self.filter_user_level(model, query)
             query = query.filter(model.fts_idx.op('@@')(ts_query))

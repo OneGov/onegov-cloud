@@ -10,7 +10,6 @@ from langdetect.lang_detect_exception import LangDetectException
 from itertools import groupby, chain, repeat
 from operator import itemgetter
 from queue import Queue, Empty, Full
-
 from sqlalchemy import func
 from sqlalchemy.dialects.postgresql import JSONB
 from unidecode import unidecode
@@ -417,7 +416,8 @@ class PostgresIndexer(IndexerBase):
                     k: unidecode(str(v))
                     for k, v in task['properties'].items()
                     if not k.startswith('es_')}
-                for k in ('es_public', 'es_tags'):
+                # the search makes use of 'es_public' and 'es_tags' fields
+                for k in ('es_public', 'es_tags', 'es_last_change'):
                     if k in task['properties']:
                         data[k] = task['properties'][k]
                 _id = task['id']
@@ -441,9 +441,10 @@ class PostgresIndexer(IndexerBase):
                     )
                     for field, weight in zip(
                         task['properties'].keys(),
-                        chain('A', repeat('B')))
+                        chain('A', repeat('D')))
                     if not field.startswith('es_')  # TODO: rename to fts_
                 ]
+
                 combined_vector = weighted_vector[0]
                 for vector in weighted_vector[1:]:
                     combined_vector = combined_vector.op('||')(vector)
