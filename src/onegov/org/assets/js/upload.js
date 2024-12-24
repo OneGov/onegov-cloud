@@ -32,16 +32,15 @@ var Upload = function(element) {
     var filelist = $(element.find('.upload-filelist'));
     var filelist_header = $(element.find('.upload-filelist-header'));
 
-    var upload = function(file) {
+    var upload_queue = [];
+    var pending_upload = false;
+
+    var upload = function(file, bar) {
         var xhr = new XMLHttpRequest();
         xhr.open('POST', url, true);
 
         var data = new FormData();
         data.append('file', file);
-
-        var bar = $('<div class="progress"><span class="meter" style="width: 0%"></span></div>')
-            .attr('data-filename', file.name)
-            .prependTo(progress);
 
         xhr.upload.addEventListener('progress', function(e) {
             bar.find('.meter').css('width', (e.loaded / e.total * 100 || 100) + '%');
@@ -51,6 +50,8 @@ var Upload = function(element) {
             if (xhr.readyState !== 4) {
                 return;
             }
+
+            pending_upload = false;
 
             if (xhr.status === 200) {
                 bar.remove();
@@ -63,9 +64,28 @@ var Upload = function(element) {
                 bar.find('.meter').css('width', '100%');
                 bar.addClass('alert').attr('data-error', xhr.statusText);
             }
+
+            // eslint-disable-next-line no-use-before-define
+            process_upload_queue();
         });
 
         xhr.send(data);
+    };
+
+    var process_upload_queue = function() {
+        if (pending_upload || upload_queue.length === 0) {
+            return;
+        }
+
+        var data = upload_queue.shift();
+        upload(data.file, data.bar);
+    };
+
+    var queue_upload = function(file) {
+        var bar = $('<div class="progress"><span class="meter" style="width: 0%"></span></div>')
+            .attr('data-filename', file.name)
+            .prependTo(progress);
+        upload_queue.push({file: file, bar: bar});
     };
 
     dropzone.on('dragenter', function() {
@@ -84,19 +104,19 @@ var Upload = function(element) {
         var files = e.originalEvent.dataTransfer.files;
 
         for (var i = 0; i < files.length; i++) {
-            upload(files[i]);
+            queue_upload(files[i]);
         }
-
+        process_upload_queue();
         return false;
     });
 
     drop_button.on('change', function() {
-        console.log('change');
         var files = this.files;
 
         for (var i = 0; i < files.length; i++) {
-            upload(files[i]);
+            queue_upload(files[i]);
         }
+        process_upload_queue();
     });
 };
 

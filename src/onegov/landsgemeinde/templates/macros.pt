@@ -244,7 +244,6 @@
 </metal:search_result_files>
 
 <metal:footer_contact define-macro="footer_contact" i18n:domain="onegov.landsgemeinde">
-    <h5 tal:condition="contact or contact_url">Auskunft</h5>
     <div tal:content="layout.org.contact_html" />
     <a tal:condition="contact_url" tal:attributes="href contact_url"><strong><tal:b i18n:translate>more</tal:b>…</strong></a>
 </metal:footer_contact>

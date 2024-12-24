@@ -474,7 +474,7 @@ class StripeConnect(PaymentProvider[StripePayment]):
 
     def sync_payouts(self, session: 'Session') -> None:
         """
-        see https://stripe.com/docs/api/balance_transactions/list
+        See https://stripe.com/docs/api/balance_transactions/list
         and https://stripe.com/docs/api/payouts
         """
 
