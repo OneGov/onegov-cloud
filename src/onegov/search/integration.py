@@ -1,3 +1,4 @@
+
 import certifi
 import morepath
 import ssl
@@ -9,27 +10,28 @@ from elasticsearch import Transport
 from elasticsearch import TransportError
 from elasticsearch.connection import create_ssl_context
 from more.transaction.main import transaction_tween_factory
+from sqlalchemy import inspect
 
-from onegov.search import Search, log, index_log
+from onegov.search import Search, log, index_log, Searchable
 from onegov.search.errors import SearchOfflineError
 from onegov.search.indexer import Indexer, PostgresIndexer
 from onegov.search.indexer import ORMEventTranslator
 from onegov.search.indexer import TypeMappingRegistry
-from onegov.search.utils import searchable_sqlalchemy_models
+from onegov.search.utils import (searchable_sqlalchemy_models,
+                                 filter_for_base_models)
 from sortedcontainers import SortedSet
 from sedate import utcnow
-from sqlalchemy import inspect
 from sqlalchemy.orm import undefer
 from urllib3.exceptions import HTTPError
 
 
 from typing import Any, Literal, TYPE_CHECKING
+
 if TYPE_CHECKING:
     from collections.abc import Callable, Iterable
     from datetime import datetime
     from onegov.core.orm import Base, SessionManager
     from onegov.core.request import CoreRequest
-    from onegov.search.mixins import Searchable
     from sqlalchemy.orm import Session
     from webob import Response
 
@@ -109,9 +111,8 @@ def is_5xx_error(error: TransportError) -> bool:
     return False
 
 
-# TODO rename to SearchApp
-class ElasticsearchApp(morepath.App):
-    """ Provides elasticsearch integration for
+class SearchApp(morepath.App):
+    """ Provides elasticsearch and postgres integration for
     :class:`onegov.core.framework.Framework` based applications.
 
     The application must be connected to a database.
@@ -179,6 +180,8 @@ class ElasticsearchApp(morepath.App):
                 - fr
         """
 
+        # TODO: set default to False once fully switched to psql (or remove
+        # es stuff entirely)
         if not cfg.get('enable_elasticsearch', True):
             self.es_client = None
             return
@@ -413,14 +416,7 @@ class ElasticsearchApp(morepath.App):
         """
         return request.is_logged_in
 
-    def get_searchable_models(self) -> list[type['Searchable']]:
-        return [
-            model
-            for base in self.session_manager.bases
-            for model in searchable_sqlalchemy_models(base)
-        ]
-
-    def es_perform_reindex(self, fail: bool = False) -> None:
+    def perform_reindex(self, fail: bool = False) -> None:
         """ Re-indexes all content.
 
         This is a heavy operation and should be run with consideration.
@@ -428,8 +424,6 @@ class ElasticsearchApp(morepath.App):
         By default, all exceptions during reindex are silently ignored.
 
         """
-        # prevent tables get re-indexed twice
-        index_done = []
         schema = self.schema
         index_log.info(f'Indexing schema {schema}..')
 
@@ -449,35 +443,34 @@ class ElasticsearchApp(morepath.App):
 
         def reindex_model(model: type['Base']) -> None:
             """ Load all database objects and index them. """
-            if model.__name__ in index_done:
-                return
-
-            index_done.append(model.__name__)
-
             session = self.session()
             try:
                 q = session.query(model).options(undefer('*'))
                 i = inspect(model)
 
                 if i.polymorphic_on is not None:
-                    q = q.filter(i.polymorphic_on == i.polymorphic_identity)
+                    q = q.filter(i.polymorphic_on.in_({
+                        m.polymorphic_identity for m in i.self_and_descendants
+                        if issubclass(m.class_, Searchable)}))
 
                 for obj in q:
                     self.es_orm_events.index(schema, obj)
 
             except Exception as e:
-                print(f"Error psql indexing model '{model}': {e}")
+                print(f"Error psql indexing model '{model.__name__}': {e}")
             finally:
                 session.invalidate()
                 session.bind.dispose()
 
-        models = self.get_searchable_models()
-        index_log.info(f'Number of models to be indexed: {len(models)}')
+        models = {
+            model
+            for base in self.session_manager.bases
+            for model in searchable_sqlalchemy_models(base)
+        }
+        base_models = filter_for_base_models(models)
 
         with ThreadPoolExecutor() as executor:
-            results = executor.map(
-                reindex_model, (model for model in models)
-            )
+            results = executor.map(reindex_model, base_models)
             if fail:
                 print(tuple(results))
 
@@ -485,14 +478,14 @@ class ElasticsearchApp(morepath.App):
         self.psql_indexer.bulk_process()
 
 
-@ElasticsearchApp.tween_factory(over=transaction_tween_factory)
+@SearchApp.tween_factory(over=transaction_tween_factory)
 def process_indexer_tween_factory(
-    app: ElasticsearchApp,
+    app: SearchApp,
     handler: 'Callable[[CoreRequest], Response]'
 ) -> 'Callable[[CoreRequest], Response]':
     def process_indexer_tween(request: 'CoreRequest') -> 'Response':
 
-        app: ElasticsearchApp = request.app  # type:ignore[assignment]
+        app: SearchApp = request.app  # type:ignore[assignment]
 
         if not app.es_client:
             return handler(request)
