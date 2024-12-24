@@ -270,8 +270,8 @@ def test_search_publication_files(client_with_es):
     path = module_path('tests.onegov.org', 'fixtures/sample.pdf')
     with (open(path, 'rb') as f):
         page = client.get('/files')
-        page.form['file'] = Upload(
-            'Sample.pdf', f.read(), 'application/pdf')
+        page.form['file'] = [Upload(
+            'Sample.pdf', f.read(), 'application/pdf')]
         page.form.submit()
 
     client.app.es_indexer.process()
