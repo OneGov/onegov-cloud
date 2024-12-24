@@ -1,4 +1,10 @@
-$max-line-width: 40rem;
+$max-line-width: 45rem;
+
+
+.limit-line-width {
+    max-width: $max-line-width;
+}
+
 
 /*
     css animations keyframes
