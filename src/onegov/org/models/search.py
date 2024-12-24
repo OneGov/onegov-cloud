@@ -298,30 +298,22 @@ class SearchPostgres(Pagination[_M]):
                                              func.unaccent(self.query))
 
         for model in self.search_models:
-            query = self.request.session.query(model)
+            query = self.request.session.query(
+                model,
+                func.ts_rank_cd(model.fts_idx, ts_query, 0).label('rank'))
             doc_count += query.count()
             query = self.filter_user_level(model, query)
+            query = query.filter(model.fts_idx.op('@@')(ts_query))
 
             if self.request.session.query(query.exists()).scalar():
-                weighted = (
-                    self._create_weighted_vector(model, language))
-                rank_expression = func.coalesce(
-                    func.ts_rank(
-                        weighted,
-                        ts_query,
-                        0  # normalization, ignore document length
-                    ), 0).label('rank')
-                query = (query.filter(model.fts_idx.op('@@')(ts_query))
-                         .add_columns(rank_expression))
                 results.extend(query)
 
-        # sort by rank
-        results.sort(key=lambda x: x[1], reverse=True)
+        results.sort(key=lambda x: x.rank, reverse=True)
 
         self.number_of_docs = doc_count
         self.number_of_results = len(results)
 
-        # return results without rank column
+        # only return the model instances
         return [r[0] for r in results]
 
     def hashtag_search(self) -> list['Searchable']:
