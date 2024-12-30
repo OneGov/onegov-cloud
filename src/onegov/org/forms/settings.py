@@ -777,6 +777,34 @@ class AnalyticsSettingsForm(Form):
         description=_('JavaScript for web statistics support'),
         render_kw={'rows': 10, 'data-editor': 'html'})
 
+    # Points the user to the analytics url e.g. matomo or plausible
+    analytics_url = StringField(
+        label=_('Analytics URL'),
+        description=_('URL pointing to the analytics page'),
+        render_kw={'readonly': True},
+        validators=[UrlRequired(), Optional()],
+    )
+
+    def derive_analytics_url(self) -> str:
+        analytics_code = self.analytics_code.data or ''
+
+        if 'analytics.seantis.ch' in analytics_code:
+            data_domain = analytics_code.split(
+                'data-domain="', 1)[1].split('"', 1)[0]
+            return f'https://analytics.seantis.ch/{data_domain}'
+        elif 'matomo' in analytics_code:
+            return 'https://stats.seantis.ch'
+        else:
+            return ''
+
+    def populate_obj(self, model: 'Organisation') -> None:  # type:ignore
+        super().populate_obj(model)
+
+    def process_obj(self, model: 'Organisation') -> None:  # type:ignore
+        super().process_obj(model)
+
+        self.analytics_url.data = self.derive_analytics_url()
+
 
 class HolidaySettingsForm(Form):
 
