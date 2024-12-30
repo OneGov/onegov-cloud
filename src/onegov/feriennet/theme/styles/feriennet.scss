@@ -902,6 +902,12 @@ $booking-left-margin: 1.6rem;
         box-shadow: 0 0 1px $shadow-color;
         margin-bottom: 2rem;
 
+        .no-wishlist {
+            div {
+                margin-left: 0 !important;
+            }
+        }
+
         .alert-box {
             margin-bottom: 0;
         }
@@ -939,8 +945,6 @@ $booking-left-margin: 1.6rem;
                 }
             }
         }
-
-
 
         h3 {
             font-weight: 500;

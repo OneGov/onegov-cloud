@@ -102,7 +102,7 @@
                                         </a>
                                     </div>
 
-                                    <div class="bookings-by-state state-${state} ${repeat.state.end and 'last-state' or ''}" tal:repeat="state grouped_bookings[attendee]" tal:condition="attendee in grouped_bookings">
+                                    <div class="bookings-by-state state-${state} ${repeat.state.end and 'last-state' or ''}  ${'' if period.wishlist_phase else 'no-wishlist'}" tal:repeat="state grouped_bookings[attendee]" tal:condition="attendee in grouped_bookings">
 
                                         <tal:b tal:define="toggled state in ('open', 'accepted')">
 
@@ -143,7 +143,7 @@
                                                         </tal:b>
                                                     </div>
                                                     <div class="booking">
-                                                        <div class="star">
+                                                        <div class="star" tal:condition="period.wishlist_phase">
                                                             <a ic-post-to="${request.link(booking, 'toggle-star')}">
                                                                 <tal:b metal:use-macro="layout.macros['star']" />
                                                             </a>
