@@ -229,9 +229,11 @@ There are two types of number fields. An integer and a float field::
     I'm an float field of a different range = -100.00..100.00
 
 Integer fields optionally can have a price attached to them which will be
-multiplied by the supplied integer.
+multiplied by the supplied integer::
 
     Number of stamps to include = 0..30 (0.85 CHF)
+
+This will result in a price of 0.85 CHF per stamp.
 
 Code
 ~~~~
@@ -259,6 +261,13 @@ do something like this::
 The files are checked against their file extension. Onegov.form also checks
 that uploaded files have the mimetype they claim to have and it won't accept
 obviously dangerous uploads like binaries (unless you really want to).
+
+These file inputs allow only for one file to be uploaded. If you want to
+allow multiple files to be uploaded, use the following syntax::
+
+    I'm a multiple file upload field = *.* (multiple)
+
+This will allow the user to upload multiple files at once.
 
 Standard Numbers
 ~~~~~~~~~~~~~~~~
