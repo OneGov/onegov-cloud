@@ -112,7 +112,7 @@ class UploadWidget(FileInput):
 
             {preview}
 
-            <ul>
+            <ul class="upload-options">
                 <li>
                     <input type="radio" id="{name}-0" name="{name}"
                            value="keep" checked="">
