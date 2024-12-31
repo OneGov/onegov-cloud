@@ -9,7 +9,7 @@ from lxml import etree
 from onegov.core.widgets import transform_structure
 from onegov.core.widgets import XML_LINE_OFFSET
 from onegov.form import Form
-from onegov.form.fields import ChosenSelectField
+from onegov.form.fields import ChosenSelectField, URLPanelField
 from onegov.form.fields import ColorField
 from onegov.form.fields import CssField
 from onegov.form.fields import MarkupField
@@ -778,11 +778,14 @@ class AnalyticsSettingsForm(Form):
         render_kw={'rows': 10, 'data-editor': 'html'})
 
     # Points the user to the analytics url e.g. matomo or plausible
-    analytics_url = StringField(
+    analytics_url = URLPanelField(
         label=_('Analytics URL'),
         description=_('URL pointing to the analytics page'),
         render_kw={'readonly': True},
         validators=[UrlRequired(), Optional()],
+        text='',
+        kind='panel',
+        hide_label=False
     )
 
     def derive_analytics_url(self) -> str:
@@ -802,8 +805,7 @@ class AnalyticsSettingsForm(Form):
 
     def process_obj(self, model: 'Organisation') -> None:  # type:ignore
         super().process_obj(model)
-
-        self.analytics_url.data = self.derive_analytics_url()
+        self.analytics_url.text = self.derive_analytics_url()
 
 
 class HolidaySettingsForm(Form):
