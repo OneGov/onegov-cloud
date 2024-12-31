@@ -10,6 +10,8 @@ from itertools import groupby
 from operator import itemgetter
 from queue import Queue, Empty, Full
 
+from sqlalchemy.orm.exc import ObjectDeletedError
+
 from onegov.core.utils import is_non_string_iterable
 from onegov.search import index_log, log, Searchable, utils
 from onegov.search.errors import SearchOfflineError
@@ -907,59 +909,65 @@ class ORMEventTranslator:
             log.error('The orm event translator queue is full!')
 
     def index(self, schema: str, obj: Searchable) -> None:
-        if obj.es_skip:
-            return
+        try:
+            if obj.es_skip:
+                return
 
-        if obj.es_language == 'auto':
-            language = self.detector.detect_object_language(obj)
-        else:
-            language = obj.es_language
-
-        translation: IndexTask = {
-            'action': 'index',
-            'id': getattr(obj, obj.es_id),
-            'id_key': obj.es_id,
-            'schema': schema,
-            'type_name': obj.es_type_name,  # FIXME: not needed for fts
-            'tablename': obj.__tablename__,  # type:ignore[attr-defined]
-            'language': language,
-            'properties': {}
-        }
-
-        mapping_ = self.mappings[obj.es_type_name].for_language(language)
-
-        for prop, mapping in mapping_.items():
-
-            if prop == 'es_suggestion':
-                continue
-
-            convert = self.converters.get(mapping['type'], lambda v: v)
-            raw = getattr(obj, prop)
-
-            if is_non_string_iterable(raw):
-                translation['properties'][prop] = [convert(v) for v in raw]
+            if obj.es_language == 'auto':
+                language = self.detector.detect_object_language(obj)
             else:
-                translation['properties'][prop] = convert(raw)
+                language = obj.es_language
 
-        if obj.es_public:
-            contexts = {'es_suggestion_context': ['public']}
-        else:
-            contexts = {'es_suggestion_context': ['private']}
-
-        suggestion = obj.es_suggestion
-
-        if is_non_string_iterable(suggestion):
-            translation['properties']['es_suggestion'] = {
-                'input': suggestion,
-                'contexts': contexts
-            }
-        else:
-            translation['properties']['es_suggestion'] = {
-                'input': [suggestion],
-                'contexts': contexts
+            translation: IndexTask = {
+                'action': 'index',
+                'id': getattr(obj, obj.es_id),
+                'id_key': obj.es_id,
+                'schema': schema,
+                'type_name': obj.es_type_name,  # FIXME: not needed for fts
+                'tablename': obj.__tablename__,  # type:ignore[attr-defined]
+                'language': language,
+                'properties': {}
             }
 
-        self.put(translation)
+            mapping_ = self.mappings[obj.es_type_name].for_language(language)
+
+            for prop, mapping in mapping_.items():
+
+                if prop == 'es_suggestion':
+                    continue
+
+                convert = self.converters.get(mapping['type'], lambda v: v)
+                raw = getattr(obj, prop)
+
+                if is_non_string_iterable(raw):
+                    translation['properties'][prop] = [convert(v) for v in raw]
+                else:
+                    translation['properties'][prop] = convert(raw)
+
+            if obj.es_public:
+                contexts = {'es_suggestion_context': ['public']}
+            else:
+                contexts = {'es_suggestion_context': ['private']}
+
+            suggestion = obj.es_suggestion
+
+            if is_non_string_iterable(suggestion):
+                translation['properties']['es_suggestion'] = {
+                    'input': suggestion,
+                    'contexts': contexts
+                }
+            else:
+                translation['properties']['es_suggestion'] = {
+                    'input': [suggestion],
+                    'contexts': contexts
+                }
+
+            self.put(translation)
+        except ObjectDeletedError as ex:
+            if hasattr(obj, 'id'):
+                log.error(f'Object {obj.id} was deleted before indexing: {ex}')
+            else:
+                log.error(f'Object {obj} was deleted before indexing: {ex}')
 
     def delete(self, schema: str, obj: Searchable) -> None:
 
