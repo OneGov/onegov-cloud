@@ -1,4 +1,6 @@
 import datetime
+
+from freezegun import freeze_time
 from sedate import utcnow
 
 from onegov.fsi.models.course_attendee import CourseAttendee
@@ -44,57 +46,67 @@ def test_attendee(
 
 
 def test_course_event(scenario):
+    # if current date is last or second last day of the year, then freeze to
+    # 28th of december
+    if utcnow().date().month == 12 and utcnow().date().day in (30, 31):
+        freeze_date = '2024-12-28'
+    else:
+        freeze_date = utcnow().date()
 
-    scenario.add_attendee()
-    scenario.add_course(name='Course')
-    scenario.add_course_event(scenario.latest_course, max_attendees=20)
-    delta = datetime.timedelta(days=366)
+    with freeze_time(freeze_date):
+        scenario.add_attendee()
+        scenario.add_course(name='Course')
+        scenario.add_course_event(scenario.latest_course, max_attendees=20)
+        delta = datetime.timedelta(days=366)
 
-    # Add a participant via a subscription
-    event = scenario.latest_event
-    scenario.add_subscription(event, None, dummy_desc='Placeholder')
-    scenario.add_subscription(event, scenario.latest_attendee)
+        # Add a participant via a subscription
+        event = scenario.latest_event
+        scenario.add_subscription(event, None, dummy_desc='Placeholder')
+        scenario.add_subscription(event, scenario.latest_attendee)
 
-    # Add inactive attendee
-    scenario.add_attendee(active=False)
-    scenario.add_subscription(event, scenario.latest_attendee)
+        # Add inactive attendee
+        scenario.add_attendee(active=False)
+        scenario.add_subscription(event, scenario.latest_attendee)
 
-    scenario.commit()
-    scenario.refresh()
+        scenario.commit()
+        scenario.refresh()
 
-    event = scenario.latest_event
-    assert event.subscriptions.count() == 3
-    assert event.attendees.count() == 2
-    assert event.available_seats == 20 - 3
-    assert event.possible_subscribers().first() is None
+        event = scenario.latest_event
+        assert event.subscriptions.count() == 3
+        assert event.attendees.count() == 2
+        assert event.available_seats == 20 - 3
+        assert event.possible_subscribers().first() is None
 
-    # Test possible and excluded subscribers
-    scenario.add_attendee(username='2@example.org')
-    attendee_2 = scenario.latest_attendee
+        # Test possible and excluded subscribers
+        scenario.add_attendee(username='2@example.org')
+        attendee_2 = scenario.latest_attendee
 
-    # event = scenario.latest_event
-    assert event.course
-    assert event.possible_subscribers(year=event.end.year).all() == [
-        attendee_2
-    ]
+        # event = scenario.latest_event
+        assert event.course
+        assert event.possible_subscribers(year=event.end.year).all() == [
+            attendee_2
+        ]
 
-    scenario.add_course_event(
-        scenario.latest_course,
-        start=event.start + delta, end=event.end + delta,
-        max_attendees=20
-    )
-    event2 = scenario.latest_event
+        scenario.add_course_event(
+            scenario.latest_course,
+            start=event.start + delta, end=event.end + delta,
+            max_attendees=20
+        )
+        event2 = scenario.latest_event
 
-    # Event for a year later, exclude the one who has a subscription to this
-    # course
-    assert event.possible_subscribers(year=event.end.year + 1).count() == 1
-    assert event2.possible_subscribers(year=event.end.year).count() == 1
-    assert event2.possible_subscribers(year=event.end.year + 1).count() == 2
-    assert event.possible_subscribers(external_only=True).count() == 0
-    assert event.excluded_subscribers().count() == 2
-    assert event2.possible_subscribers().first() == attendee_2
+        # Event for a year later, exclude the one who has a subscription to
+        # this course
+        assert event.possible_subscribers(
+            year=event.end.year + 1).count() == 1
+        assert event2.possible_subscribers(
+            year=event.end.year).count() == 1
+        assert event2.possible_subscribers(
+            year=event.end.year + 1).count() == 2
+        assert event.possible_subscribers(external_only=True).count() == 0
+        assert event.excluded_subscribers().count() == 2
+        assert event2.possible_subscribers().first() == attendee_2
 
-    assert scenario.latest_course.future_events.count() == 2
+        assert scenario.latest_course.future_events.count() == 2
 
 
 def test_subscription(session, attendee, course_event):

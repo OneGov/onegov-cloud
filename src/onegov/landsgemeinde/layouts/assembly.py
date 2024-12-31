@@ -19,7 +19,7 @@ class AssemblyCollectionLayout(DefaultLayout):
 
     @cached_property
     def title(self) -> str:
-        return _('Assemblies')
+        return _('Archive')
 
     @cached_property
     def og_description(self) -> str:
@@ -74,7 +74,7 @@ class AssemblyLayout(DefaultLayout):
         return [
             Link(_('Homepage'), self.homepage_url),
             Link(
-                _('Assemblies'),
+                _('Archive'),
                 self.request.link(self.assembly_collection())
             ),
             Link(self.title, self.request.link(self.model))
