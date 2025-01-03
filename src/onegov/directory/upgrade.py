@@ -67,3 +67,29 @@ def make_directory_models_polymorphic_type_non_nullable(
             """)
 
             context.operations.alter_column(table, 'type', nullable=False)
+
+@upgrade_task('Directory entries add notification_sent column 1')
+def add_notification_sent_column(context: UpgradeContext) -> None:
+    if not context.has_column('directory_entries', 'notification_sent'):
+        context.operations.add_column(
+            'directory_entries',
+            Column(
+                'notification_sent',
+                Boolean,
+                nullable=True,
+                default=False
+            )
+        )
+
+    # update existing entries to have notification_sent=False
+    context.operations.execute(f"""
+        UPDATE directory_entries SET notification_sent = FALSE
+        WHERE notification_sent IS NULL;
+    """)
+    context.session.flush()
+
+    # alter notification_sent non-nullable
+    context.operations.alter_column(
+        'directory_entries', 'notification_sent', nullable=False)
+
+    # TODO requires migration for past entries in cli command

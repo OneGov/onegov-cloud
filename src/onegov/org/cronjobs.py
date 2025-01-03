@@ -8,6 +8,7 @@ from onegov.core.cache import lru_cache
 from onegov.core.orm import find_models
 from onegov.core.orm.mixins.publication import UTCPublicationMixin
 from onegov.core.templates import render_template
+from onegov.directory import DirectoryCollection
 from onegov.event import Occurrence, Event
 from onegov.file import FileCollection
 from onegov.form import FormSubmission, parse_form
@@ -17,10 +18,14 @@ from onegov.org import _, OrgApp
 from onegov.org.layout import DefaultMailLayout
 from onegov.org.models import (
     ResourceRecipient, ResourceRecipientCollection, TANAccess, News)
+from onegov.org.models.directory import ExtendedDirectoryEntryCollection, \
+    ExtendedDirectory
 from onegov.org.models.extensions import (
     GeneralFileLinkExtension, DeletableContentExtension)
 from onegov.org.models.ticket import ReservationHandler
 from onegov.org.views.allocation import handle_rules_cronjob
+from onegov.org.views.directory import \
+    send_email_notification_for_directory_entry
 from onegov.org.views.newsletter import send_newsletter
 from onegov.org.views.ticket import delete_tickets_and_related_data
 from onegov.reservation import Reservation, Resource, ResourceCollection
@@ -69,6 +74,7 @@ def hourly_maintenance_tasks(request: 'OrgRequest') -> None:
     publish_files(request)
     reindex_published_models(request)
     send_scheduled_newsletter(request)
+    send_email_notification_for_recent_directory_entry_publications(request)
     delete_old_tans(request)
     delete_old_tan_accesses(request)
 
@@ -82,6 +88,34 @@ def send_scheduled_newsletter(request: 'OrgRequest') -> None:
     for newsletter in newsletters:
         send_newsletter(request, newsletter, newsletter.open_recipients)
         newsletter.scheduled = None
+
+
+def send_email_notification_for_recent_directory_entry_publications(
+    request: 'OrgRequest'
+) -> None:
+    """
+    Sends notifications to users about recently published `DirectoryEntry`.
+
+    """
+
+    now = utcnow()
+
+    for directory in DirectoryCollection(request.session).query().filter(
+            ExtendedDirectory.enable_update_notifications == True):
+
+        directory_entries = ExtendedDirectoryEntryCollection(
+            directory).query().filter(
+                and_(
+                    now >= ExtendedDirectoryEntry.publication_start,  # test for published?
+                    ExtendedDirectoryEntry.notification_sent == None,
+                )
+        )
+        for entry in directory_entries:
+            assert entry.published
+
+            send_email_notification_for_directory_entry(
+                directory, entry, request)
+            entry.notification_sent = now
 
 
 def publish_files(request: 'OrgRequest') -> None:
