@@ -10,6 +10,7 @@ from onegov.core.utils import Bunch
 from onegov.directory import (DirectoryEntryCollection,
                               DirectoryConfiguration,
                               DirectoryCollection)
+from onegov.directory.collections.directory import EntryRecipientCollection
 from onegov.event import EventCollection, OccurrenceCollection
 from onegov.event.utils import as_rdates
 from onegov.form import FormSubmissionCollection
@@ -1068,7 +1069,6 @@ def test_delete_content_marked_deletable__directory_entries(org_app, handlers):
         grundeigentumer_in='Berta Bertinio',
         publication_start=datetime(2024, 4, 1, tzinfo=tz),
         publication_end=datetime(2024, 4, 10, tzinfo=tz),
-        # delete_when_expired=True,
     ))
     event.delete_when_expired = True
 
@@ -1283,3 +1283,106 @@ def test_delete_content_marked_deletable__events_occurrences(org_app,
         client.get(get_cronjob_url(job))
         assert count_events() == 0
         assert count_occurrences() == 0
+
+
+def test_send_email_notification_for_recent_directory_entry_publications(
+    org_app,
+    handlers
+):
+    register_echo_handler(handlers)
+    register_directory_handler(handlers)
+
+    client = Client(org_app)
+    job = get_cronjob_by_name(org_app, 'hourly_maintenance_tasks')
+    job.app = org_app
+    tz = ensure_timezone('Europe/Zurich')
+
+    assert len(os.listdir(client.app.maildir)) == 0
+
+    transaction.begin()
+
+    directories = DirectoryCollection(org_app.session(), type='extended')
+    planauflage = directories.add(
+        title='Öffentliche Planauflage',
+        structure="""
+            Gesuchsteller/in *= ___
+            Grundeigentümer/in *= ___
+        """,
+        configuration=DirectoryConfiguration(
+            title="[Gesuchsteller/in]",
+            order=('Gesuchsteller/in'),
+        ),
+        enable_update_notifications=True,
+    )
+
+    planauflage.add(values=dict(
+        gesuchsteller_in='Carmine Carminio',
+        grundeigentumer_in='Doris Dorinio',
+        publication_start=datetime(2025, 1, 6, 2, 0, tzinfo=tz),
+        publication_end=datetime(2025, 1, 30, 2, 0, tzinfo=tz),
+    ))
+
+    planauflage.add(values=dict(
+        gesuchsteller_in='Emil Emilio',
+        grundeigentumer_in='Franco Francinio',
+        publication_start=datetime(2025, 1, 8, 2, 0, tzinfo=tz),
+        publication_end=datetime(2025, 1, 31, 2, 0, tzinfo=tz),
+    ))
+
+    EntryRecipientCollection(org_app.session()).add(
+        directory_id=planauflage.id,
+        address='john@doe.ch',
+        confirmed=True
+    )
+
+    transaction.commit()
+    close_all_sessions()
+
+    def planauflagen():
+        return (DirectoryCollection(org_app.session(), type='extended')
+                .by_name('offentliche-planauflage'))
+
+    def count_recipients():
+        return (EntryRecipientCollection(org_app.session()).query()
+                .filter_by(directory_id=planauflagen().id)
+                .filter_by(confirmed=True).count())
+
+    assert count_recipients() == 1
+    john = EntryRecipientCollection(org_app.session()).query().first()
+
+    with freeze_time(datetime(2025, 1, 1, 4, 0, tzinfo=tz)):
+        client.get(get_cronjob_url(job))
+
+        entry_1 = planauflagen().entries[0]
+        entry_2 = planauflagen().entries[1]
+        assert entry_1.notification_sent is None
+        assert entry_2.notification_sent is None
+        assert len(os.listdir(client.app.maildir)) == 0
+
+    with freeze_time(datetime(2025, 1, 6, 4, 0, tzinfo=tz)):
+        client.get(get_cronjob_url(job))
+
+        entry_1 = planauflagen().entries[0]
+        entry_2 = planauflagen().entries[1]
+        assert entry_1.notification_sent
+        assert entry_2.notification_sent is None
+
+        assert len(os.listdir(client.app.maildir)) == 1
+        message = client.get_email(0)
+        assert message['To'] == john.address
+        assert planauflagen().title in message['Subject']
+        assert entry_1.name in message['TextBody']
+
+    with freeze_time(datetime(2025, 1, 8, 4, 0, tzinfo=tz)):
+        client.get(get_cronjob_url(job))
+
+        entry_1 = planauflagen().entries[0]
+        entry_2 = planauflagen().entries[1]
+        assert entry_1.notification_sent
+        assert entry_2.notification_sent
+
+        assert len(os.listdir(client.app.maildir)) == 2
+        message = client.get_email(1)
+        assert message['To'] == john.address
+        assert planauflagen().title in message['Subject']
+        assert entry_2.name in message['TextBody']
