@@ -277,6 +277,12 @@ class Canton(Principal):
             with (path / '{}.json'.format(canton)).open('r') as f:
                 entities[year] = {int(k): v for k, v in json.load(f).items()}
 
+        # NOTE: this section may depend on static data for principle.entities.
+        # See src/onegov/election_day/static/municipalities/<year>/*.json
+        if date.today().year not in entities:
+            print(f'Warning: No entities for year {date.today().year} found '
+                  f'for {canton}')
+
         # Test if all entities have districts (use none, if ambiguous)
         districts = {
             entity.get('district', None)
@@ -436,6 +442,12 @@ class Municipality(Principal):
                 year: {int(municipality): {'name': kwargs.get('name', '')}}
                 for year in range(2002, date.today().year + 1)
             }
+
+        # NOTE: this section may depend on static data for principle.entities.
+        # See src/onegov/election_day/static/municipalities/<year>/*.json
+        if date.today().year not in entities:
+            print(f'Warning: No entities for year {date.today().year} found '
+                  f'for {municipality}')
 
         super().__init__(
             id_=municipality,
