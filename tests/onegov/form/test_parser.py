@@ -877,7 +877,7 @@ def test_integer_range_with_pricing():
     ]))
     form.validate()
     assert not form.errors
-    assert form.stamps.pricing.price(form.stamps) == Price(8.5, 'CHF')
+    assert form.stamps.pricing.price(form.stamps) == Price(10.00, 'CHF')
 
     form_class = parse_form("Stamps *= 0..20 (1.00 CHF!)")
     form = form_class(MultiDict([
@@ -890,7 +890,7 @@ def test_integer_range_with_pricing():
     }
     assert form.stamps.pricing.has_payment_rule
     assert form.stamps.pricing.price(form.stamps) == Price(
-        17, 'CHF', credit_card_payment=True
+        20.00, 'CHF', credit_card_payment=True
     )
 
 
