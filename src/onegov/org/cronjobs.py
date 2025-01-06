@@ -105,14 +105,14 @@ def send_email_notification_for_recent_directory_entry_publications(
 
         directory_entries = ExtendedDirectoryEntryCollection(
             directory).query().filter(
-                and_(
-                    now >= ExtendedDirectoryEntry.publication_start,  # test for published?
-                    ExtendedDirectoryEntry.notification_sent == None,
-                )
-        )
+                now >= ExtendedDirectoryEntry.publication_start,
+                now < ExtendedDirectoryEntry.publication_end,
+                # ExtendedDirectoryEntry.published == True,
+                ExtendedDirectoryEntry.notification_sent == None,
+            )
+
         for entry in directory_entries:
             assert entry.published
-
             send_email_notification_for_directory_entry(
                 directory, entry, request)
             entry.notification_sent = now

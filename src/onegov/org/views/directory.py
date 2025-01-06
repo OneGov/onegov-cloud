@@ -575,9 +575,9 @@ def view_geojson(
 
 
 def send_email_notification_for_directory_entry(
-        directory,
-        entry,
-        request
+    directory: ExtendedDirectory,
+    entry: ExtendedDirectoryEntry,
+    request: 'OrgRequest'
 ) -> None:
     title = request.translate(_(
         '${org}: New Entry in "${directory}"',

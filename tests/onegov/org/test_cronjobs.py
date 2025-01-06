@@ -1314,14 +1314,12 @@ def test_send_email_notification_for_recent_directory_entry_publications(
         ),
         enable_update_notifications=True,
     )
-
     planauflage.add(values=dict(
         gesuchsteller_in='Carmine Carminio',
         grundeigentumer_in='Doris Dorinio',
         publication_start=datetime(2025, 1, 6, 2, 0, tzinfo=tz),
         publication_end=datetime(2025, 1, 30, 2, 0, tzinfo=tz),
     ))
-
     planauflage.add(values=dict(
         gesuchsteller_in='Emil Emilio',
         grundeigentumer_in='Franco Francinio',
@@ -1329,8 +1327,38 @@ def test_send_email_notification_for_recent_directory_entry_publications(
         publication_end=datetime(2025, 1, 31, 2, 0, tzinfo=tz),
     ))
 
+    sport_clubs = directories.add(
+        title='Sport Clubs',
+        structure="""
+            Name *= ___
+            Category *= ___
+        """,
+        configuration=DirectoryConfiguration(
+            title="[Name]",
+            order=('Name'),
+        ),
+        enable_update_notifications=False,
+    )
+    sport_clubs.add(values=dict(
+        name='Wanderfreunde',
+        category='Hiking',
+        publication_start=datetime(2025, 1, 1, 2, 0, tzinfo=tz),
+        publication_end=datetime(2025, 1, 22, 2, 0, tzinfo=tz),
+    ))
+    sport_clubs.add(values=dict(
+        name='Pokerfreunde',
+        category='Games',
+        publication_start=datetime(2025, 1, 1, 2, 0, tzinfo=tz),
+        publication_end=datetime(2025, 1, 2, 2, 0, tzinfo=tz),
+    ))
+
     EntryRecipientCollection(org_app.session()).add(
         directory_id=planauflage.id,
+        address='john@doe.ch',
+        confirmed=True
+    )
+    EntryRecipientCollection(org_app.session()).add(
+        directory_id=sport_clubs.id,
         address='john@doe.ch',
         confirmed=True
     )
@@ -1341,6 +1369,10 @@ def test_send_email_notification_for_recent_directory_entry_publications(
     def planauflagen():
         return (DirectoryCollection(org_app.session(), type='extended')
                 .by_name('offentliche-planauflage'))
+
+    def sport_clubs():
+        return (DirectoryCollection(org_app.session(), type='extended')
+                .by_name('sport-clubs'))
 
     def count_recipients():
         return (EntryRecipientCollection(org_app.session()).query()
@@ -1385,4 +1417,23 @@ def test_send_email_notification_for_recent_directory_entry_publications(
         message = client.get_email(1)
         assert message['To'] == john.address
         assert planauflagen().title in message['Subject']
+        assert entry_2.name in message['TextBody']
+
+    # enable notifications for sport clubs
+    sport_clubs().enable_update_notifications = True
+    transaction.commit()
+
+    with freeze_time(datetime(2025, 1, 3, 4, 0, tzinfo=tz)):
+        client.get(get_cronjob_url(job))
+
+        entry_1 = sport_clubs().entries[0]
+        entry_2 = sport_clubs().entries[1]
+        assert entry_1.notification_sent is None
+        assert entry_2.notification_sent
+
+        assert len(os.listdir(client.app.maildir)) == 3  # only for still
+        # published sports club entry
+        message = client.get_email(2)
+        assert message['To'] == john.address
+        assert sport_clubs().title in message['Subject']
         assert entry_2.name in message['TextBody']
