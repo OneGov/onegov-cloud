@@ -2,10 +2,13 @@
 upgraded on the server. See :class:`onegov.core.upgrade.upgrade_task`.
 
 """
+from sedate import utcnow
+from sqlalchemy import Column, Integer
+
 from onegov.core.orm.types import UTCDateTime
 from onegov.core.upgrade import upgrade_task, UpgradeContext
 from onegov.directory import Directory
-from sqlalchemy import Column, Integer
+from onegov.org.models import ExtendedDirectory
 
 
 @upgrade_task('Add entries count')
@@ -68,28 +71,25 @@ def make_directory_models_polymorphic_type_non_nullable(
 
             context.operations.alter_column(table, 'type', nullable=False)
 
-@upgrade_task('Directory entries add notification_sent column 1')
+
+@upgrade_task('Directory entries add notification_sent column')
 def add_notification_sent_column(context: UpgradeContext) -> None:
     if not context.has_column('directory_entries', 'notification_sent'):
         context.operations.add_column(
             'directory_entries',
             Column(
                 'notification_sent',
-                Boolean,
+                UTCDateTime,
                 nullable=True,
-                default=False
+                default=None
             )
         )
 
-    # update existing entries to have notification_sent=False
-    context.operations.execute(f"""
-        UPDATE directory_entries SET notification_sent = FALSE
-        WHERE notification_sent IS NULL;
-    """)
     context.session.flush()
 
-    # alter notification_sent non-nullable
-    context.operations.alter_column(
-        'directory_entries', 'notification_sent', nullable=False)
-
-    # TODO requires migration for past entries in cli command
+    for directory in context.session.query(ExtendedDirectory):
+        for entry in directory.entries:
+            if entry.publication_started:
+                # prevent sending notifications for exiting entries with
+                # publication start date in the past
+                entry.notification_sent = utcnow()
