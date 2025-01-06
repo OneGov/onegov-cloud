@@ -606,7 +606,6 @@ def send_email_notification_for_directory_entry(
                 },
             )
             plaintext = html_to_text(content)
-            print('*** tschupre sending notification to', recipient.address)
             yield request.app.prepare_email(
                 receivers=(recipient.address,),
                 subject=title,
