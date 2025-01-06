@@ -633,7 +633,7 @@ class LDAPKerberosProvider(
                 }
             }))
         )
-        if cfg.get('primary', False):
+        if cfg.get('primary'):
             provider.primary = True
         return provider
 
