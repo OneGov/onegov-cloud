@@ -681,7 +681,7 @@ $pageref-color-hover: $iron;
             }
 
             .list-link {
-                border-top: 1px solid #f5f5f5;
+                border-top: 1px solid $white-smoke;
                 display: inline-block;
                 font-weight: bold;
                 padding-top: .5rem;

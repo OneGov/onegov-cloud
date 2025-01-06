@@ -184,7 +184,7 @@
                                     <div class="cell small-12 medium-4" i18n:translate>
                                         Amount
                                     </div>
-                                    <div class="cell small-12 medium-8" i18n:translate>
+                                    <div class="cell small-12 medium-8">
                                         ${'{:.2f}'.format(invoice.outstanding_amount)} CHF
                                     </div>
                                     <tal:b switch="layout.org.meta.get('bank_reference_schema')">

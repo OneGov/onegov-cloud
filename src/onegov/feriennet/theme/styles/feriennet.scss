@@ -2259,7 +2259,27 @@ $booking-left-margin: 1.6rem;
     Notifications view
 */
 .notifications li {
-    margin-bottom: .5rem;
+    margin-bottom: 1rem;
+    padding-top: .5rem;
+    border-top: 1px solid $smoke;
+
+    .text-links {
+        display: flex;
+        margin-top: .5rem;
+
+        a {
+            padding-right: .3rem;
+
+            &:last-child {
+                margin-left: auto;
+
+                &::before {
+                    content: "";
+                    margin-right: .5rem;
+                }
+            }
+        }
+    }
 
     &::before {
         @include icon-bold('\f0e0');
@@ -2310,6 +2330,9 @@ $booking-left-margin: 1.6rem;
 /*
     Notification Mailing
 */
+.notifications-sidebar .filter-panel.side-panel {
+    padding-left: 0;
+}
 
 .notification-preview {
     background: $white-smoke;

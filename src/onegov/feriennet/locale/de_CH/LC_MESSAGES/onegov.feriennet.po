@@ -1,7 +1,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE 1.0\n"
-"POT-Creation-Date: 2024-12-10 15:43+0100\n"
+"POT-Creation-Date: 2025-01-06 10:50+0100\n"
 "PO-Revision-Date: 2021-11-11 09:08+0100\n"
 "Last-Translator: Marc Sommerhalder <marc.sommerhalder@seantis.ch>\n"
 "Language-Team: German\n"
@@ -1708,8 +1708,11 @@ msgstr "Abzüge / Zuschläge"
 msgid "Organizer:"
 msgstr "Veranstalter:"
 
-msgid "Unpaid"
-msgstr "Unbezahlt"
+msgid "amount unpaid"
+msgstr "offen"
+
+msgid "paid"
+msgstr "bezahlt"
 
 msgid "Total"
 msgstr "Total"
@@ -1960,12 +1963,6 @@ msgstr "Es wurden noch keine Rechnungen erstellt."
 
 msgid "Your donation"
 msgstr "Ihre Spende"
-
-msgid "paid"
-msgstr "bezahlt"
-
-msgid "amount unpaid"
-msgstr "offen"
 
 msgid "Adjust"
 msgstr "Anpassen"
@@ -2656,6 +2653,9 @@ msgstr ""
 "Das Benutzerkonto muss durch eine erziehungsberechtigte, volljährige Person "
 "eröffnet werden."
 
+msgid "Unpaid"
+msgstr "Unbezahlt"
+
 msgid "Add manual booking"
 msgstr "Manuelle Buchung hinzufügen"
 
@@ -2973,11 +2973,11 @@ msgstr "Möchten Sie ${attendee}s Buchung wirklich stornieren?"
 msgid "The matching was successfully reset"
 msgstr "Die Zuteilung wurde erfolgreich zurückgesetzt"
 
-msgid "Mailing"
-msgstr "Versand"
-
 msgid "Delete Notification Template"
 msgstr "Mitteilungs-Vorlage löschen"
+
+msgid "Use Template"
+msgstr "Vorlage verwenden"
 
 msgid "Successfully added a new notification template"
 msgstr "Die Mitteilungs-Vorlage wurde erfolgreich hinzugefügt"
@@ -2988,6 +2988,9 @@ msgstr "Es wurden keine Empfänger gefunden welche dieser Auswahl entsprechen"
 #, python-format
 msgid "Successfully sent the e-mail to ${count} recipients"
 msgstr "Das E-Mail wurde erfolgreich an ${count} Empfänger gesendet"
+
+msgid "Mailing"
+msgstr "Versand"
 
 msgid "Send E-Mail Now"
 msgstr "E-Mail jetzt versenden"

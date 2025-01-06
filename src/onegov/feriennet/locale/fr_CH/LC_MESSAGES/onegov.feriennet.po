@@ -2,7 +2,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE 1.0\n"
-"POT-Creation-Date: 2024-12-10 15:43+0100\n"
+"POT-Creation-Date: 2025-01-06 10:50+0100\n"
 "PO-Revision-Date: 2021-11-11 09:07+0100\n"
 "Last-Translator: Marc Sommerhalder <marc.sommerhalder@seantis.ch>\n"
 "Language-Team: French\n"
@@ -1716,8 +1716,11 @@ msgstr "Remises / Suppléments"
 msgid "Organizer:"
 msgstr "Organisateur:"
 
-msgid "Unpaid"
-msgstr "Non payé"
+msgid "amount unpaid"
+msgstr "non payé"
+
+msgid "paid"
+msgstr "payé"
 
 msgid "Total"
 msgstr "Total"
@@ -1972,12 +1975,6 @@ msgstr "Aucune facture n'a été créée pour le moment."
 
 msgid "Your donation"
 msgstr "Votre don"
-
-msgid "paid"
-msgstr "payé"
-
-msgid "amount unpaid"
-msgstr "non payé"
 
 msgid "Adjust"
 msgstr "Modifier"
@@ -2671,6 +2668,9 @@ msgstr ""
 "Le compte utilisateur·trice doit être ouvert par un parent ou une personne "
 "de référence majeure."
 
+msgid "Unpaid"
+msgstr "Non payé"
+
 msgid "Add manual booking"
 msgstr "Ajouter une remise ou un supplément"
 
@@ -2987,11 +2987,11 @@ msgstr "Voulez-vous vraiment annuler la réservation de ${attendee} ?"
 msgid "The matching was successfully reset"
 msgstr "L'attribution a été réinitialisée avec succès"
 
-msgid "Mailing"
-msgstr "Envoi"
-
 msgid "Delete Notification Template"
 msgstr "Supprimer le modèle de notification"
+
+msgid "Use Template"
+msgstr "Utiliser le modèle"
 
 msgid "Successfully added a new notification template"
 msgstr "Un nouveau modèle de notification a été enregistré"
@@ -3002,6 +3002,9 @@ msgstr "Aucun destinataire correspond à la sélection"
 #, python-format
 msgid "Successfully sent the e-mail to ${count} recipients"
 msgstr "L'e-mail a été envoyé à ${count} destinataires"
+
+msgid "Mailing"
+msgstr "Envoi"
 
 msgid "Send E-Mail Now"
 msgstr "Envoyer un e-mail maintenant"

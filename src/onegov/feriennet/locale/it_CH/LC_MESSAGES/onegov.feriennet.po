@@ -2,7 +2,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: \n"
-"POT-Creation-Date: 2024-12-10 15:43+0100\n"
+"POT-Creation-Date: 2025-01-06 10:50+0100\n"
 "PO-Revision-Date: 2021-11-11 09:07+0100\n"
 "Last-Translator: Marc Sommerhalder <marc.sommerhalder@seantis.ch>\n"
 "Language-Team: \n"
@@ -1708,8 +1708,11 @@ msgstr "Deduzioni / Supplementi"
 msgid "Organizer:"
 msgstr "Organizzatore:"
 
-msgid "Unpaid"
-msgstr "Non pagato"
+msgid "amount unpaid"
+msgstr "non pagato"
+
+msgid "paid"
+msgstr "pagato"
 
 msgid "Total"
 msgstr "Totale"
@@ -1959,12 +1962,6 @@ msgstr "Nessuna fattura è stata ancora emessa."
 
 msgid "Your donation"
 msgstr "La sua donazione"
-
-msgid "paid"
-msgstr "pagato"
-
-msgid "amount unpaid"
-msgstr "non pagato"
 
 msgid "Adjust"
 msgstr "Modificare"
@@ -2650,6 +2647,9 @@ msgstr ""
 "L'account utente deve essere aperto da una persona maggiorenne con autorità "
 "parentale."
 
+msgid "Unpaid"
+msgstr "Non pagato"
+
 msgid "Add manual booking"
 msgstr "Aggiungere prenotazione manuale"
 
@@ -2968,11 +2968,11 @@ msgstr "Vuole davvero cancellare la prenotazione di ${attendee}?"
 msgid "The matching was successfully reset"
 msgstr "L'assegnazione è stata resettata con successo"
 
-msgid "Mailing"
-msgstr "Spedizione"
-
 msgid "Delete Notification Template"
 msgstr "Cancellare l'esempio di messaggio"
+
+msgid "Use Template"
+msgstr "Usare il modello"
 
 msgid "Successfully added a new notification template"
 msgstr "Il modello di messaggio è stato aggiunto con successo"
@@ -2984,6 +2984,9 @@ msgstr ""
 #, python-format
 msgid "Successfully sent the e-mail to ${count} recipients"
 msgstr "L'email è stata inviata con successo a ${count} destinatario"
+
+msgid "Mailing"
+msgstr "Spedizione"
 
 msgid "Send E-Mail Now"
 msgstr "Inviare e-mail ora"
