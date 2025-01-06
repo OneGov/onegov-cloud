@@ -88,7 +88,10 @@ class ApiException(Exception):
     ):
         self.message = (
             exception.message
-            if exception and hasattr(exception, 'message') else message
+            if exception and hasattr(exception, 'message') else
+            exception.title
+            if exception and hasattr(exception, 'title') else
+            message
         )
         self.status_code = (
             exception.status_code

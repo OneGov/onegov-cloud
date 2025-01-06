@@ -34,8 +34,6 @@ form {
 
     label {
 
-        min-width: 75%;
-
         &.error, .upload-widget.error {
             color: $alert-color;
         }
@@ -150,6 +148,12 @@ form {
             background-color: $input-background-focus;
             border: $input-border-focus;
             box-shadow: $input-shadow-focus;
+        }
+    }
+
+    .upload-options {
+        div input {
+            margin-bottom: 0;
         }
     }
 

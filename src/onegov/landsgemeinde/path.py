@@ -27,7 +27,7 @@ def get_assemblies(app: LandsgemeindeApp) -> AssemblyCollection:
 
 @LandsgemeindeApp.path(
     model=Assembly,
-    path='/landsgemeinde/{date}',  # noqa: RUF027
+    path='/landsgemeinde/{date}',
     converters={'date': extended_date_converter}
 )
 def get_assembly(app: LandsgemeindeApp, date: 'date') -> Assembly | None:
@@ -36,7 +36,7 @@ def get_assembly(app: LandsgemeindeApp, date: 'date') -> Assembly | None:
 
 @LandsgemeindeApp.path(
     model=AgendaItemCollection,
-    path='/traktanden/{date}',  # noqa: RUF027
+    path='/traktanden/{date}',
     converters={'date': extended_date_converter}
 )
 def get_agenda_items(

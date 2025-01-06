@@ -1796,17 +1796,23 @@
 </metal:bullets>
 
 <metal:search_result_users define-macro="search_result_users" i18n:domain="onegov.town6">
-    <a href="${request.return_here(request.link(result))}">${result.title} <metal:hint use-macro="layout.macros['access_hint']" tal:define="item result" /></a>
-    <ul>
-        <li>${translate(result.role.capitalize())}</li>
-    </ul>
+    <a href="${request.return_here(request.link(result))}" class="list-link">
+        <h5 class="list-title">${result.title} <metal:hint use-macro="layout.macros['access_hint']" tal:define="item result" /></h5>
+    </a>
+    <p class="search-preview">
+        ${translate(result.role.capitalize())}
+    </p>
 </metal:search_result_users>
 
 
 <metal:search_result_files define-macro="search_result_files" i18n:domain="onegov.town6">
-    <a href="${request.return_here(request.link(result))}">${result.name} <metal:hint use-macro="layout.macros['access_hint']" tal:define="item result" /></a>
-    <ul>
-        <li>
+    <a class="list-link" href="${request.return_here(request.link(result))}">
+        <h5 class="list-title">
+            ${result.name} <metal:hint use-macro="layout.macros['access_hint']" tal:define="item result" />
+        </h5>
+    </a>
+    <a href="${request.return_here(request.link(result))}">
+        <p class="search-preview">
             <tal:b condition="result.signed">
                 <span i18n:translate>Has a digital seal</span>,
             </tal:b>
@@ -1819,36 +1825,49 @@
                     <tal:b i18n:name="count">${result.stats.get('pages', 0)}</tal:b> pages
                 </tal:b>
             </span>
-        </li>
-    </ul>
+        </p>
+    </a>
 </metal:search_result_files>
 
 
 <metal:search_result_tickets define-macro="search_result_tickets" i18n:domain="onegov.town6">
-    <a href="${request.link(result)}">${result.number} <i title="This site is private" i18n:attributes="title" class="private-hint"></i></a>
-    <ul>
-        <li>${translate(result.group)}</li>
-        <li tal:content="result.title"></li>
-        <li tal:content="result.subtitle"></li>
-    </ul>
+    <a class="list-link" href="${request.link(result)}">
+        <h5 class="list-title">
+            ${result.number}
+            <i title="This site is private" i18n:attributes="title" class="private-hint"></i>
+        </h5>
+    </a>
+    <a href="${request.link(result)}">
+        <p class="search-preview">
+            <tal:b>${translate(result.group)}</tal:b><br/>
+            <tal:b tal:content="result.title"></tal:b><br/>
+            <tal:b tal:content="result.subtitle"></tal:b>
+        </p>
+    </a>
 </metal:search_result_tickets>
 
 
 <metal:search_result_events define-macro="search_result_events" i18n:domain="onegov.town6">
-    <a href="${request.link(result, 'latest')}">${result.title} <metal:hint use-macro="layout.macros['access_hint']" tal:define="item result" /></a>
-    <ul tal:define="latest result.latest_occurrence">
-        <li tal:condition="latest">
+    <a class="list-link" href="${request.link(result, 'latest')}">
+        <h5 class="list-title">
+            ${result.title} <metal:hint use-macro="layout.macros['access_hint']" tal:define="item result" />
+        </h5>
+    </a>
+    <p tal:define="latest result.latest_occurrence" class="search-preview">
+        <tal:b tal:condition="latest">
             ${
             '{}, {} - {}'.format(
                 layout.format_date(latest.localized_start, 'event'),
                 layout.format_date(latest.localized_start, 'time'),
                 layout.format_date(latest.localized_end, 'time')
                 )
-            }
-        </li>
-        <li tal:condition="result.location">${result.location}</li>
-
-        <tal:b tal:condition="future_occ" tal:define="future_occ result.future_occurrences(offset=1).all()">
+            }<br/>
+        </tal:b>
+        <tal:b tal:condition="result.location">
+        ${result.location}</tal:b>
+    </p>
+    <tal:b tal:condition="future_occ" tal:define="future_occ result.future_occurrences(offset=1).all()">
+        <ul>
             <li><span i18n:translate="">Further occurrences:</span>
                 <div class="event-child-results">
                     <ul>
@@ -1867,8 +1886,8 @@
                         </tal:b>
                     </ul>
                 </div></li>
-        </tal:b>
-    </ul>
+        </ul>
+    </tal:b>
 </metal:search_result_events>
 
 
@@ -1876,8 +1895,8 @@
     <a href="${request.link(result)}" class="list-link">
         <h5 class="list-title">${result.title} <metal:hint use-macro="layout.macros['access_hint']" tal:define="item result" /></h5>
     </a>
-        <p class="list-lead preview" tal:condition="result.function|nothing">${result.function}</p>
-        <p class="list-lead preview" tal:condition="not:result.function|nothing" i18n:translate>People</p>
+        <p class="search-preview" tal:condition="result.function|nothing">${result.function}</p>
+        <p class="search-preview" tal:condition="not:result.function|nothing" i18n:translate>People</p>
 </metal:search_result_people>
 
 
@@ -1886,7 +1905,7 @@
         <span class="h5 list-title">${result.title} <metal:hint use-macro="layout.macros['access_hint']" tal:define="item result" /></span>
     </a>
     <a tal:condition="result.lead" href="${result.url}">
-        <p class="list-lead preview">
+        <p class="search-preview">
             ${result.lead[:160]}<tal:b condition="len(result.lead) > 160">…</tal:b>
         </p>
     </a>
@@ -1899,7 +1918,7 @@
         <h5 class="list-title">${result.title} <metal:hint use-macro="layout.macros['access_hint']" tal:define="item result" /></h5>
     </a>
     <a tal:condition="result.lead|None" href="${request.link(result)}">
-        <p class="list-lead preview">
+        <p class="search-preview">
             ${result.lead[:160]}<tal:b condition="len(result.lead) > 160">…</tal:b>
         </p>
     </a>

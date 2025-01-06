@@ -10,7 +10,7 @@ from io import BytesIO
 from onegov.core.utils import module_path
 from onegov.file.utils import IMAGE_MIME_TYPES, get_image_size
 from pathlib import Path
-from PIL import Image
+from PIL import Image, ImageOps
 from tempfile import TemporaryDirectory
 
 
@@ -93,6 +93,7 @@ class WithThumbnailFilter(FileFilter):
         output = BytesIO()
 
         thumbnail: Image.Image = Image.open(fp)
+        ImageOps.exif_transpose(thumbnail, in_place=True)
         thumbnail.thumbnail(self.size, Image.Resampling.LANCZOS)
         thumbnail = thumbnail.convert('RGBA')
 
