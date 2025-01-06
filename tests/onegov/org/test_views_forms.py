@@ -267,7 +267,7 @@ def test_add_custom_form_minimum_price_validation(client):
         E-Mail *= @@@
 
         Stamp A = 0..20 (1.10 CHF)
-        Stamp B = 0..20 (0.85 CHF)
+        Stamp B = 0..20 (1.00 CHF)
 
         Discount *=
             (x) First four B stamps free (-3.40 CHF)
