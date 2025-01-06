@@ -18,13 +18,13 @@ def test_views(client_with_es):
 
     client_with_es.login('admin@example.org', 'hunter2')
 
-    page = client_with_es.get('/').click('Landsgemeinden')
+    page = client_with_es.get('/').click('Archiv')
     assert 'Noch keine Landsgemeinden erfasst.' in page
     assert 'Zum Liveticker' not in page
 
     # add assembly
     with freeze_time('2023-05-07 9:30'):
-        page = page.click('Landsgemeinde', index=1)
+        page = page.click('Landsgemeinde')
         page.form['date'] = '2023-05-07'
         page.form['state'] = 'ongoing'
         page.form['overview'] = '<p>Lorem ipsum</p>'
@@ -167,7 +167,7 @@ def test_views(client_with_es):
     # delete agenda item
     with freeze_time('2023-05-07 9:37'):
         page.click('Löschen')
-        page = page.click('Landsgemeinde', index=2)
+        page = page.click('Landsgemeinde', index=1)
     assert '<p>Lorem ipsum dolor sit amet</p>' in page
     assert 'A. consectetur adipiscing' not in page
     assert_last_modified()
@@ -175,7 +175,7 @@ def test_views(client_with_es):
     # delete landsgemeinde
     with freeze_time('2023-05-07 9:38'):
         page.click('Löschen')
-        page = page.click('Landsgemeinden', index=0)
+        page = page.click('Archiv', index=0)
     assert 'Noch keine Landsgemeinden erfasst.' in page
 
 
@@ -189,8 +189,8 @@ def test_view_pages_cache(landsgemeinde_app):
 
     # add assembly
     client.login('admin@example.org', 'hunter2')
-    page = client.get('/').click('Landsgemeinden')
-    page = page.click('Landsgemeinde', index=1)
+    page = client.get('/').click('Archiv')
+    page = page.click('Landsgemeinde')
     page.form['date'] = '2023-05-07'
     page.form['state'] = 'completed'
     page.form['overview'] = 'Lorem'

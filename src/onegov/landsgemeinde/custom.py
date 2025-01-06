@@ -85,7 +85,7 @@ def get_top_navigation(
     yield (  # type:ignore[misc]
         Bunch(id=-1, access='public', published=True),
         Link(
-            text=_('Assemblies'),
+            text=_('Archive'),
             url=request.class_link(AssemblyCollection)
         ),
         ()

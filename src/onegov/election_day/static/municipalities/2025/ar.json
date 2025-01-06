@@ -1,0 +1,82 @@
+{
+    "3001": {
+        "district": "Hinterland",
+        "name": "Herisau"
+    },
+    "3002": {
+        "district": "Hinterland",
+        "name": "Hundwil"
+    },
+    "3003": {
+        "district": "Hinterland",
+        "name": "Sch\u00f6nengrund"
+    },
+    "3004": {
+        "district": "Hinterland",
+        "name": "Schwellbrunn"
+    },
+    "3005": {
+        "district": "Hinterland",
+        "name": "Stein (AR)"
+    },
+    "3006": {
+        "district": "Hinterland",
+        "name": "Urn\u00e4sch"
+    },
+    "3007": {
+        "district": "Hinterland",
+        "name": "Waldstatt"
+    },
+    "3021": {
+        "district": "Mittelland",
+        "name": "B\u00fchler"
+    },
+    "3022": {
+        "district": "Mittelland",
+        "name": "Gais"
+    },
+    "3023": {
+        "district": "Mittelland",
+        "name": "Speicher"
+    },
+    "3024": {
+        "district": "Mittelland",
+        "name": "Teufen (AR)"
+    },
+    "3025": {
+        "district": "Mittelland",
+        "name": "Trogen"
+    },
+    "3031": {
+        "district": "Vorderland",
+        "name": "Grub (AR)"
+    },
+    "3032": {
+        "district": "Vorderland",
+        "name": "Heiden"
+    },
+    "3033": {
+        "district": "Vorderland",
+        "name": "Lutzenberg"
+    },
+    "3034": {
+        "district": "Vorderland",
+        "name": "Rehetobel"
+    },
+    "3035": {
+        "district": "Vorderland",
+        "name": "Reute (AR)"
+    },
+    "3036": {
+        "district": "Vorderland",
+        "name": "Wald (AR)"
+    },
+    "3037": {
+        "district": "Vorderland",
+        "name": "Walzenhausen"
+    },
+    "3038": {
+        "district": "Vorderland",
+        "name": "Wolfhalden"
+    }
+}

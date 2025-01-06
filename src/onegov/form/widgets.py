@@ -112,7 +112,7 @@ class UploadWidget(FileInput):
 
             {preview}
 
-            <ul>
+            <ul class="upload-options">
                 <li>
                     <input type="radio" id="{name}-0" name="{name}"
                            value="keep" checked="">
@@ -516,6 +516,21 @@ class PanelWidget:
         ).format(
             kind=field.kind,
             text=text.replace('\n', Markup('<br>'))
+        )
+
+
+class LinkPanelWidget(PanelWidget):
+    """ A widget that displays a clickable link as panel (no input). """
+
+    def __call__(self, field: 'PanelField', **kwargs: Any) -> Markup:
+        text = escape(field.meta.request.translate(field.text))
+        return Markup(  # noqa: RUF035
+            f'<div class="panel {{kind}}" {html_params(**kwargs)}>'
+            '<a href="{link}">{text}</a></div>'
+        ).format(
+            kind=field.kind,
+            text=text.replace('\n', Markup('<br>')),
+            link=field.text
         )
 
 
