@@ -112,6 +112,8 @@ def test_view_email_subscription(election_day_app_zg):
     principal.segmented_notifications = True
     election_day_app_zg.cache.set('principal', principal)
 
+    # NOTE: this section may depend on static data for principle.entities.
+    # See src/onegov/election_day/static/municipalities/<year>/*.json
     subscribe = client.get('/subscribe-email')
     subscribe.form['email'] = 'howard@example.com'
     subscribe.form['domain'].select('municipality')
