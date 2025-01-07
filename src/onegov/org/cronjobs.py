@@ -99,9 +99,11 @@ def send_email_notification_for_recent_directory_entry_publications(
     """
 
     now = utcnow()
+    directory: ExtendedDirectory
 
-    for directory in DirectoryCollection(request.session).query().filter(
-            ExtendedDirectory.enable_update_notifications == True):
+    for directory in (DirectoryCollection(request.session, type='extended')
+            .query().filter(
+                ExtendedDirectory.enable_update_notifications == True)):
 
         directory_entries = ExtendedDirectoryEntryCollection(
             directory).query().filter(
