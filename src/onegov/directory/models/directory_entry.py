@@ -1,5 +1,3 @@
-from datetime import datetime
-
 from onegov.core.orm import Base
 from onegov.core.orm.mixins import ContentMixin
 from onegov.core.orm.mixins import TimestampMixin
@@ -22,6 +20,7 @@ from typing import Any, TYPE_CHECKING
 if TYPE_CHECKING:
     import uuid
     from collections.abc import Collection
+    from datetime import datetime
     from .directory import Directory
 
 
