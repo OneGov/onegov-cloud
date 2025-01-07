@@ -2248,7 +2248,7 @@ msgid "Homepage"
 msgstr "Page d'accueil"
 
 msgid "Save"
-msgstr "Sauver"
+msgstr "Enregistrer"
 
 msgid "Edit"
 msgstr "Modifier"
@@ -4271,7 +4271,7 @@ msgid "There are currently ${count} recipients registered."
 msgstr "Il y a actuellement ${count} destinataires enregistrés."
 
 msgid "To update your subscription, please use this ${Link}"
-msgstr ""
+msgstr "Pour mettre à jour votre abonnement, veuillez utiliser ce ${Link}"
 
 msgid "Archive"
 msgstr "Archiver"
@@ -4586,6 +4586,8 @@ msgid ""
 "Thank you for filling out this survey. If there's anything you'd like to "
 "change, click on the \"Edit\"-Button below."
 msgstr ""
+"Merci d'avoir rempli ce sondage. Si vous souhaitez apporter des "
+"modifications, cliquez sur le bouton \"Modifier\" ci-dessous."
 
 msgid "No surveys defined yet."
 msgstr "Aucun sondage n'est encore défini."
@@ -5945,16 +5947,16 @@ msgstr ""
 "toutes les soumissions."
 
 msgid "Delete Submissions"
-msgstr ""
+msgstr "Supprimer les soumissions"
 
 msgid "Do you really want to delete all submissions?"
-msgstr ""
+msgstr "Voulez-vous vraiment supprimer toutes les soumissions ?"
 
 msgid "All submissions associated with this survey will be deleted."
-msgstr ""
+msgstr "Toutes les soumissions associées à cette enquête seront supprimées."
 
 msgid "Delete submissions"
-msgstr ""
+msgstr "Supprimer les soumissions"
 
 msgid "Exports the submissions of the survey."
 msgstr "Exporte les soumissions de l'enquête."
@@ -5983,6 +5985,8 @@ msgstr "Modifier la fenêtre de soumission"
 
 msgid "The submission window and all associated submissions were deleted"
 msgstr ""
+"La fenêtre de soumission et toutes les soumissions associées ont été "
+"supprimées"
 
 msgid "Added a new text module"
 msgstr "Ajout d'un nouveau module de texte"

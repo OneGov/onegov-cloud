@@ -570,7 +570,10 @@ def view_activities(
 def view_activity_filters(
     self: VacationActivityCollection,
     request: 'FeriennetRequest'
-) -> 'RenderData':
+) -> 'RenderData | Response':
+
+    if not request.is_xhr:
+        return request.redirect(request.class_link(VacationActivityCollection))
 
     active_period = request.app.active_period
     show_activities = bool(active_period or request.is_organiser)

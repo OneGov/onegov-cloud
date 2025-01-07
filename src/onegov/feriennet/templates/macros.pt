@@ -1018,7 +1018,9 @@
         data-cart-url="${cart_url}"
         data-cart-submit-url="${cart_submit_url}"
         data-cart-action-url="${cart_action_url}"
-        i18n:attributes="data-empty-label;data-button-label;data-remove-label"></div>
+        data-list-label="My List"
+        data-is-dropdown="${is_dropdown}"
+        i18n:attributes="data-empty-label;data-button-label;data-remove-label;data-list-label"></div>
 </metal:volunteer_cart>
 
 <metal:feriennet_links define-macro="feriennet_links">

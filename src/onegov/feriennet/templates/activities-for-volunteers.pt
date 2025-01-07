@@ -8,12 +8,7 @@
                 <tal:b metal:use-macro="layout.macros['filters']" />
             </div>
             <div class="cell small-12 medium-3">
-                <button class="button" type="button" data-toggle="my-list">
-                    <i class="fa fa-chevron-down"></i><tal:b i18n:translate>My list</tal:b> (0)
-                </button>
-                <div class="dropdown-pane" id="my-list" data-dropdown data-auto-focus="true">
-                    <tal:b metal:use-macro="layout.macros['volunteer-cart']" />
-                </div>
+                <tal:b metal:use-macro="layout.macros['volunteer-cart']" tal:define="is_dropdown True"/>
             </div>
 
             <div class="small-12 cell content">
