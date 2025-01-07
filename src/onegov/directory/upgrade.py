@@ -8,7 +8,6 @@ from sqlalchemy import Column, Integer
 from onegov.core.orm.types import UTCDateTime
 from onegov.core.upgrade import upgrade_task, UpgradeContext
 from onegov.directory import Directory
-from onegov.org.models import ExtendedDirectory
 
 
 @upgrade_task('Add entries count')
@@ -87,7 +86,7 @@ def add_notification_sent_column(context: UpgradeContext) -> None:
 
     context.session.flush()
 
-    for directory in context.session.query(ExtendedDirectory):
+    for directory in context.session.query(Directory):
         for entry in directory.entries:
             if entry.publication_started:
                 # prevent sending notifications for exiting entries with
