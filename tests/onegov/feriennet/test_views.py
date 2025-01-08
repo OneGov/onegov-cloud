@@ -2388,7 +2388,7 @@ def test_send_email_with_link_and_attachment(client, scenario):
                          f'<p><a href="www.google.ch">Google</a></p>')
     page = page.form.submit().follow()
 
-    page = page.click('Versand')
+    page = page.click('Vorlage verwenden')
     assert "File und Link" in page
     assert "Test.txt" not in page
     assert "Google" in page

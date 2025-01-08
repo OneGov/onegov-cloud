@@ -146,7 +146,7 @@
                             </div>
                         </div>
 
-                        <div class="invoice-items-payment" tal:condition="payment_provider and account and not invoice.paid">
+                        <div class="invoice-items-payment">
                             <div class="hide-for-print" tal:condition="payment_provider and not invoice.paid">
                                 <h4 i18n:translate>Online Payment</h4>
 
