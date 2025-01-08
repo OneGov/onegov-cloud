@@ -1,7 +1,6 @@
-from dateutil.parser import isoparse
 from functools import cached_property
 from onegov.event.collections import OccurrenceCollection
-from onegov.api import ApiEndpoint, ApiInvalidParamException
+from onegov.api import ApiEndpoint
 from onegov.gis import Coordinates
 
 
@@ -16,44 +15,6 @@ if TYPE_CHECKING:
     from typing import TypeVar
 
     T = TypeVar('T')
-
-
-UPDATE_FILTER_PARAMS = frozenset((
-    'updated_gt',
-    'updated_lt',
-    'updated_eq',
-    'updated_ge',
-    'updated_le'
-))
-
-
-def filter_for_updated(
-    filter_operation: str,
-    filter_value: str | None,
-    result: 'T'
-) -> 'T':
-    """
-    Applies filters for several 'updated' comparisons.
-    Refer to UPDATE_FILTER_PARAMS for all filter keywords.
-
-    :param filter_operation: the updated filter operation to be applied. For
-        allowed filters refer to UPDATE_FILTER_PARAMS
-    :param filter_value: the updated filter value to filter for
-    :param result: the results to apply the filters on
-    :return: filter result
-    """
-    assert hasattr(result, 'for_filter')
-
-    if filter_value is None:
-        return result.for_filter(**{filter_operation: None})
-
-    try:
-        # only parse including hours and minutes
-        isoparse(filter_value[:16])
-    except Exception as ex:
-        raise ApiInvalidParamException(f'Invalid iso timestamp for parameter'
-                                       f"'{filter_operation}': {ex}") from ex
-    return result.for_filter(**{filter_operation: filter_value[:16]})
 
 
 class ApisMixin:
@@ -86,7 +47,11 @@ class EventApiEndpoint(
 ):
     app: 'TownApp'
     endpoint = 'events'
-    filters = {'agency', 'person'} | UPDATE_FILTER_PARAMS
+    filters = {
+            'range', 'start', 'end', 'outdated', 'tags', 'locations',
+            'only_public', 'search_widget', 'event_filter_configuration',
+            'event_filter_fields'
+    }
 
     @property
     def collection(self) -> Any:
@@ -95,24 +60,30 @@ class EventApiEndpoint(
             page=self.page or 0
         )
 
-        for key, value in self.extra_parameters.items():
-            self.assert_valid_filter(key)
-
-            # apply different filters
-            if key in UPDATE_FILTER_PARAMS:
-                result = filter_for_updated(filter_operation=key,
-                                            filter_value=value,
-                                            result=result)
-
         result.batch_size = self.batch_size
         return result
 
     def item_data(self, item: 'Occurrence') -> dict[str, Any]:
         return {
             'title': item.title,
+            'description': item.event.description,
+            'organizer': item.event.organizer,
+            'organizer_email': item.event.organizer_email,
+            'organizer_phone': item.event.organizer_phone,
+            'external_event_url': item.event.external_event_url,
+            'event_registration_url': item.event.event_registration_url,
+            'price': item.event.price,
+            'tags': item.event.tags,
+            'start': item.start.isoformat(),
+            'end': item.end.isoformat(),
+            'location': item.location,
+            'coordinates': get_geo_location(item),
+            'created': item.created.isoformat(),
             'modified': get_modified_iso_format(item),
         }
 
     def item_links(self, item: 'Occurrence') -> dict[str, Any]:
         return {
+            'image': item.event.image,
+            'pfd': item.event.pdf
         }
