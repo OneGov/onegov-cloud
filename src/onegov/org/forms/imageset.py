@@ -15,6 +15,9 @@ class ImageSetForm(Form):
         description=_('Describes what this photo album is about'),
         render_kw={'rows': 4})
 
+    show_images_on_homepage = BooleanField(
+        label=_('Show images on homepage'))
+
     view = RadioField(
         label=_('View'),
         default='full',
@@ -41,6 +44,3 @@ class ImageSetForm(Form):
             ('desc', _('Descending'))
         ],
         default='desc')
-
-    show_images_on_homepage = BooleanField(
-        label=_('Show images on homepage'))
