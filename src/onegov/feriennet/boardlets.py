@@ -159,9 +159,7 @@ class ActivitiesBoardlet(FeriennetBoardlet):
 
     @property
     def title(self) -> str:
-        return _('${count} Activities', mapping={
-            'count': self.activities_count
-        })
+        return _('Activities')
 
     @property
     def number(self) -> int:
