@@ -23,5 +23,24 @@ class ImageSetForm(Form):
             ('grid', _('Grid layout'))
         ])
 
+    order = RadioField(
+        label=_('Order'),
+        fieldset=_('Order'),
+        choices=[
+            ('by-name', _('By filename')),
+            ('by-caption', _('By caption')),
+            ('by-last-change', _('By last change'))
+        ],
+        default='by-last-change')
+
+    order_direction = RadioField(
+        label=_('Direction'),
+        fieldset=_('Order'),
+        choices=[
+            ('asc', _('Ascending')),
+            ('desc', _('Descending'))
+        ],
+        default='desc')
+
     show_images_on_homepage = BooleanField(
         label=_('Show images on homepage'))

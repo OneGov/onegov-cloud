@@ -1,7 +1,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE 1.0\n"
-"POT-Creation-Date: 2024-11-25 19:53+0100\n"
+"POT-Creation-Date: 2025-01-08 16:47+0100\n"
 "PO-Revision-Date: 2022-03-15 10:21+0100\n"
 "Last-Translator: Marc Sommerhalder <marc.sommerhalder@seantis.ch>\n"
 "Language-Team: German\n"
@@ -1020,6 +1020,15 @@ msgstr "Grosse Bilder"
 msgid "Grid layout"
 msgstr "Raster"
 
+msgid "By filename"
+msgstr "Nach Name"
+
+msgid "By caption"
+msgstr "Nach Beschreibung"
+
+msgid "By last change"
+msgstr "Nach Zeitpunkt der letzten Änderung"
+
 msgid "Show images on homepage"
 msgstr "Bilder auf der Startseite zeigen"
 
@@ -1683,6 +1692,12 @@ msgstr "Analytics Code"
 
 msgid "JavaScript for web statistics support"
 msgstr "JavaScript für Web-Statistik"
+
+msgid "Analytics URL"
+msgstr ""
+
+msgid "URL pointing to the analytics page"
+msgstr ""
 
 msgid "Cantonal holidays"
 msgstr "Kantonale Feiertage"
@@ -2765,9 +2780,6 @@ msgstr ""
 msgid "Delete content"
 msgstr "Inhalt löschen"
 
-msgid "Photo album. Will be shown at the end of content."
-msgstr "Fotoalbum. Wird am Ende des Inhalts angezeigt."
-
 msgid "Photo album"
 msgstr "Fotoalbum"
 
@@ -2946,8 +2958,8 @@ msgstr "Die Absage von ${title} kann nicht rückgängig gemacht werden."
 msgid "Reject reservation"
 msgstr "Reservation absagen"
 
-#. Used in sentence: "${event} published."
 #.
+#. Used in sentence: "${event} published."
 msgid "Event"
 msgstr "Veranstaltung"
 
@@ -6182,6 +6194,9 @@ msgstr "Ein Konto wurde für Sie erstellt"
 
 msgid "The user was created successfully"
 msgstr "Der Benutzer wurde erfolgreich erstellt"
+
+#~ msgid "Photo album. Will be shown at the end of content."
+#~ msgstr "Fotoalbum. Wird am Ende des Inhalts angezeigt."
 
 #~ msgid "Include logo in newsletter"
 #~ msgstr "Logo im Newsletter anzeigen"
