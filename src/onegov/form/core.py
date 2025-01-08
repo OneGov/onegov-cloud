@@ -123,7 +123,7 @@ class Form(BaseForm):
             stamps = IntegerRangeField(
             'No. Stamps',
             range=range(0, 30),
-            pricing={range(0, 30): (0.85, 'CHF')}
+            pricing={range(0, 30): (1.00, 'CHF')}
         )
 
             delivery = RadioField('Delivery', choices=[
