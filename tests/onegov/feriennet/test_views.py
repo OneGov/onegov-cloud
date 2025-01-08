@@ -1408,7 +1408,7 @@ def test_send_email(client, scenario):
     page.form['text'] = '[Zeitraum] body'
     page = page.form.submit().follow()
 
-    page = page.click('Versand')
+    page = page.click('Vorlage verwenden')
     page.form['no_spam'] = True
     assert 'selected="False"' not in page
     assert "Ferienpass 2016 subject" in page
