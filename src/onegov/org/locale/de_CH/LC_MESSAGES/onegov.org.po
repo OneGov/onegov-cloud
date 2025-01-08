@@ -1021,7 +1021,7 @@ msgid "Grid layout"
 msgstr "Raster"
 
 msgid "By filename"
-msgstr "Nach Name"
+msgstr "Nach Dateiname"
 
 msgid "By caption"
 msgstr "Nach Beschreibung"
