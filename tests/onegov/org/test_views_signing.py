@@ -17,7 +17,7 @@ def test_sign_document(client):
     path = module_path('tests.onegov.org', 'fixtures/sample.pdf')
     with open(path, 'rb') as f:
         page = client.get('/files')
-        page.form['file'] = Upload('Sample.pdf', f.read(), 'application/pdf')
+        page.form['file'] = [Upload('Sample.pdf', f.read(), 'application/pdf')]
         page.form.submit()
 
     pdf = FileCollection(client.app.session()).query().one()

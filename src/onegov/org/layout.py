@@ -599,9 +599,10 @@ class Layout(ChameleonLayout, OpenGraphMixin):
         with_year: bool = False
     ) -> str:
 
-        if start.date() == end.date():
-            show_single_day = True
-        elif (end - start) <= timedelta(hours=23) and end.time() < time(6, 0):
+        if start.date() == end.date() or (
+            (end - start) <= timedelta(hours=23)
+            and end.time() < time(6, 0)
+        ):
             show_single_day = True
         else:
             show_single_day = False
@@ -2324,7 +2325,7 @@ class EventLayoutMixin:
     def event_deletable(self, event: 'Event') -> bool:
         tickets = TicketCollection(self.request.session)
         ticket = tickets.by_handler_id(event.id.hex)
-        return False if ticket else True
+        return not ticket
 
 
 class OccurrencesLayout(DefaultLayout, EventLayoutMixin):
@@ -2655,6 +2656,9 @@ class NewsletterLayout(DefaultLayout):
 
     @cached_property
     def editbar_links(self) -> list[Link | LinkGroup] | None:
+        if not self.request.is_manager:
+            return None
+
         if self.is_collection:
             return [
                 Link(

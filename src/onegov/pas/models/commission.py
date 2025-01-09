@@ -13,6 +13,7 @@ from uuid import uuid4
 from sqlalchemy import Enum
 from sqlalchemy.orm import relationship
 
+
 from typing import TYPE_CHECKING
 if TYPE_CHECKING:
     import uuid
@@ -115,3 +116,6 @@ class Commission(Base, ContentMixin, TimestampMixin, ORMSearchable):
             for membership in self.memberships:
                 if not membership.end:
                     membership.end = end
+
+    def __repr__(self) -> str:
+        return f'<Commission {self.name}>'

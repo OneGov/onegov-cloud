@@ -266,11 +266,11 @@ def test_add_custom_form_minimum_price_validation(client):
     form_page.form['definition'] = textwrap.dedent("""
         E-Mail *= @@@
 
-        Stamp A = 0..20 (1.10 CHF)
-        Stamp B = 0..20 (0.85 CHF)
+        Stamp A = 0..20 (1.20 CHF)
+        Stamp B = 0..20 (1.00 CHF)
 
         Discount *=
-            (x) First four B stamps free (-3.40 CHF)
+            (x) First four B stamps free (-4.00 CHF)
     """)
     form_page.form['minimum_price_total'] = '5.00'
     form_page = form_page.form.submit().follow()
@@ -281,14 +281,14 @@ def test_add_custom_form_minimum_price_validation(client):
     form_page = form_page.form.submit().follow()
 
     assert "Der Totalbetrag für Ihre Eingaben" in form_page
-    assert "beläuft sich auf 1.70 CHF" in form_page
+    assert "beläuft sich auf 2.00 CHF" in form_page
     assert "allerdings ist der Minimalbetrag 5.00 CHF" in form_page
 
     # now that we reached the minimum price we should succeed
     form_page.form['stamp_a'] = '3'
     form_page = form_page.form.submit()
     assert "Totalbetrag" in form_page
-    assert "5.00 CHF" in form_page
+    assert "5.60 CHF" in form_page
     assert "Minimalbetrag" not in form_page
 
 
@@ -367,7 +367,7 @@ def test_forms_explicitly_link_referenced_files(client):
     path = module_path('tests.onegov.org', 'fixtures/sample.pdf')
     with open(path, 'rb') as f:
         page = admin.get('/files')
-        page.form['file'] = Upload('Sample.pdf', f.read(), 'application/pdf')
+        page.form['file'] = [Upload('Sample.pdf', f.read(), 'application/pdf')]
         page.form.submit()
 
     pdf_url = (

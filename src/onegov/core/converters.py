@@ -114,7 +114,7 @@ def bool_decode(s: str) -> bool: ...
 
 def bool_decode(s: str) -> bool:
     """ Decodes a boolean. """
-    return False if s == '0' or s == '' else True
+    return not (s == '0' or s == '')
 
 
 @overload

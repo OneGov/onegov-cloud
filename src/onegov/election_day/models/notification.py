@@ -324,7 +324,8 @@ class SmsNotification(Notification):
         elections: 'Sequence[Election]',
         election_compounds: 'Sequence[ElectionCompound]',
         votes: 'Sequence[Vote]',
-        content: 'TranslationString'
+        content: 'TranslationString',
+        url: str | None = None
     ) -> None:
         """ Sends the given text to all subscribers. """
 
@@ -346,6 +347,10 @@ class SmsNotification(Notification):
         for locale, addresses in query:
             translator = request.app.translations.get(locale)
             translated = translator.gettext(content) if translator else content
+            if url is not None and len(translated) + len(url) <= 154:
+                # If the given url fits into a single SMS, then prefer it
+                # over the generic one it's bound to by default
+                content = content % {'url': url}
             translated = content.interpolate(translated)
 
             request.app.send_sms(tuple(set(addresses)), translated)
@@ -374,5 +379,8 @@ class SmsNotification(Notification):
             content=_(
                 'New results are available on ${url}',
                 mapping={'url': request.app.principal.sms_notification}
-            )
+            ),
+            # NOTE: A SiteLocale link would be nicer UX, but that will make
+            #       the URL significantly longer, so we take what we can get
+            url=request.link(model)
         )

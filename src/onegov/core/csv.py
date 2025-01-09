@@ -209,7 +209,7 @@ class CSVFile(Generic[_RowT]):
     @lru_cache(maxsize=128)
     def as_valid_identifier(value: str) -> str:
         result = normalize_header(value)
-        for invalid in '- .%/,;':
+        for invalid in '- .%/,;()':
             result = result.replace(invalid, '_')
         while result and result[0] in '_0123456789':
             result = result[1:]
@@ -755,7 +755,7 @@ def has_duplicates(a_list: 'Sequence[Any]') -> bool:
 
 def list_duplicates_index(a: 'Sequence[Any]') -> list[int]:
     """
-    returns a list of indexes of duplicates in a list.
+    Returns a list of indexes of duplicates in a list.
     for example::
 
         a = [1, 2, 3, 2, 1, 5, 6, 5, 5, 5]

@@ -43,6 +43,7 @@ RUN apt -qq update \
     python3.11-dev \
     python3.11-venv \
     tzdata \
+    weasyprint \
     xmlsec1 \
     zip
 

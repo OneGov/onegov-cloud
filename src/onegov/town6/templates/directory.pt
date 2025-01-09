@@ -35,8 +35,9 @@
                             <span class="h5">${entry.title}</span>
                         </a>
                         <div class="accordion-content" data-tab-content>
-                            <ul tal:repeat="item entry.values.items()" style="list-style: none; margin-left: 0">
-                                <li tal:define="key item[0].capitalize(); value item[1].replace('\r\n', Markup('<br>'))" tal:content="Markup('<strong>{}</strong>: {}').format(key, value)"></li>
+                            <ul tal:repeat="field directory.fields" style="list-style: none; margin-left: 0">
+                                <li tal:condition="field.type == 'textarea'" tal:define="key field.human_id; value entry.values[field.id]" tal:content="Markup('<strong>{}</strong>: <br>{}').format(key, value)" style="white-space: pre-wrap;"></li>
+                                <li tal:condition="field.type != 'textarea'" tal:define="key field.human_id; value entry.values[field.id]" tal:content="Markup('<strong>{}</strong>: {}').format(key, value)"></li>
                             </ul>
                             <ul style="list-style: none; margin-left: 0">
                                 <li>
@@ -124,7 +125,7 @@
                     <div class="side-panel files-panel" tal:condition="files and directory.show_file_links_in_sidebar|True">
                         <h3 i18n:translate>Documents</h3>
                         <ul class="more-list">
-                            <li tal:repeat="file files">
+                            <li tal:repeat="file python: sorted(files, key=lambda f: f.name)">
                                 <a class="list-link" title="${file.name}" href="${request.link(file)}">
                                     <i class="far ${layout.get_fa_file_icon(file.name)}" aria-hidden="true"></i>
                                     <span class="list-title">${file.name.split('.')[0]}</span>
@@ -132,27 +133,27 @@
                             </li>
                         </ul>
                     </div>
-
-                    <div class="side-panel" tal:condition="directory.enable_update_notifications|False or directory.enable_submissions">
-                        <h3 i18n:translate>Actions</h3>
-                        <div class="side-panel-with-bg">
-                            <ul class="more-list">
-                                <li class="icon-item" tal:condition="directory.enable_update_notifications|False">
-                                    <a class="list-link multi-line" href="${new_recipient_link}">
-                                        <i class="fa fa-bell"></i>
-                                        <span class="list-title" i18n:translate>Get notifications on new entries</span>
-                                    </a>
-                                </li>
-                                <li class="icon-item" tal:condition="directory.enable_submissions">
-                                    <a class="list-link multi-line" href="${submit}">
-                                        <i class="fa fa-folder-plus"></i>
-                                        <span class="list-title" i18n:translate>Propose a new entry</span>
-                                    </a>
-                                </li>
-                            </ul>
+                    <tal:b define="enable_update_notifications directory.enable_update_notifications|False">
+                        <div class="side-panel" tal:condition="directory.enable_submissions or enable_update_notifications">
+                            <h3 i18n:translate>Actions</h3>
+                            <div class="side-panel-with-bg">
+                                <ul class="more-list">
+                                    <li class="icon-item" tal:condition="directory.enable_update_notifications|False">
+                                        <a class="list-link multi-line" href="${new_recipient_link}">
+                                            <i class="fa fa-bell"></i>
+                                            <span class="list-title" i18n:translate>Get notifications on new entries</span>
+                                        </a>
+                                    </li>
+                                    <li class="icon-item" tal:condition="directory.enable_submissions">
+                                        <a class="list-link" href="${submit}">
+                                            <i class="fa fa-folder-plus"></i>
+                                            <span class="list-title" i18n:translate>Propose a new entry</span>
+                                        </a>
+                                    </li>
+                                </ul>
+                            </div>
                         </div>
-                    </div>
-
+                    </tal:b>
                 </div>
             </div>
 

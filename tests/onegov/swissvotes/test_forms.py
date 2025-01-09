@@ -22,10 +22,12 @@ class DummyPrincipal:
 
 
 class DummyApp:
-    def __init__(self, session, principal, mfg_api_token=None):
+    def __init__(self, session, principal,
+                 mfg_api_token=None, bs_api_token=None):
         self._session = session
         self.principal = principal
         self.mfg_api_token = None
+        self.bs_api_token = None
 
     def session(self):
         return self._session
@@ -528,6 +530,7 @@ def test_update_external_resources_form(session):
 
     assert form.resources.choices == [
         ('mfg', 'eMuseum.ch'),
+        ('bs', 'Plakatsammlung Basel'),
         ('sa', 'Social Archives')
     ]
 
@@ -537,9 +540,13 @@ def test_update_external_resources_form(session):
     form.resources.process(DummyPostData({'resources': ['sa']}))
     assert form.validate()
 
-    form.resources.process(DummyPostData({'resources': ['mfg']}))
-    assert not form.validate()
+    form.resources.process(DummyPostData({'resources': ['bs']}))
+    assert not form.validate()  # missing API token
 
-    form.request.app.mfg_api_token = 'token'
-    form.resources.process(DummyPostData({'resources': ['sa', 'mfg']}))
+    form.resources.process(DummyPostData({'resources': ['mfg']}))
+    assert not form.validate()  # missing API token
+
+    form.request.app.mfg_api_token = 'token-mfg'
+    form.request.app.bs_api_token = 'token-bs'
+    form.resources.process(DummyPostData({'resources': ['sa', 'bs', 'mfg']}))
     assert form.validate()

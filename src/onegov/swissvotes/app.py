@@ -83,6 +83,15 @@ class SwissvotesApp(Framework, FormApp, QuillApp, DepotApp, UserApp):
         """ Configures the Museum für Gestaltung API Token. """
         self.mfg_api_token = mfg_api_token
 
+    def configure_bs_api_token(
+            self,
+            *,
+            bs_api_token: str | None = None,
+            **cfg: Any
+    ) -> None:
+        """ Configures the Plakatsammlung Basel API Token. """
+        self.bs_api_token = bs_api_token
+
 
 @SwissvotesApp.static_directory()
 def get_static_directory() -> str:

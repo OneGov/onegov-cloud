@@ -146,9 +146,8 @@ def update_drive_distances(
             routes_found += 1
             dist = parse_directions_result(response)
             if out_of_tolerance(
-                    trs.drive_distance, dist, tolerance_factor, max_tolerance):
-                tol_failed.append((trs, dist))
-            elif max_distance and dist > max_distance:
+                trs.drive_distance, dist, tolerance_factor, max_tolerance
+            ) or (max_distance and dist > max_distance):
                 tol_failed.append((trs, dist))
             else:
                 trs.drive_distance = dist

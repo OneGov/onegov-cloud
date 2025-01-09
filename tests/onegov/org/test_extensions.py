@@ -1,4 +1,5 @@
 import os.path
+
 import pytest
 
 from collections import defaultdict
@@ -6,14 +7,17 @@ from depot.manager import DepotManager
 from markupsafe import Markup
 from tempfile import TemporaryDirectory
 from uuid import UUID
+from webtest import Upload
 
 from onegov.core.orm.abstract import MoveDirection
 from onegov.core.utils import Bunch
 from onegov.form import Form
 from onegov.form.extensions import Extendable
+from onegov.org.models import Topic
 from onegov.org.models.extensions import (
     PersonLinkExtension, ContactExtension, AccessExtension, HoneyPotExtension,
     SidebarLinksExtension, PeopleShownOnMainPageExtension,
+    InlinePhotoAlbumExtension,
 )
 from onegov.people import Person
 from tests.shared.utils import create_pdf
@@ -215,8 +219,8 @@ def test_person_link_extension_order():
     field = form.people
     field.append_entry()
     assert len(field) == 2
-    field[0].form.person.data ='6d120102d90344868eb32614cf3acb1a'
-    field[1].form.person.data ='f0281b558a5f43f6ac81589d79538a87'
+    field[0].form.person.data = '6d120102d90344868eb32614cf3acb1a'
+    field[1].form.person.data = 'f0281b558a5f43f6ac81589d79538a87'
     form.populate_obj(topic)
 
     # the people are kept sorted by lastname, firstname by default
@@ -260,6 +264,13 @@ def test_person_link_extension_order():
         ('6d120102d90344868eb32614cf3acb1a', (None, False)),  # Troy _B_arnes
     ]
 
+    # plug in the current order into the field, since move_person
+    # does not update the field
+    field[0].form.person.data = 'f0281b558a5f43f6ac81589d79538a87'
+    field[1].form.person.data = 'aa37e9cc40ab402ea70b0d2b4d672de3'
+    field[2].form.person.data = '6d120102d90344868eb32614cf3acb1a'
+
+    # append new selection
     field.append_entry()
     field[3].form.person.data = 'adad98ff74e2497a9e1dfbba0a6bbe96'
     form.populate_obj(topic)
@@ -267,6 +278,16 @@ def test_person_link_extension_order():
     assert topic.content['people'] == [
         ('f0281b558a5f43f6ac81589d79538a87', (None, False)),  # Britta _P_erry
         ('aa37e9cc40ab402ea70b0d2b4d672de3', (None, False)),  # Annie _E_dison
+        ('6d120102d90344868eb32614cf3acb1a', (None, False)),  # Troy _B_arnes
+        ('adad98ff74e2497a9e1dfbba0a6bbe96', (None, False)),  # Abed _N_adir
+    ]
+
+    # remove a person
+    field[1].form.person.data = ''
+    form.populate_obj(topic)
+
+    assert topic.content['people'] == [
+        ('f0281b558a5f43f6ac81589d79538a87', (None, False)),  # Britta _P_erry
         ('6d120102d90344868eb32614cf3acb1a', (None, False)),  # Troy _B_arnes
         ('adad98ff74e2497a9e1dfbba0a6bbe96', (None, False)),  # Abed _N_adir
     ]
@@ -538,9 +559,8 @@ def test_general_file_link_extension(client):
             "*Experts say it's the fact that Govikon does not really exist.*"
         )
         filename = os.path.join(td, 'simple.pdf')
-        pdf = create_pdf(filename)
-        new_page.form.fields['files'][-1].value = [filename]
-        new_page.files = pdf
+        create_pdf(filename)
+        new_page.form.fields['files'][-1].value = [Upload(filename)]
         new_page.form['show_file_links_in_sidebar'] = True
         page = new_page.form.submit().follow()
 
@@ -555,6 +575,51 @@ def test_general_file_link_extension(client):
         assert 'Living in Govikon is Swell' in page
         assert 'Dokumente' not in page
         assert 'simple.pdf' not in page
+
+
+def test_general_file_link_extension_deduplication(client):
+    client.login_admin()
+
+    with TemporaryDirectory() as td:
+
+        root_page = client.get('/topics/themen')
+        new_page = root_page.click('Thema')
+
+        assert 'files' in new_page.form.fields
+
+        new_page.form['title'] = "Living in Govikon is Swell"
+        new_page.form['text'] = (
+            "## Living in Govikon is Really Great\n"
+            "*Experts say it's the fact that Govikon does not really exist.*"
+        )
+        filename = os.path.join(td, 'simple.pdf')
+        create_pdf(filename)
+        new_page.form.fields['files'][-1].value = [
+            Upload(filename),
+            Upload(filename)
+        ]
+        new_page.form['show_file_links_in_sidebar'] = True
+        page = new_page.form.submit().follow()
+
+        assert 'Living in Govikon is Swell' in page
+        assert 'Dokumente' in page
+        assert 'simple.pdf' in page
+
+        session = client.app.session()
+        topic = session.query(Topic).filter(
+            Topic.title == "Living in Govikon is Swell").one()
+        assert len(topic.files) == 1
+
+        pages_id = topic.id
+        file_id = topic.files[0].id
+
+        count, = session.execute("""
+            SELECT COUNT(*)
+              FROM files_for_pages_files
+             WHERE pages_id = :pages_id
+               AND file_id = :file_id
+        """, {'pages_id': pages_id, 'file_id': file_id}).fetchone()
+        assert count == 1
 
 
 def test_sidebar_links_extension(session):
@@ -598,3 +663,33 @@ def test_sidebar_links_extension(session):
     assert topic.sidepanel_links == [
         ('Govikon School', 'https://www.govikon-school.ch'),
         ('Castle Govikon', 'https://www.govikon-castle.ch')]
+
+
+def test_inline_photo_album_extension():
+    class Topic(InlinePhotoAlbumExtension):
+        meta = {}
+        content = {}
+
+    class TopicForm(Form):
+        pass
+
+    # Mock database-related classes
+    class MockQuery:
+        def all(self):
+            return []
+
+    class MockSession:
+        def query(self, *args):
+            return MockQuery()
+
+    topic = Topic()
+    assert topic.photo_album_id is None
+
+    request = Bunch(
+        session=MockSession(),
+        app=Bunch(**{'settings.org.disabled_extensions': []}),
+        translate=lambda text: text
+    )
+
+    form_class = topic.with_content_extensions(TopicForm, request=request)
+    assert form_class == TopicForm  # No albums = no form extension

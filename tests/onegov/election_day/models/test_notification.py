@@ -1241,15 +1241,15 @@ def test_sms_notification(election_day_app_zg, session):
         assert sms_queue() == (
             (
                 {'+41791112233', '+41791112277'},
-                'Neue Resultate verfügbar auf https://wab.ch.ch'
+                'Neue Resultate verfügbar auf Election/election'
             ),
             (
                 {'+41791112233', '+41791112244'},
-                'New results are available on https://wab.ch.ch'
+                'New results are available on Election/election'
             ),
             (
                 {'+41791112277'},
-                'Les nouveaux résultats sont disponibles sur https://wab.ch.ch'
+                'Les nouveaux résultats sont disponibles sur Election/election'
             )
         )
 
@@ -1265,15 +1265,16 @@ def test_sms_notification(election_day_app_zg, session):
         assert sms_queue() == (
             (
                 {'+41791112233', '+41791112277'},
-                'Neue Resultate verfügbar auf https://wab.ch.ch'
+                'Neue Resultate verfügbar auf ElectionCompound/elections'
             ),
             (
                 {'+41791112233', '+41791112244'},
-                'New results are available on https://wab.ch.ch'
+                'New results are available on ElectionCompound/elections'
             ),
             (
                 {'+41791112277'},
-                'Les nouveaux résultats sont disponibles sur https://wab.ch.ch'
+                'Les nouveaux résultats sont disponibles sur '
+                'ElectionCompound/elections'
             )
         )
 
@@ -1289,11 +1290,11 @@ def test_sms_notification(election_day_app_zg, session):
         assert sms_queue() == (
             (
                 {'+41791112233', '+41791112277'},
-                'Neue Resultate verfügbar auf https://wab.ch.ch'
+                'Neue Resultate verfügbar auf Vote/vote'
             ),
             (
                 {'+41791112233', '+41791112244'},
-                'New results are available on https://wab.ch.ch'
+                'New results are available on Vote/vote'
             )
         )
 
@@ -1310,15 +1311,15 @@ def test_sms_notification(election_day_app_zg, session):
         assert sms_queue() == (
             (
                 {'+41791112233', '+41791112277'},
-                'Neue Resultate verfügbar auf https://wab.ch.ch'
+                'Neue Resultate verfügbar auf Election/election'
             ),
             (
                 {'+41791112233', '+41791112244'},
-                'New results are available on https://wab.ch.ch'
+                'New results are available on Election/election'
             ),
             (
                 {'+41791112277'},
-                'Les nouveaux résultats sont disponibles sur https://wab.ch.ch'
+                'Les nouveaux résultats sont disponibles sur Election/election'
             )
         )
 
@@ -1337,21 +1338,44 @@ def test_sms_notification(election_day_app_zg, session):
         assert sms_queue() == (
             (
                 {'+41791112233', '+41791112277'},
-                'Neue Resultate verfügbar auf https://wab.ch.ch'
+                'Neue Resultate verfügbar auf ElectionCompound/elections'
             ),
             (
                 {'+41791112233', '+41791112244'},
-                'New results are available on https://wab.ch.ch'
+                'New results are available on ElectionCompound/elections'
             ),
             (
                 {'+41791112277'},
-                'Les nouveaux résultats sont disponibles sur https://wab.ch.ch'
+                'Les nouveaux résultats sont disponibles sur '
+                'ElectionCompound/elections'
             )
         )
 
         # Final vote results
         election_day_app_zg.send_sms.reset_mock()
         vote.status = 'final'
+        notification = SmsNotification()
+        notification.trigger(request, vote)
+
+        assert notification.type == 'sms'
+        assert notification.vote_id == vote.id
+        assert notification.last_modified == freezed
+        assert election_day_app_zg.send_sms.call_count == 2
+        assert sms_queue() == (
+            (
+                {'+41791112233', '+41791112277'},
+                'Neue Resultate verfügbar auf Vote/vote'
+            ),
+            (
+                {'+41791112233', '+41791112244'},
+                'New results are available on Vote/vote'
+            )
+        )
+
+
+        # Really long urls get replaced by a generic one
+        election_day_app_zg.send_sms.reset_mock()
+        vote.id = 'really-'*16 + 'long'
         notification = SmsNotification()
         notification.trigger(request, vote)
 

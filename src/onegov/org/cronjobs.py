@@ -672,7 +672,7 @@ def send_monthly_mtan_statistics(request: 'OrgRequest') -> None:
 
 @OrgApp.cronjob(hour=4, minute=0, timezone='Europe/Zurich')
 def delete_content_marked_deletable(request: 'OrgRequest') -> None:
-    """ find all models inheriting from DeletableContentExtension, iterate
+    """ Find all models inheriting from DeletableContentExtension, iterate
     over objects marked as `deletable` and delete them if expired.
 
     Currently extended directory entries, news, events and occurrences.

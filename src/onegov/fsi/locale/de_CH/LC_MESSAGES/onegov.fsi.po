@@ -1,7 +1,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE 1.0\n"
-"POT-Creation-Date: 2024-08-13 09:41+0200\n"
+"POT-Creation-Date: 2024-11-28 10:06+0100\n"
 "PO-Revision-Date: 2020-03-05 14:36+0100\n"
 "Last-Translator: Denis Krienbühl <denis.krienbuehl@seantis.ch>\n"
 "Language-Team: German\n"
@@ -194,8 +194,18 @@ msgstr ""
 msgid "There are other subscriptions for the same course in this year"
 msgstr "Für dieses Jahr gibt es bereits andere Anmeldungen für diesen Kurs"
 
+#, python-format
+msgid ""
+"The selected course must take place at least 6 years after the last course "
+"for which the attendee was registered. The last course for this attendee was "
+"on ${date}."
+msgstr ""
+"Die gewählte Kursdurchführung muss mindestens 6 Jahre nach der letzten "
+"Kursdurchführung, zu welcher der Teilnehmer angemeldet wurde, stattfinden. "
+"Die letzte Kursdurchführung für diesen Teilnehmer war am ${date}."
+
 msgid "This course event can't be booked (anymore)."
-msgstr "Diese Durchführung kann (nicht) mehr gebucht werden."
+msgstr "Diese Durchführung kann nicht (mehr) gebucht werden."
 
 msgid "Placeholder Description (optional)"
 msgstr "Platzhalter-Beschreibung (optional)"
@@ -617,6 +627,9 @@ msgstr "Rot"
 
 msgid "Attendee should have attended the course already, but didn't."
 msgstr "Der nächste Kursbesuch ist ausstehend."
+
+msgid "Logo"
+msgstr "Logo"
 
 msgid "Dear ${first_name} ${last_name}"
 msgstr "Sehr geehrte(r) ${first_name} ${last_name}"

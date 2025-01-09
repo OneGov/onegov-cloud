@@ -9,7 +9,7 @@ from lxml import etree
 from onegov.core.widgets import transform_structure
 from onegov.core.widgets import XML_LINE_OFFSET
 from onegov.form import Form
-from onegov.form.fields import ChosenSelectField
+from onegov.form.fields import ChosenSelectField, URLPanelField
 from onegov.form.fields import ColorField
 from onegov.form.fields import CssField
 from onegov.form.fields import MarkupField
@@ -777,6 +777,36 @@ class AnalyticsSettingsForm(Form):
         description=_('JavaScript for web statistics support'),
         render_kw={'rows': 10, 'data-editor': 'html'})
 
+    # Points the user to the analytics url e.g. matomo or plausible
+    analytics_url = URLPanelField(
+        label=_('Analytics URL'),
+        description=_('URL pointing to the analytics page'),
+        render_kw={'readonly': True},
+        validators=[UrlRequired(), Optional()],
+        text='',
+        kind='panel',
+        hide_label=False
+    )
+
+    def derive_analytics_url(self) -> str:
+        analytics_code = self.analytics_code.data or ''
+
+        if 'analytics.seantis.ch' in analytics_code:
+            data_domain = analytics_code.split(
+                'data-domain="', 1)[1].split('"', 1)[0]
+            return f'https://analytics.seantis.ch/{data_domain}'
+        elif 'matomo' in analytics_code:
+            return 'https://stats.seantis.ch'
+        else:
+            return ''
+
+    def populate_obj(self, model: 'Organisation') -> None:  # type:ignore
+        super().populate_obj(model)
+
+    def process_obj(self, model: 'Organisation') -> None:  # type:ignore
+        super().process_obj(model)
+        self.analytics_url.text = self.derive_analytics_url()
+
 
 class HolidaySettingsForm(Form):
 
@@ -1101,10 +1131,6 @@ class NewsletterSettingsForm(Form):
     show_newsletter = BooleanField(
         label=_('Enable newsletter'),
         default=False
-    )
-
-    logo_in_newsletter = BooleanField(
-        label=_('Include logo in newsletter')
     )
 
     secret_content_allowed = BooleanField(

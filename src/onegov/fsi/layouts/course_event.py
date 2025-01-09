@@ -199,7 +199,7 @@ class CourseEventLayout(DefaultLayout):
                 _('Placeholder'),
                 self.request.link(
                     self.reservation_collection,
-                    name='add-icon'
+                    name='add-placeholder'
                 ),
                 attrs={'class': 'add-placeholder'}
             )

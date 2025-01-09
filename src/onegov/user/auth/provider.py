@@ -6,12 +6,15 @@ from uuid import uuid4
 
 import morepath
 from attr import attrs, attrib, validators
+from jwt.exceptions import InvalidTokenError, PyJWKClientError
+from oauthlib.oauth2 import OAuth2Error
 from sedate import utcnow
 
 from onegov.core.crypto import random_token
 from onegov.user import _, log, UserCollection
 from onegov.user.auth.clients import KerberosClient
 from onegov.user.auth.clients import LDAPClient
+from onegov.user.auth.clients.oidc import OIDCConnections
 from onegov.user.auth.clients.msal import MSALConnections
 from onegov.user.auth.clients.saml2 import SAML2Connections
 from onegov.user.auth.clients.saml2 import finish_logout
@@ -639,7 +642,7 @@ class LDAPKerberosProvider(
         LDAP/Kerberos, but for them it's basically their local OS login).
 
         """
-        user_os = request.agent['os']['family']
+        user_os = request.agent.os.family
 
         if user_os == 'Other':
             return _('Login with operating system')
@@ -1106,6 +1109,9 @@ class SAML2Provider(
         # if the source isn't what we expect then it doesn't apply
         client = self.tenants.client(request.app)
         assert client is not None
+        if not client.slo_enabled:
+            return None
+
         if client.treat_as_ldap:
             if user.source != 'ldap':
                 return None
@@ -1180,6 +1186,7 @@ class SAML2Provider(
         # remember where we need to redirect to
         redirects = client.get_redirects(app)
         redirects[session_id] = self.to
+        request.browser_session['login_to'] = self.to
 
         # since prepare_for_authenticate() needs to support other
         # bindings as well, the request_info ends up being overly
@@ -1286,6 +1293,272 @@ class SAML2Provider(
         # We set the path we wanted to go when starting the oauth flow
         redirects = client.get_redirects(request.app)
         self.to = redirects.pop(session_id, '/')
+
+        return Success(user, _('Successfully logged in as «${user}»', mapping={
+            'user': user.username
+        }))
+
+    def is_primary(self, app: 'UserApp') -> bool:
+        client = self.tenants.client(app)
+        if client:
+            return client.primary
+        return False
+
+    def available(self, app: 'UserApp') -> bool:
+        return self.tenants.client(app) and True or False
+
+
+@attrs(auto_attribs=True)
+class OIDCProvider(
+    OauthProvider,
+    metadata=ProviderMetadata(name='oidc', title=_('OpenID Connect'))
+):
+    """
+    Authenticates and authorizes a user on SAML2 IDP
+    """
+
+    # oidc instances by tenant
+    tenants: OIDCConnections = attrib()
+
+    # Roles configuration
+    roles: RolesMapping = attrib()
+
+    # Custom hint to be shown in the login view
+    custom_hint: str = ''
+
+    @classmethod
+    def configure(cls, name: str, **cfg: Any) -> Self | None:
+
+        if not cfg:
+            return None
+
+        return cls(
+            name=name,
+            tenants=OIDCConnections.from_cfg(cfg.get('tenants', {})),
+            custom_hint=cfg.get('hint', None),
+            roles=RolesMapping(cfg.get('roles', {
+                '__default__': {
+                    'admins': 'admins',
+                    'editors': 'editors',
+                    'members': 'members'
+                }
+            }))
+        )
+
+    def button_text(self, request: 'CoreRequest') -> str:
+        client = self.tenants.client(request.app)
+        assert client is not None
+        return client.button_text
+
+    def do_logout(
+        self,
+        request: 'CoreRequest',
+        user: 'User',
+        to: str
+    ) -> Response | None:
+
+        # TODO: SLO/Provider logout? Revoke access token?
+        return finish_logout(request, user, to)
+
+    def authenticate_request(
+        self,
+        request: 'CoreRequest'
+    ) -> Response | Failure:
+        """
+        Returns a redirect response or a Conclusion
+
+        Parameters of the original request are kept for when external services
+        call back.
+        """
+
+        app = request.app
+        client = self.tenants.client(app)
+        roles = self.roles.app_specific(app)
+
+        if not roles:
+            # Considered as a misconfiguration of the app
+            log.error(f'No role map for {app.application_id}')
+            return Failure(_('Authorisation failed due to an error'))
+
+        if not client:
+            # Considered as a misconfiguration of the app
+            log.error(f'No OIDC client found for '
+                      f'{app.application_id} or {app.namespace}')
+            return Failure(_('Authorisation failed due to an error'))
+
+        try:
+            metadata = client.metadata(request)
+        except Exception as error:
+            # Usually a misconfiguration, but could also be a temporary
+            # failure if the identity provider is down
+            log.error(f'Failed to retrieve/validate OIDC metadata in '
+                      f'{app.application_id}: {error}')
+            return Failure(_('Authorisation failed due to an error'))
+
+        session = client.session(self, request, with_openid_scope=True)
+        auth_url, _state = session.authorization_url(
+            metadata['authorization_endpoint'],
+            request.new_url_safe_token(
+                data={'to': self.to},
+                # NOTE: This should sufficiently prevent replay attacks
+                #       since once they succesfully manage to hijack
+                #       the original session that issued this authentication
+                #       they no longer need to or can replay authorisation
+                #       since that session is either already expired
+                #       or still logged in.
+                #       But if we want maximum robustness we can choose
+                #       to send a nonce url parameter in addition to the
+                #       state, which will be returned to us via the JWT
+                salt=request.csrf_salt
+            ),
+        )
+        request.browser_session['login_to'] = self.to
+
+        return morepath.redirect(auth_url)
+
+    def request_authorisation(
+        self,
+        request: 'CoreRequest'
+    ) -> Success | Failure:
+        """
+        Returns a webob Response or a Conclusion.
+        """
+
+        data = request.load_url_safe_token(
+            request.GET.get('state'),
+            request.csrf_salt,
+            900  # 15 minutes should be plenty for a login
+        )
+        if data is None:
+            return Failure(_('Authorisation failed due to an error'))
+
+        app = request.app
+
+        client = self.tenants.client(app)
+        roles = self.roles.app_specific(app)
+
+        if not roles:
+            # Considered as a misconfiguration of the app
+            log.error(f'No role map for {app.application_id}')
+            return Failure(_('Authorisation failed due to an error'))
+
+        if not client:
+            # Considered as a misconfiguration of the app
+            log.error(f'No oidc client found for '
+                      f'{app.application_id} or {app.namespace}')
+            return Failure(_('Authorisation failed due to an error'))
+
+        try:
+            metadata = client.metadata(request)
+        except Exception as error:
+            # Usually a misconfiguration, but could also be a temporary
+            # failure if the identity provider is down
+            log.error(f'Failed to retrieve/validate OIDC metadata in '
+                      f'{app.application_id}: {error}')
+            return Failure(_('Authorisation failed due to an error'))
+
+        session = client.session(self, request)
+        try:
+            token = session.fetch_token(
+                metadata['token_endpoint'],
+                authorization_response=request.url,
+                client_secret=client.client_secret,
+            )
+        except OAuth2Error as error:
+            log.info(f'OAuth2 Error in {app.application_id}: {error}')
+            return Failure(_('Authorisation failed due to an error'))
+
+        try:
+            payload = client.validate_token(request, token)
+        except PyJWKClientError as error:
+            # this is either a configuration error or the JWKS
+            # endpoint is down or has recently been updated, so
+            # the old keys are still in cache
+            # FIXME: Do we want to try clearing the cache here?
+            #        We could also write our own subclass, that
+            #        automatically clears the cache, if it doesn't
+            #        contain the key that was used to sign the token.
+            #        Generally this should only be a rare temporary
+            #        issue when the signing key gets changed.
+            log.info(f'OICD JWK error in {app.application_id}: {error}')
+            return Failure(_('Authorisation failed due to an error'))
+        except InvalidTokenError as error:
+            log.info(f'Invalid OIDC token in {app.application_id}: {error}')
+            return Failure(_('Authorisation failed due to an error'))
+
+        source_id = payload.get(client.attributes.source_id, None)
+        username = payload.get(client.attributes.username, None)
+        first_name = payload.get(client.attributes.first_name, None)
+        last_name = payload.get(client.attributes.last_name, None)
+        groups = payload.get(client.attributes.group, None)
+        if first_name and last_name:
+            realname = f'{first_name} {last_name}'
+        else:
+            realname = payload.get(client.attributes.preferred_username, None)
+
+        # try to retrieve any missing claims from the userinfo endpoint
+        if not (source_id and username and groups and realname) and (
+            user_url := metadata.get('userinfo_endpoint')
+        ):
+            try:
+                response = session.get(user_url, timeout=(5, 10))
+                response.raise_for_status()
+                claims = response.json()
+                assert isinstance(claims, dict)
+                source_id = source_id or claims.get(
+                    client.attributes.source_id, None)
+                username = username or claims.get(
+                    client.attributes.username, None)
+                first_name = first_name or claims.get(
+                    client.attributes.first_name, None)
+                last_name = last_name or claims.get(
+                    client.attributes.last_name, None)
+                groups = groups or claims.get(client.attributes.group, None)
+
+                if realname:
+                    # already set
+                    pass
+                elif first_name and last_name:
+                    realname = f'{first_name} {last_name}'
+                else:
+                    realname = claims.get(
+                        client.attributes.preferred_username, None)
+
+            except Exception as error:
+                log.info(f'Failed to retrieve OIDC userinfo: {error}')
+
+        if not username:
+            log.info('No username found in authorisation step')
+            return Failure(_('Authorisation failed due to an error'))
+
+        if not source_id:
+            log.info(f'No source_id found for {username}')
+            return Failure(_('Authorisation failed due to an error'))
+
+        if not groups:
+            log.info(f'No groups found for {username}')
+            return Failure(_("Can't login because your user has no group. "
+                             "Contact your OpenID system administrator"))
+
+        role = self.roles.match(roles, groups)
+
+        if not role:
+            log.info(f'No authorized group for {username}, '
+                     f'having groups: {", ".join(groups)}')
+            return Failure(_('Authorisation failed due to an error'))
+
+        user = ensure_user(
+            source=self.name,
+            source_id=source_id,
+            session=request.session,
+            username=username,
+            role=role,
+            realname=realname
+        )
+
+        # retrieve the redirect target from the state
+        if redirect_to := data.get('to'):
+            self.to = redirect_to
 
         return Success(user, _('Successfully logged in as «${user}»', mapping={
             'user': user.username

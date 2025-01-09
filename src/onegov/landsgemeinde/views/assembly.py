@@ -221,6 +221,32 @@ def delete_assembly(self: Assembly, request: 'LandsgemeindeRequest') -> None:
     collection.delete(self)
 
 
+@LandsgemeindeApp.html(
+    model=Assembly,
+    template='open_data_info.pt',
+    name='open-data',
+    permission=Public
+)
+def view_assembly_open_data(
+    self: Assembly,
+    request: 'LandsgemeindeRequest'
+) -> 'RenderData | Response':
+
+    layout = AssemblyLayout(self, request)
+
+    if not request.is_manager and layout.current_assembly() == self:
+        return redirect(request.link(self, name='ticker'))
+
+    layout.breadcrumbs.append(Link(_('Open data'), '#'))
+
+    return {
+        'layout': layout,
+        'assembly': self,
+        'agenda_items': self.agenda_items,
+        'title': _('Open data'),
+    }
+
+
 @LandsgemeindeApp.json(
     model=Assembly,
     name='json',

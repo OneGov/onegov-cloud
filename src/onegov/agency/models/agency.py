@@ -90,7 +90,10 @@ class ExtendedAgency(Agency, AccessExtension, PublicationExtension):
 
         """
 
-        return self.pdf.reference.file if self.pdf else None
+        try:
+            return self.pdf.reference.file if self.pdf else None
+        except (OSError, Exception):
+            return None
 
     # FIXME: asymmetric property
     @pdf_file.setter
@@ -162,8 +165,11 @@ class ExtendedAgency(Agency, AccessExtension, PublicationExtension):
         )
         self.memberships.append(membership)
 
-        for order, _membership in enumerate(self.memberships):
-            _membership.order_within_agency = order
+        # re-order all memberships cannot be done here, because the order
+        # within the agency is not yet set. do be done once all memberships
+        # are added to the agency.
+        # for order, _membership in enumerate(self.memberships):
+        #     _membership.order_within_agency = order
 
         session.flush()
 

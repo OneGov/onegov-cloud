@@ -91,9 +91,9 @@ def get_random_color(seed: str, lightness: float, saturation: float) -> str:
     r, g, b = colorsys.hls_to_rgb(hue, lightness, saturation)
 
     return '#{:02x}{:02x}{:02x}'.format(
-        int(round(r * 255)),
-        int(round(g * 255)),
-        int(round(b * 255))
+        round(r * 255),
+        round(g * 255),
+        round(b * 255)
     )
 
 
@@ -212,7 +212,7 @@ def annotate_html(
     if request:
         set_image_sizes(images, request)
 
-    return Markup(  # noqa: MS001
+    return Markup(  # noqa: RUF035
         ''.join(tostring(e, encoding=str) for e in fragments))
 
 
@@ -226,7 +226,7 @@ def remove_empty_paragraphs(html: Markup | None) -> Markup | None:
     if not html:
         return html
 
-    return Markup(EMPTY_PARAGRAPHS.sub('', html))  # noqa: MS001
+    return Markup(EMPTY_PARAGRAPHS.sub('', html))  # noqa: RUF035
 
 
 def set_image_sizes(
@@ -1100,7 +1100,7 @@ def hashtag_elements(request: 'OrgRequest', text: str) -> Markup:
         return f'<a class="hashtag" href="{link}">{tag}</a>'
 
     # NOTE: We need to restore Markup after re.sub call
-    return Markup(HASHTAG.sub(replace_tag, escape(text)))  # noqa: MS001
+    return Markup(HASHTAG.sub(replace_tag, escape(text)))  # noqa: RUF035
 
 
 def ticket_directory_groups(

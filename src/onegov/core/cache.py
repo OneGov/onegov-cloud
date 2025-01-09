@@ -103,7 +103,7 @@ def dill_serialize(value: Any) -> bytes:
 def dill_deserialize(value: 'bytes | NoValue') -> Any:
     if value is NO_VALUE:
         return value
-    return dill.loads(value)
+    return dill.loads(value)  # nosec:B301
 
 
 class RedisCacheRegion(CacheRegion):
@@ -121,6 +121,7 @@ class RedisCacheRegion(CacheRegion):
         redis_url: str,
     ):
         super().__init__(
+            # FIXME: OGC-1893
             serializer=dill_serialize,
             deserializer=dill_deserialize
         )

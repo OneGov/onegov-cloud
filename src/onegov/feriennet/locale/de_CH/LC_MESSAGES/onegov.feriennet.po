@@ -1,7 +1,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE 1.0\n"
-"POT-Creation-Date: 2024-05-07 08:34+0200\n"
+"POT-Creation-Date: 2024-11-18 10:17+0100\n"
 "PO-Revision-Date: 2021-11-11 09:08+0100\n"
 "Last-Translator: Marc Sommerhalder <marc.sommerhalder@seantis.ch>\n"
 "Language-Team: German\n"
@@ -683,8 +683,8 @@ msgstr "Geburtsdatum"
 msgid "Gender"
 msgstr "Geschlecht"
 
-msgid "Health Information"
-msgstr "Gesundheitsangaben"
+msgid "Is there anything the course instructor should know?"
+msgstr "Gibt es etwas, das der Kursleiter wissen sollte?"
 
 msgid "Allergies, Disabilities, Particulars"
 msgstr "Allergien, Behinderungen, Besonderheiten"
@@ -2864,20 +2864,6 @@ msgstr "Ihre Spende wurde entfernt"
 msgid "This donation has already been paid"
 msgstr "Die Spende wurde bereits bezahlt"
 
-msgid "Can not do matchings for an inactive period"
-msgstr "Zuteilungen können nur in einem aktiven Zeitraum durchgeführt werden"
-
-msgid "Can not do matchings for an confirmed period"
-msgstr ""
-"Zuteilungen können nur in einem nicht bestätigten Zeitraum durchgeführt "
-"werden"
-
-msgid "The matching was confirmed successfully"
-msgstr "Die Zuteilung wurde erfolgreich abgeschlossen"
-
-msgid "The matching run executed successfully"
-msgstr "Der Zuteilungs-Lauf wurde erfolgreich durchgeführt"
-
 msgid "Too many attendees"
 msgstr "Überbelegt"
 
@@ -2892,6 +2878,20 @@ msgstr "Unterbelegt"
 
 msgid "No attendees"
 msgstr "Unbelegt"
+
+msgid "Can not do matchings for an inactive period"
+msgstr "Zuteilungen können nur in einem aktiven Zeitraum durchgeführt werden"
+
+msgid "Can not do matchings for an confirmed period"
+msgstr ""
+"Zuteilungen können nur in einem nicht bestätigten Zeitraum durchgeführt "
+"werden"
+
+msgid "The matching was confirmed successfully"
+msgstr "Die Zuteilung wurde erfolgreich abgeschlossen"
+
+msgid "The matching run executed successfully"
+msgstr "Der Zuteilungs-Lauf wurde erfolgreich durchgeführt"
 
 #, python-format
 msgid "Matches for ${title}"
@@ -3189,6 +3189,9 @@ msgstr "Buchungen ${period}"
 #, python-format
 msgid "Billing for ${period}"
 msgstr "Fakturierung ${period}"
+
+#~ msgid "Health Information"
+#~ msgstr "Gesundheitsangaben"
 
 #~ msgid "Move"
 #~ msgstr "Verschieben"

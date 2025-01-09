@@ -16,7 +16,7 @@ from onegov.file.utils import IMAGE_MIME_TYPES_AND_SVG
 from onegov.form import log, _
 from onegov.form.utils import path_to_filename
 from onegov.form.validators import ValidPhoneNumber
-from onegov.form.widgets import ChosenSelectWidget
+from onegov.form.widgets import ChosenSelectWidget, LinkPanelWidget
 from onegov.form.widgets import HoneyPotWidget
 from onegov.form.widgets import IconWidget
 from onegov.form.widgets import MultiCheckboxWidget
@@ -311,7 +311,7 @@ class UploadMultipleField(UploadMultipleBase, FileField):
     if TYPE_CHECKING:
         _separator: str
 
-        def _add_entry(self, __d: _MultiDictLikeWithGetlist) -> UploadField:
+        def _add_entry(self, d: _MultiDictLikeWithGetlist, /) -> UploadField:
             ...
 
     upload_field_class: type[UploadField] = UploadField
@@ -453,7 +453,8 @@ class UploadMultipleFilesWithORMSupport(UploadMultipleField):
             dummy = _DummyFile()
             dummy.file = file
             field.populate_obj(dummy, 'file')
-            if dummy.file is not None:
+            # avoid generating multiple links to the same file
+            if dummy.file is not None and dummy.file not in output:
                 output.append(dummy.file)
                 if (
                     dummy.file is not file
@@ -524,7 +525,7 @@ class MarkupField(TextAreaField):
     def process_formdata(self, valuelist: list['RawFormValue']) -> None:
         if valuelist:
             assert isinstance(valuelist[0], str)
-            self.data = Markup(valuelist[0])  # noqa: MS001
+            self.data = Markup(valuelist[0])  # noqa: RUF035
         else:
             self.data = None
 
@@ -673,6 +674,11 @@ class PanelField(Field):
 
     def populate_obj(self, obj: object, name: str) -> None:
         pass
+
+
+class URLPanelField(PanelField):
+
+    widget = LinkPanelWidget()
 
 
 class DateTimeLocalField(DateTimeLocalFieldBase):

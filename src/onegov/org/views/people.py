@@ -80,7 +80,7 @@ def person_functions_by_organization(
      organizations for a person. Organizations are pages where `subject_person`
      is listed as a person.
 
-     Returns a List of Markup in the form:
+     Returns an Iterable of Markup in the form:
 
         - Organization 1: Function A
         - Organization 2: Function B

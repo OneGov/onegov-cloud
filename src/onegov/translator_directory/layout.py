@@ -19,7 +19,7 @@ from onegov.translator_directory.constants import (
     GENDERS, ADMISSIONS, PROFESSIONAL_GUILDS, INTERPRETING_TYPES)
 
 
-from typing import TYPE_CHECKING
+from typing import TYPE_CHECKING, Any
 if TYPE_CHECKING:
     from collections.abc import Iterable
     from onegov.translator_directory.models.language import Language
@@ -382,6 +382,11 @@ class AddTranslatorLayout(TranslatorCollectionLayout):
 
 
 class TranslatorDocumentsLayout(DefaultLayout):
+
+    def __init__(self, model: Any, request: 'TranslatorAppRequest') -> None:
+        super().__init__(model, request)
+        request.include('upload')
+        request.include('prompt')
 
     @cached_property
     def breadcrumbs(self) -> list[Link]:

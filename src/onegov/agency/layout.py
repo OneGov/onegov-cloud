@@ -379,9 +379,7 @@ class AgencyPathMixin:
     ) -> 'Iterator[Link]':
 
         for ix, ancestor in enumerate(item.ancestors, 1):
-            if levels is None:
-                yield Link(ancestor.title, self.request.link(ancestor))
-            elif ix in levels:
+            if levels is None or ix in levels:
                 yield Link(ancestor.title, self.request.link(ancestor))
 
         if with_item:

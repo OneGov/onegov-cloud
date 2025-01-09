@@ -6,7 +6,7 @@ from onegov.api.token import get_token
 from onegov.api.utils import authenticate, check_rate_limit
 from onegov.core.security import Public
 from onegov.form.fields import HoneyPotField
-from webob.exc import HTTPMethodNotAllowed, HTTPUnauthorized
+from webob.exc import HTTPMethodNotAllowed, HTTPNotFound, HTTPUnauthorized
 from wtforms import HiddenField
 
 
@@ -156,6 +156,12 @@ def view_api_endpoint_item(
         assert endpoint is not None
         links = self.links or {}
         data = self.data or {}
+
+        # make sure we are actually supposed to be able to see this
+        # the API shouldn't include invisible items either (for now)
+        if (item := self.item) and not request.is_visible(item):
+            raise HTTPNotFound()
+
         payload: dict[str, JSONObject] = {
             'collection': {
                 'version': '1.0',
@@ -222,6 +228,11 @@ def edit_api_endpoint_item(
             if api_key.read_only:
                 raise HTTPUnauthorized()
 
+        # make sure we are actually supposed to be able to see this
+        # the API shouldn't include invisible items either (for now)
+        if (item := self.item) and not request.is_visible(item):
+            raise HTTPNotFound()
+
         def walk_errors(
             errors: 'Sequence[str] | _FormErrors',
             prefix: str | None
@@ -258,6 +269,9 @@ def get_time_restricted_token(
     self: AuthEndpoint, request: 'CoreRequest'
 ) -> dict[str, str]:
     try:
+        if request.authorization is None:
+            raise HTTPUnauthorized()
+
         return get_token(request)
     except Exception as exception:
         raise ApiException(exception=exception) from exception

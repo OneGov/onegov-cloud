@@ -106,10 +106,7 @@ function configure-sentry() {
 }
 
 function current-version() {
-    git ls-remote --tags origin \
-        | awk -F '/' '{print $NF}' \
-        | sort --reverse --version-sort\
-        | head -n 1
+    git tag --sort=version:refname --merged master | tail -n 1
 }
 
 function announce-release-on-sentry-io() {

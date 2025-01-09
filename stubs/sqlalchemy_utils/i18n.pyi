@@ -1,5 +1,5 @@
 from collections.abc import Callable, Mapping
-from typing import Any, Generic, Any as Incomplete
+from typing import Any, Any as Incomplete
 from typing_extensions import TypeAlias
 
 from babel import Locale

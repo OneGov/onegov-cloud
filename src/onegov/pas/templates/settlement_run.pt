@@ -1,23 +1,42 @@
 <div metal:use-macro="layout.base" i18n:domain="onegov.pas">
     <tal:b metal:fill-slot="title">
-        ${title}
+            ${title}
     </tal:b>
 
     <tal:b metal:fill-slot="content">
         <dl class="field-display">
             <div>
-                <dt i18n:translate>Start</dt>
+                <dt i18n:translate="">Start</dt>
                 <dd>${layout.format_date(settlement_run.start, 'date')}</dd>
             </div>
             <div>
-                <dt i18n:translate>End</dt>
+                <dt i18n:translate="">End</dt>
                 <dd>${layout.format_date(settlement_run.end, 'date')}</dd>
             </div>
             <div>
-                <dt i18n:translate>Active</dt>
-                <dd tal:condition="settlement_run.active" i18n:translate>Yes</dd>
-                <dd tal:condition="not settlement_run.active" i18n:translate>No</dd>
+                <dt i18n:translate="">Active</dt>
+                <dd tal:condition="settlement_run.active" i18n:translate="">Yes</dd>
+                <dd tal:condition="not settlement_run.active" i18n:translate="">No</dd>
             </div>
         </dl>
+
+        <h3 i18n:translate="">Exports Settlement runs</h3>
+
+        <div tal:repeat="category categories.values()">
+
+            <div class="category-container">
+                <hr class="short-hr">
+                <h3 class="export-category-title">${category.title}</h3>
+                <hr class="long-hr">
+            </div>
+
+            <div class="link-container">
+                <tal:b repeat="link category.links">
+                    <span class="link-item" tal:content="link(layout)"></span>
+                </tal:b>
+            </div>
+
+        </div>
     </tal:b>
+
 </div>

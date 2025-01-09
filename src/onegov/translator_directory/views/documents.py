@@ -26,9 +26,6 @@ def view_translator_documents(
     self: TranslatorDocumentCollection,
     request: 'TranslatorAppRequest'
 ) -> 'RenderData':
-    request.include('common')
-    request.include('upload')
-    request.include('prompt')
 
     layout = TranslatorDocumentsLayout(self, request)
 

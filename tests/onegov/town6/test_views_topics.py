@@ -1,3 +1,4 @@
+
 def test_sort_topics(client):
     client.login_admin().follow()
 

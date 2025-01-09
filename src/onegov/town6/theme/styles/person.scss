@@ -201,7 +201,6 @@ Person card in lists
         -webkit-line-clamp: 2;
         display: -webkit-box;
         margin-bottom: 0;
-        overflow: hidden;
 
         span {
             cursor: help;
@@ -209,6 +208,10 @@ Person card in lists
     }
 }
 
+
+.list-lead.preview {
+    white-space: pre-line; /* Preserves line breaks */
+}
 /*
     A-Z Blocks
 */

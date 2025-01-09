@@ -119,7 +119,7 @@ class Principal:
         #       in order for most analytics to work. Eventually this may be
         #       able to go away again or be reduced to support a few specific
         #       providers.
-        self.analytics = Markup(analytics) if analytics else None  # noqa:MS001
+        self.analytics = Markup(analytics) if analytics else None  # noqa: RUF035
         self.has_districts = has_districts
         self.has_regions = has_regions
         self.has_superregions = has_superregions
@@ -276,6 +276,12 @@ class Canton(Principal):
             year = int(path.name)
             with (path / '{}.json'.format(canton)).open('r') as f:
                 entities[year] = {int(k): v for k, v in json.load(f).items()}
+
+        # NOTE: this section may depend on static data for principle.entities.
+        # See src/onegov/election_day/static/municipalities/<year>/*.json
+        if date.today().year not in entities:
+            print(f'Warning: No entities for year {date.today().year} found '
+                  f'for {canton}')
 
         # Test if all entities have districts (use none, if ambiguous)
         districts = {
@@ -436,6 +442,12 @@ class Municipality(Principal):
                 year: {int(municipality): {'name': kwargs.get('name', '')}}
                 for year in range(2002, date.today().year + 1)
             }
+
+        # NOTE: this section may depend on static data for principle.entities.
+        # See src/onegov/election_day/static/municipalities/<year>/*.json
+        if date.today().year not in entities:
+            print(f'Warning: No entities for year {date.today().year} found '
+                  f'for {municipality}')
 
         super().__init__(
             id_=municipality,

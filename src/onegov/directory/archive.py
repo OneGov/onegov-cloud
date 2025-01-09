@@ -42,7 +42,7 @@ if TYPE_CHECKING:
     ]
 
     class SupportsReadAndSeek(SupportsRead[bytes], Protocol):
-        def seek(self, __offset: int) -> object: ...
+        def seek(self, offset: int, /) -> object: ...
 
 
 class _Sentinel(Enum):
