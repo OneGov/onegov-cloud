@@ -687,18 +687,66 @@ def test_bug_semicolons_in_choices_with_filters(client):
     assert [t.text for t in tags] == [f'{test_label} (1)', 'B (1)', 'C (1)']
 
 
+def test_directory_change_choice_label_in_use(client):
+    session = client.app.session()
+
+    structure = f"""
+    Name *= ___
+    Choice *=
+        (x) Choice A
+        ( ) Choice B
+    """
+
+    DirectoryCollection(session, type='extended').add(
+        title='Choices',
+        structure=structure,
+        configuration=DirectoryConfiguration(
+            title="[Name]",
+            order=["Name"],
+            display={
+                'content': ['Name', 'Choice'],
+                'contact': []
+            },
+            keywords=['Choice'],
+        )
+    )
+    session.flush()
+    transaction.commit()
+    client.login_admin()
+
+    page = client.get('/directories/choices')
+    page = page.click('Eintrag', index=0)
+    page.form['name'] = 'Entry 1'
+    page.form['choice'] = 'Choice A'
+    page = page.form.submit().follow()
+    assert 'Ein neuer Verzeichniseintrag wurde hinzugefügt' in page
+
+    # change the label of 'Choice A'
+    DirectoryCollection(
+        session, type='extended').query().first().structure = f"""
+            Name *= ___
+            Choice *=
+                (x) Choice Alpha
+                ( ) Choice B
+            """
+    session.flush()
+    transaction.commit()
+
+
 def test_bug_dash_in_choices_with_filters(client):
     # initially using dashes in filter names works as expected
+    # hyphens are supported, but not dashes
+    # IMPORTANT: this seems not the root cause, it is rather changing a
+    # choices labe that is in use, see test above
     session = client.app.session()
     test_label_1 = "part one - part two"  # hyphen
-    test_label_2 = "pre – post"  # dash
+    # test_label_2 = "pre – post"  # dash
     test_label_3 = "vor und nach"
 
     structure = f"""
     Name *= ___
     Choice *=
         (x) {test_label_1}
-        ( ) {test_label_2}
         ( ) {test_label_3}
     """
     DirectoryCollection(session, type='extended').add(
@@ -730,28 +778,47 @@ def test_bug_dash_in_choices_with_filters(client):
     page = page.form.submit().follow()
     assert 'Ein neuer Verzeichniseintrag wurde hinzugefügt' in page
 
-    page = client.get('/directories/choices')
-    page = page.click('Eintrag')
-    page.form['name'] = 'Entry 2'
-    page.form['choice'] = test_label_2
-    page = page.form.submit().follow()
-    assert 'Ein neuer Verzeichniseintrag wurde hinzugefügt' in page
+    # page = client.get('/directories/choices')
+    # page = page.click('Eintrag')
+    # page.form['name'] = 'Entry 2'
+    # page.form['choice'] = test_label_2
+    # page = page.form.submit().follow()
+    # assert 'Ein neuer Verzeichniseintrag wurde hinzugefügt' in page
 
     page = client.get('/directories/choices')
     # Test the counter for the filters
     assert 'part one - part two (2)' in page  # default and explicit selection
-    assert 'pre – post (1)' in page  # explicit selection
+    # assert 'pre – post (1)' in page  # explicit selection
     assert 'vor und nach' not in page  # as it is not used
 
     # editing structure using dash in filter name will throw
     # onegov.directory.errors.ValidationError
-    test_label_1 = test_label_1.replace('-', '–')  # hyphen to dash
+    # test_label_1 = test_label_1.replace('-', '–')  # hyphen to dash
+    # DirectoryCollection(
+    #     session, type='extended').query().first().structure = f"""
+    # Name *= ___
+    # Choice *=
+    #     (x) {test_label_1}
+    #     ( ) {test_label_2}
+    #     ( ) {test_label_3}
+    # """
+    # session.flush()
+    # transaction.commit()
+    #
+    # page = client.get('/directories/choices')
+    # # Test the counter for the filters
+    # assert 'part one – part two (2)' in page  # default and explicit selection
+    # assert 'pre – post (1)' in page  # explicit selection
+
+    # editing structure using hyphen in filter label will throw
+    # onegov.directory.errors.ValidationError
+    test_label_1 = 'Super Muti - Super Papi'
+    test_label_1 = 'Super Muti Super Papi'
     DirectoryCollection(
         session, type='extended').query().first().structure = f"""
     Name *= ___
     Choice *=
         (x) {test_label_1}
-        ( ) {test_label_2}
         ( ) {test_label_3}
     """
     session.flush()
@@ -759,9 +826,9 @@ def test_bug_dash_in_choices_with_filters(client):
 
     page = client.get('/directories/choices')
     # Test the counter for the filters
-    assert 'part one – part two (2)' in page  # default and explicit selection
-    assert 'pre – post (1)' in page  # explicit selection
-
+    assert 'part one – part two (1)' in page
+    assert 'Super Muti - Super Papi (1)' in page
+    assert 'pre – post (1)' in page
 
 def test_directory_export(client):
     session = client.app.session()
