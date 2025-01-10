@@ -1100,6 +1100,76 @@ class SidebarLinksExtension(ContentExtension):
         return SidebarLinksForm
 
 
+class SidebarContactLinkExtension(ContentExtension):
+    """Extends any class that has a content dictionary field with the ability to
+    add a contact link to the sidebar.
+    """
+
+    contact_link_text = content_property()
+    contact_link_url = content_property()
+
+    def extend_form(
+        self, form_class: type['FormT'], request: 'OrgRequest'
+    ) -> type['FormT']:
+
+        class ContactLinkForm(form_class):
+            contact_link_text = StringField(
+                label=_('Contact link text'),
+                fieldset=_('Sidebar links'),
+                render_kw={'class_': 'side-by-side-form-fields'},
+                description=_(
+                    'The text to show for the contact link in the sidebar'
+                ),
+            )
+
+            contact_link_url = StringField(
+                label=_('Contact link URL'),
+                fieldset=_('Sidebar links'),
+                render_kw={'class_': 'side-by-side-form-fields'},
+                description=_('The URL the contact link should point to'),
+            )
+
+            def validate_contact_link_url(
+                self, field: StringField
+            ) -> None:
+                if self.contact_link_text.data and not field.data:
+                    raise ValidationError(
+                        _(
+                            'Please provide a URL if contact link text is set'
+                        )
+                    )
+
+                if field.data and not self.contact_link_text.data:
+                    raise ValidationError(
+                        _('Please provide link text if contact URL is set')
+                    )
+
+                    url = field.data
+                    if url and not re.match(r'^(http://|https://|/)', url):
+                        raise ValidationError(
+                            _('Your URLs must start with http://,'
+                              ' https:// or /'
+                              ' (for internal links)')
+                        )
+
+            def process_obj(self, obj: 'SidebarContactLinkExtension') -> None:
+                super().process_obj(obj)
+                self.contact_link_text.data = obj.contact_link_text
+                self.contact_link_url.data = obj.contact_link_url
+
+            def populate_obj(
+                self,
+                obj: 'SidebarContactLinkExtension',
+                *args: Any,
+                **kwargs: Any
+            ) -> None:
+                super().populate_obj(obj, *args, **kwargs)
+                obj.contact_link_text = self.contact_link_text.data or None
+                obj.contact_link_url = self.contact_link_url.data or None
+
+        return ContactLinkForm
+
+
 class DeletableContentExtension(ContentExtension):
     """ Extends any class that has a meta dictionary field with the ability to
     mark the content as deletable after reaching the end date. A cronjob will
