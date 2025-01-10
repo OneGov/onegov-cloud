@@ -8,7 +8,6 @@ from onegov.core.cache import lru_cache
 from onegov.core.orm import find_models
 from onegov.core.orm.mixins.publication import UTCPublicationMixin
 from onegov.core.templates import render_template
-from onegov.directory import DirectoryCollection
 from onegov.event import Occurrence, Event
 from onegov.file import FileCollection
 from onegov.form import FormSubmission, parse_form
@@ -18,8 +17,6 @@ from onegov.org import _, OrgApp
 from onegov.org.layout import DefaultMailLayout
 from onegov.org.models import (
     ResourceRecipient, ResourceRecipientCollection, TANAccess, News)
-from onegov.org.models.directory import ExtendedDirectoryEntryCollection, \
-    ExtendedDirectory
 from onegov.org.models.extensions import (
     GeneralFileLinkExtension, DeletableContentExtension)
 from onegov.org.models.ticket import ReservationHandler
@@ -72,9 +69,8 @@ WEEKDAYS = (
 @OrgApp.cronjob(hour='*', minute=0, timezone='UTC')
 def hourly_maintenance_tasks(request: 'OrgRequest') -> None:
     publish_files(request)
-    reindex_published_models(request)
+    handle_publication_models(request)
     send_scheduled_newsletter(request)
-    send_email_notification_for_recent_directory_entry_publications(request)
     delete_old_tans(request)
     delete_old_tan_accesses(request)
 
@@ -90,47 +86,20 @@ def send_scheduled_newsletter(request: 'OrgRequest') -> None:
         newsletter.scheduled = None
 
 
-def send_email_notification_for_recent_directory_entry_publications(
-    request: 'OrgRequest'
-) -> None:
-    """
-    Sends notifications to users about recently published `DirectoryEntry`.
-
-    """
-
-    now = utcnow()
-    directory: ExtendedDirectory
-
-    for directory in (DirectoryCollection(request.session, type='extended')
-            .query().filter(
-                ExtendedDirectory.enable_update_notifications == True)):
-
-        directory_entries = ExtendedDirectoryEntryCollection(
-            directory).query().filter(
-                now >= ExtendedDirectoryEntry.publication_start,
-                now < ExtendedDirectoryEntry.publication_end,
-                # ExtendedDirectoryEntry.published == True,
-                ExtendedDirectoryEntry.notification_sent == None,
-            )
-
-        for entry in directory_entries:
-            assert entry.published
-            send_email_notification_for_directory_entry(
-                directory, entry, request)
-            entry.notification_sent = now
-
-
 def publish_files(request: 'OrgRequest') -> None:
     FileCollection(request.session).publish_files()
 
 
-def reindex_published_models(request: 'OrgRequest') -> None:
+def handle_publication_models(request: 'OrgRequest') -> None:
     """
     Reindexes all recently published/unpublished objects
     in the elasticsearch database.
 
     For pages it also updates the propagated access to any
     associated files.
+
+    For directory entries it also sends out e-mail notifications if
+    published within the last hour.
     """
 
     if not hasattr(request.app, 'es_client'):
@@ -171,6 +140,10 @@ def reindex_published_models(request: 'OrgRequest') -> None:
 
         if isinstance(obj, Searchable):
             request.app.es_orm_events.index(request.app.schema, obj)
+
+        if isinstance(obj, ExtendedDirectoryEntry) and obj.published:
+            send_email_notification_for_directory_entry(
+                obj.directory, obj, request)
 
 
 def delete_old_tans(request: 'OrgRequest') -> None:
