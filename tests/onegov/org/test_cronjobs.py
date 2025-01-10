@@ -1286,9 +1286,10 @@ def test_delete_content_marked_deletable__events_occurrences(org_app,
 
 
 def test_send_email_notification_for_recent_directory_entry_publications(
-    org_app,
+    es_org_app,
     handlers
 ):
+    org_app = es_org_app
     register_echo_handler(handlers)
     register_directory_handler(handlers)
 
@@ -1311,6 +1312,7 @@ def test_send_email_notification_for_recent_directory_entry_publications(
         configuration=DirectoryConfiguration(
             title="[Gesuchsteller/in]",
             order=('Gesuchsteller/in'),
+            searchable=['title'],
         ),
         enable_update_notifications=True,
     )
@@ -1323,7 +1325,7 @@ def test_send_email_notification_for_recent_directory_entry_publications(
     planauflage.add(values=dict(
         gesuchsteller_in='Emil Emilio',
         grundeigentumer_in='Franco Francinio',
-        publication_start=datetime(2025, 1, 8, 2, 0, tzinfo=tz),
+        publication_start=datetime(2025, 1, 8, 6, 1, tzinfo=tz),
         publication_end=datetime(2025, 1, 31, 2, 0, tzinfo=tz),
     ))
 
@@ -1336,20 +1338,21 @@ def test_send_email_notification_for_recent_directory_entry_publications(
         configuration=DirectoryConfiguration(
             title="[Name]",
             order=('Name'),
+            searchable=['title']
         ),
         enable_update_notifications=False,
     )
     sport_clubs.add(values=dict(
         name='Wanderfreunde',
         category='Hiking',
-        publication_start=datetime(2025, 1, 1, 2, 0, tzinfo=tz),
-        publication_end=datetime(2025, 1, 22, 2, 0, tzinfo=tz),
+        publication_start=datetime(2025, 2, 1, 2, 0, tzinfo=tz),
+        publication_end=datetime(2025, 2, 22, 2, 0, tzinfo=tz),
     ))
     sport_clubs.add(values=dict(
         name='Pokerfreunde',
         category='Games',
-        publication_start=datetime(2025, 1, 1, 2, 0, tzinfo=tz),
-        publication_end=datetime(2025, 1, 2, 2, 0, tzinfo=tz),
+        publication_start=datetime(2025, 2, 1, 2, 0, tzinfo=tz),
+        publication_end=datetime(2025, 2, 2, 2, 0, tzinfo=tz),
     ))
 
     EntryRecipientCollection(org_app.session()).add(
@@ -1382,22 +1385,18 @@ def test_send_email_notification_for_recent_directory_entry_publications(
     assert count_recipients() == 1
     john = EntryRecipientCollection(org_app.session()).query().first()
 
+    assert org_app.org.meta.get('hourly_maintenance_tasks_last_run') is None
+
     with freeze_time(datetime(2025, 1, 1, 4, 0, tzinfo=tz)):
         client.get(get_cronjob_url(job))
 
-        entry_1 = planauflagen().entries[0]
-        entry_2 = planauflagen().entries[1]
-        assert entry_1.notification_sent is None
-        assert entry_2.notification_sent is None
         assert len(os.listdir(client.app.maildir)) == 0
+        assert org_app.org.meta.get('hourly_maintenance_tasks_last_run')
 
     with freeze_time(datetime(2025, 1, 6, 4, 0, tzinfo=tz)):
         client.get(get_cronjob_url(job))
 
         entry_1 = planauflagen().entries[0]
-        entry_2 = planauflagen().entries[1]
-        assert entry_1.notification_sent
-        assert entry_2.notification_sent is None
 
         assert len(os.listdir(client.app.maildir)) == 1
         message = client.get_email(0)
@@ -1405,13 +1404,10 @@ def test_send_email_notification_for_recent_directory_entry_publications(
         assert planauflagen().title in message['Subject']
         assert entry_1.name in message['TextBody']
 
-    with freeze_time(datetime(2025, 1, 8, 4, 0, tzinfo=tz)):
+    with freeze_time(datetime(2025, 1, 8, 10, 0, tzinfo=tz)):
         client.get(get_cronjob_url(job))
 
-        entry_1 = planauflagen().entries[0]
         entry_2 = planauflagen().entries[1]
-        assert entry_1.notification_sent
-        assert entry_2.notification_sent
 
         assert len(os.listdir(client.app.maildir)) == 2
         message = client.get_email(1)
@@ -1419,20 +1415,29 @@ def test_send_email_notification_for_recent_directory_entry_publications(
         assert planauflagen().title in message['Subject']
         assert entry_2.name in message['TextBody']
 
+    # before enabling notifications for sport clubs after publication
+    with freeze_time(datetime(2025, 2, 1, 6, 0, tzinfo=tz)):
+        client.get(get_cronjob_url(job))
+
+        assert len(os.listdir(client.app.maildir)) == 2  # no additional mail
+
     # enable notifications for sport clubs
     sport_clubs().enable_update_notifications = True
     transaction.commit()
 
-    with freeze_time(datetime(2025, 1, 3, 4, 0, tzinfo=tz)):
+    with freeze_time(datetime(2025, 2, 1, 1, 0, tzinfo=tz)):
         client.get(get_cronjob_url(job))
 
-        entry_1 = sport_clubs().entries[0]
-        entry_2 = sport_clubs().entries[1]
-        assert entry_1.notification_sent is None
-        assert entry_2.notification_sent
+        # no additional mail, because the entry is not published yet
+        assert len(os.listdir(client.app.maildir)) == 2
 
-        assert len(os.listdir(client.app.maildir)) == 3  # only for still
-        # published sports club entry
+    with freeze_time(datetime(2025, 2, 3, 10, 0, tzinfo=tz)):
+        client.get(get_cronjob_url(job))
+
+        entry_2 = sport_clubs().entries[1]
+
+        # only for still published sports club entry 'Wanderfreunde'
+        assert len(os.listdir(client.app.maildir)) == 3
         message = client.get_email(2)
         assert message['To'] == john.address
         assert sport_clubs().title in message['Subject']

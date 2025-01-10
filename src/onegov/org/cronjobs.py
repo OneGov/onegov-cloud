@@ -116,7 +116,8 @@ def handle_publication_models(request: 'OrgRequest') -> None:
     objects = []
     session = request.app.session()
     now = utcnow()
-    then = now - timedelta(hours=1)
+    then = request.app.org.meta.get('hourly_maintenance_tasks_last_run',
+                                    now - timedelta(hours=1))
     for base in request.app.session_manager.bases:
         for model in publication_models(base):
             query = session.query(model).filter(
@@ -141,9 +142,12 @@ def handle_publication_models(request: 'OrgRequest') -> None:
         if isinstance(obj, Searchable):
             request.app.es_orm_events.index(request.app.schema, obj)
 
-        if isinstance(obj, ExtendedDirectoryEntry) and obj.published:
+        if (isinstance(obj, ExtendedDirectoryEntry) and obj.published and
+                obj.directory.enable_update_notifications):
             send_email_notification_for_directory_entry(
                 obj.directory, obj, request)
+
+    request.app.org.meta['hourly_maintenance_tasks_last_run'] = now
 
 
 def delete_old_tans(request: 'OrgRequest') -> None:
