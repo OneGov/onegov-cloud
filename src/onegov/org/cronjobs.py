@@ -113,7 +113,7 @@ def handle_publication_models(request: 'OrgRequest') -> None:
             cls, UTCPublicationMixin)
         )
 
-    objects = []
+    objects = set()
     session = request.app.session()
     now = utcnow()
     then = request.app.org.meta.get('hourly_maintenance_tasks_last_run',
@@ -132,7 +132,7 @@ def handle_publication_models(request: 'OrgRequest') -> None:
                     )
                 )
             )
-            objects.extend(query.all())
+            objects.update(query.all())
 
     for obj in objects:
         if isinstance(obj, GeneralFileLinkExtension):
