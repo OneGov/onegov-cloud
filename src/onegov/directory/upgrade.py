@@ -2,11 +2,10 @@
 upgraded on the server. See :class:`onegov.core.upgrade.upgrade_task`.
 
 """
-from sqlalchemy import Column, Integer
-
 from onegov.core.orm.types import UTCDateTime
 from onegov.core.upgrade import upgrade_task, UpgradeContext
 from onegov.directory import Directory
+from sqlalchemy import Column, Integer
 
 
 @upgrade_task('Add entries count')
