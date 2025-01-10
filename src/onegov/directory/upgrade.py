@@ -2,7 +2,6 @@
 upgraded on the server. See :class:`onegov.core.upgrade.upgrade_task`.
 
 """
-from sedate import utcnow
 from sqlalchemy import Column, Integer
 
 from onegov.core.orm.types import UTCDateTime
@@ -69,26 +68,3 @@ def make_directory_models_polymorphic_type_non_nullable(
             """)
 
             context.operations.alter_column(table, 'type', nullable=False)
-
-
-@upgrade_task('Directory entries add notification_sent column')
-def add_notification_sent_column(context: UpgradeContext) -> None:
-    if not context.has_column('directory_entries', 'notification_sent'):
-        context.operations.add_column(
-            'directory_entries',
-            Column(
-                'notification_sent',
-                UTCDateTime,
-                nullable=True,
-                default=None
-            )
-        )
-
-    context.session.flush()
-
-    for directory in context.session.query(Directory):
-        for entry in directory.entries:
-            if entry.publication_started:
-                # prevent sending notifications for exiting entries with
-                # publication start date in the past
-                entry.notification_sent = utcnow()
