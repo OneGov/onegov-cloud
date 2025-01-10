@@ -2,7 +2,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE 1.0\n"
-"POT-Creation-Date: 2025-01-08 16:47+0100\n"
+"POT-Creation-Date: 2025-01-09 15:47+0100\n"
 "PO-Revision-Date: 2022-03-15 10:50+0100\n"
 "Last-Translator: Marc Sommerhalder <marc.sommerhalder@seantis.ch>\n"
 "Language-Team: French\n"
@@ -1020,6 +1020,9 @@ msgstr "Images de taille normale"
 msgid "Grid layout"
 msgstr "Mise en page en grille"
 
+msgid "Show images on homepage"
+msgstr "Montrer les images sur la page d'accueil"
+
 msgid "By filename"
 msgstr "Par nom de fichier"
 
@@ -1028,9 +1031,6 @@ msgstr "Par légende"
 
 msgid "By last change"
 msgstr "Par date de dernière modification"
-
-msgid "Show images on homepage"
-msgstr "Montrer les images sur la page d'accueil"
 
 msgid "Used in the overview and the e-mail subject"
 msgstr "Utilisé dans l'aperçu et le sujet de l'e-mail"
@@ -1695,10 +1695,10 @@ msgid "JavaScript for web statistics support"
 msgstr "JavaScript pour l'assistance en matière de statistiques web"
 
 msgid "Analytics URL"
-msgstr ""
+msgstr "URL Analytics"
 
 msgid "URL pointing to the analytics page"
-msgstr ""
+msgstr "URL pointant vers la page d'analyse"
 
 msgid "Cantonal holidays"
 msgstr "Jours fériés cantonaux"
@@ -1930,20 +1930,51 @@ msgstr ""
 "Format non valide. Seuls les sujets et les sous-sujets sont autorisés - "
 "aucune structure plus profonde n'est prise en charge."
 
+msgid "Migration Type"
+msgstr "Type de migration"
+
+msgid "Domain Migration"
+msgstr "Migration de domaine"
+
+msgid ""
+"Bulk URL Migration. (Find and Replace any text, a more general version.)"
+msgstr "Recherche et remplacement de n'importe quel texte, une version plus générale"
+
 msgid "Old domain"
 msgstr "Ancien domaine"
+
+msgid "URL Mappings Excel File"
+msgstr "Fichier Excel avec tableau de remplacement"
+
+msgid ""
+"Excel file with column A containing URLs to find and column B containing "
+"replacement URLs. This is useful in cases when we need to replace the entire "
+"URL (for example, https://domain.com/old-url to https://www.new-domain.com/"
+"new-url)"
+msgstr "Fichier Excel avec la colonne A contenant les URL à trouver et la colonne B les URL de remplacement. Cela est utile lorsque nous devons remplacer l'intégralité de l'URL (par exemple, https://domain.com/old-url par https://www.new-domain.com/new-url)."
 
 msgid "Test migration"
 msgstr "Tester migration"
 
-msgid "Compares links to the current domain"
-msgstr "Compare les liens avec le domaine actuel"
+msgid "Shows what would be changed without making actual changes"
+msgstr "Affiche ce qui serait modifié sans apporter de modifications réelles"
 
 msgid "Use a domain name without http(s)"
 msgstr "Utiliser un domaine sans http(s)"
 
 msgid "Domain must contain a dot"
 msgstr "Le domaine doit contenir un point"
+
+msgid "Excel file must contain at least one row of data"
+msgstr "Le fichier Excel doit contenir au moins une ligne de données"
+
+msgid ""
+"Excel file must contain exactly two columns: URLs to find and replacement "
+"URLs"
+msgstr "Le fichier Excel doit contenir exactement deux colonnes : URL à trouver et remplacement URL"
+
+msgid "Invalid Excel file format"
+msgstr "Format de fichier Excel non valide"
 
 msgid "Choose which links to check"
 msgstr "Choisissez les liens à vérifier"
@@ -2959,8 +2990,8 @@ msgstr "Refuser ${title} est irréversible."
 msgid "Reject reservation"
 msgstr "Refuser la réservation"
 
-#.
 #. Used in sentence: "${event} published."
+#.
 msgid "Event"
 msgstr "Événement"
 
@@ -3314,8 +3345,8 @@ msgid ""
 "filled-out form."
 msgstr ""
 "Veuillez vérifier vos données et appuyez sur « Compléter » pour finaliser le "
-"processus. S'il y a quelque chose que vous souhaitez modifier, cliquez sur "
-"« Modifier » pour retourner sur le formulaire complété."
+"processus. S'il y a quelque chose que vous souhaitez modifier, cliquez sur « "
+"Modifier » pour retourner sur le formulaire complété."
 
 msgid ""
 "The image shown in the list view is a square. To have your image shown fully "
@@ -4283,7 +4314,7 @@ msgid "There are currently ${count} recipients registered."
 msgstr "Il y a actuellement ${count} destinataires enregistrés."
 
 msgid "To update your subscription, please use this ${Link}"
-msgstr ""
+msgstr "Pour mettre à jour votre abonnement, veuillez utiliser ce ${Link}"
 
 msgid "Archive"
 msgstr "Archiver"
@@ -5888,6 +5919,12 @@ msgstr "Migration des liens"
 msgid "Migrate"
 msgstr "Migrer"
 
+msgid ""
+"Migrates links using the mappings provided in the Excel file. Please verify "
+"the changes in test mode before applying them."
+msgstr "Migrer les liens en utilisant les correspondances fournies dans le fichier Excel. Veuillez vérifier "
+"les changements en mode test avant de les appliquer."
+
 #, python-format
 msgid "Migrated ${number} links"
 msgstr "${number} liens migrés"
@@ -5897,10 +5934,16 @@ msgid "Total of ${number} links found."
 msgstr "Total de ${number} liens trouvés"
 
 #, python-format
+msgid "${group}: ${number} changes"
+msgstr "${group} : ${number} modifications"
+
+#, python-format
 msgid ""
-"Migrates links from the given domain to the current domain \"${domain}\". The form must be used *after* the DNS changeover to \"${domain}\"."
+"Migrates links from the given domain to the current domain \"${domain}\". "
+"The form must be used *after* the DNS changeover to \"${domain}\"."
 msgstr ""
-"Fait migrer les liens du domaine donné vers le domaine actuel \"${domain}\". Le formulaire doit être utilisé *après* le passage du DNS à  \"${domain}\"."
+"Fait migrer les liens du domaine donné vers le domaine actuel \"${domain}\". "
+"Le formulaire doit être utilisé *après* le passage du DNS à  \"${domain}\"."
 
 msgid "OneGov API"
 msgstr "API OneGov"
@@ -5957,16 +6000,16 @@ msgstr ""
 "toutes les soumissions."
 
 msgid "Delete Submissions"
-msgstr ""
+msgstr "Supprimer les soumissions"
 
 msgid "Do you really want to delete all submissions?"
-msgstr ""
+msgstr "Voulez-vous vraiment supprimer toutes les soumissions ?"
 
 msgid "All submissions associated with this survey will be deleted."
-msgstr ""
+msgstr "Toutes les soumissions associées à cette enquête seront supprimées."
 
 msgid "Delete submissions"
-msgstr ""
+msgstr "Supprimer les soumissions"
 
 msgid "Exports the submissions of the survey."
 msgstr "Exporte les soumissions de l'enquête."
@@ -5994,7 +6037,7 @@ msgid "Edit Submission Window"
 msgstr "Modifier la fenêtre de soumission"
 
 msgid "The submission window and all associated submissions were deleted"
-msgstr ""
+msgstr "La fenêtre de soumission et toutes les soumissions associées ont été supprimées"
 
 msgid "Added a new text module"
 msgstr "Ajout d'un nouveau module de texte"
@@ -6214,6 +6257,9 @@ msgstr "Un compte a été créé pour vous"
 
 msgid "The user was created successfully"
 msgstr "L'utilisateur a bien été créé"
+
+#~ msgid "Compares links to the current domain"
+#~ msgstr "Compare les liens avec le domaine actuel"
 
 #~ msgid "Photo album. Will be shown at the end of content."
 #~ msgstr "Album photo. Sera affiché à la fin du contenu."

@@ -5,17 +5,19 @@ import yaml
 
 from functools import cached_property
 from lxml import etree
+from openpyxl import load_workbook
 
 from onegov.core.widgets import transform_structure
 from onegov.core.widgets import XML_LINE_OFFSET
 from onegov.form import Form
-from onegov.form.fields import ChosenSelectField, URLPanelField
+from onegov.form.fields import ChosenSelectField, URLPanelField, UploadField
 from onegov.form.fields import ColorField
 from onegov.form.fields import CssField
 from onegov.form.fields import MarkupField
 from onegov.form.fields import MultiCheckboxField
 from onegov.form.fields import PreviewField
 from onegov.form.fields import TagsField
+from onegov.form.validators import WhitelistedMimeType, FileSizeLimit
 from onegov.gever.encrypt import encrypt_symmetric
 from onegov.gis import CoordinatesField
 from onegov.org import _
@@ -37,7 +39,7 @@ from wtforms.fields import RadioField
 from wtforms.fields import StringField
 from wtforms.fields import TextAreaField
 from wtforms.fields import URLField
-from wtforms.validators import InputRequired
+from wtforms.validators import InputRequired, DataRequired
 from wtforms.validators import NumberRange
 from wtforms.validators import Optional
 from wtforms.validators import URL as UrlRequired
@@ -1233,21 +1235,64 @@ class NewsletterSettingsForm(Form):
 
 
 class LinkMigrationForm(Form):
+    migration_type = RadioField(
+        label=_('Migration Type'),
+        choices=[
+            ('domain', _('Domain Migration')),
+            (
+                'text',
+                _(
+                    'Bulk URL Migration. (Find and Replace any text, '
+                    'a more general version.)'
+                ),
+            ),
+        ],
+        default='domain',
+        validators=[InputRequired()],
+    )
 
     old_domain = StringField(
         label=_('Old domain'),
         description='govikon.onegovcloud.ch',
-        validators=[InputRequired()]
+        depends_on=('migration_type', 'domain'),
+        validators=[InputRequired()],
+    )
+
+    url_mappings = UploadField(
+        label=_('URL Mappings Excel File'),
+        description=_(
+            'Excel file with column A containing URLs to find and column '
+            'B containing replacement URLs. This is useful in cases when we '
+            'need to replace the entire URL (for example, '
+            'https://domain.com/old-url to https://www.new-domain.com/new-url)'
+        ),
+        validators=[
+            DataRequired(),
+            WhitelistedMimeType(
+                {
+                    'application/vnd.ms-excel',  # standard
+                    (
+                        'application/'
+                        'vnd.openxmlformats-officedocument.spreadsheetml.sheet'
+                    ),
+                }
+            ),
+            FileSizeLimit(10 * 1024 * 1024)
+        ],
+        depends_on=('migration_type', 'text'),
+        render_kw={'force_simple': True}
     )
 
     test = BooleanField(
         label=_('Test migration'),
-        description=_('Compares links to the current domain'),
-        default=True
+        description=_(
+            'Shows what would be changed without making actual changes'
+        ),
+        default=True,
     )
 
     def ensure_correct_domain(self) -> bool | None:
-        if self.old_domain.data:
+        if self.migration_type.data == 'domain' and self.old_domain.data:
             errors = []
             if self.old_domain.data.startswith('http'):
                 errors.append(
@@ -1255,11 +1300,43 @@ class LinkMigrationForm(Form):
                 )
             if '.' not in self.old_domain.data:
                 errors.append(_('Domain must contain a dot'))
-
             if errors:
                 self.old_domain.errors = errors
                 return False
         return None
+
+    def validate_url_mappings(self, file: UploadField) -> None:
+        if self.migration_type.data != 'text':
+            return
+        if not file.file:
+            return
+        try:
+            # Load the workbook from the file contents
+            workbook = load_workbook(filename=file.file, read_only=True)
+            # Get the active sheet (first sheet)
+            sheet = workbook.active
+            if sheet is None:
+                return
+
+            # Check if sheet has any rows
+            if sheet.max_row < 1:
+                raise ValidationError(
+                    _('Excel file must contain at least one row of data')
+                )
+
+            # Check number of columns
+            if sheet.max_column != 2:
+                raise ValidationError(
+                    _(
+                        'Excel file must contain exactly two columns: '
+                        'URLs to find and replacement URLs'
+                    )
+                )
+
+            # Reset file pointer for actual processing
+            file.file.seek(0)
+        except Exception as err:
+            raise ValidationError(_('Exception while reading xlsx')) from err
 
 
 class LinkHealthCheckForm(Form):

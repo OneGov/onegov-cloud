@@ -1,5 +1,8 @@
+from io import BytesIO
+from webtest import Upload
+from xlsxwriter import Workbook
+
 from onegov.api.models import ApiKey
-import pytest
 from onegov.page import Page
 from onegov.org.theme.org_theme import HELVETICA
 from xml.etree.ElementTree import tostring
@@ -148,21 +151,27 @@ def test_switch_languages(client):
     assert 'Deutsch' not in page
 
 
-@pytest.mark.skip('wip')
+def create_test_replacement_xlsx(
+    replacement_pairs: list[tuple[str, str]]
+) -> BytesIO:
+    file = BytesIO()
+    workbook = Workbook(file)
+    worksheet = workbook.add_worksheet('Replacements')
+    for row, (original, replacement) in enumerate(replacement_pairs, start=1):
+        worksheet.write_string(row, 0, original)
+        worksheet.write_string(row, 1, replacement)
+
+    workbook.close()
+    file.seek(0)
+    return file
+
+
 def test_migrate_links(client):
     session = client.app.session()
 
     sitecollection = SiteCollection(session)
     objects = sitecollection.get()
-
-    foo = [page.content for page in objects['topics']]
-
-    # set one of the pages content and set
-    # content.text to something that contains an url.
-
-    # Set up test data
     old_domain = 'localhost'
-    new_domain = '127.0.0.1'
 
     # Create test objects with content containing the old domain
     page = Page(
@@ -181,8 +190,11 @@ def test_migrate_links(client):
 
     # external_link = ExternalLink(url=f'http://{old_domain}/external')
 
-    # todo: this is hard to test, need to bypass form validation
-    # Die Domain muss einen Punkt enthalten
+    # Testing the 'domain' change is hard to test, because current domain
+    # will always be localhost here, which fails in form validation
+    # 'Die Domain muss einen Punkt enthalten'
+    # One would probably need to monkey patch the validate_domain function
+    # We don't bother with that here
     session.add_all([page])
     session.flush()
     client.login_admin()
@@ -192,7 +204,21 @@ def test_migrate_links(client):
         'Migriert Links von der angegebenen Domain zur aktuellen Domain '
         '"localhost"' in page
     )
-    page.form['old_domain'] = old_domain
-    page.form['test'] = False
+    page.form['migration_type'] = 'text'
+    replacement_pairs = [
+        ('www.abes.foo.ch', 'https://www.foo.ch/wsu/amt-fuer-beistand'),
+        ('www.umgezogen.ch', 'https://www.foo.ch/umgezogen'),
+    ]
+
+    # todo: first test the dry-run 'test' mode
+    file = create_test_replacement_xlsx(replacement_pairs)
+    page.form['url_mappings'] = Upload(
+        'redirects.xlsx', file.read(), 'application/vnd.ms-excel'
+    )
+    page.form['test'] = True
     page = page.form.submit().maybe_follow()
+    assert 'Das Formular enthält Fehler' not in page
     page.showbrowser()
+
+
+    # then test the other mode:

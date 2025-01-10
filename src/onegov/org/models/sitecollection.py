@@ -77,3 +77,7 @@ class SiteCollection:
             'directories': tuple(self.get_directories(self.session)),
             'imagesets': tuple(self.get_imagesets(self.session)),
         }
+
+
+# missging tables that are not replaced: external_link, events, organisations,
+# people, tickets

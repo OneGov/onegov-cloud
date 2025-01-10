@@ -1,18 +1,21 @@
 import re
 import time
-from collections import defaultdict
+from sqlalchemy import Integer
 import transaction
+from sqlalchemy import text, bindparam, String
+from collections import defaultdict
 from aiohttp import ClientTimeout
 from sqlalchemy.orm import object_session
 from urlextract import URLExtract
-from sqlalchemy import text, bindparam, String
 from onegov.async_http.fetch import async_aiohttp_get_all
 from onegov.core.utils import normalize_for_url
+from dataclasses import dataclass, field
 from onegov.org.models import SiteCollection
 from onegov.people import AgencyCollection
 
 
-from typing import Literal, NamedTuple, TYPE_CHECKING
+from typing import Literal, NamedTuple, TYPE_CHECKING, Tuple, Dict
+
 if TYPE_CHECKING:
     from collections.abc import Iterator
     from collections.abc import Iterable, Sequence
@@ -20,6 +23,9 @@ if TYPE_CHECKING:
     from onegov.org.request import OrgRequest
     from onegov.page import Page
     from typing import Self
+
+
+sample_size = 5
 
 
 class ModelsWithLinksMixin:
@@ -39,20 +45,21 @@ class LinkMigration(ModelsWithLinksMixin):
         self,
         request: 'OrgRequest',
         old_uri: str,
-        new_uri: str = ''
+        new_uri: str = '',
+        use_domain: bool = True
     ) -> None:
 
         self.request = request
         self.old_uri = old_uri
         self.new_uri = new_uri
+        self.use_domain = use_domain
 
-        old_is_domain = not self.old_uri.startswith('http')
-        new_is_domain = not self.new_uri.startswith('http')
+        if use_domain:
+            old_is_domain = not self.old_uri.startswith('http')
+            new_is_domain = not self.new_uri.startswith('http')
 
-        if old_is_domain != new_is_domain:
-            raise ValueError('Domains must be consistent')
-
-        self.use_domain = old_is_domain
+            if old_is_domain != new_is_domain:
+                raise ValueError('Domains must be consistent')
 
     def migrate_url(
         self,
@@ -83,8 +90,8 @@ class LinkMigration(ModelsWithLinksMixin):
         else:
             pattern = re.compile(re.escape(old_uri))
 
-        for field in fields_with_urls:
-            value = getattr(item, field, None)
+        for _field in fields_with_urls:
+            value = getattr(item, _field, None)
             if not value:
                 continue
             new_val = pattern.sub(repl, value)
@@ -95,11 +102,11 @@ class LinkMigration(ModelsWithLinksMixin):
                     defaultdict(int)
                 )
 
-                id_count[field] += 1
+                id_count[_field] += 1
                 if not test:
                     setattr(
                         item,
-                        field,
+                        _field,
                         new_val
                     )
         return count, count_by_id
@@ -107,13 +114,11 @@ class LinkMigration(ModelsWithLinksMixin):
     def migrate(
         self,
         test: bool = False
-    ) -> tuple[int, dict[str, dict[str, int]]]:
+    ) -> tuple[int, dict[str, dict[str, int]], 'MigrationReportData']:
         total, grouped = self.migrate_site_collection(test=test)
 
-        if not test:
-            self.migrate_content_mixin()
-
-        return total, grouped
+        report = self.migrate_content_mixin()
+        return total, grouped, report
 
     def migrate_site_collection(
         self,
@@ -134,27 +139,79 @@ class LinkMigration(ModelsWithLinksMixin):
                 total += count
         return total, grouped
 
-    def migrate_content_mixin(self) -> None:
-        """ A catch-all function to migrate content not covered by
-        migrate_site_collection.
+    def analyze_table_changes(
+        self,
+        table: str,
+        columns: list[str],
+    ) -> 'TableMigrationData':
+        """Analyze changes that would be made to a table without executing
+        updates."""
+        column_data = []
+        errors = 0
+        warnings = []
 
-        This function was added to handle links that were not processed by the
-        migrate_site_collection function.
+        for col in columns:
+            is_json = col in {'meta', 'content', 'snapshot'}
+            count_sql = generate_count_sql(table, col, is_json)
 
+            try:
+                pattern = f'%{self.old_uri}%'
+                result = self.request.session.execute(
+                    text(count_sql).bindparams(
+                        bindparam('pattern', type_=String),
+                        bindparam('sample_size', type_=Integer)
+                    ),
+                    {
+                        'pattern': pattern,
+                        'sample_size': sample_size
+                    },
+                ).fetchone()
 
-        Generates SQL of the following form:
+                count, samples = result if result else (0, [])
+                samples = samples or []
+                column_data.append(
+                    ColumnMigrationData(
+                        name=col,
+                        affected_rows=count,
+                        sample_values=samples,
+                        is_json=is_json,
+                    )
+                )
+
+            except Exception as e:
+                errors += 1
+                warnings.append(f'Error analyzing {col}: {e!s}')
+
+        return TableMigrationData(
+            name=table,
+            columns=column_data,
+            total_rows=sum(col.affected_rows for col in column_data),
+            error_count=errors,
+            warnings=warnings,
+        )
+
+    def execute_table_update(self, table: str, columns: list[str]) -> None:
+        """Execute the actual update for a table."""
+        update_sql = generate_update_sql(table, columns)
+        self.request.session.execute(
+            text(update_sql).bindparams(
+                bindparam('old_uri', type_=String),
+                bindparam('new_uri', type_=String),
+            ),
+            {'old_uri': self.old_uri, 'new_uri': self.new_uri},
+        )
+
+    def migrate_content_mixin(
+        self, test_only: bool = True
+    ) -> 'MigrationReportData':
+        """Analyze or execute content migration based on test_only flag.
+
+        Automates the process of emitting sql statements to update content like
+        we used to do manually:
 
         update pages set content = replace(content::text, 'old', 'new')::jsonb;
         update forms set meta = replace(meta::text, 'old', 'new')::jsonb;
-
         """
-
-        def replace_json(col: str) -> str:
-            return f'{col} = replace({col}::text, :old_uri, :new_uri)::jsonb'
-
-        def replace_text(col: str) -> str:
-            return f'{col} = replace({col}, :old_uri, :new_uri)'
-
         updates = [
             ('pages', ['meta', 'content']),
             ('forms', ['meta', 'content']),
@@ -167,30 +224,120 @@ class LinkMigration(ModelsWithLinksMixin):
             ('external_links', ['url']),
         ]
 
+        tables_data = []
+
         for table, columns in updates:
-            sql_parts = []
-            for col in columns:
-                if col in {'meta', 'content', 'snapshot'}:
-                    sql_parts.append(replace_json(col))
-                else:
-                    sql_parts.append(replace_text(col))
+            # Always analyze changes first
+            table_data = self.analyze_table_changes(table, columns)
+            tables_data.append(table_data)
 
-            sql = text(
-                f"UPDATE {table} SET {', '.join(sql_parts)}"  # nosec:B608
-            ).bindparams(
-                bindparam('old_uri', type_=String),
-                bindparam('new_uri', type_=String)
-            )
+            # Execute update if not in test mode and there are changes
+            if not test_only and table_data.total_affected > 0:
+                try:
+                    self.execute_table_update(table, columns)
+                except Exception as e:
+                    table_data.error_count += 1
+                    table_data.warnings.append(
+                        f'Error updating table: {e!s}'
+                    )
 
-            self.request.session.execute(
-                sql,
-                {
-                    'old_uri': self.old_uri,
-                    'new_uri': self.new_uri
-                }
-            )
+        if not test_only:
+            transaction.commit()
 
-        transaction.commit()
+        return MigrationReportData(
+            old_uri=self.old_uri,
+            new_uri=self.new_uri,
+            tables=tables_data,
+            is_dry_run=test_only,
+        )
+
+
+@dataclass
+class ColumnMigrationData:
+    name: str
+    affected_rows: int
+    sample_values: list[
+        str
+    ]  # Store some example values that would be changed
+    is_json: bool
+
+
+@dataclass
+class TableMigrationData:
+    name: str
+    columns: list[ColumnMigrationData]
+    total_rows: int
+    error_count: int = 0
+    warnings: list[str] = field(default_factory=list)
+
+    def __post_init__(self) -> None:
+        self.warnings = self.warnings or []
+
+    @property
+    def total_affected(self) -> int:
+        return sum(col.affected_rows for col in self.columns)
+
+
+@dataclass
+class MigrationReportData:
+    old_uri: str
+    new_uri: str
+    tables: list[TableMigrationData]
+    is_dry_run: bool
+
+    @property
+    def total_affected_rows(self) -> int:
+        return sum(table.total_affected for table in self.tables)
+
+
+def generate_count_sql(
+    table: str,
+    column: str,
+    is_json: bool = False,
+) -> str:
+    """Generate SQL to count and sample rows that would be affected.
+    """
+    # Base content selection varies based on JSON status
+    content_select = (
+        f'{column}::text as content' if is_json else f'{column} as content'
+    )
+
+    return f"""  # nosec[B608]
+        WITH affected AS (
+            SELECT {content_select}
+            FROM {table}
+            WHERE {column}{'::text' if is_json else ''} LIKE :pattern
+        )
+        SELECT COUNT(*) as count,
+               array_agg(content) FILTER (
+                   WHERE content IN (
+                       SELECT content
+                       FROM affected
+                       ORDER BY random()
+                       LIMIT :sample_size
+                   )
+               ) as samples
+        FROM affected
+    """
+
+
+def generate_update_sql(table: str, columns: list[str]) -> str:
+    """Generate the update SQL statement for a table."""
+
+    def json_replace_expression(col: str) -> str:
+        return f'{col} = replace({col}::text, :old_uri, :new_uri)::jsonb'
+
+    def text_replace_expression(col: str) -> str:
+        return f'{col} = replace({col}, :old_uri, :new_uri)'
+
+    sql_parts = []
+    for col in columns:
+        if col in {'meta', 'content', 'snapshot'}:
+            sql_parts.append(json_replace_expression(col))
+        else:
+            sql_parts.append(text_replace_expression(col))
+
+    return f"UPDATE {table} SET {', '.join(sql_parts)}"  # nosec[B608]
 
 
 class PageNameChange(ModelsWithLinksMixin):

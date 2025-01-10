@@ -3,6 +3,7 @@
 from copy import copy
 from dectate import Query
 from markupsafe import Markup
+from openpyxl import load_workbook
 from webob.exc import HTTPForbidden
 from onegov.core.elements import Link, Confirm, Intercooler, BackLink
 from onegov.core.security import Secret
@@ -345,28 +346,65 @@ def handle_migrate_links(
     form: LinkMigrationForm,
     layout: DefaultLayout | None = None
 ) -> 'RenderData | Response':
-
     domain = request.domain
     button_text = _('Migrate')
     test_results = None
 
     if form.submitted(request):
-        assert form.old_domain.data is not None
+        assert form.migration_type.data in {'domain', 'text'}
+
         test_only = form.test.data
-        migration = LinkMigration(
-            request,
-            old_uri=form.old_domain.data,
-            new_uri=request.domain
-        )
-        total, __ = migration.migrate(test_only)
+        total_changes = 0
+        grouped_changes: dict[str, dict[str, int]] = {}
+
+        if form.migration_type.data == 'domain':
+            assert form.old_domain.data is not None
+            migration = LinkMigration(
+                request,
+                old_uri=form.old_domain.data,
+                new_uri=request.domain,
+                use_domain=True
+            )
+            total_changes, grouped_changes = migration.migrate(test_only)
+        else:
+            # Read the uploaded file
+            workbook = load_workbook(
+                form.url_mappings.file,
+                read_only=True,
+                data_only=True
+            )
+
+            # Get first sheet
+            sheet = workbook.active
+
+            # Process each row (This assumes no header exists.)
+            for row in list(sheet.rows):
+                if len(row) < 2:
+                    continue
+
+                old_url = str(row[0].value or '')
+                new_url = str(row[1].value or '')
+
+                if not old_url or not new_url:
+                    continue
+
+                migration = LinkMigration(
+                    request,
+                    old_uri=old_url,
+                    new_uri=new_url,
+                    use_domain=False
+                )
+                changes, __ = migration.migrate(test_only)
+            workbook.close()
 
         if not test_only:
             request.success(
-                _('Migrated ${number} links', mapping={'number': total}))
+                _('Migrated ${number} links', mapping={'number': total_changes})
+            )
             return request.redirect(request.link(self, name='settings'))
 
         test_results = _('Total of ${number} links found.',
-                         mapping={'number': total})
+                         mapping={'number': total_changes})
 
     return {
         'title': _('Link Migration'),

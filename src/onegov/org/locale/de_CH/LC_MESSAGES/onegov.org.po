@@ -1,7 +1,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE 1.0\n"
-"POT-Creation-Date: 2025-01-08 16:47+0100\n"
+"POT-Creation-Date: 2025-01-09 15:47+0100\n"
 "PO-Revision-Date: 2022-03-15 10:21+0100\n"
 "Last-Translator: Marc Sommerhalder <marc.sommerhalder@seantis.ch>\n"
 "Language-Team: German\n"
@@ -1020,6 +1020,9 @@ msgstr "Grosse Bilder"
 msgid "Grid layout"
 msgstr "Raster"
 
+msgid "Show images on homepage"
+msgstr "Bilder auf der Startseite zeigen"
+
 msgid "By filename"
 msgstr "Nach Dateiname"
 
@@ -1028,9 +1031,6 @@ msgstr "Nach Beschreibung"
 
 msgid "By last change"
 msgstr "Nach Zeitpunkt der letzten Änderung"
-
-msgid "Show images on homepage"
-msgstr "Bilder auf der Startseite zeigen"
 
 msgid "Used in the overview and the e-mail subject"
 msgstr "Wird in der Übersicht und als E-Mail Subjekt verwendet"
@@ -1694,10 +1694,10 @@ msgid "JavaScript for web statistics support"
 msgstr "JavaScript für Web-Statistik"
 
 msgid "Analytics URL"
-msgstr ""
+msgstr "Analytics URL"
 
 msgid "URL pointing to the analytics page"
-msgstr ""
+msgstr "Link zur Analytics Seite"
 
 msgid "Cantonal holidays"
 msgstr "Kantonale Feiertage"
@@ -1924,20 +1924,55 @@ msgstr ""
 "Ungültiges Format. Nur Themen und Unterthemen sind erlaubt - es werden keine "
 "tiefer verschachtelte Strukturen unterstützt."
 
+msgid "Migration Type"
+msgstr "Migrations-Typ"
+
+msgid "Domain Migration"
+msgstr "Domain-Migration"
+
+msgid ""
+"Bulk URL Migration. (Find and Replace any text, a more general version.)"
+msgstr "Suchen und Ersetzen von beliebigem Text, eine allgemeinere Version"
+
 msgid "Old domain"
 msgstr "Alte Domain"
+
+msgid "URL Mappings Excel File"
+msgstr "Excel-Datei mit Ersetzungstabelle"
+
+msgid ""
+"Excel file with column A containing URLs to find and column B containing "
+"replacement URLs. This is useful in cases when we need to replace the entire "
+"URL (for example, https://domain.com/old-url to https://www.new-domain.com/"
+"new-url)"
+msgstr "Eine Excel-Datei mit Spalte A, die die zu ersetzenden URLs enthält und "
+"Spalte B, die die Ersatz-URLs enthält. Dies ist nützlich, wenn wir die "
+"gesamte URL ersetzen müssen (zum Beispiel https://domain.com/old-url zu "
+"https://www.new-domain.com/new-url)"
 
 msgid "Test migration"
 msgstr "Migration testen"
 
-msgid "Compares links to the current domain"
-msgstr "Vergleicht Links mit der aktuellen Domain"
+msgid "Shows what would be changed without making actual changes"
+msgstr "Zeigt, was geändert würde, ohne tatsächliche Änderungen vorzunehmen"
 
 msgid "Use a domain name without http(s)"
 msgstr "Benutze eine Domain ohne http(s)"
 
 msgid "Domain must contain a dot"
 msgstr "Die Domain muss einen Punkt enthalten"
+
+msgid "Excel file must contain at least one row of data"
+msgstr "Excel-Datei muss mindestens eine Datenzeile enthalten"
+
+msgid ""
+"Excel file must contain exactly two columns: URLs to find and replacement "
+"URLs"
+msgstr "Die Excel-Datei muss genau zwei Spalten enthalten: URLs zum Finden und "
+"Ersetzungs-URLs"
+
+msgid "Invalid Excel file format"
+msgstr "Ungültiges Excel-Dateiformat"
 
 msgid "Choose which links to check"
 msgstr "Wählen Sie, welche Urls Überprüft werden sollen"
@@ -2312,7 +2347,8 @@ msgstr "Möchten Sie diesen Befragungszeitraum wirklich löschen?"
 
 msgid ""
 "Submissions associated with this submission window will be deleted as well."
-msgstr ""
+msgstr "Eingaben die mit diesem Befragungszeitraum verknüpft sind, werden "
+"ebenfalls gelöscht."
 
 msgid "Delete submission window"
 msgstr "Befragungszeitraum löschen"
@@ -2958,8 +2994,8 @@ msgstr "Die Absage von ${title} kann nicht rückgängig gemacht werden."
 msgid "Reject reservation"
 msgstr "Reservation absagen"
 
-#.
 #. Used in sentence: "${event} published."
+#.
 msgid "Event"
 msgstr "Veranstaltung"
 
@@ -4862,7 +4898,7 @@ msgstr ""
 msgid ""
 "Rule updated. ${deleted} allocations removed, ${created} new allocations "
 "created."
-msgstr ""
+msgstr "Regel aktualisiert. ${deleted} Einteilungen entfernt, ${created} neue Einteilungen erstellt."
 
 msgid "Rule not found"
 msgstr "Regel nicht gefunden"
@@ -5867,6 +5903,12 @@ msgstr "Migration Links"
 msgid "Migrate"
 msgstr "Migrieren"
 
+msgid ""
+"Migrates links using the mappings provided in the Excel file. Please verify "
+"the changes in test mode before applying them."
+msgstr "Migriert Links mit den im Excel-File bereitgestellten Zuordnungen. "
+"Bitte überprüfen Sie die Änderungen im Testmodus, bevor Sie sie anwenden."
+
 #, python-format
 msgid "Migrated ${number} links"
 msgstr "${number} Links migriert"
@@ -5876,10 +5918,17 @@ msgid "Total of ${number} links found."
 msgstr "Total ${number} Links gefunden"
 
 #, python-format
+msgid "${group}: ${number} changes"
+msgstr "${group}: ${number} Änderungen"
+
+#, python-format
 msgid ""
-"Migrates links from the given domain to the current domain \"${domain}\". The form must be used *after* the DNS changeover to \"${domain}\"."
+"Migrates links from the given domain to the current domain \"${domain}\". "
+"The form must be used *after* the DNS changeover to \"${domain}\"."
 msgstr ""
-"Migriert Links von der angegebenen Domain zur aktuellen Domain \"${domain}\". Das Formular muss *nach* der DNS-Umstellung auf  \"${domain}\" verwendet werden."
+"Migriert Links von der angegebenen Domain zur aktuellen Domain "
+"\"${domain}\". Das Formular muss *nach* der DNS-Umstellung auf  "
+"\"${domain}\" verwendet werden."
 
 msgid "OneGov API"
 msgstr "OneGov API"
@@ -5936,16 +5985,16 @@ msgstr ""
 "Einträge."
 
 msgid "Delete Submissions"
-msgstr ""
+msgstr "Einträge löschen"
 
 msgid "Do you really want to delete all submissions?"
-msgstr ""
+msgstr "Möchten Sie wirklich alle Einträge löschen?"
 
 msgid "All submissions associated with this survey will be deleted."
-msgstr ""
+msgstr "Alle mit dieser Umfrage verbundenen Einträge werden gelöscht."
 
 msgid "Delete submissions"
-msgstr ""
+msgstr "Einträge löschen"
 
 msgid "Exports the submissions of the survey."
 msgstr "Exportiert die Umfrageeinträge."
@@ -5972,7 +6021,7 @@ msgid "Edit Submission Window"
 msgstr "Befragungszeitraum bearbeiten"
 
 msgid "The submission window and all associated submissions were deleted"
-msgstr ""
+msgstr "Der Befragungszeitraum und alle zugehörigen Einträge wurden gelöscht"
 
 msgid "Added a new text module"
 msgstr "Textbaustein hinzugefügt"
@@ -6194,6 +6243,9 @@ msgstr "Ein Konto wurde für Sie erstellt"
 
 msgid "The user was created successfully"
 msgstr "Der Benutzer wurde erfolgreich erstellt"
+
+#~ msgid "Compares links to the current domain"
+#~ msgstr "Vergleicht Links mit der aktuellen Domain"
 
 #~ msgid "Photo album. Will be shown at the end of content."
 #~ msgstr "Fotoalbum. Wird am Ende des Inhalts angezeigt."
