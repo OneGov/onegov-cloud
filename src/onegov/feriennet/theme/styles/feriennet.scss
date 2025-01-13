@@ -131,6 +131,17 @@ svg {
 /*
     Forms
 */
+@media #{$medium-up} {
+    .two-columns {
+        column-count: 2;
+        column-gap: 4rem;
+
+        form .formfields,
+        form fieldset {
+            break-inside: avoid;
+        }
+    }
+}
 
 form small {
     color: $aluminum;
@@ -138,9 +149,6 @@ form small {
     font-size: .8rem;
 }
 
-.field-ticket_statistics {
-    margin-bottom: 1rem !important;
-}
 
 /*
     Strikethrough text
@@ -162,33 +170,6 @@ form small {
 */
 p.tight {
     margin-bottom: .75rem;
-}
-
-/*
-    List items rendred on a single line
-*/
-ul.single-line {
-    list-style: none;
-    margin: 0;
-    padding: 0;
-
-    li {
-        display: inline;
-    }
-
-    &.pipe-separated li + li::before {
-        content: ' | ';
-    }
-}
-
-/*
-    Improve the look of the custom homepage settings
-*/
-
-.field-show_related_contacts,
-.field-show_political_municipality,
-.field-public_organiser_data {
-    padding-bottom: 1rem;
 }
 
 /*
@@ -224,13 +205,6 @@ ul.single-line {
     background: rgba(250, 250, 250, .4);
     border-color: rgba(220, 220, 220, .1);
     font-size: .8rem;
-}
-
-.fixed-width::before,
-.fixed-width::after {
-    display: inline-block;
-    text-align: center;
-    width: 1.5ex;
 }
 
 .before::before {
@@ -402,7 +376,6 @@ footer {
     activities list
 */
 .activity-list-item {
-    margin-bottom: 1.5rem;
 
     .page-lead {
         font-size: 1rem;
@@ -424,81 +397,12 @@ footer {
             white-space: nowrap;
         }
 
-        &::before {
-            display: inline-block;
-            position: relative;
-        }
-
-        &.age::before {
-            top: -1px;
-        }
-
-        &.available-spots,
-        &.full {
-            font-weight: normal;
-        }
-
-        &.cost::before {
-            margin-right: 6px;
-        }
-
-        &.full::before {
-            margin-right: 1px;
-        }
-
-        &.available-spots::before {
-            margin-right: 3px;
-        }
-    }
-}
-
-.filter-ages ul {
-    display: flex;
-    flex-wrap: wrap;
-
-    li {
-        margin-right: .5ex;
-
-        span {
-            min-width: 45px;
-            text-align: center !important;
-        }
-    }
-}
-
-/*
-    Activity thumbnails
-*/
-.thumbnail-column {
-    padding: .5rem 1rem 0 .25rem !important;
-}
-
-.thumbnail {
-    display: block;
-    padding-bottom: 90%;
-    position: relative;
-    width: 100%;
-
-    > div {
-        background-position: center top;
-        background-size: cover;
-        border-radius: 4px;
-        bottom: 0;
-        height: 100%;
-        left: 0;
-        position: absolute;
-        right: 0;
-        top: 0;
-        width: 100%;
     }
 }
 
 /*
     Activity view
 */
-.page-content-main .tags {
-    margin-bottom: 1rem;
-}
 
 .vacation-activity-layout {
     .hint-prebooking,
@@ -513,9 +417,7 @@ footer {
 
     @mixin arrow-hint {
         @include icon-bold('\f061');
-
     }
-
 
     .hint {
         font-size: inherit;
@@ -695,12 +597,6 @@ ul.tags {
 
     .text-links {
         margin-top: .5rem;
-    }
-
-    .available-spots,
-    .full {
-        font-weight: bold;
-        margin-bottom: .4rem;
     }
 
     .dates::before {
