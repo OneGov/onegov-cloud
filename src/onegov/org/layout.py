@@ -23,6 +23,7 @@ from onegov.directory import DirectoryCollection
 from onegov.event import OccurrenceCollection
 from onegov.file import File
 from onegov.form import FormCollection, as_internal_id
+from onegov.form.models.document_form import DocumentFormCollection
 from onegov.newsletter import NewsletterCollection, RecipientCollection
 from onegov.org import _
 from onegov.org import utils
@@ -1043,12 +1044,12 @@ class EditorLayout(AdjacencyListLayout):
 class FormEditorLayout(DefaultLayout):
 
     model: ('FormDefinition | FormCollection | SurveyCollection'
-            '| SurveyDefinition')
+            '| SurveyDefinition | DocumentFormCollection')
 
     def __init__(
         self,
         model: ('FormDefinition | FormCollection | SurveyCollection'
-                '| SurveyDefinition'),
+                '| SurveyDefinition | DocumentFormCollection'),
         request: 'OrgRequest'
     ) -> None:
 
@@ -1220,6 +1221,10 @@ class FormCollectionLayout(DefaultLayout):
         return FormCollection(self.request.session)
 
     @property
+    def document_forms(self) -> DocumentFormCollection:
+        return DocumentFormCollection(self.request.session)
+
+    @property
     def editbar_links(self) -> list[Link | LinkGroup] | None:
         if self.request.is_manager:
             return [
@@ -1243,6 +1248,14 @@ class FormCollectionLayout(DefaultLayout):
                                         _('New external form')),
                                     'type': 'form'
                                 },
+                                name='new'
+                            ),
+                            attrs={'class': 'new-form'}
+                        ),
+                        Link(
+                            text=_('Document form'),
+                            url=self.request.link(
+                                self.document_forms,
                                 name='new'
                             ),
                             attrs={'class': 'new-form'}

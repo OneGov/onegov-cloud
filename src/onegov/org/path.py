@@ -30,6 +30,8 @@ from onegov.form import FormDefinition
 from onegov.form import FormRegistrationWindow
 from onegov.form import PendingFormSubmission
 from onegov.form.collection import SurveyCollection
+from onegov.form.models.document_form import (
+    DocumentFormCollection, DocumentFormPage)
 from onegov.form.models.submission import SurveySubmission
 from onegov.form.models.survey_window import SurveySubmissionWindow
 from onegov.newsletter import Newsletter
@@ -1055,6 +1057,21 @@ def get_external_link_collection(
              converters={'id': UUID})
 def get_external_link(request: 'OrgRequest', id: UUID) -> ExternalLink | None:
     return ExternalLinkCollection(request.session).by_id(id)
+
+
+@OrgApp.path(model=DocumentFormCollection, path='/document-forms')
+def get_document_form_collection(
+    request: 'OrgRequest',
+    type: str | None = None
+) -> DocumentFormCollection:
+    return DocumentFormCollection(request.session, type=type)
+
+
+@OrgApp.path(model=DocumentFormPage, path='/document-form/{id}',
+             converters={'id': UUID})
+def get_document_form_page(
+    request: 'OrgRequest', id: UUID) -> DocumentFormPage | None:
+    return DocumentFormCollection(request.session).by_id(id)
 
 
 @OrgApp.path(
