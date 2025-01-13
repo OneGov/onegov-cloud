@@ -86,7 +86,7 @@ var VolunteerCart = React.createClass({
             return (
                 <div className="volunteer-cart-container">
                     <div className="volunteer-cart">
-                        <button className="button" type="button" data-toggle="my-list">
+                        <button className={`button ${self.state.items.length === 0 ? 'hollow' : ''}`} type="button" data-toggle="my-list">
                             <i className="fa fa-chevron-down"></i>{self.props.listLabel} ({self.state.items.length})
                         </button>
                         <div className="dropdown-pane" id="my-list" data-dropdown data-auto-focus="true">

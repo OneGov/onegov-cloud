@@ -1,7 +1,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE 1.0\n"
-"POT-Creation-Date: 2025-01-06 10:50+0100\n"
+"POT-Creation-Date: 2025-01-13 14:02+0100\n"
 "PO-Revision-Date: 2021-11-11 09:08+0100\n"
 "Last-Translator: Marc Sommerhalder <marc.sommerhalder@seantis.ch>\n"
 "Language-Team: German\n"
@@ -27,6 +27,9 @@ msgstr "Buchungsphase: ${dates}"
 #, python-format
 msgid "Execution: ${dates}"
 msgstr "Durchführung: ${dates}"
+
+msgid "Activities"
+msgstr "Angebote"
 
 #, python-format
 msgid "${count} Activities"
@@ -168,9 +171,6 @@ msgstr "Rechnungen"
 
 msgid "Wishlist"
 msgstr "Wunschliste"
-
-msgid "Activities"
-msgstr "Angebote"
 
 msgid "Activity Title"
 msgstr "Angebot Titel"
@@ -1132,8 +1132,26 @@ msgstr "Start Buchungsphase"
 msgid "Booking End"
 msgstr "Ende Buchungsphase"
 
+msgid "Stop accepting bookings"
+msgstr "Die Annahme von Buchungen stoppen"
+
+msgid "Deadline"
+msgstr "Anmeldeschluss"
+
+msgid "At the end of the booking phase"
+msgstr "Am Ende der Buchungsphase"
+
+msgid "X days before each occasion"
+msgstr "X Tage vor jeder Durchführung"
+
+msgid "X Days Before"
+msgstr "X Tage vorher"
+
 msgid "Execution Start"
 msgstr "Start Durchführung"
+
+msgid "Execution phase"
+msgstr "Durchführungsphase"
 
 msgid "Execution End"
 msgstr "Ende Durchführung"
@@ -1199,21 +1217,6 @@ msgstr "Ja"
 
 msgid "No"
 msgstr "Nein"
-
-msgid "Stop accepting bookings"
-msgstr "Die Annahme von Buchungen stoppen"
-
-msgid "Deadline"
-msgstr "Anmeldeschluss"
-
-msgid "At the end of the booking phase"
-msgstr "Am Ende der Buchungsphase"
-
-msgid "X days before each occasion"
-msgstr "X Tage vor jeder Durchführung"
-
-msgid "X Days Before"
-msgstr "X Tage vorher"
 
 msgid "Allow bookings after the bills have been created."
 msgstr "Buchungen nach der Rechnungsstellung erlauben."
@@ -1586,9 +1589,6 @@ msgid "Could not add item. It overlaps with another item in your list."
 msgstr ""
 "Eintrag konnte nicht hinzugefügt werden. Es besteht eine Überlappung mit "
 "einem anderen Eintrag in der Liste."
-
-msgid "My list"
-msgstr "Meine Liste"
 
 msgid ""
 "Join us as a volunteer. Select the activities you are interested in and fill "
@@ -2218,6 +2218,9 @@ msgstr "Keine Angebote in Ihrer Liste."
 
 msgid "Register as volunteer"
 msgstr "Als Hilfsperson registrieren"
+
+msgid "My List"
+msgstr "Meine Liste"
 
 msgid "Hello!"
 msgstr "Guten Tag"
@@ -3236,6 +3239,9 @@ msgstr "Buchungen ${period}"
 #, python-format
 msgid "Billing for ${period}"
 msgstr "Fakturierung ${period}"
+
+#~ msgid "My list"
+#~ msgstr "Meine Liste"
 
 #~ msgid "Leave Group"
 #~ msgstr "Gruppe verlassen"

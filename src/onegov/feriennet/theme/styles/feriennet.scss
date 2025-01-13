@@ -131,17 +131,6 @@ svg {
 /*
     Forms
 */
-@media #{$medium-up} {
-    .two-columns {
-        column-count: 2;
-        column-gap: 4rem;
-
-        form .formfields,
-        form fieldset {
-            break-inside: avoid;
-        }
-    }
-}
 
 form small {
     color: $aluminum;
@@ -3191,13 +3180,25 @@ $booking-left-margin: 1.6rem;
     }
 
     .button {
-        margin-top: .5rem;
+    border-radius: .7rem !important;
+    margin: 0 !important;
+
+    &:hover {
+        margin: 0 !important;
+        padding: 1rem 1.5rem !important;
+    }
+
+    &.hover .fa-chevron-down {
+            transform: rotate(180deg);
+        }
     }
 }
 
 .volunteer-form-layout .volunteer-cart .button {
     display: none;
 }
+
+
 
 
 /*
