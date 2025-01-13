@@ -2,7 +2,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE 1.0\n"
-"POT-Creation-Date: 2024-11-25 19:53+0100\n"
+"POT-Creation-Date: 2025-01-08 16:47+0100\n"
 "PO-Revision-Date: 2022-03-15 10:50+0100\n"
 "Last-Translator: Marc Sommerhalder <marc.sommerhalder@seantis.ch>\n"
 "Language-Team: French\n"
@@ -1020,6 +1020,15 @@ msgstr "Images de taille normale"
 msgid "Grid layout"
 msgstr "Mise en page en grille"
 
+msgid "By filename"
+msgstr "Par nom de fichier"
+
+msgid "By caption"
+msgstr "Par légende"
+
+msgid "By last change"
+msgstr "Par date de dernière modification"
+
 msgid "Show images on homepage"
 msgstr "Montrer les images sur la page d'accueil"
 
@@ -1684,6 +1693,12 @@ msgstr "Code Analytics"
 
 msgid "JavaScript for web statistics support"
 msgstr "JavaScript pour l'assistance en matière de statistiques web"
+
+msgid "Analytics URL"
+msgstr ""
+
+msgid "URL pointing to the analytics page"
+msgstr ""
 
 msgid "Cantonal holidays"
 msgstr "Jours fériés cantonaux"
@@ -2766,9 +2781,6 @@ msgstr ""
 msgid "Delete content"
 msgstr "Supprimer le contenu"
 
-msgid "Photo album. Will be shown at the end of content."
-msgstr "Album photo. Sera affiché à la fin du contenu."
-
 msgid "Photo album"
 msgstr "Album photo"
 
@@ -2947,8 +2959,8 @@ msgstr "Refuser ${title} est irréversible."
 msgid "Reject reservation"
 msgstr "Refuser la réservation"
 
-#. Used in sentence: "${event} published."
 #.
+#. Used in sentence: "${event} published."
 msgid "Event"
 msgstr "Événement"
 
@@ -3302,8 +3314,8 @@ msgid ""
 "filled-out form."
 msgstr ""
 "Veuillez vérifier vos données et appuyez sur « Compléter » pour finaliser le "
-"processus. S'il y a quelque chose que vous souhaitez modifier, cliquez sur « "
-"Modifier » pour retourner sur le formulaire complété."
+"processus. S'il y a quelque chose que vous souhaitez modifier, cliquez sur "
+"« Modifier » pour retourner sur le formulaire complété."
 
 msgid ""
 "The image shown in the list view is a square. To have your image shown fully "
@@ -6202,3 +6214,6 @@ msgstr "Un compte a été créé pour vous"
 
 msgid "The user was created successfully"
 msgstr "L'utilisateur a bien été créé"
+
+#~ msgid "Photo album. Will be shown at the end of content."
+#~ msgstr "Album photo. Sera affiché à la fin du contenu."

@@ -231,9 +231,9 @@ There are two types of number fields. An integer and a float field::
 Integer fields optionally can have a price attached to them which will be
 multiplied by the supplied integer::
 
-    Number of stamps to include = 0..30 (0.85 CHF)
+    Number of stamps to include = 0..30 (1.00 CHF)
 
-This will result in a price of 0.85 CHF per stamp.
+This will result in a price of 1.00 CHF per stamp.
 
 Code
 ~~~~

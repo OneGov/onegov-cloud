@@ -15,7 +15,7 @@ from onegov.org import _
 from onegov.org.models.extensions import AccessExtension
 from onegov.org.utils import widest_access
 from onegov.search import ORMSearchable
-from operator import itemgetter
+from operator import attrgetter, itemgetter
 from sedate import standardize_date, utcnow
 from sqlalchemy import asc, desc, select, nullslast  # type: ignore
 
@@ -276,7 +276,37 @@ class ImageSet(FileSet, AccessExtension, ORMSearchable):
     lead: dict_property[str | None] = meta_property()
     view: dict_property[str | None] = meta_property()
 
+    order: dict_property[str] = meta_property(default='by-last-change')
+    order_direction: dict_property[str] = meta_property(default='desc')
+
     show_images_on_homepage: dict_property[bool | None] = meta_property()
+
+    @property
+    def ordered_files(self) -> list[File]:
+        if self.order == 'by-last-change':
+            # the files are already sorted, since this relationship
+            # is sorted by last change in descending order
+            if self.order_direction == 'desc':
+                return self.files
+            else:
+                return [*reversed(self.files)]
+
+        sort_key: Callable[[File], str]
+        if self.order == 'by-name':
+            sort_key = attrgetter('name')
+        elif self.order == 'by-caption':
+            # we can't use attrgetter since note is nullable
+            def sort_key(file: File) -> str:
+                return file.note or ''
+        else:
+            raise AssertionError('unreachable')
+
+        # for the rest we sort by attribute name
+        return sorted(
+            self.files,
+            key=sort_key,
+            reverse=self.order_direction == 'desc'
+        )
 
 
 class ImageSetCollection(FileSetCollection[ImageSet]):
