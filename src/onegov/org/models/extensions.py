@@ -1101,8 +1101,8 @@ class SidebarLinksExtension(ContentExtension):
 
 
 class SidebarContactLinkExtension(ContentExtension):
-    """Extends any class that has a content dictionary field with the ability to
-    add a contact link to the sidebar.
+    """Extends any class that has a content dictionary field with the ability
+    to add a contact link to the sidebar.
     """
 
     contact_link_text = content_property()
