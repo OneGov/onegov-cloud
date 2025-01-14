@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 from markupsafe import Markup
 from onegov.form.widgets import UploadWidget, UploadMultipleWidget
 from onegov.org import _
@@ -26,7 +28,7 @@ class UploadOrLinkExistingFileWidget(UploadWidget):
 
     def template_data(
         self,
-        field: 'UploadOrSelectExistingFileField',  # type:ignore[override]
+        field: UploadOrSelectExistingFileField,  # type:ignore[override]
         force_simple: bool,
         resend_upload: bool,
         wrapper_css_class: str,
@@ -129,7 +131,7 @@ class UploadOrSelectExistingFileWidget(UploadOrLinkExistingFileWidget):
 
     def template_data(
         self,
-        field: 'UploadOrSelectExistingFileField',  # type:ignore[override]
+        field: UploadOrSelectExistingFileField,  # type:ignore[override]
         force_simple: bool,
         resend_upload: bool,
         wrapper_css_class: str,
@@ -172,7 +174,7 @@ class UploadOrSelectExistingMultipleFilesWidget(UploadMultipleWidget):
 
     def render_input(
         self,
-        field: 'UploadOrSelectExistingMultipleFilesField',  # type:ignore
+        field: UploadOrSelectExistingMultipleFilesField,  # type:ignore
         **kwargs: Any
     ) -> Markup:
 

@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 from morepath import redirect
 from onegov.election_day import _
 from onegov.election_day import ElectionDayApp
@@ -25,9 +27,9 @@ if TYPE_CHECKING:
 )
 def view_trigger_notficiations(
     self: Principal,
-    request: 'ElectionDayRequest',
+    request: ElectionDayRequest,
     form: TriggerNotificationsForm
-) -> 'RenderData | Response':
+) -> RenderData | Response:
 
     """ Trigger the notifications of the current election day. """
 

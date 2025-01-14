@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 from functools import cached_property
 
 from onegov.agency.models import ExtendedPerson
@@ -48,7 +50,7 @@ class ExtendedPersonCollection(
 
     def __init__(
         self,
-        session: 'Session',
+        session: Session,
         page: int = 0,
         letter: str | None = None,
         agency: str | None = None,
@@ -81,7 +83,7 @@ class ExtendedPersonCollection(
         # Usage for link generation of people excel based on timestamp
         self.xlsx_modified = xlsx_modified
 
-    def subset(self) -> 'Query[ExtendedPerson]':
+    def subset(self) -> Query[ExtendedPerson]:
         return self.query()
 
     def __eq__(self, other: object) -> bool:
@@ -107,7 +109,7 @@ class ExtendedPersonCollection(
             updated_lt=self.updated_lt,
         )
 
-    def for_filter(self, **kwargs: 'Unpack[FilterParams]') -> Self:
+    def for_filter(self, **kwargs: Unpack[FilterParams]) -> Self:
         return self.__class__(
             session=self.session,
             letter=kwargs.get('letter', self.letter),
@@ -121,7 +123,7 @@ class ExtendedPersonCollection(
             updated_lt=kwargs.get('updated_lt', self.updated_lt),
         )
 
-    def query(self) -> 'Query[ExtendedPerson]':
+    def query(self) -> Query[ExtendedPerson]:
         query = self.session.query(ExtendedPerson)
         if self.exclude_hidden:
             query = query.filter(

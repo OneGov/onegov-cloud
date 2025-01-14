@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 from collections import OrderedDict
 from decimal import Decimal
 from itertools import groupby
@@ -51,8 +53,8 @@ class BillingCollection:
 
     def __init__(
         self,
-        request: 'FeriennetRequest',
-        period: 'Period | PeriodMeta',
+        request: FeriennetRequest,
+        period: Period | PeriodMeta,
         username: str | None = None,
         expand: bool = False,
         state: Literal['paid', 'unpaid'] | None = None
@@ -70,38 +72,38 @@ class BillingCollection:
         self.state = state
 
     @property
-    def user_id(self) -> 'UUID | None':
+    def user_id(self) -> UUID | None:
         if self.username:
             return self.app.user_ids_by_name[self.username]
         return None
 
     @property
-    def period_id(self) -> 'UUID':
+    def period_id(self) -> UUID:
         return self.period.id
 
-    def for_period(self, period: 'Period') -> 'Self':
+    def for_period(self, period: Period) -> Self:
         return self.__class__(
             self.request, period, self.username, self.expand, self.state)
 
-    def for_username(self, username: str) -> 'Self':
+    def for_username(self, username: str) -> Self:
         return self.__class__(
             self.request, self.period, username, self.expand, self.state)
 
-    def for_expand(self, expand: bool) -> 'Self':
+    def for_expand(self, expand: bool) -> Self:
         return self.__class__(
             self.request, self.period, self.username, expand, self.state)
 
-    def for_state(self, state: Literal['paid', 'unpaid'] | None) -> 'Self':
+    def for_state(self, state: Literal['paid', 'unpaid'] | None) -> Self:
         return self.__class__(
             self.request, self.period, self.username, self.expand, state)
 
     @property
-    def invoices_by_period_query(self) -> 'Alias':
+    def invoices_by_period_query(self) -> Alias:
         return as_selectable_from_path(
             module_path('onegov.feriennet', 'queries/invoices_by_period.sql'))
 
     @property
-    def invoices_by_period(self) -> 'Query[InvoicesByPeriodRow]':
+    def invoices_by_period(self) -> Query[InvoicesByPeriodRow]:
         invoices = self.invoices_by_period_query.c
 
         query = select(invoices).where(invoices.period_id == self.period_id)
@@ -115,10 +117,10 @@ class BillingCollection:
         return self.session.execute(query)
 
     class Bill(NamedTuple):
-        items: tuple['InvoicesByPeriodRow', ...]
-        first: 'InvoicesByPeriodRow'
-        id: 'UUID'
-        invoice_id: 'UUID'
+        items: tuple[InvoicesByPeriodRow, ...]
+        first: InvoicesByPeriodRow
+        id: UUID
+        invoice_id: UUID
         title: str
         paid: bool
         total: Decimal
@@ -165,7 +167,7 @@ class BillingCollection:
 
     def add_position(
         self,
-        users: 'Collection[str]',
+        users: Collection[str],
         text: str,
         amount: Decimal,
         group: str
@@ -197,7 +199,7 @@ class BillingCollection:
 
     def add_manual_position(
         self,
-        users: 'Collection[str]',
+        users: Collection[str],
         text: str,
         amount: Decimal
     ) -> int:
@@ -206,7 +208,7 @@ class BillingCollection:
     def include_donation(
         self,
         text: str,
-        user_id: 'UUID',
+        user_id: UUID,
         amount: Decimal
     ) -> InvoiceItem | None:
         """ Includes a donation for the given user and period.
@@ -244,7 +246,7 @@ class BillingCollection:
             paid=False
         )
 
-    def exclude_donation(self, user_id: 'UUID') -> bool | None:
+    def exclude_donation(self, user_id: UUID) -> bool | None:
         invoice = (
             self.invoices.query()
             .outerjoin(User)
@@ -283,7 +285,7 @@ class BillingCollection:
         # delete all existing invoices
         invoice_ids = invoices.query().with_entities(Invoice.id).subquery()
 
-        def delete_queries() -> 'Iterator[Query[Any]]':
+        def delete_queries() -> Iterator[Query[Any]]:
             yield session.query(InvoiceReference).filter(
                 InvoiceReference.invoice_id.in_(invoice_ids))
 
@@ -329,14 +331,14 @@ class BookingInvoiceBridge:
 
     """
 
-    attendees: dict['UUID', tuple[str, str]]
-    processed_attendees: set['UUID']
-    billed_attendees: set['UUID']
+    attendees: dict[UUID, tuple[str, str]]
+    processed_attendees: set[UUID]
+    billed_attendees: set[UUID]
 
     def __init__(
         self,
-        session: 'Session',
-        period: 'Period | PeriodMeta'
+        session: Session,
+        period: Period | PeriodMeta
     ) -> None:
         # tracks attendees which had at least one booking added through the
         # bridge (even if said booking was free)

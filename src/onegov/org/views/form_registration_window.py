@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 from collections import defaultdict
 from onegov.core.security import Private
 from onegov.form import CompleteFormSubmission
@@ -35,10 +37,10 @@ if TYPE_CHECKING:
 )
 def handle_new_registration_form(
     self: FormDefinition,
-    request: 'OrgRequest',
+    request: OrgRequest,
     form: FormRegistrationWindowForm,
     layout: FormSubmissionLayout | None = None
-) -> 'RenderData | Response':
+) -> RenderData | Response:
     title = _('New Registration Window')
 
     layout = layout or FormSubmissionLayout(self, request)
@@ -68,8 +70,8 @@ def handle_new_registration_form(
 
 
 def send_form_registration_email(
-    request: 'OrgRequest',
-    receivers: 'SequenceOrScalar[Address | str]',
+    request: OrgRequest,
+    receivers: SequenceOrScalar[Address | str],
     content: dict[str, Any],
     action: Literal['general-message']
 ) -> None:
@@ -88,7 +90,7 @@ def send_form_registration_email(
 
 
 def ticket_linkable(
-    request: 'OrgRequest',
+    request: OrgRequest,
     ticket: Ticket | None
 ) -> Ticket | None:
 
@@ -108,10 +110,10 @@ def ticket_linkable(
 )
 def view_send_form_registration_message(
     self: FormRegistrationWindow,
-    request: 'OrgRequest',
+    request: OrgRequest,
     form: FormRegistrationMessageForm,
     layout: FormSubmissionLayout | None = None,
-) -> 'RenderData | Response':
+) -> RenderData | Response:
 
     if form.submitted(request):
         count = 0
@@ -169,9 +171,9 @@ def view_send_form_registration_message(
 )
 def view_registration_window(
     self: FormRegistrationWindow,
-    request: 'OrgRequest',
+    request: OrgRequest,
     layout: FormSubmissionLayout | None = None
-) -> 'RenderData':
+) -> RenderData:
 
     layout = layout or FormSubmissionLayout(self.form, request)
     title = layout.format_date_range(self.start, self.end)
@@ -298,10 +300,10 @@ def view_registration_window(
 )
 def handle_edit_registration_form(
     self: FormRegistrationWindow,
-    request: 'OrgRequest',
+    request: OrgRequest,
     form: FormRegistrationWindowForm,
     layout: FormSubmissionLayout | None = None
-) -> 'RenderData | Response':
+) -> RenderData | Response:
 
     title = _('Edit Registration Window')
 
@@ -333,7 +335,7 @@ def handle_edit_registration_form(
 )
 def view_cancel_submissions_for_registration_window(
     self: FormRegistrationWindow,
-    request: 'OrgRequest'
+    request: OrgRequest
 ) -> None:
     """ Cancels a bunch of submissions either open ones or already accepted
     ones. If there is a corresponding ticket, it is accepted before denying
@@ -385,7 +387,7 @@ def view_cancel_submissions_for_registration_window(
 )
 def delete_registration_window(
     self: FormRegistrationWindow,
-    request: 'OrgRequest'
+    request: OrgRequest
 ) -> None:
 
     request.assert_valid_csrf_token()

@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 from onegov.core.elements import Link
 from onegov.org.custom import logout_path
 from onegov.org.elements import LinkGroup
@@ -14,7 +16,7 @@ if TYPE_CHECKING:
     from sqlalchemy.orm import Session
 
 
-def get_global_tools(request: 'TownRequest') -> 'Iterator[Link | LinkGroup]':
+def get_global_tools(request: TownRequest) -> Iterator[Link | LinkGroup]:
 
     if request.is_logged_in:
 
@@ -62,17 +64,17 @@ def get_global_tools(request: 'TownRequest') -> 'Iterator[Link | LinkGroup]':
             )
 
 
-def get_top_navigation(request: 'TownRequest') -> 'list[Link]':
+def get_top_navigation(request: TownRequest) -> list[Link]:
     return []
 
 
-def get_current_settlement_run(session: 'Session') -> SettlementRun:
+def get_current_settlement_run(session: Session) -> SettlementRun:
     query = session.query(SettlementRun)
     query = query.filter(SettlementRun.active == True)
     return query.one()
 
 
-def get_current_rate_set(session: 'Session', run: SettlementRun) -> RateSet:
+def get_current_rate_set(session: Session, run: SettlementRun) -> RateSet:
     rat_set = (
         session.query(RateSet).filter(RateSet.year == run.start.year).first()
     )

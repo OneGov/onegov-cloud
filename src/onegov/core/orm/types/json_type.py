@@ -4,6 +4,8 @@
 # to read each others json.
 #
 # Therefore we use a common denominator kind of json encoder/decoder.
+from __future__ import annotations
+
 from sqlalchemy.ext.mutable import MutableDict
 from sqlalchemy.types import TypeDecorator
 from sqlalchemy.dialects.postgresql import JSONB
@@ -35,7 +37,7 @@ class JSON(_Base):
     def process_bind_param(  # type:ignore[override]
         self,
         value: dict[str, Any] | None,
-        dialect: 'Dialect'
+        dialect: Dialect
     ) -> dict[str, Any]:
 
         return {} if value is None else value
@@ -43,7 +45,7 @@ class JSON(_Base):
     def process_result_value(
         self,
         value: dict[str, Any] | None,
-        dialect: 'Dialect'
+        dialect: Dialect
     ) -> dict[str, Any]:
 
         return {} if value is None else value

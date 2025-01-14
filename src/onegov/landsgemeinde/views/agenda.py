@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 from morepath import redirect
 from onegov.core.elements import BackLink, Link
 from onegov.core.security import Private
@@ -30,9 +32,9 @@ if TYPE_CHECKING:
 )
 def add_agenda_item(
     self: AgendaItemCollection,
-    request: 'LandsgemeindeRequest',
+    request: LandsgemeindeRequest,
     form: AgendaItemForm
-) -> 'RenderData | Response':
+) -> RenderData | Response:
 
     if form.submitted(request):
         agenda_item = self.add(**form.get_useful_data())
@@ -65,8 +67,8 @@ def add_agenda_item(
 )
 def view_agenda_item(
     self: AgendaItem,
-    request: 'LandsgemeindeRequest'
-) -> 'RenderData':
+    request: LandsgemeindeRequest
+) -> RenderData:
 
     layout = AgendaItemLayout(self, request)
     agenda_items = self.assembly.agenda_items
@@ -100,9 +102,9 @@ def view_agenda_item(
 )
 def edit_agenda_item(
     self: AgendaItem,
-    request: 'LandsgemeindeRequest',
+    request: LandsgemeindeRequest,
     form: AgendaItemForm
-) -> 'RenderData | Response':
+) -> RenderData | Response:
 
     if form.submitted(request):
         form.populate_obj(self)
@@ -133,7 +135,7 @@ def edit_agenda_item(
 )
 def delete_agenda_item(
     self: AgendaItem,
-    request: 'LandsgemeindeRequest'
+    request: LandsgemeindeRequest
 ) -> None:
 
     request.assert_valid_csrf_token()

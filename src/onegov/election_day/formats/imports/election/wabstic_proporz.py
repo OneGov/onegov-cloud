@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 from onegov.election_day import _
 from onegov.election_day.formats.imports.common import EXPATS
 from onegov.election_day.formats.imports.common import FileImportError
@@ -83,13 +85,13 @@ WABSTIC_PROPORZ_HEADERS_WP_KANDIDATENGDE = (
 )
 
 
-def get_entity_id(line: 'DefaultRow', expats: 'Collection[int]') -> int:
+def get_entity_id(line: DefaultRow, expats: Collection[int]) -> int:
     col = 'bfsnrgemeinde'
     entity_id = validate_integer(line, col)
     return 0 if entity_id in expats else entity_id
 
 
-def get_list_id_from_knr(line: 'DefaultRow') -> str:
+def get_list_id_from_knr(line: DefaultRow) -> str:
     """
     Takes a line from csv file with a candidate number (knr) in it and
     returns the derived listnr for this candidate. Will also handle the new
@@ -100,7 +102,7 @@ def get_list_id_from_knr(line: 'DefaultRow') -> str:
     return line.knr[0:-2]
 
 
-def get_list_id(line: 'DefaultRow') -> str:
+def get_list_id(line: DefaultRow) -> str:
     number = line.listnr or '0'
     # wabstiC 99 is blank list that maps to 999 see open_data_de.md
     number = '999' if number == '99' else number
@@ -109,7 +111,7 @@ def get_list_id(line: 'DefaultRow') -> str:
 
 def import_election_wabstic_proporz(
     election: ProporzElection,
-    principal: 'Canton | Municipality',
+    principal: Canton | Municipality,
     number: str,
     district: str | None = None,
     file_wp_wahl: IO[bytes] | None = None,

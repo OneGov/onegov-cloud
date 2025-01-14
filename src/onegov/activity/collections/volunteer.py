@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 from onegov.activity.models import Volunteer
 from onegov.core.collection import GenericCollection
 from onegov.core.orm.sql import as_selectable_from_path
@@ -75,8 +77,8 @@ class VolunteerCollection(GenericCollection[Volunteer]):
 
     def __init__(
         self,
-        session: 'Session',
-        period: 'Period | PeriodMeta | None'
+        session: Session,
+        period: Period | PeriodMeta | None
     ) -> None:
         super().__init__(session)
         self.period = period
@@ -86,10 +88,10 @@ class VolunteerCollection(GenericCollection[Volunteer]):
         return Volunteer
 
     @property
-    def period_id(self) -> 'UUID | None':
+    def period_id(self) -> UUID | None:
         return self.period and self.period.id or None
 
-    def report(self) -> 'Query[ReportRow]':
+    def report(self) -> Query[ReportRow]:
         stmt = as_selectable_from_path(
             module_path('onegov.activity', 'queries/volunteer-report.sql'))
 
@@ -97,5 +99,5 @@ class VolunteerCollection(GenericCollection[Volunteer]):
 
         return self.session.execute(query)
 
-    def for_period(self, period: 'Period | PeriodMeta | None') -> 'Self':
+    def for_period(self, period: Period | PeriodMeta | None) -> Self:
         return self.__class__(self.session, period)

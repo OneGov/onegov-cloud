@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 from collections import OrderedDict
 
 from markupsafe import escape
@@ -28,7 +30,7 @@ if TYPE_CHECKING:
     from webob import Response
 
 
-def get_variables(request: 'FeriennetRequest') -> dict[str, str]:
+def get_variables(request: FeriennetRequest) -> dict[str, str]:
     period = PeriodCollection(request.session).active()
     variables = TemplateVariables(request, period).bound
 
@@ -43,12 +45,12 @@ def get_variables(request: 'FeriennetRequest') -> dict[str, str]:
     template='notification_templates.pt')
 def view_notification_templates(
     self: NotificationTemplateCollection,
-    request: 'FeriennetRequest'
-) -> 'RenderData':
+    request: FeriennetRequest
+) -> RenderData:
 
     layout = NotificationTemplateCollectionLayout(self, request)
 
-    def get_links(notification: NotificationTemplate) -> 'Iterator[Link]':
+    def get_links(notification: NotificationTemplate) -> Iterator[Link]:
         if not request.app.active_period:
             return
 
@@ -88,9 +90,9 @@ def view_notification_templates(
     form=NotificationTemplateForm)
 def view_notification_template_form(
     self: NotificationTemplateCollection,
-    request: 'FeriennetRequest',
+    request: FeriennetRequest,
     form: NotificationTemplateForm
-) -> 'RenderData | Response':
+) -> RenderData | Response:
 
     title = _('New Notification Template')
 
@@ -121,9 +123,9 @@ def view_notification_template_form(
     form=NotificationTemplateForm)
 def edit_notification(
     self: NotificationTemplate,
-    request: 'FeriennetRequest',
+    request: FeriennetRequest,
     form: NotificationTemplateForm
-) -> 'RenderData | Response':
+) -> RenderData | Response:
 
     if form.submitted(request):
         form.populate_obj(self)
@@ -152,7 +154,7 @@ def edit_notification(
     request_method='DELETE')
 def delete_notification(
     self: NotificationTemplate,
-    request: 'FeriennetRequest'
+    request: FeriennetRequest
 ) -> None:
 
     request.assert_valid_csrf_token()
@@ -160,7 +162,7 @@ def delete_notification(
     NotificationTemplateCollection(request.session).delete(self)
 
     @request.after
-    def remove_target(response: 'Response') -> None:
+    def remove_target(response: Response) -> None:
         response.headers.add('X-IC-Remove', 'true')
 
 
@@ -173,9 +175,9 @@ def delete_notification(
 )
 def handle_send_notification(
     self: NotificationTemplate,
-    request: 'FeriennetRequest',
+    request: FeriennetRequest,
     form: NotificationTemplateSendForm
-) -> 'RenderData | Response':
+) -> RenderData | Response:
 
     period = PeriodCollection(request.session).active()
     variables = TemplateVariables(request, period)
@@ -197,7 +199,7 @@ def handle_send_notification(
             })
             plaintext = html_to_text(content)
 
-            def email_iter() -> 'Iterator[EmailJsonDict]':
+            def email_iter() -> Iterator[EmailJsonDict]:
                 for recipient in recipients:
                     yield request.app.prepare_email(
                         receivers=(recipient, ),

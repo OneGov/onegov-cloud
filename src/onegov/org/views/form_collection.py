@@ -1,4 +1,5 @@
 """ Lists the custom forms. """
+from __future__ import annotations
 
 import collections
 from markupsafe import Markup
@@ -31,7 +32,7 @@ if TYPE_CHECKING:
 def combine_grouped(
     items: dict[str, list[FormDefinition]],
     external_links: dict[str, list[ExternalLink]],
-    sort: 'SortKey | None' = None
+    sort: SortKey | None = None
 ) -> dict[str, list[FormDefinition | ExternalLink]]:
 
     # NOTE: This is not safe, we are destroying the original items
@@ -54,9 +55,9 @@ def combine_grouped(
 @OrgApp.html(model=FormCollection, template='forms.pt', permission=Public)
 def view_form_collection(
     self: FormCollection,
-    request: 'OrgRequest',
+    request: OrgRequest,
     layout: FormCollectionLayout | None = None
-) -> 'RenderData':
+) -> RenderData:
 
     forms = group_by_column(
         request=request,
@@ -131,9 +132,9 @@ def view_form_collection(
 @OrgApp.html(model=SurveyCollection, template='surveys.pt', permission=Private)
 def view_survey_collection(
     self: SurveyCollection,
-    request: 'OrgRequest',
+    request: OrgRequest,
     layout: SurveyCollectionLayout | None = None
-) -> 'RenderData':
+) -> RenderData:
 
     surveys = group_by_column(
         request=request,

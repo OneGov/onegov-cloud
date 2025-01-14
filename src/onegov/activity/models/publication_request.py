@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 from onegov.core.orm import Base
 from onegov.core.orm.mixins import TimestampMixin
 from onegov.core.orm.types import UUID
@@ -27,31 +29,31 @@ class PublicationRequest(Base, TimestampMixin):
     __tablename__ = 'publication_requests'
 
     #: The public id of the publication request
-    id: 'Column[uuid.UUID]' = Column(
+    id: Column[uuid.UUID] = Column(
         UUID,  # type:ignore[arg-type]
         primary_key=True,
         default=uuid4
     )
 
     #: The activity linked to this request
-    activity_id: 'Column[uuid.UUID]' = Column(
+    activity_id: Column[uuid.UUID] = Column(
         UUID,  # type:ignore[arg-type]
         ForeignKey('activities.id'),
         nullable=False
     )
-    activity: 'relationship[Activity]' = relationship(
+    activity: relationship[Activity] = relationship(
         'Activity',
         back_populates='publication_requests',
         lazy='joined'
     )
 
     #: The period linked to this request
-    period_id: 'Column[uuid.UUID]' = Column(
+    period_id: Column[uuid.UUID] = Column(
         UUID,  # type:ignore[arg-type]
         ForeignKey('periods.id'),
         nullable=False
     )
-    period: 'relationship[Period]' = relationship(
+    period: relationship[Period] = relationship(
         'Period',
         back_populates='publication_requests',
         lazy='joined'

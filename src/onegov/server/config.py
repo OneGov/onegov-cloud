@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 import yaml
 
 from onegov.server import errors
@@ -38,7 +40,7 @@ class Config:
                 'Not all namespaces are unique')
 
     @classmethod
-    def from_yaml_file(cls, yaml_file: 'StrOrBytesPath') -> 'Self':
+    def from_yaml_file(cls, yaml_file: StrOrBytesPath) -> Self:
         """ Load the given yaml file and return a new Configuration instance
         with the configuration values found in the yaml file.
 
@@ -47,7 +49,7 @@ class Config:
             return cls(yaml.safe_load(fp))
 
     @classmethod
-    def from_yaml_string(cls, yaml_string: str | bytes) -> 'Self':
+    def from_yaml_string(cls, yaml_string: str | bytes) -> Self:
         """ Load the given yaml string and return a new Configuration instance
         with the configuration values found in the yaml string.
 
@@ -135,7 +137,7 @@ class ApplicationConfig:
         return self._cfg['namespace'].replace('-', '_')
 
     @property
-    def application_class(self) -> type['Application']:
+    def application_class(self) -> type[Application]:
         application_class = load_class(self._cfg['application'])
 
         if application_class is None:

@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 from onegov.core.security import Public, Private
 from onegov.org import _
 from onegov.org.views.homepage import view_org
@@ -17,8 +19,8 @@ if TYPE_CHECKING:
 @TownApp.html(model=Organisation, template='homepage.pt', permission=Public)
 def town_view_org(
     self: Organisation,
-    request: 'TownRequest'
-) -> 'RenderData | Response':
+    request: TownRequest
+) -> RenderData | Response:
     view = view_org(self, request, HomepageLayout(self, request))
     # catch redirect
     if isinstance(view, Response):
@@ -39,9 +41,9 @@ def town_view_org(
 )
 def view_pages_sort(
     self: Organisation,
-    request: 'TownRequest',
+    request: TownRequest,
     layout: HomepageLayout | None = None
-) -> 'RenderData':
+) -> RenderData:
     layout = layout or HomepageLayout(self, request)
 
     return {

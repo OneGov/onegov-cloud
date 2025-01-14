@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 from collections import OrderedDict
 from onegov.election_day import _
 from onegov.election_day.models import ElectionResult
@@ -31,12 +33,12 @@ if TYPE_CHECKING:
 
 
 def get_list_results(
-    election: 'Election',
+    election: Election,
     limit: int | None = None,
-    names: 'Collection[str] | None' = None,
+    names: Collection[str] | None = None,
     sort_by_names: bool = False,
-    entities: 'Collection[str] | None' = None
-) -> 'Query[ListResultRow]':
+    entities: Collection[str] | None = None
+) -> Query[ListResultRow]:
     """ Returns the aggregated list results as list. """
 
     session = object_session(election)
@@ -80,13 +82,13 @@ def get_list_results(
 
 
 def get_lists_data(
-    election: 'Election',
+    election: Election,
     limit: int | None = None,
-    names: 'Collection[str] | None' = None,
+    names: Collection[str] | None = None,
     mandates_only: bool = False,
     sort_by_names: bool = False,
-    entities: 'Collection[str] | None' = None
-) -> 'JSONObject_ro':
+    entities: Collection[str] | None = None
+) -> JSONObject_ro:
     """" View the lists as JSON. Used to for the lists bar chart. """
 
     allocated_mandates = election.allocated_mandates
@@ -126,9 +128,9 @@ def get_lists_data(
 
 
 def get_lists_panachage_data(
-    election: 'Election',
-    request: 'ElectionDayRequest | None'
-) -> 'JSONObject_ro':
+    election: Election,
+    request: ElectionDayRequest | None
+) -> JSONObject_ro:
     """" Get the panachage data as JSON. Used to for the panachage sankey
     chart.
 

@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 from onegov.org import _
 from onegov.org.elements import DeleteLink, Link, LinkGroup, IFrameLink
 from onegov.org.models import Organisation
@@ -101,12 +103,12 @@ class TraitInfo:
         return TRAIT_MESSAGES
 
     @property
-    def allowed_subtraits(self) -> 'Sequence[str]':
+    def allowed_subtraits(self) -> Sequence[str]:
         """ Returns a list of traits that this page may contain. """
         raise NotImplementedError
 
     @property
-    def paste_target(self) -> 'TraitInfo':
+    def paste_target(self) -> TraitInfo:
         """ Returns the page that should be used as parent for the content
         pasting if paste is called on the current page (self).
 
@@ -129,15 +131,15 @@ class TraitInfo:
         self,
         trait: str,
         action: str,
-        request: 'OrgRequest'
-    ) -> type['Form']:
+        request: OrgRequest
+    ) -> type[Form]:
         """ Returns the form class for the given trait, action. """
         raise NotImplementedError
 
     def get_editbar_links(
         self,
-        request: 'OrgRequest'
-    ) -> 'Sequence[BaseLink | LinkGroup]':
+        request: OrgRequest
+    ) -> Sequence[BaseLink | LinkGroup]:
         """ Returns the editbar links on the private view of this trait. """
         links = list(self.get_edit_links(request))
         links.append(
@@ -151,8 +153,8 @@ class TraitInfo:
 
     def get_add_links(
         self,
-        request: 'OrgRequest'
-    ) -> 'Iterator[BaseLink]':
+        request: OrgRequest
+    ) -> Iterator[BaseLink]:
         """ Yields the add links shown on the private view of this trait. """
 
         for trait in self.allowed_subtraits:
@@ -170,8 +172,8 @@ class TraitInfo:
 
     def get_edit_links(
         self,
-        request: 'OrgRequest'
-    ) -> 'Iterator[BaseLink | LinkGroup]':
+        request: OrgRequest
+    ) -> Iterator[BaseLink | LinkGroup]:
         """ Yields the edit links shown on the private view of this trait. """
 
         if self.editable:

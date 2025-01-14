@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 from onegov.feriennet import _
 
 # translations provided by onegov.org, overriden by feriennet

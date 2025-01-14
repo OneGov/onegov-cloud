@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 from functools import cached_property
 
 from onegov.activity import Activity, PeriodCollection, Occasion
@@ -37,8 +39,8 @@ if TYPE_CHECKING:
 
 class DefaultLayout(BaseLayout):
 
-    app: 'FeriennetApp'
-    request: 'FeriennetRequest'
+    app: FeriennetApp
+    request: FeriennetRequest
 
     @property
     def is_owner(self) -> bool:
@@ -90,10 +92,10 @@ class DefaultLayout(BaseLayout):
             attrs={'class': 'offer-again'}
         )
 
-    def linkify(self, text: str | None) -> 'Markup':  # type:ignore[override]
+    def linkify(self, text: str | None) -> Markup:  # type:ignore[override]
         return linkify(text)
 
-    def paragraphify(self, text: str) -> 'Markup':
+    def paragraphify(self, text: str) -> Markup:
         return paragraphify(text)
 
 
@@ -105,7 +107,7 @@ class VacationActivityCollectionLayout(DefaultLayout):
         def __init__(
             self,
             model: VacationActivityCollection,
-            request: 'FeriennetRequest'
+            request: FeriennetRequest
         ) -> None: ...
 
     @cached_property
@@ -117,7 +119,7 @@ class VacationActivityCollectionLayout(DefaultLayout):
         ]
 
     @property
-    def organiser_links(self) -> 'Iterator[Link | LinkGroup]':
+    def organiser_links(self) -> Iterator[Link | LinkGroup]:
         if self.app.active_period:
             yield Link(
                 text=_('Submit Activity'),
@@ -166,8 +168,8 @@ class BookingCollectionLayout(DefaultLayout):
     def __init__(
         self,
         model: BookingCollection,
-        request: 'FeriennetRequest',
-        user: 'User | None' = None
+        request: FeriennetRequest,
+        user: User | None = None
     ) -> None:
         super().__init__(model, request)
         if user is None:
@@ -177,9 +179,9 @@ class BookingCollectionLayout(DefaultLayout):
 
     def rega_link(
         self,
-        attendee: 'Attendee | None',
-        period: 'Period | None',
-        grouped_bookings: dict['Attendee', dict[str, list['Booking']]]
+        attendee: Attendee | None,
+        period: Period | None,
+        grouped_bookings: dict[Attendee, dict[str, list[Booking]]]
     ) -> str | None:
 
         if not (period or attendee or grouped_bookings):
@@ -248,7 +250,7 @@ class VacationActivityFormLayout(DefaultLayout):
     def __init__(
         self,
         model: VacationActivity | VacationActivityCollection,
-        request: 'FeriennetRequest',
+        request: FeriennetRequest,
         title: str
     ) -> None:
 
@@ -277,7 +279,7 @@ class OccasionFormLayout(DefaultLayout):
     def __init__(
         self,
         model: Activity,
-        request: 'FeriennetRequest',
+        request: FeriennetRequest,
         title: str
     ) -> None:
 
@@ -308,7 +310,7 @@ class VacationActivityLayout(DefaultLayout):
         def __init__(
             self,
             model: VacationActivity,
-            request: 'FeriennetRequest'
+            request: FeriennetRequest
         ) -> None: ...
 
     @cached_property
@@ -321,11 +323,11 @@ class VacationActivityLayout(DefaultLayout):
         ]
 
     @cached_property
-    def latest_request(self) -> 'PublicationRequest | None':
+    def latest_request(self) -> PublicationRequest | None:
         return self.model.latest_request
 
     @cached_property
-    def ticket(self) -> 'Ticket | None':
+    def ticket(self) -> Ticket | None:
         if self.latest_request:
             tickets = TicketCollection(self.request.session)
             return tickets.by_handler_id(self.latest_request.id.hex)
@@ -508,12 +510,12 @@ class PeriodCollectionLayout(DefaultLayout):
 
 class PeriodFormLayout(DefaultLayout):
 
-    model: 'Period | PeriodCollection'
+    model: Period | PeriodCollection
 
     def __init__(
         self,
-        model: 'Period | PeriodCollection',
-        request: 'FeriennetRequest',
+        model: Period | PeriodCollection,
+        request: FeriennetRequest,
         title: str
     ) -> None:
         super().__init__(model, request)
@@ -561,7 +563,7 @@ class BillingCollectionLayout(DefaultLayout):
         def __init__(
             self,
             model: BillingCollection,
-            request: 'FeriennetRequest'
+            request: FeriennetRequest
         ) -> None: ...
 
     class FamilyRow(NamedTuple):
@@ -571,7 +573,7 @@ class BillingCollectionLayout(DefaultLayout):
         has_online_payments: bool
 
     @property
-    def families(self) -> 'Iterator[FamilyRow]':
+    def families(self) -> Iterator[FamilyRow]:
         yield from self.app.session().execute("""
             SELECT
                 text
@@ -594,7 +596,7 @@ class BillingCollectionLayout(DefaultLayout):
         """)
 
     @property
-    def family_removal_links(self) -> 'Iterator[Link]':
+    def family_removal_links(self) -> Iterator[Link]:
         attrs = {
             'class': ('remove-manual', 'extend-to-family')
         }
@@ -699,7 +701,7 @@ class OnlinePaymentsLayout(DefaultLayout):
     def __init__(
         self,
         model: Any,
-        request: 'FeriennetRequest',
+        request: FeriennetRequest,
         title: str
     ) -> None:
 
@@ -784,7 +786,7 @@ class InvoiceLayout(DefaultLayout):
     def __init__(
         self,
         model: Any,
-        request: 'FeriennetRequest',
+        request: FeriennetRequest,
         title: str
     ) -> None:
         super().__init__(model, request)
@@ -802,8 +804,8 @@ class DonationLayout(DefaultLayout):
 
     def __init__(
         self,
-        model: 'InvoiceCollection',
-        request: 'FeriennetRequest',
+        model: InvoiceCollection,
+        request: FeriennetRequest,
         title: str
     ) -> None:
         super().__init__(model, request)
@@ -843,7 +845,7 @@ class NotificationTemplateCollectionLayout(DefaultLayout):
     def __init__(
         self,
         model: NotificationTemplateCollection,
-        request: 'FeriennetRequest',
+        request: FeriennetRequest,
         subtitle: str | None = None
     ) -> None:
         super().__init__(model, request)
@@ -884,12 +886,12 @@ class NotificationTemplateCollectionLayout(DefaultLayout):
 
 class NotificationTemplateLayout(DefaultLayout):
 
-    model: 'NotificationTemplate'
+    model: NotificationTemplate
 
     def __init__(
         self,
-        model: 'NotificationTemplate',
-        request: 'FeriennetRequest',
+        model: NotificationTemplate,
+        request: FeriennetRequest,
         subtitle: str | None = None
     ) -> None:
         super().__init__(model, request)
@@ -922,13 +924,13 @@ class NotificationTemplateLayout(DefaultLayout):
 
 class VolunteerLayout(DefaultLayout):
 
-    model: 'VolunteerCollection'
+    model: VolunteerCollection
 
     if TYPE_CHECKING:
         def __init__(
             self,
-            model: 'VolunteerCollection',
-            request: 'FeriennetRequest'
+            model: VolunteerCollection,
+            request: FeriennetRequest
         ) -> None: ...
 
     @cached_property
@@ -960,13 +962,13 @@ class VolunteerFormLayout(DefaultLayout):
 
 class HomepageLayout(DefaultLayout):
 
-    model: 'Organisation'
+    model: Organisation
 
     if TYPE_CHECKING:
         def __init__(
             self,
-            model: 'Organisation',
-            request: 'FeriennetRequest'
+            model: Organisation,
+            request: FeriennetRequest
         ) -> None: ...
 
     @property

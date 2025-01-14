@@ -4,6 +4,7 @@ The algorithm used is based on Deferred Acceptance. The algorithm has a
 quadratic runtime.
 
 """
+from __future__ import annotations
 
 from onegov.activity import Attendee, Booking, Occasion, Period
 from onegov.activity.matching.score import Scoring
@@ -46,8 +47,8 @@ class AttendeeAgent(HashableID):
 
     def __init__(
         self,
-        id: 'UUID',
-        bookings: 'Iterable[Booking]',
+        id: UUID,
+        bookings: Iterable[Booking],
         limit: int | None = None,
         minutes_between: float = 0,
         alignment: Literal['day', 'week', 'month'] | None = None
@@ -124,12 +125,12 @@ class OccasionAgent(HashableID):
 
     bookings: set[Booking]
     attendees: dict[Booking, AttendeeAgent]
-    score_function: 'ScoreFunction'
+    score_function: ScoreFunction
 
     def __init__(
         self,
         occasion: Occasion,
-        score_function: 'ScoreFunction | None' = None
+        score_function: ScoreFunction | None = None
     ) -> None:
 
         self.id = occasion.id
@@ -190,14 +191,14 @@ class OccasionAgent(HashableID):
 
 
 def deferred_acceptance(
-    bookings: 'Sequence[Booking]',
-    occasions: 'Iterable[Occasion]',
-    score_function: 'ScoreFunction | None' = None,
+    bookings: Sequence[Booking],
+    occasions: Iterable[Occasion],
+    score_function: ScoreFunction | None = None,
     validity_check: bool = True,
     stability_check: bool = False,
     hard_budget: bool = True,
     default_limit: int | None = None,
-    attendee_limits: dict['UUID', int] | None = None,
+    attendee_limits: dict[UUID, int] | None = None,
     minutes_between: float = 0,
     alignment: Literal['day'] | None = None,
     sort_bookings: bool = True
@@ -336,10 +337,10 @@ def deferred_acceptance(
 
 
 def deferred_acceptance_from_database(
-    session: 'Session',
-    period_id: 'UUID',
+    session: Session,
+    period_id: UUID,
     *,
-    score_function: 'ScoreFunction | None' = None,
+    score_function: ScoreFunction | None = None,
     validity_check: bool = True,
     stability_check: bool = False,
     hard_budget: bool = True,
@@ -389,7 +390,7 @@ def deferred_acceptance_from_database(
     )
 
     # write the changes to the database
-    def update_bookings(targets: set[Booking], state: 'BookingState') -> None:
+    def update_bookings(targets: set[Booking], state: BookingState) -> None:
         q = session.query(Booking)
         q = q.filter(Booking.state != state)
         q = q.filter(Booking.state != 'cancelled')
@@ -406,8 +407,8 @@ def deferred_acceptance_from_database(
 
 
 def is_stable(
-    attendees: 'Iterable[AttendeeAgent]',
-    occasions: 'Collection[OccasionAgent]'
+    attendees: Iterable[AttendeeAgent],
+    occasions: Collection[OccasionAgent]
 ) -> bool:
     """ Returns true if the matching between attendees and occasions is
     stable.

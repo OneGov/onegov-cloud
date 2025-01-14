@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 import os
 import requests
 
@@ -14,12 +16,12 @@ if TYPE_CHECKING:
 
 
 @WinterthurApp.cronjob(hour=15, minute=50, timezone='Europe/Zurich')
-def update_streets_directory(request: 'WinterthurRequest') -> None:
+def update_streets_directory(request: WinterthurRequest) -> None:
     AddressCollection(request.session).update()
 
 
 @WinterthurApp.cronjob(hour='02', minute='00', timezone='Europe/Zurich')
-def import_dws_vk(request: 'WinterthurRequest') -> None:
+def import_dws_vk(request: WinterthurRequest) -> None:
     """
     Download ics file from DWS and import the events daily.
     https://dwswinterthur.ch/index.php/tipps-fuer-vereine/dws-sprtagenda

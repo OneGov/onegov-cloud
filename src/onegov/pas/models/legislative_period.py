@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 from onegov.core.orm import Base
 from onegov.core.orm.mixins import TimestampMixin
 from onegov.core.orm.types import UUID
@@ -29,26 +31,26 @@ class LegislativePeriod(Base, TimestampMixin, ORMSearchable):
         return self.name
 
     #: Internal ID
-    id: 'Column[uuid.UUID]' = Column(
+    id: Column[uuid.UUID] = Column(
         UUID,  # type:ignore[arg-type]
         primary_key=True,
         default=uuid4
     )
 
     #: The start date
-    start: 'Column[date]' = Column(
+    start: Column[date] = Column(
         Date,
         nullable=False
     )
 
     #: The end date
-    end: 'Column[date]' = Column(
+    end: Column[date] = Column(
         Date,
         nullable=False
     )
 
     #: The name
-    name: 'Column[str]' = Column(
+    name: Column[str] = Column(
         Text,
         nullable=False
     )

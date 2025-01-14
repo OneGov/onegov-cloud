@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 from functools import cached_property
 from onegov.activity import Invoice
 from onegov.feriennet import _
@@ -91,7 +93,7 @@ class ManualBookingForm(Form):
     )
 
     @property
-    def amount(self) -> 'Decimal':
+    def amount(self) -> Decimal:
         if self.kind.data == 'discount':
             assert self.discount.data is not None
             return -self.discount.data
@@ -106,7 +108,7 @@ class ManualBookingForm(Form):
         return self.booking_text.data
 
     @property
-    def available_usernames(self) -> 'Query[tuple[str, str]]':
+    def available_usernames(self) -> Query[tuple[str, str]]:
         return (
             self.usercollection.query()
             .with_entities(User.username, User.realname)

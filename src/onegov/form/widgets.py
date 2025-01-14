@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 import humanize
 
 from contextlib import suppress
@@ -37,7 +39,7 @@ class OrderedListWidget(ListWidget):
 
     """
 
-    def __call__(self, field: 'Field', **kwargs: Any) -> Markup:
+    def __call__(self, field: Field, **kwargs: Any) -> Markup:
 
         # ListWidget expects a field internally, but it will only use
         # its id property and __iter__ method, so we can get away
@@ -55,7 +57,7 @@ class OrderedListWidget(ListWidget):
 
             id = field.id
 
-            def __iter__(self) -> 'Iterator[Field]':
+            def __iter__(self) -> Iterator[Field]:
                 return iter(ordered)
 
         return super().__call__(FakeField(), **kwargs)  # type:ignore[arg-type]
@@ -81,7 +83,7 @@ class CoordinateWidget(TextInput):
 
     """
 
-    def __call__(self, field: 'Field', **kwargs: Any) -> Markup:
+    def __call__(self, field: Field, **kwargs: Any) -> Markup:
         kwargs['class_'] = (kwargs.get('class_', '') + ' coordinate').strip()
         return super().__call__(field, **kwargs)
 
@@ -142,7 +144,7 @@ class UploadWidget(FileInput):
         </div>
     """)
 
-    def image_source(self, field: 'UploadField') -> str | None:
+    def image_source(self, field: UploadField) -> str | None:
         """ Returns the image source url if the field points to an image and
         if it can be done (it looks like it's possible, but I'm not super
         sure this is always possible).
@@ -170,7 +172,7 @@ class UploadWidget(FileInput):
 
     def template_data(
         self,
-        field: 'UploadField',
+        field: UploadField,
         force_simple: bool,
         resend_upload: bool,
         wrapper_css_class: str,
@@ -225,7 +227,7 @@ class UploadWidget(FileInput):
 
     def __call__(
         self,
-        field: 'UploadField',  # type:ignore[override]
+        field: UploadField,  # type:ignore[override]
         **kwargs: Any
     ) -> Markup:
 
@@ -271,14 +273,14 @@ class UploadMultipleWidget(FileInput):
 
     def render_input(
         self,
-        field: 'UploadMultipleField',
+        field: UploadMultipleField,
         **kwargs: Any
     ) -> Markup:
         return super().__call__(field, **kwargs)
 
     def __call__(
         self,
-        field: 'UploadMultipleField',  # type:ignore[override]
+        field: UploadMultipleField,  # type:ignore[override]
         **kwargs: Any
     ) -> Markup:
 
@@ -346,7 +348,7 @@ class TextAreaWithTextModules(TextArea):
         </div>
     """)
 
-    def text_modules(self, field: 'StringField') -> list['TextModule']:
+    def text_modules(self, field: StringField) -> list[TextModule]:
         if not hasattr(field.meta, 'request'):
             # we depend on the field containing a reference to
             # the current request, which should be passed from
@@ -357,7 +359,7 @@ class TextAreaWithTextModules(TextArea):
         collection = TextModuleCollection(request.session)
         return collection.query().all()
 
-    def __call__(self, field: 'StringField', **kwargs: Any) -> Markup:
+    def __call__(self, field: StringField, **kwargs: Any) -> Markup:
         input_html = super().__call__(field, **kwargs)
         text_modules = self.text_modules(field)
         if not text_modules:
@@ -432,7 +434,7 @@ class IconWidget(TextInput):
         </div>
     """)
 
-    def __call__(self, field: 'Field', **kwargs: Any) -> Markup:
+    def __call__(self, field: Field, **kwargs: Any) -> Markup:
         iconfont = kwargs.pop('iconfont', self.iconfont)
         icons = kwargs.pop('icons', self.icons[iconfont])
 
@@ -460,7 +462,7 @@ class IconWidget(TextInput):
 
 class ChosenSelectWidget(Select):
 
-    def __call__(self, field: 'SelectFieldBase', **kwargs: Any) -> Markup:
+    def __call__(self, field: SelectFieldBase, **kwargs: Any) -> Markup:
         kwargs['class_'] = '{} chosen-select'.format(
             kwargs.get('class_', '')
         ).strip()
@@ -489,7 +491,7 @@ class PreviewWidget:
         </div>
     """)
 
-    def __call__(self, field: 'PreviewField', **kwargs: Any) -> Markup:
+    def __call__(self, field: PreviewField, **kwargs: Any) -> Markup:
         field.meta.request.include('preview-widget-handler')
 
         if callable(field.url):
@@ -508,7 +510,7 @@ class PreviewWidget:
 class PanelWidget:
     """ A widget that displays the field's text as panel (no input). """
 
-    def __call__(self, field: 'PanelField', **kwargs: Any) -> Markup:
+    def __call__(self, field: PanelField, **kwargs: Any) -> Markup:
         text = escape(field.meta.request.translate(field.text))
         return Markup(  # noqa: RUF035
             f'<div class="panel {{kind}}" {html_params(**kwargs)}>'
@@ -522,7 +524,7 @@ class PanelWidget:
 class LinkPanelWidget(PanelWidget):
     """ A widget that displays a clickable link as panel (no input). """
 
-    def __call__(self, field: 'PanelField', **kwargs: Any) -> Markup:
+    def __call__(self, field: PanelField, **kwargs: Any) -> Markup:
         text = escape(field.meta.request.translate(field.text))
         return Markup(  # noqa: RUF035
             f'<div class="panel {{kind}}" {html_params(**kwargs)}>'
@@ -537,7 +539,7 @@ class LinkPanelWidget(PanelWidget):
 class HoneyPotWidget(TextInput):
     """ A widget that displays the input normally not visible to the user. """
 
-    def __call__(self, field: 'Field', **kwargs: Any) -> Markup:
+    def __call__(self, field: Field, **kwargs: Any) -> Markup:
         field.meta.request.include('lazy-wolves')
         kwargs['class_'] = (kwargs.get('class_', '') + ' lazy-wolves').strip()
         return super().__call__(field, **kwargs)
@@ -571,7 +573,7 @@ class DateRangeInput(DateRangeMixin, DateInput):
     supported in some browsers based on a date or relativedelta.
     """
 
-    def __call__(self, field: 'Field', **kwargs: Any) -> Markup:
+    def __call__(self, field: Field, **kwargs: Any) -> Markup:
         min_date = self.min_date
         if min_date is not None:
             kwargs.setdefault('min', min_date.isoformat())
@@ -588,7 +590,7 @@ class DateTimeLocalRangeInput(DateRangeMixin, DateTimeLocalInput):
     are supported in some browsers based on a date or relativedelta.
     """
 
-    def __call__(self, field: 'Field', **kwargs: Any) -> Markup:
+    def __call__(self, field: Field, **kwargs: Any) -> Markup:
         min_date = self.min_date
         if min_date is not None:
             kwargs.setdefault('min', min_date.isoformat() + 'T00:00')
@@ -605,7 +607,7 @@ class TypeAheadInput(TextInput):
 
     def __call__(
         self,
-        field: 'TypeAheadField',  # type:ignore[override]
+        field: TypeAheadField,  # type:ignore[override]
         **kwargs: Any
     ) -> Markup:
         field.meta.request.include('typeahead-standalone')

@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 from onegov.core.orm import Base
 from onegov.core.orm import translation_hybrid
 from onegov.core.orm.mixins import TimestampMixin
@@ -27,27 +29,27 @@ class PartyResult(Base, TimestampMixin):
     __tablename__ = 'party_results'
 
     #: identifies the party result
-    id: 'Column[uuid.UUID]' = Column(
+    id: Column[uuid.UUID] = Column(
         UUID,  # type:ignore[arg-type]
         primary_key=True,
         default=uuid4
     )
 
     #: the election id this result belongs to
-    election_id: 'Column[str | None]' = Column(
+    election_id: Column[str | None] = Column(
         Text,
         ForeignKey('elections.id', onupdate='CASCADE', ondelete='CASCADE'),
         nullable=True
     )
 
     #: the election this result belongs to
-    election: 'relationship[ProporzElection | None]' = relationship(
+    election: relationship[ProporzElection | None] = relationship(
         'ProporzElection',
         back_populates='party_results'
     )
 
     #: the election compound id this result belongs to
-    election_compound_id: 'Column[str | None]' = Column(
+    election_compound_id: Column[str | None] = Column(
         Text,
         ForeignKey(
             'election_compounds.id', onupdate='CASCADE', ondelete='CASCADE'
@@ -56,29 +58,29 @@ class PartyResult(Base, TimestampMixin):
     )
 
     #: the election compound this result belongs to
-    election_compound: 'relationship[ElectionCompound | None]' = relationship(
+    election_compound: relationship[ElectionCompound | None] = relationship(
         'ElectionCompound',
         back_populates='party_results'
     )
 
     #: the domain of this result
-    domain: 'Column[str | None]' = Column(Text, nullable=True)
+    domain: Column[str | None] = Column(Text, nullable=True)
 
     #: the domain segment of this result
-    domain_segment: 'Column[str | None]' = Column(Text, nullable=True)
+    domain_segment: Column[str | None] = Column(Text, nullable=True)
 
     #: the number of mandates
-    number_of_mandates: 'Column[int]' = Column(
+    number_of_mandates: Column[int] = Column(
         Integer,
         nullable=False,
         default=lambda: 0
     )
 
     #: the number of votes
-    votes: 'Column[int]' = Column(Integer, nullable=False, default=lambda: 0)
+    votes: Column[int] = Column(Integer, nullable=False, default=lambda: 0)
 
     #: the number of total votes
-    total_votes: 'Column[int]' = Column(
+    total_votes: Column[int] = Column(
         Integer,
         nullable=False,
         default=lambda: 0
@@ -86,21 +88,21 @@ class PartyResult(Base, TimestampMixin):
 
     #: the number of total votes divided by the total number of mandates,
     #: used instead of total_votes by election compounds
-    voters_count: 'Column[Decimal | None]' = Column(
+    voters_count: Column[Decimal | None] = Column(
         Numeric(12, 2),
         nullable=True,
         default=lambda: 0
     )
 
     #: the voters count as percentage
-    voters_count_percentage: 'Column[Decimal | None]' = Column(
+    voters_count_percentage: Column[Decimal | None] = Column(
         Numeric(12, 2),
         nullable=True,
         default=lambda: 0
     )
 
     #: all translations of the party name
-    name_translations: 'Column[Mapping[str, str]]' = Column(
+    name_translations: Column[Mapping[str, str]] = Column(
         HSTORE,
         nullable=False
     )
@@ -110,7 +112,7 @@ class PartyResult(Base, TimestampMixin):
     name = translation_hybrid(name_translations)
 
     #: the year
-    year: 'Column[int]' = Column(Integer, nullable=False, default=lambda: 0)
+    year: Column[int] = Column(Integer, nullable=False, default=lambda: 0)
 
     #: the id of the party
-    party_id: 'Column[str]' = Column(Text, nullable=False)
+    party_id: Column[str] = Column(Text, nullable=False)

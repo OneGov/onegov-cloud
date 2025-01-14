@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 from datetime import date
 from onegov.election_day import _
 from onegov.election_day.forms.upload.common import ALLOWED_MIME_TYPES
@@ -23,7 +25,7 @@ if TYPE_CHECKING:
 
 class SubscriptionForm(Form):
 
-    request: 'ElectionDayRequest'
+    request: ElectionDayRequest
 
     domain = RadioField(
         label=_('Type'),

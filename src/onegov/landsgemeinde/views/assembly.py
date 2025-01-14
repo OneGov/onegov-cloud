@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 from morepath import redirect
 from onegov.core.elements import Link
 from onegov.core.security import Private
@@ -31,8 +33,8 @@ if TYPE_CHECKING:
 )
 def view_assemblies(
     self: AssemblyCollection,
-    request: 'LandsgemeindeRequest'
-) -> 'RenderData':
+    request: LandsgemeindeRequest
+) -> RenderData:
 
     layout = AssemblyCollectionLayout(self, request)
 
@@ -53,9 +55,9 @@ def view_assemblies(
 )
 def add_assembly(
     self: AssemblyCollection,
-    request: 'LandsgemeindeRequest',
+    request: LandsgemeindeRequest,
     form: AssemblyForm
-) -> 'RenderData | Response':
+) -> RenderData | Response:
 
     if form.submitted(request):
         assembly = self.add(**form.get_useful_data())
@@ -82,8 +84,8 @@ def add_assembly(
 )
 def view_assembly(
     self: Assembly,
-    request: 'LandsgemeindeRequest'
-) -> 'RenderData | Response':
+    request: LandsgemeindeRequest
+) -> RenderData | Response:
 
     layout = AssemblyLayout(self, request)
 
@@ -106,8 +108,8 @@ def view_assembly(
 )
 def view_assembly_ticker(
     self: Assembly,
-    request: 'LandsgemeindeRequest'
-) -> 'RenderData':
+    request: LandsgemeindeRequest
+) -> RenderData:
 
     layout = AssemblyTickerLayout(self, request)
 
@@ -132,11 +134,11 @@ def view_assembly_ticker(
 )
 def view_assembly_ticker_head(
     self: Assembly,
-    request: 'LandsgemeindeRequest'
+    request: LandsgemeindeRequest
 ) -> None:
 
     @request.after
-    def add_headers(response: 'Response') -> None:
+    def add_headers(response: Response) -> None:
         last_modified = self.last_modified or self.modified or self.created
         if last_modified:
             response.headers.add(
@@ -153,8 +155,8 @@ def view_assembly_ticker_head(
 )
 def view_assembly_states(
     self: Assembly,
-    request: 'LandsgemeindeRequest'
-) -> 'RenderData':
+    request: LandsgemeindeRequest
+) -> RenderData:
 
     layout = AssemblyLayout(self, request)
     layout.editbar_links = []
@@ -182,9 +184,9 @@ def view_assembly_states(
 )
 def edit_assembly(
     self: Assembly,
-    request: 'LandsgemeindeRequest',
+    request: LandsgemeindeRequest,
     form: AssemblyForm
-) -> 'RenderData | Response':
+) -> RenderData | Response:
 
     if form.submitted(request):
         form.populate_obj(self)
@@ -213,7 +215,7 @@ def edit_assembly(
     request_method='DELETE',
     permission=Private
 )
-def delete_assembly(self: Assembly, request: 'LandsgemeindeRequest') -> None:
+def delete_assembly(self: Assembly, request: LandsgemeindeRequest) -> None:
 
     request.assert_valid_csrf_token()
 
@@ -229,8 +231,8 @@ def delete_assembly(self: Assembly, request: 'LandsgemeindeRequest') -> None:
 )
 def view_assembly_open_data(
     self: Assembly,
-    request: 'LandsgemeindeRequest'
-) -> 'RenderData | Response':
+    request: LandsgemeindeRequest
+) -> RenderData | Response:
 
     layout = AssemblyLayout(self, request)
 
@@ -254,8 +256,8 @@ def view_assembly_open_data(
 )
 def view_assembly_json(
     self: Assembly,
-    request: 'LandsgemeindeRequest'
-) -> 'RenderData':
+    request: LandsgemeindeRequest
+) -> RenderData:
 
     agenda_items = (
         AgendaItemCollection(request.session)
@@ -265,10 +267,10 @@ def view_assembly_json(
     def text(text: str | None) -> str | None:
         return text.strip() if text else None
 
-    def link(file: 'File | None') -> str | None:
+    def link(file: File | None) -> str | None:
         return request.link(file) if file else None
 
-    def isoformat(date_: 'date | datetime | None') -> str | None:
+    def isoformat(date_: date | datetime | None) -> str | None:
         return date_.isoformat() if date_ else None
 
     return {

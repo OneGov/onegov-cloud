@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 import re
 
 from datetime import date as dateobj
@@ -45,27 +47,27 @@ def text_without(characters: str) -> Word:
     return Word(printables, excludeChars=characters)
 
 
-def matches(character: str) -> 'Callable[[ParseResults], bool]':
+def matches(character: str) -> Callable[[ParseResults], bool]:
     """ Returns true if the given character matches the token. """
     return lambda tokens: tokens and tokens[0] == character or False
 
 
-def literal(value: _T) -> 'Callable[[ParseResults], _T]':
+def literal(value: _T) -> Callable[[ParseResults], _T]:
     """" Returns the given value, ignoring the tokens alltogether. """
     return lambda tokens: value
 
 
-def as_int(tokens: 'ParseResults') -> int | None:
+def as_int(tokens: ParseResults) -> int | None:
     """ Converts the token to int if possible. """
     return int(tokens[0]) if tokens else None
 
 
-def as_joined_string(tokens: 'ParseResults') -> str:
+def as_joined_string(tokens: ParseResults) -> str:
     """ Joins the given tokens into a single string. """
     return ''.join(tokens[0])
 
 
-def as_decimal(tokens: 'ParseResults') -> Decimal | None:
+def as_decimal(tokens: ParseResults) -> Decimal | None:
     """ Converts the token to decimal if possible. """
     if tokens and tokens[0] == '-':
         tokens = tokens[1:]
@@ -76,27 +78,27 @@ def as_decimal(tokens: 'ParseResults') -> Decimal | None:
     return Decimal(prefix + '.'.join(tokens)) if tokens else None
 
 
-def as_uppercase(tokens: 'ParseResults') -> str | None:
+def as_uppercase(tokens: ParseResults) -> str | None:
     """ Converts the token to uppercase if possible. """
     return ''.join(tokens).upper() if tokens else None
 
 
-def as_integer_range(tokens: 'ParseResults') -> range | None:
+def as_integer_range(tokens: ParseResults) -> range | None:
     """ Converts the token to an integer range if possible. """
     return range(int(tokens[0]), int(tokens[1])) if tokens else None
 
 
-def as_decimal_range(tokens: 'ParseResults') -> decimal_range | None:
+def as_decimal_range(tokens: ParseResults) -> decimal_range | None:
     """ Converts the token to a decimal range if possible. """
     return decimal_range(tokens[0], tokens[1]) if tokens else None
 
 
-def as_regex(tokens: 'ParseResults') -> 'Pattern[str] | None':
+def as_regex(tokens: ParseResults) -> Pattern[str] | None:
     """ Converts the token to a working regex if possible. """
     return re.compile(tokens[0]) if tokens else None
 
 
-def as_date(instring: str, loc: int, tokens: 'ParseResults') -> dateobj | None:
+def as_date(instring: str, loc: int, tokens: ParseResults) -> dateobj | None:
     """ Converts the token to a date if possible. """
     if not tokens:
         return None
@@ -114,8 +116,8 @@ def approximate_total_days(delta: relativedelta) -> float:
 def is_valid_date_range(
     instring: str,
     loc: int,
-    tokens: 'ParseResults'
-) -> 'ParseResults':
+    tokens: ParseResults
+) -> ParseResults:
     """ Checks if the date range is valid """
     if tokens:
         after, before = tokens
@@ -142,20 +144,20 @@ def is_valid_date_range(
     raise ParseFatalException(instring, loc, 'Invalid date range')
 
 
-def as_relative_delta(tokens: 'ParseResults') -> relativedelta | None:
+def as_relative_delta(tokens: ParseResults) -> relativedelta | None:
     return relativedelta(**{  # type: ignore[arg-type]
         tokens[1]: int(tokens[0])
     }) if tokens else None
 
 
-def unwrap(tokens: 'ParseResults') -> Any | None:
+def unwrap(tokens: ParseResults) -> Any | None:
     """ Unwraps grouped tokens. """
     return tokens[0] if tokens else None
 
 
-def tag(**tags: str) -> 'Callable[[ParseResults], None]':
+def tag(**tags: str) -> Callable[[ParseResults], None]:
     """ Takes the given tags and applies them to the token. """
-    def apply_tags(tokens: 'ParseResults') -> None:
+    def apply_tags(tokens: ParseResults) -> None:
         for key, value in tags.items():
             tokens[key] = value
     return apply_tags
@@ -185,7 +187,7 @@ def number_enclosed_in(characters: str) -> ParserElement:
 
 def choices_enclosed_in(
     characters: str,
-    choices: 'Sequence[str]'
+    choices: Sequence[str]
 ) -> ParserElement:
     """ Wraps the given choices in the given characters, making sure only
     valid choices are possible.
@@ -442,7 +444,7 @@ def fileinput() -> ParserElement:
     extensions = Group(any_extension | OneOrMore(some_extension))
     multiple = enclosed_in(Literal('multiple'), '()')
 
-    def extract_file_types(tokens: 'ParseResults') -> None:
+    def extract_file_types(tokens: ParseResults) -> None:
         if len(tokens) == 2 and tokens[1] == 'multiple':
             tokens['type'] = 'multiplefileinput'
         else:
@@ -481,7 +483,7 @@ def decimal() -> ParserElement:
 
 def range_field(
     value_expression: ParserElement,
-    parse_action: 'Callable[[ParseResults], Any]',
+    parse_action: Callable[[ParseResults], Any],
     type: str
 ) -> ParserElement:
     """ Generic range field parser. """

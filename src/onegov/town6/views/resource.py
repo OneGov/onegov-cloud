@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 from onegov.core.security import Public, Private, Personal
 from onegov.org.forms.resource import AllResourcesExportForm
 
@@ -35,8 +37,8 @@ if TYPE_CHECKING:
 )
 def town_view_resources(
     self: ResourceCollection,
-    request: 'TownRequest'
-) -> 'RenderData':
+    request: TownRequest
+) -> RenderData:
     return view_resources(self, request, ResourcesLayout(self, request))
 
 
@@ -48,9 +50,9 @@ def town_view_resources(
 )
 def town_view_find_your_spot(
     self: FindYourSpotCollection,
-    request: 'TownRequest',
+    request: TownRequest,
     form: FindYourSpotForm
-) -> 'RenderData':
+) -> RenderData:
     return view_find_your_spot(
         self, request, form, FindYourSpotLayout(self, request))
 
@@ -64,9 +66,9 @@ def town_view_find_your_spot(
 )
 def town_handle_new_room(
     self: ResourceCollection,
-    request: 'TownRequest',
-    form: 'ResourceForm'
-) -> 'RenderData | Response':
+    request: TownRequest,
+    form: ResourceForm
+) -> RenderData | Response:
     return handle_new_room(self, request, form, ResourcesLayout(self, request))
 
 
@@ -79,9 +81,9 @@ def town_handle_new_room(
 )
 def town_handle_new_daypass(
     self: ResourceCollection,
-    request: 'TownRequest',
-    form: 'ResourceForm'
-) -> 'RenderData | Response':
+    request: TownRequest,
+    form: ResourceForm
+) -> RenderData | Response:
     return handle_new_daypass(
         self, request, form, ResourcesLayout(self, request))
 
@@ -95,9 +97,9 @@ def town_handle_new_daypass(
 )
 def town_handle_new_resource_item(
     self: ResourceCollection,
-    request: 'TownRequest',
-    form: 'ResourceForm'
-) -> 'RenderData | Response':
+    request: TownRequest,
+    form: ResourceForm
+) -> RenderData | Response:
     return handle_new_resource_item(
         self, request, form, ResourcesLayout(self, request))
 
@@ -111,15 +113,15 @@ def town_handle_new_resource_item(
 )
 def town_handle_edit_resource(
     self: Resource,
-    request: 'TownRequest',
-    form: 'ResourceForm'
-) -> 'RenderData | Response':
+    request: TownRequest,
+    form: ResourceForm
+) -> RenderData | Response:
     return handle_edit_resource(
         self, request, form, ResourceLayout(self, request))
 
 
 @TownApp.html(model=Resource, template='resource.pt', permission=Public)
-def town_view_resource(self: Resource, request: 'TownRequest') -> 'RenderData':
+def town_view_resource(self: Resource, request: TownRequest) -> RenderData:
     return view_resource(self, request, ResourceLayout(self, request))
 
 
@@ -132,9 +134,9 @@ def town_view_resource(self: Resource, request: 'TownRequest') -> 'RenderData':
 )
 def town_handle_cleanup_allocations(
     self: Resource,
-    request: 'TownRequest',
+    request: TownRequest,
     form: ResourceCleanupForm
-) -> 'RenderData | Response':
+) -> RenderData | Response:
     return handle_cleanup_allocations(
         self, request, form, ResourceLayout(self, request))
 
@@ -147,8 +149,8 @@ def town_handle_cleanup_allocations(
 )
 def town_view_occupancy(
     self: Resource,
-    request: 'TownRequest'
-) -> 'RenderData':
+    request: TownRequest
+) -> RenderData:
     return view_occupancy(self, request, ResourceLayout(self, request))
 
 
@@ -160,8 +162,8 @@ def town_view_occupancy(
 )
 def town_view_resource_subscribe(
     self: Resource,
-    request: 'TownRequest'
-) -> 'RenderData':
+    request: TownRequest
+) -> RenderData:
     return view_resource_subscribe(
         self, request, ResourceLayout(self, request))
 
@@ -175,9 +177,9 @@ def town_view_resource_subscribe(
 )
 def town_view_export(
     self: Resource,
-    request: 'TownRequest',
+    request: TownRequest,
     form: ResourceExportForm
-) -> 'RenderData | Response':
+) -> RenderData | Response:
     return view_export(self, request, form, ResourceLayout(self, request))
 
 
@@ -189,9 +191,9 @@ def town_view_export(
 )
 def town_view_export_all(
     self: ResourceCollection,
-    request: 'TownRequest',
+    request: TownRequest,
     form: AllResourcesExportForm
-) -> 'RenderData | Response':
+) -> RenderData | Response:
     return view_export_all(
         self, request, form,
         ResourceLayout(self, request))  # type:ignore[arg-type]

@@ -1,3 +1,4 @@
+from __future__ import annotations
 
 from onegov.core.security import Public, Private
 from onegov.form import FormCollection
@@ -17,8 +18,8 @@ if TYPE_CHECKING:
 @TownApp.html(model=FormCollection, template='forms.pt', permission=Public)
 def town_view_form_collection(
     self: FormCollection,
-    request: 'TownRequest'
-) -> 'RenderData':
+    request: TownRequest
+) -> RenderData:
     return view_form_collection(
         self, request, FormCollectionLayout(self, request))
 
@@ -27,7 +28,7 @@ def town_view_form_collection(
               permission=Private)
 def town_view_survey_collection(
     self: SurveyCollection,
-    request: 'TownRequest'
-) -> 'RenderData':
+    request: TownRequest
+) -> RenderData:
     return view_survey_collection(
         self, request, SurveyCollectionLayout(self, request))

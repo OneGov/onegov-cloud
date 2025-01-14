@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 from onegov.core.security import Public
 from onegov.org import _, OrgApp
 from onegov.org.elements import Link
@@ -14,9 +16,9 @@ if TYPE_CHECKING:
 @OrgApp.html(model=AtoZ, template='atoz.pt', permission=Public)
 def atoz(
     self: AtoZ[Any],
-    request: 'OrgRequest',
+    request: OrgRequest,
     layout: DefaultLayout | None = None
-) -> 'RenderData':
+) -> RenderData:
 
     # FIXME: If we truly wanted this to be generic, then title should
     #        probably be a property of the AtoZ, rather than hardcoded

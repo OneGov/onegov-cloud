@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 from onegov.core.security import Public
 from onegov.org.views.search import search
 from onegov.town6 import TownApp
@@ -15,7 +17,7 @@ if TYPE_CHECKING:
 
 @TownApp.html(model=Search, template='search.pt', permission=Public)
 def town_search(
-    self: Search['Base'],
-    request: 'TownRequest'
-) -> 'RenderData | Response':
+    self: Search[Base],
+    request: TownRequest
+) -> RenderData | Response:
     return search(self, request, DefaultLayout(self, request))

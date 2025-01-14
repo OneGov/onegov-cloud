@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 from onegov.pas.collections import AttendenceCollection
 from onegov.pas.app import PasApp
 from onegov.pas.collections import ChangeCollection
@@ -44,7 +46,7 @@ if TYPE_CHECKING:
     }
 )
 def get_attendences(
-    request: 'TownRequest',
+    request: TownRequest,
     settlement_run_id: str | None = None,
     date_from: date | None = None,
     date_to: date | None = None,
@@ -347,7 +349,7 @@ class SettlementRunAllExport:
     converters={'id': UUID, 'entity_id': UUID},
 )
 def get_settlement_run_export(
-    request: 'TownRequest',
+    request: TownRequest,
     id: UUID,
     category: str,
     entity_id: UUID,
@@ -382,7 +384,7 @@ def get_settlement_run_export(
     converters={'id': UUID}
 )
 def get_settlement_run_export_all(
-    request: 'TownRequest',
+    request: TownRequest,
     id: UUID,
     category: str
 ) -> SettlementRunAllExport | None:

@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 from morepath import redirect
 from onegov.core.security import Private
 from onegov.election_day import _
@@ -24,8 +26,8 @@ if TYPE_CHECKING:
 )
 def view_sms_subscribers(
     self: SmsSubscriberCollection,
-    request: 'ElectionDayRequest'
-) -> 'RenderData':
+    request: ElectionDayRequest
+) -> RenderData:
     """ View a list with all SMS subscribers. """
 
     return {
@@ -44,8 +46,8 @@ def view_sms_subscribers(
 )
 def view_email_subscribers(
     self: EmailSubscriberCollection,
-    request: 'ElectionDayRequest'
-) -> 'RenderData':
+    request: ElectionDayRequest
+) -> RenderData:
     """ View a list with all email subscribers. """
 
     return {
@@ -65,8 +67,8 @@ def view_email_subscribers(
 )
 def export_sms_subscribers(
     self: SmsSubscriberCollection,
-    request: 'ElectionDayRequest'
-) -> 'RenderData':
+    request: ElectionDayRequest
+) -> RenderData:
 
     """ Export all SMS subscribers as a CSV. """
 
@@ -83,8 +85,8 @@ def export_sms_subscribers(
 )
 def export_email_subscribers(
     self: EmailSubscriberCollection,
-    request: 'ElectionDayRequest'
-) -> 'RenderData':
+    request: ElectionDayRequest
+) -> RenderData:
 
     """ Export all email subscribers as a CSV. """
 
@@ -96,9 +98,9 @@ def export_email_subscribers(
 
 def handle_cleanup_subscribers(
     collection: EmailSubscriberCollection | SmsSubscriberCollection,
-    request: 'ElectionDayRequest',
+    request: ElectionDayRequest,
     form: SubscribersCleanupForm
-) -> 'RenderData | Response':
+) -> RenderData | Response:
 
     layout = ManageSubscribersLayout(collection, request)
 
@@ -137,9 +139,9 @@ def handle_cleanup_subscribers(
 )
 def cleanup_sms_subscribers(
     self: SmsSubscriberCollection,
-    request: 'ElectionDayRequest',
+    request: ElectionDayRequest,
     form: SubscribersCleanupForm
-) -> 'RenderData | Response':
+) -> RenderData | Response:
 
     """ Deletes a list of SMS subscribers. """
 
@@ -153,9 +155,9 @@ def cleanup_sms_subscribers(
 )
 def cleanup_email_subscribers(
     self: EmailSubscriberCollection,
-    request: 'ElectionDayRequest',
+    request: ElectionDayRequest,
     form: SubscribersCleanupForm
-) -> 'RenderData | Response':
+) -> RenderData | Response:
 
     """ Deletes a list of email subscribers. """
 
@@ -168,9 +170,9 @@ def cleanup_email_subscribers(
 )
 def delete_subscriber(
     self: Subscriber,
-    request: 'ElectionDayRequest',
-    form: 'EmptyForm'
-) -> 'RenderData | Response':
+    request: ElectionDayRequest,
+    form: EmptyForm
+) -> RenderData | Response:
 
     """ Delete a single subscriber. """
 
@@ -204,9 +206,9 @@ def delete_subscriber(
 )
 def activate_subscriber(
     self: Subscriber,
-    request: 'ElectionDayRequest',
-    form: 'EmptyForm'
-) -> 'RenderData | Response':
+    request: ElectionDayRequest,
+    form: EmptyForm
+) -> RenderData | Response:
 
     """ Activate a single subscriber. """
 
@@ -240,9 +242,9 @@ def activate_subscriber(
 )
 def deactivate_subscriber(
     self: Subscriber,
-    request: 'ElectionDayRequest',
-    form: 'EmptyForm'
-) -> 'RenderData | Response':
+    request: ElectionDayRequest,
+    form: EmptyForm
+) -> RenderData | Response:
 
     """ Deactivate a single subscriber. """
 

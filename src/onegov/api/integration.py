@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 from morepath import App
 
 
@@ -35,7 +37,7 @@ class ApiApp(App):
         )
 
     @property
-    def rate_limit_cache(self) -> 'cache.RedisCacheRegion':
+    def rate_limit_cache(self) -> cache.RedisCacheRegion:
         """ A cache for rate limits. """
 
         _limit, expiration = self.rate_limit

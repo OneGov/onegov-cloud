@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 from onegov.core.security import Personal
 from onegov.core.security.rules import has_permission_logged_in
 from onegov.fsi import FsiApp
@@ -25,7 +27,7 @@ Secret: admins
 @FsiApp.permission_rule(model=object, permission=Personal)
 def local_is_logged_in(
     app: FsiApp,
-    identity: 'Identity',
+    identity: Identity,
     model: object,
     permission: type[Personal]
 ) -> bool:
@@ -35,7 +37,7 @@ def local_is_logged_in(
 @FsiApp.permission_rule(model=CourseAttendee, permission=Personal)
 def has_course_attendee_permission(
     app: FsiApp,
-    identity: 'Identity',
+    identity: Identity,
     model: CourseAttendee,
     permission: type[Personal]
 ) -> bool:

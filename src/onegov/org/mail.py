@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 from onegov.core.templates import render_template
 from onegov.org.layout import DefaultMailLayout
 
@@ -33,10 +35,10 @@ if TYPE_CHECKING:
 
 
 def send_html_mail(
-    request: 'OrgRequest',
+    request: OrgRequest,
     template: str,
     content: dict[str, Any],
-    **kwargs: 'Unpack[EmailArgumentsWithCategory]'
+    **kwargs: Unpack[EmailArgumentsWithCategory]
 ) -> None:
     """" Sends an email rendered from the given template.
 
@@ -70,10 +72,10 @@ def send_html_mail(
 
 
 def send_transactional_html_mail(
-    request: 'OrgRequest',
+    request: OrgRequest,
     template: str,
     content: dict[str, Any],
-    **kwargs: 'Unpack[EmailArguments]'
+    **kwargs: Unpack[EmailArguments]
 ) -> None:
 
     send_html_mail(
@@ -86,10 +88,10 @@ def send_transactional_html_mail(
 
 
 def send_marketing_html_mail(
-    request: 'OrgRequest',
+    request: OrgRequest,
     template: str,
     content: dict[str, Any],
-    **kwargs: 'Unpack[EmailArguments]'
+    **kwargs: Unpack[EmailArguments]
 ) -> None:
 
     send_html_mail(
@@ -102,17 +104,17 @@ def send_marketing_html_mail(
 
 
 def send_ticket_mail(
-    request: 'OrgRequest',
+    request: OrgRequest,
     template: str,
     subject: str,
-    receivers: 'Sequence[Address | str]',
-    ticket: 'Ticket',
+    receivers: Sequence[Address | str],
+    ticket: Ticket,
     content: dict[str, Any] | None = None,
     force: bool = False,
     send_self: bool = False,
-    bcc: 'SequenceOrScalar[Address | str]' = (),
-    attachments: 'Iterable[Attachment | StrPath]' = (),
-    **kwargs: 'Unpack[TicketEmailExtraArguments]'
+    bcc: SequenceOrScalar[Address | str] = (),
+    attachments: Iterable[Attachment | StrPath] = (),
+    **kwargs: Unpack[TicketEmailExtraArguments]
 ) -> None:
 
     org = request.app.org

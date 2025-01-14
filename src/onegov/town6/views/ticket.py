@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 from onegov.core.security import Public, Private, Secret
 from onegov.form import Form
 from onegov.org.views.ticket import (
@@ -29,7 +31,7 @@ if TYPE_CHECKING:
 
 
 @TownApp.html(model=Ticket, template='ticket.pt', permission=Private)
-def town_view_ticket(self: Ticket, request: 'TownRequest') -> 'RenderData':
+def town_view_ticket(self: Ticket, request: TownRequest) -> RenderData:
     return view_ticket(self, request, TicketLayout(self, request))
 
 
@@ -39,9 +41,9 @@ def town_view_ticket(self: Ticket, request: 'TownRequest') -> 'RenderData':
 )
 def town_handle_new_note(
     self: Ticket,
-    request: 'TownRequest',
+    request: TownRequest,
     form: TicketNoteForm
-) -> 'RenderData | Response':
+) -> RenderData | Response:
     return handle_new_note(
         self, request, form, TicketNoteLayout(self, request, _('New Note')))
 
@@ -52,9 +54,9 @@ def town_handle_new_note(
 )
 def town_handle_edit_note(
     self: TicketNote,
-    request: 'TownRequest',
+    request: TownRequest,
     form: TicketNoteForm
-) -> 'RenderData | Response':
+) -> RenderData | Response:
     assert self.ticket is not None
     return handle_edit_note(
         self, request, form,
@@ -68,9 +70,9 @@ def town_handle_edit_note(
 )
 def town_assign_ticket(
     self: Ticket,
-    request: 'TownRequest',
+    request: TownRequest,
     form: TicketAssignmentForm
-) -> 'RenderData | Response':
+) -> RenderData | Response:
     return assign_ticket(
         self, request, form, layout=TicketLayout(self, request))
 
@@ -81,9 +83,9 @@ def town_assign_ticket(
 )
 def town_message_to_submitter(
     self: Ticket,
-    request: 'TownRequest',
+    request: TownRequest,
     form: ExtendedInternalTicketChatMessageForm
-) -> 'RenderData | Response':
+) -> RenderData | Response:
     return message_to_submitter(
         self, request, form, TicketChatMessageLayout(self, request))
 
@@ -94,9 +96,9 @@ def town_message_to_submitter(
 )
 def town_view_ticket_status(
     self: Ticket,
-    request: 'TownRequest',
+    request: TownRequest,
     form: TicketChatMessageForm
-) -> 'RenderData | Response':
+) -> RenderData | Response:
     return view_ticket_status(
         self, request, form, TicketChatMessageLayout(self, request))
 
@@ -108,8 +110,8 @@ def town_view_ticket_status(
 )
 def town_view_tickets(
     self: TicketCollection,
-    request: 'TownRequest'
-) -> 'RenderData':
+    request: TownRequest
+) -> RenderData:
     return view_tickets(self, request, TicketsLayout(self, request))
 
 
@@ -120,8 +122,8 @@ def town_view_tickets(
 )
 def town_view_archived_tickets(
     self: ArchivedTicketCollection,
-    request: 'TownRequest'
-) -> 'RenderData':
+    request: TownRequest
+) -> RenderData:
     return view_archived_tickets(
         self, request, ArchivedTicketsLayout(self, request)
     )
@@ -134,7 +136,7 @@ def town_view_archived_tickets(
 )
 def town_view_delete_all_archived_tickets(
     self: ArchivedTicketCollection,
-    request: 'TownRequest'
+    request: TownRequest
 ) -> None:
     return view_delete_all_archived_tickets(self, request)
 
@@ -145,8 +147,8 @@ def town_view_delete_all_archived_tickets(
 )
 def town_view_pending_tickets(
     self: FindYourSpotCollection,
-    request: 'TownRequest'
-) -> 'RenderData':
+    request: TownRequest
+) -> RenderData:
     return view_pending_tickets(
         self, request, FindYourSpotLayout(self, request))
 
@@ -157,7 +159,7 @@ def town_view_pending_tickets(
     name='send-to-gever',
     permission=Private
 )
-def town_send_to_gever(self: Ticket, request: 'TownRequest') -> 'Response':
+def town_send_to_gever(self: Ticket, request: TownRequest) -> Response:
     return view_send_to_gever(self, request)
 
 
@@ -167,8 +169,8 @@ def town_send_to_gever(self: Ticket, request: 'TownRequest') -> 'Response':
 )
 def town_delete_ticket(
     self: Ticket,
-    request: 'TownRequest',
+    request: TownRequest,
     form: Form
-) -> 'RenderData | Response':
+) -> RenderData | Response:
     return delete_ticket(
         self, request, form=form, layout=TicketLayout(self, request))

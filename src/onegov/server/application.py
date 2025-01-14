@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 import re
 
 from onegov.server import errors
@@ -19,7 +21,7 @@ class Application:
     #: If the host passed by the request is not localhost, then it is
     #: checked against the allowed_hosts expression. If it doesn't match,
     #: the request is denied.
-    allowed_hosts_expression: 'Pattern[str] | None' = None
+    allowed_hosts_expression: Pattern[str] | None = None
 
     #: Additional allowed hosts may be added to this set. Those are not
     #: expressions, but straight hostnames.
@@ -34,9 +36,9 @@ class Application:
 
     def __call__(
         self,
-        environ: 'WSGIEnvironment',
-        start_respnose: 'StartResponse'
-    ) -> 'Iterable[bytes]':
+        environ: WSGIEnvironment,
+        start_respnose: StartResponse
+    ) -> Iterable[bytes]:
         raise NotImplementedError
 
     def configure_application(self, **configuration: Any) -> None:
@@ -187,9 +189,9 @@ class Application:
     def handle_exception(
         self,
         exception: BaseException,
-        environ: 'WSGIEnvironment',
-        start_response: 'StartResponse'
-    ) -> 'Iterable[bytes]':
+        environ: WSGIEnvironment,
+        start_response: StartResponse
+    ) -> Iterable[bytes]:
         """ Default exception handling - this can be used to return a different
         response when an unhandled exception occurs inside a request or before
         a request is handled by the application (when any of the above methods

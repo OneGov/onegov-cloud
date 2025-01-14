@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 import click
 import transaction
 
@@ -29,8 +31,8 @@ cli = command_group()
 
 
 def fetch_users(
-    app: 'TranslatorDirectoryApp',
-    session: 'Session',
+    app: TranslatorDirectoryApp,
+    session: Session,
     ldap_server: str,
     ldap_username: str,
     ldap_password: str,
@@ -50,7 +52,7 @@ def fetch_users(
     translator_coll = TranslatorCollection(app, user_role='admin')
     translators = {translator.email for translator in translator_coll.query()}
 
-    def users(connection: 'LDAPConnection') -> 'Iterator[dict[str, Any]]':
+    def users(connection: LDAPConnection) -> Iterator[dict[str, Any]]:
         for src in sources:
             for base, search_filter, attrs in src.bases_filters_attributes:
                 success = connection.search(
@@ -71,7 +73,7 @@ def fetch_users(
                     search_filter=search_filter
                 )
 
-    def handle_inactive(synced_ids: list['UUID']) -> None:
+    def handle_inactive(synced_ids: list[UUID]) -> None:
         inactive = session.query(User).filter(
             and_(
                 User.id.notin_(synced_ids),
@@ -159,7 +161,7 @@ def fetch_users_cli(
     verbose: bool,
     skip_deactivate: bool,
     dry_run: bool
-) -> 'Callable[[TranslatorAppRequest, TranslatorDirectoryApp], None]':
+) -> Callable[[TranslatorAppRequest, TranslatorDirectoryApp], None]:
     r""" Updates the list of users by fetching matching users
     from a remote LDAP server.
 
@@ -179,8 +181,8 @@ def fetch_users_cli(
     """
 
     def execute(
-        request: 'TranslatorAppRequest',
-        app: 'TranslatorDirectoryApp'
+        request: TranslatorAppRequest,
+        app: TranslatorDirectoryApp
     ) -> None:
 
         fetch_users(
@@ -226,11 +228,11 @@ def drive_distances_cli(
     tolerance_factor: float,
     max_tolerance: int,
     max_distance: int
-) -> 'Callable[[TranslatorAppRequest, TranslatorDirectoryApp], None]':
+) -> Callable[[TranslatorAppRequest, TranslatorDirectoryApp], None]:
 
     def get_distances(
-        request: 'TranslatorAppRequest',
-        app: 'TranslatorDirectoryApp'
+        request: TranslatorAppRequest,
+        app: TranslatorDirectoryApp
     ) -> None:
 
         tot, routes_found, _distance_changed, no_routes, tolerance_failed = (
@@ -275,11 +277,11 @@ def drive_distances_cli(
 def geocode_cli(
     dry_run: bool,
     only_empty: bool
-) -> 'Callable[[TranslatorAppRequest, TranslatorDirectoryApp], None]':
+) -> Callable[[TranslatorAppRequest, TranslatorDirectoryApp], None]:
 
     def do_geocode(
-        request: 'TranslatorAppRequest',
-        app: 'TranslatorDirectoryApp'
+        request: TranslatorAppRequest,
+        app: TranslatorDirectoryApp
     ) -> None:
 
         if not app.mapbox_token:
@@ -315,12 +317,12 @@ def geocode_cli(
 @click.option('--dry-run/-no-dry-run', default=False)
 def update_accounts_cli(
     dry_run: bool
-) -> 'Callable[[TranslatorAppRequest, TranslatorDirectoryApp], None]':
+) -> Callable[[TranslatorAppRequest, TranslatorDirectoryApp], None]:
     """ Updates user accounts for translators. """
 
     def do_update_accounts(
-        request: 'TranslatorAppRequest',
-        app: 'TranslatorDirectoryApp'
+        request: TranslatorAppRequest,
+        app: TranslatorDirectoryApp
     ) -> None:
 
         translators = TranslatorCollection(request.app, user_role='admin')
@@ -471,7 +473,7 @@ LANGUAGES = (
 @click.option('--dry-run', is_flag=True, default=False)
 def create_languages(
         dry_run: bool
-) -> 'Callable[[TranslatorAppRequest, TranslatorDirectoryApp], None]':
+) -> Callable[[TranslatorAppRequest, TranslatorDirectoryApp], None]:
     """
     Create languages for the selected translator schema. Languages get
     created if they don't exist to prevent id changes.
@@ -487,8 +489,8 @@ def create_languages(
     """
 
     def do_create_languages(
-        request: 'TranslatorAppRequest',
-        app: 'TranslatorDirectoryApp'
+        request: TranslatorAppRequest,
+        app: TranslatorDirectoryApp
     ) -> None:
         # Compare existing languages
         existing = request.session.query(Language).all()
@@ -523,7 +525,7 @@ def create_languages(
 @click.option('--dry-run', is_flag=True, default=False)
 def force_delete_languages(
         dry_run: bool
-) -> 'Callable[[TranslatorAppRequest, TranslatorDirectoryApp], None]':
+) -> Callable[[TranslatorAppRequest, TranslatorDirectoryApp], None]:
     """
     This command forcefully deletes all languages from the database and all
     references will be lost.
@@ -536,8 +538,8 @@ def force_delete_languages(
     """
 
     def do_delete_languages(
-        request: 'TranslatorAppRequest',
-        app: 'TranslatorDirectoryApp'
+        request: TranslatorAppRequest,
+        app: TranslatorDirectoryApp
     ) -> None:
 
         i = input('Are you sure you want to delete all languages and losing '

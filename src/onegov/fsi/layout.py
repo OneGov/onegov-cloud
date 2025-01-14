@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 from onegov.fsi.models.course_event import (
     COURSE_EVENT_STATUSES_TRANSLATIONS, COURSE_EVENT_STATUSES
 )
@@ -17,16 +19,16 @@ if TYPE_CHECKING:
 
 class FormatMixin:
 
-    request: 'FsiRequest'
+    request: FsiRequest
 
     @staticmethod
-    def format_status(model_status: 'EventStatusType') -> str:
+    def format_status(model_status: EventStatusType) -> str:
         return COURSE_EVENT_STATUSES_TRANSLATIONS[
             COURSE_EVENT_STATUSES.index(model_status)
         ]
 
     @staticmethod
-    def format_notification_type(notification_type: 'NotificationType') -> str:
+    def format_notification_type(notification_type: NotificationType) -> str:
         return NOTIFICATION_TYPE_TRANSLATIONS[
             NOTIFICATION_TYPES.index(notification_type)
         ]
@@ -38,8 +40,8 @@ class FormatMixin:
 
 class DefaultLayout(BaseLayout, FormatMixin):
 
-    app: 'FsiApp'
-    request: 'FsiRequest'
+    app: FsiApp
+    request: FsiRequest
 
     def instance_link(self, instance: object) -> str:
         return self.request.link(instance)

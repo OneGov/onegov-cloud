@@ -50,6 +50,7 @@ In other words, if nobody visits the website the cronjob runs on, then
 the cronjobs won't run.
 
 """
+from __future__ import annotations
 
 import sched
 import re
@@ -95,7 +96,7 @@ CRONJOB_FORMAT = re.compile(r'\*/[0-9]+')
 def parse_cron(
     value: str | int,
     type: Literal['hour', 'minute']
-) -> 'Iterable[int]':
+) -> Iterable[int]:
     """ Minimal cron style interval parser. Currently only supports this::
 
         *   -> Run every hour, minute
@@ -156,7 +157,7 @@ class Job(Generic[_JobFunc]):
     function: _JobFunc
     hour: int | str
     minute: int | str
-    timezone: 'TzInfo'
+    timezone: TzInfo
     offset: float
     once: bool
     url: str | None
@@ -166,7 +167,7 @@ class Job(Generic[_JobFunc]):
         function: _JobFunc,
         hour: int | str,
         minute: int | str,
-        timezone: 'TzInfoOrName',
+        timezone: TzInfoOrName,
         once: bool = False,
         url: str | None = None
     ):
@@ -210,7 +211,7 @@ class Job(Generic[_JobFunc]):
 
         return self.url.partition('://')[-1]
 
-    def runtimes(self, today: date) -> 'Iterator[datetime]':
+    def runtimes(self, today: date) -> Iterator[datetime]:
         """ Generates the runtimes of this job on the given day, excluding
         runtimes in the past.
 
@@ -264,7 +265,7 @@ class Job(Generic[_JobFunc]):
         """
         return quote_plus(self.app.sign(self.name, 'cronjob-id'))
 
-    def as_request_call(self, request: 'CoreRequest') -> 'Job[Scheduled]':
+    def as_request_call(self, request: CoreRequest) -> Job[Scheduled]:
         """ Returns a new job which does the same as the old job, but it does
         so by calling an url which will execute the original job.
 
@@ -327,8 +328,8 @@ class ApplicationBoundCronjobs(Thread):
 
     def __init__(
         self,
-        request: 'CoreRequest',
-        jobs: 'Iterable[Job[Executor]]'
+        request: CoreRequest,
+        jobs: Iterable[Job[Executor]]
     ):
         Thread.__init__(self, daemon=True)
         self.application_id = request.app.application_id
@@ -358,14 +359,14 @@ class ApplicationBoundCronjobs(Thread):
 
         self.scheduler.run()
 
-    def schedule(self, job: Job['Scheduled']) -> None:
+    def schedule(self, job: Job[Scheduled]) -> None:
         self.scheduler.enterabs(
             action=self.process_job,
             argument=(job, ),
             time=job.next_runtime().timestamp(),
             priority=0)
 
-    def process_job(self, job: Job['Scheduled']) -> None:
+    def process_job(self, job: Job[Scheduled]) -> None:
         log.info(f'Executing {job.title}')
 
         try:
@@ -391,7 +392,7 @@ class ApplicationBoundCronjobs(Thread):
 
 
 @Framework.path(model=Job, path='/cronjobs/{id}')
-def get_job(app: Framework, id: str) -> Job['Executor'] | None:
+def get_job(app: Framework, id: str) -> Job[Executor] | None:
     """ The internal path to the cronjob. The id can't be guessed. """
     # FIXME: This should really use a dynamic salt, but we will have to
     #        be careful about race conditions between dispatch and
@@ -408,17 +409,17 @@ def get_job(app: Framework, id: str) -> Job['Executor'] | None:
 
 
 @Framework.view(model=Job, permission=Public)
-def run_job(self: Job['Executor'], request: 'CoreRequest') -> None:
+def run_job(self: Job[Executor], request: CoreRequest) -> None:
     """ Executes the job. """
     self.function(request)
 
 
 def register_cronjob(
     registry: object,
-    function: 'Executor',
+    function: Executor,
     hour: int | str,
     minute: int | str,
-    timezone: 'TzInfoOrName',
+    timezone: TzInfoOrName,
     once: bool = False
 ) -> None:
 

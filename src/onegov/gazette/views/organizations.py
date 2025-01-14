@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 from io import BytesIO
 from morepath import redirect
 from morepath.request import Response
@@ -28,8 +30,8 @@ if TYPE_CHECKING:
 )
 def view_organizations(
     self: OrganizationCollection,
-    request: 'GazetteRequest'
-) -> 'RenderData':
+    request: GazetteRequest
+) -> RenderData:
     """ View the list of organizations.
 
     This view is only visible by a publisher.
@@ -56,8 +58,8 @@ def view_organizations(
 )
 def view_organizations_order(
     self: OrganizationCollection,
-    request: 'GazetteRequest'
-) -> 'RenderData':
+    request: GazetteRequest
+) -> RenderData:
     """ Reorder the list of organizations.
 
     This view is only visible by a publisher.
@@ -80,7 +82,7 @@ def view_organizations_order(
 )
 def move_organization(
     self: OrganizationMove,
-    request: 'GazetteRequest'
+    request: GazetteRequest
 ) -> None:
 
     request.assert_valid_csrf_token()
@@ -96,9 +98,9 @@ def move_organization(
 )
 def create_organization(
     self: OrganizationCollection,
-    request: 'GazetteRequest',
+    request: GazetteRequest,
     form: OrganizationForm
-) -> 'RenderData | BaseResponse':
+) -> RenderData | BaseResponse:
     """ Create a new organization.
 
     This view is only visible by a publisher.
@@ -136,9 +138,9 @@ def create_organization(
 )
 def edit_organization(
     self: Organization,
-    request: 'GazetteRequest',
+    request: GazetteRequest,
     form: OrganizationForm
-) -> 'RenderData | BaseResponse':
+) -> RenderData | BaseResponse:
     """ Edit a organization.
 
     This view is only visible by a publisher.
@@ -173,9 +175,9 @@ def edit_organization(
 )
 def delete_organization(
     self: Organization,
-    request: 'GazetteRequest',
+    request: GazetteRequest,
     form: EmptyForm
-) -> 'RenderData | BaseResponse':
+) -> RenderData | BaseResponse:
     """ Delete a organization.
 
     Only unused organizations may be deleted.
@@ -227,7 +229,7 @@ def delete_organization(
 )
 def export_organizations(
     self: OrganizationCollection,
-    request: 'GazetteRequest'
+    request: GazetteRequest
 ) -> Response:
     """ Export all organizations as XLSX. The exported file can be re-imported
     using the import-organizations command line command.

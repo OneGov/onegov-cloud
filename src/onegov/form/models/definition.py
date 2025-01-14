@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 from wtforms import RadioField
 from onegov.core.orm import Base, observes
 from onegov.core.orm.mixins import (
@@ -44,44 +46,44 @@ class FormDefinition(Base, ContentMixin, TimestampMixin,
         return self.name
 
     #: the name of the form (key, part of the url)
-    name: 'Column[str]' = Column(Text, nullable=False, primary_key=True)
+    name: Column[str] = Column(Text, nullable=False, primary_key=True)
 
     #: the title of the form
-    title: 'Column[str]' = Column(Text, nullable=False)
+    title: Column[str] = Column(Text, nullable=False)
 
     #: the form as parsable string
-    definition: 'Column[str]' = Column(Text, nullable=False)
+    definition: Column[str] = Column(Text, nullable=False)
 
     #: hint on how to get to the resource
     pick_up: dict_property[str | None] = content_property()
 
     #: the group to which this resource belongs to (may be any kind of string)
-    group: 'Column[str | None]' = Column(Text, nullable=True)
+    group: Column[str | None] = Column(Text, nullable=True)
 
     #: The normalized title for sorting
-    order: 'Column[str]' = Column(Text, nullable=False, index=True)
+    order: Column[str] = Column(Text, nullable=False, index=True)
 
     #: the checksum of the definition, forms and submissions with matching
     #: checksums are guaranteed to have the exact same definition
-    checksum: 'Column[str]' = Column(Text, nullable=False)
+    checksum: Column[str] = Column(Text, nullable=False)
 
     #: the type of the form, this can be used to create custom polymorphic
     #: subclasses. See `<https://docs.sqlalchemy.org/en/improve_toc/
     #: orm/extensions/declarative/inheritance.html>`_.
-    type: 'Column[str]' = Column(
+    type: Column[str] = Column(
         Text,
         nullable=False,
         default=lambda: 'generic'
     )
 
     #: link between forms and submissions
-    submissions: 'relationship[list[FormSubmission]]' = relationship(
+    submissions: relationship[list[FormSubmission]] = relationship(
         FormSubmission,
         back_populates='form'
     )
 
     #: link between forms and registration windows
-    registration_windows: 'relationship[list[FormRegistrationWindow]]'
+    registration_windows: relationship[list[FormRegistrationWindow]]
     registration_windows = relationship(
         FormRegistrationWindow,
         back_populates='form',
@@ -102,7 +104,7 @@ class FormDefinition(Base, ContentMixin, TimestampMixin,
     #:
     #: this could of course be done more conventionally, but this is cooler 😅
     #:
-    current_registration_window: 'relationship[FormRegistrationWindow | None]'
+    current_registration_window: relationship[FormRegistrationWindow | None]
     current_registration_window = relationship(
         'FormRegistrationWindow', viewonly=True, uselist=False,
         primaryjoin="""and_(
@@ -139,7 +141,7 @@ class FormDefinition(Base, ContentMixin, TimestampMixin,
 
     #: payment options ('manual' for out of band payments without cc, 'free'
     #: for both manual and cc payments, 'cc' for forced cc payments)
-    payment_method: 'Column[PaymentMethod]' = Column(
+    payment_method: Column[PaymentMethod] = Column(
         Text,  # type:ignore[arg-type]
         nullable=False,
         default='manual'
@@ -155,7 +157,7 @@ class FormDefinition(Base, ContentMixin, TimestampMixin,
     }
 
     @property
-    def form_class(self) -> 'type_t[Form]':
+    def form_class(self) -> type_t[Form]:
         """ Parses the form definition and returns a form class. """
 
         return self.extend_form_class(
@@ -173,7 +175,7 @@ class FormDefinition(Base, ContentMixin, TimestampMixin,
 
     def has_submissions(
         self,
-        with_state: 'SubmissionState | None' = None
+        with_state: SubmissionState | None = None
     ) -> bool:
 
         session = object_session(self)
@@ -187,8 +189,8 @@ class FormDefinition(Base, ContentMixin, TimestampMixin,
 
     def add_registration_window(
         self,
-        start: 'date',
-        end: 'date',
+        start: date,
+        end: date,
         *,
         enabled: bool = True,
         timezone: str = 'Europe/Zurich',
@@ -207,7 +209,7 @@ class FormDefinition(Base, ContentMixin, TimestampMixin,
         self.registration_windows.append(window)
         return window
 
-    def for_new_name(self, name: str) -> 'Self':
+    def for_new_name(self, name: str) -> Self:
         return self.__class__(
             name=name,
             title=self.title,
@@ -236,32 +238,32 @@ class SurveyDefinition(Base, ContentMixin, TimestampMixin,
         return self.name
 
     #: the name of the form (key, part of the url)
-    name: 'Column[str]' = Column(Text, nullable=False, primary_key=True)
+    name: Column[str] = Column(Text, nullable=False, primary_key=True)
 
     #: the title of the form
-    title: 'Column[str]' = Column(Text, nullable=False)
+    title: Column[str] = Column(Text, nullable=False)
 
     #: the form as parsable string
-    definition: 'Column[str]' = Column(Text, nullable=False)
+    definition: Column[str] = Column(Text, nullable=False)
 
     #: the group to which this resource belongs to (may be any kind of string)
-    group: 'Column[str | None]' = Column(Text, nullable=True)
+    group: Column[str | None] = Column(Text, nullable=True)
 
     #: The normalized title for sorting
-    order: 'Column[str]' = Column(Text, nullable=False, index=True)
+    order: Column[str] = Column(Text, nullable=False, index=True)
 
     #: the checksum of the definition, forms and submissions with matching
     #: checksums are guaranteed to have the exact same definition
-    checksum: 'Column[str]' = Column(Text, nullable=False)
+    checksum: Column[str] = Column(Text, nullable=False)
 
     #: link between surveys and submissions
-    submissions: 'relationship[list[SurveySubmission]]' = relationship(
+    submissions: relationship[list[SurveySubmission]] = relationship(
         SurveySubmission,
         back_populates='survey'
     )
 
     #: link between surveys and submission windows
-    submission_windows: 'relationship[list[SurveySubmissionWindow]]'
+    submission_windows: relationship[list[SurveySubmissionWindow]]
     submission_windows = relationship(
         SurveySubmissionWindow,
         back_populates='survey',
@@ -269,7 +271,7 @@ class SurveyDefinition(Base, ContentMixin, TimestampMixin,
         cascade='all, delete-orphan'
     )
 
-    current_submission_window: 'relationship[SurveySubmissionWindow | None]'
+    current_submission_window: relationship[SurveySubmissionWindow | None]
     current_submission_window = relationship(
         'SurveySubmissionWindow', viewonly=True, uselist=False,
         primaryjoin="""and_(
@@ -305,7 +307,7 @@ class SurveyDefinition(Base, ContentMixin, TimestampMixin,
     extensions: dict_property[list[str]] = meta_property(default=list)
 
     @property
-    def form_class(self) -> type['Form']:
+    def form_class(self) -> type[Form]:
         """ Parses the survey definition and returns a form class. """
 
         return self.extend_form_class(
@@ -333,8 +335,8 @@ class SurveyDefinition(Base, ContentMixin, TimestampMixin,
 
     def add_submission_window(
         self,
-        start: 'date',
-        end: 'date',
+        start: date,
+        end: date,
         *,
         enabled: bool = True,
         timezone: str = 'Europe/Zurich',
@@ -349,7 +351,7 @@ class SurveyDefinition(Base, ContentMixin, TimestampMixin,
         self.submission_windows.append(window)
         return window
 
-    def get_results(self, request: 'CoreRequest', sw_id: ('UUID | None') = None
+    def get_results(self, request: CoreRequest, sw_id: (UUID | None) = None
                     ) -> dict[str, Any]:
         """ Returns the results of the survey. """
 

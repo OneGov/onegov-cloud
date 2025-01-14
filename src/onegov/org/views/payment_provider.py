@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 import morepath
 
 from onegov.core.security import Public, Private, Secret
@@ -29,13 +31,13 @@ if TYPE_CHECKING:
 )
 def view_payment_providers(
     self: PaymentProviderCollection,
-    request: 'OrgRequest',
+    request: OrgRequest,
     layout: PaymentProviderLayout | None = None
-) -> 'RenderData':
+) -> RenderData:
 
     layout = layout or PaymentProviderLayout(self, request)
 
-    def links(provider: PaymentProvider[Payment]) -> 'Iterator[Link]':
+    def links(provider: PaymentProvider[Payment]) -> Iterator[Link]:
         if not provider.default and provider.enabled:
             yield Link(
                 _('As default'),
@@ -128,8 +130,8 @@ def view_payment_providers(
 )
 def new_stripe_connect_provider(
     self: PaymentProviderCollection,
-    request: 'OrgRequest'
-) -> 'Response | None':
+    request: OrgRequest
+) -> Response | None:
 
     # since the csrf token salt is different for unauthenticated requests
     # we need to specify a constant one here
@@ -189,8 +191,8 @@ def new_stripe_connect_provider(
 )
 def new_stripe_connection_success(
     self: PaymentProviderCollection,
-    request: 'OrgRequest'
-) -> 'Response':
+    request: OrgRequest
+) -> Response:
 
     request.success(_('Your Stripe account was connected successfully.'))
     return morepath.redirect(request.link(self))
@@ -203,8 +205,8 @@ def new_stripe_connection_success(
 )
 def new_stripe_connection_error(
     self: PaymentProviderCollection,
-    request: 'OrgRequest'
-) -> 'Response':
+    request: OrgRequest
+) -> Response:
 
     request.alert(_('Your Stripe account could not be connected.'))
     return morepath.redirect(request.link(self))
@@ -218,7 +220,7 @@ def new_stripe_connection_error(
 )
 def handle_default_provider(
     self: PaymentProvider[Payment],
-    request: 'OrgRequest'
+    request: OrgRequest
 ) -> None:
 
     providers = PaymentProviderCollection(request.session)
@@ -234,7 +236,7 @@ def handle_default_provider(
     request_method='POST')
 def enable_provider(
     self: PaymentProvider[Payment],
-    request: 'OrgRequest'
+    request: OrgRequest
 ) -> None:
 
     self.enabled = True
@@ -249,7 +251,7 @@ def enable_provider(
     request_method='POST')
 def disable_provider(
     self: PaymentProvider[Payment],
-    request: 'OrgRequest'
+    request: OrgRequest
 ) -> None:
 
     self.enabled = False
@@ -264,7 +266,7 @@ def disable_provider(
 )
 def delete_provider(
     self: PaymentProvider[Payment],
-    request: 'OrgRequest'
+    request: OrgRequest
 ) -> None:
 
     request.assert_valid_csrf_token()
@@ -282,8 +284,8 @@ def delete_provider(
 )
 def sync_payments(
     self: PaymentProviderCollection,
-    request: 'OrgRequest'
-) -> 'Response':
+    request: OrgRequest
+) -> Response:
 
     self.sync()
     request.success(_('Successfully synchronised payments'))
@@ -292,7 +294,7 @@ def sync_payments(
 
 def get_settings_form(
     model: PaymentProvider[Payment],
-    request: 'OrgRequest'
+    request: OrgRequest
 ) -> type[Form]:
 
     if model.type == 'stripe_connect':
@@ -315,10 +317,10 @@ def get_settings_form(
 )
 def handle_provider_settings(
     self: PaymentProvider[Payment],
-    request: 'OrgRequest',
+    request: OrgRequest,
     form: Form,
     layout: PaymentProviderLayout | None = None
-) -> 'RenderData | Response':
+) -> RenderData | Response:
 
     if form.submitted(request):
         form.populate_obj(self)

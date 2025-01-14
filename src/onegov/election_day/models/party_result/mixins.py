@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 from onegov.core.orm.mixins import dict_property
 from onegov.core.orm.mixins import meta_property
 
@@ -76,11 +78,11 @@ class HistoricalPartyResultsMixin:
         party_results: relationship[list[PartyResult]]
 
     @property
-    def relationships_for_historical_party_results(self) -> 'Query[Any]':
+    def relationships_for_historical_party_results(self) -> Query[Any]:
         raise NotImplementedError()
 
     @property
-    def historical_party_results(self) -> 'list[PartyResult]':
+    def historical_party_results(self) -> list[PartyResult]:
         """ Returns the party results while adding party results from the last
         legislative period, Requires that a related election or compound has
         been set with type "historical".

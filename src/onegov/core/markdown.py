@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 import html
 
 from mistletoe import Document, HtmlRenderer  # type:ignore[import-untyped]
@@ -16,18 +18,18 @@ RENDERER_INSTANCES = {}
 class HTMLRendererWithoutInlineHtml(HtmlRenderer):
 
     @staticmethod
-    def render_html_block(token: 'HTMLBlock') -> str:
+    def render_html_block(token: HTMLBlock) -> str:
         return html.escape(token.content)
 
     @staticmethod
-    def render_html_span(token: 'HTMLSpan') -> str:
+    def render_html_span(token: HTMLSpan) -> str:
         return html.escape(token.content)
 
 
 def render_untrusted_markdown(
     markdown: str,
     cls: type[HtmlRenderer] = HTMLRendererWithoutInlineHtml
-) -> 'Markup':
+) -> Markup:
 
     # use a global renderer instance, but only create it if used
     if cls not in RENDERER_INSTANCES:

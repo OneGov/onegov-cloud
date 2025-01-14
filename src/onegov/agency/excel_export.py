@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 from collections import OrderedDict
 from io import BytesIO
 
@@ -35,7 +37,7 @@ column_mapper = OrderedDict(
 )
 
 
-def extract_person_data(session: 'Session') -> list[dict[str, object]]:
+def extract_person_data(session: Session) -> list[dict[str, object]]:
     collection = ExtendedPersonCollection(session)
     collection.exclude_hidden = False
     query = collection.query().outerjoin(ExtendedPerson.memberships)
@@ -56,7 +58,7 @@ def extract_person_data(session: 'Session') -> list[dict[str, object]]:
     return write_out
 
 
-def export_person_xlsx(session: 'Session') -> BytesIO:
+def export_person_xlsx(session: Session) -> BytesIO:
     """ Exports every person with their memberships in xlsx format. """
     file = BytesIO()
     workbook = Workbook(file, {'default_date_format': 'dd.mm.yyyy'})

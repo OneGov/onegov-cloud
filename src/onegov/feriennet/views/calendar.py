@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 from morepath.request import Response
 from onegov.core.security import Public
 from onegov.feriennet import FeriennetApp
@@ -14,7 +16,7 @@ if TYPE_CHECKING:
     permission=Public)
 def view_attendee_calendar(
     self: AttendeeCalendar,
-    request: 'FeriennetRequest'
+    request: FeriennetRequest
 ) -> Response:
     return Response(
         self.calendar(request),

@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 import fcntl
 import json
 import sedate
@@ -68,22 +70,22 @@ class UploadedFileField(UploadedFileFieldBase):
 
     def load_dialect_impl(
         self,
-        dialect: 'Dialect'
-    ) -> 'TypeEngine[UploadedFile]':
+        dialect: Dialect
+    ) -> TypeEngine[UploadedFile]:
         return dialect.type_descriptor(JSON())
 
     def process_bind_param(  # type:ignore[override]
         self,
-        value: 'UploadedFile | None',
-        dialect: 'Dialect'
-    ) -> 'UploadedFile | None':
+        value: UploadedFile | None,
+        dialect: Dialect
+    ) -> UploadedFile | None:
         return value if value else None
 
     def process_result_value(
         self,
         value: dict[str, Any] | None,
-        dialect: 'Dialect'
-    ) -> 'UploadedFile | None':
+        dialect: Dialect
+    ) -> UploadedFile | None:
         return self._upload_type(value) if value else None
 
 
@@ -130,7 +132,7 @@ class File(Base, Associable, TimestampMixin):
     __tablename__ = 'files'
 
     #: the unique, public id of the file
-    id: 'Column[str]' = Column(
+    id: Column[str] = Column(
         Text,
         nullable=False,
         primary_key=True,
@@ -138,16 +140,16 @@ class File(Base, Associable, TimestampMixin):
     )
 
     #: the name of the file, incl. extension (not used for public links)
-    name: 'Column[str]' = Column(Text, nullable=False)
+    name: Column[str] = Column(Text, nullable=False)
 
     #: a short note about the file (for captions, other information)
-    note: 'Column[str | None]' = Column(Text, nullable=True)
+    note: Column[str | None] = Column(Text, nullable=True)
 
     #: the default order of files
-    order: 'Column[str]' = Column(Text, nullable=False)
+    order: Column[str] = Column(Text, nullable=False)
 
     #: true if published
-    published: 'Column[bool]' = Column(Boolean, nullable=False, default=True)
+    published: Column[bool] = Column(Boolean, nullable=False, default=True)
 
     #: the date after which this file will be made public - this controls
     #: the visibility of the object through the ``access``
@@ -156,19 +158,19 @@ class File(Base, Associable, TimestampMixin):
     #: To get a file published, be sure to call
     #: :meth:`onegov.file.collection.FileCollection.publish_files` once an
     #: hour through a cronjob (see :mod:`onegov.core.cronjobs`)!
-    publish_date: 'Column[datetime | None]' = Column(
+    publish_date: Column[datetime | None] = Column(
         UTCDateTime,
         nullable=True
     )
 
     #: the date up to which the file is published
-    publish_end_date: 'Column[datetime | None]' = Column(
+    publish_end_date: Column[datetime | None] = Column(
         UTCDateTime,
         nullable=True
     )
 
     #: true if marked for publication
-    publication: 'Column[bool]' = Column(
+    publication: Column[bool] = Column(
         Boolean,
         nullable=False,
         default=False
@@ -179,7 +181,7 @@ class File(Base, Associable, TimestampMixin):
     #: (the file could be signed without this being true, but that would
     #: amount to a signature created outside of our platform, which is
     #: something we ignore)
-    signed: 'Column[bool]' = Column(Boolean, nullable=False, default=False)
+    signed: Column[bool] = Column(Boolean, nullable=False, default=False)
 
     #: the metadata of the signature - this should include the following
     #: data::
@@ -190,7 +192,7 @@ class File(Base, Associable, TimestampMixin):
     #:  - timestamp: The time the document was signed in UTC
     #:  - request_id: A unique identifier by the signing service
     #:
-    signature_metadata: 'Column[SignatureMetadata | None]' = deferred(
+    signature_metadata: Column[SignatureMetadata | None] = deferred(
         Column(JSON, nullable=True)
     )
 
@@ -200,7 +202,7 @@ class File(Base, Associable, TimestampMixin):
     #:
     #: not to be confused with the the actual filetype which is stored
     #: on the :attr:`reference`!
-    type: 'Column[str]' = Column(
+    type: Column[str] = Column(
         Text,
         nullable=False,
         default=lambda: 'generic'
@@ -208,7 +210,7 @@ class File(Base, Associable, TimestampMixin):
 
     #: the reference to the actual file, uses depot to point to a file on
     #: the local file system or somewhere else (e.g. S3)
-    reference: '_UploadedFileColumn' = Column(UploadedFileField(  # type:ignore
+    reference: _UploadedFileColumn = Column(UploadedFileField(  # type:ignore
         upload_type=ProcessedUploadedFile,
         filters=[
             OnlyIfImage(
@@ -233,26 +235,26 @@ class File(Base, Associable, TimestampMixin):
     #:
     #: note, this is not meant to be cryptographically secure - this is
     #: strictly a check of file duplicates, not protection against tampering
-    checksum: 'Column[str | None]' = Column(Text, nullable=True, index=True)
+    checksum: Column[str | None] = Column(Text, nullable=True, index=True)
 
     #: the content of the given file as text, if it can be extracted
     #: (it is important that this column be loaded deferred by default, lest
     #: we load massive amounts of text on simple queries)
-    extract: 'Column[str | None]' = deferred(Column(Text, nullable=True))
+    extract: Column[str | None] = deferred(Column(Text, nullable=True))
 
     #: the languge of the file
-    language: 'Column[str | None]' = Column(Text, nullable=True)
+    language: Column[str | None] = Column(Text, nullable=True)
 
     #: statistics around the extract (number of pages, words, etc.)
     #: those are usually set during file upload (as some information is
     #: lost afterwards)
-    stats: 'Column[FileStats | None]' = deferred(Column(JSON, nullable=True))
+    stats: Column[FileStats | None] = deferred(Column(JSON, nullable=True))
 
     #: arbitrary additional meta data, which can be used by subclasses to
     #: store additional information using e.g. `meta_property`
-    meta: 'Column[dict[str, Any]]' = Column(JSON, nullable=False, default=dict)
+    meta: Column[dict[str, Any]] = Column(JSON, nullable=False, default=dict)
 
-    filesets: 'relationship[list[FileSet]]' = relationship(
+    filesets: relationship[list[FileSet]] = relationship(
         'FileSet',
         secondary=file_to_set_associations,
         back_populates='files'
@@ -268,7 +270,7 @@ class File(Base, Associable, TimestampMixin):
     )
 
     @hybrid_property
-    def signature_timestamp(self) -> 'datetime | None':
+    def signature_timestamp(self) -> datetime | None:
         if self.signed:
             return sedate.replace_timezone(
                 isodate.parse_datetime(self.signature_metadata['timestamp']),
@@ -297,7 +299,7 @@ class File(Base, Associable, TimestampMixin):
     #       then we would need to instantiate a DepotApp for testing
     #       which could get annoying
     @observes('reference')
-    def reference_observer(self, reference: 'UploadedFile') -> None:
+    def reference_observer(self, reference: UploadedFile) -> None:
         if 'checksum' in self.reference:
             self.checksum = self.reference.pop('checksum')
 
@@ -343,7 +345,7 @@ class File(Base, Associable, TimestampMixin):
         return extension_for_content_type(
             self.reference['content_type'], self.name)
 
-    def get_thumbnail_id(self, size: str) -> 'UploadedFile | None':
+    def get_thumbnail_id(self, size: str) -> UploadedFile | None:
         """ Returns the thumbnail id with the given size (e.g. 'small').
 
         """
@@ -402,9 +404,9 @@ class File(Base, Associable, TimestampMixin):
 
 @contextmanager
 def metadata_lock(
-    metadata_path: 'StrPath',
+    metadata_path: StrPath,
     timeout: float = 0.0,
-) -> 'Iterator[bool]':
+) -> Iterator[bool]:
     """ Locks the metadata from a ``filedepot.io.local.LocalStoredFile``.
     Tries to acquire the lock repeatedly in a spin lock until timeout
     expires, it will return whether or not it managed to acquire the lock
@@ -460,7 +462,7 @@ def update_metadata_after_commit(session: Session) -> None:
 @event.listens_for(Session, 'after_soft_rollback')
 def discard_metadata_on_rollback(
     session: Session,
-    previous_transaction: 'SessionTransaction'
+    previous_transaction: SessionTransaction
 ) -> None:
     if 'pending_metadata_changes' in session.info:
         del session.info['pending_metadata_changes']

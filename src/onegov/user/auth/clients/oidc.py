@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 import requests
 from attr import attrs, attrib
 from base64 import urlsafe_b64encode
@@ -83,8 +85,8 @@ class OIDCClient:
 
     def session(
         self,
-        provider: 'OIDCProvider',
-        request: 'CoreRequest',
+        provider: OIDCProvider,
+        request: CoreRequest,
         *,
         with_openid_scope: bool = False,
     ) -> OAuth2Session:
@@ -99,7 +101,7 @@ class OIDCClient:
             redirect_uri=redirect_url,
         )
 
-    def metadata(self, request: 'CoreRequest') -> dict[str, Any]:
+    def metadata(self, request: CoreRequest) -> dict[str, Any]:
         metadata = self._provider_metadata.get(request.app.application_id)
         if metadata is None:
             # try to discover the metadata
@@ -149,7 +151,7 @@ class OIDCClient:
 
     def validate_token(
         self,
-        request: 'CoreRequest',
+        request: CoreRequest,
         token: dict[str, Any]
     ) -> dict[str, Any]:
 
@@ -198,7 +200,7 @@ class OIDCConnections:
     # instantiated connections for every tenant
     connections: dict[str, OIDCClient] = attrib()
 
-    def client(self, app: 'HasApplicationIdAndNamespace') -> OIDCClient | None:
+    def client(self, app: HasApplicationIdAndNamespace) -> OIDCClient | None:
         if app.application_id in self.connections:
             return self.connections[app.application_id]
 

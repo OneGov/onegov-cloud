@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 import click
 
 from contextlib import contextmanager
@@ -26,7 +28,7 @@ class Timer:
     def start(self) -> None:
         self.started = utcnow()
 
-    def stop(self) -> 'timedelta':
+    def stop(self) -> timedelta:
         return utcnow() - self.started
 
 
@@ -41,7 +43,7 @@ def print_query(query: bytes) -> None:
 @contextmanager
 def analyze_sql_queries(
     report: Literal['summary', 'redundant', 'all'] = 'summary'
-) -> 'Iterator[None]':
+) -> Iterator[None]:
     """ Analyzes the sql-queries executed during its context. There are three
     levels of information (report argument):
 
@@ -63,22 +65,22 @@ def analyze_sql_queries(
 
     @event.listens_for(Engine, 'before_cursor_execute')
     def before_exec(
-        conn: 'Connection',
+        conn: Connection,
         cursor: Any,
         statement: str,
         parameters: Any,
-        context: 'ExecutionContext',
+        context: ExecutionContext,
         executemany: bool
     ) -> None:
         timer.start()
 
     @event.listens_for(Engine, 'after_cursor_execute')
     def after_exec(
-        conn: 'Connection',
+        conn: Connection,
         cursor: Any,
         statement: str,
         parameters: Any,
-        context: 'ExecutionContext',
+        context: ExecutionContext,
         executemany: bool
     ) -> None:
         runtime = timer.stop()

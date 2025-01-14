@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 from yaml import safe_load
 
 
@@ -60,5 +62,5 @@ class Principal:
             self.sogc_import['canton'] = canton.upper()
 
     @classmethod
-    def from_yaml(cls, yaml_source: str) -> 'Self':
+    def from_yaml(cls, yaml_source: str) -> Self:
         return cls(**safe_load(yaml_source))

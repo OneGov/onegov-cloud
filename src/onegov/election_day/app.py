@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 import re
 
 from dectate import directive
@@ -57,14 +59,14 @@ class ElectionDayApp(Framework, FormApp, UserApp, DepotApp):
     screen_widget = directive(ScreenWidgetAction)
 
     @property
-    def principal(self) -> 'Canton | Municipality':
+    def principal(self) -> Canton | Municipality:
         """ Returns the principal of the election day app. See
         :class:`onegov.election_day.models.principal.Principal`.
 
         """
         return self.cache.get_or_create('principal', self.load_principal)
 
-    def load_principal(self) -> 'Canton | Municipality | None':
+    def load_principal(self) -> Canton | Municipality | None:
         """ The principal is defined in the ``principal.yml`` file stored
         on the applications filestorage root.
 
@@ -113,7 +115,7 @@ class ElectionDayApp(Framework, FormApp, UserApp, DepotApp):
         return {'primary-color': color}
 
     @property
-    def pages_cache(self) -> 'RedisCacheRegion':
+    def pages_cache(self) -> RedisCacheRegion:
         """ A cache for pages. """
         expiration_time = 300
         if self.principal and hasattr(self.principal, 'cache_expiration_time'):
@@ -156,7 +158,7 @@ def get_i18n_default_locale() -> str:
 
 
 @ElectionDayApp.setting(section='content_security_policy', name='default')
-def org_content_security_policy() -> 'ContentSecurityPolicy':
+def org_content_security_policy() -> ContentSecurityPolicy:
     policy = default_content_security_policy()
     policy.script_src.remove(UNSAFE_EVAL)
     policy.script_src.remove(UNSAFE_INLINE)
@@ -166,8 +168,8 @@ def org_content_security_policy() -> 'ContentSecurityPolicy':
 @ElectionDayApp.tween_factory(under=content_security_policy_tween_factory)
 def enable_iframes_and_analytics_tween_factory(
     app: ElectionDayApp,
-    handler: 'Callable[[ElectionDayRequest], Response]'
-) -> 'Callable[[ElectionDayRequest], Response]':
+    handler: Callable[[ElectionDayRequest], Response]
+) -> Callable[[ElectionDayRequest], Response]:
 
     no_iframe_paths = (
         r'/auth/.*',
@@ -187,7 +189,7 @@ def enable_iframes_and_analytics_tween_factory(
 
     def enable_iframes_and_analytics_tween(
         request: ElectionDayRequest
-    ) -> 'Response':
+    ) -> Response:
         """ Enables iframes and analytics. """
 
         result = handler(request)
@@ -213,9 +215,9 @@ def enable_iframes_and_analytics_tween_factory(
 @ElectionDayApp.tween_factory(over=current_language_tween_factory)
 def override_language_tween_factory(
     app: ElectionDayApp,
-    handler: 'Callable[[ElectionDayRequest], Response]'
-) -> 'Callable[[ElectionDayRequest], Response]':
-    def override_language_tween(request: ElectionDayRequest) -> 'Response':
+    handler: Callable[[ElectionDayRequest], Response]
+) -> Callable[[ElectionDayRequest], Response]:
+    def override_language_tween(request: ElectionDayRequest) -> Response:
         """ Allows the current language to be overwritten using a query
         parameter.
 
@@ -236,10 +238,10 @@ def override_language_tween_factory(
 )
 def cache_control_tween_factory(
     app: ElectionDayApp,
-    handler: 'Callable[[ElectionDayRequest], Response]'
-) -> 'Callable[[ElectionDayRequest], Response]':
+    handler: Callable[[ElectionDayRequest], Response]
+) -> Callable[[ElectionDayRequest], Response]:
 
-    def cache_control_tween(request: ElectionDayRequest) -> 'Response':
+    def cache_control_tween(request: ElectionDayRequest) -> Response:
         """ Set headers and cookies for cache control.
 
         Makes sure, pages are not cached downstream when logged in by setting
@@ -270,8 +272,8 @@ def cache_control_tween_factory(
 )
 def micro_cache_anonymous_pages_tween_factory(
     app: ElectionDayApp,
-    handler: 'Callable[[ElectionDayRequest], Response]'
-) -> 'Callable[[ElectionDayRequest], Response]':
+    handler: Callable[[ElectionDayRequest], Response]
+) -> Callable[[ElectionDayRequest], Response]:
 
     cache_paths = (
         '/ballot/.*',
@@ -286,7 +288,7 @@ def micro_cache_anonymous_pages_tween_factory(
     )
     cache_paths_re = re.compile(r'^({})$'.format('|'.join(cache_paths)))
 
-    def should_cache_fn(response: 'Response') -> bool:
+    def should_cache_fn(response: Response) -> bool:
         return (
             response.status_code == 200
             and 'Set-Cookie' not in response.headers
@@ -294,7 +296,7 @@ def micro_cache_anonymous_pages_tween_factory(
 
     def micro_cache_anonymous_pages_tween(
         request: ElectionDayRequest
-    ) -> 'Response':
+    ) -> Response:
         """ Cache all pages for 5 minutes. """
 
         # do not cache POST, DELETE etc.
@@ -354,7 +356,7 @@ def get_webasset_output() -> str:
 
 
 @ElectionDayApp.webasset('common')
-def get_common_asset() -> 'Iterator[str]':
+def get_common_asset() -> Iterator[str]:
     # Common assets unlikely to change
     yield 'modernizr.js'
 
@@ -382,7 +384,7 @@ def get_common_asset() -> 'Iterator[str]':
 
 
 @ElectionDayApp.webasset('custom')
-def get_custom_asset() -> 'Iterator[str]':
+def get_custom_asset() -> Iterator[str]:
     # common code
     yield 'common.js'
     yield 'form_dependencies.js'
@@ -406,7 +408,7 @@ def get_custom_asset() -> 'Iterator[str]':
 
 
 @ElectionDayApp.webasset('backend_common')
-def get_backend_common_asset() -> 'Iterator[str]':
+def get_backend_common_asset() -> Iterator[str]:
     # Common assets unlikely to change, only used in the backend
     yield 'jquery.datetimepicker.css'
     yield 'jquery.datetimepicker.js'
@@ -415,6 +417,6 @@ def get_backend_common_asset() -> 'Iterator[str]':
 
 
 @ElectionDayApp.webasset('screen')
-def get_screen_asset() -> 'Iterator[str]':
+def get_screen_asset() -> Iterator[str]:
     # Code used for screen update
     yield 'screen.js'

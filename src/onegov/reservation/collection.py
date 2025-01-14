@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 import enum
 from onegov.core.utils import normalize_for_url
 from onegov.reservation.models import Resource
@@ -20,7 +22,7 @@ class _Marker(enum.Enum):
     any_type = enum.auto()
 
 
-any_type_t: 'TypeAlias' = Literal[_Marker.any_type]
+any_type_t: TypeAlias = Literal[_Marker.any_type]  # noqa: PYI042
 any_type: any_type_t = _Marker.any_type
 
 
@@ -28,7 +30,7 @@ class ResourceCollection:
     """ Manages a list of resources.
 
     """
-    def __init__(self, libres_context: 'Context'):
+    def __init__(self, libres_context: Context):
         assert hasattr(libres_context, 'get_service'), """
             The ResourceCollection expected the libres_contex, not the session.
         """
@@ -36,7 +38,7 @@ class ResourceCollection:
         self.libres_context = libres_context
         self.session = libres_context.get_service('session_provider').session()
 
-    def query(self) -> 'Query[Resource]':
+    def query(self) -> Query[Resource]:
         return self.session.query(Resource)
 
     def add(
@@ -111,17 +113,17 @@ class ResourceCollection:
 
         return self.bind(query.first())
 
-    def by_allocation(self, allocation: 'Allocation') -> Resource | None:
+    def by_allocation(self, allocation: Allocation) -> Resource | None:
         return self.by_id(allocation.resource)
 
-    def by_reservation(self, reservation: 'Reservation') -> Resource | None:
+    def by_reservation(self, reservation: Reservation) -> Resource | None:
         return self.by_id(reservation.resource)
 
     def delete(
         self,
         resource: Resource,
         including_reservations: bool = False,
-        handle_reservation: 'Callable[[Reservation], Any] | None' = None
+        handle_reservation: Callable[[Reservation], Any] | None = None
     ) -> None:
 
         scheduler = resource.get_scheduler(self.libres_context)

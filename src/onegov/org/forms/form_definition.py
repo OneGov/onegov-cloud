@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 from onegov.core.utils import normalize_for_url
 from onegov.form import Form, merge_forms, FormDefinitionCollection
 from onegov.form.validators import ValidFormDefinition, ValidSurveyDefinition

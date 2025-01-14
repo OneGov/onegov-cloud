@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 from datetime import timedelta
 import transaction
 from wtforms.validators import DataRequired
@@ -52,26 +54,26 @@ class NewsletterForm(Form):
 
     # FIXME: Why are we passing the request in? It should alread be stored on
     #        the form itself.
-    def update_model(self, model: 'Newsletter', request: 'OrgRequest') -> None:
+    def update_model(self, model: Newsletter, request: OrgRequest) -> None:
         assert self.title.data is not None
         model.title = self.title.data
         model.lead = self.lead.data
         model.html = self.get_html(request)
 
-    def apply_model(self, model: 'Newsletter') -> None:
+    def apply_model(self, model: Newsletter) -> None:
         self.title.data = model.title
         self.lead.data = model.lead
 
     # FIXME: same here
-    def get_html(self, request: 'OrgRequest') -> str:
+    def get_html(self, request: OrgRequest) -> str:
         return ''
 
     @classmethod
     def with_news(
         cls,
-        request: 'OrgRequest',
-        news: 'Iterable[News]'
-    ) -> type['Self']:
+        request: OrgRequest,
+        news: Iterable[News]
+    ) -> type[Self]:
 
         # FIXME: using a layout just for format_date seems bad, we should
         #        probably extract these functions into util modules
@@ -113,8 +115,8 @@ class NewsletterForm(Form):
 
             def update_model(
                 self,
-                model: 'Newsletter',
-                request: 'OrgRequest'  # FIXME: same here
+                model: Newsletter,
+                request: OrgRequest  # FIXME: same here
             ) -> None:
 
                 super().update_model(model, request)
@@ -122,7 +124,7 @@ class NewsletterForm(Form):
                 model.content['show_news_as_tiles'] = (
                     self.show_news_as_tiles.data)
 
-            def apply_model(self, model: 'Newsletter') -> None:
+            def apply_model(self, model: Newsletter) -> None:
                 super().apply_model(model)
                 self.news.data = model.content.get('news')
                 self.show_news_as_tiles.data = model.content.get(
@@ -133,9 +135,9 @@ class NewsletterForm(Form):
     @classmethod
     def with_occurrences(
         cls,
-        request: 'OrgRequest',
-        occurrences: 'Iterable[Occurrence]'
-    ) -> type['Self']:
+        request: OrgRequest,
+        occurrences: Iterable[Occurrence]
+    ) -> type[Self]:
 
         # FIXME: another use of layout for format_date
         layout = Layout(None, request)
@@ -169,14 +171,14 @@ class NewsletterForm(Form):
 
             def update_model(
                 self,
-                model: 'Newsletter',
-                request: 'OrgRequest'  # FIXME: same here
+                model: Newsletter,
+                request: OrgRequest  # FIXME: same here
             ) -> None:
 
                 super().update_model(model, request)
                 model.content['occurrences'] = self.occurrences.data
 
-            def apply_model(self, model: 'Newsletter') -> None:
+            def apply_model(self, model: Newsletter) -> None:
                 super().apply_model(model)
                 self.occurrences.data = model.content.get('occurrences')
 
@@ -185,9 +187,9 @@ class NewsletterForm(Form):
     @classmethod
     def with_publications(
         cls,
-        request: 'OrgRequest',
-        publications: 'Iterable[File]'
-    ) -> type['Self']:
+        request: OrgRequest,
+        publications: Iterable[File]
+    ) -> type[Self]:
 
         # FIXME: another use of layout for format_date
         layout = Layout(None, request)
@@ -221,14 +223,14 @@ class NewsletterForm(Form):
 
             def update_model(
                 self,
-                model: 'Newsletter',
-                request: 'OrgRequest'  # FIXME: same here
+                model: Newsletter,
+                request: OrgRequest  # FIXME: same here
             ) -> None:
 
                 super().update_model(model, request)
                 model.content['publications'] = self.publications.data
 
-            def apply_model(self, model: 'Newsletter') -> None:
+            def apply_model(self, model: Newsletter) -> None:
                 super().apply_model(model)
                 self.publications.data = model.content.get('publications')
 
@@ -410,7 +412,7 @@ class NewsletterSubscriberImportExportForm(Form):
             for key, value in headers.items()
         }
 
-        def get(line: 'DefaultRow', column: str) -> Any:
+        def get(line: DefaultRow, column: str) -> Any:
             return getattr(line, column)
 
         count = 0
