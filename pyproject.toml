@@ -131,6 +131,7 @@ select = [
     "E",
     "F",
     "FLY002",
+    "I002",
     "ISC",
     "N",
     "PERF",
@@ -187,7 +188,6 @@ ignore = [
     "UP009",
     "UP012",
     "UP032",
-    "UP037",
     "UP038",
 ]
 unfixable = []
@@ -197,7 +197,7 @@ preview = true
 
 [tool.ruff.lint.extend-per-file-ignores]
 "src/onegov/core/types.py" = ["B018"]
-"reportlab_settings.py" = ["N"]
+"reportlab_settings.py" = ["N", "I002"]
 "*.pyi" = [
     "E501",
     "N",
@@ -218,6 +218,7 @@ preview = true
     "E306",
     "F841",
     "FLY002",
+    "I002",
     "ISC",
     "N",
     "Q",
@@ -229,6 +230,9 @@ preview = true
     "SIM",
     "UP",
 ]
+
+[tool.ruff.lint.isort]
+required-imports = ["from __future__ import annotations"]
 
 [tool.ruff.lint.pep8-naming]
 extend-ignore-names = [

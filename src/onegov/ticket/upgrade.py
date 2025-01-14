@@ -2,6 +2,8 @@
 upgraded on the server. See :class:`onegov.core.upgrade.upgrade_task`.
 
 """
+from __future__ import annotations
+
 from onegov.core.orm.types import JSON, UTCDateTime
 from onegov.core.upgrade import upgrade_task
 from onegov.ticket import Ticket
@@ -14,7 +16,7 @@ if TYPE_CHECKING:
 
 
 @upgrade_task('Add handler_id to ticket')
-def add_handler_id_to_ticket(context: 'UpgradeContext') -> None:
+def add_handler_id_to_ticket(context: UpgradeContext) -> None:
 
     if not context.has_column('tickets', 'handler_id'):
         context.operations.add_column(
@@ -40,7 +42,7 @@ def add_handler_id_to_ticket(context: 'UpgradeContext') -> None:
 
 
 @upgrade_task('Add snapshot json column to ticket')
-def add_snapshot_json_column_to_ticket(context: 'UpgradeContext') -> None:
+def add_snapshot_json_column_to_ticket(context: UpgradeContext) -> None:
 
     context.operations.add_column(
         'tickets', Column('snapshot', JSON, nullable=True)
@@ -54,7 +56,7 @@ def add_snapshot_json_column_to_ticket(context: 'UpgradeContext') -> None:
 
 
 @upgrade_task('Add subtitle to ticket')
-def add_subtitle_to_ticket(context: 'UpgradeContext') -> None:
+def add_subtitle_to_ticket(context: UpgradeContext) -> None:
 
     context.operations.add_column(
         'tickets', Column('subtitle', Text, nullable=True))
@@ -66,7 +68,7 @@ def add_subtitle_to_ticket(context: 'UpgradeContext') -> None:
 
 
 @upgrade_task('Add process time to ticket')
-def add_process_time_to_ticket(context: 'UpgradeContext') -> None:
+def add_process_time_to_ticket(context: UpgradeContext) -> None:
 
     if not context.has_column('tickets', 'last_state_change'):
         context.operations.add_column(
@@ -82,7 +84,7 @@ def add_process_time_to_ticket(context: 'UpgradeContext') -> None:
 
 
 @upgrade_task('Add muted state to ticket')
-def add_muted_state_to_ticket(context: 'UpgradeContext') -> None:
+def add_muted_state_to_ticket(context: UpgradeContext) -> None:
     if context.has_column('tickets', 'muted'):
         return
 
@@ -97,12 +99,12 @@ def add_muted_state_to_ticket(context: 'UpgradeContext') -> None:
 
 
 @upgrade_task('Add archived flag to ticket')
-def add_archived_flag_to_ticket(context: 'UpgradeContext') -> None:
+def add_archived_flag_to_ticket(context: UpgradeContext) -> None:
     pass
 
 
 @upgrade_task('Add archived as a state and remove flag')
-def add_archived_state_to_ticket(context: 'UpgradeContext') -> None:
+def add_archived_state_to_ticket(context: UpgradeContext) -> None:
     if context.has_column('tickets', 'archived'):
         context.operations.drop_column('tickets', 'archived')
 

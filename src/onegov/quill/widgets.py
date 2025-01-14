@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 from json import dumps
 from markupsafe import Markup
 from random import choice
@@ -28,7 +30,7 @@ class QuillInput(HiddenInput):
     def __init__(
         self,
         *,
-        tags: 'Sequence[str] | None' = None,
+        tags: Sequence[str] | None = None,
         **kwargs: Any
     ):
         if tags is None:
@@ -82,7 +84,7 @@ class QuillInput(HiddenInput):
 
     def __call__(
         self,
-        field: 'QuillField',  # type:ignore[override]
+        field: QuillField,  # type:ignore[override]
         **kwargs: Any
     ) -> Markup:
 

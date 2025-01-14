@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 from onegov.core.orm import Base
 from onegov.core.orm.mixins import ContentMixin, TimestampMixin
 from onegov.core.orm.types import UUID
@@ -30,14 +32,14 @@ class Volunteer(Base, ContentMixin, TimestampMixin):
     __tablename__ = 'volunteers'
 
     #: The id of the record, may be used publicly
-    id: 'Column[uuid.UUID]' = Column(
+    id: Column[uuid.UUID] = Column(
         UUID,  # type:ignore[arg-type]
         primary_key=True,
         default=uuid4
     )
 
     #: The state of the volunteer
-    state: 'Column[VolunteerState]' = Column(
+    state: Column[VolunteerState] = Column(
         Enum(  # type:ignore[arg-type]
             'open',
             'contacted',
@@ -49,47 +51,47 @@ class Volunteer(Base, ContentMixin, TimestampMixin):
     )
 
     #: The need the volunteer signed up for
-    need_id: 'Column[uuid.UUID]' = Column(
+    need_id: Column[uuid.UUID] = Column(
         UUID,  # type:ignore[arg-type]
         ForeignKey('occasion_needs.id'),
         nullable=False
     )
-    need: 'relationship[OccasionNeed]' = relationship(
+    need: relationship[OccasionNeed] = relationship(
         'OccasionNeed',
         back_populates='volunteers'
     )
 
     #: A token linking multiple volunteer records (volunteers sign up for
     #: multiple needs at once, and are then multiplexed here)
-    token: 'Column[uuid.UUID]' = Column(
+    token: Column[uuid.UUID] = Column(
         UUID,  # type:ignore[arg-type]
         nullable=False,
         default=uuid4
     )
 
     #: The first name of the volunteer
-    first_name: 'Column[str]' = Column(Text, nullable=False)
+    first_name: Column[str] = Column(Text, nullable=False)
 
     #: The last name of the volunteer
-    last_name: 'Column[str]' = Column(Text, nullable=False)
+    last_name: Column[str] = Column(Text, nullable=False)
 
     #: The address of the volunteer
-    address: 'Column[str]' = Column(Text, nullable=False)
+    address: Column[str] = Column(Text, nullable=False)
 
     #: The zip code of the volunteer
-    zip_code: 'Column[str]' = Column(Text, nullable=False)
+    zip_code: Column[str] = Column(Text, nullable=False)
 
     #: The place of the volunteer
-    place: 'Column[str]' = Column(Text, nullable=False)
+    place: Column[str] = Column(Text, nullable=False)
 
     #: The organisation of the volunteer
-    organisation: 'Column[str | None]' = Column(Text, nullable=True)
+    organisation: Column[str | None] = Column(Text, nullable=True)
 
     #: The birth_date of the volunteer
-    birth_date: 'Column[date]' = Column(Date, nullable=False)
+    birth_date: Column[date] = Column(Date, nullable=False)
 
     #: The e-mail address of the volunteer
-    email: 'Column[str]' = Column(Text, nullable=False)
+    email: Column[str] = Column(Text, nullable=False)
 
     #: The phone number of the volunteer
-    phone: 'Column[str]' = Column(Text, nullable=False)
+    phone: Column[str] = Column(Text, nullable=False)

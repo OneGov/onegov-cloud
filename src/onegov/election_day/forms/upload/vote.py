@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 from onegov.election_day import _
 from onegov.election_day.forms.upload.common import ALLOWED_MIME_TYPES
 from onegov.election_day.forms.upload.common import MAX_FILE_SIZE
@@ -61,7 +63,7 @@ class UploadVoteForm(Form):
         render_kw={'force_simple': True}
     )
 
-    def adjust(self, principal: 'Canton | Municipality', vote: 'Vote') -> None:
+    def adjust(self, principal: Canton | Municipality, vote: Vote) -> None:
         """ Adjusts the form to the given principal and vote. """
 
         assert hasattr(vote, 'data_sources')

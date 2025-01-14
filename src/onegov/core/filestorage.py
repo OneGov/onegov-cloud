@@ -6,6 +6,7 @@ Based on `<https://docs.pyfilesystem.org/en/latest/>`_
 See :attr:`onegov.core.framework.Framework.filestorage` for more information.
 
 """
+from __future__ import annotations
 
 from fs.errors import IllegalBackReference
 from onegov.core.framework import Framework
@@ -67,7 +68,7 @@ def get_filestorage_file(
 @Framework.view(model=FilestorageFile, render=render_file, permission=Public)
 def view_filestorage_file(
     self: FilestorageFile,
-    request: 'CoreRequest'
+    request: CoreRequest
 ) -> str:
     """ Renders the given filestorage file in the browser. """
     return getattr(request.app, self.storage).getsyspath(self.path)
@@ -75,7 +76,7 @@ def view_filestorage_file(
 
 @Framework.view(
     model=FilestorageFile, request_method='DELETE', permission=Private)
-def delete_static_file(self: FilestorageFile, request: 'CoreRequest') -> None:
+def delete_static_file(self: FilestorageFile, request: CoreRequest) -> None:
     """ Deletes the given filestorage file. By default the permission is
     ``Private``. An application using the framework can override this though.
 

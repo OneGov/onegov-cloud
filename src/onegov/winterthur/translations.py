@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 from onegov.winterthur import _
 
 # translations provided by onegov.org, overriden by Winterthur

@@ -13,6 +13,7 @@ templates directly is faster.
 This module should eventually replace the elements.py module.
 
 """
+from __future__ import annotations
 
 from onegov.core.templates import render_macro
 
@@ -60,7 +61,7 @@ class Element:
         self,
         text: str | None = None,
         attrs: dict[str, Any] | None = None,
-        traits: 'Iterable[Trait] | Trait' = (),
+        traits: Iterable[Trait] | Trait = (),
         **props: Any
     ):
         self.text = text
@@ -104,9 +105,9 @@ class Element:
 
     def __call__(
         self,
-        layout: 'ChameleonLayout',
-        extra_classes: 'Iterable[str] | None' = None
-    ) -> 'Markup':
+        layout: ChameleonLayout,
+        extra_classes: Iterable[str] | None = None
+    ) -> Markup:
 
         assert self.id is not None
 
@@ -161,7 +162,7 @@ class Link(Element, AccessMixin):
         text: str | None,
         url: str = '#',
         attrs: dict[str, Any] | None = None,
-        traits: 'Iterable[Trait] | Trait' = (),
+        traits: Iterable[Trait] | Trait = (),
         **props: Any
     ):
         # this is the only exception we permit where we don't use a trait
@@ -220,10 +221,10 @@ class LinkGroup(AccessMixin):
     def __init__(
         self,
         title: str,
-        links: 'Sequence[Link]',
+        links: Sequence[Link],
         model: Any | None = None,
         right_side: bool = True,
-        classes: 'Collection[str] | None' = None,
+        classes: Collection[str] | None = None,
         attributes: dict[str, Any] | None = None
     ):
         self.title = title
@@ -239,7 +240,7 @@ class Trait:
 
     __slots__ = ('apply', )
 
-    apply: 'Callable[[dict[str, Any]], dict[str, Any]]'
+    apply: Callable[[dict[str, Any]], dict[str, Any]]
 
     def __call__(
         self,

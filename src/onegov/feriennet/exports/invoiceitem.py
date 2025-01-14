@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 from onegov.activity import (
     Invoice, InvoiceItem, Activity, Occasion, Attendee)
 from onegov.core.security import Secret
@@ -29,25 +31,25 @@ class InvoiceItemExport(FeriennetExport):
     def run(
         self,
         form: PeriodExportForm,  # type:ignore[override]
-        session: 'Session'
-    ) -> 'Iterator[Iterator[tuple[str, Any]]]':
+        session: Session
+    ) -> Iterator[Iterator[tuple[str, Any]]]:
 
         assert form.selected_period is not None
         return self.rows(session, form.selected_period)
 
     def rows(
         self,
-        session: 'Session',
-        period: 'Period'
-    ) -> 'Iterator[Iterator[tuple[str, Any]]]':
+        session: Session,
+        period: Period
+    ) -> Iterator[Iterator[tuple[str, Any]]]:
         for item, tags, attendee in self.query(session, period):
             yield ((k, v) for k, v in self.fields(item, tags, attendee))
 
     def query(
         self,
-        session: 'Session',
-        period: 'Period'
-    ) -> 'Query[tuple[InvoiceItem, list[str] | None, Attendee]]':
+        session: Session,
+        period: Period
+    ) -> Query[tuple[InvoiceItem, list[str] | None, Attendee]]:
 
         # There might be activities with same title from other periods
         # resulting in double entries of invoice items
@@ -88,7 +90,7 @@ class InvoiceItemExport(FeriennetExport):
         item: InvoiceItem,
         tags: list[str] | None,
         attendee: Attendee
-    ) -> 'Iterator[tuple[str, Any]]':
+    ) -> Iterator[tuple[str, Any]]:
 
         yield from self.invoice_item_fields(item)
         yield from self.user_fields(item.invoice.user)

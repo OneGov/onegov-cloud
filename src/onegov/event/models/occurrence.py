@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 from icalendar import Calendar as vCalendar
 from icalendar import Event as vEvent
 from onegov.core.orm import Base
@@ -26,20 +28,20 @@ class Occurrence(Base, OccurrenceMixin, TimestampMixin):
     __tablename__ = 'event_occurrences'
 
     #: Internal number of the occurence
-    id: 'Column[uuid.UUID]' = Column(
+    id: Column[uuid.UUID] = Column(
         UUID,  # type: ignore[arg-type]
         primary_key=True,
         default=uuid4
     )
 
     #: Event this occurrence belongs to
-    event_id: 'Column[uuid.UUID]' = Column(
+    event_id: Column[uuid.UUID] = Column(
         UUID,  # type: ignore[arg-type]
         ForeignKey('events.id'),
         nullable=False
     )
 
-    event: 'relationship[Event]' = relationship(
+    event: relationship[Event] = relationship(
         'Event',
         back_populates='occurrences',
     )

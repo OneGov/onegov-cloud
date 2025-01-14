@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 from more.content_security import UNSAFE_EVAL
 from more.content_security import UNSAFE_INLINE
 from onegov.core import Framework, utils
@@ -138,7 +140,7 @@ def get_i18n_default_locale() -> str:
 
 
 @GazetteApp.setting(section='content_security_policy', name='default')
-def get_content_security_policy() -> 'ContentSecurityPolicy':
+def get_content_security_policy() -> ContentSecurityPolicy:
     policy = default_content_security_policy()
     policy.script_src.remove(UNSAFE_EVAL)
     policy.script_src.remove(UNSAFE_INLINE)
@@ -169,7 +171,7 @@ def get_webasset_output() -> str:
     'frameworks',
     filters={'css': ['datauri', 'custom-rcssmin']}
 )
-def get_frameworks_asset() -> 'Iterator[str]':
+def get_frameworks_asset() -> Iterator[str]:
     # common assets unlikely to change
     yield 'modernizr.js'
 
@@ -191,7 +193,7 @@ def get_frameworks_asset() -> 'Iterator[str]':
 
 
 @GazetteApp.webasset('common')
-def get_common_asset() -> 'Iterator[str]':
+def get_common_asset() -> Iterator[str]:
     # custom code
     yield 'form_dependencies.js'
     yield 'datetimepicker.js'

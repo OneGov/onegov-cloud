@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 from onegov.core.orm import Base
 from onegov.core.orm.mixins import ContentMixin
 from onegov.core.orm.mixins import TimestampMixin
@@ -37,7 +39,7 @@ class RoleMapping(Base, ContentMixin, TimestampMixin):
     #: subclasses of this class. See
     #: `<https://docs.sqlalchemy.org/en/improve_toc/\
     #: orm/extensions/declarative/inheritance.html>`_.
-    type: 'Column[str]' = Column(
+    type: Column[str] = Column(
         Text,
         nullable=False,
         default=lambda: 'generic'
@@ -49,7 +51,7 @@ class RoleMapping(Base, ContentMixin, TimestampMixin):
     }
 
     #: the id of the role mapping
-    id: 'Column[UUIDType]' = Column(
+    id: Column[UUIDType] = Column(
         UUID,  # type:ignore[arg-type]
         nullable=False,
         primary_key=True,
@@ -57,36 +59,36 @@ class RoleMapping(Base, ContentMixin, TimestampMixin):
     )
 
     #: the role is relevant for security in onegov.core
-    role: 'Column[str]' = Column(Text, nullable=False)
+    role: Column[str] = Column(Text, nullable=False)
 
     #: the id of the group this mapping belongs to
-    group_id: 'Column[UUIDType | None]' = Column(
+    group_id: Column[UUIDType | None] = Column(
         UUID,  # type:ignore[arg-type]
         ForeignKey(UserGroup.id),
         nullable=True
     )
 
     #: the group this mapping belongs to
-    group: 'relationship[UserGroup | None]' = relationship(
+    group: relationship[UserGroup | None] = relationship(
         UserGroup,
         back_populates='role_mappings'
     )
 
     #: the username of the user this mapping belongs to
-    username: 'Column[str | None]' = Column(
+    username: Column[str | None] = Column(
         Text,
         ForeignKey(User.username),
         nullable=True
     )
 
     #: the user this mapping belongs to
-    user: 'relationship[User | None]' = relationship(
+    user: relationship[User | None] = relationship(
         User,
         back_populates='role_mappings'
     )
 
     #: the content this mapping belongs to
-    content_id: 'Column[str]' = Column(Text, nullable=False)
+    content_id: Column[str] = Column(Text, nullable=False)
 
     #: the content type (table name) this mapping belongs to
-    content_type: 'Column[str]' = Column(Text, nullable=False)
+    content_type: Column[str] = Column(Text, nullable=False)

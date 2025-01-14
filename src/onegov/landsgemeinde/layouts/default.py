@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 from functools import cached_property
 from onegov.core.static import StaticFile
 from onegov.landsgemeinde import _
@@ -16,9 +18,9 @@ if TYPE_CHECKING:
 
 class DefaultLayout(BaseDefaultLayout):
 
-    request: 'LandsgemeindeRequest'
+    request: LandsgemeindeRequest
 
-    def __init__(self, model: Any, request: 'LandsgemeindeRequest') -> None:
+    def __init__(self, model: Any, request: LandsgemeindeRequest) -> None:
         super().__init__(model, request)
 
         self.custom_body_attributes['data-websocket-endpoint'] = ''
@@ -38,7 +40,7 @@ class DefaultLayout(BaseDefaultLayout):
 
     def agenda_item_title(
         self,
-        agenda_item: 'AgendaItem',
+        agenda_item: AgendaItem,
         short: bool = False
     ) -> str:
         if agenda_item.irrelevant:
@@ -56,7 +58,7 @@ class DefaultLayout(BaseDefaultLayout):
             agenda_item.title
         )
 
-    def votum_title(self, votum: 'Votum') -> str:
+    def votum_title(self, votum: Votum) -> str:
         return '{} {}'.format(
             self.request.translate(_('Votum')),
             votum.number

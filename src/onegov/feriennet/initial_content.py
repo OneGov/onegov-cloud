@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 import textwrap
 
 from onegov.core.utils import module_path
@@ -12,7 +14,7 @@ if TYPE_CHECKING:
 
 
 def create_new_organisation(
-    app: 'FeriennetApp',
+    app: FeriennetApp,
     name: str,
     create_files: bool = True,
     path: str | None = None,

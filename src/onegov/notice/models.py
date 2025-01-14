@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 from onegov.core.orm import Base
 from onegov.core.orm.mixins import ContentMixin
 from onegov.core.orm.mixins import TimestampMixin
@@ -62,7 +64,7 @@ class OfficialNotice(Base, ContentMixin, TimestampMixin):
     #: subclasses of this class. See
     #: `<https://docs.sqlalchemy.org/en/improve_toc/\
     #: orm/extensions/declarative/inheritance.html>`_.
-    type: 'Column[str]' = Column(
+    type: Column[str] = Column(
         Text,
         nullable=False,
         default=lambda: 'generic'
@@ -74,7 +76,7 @@ class OfficialNotice(Base, ContentMixin, TimestampMixin):
     }
 
     #: The internal ID of the notice.
-    id: 'Column[uuid.UUID]' = Column(
+    id: Column[uuid.UUID] = Column(
         UUID,  # type:ignore[arg-type]
         primary_key=True,
         default=uuid4
@@ -82,10 +84,10 @@ class OfficialNotice(Base, ContentMixin, TimestampMixin):
 
     #: A nice ID usable for the url, readable by humans.
     # FIXME: Should this be nullable=True?
-    name: 'Column[str | None]' = Column(Text)
+    name: Column[str | None] = Column(Text)
 
     #: The state of the notice.
-    state: 'Column[NoticeState]' = Column(
+    state: Column[NoticeState] = Column(
         Enum(  # type:ignore[arg-type]
             'drafted',
             'submitted',
@@ -100,25 +102,25 @@ class OfficialNotice(Base, ContentMixin, TimestampMixin):
     )
 
     #: The title of the notice.
-    title: 'Column[str]' = Column(Text, nullable=False)
+    title: Column[str] = Column(Text, nullable=False)
 
     #: The text of the notice.
-    text: 'Column[Markup | None]' = Column(MarkupText, nullable=True)
+    text: Column[Markup | None] = Column(MarkupText, nullable=True)
 
     #: The author of the notice.
-    author_name: 'Column[str | None]' = Column(Text, nullable=True)
+    author_name: Column[str | None] = Column(Text, nullable=True)
 
     #: The place (part of the signature).
-    author_place: 'Column[str | None]' = Column(Text, nullable=True)
+    author_place: Column[str | None] = Column(Text, nullable=True)
 
     #: The date (part of the signature)
-    author_date: 'Column[datetime | None]' = Column(UTCDateTime, nullable=True)
+    author_date: Column[datetime | None] = Column(UTCDateTime, nullable=True)
 
     #: A note to the notice.
-    note: 'Column[str | None]' = Column(Text, nullable=True)
+    note: Column[str | None] = Column(Text, nullable=True)
 
     #: The issues this notice appears in.
-    _issues: 'Column[dict[str, str | None]]' = Column(  # type:ignore
+    _issues: Column[dict[str, str | None]] = Column(  # type:ignore
         MutableDict.as_mutable(HSTORE), name='issues', nullable=True
     )
 
@@ -132,17 +134,17 @@ class OfficialNotice(Base, ContentMixin, TimestampMixin):
     #        to just always pass in a dict. Once everything is fully type
     #        checked we can simplify the implementation.
     @issues.setter
-    def issues(self, value: 'dict[str, str | None] | Iterable[str]') -> None:
+    def issues(self, value: dict[str, str | None] | Iterable[str]) -> None:
         if isinstance(value, dict):
             self._issues = value
         else:
             self._issues = dict.fromkeys(value, None)
 
     #: The date of the first issue of the notice.
-    first_issue: 'Column[datetime | None]' = Column(UTCDateTime, nullable=True)
+    first_issue: Column[datetime | None] = Column(UTCDateTime, nullable=True)
 
     #: The expiry date of the notice
-    expiry_date: 'Column[datetime | None]' = Column(UTCDateTime, nullable=True)
+    expiry_date: Column[datetime | None] = Column(UTCDateTime, nullable=True)
 
     @property
     def expired(self) -> bool:
@@ -153,7 +155,7 @@ class OfficialNotice(Base, ContentMixin, TimestampMixin):
         return False
 
     #: The categories of this notice.
-    _categories: 'Column[dict[str, str | None]]' = Column(  # type:ignore
+    _categories: Column[dict[str, str | None]] = Column(  # type:ignore
         MutableDict.as_mutable(HSTORE), name='categories', nullable=True
     )
 
@@ -165,7 +167,7 @@ class OfficialNotice(Base, ContentMixin, TimestampMixin):
     @categories.setter
     def categories(
         self,
-        value: 'dict[str, str | None] | Iterable[str]'
+        value: dict[str, str | None] | Iterable[str]
     ) -> None:
         if isinstance(value, dict):
             self._categories = value
@@ -173,13 +175,13 @@ class OfficialNotice(Base, ContentMixin, TimestampMixin):
             self._categories = dict.fromkeys(value, None)
 
     #: The category of the notice.
-    category: 'Column[str | None]' = Column(Text, nullable=True)
+    category: Column[str | None] = Column(Text, nullable=True)
 
     #: The organization this notice belongs to.
-    organization: 'Column[str | None]' = Column(Text, nullable=True)
+    organization: Column[str | None] = Column(Text, nullable=True)
 
     #: The organizations of this notice.
-    _organizations: 'Column[dict[str, str | None] | None]'
+    _organizations: Column[dict[str, str | None] | None]
     _organizations = Column(  # type:ignore[call-overload]
         MutableDict.as_mutable(HSTORE), name='organizations', nullable=True
     )
@@ -192,7 +194,7 @@ class OfficialNotice(Base, ContentMixin, TimestampMixin):
     @organizations.setter
     def organizations(
         self,
-        value: 'dict[str, str | None] | Iterable[str]'
+        value: dict[str, str | None] | Iterable[str]
     ) -> None:
         if isinstance(value, dict):
             self._organizations = value
@@ -200,27 +202,27 @@ class OfficialNotice(Base, ContentMixin, TimestampMixin):
             self._organizations = dict.fromkeys(value, None)
 
     #: The user that owns this notice.
-    user_id: 'Column[uuid.UUID | None]' = Column(
+    user_id: Column[uuid.UUID | None] = Column(
         UUID,  # type:ignore[arg-type]
         ForeignKey(User.id),
         nullable=True
     )
-    user: 'relationship[User | None]' = relationship(
+    user: relationship[User | None] = relationship(
         User, backref=backref('official_notices', lazy='select')
     )
 
     #: The group that owns this notice.
-    group_id: 'Column[uuid.UUID | None]' = Column(
+    group_id: Column[uuid.UUID | None] = Column(
         UUID,  # type:ignore[arg-type]
         ForeignKey(UserGroup.id),
         nullable=True
     )
-    group: 'relationship[UserGroup | None]' = relationship(
+    group: relationship[UserGroup | None] = relationship(
         UserGroup, backref=backref('official_notices', lazy='select')
     )
 
     #: The source from where this notice has been imported.
-    source: 'Column[str | None]' = Column(Text, nullable=True)
+    source: Column[str | None] = Column(Text, nullable=True)
 
     def submit(self) -> None:
         """ Submit a drafted notice. """

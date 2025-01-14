@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 import re
 import sedate
 
@@ -98,8 +100,8 @@ class FeriennetExport(Export):
 
     def activity_fields(
         self,
-        activity: 'Activity'
-    ) -> 'Iterator[tuple[str, Any]]':
+        activity: Activity
+    ) -> Iterator[tuple[str, Any]]:
 
         yield _('Activity Title'), activity.title
         yield _('Activity Lead'), activity.lead
@@ -111,8 +113,8 @@ class FeriennetExport(Export):
 
     def booking_fields(
         self,
-        booking: 'Booking'
-    ) -> 'Iterator[tuple[str, Any]]':
+        booking: Booking
+    ) -> Iterator[tuple[str, Any]]:
 
         yield _('Booking State'), BOOKING_STATES[booking.state]
         yield _('Booking Priority'), booking.priority
@@ -123,8 +125,8 @@ class FeriennetExport(Export):
 
     def attendee_fields(
         self,
-        attendee: 'Attendee'
-    ) -> 'Iterator[tuple[str, Any]]':
+        attendee: Attendee
+    ) -> Iterator[tuple[str, Any]]:
 
         first_name, last_name = decode_name(attendee.name)
 
@@ -137,8 +139,8 @@ class FeriennetExport(Export):
 
     def occasion_fields(
         self,
-        occasion: 'Occasion'
-    ) -> 'Iterator[tuple[str, Any]]':
+        occasion: Occasion
+    ) -> Iterator[tuple[str, Any]]:
 
         dates = [
             (d.localized_start, d.localized_end)
@@ -159,8 +161,8 @@ class FeriennetExport(Export):
 
     def occasion_need_fields(
         self,
-        need: 'OccasionNeed'
-    ) -> 'Iterator[tuple[str, Any]]':
+        need: OccasionNeed
+    ) -> Iterator[tuple[str, Any]]:
 
         yield _('Need Number'), '{} - {}'.format(
             need.number.lower, need.number.upper - 1)
@@ -169,12 +171,12 @@ class FeriennetExport(Export):
 
     def activity_tags(
         self,
-        tags: 'Iterable[str] | None'
-    ) -> 'Iterator[tuple[str, Any]]':
+        tags: Iterable[str] | None
+    ) -> Iterator[tuple[str, Any]]:
 
         yield _('Activity Tags'), '\n'.join(sorted(tags or []))
 
-    def user_fields(self, user: 'User') -> 'Iterator[tuple[str, Any]]':
+    def user_fields(self, user: User) -> Iterator[tuple[str, Any]]:
         user_data = user.data or {}
         salutation = user_data.get('salutation')
         first_name, last_name = decode_name(user.realname)
@@ -209,8 +211,8 @@ class FeriennetExport(Export):
 
     def invoice_item_fields(
         self,
-        item: 'InvoiceItem'
-    ) -> 'Iterator[tuple[str, Any]]':
+        item: InvoiceItem
+    ) -> Iterator[tuple[str, Any]]:
 
         yield _('Invoice Item Group'), item.group
         yield _('Invoice Item Text'), item.text
@@ -228,8 +230,8 @@ class FeriennetExport(Export):
 
     def invoice_attendee_fields(
         self,
-        attendee: 'Attendee'
-    ) -> 'Iterator[tuple[str, Any]]':
+        attendee: Attendee
+    ) -> Iterator[tuple[str, Any]]:
 
         yield _('Attendee Address'), attendee.address if attendee else ''
         yield _('Attendee Zipcode'), attendee.zip_code if attendee else ''
@@ -239,8 +241,8 @@ class FeriennetExport(Export):
 
     def organiser_fields(
         self,
-        organiser: 'User'
-    ) -> 'Iterator[tuple[str, Any]]':
+        organiser: User
+    ) -> Iterator[tuple[str, Any]]:
 
         user_data = organiser.data or {}
         first_name, last_name = decode_name(organiser.realname)
@@ -262,8 +264,8 @@ class FeriennetExport(Export):
 
     def volunteer_fields(
         self,
-        volunteer: 'Volunteer'
-    ) -> 'Iterator[tuple[str, Any]]':
+        volunteer: Volunteer
+    ) -> Iterator[tuple[str, Any]]:
 
         need = volunteer.need
         occasion = need.occasion

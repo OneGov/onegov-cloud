@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 from onegov.core.security import Public, Personal
 from onegov.core.security.roles import (
     get_roles_setting as get_roles_setting_base)
@@ -31,7 +33,7 @@ The standard permission model is used and mapped as followed:
 
 
 @TranslatorDirectoryApp.setting_section(section='roles')
-def get_roles_setting() -> dict[str, set[type['Intent']]]:
+def get_roles_setting() -> dict[str, set[type[Intent]]]:
     result = get_roles_setting_base()
     result['translator'] = {Public}
     return result
@@ -40,7 +42,7 @@ def get_roles_setting() -> dict[str, set[type['Intent']]]:
 @TranslatorDirectoryApp.permission_rule(model=object, permission=object)
 def has_permission_logged_in(
     app: TranslatorDirectoryApp,
-    identity: 'Identity',
+    identity: Identity,
     model: object,
     permission: object
 ) -> bool:
@@ -58,7 +60,7 @@ def has_permission_logged_in(
 @TranslatorDirectoryApp.permission_rule(model=Auth, permission=object)
 def restrict_auth_access(
     app: TranslatorDirectoryApp,
-    identity: 'Identity',
+    identity: Identity,
     model: Auth,
     permission: object
 ) -> bool:
@@ -71,7 +73,7 @@ def restrict_auth_access(
 @TranslatorDirectoryApp.permission_rule(model=Translator, permission=object)
 def restrict_translator_access(
     app: TranslatorDirectoryApp,
-    identity: 'Identity',
+    identity: Identity,
     model: Translator,
     permission: object
 ) -> bool:
@@ -92,7 +94,7 @@ def restrict_translator_access(
     model=Translator, permission=object, identity=None)
 def restrict_translator_access_anon(
     app: TranslatorDirectoryApp,
-    identity: 'NoIdentity',
+    identity: NoIdentity,
     model: Translator,
     permission: object
 ) -> bool:
@@ -106,7 +108,7 @@ def restrict_translator_access_anon(
     model=GeneralFileCollection, permission=object)
 def restrict_general_file_coll_access(
     app: TranslatorDirectoryApp,
-    identity: 'Identity',
+    identity: Identity,
     model: GeneralFileCollection,
     permission: object
 ) -> bool:
@@ -117,7 +119,7 @@ def restrict_general_file_coll_access(
     model=GeneralFileCollection, permission=object, identity=None)
 def restrict_general_file_coll_access_anon(
     app: TranslatorDirectoryApp,
-    identity: 'NoIdentity',
+    identity: NoIdentity,
     model: GeneralFileCollection,
     permission: object
 ) -> bool:
@@ -128,7 +130,7 @@ def restrict_general_file_coll_access_anon(
     model=File, permission=object)
 def restrict_file_access(
     app: TranslatorDirectoryApp,
-    identity: 'Identity',
+    identity: Identity,
     model: File,
     permission: object
 ) -> bool:
@@ -139,7 +141,7 @@ def restrict_file_access(
     model=File, permission=object, identity=None)
 def restrict_file_access_anon(
     app: TranslatorDirectoryApp,
-    identity: 'NoIdentity',
+    identity: NoIdentity,
     model: File,
     permission: object
 ) -> bool:
@@ -150,7 +152,7 @@ def restrict_file_access_anon(
     model=GeneralFile, permission=object)
 def restrict_general_file_access(
     app: TranslatorDirectoryApp,
-    identity: 'Identity',
+    identity: Identity,
     model: GeneralFile,
     permission: object
 ) -> bool:
@@ -165,7 +167,7 @@ def restrict_general_file_access(
     model=GeneralFile, permission=object, identity=None)
 def restrict_general_file_access_anon(
     app: TranslatorDirectoryApp,
-    identity: 'NoIdentity',
+    identity: NoIdentity,
     model: GeneralFile,
     permission: object
 ) -> bool:
@@ -179,7 +181,7 @@ def restrict_general_file_access_anon(
     model=TranslatorDocumentCollection, permission=object)
 def restrict_translator_docs_coll_access(
     app: TranslatorDirectoryApp,
-    identity: 'Identity',
+    identity: Identity,
     model: TranslatorDocumentCollection,
     permission: object
 ) -> bool:
@@ -190,7 +192,7 @@ def restrict_translator_docs_coll_access(
     model=TranslatorDocumentCollection, permission=object, identity=None)
 def disable_translator_docs_coll_access_anon(
     app: TranslatorDirectoryApp,
-    identity: 'NoIdentity',
+    identity: NoIdentity,
     model: TranslatorDocumentCollection,
     permission: object
 ) -> bool:
@@ -201,7 +203,7 @@ def disable_translator_docs_coll_access_anon(
     model=TicketCollection, permission=object)
 def restricts_ticket(
     app: TranslatorDirectoryApp,
-    identity: 'Identity',
+    identity: Identity,
     model: TicketCollection,
     permission: object
 ) -> bool:
@@ -212,7 +214,7 @@ def restricts_ticket(
     model=TicketCollection, permission=object, identity=None)
 def restricts_ticket_anon(
     app: TranslatorDirectoryApp,
-    identity: 'NoIdentity',
+    identity: NoIdentity,
     model: TicketCollection,
     permission: object
 ) -> bool:
@@ -222,7 +224,7 @@ def restricts_ticket_anon(
 @TranslatorDirectoryApp.permission_rule(model=Ticket, permission=object)
 def restrict_ticket(
     app: TranslatorDirectoryApp,
-    identity: 'Identity',
+    identity: Identity,
     model: Ticket,
     permission: object
 ) -> bool:
@@ -233,7 +235,7 @@ def restrict_ticket(
     model=Ticket, permission=object, identity=None)
 def restrict_ticket_anon(
     app: TranslatorDirectoryApp,
-    identity: 'NoIdentity',
+    identity: NoIdentity,
     model: Ticket,
     permission: object
 ) -> bool:
@@ -244,7 +246,7 @@ def restrict_ticket_anon(
     model=AccreditationTicket, permission=object, identity=None)
 def restrict_accreditation_ticket_anon(
     app: TranslatorDirectoryApp,
-    identity: 'NoIdentity',
+    identity: NoIdentity,
     model: AccreditationTicket,
     permission: object
 ) -> bool:
@@ -255,7 +257,7 @@ def restrict_accreditation_ticket_anon(
     model=AccreditationTicket, permission=object)
 def restrict_accreditation_ticket(
     app: TranslatorDirectoryApp,
-    identity: 'Identity',
+    identity: Identity,
     model: AccreditationTicket,
     permission: object
 ) -> bool:
@@ -269,7 +271,7 @@ def restrict_accreditation_ticket(
     model=TranslatorMutationTicket, permission=object)
 def restrict_translator_mutation_ticket(
     app: TranslatorDirectoryApp,
-    identity: 'Identity',
+    identity: Identity,
     model: TranslatorMutationTicket,
     permission: object
 ) -> bool:

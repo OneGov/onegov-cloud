@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 from onegov.election_day import _
 from onegov.election_day.formats.imports.common import FileImportError
 from onegov.election_day.formats.imports.common import load_xml
@@ -17,11 +19,11 @@ if TYPE_CHECKING:
 
 
 def import_ech(
-    principal: 'Canton | Municipality',
+    principal: Canton | Municipality,
     file: IO[bytes],
-    session: 'Session',
+    session: Session,
     default_locale: str
-) -> 'ECHImportResultType':
+) -> ECHImportResultType:
     """ Tries to import the given eCH XML file.
 
     This function is typically called automatically every few minutes during
@@ -44,7 +46,7 @@ def import_ech(
     updated = set()
     deleted = set()
 
-    def unwrap(result: 'ECHImportResultType') -> None:
+    def unwrap(result: ECHImportResultType) -> None:
         errors.extend(result[0])
         updated.update(result[1])
         deleted.update(result[2])

@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 from base64 import b64decode
 from io import BytesIO
 from io import StringIO
@@ -41,7 +43,7 @@ class D3Renderer:
 
     """
 
-    def __init__(self, app: 'ElectionDayApp'):
+    def __init__(self, app: ElectionDayApp):
         self.app = app
         self.renderer = app.configuration.get('d3_renderer', '').rstrip('/')
         self.supported_charts = {
@@ -78,7 +80,7 @@ class D3Renderer:
                 with open(path) as f:
                     self.scripts[chart].append(jsmin(f.read()))
 
-    def translate(self, text: 'TranslationString', locale: str | None) -> str:
+    def translate(self, text: TranslationString, locale: str | None) -> str:
         """ Translates the given string. """
 
         if locale is not None:
@@ -95,7 +97,7 @@ class D3Renderer:
         self,
         chart: str,
         fmt: Literal['pdf'],
-        data: 'JSON_ro',
+        data: JSON_ro,
         width: int = 1000,
         params: dict[str, Any] | None = None
     ) -> IO[bytes]: ...
@@ -105,7 +107,7 @@ class D3Renderer:
         self,
         chart: str,
         fmt: Literal['svg'],
-        data: 'JSON_ro',
+        data: JSON_ro,
         width: int = 1000,
         params: dict[str, Any] | None = None
     ) -> IO[str]: ...
@@ -115,7 +117,7 @@ class D3Renderer:
         self,
         chart: str,
         fmt: Literal['pdf', 'svg'],
-        data: 'JSON_ro',
+        data: JSON_ro,
         width: int = 1000,
         params: dict[str, Any] | None = None
     ) -> IO[str] | IO[bytes]: ...
@@ -124,7 +126,7 @@ class D3Renderer:
         self,
         chart: str,
         fmt: Literal['pdf', 'svg'],
-        data: 'JSON_ro',
+        data: JSON_ro,
         width: int = 1000,
         params: dict[str, Any] | None = None
     ) -> IO[str] | IO[bytes]:
@@ -165,7 +167,7 @@ class D3Renderer:
         self,
         map: str,
         fmt: Literal['pdf'],
-        data: 'JSON_ro',
+        data: JSON_ro,
         year: int,
         width: int = 1000,
         params: dict[str, Any] | None = None
@@ -176,7 +178,7 @@ class D3Renderer:
         self,
         map: str,
         fmt: Literal['svg'],
-        data: 'JSON_ro',
+        data: JSON_ro,
         year: int,
         width: int = 1000,
         params: dict[str, Any] | None = None
@@ -187,7 +189,7 @@ class D3Renderer:
         self,
         map: str,
         fmt: Literal['svg', 'pdf'],
-        data: 'JSON_ro',
+        data: JSON_ro,
         year: int,
         width: int = 1000,
         params: dict[str, Any] | None = None
@@ -197,7 +199,7 @@ class D3Renderer:
         self,
         map: str,
         fmt: Literal['pdf', 'svg'],
-        data: 'JSON_ro',
+        data: JSON_ro,
         year: int,
         width: int = 1000,
         params: dict[str, Any] | None = None

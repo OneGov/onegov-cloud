@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 from onegov.core.crypto import random_token
 from onegov.core.orm import Base
 from onegov.core.orm.mixins import TimestampMixin
@@ -43,7 +45,7 @@ class IssueName(NamedTuple):
         return f'{self.year}-{self.number}'
 
     @classmethod
-    def from_string(cls, value: str) -> 'Self':
+    def from_string(cls, value: str) -> Self:
         year, number = value.split('-', maxsplit=1)
         return cls(int(year), int(number))
 
@@ -58,21 +60,21 @@ class Issue(Base, TimestampMixin, AssociatedFiles):
     __tablename__ = 'gazette_issues'
 
     #: the id of the db record (only relevant internally)
-    id: 'Column[int]' = Column(Integer, primary_key=True)
+    id: Column[int] = Column(Integer, primary_key=True)
 
     #: The name of the issue.
-    name: 'Column[str]' = Column(Text, nullable=False)
+    name: Column[str] = Column(Text, nullable=False)
 
     #: The number of the issue.
-    number: 'Column[int | None]' = Column(Integer, nullable=True)
+    number: Column[int | None] = Column(Integer, nullable=True)
 
     # The issue date.
     # FIXME: This clearly is meant to not be nullable, the observer
     #        only works if all dates are set
-    date: 'Column[date_t]' = Column(Date, nullable=True)  # type:ignore
+    date: Column[date_t] = Column(Date, nullable=True)  # type:ignore
 
     # The deadline of this issue.
-    deadline: 'Column[datetime | None]' = Column(UTCDateTime, nullable=True)
+    deadline: Column[datetime | None] = Column(UTCDateTime, nullable=True)
 
     @property
     def pdf(self) -> File | None:
@@ -92,8 +94,8 @@ class Issue(Base, TimestampMixin, AssociatedFiles):
 
     def notices(
         self,
-        state: 'NoticeState | None' = None
-    ) -> 'Query[GazetteNotice]':
+        state: NoticeState | None = None
+    ) -> Query[GazetteNotice]:
         """ Returns a query to get all notices related to this issue. """
 
         from onegov.gazette.models.notice import GazetteNotice  # circular
@@ -135,7 +137,7 @@ class Issue(Base, TimestampMixin, AssociatedFiles):
 
     def publication_numbers(
         self,
-        state: 'NoticeState | None' = None
+        state: NoticeState | None = None
     ) -> dict[int, str | None]:
         """ Returns a dictionary containing all publication numbers (by notice)
         of this issue.
@@ -158,7 +160,7 @@ class Issue(Base, TimestampMixin, AssociatedFiles):
         return session.query(self.notices().exists()).scalar()
 
     @observes('date')
-    def date_observer(self, date_: 'date_t') -> None:
+    def date_observer(self, date_: date_t) -> None:
         """ Changes the issue date of the notices when updating the date
         of the issue.
 
@@ -183,7 +185,7 @@ class Issue(Base, TimestampMixin, AssociatedFiles):
                 if (date := issues.get(issue, None))
             )
 
-    def publish(self, request: 'GazetteRequest') -> None:
+    def publish(self, request: GazetteRequest) -> None:
         """ Publishes the issue.
 
         This ensures that every accepted notice of this issue is published. It

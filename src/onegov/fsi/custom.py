@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 from onegov.core.elements import Link
 from onegov.core.utils import Bunch
 from onegov.form.collection import SurveyCollection
@@ -22,7 +24,7 @@ if TYPE_CHECKING:
     from onegov.town6.layout import NavigationEntry
 
 
-def get_base_tools(request: 'FsiRequest') -> 'Iterator[Link | LinkGroup]':
+def get_base_tools(request: FsiRequest) -> Iterator[Link | LinkGroup]:
 
     if request.is_logged_in:
 
@@ -154,12 +156,12 @@ def get_base_tools(request: 'FsiRequest') -> 'Iterator[Link | LinkGroup]':
                 ), attrs={'class': 'register'})
 
 
-def get_global_tools(request: 'FsiRequest') -> 'Iterator[Link | LinkGroup]':
+def get_global_tools(request: FsiRequest) -> Iterator[Link | LinkGroup]:
     yield from get_base_tools(request)
 
 
 @FsiApp.template_variables()
-def get_template_variables(request: 'FsiRequest') -> dict[str, Any]:
+def get_template_variables(request: FsiRequest) -> dict[str, Any]:
     return {
         'global_tools': tuple(get_global_tools(request)),
         'top_navigation': tuple(get_top_navigation(request)),
@@ -167,7 +169,7 @@ def get_template_variables(request: 'FsiRequest') -> dict[str, Any]:
     }
 
 
-def get_top_navigation(request: 'FsiRequest') -> 'Iterator[NavigationEntry]':
+def get_top_navigation(request: FsiRequest) -> Iterator[NavigationEntry]:
 
     yield (  # type:ignore[misc]
         Bunch(id=-3, access='public', published=True),

@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 import click
 import hashlib
 import pycurl
@@ -52,8 +54,8 @@ cli = command_group()
 @cli.command('clear')
 @pass_group_context
 def clear(
-    group_context: 'GroupContext'
-) -> 'Callable[[CoreRequest, Framework], None]':
+    group_context: GroupContext
+) -> Callable[[CoreRequest, Framework], None]:
     """ Deletes all events.
 
     .. code-block:: bash
@@ -62,7 +64,7 @@ def clear(
 
     """
 
-    def _clear(request: 'CoreRequest', app: 'Framework') -> None:
+    def _clear(request: CoreRequest, app: Framework) -> None:
         if not click.confirm('Do you really want to remove all events?'):
             abort('Deletion process aborted')
 
@@ -165,11 +167,11 @@ def get_event_dates(url: str, timezone: str) -> tuple[datetime, datetime]:
 @click.option('--tagmap', 'tagmap_file', type=click.File())
 @click.option('--clear/-no-clear', default=False)
 def import_json(
-    group_context: 'GroupContext',
+    group_context: GroupContext,
     url: str,
-    tagmap_file: 'TextIOWrapper | None',
+    tagmap_file: TextIOWrapper | None,
     clear: bool
-) -> 'Callable[[CoreRequest, Framework], None]':
+) -> Callable[[CoreRequest, Framework], None]:
     r""" Fetches the events from a seantis.dir.events instance.
 
     This command is intended for migration and to be removed in the future.
@@ -186,7 +188,7 @@ def import_json(
     else:
         tagmap = None
 
-    def _import_json(request: 'CoreRequest', app: 'Framework') -> None:
+    def _import_json(request: CoreRequest, app: Framework) -> None:
         unknown_tags = set()
 
         response = get(url, timeout=60)
@@ -328,9 +330,9 @@ def import_json(
 
 
 def filter_cb(
-    ctx: 'click.Context',
-    param: 'click.Parameter',
-    value: 'tuple[str, list[str]] | None'
+    ctx: click.Context,
+    param: click.Parameter,
+    value: tuple[str, list[str]] | None
 ) -> dict[str, list[str]] | None:
     if not value:
         return {}
@@ -349,14 +351,14 @@ def filter_cb(
               type=(str, StringListParamType(' ')), callback=filter_cb,
               help='filter in the form: -f fil-name fil-val-1,fil-val-2')
 def import_ical(
-    group_context: 'GroupContext',
-    ical: 'TextIOWrapper',
+    group_context: GroupContext,
+    ical: TextIOWrapper,
     future_events_only: bool = False,
-    event_image: 'FileIO | None' = None,
-    categories: 'Sequence[str]' = (),
-    keyword_filters: 'dict[str, list[str]] | None' = None
+    event_image: FileIO | None = None,
+    categories: Sequence[str] = (),
+    keyword_filters: dict[str, list[str]] | None = None
 
-) -> 'Callable[[CoreRequest, Framework], None]':
+) -> Callable[[CoreRequest, Framework], None]:
     r""" Imports events from an iCalendar file.
 
     Examples:
@@ -389,7 +391,7 @@ def import_ical(
     """
     cat = list(categories)
 
-    def _import_ical(request: 'CoreRequest', app: 'Framework') -> None:
+    def _import_ical(request: CoreRequest, app: Framework) -> None:
         collection = EventCollection(app.session())
         added, updated, purged = collection.from_ical(
             ical.read(), future_events_only, event_image,
@@ -410,11 +412,11 @@ def import_ical(
 @click.option('--tagmap', 'tagmap_file', type=click.File())
 @click.option('--clear', is_flag=True, default=False)
 def import_guidle(
-    group_context: 'GroupContext',
+    group_context: GroupContext,
     url: str,
-    tagmap_file: 'TextIOWrapper | None',
+    tagmap_file: TextIOWrapper | None,
     clear: bool
-) -> 'Callable[[CoreRequest, Framework], None]':
+) -> Callable[[CoreRequest, Framework], None]:
     """ Fetches the events from guidle.
 
     Example:
@@ -429,7 +431,7 @@ def import_guidle(
     else:
         tagmap = None
 
-    def _import_guidle(request: 'CoreRequest', app: 'Framework') -> None:
+    def _import_guidle(request: CoreRequest, app: Framework) -> None:
         try:
             response = get(url, timeout=300)
             response.raise_for_status()
@@ -464,7 +466,7 @@ def import_guidle(
 
             def items(
                 unknown_tags: set[str]
-            ) -> 'Iterator[EventImportItem | str]':
+            ) -> Iterator[EventImportItem | str]:
 
                 for offer in GuidleExportData(root).offers():
                     source = f'{prefix}-{offer.uid}.0'

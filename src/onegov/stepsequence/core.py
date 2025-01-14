@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 from typing import overload, TypeVar, TYPE_CHECKING
 if TYPE_CHECKING:
     from collections.abc import Callable
@@ -49,13 +51,13 @@ class Step:
         self.cls_after = cls_after
         self.cls_before = cls_before
 
-    def __lt__(self, other: 'Step') -> bool:
+    def __lt__(self, other: Step) -> bool:
         return (
             other.cls_before == self.origin
             and other.position - 1 == self.position
         )
 
-    def __gt__(self, other: 'Step') -> bool:
+    def __gt__(self, other: Step) -> bool:
         return (
             self.cls_before == other.origin
             and self.position - 1 == other.position
@@ -199,7 +201,7 @@ class StepSequenceRegistry:
         title: str | None = None,
         cls_before: str | None = None,
         cls_after: str | None = None
-    ) -> 'Callable[[type[_T]], type[_T]]':
+    ) -> Callable[[type[_T]], type[_T]]:
 
         """ A decorator to register part of a full step sequence.
 

@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 from functools import cached_property
 from datetime import datetime
 from dateutil.relativedelta import relativedelta
@@ -31,17 +33,17 @@ if TYPE_CHECKING:
 
 class DefaultLayout(BaseLayout):
 
-    request: 'TranslatorAppRequest'
+    request: TranslatorAppRequest
 
     @staticmethod
-    def linkify(text: str | None) -> 'Markup':  # type:ignore[override]
+    def linkify(text: str | None) -> Markup:  # type:ignore[override]
         return linkify(text)
 
     @staticmethod
-    def format_languages(languages: 'Iterable[Language] | None') -> str:
+    def format_languages(languages: Iterable[Language] | None) -> str:
         return ', '.join(sorted(lang.name for lang in languages or ()))
 
-    def format_gender(self, gender: 'Gender') -> str:
+    def format_gender(self, gender: Gender) -> str:
         return self.request.translate(GENDERS[gender])
 
     @staticmethod
@@ -54,7 +56,7 @@ class DefaultLayout(BaseLayout):
         assert isinstance(val, bool) or val is None
         return self.request.translate(_('Yes') if val else _('No'))
 
-    def format_admission(self, val: 'AdmissionState') -> str:
+    def format_admission(self, val: AdmissionState) -> str:
         return self.request.translate(ADMISSIONS[val])
 
     def show(self, attribute_name: str) -> bool:
@@ -92,7 +94,7 @@ class DefaultLayout(BaseLayout):
 class TranslatorLayout(DefaultLayout):
 
     if TYPE_CHECKING:
-        model: 'Translator'
+        model: Translator
 
         def __init__(
             self,
@@ -383,7 +385,7 @@ class AddTranslatorLayout(TranslatorCollectionLayout):
 
 class TranslatorDocumentsLayout(DefaultLayout):
 
-    def __init__(self, model: Any, request: 'TranslatorAppRequest') -> None:
+    def __init__(self, model: Any, request: TranslatorAppRequest) -> None:
         super().__init__(model, request)
         request.include('upload')
         request.include('prompt')

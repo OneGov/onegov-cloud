@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 from onegov.core.request import CoreRequest
 
 

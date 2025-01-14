@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 from functools import cached_property
 from itertools import islice
 from onegov.agency.collections import ExtendedAgencyCollection
@@ -112,11 +114,11 @@ class NavTreeMixin:
         model: Any
         request: AgencyRequest
 
-    def nav_item_url(self, agency: 'ExtendedAgency') -> str:
+    def nav_item_url(self, agency: ExtendedAgency) -> str:
         return self.request.link(agency.proxy(), 'as-nav-item')
 
     @cached_property
-    def browsed_agency(self) -> 'ExtendedAgency | None':
+    def browsed_agency(self) -> ExtendedAgency | None:
         if (
             isinstance(self.model, ExtendedAgencyCollection)
             and self.model.browse
@@ -146,7 +148,7 @@ class AgencyCollectionLayout(
     NavTreeMixin
 ):
 
-    request: 'AgencyRequest'
+    request: AgencyRequest
 
     @cached_property
     def breadcrumbs(self) -> list[Link]:
@@ -191,7 +193,7 @@ class AgencyLayout(
     MoveAgencyMixin
 ):
 
-    request: 'AgencyRequest'
+    request: AgencyRequest
 
     def include_editor(self) -> None:
         self.request.include('redactor')
@@ -369,14 +371,14 @@ class AgencyLayout(
 class AgencyPathMixin:
 
     if TYPE_CHECKING:
-        request: 'AgencyRequest'
+        request: AgencyRequest
 
     def get_ancestors(
         self,
-        item: 'ExtendedAgency',
+        item: ExtendedAgency,
         with_item: bool = True,
-        levels: 'Collection[int] | None' = None
-    ) -> 'Iterator[Link]':
+        levels: Collection[int] | None = None
+    ) -> Iterator[Link]:
 
         for ix, ancestor in enumerate(item.ancestors, 1):
             if levels is None or ix in levels:
@@ -385,14 +387,14 @@ class AgencyPathMixin:
         if with_item:
             yield Link(item.title, self.request.link(item))
 
-    def parent_path(self, agency: 'ExtendedAgency') -> str:
+    def parent_path(self, agency: ExtendedAgency) -> str:
         levels = self.request.app.org.agency_display_levels
         return ' > '.join(
             ln.text or ln.title
             for ln in self.get_ancestors(agency, False, levels)
         )
 
-    def agency_path(self, agency: 'ExtendedAgency') -> str:
+    def agency_path(self, agency: ExtendedAgency) -> str:
         return ' > '.join(
             ln.text or ln.title
             for ln in self.get_ancestors(agency)
@@ -445,7 +447,7 @@ class ExtendedPersonCollectionLayout(
     AgencyPathMixin
 ):
 
-    request: 'AgencyRequest'
+    request: AgencyRequest
 
     @cached_property
     def editbar_links(self) -> list[Link | LinkGroup] | None:
@@ -476,7 +478,7 @@ class ExtendedPersonCollectionLayout(
 
 class ExtendedPersonLayout(PersonLayout, AgencyPathMixin):
 
-    request: 'AgencyRequest'
+    request: AgencyRequest
 
     @cached_property
     def collection(self) -> ExtendedPersonCollection:  # type:ignore
@@ -501,4 +503,4 @@ class ExtendedPersonLayout(PersonLayout, AgencyPathMixin):
 
 
 class AgencySearchLayout(DefaultLayout, AgencyPathMixin):
-    request: 'AgencyRequest'
+    request: AgencyRequest

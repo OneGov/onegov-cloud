@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 from functools import cached_property
 from onegov.form import Form, FormDefinition
 from onegov.form.fields import MultiCheckboxField
@@ -48,7 +50,7 @@ class FormRegistrationMessageForm(Form):
         return None
 
     @property
-    def receivers(self) -> dict[str, 'FormSubmission']:
+    def receivers(self) -> dict[str, FormSubmission]:
         registration_state = self.registration_state.data
         assert registration_state is not None
         return {
@@ -110,7 +112,7 @@ class FormRegistrationWindowForm(Form):
 
     def process_obj(
         self,
-        obj: 'FormRegistrationWindow'  # type:ignore[override]
+        obj: FormRegistrationWindow  # type:ignore[override]
     ) -> None:
 
         super().process_obj(obj)
@@ -121,7 +123,7 @@ class FormRegistrationWindowForm(Form):
 
     def populate_obj(  # type:ignore[override]
         self,
-        obj: 'FormRegistrationWindow',  # type:ignore[override]
+        obj: FormRegistrationWindow,  # type:ignore[override]
         *args: Any,
         **kwargs: Any,
     ) -> None:

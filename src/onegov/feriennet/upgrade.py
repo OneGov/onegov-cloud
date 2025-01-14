@@ -2,6 +2,8 @@
 upgraded on the server. See :class:`onegov.core.upgrade.upgrade_task`.
 
 """
+from __future__ import annotations
+
 import textwrap
 from typing import TYPE_CHECKING
 
@@ -186,7 +188,7 @@ def add_donation_page(context: UpgradeContext) -> None:
     )
 
 
-def as_paragraphs(text: str) -> 'Iterator[Markup]':
+def as_paragraphs(text: str) -> Iterator[Markup]:
     paragraph: list[str] = []
 
     for line in text.splitlines():

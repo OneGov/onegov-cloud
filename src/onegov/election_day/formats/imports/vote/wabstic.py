@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 from onegov.election_day import _
 from onegov.election_day.formats.imports.common import EXPATS
 from onegov.election_day.formats.imports.common import FileImportError
@@ -62,7 +64,7 @@ def parse_domain(domain: str) -> str | None:
 
 
 def line_is_relevant(
-    line: 'DefaultRow',
+    line: DefaultRow,
     domain: str,
     district: str,
     number: str
@@ -75,8 +77,8 @@ def line_is_relevant(
 
 
 def import_vote_wabstic(
-    vote: 'Vote',
-    principal: 'Canton | Municipality',
+    vote: Vote,
+    principal: Canton | Municipality,
     number: str,
     district: str,
     file_sg_geschaefte: IO[bytes],

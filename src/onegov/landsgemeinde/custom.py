@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 from onegov.chat import TextModuleCollection
 from onegov.core.elements import Link
 from onegov.core.utils import Bunch
@@ -21,8 +23,8 @@ if TYPE_CHECKING:
 
 
 def get_global_tools(
-    request: 'LandsgemeindeRequest'
-) -> 'Iterator[Link | LinkGroup]':
+    request: LandsgemeindeRequest
+) -> Iterator[Link | LinkGroup]:
 
     if request.is_logged_in:
         assert request.current_username is not None
@@ -79,8 +81,8 @@ def get_global_tools(
 
 
 def get_top_navigation(
-    request: 'LandsgemeindeRequest'
-) -> 'Iterator[NavigationEntry]':
+    request: LandsgemeindeRequest
+) -> Iterator[NavigationEntry]:
 
     yield (  # type:ignore[misc]
         Bunch(id=-1, access='public', published=True),

@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 from onegov.activity.collections.activity import ActivityFilter
 from onegov.activity.collections.activity import ActivityCollection
 from onegov.activity.collections.attendee import AttendeeCollection

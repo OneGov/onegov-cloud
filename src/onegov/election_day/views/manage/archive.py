@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 from morepath import redirect
 from onegov.core.security import Secret
 from onegov.election_day import _
@@ -24,9 +26,9 @@ if TYPE_CHECKING:
 )
 def view_update_results(
     self: Principal,
-    request: 'ElectionDayRequest',
+    request: ElectionDayRequest,
     form: EmptyForm
-) -> 'RenderData | Response':
+) -> RenderData | Response:
     """ Updates all archived results. """
 
     layout = DefaultLayout(self, request)

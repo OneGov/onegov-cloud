@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 from onegov.core.security import Secret
 
 from onegov.org.views.payment_provider import (
@@ -22,8 +24,8 @@ if TYPE_CHECKING:
 )
 def town_view_payment_providers(
     self: PaymentProviderCollection,
-    request: 'TownRequest'
-) -> 'RenderData':
+    request: TownRequest
+) -> RenderData:
     return view_payment_providers(
         self, request, PaymentProviderLayout(self, request))
 
@@ -37,8 +39,8 @@ def town_view_payment_providers(
 )
 def town_handle_provider_settings(
     self: PaymentProvider[Payment],
-    request: 'TownRequest',
-    form: 'Form'
-) -> 'RenderData | Response':
+    request: TownRequest,
+    form: Form
+) -> RenderData | Response:
     return handle_provider_settings(
         self, request, form, PaymentProviderLayout(self, request))

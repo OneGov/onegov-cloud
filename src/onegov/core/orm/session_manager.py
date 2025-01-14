@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 import threading
 import re
 import weakref
@@ -52,9 +54,9 @@ CONNECTION_LIFETIME = 60 * 60
 
 
 def query_schemas(
-    connection: 'Connection | Engine',
+    connection: Connection | Engine,
     namespace: str | None = None
-) -> 'Iterator[str]':
+) -> Iterator[str]:
     """ Yields all schemas or the ones with the given namespace. """
 
     query = text("""
@@ -279,7 +281,7 @@ class SessionManager:
         )
         self.register_session(self.session_factory)
 
-    def register_engine(self, engine: 'Engine') -> None:
+    def register_engine(self, engine: Engine) -> None:
         """ Takes the given engine and registers it with the schema
         switching mechanism. Maybe used to register external engines with
         the session manager.
@@ -291,7 +293,7 @@ class SessionManager:
 
         @event.listens_for(engine, 'before_cursor_execute')
         def activate_schema(
-            connection: 'Connection',
+            connection: Connection,
             cursor: Any,
             *args: Any,
             **kwargs: Any
@@ -315,7 +317,7 @@ class SessionManager:
 
         @event.listens_for(engine, 'before_cursor_execute')
         def limit_session_lifetime(
-            connection: 'Connection',
+            connection: Connection,
             cursor: Any,
             *args: Any,
             **kwargs: Any
@@ -327,7 +329,7 @@ class SessionManager:
                 (f'{CONNECTION_LIFETIME}s', )
             )
 
-    def register_session(self, session: 'Session') -> None:
+    def register_session(self, session: Session) -> None:
         """ Takes the given session and registers it with zope.sqlalchemy and
         various orm events.
 
@@ -367,7 +369,7 @@ class SessionManager:
 
         @event.listens_for(session, 'after_flush')
         def on_after_flush(
-            session: 'Session',
+            session: Session,
             flush_context: Any
         ) -> None:
             for signal, get_objects in signals:
@@ -451,14 +453,14 @@ class SessionManager:
             self.set_active(None)
 
     @classmethod
-    def set_active(cls, session_manager: 'SessionManager | None') -> None:
+    def set_active(cls, session_manager: SessionManager | None) -> None:
         if session_manager:
             cls._thread_bound._active = weakref.proxy(session_manager)
         else:
             cls._thread_bound._active = None
 
     @classmethod
-    def get_active(cls) -> 'SessionManager | None':
+    def get_active(cls) -> SessionManager | None:
         try:
             return cls._thread_bound._active
         except (AttributeError, ReferenceError):
@@ -583,14 +585,14 @@ class SessionManager:
         if not self.is_schema_found_on_database(schema):
             self.create_schema(schema, validate)
 
-    def bind_session(self, session: '_S') -> '_S':
+    def bind_session(self, session: _S) -> _S:
         """ Bind the session to the current schema. """
         session.info['schema'] = self.current_schema
         session.connection().info['session'] = weakref.proxy(session)
 
         return session
 
-    def session(self) -> 'Session':
+    def session(self) -> Session:
         """ Returns a new session or an existing session. Sessions with
         different schemas are kept independent, though they might reuse
         each others connections.

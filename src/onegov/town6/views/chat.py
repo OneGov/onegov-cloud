@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 from onegov.core.security import Private, Public
 from onegov.town6 import TownApp
 from morepath import redirect
@@ -31,9 +33,9 @@ if TYPE_CHECKING:
     permission=Private)
 def view_chats_staff(
     self: ChatCollection,
-    request: 'TownRequest',
+    request: TownRequest,
     form: ChatActionsForm
-) -> 'RenderData':
+) -> RenderData:
 
     user = request.current_user
     assert user is not None
@@ -108,8 +110,8 @@ def view_chats_staff(
     permission=Private)
 def view_chats_archive(
     self: ChatCollection,
-    request: 'TownRequest'
-) -> 'RenderData':
+    request: TownRequest
+) -> RenderData:
 
     user = request.current_user
 
@@ -129,9 +131,9 @@ def view_chats_archive(
     form=ChatInitiationForm)
 def view_chat_form(
     self: ChatCollection,
-    request: 'TownRequest',
+    request: TownRequest,
     form: ChatInitiationForm
-) -> 'RenderData | Response':
+) -> RenderData | Response:
 
     if not request.app.chat_open(request) and not request.is_manager:
         raise HTTPForbidden()
@@ -162,7 +164,7 @@ def view_chat_form(
     model=Chat,
     template='chat_customer.pt',
     permission=Public)
-def view_customer_chat(self: Chat, request: 'TownRequest') -> 'RenderData':
+def view_customer_chat(self: Chat, request: TownRequest) -> RenderData:
 
     active_chat_id = request.browser_session.get('active_chat_id')
     if not request.is_manager and self.id != active_chat_id:
@@ -181,7 +183,7 @@ def view_customer_chat(self: Chat, request: 'TownRequest') -> 'RenderData':
     template='chat_staff.pt',
     name='staff-view',
     permission=Public)
-def view_staff_chat(self: Chat, request: 'TownRequest') -> 'RenderData':
+def view_staff_chat(self: Chat, request: TownRequest) -> RenderData:
 
     active_chat_id = request.browser_session.get('active_chat_id')
     if not request.is_manager and self.id != active_chat_id:

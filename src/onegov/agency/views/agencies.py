@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 from datetime import datetime
 from datetime import timedelta
 from morepath import redirect
@@ -37,7 +39,7 @@ if TYPE_CHECKING:
 
 def get_agency_form_class(
     model: object,
-    request: 'AgencyRequest'
+    request: AgencyRequest
 ) -> type[ExtendedAgencyForm]:
 
     if isinstance(model, ExtendedAgency):
@@ -49,7 +51,7 @@ def get_agency_form_class(
 
 def get_membership_form_class(
     model: object,
-    request: 'AgencyRequest'
+    request: AgencyRequest
 ) -> type[MembershipForm]:
 
     if isinstance(model, ExtendedAgencyMembership):
@@ -66,8 +68,8 @@ def get_membership_form_class(
 )
 def view_agencies(
     self: ExtendedAgencyCollection,
-    request: 'AgencyRequest'
-) -> 'RenderData':
+    request: AgencyRequest
+) -> RenderData:
 
     pdf_link = None
     root_pdf_modified = request.app.root_pdf_modified
@@ -92,8 +94,8 @@ def view_agencies(
 )
 def view_agencies_sort(
     self: ExtendedAgencyCollection,
-    request: 'AgencyRequest'
-) -> 'RenderData':
+    request: AgencyRequest
+) -> RenderData:
 
     layout = AgencyCollectionLayout(self, request)
 
@@ -117,8 +119,8 @@ def view_agencies_sort(
 )
 def view_agency(
     self: ExtendedAgency,
-    request: 'AgencyRequest'
-) -> 'RenderData':
+    request: AgencyRequest
+) -> RenderData:
 
     return {
         'title': self.title,
@@ -136,8 +138,8 @@ def view_agency(
 )
 def view_agency_sort(
     self: ExtendedAgency,
-    request: 'AgencyRequest'
-) -> 'RenderData':
+    request: AgencyRequest
+) -> RenderData:
 
     layout = AgencyLayout(self, request)
     return {
@@ -171,12 +173,12 @@ def view_agency_sort(
 )
 def view_agency_as_nav_item(
     self: ExtendedAgency,
-    request: 'AgencyRequest'
+    request: AgencyRequest
 ) -> str:
     layout = AgencyCollectionLayout(self, request)
 
     @request.after
-    def push_history_state(response: 'BaseResponse') -> None:
+    def push_history_state(response: BaseResponse) -> None:
         response.headers.add(
             'X-IC-PushURL',
             request.class_link(
@@ -202,9 +204,9 @@ def view_agency_as_nav_item(
 )
 def add_root_agency(
     self: ExtendedAgencyCollection,
-    request: 'AgencyRequest',
+    request: AgencyRequest,
     form: ExtendedAgencyForm
-) -> 'RenderData | BaseResponse':
+) -> RenderData | BaseResponse:
 
     if form.submitted(request):
         agency = self.add_root(**form.get_useful_data())
@@ -231,9 +233,9 @@ def add_root_agency(
 )
 def add_agency(
     self: ExtendedAgency,
-    request: 'AgencyRequest',
+    request: AgencyRequest,
     form: ExtendedAgencyForm
-) -> 'RenderData | BaseResponse':
+) -> RenderData | BaseResponse:
 
     if form.submitted(request):
         collection = ExtendedAgencyCollection(request.session)
@@ -261,9 +263,9 @@ def add_agency(
 )
 def add_membership(
     self: ExtendedAgency,
-    request: 'AgencyRequest',
+    request: AgencyRequest,
     form: MembershipForm
-) -> 'RenderData | BaseResponse':
+) -> RenderData | BaseResponse:
 
     if form.submitted(request):
         self.add_person(**form.get_useful_data())
@@ -287,7 +289,7 @@ def add_membership(
     request_method='POST',
     permission=Private,
 )
-def sort_relationships(self: ExtendedAgency, request: 'AgencyRequest') -> None:
+def sort_relationships(self: ExtendedAgency, request: AgencyRequest) -> None:
     request.assert_valid_csrf_token()
     self.sort_relationships()
 
@@ -298,7 +300,7 @@ def sort_relationships(self: ExtendedAgency, request: 'AgencyRequest') -> None:
     request_method='POST',
     permission=Private,
 )
-def sort_children(self: ExtendedAgency, request: 'AgencyRequest') -> None:
+def sort_children(self: ExtendedAgency, request: AgencyRequest) -> None:
     request.assert_valid_csrf_token()
     self.sort_children()
 
@@ -312,9 +314,9 @@ def sort_children(self: ExtendedAgency, request: 'AgencyRequest') -> None:
 )
 def edit_agency(
     self: ExtendedAgency,
-    request: 'AgencyRequest',
+    request: AgencyRequest,
     form: ExtendedAgencyForm
-) -> 'RenderData | BaseResponse':
+) -> RenderData | BaseResponse:
 
     if form.submitted(request):
         form.update_model(self)
@@ -348,9 +350,9 @@ def edit_agency(
 )
 def change_agency_url(
     self: ExtendedAgency,
-    request: 'AgencyRequest',
+    request: AgencyRequest,
     form: ChangeAdjacencyListUrlForm
-) -> 'RenderData | BaseResponse':
+) -> RenderData | BaseResponse:
 
     layout = AgencyLayout(self, request)
     layout.breadcrumbs.append(Link(_('Change URL'), '#'))
@@ -386,9 +388,9 @@ def change_agency_url(
 )
 def move_agency(
     self: ExtendedAgency,
-    request: 'AgencyRequest',
+    request: AgencyRequest,
     form: MoveAgencyForm
-) -> 'RenderData | BaseResponse':
+) -> RenderData | BaseResponse:
 
     if form.submitted(request):
         form.update_model(self)
@@ -418,7 +420,7 @@ def move_agency(
 )
 def get_root_pdf(
     self: ExtendedAgencyCollection,
-    request: 'AgencyRequest'
+    request: AgencyRequest
 ) -> Response:
 
     last_modified = request.app.root_pdf_modified
@@ -426,7 +428,7 @@ def get_root_pdf(
         return Response(status='503 Service Unavailable')
 
     @request.after
-    def cache_headers(response: 'BaseResponse') -> None:
+    def cache_headers(response: BaseResponse) -> None:
         max_age = 1 * 24 * 60 * 60
         expires = datetime.now() + timedelta(seconds=max_age)
         fmt = '%a, %d %b %Y %H:%M:%S GMT'
@@ -454,9 +456,9 @@ def get_root_pdf(
 )
 def create_root_pdf(
     self: ExtendedAgencyCollection,
-    request: 'AgencyRequest',
+    request: AgencyRequest,
     form: Form
-) -> 'RenderData | BaseResponse':
+) -> RenderData | BaseResponse:
 
     org = request.app.org
     page_break_level = int(org.meta.get(
@@ -499,9 +501,9 @@ def create_root_pdf(
 )
 def create_agency_pdf(
     self: ExtendedAgency,
-    request: 'AgencyRequest',
+    request: AgencyRequest,
     form: Form
-) -> 'RenderData | BaseResponse':
+) -> RenderData | BaseResponse:
 
     org = request.app.org
     page_break_level = int(org.meta.get(
@@ -539,7 +541,7 @@ def create_agency_pdf(
     request_method='DELETE',
     permission=Private
 )
-def delete_agency(self: ExtendedAgency, request: 'AgencyRequest') -> None:
+def delete_agency(self: ExtendedAgency, request: AgencyRequest) -> None:
     if not self.deletable(request):
         request.alert(
             _("Agency with memberships or suborganizations can't be deleted")
@@ -554,7 +556,7 @@ def delete_agency(self: ExtendedAgency, request: 'AgencyRequest') -> None:
     permission=Private,
     request_method='PUT'
 )
-def execute_agency_move(self: AgencyMove, request: 'AgencyRequest') -> None:
+def execute_agency_move(self: AgencyMove, request: AgencyRequest) -> None:
     request.assert_valid_csrf_token()
     self.execute()
 
@@ -568,9 +570,9 @@ def execute_agency_move(self: AgencyMove, request: 'AgencyRequest') -> None:
 )
 def report_agency_change(
     self: ExtendedAgency,
-    request: 'AgencyRequest',
+    request: AgencyRequest,
     form: AgencyMutationForm
-) -> 'RenderData | BaseResponse':
+) -> RenderData | BaseResponse:
 
     if form.submitted(request):
         assert form.submitter_email.data is not None

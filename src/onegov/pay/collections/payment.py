@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 from collections import defaultdict
 from onegov.core.collection import GenericCollection, Pagination
 from onegov.pay.models import Payment
@@ -30,11 +32,11 @@ class PaymentCollection(GenericCollection[Payment], Pagination[Payment]):
 
     def __init__(
         self,
-        session: 'Session',
+        session: Session,
         source: str = '*',
         page: int = 0,
-        start: 'datetime | None' = None,
-        end: 'datetime | None' = None
+        start: datetime | None = None,
+        end: datetime | None = None
     ):
         GenericCollection.__init__(self, session)
         Pagination.__init__(self, page)
@@ -50,10 +52,10 @@ class PaymentCollection(GenericCollection[Payment], Pagination[Payment]):
         self,
         *,
         source: str | None = None,
-        amount: 'Decimal | None' = None,
+        amount: Decimal | None = None,
         currency: str = 'CHF',
         remote_id: str | None = None,
-        state: 'PaymentState' = 'open',
+        state: PaymentState = 'open',
         # FIXME: We probably don't want to allow arbitrary kwargs
         #        but we need to make sure, we don't use any other
         #        ones somewhere first
@@ -86,7 +88,7 @@ class PaymentCollection(GenericCollection[Payment], Pagination[Payment]):
             and self.end == other.end
         )
 
-    def subset(self) -> 'Query[Payment]':
+    def subset(self) -> Query[Payment]:
         q = self.query().order_by(desc(Payment.created))
 
         if self.start:
@@ -103,13 +105,13 @@ class PaymentCollection(GenericCollection[Payment], Pagination[Payment]):
     def page_index(self) -> int:
         return self.page
 
-    def page_by_index(self, index: int) -> 'Self':
+    def page_by_index(self, index: int) -> Self:
         return self.__class__(self.session, self.source, index)
 
     def payment_links_for(
         self,
-        items: 'Iterable[Payment]'
-    ) -> dict['UUID', list['AnyPayableBase']]:
+        items: Iterable[Payment]
+    ) -> dict[UUID, list[AnyPayableBase]]:
         """ A more efficient way of loading all links of the given batch
         (compared to loading payment.links one by one).
 
@@ -144,15 +146,15 @@ class PaymentCollection(GenericCollection[Payment], Pagination[Payment]):
 
     def payment_links_by_subset(
         self,
-        subset: 'Iterable[Payment] | None' = None
-    ) -> dict['UUID', list['AnyPayableBase']]:
+        subset: Iterable[Payment] | None = None
+    ) -> dict[UUID, list[AnyPayableBase]]:
         subset = subset or self.subset()
         return self.payment_links_for(subset)
 
     def payment_links_by_batch(
         self,
-        batch: 'Collection[Payment] | None' = None
-    ) -> dict['UUID', list['AnyPayableBase']] | None:
+        batch: Collection[Payment] | None = None
+    ) -> dict[UUID, list[AnyPayableBase]] | None:
         batch = batch or self.batch
 
         if not batch:

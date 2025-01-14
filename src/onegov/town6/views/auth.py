@@ -1,4 +1,5 @@
 """ The authentication views. """
+from __future__ import annotations
 
 from onegov.core.security import Public
 from onegov.org.auth import MTANAuth
@@ -37,9 +38,9 @@ if TYPE_CHECKING:
 )
 def town_handle_login(
     self: Auth,
-    request: 'TownRequest',
+    request: TownRequest,
     form: LoginForm
-) -> 'RenderData | Response':
+) -> RenderData | Response:
     """ Handles the login requests. """
 
     return handle_login(self, request, form, DefaultLayout(self, request))
@@ -54,9 +55,9 @@ def town_handle_login(
 )
 def town_handle_registration(
     self: Auth,
-    request: 'TownRequest',
+    request: TownRequest,
     form: RegistrationForm
-) -> 'RenderData | Response':
+) -> RenderData | Response:
     return handle_registration(
         self, request, form, DefaultLayout(self, request))
 
@@ -70,9 +71,9 @@ def town_handle_registration(
 )
 def town_handle_password_reset_request(
     self: Auth,
-    request: 'TownRequest',
+    request: TownRequest,
     form: RequestPasswordResetForm
-) -> 'RenderData | Response':
+) -> RenderData | Response:
     return handle_password_reset_request(
         self, request, form, DefaultLayout(self, request))
 
@@ -86,9 +87,9 @@ def town_handle_password_reset_request(
 )
 def town_handle_password_reset(
     self: Auth,
-    request: 'TownRequest',
+    request: TownRequest,
     form: PasswordResetForm
-) -> 'RenderData | Response':
+) -> RenderData | Response:
     return handle_password_reset(
         self, request, form, DefaultLayout(self, request))
 
@@ -102,10 +103,10 @@ def town_handle_password_reset(
 )
 def town_handle_mtan_second_factor(
     self: Auth,
-    request: 'TownRequest',
+    request: TownRequest,
     form: MTANForm,
     layout: DefaultLayout | None = None
-) -> 'RenderData | Response':
+) -> RenderData | Response:
     return handle_mtan_second_factor(
         self,
         request,
@@ -123,10 +124,10 @@ def town_handle_mtan_second_factor(
 )
 def town_handle_mtan_second_factor_setup(
     self: Auth,
-    request: 'TownRequest',
+    request: TownRequest,
     form: RequestMTANForm,
     layout: DefaultLayout | None = None
-) -> 'RenderData | Response':
+) -> RenderData | Response:
     return handle_mtan_second_factor_setup(
         self,
         request,
@@ -144,10 +145,10 @@ def town_handle_mtan_second_factor_setup(
 )
 def town_handle_totp_second_factor(
     self: Auth,
-    request: 'TownRequest',
+    request: TownRequest,
     form: TOTPForm,
     layout: DefaultLayout | None = None
-) -> 'RenderData | Response':
+) -> RenderData | Response:
     return handle_totp_second_factor(
         self,
         request,
@@ -165,9 +166,9 @@ def town_handle_totp_second_factor(
 )
 def town_handle_request_mtan(
     self: MTANAuth,
-    request: 'TownRequest',
+    request: TownRequest,
     form: PublicRequestMTANForm
-) -> 'RenderData | Response':
+) -> RenderData | Response:
     return handle_request_mtan(
         self,
         request,
@@ -185,9 +186,9 @@ def town_handle_request_mtan(
 )
 def town_handle_authenticate_mtan(
     self: MTANAuth,
-    request: 'TownRequest',
+    request: TownRequest,
     form: PublicMTANForm
-) -> 'RenderData | Response':
+) -> RenderData | Response:
     return handle_authenticate_mtan(
         self,
         request,

@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 import os
 
 import click
@@ -42,7 +44,7 @@ def import_mission_reports(
     vehicles_file: str,
     missions_file: str,
     no_confirm: bool
-) -> 'Callable[[WinterthurRequest, WinterthurApp], None]':
+) -> Callable[[WinterthurRequest, WinterthurApp], None]:
     """ Imports the existing mission reports. """
 
     if not no_confirm:
@@ -69,7 +71,7 @@ def import_mission_reports(
             'public'
         )))
 
-    def extract_date(mission: 'DefaultRow') -> datetime:
+    def extract_date(mission: DefaultRow) -> datetime:
         d = datetime.utcfromtimestamp(int(mission.date))
         d = sedate.replace_timezone(d, 'Europe/Zurich')
 
@@ -88,7 +90,7 @@ def import_mission_reports(
 
         return d
 
-    def extract_duration(mission: 'DefaultRow') -> Decimal:
+    def extract_duration(mission: DefaultRow) -> Decimal:
         d = mission.duration
         d = d.replace(',', '.')
 
@@ -100,7 +102,7 @@ def import_mission_reports(
 
     def extract_personnel(value: str) -> int:
 
-        def digits() -> 'Iterator[str]':
+        def digits() -> Iterator[str]:
             for v in value:
                 if v.isdigit():
                     yield v
@@ -109,7 +111,7 @@ def import_mission_reports(
 
         return int(''.join(digits()))
 
-    def is_hidden(mission: 'DefaultRow') -> bool:
+    def is_hidden(mission: DefaultRow) -> bool:
         if mission.public == '0':
             return True
 
@@ -125,8 +127,8 @@ def import_mission_reports(
         return False
 
     def handle_import(
-        request: 'WinterthurRequest',
-        app: 'WinterthurApp'
+        request: WinterthurRequest,
+        app: WinterthurApp
     ) -> None:
 
         for mission_obj in request.session.query(MissionReport):
@@ -185,15 +187,15 @@ def import_mission_reports(
 @click.option('--export-file', type=click.Path(exists=False), required=True)
 def export_mission_vehicles(
     export_file: str
-) -> 'Callable[[WinterthurRequest, WinterthurApp], None]':
+) -> Callable[[WinterthurRequest, WinterthurApp], None]:
     """ Exports the mission vehicles (with symbols, but without usage) into
     a ZIP file for consumption with the 'import-mission-vehicles' command.
 
     """
 
     def handle_export(
-        request: 'WinterthurRequest',
-        app: 'WinterthurApp'
+        request: WinterthurRequest,
+        app: WinterthurApp
     ) -> None:
 
         temp = TemporaryDirectory()
@@ -234,15 +236,15 @@ def import_mission_vehicles(
     import_file: str,
     replace: bool,
     match: bool
-) -> 'Callable[[WinterthurRequest, WinterthurApp], None]':
+) -> Callable[[WinterthurRequest, WinterthurApp], None]:
     """ Imports the mission vehicles created by the export-mission-vehicles
     command.
 
     """
 
     def handle_import(
-        request: 'WinterthurRequest',
-        app: 'WinterthurApp'
+        request: WinterthurRequest,
+        app: WinterthurApp
     ) -> None:
 
         temp = TemporaryDirectory()
@@ -311,7 +313,7 @@ def import_mission_vehicles(
 def analyze_directories(
     log_file: str | None,
     dry_run: bool
-) -> 'Callable[[WinterthurRequest, WinterthurApp], None]':
+) -> Callable[[WinterthurRequest, WinterthurApp], None]:
     """ Spots missing depot directories of file in directory entries and
     fixes full-path filenames that come from Upload via IE11. """
 
@@ -326,8 +328,8 @@ def analyze_directories(
         return file_name.rsplit('\\', 1)[-1]
 
     def handle_analyze_entries(
-        request: 'WinterthurRequest',
-        app: 'WinterthurApp'
+        request: WinterthurRequest,
+        app: WinterthurApp
     ) -> None:
 
         assert request.app.depot_storage_path is not None

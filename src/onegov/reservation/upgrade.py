@@ -2,6 +2,8 @@
 upgraded on the server. See :class:`onegov.core.upgrade.upgrade_task`.
 
 """
+from __future__ import annotations
+
 from libres.db.models import Allocation, Reservation
 from onegov.core.upgrade import upgrade_task
 from onegov.reservation import LibresIntegration
@@ -14,7 +16,7 @@ if TYPE_CHECKING:
     from onegov.core.upgrade import UpgradeContext
 
 
-def run_upgrades(context: 'UpgradeContext') -> bool:
+def run_upgrades(context: UpgradeContext) -> bool:
     """ onegov.reservation is a bit special because it defines its tables
     through its own declarative base. This is due to libres requireing its own
     base.
@@ -31,7 +33,7 @@ def run_upgrades(context: 'UpgradeContext') -> bool:
 
 
 @upgrade_task('Add form definition field')
-def add_form_definition_field(context: 'UpgradeContext') -> None:
+def add_form_definition_field(context: UpgradeContext) -> None:
 
     if run_upgrades(context):
         context.operations.add_column(
@@ -40,7 +42,7 @@ def add_form_definition_field(context: 'UpgradeContext') -> None:
 
 
 @upgrade_task('Add resource group field')
-def add_resource_group_field(context: 'UpgradeContext') -> None:
+def add_resource_group_field(context: UpgradeContext) -> None:
 
     if run_upgrades(context):
         context.operations.add_column(
@@ -49,7 +51,7 @@ def add_resource_group_field(context: 'UpgradeContext') -> None:
 
 
 @upgrade_task('Add reservations/allocations type field')
-def add_reservations_allocations_type_field(context: 'UpgradeContext') -> None:
+def add_reservations_allocations_type_field(context: UpgradeContext) -> None:
 
     if run_upgrades(context):
         context.operations.add_column(
@@ -61,7 +63,7 @@ def add_reservations_allocations_type_field(context: 'UpgradeContext') -> None:
 
 
 @upgrade_task('Make reservations/allocations payable')
-def make_reservations_allocations_payable(context: 'UpgradeContext') -> None:
+def make_reservations_allocations_payable(context: UpgradeContext) -> None:
 
     if run_upgrades(context):
         for reservation in context.session.query(Reservation):
@@ -73,7 +75,7 @@ def make_reservations_allocations_payable(context: 'UpgradeContext') -> None:
 
 @upgrade_task('Set defaults on existing resources')
 def set_defaults_on_existing_reservation_resourcd_objects(
-    context: 'UpgradeContext'
+    context: UpgradeContext
 ) -> None:
 
     if run_upgrades(context):
@@ -86,7 +88,7 @@ def set_defaults_on_existing_reservation_resourcd_objects(
 
 
 @upgrade_task('Add access_token to existing resources')
-def add_access_token_to_existing_resources(context: 'UpgradeContext') -> None:
+def add_access_token_to_existing_resources(context: UpgradeContext) -> None:
 
     if run_upgrades(context):
         for resource in context.session.query(Resource):
@@ -95,7 +97,7 @@ def add_access_token_to_existing_resources(context: 'UpgradeContext') -> None:
 
 @upgrade_task('Add default view to existing resource types')
 def add_default_view_to_existing_resource_types(
-    context: 'UpgradeContext'
+    context: UpgradeContext
 ) -> None:
     if run_upgrades(context):
         for resource in context.session.query(Resource):
@@ -107,7 +109,7 @@ def add_default_view_to_existing_resource_types(
 
 @upgrade_task('Make resource polymorphic type non-nullable')
 def make_resource_polymorphic_type_non_nullable(
-    context: 'UpgradeContext'
+    context: UpgradeContext
 ) -> None:
     if context.has_table('reservations'):
         context.operations.execute("""

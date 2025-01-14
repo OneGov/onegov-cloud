@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 from onegov.core.elements import Link
 from onegov.core.security import Private
 from onegov.pas import _
@@ -21,8 +23,8 @@ if TYPE_CHECKING:
 )
 def view_commission_membership(
     self: CommissionMembership,
-    request: 'TownRequest'
-) -> 'RenderData':
+    request: TownRequest
+) -> RenderData:
 
     layout = CommissionMembershipLayout(self, request)
 
@@ -42,9 +44,9 @@ def view_commission_membership(
 )
 def edit_commission_membership(
     self: CommissionMembership,
-    request: 'TownRequest',
+    request: TownRequest,
     form: CommissionMembershipForm
-) -> 'RenderData | Response':
+) -> RenderData | Response:
 
     if form.submitted(request):
         form.populate_obj(self)
@@ -72,7 +74,7 @@ def edit_commission_membership(
 )
 def delete_commission_membership(
     self: CommissionMembership,
-    request: 'TownRequest'
+    request: TownRequest
 ) -> None:
 
     request.assert_valid_csrf_token()

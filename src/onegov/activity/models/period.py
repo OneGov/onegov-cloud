@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 import sedate
 
 from datetime import date, datetime
@@ -213,7 +215,7 @@ class PeriodMixin:
 
 
 class PeriodMetaBase(NamedTuple):
-    id: 'uuid.UUID'
+    id: uuid.UUID
     title: str
     active: bool
     confirmed: bool
@@ -228,7 +230,7 @@ class PeriodMetaBase(NamedTuple):
     execution_start: date
     execution_end: date
     max_bookings_per_attendee: int | None
-    booking_cost: 'Decimal | None'
+    booking_cost: Decimal | None
     all_inclusive: bool
     pay_organiser_directly: bool
     minutes_between: int | None
@@ -250,7 +252,7 @@ class PeriodMeta(PeriodMetaBase, PeriodMixin):
     #       a short TTL like 60 seconds. That would already avoid
     #       the many redundant calls to `phase`.
 
-    def materialize(self, session: 'Session') -> 'Period':
+    def materialize(self, session: Session) -> Period:
         period = session.query(Period).get(self.id)
         assert period is not None
         return period
@@ -269,88 +271,88 @@ class Period(Base, PeriodMixin, TimestampMixin):
     __tablename__ = 'periods'
 
     #: The public id of this period
-    id: 'Column[uuid.UUID]' = Column(
+    id: Column[uuid.UUID] = Column(
         UUID,  # type:ignore[arg-type]
         primary_key=True,
         default=uuid4
     )
 
     #: The public title of this period
-    title: 'Column[str]' = Column(Text, nullable=False)
+    title: Column[str] = Column(Text, nullable=False)
 
     #: Only one period is active at a time
-    active: 'Column[bool]' = Column(Boolean, nullable=False, default=False)
+    active: Column[bool] = Column(Boolean, nullable=False, default=False)
 
     #: A confirmed period may not be automatically matched anymore and all
     #: booking changes to it are communicated to the customer
-    confirmed: 'Column[bool]' = Column(Boolean, nullable=False, default=False)
+    confirmed: Column[bool] = Column(Boolean, nullable=False, default=False)
 
     #: A confirmable period has a prebooking phase, while an unconfirmable
     # booking does not. An unconfirmable booking starts as `confirmed` for
     # legacy reasons (even though it doesn't sound sane to have an
     # unconfirmable period that is confirmed).
-    confirmable: 'Column[bool]' = Column(Boolean, nullable=False, default=True)
+    confirmable: Column[bool] = Column(Boolean, nullable=False, default=True)
 
     #: A finalized period may not have any change in bookings anymore
-    finalized: 'Column[bool]' = Column(Boolean, nullable=False, default=False)
+    finalized: Column[bool] = Column(Boolean, nullable=False, default=False)
 
     #: A finalizable period may have invoices associated with it, an
     #: unfinalizable period may not
-    finalizable: 'Column[bool]' = Column(Boolean, nullable=False, default=True)
+    finalizable: Column[bool] = Column(Boolean, nullable=False, default=True)
 
     #: An archived period has been entirely completed
-    archived: 'Column[bool]' = Column(Boolean, nullable=False, default=False)
+    archived: Column[bool] = Column(Boolean, nullable=False, default=False)
 
     #: Start of the wishlist-phase
-    prebooking_start: 'Column[date]' = Column(Date, nullable=False)
+    prebooking_start: Column[date] = Column(Date, nullable=False)
 
     #: End of the wishlist-phase
-    prebooking_end: 'Column[date]' = Column(Date, nullable=False)
+    prebooking_end: Column[date] = Column(Date, nullable=False)
 
     #: Start of the booking-phase
-    booking_start: 'Column[date]' = Column(Date, nullable=False)
+    booking_start: Column[date] = Column(Date, nullable=False)
 
     #: End of the booking-phase
-    booking_end: 'Column[date]' = Column(Date, nullable=False)
+    booking_end: Column[date] = Column(Date, nullable=False)
 
     #: Date of the earliest possible occasion start of this period
-    execution_start: 'Column[date]' = Column(Date, nullable=False)
+    execution_start: Column[date] = Column(Date, nullable=False)
 
     #: Date of the latest possible occasion end of this period
-    execution_end: 'Column[date]' = Column(Date, nullable=False)
+    execution_end: Column[date] = Column(Date, nullable=False)
 
     #: Extra data stored on the period
-    data: 'Column[dict[str, Any]]' = Column(JSON, nullable=False, default=dict)
+    data: Column[dict[str, Any]] = Column(JSON, nullable=False, default=dict)
 
     #: Maximum number of bookings per attendee
-    max_bookings_per_attendee: 'Column[int | None]' = Column(
+    max_bookings_per_attendee: Column[int | None] = Column(
         Integer,
         nullable=True
     )
 
     #: Base cost for one or many bookings
-    booking_cost: 'Column[Decimal | None]' = Column(
+    booking_cost: Column[Decimal | None] = Column(
         Numeric(precision=8, scale=2),
         nullable=True
     )
 
     #: True if the booking cost is meant for all bookings in a period
     #: or for each single booking
-    all_inclusive: 'Column[bool]' = Column(
+    all_inclusive: Column[bool] = Column(
         Boolean,
         nullable=False,
         default=False
     )
 
     #: True if the costs of an occasions need to be paid to the organiser
-    pay_organiser_directly: 'Column[bool]' = Column(
+    pay_organiser_directly: Column[bool] = Column(
         Boolean,
         nullable=False,
         default=False
     )
 
     #: Time between bookings in minutes
-    minutes_between: 'Column[int | None]' = Column(
+    minutes_between: Column[int | None] = Column(
         Integer,
         nullable=True,
         default=0
@@ -358,7 +360,7 @@ class Period(Base, PeriodMixin, TimestampMixin):
 
     #: The alignment of bookings in the matching
     # FIXME: Restrict this to what is actually allowed i.e. Literal['day', ...]
-    alignment: 'Column[str | None]' = Column(Text, nullable=True)
+    alignment: Column[str | None] = Column(Text, nullable=True)
 
     #: Deadline for booking occasions. A deadline of 3 means that 3 days before
     #: an occasion is set to start, bookings are disabled.
@@ -369,27 +371,27 @@ class Period(Base, PeriodMixin, TimestampMixin):
     #: Also, if deadline_days is None, bookings can't be created in a
     #: finalized period either, as deadline_days is a prerequisite for the
     #: book_finalized setting.
-    deadline_days: 'Column[int | None]' = Column(Integer, nullable=True)
+    deadline_days: Column[int | None] = Column(Integer, nullable=True)
 
     #: True if bookings can be created by normal users in finalized periods.
     #: The deadline_days are still applied for these normal users.
     #: Admins can always create bookings during any time, deadline_days and
     #: book_finalized are ignored.
-    book_finalized: 'Column[bool]' = Column(
+    book_finalized: Column[bool] = Column(
         Boolean,
         nullable=False,
         default=False
     )
 
     #: Date after which no bookings can be canceled by a mere member
-    cancellation_date: 'Column[date | None]' = Column(Date, nullable=True)
+    cancellation_date: Column[date | None] = Column(Date, nullable=True)
 
     #: Days between the occasion and the cancellation (an alternative to
     #: the cancellation_date)
-    cancellation_days: 'Column[int | None]' = Column(Integer, nullable=True)
+    cancellation_days: Column[int | None] = Column(Integer, nullable=True)
 
     #: The age barrier implementation in use
-    age_barrier_type: 'Column[str]' = Column(
+    age_barrier_type: Column[str] = Column(
         Text,
         nullable=False,
         default='exact'
@@ -420,24 +422,24 @@ class Period(Base, PeriodMixin, TimestampMixin):
     )
 
     #: The occasions linked to this period
-    occasions: 'relationship[list[Occasion]]' = relationship(
+    occasions: relationship[list[Occasion]] = relationship(
         'Occasion',
         order_by='Occasion.order',
         back_populates='period'
     )
 
     #: The bookings linked to this period
-    bookings: 'relationship[list[Booking]]' = relationship(
+    bookings: relationship[list[Booking]] = relationship(
         'Booking',
         back_populates='period'
     )
 
-    invoices: 'relationship[list[Invoice]]' = relationship(
+    invoices: relationship[list[Invoice]] = relationship(
         'Invoice',
         back_populates='period'
     )
 
-    publication_requests: 'relationship[list[PublicationRequest]]'
+    publication_requests: relationship[list[PublicationRequest]]
     publication_requests = relationship(
         'PublicationRequest',
         back_populates='period'
@@ -530,7 +532,7 @@ class Period(Base, PeriodMixin, TimestampMixin):
 
         session = object_session(self)
 
-        def future_periods() -> 'Iterator[uuid.UUID]':
+        def future_periods() -> Iterator[uuid.UUID]:
             p = session.query(Period)
             p = p.order_by(desc(Period.execution_start))
             p = p.with_entities(Period.id)
@@ -584,7 +586,7 @@ class Period(Base, PeriodMixin, TimestampMixin):
         self.booking_start = date.today()
 
     @property
-    def scoring(self) -> 'Scoring':
+    def scoring(self) -> Scoring:
         # circular import
         from onegov.activity.matching.score import Scoring
 
@@ -593,8 +595,8 @@ class Period(Base, PeriodMixin, TimestampMixin):
             session=object_session(self))
 
     @scoring.setter
-    def scoring(self, scoring: 'Scoring') -> None:
+    def scoring(self, scoring: Scoring) -> None:
         self.data['match-settings'] = scoring.settings
 
-    def materialize(self, session: 'Session') -> 'Period':
+    def materialize(self, session: Session) -> Period:
         return self

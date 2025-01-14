@@ -1,4 +1,6 @@
 """ The upload view. """
+from __future__ import annotations
+
 import transaction
 
 from onegov.election_day import ElectionDayApp
@@ -24,9 +26,9 @@ if TYPE_CHECKING:
 )
 def view_upload_election_compound(
     self: ElectionCompound,
-    request: 'ElectionDayRequest',
+    request: ElectionDayRequest,
     form: UploadElectionCompoundForm
-) -> 'RenderData':
+) -> RenderData:
     """ Upload results of a election compound. """
 
     errors = []

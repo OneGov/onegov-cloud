@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 import sedate
 
 from onegov.core.orm import Base
@@ -35,7 +37,7 @@ class Message(Base):
     __tablename__ = 'messages'
 
     #: the public id of the message - uses ulid for absolute ordering
-    id: 'Column[str]' = Column(
+    id: Column[str] = Column(
         Text,
         primary_key=True,
         default=lambda: str(ULID())
@@ -44,31 +46,31 @@ class Message(Base):
     #: channel to which this message belongs -> this might one day be
     #: linked to an actual channel record - for now it's just a string that
     #: binds all messages with the same string together
-    channel_id: 'Column[str]' = Column(Text, index=True, nullable=False)
+    channel_id: Column[str] = Column(Text, index=True, nullable=False)
 
     #: optional owner of the message -> this is just an identifier, it isn't
     #: necessarily linked to the user table
-    owner: 'Column[str | None]' = Column(Text, nullable=True)
+    owner: Column[str | None] = Column(Text, nullable=True)
 
     #: the polymorphic type of the message
-    type: 'Column[str | None]' = Column(Text, nullable=True)
+    type: Column[str | None] = Column(Text, nullable=True)
 
     #: meta information specific to this message and maybe its type -> we
     #: don't use the meta/content mixin yet as we might not need the content
     #: property
-    meta: 'Column[dict[str, Any]]' = Column(JSON, nullable=False, default=dict)
+    meta: Column[dict[str, Any]] = Column(JSON, nullable=False, default=dict)
 
     #: the text of the message, maybe None for certain use cases (say if the
     # content of the message is generated from the meta property)
-    text: 'Column[str | None]' = Column(Text, nullable=True)
+    text: Column[str | None] = Column(Text, nullable=True)
 
     #: the time this message was created - not taken from the timestamp mixin
     #: because here we don't want it to be deferred
-    created: 'Column[datetime]' = Column(UTCDateTime, default=sedate.utcnow)
+    created: Column[datetime] = Column(UTCDateTime, default=sedate.utcnow)
 
     #: the time this message was modified - not taken from the timestamp mixin
     #: because here we don't want it to be deferred
-    modified: 'Column[datetime | None]' = Column(
+    modified: Column[datetime | None] = Column(
         UTCDateTime,
         onupdate=sedate.utcnow
     )
@@ -103,7 +105,7 @@ class Message(Base):
         """
         return None
 
-    def get(self, request: 'CoreRequest') -> str | None:
+    def get(self, request: CoreRequest) -> str | None:
         """ Code rendering a message should call this method to get the
         actual text of the message. It might be rendered from meta or it
         might be returned directly from the text column.
@@ -123,7 +125,7 @@ class Message(Base):
             return self.modified != None
 
     @classmethod
-    def bound_messages(cls, session: 'Session') -> 'MessageCollection[Self]':
+    def bound_messages(cls, session: Session) -> MessageCollection[Self]:
         """ A message collection bound to the polymorphic identity of this
         message.
 

@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 from onegov.core.collection import GenericCollection
 from onegov.pay.models import PaymentProvider
 
@@ -11,7 +13,7 @@ class PaymentProviderCollection(GenericCollection[PaymentProvider['Payment']]):
     """ Manages the payment providers. """
 
     @property
-    def model_class(self) -> type[PaymentProvider['Payment']]:
+    def model_class(self) -> type[PaymentProvider[Payment]]:
         return PaymentProvider
 
     def as_default(self, provider: PaymentProvider[Any]) -> None:

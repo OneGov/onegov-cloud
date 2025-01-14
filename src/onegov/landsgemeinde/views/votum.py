@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 from morepath import redirect
 from onegov.core.elements import BackLink, Link
 from onegov.core.security import Private
@@ -28,9 +30,9 @@ if TYPE_CHECKING:
 )
 def add_votum(
     self: VotumCollection,
-    request: 'LandsgemeindeRequest',
+    request: LandsgemeindeRequest,
     form: VotumForm
-) -> 'RenderData | Response':
+) -> RenderData | Response:
 
     if form.submitted(request):
         votum = self.add(**form.get_useful_data())
@@ -67,9 +69,9 @@ def add_votum(
 )
 def edit_votum(
     self: Votum,
-    request: 'LandsgemeindeRequest',
+    request: LandsgemeindeRequest,
     form: VotumForm
-) -> 'RenderData | Response':
+) -> RenderData | Response:
 
     if form.submitted(request):
         form.populate_obj(self)
@@ -101,7 +103,7 @@ def edit_votum(
     request_method='DELETE',
     permission=Private
 )
-def delete_votum(self: Votum, request: 'LandsgemeindeRequest') -> None:
+def delete_votum(self: Votum, request: LandsgemeindeRequest) -> None:
 
     request.assert_valid_csrf_token()
 

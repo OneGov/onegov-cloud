@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 import inspect
 import time
 
@@ -20,7 +22,7 @@ if TYPE_CHECKING:
 class Assistant:
     """ Describes an assistant guiding a user through onboarding. """
 
-    def __init__(self, app: 'OnboardingApp', current_step_number: int = 1):
+    def __init__(self, app: OnboardingApp, current_step_number: int = 1):
 
         self.app = app
 
@@ -39,7 +41,7 @@ class Assistant:
         self.current_step_number = current_step_number
 
     @property
-    def current_step(self) -> 'Step':
+    def current_step(self) -> Step:
         return self.steps[self.current_step_number - 1]
 
     @property
@@ -54,31 +56,31 @@ class Assistant:
     def is_last_step(self) -> bool:
         return self.current_step_number == len(self.steps)
 
-    def for_next_step(self) -> 'Self':
+    def for_next_step(self) -> Self:
         assert not self.is_last_step
         return self.__class__(self.app, self.current_step_number + 1)
 
-    def for_prev_step(self) -> 'Self':
+    def for_prev_step(self) -> Self:
         assert not self.is_first_step
         return self.__class__(self.app, self.current_step_number - 1)
 
-    def for_first_step(self) -> 'Self':
+    def for_first_step(self) -> Self:
         return self.__class__(self.app, 1)
 
     @overload
     @classmethod
-    def step(cls, form: None = None) -> 'Callable[[_ViewF], _ViewF]': ...
+    def step(cls, form: None = None) -> Callable[[_ViewF], _ViewF]: ...
 
     @overload
     @classmethod
     def step(
         cls,
-        form: type['_FormT']
-    ) -> 'Callable[[_FormView[_FormT, _T]], _FormView[_FormT, _T]]': ...
+        form: type[_FormT]
+    ) -> Callable[[_FormView[_FormT, _T]], _FormView[_FormT, _T]]: ...
 
     @classmethod
-    def step(cls, form: type['Form'] | None = None) -> 'Callable[[_F], _F]':
-        def decorator(fn: '_F') -> '_F':
+    def step(cls, form: type[Form] | None = None) -> Callable[[_F], _F]:
+        def decorator(fn: _F) -> _F:
             fn.is_step = True  # type:ignore[attr-defined]
             # FIXME: monotonic may be more reliable
             fn.order = time.process_time()  # type:ignore[attr-defined]
@@ -95,7 +97,7 @@ class Step:
     @overload
     def __init__(
         self,
-        view_handler: 'Callable[[CoreRequest], Any]',
+        view_handler: Callable[[CoreRequest], Any],
         order: float,
         form: None
     ): ...
@@ -103,25 +105,25 @@ class Step:
     @overload
     def __init__(
         self,
-        view_handler: 'Callable[[CoreRequest, Form], Any]',
+        view_handler: Callable[[CoreRequest, Form], Any],
         order: float,
-        form: 'Form'
+        form: Form
     ): ...
 
     def __init__(
         self,
-        view_handler: 'Callable[..., Any]',
+        view_handler: Callable[..., Any],
         order: float,
-        form: 'Form | None'
+        form: Form | None
     ):
         self.view_handler = view_handler
         self.order = order
         self.form = form
 
-    def __lt__(self, other: 'Step') -> bool:
+    def __lt__(self, other: Step) -> bool:
         return self.order < other.order
 
-    def handle_view(self, request: 'CoreRequest', form: 'Form | None') -> Any:
+    def handle_view(self, request: CoreRequest, form: Form | None) -> Any:
         if form is None:
             return self.view_handler(request)
         else:

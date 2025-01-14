@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 from onegov.agency import AgencyApp
 from onegov.agency.layout import AgencySearchLayout
 from onegov.core.security import Public
@@ -15,9 +17,9 @@ if TYPE_CHECKING:
 
 @AgencyApp.html(model=Search, template='search.pt', permission=Public)
 def search(
-    self: Search['Base'],
-    request: 'AgencyRequest'
-) -> 'RenderData | Response':
+    self: Search[Base],
+    request: AgencyRequest
+) -> RenderData | Response:
 
     data = search_view(self, request)
     if isinstance(data, dict):

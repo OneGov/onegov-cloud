@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 from onegov.org.app import OrgApp
 from onegov.org.models import Export
 from onegov.ticket import Ticket
@@ -21,7 +23,7 @@ def has_export_permission_not_logged_in(
 @OrgApp.permission_rule(model=Export, permission=object)
 def has_export_permissions_logged_in(
     app: OrgApp,
-    identity: 'Identity',
+    identity: Identity,
     model: Export,
     permission: object
 ) -> bool:
@@ -31,7 +33,7 @@ def has_export_permissions_logged_in(
 @OrgApp.permission_rule(model=Ticket, permission=object)
 def has_permission_ticket(
     app: OrgApp,
-    identity: 'Identity',
+    identity: Identity,
     model: Ticket,
     permission: object
 ) -> bool:

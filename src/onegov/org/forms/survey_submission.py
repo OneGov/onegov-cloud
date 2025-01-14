@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 from wtforms import StringField
 from onegov.form import Form
 from onegov.org import _
@@ -35,14 +37,14 @@ class SurveySubmissionWindowForm(Form):
 
     def process_obj(
         self,
-        obj: 'SurveySubmissionWindow'  # type:ignore[override]
+        obj: SurveySubmissionWindow  # type:ignore[override]
     ) -> None:
 
         super().process_obj(obj)
 
     def populate_obj(  # type:ignore[override]
         self,
-        obj: 'SurveySubmissionWindow',  # type:ignore[override]
+        obj: SurveySubmissionWindow,  # type:ignore[override]
         *args: Any,
         **kwargs: Any,
     ) -> None:

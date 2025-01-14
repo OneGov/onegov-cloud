@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 from functools import cached_property
 from onegov.activity.models import Attendee, Booking, Occasion, Period
 from onegov.activity.utils import random_group_code
@@ -17,7 +19,7 @@ class GroupInvite:
 
     def __init__(
         self,
-        session: 'Session',
+        session: Session,
         group_code: str,
         username: str | None
     ) -> None:
@@ -26,7 +28,7 @@ class GroupInvite:
         self.username = username
 
     @classmethod
-    def create(cls, session: 'Session', username: str | None) -> 'Self':
+    def create(cls, session: Session, username: str | None) -> Self:
         """ Creates a new group invite with a code that is not yet used. """
         candidate = cls(
             session=session, group_code=random_group_code(), username=username)
@@ -37,7 +39,7 @@ class GroupInvite:
 
         return candidate
 
-    def for_username(self, username: str | None) -> 'Self':
+    def for_username(self, username: str | None) -> Self:
         return self.__class__(self.session, self.group_code, username)
 
     @cached_property
@@ -57,7 +59,7 @@ class GroupInvite:
         """
         return self.session.query(self.bookings().exists()).scalar()
 
-    def bookings(self) -> 'Query[Booking]':
+    def bookings(self) -> Query[Booking]:
         """ Returns a query of the bookings associated with this invite. """
 
         return (
@@ -101,7 +103,7 @@ class GroupInvite:
     def prospects(
         self,
         username: str
-    ) -> 'Iterator[tuple[Attendee, Booking | None]]':
+    ) -> Iterator[tuple[Attendee, Booking | None]]:
         """ Returns the attendees associated with the given users that are
         not yet part of the group.
 

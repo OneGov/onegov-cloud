@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 from onegov.form import Form
 from onegov.swissvotes import _
 from onegov.swissvotes.fields import SwissvoteDatasetField

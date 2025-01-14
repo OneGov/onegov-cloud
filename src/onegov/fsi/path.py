@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 from datetime import datetime
 from uuid import UUID
 
@@ -24,7 +26,7 @@ if TYPE_CHECKING:
 
 
 @FsiApp.path(model=Course, path='/fsi/course/{id}', converters={'id': UUID})
-def get_course_details(request: 'FsiRequest', id: UUID) -> Course | None:
+def get_course_details(request: FsiRequest, id: UUID) -> Course | None:
     return CourseCollection(request.session).by_id(id)
 
 
@@ -34,7 +36,7 @@ def get_course_details(request: 'FsiRequest', id: UUID) -> Course | None:
     converters={'id': UUID}
 )
 def get_course_event_details(
-    request: 'FsiRequest',
+    request: FsiRequest,
     id: UUID
 ) -> CourseEvent | None:
     return CourseEventCollection(
@@ -54,7 +56,7 @@ def get_course_event_details(
     }
 )
 def get_past_events_view(
-    request: 'FsiRequest',
+    request: FsiRequest,
     page: int = 0,
     show_hidden: bool = False,
     course_id: UUID | None = None,
@@ -87,7 +89,7 @@ def get_past_events_view(
     }
 )
 def get_events_view(
-    request: 'FsiRequest',
+    request: FsiRequest,
     page: int = 0,
     from_date: datetime | None = None,
     upcoming_only: bool = False,
@@ -121,7 +123,7 @@ def get_events_view(
     converters={'show_hidden_from_public': bool}
 )
 def get_courses(
-    request: 'FsiRequest',
+    request: FsiRequest,
     show_hidden_from_public: bool
 ) -> CourseCollection:
 
@@ -146,7 +148,7 @@ def get_courses(
     }
 )
 def get_attendees(
-    request: 'FsiRequest',
+    request: FsiRequest,
     page: int = 0,
     exclude_external: bool = False,
     external_only: bool = False,
@@ -171,7 +173,7 @@ def get_attendees(
     converters={'id': UUID}
 )
 def get_attendee_details(
-    request: 'FsiRequest',
+    request: FsiRequest,
     id: UUID
 ) -> CourseAttendee | None:
     return CourseAttendeeCollection(request.session).by_id(id)
@@ -183,7 +185,7 @@ def get_attendee_details(
     converters={'course_event_id': UUID}
 )
 def get_notification_templates(
-    request: 'FsiRequest',
+    request: FsiRequest,
     course_event_id: UUID | None = None
 ) -> CourseNotificationTemplateCollection:
     return CourseNotificationTemplateCollection(
@@ -196,7 +198,7 @@ def get_notification_templates(
     converters={'id': UUID}
 )
 def get_template_details(
-    request: 'FsiRequest',
+    request: FsiRequest,
     id: UUID
 ) -> CourseNotificationTemplate | None:
     return CourseNotificationTemplateCollection(request.session).by_id(id)
@@ -212,7 +214,7 @@ def get_template_details(
     }
 )
 def get_reservations(
-    request: 'FsiRequest',
+    request: FsiRequest,
     course_event_id: UUID | None = None,
     attendee_id: UUID | None = None,
     external_only: bool = False,
@@ -243,7 +245,7 @@ def get_reservations(
     converters={'id': UUID}
 )
 def get_reservation_details(
-    request: 'FsiRequest',
+    request: FsiRequest,
     id: UUID
 ) -> CourseSubscription | None:
     return SubscriptionsCollection(request.session).by_id(id)
@@ -259,7 +261,7 @@ def get_reservation_details(
     }
 )
 def get_audit(
-    request: 'FsiRequest',
+    request: FsiRequest,
     course_id: UUID | None,
     organisations: list[str],
     page: int = 0,

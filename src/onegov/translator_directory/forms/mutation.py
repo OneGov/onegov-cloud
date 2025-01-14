@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 from functools import cached_property
 
 from onegov.form import Form
@@ -44,7 +46,7 @@ BOOLS = [('True', _('Yes')), ('False', _('No'))]
 
 class TranslatorMutationForm(Form, DrivingDistanceMixin):
 
-    request: 'TranslatorAppRequest'
+    request: TranslatorAppRequest
 
     hints = [
         ('text', _('You can use this form to report mutations.')),
@@ -65,7 +67,7 @@ class TranslatorMutationForm(Form, DrivingDistanceMixin):
     locale: str = 'de_CH'
 
     @cached_property
-    def language_choices(self) -> list['_Choice']:
+    def language_choices(self) -> list[_Choice]:
         languages = LanguageCollection(self.request.session)
         return [
             (str(language.id), language.name)
@@ -73,7 +75,7 @@ class TranslatorMutationForm(Form, DrivingDistanceMixin):
         ]
 
     @cached_property
-    def certificate_choices(self) -> list['_Choice']:
+    def certificate_choices(self) -> list[_Choice]:
         certificates = LanguageCertificateCollection(self.request.session)
         return [
             (str(certificate.id), certificate.name)
@@ -135,7 +137,7 @@ class TranslatorMutationForm(Form, DrivingDistanceMixin):
                 field.long_description = str(value or '')  # type:ignore
 
     @property
-    def proposal_fields(self) -> dict[str, 'Field']:
+    def proposal_fields(self) -> dict[str, Field]:
         for fieldset in self.fieldsets:
             if fieldset.label == 'Proposed changes':
                 # NOTE: There's no type checker support for proxy objects
@@ -456,8 +458,8 @@ class TranslatorMutationForm(Form, DrivingDistanceMixin):
 
 class ApplyMutationForm(Form):
 
-    model: 'TranslatorMutation'
-    request: 'TranslatorAppRequest'
+    model: TranslatorMutation
+    request: TranslatorAppRequest
 
     changes = MultiCheckboxField(
         label=_('Proposed changes'),

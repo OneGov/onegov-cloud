@@ -5,6 +5,8 @@
 # version is to create release-dependent urls, artifacts and caches. During
 # development these dependencies do not need to be updated in lock-step.
 #
+from __future__ import annotations
+
 __version__ = '2025.1'
 
 # The module levels used for dependency tests and to have a well defined

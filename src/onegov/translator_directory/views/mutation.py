@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 from morepath import redirect
 from onegov.core.security import Secret
 from onegov.translator_directory import _
@@ -26,9 +28,9 @@ if TYPE_CHECKING:
 )
 def apply_translator_mutation(
     self: TranslatorMutation,
-    request: 'TranslatorAppRequest',
+    request: TranslatorAppRequest,
     form: ApplyMutationForm
-) -> 'RenderData | Response':
+) -> RenderData | Response:
 
     if self.target is None or self.ticket is None:
         raise exc.HTTPNotFound()

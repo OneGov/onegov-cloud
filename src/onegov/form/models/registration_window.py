@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 import sedate
 
 from onegov.core.orm import Base
@@ -45,49 +47,49 @@ class FormRegistrationWindow(Base, TimestampMixin):
     __tablename__ = 'registration_windows'
 
     #: the public id of the registraiton window
-    id: 'Column[uuid.UUID]' = Column(
+    id: Column[uuid.UUID] = Column(
         UUID,  # type:ignore[arg-type]
         primary_key=True,
         default=uuid4
     )
 
     #: the name of the form to which this registration window belongs
-    name: 'Column[str]' = Column(
+    name: Column[str] = Column(
         Text,
         ForeignKey('forms.name'),
         nullable=False
     )
 
     #: the form to which this registration window belongs
-    form: 'relationship[FormDefinition]' = relationship(
+    form: relationship[FormDefinition] = relationship(
         'FormDefinition',
         back_populates='registration_windows'
     )
 
     #: true if the registration window is enabled
-    enabled: 'Column[bool]' = Column(Boolean, nullable=False, default=True)
+    enabled: Column[bool] = Column(Boolean, nullable=False, default=True)
 
     #: the start date of the window
-    start: 'Column[date]' = Column(Date, nullable=False)
+    start: Column[date] = Column(Date, nullable=False)
 
     #: the end date of the window
-    end: 'Column[date]' = Column(Date, nullable=False)
+    end: Column[date] = Column(Date, nullable=False)
 
     #: the timezone of the window
-    timezone: 'Column[str]' = Column(
+    timezone: Column[str] = Column(
         Text,
         nullable=False,
         default='Europe/Zurich'
     )
 
     #: the number of spots (None => unlimited)
-    limit: 'Column[int | None]' = Column(Integer, nullable=True)
+    limit: Column[int | None] = Column(Integer, nullable=True)
 
     #: enable an overflow of submissions
-    overflow: 'Column[bool]' = Column(Boolean, nullable=False, default=True)
+    overflow: Column[bool] = Column(Boolean, nullable=False, default=True)
 
     #: submissions linked to this registration window
-    submissions: 'relationship[list[FormSubmission]]' = relationship(
+    submissions: relationship[list[FormSubmission]] = relationship(
         FormSubmission,
         back_populates='registration_window'
     )
@@ -117,7 +119,7 @@ class FormRegistrationWindow(Base, TimestampMixin):
     )
 
     @property
-    def localized_start(self) -> 'datetime':
+    def localized_start(self) -> datetime:
         return sedate.align_date_to_day(
             sedate.standardize_date(
                 sedate.as_datetime(self.start), self.timezone
@@ -125,7 +127,7 @@ class FormRegistrationWindow(Base, TimestampMixin):
         )
 
     @property
-    def localized_end(self) -> 'datetime':
+    def localized_end(self) -> datetime:
         return sedate.align_date_to_day(
             sedate.standardize_date(
                 sedate.as_datetime(self.end), self.timezone

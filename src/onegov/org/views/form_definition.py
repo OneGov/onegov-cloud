@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 import morepath
 
 from onegov.core.security import Private, Public
@@ -32,7 +34,7 @@ if TYPE_CHECKING:
 
 def get_form_class(
     model: BuiltinFormDefinition | CustomFormDefinition | FormCollection,
-    request: 'OrgRequest'
+    request: OrgRequest
 ) -> type[FormDefinitionForm]:
 
     if isinstance(model, FormCollection):
@@ -50,9 +52,9 @@ def get_form_class(
 #        first and on the layout second, passing around layouts in contexts
 #        where we don't actually always have one is weird
 def get_hints(
-    layout: 'Layout',
+    layout: Layout,
     window: FormRegistrationWindow | None
-) -> 'Iterator[tuple[str, str]]':
+) -> Iterator[tuple[str, str]]:
 
     if not window:
         return
@@ -93,10 +95,10 @@ def get_hints(
 
 
 def handle_form_change_name(
-    form: 'FormDefinitionT',
-    session: 'Session',
+    form: FormDefinitionT,
+    session: Session,
     new_name: str
-) -> 'FormDefinitionT':
+) -> FormDefinitionT:
 
     new_form = form.for_new_name(new_name)
     session.add(new_form)
@@ -132,10 +134,10 @@ def handle_form_change_name(
 )
 def handle_change_form_name(
     self: FormDefinition,
-    request: 'OrgRequest',
+    request: OrgRequest,
     form: FormDefinitionUrlForm,
     layout: FormEditorLayout | None = None
-) -> 'RenderData | Response':
+) -> RenderData | Response:
     """Since the name used for the url is the primary key, we create a new
     FormDefinition to make our live easier """
     site_title = _('Change URL')
@@ -163,10 +165,10 @@ def handle_change_form_name(
 )
 def handle_defined_form(
     self: FormDefinition,
-    request: 'OrgRequest',
-    form: 'Form',
+    request: OrgRequest,
+    form: Form,
     layout: FormSubmissionLayout | None = None
-) -> 'RenderData | Response':
+) -> RenderData | Response:
     """ Renders the empty form and takes input, even if it's not valid, stores
     it as a pending submission and redirects the user to the view that handles
     pending submissions.
@@ -215,10 +217,10 @@ def handle_defined_form(
 )
 def handle_new_definition(
     self: FormCollection,
-    request: 'OrgRequest',
+    request: OrgRequest,
     form: FormDefinitionForm,
     layout: FormEditorLayout | None = None
-) -> 'RenderData | Response':
+) -> RenderData | Response:
 
     if form.submitted(request):
         assert form.title.data is not None
@@ -260,10 +262,10 @@ def handle_new_definition(
 )
 def handle_edit_definition(
     self: FormDefinition,
-    request: 'OrgRequest',
+    request: OrgRequest,
     form: FormDefinitionForm,
     layout: FormEditorLayout | None = None
-) -> 'RenderData | Response':
+) -> RenderData | Response:
 
     if form.submitted(request):
         assert form.definition.data is not None
@@ -303,7 +305,7 @@ def handle_edit_definition(
 )
 def delete_form_definition(
     self: FormDefinition,
-    request: 'OrgRequest'
+    request: OrgRequest
 ) -> None:
     """
     With introduction of cancelling submissions over the registration window,
@@ -324,7 +326,7 @@ def delete_form_definition(
     if self.type != 'custom':
         raise exc.HTTPMethodNotAllowed()
 
-    def handle_ticket(submission: 'FormSubmission') -> None:
+    def handle_ticket(submission: FormSubmission) -> None:
         ticket = submission_deletable(submission, request.session)
         if ticket is False:
             raise exc.HTTPMethodNotAllowed()
@@ -333,7 +335,7 @@ def delete_form_definition(
             close_ticket(ticket, request.current_user, request)
             ticket.create_snapshot(request)
 
-    def handle_submissions(submissions: 'Iterable[FormSubmission]') -> None:
+    def handle_submissions(submissions: Iterable[FormSubmission]) -> None:
         for s in submissions:
             handle_ticket(s)
 

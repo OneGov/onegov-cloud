@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 from onegov.core.security import Public
 from onegov.gazette import _
 from onegov.gazette import GazetteApp
@@ -20,11 +22,11 @@ if TYPE_CHECKING:
 )
 def handle_forbidden(
     self: HTTPForbidden,
-    request: 'GazetteRequest'
-) -> 'RenderData':
+    request: GazetteRequest
+) -> RenderData:
 
     @request.after
-    def set_status_code(response: 'Response') -> None:
+    def set_status_code(response: Response) -> None:
         response.status_code = self.code  # pass along 403
 
     return {
@@ -43,11 +45,11 @@ def handle_forbidden(
 )
 def handle_notfound(
     self: HTTPNotFound,
-    request: 'GazetteRequest'
-) -> 'RenderData':
+    request: GazetteRequest
+) -> RenderData:
 
     @request.after
-    def set_status_code(response: 'Response') -> None:
+    def set_status_code(response: Response) -> None:
         response.status_code = self.code  # pass along 404
 
     return {

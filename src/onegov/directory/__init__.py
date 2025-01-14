@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 from onegov.directory.archive import DirectoryArchive, DirectoryZipArchive
 from onegov.directory.models import Directory, DirectoryEntry
 from onegov.directory.collections import DirectoryCollection

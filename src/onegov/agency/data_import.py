@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 from collections import defaultdict
 from datetime import datetime
 
@@ -33,10 +35,10 @@ Ts = TypeVarTuple('Ts')
 
 
 def with_open(
-    func: 'Callable[[CSVFile[DefaultRow], *Ts], T]'
-) -> 'Callable[[StrOrBytesPath, *Ts], T]':
+    func: Callable[[CSVFile[DefaultRow], *Ts], T]
+) -> Callable[[StrOrBytesPath, *Ts], T]:
 
-    def _read(filename: 'StrOrBytesPath', *args: *Ts) -> T:
+    def _read(filename: StrOrBytesPath, *args: *Ts) -> T:
         with open(filename, 'rb') as f:
             file = CSVFile(
                 f,
@@ -55,8 +57,8 @@ def v_(string: str | None) -> str | None:
 
 
 def cleaned(
-    func: 'Callable[[str], T]'
-) -> 'Callable[[str | None], T | None]':
+    func: Callable[[str], T]
+) -> Callable[[str | None], T | None]:
 
     def clean(string: str | None) -> T | None:
         cleaned = v_(string)
@@ -98,7 +100,7 @@ def split_address_on_new_line(
     return new_addr
 
 
-def get_address(line: 'DefaultRow') -> Markup | None:
+def get_address(line: DefaultRow) -> Markup | None:
     stao_addr, post_addr = v_(line.standortadresse), v_(line.postadresse)
     if stao_addr and post_addr:
         if stao_addr == post_addr:
@@ -114,7 +116,7 @@ def get_address(line: 'DefaultRow') -> Markup | None:
     return None
 
 
-def get_agency_portrait(line: 'DefaultRow') -> Markup | None:
+def get_agency_portrait(line: DefaultRow) -> Markup | None:
     portrait = Markup('')
     address = get_address(line)
     if address:
@@ -154,10 +156,10 @@ def get_agency_portrait(line: 'DefaultRow') -> Markup | None:
 
 @with_open
 def import_bs_agencies(
-    csvfile: CSVFile['DefaultRow'],
-    session: 'Session',
-    app: 'AgencyApp'
-) -> dict[str, 'ExtendedAgency']:
+    csvfile: CSVFile[DefaultRow],
+    session: Session,
+    app: AgencyApp
+) -> dict[str, ExtendedAgency]:
 
     agencies = ExtendedAgencyCollection(session)
     lines_by_id = {line.verzorgeinheitid: line for line in csvfile.lines}
@@ -188,9 +190,9 @@ def import_bs_agencies(
             children[parent_id].append(basisid)
 
     def parse_agency(
-        line: 'DefaultRow',
-        parent: 'ExtendedAgency | None' = None
-    ) -> 'ExtendedAgency':
+        line: DefaultRow,
+        parent: ExtendedAgency | None = None
+    ) -> ExtendedAgency:
 
         portrait = get_agency_portrait(line)
         agency = agencies.add(
@@ -206,7 +208,7 @@ def import_bs_agencies(
 
     def add_children(
         basisid: str,
-        parent: 'ExtendedAgency | None' = None
+        parent: ExtendedAgency | None = None
     ) -> None:
 
         nonlocal added_count
@@ -226,21 +228,21 @@ def import_bs_agencies(
 
 @with_open
 def import_bs_persons(
-    csvfile: CSVFile['DefaultRow'],
-    agencies: 'Mapping[str, ExtendedAgency]',
-    session: 'Session',
-    app: 'AgencyApp'
-) -> list['ExtendedPerson']:
+    csvfile: CSVFile[DefaultRow],
+    agencies: Mapping[str, ExtendedAgency],
+    session: Session,
+    app: AgencyApp
+) -> list[ExtendedPerson]:
 
     people = ExtendedPersonCollection(session)
     persons = []
 
-    def parse_date(date_string: str | None) -> 'date | None':
+    def parse_date(date_string: str | None) -> date | None:
         if not date_string:
             return None
         return datetime.strptime(date_string, '%d.%m.%Y').date()
 
-    def parse_person(line: 'DefaultRow') -> None:
+    def parse_person(line: DefaultRow) -> None:
         bemerkung = v_(line.bemerkung)
         notiz = v_(line.notiz)
         sprechstunde = v_(line.sprechstunde)
@@ -295,11 +297,11 @@ def import_bs_persons(
 
 
 def import_bs_data(
-    agency_file: 'StrOrBytesPath',
-    person_file: 'StrOrBytesPath',
-    request: 'AgencyRequest',
-    app: 'AgencyApp'
-) -> tuple[dict[str, 'ExtendedAgency'], list['ExtendedPerson']]:
+    agency_file: StrOrBytesPath,
+    person_file: StrOrBytesPath,
+    request: AgencyRequest,
+    app: AgencyApp
+) -> tuple[dict[str, ExtendedAgency], list[ExtendedPerson]]:
 
     session = request.session
     agencies = import_bs_agencies(agency_file, session, app)
@@ -334,7 +336,7 @@ def get_web_address(internet_adresse: str) -> str | None:
     return f'http://{internet_adresse}'
 
 
-def get_email(line: 'DefaultRow') -> str | None:
+def get_email(line: DefaultRow) -> str | None:
     email = v_(line.e_mail_adresse)
 
     if not email:
@@ -360,7 +362,7 @@ def get_email(line: 'DefaultRow') -> str | None:
     return None
 
 
-def check_skip(line: 'DefaultRow') -> bool:
+def check_skip(line: DefaultRow) -> bool:
     if line.department == 'zNeu':
         return True
 
@@ -378,7 +380,7 @@ def check_skip(line: 'DefaultRow') -> bool:
     return False
 
 
-def check_skip_people(line: 'DefaultRow') -> bool:
+def check_skip_people(line: DefaultRow) -> bool:
     kw_1 = 'Telefon'
     kw_2 = 'Telefonist'
 
@@ -394,14 +396,14 @@ def check_skip_people(line: 'DefaultRow') -> bool:
     return False
 
 
-def agency_id_agency_lu(words: 'Iterable[Any]') -> str:
+def agency_id_agency_lu(words: Iterable[Any]) -> str:
     """
     Generates an agency id based on each organisation and sub organisation word
     """
     return '__'.join(str(word).lower() for word in words if word)
 
 
-def agency_id_person_lu(line: 'DefaultRow') -> str:
+def agency_id_person_lu(line: DefaultRow) -> str:
     """
     Generates an agency id based on each organisation and sub organisation
     name for a person.
@@ -413,16 +415,16 @@ def agency_id_person_lu(line: 'DefaultRow') -> str:
 
 @with_open
 def import_lu_people(
-    csvfile: CSVFile['DefaultRow'],
-    agencies: 'Mapping[str, ExtendedAgency]',
-    session: 'Session',
-    app: 'AgencyApp'
-) -> list['ExtendedPerson']:
+    csvfile: CSVFile[DefaultRow],
+    agencies: Mapping[str, ExtendedAgency],
+    session: Session,
+    app: AgencyApp
+) -> list[ExtendedPerson]:
 
     people = ExtendedPersonCollection(session)
     persons = []
 
-    def parse_person(line: 'DefaultRow') -> None:
+    def parse_person(line: DefaultRow) -> None:
         vorname = v_(line.vorname) or ''
 
         if vorname and vorname[-1].isdigit():
@@ -450,8 +452,8 @@ def import_lu_people(
         parse_membership(line, person, function)
 
     def parse_membership(
-        line: 'DefaultRow',
-        person: 'ExtendedPerson',
+        line: DefaultRow,
+        person: ExtendedPerson,
         function: str
     ) -> None:
         agency_id = agency_id_person_lu(line)
@@ -483,10 +485,10 @@ def import_lu_people(
 
 @with_open
 def import_lu_agencies(
-    csvfile: CSVFile['DefaultRow'],
-    session: 'Session',
-    app: 'AgencyApp'
-) -> dict[str, 'ExtendedAgency']:
+    csvfile: CSVFile[DefaultRow],
+    session: Session,
+    app: AgencyApp
+) -> dict[str, ExtendedAgency]:
 
     added_agencies = {}
     agencies = ExtendedAgencyCollection(session)
@@ -606,10 +608,10 @@ def import_lu_agencies(
 
 
 def import_lu_data(
-    data_file: 'StrOrBytesPath',
-    request: 'AgencyRequest',
-    app: 'AgencyApp'
-) -> tuple[dict[str, 'ExtendedAgency'], list['ExtendedPerson']]:
+    data_file: StrOrBytesPath,
+    request: AgencyRequest,
+    app: AgencyApp
+) -> tuple[dict[str, ExtendedAgency], list[ExtendedPerson]]:
 
     session = request.session
     agencies = import_lu_agencies(data_file, session, app)
@@ -619,7 +621,7 @@ def import_lu_data(
 
 
 @with_open
-def parse_agencies(csvfile: CSVFile['DefaultRow']) -> dict[str, str]:
+def parse_agencies(csvfile: CSVFile[DefaultRow]) -> dict[str, str]:
     lines_by_id = {line.verzorgeinheitid: line for line in csvfile.lines}
     treat_as_root = tuple(
         line.verzorgeinheitid for line in csvfile.lines
@@ -643,10 +645,10 @@ def parse_agencies(csvfile: CSVFile['DefaultRow']) -> dict[str, str]:
 
 @with_open
 def match_person_membership_title(
-    csvfile: CSVFile['DefaultRow'],
-    agencies: 'Mapping[str, str]',
-    request: 'AgencyRequest',
-    app: 'AgencyApp'
+    csvfile: CSVFile[DefaultRow],
+    agencies: Mapping[str, str],
+    request: AgencyRequest,
+    app: AgencyApp
 ) -> None:
 
     session = request.session
@@ -659,7 +661,7 @@ def match_person_membership_title(
     agency_by_name_not_found = []
     updated_memberships = []
 
-    def find_persons(line: 'DefaultRow') -> list['ExtendedPerson']:
+    def find_persons(line: DefaultRow) -> list[ExtendedPerson]:
         nonlocal person_not_found
 
         email = v_(line.email)
@@ -681,12 +683,12 @@ def match_person_membership_title(
             person_not_found.append(f'{email}, {fn} {ln}')
         return persons
 
-    def get_agencies_by_name(name: str) -> list['ExtendedAgency']:
+    def get_agencies_by_name(name: str) -> list[ExtendedAgency]:
         return agency_coll.query().filter_by(title=name).all()
 
     def match_membership_title(
-        line: 'DefaultRow',
-        agencies: 'Mapping[str, str]'
+        line: DefaultRow,
+        agencies: Mapping[str, str]
     ) -> None:
 
         nonlocal agency_by_name_not_found
@@ -707,7 +709,7 @@ def match_person_membership_title(
             return
 
         def set_membership_title(
-            membership: 'AgencyMembership',
+            membership: AgencyMembership,
             name: str | None
         ) -> None:
             nonlocal updated_memberships
@@ -766,10 +768,10 @@ def match_person_membership_title(
 
 
 def import_membership_titles(
-    agency_file: 'StrOrBytesPath',
-    person_file: 'StrOrBytesPath',
-    request: 'AgencyRequest',
-    app: 'AgencyApp'
+    agency_file: StrOrBytesPath,
+    person_file: StrOrBytesPath,
+    request: AgencyRequest,
+    app: AgencyApp
 ) -> None:
 
     agencies = parse_agencies(agency_file)
