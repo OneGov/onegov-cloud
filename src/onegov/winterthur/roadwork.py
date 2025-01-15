@@ -17,7 +17,7 @@ from sedate import utcnow
 
 from typing import Any, TYPE_CHECKING
 if TYPE_CHECKING:
-    from collections.abc import Iterator
+    from collections.abc import Callable, Iterator
     from onegov.core.cache import RedisCacheRegion
     from typing import Self
 
@@ -333,6 +333,8 @@ class RoadworkCollection:
 
 
 class Roadwork:
+
+    convertors: dict[str, Callable[[str | None], Any]]
 
     def __init__(self, data: dict[str, Any]) -> None:
         self.data = data

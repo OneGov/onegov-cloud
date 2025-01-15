@@ -138,7 +138,7 @@ class Message(Base):
         )
 
 
-@event.listens_for(Message, 'init')
+@event.listens_for(Message, 'init')  # type:ignore[misc]
 def init(
     target: Message,
     args: tuple[Any, ...],

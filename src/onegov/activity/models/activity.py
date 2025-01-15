@@ -86,7 +86,7 @@ class Activity(Base, ContentMixin, TimestampMixin):
 
     #: Tags/Categories of the activity
     _tags: Column[dict[str, str] | None] = Column(  # type:ignore
-        MutableDict.as_mutable(HSTORE),
+        MutableDict.as_mutable(HSTORE),  # type:ignore[no-untyped-call]
         nullable=True,
         name='tags'
     )

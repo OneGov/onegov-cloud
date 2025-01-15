@@ -51,4 +51,4 @@ class JSON(_Base):
         return {} if value is None else value
 
 
-MutableDict.associate_with(JSON)
+MutableDict.associate_with(JSON)  # type:ignore[no-untyped-call]

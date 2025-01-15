@@ -81,7 +81,7 @@ def fill_docx_with_variables(
         return {}, render_docx(docx_template, template_variables)
 
 
-class FixedInplaceInlineImage(InlineImage):
+class FixedInplaceInlineImage(InlineImage):  # type:ignore[misc]
     """ InlineImage adds images to .docx files, but additional tweaking
     was required for left margin alignment.
 

@@ -21,7 +21,7 @@ from onegov.search.errors import SearchOfflineError
 
 from typing import Any, Literal, NamedTuple, TYPE_CHECKING
 if TYPE_CHECKING:
-    from collections.abc import Iterable, Iterator, Sequence
+    from collections.abc import Callable, Iterable, Iterator, Sequence
     from elasticsearch import Elasticsearch
     from sqlalchemy.engine import Engine
     from sqlalchemy.orm import Session
@@ -866,7 +866,7 @@ class ORMEventTranslator:
 
     """
 
-    converters = {
+    converters: dict[str, Callable[[Any], Any]] = {
         'date': lambda dt: dt and dt.isoformat(),
     }
 

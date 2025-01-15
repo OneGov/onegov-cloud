@@ -132,7 +132,7 @@ class AdjacencyList(Base):
     @declared_attr
     def __table_args__(cls):  # type:ignore
 
-        prefix = cls.__name__.lower()
+        prefix: str = cls.__name__.lower()  # type:ignore[attr-defined]
         return (
             # make sure that no children of a single parent share a name
             Index(
@@ -151,8 +151,8 @@ class AdjacencyList(Base):
             # and order by children/siblings
             Index(
                 prefix + '_order',
-                nullsfirst('parent_id'),
-                nullsfirst('"order"')
+                nullsfirst('parent_id'),  # type:ignore[arg-type]
+                nullsfirst('"order"')  # type:ignore[arg-type]
             )
         )
 
@@ -181,7 +181,7 @@ class AdjacencyList(Base):
     ) -> Callable[[Self, str], None]:
         """ Makes sure the A-Z sorting is kept when a title changes. """
 
-        class OldItemProxy(Proxy):
+        class OldItemProxy(Proxy):  # type:ignore[misc]
             title = None
 
         # we need to wrap this here because this is an abstract base class

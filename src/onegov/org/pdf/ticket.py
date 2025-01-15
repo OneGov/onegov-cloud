@@ -108,7 +108,7 @@ class TicketPdf(Pdf):
         canvas.drawRightString(
             doc.pagesize[0] - doc.rightMargin,
             doc.bottomMargin / 2,
-            f'{canvas.getPageNumber()}'
+            f'{canvas.getPageNumber()}'  # type:ignore[no-untyped-call]
         )
         canvas.restoreState()
 
