@@ -2,7 +2,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: \n"
-"POT-Creation-Date: 2024-11-25 19:53+0100\n"
+"POT-Creation-Date: 2025-01-08 16:47+0100\n"
 "PO-Revision-Date: 2022-03-15 10:52+0100\n"
 "Last-Translator: \n"
 "Language-Team: \n"
@@ -1022,6 +1022,15 @@ msgstr "Immagini a grandezza naturale"
 msgid "Grid layout"
 msgstr "Disposizione a griglia"
 
+msgid "By filename"
+msgstr "Per nome del file"
+
+msgid "By caption"
+msgstr "Per didascalia"
+
+msgid "By last change"
+msgstr "Per data dell'ultima modifica"
+
 msgid "Show images on homepage"
 msgstr "Mostra le immagini sulla pagina principale"
 
@@ -1686,6 +1695,12 @@ msgstr "Codice Analytics"
 
 msgid "JavaScript for web statistics support"
 msgstr "JavaScript per il supporto delle statistiche web"
+
+msgid "Analytics URL"
+msgstr ""
+
+msgid "URL pointing to the analytics page"
+msgstr ""
 
 msgid "Cantonal holidays"
 msgstr "Festività cantonali"
@@ -2772,9 +2787,6 @@ msgstr ""
 msgid "Delete content"
 msgstr "Cancellare il contenuto"
 
-msgid "Photo album. Will be shown at the end of content."
-msgstr "Album fotografico. Sarà mostrato alla fine del contenuto."
-
 msgid "Photo album"
 msgstr "Album fotografico"
 
@@ -2953,8 +2965,8 @@ msgstr "Il rifiuto di ${title} non può essere annullato."
 msgid "Reject reservation"
 msgstr "Rifiuta prenotazione"
 
-#. Used in sentence: "${event} published."
 #.
+#. Used in sentence: "${event} published."
 msgid "Event"
 msgstr "Evento"
 
@@ -6189,3 +6201,6 @@ msgstr "È stato creato un account per te"
 
 msgid "The user was created successfully"
 msgstr "Utente creato correttamente"
+
+#~ msgid "Photo album. Will be shown at the end of content."
+#~ msgstr "Album fotografico. Sarà mostrato alla fine del contenuto."
