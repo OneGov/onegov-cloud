@@ -492,7 +492,7 @@ class Mangled:
         return self._cache.get(self.mangle(name_id)) is not NO_VALUE
 
 
-class IdentityCache(Cache):
+class IdentityCache(Cache):  # type:ignore[misc]
     """
     Extension to the dict/shelve based default cache to use our
     redis based dogpile cache instead

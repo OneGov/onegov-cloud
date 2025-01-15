@@ -46,7 +46,7 @@ class Suggestion:
         for expression in self.person_expressions:
             query = self.session.query(expression)
             query = query.filter(
-                expression.isnot(None),
+                expression.isnot(None),  # type:ignore[no-untyped-call]
                 func.trim(expression) != '',
             )
             if self.term:
@@ -62,7 +62,7 @@ class Suggestion:
         query = query.join(AgendaItem)
         query = query.join(Assembly)
         query = query.filter(
-            self.votum_expression.isnot(None),
+            self.votum_expression.isnot(None),  # type:ignore[no-untyped-call]
             func.trim(self.votum_expression) != '',
         )
         if self.term:

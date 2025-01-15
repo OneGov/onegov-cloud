@@ -19,7 +19,7 @@ def type_from_hit(hit: BaseHit) -> str:
     return hit.meta.index.split('-')[-2]
 
 
-class Search(BaseSearch):
+class Search(BaseSearch):  # type:ignore[misc]
     """ Extends elastichsearch_dsl's search object with ORM integration.
 
     Works exactly the same as the original, but the results it returns offer
@@ -64,7 +64,7 @@ class Search(BaseSearch):
         return result
 
 
-class Response(BaseResponse):
+class Response(BaseResponse):  # type:ignore[misc]
     """ Extends the default response (list of results) with additional
     methods to query the SQLAlchemy models behind the results.
 
@@ -184,7 +184,7 @@ def explanation_value(explanation: Any, text: str) -> dict[str, Any] | None:
     return None
 
 
-class Hit(BaseHit):
+class Hit(BaseHit):  # type:ignore[misc]
     """ Extends a single result with additional methods to query the SQLAlchemy
     models behind the results.
 

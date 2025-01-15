@@ -427,7 +427,7 @@ def metadata_lock(
                 break
 
 
-@event.listens_for(Session, 'after_commit')
+@event.listens_for(Session, 'after_commit')  # type:ignore[misc]
 def update_metadata_after_commit(session: Session) -> None:
     if 'pending_metadata_changes' not in session.info:
         return
@@ -459,7 +459,7 @@ def update_metadata_after_commit(session: Session) -> None:
     del session.info['pending_metadata_changes']
 
 
-@event.listens_for(Session, 'after_soft_rollback')
+@event.listens_for(Session, 'after_soft_rollback')  # type:ignore[misc]
 def discard_metadata_on_rollback(
     session: Session,
     previous_transaction: SessionTransaction

@@ -40,7 +40,10 @@ class OccurrenceMixin(ContentMixin):
 
     #: Tags/Categories of the event
     _tags: Column[dict[str, str] | None] = Column(  # type:ignore
-        MutableDict.as_mutable(HSTORE), nullable=True, name='tags')
+        MutableDict.as_mutable(HSTORE),  # type:ignore[no-untyped-call]
+        nullable=True,
+        name='tags'
+    )
 
     @property
     def tags(self) -> list[str]:

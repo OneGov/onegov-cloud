@@ -17,7 +17,7 @@ from urllib.parse import quote_plus
 
 from typing import overload, Any, Literal, NoReturn, TYPE_CHECKING
 if TYPE_CHECKING:
-    from collections.abc import Mapping
+    from collections.abc import Callable, Mapping
     from sqlalchemy.engine import Dialect
     from typing import Self, TypeVar
 
@@ -27,7 +27,7 @@ else:
     _Base = TypeDecorator
 
 # XXX i18n
-SAFE_FORMAT_TRANSLATORS = {
+SAFE_FORMAT_TRANSLATORS: dict[type[object], Callable[[Any], str]] = {
     date: lambda d: d.strftime('%d.%m.%Y'),
     datetime: lambda d: d.strftime('%d.%m.%Y %H:%M'),
     time: lambda t: t.strftime('%H:%M')
@@ -168,7 +168,7 @@ class DirectoryConfiguration(Mutable, StoredConfiguration):
         self.show_as_thumbnails = show_as_thumbnails
 
     def __setattr__(self, name: str, value: object) -> None:
-        self.changed()
+        self.changed()  # type:ignore[no-untyped-call]
         return super().__setattr__(name, value)
 
     def missing_fields(self, formcode: str | None) -> dict[str, list[str]]:
@@ -310,4 +310,4 @@ class DirectoryConfiguration(Mutable, StoredConfiguration):
         return keywords
 
 
-DirectoryConfiguration.associate_with(DirectoryConfigurationStorage)
+DirectoryConfiguration.associate_with(DirectoryConfigurationStorage)  # type:ignore[no-untyped-call]

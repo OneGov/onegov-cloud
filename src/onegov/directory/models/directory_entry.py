@@ -79,7 +79,7 @@ class DirectoryEntry(Base, ContentMixin, CoordinatesMixin, TimestampMixin,
 
     #: All keywords defined for this entry (indexed)
     _keywords: Column[dict[str, str] | None] = Column(  # type:ignore
-        MutableDict.as_mutable(HSTORE),
+        MutableDict.as_mutable(HSTORE),  # type:ignore[no-untyped-call]
         nullable=True,
         name='keywords'
     )

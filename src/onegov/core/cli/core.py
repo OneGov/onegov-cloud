@@ -207,6 +207,7 @@ if TYPE_CHECKING:
     from collections.abc import Callable, Collection, Iterator, Sequence
     from typing import Protocol, TypedDict
 
+    from onegov.core.framework import Framework
     from onegov.core.request import CoreRequest
     from onegov.core.security.permissions import Intent
     from onegov.server.config import ApplicationConfig
@@ -574,6 +575,7 @@ def run_processors(
     #       below.
     processor = processors[0]
 
+    CliApplication: type[Framework]  # noqa: N806
     for appcfg in group_context.appcfgs:
 
         class CliApplication(appcfg.application_class):  # type:ignore

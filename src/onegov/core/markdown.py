@@ -15,7 +15,7 @@ if TYPE_CHECKING:
 RENDERER_INSTANCES = {}
 
 
-class HTMLRendererWithoutInlineHtml(HtmlRenderer):
+class HTMLRendererWithoutInlineHtml(HtmlRenderer):  # type:ignore[misc]
 
     @staticmethod
     def render_html_block(token: HTMLBlock) -> str:

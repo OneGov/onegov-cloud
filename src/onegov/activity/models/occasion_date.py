@@ -142,8 +142,8 @@ class OccasionDate(Base, TimestampMixin):
 
 
 # # changes to the dates need to be propagated to the parent occasion
-# # so it can update its aggreagated values
-@event.listens_for(Session, 'before_flush')
+# # so it can update its aggregated values
+@event.listens_for(Session, 'before_flush')  # type:ignore[misc]
 def before_flush(
     session: Session,
     context: UOWTransaction,

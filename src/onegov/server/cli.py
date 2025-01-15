@@ -443,8 +443,8 @@ class WsgiProcess(multiprocessing.Process):
         # https://bugs.python.org/issue27126
         # https://bugs.python.org/issue13829
         import urllib.request
-        urllib.request.proxy_bypass_macosx_sysconf = lambda host: None
-        urllib.request.getproxies_macosx_sysconf = dict
+        urllib.request.proxy_bypass_macosx_sysconf = lambda host: None  # type:ignore[attr-defined]
+        urllib.request.getproxies_macosx_sysconf = dict  # type:ignore[attr-defined]
 
     def run(self) -> None:
         # use the parent's process stdin to be able to provide pdb correctly

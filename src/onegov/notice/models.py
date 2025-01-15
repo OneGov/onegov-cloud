@@ -121,7 +121,9 @@ class OfficialNotice(Base, ContentMixin, TimestampMixin):
 
     #: The issues this notice appears in.
     _issues: Column[dict[str, str | None]] = Column(  # type:ignore
-        MutableDict.as_mutable(HSTORE), name='issues', nullable=True
+        MutableDict.as_mutable(HSTORE),  # type:ignore[no-untyped-call]
+        name='issues',
+        nullable=True
     )
 
     @property
@@ -156,7 +158,9 @@ class OfficialNotice(Base, ContentMixin, TimestampMixin):
 
     #: The categories of this notice.
     _categories: Column[dict[str, str | None]] = Column(  # type:ignore
-        MutableDict.as_mutable(HSTORE), name='categories', nullable=True
+        MutableDict.as_mutable(HSTORE),  # type:ignore[no-untyped-call]
+        name='categories',
+        nullable=True
     )
 
     @property
@@ -183,7 +187,9 @@ class OfficialNotice(Base, ContentMixin, TimestampMixin):
     #: The organizations of this notice.
     _organizations: Column[dict[str, str | None] | None]
     _organizations = Column(  # type:ignore[call-overload]
-        MutableDict.as_mutable(HSTORE), name='organizations', nullable=True
+        MutableDict.as_mutable(HSTORE),  # type:ignore[no-untyped-call]
+        name='organizations',
+        nullable=True
     )
 
     @property

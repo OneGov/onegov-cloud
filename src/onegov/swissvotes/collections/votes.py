@@ -362,7 +362,7 @@ class SwissVoteCollection(Pagination[SwissVote]):
             values = values + [x for y, x in extra.items() if y in values]
             statement = column.in_(values)
             if -1 in values:
-                statement = or_(statement, column.is_(None))
+                statement = or_(statement, column.is_(None))  # type:ignore[no-untyped-call]
             return statement
 
         if self.from_date:
