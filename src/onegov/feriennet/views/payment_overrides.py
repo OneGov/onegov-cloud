@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 from onegov.activity import InvoiceCollection, InvoiceItem
 from onegov.core.security import Private
 from onegov.feriennet import FeriennetApp
@@ -18,8 +20,8 @@ if TYPE_CHECKING:
     permission=Private)
 def sync_payments_and_reconcile(
     self: PaymentProviderCollection,
-    request: 'FeriennetRequest'
-) -> 'Response':
+    request: FeriennetRequest
+) -> Response:
 
     result = sync_payments(self, request)
 
@@ -42,7 +44,7 @@ def sync_payments_and_reconcile(
     name='refund',
     request_method='POST',
     permission=Private)
-def refund_and_reconcile(self: Payment, request: 'FeriennetRequest') -> None:
+def refund_and_reconcile(self: Payment, request: FeriennetRequest) -> None:
     result = refund(self, request)
 
     for link in self.links:

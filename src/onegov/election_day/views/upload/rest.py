@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 import transaction
 
 from base64 import b64decode
@@ -37,7 +39,7 @@ if TYPE_CHECKING:
     from webob.response import Response
 
 
-def authenticate(request: 'ElectionDayRequest') -> None:
+def authenticate(request: ElectionDayRequest) -> None:
     try:
         token = b64decode(
             request.authorization[1]  # type:ignore
@@ -55,9 +57,9 @@ def authenticate(request: 'ElectionDayRequest') -> None:
     request_method='POST'
 )
 def view_upload_rest(
-    self: 'Canton | Municipality',
-    request: 'ElectionDayRequest'
-) -> 'RenderData':
+    self: Canton | Municipality,
+    request: ElectionDayRequest
+) -> RenderData:
 
     """ Upload election or vote results via REST using the internal format.
 
@@ -77,7 +79,7 @@ def view_upload_rest(
     status_code: int | None = None
 
     @request.after
-    def set_status_code(response: 'Response') -> None:
+    def set_status_code(response: Response) -> None:
         if status_code is not None:
             response.status_code = status_code
 

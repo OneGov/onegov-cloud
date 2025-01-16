@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 from onegov.core.crypto import hash_password, verify_password
 from onegov.core.orm import Base
 from onegov.core.orm.mixins import data_property, dict_property, TimestampMixin
@@ -40,7 +42,7 @@ class User(Base, TimestampMixin, ORMSearchable):
     #: subclasses of this class. See
     #: `<https://docs.sqlalchemy.org/en/improve_toc/\
     #: orm/extensions/declarative/inheritance.html>`_.
-    type: 'Column[str]' = Column(
+    type: Column[str] = Column(
         Text, nullable=False, default=lambda: 'generic')
 
     __mapper_args__ = {
@@ -71,7 +73,7 @@ class User(Base, TimestampMixin, ORMSearchable):
         ]
 
     #: the user id is a uuid because that's more secure (no id guessing)
-    id: 'Column[UUIDType]' = Column(
+    id: Column[UUIDType] = Column(
         UUID,  # type:ignore[arg-type]
         nullable=False,
         primary_key=True,
@@ -79,34 +81,34 @@ class User(Base, TimestampMixin, ORMSearchable):
     )
 
     #: the username may be any string, but will usually be an email address
-    username: 'Column[str]' = Column(
+    username: Column[str] = Column(
         LowercaseText,
         unique=True,
         nullable=False
     )
 
     #: the password is stored with the hashing algorithm defined by onegov.core
-    password_hash: 'Column[str]' = Column(Text, nullable=False)
+    password_hash: Column[str] = Column(Text, nullable=False)
 
     #: the role is relevant for security in onegov.core
-    role: 'Column[str]' = Column(Text, nullable=False)
+    role: Column[str] = Column(Text, nullable=False)
 
     #: the id of the group this user belongs to
-    group_id: 'Column[UUIDType | None]' = Column(
+    group_id: Column[UUIDType | None] = Column(
         UUID,  # type:ignore[arg-type]
         ForeignKey(UserGroup.id),
         nullable=True
     )
 
     #: the group this user belongs to
-    group: 'relationship[UserGroup | None]' = relationship(
+    group: relationship[UserGroup | None] = relationship(
         UserGroup,
         back_populates='users'
     )
 
     #: the real name of the user for display (use the :attr:`name` property
     #: to automatically get the name or the username)
-    realname: 'Column[str | None]' = Column(Text, nullable=True)
+    realname: Column[str | None] = Column(Text, nullable=True)
 
     #: extra data that may be stored with this user, the format and content
     #: of this data is defined by the consumer of onegov.user
@@ -115,7 +117,7 @@ class User(Base, TimestampMixin, ORMSearchable):
     #:
     #:     session.query(User).options(undefer("data"))
     #:
-    data: 'Column[dict[str, Any]]' = deferred(Column(JSON, nullable=True))
+    data: Column[dict[str, Any]] = deferred(Column(JSON, nullable=True))
 
     #: two-factor authentication schemes are enabled with this property
     #: if no two-factor auth is used, the value is NULL, if one *is* used,
@@ -132,7 +134,7 @@ class User(Base, TimestampMixin, ORMSearchable):
     #:
     #: Note that 'data' could also be a nested dictionary!
     #:
-    second_factor: 'Column[dict[str, Any] | None]' = Column(
+    second_factor: Column[dict[str, Any] | None] = Column(
         JSON,
         nullable=True
     )
@@ -145,19 +147,19 @@ class User(Base, TimestampMixin, ORMSearchable):
     #
     #: A user can technically come from changing providers - the source refers
     #: to the last provider he used.
-    source: 'Column[str | None]' = Column(Text, nullable=True, default=None)
+    source: Column[str | None] = Column(Text, nullable=True, default=None)
 
     #: A string describing the user id on the source, which is an id that is
     #: supposed never change (unlike the username, which may change).
     #:
     #: If set, the source_id is unique per source.
-    source_id: 'Column[str | None]' = Column(Text, nullable=True, default=None)
+    source_id: Column[str | None] = Column(Text, nullable=True, default=None)
 
     #: true if the user is active
-    active: 'Column[bool]' = Column(Boolean, nullable=False, default=True)
+    active: Column[bool] = Column(Boolean, nullable=False, default=True)
 
     #: the signup token used by the user
-    signup_token: 'Column[str | None]' = Column(
+    signup_token: Column[str | None] = Column(
         Text,
         nullable=True,
         default=None
@@ -169,7 +171,7 @@ class User(Base, TimestampMixin, ORMSearchable):
     )
 
     #: the role mappings associated with this user
-    role_mappings: 'relationship[AppenderQuery[RoleMapping]]' = relationship(
+    role_mappings: relationship[AppenderQuery[RoleMapping]] = relationship(
         'RoleMapping',
         back_populates='user',
         lazy='dynamic'
@@ -307,7 +309,7 @@ class User(Base, TimestampMixin, ORMSearchable):
         return self.second_factor.get('data')
 
     #: sessions of this user
-    sessions: dict_property[dict[str, 'SessionDict'] | None] = data_property()
+    sessions: dict_property[dict[str, SessionDict] | None] = data_property()
 
     #: tags of this user
     tags: dict_property[list[str] | None] = data_property()
@@ -315,7 +317,7 @@ class User(Base, TimestampMixin, ORMSearchable):
     #: the phone number of this user
     phone_number: dict_property[str | None] = data_property()
 
-    def cleanup_sessions(self, app: 'Framework') -> None:
+    def cleanup_sessions(self, app: Framework) -> None:
         """ Removes stored sessions not valid anymore. """
 
         self.sessions = self.sessions or {}
@@ -323,7 +325,7 @@ class User(Base, TimestampMixin, ORMSearchable):
             if not remembered(app, session_id):
                 del self.sessions[session_id]
 
-    def save_current_session(self, request: 'CoreRequest') -> None:
+    def save_current_session(self, request: CoreRequest) -> None:
         """ Stores the current browser session. """
 
         self.sessions = self.sessions or {}
@@ -335,7 +337,7 @@ class User(Base, TimestampMixin, ORMSearchable):
 
         self.cleanup_sessions(request.app)
 
-    def remove_current_session(self, request: 'CoreRequest') -> None:
+    def remove_current_session(self, request: CoreRequest) -> None:
         """ Removes the current browser session. """
 
         token = request.browser_session._token
@@ -344,7 +346,7 @@ class User(Base, TimestampMixin, ORMSearchable):
 
         self.cleanup_sessions(request.app)
 
-    def logout_all_sessions(self, app: 'Framework') -> int:
+    def logout_all_sessions(self, app: Framework) -> int:
         """ Terminates all open browser sessions. """
 
         self.sessions = self.sessions or {}

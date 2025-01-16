@@ -4,6 +4,8 @@ of content in a hierarchy.
 See also: `<https://docs.sqlalchemy.org/en/rel_0_9/orm/self_referential.html>`_
 
 """
+from __future__ import annotations
+
 from sqlalchemy import func
 from sqlalchemy.ext.hybrid import hybrid_property
 
@@ -29,16 +31,16 @@ class Page(AdjacencyList, ContentMixin, TimestampMixin,
 
     if TYPE_CHECKING:
         # we override these relationships to be more specific
-        parent: relationship['Page | None']
-        children: relationship[list['Page']]
+        parent: relationship[Page | None]
+        children: relationship[list[Page]]
 
         @property
-        def root(self) -> 'Page': ...
+        def root(self) -> Page: ...
         @property
-        def ancestors(self) -> 'Iterator[Page]': ...
+        def ancestors(self) -> Iterator[Page]: ...
 
         # HACK: Workaround for hybrid_property not working until SQLAlchemy 2.0
-        published_or_created: 'Column[bool]'
+        published_or_created: Column[bool]
     else:
         @hybrid_property
         def published_or_created(self):

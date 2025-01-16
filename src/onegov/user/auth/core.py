@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 import morepath
 
 from itsdangerous import URLSafeSerializer, BadData
@@ -37,7 +39,7 @@ class Auth:
 
     def __init__(
         self,
-        app: 'UserApp',
+        app: UserApp,
         # FIXME: For now we allow None, because purl.URL will default
         #        to '/' for None, which is used by relative_url, but
         #        we should probably be more vigilant about this...
@@ -73,11 +75,11 @@ class Auth:
     @classmethod
     def from_request(
         cls,
-        request: 'CoreRequest',
+        request: CoreRequest,
         to: str | None = '/',
         skip: bool = False,
         signup_token: str | None = None
-    ) -> 'Self':
+    ) -> Self:
         return cls(
             request.app,  # type:ignore[arg-type]
             to,
@@ -88,10 +90,10 @@ class Auth:
     @classmethod
     def from_request_path(
         cls,
-        request: 'CoreRequest',
+        request: CoreRequest,
         skip: bool = False,
         signup_token: str | None = None
-    ) -> 'Self':
+    ) -> Self:
         return cls.from_request(
             request, request.transform(request.path), skip, signup_token)
 
@@ -99,10 +101,10 @@ class Auth:
     def users(self) -> UserCollection:
         return UserCollection(self.session)
 
-    def redirect(self, request: 'CoreRequest', path: str) -> Response:
+    def redirect(self, request: CoreRequest, path: str) -> Response:
         return morepath.redirect(request.transform(path))
 
-    def skippable(self, request: 'CoreRequest') -> bool:
+    def skippable(self, request: CoreRequest) -> bool:
         """ Returns true if the login for the current `to` target is optional
         (i.e. it is not required to access the page).
 
@@ -126,8 +128,8 @@ class Auth:
 
     def apply_second_factor(
         self,
-        request: 'CoreRequest',
-        user: 'User',
+        request: CoreRequest,
+        user: User,
         second_factor_value: str | None
     ) -> Response | bool:
         """ Applies the second factor if applicable.
@@ -168,13 +170,13 @@ class Auth:
 
     def authenticate(
         self,
-        request: 'CoreRequest',
+        request: CoreRequest,
         username: str,
         password: str,
         client: str = 'unknown',
         second_factor: str | None = None,
         skip_providers: bool = False
-    ) -> 'User | Response | None':
+    ) -> User | Response | None:
         """ Takes the given username and password and matches them against the
         users collection. This does not login the user, use :meth:`login_to` to
         accomplish that.
@@ -264,7 +266,7 @@ class Auth:
         log.info(f'Successful login by {client} ({username})')
         return user
 
-    def as_identity(self, user: 'User') -> 'Identity':
+    def as_identity(self, user: User) -> Identity:
         """ Returns the morepath identity of the given user. """
 
         return self.identity_class(
@@ -280,7 +282,7 @@ class Auth:
             application_id=self.application_id
         )
 
-    def by_identity(self, identity: 'Identity | NoIdentity') -> 'User | None':
+    def by_identity(self, identity: Identity | NoIdentity) -> User | None:
         """ Returns the user record of the given identity. """
         if identity.userid is None:
             return None
@@ -290,7 +292,7 @@ class Auth:
         self,
         username: str,
         password: str,
-        request: 'CoreRequest',
+        request: CoreRequest,
         second_factor: str | None = None,
         skip_providers: bool = False
     ) -> Response | None:
@@ -333,8 +335,8 @@ class Auth:
 
     def complete_login(
         self,
-        user: 'User',
-        request: 'CoreRequest'
+        user: User,
+        request: CoreRequest
     ) -> Response:
         """ Takes a user record, remembers its session and returns a proper
         redirect response to complete the login.
@@ -373,7 +375,7 @@ class Auth:
 
     def logout_to(
         self,
-        request: 'CoreRequest',
+        request: CoreRequest,
         to: str | None = None
     ) -> Response:
         """ Logs the current user out and redirects to ``to`` or ``self.to``.
@@ -423,7 +425,7 @@ class Auth:
             salt=token_bytes(16)
         )
 
-    def decode_signup_token(self, token: str) -> 'SignupToken | None':
+    def decode_signup_token(self, token: str) -> SignupToken | None:
         try:
             serialized, _, encoded_salt = token.rpartition('.')
             if not serialized:
@@ -462,9 +464,9 @@ class Auth:
 
     def register(
         self,
-        form: 'RegistrationForm',
-        request: 'CoreRequest'
-    ) -> 'User':
+        form: RegistrationForm,
+        request: CoreRequest
+    ) -> User:
         """ Registers the user using the information on the registration form.
 
         Takes the signup token into account to provide the user with the

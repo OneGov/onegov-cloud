@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 from decimal import Decimal
 from onegov.core.orm import Base
 from onegov.core.orm.abstract.associable import Associable
@@ -28,14 +30,14 @@ class Payment(Base, TimestampMixin, ContentMixin, Associable):
     __tablename__ = 'payments'
 
     #: the public id of the payment
-    id: 'Column[uuid.UUID]' = Column(
+    id: Column[uuid.UUID] = Column(
         UUID,  # type: ignore[arg-type]
         primary_key=True,
         default=uuid4
     )
 
     #: the polymorphic source of the payment
-    source: 'Column[str]' = Column(
+    source: Column[str] = Column(
         Text,
         nullable=False,
         default=lambda: 'generic'
@@ -43,16 +45,16 @@ class Payment(Base, TimestampMixin, ContentMixin, Associable):
 
     #: the amount to pay
     # FIXME: This was probably meant to be nullable=False
-    amount: 'Column[Decimal | None]' = Column(Numeric(precision=8, scale=2))
+    amount: Column[Decimal | None] = Column(Numeric(precision=8, scale=2))
 
     #: the currency of the amount to pay
-    currency: 'Column[str]' = Column(Text, nullable=False, default='CHF')
+    currency: Column[str] = Column(Text, nullable=False, default='CHF')
 
     #: remote id of the payment
-    remote_id: 'Column[str | None]' = Column(Text, nullable=True)
+    remote_id: Column[str | None] = Column(Text, nullable=True)
 
     #: the state of the payment
-    state: 'Column[PaymentState]' = Column(
+    state: Column[PaymentState] = Column(
         Enum(  # type:ignore[arg-type]
             'open', 'paid', 'failed', 'cancelled',
             name='payment_state'
@@ -62,7 +64,7 @@ class Payment(Base, TimestampMixin, ContentMixin, Associable):
     )
 
     #: the id of the payment provider associated with the payment
-    provider_id: 'Column[uuid.UUID | None]' = Column(
+    provider_id: Column[uuid.UUID | None] = Column(
         UUID,  # type:ignore[arg-type]
         ForeignKey('payment_providers.id'),
         nullable=True
@@ -70,7 +72,7 @@ class Payment(Base, TimestampMixin, ContentMixin, Associable):
 
     #: the payment provider associated with the payment, if it is missing it
     #: means that the payment is out-of-band (say paid by cash)
-    provider: 'relationship[PaymentProvider[Self] | None]' = relationship(
+    provider: relationship[PaymentProvider[Self] | None] = relationship(
         'PaymentProvider',
         back_populates='payments'
     )

@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 import sedate
 
 from onegov.form import Form
@@ -18,7 +20,7 @@ if TYPE_CHECKING:
 
 class CourseEventForm(Form):
 
-    request: 'FsiRequest'
+    request: FsiRequest
 
     course_id = ChosenSelectField(
         label=_('Course'),
@@ -141,7 +143,7 @@ class CourseEventForm(Form):
         self.status.default = 'created'
 
     @staticmethod
-    def fix_utc_to_local_time(db_time: 'datetime | None') -> 'datetime | None':
+    def fix_utc_to_local_time(db_time: datetime | None) -> datetime | None:
         # Todo: TimezoneDateTimeField.process_data is not called when applying
         # the date from the database in apply model
         return db_time and sedate.to_timezone(

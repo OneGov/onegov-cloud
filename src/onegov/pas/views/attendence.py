@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 from onegov.core.elements import Link
 from onegov.core.security import Private
 from onegov.pas import _
@@ -25,8 +27,8 @@ if TYPE_CHECKING:
 )
 def view_attendences(
     self: AttendenceCollection,
-    request: 'TownRequest'
-) -> 'RenderData':
+    request: TownRequest
+) -> RenderData:
 
     layout = AttendenceCollectionLayout(self, request)
 
@@ -47,9 +49,9 @@ def view_attendences(
 )
 def add_attendence(
     self: AttendenceCollection,
-    request: 'TownRequest',
+    request: TownRequest,
     form: AttendenceAddForm
-) -> 'RenderData | Response':
+) -> RenderData | Response:
 
     if form.submitted(request):
         attendence = self.add(**form.get_useful_data())
@@ -78,9 +80,9 @@ def add_attendence(
 )
 def add_plenary_attendence(
     self: AttendenceCollection,
-    request: 'TownRequest',
+    request: TownRequest,
     form: AttendenceAddPlenaryForm
-) -> 'RenderData | Response':
+) -> RenderData | Response:
 
     if form.submitted(request):
         data = form.get_useful_data()
@@ -112,8 +114,8 @@ def add_plenary_attendence(
 )
 def view_attendence(
     self: Attendence,
-    request: 'TownRequest'
-) -> 'RenderData':
+    request: TownRequest
+) -> RenderData:
 
     layout = AttendenceLayout(self, request)
 
@@ -133,9 +135,9 @@ def view_attendence(
 )
 def edit_attendence(
     self: Attendence,
-    request: 'TownRequest',
+    request: TownRequest,
     form: AttendenceForm
-) -> 'RenderData | Response':
+) -> RenderData | Response:
 
     if form.submitted(request):
         form.populate_obj(self)
@@ -164,7 +166,7 @@ def edit_attendence(
 )
 def delete_attendence(
     self: Attendence,
-    request: 'TownRequest'
+    request: TownRequest
 ) -> None:
 
     request.assert_valid_csrf_token()

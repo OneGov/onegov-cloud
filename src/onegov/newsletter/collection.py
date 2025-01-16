@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 from onegov.core.utils import normalize_for_url, is_uuid
 from onegov.newsletter import Newsletter, Recipient
 from onegov.newsletter.errors import AlreadyExistsError
@@ -13,10 +15,10 @@ if TYPE_CHECKING:
 
 class NewsletterCollection:
 
-    def __init__(self, session: 'Session'):
+    def __init__(self, session: Session):
         self.session = session
 
-    def query(self) -> 'Query[Newsletter]':
+    def query(self) -> Query[Newsletter]:
         return self.session.query(Newsletter)
 
     def by_name(self, name: str) -> Newsletter | None:
@@ -25,11 +27,11 @@ class NewsletterCollection:
     def add(
         self,
         title: str,
-        html: 'Markup',
+        html: Markup,
         lead: str | None = None,
         meta: dict[str, Any] | None = None,
         content: dict[str, Any] | None = None,
-        scheduled: 'datetime | None' = None
+        scheduled: datetime | None = None
     ) -> Newsletter:
 
         name = normalize_for_url(title)
@@ -59,13 +61,13 @@ class NewsletterCollection:
 
 class RecipientCollection:
 
-    def __init__(self, session: 'Session'):
+    def __init__(self, session: Session):
         self.session = session
 
-    def query(self) -> 'Query[Recipient]':
+    def query(self) -> Query[Recipient]:
         return self.session.query(Recipient)
 
-    def by_id(self, id: 'str | UUID') -> Recipient | None:
+    def by_id(self, id: str | UUID) -> Recipient | None:
         if is_uuid(id):
             return self.query().filter(Recipient.id == id).first()
         return None
@@ -82,7 +84,7 @@ class RecipientCollection:
 
         return query.first()
 
-    def ordered_by_status_address(self) -> 'Query[Recipient]':
+    def ordered_by_status_address(self) -> Query[Recipient]:
         """ Orders the recipients by status and address. """
         return self.query().order_by(Recipient.confirmed, Recipient.address)
 

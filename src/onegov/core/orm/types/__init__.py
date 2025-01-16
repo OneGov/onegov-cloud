@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 from onegov.core.orm.types.hstore_type import HSTORE
 from onegov.core.orm.types.json_type import JSON
 from onegov.core.orm.types.markup_text_type import MarkupText

@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 from onegov.agency import _
 from onegov.agency import AgencyApp
 from onegov.agency.collections import ExtendedAgencyCollection
@@ -27,8 +29,8 @@ if TYPE_CHECKING:
 )
 def view_hidden_agencies(
     self: Organisation,
-    request: 'AgencyRequest'
-) -> 'RenderData':
+    request: AgencyRequest
+) -> RenderData:
 
     session = request.session
 

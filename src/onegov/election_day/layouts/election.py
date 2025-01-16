@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 from functools import cached_property
 from onegov.core.utils import normalize_for_url
 from onegov.election_day import _
@@ -24,12 +26,12 @@ if TYPE_CHECKING:
 
 class ElectionLayout(DetailLayout):
 
-    model: 'Election'
+    model: Election
 
     def __init__(
         self,
-        model: 'Election',
-        request: 'ElectionDayRequest',
+        model: Election,
+        request: ElectionDayRequest,
         tab: str | None = None
     ) -> None:
         super().__init__(model, request)
@@ -244,7 +246,7 @@ class ElectionLayout(DetailLayout):
         return self.request.link(self.model, 'lists')
 
     @cached_property
-    def menu(self) -> 'NestedMenu':
+    def menu(self) -> NestedMenu:
         result: NestedMenu = []
 
         submenus = (
@@ -352,5 +354,5 @@ class ElectionLayout(DetailLayout):
         return [(e.title, self.request.link(e)) for e in result]
 
     @cached_property
-    def results(self) -> 'list[ElectionResult]':
+    def results(self) -> list[ElectionResult]:
         return self.model.results

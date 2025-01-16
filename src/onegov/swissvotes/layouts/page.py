@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 from functools import cached_property
 from onegov.core.elements import Link
 from onegov.core.elements import LinkGroup
@@ -93,7 +95,7 @@ class PageLayout(DefaultLayout):
             Link(self.title, '#'),
         ]
 
-    def get_file_url(self, file: 'TranslatablePageFile') -> str:
+    def get_file_url(self, file: TranslatablePageFile) -> str:
 
         lang = file.locale.split('_')[0]
 
@@ -204,7 +206,7 @@ class DeletePageAttachmentLayout(DefaultLayout):
         return _('Delete attachment')
 
     @cached_property
-    def parent(self) -> 'TranslatablePage':
+    def parent(self) -> TranslatablePage:
         return self.model.linked_swissvotes_page[0]
 
     @cached_property

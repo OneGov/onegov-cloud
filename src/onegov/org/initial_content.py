@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 import codecs
 import os
 import yaml
@@ -32,7 +34,7 @@ def load_content(path: str) -> dict[str, Any]:
         return yaml.safe_load(f)
 
 
-def absolute_path(path: str, base: 'StrPath') -> str:
+def absolute_path(path: str, base: StrPath) -> str:
     if path.startswith('/'):
         return path
     if path.startswith('~'):
@@ -42,7 +44,7 @@ def absolute_path(path: str, base: 'StrPath') -> str:
 
 
 def create_new_organisation(
-    app: 'OrgApp',
+    app: OrgApp,
     name: str,
     create_files: bool = True,
     path: str | None = None,
@@ -67,7 +69,7 @@ def create_new_organisation(
     translator = app.translations.get(locale)
     assert translator is not None
 
-    def translate(text: 'TranslationString') -> str:
+    def translate(text: TranslationString) -> str:
         return text.interpolate(translator.gettext(text))
 
     add_pages(session, path)
@@ -81,7 +83,7 @@ def create_new_organisation(
     return org
 
 
-def add_pages(session: 'Session', path: str) -> None:
+def add_pages(session: Session, path: str) -> None:
     pages = PageCollection(session)
 
     for ix, page in enumerate(load_content(path).get('pages', ())):
@@ -102,8 +104,8 @@ def add_pages(session: 'Session', path: str) -> None:
 
 
 def add_builtin_forms(
-    session: 'Session',
-    definitions: 'Iterable[tuple[str, str, str]] | None' = None,
+    session: Session,
+    definitions: Iterable[tuple[str, str, str]] | None = None,
     locale: str = 'de_CH'
 ) -> None:
 
@@ -125,9 +127,9 @@ def add_builtin_forms(
 
 
 def builtin_form_definitions(
-    path: 'StrPath | None' = None,
+    path: StrPath | None = None,
     locale: str = 'de_CH'
-) -> 'Iterator[tuple[str, str, str]]':
+) -> Iterator[tuple[str, str, str]]:
     """ Yields the name, title and the form definition of all form definitions
     in the given or the default path.
 
@@ -160,8 +162,8 @@ def load_definition(path: str) -> tuple[str, str]:
 
 
 def add_resources(
-    libres_context: 'LibresContext',
-    translate: 'Callable[[TranslationString], str]'
+    libres_context: LibresContext,
+    translate: Callable[[TranslationString], str]
 ) -> None:
 
     resource = ResourceCollection(libres_context)
@@ -180,7 +182,7 @@ def add_resources(
 
 
 def add_filesets(
-    session: 'Session',
+    session: Session,
     organisation_name: str,
     path: str
 ) -> None:
@@ -214,9 +216,9 @@ def add_filesets(
 
 
 def add_events(
-    session: 'Session',
+    session: Session,
     name: str,
-    translate: 'Callable[[TranslationString], str]',
+    translate: Callable[[TranslationString], str],
     create_files: bool
 ) -> None:
 

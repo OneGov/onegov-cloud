@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 from onegov.org.forms import ManageUserForm
 from onegov.translator_directory import _
 

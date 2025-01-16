@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 from datetime import date
 from onegov.core.collection import GenericCollection
 from onegov.pas.models import ParliamentaryGroup
@@ -14,7 +16,7 @@ class ParliamentaryGroupCollection(GenericCollection[ParliamentaryGroup]):
 
     def __init__(
         self,
-        session: 'Session',
+        session: Session,
         active: bool | None = None
     ):
         super().__init__(session)
@@ -24,7 +26,7 @@ class ParliamentaryGroupCollection(GenericCollection[ParliamentaryGroup]):
     def model_class(self) -> type[ParliamentaryGroup]:
         return ParliamentaryGroup
 
-    def query(self) -> 'Query[ParliamentaryGroup]':
+    def query(self) -> Query[ParliamentaryGroup]:
         query = super().query()
 
         if self.active is not None:
@@ -43,5 +45,5 @@ class ParliamentaryGroupCollection(GenericCollection[ParliamentaryGroup]):
     def for_filter(
         self,
         active: bool | None = None
-    ) -> 'Self':
+    ) -> Self:
         return self.__class__(self.session, active)

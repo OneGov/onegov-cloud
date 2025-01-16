@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 import sqlalchemy
 
 from sqlalchemy_utils import QueryChain as QueryChainBase
@@ -13,7 +15,7 @@ if TYPE_CHECKING:
     # we have to forward declare the implementation, since QueryChainBase
     # is only generic in our stub and not at runtime
     class QueryChain(QueryChainBase[_T]):
-        def slice(self, start: int | None, end: int | None) -> 'Self': ...
+        def slice(self, start: int | None, end: int | None) -> Self: ...
         def first(self) -> _T | None: ...
         def all(self) -> tuple[_T, ...]: ...
 
@@ -21,17 +23,17 @@ if TYPE_CHECKING:
 class QueryChain(QueryChainBase):  # type:ignore
     """ Extends SQLAlchemy Utils' QueryChain with some extra methods. """
 
-    def slice(self, start: int | None, end: int | None) -> 'Self':
+    def slice(self, start: int | None, end: int | None) -> Self:
         return self[start:end]
 
-    def first(self) -> '_T | None':
+    def first(self) -> _T | None:
         return next((o for o in self), None)
 
-    def all(self) -> tuple['_T', ...]:
+    def all(self) -> tuple[_T, ...]:
         return tuple(self)
 
 
-def maybe_merge(session: 'Session', obj: '_T') -> '_T':
+def maybe_merge(session: Session, obj: _T) -> _T:
     """ Merges the given obj into the given session, *if* this is possible.
     That is it acts like more forgiving session.merge().
     """

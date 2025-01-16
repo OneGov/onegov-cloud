@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 from decimal import Decimal
 from functools import cached_property
 from markupsafe import Markup
@@ -117,7 +119,7 @@ class PolicyArea:
             result.append(lookup.label or str(self.descriptor))
         return result
 
-    def html(self, request: 'SwissvotesRequest') -> Markup:
+    def html(self, request: SwissvotesRequest) -> Markup:
         title = Markup(' &gt; ').join(
             request.translate(part) for part in self.label_path
         )
@@ -137,7 +139,7 @@ class PolicyAreaDefinition:
         self,
         path: list[int] | None = None,
         label: str | None = None,
-        children: list['PolicyAreaDefinition'] | None = None
+        children: list[PolicyAreaDefinition] | None = None
     ) -> None:
 
         self.path = path or []
@@ -149,14 +151,14 @@ class PolicyAreaDefinition:
             child.value: index for index, child in enumerate(self.children)
         }
 
-    def get(self, key: int) -> 'PolicyAreaDefinition | None':
+    def get(self, key: int) -> PolicyAreaDefinition | None:
         """ Returns the child with the given value. """
         if key in self.index:
             return self.children[self.index[key]]
         return None
 
     @staticmethod
-    def all() -> 'PolicyAreaDefinition':
+    def all() -> PolicyAreaDefinition:
         """ Returns the tree of all policy areas. """
 
         return PolicyAreaDefinition(children=[

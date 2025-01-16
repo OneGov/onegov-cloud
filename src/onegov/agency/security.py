@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 from onegov.agency import AgencyApp
 from onegov.agency.collections import ExtendedAgencyCollection
 from onegov.agency.models import AgencyMembershipMoveWithinAgency
@@ -21,8 +23,8 @@ if TYPE_CHECKING:
 
 
 def get_current_role(
-    session: 'Session',
-    identity: 'Identity | NoIdentity'
+    session: Session,
+    identity: Identity | NoIdentity
 ) -> str | None:
     """ Returns the current role of the identity. Elevates the role from member
     to editor if any group role mapping with editor role is present.
@@ -45,7 +47,7 @@ def get_current_role(
 
 def has_permission(
     app: AgencyApp,
-    identity: 'Identity',
+    identity: Identity,
     model: object,
     permission: object
 ) -> bool:
@@ -62,7 +64,7 @@ def has_permission(
 
 def has_model_permission(
     app: AgencyApp,
-    identity: 'Identity',
+    identity: Identity,
     model: object,
     permission: object
 ) -> bool:
@@ -94,7 +96,7 @@ def has_model_permission(
 @AgencyApp.permission_rule(model=object, permission=object)
 def has_permission_all(
     app: AgencyApp,
-    identity: 'Identity',
+    identity: Identity,
     model: object,
     permission: object
 ) -> bool:
@@ -106,7 +108,7 @@ def has_permission_all(
 @AgencyApp.permission_rule(model=Agency, permission=object)
 def has_permission_agency(
     app: AgencyApp,
-    identity: 'Identity',
+    identity: Identity,
     model: Agency,
     permission: object
 ) -> bool:
@@ -116,7 +118,7 @@ def has_permission_agency(
 @AgencyApp.permission_rule(model=AgencyMembership, permission=object)
 def has_permission_agency_membership(
     app: AgencyApp,
-    identity: 'Identity',
+    identity: Identity,
     model: AgencyMembership,
     permission: object
 ) -> bool:
@@ -132,7 +134,7 @@ def has_permission_agency_membership(
 @AgencyApp.permission_rule(model=Person, permission=object)
 def has_permission_person(
     app: AgencyApp,
-    identity: 'Identity',
+    identity: Identity,
     model: Person,
     permission: object
 ) -> bool:
@@ -155,7 +157,7 @@ def has_permission_person(
 @AgencyApp.permission_rule(model=AgencyCollection, permission=object)
 def has_permission_agency_collection(
     app: AgencyApp,
-    identity: 'Identity',
+    identity: Identity,
     model: AgencyCollection,
     permission: object
 ) -> bool:
@@ -165,7 +167,7 @@ def has_permission_agency_collection(
 @AgencyApp.permission_rule(model=AgencyMove, permission=object)
 def has_permission_agency_move(
     app: AgencyApp,
-    identity: 'Identity',
+    identity: Identity,
     model: AgencyMove,
     permission: object
 ) -> bool:
@@ -186,7 +188,7 @@ def has_permission_agency_move(
 )
 def has_permission_agency_membership_move_within_agency(
     app: AgencyApp,
-    identity: 'Identity',
+    identity: Identity,
     model: AgencyMembershipMoveWithinAgency,
     permission: object
 ) -> bool:
@@ -207,7 +209,7 @@ def has_permission_agency_membership_move_within_agency(
 )
 def has_permission_agency_membership_move_within_person(
     app: AgencyApp,
-    identity: 'Identity',
+    identity: Identity,
     model: AgencyMembershipMoveWithinPerson,
     permission: object
 ) -> bool:
@@ -226,7 +228,7 @@ def has_permission_agency_membership_move_within_person(
 @AgencyApp.permission_rule(model=AgencyMutationTicket, permission=object)
 def has_permission_agency_mutation_ticket(
     app: AgencyApp,
-    identity: 'Identity',
+    identity: Identity,
     model: AgencyMutationTicket,
     permission: object
 ) -> bool:
@@ -240,7 +242,7 @@ def has_permission_agency_mutation_ticket(
 @AgencyApp.permission_rule(model=PersonMutationTicket, permission=object)
 def has_permission_person_mutation_ticket(
     app: AgencyApp,
-    identity: 'Identity',
+    identity: Identity,
     model: PersonMutationTicket,
     permission: object
 ) -> bool:

@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 import os
 import shlex
 import logging
@@ -32,10 +34,10 @@ class ConditionalFilter(FileFilter):
     def __init__(self, filter: FileFilter):
         self.filter = filter
 
-    def meets_condition(self, uploaded_file: 'UploadedFile') -> bool:
+    def meets_condition(self, uploaded_file: UploadedFile) -> bool:
         raise NotImplementedError
 
-    def on_save(self, uploaded_file: 'UploadedFile') -> None:
+    def on_save(self, uploaded_file: UploadedFile) -> None:
         if self.meets_condition(uploaded_file):
             self.filter.on_save(uploaded_file)
 
@@ -46,7 +48,7 @@ class OnlyIfImage(ConditionalFilter):
 
     """
 
-    def meets_condition(self, uploaded_file: 'UploadedFile') -> bool:
+    def meets_condition(self, uploaded_file: UploadedFile) -> bool:
         return uploaded_file.content_type in IMAGE_MIME_TYPES
 
 
@@ -56,7 +58,7 @@ class OnlyIfPDF(ConditionalFilter):
 
     """
 
-    def meets_condition(self, uploaded_file: 'UploadedFile') -> bool:
+    def meets_condition(self, uploaded_file: UploadedFile) -> bool:
         return uploaded_file.content_type == 'application/pdf'
 
 
@@ -104,7 +106,7 @@ class WithThumbnailFilter(FileFilter):
 
     def store_thumbnail(
         self,
-        uploaded_file: 'UploadedFile',
+        uploaded_file: UploadedFile,
         fp: IO[bytes],
         thumbnail_size: tuple[str, str] | None = None,
     ) -> None:
@@ -123,7 +125,7 @@ class WithThumbnailFilter(FileFilter):
             'size': thumbnail_size
         }
 
-    def on_save(self, uploaded_file: 'UploadedFile') -> None:
+    def on_save(self, uploaded_file: UploadedFile) -> None:
         close, fp = file_from_content(uploaded_file.original_content)
         thumbnail_fp, thumbnail_size = self.generate_thumbnail(fp)
         self.store_thumbnail(uploaded_file, thumbnail_fp, thumbnail_size)
@@ -144,7 +146,7 @@ class WithPDFThumbnailFilter(WithThumbnailFilter):
 
     downscale_factor = 4
 
-    def generate_preview(self, fp: 'SupportsRead[bytes]') -> BytesIO:
+    def generate_preview(self, fp: SupportsRead[bytes]) -> BytesIO:
         with TemporaryDirectory() as directory:
             path = Path(directory)
 
@@ -195,7 +197,7 @@ class WithPDFThumbnailFilter(WithThumbnailFilter):
 
     def generate_thumbnail(
         self,
-        fp: 'SupportsRead[bytes]'
+        fp: SupportsRead[bytes]
     ) -> tuple[BytesIO, tuple[str, str]]:
         # FIXME: This is kinda slow. We should be able to render the
         #        PDF directly at the thumbnail size. Maybe we should

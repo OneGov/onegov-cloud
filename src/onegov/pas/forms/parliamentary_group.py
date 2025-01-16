@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 from onegov.form import Form
 from onegov.org.forms.fields import HtmlField
 from onegov.pas import _

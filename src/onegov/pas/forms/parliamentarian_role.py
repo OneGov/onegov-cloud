@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 from datetime import date
 from onegov.form import Form
 from onegov.form.fields import ChosenSelectField
@@ -86,15 +88,15 @@ class ParliamentarianRoleForm(Form):
 
     def populate_obj(  # type: ignore[override]
         self,
-        obj: 'ParliamentarianRole',  # type: ignore[override]
-        exclude: 'Collection[str] | None' = None,
-        include: 'Collection[str] | None' = None
+        obj: ParliamentarianRole,  # type: ignore[override]
+        exclude: Collection[str] | None = None,
+        include: Collection[str] | None = None
     ) -> None:
         super().populate_obj(obj, exclude, include)
         obj.parliamentary_group_id = obj.parliamentary_group_id or None
         obj.party_id = obj.party_id or None
 
-    def get_useful_data(self) -> dict[str, 'Any']:  # type:ignore[override]
+    def get_useful_data(self) -> dict[str, Any]:  # type:ignore[override]
         result = super().get_useful_data()
         result['parliamentary_group_id'] = result.get(
             'parliamentary_group_id') or None

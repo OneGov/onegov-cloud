@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 from onegov.election_day import ElectionDayApp
 from onegov.election_day.layouts import ElectionCompoundPartLayout
 from onegov.election_day.models import ElectionCompoundPart
@@ -22,8 +24,8 @@ if TYPE_CHECKING:
 )
 def view_election_compound_part_districts(
     self: ElectionCompoundPart,
-    request: 'ElectionDayRequest'
-) -> 'RenderData':
+    request: ElectionDayRequest
+) -> RenderData:
 
     """" The districts view. """
 
@@ -47,8 +49,8 @@ def view_election_compound_part_districts(
 )
 def view_election_compound_part_by_district(
     self: ElectionCompoundPart,
-    request: 'ElectionDayRequest'
-) -> 'JSON_ro':
+    request: ElectionDayRequest
+) -> JSON_ro:
     """" View the districts/regions/municipalities as JSON for the map. """
 
     return get_districts_data(self, request.app.principal, request)
@@ -62,13 +64,13 @@ def view_election_compound_part_by_district(
 )
 def view_election_list_by_district_chart(
     self: ElectionCompoundPart,
-    request: 'ElectionDayRequest'
-) -> 'RenderData':
+    request: ElectionDayRequest
+) -> RenderData:
 
     """" Embed the heatmap. """
 
     @request.after
-    def add_last_modified(response: 'Response') -> None:
+    def add_last_modified(response: Response) -> None:
         add_last_modified_header(response, self.last_modified)
 
     scope = 'districts'
@@ -99,13 +101,13 @@ def view_election_list_by_district_chart(
 )
 def view_election_compound_part_districts_table(
     self: ElectionCompoundPart,
-    request: 'ElectionDayRequest'
-) -> 'RenderData':
+    request: ElectionDayRequest
+) -> RenderData:
 
     """" Displays the districts as standalone table. """
 
     @request.after
-    def add_last_modified(response: 'Response') -> None:
+    def add_last_modified(response: Response) -> None:
         add_last_modified_header(response, self.last_modified)
 
     return {

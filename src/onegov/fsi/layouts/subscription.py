@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 from functools import cached_property
 
 from onegov.core.elements import Link, Confirm, Intercooler, LinkGroup
@@ -19,12 +21,12 @@ class SubscriptionCollectionLayout(DefaultLayout):
     def for_himself(self) -> bool:
         return self.model.attendee_id == self.request.attendee_id
 
-    def link(self, subscription: 'CourseSubscription') -> str:
+    def link(self, subscription: CourseSubscription) -> str:
         if subscription.is_placeholder:
             return self.request.link(subscription, name='edit-placeholder')
         return self.request.link(subscription.attendee)
 
-    def confirmation_link(self, subscription: 'CourseSubscription') -> str:
+    def confirmation_link(self, subscription: CourseSubscription) -> str:
         return self.csrf_protected_url(
             self.request.link(subscription, name='toggle-confirm'))
 
@@ -103,7 +105,7 @@ class SubscriptionCollectionLayout(DefaultLayout):
         return links
 
     @cached_property
-    def course_event(self) -> 'CourseEvent | None':
+    def course_event(self) -> CourseEvent | None:
         return self.model.course_event
 
     @cached_property
@@ -144,7 +146,7 @@ class SubscriptionCollectionLayout(DefaultLayout):
 
     def intercooler_btn_for_item(
         self,
-        subscription: 'CourseSubscription'
+        subscription: CourseSubscription
     ) -> Link:
 
         confirm = subscription.is_placeholder and Confirm(
@@ -177,7 +179,7 @@ class SubscriptionCollectionLayout(DefaultLayout):
 class SubscriptionLayout(DefaultLayout):
     """ Only used for editing since it does not contain fields """
 
-    model: 'CourseSubscription'
+    model: CourseSubscription
 
     @cached_property
     def collection(self) -> SubscriptionsCollection:

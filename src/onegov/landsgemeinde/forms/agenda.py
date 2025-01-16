@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 from onegov.form.fields import TagsField
 from onegov.form.fields import TimeField
 from onegov.form.fields import UploadField
@@ -30,7 +32,7 @@ if TYPE_CHECKING:
 
 class AgendaItemForm(NamedFileForm):
 
-    request: 'LandsgemeindeRequest'
+    request: LandsgemeindeRequest
 
     number = IntegerField(
         label=_('Number'),

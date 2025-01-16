@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 from functools import cached_property
 from onegov.activity import Attendee, AttendeeCollection
 from onegov.activity import Booking, BookingCollection, Occasion
@@ -29,7 +31,7 @@ if TYPE_CHECKING:
 
 class AttendeeBase(Form):
 
-    request: 'FeriennetRequest'
+    request: FeriennetRequest
 
     if TYPE_CHECKING:
         first_name: StringField
@@ -267,7 +269,7 @@ class AttendeeSignupForm(AttendeeBase):
         return self.request.app.org.meta.get('show_political_municipality')
 
     @cached_property
-    def user(self) -> 'User | None':
+    def user(self) -> User | None:
         if not self.username:
             return None
         users = UserCollection(self.request.session)

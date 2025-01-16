@@ -1,4 +1,5 @@
 """ The onegov org collection of files uploaded to the site. """
+from __future__ import annotations
 
 import datetime
 import isodate
@@ -122,9 +123,9 @@ class Img:
              permission=Private)
 def view_get_file_collection(
     self: GeneralFileCollection,
-    request: 'OrgRequest',
+    request: OrgRequest,
     layout: DefaultLayout | None = None
-) -> 'RenderData':
+) -> RenderData:
 
     layout = layout or GeneralFileCollectionLayout(self, request)
     layout.breadcrumbs = [
@@ -174,7 +175,7 @@ def view_get_file_collection(
 @OrgApp.html(model=GeneralFile, permission=Private, name='details')
 def view_file_details(
     self: GeneralFile,
-    request: 'OrgRequest',
+    request: OrgRequest,
     layout: DefaultLayout | None = None
 ) -> str:
 
@@ -187,7 +188,7 @@ def view_file_details(
 
     # IE 11 caches all ajax requests otherwise
     @request.after
-    def must_revalidate(response: 'Response') -> None:
+    def must_revalidate(response: Response) -> None:
         response.headers.add('cache-control', 'must-revalidate')
         response.headers.add('cache-control', 'no-cache')
         response.headers.add('cache-control', 'no-store')
@@ -209,7 +210,7 @@ def view_file_details(
 
 @OrgApp.view(model=GeneralFile, permission=Private, name='publish',
              request_method='POST')
-def handle_publish(self: GeneralFile, request: 'OrgRequest') -> None:
+def handle_publish(self: GeneralFile, request: OrgRequest) -> None:
     request.assert_valid_csrf_token()
     self.published = True
     self.publish_end_date = None
@@ -218,14 +219,14 @@ def handle_publish(self: GeneralFile, request: 'OrgRequest') -> None:
 
 @OrgApp.view(model=GeneralFile, permission=Private, name='unpublish',
              request_method='POST')
-def handle_unpublish(self: GeneralFile, request: 'OrgRequest') -> None:
+def handle_unpublish(self: GeneralFile, request: OrgRequest) -> None:
     request.assert_valid_csrf_token()
     self.published = False
 
 
 @OrgApp.view(model=GeneralFile, permission=Private, name='toggle-publication',
              request_method='POST')
-def toggle_publication(self: GeneralFile, request: 'OrgRequest') -> None:
+def toggle_publication(self: GeneralFile, request: OrgRequest) -> None:
     request.assert_valid_csrf_token()
     self.publication = not self.publication
 
@@ -234,7 +235,7 @@ def toggle_publication(self: GeneralFile, request: 'OrgRequest') -> None:
              request_method='POST')
 def handle_update_publish_date(
     self: GeneralFile,
-    request: 'OrgRequest'
+    request: OrgRequest
 ) -> None:
 
     request.assert_valid_csrf_token()
@@ -252,7 +253,7 @@ def handle_update_publish_date(
 
 def handle_update_start_date(
     layout: DefaultLayout,
-    request: 'OrgRequest',
+    request: OrgRequest,
     self: GeneralFile
 ) -> None:
 
@@ -285,7 +286,7 @@ def handle_update_start_date(
 
 def handle_update_end_date(
     layout: DefaultLayout,
-    request: 'OrgRequest',
+    request: OrgRequest,
     self: GeneralFile
 ) -> None:
 
@@ -322,10 +323,10 @@ def handle_update_end_date(
 @OrgApp.html(model=ImageFileCollection, template='images.pt',
              permission=Private)
 def view_get_image_collection(
-    self: 'BaseImageFileCollection[Any]',
-    request: 'OrgRequest',
+    self: BaseImageFileCollection[Any],
+    request: OrgRequest,
     layout: DefaultLayout | None = None
-) -> 'RenderData':
+) -> RenderData:
 
     layout = layout or ImageFileCollectionLayout(self, request)
 
@@ -361,8 +362,8 @@ def view_get_image_collection(
 @OrgApp.json(model=GeneralFileCollection, permission=Private, name='json')
 def view_get_file_collection_json(
     self: GeneralFileCollection,
-    request: 'OrgRequest'
-) -> 'JSON_ro':
+    request: OrgRequest
+) -> JSON_ro:
     return [
         {
             'link': request.class_link(File, {'id': id}),
@@ -374,13 +375,13 @@ def view_get_file_collection_json(
 
 @OrgApp.json(model=ImageFileCollection, permission=Private, name='json')
 def view_get_image_collection_json(
-    self: 'BaseImageFileCollection[Any]',
-    request: 'OrgRequest',
-    produce_image: 'Callable[[ImageFile], Any] | None' = None
+    self: BaseImageFileCollection[Any],
+    request: OrgRequest,
+    produce_image: Callable[[ImageFile], Any] | None = None
 ) -> list[dict[str, Any]]:
 
     if not produce_image:
-        def produce_image(image: ImageFile) -> 'JSON_ro':
+        def produce_image(image: ImageFile) -> JSON_ro:
             return {
                 'thumb': request.class_link(
                     File, {'id': image.id}, 'thumbnail'),
@@ -397,9 +398,9 @@ def view_get_image_collection_json(
 
 
 def handle_file_upload(
-    self: 'FileCollection[FileT]',
-    request: 'OrgRequest'
-) -> 'FileT':
+    self: FileCollection[FileT],
+    request: OrgRequest
+) -> FileT:
     """ Stores the file given with the request and returns the new file object.
 
     """
@@ -423,27 +424,27 @@ def handle_file_upload(
 
 @overload
 def view_upload_file(
-    self: FileCollection['FileT'],
-    request: 'OrgRequest',
+    self: FileCollection[FileT],
+    request: OrgRequest,
     return_file: Literal[True]
-) -> 'FileT': ...
+) -> FileT: ...
 
 
 @overload
 def view_upload_file(
-    self: FileCollection['FileT'],
-    request: 'OrgRequest',
+    self: FileCollection[FileT],
+    request: OrgRequest,
     return_file: Literal[False] = False
-) -> 'Response': ...
+) -> Response: ...
 
 
 @OrgApp.view(model=FileCollection, name='upload',
              request_method='POST', permission=Private)
 def view_upload_file(
     self: FileCollection[Any],
-    request: 'OrgRequest',
+    request: OrgRequest,
     return_file: bool = False
-) -> 'Response | File':
+) -> Response | File:
 
     request.assert_valid_csrf_token()
 
@@ -463,7 +464,7 @@ def view_upload_file(
              request_method='POST', permission=Private)
 def view_upload_general_file(
     self: GeneralFileCollection,
-    request: 'OrgRequest',
+    request: OrgRequest,
     layout: DefaultLayout | None = None
 ) -> str:
 
@@ -487,7 +488,7 @@ def view_upload_general_file(
              request_method='POST', permission=Private)
 def view_upload_image_file(
     self: ImageFileCollection,
-    request: 'OrgRequest',
+    request: OrgRequest,
     layout: DefaultLayout | None = None
 ) -> str:
 
@@ -505,8 +506,8 @@ def view_upload_image_file(
              request_method='POST', permission=Private)
 def view_upload_file_by_json(
     self: FileCollection[Any],
-    request: 'OrgRequest'
-) -> 'JSON_ro':
+    request: OrgRequest
+) -> JSON_ro:
 
     request.assert_valid_csrf_token()
 
@@ -545,7 +546,7 @@ def view_upload_file_by_json(
 @OrgApp.html(model=GeneralFileCollection, name='digest', permission=Public)
 def view_file_digest(
     self: GeneralFileCollection,
-    request: 'OrgRequest',
+    request: OrgRequest,
     layout: DefaultLayout | None = None
 ) -> str:
 
@@ -577,7 +578,7 @@ def view_file_digest(
              permission=Private)
 def handle_sign(
     self: File,
-    request: 'OrgRequest',
+    request: OrgRequest,
     layout: DefaultLayout | None = None
 ) -> str:
 
@@ -620,8 +621,8 @@ def handle_sign(
 @OrgApp.view(model=LegacyImage, permission=Public)
 def view_old_files_redirect(
     self: LegacyFile | LegacyImage,
-    request: 'OrgRequest'
-) -> 'Response | str':
+    request: OrgRequest
+) -> Response | str:
     """ Redirects to the migrated depot file if possible. As a result, old
     image urls are preserved and will continue to function.
 
@@ -651,7 +652,7 @@ def view_old_files_redirect(
 # mTAN access. This is not a complete solution and there's arguably other
 # cases that should be looked at, but DirectoryFile is a really simple case
 # where the solution is obvious, so we fix it.
-def assert_has_mtan_access(self: DirectoryFile, request: 'OrgRequest') -> None:
+def assert_has_mtan_access(self: DirectoryFile, request: OrgRequest) -> None:
     if request.is_manager:
         # no restriction for admins/editors
         return
@@ -666,8 +667,8 @@ def assert_has_mtan_access(self: DirectoryFile, request: 'OrgRequest') -> None:
 @OrgApp.view(model=DirectoryFile, render=render_depot_file, permission=Public)
 def view_directory_file(
     self: DirectoryFile,
-    request: 'OrgRequest'
-) -> 'StoredFile':
+    request: OrgRequest
+) -> StoredFile:
 
     assert_has_mtan_access(self, request)
     return view_file(self, request)
@@ -681,8 +682,8 @@ def view_directory_file(
              render=render_depot_file)
 def view_directory_thumbnail(
     self: DirectoryFile,
-    request: 'OrgRequest'
-) -> 'StoredFile | Response':
+    request: OrgRequest
+) -> StoredFile | Response:
 
     assert_has_mtan_access(self, request)
     return view_thumbnail(self, request)
@@ -692,8 +693,8 @@ def view_directory_thumbnail(
              request_method='HEAD')
 def view_directory_file_head(
     self: DirectoryFile,
-    request: 'OrgRequest'
-) -> 'StoredFile':
+    request: OrgRequest
+) -> StoredFile:
 
     assert_has_mtan_access(self, request)
     return view_file_head(self, request)
@@ -707,8 +708,8 @@ def view_directory_file_head(
              permission=Public, request_method='HEAD')
 def view_directory_thumbnail_head(
     self: DirectoryFile,
-    request: 'OrgRequest'
-) -> 'StoredFile | Response':
+    request: OrgRequest
+) -> StoredFile | Response:
 
     assert_has_mtan_access(self, request)
     return view_thumbnail_head(self, request)

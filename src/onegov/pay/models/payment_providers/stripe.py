@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 import requests
 import stripe
 import transaction
@@ -29,7 +31,7 @@ if TYPE_CHECKING:
 
 
 @contextmanager
-def stripe_api_key(key: str | None) -> 'Iterator[None]':
+def stripe_api_key(key: str | None) -> Iterator[None]:
     old_key = stripe.api_key
     stripe.api_key = key
     yield
@@ -67,11 +69,11 @@ class StripeCaptureManager:
     def sortKey(self) -> str:
         return 'charge'
 
-    def tpc_vote(self, transaction: 'ITransaction') -> None:
+    def tpc_vote(self, transaction: ITransaction) -> None:
         with stripe_api_key(self.api_key):
             self.charge = stripe.Charge.retrieve(self.charge_id)
 
-    def tpc_finish(self, transaction: 'ITransaction') -> None:
+    def tpc_finish(self, transaction: ITransaction) -> None:
         try:
             with stripe_api_key(self.api_key):
                 self.charge.capture()
@@ -82,16 +84,16 @@ class StripeCaptureManager:
                 self.charge_id
             ))
 
-    def commit(self, transaction: 'ITransaction') -> None:
+    def commit(self, transaction: ITransaction) -> None:
         pass
 
-    def abort(self, transaction: 'ITransaction') -> None:
+    def abort(self, transaction: ITransaction) -> None:
         pass
 
-    def tpc_begin(self, transaction: 'ITransaction') -> None:
+    def tpc_begin(self, transaction: ITransaction) -> None:
         pass
 
-    def tpc_abort(self, transaction: 'ITransaction') -> None:
+    def tpc_abort(self, transaction: ITransaction) -> None:
         pass
 
 
@@ -121,7 +123,7 @@ class StripeFeePolicy:
 class StripePayment(Payment):
     __mapper_args__ = {'polymorphic_identity': 'stripe_connect'}
 
-    fee_policy: 'FeePolicy' = StripeFeePolicy
+    fee_policy: FeePolicy = StripeFeePolicy
 
     #: the date of the payout
     payout_date: dict_property[datetime | None] = meta_property()
@@ -136,7 +138,7 @@ class StripePayment(Payment):
         # our provider should always be StripeConnect, we could
         # assert if we really wanted to make sure, but it would
         # add a lot of assertions...
-        provider: relationship['StripeConnect']
+        provider: relationship[StripeConnect]
 
     @property
     def fee(self) -> Decimal:
@@ -193,7 +195,7 @@ class StripeConnect(PaymentProvider[StripePayment]):
 
     __mapper_args__ = {'polymorphic_identity': 'stripe_connect'}
 
-    fee_policy: 'FeePolicy' = StripeFeePolicy
+    fee_policy: FeePolicy = StripeFeePolicy
 
     #: The Stripe Connect client id
     client_id: dict_property[str | None] = meta_property()
@@ -414,7 +416,7 @@ class StripeConnect(PaymentProvider[StripePayment]):
 
     def process_oauth_response(
         self,
-        request_params: 'Mapping[str, Any]'
+        request_params: Mapping[str, Any]
     ) -> None:
         """ Takes the parameters of an incoming oauth request and stores
         them on the payment provider if successful.
@@ -450,9 +452,9 @@ class StripeConnect(PaymentProvider[StripePayment]):
         self.sync_payment_states(session)
         self.sync_payouts(session)
 
-    def sync_payment_states(self, session: 'Session') -> None:
+    def sync_payment_states(self, session: Session) -> None:
 
-        def payments(ids: 'Collection[UUID]') -> 'Query[StripePayment]':
+        def payments(ids: Collection[UUID]) -> Query[StripePayment]:
             q = session.query(self.payment_class)
             q = q.filter(self.payment_class.id.in_(ids))
 
@@ -472,7 +474,7 @@ class StripeConnect(PaymentProvider[StripePayment]):
         for payment in payments(by_payment.keys()):
             payment.sync(remote_obj=by_payment[payment.id.hex])
 
-    def sync_payouts(self, session: 'Session') -> None:
+    def sync_payouts(self, session: Session) -> None:
         """
         See https://stripe.com/docs/api/balance_transactions/list
         and https://stripe.com/docs/api/payouts
@@ -522,10 +524,10 @@ class StripeConnect(PaymentProvider[StripePayment]):
 
     def paged(
         self,
-        method: 'Callable[_P, stripe.ListObject]',
-        *args: '_P.args',
-        **kwargs: '_P.kwargs'
-    ) -> 'Iterator[_R]':
+        method: Callable[_P, stripe.ListObject],
+        *args: _P.args,
+        **kwargs: _P.kwargs
+    ) -> Iterator[_R]:
         with stripe_api_key(self.access_token):
             list_obj = method(*args, **kwargs)
             yield from list_obj.auto_paging_iter()

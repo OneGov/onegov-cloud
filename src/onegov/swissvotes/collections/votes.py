@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 from csv import writer
 from datetime import date
 from decimal import Decimal
@@ -54,7 +56,7 @@ class SwissVoteCollection(Pagination[SwissVote]):
 
     def __init__(
         self,
-        app: 'SwissvotesApp',
+        app: SwissvotesApp,
         page: int = 0,
         from_date: date | None = None,
         to_date: date | None = None,
@@ -91,7 +93,7 @@ class SwissVoteCollection(Pagination[SwissVote]):
         self.session.flush()
         return vote
 
-    def subset(self) -> 'Query[SwissVote]':
+    def subset(self) -> Query[SwissVote]:
         return self.query()
 
     def __eq__(self, other: object) -> bool:
@@ -121,7 +123,7 @@ class SwissVoteCollection(Pagination[SwissVote]):
             and (self.sort_order or None) == (other.sort_order or None)
         )
 
-    def default(self) -> 'Self':
+    def default(self) -> Self:
         """ Returns the votes unfiltered and ordered by default. """
 
         return self.__class__(self.app)
@@ -132,7 +134,7 @@ class SwissVoteCollection(Pagination[SwissVote]):
 
         return self.page or 0
 
-    def page_by_index(self, page: int) -> 'Self':
+    def page_by_index(self, page: int) -> Self:
         """ Returns the requested page. """
 
         return self.__class__(
@@ -193,7 +195,7 @@ class SwissVoteCollection(Pagination[SwissVote]):
             return self.current_sort_order
         return 'unsorted'
 
-    def by_order(self, sort_by: str | None) -> 'Self':
+    def by_order(self, sort_by: str | None) -> Self:
         """ Returns the votes ordered by the given key. """
 
         sort_order = self.default_sort_order
@@ -221,7 +223,7 @@ class SwissVoteCollection(Pagination[SwissVote]):
         )
 
     @property
-    def order_by(self) -> 'ColumnElement[Any]':
+    def order_by(self) -> ColumnElement[Any]:
         """ Returns an SqlAlchemy expression for ordering queries based
         on the current sorting key and ordering.
 
@@ -256,7 +258,7 @@ class SwissVoteCollection(Pagination[SwissVote]):
         return self.page_index * self.batch_size
 
     @property
-    def previous(self) -> 'Self | None':
+    def previous(self) -> Self | None:
         """ The previous page. """
 
         if self.page_index - 1 >= 0:
@@ -264,7 +266,7 @@ class SwissVoteCollection(Pagination[SwissVote]):
         return None
 
     @property
-    def next(self) -> 'Self | None':
+    def next(self) -> Self | None:
         """ The next page. """
 
         if self.page_index + 1 < self.pages_count:
@@ -272,7 +274,7 @@ class SwissVoteCollection(Pagination[SwissVote]):
         return None
 
     @property
-    def term_filter_numeric(self) -> list['ColumnElement[bool]']:
+    def term_filter_numeric(self) -> list[ColumnElement[bool]]:
         """ Returns a list of SqlAlchemy filter statements matching possible
         numeric attributes based on the term.
 
@@ -290,7 +292,7 @@ class SwissVoteCollection(Pagination[SwissVote]):
         return result
 
     @property
-    def term_filter_text(self) -> list['ColumnElement[bool]']:
+    def term_filter_text(self) -> list[ColumnElement[bool]]:
         """ Returns a list of SqlAlchemy filter statements matching possible
         fulltext attributes based on the term.
 
@@ -301,15 +303,15 @@ class SwissVoteCollection(Pagination[SwissVote]):
             return []
 
         def match(
-            column: 'ColumnElement[str] | ColumnElement[str | None]',
+            column: ColumnElement[str] | ColumnElement[str | None],
             language: str
-        ) -> 'ColumnElement[bool]':
+        ) -> ColumnElement[bool]:
             return column.op('@@')(func.to_tsquery(language, term))
 
         def match_convert(
-            column: 'ColumnElement[str] | ColumnElement[str | None]',
+            column: ColumnElement[str] | ColumnElement[str | None],
             language: str
-        ) -> 'ColumnElement[bool]':
+        ) -> ColumnElement[bool]:
             return match(func.to_tsvector(language, column), language)
 
         if not self.full_text:
@@ -337,7 +339,7 @@ class SwissVoteCollection(Pagination[SwissVote]):
         ]
 
     @property
-    def term_filter(self) -> list['ColumnElement[bool]']:
+    def term_filter(self) -> list[ColumnElement[bool]]:
         """ Returns a list of SqlAlchemy filter statements based on the search
         term.
 
@@ -345,22 +347,22 @@ class SwissVoteCollection(Pagination[SwissVote]):
 
         return self.term_filter_numeric + self.term_filter_text
 
-    def query(self) -> 'Query[SwissVote]':
+    def query(self) -> Query[SwissVote]:
         """ Returns the votes matching to the current filters and order. """
 
         query = self.session.query(SwissVote)
 
         def in_or_none(
-            column: 'ColumnElement[T] | ColumnElement[T | None]',
+            column: ColumnElement[T] | ColumnElement[T | None],
             values: list[T],
             extra: dict[T, T] | None = None
-        ) -> 'ColumnElement[bool]':
+        ) -> ColumnElement[bool]:
 
             extra = extra or {}
             values = values + [x for y, x in extra.items() if y in values]
             statement = column.in_(values)
             if -1 in values:
-                statement = or_(statement, column.is_(None))
+                statement = or_(statement, column.is_(None))  # type:ignore[no-untyped-call]
             return statement
 
         if self.from_date:
@@ -484,7 +486,7 @@ class SwissVoteCollection(Pagination[SwissVote]):
             },
         ]
 
-    def update(self, votes: 'Iterable[SwissVote]') -> tuple[int, int]:
+    def update(self, votes: Iterable[SwissVote]) -> tuple[int, int]:
         """ Adds or updates the given votes. """
 
         added = 0
@@ -534,7 +536,7 @@ class SwissVoteCollection(Pagination[SwissVote]):
         return added, updated
 
     @property
-    def last_modified(self) -> 'datetime | None':
+    def last_modified(self) -> datetime | None:
         """ Returns the last change of any votes. """
         return self.session.query(func.max(SwissVote.last_change)).scalar()
 

@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 from onegov.core.converters import extended_date_converter
 from onegov.core.converters import move_direction_converter
 from onegov.core.converters import uuid_converter
@@ -33,7 +35,7 @@ if TYPE_CHECKING:
 
 
 @GazetteApp.path(model=Auth, path='/auth')
-def get_auth(request: 'GazetteRequest', to: str = '/') -> Auth:
+def get_auth(request: GazetteRequest, to: str = '/') -> Auth:
     return Auth.from_request(request, to)
 
 
@@ -102,7 +104,7 @@ def get_organization(app: GazetteApp, id: int) -> Organization | None:
 def get_page_move(
     app: GazetteApp,
     subject_id: int,
-    direction: 'MoveDirection',
+    direction: MoveDirection,
     target_id: int
 ) -> OrganizationMove:
     return OrganizationMove(app.session(), subject_id, target_id, direction)
@@ -120,7 +122,7 @@ def get_issue(app: GazetteApp, name: str) -> Issue | None:
 
 @GazetteApp.path(model=IssuePdfFile, path='/pdf/{name}')
 def get_issue_pdf(
-    request: 'GazetteRequest',
+    request: GazetteRequest,
     app: GazetteApp,
     name: str
 ) -> IssuePdfFile | None:
@@ -150,11 +152,11 @@ def get_notices(
     term: str | None = None,
     order: str | None = None,
     direction: str | None = None,
-    from_date: 'date | None' = None,
-    to_date: 'date | None' = None,
+    from_date: date | None = None,
+    to_date: date | None = None,
     categories: list[str] | None = None,
     organizations: list[str] | None = None,
-    source: 'UUID | None' = None,
+    source: UUID | None = None,
     own: bool | None = None
 ) -> GazetteNoticeCollection:
 

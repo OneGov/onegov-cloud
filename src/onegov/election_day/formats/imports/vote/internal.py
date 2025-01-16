@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 from onegov.election_day import _
 from onegov.election_day.formats.imports.common import BALLOT_TYPES
 from onegov.election_day.formats.imports.common import EXPATS
@@ -38,8 +40,8 @@ INTERNAL_VOTE_HEADERS = (
 
 
 def import_vote_internal(
-    vote: 'Vote',
-    principal: 'Canton | Municipality',
+    vote: Vote,
+    principal: Canton | Municipality,
     file: IO[bytes],
     mimetype: str
 ) -> list[FileImportError]:

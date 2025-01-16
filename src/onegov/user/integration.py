@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 import morepath
 from more.webassets import WebassetsApp
 from more.webassets.core import webassets_injector_tween
@@ -59,7 +61,7 @@ class UserApp(WebassetsApp):
     auto_login_provider: AuthenticationProvider | None
 
     @property
-    def providers(self) -> 'Mapping[str, _AuthenticationProvider]':
+    def providers(self) -> Mapping[str, _AuthenticationProvider]:
         """ Returns a mapping of availabe providers. """
 
         return getattr(self, 'available_providers', {})
@@ -67,7 +69,7 @@ class UserApp(WebassetsApp):
     def provider(self, name: str) -> AuthenticationProvider | None:
         return self.providers.get(name)
 
-    def on_login(self, request: 'CoreRequest', user: 'User') -> None:
+    def on_login(self, request: CoreRequest, user: User) -> None:
         """ Called by the auth module, whenever a successful login
         was completed.
 
@@ -76,7 +78,7 @@ class UserApp(WebassetsApp):
     def redirect_after_login(
         self,
         identity: morepath.Identity,
-        request: 'CoreRequest',
+        request: CoreRequest,
         default: str
     ) -> str | None:
         """ Returns the path to redirect after login, given the received
@@ -141,8 +143,8 @@ def authentication_provider(
     permission=Public)
 def handle_authentication(
     # FIXME: We should ensure this is true
-    self: 'SeparateAuthenticationProvider',
-    request: 'CoreRequest'
+    self: SeparateAuthenticationProvider,
+    request: CoreRequest
 ) -> Response:
 
     response = self.authenticate_request(request)
@@ -198,8 +200,8 @@ def handle_authentication(
 )
 def handle_provider_authorisation(
     # FIXME: We should ensure this is true
-    self: 'OauthProvider',
-    request: 'CoreRequest'
+    self: OauthProvider,
+    request: CoreRequest
 ) -> Response:
 
     response = self.request_authorisation(request)
@@ -237,7 +239,7 @@ def handle_provider_authorisation(
 )
 def handle_provider_logout(
     self: AuthenticationProvider,
-    request: 'CoreRequest'
+    request: CoreRequest
 ) -> Response:
     """ We contact the provider that the user wants to log out and redirecting
     him to our main logout view. """
@@ -259,17 +261,17 @@ def get_js_path() -> str:
 
 
 @UserApp.webasset('auto-login')
-def get_preview_widget_asset() -> 'Iterator[str]':
+def get_preview_widget_asset() -> Iterator[str]:
     yield 'auto-login.js'
 
 
 @UserApp.tween_factory(over=webassets_injector_tween)
 def auto_login_tween_factory(
     app: UserApp,
-    handler: 'Callable[[CoreRequest], Response]'
-) -> 'Callable[[CoreRequest], Response]':
+    handler: Callable[[CoreRequest], Response]
+) -> Callable[[CoreRequest], Response]:
 
-    def auto_login_tween(request: 'CoreRequest') -> Response:
+    def auto_login_tween(request: CoreRequest) -> Response:
         """ Optionally injects an auto-login javascript asset.
 
         The auto-login javascript will call the auto-login provider and

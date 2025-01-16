@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 import sedate
 
 from datetime import datetime, date
@@ -22,7 +24,7 @@ if TYPE_CHECKING:
 
 class MissionReportFileCollection(BaseImageFileCollection[MissionReportFile]):
 
-    def __init__(self, session: 'Session', report: MissionReport):
+    def __init__(self, session: Session, report: MissionReport):
         super().__init__(
             session,
             type='mission-report-file',
@@ -31,11 +33,11 @@ class MissionReportFileCollection(BaseImageFileCollection[MissionReportFile]):
         self.report = report
 
     @property
-    def id(self) -> 'UUID':
+    def id(self) -> UUID:
         return self.report.id
 
     @property
-    def association(self) -> 'RegisteredLink':
+    def association(self) -> RegisteredLink:
         assert MissionReportFile.registered_links is not None
         return MissionReportFile.registered_links['linked_mission_reports']
 
@@ -49,7 +51,7 @@ class MissionReportFileCollection(BaseImageFileCollection[MissionReportFile]):
 
             return file
 
-    def query(self) -> 'Query[MissionReportFile]':
+    def query(self) -> Query[MissionReportFile]:
         query = super().query()
         table = self.association.table
 
@@ -70,7 +72,7 @@ class MissionReportCollection(
 
     def __init__(
         self,
-        session: 'Session',
+        session: Session,
         page: int = 0,
         include_hidden: bool = False,
         year: int | None = None
@@ -89,17 +91,17 @@ class MissionReportCollection(
 
     def by_id(
         self,
-        id: 'UUID'  # type:ignore[override]
+        id: UUID  # type:ignore[override]
     ) -> MissionReport | None:
         # use the parent to get a report by id, so the date filter is
         # not included, which is not desirable on this lookup
         return super().query().filter(self.primary_key == id).first()
 
-    def query(self) -> 'Query[MissionReport]':
+    def query(self) -> Query[MissionReport]:
         # default behavior is to show the current year
         return self.query_current_year()
 
-    def query_all(self) -> 'Query[MissionReport]':
+    def query_all(self) -> Query[MissionReport]:
         query = super().query()
 
         if not self.include_hidden:
@@ -110,20 +112,20 @@ class MissionReportCollection(
 
         return query.order_by(desc(MissionReport.date))
 
-    def query_current_year(self) -> 'Query[MissionReport]':
+    def query_current_year(self) -> Query[MissionReport]:
         return self.filter_by_year(self.query_all())
 
-    def subset(self) -> 'Query[MissionReport]':
+    def subset(self) -> Query[MissionReport]:
         return self.query()
 
     @property
     def page_index(self) -> int:
         return self.page
 
-    def page_by_index(self, index: int) -> 'Self':
+    def page_by_index(self, index: int) -> Self:
         return self.__class__(self.session, page=index, year=self.year)
 
-    def filter_by_year(self, query: 'Query[T]') -> 'Query[T]':
+    def filter_by_year(self, query: Query[T]) -> Query[T]:
         timezone = 'Europe/Zurich'
 
         start = sedate.replace_timezone(datetime(self.year, 1, 1), timezone)
@@ -146,5 +148,5 @@ class MissionReportVehicleCollection(GenericCollection[MissionReportVehicle]):
     def model_class(self) -> type[MissionReportVehicle]:
         return MissionReportVehicle
 
-    def query(self) -> 'Query[MissionReportVehicle]':
+    def query(self) -> Query[MissionReportVehicle]:
         return super().query().order_by(MissionReportVehicle.name)

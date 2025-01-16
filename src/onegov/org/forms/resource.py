@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 from wtforms.fields import BooleanField
 from wtforms.fields import DecimalField
 from wtforms.fields import IntegerField
@@ -305,12 +307,12 @@ class ResourceBaseForm(Form):
         self.zipcode_list.data = '\n'.join(
             str(i) for i in sorted(value['zipcode_list']))
 
-    def populate_obj(self, obj: 'Resource') -> None:  # type:ignore
+    def populate_obj(self, obj: Resource) -> None:  # type:ignore
         super().populate_obj(obj, exclude=('deadline', 'zipcode_block'))
         obj.deadline = self.deadline
         obj.zipcode_block = self.zipcode_block
 
-    def process_obj(self, obj: 'Resource') -> None:  # type:ignore
+    def process_obj(self, obj: Resource) -> None:  # type:ignore
         super().process_obj(obj)
         self.deadline = obj.deadline
         self.zipcode_block = obj.zipcode_block

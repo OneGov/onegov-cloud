@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 import csv
 
 from datetime import date
@@ -33,7 +35,7 @@ if TYPE_CHECKING:
 
 def mission_report_form(
     model: MissionReport | MissionReportCollection,
-    request: 'WinterthurRequest'
+    request: WinterthurRequest
 ) -> type[MissionReportForm]:
     if isinstance(model, MissionReportCollection):
         report = MissionReport()
@@ -124,7 +126,7 @@ def mission_report_form(
 
 def mission_report_vehicle_form(
     model: MissionReportVehicle | MissionReportVehicleCollection,
-    request: 'WinterthurRequest'
+    request: WinterthurRequest
 ) -> type[MissionReportVehicleForm]:
 
     if isinstance(model, MissionReportVehicleCollection):
@@ -142,8 +144,8 @@ def mission_report_vehicle_form(
 )
 def view_mission_reports(
     self: MissionReportCollection,
-    request: 'WinterthurRequest'
-) -> 'RenderData':
+    request: WinterthurRequest
+) -> RenderData:
     return {
         'layout': MissionReportLayout(self, request),
         'title': _('Mission Reports'),
@@ -160,8 +162,8 @@ def view_mission_reports(
 )
 def view_mission(
     self: MissionReport,
-    request: 'WinterthurRequest'
-) -> 'RenderData':
+    request: WinterthurRequest
+) -> RenderData:
     return {
         'title': self.title,
         'layout': MissionReportLayout(
@@ -179,8 +181,8 @@ def view_mission(
 )
 def view_mission_reports_as_json(
     self: MissionReportCollection,
-    request: 'WinterthurRequest'
-) -> 'JSON_ro':
+    request: WinterthurRequest
+) -> JSON_ro:
 
     query = self.query()
     if request.params.get('all', False):
@@ -228,7 +230,7 @@ def view_mission_reports_as_json(
 )
 def view_mission_reports_as_csv(
     self: MissionReportCollection,
-    request: 'WinterthurRequest'
+    request: WinterthurRequest
 ) -> Response:
 
     query = self.query()
@@ -287,8 +289,8 @@ def view_mission_reports_as_csv(
 )
 def view_mission_report_vehicles(
     self: MissionReportVehicleCollection,
-    request: 'WinterthurRequest'
-) -> 'RenderData':
+    request: WinterthurRequest
+) -> RenderData:
 
     return {
         'layout': MissionReportLayout(
@@ -307,8 +309,8 @@ def view_mission_report_vehicles(
 )
 def view_mission_report_files(
     self: MissionReportFileCollection,
-    request: 'WinterthurRequest'
-) -> 'RenderData':
+    request: WinterthurRequest
+) -> RenderData:
 
     data = view_get_image_collection(self, request)
     data['layout'] = MissionReportLayout(
@@ -329,9 +331,9 @@ def view_mission_report_files(
 )
 def handle_new_mission_report(
     self: MissionReportCollection,
-    request: 'WinterthurRequest',
+    request: WinterthurRequest,
     form: MissionReportForm
-) -> 'RenderData | Response':
+) -> RenderData | Response:
 
     if form.submitted(request):
         mission = self.add(date=form.date, **{
@@ -372,9 +374,9 @@ def handle_new_mission_report(
 )
 def handle_edit_mission_report(
     self: MissionReport,
-    request: 'WinterthurRequest',
+    request: WinterthurRequest,
     form: MissionReportForm
-) -> 'RenderData | Response':
+) -> RenderData | Response:
 
     if form.submitted(request):
         form.populate_obj(self)
@@ -405,7 +407,7 @@ def handle_edit_mission_report(
 )
 def delete_mission_report(
     self: MissionReport,
-    request: 'WinterthurRequest'
+    request: WinterthurRequest
 ) -> None:
 
     request.assert_valid_csrf_token()
@@ -422,9 +424,9 @@ def delete_mission_report(
 )
 def handle_new_vehicle(
     self: MissionReportVehicleCollection,
-    request: 'WinterthurRequest',
+    request: WinterthurRequest,
     form: MissionReportVehicleForm
-) -> 'RenderData | Response':
+) -> RenderData | Response:
 
     if form.submitted(request):
         vehicle = self.add(
@@ -460,9 +462,9 @@ def handle_new_vehicle(
 )
 def handle_edit_vehicle(
     self: MissionReportVehicle,
-    request: 'WinterthurRequest',
+    request: WinterthurRequest,
     form: MissionReportVehicleForm
-) -> 'RenderData | Response':
+) -> RenderData | Response:
 
     if form.submitted(request):
         form.populate_obj(self)
@@ -494,7 +496,7 @@ def handle_edit_vehicle(
 )
 def delete_mission_report_vehicle(
     self: MissionReportVehicle,
-    request: 'WinterthurRequest'
+    request: WinterthurRequest
 ) -> None:
 
     request.assert_valid_csrf_token()

@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 from abc import ABCMeta, abstractmethod
 
 
@@ -19,7 +21,7 @@ class MatchableOccasion(metaclass=ABCMeta):
 
     @property
     @abstractmethod
-    def id(self) -> 'UUID':
+    def id(self) -> UUID:
         """ The id of the occasion. """
 
     @property
@@ -67,22 +69,22 @@ class MatchableBooking(metaclass=ABCMeta):
 
     @property
     @abstractmethod
-    def id(self) -> 'UUID':
+    def id(self) -> UUID:
         """ The id of the booking. """
 
     @property
     @abstractmethod
-    def occasion_id(self) -> 'UUID':
+    def occasion_id(self) -> UUID:
         """ Returns the id of the occasion this booking belongs to. """
 
     @property
     @abstractmethod
-    def attendee_id(self) -> 'UUID':
+    def attendee_id(self) -> UUID:
         """ Returns the id of the attendee this booking belongs to. """
 
     @property
     @abstractmethod
-    def state(self) -> 'BookingState':
+    def state(self) -> BookingState:
         """ Returns the state of the booking, one of:
 
         * "open" (for unassigned bookings)
@@ -106,7 +108,7 @@ class MatchableBooking(metaclass=ABCMeta):
     # FIXME: We probably also need to define an interface for OccasionDate
     @property
     @abstractmethod
-    def dates(self) -> 'Sequence[OccasionDate]':
+    def dates(self) -> Sequence[OccasionDate]:
         """ Returns the dates of the booking. """
 
     @property

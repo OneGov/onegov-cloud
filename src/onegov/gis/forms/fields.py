@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 from base64 import b64decode, b64encode
 from markupsafe import Markup
 from onegov.core.custom import json
@@ -43,29 +45,29 @@ class CoordinatesField(StringField):
 
     """
 
-    data: 'AnyCoordinates'  # type:ignore[assignment]
-    widget: '_Widget[Self]' = CoordinatesWidget()  # type:ignore[assignment]
+    data: AnyCoordinates  # type:ignore[assignment]
+    widget: _Widget[Self] = CoordinatesWidget()  # type:ignore[assignment]
 
     def __init__(
         self,
         label: str | None = None,
-        validators: 'Validators[FormT, Self] | None' = None,
-        filters: 'Sequence[_Filter]' = (),
+        validators: Validators[FormT, Self] | None = None,
+        filters: Sequence[_Filter] = (),
         description: str = '',
         id: str | None = None,
-        default: 'AnyCoordinates | Callable[[], AnyCoordinates] | None' = None,
-        widget: '_Widget[Self] | None' = None,
+        default: AnyCoordinates | Callable[[], AnyCoordinates] | None = None,
+        widget: _Widget[Self] | None = None,
         render_kw: dict[str, Any] | None = None,
         name: str | None = None,
-        _form: 'BaseForm | None' = None,
+        _form: BaseForm | None = None,
         _prefix: str = '',
-        _translations: '_SupportsGettextAndNgettext | None' = None,
-        _meta: 'DefaultMeta | None' = None,
+        _translations: _SupportsGettextAndNgettext | None = None,
+        _meta: DefaultMeta | None = None,
         # onegov specific kwargs that get popped off
         *,
         fieldset: str | None = None,
-        depends_on: 'Sequence[Any] | None' = None,
-        pricing: 'PricingRules | None' = None,
+        depends_on: Sequence[Any] | None = None,
+        pricing: PricingRules | None = None,
     ):
         super().__init__(
             label=label,
@@ -102,7 +104,7 @@ class CoordinatesField(StringField):
     def populate_obj(self, obj: object, name: str) -> None:
         setattr(obj, name, self.data)
 
-    def process_formdata(self, valuelist: list['RawFormValue']) -> None:
+    def process_formdata(self, valuelist: list[RawFormValue]) -> None:
         if valuelist and valuelist[0]:
             assert isinstance(valuelist[0], str)
             text_b = b64decode(valuelist[0])

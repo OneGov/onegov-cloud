@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 from onegov.feriennet import _
 from onegov.form import Form
 from onegov.feriennet.const import DEFAULT_DONATION_AMOUNTS
@@ -13,7 +15,7 @@ if TYPE_CHECKING:
 
 class DonationForm(Form):
 
-    request: 'FeriennetRequest'
+    request: FeriennetRequest
 
     amount = SelectField(
         label=_('My donation'),

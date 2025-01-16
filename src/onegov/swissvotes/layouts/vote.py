@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 from functools import cached_property
 from datetime import date
 from onegov.core.elements import Link
@@ -86,7 +88,7 @@ class VoteLayout(DefaultLayout):
         ]
 
     @cached_property
-    def attachments(self) -> 'RenderData':
+    def attachments(self) -> RenderData:
         """ Returns a dictionary with static URLS and locale for attachments.
 
         Note that only file / locale combinations with a file_name
@@ -112,7 +114,7 @@ class VoteLayout(DefaultLayout):
     @cached_property
     def search_results(
         self
-    ) -> list[tuple[int, str, str, bool, 'SwissVoteFile']]:
+    ) -> list[tuple[int, str, str, bool, SwissVoteFile]]:
 
         result = []
         metadata = self.model.campaign_material_metadata or {}
@@ -296,7 +298,7 @@ class DeleteVoteAttachmentLayout(DefaultLayout):
         ) -> None: ...
 
     @cached_property
-    def parent(self) -> 'SwissVote':
+    def parent(self) -> SwissVote:
         return self.model.linked_swissvotes[0]
 
     @cached_property

@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 from onegov.core.elements import Link
 from onegov.core.security import Private
 from onegov.fsi import _
@@ -18,14 +20,14 @@ if TYPE_CHECKING:
 
 
 def set_cached_choices(
-    request: 'FsiRequest',
+    request: FsiRequest,
     organisations: list[str] | None
 ) -> None:
     browser_session = request.browser_session
     browser_session['last_chosen_organisations'] = organisations or None
 
 
-def cached_org_choices(request: 'FsiRequest') -> list[str] | None:
+def cached_org_choices(request: FsiRequest) -> list[str] | None:
     return request.browser_session.get('last_chosen_organisations')
 
 
@@ -37,9 +39,9 @@ def cached_org_choices(request: 'FsiRequest') -> list[str] | None:
 )
 def invite_attendees_for_event(
     self: AuditCollection,
-    request: 'FsiRequest',
+    request: FsiRequest,
     form: AuditForm
-) -> 'RenderData | Response':
+) -> RenderData | Response:
 
     now = utcnow()
 
@@ -115,7 +117,7 @@ def invite_attendees_for_event(
     name='pdf',
     permission=Private
 )
-def get_audit_pdf(self: AuditCollection, request: 'FsiRequest') -> Response:
+def get_audit_pdf(self: AuditCollection, request: FsiRequest) -> Response:
     if not self.course_id:
         # FIXME: Really, a 503 for this?
         return Response(status='503 Service Unavailable')

@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 from email.headerregistry import Address
 from onegov.core.collection import Pagination
 from onegov.core.templates import render_template
@@ -31,8 +33,8 @@ class SubscriberCollection(Pagination[_S]):
     page: int
 
     def __init__(
-        self: 'SubscriberCollection[Subscriber]',
-        session: 'Session',
+        self: SubscriberCollection[Subscriber],
+        session: Session,
         page: int = 0,
         term: str | None = None,
         active_only: bool | None = True
@@ -54,17 +56,17 @@ class SubscriberCollection(Pagination[_S]):
             and self.active_only == other.active_only
         )
 
-    def subset(self) -> 'Query[_S]':
+    def subset(self) -> Query[_S]:
         return self.query()
 
     @property
     def page_index(self) -> int:
         return self.page
 
-    def page_by_index(self, index: int) -> 'Self':
+    def page_by_index(self, index: int) -> Self:
         return self.__class__(self.session, index)
 
-    def for_active_only(self, active_only: bool) -> 'Self':
+    def for_active_only(self, active_only: bool) -> Self:
         return self.__class__(self.session, 0, self.term, active_only)
 
     def add(
@@ -86,7 +88,7 @@ class SubscriberCollection(Pagination[_S]):
         self.session.flush()
         return subscriber
 
-    def query(self, active_only: bool | None = None) -> 'Query[_S]':
+    def query(self, active_only: bool | None = None) -> Query[_S]:
         query = self.session.query(self.model_class)
 
         active_only = self.active_only if active_only is None else active_only
@@ -101,7 +103,7 @@ class SubscriberCollection(Pagination[_S]):
 
         return query
 
-    def by_id(self, id: 'UUID') -> _S | None:
+    def by_id(self, id: UUID) -> _S | None:
         """ Returns the subscriber by its id. """
 
         query = self.query(active_only=False)
@@ -129,7 +131,7 @@ class SubscriberCollection(Pagination[_S]):
         address: str,
         domain: str | None,
         domain_segment: str | None,
-        request: 'ElectionDayRequest'
+        request: ElectionDayRequest
     ) -> _S:
         """ Initiate the subscription process.
 
@@ -154,7 +156,7 @@ class SubscriberCollection(Pagination[_S]):
         subscriber: _S,
         domain: str | None,
         domain_segment: str | None,
-        request: 'ElectionDayRequest'
+        request: ElectionDayRequest
     ) -> None:
         """ Send the subscriber a request to confirm the subscription. """
 
@@ -165,7 +167,7 @@ class SubscriberCollection(Pagination[_S]):
         address: str,
         domain: str | None,
         domain_segment: str | None,
-        request: 'ElectionDayRequest'
+        request: ElectionDayRequest
     ) -> None:
         """ Initiate the unsubscription process. """
 
@@ -176,7 +178,7 @@ class SubscriberCollection(Pagination[_S]):
     def handle_unsubscription(
         self,
         subscriber: _S,
-        request: 'ElectionDayRequest'
+        request: ElectionDayRequest
     ) -> None:
         """ Send the subscriber a request to confirm the unsubscription. """
 
@@ -203,7 +205,7 @@ class SubscriberCollection(Pagination[_S]):
         file: IO[bytes],
         mimetype: str,
         delete: bool
-    ) -> tuple[list['FileImportError'], int]:
+    ) -> tuple[list[FileImportError], int]:
         """ Disables or deletes the subscribers in the given CSV.
 
         Ignores domain and domain segment, as this is inteded to cleanup
@@ -242,7 +244,7 @@ class EmailSubscriberCollection(SubscriberCollection[EmailSubscriber]):
         subscriber: EmailSubscriber,
         domain: str | None,
         domain_segment: str | None,
-        request: 'ElectionDayRequest'
+        request: ElectionDayRequest
     ) -> None:
         """ Send the (new) subscriber a request to confirm the subscription.
 
@@ -312,7 +314,7 @@ class EmailSubscriberCollection(SubscriberCollection[EmailSubscriber]):
     def handle_unsubscription(
         self,
         subscriber: EmailSubscriber,
-        request: 'ElectionDayRequest'
+        request: ElectionDayRequest
     ) -> None:
         """ Send the subscriber a request to confirm the unsubscription.
         """
@@ -383,7 +385,7 @@ class SmsSubscriberCollection(SubscriberCollection[SmsSubscriber]):
         subscriber: SmsSubscriber,
         domain: str | None,
         domain_segment: str | None,
-        request: 'ElectionDayRequest'
+        request: ElectionDayRequest
     ) -> None:
         """ Confirm the subscription by sending an SMS (if not already
         subscribed). There is no double-opt-in for SMS subscribers.
@@ -406,7 +408,7 @@ class SmsSubscriberCollection(SubscriberCollection[SmsSubscriber]):
     def handle_unsubscription(
         self,
         subscriber: SmsSubscriber,
-        request: 'ElectionDayRequest'
+        request: ElectionDayRequest
     ) -> None:
         """ Deactivate the subscriber. There is no double-opt-out for SMS
         subscribers.

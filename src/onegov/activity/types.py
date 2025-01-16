@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 from psycopg2.extras import NumericRange
 
 from typing import TYPE_CHECKING

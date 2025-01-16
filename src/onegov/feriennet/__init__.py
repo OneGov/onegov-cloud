@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 import logging
 log = logging.getLogger('onegov.feriennet')
 log.addHandler(logging.NullHandler())

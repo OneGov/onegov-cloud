@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 import morepath
 
 from webob.exc import HTTPForbidden
@@ -33,10 +35,10 @@ if TYPE_CHECKING:
 )
 def handle_new_survey_definition(
     self: SurveyCollection,
-    request: 'OrgRequest',
+    request: OrgRequest,
     form: SurveyDefinitionForm,
     layout: FormEditorLayout | None = None
-) -> 'RenderData | Response':
+) -> RenderData | Response:
 
     if form.submitted(request):
         assert form.title.data is not None
@@ -77,10 +79,10 @@ def handle_new_survey_definition(
 )
 def handle_defined_survey(
     self: SurveyDefinition,
-    request: 'OrgRequest',
-    form: 'Form',
+    request: OrgRequest,
+    form: Form,
     layout: SurveySubmissionLayout | None = None
-) -> 'RenderData | Response':
+) -> RenderData | Response:
     """ Renders the empty survey and takes input, even if it's not valid,
     stores it as a pending submission and redirects the user to the view that
     handles pending submissions.
@@ -130,10 +132,10 @@ def handle_defined_survey(
 )
 def handle_edit_survey_definition(
     self: SurveyDefinition,
-    request: 'OrgRequest',
+    request: OrgRequest,
     form: SurveyDefinitionForm,
     layout: FormEditorLayout | None = None
-) -> 'RenderData | Response':
+) -> RenderData | Response:
 
     info = _('This field cannot be edited because there are submissions '
              'associated with this survey. If you want to edit the definition '
@@ -180,9 +182,9 @@ def handle_edit_survey_definition(
              permission=Private, name='results')
 def view_survey_results(
     self: SurveyDefinition,
-    request: 'OrgRequest',
+    request: OrgRequest,
     layout: SurveySubmissionLayout | None = None
-) -> 'RenderData':
+) -> RenderData:
 
     submissions = self.submissions
     results = self.get_results(request)
@@ -242,7 +244,7 @@ def view_survey_results(
 )
 def delete_survey_definition(
     self: SurveyDefinition,
-    request: 'OrgRequest'
+    request: OrgRequest
 ) -> None:
     """
     Deletes the survey along with all its submissions.
@@ -264,7 +266,7 @@ def delete_survey_definition(
 )
 def delete_survey_entries(
     self: SurveyDefinition,
-    request: 'OrgRequest'
+    request: OrgRequest
 ) -> None:
     """
     Deletes all survey submissions.

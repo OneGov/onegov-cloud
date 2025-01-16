@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 from dateutil.parser import isoparse
 from functools import cached_property
 from onegov.agency.collections import ExtendedPersonCollection
@@ -34,8 +36,8 @@ UPDATE_FILTER_PARAMS = frozenset((
 def filter_for_updated(
     filter_operation: str,
     filter_value: str | None,
-    result: 'T'
-) -> 'T':
+    result: T
+) -> T:
     """
     Applies filters for several 'updated' comparisons.
     Refer to UPDATE_FILTER_PARAMS for all filter keywords.
@@ -62,27 +64,27 @@ def filter_for_updated(
 
 class ApisMixin:
 
-    app: 'AgencyApp'
+    app: AgencyApp
 
     @cached_property
-    def agency_api(self) -> 'AgencyApiEndpoint':
+    def agency_api(self) -> AgencyApiEndpoint:
         return AgencyApiEndpoint(self.app)
 
     @cached_property
-    def person_api(self) -> 'PersonApiEndpoint':
+    def person_api(self) -> PersonApiEndpoint:
         return PersonApiEndpoint(self.app)
 
     @cached_property
-    def membership_api(self) -> 'MembershipApiEndpoint':
+    def membership_api(self) -> MembershipApiEndpoint:
         return MembershipApiEndpoint(self.app)
 
 
-def get_geo_location(item: 'ContentMixin') -> dict[str, Any]:
+def get_geo_location(item: ContentMixin) -> dict[str, Any]:
     geo = item.content.get('coordinates', Coordinates()) or Coordinates()
     return {'lon': geo.lon, 'lat': geo.lat, 'zoom': geo.zoom}
 
 
-def get_modified_iso_format(item: 'TimestampMixin') -> str:
+def get_modified_iso_format(item: TimestampMixin) -> str:
     """
     Returns the iso format of the modified or created field of item.
 
@@ -93,7 +95,7 @@ def get_modified_iso_format(item: 'TimestampMixin') -> str:
 
 
 class PersonApiEndpoint(ApiEndpoint['ExtendedPerson'], ApisMixin):
-    app: 'AgencyApp'
+    app: AgencyApp
     endpoint = 'people'
     filters = {'first_name', 'last_name'} | UPDATE_FILTER_PARAMS
     form_class = PersonMutationForm
@@ -122,7 +124,7 @@ class PersonApiEndpoint(ApiEndpoint['ExtendedPerson'], ApisMixin):
         result.batch_size = self.batch_size
         return result
 
-    def item_data(self, item: 'ExtendedPerson') -> dict[str, Any]:
+    def item_data(self, item: ExtendedPerson) -> dict[str, Any]:
         data = {
             attribute: getattr(item, attribute, None)
             for attribute in (
@@ -152,7 +154,7 @@ class PersonApiEndpoint(ApiEndpoint['ExtendedPerson'], ApisMixin):
         data['modified'] = get_modified_iso_format(item)
         return data
 
-    def item_links(self, item: 'ExtendedPerson') -> dict[str, Any]:
+    def item_links(self, item: ExtendedPerson) -> dict[str, Any]:
         result = {
             attribute: getattr(item, attribute, None)
             for attribute in (
@@ -168,7 +170,7 @@ class PersonApiEndpoint(ApiEndpoint['ExtendedPerson'], ApisMixin):
 
     def apply_changes(
         self,
-        item: 'ExtendedPerson',
+        item: ExtendedPerson,
         form: PersonMutationForm
     ) -> None:
 
@@ -178,7 +180,7 @@ class PersonApiEndpoint(ApiEndpoint['ExtendedPerson'], ApisMixin):
 
 
 class AgencyApiEndpoint(ApiEndpoint['ExtendedAgency'], ApisMixin):
-    app: 'AgencyApp'
+    app: AgencyApp
     endpoint = 'agencies'
     filters = {'parent', 'title'} | UPDATE_FILTER_PARAMS
 
@@ -205,7 +207,7 @@ class AgencyApiEndpoint(ApiEndpoint['ExtendedAgency'], ApisMixin):
         result.batch_size = self.batch_size
         return result
 
-    def item_data(self, item: 'ExtendedAgency') -> dict[str, Any]:
+    def item_data(self, item: ExtendedAgency) -> dict[str, Any]:
         return {
             'title': item.title,
             'portrait': item.portrait,
@@ -222,7 +224,7 @@ class AgencyApiEndpoint(ApiEndpoint['ExtendedAgency'], ApisMixin):
             'geo_location': get_geo_location(item),
         }
 
-    def item_links(self, item: 'ExtendedAgency') -> dict[str, Any]:
+    def item_links(self, item: ExtendedAgency) -> dict[str, Any]:
         return {
             'organigram': item.organigram,
             'parent': self.for_item(item.parent),
@@ -238,7 +240,7 @@ class MembershipApiEndpoint(
     ApisMixin
 ):
 
-    app: 'AgencyApp'
+    app: AgencyApp
     endpoint = 'memberships'
     filters = {'agency', 'person'} | UPDATE_FILTER_PARAMS
 
@@ -263,13 +265,13 @@ class MembershipApiEndpoint(
         result.batch_size = self.batch_size
         return result
 
-    def item_data(self, item: 'ExtendedAgencyMembership') -> dict[str, Any]:
+    def item_data(self, item: ExtendedAgencyMembership) -> dict[str, Any]:
         return {
             'title': item.title,
             'modified': get_modified_iso_format(item),
         }
 
-    def item_links(self, item: 'ExtendedAgencyMembership') -> dict[str, Any]:
+    def item_links(self, item: ExtendedAgencyMembership) -> dict[str, Any]:
         return {
             'agency': self.agency_api.for_item(item.agency),
             'person': self.person_api.for_item(item.person)

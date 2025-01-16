@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 import sedate
 
 from datetime import date, datetime
@@ -34,7 +36,7 @@ if TYPE_CHECKING:
 
 class FindYourSpotCollection(ResourceCollection):
 
-    def __init__(self, libres_context: 'Context', group: str | None) -> None:
+    def __init__(self, libres_context: Context, group: str | None) -> None:
         super().__init__(libres_context)
         self.group = group
 
@@ -46,7 +48,7 @@ class FindYourSpotCollection(ResourceCollection):
     def meta(self) -> dict[str, Any]:
         return {'lead': _('Search for available dates')}
 
-    def query(self) -> 'Query[Resource]':
+    def query(self) -> Query[Resource]:
         query = self.session.query(Resource)
         # we only support find-your-spot for rooms for now
         query = query.filter(Resource.type == 'room')
@@ -85,12 +87,12 @@ class SharedMethods:
         return True
 
     @property
-    def future_managed_reservations(self) -> 'Query[Reservation]':
+    def future_managed_reservations(self) -> Query[Reservation]:
         return self.scheduler.managed_reservations().filter(  # type:ignore
             Reservation.end >= sedate.utcnow())
 
     @property
-    def future_managed_reserved_slots(self) -> 'Query[ReservedSlot]':
+    def future_managed_reserved_slots(self) -> Query[ReservedSlot]:
         return self.scheduler.managed_reserved_slots().filter(
             ReservedSlot.end >= sedate.utcnow())
 
@@ -138,9 +140,9 @@ class SharedMethods:
 
     def bound_reservations(
         self,
-        request: 'OrgRequest',
+        request: OrgRequest,
         status: str = 'pending'
-    ) -> 'Query[Reservation]':
+    ) -> Query[Reservation]:
         """ The reservations associated with this resource and user. """
 
         session = self.bound_session_id(request)
@@ -157,7 +159,7 @@ class SharedMethods:
 
         return res  # type:ignore[return-value]
 
-    def bound_session_id(self, request: 'OrgRequest') -> 'uuid.UUID':
+    def bound_session_id(self, request: OrgRequest) -> uuid.UUID:
         """ The session id associated with this resource and user. """
         if not request.browser_session.has('libres_session_id'):
             request.browser_session.libres_session_id = uuid4()
@@ -169,7 +171,7 @@ class SharedMethods:
         start: datetime | None = None,
         end: datetime | None = None,
         exclude_pending: bool = True
-    ) -> 'Query[Reservation]':
+    ) -> Query[Reservation]:
         """ Returns a query which joins this resource's reservations between
         start and end with the tickets table.
 

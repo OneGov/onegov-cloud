@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 import calendar
 import time
 
@@ -53,8 +55,8 @@ class Conclusion:
 class Success(Conclusion):
     """ Indicates a sucessful authentication. """
 
-    user: 'User' = attrib()
-    note: 'TranslationString' = attrib()
+    user: User = attrib()
+    note: TranslationString = attrib()
 
     def __bool__(self) -> Literal[True]:
         return True
@@ -64,7 +66,7 @@ class Success(Conclusion):
 class Failure(Conclusion):
     """ Indicates a corrupt JWT """
 
-    note: 'TranslationString' = attrib()
+    note: TranslationString = attrib()
 
     def __bool__(self) -> Literal[False]:
         return False
@@ -73,7 +75,7 @@ class Failure(Conclusion):
 class InvalidJWT(Failure):
     """ Indicates a failed authentication. """
 
-    note: 'TranslationString' = attrib()
+    note: TranslationString = attrib()
 
     def __bool__(self) -> Literal[False]:
         return False
@@ -104,7 +106,7 @@ class AuthenticationProvider(metaclass=ABCMeta):
 
     def __init_subclass__(
         cls,
-        metadata: 'HasName | None' = None,
+        metadata: HasName | None = None,
         **kwargs: Any
     ):
         if metadata:
@@ -136,12 +138,12 @@ class AuthenticationProvider(metaclass=ABCMeta):
 
         return cls(name=name)
 
-    def is_primary(self, app: 'UserApp') -> bool:
+    def is_primary(self, app: UserApp) -> bool:
         """ Returns whether the authentication provider is intended to be
         the primary provider for this app."""
         return self.primary if self.available(app) else False
 
-    def available(self, app: 'UserApp') -> bool:
+    def available(self, app: UserApp) -> bool:
         """Returns whether the authentication provider is available for the
         current app. Since there are tenant specific connections, we want to
         tcheck, if for the tenant of the app, there is an available client."""
@@ -163,7 +165,7 @@ class SeparateAuthenticationProvider(AuthenticationProvider):
     @abstractmethod
     def authenticate_request(
         self,
-        request: 'CoreRequest'
+        request: CoreRequest
     ) -> Success | Failure | Response | None:
         """ Authenticates the given request in one or many steps.
 
@@ -185,7 +187,7 @@ class SeparateAuthenticationProvider(AuthenticationProvider):
         """
 
     @abstractmethod
-    def button_text(self, request: 'CoreRequest') -> str:
+    def button_text(self, request: CoreRequest) -> str:
         """ Returns the translatable button text for the given request.
 
         It is okay to return a static text, if the button remains the same
@@ -212,7 +214,7 @@ class IntegratedAuthenticationProvider(AuthenticationProvider):
     kind: ClassVar[Literal['integrated']] = 'integrated'
 
     @abstractmethod
-    def hint(self, request: 'CoreRequest') -> str:
+    def hint(self, request: CoreRequest) -> str:
         """ Returns the translatable hint shown above the login mask for
         the integrated provider.
 
@@ -226,10 +228,10 @@ class IntegratedAuthenticationProvider(AuthenticationProvider):
     @abstractmethod
     def authenticate_user(
         self,
-        request: 'CoreRequest',
+        request: CoreRequest,
         username: str,
         password: str
-    ) -> 'User | None':
+    ) -> User | None:
         """ Authenticates the given username/password in a single step.
 
         The function is expected to return an existing user record or None.
@@ -265,13 +267,13 @@ def spawn_ldap_client(
 def ensure_user(
     source: str | None,
     source_id: str | None,
-    session: 'Session',
+    session: Session,
     username: str,
     role: str,
     force_role: bool = True,
     realname: str | None = None,
     force_active: bool = False
-) -> 'User':
+) -> User:
     """ Creates the given user if it doesn't already exist. Ensures the
     role is set to the given role in all cases.
     """
@@ -341,7 +343,7 @@ class RolesMapping:
 
     def app_specific(
         self,
-        app: 'HasApplicationIdAndNamespace'
+        app: HasApplicationIdAndNamespace
     ) -> dict[str, str] | None:
 
         if app.application_id in self.roles:
@@ -356,8 +358,8 @@ class RolesMapping:
 
     def match(
         self,
-        roles: 'Mapping[str, str]',
-        groups: 'Collection[str]'
+        roles: Mapping[str, str],
+        groups: Collection[str]
     ) -> str | None:
         """ Takes a role mapping (the fallback, namespace, or app specific one)
         and matches it against the given LDAP groups.
@@ -473,15 +475,15 @@ class LDAPProvider(
             })),
         )
 
-    def hint(self, request: 'CoreRequest') -> str:
+    def hint(self, request: CoreRequest) -> str:
         return self.custom_hint
 
     def authenticate_user(
         self,
-        request: 'CoreRequest',
+        request: CoreRequest,
         username: str,
         password: str
-    ) -> 'User | None':
+    ) -> User | None:
 
         if self.auth_method == 'compare':
             return self.authenticate_using_compare(request, username, password)
@@ -490,10 +492,10 @@ class LDAPProvider(
 
     def authenticate_using_compare(
         self,
-        request: 'CoreRequest',
+        request: CoreRequest,
         username: str,
         password: str
-    ) -> 'User | None':
+    ) -> User | None:
 
         # since this is turned into an LDAP query, we want to make sure this
         # is not used to make broad queries
@@ -637,7 +639,7 @@ class LDAPKerberosProvider(
             provider.primary = True
         return provider
 
-    def button_text(self, request: 'CoreRequest') -> str:
+    def button_text(self, request: CoreRequest) -> str:
         """ Returns the request tailored to each OS (users won't understand
         LDAP/Kerberos, but for them it's basically their local OS login).
 
@@ -653,7 +655,7 @@ class LDAPKerberosProvider(
 
     def authenticate_request(
         self,
-        request: 'CoreRequest'
+        request: CoreRequest
     ) -> Response | Success | Failure:
 
         response = self.kerberos.authenticated_username(request)
@@ -681,9 +683,9 @@ class LDAPKerberosProvider(
 
     def request_authorization(
         self,
-        request: 'CoreRequest',
+        request: CoreRequest,
         username: str
-    ) -> 'User | None':
+    ) -> User | None:
 
         if self.suffix:
             username = username.removesuffix(self.suffix)
@@ -744,8 +746,8 @@ class OauthProvider(SeparateAuthenticationProvider):
     @abstractmethod
     def do_logout(
         self,
-        request: 'CoreRequest',
-        user: 'User',
+        request: CoreRequest,
+        user: User,
         to: str
     ) -> Response | None:
         """ May return a webob response that gets used instead of the default
@@ -760,7 +762,7 @@ class OauthProvider(SeparateAuthenticationProvider):
     @abstractmethod
     def request_authorisation(
         self,
-        request: 'CoreRequest'
+        request: CoreRequest
     ) -> Success | Failure | Response:
         """
         Takes the request from the redirect_uri view sent from the users
@@ -773,7 +775,7 @@ class OauthProvider(SeparateAuthenticationProvider):
         to redirect the user to the auth provider.
         """
 
-    def logout_redirect_uri(self, request: 'CoreRequest') -> str:
+    def logout_redirect_uri(self, request: CoreRequest) -> str:
         """This url usually has to be registered with the OAuth Provider.
         Should not contain any query parameters. """
         return request.class_link(
@@ -782,7 +784,7 @@ class OauthProvider(SeparateAuthenticationProvider):
             name='logout'
         )
 
-    def redirect_uri(self, request: 'CoreRequest') -> str:
+    def redirect_uri(self, request: CoreRequest) -> str:
         """Returns the redirect uri in a consistent manner
         without query parameters."""
         return request.class_link(
@@ -850,21 +852,21 @@ class AzureADProvider(
             }))
         )
 
-    def button_text(self, request: 'CoreRequest') -> str:
+    def button_text(self, request: CoreRequest) -> str:
         return _('Login with Microsoft')
 
-    def do_logout(self, request: 'CoreRequest', user: 'User', to: str) -> None:
+    def do_logout(self, request: CoreRequest, user: User, to: str) -> None:
         # global logout is deactivated for AzureAD currently
         return None
 
-    def logout_url(self, request: 'CoreRequest') -> str:
+    def logout_url(self, request: CoreRequest) -> str:
         client = self.tenants.client(request.app)
         assert client is not None
         return client.logout_url(self.logout_redirect_uri(request))
 
     def authenticate_request(
         self,
-        request: 'CoreRequest'
+        request: CoreRequest
     ) -> Response | Failure:
         """
         Returns a redirect response or a Conclusion
@@ -907,7 +909,7 @@ class AzureADProvider(
 
     def validate_id_token(
         self,
-        request: 'CoreRequest',
+        request: CoreRequest,
         token: dict[str, Any]
     ) -> Failure | Literal[True]:
         """
@@ -943,7 +945,7 @@ class AzureADProvider(
 
     def request_authorisation(
         self,
-        request: 'CoreRequest'
+        request: CoreRequest
     ) -> Success | Failure:
         """
         If "Stay Logged In" on the Microsoft Login page is chosen,
@@ -1043,13 +1045,13 @@ class AzureADProvider(
             'user': user.username
         }))
 
-    def is_primary(self, app: 'UserApp') -> bool:
+    def is_primary(self, app: UserApp) -> bool:
         client = self.tenants.client(app)
         if client:
             return client.primary
         return False
 
-    def available(self, app: 'UserApp') -> bool:
+    def available(self, app: UserApp) -> bool:
         return self.tenants.client(app) and True or False
 
 
@@ -1090,15 +1092,15 @@ class SAML2Provider(
             }))
         )
 
-    def button_text(self, request: 'CoreRequest') -> str:
+    def button_text(self, request: CoreRequest) -> str:
         client = self.tenants.client(request.app)
         assert client is not None
         return client.button_text
 
     def do_logout(
         self,
-        request: 'CoreRequest',
-        user: 'User',
+        request: CoreRequest,
+        user: User,
         to: str
     ) -> Response | None:
 
@@ -1151,7 +1153,7 @@ class SAML2Provider(
 
     def authenticate_request(
         self,
-        request: 'CoreRequest'
+        request: CoreRequest
     ) -> Response | Failure:
         """
         Returns a redirect response or a Conclusion
@@ -1198,7 +1200,7 @@ class SAML2Provider(
 
     def request_authorisation(
         self,
-        request: 'CoreRequest'
+        request: CoreRequest
     ) -> Success | Failure:
         """
         Returns a webob Response or a Conclusion.
@@ -1298,13 +1300,13 @@ class SAML2Provider(
             'user': user.username
         }))
 
-    def is_primary(self, app: 'UserApp') -> bool:
+    def is_primary(self, app: UserApp) -> bool:
         client = self.tenants.client(app)
         if client:
             return client.primary
         return False
 
-    def available(self, app: 'UserApp') -> bool:
+    def available(self, app: UserApp) -> bool:
         return self.tenants.client(app) and True or False
 
 
@@ -1345,15 +1347,15 @@ class OIDCProvider(
             }))
         )
 
-    def button_text(self, request: 'CoreRequest') -> str:
+    def button_text(self, request: CoreRequest) -> str:
         client = self.tenants.client(request.app)
         assert client is not None
         return client.button_text
 
     def do_logout(
         self,
-        request: 'CoreRequest',
-        user: 'User',
+        request: CoreRequest,
+        user: User,
         to: str
     ) -> Response | None:
 
@@ -1362,7 +1364,7 @@ class OIDCProvider(
 
     def authenticate_request(
         self,
-        request: 'CoreRequest'
+        request: CoreRequest
     ) -> Response | Failure:
         """
         Returns a redirect response or a Conclusion
@@ -1418,7 +1420,7 @@ class OIDCProvider(
 
     def request_authorisation(
         self,
-        request: 'CoreRequest'
+        request: CoreRequest
     ) -> Success | Failure:
         """
         Returns a webob Response or a Conclusion.
@@ -1564,11 +1566,11 @@ class OIDCProvider(
             'user': user.username
         }))
 
-    def is_primary(self, app: 'UserApp') -> bool:
+    def is_primary(self, app: UserApp) -> bool:
         client = self.tenants.client(app)
         if client:
             return client.primary
         return False
 
-    def available(self, app: 'UserApp') -> bool:
+    def available(self, app: UserApp) -> bool:
         return self.tenants.client(app) and True or False

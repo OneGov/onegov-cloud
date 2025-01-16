@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 from onegov.election_day import _
 from onegov.election_day.forms.upload.common import ALLOWED_MIME_TYPES
 from onegov.election_day.forms.upload.common import MAX_FILE_SIZE
@@ -43,8 +45,8 @@ class UploadElectionBaseForm(Form):
 
     def adjust(
         self,
-        principal: 'Canton | Municipality',
-        election: 'Election'
+        principal: Canton | Municipality,
+        election: Election
     ) -> None:
         """ Adjusts the form to the given principal and election. """
 

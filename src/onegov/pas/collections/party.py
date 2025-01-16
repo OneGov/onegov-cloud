@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 from datetime import date
 from onegov.core.collection import GenericCollection
 from onegov.pas.models import Party
@@ -14,7 +16,7 @@ class PartyCollection(GenericCollection[Party]):
 
     def __init__(
         self,
-        session: 'Session',
+        session: Session,
         active: bool | None = None
     ):
         super().__init__(session)
@@ -24,7 +26,7 @@ class PartyCollection(GenericCollection[Party]):
     def model_class(self) -> type[Party]:
         return Party
 
-    def query(self) -> 'Query[Party]':
+    def query(self) -> Query[Party]:
         query = super().query()
 
         if self.active is not None:
@@ -43,5 +45,5 @@ class PartyCollection(GenericCollection[Party]):
     def for_filter(
         self,
         active: bool | None = None
-    ) -> 'Self':
+    ) -> Self:
         return self.__class__(self.session, active)

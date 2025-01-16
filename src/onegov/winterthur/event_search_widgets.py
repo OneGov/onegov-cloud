@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 from functools import cached_property
 from sqlalchemy import func, or_, cast, String
 
@@ -23,7 +25,7 @@ class InlineEventSearch:
 
     def __init__(
         self,
-        request: 'WinterthurRequest',
+        request: WinterthurRequest,
         search_query: dict[str, str]
     ) -> None:
         self.app = request.app
@@ -34,7 +36,7 @@ class InlineEventSearch:
     def term(self) -> str | None:
         return (self.search_query or {}).get('term', None)
 
-    def html(self, layout: 'DefaultLayout') -> str:
+    def html(self, layout: DefaultLayout) -> str:
         return render_macro(layout.macros['inline_search'],
                             self.request, {
             'term': self.term,
@@ -47,7 +49,7 @@ class InlineEventSearch:
             )
         })
 
-    def adapt(self, query: 'Query[T]') -> 'Query[T]':
+    def adapt(self, query: Query[T]) -> Query[T]:
         """
         Adapt the query to search for words in the search term `self.term` in
         event search properties.

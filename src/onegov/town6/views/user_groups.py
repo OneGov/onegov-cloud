@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 from onegov.core.security import Secret
 from onegov.org.views.user_groups import add_user_group
 from onegov.org.views.user_groups import edit_user_group
@@ -26,8 +28,8 @@ if TYPE_CHECKING:
 )
 def town_view_user_groups(
     self: UserGroupCollection[UserGroup],
-    request: 'TownRequest'
-) -> 'RenderData':
+    request: TownRequest
+) -> RenderData:
     layout = UserGroupCollectionLayout(self, request)
     return view_user_groups(self, request, layout)
 
@@ -41,9 +43,9 @@ def town_view_user_groups(
 )
 def town_add_user_group(
     self: UserGroupCollection[UserGroup],
-    request: 'TownRequest',
-    form: 'ManageUserGroupForm'
-) -> 'RenderData | Response':
+    request: TownRequest,
+    form: ManageUserGroupForm
+) -> RenderData | Response:
     layout = UserGroupCollectionLayout(self, request)
     return add_user_group(self, request, form, layout)
 
@@ -55,8 +57,8 @@ def town_add_user_group(
 )
 def town_view_user_group(
     self: UserGroup,
-    request: 'TownRequest'
-) -> 'RenderData':
+    request: TownRequest
+) -> RenderData:
     layout = UserGroupLayout(self, request)
     return view_user_group(self, request, layout)
 
@@ -70,8 +72,8 @@ def town_view_user_group(
 )
 def town_edit_user_group(
     self: UserGroup,
-    request: 'TownRequest',
-    form: 'ManageUserGroupForm'
-) -> 'RenderData | Response':
+    request: TownRequest,
+    form: ManageUserGroupForm
+) -> RenderData | Response:
     layout = UserGroupLayout(self, request)
     return edit_user_group(self, request, form, layout)

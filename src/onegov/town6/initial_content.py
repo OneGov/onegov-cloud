@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 from onegov.core.utils import module_path
 from onegov.reservation import ResourceCollection
 from onegov.org.initial_content import add_builtin_forms
@@ -16,10 +18,10 @@ if TYPE_CHECKING:
 
 
 def create_new_organisation(
-    app: 'Framework',
+    app: Framework,
     name: str,
     reply_to: str | None = None,
-    forms: 'Iterable[tuple[str, str, str]] | None' = None,
+    forms: Iterable[tuple[str, str, str]] | None = None,
     create_files: bool = True,
     path: str | None = None,
     locale: str = 'de_CH'
@@ -57,7 +59,7 @@ def create_new_organisation(
     translator = app.translations.get(locale)
     assert translator is not None
 
-    def translate(text: 'TranslationString') -> str:
+    def translate(text: TranslationString) -> str:
         return text.interpolate(translator.gettext(text))
 
     add_pages(session, path)
@@ -74,7 +76,7 @@ def create_new_organisation(
     return org
 
 
-def add_resources(libres_context: 'LibresContext') -> None:
+def add_resources(libres_context: LibresContext) -> None:
     resource = ResourceCollection(libres_context)
     resource.add(
         'SBB-Tageskarte',

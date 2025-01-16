@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 import os
 
 from onegov.foundation6 import BaseTheme
@@ -45,7 +47,7 @@ class TownTheme(BaseTheme):
         return user_options
 
     @property
-    def foundation_styles(self) -> 'Sequence[str]':
+    def foundation_styles(self) -> Sequence[str]:
         return 'global-styles', 'forms', 'typography'
 
     @property

@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 from onegov.election_day import _
 from onegov.election_day.layouts import DefaultLayout
 from onegov.election_day.models.data_source import UPLOAD_TYPE_LABELS
@@ -33,20 +35,20 @@ class DataSourceForm(Form):
         default='vote'
     )
 
-    def update_model(self, model: 'DataSource') -> None:
+    def update_model(self, model: DataSource) -> None:
         assert self.name.data is not None
         assert self.upload_type.data is not None
         model.name = self.name.data
         model.type = self.upload_type.data
 
-    def apply_model(self, model: 'DataSource') -> None:
+    def apply_model(self, model: DataSource) -> None:
         self.name.data = model.name
         self.upload_type.data = model.type
 
 
 class DataSourceItemForm(Form):
 
-    request: 'ElectionDayRequest'
+    request: ElectionDayRequest
 
     item = ChosenSelectField(
         label='',
@@ -71,7 +73,7 @@ class DataSourceItemForm(Form):
 
     callout = ''
 
-    def populate(self, source: 'DataSource') -> None:
+    def populate(self, source: DataSource) -> None:
         layout = DefaultLayout(None, self.request)
 
         self.type = source.type
@@ -93,7 +95,7 @@ class DataSourceItemForm(Form):
             else:
                 self.callout = _('No elections yet.')
 
-    def update_model(self, model: 'DataSourceItem') -> None:
+    def update_model(self, model: DataSourceItem) -> None:
         if self.type == 'vote':
             model.vote_id = self.item.data
         else:
@@ -102,7 +104,7 @@ class DataSourceItemForm(Form):
         model.district = self.district.data
         model.number = self.number.data
 
-    def apply_model(self, model: 'DataSourceItem') -> None:
+    def apply_model(self, model: DataSourceItem) -> None:
         if self.type == 'vote':
             self.item.data = model.vote_id
         else:

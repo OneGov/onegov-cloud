@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 from sedate import utcnow
 from sqlalchemy import Column, case, func, and_, not_
 from sqlalchemy.ext.hybrid import hybrid_property
@@ -34,7 +36,7 @@ class UTCPublicationMixin:
         return self.publication_start <= utcnow()
 
     @publication_started.expression  # type:ignore[no-redef]
-    def publication_started(cls) -> 'ClauseElement':
+    def publication_started(cls) -> ClauseElement:
         return case((
             (
                 cls.publication_start == None,
@@ -49,7 +51,7 @@ class UTCPublicationMixin:
         return self.publication_end < utcnow()
 
     @publication_ended.expression  # type:ignore[no-redef]
-    def publication_ended(cls) -> 'ClauseElement':
+    def publication_ended(cls) -> ClauseElement:
         return case((
             (
                 cls.publication_end == None,
@@ -62,5 +64,5 @@ class UTCPublicationMixin:
         return self.publication_started and not self.publication_ended
 
     @published.expression  # type:ignore[no-redef]
-    def published(cls) -> 'ClauseElement':
+    def published(cls) -> ClauseElement:
         return and_(cls.publication_started, not_(cls.publication_ended))

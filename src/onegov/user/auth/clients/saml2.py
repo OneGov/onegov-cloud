@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 import morepath
 
 from attr import attrs, attrib
@@ -67,11 +69,11 @@ def handle_logout_request(
 
 
 def finish_logout(
-    request: 'CoreRequest',
-    user: 'User',
+    request: CoreRequest,
+    user: User,
     to: str,
     local: bool = True
-) -> 'Response':
+) -> Response:
     # this always finishes the SAML2 logout, but it may delay
     # the local logout and make it the regular logout view's
     # responsibility
@@ -148,7 +150,7 @@ class SAML2Client:
 
     _connections: dict[str, Connection] = {}
 
-    def get_binding(self, request: 'CoreRequest') -> str:
+    def get_binding(self, request: CoreRequest) -> str:
         if request.method == 'GET':
             return BINDING_HTTP_REDIRECT
         elif request.method == 'POST':
@@ -156,19 +158,19 @@ class SAML2Client:
         else:
             raise NotImplementedError()
 
-    def get_sessions(self, app: 'UserApp | Framework') -> 'Mangled':
+    def get_sessions(self, app: UserApp | Framework) -> Mangled:
         # this can use our short-lived cache, it will likely
         # be deleted before it can expire anyways
         return Mangled(app.cache, 'saml2_sessions')
 
-    def get_redirects(self, app: 'UserApp | Framework') -> 'Mangled':
+    def get_redirects(self, app: UserApp | Framework) -> Mangled:
         # same here
         return Mangled(app.cache, 'saml2_redirects')
 
     def connection(
         self,
-        provider: 'SAML2Provider',
-        request: 'CoreRequest'
+        provider: SAML2Provider,
+        request: CoreRequest
     ) -> Connection:
         """ Returns the SAML2 instance """
         # NOTE: Unfortunately we can't create all the connections
@@ -239,16 +241,16 @@ class SAML2Client:
                 ) from exception
         return conn
 
-    def get_name_id(self, user: 'User | None') -> str | None:
+    def get_name_id(self, user: User | None) -> str | None:
         if user and user.data:
             return user.data.get('saml2_transient_id')
         return None
 
     def create_logout_request(
         self,
-        provider: 'SAML2Provider',
-        request: 'CoreRequest',
-        user: 'User | None'
+        provider: SAML2Provider,
+        request: CoreRequest,
+        user: User | None
     ) -> tuple[str | None, Any | None]:
         transient_id = self.get_name_id(user)
         if not transient_id:
@@ -319,9 +321,9 @@ class SAML2Client:
 
     def handle_slo(
         self,
-        provider: 'SAML2Provider',
-        request: 'CoreRequest'
-    ) -> 'Response':
+        provider: SAML2Provider,
+        request: CoreRequest
+    ) -> Response:
 
         # this could be either a request or a response
         saml_request = request.params.get('SAMLRequest')
@@ -403,7 +405,7 @@ class SAML2Connections:
 
     def client(
         self,
-        app: 'HasApplicationIdAndNamespace'
+        app: HasApplicationIdAndNamespace
     ) -> SAML2Client | None:
         if app.application_id in self.connections:
             return self.connections[app.application_id]
@@ -436,7 +438,7 @@ class Mangled:
     cache, so valid name_ids cannot be discovered through key listing
     """
 
-    def __init__(self, cache: 'RedisCacheRegion', prefix: str = ''):
+    def __init__(self, cache: RedisCacheRegion, prefix: str = ''):
         self._cache = cache
         self._prefix = prefix
 
@@ -490,13 +492,13 @@ class Mangled:
         return self._cache.get(self.mangle(name_id)) is not NO_VALUE
 
 
-class IdentityCache(Cache):
+class IdentityCache(Cache):  # type:ignore[misc]
     """
     Extension to the dict/shelve based default cache to use our
     redis based dogpile cache instead
     """
 
-    def __init__(self, app: 'Framework'):
+    def __init__(self, app: Framework):
         # for now we use the same expiration time as our session cache
         # we want to be able to initiate a SLO as long as the user is
         # logged in, so we need the identity to remain cached for at

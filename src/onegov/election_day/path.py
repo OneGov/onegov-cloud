@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 from onegov.core.converters import extended_date_converter
 from onegov.core.i18n import SiteLocale
 from onegov.election_day import ElectionDayApp
@@ -43,7 +45,7 @@ if TYPE_CHECKING:
     model=Auth,
     path='/auth'
 )
-def get_auth(request: 'ElectionDayRequest', to: str = '/') -> Auth:
+def get_auth(request: ElectionDayRequest, to: str = '/') -> Auth:
     return Auth.from_request(request, to)
 
 
@@ -342,8 +344,8 @@ def get_archive_by_year(
 )
 def get_archive_search(
     app: ElectionDayApp,
-    from_date: 'date | None' = None,
-    to_date: 'date | None' = None,
+    from_date: date | None = None,
+    to_date: date | None = None,
     answers: list[str] | None = None,
     item_type: str | None = None,
     domains: list[str] | None = None,
@@ -368,7 +370,7 @@ def get_archive_search(
     path='/locale/{locale}'
 )
 def get_locale(
-    request: 'ElectionDayRequest',
+    request: ElectionDayRequest,
     app: ElectionDayApp,
     locale: str
 ) -> SiteLocale | None:

@@ -1,3 +1,4 @@
+from __future__ import annotations
 
 from onegov.core.security import Public, Private, Secret
 from onegov.directory import DirectoryCollection, Directory
@@ -40,8 +41,8 @@ if TYPE_CHECKING:
 )
 def town_view_directories(
     self: DirectoryCollection[Any],
-    request: 'TownRequest'
-) -> 'RenderData':
+    request: TownRequest
+) -> RenderData:
     return view_directories(
         self, request, DirectoryCollectionLayout(self, request))
 
@@ -55,9 +56,9 @@ def town_view_directories(
 )
 def town_handle_new_directory(
     self: DirectoryCollection[Any],
-    request: 'TownRequest',
-    form: 'DirectoryForm'
-) -> 'RenderData | Response':
+    request: TownRequest,
+    form: DirectoryForm
+) -> RenderData | Response:
     return handle_new_directory(
         self, request, form, DirectoryCollectionLayout(self, request))
 
@@ -71,9 +72,9 @@ def town_handle_new_directory(
 )
 def town_handle_edit_directory(
     self: ExtendedDirectoryEntryCollection,
-    request: 'TownRequest',
-    form: 'DirectoryForm'
-) -> 'RenderData | Response':
+    request: TownRequest,
+    form: DirectoryForm
+) -> RenderData | Response:
     return handle_edit_directory(
         self, request, form, DirectoryCollectionLayout(self, request))
 
@@ -87,9 +88,9 @@ def town_handle_edit_directory(
 )
 def town_change_directory_url(
     self: Directory,
-    request: 'TownRequest',
+    request: TownRequest,
     form: DirectoryUrlForm
-) -> 'RenderData | Response':
+) -> RenderData | Response:
     return change_directory_url(
         self, request, form,
         # FIXME: Should this be DefaultLayout? DirectoryCollection definitely
@@ -105,8 +106,8 @@ def town_change_directory_url(
 )
 def town_view_directory(
     self: ExtendedDirectoryEntryCollection,
-    request: 'TownRequest'
-) -> 'RenderData':
+    request: TownRequest
+) -> RenderData:
     return view_directory(
         self, request, DirectoryEntryCollectionLayout(self, request))
 
@@ -120,9 +121,9 @@ def town_view_directory(
 )
 def town_handle_new_directory_entry(
     self: ExtendedDirectoryEntryCollection,
-    request: 'TownRequest',
-    form: 'DirectoryEntryForm'
-) -> 'RenderData | Response':
+    request: TownRequest,
+    form: DirectoryEntryForm
+) -> RenderData | Response:
     return handle_new_directory_entry(
         self, request, form,
         DirectoryEntryCollectionLayout(self, request, hide_steps=True))
@@ -137,9 +138,9 @@ def town_handle_new_directory_entry(
 )
 def town_handle_edit_directory_entry(
     self: DirectoryEntry,
-    request: 'TownRequest',
-    form: 'DirectoryEntryForm'
-) -> 'RenderData | Response':
+    request: TownRequest,
+    form: DirectoryEntryForm
+) -> RenderData | Response:
     return handle_edit_directory_entry(
         self, request, form,
         # FIXME: Should we only register this view for ExtendedDirectoryEntry?
@@ -155,9 +156,9 @@ def town_handle_edit_directory_entry(
 )
 def town_handle_submit_directory_entry(
     self: ExtendedDirectoryEntryCollection,
-    request: 'TownRequest',
-    form: 'ExtendedDirectoryEntryForm'
-) -> 'RenderData | Response':
+    request: TownRequest,
+    form: ExtendedDirectoryEntryForm
+) -> RenderData | Response:
     return handle_submit_directory_entry(
         self, request, form, DirectoryEntryCollectionLayout(self, request))
 
@@ -171,9 +172,9 @@ def town_handle_submit_directory_entry(
 )
 def town_handle_change_request(
     self: ExtendedDirectoryEntry,
-    request: 'TownRequest',
-    form: 'ExtendedDirectoryEntryForm'
-) -> 'RenderData | Response':
+    request: TownRequest,
+    form: ExtendedDirectoryEntryForm
+) -> RenderData | Response:
     return handle_change_request(
         self, request, form, DirectoryEntryLayout(self, request))
 
@@ -185,8 +186,8 @@ def town_handle_change_request(
 )
 def town_view_directory_entry(
     self: ExtendedDirectoryEntry,
-    request: 'TownRequest'
-) -> 'RenderData':
+    request: TownRequest
+) -> RenderData:
     return view_directory_entry(
         self, request, DirectoryEntryLayout(self, request))
 
@@ -200,9 +201,9 @@ def town_view_directory_entry(
 )
 def town_view_export(
     self: ExtendedDirectoryEntryCollection,
-    request: 'TownRequest',
+    request: TownRequest,
     form: ExportForm
-) -> 'RenderData | Response':
+) -> RenderData | Response:
     return view_export(
         self, request, form, DirectoryEntryCollectionLayout(self, request))
 
@@ -216,9 +217,9 @@ def town_view_export(
 )
 def town_view_import(
     self: ExtendedDirectoryEntryCollection,
-    request: 'TownRequest',
+    request: TownRequest,
     form: DirectoryImportForm
-) -> 'RenderData | Response':
+) -> RenderData | Response:
     return view_import(
         self, request, form, DirectoryEntryCollectionLayout(self, request))
 
@@ -230,9 +231,9 @@ def town_view_import(
 )
 def town_new_recipient(
     self: ExtendedDirectoryEntryCollection,
-    request: 'TownRequest',
+    request: TownRequest,
     form: DirectoryRecipientForm
-) -> 'RenderData | Response':
+) -> RenderData | Response:
 
     layout = DirectoryEntryCollectionLayout(self, request)
     layout.hide_steps = True
@@ -247,8 +248,8 @@ def town_new_recipient(
 )
 def town_view_recipients(
     self: ExtendedDirectoryEntryCollection,
-    request: 'TownRequest',
-) -> 'RenderData | Response':
+    request: TownRequest,
+) -> RenderData | Response:
 
     layout = DirectoryEntryCollectionLayout(self, request)
     layout.hide_steps = True

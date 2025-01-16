@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 from onegov.election_day.collections.archived_results import \
     ArchivedResultCollection
 from onegov.election_day.collections.archived_results import \
