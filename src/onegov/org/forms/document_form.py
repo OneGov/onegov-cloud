@@ -2,8 +2,6 @@ from onegov.form import Form
 from onegov.form.fields import HtmlField, UploadField
 from onegov.form.validators import FileSizeLimit, WhitelistedMimeType
 from onegov.org import _
-from onegov.org.models.external_link import ExternalLinkCollection
-from wtforms.fields import SelectField
 from wtforms.fields import StringField
 from wtforms.fields import TextAreaField
 from wtforms.validators import InputRequired
@@ -22,7 +20,7 @@ class DocumentForm(Form):
         render_kw={'rows': 4})
 
     text = HtmlField(
-        label=_('Text'))
+        label=_('Main Text help'))
 
     form_pdf = UploadField(
         label=_('Form PDF'),
@@ -36,17 +34,3 @@ class DocumentForm(Form):
         label=_('Group'),
         description=_('Used to group this link in the overview')
     )
-
-    member_of = SelectField(
-        label=_('Name of the list view this link will be shown'),
-        choices=[]
-    )
-
-    def on_request(self) -> None:
-        if isinstance(self.model, ExternalLinkCollection):
-            self.member_of.choices = [
-                (id_, self.request.translate(_(name)))
-                for id_, name in self.model.form_choices()
-            ]
-        else:
-            self.delete_field('member_of')

@@ -1,4 +1,4 @@
-from onegov.form.models.document_form import DocumentFormCollection
+from onegov.form.models.document_form import FormDocumentCollection
 from onegov.org.views.document_form import handle_new_document_form_page
 from onegov.town6 import TownApp
 from onegov.core.security import Private
@@ -14,14 +14,14 @@ if TYPE_CHECKING:
 
 
 @TownApp.form(
-    model=DocumentFormCollection,
+    model=FormDocumentCollection,
     name='new',
     template='form.pt',
     permission=Private,
     form=DocumentForm
 )
 def town_handle_new_document_form(
-    self: DocumentFormCollection,
+    self: FormDocumentCollection,
     request: 'TownRequest',
     form: DocumentForm
 ) -> 'RenderData | Response':
