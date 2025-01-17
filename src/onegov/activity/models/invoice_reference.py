@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 import re
 import secrets
 import string
@@ -20,7 +22,7 @@ if TYPE_CHECKING:
     from .invoice import Invoice
 
 
-KNOWN_SCHEMAS: dict[str, type['Schema']] = {}
+KNOWN_SCHEMAS: dict[str, type[Schema]] = {}
 
 INVALID_REFERENCE_CHARS_EX = re.compile(r'[^Q0-9A-F]+')
 REFERENCE_EX = re.compile(r'Q{1}[A-F0-9]{10}')
@@ -57,25 +59,25 @@ class InvoiceReference(Base, TimestampMixin):
     __tablename__ = 'invoice_references'
 
     #: the unique reference
-    reference: 'Column[str]' = Column(Text, primary_key=True)
+    reference: Column[str] = Column(Text, primary_key=True)
 
     #: the referenced invoice
-    invoice_id: 'Column[uuid.UUID]' = Column(
+    invoice_id: Column[uuid.UUID] = Column(
         UUID,  # type:ignore[arg-type]
         ForeignKey('invoices.id'),
         nullable=False
     )
-    invoice: 'relationship[Invoice]' = relationship(
+    invoice: relationship[Invoice] = relationship(
         'Invoice',
         back_populates='references'
     )
 
     #: the schema used to generate the invoice
-    schema: 'Column[str]' = Column(Text, nullable=False)
+    schema: Column[str] = Column(Text, nullable=False)
 
     #: groups schema name and its config to identify records created by a
     #: given schema and config
-    bucket: 'Column[str]' = Column(Text, nullable=False)
+    bucket: Column[str] = Column(Text, nullable=False)
 
     __table_args__ = (
         UniqueConstraint(
@@ -149,8 +151,8 @@ class Schema:
 
     def link(
         self,
-        session: 'Session',
-        invoice: 'Invoice',
+        session: Session,
+        invoice: Invoice,
         optimistic: bool = False,
         flush: bool = True
     ) -> InvoiceReference | None:

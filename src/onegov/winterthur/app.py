@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 import re
 import shlex
 import subprocess
@@ -60,12 +62,12 @@ class WinterthurApp(OrgApp):
             **cfg
         )
 
-    def enable_iframes(self, request: 'WinterthurRequest') -> None:
+    def enable_iframes(self, request: WinterthurRequest) -> None:
         request.content_security_policy.frame_ancestors |= self.frame_ancestors
         request.include('iframe-resizer')
 
     @property
-    def roadwork_cache(self) -> 'RedisCacheRegion':
+    def roadwork_cache(self) -> RedisCacheRegion:
         # the expiration time is high here, as the expiration is more closely
         # managed by the roadwork client
         return self.get_cache('roadwork', expiration_time=60 * 60 * 24)
@@ -196,8 +198,8 @@ class WinterthurApp(OrgApp):
 @WinterthurApp.tween_factory()
 def enable_iframes_tween_factory(
     app: WinterthurApp,
-    handler: 'Callable[[WinterthurRequest], Response]'
-) -> 'Callable[[WinterthurRequest], Response]':
+    handler: Callable[[WinterthurRequest], Response]
+) -> Callable[[WinterthurRequest], Response]:
     iframe_paths = (
         r'/streets.*',
         r'/director(y|ies|y-submission/.*)',
@@ -211,7 +213,7 @@ def enable_iframes_tween_factory(
 
     iframe_path_re = re.compile(rf"({'|'.join(iframe_paths)})")
 
-    def enable_iframes_tween(request: 'WinterthurRequest') -> 'Response':
+    def enable_iframes_tween(request: WinterthurRequest) -> Response:
         """ Enables iframes on matching paths. """
 
         result = handler(request)
@@ -241,7 +243,7 @@ def get_theme() -> WinterthurTheme:
 
 @WinterthurApp.setting(section='org', name='create_new_organisation')
 def get_create_new_organisation_factory(
-) -> 'Callable[[WinterthurApp, str], Organisation]':
+) -> Callable[[WinterthurApp, str], Organisation]:
     return create_new_organisation
 
 
@@ -272,24 +274,24 @@ def get_webasset_output() -> str:
 
 
 @WinterthurApp.webasset('street-search')
-def get_search_asset() -> 'Iterator[str]':
+def get_search_asset() -> Iterator[str]:
     yield 'wade.js'
     yield 'string-score.js'
     yield 'street-search.js'
 
 
 @WinterthurApp.webasset('iframe-resizer')
-def get_iframe_resizer() -> 'Iterator[str]':
+def get_iframe_resizer() -> Iterator[str]:
     yield 'iframe-resizer-options.js'
     yield 'iframe-resizer-contentwindow.js'
 
 
 @WinterthurApp.webasset('iframe-enhancements')
-def get_iframe_enhancements() -> 'Iterator[str]':
+def get_iframe_enhancements() -> Iterator[str]:
     yield 'iframe-enhancements.js'
 
 
 @WinterthurApp.webasset('common')
-def get_common_asset() -> 'Iterator[str]':
+def get_common_asset() -> Iterator[str]:
     yield from default_common_asset()
     yield 'winterthur.js'

@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 from onegov.core.orm import Base
 from onegov.core.orm.mixins import ContentMixin
 from onegov.core.orm.mixins import TimestampMixin
@@ -33,7 +35,7 @@ class Person(Base, ContentMixin, TimestampMixin, ORMSearchable,
     #: subclasses of this class. See
     #: `<https://docs.sqlalchemy.org/en/improve_toc/\
     #: orm/extensions/declarative/inheritance.html>`_.
-    type: 'Column[str]' = Column(
+    type: Column[str] = Column(
         Text,
         nullable=False,
         default=lambda: 'generic'
@@ -76,85 +78,85 @@ class Person(Base, ContentMixin, TimestampMixin, ORMSearchable,
         return ' '.join(parts)
 
     #: the unique id, part of the url
-    id: 'Column[uuid.UUID]' = Column(
+    id: Column[uuid.UUID] = Column(
         UUID,  # type:ignore[arg-type]
         primary_key=True,
         default=uuid4
     )
 
     #: the salutation used for the person
-    salutation: 'Column[str | None]' = Column(Text, nullable=True)
+    salutation: Column[str | None] = Column(Text, nullable=True)
 
     #: the academic title of the person
-    academic_title: 'Column[str | None]' = Column(Text, nullable=True)
+    academic_title: Column[str | None] = Column(Text, nullable=True)
 
     #: the first name of the person
-    first_name: 'Column[str]' = Column(Text, nullable=False)
+    first_name: Column[str] = Column(Text, nullable=False)
 
     #: the last name of the person
-    last_name: 'Column[str]' = Column(Text, nullable=False)
+    last_name: Column[str] = Column(Text, nullable=False)
 
     #: when the person was born
-    born: 'Column[str | None]' = Column(Text, nullable=True)
+    born: Column[str | None] = Column(Text, nullable=True)
 
     #: the profession of the person
-    profession: 'Column[str | None]' = Column(Text, nullable=True)
+    profession: Column[str | None] = Column(Text, nullable=True)
 
     #: the function of the person
-    function: 'Column[str | None]' = Column(Text, nullable=True)
+    function: Column[str | None] = Column(Text, nullable=True)
 
     #: an organisation the person belongs to
-    organisation: 'Column[str | None]' = Column(Text, nullable=True)
+    organisation: Column[str | None] = Column(Text, nullable=True)
 
     # a sub organisation the person belongs to
-    sub_organisation: 'Column[str | None]' = Column(Text, nullable=True)
+    sub_organisation: Column[str | None] = Column(Text, nullable=True)
 
     #: the political party the person belongs to
-    political_party: 'Column[str | None]' = Column(Text, nullable=True)
+    political_party: Column[str | None] = Column(Text, nullable=True)
 
     #: the parliamentary group the person belongs to
-    parliamentary_group: 'Column[str | None]' = Column(Text, nullable=True)
+    parliamentary_group: Column[str | None] = Column(Text, nullable=True)
 
     #: an URL leading to a picture of the person
-    picture_url: 'Column[str | None]' = Column(Text, nullable=True)
+    picture_url: Column[str | None] = Column(Text, nullable=True)
 
     #: the email of the person
-    email: 'Column[str | None]' = Column(Text, nullable=True)
+    email: Column[str | None] = Column(Text, nullable=True)
 
     #: the phone number of the person
-    phone: 'Column[str | None]' = Column(Text, nullable=True)
+    phone: Column[str | None] = Column(Text, nullable=True)
 
     #: the direct phone number of the person
-    phone_direct: 'Column[str | None]' = Column(Text, nullable=True)
+    phone_direct: Column[str | None] = Column(Text, nullable=True)
 
     #: the website related to the person
-    website: 'Column[str | None]' = Column(Text, nullable=True)
+    website: Column[str | None] = Column(Text, nullable=True)
 
     #: a second website related to the person
-    website_2: 'Column[str | None]' = Column(Text, nullable=True)
+    website_2: Column[str | None] = Column(Text, nullable=True)
 
     # agency does not use 'address' anymore. Instead, the 4 following items
     # are being used. The 'address' field is still used in org, town6,
     # volunteers and others
     #: the address of the person
-    address: 'Column[str | None]' = Column(Text, nullable=True)
+    address: Column[str | None] = Column(Text, nullable=True)
 
     #: the location address (street name and number) of the person
-    location_address: 'Column[str | None]' = Column(Text, nullable=True)
+    location_address: Column[str | None] = Column(Text, nullable=True)
 
     #: postal code of location and city of the person
-    location_code_city: 'Column[str | None]' = Column(Text, nullable=True)
+    location_code_city: Column[str | None] = Column(Text, nullable=True)
 
     #: the postal address (street name and number) of the person
-    postal_address: 'Column[str | None]' = Column(Text, nullable=True)
+    postal_address: Column[str | None] = Column(Text, nullable=True)
 
     #: postal code and city of the person
-    postal_code_city: 'Column[str | None]' = Column(Text, nullable=True)
+    postal_code_city: Column[str | None] = Column(Text, nullable=True)
 
     #: some remarks about the person
-    notes: 'Column[str | None]' = Column(Text, nullable=True)
+    notes: Column[str | None] = Column(Text, nullable=True)
 
-    memberships: 'relationship[AppenderQuery[AgencyMembership]]'
+    memberships: relationship[AppenderQuery[AgencyMembership]]
     memberships = relationship(
         AgencyMembership,
         back_populates='person',
@@ -164,9 +166,9 @@ class Person(Base, ContentMixin, TimestampMixin, ORMSearchable,
 
     def vcard_object(
         self,
-        exclude: 'Collection[str] | None' = None,
+        exclude: Collection[str] | None = None,
         include_memberships: bool = True
-    ) -> 'Component':
+    ) -> Component:
         """ Returns the person as vCard (3.0) object.
 
         Allows to specify the included attributes, provides a reasonable
@@ -283,7 +285,7 @@ class Person(Base, ContentMixin, TimestampMixin, ORMSearchable,
 
         return result
 
-    def vcard(self, exclude: 'Collection[str] | None' = None) -> str:
+    def vcard(self, exclude: Collection[str] | None = None) -> str:
         """ Returns the person as vCard (3.0).
 
         Allows to specify the included attributes, provides a reasonable

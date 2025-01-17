@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 from onegov.election_day import ElectionDayApp
 from onegov.election_day.layouts import ElectionLayout
 from onegov.election_day.models import Election
@@ -24,8 +26,8 @@ if TYPE_CHECKING:
 )
 def view_election_lists_data(
     self: Election,
-    request: 'ElectionDayRequest'
-) -> 'JSON_ro':
+    request: ElectionDayRequest
+) -> JSON_ro:
     """" View the lists as JSON. Used to for the lists bar chart. """
 
     limit = get_parameter(request, 'limit', int, None)
@@ -51,12 +53,12 @@ def view_election_lists_data(
 )
 def view_election_lists_chart(
     self: Election,
-    request: 'ElectionDayRequest'
-) -> 'RenderData':
+    request: ElectionDayRequest
+) -> RenderData:
     """" View the lists as bar chart. """
 
     @request.after
-    def add_last_modified(response: 'Response') -> None:
+    def add_last_modified(response: Response) -> None:
         add_last_modified_header(response, self.last_modified)
 
     entity = request.params.get('entity', '')
@@ -78,12 +80,12 @@ def view_election_lists_chart(
 )
 def view_election_lists_table(
     self: Election,
-    request: 'ElectionDayRequest'
-) -> 'RenderData':
+    request: ElectionDayRequest
+) -> RenderData:
     """" View the lists as table. """
 
     @request.after
-    def add_last_modified(response: 'Response') -> None:
+    def add_last_modified(response: Response) -> None:
         add_last_modified_header(response, self.last_modified)
 
     entity = request.params.get('entity', '')
@@ -107,8 +109,8 @@ def view_election_lists_table(
 )
 def view_election_lists(
     self: Election,
-    request: 'ElectionDayRequest'
-) -> 'RenderData':
+    request: ElectionDayRequest
+) -> RenderData:
     """" The main view. """
 
     layout = ElectionLayout(self, request, 'lists')
@@ -133,8 +135,8 @@ def view_election_lists(
 )
 def view_election_lists_svg(
     self: Election,
-    request: 'ElectionDayRequest'
-) -> 'RenderData':
+    request: ElectionDayRequest
+) -> RenderData:
     """ View the lists as SVG. """
 
     layout = ElectionLayout(self, request, 'lists')

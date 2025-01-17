@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 from functools import cached_property
 from itertools import groupby
 
@@ -31,8 +33,8 @@ class TranslatorDocumentCollection(FileCollection[File]):
 
     def __init__(
         self,
-        session: 'Session',
-        translator_id: 'UUID',
+        session: Session,
+        translator_id: UUID,
         category: str | None
     ) -> None:
         super().__init__(session, type='*', allow_duplicates=True)

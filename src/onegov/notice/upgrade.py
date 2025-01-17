@@ -2,6 +2,8 @@
 upgraded on the server. See :class:`onegov.core.upgrade.upgrade_task`.
 
 """
+from __future__ import annotations
+
 from onegov.core.orm.types import UTCDateTime
 from onegov.core.upgrade import upgrade_task
 from sqlalchemy import Column
@@ -16,7 +18,7 @@ if TYPE_CHECKING:
 
 
 @upgrade_task('Add categories column to official notices')
-def add_categories(context: 'UpgradeContext') -> None:
+def add_categories(context: UpgradeContext) -> None:
     if not context.has_column('official_notices', 'categories'):
         context.operations.add_column(
             'official_notices',
@@ -25,7 +27,7 @@ def add_categories(context: 'UpgradeContext') -> None:
 
 
 @upgrade_task('Add organizations column to official notices')
-def add_organizations(context: 'UpgradeContext') -> None:
+def add_organizations(context: UpgradeContext) -> None:
     if not context.has_column('official_notices', 'organizations'):
         context.operations.add_column(
             'official_notices',
@@ -34,7 +36,7 @@ def add_organizations(context: 'UpgradeContext') -> None:
 
 
 @upgrade_task('Add author fields to official notices')
-def add_author_fields(context: 'UpgradeContext') -> None:
+def add_author_fields(context: UpgradeContext) -> None:
     if not context.has_column('official_notices', 'author_name'):
         context.operations.add_column(
             'official_notices',
@@ -53,7 +55,7 @@ def add_author_fields(context: 'UpgradeContext') -> None:
 
 
 @upgrade_task('Add an imported state to official notices')
-def add_imported_state_to_notices(context: 'UpgradeContext') -> None:
+def add_imported_state_to_notices(context: UpgradeContext) -> None:
     old = ['drafted', 'submitted', 'published', 'rejected', 'accepted']
     new = [*old, 'imported']
     old_type = Enum(*old, name='official_notice_state')
@@ -75,7 +77,7 @@ def add_imported_state_to_notices(context: 'UpgradeContext') -> None:
 
 
 @upgrade_task('Add a souurce column to official notices')
-def add_source_column_to_notices(context: 'UpgradeContext') -> None:
+def add_source_column_to_notices(context: UpgradeContext) -> None:
     if not context.has_column('official_notices', 'source'):
         context.operations.add_column(
             'official_notices',
@@ -84,7 +86,7 @@ def add_source_column_to_notices(context: 'UpgradeContext') -> None:
 
 
 @upgrade_task('Add an expiry date column to official notices')
-def add_expiry_date_column_to_notices(context: 'UpgradeContext') -> None:
+def add_expiry_date_column_to_notices(context: UpgradeContext) -> None:
     if not context.has_column('official_notices', 'expiry_date'):
         context.operations.add_column(
             'official_notices',
@@ -93,7 +95,7 @@ def add_expiry_date_column_to_notices(context: 'UpgradeContext') -> None:
 
 
 @upgrade_task('Add note column to official notices')
-def add_note_to_notices(context: 'UpgradeContext') -> None:
+def add_note_to_notices(context: UpgradeContext) -> None:
     if not context.has_column('official_notices', 'note'):
         context.operations.add_column(
             'official_notices',
@@ -103,7 +105,7 @@ def add_note_to_notices(context: 'UpgradeContext') -> None:
 
 @upgrade_task('Make official notice polymorphic type non-nullable')
 def make_official_notice_polymorphic_type_non_nullable(
-    context: 'UpgradeContext'
+    context: UpgradeContext
 ) -> None:
     if context.has_table('official_notices'):
         context.operations.execute("""

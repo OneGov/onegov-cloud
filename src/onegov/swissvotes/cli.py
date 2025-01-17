@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 import click
 import os
 import transaction
@@ -32,8 +34,8 @@ cli = command_group()
 @cli.command(context_settings={'creates_path': True})
 @pass_group_context
 def add(
-    group_context: 'GroupContext'
-) -> 'Callable[[SwissvotesRequest, SwissvotesApp], None]':
+    group_context: GroupContext
+) -> Callable[[SwissvotesRequest, SwissvotesApp], None]:
     """ Adds an instance to the database. For example:
 
     .. code-block:: bash
@@ -43,8 +45,8 @@ def add(
     """
 
     def add_instance(
-        request: 'SwissvotesRequest',
-        app: 'SwissvotesApp'
+        request: SwissvotesRequest,
+        app: SwissvotesApp
     ) -> None:
 
         app.cache.flush()
@@ -57,9 +59,9 @@ def add(
 @click.argument('folder', type=click.Path(exists=True))
 @pass_group_context
 def import_attachments(
-    group_context: 'GroupContext',
+    group_context: GroupContext,
     folder: str
-) -> 'Callable[[SwissvotesRequest, SwissvotesApp], None]':
+) -> Callable[[SwissvotesRequest, SwissvotesApp], None]:
     r""" Import a attachments from the given folder. For example:
 
     .. code-block:: bash
@@ -78,7 +80,7 @@ def import_attachments(
 
     """
 
-    def _import(request: 'SwissvotesRequest', app: 'SwissvotesApp') -> None:
+    def _import(request: SwissvotesRequest, app: SwissvotesApp) -> None:
         votes = SwissVoteCollection(app)
 
         attachments = {}
@@ -161,9 +163,9 @@ def import_attachments(
 @click.argument('folder', type=click.Path(exists=True))
 @pass_group_context
 def import_campaign_material(
-    group_context: 'GroupContext',
+    group_context: GroupContext,
     folder: str
-) -> 'Callable[[SwissvotesRequest, SwissvotesApp], None]':
+) -> Callable[[SwissvotesRequest, SwissvotesApp], None]:
     r""" Import a campaign material from the given folder. For example:
 
     .. code-block:: bash
@@ -180,7 +182,7 @@ def import_campaign_material(
 
     """
 
-    def _import(request: 'SwissvotesRequest', app: 'SwissvotesApp') -> None:
+    def _import(request: SwissvotesRequest, app: SwissvotesApp) -> None:
         attachments: dict[Decimal, list[str]] = {}
 
         votes = SwissVoteCollection(app)
@@ -233,11 +235,11 @@ def import_campaign_material(
 @cli.command('reindex')
 @pass_group_context
 def reindex_attachments(
-    group_context: 'GroupContext'
-) -> 'Callable[[SwissvotesRequest, SwissvotesApp], None]':
+    group_context: GroupContext
+) -> Callable[[SwissvotesRequest, SwissvotesApp], None]:
     """ Reindexes the attachments. """
 
-    def _reindex(request: 'SwissvotesRequest', app: 'SwissvotesApp') -> None:
+    def _reindex(request: SwissvotesRequest, app: SwissvotesApp) -> None:
         bfs_numbers = sorted(app.session().query(SwissVote.bfs_number))
         for bfs_number, in bfs_numbers:
             click.secho(f'Reindexing vote {bfs_number}', fg='green')
@@ -256,17 +258,17 @@ def reindex_attachments(
 @click.option('--bs', is_flag=True, default=False)
 @pass_group_context
 def update_resources(
-    group_context: 'GroupContext',
+    group_context: GroupContext,
     details: bool,
     sa: bool,
     bs: bool,
     mfg: bool,
-) -> 'Callable[[SwissvotesRequest, SwissvotesApp], None]':
+) -> Callable[[SwissvotesRequest, SwissvotesApp], None]:
     """ Updates external resources. """
 
     def _update_sources(
-        request: 'SwissvotesRequest',
-        app: 'SwissvotesApp'
+        request: SwissvotesRequest,
+        app: SwissvotesApp
     ) -> None:
 
         posters: MfgPosters | BsPosters | SaPosters

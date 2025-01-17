@@ -1,3 +1,4 @@
+from __future__ import annotations
 from functools import cached_property
 from onegov.event.collections import OccurrenceCollection
 from onegov.api import ApiEndpoint
@@ -22,19 +23,19 @@ if TYPE_CHECKING:
 
 class ApisMixin:
 
-    app: 'TownApp'
+    app: TownApp
 
     @cached_property
-    def event_api(self) -> 'EventApiEndpoint':
+    def event_api(self) -> EventApiEndpoint:
         return EventApiEndpoint(self.app)
 
 
-def get_geo_location(item: 'ContentMixin') -> dict[str, Any]:
+def get_geo_location(item: ContentMixin) -> dict[str, Any]:
     geo = item.content.get('coordinates', Coordinates()) or Coordinates()
     return {'lon': geo.lon, 'lat': geo.lat, 'zoom': geo.zoom}
 
 
-def get_modified_iso_format(item: 'TimestampMixin') -> str:
+def get_modified_iso_format(item: TimestampMixin) -> str:
     """
     Returns the iso format of the modified or created field of item.
 
@@ -48,7 +49,7 @@ class EventApiEndpoint(
     ApiEndpoint['Occurrence'],
     ApisMixin
 ):
-    app: 'TownApp'
+    app: TownApp
     endpoint = 'events'
 
     @property
@@ -61,7 +62,7 @@ class EventApiEndpoint(
         result.batch_size = self.batch_size
         return result
 
-    def item_data(self, item: 'Occurrence') -> dict[str, Any]:
+    def item_data(self, item: Occurrence) -> dict[str, Any]:
         return {
             'title': item.title,
             'description': item.event.description,
@@ -80,7 +81,7 @@ class EventApiEndpoint(
             'modified': get_modified_iso_format(item),
         }
 
-    def item_links(self, item: 'Occurrence') -> dict[str, Any]:
+    def item_links(self, item: Occurrence) -> dict[str, Any]:
         return {
             'image': item.event.image,
             'pfd': item.event.pdf
@@ -91,7 +92,7 @@ class NewsApiEndpoint(
     ApiEndpoint['News'],
     ApisMixin
 ):
-    app: 'TownApp'
+    app: TownApp
     endpoint = 'news'
     filters = set()
 
@@ -104,7 +105,7 @@ class NewsApiEndpoint(
         result.batch_size = 25
         return result
 
-    def item_data(self, item: 'News') -> dict[str, Any]:
+    def item_data(self, item: News) -> dict[str, Any]:
         if item.publication_start:
             publication_start = item.publication_start.isoformat()
         else:
@@ -125,7 +126,7 @@ class NewsApiEndpoint(
             'modified': get_modified_iso_format(item),
         }
 
-    def item_links(self, item: 'News') -> dict[str, Any]:
+    def item_links(self, item: News) -> dict[str, Any]:
         return {
             'image': item.page_image,
         }

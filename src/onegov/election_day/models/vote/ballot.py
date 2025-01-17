@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 from onegov.core.orm import Base
 from onegov.core.orm import translation_hybrid
 from onegov.core.orm.mixins import TimestampMixin
@@ -66,14 +68,14 @@ class Ballot(Base, TimestampMixin, TitleTranslationsMixin,
     __tablename__ = 'ballots'
 
     #: identifies the ballot, maybe used in the url
-    id: 'Column[uuid.UUID]' = Column(
+    id: Column[uuid.UUID] = Column(
         UUID,  # type:ignore[arg-type]
         primary_key=True,
         default=uuid4
     )
 
     #: external identifier
-    external_id: 'Column[str | None]' = Column(Text, nullable=True)
+    external_id: Column[str | None] = Column(Text, nullable=True)
 
     #: the type of the ballot, 'standard' for normal votes, 'counter-proposal'
     #: if there's an alternative to the standard ballot. And 'tie-breaker',
@@ -81,7 +83,7 @@ class Ballot(Base, TimestampMixin, TitleTranslationsMixin,
     #: only relevant if both standard and counter proposal are accepted.
     #: If that's the case, the accepted tie breaker selects the standard,
     #: the rejected tie breaker selects the counter proposal.
-    type: 'Column[BallotType]' = Column(
+    type: Column[BallotType] = Column(
         Enum(  # type:ignore[arg-type]
             'proposal',
             'counter-proposal',
@@ -92,12 +94,12 @@ class Ballot(Base, TimestampMixin, TitleTranslationsMixin,
     )
 
     #: identifies the vote this ballot result belongs to
-    vote_id: 'Column[str]' = Column(
+    vote_id: Column[str] = Column(
         Text, ForeignKey('votes.id', onupdate='CASCADE'), nullable=False
     )
 
     #: all translations of the title
-    title_translations: 'Column[Mapping[str, str] | None]' = Column(
+    title_translations: Column[Mapping[str, str] | None] = Column(
         HSTORE,
         nullable=True
     )
@@ -107,20 +109,20 @@ class Ballot(Base, TimestampMixin, TitleTranslationsMixin,
     title = translation_hybrid(title_translations)
 
     #: a ballot contains n results
-    results: 'relationship[list[BallotResult]]' = relationship(
+    results: relationship[list[BallotResult]] = relationship(
         'BallotResult',
         cascade='all, delete-orphan',
         back_populates='ballot',
         order_by='BallotResult.district, BallotResult.name',
     )
 
-    vote: 'relationship[Vote]' = relationship(
+    vote: relationship[Vote] = relationship(
         'Vote',
         back_populates='ballots',
     )
 
     @property
-    def results_by_district(self) -> 'Query[ResultsByDistrictRow]':
+    def results_by_district(self) -> Query[ResultsByDistrictRow]:
         """ Returns the results aggregated by the distict.  """
         session = object_session(self)
 
@@ -163,7 +165,7 @@ class Ballot(Base, TimestampMixin, TitleTranslationsMixin,
         return all(result.counted for result in self.results)
 
     @counted.expression  # type:ignore[no-redef]
-    def counted(cls) -> 'ColumnElement[bool]':
+    def counted(cls) -> ColumnElement[bool]:
         expr = select([
             func.coalesce(func.bool_and(BallotResult.counted), False)
         ])
@@ -220,7 +222,7 @@ class Ballot(Base, TimestampMixin, TitleTranslationsMixin,
     def aggregate_results_expression(
         cls,
         attribute: str
-    ) -> 'ColumnElement[int]':
+    ) -> ColumnElement[int]:
         """ Gets the sum of the given attribute from the results,
         as SQL expression.
 

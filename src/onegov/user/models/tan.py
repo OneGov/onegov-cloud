@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 from datetime import timedelta
 from uuid import uuid4
 
@@ -34,20 +36,20 @@ class TAN(Base, TimestampMixin, ContentMixin):
         Index('ix_tans_created', 'created'),
     )
 
-    id: 'Column[uuid.UUID]' = Column(
+    id: Column[uuid.UUID] = Column(
         UUID,  # type: ignore[arg-type]
         primary_key=True,
         default=uuid4
     )
 
-    hashed_tan: 'Column[str]' = Column(
+    hashed_tan: Column[str] = Column(
         Text,
         index=True,
         nullable=False
     )
-    scope: 'Column[str]' = Column(Text, index=True, nullable=False)
-    client: 'Column[str]' = Column(Text, nullable=False)
-    expired: 'Column[datetime | None]' = Column(UTCDateTime, index=True)
+    scope: Column[str] = Column(Text, index=True, nullable=False)
+    client: Column[str] = Column(Text, nullable=False)
+    expired: Column[datetime | None] = Column(UTCDateTime, index=True)
 
     @hybrid_method
     def is_active(
@@ -68,7 +70,7 @@ class TAN(Base, TimestampMixin, ContentMixin):
     def is_active(
         cls,
         expires_after: timedelta | None = DEFAULT_EXPIRES_AFTER
-    ) -> 'ColumnElement[bool]':
+    ) -> ColumnElement[bool]:
 
         now = cls.timestamp()
         expr = (cls.expired > now) | cls.expired.is_(None)

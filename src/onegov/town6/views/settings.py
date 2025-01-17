@@ -1,4 +1,6 @@
 """ The settings view, defining things like the logo or color of the org. """
+from __future__ import annotations
+
 from wtforms.fields import StringField, BooleanField, IntegerField
 
 from onegov.core.security import Secret
@@ -42,7 +44,7 @@ FormT = TypeVar('FormT', bound=Form)
 @overload
 def get_custom_settings_form(
     model: Organisation,
-    request: 'TownRequest',
+    request: TownRequest,
     homepage_settings_form: type[FormT]
 ) -> type[FormT]: ...
 
@@ -50,14 +52,14 @@ def get_custom_settings_form(
 @overload
 def get_custom_settings_form(
     model: Organisation,
-    request: 'TownRequest',
+    request: TownRequest,
     homepage_settings_form: None = None
 ) -> type[HomepageSettingsForm]: ...
 
 
 def get_custom_settings_form(
     model: Organisation,
-    request: 'TownRequest',
+    request: TownRequest,
     homepage_settings_form: type[Form] | None = None
 ) -> type[Form]:
 
@@ -138,7 +140,7 @@ def get_custom_settings_form(
 
 def custom_footer_settings_form(
     model: Organisation,
-    request: 'TownRequest'
+    request: TownRequest
 ) -> type[FooterSettingsForm]:
 
     class ExtendedFooterSettings(Form):
@@ -159,8 +161,8 @@ def custom_footer_settings_form(
 )
 def view_town_settings(
     self: Organisation,
-    request: 'TownRequest'
-) -> 'RenderData':
+    request: TownRequest
+) -> RenderData:
     return view_settings(self, request, SettingsLayout(self, request))
 
 
@@ -170,9 +172,9 @@ def view_town_settings(
     icon='fa-cogs', order=-1000)
 def town_handle_general_settings(
     self: Organisation,
-    request: 'TownRequest',
+    request: TownRequest,
     form: GeneralSettingsForm
-) -> 'RenderData | Response':
+) -> RenderData | Response:
     return handle_general_settings(
         self, request, form, SettingsLayout(self, request))
 
@@ -182,9 +184,9 @@ def town_handle_general_settings(
               setting=_('Homepage'), icon='fa-home', order=-995)
 def custom_handle_settings(
     self: Organisation,
-    request: 'TownRequest',
+    request: TownRequest,
     form: HomepageSettingsForm
-) -> 'RenderData | Response':
+) -> RenderData | Response:
     form.delete_field('homepage_cover')
 
     return handle_homepage_settings(
@@ -197,9 +199,9 @@ def custom_handle_settings(
     icon='fas fa-external-link-square-alt', order=-990)
 def town_handle_favicon_settings(
     self: Organisation,
-    request: 'TownRequest',
+    request: TownRequest,
     form: FaviconSettingsForm
-) -> 'RenderData | Response':
+) -> RenderData | Response:
     return handle_favicon_settings(
         self, request, form, SettingsLayout(self, request))
 
@@ -210,9 +212,9 @@ def town_handle_favicon_settings(
     icon=' fa fa-share-alt', order=-985)
 def town_handle_social_media_settings(
     self: Organisation,
-    request: 'TownRequest',
+    request: TownRequest,
     form: SocialMediaSettingsForm
-) -> 'RenderData | Response':
+) -> RenderData | Response:
     return handle_social_media_settings(
         self, request, form, SettingsLayout(self, request))
 
@@ -223,9 +225,9 @@ def town_handle_social_media_settings(
     icon='fa-link', order=-980)
 def town_handle_links_settings(
     self: Organisation,
-    request: 'TownRequest',
+    request: TownRequest,
     form: LinksSettingsForm
-) -> 'RenderData | Response':
+) -> RenderData | Response:
     return handle_links_settings(
         self, request, form, SettingsLayout(self, request))
 
@@ -235,9 +237,9 @@ def town_handle_links_settings(
               setting=_('Chat'), icon='far fa-comments', order=-980)
 def town_handle_chat_settings(
     self: Organisation,
-    request: 'TownRequest',
+    request: TownRequest,
     form: ChatSettingsForm
-) -> 'RenderData | Response':
+) -> RenderData | Response:
     return handle_chat_settings(
         self, request, form, SettingsLayout(self, request))
 
@@ -247,9 +249,9 @@ def town_handle_chat_settings(
               setting='Gever API', icon='fa-key', order=400)
 def town_handle_gever_settings(
     self: Organisation,
-    request: 'TownRequest',
+    request: TownRequest,
     form: GeverSettingsForm
-) -> 'RenderData | Response':
+) -> RenderData | Response:
     return handle_generic_settings(self, request, form, 'Gever API',
                                    SettingsLayout(self, request))
 
@@ -260,9 +262,9 @@ def town_handle_gever_settings(
     icon='fa-window-maximize', order=-810)
 def town_handle_header_settings(
     self: Organisation,
-    request: 'TownRequest',
+    request: TownRequest,
     form: HeaderSettingsForm
-) -> 'RenderData | Response':
+) -> RenderData | Response:
     return handle_header_settings(
         self, request, form, SettingsLayout(self, request))
 
@@ -273,9 +275,9 @@ def town_handle_header_settings(
     icon='fa-window-minimize', order=-800)
 def town_handle_footer_settings(
     self: Organisation,
-    request: 'TownRequest',
+    request: TownRequest,
     form: FooterSettingsForm
-) -> 'RenderData | Response':
+) -> RenderData | Response:
     return handle_footer_settings(
         self, request, form, SettingsLayout(self, request))
 
@@ -286,9 +288,9 @@ def town_handle_footer_settings(
     icon='fa-sitemap', order=-700)
 def town_handle_module_settings(
     self: Organisation,
-    request: 'TownRequest',
+    request: TownRequest,
     form: ModuleSettingsForm
-) -> 'RenderData | Response':
+) -> RenderData | Response:
     return handle_module_settings(
         self, request, form, SettingsLayout(self, request))
 
@@ -299,9 +301,9 @@ def town_handle_module_settings(
     icon='fa-map-marker-alt', order=-700)
 def town_handle_map_settings(
     self: Organisation,
-    request: 'TownRequest',
+    request: TownRequest,
     form: MapSettingsForm
-) -> 'RenderData | Response':
+) -> RenderData | Response:
     return handle_map_settings(
         self, request, form, SettingsLayout(self, request))
 
@@ -312,9 +314,9 @@ def town_handle_map_settings(
     icon='fa-chart-bar ', order=-600)
 def town_handle_analytics_settings(
     self: Organisation,
-    request: 'TownRequest',
+    request: TownRequest,
     form: AnalyticsSettingsForm
-) -> 'RenderData | Response':
+) -> RenderData | Response:
     return handle_analytics_settings(
         self, request, form, SettingsLayout(self, request))
 
@@ -325,9 +327,9 @@ def town_handle_analytics_settings(
     icon='fa-calendar', order=-500)
 def town_handle_holiday_settings(
     self: Organisation,
-    request: 'TownRequest',
+    request: TownRequest,
     form: HolidaySettingsForm
-) -> 'RenderData | Response':
+) -> RenderData | Response:
     return handle_holiday_settings(
         self, request, form, SettingsLayout(self, request))
 
@@ -339,9 +341,9 @@ def town_handle_holiday_settings(
 )
 def town_handle_ticket_settings(
     self: Organisation,
-    request: 'TownRequest',
+    request: TownRequest,
     form: OrgTicketSettingsForm
-) -> 'RenderData | Response':
+) -> RenderData | Response:
     return handle_ticket_settings(
         self, request, form, SettingsLayout(self, request))
 
@@ -353,9 +355,9 @@ def town_handle_ticket_settings(
 )
 def town_handle_newsletter_settings(
     self: Organisation,
-    request: 'TownRequest',
+    request: TownRequest,
     form: NewsletterSettingsForm
-) -> 'RenderData | Response':
+) -> RenderData | Response:
     return handle_newsletter_settings(
         self, request, form, SettingsLayout(self, request)
     )
@@ -369,7 +371,7 @@ def town_handle_newsletter_settings(
 )
 def town_preview_holiday_settings(
     self: Organisation,
-    request: 'TownRequest',
+    request: TownRequest,
     form: HolidaySettingsForm
 ) -> str:
     return preview_holiday_settings(
@@ -382,9 +384,9 @@ def town_preview_holiday_settings(
     icon='fas fa-random', order=-400)
 def town_handle_migrate_links(
     self: Organisation,
-    request: 'TownRequest',
+    request: TownRequest,
     form: LinkMigrationForm
-) -> 'RenderData | Response':
+) -> RenderData | Response:
     return handle_migrate_links(
         self, request, form, DefaultLayout(self, request)
     )
@@ -395,9 +397,9 @@ def town_handle_migrate_links(
     permission=Secret, form=LinkHealthCheckForm)
 def town_handle_link_health_check(
     self: Organisation,
-    request: 'TownRequest',
+    request: TownRequest,
     form: LinkHealthCheckForm
-) -> 'RenderData | Response':
+) -> RenderData | Response:
     return handle_link_health_check(
         self, request, form, DefaultLayout(self, request)
     )
@@ -409,9 +411,9 @@ def town_handle_link_health_check(
     icon='fa-calendar-alt', order=-200)
 def town_handle_event(
     self: Organisation,
-    request: 'TownRequest',
+    request: TownRequest,
     form: EventSettingsForm
-) -> 'RenderData | Response':
+) -> RenderData | Response:
     return handle_event_settings(
         self, request, form, SettingsLayout(self, request)
     )
@@ -423,9 +425,9 @@ def town_handle_event(
     setting=_('OneGov API'), order=1)
 def town_handle_api_keys(
     self: Organisation,
-    request: 'TownRequest',
+    request: TownRequest,
     form: OneGovApiSettingsForm
-) -> 'RenderData | Response':
+) -> RenderData | Response:
     return handle_api_keys(self, request, form, SettingsLayout(self, request))
 
 
@@ -437,9 +439,9 @@ def town_handle_api_keys(
 )
 def town_handle_ticket_data_deletion_settings(
     self: Organisation,
-    request: 'TownRequest',
+    request: TownRequest,
     form: DataRetentionPolicyForm
-) -> 'RenderData | Response':
+) -> RenderData | Response:
     request.message(_('Proceed with caution. Tickets and the data they '
                       'contain may be irrevocable deleted.'), 'alert')
     return handle_generic_settings(

@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 from onegov.core.orm import Base
 from onegov.core.orm.abstract import associated
 from onegov.core.orm.mixins import ContentMixin
@@ -21,7 +23,7 @@ if TYPE_CHECKING:
 
     MissionType: TypeAlias = Literal['single', 'multi']
 
-MISSION_TYPES: tuple['MissionType', ...] = ('single', 'multi')
+MISSION_TYPES: tuple[MissionType, ...] = ('single', 'multi')
 
 
 class MissionReportFile(File):
@@ -33,35 +35,35 @@ class MissionReport(Base, ContentMixin, AccessExtension):
     __tablename__ = 'mission_reports'
 
     #: the public id of the mission_report
-    id: 'Column[uuid.UUID]' = Column(
+    id: Column[uuid.UUID] = Column(
         UUID,  # type:ignore[arg-type]
         primary_key=True,
         default=uuid4
     )
 
     #: the date of the report
-    date: 'Column[datetime]' = Column(UTCDateTime, nullable=False)
+    date: Column[datetime] = Column(UTCDateTime, nullable=False)
 
     #: how long the mission lasted, in hours
-    duration: 'Column[Decimal]' = Column(
+    duration: Column[Decimal] = Column(
         Numeric(precision=6, scale=2),
         nullable=False
     )
 
     #: the nature of the mission
-    nature: 'Column[str]' = Column(Text, nullable=False)
+    nature: Column[str] = Column(Text, nullable=False)
 
     #: the location of the mission
-    location: 'Column[str]' = Column(Text, nullable=False)
+    location: Column[str] = Column(Text, nullable=False)
 
     #: actually active personnel
-    personnel: 'Column[int]' = Column(Integer, nullable=False)
+    personnel: Column[int] = Column(Integer, nullable=False)
 
     #: backup personnel
-    backup: 'Column[int]' = Column(Integer, nullable=False)
+    backup: Column[int] = Column(Integer, nullable=False)
 
     #: the Zivilschutz was involved
-    civil_defence: 'Column[bool]' = Column(
+    civil_defence: Column[bool] = Column(
         Boolean,
         nullable=False,
         default=False
@@ -71,16 +73,16 @@ class MissionReport(Base, ContentMixin, AccessExtension):
     pictures = associated(MissionReportFile, 'pictures', 'one-to-many')
 
     # The number of missions on the same site during a day
-    mission_count: 'Column[int]' = Column(Integer, nullable=False, default=1)
+    mission_count: Column[int] = Column(Integer, nullable=False, default=1)
 
     # the mission type
-    mission_type: 'Column[MissionType]' = Column(
+    mission_type: Column[MissionType] = Column(
         Enum(*MISSION_TYPES, name='mission_type'),  # type:ignore[arg-type]
         nullable=False,
         default='single'
     )
 
-    used_vehicles: 'relationship[list[MissionReportVehicleUse]]'
+    used_vehicles: relationship[list[MissionReportVehicleUse]]
     used_vehicles = relationship(
         'MissionReportVehicleUse',
         cascade='all, delete-orphan',
@@ -96,7 +98,7 @@ class MissionReport(Base, ContentMixin, AccessExtension):
         return str(self.duration).rstrip('.0') + 'h'
 
     @property
-    def local_date(self) -> 'datetime':
+    def local_date(self) -> datetime:
         return to_timezone(self.date, 'Europe/Zurich')
 
 
@@ -105,25 +107,25 @@ class MissionReportVehicle(Base, ContentMixin, AccessExtension):
     __tablename__ = 'mission_report_vehicles'
 
     #: the public id of the vehicle
-    id: 'Column[uuid.UUID]' = Column(
+    id: Column[uuid.UUID] = Column(
         UUID,  # type:ignore[arg-type]
         primary_key=True,
         default=uuid4
     )
 
     #: the short id of the vehicle
-    name: 'Column[str]' = Column(Text, nullable=False)
+    name: Column[str] = Column(Text, nullable=False)
 
     #: the longer name of the vehicle
-    description: 'Column[str]' = Column(Text, nullable=False)
+    description: Column[str] = Column(Text, nullable=False)
 
     #: symbol of the vehicle
     symbol = associated(MissionReportFile, 'symbol', 'one-to-one')
 
     #: a website describing the vehicle
-    website: 'Column[str | None]' = Column(Text, nullable=True)
+    website: Column[str | None] = Column(Text, nullable=True)
 
-    uses: 'relationship[list[MissionReportVehicleUse]]' = relationship(
+    uses: relationship[list[MissionReportVehicleUse]] = relationship(
         'MissionReportVehicleUse',
         back_populates='vehicle'
     )
@@ -145,24 +147,24 @@ class MissionReportVehicleUse(Base):
 
     __tablename__ = 'mission_report_vehicle_usees'
 
-    mission_report_id: 'Column[uuid.UUID]' = Column(
+    mission_report_id: Column[uuid.UUID] = Column(
         UUID,  # type:ignore[arg-type]
         ForeignKey('mission_reports.id'),
         primary_key=True
     )
 
-    mission_report: 'relationship[MissionReport]' = relationship(
+    mission_report: relationship[MissionReport] = relationship(
         MissionReport,
         back_populates='used_vehicles'
     )
 
-    vehicle_id: 'Column[uuid.UUID]' = Column(
+    vehicle_id: Column[uuid.UUID] = Column(
         UUID,  # type:ignore[arg-type]
         ForeignKey('mission_report_vehicles.id'),
         primary_key=True
     )
 
-    vehicle: 'relationship[MissionReportVehicle]' = relationship(
+    vehicle: relationship[MissionReportVehicle] = relationship(
         MissionReportVehicle,
         back_populates='uses'
     )

@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 from uuid import uuid4
 
 from onegov.core.security import Secret
@@ -16,7 +18,7 @@ if TYPE_CHECKING:
 
 
 @TranslatorDirectoryApp.html(model=File, permission=Secret, name='details')
-def view_file_details(self: File, request: 'TranslatorAppRequest') -> str:
+def view_file_details(self: File, request: TranslatorAppRequest) -> str:
     layout = DefaultLayout(self, request)
     extension = extension_for_content_type(
         self.reference.content_type,
@@ -26,7 +28,7 @@ def view_file_details(self: File, request: 'TranslatorAppRequest') -> str:
 
     # IE 11 caches all ajax requests otherwise
     @request.after
-    def must_revalidate(response: 'Response') -> None:
+    def must_revalidate(response: Response) -> None:
         response.headers.add('cache-control', 'must-revalidate')
         response.headers.add('cache-control', 'no-cache')
         response.headers.add('cache-control', 'no-store')

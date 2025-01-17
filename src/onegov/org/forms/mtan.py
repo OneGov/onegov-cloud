@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 from onegov.form.fields import HoneyPotField
 from onegov.user.forms import MTANForm
 from onegov.user.forms import RequestMTANForm

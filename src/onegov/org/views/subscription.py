@@ -1,4 +1,5 @@
 """ Newsletter subscription management. """
+from __future__ import annotations
 
 import morepath
 
@@ -15,7 +16,7 @@ if TYPE_CHECKING:
 
 # use an english name for this view, so robots know what we use it for
 @OrgApp.view(model=Subscription, name='confirm', permission=Public)
-def view_confirm(self: Subscription, request: 'OrgRequest') -> 'BaseResponse':
+def view_confirm(self: Subscription, request: OrgRequest) -> BaseResponse:
     if self.confirm():
         request.success(_(
             'the subscription for ${address} was successfully confirmed',
@@ -37,8 +38,8 @@ def view_confirm(self: Subscription, request: 'OrgRequest') -> 'BaseResponse':
 @OrgApp.view(model=Subscription, name='unsubscribe', permission=Public)
 def view_unsubscribe(
     self: Subscription,
-    request: 'OrgRequest'
-) -> 'BaseResponse':
+    request: OrgRequest
+) -> BaseResponse:
 
     address = self.recipient.address
 
@@ -76,7 +77,7 @@ def view_unsubscribe(
 )
 def view_unsubscribe_rfc8058(
     self: Subscription,
-    request: 'OrgRequest'
+    request: OrgRequest
 ) -> Response:
     # it doesn't really make sense to check for success here
     # since this is an automated action without verficiation

@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 from email_validator import validate_email
 from onegov.core.crypto import random_token
 from onegov.core.orm import Base
@@ -59,7 +61,7 @@ class Newsletter(Base, ContentMixin, TimestampMixin, SearchableContent):
         return self.sent is not None
 
     #: the name of the newsletter, derived from the title
-    name: 'Column[str]' = Column(Text, nullable=False, primary_key=True)
+    name: Column[str] = Column(Text, nullable=False, primary_key=True)
 
     @validates('name')
     def validate_name(self, key: str, name: str) -> str:
@@ -70,33 +72,33 @@ class Newsletter(Base, ContentMixin, TimestampMixin, SearchableContent):
         return name
 
     #: the title of the newsletter
-    title: 'Column[str]' = Column(Text, nullable=False)
+    title: Column[str] = Column(Text, nullable=False)
 
     #: the optional lead or editorial of the newsletter
-    lead: 'Column[str | None]' = Column(Text, nullable=True)
+    lead: Column[str | None] = Column(Text, nullable=True)
 
     #: the content of the newsletter in html, this is not just the partial
     #: content, but the actual, fully rendered html content.
-    html: 'Column[str]' = Column(Text, nullable=False)
+    html: Column[str] = Column(Text, nullable=False)
 
     #: null if not sent yet, otherwise the date this newsletter was first sent
-    sent: 'Column[datetime | None]' = Column(UTCDateTime, nullable=True)
+    sent: Column[datetime | None] = Column(UTCDateTime, nullable=True)
 
     #: time the newsletter is scheduled to be sent (in UTC)
-    scheduled: 'Column[datetime | None]' = Column(UTCDateTime, nullable=True)
+    scheduled: Column[datetime | None] = Column(UTCDateTime, nullable=True)
 
     #: the recipients of this newsletter, meant in part as a tracking feature
     #: to answer the question "who got which newsletters?" - for this to work
     #: the user of onegov.newsletter has to make sure that sent out
     #: newsletters can't have actual recipients removed from them.
     #: onegov.newsletter does not make any guarantees here
-    recipients: 'relationship[list[Recipient]]' = relationship(
+    recipients: relationship[list[Recipient]] = relationship(
         'Recipient',
         secondary=newsletter_recipients,
         back_populates='newsletters')
 
     @property
-    def open_recipients(self) -> tuple['Recipient', ...]:
+    def open_recipients(self) -> tuple[Recipient, ...]:
         received = select([newsletter_recipients.c.recipient_id]).where(
             newsletter_recipients.c.newsletter_id == self.name)
 
@@ -129,14 +131,14 @@ class Recipient(Base, TimestampMixin, ContentMixin):
     __tablename__ = 'recipients'
 
     #: the id of the recipient, used in the url
-    id: 'Column[uuid.UUID]' = Column(
+    id: Column[uuid.UUID] = Column(
         UUID,  # type:ignore[arg-type]
         primary_key=True,
         default=uuid4
     )
 
     #: the email address of the recipient, unique per group
-    address: 'Column[str]' = Column(Text, nullable=False)
+    address: Column[str] = Column(Text, nullable=False)
 
     @validates('address')
     def validate_address(self, key: str, address: str) -> str:
@@ -144,21 +146,21 @@ class Recipient(Base, TimestampMixin, ContentMixin):
         return address
 
     #: the recipient group, a freely choosable string - may be null
-    group: 'Column[str | None]' = Column(Text, nullable=True)
+    group: Column[str | None] = Column(Text, nullable=True)
 
     #: the newsletters that this recipient received
-    newsletters: 'relationship[list[Newsletter]]' = relationship(
+    newsletters: relationship[list[Newsletter]] = relationship(
         'Newsletter',
         secondary=newsletter_recipients,
         back_populates='recipients')
 
     #: this token is used for confirm and unsubscribe
-    token: 'Column[str]' = Column(Text, nullable=False, default=random_token)
+    token: Column[str] = Column(Text, nullable=False, default=random_token)
 
     #: when recipients are added, they are unconfirmed. At this point they get
     #: one e-mail with a confirmation link. If they ignore said e-mail they
     #: should not get another one.
-    confirmed: 'Column[bool]' = Column(Boolean, nullable=False, default=False)
+    confirmed: Column[bool] = Column(Boolean, nullable=False, default=False)
 
     #: subscribed newsletter categories. For legacy reasons, no selection
     # means all topics are subscribed to.
@@ -178,7 +180,7 @@ class Recipient(Base, TimestampMixin, ContentMixin):
         )
 
     @property
-    def subscription(self) -> 'Subscription':
+    def subscription(self) -> Subscription:
         return Subscription(self, self.token)
 
 
@@ -190,7 +192,7 @@ class Subscription:
         self.token = token
 
     @property
-    def recipient_id(self) -> 'uuid.UUID':
+    def recipient_id(self) -> uuid.UUID:
         # even though this seems redundant, we need this property
         # for morepath, so it can match it to the path variable
         return self.recipient.id

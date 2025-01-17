@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 from onegov.core.orm import Base
 from onegov.core.orm.mixins import TimestampMixin
 from onegov.core.orm.types import UUID
@@ -34,67 +36,67 @@ class List(Base, TimestampMixin):
     __tablename__ = 'lists'
 
     #: internal id of the list
-    id: 'Column[uuid.UUID]' = Column(
+    id: Column[uuid.UUID] = Column(
         UUID,  # type:ignore[arg-type]
         primary_key=True,
         default=uuid4
     )
 
     #: external id of the list
-    list_id: 'Column[str]' = Column(Text, nullable=False)
+    list_id: Column[str] = Column(Text, nullable=False)
 
     # number of mandates
-    number_of_mandates: 'Column[int]' = Column(
+    number_of_mandates: Column[int] = Column(
         Integer,
         nullable=False,
         default=lambda: 0
     )
 
     #: name of the list
-    name: 'Column[str]' = Column(Text, nullable=False)
+    name: Column[str] = Column(Text, nullable=False)
 
     #: the election id this list belongs to
-    election_id: 'Column[str]' = Column(
+    election_id: Column[str] = Column(
         Text,
         ForeignKey('elections.id', onupdate='CASCADE', ondelete='CASCADE'),
         nullable=False
     )
 
     #: the election this list belongs to
-    election: 'relationship[ProporzElection]' = relationship(
+    election: relationship[ProporzElection] = relationship(
         'ProporzElection',
         back_populates='lists'
     )
 
     #: the list connection id this list belongs to
-    connection_id: 'Column[uuid.UUID | None]' = Column(
+    connection_id: Column[uuid.UUID | None] = Column(
         UUID,  # type:ignore[arg-type]
         ForeignKey('list_connections.id', ondelete='CASCADE'),
         nullable=True
     )
 
     #: the list connection this list belongs to
-    connection: 'relationship[ListConnection]' = relationship(
+    connection: relationship[ListConnection] = relationship(
         'ListConnection',
         back_populates='lists'
     )
 
     #: a list contains n candidates
-    candidates: 'relationship[list[Candidate]]' = relationship(
+    candidates: relationship[list[Candidate]] = relationship(
         'Candidate',
         cascade='all, delete-orphan',
         back_populates='list',
     )
 
     #: a list contains n results
-    results: 'relationship[list[ListResult]]' = relationship(
+    results: relationship[list[ListResult]] = relationship(
         'ListResult',
         cascade='all, delete-orphan',
         back_populates='list',
     )
 
     #: a list contains additional votes from other lists
-    panachage_results: 'relationship[list[ListPanachageResult]]'
+    panachage_results: relationship[list[ListPanachageResult]]
     panachage_results = relationship(
         'ListPanachageResult',
         foreign_keys='ListPanachageResult.target_id',
@@ -103,7 +105,7 @@ class List(Base, TimestampMixin):
     )
 
     #: a list contains to other lists lost votes
-    panachage_results_lost: 'relationship[list[ListPanachageResult]]'
+    panachage_results_lost: relationship[list[ListPanachageResult]]
     panachage_results_lost = relationship(
         'ListPanachageResult',
         foreign_keys='ListPanachageResult.source_id',
@@ -112,7 +114,7 @@ class List(Base, TimestampMixin):
     )
 
     #: an list contains n (outgoing) candidate panachage results
-    candidate_panachage_results: 'relationship[list[CandidatePanachageResult]]'
+    candidate_panachage_results: relationship[list[CandidatePanachageResult]]
     candidate_panachage_results = relationship(
         'CandidatePanachageResult',
         cascade='all, delete-orphan',
@@ -131,7 +133,7 @@ class List(Base, TimestampMixin):
     def aggregate_results_expression(
         cls,
         attribute: str
-    ) -> 'ColumnElement[int]':
+    ) -> ColumnElement[int]:
         """ Gets the sum of the given attribute from the results,
         as SQL expression.
 
@@ -147,7 +149,7 @@ class List(Base, TimestampMixin):
         return expr.label(attribute)
 
     @property
-    def percentage_by_entity(self) -> dict[int, 'EntityPercentage']:
+    def percentage_by_entity(self) -> dict[int, EntityPercentage]:
         """ Returns the percentage of votes by the entity. Includes uncounted
         entities and entities with no results available.
 
@@ -201,7 +203,7 @@ class List(Base, TimestampMixin):
         return percentage
 
     @property
-    def percentage_by_district(self) -> dict[str, 'DistrictPercentage']:
+    def percentage_by_district(self) -> dict[str, DistrictPercentage]:
         """ Returns the percentage of votes aggregated by the distict. Includes
         uncounted districts and districts with no results available.
 

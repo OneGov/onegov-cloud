@@ -1,4 +1,6 @@
 """ The settings view, defining things like the logo or color of the org. """
+from __future__ import annotations
+
 from onegov.core.security import Secret
 from onegov.org import _
 from onegov.org.models import Organisation
@@ -21,8 +23,8 @@ if TYPE_CHECKING:
 )
 def town_handle_chat_settings(
     self: Organisation,
-    request: 'TownRequest',
+    request: TownRequest,
     form: OpenDataSettingsForm
-) -> 'RenderData | Response':
+) -> RenderData | Response:
     layout = SettingsLayout(self, request, _('Open Data'))
     return handle_generic_settings(self, request, form, _('Open Data'), layout)

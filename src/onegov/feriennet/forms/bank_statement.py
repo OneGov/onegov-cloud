@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 from onegov.activity import Period, PeriodCollection
 from onegov.feriennet import _
 from onegov.form import Form
@@ -33,7 +35,7 @@ class BankStatementImportForm(Form):
     )
 
     @property
-    def period_choices(self) -> list['_Choice']:
+    def period_choices(self) -> list[_Choice]:
         periods = PeriodCollection(self.request.session)
 
         q = periods.query()
@@ -43,7 +45,7 @@ class BankStatementImportForm(Form):
         # NOTE: Technically not quite correct, it's a Row with two named
         #       fields. But this is close enough for our purposes and is
         #       quicker than defining a matching NamedTuple.
-        def choice(row: Period) -> '_Choice':
+        def choice(row: Period) -> _Choice:
             return row.id.hex, row.title
 
         return [choice(p) for p in q]

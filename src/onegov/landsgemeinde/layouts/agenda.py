@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 from functools import cached_property
 from onegov.core.elements import Confirm
 from onegov.core.elements import Intercooler
@@ -65,13 +67,13 @@ class AgendaItemCollectionLayout(DefaultLayout):
 
 class AgendaItemLayout(DefaultLayout):
 
-    model: 'AgendaItem'
-    request: 'LandsgemeindeRequest'
+    model: AgendaItem
+    request: LandsgemeindeRequest
 
     def __init__(
         self,
-        model: 'AgendaItem',
-        request: 'LandsgemeindeRequest'
+        model: AgendaItem,
+        request: LandsgemeindeRequest
     ) -> None:
 
         super().__init__(model, request)
@@ -152,7 +154,7 @@ class AgendaItemLayout(DefaultLayout):
 
     def editbar_links_for_votum(
         self,
-        votum: 'Votum'
+        votum: Votum
     ) -> list[Link | LinkGroup] | None:
 
         if self.request.is_manager:

@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 from morepath import redirect
 from onegov.core.utils import groupbylist
 from onegov.election_day import _
@@ -27,8 +29,8 @@ if TYPE_CHECKING:
 )
 def view_elections(
     self: ElectionCollection,
-    request: 'ElectionDayRequest'
-) -> 'RenderData':
+    request: ElectionDayRequest
+) -> RenderData:
     """ View a list of all elections. """
 
     years = [
@@ -56,9 +58,9 @@ def view_elections(
 )
 def create_election(
     self: ElectionCollection,
-    request: 'ElectionDayRequest',
+    request: ElectionDayRequest,
     form: ElectionForm
-) -> 'RenderData | Response':
+) -> RenderData | Response:
     """ Create a new election. """
 
     layout = ManageElectionsLayout(self, request)
@@ -89,9 +91,9 @@ def create_election(
 )
 def edit_election(
     self: Election,
-    request: 'ElectionDayRequest',
+    request: ElectionDayRequest,
     form: ElectionForm
-) -> 'RenderData | Response':
+) -> RenderData | Response:
     """ Edit an existing election. """
 
     layout = ManageElectionsLayout(self, request)
@@ -125,9 +127,9 @@ def edit_election(
 )
 def clear_election(
     self: Election,
-    request: 'ElectionDayRequest',
+    request: ElectionDayRequest,
     form: ClearResultsForm
-) -> 'RenderData | Response':
+) -> RenderData | Response:
     """ Clear the results of an election. """
 
     layout = ManageElectionsLayout(self, request)
@@ -163,9 +165,9 @@ def clear_election(
 )
 def clear_election_media(
     self: Election,
-    request: 'ElectionDayRequest',
-    form: 'EmptyForm'
-) -> 'RenderData | Response':
+    request: ElectionDayRequest,
+    form: EmptyForm
+) -> RenderData | Response:
     """ Deletes alls SVGs and PDFs of this election. """
 
     layout = ManageElectionsLayout(self, request)
@@ -208,9 +210,9 @@ def clear_election_media(
 )
 def delete_election(
     self: Election,
-    request: 'ElectionDayRequest',
-    form: 'EmptyForm'
-) -> 'RenderData | Response':
+    request: ElectionDayRequest,
+    form: EmptyForm
+) -> RenderData | Response:
     """ Delete an existing election. """
 
     layout = ManageElectionsLayout(self, request)
@@ -248,9 +250,9 @@ def delete_election(
 )
 def trigger_election(
     self: Election,
-    request: 'ElectionDayRequest',
+    request: ElectionDayRequest,
     form: TriggerNotificationForm
-) -> 'RenderData | Response':
+) -> RenderData | Response:
     """ Trigger the notifications related to an election. """
 
     session = request.session

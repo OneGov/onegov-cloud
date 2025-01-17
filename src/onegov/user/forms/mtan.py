@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 from onegov.form import Form
 from onegov.form.fields import PhoneNumberField
 from onegov.form.validators import ValidPhoneNumber

@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 from onegov.core.security import Private
 from onegov.form.models.definition import SurveyDefinition
 from onegov.org.forms.survey_export import SurveySubmissionsExport
@@ -23,8 +25,8 @@ if TYPE_CHECKING:
 )
 def town_handle_form_submissions_export(
     self: SurveyDefinition,
-    request: 'TownRequest',
+    request: TownRequest,
     form: SurveySubmissionsExport
-) -> 'RenderData | Response':
+) -> RenderData | Response:
     return handle_form_submissions_export(
         self, request, form, SurveySubmissionLayout(self, request))

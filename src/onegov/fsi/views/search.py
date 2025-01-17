@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 from onegov.core.security import Personal
 from onegov.fsi import FsiApp
 from onegov.org.models import Search
@@ -15,15 +17,15 @@ if TYPE_CHECKING:
 
 @FsiApp.html(model=Search, template='search.pt', permission=Personal)
 def search(
-    self: Search['Base'],
-    request: 'FsiRequest'
-) -> 'RenderData | Response':
+    self: Search[Base],
+    request: FsiRequest
+) -> RenderData | Response:
     return search_view(self, request)
 
 
 @FsiApp.json(model=Search, name='suggest', permission=Personal)
 def suggestions(
-    self: Search['Base'],
-    request: 'FsiRequest'
-) -> 'JSON_ro':
+    self: Search[Base],
+    request: FsiRequest
+) -> JSON_ro:
     return suggestions_view(self, request)

@@ -8,6 +8,7 @@ Because nobody else does all of these. And if they do (like standardjson), they
 don't support decoding...
 
 """
+from __future__ import annotations
 
 import datetime
 import isodate
@@ -72,8 +73,8 @@ class PrefixSerializer(Serializer[_T, str]):
         self,
         target: type[_T],
         prefix: str,
-        encode: 'Callable[[_T], str]',
-        decode: 'Callable[[str], _T]',
+        encode: Callable[[_T], str],
+        decode: Callable[[str], _T],
     ):
         super().__init__(target)
 
@@ -123,15 +124,15 @@ class DictionarySerializer(Serializer[_T, 'JSONObject_ro']):
 
     """
 
-    def __init__(self, target: type[_T], keys: 'Iterable[str]'):
+    def __init__(self, target: type[_T], keys: Iterable[str]):
         super().__init__(target)
 
         self.keys = frozenset(keys)
 
-    def encode(self, obj: _T) -> 'JSONObject_ro':
+    def encode(self, obj: _T) -> JSONObject_ro:
         return {k: getattr(obj, k) for k in self.keys}
 
-    def decode(self, dictionary: 'JSONObject_ro') -> _T:
+    def decode(self, dictionary: JSONObject_ro) -> _T:
         return self.target(**dictionary)
 
 
@@ -153,7 +154,7 @@ class Serializers:
         self.known_key_lengths = set()
 
     @property
-    def registered(self) -> 'Iterator[AnySerializer[Any]]':
+    def registered(self) -> Iterator[AnySerializer[Any]]:
         return chain(self.by_prefix.values(), self.by_keys.values())
 
     def register(
@@ -173,7 +174,7 @@ class Serializers:
     def serializer_for(
         self,
         value: object
-    ) -> 'AnySerializer[Any] | None':
+    ) -> AnySerializer[Any] | None:
         if isinstance(value, str):
             return self.serializer_for_string(value)
 
@@ -211,11 +212,11 @@ class Serializers:
     def serializer_for_class(
         self,
         cls: type[_T]
-    ) -> 'AnySerializer[_T] | None':
+    ) -> AnySerializer[_T] | None:
         matches = (s for s in self.registered if issubclass(cls, s.target))
         return next(matches, None)
 
-    def encode(self, value: object) -> 'JSON_ro':
+    def encode(self, value: object) -> JSON_ro:
         serializer = self.serializer_for(value.__class__)
 
         if serializer:
@@ -292,13 +293,13 @@ class Serializable:
 
     """
 
-    serialized_keys: ClassVar['Collection[str]']
+    serialized_keys: ClassVar[Collection[str]]
 
     @classmethod
     def serializers(cls) -> Serializers:
         return default_serializers  # for testing
 
-    def __init_subclass__(cls, keys: 'Collection[str]', **kwargs: Any):
+    def __init_subclass__(cls, keys: Collection[str], **kwargs: Any):
         super().__init_subclass__(**kwargs)
 
         cls.serialized_keys = keys
@@ -337,9 +338,9 @@ def loads(txt: str | bytes | bytearray | None, **extra: Any) -> Any:
     return {}
 
 
-def dump(data: Any, fp: 'SupportsWrite[str]', **extra: Any) -> None:
+def dump(data: Any, fp: SupportsWrite[str], **extra: Any) -> None:
     fp.write(dumps(data, **extra))
 
 
-def load(fp: 'SupportsRead[str | bytes]', **extra: Any) -> Any:
+def load(fp: SupportsRead[str | bytes], **extra: Any) -> Any:
     return loads(fp.read(), **extra)

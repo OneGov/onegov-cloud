@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 from uuid import uuid4
 
 from onegov.core.collection import GenericCollection
@@ -35,24 +37,24 @@ class ExternalLink(Base, ContentMixin, TimestampMixin, AccessExtension,
         'lead': {'type': 'localized'},
     }
 
-    id: 'Column[uuid.UUID]' = Column(
+    id: Column[uuid.UUID] = Column(
         UUID,  # type:ignore[arg-type]
         primary_key=True,
         default=uuid4
     )
 
-    title: 'Column[str]' = Column(Text, nullable=False)
-    url: 'Column[str]' = Column(Text, nullable=False)
+    title: Column[str] = Column(Text, nullable=False)
+    url: Column[str] = Column(Text, nullable=False)
     page_image: dict_property[str | None] = meta_property()
 
     # The collection name this model should appear in
-    member_of: 'Column[str | None]' = Column(Text, nullable=True)
+    member_of: Column[str | None] = Column(Text, nullable=True)
     # TODO: Stop passing title (and maybe even to) as url parameters.
     # Figure out a way to use the member_of attribute instead.
-    group: 'Column[str | None]' = Column(Text, nullable=True)
+    group: Column[str | None] = Column(Text, nullable=True)
 
     #: The normalized title for sorting
-    order: 'Column[str]' = Column(Text, nullable=False, index=True)
+    order: Column[str] = Column(Text, nullable=False, index=True)
 
     es_type_name = 'external_links'
     es_id = 'title'
@@ -73,7 +75,7 @@ class ExternalLinkCollection(GenericCollection[ExternalLink]):
 
     def __init__(
         self,
-        session: 'Session',
+        session: Session,
         member_of: str | None = None,
         group: str | None = None,
         type: str | None = None
@@ -119,7 +121,7 @@ class ExternalLinkCollection(GenericCollection[ExternalLink]):
         assert external_link.member_of is not None
         return cls.collection_by_name()[external_link.member_of]
 
-    def query(self) -> 'Query[ExternalLink]':
+    def query(self) -> Query[ExternalLink]:
         query = super().query()
         if self.member_of:
             query = query.filter_by(member_of=self.member_of)
@@ -130,10 +132,10 @@ class ExternalLinkCollection(GenericCollection[ExternalLink]):
     @classmethod
     def for_model(
         cls,
-        session: 'Session',
+        session: Session,
         model_class: type[FormCollection | ResourceCollection],
         **kwargs: Any
-    ) -> 'Self':
+    ) -> Self:
         """ It would be better to use the tablename, but the collections do
         not always implement the property model_class. """
 

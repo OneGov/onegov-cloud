@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 from json import dumps
 from json import loads
 from onegov.websockets import log
@@ -9,7 +11,7 @@ if TYPE_CHECKING:
     from websockets.legacy.client import WebSocketClientProtocol
 
 
-async def acknowledged(websocket: 'WebSocketClientProtocol') -> None:
+async def acknowledged(websocket: WebSocketClientProtocol) -> None:
     """ Wait for an OK from the server. """
 
     message = await websocket.recv()
@@ -23,7 +25,7 @@ async def acknowledged(websocket: 'WebSocketClientProtocol') -> None:
 
 
 async def register(
-    websocket: 'WebSocketClientProtocol',
+    websocket: WebSocketClientProtocol,
     schema: str,
     channel: str | None
 ) -> None:
@@ -40,7 +42,7 @@ async def register(
 
 
 async def authenticate(
-    websocket: 'WebSocketClientProtocol',
+    websocket: WebSocketClientProtocol,
     token: str
 ) -> None:
     """ Authenticates with the given token. """
@@ -55,10 +57,10 @@ async def authenticate(
 
 
 async def broadcast(
-    websocket: 'WebSocketClientProtocol',
+    websocket: WebSocketClientProtocol,
     schema: str,
     channel: str | None,
-    message: 'JSON_ro'
+    message: JSON_ro
 ) -> None:
     """ Broadcasts the given message to all connected clients.
 
@@ -77,7 +79,7 @@ async def broadcast(
     await acknowledged(websocket)
 
 
-async def status(websocket: 'WebSocketClientProtocol') -> str | None:
+async def status(websocket: WebSocketClientProtocol) -> str | None:
     """ Receives the status of the server.
 
     Assumes prior authentication.

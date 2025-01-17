@@ -1,4 +1,5 @@
 """ Contains custom converters. """
+from __future__ import annotations
 
 import isodate
 import morepath
@@ -64,7 +65,7 @@ def json_decode(s: str) -> dict[str, Any] | None:
     return json.loads(s)
 
 
-def json_encode(d: 'Mapping[str, Any] | None') -> str:
+def json_encode(d: Mapping[str, Any] | None) -> str:
     """ Encodes a dictionary to json. """
     if not d:
         return '{}'
@@ -100,7 +101,7 @@ uuid_converter = morepath.Converter(
 
 
 @Framework.converter(type=UUID)
-def get_default_uuid_converter() -> 'morepath.Converter[UUID]':
+def get_default_uuid_converter() -> morepath.Converter[UUID]:
     return uuid_converter
 
 
@@ -130,13 +131,13 @@ def bool_encode(d: bool | None) -> Literal['0', '1']:
     return d and '1' or '0'
 
 
-bool_converter: 'morepath.Converter[bool]' = morepath.Converter(
+bool_converter: morepath.Converter[bool] = morepath.Converter(
     decode=bool_decode, encode=bool_encode
 )
 
 
 @Framework.converter(type=bool)
-def get_default_bool_converter() -> 'morepath.Converter[bool]':
+def get_default_bool_converter() -> morepath.Converter[bool]:
     return bool_converter
 
 
@@ -162,7 +163,7 @@ datetime_converter = morepath.Converter(
 
 
 @Framework.converter(type=datetime)
-def get_default_datetime_converter() -> 'morepath.Converter[datetime]':
+def get_default_datetime_converter() -> morepath.Converter[datetime]:
     return datetime_converter
 
 
@@ -206,7 +207,7 @@ move_direction_converter = morepath.Converter(
 
 @Framework.converter(type=MoveDirection)
 def get_default_move_direction_converter(
-) -> 'morepath.Converter[MoveDirection]':
+) -> morepath.Converter[MoveDirection]:
     return move_direction_converter
 
 
@@ -225,7 +226,7 @@ class LiteralConverter(LiteralConverterBase):
     def __init__(self, literal_type: Any, /) -> None: ...
 
     @overload
-    def __init__(self, *literals: 'LiteralString') -> None: ...
+    def __init__(self, *literals: LiteralString) -> None: ...
 
     def __init__(self, *literals: Any) -> None:
         if len(literals) == 1 and get_origin(literals[0]) is Literal:

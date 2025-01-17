@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 import lxml
 import random
 import re
@@ -59,16 +61,16 @@ def is_valid_group_code(code: str) -> bool:
 
 
 def overlaps(
-    range_a: 'RangeLike[SupportsRichComparisonT]',
-    range_b: 'RangeLike[SupportsRichComparisonT]'
+    range_a: RangeLike[SupportsRichComparisonT],
+    range_b: RangeLike[SupportsRichComparisonT]
 ) -> bool:
     return (range_b[0] <= range_a[0] <= range_b[1]) or (  # type:ignore
         range_a[0] <= range_b[0] <= range_a[1])  # type:ignore[operator]
 
 
 def merge_ranges(
-    ranges: 'Iterable[RangeTuple[SupportsRichComparisonT]]'
-) -> list['RangeTuple[SupportsRichComparisonT]']:
+    ranges: Iterable[RangeTuple[SupportsRichComparisonT]]
+) -> list[RangeTuple[SupportsRichComparisonT]]:
     """ Merges the given list of ranges into a list of ranges including only
     exclusive ranges. The ranges are turned into tuples to make them
     hashable.
@@ -106,7 +108,7 @@ def num_range_decode(s: object) -> tuple[int, int] | None:
         return None
 
 
-def num_range_encode(a: 'RangeLike[int]') -> str:
+def num_range_encode(a: RangeLike[int]) -> str:
     return f'{a[0]}-{a[1]}'
 
 
@@ -122,11 +124,11 @@ def date_range_decode(s: object) -> tuple[date, date] | None:
     return date.fromisoformat(s), date.fromisoformat(e)
 
 
-def date_range_encode(d: 'RangeLike[date]') -> str:
+def date_range_encode(d: RangeLike[date]) -> str:
     return ':'.join((d[0].strftime('%Y-%m-%d'), d[1].strftime('%Y-%m-%d')))
 
 
-def generate_xml(payments: 'Iterable[dict[str, Any]]') -> str:
+def generate_xml(payments: Iterable[dict[str, Any]]) -> str:
     """ Creates an xml for import through ISO20022. Used for testing only. """
 
     transactions = []
@@ -191,8 +193,8 @@ def generate_xml(payments: 'Iterable[dict[str, Any]]') -> str:
 
 
 def dates_overlap(
-    a: 'Iterable[RangeTuple[datetime]]',
-    b: 'Iterable[RangeTuple[datetime]]',
+    a: Iterable[RangeTuple[datetime]],
+    b: Iterable[RangeTuple[datetime]],
     minutes_between: float = 0,
     cut_end: bool = True,
     alignment: Literal['day', 'week', 'month'] | None = None
@@ -237,7 +239,7 @@ def dates_overlap(
     return False
 
 
-def is_internal_image(url: str | None) -> 'TypeGuard[str]':
+def is_internal_image(url: str | None) -> TypeGuard[str]:
     return url and INTERNAL_IMAGE_EX.match(url) and True or False
 
 

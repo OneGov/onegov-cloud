@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 import onegov.election_day
 
 from functools import cached_property
@@ -73,8 +75,8 @@ class Principal:
         self,
         id_: str,
         domain: str,
-        domains_election: dict[str, 'TranslationString'],
-        domains_vote: dict[str, 'TranslationString'],
+        domains_election: dict[str, TranslationString],
+        domains_vote: dict[str, TranslationString],
         entities: dict[int, dict[int, dict[str, str]]],
         name: str | None = None,
         logo: str | None = None,
@@ -102,7 +104,7 @@ class Principal:
         official_host: str | None = None,
         segmented_notifications: bool = False,
         private: bool = False,
-        **kwargs: 'Never'
+        **kwargs: Never
     ):
         assert all((id_, domain, domains_election, domains_vote, entities))
         self.id = id_
@@ -146,7 +148,7 @@ class Principal:
         self.private = private
 
     @classmethod
-    def from_yaml(cls, yaml_source: '_ReadStream') -> 'Canton | Municipality':
+    def from_yaml(cls, yaml_source: _ReadStream) -> Canton | Municipality:
         kwargs = safe_load(yaml_source)
         assert 'canton' in kwargs or 'municipality' in kwargs
         if 'municipality' in kwargs:

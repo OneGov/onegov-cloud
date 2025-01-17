@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 from onegov.core.security import Secret
 from onegov.org.models import Organisation
 from onegov.translator_directory import TranslatorDirectoryApp
@@ -23,9 +25,9 @@ if TYPE_CHECKING:
 )
 def view_locations_settings(
     self: Organisation,
-    request: 'TranslatorAppRequest',
+    request: TranslatorAppRequest,
     form: TranslatorDirectorySettingsForm
-) -> 'RenderData | Response':
+) -> RenderData | Response:
 
     layout = DefaultLayout(self, request)
 

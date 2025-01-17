@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 from functools import cached_property
 from datetime import date
 from onegov.activity import InvoiceItem
@@ -14,8 +16,8 @@ class InvoiceAction:
 
     def __init__(
         self,
-        session: 'Session',
-        id: 'UUID',
+        session: Session,
+        id: UUID,
         action: Literal['mark-paid', 'mark-unpaid', 'remove-manual'],
         extend_to: Literal['invoice', 'family'] | None = None,
         text: str | None = None
@@ -47,7 +49,7 @@ class InvoiceAction:
         return True
 
     @property
-    def targets(self) -> 'Iterator[InvoiceItem]':
+    def targets(self) -> Iterator[InvoiceItem]:
         item = self.item
 
         if item:
@@ -83,20 +85,20 @@ class InvoiceAction:
 
     def assert_safe_to_change(
         self,
-        targets: 'Collection[InvoiceItem]'
+        targets: Collection[InvoiceItem]
     ) -> None:
         for target in targets:
             if target.invoice.disable_changes_for_items((target, )):
                 raise RuntimeError('Item was paid online')
 
-    def execute_mark_paid(self, targets: 'Collection[InvoiceItem]') -> None:
+    def execute_mark_paid(self, targets: Collection[InvoiceItem]) -> None:
         self.assert_safe_to_change(targets)
 
         for target in targets:
             target.payment_date = date.today()
             target.paid = True
 
-    def execute_mark_unpaid(self, targets: 'Collection[InvoiceItem]') -> None:
+    def execute_mark_unpaid(self, targets: Collection[InvoiceItem]) -> None:
         self.assert_safe_to_change(targets)
 
         for target in targets:
@@ -107,7 +109,7 @@ class InvoiceAction:
 
     def execute_remove_manual(
         self,
-        targets: 'Collection[InvoiceItem]'
+        targets: Collection[InvoiceItem]
     ) -> None:
 
         self.assert_safe_to_change(targets)

@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 import sedate
 
 from datetime import date, datetime
@@ -34,7 +36,7 @@ def today() -> date:
 
 class MissionReportForm(Form):
 
-    request: 'WinterthurRequest'
+    request: WinterthurRequest
 
     day = DateField(
         _('Date'),

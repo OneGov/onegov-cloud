@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 import hashlib
 
 from decimal import Decimal
@@ -21,11 +23,11 @@ class Scoring:
 
     """
 
-    criteria: list['Callable[[Booking], float]']
+    criteria: list[Callable[[Booking], float]]
 
     def __init__(
         self,
-        criteria: list['Callable[[Booking], float]'] | None = None
+        criteria: list[Callable[[Booking], float]] | None = None
     ) -> None:
         self.criteria = criteria or [PreferMotivated()]
 
@@ -36,8 +38,8 @@ class Scoring:
     def from_settings(
         cls,
         settings: dict[str, Any],
-        session: 'Session'
-    ) -> 'Self':
+        session: Session
+    ) -> Self:
 
         scoring = cls()
 
@@ -83,7 +85,7 @@ class PreferMotivated:
     """
 
     @classmethod
-    def from_session(cls, session: 'Session') -> 'Self':
+    def from_session(cls, session: Session) -> Self:
         return cls()
 
     def __call__(self, booking: Booking) -> int:
@@ -101,14 +103,14 @@ class PreferInAgeBracket:
 
     def __init__(
         self,
-        get_age_range: 'Callable[[Booking], tuple[int, int]]',
-        get_attendee_age: 'Callable[[Booking], int]'
+        get_age_range: Callable[[Booking], tuple[int, int]],
+        get_attendee_age: Callable[[Booking], int]
     ):
         self.get_age_range = get_age_range
         self.get_attendee_age = get_attendee_age
 
     @classmethod
-    def from_session(cls, session: 'Session') -> 'Self':
+    def from_session(cls, session: Session) -> Self:
         attendees = None
         occasions = None
 
@@ -160,11 +162,11 @@ class PreferOrganiserChildren:
 
     """
 
-    def __init__(self, get_is_organiser_child: 'Callable[[Booking], bool]'):
+    def __init__(self, get_is_organiser_child: Callable[[Booking], bool]):
         self.get_is_organiser_child = get_is_organiser_child
 
     @classmethod
-    def from_session(cls, session: 'Session') -> 'Self':
+    def from_session(cls, session: Session) -> Self:
         organisers = None
 
         def get_is_organiser_child(booking: Booking) -> bool:
@@ -192,11 +194,11 @@ class PreferOrganiserChildren:
 class PreferAdminChildren:
     """ Scores bookings of children higher if their parents are admins. """
 
-    def __init__(self, get_is_association_child: 'Callable[[Booking], bool]'):
+    def __init__(self, get_is_association_child: Callable[[Booking], bool]):
         self.get_is_association_child = get_is_association_child
 
     @classmethod
-    def from_session(cls, session: 'Session') -> 'Self':
+    def from_session(cls, session: Session) -> Self:
         members = None
 
         def get_is_association_child(booking: Booking) -> bool:
@@ -237,11 +239,11 @@ class PreferGroups:
 
     """
 
-    def __init__(self, get_group_score: 'Callable[[Booking], float]'):
+    def __init__(self, get_group_score: Callable[[Booking], float]):
         self.get_group_score = get_group_score
 
     @classmethod
-    def from_session(cls, session: 'Session') -> 'Self':
+    def from_session(cls, session: Session) -> Self:
         group_scores = None
 
         def unique_score_modifier(group_code: str) -> float:

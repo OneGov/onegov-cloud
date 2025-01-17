@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 from onegov.form import Form
 from onegov.form.fields import ChosenSelectField
 from onegov.org import _
@@ -129,7 +131,7 @@ class IframeForm(PageBaseForm):
 
 class PageUrlForm(ChangeAdjacencyListUrlForm):
 
-    def get_model(self) -> 'Page':
+    def get_model(self) -> Page:
         return self.model.page
 
 
@@ -156,9 +158,9 @@ class MovePageForm(Form):
 
     def iterate_page_tree(
         self,
-        pages: 'Iterable[Page]',
+        pages: Iterable[Page],
         indent: str = '',
-    ) -> 'Iterator[tuple[int, str]]':
+    ) -> Iterator[tuple[int, str]]:
         """
         Iterates over the page tree and lists the elements with ident
         to show the page hierarchy in the choices list
@@ -195,7 +197,7 @@ class MovePageForm(Form):
             ):
                 raise ValidationError(_('Invalid destination selected'))
 
-    def update_model(self, model: 'Page') -> None:
+    def update_model(self, model: Page) -> None:
         session = self.request.session
         pages = PageCollection(session)
 

@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 from onegov.form import Form
 from onegov.form.fields import MultiCheckboxField
 from onegov.swissvotes import _
@@ -12,7 +14,7 @@ if TYPE_CHECKING:
 
 class UpdateExternalResourcesForm(Form):
 
-    request: 'SwissvotesRequest'
+    request: SwissvotesRequest
 
     callout = _('Updating the external resources may take some time.')
 

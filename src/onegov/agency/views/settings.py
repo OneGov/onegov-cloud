@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 from onegov.agency import _
 from onegov.agency.app import AgencyApp
 from onegov.core.security import Secret
@@ -142,8 +144,8 @@ class AgencySettingsForm(Form):
     def populate_obj(  # type: ignore[override]
         self,
         obj: Organisation,  # type: ignore[override]
-        exclude: 'Collection[str] | None' = None,
-        include: 'Collection[str] | None' = None
+        exclude: Collection[str] | None = None,
+        include: Collection[str] | None = None
     ) -> None:
 
         super().populate_obj(obj, exclude, include)
@@ -175,7 +177,7 @@ class AgencySettingsForm(Form):
 )
 def handle_agency_settings(
     self: Organisation,
-    request: 'AgencyRequest',
+    request: AgencyRequest,
     form: AgencySettingsForm
-) -> 'RenderData | Response':
+) -> RenderData | Response:
     return handle_generic_settings(self, request, form, _('Agencies'))

@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 import click
 import os
 import platform
@@ -56,15 +58,15 @@ cli = command_group()
 @cli.command()
 @pass_group_context
 def delete(
-    group_context: 'GroupContext'
-) -> 'Callable[[CoreRequest, Framework], None]':
+    group_context: GroupContext
+) -> Callable[[CoreRequest, Framework], None]:
     """ Deletes a single instance matching the selector.
 
     Selectors matching multiple organisations are disabled for saftey reasons.
 
     """
 
-    def delete_instance(request: 'CoreRequest', app: 'Framework') -> None:
+    def delete_instance(request: CoreRequest, app: Framework) -> None:
 
         confirmation = 'Do you really want to DELETE this instance?'
 
@@ -118,7 +120,7 @@ def delete(
 @click.option('--limit', default=25,
               help='Max number of mails to send before exiting')
 @pass_group_context
-def sendmail(group_context: 'GroupContext', queue: str, limit: int) -> None:
+def sendmail(group_context: GroupContext, queue: str, limit: int) -> None:
     """ Sends mail from a specific mail queue. """
 
     queues = group_context.config.mail_queues
@@ -161,8 +163,8 @@ def sendmail(group_context: 'GroupContext', queue: str, limit: int) -> None:
 })
 @pass_group_context
 def sendsms(
-    group_context: 'GroupContext'
-) -> 'Callable[[CoreRequest, Framework], None]':
+    group_context: GroupContext
+) -> Callable[[CoreRequest, Framework], None]:
     """ Sends the SMS in the smsdir for a given instance.
 
     For example::
@@ -171,7 +173,7 @@ def sendsms(
 
     """
 
-    def send(request: 'CoreRequest', app: 'Framework') -> None:
+    def send(request: CoreRequest, app: Framework) -> None:
         qp = get_sms_queue_processor(app)
         if qp is None:
             return
@@ -190,7 +192,7 @@ class SmsEventHandler(PatternMatchingEventHandler):
             ignore_directories=True
         )
 
-    def on_moved(self, event: 'FileSystemEvent') -> None:
+    def on_moved(self, event: FileSystemEvent) -> None:
         dest_path = os.path.abspath(str(event.dest_path))
         assert isinstance(dest_path, str)
         for qp in self.queue_processors:
@@ -208,7 +210,7 @@ class SmsEventHandler(PatternMatchingEventHandler):
     #       move since our DataManager creates a temporary file that then is
     #       moved. But we should also trigger when new files are created just
     #       in case this ever changes.
-    def on_created(self, event: 'FileSystemEvent') -> None:
+    def on_created(self, event: FileSystemEvent) -> None:
         src_path = os.path.abspath(str(event.src_path))
         assert isinstance(src_path, str)
         for qp in self.queue_processors:
@@ -228,7 +230,7 @@ class SmsEventHandler(PatternMatchingEventHandler):
     'default_selector': '*'
 })
 @pass_group_context
-def sms_spooler(group_context: 'GroupContext') -> None:
+def sms_spooler(group_context: GroupContext) -> None:
     """ Continuously spools the SMS in the smsdir for all instances using
     a watchdog that monitors the smsdir for newly created files.
 
@@ -240,8 +242,8 @@ def sms_spooler(group_context: 'GroupContext') -> None:
     queue_processors: dict[str, list[SmsQueueProcessor]] = defaultdict(list)
 
     def create_sms_queue_processor(
-        request: 'CoreRequest',
-        app: 'Framework'
+        request: CoreRequest,
+        app: Framework
     ) -> None:
 
         # we're fine if the path doesn't exist yet, we only call
@@ -308,7 +310,7 @@ def sms_spooler(group_context: 'GroupContext') -> None:
                    'changed')
 @pass_group_context
 def transfer(
-    group_context: 'GroupContext',
+    group_context: GroupContext,
     server: str,
     remote_config: str,
     confirm: bool,
@@ -604,9 +606,9 @@ def transfer(
         return schemas
 
     def transfer_storage_of_app(
-        local_cfg: 'ApplicationConfig',
-        remote_cfg: 'ApplicationConfig',
-        transfer_function: 'Callable[..., None]'
+        local_cfg: ApplicationConfig,
+        remote_cfg: ApplicationConfig,
+        transfer_function: Callable[..., None]
     ) -> None:
 
         remote_storage = remote_cfg.configuration.get('filestorage', '')
@@ -625,9 +627,9 @@ def transfer(
             transfer_function(remote_storage, local_storage, glob=glob)
 
     def transfer_depot_storage_of_app(
-        local_cfg: 'ApplicationConfig',
-        remote_cfg: 'ApplicationConfig',
-        transfer_function: 'Callable[..., None]'
+        local_cfg: ApplicationConfig,
+        remote_cfg: ApplicationConfig,
+        transfer_function: Callable[..., None]
     ) -> None:
 
         depot_local_storage = 'depot.io.local.LocalFileStorage'
@@ -645,8 +647,8 @@ def transfer(
             transfer_function(remote_storage, local_storage, glob=glob)
 
     def transfer_database_of_app(
-        local_cfg: 'ApplicationConfig',
-        remote_cfg: 'ApplicationConfig'
+        local_cfg: ApplicationConfig,
+        remote_cfg: ApplicationConfig
     ) -> tuple[str, ...]:
 
         if 'dsn' not in remote_cfg.configuration:
@@ -665,7 +667,7 @@ def transfer(
         schema_glob = transfer_schema or f'{local_cfg.namespace}*'
         return transfer_database(remote_db, local_db, schema_glob=schema_glob)
 
-    def do_add_admins(local_cfg: 'ApplicationConfig', schema: str) -> None:
+    def do_add_admins(local_cfg: ApplicationConfig, schema: str) -> None:
         id_ = str(uuid4())
         password_hash = hash_password('test').replace('$', '\\$')
         assert '"' not in schema and "'" not in schema
@@ -741,9 +743,9 @@ def transfer(
               help='Do not write any changes into the database.')
 @pass_group_context
 def upgrade(
-    group_context: 'GroupContext',
+    group_context: GroupContext,
     dry_run: bool
-) -> tuple['Callable[..., Any]', ...]:
+) -> tuple[Callable[..., Any], ...]:
     """ Upgrades all application instances of the given namespace(s). """
 
     modules = list(get_upgrade_modules())
@@ -754,10 +756,10 @@ def upgrade(
     basic_tasks = tuple((id, task) for id, task in tasks if not task.raw)
     raw_tasks = tuple((id, task) for id, task in tasks if task.raw)
 
-    def on_success(task: '_Task[..., Any]') -> None:
+    def on_success(task: _Task[..., Any]) -> None:
         print(click.style('* ' + str(task.task_name), fg='green'))
 
-    def on_fail(task: '_Task[..., Any]') -> None:
+    def on_fail(task: _Task[..., Any]) -> None:
         print(click.style('* ' + str(task.task_name), fg='red'))
 
     def run_upgrade_runner(
@@ -772,8 +774,8 @@ def upgrade(
             print('no pending upgrade tasks found')
 
     def run_raw_upgrade(
-        group_context: 'GroupContext',
-        appcfg: 'ApplicationConfig'
+        group_context: GroupContext,
+        appcfg: ApplicationConfig
     ) -> None:
 
         if appcfg in executed_raw_upgrades:
@@ -797,7 +799,7 @@ def upgrade(
             group_context.available_schemas(appcfg),
         )
 
-    def run_upgrade(request: 'CoreRequest', app: 'Framework') -> None:
+    def run_upgrade(request: CoreRequest, app: Framework) -> None:
         title = 'Running upgrade for {}'.format(request.app.application_id)
         print(click.style(title, underline=True))
 
@@ -810,7 +812,7 @@ def upgrade(
         )
         run_upgrade_runner(upgrade_runner, request)
 
-    def upgrade_steps() -> 'Iterator[Callable[..., Any]]':
+    def upgrade_steps() -> Iterator[Callable[..., Any]]:
         if next((t for n, t in tasks if t.raw), False):
             yield run_raw_upgrade
 
@@ -842,10 +844,10 @@ class EnhancedInteractiveConsole(InteractiveConsole):
 
 
 @cli.command()
-def shell() -> 'Callable[[CoreRequest, Framework], None]':
+def shell() -> Callable[[CoreRequest, Framework], None]:
     """ Enters an interactive shell. """
 
-    def _shell(request: 'CoreRequest', app: 'Framework') -> None:
+    def _shell(request: CoreRequest, app: Framework) -> None:
 
         shell = EnhancedInteractiveConsole({
             'app': app,

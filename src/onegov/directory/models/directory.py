@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 import inspect
 
 from email_validator import validate_email
@@ -84,7 +86,7 @@ class DirectoryFile(File):
         linked_directory_entries: relationship[list[DirectoryEntry]]
 
     @property
-    def directory_entry(self) -> 'DirectoryEntry | None':
+    def directory_entry(self) -> DirectoryEntry | None:
         # we gracefully handle if there are no linked entries, even though
         # there should always be exactly one
         entries = self.linked_directory_entries
@@ -115,43 +117,43 @@ class Directory(Base, ContentMixin, TimestampMixin,
         return False  # to be overridden downstream
 
     #: An interal id for references (not public)
-    id: 'Column[uuid.UUID]' = Column(
+    id: Column[uuid.UUID] = Column(
         UUID,  # type:ignore[arg-type]
         primary_key=True,
         default=uuid4
     )
 
     #: The public, unique name of the directory
-    name: 'Column[str]' = Column(Text, nullable=False, unique=True)
+    name: Column[str] = Column(Text, nullable=False, unique=True)
 
     #: The title of the directory
-    title: 'Column[str]' = Column(Text, nullable=False)
+    title: Column[str] = Column(Text, nullable=False)
 
     #: Describes the directory briefly
-    lead: 'Column[str | None]' = Column(Text, nullable=True)
+    lead: Column[str | None] = Column(Text, nullable=True)
 
     #: The normalized title for sorting
-    order: 'Column[str]' = Column(Text, nullable=False, index=True)
+    order: Column[str] = Column(Text, nullable=False, index=True)
 
     #: The polymorphic type of the directory
-    type: 'Column[str]' = Column(
+    type: Column[str] = Column(
         Text,
         nullable=False,
         default=lambda: 'generic'
     )
 
     #: The data structure of the contained entries
-    structure: 'Column[str]' = Column(Text, nullable=False)
+    structure: Column[str] = Column(Text, nullable=False)
 
     #: The configuration of the contained entries
-    configuration: 'Column[DirectoryConfiguration]' = Column(
+    configuration: Column[DirectoryConfiguration] = Column(
         DirectoryConfigurationStorage,
         nullable=False
     )
 
     #: The number of entries in the directory
     @aggregated('entries', Column(Integer, nullable=False, default=0))
-    def count(self) -> 'ColumnElement[int]':
+    def count(self) -> ColumnElement[int]:
         return func.count('1')
 
     __mapper_args__ = {
@@ -159,7 +161,7 @@ class Directory(Base, ContentMixin, TimestampMixin,
         'polymorphic_identity': 'generic'
     }
 
-    entries: 'relationship[list[DirectoryEntry]]' = relationship(
+    entries: relationship[list[DirectoryEntry]] = relationship(
         'DirectoryEntry',
         order_by='DirectoryEntry.order',
         back_populates='directory'
@@ -170,7 +172,7 @@ class Directory(Base, ContentMixin, TimestampMixin,
         return 'DirectoryEntry'
 
     @property
-    def entry_cls(self) -> '_type[DirectoryEntry]':
+    def entry_cls(self) -> _type[DirectoryEntry]:
         return self.__class__._decl_class_registry[  # type:ignore
             self.entry_cls_name
         ]
@@ -178,8 +180,8 @@ class Directory(Base, ContentMixin, TimestampMixin,
     def add(
         self,
         values: dict[str, Any],
-        type: 'str | InheritType' = INHERIT
-    ) -> 'DirectoryEntry':
+        type: str | InheritType = INHERIT
+    ) -> DirectoryEntry:
 
         start = values.pop('publication_start', None)
         end = values.pop('publication_end', None)
@@ -203,9 +205,9 @@ class Directory(Base, ContentMixin, TimestampMixin,
 
     def add_by_form(
         self,
-        form: 'DirectoryEntryForm',
-        type: 'str | InheritType' = INHERIT
-    ) -> 'DirectoryEntry':
+        form: DirectoryEntryForm,
+        type: str | InheritType = INHERIT
+    ) -> DirectoryEntry:
 
         entry = self.add(form.mixed_data, type)
 
@@ -217,11 +219,11 @@ class Directory(Base, ContentMixin, TimestampMixin,
 
     def update(
         self,
-        entry: 'DirectoryEntry',
-        values: 'Mapping[str, Any]',
+        entry: DirectoryEntry,
+        values: Mapping[str, Any],
         set_name: bool = False,
         force_update: bool = False
-    ) -> 'DirectoryEntry':
+    ) -> DirectoryEntry:
 
         session = object_session(self)
 
@@ -464,7 +466,7 @@ class Directory(Base, ContentMixin, TimestampMixin,
     def structure_configuration_observer(
         self,
         structure: str,
-        configuration: 'DirectoryConfiguration'
+        configuration: DirectoryConfiguration
     ) -> None:
         self.migration(structure, configuration).execute()
 
@@ -477,7 +479,7 @@ class Directory(Base, ContentMixin, TimestampMixin,
     def migration(
         self,
         new_structure: str,
-        new_configuration: 'DirectoryConfiguration'
+        new_configuration: DirectoryConfiguration
     ) -> DirectoryMigration:
 
         return DirectoryMigration(
@@ -487,49 +489,49 @@ class Directory(Base, ContentMixin, TimestampMixin,
         )
 
     @property
-    def fields(self) -> 'Sequence[ParsedField]':
+    def fields(self) -> Sequence[ParsedField]:
         return self.fields_from_structure(self.structure)
 
     @staticmethod
     @lru_cache(maxsize=1)
-    def fields_from_structure(structure: str) -> 'Sequence[ParsedField]':
+    def fields_from_structure(structure: str) -> Sequence[ParsedField]:
         return tuple(flatten_fieldsets(parse_formcode(structure)))
 
     @property
-    def basic_fields(self) -> 'Sequence[BasicParsedField]':
+    def basic_fields(self) -> Sequence[BasicParsedField]:
         return tuple(
             f for f in self.fields
             if f.type != 'fileinput' and f.type != 'multiplefileinput'
         )
 
     @property
-    def file_fields(self) -> 'Sequence[FileParsedField]':
+    def file_fields(self) -> Sequence[FileParsedField]:
         return tuple(
             f for f in self.fields
             if f.type == 'fileinput' or f.type == 'multiplefileinput'
         )
 
-    def field_by_id(self, id: str) -> 'ParsedField | None':
+    def field_by_id(self, id: str) -> ParsedField | None:
         query = (f for f in self.fields if f.human_id == id or f.id == id)
         return next(query, None)
 
     @property
-    def form_obj(self) -> 'DirectoryEntryForm':
+    def form_obj(self) -> DirectoryEntryForm:
         return self.form_obj_from_structure(self.structure)
 
     @property
-    def form_class(self) -> '_type[DirectoryEntryForm]':
+    def form_class(self) -> _type[DirectoryEntryForm]:
         return self.form_class_from_structure(self.structure)
 
     @instance_lru_cache(maxsize=1)
-    def form_obj_from_structure(self, structure: str) -> 'DirectoryEntryForm':
+    def form_obj_from_structure(self, structure: str) -> DirectoryEntryForm:
         return self.form_class_from_structure(structure)()
 
     @instance_lru_cache(maxsize=1)
     def form_class_from_structure(
         self,
         structure: str
-    ) -> '_type[DirectoryEntryForm]':
+    ) -> _type[DirectoryEntryForm]:
 
         directory = self
 
@@ -552,7 +554,7 @@ class Directory(Base, ContentMixin, TimestampMixin,
 
             def populate_obj(
                 self,
-                obj: 'DirectoryEntry',
+                obj: DirectoryEntry,
                 directory_update: bool = True
             ) -> None:
 
@@ -569,7 +571,7 @@ class Directory(Base, ContentMixin, TimestampMixin,
                 if directory_update:
                     directory.update(obj, self.mixed_data)
 
-            def process_obj(self, obj: 'DirectoryEntry') -> None:
+            def process_obj(self, obj: DirectoryEntry) -> None:
                 super().process_obj(obj)
 
                 for field in directory.fields:
@@ -595,14 +597,14 @@ class EntryRecipient(Base, TimestampMixin):
     __tablename__ = 'entry_recipients'
 
     #: the id of the recipient, used in the url
-    id: 'Column[uuid.UUID]' = Column(
+    id: Column[uuid.UUID] = Column(
         UUID,  # type:ignore[arg-type]
         primary_key=True,
         default=uuid4
     )
 
     #: the email address of the recipient
-    address: 'Column[str]' = Column(Text, nullable=False)
+    address: Column[str] = Column(Text, nullable=False)
 
     @validates('address')
     def validate_address(self, key: str, address: str) -> str:
@@ -610,18 +612,18 @@ class EntryRecipient(Base, TimestampMixin):
         return address
 
     #: this token is used for confirm and unsubscribe
-    token: 'Column[str]' = Column(Text, nullable=False, default=random_token)
+    token: Column[str] = Column(Text, nullable=False, default=random_token)
 
     #: when recipients are added, they are unconfirmed. At this point they get
     #: one e-mail with a confirmation link. If they ignore said e-mail they
     #: should not get another one.
-    confirmed: 'Column[bool]' = Column(Boolean, nullable=False, default=False)
+    confirmed: Column[bool] = Column(Boolean, nullable=False, default=False)
 
     @property
-    def subscription(self) -> 'EntrySubscription':
+    def subscription(self) -> EntrySubscription:
         return EntrySubscription(self, self.token)
 
-    directory_id: 'Column[uuid.UUID]' = Column(
+    directory_id: Column[uuid.UUID] = Column(
         UUID,  # type:ignore[arg-type]
         nullable=False
     )
@@ -635,7 +637,7 @@ class EntrySubscription:
         self.token = token
 
     @property
-    def recipient_id(self) -> 'uuid.UUID':
+    def recipient_id(self) -> uuid.UUID:
         # even though this seems redundant, we need this property
         # for morepath, so it can match it to the path variable
         return self.recipient.id

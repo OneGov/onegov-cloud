@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 from onegov.core.elements import Link, LinkGroup
 from onegov.org.custom import get_global_tools as get_global_tools_base
 from onegov.town6 import _
@@ -10,7 +12,7 @@ if TYPE_CHECKING:
     from onegov.town6.request import TownRequest
 
 
-def get_global_tools(request: 'TownRequest') -> 'Iterator[Link | LinkGroup]':
+def get_global_tools(request: TownRequest) -> Iterator[Link | LinkGroup]:
     for item in get_global_tools_base(request):
 
         if getattr(item, 'attrs', {}).get('class') == {'login'}:

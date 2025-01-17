@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 from decimal import Decimal
 from datetime import date
 from markupsafe import Markup
@@ -35,8 +37,8 @@ if TYPE_CHECKING:
 )
 def redirect_to_invoice_view(
     self: InvoiceItem,
-    request: 'FeriennetRequest'
-) -> 'Response':
+    request: FeriennetRequest
+) -> Response:
     return request.redirect(
         request.link(
             InvoiceCollection(
@@ -55,8 +57,8 @@ def redirect_to_invoice_view(
 )
 def view_creditcard_payments(
     self: InvoiceItem,
-    request: 'FeriennetRequest'
-) -> 'Response':
+    request: FeriennetRequest
+) -> Response:
     return request.redirect(request.class_link(
         BillingCollection,
         {
@@ -72,8 +74,8 @@ def view_creditcard_payments(
     permission=Personal)
 def view_my_invoices(
     self: InvoiceCollection,
-    request: 'FeriennetRequest'
-) -> 'RenderData':
+    request: FeriennetRequest
+) -> RenderData:
 
     query = PeriodCollection(request.session).query()
     query = query.filter(Period.finalized == True)
@@ -136,7 +138,7 @@ def view_my_invoices(
     qr_bill_enabled = meta.get('bank_qr_bill', False)
     layout = InvoiceLayout(self, request, title)
 
-    def payment_button(title: str, price: 'Price | None') -> str | None:
+    def payment_button(title: str, price: Price | None) -> str | None:
         assert payment_provider is not None
         assert request.locale is not None
         price = payment_provider.adjust_price(price)
@@ -190,8 +192,8 @@ def view_my_invoices(
     request_method='POST')
 def handle_payment(
     self: InvoiceCollection,
-    request: 'FeriennetRequest'
-) -> 'Response':
+    request: FeriennetRequest
+) -> Response:
 
     provider = request.app.default_payment_provider
     assert provider is not None
@@ -242,9 +244,9 @@ def handle_payment(
     name='donation')
 def handle_donation(
     self: InvoiceCollection,
-    request: 'FeriennetRequest',
+    request: FeriennetRequest,
     form: DonationForm
-) -> 'RenderData | Response':
+) -> RenderData | Response:
 
     assert request.current_user is not None
     if not self.user_id:
@@ -326,7 +328,7 @@ def handle_donation(
     request_method='DELETE')
 def handle_delete_donation(
     self: InvoiceCollection,
-    request: 'FeriennetRequest'
+    request: FeriennetRequest
 ) -> None:
 
     assert self.user_id and self.period_id

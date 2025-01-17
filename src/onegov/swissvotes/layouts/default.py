@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 from babel import Locale
 from decimal import Decimal
 from decimal import ROUND_HALF_UP
@@ -27,14 +29,14 @@ if TYPE_CHECKING:
 
 class DefaultLayout(ChameleonLayout):
 
-    app: 'SwissvotesApp'
-    request: 'SwissvotesRequest'
+    app: SwissvotesApp
+    request: SwissvotesRequest
 
     day_long_format = 'skeleton:MMMMd'
     date_long_format = 'long'
     datetime_long_format = 'medium'
 
-    def __init__(self, model: Any, request: 'SwissvotesRequest') -> None:
+    def __init__(self, model: Any, request: SwissvotesRequest) -> None:
         super().__init__(model, request)
         self.request.include('frameworks')
         self.request.include('chosen')
@@ -150,7 +152,7 @@ class DefaultLayout(ChameleonLayout):
             ))
         return result
 
-    def format_policy_areas(self, vote: 'SwissVote') -> Markup:
+    def format_policy_areas(self, vote: SwissVote) -> Markup:
         paths: dict[str, list[list[str]]] = {}
         for path in (area.label_path for area in vote.policy_areas):
             paths.setdefault(path[0], []).append(path)

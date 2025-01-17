@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 from wtforms.validators import ValidationError
 from onegov.gazette import _
 
@@ -25,10 +27,10 @@ class UnusedColumnKeyValue:
     # FIXME: Technically this should be 'ColumnElement[Mapping[str, Any]]'
     #        but I don't think ColumnElement is covariant (it might be in
     #        SQLAlchemy 2.0, so we should try changing it when we upgrade)
-    def __init__(self, column: 'ColumnElement[Any]') -> None:
+    def __init__(self, column: ColumnElement[Any]) -> None:
         self.column = column
 
-    def __call__(self, form: 'Form', field: 'Field') -> None:
+    def __call__(self, form: Form, field: Field) -> None:
         if not hasattr(form, 'model'):
             return
 

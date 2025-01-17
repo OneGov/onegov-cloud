@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 from collections import OrderedDict
 from onegov.core.collection import GenericCollection
 from onegov.gazette.models import Issue
@@ -16,7 +18,7 @@ class IssueCollection(GenericCollection[Issue]):
     def model_class(self) -> type[Issue]:
         return Issue
 
-    def query(self) -> 'Query[Issue]':
+    def query(self) -> Query[Issue]:
         query = super().query()
         query = query.order_by(None).order_by(Issue.date)
         return query

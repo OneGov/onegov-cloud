@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 from markupsafe import escape, Markup
 from sqlalchemy.types import TypeDecorator, TEXT
 
@@ -20,7 +22,7 @@ class MarkupText(_Base):
     def process_bind_param(
         self,
         value: str | None,
-        dialect: 'Dialect'
+        dialect: Dialect
     ) -> Markup | None:
 
         return None if value is None else escape(value)
@@ -28,7 +30,7 @@ class MarkupText(_Base):
     def process_literal_param(
         self,
         value: str | None,
-        dialect: 'Dialect'
+        dialect: Dialect
     ) -> Markup | None:
 
         return None if value is None else escape(value)
@@ -36,7 +38,7 @@ class MarkupText(_Base):
     def process_result_value(
         self,
         value: str | None,
-        dialect: 'Dialect'
+        dialect: Dialect
     ) -> Markup | None:
 
         # NOTE: It would be safer to sanitize the text, in case someone

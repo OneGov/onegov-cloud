@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 import hashlib
 import html
 import os
@@ -28,7 +30,7 @@ HASHTAG = re.compile(r'(?<![\w/])#\w{3,}')
 
 def searchable_sqlalchemy_models(
     base: type[T]
-) -> 'Iterator[type[Searchable]]':
+) -> Iterator[type[Searchable]]:
     """ Searches through the given SQLAlchemy base and returns the classes
     of all SQLAlchemy models found which inherit from the
     :class:`onegov.search.mixins.Searchable` interface.
@@ -89,7 +91,7 @@ def extract_hashtags(text: str) -> list[str]:
 
 
 class classproperty(Generic[T_co]):  # noqa: N801
-    def __init__(self, f: 'Callable[[type[Any]], T_co]') -> None:
+    def __init__(self, f: Callable[[type[Any]], T_co]) -> None:
         if isinstance(f, classmethod):
             # unwrap classmethod decorator which is used for typing
             f = f.__func__  # type:ignore[unreachable]
@@ -99,7 +101,7 @@ class classproperty(Generic[T_co]):  # noqa: N801
         return self.f(owner)
 
 
-def iter_subclasses(baseclass: type[T]) -> 'Iterator[type[T]]':
+def iter_subclasses(baseclass: type[T]) -> Iterator[type[T]]:
     for subclass in baseclass.__subclasses__():
         yield subclass
 
@@ -147,7 +149,7 @@ class LanguageDetector:
 
     """
 
-    def __init__(self, supported_languages: 'Sequence[str]') -> None:
+    def __init__(self, supported_languages: Sequence[str]) -> None:
         self.supported_languages = supported_languages
         self.factory = DetectorFactory()
 
@@ -158,7 +160,7 @@ class LanguageDetector:
                 profile = LangProfile(**json.load(f))
                 self.factory.add_profile(profile, ix, len(supported_languages))
 
-    def spawn_detector(self, text: str) -> 'Detector':
+    def spawn_detector(self, text: str) -> Detector:
         detector = self.factory.create()
         detector.append(text)
 
@@ -167,5 +169,5 @@ class LanguageDetector:
     def detect(self, text: str) -> str:
         return self.spawn_detector(text).detect()
 
-    def probabilities(self, text: str) -> list['Language']:
+    def probabilities(self, text: str) -> list[Language]:
         return self.spawn_detector(text).get_probabilities()

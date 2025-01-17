@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 from libres.context.registry import create_default_registry
 from libres.db.models import ORMBase
 from onegov.reservation.collection import ResourceCollection
@@ -61,9 +63,9 @@ class LibresIntegration:
 
     @staticmethod
     def libres_context_from_session_manager(
-        registry: 'Registry',
-        session_manager: 'SessionManager'
-    ) -> 'Context':
+        registry: Registry,
+        session_manager: SessionManager
+    ) -> Context:
 
         if registry.is_existing_context('onegov.reservation'):
             return registry.get_context('onegov.reservation')
