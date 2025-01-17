@@ -1,4 +1,5 @@
 from datetime import datetime
+from onegov.core.collection import Pagination
 from onegov.core.orm.mixins import (
     content_property, dict_markup_property, dict_property, meta_property)
 from onegov.form import Form, move_fields
@@ -20,6 +21,7 @@ from onegov.org.models.extensions import SidebarLinksExtension
 from onegov.org.models.traitinfo import TraitInfo
 from onegov.org.observer import observes
 from onegov.page import Page
+from onegov.page.collection import AdjacencyListCollection, PageCollection
 from onegov.search import SearchableContent
 from sedate import replace_timezone
 from sqlalchemy import desc, func, or_, and_
@@ -31,6 +33,7 @@ from typing import Any, TYPE_CHECKING
 if TYPE_CHECKING:
     from onegov.org.request import OrgRequest, PageMeta
     from sqlalchemy.orm import Query, Session
+    from typing import Self
 
 
 class Topic(Page, TraitInfo, SearchableContent, AccessExtension,
@@ -344,6 +347,50 @@ class News(Page, TraitInfo, SearchableContent, NewsletterExtension,
         for hashtags, in query:
             all_hashtags.update(hashtags)
         return sorted(all_hashtags)
+
+
+class NewsCollection(Pagination[News], AdjacencyListCollection[News]):
+    """
+    Use it like this:
+
+        from onegov.page import NewsCollection
+        news = NewsCollection(session)
+    """
+
+    __listclass__ = News
+
+    def __init__(
+        self,
+        session: 'Session',
+        page: int = 0,
+    ):
+        self.session = session
+        self.page = page
+
+    def subset(self) -> 'Query[News]':
+        parent = PageCollection(self.session).by_path(
+            '/news/', ensure_type='news')
+        news = self.session.query(News)
+        if parent:
+            news = news.filter(Page.parent_id == parent.id)
+        news = news.filter(
+            News.publication_started == True,
+            News.publication_ended == False
+        )
+        news = news.order_by(desc(News.published_or_created))
+        news = news.options(undefer('created'))
+        news = news.options(undefer('content'))
+        return news
+
+    @property
+    def page_index(self) -> int:
+        return self.page
+
+    def page_by_index(self, index: int) -> 'Self':
+        return self.__class__(
+            self.session,
+            page=index
+        )
 
 
 class AtoZPages(AtoZ[Topic]):

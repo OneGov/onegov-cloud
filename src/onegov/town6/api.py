@@ -7,7 +7,10 @@ from onegov.gis import Coordinates
 from typing import Any
 from typing import TYPE_CHECKING
 
+from onegov.org.models.page import NewsCollection
+
 if TYPE_CHECKING:
+    from onegov.org.models.page import News
     from onegov.town6.app import TownApp
     from onegov.event.models import Occurrence
     from onegov.core.orm.mixins import ContentMixin
@@ -47,11 +50,6 @@ class EventApiEndpoint(
 ):
     app: 'TownApp'
     endpoint = 'events'
-    filters = {
-            'range', 'start', 'end', 'outdated', 'tags', 'locations',
-            'only_public', 'search_widget', 'event_filter_configuration',
-            'event_filter_fields'
-    }
 
     @property
     def collection(self) -> Any:
@@ -86,4 +84,48 @@ class EventApiEndpoint(
         return {
             'image': item.event.image,
             'pfd': item.event.pdf
+        }
+
+
+class NewsApiEndpoint(
+    ApiEndpoint['News'],
+    ApisMixin
+):
+    app: 'TownApp'
+    endpoint = 'news'
+    filters = set()
+
+    @property
+    def collection(self) -> Any:
+        result = NewsCollection(
+            self.session,
+            page=self.page or 0
+        )
+        result.batch_size = 25
+        return result
+
+    def item_data(self, item: 'News') -> dict[str, Any]:
+        if item.publication_start:
+            publication_start = item.publication_start.isoformat()
+        else:
+            publication_start = None
+
+        if item.publication_end:
+            publication_end = item.publication_end.isoformat()
+        else:
+            publication_end = None
+
+        return {
+            'title': item.title,
+            'lead': item.lead,
+            'text': item.text,
+            'publication_start': publication_start,
+            'publication_end': publication_end,
+            'created': item.created.isoformat(),
+            'modified': get_modified_iso_format(item),
+        }
+
+    def item_links(self, item: 'News') -> dict[str, Any]:
+        return {
+            'image': item.page_image,
         }
