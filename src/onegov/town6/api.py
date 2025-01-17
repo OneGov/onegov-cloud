@@ -1,4 +1,5 @@
 from __future__ import annotations
+
 from functools import cached_property
 from onegov.event.collections import OccurrenceCollection
 from onegov.api import ApiEndpoint
