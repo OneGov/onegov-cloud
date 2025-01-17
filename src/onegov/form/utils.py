@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 import hashlib
 import re
 import wtforms.widgets.core
@@ -28,8 +30,8 @@ def as_internal_id(label: str) -> str:
 
 
 def get_fields_from_class(
-    cls: type['Form']
-) -> list[tuple[str, 'UnboundField[Any]']]:
+    cls: type[Form]
+) -> list[tuple[str, UnboundField[Any]]]:
 
     # often times FormMeta will have already calculated the fields
     # and stored them on the class, so we only need to calculate
@@ -113,7 +115,7 @@ class decimal_range:  # noqa: N801
             other.start, other.stop, other.step
         )
 
-    def __iter__(self) -> 'Self':
+    def __iter__(self) -> Self:
         return self
 
     def __next__(self) -> Decimal:

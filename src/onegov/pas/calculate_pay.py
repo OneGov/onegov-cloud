@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 from decimal import Decimal
 
 
@@ -7,7 +9,7 @@ if TYPE_CHECKING:
 
 
 def calculate_rate(
-    rate_set: 'RateSet',
+    rate_set: RateSet,
     attendence_type: str,
     duration_minutes: int,
     is_president: bool,

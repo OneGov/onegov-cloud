@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 from markupsafe import Markup
 from onegov.core.security import Secret
 from onegov.feriennet import _
@@ -34,7 +36,7 @@ if TYPE_CHECKING:
 
 class FeriennetSettingsForm(Form):
 
-    request: 'FeriennetRequest'
+    request: FeriennetRequest
 
     bank_qr_bill = BooleanField(
         label=_('QR-Bill'),
@@ -288,7 +290,7 @@ class FeriennetSettingsForm(Form):
                    icon='fa-child')
 def custom_handle_settings(
     self: Organisation,
-    request: 'FeriennetRequest',
+    request: FeriennetRequest,
     form: FeriennetSettingsForm
-) -> 'RenderData | Response':
+) -> RenderData | Response:
     return handle_generic_settings(self, request, form, _('Feriennet'))

@@ -35,15 +35,12 @@ python_version = "3.11"
 follow_imports = "silent"
 namespace_packages = true
 explicit_package_bases = true
-warn_unused_ignores = true
-warn_redundant_casts = true
-warn_unused_configs = true
+strict = true
+implicit_reexport = true
 warn_unreachable = true
-disallow_any_generics = true
-disallow_incomplete_defs = true
-disallow_untyped_defs = true
-strict_equality = true
-extra_checks = true
+warn_return_any = false
+# FIXME: remove sqlalchemy when upgrading to SQlAlchemy 2.0
+untyped_calls_exclude = "sqlalchemy,pycurl,onegov.core.types"
 plugins = "sqlmypy"
 mypy_path = "$MYPY_CONFIG_FILE_DIR/src:$MYPY_CONFIG_FILE_DIR/stubs"
 
@@ -72,13 +69,10 @@ exclude_dirs = [
 skips = [
     # ignore asserts
     "B101",
-    # ignore lxml.etree.fromstring (we may want to revisit this in the future)
-    "B320",
     # ignore meta-codes, we are aware of the implications
     "B403",
     "B404",
     "B405",
-    "B410",
 ]
 
 [tool.ruff]
@@ -134,6 +128,7 @@ select = [
     "E",
     "F",
     "FLY002",
+    "I002",
     "ISC",
     "N",
     "PERF",
@@ -176,6 +171,7 @@ ignore = [
     "RUF023",
     "RUF031",
     "RUF052",
+    "RUF056",
     # TODO: We would like to enable SIM102, but it has a ton of
     #       violations, so it's a big job to clean it up
     "SIM102",
@@ -189,7 +185,6 @@ ignore = [
     "UP009",
     "UP012",
     "UP032",
-    "UP037",
     "UP038",
 ]
 unfixable = []
@@ -199,7 +194,7 @@ preview = true
 
 [tool.ruff.lint.extend-per-file-ignores]
 "src/onegov/core/types.py" = ["B018"]
-"reportlab_settings.py" = ["N"]
+"reportlab_settings.py" = ["N", "I002"]
 "*.pyi" = [
     "E501",
     "N",
@@ -220,6 +215,7 @@ preview = true
     "E306",
     "F841",
     "FLY002",
+    "I002",
     "ISC",
     "N",
     "Q",
@@ -231,6 +227,9 @@ preview = true
     "SIM",
     "UP",
 ]
+
+[tool.ruff.lint.isort]
+required-imports = ["from __future__ import annotations"]
 
 [tool.ruff.lint.pep8-naming]
 extend-ignore-names = [

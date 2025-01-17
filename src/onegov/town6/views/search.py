@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 from onegov.core.security import Public
 from onegov.org.models import Search
 from onegov.org.models.search import SearchPostgres
@@ -15,16 +17,16 @@ if TYPE_CHECKING:
 
 @TownApp.html(model=Search, template='search.pt', permission=Public)
 def town_search(
-    self: Search['Base'],
-    request: 'TownRequest'
-) -> 'RenderData | Response':
+    self: Search[Base],
+    request: TownRequest
+) -> RenderData | Response:
     return search(self, request, DefaultLayout(self, request))
 
 
 @TownApp.html(model=SearchPostgres, template='search_postgres.pt',
               permission=Public)
 def town_search_postgres(
-    self: SearchPostgres['Base'],
-    request: 'TownRequest'
-) -> 'RenderData | Response':
+    self: SearchPostgres[Base],
+    request: TownRequest
+) -> RenderData | Response:
     return search_postgres(self, request, DefaultLayout(self, request))

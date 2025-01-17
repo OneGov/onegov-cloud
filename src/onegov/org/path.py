@@ -1,4 +1,6 @@
 """ Contains the paths to the different models served by onegov.org. """
+from __future__ import annotations
+
 from onegov.form.models.definition import SurveyDefinition
 import sedate
 
@@ -207,7 +209,7 @@ def get_news(
 
 @OrgApp.path(model=GeneralFileCollection, path='/files')
 def get_files(
-    request: 'OrgRequest',
+    request: OrgRequest,
     order_by: str = 'name'
 ) -> GeneralFileCollection:
     return GeneralFileCollection(request.session, order_by=order_by)
@@ -219,12 +221,12 @@ def get_images(app: OrgApp) -> ImageFileCollection:
 
 
 @OrgApp.path(model=ExportCollection, path='/exports')
-def get_exports(request: 'OrgRequest', app: OrgApp) -> ExportCollection:
+def get_exports(request: OrgRequest, app: OrgApp) -> ExportCollection:
     return ExportCollection(app)
 
 
 @OrgApp.path(model=Export, path='/export/{id}')
-def get_export(request: 'OrgRequest', app: OrgApp, id: str) -> Export | None:
+def get_export(request: OrgRequest, app: OrgApp, id: str) -> Export | None:
     return ExportCollection(app).by_id(id)
 
 
@@ -283,7 +285,7 @@ def get_complete_form_submission(
     path='/form-registration-window/{id}',
     converters={'id': UUID})
 def get_form_registration_window(
-    request: 'OrgRequest',
+    request: OrgRequest,
     id: UUID
 ) -> FormRegistrationWindow | None:
     return FormCollection(request.session).registration_windows.by_id(id)
@@ -294,7 +296,7 @@ def get_form_registration_window(
     path='/survey-submission-window/{id}',
     converters={'id': UUID})
 def get_survey_submission_window(
-    request: 'OrgRequest',
+    request: OrgRequest,
     id: UUID
 ) -> SurveySubmissionWindow | None:
     return SurveyCollection(request.session).submission_windows.by_id(id)
@@ -302,7 +304,7 @@ def get_survey_submission_window(
 
 @OrgApp.path(model=File, path='/storage/{id}')
 def get_file_for_org(
-    request: 'OrgRequest',
+    request: OrgRequest,
     app: OrgApp,
     id: str
 ) -> File | None:
@@ -424,7 +426,7 @@ def get_ticket(app: OrgApp, handler_code: str, id: UUID) -> Ticket | None:
 def get_tickets(
     app: OrgApp,
     handler: str = 'ALL',
-    state: 'ExtendedTicketState' = 'open',
+    state: ExtendedTicketState = 'open',
     page: int = 0,
     group: str | None = None,
     owner: str | None = None,
@@ -546,7 +548,7 @@ def get_reservation(
 
 
 @OrgApp.path(model=Clipboard, path='/clipboard/copy/{token}')
-def get_clipboard(request: 'OrgRequest', token: str) -> Clipboard | None:
+def get_clipboard(request: OrgRequest, token: str) -> Clipboard | None:
     clipboard = Clipboard(request, token)
 
     # the url is None if the token is invalid
@@ -689,7 +691,7 @@ def get_resource_move(
 )
 def get_occurrences(
     app: OrgApp,
-    request: 'OrgRequest',
+    request: OrgRequest,
     page: int = 0,
     range: DateRange | None = None,
     start: date | None = None,
@@ -736,7 +738,7 @@ def get_event(app: OrgApp, name: str) -> Event | None:
 
 @OrgApp.path(model=Search, path='/search', converters={'page': int})
 def get_search(
-    request: 'OrgRequest',
+    request: OrgRequest,
     q: str = '',
     page: int = 0
 ) -> Search[Any]:
@@ -746,7 +748,7 @@ def get_search(
 @OrgApp.path(model=SearchPostgres, path='/search-postgres',
              converters={'page': int})
 def get_search_postgres(
-    request: 'OrgRequest',
+    request: OrgRequest,
     q: str = '',
     page: int = 0
 ) -> SearchPostgres[Any]:
@@ -754,7 +756,7 @@ def get_search_postgres(
 
 
 @OrgApp.path(model=AtoZPages, path='/a-z')
-def get_a_to_z(request: 'OrgRequest') -> AtoZPages:
+def get_a_to_z(request: OrgRequest) -> AtoZPages:
     return AtoZPages(request)
 
 
@@ -945,7 +947,7 @@ def get_directory(app: OrgApp, name: str) -> Directory | None:
         'upcoming_only': bool
     })
 def get_directory_entries(
-    request: 'OrgRequest',
+    request: OrgRequest,
     app: OrgApp,
     directory_name: str,
     keywords: dict[str, list[str]],
@@ -1035,7 +1037,7 @@ def get_directory_submission_action(
     path='/publications',
     converters={'year': int})
 def get_publication_collection(
-    request: 'OrgRequest',
+    request: OrgRequest,
     year: int | None = None
 ) -> PublicationCollection:
     year = year or sedate.to_timezone(sedate.utcnow(), 'Europe/Zurich').year
@@ -1045,7 +1047,7 @@ def get_publication_collection(
 @OrgApp.path(
     model=Dashboard,
     path='/dashboard')
-def get_dashboard(request: 'OrgRequest') -> Dashboard | None:
+def get_dashboard(request: OrgRequest) -> Dashboard | None:
     dashboard = Dashboard(request)
 
     if dashboard.is_available:
@@ -1055,7 +1057,7 @@ def get_dashboard(request: 'OrgRequest') -> Dashboard | None:
 
 @OrgApp.path(model=ExternalLinkCollection, path='/external-links')
 def get_external_link_collection(
-    request: 'OrgRequest',
+    request: OrgRequest,
     type: str | None = None
 ) -> ExternalLinkCollection:
     return ExternalLinkCollection(request.session, type=type)
@@ -1063,7 +1065,7 @@ def get_external_link_collection(
 
 @OrgApp.path(model=ExternalLink, path='/external-link/{id}',
              converters={'id': UUID})
-def get_external_link(request: 'OrgRequest', id: UUID) -> ExternalLink | None:
+def get_external_link(request: OrgRequest, id: UUID) -> ExternalLink | None:
     return ExternalLinkCollection(request.session).by_id(id)
 
 
@@ -1098,5 +1100,5 @@ def get_qr_code(
 @OrgApp.path(
     model=ApiKey, path='/api_keys/{key}/delete', converters={'key': UUID}
 )
-def get_api_key_for_delete(request: 'OrgRequest', key: UUID) -> ApiKey | None:
+def get_api_key_for_delete(request: OrgRequest, key: UUID) -> ApiKey | None:
     return request.session.query(ApiKey).filter_by(key=key).first()

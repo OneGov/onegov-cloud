@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 from onegov.election_day.models import Ballot
 
 
@@ -9,11 +11,11 @@ if TYPE_CHECKING:
 
 class BallotCollection:
 
-    def __init__(self, session: 'Session'):
+    def __init__(self, session: Session):
         self.session = session
 
-    def query(self) -> 'Query[Ballot]':
+    def query(self) -> Query[Ballot]:
         return self.session.query(Ballot)
 
-    def by_id(self, id: 'UUID') -> Ballot | None:
+    def by_id(self, id: UUID) -> Ballot | None:
         return self.query().filter(Ballot.id == id).first()

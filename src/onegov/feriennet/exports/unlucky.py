@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 from onegov.activity import AttendeeCollection, Attendee, Booking
 from onegov.core.security import Secret
 from onegov.feriennet import FeriennetApp, _
@@ -27,17 +29,17 @@ class UnluckyExport(FeriennetExport):
     def run(
         self,
         form: PeriodSelectForm,  # type:ignore[override]
-        session: 'Session'
-    ) -> 'Iterator[Iterator[tuple[str, Any]]]':
+        session: Session
+    ) -> Iterator[Iterator[tuple[str, Any]]]:
 
         assert form.selected_period is not None
         return self.rows(session, form.selected_period)
 
     def query(
         self,
-        session: 'Session',
-        period: 'Period | PeriodMeta'
-    ) -> 'Query[Attendee]':
+        session: Session,
+        period: Period | PeriodMeta
+    ) -> Query[Attendee]:
 
         with_any_bookings = session.query(Booking.attendee_id).filter(
             Booking.period_id == period.id).subquery()
@@ -54,13 +56,13 @@ class UnluckyExport(FeriennetExport):
 
     def rows(
         self,
-        session: 'Session',
-        period: 'Period | PeriodMeta'
-    ) -> 'Iterator[Iterator[tuple[str, Any]]]':
+        session: Session,
+        period: Period | PeriodMeta
+    ) -> Iterator[Iterator[tuple[str, Any]]]:
 
         for user in self.query(session, period):
             yield ((k, v) for k, v in self.fields(user))
 
-    def fields(self, attendee: Attendee) -> 'Iterator[tuple[str, Any]]':
+    def fields(self, attendee: Attendee) -> Iterator[tuple[str, Any]]:
         yield from self.attendee_fields(attendee)
         yield from self.user_fields(attendee.user)

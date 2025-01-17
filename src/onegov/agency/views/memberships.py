@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 from morepath import redirect
 from morepath.request import Response
 from onegov.agency import _
@@ -23,7 +25,7 @@ if TYPE_CHECKING:
 
 def get_membership_form_class(
     model: ExtendedAgencyMembership,
-    request: 'AgencyRequest'
+    request: AgencyRequest
 ) -> type[MembershipForm]:
     return model.with_content_extensions(MembershipForm, request)
 
@@ -35,8 +37,8 @@ def get_membership_form_class(
 )
 def view_membership(
     self: AgencyMembership,
-    request: 'AgencyRequest'
-) -> 'RenderData':
+    request: AgencyRequest
+) -> RenderData:
 
     return {
         'title': self.title,
@@ -54,9 +56,9 @@ def view_membership(
 )
 def edit_membership(
     self: ExtendedAgencyMembership,
-    request: 'AgencyRequest',
+    request: AgencyRequest,
     form: MembershipForm
-) -> 'RenderData | BaseResponse':
+) -> RenderData | BaseResponse:
 
     if form.submitted(request):
         form.populate_obj(self)
@@ -83,7 +85,7 @@ def edit_membership(
 )
 def delete_membership(
     self: AgencyMembership,
-    request: 'AgencyRequest'
+    request: AgencyRequest
 ) -> None:
 
     request.assert_valid_csrf_token()
@@ -97,7 +99,7 @@ def delete_membership(
 )
 def move_membership_within_agency(
     self: AgencyMembershipMoveWithinAgency,
-    request: 'AgencyRequest'
+    request: AgencyRequest
 ) -> None:
     request.assert_valid_csrf_token()
     self.execute()
@@ -110,7 +112,7 @@ def move_membership_within_agency(
 )
 def move_membership_within_person(
     self: AgencyMembershipMoveWithinPerson,
-    request: 'AgencyRequest'
+    request: AgencyRequest
 ) -> None:
     request.assert_valid_csrf_token()
     self.execute()
@@ -123,7 +125,7 @@ def move_membership_within_person(
 )
 def vcard_export_membership(
     self: AgencyMembership,
-    request: 'AgencyRequest'
+    request: AgencyRequest
 ) -> Response:
     """ Returns the memberships vCard. """
 

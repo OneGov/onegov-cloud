@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 from functools import cached_property
 from onegov.core import utils
 from onegov.gis import Coordinates
@@ -46,16 +48,16 @@ class TranslatorDirectoryApp(TownApp):
         )
 
     @property
-    def coordinates(self) -> 'AnyCoordinates':
+    def coordinates(self) -> AnyCoordinates:
         return self.org.meta.get('translator_directory_home') or Coordinates()
 
     @coordinates.setter
-    def coordinates(self, value: 'AnyCoordinates') -> None:
+    def coordinates(self, value: AnyCoordinates) -> None:
         self.org.meta['translator_directory_home'] = value or {}
 
     def redirect_after_login(
         self,
-        identity: 'Identity | NoIdentity',
+        identity: Identity | NoIdentity,
         request: TranslatorAppRequest,  # type:ignore[override]
         default: str
     ) -> str | None:
@@ -107,7 +109,7 @@ def get_theme() -> TranslatorDirectoryTheme:
 
 @TranslatorDirectoryApp.setting(section='org', name='create_new_organisation')
 def get_create_new_organisation_factory(
-) -> 'Callable[[TranslatorDirectoryApp, str], Organisation]':
+) -> Callable[[TranslatorDirectoryApp, str], Organisation]:
     return create_new_organisation
 
 
@@ -128,6 +130,6 @@ def get_webasset_output() -> str:
 
 
 @TranslatorDirectoryApp.webasset('common')
-def get_common_asset() -> 'Iterator[str]':
+def get_common_asset() -> Iterator[str]:
     yield from default_common_asset()
     yield 'translator_directory.js'

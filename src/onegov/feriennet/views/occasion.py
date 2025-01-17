@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 from datetime import date
 from markupsafe import Markup
 from onegov.activity import AttendeeCollection
@@ -30,7 +32,7 @@ if TYPE_CHECKING:
     model=Occasion,
     permission=Public,
 )
-def view_occasion(self: Occasion, request: 'FeriennetRequest') -> 'Response':
+def view_occasion(self: Occasion, request: FeriennetRequest) -> Response:
     return request.redirect(request.link(self.activity))
 
 
@@ -42,9 +44,9 @@ def view_occasion(self: Occasion, request: 'FeriennetRequest') -> 'Response':
     name='new-occasion')
 def new_occasion(
     self: VacationActivity,
-    request: 'FeriennetRequest',
+    request: FeriennetRequest,
     form: OccasionForm
-) -> 'RenderData | Response':
+) -> RenderData | Response:
 
     if form.submitted(request):
         occasions = OccasionCollection(request.session)
@@ -81,9 +83,9 @@ def new_occasion(
     name='clone')
 def clone_occasion(
     self: Occasion,
-    request: 'FeriennetRequest',
+    request: FeriennetRequest,
     form: OccasionForm
-) -> 'RenderData | Response':
+) -> RenderData | Response:
 
     if form.submitted(request):
         occasions = OccasionCollection(request.session)
@@ -121,9 +123,9 @@ def clone_occasion(
     name='edit')
 def edit_occasion(
     self: Occasion,
-    request: 'FeriennetRequest',
+    request: FeriennetRequest,
     form: OccasionForm
-) -> 'RenderData | Response':
+) -> RenderData | Response:
 
     if self.period.confirmed:
         warning = _(
@@ -156,7 +158,7 @@ def edit_occasion(
     model=Occasion,
     permission=Private,
     request_method='DELETE')
-def delete_occasion(self: Occasion, request: 'FeriennetRequest') -> None:
+def delete_occasion(self: Occasion, request: FeriennetRequest) -> None:
     request.assert_valid_csrf_token()
 
     OccasionCollection(request.session).delete(self)
@@ -167,7 +169,7 @@ def delete_occasion(self: Occasion, request: 'FeriennetRequest') -> None:
     permission=Private,
     request_method='POST',
     name='cancel')
-def cancel_occasion(self: Occasion, request: 'FeriennetRequest') -> None:
+def cancel_occasion(self: Occasion, request: FeriennetRequest) -> None:
     request.assert_valid_csrf_token()
 
     self.cancel()
@@ -178,7 +180,7 @@ def cancel_occasion(self: Occasion, request: 'FeriennetRequest') -> None:
     permission=Private,
     request_method='POST',
     name='reinstate')
-def reinstate_occasion(self: Occasion, request: 'FeriennetRequest') -> None:
+def reinstate_occasion(self: Occasion, request: FeriennetRequest) -> None:
     request.assert_valid_csrf_token()
 
     self.cancelled = False
@@ -192,9 +194,9 @@ def reinstate_occasion(self: Occasion, request: 'FeriennetRequest') -> None:
     template='enroll_form.pt')
 def book_occasion(
     self: Occasion,
-    request: 'FeriennetRequest',
+    request: FeriennetRequest,
     form: AttendeeSignupForm
-) -> 'RenderData | Response':
+) -> RenderData | Response:
 
     # for the "nth. occasion" title
     number: int = request.session.execute("""
@@ -382,9 +384,9 @@ def book_occasion(
     name='add-need')
 def handle_new_occasion_need(
     self: Occasion,
-    request: 'FeriennetRequest',
+    request: FeriennetRequest,
     form: OccasionNeedForm
-) -> 'RenderData | Response':
+) -> RenderData | Response:
 
     if form.submitted(request):
         assert form.name.data is not None
@@ -415,9 +417,9 @@ def handle_new_occasion_need(
     name='edit')
 def handle_occasion_need(
     self: OccasionNeed,
-    request: 'FeriennetRequest',
+    request: FeriennetRequest,
     form: OccasionNeedForm
-) -> 'RenderData | Response':
+) -> RenderData | Response:
 
     if form.submitted(request):
         form.populate_obj(self)
@@ -446,7 +448,7 @@ def handle_occasion_need(
     request_method='DELETE')
 def delete_occasion_need(
     self: OccasionNeed,
-    request: 'FeriennetRequest'
+    request: FeriennetRequest
 ) -> None:
 
     request.assert_valid_csrf_token()

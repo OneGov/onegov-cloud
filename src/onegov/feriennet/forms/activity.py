@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 from onegov.core.utils import normalize_for_url
 from onegov.feriennet import _
 from onegov.form import Form
@@ -57,7 +59,7 @@ TAGS = tuple((tag, tag) for tag in (
 
 class VacationActivityForm(Form):
 
-    request: 'FeriennetRequest'
+    request: FeriennetRequest
 
     title = StringField(
         label=_('Title'),
@@ -90,7 +92,7 @@ class VacationActivityForm(Form):
     )
 
     @property
-    def username_choices(self) -> list['_Choice']:
+    def username_choices(self) -> list[_Choice]:
         assert self.request.is_admin  # safety net
 
         users = (
@@ -99,10 +101,10 @@ class VacationActivityForm(Form):
             .with_entities(User.username, User.title)
         )
 
-        def choice(row: tuple[str, str]) -> '_Choice':
+        def choice(row: tuple[str, str]) -> _Choice:
             return row[0], row[1]
 
-        def by_title(choice: '_Choice') -> str:
+        def by_title(choice: _Choice) -> str:
             return normalize_for_url(choice[1])
 
         return sorted((choice(r) for r in users), key=by_title)

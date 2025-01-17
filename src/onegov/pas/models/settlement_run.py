@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 from onegov.core.orm import Base
 from onegov.core.orm.mixins import content_property
 from onegov.core.orm.mixins import ContentMixin
@@ -33,41 +35,41 @@ class SettlementRun(Base, ContentMixin, TimestampMixin, ORMSearchable):
         return self.name
 
     #: Internal ID
-    id: 'Column[uuid.UUID]' = Column(
+    id: Column[uuid.UUID] = Column(
         UUID,  # type:ignore[arg-type]
         primary_key=True,
         default=uuid4
     )
 
     #: the name
-    name: 'Column[str]' = Column(
+    name: Column[str] = Column(
         Text,
         nullable=False
     )
 
     #: The start date
-    start: 'Column[date]' = Column(
+    start: Column[date] = Column(
         Date,
         nullable=False
     )
 
     #: The end date
-    end: 'Column[date]' = Column(
+    end: Column[date] = Column(
         Date,
         nullable=False
     )
 
     #: The end date
-    active: 'Column[bool]' = Column(
+    active: Column[bool] = Column(
         Boolean,
         nullable=False
     )
 
     #: The description
-    description: 'dict_property[str | None]' = content_property()
+    description: dict_property[str | None] = content_property()
 
     @classmethod
-    def get_run_number_for_year(cls, session: 'Session', year: int) -> int:
+    def get_run_number_for_year(cls, session: Session, year: int) -> int:
         """
         Computes the run number for a given year.
 

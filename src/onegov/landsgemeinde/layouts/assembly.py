@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 from functools import cached_property
 from onegov.core.elements import Confirm
 from onegov.core.elements import Intercooler
@@ -19,7 +21,7 @@ class AssemblyCollectionLayout(DefaultLayout):
 
     @cached_property
     def title(self) -> str:
-        return _('Assemblies')
+        return _('Archive')
 
     @cached_property
     def og_description(self) -> str:
@@ -74,7 +76,7 @@ class AssemblyLayout(DefaultLayout):
         return [
             Link(_('Homepage'), self.homepage_url),
             Link(
-                _('Assemblies'),
+                _('Archive'),
                 self.request.link(self.assembly_collection())
             ),
             Link(self.title, self.request.link(self.model))
@@ -137,12 +139,12 @@ class AssemblyLayout(DefaultLayout):
 
 class AssemblyTickerLayout(DefaultLayout):
 
-    model: 'Assembly'
+    model: Assembly
 
     def __init__(
         self,
-        model: 'Assembly',
-        request: 'LandsgemeindeRequest'
+        model: Assembly,
+        request: LandsgemeindeRequest
     ) -> None:
 
         super().__init__(model, request)

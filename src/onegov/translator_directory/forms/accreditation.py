@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 from datetime import date
 
 from depot.io.utils import FileIntent
@@ -54,7 +56,7 @@ if TYPE_CHECKING:
 
 class RequestAccreditationForm(Form, DrivingDistanceMixin):
 
-    request: 'TranslatorAppRequest'
+    request: TranslatorAppRequest
 
     callout = _(
         'Make sure you have all information and scans of the required '
@@ -524,14 +526,14 @@ class RequestAccreditationForm(Form, DrivingDistanceMixin):
             )
 
     @cached_property
-    def gender_choices(self) -> list['_Choice']:
+    def gender_choices(self) -> list[_Choice]:
         return [
             (id_, self.request.translate(choice))
             for id_, choice in GENDERS.items()
         ]
 
     @cached_property
-    def language_choices(self) -> list['_Choice']:
+    def language_choices(self) -> list[_Choice]:
         languages = LanguageCollection(self.request.session)
         return [
             (str(language.id), language.name)
@@ -539,21 +541,21 @@ class RequestAccreditationForm(Form, DrivingDistanceMixin):
         ]
 
     @cached_property
-    def expertise_professional_guilds_choices(self) -> list['_Choice']:
+    def expertise_professional_guilds_choices(self) -> list[_Choice]:
         return [
             (id_, self.request.translate(choice))
             for id_, choice in PROFESSIONAL_GUILDS.items()
         ]
 
     @cached_property
-    def expertise_interpreting_types_choices(self) -> list['_Choice']:
+    def expertise_interpreting_types_choices(self) -> list[_Choice]:
         return [
             (id_, self.request.translate(choice))
             for id_, choice in INTERPRETING_TYPES.items()
         ]
 
     @property
-    def mother_tongues(self) -> list['Language']:
+    def mother_tongues(self) -> list[Language]:
         if not self.mother_tongues_ids.data:
             return []
 
@@ -561,7 +563,7 @@ class RequestAccreditationForm(Form, DrivingDistanceMixin):
         return languages.by_ids(self.mother_tongues_ids.data)
 
     @property
-    def spoken_languages(self) -> list['Language']:
+    def spoken_languages(self) -> list[Language]:
         if not self.spoken_languages_ids.data:
             return []
 
@@ -569,7 +571,7 @@ class RequestAccreditationForm(Form, DrivingDistanceMixin):
         return languages.by_ids(self.spoken_languages_ids.data)
 
     @property
-    def written_languages(self) -> list['Language']:
+    def written_languages(self) -> list[Language]:
         if not self.written_languages_ids.data:
             return []
 
@@ -577,7 +579,7 @@ class RequestAccreditationForm(Form, DrivingDistanceMixin):
         return languages.by_ids(self.written_languages_ids.data)
 
     @property
-    def monitoring_languages(self) -> list['Language']:
+    def monitoring_languages(self) -> list[Language]:
         if not self.monitoring_languages_ids.data:
             return []
 

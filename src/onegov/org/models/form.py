@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 from onegov.form.models import FormDefinition
 from onegov.org.models.extensions import AccessExtension
 from onegov.org.models.extensions import ContactExtension
@@ -48,10 +50,10 @@ class CustomFormDefinition(FormDefinition, AccessExtension,
 
 
 def submission_deletable(
-    submission: 'FormSubmission',
-    session: 'Session',
+    submission: FormSubmission,
+    session: Session,
     payment_blocks: bool = True
-) -> 'Ticket | bool':
+) -> Ticket | bool:
     """ CustomFormDefinition's are normally linked to a ticket.
 
     Submissions without registration window do not require a decision. The

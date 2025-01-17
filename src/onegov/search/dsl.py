@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 from elasticsearch_dsl import Search as BaseSearch  # type:ignore
 from elasticsearch_dsl.response import Hit as BaseHit  # type:ignore
 from elasticsearch_dsl.response import Response as BaseResponse
@@ -17,7 +19,7 @@ def type_from_hit(hit: BaseHit) -> str:
     return hit.meta.index.split('-')[-2]
 
 
-class Search(BaseSearch):
+class Search(BaseSearch):  # type:ignore[misc]
     """ Extends elastichsearch_dsl's search object with ORM integration.
 
     Works exactly the same as the original, but the results it returns offer
@@ -26,8 +28,8 @@ class Search(BaseSearch):
 
     """
 
-    session: 'Session | None'
-    mappings: 'TypeMappingRegistry'
+    session: Session | None
+    mappings: TypeMappingRegistry
 
     def __init__(self, *args: Any, **kwargs: Any) -> None:
 
@@ -45,14 +47,14 @@ class Search(BaseSearch):
     def explain(self) -> bool:
         return self._extra.get('explain', False)
 
-    def _clone(self) -> 'Self':
+    def _clone(self) -> Self:
         search = super()._clone()
         search.session = self.session
         search.mappings = self.mappings
 
         return search
 
-    def _get_result(self, *args: Any, **kwargs: Any) -> 'BoundHit':
+    def _get_result(self, *args: Any, **kwargs: Any) -> BoundHit:
         result = super()._get_result(*args, **kwargs)
         result.__class__ = Hit.bind(
             session=self.session,
@@ -62,7 +64,7 @@ class Search(BaseSearch):
         return result
 
 
-class Response(BaseResponse):
+class Response(BaseResponse):  # type:ignore[misc]
     """ Extends the default response (list of results) with additional
     methods to query the SQLAlchemy models behind the results.
 
@@ -71,10 +73,10 @@ class Response(BaseResponse):
     @classmethod
     def bind(
         cls,
-        session: 'Session | None',
-        mappings: 'TypeMappingRegistry | None',
+        session: Session | None,
+        mappings: TypeMappingRegistry | None,
         explain: bool
-    ) -> type['BoundResponse']:
+    ) -> type[BoundResponse]:
 
         class BoundResponse(cls):  # type:ignore[valid-type,misc]
             pass
@@ -85,12 +87,12 @@ class Response(BaseResponse):
 
         return BoundResponse
 
-    def hits_by_type(self, type: str) -> 'Iterator[BaseHit]':
+    def hits_by_type(self, type: str) -> Iterator[BaseHit]:
         for hit in self.hits:
             if type_from_hit(hit) == type:
                 yield hit
 
-    def query(self, type: str) -> 'Query[Any] | None':
+    def query(self, type: str) -> Query[Any] | None:
         """ Returns an SQLAlchemy query for the given type. You must provide
         a type, because a query can't consist of multiple unrelated tables.
 
@@ -182,7 +184,7 @@ def explanation_value(explanation: Any, text: str) -> dict[str, Any] | None:
     return None
 
 
-class Hit(BaseHit):
+class Hit(BaseHit):  # type:ignore[misc]
     """ Extends a single result with additional methods to query the SQLAlchemy
     models behind the results.
 
@@ -191,9 +193,9 @@ class Hit(BaseHit):
     @classmethod
     def bind(
         cls,
-        model: type['Searchable'] | None,
-        session: 'Session | None'
-    ) -> type['BoundHit']:
+        model: type[Searchable] | None,
+        session: Session | None
+    ) -> type[BoundHit]:
 
         class BoundHit(cls):  # type:ignore[valid-type,misc]
             pass
@@ -203,7 +205,7 @@ class Hit(BaseHit):
 
         return BoundHit
 
-    def query(self) -> 'Query[Any]':
+    def query(self) -> Query[Any]:
         """ Returns the SQLAlchemy query for this result. """
         query = self.session.query(self.model)
         model_id = getattr(self.model, self.model.es_id)

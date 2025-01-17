@@ -1,4 +1,5 @@
 """ Provides commands related to the onegov.search. """
+from __future__ import annotations
 
 import click
 
@@ -18,7 +19,7 @@ if TYPE_CHECKING:
 cli = command_group()
 
 
-def psql_index_status(app: 'Framework') -> None:
+def psql_index_status(app: Framework) -> None:
     """ Prints the percentage of indexed documents per model. """
 
     success = 1  # 1 = OK, 2 = WARNING, 3 = ERROR
@@ -70,12 +71,12 @@ def psql_index_status(app: 'Framework') -> None:
 @click.option('--fail', is_flag=True, default=False, help='Fail on errors')
 @pass_group_context
 def reindex(
-    group_context: 'GroupContext',
+    group_context: GroupContext,
     fail: bool
-) -> 'Callable[[CoreRequest, Framework], None]':
+) -> Callable[[CoreRequest, Framework], None]:
     """ Reindexes all objects in the elasticsearch and psql database. """
 
-    def run_reindex(request: 'CoreRequest', app: 'Framework') -> None:
+    def run_reindex(request: CoreRequest, app: Framework) -> None:
         if not hasattr(request.app, 'es_client'):
             return
 
@@ -93,11 +94,11 @@ def reindex(
 @cli.command(context_settings={'default_selector': '*'})
 @pass_group_context
 def index_status(
-    group_context: 'GroupContext'
-) -> 'Callable[[CoreRequest, Framework], None]':
+    group_context: GroupContext
+) -> Callable[[CoreRequest, Framework], None]:
     """ Prints the status of the psql index. """
 
-    def run_index_status(request: 'CoreRequest', app: 'Framework') -> None:
+    def run_index_status(request: CoreRequest, app: Framework) -> None:
         if not hasattr(request.app, 'es_client'):
             return
 

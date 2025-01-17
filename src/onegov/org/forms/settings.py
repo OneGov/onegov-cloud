@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 import datetime
 import json
 import re
@@ -9,7 +11,7 @@ from lxml import etree
 from onegov.core.widgets import transform_structure
 from onegov.core.widgets import XML_LINE_OFFSET
 from onegov.form import Form
-from onegov.form.fields import ChosenSelectField
+from onegov.form.fields import ChosenSelectField, URLPanelField
 from onegov.form.fields import ColorField
 from onegov.form.fields import CssField
 from onegov.form.fields import MarkupField
@@ -142,19 +144,19 @@ class GeneralSettingsForm(Form):
             'font-family-sans-serif') or self.default_font_family
 
     @cached_property
-    def theme(self) -> 'OrgTheme':
+    def theme(self) -> OrgTheme:
         return self.request.app.settings.core.theme
 
     @property
     def default_font_family(self) -> str | None:
         return self.theme.default_options.get('font-family-sans-serif')
 
-    def populate_obj(self, model: 'Organisation') -> None:  # type:ignore
+    def populate_obj(self, model: Organisation) -> None:  # type:ignore
         super().populate_obj(model)
         model.theme_options = self.theme_options
         model.custom_css = self.custom_css.data or ''
 
-    def process_obj(self, model: 'Organisation') -> None:  # type:ignore
+    def process_obj(self, model: Organisation) -> None:  # type:ignore
         super().process_obj(model)
         self.theme_options = model.theme_options or {}
         self.custom_css.data = model.custom_css or ''
@@ -168,7 +170,7 @@ class GeneralSettingsForm(Form):
         self.populate_font_families()
 
         @self.request.after
-        def clear_locale(response: 'Response') -> None:
+        def clear_locale(response: Response) -> None:
             response.delete_cookie('locale')
 
 
@@ -581,11 +583,11 @@ class HeaderSettingsForm(Form):
             super().__init__(*args, **kwargs)
             self.link_errors = {}
 
-    def populate_obj(self, model: 'Organisation') -> None:  # type:ignore
+    def populate_obj(self, model: Organisation) -> None:  # type:ignore
         super().populate_obj(model)
         model.header_options = self.header_options
 
-    def process_obj(self, model: 'Organisation') -> None:  # type:ignore
+    def process_obj(self, model: Organisation) -> None:  # type:ignore
         super().process_obj(model)
         self.header_options = model.header_options or {}
 
@@ -615,7 +617,7 @@ class HeaderSettingsForm(Form):
 
     def links_to_json(
         self,
-        header_links: 'Sequence[tuple[str | None, str | None]] | None' = None
+        header_links: Sequence[tuple[str | None, str | None]] | None = None
     ) -> str:
         header_links = header_links or []
 
@@ -776,6 +778,36 @@ class AnalyticsSettingsForm(Form):
         label=_('Analytics Code'),
         description=_('JavaScript for web statistics support'),
         render_kw={'rows': 10, 'data-editor': 'html'})
+
+    # Points the user to the analytics url e.g. matomo or plausible
+    analytics_url = URLPanelField(
+        label=_('Analytics URL'),
+        description=_('URL pointing to the analytics page'),
+        render_kw={'readonly': True},
+        validators=[UrlRequired(), Optional()],
+        text='',
+        kind='panel',
+        hide_label=False
+    )
+
+    def derive_analytics_url(self) -> str:
+        analytics_code = self.analytics_code.data or ''
+
+        if 'analytics.seantis.ch' in analytics_code:
+            data_domain = analytics_code.split(
+                'data-domain="', 1)[1].split('"', 1)[0]
+            return f'https://analytics.seantis.ch/{data_domain}'
+        elif 'matomo' in analytics_code:
+            return 'https://stats.seantis.ch'
+        else:
+            return ''
+
+    def populate_obj(self, model: Organisation) -> None:  # type:ignore
+        super().populate_obj(model)
+
+    def process_obj(self, model: Organisation) -> None:  # type:ignore
+        super().process_obj(model)
+        self.analytics_url.text = self.derive_analytics_url()
 
 
 class HolidaySettingsForm(Form):
@@ -953,10 +985,10 @@ class HolidaySettingsForm(Form):
         self.school_holidays.data = '\n'.join(
             format_school(d) for d in data.get('school', ()))
 
-    def populate_obj(self, model: 'Organisation') -> None:  # type:ignore
+    def populate_obj(self, model: Organisation) -> None:  # type:ignore
         model.holiday_settings = self.holiday_settings
 
-    def process_obj(self, model: 'Organisation') -> None:  # type:ignore
+    def process_obj(self, model: Organisation) -> None:  # type:ignore
         self.holiday_settings = model.holiday_settings
 
 
@@ -1183,14 +1215,14 @@ class NewsletterSettingsForm(Form):
 
         return None
 
-    def populate_obj(self, model: 'Organisation') -> None:  # type:ignore
+    def populate_obj(self, model: Organisation) -> None:  # type:ignore
         super().populate_obj(model)
 
         yaml_data = self.newsletter_categories.data
         data = yaml.safe_load(yaml_data) if yaml_data else {}
         model.newsletter_categories = data
 
-    def process_obj(self, model: 'Organisation') -> None:  # type:ignore
+    def process_obj(self, model: Organisation) -> None:  # type:ignore
         super().process_obj(model)
 
         categories = model.newsletter_categories or {}
@@ -1244,7 +1276,7 @@ class LinkHealthCheckForm(Form):
     )
 
 
-def validate_https(form: Form, field: 'Field') -> None:
+def validate_https(form: Form, field: Field) -> None:
     if not field.data.startswith('https'):
         raise ValidationError(_("Link must start with 'https'"))
 
@@ -1272,7 +1304,7 @@ class GeverSettingsForm(Form):
         description=_('Website address including https://'),
     )
 
-    def populate_obj(self, model: 'Organisation') -> None:  # type:ignore
+    def populate_obj(self, model: Organisation) -> None:  # type:ignore
         super().populate_obj(model)
         key_base64 = self.request.app.hashed_identity_key
         try:
@@ -1285,7 +1317,7 @@ class GeverSettingsForm(Form):
             model.gever_username = ''
             model.gever_password = ''  # nosec: B105
 
-    def process_obj(self, model: 'Organisation') -> None:  # type:ignore
+    def process_obj(self, model: Organisation) -> None:  # type:ignore
         super().process_obj(model)
 
         self.gever_username.data = model.gever_username or ''

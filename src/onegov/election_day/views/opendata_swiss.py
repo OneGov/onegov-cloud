@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 from babel.dates import format_date
 from io import BytesIO
 from onegov.core.security import Public
@@ -40,7 +42,7 @@ def sub(
     name='catalog.rdf',
     permission=Public
 )
-def view_rdf(self: Principal, request: 'ElectionDayRequest') -> bytes:
+def view_rdf(self: Principal, request: ElectionDayRequest) -> bytes:
 
     """ Returns an XML / RDF / DCAT-AP for Switzerland format for
     opendata.swiss.
@@ -58,7 +60,7 @@ def view_rdf(self: Principal, request: 'ElectionDayRequest') -> bytes:
         raise HTTPNotImplemented()
 
     @request.after
-    def set_headers(response: 'Response') -> None:
+    def set_headers(response: Response) -> None:
         response.headers['Content-Type'] = 'application/rdf+xml; charset=UTF-8'
 
     layout = DefaultLayout(self, request)
@@ -89,7 +91,7 @@ def view_rdf(self: Principal, request: 'ElectionDayRequest') -> bytes:
 
     translations = request.app.translations
 
-    def translate(text: 'TranslationString', locale: str) -> str:
+    def translate(text: TranslationString, locale: str) -> str:
         translator = translations.get(locale)
         if translator:
             return text.interpolate(translator.gettext(text))

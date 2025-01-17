@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 from collections import defaultdict
 from copy import copy
 from onegov.core.crypto import random_password
@@ -35,10 +37,10 @@ if TYPE_CHECKING:
              permission=Secret)
 def view_usermanagement(
     self: UserCollection,
-    request: 'OrgRequest',
+    request: OrgRequest,
     layout: UserManagementLayout | None = None,
-    roles: 'Mapping[str, str] | None' = None
-) -> 'RenderData':
+    roles: Mapping[str, str] | None = None
+) -> RenderData:
     """ Allows the management of organisation users. """
 
     layout = layout or UserManagementLayout(self, request)
@@ -115,10 +117,10 @@ def view_usermanagement(
 )
 def handle_create_signup_link(
     self: UserCollection,
-    request: 'OrgRequest',
+    request: OrgRequest,
     form: SignupLinkForm,
     layout: UserManagementLayout | None = None
-) -> 'RenderData':
+) -> RenderData:
 
     link = None
 
@@ -143,9 +145,9 @@ def handle_create_signup_link(
 @OrgApp.html(model=User, template='user.pt', permission=Secret)
 def view_user(
     self: User,
-    request: 'OrgRequest',
+    request: OrgRequest,
     layout: UserLayout | None = None
-) -> 'RenderData':
+) -> RenderData:
     """ Shows all objects owned by the given user. """
 
     layout = layout or UserLayout(self, request)
@@ -163,7 +165,7 @@ def view_user(
 
 
 @OrgApp.userlinks()
-def ticket_links(request: 'OrgRequest', user: User) -> LinkGroup:
+def ticket_links(request: OrgRequest, user: User) -> LinkGroup:
     tickets = TicketCollection(request.session).query()
     tickets = tickets.filter_by(user_id=user.id)
     tickets = tickets.order_by(Ticket.number)
@@ -188,23 +190,23 @@ def ticket_links(request: 'OrgRequest', user: User) -> LinkGroup:
 @overload
 def get_manage_user_form(
     self: User,
-    request: 'OrgRequest'
+    request: OrgRequest
 ) -> type[ManageUserForm]: ...
 
 
 @overload
 def get_manage_user_form(
     self: User,
-    request: 'OrgRequest',
-    base: type['FormT']
-) -> type['FormT']: ...
+    request: OrgRequest,
+    base: type[FormT]
+) -> type[FormT]: ...
 
 
 def get_manage_user_form(
     self: User,
-    request: 'OrgRequest',
-    base: type['Form'] = ManageUserForm
-) -> type['Form']:
+    request: OrgRequest,
+    base: type[Form] = ManageUserForm
+) -> type[Form]:
 
     userprofile_form = query_form_class(request, self, name='userprofile')
     assert userprofile_form
@@ -213,7 +215,7 @@ def get_manage_user_form(
 
         hooked = False
 
-        def submitted(self, request: 'OrgRequest') -> bool:
+        def submitted(self, request: OrgRequest) -> bool:
             # fields only present on the userprofile_form are made optional
             # to make sure that we can always change the active/inactive state
             # of the user and the role the user has
@@ -240,10 +242,10 @@ def get_manage_user_form(
              permission=Secret, name='edit')
 def handle_manage_user(
     self: User,
-    request: 'OrgRequest',
+    request: OrgRequest,
     form: ManageUserForm,
     layout: UserManagementLayout | None = None
-) -> 'RenderData | Response':
+) -> RenderData | Response:
 
     if self.source:
         raise HTTPForbidden()
@@ -280,10 +282,10 @@ def handle_manage_user(
              form=NewUserForm, name='new', permission=Secret)
 def handle_new_user(
     self: UserCollection,
-    request: 'OrgRequest',
+    request: OrgRequest,
     form: NewUserForm,
     layout: UserManagementLayout | None = None
-) -> 'RenderData':
+) -> RenderData:
 
     if not request.app.enable_yubikey:
         form.delete_field('yubikey')

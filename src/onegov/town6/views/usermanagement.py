@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 from onegov.core.security import Secret
 
 from onegov.org.views.usermanagement import (
@@ -26,9 +28,9 @@ if TYPE_CHECKING:
 )
 def town_view_usermanagement(
     self: UserCollection,
-    request: 'TownRequest',
-    roles: 'Mapping[str, str] | None' = None
-) -> 'RenderData':
+    request: TownRequest,
+    roles: Mapping[str, str] | None = None
+) -> RenderData:
     return view_usermanagement(
         self, request, UserManagementLayout(self, request), roles=roles)
 
@@ -42,15 +44,15 @@ def town_view_usermanagement(
 )
 def town_handle_create_signup_link(
     self: UserCollection,
-    request: 'TownRequest',
+    request: TownRequest,
     form: SignupLinkForm
-) -> 'RenderData | Response':
+) -> RenderData | Response:
     return handle_create_signup_link(
         self, request, form, UserManagementLayout(self, request))
 
 
 @TownApp.html(model=User, template='user.pt', permission=Secret)
-def town_view_user(self: User, request: 'TownRequest') -> 'RenderData':
+def town_view_user(self: User, request: TownRequest) -> RenderData:
     return view_user(self, request, UserLayout(self, request))
 
 
@@ -63,9 +65,9 @@ def town_view_user(self: User, request: 'TownRequest') -> 'RenderData':
 )
 def town_handle_manage_user(
     self: User,
-    request: 'TownRequest',
-    form: 'ManageUserForm'
-) -> 'RenderData | Response':
+    request: TownRequest,
+    form: ManageUserForm
+) -> RenderData | Response:
     return handle_manage_user(
         self, request, form, UserManagementLayout(self, request))
 
@@ -79,8 +81,8 @@ def town_handle_manage_user(
 )
 def town_handle_new_user(
     self: UserCollection,
-    request: 'TownRequest',
+    request: TownRequest,
     form: NewUserForm
-) -> 'RenderData':
+) -> RenderData:
     return handle_new_user(
         self, request, form, UserManagementLayout(self, request))

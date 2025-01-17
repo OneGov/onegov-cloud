@@ -2,6 +2,8 @@
 upgraded on the server. See :class:`onegov.core.upgrade.upgrade_task`.
 
 """
+from __future__ import annotations
+
 from sqlalchemy import Column
 from sqlalchemy.dialects.postgresql import TSVECTOR, JSONB
 

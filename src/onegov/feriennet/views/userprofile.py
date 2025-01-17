@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 from onegov.core.security import Personal
 from onegov.feriennet import FeriennetApp
 from onegov.feriennet.forms import UserProfileForm
@@ -17,7 +19,7 @@ if TYPE_CHECKING:
     permission=Personal, form=UserProfileForm)
 def handle_custom_user_profile(
     self: Organisation,
-    request: 'FeriennetRequest',
+    request: FeriennetRequest,
     form: UserProfileForm
-) -> 'RenderData | Response':
+) -> RenderData | Response:
     return handle_user_profile(self, request, form)

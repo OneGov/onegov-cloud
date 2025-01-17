@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 from onegov.form import Form
 from onegov.user import _
 from onegov.user import UserCollection
@@ -39,7 +41,7 @@ class PasswordResetForm(Form):
     )
     token = HiddenField()
 
-    def update_password(self, request: 'CoreRequest') -> bool:
+    def update_password(self, request: CoreRequest) -> bool:
         """ Updates the password using the form data (if permitted to do so).
 
         Returns True if successful, False if not successful.

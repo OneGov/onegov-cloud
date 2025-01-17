@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 import morepath
 
 from onegov.core.security import Public
@@ -20,10 +22,10 @@ if TYPE_CHECKING:
 
 @OrgApp.html(model=Search, template='search.pt', permission=Public)
 def search(
-    self: Search['Base'],
-    request: 'OrgRequest',
+    self: Search[Base],
+    request: OrgRequest,
     layout: DefaultLayout | None = None
-) -> 'RenderData | Response':
+) -> RenderData | Response:
 
     layout = layout or DefaultLayout(self, request)
     assert isinstance(layout.breadcrumbs, list)
@@ -63,10 +65,10 @@ def search(
 @OrgApp.html(model=SearchPostgres, template='search_postgres.pt',
              permission=Public)
 def search_postgres(
-    self: SearchPostgres['Base'],
-    request: 'OrgRequest',
+    self: SearchPostgres[Base],
+    request: OrgRequest,
     layout: DefaultLayout | None = None
-) -> 'RenderData | Response':
+) -> RenderData | Response:
     layout = layout or DefaultLayout(self, request)
     assert isinstance(layout.breadcrumbs, list)
     layout.breadcrumbs.append(Link(_('Search'), '#'))
@@ -104,7 +106,7 @@ def search_postgres(
 
 
 @OrgApp.json(model=Search, name='suggest', permission=Public)
-def suggestions(self: Search['Base'], request: 'OrgRequest') -> 'JSON_ro':
+def suggestions(self: Search[Base], request: OrgRequest) -> JSON_ro:
     try:
         return self.suggestions()
     except SearchOfflineError as exception:
@@ -112,8 +114,8 @@ def suggestions(self: Search['Base'], request: 'OrgRequest') -> 'JSON_ro':
 
 
 @OrgApp.json(model=SearchPostgres, name='suggest', permission=Public)
-def suggestions_postgres(self: SearchPostgres['Base'], request: 'OrgRequest') \
-        -> 'JSON_ro':
+def suggestions_postgres(self: SearchPostgres[Base], request: OrgRequest) \
+        -> JSON_ro:
     try:
         return self.suggestions()
     except SearchOfflineError as exception:

@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 from functools import cached_property
 from onegov.core.orm import orm_cached
 from onegov.core.request import CoreRequest
@@ -25,11 +27,11 @@ class PageMeta(NamedTuple):
     published: bool
     is_visible_on_homepage: bool | None
     path: str
-    children: tuple['PageMeta', ...]
+    children: tuple[PageMeta, ...]
 
     def link(
         self,
-        request: 'OrgRequest',
+        request: OrgRequest,
         variables: dict[str, Any] | None = None,
         name: str = '',
     ) -> str:
@@ -47,7 +49,7 @@ class PageMeta(NamedTuple):
 class OrgRequest(CoreRequest):
 
     if TYPE_CHECKING:
-        app: 'OrgApp'
+        app: OrgApp
 
     @cached_property
     def is_manager(self) -> bool:
@@ -155,7 +157,7 @@ class OrgRequest(CoreRequest):
         # if we already accessed this url we are also still fine
         return self.mtan_accesses.by_url(self.path_url) is None
 
-    def auto_accept(self, ticket: 'Ticket') -> bool:
+    def auto_accept(self, ticket: Ticket) -> bool:
         if self.app.org.ticket_auto_accept_style == 'role':
             roles = self.app.org.ticket_auto_accept_roles
             if not roles:
@@ -230,9 +232,9 @@ class OrgRequest(CoreRequest):
     def homepage_pages(self) -> dict[int, list[PageMeta]]:
 
         def visit_topics(
-            pages: 'Iterable[PageMeta]',
+            pages: Iterable[PageMeta],
             root_id: int | None = None
-        ) -> 'Generator[tuple[int, PageMeta]]':
+        ) -> Generator[tuple[int, PageMeta]]:
             for page in pages:
                 if page.type != 'topic':
                     continue

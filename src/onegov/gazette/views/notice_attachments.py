@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 from morepath import redirect
 from onegov.core.crypto import random_token
 from onegov.core.security import Private
@@ -26,8 +28,8 @@ if TYPE_CHECKING:
 )
 def view_notice_attachments(
     self: GazetteNotice,
-    request: 'GazetteRequest'
-) -> 'RenderData | Response':
+    request: GazetteRequest
+) -> RenderData | Response:
     """ View all attachments to a single notice and allow to drop new
     attachments.
 
@@ -61,8 +63,8 @@ def view_notice_attachments(
 )
 def upload_attachment(
     self: GazetteNotice,
-    request: 'GazetteRequest'
-) -> 'Response':
+    request: GazetteRequest
+) -> Response:
     """ Upload an attachment and add it to the notice.
 
     Raises a HTTP 405 (Metho not Allowed) for non-admins if the notice has
@@ -108,9 +110,9 @@ def upload_attachment(
 )
 def delete_attachment(
     self: GazetteNoticeFile,
-    request: 'GazetteRequest',
+    request: GazetteRequest,
     form: EmptyForm
-) -> 'RenderData | Response':
+) -> RenderData | Response:
     """ Delete a notice attachment. """
 
     layout = Layout(self, request)

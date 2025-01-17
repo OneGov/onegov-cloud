@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 from decimal import Decimal
 from onegov.form.fields import UploadField
 from onegov.form.validators import FileSizeLimit
@@ -76,7 +78,7 @@ class SwissvoteMetadataField(UploadField):
 
     def post_validate(
         self,
-        form: 'BaseForm',
+        form: BaseForm,
         validation_stopped: bool
     ) -> None:
         """ Make sure the given XLSX is valid (all expected columns are

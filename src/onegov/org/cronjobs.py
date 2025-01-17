@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 from collections import OrderedDict
 from babel.dates import get_month_names
 from datetime import datetime, timedelta
@@ -65,7 +67,7 @@ WEEKDAYS = (
 
 
 @OrgApp.cronjob(hour='*', minute=0, timezone='UTC')
-def hourly_maintenance_tasks(request: 'OrgRequest') -> None:
+def hourly_maintenance_tasks(request: OrgRequest) -> None:
     publish_files(request)
     reindex_published_models(request)
     send_scheduled_newsletter(request)
@@ -73,7 +75,7 @@ def hourly_maintenance_tasks(request: 'OrgRequest') -> None:
     delete_old_tan_accesses(request)
 
 
-def send_scheduled_newsletter(request: 'OrgRequest') -> None:
+def send_scheduled_newsletter(request: OrgRequest) -> None:
     newsletters = NewsletterCollection(request.session).query().filter(and_(
         Newsletter.scheduled != None,
         Newsletter.scheduled <= (utcnow() + timedelta(seconds=60)),
@@ -84,11 +86,11 @@ def send_scheduled_newsletter(request: 'OrgRequest') -> None:
         newsletter.scheduled = None
 
 
-def publish_files(request: 'OrgRequest') -> None:
+def publish_files(request: OrgRequest) -> None:
     FileCollection(request.session).publish_files()
 
 
-def reindex_published_models(request: 'OrgRequest') -> None:
+def reindex_published_models(request: OrgRequest) -> None:
     """
     Reindexes all recently published/unpublished objects
     in the elasticsearch and postgres database.
@@ -101,9 +103,9 @@ def reindex_published_models(request: 'OrgRequest') -> None:
         return
 
     def publication_models(
-        base: type['Base']
+        base: type[Base]
         # NOTE: This should be Iterator[type[Base & UTCPublicationMixin]]
-    ) -> 'Iterator[type[UTCPublicationMixin]]':
+    ) -> Iterator[type[UTCPublicationMixin]]:
         yield from find_models(base, lambda cls: issubclass(  # type:ignore
             cls, UTCPublicationMixin)
         )
@@ -137,7 +139,7 @@ def reindex_published_models(request: 'OrgRequest') -> None:
             request.app.es_orm_events.index(request.app.schema, obj)
 
 
-def delete_old_tans(request: 'OrgRequest') -> None:
+def delete_old_tans(request: OrgRequest) -> None:
     """
     Deletes TANs that are older than half a year.
 
@@ -153,7 +155,7 @@ def delete_old_tans(request: 'OrgRequest') -> None:
     query.delete(synchronize_session=False)
 
 
-def delete_old_tan_accesses(request: 'OrgRequest') -> None:
+def delete_old_tan_accesses(request: OrgRequest) -> None:
     """
     Deletes TAN accesses that are older than half a year.
 
@@ -170,7 +172,7 @@ def delete_old_tan_accesses(request: 'OrgRequest') -> None:
 
 
 @OrgApp.cronjob(hour=23, minute=45, timezone='Europe/Zurich')
-def process_resource_rules(request: 'OrgRequest') -> None:
+def process_resource_rules(request: OrgRequest) -> None:
     resources = ResourceCollection(request.app.libres_context)
 
     for resource in resources.query():
@@ -178,7 +180,7 @@ def process_resource_rules(request: 'OrgRequest') -> None:
 
 
 def ticket_statistics_common_template_args(
-    request: 'OrgRequest',
+    request: OrgRequest,
     collection: TicketCollection
 ) -> dict[str, Any]:
 
@@ -223,7 +225,7 @@ def ticket_statistics_users(app: OrgApp) -> list[User]:
 
 
 @OrgApp.cronjob(hour=8, minute=30, timezone='Europe/Zurich')
-def send_daily_ticket_statistics(request: 'OrgRequest') -> None:
+def send_daily_ticket_statistics(request: OrgRequest) -> None:
 
     today = to_timezone(utcnow(), 'Europe/Zurich')
 
@@ -288,7 +290,7 @@ def send_daily_ticket_statistics(request: 'OrgRequest') -> None:
 
 
 @OrgApp.cronjob(hour=8, minute=45, timezone='Europe/Zurich')
-def send_weekly_ticket_statistics(request: 'OrgRequest') -> None:
+def send_weekly_ticket_statistics(request: OrgRequest) -> None:
 
     today = to_timezone(utcnow(), 'Europe/Zurich')
 
@@ -349,7 +351,7 @@ def send_weekly_ticket_statistics(request: 'OrgRequest') -> None:
 
 
 @OrgApp.cronjob(hour=9, minute=0, timezone='Europe/Zurich')
-def send_monthly_ticket_statistics(request: 'OrgRequest') -> None:
+def send_monthly_ticket_statistics(request: OrgRequest) -> None:
 
     today = to_timezone(utcnow(), 'Europe/Zurich')
 
@@ -414,7 +416,7 @@ def send_monthly_ticket_statistics(request: 'OrgRequest') -> None:
 
 
 @OrgApp.cronjob(hour=6, minute=5, timezone='Europe/Zurich')
-def send_daily_resource_usage_overview(request: 'OrgRequest') -> None:
+def send_daily_resource_usage_overview(request: OrgRequest) -> None:
     today = to_timezone(utcnow(), 'Europe/Zurich')
     weekday = WEEKDAYS[today.weekday()]
 
@@ -470,7 +472,7 @@ def send_daily_resource_usage_overview(request: 'OrgRequest') -> None:
     )
 
     @lru_cache(maxsize=128)
-    def form(definition: str) -> type['Form']:
+    def form(definition: str) -> type[Form]:
         return parse_form(definition)
 
     # get the reservations of this day
@@ -542,7 +544,7 @@ def send_daily_resource_usage_overview(request: 'OrgRequest') -> None:
 
 
 @OrgApp.cronjob(hour='*', minute='*/30', timezone='UTC')
-def end_chats_and_create_tickets(request: 'OrgRequest') -> None:
+def end_chats_and_create_tickets(request: OrgRequest) -> None:
     half_hour_ago = utcnow() - timedelta(minutes=30)
 
     chats = ChatCollection(request.session).query().filter(
@@ -573,7 +575,7 @@ def end_chats_and_create_tickets(request: 'OrgRequest') -> None:
 
 
 @OrgApp.cronjob(hour=4, minute=30, timezone='Europe/Zurich')
-def archive_old_tickets(request: 'OrgRequest') -> None:
+def archive_old_tickets(request: OrgRequest) -> None:
 
     archive_timespan = request.app.org.auto_archive_timespan
     session = request.session
@@ -604,7 +606,7 @@ def archive_old_tickets(request: 'OrgRequest') -> None:
 
 
 @OrgApp.cronjob(hour=5, minute=30, timezone='Europe/Zurich')
-def delete_old_tickets(request: 'OrgRequest') -> None:
+def delete_old_tickets(request: OrgRequest) -> None:
     delete_timespan = request.app.org.auto_delete_timespan
     session = request.session
 
@@ -623,7 +625,7 @@ def delete_old_tickets(request: 'OrgRequest') -> None:
 
 
 @OrgApp.cronjob(hour=9, minute=30, timezone='Europe/Zurich')
-def send_monthly_mtan_statistics(request: 'OrgRequest') -> None:
+def send_monthly_mtan_statistics(request: OrgRequest) -> None:
 
     today = to_timezone(utcnow(), 'Europe/Zurich')
 
@@ -671,7 +673,7 @@ def send_monthly_mtan_statistics(request: 'OrgRequest') -> None:
 
 
 @OrgApp.cronjob(hour=4, minute=0, timezone='Europe/Zurich')
-def delete_content_marked_deletable(request: 'OrgRequest') -> None:
+def delete_content_marked_deletable(request: OrgRequest) -> None:
     """ Find all models inheriting from DeletableContentExtension, iterate
     over objects marked as `deletable` and delete them if expired.
 

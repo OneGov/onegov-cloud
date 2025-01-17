@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 from onegov.core.converters import extended_date_converter
 from onegov.landsgemeinde.app import LandsgemeindeApp
 from onegov.landsgemeinde.collections import AgendaItemCollection
@@ -30,7 +32,7 @@ def get_assemblies(app: LandsgemeindeApp) -> AssemblyCollection:
     path='/landsgemeinde/{date}',
     converters={'date': extended_date_converter}
 )
-def get_assembly(app: LandsgemeindeApp, date: 'date') -> Assembly | None:
+def get_assembly(app: LandsgemeindeApp, date: date) -> Assembly | None:
     return AssemblyCollection(app.session()).by_date(date)
 
 
@@ -41,7 +43,7 @@ def get_assembly(app: LandsgemeindeApp, date: 'date') -> Assembly | None:
 )
 def get_agenda_items(
     app: LandsgemeindeApp,
-    date: 'date'
+    date: date
 ) -> AgendaItemCollection:
     return AgendaItemCollection(app.session(), date)
 
@@ -53,7 +55,7 @@ def get_agenda_items(
 )
 def get_agenda_item(
     app: LandsgemeindeApp,
-    date: 'date',
+    date: date,
     number: int
 ) -> AgendaItem | None:
     return AgendaItemCollection(app.session(), date).by_number(number)
@@ -69,7 +71,7 @@ def get_agenda_item(
 )
 def get_vota(
     app: LandsgemeindeApp,
-    date: 'date',
+    date: date,
     agenda_item_number: int
 ) -> VotumCollection:
     return VotumCollection(app.session(), date, agenda_item_number)
@@ -86,7 +88,7 @@ def get_vota(
 )
 def get_votum(
     app: LandsgemeindeApp,
-    date: 'date',
+    date: date,
     agenda_item_number: int,
     number: int
 ) -> Votum | None:

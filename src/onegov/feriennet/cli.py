@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 import click
 import sys
 
@@ -21,7 +23,7 @@ cli = command_group()
 @click.argument('title')
 def delete_period(
     title: str
-) -> 'Callable[[FeriennetRequest, FeriennetApp], None]':
+) -> Callable[[FeriennetRequest, FeriennetApp], None]:
     """ Deletes all the data associated with a period, including:
 
     * Payments
@@ -41,8 +43,8 @@ def delete_period(
     """
 
     def delete_period(
-        request: 'FeriennetRequest',
-        app: 'FeriennetApp'
+        request: FeriennetRequest,
+        app: FeriennetApp
     ) -> None:
 
         period = request.session.query(Period).filter_by(title=title).first()
@@ -150,7 +152,7 @@ def delete_period(
 
 @cli.command(name='compute-occasion-durations')
 def compute_occasion_durations(
-) -> 'Callable[[FeriennetRequest, FeriennetApp], None]':
+) -> Callable[[FeriennetRequest, FeriennetApp], None]:
     """ Recomputes the durations of all occassions.
 
     Example::
@@ -160,8 +162,8 @@ def compute_occasion_durations(
     """
 
     def compute_occasion_durations(
-        request: 'FeriennetRequest',
-        app: 'FeriennetApp'
+        request: FeriennetRequest,
+        app: FeriennetApp
     ) -> None:
 
         occasions = request.session.query(Occasion)

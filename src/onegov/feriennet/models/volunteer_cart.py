@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 from itertools import groupby
 from onegov.activity import OccasionNeed
 from onegov.core.orm.sql import as_selectable_from_path
@@ -40,32 +42,32 @@ class VolunteerCart:
 
     def __init__(
         self,
-        session: 'Session',
-        browser_session: 'BrowserSession'
+        session: Session,
+        browser_session: BrowserSession
     ) -> None:
         self.session = session
         self.browser_session = browser_session
 
     @classmethod
-    def from_request(cls, request: 'FeriennetRequest') -> 'Self':
+    def from_request(cls, request: FeriennetRequest) -> Self:
         return cls(request.session, request.browser_session)
 
-    def add(self, need_id: 'UUID') -> None:
+    def add(self, need_id: UUID) -> None:
         items: list[UUID] = self.browser_session.get('volunteer_cart', [])
         items.append(need_id)
 
         self.browser_session.volunteer_cart = items
 
-    def remove(self, need_id: 'UUID') -> None:
+    def remove(self, need_id: UUID) -> None:
         self.browser_session.volunteer_cart = [
             i for i in self.browser_session.get('volunteer_cart', ())
             if i != need_id
         ]
 
-    def has(self, need_id: 'UUID') -> bool:
+    def has(self, need_id: UUID) -> bool:
         return need_id in self.ids()
 
-    def ids(self) -> 'Sequence[UUID]':
+    def ids(self) -> Sequence[UUID]:
         return self.browser_session.get('volunteer_cart', ())
 
     def clear(self) -> None:
@@ -74,8 +76,8 @@ class VolunteerCart:
 
     def card_items(
         self,
-        need_id: 'UUID | None' = None
-    ) -> 'Query[CardItemRow]':
+        need_id: UUID | None = None
+    ) -> Query[CardItemRow]:
         stmt = as_selectable_from_path(
             module_path('onegov.feriennet', 'queries/card_items.sql'))
 
@@ -87,7 +89,7 @@ class VolunteerCart:
         query = select(stmt.c).where(stmt.c.need_id.in_(need_ids))
         return self.session.execute(query)
 
-    def overlaps(self, need_id: 'UUID') -> bool:
+    def overlaps(self, need_id: UUID) -> bool:
         need = self.session.query(OccasionNeed).filter_by(id=need_id).first()
 
         if not need:
@@ -102,13 +104,13 @@ class VolunteerCart:
 
     def for_frontend(
         self,
-        layout: 'DefaultLayout',
+        layout: DefaultLayout,
         localize: bool = True
-    ) -> 'Iterator[RenderData]':
+    ) -> Iterator[RenderData]:
 
         grouped = groupby(self.card_items(), key=lambda i: i.need_id)
 
-        def date(record: 'CardItemRow') -> str:
+        def date(record: CardItemRow) -> str:
             start = record.start
             end = record.end
             if localize:
@@ -116,7 +118,7 @@ class VolunteerCart:
                 end = layout.to_timezone(end, record.timezone)
             return layout.format_datetime_range(start, end)
 
-        def remove(record: 'CardItemRow') -> str:
+        def remove(record: CardItemRow) -> str:
             return layout.csrf_protected_url(
                 layout.request.link(
                     VolunteerCartAction('remove', record.need_id)))
@@ -140,16 +142,16 @@ class VolunteerCartAction:
     def __init__(
         self,
         action: Literal['add', 'remove'],
-        target: 'UUID'
+        target: UUID
     ):
         self.action = action
         self.target = target
 
     def execute(
         self,
-        request: 'FeriennetRequest',
+        request: FeriennetRequest,
         cart: VolunteerCart
-    ) -> 'JSON_ro':
+    ) -> JSON_ro:
 
         if self.action == 'add':
             if cart.has(self.target):

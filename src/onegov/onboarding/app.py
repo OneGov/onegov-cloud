@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 from onegov.core import Framework, utils
 from onegov.file import DepotApp
 from onegov.onboarding.theme import OnboardingTheme
@@ -73,7 +75,7 @@ def get_webasset_output() -> str:
 
 
 @OnboardingApp.webasset('common')
-def get_common_asset() -> 'Iterator[str]':
+def get_common_asset() -> Iterator[str]:
     yield 'modernizr.js'
     yield 'jquery.js'
     yield 'placeholder.js'

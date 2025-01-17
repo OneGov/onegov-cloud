@@ -1,4 +1,5 @@
 """ Contains renderers to display form fields. """
+from __future__ import annotations
 
 import humanize
 import re
@@ -25,12 +26,12 @@ class Registry:
     making sure each renderer is only instantiated once.
 
     """
-    renderer_map: dict[str, 'BaseRenderer']
+    renderer_map: dict[str, BaseRenderer]
 
     def __init__(self) -> None:
         self.renderer_map = {}
 
-    def register_for(self, *types: str) -> 'Callable[[type[_R]], type[_R]]':
+    def register_for(self, *types: str) -> Callable[[type[_R]], type[_R]]:
         """ Decorator to register a renderer. """
         def wrapper(renderer: type[_R]) -> type[_R]:
             instance = renderer()
@@ -41,7 +42,7 @@ class Registry:
             return renderer
         return wrapper
 
-    def render(self, field: 'Field') -> Markup:
+    def render(self, field: Field) -> Markup:
         """ Renders the given field with the correct renderer. """
         if not field.data:
             return Markup('')
@@ -72,7 +73,7 @@ class BaseRenderer:
     def escape(self, text: str) -> Markup:
         return escape(text)
 
-    def translate(self, field: 'Field', text: str) -> str:
+    def translate(self, field: Field, text: str) -> str:
         if isinstance(text, TranslationString):
             return field.gettext(text)
 
@@ -84,7 +85,7 @@ class BaseRenderer:
     'TextAreaField',
 )
 class StringFieldRenderer(BaseRenderer):
-    def __call__(self, field: 'Field') -> Markup:
+    def __call__(self, field: Field) -> Markup:
         if field.render_kw:
             if field.render_kw.get('data-editor') == 'markdown':
                 return render_untrusted_markdown(field.data)
@@ -94,13 +95,13 @@ class StringFieldRenderer(BaseRenderer):
 
 @registry.register_for('PasswordField')
 class PasswordFieldRenderer(BaseRenderer):
-    def __call__(self, field: 'Field') -> Markup:
+    def __call__(self, field: Field) -> Markup:
         return Markup('*' * len(field.data))  # noqa: RUF035
 
 
 @registry.register_for('EmailField')
 class EmailFieldRenderer(BaseRenderer):
-    def __call__(self, field: 'Field') -> Markup:
+    def __call__(self, field: Field) -> Markup:
         params = {'href': f'mailto:{field.data}'}
         return Markup(  # noqa: RUF035
             f'<a {html_params(**params)}>{{email}}</a>'
@@ -109,7 +110,7 @@ class EmailFieldRenderer(BaseRenderer):
 
 @registry.register_for('URLField')
 class URLFieldRenderer(BaseRenderer):
-    def __call__(self, field: 'Field') -> Markup:
+    def __call__(self, field: Field) -> Markup:
         params = {'href': field.data}
         return Markup(  # noqa: RUF035
             f'<a {html_params(**params)}>{{url}}</a>'
@@ -134,7 +135,7 @@ class VideoURLFieldRenderer(BaseRenderer):
     """)
     url_template = Markup('<a href="{url}">{url}</a>')
 
-    def __call__(self, field: 'Field') -> Markup:
+    def __call__(self, field: Field) -> Markup:
         url = None
         data = field.data
 
@@ -188,7 +189,7 @@ class DateFieldRenderer(BaseRenderer):
     # be doable with little work (not necessary for now)
     date_format = '%d.%m.%Y'
 
-    def __call__(self, field: 'Field') -> Markup:
+    def __call__(self, field: Field) -> Markup:
         return self.escape(field.data.strftime(self.date_format))
 
 
@@ -204,7 +205,7 @@ class TimezoneDateTimeFieldRenderer(DateFieldRenderer):
 
 @registry.register_for('TimeField')
 class TimeFieldRenderer(BaseRenderer):
-    def __call__(self, field: 'Field') -> Markup:
+    def __call__(self, field: Field) -> Markup:
         return Markup(  # noqa: RUF035
             f'{field.data.hour:02d}:{field.data.minute:02d}'
         )
@@ -213,7 +214,7 @@ class TimeFieldRenderer(BaseRenderer):
 @registry.register_for('UploadField')
 class UploadFieldRenderer(BaseRenderer):
 
-    def __call__(self, field: 'Field') -> Markup:
+    def __call__(self, field: Field) -> Markup:
         return Markup('{filename} ({size})').format(
             filename=field.data['filename'],
             size=humanize.naturalsize(field.data['size'])
@@ -223,7 +224,7 @@ class UploadFieldRenderer(BaseRenderer):
 @registry.register_for('UploadMultipleField')
 class UploadMultipleFieldRenderer(BaseRenderer):
 
-    def __call__(self, field: 'Field') -> Markup:
+    def __call__(self, field: Field) -> Markup:
         return Markup('<br>').join(
             Markup('<i class="far fa-file-pdf"></i> {filename} ({'
                    'size})').format(
@@ -236,7 +237,7 @@ class UploadMultipleFieldRenderer(BaseRenderer):
 @registry.register_for('RadioField')
 class RadioFieldRenderer(BaseRenderer):
 
-    def __call__(self, field: 'Field') -> Markup:
+    def __call__(self, field: Field) -> Markup:
         choices = dict(field.choices)  # type:ignore[attr-defined]
         return self.escape('✓ ' + self.translate(
             field, choices.get(field.data, '?')
@@ -246,7 +247,7 @@ class RadioFieldRenderer(BaseRenderer):
 @registry.register_for('MultiCheckboxField')
 class MultiCheckboxFieldRenderer(BaseRenderer):
 
-    def __call__(self, field: 'Field') -> Markup:
+    def __call__(self, field: Field) -> Markup:
         choices = {value: f'? ({value})' for value in field.data}
         choices.update(field.choices)  # type:ignore[attr-defined]
         return Markup('<br>').join(
@@ -257,17 +258,17 @@ class MultiCheckboxFieldRenderer(BaseRenderer):
 
 @registry.register_for('CSRFTokenField', 'HiddenField')
 class NullRenderer(BaseRenderer):
-    def __call__(self, field: 'Field') -> Markup:
+    def __call__(self, field: Field) -> Markup:
         return Markup('')
 
 
 @registry.register_for('DecimalField')
 class DecimalRenderer(BaseRenderer):
-    def __call__(self, field: 'Field') -> Markup:
+    def __call__(self, field: Field) -> Markup:
         return Markup(f'{field.data:.2f}')  # noqa: RUF035
 
 
 @registry.register_for('IntegerField')
 class IntegerRenderer(BaseRenderer):
-    def __call__(self, field: 'Field') -> Markup:
+    def __call__(self, field: Field) -> Markup:
         return Markup(f'{int(field.data)}')  # noqa: RUF035

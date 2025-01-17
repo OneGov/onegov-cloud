@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 import morepath
 import pytz
 import sedate
@@ -43,7 +45,7 @@ if TYPE_CHECKING:
 def assert_anonymous_access_only_temporary(
     resource: Resource,
     reservation: Reservation,
-    request: 'OrgRequest'
+    request: OrgRequest
 ) -> None:
     """ Raises exceptions if the current user is anonymous and no longer
     should be given access to the reservation models.
@@ -71,16 +73,16 @@ def assert_anonymous_access_only_temporary(
 
 
 def assert_access_only_if_there_are_reservations(
-    reservations: 'Collection[Any]'
+    reservations: Collection[Any]
 ) -> None:
     """ Raises an exception if no reservations are available. """
     if not reservations:
         raise exc.HTTPForbidden()
 
 
-def respond_with_success(request: 'OrgRequest') -> 'JSON_ro':
+def respond_with_success(request: OrgRequest) -> JSON_ro:
     @request.after
-    def trigger_calendar_update(response: 'Response') -> None:
+    def trigger_calendar_update(response: Response) -> None:
         response.headers.add('X-IC-Trigger', 'rc-reservations-changed')
 
     return {
@@ -88,14 +90,14 @@ def respond_with_success(request: 'OrgRequest') -> 'JSON_ro':
     }
 
 
-def respond_with_error(request: 'OrgRequest', error: str) -> 'JSON_ro':
+def respond_with_error(request: OrgRequest, error: str) -> JSON_ro:
     message: JSON_ro = {
         'message': error,
         'success': False
     }
 
     @request.after
-    def trigger(response: 'Response') -> None:
+    def trigger(response: Response) -> None:
         response.headers.add('X-IC-Trigger', 'rc-reservation-error')
         response.headers.add('X-IC-Trigger-Data', json.dumps(message))
 
@@ -108,7 +110,7 @@ def respond_with_error(request: 'OrgRequest', error: str) -> 'JSON_ro':
     request_method='POST',
     permission=Public
 )
-def reserve_allocation(self: Allocation, request: 'OrgRequest') -> 'JSON_ro':
+def reserve_allocation(self: Allocation, request: OrgRequest) -> JSON_ro:
     """ Adds a single reservation to the list of reservations bound to the
     current browser session.
 
@@ -213,7 +215,7 @@ def reserve_allocation(self: Allocation, request: 'OrgRequest') -> 'JSON_ro':
 
 
 @OrgApp.json(model=Reservation, request_method='DELETE', permission=Public)
-def delete_reservation(self: Reservation, request: 'OrgRequest') -> 'JSON_ro':
+def delete_reservation(self: Reservation, request: OrgRequest) -> JSON_ro:
 
     # anonymous users do not get a csrf token (it's bound to the identity)
     # therefore we can't check for it -> this is not a problem since
@@ -244,7 +246,7 @@ def delete_reservation(self: Reservation, request: 'OrgRequest') -> 'JSON_ro':
 
 def get_reservation_form_class(
     resource: Resource,
-    request: 'OrgRequest'
+    request: OrgRequest
 ) -> type[ReservationForm]:
 
     if resource.definition:
@@ -264,10 +266,10 @@ def get_reservation_form_class(
 )
 def handle_reservation_form(
     self: Resource,
-    request: 'OrgRequest',
+    request: OrgRequest,
     form: ReservationForm,
     layout: ReservationLayout | None = None
-) -> 'RenderData | Response':
+) -> RenderData | Response:
     """ Asks the user for the form data required to complete one or many
     reservations on a resource.
 
@@ -412,8 +414,8 @@ def get_next_resource_context(
 @OrgApp.view(model=FindYourSpotCollection, name='form', permission=Public)
 def handle_find_your_spot_reservation_form(
     self: FindYourSpotCollection,
-    request: 'OrgRequest'
-) -> 'Response':
+    request: OrgRequest
+) -> Response:
     """ This is a convenience view that redirects to the appropriate
     resource specific reservation form.
 
@@ -431,10 +433,10 @@ def handle_find_your_spot_reservation_form(
 
 
 def blocked_by_zipcode(
-    request: 'OrgRequest',
+    request: OrgRequest,
     resource: Resource,
-    form: 'Form',
-    reservations: 'Iterable[Reservation]'
+    form: Form,
+    reservations: Iterable[Reservation]
 ) -> dict[int, date]:
     """ Returns a dict of reservation ids that are blocked by zipcode, with
     the value set to the date it will be available.
@@ -474,9 +476,9 @@ def blocked_by_zipcode(
 )
 def confirm_reservation(
     self: Resource,
-    request: 'OrgRequest',
+    request: OrgRequest,
     layout: ReservationLayout | None = None
-) -> 'RenderData':
+) -> RenderData:
 
     reservations: list[Reservation]
     reservations = self.bound_reservations(request).all()  # type:ignore
@@ -540,7 +542,7 @@ def confirm_reservation(
     template='layout.pt',
     request_method='POST'
 )
-def finalize_reservation(self: Resource, request: 'OrgRequest') -> 'Response':
+def finalize_reservation(self: Resource, request: OrgRequest) -> Response:
     reservations: list[Reservation]
     reservations = self.bound_reservations(request).all()  # type:ignore
     assert_access_only_if_there_are_reservations(reservations)
@@ -696,10 +698,10 @@ def finalize_reservation(self: Resource, request: 'OrgRequest') -> 'Response':
 @OrgApp.view(model=Reservation, name='accept', permission=Private)
 def accept_reservation(
     self: Reservation,
-    request: 'OrgRequest',
+    request: OrgRequest,
     text: str | None = None,
     notify: bool = False
-) -> 'Response':
+) -> Response:
 
     if not self.data or not self.data.get('accepted'):
         resource = request.app.libres_resources.by_reservation(self)
@@ -766,7 +768,7 @@ def accept_reservation(
             },
         )
 
-        def recipients_which_have_registered_for_mail() -> 'Iterator[str]':
+        def recipients_which_have_registered_for_mail() -> Iterator[str]:
             q = ResourceRecipientCollection(request.session).query()
             q = q.filter(ResourceRecipient.medium == 'email')
             q = q.order_by(None).order_by(ResourceRecipient.address)
@@ -803,7 +805,7 @@ def accept_reservation(
         )
         plaintext = html_to_text(content)
 
-        def email_iter() -> 'Iterator[EmailJsonDict]':
+        def email_iter() -> Iterator[EmailJsonDict]:
             for recipient_addr in recipients_which_have_registered_for_mail():
                 yield request.app.prepare_email(
                     receivers=(recipient_addr,),
@@ -832,10 +834,10 @@ def accept_reservation(
 )
 def accept_reservation_with_message(
     self: Reservation,
-    request: 'OrgRequest',
+    request: OrgRequest,
     form: InternalTicketChatMessageForm,
     layout: TicketChatMessageLayout | None = None
-) -> 'RenderData | Response':
+) -> RenderData | Response:
 
     recipient = self.email
     if not recipient:
@@ -863,10 +865,10 @@ def accept_reservation_with_message(
 @OrgApp.view(model=Reservation, name='reject', permission=Private)
 def reject_reservation(
     self: Reservation,
-    request: 'OrgRequest',
+    request: OrgRequest,
     text: str | None = None,
     notify: bool = False
-) -> 'Response | None':
+) -> Response | None:
 
     token = self.token
     resource = request.app.libres_resources.by_reservation(self)
@@ -940,7 +942,7 @@ def reject_reservation(
         }
     )
 
-    def recipients_with_mail_for_reservation() -> 'Iterator[str]':
+    def recipients_with_mail_for_reservation() -> Iterator[str]:
         # all recipients which want to receive e-mail for rejected reservations
         q = ResourceRecipientCollection(request.session).query()
         q = q.filter(ResourceRecipient.medium == 'email')
@@ -983,7 +985,7 @@ def reject_reservation(
         )
         plaintext = html_to_text(content)
 
-        def email_iter() -> 'Iterator[EmailJsonDict]':
+        def email_iter() -> Iterator[EmailJsonDict]:
             for recipient_addr in recipients_with_mail_for_reservation():
                 yield request.app.prepare_email(
                     receivers=(recipient_addr,),
@@ -1026,10 +1028,10 @@ def reject_reservation(
 )
 def reject_reservation_with_message(
     self: Reservation,
-    request: 'OrgRequest',
+    request: OrgRequest,
     form: InternalTicketChatMessageForm,
     layout: TicketChatMessageLayout | None = None
-) -> 'RenderData | Response | None':
+) -> RenderData | Response | None:
 
     recipient = self.email
     if not recipient:

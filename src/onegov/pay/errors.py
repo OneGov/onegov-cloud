@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 import stripe
 
 # the following exceptions should be caught and logged - the user should be

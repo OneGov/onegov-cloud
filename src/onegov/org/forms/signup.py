@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 from onegov.form import Form
 from onegov.form.fields import HoneyPotField, MultiCheckboxField
 from onegov.org import _
@@ -15,7 +17,7 @@ if TYPE_CHECKING:
 
 class SignupForm(Form):
 
-    request: 'OrgRequest'
+    request: OrgRequest
 
     address = StringField(
         label=_('E-Mail Address'),

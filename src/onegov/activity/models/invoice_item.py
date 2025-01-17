@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 from onegov.core.orm import Base
 from onegov.core.orm.mixins import TimestampMixin
 from onegov.core.orm.types import UUID
@@ -36,7 +38,7 @@ class InvoiceItem(Base, TimestampMixin, PayableManyTimes):
     __tablename__ = 'invoice_items'
 
     #: the public id of the invoice item
-    id: 'Column[uuid.UUID]' = Column(
+    id: Column[uuid.UUID] = Column(
         UUID,  # type:ignore[arg-type]
         primary_key=True,
         default=uuid4
@@ -44,56 +46,56 @@ class InvoiceItem(Base, TimestampMixin, PayableManyTimes):
 
     #: the invoice this item belongs to
     # FIXME: Shouldn't this be nullable=False?
-    invoice_id: 'Column[uuid.UUID | None]' = Column(
+    invoice_id: Column[uuid.UUID | None] = Column(
         UUID,  # type:ignore[arg-type]
         ForeignKey('invoices.id')
     )
-    invoice: 'relationship[Invoice]' = relationship(
+    invoice: relationship[Invoice] = relationship(
         'Invoice',
         back_populates='items'
     )
 
     #: the attendee, if the item is connected to an attendee
-    attendee_id: 'Column[uuid.UUID | None]' = Column(
+    attendee_id: Column[uuid.UUID | None] = Column(
         UUID,  # type:ignore[arg-type]
         ForeignKey('attendees.id'),
         nullable=True
     )
 
     #: the item group (all items with the same text are visually grouped)
-    group: 'Column[str]' = Column(Text, nullable=False)
+    group: Column[str] = Column(Text, nullable=False)
 
     #: a secondary group who is not necessarily grouped visually
-    family: 'Column[str | None]' = Column(Text, nullable=True)
+    family: Column[str | None] = Column(Text, nullable=True)
 
     #: the item text
-    text: 'Column[str]' = Column(Text, nullable=False)
+    text: Column[str] = Column(Text, nullable=False)
 
     #: organizer (if the item is an activity)
-    organizer: 'Column[str | None]' = Column(Text, nullable=True)
+    organizer: Column[str | None] = Column(Text, nullable=True)
 
     #: true if paid
-    paid: 'Column[bool]' = Column(Boolean, nullable=False, default=False)
+    paid: Column[bool] = Column(Boolean, nullable=False, default=False)
 
     #: the payment date
-    payment_date: 'Column[date | None]' = Column(Date, nullable=True)
+    payment_date: Column[date | None] = Column(Date, nullable=True)
 
     #: the transaction id if paid through a bank or online transaction
-    tid: 'Column[str | None]' = Column(Text, nullable=True)
+    tid: Column[str | None] = Column(Text, nullable=True)
 
     #: the source of the transaction id, e.g. stripe, xml
-    source: 'Column[str | None]' = Column(Text, nullable=True)
+    source: Column[str | None] = Column(Text, nullable=True)
 
     #: the unit to pay..
     # FIXME: I don't think this should be nullable
-    unit: 'Column[Decimal | None]' = Column(
+    unit: Column[Decimal | None] = Column(
         Numeric(precision=PRECISION, scale=SCALE),
         nullable=True
     )
 
     #: ..multiplied by the quantity..
     # FIXME: and neither should this be
-    quantity: 'Column[Decimal | None]' = Column(
+    quantity: Column[Decimal | None] = Column(
         Numeric(precision=PRECISION, scale=SCALE),
         nullable=True
     )
@@ -103,13 +105,13 @@ class InvoiceItem(Base, TimestampMixin, PayableManyTimes):
 
     #: ..together form the amount
     @hybrid_property  # type: ignore[no-redef]
-    def amount(self) -> 'Decimal | None':
+    def amount(self) -> Decimal | None:
         if self.unit is None or self.quantity is None:
             return None
         return round(self.unit, SCALE) * round(self.quantity, SCALE)
 
     @amount.expression  # type:ignore[no-redef]
-    def amount(cls) -> 'ColumnElement[Decimal | None]':
+    def amount(cls) -> ColumnElement[Decimal | None]:
         return cls.unit * cls.quantity
 
     @validates('source')

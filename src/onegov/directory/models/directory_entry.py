@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 from onegov.core.orm import Base
 from onegov.core.orm.mixins import ContentMixin
 from onegov.core.orm.mixins import TimestampMixin
@@ -46,38 +48,38 @@ class DirectoryEntry(Base, ContentMixin, CoordinatesMixin, TimestampMixin,
         return False  # to be overridden downstream
 
     #: An interal id for references (not public)
-    id: 'Column[uuid.UUID]' = Column(
+    id: Column[uuid.UUID] = Column(
         UUID,  # type:ignore[arg-type]
         primary_key=True,
         default=uuid4
     )
 
     #: The public id of the directory entry
-    name: 'Column[str]' = Column(Text, nullable=False)
+    name: Column[str] = Column(Text, nullable=False)
 
     #: The directory this entry belongs to
-    directory_id: 'Column[UUID]' = Column(
+    directory_id: Column[UUID] = Column(
         ForeignKey('directories.id'), nullable=False)
 
     #: the polymorphic type of the entry
-    type: 'Column[str]' = Column(
+    type: Column[str] = Column(
         Text,
         nullable=False,
         default=lambda: 'generic'
     )
 
     #: The order of the entry in the directory
-    order: 'Column[str]' = Column(Text, nullable=False, index=True)
+    order: Column[str] = Column(Text, nullable=False, index=True)
 
     #: The title of the entry
-    title: 'Column[str]' = Column(Text, nullable=False)
+    title: Column[str] = Column(Text, nullable=False)
 
     #: Describes the entry briefly
-    lead: 'Column[str | None]' = Column(Text, nullable=True)
+    lead: Column[str | None] = Column(Text, nullable=True)
 
     #: All keywords defined for this entry (indexed)
-    _keywords: 'Column[dict[str, str] | None]' = Column(  # type:ignore
-        MutableDict.as_mutable(HSTORE),
+    _keywords: Column[dict[str, str] | None] = Column(  # type:ignore
+        MutableDict.as_mutable(HSTORE),  # type:ignore[no-untyped-call]
         nullable=True,
         name='keywords'
     )
@@ -92,7 +94,7 @@ class DirectoryEntry(Base, ContentMixin, CoordinatesMixin, TimestampMixin,
         Index('unique_entry_name', 'directory_id', 'name', unique=True),
     )
 
-    directory: 'relationship[Directory]' = relationship(
+    directory: relationship[Directory] = relationship(
         'Directory',
         back_populates='entries'
     )
@@ -120,7 +122,7 @@ class DirectoryEntry(Base, ContentMixin, CoordinatesMixin, TimestampMixin,
     # FIXME: asymmetric properties are not supported by mypy, switch to
     #        a custom descriptor, if desired.
     @keywords.setter
-    def keywords(self, value: 'Collection[str] | None') -> None:
+    def keywords(self, value: Collection[str] | None) -> None:
         self._keywords = dict.fromkeys(value, '') if value else None
 
     @property

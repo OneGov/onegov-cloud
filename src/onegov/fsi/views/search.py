@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 from onegov.core.security import Personal
 from onegov.fsi import FsiApp
 from onegov.fsi.layout import DefaultLayout
@@ -19,9 +21,9 @@ if TYPE_CHECKING:
     permission=Personal
 )
 def fsi_search(
-    self: Search['Base'],
-    request: 'FsiRequest'
-) -> 'RenderData | Response':
+    self: Search[Base],
+    request: FsiRequest
+) -> RenderData | Response:
     return search(self, request, DefaultLayout(self, request))
 
 
@@ -31,23 +33,23 @@ def fsi_search(
     permission=Personal
 )
 def fsi_search_postgres(
-    self: SearchPostgres['Base'],
-    request: 'FsiRequest'
-) -> 'RenderData | Response':
+    self: SearchPostgres[Base],
+    request: FsiRequest
+) -> RenderData | Response:
     return search_postgres(self, request, DefaultLayout(self, request))
 
 
 @FsiApp.json(model=Search, name='suggest', permission=Personal)
 def fsi_suggestions(
-    self: Search['Base'],
-    request: 'FsiRequest'
-) -> 'JSON_ro':
+    self: Search[Base],
+    request: FsiRequest
+) -> JSON_ro:
     return suggestions(self, request)
 
 
 @FsiApp.json(model=SearchPostgres, name='suggest', permission=Personal)
 def fsi_suggestions_postgres(
-    self: SearchPostgres['Base'],
-    request: 'FsiRequest'
-) -> 'JSON_ro':
+    self: SearchPostgres[Base],
+    request: FsiRequest
+) -> JSON_ro:
     return suggestions_postgres(self, request)

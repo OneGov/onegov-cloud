@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 from onegov.core.crypto import random_token
 from onegov.file.models.file import File
 from onegov.file.utils import as_fileintent
@@ -48,21 +50,21 @@ class NamedFile:
     def __get__(
         self,
         instance: None,
-        owner: type['HasFiles'] | None = None
-    ) -> 'Self': ...
+        owner: type[HasFiles] | None = None
+    ) -> Self: ...
 
     @overload
     def __get__(
         self,
-        instance: 'HasFiles',
-        owner: type['HasFiles'] | None = None
+        instance: HasFiles,
+        owner: type[HasFiles] | None = None
     ) -> File | None: ...
 
     def __get__(
         self,
-        instance: 'HasFiles | None',
-        owner: type['HasFiles'] | None = None
-    ) -> 'Self | File | None':
+        instance: HasFiles | None,
+        owner: type[HasFiles] | None = None
+    ) -> Self | File | None:
 
         if instance is None:
             return None
@@ -75,7 +77,7 @@ class NamedFile:
 
     def __set__(
         self,
-        instance: 'HasFiles',
+        instance: HasFiles,
         value: tuple[bytes | IO[bytes], str | None]
     ) -> None:
 
@@ -86,7 +88,7 @@ class NamedFile:
         file.reference = as_fileintent(content, filename)
         instance.files.append(file)
 
-    def __delete__(self, instance: 'HasFiles') -> None:
+    def __delete__(self, instance: HasFiles) -> None:
         for file in tuple(instance.files):
             if file.name == self.name:
                 instance.files.remove(file)

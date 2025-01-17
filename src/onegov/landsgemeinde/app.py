@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 from onegov.core.framework import current_language_tween_factory
 from onegov.core.framework import transaction_tween_factory
 from onegov.core.utils import module_path
@@ -24,7 +26,7 @@ if TYPE_CHECKING:
 class LandsgemeindeApp(TownApp):
 
     @property
-    def pages_cache(self) -> 'RedisCacheRegion':
+    def pages_cache(self) -> RedisCacheRegion:
         """ A cache for pages. """
 
         return self.get_cache('pages', 300)
@@ -32,12 +34,12 @@ class LandsgemeindeApp(TownApp):
 
 @LandsgemeindeApp.setting(section='org', name='create_new_organisation')
 def get_create_new_organisation_factory(
-) -> 'Callable[[LandsgemeindeApp, str], Organisation]':
+) -> Callable[[LandsgemeindeApp, str], Organisation]:
     return create_new_organisation
 
 
 @LandsgemeindeApp.template_variables()
-def get_template_variables(request: 'LandsgemeindeRequest') -> 'RenderData':
+def get_template_variables(request: LandsgemeindeRequest) -> RenderData:
     return {
         'global_tools': tuple(get_global_tools(request)),
         'top_navigation': tuple(get_top_navigation(request)),
@@ -71,22 +73,22 @@ def get_theme() -> LandsgemeindeTheme:
 
 
 @LandsgemeindeApp.webasset('ticker')
-def get_backend_ticker() -> 'Iterator[str]':
+def get_backend_ticker() -> Iterator[str]:
     yield 'ticker.js'
 
 
 @LandsgemeindeApp.webasset('person_votum')
-def get_person_votum() -> 'Iterator[str]':
+def get_person_votum() -> Iterator[str]:
     yield 'person_votum.js'
 
 
 @LandsgemeindeApp.webasset('start_time')
-def get_start_time() -> 'Iterator[str]':
+def get_start_time() -> Iterator[str]:
     yield 'start_time.js'
 
 
 @LandsgemeindeApp.webasset('agenda_items')
-def get_backend_agenda_items() -> 'Iterator[str]':
+def get_backend_agenda_items() -> Iterator[str]:
     yield 'agenda_items.js'
 
 
@@ -96,8 +98,8 @@ def get_backend_agenda_items() -> 'Iterator[str]':
 )
 def pages_cache_tween_factory(
     app: LandsgemeindeApp,
-    handler: 'Callable[[LandsgemeindeRequest], Response]'
-) -> 'Callable[[LandsgemeindeRequest], Response]':
+    handler: Callable[[LandsgemeindeRequest], Response]
+) -> Callable[[LandsgemeindeRequest], Response]:
 
     """ Cache pages for 5 minutes. """
 
@@ -106,13 +108,13 @@ def pages_cache_tween_factory(
     )
     cache_paths_re = compile(r'^({})$'.format('|'.join(cache_paths)))
 
-    def should_cache_fn(response: 'Response') -> bool:
+    def should_cache_fn(response: Response) -> bool:
         return (
             response.status_code == 200
             and 'Set-Cookie' not in response.headers
         )
 
-    def pages_cache_tween(request: 'LandsgemeindeRequest') -> 'Response':
+    def pages_cache_tween(request: LandsgemeindeRequest) -> Response:
 
         # do not cache POST, DELETE etc.
         if request.method not in ('GET', 'HEAD'):

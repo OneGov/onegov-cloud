@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 from sqlalchemy import Column
 from sqlalchemy.dialects.postgresql import TSVECTOR, JSONB
 from sqlalchemy.ext.declarative import declared_attr
@@ -66,7 +68,7 @@ class Searchable:
         es_id: ClassVar[str]
 
     @declared_attr  # type:ignore[no-redef]
-    def fts_idx(cls) -> 'Column[object]':
+    def fts_idx(cls) -> Column[object]:
         """ The column for the full text search index.
         """
 
@@ -76,7 +78,7 @@ class Searchable:
         return deferred(Column(col_name, TSVECTOR))
 
     @declared_attr
-    def fts_idx_data(cls) -> 'Column[object]':
+    def fts_idx_data(cls) -> Column[object]:
         """ This column holds all the properties including its values
         important for full text search.
         """
@@ -162,7 +164,7 @@ class Searchable:
         return False
 
     @property
-    def es_suggestion(self) -> 'Sequence[str] | str':
+    def es_suggestion(self) -> Sequence[str] | str:
         """ Returns suggest-as-you-type value of the document.
         The field used for this property should also be indexed, or the
         suggestion will lead to nowhere.
@@ -177,7 +179,7 @@ class Searchable:
         return self.title  # type:ignore[attr-defined]
 
     @property
-    def es_last_change(self) -> 'datetime | None':
+    def es_last_change(self) -> datetime | None:
         """ Returns the date the document was created/last modified. """
         return None
 
@@ -210,7 +212,7 @@ class ORMSearchable(Searchable):
         return cls.__tablename__  # type:ignore[attr-defined]
 
     @property
-    def es_last_change(self) -> 'datetime | None':
+    def es_last_change(self) -> datetime | None:
         return getattr(self, 'last_change', None)
 
 

@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 from datetime import date
 from datetime import datetime
 from onegov.core.utils import append_query_param
@@ -19,7 +21,7 @@ if TYPE_CHECKING:
 class StartTimeMixin:
 
     #: The local start time
-    start_time: 'Column[time | None]' = Column(Time, nullable=True)
+    start_time: Column[time | None] = Column(Time, nullable=True)
 
     def start(self) -> None:
         self.start_time = to_timezone(utcnow(), 'Europe/Zurich').time()
@@ -29,7 +31,7 @@ class TimestampedVideoMixin(StartTimeMixin):
 
     if TYPE_CHECKING:
         # forward declare required attributes
-        assembly: 'Assembly | relationship[Assembly]'
+        assembly: Assembly | relationship[Assembly]
 
     #: The manual video timestamp of this agenda item
     video_timestamp: dict_property[str | None] = content_property()

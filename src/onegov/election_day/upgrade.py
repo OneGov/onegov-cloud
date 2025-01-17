@@ -2,6 +2,8 @@
 upgraded on the server. See :class:`onegov.core.upgrade.upgrade_task`.
 
 """
+from __future__ import annotations
+
 from onegov.core.orm.types import HSTORE
 from onegov.core.orm.types import JSON
 from onegov.core.orm.types import UTCDateTime

@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 from base64 import b64decode
 from gzip import GzipFile
 from io import BytesIO
@@ -48,9 +50,9 @@ if TYPE_CHECKING:
     permission=Secret)
 def view_billing(
     self: BillingCollection,
-    request: 'FeriennetRequest',
+    request: FeriennetRequest,
     form: BillingForm
-) -> 'RenderData':
+) -> RenderData:
 
     layout = BillingCollectionLayout(self, request)
     session = request.session
@@ -88,7 +90,7 @@ def view_billing(
     def csrf_protected(url: str) -> str:
         return URL(url).query_param('csrf-token', csrf_token).as_string()
 
-    def as_link(action: InvoiceAction, traits: 'Iterable[Trait]') -> Link:
+    def as_link(action: InvoiceAction, traits: Iterable[Trait]) -> Link:
         traits = (
             *traits,
             Intercooler(request_method='POST')
@@ -130,7 +132,7 @@ def view_billing(
             url=url
         )
 
-    def invoice_links(details: BillingCollection.Bill) -> 'Iterator[Link]':
+    def invoice_links(details: BillingCollection.Bill) -> Iterator[Link]:
         if not self.period.finalized:
             return
 
@@ -189,7 +191,7 @@ def view_billing(
 
         yield from (as_link(a, traits) for a in invoice_actions(details))
 
-    def item_links(item: 'InvoicesByPeriodRow') -> 'Iterator[Link]':
+    def item_links(item: InvoicesByPeriodRow) -> Iterator[Link]:
         if not self.period.finalized:
             return
 
@@ -226,7 +228,7 @@ def view_billing(
 
     def invoice_actions(
         details: BillingCollection.Bill
-    ) -> 'Iterator[InvoiceAction]':
+    ) -> Iterator[InvoiceAction]:
 
         if details.paid:
             yield InvoiceAction(
@@ -245,7 +247,7 @@ def view_billing(
                 text=_('Mark whole bill as paid')
             )
 
-    def item_actions(item: 'InvoicesByPeriodRow') -> 'Iterator[InvoiceAction]':
+    def item_actions(item: InvoicesByPeriodRow) -> Iterator[InvoiceAction]:
         if item.paid:
             yield InvoiceAction(
                 session=session,
@@ -292,8 +294,8 @@ def view_billing(
     request_method='POST')
 def reset_billing(
     self: BillingCollection,
-    request: 'FeriennetRequest'
-) -> 'Response | None':
+    request: FeriennetRequest
+) -> Response | None:
 
     if not self.period.active:
         request.warning(
@@ -316,8 +318,8 @@ def reset_billing(
     template='online-payments.pt')
 def view_online_payments(
     self: BillingCollection,
-    request: 'FeriennetRequest'
-) -> 'RenderData':
+    request: FeriennetRequest
+) -> RenderData:
 
     table = payments_association_table_for(InvoiceItem)
     session = request.session
@@ -346,7 +348,7 @@ def view_online_payments(
 
     layout = OnlinePaymentsLayout(self, request, title=title)
 
-    def payment_actions(payment: Payment) -> 'Iterator[Link]':
+    def payment_actions(payment: Payment) -> Iterator[Link]:
         if payment.state == 'paid':
             assert payment.amount is not None
             amount = f'{payment.amount:02f} {payment.currency}'
@@ -390,14 +392,14 @@ def view_online_payments(
     request_method='POST')
 def execute_invoice_action(
     self: InvoiceAction,
-    request: 'FeriennetRequest'
+    request: FeriennetRequest
 ) -> None:
 
     request.assert_valid_csrf_token()
     self.execute()
 
     @request.after
-    def trigger_bill_update(response: 'Response') -> None:
+    def trigger_bill_update(response: Response) -> None:
         if self.extend_to == 'family':
             response.headers.add('X-IC-Redirect', request.class_link(
                 BillingCollection
@@ -418,7 +420,7 @@ def execute_invoice_action(
     permission=Secret)
 def view_execute_import(
     self: BillingCollection,
-    request: 'FeriennetRequest'
+    request: FeriennetRequest
 ) -> None:
 
     request.assert_valid_csrf_token()
@@ -465,7 +467,7 @@ def view_execute_import(
     del request.browser_session['account-statement']
 
     @request.after
-    def redirect_intercooler(response: 'Response') -> None:
+    def redirect_intercooler(response: Response) -> None:
         response.headers.add('X-IC-Redirect', request.link(self))
 
 
@@ -478,9 +480,9 @@ def view_execute_import(
 )
 def view_billing_import(
     self: BillingCollection,
-    request: 'FeriennetRequest',
+    request: FeriennetRequest,
     form: BankStatementImportForm
-) -> 'RenderData | Response':
+) -> RenderData | Response:
 
     uploaded = 'account-statement' in request.browser_session
 
@@ -566,9 +568,9 @@ def view_billing_import(
 )
 def view_manual_booking_form(
     self: BillingCollection,
-    request: 'FeriennetRequest',
+    request: FeriennetRequest,
     form: ManualBookingForm
-) -> 'RenderData | Response':
+) -> RenderData | Response:
 
     if form.submitted(request):
         assert form.text is not None
@@ -599,9 +601,9 @@ def view_manual_booking_form(
 )
 def view_paid_date_form(
     self: BillingCollection,
-    request: 'FeriennetRequest',
+    request: FeriennetRequest,
     form: PaymentWithDateForm
-) -> 'RenderData | Response':
+) -> RenderData | Response:
 
     if form.submitted(request):
         assert form.items.data is not None

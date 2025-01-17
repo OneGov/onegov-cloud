@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 import sedate
 
 from datetime import datetime
@@ -15,7 +17,7 @@ if TYPE_CHECKING:
 
 class PublicationCollection(GenericCollection[File]):
 
-    def __init__(self, session: 'Session', year: int | None = None) -> None:
+    def __init__(self, session: Session, year: int | None = None) -> None:
         super().__init__(session)
         self.year = year
 
@@ -23,7 +25,7 @@ class PublicationCollection(GenericCollection[File]):
     def model_class(self) -> type[File]:
         return File
 
-    def query(self) -> 'Query[File]':
+    def query(self) -> Query[File]:
         query = super().query().filter(
             self.model_class.published.is_(True),
             self.model_class.publication.is_(True),
@@ -40,10 +42,10 @@ class PublicationCollection(GenericCollection[File]):
 
         return query
 
-    def for_year(self, year: int | None) -> 'Self':
+    def for_year(self, year: int | None) -> Self:
         return self.__class__(self.session, year)
 
-    def first_year(self, timezone: 'TzInfoOrName') -> int | None:
+    def first_year(self, timezone: TzInfoOrName) -> int | None:
         query = (
             self.for_year(None).query()
             .with_entities(File.created)

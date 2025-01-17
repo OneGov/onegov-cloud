@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 import hashlib
 
 from onegov.core.orm.abstract import associated

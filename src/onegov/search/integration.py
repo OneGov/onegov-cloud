@@ -1,3 +1,4 @@
+from __future__ import annotations
 
 import certifi
 import morepath
@@ -43,7 +44,7 @@ class TolerantTransport(Transport):
 
     """
 
-    failure_time: 'datetime | None'
+    failure_time: datetime | None
 
     def __init__(self, *args: Any, **kwargs: Any) -> None:
         super().__init__(*args, **kwargs)
@@ -132,7 +133,7 @@ class SearchApp(morepath.App):
         session_manager: SessionManager
 
         @property
-        def session(self) -> 'Callable[[], Session]': ...
+        def session(self) -> Callable[[], Session]: ...
         @property
         def has_database_connection(self) -> bool: ...
 
@@ -267,8 +268,8 @@ class SearchApp(morepath.App):
 
     def es_search(
         self,
-        languages: 'Iterable[str]' = '*',
-        types: 'Iterable[str]' = '*',
+        languages: Iterable[str] = '*',
+        types: Iterable[str] = '*',
         include_private: bool = False,
         explain: bool = False
     ) -> Search:
@@ -296,8 +297,8 @@ class SearchApp(morepath.App):
 
     def es_indices(
         self,
-        languages: 'Iterable[str]' = '*',
-        types: 'Iterable[str]' = '*'
+        languages: Iterable[str] = '*',
+        types: Iterable[str] = '*'
     ) -> str:
         return self.es_indexer.ixmgr.get_external_index_names(
             schema=self.schema,
@@ -307,8 +308,8 @@ class SearchApp(morepath.App):
 
     def es_search_by_request(
         self,
-        request: 'CoreRequest',
-        types: 'Iterable[str]' = '*',
+        request: CoreRequest,
+        types: Iterable[str] = '*',
         explain: bool = False,
         limit_to_request_language: bool = False
     ) -> Search:
@@ -335,8 +336,8 @@ class SearchApp(morepath.App):
     def es_suggestions(
         self,
         query: str,
-        languages: 'Iterable[str]' = '*',
-        types: 'Iterable[str]' = '*',
+        languages: Iterable[str] = '*',
+        types: Iterable[str] = '*',
         include_private: bool = False
     ) -> tuple[str, ...]:
         """ Returns suggestions for the given query. """
@@ -384,9 +385,9 @@ class SearchApp(morepath.App):
 
     def es_suggestions_by_request(
         self,
-        request: 'CoreRequest',
+        request: CoreRequest,
         query: str,
-        types: 'Iterable[str]' = '*',
+        types: Iterable[str] = '*',
         limit_to_request_language: bool = False
     ) -> tuple[str, ...]:
         """ Returns suggestions for the given query, scoped to the language
@@ -407,7 +408,7 @@ class SearchApp(morepath.App):
             include_private=self.es_may_use_private_search(request)
         )
 
-    def es_may_use_private_search(self, request: 'CoreRequest') -> bool:
+    def es_may_use_private_search(self, request: CoreRequest) -> bool:
         """ Returns True if the given request is allowed to access private
         search results. By default every logged in user has access to those.
 
@@ -441,7 +442,7 @@ class SearchApp(morepath.App):
         self.es_orm_events.es_queue.maxsize = 0
         self.es_orm_events.psql_queue.maxsize = 0
 
-        def reindex_model(model: type['Base']) -> None:
+        def reindex_model(model: type[Base]) -> None:
             """ Load all database objects and index them. """
             session = self.session()
             try:
@@ -481,9 +482,9 @@ class SearchApp(morepath.App):
 @SearchApp.tween_factory(over=transaction_tween_factory)
 def process_indexer_tween_factory(
     app: SearchApp,
-    handler: 'Callable[[CoreRequest], Response]'
-) -> 'Callable[[CoreRequest], Response]':
-    def process_indexer_tween(request: 'CoreRequest') -> 'Response':
+    handler: Callable[[CoreRequest], Response]
+) -> Callable[[CoreRequest], Response]:
+    def process_indexer_tween(request: CoreRequest) -> Response:
 
         app: SearchApp = request.app  # type:ignore[assignment]
 

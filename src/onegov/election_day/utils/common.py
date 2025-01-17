@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 from collections import OrderedDict
 from onegov.core.utils import append_query_param
 from onegov.election_day import _
@@ -56,8 +58,8 @@ class LastUpdatedOrderedDict(OrderedDict[_KT, _VT]):
 
 
 def add_last_modified_header(
-    response: 'Response',
-    last_modified: 'datetime | None'
+    response: Response,
+    last_modified: datetime | None
 ) -> None:
     """ Adds the give date to the response as Last-Modified header. """
 
@@ -68,16 +70,16 @@ def add_last_modified_header(
         )
 
 
-def add_cors_header(response: 'Response') -> None:
+def add_cors_header(response: Response) -> None:
     """ Adds a header allowing the response being used in scripts. """
     response.headers.add('Access-Control-Allow-Origin', '*')
 
 
 def add_local_results(
-    source: 'ArchivedResult',
-    target: 'ArchivedResult',
-    principal: 'Canton | Municipality',
-    session: 'Session'
+    source: ArchivedResult,
+    target: ArchivedResult,
+    principal: Canton | Municipality,
+    session: Session
 ) -> None:
     """ Adds the result of the principal.
 
@@ -147,7 +149,7 @@ def add_local_results(
 
 
 def get_parameter(
-    request: 'ElectionDayRequest',
+    request: ElectionDayRequest,
     name: str,
     type_: type[_ParamT],
     default: _T
@@ -183,8 +185,8 @@ def get_parameter(
 
 
 def get_entity_filter(
-    request: 'ElectionDayRequest',
-    item: 'Election',
+    request: ElectionDayRequest,
+    item: Election,
     view: str,
     selected: str | None
 ) -> list[tuple[str, bool, str]]:

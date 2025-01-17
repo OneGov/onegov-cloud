@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 import datetime
 
 from onegov.form import Form
@@ -26,7 +28,7 @@ class SettlementRunBoundMixin:
     if TYPE_CHECKING:
         # forward declaration of required attributes
         date: DateField
-        request: 'CoreRequest'
+        request: CoreRequest
 
     def ensure_date(self) -> bool:
         if self.date.data:
@@ -100,15 +102,15 @@ class AttendenceForm(Form, SettlementRunBoundMixin):
 
         return True
 
-    def process_obj(self, obj: 'Attendence') -> None:  # type:ignore
+    def process_obj(self, obj: Attendence) -> None:  # type:ignore
         super().process_obj(obj)
         self.duration.data = obj.duration / 60
 
     def populate_obj(  # type: ignore[override]
         self,
-        obj: 'Attendence',  # type: ignore[override]
-        exclude: 'Collection[str] | None' = None,
-        include: 'Collection[str] | None' = None
+        obj: Attendence,  # type: ignore[override]
+        exclude: Collection[str] | None = None,
+        include: Collection[str] | None = None
     ) -> None:
         super().populate_obj(obj, exclude, include)
         obj.commission_id = obj.commission_id or None
@@ -116,7 +118,7 @@ class AttendenceForm(Form, SettlementRunBoundMixin):
         if obj.type == 'plenary':
             obj.commission_id = None
 
-    def get_useful_data(self) -> dict[str, 'Any']:  # type:ignore[override]
+    def get_useful_data(self) -> dict[str, Any]:  # type:ignore[override]
         result = super().get_useful_data()
         result['commission_id'] = result.get('commission_id') or None
         if result.get('type', '') == 'plenary':
@@ -167,7 +169,7 @@ class AttendenceAddPlenaryForm(Form, SettlementRunBoundMixin):
         validators=[InputRequired()],
     )
 
-    def get_useful_data(self) -> dict[str, 'Any']:  # type:ignore[override]
+    def get_useful_data(self) -> dict[str, Any]:  # type:ignore[override]
         result = super().get_useful_data()
         result['duration'] = int(60 * (result.get('duration') or 0))
         return result
@@ -210,7 +212,7 @@ class AttendenceAddCommissionForm(Form, SettlementRunBoundMixin):
         validators=[InputRequired()],
     )
 
-    def get_useful_data(self) -> dict[str, 'Any']:  # type:ignore[override]
+    def get_useful_data(self) -> dict[str, Any]:  # type:ignore[override]
         result = super().get_useful_data()
         result['commission_id'] = self.model.id
         result['duration'] = int(60 * (result.get('duration') or 0))

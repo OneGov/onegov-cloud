@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 from datetime import date
 from io import BytesIO
 from operator import itemgetter
@@ -28,11 +30,11 @@ class FsiPdf(Pdf):
     previous_level_context: int | None = None
 
     @property
-    def page_fn(self) -> 'Callable[[Canvas, Template], None]':
+    def page_fn(self) -> Callable[[Canvas, Template], None]:
         return page_fn_footer
 
     @property
-    def page_fn_later(self) -> 'Callable[[Canvas, Template], None]':
+    def page_fn_later(self) -> Callable[[Canvas, Template], None]:
         return page_fn_header_and_footer
 
     @property
@@ -46,8 +48,8 @@ class FsiPdf(Pdf):
     @classmethod
     def from_subscriptions(
         cls,
-        collection: 'SubscriptionsCollection',
-        layout: 'DefaultLayout',
+        collection: SubscriptionsCollection,
+        layout: DefaultLayout,
         title: str
     ) -> BytesIO:
 
@@ -78,7 +80,7 @@ class FsiPdf(Pdf):
             headers += ['Course Status', 'Course attended', 'Last info mail']
             return [translate(_(h)) for h in headers]
 
-        def get_row(subscription: 'CourseSubscription') -> list[str]:
+        def get_row(subscription: CourseSubscription) -> list[str]:
             row = [str(subscription)]
             att = subscription.attendee
             row.append(att and att.source_id or '')
@@ -119,8 +121,8 @@ class FsiPdf(Pdf):
     @classmethod
     def from_audit_collection(
         cls,
-        collection: 'AuditCollection',
-        layout: 'AuditLayout',
+        collection: AuditCollection,
+        layout: AuditLayout,
         title: str
     ) -> BytesIO:
 
@@ -171,7 +173,7 @@ class FsiPdf(Pdf):
 
         style = pdf.table_style
 
-        def bgcolor(ix: int, row: int, color: 'Color') -> tuple[Any, ...]:
+        def bgcolor(ix: int, row: int, color: Color) -> tuple[Any, ...]:
             return 'BACKGROUND', (row, ix), (row, ix), color
 
         next_subscriptions = collection.next_subscriptions(request)

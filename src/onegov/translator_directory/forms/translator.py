@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 import re
 
 from functools import cached_property
@@ -64,14 +66,14 @@ if TYPE_CHECKING:
 
 class FormChoicesMixin:
 
-    request: 'TranslatorAppRequest'
+    request: TranslatorAppRequest
 
     @property
-    def available_languages(self) -> 'Query[Language]':
+    def available_languages(self) -> Query[Language]:
         return LanguageCollection(self.request.session).query()
 
     @property
-    def available_certificates(self) -> 'Query[LanguageCertificate]':
+    def available_certificates(self) -> Query[LanguageCertificate]:
         return LanguageCertificateCollection(self.request.session).query()
 
     @property
@@ -80,19 +82,19 @@ class FormChoicesMixin:
         return translators.available_additional_professional_guilds
 
     @cached_property
-    def language_choices(self) -> list['_Choice']:
+    def language_choices(self) -> list[_Choice]:
         return [
             (str(lang.id), lang.name) for lang in self.available_languages
         ]
 
     @cached_property
-    def certificate_choices(self) -> list['_Choice']:
+    def certificate_choices(self) -> list[_Choice]:
         return [
             (str(cert.id), cert.name) for cert in self.available_certificates
         ]
 
     @cached_property
-    def gender_choices(self) -> list['_Choice']:
+    def gender_choices(self) -> list[_Choice]:
         return [
             (id_, self.request.translate(choice))
             for id_, choice in GENDERS.items()
@@ -105,14 +107,14 @@ class FormChoicesMixin:
         ]
 
     @cached_property
-    def interpret_types_choices(self) -> list['_Choice']:
+    def interpret_types_choices(self) -> list[_Choice]:
         return [
             (k, self.request.translate(v))
             for k, v in INTERPRETING_TYPES.items()
         ]
 
     @cached_property
-    def guilds_choices(self) -> list['_Choice']:
+    def guilds_choices(self) -> list[_Choice]:
         result: list[_Choice] = [
             (k, self.request.translate(v))
             for k, v in PROFESSIONAL_GUILDS.items()
@@ -121,7 +123,7 @@ class FormChoicesMixin:
         return sorted(result, key=lambda x: x[1].upper())
 
     @cached_property
-    def admission_choices(self) -> list['_Choice']:
+    def admission_choices(self) -> list[_Choice]:
         admissions = tuple(
             (k, self.request.translate(v))
             for k, v in ADMISSIONS.items()
@@ -135,7 +137,7 @@ class FormChoicesMixin:
 
 class EditorTranslatorForm(Form, FormChoicesMixin):
 
-    request: 'TranslatorAppRequest'
+    request: TranslatorAppRequest
 
     pers_id = IntegerField(
         label=_('Personal ID'),
@@ -148,7 +150,7 @@ class EditorTranslatorForm(Form, FormChoicesMixin):
 
 class TranslatorForm(Form, FormChoicesMixin, DrivingDistanceMixin):
 
-    request: 'TranslatorAppRequest'
+    request: TranslatorAppRequest
 
     pers_id = IntegerField(
         label=_('Personal ID'),
@@ -395,35 +397,35 @@ class TranslatorForm(Form, FormChoicesMixin, DrivingDistanceMixin):
         return LanguageCertificateCollection(self.request.session)
 
     @property
-    def certificates(self) -> list['LanguageCertificate']:
+    def certificates(self) -> list[LanguageCertificate]:
         if not self.certificates_ids.data:
             return []
 
         return self.cert_collection.by_ids(self.certificates_ids.data)
 
     @property
-    def mother_tongues(self) -> list['Language']:
+    def mother_tongues(self) -> list[Language]:
         if not self.mother_tongues_ids.data:
             return []
 
         return self.lang_collection.by_ids(self.mother_tongues_ids.data)
 
     @property
-    def spoken_languages(self) -> list['Language']:
+    def spoken_languages(self) -> list[Language]:
         if not self.spoken_languages_ids.data:
             return []
 
         return self.lang_collection.by_ids(self.spoken_languages_ids.data)
 
     @property
-    def written_languages(self) -> list['Language']:
+    def written_languages(self) -> list[Language]:
         if not self.written_languages_ids.data:
             return []
 
         return self.lang_collection.by_ids(self.written_languages_ids.data)
 
     @property
-    def monitoring_languages(self) -> list['Language']:
+    def monitoring_languages(self) -> list[Language]:
         if not self.monitoring_languages_ids.data:
             return []
 
@@ -553,7 +555,7 @@ class TranslatorForm(Form, FormChoicesMixin, DrivingDistanceMixin):
 
 class TranslatorSearchForm(Form, FormChoicesMixin):
 
-    request: 'TranslatorAppRequest'
+    request: TranslatorAppRequest
 
     spoken_langs = ChosenSelectMultipleField(
         label=_('Spoken languages'),
@@ -614,7 +616,7 @@ class TranslatorSearchForm(Form, FormChoicesMixin):
     )
 
     @property
-    def monitoring_languages(self) -> list['Language']:
+    def monitoring_languages(self) -> list[Language]:
         if not self.monitoring_languages_ids.data:
             return []
 
@@ -666,7 +668,7 @@ class TranslatorSearchForm(Form, FormChoicesMixin):
 class MailTemplatesForm(Form):
     """ Defines the form for generating mail templates. """
 
-    request: 'TranslatorAppRequest'
+    request: TranslatorAppRequest
 
     templates = ChosenSelectField(
         label=_('Chose a mail template to generate:'),

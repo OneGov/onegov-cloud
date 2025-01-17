@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 from onegov.user.forms.group import UserGroupForm
 from onegov.user.forms.login import LoginForm
 from onegov.user.forms.mtan import MTANForm

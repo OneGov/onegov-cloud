@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 from onegov.core import utils
 from onegov.core.collection import GenericCollection
 from onegov.people.models import Person
@@ -60,7 +62,7 @@ class BasePersonCollection(GenericCollection[PersonT]):
         else:
             return self.add(first_name, last_name, **optional)
 
-    def by_id(self, id: 'UUID') -> PersonT | None:  # type:ignore[override]
+    def by_id(self, id: UUID) -> PersonT | None:  # type:ignore[override]
         if utils.is_uuid(id):
             return self.query().filter(self.model_class.id == id).first()
         return None

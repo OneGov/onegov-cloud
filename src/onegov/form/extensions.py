@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 from typing import Any, Generic, TypeVar, TYPE_CHECKING
 if TYPE_CHECKING:
     from collections.abc import Collection
@@ -6,7 +8,7 @@ if TYPE_CHECKING:
 _FormT = TypeVar('_FormT', bound='Form')
 
 
-form_extensions: dict[str, type['FormExtension[Any]']] = {}
+form_extensions: dict[str, type[FormExtension[Any]]] = {}
 
 
 class FormExtension(Generic[_FormT]):
@@ -72,7 +74,7 @@ class Extendable:
     def extend_form_class(
         self,
         form_class: type[_FormT],
-        extensions: 'Collection[str]'
+        extensions: Collection[str]
     ) -> type[_FormT]:
         if not extensions:
             return form_class

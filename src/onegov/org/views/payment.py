@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 import decimal
 from collections import OrderedDict
 from decimal import Decimal
@@ -59,7 +61,7 @@ def ticket_by_link(
 
 def send_ticket_notifications(
     payment: Payment,
-    request: 'OrgRequest',
+    request: OrgRequest,
     change: str
 ) -> None:
 
@@ -103,9 +105,9 @@ def send_ticket_notifications(
 )
 def view_payments(
     self: PaymentCollection,
-    request: 'OrgRequest',
+    request: OrgRequest,
     layout: PaymentCollectionLayout | None = None
-) -> 'RenderData':
+) -> RenderData:
 
     tickets = TicketCollection(request.session)
 
@@ -135,10 +137,10 @@ def view_payments(
 )
 def export_payments(
     self: PaymentCollection,
-    request: 'OrgRequest',
-    form: 'PaymentExportForm',
+    request: OrgRequest,
+    form: PaymentExportForm,
     layout: PaymentCollectionLayout | None = None
-) -> 'RenderData | Response':
+) -> RenderData | Response:
 
     layout = layout or PaymentCollectionLayout(self, request)
     layout.breadcrumbs.append(Link(_('Export'), '#'))
@@ -168,12 +170,12 @@ def export_payments(
 
 
 def run_export(
-    session: 'Session',
-    start: 'datetime',
-    end: 'datetime',
+    session: Session,
+    start: datetime,
+    end: datetime,
     nested: bool,
-    formatter: 'Callable[[Any], object]'
-) -> 'Sequence[dict[str, Any]]':
+    formatter: Callable[[Any], object]
+) -> Sequence[dict[str, Any]]:
 
     collection = PaymentCollection(session, start=start, end=end)
 
@@ -186,7 +188,7 @@ def run_export(
 
     def transform(
         payment: Payment,
-        links: list['AnyPayableBase']
+        links: list[AnyPayableBase]
     ) -> dict[str, Any]:
 
         r: dict[str, Any] = OrderedDict()
@@ -216,7 +218,7 @@ def run_export(
     request_method='POST',
     permission=Private
 )
-def change_payment_amount(self: Payment, request: 'OrgRequest') -> 'JSON_ro':
+def change_payment_amount(self: Payment, request: OrgRequest) -> JSON_ro:
     request.assert_valid_csrf_token()
     assert not self.paid
     format_ = DefaultLayout(self, request).format_number
@@ -245,7 +247,7 @@ def change_payment_amount(self: Payment, request: 'OrgRequest') -> 'JSON_ro':
     request_method='POST',
     permission=Private
 )
-def mark_as_paid(self: Payment, request: 'OrgRequest') -> None:
+def mark_as_paid(self: Payment, request: OrgRequest) -> None:
     request.assert_valid_csrf_token()
     send_ticket_notifications(self, request, 'marked-as-paid')
 
@@ -261,7 +263,7 @@ def mark_as_paid(self: Payment, request: 'OrgRequest') -> None:
     request_method='POST',
     permission=Private
 )
-def mark_as_unpaid(self: Payment, request: 'OrgRequest') -> None:
+def mark_as_unpaid(self: Payment, request: OrgRequest) -> None:
     request.assert_valid_csrf_token()
     send_ticket_notifications(self, request, 'marked-as-unpaid')
 
@@ -277,7 +279,7 @@ def mark_as_unpaid(self: Payment, request: 'OrgRequest') -> None:
     request_method='POST',
     permission=Private
 )
-def capture(self: Payment, request: 'OrgRequest') -> None:
+def capture(self: Payment, request: OrgRequest) -> None:
     request.assert_valid_csrf_token()
     send_ticket_notifications(self, request, 'captured')
 
@@ -294,7 +296,7 @@ def capture(self: Payment, request: 'OrgRequest') -> None:
     request_method='POST',
     permission=Private
 )
-def refund(self: Payment, request: 'OrgRequest') -> None:
+def refund(self: Payment, request: OrgRequest) -> None:
     request.assert_valid_csrf_token()
     send_ticket_notifications(self, request, 'refunded')
 

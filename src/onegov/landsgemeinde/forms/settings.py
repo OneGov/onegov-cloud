@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 from wtforms.fields import EmailField
 from onegov.form import Form
 from onegov.landsgemeinde import _
@@ -27,7 +29,7 @@ class OpenDataSettingsForm(Form):
 
     def process_obj(
         self,
-        obj: 'Organisation'  # type:ignore[override]
+        obj: Organisation  # type:ignore[override]
     ) -> None:
 
         super().process_obj(obj)
@@ -37,7 +39,7 @@ class OpenDataSettingsForm(Form):
 
     def populate_obj(  # type:ignore[override]
         self,
-        obj: 'Organisation',  # type:ignore[override]
+        obj: Organisation,  # type:ignore[override]
         *args: Any,
         **kwargs: Any
     ) -> None:

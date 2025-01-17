@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 from onegov.election_day import _
 from onegov.election_day.formats.imports.common import EXPATS
 from onegov.election_day.formats.imports.common import FileImportError
@@ -63,15 +65,15 @@ WABSTIC_MAJORZ_HEADERS_WM_KANDIDATENGDE = (
 )
 
 
-def get_entity_id(line: 'DefaultRow') -> int:
+def get_entity_id(line: DefaultRow) -> int:
     col = 'bfsnrgemeinde'
     entity_id = validate_integer(line, col)
     return 0 if entity_id in EXPATS else entity_id
 
 
 def import_election_wabstic_majorz(
-    election: 'Election',
-    principal: 'Canton | Municipality',
+    election: Election,
+    principal: Canton | Municipality,
     number: str,
     district: str,
     file_wm_wahl: IO[bytes],

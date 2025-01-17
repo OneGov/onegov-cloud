@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 from elasticsearch_dsl.function import SF  # type:ignore
 from elasticsearch_dsl.query import FunctionScore  # type:ignore
 from elasticsearch_dsl.query import Match
@@ -22,7 +24,7 @@ class Search(Pagination[_M]):
     results_per_page = 10
     max_query_length = 100
 
-    def __init__(self, request: 'OrgRequest', query: str, page: int) -> None:
+    def __init__(self, request: OrgRequest, query: str, page: int) -> None:
         super().__init__(page)
         self.request = request
         self.query = query
@@ -49,20 +51,20 @@ class Search(Pagination[_M]):
 
     if TYPE_CHECKING:
         @property
-        def cached_subset(self) -> 'Response | None': ...  # type:ignore
+        def cached_subset(self) -> Response | None: ...  # type:ignore
 
-    def subset(self) -> 'Response | None':  # type:ignore[override]
+    def subset(self) -> Response | None:  # type:ignore[override]
         return self.batch
 
     @property
     def page_index(self) -> int:
         return self.page
 
-    def page_by_index(self, index: int) -> 'Search[_M]':
+    def page_by_index(self, index: int) -> Search[_M]:
         return Search(self.request, self.query, index)
 
     @cached_property
-    def batch(self) -> 'Response | None':  # type:ignore[override]
+    def batch(self) -> Response | None:  # type:ignore[override]
         if not self.query:
             return None
 
@@ -83,7 +85,7 @@ class Search(Pagination[_M]):
         return search[self.offset:self.offset + self.batch_size].execute()
 
     @cached_property
-    def load_batch_results(self) -> list['Hit']:
+    def load_batch_results(self) -> list[Hit]:
         """Load search results and sort events by latest occurrence.
 
         This methods is a wrapper around `batch.load()`, which returns the
@@ -116,9 +118,9 @@ class Search(Pagination[_M]):
 
     def generic_search(
         self,
-        search: 'ESSearch',
+        search: ESSearch,
         query: str
-    ) -> 'ESSearch':
+    ) -> ESSearch:
 
         # make sure the title matches with a higher priority, otherwise the
         # "get lucky" functionality is not so lucky after all
@@ -145,7 +147,7 @@ class Search(Pagination[_M]):
 
         return search
 
-    def hashtag_search(self, search: 'ESSearch', query: str) -> 'ESSearch':
+    def hashtag_search(self, search: ESSearch, query: str) -> ESSearch:
         return search.query(Match(es_tags=query.lstrip('#')))
 
     def feeling_lucky(self) -> str | None:
@@ -182,7 +184,7 @@ class SearchPostgres(Pagination[_M]):
     results_per_page = 10
     max_query_length = 100
 
-    def __init__(self, request: 'OrgRequest', query: str, page: int):
+    def __init__(self, request: OrgRequest, query: str, page: int):
         self.request = request
         self.query = query
         self.page = page  # page index
@@ -219,18 +221,18 @@ class SearchPostgres(Pagination[_M]):
             return NotImplemented
         return self.page == other.page and self.query == other.query
 
-    def subset(self) -> 'list[Searchable] | None':  # type:ignore[override]
+    def subset(self) -> list[Searchable] | None:  # type:ignore[override]
         return self.batch
 
     @property
     def page_index(self) -> int:
         return self.page
 
-    def page_by_index(self, index: int) -> 'SearchPostgres[_M]':
+    def page_by_index(self, index: int) -> SearchPostgres[_M]:
         return SearchPostgres(self.request, self.query, index)
 
     @cached_property
-    def batch(self) -> 'list[Searchable]':  # type:ignore[override]
+    def batch(self) -> list[Searchable]:  # type:ignore[override]
         if not self.query:
             return []
 
@@ -290,7 +292,7 @@ class SearchPostgres(Pagination[_M]):
 
         return query
 
-    def generic_search(self) -> list['Searchable']:
+    def generic_search(self) -> list[Searchable]:
         doc_count = 0
         results: list[Any] = []
         language = locale_mapping(self.request.locale or 'de_CH')
@@ -331,7 +333,7 @@ class SearchPostgres(Pagination[_M]):
         # only return the model instances
         return [r[0] for r in results]
 
-    def hashtag_search(self) -> list['Searchable']:
+    def hashtag_search(self) -> list[Searchable]:
         doc_count = 0
         results: list[Any] = []
         q = self.query.lstrip('#')

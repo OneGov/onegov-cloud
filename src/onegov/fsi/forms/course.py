@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 import re
 
 from collections import OrderedDict
@@ -149,7 +151,7 @@ class CourseForm(Form):
 
     def get_useful_data(
         self,
-        exclude: 'Collection[str] | None' = None
+        exclude: Collection[str] | None = None
     ) -> dict[str, Any]:
 
         result = super().get_useful_data(exclude)
@@ -167,7 +169,7 @@ class CourseForm(Form):
             return False
         return True
 
-    def apply_model(self, model: 'Course') -> None:
+    def apply_model(self, model: Course) -> None:
         self.name.data = model.name
         self.description.data = model.description
         self.mandatory_refresh.data = model.mandatory_refresh
@@ -175,7 +177,7 @@ class CourseForm(Form):
         self.hidden_from_public.data = model.hidden_from_public
         self.evaluation_url.data = model.evaluation_url
 
-    def update_model(self, model: 'Course') -> None:
+    def update_model(self, model: Course) -> None:
         assert self.name.data is not None
         model.name = self.name.data
         model.description = linkify(self.description.data)
@@ -199,7 +201,7 @@ class InviteCourseForm(Form):
     #        This should be its own method really...
     def get_useful_data(  # type:ignore[override]
         self,
-        exclude: 'Collection[str] | None' = None
+        exclude: Collection[str] | None = None
     ) -> tuple[str, ...]:
         string = self.attendees.data or ''
         return tuple(t[0] for t in _email_regex.findall(string))
