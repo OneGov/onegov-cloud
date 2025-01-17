@@ -8,7 +8,7 @@ from onegov.core.orm import Base
 from onegov.core.orm.abstract import associated
 from onegov.core.orm.mixins import (
     dict_markup_property, dict_property, meta_property, TimestampMixin)
-from onegov.core.orm.types import JSON, UUID
+from onegov.core.orm.types import JSON, UUID, UTCDateTime
 from onegov.core.utils import linkify, paragraphify
 from onegov.file.models.file import File
 from onegov.form import flatten_fieldsets, parse_formcode
@@ -240,6 +240,10 @@ class Organisation(Base, TimestampMixin):
     ogd_publisher_mail: dict_property[str | None] = meta_property()
     ogd_publisher_id: dict_property[str | None] = meta_property()
     ogd_publisher_name: dict_property[str | None] = meta_property()
+
+    # cron jobs
+    hourly_maintenance_tasks_last_run: (
+        dict_property)[UTCDateTime | None] = (meta_property(default=None))
 
     @property
     def mtan_access_window(self) -> timedelta:

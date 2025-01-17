@@ -23,6 +23,8 @@ from onegov.org.models.extensions import (
     GeneralFileLinkExtension, DeletableContentExtension)
 from onegov.org.models.ticket import ReservationHandler
 from onegov.org.views.allocation import handle_rules_cronjob
+from onegov.org.views.directory import (
+    send_email_notification_for_directory_entry)
 from onegov.org.views.newsletter import send_newsletter
 from onegov.org.views.ticket import delete_tickets_and_related_data
 from onegov.reservation import Reservation, Resource, ResourceCollection
@@ -69,7 +71,7 @@ WEEKDAYS = (
 @OrgApp.cronjob(hour='*', minute=0, timezone='UTC')
 def hourly_maintenance_tasks(request: OrgRequest) -> None:
     publish_files(request)
-    reindex_published_models(request)
+    handle_publication_models(request)
     send_scheduled_newsletter(request)
     delete_old_tans(request)
     delete_old_tan_accesses(request)
@@ -90,13 +92,16 @@ def publish_files(request: OrgRequest) -> None:
     FileCollection(request.session).publish_files()
 
 
-def reindex_published_models(request: OrgRequest) -> None:
+def handle_publication_models(request: OrgRequest) -> None:
     """
     Reindexes all recently published/unpublished objects
     in the elasticsearch database.
 
     For pages it also updates the propagated access to any
     associated files.
+
+    For directory entries it also sends out e-mail notifications if
+    published within the last hour.
     """
 
     if not hasattr(request.app, 'es_client'):
@@ -110,10 +115,11 @@ def reindex_published_models(request: OrgRequest) -> None:
             cls, UTCPublicationMixin)
         )
 
-    objects = []
+    objects = set()
     session = request.app.session()
     now = utcnow()
-    then = now - timedelta(hours=1)
+    then = request.app.org.meta.get('hourly_maintenance_tasks_last_run',
+                                    now - timedelta(hours=1))
     for base in request.app.session_manager.bases:
         for model in publication_models(base):
             query = session.query(model).filter(
@@ -128,7 +134,7 @@ def reindex_published_models(request: OrgRequest) -> None:
                     )
                 )
             )
-            objects.extend(query.all())
+            objects.update(query.all())
 
     for obj in objects:
         if isinstance(obj, GeneralFileLinkExtension):
@@ -137,6 +143,13 @@ def reindex_published_models(request: OrgRequest) -> None:
 
         if isinstance(obj, Searchable):
             request.app.es_orm_events.index(request.app.schema, obj)
+
+        if (isinstance(obj, ExtendedDirectoryEntry) and obj.published and
+                obj.directory.enable_update_notifications):
+            send_email_notification_for_directory_entry(
+                obj.directory, obj, request)
+
+    request.app.org.meta['hourly_maintenance_tasks_last_run'] = now
 
 
 def delete_old_tans(request: OrgRequest) -> None:
