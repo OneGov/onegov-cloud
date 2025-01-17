@@ -428,8 +428,8 @@ def test_search_future_events_are_sorted_by_occurrence_date(client_with_es):
     for current_client in (client, member, anom):
         results = current_client.get('/search?q=Concert')
         # Expect ordered by occurrence date, for all search results of 'Event'
-        assert [a.text.rstrip(' \n') for a in
-                results.pyquery('li.search-result-events a')] == [
+        assert [t.text.strip() for t in
+                results.pyquery('li.search-result-events a h5')] == [
             'Not sorted Concert', 'First Concert', 'Second Concert',
             'Third Concert', 'Forth Concert'
         ]
@@ -437,10 +437,10 @@ def test_search_future_events_are_sorted_by_occurrence_date(client_with_es):
     # postgres
     for current_client in (client, member, anom):
         results = current_client.get('/search-postgres?q=Concert')
-        # Expect future events ordered by occurrence date, fare future first.
+        # Expect future events ordered by occurrence date, far future first.
         # Past events are not sorted by occurrence date.
-        assert [a.text.rstrip(' \n') for a in
-                results.pyquery('li.search-result-events a')] == [
+        assert [t.text.strip() for t in
+                results.pyquery('li.search-result-events a h5')] == [
             'Forth Concert', 'Third Concert', 'Second Concert',
             'First Concert', 'Not sorted Concert'
         ]
