@@ -1,7 +1,10 @@
 from collections import OrderedDict
+
+import requests
 from babel.dates import get_month_names
 from datetime import datetime, timedelta
 from itertools import groupby
+
 from onegov.chat.collections import ChatCollection
 from onegov.chat.models import Chat
 from onegov.core.cache import lru_cache
@@ -12,7 +15,8 @@ from onegov.event import Occurrence, Event
 from onegov.file import FileCollection
 from onegov.form import FormSubmission, parse_form
 from onegov.org.mail import send_ticket_mail
-from onegov.newsletter import Newsletter, NewsletterCollection
+from onegov.newsletter import Newsletter, NewsletterCollection, \
+    RecipientCollection
 from onegov.org import _, OrgApp
 from onegov.org.layout import DefaultMailLayout
 from onegov.org.models import (
@@ -711,3 +715,36 @@ def delete_content_marked_deletable(request: 'OrgRequest') -> None:
 
     if count:
         print(f'Cron: Deleted {count} expired deletable objects in db')
+
+
+@OrgApp.cronjob(hour=7, minute=0, timezone='Europe/Zurich')
+def update_newsletter_email_bounce_statistic(
+    request: 'OrgRequest'
+) -> None:
+    # I choose hour=7 as the maximum time difference between Eastern Standard
+    # Time (EST) and Central European Summer Time (CEST) is 7 hours. This
+    # occurs when EST is observing standard time (UTC-5) and CEST is observing
+    # daylight saving time (UTC+2).
+    # Postmark uses EST in `fromdate` and `todate`, see
+    # https://postmarkapp.com/developer/api/bounce-api.
+
+    recipients = RecipientCollection(request.session)
+    yesterday = utcnow() - timedelta(days=1)
+
+    r = requests.get(
+        'https://api.postmarkapp.com/bounces?count=500&offset=0',
+        f'fromDate={yesterday.date()}&toDate={yesterday.date()}',
+        headers={
+                "Accept": "application/json",
+                "X-Postmark-Server-Token": "abcd"
+            },
+        timeout=60
+    )
+    r.raise_for_status()
+    bounces = r.json().get('Bounces', [])
+
+    for bounce in bounces:
+        email = bounce['Email']
+        recipient = recipients.by_address(email)
+        if recipient:
+            recipient.update_bounce_statistics({bounce['Type']: 1})

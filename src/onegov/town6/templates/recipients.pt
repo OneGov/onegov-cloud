@@ -30,6 +30,9 @@
                        i18n:attributes="data-confirm-extra;data-confirm-yes;data-confirm-no">
                         unsubscribe
                     </a>
+                    <span tal:condition="recipient.has_delivery_failure" class="small-text info-text" title="This recipient has delivery failures, including hard bounces, invalid email addresses, spam complaints, manual deactivations, or being blocked. We recommend unsubscribing it from the list." i18n:attributes="title">
+                        <i class="fa fa-exclamation-triangle"></i>
+                    </span>
                 </li>
             </ul>
         </tal:b>
