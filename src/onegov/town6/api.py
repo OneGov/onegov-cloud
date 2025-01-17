@@ -1,6 +1,5 @@
 from __future__ import annotations
 
-from functools import cached_property
 from onegov.event.collections import OccurrenceCollection
 from onegov.api import ApiEndpoint
 from onegov.gis import Coordinates
@@ -22,15 +21,6 @@ if TYPE_CHECKING:
     T = TypeVar('T')
 
 
-class ApisMixin:
-
-    app: TownApp
-
-    @cached_property
-    def event_api(self) -> EventApiEndpoint:
-        return EventApiEndpoint(self.app)
-
-
 def get_geo_location(item: ContentMixin) -> dict[str, Any]:
     geo = item.content.get('coordinates', Coordinates()) or Coordinates()
     return {'lon': geo.lon, 'lat': geo.lat, 'zoom': geo.zoom}
@@ -48,7 +38,6 @@ def get_modified_iso_format(item: TimestampMixin) -> str:
 
 class EventApiEndpoint(
     ApiEndpoint['Occurrence'],
-    ApisMixin
 ):
     app: TownApp
     endpoint = 'events'
@@ -91,7 +80,6 @@ class EventApiEndpoint(
 
 class NewsApiEndpoint(
     ApiEndpoint['News'],
-    ApisMixin
 ):
     app: TownApp
     endpoint = 'news'
