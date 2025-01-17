@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 from morepath import redirect
 from morepath.request import Response
 from onegov.core.security import Personal
@@ -30,8 +32,8 @@ if TYPE_CHECKING:
 )
 def view_notice(
     self: GazetteNotice,
-    request: 'GazetteRequest'
-) -> 'RenderData':
+    request: GazetteRequest
+) -> RenderData:
     """ View a notice.
 
     View the notice and its meta data. This is the main view for the notices
@@ -132,8 +134,8 @@ def view_notice(
 )
 def preview_notice(
     self: GazetteNotice,
-    request: 'GazetteRequest'
-) -> 'RenderData':
+    request: GazetteRequest
+) -> RenderData:
     """ Preview the notice. """
 
     layout = Layout(self, request)
@@ -152,7 +154,7 @@ def preview_notice(
 )
 def preview_notice_pdf(
     self: GazetteNotice,
-    request: 'GazetteRequest'
+    request: GazetteRequest
 ) -> Response:
     """ Preview the notice as PDF. """
 
@@ -182,9 +184,9 @@ def preview_notice_pdf(
 )
 def edit_notice(
     self: GazetteNotice,
-    request: 'GazetteRequest',
+    request: GazetteRequest,
     form: NoticeForm
-) -> 'RenderData | BaseResponse':
+) -> RenderData | BaseResponse:
     """ Edit a notice.
 
     This view is used by the editors and publishers. Editors may only edit
@@ -277,9 +279,9 @@ def edit_notice(
 )
 def edit_notice_unrestricted(
     self: GazetteNotice,
-    request: 'GazetteRequest',
+    request: GazetteRequest,
     form: UnrestrictedNoticeForm
-) -> 'RenderData | BaseResponse':
+) -> RenderData | BaseResponse:
     """ Edit a notice without restrictions.
 
     This view is only usable by publishers.
@@ -331,9 +333,9 @@ def edit_notice_unrestricted(
 )
 def delete_notice(
     self: GazetteNotice,
-    request: 'GazetteRequest',
+    request: GazetteRequest,
     form: EmptyForm
-) -> 'RenderData | BaseResponse':
+) -> RenderData | BaseResponse:
     """ Delete a notice.
 
     Editors may only delete their own drafted and rejected notices.

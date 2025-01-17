@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 from morepath import redirect
 from onegov.core.crypto import random_token
 from onegov.core.security import Private
@@ -47,9 +49,9 @@ if TYPE_CHECKING:
 )
 def view_vote(
     self: SwissVote,
-    request: 'SwissvotesRequest',
+    request: SwissvotesRequest,
     form: AttachmentsSearchForm
-) -> 'RenderData':
+) -> RenderData:
 
     layout = VoteLayout(self, request)
     query = request.session.query(SwissVote)
@@ -87,23 +89,23 @@ def view_vote(
 )
 def view_vote_percentages(
     self: SwissVote,
-    request: 'SwissvotesRequest'
-) -> 'JSON_ro':
+    request: SwissvotesRequest
+) -> JSON_ro:
 
     def create(
         text: str,
         text_label: str | None = None,
-        percentage: 'Decimal | None' = None,
-        yeas_p: 'Decimal | None' = None,
-        nays_p: 'Decimal | None' = None,
-        yeas: 'Decimal | int | None' = None,
-        nays: 'Decimal | int | None' = None,
+        percentage: Decimal | None = None,
+        yeas_p: Decimal | None = None,
+        nays_p: Decimal | None = None,
+        yeas: Decimal | int | None = None,
+        nays: Decimal | int | None = None,
         code: str | None = None,
         yea_label: str | None = None,
         nay_label: str | None = None,
         none_label: str | None = None,
         empty: bool = False
-    ) -> dict[str, 'JSON_ro']:
+    ) -> dict[str, JSON_ro]:
 
         translate = request.translate
         result: dict[str, JSON_ro] = {
@@ -264,8 +266,8 @@ def view_vote_percentages(
 )
 def view_vote_strengths(
     self: SwissVote,
-    request: 'SwissvotesRequest'
-) -> 'RenderData':
+    request: SwissvotesRequest
+) -> RenderData:
     return {
         'layout': VoteStrengthsLayout(self, request),
         'Actor': Actor
@@ -280,8 +282,8 @@ def view_vote_strengths(
 )
 def view_vote_campaign_material(
     self: SwissVote,
-    request: 'SwissvotesRequest'
-) -> 'RenderData':
+    request: SwissvotesRequest
+) -> RenderData:
 
     layout = VoteCampaignMaterialLayout(self, request)
     files = sorted(
@@ -307,9 +309,9 @@ def view_vote_campaign_material(
 )
 def upload_vote_attachments(
     self: SwissVote,
-    request: 'SwissvotesRequest',
+    request: SwissvotesRequest,
     form: AttachmentsForm
-) -> 'RenderData | Response':
+) -> RenderData | Response:
 
     if form.submitted(request):
         form.update_model(self)
@@ -337,9 +339,9 @@ def upload_vote_attachments(
 )
 def delete_vote(
     self: SwissVote,
-    request: 'SwissvotesRequest',
+    request: SwissvotesRequest,
     form: Form
-) -> 'RenderData | Response':
+) -> RenderData | Response:
 
     layout = DeleteVoteLayout(self, request)
 
@@ -369,11 +371,11 @@ def delete_vote(
 )
 def view_file(
     self: SwissVoteFile,
-    request: 'SwissvotesRequest'
-) -> 'StoredFile':
+    request: SwissvotesRequest
+) -> StoredFile:
 
     @request.after
-    def set_filename(response: 'Response') -> None:
+    def set_filename(response: Response) -> None:
         attribute = SwissVote.localized_files().get(self.name.split('-')[0])
         if attribute:
             bfs_number = self.linked_swissvotes[0].bfs_number
@@ -389,12 +391,12 @@ def view_file(
 def create_static_file_view(
     attribute: str,
     locale: str
-) -> 'Callable[[SwissVote, SwissvotesRequest], Response]':
+) -> Callable[[SwissVote, SwissvotesRequest], Response]:
 
     def static_view(
         self: SwissVote,
-        request: 'SwissvotesRequest'
-    ) -> 'Response':
+        request: SwissvotesRequest
+    ) -> Response:
         file = self.get_file(attribute, locale=locale, fallback=False)
         if not file:
             raise HTTPNotFound()
@@ -420,8 +422,8 @@ for attribute_name, attribute in SwissVote.localized_files().items():
 )
 def view_manage_campaign_material(
     self: SwissVote,
-    request: 'SwissvotesRequest'
-) -> 'RenderData':
+    request: SwissvotesRequest
+) -> RenderData:
 
     layout = ManageCampaingMaterialLayout(self, request)
 
@@ -444,7 +446,7 @@ def view_manage_campaign_material(
 )
 def upload_manage_campaign_material(
     self: SwissVote,
-    request: 'SwissvotesRequest'
+    request: SwissvotesRequest
 ) -> None:
 
     request.assert_valid_csrf_token()
@@ -472,8 +474,8 @@ def upload_manage_campaign_material(
 )
 def view_manage_campaign_material_yea(
     self: SwissVote,
-    request: 'SwissvotesRequest'
-) -> 'RenderData':
+    request: SwissvotesRequest
+) -> RenderData:
 
     layout = ManageCampaingMaterialYeaLayout(self, request)
 
@@ -496,7 +498,7 @@ def view_manage_campaign_material_yea(
 )
 def upload_manage_campaign_material_yea(
     self: SwissVote,
-    request: 'SwissvotesRequest'
+    request: SwissvotesRequest
 ) -> None:
 
     request.assert_valid_csrf_token()
@@ -524,8 +526,8 @@ def upload_manage_campaign_material_yea(
 )
 def view_manage_campaign_material_nay(
     self: SwissVote,
-    request: 'SwissvotesRequest'
-) -> 'RenderData':
+    request: SwissvotesRequest
+) -> RenderData:
 
     layout = ManageCampaingMaterialNayLayout(self, request)
 
@@ -548,7 +550,7 @@ def view_manage_campaign_material_nay(
 )
 def upload_manage_campaign_material_nay(
     self: SwissVote,
-    request: 'SwissvotesRequest'
+    request: SwissvotesRequest
 ) -> None:
 
     request.assert_valid_csrf_token()
@@ -577,9 +579,9 @@ def upload_manage_campaign_material_nay(
 )
 def delete_vote_attachment(
     self: SwissVoteFile,
-    request: 'SwissvotesRequest',
+    request: SwissvotesRequest,
     form: Form
-) -> 'RenderData | Response':
+) -> RenderData | Response:
 
     layout = DeleteVoteAttachmentLayout(self, request)
     name = 'manage-campaign-material'

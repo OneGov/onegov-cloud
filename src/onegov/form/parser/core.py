@@ -231,9 +231,9 @@ There are two types of number fields. An integer and a float field::
 Integer fields optionally can have a price attached to them which will be
 multiplied by the supplied integer::
 
-    Number of stamps to include = 0..30 (0.85 CHF)
+    Number of stamps to include = 0..30 (1.00 CHF)
 
-This will result in a price of 0.85 CHF per stamp.
+This will result in a price of 1.00 CHF per stamp.
 
 Code
 ~~~~
@@ -383,6 +383,7 @@ will become mandatory if this option is selected. It is possible to achieve
 this without a price increase too: (0 CHF!)
 
 """
+from __future__ import annotations
 
 import pyparsing as pp
 import re
@@ -515,8 +516,8 @@ class constructor:  # noqa: N801
 
     def __call__(
         self,
-        fn: 'Callable[[CustomLoader, ScalarNode], pp.ParseResults]'
-    ) -> 'Callable[[CustomLoader, ScalarNode], pp.ParseResults]':
+        fn: Callable[[CustomLoader, ScalarNode], pp.ParseResults]
+    ) -> Callable[[CustomLoader, ScalarNode], pp.ParseResults]:
         CustomLoader.add_constructor(self.tag, fn)
         return fn
 
@@ -524,7 +525,7 @@ class constructor:  # noqa: N801
 @constructor('!text')
 def construct_textfield(
     loader: CustomLoader,
-    node: 'ScalarNode'
+    node: ScalarNode
 ) -> pp.ParseResults:
     return ELEMENTS.textfield.parse_string(node.value)
 
@@ -532,7 +533,7 @@ def construct_textfield(
 @constructor('!textarea')
 def construct_textarea(
     loader: CustomLoader,
-    node: 'ScalarNode'
+    node: ScalarNode
 ) -> pp.ParseResults:
     return ELEMENTS.textarea.parse_string(node.value)
 
@@ -540,7 +541,7 @@ def construct_textarea(
 @constructor('!code')
 def construct_syntax(
     loader: CustomLoader,
-    node: 'ScalarNode'
+    node: ScalarNode
 ) -> pp.ParseResults:
     return ELEMENTS.code.parse_string(node.value)
 
@@ -548,7 +549,7 @@ def construct_syntax(
 @constructor('!email')
 def construct_email(
     loader: CustomLoader,
-    node: 'ScalarNode'
+    node: ScalarNode
 ) -> pp.ParseResults:
     return ELEMENTS.email.parse_string(node.value)
 
@@ -556,7 +557,7 @@ def construct_email(
 @constructor('!url')
 def construct_url(
         loader: CustomLoader,
-        node: 'ScalarNode'
+        node: ScalarNode
 ) -> pp.ParseResults:
     return ELEMENTS.url.parse_string(node.value)
 
@@ -564,7 +565,7 @@ def construct_url(
 @constructor('!video_url')
 def construct_video_url(
     loader: CustomLoader,
-    node: 'ScalarNode'
+    node: ScalarNode
 ) -> pp.ParseResults:
     return ELEMENTS.video_url.parse_string(node.value)
 
@@ -572,7 +573,7 @@ def construct_video_url(
 @constructor('!stdnum')
 def construct_stdnum(
     loader: CustomLoader,
-    node: 'ScalarNode'
+    node: ScalarNode
 ) -> pp.ParseResults:
     return ELEMENTS.stdnum.parse_string(node.value)
 
@@ -580,7 +581,7 @@ def construct_stdnum(
 @constructor('!date')
 def construct_date(
     loader: CustomLoader,
-    node: 'ScalarNode'
+    node: ScalarNode
 ) -> pp.ParseResults:
     return ELEMENTS.date.parse_string(node.value)
 
@@ -588,7 +589,7 @@ def construct_date(
 @constructor('!datetime')
 def construct_datetime(
     loader: CustomLoader,
-    node: 'ScalarNode'
+    node: ScalarNode
 ) -> pp.ParseResults:
     return ELEMENTS.datetime.parse_string(node.value)
 
@@ -596,7 +597,7 @@ def construct_datetime(
 @constructor('!time')
 def construct_time(
     loader: CustomLoader,
-    node: 'ScalarNode'
+    node: ScalarNode
 ) -> pp.ParseResults:
     return ELEMENTS.time.parse_string(node.value)
 
@@ -604,7 +605,7 @@ def construct_time(
 @constructor('!radio')
 def construct_radio(
     loader: CustomLoader,
-    node: 'ScalarNode'
+    node: ScalarNode
 ) -> pp.ParseResults:
     return ELEMENTS.radio.parse_string(node.value)
 
@@ -612,7 +613,7 @@ def construct_radio(
 @constructor('!checkbox')
 def construct_checkbox(
     loader: CustomLoader,
-    node: 'ScalarNode'
+    node: ScalarNode
 ) -> pp.ParseResults:
     return ELEMENTS.checkbox.parse_string(node.value)
 
@@ -620,7 +621,7 @@ def construct_checkbox(
 @constructor('!fileinput')
 def construct_fileinput(
     loader: CustomLoader,
-    node: 'ScalarNode'
+    node: ScalarNode
 ) -> pp.ParseResults:
     return ELEMENTS.fileinput.parse_string(node.value)
 
@@ -628,7 +629,7 @@ def construct_fileinput(
 @constructor('!multiplefileinput')
 def construct_multiplefileinput(
     loader: CustomLoader,
-    node: 'ScalarNode'
+    node: ScalarNode
 ) -> pp.ParseResults:
     return ELEMENTS.multiplefileinput.parse_string(node.value)
 
@@ -636,7 +637,7 @@ def construct_multiplefileinput(
 @constructor('!password')
 def construct_password(
     loader: CustomLoader,
-    node: 'ScalarNode'
+    node: ScalarNode
 ) -> pp.ParseResults:
     return ELEMENTS.password.parse_string(node.value)
 
@@ -644,7 +645,7 @@ def construct_password(
 @constructor('!decimal_range')
 def construct_decimal_range(
     loader: CustomLoader,
-    node: 'ScalarNode'
+    node: ScalarNode
 ) -> pp.ParseResults:
     return ELEMENTS.decimal_range.parse_string(node.value)
 
@@ -652,21 +653,21 @@ def construct_decimal_range(
 @constructor('!integer_range')
 def construct_integer_range(
     loader: CustomLoader,
-    node: 'ScalarNode'
+    node: ScalarNode
 ) -> pp.ParseResults:
     return ELEMENTS.integer_range.parse_string(node.value)
 
 
 def flatten_fieldsets(
-    fieldsets: 'Iterable[Fieldset]'
-) -> 'Iterator[ParsedField]':
+    fieldsets: Iterable[Fieldset]
+) -> Iterator[ParsedField]:
     for fieldset in fieldsets:
         yield from flatten_fields(fieldset.fields)
 
 
 def flatten_fields(
-    fields: 'Sequence[ParsedField] | None'
-) -> 'Iterator[ParsedField]':
+    fields: Sequence[ParsedField] | None
+) -> Iterator[ParsedField]:
 
     for field in fields or []:
         yield field
@@ -680,9 +681,9 @@ def flatten_fields(
 
 
 def find_field(
-    fieldsets: 'Iterable[Fieldset]',
+    fieldsets: Iterable[Fieldset],
     id: str | None
-) -> 'Fieldset | ParsedField | None':
+) -> Fieldset | ParsedField | None:
 
     id = as_internal_id(id or '')
 
@@ -703,7 +704,7 @@ class Fieldset:
     def __init__(
         self,
         label: str,
-        fields: 'Sequence[ParsedField] | None' = None
+        fields: Sequence[ParsedField] | None = None
     ):
         self.label = label if label != '...' else None
         self.fields = fields or []
@@ -719,7 +720,7 @@ class Fieldset:
     def find_field(
         self,
         id: str | None = None
-    ) -> 'Fieldset | ParsedField | None':
+    ) -> Fieldset | ParsedField | None:
         return find_field((self,), id=id)
 
 
@@ -735,7 +736,7 @@ class Choice:
         key: str,
         label: str,
         selected: bool = False,
-        fields: 'Sequence[ParsedField] | None' = None
+        fields: Sequence[ParsedField] | None = None
     ):
         self.key = key
         self.label = label
@@ -750,7 +751,7 @@ class Field:
         self,
         label: str,
         required: bool,
-        parent: 'ParsedField | None' = None,
+        parent: ParsedField | None = None,
         fieldset: Fieldset | None = None,
         field_help: str | None = None,
         human_id: str | None = None,
@@ -786,7 +787,7 @@ class Field:
         cls: type[_FieldT],
         field: pp.ParseResults,
         identifier: pp.ParseResults,
-        parent: 'ParsedField | None' = None,
+        parent: ParsedField | None = None,
         fieldset: Fieldset | None = None,
         field_help: str | None = None
     ) -> _FieldT:
@@ -838,10 +839,10 @@ class DateField(Field):
         cls,
         field: pp.ParseResults,
         identifier: pp.ParseResults,
-        parent: 'ParsedField | None' = None,
+        parent: ParsedField | None = None,
         fieldset: Fieldset | None = None,
         field_help: str | None = None
-    ) -> 'DateField':
+    ) -> DateField:
 
         return cls(
             label=identifier.label,
@@ -868,10 +869,10 @@ class DatetimeField(Field):
         cls,
         field: pp.ParseResults,
         identifier: pp.ParseResults,
-        parent: 'ParsedField | None' = None,
+        parent: ParsedField | None = None,
         fieldset: Fieldset | None = None,
         field_help: str | None = None
-    ) -> 'DatetimeField':
+    ) -> DatetimeField:
 
         return cls(
             label=identifier.label,
@@ -900,17 +901,17 @@ class TimeField(Field):
 class StringField(Field):
     type: ClassVar[Literal['text']] = 'text'
     maxlength: int | None
-    regex: 'Pattern[str] | None'
+    regex: Pattern[str] | None
 
     @classmethod
     def create(
         cls,
         field: pp.ParseResults,
         identifier: pp.ParseResults,
-        parent: 'ParsedField | None' = None,
+        parent: ParsedField | None = None,
         fieldset: Fieldset | None = None,
         field_help: str | None = None
-    ) -> 'StringField':
+    ) -> StringField:
         regex = field.regex and re.compile(field.regex) or None
 
         return cls(
@@ -934,10 +935,10 @@ class TextAreaField(Field):
         cls,
         field: pp.ParseResults,
         identifier: pp.ParseResults,
-        parent: 'ParsedField | None' = None,
+        parent: ParsedField | None = None,
         fieldset: Fieldset | None = None,
         field_help: str | None = None
-    ) -> 'TextAreaField':
+    ) -> TextAreaField:
         return cls(
             label=identifier.label,
             required=identifier.required,
@@ -958,10 +959,10 @@ class CodeField(Field):
         cls,
         field: pp.ParseResults,
         identifier: pp.ParseResults,
-        parent: 'ParsedField | None' = None,
+        parent: ParsedField | None = None,
         fieldset: Fieldset | None = None,
         field_help: str | None = None
-    ) -> 'CodeField':
+    ) -> CodeField:
         return cls(
             label=identifier.label,
             required=identifier.required,
@@ -982,7 +983,7 @@ class StdnumField(Field):
         cls,
         field: pp.ParseResults,
         identifier: pp.ParseResults,
-        parent: 'ParsedField | None' = None,
+        parent: ParsedField | None = None,
         fieldset: Fieldset | None = None,
         field_help: str | None = None
     ) -> Self:
@@ -999,7 +1000,7 @@ class StdnumField(Field):
 @final
 class IntegerRangeField(Field):
     type: ClassVar[Literal['integer_range']] = 'integer_range'
-    pricing: 'PricingRules'
+    pricing: PricingRules
     range: range
 
     @classmethod
@@ -1007,10 +1008,10 @@ class IntegerRangeField(Field):
         cls,
         field: pp.ParseResults,
         identifier: pp.ParseResults,
-        parent: 'ParsedField | None' = None,
+        parent: ParsedField | None = None,
         fieldset: Fieldset | None = None,
         field_help: str | None = None
-    ) -> 'IntegerRangeField':
+    ) -> IntegerRangeField:
 
         if field.pricing:
             label = identifier.label + format_pricing(field.pricing)
@@ -1041,17 +1042,17 @@ class IntegerRangeField(Field):
 @final
 class DecimalRangeField(Field):
     type: ClassVar[Literal['decimal_range']] = 'decimal_range'
-    range: 'decimal_range'
+    range: decimal_range
 
     @classmethod
     def create(
         cls,
         field: pp.ParseResults,
         identifier: pp.ParseResults,
-        parent: 'ParsedField | None' = None,
+        parent: ParsedField | None = None,
         fieldset: Fieldset | None = None,
         field_help: str | None = None
-    ) -> 'DecimalRangeField':
+    ) -> DecimalRangeField:
         return cls(
             label=identifier.label,
             required=identifier.required,
@@ -1074,7 +1075,7 @@ class FileinputBase:
         cls: type[_FieldT],
         field: pp.ParseResults,
         identifier: pp.ParseResults,
-        parent: 'ParsedField | None' = None,
+        parent: ParsedField | None = None,
         fieldset: Fieldset | None = None,
         field_help: str | None = None
     ) -> _FieldT:
@@ -1100,14 +1101,14 @@ class MultipleFileinputField(FileinputBase, Field):
 
 class OptionsField:
     choices: list[Choice]
-    pricing: 'PricingRules'
+    pricing: PricingRules
 
     @classmethod
     def create(  # type:ignore[misc]
         cls: type[_FieldT],
         field: pp.ParseResults,
         identifier: pp.ParseResults,
-        parent: 'ParsedField | None' = None,
+        parent: ParsedField | None = None,
         fieldset: Fieldset | None = None,
         field_help: str | None = None
     ) -> _FieldT:
@@ -1202,11 +1203,11 @@ def parse_field_block(
     # FIXME: This is very loose, we could do better, but we want to
     #        refactor form parsing anyways...
     field_block: dict[str, Any],
-    field_classes: dict[str, type['ParsedField']],
+    field_classes: dict[str, type[ParsedField]],
     used_ids: set[str],
     fieldset: Fieldset,
-    parent: 'ParsedField | None' = None
-) -> 'ParsedField':
+    parent: ParsedField | None = None
+) -> ParsedField:
     """ Takes the given parsed field block and yields the fields from it """
 
     key, field = next(i for i in field_block.items())
@@ -1261,7 +1262,7 @@ def parse_field_block(
     return result
 
 
-def format_pricing(pricing: 'RawPricing | None') -> str:
+def format_pricing(pricing: RawPricing | None) -> str:
     if not pricing:
         return ''
 
@@ -1288,7 +1289,7 @@ def try_parse(expr: pp.ParserElement, text: str) -> pp.ParseResults | None:
         return None
 
 
-def prepare(text: str) -> 'Iterator[tuple[int, str]]':
+def prepare(text: str) -> Iterator[tuple[int, str]]:
     """ Takes the raw form source and prepares it for the translation into
     yaml.
 
@@ -1299,8 +1300,8 @@ def prepare(text: str) -> 'Iterator[tuple[int, str]]':
 
 
 def ensure_a_fieldset(
-    lines: 'Iterable[tuple[int, str]]'
-) -> 'Iterator[tuple[int, str]]':
+    lines: Iterable[tuple[int, str]]
+) -> Iterator[tuple[int, str]]:
     """ Makes sure that the given lines all belong to a fieldset. That means
     adding an empty fieldset before all lines, if none is found first.
 
@@ -1333,7 +1334,7 @@ def validate_indent(indent: str) -> bool:
 def translate_to_yaml(
     text: str,
     enable_edit_checks: bool = False
-) -> 'Iterator[str]':
+) -> Iterator[str]:
     """ Takes the given form text and constructs an easier to parse yaml
     string.
 

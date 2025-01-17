@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 import datetime
 import pytz
 from onegov.core.orm import Base
@@ -53,14 +55,14 @@ class CourseAttendee(Base, ORMSearchable):
 
     es_public = False
 
-    id: 'Column[uuid.UUID]' = Column(
+    id: Column[uuid.UUID] = Column(
         UUID,  # type:ignore[arg-type]
         primary_key=True,
         default=uuid4
     )
 
     # is null if its an external attendee
-    user_id: 'Column[uuid.UUID | None]' = Column(
+    user_id: Column[uuid.UUID | None] = Column(
         UUID,  # type:ignore[arg-type]
         ForeignKey('users.id'),
         nullable=True
@@ -68,17 +70,17 @@ class CourseAttendee(Base, ORMSearchable):
     # FIXME: It's not great that we insert a backref on User across
     #        module boundaries here. This technically violates the
     #        separation of modules. Do we need this?
-    user: 'relationship[User | None]' = relationship(
+    user: relationship[User | None] = relationship(
         'User', backref=backref('attendee', uselist=False))
 
     # mirrors user active property
-    active: 'Column[bool]' = Column(Boolean, nullable=False, default=True)
+    active: Column[bool] = Column(Boolean, nullable=False, default=True)
 
     # mirrors the source_id field from user due to performance reasons
-    source_id: 'Column[str | None]' = Column(Text, nullable=True)
+    source_id: Column[str | None] = Column(Text, nullable=True)
 
-    first_name: 'Column[str | None]' = Column(Text, nullable=True)
-    last_name: 'Column[str | None]' = Column(Text, nullable=True)
+    first_name: Column[str | None] = Column(Text, nullable=True)
+    last_name: Column[str | None] = Column(Text, nullable=True)
 
     # The organization this user belongs to, which may be a path like this:
     #
@@ -98,11 +100,11 @@ class CourseAttendee(Base, ORMSearchable):
     # BD / HBA / Planungsbaukommission" and "BD / HBA" to access all of
     # "BD / HBA / *"
     #
-    organisation: 'Column[str | None]' = Column(Text, nullable=True)
+    organisation: Column[str | None] = Column(Text, nullable=True)
 
-    permissions: 'Column[list[str] | None]' = Column(ARRAY(Text), default=list)
+    permissions: Column[list[str] | None] = Column(ARRAY(Text), default=list)
 
-    _email: 'Column[str | None]' = Column(Text, unique=True)
+    _email: Column[str | None] = Column(Text, unique=True)
 
     def __str__(self) -> str:
         if self.first_name and self.last_name:
@@ -115,14 +117,14 @@ class CourseAttendee(Base, ORMSearchable):
             return mail
         return 'NO NAME NO EMAIL'
 
-    meta: 'Column[dict[str, Any] | None]' = Column(
+    meta: Column[dict[str, Any] | None] = Column(
         JSON,
         # FIXME: Why is this nullable=True if we set a default?
         nullable=True,
         default=dict
     )
 
-    subscriptions: 'relationship[AppenderQuery[CourseSubscription]]'
+    subscriptions: relationship[AppenderQuery[CourseSubscription]]
     subscriptions = relationship(
         'CourseSubscription',
         back_populates='attendee',
@@ -172,7 +174,7 @@ class CourseAttendee(Base, ORMSearchable):
         self._email = value
 
     @property
-    def course_events(self) -> 'Query[CourseEvent]':
+    def course_events(self) -> Query[CourseEvent]:
         """
         Will return the query for not completed (future) courses events
          the attendee has a subscription record.
@@ -189,19 +191,19 @@ class CourseAttendee(Base, ORMSearchable):
         return result
 
     @property
-    def confirmed_course_events(self) -> 'Query[CourseEvent]':
+    def confirmed_course_events(self) -> Query[CourseEvent]:
         """ Registered future course events which have been confirmed """
         from onegov.fsi.models import CourseEvent
         return self.course_events.filter(CourseEvent.status == 'confirmed')
 
     @property
-    def total_done_course_events(self) -> 'Query[CourseSubscription]':
+    def total_done_course_events(self) -> Query[CourseSubscription]:
         from onegov.fsi.models import CourseSubscription  # circular
         return self.subscriptions.filter(
             CourseSubscription.event_completed == True)
 
     @property
-    def repeating_courses(self) -> 'Query[CourseEvent]':
+    def repeating_courses(self) -> Query[CourseEvent]:
         """
         Will return query to filter for all upcoming courses the attendee
         has to refresh.
@@ -231,7 +233,7 @@ class CourseAttendee(Base, ORMSearchable):
         )
 
     @property
-    def undone_registered_courses(self) -> 'Query[CourseEvent]':
+    def undone_registered_courses(self) -> Query[CourseEvent]:
         from onegov.fsi.models import CourseEvent
         from onegov.fsi.models import CourseSubscription
 
@@ -247,7 +249,7 @@ class CourseAttendee(Base, ORMSearchable):
         self,
         show_hidden: bool = True,
         show_locked: bool = False
-    ) -> 'Query[CourseEvent]':
+    ) -> Query[CourseEvent]:
         """Used for the subscription form. Should exclude past courses
         and courses already registered"""
         from onegov.fsi.models import CourseEvent

@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 import sedate
 
 from functools import cached_property
@@ -30,7 +32,7 @@ if TYPE_CHECKING:
         def __contains__(self, dt: date | datetime, /) -> bool: ...
 
 
-def choices_as_integer(choices: 'Iterable[str] | None') -> list[int] | None:
+def choices_as_integer(choices: Iterable[str] | None) -> list[int] | None:
     if choices is None:
         return None
 
@@ -45,7 +47,7 @@ class AllocationFormHelpers:
         end: date | None,
         start_time: time | None = None,
         end_time: time | None = None,
-        weekdays: 'Iterable[int] | None' = None
+        weekdays: Iterable[int] | None = None
     ) -> list[tuple[datetime, datetime]]:
         """ Takes the given dates and generates the date tuples.
 
@@ -195,7 +197,7 @@ class AllocationRuleForm(Form):
             if k not in ('title', 'extend', 'csrf_token')
         }
 
-    def apply(self, resource: 'Resource') -> int:
+    def apply(self, resource: Resource) -> int:
         if self.iteration == 0:
             dates = self.dates
         else:
@@ -250,7 +252,7 @@ class AllocationForm(Form, AllocationFormHelpers):
     """
 
     if TYPE_CHECKING:
-        request: 'OrgRequest'
+        request: OrgRequest
 
     start = DateField(
         label=_('Start'),
@@ -325,7 +327,7 @@ class AllocationForm(Form, AllocationFormHelpers):
         return [d[0] for d in WEEKDAYS if d[0] not in exceptions]
 
     @cached_property
-    def exceptions(self) -> 'DateContainer':
+    def exceptions(self) -> DateContainer:
         if not hasattr(self, 'request'):
             return ()
 
@@ -338,7 +340,7 @@ class AllocationForm(Form, AllocationFormHelpers):
         return self.request.app.org.holidays
 
     @cached_property
-    def ranged_exceptions(self) -> 'Sequence[tuple[date, date]]':
+    def ranged_exceptions(self) -> Sequence[tuple[date, date]]:
         if not hasattr(self, 'request'):
             return ()
 
@@ -361,7 +363,7 @@ class AllocationForm(Form, AllocationFormHelpers):
         return False
 
     @property
-    def dates(self) -> 'SequenceOrScalar[tuple[datetime, datetime]]':
+    def dates(self) -> SequenceOrScalar[tuple[datetime, datetime]]:
         """ Passed to :meth:`libres.db.scheduler.Scheduler.allocate`. """
         raise NotImplementedError
 
@@ -466,7 +468,7 @@ class DaypassAllocationForm(AllocationForm, Daypasses):
         return self.daypasses_limit.data  # type:ignore[return-value]
 
     @property
-    def dates(self) -> 'Sequence[tuple[datetime, datetime]]':
+    def dates(self) -> Sequence[tuple[datetime, datetime]]:
         return self.generate_dates(
             self.start.data,
             self.end.data,
@@ -500,7 +502,7 @@ class DaypassAllocationEditForm(AllocationEditForm, Daypasses):
     def apply_dates(self, start: datetime, end: datetime) -> None:
         self.date.data = start.date()
 
-    def apply_model(self, model: 'Allocation') -> None:
+    def apply_model(self, model: Allocation) -> None:
         self.apply_data(model.data)
         self.date.data = model.display_start().date()
         self.daypasses.data = model.quota
@@ -575,7 +577,7 @@ class RoomAllocationForm(AllocationForm):
         return self.is_partly_available.data == 'yes'
 
     @property
-    def dates(self) -> 'Sequence[tuple[datetime, datetime]]':
+    def dates(self) -> Sequence[tuple[datetime, datetime]]:
         return self.generate_dates(
             self.start.data,
             self.end.data,
@@ -622,7 +624,7 @@ class DailyItemAllocationForm(AllocationForm, DailyItemFields):
         return self.item_limit.data  # type:ignore[return-value]
 
     @property
-    def dates(self) -> 'Sequence[tuple[datetime, datetime]]':
+    def dates(self) -> Sequence[tuple[datetime, datetime]]:
         return self.generate_dates(
             self.start.data,
             self.end.data,
@@ -655,7 +657,7 @@ class DailyItemAllocationEditForm(AllocationEditForm, DailyItemFields):
     def apply_dates(self, start: datetime, end: datetime) -> None:
         self.date.data = start.date()
 
-    def apply_model(self, model: 'Allocation') -> None:
+    def apply_model(self, model: Allocation) -> None:
         self.apply_data(model.data)
         self.date.data = model.display_start().date()
         self.items.data = model.quota
@@ -748,7 +750,7 @@ class RoomAllocationEditForm(AllocationEditForm):
         self.start_time.data = start.time()
         self.end_time.data = end.time()
 
-    def apply_model(self, model: 'Allocation') -> None:
+    def apply_model(self, model: Allocation) -> None:
         self.apply_data(model.data)
         self.apply_dates(model.display_start(), model.display_end())
         self.as_whole_day.data = model.whole_day and 'yes' or 'no'

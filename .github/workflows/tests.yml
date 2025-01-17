@@ -85,7 +85,7 @@ jobs:
         --recursive \
         --configfile pyproject.toml \
         --format custom \
-        --msg-template '::error file={abspath},line={line},col={col},title=Bandit {test_id})::{msg}' \
+        --msg-template '::error file={abspath},line={line},col={col},title=Bandit ({test_id})::{msg}' \
         src/ 2> /dev/null
 
     - name: Static type checking

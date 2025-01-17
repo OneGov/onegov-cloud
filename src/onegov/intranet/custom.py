@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 from onegov.core.elements import Link
 from onegov.org.custom import logout_path
 from onegov.org.elements import LinkGroup
@@ -22,8 +24,8 @@ if TYPE_CHECKING:
 
 
 def get_global_tools(
-    request: 'TranslatorAppRequest'
-) -> 'Iterator[Link | LinkGroup]':
+    request: TranslatorAppRequest
+) -> Iterator[Link | LinkGroup]:
 
     if request.is_logged_in:
         assert request.current_username is not None
@@ -150,7 +152,7 @@ def get_global_tools(
 
 
 def get_top_navigation(
-        request: 'TranslatorAppRequest') -> 'Iterator[NavigationEntry]':
+        request: TranslatorAppRequest) -> Iterator[NavigationEntry]:
 
     # inject an activites link in front of all top navigation links
     if request.is_manager or request.is_member:
@@ -179,7 +181,7 @@ def get_top_navigation(
 
 
 @TranslatorDirectoryApp.template_variables()
-def get_template_variables(request: 'TranslatorAppRequest') -> 'RenderData':
+def get_template_variables(request: TranslatorAppRequest) -> RenderData:
     return {
         'global_tools': tuple(get_global_tools(request)),
         'top_navigation': tuple(get_top_navigation(request)),

@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 from morepath import redirect
 from onegov.core.utils import groupbylist
 from onegov.election_day import _
@@ -27,8 +29,8 @@ if TYPE_CHECKING:
 )
 def view_votes(
     self: VoteCollection,
-    request: 'ElectionDayRequest'
-) -> 'RenderData':
+    request: ElectionDayRequest
+) -> RenderData:
     """ View a list of all votes. """
 
     years = [
@@ -56,9 +58,9 @@ def view_votes(
 )
 def create_vote(
     self: VoteCollection,
-    request: 'ElectionDayRequest',
+    request: ElectionDayRequest,
     form: VoteForm
-) -> 'RenderData | Response':
+) -> RenderData | Response:
     """ Create a new vote. """
 
     layout = ManageVotesLayout(self, request)
@@ -89,9 +91,9 @@ def create_vote(
 )
 def edit_vote(
     self: Vote,
-    request: 'ElectionDayRequest',
+    request: ElectionDayRequest,
     form: VoteForm
-) -> 'RenderData | Response':
+) -> RenderData | Response:
     """ Edit an existing vote. """
 
     layout = ManageVotesLayout(self, request)
@@ -125,9 +127,9 @@ def edit_vote(
 )
 def clear_vote(
     self: Vote,
-    request: 'ElectionDayRequest',
+    request: ElectionDayRequest,
     form: ClearResultsForm
-) -> 'RenderData | Response':
+) -> RenderData | Response:
     """ Clear the results of a vote. """
 
     layout = ManageVotesLayout(self, request)
@@ -163,9 +165,9 @@ def clear_vote(
 )
 def clear_election_media(
     self: Vote,
-    request: 'ElectionDayRequest',
-    form: 'EmptyForm'
-) -> 'RenderData | Response':
+    request: ElectionDayRequest,
+    form: EmptyForm
+) -> RenderData | Response:
     """ Deletes alls SVGs and PDFs of this vote. """
 
     layout = ManageVotesLayout(self, request)
@@ -208,9 +210,9 @@ def clear_election_media(
 )
 def delete_vote(
     self: Vote,
-    request: 'ElectionDayRequest',
-    form: 'EmptyForm'
-) -> 'RenderData | Response':
+    request: ElectionDayRequest,
+    form: EmptyForm
+) -> RenderData | Response:
     """ Delete an existing vote. """
 
     layout = ManageVotesLayout(self, request)
@@ -248,9 +250,9 @@ def delete_vote(
 )
 def trigger_vote(
     self: Vote,
-    request: 'ElectionDayRequest',
+    request: ElectionDayRequest,
     form: TriggerNotificationForm
-) -> 'RenderData | Response':
+) -> RenderData | Response:
     """ Trigger the notifications related to a vote. """
 
     session = request.session

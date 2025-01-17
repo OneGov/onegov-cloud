@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 from uuid import uuid4
 
 from sqlalchemy import Column, Text, Table, ForeignKey
@@ -32,14 +34,14 @@ class LanguageCertificate(Base, TimestampMixin):
 
     __tablename__ = 'language_certificates'
 
-    id: 'Column[uuid.UUID]' = Column(
+    id: Column[uuid.UUID] = Column(
         UUID,  # type:ignore[arg-type]
         primary_key=True,
         default=uuid4
     )
-    name: 'Column[str]' = Column(Text, nullable=False)
+    name: Column[str] = Column(Text, nullable=False)
 
-    owners: 'relationship[list[Translator]]' = relationship(
+    owners: relationship[list[Translator]] = relationship(
         'Translator',
         secondary=certificate_association_table,
         back_populates='certificates')

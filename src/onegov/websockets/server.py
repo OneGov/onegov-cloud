@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 import hashlib
 import http
 from asyncio import Future
@@ -41,10 +43,10 @@ CONNECTIONS: dict[str, set[WebSocketServerProtocol]] = {}
 TOKEN = ''  # nosec: B105
 
 NOTFOUND = object()
-SESSIONS: dict[str, 'Session'] = {}
+SESSIONS: dict[str, Session] = {}
 STAFF_CONNECTIONS: dict[str, set[WebSocketServerProtocol]] = {}
 STAFF: dict[str, dict[str, User]] = {}  # For Authentication of User
-ACTIVE_CHATS: dict[str, dict['UUID', 'Chat']] = {}  # For DB
+ACTIVE_CHATS: dict[str, dict[UUID, Chat]] = {}  # For DB
 CHANNELS: dict[str, dict[str, set[WebSocketServerProtocol]]] = {}
 
 
@@ -69,7 +71,7 @@ class WebSocketServer(WebSocketServerProtocol):
 
     def __init__(
         self,
-        config: 'Config',
+        config: Config,
         session_manager: SessionManager,
         *args: Any,
         **kwargs: Any
@@ -81,8 +83,8 @@ class WebSocketServer(WebSocketServerProtocol):
     async def process_request(
         self,
         path: str,
-        headers: 'Headers'
-    ) -> 'HTTPResponse | None':
+        headers: Headers
+    ) -> HTTPResponse | None:
         """ Intercept initial HTTP request.
 
         Before establishing a WebSocket connection, a client sends a HTTP
@@ -169,7 +171,7 @@ class WebSocketServer(WebSocketServerProtocol):
 
         transaction.commit()
 
-    async def get_chat(self, id: 'UUID') -> 'Chat':
+    async def get_chat(self, id: UUID) -> Chat:
         chat = ACTIVE_CHATS.setdefault(self.schema, {}).get(id, NOTFOUND)
 
         # Force (cached) session to fetch latest state of the database,
@@ -206,7 +208,7 @@ class WebSocketServer(WebSocketServerProtocol):
             return None
 
     @property
-    def session(self) -> 'Session':
+    def session(self) -> Session:
         self.session_manager.set_current_schema(self.schema)
 
         session = self.session_manager.session()
@@ -258,7 +260,7 @@ class WebSocketServer(WebSocketServerProtocol):
         return {}
 
     @cached_property
-    def browser_session(self) -> 'BrowserSession | dict[str, Any]':
+    def browser_session(self) -> BrowserSession | dict[str, Any]:
         if self.signed_session_id is None:
             return {}
         session_id = self.unsign(self.signed_session_id)
@@ -272,8 +274,8 @@ class WebSocketServer(WebSocketServerProtocol):
 
 def get_payload(
     message: str | bytes,
-    expected: 'Collection[str]'
-) -> 'JSONObject | None':
+    expected: Collection[str]
+) -> JSONObject | None:
     """ Deserialize JSON payload and check type. """
 
     try:
@@ -314,7 +316,7 @@ async def acknowledge(websocket: WebSocketServerProtocol) -> None:
 
 async def handle_listen(
     websocket: WebSocketServerProtocol,
-    payload: 'JSONObject_ro'
+    payload: JSONObject_ro
 ) -> None:
     """ Handles listening clients. """
 
@@ -346,7 +348,7 @@ async def handle_listen(
 
 async def handle_authentication(
     websocket: WebSocketServerProtocol,
-    payload: 'JSONObject_ro'
+    payload: JSONObject_ro
 ) -> None:
     """ Handles authentication. """
 
@@ -367,7 +369,7 @@ async def handle_authentication(
 
 async def handle_status(
     websocket: WebSocketServerProtocol,
-    payload: 'JSONObject_ro'
+    payload: JSONObject_ro
 ) -> None:
     """ Handles status requests. """
 
@@ -392,7 +394,7 @@ async def handle_status(
 
 async def handle_broadcast(
     websocket: WebSocketServerProtocol,
-    payload: 'JSONObject_ro'
+    payload: JSONObject_ro
 ) -> None:
     """ Handles broadcasts. """
 
@@ -432,7 +434,7 @@ async def handle_broadcast(
 
 async def handle_manage(
     websocket: WebSocketServerProtocol,
-    authentication_payload: 'JSONObject_ro'
+    authentication_payload: JSONObject_ro
 ) -> None:
     """ Handles managing clients. """
 
@@ -454,7 +456,7 @@ async def handle_manage(
 
 async def handle_customer_chat(
     websocket: WebSocketServer,
-    payload: 'JSONObject_ro'
+    payload: JSONObject_ro
 ) -> None:
     """
     Starts a chat. Handles listening to messages on channel.
@@ -563,7 +565,7 @@ async def handle_customer_chat(
 
 async def handle_staff_chat(
     websocket: WebSocketServer,
-    payload: 'JSONObject_ro'
+    payload: JSONObject_ro
 ) -> None:
     """
     Registers staff member and listens to messages.
@@ -772,7 +774,7 @@ async def handle_start(websocket: WebSocketServerProtocol) -> None:
 
 async def main(
     host: str, port: int, token: str,
-    config: 'Config | None' = None
+    config: Config | None = None
 ) -> None:
 
     global TOKEN

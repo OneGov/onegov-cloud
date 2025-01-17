@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 from onegov.activity import Attendee, BookingCollection
 from onegov.core.security import Personal
 from onegov.feriennet import FeriennetApp, _
@@ -20,9 +22,9 @@ if TYPE_CHECKING:
     template='form.pt')
 def edit_attendee(
     self: Attendee,
-    request: 'FeriennetRequest',
+    request: FeriennetRequest,
     form: AttendeeForm
-) -> 'RenderData | Response':
+) -> RenderData | Response:
 
     # note: attendees are added in the views/occasion.py file
     assert request.is_admin or self.username == request.current_username
@@ -60,9 +62,9 @@ def edit_attendee(
     template='form.pt')
 def edit_attendee_limit(
     self: Attendee,
-    request: 'FeriennetRequest',
+    request: FeriennetRequest,
     form: AttendeeLimitForm
-) -> 'RenderData | Response':
+) -> RenderData | Response:
 
     assert request.is_admin or self.username == request.current_username
 

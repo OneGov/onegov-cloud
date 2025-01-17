@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 from datetime import datetime
 from onegov.core.orm.mixins import (
     content_property, dict_markup_property, dict_property, meta_property)
@@ -77,7 +79,7 @@ class Topic(Page, TraitInfo, SearchableContent, AccessExtension,
         return True
 
     @property
-    def paste_target(self) -> 'Topic | News':
+    def paste_target(self) -> Topic | News:
         if self.trait == 'link':
             return self.parent or self  # type:ignore[return-value]
 
@@ -106,7 +108,7 @@ class Topic(Page, TraitInfo, SearchableContent, AccessExtension,
         self,
         trait: str,
         action: str,
-        request: 'OrgRequest'
+        request: OrgRequest
     ) -> type[LinkForm | PageForm | IframeForm]:
 
         if trait == 'link':
@@ -182,7 +184,7 @@ class News(Page, TraitInfo, SearchableContent, NewsletterExtension,
         return self.parent_id is not None
 
     @property
-    def paste_target(self) -> 'Topic | News':
+    def paste_target(self) -> Topic | News:
         if self.parent:
             return self.parent  # type:ignore[return-value]
         else:
@@ -199,7 +201,7 @@ class News(Page, TraitInfo, SearchableContent, NewsletterExtension,
     def is_supported_trait(self, trait: str) -> bool:
         return trait in {'news'}
 
-    def get_root_page_form_class(self, request: 'OrgRequest') -> type[Form]:
+    def get_root_page_form_class(self, request: OrgRequest) -> type[Form]:
         return self.with_content_extensions(
             Form, request, extensions=(
                 InheritableContactExtension, ContactHiddenOnPageExtension,
@@ -211,7 +213,7 @@ class News(Page, TraitInfo, SearchableContent, NewsletterExtension,
         self,
         trait: str,
         action: str,
-        request: 'OrgRequest'
+        request: OrgRequest
     ) -> type[Form | PageForm]:
 
         if trait == 'news':
@@ -240,7 +242,7 @@ class News(Page, TraitInfo, SearchableContent, NewsletterExtension,
 
         raise NotImplementedError
 
-    def for_year(self, year: int) -> 'News':
+    def for_year(self, year: int) -> News:
         years_ = set(self.filter_years)
         years = list(years_ - {year} if year in years_ else years_ | {year})
         return News(  # type:ignore[misc]
@@ -251,7 +253,7 @@ class News(Page, TraitInfo, SearchableContent, NewsletterExtension,
             filter_tags=sorted(self.filter_tags)
         )
 
-    def for_tag(self, tag: str) -> 'News':
+    def for_tag(self, tag: str) -> News:
         tags_ = set(self.filter_tags)
         tags = list(tags_ - {tag} if tag in tags_ else tags_ | {tag})
         return News(  # type:ignore[misc]
@@ -265,11 +267,11 @@ class News(Page, TraitInfo, SearchableContent, NewsletterExtension,
     @classmethod
     def news_query_for(
         cls,
-        self: 'News | PageMeta',
+        self: News | PageMeta,
         limit: int | None = 2,
         published_only: bool = True,
-        session: 'Session | None' = None,
-    ) -> 'Query[News]':
+        session: Session | None = None,
+    ) -> Query[News]:
 
         if session is None:
             session = object_session(self)
@@ -322,7 +324,7 @@ class News(Page, TraitInfo, SearchableContent, NewsletterExtension,
         self,
         limit: int | None = 2,
         published_only: bool = True
-    ) -> 'Query[News]':
+    ) -> Query[News]:
 
         return self.news_query_for(self, limit, published_only)
 

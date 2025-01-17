@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 from onegov.core.orm import Base
 from onegov.core.orm.types import UUID
 from sqlalchemy import Column, ForeignKey, Boolean, Table, Text
@@ -53,12 +55,12 @@ class CourseSubscription(Base):
         event_completed: Column[bool]
         dummy_desc: Column[str | None]
 
-    course_event: 'relationship[CourseEvent]' = relationship(
+    course_event: relationship[CourseEvent] = relationship(
         'CourseEvent',
         back_populates='subscriptions',
         lazy='joined'
     )
-    attendee: 'relationship[CourseAttendee | None]' = relationship(
+    attendee: relationship[CourseAttendee | None] = relationship(
         'CourseAttendee',
         back_populates='subscriptions',
     )
@@ -67,7 +69,7 @@ class CourseSubscription(Base):
     def is_placeholder(self) -> bool:
         return self.attendee_id is None
 
-    def can_be_confirmed(self, request: 'FsiRequest') -> bool:
+    def can_be_confirmed(self, request: FsiRequest) -> bool:
         if not request.is_admin:
             return False
         event = self.course_event

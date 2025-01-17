@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 import os
 import pglast  # type:ignore[import-untyped]
 import re
@@ -20,7 +22,7 @@ if TYPE_CHECKING:
 NESTED_TYPE = re.compile(r'(\w+)\((\w+)\)')
 
 
-def as_selectable(query: str, alias: str | None = None) -> 'Alias':
+def as_selectable(query: str, alias: str | None = None) -> Alias:
     """ Takes a raw SQL query and turns it into a selectable SQLAlchemy
     expression using annotations in comments.
 
@@ -67,7 +69,7 @@ def as_selectable(query: str, alias: str | None = None) -> 'Alias':
 
 def type_by_string(
     expression: str
-) -> 'type[TypeEngine[Any]] | TypeEngine[Any]':
+) -> type[TypeEngine[Any]] | TypeEngine[Any]:
     nested_match = NESTED_TYPE.match(expression)
 
     if nested_match:
@@ -81,7 +83,7 @@ def type_by_string(
 
 
 @lru_cache(maxsize=64)
-def as_selectable_from_path(path: str) -> 'Alias':
+def as_selectable_from_path(path: str) -> Alias:
     alias = os.path.basename(path).split('.', 1)[0]
 
     with open(path) as f:
@@ -89,9 +91,9 @@ def as_selectable_from_path(path: str) -> 'Alias':
 
 
 def column_names_with_comments(
-    statement: 'RawStmt',
+    statement: RawStmt,
     query: str
-) -> 'Iterator[tuple[str, str]]':
+) -> Iterator[tuple[str, str]]:
 
     for target in statement.stmt.targetList:
 

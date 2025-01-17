@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 from functools import cached_property
 from markupsafe import Markup
 from onegov.core.elements import Link
@@ -29,7 +31,7 @@ class TranslatorMutationTicket(OrgTicketMixin, Ticket):
     __mapper_args__ = {'polymorphic_identity': 'TRN'}  # type:ignore
     es_type_name = 'translator_tickets'
 
-    def reference_group(self, request: 'OrgRequest') -> str:
+    def reference_group(self, request: OrgRequest) -> str:
         return self.title
 
 
@@ -95,7 +97,7 @@ class TranslatorMutationHandler(Handler):
 
     def get_summary(
         self,
-        request: 'TranslatorAppRequest'  # type:ignore[override]
+        request: TranslatorAppRequest  # type:ignore[override]
     ) -> Markup:
 
         assert self.mutation is not None
@@ -115,7 +117,7 @@ class TranslatorMutationHandler(Handler):
 
     def get_links(  # type:ignore[override]
         self,
-        request: 'TranslatorAppRequest'  # type:ignore[override]
+        request: TranslatorAppRequest  # type:ignore[override]
     ) -> list[Link | LinkGroup]:
 
         if self.deleted:
@@ -156,7 +158,7 @@ class AccreditationTicket(OrgTicketMixin, Ticket):
     __mapper_args__ = {'polymorphic_identity': 'AKK'}  # type:ignore
     es_type_name = 'translator_accreditations'
 
-    def reference_group(self, request: 'OrgRequest') -> str:
+    def reference_group(self, request: OrgRequest) -> str:
         return self.title
 
 
@@ -212,7 +214,7 @@ class AccreditationHandler(Handler):
 
     def get_summary(
         self,
-        request: 'TranslatorAppRequest'  # type:ignore[override]
+        request: TranslatorAppRequest  # type:ignore[override]
     ) -> Markup:
         layout = AccreditationLayout(self.translator, request)
 
@@ -235,7 +237,7 @@ class AccreditationHandler(Handler):
 
     def get_links(  # type:ignore[override]
         self,
-        request: 'TranslatorAppRequest'  # type:ignore[override]
+        request: TranslatorAppRequest  # type:ignore[override]
     ) -> list[Link | LinkGroup]:
 
         if self.deleted:

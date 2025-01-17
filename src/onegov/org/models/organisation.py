@@ -1,4 +1,5 @@
 """ Contains the model describing the organisation proper. """
+from __future__ import annotations
 
 from datetime import date, timedelta
 from functools import cached_property, lru_cache
@@ -36,20 +37,20 @@ class Organisation(Base, TimestampMixin):
     __tablename__ = 'organisations'
 
     #: the id of the organisation, an automatically generated uuid
-    id: 'Column[uuid.UUID]' = Column(
+    id: Column[uuid.UUID] = Column(
         UUID,  # type:ignore[arg-type]
         primary_key=True,
         default=uuid4
     )
 
     #: the name of the organisation
-    name: 'Column[str]' = Column(Text, nullable=False)
+    name: Column[str] = Column(Text, nullable=False)
 
     #: the logo of the organisation
-    logo_url: 'Column[str | None]' = Column(Text, nullable=True)
+    logo_url: Column[str | None] = Column(Text, nullable=True)
 
     #: the theme options of the organisation
-    theme_options: 'Column[dict[str, Any] | None]' = Column(
+    theme_options: Column[dict[str, Any] | None] = Column(
         JSON,
         nullable=True,
         default=user_options.copy
@@ -57,7 +58,7 @@ class Organisation(Base, TimestampMixin):
 
     #: additional data associated with the organisation
     # FIXME: This should probably not be nullable
-    meta: 'Column[dict[str, Any]]' = Column(  # type:ignore[assignment]
+    meta: Column[dict[str, Any]] = Column(  # type:ignore[assignment]
         JSON,
         nullable=True,
         default=dict
@@ -290,7 +291,7 @@ class Organisation(Base, TimestampMixin):
         return bool(self.holiday_settings.get('school', ()))
 
     @property
-    def school_holidays(self) -> 'Iterator[tuple[date, date]]':
+    def school_holidays(self) -> Iterator[tuple[date, date]]:
         """ Returns an iterable that yields date pairs of start
         and end dates of school holidays
         """
@@ -304,7 +305,7 @@ class Organisation(Base, TimestampMixin):
         self.__dict__['contact_html'] = paragraphify(linkify(value))
 
     @cached_property
-    def contact_html(self) -> 'Markup':
+    def contact_html(self) -> Markup:
         return paragraphify(linkify(self.contact))
 
     @opening_hours.setter  # type:ignore[no-redef]
@@ -314,7 +315,7 @@ class Organisation(Base, TimestampMixin):
         self.__dict__['opening_hours_html'] = paragraphify(linkify(value))
 
     @cached_property
-    def opening_hours_html(self) -> 'Markup':
+    def opening_hours_html(self) -> Markup:
         return paragraphify(linkify(self.opening_hours))
 
     @property
@@ -330,11 +331,11 @@ class Organisation(Base, TimestampMixin):
 
         return ' '.join(parts[:-1]), parts[-1]
 
-    def excluded_person_fields(self, request: 'OrgRequest') -> list[str]:
+    def excluded_person_fields(self, request: OrgRequest) -> list[str]:
         return [] if request.is_logged_in else self.hidden_people_fields
 
     @property
-    def event_filter_fields(self) -> tuple['ParsedField', ...]:
+    def event_filter_fields(self) -> tuple[ParsedField, ...]:
         return flatten_event_filter_fields_from_definition(
             self.event_filter_definition)
 
@@ -342,5 +343,5 @@ class Organisation(Base, TimestampMixin):
 @lru_cache(maxsize=64)
 def flatten_event_filter_fields_from_definition(
     definition: str
-) -> tuple['ParsedField', ...]:
+) -> tuple[ParsedField, ...]:
     return tuple(flatten_fieldsets(parse_formcode(definition)))

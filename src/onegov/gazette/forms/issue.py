@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 from onegov.form import Form
 from onegov.form.fields import DateTimeLocalField
 from onegov.form.validators import UniqueColumnValue
@@ -22,7 +24,7 @@ if TYPE_CHECKING:
 
 class IssueForm(Form):
 
-    request: 'GazetteRequest'
+    request: GazetteRequest
 
     number = IntegerField(
         label=_('Number'),

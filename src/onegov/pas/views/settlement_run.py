@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 from onegov.core.elements import Link
 from onegov.core.security import Private
 from onegov.pas import _
@@ -161,8 +163,8 @@ tr:nth-child(even):not(.total-row) td {
 )
 def view_settlement_runs(
     self: SettlementRunCollection,
-    request: 'TownRequest'
-) -> 'RenderData':
+    request: TownRequest
+) -> RenderData:
 
     layout = SettlementRunCollectionLayout(self, request)
 
@@ -196,9 +198,9 @@ def view_settlement_runs(
 )
 def add_settlement_run(
     self: SettlementRunCollection,
-    request: 'TownRequest',
+    request: TownRequest,
     form: SettlementRunForm
-) -> 'RenderData | Response':
+) -> RenderData | Response:
 
     if form.submitted(request):
         settlement_run = self.add(**form.get_useful_data())
@@ -224,8 +226,8 @@ def add_settlement_run(
 )
 def view_settlement_run(
     self: SettlementRun,
-    request: 'TownRequest'
-) -> 'RenderData':
+    request: TownRequest
+) -> RenderData:
     """ A page where all exports are listed and grouped by category. """
     layout = SettlementRunLayout(self, request)
     session = request.session
@@ -335,9 +337,9 @@ def view_settlement_run(
 
 def _get_commission_totals(
     settlement_run: SettlementRun,
-    request: 'TownRequest',
+    request: TownRequest,
     commission: Commission
-) -> list['TotalRow']:
+) -> list[TotalRow]:
     """Get totals for a specific commission grouped by party."""
     session = request.session
     rate_set = get_current_rate_set(session, settlement_run)
@@ -440,7 +442,7 @@ def _get_commission_totals(
 
 def _get_party_totals_for_export_all(
     self: SettlementRun,
-    request: 'TownRequest'
+    request: TownRequest
 ) -> list[tuple[str, Decimal, Decimal, Decimal, Decimal, Decimal]]:
     """Get totals grouped by party."""
     session = request.session
@@ -537,7 +539,7 @@ def _get_party_totals_for_export_all(
 
 def generate_settlement_pdf(
     settlement_run: SettlementRun,
-    request: 'TownRequest',
+    request: TownRequest,
     entity_type: Literal['all', 'commission', 'party', 'parliamentarian'],
     entity: Commission | Party | Parliamentarian | None = None,
 ) -> bytes:
@@ -577,9 +579,9 @@ def generate_settlement_pdf(
 
 def _get_commission_settlement_data(
     settlement_run: SettlementRun,
-    request: 'TownRequest',
+    request: TownRequest,
     commission: Commission
-) -> list['SettlementDataRow']:
+) -> list[SettlementDataRow]:
     """Get settlement data for a specific commission."""
     session = request.session
     rate_set = get_current_rate_set(request.session, settlement_run)
@@ -626,8 +628,8 @@ def _get_commission_settlement_data(
 
 
 def _generate_settlement_html(
-    settlement_data: list['SettlementDataRow'],
-    totals: list['TotalRow'],
+    settlement_data: list[SettlementDataRow],
+    totals: list[TotalRow],
     subtitle: str,
 ) -> str:
     """Generate HTML for settlement PDF."""
@@ -722,8 +724,8 @@ def _generate_settlement_html(
 
 
 def _get_data_export_all(
-    self: SettlementRun, request: 'TownRequest'
-) -> list['SettlementDataRow']:
+    self: SettlementRun, request: TownRequest
+) -> list[SettlementDataRow]:
 
     session = request.session
     rate_set = get_current_rate_set(session, self)
@@ -802,8 +804,8 @@ def _get_data_export_all(
 
 
 def get_party_specific_totals(
-    settlement_run: SettlementRun, request: 'TownRequest', party: Party
-) -> list['TotalRow']:
+    settlement_run: SettlementRun, request: TownRequest, party: Party
+) -> list[TotalRow]:
     """Get totals for a specific party."""
     session = request.session
     rate_set = get_current_rate_set(session, settlement_run)
@@ -900,7 +902,7 @@ def get_party_specific_totals(
 
 def debug_party_export(
     settlement_run: SettlementRun,
-    request: 'TownRequest',
+    request: TownRequest,
     party: Party
 ) -> None:
     """Debug function to trace party export data retrieval"""
@@ -963,7 +965,7 @@ def debug_party_export(
 
 def debug_party_export2(
     settlement_run: SettlementRun,
-    request: 'TownRequest',
+    request: TownRequest,
     party: Party
 ) -> None:
     session = request.session
@@ -986,9 +988,9 @@ def debug_party_export2(
 
 def _get_party_settlement_data(
     settlement_run: SettlementRun,
-    request: 'TownRequest',
+    request: TownRequest,
     party: Party
-) -> list['SettlementDataRow']:
+) -> list[SettlementDataRow]:
     """Get settlement data for a specific party."""
 
     session = request.session
@@ -1060,7 +1062,7 @@ def _get_party_settlement_data(
 )
 def view_settlement_run_all_export(
     self: SettlementRunAllExport,
-    request: 'TownRequest'
+    request: TownRequest
 ) -> Response:
     """Generate export data for a specific entity in a settlement run."""
 
@@ -1088,7 +1090,7 @@ def view_settlement_run_all_export(
 )
 def view_settlement_run_export(
     self: SettlementRunExport,
-    request: 'TownRequest'
+    request: TownRequest
 ) -> Response:
     """Generate export data for a specific entity (commission, party or
     parliamentarian) in a settlement run."""
@@ -1151,9 +1153,9 @@ def view_settlement_run_export(
 )
 def edit_settlement_run(
     self: SettlementRun,
-    request: 'TownRequest',
+    request: TownRequest,
     form: SettlementRunForm
-) -> 'RenderData | Response':
+) -> RenderData | Response:
 
     if form.submitted(request):
         form.populate_obj(self)
@@ -1181,7 +1183,7 @@ def edit_settlement_run(
 )
 def delete_settlement_run(
     self: SettlementRun,
-    request: 'TownRequest'
+    request: TownRequest
 ) -> None:
 
     request.assert_valid_csrf_token()

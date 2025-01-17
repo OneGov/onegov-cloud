@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 from onegov.form import Form
 from onegov.translator_directory import _
 from onegov.translator_directory.collections.language import LanguageCollection

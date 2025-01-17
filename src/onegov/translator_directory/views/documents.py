@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 from onegov.translator_directory import _
 from onegov.core.security import Secret
 from onegov.core.templates import render_macro
@@ -24,8 +26,8 @@ if TYPE_CHECKING:
 )
 def view_translator_documents(
     self: TranslatorDocumentCollection,
-    request: 'TranslatorAppRequest'
-) -> 'RenderData':
+    request: TranslatorAppRequest
+) -> RenderData:
 
     layout = TranslatorDocumentsLayout(self, request)
 
@@ -54,7 +56,7 @@ def view_translator_documents(
 )
 def view_upload_file_translator(
     self: TranslatorDocumentCollection,
-    request: 'TranslatorAppRequest'
+    request: TranslatorAppRequest
 ) -> str:
 
     assert self.translator is not None

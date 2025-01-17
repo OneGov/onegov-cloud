@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 from onegov.core.security import Public
 from onegov.landsgemeinde import LandsgemeindeApp
 from onegov.landsgemeinde.layouts import DefaultLayout
@@ -15,7 +17,7 @@ if TYPE_CHECKING:
 
 @LandsgemeindeApp.html(model=Search, template='search.pt', permission=Public)
 def landsgemeinde_search(
-    self: Search['Base'],
-    request: 'LandsgemeindeRequest'
-) -> 'RenderData | Response':
+    self: Search[Base],
+    request: LandsgemeindeRequest
+) -> RenderData | Response:
     return search(self, request, DefaultLayout(self, request))

@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 import morepath
 import os.path
 import shlex
@@ -198,7 +200,7 @@ class DepotApp(App):
         return self.custom_depot_id or self.schema
 
     @property
-    def bound_depot(self) -> 'FileStorage | None':
+    def bound_depot(self) -> FileStorage | None:
         # FIXME: Do we actually care that the default depot is our depot?
         #        One could imagine a separate thread which works on all
         #        the file depots and gets the bound depot for each App
@@ -348,7 +350,7 @@ class DepotApp(App):
         return self.application_id.replace('/', '-')
 
     @property
-    def signing_service_config(self) -> 'SigningServiceConfig':
+    def signing_service_config(self) -> SigningServiceConfig:
         if not self.signing_services:
             raise RuntimeError('No signing service config path set')
 
@@ -396,7 +398,7 @@ class DepotApp(App):
         depot_storage_path: str | None = None,
         # FIXME: Remove this parameter
         **ignored: Any
-    ) -> 'Iterator[None]':
+    ) -> Iterator[None]:
         """ Temporarily use another depot. """
 
         original_depot_backend = self.depot_backend
@@ -429,12 +431,12 @@ class DepotApp(App):
 @DepotApp.tween_factory(over=transaction_tween_factory)
 def configure_depot_tween_factory(
     app: DepotApp,
-    handler: 'Callable[[CoreRequest], Response]'
-) -> 'Callable[[CoreRequest], Response]':
+    handler: Callable[[CoreRequest], Response]
+) -> Callable[[CoreRequest], Response]:
 
     assert app.has_database_connection, 'This module requires a db backed app.'
 
-    def configure_depot_tween(request: 'CoreRequest') -> 'Response':
+    def configure_depot_tween(request: CoreRequest) -> Response:
         app.bind_depot()
         return handler(request)
 
@@ -442,16 +444,16 @@ def configure_depot_tween_factory(
 
 
 def render_depot_file(
-    file: 'StoredFile',
-    request: 'CoreRequest'
-) -> 'Response':
+    file: StoredFile,
+    request: CoreRequest
+) -> Response:
     return request.get_response(
         FileServeApp(file, cache_max_age=3600 * 24 * 7))
 
 
-def respond_with_alt_text(reference: File, request: 'CoreRequest') -> None:
+def respond_with_alt_text(reference: File, request: CoreRequest) -> None:
     @request.after
-    def include_alt_text(response: 'Response') -> None:
+    def include_alt_text(response: Response) -> None:
         # HTTP headers are limited to ASCII, so we encode our result in
         # JSON before showing it
         response.headers.add('X-File-Note', json.dumps(
@@ -461,21 +463,21 @@ def respond_with_alt_text(reference: File, request: 'CoreRequest') -> None:
 
 def respond_with_caching_header(
     reference: File,
-    request: 'CoreRequest'
+    request: CoreRequest
 ) -> None:
     if not reference.published:
         @request.after
-        def include_private_header(response: 'Response') -> None:
+        def include_private_header(response: Response) -> None:
             response.headers['Cache-Control'] = 'private'
 
 
 def respond_with_x_robots_tag_header(
     reference: File,
-    request: 'CoreRequest'
+    request: CoreRequest
 ) -> None:
     if getattr(reference, 'access', None) in ('secret', 'secret_mtan'):
         @request.after
-        def include_x_robots_tag_header(response: 'Response') -> None:
+        def include_x_robots_tag_header(response: Response) -> None:
             response.headers.add('X-Robots-Tag', 'noindex')
 
 
@@ -485,7 +487,7 @@ def get_file(app: DepotApp, id: str) -> File | None:
 
 
 @DepotApp.view(model=File, render=render_depot_file, permission=Public)
-def view_file(self: File, request: 'CoreRequest') -> 'StoredFile':
+def view_file(self: File, request: CoreRequest) -> StoredFile:
     respond_with_alt_text(self, request)
     respond_with_caching_header(self, request)
     respond_with_x_robots_tag_header(self, request)
@@ -500,8 +502,8 @@ def view_file(self: File, request: 'CoreRequest') -> 'StoredFile':
                render=render_depot_file)
 def view_thumbnail(
     self: File,
-    request: 'CoreRequest'
-) -> 'StoredFile | Response':
+    request: CoreRequest
+) -> StoredFile | Response:
     if request.view_name in ('small', 'medium'):
         size = request.view_name
     else:
@@ -521,10 +523,10 @@ def view_thumbnail(
 
 @DepotApp.view(model=File, render=render_depot_file, permission=Public,
                request_method='HEAD')
-def view_file_head(self: File, request: 'CoreRequest') -> 'StoredFile':
+def view_file_head(self: File, request: CoreRequest) -> StoredFile:
 
     @request.after
-    def set_cache(response: 'Response') -> None:
+    def set_cache(response: Response) -> None:
         response.cache_control.max_age = 60
 
     return view_file(self, request)
@@ -538,11 +540,11 @@ def view_file_head(self: File, request: 'CoreRequest') -> 'StoredFile':
                permission=Public, request_method='HEAD')
 def view_thumbnail_head(
     self: File,
-    request: 'CoreRequest'
-) -> 'StoredFile | Response':
+    request: CoreRequest
+) -> StoredFile | Response:
 
     @request.after
-    def set_cache(response: 'Response') -> None:
+    def set_cache(response: Response) -> None:
         response.cache_control.max_age = 60
 
     return view_thumbnail(self, request)
@@ -550,7 +552,7 @@ def view_thumbnail_head(
 
 @DepotApp.view(model=File, name='note', request_method='POST',
                permission=Private)
-def handle_note_update(self: File, request: 'CoreRequest') -> None:
+def handle_note_update(self: File, request: CoreRequest) -> None:
     request.assert_valid_csrf_token()
     note = request.POST.get('note')
 
@@ -567,7 +569,7 @@ def handle_note_update(self: File, request: 'CoreRequest') -> None:
 
 @DepotApp.view(model=File, name='rename', request_method='POST',
                permission=Private)
-def handle_rename(self: File, request: 'CoreRequest') -> None:
+def handle_rename(self: File, request: CoreRequest) -> None:
     request.assert_valid_csrf_token()
     name = request.POST.get('name')
 
@@ -587,7 +589,7 @@ def handle_rename(self: File, request: 'CoreRequest') -> None:
 
 
 @DepotApp.view(model=File, request_method='DELETE', permission=Private)
-def delete_file(self: File, request: 'CoreRequest') -> None:
+def delete_file(self: File, request: CoreRequest) -> None:
     """ Deletes the given file. By default the permission is
     ``Private``. An application using the framework can override this though.
 

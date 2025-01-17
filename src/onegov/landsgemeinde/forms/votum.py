@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 from onegov.form.fields import ChosenSelectField
 from onegov.form.fields import TimeField
 from onegov.form.fields import TypeAheadField
@@ -31,7 +33,7 @@ if TYPE_CHECKING:
 
 class VotumForm(NamedFileForm):
 
-    request: 'LandsgemeindeRequest'
+    request: LandsgemeindeRequest
 
     number = IntegerField(
         label=_('Number'),

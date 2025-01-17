@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 from functools import cached_property
 from json import JSONDecodeError
 from logging import getLogger
@@ -51,7 +53,7 @@ if TYPE_CHECKING:
         def page(self) -> int | None: ...
         @property
         def page_index(self) -> int: ...
-        def page_by_index(self, index: int) -> 'Self': ...
+        def page_by_index(self, index: int) -> Self: ...
         @property
         def subset_count(self) -> int: ...
         @property
@@ -61,11 +63,11 @@ if TYPE_CHECKING:
         @property
         def pages_count(self) -> int: ...
         @property
-        def pages(self) -> 'Iterator[Self]': ...
+        def pages(self) -> Iterator[Self]: ...
         @property
-        def previous(self) -> 'Self | None': ...
+        def previous(self) -> Self | None: ...
         @property
-        def next(self) -> 'Self | None': ...
+        def next(self) -> Self | None: ...
 
 log = getLogger('onegov.api')
 log.addHandler(NullHandler())
@@ -121,13 +123,13 @@ class ApiEndpointItem(Generic[_M]):
 
     """
 
-    def __init__(self, app: 'Framework', endpoint: str, id: str):
+    def __init__(self, app: Framework, endpoint: str, id: str):
         self.app = app
         self.endpoint = endpoint
         self.id = id
 
     @cached_property
-    def api_endpoint(self) -> 'ApiEndpoint[_M] | None':
+    def api_endpoint(self) -> ApiEndpoint[_M] | None:
         cls = ApiEndpointCollection(self.app).endpoints.get(self.endpoint)
         # type(cls(self.app)) == <class 'onegov.agency.api.AgencyApiEndpoint'>
         return cls(self.app) if cls else None
@@ -150,7 +152,7 @@ class ApiEndpointItem(Generic[_M]):
             return self.api_endpoint.item_links(item)
         return None
 
-    def form(self, request: 'CoreRequest') -> 'Form | None':
+    def form(self, request: CoreRequest) -> Form | None:
         if self.api_endpoint and (item := self.item):
             return self.api_endpoint.form(item, request)
 
@@ -172,11 +174,11 @@ class ApiEndpoint(Generic[_M]):
     name: ClassVar[str] = ''  # FIXME: Do we ever use this?
     endpoint: ClassVar[str] = ''
     filters: ClassVar[set[str]] = set()
-    form_class: ClassVar[type['Form'] | None] = None
+    form_class: ClassVar[type[Form] | None] = None
 
     def __init__(
         self,
-        app: 'Framework',
+        app: Framework,
         extra_parameters: dict[str, str | None] | None = None,
         page: int | None = None,
     ):
@@ -185,7 +187,7 @@ class ApiEndpoint(Generic[_M]):
         self.page = int(page) if page else page
         self.batch_size = 100
 
-    def for_page(self, page: int | None) -> 'Self | None':
+    def for_page(self, page: int | None) -> Self | None:
         """ Return a new endpoint instance with the given page while keeping
         the current filters.
 
@@ -193,7 +195,7 @@ class ApiEndpoint(Generic[_M]):
 
         return self.__class__(self.app, self.extra_parameters, page)
 
-    def for_filter(self, **filters: Any) -> 'Self':
+    def for_filter(self, **filters: Any) -> Self:
         """ Return a new endpoint instance with the given filters while
         discarding the current filters and page.
 
@@ -204,9 +206,9 @@ class ApiEndpoint(Generic[_M]):
     @overload
     def for_item(self, item: None) -> None: ...
     @overload
-    def for_item(self, item: _M) -> 'ApiEndpointItem[_M]': ...
+    def for_item(self, item: _M) -> ApiEndpointItem[_M]: ...
 
-    def for_item(self, item: _M | None) -> 'ApiEndpointItem[_M] | None':
+    def for_item(self, item: _M | None) -> ApiEndpointItem[_M] | None:
         """ Return a new endpoint item instance with the given item. """
 
         if not item:
@@ -222,17 +224,17 @@ class ApiEndpoint(Generic[_M]):
     def get_filter(
         self,
         name: str,
-        default: '_DefaultT',
-        empty: '_EmptyT'
-    ) -> 'str | _DefaultT | _EmptyT': ...
+        default: _DefaultT,
+        empty: _EmptyT
+    ) -> str | _DefaultT | _EmptyT: ...
 
     @overload
     def get_filter(
         self,
         name: str,
-        default: '_DefaultT',
+        default: _DefaultT,
         empty: None = None
-    ) -> 'str | _DefaultT | None': ...
+    ) -> str | _DefaultT | None: ...
 
     @overload
     def get_filter(
@@ -240,8 +242,8 @@ class ApiEndpoint(Generic[_M]):
         name: str,
         default: None = None,
         *,
-        empty: '_EmptyT'
-    ) -> 'str | _EmptyT | None': ...
+        empty: _EmptyT
+    ) -> str | _EmptyT | None: ...
 
     @overload
     def get_filter(
@@ -264,7 +266,7 @@ class ApiEndpoint(Generic[_M]):
             return default
         return self.extra_parameters[name] or empty
 
-    def by_id(self, id: 'PKType') -> _M | None:
+    def by_id(self, id: PKType) -> _M | None:
         """ Return the item with the given ID from the collection. """
 
         try:
@@ -273,11 +275,11 @@ class ApiEndpoint(Generic[_M]):
             return None
 
     @property
-    def session(self) -> 'Session':
+    def session(self) -> Session:
         return self.app.session()
 
     @property
-    def links(self) -> dict[str, 'Self | None']:
+    def links(self) -> dict[str, Self | None]:
         """ Returns a dictionary with pagination instances. """
 
         result: dict[str, Self | None] = {'prev': None, 'next': None}
@@ -291,7 +293,7 @@ class ApiEndpoint(Generic[_M]):
         return result
 
     @property
-    def batch(self) -> dict['ApiEndpointItem[_M]', _M]:
+    def batch(self) -> dict[ApiEndpointItem[_M], _M]:
         """ Returns a dictionary with endpoint item instances and their
         titles.
 
@@ -334,8 +336,8 @@ class ApiEndpoint(Generic[_M]):
     def form(
         self,
         item: _M | None,
-        request: 'CoreRequest'
-    ) -> 'Form | None':
+        request: CoreRequest
+    ) -> Form | None:
         """ Return a form for editing items of this collection. """
 
         if self.form_class is None:
@@ -414,7 +416,7 @@ class ApiEndpoint(Generic[_M]):
         raise NotImplementedError()
 
     @property
-    def collection(self) -> 'PaginationWithById[_M, Any]':
+    def collection(self) -> PaginationWithById[_M, Any]:
         """ Return an instance of the collection with filters and page set.
         """
 
@@ -430,7 +432,7 @@ class ApiEndpoint(Generic[_M]):
 class ApiEndpointCollection:
     """ A collection of all available API endpoints. """
 
-    def __init__(self, app: 'Framework'):
+    def __init__(self, app: Framework):
         self.app = app
 
     @cached_property
@@ -443,7 +445,7 @@ class ApiEndpointCollection:
 
 class AuthEndpoint:
 
-    def __init__(self, app: 'Framework'):
+    def __init__(self, app: Framework):
         self.app = app
 
 
@@ -451,7 +453,7 @@ class ApiKey(Base):
 
     __tablename__ = 'api_keys'
 
-    id: 'Column[uuid.UUID]' = Column(
+    id: Column[uuid.UUID] = Column(
         UUID,  # type: ignore[arg-type]
         nullable=False,
         primary_key=True,
@@ -459,14 +461,14 @@ class ApiKey(Base):
     )
 
     #: the id of the user that created the api key
-    user_id: 'Column[uuid.UUID]' = Column(
+    user_id: Column[uuid.UUID] = Column(
         UUID,  # type: ignore[arg-type]
         ForeignKey('users.id'),
         nullable=False
     )
 
     #: the user that created the api key
-    user: 'relationship[User]' = relationship(
+    user: relationship[User] = relationship(
         User,
         backref=backref(
             'api_keys', cascade='all,delete-orphan', lazy='dynamic'
@@ -474,16 +476,16 @@ class ApiKey(Base):
     )
 
     #: the name of the api key, may be any string
-    name: 'Column[str]' = Column(Text, nullable=False)
+    name: Column[str] = Column(Text, nullable=False)
 
     #: whether or not the api key can submit changes
-    read_only: 'Column[bool]' = Column(Boolean, default=True, nullable=False)
+    read_only: Column[bool] = Column(Boolean, default=True, nullable=False)
 
     #: the last time a token was generated based on this api key
-    last_used: 'Column[datetime | None]' = Column(UTCDateTime, nullable=True)
+    last_used: Column[datetime | None] = Column(UTCDateTime, nullable=True)
 
     #: the key itself
-    key: 'Column[uuid.UUID]' = Column(
+    key: Column[uuid.UUID] = Column(
         UUID,  # type: ignore[arg-type]
         nullable=False,
         default=uuid4

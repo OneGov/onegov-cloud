@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 from onegov.org import _
 from datetime import date
 from functools import partial
@@ -89,8 +91,8 @@ class TicketPdf(Pdf):
 
     @staticmethod
     def page_fn_header_and_footer(
-        canvas: 'Canvas',
-        doc: 'Template'
+        canvas: Canvas,
+        doc: Template
     ) -> None:
 
         page_fn_header(canvas, doc)
@@ -106,14 +108,14 @@ class TicketPdf(Pdf):
         canvas.drawRightString(
             doc.pagesize[0] - doc.rightMargin,
             doc.bottomMargin / 2,
-            f'{canvas.getPageNumber()}'
+            f'{canvas.getPageNumber()}'  # type:ignore[no-untyped-call]
         )
         canvas.restoreState()
 
     @staticmethod
     def page_fn_header_and_footer_qr(
-        canvas: 'Canvas',
-        doc: 'Template'
+        canvas: Canvas,
+        doc: Template
     ) -> None:
 
         assert hasattr(doc, 'qr_payload')
@@ -133,20 +135,20 @@ class TicketPdf(Pdf):
         canvas.restoreState()
 
     @property
-    def page_fn(self) -> 'Callable[[Canvas, Template], None]':
+    def page_fn(self) -> Callable[[Canvas, Template], None]:
         """ First page the same as later except Qr-Code ..."""
         return self.page_fn_header_and_footer_qr
 
     @property
-    def page_fn_later(self) -> 'Callable[[Canvas, Template], None]':
+    def page_fn_later(self) -> Callable[[Canvas, Template], None]:
         return self.page_fn_header_and_footer
 
     @overload  # type:ignore[override]
     def table(
         self,
-        data: 'Sequence[Sequence[str | Paragraph]]',
-        columns: 'Literal["even"] | Sequence[float | None] | None',
-        style: 'TableStyle | Iterable[_TableCommand] | None' = None,
+        data: Sequence[Sequence[str | Paragraph]],
+        columns: Literal['even'] | Sequence[float | None] | None,
+        style: TableStyle | Iterable[_TableCommand] | None = None,
         ratios: Literal[False] = False,
         border: bool = True,
         first_bold: bool = True
@@ -155,9 +157,9 @@ class TicketPdf(Pdf):
     @overload
     def table(
         self,
-        data: 'Sequence[Sequence[str | Paragraph]]',
+        data: Sequence[Sequence[str | Paragraph]],
         columns: Literal['even'] | list[float] | None,
-        style: 'TableStyle | Iterable[_TableCommand] | None' = None,
+        style: TableStyle | Iterable[_TableCommand] | None = None,
         *,
         ratios: Literal[True],
         border: bool = True,
@@ -167,9 +169,9 @@ class TicketPdf(Pdf):
     @overload
     def table(
         self,
-        data: 'Sequence[Sequence[str | Paragraph]]',
+        data: Sequence[Sequence[str | Paragraph]],
         columns: Literal['even'] | list[float] | None,
-        style: 'TableStyle | Iterable[_TableCommand] | None',
+        style: TableStyle | Iterable[_TableCommand] | None,
         ratios: Literal[True],
         border: bool = True,
         first_bold: bool = True
@@ -178,9 +180,9 @@ class TicketPdf(Pdf):
     @overload
     def table(
         self,
-        data: 'Sequence[Sequence[str | Paragraph]]',
-        columns: 'Literal["even"] | Sequence[float | None] | None',
-        style: 'TableStyle | Iterable[_TableCommand] | None' = None,
+        data: Sequence[Sequence[str | Paragraph]],
+        columns: Literal['even'] | Sequence[float | None] | None,
+        style: TableStyle | Iterable[_TableCommand] | None = None,
         ratios: bool = False,
         border: bool = True,
         first_bold: bool = True
@@ -188,9 +190,9 @@ class TicketPdf(Pdf):
 
     def table(
         self,
-        data: 'Sequence[Sequence[str | Paragraph]]',
-        columns: 'Literal["even"] | Sequence[float | None] | None',
-        style: 'TableStyle | Iterable[_TableCommand] | None' = None,
+        data: Sequence[Sequence[str | Paragraph]],
+        columns: Literal['even'] | Sequence[float | None] | None,
+        style: TableStyle | Iterable[_TableCommand] | None = None,
         ratios: bool = False,
         border: bool = True,
         first_bold: bool = True
@@ -238,9 +240,9 @@ class TicketPdf(Pdf):
             underline_width = self.underline_width
 
             def colorize(
-                attrs: '_HTMLAttrs',
+                attrs: _HTMLAttrs,
                 new: bool = False
-            ) -> '_HTMLAttrs':
+            ) -> _HTMLAttrs:
 
                 # phone numbers appear here but are escaped, skip...
                 if not attrs.get((None, 'href')):
@@ -369,12 +371,12 @@ class TicketPdf(Pdf):
     def p_markup(
         self,
         text: str,
-        style: 'PropertySet | None' = None
+        style: PropertySet | None = None
     ) -> None:
 
         super().p_markup(self.translate(text), style)
 
-    def ticket_timeline(self, msg_feed: 'Mapping[str, Any] | None') -> None:
+    def ticket_timeline(self, msg_feed: Mapping[str, Any] | None) -> None:
         """Will parse the timeline from view_messages_feed """
         if not msg_feed or not msg_feed['messages']:
             return
@@ -437,8 +439,8 @@ class TicketPdf(Pdf):
     @classmethod
     def from_ticket(
         cls,
-        request: 'OrgRequest',
-        ticket: 'Ticket'
+        request: OrgRequest,
+        ticket: Ticket
     ) -> BytesIO:
         """
         Creates a PDF representation of the ticket. It is sensible to the

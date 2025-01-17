@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 from onegov.core.elements import Link
 from onegov.core.security import Private
 from onegov.pas import _
@@ -24,8 +26,8 @@ if TYPE_CHECKING:
 )
 def view_parliamentarians(
     self: ParliamentarianCollection,
-    request: 'TownRequest'
-) -> 'RenderData':
+    request: TownRequest
+) -> RenderData:
 
     layout = ParliamentarianCollectionLayout(self, request)
 
@@ -59,9 +61,9 @@ def view_parliamentarians(
 )
 def add_parliamentarian(
     self: ParliamentarianCollection,
-    request: 'TownRequest',
+    request: TownRequest,
     form: ParliamentarianForm
-) -> 'RenderData | Response':
+) -> RenderData | Response:
 
     if form.submitted(request):
         parliamentarian = self.add(**form.get_useful_data())
@@ -87,8 +89,8 @@ def add_parliamentarian(
 )
 def view_parliamentarian(
     self: Parliamentarian,
-    request: 'TownRequest'
-) -> 'RenderData':
+    request: TownRequest
+) -> RenderData:
 
     layout = ParliamentarianLayout(self, request)
 
@@ -108,9 +110,9 @@ def view_parliamentarian(
 )
 def edit_parliamentarian(
     self: Parliamentarian,
-    request: 'TownRequest',
+    request: TownRequest,
     form: ParliamentarianForm
-) -> 'RenderData | Response':
+) -> RenderData | Response:
 
     if form.submitted(request):
         form.populate_obj(self)
@@ -138,7 +140,7 @@ def edit_parliamentarian(
 )
 def delete_parliamentarian(
     self: Parliamentarian,
-    request: 'TownRequest'
+    request: TownRequest
 ) -> None:
 
     request.assert_valid_csrf_token()
@@ -156,9 +158,9 @@ def delete_parliamentarian(
 )
 def add_commission_membership(
     self: Parliamentarian,
-    request: 'TownRequest',
+    request: TownRequest,
     form: ParliamentarianRoleForm
-) -> 'RenderData | Response':
+) -> RenderData | Response:
 
     form.delete_field('parliamentarian_id')
 

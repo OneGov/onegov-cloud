@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 from functools import cached_property
 
 from onegov.core.elements import Link, LinkGroup, Confirm, Intercooler
@@ -90,7 +92,7 @@ class CourseAttendeeCollectionLayout(DefaultLayout):
 
 class CourseAttendeeLayout(DefaultLayout):
 
-    model: 'CourseAttendee'
+    model: CourseAttendee
 
     @cached_property
     def title(self) -> str:

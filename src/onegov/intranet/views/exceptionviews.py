@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 import morepath
 
 from onegov.core.security import Public
@@ -22,8 +24,8 @@ if TYPE_CHECKING:
 )
 def handle_forbidden_for_homepage(
     self: HTTPForbidden,
-    request: 'TownRequest'
-) -> 'RenderData | Response':
+    request: TownRequest
+) -> RenderData | Response:
     """ Usually, the forbidden view offers no way to log in, as we usually
     do not need that feature (exception views should be simple).
 

@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 from onegov.election_day.screen_widgets.election_compound import (
     ElectionCompoundCandidatesTableWidget,
     ElectionCompoundDistrictsMapWidget,

@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 from onegov.core.security import Public, Private
 from onegov.org.forms import InternalTicketChatMessageForm
 from onegov.org.views.reservation import (
@@ -27,9 +29,9 @@ if TYPE_CHECKING:
 )
 def town_handle_reservation_form(
     self: Resource,
-    request: 'TownRequest',
-    form: 'ReservationForm'
-) -> 'RenderData | Response':
+    request: TownRequest,
+    form: ReservationForm
+) -> RenderData | Response:
     return handle_reservation_form(
         self, request, form, ReservationLayout(self, request))
 
@@ -42,8 +44,8 @@ def town_handle_reservation_form(
 )
 def town_confirm_reservation(
     self: Resource,
-    request: 'TownRequest'
-) -> 'RenderData':
+    request: TownRequest
+) -> RenderData:
     return confirm_reservation(self, request, ReservationLayout(self, request))
 
 
@@ -57,8 +59,8 @@ def town_confirm_reservation(
 )
 def town_finalize_reservation(
     self: Resource,
-    request: 'TownRequest'
-) -> 'Response':
+    request: TownRequest
+) -> Response:
     """Returns a redirect, no layout passed"""
     return finalize_reservation(self, request)
 
@@ -72,9 +74,9 @@ def town_finalize_reservation(
 )
 def town_accept_reservation_with_message(
     self: Reservation,
-    request: 'TownRequest',
+    request: TownRequest,
     form: InternalTicketChatMessageForm
-) -> 'RenderData | Response':
+) -> RenderData | Response:
     layout = TicketChatMessageLayout(self, request)  # type:ignore
     return accept_reservation_with_message(self, request, form, layout)
 
@@ -88,8 +90,8 @@ def town_accept_reservation_with_message(
 )
 def town_reject_reservation_with_message(
     self: Reservation,
-    request: 'TownRequest',
+    request: TownRequest,
     form: InternalTicketChatMessageForm
-) -> 'RenderData | Response | None':
+) -> RenderData | Response | None:
     layout = TicketChatMessageLayout(self, request)  # type:ignore
     return reject_reservation_with_message(self, request, form, layout)

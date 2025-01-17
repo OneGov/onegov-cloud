@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 from onegov.election_day import _
 from onegov.election_day.forms.upload.common import ALLOWED_MIME_TYPES
 from onegov.election_day.forms.upload.common import ALLOWED_MIME_TYPES_XML

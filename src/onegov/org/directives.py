@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 from dectate import Action
 from itertools import count
 
@@ -82,14 +84,14 @@ class HomepageWidgetAction(Action):
 
     def identifier(  # type:ignore[override]
         self,
-        homepage_widget_registry: dict[str, 'RegisteredHomepageWidget']
+        homepage_widget_registry: dict[str, RegisteredHomepageWidget]
     ) -> str:
         return self.tag
 
     def perform(  # type:ignore[override]
         self,
-        func: 'Callable[[], HomepageWidget]',
-        homepage_widget_registry: dict[str, 'RegisteredHomepageWidget']
+        func: Callable[[], HomepageWidget],
+        homepage_widget_registry: dict[str, RegisteredHomepageWidget]
     ) -> None:
         widget = cast('RegisteredHomepageWidget', func())
         widget.tag = self.tag  # keep redundantly for ease of access
@@ -117,7 +119,7 @@ class ExportAction(Action):
 
     def perform(  # type:ignore[override]
         self,
-        cls: 'Callable[..., Any]',
+        cls: Callable[..., Any],
         export_registry: dict[str, Any]
     ) -> None:
         export_registry[self.id] = cls(**self.kwargs)
@@ -137,14 +139,14 @@ class UserlinkAction(Action):
 
     def identifier(  # type:ignore[override]
         self,
-        linkgroup_registry: list['LinkGroupFactory']
+        linkgroup_registry: list[LinkGroupFactory]
     ) -> int:
         return self.name
 
     def perform(  # type:ignore[override]
         self,
-        func: 'LinkGroupFactory',
-        linkgroup_registry: list['LinkGroupFactory']
+        func: LinkGroupFactory,
+        linkgroup_registry: list[LinkGroupFactory]
     ) -> None:
         linkgroup_registry.append(func)
 
@@ -161,14 +163,14 @@ class DirectorySearchWidgetAction(Action):
 
     def identifier(  # type:ignore[override]
         self,
-        directory_search_widget_registry: 'DirectorySearchWidgetRegistry'
+        directory_search_widget_registry: DirectorySearchWidgetRegistry
     ) -> str:
         return self.name
 
     def perform(  # type:ignore[override]
         self,
-        cls: type['DirectorySearchWidget[Any]'],
-        directory_search_widget_registry: 'DirectorySearchWidgetRegistry'
+        cls: type[DirectorySearchWidget[Any]],
+        directory_search_widget_registry: DirectorySearchWidgetRegistry
     ) -> None:
 
         cls = cast('type[RegisteredDirectorySearchWidget[Any]]', cls)
@@ -192,14 +194,14 @@ class EventSearchWidgetAction(Action):
 
     def identifier(  # type:ignore[override]
         self,
-        event_search_widget_registry: 'EventSearchWidgetRegistry'
+        event_search_widget_registry: EventSearchWidgetRegistry
     ) -> str:
         return self.name
 
     def perform(  # type:ignore[override]
         self,
-        cls: type['EventSearchWidget'],
-        event_search_widget_registry: 'EventSearchWidgetRegistry'
+        cls: type[EventSearchWidget],
+        event_search_widget_registry: EventSearchWidgetRegistry
     ) -> None:
 
         cls = cast('type[RegisteredEventSearchWidget]', cls)
@@ -237,14 +239,14 @@ class SettingsView(Action):
 
     def identifier(  # type:ignore[override]
         self,
-        settings_view_registry: dict[str, 'SettingsDict']
+        settings_view_registry: dict[str, SettingsDict]
     ) -> str:
         return self.name
 
     def perform(  # type:ignore[override]
         self,
         func: Any,
-        settings_view_registry: dict[str, 'SettingsDict']
+        settings_view_registry: dict[str, SettingsDict]
     ) -> None:
         settings_view_registry[self.name] = self.setting
 
@@ -267,14 +269,14 @@ class Boardlet(Action):
 
     def identifier(  # type:ignore[override]
         self,
-        boardlets_registry: dict[str, 'BoardletConfig']
+        boardlets_registry: dict[str, BoardletConfig]
     ) -> str:
         return self.name
 
     def perform(  # type:ignore[override]
         self,
-        func: type['_Boardlet'],
-        boardlets_registry: dict[str, 'BoardletConfig']
+        func: type[_Boardlet],
+        boardlets_registry: dict[str, BoardletConfig]
     ) -> None:
         boardlets_registry[self.name] = {
             'cls': func,

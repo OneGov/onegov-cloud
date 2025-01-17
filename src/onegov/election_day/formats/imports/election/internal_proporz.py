@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 from onegov.election_day import _
 from onegov.election_day.formats.imports.common import EXPATS
 from onegov.election_day.formats.imports.common import FileImportError
@@ -60,7 +62,7 @@ INTERNAL_PROPORZ_HEADERS = (
 )
 
 
-def parse_election(line: 'DefaultRow', errors: list[str]) -> 'Status | None':
+def parse_election(line: DefaultRow, errors: list[str]) -> Status | None:
     status = None
     try:
         status = line.election_status or 'unknown'
@@ -72,11 +74,11 @@ def parse_election(line: 'DefaultRow', errors: list[str]) -> 'Status | None':
 
 
 def parse_election_result(
-    line: 'DefaultRow',
+    line: DefaultRow,
     errors: list[str],
     entities: dict[int, dict[str, str]],
-    election: 'Election',
-    principal: 'Canton | Municipality',
+    election: Election,
+    principal: Canton | Municipality,
     ignore_extra: bool
 ) -> dict[str, Any] | bool:
 
@@ -137,7 +139,7 @@ def parse_election_result(
 
 
 def parse_list(
-    line: 'DefaultRow',
+    line: DefaultRow,
     errors: list[str],
     election_id: str,
     colors: dict[str, str]
@@ -164,7 +166,7 @@ def parse_list(
 
 
 def parse_list_result(
-    line: 'DefaultRow',
+    line: DefaultRow,
     errors: list[str],
     counted: bool
 ) -> dict[str, Any] | None:
@@ -181,7 +183,7 @@ def parse_list_result(
     return None
 
 
-def parse_list_panachage_headers(csv: 'DefaultCSVFile') -> dict[str, str]:
+def parse_list_panachage_headers(csv: DefaultCSVFile) -> dict[str, str]:
     headers = {}
     prefix = 'list_panachage_votes_from_list_'
     for header in csv.headers:
@@ -200,7 +202,7 @@ def parse_list_panachage_headers(csv: 'DefaultCSVFile') -> dict[str, str]:
 
 
 def parse_list_panachage_results(
-    line: 'DefaultRow',
+    line: DefaultRow,
     errors: list[str],
     values: dict[str, dict[str, int]],
     headers: dict[str, str]
@@ -225,7 +227,7 @@ def parse_list_panachage_results(
 
 
 def parse_candidate(
-    line: 'DefaultRow',
+    line: DefaultRow,
     errors: list[str],
     election_id: str,
     colors: dict[str, str]
@@ -265,7 +267,7 @@ def parse_candidate(
 
 
 def parse_candidate_result(
-    line: 'DefaultRow',
+    line: DefaultRow,
     errors: list[str],
     counted: bool
 ) -> dict[str, Any] | None:
@@ -282,7 +284,7 @@ def parse_candidate_result(
     return None
 
 
-def parse_candidate_panachage_headers(csv: 'DefaultCSVFile') -> dict[str, str]:
+def parse_candidate_panachage_headers(csv: DefaultCSVFile) -> dict[str, str]:
     headers = {}
     prefix = 'candidate_panachage_votes_from_list_'
     for header in csv.headers:
@@ -299,7 +301,7 @@ def parse_candidate_panachage_headers(csv: 'DefaultCSVFile') -> dict[str, str]:
 
 
 def parse_candidate_panachage_results(
-    line: 'DefaultRow',
+    line: DefaultRow,
     errors: list[str],
     values: list[dict[str, Any]],
     headers: dict[str, str]
@@ -332,7 +334,7 @@ def prefix_connection_id(connection_id: str, parent_connection_id: str) -> str:
 
 
 def parse_connection(
-    line: 'DefaultRow',
+    line: DefaultRow,
     errors: list[str],
     election_id: str
 ) -> tuple[dict[str, Any] | None, dict[str, Any] | None]:
@@ -364,8 +366,8 @@ def parse_connection(
 
 
 def import_election_internal_proporz(
-    election: 'Election',
-    principal: 'Canton | Municipality',
+    election: Election,
+    principal: Canton | Municipality,
     file: IO[bytes],
     mimetype: str,
     ignore_extra: bool = False

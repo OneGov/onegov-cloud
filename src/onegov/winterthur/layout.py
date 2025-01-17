@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 from functools import cached_property
 from onegov.org.layout import DefaultLayout
 from onegov.core.elements import Link, LinkGroup, Intercooler, Confirm, Block
@@ -100,19 +102,19 @@ class DaycareSubsidyCalculatorLayout(DefaultLayout):
 
 class MissionReportLayout(DefaultLayout):
 
-    model: 'MissionReportContext'
+    model: MissionReportContext
 
     def __init__(
         self,
-        model: 'MissionReportContext',
-        request: 'WinterthurRequest',
+        model: MissionReportContext,
+        request: WinterthurRequest,
         *suffixes: Link
     ) -> None:
         self.suffixes = suffixes
         super().__init__(model, request)
         request.include('iframe-enhancements')
 
-    def breadcrumbs_iter(self) -> 'Iterator[Link]':
+    def breadcrumbs_iter(self) -> Iterator[Link]:
         yield Link(
             _('Homepage'),
             self.homepage_url)

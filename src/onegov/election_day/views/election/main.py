@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 from collections import defaultdict
 from morepath import redirect
 from onegov.core.utils import normalize_for_url
@@ -31,11 +33,11 @@ if TYPE_CHECKING:
 )
 def view_election_head(
     self: Election,
-    request: 'ElectionDayRequest'
+    request: ElectionDayRequest
 ) -> None:
 
     @request.after
-    def add_headers(response: 'Response') -> None:
+    def add_headers(response: Response) -> None:
         add_cors_header(response)
         add_last_modified_header(response, self.last_modified)
 
@@ -46,8 +48,8 @@ def view_election_head(
 )
 def view_election(
     self: Election,
-    request: 'ElectionDayRequest'
-) -> 'Response':
+    request: ElectionDayRequest
+) -> Response:
 
     """" The main view. """
 
@@ -61,15 +63,15 @@ def view_election(
 )
 def view_election_json(
     self: Election,
-    request: 'ElectionDayRequest'
-) -> 'JSON_ro':
+    request: ElectionDayRequest
+) -> JSON_ro:
     """" The main view as JSON. """
 
     last_modified = self.last_modified
     assert last_modified is not None
 
     @request.after
-    def add_headers(response: 'Response') -> None:
+    def add_headers(response: Response) -> None:
         add_cors_header(response)
         add_last_modified_header(response, last_modified)
 
@@ -233,12 +235,12 @@ def view_election_json(
 )
 def view_election_summary(
     self: Election,
-    request: 'ElectionDayRequest'
-) -> 'JSON_ro':
+    request: ElectionDayRequest
+) -> JSON_ro:
     """ View the summary of the election as JSON. """
 
     @request.after
-    def add_headers(response: 'Response') -> None:
+    def add_headers(response: Response) -> None:
         add_cors_header(response)
         add_last_modified_header(response, self.last_modified)
 
@@ -252,8 +254,8 @@ def view_election_summary(
 )
 def view_election_pdf(
     self: Election,
-    request: 'ElectionDayRequest'
-) -> 'RenderData':
+    request: ElectionDayRequest
+) -> RenderData:
     """ View the generated PDF. """
 
     layout = ElectionLayout(self, request)

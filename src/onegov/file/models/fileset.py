@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 from onegov.core.crypto import random_token
 from onegov.core.orm import Base
 from onegov.core.orm.mixins import ContentMixin, TimestampMixin
@@ -34,7 +36,7 @@ class FileSet(Base, ContentMixin, TimestampMixin):
     __tablename__ = 'filesets'
 
     #: the unique, public id of the fileset
-    id: 'Column[str]' = Column(
+    id: Column[str] = Column(
         Text,
         nullable=False,
         primary_key=True,
@@ -42,7 +44,7 @@ class FileSet(Base, ContentMixin, TimestampMixin):
     )
 
     #: the title of the fileset (not usable in url)
-    title: 'Column[str]' = Column(Text, nullable=False)
+    title: Column[str] = Column(Text, nullable=False)
 
     #: the type of the fileset, this can be used to create custom polymorphic
     #: subclasses. See `<https://docs.sqlalchemy.org/en/improve_toc/
@@ -50,13 +52,13 @@ class FileSet(Base, ContentMixin, TimestampMixin):
     #:
     #: this is independent from the :attr:`onegov.file.models.File.type`
     #: attribute on the :class:`~onegov.file.models.File`.
-    type: 'Column[str]' = Column(
+    type: Column[str] = Column(
         Text,
         nullable=False,
         default=lambda: 'generic'
     )
 
-    files: 'relationship[list[File]]' = relationship(
+    files: relationship[list[File]] = relationship(
         'File',
         secondary=file_to_set_associations,
         back_populates='filesets',

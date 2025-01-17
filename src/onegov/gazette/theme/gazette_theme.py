@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 from onegov.foundation import BaseTheme
 from onegov.core.utils import module_path
 
@@ -20,7 +22,7 @@ class GazetteTheme(BaseTheme):
         # Leave this empty, see below
         return {}
 
-    def compile(self, options: 'Mapping[str, Any] | None' = None) -> str:
+    def compile(self, options: Mapping[str, Any] | None = None) -> str:
         # FIXME: We should just gracefully fallback to a default primary-color
         #        since that is the only attribute from options we care about
         assert options is not None

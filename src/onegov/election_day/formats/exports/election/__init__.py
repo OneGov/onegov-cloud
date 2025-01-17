@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 from onegov.election_day.formats.exports.election.internal_majorz import \
     export_election_internal_majorz
 from onegov.election_day.formats.exports.election.internal_proporz import \
@@ -12,8 +14,8 @@ if TYPE_CHECKING:
 
 
 def export_election_internal(
-    election: 'Election',
-    locales: 'Collection[str]'
+    election: Election,
+    locales: Collection[str]
 ) -> list[dict[str, Any]]:
 
     if election.type == 'proporz':

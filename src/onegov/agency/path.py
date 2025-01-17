@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 from onegov.agency.app import AgencyApp
 from onegov.agency.collections import ExtendedAgencyCollection
 from onegov.agency.collections import ExtendedPersonCollection
@@ -52,7 +54,7 @@ def get_agencies(
     path='/organization',
     absorb=True
 )
-def get_agency(app: AgencyApp, absorb: str) -> 'ExtendedAgency | None':
+def get_agency(app: AgencyApp, absorb: str) -> ExtendedAgency | None:
     collection = ExtendedAgencyCollection(app.session())
     return collection.by_path(absorb)
 
@@ -62,7 +64,7 @@ def get_agency(app: AgencyApp, absorb: str) -> 'ExtendedAgency | None':
     path='/agency/{id}',
     converters={'id': int}
 )
-def get_agency_proxy(app: AgencyApp, id: int) -> 'ExtendedAgency | None':
+def get_agency_proxy(app: AgencyApp, id: int) -> ExtendedAgency | None:
     return ExtendedAgencyCollection(app.session()).by_id(id)
 
 

@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 from collections import OrderedDict
 from onegov.election_day.models import Candidate
 from onegov.election_day.models import CandidateResult
@@ -14,7 +16,7 @@ if TYPE_CHECKING:
 
 def export_election_internal_majorz(
     election: Election,
-    locales: 'Collection[str]'
+    locales: Collection[str]
 ) -> list[dict[str, Any]]:
     """ Returns all data connected to this election as list with dicts.
 

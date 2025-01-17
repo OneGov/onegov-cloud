@@ -1,4 +1,6 @@
 """ The onegov org collection of images uploaded to the site. """
+from __future__ import annotations
+
 from collections import defaultdict
 from datetime import date
 from markupsafe import Markup
@@ -36,9 +38,9 @@ class Filter(NamedTuple):
 
 
 def get_filters(
-    request: 'OrgRequest',
+    request: OrgRequest,
     self: OccurrenceCollection,
-    keyword_counts: 'Mapping[str, Mapping[str, int]]',
+    keyword_counts: Mapping[str, Mapping[str, int]],
     view_name: str = ''
 ) -> list[Filter]:
 
@@ -77,7 +79,7 @@ def get_filters(
 
 
 def keyword_count(
-    request: 'OrgRequest',
+    request: OrgRequest,
     collection: OccurrenceCollection
 ) -> dict[str, dict[str, int]]:
 
@@ -124,9 +126,9 @@ def keyword_count(
              permission=Public)
 def view_occurrences(
     self: OccurrenceCollection,
-    request: 'OrgRequest',
+    request: OrgRequest,
     layout: OccurrencesLayout | None = None
-) -> 'RenderData':
+) -> RenderData:
     """ View all occurrences of all events. """
 
     filters = None
@@ -223,9 +225,9 @@ def view_occurrences(
 @OrgApp.html(model=Occurrence, template='occurrence.pt', permission=Public)
 def view_occurrence(
     self: Occurrence,
-    request: 'OrgRequest',
+    request: OrgRequest,
     layout: OccurrenceLayout | None = None
-) -> 'RenderData':
+) -> RenderData:
     """ View a single occurrence of an event. """
 
     layout = layout or OccurrenceLayout(self, request)
@@ -261,10 +263,10 @@ def view_occurrence(
              form=EventConfigurationForm)
 def handle_edit_event_filters(
     self: OccurrenceCollection,
-    request: 'OrgRequest',
+    request: OrgRequest,
     form: EventConfigurationForm,
     layout: OccurrencesLayout | None = None
-) -> 'RenderData | BaseResponse':
+) -> RenderData | BaseResponse:
 
     try:
         if form.submitted(request):
@@ -318,7 +320,7 @@ def handle_edit_event_filters(
 
 
 @OrgApp.view(model=Occurrence, name='ical', permission=Public)
-def ical_export_occurence(self: Occurrence, request: 'OrgRequest') -> Response:
+def ical_export_occurence(self: Occurrence, request: OrgRequest) -> Response:
     """ Returns the occurrence as ics. """
 
     return Response(
@@ -331,7 +333,7 @@ def ical_export_occurence(self: Occurrence, request: 'OrgRequest') -> Response:
 @OrgApp.view(model=OccurrenceCollection, name='ical', permission=Public)
 def ical_export_occurences(
     self: OccurrenceCollection,
-    request: 'OrgRequest'
+    request: OrgRequest
 ) -> Response:
     """ Returns the occurrences as ics. """
 
@@ -346,10 +348,10 @@ def ical_export_occurences(
              form=ExportForm, template='export.pt')
 def export_occurrences(
     self: OccurrenceCollection,
-    request: 'OrgRequest',
+    request: OrgRequest,
     form: ExportForm,
     layout: OccurrencesLayout | None = None
-) -> 'RenderData | BaseResponse':
+) -> RenderData | BaseResponse:
     """ Export the occurrences in various formats. """
 
     layout = layout or OccurrencesLayout(self, request)
@@ -376,8 +378,8 @@ def export_occurrences(
 @OrgApp.json(model=OccurrenceCollection, name='json', permission=Public)
 def json_export_occurences(
     self: OccurrenceCollection,
-    request: 'OrgRequest'
-) -> 'JSON_ro':
+    request: OrgRequest
+) -> JSON_ro:
     """ Returns the occurrences as JSON.
 
     This is used for the senantis.dir.eventsportlet.
@@ -385,7 +387,7 @@ def json_export_occurences(
     """
 
     @request.after
-    def cors(response: 'BaseResponse') -> None:
+    def cors(response: BaseResponse) -> None:
         response.headers.add('Access-Control-Allow-Origin', '*')
 
     query = self.for_filter(
@@ -413,7 +415,7 @@ def json_export_occurences(
 )
 def xml_export_all_occurrences(
     self: OccurrenceCollection,
-    request: 'OrgRequest'
+    request: OrgRequest
 ) -> Response:
     """
     Returns events as xml.
@@ -437,10 +439,10 @@ def xml_export_all_occurrences(
 )
 def import_occurrences(
     self: OccurrenceCollection,
-    request: 'OrgRequest',
+    request: OrgRequest,
     form: EventImportForm,
     layout: OccurrencesLayout | None = None
-) -> 'RenderData | BaseResponse':
+) -> RenderData | BaseResponse:
 
     if form.submitted(request):
         count, errors = form.run_import()

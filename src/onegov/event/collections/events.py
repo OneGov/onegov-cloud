@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 import hashlib
 
 from datetime import date
@@ -53,9 +55,9 @@ class EventCollection(Pagination[Event]):
 
     def __init__(
         self,
-        session: 'Session',
+        session: Session,
         page: int = 0,
-        state: 'EventState | None' = None
+        state: EventState | None = None
     ) -> None:
 
         super().__init__(page)
@@ -69,22 +71,22 @@ class EventCollection(Pagination[Event]):
             and self.page == other.page
         )
 
-    def subset(self) -> 'Query[Event]':
+    def subset(self) -> Query[Event]:
         return self.query()
 
     @property
     def page_index(self) -> int:
         return self.page
 
-    def page_by_index(self, index: int) -> 'Self':
+    def page_by_index(self, index: int) -> Self:
         return self.__class__(self.session, index, self.state)
 
-    def for_state(self, state: 'EventState | None') -> 'Self':
+    def for_state(self, state: EventState | None) -> Self:
         """ Returns a new instance of the collection with the given state. """
 
         return self.__class__(self.session, 0, state)
 
-    def query(self) -> 'Query[Event]':
+    def query(self) -> Query[Event]:
         query = self.session.query(Event)
         if self.state:
             query = query.filter(Event.state == self.state)
@@ -178,20 +180,20 @@ class EventCollection(Pagination[Event]):
         query = self.session.query(Event).filter(Event.name == name)
         return query.first()
 
-    def by_id(self, id: 'UUID') -> Event | None:
+    def by_id(self, id: UUID) -> Event | None:
         """ Return an event by its id. Hex representations work as well. """
         query = self.session.query(Event).filter(Event.id == id)
         return query.first()
 
     def from_import(
         self,
-        items: 'Iterable[EventImportItem | str]',
+        items: Iterable[EventImportItem | str],
         purge: str | None = None,
         publish_immediately: bool = True,
-        valid_state_transfers: 'Mapping[str, str] | None' = None,
+        valid_state_transfers: Mapping[str, str] | None = None,
         published_only: bool = False,
         future_events_only: bool = False
-    ) -> tuple[list[Event], list[Event], list['UUID']]:
+    ) -> tuple[list[Event], list[Event], list[UUID]]:
         """ Add or updates the given events.
 
         Only updates events which have changed. Uses ``Event.source_updated``
@@ -351,11 +353,11 @@ class EventCollection(Pagination[Event]):
         self,
         ical: str,
         future_events_only: bool = False,
-        event_image: 'IO[bytes] | None' = None,
+        event_image: IO[bytes] | None = None,
         event_image_name: str | None = None,
         default_categories: list[str] | None = None,
         default_filter_keywords: dict[str, list[str]] | None = None
-    ) -> tuple[list[Event], list[Event], list['UUID']]:
+    ) -> tuple[list[Event], list[Event], list[UUID]]:
         """ Imports the events from an iCalender string.
 
         We assume the timezone to be Europe/Zurich!
@@ -482,7 +484,7 @@ class EventCollection(Pagination[Event]):
 
     def as_anthrazit_xml(
         self,
-        request: 'CoreRequest',
+        request: CoreRequest,
         future_events_only: bool = True
     ) -> str:
         """

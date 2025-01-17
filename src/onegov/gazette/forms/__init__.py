@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 from onegov.gazette.forms.category import CategoryForm
 from onegov.gazette.forms.common import EmptyForm
 from onegov.gazette.forms.common import RejectForm

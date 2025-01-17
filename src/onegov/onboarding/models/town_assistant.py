@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 import morepath
 import re
 
@@ -30,9 +32,9 @@ class TownAssistant(Assistant):
     @Assistant.step(form=TownForm)
     def first_step(
         self,
-        request: 'CoreRequest',
+        request: CoreRequest,
         form: TownForm
-    ) -> 'RenderData | Response':
+    ) -> RenderData | Response:
 
         if form.submitted(request):
             request.browser_session['name'] = form.name.data
@@ -66,9 +68,9 @@ class TownAssistant(Assistant):
     @Assistant.step(form=FinishForm)
     def last_step(
         self,
-        request: 'CoreRequest',
+        request: CoreRequest,
         form: FinishForm
-    ) -> 'RenderData | Response':
+    ) -> RenderData | Response:
 
         for key in ('name', 'user', 'color'):
             if not request.browser_session.has(key):
@@ -164,8 +166,8 @@ class TownAssistant(Assistant):
         name: str,
         user: str,
         color: str,
-        request: 'CoreRequest'
-    ) -> 'RenderData':
+        request: CoreRequest
+    ) -> RenderData:
 
         current_schema = self.app.session_manager.current_schema
         assert current_schema is not None

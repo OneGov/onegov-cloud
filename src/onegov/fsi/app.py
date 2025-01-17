@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 from onegov.core import utils
 from onegov.fsi.initial_content import create_new_organisation
 from onegov.fsi.models.course_attendee import CourseAttendee
@@ -45,7 +47,7 @@ class FsiApp(TownApp):
             **cfg
         )
 
-    def on_login(self, request: 'CoreRequest', user: 'User') -> None:
+    def on_login(self, request: CoreRequest, user: User) -> None:
         assert hasattr(user, 'attendee')
         if not user.attendee:
             user.attendee = CourseAttendee()
@@ -68,7 +70,7 @@ def get_theme() -> FsiTheme:
 
 @FsiApp.setting(section='org', name='create_new_organisation')
 def get_create_new_organisation_factory(
-) -> 'Callable[[FsiApp, str], Organisation]':
+) -> Callable[[FsiApp, str], Organisation]:
     return create_new_organisation
 
 
@@ -89,6 +91,6 @@ def get_webasset_output() -> str:
 
 
 @FsiApp.webasset('common')
-def get_common_asset() -> 'Iterator[str]':
+def get_common_asset() -> Iterator[str]:
     yield from default_common_asset()
     yield 'fsi.js'

@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 from onegov.translator_directory import _
 
 full_text_max_chars = 25

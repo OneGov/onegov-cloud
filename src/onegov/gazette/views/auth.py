@@ -1,4 +1,5 @@
 """ The authentication views. """
+from __future__ import annotations
 
 from morepath import redirect
 from onegov.core.security import Personal
@@ -34,9 +35,9 @@ if TYPE_CHECKING:
 )
 def handle_login(
     self: Auth,
-    request: 'GazetteRequest',
+    request: GazetteRequest,
     form: LoginForm
-) -> 'RenderData | Response':
+) -> RenderData | Response:
     """ Handles the login requests. """
 
     layout = Layout(self, request)
@@ -58,7 +59,7 @@ def handle_login(
 
 
 @GazetteApp.html(model=Auth, name='logout', permission=Personal)
-def view_logout(self: Auth, request: 'GazetteRequest') -> 'Response':
+def view_logout(self: Auth, request: GazetteRequest) -> Response:
     """ Handles the logout requests. """
 
     return self.logout_to(request)
@@ -70,9 +71,9 @@ def view_logout(self: Auth, request: 'GazetteRequest') -> 'Response':
 )
 def handle_password_reset_request(
     self: Principal,
-    request: 'GazetteRequest',
+    request: GazetteRequest,
     form: RequestPasswordResetForm
-) -> 'RenderData':
+) -> RenderData:
     """ Handles the password reset requests. """
 
     show_form = True
@@ -135,9 +136,9 @@ def handle_password_reset_request(
 )
 def handle_password_reset(
     self: Principal,
-    request: 'GazetteRequest',
+    request: GazetteRequest,
     form: PasswordResetForm
-) -> 'RenderData | Response':
+) -> RenderData | Response:
 
     layout = Layout(self, request)
     callout = None
@@ -177,15 +178,15 @@ def handle_password_reset(
 )
 def handle_totp_second_factor(
     self: Auth,
-    request: 'GazetteRequest',
+    request: GazetteRequest,
     form: TOTPForm
-) -> 'RenderData | Response':
+) -> RenderData | Response:
 
     if not request.app.totp_enabled:
         raise exc.HTTPNotFound()
 
     @request.after
-    def respond_with_no_index(response: 'Response') -> None:
+    def respond_with_no_index(response: Response) -> None:
         response.headers['X-Robots-Tag'] = 'noindex'
 
     users = UserCollection(request.session)

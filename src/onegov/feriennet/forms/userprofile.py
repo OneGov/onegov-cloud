@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 import string
 
 from onegov.feriennet import _
@@ -20,7 +22,7 @@ if TYPE_CHECKING:
 class UserProfileForm(Form):
     """ Custom userprofile form for feriennet """
 
-    request: 'FeriennetRequest'
+    request: FeriennetRequest
 
     extra_fields = (
         'salutation',
@@ -208,7 +210,7 @@ class UserProfileForm(Form):
 
         return False
 
-    def populate_obj(self, model: 'User') -> None:  # type:ignore[override]
+    def populate_obj(self, model: User) -> None:  # type:ignore[override]
         super().populate_obj(model)
 
         if model:
@@ -226,7 +228,7 @@ class UserProfileForm(Form):
                 if isinstance(model.data[key], str):
                     model.data[key] = model.data[key].strip()
 
-    def process_obj(self, model: 'User') -> None:  # type:ignore[override]
+    def process_obj(self, model: User) -> None:  # type:ignore[override]
         super().process_obj(model)
 
         if model:

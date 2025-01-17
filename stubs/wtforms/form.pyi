@@ -6,6 +6,8 @@ from typing_extensions import TypeAlias
 from wtforms.fields.core import Field, UnboundField
 from wtforms.meta import DefaultMeta, _MultiDictLike
 
+__all__ = ("BaseForm", "Form")
+
 _T = TypeVar("_T")
 _FormErrors: TypeAlias = dict[str, Sequence[str] | _FormErrors]
 

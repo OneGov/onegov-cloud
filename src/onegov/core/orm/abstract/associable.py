@@ -56,6 +56,7 @@ table. The link between the two is established in the automatically created
 ``payments_for_products`` table.
 
 """
+from __future__ import annotations
 
 from onegov.core.orm.utils import QueryChain
 from sqlalchemy import Column
@@ -82,11 +83,11 @@ _M = TypeVar('_M', bound='Associable')
 
 
 class RegisteredLink(NamedTuple):
-    cls: type['Base']
+    cls: type[Base]
     table: Table
     key: str
     attribute: str
-    cardinality: 'Cardinality'
+    cardinality: Cardinality
 
     @property
     def class_attribute(self) -> Any:
@@ -102,7 +103,7 @@ def associated(
     uselist: Literal['auto'] = ...,
     backref_suffix: str = ...,
     onupdate: str | None = ...
-) -> 'rel[list[_M]]': ...
+) -> rel[list[_M]]: ...
 
 
 @overload
@@ -114,41 +115,41 @@ def associated(
     uselist: Literal['auto'] = ...,
     backref_suffix: str = ...,
     onupdate: str | None = ...
-) -> 'rel[_M | None]': ...
+) -> rel[_M | None]: ...
 
 
 @overload
 def associated(
     associated_cls: type[_M],
     attribute_name: str,
-    cardinality: 'Cardinality' = ...,
+    cardinality: Cardinality = ...,
     *,
     uselist: Literal[True],
     backref_suffix: str = ...,
     onupdate: str | None = ...
-) -> 'rel[list[_M]]': ...
+) -> rel[list[_M]]: ...
 
 
 @overload
 def associated(
     associated_cls: type[_M],
     attribute_name: str,
-    cardinality: 'Cardinality' = ...,
+    cardinality: Cardinality = ...,
     *,
     uselist: Literal[False],
     backref_suffix: str = ...,
     onupdate: str | None = ...
-) -> 'rel[_M | None]': ...
+) -> rel[_M | None]: ...
 
 
 def associated(
     associated_cls: type[_M],
     attribute_name: str,
-    cardinality: 'Cardinality' = 'one-to-many',
+    cardinality: Cardinality = 'one-to-many',
     uselist: Literal['auto'] | bool = 'auto',
     backref_suffix: str = '__tablename__',
     onupdate: str | None = None
-) -> 'rel[list[_M]] | rel[_M | None]':
+) -> rel[list[_M]] | rel[_M | None]:
     """ Creates an associated attribute. This attribute is supposed to be
     defined on the mixin class that will establish the generic association
     if inherited by a model.
@@ -202,7 +203,7 @@ def associated(
     if uselist == 'auto':
         uselist = not cardinality.endswith('to-one')
 
-    def descriptor(cls: type['Base']) -> 'rel[list[_M]] | rel[_M | None]':
+    def descriptor(cls: type[Base]) -> rel[list[_M]] | rel[_M | None]:
         # HACK: forms is one of the only tables which doesn't use id as
         #       its primary key, we probably should just use id everywhere
         #       consistently
@@ -322,7 +323,7 @@ class Associable:
         __tablename__: ClassVar[str]
 
     @classmethod
-    def association_base(cls) -> type['Associable']:
+    def association_base(cls) -> type[Associable]:
         """ Returns the model which directly inherits from Associable. """
 
         for parent in cls.__bases__:
@@ -337,11 +338,11 @@ class Associable:
     def register_link(
         cls,
         link_name: str,
-        linked_class: type['Base'],
+        linked_class: type[Base],
         table: Table,
         key: str,
         attribute: str,
-        cardinality: 'Cardinality'
+        cardinality: Cardinality
     ) -> None:
         """ All associated classes are registered through this method. This
         yields the following benefits:
@@ -370,7 +371,7 @@ class Associable:
         )
 
     @property
-    def links(self) -> 'QueryChain[Base]':
+    def links(self) -> QueryChain[Base]:
         """ Returns a query chain with all records of all models which attach
         to the associable model.
 
@@ -379,7 +380,7 @@ class Associable:
 
         session = object_session(self)
 
-        def query(link: RegisteredLink) -> 'Query[Base]':
+        def query(link: RegisteredLink) -> Query[Base]:
             column = getattr(link.cls, link.attribute)
 
             q = session.query(link.cls)

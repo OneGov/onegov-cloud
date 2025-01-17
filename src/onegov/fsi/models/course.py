@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 from onegov.core.html import html_to_text
 from onegov.core.orm import Base
 from onegov.core.orm.types import MarkupText, UUID
@@ -27,36 +29,36 @@ class Course(Base, ORMSearchable):
     }
     es_public = True
 
-    id: 'Column[uuid.UUID]' = Column(
+    id: Column[uuid.UUID] = Column(
         UUID,  # type:ignore[arg-type]
         primary_key=True,
         default=uuid4
     )
 
-    name: 'Column[str]' = Column(Text, nullable=False, unique=True)
+    name: Column[str] = Column(Text, nullable=False, unique=True)
 
-    description: 'Column[Markup]' = Column(MarkupText, nullable=False)
+    description: Column[Markup] = Column(MarkupText, nullable=False)
 
     # saved as integer (years), accessed as years
-    refresh_interval: 'Column[int | None]' = Column(Integer)
+    refresh_interval: Column[int | None] = Column(Integer)
 
     # If the course has to be refreshed after some interval
-    mandatory_refresh: 'Column[bool]' = Column(
+    mandatory_refresh: Column[bool] = Column(
         Boolean,
         nullable=False,
         default=False
     )
 
     # hides the course in the collection for non-admins
-    hidden_from_public: 'Column[bool]' = Column(
+    hidden_from_public: Column[bool] = Column(
         Boolean,
         nullable=False,
         default=False
     )
 
-    evaluation_url: 'Column[str | None]' = Column(Text)
+    evaluation_url: Column[str | None] = Column(Text)
 
-    events: 'relationship[AppenderQuery[CourseEvent]]' = relationship(
+    events: relationship[AppenderQuery[CourseEvent]] = relationship(
         'CourseEvent',
         back_populates='course',
         lazy='dynamic'
@@ -76,7 +78,7 @@ class Course(Base, ORMSearchable):
             return text
 
     @property
-    def description_html(self) -> 'Markup':
+    def description_html(self) -> Markup:
         """
         Returns the description that is saved as HTML from the redactor js
         plugin.
@@ -84,7 +86,7 @@ class Course(Base, ORMSearchable):
         return self.description
 
     @hybrid_property
-    def future_events(self) -> 'Query[CourseEvent]':
+    def future_events(self) -> Query[CourseEvent]:
         from onegov.fsi.models import CourseEvent
         return self.events.filter(CourseEvent.start > utcnow()).order_by(
             CourseEvent.start)

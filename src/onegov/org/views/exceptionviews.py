@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 from onegov.core.security import Public
 from onegov.org import _, OrgApp
 from onegov.org.layout import DefaultLayout
@@ -15,9 +17,9 @@ if TYPE_CHECKING:
 @OrgApp.html(model=HTTPForbidden, permission=Public, template='forbidden.pt')
 def handle_forbidden(
     self: HTTPForbidden,
-    request: 'OrgRequest',
+    request: OrgRequest,
     layout: DefaultLayout | None = None
-) -> 'RenderData':
+) -> RenderData:
     """ If a view is forbidden, the request is redirected to the login
     view. There, the user may login to the site and be redirected back
     to the originally forbidden view.
@@ -25,7 +27,7 @@ def handle_forbidden(
     """
 
     @request.after
-    def set_status_code(response: 'Response') -> None:
+    def set_status_code(response: Response) -> None:
         response.status_code = self.code  # pass along 403
 
     layout = layout or DefaultLayout(self, request)
@@ -41,12 +43,12 @@ def handle_forbidden(
 @OrgApp.html(model=HTTPNotFound, permission=Public, template='notfound.pt')
 def handle_notfound(
     self: HTTPNotFound,
-    request: 'OrgRequest',
+    request: OrgRequest,
     layout: DefaultLayout | None = None
-) -> 'RenderData':
+) -> RenderData:
 
     @request.after
-    def set_status_code(response: 'Response') -> None:
+    def set_status_code(response: Response) -> None:
         response.status_code = self.code  # pass along 404
 
     return {

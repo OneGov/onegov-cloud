@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 import base64
 
 from onegov.core.security import Public
@@ -20,8 +22,8 @@ if TYPE_CHECKING:
 )
 def view_shift_schedule(
     self: Organisation,
-    request: 'WinterthurRequest'
-) -> 'RenderData':
+    request: WinterthurRequest
+) -> RenderData:
 
     image_buffer = request.app.get_shift_schedule_image()
     if image_buffer:

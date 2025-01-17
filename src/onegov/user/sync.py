@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 from typing import overload, Any, TypeVar, TYPE_CHECKING
 if TYPE_CHECKING:
     from collections.abc import Iterable, Iterator, Mapping, Sequence
@@ -22,11 +24,11 @@ class UserSource:
     def __init__(
         self,
         name: str,
-        bases: 'Sequence[str]',
+        bases: Sequence[str],
         # FIXME: We should probably make this generic in Org or
         #        drop this entirely if we don't use it anywhere
         org: Any | None = None,
-        filters: 'Sequence[str] | None' = None,
+        filters: Sequence[str] | None = None,
         user_type: str | None = None,
         default_filter: str = '(objectClass=*)',
         verbose: bool = False
@@ -57,11 +59,11 @@ class UserSource:
         return value or default
 
     @property
-    def ldap_attributes(self) -> 'Sequence[str]':
+    def ldap_attributes(self) -> Sequence[str]:
         raise NotImplementedError
 
     @property
-    def ldap_mapping(self) -> 'Mapping[str, str]':
+    def ldap_mapping(self) -> Mapping[str, str]:
         raise NotImplementedError
 
     @property
@@ -69,21 +71,21 @@ class UserSource:
         return getattr(self, f'org_{self.name}', self._org)
 
     @property
-    def bases(self) -> 'Sequence[str]':
+    def bases(self) -> Sequence[str]:
         return getattr(self, f'bases_{self.name}', self._bases)
 
-    def user_type_default(self, entry: 'Entry') -> str | None:
+    def user_type_default(self, entry: Entry) -> str | None:
         return self._user_type
 
-    def user_type(self, entry: 'Entry') -> str | None:
+    def user_type(self, entry: Entry) -> str | None:
         func = getattr(self, f'user_type_{self.name}', None)
         return func(entry) if func else self.user_type_default(entry)
 
-    def excluded_default(self, entry: 'Entry') -> bool:
+    def excluded_default(self, entry: Entry) -> bool:
         """ Default when no function specific to the source name exists. """
         return False
 
-    def excluded(self, entry: 'Entry') -> bool:
+    def excluded(self, entry: Entry) -> bool:
         """ Finds a specific exclusion function specific to the name or use
         the fallback """
         func = getattr(self, f'exclude_{self.name}', None)
@@ -96,13 +98,13 @@ class UserSource:
     @property
     def bases_filters_attributes(
         self
-    ) -> 'Sequence[tuple[str, str, Sequence[str]]]':
+    ) -> Sequence[tuple[str, str, Sequence[str]]]:
         return tuple(
             (b, f, self.ldap_attributes)
             for b, f in zip(self.bases, self.filters)
         )
 
-    def map_entry(self, entry: 'Entry') -> dict[str, Any]:
+    def map_entry(self, entry: Entry) -> dict[str, Any]:
         attrs = entry.entry_attributes_as_dict
         user = {
             column: self.scalar(attrs.get(attr))
@@ -121,9 +123,9 @@ class UserSource:
 
     def map_entries(
         self,
-        entries: 'Iterable[Entry]',
+        entries: Iterable[Entry],
         **kwargs: Any
-    ) -> 'Iterator[dict[str, Any]]':
+    ) -> Iterator[dict[str, Any]]:
         for e in entries:
             if self.excluded(e):
                 continue
@@ -146,7 +148,7 @@ class ZugUserSource(UserSource):
         'zgXAbteilung': 'department',
     }
 
-    schools: dict[str, 'UserSourceArgsWithoutName'] = {
+    schools: dict[str, UserSourceArgsWithoutName] = {
         'PHZ': {
             'default_filter': '(mail=*@phzg.ch)',
             'org': 'DBK / AMH / Pädagogische Hochschule Zug',
@@ -184,7 +186,7 @@ class ZugUserSource(UserSource):
         }
     }
 
-    ldap_users: dict[str, 'UserSourceArgsWithoutName'] = {
+    ldap_users: dict[str, UserSourceArgsWithoutName] = {
         'KTZG': {'bases': ['ou=Kanton,o=KTZG']}
     }
 
@@ -198,7 +200,7 @@ class ZugUserSource(UserSource):
             *additional
         ]
 
-    def user_type_ktzg(self, entry: 'Entry') -> str | None:
+    def user_type_ktzg(self, entry: Entry) -> str | None:
         """ KTZG specific user type """
         mail = entry.entry_attributes_as_dict.get('mail')
         mail = mail and mail[0].strip().lower()
@@ -208,7 +210,7 @@ class ZugUserSource(UserSource):
             print(f'No usertype for {mail}')
         return None
 
-    def user_type_default(self, entry: 'Entry') -> str | None:
+    def user_type_default(self, entry: Entry) -> str | None:
         """For all the schools, we filter by Mail already, but we exclude the
         students. Name specific user_type functions will run first, this is
         a fallback. """
@@ -223,7 +225,7 @@ class ZugUserSource(UserSource):
 
         return 'regular'
 
-    def excluded(self, entry: 'Entry') -> bool:
+    def excluded(self, entry: Entry) -> bool:
         """General exclusion pattern for all synced users. """
         data = entry.entry_attributes_as_dict
         mail = data.get('mail')
@@ -255,7 +257,7 @@ class ZugUserSource(UserSource):
         # if there is any, else return False
         return super().excluded(entry)
 
-    def map_entry(self, entry: 'Entry') -> dict[str, Any]:
+    def map_entry(self, entry: Entry) -> dict[str, Any]:
         attrs = entry.entry_attributes_as_dict
 
         user: dict[str, Any] = {
@@ -300,9 +302,9 @@ class ZugUserSource(UserSource):
 
     def map_entries(
         self,
-        entries: 'Iterable[Entry]',
+        entries: Iterable[Entry],
         **kwargs: Any
-    ) -> 'Iterator[dict[str, Any]]':
+    ) -> Iterator[dict[str, Any]]:
 
         count = 0
         total = 0
@@ -325,7 +327,7 @@ class ZugUserSource(UserSource):
             print(f'- Excluded: {total - count}')
 
     @classmethod
-    def factory(cls, verbose: bool = False) -> list['ZugUserSource']:
+    def factory(cls, verbose: bool = False) -> list[ZugUserSource]:
         # FIXME: Why are we using ZugUserSource and not cls?
         #        Switch to list[Self] if we decide to change this
         return [

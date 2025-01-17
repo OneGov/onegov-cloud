@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 import json
 import transaction
 
@@ -365,7 +367,7 @@ class EventForm(Form):
 
         return None
 
-    def populate_obj(self, model: 'Event') -> None:  # type:ignore[override]
+    def populate_obj(self, model: Event) -> None:  # type:ignore[override]
         """ Stores the form values on the model. """
 
         super().populate_obj(model, exclude={
@@ -428,7 +430,7 @@ class EventForm(Form):
                 for occ in model.occurrences:
                     occ.filter_keywords = filter_keywords
 
-    def process_obj(self, model: 'Event') -> None:  # type:ignore[override]
+    def process_obj(self, model: Event) -> None:  # type:ignore[override]
         """ Stores the page values on the form. """
 
         super().process_obj(model)
@@ -488,7 +490,7 @@ class EventForm(Form):
             for value in json.loads(text).get('values', [])
         ]
 
-    def dates_to_json(self, dates: 'Sequence[date] | None' = None) -> str:
+    def dates_to_json(self, dates: Sequence[date] | None = None) -> str:
         dates = dates or []
 
         return json.dumps({
@@ -576,7 +578,7 @@ class EventImportForm(Form):
         occurrences = OccurrenceCollection(self.request.session)
         headers = self.headers
 
-        def get(occurrence: 'Occurrence', attribute: str) -> str:
+        def get(occurrence: Occurrence, attribute: str) -> str:
             if attribute in ('start', 'end'):
                 attribute = f'localized_{attribute}'
             result = (
@@ -639,7 +641,7 @@ class EventImportForm(Form):
             for key, value in headers.items()
         }
 
-        def get(line: 'DefaultRow', column: str, attribute: str) -> Any:
+        def get(line: DefaultRow, column: str, attribute: str) -> Any:
             result = getattr(line, column)
             if attribute in ('start', 'end'):
                 result = parse(result, dayfirst=True)

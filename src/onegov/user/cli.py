@@ -1,4 +1,5 @@
 """ Provides commands used to manage users. """
+from __future__ import annotations
 
 import click
 import phonenumbers
@@ -42,10 +43,10 @@ def add(
     no_prompt: bool,
     realname: str | None,
     phone_number: str | None
-) -> 'Callable[[CoreRequest, Framework], None]':
+) -> Callable[[CoreRequest, Framework], None]:
     """ Adds a user with the given name to the database. """
 
-    def add_user(request: 'CoreRequest', app: 'Framework') -> None:
+    def add_user(request: CoreRequest, app: Framework) -> None:
         users = UserCollection(app.session())
 
         print('Adding {} to {}'.format(username, app.application_id))
@@ -86,10 +87,10 @@ def add(
 
 @cli.command(context_settings={'singular': True})
 @click.argument('username')
-def delete(username: str) -> 'Callable[[CoreRequest, Framework], None]':
+def delete(username: str) -> Callable[[CoreRequest, Framework], None]:
     """ Removes the given user from the database. """
 
-    def delete_user(request: 'CoreRequest', app: 'Framework') -> None:
+    def delete_user(request: CoreRequest, app: Framework) -> None:
         users = UserCollection(app.session())
 
         if not users.exists(username):
@@ -104,13 +105,15 @@ def delete(username: str) -> 'Callable[[CoreRequest, Framework], None]':
 @cli.command(context_settings={'default_selector': '*'})
 @click.argument('username')
 @click.option('-r', '--recursive', is_flag=True, default=False)
-def exists(username: str, recursive: bool) -> ('Callable[[CoreRequest, '
-                                               'Framework], None]'):
+def exists(
+    username: str,
+    recursive: bool
+) -> Callable[[CoreRequest, Framework], None]:
     """ Returns 0 if the user exists, 1 if it doesn't when recursive equals
     to False. If the recursive flag is set, it will loop over all schemas
     and print the result for each schema without return value."""
 
-    def find_user(request: 'CoreRequest', app: 'Framework') -> None:
+    def find_user(request: CoreRequest, app: Framework) -> None:
         users = UserCollection(app.session())
 
         if users.exists(username):
@@ -127,10 +130,10 @@ def exists(username: str, recursive: bool) -> ('Callable[[CoreRequest, '
 
 @cli.command(context_settings={'singular': True})
 @click.argument('username')
-def activate(username: str) -> 'Callable[[CoreRequest, Framework], None]':
+def activate(username: str) -> Callable[[CoreRequest, Framework], None]:
     """ Activates the given user. """
 
-    def activate_user(request: 'CoreRequest', app: 'Framework') -> None:
+    def activate_user(request: CoreRequest, app: Framework) -> None:
         user = UserCollection(app.session()).by_username(username)
 
         if user is None:
@@ -144,10 +147,10 @@ def activate(username: str) -> 'Callable[[CoreRequest, Framework], None]':
 
 @cli.command(context_settings={'singular': True})
 @click.argument('username')
-def deactivate(username: str) -> 'Callable[[CoreRequest, Framework], None]':
+def deactivate(username: str) -> Callable[[CoreRequest, Framework], None]:
     """ Deactivates the given user. """
 
-    def deactivate_user(request: 'CoreRequest', app: 'Framework') -> None:
+    def deactivate_user(request: CoreRequest, app: Framework) -> None:
         user = UserCollection(app.session()).by_username(username)
 
         if not user:
@@ -162,10 +165,10 @@ def deactivate(username: str) -> 'Callable[[CoreRequest, Framework], None]':
 
 @cli.command(context_settings={'singular': True})
 @click.argument('username')
-def logout(username: str) -> 'Callable[[CoreRequest, Framework], None]':
+def logout(username: str) -> Callable[[CoreRequest, Framework], None]:
     """ Logs out the given user on all sessions. """
 
-    def logout_user(request: 'CoreRequest', app: 'Framework') -> None:
+    def logout_user(request: CoreRequest, app: Framework) -> None:
         user = UserCollection(app.session()).by_username(username)
 
         if not user:
@@ -178,10 +181,10 @@ def logout(username: str) -> 'Callable[[CoreRequest, Framework], None]':
 
 
 @cli.command(name='logout-all', context_settings={'singular': True})
-def logout_all() -> 'Callable[[CoreRequest, Framework], None]':
+def logout_all() -> Callable[[CoreRequest, Framework], None]:
     """ Logs out all users on all sessions. """
 
-    def logout_user(request: 'CoreRequest', app: 'Framework') -> None:
+    def logout_user(request: CoreRequest, app: Framework) -> None:
         for user in UserCollection(app.session()).query():
             count = user.logout_all_sessions(request.app)
             if count:
@@ -198,12 +201,12 @@ def list(
     active_only: bool,
     inactive_only: bool,
     sources: bool
-) -> 'Callable[[CoreRequest, Framework], None]':
+) -> Callable[[CoreRequest, Framework], None]:
     """ Lists all users. """
 
     assert not all((active_only, inactive_only))
 
-    def list_users(request: 'CoreRequest', app: 'Framework') -> None:
+    def list_users(request: CoreRequest, app: Framework) -> None:
 
         users: Query[tuple[str, str, bool, str | None]]
         users = UserCollection(app.session()).query().with_entities(
@@ -236,10 +239,10 @@ def list(
 def change_password(
     username: str,
     password: str | None
-) -> 'Callable[[CoreRequest, Framework], None]':
+) -> Callable[[CoreRequest, Framework], None]:
     """ Changes the password of the given username. """
 
-    def change(request: 'CoreRequest', app: 'Framework') -> None:
+    def change(request: CoreRequest, app: Framework) -> None:
         users = UserCollection(app.session())
 
         user = users.by_username(username)
@@ -263,10 +266,10 @@ def change_password(
 def change_yubikey(
     username: str,
     yubikey: str | None
-) -> 'Callable[[CoreRequest, Framework], None]':
+) -> Callable[[CoreRequest, Framework], None]:
     """ Changes the yubikey of the given username. """
 
-    def change(request: 'CoreRequest', app: 'Framework') -> None:
+    def change(request: CoreRequest, app: Framework) -> None:
         users = UserCollection(app.session())
 
         user = users.by_username(username)
@@ -297,10 +300,10 @@ def change_yubikey(
 def change_mtan(
     username: str,
     phone_number: str | None
-) -> 'Callable[[CoreRequest, Framework], None]':
+) -> Callable[[CoreRequest, Framework], None]:
     """ Changes the yubikey of the given username. """
 
-    def change(request: 'CoreRequest', app: 'Framework') -> None:
+    def change(request: CoreRequest, app: Framework) -> None:
         users = UserCollection(app.session())
 
         user = users.by_username(username)
@@ -353,10 +356,10 @@ def change_totp(
     username: str,
     secret: str | None,
     generate: bool
-) -> 'Callable[[CoreRequest, Framework], None]':
+) -> Callable[[CoreRequest, Framework], None]:
     """ Changes the yubikey of the given username. """
 
-    def change(request: 'CoreRequest', app: 'Framework') -> None:
+    def change(request: CoreRequest, app: Framework) -> None:
         users = UserCollection(app.session())
 
         user = users.by_username(username)
@@ -393,10 +396,10 @@ def change_totp(
 def transfer_yubikey(
     source: str,
     target: str
-) -> 'Callable[[CoreRequest, Framework], None]':
+) -> Callable[[CoreRequest, Framework], None]:
     """ Transfers the Yubikey from one user to another. """
 
-    def transfer(request: 'CoreRequest', app: 'Framework') -> None:
+    def transfer(request: CoreRequest, app: Framework) -> None:
         users = UserCollection(app.session())
 
         source_user = users.by_username(source)
@@ -432,10 +435,10 @@ def transfer_yubikey(
 def change_role(
     username: str,
     role: str
-) -> 'Callable[[CoreRequest, Framework], None]':
+) -> Callable[[CoreRequest, Framework], None]:
     """ Changes the role of the given username. """
 
-    def change(request: 'CoreRequest', app: 'Framework') -> None:
+    def change(request: CoreRequest, app: Framework) -> None:
         users = UserCollection(app.session())
 
         user = users.by_username(username)
@@ -451,10 +454,10 @@ def change_role(
 
 
 @cli.command(name='list-sessions', context_settings={'singular': True})
-def list_sessions() -> 'Callable[[CoreRequest, Framework], None]':
+def list_sessions() -> Callable[[CoreRequest, Framework], None]:
     """ Lists all sessions of all users. """
 
-    def list_sessions(request: 'CoreRequest', app: 'Framework') -> None:
+    def list_sessions(request: CoreRequest, app: Framework) -> None:
         for user in UserCollection(app.session()).query():
             if user.sessions:
                 click.secho('{}'.format(user.username), fg='yellow')

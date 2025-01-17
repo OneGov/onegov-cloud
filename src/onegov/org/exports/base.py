@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 from onegov.org.models import Export
 from onegov.town6 import _
 
@@ -11,7 +13,7 @@ if TYPE_CHECKING:
     from onegov.ticket import Ticket
 
 
-def payment_date_paid(payment: 'Payment') -> 'datetime | None':
+def payment_date_paid(payment: Payment) -> datetime | None:
     if not payment.paid:
         return None
     if payment.source == 'manual':
@@ -27,10 +29,10 @@ class OrgExport(Export):
 
     def payment_items_fields(
         self,
-        payment: 'Payment',
-        links: 'Iterable[AnyPayableBase]',
+        payment: Payment,
+        links: Iterable[AnyPayableBase],
         provider_title: str
-    ) -> 'Iterator[tuple[str, Any]]':
+    ) -> Iterator[tuple[str, Any]]:
 
         yield _('ID Payment Provider'), payment.remote_id
         yield _('Status'), _(payment.state.capitalize())
@@ -47,8 +49,8 @@ class OrgExport(Export):
 
     def ticket_item_fields(
         self,
-        ticket: 'Ticket | None'
-    ) -> 'Iterator[tuple[str, Any]]':
+        ticket: Ticket | None
+    ) -> Iterator[tuple[str, Any]]:
 
         ha = ticket and ticket.handler
         yield _('Reference Ticket'), ticket and ticket.number

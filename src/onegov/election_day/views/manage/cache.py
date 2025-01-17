@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 from morepath import redirect
 from onegov.core.security import Secret
 from onegov.election_day import _
@@ -23,9 +25,9 @@ if TYPE_CHECKING:
 )
 def view_clear_pages_cache(
     self: Principal,
-    request: 'ElectionDayRequest',
+    request: ElectionDayRequest,
     form: EmptyForm
-) -> 'RenderData | Response':
+) -> RenderData | Response:
     """ Clears the pages cache. """
 
     layout = DefaultLayout(self, request)

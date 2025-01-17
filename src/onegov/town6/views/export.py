@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 from onegov.core.security import Private
 from onegov.org.views.export import view_export_collection, view_export
 from onegov.town6 import TownApp
@@ -20,8 +22,8 @@ if TYPE_CHECKING:
 )
 def town_view_export_collection(
     self: ExportCollection,
-    request: 'TownRequest'
-) -> 'RenderData':
+    request: TownRequest
+) -> RenderData:
     return view_export_collection(
         self, request, ExportCollectionLayout(self, request))
 
@@ -34,8 +36,8 @@ def town_view_export_collection(
 )
 def town_view_export(
     self: Export,
-    request: 'TownRequest',
-    form: 'Form'
-) -> 'RenderData | Response':
+    request: TownRequest,
+    form: Form
+) -> RenderData | Response:
     return view_export(
         self, request, form, ExportCollectionLayout(self, request))
