@@ -1,8 +1,36 @@
 # Changes
 
+## 2025.2
+
+`2025-01-17` | [2e9311bc89...e9e35cb967](https://github.com/OneGov/onegov-cloud/compare/2e9311bc89^...e9e35cb967)
+
+### Directory
+
+##### Delay sending update notifications to subscribers if publication starts in future
+
+`Feature` | [OGC-1825](https://linear.app/onegovcloud/issue/OGC-1825) | [991f2c5c76](https://github.com/onegov/onegov-cloud/commit/991f2c5c761b72ea158a54180267b276b3049e14)
+
+### Feriennet
+
+##### Fix save button
+
+`Bugfix` | [OGC-1348](https://linear.app/onegovcloud/issue/OGC-1348) | [2e9311bc89](https://github.com/onegov/onegov-cloud/commit/2e9311bc89639ab1d83014430fa5971fa52a4687)
+
+### Org
+
+##### Sort side panel links alphabetically
+
+`Feature` | [OGC-2008](https://linear.app/onegovcloud/issue/OGC-2008) | [10c9a81c86](https://github.com/onegov/onegov-cloud/commit/10c9a81c86187f7aa59ead9aa567481cdfbf8805)
+
+### Town6
+
+##### API For News and Events
+
+`Feature` | [OGC-1950](https://linear.app/onegovcloud/issue/OGC-1950) | [e9e35cb967](https://github.com/onegov/onegov-cloud/commit/e9e35cb967ebcde1369507192ec1d56db9451a6a)
+
 ## 2025.1
 
-`2025-01-09` | [4cbd81a1fe...db7d0c9304](https://github.com/OneGov/onegov-cloud/compare/4cbd81a1fe^...db7d0c9304)
+`2025-01-09` | [4cbd81a1fe...fa75011145](https://github.com/OneGov/onegov-cloud/compare/4cbd81a1fe^...fa75011145)
 
 ### Core
 
@@ -2171,48 +2199,4 @@ Feature
 ##### Roadwork view misses location
 
 `Bugfix` | [OGC-1520](https://linear.app/onegovcloud/issue/OGC-1520) | [ed130b1f13](https://github.com/onegov/onegov-cloud/commit/ed130b1f132aefb06d2bcfc6ab4f3d90bc97a3a8)
-
-## 2024.16
-
-`2024-03-19` | [8a532a45af...b7196b1406](https://github.com/OneGov/onegov-cloud/compare/8a532a45af^...b7196b1406)
-
-### Agency
-
-##### Add back translation that was removed.
-
-`Bugfix` | [OGC-1508](https://linear.app/onegovcloud/issue/OGC-1508) | [260d09ce2a](https://github.com/onegov/onegov-cloud/commit/260d09ce2a7edc4688f702160802c124e69f21df)
-
-### Feriennet
-
-##### Remove offset which ignored preferred bookings if attendee is also in a group
-
-`Bugfix` | [PRO-1262](https://linear.app/projuventute/issue/PRO-1262) | [d327fb00ee](https://github.com/onegov/onegov-cloud/commit/d327fb00ee08bcf873ccb63f78ede60f14535a7b)
-
-### Form
-
-##### Actually use upload limit, instead of a number
-
-`Other` | [81b4d41267](https://github.com/onegov/onegov-cloud/commit/81b4d412670793f4b925a1721360984aae9cf3a9)
-
-### Org
-
-##### Delete root pages:.
-
-`Feature` | [OGC-1108](https://linear.app/onegovcloud/issue/OGC-1108) | [0dd076c4e0](https://github.com/onegov/onegov-cloud/commit/0dd076c4e026727e2821dffc45203c3c84104c7a)
-
-##### Adds missing translations.
-
-`Bugfix` | [OGC-1137](https://linear.app/onegovcloud/issue/OGC-1137) | [18900b4e93](https://github.com/onegov/onegov-cloud/commit/18900b4e93e9c46f325f0fcdb185da1953f7e723)
-
-### Pas
-
-##### Add base models.
-
-`Feature` | [OGC-1502](https://linear.app/onegovcloud/issue/OGC-1502) | [22e80828e6](https://github.com/onegov/onegov-cloud/commit/22e80828e6645b5daefa03b0508a554d53b9bdc2)
-
-### Town6
-
-##### Add missing style for chosen selects.
-
-`Bugfix` | [8a532a45af](https://github.com/onegov/onegov-cloud/commit/8a532a45afa8a159819e63d08d5d1ebf2df070d2)
 
