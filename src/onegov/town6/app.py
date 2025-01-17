@@ -5,12 +5,14 @@ from datetime import datetime
 import pytz
 from sedate import replace_timezone
 
+from onegov.api import ApiApp
 from onegov.core import utils
 from onegov.core.i18n import default_locale_negotiator
 from onegov.core.utils import module_path
 from onegov.foundation6.integration import FoundationApp
 from onegov.org.app import OrgApp
 from onegov.org.app import get_i18n_localedirs as get_org_i18n_localedirs
+from onegov.town6.api import EventApiEndpoint, NewsApiEndpoint
 from onegov.town6.custom import get_global_tools
 from onegov.town6.initial_content import create_new_organisation
 from onegov.town6.theme import TownTheme
@@ -19,12 +21,13 @@ from onegov.town6.theme import TownTheme
 from typing import Any, TYPE_CHECKING
 if TYPE_CHECKING:
     from collections.abc import Callable, Iterator, Sequence
+    from onegov.api import ApiEndpoint
     from onegov.core.types import RenderData
     from onegov.org.models import Organisation
     from onegov.town6.request import TownRequest
 
 
-class TownApp(OrgApp, FoundationApp):
+class TownApp(OrgApp, FoundationApp, ApiApp):
 
     def configure_organisation(
         self,
@@ -188,6 +191,14 @@ def get_public_ticket_messages() -> tuple[str, ...]:
         'ticket',
         'ticket_chat',
     )
+
+
+@TownApp.setting(section='api', name='endpoints')
+def get_api_endpoints() -> list[type[ApiEndpoint[Any]]]:
+    return [
+        EventApiEndpoint,
+        NewsApiEndpoint
+    ]
 
 
 @TownApp.webasset_path()
