@@ -6183,6 +6183,9 @@ msgstr "Ein Konto wurde für Sie erstellt"
 msgid "The user was created successfully"
 msgstr "Der Benutzer wurde erfolgreich erstellt"
 
+msgid "This recipient has delivery failures, including hard bounces, invalid email addresses, spam complaints, manual deactivations, or being blocked. We recommend unsubscribing it from the list."
+msgstr "Dieser Empfänger hat Zustellungsfehler, einschließlich Hard Bounces, ungültige E-Mail-Adresse, Spam-Beschwerde, manuelle Deaktivierung oder wird blockiert. Wir empfehlen, ihn von der Liste abzumelden."
+
 #~ msgid "Include logo in newsletter"
 #~ msgstr "Logo im Newsletter anzeigen"
 

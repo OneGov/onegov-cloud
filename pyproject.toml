@@ -72,13 +72,10 @@ exclude_dirs = [
 skips = [
     # ignore asserts
     "B101",
-    # ignore lxml.etree.fromstring (we may want to revisit this in the future)
-    "B320",
     # ignore meta-codes, we are aware of the implications
     "B403",
     "B404",
     "B405",
-    "B410",
 ]
 
 [tool.ruff]

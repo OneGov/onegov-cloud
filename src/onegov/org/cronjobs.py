@@ -15,8 +15,8 @@ from onegov.event import Occurrence, Event
 from onegov.file import FileCollection
 from onegov.form import FormSubmission, parse_form
 from onegov.org.mail import send_ticket_mail
-from onegov.newsletter import Newsletter, NewsletterCollection, \
-    RecipientCollection
+from onegov.newsletter import (Newsletter, NewsletterCollection,
+                               RecipientCollection)
 from onegov.org import _, OrgApp
 from onegov.org.layout import DefaultMailLayout
 from onegov.org.models import (

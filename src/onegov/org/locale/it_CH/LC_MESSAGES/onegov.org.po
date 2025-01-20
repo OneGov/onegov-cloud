@@ -6189,3 +6189,6 @@ msgstr "È stato creato un account per te"
 
 msgid "The user was created successfully"
 msgstr "Utente creato correttamente"
+
+msgid "This recipient has delivery failures, including hard bounces, invalid email addresses, spam complaints, manual deactivations, or being blocked. We recommend unsubscribing it from the list."
+msgstr "Questo destinatario presenta errori di consegna, tra cui rimbalzi, indirizzi e-mail non validi, reclami per spam, disattivazioni manuali o blocco. Si consiglia di cancellarlo dall'elenco."
