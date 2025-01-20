@@ -398,7 +398,7 @@ def view_subscribers(
         'layout': layout or RecipientLayout(self, request),
         'title': _('Subscribers'),
         'by_letter': by_letter,
-        'count': len(by_letter),
+        'count': recipients.count(),
         'warning': warning,
     }
 
