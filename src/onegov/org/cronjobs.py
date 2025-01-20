@@ -733,17 +733,25 @@ def update_newsletter_email_bounce_statistics(
     recipients = RecipientCollection(request.session)
     yesterday = utcnow() - timedelta(days=1)
 
-    r = requests.get(
-        'https://api.postmarkapp.com/bounces?count=500&offset=0',
-        f'fromDate={yesterday.date()}&toDate={yesterday.date()}',
-        headers={
-            'Accept': 'application/json',
-            'X-Postmark-Server-Token': token
-    },
-        timeout=60
-    )
-    r.raise_for_status()
-    bounces = r.json().get('Bounces', [])
+    try:
+        r = requests.get(
+            'https://api.postmarkapp.com/bounces?count=500&offset=0',
+            f'fromDate={yesterday.date()}&toDate={yesterday.date()}',
+            headers={
+                'Accept': 'application/json',
+                'X-Postmark-Server-Token': token
+        },
+            timeout=60
+        )
+        r.raise_for_status()
+        bounces = r.json().get('Bounces', [])
+    except requests.exceptions.HTTPError as http_err:
+        if r.status_code == 401:
+            raise RuntimeWarning(
+                f'Postmark API token is not set or invalid: {http_err}'
+            ) from None
+        else:
+            raise
 
     for bounce in bounces:
         email = bounce['Email']
