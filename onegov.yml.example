@@ -112,6 +112,9 @@ configuration: &global-config
       sender: newsletters@onegovcloud.ch
       <<: *local_smtp
 
+    # Postmark token for email bounce statistics cronjob
+    postmark_token: abcd
+
   # SMS delivery works a little differently from mail delivery, from the onset
   # we assume that each schema has its own queue with its own ASPSM account and
   # it is optional. They all share the same base directory though, each schema

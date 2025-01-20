@@ -1,6 +1,6 @@
-from collections import OrderedDict
-
 import requests
+
+from collections import OrderedDict
 from babel.dates import get_month_names
 from datetime import datetime, timedelta
 from itertools import groupby
@@ -718,7 +718,7 @@ def delete_content_marked_deletable(request: 'OrgRequest') -> None:
 
 
 @OrgApp.cronjob(hour=7, minute=0, timezone='Europe/Zurich')
-def update_newsletter_email_bounce_statistic(
+def update_newsletter_email_bounce_statistics(
     request: 'OrgRequest'
 ) -> None:
     # I choose hour=7 as the maximum time difference between Eastern Standard
@@ -728,6 +728,8 @@ def update_newsletter_email_bounce_statistic(
     # Postmark uses EST in `fromdate` and `todate`, see
     # https://postmarkapp.com/developer/api/bounce-api.
 
+    token = request.app.get_postmark_token()
+
     recipients = RecipientCollection(request.session)
     yesterday = utcnow() - timedelta(days=1)
 
@@ -735,9 +737,9 @@ def update_newsletter_email_bounce_statistic(
         'https://api.postmarkapp.com/bounces?count=500&offset=0',
         f'fromDate={yesterday.date()}&toDate={yesterday.date()}',
         headers={
-                "Accept": "application/json",
-                "X-Postmark-Server-Token": "abcd"
-            },
+            'Accept': 'application/json',
+            'X-Postmark-Server-Token': token
+    },
         timeout=60
     )
     r.raise_for_status()

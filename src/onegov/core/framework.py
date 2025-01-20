@@ -593,6 +593,7 @@ class Framework(
             assert isinstance(self.mail, dict)
             assert 'transactional' in self.mail
             assert 'marketing' in self.mail
+            assert 'postmark_token' in self.mail
 
     def configure_sms(
         self,
