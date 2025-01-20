@@ -2189,7 +2189,7 @@ msgid "New Note"
 msgstr "Neue Notiz"
 
 msgid "This recipient has delivery failures, including hard bounces, invalid email addresses, spam complaints, manual deactivations, or being blocked. We recommend unsubscribing it from the list."
-msgstr "Dieser Empfänger hat Zustellfehler, einschließlich Hard Bounces, ungültiger E-Mail-Adresse, Spam-Beschwerde, manueller Deaktivierung oder Blockierung. Wir empfehlen, ihn von der Liste abzumelden."
+msgstr "Dieser Empfänger hat Zustellungsfehler, einschließlich Hard Bounces, ungültige E-Mail-Adresse, Spam-Beschwerde, manuelle Deaktivierung oder wird blockiert. Wir empfehlen, ihn von der Liste abzumelden."
 
 #~ msgid "Change Request"
 #~ msgstr "Änderung vorschlagen"
