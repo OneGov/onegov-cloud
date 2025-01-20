@@ -1,6 +1,7 @@
 import json
 import os
 from pathlib import Path
+from unittest.mock import patch, Mock
 
 import pytest
 import transaction
@@ -1283,3 +1284,56 @@ def test_delete_content_marked_deletable__events_occurrences(org_app,
         client.get(get_cronjob_url(job))
         assert count_events() == 0
         assert count_occurrences() == 0
+
+
+def test_update_newsletter_email_bounce_statistics(org_app, handlers):
+    register_echo_handler(handlers)
+    register_directory_handler(handlers)
+
+    client = Client(org_app)
+    job = get_cronjob_by_name(org_app,
+                              'update_newsletter_email_bounce_statistics')
+    job.app = org_app
+    # tz = ensure_timezone('Europe/Zurich')
+
+    transaction.begin()
+
+    # create recipients Franz and Heinz
+    recipients = RecipientCollection(org_app.session())
+    franz = recipients.add('franz@user.ch', confirmed=True)
+    heinz = recipients.add('heinz@user.ch', confirmed=True)
+    trudi = recipients.add('trudi@user.ch', confirmed=True)
+
+    transaction.commit()
+    close_all_sessions()
+
+    with patch('requests.get') as mock_get:
+        mock_get.return_value = Bunch(
+            status_code=200,
+            json=lambda: {
+                'TotalCount': 2,
+                'Bounces': [
+                    {'RecordType': 'Bounce', 'ID': 3719297970,
+                     'Type': 'SoftBounce', 'Email': 'franz@user.ch'},
+                    {'RecordType': 'Bounce', 'ID': 4739297971,
+                     'Type': 'HardBounce', 'Email': 'heinz@user.ch'}
+                ]
+            },
+            raise_for_status=Mock(return_value=None),
+        )
+
+        # execute cronjob
+        client.get(get_cronjob_url(job))
+
+        # check if the statistics are updated
+        assert mock_get.called
+        assert RecipientCollection(org_app.session()).by_address(
+            'franz@user.ch').bounce_statistics == {
+            'SoftBounce': 1
+        }
+        assert RecipientCollection(org_app.session()).by_address(
+            'heinz@user.ch').bounce_statistics == {
+                   'HardBounce': 1
+        }
+        assert RecipientCollection(org_app.session()).by_address(
+            'trudi@user.ch').bounce_statistics == {}
