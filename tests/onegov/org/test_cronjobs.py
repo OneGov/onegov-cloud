@@ -1300,9 +1300,9 @@ def test_update_newsletter_email_bounce_statistics(org_app, handlers):
 
     # create recipients Franz and Heinz
     recipients = RecipientCollection(org_app.session())
-    franz = recipients.add('franz@user.ch', confirmed=True)
-    heinz = recipients.add('heinz@user.ch', confirmed=True)
-    trudi = recipients.add('trudi@user.ch', confirmed=True)
+    recipients.add('franz@user.ch', confirmed=True)
+    recipients.add('heinz@user.ch', confirmed=True)
+    recipients.add('trudi@user.ch', confirmed=True)
 
     transaction.commit()
     close_all_sessions()
