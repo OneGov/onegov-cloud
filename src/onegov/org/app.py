@@ -418,7 +418,10 @@ class OrgApp(Framework, LibresIntegration, ElasticsearchApp, MapboxApp,
 
     def get_postmark_token(self) -> str:
         if self.mail:
-            return self.mail.get('postmark_token', '')
+            mailer = self.mail.get('transactional', {}).get('mailer', None)
+            if mailer == 'postmark':
+                token = self.mail.get('transactional', {}).get('token', '')
+                return token
 
         return ''
 
