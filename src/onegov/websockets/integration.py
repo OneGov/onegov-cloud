@@ -8,7 +8,7 @@ from onegov.websockets.client import authenticate
 from onegov.websockets.client import broadcast
 from urllib.parse import ParseResult
 from urllib.parse import urlparse
-from websockets.legacy.client import connect
+from websockets.asyncio.client import connect
 
 
 from typing import Any
