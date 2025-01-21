@@ -1,10 +1,12 @@
+from __future__ import annotations
+
 from typing import TYPE_CHECKING
 if TYPE_CHECKING:
     from onegov.file import File
 
 
 class AlreadySignedError(RuntimeError):
-    def __init__(self, file: 'File'):
+    def __init__(self, file: File):
         super().__init__(f'File {file.id} has already been signed')
 
 

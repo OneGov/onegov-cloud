@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 import babel.dates
 import re
 
@@ -24,7 +26,8 @@ from onegov.event import OccurrenceCollection
 from onegov.file import File
 from onegov.form import FormCollection, as_internal_id
 from onegov.form.models.document_form import (
-    FormDocumentCollection, FormDocument)
+    FormDocument,
+    FormDocumentCollection)
 from onegov.newsletter import NewsletterCollection, RecipientCollection
 from onegov.org import _
 from onegov.org import utils
@@ -82,11 +85,15 @@ if TYPE_CHECKING:
     from onegov.ticket import Ticket
     from onegov.user import User, UserGroup
     from sedate.types import TzInfoOrName
-    from typing import TypeVar
+    from typing import TypeAlias, TypeVar
     from webob import Response
     from wtforms import Field
 
     _T = TypeVar('_T')
+
+    AnyFormDefinitionOrCollection: TypeAlias = (
+        FormDefinition | FormCollection | SurveyCollection | SurveyDefinition
+        | FormDocumentCollection | FormDocument)
 
 
 capitalised_name = re.compile(r'[A-Z]{1}[a-z]+')
@@ -112,8 +119,8 @@ class Layout(ChameleonLayout, OpenGraphMixin):
 
     """
 
-    app: 'OrgApp'
-    request: 'OrgRequest'
+    app: OrgApp
+    request: OrgRequest
 
     date_long_without_year_format = 'E d. MMMM'
     datetime_long_without_year_format = 'E d. MMMM HH:mm'
@@ -122,7 +129,7 @@ class Layout(ChameleonLayout, OpenGraphMixin):
     event_short_format = 'EE d. MMMM YYYY'
     isodate_format = 'y-M-d'
 
-    def has_model_permission(self, permission: type['Intent'] | None) -> bool:
+    def has_model_permission(self, permission: type[Intent] | None) -> bool:
         return self.request.has_permission(self.model, permission)
 
     @property
@@ -137,7 +144,7 @@ class Layout(ChameleonLayout, OpenGraphMixin):
         )
 
     @property
-    def org(self) -> 'Organisation':
+    def org(self) -> Organisation:
         """ An alias for self.request.app.org. """
         return self.request.app.org
 
@@ -171,7 +178,7 @@ class Layout(ChameleonLayout, OpenGraphMixin):
         }
 
     @cached_property
-    def svg(self) -> 'PageTemplateFile':
+    def svg(self) -> PageTemplateFile:
         return self.template_loader['svg.pt']
 
     @cached_property
@@ -213,7 +220,7 @@ class Layout(ChameleonLayout, OpenGraphMixin):
         return 'page-' + (page_id or 'root')
 
     @cached_property
-    def body_classes(self) -> 'Iterator[str]':
+    def body_classes(self) -> Iterator[str]:
         """ Yields a list of body classes used on the body. """
 
         if self.request.is_logged_in:
@@ -225,7 +232,7 @@ class Layout(ChameleonLayout, OpenGraphMixin):
         yield self.name
 
     @cached_property
-    def top_navigation(self) -> 'Sequence[Link] | None':
+    def top_navigation(self) -> Sequence[Link] | None:
         """ Returns a list of :class:`onegov.org.elements.Link` objects.
         Those links are used for the top navigation.
 
@@ -235,7 +242,7 @@ class Layout(ChameleonLayout, OpenGraphMixin):
         return None
 
     @cached_property
-    def breadcrumbs(self) -> 'Sequence[Link] | None':
+    def breadcrumbs(self) -> Sequence[Link] | None:
         """ Returns a list of :class:`onegov.org.elements.Link` objects.
         Those links are used for the breadcrumbs.
 
@@ -245,12 +252,12 @@ class Layout(ChameleonLayout, OpenGraphMixin):
         return None
 
     @cached_property
-    def sidebar_links(self) -> 'Sequence[Link | LinkGroup] | None':
+    def sidebar_links(self) -> Sequence[Link | LinkGroup] | None:
         """ A list of links shown in the sidebar, used for navigation. """
         return None
 
     @cached_property
-    def editbar_links(self) -> 'Sequence[BaseLink | LinkGroup] | None':
+    def editbar_links(self) -> Sequence[BaseLink | LinkGroup] | None:
         """ A of :class:`onegov.org.elements.LinkGroup` classes. Each of them
         will be shown in the top editbar, with the group title being the
         dropdown title.
@@ -370,7 +377,7 @@ class Layout(ChameleonLayout, OpenGraphMixin):
         auth = Auth.from_request_path(self.request)
         return self.request.link(auth, name='login')
 
-    def export_formatter(self, format: str) -> 'Callable[[object], Any]':
+    def export_formatter(self, format: str) -> Callable[[object], Any]:
         """ Returns a formatter function which takes a value and returns
         the value ready for export.
 
@@ -517,7 +524,7 @@ class Layout(ChameleonLayout, OpenGraphMixin):
 
     def field_download_link(
         self,
-        field: 'Field'
+        field: Field
     ) -> list[str | None] | str | None:
 
         if field.type == 'UploadField':
@@ -529,7 +536,7 @@ class Layout(ChameleonLayout, OpenGraphMixin):
             ]
         return None
 
-    def field_file(self, field: 'Field') -> list[File | None] | File | None:
+    def field_file(self, field: Field) -> list[File | None] | File | None:
         if field.type == 'UploadField':
             return self.file_data_file(field.data)
         elif field.type == 'UploadMultipleField':
@@ -563,7 +570,7 @@ class Layout(ChameleonLayout, OpenGraphMixin):
     def to_timezone(
         self,
         date: datetime,
-        timezone: 'TzInfoOrName'
+        timezone: TzInfoOrName
     ) -> datetime:
         return to_timezone(date, timezone)
 
@@ -633,7 +640,7 @@ class Layout(ChameleonLayout, OpenGraphMixin):
     def format_seconds(self, seconds: float) -> str:
         return self.format_timedelta(timedelta(seconds=seconds))
 
-    def password_reset_url(self, user: 'User | None') -> str | None:
+    def password_reset_url(self, user: User | None) -> str | None:
         if not user:
             return None
 
@@ -662,7 +669,7 @@ class Layout(ChameleonLayout, OpenGraphMixin):
             return linkified
         return linkified.replace('\n', Markup('<br>'))
 
-    def linkify_field(self, field: 'Field', rendered: Markup) -> Markup:
+    def linkify_field(self, field: Field, rendered: Markup) -> Markup:
         include = ('TextAreaField', 'StringField', 'EmailField', 'URLField')
         if field.render_kw:
             if field.render_kw.get('data-editor') == 'markdown':
@@ -756,17 +763,17 @@ class DefaultLayoutMixin:
             return
 
         @self.request.after
-        def respond_with_no_index(response: 'Response') -> None:
+        def respond_with_no_index(response: Response) -> None:
             response.headers['X-Robots-Tag'] = 'noindex'
 
 
 class DefaultLayout(Layout, DefaultLayoutMixin):
     """ The default layout meant for the public facing parts of the site. """
 
-    request: 'OrgRequest'
+    request: OrgRequest
     edit_mode: bool
 
-    def __init__(self, model: Any, request: 'OrgRequest',
+    def __init__(self, model: Any, request: OrgRequest,
                  edit_mode: bool = False) -> None:
         super().__init__(model, request)
 
@@ -794,26 +801,26 @@ class DefaultLayout(Layout, DefaultLayoutMixin):
 
         self.hide_from_robots()
 
-    def show_label(self, field: 'Field') -> bool:
+    def show_label(self, field: Field) -> bool:
         return True
 
     @cached_property
-    def breadcrumbs(self) -> 'Sequence[Link] | None':
+    def breadcrumbs(self) -> Sequence[Link] | None:
         """ Returns the breadcrumbs for the current page. """
         return [Link(_('Homepage'), self.homepage_url)]
 
-    def exclude_invisible(self, items: 'Iterable[_T]') -> 'Sequence[_T]':
+    def exclude_invisible(self, items: Iterable[_T]) -> Sequence[_T]:
         items = self.request.exclude_invisible(items)
         if not self.request.is_manager:
             return tuple(i for i in items if getattr(i, 'published', True))
         return items
 
     @property
-    def root_pages(self) -> tuple['PageMeta', ...]:
+    def root_pages(self) -> tuple[PageMeta, ...]:
         return self.request.root_pages
 
     @cached_property
-    def top_navigation(self) -> 'Sequence[Link] | None':
+    def top_navigation(self) -> Sequence[Link] | None:
         return tuple(
             Link(r.title, r.link(self.request)) for r in self.root_pages
         )
@@ -862,11 +869,11 @@ class DefaultMailLayout(Layout, DefaultMailLayoutMixin):  # type:ignore[misc]
     """ A special layout for creating HTML E-Mails. """
 
     @cached_property
-    def base(self) -> 'PageTemplateFile':
+    def base(self) -> PageTemplateFile:
         return self.template_loader['mail_layout.pt']
 
     @cached_property
-    def macros(self) -> 'MacrosLookup':
+    def macros(self) -> MacrosLookup:
         return self.template_loader.mail_macros
 
     @cached_property
@@ -907,7 +914,7 @@ class AdjacencyListMixin:
             )
         )
 
-    def get_breadcrumbs(self, item: 'AdjacencyList') -> 'Iterator[Link]':
+    def get_breadcrumbs(self, item: AdjacencyList) -> Iterator[Link]:
         """ Yields the breadcrumbs for the given adjacency list item. """
         yield Link(_('Homepage'), self.homepage_url)
 
@@ -920,13 +927,13 @@ class AdjacencyListMixin:
     def get_sidebar(
         self,
         type: str | None = None
-    ) -> 'Iterator[Link | LinkGroup]':
+    ) -> Iterator[Link | LinkGroup]:
         """ Yields the sidebar for the given adjacency list item. """
         query = self.model.siblings.filter(self.model.__class__.type == type)
 
         def filter(
-            items: 'Iterable[AdjacencyList]'
-        ) -> 'Sequence[AdjacencyList]':
+            items: Iterable[AdjacencyList]
+        ) -> Sequence[AdjacencyList]:
 
             items = self.request.exclude_invisible(items)
             if not self.request.is_manager:
@@ -952,14 +959,14 @@ class AdjacencyListMixin:
 
 
 class AdjacencyListLayout(DefaultLayout, AdjacencyListMixin):
-    request: 'OrgRequest'
+    request: OrgRequest
 
 
 class SettingsLayout(DefaultLayout):
     def __init__(
         self,
         model: Any,
-        request: 'OrgRequest',
+        request: OrgRequest,
         setting: str | None = None
     ) -> None:
         super().__init__(model, request)
@@ -995,11 +1002,11 @@ class PageLayout(AdjacencyListLayout):
         return super().og_image_source
 
     @cached_property
-    def breadcrumbs(self) -> 'Sequence[Link]':
+    def breadcrumbs(self) -> Sequence[Link]:
         return tuple(self.get_breadcrumbs(self.model))
 
     @cached_property
-    def sidebar_links(self) -> 'Sequence[Link | LinkGroup]':
+    def sidebar_links(self) -> Sequence[Link | LinkGroup]:
         return tuple(self.get_sidebar(type='topic'))
 
 
@@ -1015,7 +1022,7 @@ class NewsLayout(AdjacencyListLayout):
         return super().og_image_source
 
     @cached_property
-    def breadcrumbs(self) -> 'Sequence[Link]':
+    def breadcrumbs(self) -> Sequence[Link]:
         return tuple(self.get_breadcrumbs(self.model))
 
 
@@ -1026,7 +1033,7 @@ class EditorLayout(AdjacencyListLayout):
     def __init__(
         self,
         model: Editor,
-        request: 'OrgRequest',
+        request: OrgRequest,
         site_title: str | None
     ) -> None:
         super().__init__(model, request)
@@ -1044,14 +1051,12 @@ class EditorLayout(AdjacencyListLayout):
 
 class FormEditorLayout(DefaultLayout):
 
-    model: ('FormDefinition | FormCollection | SurveyCollection'
-            '| SurveyDefinition | FormDocumentCollection | FormDocument')
+    model: AnyFormDefinitionOrCollection
 
     def __init__(
         self,
-        model: ('FormDefinition | FormCollection | SurveyCollection'
-                '| SurveyDefinition | FormDocumentCollection | FormDocument'),
-        request: 'OrgRequest'
+        model: AnyFormDefinitionOrCollection,
+        request: OrgRequest
     ) -> None:
 
         super().__init__(model, request)
@@ -1061,12 +1066,12 @@ class FormEditorLayout(DefaultLayout):
 
 class FormSubmissionLayout(DefaultLayout):
 
-    model: 'FormSubmission | FormDefinition'
+    model: FormSubmission | FormDefinition
 
     def __init__(
         self,
-        model: 'FormSubmission | FormDefinition',
-        request: 'OrgRequest',
+        model: FormSubmission | FormDefinition,
+        request: OrgRequest,
         title: str | None = None
     ) -> None:
 
@@ -1075,7 +1080,7 @@ class FormSubmissionLayout(DefaultLayout):
         self.title = title or self.form.title
 
     @cached_property
-    def form(self) -> 'FormDefinition':
+    def form(self) -> FormDefinition:
         if hasattr(self.model, 'form'):
             return self.model.form  # type:ignore[return-value]
         else:
@@ -1329,12 +1334,12 @@ class SurveySubmissionWindowLayout(DefaultLayout):
 
 class SurveySubmissionLayout(DefaultLayout):
 
-    model: 'SurveySubmission | SurveyDefinition'
+    model: SurveySubmission | SurveyDefinition
 
     def __init__(
         self,
-        model: 'SurveySubmission | SurveyDefinition',
-        request: 'OrgRequest',
+        model: SurveySubmission | SurveyDefinition,
+        request: OrgRequest,
         title: str | None = None
     ) -> None:
 
@@ -1343,7 +1348,7 @@ class SurveySubmissionLayout(DefaultLayout):
         self.title = title or self.form.title
 
     @cached_property
-    def form(self) -> 'SurveyDefinition':
+    def form(self) -> SurveyDefinition:
         if hasattr(self.model, 'survey'):
             return self.model.survey  # type:ignore[return-value]
         else:
@@ -1678,9 +1683,9 @@ class ArchivedTicketsLayout(DefaultLayout):
 
 class TicketLayout(DefaultLayout):
 
-    model: 'Ticket'
+    model: Ticket
 
-    def __init__(self, model: 'Ticket', request: 'OrgRequest') -> None:
+    def __init__(self, model: Ticket, request: OrgRequest) -> None:
         super().__init__(model, request)
         self.request.include('timeline')
 
@@ -1816,13 +1821,13 @@ class TicketLayout(DefaultLayout):
 
 class TicketNoteLayout(DefaultLayout):
 
-    ticket: 'Ticket'
+    ticket: Ticket
 
     @overload
     def __init__(
         self,
-        model: 'Ticket',
-        request: 'OrgRequest',
+        model: Ticket,
+        request: OrgRequest,
         title: str,
         ticket: None = None
     ) -> None: ...
@@ -1831,17 +1836,17 @@ class TicketNoteLayout(DefaultLayout):
     def __init__(
         self,
         model: Any,
-        request: 'OrgRequest',
+        request: OrgRequest,
         title: str,
-        ticket: 'Ticket'
+        ticket: Ticket
     ) -> None: ...
 
     def __init__(
         self,
         model: Any,
-        request: 'OrgRequest',
+        request: OrgRequest,
         title: str,
-        ticket: 'Ticket | None' = None
+        ticket: Ticket | None = None
     ) -> None:
 
         super().__init__(model, request)
@@ -1867,12 +1872,12 @@ class TicketNoteLayout(DefaultLayout):
 #        ticket attribute, much akin to TicketNoteLayout
 class TicketChatMessageLayout(DefaultLayout):
 
-    model: 'Ticket'
+    model: Ticket
 
     def __init__(
         self,
-        model: 'Ticket',
-        request: 'OrgRequest',
+        model: Ticket,
+        request: OrgRequest,
         internal: bool = False
     ) -> None:
 
@@ -2124,7 +2129,7 @@ class ResourceRecipientsLayout(DefaultLayout):
 
 class ResourceRecipientsFormLayout(DefaultLayout):
 
-    def __init__(self, model: Any, request: 'OrgRequest', title: str) -> None:
+    def __init__(self, model: Any, request: OrgRequest, title: str) -> None:
         super().__init__(model, request)
         self.title = title
 
@@ -2148,9 +2153,9 @@ class ResourceRecipientsFormLayout(DefaultLayout):
 
 class ResourceLayout(DefaultLayout):
 
-    model: 'Resource'
+    model: Resource
 
-    def __init__(self, model: 'Resource', request: 'OrgRequest') -> None:
+    def __init__(self, model: Resource, request: OrgRequest) -> None:
         super().__init__(model, request)
 
         self.request.include('fullcalendar')
@@ -2321,7 +2326,7 @@ class AllocationEditFormLayout(DefaultLayout):
 
     @cached_property
     def editbar_links(self) -> list[Link | LinkGroup]:
-        def links() -> 'Iterator[Link | LinkGroup]':
+        def links() -> Iterator[Link | LinkGroup]:
             if not self.request.is_manager:
                 return
 
@@ -2365,7 +2370,7 @@ class AllocationEditFormLayout(DefaultLayout):
 
 class EventLayoutMixin:
 
-    request: 'OrgRequest'
+    request: OrgRequest
 
     def format_recurrence(self, recurrence: str | None) -> str:
         """ Returns a human readable version of an RRULE used by us. """
@@ -2395,7 +2400,7 @@ class EventLayoutMixin:
 
         return ''
 
-    def event_deletable(self, event: 'Event') -> bool:
+    def event_deletable(self, event: Event) -> bool:
         tickets = TicketCollection(self.request.session)
         ticket = tickets.by_handler_id(event.id.hex)
         return not ticket
@@ -2403,8 +2408,8 @@ class EventLayoutMixin:
 
 class OccurrencesLayout(DefaultLayout, EventLayoutMixin):
 
-    app: 'OrgApp'
-    request: 'OrgRequest'
+    app: OrgApp
+    request: OrgRequest
 
     @property
     def og_description(self) -> str:
@@ -2419,7 +2424,7 @@ class OccurrencesLayout(DefaultLayout, EventLayoutMixin):
 
     @cached_property
     def editbar_links(self) -> list[Link | LinkGroup]:
-        def links() -> 'Iterator[Link | LinkGroup]':
+        def links() -> Iterator[Link | LinkGroup]:
             if (self.request.is_admin and self.request.app.org.
                     event_filter_type in ['filters', 'tags_and_filters']):
                 yield Link(
@@ -2459,11 +2464,11 @@ class OccurrencesLayout(DefaultLayout, EventLayoutMixin):
 
 class OccurrenceLayout(DefaultLayout, EventLayoutMixin):
 
-    app: 'OrgApp'
-    request: 'OrgRequest'
-    model: 'Occurrence'
+    app: OrgApp
+    request: OrgRequest
+    model: Occurrence
 
-    def __init__(self, model: 'Occurrence', request: 'OrgRequest') -> None:
+    def __init__(self, model: Occurrence, request: OrgRequest) -> None:
         super().__init__(model, request)
         self.request.include('monthly-view')
 
@@ -2574,12 +2579,12 @@ class OccurrenceLayout(DefaultLayout, EventLayoutMixin):
 
 class EventLayout(EventLayoutMixin, DefaultLayout):
 
-    app: 'OrgApp'
-    request: 'OrgRequest'
-    model: 'Event'
+    app: OrgApp
+    request: OrgRequest
+    model: Event
 
     if TYPE_CHECKING:
-        def __init__(self, model: 'Event', request: 'OrgRequest') -> None: ...
+        def __init__(self, model: Event, request: OrgRequest) -> None: ...
 
     @cached_property
     def breadcrumbs(self) -> list[Link]:
@@ -2868,9 +2873,9 @@ class ImageSetCollectionLayout(DefaultLayout):
 
 class ImageSetLayout(DefaultLayout):
 
-    model: 'ImageSet'
+    model: ImageSet
 
-    def __init__(self, model: 'ImageSet', request: 'OrgRequest') -> None:
+    def __init__(self, model: ImageSet, request: OrgRequest) -> None:
         super().__init__(model, request)
         self.request.include('photoswipe')
 
@@ -3039,7 +3044,7 @@ class UserGroupLayout(DefaultLayout):
         def __init__(self, model: UserGroup, request: OrgRequest) -> None: ...
 
     @cached_property
-    def collection(self) -> UserGroupCollection['UserGroup']:
+    def collection(self) -> UserGroupCollection[UserGroup]:
         return UserGroupCollection(self.request.session)
 
     @cached_property
@@ -3176,7 +3181,7 @@ class PaymentCollectionLayout(DefaultLayout):
 
 
 class MessageCollectionLayout(DefaultLayout):
-    def __init__(self, model: Any, request: 'OrgRequest') -> None:
+    def __init__(self, model: Any, request: OrgRequest) -> None:
         super().__init__(model, request)
         self.request.include('timeline')
 
@@ -3190,12 +3195,12 @@ class MessageCollectionLayout(DefaultLayout):
 
 class DirectoryCollectionLayout(DefaultLayout):
 
-    model: 'DirectoryCollection[Any] | DirectoryEntryCollection[Any]'
+    model: DirectoryCollection[Any] | DirectoryEntryCollection[Any]
 
     def __init__(
         self,
-        model: 'DirectoryCollection[Any] | DirectoryEntryCollection[Any]',
-        request: 'OrgRequest'
+        model: DirectoryCollection[Any] | DirectoryEntryCollection[Any],
+        request: OrgRequest
     ) -> None:
 
         super().__init__(model, request)
@@ -3237,8 +3242,8 @@ class DirectoryCollectionLayout(DefaultLayout):
 
 class DirectoryEntryMixin:
 
-    request: 'OrgRequest'
-    model: 'ExtendedDirectoryEntry | ExtendedDirectoryEntryCollection'
+    request: OrgRequest
+    model: ExtendedDirectoryEntry | ExtendedDirectoryEntryCollection
     custom_body_attributes: dict[str, Any]
 
     def init_markers(self) -> None:
@@ -3252,7 +3257,7 @@ class DirectoryEntryMixin:
                 self.directory.marker_icon.encode('unicode-escape')[2:])
 
     @property
-    def directory(self) -> 'ExtendedDirectory':
+    def directory(self) -> ExtendedDirectory:
         return self.model.directory
 
     @cached_property
@@ -3261,19 +3266,19 @@ class DirectoryEntryMixin:
             return as_internal_id(thumbnail)
         return None
 
-    def thumbnail_file_id(self, entry: 'ExtendedDirectoryEntry') -> str | None:
+    def thumbnail_file_id(self, entry: ExtendedDirectoryEntry) -> str | None:
         thumbnail = self.thumbnail_field_id
         if not thumbnail:
             return None
         return (entry.values.get(thumbnail) or {}).get('data', '').lstrip('@')
 
-    def thumbnail_link(self, entry: 'ExtendedDirectoryEntry') -> str | None:
+    def thumbnail_link(self, entry: ExtendedDirectoryEntry) -> str | None:
         file_id = self.thumbnail_file_id(entry)
         return self.request.class_link(
             File, {'id': file_id}, name='thumbnail'
         ) if file_id else None
 
-    def thumbnail_file(self, entry: 'ExtendedDirectoryEntry') -> File | None:
+    def thumbnail_file(self, entry: ExtendedDirectoryEntry) -> File | None:
         file_id = self.thumbnail_file_id(entry)
         if not file_id:
             return None
@@ -3282,13 +3287,13 @@ class DirectoryEntryMixin:
 
 class DirectoryEntryCollectionLayout(DefaultLayout, DirectoryEntryMixin):
 
-    request: 'OrgRequest'
+    request: OrgRequest
     model: ExtendedDirectoryEntryCollection
 
     def __init__(
         self,
         model: ExtendedDirectoryEntryCollection,
-        request: 'OrgRequest'
+        request: OrgRequest
     ) -> None:
 
         super().__init__(model, request)
@@ -3322,7 +3327,7 @@ class DirectoryEntryCollectionLayout(DefaultLayout, DirectoryEntryMixin):
             attrs={'class': 'export-link'}
         )
 
-        def links() -> 'Iterator[Link | LinkGroup]':
+        def links() -> Iterator[Link | LinkGroup]:
             qr_link = None
             if self.request.is_admin:
                 yield Link(
@@ -3462,7 +3467,7 @@ class DirectoryEntryCollectionLayout(DefaultLayout, DirectoryEntryMixin):
         return f'{default_title}: {self.request.translate(_("Choose filter"))}'
 
     @property
-    def publication_links(self) -> 'Iterator[Link]':
+    def publication_links(self) -> Iterator[Link]:
         return (
             self.get_pub_link(text, filter_kw)
             for filter_kw, text in self.publication_filters.items()
@@ -3470,19 +3475,19 @@ class DirectoryEntryCollectionLayout(DefaultLayout, DirectoryEntryMixin):
 
 
 class DirectoryEntryLayout(DefaultLayout, DirectoryEntryMixin):
-    request: 'OrgRequest'
-    model: 'ExtendedDirectoryEntry'
+    request: OrgRequest
+    model: ExtendedDirectoryEntry
 
     def __init__(
         self,
-        model: 'ExtendedDirectoryEntry',
-        request: 'OrgRequest'
+        model: ExtendedDirectoryEntry,
+        request: OrgRequest
     ) -> None:
 
         super().__init__(model, request)
         self.init_markers()
 
-    def show_label(self, field: 'Field') -> bool:
+    def show_label(self, field: Field) -> bool:
         return field.id not in self.model.hidden_label_fields
 
     @cached_property
@@ -3503,7 +3508,7 @@ class DirectoryEntryLayout(DefaultLayout, DirectoryEntryMixin):
 
     def field_download_link(
         self,
-        field: 'Field'
+        field: Field
     ) -> list[str | None] | str | None:
 
         url = super().field_download_link(field)
@@ -3585,7 +3590,7 @@ class DirectoryEntryLayout(DefaultLayout, DirectoryEntryMixin):
 
 class PublicationLayout(DefaultLayout):
 
-    def __init__(self, model: Any, request: 'OrgRequest') -> None:
+    def __init__(self, model: Any, request: OrgRequest) -> None:
         super().__init__(model, request)
         self.request.include('filedigest')
 
@@ -3610,7 +3615,7 @@ class DashboardLayout(DefaultLayout):
 
 
 class GeneralFileCollectionLayout(DefaultLayout):
-    def __init__(self, model: Any, request: 'OrgRequest') -> None:
+    def __init__(self, model: Any, request: OrgRequest) -> None:
         request.include('common')
         request.include('upload')
         request.include('prompt')
@@ -3619,7 +3624,7 @@ class GeneralFileCollectionLayout(DefaultLayout):
 
 class ImageFileCollectionLayout(DefaultLayout):
 
-    def __init__(self, model: Any, request: 'OrgRequest') -> None:
+    def __init__(self, model: Any, request: OrgRequest) -> None:
         request.include('common')
         request.include('upload')
         request.include('editalttext')

@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 import os
 
 from onegov.foundation import BaseTheme
@@ -38,7 +40,7 @@ class OrgTheme(BaseTheme):
         return user_options
 
     @property
-    def foundation_components(self) -> 'Sequence[str]':
+    def foundation_components(self) -> Sequence[str]:
         return (
             'grid',
             'accordion',

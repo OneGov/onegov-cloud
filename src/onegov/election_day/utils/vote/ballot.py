@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 from typing import TYPE_CHECKING
 if TYPE_CHECKING:
     from onegov.election_day.models import Ballot
@@ -12,7 +14,7 @@ if TYPE_CHECKING:
         entities: list[int]
 
 
-def get_ballot_data_by_entity(ballot: 'Ballot') -> dict[int, 'EntityData']:
+def get_ballot_data_by_entity(ballot: Ballot) -> dict[int, EntityData]:
     """ Returns the yeas/nays percentage by entity_id. """
 
     data = {}
@@ -25,7 +27,7 @@ def get_ballot_data_by_entity(ballot: 'Ballot') -> dict[int, 'EntityData']:
     return data
 
 
-def get_ballot_data_by_district(ballot: 'Ballot') -> dict[str, 'DistrictData']:
+def get_ballot_data_by_district(ballot: Ballot) -> dict[str, DistrictData]:
     """ Returns the yeas/nays percentage grouped and keyed by district. """
 
     data = {}

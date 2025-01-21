@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 from datetime import timedelta
 from libres.db.models import Reservation
 from onegov.core.orm import ModelBase

@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 from morepath import redirect
 from onegov.core.security import Personal
 from onegov.core.security import Public
@@ -35,9 +37,9 @@ if TYPE_CHECKING:
 )
 def handle_login(
     self: Auth,
-    request: 'SwissvotesRequest',
+    request: SwissvotesRequest,
     form: LoginForm
-) -> 'RenderData | Response':
+) -> RenderData | Response:
     """ Handles the login requests. """
     layout = DefaultLayout(self, request)
 
@@ -64,7 +66,7 @@ def handle_login(
     name='logout',
     permission=Personal
 )
-def view_logout(self: Auth, request: 'SwissvotesRequest') -> 'Response':
+def view_logout(self: Auth, request: SwissvotesRequest) -> Response:
     """ Handles the logout requests. """
 
     return self.logout_to(request)
@@ -79,9 +81,9 @@ def view_logout(self: Auth, request: 'SwissvotesRequest') -> 'Response':
 )
 def handle_password_reset_request(
     self: Auth,
-    request: 'SwissvotesRequest',
+    request: SwissvotesRequest,
     form: RequestPasswordResetForm
-) -> 'RenderData | Response':
+) -> RenderData | Response:
     """ Handles the password reset requests. """
 
     layout = DefaultLayout(self, request)
@@ -145,9 +147,9 @@ def handle_password_reset_request(
 )
 def handle_password_reset(
     self: Auth,
-    request: 'SwissvotesRequest',
+    request: SwissvotesRequest,
     form: PasswordResetForm
-) -> 'RenderData | Response':
+) -> RenderData | Response:
     """ Handles password reset requests. """
 
     layout = DefaultLayout(self, request)
@@ -186,15 +188,15 @@ def handle_password_reset(
 )
 def handle_totp_second_factor(
     self: Auth,
-    request: 'SwissvotesRequest',
+    request: SwissvotesRequest,
     form: TOTPForm
-) -> 'RenderData | Response':
+) -> RenderData | Response:
 
     if not request.app.totp_enabled:
         raise exc.HTTPNotFound()
 
     @request.after
-    def respond_with_no_index(response: 'Response') -> None:
+    def respond_with_no_index(response: Response) -> None:
         response.headers['X-Robots-Tag'] = 'noindex'
 
     users = UserCollection(request.session)

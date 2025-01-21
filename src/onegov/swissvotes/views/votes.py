@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 from morepath.request import Response
 from onegov.core.security import Private
 from onegov.core.security import Public
@@ -36,9 +38,9 @@ if TYPE_CHECKING:
 )
 def view_votes(
     self: SwissVoteCollection,
-    request: 'SwissvotesRequest',
+    request: SwissvotesRequest,
     form: SearchForm
-) -> 'RenderData':
+) -> RenderData:
 
     form.submitted(request)
     if not form.errors:
@@ -59,9 +61,9 @@ def view_votes(
 )
 def update_votes(
     self: SwissVoteCollection,
-    request: 'SwissvotesRequest',
+    request: SwissvotesRequest,
     form: UpdateDatasetForm
-) -> 'RenderData | BaseResponse':
+) -> RenderData | BaseResponse:
 
     self = self.default()
 
@@ -113,9 +115,9 @@ def update_votes(
 )
 def update_metadata(
     self: SwissVoteCollection,
-    request: 'SwissvotesRequest',
+    request: SwissvotesRequest,
     form: UpdateMetadataForm
-) -> 'RenderData | BaseResponse':
+) -> RenderData | BaseResponse:
 
     self = self.default()
 
@@ -150,9 +152,9 @@ def update_metadata(
 )
 def update_external_resources(
     self: SwissVoteCollection,
-    request: 'SwissvotesRequest',
+    request: SwissvotesRequest,
     form: UpdateExternalResourcesForm
-) -> 'RenderData | BaseResponse':
+) -> RenderData | BaseResponse:
 
     self = self.default()
 
@@ -234,7 +236,7 @@ def update_external_resources(
 )
 def export_votes_csv(
     self: SwissVoteCollection,
-    request: 'SwissvotesRequest'
+    request: SwissvotesRequest
 ) -> Response:
     return Response(
         request.app.get_cached_dataset('csv'),
@@ -250,7 +252,7 @@ def export_votes_csv(
 )
 def export_votes_xlsx(
     self: SwissVoteCollection,
-    request: 'SwissvotesRequest'
+    request: SwissvotesRequest
 ) -> Response:
     return Response(
         request.app.get_cached_dataset('xlsx'),
@@ -270,9 +272,9 @@ def export_votes_xlsx(
 )
 def delete_votes(
     self: SwissVoteCollection,
-    request: 'SwissvotesRequest',
+    request: SwissvotesRequest,
     form: Form
-) -> 'RenderData | BaseResponse':
+) -> RenderData | BaseResponse:
 
     self = self.default()
 

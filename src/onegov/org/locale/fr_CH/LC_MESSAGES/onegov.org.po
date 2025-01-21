@@ -1035,6 +1035,15 @@ msgstr "Images de taille normale"
 msgid "Grid layout"
 msgstr "Mise en page en grille"
 
+msgid "By filename"
+msgstr "Par nom de fichier"
+
+msgid "By caption"
+msgstr "Par légende"
+
+msgid "By last change"
+msgstr "Par date de dernière modification"
+
 msgid "Show images on homepage"
 msgstr "Montrer les images sur la page d'accueil"
 
@@ -2968,8 +2977,8 @@ msgstr "Refuser ${title} est irréversible."
 msgid "Reject reservation"
 msgstr "Refuser la réservation"
 
-#. Used in sentence: "${event} published."
 #.
+#. Used in sentence: "${event} published."
 msgid "Event"
 msgstr "Événement"
 
@@ -3323,8 +3332,8 @@ msgid ""
 "filled-out form."
 msgstr ""
 "Veuillez vérifier vos données et appuyez sur « Compléter » pour finaliser le "
-"processus. S'il y a quelque chose que vous souhaitez modifier, cliquez sur « "
-"Modifier » pour retourner sur le formulaire complété."
+"processus. S'il y a quelque chose que vous souhaitez modifier, cliquez sur "
+"« Modifier » pour retourner sur le formulaire complété."
 
 msgid ""
 "The image shown in the list view is a square. To have your image shown fully "

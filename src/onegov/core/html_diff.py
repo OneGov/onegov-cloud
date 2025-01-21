@@ -22,6 +22,8 @@ Examples:
 :copyright: (c) 2011 by Armin Ronacher
 :license: BSD
 """
+from __future__ import annotations
+
 import re
 from contextlib import contextmanager
 from difflib import SequenceMatcher
@@ -90,9 +92,9 @@ class StreamDiffer:
     so the tags the `StreamDiffer` adds are also unnamespaced.
     """
 
-    _old: list['StreamEvent']
-    _new: list['StreamEvent']
-    _result: list['StreamEvent']
+    _old: list[StreamEvent]
+    _new: list[StreamEvent]
+    _result: list[StreamEvent]
     _stack: list[str]
     _context: str | None
 
@@ -105,7 +107,7 @@ class StreamDiffer:
         self._context = None
 
     @contextmanager
-    def context(self, kind: str | None) -> 'Iterator[None]':
+    def context(self, kind: str | None) -> Iterator[None]:
         old_context = self._context
         self._context = kind
         try:
@@ -120,9 +122,9 @@ class StreamDiffer:
 
     def append(
         self,
-        type: 'StreamEventKind',
+        type: StreamEventKind,
         data: Any,
-        pos: 'Position'
+        pos: Position
     ) -> None:
         self._result.append((type, data, pos))
 
@@ -136,7 +138,7 @@ class StreamDiffer:
             return '', s
         return match.group(), s[match.end():]
 
-    def mark_text(self, pos: 'Position', text: str, tag: str) -> None:
+    def mark_text(self, pos: Position, text: str, tag: str) -> None:
         ws, text = self.cut_leading_space(text)
         tag = QName(tag)
         if ws:
@@ -145,7 +147,7 @@ class StreamDiffer:
         self.append(TEXT, text, pos)
         self.append(END, tag, pos)
 
-    def diff_text(self, pos: 'Position', old_text: str, new_text: str) -> None:
+    def diff_text(self, pos: Position, old_text: str, new_text: str) -> None:
         old = self.text_split(old_text)
         new = self.text_split(new_text)
         matcher = SequenceMatcher(None, old, new)
@@ -253,7 +255,7 @@ class StreamDiffer:
 
     def enter_mark_replaced(
         self,
-        pos: 'Position',
+        pos: Position,
         tag: str,
         attrs: Attrs
     ) -> None:
@@ -261,7 +263,7 @@ class StreamDiffer:
         self._stack.append(tag)
         self.append(START, (tag, attrs), pos)
 
-    def leave(self, pos: 'Position', tag: str) -> bool:
+    def leave(self, pos: Position, tag: str) -> bool:
         if not self._stack:
             return False
         if tag == self._stack[-1]:
@@ -277,7 +279,7 @@ class StreamDiffer:
                 self.append(END, tag, last_pos)
         del self._stack[:]
 
-    def block_process(self, events: list['StreamEvent']) -> None:
+    def block_process(self, events: list[StreamEvent]) -> None:
         for event in events:
             type, data, pos = event
             if type == START:

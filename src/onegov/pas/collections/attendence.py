@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 from onegov.core.collection import GenericCollection
 from onegov.pas.models import (
     Attendence,
@@ -17,10 +19,10 @@ if TYPE_CHECKING:
 class AttendenceCollection(GenericCollection[Attendence]):
     def __init__(
         self,
-        session: 'Session',
+        session: Session,
         settlement_run_id: str | None = None,
-        date_from: 'date | None' = None,
-        date_to: 'date | None' = None,
+        date_from: date | None = None,
+        date_to: date | None = None,
         type: str | None = None,
         parliamentarian_id: str | None = None,
         commission_id: str | None = None,
@@ -39,7 +41,7 @@ class AttendenceCollection(GenericCollection[Attendence]):
     def model_class(self) -> type[Attendence]:
         return Attendence
 
-    def query(self) -> 'Query[Attendence]':
+    def query(self) -> Query[Attendence]:
         query = super().query()
 
         if self.settlement_run_id:
@@ -90,8 +92,8 @@ class AttendenceCollection(GenericCollection[Attendence]):
     def for_filter(
         self,
         settlement_run_id: str | None = None,
-        date_from: 'date | None' = None,
-        date_to: 'date | None' = None,
+        date_from: date | None = None,
+        date_to: date | None = None,
         type: str | None = None,
         parliamentarian_id: str | None = None,
         commission_id: str | None = None,
@@ -111,8 +113,8 @@ class AttendenceCollection(GenericCollection[Attendence]):
     def by_party(
         self,
         party_id: str,
-        start_date: 'date',
-        end_date: 'date'
+        start_date: date,
+        end_date: date
     ) -> Self:
         """
         Filter attendances by party membership during a period.

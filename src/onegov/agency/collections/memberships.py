@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 from onegov.agency.models import ExtendedAgency
 from onegov.agency.models import ExtendedAgencyMembership
 from onegov.agency.models import ExtendedPerson
@@ -31,7 +33,7 @@ class PaginatedMembershipCollection(
 
     def __init__(
         self,
-        session: 'Session',
+        session: Session,
         page: int = 0,
         agency: str | None = None,
         person: str | None = None,
@@ -67,7 +69,7 @@ class PaginatedMembershipCollection(
             and other.person == self.person
         )
 
-    def subset(self) -> 'Query[ExtendedAgencyMembership]':
+    def subset(self) -> Query[ExtendedAgencyMembership]:
         return self.query()
 
     @property
@@ -85,7 +87,7 @@ class PaginatedMembershipCollection(
             updated_lt=self.updated_lt,
         )
 
-    def for_filter(self, **kwargs: 'Unpack[FilterParams]') -> Self:
+    def for_filter(self, **kwargs: Unpack[FilterParams]) -> Self:
         return self.__class__(
             session=self.session,
             updated_gt=kwargs.get('updated_gt', self.updated_gt),
@@ -95,7 +97,7 @@ class PaginatedMembershipCollection(
             updated_lt=kwargs.get('updated_lt', self.updated_lt),
         )
 
-    def query(self) -> 'Query[ExtendedAgencyMembership]':
+    def query(self) -> Query[ExtendedAgencyMembership]:
         query = super().query()
 
         if self.exclude_hidden:

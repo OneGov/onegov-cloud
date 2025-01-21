@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 from dateutil.parser import parse
 from markupsafe import Markup
 from onegov.gazette.models import Issue
@@ -30,7 +32,7 @@ class SogcConverter:
 
     """ The base class for all converters. """
 
-    def __init__(self, root: '_Element') -> None:
+    def __init__(self, root: _Element) -> None:
         self.root = root
 
     # FIXME: This returning Literal[""] regardless of the conversion
@@ -40,23 +42,23 @@ class SogcConverter:
     def get(
         self,
         path: str,
-        converter: 'Callable[[str], Markup] | None' = html_converter,
-        root: '_Element | None' = None
+        converter: Callable[[str], Markup] | None = html_converter,
+        root: _Element | None = None
     ) -> Markup | Literal['']: ...
 
     @overload
     def get(
         self,
         path: str,
-        converter: 'Callable[[str], _T]',
-        root: '_Element | None' = None
-    ) -> '_T | Literal[""]': ...
+        converter: Callable[[str], _T],
+        root: _Element | None = None
+    ) -> _T | Literal['']: ...
 
     def get(
         self,
         path: str,
-        converter: 'Callable[[str], Any] | None' = html_converter,
-        root: '_Element | None' = None
+        converter: Callable[[str], Any] | None = html_converter,
+        root: _Element | None = None
     ) -> Any:
 
         root = root if root is not None else self.root
@@ -66,7 +68,7 @@ class SogcConverter:
             result = converter(result)
         return result
 
-    def get_line(self, path: str, root: '_Element | None' = None) -> str:
+    def get_line(self, path: str, root: _Element | None = None) -> str:
         return self.get(path, converter=line_converter, root=root)
 
     @property
@@ -78,14 +80,14 @@ class SogcConverter:
         return self.get_line('meta/publicationNumber')
 
     @property
-    def publication_date(self) -> 'datetime | Literal[""]':
+    def publication_date(self) -> datetime | Literal['']:
         return self.get('meta/publicationDate', converter=parse)
 
     @property
-    def expiration_date(self) -> 'datetime | Literal[""]':
+    def expiration_date(self) -> datetime | Literal['']:
         return self.get('meta/expirationDate', converter=parse)
 
-    def issues(self, session: 'Session') -> list[str]:
+    def issues(self, session: Session) -> list[str]:
         query = session.query(Issue.name)
         query = query.filter(Issue.date >= self.publication_date)
         query = query.order_by(Issue.date)

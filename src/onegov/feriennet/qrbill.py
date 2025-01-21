@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 from base64 import b64encode
 from io import StringIO
 from onegov.feriennet import log
@@ -46,9 +48,9 @@ SUPPORTED_LANGUAGES: dict[str | None, Literal['en', 'de', 'fr', 'it']] = {
 
 def generate_qr_bill(
     schema: str,
-    request: 'FeriennetRequest',
-    user: 'User',
-    invoice: 'Invoice'
+    request: FeriennetRequest,
+    user: User,
+    invoice: Invoice
 ) -> bytes | None:
     """ Generates a QR Bill and returns it as base64 encoded SVG. """
 

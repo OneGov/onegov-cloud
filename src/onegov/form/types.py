@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 from typing import TypeVar, TYPE_CHECKING
 
 BaseFormT = TypeVar('BaseFormT', bound='BaseForm', contravariant=True)

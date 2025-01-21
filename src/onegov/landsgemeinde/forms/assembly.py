@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 from datetime import date
 from onegov.form.fields import PanelField
 from onegov.form.fields import TimeField
@@ -27,7 +29,7 @@ if TYPE_CHECKING:
 
 class AssemblyForm(NamedFileForm):
 
-    request: 'LandsgemeindeRequest'
+    request: LandsgemeindeRequest
 
     date = DateField(
         label=_('Date'),

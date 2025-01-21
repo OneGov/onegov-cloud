@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 from onegov.core.i18n import SiteLocale
 from onegov.core.security import Public
 from onegov.election_day import ElectionDayApp
@@ -15,8 +17,8 @@ if TYPE_CHECKING:
 )
 def change_site_locale(
     self: SiteLocale,
-    request: 'ElectionDayRequest'
-) -> 'Response':
+    request: ElectionDayRequest
+) -> Response:
     """ Changes the locale. """
 
     return self.redirect(request)

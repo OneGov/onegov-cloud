@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 from morepath import redirect
 from onegov.core.crypto import random_token
 from onegov.core.security import Public
@@ -48,9 +50,9 @@ if TYPE_CHECKING:
 )
 def request_accreditation(
     self: Organisation,
-    request: 'TranslatorAppRequest',
+    request: TranslatorAppRequest,
     form: RequestAccreditationForm
-) -> 'RenderData | Response':
+) -> RenderData | Response:
 
     if form.submitted(request):
         assert form.email.data is not None
@@ -126,9 +128,9 @@ def request_accreditation(
 )
 def grant_accreditation(
     self: Accreditation,
-    request: 'TranslatorAppRequest',
+    request: TranslatorAppRequest,
     form: GrantAccreditationForm
-) -> 'RenderData | Response':
+) -> RenderData | Response:
 
     if self.target is None or self.ticket is None:
         raise exc.HTTPNotFound()
@@ -191,9 +193,9 @@ def grant_accreditation(
 )
 def refuse_accreditation(
     self: Accreditation,
-    request: 'TranslatorAppRequest',
+    request: TranslatorAppRequest,
     form: RequestAccreditationForm
-) -> 'RenderData | Response':
+) -> RenderData | Response:
 
     if self.target is None or self.ticket is None:
         raise exc.HTTPNotFound()

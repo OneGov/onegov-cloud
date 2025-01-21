@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 from babel import Locale
 from fs.errors import ResourceNotFound
 from functools import cached_property
@@ -36,10 +38,10 @@ class DefaultLayout(ChameleonLayout):
     docs_base_url = ('https://github.com/OneGov/onegov-cloud/blob/master/src'
                      '/onegov/election_day/static/docs/api')
 
-    app: 'ElectionDayApp'
-    request: 'ElectionDayRequest'
+    app: ElectionDayApp
+    request: ElectionDayRequest
 
-    def __init__(self, model: Any, request: 'ElectionDayRequest') -> None:
+    def __init__(self, model: Any, request: ElectionDayRequest) -> None:
         super().__init__(model, request)
 
         self.request.include('common')
@@ -56,7 +58,7 @@ class DefaultLayout(ChameleonLayout):
         return ''
 
     @cached_property
-    def principal(self) -> 'Canton | Municipality':
+    def principal(self) -> Canton | Municipality:
         return self.request.app.principal
 
     def label(self, value: str) -> str:
@@ -181,7 +183,7 @@ class DefaultLayout(ChameleonLayout):
             for locale in sorted(self.app.locales)
         ]
 
-    def format_name(self, item: 'HasName') -> str:
+    def format_name(self, item: HasName) -> str:
         if hasattr(item, 'entity_id'):
             return item.name if item.entity_id else _('Expats')
         return item.name or _('Expats')
@@ -200,7 +202,7 @@ class DefaultLayout(ChameleonLayout):
         return self.request.link(self.principal, name='archive-download')
 
     @property
-    def last_archive_modification(self) -> 'datetime | None':
+    def last_archive_modification(self) -> datetime | None:
         try:
             filestorage = self.request.app.filestorage
             assert filestorage is not None

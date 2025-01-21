@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 from onegov.core.converters import extended_date_converter
 from onegov.core.i18n import SiteLocale
 from onegov.core.orm.abstract import MoveDirection
@@ -31,7 +33,7 @@ def get_principal(app: SwissvotesApp) -> Principal:
     model=Auth,
     path='/auth'
 )
-def get_auth(request: 'SwissvotesRequest', to: str = '/') -> Auth:
+def get_auth(request: SwissvotesRequest, to: str = '/') -> Auth:
     return Auth.from_request(request, to)
 
 
@@ -65,8 +67,8 @@ def get_locale(app: SwissvotesApp, locale: str) -> SiteLocale | None:
 def get_votes(
     app: SwissvotesApp,
     page: int = 0,
-    from_date: 'date | None' = None,
-    to_date: 'date | None' = None,
+    from_date: date | None = None,
+    to_date: date | None = None,
     legal_form: list[int] | None = None,
     result: list[int] | None = None,
     policy_area: list[str] | None = None,

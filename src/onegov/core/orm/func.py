@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 from sqlalchemy.sql.functions import ReturnTypeFromArgs
 
 from typing import TypeVar, TYPE_CHECKING

@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 import isodate
 
 from decimal import Decimal
@@ -29,7 +31,7 @@ if TYPE_CHECKING:
 
 class OccasionForm(Form):
 
-    request: 'FeriennetRequest'
+    request: FeriennetRequest
 
     timezone = 'Europe/Zurich'
 
@@ -173,8 +175,8 @@ class OccasionForm(Form):
             self.period_id.data)
 
     class DateRange(NamedTuple):
-        start: 'datetime'
-        end: 'datetime'
+        start: datetime
+        end: datetime
 
     @cached_property
     def parsed_dates(self) -> list[DateRange]:
@@ -331,12 +333,12 @@ class OccasionForm(Form):
 
     def dates_to_json(
         self,
-        dates: 'Sequence[DateRange | OccasionDate] | None' = None
+        dates: Sequence[DateRange | OccasionDate] | None = None
     ) -> str:
 
         dates = dates or []
 
-        def as_json_date(date: 'datetime') -> str:
+        def as_json_date(date: datetime) -> str:
             return (
                 to_timezone(date, self.timezone)
                 .replace(tzinfo=None).isoformat()

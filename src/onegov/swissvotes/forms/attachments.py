@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 from onegov.core.crypto import random_token
 from onegov.file.utils import as_fileintent
 from onegov.form import Form
@@ -270,7 +272,7 @@ class AttachmentsForm(Form):
         fieldset=_('Post-vote polls'),
     )
 
-    def update_model(self, model: 'SwissVote') -> None:
+    def update_model(self, model: SwissVote) -> None:
         locale = self.request.locale
 
         for field in self:
@@ -289,7 +291,7 @@ class AttachmentsForm(Form):
                 )
                 setattr(model, name, file)
 
-    def apply_model(self, model: 'SwissVote') -> None:
+    def apply_model(self, model: SwissVote) -> None:
         file: SwissVoteFile | None
         for field in self:
             name = field.name

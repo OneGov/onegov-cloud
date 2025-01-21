@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 from onegov.core.security import Public
 from onegov.fsi import _
 from onegov.fsi.app import FsiApp
@@ -17,7 +19,7 @@ if TYPE_CHECKING:
 class FsiLoginForm(LoginForm):
 
     @property
-    def login_data(self) -> 'LoginData':
+    def login_data(self) -> LoginData:
         """
         Skips auth providers for school users are just indexed by the LDAP but
         not can bot be logged in to. The are authenticated with the user and
@@ -48,9 +50,9 @@ class FsiLoginForm(LoginForm):
 )
 def handle_login(
     self: Auth,
-    request: 'FsiRequest',
+    request: FsiRequest,
     form: FsiLoginForm
-) -> 'RenderData | Response':
+) -> RenderData | Response:
 
     # custom default redirect
     if self.to == '/':

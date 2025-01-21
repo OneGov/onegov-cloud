@@ -9,6 +9,7 @@ Usage::
     qp = SMTPEmailQueueProcessor(mailer, maildir1, maildir2, ..., limit=x)
     qp.send_messages()
 """
+from __future__ import annotations
 
 import json
 import smtplib

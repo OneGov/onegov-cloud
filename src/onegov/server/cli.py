@@ -48,6 +48,7 @@ A onegov.yml file looks like this:
         level: DEBUG
         handlers: [console]
 """
+from __future__ import annotations
 
 import bjoern  # type:ignore[import-untyped]
 import click
@@ -310,14 +311,14 @@ class WSGIRequestMonitorMiddleware:
 
     """
 
-    def __init__(self, app: 'WSGIApplication'):
+    def __init__(self, app: WSGIApplication):
         self.app = app
 
     def __call__(
         self,
-        environ: 'WSGIEnvironment',
-        start_response: 'StartResponse'
-    ) -> 'Iterable[bytes]':
+        environ: WSGIEnvironment,
+        start_response: StartResponse
+    ) -> Iterable[bytes]:
 
         received = perf_counter()
         received_status: str = ''
@@ -325,8 +326,8 @@ class WSGIRequestMonitorMiddleware:
         def local_start_response(
             status: str,
             headers: list[tuple[str, str]],
-            exc_info: 'OptExcInfo | None' = None
-        ) -> 'Callable[[bytes], object]':
+            exc_info: OptExcInfo | None = None
+        ) -> Callable[[bytes], object]:
 
             nonlocal received_status
             received_status = status
@@ -339,7 +340,7 @@ class WSGIRequestMonitorMiddleware:
 
     def log(
         self,
-        environ: 'WSGIEnvironment',
+        environ: WSGIEnvironment,
         status: str,
         received: float
     ) -> None:
@@ -389,11 +390,11 @@ class WsgiProcess(multiprocessing.Process):
 
     """
 
-    _ready: 'Synchronized[int]'
+    _ready: Synchronized[int]
 
     def __init__(
         self,
-        app_factory: 'Callable[[], WSGIApplication]',
+        app_factory: Callable[[], WSGIApplication],
         host: str = '127.0.0.1',
         port: int = 8080,
         env: dict[str, str] | None = None,
@@ -424,7 +425,7 @@ class WsgiProcess(multiprocessing.Process):
     def print_memory_stats(
         self,
         signum: int,
-        frame: 'FrameType | None'
+        frame: FrameType | None
     ) -> None:
 
         print('-' * shutil.get_terminal_size((80, 20)).columns)
@@ -442,8 +443,8 @@ class WsgiProcess(multiprocessing.Process):
         # https://bugs.python.org/issue27126
         # https://bugs.python.org/issue13829
         import urllib.request
-        urllib.request.proxy_bypass_macosx_sysconf = lambda host: None
-        urllib.request.getproxies_macosx_sysconf = dict
+        urllib.request.proxy_bypass_macosx_sysconf = lambda host: None  # type:ignore[attr-defined]
+        urllib.request.getproxies_macosx_sysconf = dict  # type:ignore[attr-defined]
 
     def run(self) -> None:
         # use the parent's process stdin to be able to provide pdb correctly
@@ -496,7 +497,7 @@ class WsgiServer(FileSystemEventHandler):
 
     def __init__(
         self,
-        app_factory: 'Callable[[], WSGIApplication]',
+        app_factory: Callable[[], WSGIApplication],
         host: str = '127.0.0.1',
         port: int = 8080,
         **kwargs: Any
@@ -533,7 +534,7 @@ class WsgiServer(FileSystemEventHandler):
         if block:
             self.join()
 
-    def on_any_event(self, event: 'FileSystemEvent') -> None:
+    def on_any_event(self, event: FileSystemEvent) -> None:
         """ If anything of significance changed, restart the process. """
 
         if getattr(event, 'event_type', None) in ('opened', 'closed_no_write'):

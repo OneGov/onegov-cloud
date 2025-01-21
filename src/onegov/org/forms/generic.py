@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 from dicttoxml import dicttoxml  # type:ignore[import-untyped]
 from morepath.request import Response
 from onegov.core.csv import convert_list_of_dicts_to_csv
@@ -72,7 +74,7 @@ class ExportForm(Form):
 
     def as_export_response(
         self,
-        results: 'Sequence[dict[str, Any]]',
+        results: Sequence[dict[str, Any]],
         title: str = 'export',
         **kwargs: Any
     ) -> Response:
@@ -171,7 +173,7 @@ class ChangeAdjacencyListUrlForm(Form):
         default=True
     )
 
-    def get_model(self) -> 'AdjacencyList':
+    def get_model(self) -> AdjacencyList:
         return self.model
 
     def validate_name(self, field: StringField) -> None:

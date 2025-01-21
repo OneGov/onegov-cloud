@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 from onegov.form import Form
 from onegov.user import _
 from wtforms.fields import PasswordField
@@ -40,7 +42,7 @@ class LoginForm(Form):
     )
 
     @property
-    def login_data(self) -> 'LoginData':
+    def login_data(self) -> LoginData:
         """ Returns the data required to be passed to the
         :class:`onegov.user.auth.Auth` methods.
 

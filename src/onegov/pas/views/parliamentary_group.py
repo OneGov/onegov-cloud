@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 from onegov.core.elements import Link
 from onegov.core.security import Private
 from onegov.pas import _
@@ -22,8 +24,8 @@ if TYPE_CHECKING:
 )
 def view_parliamentary_groups(
     self: ParliamentaryGroupCollection,
-    request: 'TownRequest'
-) -> 'RenderData':
+    request: TownRequest
+) -> RenderData:
 
     layout = ParliamentaryGroupCollectionLayout(self, request)
 
@@ -57,9 +59,9 @@ def view_parliamentary_groups(
 )
 def add_parliamentary_group(
     self: ParliamentaryGroupCollection,
-    request: 'TownRequest',
+    request: TownRequest,
     form: ParliamentaryGroupForm
-) -> 'RenderData | Response':
+) -> RenderData | Response:
 
     if form.submitted(request):
         parliamentary_group = self.add(**form.get_useful_data())
@@ -86,8 +88,8 @@ def add_parliamentary_group(
 )
 def view_parliamentary_group(
     self: ParliamentaryGroup,
-    request: 'TownRequest'
-) -> 'RenderData':
+    request: TownRequest
+) -> RenderData:
 
     layout = ParliamentaryGroupLayout(self, request)
 
@@ -107,9 +109,9 @@ def view_parliamentary_group(
 )
 def edit_parliamentary_group(
     self: ParliamentaryGroup,
-    request: 'TownRequest',
+    request: TownRequest,
     form: ParliamentaryGroupForm
-) -> 'RenderData | Response':
+) -> RenderData | Response:
 
     if form.submitted(request):
         form.populate_obj(self)
@@ -138,7 +140,7 @@ def edit_parliamentary_group(
 )
 def delete_parliamentary_group(
     self: ParliamentaryGroup,
-    request: 'TownRequest'
+    request: TownRequest
 ) -> None:
 
     request.assert_valid_csrf_token()

@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 from onegov.core.orm import Base, observes
 from onegov.core.orm import translation_hybrid
 from onegov.core.orm.mixins import ContentMixin
@@ -54,17 +56,17 @@ class ElectionCompound(
     __tablename__ = 'election_compounds'
 
     @property
-    def polymorphic_base(self) -> type['ElectionCompound']:
+    def polymorphic_base(self) -> type[ElectionCompound]:
         return ElectionCompound
 
     #: Identifies the election compound, may be used in the url
-    id: 'Column[str]' = Column(Text, primary_key=True)
+    id: Column[str] = Column(Text, primary_key=True)
 
     #: external identifier
-    external_id: 'Column[str | None]' = Column(Text, nullable=True)
+    external_id: Column[str | None] = Column(Text, nullable=True)
 
     #: all translations of the title
-    title_translations: 'Column[Mapping[str, str]]' = Column(
+    title_translations: Column[Mapping[str, str]] = Column(
         HSTORE,
         nullable=False
     )
@@ -74,7 +76,7 @@ class ElectionCompound(
     title = translation_hybrid(title_translations)
 
     #: all translations of the short title
-    short_title_translations: 'Column[Mapping[str, str] | None]' = Column(
+    short_title_translations: Column[Mapping[str, str] | None] = Column(
         HSTORE,
         nullable=True
     )
@@ -86,44 +88,44 @@ class ElectionCompound(
     @observes('title_translations', 'short_title_translations')
     def title_observer(
         self,
-        title_translations: 'Mapping[str, str]',
-        short_title_translations: 'Mapping[str, str]'
+        title_translations: Mapping[str, str],
+        short_title_translations: Mapping[str, str]
     ) -> None:
         if not self.id:
             self.id = self.id_from_title(object_session(self))
 
     #: Shortcode for cantons that use it
-    shortcode: 'Column[str | None]' = Column(Text, nullable=True)
+    shortcode: Column[str | None] = Column(Text, nullable=True)
 
     #: The date of the elections
-    date: 'Column[datetime.date]' = Column(Date, nullable=False)
+    date: Column[datetime.date] = Column(Date, nullable=False)
 
     #: Doppelter Pukelsheim
-    pukelsheim: 'Column[bool]' = Column(Boolean, nullable=False, default=False)
+    pukelsheim: Column[bool] = Column(Boolean, nullable=False, default=False)
 
     #: Allow setting the status of the compound and its elections manually
-    completes_manually: 'Column[bool]' = Column(
+    completes_manually: Column[bool] = Column(
         Boolean,
         nullable=False,
         default=False
     )
 
     #: Status of the compound and its elections
-    manually_completed: 'Column[bool]' = Column(
+    manually_completed: Column[bool] = Column(
         Boolean,
         nullable=False,
         default=False
     )
 
     #: An election compound may contains n party results
-    party_results: 'relationship[list[PartyResult]]' = relationship(
+    party_results: relationship[list[PartyResult]] = relationship(
         'PartyResult',
         cascade='all, delete-orphan',
         back_populates='election_compound'
     )
 
     #: An election compound may contains n party panachage results
-    party_panachage_results: 'rel[list[PartyPanachageResult]]'
+    party_panachage_results: rel[list[PartyPanachageResult]]
     party_panachage_results = relationship(
         'PartyPanachageResult',
         cascade='all, delete-orphan',
@@ -131,7 +133,7 @@ class ElectionCompound(
     )
 
     #: An election compound may have related election compounds
-    related_compounds: 'rel[AppenderQuery[ElectionCompoundRelationship]]'
+    related_compounds: rel[AppenderQuery[ElectionCompoundRelationship]]
     related_compounds = relationship(
         'ElectionCompoundRelationship',
         foreign_keys='ElectionCompoundRelationship.source_id',
@@ -141,7 +143,7 @@ class ElectionCompound(
     )
 
     #: An election compound may be related by other election compounds
-    referencing_compounds: 'rel[AppenderQuery[ElectionCompoundRelationship]]'
+    referencing_compounds: rel[AppenderQuery[ElectionCompoundRelationship]]
     referencing_compounds = relationship(
         'ElectionCompoundRelationship',
         foreign_keys='ElectionCompoundRelationship.target_id',
@@ -157,13 +159,13 @@ class ElectionCompound(
     )
 
     #: Defines the domain of the elections
-    domain_elections: dict_property['DomainOfInfluence'] = meta_property(
+    domain_elections: dict_property[DomainOfInfluence] = meta_property(
         'domain_elections',
         default='district'
     )
 
     #: An election compound may contain n elections
-    elections: 'relationship[list[Election]]' = relationship(
+    elections: relationship[list[Election]] = relationship(
         'Election',
         cascade='all',
         back_populates='election_compound',
@@ -173,7 +175,7 @@ class ElectionCompound(
     @observes('elections')
     def elections_observer(
         self,
-        elections: 'Collection[Election]'
+        elections: Collection[Election]
     ) -> None:
         changes = {c for e in elections if (c := e.last_result_change)}
         if changes:
@@ -233,7 +235,7 @@ class ElectionCompound(
         return result
 
     #: notifcations linked to this election compound
-    notifications: 'relationship[AppenderQuery[Notification]]'
+    notifications: relationship[AppenderQuery[Notification]]
     notifications = relationship(  # type:ignore[misc]
         'onegov.election_day.models.notification.Notification',
         back_populates='election_compound',
@@ -241,7 +243,7 @@ class ElectionCompound(
     )
 
     #: screens linked to this election compound
-    screens: 'relationship[AppenderQuery[Screen]]' = relationship(
+    screens: relationship[AppenderQuery[Screen]] = relationship(
         'Screen',
         back_populates='election_compound',
     )
@@ -263,7 +265,7 @@ class ElectionCompound(
     @property
     def relationships_for_historical_party_results(
         self
-    ) -> 'AppenderQuery[ElectionCompoundRelationship]':
+    ) -> AppenderQuery[ElectionCompoundRelationship]:
         return self.related_compounds
 
     def clear_results(self, clear_all: bool = False) -> None:

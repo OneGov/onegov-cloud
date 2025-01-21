@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 from morepath import redirect
 from onegov.core.mail import Attachment
 from onegov.core.security import Personal
@@ -22,7 +24,7 @@ if TYPE_CHECKING:
 
 
 def send_accepted_mail(
-    request: 'GazetteRequest',
+    request: GazetteRequest,
     notice: GazetteNotice
 ) -> None:
     """ Sends a mail to the publisher with the contents of the notice.
@@ -35,7 +37,7 @@ def send_accepted_mail(
 
     def construct_subject(
         notice: GazetteNotice,
-        request: 'GazetteRequest'
+        request: GazetteRequest
     ) -> str:
 
         issues = notice.issue_objects
@@ -92,9 +94,9 @@ def send_accepted_mail(
 )
 def submit_notice(
     self: GazetteNotice,
-    request: 'GazetteRequest',
+    request: GazetteRequest,
     form: EmptyForm
-) -> 'RenderData | Response':
+) -> RenderData | Response:
     """ Submit a notice.
 
     This view is used by the editors to submit their drafts for the publishers
@@ -163,9 +165,9 @@ def submit_notice(
 )
 def accept_notice(
     self: GazetteNotice,
-    request: 'GazetteRequest',
+    request: GazetteRequest,
     form: EmptyForm
-) -> 'RenderData | Response':
+) -> RenderData | Response:
     """ Accept a notice.
 
     This view is used by the publishers to accept a submitted notice.
@@ -225,9 +227,9 @@ def accept_notice(
 )
 def reject_notice(
     self: GazetteNotice,
-    request: 'GazetteRequest',
+    request: GazetteRequest,
     form: RejectForm
-) -> 'RenderData | Response':
+) -> RenderData | Response:
     """ Reject a notice.
 
     This view is used by the publishers to reject a submitted notice.

@@ -1,4 +1,5 @@
 """ The manage subscription views. """
+from __future__ import annotations
 
 import morepath
 
@@ -30,8 +31,8 @@ if TYPE_CHECKING:
 )
 def view_data_sources(
     self: DataSourceCollection,
-    request: 'ElectionDayRequest'
-) -> 'RenderData':
+    request: ElectionDayRequest
+) -> RenderData:
     """ View all data sources as a list. """
 
     return {
@@ -50,9 +51,9 @@ def view_data_sources(
 )
 def create_data_source(
     self: DataSourceCollection,
-    request: 'ElectionDayRequest',
+    request: ElectionDayRequest,
     form: DataSourceForm
-) -> 'RenderData | Response':
+) -> RenderData | Response:
     """ Create a new data source. """
 
     layout = ManageDataSourcesLayout(self, request)
@@ -79,8 +80,8 @@ def create_data_source(
 )
 def manage_data_source(
     self: DataSource,
-    request: 'ElectionDayRequest'
-) -> 'Response':
+    request: ElectionDayRequest
+) -> Response:
     """ Manage the data source.
 
     Redirect to the list of data source items.
@@ -97,9 +98,9 @@ def manage_data_source(
 )
 def generate_data_source_token(
     self: DataSource,
-    request: 'ElectionDayRequest',
-    form: 'EmptyForm'
-) -> 'RenderData | Response':
+    request: ElectionDayRequest,
+    form: EmptyForm
+) -> RenderData | Response:
     """ Regenerate a new token for the data source. """
 
     layout = ManageDataSourcesLayout(self, request)
@@ -127,9 +128,9 @@ def generate_data_source_token(
 )
 def delete_data_source(
     self: DataSource,
-    request: 'ElectionDayRequest',
-    form: 'EmptyForm'
-) -> 'RenderData | Response':
+    request: ElectionDayRequest,
+    form: EmptyForm
+) -> RenderData | Response:
     """ Delete the data source item. """
 
     layout = ManageDataSourcesLayout(self, request)
@@ -163,8 +164,8 @@ def delete_data_source(
 )
 def view_data_source_items(
     self: DataSourceItemCollection,
-    request: 'ElectionDayRequest'
-) -> 'RenderData':
+    request: ElectionDayRequest
+) -> RenderData:
     """ View all data source items as a list. """
 
     assert self.source is not None
@@ -185,9 +186,9 @@ def view_data_source_items(
 )
 def create_data_source_item(
     self: DataSourceItemCollection,
-    request: 'ElectionDayRequest',
+    request: ElectionDayRequest,
     form: DataSourceItemForm
-) -> 'RenderData | Response':
+) -> RenderData | Response:
     """ Create a new data source item. """
 
     layout = ManageDataSourceItemsLayout(self, request)
@@ -218,9 +219,9 @@ def create_data_source_item(
 )
 def edit_data_source_item(
     self: DataSourceItem,
-    request: 'ElectionDayRequest',
+    request: ElectionDayRequest,
     form: DataSourceItemForm
-) -> 'RenderData | Response':
+) -> RenderData | Response:
     """ Edit a data source item. """
 
     layout = ManageDataSourceItemsLayout(self.source, request)
@@ -250,9 +251,9 @@ def edit_data_source_item(
 )
 def delete_data_source_item(
     self: DataSourceItem,
-    request: 'ElectionDayRequest',
-    form: 'EmptyForm'
-) -> 'RenderData | Response':
+    request: ElectionDayRequest,
+    form: EmptyForm
+) -> RenderData | Response:
     """ Delete the data source item. """
 
     layout = ManageDataSourceItemsLayout(self.source, request)

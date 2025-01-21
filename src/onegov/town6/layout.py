@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 import secrets
 from functools import cached_property
 
@@ -106,10 +108,10 @@ class PartnerCard(NamedTuple):
 
 class Layout(OrgLayout):
 
-    app: 'TownApp'
-    request: 'TownRequest'
+    app: TownApp
+    request: TownRequest
 
-    def __init__(self, model: Any, request: 'TownRequest',
+    def __init__(self, model: Any, request: TownRequest,
                  edit_mode: bool = False) -> None:
         super().__init__(model, request)
         self.request.include('foundation6')
@@ -186,7 +188,7 @@ class Layout(OrgLayout):
     def page_collection(self) -> PageCollection:
         return PageCollection(self.request.session)
 
-    def page_by_path(self, path: str) -> 'Page | None':
+    def page_by_path(self, path: str) -> Page | None:
         return self.page_collection.by_path(path)
 
 
@@ -199,9 +201,9 @@ class DefaultLayout(OrgDefaultLayout, Layout):
         def __init__(self, model: Any, request: TownRequest) -> None: ...
 
     @cached_property
-    def top_navigation(self) -> tuple['NavigationEntry', ...]:  # type:ignore
+    def top_navigation(self) -> tuple[NavigationEntry, ...]:  # type:ignore
 
-        def yield_children(page: 'PageMeta') -> 'NavigationEntry':
+        def yield_children(page: PageMeta) -> NavigationEntry:
             if page.type != 'news':
                 children = tuple(
                     yield_children(p)
@@ -233,26 +235,26 @@ class DefaultLayout(OrgDefaultLayout, Layout):
 
 class DefaultMailLayout(OrgDefaultMailLayout, Layout):
     """ A special layout for creating HTML E-Mails. """
-    app: 'TownApp'
-    request: 'TownRequest'
+    app: TownApp
+    request: TownRequest
 
 
 class AdjacencyListLayout(OrgAdjacencyListLayout, DefaultLayout):
 
-    app: 'TownApp'
-    request: 'TownRequest'
+    app: TownApp
+    request: TownRequest
 
 
 class SettingsLayout(OrgSettingsLayout, DefaultLayout):
 
-    app: 'TownApp'
-    request: 'TownRequest'
+    app: TownApp
+    request: TownRequest
 
 
 class PageLayout(OrgPageLayout, AdjacencyListLayout):
 
-    app: 'TownApp'
-    request: 'TownRequest'
+    app: TownApp
+    request: TownRequest
 
     @cached_property
     def contact_html(self) -> str:
@@ -263,8 +265,8 @@ class PageLayout(OrgPageLayout, AdjacencyListLayout):
 
 class NewsLayout(OrgNewsLayout, AdjacencyListLayout):
 
-    app: 'TownApp'
-    request: 'TownRequest'
+    app: TownApp
+    request: TownRequest
 
     @cached_property
     def contact_html(self) -> str:
@@ -275,14 +277,14 @@ class NewsLayout(OrgNewsLayout, AdjacencyListLayout):
 
 class EditorLayout(OrgEditorLayout, DefaultLayout):
 
-    app: 'TownApp'
-    request: 'TownRequest'
+    app: TownApp
+    request: TownRequest
 
 
 class FormEditorLayout(OrgFormEditorLayout, DefaultLayout):
 
-    app: 'TownApp'
-    request: 'TownRequest'
+    app: TownApp
+    request: TownRequest
 
 
 @step_sequences.registered_step(
@@ -311,15 +313,15 @@ class FormSubmissionLayout(
     DefaultLayout
 ):
 
-    app: 'TownApp'
-    request: 'TownRequest'
-    model: 'FormSubmission | FormDefinition'
+    app: TownApp
+    request: TownRequest
+    model: FormSubmission | FormDefinition
 
     if TYPE_CHECKING:
         def __init__(
             self,
-            model: 'FormSubmission | FormDefinition',
-            request: 'TownRequest',
+            model: FormSubmission | FormDefinition,
+            request: TownRequest,
             title: str | None = None,
             *,
             hide_steps: bool = False
@@ -340,15 +342,15 @@ class SurveySubmissionLayout(
     DefaultLayout
 ):
 
-    app: 'TownApp'
-    request: 'TownRequest'
-    model: 'SurveySubmission | SurveyDefinition'
+    app: TownApp
+    request: TownRequest
+    model: SurveySubmission | SurveyDefinition
 
     if TYPE_CHECKING:
         def __init__(
             self,
-            model: 'SurveySubmission | SurveyDefinition',
-            request: 'TownRequest',
+            model: SurveySubmission | SurveyDefinition,
+            request: TownRequest,
             title: str | None = None,
             *,
             hide_steps: bool = False
@@ -365,14 +367,14 @@ class SurveySubmissionLayout(
 
 class FormDocumentLayout(OrgFormDocumentLayout, DefaultLayout):
 
-    app: 'TownApp'
-    request: 'TownRequest'
+    app: TownApp
+    request: TownRequest
 
 
 class FormCollectionLayout(OrgFormCollectionLayout, DefaultLayout):
 
-    app: 'TownApp'
-    request: 'TownRequest'
+    app: TownApp
+    request: TownRequest
 
     @property
     def forms_url(self) -> str:
@@ -382,44 +384,44 @@ class FormCollectionLayout(OrgFormCollectionLayout, DefaultLayout):
 class SurveySubmissionWindowLayout(OrgSurveySubmissionWindowLayout,
                                    DefaultLayout):
 
-    app: 'TownApp'
-    request: 'TownRequest'
+    app: TownApp
+    request: TownRequest
 
 
 class SurveyCollectionLayout(OrgSurveyCollectionLayout, DefaultLayout):
 
-    app: 'TownApp'
-    request: 'TownRequest'
+    app: TownApp
+    request: TownRequest
 
 
 class PersonCollectionLayout(OrgPersonCollectionLayout, DefaultLayout):
 
-    app: 'TownApp'
-    request: 'TownRequest'
+    app: TownApp
+    request: TownRequest
 
 
 class PersonLayout(OrgPersonLayout, DefaultLayout):
 
-    app: 'TownApp'
-    request: 'TownRequest'
+    app: TownApp
+    request: TownRequest
 
 
 class TicketsLayout(OrgTicketsLayout, DefaultLayout):
 
-    app: 'TownApp'
-    request: 'TownRequest'
+    app: TownApp
+    request: TownRequest
 
 
 class ArchivedTicketsLayout(OrgArchivedTicketsLayout, DefaultLayout):
 
-    app: 'TownApp'
-    request: 'TownRequest'
+    app: TownApp
+    request: TownRequest
 
 
 class TicketLayout(OrgTicketLayout, DefaultLayout):
 
-    app: 'TownApp'
-    request: 'TownRequest'
+    app: TownApp
+    request: TownRequest
 
     @cached_property
     def editbar_links(self) -> list[Link | LinkGroup] | None:
@@ -447,8 +449,8 @@ class TicketLayout(OrgTicketLayout, DefaultLayout):
 
 class TicketNoteLayout(OrgTicketNoteLayout, DefaultLayout):
 
-    app: 'TownApp'
-    request: 'TownRequest'
+    app: TownApp
+    request: TownRequest
 
 
 @step_sequences.registered_step(
@@ -466,13 +468,13 @@ class TicketChatMessageLayout(
     DefaultLayout
 ):
 
-    app: 'TownApp'
-    request: 'TownRequest'
+    app: TownApp
+    request: TownRequest
     if TYPE_CHECKING:
         def __init__(
             self,
-            model: 'Ticket',
-            request: 'TownRequest',
+            model: Ticket,
+            request: TownRequest,
             internal: bool = False,
             *,
             hide_steps: bool = False,
@@ -485,32 +487,32 @@ class TicketChatMessageLayout(
 
 class TextModulesLayout(OrgTextModulesLayout, DefaultLayout):
 
-    app: 'TownApp'
-    request: 'TownRequest'
+    app: TownApp
+    request: TownRequest
 
 
 class TextModuleLayout(OrgTextModuleLayout, DefaultLayout):
 
-    app: 'TownApp'
-    request: 'TownRequest'
+    app: TownApp
+    request: TownRequest
 
 
 class ResourcesLayout(OrgResourcesLayout, DefaultLayout):
 
-    app: 'TownApp'
-    request: 'TownRequest'
+    app: TownApp
+    request: TownRequest
 
 
 class FindYourSpotLayout(OrgFindYourSpotLayout, DefaultLayout):
 
-    app: 'TownApp'
-    request: 'TownRequest'
+    app: TownApp
+    request: TownRequest
 
 
 class ResourceRecipientsLayout(OrgResourceRecipientsLayout, DefaultLayout):
 
-    app: 'TownApp'
-    request: 'TownRequest'
+    app: TownApp
+    request: TownRequest
 
 
 class ResourceRecipientsFormLayout(
@@ -518,14 +520,14 @@ class ResourceRecipientsFormLayout(
     DefaultLayout
 ):
 
-    app: 'TownApp'
-    request: 'TownRequest'
+    app: TownApp
+    request: TownRequest
 
 
 class ResourceLayout(OrgResourceLayout, DefaultLayout):
 
-    app: 'TownApp'
-    request: 'TownRequest'
+    app: TownApp
+    request: TownRequest
 
 
 @step_sequences.registered_step(
@@ -539,8 +541,8 @@ class ReservationLayout(
     ResourceLayout
 ):
 
-    app: 'TownApp'
-    request: 'TownRequest'
+    app: TownApp
+    request: TownRequest
     editbar_links = None
 
     if TYPE_CHECKING:
@@ -565,8 +567,8 @@ class ReservationLayout(
 
 class AllocationRulesLayout(OrgAllocationRulesLayout, DefaultLayout):
 
-    app: 'TownApp'
-    request: 'TownRequest'
+    app: TownApp
+    request: TownRequest
 
 
 class AllocationEditFormLayout(OrgAllocationEditFormLayout, DefaultLayout):
@@ -574,14 +576,14 @@ class AllocationEditFormLayout(OrgAllocationEditFormLayout, DefaultLayout):
     there's not really an allocation view, but there are allocation forms.
 
     """
-    app: 'TownApp'
-    request: 'TownRequest'
+    app: TownApp
+    request: TownRequest
 
 
 class OccurrencesLayout(OrgOccurrencesLayout, DefaultLayout):
 
-    app: 'TownApp'
-    request: 'TownRequest'
+    app: TownApp
+    request: TownRequest
 
     @cached_property
     def editbar_links(self) -> list[Link | LinkGroup]:
@@ -604,8 +606,8 @@ class OccurrencesLayout(OrgOccurrencesLayout, DefaultLayout):
 
 class OccurrenceLayout(OrgOccurrenceLayout, DefaultLayout):
 
-    app: 'TownApp'
-    request: 'TownRequest'
+    app: TownApp
+    request: TownRequest
 
 
 @step_sequences.registered_step(1, _('Form'), cls_after='FormSubmissionLayout')
@@ -616,15 +618,15 @@ class OccurrenceLayout(OrgOccurrenceLayout, DefaultLayout):
 )
 class EventLayout(StepsLayoutExtension, OrgEventLayout, DefaultLayout):
 
-    app: 'TownApp'
-    request: 'TownRequest'
-    model: 'Event'
+    app: TownApp
+    request: TownRequest
+    model: Event
 
     if TYPE_CHECKING:
         def __init__(
             self,
-            model: 'Event',
-            request: 'TownRequest',
+            model: Event,
+            request: TownRequest,
             *,
             hide_steps: bool = False
         ) -> None: ...
@@ -638,80 +640,80 @@ class EventLayout(StepsLayoutExtension, OrgEventLayout, DefaultLayout):
 
 class NewsletterLayout(OrgNewsletterLayout, DefaultLayout):
 
-    app: 'TownApp'
-    request: 'TownRequest'
+    app: TownApp
+    request: TownRequest
 
 
 class RecipientLayout(OrgRecipientLayout, DefaultLayout):
 
-    app: 'TownApp'
-    request: 'TownRequest'
+    app: TownApp
+    request: TownRequest
 
 
 class ImageSetCollectionLayout(OrgImageSetCollectionLayout, DefaultLayout):
 
-    app: 'TownApp'
-    request: 'TownRequest'
+    app: TownApp
+    request: TownRequest
 
 
 class ImageSetLayout(OrgImageSetLayout, DefaultLayout):
 
-    app: 'TownApp'
-    request: 'TownRequest'
+    app: TownApp
+    request: TownRequest
 
 
 class UserManagementLayout(OrgUserManagementLayout, DefaultLayout):
 
-    app: 'TownApp'
-    request: 'TownRequest'
+    app: TownApp
+    request: TownRequest
 
 
 class UserLayout(OrgUserLayout, DefaultLayout):
 
-    app: 'TownApp'
-    request: 'TownRequest'
+    app: TownApp
+    request: TownRequest
 
 
 class UserGroupCollectionLayout(OrgUserGroupCollectionLayout, DefaultLayout):
 
-    app: 'TownApp'
-    request: 'TownRequest'
+    app: TownApp
+    request: TownRequest
 
 
 class UserGroupLayout(OrgUserGroupLayout, DefaultLayout):
 
-    app: 'TownApp'
-    request: 'TownRequest'
+    app: TownApp
+    request: TownRequest
 
 
 class ExportCollectionLayout(OrgExportCollectionLayout, DefaultLayout):
 
-    app: 'TownApp'
-    request: 'TownRequest'
+    app: TownApp
+    request: TownRequest
 
 
 class PaymentProviderLayout(OrgPaymentProviderLayout, DefaultLayout):
 
-    app: 'TownApp'
-    request: 'TownRequest'
+    app: TownApp
+    request: TownRequest
 
 
 class PaymentCollectionLayout(OrgPaymentCollectionLayout, DefaultLayout):
 
-    app: 'TownApp'
-    request: 'TownRequest'
+    app: TownApp
+    request: TownRequest
 
 
 class MessageCollectionLayout(OrgMessageCollectionLayout, DefaultLayout):
 
-    app: 'TownApp'
-    request: 'TownRequest'
+    app: TownApp
+    request: TownRequest
 
 
 class DirectoryCollectionLayout(OrgDirectoryCollectionLayout, DefaultLayout):
 
-    app: 'TownApp'
-    request: 'TownRequest'
+    app: TownApp
+    request: TownRequest
 
 
 @step_sequences.registered_step(
@@ -724,13 +726,13 @@ class DirectoryEntryCollectionLayout(
 ):
 
     if TYPE_CHECKING:
-        app: 'TownApp'
-        request: 'TownRequest'
+        app: TownApp
+        request: TownRequest
 
         def __init__(
             self,
             model: ExtendedDirectoryEntryCollection,
-            request: 'TownRequest',
+            request: TownRequest,
             *,
             hide_steps: bool = False,
         ) -> None: ...
@@ -750,7 +752,7 @@ class DirectoryEntryCollectionLayout(
             attrs={'class': 'export-link'}
         )
 
-        def links() -> 'Iterator[Link | LinkGroup]':
+        def links() -> Iterator[Link | LinkGroup]:
             qr_link = None
             if self.request.is_admin:
                 yield Link(
@@ -847,8 +849,8 @@ class DirectoryEntryLayout(
     DefaultLayout
 ):
 
-    app: 'TownApp'
-    request: 'TownRequest'
+    app: TownApp
+    request: TownRequest
 
     if TYPE_CHECKING:
         def __init__(
@@ -866,19 +868,19 @@ class DirectoryEntryLayout(
 
 class PublicationLayout(OrgPublicationLayout, DefaultLayout):
 
-    app: 'TownApp'
-    request: 'TownRequest'
+    app: TownApp
+    request: TownRequest
 
 
 class DashboardLayout(OrgDashboardLayout, DefaultLayout):
 
-    app: 'TownApp'
-    request: 'TownRequest'
+    app: TownApp
+    request: TownRequest
 
 
 class GeneralFileCollectionLayout(DefaultLayout):
 
-    def __init__(self, model: Any, request: 'TownRequest') -> None:
+    def __init__(self, model: Any, request: TownRequest) -> None:
         """
         The order of assets differ from org where common.js must come first
         including jquery. Here, the foundation6 assets contain jquery and must
@@ -891,7 +893,7 @@ class GeneralFileCollectionLayout(DefaultLayout):
 
 class ImageFileCollectionLayout(DefaultLayout):
 
-    def __init__(self, model: Any, request: 'TownRequest') -> None:
+    def __init__(self, model: Any, request: TownRequest) -> None:
         super().__init__(model, request)
         request.include('upload')
         request.include('editalttext')
@@ -899,19 +901,19 @@ class ImageFileCollectionLayout(DefaultLayout):
 
 class ExternalLinkLayout(OrgExternalLinkLayout, DefaultLayout):
 
-    app: 'TownApp'
-    request: 'TownRequest'
+    app: TownApp
+    request: TownRequest
 
 
 class HomepageLayout(OrgHomepageLayout, DefaultLayout):
 
-    app: 'TownApp'
-    request: 'TownRequest'
+    app: TownApp
+    request: TownRequest
 
 
 class ChatLayout(DefaultLayout):
 
-    def __init__(self, model: Any, request: 'TownRequest') -> None:
+    def __init__(self, model: Any, request: TownRequest) -> None:
         super().__init__(model, request)
 
         token = self.make_websocket_token()
@@ -937,7 +939,7 @@ class ChatLayout(DefaultLayout):
 
 class StaffChatLayout(ChatLayout):
 
-    def __init__(self, model: Any, request: 'TownRequest') -> None:
+    def __init__(self, model: Any, request: TownRequest) -> None:
         super().__init__(model, request)
         self.request.include('websockets')
         self.request.include('staff-chat')
@@ -960,7 +962,7 @@ class StaffChatLayout(ChatLayout):
 
 class ClientChatLayout(ChatLayout):
 
-    def __init__(self, model: Any, request: 'TownRequest') -> None:
+    def __init__(self, model: Any, request: TownRequest) -> None:
         super().__init__(model, request)
         self.request.include('websockets')
         self.request.include('client-chat')

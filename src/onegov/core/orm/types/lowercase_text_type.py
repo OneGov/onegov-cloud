@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 from sqlalchemy.types import TypeDecorator, TEXT
 from sqlalchemy_utils.operators import CaseInsensitiveComparator
 
@@ -21,7 +23,7 @@ class LowercaseText(_Base):
     def process_bind_param(
         self,
         value: str | None,
-        dialect: 'Dialect'
+        dialect: Dialect
     ) -> str | None:
 
         return None if value is None else value.lower()

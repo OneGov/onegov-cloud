@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 from functools import cached_property
 from markupsafe import Markup
 from onegov.swissvotes import _
@@ -213,7 +215,7 @@ class Actor:
             'vsa': _('actor-vsa-label'),
         }.get(self.name, self.name)
 
-    def html(self, request: 'SwissvotesRequest') -> Markup:
+    def html(self, request: SwissvotesRequest) -> Markup:
         return Markup('<span title="{}">{}</span>').format(
             request.translate(self.label),
             request.translate(self.abbreviation)

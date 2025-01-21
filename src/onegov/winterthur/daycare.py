@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 import textwrap
 import yaml
 
@@ -83,7 +85,7 @@ class Daycare:
 
     def __init__(
         self,
-        id: 'UUID',
+        id: UUID,
         title: str,
         rate: Decimal | float | str,
         weeks: int
@@ -118,7 +120,7 @@ class Services:
         self.selected = defaultdict(set)
 
     @classmethod
-    def from_org(cls, org: Organisation) -> 'Self':
+    def from_org(cls, org: Organisation) -> Self:
         if 'daycare_settings' not in org.meta:
             return cls(None)
 
@@ -128,11 +130,11 @@ class Services:
         return cls(org.meta['daycare_settings']['services'])
 
     @classmethod
-    def from_session(cls, session: 'Session') -> 'Self':
+    def from_session(cls, session: Session) -> Self:
         return cls.from_org(session.query(Organisation).one())
 
     @staticmethod
-    def parse_definition(definition: str) -> 'Iterator[tuple[str, Service]]':
+    def parse_definition(definition: str) -> Iterator[tuple[str, Service]]:
         for service in yaml.safe_load(definition):
             service_id = normalize_for_url(service['titel'])
             days = (d.strip() for d in service['tage'].split(','))
@@ -175,7 +177,7 @@ class Result:
         operation: str | None = None,
         important: bool = False,
         currency: str | None = 'CHF',
-        output_format: 'Callable[[Decimal], str] | None' = None
+        output_format: Callable[[Decimal], str] | None = None
     ) -> None:
 
         self.title = title
@@ -213,7 +215,7 @@ class Block:
         operation: str | None = None,
         important: bool = False,
         currency: str | None = 'CHF',
-        output_format: 'Callable[[Decimal], str] | None' = None,
+        output_format: Callable[[Decimal], str] | None = None,
         total_places: int = 2,
         amount_places: int = 2
     ) -> Decimal:
@@ -271,7 +273,7 @@ class Block:
 
 class DirectoryDaycareAdapter:
 
-    def __init__(self, directory: 'ExtendedDirectory') -> None:
+    def __init__(self, directory: ExtendedDirectory) -> None:
         self.directory = directory
 
     @cached_property
@@ -298,7 +300,7 @@ class DirectoryDaycareAdapter:
 
         return fieldmap
 
-    def as_daycare(self, entry: 'ExtendedDirectoryEntry') -> Daycare:
+    def as_daycare(self, entry: ExtendedDirectoryEntry) -> Daycare:
         assert self.fieldmap['daycare_rate'] is not None
         assert self.fieldmap['daycare_weeks'] is not None
         return Daycare(
@@ -377,7 +379,7 @@ class SubsidyResult(NamedTuple):
 
 class DaycareSubsidyCalculator:
 
-    def __init__(self, session: 'Session') -> None:
+    def __init__(self, session: Session) -> None:
         self.session = session
 
     @cached_property
@@ -389,7 +391,7 @@ class DaycareSubsidyCalculator:
         return Settings(self.organisation)
 
     @cached_property
-    def directory(self) -> 'ExtendedDirectory':
+    def directory(self) -> ExtendedDirectory:
         directory: ExtendedDirectory | None = (
             DirectoryCollection(self.session, type='extended')
             .by_id(self.settings.directory)
@@ -618,7 +620,7 @@ class DaycareSubsidyCalculator:
 
         # Services table
         # --------------
-        def services_table() -> 'Iterator[tuple[str, str | None, str]]':
+        def services_table() -> Iterator[tuple[str, str | None, str]]:
             total = Decimal(0)
             total_percentage = Decimal(0)
 
@@ -704,7 +706,7 @@ class DaycareServicesWidget:
         </table
     """)
 
-    def __call__(self, field: 'DaycareServicesField', **kwargs: Any) -> Markup:
+    def __call__(self, field: DaycareServicesField, **kwargs: Any) -> Markup:
         self.field = field
         self.services = field.services
 
@@ -740,7 +742,7 @@ class DaycareServicesField(Field):
             service_id, day = value.rsplit('-', maxsplit=1)
             self.services.select(service_id, int(day))
 
-    def pre_validate(self, form: 'BaseForm') -> None:
+    def pre_validate(self, form: BaseForm) -> None:
         for day in SERVICE_DAYS.values():
             days = sum(
                 1 for id in self.services.available
@@ -783,7 +785,7 @@ class DaycareSubsidyCalculatorForm(Form):
         self.daycare.choices = list(self.daycare_choices)
 
     @property
-    def daycare_choices(self) -> 'Iterator[tuple[str, str]]':
+    def daycare_choices(self) -> Iterator[tuple[str, str]]:
 
         def choice(daycare: Daycare) -> tuple[str, str]:
             label = _((

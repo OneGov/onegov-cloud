@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 from onegov.core.orm import Base
 from onegov.core.orm.mixins import TimestampMixin
 from onegov.core.orm.types import UUID
@@ -27,44 +29,44 @@ class ListConnection(Base, TimestampMixin):
     __tablename__ = 'list_connections'
 
     #: internal id of the list
-    id: 'Column[uuid.UUID]' = Column(
+    id: Column[uuid.UUID] = Column(
         UUID,  # type:ignore[arg-type]
         primary_key=True,
         default=uuid4
     )
 
     #: external id of the list
-    connection_id: 'Column[str]' = Column(Text, nullable=False)
+    connection_id: Column[str] = Column(Text, nullable=False)
 
     #: the election id this result belongs to
-    election_id: 'Column[str | None]' = Column(
+    election_id: Column[str | None] = Column(
         Text,
         ForeignKey('elections.id', onupdate='CASCADE', ondelete='CASCADE'),
         nullable=True
     )
 
     #: the election this result belongs to
-    election: 'relationship[ProporzElection]' = relationship(
+    election: relationship[ProporzElection] = relationship(
         'ProporzElection',
         back_populates='list_connections'
     )
 
     #: ID of the parent list connection
-    parent_id: 'Column[uuid.UUID | None]' = Column(
+    parent_id: Column[uuid.UUID | None] = Column(
         UUID,  # type:ignore[arg-type]
         ForeignKey('list_connections.id'),
         nullable=True
     )
 
     # the parent
-    parent: 'relationship[ListConnection]' = relationship(
+    parent: relationship[ListConnection] = relationship(
         'ListConnection',
         back_populates='children',
         remote_side='ListConnection.id'
     )
 
     #: a list connection contains n lists
-    lists: 'relationship[list[List]]' = relationship(
+    lists: relationship[list[List]] = relationship(
         'List',
         cascade='all, delete-orphan',
         back_populates='connection',
@@ -72,7 +74,7 @@ class ListConnection(Base, TimestampMixin):
     )
 
     #: a list connection contains n sub-connection
-    children: 'relationship[AppenderQuery[ListConnection]]' = relationship(
+    children: relationship[AppenderQuery[ListConnection]] = relationship(
         'ListConnection',
         cascade='all, delete-orphan',
         back_populates='parent',
@@ -108,7 +110,7 @@ class ListConnection(Base, TimestampMixin):
     def aggregate_results_expression(
         cls,
         attribute: str
-    ) -> 'ColumnElement[int]':
+    ) -> ColumnElement[int]:
         """ Gets the sum of the given attribute from the results,
         as SQL expression.
 

@@ -40,6 +40,7 @@ template::
 Note that for the theme to work you need to define a filestorage. See
 :meth:`onegov.core.framework.Framework.configure_application`.
 """
+from __future__ import annotations
 
 from onegov.core import __version__
 from onegov.core.framework import Framework
@@ -105,7 +106,7 @@ def get_filename(theme: Theme, options: dict[str, Any] | None = None) -> str:
 
 
 def compile(
-    storage: 'FS | SubFS[FS]',
+    storage: FS | SubFS[FS],
     theme: Theme,
     options: dict[str, Any] | None = None,
     force: bool = False

@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 from onegov.form import Form
 from onegov.user import _
 from wtforms.fields import IntegerField
@@ -43,7 +45,7 @@ class SignupLinkForm(Form):
         ],
     )
 
-    def signup_token(self, auth: 'Auth') -> str:
+    def signup_token(self, auth: Auth) -> str:
         assert self.role.data in ('member', 'editor', 'admin')
 
         max_age = {

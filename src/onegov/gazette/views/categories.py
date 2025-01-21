@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 from io import BytesIO
 from morepath import redirect
 from morepath.request import Response
@@ -27,8 +29,8 @@ if TYPE_CHECKING:
 )
 def view_categories(
     self: CategoryCollection,
-    request: 'GazetteRequest'
-) -> 'RenderData':
+    request: GazetteRequest
+) -> RenderData:
     """ View the list of categories.
 
     This view is only visible by an admin.
@@ -54,9 +56,9 @@ def view_categories(
 )
 def create_category(
     self: CategoryCollection,
-    request: 'GazetteRequest',
+    request: GazetteRequest,
     form: CategoryForm
-) -> 'RenderData | BaseResponse':
+) -> RenderData | BaseResponse:
     """ Create a new category.
 
     This view is only visible by an admin.
@@ -92,9 +94,9 @@ def create_category(
 )
 def edit_category(
     self: Category,
-    request: 'GazetteRequest',
+    request: GazetteRequest,
     form: CategoryForm
-) -> 'RenderData | BaseResponse':
+) -> RenderData | BaseResponse:
     """ Edit a category.
 
     This view is only visible by an admin.
@@ -129,9 +131,9 @@ def edit_category(
 )
 def delete_category(
     self: Category,
-    request: 'GazetteRequest',
+    request: GazetteRequest,
     form: EmptyForm
-) -> 'RenderData | BaseResponse':
+) -> RenderData | BaseResponse:
     """ Delete a category.
 
     Only unused categorys may be deleted.
@@ -180,7 +182,7 @@ def delete_category(
 )
 def export_categories(
     self: CategoryCollection,
-    request: 'GazetteRequest'
+    request: GazetteRequest
 ) -> Response:
     """ Export all categories as XLSX. The exported file can be re-imported
     using the import-categories command line command.

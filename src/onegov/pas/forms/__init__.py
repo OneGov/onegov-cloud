@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 from onegov.pas.forms.attendence import AttendenceAddCommissionForm
 from onegov.pas.forms.attendence import AttendenceAddForm
 from onegov.pas.forms.attendence import AttendenceAddPlenaryForm

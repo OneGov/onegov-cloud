@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 from onegov.ticket.errors import DuplicateHandlerError
 from sqlalchemy.orm import object_session
 
@@ -43,8 +45,8 @@ class Handler:
 
     def __init__(
         self,
-        ticket: 'Ticket',
-        handler_id: 'UUID | str',
+        ticket: Ticket,
+        handler_id: UUID | str,
         handler_data: dict[str, Any]
     ):
         self.ticket = ticket
@@ -52,7 +54,7 @@ class Handler:
         self.data = handler_data
 
     @property
-    def session(self) -> 'Session':
+    def session(self) -> Session:
         return object_session(self.ticket)
 
     def refresh(self) -> None:
@@ -137,7 +139,7 @@ class Handler:
         raise NotImplementedError
 
     @property
-    def extra_data(self) -> 'Sequence[str]':
+    def extra_data(self) -> Sequence[str]:
         """ An array of string values which are indexed in elasticsearch when
         the ticket is stored there.
 
@@ -146,7 +148,7 @@ class Handler:
         return ()
 
     @property
-    def payment(self) -> 'Payment | None':
+    def payment(self) -> Payment | None:
         """ An optional link to a onegov.pay payment record. """
 
         return None
@@ -176,7 +178,7 @@ class Handler:
     @classmethod
     def handle_extra_parameters(
         cls,
-        session: 'Session',
+        session: Session,
         query: _Q,
         extra_parameters: dict[str, Any]
     ) -> _Q:
@@ -195,12 +197,12 @@ class Handler:
         """
         return query
 
-    def get_summary(self, request: 'CoreRequest') -> 'Markup':
+    def get_summary(self, request: CoreRequest) -> Markup:
         """ Returns the summary of the current ticket as a html string. """
 
         raise NotImplementedError
 
-    def get_links(self, request: 'CoreRequest') -> 'Sequence[_LinkOrCallback]':
+    def get_links(self, request: CoreRequest) -> Sequence[_LinkOrCallback]:
         """ Returns the links associated with the current ticket in the
         following format::
 
@@ -285,7 +287,7 @@ class HandlerRegistry:
     def registered_handler(
         self,
         handler_code: str
-    ) -> 'Callable[[type[_H]], type[_H]]':
+    ) -> Callable[[type[_H]], type[_H]]:
         """ A decorator to register handles.
 
         Use as followed::

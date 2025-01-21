@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 from io import BytesIO
 from morepath import redirect
 from morepath.request import Response
@@ -35,8 +37,8 @@ if TYPE_CHECKING:
 )
 def view_users(
     self: UserCollection,
-    request: 'GazetteRequest'
-) -> 'RenderData':
+    request: GazetteRequest
+) -> RenderData:
     """ View the users.
 
     Publishers can see editors, admins can see editors and publishers. Admins
@@ -80,9 +82,9 @@ def view_users(
 )
 def create_user(
     self: UserCollection,
-    request: 'GazetteRequest',
+    request: GazetteRequest,
     form: UserForm
-) -> 'RenderData | BaseResponse':
+) -> RenderData | BaseResponse:
     """ Create a new publisher or editor.
 
     This view is visible for admins and publishers.
@@ -143,9 +145,9 @@ def create_user(
 )
 def edit_user(
     self: User,
-    request: 'GazetteRequest',
+    request: GazetteRequest,
     form: UserForm
-) -> 'RenderData | BaseResponse':
+) -> RenderData | BaseResponse:
     """ Edit the role, name and email of a user.
 
     Publishers may only edit members. Admins can not be edited.
@@ -184,9 +186,9 @@ def edit_user(
 )
 def delete_user(
     self: User,
-    request: 'GazetteRequest',
+    request: GazetteRequest,
     form: EmptyForm
-) -> 'RenderData | BaseResponse':
+) -> RenderData | BaseResponse:
     """ Delete a user.
 
     Publishers may only edit members. Admins can not be deleted.
@@ -239,8 +241,8 @@ def delete_user(
 )
 def view_user_sessions(
     self: UserCollection,
-    request: 'GazetteRequest'
-) -> 'RenderData':
+    request: GazetteRequest
+) -> RenderData:
     """ View all open browser sessions.
 
     This view is only visible by an admin.
@@ -264,9 +266,9 @@ def view_user_sessions(
 )
 def clear_user_sessions(
     self: User,
-    request: 'GazetteRequest',
+    request: GazetteRequest,
     form: EmptyForm
-) -> 'RenderData | BaseResponse':
+) -> RenderData | BaseResponse:
     """ Closes all open browser sessions.
 
     This view is only visible by an admin.
@@ -303,9 +305,9 @@ def clear_user_sessions(
 )
 def export_users(
     self: UserCollection,
-    request: 'GazetteRequest',
+    request: GazetteRequest,
     form: ExportUsersForm
-) -> 'RenderData | Response':
+) -> RenderData | Response:
     """ Export all users as XLSX. The exported file can be re-imported
     using the import-editors command line command.
 
