@@ -29,6 +29,12 @@ mail_queues:
     username:
     password:
 
+  # postmark: &postmark
+    # mailer: postmark
+    # token: abcd
+    # NOTE: Do not define folder otherwise emails will be sent to customers and
+    # subscribers
+
 # The following block is shared with all applications below, though each
 # application may override any or all values.
 configuration: &global-config
