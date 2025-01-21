@@ -1451,7 +1451,7 @@ def test_update_newsletter_email_bounce_statistics(org_app, handlers):
     register_directory_handler(handlers)
 
     # fake postmark mailer
-    org_app.mail['transactional']['mailer'] = 'postmark'
+    org_app.mail['marketing']['mailer'] = 'postmark'
 
     client = Client(org_app)
     job = get_cronjob_by_name(org_app,
