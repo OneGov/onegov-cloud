@@ -416,15 +416,6 @@ class OrgApp(Framework, LibresIntegration, ElasticsearchApp, MapboxApp,
 
         return URL(request.link(dashboard)).path()
 
-    def get_postmark_token(self) -> str:
-        if self.mail:
-            mailer = self.mail.get('transactional', {}).get('mailer', None)
-            if mailer == 'postmark':
-                token = self.mail.get('transactional', {}).get('token', '')
-                return token
-
-        return ''
-
 
 @OrgApp.webasset_path()
 def get_shared_assets_path() -> str:

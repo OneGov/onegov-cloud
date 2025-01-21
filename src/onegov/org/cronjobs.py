@@ -741,7 +741,17 @@ def update_newsletter_email_bounce_statistics(
     # Postmark uses EST in `fromdate` and `todate`, see
     # https://postmarkapp.com/developer/api/bounce-api.
 
-    token = request.app.get_postmark_token()
+    def get_postmark_token() -> str:
+        # read postmark token from the applications configuration
+        mail_config = request.app.mail
+        if mail_config:
+            mailer = mail_config.get('marketing', {}).get('mailer', None)
+            if mailer == 'postmark':
+                return mail_config.get('marketing', {}).get('token', '')
+
+        return ''
+
+    token = get_postmark_token()
 
     recipients = RecipientCollection(request.session)
     yesterday = utcnow() - timedelta(days=1)
