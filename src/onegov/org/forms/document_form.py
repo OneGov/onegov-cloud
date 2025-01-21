@@ -26,7 +26,7 @@ class DocumentForm(Form):
 
     text = HtmlField(
         label=_('Detailed Explanation'),
-        description=_('Describes in detail how this form is to be used'))
+        description=_('Describes in detail how this form is to be filled'))
 
     pdf_form = UploadFileWithORMSupport(
         label=_('Form PDF'),
@@ -38,7 +38,7 @@ class DocumentForm(Form):
 
     group = StringField(
         label=_('Group'),
-        description=_('Used to group this link in the overview'))
+        description=_('Used to group this form in the overview'))
 
     def get_useful_data(
             self,

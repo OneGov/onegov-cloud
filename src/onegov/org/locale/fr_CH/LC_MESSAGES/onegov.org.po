@@ -2,7 +2,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE 1.0\n"
-"POT-Creation-Date: 2024-11-25 19:53+0100\n"
+"POT-Creation-Date: 2025-01-21 14:22+0100\n"
 "PO-Revision-Date: 2022-03-15 10:50+0100\n"
 "Last-Translator: Marc Sommerhalder <marc.sommerhalder@seantis.ch>\n"
 "Language-Team: French\n"
@@ -595,6 +595,24 @@ msgstr "Une entrée avec le même nom existe"
 msgid "E-Mail"
 msgstr "E-mail"
 
+msgid "Describes briefly what this form is about"
+msgstr "Décrit brièvement ce formulaire"
+
+msgid "Detailed Explanation"
+msgstr "Explication détaillée"
+
+msgid "Describes in detail how this form is to be filled"
+msgstr "Décrit en détail comment remplir ce formulaire"
+
+msgid "Form PDF"
+msgstr "Formulaire PDF"
+
+msgid "Group"
+msgstr "Groupe"
+
+msgid "Used to group this form in the overview"
+msgstr "Utilisé pour regrouper ce formulaire dans la vue d'ensemble"
+
 msgid "Art"
 msgstr "Art"
 
@@ -845,9 +863,6 @@ msgstr "Lien"
 
 msgid "Url pointing to another website"
 msgstr "Url qui pointe vers une page externe"
-
-msgid "Group"
-msgstr "Groupe"
 
 msgid "Used to group this link in the overview"
 msgstr "Utilisé pour regrouper le lien dans la vue d'ensemble"
@@ -1685,6 +1700,12 @@ msgstr "Code Analytics"
 msgid "JavaScript for web statistics support"
 msgstr "JavaScript pour l'assistance en matière de statistiques web"
 
+msgid "Analytics URL"
+msgstr "URL Analytics"
+
+msgid "URL pointing to the analytics page"
+msgstr "URL pointant vers la page d'analyse"
+
 msgid "Cantonal holidays"
 msgstr "Jours fériés cantonaux"
 
@@ -2296,6 +2317,9 @@ msgstr "Formulaire externe"
 msgid "New external form"
 msgstr "Nouveau formulaire externe"
 
+msgid "Document form"
+msgstr "Formulaire de document"
+
 msgid "Do you really want to delete this submission window?"
 msgstr "Voulez-vous vraiment supprimer cette fenêtre de soumission ?"
 
@@ -2765,9 +2789,6 @@ msgstr ""
 
 msgid "Delete content"
 msgstr "Supprimer le contenu"
-
-msgid "Photo album. Will be shown at the end of content."
-msgstr "Album photo. Sera affiché à la fin du contenu."
 
 msgid "Photo album"
 msgstr "Album photo"
@@ -4272,6 +4293,7 @@ msgstr "Il y a actuellement ${count} destinataires enregistrés."
 
 msgid "To update your subscription, please use this ${Link}"
 msgstr ""
+"Pour mettre à jour votre abonnement, veuillez utiliser ce ${Link}"
 
 msgid "Archive"
 msgstr "Archiver"
@@ -4586,6 +4608,8 @@ msgid ""
 "Thank you for filling out this survey. If there's anything you'd like to "
 "change, click on the \"Edit\"-Button below."
 msgstr ""
+"Merci d'avoir rempli ce sondage. Si vous souhaitez apporter des "
+"modifications, cliquez sur le bouton \"Modifier\" ci-dessous."
 
 msgid "No surveys defined yet."
 msgstr "Aucun sondage n'est encore défini."
@@ -5179,6 +5203,15 @@ msgstr "${address} désinscrit avec succès"
 msgid "${address} could not be unsubscribed, wrong token"
 msgstr "${address} n'a pas pu être désinscrite, mauvaise zone de texte"
 
+msgid "Added a new form"
+msgstr "A ajouté un nouveau formulaire"
+
+msgid "New Document Form"
+msgstr "Nouveau formulaire de document"
+
+msgid "Edit Document Form"
+msgstr "Modifier le formulaire de document"
+
 msgid "Moves the topic and all its sub topics to the given destination."
 msgstr "Déplace le sujet et tous ses sous-sujets vers la destination donnée."
 
@@ -5314,9 +5347,6 @@ msgstr "Il reste ${count} places"
 
 msgid "A form with this name already exists"
 msgstr "Un formulaire avec ce nom existe déjà"
-
-msgid "Added a new form"
-msgstr "A ajouté un nouveau formulaire"
 
 msgid "New Form"
 msgstr "Nouveau formulaire"
@@ -5945,16 +5975,16 @@ msgstr ""
 "toutes les soumissions."
 
 msgid "Delete Submissions"
-msgstr ""
+msgstr "Supprimer les soumissions"
 
 msgid "Do you really want to delete all submissions?"
-msgstr ""
+msgstr "Voulez-vous vraiment supprimer toutes les soumissions ?"
 
 msgid "All submissions associated with this survey will be deleted."
-msgstr ""
+msgstr "Toutes les soumissions associées à cette enquête seront supprimées."
 
 msgid "Delete submissions"
-msgstr ""
+msgstr "Supprimer les soumissions"
 
 msgid "Exports the submissions of the survey."
 msgstr "Exporte les soumissions de l'enquête."
@@ -5982,7 +6012,7 @@ msgid "Edit Submission Window"
 msgstr "Modifier la fenêtre de soumission"
 
 msgid "The submission window and all associated submissions were deleted"
-msgstr ""
+msgstr "La fenêtre de soumission et toutes les soumissions associées ont été "
 
 msgid "Added a new text module"
 msgstr "Ajout d'un nouveau module de texte"
@@ -6202,3 +6232,6 @@ msgstr "Un compte a été créé pour vous"
 
 msgid "The user was created successfully"
 msgstr "L'utilisateur a bien été créé"
+
+#~ msgid "Photo album. Will be shown at the end of content."
+#~ msgstr "Album photo. Sera affiché à la fin du contenu."

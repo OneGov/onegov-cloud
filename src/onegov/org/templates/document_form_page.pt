@@ -10,7 +10,7 @@
 
             <div class="page-text" tal:condition="text" tal:content="text" />
 
-            <a title="Download Form" class="button" href="${request.link(pdf)}"><i class="fa fa-file-pdf-o"></i> <tal:b>Download ${pdf.name}</tal:b></a>
+            <a title="Download Form" class="button" href="${request.link(pdf)}"><i class="fa fa-file-pdf-o"></i> ${pdf.name}</a>
         </div>
 
     </tal:b>

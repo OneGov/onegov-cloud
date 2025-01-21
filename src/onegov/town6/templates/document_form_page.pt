@@ -9,7 +9,7 @@
             <span class="page-lead" tal:condition="lead" tal:content="lead"/>
 
             <div class="page-text" tal:condition="text" tal:content="text"/>
-            <a title="Download Form" class="download-button" href="${request.link(pdf)}"><i class="fa fa-file-pdf"></i> <span i18n:translate="">Download ${pdf.name}</span></a>
+            <a title="Download Form" class="download-button" href="${request.link(pdf)}"><i class="fa fa-file-pdf"></i> ${pdf.name}</a>
         </div>
     </tal:b>
 </div>
