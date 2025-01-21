@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 from onegov.activity import log
 from onegov.activity.utils import dates_overlap
 from sortedcontainers import SortedSet
@@ -21,8 +23,8 @@ if TYPE_CHECKING:
 
 
 def overlaps(
-    booking: 'Booking',
-    other: 'Booking | Occasion',
+    booking: Booking,
+    other: Booking | Occasion,
     minutes_between: float = 0,
     alignment: Literal['day', 'week', 'month'] | None = None,
     with_anti_affinity_check: bool = False
@@ -97,7 +99,7 @@ class LoopBudget:
 
 class HashableID:
 
-    id: 'Hashable'
+    id: Hashable
 
     def __hash__(self) -> int:
         return hash(self.id)
@@ -106,7 +108,7 @@ class HashableID:
         return isinstance(other, self.__class__) and self.id == other.id
 
 
-def booking_order(booking: 'Booking') -> tuple['Decimal', int, 'UUID']:
+def booking_order(booking: Booking) -> tuple[Decimal, int, UUID]:
     """ Keeps the bookings predictably sorted from highest to lowest priority.
 
     """
@@ -115,14 +117,14 @@ def booking_order(booking: 'Booking') -> tuple['Decimal', int, 'UUID']:
 
 
 def unblockable(
-    accepted: 'Iterable[Booking]',
-    blocked: 'Iterable[Booking]',
+    accepted: Iterable[Booking],
+    blocked: Iterable[Booking],
     # NOTE: value defaults don't yet have an exception for type params
     #       with a default type. So we need to ignore here, despite the
     #       types matching.
-    key: 'Callable[[Booking], OrderT]' = booking_order,  # type:ignore
+    key: Callable[[Booking], OrderT] = booking_order,  # type:ignore
     with_anti_affinity_check: bool = False
-) -> 'SortedKeySet[Booking, OrderT]':
+) -> SortedKeySet[Booking, OrderT]:
     """ Returns a set of items in the blocked set which do not block
     with anything. The set is ordered using :func:`booking_order`.
 

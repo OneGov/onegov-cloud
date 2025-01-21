@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 from onegov.translator_directory import TranslatorDirectoryApp
 from onegov.translator_directory.collections.documents import (
     TranslatorDocumentCollection)
@@ -21,7 +23,7 @@ if TYPE_CHECKING:
     converters={'id': UUID}
 )
 def get_translator(
-    request: 'TranslatorAppRequest',
+    request: TranslatorAppRequest,
     id: UUID
 ) -> Translator | None:
     return request.session.query(Translator).filter_by(id=id).first()
@@ -42,7 +44,7 @@ def get_translator(
     }
 )
 def get_translators(
-    request: 'TranslatorAppRequest',
+    request: TranslatorAppRequest,
     page: int | None = None,
     written_langs: list[str] | None = None,
     spoken_langs: list[str] | None = None,

@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 from enum import IntEnum
 from more.webassets import WebassetsApp
 from onegov.core.orm.cache import request_cached
@@ -26,7 +28,7 @@ class PayApp(WebassetsApp):
     if TYPE_CHECKING:
         # forward declare the attributes from Framework we depend on
         @cached_property
-        def session(self) -> 'Callable[[], Session]': ...
+        def session(self) -> Callable[[], Session]: ...
 
     def configure_payment_providers(
         self,
@@ -96,7 +98,7 @@ def get_js_path() -> str:
 
 
 @PayApp.webasset('pay')
-def get_pay_assets() -> 'Iterator[str]':
+def get_pay_assets() -> Iterator[str]:
     yield 'stripe.js'
 
 
@@ -108,11 +110,11 @@ INSUFFICIENT_FUNDS = PaymentError.INSUFFICIENT_FUNDS
 
 
 def process_payment(
-    method: 'PaymentMethod',
+    method: PaymentMethod,
     price: Price,
     provider: PaymentProvider[Any] | None = None,
     token: str | None = None
-) -> 'Payment | PaymentError | None':
+) -> Payment | PaymentError | None:
     """ Processes a payment using various methods.
 
     This method returns one of the following:

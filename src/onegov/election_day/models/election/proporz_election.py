@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 from onegov.election_day.models.election.candidate_panachage_result import \
     CandidatePanachageResult
 from onegov.election_day.models.election.election import Election
@@ -43,7 +45,7 @@ class ProporzElection(
     }
 
     #: An election contains n list connections
-    list_connections: 'relationship[list[ListConnection]]' = relationship(
+    list_connections: relationship[list[ListConnection]] = relationship(
         'ListConnection',
         cascade='all, delete-orphan',
         back_populates='election',
@@ -51,21 +53,21 @@ class ProporzElection(
     )
 
     #: An election contains n lists
-    lists: 'relationship[list[List]]' = relationship(
+    lists: relationship[list[List]] = relationship(
         'List',
         cascade='all, delete-orphan',
         back_populates='election',
     )
 
     #: An election may contains n party results
-    party_results: 'relationship[list[PartyResult]]' = relationship(
+    party_results: relationship[list[PartyResult]] = relationship(
         'PartyResult',
         cascade='all, delete-orphan',
         back_populates='election'
     )
 
     #: An election may contains n party panachage results
-    party_panachage_results: 'relationship[list[PartyPanachageResult]]'
+    party_panachage_results: relationship[list[PartyPanachageResult]]
     party_panachage_results = relationship(
         'PartyPanachageResult',
         cascade='all, delete-orphan',
@@ -73,7 +75,7 @@ class ProporzElection(
     )
 
     @property
-    def votes_by_entity(self) -> 'Query[VotesByEntityRow]':
+    def votes_by_entity(self) -> Query[VotesByEntityRow]:
         query = self.results_query.order_by(None)
         query = query.outerjoin(ListResult)
         results = query.with_entities(
@@ -90,7 +92,7 @@ class ProporzElection(
         return results
 
     @property
-    def votes_by_district(self) -> 'Query[VotesByDistrictRow]':
+    def votes_by_district(self) -> Query[VotesByDistrictRow]:
         query = self.results_query.order_by(None)
         query = query.outerjoin(ListResult)
         results = query.with_entities(
@@ -134,7 +136,7 @@ class ProporzElection(
     @property
     def relationships_for_historical_party_results(
         self
-    ) -> 'AppenderQuery[ElectionRelationship]':
+    ) -> AppenderQuery[ElectionRelationship]:
         return self.related_elections
 
     def clear_results(self, clear_all: bool = False) -> None:

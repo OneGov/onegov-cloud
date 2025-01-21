@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 from decimal import Decimal
 from functools import total_ordering
 from onegov.core.orm import Base
@@ -32,7 +34,7 @@ class Price(_PriceBase):
         currency: str | None,
         fee: Decimal | float = 0,
         credit_card_payment: bool = False
-    ) -> 'Self':
+    ) -> Self:
         return super().__new__(
             cls,
             Decimal(amount),
@@ -44,11 +46,11 @@ class Price(_PriceBase):
     def __bool__(self) -> bool:
         return self.amount and True or False
 
-    def __lt__(self, other: 'Price') -> bool:  # type:ignore[override]
+    def __lt__(self, other: Price) -> bool:  # type:ignore[override]
         # FIXME: This probably should assert equal currency as well
         return self.amount < other.amount
 
-    def __add__(self, other: 'Price') -> 'Self':  # type:ignore[override]
+    def __add__(self, other: Price) -> Self:  # type:ignore[override]
         assert self.currency is None or self.currency == other.currency
         cc_payment = self.credit_card_payment or other.credit_card_payment
         return self.__class__(
@@ -57,7 +59,7 @@ class Price(_PriceBase):
             credit_card_payment=cc_payment
         )
 
-    def __sub__(self, other: 'Price') -> 'Self':
+    def __sub__(self, other: Price) -> Self:
         assert self.currency == other.currency
         cc_payment = self.credit_card_payment or other.credit_card_payment
         return self.__class__(
@@ -73,10 +75,10 @@ class Price(_PriceBase):
         return f'Price({self.amount!r}, {self.currency!r})'
 
     @classmethod
-    def zero(cls) -> 'Self':
+    def zero(cls) -> Self:
         return cls(0, None)
 
-    def as_dict(self) -> 'PriceDict':
+    def as_dict(self) -> PriceDict:
         return {
             'amount': float(self.amount),
             'currency': self.currency,
@@ -89,5 +91,5 @@ class Price(_PriceBase):
         return self.amount - self.fee
 
 
-def payments_association_table_for(cls: type[Base]) -> 'Table':
+def payments_association_table_for(cls: type[Base]) -> Table:
     return Base.metadata.tables[f'payments_for_{cls.__tablename__}_payments']

@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 from onegov.activity import Occasion, OccasionNeed
 from onegov.core.security import Secret
 from onegov.feriennet import FeriennetApp, _
@@ -25,17 +27,17 @@ class VolunteerExport(FeriennetExport):
     def run(
         self,
         form: PeriodExportForm,  # type:ignore[override]
-        session: 'Session'
-    ) -> 'Iterator[Iterator[tuple[str, Any]]]':
+        session: Session
+    ) -> Iterator[Iterator[tuple[str, Any]]]:
 
         assert form.selected_period is not None
         return self.rows(session, form.selected_period)
 
     def query(
         self,
-        session: 'Session',
-        period: 'Period'
-    ) -> 'Query[OccasionNeed]':
+        session: Session,
+        period: Period
+    ) -> Query[OccasionNeed]:
 
         q = session.query(OccasionNeed)
         q = q.filter(OccasionNeed.occasion_id.in_(
@@ -59,14 +61,14 @@ class VolunteerExport(FeriennetExport):
 
     def rows(
         self,
-        session: 'Session',
-        period: 'Period'
-    ) -> 'Iterator[Iterator[tuple[str, Any]]]':
+        session: Session,
+        period: Period
+    ) -> Iterator[Iterator[tuple[str, Any]]]:
 
         for need in self.query(session, period):
             for volunteer in need.volunteers:
                 yield ((k, v) for k, v in self.fields(volunteer))
 
-    def fields(self, volunteer: 'Volunteer') -> 'Iterator[tuple[str, Any]]':
+    def fields(self, volunteer: Volunteer) -> Iterator[tuple[str, Any]]:
 
         yield from self.volunteer_fields(volunteer)

@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 import os.path
 
 from dectate import Action, Query
@@ -53,10 +55,10 @@ class HtmlHandleFormAction(HtmlAction):
     def __init__(
         self,
         model: type | str,
-        form: 'type[Form] | Callable[[Any, _RequestT], type[Form]]',
-        render: 'Callable[[Any, _RequestT], Response] | str | None' = None,
-        template: 'StrOrBytesPath | None' = None,
-        load: 'Callable[[_RequestT], Any] | str | None' = None,
+        form: type[Form] | Callable[[Any, _RequestT], type[Form]],
+        render: Callable[[Any, _RequestT], Response] | str | None = None,
+        template: StrOrBytesPath | None = None,
+        load: Callable[[_RequestT], Any] | str | None = None,
         permission: object | str | None = None,
         internal: bool = False,
         **predicates: Any
@@ -67,7 +69,7 @@ class HtmlHandleFormAction(HtmlAction):
 
     def perform(
         self,
-        obj: 'Callable[[Any, _RequestT, Any], Any]',
+        obj: Callable[[Any, _RequestT, Any], Any],
         *args: Any,
         **kwargs: Any
     ) -> None:
@@ -91,7 +93,7 @@ class HtmlHandleFormAction(HtmlAction):
 
 
 def fetch_form_class(
-    form_class: 'type[_FormT] | Callable[[Any, _RequestT], type[_FormT]]',
+    form_class: type[_FormT] | Callable[[Any, _RequestT], type[_FormT]],
     model: object,
     request: _RequestT
 ) -> type[_FormT]:
@@ -110,7 +112,7 @@ def query_form_class(
     request: _RequestT,
     model: object,
     name: str | None = None
-) -> 'type[Form] | None':
+) -> type[Form] | None:
     """ Queries the app configuration for the form class associated with
     the given model and name. Take this configuration for example::
 
@@ -141,9 +143,9 @@ def query_form_class(
 
 
 def wrap_with_generic_form_handler(
-    obj: 'Callable[[_T, _RequestT, _FormT], Any]',
-    form_class: 'type[_FormT] | Callable[[_T, _RequestT], type[_FormT]]'
-) -> 'Callable[[_T, _RequestT], Any]':
+    obj: Callable[[_T, _RequestT, _FormT], Any],
+    form_class: type[_FormT] | Callable[[_T, _RequestT], type[_FormT]]
+) -> Callable[[_T, _RequestT], Any]:
     """ Wraps a view handler with generic form handling.
 
     This includes instantiating the form with translations/csrf protection
@@ -195,7 +197,7 @@ class CronjobAction(Action):
 
     def perform(  # type:ignore[override]
         self,
-        func: 'Callable[[CoreRequest], Any]',
+        func: Callable[[CoreRequest], Any],
         cronjob_registry: Bunch
     ) -> None:
         from onegov.core.cronjobs import register_cronjob
@@ -228,7 +230,7 @@ class StaticDirectoryAction(Action):
 
     def perform(  # type:ignore[override]
         self,
-        func: 'Callable[..., Any]',
+        func: Callable[..., Any],
         staticdirectory_registry: Bunch
     ) -> None:
 
@@ -253,7 +255,7 @@ class TemplateVariablesRegistry:
 
     def get_variables(
         self,
-        request: 'CoreRequest',
+        request: CoreRequest,
         base: dict[str, Any] | None = None
     ) -> dict[str, Any]:
         base = base or {}
@@ -300,7 +302,7 @@ class TemplateVariablesAction(Action):
 
     def perform(  # type:ignore[override]
         self,
-        func: 'Callable[[CoreRequest], dict[str, Any]]',
+        func: Callable[[CoreRequest], dict[str, Any]],
         templatevariables_registry: TemplateVariablesRegistry
     ) -> None:
         templatevariables_registry.callbacks.append(func)

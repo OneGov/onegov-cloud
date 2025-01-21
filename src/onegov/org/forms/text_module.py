@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 from onegov.form import Form
 from onegov.form.filters import strip_whitespace
 from onegov.org import _

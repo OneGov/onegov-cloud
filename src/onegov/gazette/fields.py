@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 from onegov.form.fields import MultiCheckboxField as MultiCheckboxFieldBase
 from onegov.form.widgets import MultiCheckboxWidget as MultiCheckboxWidgetBase
 from onegov.gazette import _
@@ -13,9 +15,9 @@ class MultiCheckboxWidget(MultiCheckboxWidgetBase):
 
     def __call__(
         self,
-        field: 'MultiCheckboxField',  # type:ignore[override]
+        field: MultiCheckboxField,  # type:ignore[override]
         **kwargs: Any
-    ) -> 'Markup':
+    ) -> Markup:
         kwargs['data-expand-title'] = field.gettext(_('Show all'))
         kwargs['data-fold-title'] = field.gettext(_('Show less'))
 

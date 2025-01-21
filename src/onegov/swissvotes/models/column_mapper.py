@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 from functools import cached_property
 from collections import OrderedDict
 from onegov.swissvotes.models.vote import SwissVote
@@ -714,19 +716,19 @@ class ColumnMapperDataset:
             return (getattr(vote, attribute) or {}).get(key)
         return getattr(vote, attribute)
 
-    def get_values(self, vote: SwissVote) -> 'Iterator[Any]':
+    def get_values(self, vote: SwissVote) -> Iterator[Any]:
         """ Get all values of a vote in order. """
 
         for attribute in self.columns.keys():
             yield self.get_value(vote, attribute)
 
-    def get_items(self, vote: SwissVote) -> 'Iterator[tuple[str, Any]]':
+    def get_items(self, vote: SwissVote) -> Iterator[tuple[str, Any]]:
         """ Get all names and values of a vote in order. """
 
         for attribute in self.columns.keys():
             yield attribute, self.get_value(vote, attribute)
 
-    def items(self) -> 'Iterator[ColumnItem]':
+    def items(self) -> Iterator[ColumnItem]:
         """ Returns the attributes and column names together with additional
         information (type, nullable, precision, scale).
 
@@ -827,7 +829,7 @@ class ColumnMapperMetadata:
         else:
             data[attribute] = value
 
-    def items(self) -> 'Iterator[ColumnItem]':
+    def items(self) -> Iterator[ColumnItem]:
         """ Returns the attributes and column names together with additional
         information (type, nullable, precision, scale).
 

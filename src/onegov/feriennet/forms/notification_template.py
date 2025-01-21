@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 from functools import cached_property
 from markupsafe import Markup, escape
 
@@ -58,7 +60,7 @@ class NotificationTemplateForm(Form):
 
 class NotificationTemplateSendForm(Form):
 
-    request: 'FeriennetRequest'
+    request: FeriennetRequest
 
     send_to = RadioField(
         label=_('Send to'),
@@ -127,7 +129,7 @@ class NotificationTemplateSendForm(Form):
         self.occasion.choices = list(self.occasion_choices)
 
     @cached_property
-    def period(self) -> 'PeriodMeta':
+    def period(self) -> PeriodMeta:
         for period in self.request.app.periods:
             if period.id == self.model.period_id:
                 return period
@@ -179,7 +181,7 @@ class NotificationTemplateSendForm(Form):
 
         return {u.username for u in users.with_entities(User.username)}
 
-    def recipients_by_role(self, roles: 'Collection[str]') -> set[str]:
+    def recipients_by_role(self, roles: Collection[str]) -> set[str]:
         if not roles:
             return set()
 
@@ -240,8 +242,8 @@ class NotificationTemplateSendForm(Form):
         #       if we wanted to be a little bit more rigorous we could
         #       use `coerce` on `MultiCheckboxField` to ensure we're
         #       passing in `UUID`s, rather than `str`s.
-        occasions: 'Collection[str]'
-    ) -> 'Query[Booking]':
+        occasions: Collection[str]
+    ) -> Query[Booking]:
         bookings = BookingCollection(self.request.session)
 
         q = bookings.query().order_by(None)
@@ -264,7 +266,7 @@ class NotificationTemplateSendForm(Form):
 
     def recipients_by_occasion(
         self,
-        occasions: 'Collection[str]',
+        occasions: Collection[str],
         include_organisers: bool = True
     ) -> set[str]:
 
@@ -286,7 +288,7 @@ class NotificationTemplateSendForm(Form):
         return attendees | organisers
 
     @property
-    def occasion_choices(self) -> 'Iterator[tuple[str, Markup]]':
+    def occasion_choices(self) -> Iterator[tuple[str, Markup]]:
         layout = DefaultLayout(self.model, self.request)
 
         stmt = as_selectable_from_path(

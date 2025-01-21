@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 from datetime import timedelta
 from morepath import redirect
 from onegov.core.security import Personal
@@ -23,7 +25,7 @@ if TYPE_CHECKING:
     model=Principal,
     permission=Public
 )
-def view_principal(self: Principal, request: 'GazetteRequest') -> 'Response':
+def view_principal(self: Principal, request: GazetteRequest) -> Response:
     """ The homepage.
 
     Redirects to the default management views according to the logged in role.
@@ -52,7 +54,7 @@ def view_principal(self: Principal, request: 'GazetteRequest') -> 'Response':
     name='archive',
     template='archive.pt',
 )
-def view_archive(self: Principal, request: 'GazetteRequest') -> 'RenderData':
+def view_archive(self: Principal, request: GazetteRequest) -> RenderData:
     """ The archive.
 
     Shows all the weekly PDFs by year.
@@ -72,7 +74,7 @@ def view_archive(self: Principal, request: 'GazetteRequest') -> 'RenderData':
     name='dashboard',
     template='dashboard.pt',
 )
-def view_dashboard(self: Principal, request: 'GazetteRequest') -> 'RenderData':
+def view_dashboard(self: Principal, request: GazetteRequest) -> RenderData:
     """ The dashboard view (for editors).
 
     Shows the drafted, submitted and rejected notices, shows warnings and

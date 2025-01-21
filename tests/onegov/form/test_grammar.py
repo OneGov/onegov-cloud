@@ -370,10 +370,10 @@ def test_prices():
     assert f.pricing.credit_card_payment
 
     field = integer_range_field()
-    f = field.parseString("0..30 (0.85 CHF)")
+    f = field.parseString("0..30 (1.00 CHF)")
     assert f.type == 'integer_range'
     assert f[0] == range(0, 30)
-    assert f.pricing.amount == Decimal('0.85')
+    assert f.pricing.amount == Decimal('1.00')
     assert f.pricing.currency == 'CHF'
     assert not f.pricing.credit_card_payment
 

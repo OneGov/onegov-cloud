@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 import morepath
 
 from onegov.core.security import Private
@@ -12,7 +14,7 @@ if TYPE_CHECKING:
 
 
 @OrgApp.view(model=Clipboard, permission=Private)
-def copy_to_clipboard(self: Clipboard, request: 'OrgRequest') -> 'Response':
+def copy_to_clipboard(self: Clipboard, request: OrgRequest) -> Response:
     self.store_in_session()
     request.success(_('A link was added to the clipboard'))
     return morepath.redirect(

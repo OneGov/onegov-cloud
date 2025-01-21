@@ -50,6 +50,8 @@ Resources
 
 
 """
+from __future__ import annotations
+
 from typing import TYPE_CHECKING, Any
 
 from onegov.chat.utils import param_from_path
@@ -91,7 +93,7 @@ class NoWebsocketTokenStored(WebsocketSecurityError):
 
 def consume_websocket_token(
     path: str,
-    session: 'BrowserSession | dict[str, Any]',
+    session: BrowserSession | dict[str, Any],
     session_key: str = 'websocket_token'
 ) -> str:
     """ Consume websocket token.

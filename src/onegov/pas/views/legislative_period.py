@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 from onegov.core.elements import Link
 from onegov.core.security import Private
 from onegov.pas import _
@@ -22,8 +24,8 @@ if TYPE_CHECKING:
 )
 def view_legislative_periods(
     self: LegislativePeriodCollection,
-    request: 'TownRequest'
-) -> 'RenderData':
+    request: TownRequest
+) -> RenderData:
 
     layout = LegislativePeriodCollectionLayout(self, request)
 
@@ -57,9 +59,9 @@ def view_legislative_periods(
 )
 def add_legislative_period(
     self: LegislativePeriodCollection,
-    request: 'TownRequest',
+    request: TownRequest,
     form: LegislativePeriodForm
-) -> 'RenderData | Response':
+) -> RenderData | Response:
 
     if form.submitted(request):
         legislative_period = self.add(**form.get_useful_data())
@@ -85,8 +87,8 @@ def add_legislative_period(
 )
 def view_legislative_period(
     self: LegislativePeriod,
-    request: 'TownRequest'
-) -> 'RenderData':
+    request: TownRequest
+) -> RenderData:
 
     layout = LegislativePeriodLayout(self, request)
 
@@ -106,9 +108,9 @@ def view_legislative_period(
 )
 def edit_legislative_period(
     self: LegislativePeriod,
-    request: 'TownRequest',
+    request: TownRequest,
     form: LegislativePeriodForm
-) -> 'RenderData | Response':
+) -> RenderData | Response:
 
     if form.submitted(request):
         form.populate_obj(self)
@@ -136,7 +138,7 @@ def edit_legislative_period(
 )
 def delete_legislative_period(
     self: LegislativePeriod,
-    request: 'TownRequest'
+    request: TownRequest
 ) -> None:
 
     request.assert_valid_csrf_token()

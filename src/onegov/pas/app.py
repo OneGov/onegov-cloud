@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 from onegov.core.utils import module_path
 from onegov.pas.content import create_new_organisation
 from onegov.pas.custom import get_global_tools
@@ -20,12 +22,12 @@ class PasApp(TownApp):
 
 @PasApp.setting(section='org', name='create_new_organisation')
 def get_create_new_organisation_factory(
-) -> 'Callable[[TownApp, str], Organisation]':
+) -> Callable[[TownApp, str], Organisation]:
     return create_new_organisation
 
 
 @PasApp.template_variables()
-def get_template_variables(request: 'TownRequest') -> 'RenderData':
+def get_template_variables(request: TownRequest) -> RenderData:
     return {
         'global_tools': tuple(get_global_tools(request)),
         'top_navigation': tuple(get_top_navigation(request)),

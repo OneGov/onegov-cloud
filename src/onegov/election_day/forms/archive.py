@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 from onegov.election_day import _
 from onegov.form import Form
 from onegov.form.fields import MultiCheckboxField
@@ -14,7 +16,7 @@ if TYPE_CHECKING:
 
 class ArchiveSearchForm(Form):
 
-    request: 'ElectionDayRequest'
+    request: ElectionDayRequest
 
     term = StringField(
         label=_('Term'),
@@ -51,7 +53,7 @@ class ArchiveSearchForm(Form):
         if not field.data:
             field.data = list(next(zip(*field.choices)))
 
-    def apply_model(self, model: 'SearchableArchivedResultCollection') -> None:
+    def apply_model(self, model: SearchableArchivedResultCollection) -> None:
         self.term.data = model.term
         self.from_date.data = model.from_date
         self.to_date.data = model.to_date
@@ -77,7 +79,7 @@ class ArchiveSearchFormVote(ArchiveSearchForm):
         principal = self.request.app.principal
         self.domains.choices = list(principal.domains_vote.items())
 
-    def apply_model(self, model: 'SearchableArchivedResultCollection') -> None:
+    def apply_model(self, model: SearchableArchivedResultCollection) -> None:
         super().apply_model(model)
         self.answers.data = model.answers
         self.select_all('answers')

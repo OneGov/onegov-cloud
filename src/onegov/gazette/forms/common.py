@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 from onegov.form import Form
 from onegov.gazette import _
 from wtforms.fields import TextAreaField

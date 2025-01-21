@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 from io import BytesIO
 from onegov.file import File
 from morepath import redirect
@@ -60,9 +62,9 @@ if TYPE_CHECKING:
 )
 def add_new_translator(
     self: TranslatorCollection,
-    request: 'TranslatorAppRequest',
+    request: TranslatorAppRequest,
     form: TranslatorForm
-) -> 'RenderData | BaseResponse':
+) -> RenderData | BaseResponse:
 
     form.delete_field('date_of_decision')
     form.delete_field('for_admins_only')
@@ -111,9 +113,9 @@ def add_new_translator(
 )
 def view_translators(
     self: TranslatorCollection,
-    request: 'TranslatorAppRequest',
+    request: TranslatorAppRequest,
     form: TranslatorSearchForm
-) -> 'RenderData | BaseResponse':
+) -> RenderData | BaseResponse:
 
     layout = TranslatorCollectionLayout(self, request)
 
@@ -141,43 +143,43 @@ def view_translators(
 )
 def export_translator_directory(
     self: TranslatorCollection,
-    request: 'TranslatorAppRequest'
+    request: TranslatorAppRequest
 ) -> Response:
 
     output = BytesIO()
     workbook = Workbook(output)
 
-    def format_date(dt: 'datetime | date | None') -> str:
+    def format_date(dt: datetime | date | None) -> str:
         if not dt:
             return ''
         return dt.strftime('%Y-%m-%d')
 
-    def format_iterable(listlike: 'Iterable[str]') -> str:
+    def format_iterable(listlike: Iterable[str]) -> str:
         return '|'.join(listlike) if listlike else ''
 
     def format_languages(
-        langs: 'Iterable[Language | LanguageCertificate]'
+        langs: Iterable[Language | LanguageCertificate]
     ) -> str:
         return format_iterable(la.name for la in langs)
 
-    def format_guilds(guilds: 'Iterable[str]') -> str:
+    def format_guilds(guilds: Iterable[str]) -> str:
         return format_iterable(
             request.translate(PROFESSIONAL_GUILDS[s])
             if s in PROFESSIONAL_GUILDS else s
             for s in guilds
         )
 
-    def format_interpreting_types(types: 'Iterable[InterpretingType]') -> str:
+    def format_interpreting_types(types: Iterable[InterpretingType]) -> str:
         return format_iterable(
             request.translate(INTERPRETING_TYPES[t]) for t in types
         )
 
-    def format_admission(admission: 'AdmissionState | None') -> str:
+    def format_admission(admission: AdmissionState | None) -> str:
         if not admission:
             return ''
         return request.translate(ADMISSIONS[admission])
 
-    def format_gender(gender: 'Gender | None') -> str:
+    def format_gender(gender: Gender | None) -> str:
         if not gender:
             return ''
         return request.translate(GENDERS[gender])
@@ -304,8 +306,8 @@ def export_translator_directory(
 )
 def view_translator(
     self: Translator,
-    request: 'TranslatorAppRequest'
-) -> 'RenderData':
+    request: TranslatorAppRequest
+) -> RenderData:
     layout = TranslatorLayout(self, request)
     if layout.translator_data_outdated():
         request.warning(_(
@@ -328,9 +330,9 @@ def view_translator(
 )
 def edit_translator(
     self: Translator,
-    request: 'TranslatorAppRequest',
+    request: TranslatorAppRequest,
     form: TranslatorForm
-) -> 'RenderData | BaseResponse':
+) -> RenderData | BaseResponse:
 
     if form.submitted(request):
         form.update_model(self)
@@ -369,9 +371,9 @@ def edit_translator(
 )
 def edit_translator_as_editor(
     self: Translator,
-    request: 'TranslatorAppRequest',
+    request: TranslatorAppRequest,
     form: EditorTranslatorForm
-) -> 'RenderData | BaseResponse':
+) -> RenderData | BaseResponse:
 
     if request.is_admin:
         return request.redirect(request.link(self, name='edit'))
@@ -398,7 +400,7 @@ def edit_translator_as_editor(
 )
 def delete_translator(
     self: Translator,
-    request: 'TranslatorAppRequest'
+    request: TranslatorAppRequest
 ) -> None:
 
     request.assert_valid_csrf_token()
@@ -415,9 +417,9 @@ def delete_translator(
 )
 def report_translator_change(
     self: Translator,
-    request: 'TranslatorAppRequest',
+    request: TranslatorAppRequest,
     form: TranslatorMutationForm
-) -> 'RenderData | BaseResponse':
+) -> RenderData | BaseResponse:
 
     if form.submitted(request):
         assert request.current_username is not None
@@ -484,8 +486,8 @@ def report_translator_change(
 )
 def confirm_current_data(
     self: Translator,
-    request: 'TranslatorAppRequest'
-) -> 'BaseResponse':
+    request: TranslatorAppRequest
+) -> BaseResponse:
 
     TranslatorCollection(request.app).confirm_current_data(self)
     request.success(_('Your data has been confirmed'))
@@ -501,9 +503,9 @@ def confirm_current_data(
 )
 def view_mail_templates(
     self: Translator,
-    request: 'TranslatorAppRequest',
+    request: TranslatorAppRequest,
     form: MailTemplatesForm
-) -> 'RenderData | BaseResponse':
+) -> RenderData | BaseResponse:
 
     layout = MailTemplatesLayout(self, request)
     if form.submitted(request):

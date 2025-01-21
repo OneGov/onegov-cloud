@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 from onegov.core.cli.commands import cli
 from onegov.core.cli.core import (
     abort,

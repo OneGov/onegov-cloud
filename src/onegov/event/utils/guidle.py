@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 from bleach.sanitizer import Cleaner
 from functools import cached_property
 from datetime import timedelta
@@ -23,7 +25,7 @@ if TYPE_CHECKING:
 class GuidleBase:
     """ Base class for parsing guidle exports containing general helpers. """
 
-    def __init__(self, root: '_Element') -> None:
+    def __init__(self, root: _Element) -> None:
         self.root = root
         self.nsmap = {'guidle': 'http://www.guidle.com'}
         self.cleaner = Cleaner(
@@ -36,8 +38,8 @@ class GuidleBase:
     def find(
         self,
         path: str,
-        root: '_Element | None' = None
-    ) -> list['_Element']:
+        root: _Element | None = None
+    ) -> list[_Element]:
         """ Gets the elements with the given path. """
 
         root = root if root is not None else self.root
@@ -47,7 +49,7 @@ class GuidleBase:
     def get(
         self,
         path: str,
-        root: '_Element | None' = None,
+        root: _Element | None = None,
         joiner: str = ' ',
         parser: None = None
     ) -> str: ...
@@ -56,19 +58,19 @@ class GuidleBase:
     def get(
         self,
         path: str,
-        root: '_Element | None' = None,
+        root: _Element | None = None,
         joiner: str = ' ',
         *,
-        parser: 'Callable[[str], _T]'
-    ) -> '_T | None': ...
+        parser: Callable[[str], _T]
+    ) -> _T | None: ...
 
     def get(
         self,
         path: str,
-        root: '_Element | None' = None,
+        root: _Element | None = None,
         joiner: str = ' ',
-        parser: 'Callable[[str], _T] | None' = None
-    ) -> '_T | str | None':
+        parser: Callable[[str], _T] | None = None
+    ) -> _T | str | None:
         """ Returns the text of the elements with the given path.
 
         Allows to specifiy a joining character and optionally a parser. If no
@@ -86,7 +88,7 @@ class GuidleBase:
         else:
             return self.cleaner.clean(result) if result else ''
 
-    def join(self, texts: 'Sequence[str]', joiner: str = ', ') -> str:
+    def join(self, texts: Sequence[str], joiner: str = ', ') -> str:
         """ Joins a set of text, skips duplicate and empty texts while
         preserving the order. """
 
@@ -102,7 +104,7 @@ class GuidleBase:
 class GuidleExportData(GuidleBase):
     """ Represents a whole guidle export. """
 
-    def offers(self) -> 'Iterator[GuidleOffer]':
+    def offers(self) -> Iterator[GuidleOffer]:
         for offer in self.find('.//guidle:offer'):
             yield GuidleOffer(offer)
 
@@ -216,7 +218,7 @@ class GuidleOffer(GuidleBase):
 
     def tags(
         self,
-        tagmap: 'Mapping[str, str] | None' = None
+        tagmap: Mapping[str, str] | None = None
     ) -> tuple[set[str], set[str]]:
         """ Returns a set of known and a set of unkonwn tags. """
 
@@ -238,14 +240,14 @@ class GuidleOffer(GuidleBase):
         return tags, set()
 
     @cached_property
-    def coordinates(self) -> 'RealCoordinates | None':
+    def coordinates(self) -> RealCoordinates | None:
         lat = self.get('guidle:address/guidle:latitude', parser=float)
         lon = self.get('guidle:address/guidle:longitude', parser=float)
         if lat is not None and lon is not None:
             return Coordinates(lat, lon)
         return None
 
-    def schedules(self) -> 'Iterator[GuidleScheduleDate]':
+    def schedules(self) -> Iterator[GuidleScheduleDate]:
         for schedule in self.find('guidle:schedules/guidle:date'):
             yield GuidleScheduleDate(schedule)
 
@@ -253,7 +255,7 @@ class GuidleOffer(GuidleBase):
 class GuidleScheduleDate(GuidleBase):
     """ Represents a single schedule date of an offer. """
 
-    def __init__(self, root: '_Element') -> None:
+    def __init__(self, root: _Element) -> None:
         super().__init__(root)
 
         #  Parse start date, end date and recurrence

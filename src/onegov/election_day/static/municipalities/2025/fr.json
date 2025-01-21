@@ -71,17 +71,9 @@
         "district": "La Broye",
         "name": "Cheyres-Ch\u00e2bles"
     },
-    "2061": {
-        "district": "La Gl\u00e2ne",
-        "name": "Auboranges"
-    },
     "2063": {
         "district": "La Gl\u00e2ne",
         "name": "Billens-Hennens"
-    },
-    "2066": {
-        "district": "La Gl\u00e2ne",
-        "name": "Chapelle (Gl\u00e2ne)"
     },
     "2067": {
         "district": "La Gl\u00e2ne",
@@ -90,10 +82,6 @@
     "2068": {
         "district": "La Gl\u00e2ne",
         "name": "Ch\u00e2tonnaye"
-    },
-    "2072": {
-        "district": "La Gl\u00e2ne",
-        "name": "Ecublens (FR)"
     },
     "2079": {
         "district": "La Gl\u00e2ne",
@@ -106,10 +94,6 @@
     "2087": {
         "district": "La Gl\u00e2ne",
         "name": "M\u00e9zi\u00e8res (FR)"
-    },
-    "2089": {
-        "district": "La Gl\u00e2ne",
-        "name": "Montet (Gl\u00e2ne)"
     },
     "2096": {
         "district": "La Gl\u00e2ne",
@@ -283,10 +267,6 @@
         "district": "La Sarine",
         "name": "Granges-Paccot"
     },
-    "2200": {
-        "district": "La Sarine",
-        "name": "Grolley"
-    },
     "2206": {
         "district": "La Sarine",
         "name": "Marly"
@@ -302,10 +282,6 @@
     "2216": {
         "district": "La Sarine",
         "name": "Pierrafortscha"
-    },
-    "2217": {
-        "district": "La Sarine",
-        "name": "Ponthaux"
     },
     "2220": {
         "district": "La Sarine",
@@ -346,6 +322,10 @@
     "2238": {
         "district": "La Sarine",
         "name": "Bois-d'Amont"
+    },
+    "2239": {
+        "district": "La Sarine",
+        "name": "Grolley-Ponthaux"
     },
     "2250": {
         "district": "See / Lac",

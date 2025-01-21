@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 from onegov.core.security import Private, Public
 from onegov.form.collection import SurveyCollection
 from onegov.form.models.definition import SurveyDefinition
@@ -25,9 +27,9 @@ if TYPE_CHECKING:
 )
 def town_handle_defined_survey(
     self: SurveyDefinition,
-    request: 'TownRequest',
-    form: 'Form'
-) -> 'RenderData | Response':
+    request: TownRequest,
+    form: Form
+) -> RenderData | Response:
     return handle_defined_survey(
         self, request, form, SurveySubmissionLayout(self, request))
 
@@ -41,9 +43,9 @@ def town_handle_defined_survey(
 )
 def town_handle_new_survey_definition(
     self: SurveyCollection,
-    request: 'TownRequest',
+    request: TownRequest,
     form: SurveyDefinitionForm
-) -> 'RenderData | Response':
+) -> RenderData | Response:
     return handle_new_survey_definition(
         self, request, form, FormEditorLayout(self, request))
 
@@ -57,9 +59,9 @@ def town_handle_new_survey_definition(
 )
 def town_handle_edit_survey_definition(
     self: SurveyDefinition,
-    request: 'TownRequest',
+    request: TownRequest,
     form: SurveyDefinitionForm
-) -> 'RenderData | Response':
+) -> RenderData | Response:
     return handle_edit_survey_definition(
         self, request, form, FormEditorLayout(self, request))
 
@@ -68,7 +70,7 @@ def town_handle_edit_survey_definition(
               permission=Private, name='results')
 def town_view_survey_results(
     self: SurveyDefinition,
-    request: 'TownRequest'
-) -> 'RenderData':
+    request: TownRequest
+) -> RenderData:
     return view_survey_results(
         self, request, SurveySubmissionLayout(self, request))

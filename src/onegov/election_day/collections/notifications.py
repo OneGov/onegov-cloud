@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 from itertools import chain
 from onegov.election_day import _
 from onegov.election_day.models import Election
@@ -21,10 +23,10 @@ if TYPE_CHECKING:
 
 class NotificationCollection:
 
-    def __init__(self, session: 'Session'):
+    def __init__(self, session: Session):
         self.session = session
 
-    def query(self) -> 'Query[Notification]':
+    def query(self) -> Query[Notification]:
         return self.session.query(Notification)
 
     def by_model(
@@ -58,9 +60,9 @@ class NotificationCollection:
 
     def trigger(
         self,
-        request: 'ElectionDayRequest',
+        request: ElectionDayRequest,
         model: Election | ElectionCompound | Vote,
-        options: 'Collection[str]'
+        options: Collection[str]
     ) -> None:
         """ Triggers and adds the selected notifications. """
 
@@ -85,11 +87,11 @@ class NotificationCollection:
 
     def trigger_summarized(
         self,
-        request: 'ElectionDayRequest',
-        elections: 'Sequence[Election]',
-        election_compounds: 'Sequence[ElectionCompound]',
-        votes: 'Sequence[Vote]',
-        options: 'Collection[str]'
+        request: ElectionDayRequest,
+        elections: Sequence[Election],
+        election_compounds: Sequence[ElectionCompound],
+        votes: Sequence[Vote],
+        options: Collection[str]
     ) -> None:
         """ Triggers and adds a single notification for all given votes and
         elections.

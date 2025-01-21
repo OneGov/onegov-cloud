@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 import json
 from wtforms.fields import BooleanField, RadioField
 from wtforms.validators import InputRequired
@@ -115,7 +117,7 @@ class GeneralSettingsForm(OrgGeneralSettingsForm):
         self.delete_field('font_family_sans_serif')
 
         @self.request.after
-        def clear_locale(response: 'Response') -> None:
+        def clear_locale(response: Response) -> None:
             response.delete_cookie('locale')
 
 
@@ -158,7 +160,7 @@ class ChatSettingsForm(Form):
 
     def process_obj(
         self,
-        obj: 'Organisation'  # type:ignore[override]
+        obj: Organisation  # type:ignore[override]
     ) -> None:
 
         super().process_obj(obj)
@@ -175,7 +177,7 @@ class ChatSettingsForm(Form):
 
     def populate_obj(  # type:ignore[override]
         self,
-        obj: 'Organisation',  # type:ignore[override]
+        obj: Organisation,  # type:ignore[override]
         *args: Any,
         **kwargs: Any
     ) -> None:

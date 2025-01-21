@@ -183,6 +183,7 @@ If a selector is passed which matches more than one application, the command
 is not executed.
 
 """
+from __future__ import annotations
 
 import click
 import inspect
@@ -206,6 +207,7 @@ if TYPE_CHECKING:
     from collections.abc import Callable, Collection, Iterator, Sequence
     from typing import Protocol, TypedDict
 
+    from onegov.core.framework import Framework
     from onegov.core.request import CoreRequest
     from onegov.core.security.permissions import Intent
     from onegov.server.config import ApplicationConfig
@@ -218,7 +220,7 @@ if TYPE_CHECKING:
         @property
         def available_selectors(self) -> list[str]: ...
         @property
-        def matches(self) -> 'Iterator[str]': ...
+        def matches(self) -> Iterator[str]: ...
         matches_required: bool
         singular: bool
         creates_path: bool
@@ -260,7 +262,7 @@ class GroupContextGuard(_GroupContextAttrs):
     def abort_if_no_selector(
         self,
         click_context: click.Context,
-        matches: 'Collection[str]'
+        matches: Collection[str]
     ) -> None:
 
         if not self.selector:
@@ -274,7 +276,7 @@ class GroupContextGuard(_GroupContextAttrs):
     def abort_if_no_subcommand(
         self,
         click_context: click.Context,
-        matches: 'Collection[str]'
+        matches: Collection[str]
     ) -> None:
 
         if click_context.invoked_subcommand is None:
@@ -288,7 +290,7 @@ class GroupContextGuard(_GroupContextAttrs):
     def abort_if_no_match(
         self,
         click_context: click.Context,
-        matches: 'Collection[str]'
+        matches: Collection[str]
     ) -> None:
 
         if self.matches_required and not matches:
@@ -302,7 +304,7 @@ class GroupContextGuard(_GroupContextAttrs):
     def abort_if_not_singular(
         self,
         click_context: click.Context,
-        matches: 'Collection[str]'
+        matches: Collection[str]
     ) -> None:
 
         if self.singular and len(matches) > 1:
@@ -316,7 +318,7 @@ class GroupContextGuard(_GroupContextAttrs):
     def abort_if_no_create_path(
         self,
         click_context: click.Context,
-        matches: 'Collection[str]'
+        matches: Collection[str]
     ) -> None:
 
         if self.creates_path:
@@ -390,7 +392,7 @@ class GroupContext(GroupContextGuard):
             self.singular = singular
             self.matches_required = matches_required
 
-    def available_schemas(self, appcfg: 'ApplicationConfig') -> list[str]:
+    def available_schemas(self, appcfg: ApplicationConfig) -> list[str]:
         """ Returns all available schemas, if the application is database
         bound.
 
@@ -425,7 +427,7 @@ class GroupContext(GroupContextGuard):
 
         return None
 
-    def match_to_appcfg(self, match: str) -> 'ApplicationConfig | None':
+    def match_to_appcfg(self, match: str) -> ApplicationConfig | None:
         """ Takes the given match and returns the maching appcfg object. """
 
         namespace, _id = self.split_match(match)
@@ -437,7 +439,7 @@ class GroupContext(GroupContextGuard):
         return None
 
     @property
-    def appcfgs(self) -> 'Iterator[ApplicationConfig]':
+    def appcfgs(self) -> Iterator[ApplicationConfig]:
         """ Returns the matching appconfigs.
 
         Since there's only one appconfig per namespace, we ignore the path
@@ -470,7 +472,7 @@ class GroupContext(GroupContextGuard):
         return sorted(selectors)
 
     @property
-    def all_wildcard_selectors(self) -> 'Iterator[str]':
+    def all_wildcard_selectors(self) -> Iterator[str]:
         """ Returns all selectors targeting a namespace by wildcard. """
 
         for appcfg in self.config.applications:
@@ -478,7 +480,7 @@ class GroupContext(GroupContextGuard):
                 yield '/' + appcfg.namespace + '/*'
 
     @property
-    def all_specific_selectors(self) -> 'Iterator[str]':
+    def all_specific_selectors(self) -> Iterator[str]:
         """ Returns all selectors targeting an application directly. """
 
         for appcfg in self.config.applications:
@@ -489,7 +491,7 @@ class GroupContext(GroupContextGuard):
                     yield '/' + schema.replace('-', '/')
 
     @property
-    def matches(self) -> 'Iterator[str]':
+    def matches(self) -> Iterator[str]:
         """ Returns the specific selectors matching the context selector.
 
         That is, a combination of namespace / application id is returned.
@@ -513,7 +515,7 @@ class GroupContext(GroupContextGuard):
 
 def get_context_specific_settings(
     context: click.Context
-) -> 'ContextSpecificSettings':
+) -> ContextSpecificSettings:
     """ Takes the given *click* context and extracts all context specific
     settings from it.
 
@@ -549,7 +551,7 @@ pass_group_context = click.make_pass_decorator(GroupContext, ensure=True)
 
 def run_processors(
     group_context: GroupContext,
-    processors: 'Sequence[Callable[..., Any]]'
+    processors: Sequence[Callable[..., Any]]
 ) -> None:
     """ Runs a sequence of processors either in a raw context or
     in a fully running application within a server.
@@ -573,6 +575,7 @@ def run_processors(
     #       below.
     processor = processors[0]
 
+    CliApplication: type[Framework]  # noqa: N806
     for appcfg in group_context.appcfgs:
 
         class CliApplication(appcfg.application_class):  # type:ignore
@@ -596,7 +599,7 @@ def run_processors(
             pass
 
         @CliApplication.view(model=Model, permission=Public)
-        def run_command(self: Model, request: 'CoreRequest') -> None:
+        def run_command(self: Model, request: CoreRequest) -> None:
             # NOTE: This is kind of fragile, this depends on the loop
             #       variable 'processor' from the loop below, this works
             #       because Python will look up the variable at the time
@@ -608,7 +611,7 @@ def run_processors(
             return False
 
         @CliApplication.setting_section(section='roles')
-        def get_roles_setting() -> dict[str, set[type['Intent']]]:
+        def get_roles_setting() -> dict[str, set[type[Intent]]]:
             # override the security settings -> we need the public
             # role to work for anonymous users, even if the base
             # application disables that
@@ -634,7 +637,7 @@ def run_processors(
         configure_logging=False
     )
 
-    def expects_request(processor: 'Callable[..., Any]') -> bool:
+    def expects_request(processor: Callable[..., Any]) -> bool:
         return 'request' in processor.__code__.co_varnames
 
     # call the matching applications
@@ -699,7 +702,7 @@ def command_group() -> click.Group:
 
     @command_group.result_callback()
     def process_results(
-        processor: 'Callable[..., Any] | Sequence[Callable[..., Any]]',
+        processor: Callable[..., Any] | Sequence[Callable[..., Any]],
         select: str,
         config: str
     ) -> None:

@@ -138,7 +138,7 @@ def test_view_translator(client):
 
         translator_url = page.request.url
         assert 'Uncle' in page
-        assert 'Bob' in page
+        assert 'BOB' in page
         assert '<a href="mailto:test@test.com">test@test.com</a>' in page
         values = {
             dl.find('dt').text_content().strip():

@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 from onegov.core.security import Private
 from onegov.landsgemeinde import LandsgemeindeApp
 from onegov.landsgemeinde.models import PersonFunctionSuggestion
@@ -18,8 +20,8 @@ if TYPE_CHECKING:
 )
 def suggest_person_function(
     self: PersonFunctionSuggestion,
-    request: 'LandsgemeindeRequest'
-) -> 'JSON_ro':
+    request: LandsgemeindeRequest
+) -> JSON_ro:
     return self.query()
 
 
@@ -29,8 +31,8 @@ def suggest_person_function(
 )
 def suggest_person_name(
     self: PersonNameSuggestion,
-    request: 'LandsgemeindeRequest'
-) -> 'JSON_ro':
+    request: LandsgemeindeRequest
+) -> JSON_ro:
     return self.query()
 
 
@@ -40,8 +42,8 @@ def suggest_person_name(
 )
 def suggest_person_place(
     self: PersonPlaceSuggestion,
-    request: 'LandsgemeindeRequest'
-) -> 'JSON_ro':
+    request: LandsgemeindeRequest
+) -> JSON_ro:
     return self.query()
 
 
@@ -51,6 +53,6 @@ def suggest_person_place(
 )
 def suggest_person_political_affiliation(
     self: PersonPoliticalAffiliationSuggestion,
-    request: 'LandsgemeindeRequest'
-) -> 'JSON_ro':
+    request: LandsgemeindeRequest
+) -> JSON_ro:
     return self.query()

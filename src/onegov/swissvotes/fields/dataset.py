@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 from dateutil.parser import parse
 from decimal import Decimal
 from onegov.form.fields import UploadField
@@ -77,7 +79,7 @@ class SwissvoteDatasetField(UploadField):
 
     def post_validate(
         self,
-        form: 'BaseForm',
+        form: BaseForm,
         validation_stopped: bool
     ) -> None:
         """ Make sure the given XLSX is valid (all expected columns are

@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 from uuid import uuid4
 
 from sqlalchemy import func, Index, Column, Text, Table, ForeignKey
@@ -67,12 +69,12 @@ class Language(Base):
         Index('unique_name', 'name', unique=True),
     )
 
-    id: 'Column[uuid.UUID]' = Column(
+    id: Column[uuid.UUID] = Column(
         UUID,  # type:ignore[arg-type]
         primary_key=True,
         default=uuid4
     )
-    name: 'Column[str]' = Column(Text, nullable=False)
+    name: Column[str] = Column(Text, nullable=False)
 
     @property
     def speakers_count(self) -> int:
@@ -114,22 +116,22 @@ class Language(Base):
             and self.monitors_count == 0
         )
 
-    mother_tongues: 'relationship[list[Translator]]' = relationship(
+    mother_tongues: relationship[list[Translator]] = relationship(
         'Translator',
         secondary=mother_tongue_association_table,
         back_populates='mother_tongues'
     )
-    speakers: 'relationship[list[Translator]]' = relationship(
+    speakers: relationship[list[Translator]] = relationship(
         'Translator',
         secondary=spoken_association_table,
         back_populates='spoken_languages'
     )
-    writers: 'relationship[list[Translator]]' = relationship(
+    writers: relationship[list[Translator]] = relationship(
         'Translator',
         secondary=written_association_table,
         back_populates='written_languages'
     )
-    monitors: 'relationship[list[Translator]]' = relationship(
+    monitors: relationship[list[Translator]] = relationship(
         'Translator',
         secondary=monitoring_association_table,
         back_populates='monitoring_languages'

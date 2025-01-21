@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 from onegov.activity import Attendee, AttendeeCollection
 from onegov.activity import BookingCollection
 from onegov.feriennet import FeriennetApp, _
@@ -16,7 +18,7 @@ if TYPE_CHECKING:
 
 
 @FeriennetApp.userlinks()
-def activity_links(request: 'FeriennetRequest', user: 'User') -> LinkGroup:
+def activity_links(request: FeriennetRequest, user: User) -> LinkGroup:
     activities: Query[tuple[str, str]] = (
         VacationActivityCollection(
             session=request.session,
@@ -44,7 +46,7 @@ def activity_links(request: 'FeriennetRequest', user: 'User') -> LinkGroup:
 
 
 @FeriennetApp.userlinks()
-def attendee_links(request: 'FeriennetRequest', user: 'User') -> LinkGroup:
+def attendee_links(request: FeriennetRequest, user: User) -> LinkGroup:
     attendees: Query[tuple[UUID, str]] = (
         AttendeeCollection(request.session).query()
         .filter_by(username=user.username)
@@ -66,7 +68,7 @@ def attendee_links(request: 'FeriennetRequest', user: 'User') -> LinkGroup:
 
 
 @FeriennetApp.userlinks()
-def booking_links(request: 'FeriennetRequest', user: 'User') -> LinkGroup:
+def booking_links(request: FeriennetRequest, user: User) -> LinkGroup:
     return LinkGroup(
         title=_('Bookings'),
         links=[
@@ -82,7 +84,7 @@ def booking_links(request: 'FeriennetRequest', user: 'User') -> LinkGroup:
 
 
 @FeriennetApp.userlinks()
-def billing_links(request: 'FeriennetRequest', user: 'User') -> LinkGroup:
+def billing_links(request: FeriennetRequest, user: User) -> LinkGroup:
     return LinkGroup(
         title=_('Billing'),
         links=[

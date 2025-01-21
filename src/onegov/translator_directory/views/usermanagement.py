@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 from onegov.core.security import Secret
 from onegov.org.views.usermanagement import get_manage_user_form
 from onegov.town6.views.usermanagement import town_handle_manage_user
@@ -23,8 +25,8 @@ if TYPE_CHECKING:
 )
 def view_usermanagement_custom(
     self: UserCollection,
-    request: 'TranslatorAppRequest'
-) -> 'RenderData':
+    request: TranslatorAppRequest
+) -> RenderData:
 
     roles = {
         'admin': _('Administrator'),
@@ -37,7 +39,7 @@ def view_usermanagement_custom(
 
 def get_manage_user_form_custom(
     self: User,
-    request: 'TranslatorAppRequest'
+    request: TranslatorAppRequest
 ) -> type[ManageUserFormCustom]:
     return get_manage_user_form(self, request, base=ManageUserFormCustom)
 
@@ -51,7 +53,7 @@ def get_manage_user_form_custom(
 )
 def handle_manage_user_custom(
     self: User,
-    request: 'TranslatorAppRequest',
+    request: TranslatorAppRequest,
     form: ManageUserFormCustom
-) -> 'RenderData | Response':
+) -> RenderData | Response:
     return town_handle_manage_user(self, request, form)

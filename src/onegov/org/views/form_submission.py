@@ -1,4 +1,5 @@
 """ Renders and handles defined forms, turning them into submissions. """
+from __future__ import annotations
 
 import morepath
 
@@ -32,9 +33,9 @@ if TYPE_CHECKING:
 
 
 def copy_query(
-    request: 'OrgRequest',
+    request: OrgRequest,
     url: str,
-    fields: 'Iterable[str]'
+    fields: Iterable[str]
 ) -> str:
 
     url_obj = URL(url)
@@ -53,9 +54,9 @@ def copy_query(
 
 
 def get_price(
-    request: 'OrgRequest',
-    form: 'Form',
-    submission: 'FormSubmission'
+    request: OrgRequest,
+    form: Form,
+    submission: FormSubmission
 ) -> Price | None:
 
     total = form.total()
@@ -79,9 +80,9 @@ def get_price(
              permission=Private, request_method='POST')
 def handle_pending_submission(
     self: PendingFormSubmission | CompleteFormSubmission,
-    request: 'OrgRequest',
+    request: OrgRequest,
     layout: FormSubmissionLayout | None = None
-) -> 'RenderData | Response':
+) -> RenderData | Response:
     """ Renders a pending submission, takes it's input and allows the
     user to turn the submission into a complete submission, once all data
     is valid.
@@ -208,8 +209,8 @@ def handle_pending_submission(
              permission=Private, request_method='POST')
 def handle_complete_submission(
     self: PendingFormSubmission | CompleteFormSubmission,
-    request: 'OrgRequest'
-) -> 'Response':
+    request: OrgRequest
+) -> Response:
 
     form = request.get_form(self.form_class)
     form.process(data=self.data)
@@ -348,8 +349,8 @@ def handle_complete_submission(
 @OrgApp.view(model=CompleteFormSubmission, name='ticket', permission=Private)
 def view_submission_ticket(
     self: CompleteFormSubmission,
-    request: 'OrgRequest'
-) -> 'Response':
+    request: OrgRequest
+) -> Response:
     ticket = TicketCollection(request.session).by_handler_id(self.id.hex)
     if not ticket:
         raise HTTPNotFound()
@@ -360,8 +361,8 @@ def view_submission_ticket(
              permission=Private, request_method='POST')
 def handle_accept_registration(
     self: CompleteFormSubmission,
-    request: 'OrgRequest'
-) -> 'Response | None':
+    request: OrgRequest
+) -> Response | None:
     return handle_submission_action(self, request, 'confirmed')
 
 
@@ -369,8 +370,8 @@ def handle_accept_registration(
              permission=Private, request_method='POST')
 def handle_deny_registration(
     self: CompleteFormSubmission,
-    request: 'OrgRequest'
-) -> 'Response | None':
+    request: OrgRequest
+) -> Response | None:
     return handle_submission_action(self, request, 'denied')
 
 
@@ -378,20 +379,20 @@ def handle_deny_registration(
              permission=Private, request_method='POST')
 def handle_cancel_registration(
     self: CompleteFormSubmission,
-    request: 'OrgRequest'
-) -> 'Response | None':
+    request: OrgRequest
+) -> Response | None:
     return handle_submission_action(self, request, 'cancelled')
 
 
 def handle_submission_action(
     self: CompleteFormSubmission,
-    request: 'OrgRequest',
+    request: OrgRequest,
     action: Literal['confirmed', 'denied', 'cancelled'],
     ignore_csrf: bool = False,
     raises: bool = False,
     no_messages: bool = False,
     force_email: bool = False
-) -> 'Response | None':
+) -> Response | None:
 
     if not ignore_csrf:
         request.assert_valid_csrf_token()
@@ -474,9 +475,9 @@ def handle_submission_action(
              permission=Public, request_method='POST')
 def handle_survey_submission(
     self: SurveySubmission,
-    request: 'OrgRequest',
+    request: OrgRequest,
     layout: SurveySubmissionLayout | None = None
-) -> 'RenderData | Response':
+) -> RenderData | Response:
     """ Renders a pending submission, takes it's input and allows the
     user to turn the submission into a complete submission, once all data
     is valid.

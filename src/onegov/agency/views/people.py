@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 from collections import OrderedDict
 from datetime import datetime, timedelta
 from itertools import groupby
@@ -44,7 +46,7 @@ class FilterOption(NamedTuple):
 
 def get_person_form_class(
     model: object,
-    request: 'AgencyRequest'
+    request: AgencyRequest
 ) -> type[PersonForm]:
 
     if isinstance(model, ExtendedPerson):
@@ -59,8 +61,8 @@ def get_person_form_class(
 )
 def view_people(
     self: ExtendedPersonCollection,
-    request: 'AgencyRequest'
-) -> 'RenderData':
+    request: AgencyRequest
+) -> RenderData:
 
     request.include('common')
     request.include('chosen')
@@ -140,9 +142,9 @@ def view_people(
 )
 def create_people_xlsx(
     self: ExtendedPersonCollection,
-    request: 'AgencyRequest',
+    request: AgencyRequest,
     form: Form
-) -> 'RenderData | BaseResponse':
+) -> RenderData | BaseResponse:
 
     if form.submitted(request):
         request.app.people_xlsx = export_person_xlsx(
@@ -175,14 +177,14 @@ def create_people_xlsx(
 )
 def get_people_xlsx(
     self: ExtendedPersonCollection,
-    request: 'AgencyRequest'
+    request: AgencyRequest
 ) -> Response:
 
     if not request.app.people_xlsx_exists:
         return Response(status='503 Service Unavailable')
 
     @request.after
-    def cache_headers(response: 'BaseResponse') -> None:
+    def cache_headers(response: BaseResponse) -> None:
         last_modified = request.app.people_xlsx_modified
         if last_modified:
             max_age = 1 * 24 * 60 * 60
@@ -210,8 +212,8 @@ def get_people_xlsx(
 )
 def view_person(
     self: ExtendedPerson,
-    request: 'AgencyRequest'
-) -> 'RenderData':
+    request: AgencyRequest
+) -> RenderData:
 
     return {
         'title': self.title,
@@ -228,8 +230,8 @@ def view_person(
 )
 def view_sort_person(
     self: ExtendedPerson,
-    request: 'AgencyRequest'
-) -> 'RenderData':
+    request: AgencyRequest
+) -> RenderData:
 
     layout = ExtendedPersonLayout(self, request)
 
@@ -261,9 +263,9 @@ def view_sort_person(
 )
 def add_person(
     self: ExtendedPersonCollection,
-    request: 'AgencyRequest',
+    request: AgencyRequest,
     form: PersonForm
-) -> 'RenderData | BaseResponse':
+) -> RenderData | BaseResponse:
 
     if form.submitted(request):
         person = self.add(**form.get_useful_data())
@@ -292,9 +294,9 @@ def add_person(
 )
 def edit_person(
     self: ExtendedPerson,
-    request: 'AgencyRequest',
+    request: AgencyRequest,
     form: PersonForm
-) -> 'RenderData | BaseResponse':
+) -> RenderData | BaseResponse:
 
     if form.submitted(request):
         form.populate_obj(self)
@@ -323,7 +325,7 @@ def edit_person(
     permission=Private)
 def handle_delete_person(
     self: ExtendedPerson,
-    request: 'AgencyRequest'
+    request: AgencyRequest
 ) -> None:
 
     if not self.deletable(request):
@@ -334,9 +336,9 @@ def handle_delete_person(
 
 def do_report_person_change(
     self: ExtendedPerson,
-    request: 'AgencyRequest',
+    request: AgencyRequest,
     form: PersonMutationForm
-) -> 'Ticket':
+) -> Ticket:
 
     session = request.session
     with session.no_autoflush:
@@ -395,9 +397,9 @@ def do_report_person_change(
 )
 def report_person_change(
     self: ExtendedPerson,
-    request: 'AgencyRequest',
+    request: AgencyRequest,
     form: PersonMutationForm
-) -> 'RenderData | BaseResponse':
+) -> RenderData | BaseResponse:
 
     if form.submitted(request):
         ticket = do_report_person_change(self, request, form)

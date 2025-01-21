@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 from datetime import date
 from datetime import datetime
 from markupsafe import Markup
@@ -40,7 +42,7 @@ class NoticeForm(Form):
 
     """
 
-    request: 'GazetteRequest'
+    request: GazetteRequest
 
     title = StringField(
         label=_('Title (maximum 60 characters)'),
@@ -196,7 +198,7 @@ class NoticeForm(Form):
         if not self.request.is_private(self.model):
             self.delete_field('print_only')
 
-    def update_model(self, model: 'GazetteNotice') -> None:
+    def update_model(self, model: GazetteNotice) -> None:
         assert self.title.data is not None
         model.title = self.title.data
         model.organization_id = self.organization.data
@@ -215,7 +217,7 @@ class NoticeForm(Form):
             model.user.phone_number = self.phone_number.formatted_data
         model.apply_meta(self.request.session)
 
-    def apply_model(self, model: 'GazetteNotice') -> None:
+    def apply_model(self, model: GazetteNotice) -> None:
         self.title.data = model.title
         self.organization.data = model.organization_id
         self.category.data = model.category_id
@@ -292,7 +294,7 @@ class UnrestrictedNoticeForm(NoticeForm):
         self.issues.validators = []
         self.issues.render_kw['disabled'] = True
 
-    def update_model(self, model: 'GazetteNotice') -> None:
+    def update_model(self, model: GazetteNotice) -> None:
         assert self.title.data is not None
         model.title = self.title.data
         model.organization_id = self.organization.data
@@ -311,6 +313,6 @@ class UnrestrictedNoticeForm(NoticeForm):
             model.user.phone_number = self.phone_number.formatted_data
         model.apply_meta(self.request.session)
 
-    def apply_model(self, model: 'GazetteNotice') -> None:
+    def apply_model(self, model: GazetteNotice) -> None:
         super().apply_model(model)
         self.note.data = model.note

@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 from morepath import redirect
 from onegov.core.security import Private
 from onegov.gazette import _
@@ -23,8 +25,8 @@ if TYPE_CHECKING:
 )
 def view_groups(
     self: UserGroupCollection[UserGroup],
-    request: 'GazetteRequest'
-) -> 'RenderData':
+    request: GazetteRequest
+) -> RenderData:
     """ View all the user groups.
 
     This view is only visible by an admin.
@@ -49,9 +51,9 @@ def view_groups(
 )
 def create_group(
     self: UserGroupCollection[UserGroup],
-    request: 'GazetteRequest',
+    request: GazetteRequest,
     form: UserGroupForm
-) -> 'RenderData | Response':
+) -> RenderData | Response:
     """ Create a new user group.
 
     This view is only visible by an admin.
@@ -82,9 +84,9 @@ def create_group(
 )
 def edit_group(
     self: UserGroup,
-    request: 'GazetteRequest',
+    request: GazetteRequest,
     form: UserGroupForm
-) -> 'RenderData | Response':
+) -> RenderData | Response:
     """ Edit a user group.
 
     This view is only visible by an admin.
@@ -119,9 +121,9 @@ def edit_group(
 )
 def delete_group(
     self: UserGroup,
-    request: 'GazetteRequest',
+    request: GazetteRequest,
     form: EmptyForm
-) -> 'RenderData | Response':
+) -> RenderData | Response:
     """ Delete a user group.
 
     This view is only visible by an admin.

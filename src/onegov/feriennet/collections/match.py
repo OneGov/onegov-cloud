@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 from onegov.activity import Booking, Attendee, Occasion
 from onegov.core.utils import toggle
 from onegov.core.orm import as_selectable_from_path
@@ -19,7 +21,7 @@ if TYPE_CHECKING:
     from uuid import UUID
 
     class OccasionByStateRow(NamedTuple):
-        state: 'OccasionState | None'
+        state: OccasionState | None
         occasion_id: UUID
         title: str
         start: datetime
@@ -33,7 +35,7 @@ if TYPE_CHECKING:
         total_bookings: int
         period_id: UUID
 
-OccasionState: 'TypeAlias' = Literal[
+OccasionState: TypeAlias = Literal[
     'cancelled',
     'overfull',
     'empty',
@@ -47,22 +49,22 @@ class MatchCollection:
 
     def __init__(
         self,
-        session: 'Session',
-        period: 'Period | PeriodMeta',
-        states: 'Collection[OccasionState] | None' = None
+        session: Session,
+        period: Period | PeriodMeta,
+        states: Collection[OccasionState] | None = None
     ) -> None:
         self.session = session
         self.period = period
         self.states = set(states) if states else set()
 
     @property
-    def period_id(self) -> 'UUID':
+    def period_id(self) -> UUID:
         return self.period.id
 
-    def for_period(self, period: 'Period | PeriodMeta') -> 'Self':
+    def for_period(self, period: Period | PeriodMeta) -> Self:
         return self.__class__(self.session, period)
 
-    def for_filter(self, state: OccasionState | None = None) -> 'Self':
+    def for_filter(self, state: OccasionState | None = None) -> Self:
         toggled = toggle(self.states, state)
         return self.__class__(self.session, self.period, toggled)
 
@@ -81,7 +83,7 @@ class MatchCollection:
             return 0
 
     @property
-    def occasions_by_state(self) -> 'Alias':
+    def occasions_by_state(self) -> Alias:
         return as_selectable_from_path(
             module_path('onegov.feriennet', 'queries/occasions_by_state.sql'))
 
@@ -108,14 +110,14 @@ class MatchCollection:
 
         return sum(bits) / len(bits)
 
-    def include_in_output(self, occasion: 'OccasionByStateRow') -> bool:
+    def include_in_output(self, occasion: OccasionByStateRow) -> bool:
         if not self.states:
             return True
 
         return occasion.state in self.states
 
     @property
-    def occasions(self) -> 'Query[OccasionByStateRow]':
+    def occasions(self) -> Query[OccasionByStateRow]:
         columns = self.occasions_by_state.c
         query = select(columns)
 

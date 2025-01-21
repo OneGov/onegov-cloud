@@ -7,6 +7,7 @@ Usage::
     qp = PostmarkQueueProcessor(token, maildir, maildir, ..., limit=x)
     qp.send_messages()
 """
+from __future__ import annotations
 
 import json
 import pycurl

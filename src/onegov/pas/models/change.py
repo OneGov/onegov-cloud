@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 from datetime import date
 from onegov.core.orm import Base
 from onegov.core.orm.mixins import content_property
@@ -28,7 +30,7 @@ if TYPE_CHECKING:
         'delete'
     ]
 
-ACTIONS: list['Action'] = [
+ACTIONS: list[Action] = [
     'add',
     'edit',
     'delete',
@@ -40,20 +42,20 @@ class Change(Base, ContentMixin, TimestampMixin):
     __tablename__ = 'pas_changes'
 
     #: Internal ID
-    id: 'Column[uuid.UUID]' = Column(
+    id: Column[uuid.UUID] = Column(
         UUID,  # type:ignore[arg-type]
         primary_key=True,
         default=uuid4
     )
 
     #: The user id responsible for the change
-    user_id: 'Column[str | None]' = Column(
+    user_id: Column[str | None] = Column(
         String,
         nullable=True
     )
 
     #: The user name responsible for the change
-    user_name: 'Column[str | None]' = Column(
+    user_name: Column[str | None] = Column(
         String,
         nullable=True
     )
@@ -69,7 +71,7 @@ class Change(Base, ContentMixin, TimestampMixin):
         return self.user_name or self.user_id
 
     #: The type of change
-    action: 'Column[Action]' = Column(
+    action: Column[Action] = Column(
         Enum(
             *ACTIONS,  # type:ignore[arg-type]
             name='pas_actions'
@@ -88,13 +90,13 @@ class Change(Base, ContentMixin, TimestampMixin):
         raise NotImplementedError()
 
     #: The model behind this change
-    model: 'Column[str]' = Column(
+    model: Column[str] = Column(
         String,
         nullable=False
     )
 
     @property
-    def attendence(self) -> 'Attendence | None':
+    def attendence(self) -> Attendence | None:
         from onegov.pas.models import Attendence
         attendence_id = (self.changes or {}).get('id')
         if self.model == 'attendence' and attendence_id:
@@ -104,7 +106,7 @@ class Change(Base, ContentMixin, TimestampMixin):
         return None
 
     #: The changes
-    changes: 'dict_property[dict[str, str | int | None] | None]'
+    changes: dict_property[dict[str, str | int | None] | None]
     changes = content_property()
 
     @property
@@ -116,7 +118,7 @@ class Change(Base, ContentMixin, TimestampMixin):
         return None
 
     @property
-    def parliamentarian(self) -> 'Parliamentarian | None':
+    def parliamentarian(self) -> Parliamentarian | None:
         from onegov.pas.models import Parliamentarian
         parliamentarian_id = (self.changes or {}).get('parliamentarian_id')
         if self.model == 'attendence' and parliamentarian_id:
@@ -128,7 +130,7 @@ class Change(Base, ContentMixin, TimestampMixin):
         return None
 
     @property
-    def commission(self) -> 'Commission | None':
+    def commission(self) -> Commission | None:
         from onegov.pas.models import Commission
         commission_id = (self.changes or {}).get('commission_id')
         if self.model == 'attendence' and commission_id:
@@ -140,10 +142,10 @@ class Change(Base, ContentMixin, TimestampMixin):
     @classmethod
     def add(
         cls,
-        request: 'TownRequest',
-        action: 'Action',
-        attendence: 'Attendence'
-    ) -> 'Change':
+        request: TownRequest,
+        action: Action,
+        attendence: Attendence
+    ) -> Change:
         """ Create a new change and add it to the session. """
 
         change = cls()

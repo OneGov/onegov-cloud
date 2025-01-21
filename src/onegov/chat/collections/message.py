@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 from onegov.chat.models import Message
 from onegov.core.collection import GenericCollection
 from sqlalchemy import desc
@@ -17,8 +19,8 @@ class MessageCollection(GenericCollection[_M]):
 
     @overload
     def __init__(
-        self: 'MessageCollection[Message]',
-        session: 'Session',
+        self: MessageCollection[Message],
+        session: Session,
         type: tuple[str, ...] | Literal['*'] | None = ...,
         channel_id: str = '*',
         newer_than: str | None = None,
@@ -30,7 +32,7 @@ class MessageCollection(GenericCollection[_M]):
     @overload
     def __init__(
         self,
-        session: 'Session',
+        session: Session,
         type: str,
         channel_id: str = '*',
         newer_than: str | None = None,
@@ -41,7 +43,7 @@ class MessageCollection(GenericCollection[_M]):
 
     def __init__(
         self,
-        session: 'Session',
+        session: Session,
         type: str | tuple[str, ...] | None = '*',
         channel_id: str = '*',
         newer_than: str | None = None,
@@ -74,9 +76,9 @@ class MessageCollection(GenericCollection[_M]):
         type: str | None = None,
         meta: dict[str, Any] = ...,
         text: str | None = None,
-        created: 'datetime' = ...,
-        updated: 'datetime | None' = ...,
-        file: 'MessageFile | None' = None,
+        created: datetime = ...,
+        updated: datetime | None = ...,
+        file: MessageFile | None = None,
         **kwargs: Any
     ) -> _M: ...
 
@@ -104,7 +106,7 @@ class MessageCollection(GenericCollection[_M]):
 
         return super().add(type=_type, **kwargs)
 
-    def query(self) -> 'Query[_M]':
+    def query(self) -> Query[_M]:
         """ Queries the messages with the given parameters. """
 
         q = self.session.query(self.model_class)

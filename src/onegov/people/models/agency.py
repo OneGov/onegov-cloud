@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 from onegov.core.crypto import random_token
 from onegov.core.orm.abstract import AdjacencyList
 from onegov.core.orm.abstract import associated
@@ -53,7 +55,7 @@ class Agency(AdjacencyList, ContentMixin, TimestampMixin, ORMSearchable,
     #: subclasses of this class. See
     #: `<https://docs.sqlalchemy.org/en/improve_toc/\
     #: orm/extensions/declarative/inheritance.html>`_.
-    type: 'Column[str]' = Column(
+    type: Column[str] = Column(
         Text,
         nullable=False,
         default=lambda: 'generic'
@@ -72,42 +74,42 @@ class Agency(AdjacencyList, ContentMixin, TimestampMixin, ORMSearchable,
     }
 
     #: a short description of the agency
-    description: 'Column[str | None]' = Column(Text, nullable=True)
+    description: Column[str | None] = Column(Text, nullable=True)
 
     #: describes the agency
-    portrait: 'Column[Markup | None]' = Column(MarkupText, nullable=True)
+    portrait: Column[Markup | None] = Column(MarkupText, nullable=True)
 
     #: location address (street name and number) of agency
-    location_address: 'Column[str | None]' = Column(Text, nullable=True)
+    location_address: Column[str | None] = Column(Text, nullable=True)
 
     #: location code and city of agency
-    location_code_city: 'Column[str | None]' = Column(Text, nullable=True)
+    location_code_city: Column[str | None] = Column(Text, nullable=True)
 
     #: postal address (street name and number) of agency
-    postal_address: 'Column[str | None]' = Column(Text, nullable=True)
+    postal_address: Column[str | None] = Column(Text, nullable=True)
 
     #: postal code and city of agency
-    postal_code_city: 'Column[str | None]' = Column(Text, nullable=True)
+    postal_code_city: Column[str | None] = Column(Text, nullable=True)
 
     #: the phone number of agency
-    phone: 'Column[str | None]' = Column(Text, nullable=True)
+    phone: Column[str | None] = Column(Text, nullable=True)
 
     #: the direct phone number of agency
-    phone_direct: 'Column[str | None]' = Column(Text, nullable=True)
+    phone_direct: Column[str | None] = Column(Text, nullable=True)
 
     #: the email of agency
-    email: 'Column[str | None]' = Column(Text, nullable=True)
+    email: Column[str | None] = Column(Text, nullable=True)
 
     #: the website related to agency
-    website: 'Column[str | None]' = Column(Text, nullable=True)
+    website: Column[str | None] = Column(Text, nullable=True)
 
     #: opening hours of agency
-    opening_hours: 'Column[str | None]' = Column(Text, nullable=True)
+    opening_hours: Column[str | None] = Column(Text, nullable=True)
 
     #: a reference to the organization chart
     organigram = associated(AgencyOrganigram, 'organigram', 'one-to-one')
 
-    memberships: 'relationship[AppenderQuery[AgencyMembership]]'
+    memberships: relationship[AppenderQuery[AgencyMembership]]
     memberships = relationship(
         AgencyMembership,
         back_populates='agency',
@@ -118,16 +120,16 @@ class Agency(AdjacencyList, ContentMixin, TimestampMixin, ORMSearchable,
 
     if TYPE_CHECKING:
         # override the attributes from AdjacencyList
-        parent: relationship['Agency | None']
-        children: relationship[list['Agency']]
+        parent: relationship[Agency | None]
+        children: relationship[list[Agency]]
 
         @property
-        def root(self) -> 'Agency': ...
+        def root(self) -> Agency: ...
         @property
-        def ancestors(self) -> 'Iterator[Agency]': ...
+        def ancestors(self) -> Iterator[Agency]: ...
 
     @property
-    def organigram_file(self) -> 'StoredFile | None':
+    def organigram_file(self) -> StoredFile | None:
         """ Returns the file-like content of the organigram. """
 
         try:
@@ -156,7 +158,7 @@ class Agency(AdjacencyList, ContentMixin, TimestampMixin, ORMSearchable,
 
     def add_person(
         self,
-        person_id: 'UUID',
+        person_id: UUID,
         title: str,
         *,
         order_within_agency: int = 2 ** 16,
@@ -197,14 +199,14 @@ class Agency(AdjacencyList, ContentMixin, TimestampMixin, ORMSearchable,
 
     def sort_children(
         self,
-        sortkey: 'AgencySortKey | None' = None
+        sortkey: AgencySortKey | None = None
     ) -> None:
         """ Sorts the suborganizations.
 
         Sorts by the agency title by default.
         """
         if sortkey is None:
-            def sortkey(agency: 'Agency') -> str:
+            def sortkey(agency: Agency) -> str:
                 return normalize_for_url(agency.title)
 
         children = sorted(self.children, key=sortkey)
@@ -213,7 +215,7 @@ class Agency(AdjacencyList, ContentMixin, TimestampMixin, ORMSearchable,
 
     def sort_relationships(
         self,
-        sortkey: 'AgencyMembershipSortKey | None' = None
+        sortkey: AgencyMembershipSortKey | None = None
     ) -> None:
         """ Sorts the relationships.
 

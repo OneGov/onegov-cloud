@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 from decimal import Decimal
 from onegov.election_day import _
 from operator import itemgetter
@@ -17,7 +19,7 @@ if TYPE_CHECKING:
 
 
 def get_party_results(
-    item: 'Election | ElectionCompound | ElectionCompoundPart',
+    item: Election | ElectionCompound | ElectionCompoundPart,
     json_serializable: bool = False
 ) -> tuple[list[str], dict[str, Any]]:
 
@@ -86,8 +88,8 @@ def get_party_results(
 
 
 def get_party_results_deltas(
-    item: 'Election | ElectionCompound | ElectionCompoundPart',
-    years: 'Sequence[str]',
+    item: Election | ElectionCompound | ElectionCompoundPart,
+    years: Sequence[str],
     parties: dict[str, Any]
 ) -> tuple[bool, dict[str, list[list[str]]]]:
 
@@ -135,9 +137,9 @@ def get_party_results_deltas(
 
 
 def get_party_results_data(
-    item: 'Election | ElectionCompound | ElectionCompoundPart',
+    item: Election | ElectionCompound | ElectionCompoundPart,
     horizontal: bool
-) -> 'JSONObject_ro':
+) -> JSONObject_ro:
     """ Retuns the data used for the diagrams showing the party results. """
     if horizontal:
         return get_party_results_horizontal_data(item)
@@ -145,8 +147,8 @@ def get_party_results_data(
 
 
 def get_party_results_horizontal_data(
-    item: 'Election | ElectionCompound | ElectionCompoundPart'
-) -> 'JSONObject_ro':
+    item: Election | ElectionCompound | ElectionCompoundPart
+) -> JSONObject_ro:
 
     """ Retuns the data used for the horitzonal bar diagram showing the party
     results.
@@ -210,8 +212,8 @@ def get_party_results_horizontal_data(
 
 
 def get_party_results_vertical_data(
-    item: 'Election | ElectionCompound | ElectionCompoundPart'
-) -> 'JSONObject_ro':
+    item: Election | ElectionCompound | ElectionCompoundPart
+) -> JSONObject_ro:
 
     """ Retuns the data used for the grouped bar diagram showing the party
     results.
@@ -269,7 +271,7 @@ def get_party_results_vertical_data(
 
 
 def get_party_results_seat_allocation(
-    years: 'Sequence[str]',
+    years: Sequence[str],
     parties: dict[str, Any]
 ) -> list[list[Any]]:
 
@@ -298,9 +300,9 @@ def get_party_results_seat_allocation(
 
 
 def get_parties_panachage_data(
-    item: 'Election | ElectionCompound | ElectionCompoundPart',
-    request: 'ElectionDayRequest | None' = None
-) -> 'JSONObject_ro':
+    item: Election | ElectionCompound | ElectionCompoundPart,
+    request: ElectionDayRequest | None = None
+) -> JSONObject_ro:
     """" Get the panachage data as JSON. Used to for the panachage sankey
     chart.
 

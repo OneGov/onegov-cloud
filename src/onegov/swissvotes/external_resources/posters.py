@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 import lxml.etree
 import requests
 from onegov.swissvotes import log
@@ -35,10 +37,10 @@ class Posters:
 
     def _fetch(
         self,
-        bfs_number: 'Decimal',
+        bfs_number: Decimal,
         poster_urls: str | None,
         image_urls: dict[str, Any]
-    ) -> tuple[dict[str, str], int, int, int, set[tuple['Decimal', str]]]:
+    ) -> tuple[dict[str, str], int, int, int, set[tuple[Decimal, str]]]:
 
         result: dict[str, str] = {}
         added = 0
@@ -87,8 +89,8 @@ class Posters:
 
     def fetch(
         self,
-        session: 'Session'
-    ) -> tuple[int, int, int, set[tuple['Decimal', str]]]:
+        session: Session
+    ) -> tuple[int, int, int, set[tuple[Decimal, str]]]:
         """
 
         Returns a dictionary with changed image urls as compared to the

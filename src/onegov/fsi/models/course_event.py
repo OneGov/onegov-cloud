@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 import datetime
 import pytz
 
@@ -44,7 +46,7 @@ if TYPE_CHECKING:
     ]
 
 
-COURSE_EVENT_STATUSES: tuple['EventStatusType', ...] = (
+COURSE_EVENT_STATUSES: tuple[EventStatusType, ...] = (
     'created', 'confirmed', 'canceled', 'planned')
 COURSE_EVENT_STATUSES_TRANSLATIONS = (
     _('Created'), _('Confirmed'), _('Canceled'), _('Planned'))
@@ -52,30 +54,30 @@ COURSE_EVENT_STATUSES_TRANSLATIONS = (
 
 @overload
 def course_status_choices(
-    request: 'FsiRequest | None' = None,
+    request: FsiRequest | None = None,
     as_dict: Literal[False] = False
-) -> list['_Choice']: ...
+) -> list[_Choice]: ...
 
 
 @overload
 def course_status_choices(
-    request: 'FsiRequest | None',
+    request: FsiRequest | None,
     as_dict: Literal[True]
 ) -> list[dict[str, str]]: ...
 
 
 @overload
 def course_status_choices(
-    request: 'FsiRequest | None' = None,
+    request: FsiRequest | None = None,
     *,
     as_dict: Literal[True]
 ) -> list[dict[str, str]]: ...
 
 
 def course_status_choices(
-    request: 'FsiRequest | None' = None,
+    request: FsiRequest | None = None,
     as_dict: bool = False
-) -> list['_Choice'] | list[dict[str, str]]:
+) -> list[_Choice] | list[dict[str, str]]:
 
     if request:
         translations: Iterable[str] = (
@@ -104,18 +106,18 @@ class CourseEvent(Base, TimestampMixin, ORMSearchable):
         'presenter_email': {'type': 'text'},
     }
 
-    id: 'Column[uuid.UUID]' = Column(
+    id: Column[uuid.UUID] = Column(
         UUID,  # type:ignore[arg-type]
         primary_key=True,
         default=uuid4
     )
 
-    course_id: 'Column[uuid.UUID]' = Column(
+    course_id: Column[uuid.UUID] = Column(
         UUID,  # type:ignore[arg-type]
         ForeignKey('fsi_courses.id'),
         nullable=False
     )
-    course: 'relationship[Course]' = relationship(
+    course: relationship[Course] = relationship(
         'Course',
         back_populates='events',
         lazy='joined'
@@ -142,7 +144,7 @@ class CourseEvent(Base, TimestampMixin, ORMSearchable):
         )
 
     @property
-    def description(self) -> 'Markup':
+    def description(self) -> Markup:
         return self.course.description
 
     def __str__(self) -> str:
@@ -159,26 +161,26 @@ class CourseEvent(Base, TimestampMixin, ORMSearchable):
         return to_timezone(self.end, 'Europe/Zurich')
 
     # Event specific information
-    location: 'Column[str]' = Column(Text, nullable=False)
-    start: 'Column[datetime.datetime]' = Column(UTCDateTime, nullable=False)
-    end: 'Column[datetime.datetime]' = Column(UTCDateTime, nullable=False)
-    presenter_name: 'Column[str]' = Column(Text, nullable=False)
-    presenter_company: 'Column[str]' = Column(Text, nullable=False)
-    presenter_email: 'Column[str | None]' = Column(Text)
-    min_attendees: 'Column[int]' = Column(
+    location: Column[str] = Column(Text, nullable=False)
+    start: Column[datetime.datetime] = Column(UTCDateTime, nullable=False)
+    end: Column[datetime.datetime] = Column(UTCDateTime, nullable=False)
+    presenter_name: Column[str] = Column(Text, nullable=False)
+    presenter_company: Column[str] = Column(Text, nullable=False)
+    presenter_email: Column[str | None] = Column(Text)
+    min_attendees: Column[int] = Column(
         SmallInteger,
         nullable=False,
         default=1
     )
-    max_attendees: 'Column[int | None]' = Column(SmallInteger, nullable=True)
+    max_attendees: Column[int | None] = Column(SmallInteger, nullable=True)
 
-    status: 'Column[EventStatusType]' = Column(
+    status: Column[EventStatusType] = Column(
         Enum(  # type:ignore[arg-type]
             *COURSE_EVENT_STATUSES, name='status'
         ),
         nullable=False, default='created')
 
-    attendees: 'relationship[AppenderQuery[CourseAttendee]]' = relationship(
+    attendees: relationship[AppenderQuery[CourseAttendee]] = relationship(
         CourseAttendee,
         secondary=subscription_table,
         primaryjoin=id == subscription_table.c.course_event_id,
@@ -186,7 +188,7 @@ class CourseEvent(Base, TimestampMixin, ORMSearchable):
         lazy='dynamic'
     )
 
-    subscriptions: 'relationship[AppenderQuery[CourseSubscription]]'
+    subscriptions: relationship[AppenderQuery[CourseSubscription]]
     subscriptions = relationship(
         'CourseSubscription',
         back_populates='course_event',
@@ -194,7 +196,7 @@ class CourseEvent(Base, TimestampMixin, ORMSearchable):
         cascade='all, delete-orphan',
     )
 
-    notification_templates: 'relationship[list[CourseNotificationTemplate]]'
+    notification_templates: relationship[list[CourseNotificationTemplate]]
     notification_templates = relationship(
         'CourseNotificationTemplate',
         back_populates='course_event',
@@ -203,17 +205,17 @@ class CourseEvent(Base, TimestampMixin, ORMSearchable):
 
     # The associated notification templates
     # FIXME: Are some of these optional?
-    info_template: 'relationship[InfoTemplate]' = relationship(
+    info_template: relationship[InfoTemplate] = relationship(
         'InfoTemplate', uselist=False)
-    reservation_template: 'relationship[SubscriptionTemplate]' = relationship(
+    reservation_template: relationship[SubscriptionTemplate] = relationship(
         'SubscriptionTemplate', uselist=False)
-    cancellation_template: 'relationship[CancellationTemplate]' = relationship(
+    cancellation_template: relationship[CancellationTemplate] = relationship(
         'CancellationTemplate', uselist=False)
-    reminder_template: 'relationship[ReminderTemplate]' = relationship(
+    reminder_template: relationship[ReminderTemplate] = relationship(
         'ReminderTemplate', uselist=False)
 
     # hides for members/editors
-    hidden_from_public: 'Column[bool]' = Column(
+    hidden_from_public: Column[bool] = Column(
         Boolean,
         nullable=False,
         default=False
@@ -221,19 +223,19 @@ class CourseEvent(Base, TimestampMixin, ORMSearchable):
 
     # to a locked event, only an admin can place subscriptions
     # FIXME: Is this intentionally nullable?
-    locked_for_subscriptions: 'Column[bool | None]' = Column(
+    locked_for_subscriptions: Column[bool | None] = Column(
         Boolean,
         default=False
     )
 
     # when before course start schedule reminder email
-    schedule_reminder_before: 'Column[datetime.timedelta]' = Column(
+    schedule_reminder_before: Column[datetime.timedelta] = Column(
         Interval,
         nullable=False,
         default=default_reminder_before)
 
     @property
-    def description_html(self) -> 'Markup':
+    def description_html(self) -> Markup:
         """
         Returns the portrait that is saved as HTML from the redactor js
         plugin.
@@ -306,10 +308,10 @@ class CourseEvent(Base, TimestampMixin, ORMSearchable):
         )
 
     @property
-    def duplicate(self) -> 'Self':
+    def duplicate(self) -> Self:
         return self.__class__(**self.duplicate_dict)
 
-    def has_reservation(self, attendee_id: 'uuid.UUID') -> bool:
+    def has_reservation(self, attendee_id: uuid.UUID) -> bool:
         return self.subscriptions.filter_by(
             attendee_id=attendee_id).first() is not None
 
@@ -319,7 +321,7 @@ class CourseEvent(Base, TimestampMixin, ORMSearchable):
         year: int | None = None,
         as_uids: Literal[True] = True,
         exclude_inactive: bool = True
-    ) -> 'Query[tuple[uuid.UUID]]': ...
+    ) -> Query[tuple[uuid.UUID]]: ...
 
     @overload
     def excluded_subscribers(
@@ -327,7 +329,7 @@ class CourseEvent(Base, TimestampMixin, ORMSearchable):
         year: int | None,
         as_uids: Literal[False],
         exclude_inactive: bool = True
-    ) -> 'Query[CourseAttendee]': ...
+    ) -> Query[CourseAttendee]: ...
 
     @overload
     def excluded_subscribers(
@@ -336,7 +338,7 @@ class CourseEvent(Base, TimestampMixin, ORMSearchable):
         *,
         as_uids: Literal[False],
         exclude_inactive: bool = True
-    ) -> 'Query[CourseAttendee]': ...
+    ) -> Query[CourseAttendee]: ...
 
     @overload
     def excluded_subscribers(
@@ -344,14 +346,14 @@ class CourseEvent(Base, TimestampMixin, ORMSearchable):
         year: int | None,
         as_uids: bool,
         exclude_inactive: bool = True
-    ) -> 'Query[tuple[uuid.UUID]] | Query[CourseAttendee]': ...
+    ) -> Query[tuple[uuid.UUID]] | Query[CourseAttendee]: ...
 
     def excluded_subscribers(
         self,
         year: int | None = None,
         as_uids: bool = True,
         exclude_inactive: bool = True
-    ) -> 'Query[tuple[uuid.UUID]] | Query[CourseAttendee]':
+    ) -> Query[tuple[uuid.UUID]] | Query[CourseAttendee]:
         """
         Returns a list of attendees / names tuple of UIDS
         of attendees that have booked one of the events of a course in
@@ -393,7 +395,7 @@ class CourseEvent(Base, TimestampMixin, ORMSearchable):
         as_uids: Literal[False] = False,
         exclude_inactive: bool = True,
         auth_attendee: CourseAttendee | None = None
-    ) -> 'Query[CourseAttendee]': ...
+    ) -> Query[CourseAttendee]: ...
 
     @overload
     def possible_subscribers(
@@ -403,7 +405,7 @@ class CourseEvent(Base, TimestampMixin, ORMSearchable):
         as_uids: Literal[True],
         exclude_inactive: bool = True,
         auth_attendee: CourseAttendee | None = None
-    ) -> 'Query[tuple[uuid.UUID]]': ...
+    ) -> Query[tuple[uuid.UUID]]: ...
 
     @overload
     def possible_subscribers(
@@ -414,7 +416,7 @@ class CourseEvent(Base, TimestampMixin, ORMSearchable):
         as_uids: Literal[True],
         exclude_inactive: bool = True,
         auth_attendee: CourseAttendee | None = None
-    ) -> 'Query[tuple[uuid.UUID]]': ...
+    ) -> Query[tuple[uuid.UUID]]: ...
 
     def possible_subscribers(
         self,
@@ -423,7 +425,7 @@ class CourseEvent(Base, TimestampMixin, ORMSearchable):
         as_uids: bool = False,
         exclude_inactive: bool = True,
         auth_attendee: CourseAttendee | None = None
-    ) -> 'Query[tuple[uuid.UUID]] | Query[CourseAttendee]':
+    ) -> Query[tuple[uuid.UUID]] | Query[CourseAttendee]:
         """Returns the list of possible bookers. Attendees that already have
         a subscription for the parent course in the same year are excluded."""
         session = object_session(self)
@@ -456,7 +458,7 @@ class CourseEvent(Base, TimestampMixin, ORMSearchable):
         return query
 
     @property
-    def email_recipients(self) -> 'Iterator[str]':
+    def email_recipients(self) -> Iterator[str]:
         return (att.email for att in self.attendees)
 
     def as_ical(self, event_url: str | None = None) -> bytes:
@@ -491,7 +493,7 @@ class CourseEvent(Base, TimestampMixin, ORMSearchable):
 
     def can_book(
         self,
-        attendee_or_id: 'CourseAttendee | uuid.UUID | str',
+        attendee_or_id: CourseAttendee | uuid.UUID | str,
         year: int | None = None
     ) -> bool:
 

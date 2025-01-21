@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 from onegov.core.security import Public
 from onegov.winterthur import WinterthurApp, _
 from onegov.winterthur.daycare import DaycareSubsidyCalculator
@@ -18,9 +20,9 @@ if TYPE_CHECKING:
     template='daycare.pt')
 def view_daycare_subsidy_calculator(
     self: DaycareSubsidyCalculator,
-    request: 'WinterthurRequest',
+    request: WinterthurRequest,
     form: DaycareSubsidyCalculatorForm
-) -> 'RenderData':
+) -> RenderData:
 
     calculation = None
     if form.submitted(request):

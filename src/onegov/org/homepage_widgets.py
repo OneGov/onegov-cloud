@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 from onegov.directory import DirectoryCollection
 from onegov.event import OccurrenceCollection
 from onegov.org import _, OrgApp
@@ -134,7 +136,7 @@ class DirectoriesWidget:
         </xsl:template>
     """
 
-    def get_variables(self, layout: 'DefaultLayout') -> 'RenderData':
+    def get_variables(self, layout: DefaultLayout) -> RenderData:
         directories: DirectoryCollection[ExtendedDirectory]
         directories = DirectoryCollection(
             layout.app.session(), type='extended')
@@ -178,7 +180,7 @@ class NewsWidget:
         </xsl:template>
     """
 
-    def get_variables(self, layout: 'DefaultLayout') -> 'RenderData':
+    def get_variables(self, layout: DefaultLayout) -> RenderData:
 
         root_pages = layout.root_pages
         if not root_pages:
@@ -214,7 +216,7 @@ class NewsWidget:
         )
 
         # limits the news, but doesn't count sticky news towards that limit
-        def limited(news: 'Iterable[News]', limit: int) -> 'Iterator[News]':
+        def limited(news: Iterable[News], limit: int) -> Iterator[News]:
             count = 0
 
             for item in news:
@@ -251,7 +253,7 @@ class EventsWidget:
         </xsl:template>
     """
 
-    def get_variables(self, layout: 'DefaultLayout') -> 'RenderData':
+    def get_variables(self, layout: DefaultLayout) -> RenderData:
         occurrences = OccurrenceCollection(layout.app.session()).query()
         occurrences = occurrences.limit(layout.org.event_limit_homepage)
 
@@ -299,15 +301,15 @@ class TilesWidget:
         </xsl:template>
     """
 
-    def get_variables(self, layout: 'DefaultLayout') -> 'RenderData':
+    def get_variables(self, layout: DefaultLayout) -> RenderData:
         return {'tiles': tuple(self.get_tiles(layout))}
 
     class Tile(NamedTuple):
         page: Link
-        links: 'Sequence[Link]'
+        links: Sequence[Link]
         number: int
 
-    def get_tiles(self, layout: 'DefaultLayout') -> 'Iterator[Tile]':
+    def get_tiles(self, layout: DefaultLayout) -> Iterator[Tile]:
 
         request = layout.request
         homepage_pages = request.homepage_pages
@@ -361,8 +363,8 @@ class SliderWidget:
 
     def get_images_from_sets(
         self,
-        layout: 'DefaultLayout'
-    ) -> 'Iterator[RenderData]':
+        layout: DefaultLayout
+    ) -> Iterator[RenderData]:
 
         session = layout.app.session()
 
@@ -393,7 +395,7 @@ class SliderWidget:
                 'src': layout.request.link(image)
             }
 
-    def get_variables(self, layout: 'DefaultLayout') -> 'RenderData':
+    def get_variables(self, layout: DefaultLayout) -> RenderData:
         # if we don't have an album used for images, we use the images
         # shown on the homepage anyway to avoid having to show nothing
         images = tuple(self.get_images_from_sets(layout))
