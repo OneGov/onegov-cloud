@@ -1,20 +1,15 @@
-<div metal:use-macro="layout.base" i18n:domain="onegov.town6" tal:define="header layout.org.theme_options.get('page-image-position', False) == 'header' and page.show_page_image and (page.page_image or layout.org.meta.get('standard_image', False))">
-    <tal:b metal:fill-slot="header-image" tal:condition="header">
-        <div tal:condition="header" class="page-image" style="background-image: url(${page.page_image if (page.show_page_image and page.page_image) else layout.org.meta.get('standard_image', None)}); background-size: cover; padding-bottom: 30%;"></div>
-    </tal:b>
-    <tal:b tal:condition="header" metal:fill-slot="hi-title">
-        <h1 class="main-title with-header-image">
-            ${title}
-        </h1>
-    </tal:b>
-    <tal:b tal:condition="not header" metal:fill-slot="title">
+<div metal:use-macro="layout.base" i18n:domain="onegov.town6">
+    <tal:b metal:fill-slot="title">
         ${title}
     </tal:b>
 
     <tal:b metal:fill-slot="content">
         <metal:hint use-macro="layout.macros['access_hint_long']" tal:define="item page"/>
-        <metal:hint use-macro="layout.macros['publication_hint_long']" tal:define="item page" />
+        <div class="small-12 cell page-content-main">
+            <span class="page-lead" tal:condition="lead" tal:content="lead"/>
 
-        <p>test</p>
+            <div class="page-text" tal:condition="text" tal:content="text"/>
+            <a title="Download Form" class="download-button" href="${request.link(pdf)}"><i class="fa fa-file-pdf"></i> <span i18n:translate="">Download ${pdf.name}</span></a>
+        </div>
     </tal:b>
 </div>

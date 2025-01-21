@@ -1,10 +1,15 @@
 from onegov.form import Form
-from onegov.form.fields import HtmlField, UploadField
+from onegov.form.fields import HtmlField, UploadFileWithORMSupport
+from onegov.form.models.document_form import DocumentFormFile
 from onegov.form.validators import FileSizeLimit, WhitelistedMimeType
 from onegov.org import _
 from wtforms.fields import StringField
 from wtforms.fields import TextAreaField
 from wtforms.validators import InputRequired
+
+from typing import Any, TYPE_CHECKING
+if TYPE_CHECKING:
+    from collections.abc import Collection
 
 
 class DocumentForm(Form):
@@ -15,22 +20,32 @@ class DocumentForm(Form):
 
     lead = TextAreaField(
         label=_('Lead'),
-        description=_('Describes briefly what this entry is about'),
+        description=_('Describes briefly what this form is about'),
         validators=[],
         render_kw={'rows': 4})
 
     text = HtmlField(
-        label=_('Main Text help'))
+        label=_('Detailed Explanation'),
+        description=_('Describes in detail how this form is to be used'))
 
-    form_pdf = UploadField(
+    pdf_form = UploadFileWithORMSupport(
         label=_('Form PDF'),
+        file_class=DocumentFormFile,
         validators=[
             WhitelistedMimeType({'application/pdf'}),
-            FileSizeLimit(100 * 1024 * 1024)
-        ],
-    )
+            FileSizeLimit(100 * 1024 * 1024),
+        ],)
 
     group = StringField(
         label=_('Group'),
-        description=_('Used to group this link in the overview')
-    )
+        description=_('Used to group this link in the overview'))
+
+    def get_useful_data(
+            self,
+        exclude: 'Collection[str] | None' = None
+    ) -> dict[str, Any]:
+
+        data = super().get_useful_data(exclude)
+        data['pdf_form'] = self.pdf_form.create()
+
+        return data

@@ -32,6 +32,7 @@ from onegov.org.layout import (
     FormSubmissionLayout as OrgFormSubmissionLayout,
     SurveySubmissionLayout as OrgSurveySubmissionLayout,
     SurveySubmissionWindowLayout as OrgSurveySubmissionWindowLayout,
+    FormDocumentLayout as OrgFormDocumentLayout,
     HomepageLayout as OrgHomepageLayout,
     ImageSetCollectionLayout as OrgImageSetCollectionLayout,
     ImageSetLayout as OrgImageSetLayout,
@@ -360,6 +361,12 @@ class SurveySubmissionLayout(
         if self.model.__class__.__name__ == 'SurveyDefinition':
             return 1
         return 2
+
+
+class FormDocumentLayout(OrgFormDocumentLayout, DefaultLayout):
+
+    app: 'TownApp'
+    request: 'TownRequest'
 
 
 class FormCollectionLayout(OrgFormCollectionLayout, DefaultLayout):

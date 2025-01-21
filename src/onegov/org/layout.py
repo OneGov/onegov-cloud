@@ -1259,7 +1259,7 @@ class FormCollectionLayout(DefaultLayout):
                                 self.document_forms,
                                 name='new'
                             ),
-                            attrs={'class': 'new-form'}
+                            attrs={'class': 'new-document-form'}
                         ),
                     ]
                 ),

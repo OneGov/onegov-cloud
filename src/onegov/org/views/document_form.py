@@ -21,6 +21,16 @@ if TYPE_CHECKING:
     FormDefinitionT = TypeVar('FormDefinitionT', bound=FormDefinition)
 
 
+def get_form_document_form(
+    model: FormDocument | FormDocumentCollection,
+    request: 'OrgRequest'
+) -> type[DocumentForm]:
+
+    if isinstance(model, FormDocumentCollection):
+        model = model.model_class()
+    return model.with_content_extensions(DocumentForm, request)
+
+
 @OrgApp.html(model=FormDocument, template='document_form_page.pt',
              permission=Public)
 def view_document_form_page(
@@ -34,14 +44,17 @@ def view_document_form_page(
     return {
         'layout': layout,
         'title': self.title,
-        'page': self
+        'page': self,
+        'lead': self.lead,
+        'text': self.text,
+        'pdf': self.pdf_form,
         }
 
 
 @OrgApp.form(
     model=FormDocumentCollection,
     name='new', template='form.pt',
-    permission=Private, form=DocumentForm
+    permission=Private, form=get_form_document_form
 )
 def handle_new_document_form_page(
     self: FormDocumentCollection,
@@ -76,13 +89,13 @@ def handle_new_document_form_page(
 @OrgApp.form(
     model=FormDocument,
     name='edit', template='form.pt',
-    permission=Private, form=DocumentForm
+    permission=Private, form=get_form_document_form
 )
 def handle_edit_document_form_page(
     self: FormDocument,
     request: 'OrgRequest',
     form: DocumentForm,
-    layout: FormDocumentLayout | None = None
+    layout: FormEditorLayout | None = None
 ) -> 'RenderData | Response':
 
     if form.submitted(request):
@@ -94,7 +107,7 @@ def handle_edit_document_form_page(
     elif not request.POST:
         form.process(obj=self)
 
-    layout = layout or FormDocumentLayout(self, request)
+    layout = layout or FormEditorLayout(self, request)
     layout.breadcrumbs = [
         Link(_('Homepage'), layout.homepage_url),
         Link(_('Forms'), request.class_link(FormCollection)),
@@ -108,3 +121,9 @@ def handle_edit_document_form_page(
         'title': _('Edit Document Form'),
         'form': form,
     }
+
+
+@OrgApp.view(model=FormDocument, permission=Private, request_method='DELETE')
+def delete_form_document(self: FormDocument, request: 'OrgRequest') -> None:
+    request.assert_valid_csrf_token()
+    request.session.delete(self)

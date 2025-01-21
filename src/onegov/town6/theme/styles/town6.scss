@@ -443,6 +443,25 @@ input[type="url"] {
         }
     }
 
+    *:first-child.fa:has(+ span) {
+        margin-right: .5rem;
+    }
+
+}
+
+.download-button {
+    border-radius: .7rem;
+    border: 1px solid  $primary-color;
+    padding: 1rem;
+    transition: background 200ms linear;
+
+    &:hover {
+        background: $white-smoke;
+    }
+
+    .fa {
+        margin-right: .5rem;
+    }
 }
 
 // like above, but no border, no hover effect

@@ -1,13 +1,16 @@
 from uuid import uuid4
 
+from onegov.chat.models.message import associated
 from onegov.core.collection import GenericCollection
 from onegov.core.orm import Base
 from onegov.core.orm.mixins import (
-    ContentMixin, TimestampMixin, dict_property, meta_property)
+    ContentMixin, TimestampMixin, content_property, dict_property)
 from onegov.core.orm.mixins.content import dict_markup_property
 from onegov.core.orm.types import UUID
+from onegov.core.utils import normalize_for_url
 from onegov.file import AssociatedFiles, File, SearchableFile
 from onegov.form import FormCollection
+from onegov.org.observer import observes
 from onegov.reservation import ResourceCollection
 from onegov.org.models import AccessExtension
 from onegov.search import SearchableContent
@@ -50,10 +53,14 @@ class FormDocument(Base, ContentMixin, TimestampMixin, AccessExtension,
     title: 'Column[str]' = Column(Text, nullable=False)
 
     #: Describes the document briefly
-    lead: 'dict_property[str | None]' = meta_property()
+    lead: 'dict_property[str | None]' = content_property()
 
     #: Describes the document in detail
     text = dict_markup_property('content')
+
+    pdf_form = associated(
+        DocumentFormFile, 'pdf', 'one-to-one', uselist=False,
+        backref_suffix='pdf')
 
     # The collection name this model should appear in
     member_of: 'Column[str | None]' = Column(Text, nullable=True)
@@ -62,6 +69,10 @@ class FormDocument(Base, ContentMixin, TimestampMixin, AccessExtension,
 
     #: The normalized title for sorting
     order: 'Column[str]' = Column(Text, nullable=False, index=True)
+
+    @observes('title')
+    def title_observer(self, title: str) -> None:
+        self.order = normalize_for_url(title)
 
     es_type_name = 'document_pages'
     es_id = 'title'
