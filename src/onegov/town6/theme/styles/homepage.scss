@@ -57,6 +57,18 @@
             position: absolute;
             text-shadow: 0 0 2em $black;
 
+            a {
+                color: $white;
+                font-size: 1.6rem;
+                text-shadow: none;
+                font-weight: bold;
+                padding: 1.5rem 2.5rem !important;
+
+                &:hover {
+                    padding: 1.5rem 3rem !important;
+                }
+            }
+
             span {
                 font-size: 3rem;
                 @media #{$small-only} {
