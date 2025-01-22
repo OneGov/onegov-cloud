@@ -1037,6 +1037,15 @@ msgstr "Immagini a grandezza naturale"
 msgid "Grid layout"
 msgstr "Disposizione a griglia"
 
+msgid "By filename"
+msgstr "Per nome del file"
+
+msgid "By caption"
+msgstr "Per didascalia"
+
+msgid "By last change"
+msgstr "Per data dell'ultima modifica"
+
 msgid "Show images on homepage"
 msgstr "Mostra le immagini sulla pagina principale"
 
@@ -2984,8 +2993,8 @@ msgstr "Il rifiuto di ${title} non può essere annullato."
 msgid "Reject reservation"
 msgstr "Rifiuta prenotazione"
 
-#. Used in sentence: "${event} published."
 #.
+#. Used in sentence: "${event} published."
 msgid "Event"
 msgstr "Evento"
 
