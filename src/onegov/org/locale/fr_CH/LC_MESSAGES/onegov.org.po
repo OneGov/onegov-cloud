@@ -2,7 +2,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE 1.0\n"
-"POT-Creation-Date: 2025-01-21 14:22+0100\n"
+"POT-Creation-Date: 2025-01-22 08:44+0100\n"
 "PO-Revision-Date: 2022-03-15 10:50+0100\n"
 "Last-Translator: Marc Sommerhalder <marc.sommerhalder@seantis.ch>\n"
 "Language-Team: French\n"
@@ -1035,6 +1035,9 @@ msgstr "Images de taille normale"
 msgid "Grid layout"
 msgstr "Mise en page en grille"
 
+msgid "Show images on homepage"
+msgstr "Montrer les images sur la page d'accueil"
+
 msgid "By filename"
 msgstr "Par nom de fichier"
 
@@ -1043,9 +1046,6 @@ msgstr "Par légende"
 
 msgid "By last change"
 msgstr "Par date de dernière modification"
-
-msgid "Show images on homepage"
-msgstr "Montrer les images sur la page d'accueil"
 
 msgid "Used in the overview and the e-mail subject"
 msgstr "Utilisé dans l'aperçu et le sujet de l'e-mail"
@@ -2977,8 +2977,8 @@ msgstr "Refuser ${title} est irréversible."
 msgid "Reject reservation"
 msgstr "Refuser la réservation"
 
-#.
 #. Used in sentence: "${event} published."
+#.
 msgid "Event"
 msgstr "Événement"
 
@@ -3318,6 +3318,9 @@ msgstr "Confirmer"
 msgid "There was an error while importing your directory!"
 msgstr "Une erreur est survenue lors de l'importation de votre dossier !"
 
+msgid "Download Form"
+msgstr "Télécharger le formulaire"
+
 msgid "Embed iFrame"
 msgstr "Intégrer l'iFrame"
 
@@ -3332,8 +3335,8 @@ msgid ""
 "filled-out form."
 msgstr ""
 "Veuillez vérifier vos données et appuyez sur « Compléter » pour finaliser le "
-"processus. S'il y a quelque chose que vous souhaitez modifier, cliquez sur "
-"« Modifier » pour retourner sur le formulaire complété."
+"processus. S'il y a quelque chose que vous souhaitez modifier, cliquez sur « "
+"Modifier » pour retourner sur le formulaire complété."
 
 msgid ""
 "The image shown in the list view is a square. To have your image shown fully "
@@ -4301,8 +4304,7 @@ msgid "There are currently ${count} recipients registered."
 msgstr "Il y a actuellement ${count} destinataires enregistrés."
 
 msgid "To update your subscription, please use this ${Link}"
-msgstr ""
-"Pour mettre à jour votre abonnement, veuillez utiliser ce ${Link}"
+msgstr "Pour mettre à jour votre abonnement, veuillez utiliser ce ${Link}"
 
 msgid "Archive"
 msgstr "Archiver"

@@ -2,7 +2,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: \n"
-"POT-Creation-Date: 2025-01-21 14:22+0100\n"
+"POT-Creation-Date: 2025-01-22 08:44+0100\n"
 "PO-Revision-Date: 2022-03-15 10:52+0100\n"
 "Last-Translator: \n"
 "Language-Team: \n"
@@ -1037,6 +1037,9 @@ msgstr "Immagini a grandezza naturale"
 msgid "Grid layout"
 msgstr "Disposizione a griglia"
 
+msgid "Show images on homepage"
+msgstr "Mostra le immagini sulla pagina principale"
+
 msgid "By filename"
 msgstr "Per nome del file"
 
@@ -1045,9 +1048,6 @@ msgstr "Per didascalia"
 
 msgid "By last change"
 msgstr "Per data dell'ultima modifica"
-
-msgid "Show images on homepage"
-msgstr "Mostra le immagini sulla pagina principale"
 
 msgid "Used in the overview and the e-mail subject"
 msgstr "Utilizzato nella panoramica e nell'oggetto dell'e-mail"
@@ -2984,8 +2984,8 @@ msgstr "Il rifiuto di ${title} non può essere annullato."
 msgid "Reject reservation"
 msgstr "Rifiuta prenotazione"
 
-#.
 #. Used in sentence: "${event} published."
+#.
 msgid "Event"
 msgstr "Evento"
 
@@ -3317,6 +3317,9 @@ msgstr "Conferma"
 
 msgid "There was an error while importing your directory!"
 msgstr "Si è verificato un errore durante l'importazione della cartella!"
+
+msgid "Download Form"
+msgstr "Scarica modulo"
 
 msgid "Embed iFrame"
 msgstr "Incorpora iFrame"

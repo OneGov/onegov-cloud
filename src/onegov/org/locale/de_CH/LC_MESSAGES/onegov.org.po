@@ -1,7 +1,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE 1.0\n"
-"POT-Creation-Date: 2025-01-21 14:22+0100\n"
+"POT-Creation-Date: 2025-01-22 08:44+0100\n"
 "PO-Revision-Date: 2022-03-15 10:21+0100\n"
 "Last-Translator: Marc Sommerhalder <marc.sommerhalder@seantis.ch>\n"
 "Language-Team: German\n"
@@ -1035,6 +1035,9 @@ msgstr "Grosse Bilder"
 msgid "Grid layout"
 msgstr "Raster"
 
+msgid "Show images on homepage"
+msgstr "Bilder auf der Startseite zeigen"
+
 msgid "By filename"
 msgstr "Nach Dateiname"
 
@@ -1043,9 +1046,6 @@ msgstr "Nach Beschreibung"
 
 msgid "By last change"
 msgstr "Nach Zeitpunkt der letzten Änderung"
-
-msgid "Show images on homepage"
-msgstr "Bilder auf der Startseite zeigen"
 
 msgid "Used in the overview and the e-mail subject"
 msgstr "Wird in der Übersicht und als E-Mail Subjekt verwendet"
@@ -2978,8 +2978,8 @@ msgstr "Die Absage von ${title} kann nicht rückgängig gemacht werden."
 msgid "Reject reservation"
 msgstr "Reservation absagen"
 
-#.
 #. Used in sentence: "${event} published."
+#.
 msgid "Event"
 msgstr "Veranstaltung"
 
@@ -3315,6 +3315,9 @@ msgstr "Bestätigen"
 
 msgid "There was an error while importing your directory!"
 msgstr "Beim Verzeichnisimport ist ein Fehler aufgetreten!"
+
+msgid "Download Form"
+msgstr "Formular herunterladen"
 
 msgid "Embed iFrame"
 msgstr "iFrame einbetten"
