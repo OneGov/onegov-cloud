@@ -5,7 +5,7 @@ from onegov.core.security import Private, Public
 from onegov.core.utils import normalize_for_url
 from onegov.form import FormDefinition
 from onegov.form.collection import FormCollection
-from onegov.form.models.document_form import (
+from onegov.org.models.document_form import (
     FormDocumentCollection, FormDocument)
 from onegov.org import _, OrgApp
 from onegov.core.elements import Link
@@ -49,7 +49,7 @@ def view_document_form_page(
         'page': self,
         'lead': self.lead,
         'text': self.text,
-        'pdf': self.pdf_form,
+        'pdf': self.pdf,
         }
 
 

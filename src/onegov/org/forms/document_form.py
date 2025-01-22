@@ -3,7 +3,7 @@ from onegov.core.utils import normalize_for_url
 from onegov.form import Form
 from onegov.form.core import DataRequired
 from onegov.form.fields import HtmlField, UploadFileWithORMSupport
-from onegov.form.models.document_form import DocumentFormFile
+from onegov.org.models.document_form import DocumentFormFile
 from onegov.form.validators import FileSizeLimit, WhitelistedMimeType
 from onegov.org import _
 from wtforms.fields import StringField
@@ -31,7 +31,7 @@ class DocumentForm(Form):
         label=_('Detailed Explanation'),
         description=_('Describes in detail how this form is to be filled'))
 
-    pdf_form = UploadFileWithORMSupport(
+    pdf = UploadFileWithORMSupport(
         label=_('Form PDF'),
         file_class=DocumentFormFile,
         validators=[
@@ -50,7 +50,7 @@ class DocumentForm(Form):
     ) -> dict[str, Any]:
 
         data = super().get_useful_data(exclude)
-        data['pdf_form'] = self.pdf_form.create()
+        data['pdf'] = self.pdf.create()
         data['name'] = normalize_for_url(self.title.data)  # type: ignore
 
         return data

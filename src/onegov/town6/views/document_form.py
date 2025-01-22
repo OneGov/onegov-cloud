@@ -1,5 +1,7 @@
+from __future__ import annotations
+
 from onegov.core.security.permissions import Public
-from onegov.form.models.document_form import (FormDocument,
+from onegov.org.models.document_form import (FormDocument,
                                               FormDocumentCollection)
 from onegov.org.views.document_form import (
     get_form_document_form, handle_edit_document_form_page,
@@ -23,9 +25,9 @@ if TYPE_CHECKING:
     permission=Public)
 def town_view_document_form_page(
     self: FormDocument,
-    request: 'TownRequest',
+    request: TownRequest,
     layout: FormDocumentLayout | None = None
-) -> 'RenderData | Response':
+) -> RenderData | Response:
     return view_document_form_page(
         self, request, layout=FormDocumentLayout(self, request)
     )
@@ -40,9 +42,9 @@ def town_view_document_form_page(
 )
 def town_handle_new_document_form(
     self: FormDocumentCollection,
-    request: 'TownRequest',
-    form: 'DocumentForm'
-) -> 'RenderData | Response':
+    request: TownRequest,
+    form: DocumentForm
+) -> RenderData | Response:
     return handle_new_document_form_page(
         self, request, form, layout=FormEditorLayout(self, request)
     )
@@ -57,9 +59,9 @@ def town_handle_new_document_form(
 )
 def town_handle_edit_document_form(
     self: FormDocument,
-    request: 'TownRequest',
-    form: 'DocumentForm'
-) -> 'RenderData | Response':
+    request: TownRequest,
+    form: DocumentForm
+) -> RenderData | Response:
     return handle_edit_document_form_page(
         self, request, form, layout=FormEditorLayout(self, request)
     )

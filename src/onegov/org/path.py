@@ -32,7 +32,7 @@ from onegov.form import FormDefinition
 from onegov.form import FormRegistrationWindow
 from onegov.form import PendingFormSubmission
 from onegov.form.collection import SurveyCollection
-from onegov.form.models.document_form import (
+from onegov.org.models.document_form import (
     FormDocumentCollection, FormDocument)
 from onegov.form.models.submission import SurveySubmission
 from onegov.form.models.survey_window import SurveySubmissionWindow

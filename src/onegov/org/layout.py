@@ -25,7 +25,7 @@ from onegov.directory import DirectoryCollection
 from onegov.event import OccurrenceCollection
 from onegov.file import File
 from onegov.form import FormCollection, as_internal_id
-from onegov.form.models.document_form import (
+from onegov.org.models.document_form import (
     FormDocument,
     FormDocumentCollection)
 from onegov.newsletter import NewsletterCollection, RecipientCollection

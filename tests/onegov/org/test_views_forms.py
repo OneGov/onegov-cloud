@@ -1412,7 +1412,7 @@ def test_document_form(client):
         Fill out the form below to request a deadline extension.
     '''
     with open(path, 'rb') as f:
-        page.form['pdf_form'] = Upload(
+        page.form['pdf'] = Upload(
             'Sample.pdf', f.read(), 'application/pdf')
     page = page.form.submit().follow()
 

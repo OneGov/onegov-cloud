@@ -7,7 +7,7 @@ from onegov.core.security import Public, Private
 from onegov.form import FormCollection, FormDefinition
 from onegov.form.collection import SurveyCollection
 from onegov.form.models.definition import SurveyDefinition
-from onegov.form.models.document_form import FormDocument
+from onegov.org.models.document_form import FormDocument
 from onegov.org import _, OrgApp
 from onegov.org.layout import FormCollectionLayout, SurveyCollectionLayout
 from onegov.org.models.external_link import (
