@@ -1,3 +1,4 @@
+from __future__ import annotations
 import morepath
 
 from onegov.core.security import Private, Public
@@ -6,7 +7,7 @@ from onegov.form.collection import FormCollection
 from onegov.form.models.document_form import (
     FormDocumentCollection, FormDocument)
 from onegov.org import _, OrgApp
-from onegov.org.elements import Link
+from onegov.core.elements import Link
 from onegov.org.forms.document_form import DocumentForm
 from onegov.org.layout import FormDocumentLayout, FormEditorLayout
 
@@ -23,7 +24,7 @@ if TYPE_CHECKING:
 
 def get_form_document_form(
     model: FormDocument | FormDocumentCollection,
-    request: 'OrgRequest'
+    request: OrgRequest
 ) -> type[DocumentForm]:
 
     if isinstance(model, FormDocumentCollection):
@@ -35,9 +36,9 @@ def get_form_document_form(
              permission=Public)
 def view_document_form_page(
     self: FormDocument,
-    request: 'OrgRequest',
+    request: OrgRequest,
     layout: FormDocumentLayout | None = None
-) -> 'RenderData | Response':
+) -> RenderData | Response:
 
     layout = layout or FormDocumentLayout(self, request)
 
@@ -58,10 +59,10 @@ def view_document_form_page(
 )
 def handle_new_document_form_page(
     self: FormDocumentCollection,
-    request: 'OrgRequest',
+    request: OrgRequest,
     form: DocumentForm,
     layout: FormEditorLayout | None = None
-) -> 'RenderData | Response':
+) -> RenderData | Response:
 
     if form.submitted(request):
         assert form.title.data is not None
@@ -77,6 +78,11 @@ def handle_new_document_form_page(
         Link(_('New Document Form'), request.link(self, name='new'))
     ]
     layout.edit_mode = True
+    layout.editmode_links[1] = Link(
+        text=_('Cancel'),
+        url=request.class_link(FormCollection),
+        attrs={'class': 'cancel-link'}
+    )
 
     return {
         'layout': layout,
@@ -93,10 +99,10 @@ def handle_new_document_form_page(
 )
 def handle_edit_document_form_page(
     self: FormDocument,
-    request: 'OrgRequest',
+    request: OrgRequest,
     form: DocumentForm,
     layout: FormEditorLayout | None = None
-) -> 'RenderData | Response':
+) -> RenderData | Response:
 
     if form.submitted(request):
         assert form.title.data is not None
@@ -115,6 +121,11 @@ def handle_edit_document_form_page(
         Link(_('Edit'), request.link(self, name='edit')),
     ]
     layout.edit_mode = True
+    layout.editmode_links[1] = Link(
+        text=_('Cancel'),
+        url=request.class_link(FormCollection),
+        attrs={'class': 'cancel-link'}
+    )
 
     return {
         'layout': layout,
@@ -124,6 +135,6 @@ def handle_edit_document_form_page(
 
 
 @OrgApp.view(model=FormDocument, permission=Private, request_method='DELETE')
-def delete_form_document(self: FormDocument, request: 'OrgRequest') -> None:
+def delete_form_document(self: FormDocument, request: OrgRequest) -> None:
     request.assert_valid_csrf_token()
     request.session.delete(self)

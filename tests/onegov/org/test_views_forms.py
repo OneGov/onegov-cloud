@@ -1397,3 +1397,33 @@ def test_create_and_fill_survey(client):
     assert 'Medium' in page
     assert '(1/1)' in page
     assert 'Nicolas Thomas' not in page
+
+
+def test_document_form(client):
+
+    path = module_path('tests.onegov.org', 'fixtures/sample.pdf')
+    client.login_editor()
+
+    page = client.get('/forms')
+    page = page.click('Dokumentenformular')
+    page.form['title'] = 'Deadline Extension'
+    page.form['lead'] = 'Request a deadline extension'
+    page.form['text'] = '''
+        Fill out the form below to request a deadline extension.
+    '''
+    with open(path, 'rb') as f:
+        page.form['pdf_form'] = Upload(
+            'Sample.pdf', f.read(), 'application/pdf')
+    page = page.form.submit().follow()
+
+    assert 'Deadline Extension' in page
+    assert 'Request a deadline extension' in page
+    assert '''
+        Fill out the form below to request a deadline extension.
+    ''' in page
+    assert 'Sample.pdf' in page
+
+    page = page.click('Bearbeiten')
+    page.form['title'] = 'Deadline Extension Request'
+    page = page.form.submit().follow()
+    assert 'Deadline Extension Request' in page
