@@ -1,4 +1,5 @@
 from __future__ import annotations
+
 from uuid import uuid4
 
 from onegov.chat.models.message import associated
