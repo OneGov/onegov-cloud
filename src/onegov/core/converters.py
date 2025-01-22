@@ -162,6 +162,24 @@ datetime_converter = morepath.Converter(
 )
 
 
+def datetime_year_decode(s: str) -> int:
+    """ Decodes a year limited to the range datetime provides. """
+    year = int(s)
+    if datetime.min.year <= year <= datetime.max.year:
+        return year
+    raise ValueError('year outside valid range')
+
+
+def datetime_year_encode(y: int | None) -> str:
+    """ Encodes a year. """
+    return str(y) if y is not None else ''
+
+
+datetime_year_converter = morepath.Converter(
+    decode=datetime_year_decode, encode=datetime_year_encode
+)
+
+
 @Framework.converter(type=datetime)
 def get_default_datetime_converter() -> morepath.Converter[datetime]:
     return datetime_converter
