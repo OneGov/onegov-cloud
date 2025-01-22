@@ -347,14 +347,10 @@ h1.main-title small {
     }
 }
 
-
 /* Side panel*/
 
-.assembly-toggler {
-    background: $primary-color;
-    opacity: .6;
-    padding-right: .6rem;
-    top: calc(80vh - 50px);
+.sidebar-toggler .text{
+    margin-bottom: -2px;
 }
 
 .agenda-item-list.with-current {
