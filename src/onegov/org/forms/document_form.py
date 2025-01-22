@@ -1,4 +1,5 @@
 from __future__ import annotations
+
 from onegov.core.utils import normalize_for_url
 from onegov.form import Form
 from onegov.form.core import DataRequired
