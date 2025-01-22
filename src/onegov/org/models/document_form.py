@@ -59,7 +59,7 @@ class FormDocument(Base, ContentMixin, TimestampMixin, AccessExtension,
     title: Column[str] = Column(Text, nullable=False)
 
     #: Describes the document briefly
-    lead: dict_property[str | None] = content_property()
+    lead: dict_property[str | None] = meta_property()
 
     #: Describes the document in detail
     text = dict_markup_property('content')
