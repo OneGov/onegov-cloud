@@ -1,6 +1,5 @@
 from __future__ import annotations
 
-import re
 from html import escape
 from onegov.form import errors
 from onegov.form.core import FieldDependency
@@ -104,15 +103,6 @@ def parse_form(
     form_class._source = text
 
     return form_class
-
-
-def normalize_label_for_dependency(label: str) -> str:
-    """ Removes all between '(' and ')' Parentheses (inclusive) """
-    if '(' in label and ')' in label:
-        label = re.sub(r'([(]).*?([)])', '', label)
-        return label[:-1] if label[-1] == ' ' else label
-    else:
-        return label
 
 
 def handle_field(
@@ -378,8 +368,7 @@ def handle_field(
         for choice in field.choices:
             if not choice.fields:
                 continue
-            normalized_label = normalize_label_for_dependency(choice.label)
-            dependency = FieldDependency(field.id, normalized_label)
+            dependency = FieldDependency(field.id, choice.key)
             for choice_field in choice.fields:
                 handle_field(builder, choice_field, dependency)
 
