@@ -1069,11 +1069,9 @@ def get_document_form_collection(
     return FormDocumentCollection(request.session, type=type)
 
 
-@OrgApp.path(model=FormDocument, path='/document-form/{id}',
-             converters={'id': UUID})
-def get_document_form_page(
-    request: OrgRequest, id: UUID) -> FormDocument | None:
-    return FormDocumentCollection(request.session).by_id(id)
+@OrgApp.path(model=FormDocument, path='/document-form/{name}')
+def get_document_form_page(app: OrgApp, name: str) -> FormDocument | None:
+    return FormDocumentCollection(app.session()).by_name(name)
 
 
 @OrgApp.path(

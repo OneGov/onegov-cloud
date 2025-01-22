@@ -1,4 +1,7 @@
+from __future__ import annotations
+from onegov.core.utils import normalize_for_url
 from onegov.form import Form
+from onegov.form.core import DataRequired
 from onegov.form.fields import HtmlField, UploadFileWithORMSupport
 from onegov.form.models.document_form import DocumentFormFile
 from onegov.form.validators import FileSizeLimit, WhitelistedMimeType
@@ -34,6 +37,7 @@ class DocumentForm(Form):
         validators=[
             WhitelistedMimeType({'application/pdf'}),
             FileSizeLimit(100 * 1024 * 1024),
+            DataRequired()
         ],)
 
     group = StringField(
@@ -42,10 +46,11 @@ class DocumentForm(Form):
 
     def get_useful_data(
             self,
-        exclude: 'Collection[str] | None' = None
+        exclude: Collection[str] | None = None
     ) -> dict[str, Any]:
 
         data = super().get_useful_data(exclude)
         data['pdf_form'] = self.pdf_form.create()
+        data['name'] = normalize_for_url(self.title.data)  # type: ignore
 
         return data

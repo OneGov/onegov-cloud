@@ -450,7 +450,11 @@ input[type="url"] {
 }
 
 .download-button {
+    display: block;
+    width: fit-content;
     border-radius: .7rem;
+    margin-top: 2rem;
+    margin-bottom: 2rem;
     border: 1px solid  $primary-color;
     padding: 1rem;
     transition: background 200ms linear;

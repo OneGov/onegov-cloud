@@ -2,6 +2,7 @@ from __future__ import annotations
 import morepath
 
 from onegov.core.security import Private, Public
+from onegov.core.utils import normalize_for_url
 from onegov.form import FormDefinition
 from onegov.form.collection import FormCollection
 from onegov.form.models.document_form import (
@@ -66,10 +67,12 @@ def handle_new_document_form_page(
 
     if form.submitted(request):
         assert form.title.data is not None
-        document_form = self.add_by_form(form)
-
-        request.success(_('Added a new form'))
-        return morepath.redirect(request.link(document_form))
+        if self.by_name(normalize_for_url(form.title.data)):
+            request.alert(_('A form with this name already exists'))
+        else:
+            document_form = self.add_by_form(form)
+            request.success(_('Added a new form'))
+            return morepath.redirect(request.link(document_form))
 
     layout = layout or FormEditorLayout(self, request)
     layout.breadcrumbs = [

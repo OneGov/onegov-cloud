@@ -1,3 +1,4 @@
+from __future__ import annotations
 from uuid import uuid4
 
 from onegov.chat.models.message import associated
@@ -44,16 +45,20 @@ class FormDocument(Base, ContentMixin, TimestampMixin, AccessExtension,
         'lead': {'type': 'localized'},
     }
 
-    id: 'Column[uuid.UUID]' = Column(
+    #: An internal id for references (not public)
+    id: Column[uuid.UUID] = Column(
         UUID,  # type:ignore[arg-type]
         primary_key=True,
         default=uuid4
     )
 
-    title: 'Column[str]' = Column(Text, nullable=False)
+    #: A nice id for the url, readable by humans
+    name: Column[str] = Column(Text, nullable=False, unique=True)
+
+    title: Column[str] = Column(Text, nullable=False)
 
     #: Describes the document briefly
-    lead: 'dict_property[str | None]' = content_property()
+    lead: dict_property[str | None] = content_property()
 
     #: Describes the document in detail
     text = dict_markup_property('content')
@@ -63,12 +68,12 @@ class FormDocument(Base, ContentMixin, TimestampMixin, AccessExtension,
         backref_suffix='pdf')
 
     # The collection name this model should appear in
-    member_of: 'Column[str | None]' = Column(Text, nullable=True)
+    member_of: Column[str | None] = Column(Text, nullable=True)
 
-    group: 'Column[str | None]' = Column(Text, nullable=True)
+    group: Column[str | None] = Column(Text, nullable=True)
 
     #: The normalized title for sorting
-    order: 'Column[str]' = Column(Text, nullable=False, index=True)
+    order: Column[str] = Column(Text, nullable=False, index=True)
 
     @observes('title')
     def title_observer(self, title: str) -> None:
@@ -87,7 +92,7 @@ class FormDocumentCollection(GenericCollection[FormDocument]):
 
     def __init__(
         self,
-        session: 'Session',
+        session: Session,
         member_of: str | None = None,
         group: str | None = None,
         type: str | None = None
@@ -117,6 +122,10 @@ class FormDocumentCollection(GenericCollection[FormDocument]):
                 for m in self.supported_collections.values()
             )
 
+    def by_name(self, name: str) -> FormDocument | None:
+        """ Returns the given form by name or None. """
+        return self.query().filter(FormDocument.name == name).first()
+
     @classmethod
     def collection_by_name(cls) -> dict[str, type[GenericCollection[Any]]]:
         return {m.__name__: m for m in cls.supported_collections.values()}
@@ -133,5 +142,5 @@ class FormDocumentCollection(GenericCollection[FormDocument]):
         assert external_link.member_of is not None
         return cls.collection_by_name()[external_link.member_of]
 
-    def query(self) -> 'Query[FormDocument]':
+    def query(self) -> Query[FormDocument]:
         return self.session.query(FormDocument)
