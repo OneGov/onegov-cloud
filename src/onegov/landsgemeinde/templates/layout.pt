@@ -66,8 +66,14 @@
             </div>
         </div>
 
-        <div class="sidebar-toggler show-for-small-only assembly-toggler" data-toggle="offCanvasSidebar">
-            <i class="fa fa-chevron-left rotate"></i>
+        <div class="sidebar-toggler show-for-small-only" data-toggle="offCanvasSidebar">
+                <div class="animated-hamburger">
+                    <span></span>
+                    <span></span>
+                    <span></span>
+                    <span></span>
+                </div>
+                <span class="text"> Sidebar</span>
         </div>
 
         <div class="off-canvas position-right show-for-small-only" id="offCanvasSidebar" data-auto-focus="false" data-off-canvas >
