@@ -11,6 +11,7 @@ from onegov.chat import MessageCollection
 from onegov.chat import TextModule
 from onegov.chat import TextModuleCollection
 from onegov.core.converters import extended_date_converter
+from onegov.core.converters import datetime_year_converter
 from onegov.core.converters import json_converter
 from onegov.core.converters import LiteralConverter
 from onegov.core.orm.abstract import MoveDirection
@@ -180,7 +181,7 @@ def get_topic(app: OrgApp, absorb: str) -> Topic | None:
     path='/news',
     absorb=True,
     converters={
-        'filter_years': [int],
+        'filter_years': [datetime_year_converter],
         'filter_tags': [str]
     }
 )
@@ -1025,7 +1026,7 @@ def get_directory_submission_action(
 @OrgApp.path(
     model=PublicationCollection,
     path='/publications',
-    converters={'year': int})
+    converters={'year': datetime_year_converter})
 def get_publication_collection(
     request: OrgRequest,
     year: int | None = None
