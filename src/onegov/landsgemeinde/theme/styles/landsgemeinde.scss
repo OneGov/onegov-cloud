@@ -347,8 +347,12 @@ h1.main-title small {
     }
 }
 
-
 /* Side panel*/
+
+.sidebar-toggler .text{
+    margin-bottom: -2px;
+}
+
 .agenda-item-list.with-current {
     height: 25rem;
     overflow-y: scroll;
@@ -635,5 +639,4 @@ h1.main-title small {
             }
         }
     }
-
 }
