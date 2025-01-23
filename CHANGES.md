@@ -1,8 +1,64 @@
 # Changes
 
+## 2025.3
+
+`2025-01-23` | [9eabea3e30...d2c4c7dedd](https://github.com/OneGov/onegov-cloud/compare/9eabea3e30^...d2c4c7dedd)
+
+### Electionday
+
+##### Allows defining the publisher URI via `open_data` metadata.
+
+This also ensures that the default URI is a URN, rather than a URL
+since we can't compute a URL that will always be valid.
+
+We now also include the publisher's email directly and not only via the
+contactPoint.
+
+`Bugfix` | [OGC-2002](https://linear.app/onegovcloud/issue/OGC-2002) | [81edbfa4fa](https://github.com/onegov/onegov-cloud/commit/81edbfa4fa009e6983adfd66b6eaafd97c26a556)
+
+### Form
+
+##### Fixes incorrect field dependencies for labels that use parentheses
+
+`Bugfix` | [OGC-2041](https://linear.app/onegovcloud/issue/OGC-2041) | [2eff06c5f6](https://github.com/onegov/onegov-cloud/commit/2eff06c5f653f2a4b0ed2233f9f8aa14145dccd6)
+
+### Landsgemeinde
+
+##### Adds redirect from /film to /topics/film
+
+`Feature` | [OGC-2039](https://linear.app/onegovcloud/issue/OGC-2039) | [832ada552a](https://github.com/onegov/onegov-cloud/commit/832ada552a6664a5a34c3154a7703f5239363739)
+
+### Org
+
+##### Document forms
+
+Upload a PDF to be displayed in the forms view.
+
+`Feature` | [OGC-2003](https://linear.app/onegovcloud/issue/OGC-2003) | [1a3e11618b](https://github.com/onegov/onegov-cloud/commit/1a3e11618bb305d72e2f52872fe602d38dd05b7d)
+
+##### Avoid emitting an exception for invalid years
+
+`Bugfix` | [SEA-1666](https://linear.app/seantis/issue/SEA-1666) | [79c1ac840c](https://github.com/onegov/onegov-cloud/commit/79c1ac840cd22392f7c69d85bfa5266fd88a2ecc)
+
+### Town 6
+
+##### Homepage video Link
+
+Add option for text-link
+
+`Feature` | [OGC-2040](https://linear.app/onegovcloud/issue/OGC-2040) | [7136ecb857](https://github.com/onegov/onegov-cloud/commit/7136ecb857db1c56dd9ff8539c8e95e78d8ff634)
+
+### Town6
+
+##### Sidebar-toggler bottom
+
+Restyle the sidebar-toggler so it is fixed to the bottom and more visible.
+
+`Feature` | [OGC-1985](https://linear.app/onegovcloud/issue/OGC-1985) | [d2c4c7dedd](https://github.com/onegov/onegov-cloud/commit/d2c4c7deddd82e65881fb003345bc1bcb99fff9c)
+
 ## 2025.2
 
-`2025-01-17` | [2e9311bc89...e9e35cb967](https://github.com/OneGov/onegov-cloud/compare/2e9311bc89^...e9e35cb967)
+`2025-01-17` | [2e9311bc89...0f10de8479](https://github.com/OneGov/onegov-cloud/compare/2e9311bc89^...0f10de8479)
 
 ### Directory
 
@@ -2128,75 +2184,4 @@ onegov.translator_directory.views.translator.view_mail_templates
 ##### Update display of campaign finances.
 
 `Other` | [SWI-43](https://linear.app/swissvotes/issue/SWI-43) | [253d3bccfe](https://github.com/onegov/onegov-cloud/commit/253d3bccfe5f3697f030c8bf8c6a6eba91da9fb8)
-
-## 2024.17
-
-`2024-03-26` | [167b7bf9ea...254edb538b](https://github.com/OneGov/onegov-cloud/compare/167b7bf9ea^...254edb538b)
-
-### Election Day
-
-##### Resolve various fixmes.
-
-`Bugfix` | [OGC-1525](https://linear.app/onegovcloud/issue/OGC-1525) | [cde18e9870](https://github.com/onegov/onegov-cloud/commit/cde18e98702f704e838114ba41548a0e1721cb2b)
-
-### Forms
-
-##### Adds user snippet for subfields to formcode
-
-Feature
-
-`Other` | [OGC-977](https://linear.app/onegovcloud/issue/OGC-977) | [c1c61d976b](https://github.com/onegov/onegov-cloud/commit/c1c61d976b9767452f629dfa5f6336ba556e5296)
-
-### Landsgemeinde
-
-##### Resolve various fixmes
-
-`Bugfix` | [OGC-1535](https://linear.app/onegovcloud/issue/OGC-1535) | [196c4654fd](https://github.com/onegov/onegov-cloud/commit/196c4654fd45ac72f9069feb68ebf8c360166a16)
-
-### Org
-
-##### Side-panel fixes and improvements
-
-- Added missing files sidepanel for resources and directories
-- Redesigned edit-button for uploaded files
-
-`Other` | [dd80494160](https://github.com/onegov/onegov-cloud/commit/dd804941608b6c0233593610fd876ee8af492a49)
-
-### Swissvotes
-
-##### Add french translations for initiator and recommendations.
-
-`Feature` | [SWI-44](https://linear.app/swissvotes/issue/SWI-44) | [b145c2a303](https://github.com/onegov/onegov-cloud/commit/b145c2a303d79e7b4a58d4600f3bc6e5f57e1b6f)
-
-##### Add campaign links.
-
-`Feature` | [SWI-45](https://linear.app/swissvotes/issue/SWI-45) | [95ac77f6fe](https://github.com/onegov/onegov-cloud/commit/95ac77f6fe57e87a87e5e57c80be14762e82a286)
-
-##### Add campaign finances.
-
-`Feature` | [SWI-43](https://linear.app/swissvotes/issue/SWI-43) | [979352dd64](https://github.com/onegov/onegov-cloud/commit/979352dd645303f7de8e3615a79667dbeab1aeea)
-
-##### Add link to BFS map.
-
-`Feature` | [SWI-46](https://linear.app/swissvotes/issue/SWI-46) | [808676e5c0](https://github.com/onegov/onegov-cloud/commit/808676e5c0e38aa99126b20d12af8970354e7d56)
-
-### Town6
-
-##### Show RSS button always, not just if filter tags enabled.
-
-`Feature` | [OGC-1511](https://linear.app/onegovcloud/issue/OGC-1511) | [167b7bf9ea](https://github.com/onegov/onegov-cloud/commit/167b7bf9ea83e3b6fd734f9e01d0f9684ee03fc3)
-
-##### Remove gap above homepage video
-
-`Bugfix` | [OGC-1522](https://linear.app/onegovcloud/issue/OGC-1522) | [a5c5571a44](https://github.com/onegov/onegov-cloud/commit/a5c5571a44e5cf818987d4315be5f9d15a6f7d90)
-
-##### Styling of search results
-
-`Bugfix` | [OGC-1125](https://linear.app/onegovcloud/issue/OGC-1125) | [12810ba2e4](https://github.com/onegov/onegov-cloud/commit/12810ba2e495e99c808849a976f2b06d9f665c03)
-
-### Winterthur
-
-##### Roadwork view misses location
-
-`Bugfix` | [OGC-1520](https://linear.app/onegovcloud/issue/OGC-1520) | [ed130b1f13](https://github.com/onegov/onegov-cloud/commit/ed130b1f132aefb06d2bcfc6ab4f3d90bc97a3a8)
 
