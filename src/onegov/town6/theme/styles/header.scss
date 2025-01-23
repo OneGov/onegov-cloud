@@ -34,6 +34,7 @@ $new-directory-icon: '\f0e8';
 $new-directory-entry-icon: '\f07b';
 $new-recipient: '\f0e0';
 $new-form-icon: '\f044';
+$new-document-form-icon: '\f70e';
 $new-link-icon: '\f0c1';
 $new-iframe-icon: '\f2d0';
 $new-news-icon: '\f1ea';
@@ -529,6 +530,7 @@ $editbar-fg-color-active: $white;
     .new-directory::before { @include icon-bold($new-directory-icon); }
     .new-directory-entry::before { @include icon($new-directory-entry-icon); }
     .new-form::before { @include icon($new-form-icon); }
+    .new-document-form::before { @include icon-bold($new-document-form-icon); }
     .new-link::before { @include icon-bold($new-link-icon); }
     .new-iframe::before { @include icon-bold($new-iframe-icon); }
     .new-news::before { @include icon($new-news-icon); }

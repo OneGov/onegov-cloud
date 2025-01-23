@@ -1,7 +1,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE 1.0\n"
-"POT-Creation-Date: 2025-01-08 16:47+0100\n"
+"POT-Creation-Date: 2025-01-22 08:59+0100\n"
 "PO-Revision-Date: 2022-03-15 10:21+0100\n"
 "Last-Translator: Marc Sommerhalder <marc.sommerhalder@seantis.ch>\n"
 "Language-Team: German\n"
@@ -593,6 +593,24 @@ msgstr "Ein Eintrag mit diesem Namen existiert bereits"
 msgid "E-Mail"
 msgstr "E-Mail"
 
+msgid "Describes briefly what this form is about"
+msgstr "Beschreibt kurz um was es bei diesem Formular geht"
+
+msgid "Detailed Explanation"
+msgstr "Detaillierte Erklärung"
+
+msgid "Describes in detail how this form is to be filled"
+msgstr "Beschreibt detailliert wie dieses Formular ausgefüllt werden soll"
+
+msgid "Form PDF"
+msgstr "Formular PDF"
+
+msgid "Group"
+msgstr "Gruppe"
+
+msgid "Used to group this form in the overview"
+msgstr "Dient zur Gruppierung in der Übersicht"
+
 msgid "Art"
 msgstr "Kunst"
 
@@ -844,9 +862,6 @@ msgstr "URL"
 msgid "Url pointing to another website"
 msgstr "Url, der auf eine andere Website zeigt"
 
-msgid "Group"
-msgstr "Gruppe"
-
 msgid "Used to group this link in the overview"
 msgstr "Wird benutzt, um diesen Link in der Übersicht zu gruppieren"
 
@@ -1031,6 +1046,15 @@ msgstr "Nach Zeitpunkt der letzten Änderung"
 
 msgid "Show images on homepage"
 msgstr "Bilder auf der Startseite zeigen"
+
+msgid "By filename"
+msgstr "Nach Dateiname"
+
+msgid "By caption"
+msgstr "Nach Beschreibung"
+
+msgid "By last change"
+msgstr "Nach Zeitpunkt der letzten Änderung"
 
 msgid "Used in the overview and the e-mail subject"
 msgstr "Wird in der Übersicht und als E-Mail Subjekt verwendet"
@@ -1694,10 +1718,10 @@ msgid "JavaScript for web statistics support"
 msgstr "JavaScript für Web-Statistik"
 
 msgid "Analytics URL"
-msgstr ""
+msgstr "Analytics URL"
 
 msgid "URL pointing to the analytics page"
-msgstr ""
+msgstr "Link zur Analytics Seite"
 
 msgid "Cantonal holidays"
 msgstr "Kantonale Feiertage"
@@ -2307,12 +2331,17 @@ msgstr "Externes Formular"
 msgid "New external form"
 msgstr "Neues externes Formular"
 
+msgid "Document form"
+msgstr "Dokumentenformular"
+
 msgid "Do you really want to delete this submission window?"
 msgstr "Möchten Sie diesen Befragungszeitraum wirklich löschen?"
 
 msgid ""
 "Submissions associated with this submission window will be deleted as well."
 msgstr ""
+"Eingaben, die mit diesem Befragungszeitraum verknüpft sind, werden ebenfalls "
+"gelöscht."
 
 msgid "Delete submission window"
 msgstr "Befragungszeitraum löschen"
@@ -3296,6 +3325,9 @@ msgstr "Bestätigen"
 msgid "There was an error while importing your directory!"
 msgstr "Beim Verzeichnisimport ist ein Fehler aufgetreten!"
 
+msgid "Download Form"
+msgstr "Formular herunterladen"
+
 msgid "Embed iFrame"
 msgstr "iFrame einbetten"
 
@@ -4278,7 +4310,7 @@ msgid "There are currently ${count} recipients registered."
 msgstr "Zur Zeit sind ${count} Abonnenten registriert."
 
 msgid "To update your subscription, please use this ${Link}"
-msgstr ""
+msgstr "Um Ihr Abonnement zu aktualisieren, verwenden Sie bitte diesen ${Link}"
 
 msgid "Archive"
 msgstr "Archiv"
@@ -4589,6 +4621,8 @@ msgid ""
 "Thank you for filling out this survey. If there's anything you'd like to "
 "change, click on the \"Edit\"-Button below."
 msgstr ""
+"Vielen Dank für das Ausfüllen dieser Umfrage. Falls Sie noch etwas ändern "
+"möchten, klicken Sie auf den \"Bearbeiten\"-Button unten."
 
 msgid "No surveys defined yet."
 msgstr "Es wurden noch keine Umfragen definiert."
@@ -4863,6 +4897,8 @@ msgid ""
 "Rule updated. ${deleted} allocations removed, ${created} new allocations "
 "created."
 msgstr ""
+"Regel aktualisiert. ${deleted} Einteilungen entfernt, ${created} neue "
+"Einteilungen erstellt."
 
 msgid "Rule not found"
 msgstr "Regel nicht gefunden"
@@ -5172,6 +5208,15 @@ msgstr "${address} wurde erfolgreich abgemeldet"
 msgid "${address} could not be unsubscribed, wrong token"
 msgstr "${address} konnte nicht abgemeldet werden - falsches Token"
 
+msgid "Added a new form"
+msgstr "Ein neues Formular wurd hinzugefügt"
+
+msgid "New Document Form"
+msgstr "Neues Dokumentenformular"
+
+msgid "Edit Document Form"
+msgstr "Dokumentenformular bearbeiten"
+
 msgid "Moves the topic and all its sub topics to the given destination."
 msgstr "Verschiebt das Thema mit allen Unterthemen an den gewählten Ort."
 
@@ -5308,9 +5353,6 @@ msgstr "Es sind noch ${count} Plätze verfügbar"
 
 msgid "A form with this name already exists"
 msgstr "Ein Formular mit diesem Namen existiert bereits"
-
-msgid "Added a new form"
-msgstr "Ein neues Formular wurd hinzugefügt"
 
 msgid "New Form"
 msgstr "Neues Formular"
@@ -5936,16 +5978,16 @@ msgstr ""
 "Einträge."
 
 msgid "Delete Submissions"
-msgstr ""
+msgstr "Einträge löschen"
 
 msgid "Do you really want to delete all submissions?"
-msgstr ""
+msgstr "Möchten Sie wirklich alle Einträge löschen?"
 
 msgid "All submissions associated with this survey will be deleted."
-msgstr ""
+msgstr "Alle mit dieser Umfrage verbundenen Einträge werden gelöscht."
 
 msgid "Delete submissions"
-msgstr ""
+msgstr "Einträge löschen"
 
 msgid "Exports the submissions of the survey."
 msgstr "Exportiert die Umfrageeinträge."
@@ -5972,7 +6014,7 @@ msgid "Edit Submission Window"
 msgstr "Befragungszeitraum bearbeiten"
 
 msgid "The submission window and all associated submissions were deleted"
-msgstr ""
+msgstr "Der Befragungszeitraum und alle zugehörigen Einträge wurden gelöscht"
 
 msgid "Added a new text module"
 msgstr "Textbaustein hinzugefügt"
@@ -6194,6 +6236,9 @@ msgstr "Ein Konto wurde für Sie erstellt"
 
 msgid "The user was created successfully"
 msgstr "Der Benutzer wurde erfolgreich erstellt"
+
+#~ msgid "Describes in detail how this form is to be used"
+#~ msgstr "Beschreibt detailliert wie dieses Formular benutzt werden soll"
 
 #~ msgid "Photo album. Will be shown at the end of content."
 #~ msgstr "Fotoalbum. Wird am Ende des Inhalts angezeigt."
