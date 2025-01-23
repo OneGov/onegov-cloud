@@ -6,7 +6,8 @@ from onegov.chat.models.message import associated
 from onegov.core.collection import GenericCollection
 from onegov.core.orm import Base
 from onegov.core.orm.mixins import (
-    ContentMixin, TimestampMixin, content_property, dict_property)
+    ContentMixin, TimestampMixin, dict_property, content_property,
+    meta_property)
 from onegov.core.orm.mixins.content import dict_markup_property
 from onegov.core.orm.types import UUID
 from onegov.core.utils import normalize_for_url
@@ -75,6 +76,12 @@ class FormDocument(Base, ContentMixin, TimestampMixin, AccessExtension,
 
     #: The normalized title for sorting
     order: Column[str] = Column(Text, nullable=False, index=True)
+
+    pdf_extract: dict_property[str | None] = content_property()
+
+    @observes('pdf')
+    def pdf_observer(self, pdf: DocumentFormFile | None) -> None:
+        self.pdf_extract = pdf.extract if pdf is not None else None
 
     @observes('title')
     def title_observer(self, title: str) -> None:
