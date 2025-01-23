@@ -184,54 +184,25 @@ class Recipient(Base, TimestampMixin, ContentMixin):
         return Subscription(self, self.token)
 
     @property
-    def bounce_statistics(self) -> dict[str, int]:
-        return self.meta.get('bounce_statistics', {})
-
-    @property
-    def has_delivery_failure(self) -> bool:
-        """ Returns True if the recipient has any delivery failures. """
-        return any(
-            self.bounce_statistics.get(bounce_type, 0) > 0
-            for bounce_type in [
-                'HardBounce', 'BadEmailAddress', 'SpamComplaint',
-                'ManuallyDeactivated', 'Blocked'
-            ]
-        )
-
-    def update_bounce_statistics(self, statistics: dict[str, int]) -> None:
-        """ Updates the bounce statistics for this recipient.
-        https://postmarkapp.com/developer/api/bounce-api#bounce-types
-
-        Example: Type as string, count as int
-        {
-            'HardBounce': 11,
-            'SoftBounce': 22,
-            'Transient': 33,
-            ..
-        }
+    def is_inactive(self) -> bool:
         """
+        Checks if the recipient's email address is marked as inactive.
 
-        allowed_types = [
-            'HardBounce', 'SoftBounce', 'Transient', 'SpamNotification',
-            'BadEmailAddress', 'SpamComplaint', 'ManuallyDeactivated',
-            'Blocked', 'Undetermined', 'Unsubscribe', 'Subscribe',
-            'AutoResponder', 'AddressChange', 'DnsError', 'OpenRelayTest',
-            'Unknown', 'VirusNotification', 'ChallengeVerification',
-            'Unconfirmed', 'SMTPApiError', 'InboundError', 'DMARCPolicy',
-            'TemplateRenderingFailed'
-        ]
+        Returns:
+            bool: True if the email address is marked as inactive, False
+            otherwise.
+        """
+        return self.meta.get('inactive', False)
 
-        if 'bounce_statistics' not in self.meta:
-            self.meta['bounce_statistics'] = {}
+    def mark_inactive(self) -> None:
+        """
+        Marks the recipient's email address as inactive.
 
-        for key, value in statistics.items():
-            if key not in allowed_types:
-                continue
-
-            if key not in self.meta['bounce_statistics']:
-                self.meta['bounce_statistics'][key] = value
-            else:
-                self.meta['bounce_statistics'][key] += value
+        This method sets the 'inactive' flag in the recipient's metadata to
+        True. It is typically used when a bounce event causes the email
+        address to be deactivated by Postmark.
+        """
+        self.meta['inactive'] = True
 
 
 class Subscription:

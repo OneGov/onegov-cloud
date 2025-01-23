@@ -759,12 +759,13 @@ def update_newsletter_email_bounce_statistics(
     try:
         r = requests.get(
             'https://api.postmarkapp.com/bounces?count=500&offset=0',
-            f'fromDate={yesterday.date()}&toDate={yesterday.date()}',
+            f'fromDate={yesterday.date()}&toDate='
+            f'{yesterday.date()}&inactive=true',
             headers={
                 'Accept': 'application/json',
                 'X-Postmark-Server-Token': token
         },
-            timeout=60
+            timeout=30
         )
         r.raise_for_status()
         bounces = r.json().get('Bounces', [])
@@ -777,7 +778,9 @@ def update_newsletter_email_bounce_statistics(
             raise
 
     for bounce in bounces:
-        email = bounce['Email']
+        email = bounce.get('Email', '')
+        inactive = bounce.get('Inactive', False)
         recipient = recipients.by_address(email)
-        if recipient:
-            recipient.update_bounce_statistics({bounce['Type']: 1})
+
+        if recipient and inactive:
+            recipient.mark_inactive()
