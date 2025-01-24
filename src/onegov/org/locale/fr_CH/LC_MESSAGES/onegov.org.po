@@ -3856,6 +3856,12 @@ msgstr "Aucune réservation aujourd'hui."
 msgid "Have a great day!"
 msgstr "Passez une bonne journée!"
 
+msgid "Hi Admin,"
+msgstr "Bonjour administrateur"
+
+msgid "The user with the address ${address} just unsubscribed from the newsletter subscriber list."
+msgstr "L'utilisateur dont l'adresse est ${address} vient de se désinscrire de la liste des abonnés à la lettre d'information."
+
 msgid ""
 "This is the daily reservation overview for ${organisation}. If you no longer "
 "want to receive this e-mail please contact an administrator so they can "
