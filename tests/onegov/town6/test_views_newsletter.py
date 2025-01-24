@@ -927,3 +927,84 @@ def test_import_export_subscribers(client):
     page = page.form.submit().follow()
     assert "Import abgeschlossen: Imported: 2" in page
     assert recipients.query().count() == 4
+
+
+def test_admin_receives_email_notification_on_unsubscription(client):
+
+    def extract_unsubscription_link(client, index):
+        message = client.get_email(index)['TextBody']
+        unsubscribe = re.search(r'abzumelden.\]\(([^\)]+)', message).group(1)
+        return unsubscribe
+
+    client.login_admin()
+
+    # newsletter settings no admin notification
+    page = client.get('/newsletter-settings')
+    page.form['show_newsletter'] = True
+    page.form['notify_on_unsubscription'] = []
+    page.form.submit().follow()
+
+    # add a newsletter
+    newsletters = client.get('/newsletters')
+    new_link = find_link_by_href_end(newsletters, '/newsletters/new')
+    new = newsletters.click(href=new_link['href'])
+    new.form['title'] = "Our town is AWESOME"
+    new.form['lead'] = "Like many of you, I just love our town..."
+    new.select_checkbox("news", "Willkommen bei OneGov")
+    new.select_checkbox("occurrences", "150 Jahre Govikon")
+    new.form.submit().follow()
+
+    # add some recipients the quick way
+    recipients = RecipientCollection(client.app.session())
+    recipients.add('one@example.org', confirmed=True)
+    recipients.add('two@example.org', confirmed=True)
+
+    transaction.commit()
+
+    # send out newsletter
+    newsletter = client.get('/newsletter/our-town-is-awesome')
+    preview = newsletter.click('Senden')
+    preview.form.submit().follow()
+
+    # verify newsletter was sent to both
+    assert len(os.listdir(client.app.maildir)) == 1
+
+    # extract unsubscription link from email and unsubscribe
+    unsubscribe = extract_unsubscription_link(client, 0)
+    result = client.get(unsubscribe).follow()
+    assert "one@example.org erfolgreich vom Newsletter abgemeldet" in result
+
+    # verify admin received NO email notification
+    assert len(os.listdir(client.app.maildir)) == 1  # no new email
+
+    # newsletter settings enable admin notification
+    page = client.get('/newsletter-settings')
+    page.form['show_newsletter'] = True
+    page.form['notify_on_unsubscription'].select_multiple(texts=[
+        'admin@example.org'])
+    page.form.submit().follow()
+
+    # add another newsletter
+    newsletters = client.get('/newsletters')
+    new_link = find_link_by_href_end(newsletters, '/newsletters/new')
+    new = newsletters.click(href=new_link['href'])
+    new.form['title'] = "Our town is AWESOME 2"
+    new.form['lead'] = "Event reminder"
+    new.select_checkbox("occurrences", "150 Jahre Govikon")
+    new.form.submit().follow()
+
+    # send newsletter
+    newsletter = client.get('/newsletter/our-town-is-awesome-2')
+    preview = newsletter.click('Senden')
+    preview.form.submit().follow()
+
+    assert len(os.listdir(client.app.maildir)) == 2
+
+    # extract unsubscription link from email and unsubscribe
+    unsubscribe = extract_unsubscription_link(client, 1)
+    result = client.get(unsubscribe).follow()
+    assert "two@example.org erfolgreich vom Newsletter abgemeldet" in result
+
+    # verify admin received email notification
+    assert len(os.listdir(client.app.maildir)) == 3
+    assert 'two@example.org' in client.get_email(2)['TextBody']
