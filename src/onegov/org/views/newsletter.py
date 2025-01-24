@@ -563,7 +563,7 @@ def handle_send_newsletter(
     open_recipients = self.open_recipients
 
     if form.submitted(request):
-        if form.categories.data == []:
+        if form.categories and form.categories.data == []:
             # for backward compatibility select all categories if none has
             # been selected
             extracted = extract_categories_and_subcategories(
@@ -572,7 +572,8 @@ def handle_send_newsletter(
             self.newsletter_categories = (
                 extracted) if isinstance(extracted, list) else []
         else:
-            self.newsletter_categories = form.categories.data or []
+            self.newsletter_categories = (
+                form.categories.data) if form.categories else []
 
         if form.send.data == 'now':
             sent = send_newsletter(request, self, open_recipients)
