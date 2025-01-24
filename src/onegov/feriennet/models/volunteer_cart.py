@@ -176,7 +176,4 @@ class VolunteerCartAction:
         elif self.action == 'remove':
             cart.remove(self.target)
 
-        else:
-            pass
-
         return {'success': True}
