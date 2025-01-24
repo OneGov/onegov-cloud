@@ -9,6 +9,9 @@ from onegov.newsletter import NewsletterCollection, Subscription
 from onegov.org import _, OrgApp, log
 
 from typing import TYPE_CHECKING
+
+from onegov.org.mail import send_transactional_html_mail
+
 if TYPE_CHECKING:
     from onegov.org.request import OrgRequest
     from webob import Response as BaseResponse
@@ -56,7 +59,28 @@ def view_unsubscribe(
             'at ${address}',
             mapping={'address': address}
         ))
+
         log.debug(f'Unsubscribed: {address}')
+
+        # check if admin wants an email for each unsubscription
+        receivers = request.app.org.notify_on_unsubscription or None
+        if receivers:
+            print('*** tschupre receivers:', receivers)
+            subject = _(
+                'Unsubscription from the newsletter at ${address}',
+                mapping={'address': address}
+            )
+            send_transactional_html_mail(
+                request=request,
+                template='mail_notify_unsubscribe.pt',
+                subject=subject,
+                receivers=receivers,
+                content={
+                    'address': address,
+                    'title': subject,
+                    'model': None,
+                },
+            )
     else:
         request.alert(_(
             '${address} could not be unsubscribed, wrong token',

@@ -1068,6 +1068,12 @@ msgstr "Nachfolgend sehen Sie Ihre Chat-Konversation:"
 msgid "Have a great day!"
 msgstr "Wir wünschen Ihnen einen schönen Tag!"
 
+msgid "Hi Admin,"
+msgstr "Hallo Administrator"
+
+msgid "The user with the address <strong>${address}</strong> just unsubscribed from the newsletter subscriber list."
+msgstr "Der Benutzer mit der Adresse <strong>${address}</strong> hat sich soeben von der Newsletter-Abonnentenliste abgemeldet."
+
 msgid "Hello"
 msgstr "Grüezi"
 
