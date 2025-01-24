@@ -15,11 +15,15 @@ class Snippets:
     fragments = (
         (_('General'), None),
         (_('Title'), '#'),
-        (_('Text'), '___'),
-        (_('Multiline'), '...'),
         (_('E-Mail'), '@@@'),
         (_('Website'), 'http://'),
         (_('Video Link'), 'video-url'),
+
+        (_('Text'), None),
+        (_('Text'), '___'),
+        (_('Limited text'), '___[50]'),
+        (_('Numbers-only textfield (regex)'), '___/^[0-9]+$'),
+        (_('Multiline with optional number of rows'), '...[10]'),
 
         (_('Comment'), None),
         (_('Example Comment'), '<<  >>'),
@@ -53,16 +57,19 @@ class Snippets:
         (_('Files'), None),
         (_('Image'), '*.jpg|*.png|*.gif'),
         (_('Document'), '*.pdf'),
+        (_('Documents (Multiple upload)'), '*.pdf (multiple)'),
 
         (_('Numbers'), None),
         (_('Age'), '0..150'),
         (_('Percentage'), '0.00..100.00'),
+        (_('Amount with Price'), '0..30 (10 CHF)'),
 
         (_('Extended'), None),
         (_('IBAN'), '# iban'),
         (_('Swiss social security number'), '# ch.ssn'),
         (_('Swiss business identifier'), '# ch.uid'),
         (_('Swiss vat number'), '# ch.vat'),
+        (_('Password'), '***    '),
         (_('Markdown'), '<markdown>')
     )
 

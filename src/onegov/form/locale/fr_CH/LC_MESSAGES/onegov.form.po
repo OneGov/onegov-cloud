@@ -6,7 +6,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE 1.0\n"
-"POT-Creation-Date: 2024-07-02 14:42+0200\n"
+"POT-Creation-Date: 2025-01-24 19:04+0100\n"
 "PO-Revision-Date: 2019-01-31 08:31+0100\n"
 "Last-Translator: Marc Sommerhalder <marc.sommerhalder@seantis.ch>\n"
 "Language-Team: French\n"
@@ -43,12 +43,6 @@ msgstr "Général"
 msgid "Title"
 msgstr "Titre"
 
-msgid "Text"
-msgstr "Texte"
-
-msgid "Multiline"
-msgstr "Multi-lignes"
-
 msgid "E-Mail"
 msgstr "E-mail"
 
@@ -56,7 +50,19 @@ msgid "Website"
 msgstr "Site internet"
 
 msgid "Video Link"
-msgstr ""
+msgstr "Lien vidéo"
+
+msgid "Text"
+msgstr "Texte"
+
+msgid "Limited text"
+msgstr "Texte limité"
+
+msgid "Numbers-only textfield (regex)"
+msgstr "Champ de texte numérique uniquement (regex)"
+
+msgid "Multiline with optional number of rows"
+msgstr "Multiligne avec nombre de lignes optionnel"
 
 msgid "Comment"
 msgstr "Commentaire"
@@ -94,6 +100,9 @@ msgstr "Image"
 msgid "Document"
 msgstr "Document"
 
+msgid "Documents (Multiple upload)"
+msgstr "Documents (Téléchargement multiple)"
+
 msgid "Numbers"
 msgstr "Numéros"
 
@@ -102,6 +111,9 @@ msgstr "Âge"
 
 msgid "Percentage"
 msgstr "Pourcentage"
+
+msgid "Amount with Price"
+msgstr "Montant avec prix"
 
 msgid "Extended"
 msgstr "Étendu"
@@ -117,6 +129,9 @@ msgstr "Identificateur suisse d'entreprise"
 
 msgid "Swiss vat number"
 msgstr "Numéro de TVA suisse"
+
+msgid "Password"
+msgstr "Mot de passe"
 
 msgid "Markdown"
 msgstr "Markdown"
@@ -175,10 +190,12 @@ msgstr ""
 "payant est défini."
 
 #, python-format
-msgid "The '{label}' group is empty and will not be visible. Either "
-"remove the empty group or add fields to it."
-msgstr "Le groupe '{label}' est vide et ne sera pas visible. Supprimez le "
-"groupe vide ou ajoutez des champs."
+msgid ""
+"The '{label}' group is empty and will not be visible. Either remove the "
+"empty group or add fields to it."
+msgstr ""
+"Le groupe '{label}' est vide et ne sera pas visible. Supprimez le groupe "
+"vide ou ajoutez des champs."
 
 #, python-format
 msgid ""
@@ -190,7 +207,7 @@ msgstr ""
 
 #, python-format
 msgid ""
-"Invalid field type for field '{label}'. Please use the plus-icon to add "
+"Invalid field type for field '${label}'. Please use the plus-icon to add "
 "allowed field types."
 msgstr ""
 
@@ -241,3 +258,6 @@ msgstr "Aucun résultat ne correspond"
 
 msgid "Select Some Options"
 msgstr "Sélectionner quelques options"
+
+#~ msgid "Multiline"
+#~ msgstr "Multi-lignes"
