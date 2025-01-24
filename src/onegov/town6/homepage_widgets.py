@@ -83,7 +83,7 @@ class AutoplayVideoWidget:
             <div metal:use-macro="layout.macros.autoplay_video"
              tal:define="max_height '{@max-height}'; link_mp4 '{@link_mp4}';
              link_mp4_low_res '{@link_mp4_low_res}';
-             link_webm '{@link_webm}';
+             link_webm '{@link_webm}'; text_link '{@text_link}';
               link_webm_low_res '{@link_webm_low_res}'; text '{@text}'
              "
             />

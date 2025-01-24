@@ -1,3 +1,5 @@
+import os
+from tempfile import TemporaryDirectory
 import textwrap
 import transaction
 import zipfile
@@ -11,10 +13,11 @@ from onegov.file import FileCollection
 from onegov.form import (
     FormCollection, FormDefinitionCollection, as_internal_id)
 from onegov.org.models import TicketNote
+from onegov.org.models.document_form import FormDocument
 from onegov.people import Person
 from onegov.ticket import TicketCollection, Ticket
 from onegov.user import UserCollection
-from tests.shared.utils import create_image
+from tests.shared.utils import create_image, create_pdf
 from unittest.mock import patch
 from webtest import Upload
 
@@ -1397,3 +1400,45 @@ def test_create_and_fill_survey(client):
     assert 'Medium' in page
     assert '(1/1)' in page
     assert 'Nicolas Thomas' not in page
+
+
+def test_document_form(client):
+
+    session = client.app.session()
+    client.login_editor()
+
+    with TemporaryDirectory() as td:
+        first_pdf = os.path.join(td, 'first_pdf.pdf')
+        create_pdf(first_pdf, 'This is the wrong form')
+        other_pdf = os.path.join(td, 'other_pdf.pdf')
+        create_pdf(other_pdf, 'This is a deadline extension form')
+
+        page = client.get('/forms')
+        page = page.click('Dokumentenformular')
+        page.form['title'] = 'Deadline Extension'
+        page.form['lead'] = 'Request a deadline extension'
+        page.form['text'] = '''
+            Fill out the form below to request a deadline extension.
+        '''
+        page.form['pdf'] = Upload(first_pdf)
+        page = page.form.submit().follow()
+        assert 'Formular herunterladen'
+        assert 'Deadline Extension' in page
+        assert 'Request a deadline extension' in page
+        assert '''
+            Fill out the form below to request a deadline extension.
+        ''' in page
+        assert 'first_pdf.pdf' in page
+        form_document = session.query(FormDocument).one()
+        assert 'This is the wrong form' in form_document.pdf_extract
+
+        page = page.click('Bearbeiten')
+        page.form['title'] = 'Deadline Extension Request'
+
+        page.form.get('pdf', 0).select('replace')
+        page.form.get('pdf', 1).value = Upload(other_pdf)
+        page = page.form.submit().follow()
+        assert 'Deadline Extension Request' in page
+        assert 'other_pdf.pdf' in page
+        form_document = session.query(FormDocument).one()
+        assert 'This is a deadline extension form' in form_document.pdf_extract

@@ -1652,7 +1652,12 @@
             <div class="dark-overlay" tal:condition="text"></div>
             <div class="grid-container" tal:condition="text">
                 <div class="text">
-                    <span>${text}</span>
+                    <tal:b tal:condition="text_link|False">
+                        <a class="button" href="${text_link}">${text}</a>
+                    </tal:b>
+                    <tal:b tal:condition="not:text_link|False">
+                        <span>${text}</span>
+                    </tal:b>
                 </div>
             </div>
         </div>

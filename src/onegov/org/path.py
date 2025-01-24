@@ -11,6 +11,7 @@ from onegov.chat import MessageCollection
 from onegov.chat import TextModule
 from onegov.chat import TextModuleCollection
 from onegov.core.converters import extended_date_converter
+from onegov.core.converters import datetime_year_converter
 from onegov.core.converters import json_converter
 from onegov.core.converters import LiteralConverter
 from onegov.core.orm.abstract import MoveDirection
@@ -32,6 +33,8 @@ from onegov.form import FormDefinition
 from onegov.form import FormRegistrationWindow
 from onegov.form import PendingFormSubmission
 from onegov.form.collection import SurveyCollection
+from onegov.org.models.document_form import (
+    FormDocumentCollection, FormDocument)
 from onegov.form.models.submission import SurveySubmission
 from onegov.form.models.survey_window import SurveySubmissionWindow
 from onegov.newsletter import Newsletter
@@ -180,7 +183,7 @@ def get_topic(app: OrgApp, absorb: str) -> Topic | None:
     path='/news',
     absorb=True,
     converters={
-        'filter_years': [int],
+        'filter_years': [datetime_year_converter],
         'filter_tags': [str]
     }
 )
@@ -1025,7 +1028,7 @@ def get_directory_submission_action(
 @OrgApp.path(
     model=PublicationCollection,
     path='/publications',
-    converters={'year': int})
+    converters={'year': datetime_year_converter})
 def get_publication_collection(
     request: OrgRequest,
     year: int | None = None
@@ -1057,6 +1060,19 @@ def get_external_link_collection(
              converters={'id': UUID})
 def get_external_link(request: OrgRequest, id: UUID) -> ExternalLink | None:
     return ExternalLinkCollection(request.session).by_id(id)
+
+
+@OrgApp.path(model=FormDocumentCollection, path='/document-forms')
+def get_document_form_collection(
+    request: OrgRequest,
+    type: str | None = None
+) -> FormDocumentCollection:
+    return FormDocumentCollection(request.session, type=type)
+
+
+@OrgApp.path(model=FormDocument, path='/document-form/{name}')
+def get_document_form_page(app: OrgApp, name: str) -> FormDocument | None:
+    return FormDocumentCollection(app.session()).by_name(name)
 
 
 @OrgApp.path(

@@ -25,6 +25,9 @@ from onegov.directory import DirectoryCollection
 from onegov.event import OccurrenceCollection
 from onegov.file import File
 from onegov.form import FormCollection, as_internal_id
+from onegov.org.models.document_form import (
+    FormDocument,
+    FormDocumentCollection)
 from onegov.newsletter import NewsletterCollection, RecipientCollection
 from onegov.org import _
 from onegov.org import utils
@@ -89,7 +92,8 @@ if TYPE_CHECKING:
     _T = TypeVar('_T')
 
     AnyFormDefinitionOrCollection: TypeAlias = (
-        FormDefinition | FormCollection | SurveyCollection | SurveyDefinition)
+        FormDefinition | FormCollection | SurveyCollection | SurveyDefinition
+        | FormDocumentCollection | FormDocument)
 
 
 capitalised_name = re.compile(r'[A-Z]{1}[a-z]+')
@@ -1223,6 +1227,10 @@ class FormCollectionLayout(DefaultLayout):
         return FormCollection(self.request.session)
 
     @property
+    def document_forms(self) -> FormDocumentCollection:
+        return FormDocumentCollection(self.request.session)
+
+    @property
     def editbar_links(self) -> list[Link | LinkGroup] | None:
         if self.request.is_manager:
             return [
@@ -1249,6 +1257,14 @@ class FormCollectionLayout(DefaultLayout):
                                 name='new'
                             ),
                             attrs={'class': 'new-form'}
+                        ),
+                        Link(
+                            text=_('Document form'),
+                            url=self.request.link(
+                                self.document_forms,
+                                name='new'
+                            ),
+                            attrs={'class': 'new-document-form'}
                         ),
                     ]
                 ),
@@ -1477,6 +1493,65 @@ class SurveyCollectionLayout(DefaultLayout):
                 ),
             ]
         return None
+
+
+class FormDocumentLayout(DefaultLayout):
+
+    @cached_property
+    def breadcrumbs(self) -> list[Link]:
+        collection = FormCollection(self.request.session)
+
+        return [
+            Link(_('Homepage'), self.homepage_url),
+            Link(_('Forms'), self.request.link(collection)),
+            Link(self.model.title, self.request.link(self.model))
+        ]
+
+    @cached_property
+    def editbar_links(self) -> list[Link | LinkGroup] | None:
+
+        if not self.request.is_manager:
+            return None
+
+        collection = FormCollection(self.request.session)
+
+        edit_link = Link(
+            text=_('Edit'),
+            url=self.request.link(self.model, name='edit'),
+            attrs={'class': 'edit-link'}
+        )
+
+        qr_link = QrCodeLink(
+            text=_('QR'),
+            url=self.request.link(self.model),
+            attrs={'class': 'qr-code-link'}
+        )
+
+        delete_link = Link(
+            text=_('Delete'),
+            url=self.csrf_protected_url(
+                self.request.link(self.model)
+            ),
+            attrs={'class': 'delete-link'},
+            traits=(
+                Confirm(
+                    _('Do you really want to delete this form?'),
+                    _('This cannot be undone.'),
+                    _('Delete form'),
+                    _('Cancel')
+                ),
+                Intercooler(
+                    request_method='DELETE',
+                    redirect_after=self.request.link(collection)
+                )
+            )
+        )
+
+        return [
+            edit_link,
+            delete_link,
+            qr_link
+        ]
 
 
 class PersonCollectionLayout(DefaultLayout):

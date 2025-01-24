@@ -443,6 +443,29 @@ input[type="url"] {
         }
     }
 
+    *:first-child.fa:has(+ span) {
+        margin-right: .5rem;
+    }
+
+}
+
+.download-button {
+    display: block;
+    width: fit-content;
+    border-radius: .7rem;
+    margin-top: 2rem;
+    margin-bottom: 2rem;
+    border: 1px solid  $primary-color;
+    padding: 1rem;
+    transition: background 200ms linear;
+
+    &:hover {
+        background: $white-smoke;
+    }
+
+    .fa {
+        margin-right: .5rem;
+    }
 }
 
 // like above, but no border, no hover effect
@@ -1004,18 +1027,103 @@ ul.recipients {
 }
 
 .sidebar-toggler {
-    background: $black;
-    border-radius: 200px 0 0 200px;
+    background: $primary-color;
     display: block;
-    opacity: .5;
-    padding: .9rem .4rem .7rem 1rem;
+    padding-top: .3rem;
+    padding-bottom: .3rem;
     position: fixed;
-    right: 0;
-    top: calc(50vh - 23px);
+    bottom: 0;
+    color: $white;
     z-index: 1001;
+    width: 100%;
+    border-top: 1px solid rgba(255, 255, 255, 0.3);
+    align-items: center;
+    display: flex;
+    justify-content: center;
 
-    i {
-        color: $white;
+    .text {
+        font-weight: bold;
+    }
+
+
+    /* Animated Hamburger */
+
+    $bar-height: 3px;
+
+    .animated-hamburger {
+        width: 5 * $bar-height + .5 * $bar-height;
+        height: 5 * $bar-height;
+        margin-right: .5rem;
+        -webkit-transform: rotate(0deg);
+        -moz-transform: rotate(0deg);
+        -o-transform: rotate(0deg);
+        transform: rotate(0deg);
+        -webkit-transition: .5s ease-in-out;
+        -moz-transition: .5s ease-in-out;
+        -o-transition: .5s ease-in-out;
+        transition: .5s ease-in-out;
+        cursor: pointer;
+
+        span {
+            display: block;
+            position: absolute;
+            height: $bar-height;
+            width: 100%;
+            background: $white;
+            border-radius: 9px;
+            opacity: 1;
+            left: 0;
+            -webkit-transform: rotate(0deg);
+            -moz-transform: rotate(0deg);
+            -o-transform: rotate(0deg);
+            transform: rotate(0deg);
+            -webkit-transition: .25s ease-in-out;
+            -moz-transition: .25s ease-in-out;
+            -o-transition: .25s ease-in-out;
+            transition: .25s ease-in-out;
+        }
+    }
+
+
+    .animated-hamburger span:nth-child(1) {
+        top: 0px;
+    }
+
+    .animated-hamburger span:nth-child(2),.animated-hamburger span:nth-child(3) {
+        top: 2 * $bar-height;
+    }
+
+    .animated-hamburger span:nth-child(4) {
+        top: 4 * $bar-height;
+    }
+
+
+    &[aria-expanded="true"] {
+        .animated-hamburger span:nth-child(1) {
+            top: 2 * $bar-height;
+            width: 0%;
+            left: 50%;
+        }
+
+        .animated-hamburger span:nth-child(2) {
+            -webkit-transform: rotate(45deg);
+            -moz-transform: rotate(45deg);
+            -o-transform: rotate(45deg);
+            transform: rotate(45deg);
+        }
+
+        .animated-hamburger span:nth-child(3) {
+            -webkit-transform: rotate(-45deg);
+            -moz-transform: rotate(-45deg);
+            -o-transform: rotate(-45deg);
+            transform: rotate(-45deg);
+        }
+
+        .animated-hamburger span:nth-child(4) {
+            top: 2 * $bar-height;
+            width: 0%;
+            left: 50%;
+        }
     }
 }
 
