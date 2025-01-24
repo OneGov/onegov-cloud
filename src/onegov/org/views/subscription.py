@@ -65,7 +65,6 @@ def view_unsubscribe(
         # check if admin wants an email for each unsubscription
         receivers = request.app.org.notify_on_unsubscription or None
         if receivers:
-            print('*** tschupre receivers:', receivers)
             subject = _(
                 'Unsubscription from the newsletter at ${address}',
                 mapping={'address': address}
