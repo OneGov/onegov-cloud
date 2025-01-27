@@ -1,8 +1,10 @@
 import json
 import os
 from pathlib import Path
+from unittest.mock import patch, Mock
 
 import pytest
+import requests
 import transaction
 from datetime import datetime, timedelta
 from freezegun import freeze_time
@@ -1069,6 +1071,7 @@ def test_delete_content_marked_deletable__directory_entries(org_app, handlers):
         grundeigentumer_in='Berta Bertinio',
         publication_start=datetime(2024, 4, 1, tzinfo=tz),
         publication_end=datetime(2024, 4, 10, tzinfo=tz),
+        # delete_when_expired=True,
     ))
     event.delete_when_expired = True
 
@@ -1442,3 +1445,82 @@ def test_send_email_notification_for_recent_directory_entry_publications(
         assert message['To'] == john.address
         assert sport_clubs().title in message['Subject']
         assert entry_2.name in message['TextBody']
+
+
+def test_update_newsletter_email_bounce_statistics(org_app, handlers):
+    register_echo_handler(handlers)
+    register_directory_handler(handlers)
+
+    # fake postmark mailer
+    org_app.mail['marketing']['mailer'] = 'postmark'
+
+    client = Client(org_app)
+    job = get_cronjob_by_name(org_app,
+                              'update_newsletter_email_bounce_statistics')
+    job.app = org_app
+    # tz = ensure_timezone('Europe/Zurich')
+
+    transaction.begin()
+
+    # create recipients Franz and Heinz
+    recipients = RecipientCollection(org_app.session())
+    recipients.add('franz@user.ch', confirmed=True)
+    recipients.add('heinz@user.ch', confirmed=True)
+    recipients.add('trudi@user.ch', confirmed=True)
+
+    transaction.commit()
+    close_all_sessions()
+
+    with patch('requests.get') as mock_get:
+        mock_get.return_value = Bunch(
+            status_code=200,
+            json=lambda: {
+                'TotalCount': 2,
+                'Bounces': [
+                    {'RecordType': 'Bounce', 'ID': 3719297970,
+                     'Inactive': False, 'Email': 'franz@user.ch'},
+                    {'RecordType': 'Bounce', 'ID': 4739297971,
+                     'Inactive': True, 'Email': 'heinz@user.ch'}
+                ]
+            },
+            raise_for_status=Mock(return_value=None),
+        )
+
+        # execute cronjob
+        client.get(get_cronjob_url(job))
+
+        # check if the statistics are updated
+        assert mock_get.called
+        assert RecipientCollection(org_app.session()).by_address(
+            'franz@user.ch').is_inactive is False
+        assert RecipientCollection(org_app.session()).by_address(
+            'heinz@user.ch').is_inactive is True
+        assert RecipientCollection(org_app.session()).by_address(
+            'trudi@user.ch').is_inactive is False
+
+    # test raising runtime warning exception for status code 401
+    with patch('requests.get') as mock_get:
+        mock_get.return_value = Bunch(
+            status_code=401,
+            json=lambda: {},
+            raise_for_status=Mock(
+                side_effect=requests.exceptions.HTTPError('401 Unauthorized')),
+        )
+
+        # execute cronjob
+        with pytest.raises(RuntimeWarning):
+            client.get(get_cronjob_url(job))
+
+    # for other 30x and 40x status codes, the cronjob shall raise an exception
+    for status_code in [301, 302, 303, 400, 402, 403, 404, 405]:
+        with patch('requests.get') as mock_get:
+            mock_get.return_value = Bunch(
+                status_code=status_code,
+                json=lambda: {},
+                raise_for_status=Mock(
+                    side_effect=requests.exceptions.HTTPError()),
+            )
+
+            # execute cronjob
+            with pytest.raises(requests.exceptions.HTTPError):
+                client.get(get_cronjob_url(job))

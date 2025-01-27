@@ -2187,6 +2187,9 @@ msgstr ""
 msgid "New Note"
 msgstr "Nuova nota"
 
+msgid "This recipient has delivery failures, including hard bounces, invalid email addresses, spam complaints, manual deactivations, or being blocked. We recommend unsubscribing it from the list."
+msgstr "Questo destinatario presenta errori di consegna, tra cui rimbalzi, indirizzi e-mail non validi, reclami per spam, disattivazioni manuali o blocco. Si consiglia di cancellarlo dall'elenco."
+
 #~ msgid "Sign up to our newsletter to always stay up to date:"
 #~ msgstr "Iscriviti alla nostra newsletter per rimanere sempre aggiornato:"
 

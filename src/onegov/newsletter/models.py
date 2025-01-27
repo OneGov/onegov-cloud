@@ -183,6 +183,27 @@ class Recipient(Base, TimestampMixin, ContentMixin):
     def subscription(self) -> Subscription:
         return Subscription(self, self.token)
 
+    @property
+    def is_inactive(self) -> bool:
+        """
+        Checks if the recipient's email address is marked as inactive.
+
+        Returns:
+            bool: True if the email address is marked as inactive, False
+            otherwise.
+        """
+        return self.meta.get('inactive', False)
+
+    def mark_inactive(self) -> None:
+        """
+        Marks the recipient's email address as inactive.
+
+        This method sets the 'inactive' flag in the recipient's metadata to
+        True. It is typically used when a bounce event causes the email
+        address to be deactivated by Postmark.
+        """
+        self.meta['inactive'] = True
+
 
 class Subscription:
     """ Adds subscription management to a recipient. """

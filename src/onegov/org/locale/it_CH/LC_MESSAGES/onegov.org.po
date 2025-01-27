@@ -2815,6 +2815,9 @@ msgstr ""
 msgid "Delete content"
 msgstr "Cancellare il contenuto"
 
+msgid "Photo album. Will be shown at the end of content."
+msgstr "Album fotografico. Sarà mostrato alla fine del contenuto."
+
 msgid "Photo album"
 msgstr "Album fotografico"
 
@@ -6240,6 +6243,9 @@ msgstr "È stato creato un account per te"
 
 msgid "The user was created successfully"
 msgstr "Utente creato correttamente"
+
+msgid "This recipient has delivery failures, including hard bounces, invalid email addresses, spam complaints, manual deactivations, or being blocked. We recommend unsubscribing it from the list."
+msgstr "Questo destinatario presenta errori di consegna, tra cui rimbalzi, indirizzi e-mail non validi, reclami per spam, disattivazioni manuali o blocco. Si consiglia di cancellarlo dall'elenco."
 
 #~ msgid "Photo album. Will be shown at the end of content."
 #~ msgstr "Album fotografico. Sarà mostrato alla fine del contenuto."
