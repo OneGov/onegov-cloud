@@ -2,7 +2,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE 1.0\n"
-"POT-Creation-Date: 2025-01-13 14:02+0100\n"
+"POT-Creation-Date: 2025-01-27 13:25+0100\n"
 "PO-Revision-Date: 2021-11-11 09:07+0100\n"
 "Last-Translator: Marc Sommerhalder <marc.sommerhalder@seantis.ch>\n"
 "Language-Team: French\n"
@@ -32,37 +32,26 @@ msgstr "Réalisation : ${dates}"
 msgid "Activities"
 msgstr "Activités"
 
-#, python-format
-msgid "${count} Activities"
-msgstr "${count} activités"
+msgid "Occasions"
+msgstr "Événements"
 
-#, python-format
-msgid "${count} Occasions"
-msgstr "${count} événement(s)"
+msgid "overfull"
+msgstr "avec trop de participants"
 
-#, python-format
-msgid "${count} overfull"
-msgstr "${count} avec trop de participants"
+msgid "full"
+msgstr "complet"
 
-#, python-format
-msgid "${count} full"
-msgstr "${count} complet"
+msgid "operable"
+msgstr "avec suffisamment de participants"
 
-#, python-format
-msgid "${count} operable"
-msgstr "${count} avec suffisamment de participants"
+msgid "unoperable"
+msgstr "avec trop peu de participants"
 
-#, python-format
-msgid "${count} unoperable"
-msgstr "${count} avec trop peu de participants"
+msgid "empty"
+msgstr "pas de participants"
 
-#, python-format
-msgid "${count} empty"
-msgstr "${count} pas de participants"
-
-#, python-format
-msgid "${count} cancelled"
-msgstr "${count} annulés"
+msgid "cancelled"
+msgstr "annulés"
 
 msgid "Wishes"
 msgstr "Souhaits"
@@ -70,78 +59,50 @@ msgstr "Souhaits"
 msgid "Bookings"
 msgstr "Réservations"
 
-#, python-format
-msgid "${count} Wishes"
-msgstr "${count} souhaits"
+msgid "Wishes per Attendee"
+msgstr "souhaits par participant·e"
 
-#, python-format
-msgid "${count} Wishes per Attendee"
-msgstr "${count} souhaits par participant·e"
+msgid "accepted"
+msgstr "acceptés"
 
-#, python-format
-msgid "${count} Bookings"
-msgstr "${count} réservation(s)"
+msgid "not carried out or cancelled"
+msgstr "annulé(e) ou déprogrammé(e)"
 
-#, python-format
-msgid "${count} accepted"
-msgstr "${count} acceptés"
+msgid "denied"
+msgstr "refusés/complet"
 
-#, python-format
-msgid "${count} not carried out or cancelled"
-msgstr "${count} annulé(e) ou déprogrammé(e)"
+msgid "blocked"
+msgstr "bloqués"
 
-#, python-format
-msgid "${count} denied"
-msgstr "${count} refusés/complet"
-
-#, python-format
-msgid "${count} blocked"
-msgstr "${count} bloqués"
-
-#, python-format
-msgid "${count} Bookings per Attendee"
-msgstr "${count} réservation(s) par participant·e"
+msgid "Bookings per Attendee"
+msgstr "réservation(s) par participant·e"
 
 msgid "Attendees"
 msgstr "Participant·e·s"
 
-#, python-format
-msgid "${count} Girls"
-msgstr "${count} filles"
+msgid "Girls"
+msgstr "filles"
 
-#, python-format
-msgid "${count} Boys"
-msgstr "${count} garçons"
+msgid "Boys"
+msgstr "garçons"
 
-#, python-format
-msgid "${count} of which without accepted bookings"
-msgstr "${count} dont sans réservations acceptées"
+msgid "of which without accepted bookings"
+msgstr "dont sans réservations acceptées"
 
 msgid "Happiness"
 msgstr "Satisfaction"
 
-#, python-format
-msgid "${amount}% Happiness"
-msgstr "${amount}% de satisfaits"
-
-#, python-format
-msgid "${count} Attendees Without Occasion"
-msgstr "${count} participant·e·s sans réservations"
+msgid "Attendees Without Occasion"
+msgstr "participant·e·s sans réservations"
 
 msgid "CHF outstanding"
 msgstr "CHF impayés"
 
-#, python-format
-msgid "${amount} CHF total"
-msgstr "Total de ${amount} CHF"
+msgid "CHF total"
+msgstr "CHF total"
 
-#, python-format
-msgid "${amount} CHF paid"
-msgstr "${amount} CHF payés"
-
-#, python-format
-msgid "${amount} CHF outstanding"
-msgstr "${amount} CHF impayés"
+msgid "CHF paid"
+msgstr "CHF payés"
 
 msgid "Help us"
 msgstr "Aidez-nous"
@@ -518,9 +479,6 @@ msgstr "Éléments de la facture"
 
 msgid "Exports invoice items in the given period."
 msgstr "Exporter les éléments de la facture sur une période donnée."
-
-msgid "Occasions"
-msgstr "Événements"
 
 msgid "Exports activities with an occasion in the given period."
 msgstr "Exporter les activités qui ont lieu sur une période définie."
@@ -3252,6 +3210,102 @@ msgstr "Réservations pour ${period}"
 #, python-format
 msgid "Billing for ${period}"
 msgstr "Facturation pour ${period}"
+
+#, python-format
+#~ msgid "${count} Activities"
+#~ msgstr "${count} activités"
+
+#, python-format
+#~ msgid "${count} Occasions"
+#~ msgstr "${count} événement(s)"
+
+#, python-format
+#~ msgid "${count} overfull"
+#~ msgstr "${count} avec trop de participants"
+
+#, python-format
+#~ msgid "${count} full"
+#~ msgstr "${count} complet"
+
+#, python-format
+#~ msgid "${count} operable"
+#~ msgstr "${count} avec suffisamment de participants"
+
+#, python-format
+#~ msgid "${count} unoperable"
+#~ msgstr "${count} avec trop peu de participants"
+
+#, python-format
+#~ msgid "${count} empty"
+#~ msgstr "${count} pas de participants"
+
+#, python-format
+#~ msgid "${count} cancelled"
+#~ msgstr "${count} annulés"
+
+#, python-format
+#~ msgid "${count} Wishes"
+#~ msgstr "${count} souhaits"
+
+#, python-format
+#~ msgid "${count} Wishes per Attendee"
+#~ msgstr "${count} souhaits par participant·e"
+
+#, python-format
+#~ msgid "${count} Bookings"
+#~ msgstr "${count} réservation(s)"
+
+#, python-format
+#~ msgid "${count} accepted"
+#~ msgstr "${count} acceptés"
+
+#, python-format
+#~ msgid "${count} not carried out or cancelled"
+#~ msgstr "${count} annulé(e) ou déprogrammé(e)"
+
+#, python-format
+#~ msgid "${count} denied"
+#~ msgstr "${count} refusés/complet"
+
+#, python-format
+#~ msgid "${count} blocked"
+#~ msgstr "${count} bloqués"
+
+#, python-format
+#~ msgid "${count} Bookings per Attendee"
+#~ msgstr "${count} réservation(s) par participant·e"
+
+#, python-format
+#~ msgid "${count} Girls"
+#~ msgstr "${count} filles"
+
+#, python-format
+#~ msgid "${count} Boys"
+#~ msgstr "${count} garçons"
+
+#, python-format
+#~ msgid "${count} of which without accepted bookings"
+#~ msgstr "${count} dont sans réservations acceptées"
+
+#, python-format
+#~ msgid "${amount}% Happiness"
+#~ msgstr "${amount}% de satisfaits"
+
+#, python-format
+#~ msgid "${count} Attendees Without Occasion"
+#~ msgstr "${count} participant·e·s sans réservations"
+
+#, python-format
+#~ msgid "${amount} CHF total"
+#~ msgstr "Total de ${amount} CHF"
+
+#, python-format
+#~ msgid "${amount} CHF paid"
+#~ msgstr "${amount} CHF payés"
+
+#, python-format
+#~ msgid "${amount} CHF outstanding"
+#~ msgstr "${amount} CHF impayés"
 
 #~ msgid "My list"
 #~ msgstr "Ma liste"

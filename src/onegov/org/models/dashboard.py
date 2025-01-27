@@ -97,7 +97,7 @@ class BoardletFact:
     # the text of the fact (includes the metric)
     text: str
 
-    number: str | None = None
+    number: int | float | str | None = None
 
     icon: str | None = None
 

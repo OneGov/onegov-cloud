@@ -2,9 +2,8 @@
     Dashboard
 */
 
-
 .boardlet {
-        background: $gray-pastel;
+        background: $white-smoke;
         margin-bottom: 1.5rem;
         border-top: 5px solid $green-light;
         padding: 1rem;
@@ -38,16 +37,50 @@
         font-weight: normal;
     }
 
+    .facts {
+        width: 100%;
+        table-layout: auto;
+        border-collapse: collapse;
+
+        tbody {
+            background: transparent;
+        }
+
+        tr {
+            background: transparent;
+
+            &.none {
+                color: $base;
+            }
+        }
+
+        td {
+            padding: .2rem 0;
+            background: transparent;
+        }
+
+        td:first-child {
+            white-space: nowrap;
+            width: 1%;
+          }
+    }
+
     .fact-number,
     .fact-icon {
         background: $white;
         padding: .2rem .5rem;
-        margin-bottom: .2rem;
         border-radius: .2rem;
+        width: 100%;
+        display: block;
+        text-align: right;
     }
 
-    ul .small {
-        margin-bottom: .2rem;
+    .fact-icon {
+        padding: .3rem;
+    }
+
+    .fact-text {
+        margin-left: .5rem;
     }
 }
 

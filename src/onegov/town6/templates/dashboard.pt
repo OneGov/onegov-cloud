@@ -7,12 +7,16 @@
             <div class=" cell" tal:repeat="boardlet group">
                 <div class="boardlet boardlet-${boardlet.state} ${boardlet.name}">
                     <h2 class="h4"><span>${boardlet.number|''}</span><br tal:condition="exists:boardlet.number"><span class="title">${boardlet.title}</span></h2>
-                    <ul class="dense">
-                        <li tal:repeat="fact boardlet.facts" class="${fact.css_class} small">
-                            <i tal:condition="fact.icon" class="far ${fact.icon} fact-icon"></i>
-                            <span tal:condition="fact.number" class="fact-number">${fact.number}</span> <span class="fact-text">${fact.text}</span>
-                        </li>
-                    </ul>
+                    <table class="facts">
+                        <tr tal:repeat="fact boardlet.facts" class="${fact.css_class} small ${'none' if not (fact.number or fact.icon) else ''}">
+                            <td>
+                                <i tal:condition="fact.icon" class="far ${fact.icon} fact-icon"></i>
+                                <span tal:condition="fact.number" class="fact-number">${fact.number}</span>
+                                <span tal:condition="not:(fact.number or fact.icon)" class="fact-number">-</span>
+                            </td>
+                            <td><span class="fact-text">${fact.text}</span></td>
+                        </tr>
+                    </table>
                 </div>
             </div>
         </div>

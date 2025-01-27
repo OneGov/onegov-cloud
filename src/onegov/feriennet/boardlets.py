@@ -182,49 +182,49 @@ class ActivitiesBoardlet(FeriennetBoardlet):
 
         yield BoardletFact(
             text=_('Activities'),
-            number=str(self.activities_count)
+            number=self.activities_count
         )
 
         yield BoardletFact(
             text=_('Occasions'),
-            number=str(self.occasions_count)
+            number=self.occasions_count
         )
 
         states = self.occasion_states()
 
         yield BoardletFact(
             text=_('overfull'),
-            number=str(states['overfull']),
+            number=states['overfull'],
             css_class='' if states['overfull'] else 'zero'
         )
 
         yield BoardletFact(
             text=_('full'),
-            number=str(states['full']),
+            number=states['full'],
             css_class='' if states['full'] else 'zero'
         )
 
         yield BoardletFact(
             text=_('operable'),
-            number=str(states['operable']),
+            number=states['operable'],
             css_class='' if states['operable'] else 'zero'
         )
 
         yield BoardletFact(
             text=_('unoperable'),
-            number=str(states['unoperable']),
+            number=states['unoperable'],
             css_class='' if states['unoperable'] else 'zero'
         )
 
         yield BoardletFact(
             text=_('empty'),
-            number=str(states['empty']),
+            number=states['empty'],
             css_class='' if states['empty'] else 'zero'
         )
 
         yield BoardletFact(
             text=_('cancelled'),
-            number=str(states['cancelled']),
+            number=states['cancelled'],
             css_class='' if states['cancelled'] else 'zero'
         )
 
@@ -297,40 +297,40 @@ class BookingsBoardlet(FeriennetBoardlet):
             )
             yield BoardletFact(
                 text=_('Wishes per Attendee'),
-                number=str(self.attendees_count and (
+                number=self.attendees_count and (
                     round(self.counts['total'] / self.attendees_count, 1)
-                ) or 0)
+                ) or 0
             )
         else:
             yield BoardletFact(
                 text=_('Bookings'),
-                number=str(self.counts['total'])
+                number=self.counts['total']
             )
             yield BoardletFact(
                 text=_('accepted'),
-                number=str(self.counts['accepted']),
+                number=self.counts['accepted'],
                 css_class='' if self.counts['accepted'] else 'zero'
             )
             yield BoardletFact(
                 text=_('not carried out or cancelled'),
-                number=str(self.counts['cancelled']),
+                number=self.counts['cancelled'],
                 css_class='' if self.counts['cancelled'] else 'zero'
             )
             yield BoardletFact(
                 text=_('denied'),
-                number=str(self.counts['denied']),
+                number=self.counts['denied'],
                 css_class='' if self.counts['denied'] else 'zero'
             )
             yield BoardletFact(
                 text=_('blocked'),
-                number=str(self.counts['blocked']),
+                number=self.counts['blocked'],
                 css_class='' if self.counts['blocked'] else 'zero'
             )
             yield BoardletFact(
                 text=_('Bookings per Attendee'),
-                number=str(self.attendees_count and round(
+                number=self.attendees_count and round(
                         self.counts['accepted'] / self.attendees_count, 1
-                    ) or 0),
+                    ) or 0,
             )
 
 
@@ -395,24 +395,20 @@ class AttendeesBoardlet(FeriennetBoardlet):
             return
 
         yield BoardletFact(
-            text=_('${count} Girls', mapping={
-                'count': self.attendee_counts['girls']
-            }),
+            text=_('Girls'),
+            number=self.attendee_counts['girls'],
             css_class='' if self.attendee_counts['girls'] else 'zero'
         )
 
         yield BoardletFact(
-            text=_('${count} Boys', mapping={
-                'count': self.attendee_counts['boys']
-            }),
+            text=_('Boys'),
+            number=self.attendee_counts['boys'],
             css_class='' if self.attendee_counts['boys'] else 'zero'
         )
 
         yield BoardletFact(
-            text=_('${count} of which without accepted bookings',
-                   mapping={
-                       'count': self.attendee_counts['without_booking']
-                   }),
+            text=_('of which without accepted bookings'),
+            number=self.attendee_counts['without_booking'],
             css_class='' if self.attendee_counts['without_booking'] else 'zero'
         )
 
@@ -456,15 +452,8 @@ class MatchingBoardlet(FeriennetBoardlet):
             return
 
         yield BoardletFact(
-            text=_('${amount}% Happiness', mapping={
-                'amount': self.happiness
-            }),
-        )
-
-        yield BoardletFact(
-            text=_('${count} Attendees Without Occasion', mapping={
-                'count': self.unlucky_count
-            }),
+            text=_('Attendees Without Occasion'),
+            number=str(self.unlucky_count),
             css_class='' if self.unlucky_count else 'zero'
         )
 
@@ -512,22 +501,17 @@ class BillingPortlet(FeriennetBoardlet):
             return
 
         yield BoardletFact(
-            text=_('${amount} CHF total', mapping={
-                'amount': self.layout.format_number(self.amounts['total'])
-            }),
+            text=_('CHF total'),
+            number=self.layout.format_number(self.amounts['total']),
             css_class='' if self.amounts['total'] else 'zero'
         )
         yield BoardletFact(
-            text=_('${amount} CHF paid', mapping={
-                'amount': self.layout.format_number(self.amounts['paid'])
-            }),
+            text=_('CHF paid'),
+            number=self.layout.format_number(self.amounts['paid']),
             css_class='' if self.amounts['paid'] else 'zero'
         )
         yield BoardletFact(
-            text=_('${amount} CHF outstanding', mapping={
-                'amount': self.layout.format_number(
-                    self.amounts['outstanding']
-                )
-            }),
+            text=_('CHF outstanding'),
+            number=self.layout.format_number(self.amounts['outstanding']),
             css_class='' if self.amounts['outstanding'] else 'zero'
         )
