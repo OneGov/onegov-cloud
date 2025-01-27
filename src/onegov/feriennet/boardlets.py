@@ -67,7 +67,7 @@ class PeriodBoardlet(FeriennetBoardlet):
             return
 
         def icon(checked: bool) -> str:
-            return 'fa-check-square' if checked else 'fa-square'
+            return 'fa-check-circle' if checked else 'fa-circle'
 
         yield BoardletFact(
             text=_('Prebooking: ${dates}', mapping={
@@ -76,6 +76,7 @@ class PeriodBoardlet(FeriennetBoardlet):
                     self.period.prebooking_end,
                 )
             }),
+            icon=icon(self.period.confirmed),
         )
 
         yield BoardletFact(
@@ -85,6 +86,7 @@ class PeriodBoardlet(FeriennetBoardlet):
                     self.period.booking_end,
                 )
             }),
+            icon=icon(self.period.is_booking_in_past),
         )
 
         yield BoardletFact(
@@ -94,6 +96,7 @@ class PeriodBoardlet(FeriennetBoardlet):
                     self.period.execution_end,
                 )
             }),
+            icon=icon(self.period.is_execution_in_past),
         )
 
 
@@ -178,58 +181,50 @@ class ActivitiesBoardlet(FeriennetBoardlet):
             return
 
         yield BoardletFact(
-            text=_('${count} Activities', mapping={
-                'count': self.activities_count
-            }),
+            text=_('Activities'),
+            number=str(self.activities_count)
         )
 
         yield BoardletFact(
-            text=_('${count} Occasions', mapping={
-                'count': self.occasions_count
-            }),
+            text=_('Occasions'),
+            number=str(self.occasions_count)
         )
 
         states = self.occasion_states()
 
         yield BoardletFact(
-            text=_('${count} overfull', mapping={
-                'count': states['overfull'],
-            }),
+            text=_('overfull'),
+            number=str(states['overfull']),
             css_class='' if states['overfull'] else 'zero'
         )
 
         yield BoardletFact(
-            text=_('${count} full', mapping={
-                'count': states['full'],
-            }),
+            text=_('full'),
+            number=str(states['full']),
             css_class='' if states['full'] else 'zero'
         )
 
         yield BoardletFact(
-            text=_('${count} operable', mapping={
-                'count': states['operable'],
-            }),
+            text=_('operable'),
+            number=str(states['operable']),
             css_class='' if states['operable'] else 'zero'
         )
 
         yield BoardletFact(
-            text=_('${count} unoperable', mapping={
-                'count': states['unoperable'],
-            }),
+            text=_('unoperable'),
+            number=str(states['unoperable']),
             css_class='' if states['unoperable'] else 'zero'
         )
 
         yield BoardletFact(
-            text=_('${count} empty', mapping={
-                'count': states['empty'],
-            }),
+            text=_('empty'),
+            number=str(states['empty']),
             css_class='' if states['empty'] else 'zero'
         )
 
         yield BoardletFact(
-            text=_('${count} cancelled', mapping={
-                'count': states['cancelled'],
-            }),
+            text=_('cancelled'),
+            number=str(states['cancelled']),
             css_class='' if states['cancelled'] else 'zero'
         )
 
@@ -297,53 +292,45 @@ class BookingsBoardlet(FeriennetBoardlet):
 
         if not self.period.confirmed:
             yield BoardletFact(
-                text=_('${count} Wishes', mapping={
-                    'count': self.counts['total']
-                }),
+                text=_('Wishes'),
+                number=str(self.counts['total'])
             )
             yield BoardletFact(
-                text=_('${count} Wishes per Attendee', mapping={
-                    'count': self.attendees_count and (
-                        round(self.counts['total'] / self.attendees_count, 1)
-                    ) or 0
-                }),
+                text=_('Wishes per Attendee'),
+                number=str(self.attendees_count and (
+                    round(self.counts['total'] / self.attendees_count, 1)
+                ) or 0)
             )
         else:
             yield BoardletFact(
-                text=_('${count} Bookings', mapping={
-                    'count': self.counts['total']
-                }),
+                text=_('Bookings'),
+                number=str(self.counts['total'])
             )
             yield BoardletFact(
-                text=_('${count} accepted', mapping={
-                    'count': self.counts['accepted']
-                }),
+                text=_('accepted'),
+                number=str(self.counts['accepted']),
                 css_class='' if self.counts['accepted'] else 'zero'
             )
             yield BoardletFact(
-                text=_('${count} not carried out or cancelled', mapping={
-                    'count': self.counts['cancelled']
-                }),
+                text=_('not carried out or cancelled'),
+                number=str(self.counts['cancelled']),
                 css_class='' if self.counts['cancelled'] else 'zero'
             )
             yield BoardletFact(
-                text=_('${count} denied', mapping={
-                    'count': self.counts['denied']
-                }),
+                text=_('denied'),
+                number=str(self.counts['denied']),
                 css_class='' if self.counts['denied'] else 'zero'
             )
             yield BoardletFact(
-                text=_('${count} blocked', mapping={
-                    'count': self.counts['blocked']
-                }),
+                text=_('blocked'),
+                number=str(self.counts['blocked']),
                 css_class='' if self.counts['blocked'] else 'zero'
             )
             yield BoardletFact(
-                text=_('${count} Bookings per Attendee', mapping={
-                    'count': self.attendees_count and round(
+                text=_('Bookings per Attendee'),
+                number=str(self.attendees_count and round(
                         self.counts['accepted'] / self.attendees_count, 1
-                    ) or 0
-                }),
+                    ) or 0),
             )
 
 

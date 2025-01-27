@@ -99,4 +99,6 @@ class BoardletFact:
 
     number: str | None = None
 
+    icon: str | None = None
+
     css_class: str | None = None
