@@ -15,8 +15,8 @@
                     <span>
                         ${recipient.address}
                     </span>
-                    <span i18n:translate="" class="info">
-                        (Subscribed on <tal:b i18n:name="date">${layout.format_date(recipient.last_change, 'date')}</tal:b>)
+                    <span class="info">
+                        (<tal:b i18n:translate="">Subscribed on</tal:b> ${layout.format_date(recipient.created, 'date')})
                     </span>
                     -
                     <a class="confirm"

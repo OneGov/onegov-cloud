@@ -2,7 +2,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE 1.0\n"
-"POT-Creation-Date: 2025-01-27 14:56+0100\n"
+"POT-Creation-Date: 2025-01-27 16:09+0100\n"
 "PO-Revision-Date: 2022-03-15 10:50+0100\n"
 "Last-Translator: Marc Sommerhalder <marc.sommerhalder@seantis.ch>\n"
 "Language-Team: French\n"
@@ -1110,6 +1110,9 @@ msgstr "Destinataire"
 
 msgid "Do not actually import the newsletter subscribers"
 msgstr "Ne pas importer les abonnés à la newsletter"
+
+msgid "Subscribed on"
+msgstr "Abonné le"
 
 msgid "Will be used as image in the page overview on the parent page"
 msgstr "Sera utilisé comme image dans la vue d'ensemble de la page parent"
@@ -4452,9 +4455,6 @@ msgstr "Déposez les fichiers pour les vérifier"
 msgid "No subscribers yet"
 msgstr "Pas encore d'abonnés"
 
-msgid "(Subscribed on ${date})"
-msgstr "(Abonné le ${date})"
-
 msgid "submitted"
 msgstr "soumis"
 
@@ -6246,6 +6246,9 @@ msgstr "Un compte a été créé pour vous"
 
 msgid "The user was created successfully"
 msgstr "L'utilisateur a bien été créé"
+
+#~ msgid "(Subscribed on ${date})"
+#~ msgstr "(Abonné le ${date})"
 
 #~ msgid "Photo album. Will be shown at the end of content."
 #~ msgstr "Album photo. Sera affiché à la fin du contenu."

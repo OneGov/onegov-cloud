@@ -2,7 +2,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: \n"
-"POT-Creation-Date: 2025-01-27 14:56+0100\n"
+"POT-Creation-Date: 2025-01-27 16:09+0100\n"
 "PO-Revision-Date: 2022-03-15 10:52+0100\n"
 "Last-Translator: \n"
 "Language-Team: \n"
@@ -1110,6 +1110,9 @@ msgstr "Destinatario"
 
 msgid "Do not actually import the newsletter subscribers"
 msgstr "Non importare effettivamente gli iscritti alla newsletter"
+
+msgid "Subscribed on"
+msgstr "Iscritto il"
 
 msgid "Will be used as image in the page overview on the parent page"
 msgstr ""
@@ -4442,9 +4445,6 @@ msgstr "Rilascia i file per verificarli"
 msgid "No subscribers yet"
 msgstr "Non ci sono ancora abbonati"
 
-msgid "(Subscribed on ${date})"
-msgstr "(Iscritto il ${date})"
-
 msgid "submitted"
 msgstr "inviato"
 
@@ -6234,6 +6234,9 @@ msgstr "È stato creato un account per te"
 
 msgid "The user was created successfully"
 msgstr "Utente creato correttamente"
+
+#~ msgid "(Subscribed on ${date})"
+#~ msgstr "(Iscritto il ${date})"
 
 #~ msgid "Photo album. Will be shown at the end of content."
 #~ msgstr "Album fotografico. Sarà mostrato alla fine del contenuto."

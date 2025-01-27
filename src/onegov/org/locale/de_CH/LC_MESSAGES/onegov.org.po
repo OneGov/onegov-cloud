@@ -1,7 +1,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE 1.0\n"
-"POT-Creation-Date: 2025-01-27 14:56+0100\n"
+"POT-Creation-Date: 2025-01-27 16:09+0100\n"
 "PO-Revision-Date: 2022-03-15 10:21+0100\n"
 "Last-Translator: Marc Sommerhalder <marc.sommerhalder@seantis.ch>\n"
 "Language-Team: German\n"
@@ -1109,6 +1109,9 @@ msgstr "Empfänger"
 
 msgid "Do not actually import the newsletter subscribers"
 msgstr "Die Newsletter Abonnenten werden nicht gespeichert"
+
+msgid "Subscribed on"
+msgstr "Abonniert am"
 
 msgid "Will be used as image in the page overview on the parent page"
 msgstr ""
@@ -4449,9 +4452,6 @@ msgstr "Dateien zur Prüfung hierhin ziehen"
 msgid "No subscribers yet"
 msgstr "Noch keine Abonnenten"
 
-msgid "(Subscribed on ${date})"
-msgstr "(Abonniert am ${date})"
-
 msgid "submitted"
 msgstr "gemeldet"
 
@@ -6230,6 +6230,9 @@ msgstr "Ein Konto wurde für Sie erstellt"
 
 msgid "The user was created successfully"
 msgstr "Der Benutzer wurde erfolgreich erstellt"
+
+#~ msgid "(Subscribed on ${date})"
+#~ msgstr "(Abonniert am ${date})"
 
 #~ msgid "(Subscribed on ${date}"
 #~ msgstr "(Abonniert am ${date}"

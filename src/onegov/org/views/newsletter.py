@@ -689,7 +689,8 @@ def export_newsletter_recipients(
     if form.submitted(request):
         import_form = NewsletterSubscriberImportExportForm()
         import_form.request = request
-        results = import_form.run_export()
+        results = import_form.run_export(
+            formatter=layout.export_formatter(form.format))
 
         return form.as_export_response(
             results, title=request.translate(_('Newsletter Recipients'))
