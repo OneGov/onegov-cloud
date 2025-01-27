@@ -3,7 +3,7 @@
         ${title}
     </tal:b>
     <tal:b metal:fill-slot="body">
-        <p i18n:translate>Hi Admin,</p>
+        <p i18n:translate>Hello</p>
 
         <p i18n:translate>
             The user with the address <strong i18n:name="address">${address}</strong> just unsubscribed from the newsletter subscriber list.

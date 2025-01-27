@@ -1074,9 +1074,6 @@ msgstr "Benachrichtigung bei Abmeldung vom Newsletter"
 msgid "Send an email notification when a user unsubscribes from the newsletter"
 msgstr "Sende eine E-Mail-Benachrichtigung, wenn sich ein Benutzer vom Newsletter abmeldet"
 
-msgid "Hi Admin,"
-msgstr "Hallo Administrator"
-
 msgid "The user with the address <strong>${address}</strong> just unsubscribed from the newsletter subscriber list."
 msgstr "Der Benutzer mit der Adresse <strong>${address}</strong> hat sich soeben von der Newsletter-Abonnentenliste abgemeldet."
 

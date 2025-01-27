@@ -66,7 +66,7 @@ def view_unsubscribe(
         receivers = request.app.org.notify_on_unsubscription or None
         if receivers:
             subject = _(
-                'Unsubscription from the newsletter at ${address}',
+                'Unsubscription from newsletter',
                 mapping={'address': address}
             )
             send_transactional_html_mail(

@@ -3851,11 +3851,13 @@ msgstr "Ti auguro una buona giornata!"
 msgid "Notify on newsletter unsubscription"
 msgstr "Notifica di annullamento dell'iscrizione alla newsletter"
 
-msgid "Send an email notification when a user unsubscribes from the newsletter"
-msgstr "Inviare una notifica via e-mail quando un utente si cancella dalla newsletter"
+msgid "Send an email notification to the following users when a recipient "
+"unsubscribes from the newsletter"
+msgstr "Inviare una notifica via e-mail ai seguenti utenti quando un "
+"destinatario si cancella dalla newsletter"
 
-msgid "Hi Admin,"
-msgstr "Salve amministratore"
+msgid "Unsubscription from newsletter"
+msgstr "Cancellazione dalla newsletter"
 
 msgid "The user with the address ${address} just unsubscribed from the newsletter subscriber list."
 msgstr "L'utente con l'indirizzo ${indirizzo} si è appena cancellato dalla lista degli iscritti alla newsletter."

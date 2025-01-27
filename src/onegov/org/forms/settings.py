@@ -1165,8 +1165,8 @@ class NewsletterSettingsForm(Form):
 
     notify_on_unsubscription = ChosenSelectMultipleEmailField(
         label=_('Notify on newsletter unsubscription'),
-        description=_('Send an email notification when a user unsubscribes '
-                      'from the newsletter'),
+        description=_('Send an email notification to the following users '
+                      'when a recipient unsubscribes from the newsletter'),
         validators=[StrictOptional()],
         choices=[]
     )
@@ -1249,10 +1249,11 @@ class NewsletterSettingsForm(Form):
             self.notify_on_unsubscription.data = model.notify_on_unsubscription
 
     def on_request(self) -> None:
-        user_q = self.request.session.query(User).filter_by(role='admin')
-        user_q = user_q.order_by(User.username.desc())
+        users = self.request.session.query(User).filter(
+            User.role.in_(['admin', 'editor']))
+        users = users.order_by(User.username.desc())
         self.notify_on_unsubscription.choices = [
-            (u.username, u.title) for u in user_q if '@' in u.username
+            (u.username) for u in users if '@' in u.username
         ]
 
 
