@@ -5512,6 +5512,11 @@ msgstr "Willkommen beim ${org} Newsletter"
 
 #, python-format
 msgid ""
+"Success! We have added ${address} to the list of recipients."
+msgstr ""
+"Erfolg! Wir haben ${address} zur Liste der Empfänger hinzugefügt."
+
+msgid ""
 "Success! We have added ${address} to the list of recipients. Subscribed "
 "categories are ${subscribed}."
 msgstr ""

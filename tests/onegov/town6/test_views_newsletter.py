@@ -966,7 +966,7 @@ def test_admin_receives_email_notification_on_unsubscription(client):
     preview = newsletter.click('Senden')
     preview.form.submit().follow()
 
-    # verify newsletter was sent to both
+    # verify newsletter was sent
     assert len(os.listdir(client.app.maildir)) == 1
 
     # extract unsubscription link from email and unsubscribe

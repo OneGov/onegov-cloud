@@ -227,13 +227,19 @@ def handle_newsletters(
                 # auto confirm user
                 recipient.confirmed = True
 
-                request.success(_((
-                    'Success! We have added ${address} to the list of '
-                    'recipients. Subscribed categories are ${subscribed}.'
-                ), mapping={
-                    'address': form.address.data,
-                    'subscribed': ', '.join(subscribed)
-                }))
+                if subscribed:
+                    request.success(_((
+                        'Success! We have added ${address} to the list of '
+                        'recipients. Subscribed categories are ${subscribed}.'
+                    ), mapping={
+                        'address': form.address.data,
+                        'subscribed': ', '.join(subscribed)
+                    }))
+                else:
+                    request.success(_(
+                        'Success! We have added ${address} to the list of '
+                        'recipients.', mapping={'address': form.address.data}
+                    ))
             else:
                 # send out confirmation mail
                 confirm_mail = render_template('mail_confirm.pt', request, {

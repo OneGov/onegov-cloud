@@ -5529,6 +5529,11 @@ msgstr "Bienvenue sur la lettre d'information ${org}"
 
 #, python-format
 msgid ""
+"Success! We have added ${address} to the list of recipients."
+msgstr ""
+"Succès! Nous avons ajouté ${address} à la liste des destinataires."
+
+msgid ""
 "Success! We have added ${address} to the list of recipients. Subscribed "
 "categories are ${subscribed}."
 msgstr ""
