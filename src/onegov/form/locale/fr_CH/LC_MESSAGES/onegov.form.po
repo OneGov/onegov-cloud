@@ -6,7 +6,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE 1.0\n"
-"POT-Creation-Date: 2025-01-24 19:04+0100\n"
+"POT-Creation-Date: 2025-01-27 10:34+0100\n"
 "PO-Revision-Date: 2019-01-31 08:31+0100\n"
 "Last-Translator: Marc Sommerhalder <marc.sommerhalder@seantis.ch>\n"
 "Language-Team: French\n"
@@ -51,6 +51,9 @@ msgstr "Site internet"
 
 msgid "Video Link"
 msgstr "Lien vidéo"
+
+msgid "Text fields"
+msgstr "Champs de texte"
 
 msgid "Text"
 msgstr "Texte"

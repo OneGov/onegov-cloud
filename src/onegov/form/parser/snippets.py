@@ -19,7 +19,7 @@ class Snippets:
         (_('Website'), 'http://'),
         (_('Video Link'), 'video-url'),
 
-        (_('Text'), None),
+        (_('Text fields'), None),
         (_('Text'), '___'),
         (_('Limited text'), '___[50]'),
         (_('Numbers-only textfield (regex)'), '___/^[0-9]+$'),
