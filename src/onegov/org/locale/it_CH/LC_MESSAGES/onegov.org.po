@@ -3848,6 +3848,12 @@ msgstr "Nessuna prenotazione oggi."
 msgid "Have a great day!"
 msgstr "Ti auguro una buona giornata!"
 
+msgid "Notify on newsletter unsubscription"
+msgstr "Notifica di annullamento dell'iscrizione alla newsletter"
+
+msgid "Send an email notification when a user unsubscribes from the newsletter"
+msgstr "Inviare una notifica via e-mail quando un utente si cancella dalla newsletter"
+
 msgid "Hi Admin,"
 msgstr "Salve amministratore"
 
