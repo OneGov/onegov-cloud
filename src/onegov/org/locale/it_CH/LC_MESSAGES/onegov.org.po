@@ -2,7 +2,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: \n"
-"POT-Creation-Date: 2025-01-22 08:59+0100\n"
+"POT-Creation-Date: 2025-01-27 14:56+0100\n"
 "PO-Revision-Date: 2022-03-15 10:52+0100\n"
 "Last-Translator: \n"
 "Language-Team: \n"
@@ -1036,15 +1036,6 @@ msgstr "Immagini a grandezza naturale"
 
 msgid "Grid layout"
 msgstr "Disposizione a griglia"
-
-msgid "By filename"
-msgstr "Per nome del file"
-
-msgid "By caption"
-msgstr "Per didascalia"
-
-msgid "By last change"
-msgstr "Per data dell'ultima modifica"
 
 msgid "Show images on homepage"
 msgstr "Mostra le immagini sulla pagina principale"
@@ -2993,8 +2984,8 @@ msgstr "Il rifiuto di ${title} non può essere annullato."
 msgid "Reject reservation"
 msgstr "Rifiuta prenotazione"
 
-#.
 #. Used in sentence: "${event} published."
+#.
 msgid "Event"
 msgstr "Evento"
 
@@ -4451,6 +4442,9 @@ msgstr "Rilascia i file per verificarli"
 msgid "No subscribers yet"
 msgstr "Non ci sono ancora abbonati"
 
+msgid "(Subscribed on ${date})"
+msgstr "(Iscritto il ${date})"
+
 msgid "submitted"
 msgstr "inviato"
 
@@ -5204,6 +5198,9 @@ msgstr "${address} disiscritto con successo"
 msgid "${address} could not be unsubscribed, wrong token"
 msgstr "Impossibile annullare l'iscrizione di ${address}, token errato"
 
+msgid "A form with this name already exists"
+msgstr "Un modulo con questo nome esiste già"
+
 msgid "Added a new form"
 msgstr "Aggiunto un nuovo modulo"
 
@@ -5351,9 +5348,6 @@ msgstr "È rimasto un posto disponibile"
 #, python-format
 msgid "There are ${count} spots left"
 msgstr "Sono rimasti ${count} posti disponibili"
-
-msgid "A form with this name already exists"
-msgstr "Un modulo con questo nome esiste già"
 
 msgid "New Form"
 msgstr "Nuovo modulo"

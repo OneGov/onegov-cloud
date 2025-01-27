@@ -1,7 +1,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE 1.0\n"
-"POT-Creation-Date: 2025-01-22 08:59+0100\n"
+"POT-Creation-Date: 2025-01-27 14:56+0100\n"
 "PO-Revision-Date: 2022-03-15 10:21+0100\n"
 "Last-Translator: Marc Sommerhalder <marc.sommerhalder@seantis.ch>\n"
 "Language-Team: German\n"
@@ -1034,15 +1034,6 @@ msgstr "Grosse Bilder"
 
 msgid "Grid layout"
 msgstr "Raster"
-
-msgid "By filename"
-msgstr "Nach Dateiname"
-
-msgid "By caption"
-msgstr "Nach Beschreibung"
-
-msgid "By last change"
-msgstr "Nach Zeitpunkt der letzten Änderung"
 
 msgid "Show images on homepage"
 msgstr "Bilder auf der Startseite zeigen"
@@ -2987,8 +2978,8 @@ msgstr "Die Absage von ${title} kann nicht rückgängig gemacht werden."
 msgid "Reject reservation"
 msgstr "Reservation absagen"
 
-#.
 #. Used in sentence: "${event} published."
+#.
 msgid "Event"
 msgstr "Veranstaltung"
 
@@ -4458,6 +4449,9 @@ msgstr "Dateien zur Prüfung hierhin ziehen"
 msgid "No subscribers yet"
 msgstr "Noch keine Abonnenten"
 
+msgid "(Subscribed on ${date})"
+msgstr "(Abonniert am ${date})"
+
 msgid "submitted"
 msgstr "gemeldet"
 
@@ -5208,6 +5202,9 @@ msgstr "${address} wurde erfolgreich abgemeldet"
 msgid "${address} could not be unsubscribed, wrong token"
 msgstr "${address} konnte nicht abgemeldet werden - falsches Token"
 
+msgid "A form with this name already exists"
+msgstr "Ein Formular mit diesem Namen existiert bereits"
+
 msgid "Added a new form"
 msgstr "Ein neues Formular wurd hinzugefügt"
 
@@ -5350,9 +5347,6 @@ msgstr "Es ist noch ein Platz verfügbar"
 #, python-format
 msgid "There are ${count} spots left"
 msgstr "Es sind noch ${count} Plätze verfügbar"
-
-msgid "A form with this name already exists"
-msgstr "Ein Formular mit diesem Namen existiert bereits"
 
 msgid "New Form"
 msgstr "Neues Formular"
@@ -6236,6 +6230,9 @@ msgstr "Ein Konto wurde für Sie erstellt"
 
 msgid "The user was created successfully"
 msgstr "Der Benutzer wurde erfolgreich erstellt"
+
+#~ msgid "(Subscribed on ${date}"
+#~ msgstr "(Abonniert am ${date}"
 
 #~ msgid "Describes in detail how this form is to be used"
 #~ msgstr "Beschreibt detailliert wie dieses Formular benutzt werden soll"

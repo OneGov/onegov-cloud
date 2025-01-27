@@ -2,7 +2,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE 1.0\n"
-"POT-Creation-Date: 2025-01-22 08:59+0100\n"
+"POT-Creation-Date: 2025-01-27 14:56+0100\n"
 "PO-Revision-Date: 2022-03-15 10:50+0100\n"
 "Last-Translator: Marc Sommerhalder <marc.sommerhalder@seantis.ch>\n"
 "Language-Team: French\n"
@@ -1034,15 +1034,6 @@ msgstr "Images de taille normale"
 
 msgid "Grid layout"
 msgstr "Mise en page en grille"
-
-msgid "By filename"
-msgstr "Par nom de fichier"
-
-msgid "By caption"
-msgstr "Par légende"
-
-msgid "By last change"
-msgstr "Par date de dernière modification"
 
 msgid "Show images on homepage"
 msgstr "Montrer les images sur la page d'accueil"
@@ -2986,8 +2977,8 @@ msgstr "Refuser ${title} est irréversible."
 msgid "Reject reservation"
 msgstr "Refuser la réservation"
 
-#.
 #. Used in sentence: "${event} published."
+#.
 msgid "Event"
 msgstr "Événement"
 
@@ -3344,8 +3335,8 @@ msgid ""
 "filled-out form."
 msgstr ""
 "Veuillez vérifier vos données et appuyez sur « Compléter » pour finaliser le "
-"processus. S'il y a quelque chose que vous souhaitez modifier, cliquez sur "
-"« Modifier » pour retourner sur le formulaire complété."
+"processus. S'il y a quelque chose que vous souhaitez modifier, cliquez sur « "
+"Modifier » pour retourner sur le formulaire complété."
 
 msgid ""
 "The image shown in the list view is a square. To have your image shown fully "
@@ -4461,6 +4452,9 @@ msgstr "Déposez les fichiers pour les vérifier"
 msgid "No subscribers yet"
 msgstr "Pas encore d'abonnés"
 
+msgid "(Subscribed on ${date})"
+msgstr "(Abonné le ${date})"
+
 msgid "submitted"
 msgstr "soumis"
 
@@ -5223,6 +5217,9 @@ msgstr "${address} désinscrit avec succès"
 msgid "${address} could not be unsubscribed, wrong token"
 msgstr "${address} n'a pas pu être désinscrite, mauvaise zone de texte"
 
+msgid "A form with this name already exists"
+msgstr "Un formulaire avec ce nom existe déjà"
+
 msgid "Added a new form"
 msgstr "A ajouté un nouveau formulaire"
 
@@ -5364,9 +5361,6 @@ msgstr "Il reste une place"
 #, python-format
 msgid "There are ${count} spots left"
 msgstr "Il reste ${count} places"
-
-msgid "A form with this name already exists"
-msgstr "Un formulaire avec ce nom existe déjà"
 
 msgid "New Form"
 msgstr "Nouveau formulaire"
