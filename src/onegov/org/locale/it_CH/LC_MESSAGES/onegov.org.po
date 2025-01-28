@@ -2,7 +2,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: \n"
-"POT-Creation-Date: 2025-01-08 16:47+0100\n"
+"POT-Creation-Date: 2025-01-28 15:26+0100\n"
 "PO-Revision-Date: 2022-03-15 10:52+0100\n"
 "Last-Translator: \n"
 "Language-Team: \n"
@@ -1022,6 +1022,9 @@ msgstr "Immagini a grandezza naturale"
 msgid "Grid layout"
 msgstr "Disposizione a griglia"
 
+msgid "Show images on homepage"
+msgstr "Mostra le immagini sulla pagina principale"
+
 msgid "By filename"
 msgstr "Per nome del file"
 
@@ -1030,9 +1033,6 @@ msgstr "Per didascalia"
 
 msgid "By last change"
 msgstr "Per data dell'ultima modifica"
-
-msgid "Show images on homepage"
-msgstr "Mostra le immagini sulla pagina principale"
 
 msgid "Used in the overview and the e-mail subject"
 msgstr "Utilizzato nella panoramica e nell'oggetto dell'e-mail"
@@ -2776,6 +2776,24 @@ msgstr ""
 msgid "Sidebar links"
 msgstr "Collegamenti della barra laterale"
 
+msgid "Contact link"
+msgstr ""
+
+msgid "Sidebar contact"
+msgstr ""
+
+msgid "Please provide a URL if contact link text is set"
+msgstr ""
+
+msgid "Please provide link text if contact URL is set"
+msgstr ""
+
+msgid "Contact Text"
+msgstr ""
+
+msgid "Contact URL"
+msgstr ""
+
 msgid "Delete content when expired"
 msgstr "Eliminare il contenuto quando è scaduto"
 
@@ -2965,8 +2983,8 @@ msgstr "Il rifiuto di ${title} non può essere annullato."
 msgid "Reject reservation"
 msgstr "Rifiuta prenotazione"
 
-#.
 #. Used in sentence: "${event} published."
+#.
 msgid "Event"
 msgstr "Evento"
 

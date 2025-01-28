@@ -537,13 +537,3 @@ p.file-title {
         cursor: pointer !important;
     }
 }
-
-.formfields > div:has(input.side-by-side-form-fields) {
-    width: 50%;
-    display: inline-block;
-}
-
-input.side-by-side-form-fields {
-    width: 100%;
-}
-
