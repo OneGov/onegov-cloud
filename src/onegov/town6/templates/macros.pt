@@ -771,6 +771,14 @@
                     </li>
                 </ul>
             </div>
+            <div class="page-sidebar-item" tal:condition="contact_link_text and contact_link_url">
+                <h3 i18n:translate="">Link to contact</h3>
+                <ul class="sidebar-links">
+                    <li>
+                        <a href="${contact_link_url}">${contact_link_text}</a>
+                    </li>
+                </ul>
+            </div>
             <div class="more-news side-panel" tal:condition="siblings|False">
                 <h3 i18n:translate="">More news</h3>
                 <ul class="more-list">
@@ -821,7 +829,7 @@
 </metal:page_content>
 
 <metal:page_content define-macro="page_content" i18n:domain="onegov.town6">
-    <div class="grid-x grid-padding-x wrapper" tal:define="show_side_panel show_side_panel|False; location location|False; show_page_image page.show_page_image|None; files files|None; sidepanel_links sidepanel_links|None; news page.type == 'news'|False; imageset page.photo_album|None; as_content layout.org.theme_options.get('page-image-position', 'as_content') ==  'as_content';">
+    <div class="grid-x grid-padding-x wrapper" tal:define="show_side_panel show_side_panel|False; location location|False; show_page_image page.show_page_image|None; files files|None; sidepanel_links sidepanel_links|None; news page.type == 'news'|False; imageset page.photo_album|None; as_content layout.org.theme_options.get('page-image-position', 'as_content') ==  'as_content'; contact_link_text page.contact_link_text|None; contact_link_url page.contact_link_url|None;">
         <tal:b condition="not: people or files or contact or coordinates or location or show_side_panel or more_entries|False">
             <div class="small-12 cell page-content-main">
                 <img class="page-image" tal:condition="show_page_image and page.page_image and (as_content or news)" src="${page.page_image}">
@@ -851,7 +859,6 @@
                     <metal:b tal:condition="imageset" use-macro="layout.macros['render_inline_photo_album']"/>
 
                     <div metal:define-slot="after-text"></div>
-
 
                     <div class="people-panel" tal:condition="people and show_people_on_main_page" tal:define="show_people_on_main_page page.show_people_on_main_page|resource.show_people_on_main_page|False; western_name_order page.western_name_order|resource.western_name_order|False">
                         <h3 i18n:translate>People</h3>
