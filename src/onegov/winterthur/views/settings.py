@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 import textwrap
 
 from markupsafe import Markup
@@ -115,8 +117,8 @@ class WinterthurDaycareSettingsForm(Form):
     def populate_obj(  # type:ignore[override]
         self,
         obj: Organisation,  # type:ignore[override]
-        exclude: 'Collection[str] | None' = None,
-        include: 'Collection[str] | None' = None
+        exclude: Collection[str] | None = None,
+        include: Collection[str] | None = None
     ) -> None:
 
         super().populate_obj(obj, exclude=exclude, include=include)
@@ -153,11 +155,11 @@ class WinterthurDaycareSettingsForm(Form):
                 _('Invalid services configuration')
             ) from exception
 
-    def directory_choices(self) -> 'Iterator[tuple[str, str]]':
+    def directory_choices(self) -> Iterator[tuple[str, str]]:
         dirs: DirectoryCollection[ExtendedDirectory]
         dirs = DirectoryCollection(self.request.session, type='extended')
 
-        def choice(directory: 'ExtendedDirectory') -> tuple[str, str]:
+        def choice(directory: ExtendedDirectory) -> tuple[str, str]:
             return (
                 directory.id.hex,
                 directory.title
@@ -179,9 +181,9 @@ class WinterthurDaycareSettingsForm(Form):
 )
 def custom_handle_settings(
     self: Organisation,
-    request: 'WinterthurRequest',
+    request: WinterthurRequest,
     form: WinterthurDaycareSettingsForm
-) -> 'RenderData | Response':
+) -> RenderData | Response:
     return handle_generic_settings(self, request, form, _('Daycare Settings'))
 
 
@@ -196,8 +198,8 @@ class WinterthurMissionReportSettingsForm(Form):
     def populate_obj(  # type:ignore[override]
         self,
         obj: Organisation,  # type:ignore[override]
-        exclude: 'Collection[str] | None' = None,
-        include: 'Collection[str] | None' = None
+        exclude: Collection[str] | None = None,
+        include: Collection[str] | None = None
     ) -> None:
 
         super().populate_obj(obj, exclude=exclude, include=include)
@@ -231,8 +233,8 @@ class WinterthurMissionReportSettingsForm(Form):
 )
 def handle_mission_report_settings(
     self: Organisation,
-    request: 'WinterthurRequest',
+    request: WinterthurRequest,
     form: WinterthurMissionReportSettingsForm
-) -> 'RenderData | Response':
+) -> RenderData | Response:
     return handle_generic_settings(
         self, request, form, _('Mission Reports'))

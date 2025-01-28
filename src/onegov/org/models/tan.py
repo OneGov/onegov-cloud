@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 from datetime import timedelta
 from uuid import uuid4
 
@@ -32,21 +34,21 @@ class TANAccess(Base, TimestampMixin):
         Index('ix_tan_accesses_created', 'created'),
     )
 
-    id: 'Column[uuid.UUID]' = Column(
+    id: Column[uuid.UUID] = Column(
         UUID,  # type: ignore[arg-type]
         primary_key=True,
         default=uuid4
     )
 
     # for an mTAN session this would be the phone number
-    session_id: 'Column[str]' = Column(
+    session_id: Column[str] = Column(
         Text,
         index=True,
         nullable=False
     )
 
     # The url that was accessed
-    url: 'Column[str]' = Column(
+    url: Column[str] = Column(
         Text,
         index=True,
         nullable=False
@@ -57,7 +59,7 @@ class TANAccessCollection(GenericCollection[TANAccess]):
 
     def __init__(
         self,
-        session: 'Session',
+        session: Session,
         session_id: str,
         access_window: timedelta = DEFAULT_ACCESS_WINDOW,
     ):
@@ -69,7 +71,7 @@ class TANAccessCollection(GenericCollection[TANAccess]):
     def model_class(self) -> type[TANAccess]:
         return TANAccess
 
-    def query(self) -> 'Query[TANAccess]':
+    def query(self) -> Query[TANAccess]:
         cutoff = TANAccess.timestamp() - self.access_window
         return self.session.query(TANAccess).filter(
             TANAccess.session_id == self.session_id

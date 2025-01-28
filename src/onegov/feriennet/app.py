@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 from functools import cached_property
 from markupsafe import Markup
 from onegov.activity import (
@@ -116,15 +118,15 @@ class FeriennetApp(TownApp):
             User.username, User.title))
 
     @orm_cached(policy='on-table-change:users')
-    def user_ids_by_name(self) -> dict[str | None, 'UUID']:
+    def user_ids_by_name(self) -> dict[str | None, UUID]:
         return dict(UserCollection(self.session()).query().with_entities(
             User.username, User.id))
 
     @cached_property
-    def sponsors(self) -> list['Sponsor']:
+    def sponsors(self) -> list[Sponsor]:
         return load_sponsors(utils.module_path('onegov.feriennet', 'sponsors'))
 
-    def mail_sponsor(self, request: FeriennetRequest) -> list['Sponsor']:
+    def mail_sponsor(self, request: FeriennetRequest) -> list[Sponsor]:
         sponsors = [
             sponsor.compiled(request) for sponsor in self.sponsors
             if getattr(sponsor, 'mail_url', None)
@@ -143,13 +145,13 @@ class FeriennetApp(TownApp):
         return self.periods[0] if self.periods else None
 
     @property
-    def public_organiser_data(self) -> 'Sequence[str]':
+    def public_organiser_data(self) -> Sequence[str]:
         return self.org.meta.get('public_organiser_data', ('name', 'website'))
 
     def get_sponsors(
         self,
         request: FeriennetRequest
-    ) -> list['Sponsor'] | None:
+    ) -> list[Sponsor] | None:
 
         assert request.locale is not None
         language = request.locale[:2]
@@ -218,8 +220,8 @@ class FeriennetApp(TownApp):
 
     def invoice_collection(
         self,
-        period_id: 'UUID | None' = None,
-        user_id: 'UUID | None' = None
+        period_id: UUID | None = None,
+        user_id: UUID | None = None
     ) -> InvoiceCollection:
         """ Returns the invoice collection guaranteed to be configured
         according to the organisation's settings.
@@ -247,7 +249,7 @@ class FeriennetApp(TownApp):
 
     # FIXME: Are we still using these properties? Because they were broken
     @property
-    def donation_amounts(self) -> 'Sequence[int]':
+    def donation_amounts(self) -> Sequence[int]:
         return self.org.meta.get('donation_amounts', DEFAULT_DONATION_AMOUNTS)
 
     def show_volunteers(self, request: FeriennetRequest) -> bool:
@@ -273,22 +275,22 @@ def get_template_directory() -> str:
 
 @FeriennetApp.setting(section='org', name='create_new_organisation')
 def get_create_new_organisation_factory(
-) -> 'Callable[[FeriennetApp, str], Organisation]':
+) -> Callable[[FeriennetApp, str], Organisation]:
     return create_new_organisation
 
 
 @FeriennetApp.setting(section='org', name='status_mail_roles')
-def get_status_mail_roles() -> 'Sequence[str]':
+def get_status_mail_roles() -> Sequence[str]:
     return ('admin', )
 
 
 @FeriennetApp.setting(section='org', name='ticket_manager_roles')
-def get_ticket_manager_roles() -> 'Sequence[str]':
+def get_ticket_manager_roles() -> Sequence[str]:
     return ('admin', )
 
 
 @FeriennetApp.setting(section='org', name='public_ticket_messages')
-def get_public_ticket_messages() -> 'Sequence[str]':
+def get_public_ticket_messages() -> Sequence[str]:
     return (*default_public_ticket_messages(), 'activity')
 
 
@@ -299,7 +301,7 @@ def get_require_complete_userprofile() -> bool:
 
 @FeriennetApp.setting(section='org', name='is_complete_userprofile')
 def get_is_complete_userprofile_handler(
-) -> 'Callable[[FeriennetRequest, str], bool]':
+) -> Callable[[FeriennetRequest, str], bool]:
     from onegov.feriennet.forms import UserProfileForm
 
     def is_complete_userprofile(
@@ -350,12 +352,12 @@ def get_js_path() -> str:
 
 
 @FeriennetApp.webasset('volunteer-cart')
-def get_volunteer_cart() -> 'Iterator[str]':
+def get_volunteer_cart() -> Iterator[str]:
     yield 'volunteer-cart.jsx'
 
 
 @FeriennetApp.webasset('common')
-def get_common_asset() -> 'Iterator[str]':
+def get_common_asset() -> Iterator[str]:
     yield from default_common_asset()
     yield 'printthis.js'
     yield 'print.js'
@@ -364,7 +366,7 @@ def get_common_asset() -> 'Iterator[str]':
 
 
 @FeriennetApp.setting(section='content_security_policy', name='default')
-def feriennet_content_security_policy() -> 'ContentSecurityPolicy':
+def feriennet_content_security_policy() -> ContentSecurityPolicy:
     policy = org_content_security_policy()
     policy.connect_src.add('https://*.piwik.pro')
     return policy

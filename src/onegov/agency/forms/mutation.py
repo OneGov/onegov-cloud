@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 from onegov.agency import _
 from onegov.core.utils import ensure_scheme
 from onegov.form import Form
@@ -41,7 +43,7 @@ class MutationForm(Form):
     )
 
     @property
-    def proposal_fields(self) -> dict[str, 'CallableProxyType[Field]']:
+    def proposal_fields(self) -> dict[str, CallableProxyType[Field]]:
         for fieldset in self.fieldsets:
             if fieldset.label == 'Proposed changes':
                 return fieldset.fields

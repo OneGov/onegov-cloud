@@ -2,6 +2,8 @@
 upgraded on the server. See :class:`onegov.core.upgrade.upgrade_task`.
 
 """
+from __future__ import annotations
+
 from markupsafe import Markup
 from onegov.core.upgrade import upgrade_task
 from onegov.core.upgrade import UpgradeContext

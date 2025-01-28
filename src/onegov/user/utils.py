@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 from typing import TYPE_CHECKING
 if TYPE_CHECKING:
     from onegov.user import User
@@ -5,8 +7,8 @@ if TYPE_CHECKING:
 
 
 def password_reset_url(
-    user: 'User',
-    request: 'CoreRequest',
+    user: User,
+    request: CoreRequest,
     url: str
 ) -> str | None:
     """ Appends the token needed by PasswordResetForm for a password reset.

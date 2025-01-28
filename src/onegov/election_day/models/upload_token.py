@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 from onegov.core.orm import Base
 from onegov.core.orm.mixins import TimestampMixin
 from onegov.core.orm.types import UUID
@@ -16,14 +18,14 @@ class UploadToken(Base, TimestampMixin):
     __tablename__ = 'upload_tokens'
 
     #: Identifies the token
-    id: 'Column[uuid.UUID]' = Column(
+    id: Column[uuid.UUID] = Column(
         UUID,  # type:ignore[arg-type]
         primary_key=True,
         default=uuid4
     )
 
     #: The token
-    token: 'Column[uuid.UUID]' = Column(
+    token: Column[uuid.UUID] = Column(
         UUID,  # type:ignore[arg-type]
         unique=True,
         default=uuid4,

@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 from onegov.core.security import Public
 from onegov.feriennet import FeriennetApp, _
 from onegov.town6.views.auth import town_handle_registration
@@ -18,9 +20,9 @@ if TYPE_CHECKING:
 )
 def custom_handle_registration(
     self: Auth,
-    request: 'FeriennetRequest',
+    request: FeriennetRequest,
     form: RegistrationForm
-) -> 'RenderData | Response':
+) -> RenderData | Response:
 
     if request.app.org.meta.get('require_full_age_for_registration', False):
         form.callout = _(  # type:ignore[attr-defined]

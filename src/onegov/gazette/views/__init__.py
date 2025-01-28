@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 from onegov.user import UserCollection
 
 
@@ -8,7 +10,7 @@ if TYPE_CHECKING:
     from uuid import UUID
 
 
-def get_user(request: 'GazetteRequest') -> 'User | None':
+def get_user(request: GazetteRequest) -> User | None:
     username = request.identity.userid
     if username is None:
         return None
@@ -18,8 +20,8 @@ def get_user(request: 'GazetteRequest') -> 'User | None':
 
 
 def get_user_and_group(
-    request: 'GazetteRequest'
-) -> tuple[list['UUID'], list['UUID']]:
+    request: GazetteRequest
+) -> tuple[list[UUID], list[UUID]]:
 
     user = get_user(request)
     return (

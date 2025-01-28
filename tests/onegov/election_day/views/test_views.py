@@ -571,6 +571,10 @@ def test_view_opendata_catalog(election_day_app_zg):
         for x in root.findall('.//{http://purl.org/dc/terms/}publisher')
     ]) == {'Staatskanzlei Kanton Govikon'}
     assert set([
+        list(x[0].attrib.values())[0]
+        for x in root.findall('.//{http://purl.org/dc/terms/}publisher')
+    ]) == {'urn:onegov_election_day:publisher:kanton-govikon'}
+    assert set([
         list(x.attrib.values())[0]
         for x in root.findall('.//{http://www.w3.org/2006/vcard/ns#}hasEmail')
     ]) == {'mailto:info@govikon'}
@@ -620,6 +624,15 @@ def test_view_opendata_catalog(election_day_app_zg):
         'http://kanton-govikon/election-elections',
         'http://kanton-govikon/vote-vote'
     }
+
+    # explicit publisher URI, rather than implicit based on ID
+    principal.open_data['uri'] = 'https://staatskanzlei.govikon.ch'
+    election_day_app_zg.cache.set('principal', principal)
+    root = fromstring(client.get('/catalog.rdf').text)
+    assert set([
+        list(x[0].attrib.values())[0]
+        for x in root.findall('.//{http://purl.org/dc/terms/}publisher')
+    ]) == {'https://staatskanzlei.govikon.ch'}
 
 
 def test_view_screen(election_day_app_zg):

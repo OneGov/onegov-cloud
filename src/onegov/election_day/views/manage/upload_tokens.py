@@ -1,4 +1,5 @@
 """ The manage subscription views. """
+from __future__ import annotations
 
 import morepath
 
@@ -23,8 +24,8 @@ if TYPE_CHECKING:
 )
 def view_upload_tokens(
     self: UploadTokenCollection,
-    request: 'ElectionDayRequest'
-) -> 'RenderData':
+    request: ElectionDayRequest
+) -> RenderData:
     """ View all upload tokens as a list. """
 
     return {
@@ -42,9 +43,9 @@ def view_upload_tokens(
 )
 def create_upload_token(
     self: UploadTokenCollection,
-    request: 'ElectionDayRequest',
+    request: ElectionDayRequest,
     form: EmptyForm
-) -> 'RenderData | Response':
+) -> RenderData | Response:
     """ Create a new upload token. """
 
     layout = ManageUploadTokensLayout(self, request)
@@ -70,9 +71,9 @@ def create_upload_token(
 )
 def delete_upload_token(
     self: UploadToken,
-    request: 'ElectionDayRequest',
+    request: ElectionDayRequest,
     form: EmptyForm
-) -> 'RenderData | Response':
+) -> RenderData | Response:
     """ Delete the upload token item. """
 
     layout = ManageUploadTokensLayout(self, request)

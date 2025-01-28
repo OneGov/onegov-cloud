@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 from onegov.core.orm import Base
 from onegov.core.orm.mixins import ContentMixin
 from onegov.core.orm.mixins import TimestampMixin
@@ -33,7 +35,7 @@ class AgencyMembership(Base, ContentMixin, TimestampMixin, ORMSearchable,
     #: subclasses of this class. See
     #: `<https://docs.sqlalchemy.org/en/improve_toc/\
     #: orm/extensions/declarative/inheritance.html>`_.
-    type: 'Column[str]' = Column(
+    type: Column[str] = Column(
         Text,
         nullable=False,
         default=lambda: 'generic'
@@ -50,52 +52,52 @@ class AgencyMembership(Base, ContentMixin, TimestampMixin, ORMSearchable,
     }
 
     #: the unique id, part of the url
-    id: 'Column[uuid.UUID]' = Column(
+    id: Column[uuid.UUID] = Column(
         UUID,  # type:ignore[arg-type]
         primary_key=True,
         default=uuid4
     )
 
     #: the id of the agency
-    agency_id: 'Column[int]' = Column(
+    agency_id: Column[int] = Column(
         Integer,
         ForeignKey('agencies.id'),
         nullable=False
     )
 
     #: the related agency (which may have any number of memberships)
-    agency: 'relationship[Agency]' = relationship(
+    agency: relationship[Agency] = relationship(
         'Agency',
         back_populates='memberships'
     )
 
     #: the id of the person
-    person_id: 'Column[uuid.UUID]' = Column(
+    person_id: Column[uuid.UUID] = Column(
         UUID,  # type:ignore[arg-type]
         ForeignKey('people.id'),
         nullable=False
     )
 
     #: the related person (which may have any number of memberships)
-    person: 'relationship[Person]' = relationship(
+    person: relationship[Person] = relationship(
         'Person',
         back_populates='memberships',
     )
 
     #: the position of the membership within the agency
-    order_within_agency: 'Column[int]' = Column(Integer, nullable=False)
+    order_within_agency: Column[int] = Column(Integer, nullable=False)
 
     #: the position of the membership within all memberships of a person
-    order_within_person: 'Column[int]' = Column(Integer, nullable=False)
+    order_within_person: Column[int] = Column(Integer, nullable=False)
 
     #: describes the membership
-    title: 'Column[str]' = Column(Text, nullable=False)
+    title: Column[str] = Column(Text, nullable=False)
 
     #: when the membership started
-    since: 'Column[str | None]' = Column(Text, nullable=True)
+    since: Column[str | None] = Column(Text, nullable=True)
 
     @property
-    def siblings_by_agency(self) -> 'Query[Self]':
+    def siblings_by_agency(self) -> Query[Self]:
         """ Returns a query that includes all siblings by agency, including
         the item itself ordered by `order_within_agency`.
         """
@@ -107,7 +109,7 @@ class AgencyMembership(Base, ContentMixin, TimestampMixin, ORMSearchable,
         return query
 
     @property
-    def siblings_by_person(self) -> 'Query[Self]':
+    def siblings_by_person(self) -> Query[Self]:
         """ Returns a query that includes all siblings by person, including
         the item itself ordered by `order_within_person`.
         """
@@ -118,7 +120,7 @@ class AgencyMembership(Base, ContentMixin, TimestampMixin, ORMSearchable,
         query = query.filter(cls.person == self.person)
         return query
 
-    def vcard(self, exclude: 'Collection[str] | None ' = None) -> str:
+    def vcard(self, exclude: Collection[str] | None = None) -> str:
         """ Returns the person as vCard (3.0).
 
         Allows to specify the included attributes, provides a reasonable

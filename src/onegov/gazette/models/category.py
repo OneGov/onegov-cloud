@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 from onegov.core.orm.abstract import AdjacencyList
 from onegov.core.orm.mixins import ContentMixin
 from onegov.core.orm.mixins import TimestampMixin
@@ -29,19 +31,19 @@ class Category(AdjacencyList, ContentMixin, TimestampMixin):
     __tablename__ = 'gazette_categories'
 
     #: True, if this category is still in use.
-    active: 'Column[bool | None]' = Column(Boolean, nullable=True)
+    active: Column[bool | None] = Column(Boolean, nullable=True)
 
     if TYPE_CHECKING:
         # we need to override these attributes to get the correct base class
-        parent: relationship['Category | None']
-        children: relationship[Sequence['Category']]
+        parent: relationship[Category | None]
+        children: relationship[Sequence[Category]]
 
         @property
-        def root(self) -> 'Category': ...
+        def root(self) -> Category: ...
         @property
-        def ancestors(self) -> Iterator['Category']: ...
+        def ancestors(self) -> Iterator[Category]: ...
 
-    def notices(self) -> 'Query[GazetteNotice]':
+    def notices(self) -> Query[GazetteNotice]:
         """ Returns a query to get all notices related to this category. """
 
         from onegov.gazette.models.notice import GazetteNotice  # circular

@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 from decimal import Decimal
 from onegov.core.cache import lru_cache
 from onegov.activity import Attendee
@@ -29,7 +31,7 @@ if TYPE_CHECKING:
     from webob import Response
 
 
-OCCASION_STATES: tuple[tuple[str, 'OccasionState'], ...] = (
+OCCASION_STATES: tuple[tuple[str, OccasionState], ...] = (
     (_('Too many attendees'), 'overfull'),
     (_('Fully occupied'), 'full'),
     (_('Enough attendees'), 'operable'),
@@ -46,9 +48,9 @@ OCCASION_STATES: tuple[tuple[str, 'OccasionState'], ...] = (
     permission=Secret)
 def handle_matches(
     self: MatchCollection,
-    request: 'FeriennetRequest',
+    request: FeriennetRequest,
     form: MatchForm
-) -> 'RenderData | Response':
+) -> RenderData | Response:
 
     layout = MatchCollectionLayout(self, request)
 
@@ -84,10 +86,10 @@ def handle_matches(
         self.period = self.period.materialize(request.session)
         form.process_scoring(self.period.scoring)
 
-    def activity_link(oid: 'UUID') -> str:
+    def activity_link(oid: UUID) -> str:
         return request.class_link(Occasion, {'id': oid})
 
-    def occasion_table_link(oid: 'UUID') -> str:
+    def occasion_table_link(oid: UUID) -> str:
         return request.class_link(Occasion, {'id': oid}, name='bookings-table')
 
     filters = {
@@ -126,8 +128,8 @@ def handle_matches(
     permission=Secret)
 def view_occasion_bookings_table(
     self: Occasion,
-    request: 'FeriennetRequest'
-) -> 'RenderData':
+    request: FeriennetRequest
+) -> RenderData:
 
     layout = DefaultLayout(self, request)
 
@@ -143,7 +145,7 @@ def view_occasion_bookings_table(
         )
     }
 
-    def occasion_links(oid: 'UUID') -> 'Iterator[Link]':
+    def occasion_links(oid: UUID) -> Iterator[Link]:
         if self.period.finalized:
             yield Link(
                 text=_('Signup Attendee'),
@@ -182,7 +184,7 @@ def view_occasion_bookings_table(
         )
 
     @lru_cache(maxsize=10)
-    def attendee_link(attendee_id: 'UUID') -> str:
+    def attendee_link(attendee_id: UUID) -> str:
         return request.return_here(
             request.class_link(
                 Attendee, {'id': attendee_id}
@@ -197,7 +199,7 @@ def view_occasion_bookings_table(
             }
         )
 
-    def booking_links(booking: Booking) -> 'Iterator[Link]':
+    def booking_links(booking: Booking) -> Iterator[Link]:
         yield Link(_('User'), user_link(booking.attendee.username))
         yield Link(_('Attendee'), attendee_link(booking.attendee_id))
         yield Link(phase_title, bookings_link(booking.attendee.username))
@@ -300,7 +302,7 @@ def view_occasion_bookings_table(
     request_method='POST')
 def reset_matching(
     self: MatchCollection,
-    request: 'FeriennetRequest',
+    request: FeriennetRequest,
     quiet: bool = False
 ) -> None:
 

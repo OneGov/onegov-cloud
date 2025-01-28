@@ -6,7 +6,6 @@ from onegov.form import Form, errors, find_field
 from onegov.form import parse_formcode, parse_form, flatten_fieldsets
 from onegov.form.errors import InvalidIndentSyntax
 from onegov.form.fields import DateTimeLocalField, TimeField, VideoURLField
-from onegov.form.parser.form import normalize_label_for_dependency
 from onegov.form.parser.grammar import field_help_identifier
 from onegov.form.validators import LaxDataRequired
 from onegov.pay import Price
@@ -1034,16 +1033,6 @@ def test_parse_dependency_with_price():
     assert isinstance(fieldsets[0].fields[0], RadioField)
     choices = fieldsets[0].fields[0].choices
     assert len(choices) == 2
-
-
-def test_normalization():
-    label = "Ich möchte die Bestellung mittels Post erhalten (5.00 CHF)"
-    norm = normalize_label_for_dependency(label)
-    assert norm == "Ich möchte die Bestellung mittels Post erhalten"
-
-    label = "Ich möchte die Bestellung mittels Post erhalten (200.00 CHF)"
-    norm = normalize_label_for_dependency(label)
-    assert norm == "Ich möchte die Bestellung mittels Post erhalten"
 
 
 @pytest.mark.parametrize('indent,edit_checks,shall_raise', [

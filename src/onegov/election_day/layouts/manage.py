@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 from functools import cached_property
 from onegov.election_day import _
 from onegov.election_day.collections import DataSourceCollection
@@ -38,7 +40,7 @@ if TYPE_CHECKING:
 
 class ManageLayout(DefaultLayout):
 
-    def __init__(self, model: Any, request: 'ElectionDayRequest'):
+    def __init__(self, model: Any, request: ElectionDayRequest):
         super().__init__(model, request)
         self.request.include('backend_common')
         self.request.include('chosen')
@@ -51,7 +53,7 @@ class ManageLayout(DefaultLayout):
         return self.request.link(self.model)
 
     @cached_property
-    def menu(self) -> 'NestedMenu':
+    def menu(self) -> NestedMenu:
         session = self.request.session
         principal = self.principal
 
@@ -196,7 +198,7 @@ class ManageLayout(DefaultLayout):
 
     def clear_media(
         self,
-        tabs: 'Collection[str] | None' = None,
+        tabs: Collection[str] | None = None,
         additional: list[str] | None = None
     ) -> int:
 
@@ -230,7 +232,7 @@ class ManageElectionsLayout(ManageLayout):
     def __init__(
         self,
         model: Election | ElectionCollection,
-        request: 'ElectionDayRequest'
+        request: ElectionDayRequest
     ) -> None:
 
         super().__init__(model, request)
@@ -258,7 +260,7 @@ class ManageElectionCompoundsLayout(ManageLayout):
     def __init__(
         self,
         model: ElectionCompound | ElectionCompoundCollection,
-        request: 'ElectionDayRequest'
+        request: ElectionDayRequest
     ) -> None:
 
         super().__init__(model, request)
@@ -286,7 +288,7 @@ class ManageVotesLayout(ManageLayout):
     def __init__(
         self,
         model: Vote | VoteCollection,
-        request: 'ElectionDayRequest'
+        request: ElectionDayRequest
     ) -> None:
 
         super().__init__(model, request)
@@ -318,12 +320,12 @@ class ManageVotesLayout(ManageLayout):
 
 class ManageSubscribersLayout(ManageLayout):
 
-    model: 'SubscriberCollection[Any] | Subscriber'
+    model: SubscriberCollection[Any] | Subscriber
 
     def __init__(
         self,
-        model: 'SubscriberCollection[Any] | Subscriber',
-        request: 'ElectionDayRequest'
+        model: SubscriberCollection[Any] | Subscriber,
+        request: ElectionDayRequest
     ) -> None:
 
         super().__init__(model, request)
@@ -359,12 +361,12 @@ class ManageSubscribersLayout(ManageLayout):
 
 class ManageUploadTokensLayout(ManageLayout):
 
-    model: 'UploadToken | UploadTokenCollection'
+    model: UploadToken | UploadTokenCollection
 
     def __init__(
         self,
-        model: 'UploadToken | UploadTokenCollection',
-        request: 'ElectionDayRequest'
+        model: UploadToken | UploadTokenCollection,
+        request: ElectionDayRequest
     ) -> None:
 
         super().__init__(model, request)
@@ -381,7 +383,7 @@ class ManageUploadTokensLayout(ManageLayout):
 
 class ManageDataSourcesLayout(ManageLayout):
 
-    def __init__(self, model: Any, request: 'ElectionDayRequest') -> None:
+    def __init__(self, model: Any, request: ElectionDayRequest) -> None:
 
         super().__init__(model, request)
         self.breadcrumbs.append(
@@ -397,12 +399,12 @@ class ManageDataSourcesLayout(ManageLayout):
 
 class ManageDataSourceItemsLayout(ManageLayout):
 
-    model: 'DataSource | DataSourceItemCollection'
+    model: DataSource | DataSourceItemCollection
 
     def __init__(
         self,
-        model: 'DataSource | DataSourceItemCollection',
-        request: 'ElectionDayRequest'
+        model: DataSource | DataSourceItemCollection,
+        request: ElectionDayRequest
     ) -> None:
 
         super().__init__(model, request)
@@ -431,7 +433,7 @@ class ManageDataSourceItemsLayout(ManageLayout):
 
 class ManageScreensLayout(ManageLayout):
 
-    def __init__(self, model: Any, request: 'ElectionDayRequest') -> None:
+    def __init__(self, model: Any, request: ElectionDayRequest) -> None:
         super().__init__(model, request)
         self.breadcrumbs.append(
             (_('Screens'), request.link(self.model), ''),

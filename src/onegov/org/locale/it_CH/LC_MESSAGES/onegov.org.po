@@ -2,7 +2,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: \n"
-"POT-Creation-Date: 2025-01-08 16:47+0100\n"
+"POT-Creation-Date: 2025-01-28 08:31+0100\n"
 "PO-Revision-Date: 2022-03-15 10:52+0100\n"
 "Last-Translator: \n"
 "Language-Team: \n"
@@ -595,6 +595,24 @@ msgstr "Esiste già un elemento con lo stesso nome"
 msgid "E-Mail"
 msgstr "E-mail"
 
+msgid "Describes briefly what this form is about"
+msgstr "Descrive brevemente il contenuto di questo modulo"
+
+msgid "Detailed Explanation"
+msgstr "Spiegazione dettagliata"
+
+msgid "Describes in detail how this form is to be filled"
+msgstr "Descrive dettagliatamente come compilare questo modulo"
+
+msgid "Form PDF"
+msgstr "Modulo PDF"
+
+msgid "Group"
+msgstr "Gruppo"
+
+msgid "Used to group this form in the overview"
+msgstr "Utilizzato per raggruppare questo modulo nella panoramica"
+
 msgid "Art"
 msgstr "Arte"
 
@@ -846,9 +864,6 @@ msgstr "URL"
 msgid "Url pointing to another website"
 msgstr "URL che punta a un altro sito web"
 
-msgid "Group"
-msgstr "Gruppo"
-
 msgid "Used to group this link in the overview"
 msgstr "Utilizzato per raggruppare questo collegamento nella panoramica"
 
@@ -861,6 +876,12 @@ msgstr "Descrive il contenuto di questo modulo"
 
 msgid "Used to group the form in the overview"
 msgstr "Utilizzato per raggruppare il modulo nella panoramica"
+
+msgid "Form Definition"
+msgstr "Definizione del modulo"
+
+msgid "Link to Formcode Documentation"
+msgstr "Collegamento alla documentazione del Formcode"
 
 msgid "Pick-Up"
 msgstr "Prelievo"
@@ -1022,6 +1043,9 @@ msgstr "Immagini a grandezza naturale"
 msgid "Grid layout"
 msgstr "Disposizione a griglia"
 
+msgid "Show images on homepage"
+msgstr "Mostra le immagini sulla pagina principale"
+
 msgid "By filename"
 msgstr "Per nome del file"
 
@@ -1030,9 +1054,6 @@ msgstr "Per didascalia"
 
 msgid "By last change"
 msgstr "Per data dell'ultima modifica"
-
-msgid "Show images on homepage"
-msgstr "Mostra le immagini sulla pagina principale"
 
 msgid "Used in the overview and the e-mail subject"
 msgstr "Utilizzato nella panoramica e nell'oggetto dell'e-mail"
@@ -1697,10 +1718,10 @@ msgid "JavaScript for web statistics support"
 msgstr "JavaScript per il supporto delle statistiche web"
 
 msgid "Analytics URL"
-msgstr ""
+msgstr "URL Analytics"
 
 msgid "URL pointing to the analytics page"
-msgstr ""
+msgstr "URL che punta alla pagina di analisi"
 
 msgid "Cantonal holidays"
 msgstr "Festività cantonali"
@@ -2316,12 +2337,16 @@ msgstr "Modulo esterno"
 msgid "New external form"
 msgstr "Nuovo modulo esterno"
 
+msgid "Document form"
+msgstr "Modulo documento"
+
 msgid "Do you really want to delete this submission window?"
 msgstr "Vuoi davvero eliminare questa finestra di invio?"
 
 msgid ""
 "Submissions associated with this submission window will be deleted as well."
 msgstr ""
+"Gli invii associati a questa finestra di invio verranno eliminati anche."
 
 msgid "Delete submission window"
 msgstr "Elimina la finestra di invio"
@@ -2787,6 +2812,9 @@ msgstr ""
 msgid "Delete content"
 msgstr "Cancellare il contenuto"
 
+msgid "Photo album. Will be shown at the end of content."
+msgstr "Album fotografico. Sarà mostrato alla fine del contenuto."
+
 msgid "Photo album"
 msgstr "Album fotografico"
 
@@ -2965,8 +2993,8 @@ msgstr "Il rifiuto di ${title} non può essere annullato."
 msgid "Reject reservation"
 msgstr "Rifiuta prenotazione"
 
-#.
 #. Used in sentence: "${event} published."
+#.
 msgid "Event"
 msgstr "Evento"
 
@@ -3298,6 +3326,9 @@ msgstr "Conferma"
 
 msgid "There was an error while importing your directory!"
 msgstr "Si è verificato un errore durante l'importazione della cartella!"
+
+msgid "Download Form"
+msgstr "Scarica modulo"
 
 msgid "Embed iFrame"
 msgstr "Incorpora iFrame"
@@ -4587,6 +4618,8 @@ msgid ""
 "Thank you for filling out this survey. If there's anything you'd like to "
 "change, click on the \"Edit\"-Button below."
 msgstr ""
+"Grazie per aver compilato questo sondaggio. Se c'è qualcosa che desideri "
+"cambiare, fai clic sul pulsante \"Modifica\" qui sotto."
 
 msgid "No surveys defined yet."
 msgstr "Ancora nessun sondaggio definito."
@@ -5171,6 +5204,18 @@ msgstr "${address} disiscritto con successo"
 msgid "${address} could not be unsubscribed, wrong token"
 msgstr "Impossibile annullare l'iscrizione di ${address}, token errato"
 
+msgid "A form with this name already exists"
+msgstr "Un modulo con questo nome esiste già"
+
+msgid "Added a new form"
+msgstr "Aggiunto un nuovo modulo"
+
+msgid "New Document Form"
+msgstr "Nuovo modulo documento"
+
+msgid "Edit Document Form"
+msgstr "Modifica modulo documento"
+
 msgid "Moves the topic and all its sub topics to the given destination."
 msgstr ""
 "Sposta l'argomento e tutti i suoi sottoargomenti nella destinazione indicata."
@@ -5309,12 +5354,6 @@ msgstr "È rimasto un posto disponibile"
 #, python-format
 msgid "There are ${count} spots left"
 msgstr "Sono rimasti ${count} posti disponibili"
-
-msgid "A form with this name already exists"
-msgstr "Un modulo con questo nome esiste già"
-
-msgid "Added a new form"
-msgstr "Aggiunto un nuovo modulo"
 
 msgid "New Form"
 msgstr "Nuovo modulo"
@@ -5982,7 +6021,7 @@ msgid "Edit Submission Window"
 msgstr "Modifica la finestra di invio"
 
 msgid "The submission window and all associated submissions were deleted"
-msgstr ""
+msgstr "La finestra di invio e tutti gli invii associati sono stati eliminati"
 
 msgid "Added a new text module"
 msgstr "Aggiunto un nuovo modulo di testo"
@@ -6201,6 +6240,9 @@ msgstr "È stato creato un account per te"
 
 msgid "The user was created successfully"
 msgstr "Utente creato correttamente"
+
+msgid "This recipient has delivery failures, including hard bounces, invalid email addresses, spam complaints, manual deactivations, or being blocked. We recommend unsubscribing it from the list."
+msgstr "Questo destinatario presenta errori di consegna, tra cui rimbalzi, indirizzi e-mail non validi, reclami per spam, disattivazioni manuali o blocco. Si consiglia di cancellarlo dall'elenco."
 
 #~ msgid "Photo album. Will be shown at the end of content."
 #~ msgstr "Album fotografico. Sarà mostrato alla fine del contenuto."

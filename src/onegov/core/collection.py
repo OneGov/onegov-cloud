@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 import math
 
 from functools import cached_property
@@ -41,7 +43,7 @@ _M = TypeVar('_M', bound='Base')
 
 class GenericCollection(Generic[_M]):
 
-    def __init__(self, session: 'Session', **kwargs: Any):
+    def __init__(self, session: Session, **kwargs: Any):
         self.session = session
 
     @property
@@ -49,16 +51,16 @@ class GenericCollection(Generic[_M]):
         raise NotImplementedError
 
     @cached_property
-    def primary_key(self) -> 'Column[str] | Column[UUID] | Column[int]':
+    def primary_key(self) -> Column[str] | Column[UUID] | Column[int]:
         return inspect(self.model_class).primary_key[0]
 
-    def query(self) -> 'Query[_M]':
+    def query(self) -> Query[_M]:
         return self.session.query(self.model_class)
 
-    def by_id(self, id: 'PKType') -> _M | None:
+    def by_id(self, id: PKType) -> _M | None:
         return self.query().filter(self.primary_key == id).first()
 
-    def by_ids(self, ids: 'Collection[PKType]') -> list[_M]:
+    def by_ids(self, ids: Collection[PKType]) -> list[_M]:
         # FIXME: This type error is a bug in the sqlalchemy-stubs
         #        plugin, it might go away with SQLAlchemy 2.0, since
         #        Column is being treated like a descriptor, even though
@@ -83,8 +85,8 @@ class GenericCollection(Generic[_M]):
 
     def add_by_form(
         self,
-        form: '_FormThatSupportsGetUsefulData',
-        properties: 'Iterable[str] | None' = None
+        form: _FormThatSupportsGetUsefulData,
+        properties: Iterable[str] | None = None
     ) -> _M:
 
         cls = self.model_class
@@ -109,10 +111,10 @@ class SearcheableCollection(GenericCollection[_M]):
 
     @staticmethod
     def match_term(
-        column: 'Column[str] | Column[str | None]',
+        column: Column[str] | Column[str | None],
         language: str,
         term: str
-    ) -> 'ClauseElement':
+    ) -> ClauseElement:
         """
         Usage:
         model.filter(match_term(model.col, 'german', 'my search term'))
@@ -144,10 +146,10 @@ class SearcheableCollection(GenericCollection[_M]):
 
     def filter_text_by_locale(
         self,
-        column: 'Column[str] | Column[str | None]',
+        column: Column[str] | Column[str | None],
         term: str,
         locale: str | None = None
-    ) -> 'ClauseElement':
+    ) -> ClauseElement:
         """
         Returns an SqlAlchemy filter statement based on the search term.
         If no locale is provided, it will use english as language.
@@ -182,17 +184,17 @@ class SearcheableCollection(GenericCollection[_M]):
 
         @property
         @abstractmethod
-        def term_filter_cols(self) -> dict[str, 'TextColumn']: ...
+        def term_filter_cols(self) -> dict[str, TextColumn]: ...
     else:
         @property
-        def term_filter_cols(self) -> dict[str, 'TextColumn']:
+        def term_filter_cols(self) -> dict[str, TextColumn]:
             """ Returns a dict of column names to search in with term.
             Must be attributes of self.model_class.
             """
             raise NotImplementedError
 
     @property
-    def term_filter(self) -> 'Iterator[ClauseElement]':
+    def term_filter(self) -> Iterator[ClauseElement]:
         assert self.term_filter_cols
         term = self.__class__.term_to_tsquery_string(self.term)
 
@@ -202,7 +204,7 @@ class SearcheableCollection(GenericCollection[_M]):
             for col in self.term_filter_cols
         )
 
-    def query(self) -> 'Query[_M]':
+    def query(self) -> Query[_M]:
         if not self.term or not self.locale:
             return super().query()
         return super().query().filter(or_(*self.term_filter))
@@ -233,7 +235,7 @@ class Pagination(Generic[_M]):
         """
         raise NotImplementedError
 
-    def subset(self) -> 'Query[_M]':
+    def subset(self) -> Query[_M]:
         """ Returns an SQLAlchemy query containing all records that should
         be considered for pagination.
 
@@ -241,7 +243,7 @@ class Pagination(Generic[_M]):
         raise NotImplementedError
 
     @cached_property
-    def cached_subset(self) -> 'Query[_M]':
+    def cached_subset(self) -> Query[_M]:
         return self.subset()
 
     if TYPE_CHECKING:
@@ -256,14 +258,14 @@ class Pagination(Generic[_M]):
         """ Returns the current page index (starting at 0). """
         raise NotImplementedError
 
-    def page_by_index(self, index: int) -> 'Self':
+    def page_by_index(self, index: int) -> Self:
         """ Returns the page at the given index. A page here means an instance
         of the class inheriting from the ``Pagination`` base class.
 
         """
         raise NotImplementedError
 
-    def transform_batch_query(self, query: 'Query[_M]') -> 'Query[_M]':
+    def transform_batch_query(self, query: Query[_M]) -> Query[_M]:
         """ Allows subclasses to transform the given query before it is
         used to retrieve the batch. This is a good place to add additional
         loading that should only apply to the batch (say joining other
@@ -309,20 +311,20 @@ class Pagination(Generic[_M]):
         return ''
 
     @property
-    def pages(self) -> 'Iterator[Self]':
+    def pages(self) -> Iterator[Self]:
         """ Yields all page objects of this Pagination. """
         for page in range(self.pages_count):
             yield self.page_by_index(page)
 
     @property
-    def previous(self) -> 'Self | None':
+    def previous(self) -> Self | None:
         """ Returns the previous page or None. """
         if self.page - 1 >= 0:
             return self.page_by_index(self.page - 1)
         return None
 
     @property
-    def next(self) -> 'Self | None':
+    def next(self) -> Self | None:
         """ Returns the next page or None. """
         if self.page + 1 < self.pages_count:
             return self.page_by_index(self.page + 1)
@@ -345,7 +347,7 @@ class RangedPagination(Generic[_M]):
     # may be clipped by using `limit_range`.
     range_limit = 5
 
-    def subset(self) -> 'Query[_M]':
+    def subset(self) -> Query[_M]:
         """ Returns an SQLAlchemy query containing all records that should
         be considered for pagination.
 
@@ -353,7 +355,7 @@ class RangedPagination(Generic[_M]):
         raise NotImplementedError
 
     @cached_property
-    def cached_subset(self) -> 'Query[_M]':
+    def cached_subset(self) -> Query[_M]:
         return self.subset()
 
     @property
@@ -361,7 +363,7 @@ class RangedPagination(Generic[_M]):
         """ Returns the current page range (starting at (0, 0)). """
         raise NotImplementedError
 
-    def by_page_range(self, page_range: tuple[int, int]) -> 'Self':
+    def by_page_range(self, page_range: tuple[int, int]) -> Self:
         """ Returns an instance of the collection limited to the given
         page range.
 
@@ -370,7 +372,7 @@ class RangedPagination(Generic[_M]):
 
     def limit_range(
         self,
-        page_range: 'Sequence[int] | None',
+        page_range: Sequence[int] | None,
         direction: Literal['up', 'down']
     ) -> tuple[int, int]:
         """ Limits the range to the range limit in the given direction.
@@ -399,7 +401,7 @@ class RangedPagination(Generic[_M]):
 
         return (s, e)
 
-    def transform_batch_query(self, query: 'Query[_M]') -> 'Query[_M]':
+    def transform_batch_query(self, query: Query[_M]) -> Query[_M]:
         """ Allows subclasses to transform the given query before it is
         used to retrieve the batch. This is a good place to add additional
         loading that should only apply to the batch (say joining other
@@ -439,7 +441,7 @@ class RangedPagination(Generic[_M]):
         return math.ceil(self.subset_count / self.batch_size)
 
     @property
-    def previous(self) -> 'Self | None':
+    def previous(self) -> Self | None:
         """ Returns the previous page or None. """
         s, _e = self.page_range
 
@@ -448,7 +450,7 @@ class RangedPagination(Generic[_M]):
         return None
 
     @property
-    def next(self) -> 'Self | None':
+    def next(self) -> Self | None:
         """ Returns the next page range or None. """
         _s, e = self.page_range
 

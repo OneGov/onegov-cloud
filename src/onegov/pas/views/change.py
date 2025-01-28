@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 from onegov.core.security import Private
 from onegov.pas import PasApp
 from onegov.pas.collections import ChangeCollection
@@ -18,8 +20,8 @@ if TYPE_CHECKING:
 )
 def view_changes(
     self: ChangeCollection,
-    request: 'TownRequest'
-) -> 'RenderData':
+    request: TownRequest
+) -> RenderData:
 
     layout = ChangeCollectionLayout(self, request)
 
@@ -37,8 +39,8 @@ def view_changes(
 )
 def view_change(
     self: Change,
-    request: 'TownRequest'
-) -> 'RenderData':
+    request: TownRequest
+) -> RenderData:
 
     layout = ChangeLayout(self, request)
 

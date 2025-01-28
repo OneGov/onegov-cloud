@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 from collections import defaultdict
 from datetime import date, datetime
 from dateutil.easter import easter
@@ -65,8 +67,8 @@ class SwissHolidays:
 
     def __init__(
         self,
-        cantons: 'Iterable[str]' = (),
-        other: 'Iterable[tuple[int, int, str]]' = (),
+        cantons: Iterable[str] = (),
+        other: Iterable[tuple[int, int, str]] = (),
         timezone: str = 'Europe/Zurich'
     ) -> None:
 
@@ -150,7 +152,7 @@ class SwissHolidays:
             #        tested this more than two years?
             years = (start.year, end.year)
 
-        def generate() -> 'Iterator[tuple[date, list[str]]]':
+        def generate() -> Iterator[tuple[date, list[str]]]:
             for year in years:
                 for dt, descriptions in self.all(year):
                     if start <= dt and dt <= end:
@@ -158,13 +160,13 @@ class SwissHolidays:
 
         return list(generate())
 
-    def other(self, year: int) -> 'Iterator[tuple[date, set[str]]]':
+    def other(self, year: int) -> Iterator[tuple[date, set[str]]]:
         """ Returns all custom defined holidays for the given year. """
 
         for month, day in self._other:
             yield date(year, month, day), self._other[(month, day)]
 
-    def official(self, year: int) -> 'Iterator[tuple[date, tuple[str, ...]]]':
+    def official(self, year: int) -> Iterator[tuple[date, tuple[str, ...]]]:
         """ Like :meth:`all`, but only includes the official holidays,
         not the custom defined ones.
 

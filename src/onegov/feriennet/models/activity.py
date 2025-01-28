@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 from functools import cached_property
 from onegov.activity import Activity, ActivityCollection, Occasion
 from onegov.activity import PublicationRequestCollection
@@ -73,7 +75,7 @@ class VacationActivity(Activity, CoordinatesExtension, SearchableContent):
 
     def ordered_tags(
         self,
-        request: 'FeriennetRequest',
+        request: FeriennetRequest,
         durations: int | None = None
     ) -> list[str]:
 
@@ -105,7 +107,7 @@ class ActivityTicket(OrgTicketMixin, Ticket):
 
     def reference_group(
         self,
-        request: 'FeriennetRequest'  # type:ignore[override]
+        request: FeriennetRequest  # type:ignore[override]
     ) -> str:
         return self.handler.title
 
@@ -127,7 +129,7 @@ class VacationActivityHandler(Handler):
         return self.publication_request.activity
 
     @cached_property
-    def publication_request(self) -> 'PublicationRequest | None':
+    def publication_request(self) -> PublicationRequest | None:
         return self.collection.by_id(self.id)
 
     @property
@@ -153,7 +155,7 @@ class VacationActivityHandler(Handler):
         return _('Activity')
 
     @property
-    def extra_data(self) -> 'Sequence[str]':
+    def extra_data(self) -> Sequence[str]:
         return ()
 
     @property
@@ -174,8 +176,8 @@ class VacationActivityHandler(Handler):
 
     def get_summary(
         self,
-        request: 'FeriennetRequest'  # type:ignore[override]
-    ) -> 'Markup':
+        request: FeriennetRequest  # type:ignore[override]
+    ) -> Markup:
 
         assert self.publication_request is not None
         assert self.activity is not None
@@ -198,8 +200,8 @@ class VacationActivityHandler(Handler):
 
     def get_period_bound_links(
         self,
-        request: 'FeriennetRequest'
-    ) -> 'Iterator[Link]':
+        request: FeriennetRequest
+    ) -> Iterator[Link]:
 
         if self.activity is None:
             return
@@ -247,7 +249,7 @@ class VacationActivityHandler(Handler):
 
     def get_links(  # type:ignore[override]
         self,
-        request: 'FeriennetRequest'  # type:ignore[override]
+        request: FeriennetRequest  # type:ignore[override]
     ) -> list[Link]:
 
         links = list(self.get_period_bound_links(request))

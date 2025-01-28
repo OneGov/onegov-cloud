@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 from onegov.stepsequence.core import (
     Step, StepSequenceRegistry, as_step_registry_id
 )

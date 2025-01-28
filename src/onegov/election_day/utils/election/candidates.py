@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 from onegov.core.utils import groupbylist
 from onegov.election_day.models import Candidate
 from onegov.election_day.models import CandidateResult
@@ -49,10 +51,10 @@ if TYPE_CHECKING:
 
 
 def get_candidates_results(
-    election: 'Election',
-    session: 'Session',
-    entities: 'Collection[str] | None' = None,
-) -> 'Query[CandidateResultRow]':
+    election: Election,
+    session: Session,
+    entities: Collection[str] | None = None,
+) -> Query[CandidateResultRow]:
     """ Returns the aggregated candidates results as list.
 
     Also includes percentages of votes for majorz elections. Be aware that this
@@ -125,13 +127,13 @@ def get_candidates_results(
 
 
 def get_candidates_data(
-    election: 'Election',
+    election: Election,
     limit: int | None = None,
-    lists: 'Collection[str] | None' = None,
+    lists: Collection[str] | None = None,
     elected: bool | None = None,
     sort_by_lists: bool = False,
-    entities: 'Collection[str] | None' = None
-) -> 'JSONObject_ro':
+    entities: Collection[str] | None = None
+) -> JSONObject_ro:
     """" Get the candidates as JSON. Used to for the candidates bar chart.
 
     Allows to optionally
@@ -246,9 +248,9 @@ def get_candidates_data(
 
 
 def get_candidates_results_by_entity(
-    election: 'Election',
+    election: Election,
     sort_by_votes: bool = False
-) -> tuple[list['CandidateRow'], list[tuple[str, list['ResultRow']]]]:
+) -> tuple[list[CandidateRow], list[tuple[str, list[ResultRow]]]]:
     """ Returns the candidates results by entity.
 
     Allows to optionally order by the number of total votes instead of the

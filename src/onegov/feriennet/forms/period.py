@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 from functools import cached_property
 from datetime import date, datetime
 from onegov.activity import Activity, Period, Occasion, OccasionDate
@@ -27,7 +29,7 @@ if TYPE_CHECKING:
 
 class PeriodSelectForm(Form):
 
-    request: 'FeriennetRequest'
+    request: FeriennetRequest
 
     period = SelectField(
         label=_('Period'),
@@ -35,7 +37,7 @@ class PeriodSelectForm(Form):
         default='0xdeadbeef')
 
     @property
-    def period_choices(self) -> list['_Choice']:
+    def period_choices(self) -> list[_Choice]:
         q = PeriodCollection(self.request.session).query()
         q = q.with_entities(Period.id, Period.title)
         q = q.order_by(Period.execution_start)
@@ -48,7 +50,7 @@ class PeriodSelectForm(Form):
             self.period.data)
 
     @property
-    def active_period(self) -> 'PeriodMeta | None':
+    def active_period(self) -> PeriodMeta | None:
         return self.request.app.active_period
 
     def on_request(self) -> None:

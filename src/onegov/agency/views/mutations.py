@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 from morepath import redirect
 from onegov.agency import _
 from onegov.agency import AgencyApp
@@ -28,9 +30,9 @@ if TYPE_CHECKING:
 )
 def apply_agency_mutation(
     self: AgencyMutation,
-    request: 'AgencyRequest',
+    request: AgencyRequest,
     form: ApplyMutationForm
-) -> 'RenderData | Response':
+) -> RenderData | Response:
 
     if form.submitted(request):
         form.update_model()
@@ -62,9 +64,9 @@ def apply_agency_mutation(
 )
 def apply_person_mutation(
     self: PersonMutation,
-    request: 'AgencyRequest',
+    request: AgencyRequest,
     form: ApplyMutationForm
-) -> 'RenderData | Response':
+) -> RenderData | Response:
 
     if form.submitted(request):
         form.update_model()

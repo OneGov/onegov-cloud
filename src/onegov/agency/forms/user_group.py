@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 from onegov.agency import _
 from onegov.agency.collections import ExtendedAgencyCollection
 from onegov.form.fields import ChosenSelectMultipleField
@@ -36,7 +38,7 @@ class UserGroupForm(ManageUserGroupForm):
             for a in ExtendedAgencyCollection(self.request.session).query()
         ]
 
-    def update_model(self, model: 'UserGroup') -> None:
+    def update_model(self, model: UserGroup) -> None:
         super().update_model(model)
         model.role_mappings = [  # type:ignore[assignment]
             RoleMapping(
@@ -51,7 +53,7 @@ class UserGroupForm(ManageUserGroupForm):
             model.meta = {}
         model.meta['immediate_notification'] = self.immediate_notification.data
 
-    def apply_model(self, model: 'UserGroup') -> None:
+    def apply_model(self, model: UserGroup) -> None:
         super().apply_model(model)
         mappings = model.role_mappings.all()
         self.agencies.data = [m.content_id for m in mappings]

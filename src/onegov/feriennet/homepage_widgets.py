@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 from onegov.feriennet import FeriennetApp, _
 
 
@@ -27,7 +29,7 @@ class RegistrationWidget:
         </xsl:template>
     """
 
-    def get_variables(self, layout: 'DefaultLayout') -> 'RenderData':
+    def get_variables(self, layout: DefaultLayout) -> RenderData:
         return {
             'register_text': _('Register a new account'),
             'login_text': _('Go to Login'),

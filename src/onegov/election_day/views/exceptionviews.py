@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 from onegov.core.security import Public
 from onegov.election_day import _
 from onegov.election_day import ElectionDayApp
@@ -21,13 +23,13 @@ if TYPE_CHECKING:
 )
 def handle_forbidden(
     self: HTTPForbidden,
-    request: 'ElectionDayRequest'
-) -> 'RenderData':
+    request: ElectionDayRequest
+) -> RenderData:
 
     """ Displays a nice HTTP 403 error. """
 
     @request.after
-    def set_status_code(response: 'Response') -> None:
+    def set_status_code(response: Response) -> None:
         response.status_code = self.code  # pass along 403
 
     return {
@@ -46,13 +48,13 @@ def handle_forbidden(
 )
 def handle_notfound(
     self: HTTPNotFound,
-    request: 'ElectionDayRequest'
-) -> 'RenderData':
+    request: ElectionDayRequest
+) -> RenderData:
 
     """ Displays a nice HTTP 404 error. """
 
     @request.after
-    def set_status_code(response: 'Response') -> None:
+    def set_status_code(response: Response) -> None:
         response.status_code = self.code  # pass along 404
 
     return {
@@ -69,13 +71,13 @@ def handle_notfound(
 )
 def handle_accepted(
     self: HTTPAccepted,
-    request: 'ElectionDayRequest'
-) -> 'RenderData':
+    request: ElectionDayRequest
+) -> RenderData:
 
     """ Displays a nice HTTP 202 exception. """
 
     @request.after
-    def set_status_code(response: 'Response') -> None:
+    def set_status_code(response: Response) -> None:
         response.status_code = self.code
 
     return {

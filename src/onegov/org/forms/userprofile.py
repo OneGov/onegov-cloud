@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 from onegov.form import Form
 from onegov.org import _
 from wtforms.fields import RadioField
@@ -46,7 +48,7 @@ class UserProfileForm(Form):
         if not self.enable_ticket_statistics:
             self.delete_field('ticket_statistics')
 
-    def populate_obj(self, obj: 'User') -> None:  # type:ignore
+    def populate_obj(self, obj: User) -> None:  # type:ignore
         super().populate_obj(obj, exclude={
             'ticket_statistics',
         })
@@ -55,7 +57,7 @@ class UserProfileForm(Form):
             obj.data = obj.data or {}
             obj.data['ticket_statistics'] = self.ticket_statistics.data
 
-    def process_obj(self, obj: 'User') -> None:  # type:ignore
+    def process_obj(self, obj: User) -> None:  # type:ignore
         super().process_obj(obj)
 
         if self.enable_ticket_statistics:

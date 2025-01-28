@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 from onegov.core.orm.mixins import dict_property
 from onegov.core.orm.mixins import meta_property
 from onegov.org.models.extensions import AccessExtension

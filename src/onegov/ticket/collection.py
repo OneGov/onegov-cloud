@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 import random
 
 from onegov.core.collection import Pagination
@@ -27,13 +29,13 @@ class TicketCollectionPagination(Pagination[Ticket]):
 
     if TYPE_CHECKING:
         # forward declare query
-        def query(self) -> 'Query[Ticket]': ...
+        def query(self) -> Query[Ticket]: ...
 
     def __init__(
         self,
-        session: 'Session',
+        session: Session,
         page: int = 0,
-        state: 'ExtendedTicketState' = 'open',
+        state: ExtendedTicketState = 'open',
         handler: str = 'ALL',
         group: str | None = None,
         owner: str = '*',
@@ -59,7 +61,7 @@ class TicketCollectionPagination(Pagination[Ticket]):
             and self.page == other.page
         )
 
-    def subset(self) -> 'Query[Ticket]':
+    def subset(self) -> Query[Ticket]:
         query = self.query()
         query = query.order_by(desc(Ticket.created))
         query = query.options(joinedload(Ticket.user))
@@ -111,7 +113,7 @@ class TicketCollectionPagination(Pagination[Ticket]):
 
         return tuple(r[0] for r in query.all())
 
-    def for_state(self, state: 'ExtendedTicketState') -> Self:
+    def for_state(self, state: ExtendedTicketState) -> Self:
         return self.__class__(
             self.session, 0, state, self.handler, self.group, self.owner,
             self.extra_parameters
@@ -148,7 +150,7 @@ class TicketCount(NamedTuple):
 
 class TicketCollection(TicketCollectionPagination):
 
-    def query(self) -> 'Query[Ticket]':
+    def query(self) -> Query[Ticket]:
         return self.session.query(Ticket)
 
     def random_number(self, length: int) -> int:
@@ -259,7 +261,7 @@ class TicketCollection(TicketCollectionPagination):
     def by_handler_data_id(
         self,
         handler_data_id: str | UUID
-    ) -> 'Query[Ticket]':
+    ) -> Query[Ticket]:
         return self.query().filter(
             Ticket.handler_data['handler_data']['id'] == str(handler_data_id))
 
@@ -267,5 +269,5 @@ class TicketCollection(TicketCollectionPagination):
 # FIXME: Why is this its own subclass? shouldn't this at least override
 #        __init__ to pin state to 'archived'?!
 class ArchivedTicketCollection(TicketCollectionPagination):
-    def query(self) -> 'Query[Ticket]':
+    def query(self) -> Query[Ticket]:
         return self.session.query(Ticket)

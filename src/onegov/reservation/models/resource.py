@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 import datetime
 import secrets
 
@@ -77,7 +79,7 @@ class Resource(ORMBase, ModelBase, ContentMixin,
     __tablename__ = 'resources'
 
     #: the unique id
-    id: 'Column[uuid.UUID]' = Column(
+    id: Column[uuid.UUID] = Column(
         UUID,  # type:ignore[arg-type]
         primary_key=True,
         default=uuid4
@@ -85,31 +87,31 @@ class Resource(ORMBase, ModelBase, ContentMixin,
 
     #: a nice id for the url, readable by humans
     # FIXME: This probably should've been nullable=False
-    name: 'Column[str | None]' = Column(Text, primary_key=False, unique=True)
+    name: Column[str | None] = Column(Text, primary_key=False, unique=True)
 
     #: the title of the resource
-    title: 'Column[str]' = Column(Text, primary_key=False, nullable=False)
+    title: Column[str] = Column(Text, primary_key=False, nullable=False)
 
     #: the timezone this resource resides in
-    timezone: 'Column[str]' = Column(Text, nullable=False)
+    timezone: Column[str] = Column(Text, nullable=False)
 
     #: the custom form definition used when creating a reservation
-    definition: 'Column[str | None]' = Column(Text, nullable=True)
+    definition: Column[str | None] = Column(Text, nullable=True)
 
     #: the group to which this resource belongs to (may be any kind of string)
-    group: 'Column[str | None]' = Column(Text, nullable=True)
+    group: Column[str | None] = Column(Text, nullable=True)
 
     #: the type of the resource, this can be used to create custom polymorphic
     #: subclasses. See `<https://docs.sqlalchemy.org/en/improve_toc/
     #: orm/extensions/declarative/inheritance.html>`_.
-    type: 'Column[str]' = Column(
+    type: Column[str] = Column(
         Text,
         nullable=False,
         default=lambda: 'generic'
     )
 
     #: the payment method
-    payment_method: dict_property['PaymentMethod | None'] = content_property()
+    payment_method: dict_property[PaymentMethod | None] = content_property()
 
     #: the minimum price total the reservation must exceed
     minimum_price_total: dict_property[float | None] = content_property()
@@ -128,7 +130,7 @@ class Resource(ORMBase, ModelBase, ContentMixin,
     price_per_item = content_property('price_per_reservation')
 
     #: reservation deadline (e.g. None, (5, 'd'), (24, 'h'))
-    deadline: dict_property[tuple[int, 'DeadlineUnit'] | None]
+    deadline: dict_property[tuple[int, DeadlineUnit] | None]
     deadline = content_property()
 
     #: the default view
@@ -160,7 +162,7 @@ class Resource(ORMBase, ModelBase, ContentMixin,
         'polymorphic_identity': 'generic'
     }
 
-    allocations: 'relationship[list[Allocation]]' = relationship(
+    allocations: relationship[list[Allocation]] = relationship(
         Allocation,
         cascade='all, delete-orphan',
         primaryjoin='Resource.id == Allocation.resource',
@@ -178,7 +180,7 @@ class Resource(ORMBase, ModelBase, ContentMixin,
     view: str | None = 'month'
 
     @deadline.setter
-    def set_deadline(self, value: tuple[int, 'DeadlineUnit'] | None) -> None:
+    def set_deadline(self, value: tuple[int, DeadlineUnit] | None) -> None:
         value = value or None
 
         if value:
@@ -198,7 +200,7 @@ class Resource(ORMBase, ModelBase, ContentMixin,
 
     def highlight_allocations(
         self,
-        allocations: 'Sequence[Allocation]'
+        allocations: Sequence[Allocation]
     ) -> None:
         """ The allocation to jump to in the view. """
 
@@ -213,7 +215,7 @@ class Resource(ORMBase, ModelBase, ContentMixin,
 
         self.date = allocations[0].start.date()
 
-    def get_scheduler(self, libres_context: 'Context') -> '_OurScheduler':
+    def get_scheduler(self, libres_context: Context) -> _OurScheduler:
         assert self.id, 'the id needs to be set'
         assert self.timezone, 'the timezone needs to be set'
 
@@ -227,15 +229,15 @@ class Resource(ORMBase, ModelBase, ContentMixin,
         )
 
     @property
-    def scheduler(self) -> '_OurScheduler':
+    def scheduler(self) -> _OurScheduler:
         assert hasattr(self, 'libres_context'), 'not bound to libres context'
         return self.get_scheduler(self.libres_context)
 
-    def bind_to_libres_context(self, libres_context: 'Context') -> None:
+    def bind_to_libres_context(self, libres_context: Context) -> None:
         self.libres_context = libres_context
 
     @property
-    def form_class(self) -> 'type_t[Form] | None':
+    def form_class(self) -> type_t[Form] | None:
         """ Parses the form definition and returns a form class. """
 
         if not self.definition:
@@ -245,7 +247,7 @@ class Resource(ORMBase, ModelBase, ContentMixin,
 
     def price_of_reservation(
         self,
-        token: 'uuid.UUID',
+        token: uuid.UUID,
         extra: Price | None = None
     ) -> Price:
 
@@ -275,9 +277,9 @@ class Resource(ORMBase, ModelBase, ContentMixin,
     def process_payment(
         self,
         price: Price | None,
-        provider: 'PaymentProvider[Any] | None' = None,
+        provider: PaymentProvider[Any] | None = None,
         payment_token: str | None = None
-    ) -> 'Payment | PaymentError | Literal[True] | None':
+    ) -> Payment | PaymentError | Literal[True] | None:
         """ Processes the payment for the given reservation token. """
 
         if price and price.amount > 0:

@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 from datetime import datetime
 import pytz
 from sqlalchemy import desc
@@ -22,7 +24,7 @@ if TYPE_CHECKING:
 class SubscriptionFormMixin:
 
     model: CourseSubscription
-    request: 'FsiRequest'
+    request: FsiRequest
 
     @property
     def event(self) -> CourseEvent:
@@ -38,7 +40,7 @@ class SubscriptionFormMixin:
         )
 
     @property
-    def attendee(self) -> 'CourseAttendee | None':
+    def attendee(self) -> CourseAttendee | None:
         return self.model.attendee
 
     def event_choice(self, event: CourseEvent) -> tuple[str, str]:
@@ -46,7 +48,7 @@ class SubscriptionFormMixin:
 
     def attendee_choice(
         self,
-        attendee: 'CourseAttendee | None'
+        attendee: CourseAttendee | None
     ) -> tuple[str, str]:
         if not attendee:
             return self.none_choice
@@ -64,7 +66,7 @@ class SubscriptionFormMixin:
 
 class AddFsiSubscriptionForm(Form, SubscriptionFormMixin):
 
-    request: 'FsiRequest'
+    request: FsiRequest
 
     attendee_id = ChosenSelectField(
         label=_('Attendee'),
@@ -91,7 +93,7 @@ class AddFsiSubscriptionForm(Form, SubscriptionFormMixin):
             auth_attendee=self.request.attendee
         )
 
-    def get_event_choices(self) -> list['_Choice']:
+    def get_event_choices(self) -> list[_Choice]:
 
         if self.model.course_event_id:
             return [self.event_choice(self.event)]
@@ -108,7 +110,7 @@ class AddFsiSubscriptionForm(Form, SubscriptionFormMixin):
 
         return [self.event_choice(e) for e in events] or [self.none_choice]
 
-    def get_attendee_choices(self) -> list['_Choice']:
+    def get_attendee_choices(self) -> list[_Choice]:
 
         if self.model.attendee_id:
             return [self.attendee_choice(self.attendee)]
@@ -202,7 +204,7 @@ class AddFsiSubscriptionForm(Form, SubscriptionFormMixin):
 
 class AddFsiPlaceholderSubscriptionForm(Form, SubscriptionFormMixin):
 
-    request: 'FsiRequest'
+    request: FsiRequest
 
     course_event_id = ChosenSelectField(
         label=_('Course Event'),
@@ -216,7 +218,7 @@ class AddFsiPlaceholderSubscriptionForm(Form, SubscriptionFormMixin):
         label=_('Placeholder Description (optional)'),
     )
 
-    def get_event_choices(self) -> list['_Choice']:
+    def get_event_choices(self) -> list[_Choice]:
 
         if self.model.course_event_id:
             return [self.event_choice(self.event)]
@@ -241,7 +243,7 @@ class EditFsiSubscriptionForm(Form, SubscriptionFormMixin):
     The view of this form is not accessible for members
     """
 
-    request: 'FsiRequest'
+    request: FsiRequest
 
     attendee_id = ChosenSelectField(
         label=_('Attendee'),
@@ -273,10 +275,10 @@ class EditFsiSubscriptionForm(Form, SubscriptionFormMixin):
         self.course_event_id.data = model.course_event_id
         self.attendee_id.data = model.attendee_id
 
-    def get_event_choices(self) -> list['_Choice']:
+    def get_event_choices(self) -> list[_Choice]:
         return [self.event_choice(self.model.course_event)]
 
-    def get_attendee_choices(self) -> list['_Choice']:
+    def get_attendee_choices(self) -> list[_Choice]:
         attendees = self.model.course_event.possible_subscribers(
             external_only=False
         )
@@ -291,7 +293,7 @@ class EditFsiSubscriptionForm(Form, SubscriptionFormMixin):
 
 class EditFsiPlaceholderSubscriptionForm(Form, SubscriptionFormMixin):
 
-    request: 'FsiRequest'
+    request: FsiRequest
 
     course_event_id = ChosenSelectField(
         label=_('Course Event'),
@@ -316,7 +318,7 @@ class EditFsiPlaceholderSubscriptionForm(Form, SubscriptionFormMixin):
         self.course_event_id.data = model.course_event_id
         self.dummy_desc.data = model.dummy_desc
 
-    def get_event_choices(self) -> list['_Choice']:
+    def get_event_choices(self) -> list[_Choice]:
         return [self.event_choice(self.model.course_event)]
 
     def on_request(self) -> None:

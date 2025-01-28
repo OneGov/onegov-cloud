@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 from onegov.core.orm import Base, observes
 from onegov.core.orm import translation_hybrid
 from onegov.core.orm.mixins import ContentMixin
@@ -49,14 +51,14 @@ class Vote(
     __tablename__ = 'votes'
 
     @property
-    def polymorphic_base(self) -> type['Vote']:
+    def polymorphic_base(self) -> type[Vote]:
         return Vote
 
     #: the type of the item, this can be used to create custom polymorphic
     #: subclasses of this class. See
     #: `<https://docs.sqlalchemy.org/en/improve_toc/\
     #: orm/extensions/declarative/inheritance.html>`_.
-    type: 'Column[str]' = Column(Text, nullable=False)
+    type: Column[str] = Column(Text, nullable=False)
 
     __mapper_args__ = {
         'polymorphic_on': type,
@@ -64,16 +66,16 @@ class Vote(
     }
 
     #: identifies the vote, may be used in the url, generated from the title
-    id: 'Column[str]' = Column(Text, primary_key=True)
+    id: Column[str] = Column(Text, primary_key=True)
 
     #: external identifier
-    external_id: 'Column[str | None]' = Column(Text, nullable=True)
+    external_id: Column[str | None] = Column(Text, nullable=True)
 
     #: shortcode for cantons that use it
-    shortcode: 'Column[str | None]' = Column(Text, nullable=True)
+    shortcode: Column[str | None] = Column(Text, nullable=True)
 
     #: all translations of the title
-    title_translations: 'Column[Mapping[str, str]]' = Column(
+    title_translations: Column[Mapping[str, str]] = Column(
         HSTORE,
         nullable=False
     )
@@ -83,7 +85,7 @@ class Vote(
     title = translation_hybrid(title_translations)
 
     #: all translations of the short title
-    short_title_translations: 'Column[Mapping[str, str] | None]' = Column(
+    short_title_translations: Column[Mapping[str, str] | None] = Column(
         HSTORE,
         nullable=True
     )
@@ -95,17 +97,17 @@ class Vote(
     @observes('title_translations', 'short_title_translations')
     def title_observer(
         self,
-        title_translations: 'Mapping[str, str]',
-        short_title_translations: 'Mapping[str, str]'
+        title_translations: Mapping[str, str],
+        short_title_translations: Mapping[str, str]
     ) -> None:
         if not self.id:
             self.id = self.id_from_title(object_session(self))
 
     #: identifies the date of the vote
-    date: 'Column[datetime.date]' = Column(Date, nullable=False)
+    date: Column[datetime.date] = Column(Date, nullable=False)
 
     #: a vote contains n ballots
-    ballots: 'relationship[list[Ballot]]' = relationship(
+    ballots: relationship[list[Ballot]] = relationship(
         'Ballot',
         cascade='all, delete-orphan',
         order_by='Ballot.type',
@@ -115,7 +117,7 @@ class Vote(
 
     def ballot(
         self,
-        ballot_type: 'BallotType'
+        ballot_type: BallotType
     ) -> Ballot:
         """ Returns the given ballot if it exists, creates it if not. """
 
@@ -242,7 +244,7 @@ class Vote(
     def aggregate_results_expression(
         cls,
         attribute: str
-    ) -> 'ColumnElement[int]':
+    ) -> ColumnElement[int]:
         """ Gets the sum of the given attribute from the results,
         as SQL expression.
 
@@ -262,7 +264,7 @@ class Vote(
         last_modified: Column[datetime.datetime | None]
 
     @hybrid_property  # type:ignore[no-redef]
-    def last_ballot_change(self) -> 'datetime.datetime | None':
+    def last_ballot_change(self) -> datetime.datetime | None:
         """ Returns last change of the vote, its ballots and any of its
         results.
 
@@ -275,14 +277,14 @@ class Vote(
         return max(changes) if changes else None
 
     @last_ballot_change.expression  # type:ignore[no-redef]
-    def last_ballot_change(cls) -> 'ColumnElement[datetime.datetime | None]':
+    def last_ballot_change(cls) -> ColumnElement[datetime.datetime | None]:
         expr = select([func.max(Ballot.last_change)])
         expr = expr.where(Ballot.vote_id == cls.id)
         expr = expr.label('last_ballot_change')
         return expr
 
     @hybrid_property  # type:ignore[no-redef]
-    def last_modified(self) -> 'datetime.datetime | None':
+    def last_modified(self) -> datetime.datetime | None:
         """ Returns last change of the vote, its ballots and any of its
         results.
 
@@ -304,19 +306,19 @@ class Vote(
         return max(changes) if changes else None
 
     @last_modified.expression  # type:ignore[no-redef]
-    def last_modified(cls) -> 'ColumnElement[datetime.datetime | None]':
+    def last_modified(cls) -> ColumnElement[datetime.datetime | None]:
         return func.greatest(
             cls.last_change, cls.last_result_change, cls.last_ballot_change
         )
 
     #: data source items linked to this vote
-    data_sources: 'relationship[list[DataSourceItem]]' = relationship(
+    data_sources: relationship[list[DataSourceItem]] = relationship(
         'DataSourceItem',
         back_populates='vote'
     )
 
     #: notifcations linked to this vote
-    notifications: 'relationship[AppenderQuery[Notification]]'
+    notifications: relationship[AppenderQuery[Notification]]
     notifications = relationship(  # type:ignore[misc]
         'onegov.election_day.models.notification.Notification',
         back_populates='vote',
@@ -324,7 +326,7 @@ class Vote(
     )
 
     #: screens linked to this vote
-    screens: 'relationship[AppenderQuery[Screen]]' = relationship(
+    screens: relationship[AppenderQuery[Screen]] = relationship(
         'Screen',
         back_populates='vote',
     )

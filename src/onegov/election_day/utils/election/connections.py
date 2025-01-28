@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 from collections import OrderedDict
 from itertools import groupby
 from onegov.core.orm import as_selectable_from_path
@@ -34,9 +36,9 @@ def to_int(value: str) -> int | str:
 
 
 def get_connection_results_api(
-    election: 'Election',
-    session: 'Session'
-) -> 'JSONObject_ro':
+    election: Election,
+    session: Session
+) -> JSONObject_ro:
 
     connection_query = as_selectable_from_path(
         module_path(
@@ -77,9 +79,9 @@ def get_connection_results_api(
 
 
 def get_connection_results(
-    election: 'Election',
-    session: 'Session'
-) -> list['Connection']:
+    election: Election,
+    session: Session
+) -> list[Connection]:
     """ Returns the aggregated list connection results as list. """
 
     if election.type != 'proporz':
@@ -151,8 +153,8 @@ def get_connection_results(
 
 
 def get_connections_data(
-    election: 'Election',
-) -> 'JSONObject_ro':
+    election: Election,
+) -> JSONObject_ro:
     """" View the list connections as JSON. Used to for the connection sankey
     chart. """
 

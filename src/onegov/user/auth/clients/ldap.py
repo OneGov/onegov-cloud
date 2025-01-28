@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 import socket
 
 from attr import attrs, attrib
@@ -19,10 +21,10 @@ _T = TypeVar('_T')
 
 
 def auto_retry(
-    fn: 'Callable[Concatenate[LDAPClient, _P], _T]',
+    fn: Callable[Concatenate[LDAPClient, _P], _T],
     max_tries: int = 5,
     pause: float = 0.1
-) -> 'Callable[Concatenate[LDAPClient, _P], _T]':
+) -> Callable[Concatenate[LDAPClient, _P], _T]:
     """ Retries the decorated function if a LDAP connection error occurs, up
     to a given set of retries, using linear backoff.
 
@@ -31,10 +33,10 @@ def auto_retry(
 
     @wraps(fn)
     def retry(
-        self: 'LDAPClient',
+        self: LDAPClient,
         /,
-        *args: '_P.args',
-        **kwargs: '_P.kwargs'
+        *args: _P.args,
+        **kwargs: _P.kwargs
     ) -> _T:
         nonlocal tried
 
@@ -113,7 +115,7 @@ class LDAPClient:
     def search(
         self,
         query: str,
-        attributes: 'Sequence[str]' = ()
+        attributes: Sequence[str] = ()
     ) -> dict[str, dict[str, Any]]:
         """ Runs an LDAP query against the server and returns a dictionary
         with the distinguished name as key and the given attributes as values

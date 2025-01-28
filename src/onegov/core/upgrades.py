@@ -2,6 +2,8 @@
 upgraded on the server. See :class:`onegov.core.upgrade.upgrade_task`.
 
 """
+from __future__ import annotations
+
 from itertools import chain
 from libres.db.models import ORMBase
 from onegov.core.upgrade import upgrade_task
@@ -23,7 +25,7 @@ if TYPE_CHECKING:
 
 
 @upgrade_task('Drop primary key from associated tables')
-def drop_primary_key_from_associated_tables(context: 'UpgradeContext') -> None:
+def drop_primary_key_from_associated_tables(context: UpgradeContext) -> None:
     bases = set()
 
     for cls in find_models(Base, lambda cls: issubclass(cls, Associable)):
@@ -43,12 +45,12 @@ def drop_primary_key_from_associated_tables(context: 'UpgradeContext') -> None:
 
 @upgrade_task('Migrate to JSONB', always_run=True, raw=True)
 def migrate_to_jsonb(
-    connection: 'Connection',
-    schemas: 'Sequence[str]'
-) -> 'Iterator[bool]':
+    connection: Connection,
+    schemas: Sequence[str]
+) -> Iterator[bool]:
     """ Migrates all text base json columns to jsonb. """
 
-    def json_columns(cls: type[Any]) -> 'Iterator[Column[Any]]':
+    def json_columns(cls: type[Any]) -> Iterator[Column[Any]]:
         try:
             for column in inspect(cls).columns:
                 if isinstance(column.type, JSON):
@@ -112,7 +114,7 @@ def migrate_to_jsonb(
 
 
 @upgrade_task('Rename associated tables')
-def rename_associated_tables(context: 'UpgradeContext') -> None:
+def rename_associated_tables(context: UpgradeContext) -> None:
     bases = set()
 
     for cls in find_models(Base, lambda cls: issubclass(cls, Associable)):
@@ -142,7 +144,7 @@ def rename_associated_tables(context: 'UpgradeContext') -> None:
 
 
 @upgrade_task('OGC-1792 Remove all wtfs tables')
-def remove_all_wtfs_tables(context: 'UpgradeContext') -> None:
+def remove_all_wtfs_tables(context: UpgradeContext) -> None:
     tables = ['wtfs_payment_type', 'wtfs_pickup_dates', 'wtfs_scan_jobs']
 
     for table in tables:
@@ -152,7 +154,7 @@ def remove_all_wtfs_tables(context: 'UpgradeContext') -> None:
 
 @upgrade_task('Remove redundant page to general file links')
 def remove_redundant_page_to_general_file_links(
-    context: 'UpgradeContext'
+    context: UpgradeContext
 ) -> None:
 
     if not context.has_table('files_for_pages_files'):
@@ -189,7 +191,7 @@ def remove_redundant_page_to_general_file_links(
 
 
 @upgrade_task('Add unique constraint to association tables')
-def unique_constraint_in_association_tables(context: 'UpgradeContext') -> None:
+def unique_constraint_in_association_tables(context: UpgradeContext) -> None:
     bases = set()
 
     for cls in chain(

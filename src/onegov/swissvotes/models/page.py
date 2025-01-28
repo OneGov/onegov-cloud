@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 from onegov.core.orm import Base
 from onegov.core.orm import translation_hybrid
 from onegov.core.orm import translation_markup_hybrid
@@ -31,42 +33,42 @@ class TranslatablePage(Base, TimestampMixin):
 
     __tablename__ = 'swissvotes_page'
 
-    id: 'Column[str]' = Column(Text, nullable=False, primary_key=True)
+    id: Column[str] = Column(Text, nullable=False, primary_key=True)
 
-    title_translations: 'Column[Mapping[str, str]]' = Column(
+    title_translations: Column[Mapping[str, str]] = Column(
         HSTORE,
         nullable=False
     )
     title = translation_hybrid(title_translations)
 
-    content_translations: 'Column[Mapping[str, str]]' = Column(
+    content_translations: Column[Mapping[str, str]] = Column(
         HSTORE,
         nullable=False
     )
     content = translation_markup_hybrid(content_translations)
 
-    order: 'Column[int | None]' = Column(Integer, default=2 ** 16)
+    order: Column[int | None] = Column(Integer, default=2 ** 16)
 
-    meta: 'Column[dict[str, Any]]' = Column(JSON, nullable=False, default=dict)
+    meta: Column[dict[str, Any]] = Column(JSON, nullable=False, default=dict)
 
     show_timeline: dict_property[bool] = meta_property(default=False)
 
     files = associated(TranslatablePageFile, 'files', 'one-to-many')
 
     @property
-    def siblings(self) -> 'Query[TranslatablePage]':
+    def siblings(self) -> Query[TranslatablePage]:
         query = object_session(self).query(TranslatablePage)
         query = query.order_by(TranslatablePage.order)
         return query
 
     @property
-    def html_content(self) -> 'Markup | None':
+    def html_content(self) -> Markup | None:
         return self.content
 
     def get_file(
         self,
         name: str,
-        request: 'SwissvotesRequest'
+        request: SwissvotesRequest
     ) -> TranslatablePageFile | None:
 
         files_from_name = [f for f in self.files if name in f.filename]
@@ -99,10 +101,10 @@ class TranslatablePageMove:
 
     def __init__(
         self,
-        session: 'Session',
+        session: Session,
         subject_id: str,
         target_id: str,
-        direction: 'MoveDirection'
+        direction: MoveDirection
     ) -> None:
         self.session = session
         self.subject_id = subject_id

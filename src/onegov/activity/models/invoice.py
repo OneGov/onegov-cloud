@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 from onegov.activity.models.invoice_item import InvoiceItem, SCALE
 from onegov.activity.models.period import Period
 from onegov.core.orm import Base
@@ -25,7 +27,7 @@ if TYPE_CHECKING:
 
 
 def sync_invoice_items(
-    items: 'Iterable[InvoiceItem]',
+    items: Iterable[InvoiceItem],
     capture: bool = True
 ) -> None:
 
@@ -54,41 +56,41 @@ class Invoice(Base, TimestampMixin):
     __tablename__ = 'invoices'
 
     #: the public id of the invoice
-    id: 'Column[uuid.UUID]' = Column(
+    id: Column[uuid.UUID] = Column(
         UUID,  # type:ignore[arg-type]
         primary_key=True,
         default=uuid4
     )
 
     #: the period to which this invoice belongs to
-    period_id: 'Column[uuid.UUID]' = Column(
+    period_id: Column[uuid.UUID] = Column(
         UUID,  # type:ignore[arg-type]
         ForeignKey('periods.id'),
         nullable=False
     )
-    period: 'relationship[Period]' = relationship(
+    period: relationship[Period] = relationship(
         Period,
         back_populates='invoices'
     )
 
     #: the user to which the invoice belongs
-    user_id: 'Column[uuid.UUID]' = Column(
+    user_id: Column[uuid.UUID] = Column(
         UUID,  # type:ignore[arg-type]
         ForeignKey('users.id'),
         nullable=False
     )
     # FIXME: Do we need this backref? It's across module boundaries, so
     #        not the best for proper module isolation
-    user: 'relationship[User]' = relationship(User, backref='invoices')
+    user: relationship[User] = relationship(User, backref='invoices')
 
     #: the specific items linked with this invoice
-    items: 'relationship[list[InvoiceItem]]' = relationship(
+    items: relationship[list[InvoiceItem]] = relationship(
         InvoiceItem,
         back_populates='invoice'
     )
 
     #: the references pointing to this invoice
-    references: 'relationship[list[InvoiceReference]]' = relationship(
+    references: relationship[list[InvoiceReference]] = relationship(
         'InvoiceReference',
         back_populates='invoice',
         cascade='all, delete-orphan'
@@ -124,10 +126,10 @@ class Invoice(Base, TimestampMixin):
         self,
         group: str,
         text: str,
-        unit: 'Decimal',
-        quantity: 'Decimal',
+        unit: Decimal,
+        quantity: Decimal,
         organizer: str = '',
-        attendee_id: 'uuid.UUID | None' = None,
+        attendee_id: uuid.UUID | None = None,
         flush: bool = True,
         **kwargs: Any  # FIXME: type safety for optional arguments
     ) -> InvoiceItem:
@@ -164,7 +166,7 @@ class Invoice(Base, TimestampMixin):
 
     def discourage_changes_for_items(
         self,
-        items: 'Iterable[InvoiceItem]'
+        items: Iterable[InvoiceItem]
     ) -> bool:
         for item in items:
             if item.source == 'xml':
@@ -174,7 +176,7 @@ class Invoice(Base, TimestampMixin):
 
     def disable_changes_for_items(
         self,
-        items: 'Iterable[InvoiceItem]'
+        items: Iterable[InvoiceItem]
     ) -> bool:
         for item in items:
             if not item.source:
@@ -191,7 +193,7 @@ class Invoice(Base, TimestampMixin):
 
     def has_online_payments_for_items(
         self,
-        items: 'Iterable[InvoiceItem]'
+        items: Iterable[InvoiceItem]
     ) -> bool:
         for item in items:
             if not item.source or item.source == 'xml':
@@ -213,11 +215,11 @@ class Invoice(Base, TimestampMixin):
 
     # paid + unpaid
     @hybrid_property  # type:ignore[no-redef]
-    def total_amount(self) -> 'Decimal':
+    def total_amount(self) -> Decimal:
         return self.outstanding_amount + self.paid_amount
 
     @total_amount.expression  # type:ignore[no-redef]
-    def total_amount(cls) -> 'ColumnElement[Decimal]':
+    def total_amount(cls) -> ColumnElement[Decimal]:
         return select([func.sum(InvoiceItem.amount)]).where(
             InvoiceItem.invoice_id == cls.id
         ).label('total_amount')
@@ -241,14 +243,14 @@ class Invoice(Base, TimestampMixin):
 
     # unpaid only
     @hybrid_property  # type:ignore[no-redef]
-    def paid_amount(self) -> 'Decimal':
+    def paid_amount(self) -> Decimal:
         return round(
             sum(item.amount for item in self.items if item.paid),
             SCALE
         )
 
     @paid_amount.expression  # type:ignore[no-redef]
-    def paid_amount(cls) -> 'ColumnElement[Decimal]':
+    def paid_amount(cls) -> ColumnElement[Decimal]:
         return select([func.sum(InvoiceItem.amount)]).where(
             and_(
                 InvoiceItem.invoice_id == cls.id,

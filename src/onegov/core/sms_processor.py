@@ -7,6 +7,7 @@ Usage::
     qp = SmsQueueProcessor(sms_directory)
     qp.send_messages()
 """
+from __future__ import annotations
 
 import errno
 import logging
@@ -163,7 +164,7 @@ class SmsQueueProcessor:
 
     def send(
         self,
-        numbers: 'Sequence[str]',
+        numbers: Sequence[str],
         content: str
     ) -> dict[str, Any] | None:
         """ Sends the SMS and returns the API response on error.
@@ -187,7 +188,7 @@ class SmsQueueProcessor:
             return result
         return None
 
-    def send_request(self, parameters: 'JSON_ro') -> tuple[int, str]:
+    def send_request(self, parameters: JSON_ro) -> tuple[int, str]:
         """ Performes the API request using the given parameters. """
 
         body = BytesIO()
@@ -368,7 +369,7 @@ class SmsQueueProcessor:
 
 
 def get_sms_queue_processor(
-    app: 'Framework',
+    app: Framework,
     missing_path_ok: bool = False
 ) -> SmsQueueProcessor | None:
 

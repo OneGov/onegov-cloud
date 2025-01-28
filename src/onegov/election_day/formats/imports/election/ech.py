@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 from onegov.election_day import _
 from onegov.election_day.formats.imports.common import convert_ech_domain
 from onegov.election_day.formats.imports.common import EXPATS
@@ -45,7 +47,7 @@ election_class = {
     TypeOfElectionType.VALUE_2: Election,
 }
 
-gender: dict[SexType, 'Gender'] = {
+gender: dict[SexType, Gender] = {
     SexType.VALUE_1: 'male',
     SexType.VALUE_2: 'female',
     SexType.VALUE_3: 'undetermined',
@@ -53,11 +55,11 @@ gender: dict[SexType, 'Gender'] = {
 
 
 def import_elections_ech(
-    principal: 'Canton | Municipality',
-    delivery: 'Delivery',
-    session: 'Session',
+    principal: Canton | Municipality,
+    delivery: Delivery,
+    session: Session,
     default_locale: str,
-) -> 'ECHImportResultType':
+) -> ECHImportResultType:
     """ Imports all elections in a given eCH-0252 delivery.
 
     Deletes elections on the same day not appearing in the delivery.
@@ -118,12 +120,12 @@ def import_elections_ech(
 
 
 def import_information_delivery(
-    principal: 'Canton | Municipality',
-    delivery: 'EventElectionInformationDeliveryType',
-    session: 'Session',
+    principal: Canton | Municipality,
+    delivery: EventElectionInformationDeliveryType,
+    session: Session,
     default_locale: str,
 ) -> tuple[
-    'date',
+    date,
     list[ElectionCompound],
     list[Election],
     set[ElectionCompound | Election],
@@ -363,9 +365,9 @@ def import_information_delivery(
 
 
 def import_result_delivery(
-    principal: 'Canton | Municipality',
-    delivery: 'EventElectionResultDeliveryType',
-    polling_day: 'date',
+    principal: Canton | Municipality,
+    delivery: EventElectionResultDeliveryType,
+    polling_day: date,
     elections: list[Election],
     errors: set[FileImportError]
 ) -> None:
@@ -564,7 +566,7 @@ def import_result_delivery(
 def import_majoral_election_result(
     candidates: dict[str, Candidate],
     election_result: ElectionResult,
-    majoral_election: 'ElectionResultType.MajoralElection',
+    majoral_election: ElectionResultType.MajoralElection,
     errors: set[FileImportError]
 ) -> None:
     """ Helper function to import election results specific to majoral
@@ -599,7 +601,7 @@ def import_proportional_election_result(
     candidates: dict[str, Candidate],
     lists: dict[str, List],
     election_result: ElectionResult,
-    proportional_election: 'ElectionResultType.ProportionalElection',
+    proportional_election: ElectionResultType.ProportionalElection,
     errors: set[FileImportError]
 ) -> None:
     """ Helper function to import election results specific to proportional

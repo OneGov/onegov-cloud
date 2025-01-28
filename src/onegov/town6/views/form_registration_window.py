@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 from onegov.core.security import Private
 from onegov.form import FormDefinition
 from onegov.form import FormRegistrationWindow
@@ -26,9 +28,9 @@ if TYPE_CHECKING:
 )
 def town_handle_new_registration_form(
     self: FormDefinition,
-    request: 'TownRequest',
+    request: TownRequest,
     form: FormRegistrationWindowForm
-) -> 'RenderData | Response':
+) -> RenderData | Response:
     return handle_new_registration_form(
         self, request, form, FormSubmissionLayout(self, request))
 
@@ -42,9 +44,9 @@ def town_handle_new_registration_form(
 )
 def town_view_send_form_registration_message(
     self: FormRegistrationWindow,
-    request: 'TownRequest',
+    request: TownRequest,
     form: FormRegistrationMessageForm
-) -> 'RenderData | Response':
+) -> RenderData | Response:
     return view_send_form_registration_message(
         self, request, form, FormSubmissionLayout(self.form, request))
 
@@ -56,8 +58,8 @@ def town_view_send_form_registration_message(
 )
 def town_view_registration_window(
     self: FormRegistrationWindow,
-    request: 'TownRequest'
-) -> 'RenderData':
+    request: TownRequest
+) -> RenderData:
     return view_registration_window(
         self, request, FormSubmissionLayout(self.form, request))
 
@@ -71,8 +73,8 @@ def town_view_registration_window(
 )
 def town_handle_edit_registration_form(
     self: FormRegistrationWindow,
-    request: 'TownRequest',
+    request: TownRequest,
     form: FormRegistrationWindowForm
-) -> 'RenderData | Response':
+) -> RenderData | Response:
     return handle_edit_registration_form(
         self, request, form, FormSubmissionLayout(self.form, request))

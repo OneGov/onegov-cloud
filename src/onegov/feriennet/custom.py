@@ -1,3 +1,4 @@
+from __future__ import annotations
 from onegov.activity import BookingCollection
 from onegov.activity import PeriodCollection
 from onegov.activity import VolunteerCollection
@@ -23,7 +24,7 @@ if TYPE_CHECKING:
 
 
 @FeriennetApp.template_variables()
-def get_template_variables(request: 'FeriennetRequest') -> 'RenderData':
+def get_template_variables(request: FeriennetRequest) -> RenderData:
     links = {
         'global_tools': tuple(get_global_tools(request)),
         'top_navigation': tuple(get_top_navigation(request)),
@@ -43,16 +44,16 @@ def get_template_variables(request: 'FeriennetRequest') -> 'RenderData':
 
 
 def get_global_tools(
-    request: 'FeriennetRequest'
-) -> 'Iterator[Link | LinkGroup]':
+    request: FeriennetRequest
+) -> Iterator[Link | LinkGroup]:
     yield from get_base_tools(request)
     yield from get_personal_tools(request)
     yield from get_admin_tools(request)
 
 
 def get_admin_tools(
-    request: 'FeriennetRequest'
-) -> 'Iterator[Link | LinkGroup]':
+    request: FeriennetRequest
+) -> Iterator[Link | LinkGroup]:
     if request.is_organiser:
         period = request.app.active_period
         periods = request.app.periods
@@ -144,8 +145,8 @@ def get_admin_tools(
 
 
 def get_personal_tools(
-    request: 'FeriennetRequest'
-) -> 'Iterator[Link | LinkGroup]':
+    request: FeriennetRequest
+) -> Iterator[Link | LinkGroup]:
     # for logged-in users show the number of open bookings
     if request.is_logged_in:
         session = request.session
@@ -222,7 +223,7 @@ def get_personal_tools(
 
 
 def get_top_navigation(
-        request: 'FeriennetRequest') -> 'Iterator[NavigationEntry]':
+        request: FeriennetRequest) -> Iterator[NavigationEntry]:
     # inject an activites link in front of all top navigation links
     yield (  # type:ignore[misc]
         Bunch(id=-1, access='public', published=True),

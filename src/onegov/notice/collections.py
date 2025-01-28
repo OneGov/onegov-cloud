@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 from onegov.core.collection import Pagination
 from onegov.core.utils import increment_name
 from onegov.core.utils import normalize_for_url
@@ -37,7 +39,7 @@ _N = TypeVar('_N', bound=OfficialNotice)
 
 def get_unique_notice_name(
     name: str,
-    session: 'Session',
+    session: Session,
     model_class: type[OfficialNotice]
 ) -> str:
     """ Create a unique, URL-friendly name. """
@@ -60,17 +62,17 @@ class OfficialNoticeCollection(Pagination[_N]):
 
     def __init__(
         self,
-        session: 'Session',
+        session: Session,
         page: int = 0,
-        state: 'NoticeState | None' = None,
+        state: NoticeState | None = None,
         term: str | None = None,
         order: str | None = None,
         direction: Literal['asc', 'desc'] | None = None,
-        issues: 'Collection[str] | None ' = None,
-        categories: 'Collection[str] | None' = None,
-        organizations: 'Collection[str] | None' = None,
-        user_ids: list['UUID'] | None = None,
-        group_ids: list['UUID'] | None = None
+        issues: Collection[str] | None = None,
+        categories: Collection[str] | None = None,
+        organizations: Collection[str] | None = None,
+        user_ids: list[UUID] | None = None,
+        group_ids: list[UUID] | None = None
     ):
         super().__init__(page)
         self.session = session
@@ -102,14 +104,14 @@ class OfficialNoticeCollection(Pagination[_N]):
             and self.group_ids == other.group_ids
         )
 
-    def subset(self) -> 'Query[_N]':
+    def subset(self) -> Query[_N]:
         return self.query()
 
     @property
     def page_index(self) -> int:
         return self.page
 
-    def page_by_index(self, index: int) -> 'Self':
+    def page_by_index(self, index: int) -> Self:
         return self.__class__(
             self.session,
             page=index,
@@ -124,7 +126,7 @@ class OfficialNoticeCollection(Pagination[_N]):
             group_ids=self.group_ids
         )
 
-    def for_state(self, state: 'NoticeState') -> 'Self':
+    def for_state(self, state: NoticeState) -> Self:
         """ Returns a new instance of the collection with the given state. """
 
         return self.__class__(
@@ -140,7 +142,7 @@ class OfficialNoticeCollection(Pagination[_N]):
             group_ids=self.group_ids
         )
 
-    def for_term(self, term: str | None) -> 'Self':
+    def for_term(self, term: str | None) -> Self:
         """ Returns a new instance of the collection with the given term. """
 
         return self.__class__(
@@ -160,7 +162,7 @@ class OfficialNoticeCollection(Pagination[_N]):
         self,
         order: str,
         direction: Literal['asc', 'desc'] | None = None
-    ) -> 'Self':
+    ) -> Self:
         """ Returns a new instance of the collection with the given ordering.
         Inverts the direction if the new ordering is the same as the old one
         and an explicit ordering is not defined.
@@ -188,8 +190,8 @@ class OfficialNoticeCollection(Pagination[_N]):
 
     def for_organizations(
         self,
-        organizations: 'Collection[str] | None'
-    ) -> 'Self':
+        organizations: Collection[str] | None
+    ) -> Self:
         """ Returns a new instance of the collection with the given
         organizations.
 
@@ -208,7 +210,7 @@ class OfficialNoticeCollection(Pagination[_N]):
             group_ids=self.group_ids
         )
 
-    def for_categories(self, categories: 'Collection[str] | None') -> 'Self':
+    def for_categories(self, categories: Collection[str] | None) -> Self:
         """ Returns a new instance of the collection with the given categories.
 
         """
@@ -231,7 +233,7 @@ class OfficialNoticeCollection(Pagination[_N]):
         return OfficialNotice  # type:ignore[return-value]
 
     @property
-    def term_columns(self) -> list['_StrColumnLike']:
+    def term_columns(self) -> list[_StrColumnLike]:
         """ The columns used for full text search. """
 
         return [
@@ -248,7 +250,7 @@ class OfficialNoticeCollection(Pagination[_N]):
             User.username
         ]
 
-    def filter_query(self, query: 'Query[_N]') -> 'Query[_N]':
+    def filter_query(self, query: Query[_N]) -> Query[_N]:
         """ Filters the given query by the state of the collection. """
 
         if self.state:
@@ -284,7 +286,7 @@ class OfficialNoticeCollection(Pagination[_N]):
 
         return query
 
-    def order_query(self, query: 'Query[_N]') -> 'Query[_N]':
+    def order_query(self, query: Query[_N]) -> Query[_N]:
         """ Orders the given query by the state of the collection. """
 
         direction = desc if self.direction == 'desc' else asc
@@ -303,7 +305,7 @@ class OfficialNoticeCollection(Pagination[_N]):
 
         return query.order_by(None).order_by(direction(attribute))
 
-    def query(self) -> 'Query[_N]':
+    def query(self) -> Query[_N]:
         """ Returns a filtered and sorted query.
 
         Filters by:
@@ -383,7 +385,7 @@ class OfficialNoticeCollection(Pagination[_N]):
         query = query.filter(self.model_class.name == name)
         return query.first()
 
-    def by_id(self, id: 'UUID') -> _N | None:
+    def by_id(self, id: UUID) -> _N | None:
         """ Returns a notice by its id. """
 
         query = self.session.query(self.model_class)

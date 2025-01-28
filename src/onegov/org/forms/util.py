@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 from dateutil.rrule import MO, TU, WE, TH, FR, SA, SU
 
 from onegov.org import _

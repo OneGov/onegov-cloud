@@ -13,6 +13,7 @@ For wildcard paths (e.g. /old-pages/my-page to /new-pages/my-page)::
         to = '/new-pages
 
 """
+from __future__ import annotations
 
 from onegov.core import Framework
 from onegov.core.security import Public
@@ -36,5 +37,5 @@ class Redirect:
 
 
 @Framework.view(model=Redirect, permission=Public)
-def view_redirect(self: Redirect, request: 'CoreRequest') -> 'Response':
+def view_redirect(self: Redirect, request: CoreRequest) -> Response:
     return request.redirect(self.to)

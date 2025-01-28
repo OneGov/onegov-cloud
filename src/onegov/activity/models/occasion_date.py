@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 import sedate
 
 from datetime import datetime, time
@@ -38,7 +40,7 @@ class DAYS(IntEnum):
         localized_start: datetime,
         localized_end: datetime,
         total_seconds: float
-    ) -> 'DAYS':
+    ) -> DAYS:
         hours = total_seconds / 3600
 
         if hours <= 6:
@@ -70,24 +72,24 @@ class OccasionDate(Base, TimestampMixin):
         return hash(self.id)
 
     #: the internal id of this occasion date
-    id: 'Column[int]' = Column(Integer, primary_key=True)
+    id: Column[int] = Column(Integer, primary_key=True)
 
     #: Timezone of the occasion date
-    timezone: 'Column[str]' = Column(Text, nullable=False)
+    timezone: Column[str] = Column(Text, nullable=False)
 
     #: The start of the range
-    start: 'Column[datetime]' = Column(UTCDateTime, nullable=False)
+    start: Column[datetime] = Column(UTCDateTime, nullable=False)
 
     #: The end of the range
-    end: 'Column[datetime]' = Column(UTCDateTime, nullable=False)
+    end: Column[datetime] = Column(UTCDateTime, nullable=False)
 
     #: The associated occasion
-    occasion_id: 'Column[uuid.UUID]' = Column(
+    occasion_id: Column[uuid.UUID] = Column(
         UUID,  # type:ignore[arg-type]
         ForeignKey('occasions.id'),
         nullable=False
     )
-    occasion: 'relationship[Occasion]' = relationship(
+    occasion: relationship[Occasion] = relationship(
         'Occasion',
         back_populates='dates'
     )
@@ -105,7 +107,7 @@ class OccasionDate(Base, TimestampMixin):
         return sedate.to_timezone(self.end, self.timezone)
 
     @property
-    def active_days(self) -> 'Iterator[int]':
+    def active_days(self) -> Iterator[int]:
         for dt in sedate.dtrange(self.localized_start, self.localized_end):
             yield dt.date().toordinal()
 
@@ -135,17 +137,17 @@ class OccasionDate(Base, TimestampMixin):
             self.duration_in_seconds
         )
 
-    def overlaps(self, other: 'OccasionDate') -> bool:
+    def overlaps(self, other: OccasionDate) -> bool:
         return sedate.overlaps(self.start, self.end, other.start, other.end)
 
 
 # # changes to the dates need to be propagated to the parent occasion
-# # so it can update its aggreagated values
-@event.listens_for(Session, 'before_flush')
+# # so it can update its aggregated values
+@event.listens_for(Session, 'before_flush')  # type:ignore[misc]
 def before_flush(
     session: Session,
-    context: 'UOWTransaction',
-    instances: 'Sequence[Any]'
+    context: UOWTransaction,
+    instances: Sequence[Any]
 ) -> None:
     for obj in session.dirty:
         if isinstance(obj, OccasionDate):

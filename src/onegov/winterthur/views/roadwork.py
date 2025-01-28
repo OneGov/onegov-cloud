@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 from onegov.core.security import Public
 from onegov.winterthur import WinterthurApp, _
 from onegov.winterthur.layout import RoadworkLayout, RoadworkCollectionLayout
@@ -17,8 +19,8 @@ if TYPE_CHECKING:
 )
 def view_roadwork_collection(
     self: RoadworkCollection,
-    request: 'WinterthurRequest'
-) -> 'RenderData':
+    request: WinterthurRequest
+) -> RenderData:
 
     return {
         'layout': RoadworkCollectionLayout(self, request),
@@ -34,8 +36,8 @@ def view_roadwork_collection(
 )
 def view_roadwork(
     self: Roadwork,
-    request: 'WinterthurRequest'
-) -> 'RenderData':
+    request: WinterthurRequest
+) -> RenderData:
 
     return {
         'layout': RoadworkLayout(self, request),

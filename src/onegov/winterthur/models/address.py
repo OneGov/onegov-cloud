@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 from onegov.core.orm import Base
 from onegov.core.orm.mixins import TimestampMixin
 from sqlalchemy import Column
@@ -15,30 +17,30 @@ class WinterthurAddress(Base, TimestampMixin):
     __tablename__ = 'winterthur_addresses'
 
     #: the adress id
-    id: 'Column[int]' = Column(Integer, nullable=False, primary_key=True)
+    id: Column[int] = Column(Integer, nullable=False, primary_key=True)
 
     #: the street
-    street_id: 'Column[int]' = Column(Integer, nullable=False)
-    street: 'Column[str]' = Column(Text, nullable=False)
+    street_id: Column[int] = Column(Integer, nullable=False)
+    street: Column[str] = Column(Text, nullable=False)
 
     #: the house
-    house_number: 'Column[int]' = Column(Integer, nullable=False)
-    house_extra: 'Column[str | None]' = Column(Text, nullable=True)
+    house_number: Column[int] = Column(Integer, nullable=False)
+    house_extra: Column[str | None] = Column(Text, nullable=True)
 
     #: the place
-    zipcode: 'Column[int]' = Column(Integer, nullable=False)
-    zipcode_extra: 'Column[int | None]' = Column(Integer, nullable=True)
+    zipcode: Column[int] = Column(Integer, nullable=False)
+    zipcode_extra: Column[int | None] = Column(Integer, nullable=True)
 
-    place: 'Column[str]' = Column(Text, nullable=False)
+    place: Column[str] = Column(Text, nullable=False)
 
     #: the district
-    district: 'Column[str]' = Column(Text, nullable=False)
+    district: Column[str] = Column(Text, nullable=False)
 
     #: the neighbourhood
-    neighbourhood: 'Column[str]' = Column(Text, nullable=False)
+    neighbourhood: Column[str] = Column(Text, nullable=False)
 
     @classmethod
-    def as_addressless(cls, street_id: int, street: str) -> 'Self':
+    def as_addressless(cls, street_id: int, street: str) -> Self:
         return cls(
             street_id=street_id,
             street=street,

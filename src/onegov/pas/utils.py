@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 from decimal import Decimal
 from babel.numbers import format_decimal
 

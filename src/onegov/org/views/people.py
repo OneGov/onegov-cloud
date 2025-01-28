@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 import morepath
 from morepath.request import Response
 from sqlalchemy.orm import undefer
@@ -22,9 +24,9 @@ if TYPE_CHECKING:
 @OrgApp.html(model=PersonCollection, template='people.pt', permission=Public)
 def view_people(
     self: PersonCollection,
-    request: 'OrgRequest',
+    request: OrgRequest,
     layout: PersonCollectionLayout | None = None
-) -> 'RenderData':
+) -> RenderData:
 
     selected_org = str(request.params.get('organisation', ''))
     selected_sub_org = str(request.params.get('sub_organisation', ''))
@@ -56,9 +58,9 @@ def view_people(
 @OrgApp.html(model=Person, template='person.pt', permission=Public)
 def view_person(
     self: Person,
-    request: 'OrgRequest',
+    request: OrgRequest,
     layout: PersonLayout | None = None
-) -> 'RenderData':
+) -> RenderData:
 
     query = request.session.query(Topic)
     query = query.options(undefer('content'))
@@ -73,9 +75,9 @@ def view_person(
 
 def person_functions_by_organization(
     subject_person: Person,
-    topics: 'Iterable[Topic]',
-    request: 'OrgRequest'
-) -> 'Iterable[Markup]':
+    topics: Iterable[Topic],
+    request: OrgRequest
+) -> Iterable[Markup]:
     """ Collects 1:1 mappings of all context-specific functions and
      organizations for a person. Organizations are pages where `subject_person`
      is listed as a person.
@@ -126,10 +128,10 @@ def person_functions_by_organization(
 )
 def handle_new_person(
     self: PersonCollection,
-    request: 'OrgRequest',
+    request: OrgRequest,
     form: PersonForm,
     layout: PersonCollectionLayout | None = None
-) -> 'RenderData | BaseResponse':
+) -> RenderData | BaseResponse:
 
     if form.submitted(request):
         person = self.add(**form.get_useful_data())
@@ -158,10 +160,10 @@ def handle_new_person(
 )
 def handle_edit_person(
     self: Person,
-    request: 'OrgRequest',
+    request: OrgRequest,
     form: PersonForm,
     layout: PersonLayout | None = None
-) -> 'RenderData | BaseResponse':
+) -> RenderData | BaseResponse:
 
     if form.submitted(request):
         form.populate_obj(self)
@@ -184,13 +186,13 @@ def handle_edit_person(
 
 
 @OrgApp.view(model=Person, request_method='DELETE', permission=Private)
-def handle_delete_person(self: Person, request: 'OrgRequest') -> None:
+def handle_delete_person(self: Person, request: OrgRequest) -> None:
     request.assert_valid_csrf_token()
     PersonCollection(request.session).delete(self)
 
 
 @OrgApp.view(model=Person, name='vcard', permission=Public)
-def vcard_export_person(self: Person, request: 'OrgRequest') -> Response:
+def vcard_export_person(self: Person, request: OrgRequest) -> Response:
     """ Returns the persons vCard. """
 
     exclude = [*request.app.org.excluded_person_fields(request), 'notes']

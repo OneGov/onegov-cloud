@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 from onegov.directory.models.directory_entry import DirectoryEntry
 from onegov.form import as_internal_id
 from onegov.form import flatten_fieldsets
@@ -25,9 +27,9 @@ class DirectoryMigration:
 
     def __init__(
         self,
-        directory: 'Directory',
+        directory: Directory,
         new_structure: str | None = None,
-        new_configuration: 'DirectoryConfiguration | None' = None,
+        new_configuration: DirectoryConfiguration | None = None,
         old_structure: str | None = None
     ):
 
@@ -84,7 +86,7 @@ class DirectoryMigration:
         return False
 
     @property
-    def entries(self) -> 'Iterable[DirectoryEntry]':
+    def entries(self) -> Iterable[DirectoryEntry]:
         session = object_session(self.directory)
 
         if not session:
@@ -179,7 +181,7 @@ class FieldTypeMigrations:
         self,
         old_type: str,
         new_type: str
-    ) -> 'Callable[[Any], Any] | None':
+    ) -> Callable[[Any], Any] | None:
 
         if old_type == 'password':
             return None  # disabled to avoid accidental leaks
@@ -211,13 +213,13 @@ class FieldTypeMigrations:
     def text_to_code(self, value: str) -> str:
         return value
 
-    def date_to_text(self, value: 'date') -> str:
+    def date_to_text(self, value: date) -> str:
         return '{:%d.%m.%Y}'.format(value)
 
-    def datetime_to_text(self, value: 'datetime') -> str:
+    def datetime_to_text(self, value: datetime) -> str:
         return '{:%d.%m.%Y %H:%M}'.format(value)
 
-    def time_to_text(self, value: 'time') -> str:
+    def time_to_text(self, value: time) -> str:
         return '{:%H:%M}'.format(value)
 
     def radio_to_checkbox(self, value: str) -> list[str]:

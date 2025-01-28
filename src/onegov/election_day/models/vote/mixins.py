@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 from sqlalchemy import case
 from sqlalchemy import cast
 from sqlalchemy import Float
@@ -28,7 +30,7 @@ class DerivedAttributesMixin:
         return self.yeas / ((self.yeas + self.nays) or 1) * 100
 
     @yeas_percentage.expression  # type:ignore[no-redef]
-    def yeas_percentage(cls) -> 'ColumnElement[float]':
+    def yeas_percentage(cls) -> ColumnElement[float]:
         # coalesce will pick the first non-null result
         # nullif will return null if division by zero
         # => when all yeas and nays are zero the yeas percentage is 0%
@@ -52,7 +54,7 @@ class DerivedAttributesMixin:
         return self.yeas > self.nays if self.counted else None
 
     @accepted.expression  # type:ignore[no-redef]
-    def accepted(cls) -> 'ColumnElement[bool]':
+    def accepted(cls) -> ColumnElement[bool]:
         return case({True: cls.yeas > cls.nays}, cls.counted)
 
 
@@ -86,7 +88,7 @@ class DerivedBallotsCountMixin:
         )
 
     @turnout.expression  # type:ignore[no-redef]
-    def turnout(cls) -> 'ColumnElement[float]':
+    def turnout(cls) -> ColumnElement[float]:
         return case(
             [(
                 cls.eligible_voters > 0,

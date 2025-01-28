@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 from itertools import groupby
 from onegov.core.collection import GenericCollection, Pagination
 from onegov.core.utils import toggle
@@ -26,14 +28,14 @@ class DirectorySearchWidget(Protocol[DirectoryEntryT]):
     @property
     def name(self) -> str: ...
     @property
-    def search_query(self) -> 'Query[DirectoryEntryT]': ...
+    def search_query(self) -> Query[DirectoryEntryT]: ...
 
     def adapt(
         self,
-        query: 'Query[DirectoryEntryT]'
-    ) -> 'Query[DirectoryEntryT]': ...
+        query: Query[DirectoryEntryT]
+    ) -> Query[DirectoryEntryT]: ...
 
-    def html(self, layout: Any) -> 'Markup': ...
+    def html(self, layout: Any) -> Markup: ...
 
 
 class DirectoryEntryCollection(
@@ -50,11 +52,11 @@ class DirectoryEntryCollection(
 
     def __init__(
         self,
-        directory: 'Directory',
+        directory: Directory,
         type: str = '*',
-        keywords: 'Mapping[str, list[str]] | None' = None,
+        keywords: Mapping[str, list[str]] | None = None,
         page: int = 0,
-        search_widget: 'DirectorySearchWidget[DirectoryEntryT] | None' = None
+        search_widget: DirectorySearchWidget[DirectoryEntryT] | None = None
     ) -> None:
 
         super().__init__(object_session(directory))
@@ -71,7 +73,7 @@ class DirectoryEntryCollection(
             and self.page == other.page
         )
 
-    def subset(self) -> 'Query[DirectoryEntryT]':
+    def subset(self) -> Query[DirectoryEntryT]:
         return self.query()
 
     @property
@@ -82,7 +84,7 @@ class DirectoryEntryCollection(
         return self.search_widget.name
 
     @property
-    def search_query(self) -> 'Query[DirectoryEntryT] | None':
+    def search_query(self) -> Query[DirectoryEntryT] | None:
         if self.search_widget is None:
             return None
 
@@ -92,7 +94,7 @@ class DirectoryEntryCollection(
     def page_index(self) -> int:
         return self.page
 
-    def page_by_index(self, index: int) -> 'Self':
+    def page_by_index(self, index: int) -> Self:
         return self.__class__(
             self.directory,
             self.type,
@@ -103,7 +105,7 @@ class DirectoryEntryCollection(
     def by_name(self, name: str) -> DirectoryEntryT | None:
         return self.query().filter_by(name=name).first()
 
-    def query(self) -> 'Query[DirectoryEntryT]':
+    def query(self) -> Query[DirectoryEntryT]:
         cls = self.model_class
 
         query = super().query().filter_by(directory_id=self.directory.id)
@@ -138,7 +140,7 @@ class DirectoryEntryCollection(
 
     def valid_keywords(
         self,
-        parameters: 'Mapping[str, T]'
+        parameters: Mapping[str, T]
     ) -> dict[str, T]:
 
         valid_keywords = {
@@ -165,8 +167,8 @@ class DirectoryEntryCollection(
     def available_filters(
         self,
         sort_choices: bool = False,
-        sortfunc: 'Callable[[str], SupportsRichComparison] | None ' = None
-    ) -> 'Iterable[tuple[str, str, list[str]]]':
+        sortfunc: Callable[[str], SupportsRichComparison] | None = None
+    ) -> Iterable[tuple[str, str, list[str]]]:
         """ Retrieve the filters with their choices.
 
         By default the choices are returned in the same order as defined in the
@@ -186,7 +188,7 @@ class DirectoryEntryCollection(
             )
         }
 
-        def maybe_sorted(values: 'Iterable[str]') -> list[str]:
+        def maybe_sorted(values: Iterable[str]) -> list[str]:
             if not sort_choices:
                 return list(values)
             return sorted(values, key=sortfunc)
@@ -200,7 +202,7 @@ class DirectoryEntryCollection(
         self,
         singular: bool = False,
         **keywords: list[str]
-    ) -> 'Self':
+    ) -> Self:
 
         if not self.directory.configuration.keywords:
             return self
@@ -217,7 +219,7 @@ class DirectoryEntryCollection(
         keyword: str,
         value: str,
         singular: bool = False,
-    ) -> 'Self':
+    ) -> Self:
 
         if not self.directory.configuration.keywords:
             return self
@@ -243,7 +245,7 @@ class DirectoryEntryCollection(
             keywords=parameters
         )
 
-    def without_keywords(self) -> 'Self':
+    def without_keywords(self) -> Self:
         return self.__class__(
             directory=self.directory,
             type=self.type,

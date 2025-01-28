@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 from functools import cached_property
 from onegov.town6.request import TownRequest
 
@@ -9,7 +11,7 @@ if TYPE_CHECKING:
 
 class FeriennetRequest(TownRequest):
 
-    app: 'FeriennetApp'
+    app: FeriennetApp
 
     @cached_property
     def is_organiser(self) -> bool:

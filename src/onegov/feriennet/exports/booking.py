@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 from onegov.activity import Activity, Attendee, Booking, Occasion
 from onegov.core.security import Secret
 from onegov.feriennet import FeriennetApp, _
@@ -29,8 +31,8 @@ class BookingExport(FeriennetExport):
     def run(
         self,
         form: PeriodExportForm,  # type:ignore[override]
-        session: 'Session'
-    ) -> 'Iterator[Iterator[tuple[str, Any]]]':
+        session: Session
+    ) -> Iterator[Iterator[tuple[str, Any]]]:
 
         assert form.selected_period is not None
 
@@ -41,7 +43,7 @@ class BookingExport(FeriennetExport):
 
         return self.rows(session, form.selected_period)
 
-    def query(self, session: 'Session', period: 'Period') -> 'Query[Booking]':
+    def query(self, session: Session, period: Period) -> Query[Booking]:
         q = session.query(Booking)
         q = q.filter(Booking.period_id == period.id)
 
@@ -68,18 +70,18 @@ class BookingExport(FeriennetExport):
 
     def rows(
         self,
-        session: 'Session',
-        period: 'Period'
-    ) -> 'Iterator[Iterator[tuple[str, Any]]]':
+        session: Session,
+        period: Period
+    ) -> Iterator[Iterator[tuple[str, Any]]]:
 
         for booking in self.query(session, period):
             yield ((k, v) for k, v in self.fields(period, booking))
 
     def fields(
         self,
-        period: 'Period',
+        period: Period,
         booking: Booking
-    ) -> 'Iterator[tuple[str, Any]]':
+    ) -> Iterator[tuple[str, Any]]:
 
         yield from self.booking_fields(booking)
         yield from self.activity_fields(booking.occasion.activity)

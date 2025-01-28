@@ -2,6 +2,7 @@
 upgraded on the server. See :class:`onegov.core.upgrade.upgrade_task`.
 
 """
+from __future__ import annotations
 
 from onegov.core.upgrade import upgrade_task, UpgradeContext
 from onegov.org.models import Organisation

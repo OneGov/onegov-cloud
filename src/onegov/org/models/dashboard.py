@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 from attr import attrs
 from itertools import groupby
 
@@ -11,7 +13,7 @@ if TYPE_CHECKING:
 
 class Dashboard:
 
-    def __init__(self, request: 'OrgRequest') -> None:
+    def __init__(self, request: OrgRequest) -> None:
         self.request = request
 
     @property
@@ -20,7 +22,7 @@ class Dashboard:
 
         return self.request.app.config.boardlets_registry and True or False
 
-    def boardlets(self) -> list[tuple['Boardlet', ...]]:
+    def boardlets(self) -> list[tuple[Boardlet, ...]]:
         """ Returns the boardlets, grouped/ordered by their order tuple. """
 
         instances = []
@@ -58,7 +60,7 @@ class Boardlet:
         self,
         name: str,
         order: tuple[int, int],
-        request: 'OrgRequest'
+        request: OrgRequest
     ) -> None:
         self.name = name
         self.order = order
@@ -73,7 +75,7 @@ class Boardlet:
         raise NotImplementedError()
 
     @property
-    def facts(self) -> 'Iterator[BoardletFact]':
+    def facts(self) -> Iterator[BoardletFact]:
         """ Yields facts. (:class:`BoardletFact` instances)"""
 
         raise NotImplementedError()
