@@ -476,60 +476,59 @@ function spawnMap(element, lat, lon, zoom, includeZoomControls, cb) {
         console.log('Default map spawned');
         map.setView([lat, lon], zoom);
 
-        // Add a div that will catch all events
-        var blocker = L.DomUtil.create('div', 'map-event-blocker');
-        blocker.style.position = 'absolute';
-        blocker.style.top = '0';
-        blocker.style.left = '0';
-        blocker.style.right = '0';
-        blocker.style.bottom = '0';
-        blocker.style.zIndex = '1000';
-        blocker.style.backgroundColor = 'rgba(0, 0, 0, 0.1)';
-        blocker.style.cursor = 'pointer';
-        blocker.style.display = 'flex';
-        blocker.style.alignItems = 'center';
-        blocker.style.justifyContent = 'center';
+        // Function to create and add blocker
+        function addBlocker() {
+            const blocker = L.DomUtil.create('div', 'map-event-blocker');
+            blocker.style.position = 'absolute';
+            blocker.style.top = '0';
+            blocker.style.left = '0';
+            blocker.style.right = '0';
+            blocker.style.bottom = '0';
+            blocker.style.zIndex = '1000';
+            blocker.style.backgroundColor = 'rgba(0, 0, 0, 0.1)';
+            blocker.style.cursor = 'pointer';
+            blocker.style.display = 'flex';
+            blocker.style.alignItems = 'center';
+            blocker.style.justifyContent = 'center';
 
-        // Add message container
-        var message = L.DomUtil.create('div', 'map-click-message');
-        message.innerHTML = 'Klicken, um die Karte zu aktivieren';
-        message.style.backgroundColor = 'white';
-        message.style.padding = '8px 16px';
-        message.style.borderRadius = '4px';
-        message.style.boxShadow = '0 2px 4px rgba(0,0,0,0.2)';
-        message.style.fontSize = '14px';
-        message.style.transition = 'opacity 0.2s';
+            const message = L.DomUtil.create('div', 'map-click-message');
+            message.innerHTML = 'Click to activate map';
+            message.style.backgroundColor = 'white';
+            message.style.padding = '8px 16px';
+            message.style.borderRadius = '4px';
+            message.style.boxShadow = '0 2px 4px rgba(0,0,0,0.2)';
+            message.style.fontSize = '14px';
 
-        blocker.appendChild(message);
-        map.getContainer().appendChild(blocker);
+            blocker.appendChild(message);
+            map.getContainer().appendChild(blocker);
 
-        // Fade out message on hover
-        blocker.addEventListener('mouseover', function() {
-            message.style.opacity = '0.5';
+            // Block all events
+            L.DomEvent
+                .on(blocker, 'mousewheel', L.DomEvent.stopPropagation)
+                .on(blocker, 'wheel', L.DomEvent.stopPropagation)
+                .on(blocker, 'mousedown', L.DomEvent.stopPropagation)
+                .on(blocker, 'touchstart', L.DomEvent.stopPropagation)
+                .on(blocker, 'dblclick', L.DomEvent.stopPropagation)
+                .on(blocker, 'contextmenu', L.DomEvent.stopPropagation)
+                .on(blocker, 'click', function(e) {
+                    blocker.remove();
+                    L.DomEvent.stopPropagation(e);
+                });
+
+            return blocker;
+        }
+
+        // Add initial blocker
+        addBlocker();
+
+        // Add click handler to document to re-add blocker when clicking outside
+        $(document).on('click', function(e) {
+            if (!$(e.target).closest(map.getContainer()).length) {
+                if (!map.getContainer().querySelector('.map-event-blocker')) {
+                    addBlocker();
+                }
+            }
         });
-        blocker.addEventListener('mouseout', function() {
-            message.style.opacity = '1';
-        });
-
-        // Remove blocker on first click with a nice fade effect
-        L.DomEvent.on(blocker, 'click', function(e) {
-            console.log('Removing blocker');
-            blocker.style.transition = 'opacity 0.2s';
-            blocker.style.opacity = '0';
-            setTimeout(function() {
-                blocker.remove();
-            }, 200);
-            L.DomEvent.stopPropagation(e);
-        });
-
-        // Block all events on the blocker
-        L.DomEvent
-            .on(blocker, 'mousewheel', L.DomEvent.stopPropagation)
-            .on(blocker, 'wheel', L.DomEvent.stopPropagation)
-            .on(blocker, 'mousedown', L.DomEvent.stopPropagation)
-            .on(blocker, 'touchstart', L.DomEvent.stopPropagation)
-            .on(blocker, 'dblclick', L.DomEvent.stopPropagation)
-            .on(blocker, 'contextmenu', L.DomEvent.stopPropagation);
 
         // remove leaflet link - we don't advertise other open source projects
         // we depend on as visibly either
