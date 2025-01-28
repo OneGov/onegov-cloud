@@ -458,12 +458,28 @@ function spawnDefaultMap(target, options, cb) {
 
 function spawnMap(element, lat, lon, zoom, includeZoomControls, cb) {
     console.log('spawnMap');
-    var $el = $(element);
+    let $el = $(element);
+
+    let lang = getLanguage();
+
+    // there's no translation layer for onegov.gis yet
+    let strings = {
+        'de': {
+            clickToActivate: _("Klicken Sie zur Aktivierung der Karte")
+        },
+        'fr': {
+            clickToActivate: _("Cliquez pour activer la carte")
+        },
+        'en': {
+            clickToActivate: _("Click to activate map")
+        }
+    };
+    strings = strings[lang] || strings.de;
 
     // the height is calculated form the width using the golden ratio
     element.css('height', $el.data('map-height') || $el.width() / 1.618 + 'px');
 
-    var options = {
+    let options = {
         zoomControl: false,
         sleepNote: false,
         sleepTime: 500,
@@ -476,8 +492,8 @@ function spawnMap(element, lat, lon, zoom, includeZoomControls, cb) {
         console.log('Default map spawned');
         map.setView([lat, lon], zoom);
 
-        // Function to create and add blocker
         function addBlocker() {
+            // Add a blocker to prevent interaction with the map until clicked
             const blocker = L.DomUtil.create('div', 'map-event-blocker');
             blocker.style.position = 'absolute';
             blocker.style.top = '0';
@@ -492,7 +508,7 @@ function spawnMap(element, lat, lon, zoom, includeZoomControls, cb) {
             blocker.style.justifyContent = 'center';
 
             const message = L.DomUtil.create('div', 'map-click-message');
-            message.innerHTML = 'Click to activate map';
+            message.innerHTML = strings.clickToActivate;
             message.style.backgroundColor = 'white';
             message.style.padding = '8px 16px';
             message.style.borderRadius = '4px';
