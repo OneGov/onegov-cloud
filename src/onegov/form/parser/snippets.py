@@ -22,8 +22,8 @@ class Snippets:
         (_('Text fields'), None),
         (_('Text'), '___'),
         (_('Limited text'), '___[50]'),
-        (_('Numbers-only textfield (regex)'), '___/^[0-9]+$'),
         (_('Multiline with optional number of rows'), '...[10]'),
+        (_('Numbers-only textfield (regex)'), '___/^[0-9]+$'),
 
         (_('Comment'), None),
         (_('Example Comment'), '<<  >>'),
