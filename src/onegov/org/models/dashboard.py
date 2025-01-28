@@ -26,10 +26,12 @@ class Dashboard:
 
         instances = []
 
-        for name, data in self.request.app.config.boardlets_registry.items():
+        for name, data in (
+                self.request.app.config.boardlets_registry.items()):
             instances.append(data['cls'](
                 name=name,
                 order=data['order'],
+                icon=data['icon'],
                 request=self.request
             ))
 
@@ -49,7 +51,7 @@ class Boardlet:
 
         from onegov.app import App
 
-        @App.boardlet(name='foo', order=(1, 1))
+        @App.boardlet(name='foo', order=(1, 1), icon='')
         class MyBoardlet(Boardlet):
             pass
 
@@ -59,10 +61,12 @@ class Boardlet:
         self,
         name: str,
         order: tuple[int, int],
+        icon: str,
         request: OrgRequest
     ) -> None:
         self.name = name
         self.order = order
+        self.icon = icon or ''
         self.request = request
 
     @property
@@ -95,10 +99,19 @@ class Boardlet:
 class BoardletFact:
     """ A single boardlet fact. """
 
-    # the text of the fact (includes the metric)
+    # the text of the fact (not including the metric)
     text: str
+
+    # the metric of the fact
+    number: int | float | str | None = None
+
+    # link to be displayed as tuple of link, link text
+    link: tuple[str, str] | None = None
 
     # the font awesome (fa-*) icon to use, if any
     icon: str | None = None
+
+    # title of the icon (hover text)
+    icon_title: str | None = None
 
     css_class: str | None = None
