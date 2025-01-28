@@ -3,14 +3,13 @@ from __future__ import annotations
 from datetime import timedelta
 from functools import cached_property
 
-import requests
-from requests import HTTPError
 from sedate import utcnow
 from typing import TYPE_CHECKING
 
 from onegov.org.layout import DefaultLayout
 from onegov.org.models import Boardlet, BoardletFact, News
 from onegov.page import Page
+from onegov.plausible.plausible_api import PlausibleAPI
 from onegov.ticket import Ticket
 from onegov.town6 import TownApp, _
 
@@ -103,50 +102,6 @@ def get_icon_title(request: TownRequest, visibility: str) -> str:
                              mapping={'visibility': visibility}))
 
 
-def plausible_stats(
-    metrics: list[str],
-    date_range: str,
-    filters: list[str] | None = None,
-    dimensions: list[str] | None = None
-) -> dict[str, list[dict[str, str]]]:
-    api_key = (
-        'eR9snr0RzrglMLrKqVPNQ_IYL3dD6hyOX0-2gyRMlxSSSTk5bg6NjORWtbNEMoHU')
-    site_id = 'wil.onegovcloud.ch'
-
-    if filters is None:
-        filters = []
-    if dimensions is None:
-        dimensions = []
-
-    url = 'https://analytics.seantis.ch/api/v2/query'
-    headers = {
-        'Authorization': f'Bearer {api_key}',
-        'Content-Type': 'application/json'
-    }
-    data = {
-        'site_id': site_id,
-        'metrics': metrics,
-        'date_range': date_range,
-        'filters': filters,
-        'dimensions': dimensions
-    }
-
-    try:
-        response = requests.post(url, headers=headers, json=data, timeout=30)
-        response.raise_for_status()  # Raise an error for bad status codes
-    except HTTPError as e:
-        if response.status_code == 401:
-            print('Unauthorized: Invalid API key or insufficient '
-                  'permissions', e)
-        else:
-            print('HTTP error', e)
-    except Exception as e:
-        print('Plausible error occurred:', e)
-
-    print('*** tschupre get plausible stats response', response.json())
-    return response.json()
-
-
 @TownApp.boardlet(name='pages', order=(1, 2), icon='fa-edit')
 class EditedPagesBoardlet(TownBoardlet):
 
@@ -159,6 +114,7 @@ class EditedPagesBoardlet(TownBoardlet):
 
         last_edited_pages = self.session.query(Page).order_by(
             Page.last_change.desc()).limit(8)
+
         for p in last_edited_pages:
             yield BoardletFact(
                 text='',
@@ -179,6 +135,7 @@ class EditedNewsBoardlet(TownBoardlet):
     def facts(self) -> Iterator[BoardletFact]:
         last_edited_news = self.session.query(News).order_by(
             Page.last_change.desc()).limit(8)
+
         for n in last_edited_news:
             yield BoardletFact(
                 text='',
@@ -198,33 +155,13 @@ class PlausibleStats(TownBoardlet):
     @property
     def facts(self) -> Iterator[BoardletFact]:
 
-        data = plausible_stats(
-            ['visitors', 'pageviews', 'views_per_visit',
-             'visit_duration'],
-            '7d',
-        )
+        results = PlausibleAPI().get_stats()
 
-        values = data['results'][0]['metrics']
-
-        yield BoardletFact(
-            text='Unique Visitors in the Last Week',
-            number=values[0] or '-',
-        )
-
-        yield BoardletFact(
-            text='Total Page Views in the Last Week',
-            number=values[1] or '-',
-        )
-
-        yield BoardletFact(
-            text='Number of Page Views per Visit',
-            number=values[2] or '-',
-        )
-
-        yield BoardletFact(
-            text='Average Visit Duration in Seconds',
-            number=values[3] or '-',
-        )
+        for text, number in results.items():
+            yield BoardletFact(
+                text=text,
+                number=number
+            )
 
 
 @TownApp.boardlet(name='Top Pages', order=(2, 2))
@@ -237,22 +174,16 @@ class PlausibleTopPages(TownBoardlet):
     @property
     def facts(self) -> Iterator[BoardletFact]:
 
-        data = plausible_stats(
-            ['visitors'],
-            '7d',
-            [],
-            ['event:page']
-        )
+        results = PlausibleAPI().get_top_pages(limit=10)
 
-        # Extract and sort the results by the number of visits (metrics)
-        sorted_results = sorted(
-            data['results'], key=lambda x: x['metrics'][0], reverse=True)
-
-        # Print the sorted results
-        for result in sorted_results[:10]:
-            print(f"Top Page: {result['dimensions'][0]}, Visits:"
-                  f" {result['metrics'][0]}")
+        if not results:
             yield BoardletFact(
-                text=result['dimensions'][0],
-                number=result['metrics'][0] or '-',
+                text=_('No data available'),
+                number=None
+            )
+
+        for text, number in results.items():
+            yield BoardletFact(
+                text=text,
+                number=number
             )
