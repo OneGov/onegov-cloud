@@ -2,7 +2,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: \n"
-"POT-Creation-Date: 2025-01-28 08:31+0100\n"
+"POT-Creation-Date: 2025-01-27 16:09+0100\n"
 "PO-Revision-Date: 2022-03-15 10:52+0100\n"
 "Last-Translator: \n"
 "Language-Team: \n"
@@ -1116,6 +1116,9 @@ msgstr "Destinatario"
 
 msgid "Do not actually import the newsletter subscribers"
 msgstr "Non importare effettivamente gli iscritti alla newsletter"
+
+msgid "Subscribed on"
+msgstr "Iscritto il"
 
 msgid "Will be used as image in the page overview on the parent page"
 msgstr ""

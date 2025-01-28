@@ -34,8 +34,15 @@
     }
 }
 
-.subscribers li:hover span {
-    background-color: $yellow-pastel;
+.subscribers {
+
+    .info {
+        color: $aluminum;
+    }
+
+    li:hover span:not(.info) {
+       background-color: $yellow-pastel;
+   }
 }
 
 .newsletter-block > h2,
