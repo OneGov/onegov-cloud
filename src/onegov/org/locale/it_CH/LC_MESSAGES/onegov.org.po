@@ -3848,6 +3848,20 @@ msgstr "Nessuna prenotazione oggi."
 msgid "Have a great day!"
 msgstr "Ti auguro una buona giornata!"
 
+msgid "Notify on newsletter unsubscription"
+msgstr "Notifica di annullamento dell'iscrizione alla newsletter"
+
+msgid "Send an email notification to the following users when a recipient "
+"unsubscribes from the newsletter"
+msgstr "Inviare una notifica via e-mail ai seguenti utenti quando un "
+"destinatario si cancella dalla newsletter"
+
+msgid "Unsubscription from newsletter"
+msgstr "Cancellazione dalla newsletter"
+
+msgid "The user with the address ${address} just unsubscribed from the newsletter subscriber list."
+msgstr "L'utente con l'indirizzo ${indirizzo} si è appena cancellato dalla lista degli iscritti alla newsletter."
+
 msgid ""
 "This is the daily reservation overview for ${organisation}. If you no longer "
 "want to receive this e-mail please contact an administrator so they can "
@@ -5504,6 +5518,11 @@ msgid "Welcome to the ${org} Newsletter"
 msgstr "Benvenuto nella newsletter di ${org}"
 
 #, python-format
+msgid ""
+"Success! We have added ${address} to the list of recipients."
+msgstr ""
+"Successo! Abbiamo aggiunto ${indirizzo} alla lista dei destinatari."
+
 msgid ""
 "Success! We have added ${address} to the list of recipients. Subscribed "
 "categories are ${subscribed}."

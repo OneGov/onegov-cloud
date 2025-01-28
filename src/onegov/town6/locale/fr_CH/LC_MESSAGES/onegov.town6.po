@@ -1069,6 +1069,15 @@ msgstr "Passez une bonne journée!"
 msgid "Hello"
 msgstr "Bonjour"
 
+msgid "Notify on newsletter unsubscription"
+msgstr "Notifier le désabonnement à la lettre d'information"
+
+msgid "Send an email notification when a user unsubscribes from the newsletter"
+msgstr "Envoyer une notification par courrier électronique lorsqu'un utilisateur se désinscrit de la lettre d'information"
+
+msgid "The user with the address ${address} just unsubscribed from the newsletter subscriber list."
+msgstr "L'utilisateur dont l'adresse est ${address} vient de se désinscrire de la liste des abonnés à la lettre d'information."
+
 msgid ""
 "You are receiving this mail because you subscribed to the following "
 "newsletter:"

@@ -1223,6 +1223,9 @@ def extract_categories_and_subcategories(
     cats: list[str] = []
     subcats: list[list[str]] = []
 
+    if not categories:
+        return cats, subcats
+
     for items in categories.values():
         for item in items:
             if isinstance(item, dict):

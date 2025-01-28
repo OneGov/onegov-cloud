@@ -302,6 +302,10 @@ class NewsletterSendForm(Form):
             choices.append((cat, cat))
             choices.extend((s, f'\xa0\xa0\xa0{s}') for s in sub)
 
+        if not choices:
+            self.delete_field('categories')
+            return
+
         self.categories.choices = choices
 
 
