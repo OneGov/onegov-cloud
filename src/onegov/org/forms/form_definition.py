@@ -2,7 +2,9 @@ from __future__ import annotations
 
 from onegov.core.utils import normalize_for_url
 from onegov.form import Form, merge_forms, FormDefinitionCollection
-from onegov.form.validators import ValidFormDefinition, ValidSurveyDefinition
+from onegov.form.fields import URLPanelField
+from onegov.form.validators import (Optional, ValidFormDefinition,
+                                    ValidSurveyDefinition)
 from onegov.org import _
 from onegov.org.forms.fields import HtmlField
 from onegov.org.forms.generic import PaymentForm
@@ -31,12 +33,25 @@ class FormDefinitionBaseForm(Form):
 
     definition = TextAreaField(
         label=_('Definition'),
+        description='do bruchts text',
+        fieldset=_('Form Definition'),
         validators=[InputRequired(), ValidFormDefinition()],
         render_kw={'rows': 32, 'data-editor': 'form'},
         default='E-Mail *= @@@')
 
+    formcode_doc_link = URLPanelField(
+        label=_('Link to Formcode Documentation'),
+        fieldset=_('Form Definition'),
+        render_kw={'readonly': True},
+        validators=[Optional()],
+        text='https://onegov.github.io/onegov-cloud/formcode.html',
+        kind='panel',
+        hide_label=False
+    )
+
     pick_up = TextAreaField(
         label=_('Pick-Up'),
+        fieldset=_('Pick-Up'),
         description=_('Describes how this resource can be picked up. '
                       'This text is used on the ticket status page to '
                       'inform the user')

@@ -1,21 +1,24 @@
 from __future__ import annotations
-
 from collections import OrderedDict
+
+import requests
 from babel.dates import get_month_names
 from datetime import datetime, timedelta
 from itertools import groupby
+
 from onegov.chat.collections import ChatCollection
 from onegov.chat.models import Chat
 from onegov.core.cache import lru_cache
-from onegov.core.orm import find_models
+from onegov.core.orm import find_models, Base
 from onegov.core.orm.mixins.publication import UTCPublicationMixin
 from onegov.core.templates import render_template
 from onegov.event import Occurrence, Event
 from onegov.file import FileCollection
-from onegov.form import FormSubmission, parse_form
+from onegov.form import FormSubmission, parse_form, Form
 from onegov.newsletter.models import Recipient
 from onegov.org.mail import send_ticket_mail
-from onegov.newsletter import Newsletter, NewsletterCollection
+from onegov.newsletter import (Newsletter, NewsletterCollection,
+                               RecipientCollection)
 from onegov.org import _, OrgApp
 from onegov.org.layout import DefaultMailLayout
 from onegov.org.models import (
@@ -43,9 +46,8 @@ from uuid import UUID
 from typing import Any, TYPE_CHECKING
 if TYPE_CHECKING:
     from collections.abc import Iterator
-    from onegov.core.orm import Base
     from onegov.core.types import RenderData
-    from onegov.form import Form
+
     from onegov.org.request import OrgRequest
 
 
@@ -729,7 +731,62 @@ def delete_content_marked_deletable(request: OrgRequest) -> None:
         print(f'Cron: Deleted {count} expired deletable objects in db')
 
 
-# Weekly cronjob to delete unconfirmed newsletter subscriptions
+@OrgApp.cronjob(hour=7, minute=0, timezone='Europe/Zurich')
+def update_newsletter_email_bounce_statistics(
+    request: OrgRequest
+) -> None:
+    # I choose hour=7 as the maximum time difference between Eastern Standard
+    # Time (EST) and Central European Summer Time (CEST) is 7 hours. This
+    # occurs when EST is observing standard time (UTC-5) and CEST is observing
+    # daylight saving time (UTC+2).
+    # Postmark uses EST in `fromdate` and `todate`, see
+    # https://postmarkapp.com/developer/api/bounce-api.
+
+    def get_postmark_token() -> str:
+        # read postmark token from the applications configuration
+        mail_config = request.app.mail
+        if mail_config:
+            mailer = mail_config.get('marketing', {}).get('mailer', None)
+            if mailer == 'postmark':
+                return mail_config.get('marketing', {}).get('token', '')
+
+        return ''
+
+    token = get_postmark_token()
+
+    recipients = RecipientCollection(request.session)
+    yesterday = utcnow() - timedelta(days=1)
+
+    try:
+        r = requests.get(
+            'https://api.postmarkapp.com/bounces?count=500&offset=0',
+            f'fromDate={yesterday.date()}&toDate='
+            f'{yesterday.date()}&inactive=true',
+            headers={
+                'Accept': 'application/json',
+                'X-Postmark-Server-Token': token
+        },
+            timeout=30
+        )
+        r.raise_for_status()
+        bounces = r.json().get('Bounces', [])
+    except requests.exceptions.HTTPError as http_err:
+        if r.status_code == 401:
+            raise RuntimeWarning(
+                f'Postmark API token is not set or invalid: {http_err}'
+            ) from None
+        else:
+            raise
+
+    for bounce in bounces:
+        email = bounce.get('Email', '')
+        inactive = bounce.get('Inactive', False)
+        recipient = recipients.by_address(email)
+
+        if recipient and inactive:
+            recipient.mark_inactive()
+
+
 @OrgApp.cronjob(hour=4, minute=30, timezone='Europe/Zurich')
 def delete_unconfirmed_newsletter_subscriptions(request: OrgRequest) -> None:
     """ Delete unconfirmed newsletter subscriptions older than 7 days. """

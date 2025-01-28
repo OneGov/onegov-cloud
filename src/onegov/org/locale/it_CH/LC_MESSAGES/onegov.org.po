@@ -877,6 +877,12 @@ msgstr "Descrive il contenuto di questo modulo"
 msgid "Used to group the form in the overview"
 msgstr "Utilizzato per raggruppare il modulo nella panoramica"
 
+msgid "Form Definition"
+msgstr "Definizione del modulo"
+
+msgid "Link to Formcode Documentation"
+msgstr "Collegamento alla documentazione del Formcode"
+
 msgid "Pick-Up"
 msgstr "Prelievo"
 
@@ -2808,6 +2814,9 @@ msgstr ""
 
 msgid "Delete content"
 msgstr "Cancellare il contenuto"
+
+msgid "Photo album. Will be shown at the end of content."
+msgstr "Album fotografico. Sarà mostrato alla fine del contenuto."
 
 msgid "Photo album"
 msgstr "Album fotografico"
@@ -6235,8 +6244,8 @@ msgstr "È stato creato un account per te"
 msgid "The user was created successfully"
 msgstr "Utente creato correttamente"
 
-#~ msgid "(Subscribed on ${date})"
-#~ msgstr "(Iscritto il ${date})"
+msgid "This recipient has delivery failures, including hard bounces, invalid email addresses, spam complaints, manual deactivations, or being blocked. We recommend unsubscribing it from the list."
+msgstr "Questo destinatario presenta errori di consegna, tra cui rimbalzi, indirizzi e-mail non validi, reclami per spam, disattivazioni manuali o blocco. Si consiglia di cancellarlo dall'elenco."
 
 #~ msgid "Photo album. Will be shown at the end of content."
 #~ msgstr "Album fotografico. Sarà mostrato alla fine del contenuto."

@@ -18,6 +18,7 @@
                         </div>
                         <div class="card-section">
                             <h5>${imageset.title}</h5><metal:hint use-macro="layout.macros['access_hint']" tal:define="item imageset" />
+                            <div class="imageset-date">${layout.format_date(imageset.created, 'date')}</div>
                             <div class="list-lead">${imageset.meta.get('lead')}</div>
                         </div>
                     </div>

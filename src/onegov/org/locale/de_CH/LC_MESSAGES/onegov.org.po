@@ -874,6 +874,12 @@ msgstr "Beschreibt kurz um was es bei diesem Formular geht"
 msgid "Used to group the form in the overview"
 msgstr "Dient zur Gruppierung in der Übersicht"
 
+msgid "Form Definition"
+msgstr "Formulardefinition"
+
+msgid "Link to Formcode Documentation"
+msgstr "Link zur Formcode Dokumentation"
+
 msgid "Pick-Up"
 msgstr "Abholung"
 
@@ -2802,6 +2808,9 @@ msgstr ""
 
 msgid "Delete content"
 msgstr "Inhalt löschen"
+
+msgid "Photo album. Will be shown at the end of content."
+msgstr "Fotoalbum. Wird am Ende des Inhalts angezeigt."
 
 msgid "Photo album"
 msgstr "Fotoalbum"
@@ -6231,11 +6240,8 @@ msgstr "Ein Konto wurde für Sie erstellt"
 msgid "The user was created successfully"
 msgstr "Der Benutzer wurde erfolgreich erstellt"
 
-#~ msgid "(Subscribed on ${date})"
-#~ msgstr "(Abonniert am ${date})"
-
-#~ msgid "(Subscribed on ${date}"
-#~ msgstr "(Abonniert am ${date}"
+msgid "This recipient has delivery failures, including hard bounces, invalid email addresses, spam complaints, manual deactivations, or being blocked. We recommend unsubscribing it from the list."
+msgstr "Dieser Empfänger hat Zustellungsfehler, einschließlich Hard Bounces, ungültige E-Mail-Adresse, Spam-Beschwerde, manuelle Deaktivierung oder wird blockiert. Wir empfehlen, ihn von der Liste abzumelden."
 
 #~ msgid "Describes in detail how this form is to be used"
 #~ msgstr "Beschreibt detailliert wie dieses Formular benutzt werden soll"
