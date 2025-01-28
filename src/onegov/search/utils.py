@@ -5,15 +5,17 @@ import html
 import os
 import re
 
+from sqlalchemy import inspect
+
 from onegov.core.custom import json
 from langdetect import DetectorFactory, PROFILES_DIRECTORY
 from langdetect.utils.lang_profile import LangProfile
 from onegov.core.orm import find_models
 
-
 from typing import Any, Generic, TypeVar, TYPE_CHECKING
+
 if TYPE_CHECKING:
-    from collections.abc import Callable, Iterator, Sequence
+    from collections.abc import Callable, Iterable, Iterator, Sequence
     from langdetect.detector import Detector
     from langdetect.language import Language
     from onegov.search.mixins import Searchable
@@ -43,6 +45,24 @@ def searchable_sqlalchemy_models(
     yield from find_models(  # type:ignore[misc]
         base, lambda cls: issubclass(cls, Searchable)
     )
+
+
+def filter_for_base_models(
+    models: Iterable[type[Searchable]]
+) -> set[type[Searchable]]:
+    """
+    Filter out models that are polymorphic subclasses of other
+    models in order to save on queries.
+
+    """
+    new_models = set()
+
+    for model in models:
+        i = inspect(model)
+        new_models.add(
+            model if i.polymorphic_on is None else i.base_mapper.class_)
+
+    return new_models
 
 
 _invalid_index_characters = re.compile(r'[\\/?"<>|\s,A-Z:]+')
@@ -87,7 +107,7 @@ def hash_mapping(mapping: dict[str, Any]) -> str:
 
 
 def extract_hashtags(text: str) -> list[str]:
-    return HASHTAG.findall(html.unescape(text))
+    return [t.lower() for t in HASHTAG.findall(html.unescape(text))]
 
 
 class classproperty(Generic[T_co]):  # noqa: N801
