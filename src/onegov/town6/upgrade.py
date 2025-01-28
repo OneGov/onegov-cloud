@@ -2,6 +2,8 @@
 upgraded on the server. See :class:`onegov.core.upgrade.upgrade_task`.
 
 """
+from __future__ import annotations
+
 import textwrap
 from onegov.town6.theme.town_theme import MERRIWEATHER, ROBOTO_CONDENSED
 from onegov.core.upgrade import upgrade_task, UpgradeContext

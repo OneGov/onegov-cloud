@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 from wtforms.widgets import TextInput
 
 
@@ -18,9 +20,9 @@ class CoordinatesWidget(TextInput):
 
     def __call__(
         self,
-        field: 'CoordinatesField',  # type:ignore[override]
+        field: CoordinatesField,  # type:ignore[override]
         **kwargs: Any
-    ) -> 'Markup':
+    ) -> Markup:
 
         kwargs['class_'] = (kwargs.get('class_', '') + ' coordinates').strip()
         return super().__call__(field, **kwargs)

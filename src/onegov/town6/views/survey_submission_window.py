@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 from onegov.core.security import Private
 from onegov.core.security import Public
 from onegov.form import SurveyDefinition
@@ -28,9 +30,9 @@ if TYPE_CHECKING:
 )
 def town_handle_new_submission_form(
     self: SurveyDefinition,
-    request: 'TownRequest',
+    request: TownRequest,
     form: SurveySubmissionWindowForm
-) -> 'RenderData | Response':
+) -> RenderData | Response:
     return handle_new_submission_form(
         self, request, form, SurveySubmissionLayout(self, request))
 
@@ -43,9 +45,9 @@ def town_handle_new_submission_form(
 )
 def town_view_submission_window_survey(
     self: SurveySubmissionWindow,
-    request: 'TownRequest',
-    form: 'Form'
-) -> 'RenderData | Response':
+    request: TownRequest,
+    form: Form
+) -> RenderData | Response:
     return view_submission_window_survey(
         self, request, form, SurveySubmissionWindowLayout(self, request))
 
@@ -58,8 +60,8 @@ def town_view_submission_window_survey(
 )
 def town_view_submission_window_results(
     self: SurveySubmissionWindow,
-    request: 'TownRequest'
-) -> 'RenderData':
+    request: TownRequest
+) -> RenderData:
     return view_submission_window_results(
         self, request, SurveySubmissionLayout(self.survey, request))
 
@@ -73,8 +75,8 @@ def town_view_submission_window_results(
 )
 def town_handle_edit_submission_form(
     self: SurveySubmissionWindow,
-    request: 'TownRequest',
+    request: TownRequest,
     form: SurveySubmissionWindowForm
-) -> 'RenderData | Response':
+) -> RenderData | Response:
     return handle_edit_submission_window(
         self, request, form, SurveySubmissionLayout(self.survey, request))

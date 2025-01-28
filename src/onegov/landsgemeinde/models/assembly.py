@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 from onegov.core.orm import Base
 from onegov.core.orm.mixins import dict_markup_property
 from onegov.core.orm.mixins import ContentMixin
@@ -32,7 +34,7 @@ if TYPE_CHECKING:
     AssemblyState: TypeAlias = Literal['scheduled', 'ongoing', 'completed']
 
 
-STATES: dict['AssemblyState', 'TranslationString'] = {
+STATES: dict[AssemblyState, TranslationString] = {
     'scheduled': _('scheduled'),
     'ongoing': _('ongoing'),
     'completed': _('completed')
@@ -59,30 +61,30 @@ class Assembly(
         )
 
     #: Internal number of the event
-    id: 'Column[uuid.UUID]' = Column(
+    id: Column[uuid.UUID] = Column(
         UUID,  # type:ignore[arg-type]
         primary_key=True,
         default=uuid4
     )
 
     #: the state of the assembly
-    state: 'Column[AssemblyState]' = Column(
+    state: Column[AssemblyState] = Column(
         Enum(*STATES.keys(), name='assembly_state'),  # type:ignore[arg-type]
         nullable=False
     )
 
     #: The date of the assembly
-    date: 'Column[date_t]' = Column(Date, nullable=False, unique=True)
+    date: Column[date_t] = Column(Date, nullable=False, unique=True)
 
     #: True if this is an extraordinary assembly
-    extraordinary: 'Column[bool]' = Column(
+    extraordinary: Column[bool] = Column(
         Boolean,
         nullable=False,
         default=False
     )
 
     #: The video URL of the assembly
-    video_url: 'Column[str | None]' = Column(Text, nullable=True)
+    video_url: Column[str | None] = Column(Text, nullable=True)
 
     #: The memorial of the assembly
     memorial_pdf = NamedFile(cls=LandsgemeindeFile)
@@ -106,14 +108,14 @@ class Assembly(
     overview = dict_markup_property('content')
 
     #: An assembly contains n agenda items
-    agenda_items: 'relationship[list[AgendaItem]]' = relationship(
+    agenda_items: relationship[list[AgendaItem]] = relationship(
         AgendaItem,
         cascade='all, delete-orphan',
         back_populates='assembly',
         order_by='AgendaItem.number',
     )
 
-    last_modified: 'Column[datetime | None]' = Column(UTCDateTime)
+    last_modified: Column[datetime | None] = Column(UTCDateTime)
 
     def stamp(self) -> None:
         self.last_modified = self.timestamp()

@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 from onegov.town6 import TownApp
 from typing import Any
 from typing import TYPE_CHECKING
@@ -29,7 +31,7 @@ class IntranetApp(TownApp):
 
 
 @IntranetApp.template_variables()
-def get_template_variables(request: 'TownRequest') -> 'RenderData':
+def get_template_variables(request: TownRequest) -> RenderData:
     return {
         'global_tools': tuple(get_global_tools(request)),
         'hide_search_header': not request.is_logged_in

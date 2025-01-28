@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 from onegov.core.orm.abstract import associated
 from onegov.file.models.file import File
 

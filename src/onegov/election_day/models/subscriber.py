@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 from onegov.core.orm import Base
 from onegov.core.orm.mixins import TimestampMixin
 from onegov.core.orm.types import UTCDateTime
@@ -23,7 +25,7 @@ class Subscriber(Base, TimestampMixin):
     #: subclasses of this class. See
     #: `<https://docs.sqlalchemy.org/en/improve_toc/\
     #: orm/extensions/declarative/inheritance.html>`_.
-    type: 'Column[str]' = Column(
+    type: Column[str] = Column(
         Text,
         nullable=False,
         default=lambda: 'generic'
@@ -35,7 +37,7 @@ class Subscriber(Base, TimestampMixin):
     }
 
     #: Identifies the subscriber
-    id: 'Column[uuid.UUID]' = Column(
+    id: Column[uuid.UUID] = Column(
         UUID,  # type:ignore[arg-type]
         primary_key=True,
         default=uuid4
@@ -43,28 +45,28 @@ class Subscriber(Base, TimestampMixin):
 
     #: The address of the subscriber, e.g. the phone number or the email
     #: address.
-    address: 'Column[str]' = Column(Text, nullable=False)
+    address: Column[str] = Column(Text, nullable=False)
 
     #: The locale used by the subscriber
-    locale: 'Column[str]' = Column(Text, nullable=False)
+    locale: Column[str] = Column(Text, nullable=False)
 
     #: True, if the subscriber has been confirmed
-    active: 'Column[bool | None]' = Column(Boolean, nullable=True)
+    active: Column[bool | None] = Column(Boolean, nullable=True)
 
     #: The domain of the election compound part.
-    domain: 'Column[str | None]' = Column(Text, nullable=True)
+    domain: Column[str | None] = Column(Text, nullable=True)
 
     #: The domain segment of the election compound part.
-    domain_segment: 'Column[str | None]' = Column(Text, nullable=True)
+    domain_segment: Column[str | None] = Column(Text, nullable=True)
 
     #: When has this subscriber last been (explicitly) activated.
-    active_since: 'Column[datetime | None]' = Column(
+    active_since: Column[datetime | None] = Column(
         UTCDateTime,
         nullable=True
     )
 
     #: When has this subscriber last been (explicitly) deactivated.
-    inactive_since: 'Column[datetime | None]' = Column(
+    inactive_since: Column[datetime | None] = Column(
         UTCDateTime,
         nullable=True
     )

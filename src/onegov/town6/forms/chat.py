@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 from wtforms.fields import EmailField, HiddenField, SelectField, StringField
 from wtforms.fields import BooleanField
 from wtforms.validators import InputRequired
@@ -13,7 +15,7 @@ if TYPE_CHECKING:
 
 class ChatInitiationForm(Form):
 
-    request: 'TownRequest'
+    request: TownRequest
 
     name = StringField(
         label=_('Name'),

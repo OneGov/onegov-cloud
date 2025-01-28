@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 from collections import OrderedDict
 from datetime import date
 from onegov.chat import Message
@@ -120,7 +122,7 @@ class CachedGroupNameMixin:
 
     def _group_observer(
         self,
-        group: 'UserGroup | None',
+        group: UserGroup | None,
         name: str | None
     ) -> None:
         """ Upates the last known name of the group.
@@ -140,7 +142,7 @@ class GazetteNoticeFile(File):
 
     if TYPE_CHECKING:
         # we manually add the backref AssociatedFiles creates
-        linked_official_notices: relationship[list['GazetteNotice']]
+        linked_official_notices: relationship[list[GazetteNotice]]
 
 
 class GazetteNotice(
@@ -178,7 +180,7 @@ class GazetteNotice(
     billing_address: dict_property[str | None]
     billing_address = content_property('billing_address')
 
-    changes: 'relationship[AppenderQuery[GazetteNoticeChange]]' = relationship(
+    changes: relationship[AppenderQuery[GazetteNoticeChange]] = relationship(
         'GazetteNoticeChange',
         back_populates='notice',
         primaryjoin=(
@@ -202,14 +204,14 @@ class GazetteNotice(
     @observes('group', 'group.name')
     def group_observer(
         self,
-        group: 'UserGroup | None',
+        group: UserGroup | None,
         name: str | None
     ) -> None:
         self._group_observer(group, name)
 
     def add_change(
         self,
-        request: 'GazetteRequest',
+        request: GazetteRequest,
         event: str,
         text: str | None = None
     ) -> None:
@@ -233,7 +235,7 @@ class GazetteNotice(
             )
         )
 
-    def submit(self, request: 'GazetteRequest') -> None:  # type:ignore
+    def submit(self, request: GazetteRequest) -> None:  # type:ignore
         """ Submit a drafted notice.
 
         This automatically adds en entry to the changelog.
@@ -245,7 +247,7 @@ class GazetteNotice(
 
     def reject(  # type:ignore[override]
         self,
-        request: 'GazetteRequest',
+        request: GazetteRequest,
         comment: str
     ) -> None:
         """ Reject a submitted notice.
@@ -257,7 +259,7 @@ class GazetteNotice(
         super().reject()
         self.add_change(request, _('rejected'), comment)
 
-    def accept(self, request: 'GazetteRequest') -> None:  # type:ignore
+    def accept(self, request: GazetteRequest) -> None:  # type:ignore
         """ Accept a submitted notice.
 
         This automatically adds en entry to the changelog.
@@ -267,7 +269,7 @@ class GazetteNotice(
         super().accept()
         self.add_change(request, _('accepted'))
 
-    def publish(self, request: 'GazetteRequest') -> None:  # type:ignore
+    def publish(self, request: GazetteRequest) -> None:  # type:ignore
         """ Publish an accepted notice.
 
         This automatically adds en entry to the changelog.
@@ -300,7 +302,7 @@ class GazetteNotice(
 
     # FIXME: asymmetric properties don't work
     @issues.setter
-    def issues(self, value: 'dict[str, str | None] | Iterable[str]') -> None:
+    def issues(self, value: dict[str, str | None] | Iterable[str]) -> None:
         if isinstance(value, dict):
             self._issues = value
         else:
@@ -402,7 +404,7 @@ class GazetteNotice(
         row = query.filter(Organization.name == self.organization_id).first()
         return (not row[0]) if row else True
 
-    def apply_meta(self, session: 'Session') -> None:
+    def apply_meta(self, session: Session) -> None:
         """ Updates the category, organization and issue date from the meta
         values.
 
@@ -436,7 +438,7 @@ class GazetteNoticeChange(Message, CachedUserNameMixin):
     __mapper_args__ = {'polymorphic_identity': 'gazette_notice'}
 
     #: the user which made this change
-    user: 'relationship[User | None]' = relationship(
+    user: relationship[User | None] = relationship(
         User,
         primaryjoin=(
             'foreign(GazetteNoticeChange.owner) == cast(User.id, TEXT)'
@@ -454,7 +456,7 @@ class GazetteNoticeChange(Message, CachedUserNameMixin):
         self._user_observer(user, realname, username)
 
     #: the notice which this change belongs to
-    notice: 'relationship[GazetteNotice]' = relationship(
+    notice: relationship[GazetteNotice] = relationship(
         GazetteNotice,
         primaryjoin=(
             'foreign(GazetteNoticeChange.channel_id)'

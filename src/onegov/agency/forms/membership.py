@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 from onegov.agency import _
 from onegov.agency.collections import ExtendedPersonCollection
 from onegov.agency.models import ExtendedPerson
@@ -17,7 +19,7 @@ if TYPE_CHECKING:
     _T = TypeVar('_T')
 
 
-def duplicates(iterable: 'Iterable[_T]') -> set['_T']:
+def duplicates(iterable: Iterable[_T]) -> set[_T]:
     items = set()
     duplicates = set()
     for item in iterable:

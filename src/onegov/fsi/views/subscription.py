@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 from webob import Response
 from webob.exc import HTTPForbidden
 
@@ -29,8 +31,8 @@ if TYPE_CHECKING:
 )
 def view_subscriptions(
     self: SubscriptionsCollection,
-    request: 'FsiRequest'
-) -> 'RenderData':
+    request: FsiRequest
+) -> RenderData:
     layout = SubscriptionCollectionLayout(self, request)
     return {
         'layout': layout,
@@ -45,7 +47,7 @@ def view_subscriptions(
 )
 def attendee_list_as_pdf(
     self: SubscriptionsCollection,
-    request: 'FsiRequest'
+    request: FsiRequest
 ) -> Response:
 
     layout = SubscriptionCollectionLayout(self, request)
@@ -70,9 +72,9 @@ def attendee_list_as_pdf(
 )
 def view_add_reservation(
     self: SubscriptionsCollection,
-    request: 'FsiRequest',
+    request: FsiRequest,
     form: AddFsiSubscriptionForm
-) -> 'RenderData | Response':
+) -> RenderData | Response:
 
     if form.submitted(request):
         data = form.get_useful_data()
@@ -118,9 +120,9 @@ def view_add_reservation(
 )
 def view_edit_reservation(
     self: CourseSubscription,
-    request: 'FsiRequest',
+    request: FsiRequest,
     form: EditFsiSubscriptionForm
-) -> 'RenderData | Response':
+) -> RenderData | Response:
 
     if self.is_placeholder:
         raise HTTPForbidden()
@@ -185,9 +187,9 @@ def view_edit_reservation(
 )
 def view_edit_placeholder_reservation(
     self: CourseSubscription,
-    request: 'FsiRequest',
+    request: FsiRequest,
     form: EditFsiPlaceholderSubscriptionForm
-) -> 'RenderData | Response':
+) -> RenderData | Response:
 
     if not self.is_placeholder:
         raise HTTPForbidden()
@@ -223,9 +225,9 @@ def view_edit_placeholder_reservation(
 )
 def view_add_reservation_placeholder(
     self: SubscriptionsCollection,
-    request: 'FsiRequest',
+    request: FsiRequest,
     form: AddFsiPlaceholderSubscriptionForm
-) -> 'RenderData | Response':
+) -> RenderData | Response:
 
     if form.submitted(request):
         data = form.get_useful_data()
@@ -262,7 +264,7 @@ def view_add_reservation_placeholder(
 )
 def view_add_from_course_event(
     self: SubscriptionsCollection,
-    request: 'FsiRequest'
+    request: FsiRequest
 ) -> None:
 
     if self.course_event is None or self.attendee is None:
@@ -290,7 +292,7 @@ def view_add_from_course_event(
 )
 def view_delete_reservation(
     self: CourseSubscription,
-    request: 'FsiRequest'
+    request: FsiRequest
 ) -> None:
 
     request.assert_valid_csrf_token()
@@ -318,7 +320,7 @@ def view_delete_reservation(
 )
 def view_toggle_confirm_reservation(
     self: CourseSubscription,
-    request: 'FsiRequest'
+    request: FsiRequest
 ) -> bool:
     request.assert_valid_csrf_token()
     self.event_completed = not self.event_completed

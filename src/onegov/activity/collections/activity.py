@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 import secrets
 import sedate
 
@@ -90,7 +92,7 @@ if TYPE_CHECKING:
 
 
 ActivityT = TypeVar('ActivityT', bound=Activity)
-AVAILABILITY_VALUES: set['AvailabilityType'] = {'none', 'few', 'many'}
+AVAILABILITY_VALUES: set[AvailabilityType] = {'none', 'few', 'many'}
 
 
 class ActivityFilter:
@@ -98,7 +100,7 @@ class ActivityFilter:
     # supported filters - should be named with a plural version that can
     # be turned into a singular with the removal of the last s
     # (i.e. slots => slot)
-    __slots__: tuple['FilterKey', ...] = (
+    __slots__: tuple[FilterKey, ...] = (
         'age_ranges',
         'available',
         'price_ranges',
@@ -119,20 +121,20 @@ class ActivityFilter:
     }
 
     age_ranges: set[tuple[int, int]]
-    available: set['AvailabilityType']
+    available: set[AvailabilityType]
     price_ranges: set[tuple[int, int]]
-    dateranges: set[tuple['date', 'date']]
+    dateranges: set[tuple[date, date]]
     durations: set[int]
     municipalities: set[str]
     owners: set[str]
     period_ids: set[UUID]
-    states: set['ActivityState']
+    states: set[ActivityState]
     tags: set[str]
     timelines: set[str]
     weekdays: set[int]
     volunteers: set[bool]
 
-    def __init__(self, **keywords: 'Unpack[FilterArgs]') -> None:
+    def __init__(self, **keywords: Unpack[FilterArgs]) -> None:
         for key in self.__slots__:
             if key in keywords:
                 values = set(v) if (v := keywords[key]) else set()
@@ -148,14 +150,14 @@ class ActivityFilter:
                 setattr(self, key, set())
 
     @property
-    def keywords(self) -> dict['FilterKey', str | list[str]]:
+    def keywords(self) -> dict[FilterKey, str | list[str]]:
         return {
             key: self.encode(key, value)
             for key in self.__slots__
             if (value := getattr(self, key))
         }
 
-    def toggled(self, **keywords: 'Unpack[ToggledArgs]') -> 'Self':
+    def toggled(self, **keywords: Unpack[ToggledArgs]) -> Self:
         # create a new filter with the toggled values
         toggled = copy(self)
 
@@ -191,7 +193,7 @@ class ActivityFilter:
     def adapt_price_ranges(self, values: set[str]) -> set[tuple[int, int]]:
         return self.adapt_num_ranges(values)
 
-    def adapt_dateranges(self, values: set[str]) -> set[tuple['date', 'date']]:
+    def adapt_dateranges(self, values: set[str]) -> set[tuple[date, date]]:
         return {v for v in map(date_range_decode, values) if v}
 
     def adapt_weekdays(self, values: set[str]) -> set[int]:
@@ -243,7 +245,7 @@ class ActivityFilter:
     def contains_num_range(
         self,
         value: tuple[int, int],
-        ranges: 'Iterable[tuple[int, int]]'
+        ranges: Iterable[tuple[int, int]]
     ) -> bool:
         for r in ranges:
             if overlaps(r, value):
@@ -261,8 +263,8 @@ class ActivityCollection(RangedPagination[ActivityT]):
 
     @overload
     def __init__(
-        self: 'ActivityCollection[Activity]',
-        session: 'Session',
+        self: ActivityCollection[Activity],
+        session: Session,
         type: Literal['*', 'generic'] = '*',
         pages: tuple[int, int] | None = None,
         filter: ActivityFilter | None = None
@@ -271,7 +273,7 @@ class ActivityCollection(RangedPagination[ActivityT]):
     @overload
     def __init__(
         self,
-        session: 'Session',
+        session: Session,
         type: str,
         pages: tuple[int, int] | None = None,
         filter: ActivityFilter | None = None
@@ -279,7 +281,7 @@ class ActivityCollection(RangedPagination[ActivityT]):
 
     def __init__(
         self,
-        session: 'Session',
+        session: Session,
         type: str = '*',
         pages: tuple[int, int] | None = None,
         filter: ActivityFilter | None = None
@@ -289,14 +291,14 @@ class ActivityCollection(RangedPagination[ActivityT]):
         self.pages = pages or (0, 0)
         self.filter = filter or ActivityFilter()
 
-    def subset(self) -> 'Query[ActivityT]':
+    def subset(self) -> Query[ActivityT]:
         return self.query()
 
     @property
     def page_range(self) -> tuple[int, int]:
         return self.pages
 
-    def by_page_range(self, page_range: tuple[int, int] | None) -> 'Self':
+    def by_page_range(self, page_range: tuple[int, int] | None) -> Self:
         return self.__class__(
             self.session,
             type=self.type,
@@ -311,7 +313,7 @@ class ActivityCollection(RangedPagination[ActivityT]):
             Activity  # type:ignore[arg-type]
         )
 
-    def query_base(self) -> 'Query[ActivityT]':
+    def query_base(self) -> Query[ActivityT]:
         """ Returns the query based used by :meth:`query`. Overriding this
         function is useful to apply a general filter to the query before
         any other filter is applied.
@@ -322,7 +324,7 @@ class ActivityCollection(RangedPagination[ActivityT]):
         """
         return self.session.query(self.model_class)
 
-    def query(self) -> 'Query[ActivityT]':
+    def query(self) -> Query[ActivityT]:
         query = self.query_base()
         model_class = self.model_class
 
@@ -460,8 +462,8 @@ class ActivityCollection(RangedPagination[ActivityT]):
 
     def for_filter(
         self,
-        **keywords: 'Unpack[ToggledArgs]'
-    ) -> 'Self':
+        **keywords: Unpack[ToggledArgs]
+    ) -> Self:
         """ Returns a new collection instance.
 
         The given tag is excluded if already in the list, included if not
@@ -486,10 +488,10 @@ class ActivityCollection(RangedPagination[ActivityT]):
     def by_name(self, name: str) -> ActivityT | None:
         return self.query().filter(Activity.name == name).first()
 
-    def by_user(self, user: 'User') -> 'Query[ActivityT]':
+    def by_user(self, user: User) -> Query[ActivityT]:
         return self.query().filter(Activity.username == user.username)
 
-    def by_username(self, username: str) -> 'Query[ActivityT]':
+    def by_username(self, username: str) -> Query[ActivityT]:
         return self.query().filter(Activity.username == username)
 
     @property
@@ -546,7 +548,7 @@ class ActivityCollection(RangedPagination[ActivityT]):
         title: str,
         username: str,
         lead: str | None = None,
-        text: 'Markup | None' = None,
+        text: Markup | None = None,
         tags: set[str] | None = None,
         name: str | None = None
     ) -> ActivityT:
@@ -579,8 +581,8 @@ class ActivityCollection(RangedPagination[ActivityT]):
 
     def available_weeks(
         self,
-        period: 'Period | PeriodMeta | None'
-    ) -> 'Iterator[tuple[date, date]]':
+        period: Period | PeriodMeta | None
+    ) -> Iterator[tuple[date, date]]:
         if not period:
             return
 

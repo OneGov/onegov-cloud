@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 from datetime import timedelta
 
 from functools import cached_property
@@ -15,7 +17,7 @@ if TYPE_CHECKING:
 
 class AuditLayout(DefaultLayout):
 
-    model: 'AuditCollection'
+    model: AuditCollection
 
     @property
     def title(self) -> str:
@@ -44,8 +46,8 @@ class AuditLayout(DefaultLayout):
 
     def render_start_end(
         self,
-        start: 'datetime | None',
-        end: 'datetime | None'
+        start: datetime | None,
+        end: datetime | None
     ) -> str:
         if not start:
             return '-'
@@ -67,9 +69,9 @@ class AuditLayout(DefaultLayout):
 
     @staticmethod
     def next_event_date(
-        start: 'datetime | None',
+        start: datetime | None,
         refresh_interval: int | None
-    ) -> 'datetime | None':
+    ) -> datetime | None:
         if not start:
             return None
         if refresh_interval is None:

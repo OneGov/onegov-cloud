@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 from onegov.page import Page
 from onegov.form import FormDefinition
 from onegov.reservation import Resource
@@ -23,11 +25,11 @@ class PersonMove(Generic[_OwnerT]):
 
     def __init__(
         self,
-        session: 'Session',
+        session: Session,
         obj: _OwnerT,
         subject: str,
         target: str,
-        direction: 'MoveDirection'
+        direction: MoveDirection
     ) -> None:
 
         self.session = session
@@ -48,7 +50,7 @@ class PersonMove(Generic[_OwnerT]):
     @staticmethod
     def get_implementation(
         obj: object
-    ) -> type['PagePersonMove | FormPersonMove | ResourcePersonMove']:
+    ) -> type[PagePersonMove | FormPersonMove | ResourcePersonMove]:
         # XXX this is not really extendable by other org applications. They
         # need to override this function *and* define new paths for each class
         # they add.
@@ -115,5 +117,5 @@ class ResourcePersonMove(PersonMove[
     """ Represents a single move of a linked person on a form definition. """
 
     @property
-    def key(self) -> 'UUID':
+    def key(self) -> UUID:
         return self.obj.id

@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 import os.path
 
 from onegov.election_day import _
@@ -48,8 +50,8 @@ class PdfGenerator:
 
     def __init__(
         self,
-        app: 'ElectionDayApp',
-        request: 'ElectionDayRequest',
+        app: ElectionDayApp,
+        request: ElectionDayRequest,
         renderer: D3Renderer | None = None
     ):
         self.app = app
@@ -58,7 +60,7 @@ class PdfGenerator:
         self.session = self.app.session()
         self.renderer = renderer or D3Renderer(app)
 
-    def remove(self, directory: str, files: 'Collection[str]') -> None:
+    def remove(self, directory: str, files: Collection[str]) -> None:
         """ Safely removes the given files from the directory. """
         if not files:
             return
@@ -136,7 +138,7 @@ class PdfGenerator:
 
     def add_tacit_election(
         self,
-        principal: 'Canton | Municipality',
+        principal: Canton | Municipality,
         election: Election,
         pdf: Pdf
     ) -> None:
@@ -173,12 +175,12 @@ class PdfGenerator:
 
     def add_election(
         self,
-        principal: 'Canton | Municipality',
+        principal: Canton | Municipality,
         election: Election,
         pdf: Pdf
     ) -> None:
 
-        def format_name(item: 'ElectionResult') -> str:
+        def format_name(item: ElectionResult) -> str:
             return item.name if item.entity_id else pdf.translate(_('Expats'))
 
         majorz = election.type == 'majorz'
@@ -469,7 +471,7 @@ class PdfGenerator:
 
     def add_election_compound(
         self,
-        principal: 'Canton | Municipality',
+        principal: Canton | Municipality,
         compound: ElectionCompound,
         pdf: Pdf
     ) -> None:
@@ -777,7 +779,7 @@ class PdfGenerator:
 
     def add_vote(
         self,
-        principal: 'Canton | Municipality',
+        principal: Canton | Municipality,
         vote: Vote,
         pdf: Pdf,
         locale: str
@@ -788,7 +790,7 @@ class PdfGenerator:
         layout = VoteLayout(vote, self.request)
         direct = vote.direct
 
-        def format_name(item: 'BallotResult | ResultsByDistrictRow') -> str:
+        def format_name(item: BallotResult | ResultsByDistrictRow) -> str:
             if getattr(item, 'entity_id', None):
                 # FIXME: Why are we even doing this check, when we still
                 #        return the name rather than the entity_id? Is
@@ -799,8 +801,8 @@ class PdfGenerator:
             return pdf.translate(_('Expats'))
 
         def format_accepted(
-            result: 'BallotResult | Ballot | ResultsByDistrictRow',
-            ballot: 'Ballot'
+            result: BallotResult | Ballot | ResultsByDistrictRow,
+            ballot: Ballot
         ) -> str:
             tie_breaker = (
                 ballot.type == 'tie-breaker'
@@ -824,9 +826,9 @@ class PdfGenerator:
             return f'{number:.2f}%'
 
         def format_value(
-            result: 'Ballot | BallotResult | ResultsByDistrictRow',
+            result: Ballot | BallotResult | ResultsByDistrictRow,
             attr: str,
-            fmt: 'Callable[[Any], str]' = format_percentage
+            fmt: Callable[[Any], str] = format_percentage
         ) -> str:
 
             if result.accepted is None:

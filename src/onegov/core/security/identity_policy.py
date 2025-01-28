@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 from morepath import Identity
 from onegov.core.browser_session import BrowserSession
 from onegov.core.framework import Framework
@@ -16,7 +18,7 @@ class IdentityPolicy:
 
     required_keys = {'userid', 'groupid', 'role', 'application_id'}
 
-    def identify(self, request: 'CoreRequest') -> Identity | None:
+    def identify(self, request: CoreRequest) -> Identity | None:
         try:
             identifiers = {
                 key: request.browser_session[key] for key in self.required_keys
@@ -29,14 +31,14 @@ class IdentityPolicy:
 
     def remember(
         self,
-        response: 'Response',
-        request: 'CoreRequest',
+        response: Response,
+        request: CoreRequest,
         identity: Identity
     ) -> None:
         for key in self.required_keys:
             request.browser_session[key] = getattr(identity, key)
 
-    def forget(self, response: 'Response', request: 'CoreRequest') -> None:
+    def forget(self, response: Response, request: CoreRequest) -> None:
         request.browser_session.flush()
 
 

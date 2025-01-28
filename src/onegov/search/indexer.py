@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 import platform
 import re
 import sqlalchemy
@@ -19,7 +21,7 @@ from onegov.search.errors import SearchOfflineError
 
 from typing import Any, Literal, NamedTuple, TYPE_CHECKING
 if TYPE_CHECKING:
-    from collections.abc import Iterable, Iterator, Sequence
+    from collections.abc import Callable, Iterable, Iterator, Sequence
     from elasticsearch import Elasticsearch
     from sqlalchemy.engine import Engine
     from sqlalchemy.orm import Session
@@ -193,8 +195,8 @@ def parse_index_name(index_name: str) -> IndexParts:
 
 class IndexerBase:
 
-    queue: 'Queue[Any]'
-    failed_task: 'Task | None' = None
+    queue: Queue[Any]
+    failed_task: Task | None = None
 
     def process(
         self,
@@ -238,7 +240,7 @@ class IndexerBase:
 
         return processed
 
-    def process_task(self, task: 'Task') -> bool:
+    def process_task(self, task: Task) -> bool:
         try:
             getattr(self, task['action'])(task)
         except SearchOfflineError:
@@ -261,13 +263,13 @@ class Indexer(IndexerBase):
 
     """
 
-    queue: 'Queue[Task]'
+    queue: Queue[Task]
 
     def __init__(
         self,
-        mappings: 'TypeMappingRegistry',
-        queue: 'Queue[Task]',
-        es_client: 'Elasticsearch',
+        mappings: TypeMappingRegistry,
+        queue: Queue[Task],
+        es_client: Elasticsearch,
         hostname: str | None = None
     ) -> None:
         self.es_client = es_client
@@ -283,7 +285,7 @@ class Indexer(IndexerBase):
 
         """
 
-        def actions() -> 'Iterator[dict[str, Any]]':
+        def actions() -> Iterator[dict[str, Any]]:
             try:
                 task = self.queue.get(block=False, timeout=None)
 
@@ -312,7 +314,7 @@ class Indexer(IndexerBase):
             if success:
                 self.queue.task_done()
 
-    def ensure_index(self, task: 'IndexTask') -> str:
+    def ensure_index(self, task: IndexTask) -> str:
         return self.ixmgr.ensure_index(
             task['schema'],
             task['language'],
@@ -320,7 +322,7 @@ class Indexer(IndexerBase):
             return_index='internal'
         )
 
-    def index(self, task: 'IndexTask') -> None:
+    def index(self, task: IndexTask) -> None:
         index = self.ensure_index(task)
 
         self.es_client.index(
@@ -329,7 +331,7 @@ class Indexer(IndexerBase):
             document=task['properties']
         )
 
-    def delete(self, task: 'DeleteTask') -> None:
+    def delete(self, task: DeleteTask) -> None:
         # get all the types this model could be stored in (with polymorphic)
         # identites, this could be many
         mapping = self.mappings[task['type_name']]
@@ -369,20 +371,20 @@ class PostgresIndexer(IndexerBase):
         'en': 'english',
     }
 
-    queue: 'Queue[IndexTask]'
+    queue: Queue[IndexTask]
 
     def __init__(
         self,
-        queue: 'Queue[IndexTask]',
-        engine: 'Engine',
+        queue: Queue[IndexTask],
+        engine: Engine,
     ) -> None:
         self.queue = queue
         self.engine = engine
 
     def index(
         self,
-        tasks: 'list[IndexTask] | IndexTask',
-        session: 'Session | None' = None
+        tasks: list[IndexTask] | IndexTask,
+        session: Session | None = None
     ) -> bool:
         """ Update the 'fts_idx' column (full text search index) of the given
         object(s)/task(s).
@@ -454,7 +456,7 @@ class PostgresIndexer(IndexerBase):
     # FIXME: bulk_process should probably be the only function we use for
     #        the Postgres indexer, we don't have to worry about individual
     #        transactions failing as much
-    def bulk_process(self, session: 'Session | None' = None) -> None:
+    def bulk_process(self, session: Session | None = None) -> None:
         """ Processes the queue in bulk. This offers better performance but it
         is less safe at the moment and should only be used as part of
         reindexing.
@@ -462,7 +464,7 @@ class PostgresIndexer(IndexerBase):
         Gather all index tasks, group them by model and index batch-wise
         """
 
-        def task_generator() -> 'Iterator[IndexTask]':
+        def task_generator() -> Iterator[IndexTask]:
             while not self.queue.empty():
                 task = self.queue.get(block=False, timeout=None)
                 self.queue.task_done()
@@ -570,7 +572,7 @@ class TypeMappingRegistry:
     def __getitem__(self, key: str) -> TypeMapping:
         return self.mappings[key]
 
-    def __iter__(self) -> 'Iterator[TypeMapping]':
+    def __iter__(self) -> Iterator[TypeMapping]:
         yield from self.mappings.values()
 
     def register_orm_base(self, base: type[object]) -> None:
@@ -623,7 +625,7 @@ class IndexManager:
 
     created_indices: set[str]
 
-    def __init__(self, hostname: str, es_client: 'Elasticsearch') -> None:
+    def __init__(self, hostname: str, es_client: Elasticsearch) -> None:
         assert hostname and es_client
 
         self.hostname = hostname
@@ -731,7 +733,7 @@ class IndexManager:
 
     def remove_expired_indices(
         self,
-        current_mappings: 'Iterable[TypeMapping]'
+        current_mappings: Iterable[TypeMapping]
     ) -> int:
         """ Removes all expired indices. An index is expired if it's version
         number is no longer known in the current mappings.
@@ -765,8 +767,8 @@ class IndexManager:
     def get_external_index_names(
         self,
         schema: str,
-        languages: 'Iterable[str]' = '*',
-        types: 'Iterable[str]' = '*'
+        languages: Iterable[str] = '*',
+        types: Iterable[str] = '*'
     ) -> str:
         """ Returns a comma separated string of external index names that
         match the given arguments. Useful to pass on to elasticsearch when
@@ -811,7 +813,7 @@ class IndexManager:
 class ORMLanguageDetector(utils.LanguageDetector):
     html_strip_expression = re.compile(r'<[^<]+?>')
 
-    def localized_properties(self, obj: Searchable) -> 'Iterator[str]':
+    def localized_properties(self, obj: Searchable) -> Iterator[str]:
         for key, definition in obj.es_properties.items():
             if definition.get('type', '').startswith('localized'):
                 yield key
@@ -820,7 +822,7 @@ class ORMLanguageDetector(utils.LanguageDetector):
         self,
         obj: Searchable,
         max_chars: int | None = None
-    ) -> 'Iterator[str]':
+    ) -> Iterator[str]:
 
         chars = 0
         for p in self.localized_properties(obj):
@@ -864,18 +866,18 @@ class ORMEventTranslator:
 
     """
 
-    converters = {
+    converters: dict[str, Callable[[Any], Any]] = {
         'date': lambda dt: dt and dt.isoformat(),
     }
 
-    es_queue: 'Queue[Task]'
-    psql_queue: 'Queue[IndexTask]'
+    es_queue: Queue[Task]
+    psql_queue: Queue[IndexTask]
 
     def __init__(
         self,
         mappings: TypeMappingRegistry,
         max_queue_size: int = 0,
-        languages: 'Sequence[str]' = ('de', 'fr', 'en')
+        languages: Sequence[str] = ('de', 'fr', 'en')
     ) -> None:
         self.mappings = mappings
         self.es_queue = Queue(maxsize=max_queue_size)
@@ -899,7 +901,7 @@ class ORMEventTranslator:
             if isinstance(obj, Searchable):
                 self.delete(schema, obj)
 
-    def put(self, translation: 'Task') -> None:
+    def put(self, translation: Task) -> None:
         try:
             self.es_queue.put_nowait(translation)
             if translation['action'] == 'index':

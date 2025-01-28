@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 from onegov.core.security import Private
 from onegov.org import _, OrgApp
 from onegov.org.models import SiteCollection
@@ -12,8 +14,8 @@ if TYPE_CHECKING:
 @OrgApp.json(model=SiteCollection, permission=Private)
 def get_site_collection(
     self: SiteCollection,
-    request: 'OrgRequest'
-) -> 'JSON_ro':
+    request: OrgRequest
+) -> JSON_ro:
     """ Returns a list of internal links to be used by the redactor.
 
     See `<https://imperavi.com/redactor/plugins/predefined-links/>`_

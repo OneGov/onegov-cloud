@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 from passlib.hash import bcrypt_sha256
 
 

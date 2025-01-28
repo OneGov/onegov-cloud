@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 from onegov.core.elements import Link
 from onegov.core.security import Private
 from onegov.pas import _
@@ -22,8 +24,8 @@ if TYPE_CHECKING:
 )
 def view_parties(
     self: PartyCollection,
-    request: 'TownRequest'
-) -> 'RenderData':
+    request: TownRequest
+) -> RenderData:
 
     layout = PartyCollectionLayout(self, request)
 
@@ -57,9 +59,9 @@ def view_parties(
 )
 def add_party(
     self: PartyCollection,
-    request: 'TownRequest',
+    request: TownRequest,
     form: PartyForm
-) -> 'RenderData | Response':
+) -> RenderData | Response:
 
     if form.submitted(request):
         party = self.add(**form.get_useful_data())
@@ -86,8 +88,8 @@ def add_party(
 )
 def view_party(
     self: Party,
-    request: 'TownRequest'
-) -> 'RenderData':
+    request: TownRequest
+) -> RenderData:
 
     layout = PartyLayout(self, request)
 
@@ -107,9 +109,9 @@ def view_party(
 )
 def edit_party(
     self: Party,
-    request: 'TownRequest',
+    request: TownRequest,
     form: PartyForm
-) -> 'RenderData | Response':
+) -> RenderData | Response:
 
     if form.submitted(request):
         form.populate_obj(self)
@@ -138,7 +140,7 @@ def edit_party(
 )
 def delete_party(
     self: Party,
-    request: 'TownRequest'
+    request: TownRequest
 ) -> None:
 
     request.assert_valid_csrf_token()

@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 from sqlalchemy import desc, and_, or_
 from onegov.core.collection import GenericCollection, Pagination
 from onegov.core.crypto import random_password
@@ -33,7 +35,7 @@ class TranslatorCollection(
 
     def __init__(
         self,
-        app: 'TranslatorDirectoryApp',
+        app: TranslatorDirectoryApp,
         page: int = 0,
         written_langs: list[str] | None = None,
         spoken_langs: list[str] | None = None,
@@ -198,7 +200,7 @@ class TranslatorCollection(
     def model_class(self) -> type[Translator]:
         return Translator
 
-    def subset(self) -> 'Query[Translator]':
+    def subset(self) -> Query[Translator]:
         return self.query()
 
     @property
@@ -206,33 +208,33 @@ class TranslatorCollection(
         return self.page
 
     @property
-    def order_expression(self) -> 'ColumnElement[Any]':
+    def order_expression(self) -> ColumnElement[Any]:
         order_by = getattr(self.model_class, self.order_by)
         return desc(order_by) if self.order_desc else order_by
 
     @property
-    def by_spoken_lang_expression(self) -> tuple['ColumnElement[bool]', ...]:
+    def by_spoken_lang_expression(self) -> tuple[ColumnElement[bool], ...]:
         return tuple(
             Translator.spoken_languages.any(id=lang_id)
             for lang_id in self.spoken_langs or ()
         )
 
     @property
-    def by_written_lang_expression(self) -> tuple['ColumnElement[bool]', ...]:
+    def by_written_lang_expression(self) -> tuple[ColumnElement[bool], ...]:
         return tuple(
             Translator.written_languages.any(id=lang_id)
             for lang_id in self.written_langs or ()
         )
 
     @property
-    def by_monitor_lang_expression(self) -> tuple['ColumnElement[bool]', ...]:
+    def by_monitor_lang_expression(self) -> tuple[ColumnElement[bool], ...]:
         return tuple(
             Translator.monitoring_languages.any(id=lang_id)
             for lang_id in self.monitor_langs or ()
         )
 
     @property
-    def by_search_term_expression(self) -> tuple['ColumnElement[bool]', ...]:
+    def by_search_term_expression(self) -> tuple[ColumnElement[bool], ...]:
         """Search for any word in any field of the search columns"""
         words = (self.search or '').split(' ')
         cols = self.search_columns
@@ -241,7 +243,7 @@ class TranslatorCollection(
     @property
     def by_professional_guilds_expression(
         self
-    ) -> tuple['ColumnElement[bool]', ...]:
+    ) -> tuple[ColumnElement[bool], ...]:
         keys = (
             'expertise_professional_guilds',
             'expertise_professional_guilds_other'
@@ -254,21 +256,21 @@ class TranslatorCollection(
     @property
     def by_interpreting_types_expression(
         self
-    ) -> tuple['ColumnElement[bool]', ...]:
+    ) -> tuple[ColumnElement[bool], ...]:
         return tuple(
             Translator.meta['expertise_interpreting_types'].contains((v,))
             for v in self.interpret_types
         )
 
     @property
-    def by_admission(self) -> tuple['ColumnElement[bool]', ...]:
+    def by_admission(self) -> tuple[ColumnElement[bool], ...]:
         return tuple(
             Translator.admission == admission
             for admission in self.admissions or ()
         )
 
     @property
-    def by_gender(self) -> tuple['ColumnElement[bool]', ...]:
+    def by_gender(self) -> tuple[ColumnElement[bool], ...]:
         return tuple(
             Translator.gender == gender
             for gender in self.genders or ()
@@ -277,7 +279,7 @@ class TranslatorCollection(
     def by_lastname(self, lastname: str) -> Translator | None:
         return self.query().filter(Translator.last_name == lastname).first()
 
-    def page_by_index(self, index: int) -> 'Self':
+    def page_by_index(self, index: int) -> Self:
         return self.__class__(
             self.app,
             page=index,
@@ -296,7 +298,7 @@ class TranslatorCollection(
         )
 
     @property
-    def search_columns(self) -> list['ColumnElement[Any]']:
+    def search_columns(self) -> list[ColumnElement[Any]]:
         """ The columns used for text search. """
 
         return [
@@ -304,7 +306,7 @@ class TranslatorCollection(
             self.model_class.last_name
         ]
 
-    def query(self) -> 'Query[Translator]':
+    def query(self) -> Query[Translator]:
         query = super().query()
 
         if self.spoken_langs:
@@ -340,7 +342,7 @@ class TranslatorCollection(
         query = query.order_by(self.order_expression)
         return query
 
-    def by_form(self, form: 'TranslatorSearchForm') -> 'Self':
+    def by_form(self, form: TranslatorSearchForm) -> Self:
         return self.__class__(
             self.app,
             page=0,

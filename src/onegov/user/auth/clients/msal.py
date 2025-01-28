@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 import msal  # type:ignore[import-untyped]
 from attr import attrs, attrib
 from functools import cached_property
@@ -36,7 +38,7 @@ class AzureADAttributes:
     preferred_username: str
 
     @classmethod
-    def from_cfg(cls, cfg: dict[str, Any]) -> 'Self':
+    def from_cfg(cls, cfg: dict[str, Any]) -> Self:
         return cls(
             source_id=cfg.get('source_id', 'sub'),
             username=cfg.get('username', 'email'),
@@ -104,7 +106,7 @@ class MSALConnections:
     # instantiated connections for every tenant
     connections: dict[str, MSALClient] = attrib()
 
-    def client(self, app: 'HasApplicationIdAndNamespace') -> MSALClient | None:
+    def client(self, app: HasApplicationIdAndNamespace) -> MSALClient | None:
         if app.application_id in self.connections:
             return self.connections[app.application_id]
 
@@ -113,7 +115,7 @@ class MSALConnections:
         return None
 
     @classmethod
-    def from_cfg(cls, config: dict[str, Any]) -> 'Self':
+    def from_cfg(cls, config: dict[str, Any]) -> Self:
         clients = {
             app_id: MSALClient(
                 client_id=cfg['client_id'],

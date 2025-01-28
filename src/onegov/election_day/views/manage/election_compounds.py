@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 from morepath import redirect
 from onegov.core.utils import groupbylist
 from onegov.election_day import _
@@ -27,8 +29,8 @@ if TYPE_CHECKING:
 )
 def view_election_compounds(
     self: ElectionCompoundCollection,
-    request: 'ElectionDayRequest'
-) -> 'RenderData':
+    request: ElectionDayRequest
+) -> RenderData:
     """ View a list of all election compoundss. """
 
     years = [
@@ -56,9 +58,9 @@ def view_election_compounds(
 )
 def create_election_compound(
     self: ElectionCompoundCollection,
-    request: 'ElectionDayRequest',
+    request: ElectionDayRequest,
     form: ElectionCompoundForm
-) -> 'RenderData | Response':
+) -> RenderData | Response:
     """ Create a new election compound. """
 
     layout = ManageElectionCompoundsLayout(self, request)
@@ -89,9 +91,9 @@ def create_election_compound(
 )
 def edit_election_compound(
     self: ElectionCompound,
-    request: 'ElectionDayRequest',
+    request: ElectionDayRequest,
     form: ElectionCompoundForm
-) -> 'RenderData | Response':
+) -> RenderData | Response:
     """ Edit an existing election compound. """
 
     layout = ManageElectionCompoundsLayout(self, request)
@@ -125,9 +127,9 @@ def edit_election_compound(
 )
 def clear_election_compound(
     self: ElectionCompound,
-    request: 'ElectionDayRequest',
+    request: ElectionDayRequest,
     form: ClearResultsForm
-) -> 'RenderData | Response':
+) -> RenderData | Response:
     """ Clear the results of an election ompound. """
 
     layout = ManageElectionCompoundsLayout(self, request)
@@ -163,9 +165,9 @@ def clear_election_compound(
 )
 def clear_election_compound_media(
     self: ElectionCompound,
-    request: 'ElectionDayRequest',
-    form: 'EmptyForm'
-) -> 'RenderData | Response':
+    request: ElectionDayRequest,
+    form: EmptyForm
+) -> RenderData | Response:
     """ Deletes alls SVGs and PDFs of this election compound. """
 
     layout = ManageElectionCompoundsLayout(self, request)
@@ -208,9 +210,9 @@ def clear_election_compound_media(
 )
 def delete_election_compound(
     self: ElectionCompound,
-    request: 'ElectionDayRequest',
-    form: 'EmptyForm'
-) -> 'RenderData | Response':
+    request: ElectionDayRequest,
+    form: EmptyForm
+) -> RenderData | Response:
     """ Delete an existing election compound. """
 
     layout = ManageElectionCompoundsLayout(self, request)
@@ -248,9 +250,9 @@ def delete_election_compound(
 )
 def trigger_election(
     self: ElectionCompound,
-    request: 'ElectionDayRequest',
+    request: ElectionDayRequest,
     form: TriggerNotificationForm
-) -> 'RenderData | Response':
+) -> RenderData | Response:
     """ Trigger the notifications related to an election. """
 
     session = request.session

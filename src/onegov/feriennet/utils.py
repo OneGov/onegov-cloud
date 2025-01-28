@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 from contextlib import suppress
 
 
@@ -31,7 +33,7 @@ def decode_name(fullname: str | None) -> tuple[str | None, str | None]:
 def parse_donation_amounts(text: str) -> tuple[float, ...]:
     lines = (stripped for l in text.splitlines() if (stripped := l.strip()))
 
-    def amounts() -> 'Iterator[float]':
+    def amounts() -> Iterator[float]:
         for line in lines:
             with suppress(ValueError):
                 amount = float(line)
@@ -42,8 +44,8 @@ def parse_donation_amounts(text: str) -> tuple[float, ...]:
     return tuple(amounts())
 
 
-def format_donation_amounts(amounts: 'Iterable[Decimal | float]') -> str:
-    def lines() -> 'Iterator[str]':
+def format_donation_amounts(amounts: Iterable[Decimal | float]) -> str:
+    def lines() -> Iterator[str]:
         for amount in amounts:
             if float(amount).is_integer():
                 yield f'{int(amount):d}'

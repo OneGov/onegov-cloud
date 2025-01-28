@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 from onegov.chat.models import Chat
 from onegov.core.collection import GenericCollection, Pagination
 
@@ -19,7 +21,7 @@ class ChatCollection(GenericCollection[Chat], Pagination[Chat]):
 
     def __init__(
         self,
-        session: 'Session',
+        session: Session,
         page: int = 0,
         state: str = 'active',
         group: str | None = None,
@@ -34,7 +36,7 @@ class ChatCollection(GenericCollection[Chat], Pagination[Chat]):
     def __eq__(self, other: object) -> bool:
         return isinstance(other, self.__class__) and self.page == other.page
 
-    def subset(self) -> 'Query[Chat]':
+    def subset(self) -> Query[Chat]:
         query = self.query().filter(Chat.chat_history != []).order_by(
             Chat.last_change.desc())
         if self.state == 'active':
@@ -48,7 +50,7 @@ class ChatCollection(GenericCollection[Chat], Pagination[Chat]):
     def page_index(self) -> int:
         return self.page
 
-    def page_by_index(self, index: int) -> 'Self':
+    def page_by_index(self, index: int) -> Self:
         return self.__class__(
             self.session,
             page=index,

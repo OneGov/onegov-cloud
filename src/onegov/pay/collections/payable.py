@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 from onegov.core.collection import Pagination
 from onegov.core.orm.utils import QueryChain
 from onegov.pay import Payment
@@ -29,23 +31,23 @@ class PayableCollection(Pagination[_P]):
 
     @overload
     def __init__(
-        self: 'PayableCollection[_P]',
-        session: 'Session',
+        self: PayableCollection[_P],
+        session: Session,
         cls: type[_P],
         page: int = 0
     ): ...
 
     @overload
     def __init__(
-        self: 'PayableCollection[Base]',
-        session: 'Session',
+        self: PayableCollection[Base],
+        session: Session,
         cls: Literal['*'] = '*',
         page: int = 0
     ): ...
 
     def __init__(
         self,
-        session: 'Session',
+        session: Session,
         cls: Literal['*'] | type[_P] = '*',
         page: int = 0
     ):
@@ -58,18 +60,18 @@ class PayableCollection(Pagination[_P]):
         # of query changed from the base class Pagination
         def transform_batch_query(  # type:ignore[override]
             self,
-            query: 'QueryChain[_P]'  # type:ignore[override]
-        ) -> 'QueryChain[_P]': ...
+            query: QueryChain[_P]  # type:ignore[override]
+        ) -> QueryChain[_P]: ...
 
     @property
-    def classes(self) -> tuple[type['Base'], ...]:
+    def classes(self) -> tuple[type[Base], ...]:
         if self.cls != '*':
             return (self.cls, )
 
         assert Payment.registered_links is not None
         return tuple(link.cls for link in Payment.registered_links.values())
 
-    def query(self) -> 'QueryChain[_P]':
+    def query(self) -> QueryChain[_P]:
         return QueryChain(tuple(
             self.session.query(cls).options(
                 joinedload(cls.payment)  # type:ignore[attr-defined]
@@ -83,12 +85,12 @@ class PayableCollection(Pagination[_P]):
 
         return self.cls == other.cls and self.page == other.page
 
-    def subset(self) -> 'QueryChain[_P]':  # type:ignore[override]
+    def subset(self) -> QueryChain[_P]:  # type:ignore[override]
         return self.query()
 
     @property
     def page_index(self) -> int:
         return self.page
 
-    def page_by_index(self, index: int) -> 'Self':
+    def page_by_index(self, index: int) -> Self:
         return self.__class__(self.session, self.cls, index)

@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 import morepath
 
 from onegov.core.utils import relative_url
@@ -27,13 +29,13 @@ class MTANAuth:
 
     """
 
-    def __init__(self, app: 'OrgApp', to: str = '/'):
+    def __init__(self, app: OrgApp, to: str = '/'):
         self.app = app
         self.session = app.session()
         self.application_id = app.application_id
         self.to = relative_url(to)
 
-    def send_mtan(self, request: 'OrgRequest', number: str) -> 'Response':
+    def send_mtan(self, request: OrgRequest, number: str) -> Response:
 
         # we are already authenticated just redirect to the page we wanted
         if request.active_mtan_session:
@@ -66,7 +68,7 @@ class MTANAuth:
 
     def authenticate(
         self,
-        request: 'OrgRequest',
+        request: OrgRequest,
         tan: str,
     ) -> str | None:
 

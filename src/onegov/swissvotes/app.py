@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 from functools import cached_property
 from more.content_security import SELF
 from more.content_security import UNSAFE_EVAL
@@ -128,7 +130,7 @@ def get_i18n_default_locale() -> str:
 
 
 @SwissvotesApp.setting(section='content_security_policy', name='default')
-def org_content_security_policy() -> 'ContentSecurityPolicy':
+def org_content_security_policy() -> ContentSecurityPolicy:
     policy = default_content_security_policy()
     policy.connect_src.add(SELF)
     policy.connect_src.add('https://stats.seantis.ch')
@@ -161,7 +163,7 @@ def get_webasset_output() -> str:
 
 
 @SwissvotesApp.webasset('frameworks')
-def get_frameworks_asset() -> 'Iterator[str]':
+def get_frameworks_asset() -> Iterator[str]:
     yield 'modernizr.js'
     yield 'jquery.js'
     yield 'jquery.tablesorter.js'
@@ -190,18 +192,18 @@ def get_frameworks_asset() -> 'Iterator[str]':
 
 
 @SwissvotesApp.webasset('common')
-def get_common_asset() -> 'Iterator[str]':
+def get_common_asset() -> Iterator[str]:
     yield 'common.js'
     yield 'policy-selector.jsx'
     yield 'image-gallery.js'
 
 
 @SwissvotesApp.webasset('mastodon')
-def get_mastodon_asset() -> 'Iterator[str]':
+def get_mastodon_asset() -> Iterator[str]:
     yield 'mastodon-timeline.js'
     yield 'mastodon-timeline.css'
 
 
 @SwissvotesApp.webasset('stats')
-def get_stats_asset() -> 'Iterator[str]':
+def get_stats_asset() -> Iterator[str]:
     yield 'stats.js'

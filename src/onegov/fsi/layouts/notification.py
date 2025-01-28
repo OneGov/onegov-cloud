@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 from functools import cached_property
 
 from onegov.core.elements import Link, LinkGroup
@@ -24,9 +26,9 @@ class MailLayout(OrgDefaultMailLayout, FormatMixin):
     Takes in a notification template linked to a course_event.
     """
 
-    app: 'FsiApp'
-    request: 'FsiRequest'
-    model: 'CourseNotificationTemplate'
+    app: FsiApp
+    request: FsiRequest
+    model: CourseNotificationTemplate
 
     @property
     def title(self) -> str:
@@ -36,7 +38,7 @@ class MailLayout(OrgDefaultMailLayout, FormatMixin):
         )
 
     @cached_property
-    def default_macros(self) -> 'MacrosLookup':
+    def default_macros(self) -> MacrosLookup:
         return self.template_loader.macros
 
     @cached_property
@@ -44,7 +46,7 @@ class MailLayout(OrgDefaultMailLayout, FormatMixin):
         return self.request.link(self.model, name='edit')
 
     @cached_property
-    def base(self) -> 'PageTemplateFile':
+    def base(self) -> PageTemplateFile:
         return self.template_loader['mail_layout.pt']
 
     @cached_property
@@ -92,7 +94,7 @@ class MailLayout(OrgDefaultMailLayout, FormatMixin):
         return self.request.link(self.upcoming_events_collection)
 
     @cached_property
-    def events_list(self) -> list['CourseEvent']:
+    def events_list(self) -> list[CourseEvent]:
         return self.upcoming_events_collection.query().all()
 
     @cached_property
@@ -142,7 +144,7 @@ class NotificationTemplateCollectionLayout(DefaultLayout):
 
 class NotificationTemplateLayout(DefaultLayout):
 
-    model: 'CourseNotificationTemplate'
+    model: CourseNotificationTemplate
 
     @cached_property
     def title(self) -> str:

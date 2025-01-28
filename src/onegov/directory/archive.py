@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 import mimetypes
 import shutil
 import os
@@ -67,7 +69,7 @@ class FieldParser:
         self.fields_by_id = {f.id: f for f in directory.fields}
         self.archive_path = archive_path
 
-    def get_field(self, key: str) -> 'ParsedField | None':
+    def get_field(self, key: str) -> ParsedField | None:
         """
         CSV Files header parsing is inconsistent with the the internal id (
         field.id) of the field. The headers are lovercased, so that the first
@@ -84,7 +86,7 @@ class FieldParser:
         self,
         key: str,
         value: str,
-        field: 'FileinputField'
+        field: FileinputField
     ) -> Bunch | None:  # FIXME: Use NamedTuple
 
         if not value:
@@ -112,13 +114,13 @@ class FieldParser:
         self,
         key: str,
         value: str,
-        field: 'MultipleFileinputField'
+        field: MultipleFileinputField
     ) -> tuple[Bunch, ...]:  # FIXME: Use NamedTuple
 
         if not value:
             return ()
 
-        def iter_files() -> 'Iterator[Bunch]':
+        def iter_files() -> Iterator[Bunch]:
             for val in value.split(os.pathsep):
                 # be extra paranoid about these path values -> they could
                 # potentially be used to access files on the local system
@@ -144,7 +146,7 @@ class FieldParser:
         self,
         key: str,
         value: str,
-        field: 'ParsedField'
+        field: ParsedField
     ) -> object:
         return field.parse(value)
 
@@ -152,7 +154,7 @@ class FieldParser:
         self,
         key: str,
         value: str
-    ) -> 'tuple[str, Any | None] | UnknownFieldType':
+    ) -> tuple[str, Any | None] | UnknownFieldType:
 
         field = self.get_field(key)
 
@@ -170,7 +172,7 @@ class FieldParser:
 
     def parse(
         self,
-        record: 'SupportsItems[str, str]'
+        record: SupportsItems[str, str]
     ) -> dict[str, Any | None]:
 
         return dict(
@@ -191,7 +193,7 @@ class DirectoryArchiveReader:
         skip_existing: bool = True,
         limit: int = 0,
         apply_metadata: bool = True,
-        after_import: 'Callable[[DirectoryEntry], Any] | None' = None
+        after_import: Callable[[DirectoryEntry], Any] | None = None
     ) -> Directory:
         """ Reads the archive resulting in a dictionary and entries.
 
@@ -309,7 +311,7 @@ class DirectoryArchiveReader:
         except FileNotFoundError as exception:
             raise MissingFileError('metadata.json') from exception
 
-    def read_data(self) -> 'Sequence[dict[str, Any]]':
+    def read_data(self) -> Sequence[dict[str, Any]]:
         """ Returns the entries as a sequence of dictionaries. """
 
         if (self.path / 'data.json').exists():
@@ -344,14 +346,14 @@ class DirectoryArchiveWriter:
 
     path: Path
     format: Literal['json', 'csv', 'xlsx']
-    transform: 'FieldValueTransform'
+    transform: FieldValueTransform
 
     def write(
         self,
         directory: Directory,
         *args: Any,
-        entry_filter: 'DirectoryEntryFilter | None' = None,
-        query: 'Query[DirectoryEntry] | None' = None,
+        entry_filter: DirectoryEntryFilter | None = None,
+        query: Query[DirectoryEntry] | None = None,
         **kwargs: Any
     ) -> None:
         """ Writes the given directory. """
@@ -378,8 +380,8 @@ class DirectoryArchiveWriter:
     def write_directory_entries(
         self,
         directory: Directory,
-        entry_filter: 'DirectoryEntryFilter | None' = None,
-        query: 'Query[DirectoryEntry] | None' = None
+        entry_filter: DirectoryEntryFilter | None = None,
+        query: Query[DirectoryEntry] | None = None
     ) -> None:
         """ Writes the directory entries. Allows filtering with custom
         entry_filter function as well as passing a query object """
@@ -390,7 +392,7 @@ class DirectoryArchiveWriter:
 
         def file_path(
             entry: DirectoryEntry,
-            field: 'ParsedField',
+            field: ParsedField,
             value: dict[str, Any],
             suffix: str = ''
         ) -> str:
@@ -403,7 +405,7 @@ class DirectoryArchiveWriter:
 
         def as_tuples(
             entry: DirectoryEntry
-        ) -> 'Iterator[tuple[str, Any | None]]':
+        ) -> Iterator[tuple[str, Any | None]]:
 
             for field in fields:
                 value = entry.values.get(field.id)
@@ -461,7 +463,7 @@ class DirectoryArchiveWriter:
 
     def write_paths(
         self,
-        session: 'Session',
+        session: Session,
         paths: dict[str, str],
         fid_to_entry: dict[str, str] | None = None
     ) -> None:
@@ -525,15 +527,15 @@ class DirectoryArchiveWriter:
             for tempfile in tempfiles:
                 tempfile.close()
 
-    def write_json(self, path: Path, data: 'JSON_ro') -> None:
+    def write_json(self, path: Path, data: JSON_ro) -> None:
         with open(str(path), 'w') as f:
             json.dump(data, f, sort_keys=True, indent=2)
 
-    def write_xlsx(self, path: Path, data: 'Iterable[dict[str, Any]]') -> None:
+    def write_xlsx(self, path: Path, data: Iterable[dict[str, Any]]) -> None:
         with open(str(path), 'wb') as f:
             f.write(convert_list_of_dicts_to_xlsx(data))
 
-    def write_csv(self, path: Path, data: 'Iterable[dict[str, Any]]') -> None:
+    def write_csv(self, path: Path, data: Iterable[dict[str, Any]]) -> None:
         with open(str(path), 'w') as f:
             f.write(convert_list_of_dicts_to_csv(data))
 
@@ -562,9 +564,9 @@ class DirectoryArchive(DirectoryArchiveReader, DirectoryArchiveWriter):
 
     def __init__(
         self,
-        path: 'StrPath',
+        path: StrPath,
         format: Literal['json', 'csv', 'xlsx'] = 'json',
-        transform: 'FieldValueTransform | None ' = None
+        transform: FieldValueTransform | None = None
     ):
         """ Initialise the archive at the given path (must exist).
 
@@ -600,7 +602,7 @@ class DirectoryZipArchive:
 
     def __init__(
         self,
-        path: 'StrPath',
+        path: StrPath,
         *args: Any,
         **kwargs: Any
     ):
@@ -609,7 +611,7 @@ class DirectoryZipArchive:
         self.archive = DirectoryArchive(self.temp.name, *args, **kwargs)
 
     @classmethod
-    def from_buffer(cls, buffer: 'SupportsReadAndSeek') -> 'Self':
+    def from_buffer(cls, buffer: SupportsReadAndSeek) -> Self:
         """ Creates a zip archive instance from a file object in memory. """
 
         f = NamedTemporaryFile()  # noqa: SIM115

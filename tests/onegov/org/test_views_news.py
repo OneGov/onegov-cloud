@@ -184,3 +184,15 @@ def test_hide_news(client):
     assert "Test" in overview
     overview = anonymous.get("/news")
     assert "Test" not in overview
+
+
+def test_news_filter_invalid_years(client):
+
+    page = client.get('/news?filter_years=20263', status=400)
+    assert 'Cannot decode URL parameter' in page
+
+    page = client.get('/news?filter_years=0', status=400)
+    assert 'Cannot decode URL parameter' in page
+
+    page = client.get('/news?filter_years=2020')
+    assert 'Aktuelles' in page

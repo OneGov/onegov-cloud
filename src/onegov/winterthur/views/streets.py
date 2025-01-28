@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 from itertools import groupby
 from onegov.core.cache import lru_cache
 from onegov.core.security import Public, Private
@@ -23,8 +25,8 @@ if TYPE_CHECKING:
 )
 def view_streets(
     self: AddressCollection,
-    request: 'WinterthurRequest'
-) -> 'RenderData':
+    request: WinterthurRequest
+) -> RenderData:
 
     request.include('street-search')
 
@@ -56,7 +58,7 @@ def view_streets(
 )
 def update_streets(
     self: AddressCollection,
-    request: 'WinterthurRequest'
+    request: WinterthurRequest
 ) -> None:
 
     request.assert_valid_csrf_token()
@@ -73,14 +75,14 @@ def update_streets(
 )
 def view_street(
     self: AddressSubsetCollection,
-    request: 'WinterthurRequest'
-) -> 'RenderData':
+    request: WinterthurRequest
+) -> RenderData:
 
-    def external_link_to_street(address: 'WinterthurAddress') -> str:
+    def external_link_to_street(address: WinterthurAddress) -> str:
         q = quote_plus(str(address.street_id))
         return f'https://stadtplan.winterthur.ch/?locate=strasse&locations={q}'
 
-    def external_link_to_address(address: 'WinterthurAddress') -> str:
+    def external_link_to_address(address: WinterthurAddress) -> str:
         q = quote_plus(str(address.title))
         return f'https://stadtplan.winterthur.ch/?locate=adresse&locations={q}'
 

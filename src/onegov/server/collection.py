@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 import inspect
 
 from onegov.server import errors
@@ -18,11 +20,11 @@ class CachedApplication:
 
     """
 
-    instance: 'Application | None'
+    instance: Application | None
 
     def __init__(
         self,
-        application_class: type['Application'],
+        application_class: type[Application],
         namespace: str,
         configuration: dict[str, Any] | None = None
     ):
@@ -31,7 +33,7 @@ class CachedApplication:
         self.namespace = namespace
         self.instance = None
 
-    def get(self) -> 'Application':
+    def get(self) -> Application:
         if self.instance is None:
             self.instance = self.application_class()
             self.instance.namespace = self.namespace
@@ -50,7 +52,7 @@ class ApplicationCollection:
 
     def __init__(
         self,
-        applications: 'Iterable[ApplicationConfig] | None' = None
+        applications: Iterable[ApplicationConfig] | None = None
     ):
         self.applications = {}
 
@@ -61,7 +63,7 @@ class ApplicationCollection:
     def register(
         self,
         root: str,
-        application_class: type['Application'],
+        application_class: type[Application],
         namespace: str,
         configuration: dict[str, Any] | None = None
     ) -> None:
@@ -78,7 +80,7 @@ class ApplicationCollection:
             application_class, namespace, configuration
         )
 
-    def get(self, root: str) -> 'Application | None':
+    def get(self, root: str) -> Application | None:
         """ Returns the applicaton for the given path, creating a new instance
         if none exists already.
 
@@ -90,7 +92,7 @@ class ApplicationCollection:
         else:
             return application.get()
 
-    def morepath_applications(self) -> 'Iterator[CachedApplication]':
+    def morepath_applications(self) -> Iterator[CachedApplication]:
         """ Iterates through the applications that depend on morepath. """
 
         for app in self.applications.values():

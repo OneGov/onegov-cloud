@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 from onegov.org import _
 
 
@@ -7,7 +9,7 @@ if TYPE_CHECKING:
     from onegov.ticket.collection import ExtendedTicketState
 
 
-TICKET_STATES: dict['ExtendedTicketState', str] = {
+TICKET_STATES: dict[ExtendedTicketState, str] = {
     'open': _('Open'),
     'pending': _('Pending'),
     'closed': _('Closed'),
@@ -15,7 +17,7 @@ TICKET_STATES: dict['ExtendedTicketState', str] = {
     'all': _('All')
 }
 
-PAYMENT_STATES: dict['PaymentState', str] = {
+PAYMENT_STATES: dict[PaymentState, str] = {
     'open': TICKET_STATES['open'],
     'paid': _('Paid'),
     'failed': _('Failed'),

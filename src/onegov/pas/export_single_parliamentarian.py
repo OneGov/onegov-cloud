@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 from onegov.pas.calculate_pay import calculate_rate
 from dataclasses import dataclass
 from typing import cast
@@ -28,7 +30,7 @@ class ParliamentarianEntry:
     calculated_value: Decimal
     additional_value: Decimal
     base_rate: Decimal
-    attendance_type: 'AttendenceType'
+    attendance_type: AttendenceType
 
 
 AttendenceType = Literal['plenary', 'commission', 'study', 'shortest']
@@ -48,9 +50,9 @@ if TYPE_CHECKING:
 
 
 def generate_parliamentarian_settlement_pdf(
-    settlement_run: 'SettlementRun',
-    request: 'TownRequest',
-    parliamentarian: 'Parliamentarian',
+    settlement_run: SettlementRun,
+    request: TownRequest,
+    parliamentarian: Parliamentarian,
 ) -> bytes:
     """Generate PDF for parliamentarian settlement data."""
     font_config = FontConfiguration()
@@ -275,9 +277,9 @@ th, td {
 
 
 def get_parliamentarian_settlement_data(
-    settlement_run: 'SettlementRun',
-    request: 'TownRequest',
-    parliamentarian: 'Parliamentarian',
+    settlement_run: SettlementRun,
+    request: TownRequest,
+    parliamentarian: Parliamentarian,
 ) -> dict[str, list[ParliamentarianEntry]]:
     """Get settlement data for a specific parliamentarian."""
     session = request.session

@@ -1,18 +1,23 @@
+from __future__ import annotations
 from collections import OrderedDict
+
+import requests
 from babel.dates import get_month_names
 from datetime import datetime, timedelta
 from itertools import groupby
+
 from onegov.chat.collections import ChatCollection
 from onegov.chat.models import Chat
 from onegov.core.cache import lru_cache
-from onegov.core.orm import find_models
+from onegov.core.orm import find_models, Base
 from onegov.core.orm.mixins.publication import UTCPublicationMixin
 from onegov.core.templates import render_template
 from onegov.event import Occurrence, Event
 from onegov.file import FileCollection
-from onegov.form import FormSubmission, parse_form
+from onegov.form import FormSubmission, parse_form, Form
 from onegov.org.mail import send_ticket_mail
-from onegov.newsletter import Newsletter, NewsletterCollection
+from onegov.newsletter import (Newsletter, NewsletterCollection,
+                               RecipientCollection)
 from onegov.org import _, OrgApp
 from onegov.org.layout import DefaultMailLayout
 from onegov.org.models import (
@@ -21,6 +26,8 @@ from onegov.org.models.extensions import (
     GeneralFileLinkExtension, DeletableContentExtension)
 from onegov.org.models.ticket import ReservationHandler
 from onegov.org.views.allocation import handle_rules_cronjob
+from onegov.org.views.directory import (
+    send_email_notification_for_directory_entry)
 from onegov.org.views.newsletter import send_newsletter
 from onegov.org.views.ticket import delete_tickets_and_related_data
 from onegov.reservation import Reservation, Resource, ResourceCollection
@@ -38,9 +45,8 @@ from uuid import UUID
 from typing import Any, TYPE_CHECKING
 if TYPE_CHECKING:
     from collections.abc import Iterator
-    from onegov.core.orm import Base
     from onegov.core.types import RenderData
-    from onegov.form import Form
+
     from onegov.org.request import OrgRequest
 
 
@@ -65,15 +71,15 @@ WEEKDAYS = (
 
 
 @OrgApp.cronjob(hour='*', minute=0, timezone='UTC')
-def hourly_maintenance_tasks(request: 'OrgRequest') -> None:
+def hourly_maintenance_tasks(request: OrgRequest) -> None:
     publish_files(request)
-    reindex_published_models(request)
+    handle_publication_models(request)
     send_scheduled_newsletter(request)
     delete_old_tans(request)
     delete_old_tan_accesses(request)
 
 
-def send_scheduled_newsletter(request: 'OrgRequest') -> None:
+def send_scheduled_newsletter(request: OrgRequest) -> None:
     newsletters = NewsletterCollection(request.session).query().filter(and_(
         Newsletter.scheduled != None,
         Newsletter.scheduled <= (utcnow() + timedelta(seconds=60)),
@@ -84,34 +90,38 @@ def send_scheduled_newsletter(request: 'OrgRequest') -> None:
         newsletter.scheduled = None
 
 
-def publish_files(request: 'OrgRequest') -> None:
+def publish_files(request: OrgRequest) -> None:
     FileCollection(request.session).publish_files()
 
 
-def reindex_published_models(request: 'OrgRequest') -> None:
+def handle_publication_models(request: OrgRequest) -> None:
     """
     Reindexes all recently published/unpublished objects
     in the elasticsearch database.
 
     For pages it also updates the propagated access to any
     associated files.
+
+    For directory entries it also sends out e-mail notifications if
+    published within the last hour.
     """
 
     if not hasattr(request.app, 'es_client'):
         return
 
     def publication_models(
-        base: type['Base']
+        base: type[Base]
         # NOTE: This should be Iterator[type[Base & UTCPublicationMixin]]
-    ) -> 'Iterator[type[UTCPublicationMixin]]':
+    ) -> Iterator[type[UTCPublicationMixin]]:
         yield from find_models(base, lambda cls: issubclass(  # type:ignore
             cls, UTCPublicationMixin)
         )
 
-    objects = []
+    objects = set()
     session = request.app.session()
     now = utcnow()
-    then = now - timedelta(hours=1)
+    then = request.app.org.meta.get('hourly_maintenance_tasks_last_run',
+                                    now - timedelta(hours=1))
     for base in request.app.session_manager.bases:
         for model in publication_models(base):
             query = session.query(model).filter(
@@ -126,7 +136,7 @@ def reindex_published_models(request: 'OrgRequest') -> None:
                     )
                 )
             )
-            objects.extend(query.all())
+            objects.update(query.all())
 
     for obj in objects:
         if isinstance(obj, GeneralFileLinkExtension):
@@ -136,8 +146,15 @@ def reindex_published_models(request: 'OrgRequest') -> None:
         if isinstance(obj, Searchable):
             request.app.es_orm_events.index(request.app.schema, obj)
 
+        if (isinstance(obj, ExtendedDirectoryEntry) and obj.published and
+                obj.directory.enable_update_notifications):
+            send_email_notification_for_directory_entry(
+                obj.directory, obj, request)
 
-def delete_old_tans(request: 'OrgRequest') -> None:
+    request.app.org.meta['hourly_maintenance_tasks_last_run'] = now
+
+
+def delete_old_tans(request: OrgRequest) -> None:
     """
     Deletes TANs that are older than half a year.
 
@@ -153,7 +170,7 @@ def delete_old_tans(request: 'OrgRequest') -> None:
     query.delete(synchronize_session=False)
 
 
-def delete_old_tan_accesses(request: 'OrgRequest') -> None:
+def delete_old_tan_accesses(request: OrgRequest) -> None:
     """
     Deletes TAN accesses that are older than half a year.
 
@@ -170,7 +187,7 @@ def delete_old_tan_accesses(request: 'OrgRequest') -> None:
 
 
 @OrgApp.cronjob(hour=23, minute=45, timezone='Europe/Zurich')
-def process_resource_rules(request: 'OrgRequest') -> None:
+def process_resource_rules(request: OrgRequest) -> None:
     resources = ResourceCollection(request.app.libres_context)
 
     for resource in resources.query():
@@ -178,7 +195,7 @@ def process_resource_rules(request: 'OrgRequest') -> None:
 
 
 def ticket_statistics_common_template_args(
-    request: 'OrgRequest',
+    request: OrgRequest,
     collection: TicketCollection
 ) -> dict[str, Any]:
 
@@ -223,7 +240,7 @@ def ticket_statistics_users(app: OrgApp) -> list[User]:
 
 
 @OrgApp.cronjob(hour=8, minute=30, timezone='Europe/Zurich')
-def send_daily_ticket_statistics(request: 'OrgRequest') -> None:
+def send_daily_ticket_statistics(request: OrgRequest) -> None:
 
     today = to_timezone(utcnow(), 'Europe/Zurich')
 
@@ -288,7 +305,7 @@ def send_daily_ticket_statistics(request: 'OrgRequest') -> None:
 
 
 @OrgApp.cronjob(hour=8, minute=45, timezone='Europe/Zurich')
-def send_weekly_ticket_statistics(request: 'OrgRequest') -> None:
+def send_weekly_ticket_statistics(request: OrgRequest) -> None:
 
     today = to_timezone(utcnow(), 'Europe/Zurich')
 
@@ -349,7 +366,7 @@ def send_weekly_ticket_statistics(request: 'OrgRequest') -> None:
 
 
 @OrgApp.cronjob(hour=9, minute=0, timezone='Europe/Zurich')
-def send_monthly_ticket_statistics(request: 'OrgRequest') -> None:
+def send_monthly_ticket_statistics(request: OrgRequest) -> None:
 
     today = to_timezone(utcnow(), 'Europe/Zurich')
 
@@ -414,7 +431,7 @@ def send_monthly_ticket_statistics(request: 'OrgRequest') -> None:
 
 
 @OrgApp.cronjob(hour=6, minute=5, timezone='Europe/Zurich')
-def send_daily_resource_usage_overview(request: 'OrgRequest') -> None:
+def send_daily_resource_usage_overview(request: OrgRequest) -> None:
     today = to_timezone(utcnow(), 'Europe/Zurich')
     weekday = WEEKDAYS[today.weekday()]
 
@@ -470,7 +487,7 @@ def send_daily_resource_usage_overview(request: 'OrgRequest') -> None:
     )
 
     @lru_cache(maxsize=128)
-    def form(definition: str) -> type['Form']:
+    def form(definition: str) -> type[Form]:
         return parse_form(definition)
 
     # get the reservations of this day
@@ -542,7 +559,7 @@ def send_daily_resource_usage_overview(request: 'OrgRequest') -> None:
 
 
 @OrgApp.cronjob(hour='*', minute='*/30', timezone='UTC')
-def end_chats_and_create_tickets(request: 'OrgRequest') -> None:
+def end_chats_and_create_tickets(request: OrgRequest) -> None:
     half_hour_ago = utcnow() - timedelta(minutes=30)
 
     chats = ChatCollection(request.session).query().filter(
@@ -573,7 +590,7 @@ def end_chats_and_create_tickets(request: 'OrgRequest') -> None:
 
 
 @OrgApp.cronjob(hour=4, minute=30, timezone='Europe/Zurich')
-def archive_old_tickets(request: 'OrgRequest') -> None:
+def archive_old_tickets(request: OrgRequest) -> None:
 
     archive_timespan = request.app.org.auto_archive_timespan
     session = request.session
@@ -604,7 +621,7 @@ def archive_old_tickets(request: 'OrgRequest') -> None:
 
 
 @OrgApp.cronjob(hour=5, minute=30, timezone='Europe/Zurich')
-def delete_old_tickets(request: 'OrgRequest') -> None:
+def delete_old_tickets(request: OrgRequest) -> None:
     delete_timespan = request.app.org.auto_delete_timespan
     session = request.session
 
@@ -623,7 +640,7 @@ def delete_old_tickets(request: 'OrgRequest') -> None:
 
 
 @OrgApp.cronjob(hour=9, minute=30, timezone='Europe/Zurich')
-def send_monthly_mtan_statistics(request: 'OrgRequest') -> None:
+def send_monthly_mtan_statistics(request: OrgRequest) -> None:
 
     today = to_timezone(utcnow(), 'Europe/Zurich')
 
@@ -671,7 +688,7 @@ def send_monthly_mtan_statistics(request: 'OrgRequest') -> None:
 
 
 @OrgApp.cronjob(hour=4, minute=0, timezone='Europe/Zurich')
-def delete_content_marked_deletable(request: 'OrgRequest') -> None:
+def delete_content_marked_deletable(request: OrgRequest) -> None:
     """ Find all models inheriting from DeletableContentExtension, iterate
     over objects marked as `deletable` and delete them if expired.
 
@@ -711,3 +728,59 @@ def delete_content_marked_deletable(request: 'OrgRequest') -> None:
 
     if count:
         print(f'Cron: Deleted {count} expired deletable objects in db')
+
+
+@OrgApp.cronjob(hour=7, minute=0, timezone='Europe/Zurich')
+def update_newsletter_email_bounce_statistics(
+    request: OrgRequest
+) -> None:
+    # I choose hour=7 as the maximum time difference between Eastern Standard
+    # Time (EST) and Central European Summer Time (CEST) is 7 hours. This
+    # occurs when EST is observing standard time (UTC-5) and CEST is observing
+    # daylight saving time (UTC+2).
+    # Postmark uses EST in `fromdate` and `todate`, see
+    # https://postmarkapp.com/developer/api/bounce-api.
+
+    def get_postmark_token() -> str:
+        # read postmark token from the applications configuration
+        mail_config = request.app.mail
+        if mail_config:
+            mailer = mail_config.get('marketing', {}).get('mailer', None)
+            if mailer == 'postmark':
+                return mail_config.get('marketing', {}).get('token', '')
+
+        return ''
+
+    token = get_postmark_token()
+
+    recipients = RecipientCollection(request.session)
+    yesterday = utcnow() - timedelta(days=1)
+
+    try:
+        r = requests.get(
+            'https://api.postmarkapp.com/bounces?count=500&offset=0',
+            f'fromDate={yesterday.date()}&toDate='
+            f'{yesterday.date()}&inactive=true',
+            headers={
+                'Accept': 'application/json',
+                'X-Postmark-Server-Token': token
+        },
+            timeout=30
+        )
+        r.raise_for_status()
+        bounces = r.json().get('Bounces', [])
+    except requests.exceptions.HTTPError as http_err:
+        if r.status_code == 401:
+            raise RuntimeWarning(
+                f'Postmark API token is not set or invalid: {http_err}'
+            ) from None
+        else:
+            raise
+
+    for bounce in bounces:
+        email = bounce.get('Email', '')
+        inactive = bounce.get('Inactive', False)
+        recipient = recipients.by_address(email)
+
+        if recipient and inactive:
+            recipient.mark_inactive()

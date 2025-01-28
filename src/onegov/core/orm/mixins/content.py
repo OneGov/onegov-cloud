@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 from markupsafe import escape, Markup
 from onegov.core.orm.types import JSON, MarkupText
 from sqlalchemy import type_coerce
@@ -24,24 +26,24 @@ if TYPE_CHECKING:
             key: str | None = None,
             default: None = None,
             value_type: None = None
-        ) -> 'dict_property[Any | None]': ...
+        ) -> dict_property[Any | None]: ...
 
         @overload
         def __call__(
             self,
             key: str | None,
-            default: '_T | Callable[[], _T]',
+            default: _T | Callable[[], _T],
             value_type: None = None
-        ) -> 'dict_property[_T]': ...
+        ) -> dict_property[_T]: ...
 
         @overload
         def __call__(
             self,
             key: str | None = None,
             *,
-            default: '_T | Callable[[], _T]',
+            default: _T | Callable[[], _T],
             value_type: None = None
-        ) -> 'dict_property[_T]': ...
+        ) -> dict_property[_T]: ...
 
         @overload
         def __call__(
@@ -49,8 +51,8 @@ if TYPE_CHECKING:
             key: str | None,
             default: None,
             *,
-            value_type: 'type[_T]'
-        ) -> 'dict_property[_T]': ...
+            value_type: type[_T]
+        ) -> dict_property[_T]: ...
 
         @overload
         def __call__(
@@ -58,25 +60,25 @@ if TYPE_CHECKING:
             key: str | None = None,
             default: None = None,
             *,
-            value_type: 'type[_T]'
-        ) -> 'dict_property[_T]': ...
+            value_type: type[_T]
+        ) -> dict_property[_T]: ...
 
         @overload
         def __call__(
             self,
             key: str | None,
-            default: '_T | Callable[[], _T]',
-            value_type: 'type[_T]'
-        ) -> 'dict_property[_T]': ...
+            default: _T | Callable[[], _T],
+            value_type: type[_T]
+        ) -> dict_property[_T]: ...
 
         @overload
         def __call__(
             self,
             key: str | None = None,
             *,
-            default: '_T | Callable[[], _T]',
-            value_type: 'type[_T]'
-        ) -> 'dict_property[_T]': ...
+            default: _T | Callable[[], _T],
+            value_type: type[_T]
+        ) -> dict_property[_T]: ...
 
 
 _T = TypeVar('_T')
@@ -99,12 +101,12 @@ class ContentMixin:
 
     #: metadata associated with the form, for storing small amounts of data
     @declared_attr  # type:ignore[no-redef]
-    def meta(cls) -> 'Column[dict[str, Any]]':
+    def meta(cls) -> Column[dict[str, Any]]:
         return Column(JSON, nullable=False, default=dict)
 
     #: content associated with the form, for storing things like long texts
     @declared_attr  # type:ignore[no-redef]
-    def content(cls) -> 'Column[dict[str, Any]]':
+    def content(cls) -> Column[dict[str, Any]]:
         return deferred(Column(JSON, nullable=False, default=dict))
 
 
@@ -208,16 +210,16 @@ class dict_property(InspectionAttrInfo, Generic[_T]):  # noqa: N801
 
     is_attribute = True
 
-    custom_getter: 'Callable[[Any], _T] | None'
-    custom_expression: 'Callable[[type[Any]], ColumnElement[_T]] | None'
-    custom_setter: 'Callable[[Any, _T], None] | None'
-    custom_deleter: 'Callable[[Any], None] | None'
+    custom_getter: Callable[[Any], _T] | None
+    custom_expression: Callable[[type[Any]], ColumnElement[_T]] | None
+    custom_setter: Callable[[Any, _T], None] | None
+    custom_deleter: Callable[[Any], None] | None
 
     @overload
     def __init__(
         # TODO: We probably want to change this to `dict_property[_T | None]`
         #       eventually so mypy complains about the missing LHS annotation
-        self: 'dict_property[Any | None]',
+        self: dict_property[Any | None],
         attribute: str,
         key: str | None = None,
         default: None = None,
@@ -226,26 +228,26 @@ class dict_property(InspectionAttrInfo, Generic[_T]):  # noqa: N801
 
     @overload
     def __init__(
-        self: 'dict_property[_T]',
+        self: dict_property[_T],
         attribute: str,
         key: str | None,
-        default: '_T | Callable[[], _T]',
+        default: _T | Callable[[], _T],
         value_type: None = None
     ): ...
 
     @overload
     def __init__(
-        self: 'dict_property[_T]',
+        self: dict_property[_T],
         attribute: str,
         key: str | None = None,
         *,
-        default: '_T | Callable[[], _T]',
+        default: _T | Callable[[], _T],
         value_type: None = None
     ): ...
 
     @overload
     def __init__(
-        self: 'dict_property[_T]',
+        self: dict_property[_T],
         attribute: str,
         key: str | None,
         default: None,
@@ -255,7 +257,7 @@ class dict_property(InspectionAttrInfo, Generic[_T]):  # noqa: N801
 
     @overload
     def __init__(
-        self: 'dict_property[_T]',
+        self: dict_property[_T],
         attribute: str,
         key: str | None = None,
         default: None = None,
@@ -265,20 +267,20 @@ class dict_property(InspectionAttrInfo, Generic[_T]):  # noqa: N801
 
     @overload
     def __init__(
-        self: 'dict_property[_T]',
+        self: dict_property[_T],
         attribute: str,
         key: str | None,
-        default: '_T | Callable[[], _T]',
+        default: _T | Callable[[], _T],
         value_type: type[_T]
     ): ...
 
     @overload
     def __init__(
-        self: 'dict_property[_T]',
+        self: dict_property[_T],
         attribute: str,
         key: str | None = None,
         *,
-        default: '_T | Callable[[], _T]',
+        default: _T | Callable[[], _T],
         value_type: type[_T]
     ): ...
 
@@ -318,24 +320,24 @@ class dict_property(InspectionAttrInfo, Generic[_T]):  # noqa: N801
             self.key = name
 
     @property
-    def getter(self) -> 'Callable[[Callable[[Any], _T]], Self]':
-        def wrapper(fn: 'Callable[[Any], _T]') -> Any:
+    def getter(self) -> Callable[[Callable[[Any], _T]], Self]:
+        def wrapper(fn: Callable[[Any], _T]) -> Any:
             self.custom_getter = fn
             return self
 
         return wrapper
 
     @property
-    def setter(self) -> 'Callable[[Callable[[Any, _T], None]], Self]':
-        def wrapper(fn: 'Callable[[Any, _T], None]') -> Any:
+    def setter(self) -> Callable[[Callable[[Any, _T], None]], Self]:
+        def wrapper(fn: Callable[[Any, _T], None]) -> Any:
             self.custom_setter = fn
             return self
 
         return wrapper
 
     @property
-    def deleter(self) -> 'Callable[[Callable[[Any], None]], Self]':
-        def wrapper(fn: 'Callable[[Any], None]') -> Any:
+    def deleter(self) -> Callable[[Callable[[Any], None]], Self]:
+        def wrapper(fn: Callable[[Any], None]) -> Any:
             self.custom_deleter = fn
             return self
 
@@ -344,14 +346,14 @@ class dict_property(InspectionAttrInfo, Generic[_T]):  # noqa: N801
     @property
     def expression(
         self
-    ) -> 'Callable[[Callable[[Any], ColumnElement[_T]]], Self]':
-        def wrapper(fn: 'Callable[[Any], ColumnElement[_T]]') -> Any:
+    ) -> Callable[[Callable[[Any], ColumnElement[_T]]], Self]:
+        def wrapper(fn: Callable[[Any], ColumnElement[_T]]) -> Any:
             self.custom_expression = fn
             return self
 
         return wrapper
 
-    def _expr(self, owner: type[Any]) -> 'QueryableAttribute | None':
+    def _expr(self, owner: type[Any]) -> QueryableAttribute | None:
         # FIXME: We should be able to remove this Any in SQlAlchemy 2.0
         expr: Any
         if self.custom_expression is not None:
@@ -388,7 +390,7 @@ class dict_property(InspectionAttrInfo, Generic[_T]):  # noqa: N801
         self,
         instance: None,
         owner: type[object]
-    ) -> 'QueryableAttribute | None': ...
+    ) -> QueryableAttribute | None: ...
 
     @overload
     def __get__(
@@ -401,7 +403,7 @@ class dict_property(InspectionAttrInfo, Generic[_T]):  # noqa: N801
         self,
         instance: object | None,
         owner: type[object]
-    ) -> '_T | QueryableAttribute | None':
+    ) -> _T | QueryableAttribute | None:
 
         if instance is None:
             return self._expr(owner)
@@ -446,7 +448,7 @@ class dict_markup_property(dict_property[_MarkupT]):  # noqa: N801
 
     @overload
     def __init__(
-        self: 'dict_markup_property[Markup | None]',
+        self: dict_markup_property[Markup | None],
         attribute: str,
         key: str | None = None,
         default: None = None,
@@ -454,7 +456,7 @@ class dict_markup_property(dict_property[_MarkupT]):  # noqa: N801
 
     @overload
     def __init__(
-        self: 'dict_markup_property[Markup]',
+        self: dict_markup_property[Markup],
         attribute: str,
         key: str | None,
         default: Markup,
@@ -462,7 +464,7 @@ class dict_markup_property(dict_property[_MarkupT]):  # noqa: N801
 
     @overload
     def __init__(
-        self: 'dict_markup_property[Markup]',
+        self: dict_markup_property[Markup],
         attribute: str,
         key: str | None = None,
         *,
@@ -496,7 +498,7 @@ class dict_markup_property(dict_property[_MarkupT]):  # noqa: N801
         self,
         instance: None,
         owner: type[object]
-    ) -> 'QueryableAttribute | None': ...
+    ) -> QueryableAttribute | None: ...
 
     @overload
     def __get__(
@@ -509,7 +511,7 @@ class dict_markup_property(dict_property[_MarkupT]):  # noqa: N801
         self,
         instance: object | None,
         owner: type[object]
-    ) -> '_MarkupT | QueryableAttribute | None':
+    ) -> _MarkupT | QueryableAttribute | None:
 
         if instance is None:
             return self._expr(owner)
@@ -546,7 +548,7 @@ class dict_markup_property(dict_property[_MarkupT]):  # noqa: N801
         )
 
 
-def dict_property_factory(attribute: str) -> '_dict_property_factory':
+def dict_property_factory(attribute: str) -> _dict_property_factory:
     def factory(
         key: str | None = None,
         default: Any | None = None,

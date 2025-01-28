@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 from datetime import date, time, timedelta
 from functools import cached_property
 from uuid import UUID
@@ -110,7 +112,7 @@ class FindYourSpotForm(Form):
             self.start.data = date.today()
             self.end.data = self.start.data + timedelta(days=7)
 
-    def apply_rooms(self, rooms: 'Sequence[Resource]') -> None:
+    def apply_rooms(self, rooms: Sequence[Resource]) -> None:
         if len(rooms) < 2:
             # no need to filter
             self.delete_field('rooms')
@@ -154,7 +156,7 @@ class FindYourSpotForm(Form):
         return None
 
     @cached_property
-    def exceptions(self) -> 'DateContainer':
+    def exceptions(self) -> DateContainer:
         if not hasattr(self, 'request'):
             return ()
 
@@ -167,7 +169,7 @@ class FindYourSpotForm(Form):
         return self.request.app.org.holidays
 
     @cached_property
-    def ranged_exceptions(self) -> 'Sequence[tuple[date, date]]':
+    def ranged_exceptions(self) -> Sequence[tuple[date, date]]:
         if not hasattr(self, 'request'):
             return ()
 
@@ -202,9 +204,9 @@ class ExportToExcelWorksheets(Form):
 
     def as_multiple_export_response(
         self,
-        keys: 'Sequence[StrKeyFunc | None] | None',
-        results: 'Sequence[Iterable[dict[str, Any]]]',
-        titles: 'Sequence[str]'
+        keys: Sequence[StrKeyFunc | None] | None,
+        results: Sequence[Iterable[dict[str, Any]]],
+        titles: Sequence[str]
     ) -> bytes:
 
         return convert_list_of_list_of_dicts_to_xlsx(

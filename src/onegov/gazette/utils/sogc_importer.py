@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 from lxml import etree
 from onegov.chat import MessageCollection
 from onegov.gazette import _
@@ -31,7 +33,7 @@ class SogcImporter:
         | KK06 | KK07 | KK08 | KK09 | KK10
     ]]
 
-    def __init__(self, session: 'Session', config: dict[str, str]):
+    def __init__(self, session: Session, config: dict[str, str]):
         self.session = session
         self.endpoint = config['endpoint'].rstrip('/')
         self.canton = config['canton']

@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 from itertools import groupby
 from onegov.chat import MessageCollection
 from onegov.core.utils import groupbylist
@@ -57,20 +59,20 @@ class GazetteNoticeCollection(OfficialNoticeCollection[GazetteNotice]):
 
     def __init__(
         self,
-        session: 'Session',
+        session: Session,
         page: int = 0,
-        state: 'NoticeState | None' = None,
+        state: NoticeState | None = None,
         term: str | None = None,
         order: str | None = None,
         direction: Literal['asc', 'desc'] | None = None,
-        issues: 'Collection[str] | None ' = None,
-        categories: 'Collection[str] | None ' = None,
-        organizations: 'Collection[str] | None ' = None,
-        user_ids: list['UUID'] | None = None,
-        group_ids: list['UUID'] | None = None,
-        from_date: 'date | None' = None,
-        to_date: 'date | None' = None,
-        source: 'UUID | None' = None,
+        issues: Collection[str] | None = None,
+        categories: Collection[str] | None = None,
+        organizations: Collection[str] | None = None,
+        user_ids: list[UUID] | None = None,
+        group_ids: list[UUID] | None = None,
+        from_date: date | None = None,
+        to_date: date | None = None,
+        source: UUID | None = None,
         own: bool | None = None
     ) -> None:
 
@@ -102,13 +104,13 @@ class GazetteNoticeCollection(OfficialNoticeCollection[GazetteNotice]):
         self.own = own
         self.own_user_id: str | None = None
 
-    def on_request(self, request: 'GazetteRequest') -> None:
+    def on_request(self, request: GazetteRequest) -> None:
         if self.own and request.identity and request.identity.userid:
             id_ = self.session.query(User.id)
             row = id_.filter_by(username=request.identity.userid).first()
             self.own_user_id = str(row[0]) if row else None
 
-    def page_by_index(self, index: int) -> 'Self':
+    def page_by_index(self, index: int) -> Self:
         return self.__class__(
             self.session,
             page=index,
@@ -127,7 +129,7 @@ class GazetteNoticeCollection(OfficialNoticeCollection[GazetteNotice]):
             own=self.own
         )
 
-    def for_state(self, state: 'NoticeState') -> 'Self':
+    def for_state(self, state: NoticeState) -> Self:
         """ Returns a new instance of the collection with the given state. """
 
         result = super().for_state(state)
@@ -137,7 +139,7 @@ class GazetteNoticeCollection(OfficialNoticeCollection[GazetteNotice]):
         result.own = self.own
         return result
 
-    def for_term(self, term: str | None) -> 'Self':
+    def for_term(self, term: str | None) -> Self:
         """ Returns a new instance of the collection with the given term. """
 
         result = super().for_term(term)
@@ -151,7 +153,7 @@ class GazetteNoticeCollection(OfficialNoticeCollection[GazetteNotice]):
         self,
         order: str,
         direction: Literal['asc', 'desc'] | None = None
-    ) -> 'Self':
+    ) -> Self:
         """ Returns a new instance of the collection with the given ordering.
         Inverts the direction if the new ordering is the same as the old one
         and an explicit ordering is not defined.
@@ -167,8 +169,8 @@ class GazetteNoticeCollection(OfficialNoticeCollection[GazetteNotice]):
 
     def for_organizations(
         self,
-        organizations: 'Collection[str] | None'
-    ) -> 'Self':
+        organizations: Collection[str] | None
+    ) -> Self:
         """ Returns a new instance of the collection with the given
         organizations.
 
@@ -181,7 +183,7 @@ class GazetteNoticeCollection(OfficialNoticeCollection[GazetteNotice]):
         result.own = self.own
         return result
 
-    def for_categories(self, categories: 'Collection[str] | None') -> 'Self':
+    def for_categories(self, categories: Collection[str] | None) -> Self:
         """ Returns a new instance of the collection with the given categories.
 
         """
@@ -195,9 +197,9 @@ class GazetteNoticeCollection(OfficialNoticeCollection[GazetteNotice]):
 
     def for_dates(
         self,
-        from_date: 'date | None',
-        to_date: 'date | None'
-    ) -> 'Self':
+        from_date: date | None,
+        to_date: date | None
+    ) -> Self:
         """ Returns a new instance of the collection with the given dates. """
 
         return self.__class__(
@@ -217,7 +219,7 @@ class GazetteNoticeCollection(OfficialNoticeCollection[GazetteNotice]):
         )
 
     @property
-    def term_columns(self) -> list['_StrColumnLike']:
+    def term_columns(self) -> list[_StrColumnLike]:
         """ The columns used for full text search. """
 
         return [
@@ -228,8 +230,8 @@ class GazetteNoticeCollection(OfficialNoticeCollection[GazetteNotice]):
 
     def filter_query(
         self,
-        query: 'Query[GazetteNotice]'
-    ) -> 'Query[GazetteNotice]':
+        query: Query[GazetteNotice]
+    ) -> Query[GazetteNotice]:
         """ Allows additionally to filter for notices with changes made by a
         given user.
 
@@ -253,7 +255,7 @@ class GazetteNoticeCollection(OfficialNoticeCollection[GazetteNotice]):
         organization_id: str | None,
         category_id: str | None,
         user: User,
-        issues: 'dict[str, str | None] | Iterable[str]',
+        issues: dict[str, str | None] | Iterable[str],
         **kwargs: Any
     ) -> GazetteNotice:
         """ Add a new notice.
@@ -325,7 +327,7 @@ class GazetteNoticeCollection(OfficialNoticeCollection[GazetteNotice]):
             # while issues.union also works it doesn't convey the
             # intent very well, that we just count the original
             # issues without filtering them
-            def operation(x: list[str]) -> 'Sized':
+            def operation(x: list[str]) -> Sized:
                 return x
         return [
             (
@@ -367,7 +369,7 @@ class GazetteNoticeCollection(OfficialNoticeCollection[GazetteNotice]):
             # while issues.union also works it doesn't convey the
             # intent very well, that we just count the original
             # issues without filtering them
-            def operation(x: list[str]) -> 'Sized':
+            def operation(x: list[str]) -> Sized:
                 return x
         return [
             (
@@ -409,7 +411,7 @@ class GazetteNoticeCollection(OfficialNoticeCollection[GazetteNotice]):
             # while issues.union also works it doesn't convey the
             # intent very well, that we just count the original
             # issues without filtering them
-            def operation(x: list[str]) -> 'Sized':
+            def operation(x: list[str]) -> Sized:
                 return x
         return [
             (

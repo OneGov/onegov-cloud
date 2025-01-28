@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 import re
 import time
 from collections import defaultdict
@@ -37,7 +39,7 @@ class LinkMigration(ModelsWithLinksMixin):
 
     def __init__(
         self,
-        request: 'OrgRequest',
+        request: OrgRequest,
         old_uri: str,
         new_uri: str = ''
     ) -> None:
@@ -57,7 +59,7 @@ class LinkMigration(ModelsWithLinksMixin):
     def migrate_url(
         self,
         item: object,
-        fields: 'Iterable[str]',
+        fields: Iterable[str],
         test: bool = False,
         group_by: str | None = None,
         count_obj: dict[str, dict[str, int]] | None = None
@@ -128,8 +130,8 @@ class PageNameChange(ModelsWithLinksMixin):
 
     def __init__(
         self,
-        request: 'OrgRequest',
-        page: 'Page',
+        request: OrgRequest,
+        page: Page,
         new_name: str
     ) -> None:
 
@@ -141,10 +143,10 @@ class PageNameChange(ModelsWithLinksMixin):
         self.new_name = new_name
 
     @property
-    def subpages(self) -> list['Page']:
+    def subpages(self) -> list[Page]:
         pages: list[Page] = []
 
-        def add(page: 'Page') -> None:
+        def add(page: Page) -> None:
             nonlocal pages
             pages.append(page)
             for child in page.children:
@@ -189,7 +191,7 @@ class PageNameChange(ModelsWithLinksMixin):
         return run()
 
     @classmethod
-    def from_form(cls, model: 'Page', form: 'Form') -> 'Self':
+    def from_form(cls, model: Page, form: Form) -> Self:
         return cls(form.request, model, form['name'].data)  # type:ignore
 
 
@@ -221,7 +223,7 @@ class LinkHealthCheck(ModelsWithLinksMixin):
 
     def __init__(
         self,
-        request: 'OrgRequest',
+        request: OrgRequest,
         link_type: Literal['internal', 'external', ''] | None = None,
         total_timout: float = 30
     ) -> None:
@@ -253,14 +255,14 @@ class LinkHealthCheck(ModelsWithLinksMixin):
     def internal_link(self, url: str) -> bool:
         return self.domain in url
 
-    def filter_urls(self, urls: 'Sequence[str]') -> 'Sequence[str]':
+    def filter_urls(self, urls: Sequence[str]) -> Sequence[str]:
         if self.external_only:
             return tuple(url for url in urls if not self.internal_link(url))
         if self.internal_only:
             return tuple(url for url in urls if self.internal_link(url))
         return urls
 
-    def find_urls(self) -> 'Iterator[tuple[str, str, Sequence[str]]]':
+    def find_urls(self) -> Iterator[tuple[str, str, Sequence[str]]]:
         for entries in self.site_collection.get().values():
             for entry in entries:
                 urls = []
@@ -287,12 +289,12 @@ class LinkHealthCheck(ModelsWithLinksMixin):
                     self.filter_urls(urls)
                 )
 
-    def url_list_generator(self) -> 'Iterator[LinkCheck]':
+    def url_list_generator(self) -> Iterator[LinkCheck]:
         for name, model_link, urls in self.find_urls():
             for url in urls:
                 yield LinkCheck(name, model_link, url)
 
-    def unhealthy_urls(self) -> tuple[Statistic, 'Sequence[LinkCheck]']:
+    def unhealthy_urls(self) -> tuple[Statistic, Sequence[LinkCheck]]:
         """ We check the urls in the backend, unless they are internal.
         In that case, we can not do that since we do not have async support.
         Otherwise returns the LinkChecks with empty statistics for use in

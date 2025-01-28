@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 from functools import cached_property
 from onegov.core.elements import Confirm
 from onegov.core.elements import Intercooler
@@ -137,12 +139,12 @@ class AssemblyLayout(DefaultLayout):
 
 class AssemblyTickerLayout(DefaultLayout):
 
-    model: 'Assembly'
+    model: Assembly
 
     def __init__(
         self,
-        model: 'Assembly',
-        request: 'LandsgemeindeRequest'
+        model: Assembly,
+        request: LandsgemeindeRequest
     ) -> None:
 
         super().__init__(model, request)

@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 from collections import OrderedDict
 from onegov.election_day.models.election import Election
 from onegov.election_day.models.election_compound import ElectionCompound
@@ -55,46 +57,46 @@ class Screen(Base, ContentMixin, TimestampMixin):
     __tablename__ = 'election_day_screens'
 
     #: Identifies the screen
-    id: 'Column[int]' = Column(Integer, primary_key=True)
+    id: Column[int] = Column(Integer, primary_key=True)
 
     #: A unique number for the path
-    number: 'Column[int]' = Column(Integer, unique=True, nullable=False)
+    number: Column[int] = Column(Integer, unique=True, nullable=False)
 
     #: The vote
-    vote_id: 'Column[str | None]' = Column(
+    vote_id: Column[str | None] = Column(
         Text,
         ForeignKey(Vote.id, onupdate='CASCADE'), nullable=True
     )
-    vote: 'relationship[Vote | None]' = relationship(
+    vote: relationship[Vote | None] = relationship(
         'Vote',
         back_populates='screens'
     )
 
     #: The election
-    election_id: 'Column[str | None]' = Column(
+    election_id: Column[str | None] = Column(
         Text,
         ForeignKey(Election.id, onupdate='CASCADE'), nullable=True
     )
-    election: 'relationship[Election | None]' = relationship(
+    election: relationship[Election | None] = relationship(
         'Election',
         back_populates='screens'
     )
 
     #: The election compound
-    election_compound_id: 'Column[str | None]' = Column(
+    election_compound_id: Column[str | None] = Column(
         Text,
         ForeignKey(ElectionCompound.id, onupdate='CASCADE'), nullable=True
     )
-    election_compound: 'relationship[ElectionCompound | None]' = relationship(
+    election_compound: relationship[ElectionCompound | None] = relationship(
         'ElectionCompound',
         back_populates='screens'
     )
 
     #: The domain of the election compound part.
-    domain: 'Column[str | None]' = Column(Text, nullable=True)
+    domain: Column[str | None] = Column(Text, nullable=True)
 
     #: The domain segment of the election compound part.
-    domain_segment: 'Column[str | None]' = Column(Text, nullable=True)
+    domain_segment: Column[str | None] = Column(Text, nullable=True)
 
     @property
     def election_compound_part(self) -> ElectionCompoundPart | None:
@@ -105,22 +107,22 @@ class Screen(Base, ContentMixin, TimestampMixin):
         return None
 
     #: The title
-    description: 'Column[str | None]' = Column(Text, nullable=True)
+    description: Column[str | None] = Column(Text, nullable=True)
 
     #: The type
-    type: 'Column[str]' = Column(Text, nullable=False)
+    type: Column[str] = Column(Text, nullable=False)
 
     #: The content of the screen
-    structure: 'Column[str]' = Column(Text, nullable=False)
+    structure: Column[str] = Column(Text, nullable=False)
 
     #: Additional CSS
-    css: 'Column[str | None]' = Column(Text, nullable=True)
+    css: Column[str | None] = Column(Text, nullable=True)
 
     #: The group this screen belongs to, used for cycling
-    group: 'Column[str | None]' = Column(Text, nullable=True)
+    group: Column[str | None] = Column(Text, nullable=True)
 
     #: The duration this screen is presented if cycling
-    duration: 'Column[int | None]' = Column(Integer, nullable=True)
+    duration: Column[int | None] = Column(Integer, nullable=True)
 
     @property
     def model(
@@ -141,7 +143,7 @@ class Screen(Base, ContentMixin, TimestampMixin):
         return ScreenType(self.type)
 
     @property
-    def last_modified(self) -> 'datetime | None':
+    def last_modified(self) -> datetime | None:
         model = self.model
         assert model is not None
         changes = [self.last_change, model.last_change]
@@ -149,7 +151,7 @@ class Screen(Base, ContentMixin, TimestampMixin):
         return max(set_changes) if set_changes else None
 
     @property
-    def next(self) -> 'Screen | None':
+    def next(self) -> Screen | None:
         if self.group:
             session = object_session(self)
             query = session.query(Screen.number, Screen)

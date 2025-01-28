@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 from onegov.core.elements import Link
 from onegov.core.security import Private
 from onegov.pas import _
@@ -22,8 +24,8 @@ if TYPE_CHECKING:
 )
 def view_rate_sets(
     self: RateSetCollection,
-    request: 'TownRequest'
-) -> 'RenderData':
+    request: TownRequest
+) -> RenderData:
 
     layout = RateSetCollectionLayout(self, request)
 
@@ -57,9 +59,9 @@ def view_rate_sets(
 )
 def add_rate_set(
     self: RateSetCollection,
-    request: 'TownRequest',
+    request: TownRequest,
     form: RateSetForm
-) -> 'RenderData | Response':
+) -> RenderData | Response:
 
     if form.submitted(request):
         rate_set = self.add(**form.get_useful_data())
@@ -85,8 +87,8 @@ def add_rate_set(
 )
 def view_rate_set(
     self: RateSet,
-    request: 'TownRequest'
-) -> 'RenderData':
+    request: TownRequest
+) -> RenderData:
 
     layout = RateSetLayout(self, request)
 
@@ -106,9 +108,9 @@ def view_rate_set(
 )
 def edit_rate_set(
     self: RateSet,
-    request: 'TownRequest',
+    request: TownRequest,
     form: RateSetForm
-) -> 'RenderData | Response':
+) -> RenderData | Response:
 
     if form.submitted(request):
         form.populate_obj(self)
@@ -136,7 +138,7 @@ def edit_rate_set(
 )
 def delete_rate_set(
     self: RateSet,
-    request: 'TownRequest'
+    request: TownRequest
 ) -> None:
 
     request.assert_valid_csrf_token()

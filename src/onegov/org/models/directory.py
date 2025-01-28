@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 import sedate
 
 from copy import copy
@@ -62,7 +64,7 @@ if TYPE_CHECKING:
         @property
         def submitter_meta(self) -> Mapping[str, str | None]: ...
         @property
-        def target(self) -> 'ExtendedDirectoryEntry | None': ...
+        def target(self) -> ExtendedDirectoryEntry | None: ...
         def is_different(self, field: Field) -> bool: ...
         def ensure_changes(self) -> bool | None: ...
         def ensure_publication_start_end(self) -> bool | None: ...
@@ -78,10 +80,10 @@ class DirectorySubmissionAction:
 
     def __init__(
         self,
-        session: 'Session',
-        directory_id: 'UUID',
+        session: Session,
+        directory_id: UUID,
         action: str,
-        submission_id: 'UUID'
+        submission_id: UUID
     ) -> None:
 
         self.session = session
@@ -115,7 +117,7 @@ class DirectorySubmissionAction:
 
     def send_mail_if_enabled(
         self,
-        request: 'OrgRequest',
+        request: OrgRequest,
         subject: str,
         template: str
     ) -> None:
@@ -153,7 +155,7 @@ class DirectorySubmissionAction:
         return ('change-request'
                 in self.submission.extensions)  # type:ignore[union-attr]
 
-    def execute(self, request: 'OrgRequest') -> None:
+    def execute(self, request: OrgRequest) -> None:
         assert self.valid
         assert self.directory is not None
         assert self.ticket is not None
@@ -163,7 +165,7 @@ class DirectorySubmissionAction:
 
         return getattr(self, self.action)(request)
 
-    def adopt(self, request: 'OrgRequest') -> None:
+    def adopt(self, request: OrgRequest) -> None:
         assert self.directory is not None
         assert self.submission is not None
         assert self.ticket is not None
@@ -211,7 +213,7 @@ class DirectorySubmissionAction:
 
     def create_new_entry(
         self,
-        request: 'OrgRequest',
+        request: OrgRequest,
         data: dict[str, Any]
     ) -> DirectoryEntry:
 
@@ -235,7 +237,7 @@ class DirectorySubmissionAction:
 
     def apply_change_request(
         self,
-        request: 'OrgRequest',
+        request: OrgRequest,
         data: dict[str, Any]
     ) -> DirectoryEntry:
 
@@ -300,7 +302,7 @@ class DirectorySubmissionAction:
 
         return entry
 
-    def reject(self, request: 'OrgRequest') -> None:
+    def reject(self, request: OrgRequest) -> None:
         assert self.ticket is not None
 
         # be idempotent
@@ -335,7 +337,7 @@ class DirectorySubmissionAction:
             DirectoryMessage.create(
                 self.directory, self.ticket, request, 'change-rejected')
 
-    def withdraw_rejection(self, request: 'OrgRequest') -> None:
+    def withdraw_rejection(self, request: OrgRequest) -> None:
         assert self.ticket is not None
 
         # be idempotent
@@ -404,7 +406,7 @@ class ExtendedDirectory(Directory, AccessExtension, Extendable,
     currency: dict_property[str | None] = content_property()
 
     minimum_price_total: dict_property[float | None] = meta_property()
-    payment_method: dict_property['PaymentMethod | None'] = meta_property()
+    payment_method: dict_property[PaymentMethod | None] = meta_property()
 
     search_widget_config: dict_property[dict[str, Any] | None]
     search_widget_config = content_property()
@@ -429,14 +431,14 @@ class ExtendedDirectory(Directory, AccessExtension, Extendable,
     if TYPE_CHECKING:
         def extend_form_class(  # type:ignore[override]
             self,
-            form_class: type['DirectoryEntryForm'],  # type:ignore[override]
+            form_class: type[DirectoryEntryForm],  # type:ignore[override]
             extensions: Collection[str]
-        ) -> type['ExtendedDirectoryEntryForm']: ...
+        ) -> type[ExtendedDirectoryEntryForm]: ...
 
     def form_class_for_submissions(
         self,
         change_request: bool = False
-    ) -> type['ExtendedDirectoryEntryForm']:
+    ) -> type[ExtendedDirectoryEntryForm]:
         """ Generates the form_class used for user submissions and change
         requests. The resulting form always includes a submitter field and all
         fields. When doing a change request, removes input required validators
@@ -467,7 +469,7 @@ class ExtendedDirectory(Directory, AccessExtension, Extendable,
     def submission_action(
         self,
         action: Literal['adopt', 'reject', 'withdraw_rejection'],
-        submission_id: 'UUID'
+        submission_id: UUID
     ) -> DirectorySubmissionAction:
 
         return DirectorySubmissionAction(
@@ -537,7 +539,7 @@ class ExtendedDirectoryEntry(DirectoryEntry, PublicationExtension,
         return None
 
     @property
-    def content_fields(self) -> tuple['Field', ...] | None:
+    def content_fields(self) -> tuple[Field, ...] | None:
         content_config = {
             as_internal_id(k)
             for k in self.display_config.get('content', ())
@@ -569,9 +571,9 @@ class ExtendedDirectoryEntryCollection(
         directory: ExtendedDirectory,
         # FIXME: We should probably disallow the type argument here
         type: Literal['extended'] = 'extended',
-        keywords: 'Mapping[str, list[str]] | None' = None,
+        keywords: Mapping[str, list[str]] | None = None,
         page: int = 0,
-        search_widget: 'ExtendedDirectorySearchWidget | None' = None,
+        search_widget: ExtendedDirectorySearchWidget | None = None,
         published_only: bool = False,
         past_only: bool = False,
         upcoming_only: bool = False
@@ -585,7 +587,7 @@ class ExtendedDirectoryEntryCollection(
     if TYPE_CHECKING:
         directory: ExtendedDirectory
 
-    def query(self) -> 'Query[ExtendedDirectoryEntry]':
+    def query(self) -> Query[ExtendedDirectoryEntry]:
         query = super().query()
         if self.published_only:
             query = query.filter(

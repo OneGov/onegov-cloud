@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 from onegov.core.orm import Base
 from onegov.core.orm.mixins import TimestampMixin
 from onegov.core.orm.types import UUID
@@ -25,7 +27,7 @@ if TYPE_CHECKING:
         'president',
     ]
 
-ROLES: dict['MembershipRole', str] = {
+ROLES: dict[MembershipRole, str] = {
     'guest': _('Guest'),
     'member': _('Member'),
     'extended_member': _('Extended Member'),
@@ -38,26 +40,26 @@ class CommissionMembership(Base, TimestampMixin):
     __tablename__ = 'pas_commission_memberships'
 
     #: Internal ID
-    id: 'Column[uuid.UUID]' = Column(
+    id: Column[uuid.UUID] = Column(
         UUID,  # type:ignore[arg-type]
         primary_key=True,
         default=uuid4
     )
 
     #: The start date
-    start: 'Column[date|None]' = Column(
+    start: Column[date | None] = Column(
         Date,
         nullable=True
     )
 
     #: The end date
-    end: 'Column[date|None]' = Column(
+    end: Column[date | None] = Column(
         Date,
         nullable=True
     )
 
     #: The role value
-    role: 'Column[MembershipRole]' = Column(
+    role: Column[MembershipRole] = Column(
         Enum(
             *ROLES.keys(),  # type:ignore[arg-type]
             name='pas_commission_membership_role'
@@ -72,27 +74,27 @@ class CommissionMembership(Base, TimestampMixin):
         return ROLES.get(self.role, '')
 
     #: the id of the commission
-    commission_id: 'Column[uuid.UUID]' = Column(
+    commission_id: Column[uuid.UUID] = Column(
         UUID,  # type:ignore[arg-type]
         ForeignKey('pas_commissions.id'),
         nullable=False
     )
 
     #: the related commission (which may have any number of memberships)
-    commission: 'relationship[Commission]' = relationship(
+    commission: relationship[Commission] = relationship(
         Commission,
         back_populates='memberships'
     )
 
     #: the id of the parliamentarian
-    parliamentarian_id: 'Column[uuid.UUID]' = Column(
+    parliamentarian_id: Column[uuid.UUID] = Column(
         UUID,  # type:ignore[arg-type]
         ForeignKey('pas_parliamentarians.id'),
         nullable=False
     )
 
     #: the related parliamentarian (which may have any number of memberships)
-    parliamentarian: 'relationship[Parliamentarian]' = relationship(
+    parliamentarian: relationship[Parliamentarian] = relationship(
         Parliamentarian,
         back_populates='commission_memberships'
     )

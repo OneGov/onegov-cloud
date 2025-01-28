@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 from onegov.core.security import Private
 from onegov.core.security import Secret
 from onegov.org.models import Organisation
@@ -29,8 +31,8 @@ if TYPE_CHECKING:
 )
 def view_settings(
     self: Organisation,
-    request: 'TownRequest'
-) -> 'RenderData':
+    request: TownRequest
+) -> RenderData:
     layout = DefaultLayout(self, request)
 
     shortcuts = [
@@ -95,6 +97,6 @@ def view_settings(
 )
 def handle_chat_settings(
     self: Organisation,
-    request: 'TownRequest',
-) -> 'Response':
+    request: TownRequest,
+) -> Response:
     return request.redirect(request.class_link(UserCollection))

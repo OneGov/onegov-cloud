@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 from onegov.core.utils import groupbylist
 from operator import itemgetter
 
@@ -13,10 +15,10 @@ if TYPE_CHECKING:
 
 
 def get_districts_data(
-    compound: 'ElectionCompound | ElectionCompoundPart',
-    principal: 'Canton | Municipality',
-    request: 'ElectionDayRequest | None' = None
-) -> 'JSONObject_ro':
+    compound: ElectionCompound | ElectionCompoundPart,
+    principal: Canton | Municipality,
+    request: ElectionDayRequest | None = None
+) -> JSONObject_ro:
     """ Returns the data used by elections compounds for rendering entities and
     districts maps. """
 

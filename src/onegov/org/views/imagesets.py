@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 import morepath
 
 from onegov.core.security import Public, Private
@@ -24,7 +26,7 @@ if TYPE_CHECKING:
 
 def get_form_class(
     self: ImageSet | ImageSetCollection,
-    request: 'OrgRequest'
+    request: OrgRequest
 ) -> type[ImageSetForm]:
 
     if isinstance(self, ImageSetCollection):
@@ -39,9 +41,9 @@ def get_form_class(
              permission=Public)
 def view_imagesets(
     self: ImageSetCollection,
-    request: 'OrgRequest',
+    request: OrgRequest,
     layout: ImageSetCollectionLayout | None = None
-) -> 'RenderData':
+) -> RenderData:
 
     # XXX add collation support to the core (create collations automatically)
     imagesets = sorted(self.query(), key=lambda d: d.created, reverse=True)
@@ -57,9 +59,9 @@ def view_imagesets(
              permission=Private, request_method='GET')
 def select_images(
     self: ImageSet,
-    request: 'OrgRequest',
+    request: OrgRequest,
     layout: ImageSetLayout | None = None
-) -> 'RenderData':
+) -> RenderData:
 
     collection = ImageFileCollection(request.session)
     selected = {f.id for f in self.files}
@@ -94,7 +96,7 @@ def select_images(
 
 @OrgApp.html(model=ImageSet, name='select', template='select_images.pt',
              permission=Private, request_method='POST')
-def handle_select_images(self: ImageSet, request: 'OrgRequest') -> 'Response':
+def handle_select_images(self: ImageSet, request: OrgRequest) -> Response:
 
     # we do custom form handling here, so we need to check for CSRF manually
     request.assert_valid_csrf_token()
@@ -120,10 +122,10 @@ def handle_select_images(self: ImageSet, request: 'OrgRequest') -> 'Response':
              permission=Private, form=get_form_class)
 def handle_new_imageset(
     self: ImageSetCollection,
-    request: 'OrgRequest',
+    request: OrgRequest,
     form: ImageSetForm,
     layout: ImageSetCollectionLayout | None = None
-) -> 'RenderData | Response':
+) -> RenderData | Response:
 
     if form.submitted(request):
         assert form.title.data is not None
@@ -148,10 +150,10 @@ def handle_new_imageset(
              permission=Private, form=get_form_class)
 def handle_edit_imageset(
     self: ImageSet,
-    request: 'OrgRequest',
+    request: OrgRequest,
     form: ImageSetForm,
     layout: ImageSetLayout | None = None
-) -> 'RenderData | Response':
+) -> RenderData | Response:
 
     if form.submitted(request):
         form.populate_obj(self)
@@ -174,7 +176,7 @@ def handle_edit_imageset(
 
 
 @OrgApp.view(model=ImageSet, request_method='DELETE', permission=Private)
-def handle_delete_imageset(self: ImageSet, request: 'OrgRequest') -> None:
+def handle_delete_imageset(self: ImageSet, request: OrgRequest) -> None:
     request.assert_valid_csrf_token()
 
     collection = ImageSetCollection(request.session)
@@ -184,9 +186,9 @@ def handle_delete_imageset(self: ImageSet, request: 'OrgRequest') -> None:
 @OrgApp.html(model=ImageSet, template='imageset.pt', permission=Public)
 def view_imageset(
     self: ImageSet,
-    request: 'OrgRequest',
+    request: OrgRequest,
     layout: ImageSetLayout | None = None
-) -> 'RenderData':
+) -> RenderData:
 
     return {
         'layout': layout or ImageSetLayout(self, request),

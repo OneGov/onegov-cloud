@@ -92,6 +92,8 @@ Anmeldungen in Teilnehmer.txt die keine Referenz zu Personen.txt haben,
 wurden berücksichtigt, sofern eine Email vorlag.
 
 """
+from __future__ import annotations
+
 import dateutil.parser
 from collections import OrderedDict, defaultdict
 from datetime import datetime
@@ -176,15 +178,15 @@ def parse_date(
     val: str | None,
     # NOTE: Seems like PEP-696 does not allow assigning a TypeVar to its
     #       default value yet, this should probably be allowed
-    default: 'DefaultT' = None  # type:ignore[assignment]
-) -> 'datetime | DefaultT':
+    default: DefaultT = None  # type:ignore[assignment]
+) -> datetime | DefaultT:
     if not val:
         return default
     date_ = dateutil.parser.parse(val)
     return replace_timezone(date_, 'UTC')
 
 
-def parse_status(val: str) -> 'EventStatusType':
+def parse_status(val: str) -> EventStatusType:
     mapping: dict[str, EventStatusType] = {
         'Abgeschlossen': 'confirmed',
         'Abgesagt': 'canceled',
@@ -206,9 +208,9 @@ def validate_integer(
 
 
 def with_open(
-    func: 'Callable[[CSVFile[DefaultRow], *Ts], T]'
-) -> 'Callable[[str, *Ts], T]':
-    def _read(filename: str, /, *args: *Ts) -> 'T':
+    func: Callable[[CSVFile[DefaultRow], *Ts], T]
+) -> Callable[[str, *Ts], T]:
+    def _read(filename: str, /, *args: *Ts) -> T:
         with open(filename, 'rb') as f:
             file = CSVFile(
                 f,
@@ -221,8 +223,8 @@ def with_open(
 
 @with_open
 def import_teacher_data(
-    csvfile: CSVFile['DefaultRow'],
-    request: 'FsiRequest',
+    csvfile: CSVFile[DefaultRow],
+    request: FsiRequest,
     clean: bool = False
 ) -> None:
 
@@ -288,7 +290,7 @@ def parse_completed(val: str | None) -> bool:
 
 
 @with_open
-def parse_persons(csvfile: CSVFile['DefaultRow']) -> dict[str, 'PersonDict']:
+def parse_persons(csvfile: CSVFile[DefaultRow]) -> dict[str, PersonDict]:
     """Pure extracting information"""
     persons: dict[str, PersonDict] = OrderedDict()
     print('-- parse_persons --')
@@ -310,7 +312,7 @@ def parse_persons(csvfile: CSVFile['DefaultRow']) -> dict[str, 'PersonDict']:
 
 @with_open
 def parse_courses(
-    csvfile: CSVFile['DefaultRow']
+    csvfile: CSVFile[DefaultRow]
 ) -> tuple[dict[int, str], dict[str, Course]]:
     errors = OrderedDict()
     courses = OrderedDict()
@@ -332,7 +334,7 @@ def parse_courses(
 
 @with_open
 def parse_events(
-    csvfile: CSVFile['DefaultRow'],
+    csvfile: CSVFile[DefaultRow],
     courses: dict[str, Course]
 ) -> tuple[dict[int, str], dict[str, CourseEvent]]:
     events = OrderedDict()
@@ -390,10 +392,10 @@ def parse_events(
 
 @with_open
 def parse_subscriptions(
-    csvfile: CSVFile['DefaultRow'],
-    persons: dict[str, 'PersonDict'],
+    csvfile: CSVFile[DefaultRow],
+    persons: dict[str, PersonDict],
     events: dict[str, CourseEvent]
-) -> tuple[dict[int, str], dict[str, 'PersonDict'], dict[str, 'UserDict']]:
+) -> tuple[dict[int, str], dict[str, PersonDict], dict[str, UserDict]]:
     """
 
     :param csvfile:
@@ -504,9 +506,9 @@ def parse_subscriptions(
 
 
 def map_persons_to_known_ldap_user(
-    person_record: 'PersonDict | UserDict',
-    session: 'Session'
-) -> 'CourseAttendee | None':
+    person_record: PersonDict | UserDict,
+    session: Session
+) -> CourseAttendee | None:
     """
     Since the exported persons table contains records without email
     from various sources, we have to try to map it to an existing record
@@ -560,10 +562,10 @@ def parse_ims_data(
     persons_file: str,
 ) -> tuple[
     dict[str, dict[int, str]],
-    dict[str, 'PersonDict'] | None,
+    dict[str, PersonDict] | None,
     dict[str, Course] | None,
     dict[str, CourseEvent] | None,
-    dict[str, 'UserDict'] | None
+    dict[str, UserDict] | None
 ]:
     gathered_errors = {}
 
@@ -591,11 +593,11 @@ def parse_ims_data(
 
 
 def import_ims_data(
-    session: 'Session',
-    persons: dict[str, 'PersonDict'],
+    session: Session,
+    persons: dict[str, PersonDict],
     courses: dict[str, Course],
     events: dict[str, CourseEvent],
-    possible_ldap_users: dict[str, 'UserDict']
+    possible_ldap_users: dict[str, UserDict]
 ) -> dict[str, int]:
 
     print('-- Import IMS DATA to database with LDAP --')

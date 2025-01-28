@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 from onegov.core.elements import BackLink
 from onegov.org import _
 from onegov.core.security import Private
@@ -19,7 +21,7 @@ if TYPE_CHECKING:
 
 def get_external_link_form(
     model: ExternalLink | ExternalLinkCollection,
-    request: 'OrgRequest'
+    request: OrgRequest
 ) -> type[ExternalLinkForm]:
 
     if isinstance(model, ExternalLinkCollection):
@@ -33,10 +35,10 @@ def get_external_link_form(
 )
 def handle_new_external_link(
     self: ExternalLinkCollection,
-    request: 'OrgRequest',
+    request: OrgRequest,
     form: ExternalLinkForm,
     layout: DefaultLayout | None = None
-) -> 'RenderData | Response':
+) -> RenderData | Response:
 
     if form.submitted(request):
         external_link = self.add_by_form(form)
@@ -60,10 +62,10 @@ def handle_new_external_link(
              permission=Private, form=get_external_link_form)
 def edit_external_link(
     self: ExternalLink,
-    request: 'OrgRequest',
+    request: OrgRequest,
     form: ExternalLinkForm,
     layout: DefaultLayout | None = None
-) -> 'RenderData | Response':
+) -> RenderData | Response:
 
     if form.submitted(request):
         form.populate_obj(self)
@@ -88,6 +90,6 @@ def edit_external_link(
 
 
 @OrgApp.view(model=ExternalLink, permission=Private, request_method='DELETE')
-def delete_external_link(self: ExternalLink, request: 'OrgRequest') -> None:
+def delete_external_link(self: ExternalLink, request: OrgRequest) -> None:
     request.assert_valid_csrf_token()
     request.session.delete(self)

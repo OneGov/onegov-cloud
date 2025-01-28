@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 from datetime import date
 from io import BytesIO
 from morepath import redirect
@@ -30,8 +32,8 @@ if TYPE_CHECKING:
 )
 def view_issues(
     self: IssueCollection,
-    request: 'GazetteRequest'
-) -> 'RenderData':
+    request: GazetteRequest
+) -> RenderData:
     """ View the list of issues.
 
     This view is only visible by a publisher.
@@ -63,9 +65,9 @@ def view_issues(
 )
 def create_issue(
     self: IssueCollection,
-    request: 'GazetteRequest',
+    request: GazetteRequest,
     form: IssueForm
-) -> 'RenderData | BaseReponse':
+) -> RenderData | BaseReponse:
     """ Create a new issue.
 
     This view is only visible by a publisher.
@@ -98,9 +100,9 @@ def create_issue(
 )
 def edit_issue(
     self: Issue,
-    request: 'GazetteRequest',
+    request: GazetteRequest,
     form: IssueForm
-) -> 'RenderData | BaseReponse':
+) -> RenderData | BaseReponse:
     """ Edit a issue.
 
     This view is only visible by a publisher.
@@ -135,9 +137,9 @@ def edit_issue(
 )
 def delete_issue(
     self: Issue,
-    request: 'GazetteRequest',
+    request: GazetteRequest,
     form: EmptyForm
-) -> 'RenderData | BaseReponse':
+) -> RenderData | BaseReponse:
     """ Delete a issue.
 
     Only unused issues may be deleted.
@@ -190,9 +192,9 @@ def delete_issue(
 )
 def publish_issue(
     self: Issue,
-    request: 'GazetteRequest',
+    request: GazetteRequest,
     form: EmptyForm
-) -> 'RenderData | BaseReponse':
+) -> RenderData | BaseReponse:
     """ Publish an issue.
 
     This moves all accepted notices related to this issue to the published
@@ -270,7 +272,7 @@ def publish_issue(
     name='print-only-pdf',
     permission=Private
 )
-def print_only_pdf(self: Issue, request: 'GazetteRequest') -> Response:
+def print_only_pdf(self: Issue, request: GazetteRequest) -> Response:
     """ Creates the PDF with all the print only notices of an issue. """
 
     response = Response()
@@ -288,7 +290,7 @@ def print_only_pdf(self: Issue, request: 'GazetteRequest') -> Response:
     name='export',
     permission=Private
 )
-def export_issue(self: IssueCollection, request: 'GazetteRequest') -> Response:
+def export_issue(self: IssueCollection, request: GazetteRequest) -> Response:
     """ Export all issues as XLSX. The exported file can be re-imported
     using the import-issues command line command.
 

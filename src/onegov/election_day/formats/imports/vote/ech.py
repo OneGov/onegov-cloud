@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 from onegov.election_day import _
 from onegov.election_day.formats.imports.common import convert_ech_domain
 from onegov.election_day.formats.imports.common import EXPATS
@@ -24,10 +26,10 @@ if TYPE_CHECKING:
 
 
 def import_votes_ech(
-    principal: 'Canton | Municipality',
-    delivery: 'DeliveryV1 | DeliveryV2',
-    session: 'Session'
-) -> 'ECHImportResultType':
+    principal: Canton | Municipality,
+    delivery: DeliveryV1 | DeliveryV2,
+    session: Session
+) -> ECHImportResultType:
     """ Imports all votes in a given eCH-0252 delivery.
 
     Deletes votes on the same day not appearing in the delivery.

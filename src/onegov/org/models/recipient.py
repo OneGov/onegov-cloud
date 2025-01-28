@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 from onegov.core.orm.mixins import content_property, dict_property
 from onegov.recipient import GenericRecipient, GenericRecipientCollection
 
@@ -21,5 +23,5 @@ class ResourceRecipient(GenericRecipient):
 class ResourceRecipientCollection(
     GenericRecipientCollection[ResourceRecipient]
 ):
-    def __init__(self, session: 'Session') -> None:
+    def __init__(self, session: Session) -> None:
         super().__init__(session, type='resource')

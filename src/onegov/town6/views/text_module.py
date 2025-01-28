@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 from onegov.chat import TextModule
 from onegov.chat import TextModuleCollection
 from onegov.core.security import Private
@@ -25,8 +27,8 @@ if TYPE_CHECKING:
 )
 def town_view_text_moduless(
     self: TextModuleCollection,
-    request: 'TownRequest'
-) -> 'RenderData':
+    request: TownRequest
+) -> RenderData:
     layout = TextModulesLayout(self, request)
     return view_text_modules(self, request, layout)
 
@@ -40,9 +42,9 @@ def town_view_text_moduless(
 )
 def town_add_text_module(
     self: TextModuleCollection,
-    request: 'TownRequest',
+    request: TownRequest,
     form: TextModuleForm
-) -> 'RenderData | Response':
+) -> RenderData | Response:
     layout = TextModulesLayout(self, request)
     return add_text_module(self, request, form, layout)
 
@@ -54,8 +56,8 @@ def town_add_text_module(
 )
 def town_view_text_module(
     self: TextModule,
-    request: 'TownRequest'
-) -> 'RenderData':
+    request: TownRequest
+) -> RenderData:
     layout = TextModuleLayout(self, request)
     return view_text_module(self, request, layout)
 
@@ -69,8 +71,8 @@ def town_view_text_module(
 )
 def town_edit_text_module(
     self: TextModule,
-    request: 'TownRequest',
+    request: TownRequest,
     form: TextModuleForm
-) -> 'RenderData | Response':
+) -> RenderData | Response:
     layout = TextModuleLayout(self, request)
     return edit_text_module(self, request, form, layout)

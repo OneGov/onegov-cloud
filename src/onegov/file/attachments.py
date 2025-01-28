@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 import pdftotext  # type:ignore
 
 from depot.fields.upload import UploadedFile
@@ -40,7 +42,7 @@ def get_svg_size_or_default(content: IO[bytes]) -> tuple[str, str]:
 
 
 def strip_exif_and_limit_and_store_image_size(
-    file: 'ProcessedUploadedFile',
+    file: ProcessedUploadedFile,
     content: IO[bytes],
     content_type: str | None
 ) -> IO[bytes] | None:
@@ -99,7 +101,7 @@ def strip_exif_and_limit_and_store_image_size(
 
 
 def store_checksum(
-    file: 'ProcessedUploadedFile',
+    file: ProcessedUploadedFile,
     content: IO[bytes],
     content_type: str | None
 ) -> None:
@@ -108,7 +110,7 @@ def store_checksum(
 
 
 def sanitize_svg_images(
-    file: 'ProcessedUploadedFile',
+    file: ProcessedUploadedFile,
     content: IO[bytes],
     content_type: str | None
 ) -> IO[bytes]:
@@ -121,7 +123,7 @@ def sanitize_svg_images(
 
 
 def store_extract_and_pages(
-    file: 'ProcessedUploadedFile',
+    file: ProcessedUploadedFile,
     content: IO[bytes],
     content_type: str | None
 ) -> None:
@@ -146,7 +148,7 @@ class ProcessedUploadedFile(UploadedFile):
 
     def process_content(
         self,
-        content: '_FileContent',
+        content: _FileContent,
         filename: str | None = None,
         content_type: str | None = None
     ) -> None:

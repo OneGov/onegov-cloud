@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 from functools import cached_property
 from onegov.core.utils import normalize_for_url
 from onegov.election_day import _
@@ -17,12 +19,12 @@ if TYPE_CHECKING:
 
 class ElectionCompoundPartLayout(DetailLayout):
 
-    model: 'ElectionCompoundPart'
+    model: ElectionCompoundPart
 
     def __init__(
         self,
-        model: 'ElectionCompoundPart',
-        request: 'ElectionDayRequest',
+        model: ElectionCompoundPart,
+        request: ElectionDayRequest,
         tab: str | None = None
     ) -> None:
         super().__init__(model, request)
@@ -69,11 +71,11 @@ class ElectionCompoundPartLayout(DetailLayout):
         return tuple(result)
 
     @cached_property
-    def results(self) -> list['ResultRow']:
+    def results(self) -> list[ResultRow]:
         return self.model.results
 
     @cached_property
-    def totals(self) -> 'TotalRow':
+    def totals(self) -> TotalRow:
         return self.model.totals
 
     def label(self, value: str) -> str:
@@ -130,7 +132,7 @@ class ElectionCompoundPartLayout(DetailLayout):
         return self.request.link(self.model, 'districts')
 
     @cached_property
-    def menu(self) -> 'NestedMenu':
+    def menu(self) -> NestedMenu:
         return [
             (
                 self.title(tab),

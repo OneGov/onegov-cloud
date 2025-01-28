@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 import re
 import stdnum.ch.esr as esr  # type: ignore[import-untyped]
 
@@ -57,7 +59,7 @@ class Transaction:
         # if possible, don't rely on manual extraction of the reference number.
         return {self.reference}
 
-    def extract_references(self) -> 'Iterator[str]':
+    def extract_references(self) -> Iterator[str]:
         if self.reference:
             yield self.reference
 
@@ -113,7 +115,7 @@ class Transaction:
         return 'unknown'
 
 
-def transaction_entries(root: 'etree._Element') -> 'Iterator[etree._Element]':
+def transaction_entries(root: etree._Element) -> Iterator[etree._Element]:
     """ Yields the transaction entries from the given Camt.053 or Camt.054
     xml. This works because for our purposes the entries of those two formats
     are identical.
@@ -180,14 +182,14 @@ def get_esr(booking_text: str) -> str | None:
 def extract_transactions(
     xml: str,
     invoice_schema: str
-) -> 'Iterator[Transaction]':
+) -> Iterator[Transaction]:
     root = etree.fromstring(normalize_xml(xml).encode('utf-8'))
 
-    def first(element: 'etree._Element', xpath: str) -> Any | None:
+    def first(element: etree._Element, xpath: str) -> Any | None:
         elements = element.xpath(xpath)
         return elements[0] if elements else None
 
-    def joined(element: 'etree._Element', xpath: str) -> str:
+    def joined(element: etree._Element, xpath: str) -> str:
         return '\n'.join(element.xpath(xpath))
 
     def as_decimal(text: str | None) -> Decimal | None:
@@ -242,11 +244,11 @@ def extract_transactions(
 
 def match_iso_20022_to_usernames(
     xml: str,
-    session: 'Session',
-    period_id: 'UUID',
+    session: Session,
+    period_id: UUID,
     schema: str,
     currency: str = 'CHF'
-) -> 'Iterator[Transaction]':
+) -> Iterator[Transaction]:
     """ Takes an ISO20022 camt.053 file and matches it with the invoice
     items in the database.
 
@@ -259,7 +261,7 @@ def match_iso_20022_to_usernames(
 
     """
 
-    def items(period_id: 'UUID | None' = None) -> 'Query[InvoiceItem]':
+    def items(period_id: UUID | None = None) -> Query[InvoiceItem]:
         invoices = InvoiceCollection(session, period_id=period_id)
         return invoices.query_items().outerjoin(Invoice).outerjoin(User)
 

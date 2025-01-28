@@ -770,7 +770,7 @@
             <div class="side-panel links-panel" tal:condition="sidepanel_links|False">
                 <h3 i18n:translate>Links</h3>
                 <ul class="more-list">
-                    <li tal:repeat="sl sidepanel_links">
+                    <li tal:repeat="sl python: sorted(sidepanel_links, key=lambda sl: sl[0] if sl[0] else sl[1])">
                         <a class="list-link" title="${sl[0] if sl[0] else sl[1]}" href="${sl[1]}">
                             <i class="fa fa-link" aria-hidden="true"></i>
                             <span class="list-title">${sl[0] if sl[0] else sl[1]}</span>
@@ -1658,7 +1658,12 @@
             <div class="dark-overlay" tal:condition="text"></div>
             <div class="grid-container" tal:condition="text">
                 <div class="text">
-                    <span>${text}</span>
+                    <tal:b tal:condition="text_link|False">
+                        <a class="button" href="${text_link}">${text}</a>
+                    </tal:b>
+                    <tal:b tal:condition="not:text_link|False">
+                        <span>${text}</span>
+                    </tal:b>
                 </div>
             </div>
         </div>

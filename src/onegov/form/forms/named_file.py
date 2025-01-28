@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 from functools import cached_property
 from onegov.form.fields import UploadField
 from onegov.form import Form
@@ -49,7 +51,7 @@ class NamedFileForm(Form):
 
     def get_useful_data(
         self,
-        exclude: 'Collection[str] | None' = None
+        exclude: Collection[str] | None = None
     ) -> dict[str, Any]:
 
         exclude = set(exclude or ())
@@ -67,8 +69,8 @@ class NamedFileForm(Form):
     def populate_obj(
         self,
         obj: object,
-        exclude: 'Collection[str] | None' = None,
-        include: 'Collection[str] | None' = None
+        exclude: Collection[str] | None = None,
+        include: Collection[str] | None = None
     ) -> None:
 
         exclude = set(exclude or ())

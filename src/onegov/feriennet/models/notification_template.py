@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 from markupsafe import Markup
 from onegov.activity import BookingCollection, InvoiceCollection
 from onegov.core.orm import Base
@@ -34,25 +36,25 @@ class NotificationTemplate(Base, ContentMixin, TimestampMixin):
     __tablename__ = 'notification_templates'
 
     #: holds the selected period id (not stored in the database)
-    period_id: 'uuid.UUID | None' = None
+    period_id: uuid.UUID | None = None
 
     #: The public id of the notification template
-    id: 'Column[uuid.UUID]' = Column(
+    id: Column[uuid.UUID] = Column(
         UUID,  # type:ignore[arg-type]
         primary_key=True,
         default=uuid4
     )
 
     #: The subject of the notification
-    subject: 'Column[str]' = Column(Text, nullable=False, unique=True)
+    subject: Column[str] = Column(Text, nullable=False, unique=True)
 
     #: The template text in html, fully rendered html content
-    text: 'Column[str]' = Column(Text, nullable=False)
+    text: Column[str] = Column(Text, nullable=False)
 
     #: The date the notification was last sent
-    last_sent: 'Column[datetime | None]' = Column(UTCDateTime, nullable=True)
+    last_sent: Column[datetime | None] = Column(UTCDateTime, nullable=True)
 
-    def for_period(self, period: 'Period') -> 'Self':
+    def for_period(self, period: Period) -> Self:
         """ Implements the required interface for the 'periods' macro in
         onegov.feriennet.
 
@@ -63,13 +65,13 @@ class NotificationTemplate(Base, ContentMixin, TimestampMixin):
 
 class TemplateVariables:
 
-    bound: dict[str, 'BoundCallable']
+    bound: dict[str, BoundCallable]
     expanded: dict[str, str]
 
     def __init__(
         self,
-        request: 'FeriennetRequest',
-        period: 'Period | None'
+        request: FeriennetRequest,
+        period: Period | None
     ) -> None:
         self.request = request
         self.period = period
@@ -106,7 +108,7 @@ class TemplateVariables:
         self,
         name: str,
         description: str,
-        method: 'Callable[[], str]'
+        method: Callable[[], str]
     ) -> None:
 
         assert hasattr(method, '__func__')

@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 from functools import cached_property
 from onegov.core.collection import GenericCollection
 from onegov.landsgemeinde.models import AgendaItem
@@ -20,7 +22,7 @@ if TYPE_CHECKING:
 
 class AgendaItemCollection(GenericCollection[AgendaItem]):
 
-    def __init__(self, session: 'Session', date: 'date | None' = None) -> None:
+    def __init__(self, session: Session, date: date | None = None) -> None:
         self.session = session
         self.date = date
 
@@ -28,7 +30,7 @@ class AgendaItemCollection(GenericCollection[AgendaItem]):
     def model_class(self) -> type[AgendaItem]:
         return AgendaItem
 
-    def query(self) -> 'Query[AgendaItem]':
+    def query(self) -> Query[AgendaItem]:
         query = super().query()
         if self.date:
             query = query.join(AgendaItem.assembly)
@@ -38,7 +40,7 @@ class AgendaItemCollection(GenericCollection[AgendaItem]):
 
     def by_id(
         self,
-        id: 'UUID'  # type:ignore[override]
+        id: UUID  # type:ignore[override]
     ) -> AgendaItem | None:
         return super().query().filter(AgendaItem.id == id).first()
 
@@ -57,7 +59,7 @@ class AgendaItemCollection(GenericCollection[AgendaItem]):
             return query.first()
         return None
 
-    def preloaded_by_assembly(self, assembly: Assembly) -> 'Query[AgendaItem]':
+    def preloaded_by_assembly(self, assembly: Assembly) -> Query[AgendaItem]:
         query = self.session.query(AgendaItem)
         query = query.outerjoin(AgendaItem.vota)
         query = query.filter(AgendaItem.assembly_id == assembly.id)

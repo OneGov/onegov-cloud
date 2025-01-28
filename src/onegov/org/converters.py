@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 import morepath
 
 from collections import defaultdict
@@ -14,7 +16,7 @@ if TYPE_CHECKING:
 
 
 def keywords_encode(
-    keywords: 'HasKeywords | Mapping[str, Sequence[str]]'
+    keywords: HasKeywords | Mapping[str, Sequence[str]]
 ) -> str:
     """ Takes a dictionary of keywords and encodes them into a somewhat
     readable url query format.

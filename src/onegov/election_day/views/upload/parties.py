@@ -1,4 +1,6 @@
 """ The upload view. """
+from __future__ import annotations
+
 import transaction
 
 from onegov.election_day import ElectionDayApp
@@ -25,9 +27,9 @@ if TYPE_CHECKING:
 )
 def view_upload_election_party_results(
     self: ProporzElection,
-    request: 'ElectionDayRequest',
+    request: ElectionDayRequest,
     form: UploadPartyResultsForm
-) -> 'RenderData':
+) -> RenderData:
     """ Uploads party results. """
 
     errors = []
@@ -87,9 +89,9 @@ def view_upload_election_party_results(
 )
 def view_upload_election_compound_party_results(
     self: ElectionCompound,
-    request: 'ElectionDayRequest',
+    request: ElectionDayRequest,
     form: UploadPartyResultsForm
-) -> 'RenderData':
+) -> RenderData:
     """ Uploads party results. """
 
     errors = []

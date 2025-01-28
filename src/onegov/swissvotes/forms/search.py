@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 from onegov.form import Form
 from onegov.form.fields import MultiCheckboxField
 from onegov.swissvotes import _
@@ -23,7 +25,7 @@ if TYPE_CHECKING:
 
 class SearchForm(Form):
 
-    request: 'SwissvotesRequest'
+    request: SwissvotesRequest
 
     term = StringField(
         label=_('Text Search'),
@@ -118,7 +120,7 @@ class SearchForm(Form):
 
         def serialize(
             item: PolicyAreaDefinition
-        ) -> 'list[PolicyAreaTreeNode] | PolicyAreaTreeNode | None':
+        ) -> list[PolicyAreaTreeNode] | PolicyAreaTreeNode | None:
 
             children = [
                 serialized
@@ -144,8 +146,8 @@ class SearchForm(Form):
 
     def populate_choice(
         self,
-        field: 'SelectField',
-        remove: 'Collection[int] | None' = None,
+        field: SelectField,
+        remove: Collection[int] | None = None,
         add_none: bool = False
     ) -> None:
 
@@ -169,7 +171,7 @@ class SearchForm(Form):
         self.populate_choice(self.position_council_of_states, [8, 9])
         self.populate_policy_area()
 
-    def select_all(self, field: 'SelectMultipleField') -> None:
+    def select_all(self, field: SelectMultipleField) -> None:
         if not field.data:
             field.data = [choice[0] for choice in field.choices]
 

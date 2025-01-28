@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 import operator
 from email.headerregistry import Address
 from markupsafe import Markup
@@ -28,8 +30,8 @@ def handle_empty_p_tags(html: Markup) -> Markup:
 
 def emails_for_new_ticket(
     model: Agency | Person,
-    request: 'AgencyRequest'
-) -> 'Iterator[Address]':
+    request: AgencyRequest
+) -> Iterator[Address]:
     """
     Returns an iterator with all the unique email addresses
     that need to be notified for a new ticket of this type
@@ -103,7 +105,7 @@ def emails_for_new_ticket(
 def ticket_groups(
     agency: Agency,
     groupids: list[str] | None
-) -> list['UserGroup']:
+) -> list[UserGroup]:
     return [
         group
         for role_mapping in getattr(agency, 'role_mappings', ())
@@ -122,13 +124,13 @@ def get_html_paragraph_with_line_breaks(text: str | None) -> Markup:
 
 
 def filter_modified_or_created(
-    query: 'Query[_T]',
+    query: Query[_T],
     relate: Literal['>', '<', '>=', '<=', '=='],
     # FIXME: This is a bit lax about types, SQLAlchemy is doing the heavy
     #        lifting here, auto casting ISO formatted date strings
-    comparison_property: 'datetime | str',
-    collection_class: type['TimestampMixin']
-) -> 'Query[_T]':
+    comparison_property: datetime | str,
+    collection_class: type[TimestampMixin]
+) -> Query[_T]:
 
     ops = {
         '>': operator.gt,

@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 import transaction
 
 from base64 import b64decode
@@ -31,7 +33,7 @@ if TYPE_CHECKING:
     from onegov.election_day.request import ElectionDayRequest
 
 
-def authenticated_source(request: 'ElectionDayRequest') -> DataSource:
+def authenticated_source(request: ElectionDayRequest) -> DataSource:
     try:
         token = b64decode(
             request.authorization[1]  # type:ignore
@@ -51,9 +53,9 @@ def authenticated_source(request: 'ElectionDayRequest') -> DataSource:
     permission=Public
 )
 def view_upload_wabsti_vote(
-    self: 'Canton | Municipality',
-    request: 'ElectionDayRequest'
-) -> 'RenderData':
+    self: Canton | Municipality,
+    request: ElectionDayRequest
+) -> RenderData:
 
     """ Upload vote results using the WabstiCExportert 2.2+.
 
@@ -150,9 +152,9 @@ def view_upload_wabsti_vote(
     permission=Public
 )
 def view_upload_wabsti_majorz(
-    self: 'Canton | Municipality',
-    request: 'ElectionDayRequest'
-) -> 'RenderData':
+    self: Canton | Municipality,
+    request: ElectionDayRequest
+) -> RenderData:
     """ Upload election results using the WabstiCExportert 2.2+.
 
     Example usage:
@@ -265,9 +267,9 @@ def view_upload_wabsti_majorz(
     permission=Public
 )
 def view_upload_wabsti_proporz(
-    self: 'Canton | Municipality',
-    request: 'ElectionDayRequest'
-) -> 'RenderData':
+    self: Canton | Municipality,
+    request: ElectionDayRequest
+) -> RenderData:
     """ Upload election results using the WabstiCExportert 2.2+.
 
     Example usage:

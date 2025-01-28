@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 from functools import cached_property
 from onegov.form import Form
 from onegov.form.fields import ChosenSelectMultipleField, ChosenSelectField
@@ -17,7 +19,7 @@ if TYPE_CHECKING:
 
 class CourseAttendeeForm(Form):
 
-    request: 'FsiRequest'
+    request: FsiRequest
 
     first_name = StringField(
         label=_('First Name'),

@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 from onegov.core.elements import Link
 from onegov.core.security import Private
 from onegov.pas import _
@@ -21,8 +23,8 @@ if TYPE_CHECKING:
 )
 def view_parliamentarian_role(
     self: ParliamentarianRole,
-    request: 'TownRequest'
-) -> 'RenderData':
+    request: TownRequest
+) -> RenderData:
 
     layout = ParliamentarianRoleLayout(self, request)
 
@@ -42,9 +44,9 @@ def view_parliamentarian_role(
 )
 def edit_parliamentarian_role(
     self: ParliamentarianRole,
-    request: 'TownRequest',
+    request: TownRequest,
     form: ParliamentarianRoleForm
-) -> 'RenderData | Response':
+) -> RenderData | Response:
 
     if form.submitted(request):
         form.populate_obj(self)
@@ -72,7 +74,7 @@ def edit_parliamentarian_role(
 )
 def delete_parliamentarian_role(
     self: ParliamentarianRole,
-    request: 'TownRequest'
+    request: TownRequest
 ) -> None:
 
     request.assert_valid_csrf_token()

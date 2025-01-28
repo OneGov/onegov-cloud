@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 from io import BytesIO
 from morepath import redirect
 from morepath.request import Response
@@ -38,9 +40,9 @@ if TYPE_CHECKING:
 )
 def create_notice(
     self: GazetteNoticeCollection,
-    request: 'GazetteRequest',
+    request: GazetteRequest,
     form: NoticeForm
-) -> 'RenderData | BaseResponse':
+) -> RenderData | BaseResponse:
     """ Create a new notice.
 
     If a valid UID of a notice is given (via 'source' query parameter), its
@@ -108,8 +110,8 @@ def create_notice(
 )
 def view_notices(
     self: GazetteNoticeCollection,
-    request: 'GazetteRequest'
-) -> 'RenderData':
+    request: GazetteRequest
+) -> RenderData:
     """ View the list of notices.
 
     This view is only visible by a publisher. This (in the state 'accepted')
@@ -130,7 +132,7 @@ def view_notices(
         states.append('published')
 
     # https://kanton-zug.atlassian.net/browse/ZW-246
-    def for_state(state: 'NoticeState') -> GazetteNoticeCollection:
+    def for_state(state: NoticeState) -> GazetteNoticeCollection:
         if state == 'accepted':
             return self.for_state(state).for_order('first_issue', 'desc')
 
@@ -227,8 +229,8 @@ def view_notices(
 )
 def view_notices_statistics(
     self: GazetteNoticeCollection,
-    request: 'GazetteRequest'
-) -> 'RenderData':
+    request: GazetteRequest
+) -> RenderData:
     """ View the list of notices.
 
     This view is only visible by a publisher. This (in the state 'accepted')
@@ -277,7 +279,7 @@ def view_notices_statistics(
 )
 def view_notices_statistics_xlsx(
     self: GazetteNoticeCollection,
-    request: 'GazetteRequest'
+    request: GazetteRequest
 ) -> Response:
     """ View the statistics as XLSX. """
 
@@ -321,7 +323,7 @@ def view_notices_statistics_xlsx(
 )
 def view_notices_preview_pdf(
     self: GazetteNoticeCollection,
-    request: 'GazetteRequest'
+    request: GazetteRequest
 ) -> Response:
     """ Preview the notices as PDF.
 
@@ -352,7 +354,7 @@ def view_notices_preview_pdf(
 )
 def view_notices_index(
     self: GazetteNoticeCollection,
-    request: 'GazetteRequest'
+    request: GazetteRequest
 ) -> Response:
     """ Export the index to the notices as PDF.
 
@@ -385,9 +387,9 @@ def view_notices_index(
 )
 def view_notices_update(
     self: GazetteNoticeCollection,
-    request: 'GazetteRequest',
+    request: GazetteRequest,
     form: EmptyForm
-) -> 'RenderData | BaseResponse':
+) -> RenderData | BaseResponse:
     """ Updates all notices (of this state): Applies the categories, issues and
     organization from the meta informations. This view is not used normally
     and only intended when changing category names in the principal definition,

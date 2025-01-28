@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 from copy import deepcopy
 from onegov.core.orm import Base
 from onegov.core.orm import translation_hybrid
@@ -49,29 +51,29 @@ class ArchivedResult(Base, ContentMixin, TimestampMixin,
     __tablename__ = 'archived_results'
 
     #: Identifies the result
-    id: 'Column[uuid.UUID]' = Column(
+    id: Column[uuid.UUID] = Column(
         UUID,  # type:ignore[arg-type]
         primary_key=True,
         default=uuid4
     )
 
     #: The date of the election/vote
-    date: 'Column[datetime.date]' = Column(Date, nullable=False)
+    date: Column[datetime.date] = Column(Date, nullable=False)
 
     #: The last change of the results election/vote
-    last_modified: 'Column[datetime.datetime | None]' = Column(
+    last_modified: Column[datetime.datetime | None] = Column(
         UTCDateTime,
         nullable=True
     )
 
     #: The last change of election/vote
-    last_result_change: 'Column[datetime.datetime | None]' = Column(
+    last_result_change: Column[datetime.datetime | None] = Column(
         UTCDateTime,
         nullable=True
     )
 
     #: Type of the result
-    type: 'Column[ResultType]' = Column(
+    type: Column[ResultType] = Column(
         Enum(  # type:ignore[arg-type]
             'vote', 'election', 'election_compound',
             name='type_of_result'
@@ -80,42 +82,42 @@ class ArchivedResult(Base, ContentMixin, TimestampMixin,
     )
 
     #: Origin of the result
-    schema: 'Column[str]' = Column(Text, nullable=False)
+    schema: Column[str] = Column(Text, nullable=False)
 
     #: The name of the principal
-    name: 'Column[str]' = Column(Text, nullable=False)
+    name: Column[str] = Column(Text, nullable=False)
 
     #: Total number of political entities
-    total_entities: 'Column[int | None]' = Column(Integer, nullable=True)
+    total_entities: Column[int | None] = Column(Integer, nullable=True)
 
     #: Number of already counted political entities
-    counted_entities: 'Column[int | None]' = Column(Integer, nullable=True)
+    counted_entities: Column[int | None] = Column(Integer, nullable=True)
 
     @property
     def progress(self) -> tuple[int, int]:
         return self.counted_entities or 0, self.total_entities or 0
 
     #: Number of already counted political entities
-    has_results: 'Column[bool | None]' = Column(Boolean, nullable=True)
+    has_results: Column[bool | None] = Column(Boolean, nullable=True)
 
     #: The link to the detailed results
-    url: 'Column[str]' = Column(Text, nullable=False)
+    url: Column[str] = Column(Text, nullable=False)
 
     #: Title of the election/vote
-    title_translations: 'Column[Mapping[str, str]]' = Column(
+    title_translations: Column[Mapping[str, str]] = Column(
         HSTORE,
         nullable=False
     )
     title = translation_hybrid(title_translations)
 
-    def title_prefix(self, request: 'ElectionDayRequest') -> str:
+    def title_prefix(self, request: ElectionDayRequest) -> str:
         if self.is_fetched(request) and self.domain == 'municipality':
             return self.name or ''
 
         return ''
 
     #: Shortcode for cantons that use it
-    shortcode: 'Column[str | None]' = Column(Text, nullable=True)
+    shortcode: Column[str | None] = Column(Text, nullable=True)
 
     #: The id of the election/vote.
     external_id: dict_property[str | None] = meta_property('id')
@@ -187,7 +189,7 @@ class ArchivedResult(Base, ContentMixin, TimestampMixin,
     )
 
     @property
-    def type_class(self) -> '_type[Election | ElectionCompound | Vote]':
+    def type_class(self) -> _type[Election | ElectionCompound | Vote]:
         if self.type == 'vote':
             return Vote
         elif self.type == 'election':
@@ -196,7 +198,7 @@ class ArchivedResult(Base, ContentMixin, TimestampMixin,
             return ElectionCompound
         raise NotImplementedError
 
-    def is_fetched(self, request: 'ElectionDayRequest') -> bool:
+    def is_fetched(self, request: ElectionDayRequest) -> bool:
         """ Returns True, if this results has been fetched from another
         instance.
 
@@ -205,7 +207,7 @@ class ArchivedResult(Base, ContentMixin, TimestampMixin,
 
     def is_fetched_by_municipality(
         self,
-        request: 'ElectionDayRequest'
+        request: ElectionDayRequest
     ) -> bool:
         """ Returns True, if this results has been fetched from another
         instance by a communal instance.
@@ -216,7 +218,7 @@ class ArchivedResult(Base, ContentMixin, TimestampMixin,
             and request.app.principal.domain == 'municipality'
         )
 
-    def adjusted_url(self, request: 'ElectionDayRequest') -> str:
+    def adjusted_url(self, request: ElectionDayRequest) -> str:
         """ Returns the url adjusted to the current host. Needed if the
         instance is accessible under different hosts at the same time.
 
@@ -229,28 +231,28 @@ class ArchivedResult(Base, ContentMixin, TimestampMixin,
             {'id': self.external_id}
         )
 
-    def display_answer(self, request: 'ElectionDayRequest') -> str:
+    def display_answer(self, request: ElectionDayRequest) -> str:
         """ Returns the answer (depending on the current instance). """
 
         if self.is_fetched_by_municipality(request):
             return self.local_answer
         return self.answer
 
-    def display_nays_percentage(self, request: 'ElectionDayRequest') -> float:
+    def display_nays_percentage(self, request: ElectionDayRequest) -> float:
         """ Returns the nays rate (depending on the current instance). """
 
         if self.is_fetched_by_municipality(request):
             return self.local_nays_percentage
         return self.nays_percentage
 
-    def display_yeas_percentage(self, request: 'ElectionDayRequest') -> float:
+    def display_yeas_percentage(self, request: ElectionDayRequest) -> float:
         """ Returns the yeas rate (depending on the current instance). """
 
         if self.is_fetched_by_municipality(request):
             return self.local_yeas_percentage
         return self.yeas_percentage
 
-    def copy_from(self, source: 'Self') -> None:
+    def copy_from(self, source: Self) -> None:
         self.date = source.date
         self.last_modified = source.last_modified
         self.last_result_change = source.last_result_change

@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 from onegov.core.orm import Base
 from onegov.core.orm.mixins import TimestampMixin
 from onegov.core.orm.types import UUID
@@ -39,26 +41,26 @@ class Candidate(Base, TimestampMixin):
     __tablename__ = 'candidates'
 
     #: the internal id of the candidate
-    id: 'Column[uuid.UUID]' = Column(
+    id: Column[uuid.UUID] = Column(
         UUID,  # type:ignore[arg-type]
         primary_key=True,
         default=uuid4
     )
 
     #: the external id of the candidate
-    candidate_id: 'Column[str]' = Column(Text, nullable=False)
+    candidate_id: Column[str] = Column(Text, nullable=False)
 
     #: the family name
-    family_name: 'Column[str]' = Column(Text, nullable=False)
+    family_name: Column[str] = Column(Text, nullable=False)
 
     #: the first name
-    first_name: 'Column[str]' = Column(Text, nullable=False)
+    first_name: Column[str] = Column(Text, nullable=False)
 
     #: True if the candidate is elected
-    elected: 'Column[bool]' = Column(Boolean, nullable=False)
+    elected: Column[bool] = Column(Boolean, nullable=False)
 
     #: the gender
-    gender: 'Column[Gender | None]' = Column(
+    gender: Column[Gender | None] = Column(
         Enum(  # type:ignore[arg-type]
             'male',
             'female',
@@ -69,46 +71,46 @@ class Candidate(Base, TimestampMixin):
     )
 
     #: the year of birth
-    year_of_birth: 'Column[int | None]' = Column(Integer, nullable=True)
+    year_of_birth: Column[int | None] = Column(Integer, nullable=True)
 
     #: the election id this candidate belongs to
-    election_id: 'Column[str]' = Column(
+    election_id: Column[str] = Column(
         Text,
         ForeignKey('elections.id', onupdate='CASCADE', ondelete='CASCADE'),
         nullable=False
     )
 
     #: the election this candidate belongs to
-    election: 'relationship[Election]' = relationship(
+    election: relationship[Election] = relationship(
         'Election',
         back_populates='candidates'
     )
 
     #: the list id this candidate belongs to
-    list_id: 'Column[uuid.UUID | None]' = Column(
+    list_id: Column[uuid.UUID | None] = Column(
         UUID,  # type:ignore[arg-type]
         ForeignKey('lists.id', ondelete='CASCADE'),
         nullable=True
     )
 
     #: the list this candidate belongs to
-    list: 'relationship[List]' = relationship(
+    list: relationship[List] = relationship(
         'List',
         back_populates='candidates'
     )
 
     #: the party name
-    party: 'Column[str | None]' = Column(Text, nullable=True)
+    party: Column[str | None] = Column(Text, nullable=True)
 
     #: a candidate contains n results
-    results: 'relationship[list_t[CandidateResult]]' = relationship(
+    results: relationship[list_t[CandidateResult]] = relationship(
         'CandidateResult',
         cascade='all, delete-orphan',
         back_populates='candidate'
     )
 
     #: a (proporz) candidate contains votes from other other lists
-    panachage_results: 'relationship[list_t[CandidatePanachageResult]]'
+    panachage_results: relationship[list_t[CandidatePanachageResult]]
     panachage_results = relationship(
         'CandidatePanachageResult',
         cascade='all, delete-orphan',
@@ -126,7 +128,7 @@ class Candidate(Base, TimestampMixin):
     def aggregate_results_expression(
         cls,
         attribute: str
-    ) -> 'ColumnElement[int]':
+    ) -> ColumnElement[int]:
         """ Gets the sum of the given attribute from the results,
         as SQL expression.
 
@@ -142,7 +144,7 @@ class Candidate(Base, TimestampMixin):
         return expr.label(attribute)
 
     @property
-    def percentage_by_entity(self) -> dict[int, 'EntityPercentage']:
+    def percentage_by_entity(self) -> dict[int, EntityPercentage]:
         """ Returns the percentage of votes by the entity. Includes uncounted
         entities and entities with no results available.
 
@@ -207,7 +209,7 @@ class Candidate(Base, TimestampMixin):
         return percentage
 
     @property
-    def percentage_by_district(self) -> dict[str, 'DistrictPercentage']:
+    def percentage_by_district(self) -> dict[str, DistrictPercentage]:
         """ Returns the percentage of votes aggregated by the distict. Includes
         uncounted districts and districts with no results available.
 

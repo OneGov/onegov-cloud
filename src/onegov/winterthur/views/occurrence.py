@@ -1,4 +1,5 @@
 """ The onegov winterthur occurrence views. """
+from __future__ import annotations
 
 from morepath.request import Response
 
@@ -15,7 +16,7 @@ if TYPE_CHECKING:
 @WinterthurApp.view(model=OccurrenceCollection, name='xml', permission=Public)
 def xml_export_all_events(
     self: OccurrenceCollection,
-    request: 'WinterthurRequest'
+    request: WinterthurRequest
 ) -> Response:
     """
     Returns events as xml in Anthrazit format.

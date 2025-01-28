@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 import csv
 import os.path
 import subprocess
@@ -59,7 +61,7 @@ class DigirezDB:
                     stdout=output_file)
 
     @property
-    def records(self) -> 'RecordsAccessor':
+    def records(self) -> RecordsAccessor:
         assert self.opened and self.csv_path
         return RecordsAccessor(self.csv_path)
 
@@ -79,7 +81,7 @@ class RecordsAccessor:
 
         return self.files[name]
 
-    def __getattr__(self, name: str) -> 'Iterator[DefaultRow]':
+    def __getattr__(self, name: str) -> Iterator[DefaultRow]:
         csv_file = CSVFile(
             self.get_file(name),
             expected_headers=None,

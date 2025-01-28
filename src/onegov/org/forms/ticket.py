@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 from onegov.chat import MessageFile
 from onegov.core.security import Private
 from onegov.form import Form

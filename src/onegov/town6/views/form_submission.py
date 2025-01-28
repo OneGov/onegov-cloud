@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 from onegov.core.security import Public, Private
 from onegov.form.models.submission import SurveySubmission
 from onegov.org.views.form_submission import (handle_pending_submission,
@@ -27,8 +29,8 @@ if TYPE_CHECKING:
               permission=Private, request_method='POST')
 def town_handle_pending_submission(
     self: PendingFormSubmission | CompleteFormSubmission,
-    request: 'TownRequest'
-) -> 'RenderData | Response':
+    request: TownRequest
+) -> RenderData | Response:
     if 'title' in request.GET:
         title = request.GET['title']
     else:
@@ -44,8 +46,8 @@ def town_handle_pending_submission(
               permission=Public, request_method='POST')
 def town_handle_survey_submission(
     self: SurveySubmission,
-    request: 'TownRequest'
-) -> 'RenderData | Response':
+    request: TownRequest
+) -> RenderData | Response:
     if 'title' in request.GET:
         title = request.GET['title']
     else:
