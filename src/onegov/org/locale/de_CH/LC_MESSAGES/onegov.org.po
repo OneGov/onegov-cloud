@@ -1,7 +1,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE 1.0\n"
-"POT-Creation-Date: 2025-01-22 08:59+0100\n"
+"POT-Creation-Date: 2025-01-28 08:31+0100\n"
 "PO-Revision-Date: 2022-03-15 10:21+0100\n"
 "Last-Translator: Marc Sommerhalder <marc.sommerhalder@seantis.ch>\n"
 "Language-Team: German\n"
@@ -874,6 +874,12 @@ msgstr "Beschreibt kurz um was es bei diesem Formular geht"
 msgid "Used to group the form in the overview"
 msgstr "Dient zur Gruppierung in der Übersicht"
 
+msgid "Form Definition"
+msgstr "Formulardefinition"
+
+msgid "Link to Formcode Documentation"
+msgstr "Link zur Formcode Dokumentation"
+
 msgid "Pick-Up"
 msgstr "Abholung"
 
@@ -1034,15 +1040,6 @@ msgstr "Grosse Bilder"
 
 msgid "Grid layout"
 msgstr "Raster"
-
-msgid "By filename"
-msgstr "Nach Dateiname"
-
-msgid "By caption"
-msgstr "Nach Beschreibung"
-
-msgid "By last change"
-msgstr "Nach Zeitpunkt der letzten Änderung"
 
 msgid "Show images on homepage"
 msgstr "Bilder auf der Startseite zeigen"
@@ -2990,8 +2987,8 @@ msgstr "Die Absage von ${title} kann nicht rückgängig gemacht werden."
 msgid "Reject reservation"
 msgstr "Reservation absagen"
 
-#.
 #. Used in sentence: "${event} published."
+#.
 msgid "Event"
 msgstr "Veranstaltung"
 
@@ -5211,6 +5208,9 @@ msgstr "${address} wurde erfolgreich abgemeldet"
 msgid "${address} could not be unsubscribed, wrong token"
 msgstr "${address} konnte nicht abgemeldet werden - falsches Token"
 
+msgid "A form with this name already exists"
+msgstr "Ein Formular mit diesem Namen existiert bereits"
+
 msgid "Added a new form"
 msgstr "Ein neues Formular wurd hinzugefügt"
 
@@ -5353,9 +5353,6 @@ msgstr "Es ist noch ein Platz verfügbar"
 #, python-format
 msgid "There are ${count} spots left"
 msgstr "Es sind noch ${count} Plätze verfügbar"
-
-msgid "A form with this name already exists"
-msgstr "Ein Formular mit diesem Namen existiert bereits"
 
 msgid "New Form"
 msgstr "Neues Formular"
