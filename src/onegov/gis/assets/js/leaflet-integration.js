@@ -457,7 +457,7 @@ function spawnDefaultMap(target, options, cb) {
 }
 
 function spawnMap(element, lat, lon, zoom, includeZoomControls, cb) {
-
+    console.log('spawnMap');
     var $el = $(element);
 
     // the height is calculated form the width using the golden ratio
@@ -473,19 +473,46 @@ function spawnMap(element, lat, lon, zoom, includeZoomControls, cb) {
     };
 
     spawnDefaultMap(element[0], options, function(map) {
+        console.log('Default map spawned');
         map.setView([lat, lon], zoom);
+
+        // Add a div that will catch all events
+        var blocker = L.DomUtil.create('div', 'map-event-blocker');
+        blocker.style.position = 'absolute';
+        blocker.style.top = '0';
+        blocker.style.left = '0';
+        blocker.style.right = '0';
+        blocker.style.bottom = '0';
+        blocker.style.zIndex = '1000';
+        map.getContainer().appendChild(blocker);
+
+        // Remove blocker on first click
+        L.DomEvent.on(blocker, 'click', function(e) {
+            console.log('Removing blocker');
+            blocker.remove();
+            L.DomEvent.stopPropagation(e);
+        });
+
+        // Block all events on the blocker
+        L.DomEvent
+            .on(blocker, 'mousewheel', L.DomEvent.stopPropagation)
+            .on(blocker, 'wheel', L.DomEvent.stopPropagation)
+            .on(blocker, 'mousedown', L.DomEvent.stopPropagation)
+            .on(blocker, 'touchstart', L.DomEvent.stopPropagation)
+            .on(blocker, 'dblclick', L.DomEvent.stopPropagation)
+            .on(blocker, 'contextmenu', L.DomEvent.stopPropagation);
+
+        // remove leaflet link - we don't advertise other open source projects
+        // we depend on as visibly either
+        map.attributionControl.setPrefix('');
+        console.log('spawnDefaultMap');
 
         if (typeof includeZoomControls === 'undefined' || includeZoomControls) {
             new L.Control.Zoom({position: 'topright'}).addTo(map);
         }
 
-        // remove leaflet link - we don't advertise other open source projects
-        // we depend on as visibly either
-        map.attributionControl.setPrefix('');
-
         map.on('load', function() {
             var container = $(map._container);
-
             // buttons inside the map lead to form-submit if not prevented form it
             container.find('button').on('click', function(e) {
                 e.preventDefault();
@@ -494,7 +521,6 @@ function spawnMap(element, lat, lon, zoom, includeZoomControls, cb) {
 
         document.leafletmaps = document.leafletmaps || [];
         document.leafletmaps.push(map);
-
         cb(map);
     });
 }
