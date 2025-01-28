@@ -484,12 +484,41 @@ function spawnMap(element, lat, lon, zoom, includeZoomControls, cb) {
         blocker.style.right = '0';
         blocker.style.bottom = '0';
         blocker.style.zIndex = '1000';
+        blocker.style.backgroundColor = 'rgba(0, 0, 0, 0.1)';
+        blocker.style.cursor = 'pointer';
+        blocker.style.display = 'flex';
+        blocker.style.alignItems = 'center';
+        blocker.style.justifyContent = 'center';
+
+        // Add message container
+        var message = L.DomUtil.create('div', 'map-click-message');
+        message.innerHTML = 'Klicken, um die Karte zu aktivieren';
+        message.style.backgroundColor = 'white';
+        message.style.padding = '8px 16px';
+        message.style.borderRadius = '4px';
+        message.style.boxShadow = '0 2px 4px rgba(0,0,0,0.2)';
+        message.style.fontSize = '14px';
+        message.style.transition = 'opacity 0.2s';
+
+        blocker.appendChild(message);
         map.getContainer().appendChild(blocker);
 
-        // Remove blocker on first click
+        // Fade out message on hover
+        blocker.addEventListener('mouseover', function() {
+            message.style.opacity = '0.5';
+        });
+        blocker.addEventListener('mouseout', function() {
+            message.style.opacity = '1';
+        });
+
+        // Remove blocker on first click with a nice fade effect
         L.DomEvent.on(blocker, 'click', function(e) {
             console.log('Removing blocker');
-            blocker.remove();
+            blocker.style.transition = 'opacity 0.2s';
+            blocker.style.opacity = '0';
+            setTimeout(function() {
+                blocker.remove();
+            }, 200);
             L.DomEvent.stopPropagation(e);
         });
 
