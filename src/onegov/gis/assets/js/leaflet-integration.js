@@ -457,7 +457,6 @@ function spawnDefaultMap(target, options, cb) {
 }
 
 function spawnMap(element, lat, lon, zoom, includeZoomControls, cb) {
-    console.log('spawnMap');
     let $el = $(element);
 
     let lang = getLanguage();
@@ -489,10 +488,14 @@ function spawnMap(element, lat, lon, zoom, includeZoomControls, cb) {
     };
 
     spawnDefaultMap(element[0], options, function(map) {
-        console.log('Default map spawned');
         map.setView([lat, lon], zoom);
 
         function addBlocker() {
+            const isOnEditPage = window.location.href.endsWith('+edit');
+            if (!isOnEditPage) {
+                return;
+            }
+
             // Add a blocker to prevent interaction with the map until clicked
             const blocker = L.DomUtil.create('div', 'map-event-blocker');
             blocker.style.position = 'absolute';
@@ -549,7 +552,6 @@ function spawnMap(element, lat, lon, zoom, includeZoomControls, cb) {
         // remove leaflet link - we don't advertise other open source projects
         // we depend on as visibly either
         map.attributionControl.setPrefix('');
-        console.log('spawnDefaultMap');
 
         if (typeof includeZoomControls === 'undefined' || includeZoomControls) {
             new L.Control.Zoom({position: 'topright'}).addTo(map);
