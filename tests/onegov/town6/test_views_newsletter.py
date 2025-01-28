@@ -860,70 +860,76 @@ def test_newsletter_test_delivery(client):
 
 
 def test_import_export_subscribers(client):
-    session = client.app.session()
-    client.login_admin()
+    with freeze_time("2018-05-31 12:00"):
+        session = client.app.session()
+        client.login_admin()
 
-    # add a newsletter
-    newsletters = client.get('/newsletters')
-    new_link = find_link_by_href_end(newsletters, '/newsletters/new')
-    new = newsletters.click(href=new_link['href'])
-    new.form['title'] = "Our town is AWESOME"
-    new.form['lead'] = "Like many of you, I just love our town..."
+        # add a newsletter
+        newsletters = client.get('/newsletters')
+        new_link = find_link_by_href_end(newsletters, '/newsletters/new')
+        new = newsletters.click(href=new_link['href'])
+        new.form['title'] = "Our town is AWESOME"
+        new.form['lead'] = "Like many of you, I just love our town..."
 
-    new.select_checkbox("news", "Willkommen bei OneGov")
-    new.select_checkbox("occurrences", "150 Jahre Govikon")
+        new.select_checkbox("news", "Willkommen bei OneGov")
+        new.select_checkbox("occurrences", "150 Jahre Govikon")
 
-    new.form.submit().follow()
+        new.form.submit().follow()
 
-    # add some recipients the quick way
-    recipients = RecipientCollection(session)
-    recipients.add('one@example.org', confirmed=True)
-    recipients.add('two@example.org', confirmed=True)
+        # add some recipients the quick way
+        recipients = RecipientCollection(session)
+        recipients.add('one@example.org', confirmed=True)
+        recipients.add('two@example.org', confirmed=True)
 
-    transaction.commit()
+        transaction.commit()
 
-    # perform export
-    page = client.get('/subscribers/export-newsletter-recipients')
-    page.form['file_format'] = 'xlsx'
+        # perform export
+        page = client.get('/subscribers/export-newsletter-recipients')
+        page.form['file_format'] = 'xlsx'
 
-    response = page.form.submit()
+        response = page.form.submit()
 
-    wb = load_workbook(BytesIO(response.body), data_only=True)
-    sheet = tuple(wb[wb.sheetnames[0]].rows)
-    assert sheet[0][0].value == 'Adresse'
-    assert sheet[1][0].value == 'one@example.org'
-    assert sheet[2][0].value == 'two@example.org'
+        wb = load_workbook(BytesIO(response.body), data_only=True)
+        sheet = tuple(wb[wb.sheetnames[0]].rows)
+        assert sheet[0][0].value == 'Adresse'
+        assert sheet[1][0].value == 'one@example.org'
+        assert sheet[2][0].value == 'two@example.org'
 
-    page.form['file_format'] = 'json'
-    response = page.form.submit().json
-    assert response == [
-        {'Adresse': 'one@example.org', 'Bestätigt': True},
-        {'Adresse': 'two@example.org', 'Bestätigt': True},
-    ]
+        page.form['file_format'] = 'json'
+        response = page.form.submit().json
+        assert response == [
+            {'Adresse': 'one@example.org',
+             'Abonniert am': '2018-05-31T12:00:00+00:00'},
+            {'Adresse': 'two@example.org',
+             'Abonniert am': '2018-05-31T12:00:00+00:00'},
+        ]
 
-    page.form['file_format'] = 'xlsx'
+        page.form['file_format'] = 'xlsx'
 
-    more_recipients = [
-        {'Adresse': 'three@example.org', 'Bestätigt': True},
-        {'Adresse': 'four@example.org', 'Bestätigt': False},
-    ]
-    file = Upload(
-        'file',
-        convert_list_of_dicts_to_xlsx(more_recipients),
-        'application/vnd.openxmlformats-' 'officedocument.spreadsheetml.sheet',
-    )
+        more_recipients = [
+            {'Adresse': 'three@example.org',
+             'Abonniert am': '2018-05-31T12:00:00+00:00'},
+            {'Adresse': 'four@example.org',
+             'Abonniert am': '2018-05-31T12:00:00+00:00'},
+        ]
+        file = Upload(
+            'file',
+            convert_list_of_dicts_to_xlsx(more_recipients),
+            'application/vnd.openxmlformats-'
+            'officedocument.spreadsheetml.sheet',
+        )
 
-    # Import (Dry run)
-    page = client.get('/subscribers/import-newsletter-recipients')
-    page.form['dry_run'] = True
-    page.form['file'] = file
-    page = page.form.submit()
-    assert "Importvorschau: Imported: 2" in page
+        # Import (Dry run)
+        page = client.get('/subscribers/import-newsletter-recipients')
+        page.form['dry_run'] = True
+        page.form['file'] = file
+        page = page.form.submit()
+        assert "Importvorschau: Imported: 2" in page
 
-    # Import
-    page = client.get('/subscribers/import-newsletter-recipients')
-    page.form['dry_run'] = False
-    page.form['file'] = file
-    page = page.form.submit().follow()
-    assert "Import abgeschlossen: Imported: 2" in page
-    assert recipients.query().count() == 4
+        # Import
+        page = client.get('/subscribers/import-newsletter-recipients')
+        page.form['dry_run'] = False
+        page.form['file'] = file
+        page = page.form.submit().follow()
+        assert "Import abgeschlossen: Imported: 2" in page
+        assert recipients.query().count() == 4
