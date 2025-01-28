@@ -2,7 +2,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: \n"
-"POT-Creation-Date: 2025-01-28 08:31+0100\n"
+"POT-Creation-Date: 2025-01-28 17:16+0100\n"
 "PO-Revision-Date: 2022-03-15 10:52+0100\n"
 "Last-Translator: \n"
 "Language-Team: \n"
@@ -2802,22 +2802,22 @@ msgid "Sidebar links"
 msgstr "Collegamenti della barra laterale"
 
 msgid "Contact link"
-msgstr ""
+msgstr "Link di contatto"
 
 msgid "Sidebar contact"
-msgstr ""
+msgstr "Contatto laterale"
 
 msgid "Please provide a URL if contact link text is set"
-msgstr ""
+msgstr "Si prega di fornire un URL se il testo del link di contatto è impostato"
 
 msgid "Please provide link text if contact URL is set"
-msgstr ""
+msgstr "Fornire il testo del link se l'URL di contatto è impostato"
 
 msgid "Contact Text"
-msgstr ""
+msgstr "Testo di contatto"
 
 msgid "Contact URL"
-msgstr ""
+msgstr "URL di contatto"
 
 msgid "Delete content when expired"
 msgstr "Eliminare il contenuto quando è scaduto"
@@ -2829,9 +2829,6 @@ msgstr ""
 
 msgid "Delete content"
 msgstr "Cancellare il contenuto"
-
-msgid "Photo album. Will be shown at the end of content."
-msgstr "Album fotografico. Sarà mostrato alla fine del contenuto."
 
 msgid "Photo album"
 msgstr "Album fotografico"
@@ -4468,6 +4465,15 @@ msgstr "Rilascia i file per verificarli"
 
 msgid "No subscribers yet"
 msgstr "Non ci sono ancora abbonati"
+
+msgid ""
+"This recipient has delivery failures, including hard bounces, invalid email "
+"addresses, spam complaints, manual deactivations, or being blocked. We "
+"recommend unsubscribing it from the list."
+msgstr ""
+"Questo destinatario presenta errori di consegna, tra cui rimbalzi, indirizzi "
+"e-mail non validi, reclami per spam, disattivazioni manuali o blocco. Si "
+"consiglia di cancellarlo dall'elenco."
 
 msgid "submitted"
 msgstr "inviato"
@@ -6258,9 +6264,3 @@ msgstr "È stato creato un account per te"
 
 msgid "The user was created successfully"
 msgstr "Utente creato correttamente"
-
-msgid "This recipient has delivery failures, including hard bounces, invalid email addresses, spam complaints, manual deactivations, or being blocked. We recommend unsubscribing it from the list."
-msgstr "Questo destinatario presenta errori di consegna, tra cui rimbalzi, indirizzi e-mail non validi, reclami per spam, disattivazioni manuali o blocco. Si consiglia di cancellarlo dall'elenco."
-
-#~ msgid "Photo album. Will be shown at the end of content."
-#~ msgstr "Album fotografico. Sarà mostrato alla fine del contenuto."

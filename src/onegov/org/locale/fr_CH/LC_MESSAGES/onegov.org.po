@@ -2,7 +2,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE 1.0\n"
-"POT-Creation-Date: 2025-01-28 08:31+0100\n"
+"POT-Creation-Date: 2025-01-28 17:16+0100\n"
 "PO-Revision-Date: 2022-03-15 10:50+0100\n"
 "Last-Translator: Marc Sommerhalder <marc.sommerhalder@seantis.ch>\n"
 "Language-Team: French\n"
@@ -2796,22 +2796,22 @@ msgid "Sidebar links"
 msgstr "Liens dans la barre latérale"
 
 msgid "Contact link"
-msgstr ""
+msgstr "Lien de contact"
 
 msgid "Sidebar contact"
-msgstr ""
+msgstr "Contact dans la barre latérale"
 
 msgid "Please provide a URL if contact link text is set"
-msgstr ""
+msgstr "Veuillez fournir une URL si le texte du lien de contact est défini"
 
 msgid "Please provide link text if contact URL is set"
-msgstr ""
+msgstr "Veuillez indiquer le texte du lien si l'URL de contact est définie"
 
 msgid "Contact Text"
-msgstr ""
+msgstr "Lien de contact"
 
 msgid "Contact URL"
-msgstr ""
+msgstr "URL de contact"
 
 msgid "Delete content when expired"
 msgstr "Supprimer le contenu lorsqu'il est expiré"
@@ -2822,9 +2822,6 @@ msgstr ""
 
 msgid "Delete content"
 msgstr "Supprimer le contenu"
-
-msgid "Photo album. Will be shown at the end of content."
-msgstr "Album photo. Sera affiché à la fin du contenu."
 
 msgid "Photo album"
 msgstr "Album photo"
@@ -4478,6 +4475,15 @@ msgstr "Déposez les fichiers pour les vérifier"
 
 msgid "No subscribers yet"
 msgstr "Pas encore d'abonnés"
+
+msgid ""
+"This recipient has delivery failures, including hard bounces, invalid email "
+"addresses, spam complaints, manual deactivations, or being blocked. We "
+"recommend unsubscribing it from the list."
+msgstr ""
+"Ce destinataire a des échecs de livraison, y compris des rebonds, des "
+"adresses e-mail invalides, des plaintes pour spam, des désactivations "
+"manuelles, ou est bloqué. Nous recommandons de le désinscrire de la liste."
 
 msgid "submitted"
 msgstr "soumis"
@@ -6270,9 +6276,3 @@ msgstr "Un compte a été créé pour vous"
 
 msgid "The user was created successfully"
 msgstr "L'utilisateur a bien été créé"
-
-msgid "This recipient has delivery failures, including hard bounces, invalid email addresses, spam complaints, manual deactivations, or being blocked. We recommend unsubscribing it from the list."
-msgstr "Ce destinataire a des échecs de livraison, y compris des rebonds, des adresses e-mail invalides, des plaintes pour spam, des désactivations manuelles, ou est bloqué. Nous recommandons de le désinscrire de la liste."
-
-#~ msgid "Photo album. Will be shown at the end of content."
-#~ msgstr "Album photo. Sera affiché à la fin du contenu."
