@@ -3210,7 +3210,11 @@ def test_view_dashboard(client, scenario):
     client.login_admin()
 
     page = client.get('/dashboard')
-    assert "1 Angebote" in page
-    assert "2 Durchführungen" in page
-    assert "1 unbelegt" in page
-    assert "1 durchführbar" in page
+    assert page.pyquery('.activities .facts tr:first-child').text(
+        ) == "1\nAngebote"
+    assert page.pyquery('.activities .facts tr:nth-child(2)').text(
+        ) == "2\nDurchführungen"
+    assert page.pyquery('.activities .facts tr:nth-child(5)').text(
+        ) == "1\ndurchführbar"
+    assert page.pyquery('.activities .facts tr:nth-child(7)').text(
+        ) == "1\nunbelegt"
