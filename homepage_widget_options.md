@@ -82,7 +82,8 @@ The images for the slider are defined via photoalbums. You can find the "show on
     <autoplay_video
         max-height="100vh"
         text="Text on video"
-        text_link="https://..."
+        button_url="https://..."
+        button_text="Button Text"
         link_mp4="/storage/..."
         link_mp4_low_res="/storage/..."
         link_webm="/storage/..."
@@ -93,7 +94,8 @@ The images for the slider are defined via photoalbums. You can find the "show on
 | ------------- | ------------------------------------------ | ------------------- | ---------------------- |
 | `max-height` | The *maximum* height of the video. Can for example be used for fullscreen videos on desktop. The video will center itself in the available space. | Video height                  | 30vw, 40vh, 100px, ... |
 | `text`       | Text to be shown atop of the video | -                   | Any text         |
-| `text_link`       | Turns the text into a linked button | -                   | https://...         |
+| `button_url`       | Adds a button linked to the url | -                   | https://...         |
+| `button_text`       | Text used as the label of the button. Button only appears if there is a button_url. | "Show more"                   | Any text         |
 | `link_mp4_low_res`  | Link to the video in the mp4 format with reduced size uploaded in the files-section. Will be shown for mobile devices instead of the full sized video. | -                   | /storage/...         |
 | `link_mp4`       | Link to the full sized video in the mp4 format uploaded in the files-section. Will be shown for desktop and mobile, if no smaller size is available. | -                   | /storage/...         |
 | `link_webm_low_res`  | Link to the video in the webm format with reduced size uploaded in the files-section. Will be shown for mobile devices instead of the full sized video. | -                   | /storage/...         |
