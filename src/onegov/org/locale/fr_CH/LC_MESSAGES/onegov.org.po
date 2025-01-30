@@ -2,7 +2,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE 1.0\n"
-"POT-Creation-Date: 2025-01-28 08:31+0100\n"
+"POT-Creation-Date: 2025-01-27 16:09+0100\n"
 "PO-Revision-Date: 2022-03-15 10:50+0100\n"
 "Last-Translator: Marc Sommerhalder <marc.sommerhalder@seantis.ch>\n"
 "Language-Team: French\n"
@@ -1116,6 +1116,9 @@ msgstr "Destinataire"
 
 msgid "Do not actually import the newsletter subscribers"
 msgstr "Ne pas importer les abonnés à la newsletter"
+
+msgid "Subscribed on"
+msgstr "Abonné le"
 
 msgid "Will be used as image in the page overview on the parent page"
 msgstr "Sera utilisé comme image dans la vue d'ensemble de la page parent"
