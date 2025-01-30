@@ -73,8 +73,9 @@ class EventApiEndpoint(
 
     def item_links(self, item: Occurrence) -> dict[str, Any]:
         return {
+            'self': item,
             'image': item.event.image,
-            'pfd': item.event.pdf
+            'pfd': item.event.pdf,
         }
 
 
@@ -117,5 +118,6 @@ class NewsApiEndpoint(
 
     def item_links(self, item: News) -> dict[str, Any]:
         return {
+            'self': item,
             'image': item.page_image,
         }
