@@ -9,7 +9,7 @@
             The user with the address <strong i18n:name="address">${address}</strong> just unsubscribed from the newsletter subscriber list.
         </p>
 
-        <p i18n:translate>
+        <p>
             <span i18n:translate>Have a great day!</span>
         </p>
     </tal:b>
