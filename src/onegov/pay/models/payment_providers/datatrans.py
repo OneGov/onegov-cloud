@@ -220,11 +220,10 @@ class DatatransSettleManager:
         # make sure the transaction is still alive
         tx = self.client.status(self.tx.transaction_id)
         # make sure nothing weird happened
-        assert tx.type == 'payment'
-        assert tx.status == 'authorized'
+        tx.raise_if_cannot_be_settled()
+        assert tx.merchant_id == self.client.merchant_id
         assert tx.refno == self.tx.refno
         assert tx.currency == self.tx.currency
-        assert tx.amount == self.tx.amount
 
     def tpc_finish(self, transaction: ITransaction) -> None:
         try:
