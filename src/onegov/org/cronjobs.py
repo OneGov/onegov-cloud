@@ -147,7 +147,8 @@ def handle_publication_models(request: OrgRequest) -> None:
             request.app.es_orm_events.index(request.app.schema, obj)
 
         if (isinstance(obj, ExtendedDirectoryEntry) and obj.published and
-                obj.directory.enable_update_notifications):
+                obj.directory.enable_update_notifications and obj.access in
+                ('public', 'mtan')):
             send_email_notification_for_directory_entry(
                 obj.directory, obj, request)
 
