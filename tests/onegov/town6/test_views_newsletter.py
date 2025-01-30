@@ -880,6 +880,8 @@ def test_import_export_subscribers(client):
         recipients = RecipientCollection(session)
         recipients.add('one@example.org', confirmed=True)
         recipients.add('two@example.org', confirmed=True)
+        # this recipient will not show up because they are unconfirmed
+        recipients.add('xxx@example.org', confirmed=False)
 
         transaction.commit()
 
@@ -932,4 +934,5 @@ def test_import_export_subscribers(client):
         page.form['file'] = file
         page = page.form.submit().follow()
         assert "Import abgeschlossen: Imported: 2" in page
-        assert recipients.query().count() == 4
+        assert recipients.query().count() == 5
+        assert recipients.query().filter_by(confirmed=True).count() == 4
