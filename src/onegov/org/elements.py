@@ -147,6 +147,9 @@ class Link(_Base):
 
         return Markup(tostring(a, encoding=str))  # noqa: RUF035
 
+    def __repr__(self) -> str:
+        return f'<Link {self.text}>'
+
 
 class QrCodeLink(BaseLink):
     """ Implements a qr code link that shows a modal with the QrCode.
