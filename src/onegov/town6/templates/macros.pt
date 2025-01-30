@@ -711,7 +711,7 @@
 </metal:empty_lead_hint>
 
 <metal:page_content define-macro="page_content_sidebar" i18n:domain="onegov.town6">
-    <div class="small-12 medium-4 cell sidebar medium-offset-1 ${'filter-panel' if filter_panel else ''}" tal:condition="people or contact or coordinates or files or show_side_panel or more_entries|False or sidepanel_links|False" tal:define="files files|None; highlight_contacts highlight_contacts|True; filter_panel filter_panel|False">
+    <div class="small-12 medium-4 cell sidebar medium-offset-1 ${'filter-panel' if filter_panel else ''}" tal:condition="people or contact or coordinates or files or show_side_panel or more_entries|False or sidepanel_links|False" tal:define="files files|None; highlight_contacts highlight_contacts|True; filter_panel filter_panel|False; sidepanel_contact page.sidepanel_contact|None;">
         <div class="sidebar-wrapper">
             <div metal:define-slot="before-panels"></div>
             <div tal:define="hide page.hide_contact|hide_contact|False" class="side-panel contact-panel" tal:condition="not hide and contact or coordinates or location">
