@@ -350,6 +350,18 @@ class CoreRequest(IncludeRequest, ContentSecurityRequest, ReturnToMixin):
 
         return self.link(self.app.modules.theme.ThemeFile(filename))
 
+    def get_session_nonce(self) -> str:
+        """ Returns a nonce that can be passed as a POST parameter
+        to restore a session in a context where the session cookie
+        is unavailable, due to `SameSite=Lax`.
+        """
+        nonce = random_token()
+        self.app.cache.set(
+            nonce,
+            self.app.sign(self.browser_session._token),
+        )
+        return nonce
+
     @cached_property
     def browser_session(self) -> BrowserSession:
         """ Returns a browser_session bound to the request. Works via cookies,
@@ -376,6 +388,19 @@ class CoreRequest(IncludeRequest, ContentSecurityRequest, ReturnToMixin):
                 #       until we delete the cookie manually and will get
                 #       infinite CSRF errors
                 del self.cookies['session_id']
+                session_id = random_token()
+
+        elif isinstance(nonce := self.POST.get('session_nonce'), str):
+            # restore the session in a non SameSite context
+            signed_session_id = self.app.cache.get(nonce)
+            if signed_session_id:
+                # make sure this nonce can't be reused
+                self.app.cache.delete(nonce)
+                session_id = self.app.unsign(signed_session_id)
+            else:
+                session_id = None
+
+            if session_id is None:
                 session_id = random_token()
         else:
             session_id = random_token()

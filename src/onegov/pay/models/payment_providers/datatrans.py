@@ -7,6 +7,7 @@ from decimal import Decimal
 from functools import cached_property
 from markupsafe import Markup
 from onegov.core.orm.mixins import dict_property, meta_property
+from onegov.core.utils import append_query_param
 from onegov.pay import log
 from onegov.pay.errors import DatatransPaymentError, DatatransApiError
 from onegov.pay.models.payment import Payment
@@ -502,6 +503,12 @@ class DatatransProvider(PaymentProvider[DatatransPayment]):
         extra_params = {}
         if locale := request.locale:
             extra_params['language'] = locale.split('_')[0]
+
+        complete_url = append_query_param(
+            complete_url,
+            'session_nonce',
+            request.get_session_nonce()
+        )
 
         transaction_id = self.client.init(
             amount=amount,
