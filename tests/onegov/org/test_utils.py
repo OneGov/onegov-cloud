@@ -266,7 +266,7 @@ def test_extract_categories_and_subcategories():
     assert result == ([], [])
     result = utils.extract_categories_and_subcategories(
         {}, flattened=True)
-    assert result == []
+    assert result == ([], [])
 
     categories = {
         'Org': ['Category 1', 'Category 2'],

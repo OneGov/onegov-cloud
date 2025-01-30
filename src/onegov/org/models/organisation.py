@@ -214,6 +214,7 @@ class Organisation(Base, TimestampMixin):
     newsletter_categories: (
         dict_property)[dict[str, list[dict[str, list[str]] | str]]] = (
         meta_property(default=dict))
+    notify_on_unsubscription: dict_property[list[str] | None] = meta_property()
 
     # Chat Settings
     chat_staff: dict_property[list[str] | None] = meta_property()
