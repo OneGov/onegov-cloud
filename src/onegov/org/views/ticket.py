@@ -136,8 +136,8 @@ def view_ticket(
                 request.link(payment, name='change-net-amount')
             )
 
-    if payment and payment.source == 'stripe_connect':
-        payment_button = stripe_payment_button(payment, layout)
+    if payment and payment.source in ('stripe_connect', 'datatrans'):
+        payment_button = online_payment_button(payment, layout)
 
     return {
         'title': self.number,
@@ -247,7 +247,7 @@ def manual_payment_button(
 
 
 # FIXME: same here as for manual_payment_button
-def stripe_payment_button(
+def online_payment_button(
     payment: Payment,
     layout: Layout
 ) -> Link | None:
