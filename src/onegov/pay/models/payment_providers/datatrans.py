@@ -299,9 +299,9 @@ class DatatransPayment(Payment):
     @property
     def remote_url(self) -> str:
         if self.provider.livemode:
-            base = 'https://admin.datatrans.com/{}'
+            base = 'https://admin.datatrans.com/TrDetail.jsp?tid={}'
         else:
-            base = 'https://admin.sandbox.datatrans.com/{}'
+            base = 'https://admin.sandbox.datatrans.com/TrDetail.jsp?tid={}'
 
         return base.format(self.remote_id)
 
