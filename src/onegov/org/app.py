@@ -354,7 +354,8 @@ class OrgApp(Framework, LibresIntegration, ElasticsearchApp, MapboxApp,
         title: str,
         price: Price | None,
         email: str,
-        locale: str
+        complete_url: str,
+        request: OrgRequest
     ) -> str | None:
         provider = self.default_payment_provider
 
@@ -377,10 +378,8 @@ class OrgApp(Framework, LibresIntegration, ElasticsearchApp, MapboxApp,
             email=email,
             name=self.org.name,
             description=title,
-            locale=locale.split('_')[0],
-            # FIXME: This seems Stripe specific, so it should probably be
-            #        built into that payment provider
-            allowRememberMe='false',
+            complete_url=complete_url,
+            request=request,
             **extra
         )
 
@@ -485,6 +484,8 @@ def org_content_security_policy() -> ContentSecurityPolicy:
     policy.child_src.add('https://*.vimeo.com')
     policy.child_src.add('https://*.infomaniak.com')
     policy.child_src.add('https://checkout.stripe.com')
+    policy.child_src.add('https://pay.datatrans.com')
+    policy.child_src.add('https://pay.sandbox.datatrans.com')
 
     policy.connect_src.add(SELF)
     policy.connect_src.add('https://checkout.stripe.com')

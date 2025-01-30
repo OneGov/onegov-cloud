@@ -3,9 +3,11 @@ from __future__ import annotations
 from onegov.activity import InvoiceCollection, InvoiceItem
 from onegov.core.security import Private
 from onegov.feriennet import FeriennetApp
-from onegov.pay import Payment, PaymentProviderCollection
+from onegov.pay import PaymentProviderCollection
+from onegov.pay.models.payment_providers.datatrans import DatatransPayment
+from onegov.pay.models.payment_providers.stripe import StripePayment
 from onegov.org.views.payment_provider import sync_payments
-from onegov.org.views.payment import refund
+from onegov.org.views.payment import refund_datatrans, refund_stripe
 
 
 from typing import TYPE_CHECKING
@@ -40,13 +42,34 @@ def sync_payments_and_reconcile(
 
 
 @FeriennetApp.view(
-    model=Payment,
+    model=StripePayment,
     name='refund',
     request_method='POST',
     permission=Private)
-def refund_and_reconcile(self: Payment, request: FeriennetRequest) -> None:
-    result = refund(self, request)
+def refund_and_reconcile_stripe(
+    self: StripePayment,
+    request: FeriennetRequest
+) -> None:
 
+    result = refund_stripe(self, request)
+    for link in self.links:
+        if isinstance(link, InvoiceItem):
+            link.paid = self.state == 'paid'
+
+    return result
+
+
+@FeriennetApp.view(
+    model=DatatransPayment,
+    name='refund',
+    request_method='POST',
+    permission=Private)
+def refund_and_reconcile_datatrans(
+    self: DatatransPayment,
+    request: FeriennetRequest
+) -> None:
+
+    result = refund_datatrans(self, request)
     for link in self.links:
         if isinstance(link, InvoiceItem):
             link.paid = self.state == 'paid'

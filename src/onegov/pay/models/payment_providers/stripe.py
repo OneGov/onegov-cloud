@@ -21,6 +21,7 @@ from uuid import UUID, uuid4, uuid5
 from typing import Any, TypeVar, TYPE_CHECKING
 if TYPE_CHECKING:
     from collections.abc import Collection, Callable, Iterator, Mapping
+    from onegov.core.request import CoreRequest
     from onegov.pay.types import FeePolicy
     from sqlalchemy.orm import relationship, Query, Session
     from transaction.interfaces import ITransaction
@@ -324,12 +325,20 @@ class StripeConnect(PaymentProvider[StripePayment]):
 
         return payment
 
+    def get_token(self, request: CoreRequest) -> str | None:
+        """ Extracts this provider's specific token from the request. """
+        token = request.params.get('payment_token')
+        if not isinstance(token, str):
+            return None
+        return token
+
     def checkout_button(
         self,
         label: str,
         amount: Decimal | None,
         currency: str | None,
-        action: str = 'submit',
+        complete_url: str,
+        request: CoreRequest,
         **extra: Any
     ) -> Markup:
         """ Generates the html for the checkout button. """
@@ -343,12 +352,15 @@ class StripeConnect(PaymentProvider[StripePayment]):
         extra['amount'] = round(amount * 100, 0)
         extra['currency'] = currency
         extra['key'] = self.publishable_key
+        extra['allowRememberMe'] = 'false'
+        if request.locale:
+            extra['locale'] = request.locale.split('_')[0]
 
         attrs = {
             f'data-stripe-{key}': str(value)
             for key, value in extra.items()
         }
-        attrs['data-action'] = action
+        attrs['data-action'] = 'submit'
 
         return Markup("""
             <input type="hidden" name="payment_token" id="{target}">

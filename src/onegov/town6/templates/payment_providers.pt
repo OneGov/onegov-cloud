@@ -27,6 +27,12 @@
                 </div>
                 <div>
                     <tal:b switch="provider.type">
+                        <tal:b case="'datatrans'">
+                            <span i18n:translate>Fee:</span>
+                            <span>
+                                ${'{:.02f}'.format(provider.fee_policy.fixed)}
+                            </span>
+                        </tal:b>
                         <tal:b case="'stripe_connect'">
                             <span i18n:translate>Fee:</span>
                             <span>

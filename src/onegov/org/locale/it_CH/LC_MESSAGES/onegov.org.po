@@ -2,7 +2,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: \n"
-"POT-Creation-Date: 2025-01-28 08:31+0100\n"
+"POT-Creation-Date: 2025-01-30 15:51+0100\n"
 "PO-Revision-Date: 2022-03-15 10:52+0100\n"
 "Last-Translator: \n"
 "Language-Team: \n"
@@ -1932,6 +1932,16 @@ msgstr ""
 "   - Sottotema 3.1\n"
 "```"
 
+msgid "Notify on newsletter unsubscription"
+msgstr "Notifica di annullamento dell'iscrizione alla newsletter"
+
+msgid ""
+"Send an email notification to the following users when a recipient "
+"unsubscribes from the newsletter"
+msgstr ""
+"Inviare una notifica via e-mail ai seguenti utenti quando un destinatario si "
+"cancella dalla newsletter"
+
 msgid "Invalid YAML format. Please refer to the example."
 msgstr "Formato YAML non valido. Fare riferimento all'esempio."
 
@@ -2604,6 +2614,9 @@ msgstr "Esportazioni"
 msgid "Payment Providers"
 msgstr "Provider di servizi di pagamento"
 
+msgid "Datatrans"
+msgstr "Datatrans"
+
 msgid "Synchronise"
 msgstr "Sincronizza"
 
@@ -2812,9 +2825,6 @@ msgstr ""
 msgid "Delete content"
 msgstr "Cancellare il contenuto"
 
-msgid "Photo album. Will be shown at the end of content."
-msgstr "Album fotografico. Sarà mostrato alla fine del contenuto."
-
 msgid "Photo album"
 msgstr "Album fotografico"
 
@@ -2993,8 +3003,8 @@ msgstr "Il rifiuto di ${title} non può essere annullato."
 msgid "Reject reservation"
 msgstr "Rifiuta prenotazione"
 
-#. Used in sentence: "${event} published."
 #.
+#. Used in sentence: "${event} published."
 msgid "Event"
 msgstr "Evento"
 
@@ -3848,20 +3858,6 @@ msgstr "Nessuna prenotazione oggi."
 msgid "Have a great day!"
 msgstr "Ti auguro una buona giornata!"
 
-msgid "Notify on newsletter unsubscription"
-msgstr "Notifica di annullamento dell'iscrizione alla newsletter"
-
-msgid "Send an email notification to the following users when a recipient "
-"unsubscribes from the newsletter"
-msgstr "Inviare una notifica via e-mail ai seguenti utenti quando un "
-"destinatario si cancella dalla newsletter"
-
-msgid "Unsubscription from newsletter"
-msgstr "Cancellazione dalla newsletter"
-
-msgid "The user with the address ${address} just unsubscribed from the newsletter subscriber list."
-msgstr "L'utente con l'indirizzo ${indirizzo} si è appena cancellato dalla lista degli iscritti alla newsletter."
-
 msgid ""
 "This is the daily reservation overview for ${organisation}. If you no longer "
 "want to receive this e-mail please contact an administrator so they can "
@@ -4054,6 +4050,13 @@ msgstr "Clicca qui per visualizzare la versione web."
 
 msgid "You no longer wish to receive the newsletter?"
 msgstr "Non desideri più ricevere la newsletter?"
+
+msgid ""
+"The user with the address ${address} just unsubscribed from the newsletter "
+"subscriber list."
+msgstr ""
+"L'utente con l'indirizzo ${indirizzo} si è appena cancellato dalla lista "
+"degli iscritti alla newsletter."
 
 msgid "Click the following link to set a new password:"
 msgstr "Clicca sul collegamento seguente per impostare una nuova password:"
@@ -4464,6 +4467,15 @@ msgstr "Rilascia i file per verificarli"
 
 msgid "No subscribers yet"
 msgstr "Non ci sono ancora abbonati"
+
+msgid ""
+"This recipient has delivery failures, including hard bounces, invalid email "
+"addresses, spam complaints, manual deactivations, or being blocked. We "
+"recommend unsubscribing it from the list."
+msgstr ""
+"Questo destinatario presenta errori di consegna, tra cui rimbalzi, indirizzi "
+"e-mail non validi, reclami per spam, disattivazioni manuali o blocco. Si "
+"consiglia di cancellarlo dall'elenco."
 
 msgid "submitted"
 msgstr "inviato"
@@ -5461,14 +5473,14 @@ msgstr ""
 "L'importo totale per i dati attualmente inseriti è ${total} ma deve essere "
 "almeno ${minimum}. Si prega di modificare i dati inseriti."
 
+msgid "Registrations are no longer possible"
+msgstr "Le iscrizioni non sono più possibili"
+
 msgid "Pay Online and Complete"
 msgstr "Paga online e completa"
 
 msgid "Your payment could not be processed"
 msgstr "Non è stato possibile elaborare Il tuo pagamento"
-
-msgid "Registrations are no longer possible"
-msgstr "Le iscrizioni non sono più possibili"
 
 msgid "Your registration has been confirmed"
 msgstr "La tua registrazione è stata confermata"
@@ -5519,16 +5531,15 @@ msgstr "Benvenuto nella newsletter di ${org}"
 
 #, python-format
 msgid ""
-"Success! We have added ${address} to the list of recipients."
-msgstr ""
-"Successo! Abbiamo aggiunto ${indirizzo} alla lista dei destinatari."
-
-msgid ""
 "Success! We have added ${address} to the list of recipients. Subscribed "
 "categories are ${subscribed}."
 msgstr ""
 "Successo! Abbiamo aggiunto ${indirizzo} alla lista dei destinatari. Le "
 "categorie sottoscritte sono ${subscribed}."
+
+#, python-format
+msgid "Success! We have added ${address} to the list of recipients."
+msgstr "Successo! Abbiamo aggiunto ${indirizzo} alla lista dei destinatari."
 
 #, python-format
 msgid ""
@@ -5658,6 +5669,12 @@ msgstr "Il pagamento è stato acquisito"
 msgid "The payment was refunded"
 msgstr "Il pagamento è stato rimborsato"
 
+msgid "The payment is already captured but is still processing"
+msgstr "Il pagamento è già stato acquisito ma è ancora in fase di elaborazione."
+
+msgid "Could not refund the payment"
+msgstr "Impossibile rimborsare il pagamento"
+
 msgid "As default"
 msgstr "Valore predefinito"
 
@@ -5706,8 +5723,29 @@ msgstr "Il fornitore di servizi di pagamento è stato eliminato."
 msgid "Successfully synchronised payments"
 msgstr "Pagamenti sincronizzati correttamente"
 
+msgid "Merchant Name"
+msgstr "Nome dell'esercente"
+
+msgid "UPP Username"
+msgstr "UPP Username"
+
+msgid "UPP Password"
+msgstr "UPP Password"
+
+msgid "Webhook Signing Key"
+msgstr "Chiave di firma Webhook"
+
 msgid "Charge fees to customer"
 msgstr "Addebita commissioni al cliente"
+
+msgid "Use sandbox environment (for testing)"
+msgstr "Utilizzare l'ambiente sandbox (per i test)"
+
+msgid "Datatrans has been added"
+msgstr "È stato aggiunto Datatrans"
+
+msgid "Add Datatrans"
+msgstr "Aggiungi Datatrans"
 
 msgid "Added a new person"
 msgstr "Aggiunta una nuova persona"
@@ -5980,6 +6018,9 @@ msgstr "Argomenti"
 msgid "You have successfully unsubscribed from the newsletter at ${address}"
 msgstr ""
 "L'iscrizione alla newsletter di ${address} è stata annullata con successo."
+
+msgid "Unsubscription from newsletter"
+msgstr "Cancellazione dalla newsletter"
 
 msgid "A survey with this name already exists"
 msgstr "Esiste già un'indagine con questo nome"
@@ -6259,9 +6300,6 @@ msgstr "È stato creato un account per te"
 
 msgid "The user was created successfully"
 msgstr "Utente creato correttamente"
-
-msgid "This recipient has delivery failures, including hard bounces, invalid email addresses, spam complaints, manual deactivations, or being blocked. We recommend unsubscribing it from the list."
-msgstr "Questo destinatario presenta errori di consegna, tra cui rimbalzi, indirizzi e-mail non validi, reclami per spam, disattivazioni manuali o blocco. Si consiglia di cancellarlo dall'elenco."
 
 #~ msgid "Photo album. Will be shown at the end of content."
 #~ msgstr "Album fotografico. Sarà mostrato alla fine del contenuto."
