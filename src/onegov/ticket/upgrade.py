@@ -163,7 +163,7 @@ def add_closed_on_column_to_ticket(context: UpgradeContext) -> None:
             filter(Ticket.process_time.isnot(None))):
 
         ticket.closed_on = (ticket.created +
-                            timedelta(seconds=ticket.reaction_time) +
-                            timedelta(seconds=ticket.process_time))
+                            timedelta(seconds=ticket.reaction_time or 0) +
+                            timedelta(seconds=ticket.process_time or 0))
 
     context.session.flush()

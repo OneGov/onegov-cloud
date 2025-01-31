@@ -10,15 +10,17 @@ log = logging.getLogger('onegov.plausible')
 
 class PlausibleAPI:
 
-    def __init__(self) -> None:
+    def __init__(self, site_id:str|None=None) -> None:
         """
         Initialize Plausible API client
         For details about the API see https://plausible.io/docs/stats-api
 
         """
+
+        # plausible url
         self.url = 'https://analytics.seantis.ch/api/v2/query'
 
-        # api key generated https://analytics.seantis.ch/settings/api-keys
+        # api key from https://analytics.seantis.ch/settings/api-keys
         api_key = (
             'eR9snr0RzrglMLrKqVPNQ_IYL3dD6hyOX0-2gyRMlxSSSTk5bg6NjORWtbNEMoHU')
 
@@ -26,14 +28,18 @@ class PlausibleAPI:
             'Authorization': f'Bearer {api_key}',
             'Content-Type': 'application/json'
         }
-        self.site_id = 'wil.onegovcloud.ch'  # configure it, may be in web
-        # statistics settings
+
+        self.site_id = site_id
 
     def _send_request(self, payload: dict[str, Any]) -> dict[Any, Any]:
         """
         Send request to Plausible API
 
         """
+        if not self.site_id:
+            log.error('Site Id not configured')
+            return {'results': []}
+
         try:
             response = requests.post(
                 self.url, headers=self.headers, json=payload, timeout=30)
@@ -55,9 +61,9 @@ class PlausibleAPI:
 
         """
         figures = ['-', '-', '-', '-']
-        metrics = [
-            'visitors', 'pageviews', 'views_per_visit', 'visit_duration']
-        date_range = '7d'
+        metrics = ['visitors', 'visits', 'pageviews', 'views_per_visit',
+                   'visit_duration']
+        date_range = '30d'
 
         payload = {
             'site_id': self.site_id,
@@ -70,13 +76,20 @@ class PlausibleAPI:
         r = self._send_request(payload)
 
         results = r.get('results', [])
+        if not results:
+            return {}
+
         figures = results[0].get('metrics', figures)
 
+        # convert last figure from seconds to minutes
+        figures[-1] = round(int(figures[-1]) / 60, 1) if figures[-1] else '-'
+
         texts = [
-            'Unique Visitors in the Last Week',
-            'Total Page Views in the Last Week',
+            'Unique Visitors in the Last Month',
+            'Total Visits in the Last Month',
+            'Total Page Views in the Last Month',
             'Number of Page Views per Visit',
-            'Average Visit Duration in Seconds'
+            'Average Visit Duration in Minutes'
         ]
 
         return {text: figures[i] for i, text in enumerate(texts)}
@@ -87,7 +100,7 @@ class PlausibleAPI:
 
         """
         metrics = ['visitors']
-        date_range = '7d'
+        date_range = '30d'
         dimensions = ['event:page']
 
         payload = {

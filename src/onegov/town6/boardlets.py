@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import re
 from datetime import timedelta
 from functools import cached_property
 
@@ -32,6 +33,18 @@ class TownBoardlet(Boardlet):
     def layout(self) -> DefaultLayout:
         return DefaultLayout(None, self.request)
 
+    @cached_property
+    def plausible_api(self) -> PlausibleAPI:
+        site_id = None
+        analytics_code = self.request.app.org.analytics_code
+
+        if analytics_code:
+            if 'analytics.seantis.ch' in analytics_code:
+                match = re.search(r'data-domain="(.+?)"', analytics_code)
+                site_id = match.group(1) if match else None
+
+        return PlausibleAPI(site_id)
+
 
 @TownApp.boardlet(name='ticket', order=(1, 1), icon='fa-ticket-alt')
 class TicketBoardlet(TownBoardlet):
@@ -56,28 +69,59 @@ class TicketBoardlet(TownBoardlet):
             icon='fa-hourglass-half'
         )
 
-        time_7d_ago = utcnow() - timedelta(days=7)
+        time_30d_ago = utcnow() - timedelta(days=30)
 
         new_tickets = self.session.query(Ticket).filter(
-            Ticket.created <= time_7d_ago).count()
+            Ticket.created > time_30d_ago).count()
         yield BoardletFact(
-            text=_('New Tickets in the Last Week'),
+            text=_('New Tickets in the Last Month'),
             number=new_tickets,
             icon='fa-plus-circle'
         )
 
-        closed_tickets = self.session.query(Ticket).filter_by(
-            state='closed').filter(
-            Ticket.last_change >= time_7d_ago).count()
+        closed_tickets = (
+            self.session.query(Ticket).
+            filter(Ticket.closed_on.isnot(None)).
+            filter(Ticket.closed_on >= time_30d_ago).count())
         yield BoardletFact(
-            text=_('Closed Tickets in the Last Week'),
+            text=_('Closed Tickets in the Last Month'),
             number=closed_tickets,
             icon='fa-check-circle'
         )
 
-        # TODO: add average ticket lead time from opening to closing
-        # TODO: add average ticket lead time from pending/in progress to
-        #  closing
+        closed_tickets = (
+            self.session.query(Ticket).
+            filter(Ticket.closed_on.isnot(None)).
+            filter(Ticket.closed_on >= time_30d_ago).all())
+
+        # average lead time from opening to closing
+        average_lead_time_s: float | str = '-'
+        if closed_tickets:
+            total_lead_time_s = sum(
+                t.reaction_time + t.process_time for t in closed_tickets)
+            average_lead_time_s = total_lead_time_s / len(closed_tickets)
+            average_lead_time_s = round(average_lead_time_s / 86400, 1)
+
+        yield BoardletFact(
+            text=_('Lead Time from opening to closing in Days '
+                   'over the Last Month '),
+            number=average_lead_time_s,
+            icon='fa-clock'
+        )
+
+        # average lead time from pending to closing
+        average_lead_time_s = '-'
+        if closed_tickets:
+            total_lead_time_s = sum(t.process_time for t in closed_tickets)
+            average_lead_time_s = total_lead_time_s / len(closed_tickets)
+            average_lead_time_s = round(average_lead_time_s / 86400, 1)
+
+        yield BoardletFact(
+            text=_('Lead Time from pending to closing in Days '
+                   'over the Last Month'),
+            number=average_lead_time_s,
+            icon='fa-clock'
+        )
 
 
 def get_icon_for_visibility(visibility: str) -> str:
@@ -145,17 +189,26 @@ class EditedNewsBoardlet(TownBoardlet):
             )
 
 
-@TownApp.boardlet(name='plausible-stats', order=(2, 1))
+@TownApp.boardlet(name='web-stats', order=(2, 1))
 class PlausibleStats(TownBoardlet):
 
     @property
     def title(self) -> str:
-        return 'Plausible Stats'
+        return 'Web Statistics'
+
+    @property
+    def enabled(self) -> bool:
+        return self.plausible_api.site_id is not None
 
     @property
     def facts(self) -> Iterator[BoardletFact]:
 
-        results = PlausibleAPI().get_stats()
+        results = self.plausible_api.get_stats()
+        if not results:
+            yield BoardletFact(
+                text=_('No data available'),
+                number=None
+            )
 
         for text, number in results.items():
             yield BoardletFact(
@@ -172,9 +225,13 @@ class PlausibleTopPages(TownBoardlet):
         return 'Top Pages'
 
     @property
+    def enabled(self) -> bool:
+        return self.plausible_api.site_id is not None
+
+    @property
     def facts(self) -> Iterator[BoardletFact]:
 
-        results = PlausibleAPI().get_top_pages(limit=10)
+        results = self.plausible_api.get_top_pages(limit=10)
 
         if not results:
             yield BoardletFact(
