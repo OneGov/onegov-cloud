@@ -358,9 +358,9 @@ class CoreRequest(IncludeRequest, ContentSecurityRequest, ReturnToMixin):
         nonce = random_token()
         self.app.cache.set(
             nonce,
-            self.app.sign(self.browser_session._token),
+            self.app.sign(self.browser_session._token, nonce),
         )
-        return nonce
+        return self.app.sign(nonce)
 
     @cached_property
     def browser_session(self) -> BrowserSession:
@@ -390,18 +390,16 @@ class CoreRequest(IncludeRequest, ContentSecurityRequest, ReturnToMixin):
                 del self.cookies['session_id']
                 session_id = random_token()
 
-        elif isinstance(nonce := self.POST.get('session_nonce'), str):
-            # restore the session in a non SameSite context
-            signed_session_id = self.app.cache.get(nonce)
-            if signed_session_id:
-                # make sure this nonce can't be reused
-                self.app.cache.delete(nonce)
-                session_id = self.app.unsign(signed_session_id)
-            else:
-                session_id = None
-
-            if session_id is None:
-                session_id = random_token()
+        elif isinstance(signed_nonce := self.POST.get('session_nonce'), str):
+            nonce = self.app.unsign(signed_nonce)
+            session_id = random_token()
+            if nonce:
+                # restore the session in a non SameSite context
+                signed_session_id = self.app.cache.get(nonce)
+                if signed_session_id:
+                    # make sure this nonce can't be reused
+                    self.app.cache.delete(nonce)
+                    session_id = self.app.unsign(signed_session_id, nonce)
         else:
             session_id = random_token()
 
