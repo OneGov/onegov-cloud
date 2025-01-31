@@ -2,6 +2,7 @@ from __future__ import annotations
 
 from functools import cached_property
 from markupsafe import Markup
+
 from onegov.chat.collections import ChatCollection
 from onegov.core.templates import render_macro
 from onegov.directory import Directory, DirectoryEntry
