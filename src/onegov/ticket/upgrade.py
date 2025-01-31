@@ -4,6 +4,8 @@ upgraded on the server. See :class:`onegov.core.upgrade.upgrade_task`.
 """
 from __future__ import annotations
 
+from datetime import timedelta
+
 from onegov.core.orm.types import JSON, UTCDateTime
 from onegov.core.upgrade import upgrade_task
 from onegov.ticket import Ticket
@@ -144,3 +146,24 @@ def add_archived_state_to_ticket(context: UpgradeContext) -> None:
         USING state::text::ticket_state
     """)
     tmp_type.drop(context.operations.get_bind(), checkfirst=False)
+
+
+@upgrade_task('Add closed on column to ticket 2')
+def add_closed_on_column_to_ticket(context: UpgradeContext) -> None:
+    if context.has_column('tickets', 'closed_on'):
+        return
+
+    context.operations.add_column(
+        'tickets', Column('closed_on', UTCDateTime, nullable=True)
+    )
+
+    for ticket in (context.session.query(Ticket).
+            filter(Ticket.state.in_(('closed', 'archived'))).
+            filter(Ticket.reaction_time.isnot(None)).
+            filter(Ticket.process_time.isnot(None))):
+
+        ticket.closed_on = (ticket.created +
+                            timedelta(seconds=ticket.reaction_time) +
+                            timedelta(seconds=ticket.process_time))
+
+    context.session.flush()
