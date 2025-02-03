@@ -28,6 +28,7 @@ var ManyFields = React.createClass({
                             onChange={this.props.onChange}
                         />
                 }
+
                 {
                     this.props.type === "opening-hours" &&
                         <ManyOpeningHours
@@ -626,54 +627,112 @@ var StringField = React.createClass({
     }
 });
 
+var initializedInstances = new WeakMap();
+
 function extractType(target) {
-    return _.first(_.filter(
-        target.attr('class').split(' '),
-        function(c) { return c.startsWith('many-'); }
-    )).replace('many-', '');
+    // More robust type extraction
+    var classes = target.attr('class').split(' ');
+    var manyClass = classes.find(function(c) {
+        return c.startsWith('many-');
+    });
+    return manyClass ? manyClass.replace('many-', '') : 'links'; // Default to links if no type found
 }
 
 jQuery.fn.many = function() {
-    return this.each(function() {
+    console.log('Starting many initialization, elements found:', this.length);
 
+    return this.each(function(index) {
         var target = $(this);
-        var type = extractType(target);
-        var data = JSON.parse(target.val());
-        var label = target.closest('label');
-        var errors = label.siblings('.error');
+        console.log('Processing element', index, 'class:', target.attr('class'));
 
-        // straight-up hiding the element prevents it from getting update
-        // with the target.val call below
+        // Get type before any DOM modifications
+        var type = extractType(target);
+        console.log('Extracted type:', type);
+
+        // Safely parse data with fallback
+        var rawValue = target.val();
+        console.log('Raw value:', rawValue);
+
+        var data;
+        try {
+            data = rawValue ? JSON.parse(rawValue) : null;
+            console.log('Parsed data successfully');
+        } catch (e) {
+            console.warn('Failed to parse JSON for many-' + type, e);
+            data = null;
+        }
+
+        // Provide default data structure if needed
+        if (!data) {
+            data = {
+                labels: {
+                    text: type === 'contactlinks' ? 'Contact Text' : 'Text',
+                    link: type === 'contactlinks' ? 'Contact URL' : 'URL',
+                    add: 'Add',
+                    remove: 'Remove'
+                },
+                values: []
+            };
+        }
+
+        var label = target.closest('label');
+        console.log('Found label:', label.length > 0);
+
+        // Create a unique wrapper for this instance
+        var wrapperId = 'many-wrapper-' + Math.random().toString(36).substr(2, 9);
+        var el = $('<div class="many-wrapper" id="' + wrapperId + '" />');
+        console.log('Created wrapper with ID:', wrapperId);
+
+        // Handle visibility
         label.attr('aria-hidden', true);
         label.css({
-            'position': 'absolute'
+            'position': 'absolute',
+            'visibility': 'hidden'
         });
-        label.hide();
 
-        var el = $('<div class="many-wrapper" />');
         el.appendTo(label.parent());
+        console.log('Appended wrapper to parent');
 
-        // transfer javascript dependencies to the wrapper
+        // Handle dependencies
         var dependency = target.attr('data-depends-on');
-        if (!_.isUndefined(dependency)) {
+        if (dependency) {
             target.removeAttr('data-depends-on');
             el.attr('data-depends-on', dependency);
         }
 
+        // Create scoped onChange handler
         var onChange = function(newValues) {
             data.values = newValues.values;
             var json = JSON.stringify(data);
-            label.show();
             target.val(json);
-            label.hide();
         };
 
-        ReactDOM.render(
-            <ManyFields type={type} data={data} onChange={onChange} />,
-            el.get(0)
-        );
+        // Render with error handling
+        try {
+            console.log('About to render React component for element', index);
+            ReactDOM.render(
+                React.createElement(ManyFields, {
+                    type: type,
+                    data: data,
+                    onChange: onChange
+                }),
+                document.getElementById(wrapperId)
+            );
+            console.log('Successfully rendered React component');
+        } catch (e) {
+            console.error('Failed to render ManyFields for ' + type, e);
+            // Restore original input if render fails
+            el.remove();
+            label.css({
+                'position': 'static',
+                'visibility': 'visible'
+            });
+        }
+
+        console.log('Finished processing element', index);
     });
 };
+
 
 // since we intercept the dependency setup we need to run before document.ready
 $('.many').many();

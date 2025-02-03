@@ -718,7 +718,7 @@
                 <div tal:condition="contact and not hide">
                     <h3 i18n:translate>Contact</h3>
                     <tal:b content="contact" />
-                    <div tal:condition="sidepanel_contact">
+                    <div tal:condition="sidepanel_contact|False">
                         <ul class="sidebar-links">
                             <li tal:repeat="contact sidepanel_contact" tal:condition="contact">
                                 <a href="${contact[1]}">${contact[0]}</a>
