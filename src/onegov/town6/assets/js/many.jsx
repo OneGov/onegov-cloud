@@ -627,75 +627,37 @@ var StringField = React.createClass({
     }
 });
 
-var initializedInstances = new WeakMap();
-
 function extractType(target) {
-    // More robust type extraction
-    var classes = target.attr('class').split(' ');
-    var manyClass = classes.find(function(c) {
-        return c.startsWith('many-');
-    });
-    return manyClass ? manyClass.replace('many-', '') : 'links'; // Default to links if no type found
+    return _.first(_.filter(
+        target.attr('class').split(' '),
+        function(c) { return c.startsWith('many-'); }
+    )).replace('many-', '');
 }
 
 jQuery.fn.many = function() {
-    console.log('Starting many initialization, elements found:', this.length);
-
     return this.each(function(index) {
+
         var target = $(this);
-        console.log('Processing element', index, 'class:', target.attr('class'));
-
-        // Get type before any DOM modifications
         var type = extractType(target);
-        console.log('Extracted type:', type);
-
-        // Safely parse data with fallback
-        var rawValue = target.val();
-        console.log('Raw value:', rawValue);
-
-        var data;
-        try {
-            data = rawValue ? JSON.parse(rawValue) : null;
-            console.log('Parsed data successfully');
-        } catch (e) {
-            console.warn('Failed to parse JSON for many-' + type, e);
-            data = null;
-        }
-
-        // Provide default data structure if needed
-        if (!data) {
-            data = {
-                labels: {
-                    text: type === 'contactlinks' ? 'Contact Text' : 'Text',
-                    link: type === 'contactlinks' ? 'Contact URL' : 'URL',
-                    add: 'Add',
-                    remove: 'Remove'
-                },
-                values: []
-            };
-        }
-
+        var data = JSON.parse(target.val());
         var label = target.closest('label');
-        console.log('Found label:', label.length > 0);
 
-        // Create a unique wrapper for this instance
-        var wrapperId = 'many-wrapper-' + Math.random().toString(36).substr(2, 9);
-        var el = $('<div class="many-wrapper" id="' + wrapperId + '" />');
-        console.log('Created wrapper with ID:', wrapperId);
-
-        // Handle visibility
+        // straight-up hiding the element prevents it from getting update
+        // with the target.val call below
         label.attr('aria-hidden', true);
         label.css({
-            'position': 'absolute',
-            'visibility': 'hidden'
+            'position': 'absolute'
         });
+        label.hide();
 
+        // Create a unique wrapper for this instance
+        let wrapperId = 'many-wrapper-' + Math.random().toString(36).substr(2, 9);
+        let el = $('<div class="many-wrapper" id="' + wrapperId + '" />');
         el.appendTo(label.parent());
-        console.log('Appended wrapper to parent');
 
-        // Handle dependencies
+        // transfer javascript dependencies to the wrapper
         var dependency = target.attr('data-depends-on');
-        if (dependency) {
+        if (!_.isUndefined(dependency)) {
             target.removeAttr('data-depends-on');
             el.attr('data-depends-on', dependency);
         }
@@ -704,12 +666,13 @@ jQuery.fn.many = function() {
         var onChange = function(newValues) {
             data.values = newValues.values;
             var json = JSON.stringify(data);
+            label.show();
             target.val(json);
+            label.hide();
         };
 
         // Render with error handling
         try {
-            console.log('About to render React component for element', index);
             ReactDOM.render(
                 React.createElement(ManyFields, {
                     type: type,
@@ -718,7 +681,6 @@ jQuery.fn.many = function() {
                 }),
                 document.getElementById(wrapperId)
             );
-            console.log('Successfully rendered React component');
         } catch (e) {
             console.error('Failed to render ManyFields for ' + type, e);
             // Restore original input if render fails
@@ -728,8 +690,6 @@ jQuery.fn.many = function() {
                 'visibility': 'visible'
             });
         }
-
-        console.log('Finished processing element', index);
     });
 };
 
