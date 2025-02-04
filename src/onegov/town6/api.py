@@ -1,17 +1,16 @@
 from __future__ import annotations
 
 from onegov.event.collections import OccurrenceCollection
-from onegov.api import ApiEndpoint
+from onegov.api.models import ApiEndpoint, ApiEndpointItem
 from onegov.gis import Coordinates
 
 
 from typing import Any
 from typing import TYPE_CHECKING
 
-from onegov.org.models.page import NewsCollection
+from onegov.org.models.page import News, NewsCollection, Topic, TopicCollection
 
 if TYPE_CHECKING:
-    from onegov.org.models.page import News
     from onegov.town6.app import TownApp
     from onegov.event.models import Occurrence
     from onegov.core.orm.mixins import ContentMixin
@@ -36,9 +35,7 @@ def get_modified_iso_format(item: TimestampMixin) -> str:
     return item.last_change.isoformat()
 
 
-class EventApiEndpoint(
-    ApiEndpoint['Occurrence'],
-):
+class EventApiEndpoint(ApiEndpoint['Occurrence']):
     app: TownApp
     endpoint = 'events'
 
@@ -73,14 +70,13 @@ class EventApiEndpoint(
 
     def item_links(self, item: Occurrence) -> dict[str, Any]:
         return {
+            'html': item,
             'image': item.event.image,
             'pfd': item.event.pdf
         }
 
 
-class NewsApiEndpoint(
-    ApiEndpoint['News'],
-):
+class NewsApiEndpoint(ApiEndpoint[News]):
     app: TownApp
     endpoint = 'news'
     filters = set()
@@ -109,6 +105,7 @@ class NewsApiEndpoint(
             'title': item.title,
             'lead': item.lead,
             'text': item.text,
+            'hashtags': item.hashtags,
             'publication_start': publication_start,
             'publication_end': publication_end,
             'created': item.created.isoformat(),
@@ -117,5 +114,53 @@ class NewsApiEndpoint(
 
     def item_links(self, item: News) -> dict[str, Any]:
         return {
+            'html': item,
             'image': item.page_image,
         }
+
+
+class TopicApiEndpoint(ApiEndpoint[Topic]):
+    app: TownApp
+    endpoint = 'topics'
+    filters = set()
+
+    @property
+    def collection(self) -> Any:
+        result = TopicCollection(
+            self.session,
+            page=self.page or 0
+        )
+        result.batch_size = 25
+        return result
+
+    def item_data(self, item: Topic) -> dict[str, Any]:
+        if item.publication_start:
+            publication_start = item.publication_start.isoformat()
+        else:
+            publication_start = None
+
+        if item.publication_end:
+            publication_end = item.publication_end.isoformat()
+        else:
+            publication_end = None
+
+        return {
+            'title': item.title,
+            'lead': item.lead,
+            'text': item.text,
+            'publication_start': publication_start,
+            'publication_end': publication_end,
+            'created': item.created.isoformat(),
+            'modified': get_modified_iso_format(item),
+        }
+
+    def item_links(self, item: Topic) -> dict[str, Any]:
+        links: dict[str, Any] = {
+            'html': item,
+            'image': item.page_image
+        }
+
+        if item.parent_id is not None:
+            links['parent'] = ApiEndpointItem(
+                self.app, self.endpoint, str(item.parent_id))
+        return links

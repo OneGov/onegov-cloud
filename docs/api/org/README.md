@@ -4,6 +4,7 @@ The headless Org API offers the following views:
 
 - [Events](#events-view)
 - [News](#news-view)
+- [Topics](#topics-view)
 
 We implement the called Collection+JSON standard established by Mike
 Amundsen. For details please refer to [media types - collection & json](http://amundsen.com/media-types/collection/format/)
@@ -122,13 +123,17 @@ A collection+JSON of items including paging
 
 ## News View
 
-The news view provides information about all people in relation with agencies
-within the organisation. Each person offers several data fields like
-first and last name, academic title, function within the organisation,
-contact information and more. Additionally, the people api provides links to
-a picture, website and memberships to agencies memberships if given.
+The news view provides information about all the news.
 
-`curl https://[base_url]/people`
+`curl https://[base_url]/news`
+
+## Topics View
+
+The topics view provides information about all the topics, including
+their hierarchical relationship via a `parent` link. Links to children
+are implicit through their `parent` link.
+
+`curl https://[base_url]/news`
 
 
 ## Authorization
