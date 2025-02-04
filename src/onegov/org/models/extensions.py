@@ -239,7 +239,7 @@ class VisibleOnHomepageExtension(ContentExtension):
         return VisibleOnHomepageForm
 
 
-class ContactExtension:
+class ContactExtension(ContentExtension):
     """ Extends any class that has a content dictionary field with a simple
     contacts field, that can optionally be inherited from another topic.
 
@@ -249,7 +249,7 @@ class ContactExtension:
 
     @contact.setter  # type:ignore[no-redef]
     def contact(self, value: str | None) -> None:
-        self.content['contact'] = value  # type:ignore[attr-defined]
+        self.content['contact'] = value
         if self.inherit_contact:
             # no need to update the cache
             return
@@ -263,7 +263,7 @@ class ContactExtension:
 
     @inherit_contact.setter  # type:ignore[no-redef]
     def inherit_contact(self, value: bool) -> None:
-        self.content['inherit_contact'] = value  # type:ignore[attr-defined]
+        self.content['inherit_contact'] = value
 
         # clear cache (don't update eagerly since it involves a query)
         if 'contact_html' in self.__dict__:
@@ -273,7 +273,7 @@ class ContactExtension:
 
     @contact_inherited_from.setter  # type:ignore[no-redef]
     def contact_inherited_from(self, value: int | None) -> None:
-        self.content['contact_inherited_from'] = value  # type:ignore[attr-defined]
+        self.content['contact_inherited_from'] = value
         if not self.inherit_contact:
             # no need to clear the cache
             return
