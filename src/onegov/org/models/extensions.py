@@ -1111,9 +1111,9 @@ class SidebarContactLinkExtension(ContentExtension):
 
     def extend_form(
         self,
-        form_class: type['FormT'],
-        request: 'OrgRequest'
-    ) -> type['FormT']:
+        form_class: type[FormT],
+        request: OrgRequest
+    ) -> type[FormT]:
 
         class SidebarContactLinkForm(form_class):  # type:ignore
 
@@ -1134,7 +1134,7 @@ class SidebarContactLinkExtension(ContentExtension):
                 if not self.sidepanel_contact.data:
                     self.sidepanel_contact.data = self.links_to_json(None)
 
-            def process_obj(self, obj: 'SidebarContactLinkExtension') -> None:
+            def process_obj(self, obj: SidebarContactLinkExtension) -> None:
                 super().process_obj(obj)
                 if not obj.sidepanel_contact:
                     self.sidepanel_contact.data = self.links_to_json(None)
@@ -1145,7 +1145,7 @@ class SidebarContactLinkExtension(ContentExtension):
 
             def populate_obj(
                 self,
-                obj: 'SidebarContactLinkExtension',
+                obj: SidebarContactLinkExtension,
                 *args: Any, **kwargs: Any
             ) -> None:
                 super().populate_obj(obj, *args, **kwargs)
@@ -1188,7 +1188,7 @@ class SidebarContactLinkExtension(ContentExtension):
 
             def links_to_json(
                 self,
-                links: 'Sequence[tuple[str | None, str | None]] | None'
+                links: Sequence[tuple[str | None, str | None]] | None
             ) -> str:
                 contact_links = links or []
 
