@@ -351,6 +351,46 @@ class News(Page, TraitInfo, SearchableContent, NewsletterExtension,
         return sorted(all_hashtags)
 
 
+class TopicCollection(Pagination[Topic], AdjacencyListCollection[Topic]):
+    """
+    Use it like this:
+
+        from onegov.page import TopicCollection
+        topics = TopicCollection(session)
+    """
+
+    __listclass__ = Topic
+
+    def __init__(
+        self,
+        session: Session,
+        page: int = 0,
+    ):
+        self.session = session
+        self.page = page
+
+    def subset(self) -> Query[Topic]:
+        topics = self.session.query(Topic)
+        topics = topics.filter(
+            News.publication_started == True,
+            News.publication_ended == False
+        )
+        topics = topics.order_by(desc(Topic.published_or_created))
+        topics = topics.options(undefer('created'))
+        topics = topics.options(undefer('content'))
+        return topics
+
+    @property
+    def page_index(self) -> int:
+        return self.page
+
+    def page_by_index(self, index: int) -> Self:
+        return self.__class__(
+            self.session,
+            page=index
+        )
+
+
 class NewsCollection(Pagination[News], AdjacencyListCollection[News]):
     """
     Use it like this:

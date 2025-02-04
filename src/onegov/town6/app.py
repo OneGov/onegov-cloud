@@ -12,7 +12,8 @@ from onegov.core.utils import module_path
 from onegov.foundation6.integration import FoundationApp
 from onegov.org.app import OrgApp
 from onegov.org.app import get_i18n_localedirs as get_org_i18n_localedirs
-from onegov.town6.api import EventApiEndpoint, NewsApiEndpoint
+from onegov.town6.api import (
+    EventApiEndpoint, NewsApiEndpoint, TopicApiEndpoint)
 from onegov.town6.custom import get_global_tools
 from onegov.town6.initial_content import create_new_organisation
 from onegov.town6.theme import TownTheme
@@ -197,7 +198,8 @@ def get_public_ticket_messages() -> tuple[str, ...]:
 def get_api_endpoints() -> list[type[ApiEndpoint[Any]]]:
     return [
         EventApiEndpoint,
-        NewsApiEndpoint
+        NewsApiEndpoint,
+        TopicApiEndpoint,
     ]
 
 
