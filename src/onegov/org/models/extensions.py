@@ -239,8 +239,9 @@ class VisibleOnHomepageExtension(ContentExtension):
         return VisibleOnHomepageForm
 
 
-class ContactExtensionBase:
-    """ Common base class for extensions that add a contact field.
+class ContactExtension:
+    """ Extends any class that has a content dictionary field with a simple
+    contacts field, that can optionally be inherited from another topic.
 
     """
 
@@ -249,67 +250,53 @@ class ContactExtensionBase:
     @contact.setter  # type:ignore[no-redef]
     def contact(self, value: str | None) -> None:
         self.content['contact'] = value  # type:ignore[attr-defined]
+        if self.inherit_contact:
+            # no need to update the cache
+            return
+
         # update cache
         self.__dict__['contact_html'] = to_html_ul(
-            self.contact, convert_dashes=True, with_title=True
-        ) if self.contact is not None else None
+            value, convert_dashes=True, with_title=True
+        ) if value is not None else None
+
+    inherit_contact: dict_property[bool] = content_property(default=False)
+
+    @inherit_contact.setter  # type:ignore[no-redef]
+    def inherit_contact(self, value: bool) -> None:
+        self.content['inherit_contact'] = value  # type:ignore[attr-defined]
+
+        # clear cache (don't update eagerly since it involves a query)
+        if 'contact_html' in self.__dict__:
+            del self.__dict__['contact_html']
+
+    contact_inherited_from: dict_property[int | None] = content_property()
+
+    @contact_inherited_from.setter  # type:ignore[no-redef]
+    def contact_inherited_from(self, value: int | None) -> None:
+        self.content['contact_inherited_from'] = value  # type:ignore[attr-defined]
+        if not self.inherit_contact:
+            # no need to clear the cache
+            return
+
+        # clear cache (don't update eagerly since it involves a query)
+        if 'contact_html' in self.__dict__:
+            del self.__dict__['contact_html']
 
     @cached_property
     def contact_html(self) -> Markup | None:
-        if self.contact is None:
-            return None
-        return to_html_ul(self.contact, convert_dashes=True, with_title=True)
-
-    def get_contact_html(self, request: OrgRequest) -> Markup | None:
-        return self.contact_html
-
-    def extend_form(
-        self,
-        form_class: type[FormT],
-        request: OrgRequest
-    ) -> type[FormT]:
-
-        class ContactPageForm(form_class):  # type:ignore
-            contact = TextAreaField(
-                label=_('Address'),
-                fieldset=_('Contact'),
-                render_kw={'rows': 5},
-                description=_("- '-' will be converted to a bulleted list\n"
-                              "- Urls will be transformed into links\n"
-                              "- Emails and phone numbers as well")
-            )
-
-        return ContactPageForm
-
-
-class ContactExtension(ContactExtensionBase, ContentExtension):
-    """ Extends any class that has a content dictionary field with a simple
-    contacts field.
-
-    """
-
-
-class InheritableContactExtension(ContactExtensionBase, ContentExtension):
-    """ Extends any class that has a content dictionary field with a simple
-    contacts field, that can optionally be inherited from another topic.
-
-    """
-
-    inherit_contact: dict_property[bool] = content_property(default=False)
-    contact_inherited_from: dict_property[int | None] = content_property()
-
-    # TODO: If we end up calling this more than once per request
-    #       we may want to cache this
-    def get_contact_html(self, request: OrgRequest) -> Markup | None:
         if self.inherit_contact:
             if self.contact_inherited_from is None:
                 return None
 
-            pages = PageCollection(request.session)
+            pages = PageCollection(object_session(self))
             page = pages.by_id(self.contact_inherited_from)
-            return getattr(page, 'contact_html', None)
+            contact = getattr(page, 'contact', None)
+        else:
+            contact = self.contact
 
-        return self.contact_html
+        if contact is None:
+            return None
+        return to_html_ul(contact, convert_dashes=True, with_title=True)
 
     def extend_form(
         self,
@@ -343,16 +330,14 @@ class InheritableContactExtension(ContactExtensionBase, ContentExtension):
             for choice in reversed(pinned.items()):
                 choices.insert(0, choice)
 
-        class InheritableContactPageForm(form_class):  # type:ignore
-
+        class ContactPageForm(form_class):  # type:ignore
             contact = TextAreaField(
                 label=_('Address'),
                 fieldset=_('Contact'),
                 render_kw={'rows': 5},
                 description=_("- '-' will be converted to a bulleted list\n"
                               "- Urls will be transformed into links\n"
-                              "- Emails and phone numbers as well"),
-                depends_on=('inherit_contact', '!y')
+                              "- Emails and phone numbers as well")
             )
 
             inherit_contact = BooleanField(
@@ -370,7 +355,7 @@ class InheritableContactExtension(ContactExtensionBase, ContentExtension):
                 validators=[InputRequired()]
             )
 
-        return InheritableContactPageForm
+        return ContactPageForm
 
 
 class ContactHiddenOnPageExtension(ContentExtension):
