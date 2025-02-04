@@ -133,7 +133,7 @@ The topics view provides information about all the topics, including
 their hierarchical relationship via a `parent` link. Links to children
 are implicit through their `parent` link.
 
-`curl https://[base_url]/news`
+`curl https://[base_url]/topics`
 
 
 ## Authorization

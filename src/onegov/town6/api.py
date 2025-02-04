@@ -115,7 +115,7 @@ class NewsApiEndpoint(ApiEndpoint[News]):
     def item_links(self, item: News) -> dict[str, Any]:
         return {
             'html': item,
-            'image': item.page_image,
+            'image': item.page_image or None,
         }
 
 
@@ -155,12 +155,10 @@ class TopicApiEndpoint(ApiEndpoint[Topic]):
         }
 
     def item_links(self, item: Topic) -> dict[str, Any]:
-        links: dict[str, Any] = {
+        return {
             'html': item,
-            'image': item.page_image
+            'image': item.page_image or None,
+            'parent': ApiEndpointItem(
+                self.app, self.endpoint, str(item.parent_id)
+            ) if item.parent_id is not None else None,
         }
-
-        if item.parent_id is not None:
-            links['parent'] = ApiEndpointItem(
-                self.app, self.endpoint, str(item.parent_id))
-        return links
