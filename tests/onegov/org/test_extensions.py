@@ -339,19 +339,22 @@ def test_person_link_move_function():
     ]
 
 
-def test_contact_extension():
-    class Topic(ContactExtension):
-        content = {}
+def test_contact_extension(org_app):
+    from onegov.org.models import Topic
 
     class TopicForm(Form):
         pass
 
-    topic = Topic()
+    topic = Topic('test')
     assert topic.contact is None
     assert topic.contact_html is None
 
-    request = Bunch(**{'app.settings.org.disabled_extensions': []})
-    form_class = topic.with_content_extensions(TopicForm, request=request)
+    request = Bunch(app=org_app, session=org_app.session())
+    form_class = topic.with_content_extensions(
+        TopicForm,
+        request=request,
+        extensions=(ContactExtension,)
+    )
     form = form_class()
 
     assert 'contact' in form._fields
@@ -379,7 +382,11 @@ def test_contact_extension():
         '</p>'
     )
 
-    form_class = topic.with_content_extensions(TopicForm, request=request)
+    form_class = topic.with_content_extensions(
+        TopicForm,
+        request=request,
+        extensions=(ContactExtension,)
+    )
     form = form_class()
 
     form.process(obj=topic)
@@ -391,21 +398,25 @@ def test_contact_extension():
     )
 
 
-def test_contact_extension_with_top_level_domain_agency():
-    class Topic(ContactExtension):
-        content = {}
+def test_contact_extension_with_top_level_domain_agency(org_app):
+    from onegov.org.models import Topic
 
     class TopicForm(Form):
         pass
 
-    topic = Topic()
+    topic = Topic('test')
 
     assert topic.contact is None
     assert topic.contact_html is None
 
-    request = Bunch(**{'app.settings.org.disabled_extensions': []})
-    form_class = topic.with_content_extensions(TopicForm, request=request)
+    request = Bunch(app=org_app, session=org_app.session())
+    form_class = topic.with_content_extensions(
+        TopicForm,
+        request=request,
+        extensions=(ContactExtension,)
+    )
     form = form_class()
+    form.request = request
 
     assert 'contact' in form._fields
 
