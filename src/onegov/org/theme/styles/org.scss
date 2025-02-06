@@ -6635,6 +6635,10 @@ a#results {
                     rgba($iron, .25) 20px
                 );
                 cursor: default;
+
+                &.event-available.event-adjustable {
+                    cursor: pointer;
+                }
             }
 
             &.not-selected:not(:hover) {
@@ -6656,6 +6660,13 @@ a#results {
         .event-available {
             background-color: $green;
             cursor: pointer;
+        }
+
+        .event-adjustable::before {
+            float: right;
+            color: white;
+            font-size: 1.5rem;
+            @include icon($edit-link-icon);
         }
     }
 }

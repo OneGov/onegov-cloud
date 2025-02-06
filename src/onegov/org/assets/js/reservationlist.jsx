@@ -43,8 +43,12 @@ $.fn.reservationList = function(options) {
         var list = $(element);
 
         // handles clicks on events
-        list.on('click', '.event:not(.event-unavailable,.selected)', function(e) {
+        list.on('click', '.event:not(.event-unavailable)', function(e) {
             var el = $(this);
+            if (!el.hasClass('event-adjustable') && el.hasClass('selected')) {
+                e.preventDefault();
+                return false;
+            }
             var event = {
                 partlyAvailable: el.data('partly-available'),
                 quota: el.data('quota'),
@@ -56,7 +60,24 @@ $.fn.reservationList = function(options) {
                 reserveurl: el.data('reserveurl')
             };
             rl.removeAllPopups();
-            rl.showActionsPopup(list, this, event);
+            if (el.hasClass('event-adjustable')) {
+                rl.showActionsPopup(list, this, event);
+            } else {
+                // we only allow one reservation per row, so if we pick another one
+                // we delete the previous one
+                var delete_existing = el.data('delete');
+                if (delete_existing !== undefined) {
+                    rl.delete(list, delete_existing);
+                }
+                rl.reserve(
+                    list,
+                    event.reserveurl,
+                    event.start.format('hh:mm'),
+                    event.end.format('hh:mm'),
+                    1,
+                    event.wholeDay
+                );
+            }
             e.preventDefault();
             return false;
         });
@@ -256,34 +277,52 @@ rl.setupReservationSelect = function(options) {
 
                 // clear list state
                 list.find('.event').removeClass(['selected', 'not-selected'])
-                .removeAttr('data-delete');
+                    .removeAttr('data-delete');
 
                 // set list state
+                /* eslint-disable max-nested-callbacks */
                 _.each(data.reservations, function(reservation) {
                     var resource = reservation.resource;
                     var isodate = reservation.date.substring(0, 10);
-                    var column = list.find('th[data-resource="'+resource+'"]').index();
-                    var row = list.find('tr[data-date="'+isodate+'"]');
+                    var column = list.find('th[data-resource="' + resource + '"]').index();
+                    var row = list.find('tr[data-date="' + isodate + '"]');
                     var events = row.children().eq(column).find('.event');
                     var selected = null;
                     if (events.length === 1) {
                         selected = events.eq(0);
                     } else {
                         var target_start = moment(reservation.date);
-                        var min_diff = Infinity;
-                        _.each(events, function(event) {
-                            var date = moment(event.data('start'));
-                            var diff = target_start.diff(start);
-                            if (diff < min_diff) {
-                                selected = event;
-                                min_diff = diff;
+                        var target_end = moment(target_start)
+                            .set('hour', parseInt(reservation.time.substring(8, 10), 10))
+                            .set('minute', parseInt(reservation.time.substring(11), 10));
+                        events.filter(':not(.event-adjustable)').each(function() {
+                            var event = $(this);
+                            if (!target_start.isSame(event.data('start'))) {
+                                return;
                             }
-                        })
+                            if (target_end.isSame(event.data('end'))) {
+                                selected = event;
+                            }
+                        });
+
+                        if (selected === null) {
+                            events.filter('.event-adjustable').each(function() {
+                                var event = $(this);
+                                if (target_start.isBefore(event.data('start'))) {
+                                    return;
+                                }
+                                if (!target_end.isAfter(event.data('end'))) {
+                                    selected = event;
+                                }
+                            });
+                        }
                     }
                     // visually mark selected event and set delete link
                     if (selected !== null) {
-                        row.find('.event').removeClass('selected')
-                        .addClass('not-selected').data('delete', reservation.delete);
+                        row.find('.event')
+                            .removeClass('selected')
+                            .addClass('not-selected')
+                            .data('delete', reservation.delete);
                         if (column >= 0) {
                             // if column < 0 it means the resource is not currently
                             // visible due to a filter, we still want to show that
@@ -294,6 +333,7 @@ rl.setupReservationSelect = function(options) {
                         }
                     }
                 });
+                /* eslint-enable max-nested-callbacks */
 
                 rl.loadPreviousReservationState(list, data.reservations);
             });

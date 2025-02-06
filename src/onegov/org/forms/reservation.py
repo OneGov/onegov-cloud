@@ -45,6 +45,28 @@ class FindYourSpotForm(Form):
     if TYPE_CHECKING:
         request: OrgRequest
 
+    # FIXME: Proper duration field
+    duration = TimeField(
+        label=_('I am looking for an appointment lasting'),
+        default=time(1),
+        validators=[InputRequired()],
+        render_kw={
+            'step': 300,
+            'min': '00:05',
+        }
+    )
+
+    weekdays = MultiCheckboxField(
+        label=_('On Weekday(s)'),
+        choices=WEEKDAYS,
+        coerce=int,
+        default=[v for v, l in WEEKDAYS[:5]],
+        validators=[InputRequired()],
+        render_kw={
+            'prefix_label': False,
+            'class_': 'oneline-checkboxes'
+        })
+
     start = DateField(
         label=_('From'),
         validators=[InputRequired()])
@@ -54,32 +76,27 @@ class FindYourSpotForm(Form):
         validators=[InputRequired()])
 
     start_time = TimeField(
-        label=_('Start'),
+        label=_('Earliest Start'),
         description=_('HH:MM'),
         default=time(7),
-        validators=[DataRequired()])
+        validators=[DataRequired()],
+        render_kw={
+            'step': 300,
+        })
 
     end_time = TimeField(
-        label=_('End'),
+        label=_('Latest End'),
         description=_('HH:MM'),
         default=time(22),
-        validators=[DataRequired()])
+        validators=[DataRequired()],
+        render_kw={
+            'step': 300,
+        })
 
     rooms = MultiCheckboxField(
         label=_('Rooms'),
         choices=(),
         coerce=lambda v: UUID(v) if isinstance(v, str) else v,
-        validators=[InputRequired()],
-        render_kw={
-            'prefix_label': False,
-            'class_': 'oneline-checkboxes'
-        })
-
-    weekdays = MultiCheckboxField(
-        label=_('Weekdays'),
-        choices=WEEKDAYS,
-        coerce=int,
-        default=[v for v, l in WEEKDAYS[:5]],
         validators=[InputRequired()],
         render_kw={
             'prefix_label': False,
@@ -139,7 +156,7 @@ class FindYourSpotForm(Form):
                 return False
         return None
 
-    def ensure_start_time_before_end_time(self) -> bool | None:
+    def ensure_start_before_end_time_and_valid_duration(self) -> bool | None:
         start = self.start_time.data
         end = self.end_time.data
         if start and end:
@@ -153,6 +170,18 @@ class FindYourSpotForm(Form):
                 assert isinstance(self.start_time.errors, list)
                 self.start_time.errors.append(_('Start time before end time'))
                 return False
+
+            if duration := self.duration.data:
+                max_duration = (
+                    (60*end.hour + end.minute)
+                    - (60*start.hour + end.minute)
+                )
+                if (60*duration.hour + duration.minute) > max_duration:
+                    assert isinstance(self.duration.errors, list)
+                    self.duration.errors.append(_(
+                        'Duration is longer than the range between '
+                        'start and end time'
+                    ))
         return None
 
     @cached_property

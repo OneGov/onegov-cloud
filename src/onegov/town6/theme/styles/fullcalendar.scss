@@ -739,7 +739,6 @@ a#results {
             }
 
             &.selected {
-                cursor: default;
                 background-image: repeating-linear-gradient(
                     45deg,
                     rgba($steel, .25),
@@ -747,6 +746,11 @@ a#results {
                     rgba($iron, .25) 10px,
                     rgba($iron, .25) 20px
                 );
+                cursor: default;
+
+                &.event-available.event-adjustable {
+                    cursor: pointer;
+                }
             }
 
             &.not-selected:not(:hover) {
@@ -768,6 +772,13 @@ a#results {
         .event-available {
             cursor: pointer;
             background-color: $green;
+        }
+
+        .event-adjustable::before {
+            float: right;
+            color: white;
+            font-size: 1.5rem;
+            @include icon($edit-link-icon);
         }
     }
 }

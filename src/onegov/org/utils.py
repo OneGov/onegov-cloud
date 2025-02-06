@@ -627,7 +627,7 @@ class AllocationEventInfo:
 class FindYourSpotEventInfo:
 
     __slots__ = ('allocation', 'slot_time', 'availability', 'quota_left',
-                 'request', 'translate')
+                 'request', 'translate', 'adjustable')
 
     def __init__(
         self,
@@ -635,7 +635,9 @@ class FindYourSpotEventInfo:
         slot_time: DateRange | None,
         availability: float,
         quota_left: int,
-        request: OrgRequest
+        request: OrgRequest,
+        *,
+        adjustable: bool = False
     ) -> None:
 
         self.allocation = allocation
@@ -643,6 +645,7 @@ class FindYourSpotEventInfo:
         self.availability = availability
         self.quota_left = quota_left
         self.request = request
+        self.adjustable = adjustable
         self.translate = request.translate
 
     @property
@@ -732,6 +735,9 @@ class FindYourSpotEventInfo:
                 yield 'event-partly-available'
             else:
                 yield 'event-unavailable'
+
+        if self.adjustable:
+            yield 'event-adjustable'
 
     @property
     def css_class(self) -> str:
