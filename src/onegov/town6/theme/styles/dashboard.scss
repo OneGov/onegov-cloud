@@ -14,7 +14,7 @@
         margin-top: -.2rem;
     }
 
-    li {
+    tr {
         &.boardlet-failure {
             border-top-color: $red-light;
         }
@@ -39,19 +39,6 @@
                 background: transparent;
             }
 
-            tr {
-                background: transparent;
-
-                &.none {
-                    color: $base;
-                }
-            }
-
-            td {
-                padding: .2rem 0;
-                background: transparent;
-            }
-
             td:first-child {
                 white-space: nowrap;
                 width: 1%;
@@ -60,16 +47,13 @@
 
         .fact-number,
         .fact-icon {
-            background: $white;
-            padding: .2rem .5rem;
+            padding: .5rem;
             border-radius: .2rem;
-            width: 100%;
-            display: block;
             text-align: right;
         }
 
         .fact-icon {
-            padding: .3rem;
+            text-align: center;
         }
 
         .fact-text {
