@@ -6247,5 +6247,32 @@ msgstr "Utente creato correttamente"
 msgid "This recipient has delivery failures, including hard bounces, invalid email addresses, spam complaints, manual deactivations, or being blocked. We recommend unsubscribing it from the list."
 msgstr "Questo destinatario presenta errori di consegna, tra cui rimbalzi, indirizzi e-mail non validi, reclami per spam, disattivazioni manuali o blocco. Si consiglia di cancellarlo dall'elenco."
 
-#~ msgid "Photo album. Will be shown at the end of content."
+msgid "Last Edited Pages"
+msgstr "Ultime pagine modificate"
+
+msgid "Last Edited News"
+msgstr "Ultime notizie modificate"
+
+msgid "Web Statistics"
+msgstr "Statistiche Web"
+
+msgid "Most Popular Pages"
+msgstr "Pagine più popolari"
+
+msgid "Unique Visitors in the Last Month"
+msgstr "Visitatori unici nell'ultimo mese"
+
+msgid "Total Visits in the Last Month"
+msgstr "Visite totali nell'ultimo mese"
+
+msgid "Total Page Views in the Last Month"
+msgstr "Visualizzazioni totali di pagine nell'ultimo mese"
+
+msgid "Number of Page Views per Visit"
+msgstr "Numero di visualizzazioni di pagine per visita"
+
+msgid "Average Visit Duration in Minutes"
+msgstr "Durata media della visita in minuti"
+
+#~ msgid "Photo album. Will be shown at the end of content."#~ msgid "Photo album. Will be shown at the end of content."
 #~ msgstr "Album fotografico. Sarà mostrato alla fine del contenuto."

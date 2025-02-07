@@ -6243,6 +6243,33 @@ msgstr "Der Benutzer wurde erfolgreich erstellt"
 msgid "This recipient has delivery failures, including hard bounces, invalid email addresses, spam complaints, manual deactivations, or being blocked. We recommend unsubscribing it from the list."
 msgstr "Dieser Empfänger hat Zustellungsfehler, einschließlich Hard Bounces, ungültige E-Mail-Adresse, Spam-Beschwerde, manuelle Deaktivierung oder wird blockiert. Wir empfehlen, ihn von der Liste abzumelden."
 
+msgid "Last Edited Pages"
+msgstr "Zuletzt bearbeitete Seiten"
+
+msgid "Last Edited News"
+msgstr "Zuletzt bearbeitete News"
+
+msgid "Web Statistics"
+msgstr "Web-Statistik"
+
+msgid "Most Popular Pages"
+msgstr "Beliebteste Seiten"
+
+msgid "Unique Visitors in the Last Month"
+msgstr "Einzigartige Besucher im letzten Monat"
+
+msgid "Total Visits in the Last Month"
+msgstr "Gesamtbesuche im letzten Monat"
+
+msgid "Total Page Views in the Last Month"
+msgstr "Gesamtseitenaufrufe im letzten Monat"
+
+msgid "Number of Page Views per Visit"
+msgstr "Anzahl der Seitenaufrufe pro Besuch"
+
+msgid "Average Visit Duration in Minutes"
+msgstr "Durchschnittliche Besuchsdauer in Minuten"
+
 #~ msgid "Describes in detail how this form is to be used"
 #~ msgstr "Beschreibt detailliert wie dieses Formular benutzt werden soll"
 

@@ -18,12 +18,13 @@ if TYPE_CHECKING:
     from collections.abc import Iterator
     from sqlalchemy.orm import Session
 
+    from onegov.org.request import OrgRequest
     from onegov.town6.request import TownRequest
 
 
-class TownBoardlet(Boardlet):
+class OrgBoardlet(Boardlet):
 
-    request: TownRequest
+    request: OrgRequest
 
     @cached_property
     def session(self) -> Session:
@@ -47,11 +48,11 @@ class TownBoardlet(Boardlet):
 
 
 @TownApp.boardlet(name='ticket', order=(1, 1), icon='fa-ticket-alt')
-class TicketBoardlet(TownBoardlet):
+class TicketBoardlet(OrgBoardlet):
 
     @property
     def title(self) -> str:
-        return 'Tickets'
+        return _('Tickets')
 
     @property
     def facts(self) -> Iterator[BoardletFact]:
@@ -124,34 +125,41 @@ class TicketBoardlet(TownBoardlet):
         )
 
 
-def get_icon_for_visibility(visibility: str) -> str:
-    visibility_icons = {
+def get_icon_for_access_level(access: str) -> str:
+    access_icons = {
         'public': 'fa-eye',
         'secret': 'fa-user-secret',
         'private': 'fa-lock',
         'member': 'fa-users'
     }
 
-    if visibility not in visibility_icons:
-        raise ValueError(f'Invalid visibility: {visibility}')
+    if access not in access_icons:
+        raise ValueError(f'Invalid access: {access}')
 
-    return visibility_icons[visibility]
+    return access_icons[access]
 
 
-def get_icon_title(request: TownRequest, visibility: str) -> str:
-    if visibility not in ['public', 'secret', 'private', 'member']:
-        raise ValueError(f'Invalid visibility: {visibility}')
+def get_icon_title(request: TownRequest, access: str) -> str:
+    access_texts = {
+        'public': 'Public',
+        'secret': 'Through URL only (not listed)',
+        'private': 'Only by privileged users',
+        'member': 'Only by privileged users and members'
+    }
+    if access not in ['public', 'secret', 'private', 'member']:
+        raise ValueError(f'Invalid access: {access}')
 
-    return request.translate(_('Visibility ${visibility}',
-                             mapping={'visibility': visibility}))
+    a = request.translate(_('Access'))
+    b = request.translate(_(access_texts[access]))
+    return f'{a}: {b}'
 
 
 @TownApp.boardlet(name='pages', order=(1, 2), icon='fa-edit')
-class EditedPagesBoardlet(TownBoardlet):
+class EditedPagesBoardlet(OrgBoardlet):
 
     @property
     def title(self) -> str:
-        return 'Last Edited Pages'
+        return _('Last Edited Pages')
 
     @property
     def facts(self) -> Iterator[BoardletFact]:
@@ -163,17 +171,17 @@ class EditedPagesBoardlet(TownBoardlet):
             yield BoardletFact(
                 text='',
                 link=(self.layout.request.link(p), p.title),
-                icon=get_icon_for_visibility(p.access),  # type:ignore[attr-defined]
+                icon=get_icon_for_access_level(p.access),  # type:ignore[attr-defined]
                 icon_title=get_icon_title(self.request, p.access)  # type:ignore[attr-defined]
             )
 
 
 @TownApp.boardlet(name='news', order=(1, 3), icon='fa-edit')
-class EditedNewsBoardlet(TownBoardlet):
+class EditedNewsBoardlet(OrgBoardlet):
 
     @property
     def title(self) -> str:
-        return 'Last Edited News'
+        return _('Last Edited News')
 
     @property
     def facts(self) -> Iterator[BoardletFact]:
@@ -184,17 +192,17 @@ class EditedNewsBoardlet(TownBoardlet):
             yield BoardletFact(
                 text='',
                 link=(self.layout.request.link(n), n.title),
-                icon=get_icon_for_visibility(n.access),
+                icon=get_icon_for_access_level(n.access),
                 icon_title=get_icon_title(self.request, n.access)
             )
 
 
-@TownApp.boardlet(name='web-stats', order=(2, 1))
-class PlausibleStats(TownBoardlet):
+@TownApp.boardlet(name='web stats', order=(2, 1))
+class PlausibleStats(OrgBoardlet):
 
     @property
     def title(self) -> str:
-        return 'Web Statistics'
+        return _('Web Statistics')
 
     @property
     def enabled(self) -> bool:
@@ -212,17 +220,17 @@ class PlausibleStats(TownBoardlet):
 
         for text, number in results.items():
             yield BoardletFact(
-                text=text,
+                text=self.request.translate(_(text)),
                 number=number
             )
 
 
-@TownApp.boardlet(name='Top Pages', order=(2, 2))
-class PlausibleTopPages(TownBoardlet):
+@TownApp.boardlet(name='most popular pages', order=(2, 2))
+class PlausibleTopPages(OrgBoardlet):
 
     @property
     def title(self) -> str:
-        return 'Top Pages'
+        return _('Most Popular Pages')
 
     @property
     def enabled(self) -> bool:
