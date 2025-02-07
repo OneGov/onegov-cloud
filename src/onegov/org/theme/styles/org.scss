@@ -328,6 +328,7 @@ $globals-height: 2.5rem;
         text-align: center;
     }
 
+    .dashboard::before { @include icon('\f0e4'); }
     .login::before { @include icon('\f090'); }
     .logout::before { @include icon('\f08b'); }
     .register::before { @include icon('\f234'); }
