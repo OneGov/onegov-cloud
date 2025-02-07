@@ -1178,7 +1178,7 @@ def view_directory_entry_update_recipients(
     for recipient in recipients:
         letter = recipient.address[0].upper()
         by_letter[letter].append(recipient)
-    by_letter = dict(sorted(by_letter.items()))
+    by_letter = defaultdict(list, sorted(by_letter.items()))
 
     layout = layout or DirectoryEntryCollectionLayout(self, request)
     layout.breadcrumbs.append(Link(_('Recipients of new entry updates'), '#'))
