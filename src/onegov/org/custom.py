@@ -70,7 +70,7 @@ def get_global_tools(request: OrgRequest) -> Iterator[Link | LinkGroup]:
             Link(
                 text=_('Dashboard'),
                 url=request.class_link(Dashboard),
-                attrs={'class': 'show-dashboard'}
+                attrs={'class': 'dashboard'}
             )
         )
 

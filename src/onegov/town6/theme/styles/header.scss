@@ -163,6 +163,7 @@ $trash-restore-icon: '\f829';
         }
     }
 
+    .dashboard::before { @include icon-bold('\f3fd'); }
     .login::before { @include icon-bold("\f2f6"); }
     .logout::before { @include icon-bold("\f2f5"); }
     .register::before { @include icon("\f234"); }
