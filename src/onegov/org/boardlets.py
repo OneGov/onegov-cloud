@@ -205,7 +205,7 @@ class PlausibleStats(OrgBoardlet):
         return _('Web Statistics')
 
     @property
-    def enabled(self) -> bool:
+    def is_available(self) -> bool:
         return self.plausible_api.site_id is not None
 
     @property
@@ -233,7 +233,7 @@ class PlausibleTopPages(OrgBoardlet):
         return _('Most Popular Pages')
 
     @property
-    def enabled(self) -> bool:
+    def is_available(self) -> bool:
         return self.plausible_api.site_id is not None
 
     @property

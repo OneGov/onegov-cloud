@@ -84,8 +84,8 @@ class Boardlet:
         raise NotImplementedError()
 
     @property
-    def enabled(self) -> bool:
-        """ Returns true if the boardlet is enabled/has data. """
+    def is_available(self) -> bool:
+        """ Returns true if the boardlet is active/has data. """
         return True
 
     @property
