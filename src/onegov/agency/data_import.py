@@ -446,7 +446,8 @@ def import_lu_people(
             location_address=v_(line.adresse),
             location_code_city=v_(get_plz_city(line.plz, line.ort)),
             access='public',
-            compare_names_only=True
+            compare_names_only=True,
+            external_id=v_(line.benutzer_id)
         )
         persons.append(person)
         parse_membership(line, person, function)
