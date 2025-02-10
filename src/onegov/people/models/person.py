@@ -156,6 +156,11 @@ class Person(Base, ContentMixin, TimestampMixin, ORMSearchable,
     #: some remarks about the person
     notes: Column[str | None] = Column(Text, nullable=True)
 
+    #: It's an external system identifier for synchronization.
+    #: Used for agency import. Is called 'Benutzer-ID' in csv import file,
+    # 'division' in api.
+    external_id: Column[str | None] = Column(Text, nullable=True)
+
     memberships: relationship[AppenderQuery[AgencyMembership]]
     memberships = relationship(
         AgencyMembership,
