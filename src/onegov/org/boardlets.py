@@ -7,12 +7,13 @@ from functools import cached_property
 from sedate import utcnow
 from typing import TYPE_CHECKING
 
+from onegov.org import OrgApp
 from onegov.org.layout import DefaultLayout
 from onegov.org.models import Boardlet, BoardletFact, News
 from onegov.page import Page
 from onegov.plausible.plausible_api import PlausibleAPI
 from onegov.ticket import Ticket
-from onegov.town6 import TownApp, _
+from onegov.town6 import _
 
 if TYPE_CHECKING:
     from collections.abc import Iterator
@@ -44,10 +45,12 @@ class OrgBoardlet(Boardlet):
                 match = re.search(r'data-domain="(.+?)"', analytics_code)
                 site_id = match.group(1) if match else None
 
-        return PlausibleAPI(site_id)
+            return PlausibleAPI(site_id)
+
+        return None
 
 
-@TownApp.boardlet(name='ticket', order=(1, 1), icon='fa-ticket-alt')
+@OrgApp.boardlet(name='ticket', order=(1, 1), icon='fa-ticket-alt')
 class TicketBoardlet(OrgBoardlet):
 
     @property
@@ -80,38 +83,41 @@ class TicketBoardlet(OrgBoardlet):
             icon='fa-plus-circle'
         )
 
-        closed_tickets = (
+        closed_tickets_count = (
             self.session.query(Ticket).
             filter(Ticket.closed_on.isnot(None)).
             filter(Ticket.closed_on >= time_30d_ago).count())
         yield BoardletFact(
             text=_('Closed Tickets in the Last Month'),
-            number=closed_tickets,
+            number=closed_tickets_count,
             icon='fa-check-circle'
         )
 
-        closed_tickets = (
+        query = (
             self.session.query(Ticket).
             filter(Ticket.closed_on.isnot(None)).
-            filter(Ticket.closed_on >= time_30d_ago).all())
+            filter(Ticket.closed_on >= time_30d_ago))
+        closed_tickets_count = query.count()
+        closed_tickets = query.all()
 
         # average lead time from opening to closing
-        average_lead_time_s: float | str = '-'
+        average_lead_time_s: float | None = None
         if closed_tickets:
             total_lead_time_s = sum(
-                t.reaction_time + t.process_time for t in closed_tickets)
-            average_lead_time_s = total_lead_time_s / len(closed_tickets)
+                (t.reaction_time or 0) + (t.process_time or 0)
+                for t in closed_tickets)
+            average_lead_time_s = total_lead_time_s / closed_tickets_count
             average_lead_time_s = round(average_lead_time_s / 86400, 1)
 
         yield BoardletFact(
             text=_('Lead Time from opening to closing in Days '
-                   'over the Last Month '),
-            number=average_lead_time_s,
+                   'over the Last Month'),
+            number=average_lead_time_s or '-',
             icon='fa-clock'
         )
 
         # average lead time from pending to closing
-        average_lead_time_s = '-'
+        average_lead_time_s = None
         if closed_tickets:
             total_lead_time_s = sum(t.process_time for t in closed_tickets)
             average_lead_time_s = total_lead_time_s / len(closed_tickets)
@@ -120,7 +126,7 @@ class TicketBoardlet(OrgBoardlet):
         yield BoardletFact(
             text=_('Lead Time from pending to closing in Days '
                    'over the Last Month'),
-            number=average_lead_time_s,
+            number=average_lead_time_s or '-',
             icon='fa-clock'
         )
 
@@ -139,7 +145,7 @@ def get_icon_for_access_level(access: str) -> str:
     return access_icons[access]
 
 
-def get_icon_title(request: TownRequest, access: str) -> str:
+def get_icon_title(request: OrgRequest, access: str) -> str:
     access_texts = {
         'public': 'Public',
         'secret': 'Through URL only (not listed)',
@@ -154,7 +160,7 @@ def get_icon_title(request: TownRequest, access: str) -> str:
     return f'{a}: {b}'
 
 
-@TownApp.boardlet(name='pages', order=(1, 2), icon='fa-edit')
+@OrgApp.boardlet(name='pages', order=(1, 2), icon='fa-edit')
 class EditedPagesBoardlet(OrgBoardlet):
 
     @property
@@ -176,7 +182,7 @@ class EditedPagesBoardlet(OrgBoardlet):
             )
 
 
-@TownApp.boardlet(name='news', order=(1, 3), icon='fa-edit')
+@OrgApp.boardlet(name='news', order=(1, 3), icon='fa-edit')
 class EditedNewsBoardlet(OrgBoardlet):
 
     @property
@@ -197,7 +203,7 @@ class EditedNewsBoardlet(OrgBoardlet):
             )
 
 
-@TownApp.boardlet(name='web stats', order=(2, 1))
+@OrgApp.boardlet(name='web stats', order=(2, 1))
 class PlausibleStats(OrgBoardlet):
 
     @property
@@ -206,10 +212,12 @@ class PlausibleStats(OrgBoardlet):
 
     @property
     def is_available(self) -> bool:
-        return self.plausible_api.site_id is not None
+        return self.plausible_api is not None
 
     @property
     def facts(self) -> Iterator[BoardletFact]:
+        if not self.plausible_api:
+            return None
 
         results = self.plausible_api.get_stats()
         if not results:
@@ -225,7 +233,7 @@ class PlausibleStats(OrgBoardlet):
             )
 
 
-@TownApp.boardlet(name='most popular pages', order=(2, 2))
+@OrgApp.boardlet(name='most popular pages', order=(2, 2))
 class PlausibleTopPages(OrgBoardlet):
 
     @property
@@ -234,13 +242,14 @@ class PlausibleTopPages(OrgBoardlet):
 
     @property
     def is_available(self) -> bool:
-        return self.plausible_api.site_id is not None
+        return self.plausible_api is not None
 
     @property
     def facts(self) -> Iterator[BoardletFact]:
+        if not self.plausible_api:
+            return None
 
         results = self.plausible_api.get_top_pages(limit=10)
-
         if not results:
             yield BoardletFact(
                 text=_('No data available'),

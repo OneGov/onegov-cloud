@@ -17,7 +17,7 @@ class Dashboard:
 
     @property
     def is_available(self) -> bool:
-        """ Returns true if there are boardlets to show. """
+        """ Returns true if there are `Boardlet`s to display. """
 
         return self.request.app.config.boardlets_registry and True or False
 

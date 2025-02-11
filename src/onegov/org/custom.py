@@ -68,8 +68,7 @@ def get_global_tools(request: OrgRequest) -> Iterator[Link | LinkGroup]:
 
         links.append(
             Link(
-                text=_('Dashboard'),
-                url=request.class_link(Dashboard),
+                _('Dashboard'), request.class_link(Dashboard),
                 attrs={'class': 'dashboard'}
             )
         )

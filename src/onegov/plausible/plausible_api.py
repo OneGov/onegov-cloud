@@ -10,13 +10,12 @@ log = logging.getLogger('onegov.plausible')
 
 class PlausibleAPI:
 
-    def __init__(self, site_id:str|None=None) -> None:
+    def __init__(self, site_id: str | None = None) -> None:
         """
         Initialize Plausible API client
         For details about the API see https://plausible.io/docs/stats-api
 
         """
-
         # plausible url
         self.url = 'https://analytics.seantis.ch/api/v2/query'
 
@@ -82,7 +81,7 @@ class PlausibleAPI:
         figures = results[0].get('metrics', figures)
 
         # convert last figure from seconds to minutes
-        figures[-1] = round(int(figures[-1]) / 60, 1) if figures[-1] else '-'
+        figures[-1] = round(int(figures[-1]) / 60, 1) if figures[-1] else 0
 
         texts = [
             'Unique Visitors in the Last Month',
@@ -118,7 +117,6 @@ class PlausibleAPI:
         results = r.get('results', [])
         if not results:
             return {}
-
         return {
             result['dimensions'][0]: result['metrics'][0] for result in results
         }
