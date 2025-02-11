@@ -15,7 +15,7 @@ repos:
         exclude: .pre-commit-config.yaml
       - id: pt_structure
   - repo: https://github.com/astral-sh/ruff-pre-commit
-    rev: v0.9.2
+    rev: v0.9.4
     hooks:
       - id: ruff
         args: [ "--fix" ]
@@ -32,7 +32,7 @@ repos:
     - id: sass-lint
       files: '^src/.*\.scss'
   - repo: https://github.com/pre-commit/mirrors-eslint
-    rev: v9.18.0
+    rev: v9.19.0
     hooks:
     - id: eslint
       files: '^src/.*\.jsx?$'

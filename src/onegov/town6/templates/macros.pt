@@ -1658,11 +1658,16 @@
             <div class="dark-overlay" tal:condition="text"></div>
             <div class="grid-container" tal:condition="text">
                 <div class="text">
-                    <tal:b tal:condition="text_link|False">
-                        <a class="button" href="${text_link}">${text}</a>
-                    </tal:b>
-                    <tal:b tal:condition="not:text_link|False">
+                    <p tal:condition="text and button_url">
+                        <tal:b >
+                            <span>${text}</span>
+                        </tal:b>
+                    </p>
+                    <tal:b tal:condition="text and not button_url">
                         <span>${text}</span>
+                    </tal:b>
+                    <tal:b tal:condition="button_url|False">
+                        <a class="button" href="${button_url}">${button_text}<tal:b condition="not: button_text" i18n:translate="">Show more</tal:b></a>
                     </tal:b>
                 </div>
             </div>

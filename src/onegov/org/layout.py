@@ -865,7 +865,7 @@ class DefaultMailLayoutMixin:
         return paragraphify(text)
 
 
-class DefaultMailLayout(Layout, DefaultMailLayoutMixin):  # type:ignore[misc]
+class DefaultMailLayout(Layout, DefaultMailLayoutMixin):
     """ A special layout for creating HTML E-Mails. """
 
     @cached_property
@@ -3120,6 +3120,14 @@ class PaymentProviderLayout(DefaultLayout):
                 LinkGroup(
                     title=_('Add'),
                     links=(
+                        Link(
+                            text=_('Datatrans'),
+                            url=self.request.class_link(
+                                PaymentProviderCollection,
+                                name='new-datatrans'
+                            ),
+                            attrs={'class': 'new-datatrans'}
+                        ),
                         Link(
                             text=_('Stripe Connect'),
                             url=self.request.class_link(

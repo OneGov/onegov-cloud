@@ -157,7 +157,8 @@ def view_my_invoices(
             title=title,
             price=price,
             email=user.username,
-            locale=request.locale
+            complete_url=request.link(self),
+            request=request,
         )
 
     def user_select_link(user: User) -> str:
@@ -197,8 +198,7 @@ def handle_payment(
 
     provider = request.app.default_payment_provider
     assert provider is not None
-    token = request.params.get('payment_token')
-    assert token is None or isinstance(token, str)
+    token = provider.get_token(request)
     # FIXME: Can period actually be omitted, i.e. are there
     #        cases where we only get a single Invoice when we
     #        omit the period?

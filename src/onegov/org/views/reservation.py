@@ -530,7 +530,8 @@ def confirm_reservation(
             title=self.title,
             price=price,
             email=reservations[0].email,
-            locale=request.locale
+            complete_url=request.link(self, 'finish'),
+            request=request,
         )
     }
 
@@ -555,10 +556,7 @@ def finalize_reservation(self: Resource, request: OrgRequest) -> Response:
 
     try:
         provider = request.app.default_payment_provider
-        payment_token = request.params.get('payment_token')
-        if not isinstance(payment_token, str):
-            payment_token = None
-
+        payment_token = provider.get_token(request) if provider else None
         price = request.app.adjust_price(self.price_of_reservation(
             token,
             submission.form_obj.total() if submission else None

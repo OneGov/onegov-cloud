@@ -1922,6 +1922,16 @@ msgstr ""
 "    - Unterthema 3.1\n"
 "```"
 
+msgid "Notify on newsletter unsubscription"
+msgstr "Benachrichtigung bei Abmeldung vom Newsletter"
+
+msgid ""
+"Send an email notification to the following users when a recipient "
+"unsubscribes from the newsletter"
+msgstr ""
+"Sende eine E-Mail-Benachrichtigung an die folgenden Benutzer, wenn sich ein "
+"Empfänger vom Newsletter abmeldet"
+
 msgid "Invalid YAML format. Please refer to the example."
 msgstr "Ungültiges YAML Format. Bitte beachten Sie das Beispiel."
 
@@ -2600,6 +2610,9 @@ msgstr "Exporte"
 msgid "Payment Providers"
 msgstr "Zahlungsanbieter"
 
+msgid "Datatrans"
+msgstr "Datatrans"
+
 msgid "Synchronise"
 msgstr "Synchronisieren"
 
@@ -3002,8 +3015,8 @@ msgstr "Die Absage von ${title} kann nicht rückgängig gemacht werden."
 msgid "Reject reservation"
 msgstr "Reservation absagen"
 
-#. Used in sentence: "${event} published."
 #.
+#. Used in sentence: "${event} published."
 msgid "Event"
 msgstr "Veranstaltung"
 
@@ -4063,6 +4076,13 @@ msgstr "Klicken Sie hier, um die Web-Version anzuzeigen."
 
 msgid "You no longer wish to receive the newsletter?"
 msgstr "Sie möchten den Newsletter nicht mehr erhalten?"
+
+msgid ""
+"The user with the address ${address} just unsubscribed from the newsletter "
+"subscriber list."
+msgstr ""
+"Der Benutzer mit der Adresse ${address} hat sich soeben von der Newsletter-"
+"Abonnentenliste abgemeldet."
 
 msgid "Click the following link to set a new password:"
 msgstr "Klicken Sie auf den folgenden Link, um ein neues Passwort zu setzen:"
@@ -5466,14 +5486,14 @@ msgstr ""
 "Der Totalbetrag für Ihre Eingaben beläuft sich auf ${total} allerdings ist "
 "der Minimalbetrag ${minimum}. Bitte ändern Sie ihre Eingaben."
 
+msgid "Registrations are no longer possible"
+msgstr "Anmeldungen sind nicht mehr möglich"
+
 msgid "Pay Online and Complete"
 msgstr "Online zahlen und abschliessen"
 
 msgid "Your payment could not be processed"
 msgstr "Ihre Zahlung konnte nicht verarbeitet werden"
-
-msgid "Registrations are no longer possible"
-msgstr "Anmeldungen sind nicht mehr möglich"
 
 msgid "Your registration has been confirmed"
 msgstr "Ihre Anmeldung wurde bestätigt"
@@ -5529,6 +5549,10 @@ msgid ""
 msgstr ""
 "Erfolg! Wir haben ${address} zur Liste der Empfänger hinzugefügt. Abonnierte "
 "Kategorien sind ${subscribed}."
+
+#, python-format
+msgid "Success! We have added ${address} to the list of recipients."
+msgstr "Erfolg! Wir haben ${address} zur Liste der Empfänger hinzugefügt."
 
 #, python-format
 msgid ""
@@ -5658,6 +5682,12 @@ msgstr "Die Zahlung wurde eingenommen"
 msgid "The payment was refunded"
 msgstr "Die Zahlung wurde rückerstattet"
 
+msgid "The payment is already captured but is still processing"
+msgstr "Die Zahlung wurde bereits eingenommen, aber wurde noch nicht fertig verarbeitet"
+
+msgid "Could not refund the payment"
+msgstr "Die Zahlung konnte nicht rückerstattet werden"
+
 msgid "As default"
 msgstr "Als Standard"
 
@@ -5706,8 +5736,29 @@ msgstr "Der Zahlungsanbieter wurde gelöscht."
 msgid "Successfully synchronised payments"
 msgstr "Synchronisierung erfolgreich"
 
+msgid "Merchant Name"
+msgstr "Händlername"
+
+msgid "UPP Username"
+msgstr "UPP Benutername"
+
+msgid "UPP Password"
+msgstr "UPP Passwort"
+
+msgid "Webhook Signing Key"
+msgstr "Webhook Signier-Schlüssel"
+
 msgid "Charge fees to customer"
 msgstr "Kreditkarten-Gebühren dem Kunden verrechnen"
+
+msgid "Use sandbox environment (for testing)"
+msgstr "Sandbox Umbegung verwenden (nur für Testing)"
+
+msgid "Datatrans has been added"
+msgstr "Datatrans wurde hinzugefügt"
+
+msgid "Add Datatrans"
+msgstr "Datatrans hinzufügen"
 
 msgid "Added a new person"
 msgstr "Eine neue Person wurde hinzugefügt"
@@ -5979,6 +6030,9 @@ msgstr "Themen"
 msgid "You have successfully unsubscribed from the newsletter at ${address}"
 msgstr ""
 "Sie haben die Mail-Adresse ${address} erfolgreich vom Newsletter abgemeldet"
+
+msgid "Unsubscription from newsletter"
+msgstr "Abmeldung vom Newsletter"
 
 msgid "A survey with this name already exists"
 msgstr "Eine Umfrage mit diesem Namen existiert bereits"
