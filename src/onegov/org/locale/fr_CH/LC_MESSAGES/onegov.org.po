@@ -2,7 +2,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE 1.0\n"
-"POT-Creation-Date: 2025-01-30 15:51+0100\n"
+"POT-Creation-Date: 2025-02-11 15:15+0100\n"
 "PO-Revision-Date: 2022-03-15 10:50+0100\n"
 "Last-Translator: Marc Sommerhalder <marc.sommerhalder@seantis.ch>\n"
 "Language-Team: French\n"
@@ -2609,6 +2609,9 @@ msgstr "Opérateurs de paiement"
 
 msgid "Datatrans"
 msgstr "Datatrans"
+
+msgid "Worldline Saferpay"
+msgstr "Worldline Saferpay"
 
 msgid "Synchronise"
 msgstr "Synchroniser"
@@ -5704,6 +5707,9 @@ msgstr "Le paiement a déjà été saisi mais est encore en cours de traitement"
 msgid "Could not refund the payment"
 msgstr "Impossible de rembourser le paiement"
 
+msgid "Could not capture the payment"
+msgstr "Le paiement n'a pas pu être saisi"
+
 msgid "As default"
 msgstr "Par défaut"
 
@@ -5771,11 +5777,32 @@ msgstr "Facturer le client"
 msgid "Use sandbox environment (for testing)"
 msgstr "Utiliser l'environnement sandbox (pour les tests)"
 
+msgid "Customer Name"
+msgstr "Nom du client"
+
+msgid "Customer ID"
+msgstr "ID du client"
+
+msgid "Terminaux ID"
+msgstr "ID du terminal"
+
+msgid "API Username"
+msgstr "Nom d'utilisateur API"
+
+msgid "API Password"
+msgstr "Mot de passe API"
+
 msgid "Datatrans has been added"
 msgstr "Datatrans a été ajouté"
 
 msgid "Add Datatrans"
 msgstr "Ajouter Datatrans"
+
+msgid "Worldline Saferpay has been added"
+msgstr "Worldline Saferpay a été ajouté"
+
+msgid "Add Worldline Saferpay"
+msgstr "Ajouter Worldline Saferpay"
 
 msgid "Added a new person"
 msgstr "Nouvelle personne ajoutée"

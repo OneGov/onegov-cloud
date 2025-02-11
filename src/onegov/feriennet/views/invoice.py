@@ -75,7 +75,13 @@ def view_creditcard_payments(
 def view_my_invoices(
     self: InvoiceCollection,
     request: FeriennetRequest
-) -> RenderData:
+) -> RenderData | Response:
+
+    payment_provider = request.app.default_payment_provider
+    if payment_provider and payment_provider.payment_via_get:
+        token = payment_provider.get_token(request)
+        if token:
+            return handle_payment(self, request, token)
 
     query = PeriodCollection(request.session).query()
     query = query.filter(Period.finalized == True)
@@ -134,7 +140,6 @@ def view_my_invoices(
         account = meta.get('bank_esr_participant_number')
 
     beneficiary = meta.get('bank_beneficiary')
-    payment_provider = request.app.default_payment_provider
     qr_bill_enabled = meta.get('bank_qr_bill', False)
     layout = InvoiceLayout(self, request, title)
 
@@ -193,12 +198,15 @@ def view_my_invoices(
     request_method='POST')
 def handle_payment(
     self: InvoiceCollection,
-    request: FeriennetRequest
+    request: FeriennetRequest,
+    token: str | None = None
 ) -> Response:
 
     provider = request.app.default_payment_provider
     assert provider is not None
-    token = provider.get_token(request)
+
+    if token is None:
+        token = provider.get_token(request)
     # FIXME: Can period actually be omitted, i.e. are there
     #        cases where we only get a single Invoice when we
     #        omit the period?
