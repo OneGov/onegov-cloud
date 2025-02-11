@@ -664,7 +664,8 @@ class WorldlineSaferpay(PaymentProvider[SaferpayPayment]):
 
         # ensure the transaction can be settled
         tx = self.client.assert_transaction(token)
-        tx.raise_if_cannot_be_captured()
+        if tx.type != 'PAYMENT' or tx.status not in ('AUTHORIZED', 'CAPTURED'):
+            raise SaferpayPaymentError('Invalid transaction type')
         if (
             tx.amount.currency_code != currency
             or tx.amount.value != round(amount * 100)
@@ -681,11 +682,13 @@ class WorldlineSaferpay(PaymentProvider[SaferpayPayment]):
             remote_id=tx.id,
             order_id=tx.order_id,
             six_transaction_reference=tx.six_transaction_reference,
-            state='open'
+            state='paid' if tx.status == 'CAPTURED' else 'open'
         )
 
-        assert self.customer_id is not None
-        SaferpayCaptureManager.capture_charge(self.client, tx)
+        if tx.status == 'AUTHORIZED':
+            # we need to capture the charge
+            assert self.customer_id is not None
+            SaferpayCaptureManager.capture_charge(self.client, tx)
 
         # we do *not* want to lose this information, so even though the
         # caller should make sure the payment is stored, we make sure
