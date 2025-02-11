@@ -20,7 +20,6 @@ if TYPE_CHECKING:
     from sqlalchemy.orm import Session
 
     from onegov.org.request import OrgRequest
-    from onegov.town6.request import TownRequest
 
 
 class OrgBoardlet(Boardlet):

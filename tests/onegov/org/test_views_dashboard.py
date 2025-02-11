@@ -1,14 +1,10 @@
 import uuid
-from unittest.mock import patch
-
 import transaction
 
-from onegov.org import OrgApp
 from onegov.org.boardlets import OrgBoardlet
 from onegov.plausible.plausible_api import PlausibleAPI
 from onegov.ticket import TicketCollection
 from onegov.user import User
-from tests.onegov.core.test_sentry import monkeypatch_test_transport
 from tests.onegov.ticket.test_collection import EchoHandler
 
 
