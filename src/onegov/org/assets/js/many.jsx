@@ -453,12 +453,19 @@ function extractType(target) {
 }
 
 jQuery.fn.many = function() {
-    return this.each(function(index) {
+    // Don't forget to change this file in town6 as well.
+    return this.each(function() {
 
         var target = $(this);
         var type = extractType(target);
-        var data = JSON.parse(target.val());
+        try {
+            var data = JSON.parse(target.val());
+        } catch (e) {
+            console.log('Failed to parse JSON:', e);
+            return; // Skip this iteration if JSON is invalid
+        }
         var label = target.closest('label');
+        var errors = label.siblings('.error');
 
         // straight-up hiding the element prevents it from getting update
         // with the target.val call below
@@ -467,6 +474,7 @@ jQuery.fn.many = function() {
             'position': 'absolute'
         });
         label.hide();
+        errors.hide();
 
         // Create a unique wrapper for this instance
         let wrapperId = 'many-wrapper-' + Math.random().toString(36).substr(2, 9);
@@ -480,7 +488,6 @@ jQuery.fn.many = function() {
             el.attr('data-depends-on', dependency);
         }
 
-        // Create scoped onChange handler
         var onChange = function(newValues) {
             data.values = newValues.values;
             var json = JSON.stringify(data);
@@ -489,25 +496,10 @@ jQuery.fn.many = function() {
             label.hide();
         };
 
-        // Render with error handling
-        try {
-            ReactDOM.render(
-                React.createElement(ManyFields, {
-                    type: type,
-                    data: data,
-                    onChange: onChange
-                }),
-                document.getElementById(wrapperId)
-            );
-        } catch (e) {
-            console.error('Failed to render ManyFields for ' + type, e);
-            // Restore original input if render fails
-            el.remove();
-            label.css({
-                'position': 'static',
-                'visibility': 'visible'
-            });
-        }
+        ReactDOM.render(
+            <ManyFields type={type} data={data} onChange={onChange} />,
+            el.get(0)
+        );
     });
 };
 
