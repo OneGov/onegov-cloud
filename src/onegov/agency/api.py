@@ -19,6 +19,7 @@ if TYPE_CHECKING:
     from onegov.agency.models import ExtendedPerson
     from onegov.core.orm.mixins import ContentMixin
     from onegov.core.orm.mixins import TimestampMixin
+    from onegov.core.request import CoreRequest
     from typing import TypeVar
 
     T = TypeVar('T')
@@ -124,7 +125,40 @@ class PersonApiEndpoint(ApiEndpoint['ExtendedPerson'], ApisMixin):
         result.batch_size = self.batch_size
         return result
 
-    def item_data(self, item: ExtendedPerson) -> dict[str, Any]:
+    def item_data(
+        self,
+        item: ExtendedPerson,
+        request: CoreRequest
+    ) -> dict[str, Any]:
+        if request.authorization:
+            data = {
+                attribute: getattr(item, attribute, None)
+                for attribute in (
+                    'academic_title',
+                    'born',
+                    'email',
+                    'first_name',
+                    'function',
+                    'last_name',
+                    'location_address',
+                    'location_code_city',
+                    'notes',
+                    'parliamentary_group',
+                    'phone',
+                    'phone_direct',
+                    'political_party',
+                    'postal_address',
+                    'postal_code_city',
+                    'profession',
+                    'salutation',
+                    'title',
+                    'website',
+                )
+                if attribute not in self.app.org.hidden_people_fields
+            }
+            data['modified'] = get_modified_iso_format(item)
+            return data
+
         data = {
             attribute: getattr(item, attribute, None)
             for attribute in (
@@ -207,7 +241,7 @@ class AgencyApiEndpoint(ApiEndpoint['ExtendedAgency'], ApisMixin):
         result.batch_size = self.batch_size
         return result
 
-    def item_data(self, item: ExtendedAgency) -> dict[str, Any]:
+    def item_data(self, item: ExtendedAgency, request: CoreRequest) -> dict[str, Any]:
         return {
             'title': item.title,
             'portrait': item.portrait,
@@ -265,7 +299,7 @@ class MembershipApiEndpoint(
         result.batch_size = self.batch_size
         return result
 
-    def item_data(self, item: ExtendedAgencyMembership) -> dict[str, Any]:
+    def item_data(self, item: ExtendedAgencyMembership, request: CoreRequest) -> dict[str, Any]:
         return {
             'title': item.title,
             'modified': get_modified_iso_format(item),

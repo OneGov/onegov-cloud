@@ -704,6 +704,7 @@ class ModuleSettingsForm(Form):
     hidden_people_fields = MultiCheckboxField(
         label=_('Hide these fields for non-logged-in users'),
         fieldset=_('People'),
+        default=['external_id'],
         choices=[
             ('salutation', _('Salutation')),
             ('academic_title', _('Academic Title')),
@@ -722,6 +723,7 @@ class ModuleSettingsForm(Form):
             ('postal_address', _('Postal address')),
             ('postal_code_city', _('Postal Code and City')),
             ('notes', _('Notes')),
+            ('external_id', _('external_id'))
         ])
 
     mtan_session_duration_seconds = IntegerField(

@@ -303,7 +303,7 @@ class ApiEndpoint(Generic[_M]):
             for item in self.collection.batch
         }
 
-    def item_data(self, item: _M) -> dict[str, Any]:
+    def item_data(self, item: _M, request: CoreRequest) -> dict[str, Any]:
         """ Return the data properties of the collection item as a dictionary.
 
         For example::

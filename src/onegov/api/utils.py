@@ -31,6 +31,8 @@ def authenticate(request: CoreRequest) -> ApiKey:
         raise ApiException(exception=e) from e
 
     api_key = request.session.query(ApiKey).get(data['id'])
+    user = api_key.user
+    request.identity = api_key.identity
     if api_key is None:
         raise HTTPClientError()
     return api_key
