@@ -3216,3 +3216,6 @@ def test_view_dashboard(client, scenario):
     assert "2 Durchführungen" in page
     assert "1 unbelegt" in page
     assert "1 durchführbar" in page
+
+    # ensure only feriennet boardlets are shown
+    assert len(page.pyquery('.boardlet')) == 6
