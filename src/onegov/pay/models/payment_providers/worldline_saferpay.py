@@ -702,13 +702,14 @@ class WorldlineSaferpay(PaymentProvider[SaferpayPayment]):
         if not (signed_nonce := request.GET.get('saferpay_nonce')):
             return None
         app = request.app
-        nonce = app.unsign(signed_nonce, request.browser_session._token)
+        salt = app.sign(request.browser_session._token, 'saferpay_salt')
+        nonce = app.unsign(signed_nonce, salt)
         if not nonce or not (signed_token := app.cache.get(nonce)):
             return None
 
         # make sure the nonce can't be reused
         app.cache.delete(nonce)
-        return app.unsign(signed_token, request.browser_session._token)
+        return app.unsign(signed_token, salt)
 
     def checkout_button(
         self,
@@ -730,7 +731,7 @@ class WorldlineSaferpay(PaymentProvider[SaferpayPayment]):
         # append a saferpay nonce to the complete url
         app = request.app
         nonce = random_token()
-        salt = request.browser_session._token
+        salt = app.sign(request.browser_session._token, 'saferpay_salt')
         signed_nonce = app.sign(nonce, salt)
         complete_url = append_query_param(
             complete_url,
