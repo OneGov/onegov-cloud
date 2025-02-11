@@ -106,8 +106,7 @@ def view_api_endpoint(
                                 'name': name,
                                 'value': value
                             }
-                            for name, value in self.item_data(item,
-                                                              request).items()
+                            for name, value in self.item_data(item).items()
                         ],
                         'links': [
                             {

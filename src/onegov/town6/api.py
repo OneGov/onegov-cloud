@@ -15,7 +15,6 @@ if TYPE_CHECKING:
     from onegov.event.models import Occurrence
     from onegov.core.orm.mixins import ContentMixin
     from onegov.core.orm.mixins import TimestampMixin
-    from onegov.core.request import CoreRequest
     from typing import TypeVar
 
     T = TypeVar('T')
@@ -51,7 +50,7 @@ class EventApiEndpoint(ApiEndpoint['Occurrence']):
         result.batch_size = self.batch_size
         return result
 
-    def item_data(self, item: Occurrence, request: CoreRequest) -> dict[str, Any]:
+    def item_data(self, item: Occurrence) -> dict[str, Any]:
         return {
             'title': item.title,
             'description': item.event.description,
@@ -137,7 +136,7 @@ class TopicApiEndpoint(ApiEndpoint[Topic]):
         result.batch_size = 25
         return result
 
-    def item_data(self, item: Topic, request: CoreRequest) -> dict[str, Any]:
+    def item_data(self, item: Topic) -> dict[str, Any]:
         if item.publication_start:
             publication_start = item.publication_start.isoformat()
         else:
