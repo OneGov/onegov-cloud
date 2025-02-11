@@ -541,6 +541,9 @@ class SaferpayPayment(Payment):
                 )
                 return
 
+        if self.capture_id != remote_obj.capture_id:
+            self.capture_id = remote_obj.capture_id
+
         match remote_obj.status:
             case 'CAPTURED':
                 self.state = 'paid'
