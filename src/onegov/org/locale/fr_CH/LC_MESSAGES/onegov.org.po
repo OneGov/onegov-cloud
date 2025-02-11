@@ -2808,6 +2808,24 @@ msgstr ""
 msgid "Sidebar links"
 msgstr "Liens dans la barre latérale"
 
+msgid "Contact link"
+msgstr "Lien de contact"
+
+msgid "Sidebar contact"
+msgstr "Contact dans la barre latérale"
+
+msgid "Please provide a URL if contact link text is set"
+msgstr "Veuillez fournir une URL si le texte du lien de contact est défini"
+
+msgid "Please provide link text if contact URL is set"
+msgstr "Veuillez indiquer le texte du lien si l'URL de contact est définie"
+
+msgid "Contact Text"
+msgstr "Lien de contact"
+
+msgid "Contact URL"
+msgstr "URL de contact"
+
 msgid "Delete content when expired"
 msgstr "Supprimer le contenu lorsqu'il est expiré"
 
@@ -6312,6 +6330,3 @@ msgstr "Un compte a été créé pour vous"
 
 msgid "The user was created successfully"
 msgstr "L'utilisateur a bien été créé"
-
-#~ msgid "Photo album. Will be shown at the end of content."
-#~ msgstr "Album photo. Sera affiché à la fin du contenu."
