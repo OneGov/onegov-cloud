@@ -14,6 +14,10 @@
         margin-top: -.2rem;
     }
 
+    table{
+        margin-bottom: 0;
+    }
+
     tr {
         &.boardlet-failure {
             border-top-color: $red-light;
@@ -43,6 +47,7 @@
                 white-space: nowrap;
                 width: 1%;
             }
+
         }
 
         .fact-number,

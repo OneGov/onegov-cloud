@@ -14,14 +14,14 @@
                                 <i class="fas ${fact.icon}" tal:attributes="title fact.icon_title|None"></i>
                             </td>
                             <td tal:condition="fact.number is not None" class="fact-number">
-                                ${layout.format_number(fact.number)}
+                                ${layout.format_number(fact.number) or '-'}
                             </td>
                             <td tal:condition="not:(fact.number is not None or fact.icon)" class="fact-number">
                                 -
                             </td>
                             <td class="fact-text">
                                 ${fact.text}
-                                <span tal:condition="fact.link" class="boardlet-fact">
+                                <span tal:condition="fact.link">
                                     <a href="${fact.link[0]}">${fact.link[1]}</a>
                                 </span>
                             </td>

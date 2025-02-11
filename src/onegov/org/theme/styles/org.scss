@@ -6334,7 +6334,10 @@ h2 + div.timeline {
     border-top: 10px solid $green-light;
     margin-bottom: 1.5rem;
     padding: .5rem 1rem 1rem;
-    width: calc((100% / 3) - 1rem);
+    //padding: 1rem;
+    //width: calc((100% / 3) + 1rem);
+    //max-width: calc((100% / 3) - 1rem);
+    //max-width: 60%;
 
     h2 {
         font-size: 1.3rem;
@@ -6343,11 +6346,36 @@ h2 + div.timeline {
         word-wrap: break-word;
     }
 
-    li {
+    table {
+        margin-bottom: 0;
+    }
+
+    tr {
         font-size: .9rem;
 
         &.zero {
             color: $base;
+        }
+
+        .facts {
+            width: 100%;
+            table-layout: auto;
+            border-collapse: collapse;
+        }
+
+        .fact-number,
+        .fact-icon {
+            padding: 0.5rem;
+            text-align: right;
+        }
+
+        .fact-icon {
+            text-align: center;
+        }
+
+        .fact-text {
+            margin-left: .5rem;
+            width: 100%;
         }
     }
 
