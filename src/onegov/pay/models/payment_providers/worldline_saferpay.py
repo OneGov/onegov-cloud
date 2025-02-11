@@ -340,12 +340,13 @@ class SaferpayClient:
             )
             self.raise_for_status(res)
             refund_tx = SaferpayTransaction.model_validate_json(res.content)
-            try:
-                # try to capture but if we can't don't stress about it
-                # they can try to manually capture it
-                self.capture(refund_tx, 'REFUND')
-            except Exception:
-                log.exception('Failed to capture Saferpay refund')
+            if refund_tx.status == 'AUTHORIZED':
+                try:
+                    # try to capture but if we can't don't stress about it
+                    # they can try to manually capture it
+                    self.capture(refund_tx, 'REFUND')
+                except Exception:
+                    log.exception('Failed to capture Saferpay refund')
             return refund_tx
         elif tx.status == 'CANCELED':
             # transaction is already canceled
