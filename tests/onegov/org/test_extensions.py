@@ -17,7 +17,7 @@ from onegov.org.models import Topic
 from onegov.org.models.extensions import (
     PersonLinkExtension, ContactExtension, AccessExtension, HoneyPotExtension,
     SidebarLinksExtension, PeopleShownOnMainPageExtension,
-    InlinePhotoAlbumExtension,
+    InlinePhotoAlbumExtension, SidebarContactLinkExtension,
 )
 from onegov.people import Person
 from tests.shared.utils import create_pdf
@@ -674,6 +674,50 @@ def test_sidebar_links_extension(session):
     assert topic.sidepanel_links == [
         ('Govikon School', 'https://www.govikon-school.ch'),
         ('Castle Govikon', 'https://www.govikon-castle.ch')]
+
+
+def test_sidebar_contact_extension(session):
+    class Topic(SidebarContactLinkExtension):
+        sidepanel_contact = []
+
+    class TopicForm(Form):
+        pass
+
+    topic = Topic()
+    assert topic.sidepanel_contact == []
+
+    request = Bunch(**{
+        'app.settings.org.disabled_extensions': [],
+        'session': session
+    })
+
+    form_class = topic.with_content_extensions(TopicForm, request=request)
+    form = form_class(meta={'request': request})
+
+    assert 'sidepanel_contact' in form._fields
+    assert form.sidepanel_contact.data == None
+
+    form.sidepanel_contact.data = '''
+    {"labels":
+        {"text": "Contact Text",
+        "link": "Contact URL",
+        "add": "Add",
+        "remove": "Remove"},
+    "values": [
+        {"text": "Town Hall",
+        "link": "https://www.townhall.gov", "error": ""},
+        {"text": "Public Services",
+        "link": "https://www.public-services.gov", "error": ""}
+    ]
+    }
+    '''
+
+    form.populate_obj(topic)
+
+    assert topic.sidepanel_contact == [
+        ('Town Hall', 'https://www.townhall.gov'),
+        ('Public Services', 'https://www.public-services.gov')
+    ]
 
 
 def test_inline_photo_album_extension():
