@@ -116,5 +116,11 @@ class InvoiceItem(Base, TimestampMixin, PayableManyTimes):
 
     @validates('source')
     def validate_source(self, key: str, value: str | None) -> str | None:
-        assert value in (None, 'xml', 'datatrans', 'stripe_connect')
+        assert value in (
+            None,
+            'xml',
+            'datatrans',
+            'stripe_connect',
+            'worldline_saferpay'
+        )
         return value

@@ -2,7 +2,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: \n"
-"POT-Creation-Date: 2025-01-30 15:51+0100\n"
+"POT-Creation-Date: 2025-02-11 15:15+0100\n"
 "PO-Revision-Date: 2022-03-15 10:52+0100\n"
 "Last-Translator: \n"
 "Language-Team: \n"
@@ -2616,6 +2616,9 @@ msgstr "Provider di servizi di pagamento"
 
 msgid "Datatrans"
 msgstr "Datatrans"
+
+msgid "Worldline Saferpay"
+msgstr "Worldline Saferpay"
 
 msgid "Synchronise"
 msgstr "Sincronizza"
@@ -5670,10 +5673,14 @@ msgid "The payment was refunded"
 msgstr "Il pagamento è stato rimborsato"
 
 msgid "The payment is already captured but is still processing"
-msgstr "Il pagamento è già stato acquisito ma è ancora in fase di elaborazione."
+msgstr ""
+"Il pagamento è già stato acquisito ma è ancora in fase di elaborazione."
 
 msgid "Could not refund the payment"
 msgstr "Impossibile rimborsare il pagamento"
+
+msgid "Could not capture the payment"
+msgstr "Impossibile acquisire il pagamento"
 
 msgid "As default"
 msgstr "Valore predefinito"
@@ -5741,11 +5748,32 @@ msgstr "Addebita commissioni al cliente"
 msgid "Use sandbox environment (for testing)"
 msgstr "Utilizzare l'ambiente sandbox (per i test)"
 
+msgid "Customer Name"
+msgstr "Nome del cliente"
+
+msgid "Customer ID"
+msgstr "ID cliente"
+
+msgid "Terminal ID"
+msgstr "ID terminali"
+
+msgid "API Username"
+msgstr "Nome utente API"
+
+msgid "API Password"
+msgstr "Password API"
+
 msgid "Datatrans has been added"
 msgstr "È stato aggiunto Datatrans"
 
 msgid "Add Datatrans"
 msgstr "Aggiungi Datatrans"
+
+msgid "Worldline Saferpay has been added"
+msgstr "È stato aggiunto Worldline Saferpay"
+
+msgid "Add Worldline Saferpay"
+msgstr "Aggiungi Worldline Saferpay"
 
 msgid "Added a new person"
 msgstr "Aggiunta una nuova persona"

@@ -1181,9 +1181,19 @@
     <div i18n:translate tal:condition="payment.source == 'manual'">
         Manual
     </div>
+    <div tal:condition="payment.source == 'datatrans'">
+        <a href="${payment.remote_url}">
+            Datatrans
+        </a>
+    </div>
     <div tal:condition="payment.source == 'stripe_connect'">
         <a href="${payment.remote_url}">
             Stripe Connect
+        </a>
+    </div>
+    <div tal:condition="payment.source == 'worldline_saferpay'">
+        <a href="${payment.remote_url}">
+            Worldline Saferpay
         </a>
     </div>
 </metal:payment_status>

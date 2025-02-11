@@ -20,7 +20,7 @@ from onegov.org.utils import user_group_emails_for_new_ticket
 from onegov.org.models import TicketMessage, SubmissionMessage
 from onegov.pay import PaymentError, Price
 from purl import URL
-from webob.exc import HTTPNotFound
+from webob.exc import HTTPMethodNotAllowed, HTTPNotFound
 
 
 from typing import Literal, TYPE_CHECKING
@@ -213,7 +213,11 @@ def handle_pending_submission(
 
 
 @OrgApp.view(model=PendingFormSubmission, name='complete',
+             permission=Public, request_method='GET')
+@OrgApp.view(model=PendingFormSubmission, name='complete',
              permission=Public, request_method='POST')
+@OrgApp.view(model=CompleteFormSubmission, name='complete',
+             permission=Public, request_method='GET')
 @OrgApp.view(model=CompleteFormSubmission, name='complete',
              permission=Private, request_method='POST')
 def handle_complete_submission(
@@ -229,6 +233,17 @@ def handle_complete_submission(
     # button is basically just there so we can use a POST instead of a GET)
     form.validate()
     form.ignore_csrf_error()
+
+    # NOTE: we only allow GET requests for some specific payment providers
+    if request.method == 'GET' and (
+        form.errors
+        or self.state == 'complete'
+        or (provider := request.app.default_payment_provider) is None
+        or not provider.payment_via_get
+    ):
+        # TODO: A redirect back to the previous step with an error might
+        #       be better UX, if this error can occur too easily...
+        raise HTTPMethodNotAllowed()
 
     if form.errors:
         return morepath.redirect(request.link(self))

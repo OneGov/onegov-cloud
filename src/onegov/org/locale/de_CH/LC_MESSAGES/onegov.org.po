@@ -1,7 +1,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE 1.0\n"
-"POT-Creation-Date: 2025-01-30 15:51+0100\n"
+"POT-Creation-Date: 2025-02-11 15:15+0100\n"
 "PO-Revision-Date: 2022-03-15 10:21+0100\n"
 "Last-Translator: Marc Sommerhalder <marc.sommerhalder@seantis.ch>\n"
 "Language-Team: German\n"
@@ -2612,6 +2612,9 @@ msgstr "Zahlungsanbieter"
 
 msgid "Datatrans"
 msgstr "Datatrans"
+
+msgid "Worldline Saferpay"
+msgstr "Worldline Saferpay"
 
 msgid "Synchronise"
 msgstr "Synchronisieren"
@@ -5665,10 +5668,15 @@ msgid "The payment was refunded"
 msgstr "Die Zahlung wurde rückerstattet"
 
 msgid "The payment is already captured but is still processing"
-msgstr "Die Zahlung wurde bereits eingenommen, aber wurde noch nicht fertig verarbeitet"
+msgstr ""
+"Die Zahlung wurde bereits eingenommen, aber wurde noch nicht fertig "
+"verarbeitet"
 
 msgid "Could not refund the payment"
 msgstr "Die Zahlung konnte nicht rückerstattet werden"
+
+msgid "Could not capture the payment"
+msgstr "Die Zahlung konnte nicht eingenommen werden"
 
 msgid "As default"
 msgstr "Als Standard"
@@ -5736,11 +5744,32 @@ msgstr "Kreditkarten-Gebühren dem Kunden verrechnen"
 msgid "Use sandbox environment (for testing)"
 msgstr "Sandbox Umbegung verwenden (nur für Testing)"
 
+msgid "Customer Name"
+msgstr "Kundenname"
+
+msgid "Customer ID"
+msgstr "Kundennummer"
+
+msgid "Terminal ID"
+msgstr "Terminal ID"
+
+msgid "API Username"
+msgstr "API Nutzername"
+
+msgid "API Password"
+msgstr "API Passwort"
+
 msgid "Datatrans has been added"
 msgstr "Datatrans wurde hinzugefügt"
 
 msgid "Add Datatrans"
 msgstr "Datatrans hinzufügen"
+
+msgid "Worldline Saferpay has been added"
+msgstr "Worldline Saferpay wurde hinzugefügt"
+
+msgid "Add Worldline Saferpay"
+msgstr "Worldline Saferpay hinzufügen"
 
 msgid "Added a new person"
 msgstr "Eine neue Person wurde hinzugefügt"

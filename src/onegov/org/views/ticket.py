@@ -136,7 +136,11 @@ def view_ticket(
                 request.link(payment, name='change-net-amount')
             )
 
-    if payment and payment.source in ('stripe_connect', 'datatrans'):
+    if payment and payment.source in (
+        'stripe_connect',
+        'datatrans',
+        'worldline_saferpay',
+    ):
         payment_button = online_payment_button(payment, layout)
 
     return {
