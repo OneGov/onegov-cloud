@@ -6243,6 +6243,21 @@ msgstr "Der Benutzer wurde erfolgreich erstellt"
 msgid "This recipient has delivery failures, including hard bounces, invalid email addresses, spam complaints, manual deactivations, or being blocked. We recommend unsubscribing it from the list."
 msgstr "Dieser Empfänger hat Zustellungsfehler, einschließlich Hard Bounces, ungültige E-Mail-Adresse, Spam-Beschwerde, manuelle Deaktivierung oder wird blockiert. Wir empfehlen, ihn von der Liste abzumelden."
 
+msgid "No data available"
+msgstr "Keine Daten verfügbar"
+
+msgid "New Tickets in the Last Month"
+msgstr "Neue Tickets im letzten Monat"
+
+msgid "Closed Tickets in the Last Month"
+msgstr "Abgeschlossene Tickets im letzten Monat"
+
+msgid "Lead Time from opening to closing in Days over the Last Month"
+msgstr "Zeit von Öffnung bis Schliessung in Tagen im letzten Monat"
+
+msgid "Lead Time from pending to closing in Days over the Last Month"
+msgstr "Zeit von Bearbeitung bis Schliessung in Tagen im letzten Monat"
+
 msgid "Last Edited Pages"
 msgstr "Zuletzt bearbeitete Seiten"
 

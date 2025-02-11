@@ -6247,6 +6247,21 @@ msgstr "Utente creato correttamente"
 msgid "This recipient has delivery failures, including hard bounces, invalid email addresses, spam complaints, manual deactivations, or being blocked. We recommend unsubscribing it from the list."
 msgstr "Questo destinatario presenta errori di consegna, tra cui rimbalzi, indirizzi e-mail non validi, reclami per spam, disattivazioni manuali o blocco. Si consiglia di cancellarlo dall'elenco."
 
+msgid "No data available"
+msgstr "Nessun dato disponibile"
+
+msgid "New Tickets in the Last Month"
+msgstr "Nuovi biglietti nell'ultimo mese"
+
+msgid "Closed Tickets in the Last Month"
+msgstr "Biglietti chiusi nell'ultimo mese"
+
+msgid "Lead Time from opening to closing in Days over the Last Month"
+msgstr "Tempo di gestione dall'apertura alla chiusura in giorni nell'ultimo mese"
+
+msgid "Lead Time from pending to closing in Days over the Last Month"
+msgstr "Tempo di gestione dall'in sospeso alla chiusura in giorni nell'ultimo mese"
+
 msgid "Last Edited Pages"
 msgstr "Ultime pagine modificate"
 
@@ -6274,5 +6289,5 @@ msgstr "Numero di visualizzazioni di pagine per visita"
 msgid "Average Visit Duration in Minutes"
 msgstr "Durata media della visita in minuti"
 
-#~ msgid "Photo album. Will be shown at the end of content."#~ msgid "Photo album. Will be shown at the end of content."
+#~ msgid "Photo album. Will be shown at the end of content."
 #~ msgstr "Album fotografico. Sarà mostrato alla fine del contenuto."
