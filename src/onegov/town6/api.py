@@ -43,7 +43,8 @@ class EventApiEndpoint(ApiEndpoint['Occurrence']):
     def collection(self) -> Any:
         result = OccurrenceCollection(
             self.session,
-            page=self.page or 0
+            page=self.page or 0,
+            only_public=True
         )
 
         result.batch_size = self.batch_size
@@ -85,7 +86,8 @@ class NewsApiEndpoint(ApiEndpoint[News]):
     def collection(self) -> Any:
         result = NewsCollection(
             self.session,
-            page=self.page or 0
+            page=self.page or 0,
+            only_public=True
         )
         result.batch_size = 25
         return result
@@ -128,7 +130,8 @@ class TopicApiEndpoint(ApiEndpoint[Topic]):
     def collection(self) -> Any:
         result = TopicCollection(
             self.session,
-            page=self.page or 0
+            page=self.page or 0,
+            only_public=True
         )
         result.batch_size = 25
         return result
