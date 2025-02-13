@@ -373,7 +373,8 @@ def test_person_mutation_form():
         'submitter_message': 'There is a typo in the name!',
         'first_name': 'nick',
         'last_name': 'Rivera',
-        'academic_title': 'Dr.'
+        'academic_title': 'Dr.',
+        'lu_external_id': '123456'
     }))
     form.model = ExtendedPerson(first_name="Nick", last_name="Riviera")
     form.request = DummyRequest(None)
@@ -384,13 +385,14 @@ def test_person_mutation_form():
         'email', 'notes', 'first_name', 'last_name', 'born', 'phone',
         'parliamentary_group', 'location_address',
         'location_code_city', 'postal_address', 'postal_code_city',
-        'profession', 'phone_direct', 'academic_title'
+        'profession', 'phone_direct', 'academic_title', 'lu_external_id'
     }
     assert form.first_name.description == 'Nick'
     assert form.last_name.description == 'Riviera'
     assert form.academic_title.description is None
     assert form.proposed_changes == {
-        'academic_title': 'Dr.', 'first_name': 'nick', 'last_name': 'Rivera'
+        'academic_title': 'Dr.', 'first_name': 'nick', 'last_name': 'Rivera',
+        'lu_external_id': '123456'
     }
     assert form.get_useful_data() == {
         'submitter_email': 'info@hospital-springfield.org',
@@ -413,7 +415,8 @@ def test_person_mutation_form():
         'location_code_city': None,
         'postal_address': None,
         'postal_code_city': None,
-        'notes': None
+        'notes': None,
+        'lu_external_id': '123456'
     }
     assert form.validate()
 

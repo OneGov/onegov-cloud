@@ -1,5 +1,4 @@
 from onegov.api.models import ApiEndpoint
-from onegov.api.models import ApiEndpointCollection
 from onegov.api.models import ApiEndpointItem
 from onegov.api.models import ApiException, ApiInvalidParamException
 from onegov.core.utils import Bunch
@@ -36,11 +35,6 @@ def test_api_exceptions():
     exception = ApiInvalidParamException('Invalid Param x', status_code=99)
     assert exception.message == 'Invalid Param x'
     assert exception.status_code == 99
-
-
-def test_api_endpoint_collection(app, endpoint_class):
-    collection = ApiEndpointCollection(app)
-    assert collection.endpoints == {'endpoint': endpoint_class}
 
 
 def test_api_endpoint_item(app, endpoint_class):

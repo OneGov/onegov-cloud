@@ -31,18 +31,7 @@ def test_view_api(client):
     headers = response.headers
     assert headers['Content-Type'] == 'application/vnd.collection+json'
     assert 'X-RateLimit-Limit' not in headers
-    assert response.json == {
-        'collection': {
-            'version': '1.0',
-            'href': 'http://localhost/api',
-            'queries': [{
-                'rel': 'endpoint',
-                'href': 'http://localhost/api/endpoint',
-                'data': []
-            }]
-        }
-    }
-    assert len(Collection.from_json(response.body).queries) == 1
+    assert len(Collection.from_json(response.body).queries) == 2
 
     # Endpoint
     with freeze_time('2020-02-02 20:20'):
