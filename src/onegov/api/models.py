@@ -363,6 +363,8 @@ class ApiEndpoint(Generic[_M]):
                     (HiddenField, HoneyPotField)
                 )
             }
+            breakpoint()
+            
             formdata = MultiDict()
             try:
                 json_data = request.json

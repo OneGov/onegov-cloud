@@ -6,6 +6,7 @@ from onegov.agency.collections import ExtendedPersonCollection
 from onegov.agency.collections import PaginatedAgencyCollection
 from onegov.agency.collections import PaginatedMembershipCollection
 from onegov.agency.forms import PersonMutationForm
+from onegov.agency.forms.person import AuthenticatedPersonMutationForm
 from onegov.api import ApiEndpoint, ApiInvalidParamException
 from onegov.api.utils import authenticate
 from onegov.gis import Coordinates
@@ -101,7 +102,7 @@ class PersonApiEndpoint(ApiEndpoint['ExtendedPerson'], ApisMixin):
     app: AgencyApp
     endpoint = 'people'
     filters = {'first_name', 'last_name'} | UPDATE_FILTER_PARAMS
-    form_class = PersonMutationForm
+    form_class = AuthenticatedPersonMutationForm
 
     @property
     def collection(self) -> ExtendedPersonCollection:
@@ -157,10 +158,10 @@ class PersonApiEndpoint(ApiEndpoint['ExtendedPerson'], ApisMixin):
             and self.request.authorization
             and authenticate(self.request)
         ):
-            # Authenticated users get all fields including lu_external_id
+            # Authenticated users get all fields including external_user_id
             data = {
                 attribute: getattr(item, attribute, None)
-                for attribute in (*self._public_item_data, 'lu_external_id')
+                for attribute in (*self._public_item_data, 'external_user_id')
             }
         else:
             # Non-authenticated users only get non-hidden fields

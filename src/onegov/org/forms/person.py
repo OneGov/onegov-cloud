@@ -30,18 +30,17 @@ class PersonForm(Form):
     political_party = StringField(_('Political Party'))
     parliamentary_group = StringField(_('Parliamentary Group'))
     website = StringField(_('Website'), filters=(ensure_scheme, ))
-    website_2 = StringField(_('Website 2'), filters=(ensure_scheme, ))
-    lu_external_id = StringField(_('External ID'))
+    website_3 = StringField(_('Website 2'), filters=(ensure_scheme, ))
 
     location_address = TextAreaField(
         label=_('Location address'),
-        render_kw={'rows': 2}
+        render_kw={'rows': 3}
     )
     location_code_city = StringField(label=_('Location Code and City'))
 
     postal_address = TextAreaField(
         label=_('Postal address'),
-        render_kw={'rows': 2}
+        render_kw={'rows': 3}
     )
     postal_code_city = StringField(label=_('Postal Code and City'))
 
@@ -54,5 +53,5 @@ class PersonForm(Form):
     notes = TextAreaField(
         label=_('Notes'),
         description=_('Public extra information about this person'),
-        render_kw={'rows': 5}
+        render_kw={'rows': 6}
     )
