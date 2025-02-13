@@ -514,7 +514,8 @@ def import_lu_agencies(
 
         dienststelle, abteilung, unterabteilung, unterabteilung_2 = (
             None, None, None, None)
-        export_fields = ['person.title', 'person.phone']
+        export_fields = ['person.function', 'person.academic_title',
+                         'person.title', 'person.phone']
 
         adr, pc, loc = None, None, None
         phone, phone_u2, phone_u, phone_a, phone_ds, phone_dep = \
