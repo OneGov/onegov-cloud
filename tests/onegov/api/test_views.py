@@ -237,7 +237,7 @@ def test_view_private_field_unauthorized(client):
 
     people = ExtendedPersonCollection(session)
     person = people.add(
-        first_name='vorname', last_name='nachname', lu_external_id='123456'
+        first_name='vorname', last_name='nachname', external_user_id='123456'
     )
     session.flush()
     person_id = person.id.hex
@@ -249,7 +249,7 @@ def test_view_private_field_unauthorized(client):
     person_item_data = json.loads(response_item.body.decode('utf-8'))
     person_data = person_item_data['collection']['items'][0]['data']
     assert not any(
-        d['name'] == 'lu_external_id'
+        d['name'] == 'external_user_id'
         for d in person_data
     )
 
@@ -271,7 +271,7 @@ def test_view_private_field(client):
     session = client.app.session()  # Get fresh session after commit
     people = ExtendedPersonCollection(session)
     person = people.add(
-        first_name='vorname', last_name='nachname', lu_external_id='123456'
+        first_name='vorname', last_name='nachname', external_user_id='123456'
     )
     session.flush()  # Ensure ID is generated
     person_id = person.id.hex  # Store ID before commit
@@ -309,6 +309,6 @@ def test_view_private_field(client):
     person_item_data = json.loads(response_item.body.decode('utf-8'))
     person_data = person_item_data['collection']['items'][0]['data']
     assert any(
-        d['name'] == 'lu_external_id' and d['value'] == '123456'
+        d['name'] == 'external_user_id' and d['value'] == '123456'
         for d in person_data
     )
