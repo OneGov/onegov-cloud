@@ -17,7 +17,10 @@ def reset_payment():
         cls = classes.pop()
 
         for key in (Payment.registered_links or tuple()):
-            del cls.__mapper__._props[key]
+            try:
+                del cls.__mapper__._props[key]
+            except KeyError:
+                pass
 
         classes.extend(cls.__subclasses__())
 

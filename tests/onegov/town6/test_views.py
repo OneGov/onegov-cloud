@@ -32,6 +32,9 @@ def test_links(client):
     assert "Sie wurden nicht automatisch weitergeleitet" in link
     assert 'https://www.google.ch' in link
 
+    edit_page = link.click('Bearbeiten')
+    assert edit_page.pyquery('.delete-link').text() == 'Löschen'
+
     client.get('/auth/logout')
 
     root_page = client.get(root_url)

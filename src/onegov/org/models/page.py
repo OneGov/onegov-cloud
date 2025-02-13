@@ -9,10 +9,10 @@ from onegov.org import _
 from onegov.org.forms import LinkForm, PageForm, IframeForm
 from onegov.org.models.atoz import AtoZ
 from onegov.org.models.extensions import (
-    InheritableContactExtension, ContactHiddenOnPageExtension,
+    ContactExtension, ContactHiddenOnPageExtension,
     PeopleShownOnMainPageExtension, ImageExtension,
     NewsletterExtension, PublicationExtension, DeletableContentExtension,
-    InlinePhotoAlbumExtension
+    InlinePhotoAlbumExtension, SidebarContactLinkExtension
 )
 from onegov.org.models.extensions import AccessExtension
 from onegov.org.models.extensions import CoordinatesExtension
@@ -40,11 +40,11 @@ if TYPE_CHECKING:
 
 class Topic(Page, TraitInfo, SearchableContent, AccessExtension,
             PublicationExtension, VisibleOnHomepageExtension,
-            InheritableContactExtension, ContactHiddenOnPageExtension,
+            ContactExtension, ContactHiddenOnPageExtension,
             PeopleShownOnMainPageExtension, PersonLinkExtension,
             CoordinatesExtension, ImageExtension,
             GeneralFileLinkExtension, SidebarLinksExtension,
-            InlinePhotoAlbumExtension):
+            SidebarContactLinkExtension, InlinePhotoAlbumExtension):
 
     __mapper_args__ = {'polymorphic_identity': 'topic'}
 
@@ -143,7 +143,7 @@ class Topic(Page, TraitInfo, SearchableContent, AccessExtension,
 
 class News(Page, TraitInfo, SearchableContent, NewsletterExtension,
            AccessExtension, PublicationExtension, VisibleOnHomepageExtension,
-           InheritableContactExtension, ContactHiddenOnPageExtension,
+           ContactExtension, ContactHiddenOnPageExtension,
            PeopleShownOnMainPageExtension, PersonLinkExtension,
            CoordinatesExtension, ImageExtension, GeneralFileLinkExtension,
            DeletableContentExtension, InlinePhotoAlbumExtension):
@@ -207,7 +207,7 @@ class News(Page, TraitInfo, SearchableContent, NewsletterExtension,
     def get_root_page_form_class(self, request: OrgRequest) -> type[Form]:
         return self.with_content_extensions(
             Form, request, extensions=(
-                InheritableContactExtension, ContactHiddenOnPageExtension,
+                ContactExtension, ContactHiddenOnPageExtension,
                 PersonLinkExtension, AccessExtension
             )
         )
@@ -349,6 +349,46 @@ class News(Page, TraitInfo, SearchableContent, NewsletterExtension,
         for hashtags, in query:
             all_hashtags.update(hashtags)
         return sorted(all_hashtags)
+
+
+class TopicCollection(Pagination[Topic], AdjacencyListCollection[Topic]):
+    """
+    Use it like this:
+
+        from onegov.page import TopicCollection
+        topics = TopicCollection(session)
+    """
+
+    __listclass__ = Topic
+
+    def __init__(
+        self,
+        session: Session,
+        page: int = 0,
+    ):
+        self.session = session
+        self.page = page
+
+    def subset(self) -> Query[Topic]:
+        topics = self.session.query(Topic)
+        topics = topics.filter(
+            News.publication_started == True,
+            News.publication_ended == False
+        )
+        topics = topics.order_by(desc(Topic.published_or_created))
+        topics = topics.options(undefer('created'))
+        topics = topics.options(undefer('content'))
+        return topics
+
+    @property
+    def page_index(self) -> int:
+        return self.page
+
+    def page_by_index(self, index: int) -> Self:
+        return self.__class__(
+            self.session,
+            page=index
+        )
 
 
 class NewsCollection(Pagination[News], AdjacencyListCollection[News]):

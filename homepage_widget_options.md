@@ -42,7 +42,7 @@ There are two different types of rows, `<row-wide> </row-wide>` and `<row> </row
 </title>
 ```
 | Attribute Name | Description                                | Value if left empty | Possible Values        |
-| ------------- | ------------------------------------------ | ------------------- | ---------------------- |   
+| ------------- | ------------------------------------------ | ------------------- | ---------------------- |
 | `class`       | Custom classes                             | -                   | Any class name         |
 
 
@@ -79,9 +79,11 @@ The images for the slider are defined via photoalbums. You can find the "show on
 ## Autoplay Video(s)
 [![Autoplay Video](docs/_static/homepage_widgets//autoplay_video.png?raw=true)]()
 ```
-    <autoplay_video 
+    <autoplay_video
         max-height="100vh"
         text="Text on video"
+        button_url="https://..."
+        button_text="Button Text"
         link_mp4="/storage/..."
         link_mp4_low_res="/storage/..."
         link_webm="/storage/..."
@@ -92,6 +94,8 @@ The images for the slider are defined via photoalbums. You can find the "show on
 | ------------- | ------------------------------------------ | ------------------- | ---------------------- |
 | `max-height` | The *maximum* height of the video. Can for example be used for fullscreen videos on desktop. The video will center itself in the available space. | Video height                  | 30vw, 40vh, 100px, ... |
 | `text`       | Text to be shown atop of the video | -                   | Any text         |
+| `button_url`       | Adds a button linked to the url | -                   | https://...         |
+| `button_text`       | Text used as the label of the button. Button only appears if there is a button_url. | "Show more"                   | Any text         |
 | `link_mp4_low_res`  | Link to the video in the mp4 format with reduced size uploaded in the files-section. Will be shown for mobile devices instead of the full sized video. | -                   | /storage/...         |
 | `link_mp4`       | Link to the full sized video in the mp4 format uploaded in the files-section. Will be shown for desktop and mobile, if no smaller size is available. | -                   | /storage/...         |
 | `link_webm_low_res`  | Link to the video in the webm format with reduced size uploaded in the files-section. Will be shown for mobile devices instead of the full sized video. | -                   | /storage/...         |
@@ -101,9 +105,9 @@ The images for the slider are defined via photoalbums. You can find the "show on
 You can add multiple videos and wrap them with `<random_videos> </random_videos>` to display one of the videos at random each time the page gets refreshed. Like this:
 ```
 <random_videos>
-    <autoplay_video 
+    <autoplay_video
         link_mp4="/storage/video_1" />
-    <autoplay_video 
+    <autoplay_video
         link_mp4="/storage/video_2" />
 
 </random_videos>
@@ -113,8 +117,8 @@ You can add multiple videos and wrap them with `<random_videos> </random_videos>
 ## Icon Links
 [![Icon Links](docs/_static/homepage_widgets//icon_links.png?raw=true)]()
 ```
-<icon_link 
-    icon="fa-concierge-bell" 
+<icon_link
+    icon="fa-concierge-bell"
     title="Online-Schalter"
     link="/forms"
     text="Nehmen Sie online bequem Dienstleistungen in Anspruch"
@@ -177,7 +181,7 @@ You can adjust the number of displayed events in the homepage-settings form.
 
 ## Partners
 [![Partners](docs/_static/homepage_widgets//partners.png?raw=true)]()
-``` 
+```
 <partners />
 ```
 | Attribute Name | Description      | Value if left empty | Possible Values        |
@@ -210,13 +214,13 @@ The label and visibility of the services can be edited in the homepage settings.
 
 ## Contacts
 [![Contacts](docs/_static/homepage_widgets/people.png?raw=true)]()
-``` 
+```
 <contacts_and_albums/>
 ```
 
 ## Directories
 [![Directories](docs/_static/homepage_widgets/directories.png?raw=true)]()
-``` 
+```
 <directories/>
 ```
 
@@ -290,7 +294,7 @@ The label and visibility of the services can be edited in the homepage settings.
 
 ## Jobs
 [![Jobs](docs/_static/homepage_widgets//jobs.png?raw=true)]()
-``` 
+```
 <jobs
     rss_feed="https://www.publicjobs.ch/rss/~search1576049765b9fb8a630d17ec5dfcce06841a6e"
     jobs_card_title="Looking for ..."

@@ -2,7 +2,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE 1.0\n"
-"POT-Creation-Date: 2025-01-27 16:09+0100\n"
+"POT-Creation-Date: 2025-02-11 15:15+0100\n"
 "PO-Revision-Date: 2022-03-15 10:50+0100\n"
 "Last-Translator: Marc Sommerhalder <marc.sommerhalder@seantis.ch>\n"
 "Language-Team: French\n"
@@ -1931,6 +1931,16 @@ msgstr ""
 "  - Thème 3:\n"
 "  - Sous-thème 3.1```"
 
+msgid "Notify on newsletter unsubscription"
+msgstr "Notifier le désabonnement à la lettre d'information"
+
+msgid ""
+"Send an email notification to the following users when a recipient "
+"unsubscribes from the newsletter"
+msgstr ""
+"Envoyer une notification par e-mail aux utilisateurs suivants lorsqu'un "
+"destinataire se désabonne de la newsletter"
+
 msgid "Invalid YAML format. Please refer to the example."
 msgstr "Format YAML non valide. Veuillez vous référer à l'exemple."
 
@@ -2600,6 +2610,12 @@ msgstr "Exports"
 msgid "Payment Providers"
 msgstr "Opérateurs de paiement"
 
+msgid "Datatrans"
+msgstr "Datatrans"
+
+msgid "Worldline Saferpay"
+msgstr "Worldline Saferpay"
+
 msgid "Synchronise"
 msgstr "Synchroniser"
 
@@ -2798,6 +2814,24 @@ msgstr ""
 msgid "Sidebar links"
 msgstr "Liens dans la barre latérale"
 
+msgid "Contact link"
+msgstr "Lien de contact"
+
+msgid "Sidebar contact"
+msgstr "Contact dans la barre latérale"
+
+msgid "Please provide a URL if contact link text is set"
+msgstr "Veuillez fournir une URL si le texte du lien de contact est défini"
+
+msgid "Please provide link text if contact URL is set"
+msgstr "Veuillez indiquer le texte du lien si l'URL de contact est définie"
+
+msgid "Contact Text"
+msgstr "Lien de contact"
+
+msgid "Contact URL"
+msgstr "URL de contact"
+
 msgid "Delete content when expired"
 msgstr "Supprimer le contenu lorsqu'il est expiré"
 
@@ -2807,9 +2841,6 @@ msgstr ""
 
 msgid "Delete content"
 msgstr "Supprimer le contenu"
-
-msgid "Photo album. Will be shown at the end of content."
-msgstr "Album photo. Sera affiché à la fin du contenu."
 
 msgid "Photo album"
 msgstr "Album photo"
@@ -2989,8 +3020,8 @@ msgstr "Refuser ${title} est irréversible."
 msgid "Reject reservation"
 msgstr "Refuser la réservation"
 
-#. Used in sentence: "${event} published."
 #.
+#. Used in sentence: "${event} published."
 msgid "Event"
 msgstr "Événement"
 
@@ -3347,8 +3378,8 @@ msgid ""
 "filled-out form."
 msgstr ""
 "Veuillez vérifier vos données et appuyez sur « Compléter » pour finaliser le "
-"processus. S'il y a quelque chose que vous souhaitez modifier, cliquez sur « "
-"Modifier » pour retourner sur le formulaire complété."
+"processus. S'il y a quelque chose que vous souhaitez modifier, cliquez sur "
+"« Modifier » pour retourner sur le formulaire complété."
 
 msgid ""
 "The image shown in the list view is a square. To have your image shown fully "
@@ -4054,6 +4085,13 @@ msgstr "Cliquer ici pour voir la version internet."
 msgid "You no longer wish to receive the newsletter?"
 msgstr "Vous ne souhaitez plus recevoir la lettre d'informations ?"
 
+msgid ""
+"The user with the address ${address} just unsubscribed from the newsletter "
+"subscriber list."
+msgstr ""
+"L'utilisateur dont l'adresse est ${address} vient de se désinscrire de la "
+"liste des abonnés à la lettre d'information."
+
 msgid "Click the following link to set a new password:"
 msgstr "Cliquer sur le lien suivant pour définir un nouveau mot de passe :"
 
@@ -4463,6 +4501,15 @@ msgstr "Déposez les fichiers pour les vérifier"
 
 msgid "No subscribers yet"
 msgstr "Pas encore d'abonnés"
+
+msgid ""
+"This recipient has delivery failures, including hard bounces, invalid email "
+"addresses, spam complaints, manual deactivations, or being blocked. We "
+"recommend unsubscribing it from the list."
+msgstr ""
+"Ce destinataire a des échecs de livraison, y compris des rebonds, des "
+"adresses e-mail invalides, des plaintes pour spam, des désactivations "
+"manuelles, ou est bloqué. Nous recommandons de le désinscrire de la liste."
 
 msgid "submitted"
 msgstr "soumis"
@@ -5462,14 +5509,14 @@ msgstr ""
 "Le montant total pour les données actuellement saisies est de ${total} mais "
 "doit être au moins ${minimum}. Veuillez ajuster vos entrées."
 
+msgid "Registrations are no longer possible"
+msgstr "Les inscriptions ne sont plus possibles"
+
 msgid "Pay Online and Complete"
 msgstr "Payer en ligne et compléter"
 
 msgid "Your payment could not be processed"
 msgstr "Votre paiement n'a pas pu être traité"
-
-msgid "Registrations are no longer possible"
-msgstr "Les inscriptions ne sont plus possibles"
 
 msgid "Your registration has been confirmed"
 msgstr "Votre inscription a été confirmée"
@@ -5525,6 +5572,10 @@ msgid ""
 msgstr ""
 "Succès! Nous avons ajouté ${address} à la liste des destinataires. Les "
 "catégories abonnées sont ${subscribed}."
+
+#, python-format
+msgid "Success! We have added ${address} to the list of recipients."
+msgstr "Succès! Nous avons ajouté ${address} à la liste des destinataires."
 
 #, python-format
 msgid ""
@@ -5653,6 +5704,15 @@ msgstr "Le paiement a été saisi"
 msgid "The payment was refunded"
 msgstr "Le paiement a été remboursé"
 
+msgid "The payment is already captured but is still processing"
+msgstr "Le paiement a déjà été saisi mais est encore en cours de traitement"
+
+msgid "Could not refund the payment"
+msgstr "Impossible de rembourser le paiement"
+
+msgid "Could not capture the payment"
+msgstr "Le paiement n'a pas pu être saisi"
+
 msgid "As default"
 msgstr "Par défaut"
 
@@ -5702,8 +5762,50 @@ msgstr "Le prestataire de paiement a été supprimé."
 msgid "Successfully synchronised payments"
 msgstr "Les paiements ont été synchronisés avec succès"
 
+msgid "Merchant Name"
+msgstr "Nom du marchand"
+
+msgid "UPP Username"
+msgstr "UPP Username"
+
+msgid "UPP Password"
+msgstr "UPP Password"
+
+msgid "Webhook Signing Key"
+msgstr "Clé de signature du webhook"
+
 msgid "Charge fees to customer"
 msgstr "Facturer le client"
+
+msgid "Use sandbox environment (for testing)"
+msgstr "Utiliser l'environnement sandbox (pour les tests)"
+
+msgid "Customer Name"
+msgstr "Nom du client"
+
+msgid "Customer ID"
+msgstr "ID du client"
+
+msgid "Terminaux ID"
+msgstr "ID du terminal"
+
+msgid "API Username"
+msgstr "Nom d'utilisateur API"
+
+msgid "API Password"
+msgstr "Mot de passe API"
+
+msgid "Datatrans has been added"
+msgstr "Datatrans a été ajouté"
+
+msgid "Add Datatrans"
+msgstr "Ajouter Datatrans"
+
+msgid "Worldline Saferpay has been added"
+msgstr "Worldline Saferpay a été ajouté"
+
+msgid "Add Worldline Saferpay"
+msgstr "Ajouter Worldline Saferpay"
 
 msgid "Added a new person"
 msgstr "Nouvelle personne ajoutée"
@@ -5975,6 +6077,9 @@ msgstr "Sujets"
 msgid "You have successfully unsubscribed from the newsletter at ${address}"
 msgstr ""
 "Vous vous êtes désabonné avec succès de la lettre d'information à ${address}."
+
+msgid "Unsubscription from newsletter"
+msgstr "Se désabonner de la lettre d'information"
 
 msgid "A survey with this name already exists"
 msgstr "Une enquête avec ce nom existe déjà"
@@ -6255,9 +6360,3 @@ msgstr "Un compte a été créé pour vous"
 
 msgid "The user was created successfully"
 msgstr "L'utilisateur a bien été créé"
-
-msgid "This recipient has delivery failures, including hard bounces, invalid email addresses, spam complaints, manual deactivations, or being blocked. We recommend unsubscribing it from the list."
-msgstr "Ce destinataire a des échecs de livraison, y compris des rebonds, des adresses e-mail invalides, des plaintes pour spam, des désactivations manuelles, ou est bloqué. Nous recommandons de le désinscrire de la liste."
-
-#~ msgid "Photo album. Will be shown at the end of content."
-#~ msgstr "Album photo. Sera affiché à la fin du contenu."

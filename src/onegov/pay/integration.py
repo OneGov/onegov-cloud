@@ -99,7 +99,9 @@ def get_js_path() -> str:
 
 @PayApp.webasset('pay')
 def get_pay_assets() -> Iterator[str]:
+    yield 'datatrans.js'
     yield 'stripe.js'
+    yield 'worldline_saferpay.js'
 
 
 class PaymentError(IntEnum):

@@ -227,13 +227,19 @@ def handle_newsletters(
                 # auto confirm user
                 recipient.confirmed = True
 
-                request.success(_((
-                    'Success! We have added ${address} to the list of '
-                    'recipients. Subscribed categories are ${subscribed}.'
-                ), mapping={
-                    'address': form.address.data,
-                    'subscribed': ', '.join(subscribed)
-                }))
+                if subscribed:
+                    request.success(_((
+                        'Success! We have added ${address} to the list of '
+                        'recipients. Subscribed categories are ${subscribed}.'
+                    ), mapping={
+                        'address': form.address.data,
+                        'subscribed': ', '.join(subscribed)
+                    }))
+                else:
+                    request.success(_(
+                        'Success! We have added ${address} to the list of '
+                        'recipients.', mapping={'address': form.address.data}
+                    ))
             else:
                 # send out confirmation mail
                 confirm_mail = render_template('mail_confirm.pt', request, {
@@ -563,7 +569,7 @@ def handle_send_newsletter(
     open_recipients = self.open_recipients
 
     if form.submitted(request):
-        if form.categories.data == []:
+        if form.categories and form.categories.data == []:
             # for backward compatibility select all categories if none has
             # been selected
             extracted = extract_categories_and_subcategories(
@@ -572,7 +578,8 @@ def handle_send_newsletter(
             self.newsletter_categories = (
                 extracted) if isinstance(extracted, list) else []
         else:
-            self.newsletter_categories = form.categories.data or []
+            self.newsletter_categories = (
+                form.categories.data) if form.categories else []
 
         if form.send.data == 'now':
             sent = send_newsletter(request, self, open_recipients)

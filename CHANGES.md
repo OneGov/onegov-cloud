@@ -1,8 +1,82 @@
 # Changes
 
+## 2025.4
+
+`2025-01-31` | [c0942af43d...68aa420b48](https://github.com/OneGov/onegov-cloud/compare/c0942af43d^...68aa420b48)
+
+### Api
+
+##### Add documentation
+
+`Feature` | [OGC-2036](https://linear.app/onegovcloud/issue/OGC-2036) | [42524e6d9a](https://github.com/onegov/onegov-cloud/commit/42524e6d9a5f091e0c0bdeb0b8ccf5e55a36916f)
+
+### Directories
+
+##### Only send delayed email notifications for 'public' and 'mtan' access levels.
+
+`Bugfix` | [OGC-2044](https://linear.app/onegovcloud/issue/OGC-2044) | [41b2f79431](https://github.com/onegov/onegov-cloud/commit/41b2f79431f89896b6c3d3baea0b34a0cc1a04ca)
+
+### Feriennet
+
+##### Google Tag Manager
+
+Replace script
+
+`Feature` | [OGC-1353](https://linear.app/onegovcloud/issue/OGC-1353) | [40481da20c](https://github.com/onegov/onegov-cloud/commit/40481da20ca8e140655dbc7cb694ad5562089080)
+
+### Form
+
+##### Add formcode definitions
+
+Add more possible definitions in the form editor to choose from.
+
+`Feature` | [OGC-1942](https://linear.app/onegovcloud/issue/OGC-1942) | [382bcc60b5](https://github.com/onegov/onegov-cloud/commit/382bcc60b5f945b067a2920bb8eacd9b71f0cf87)
+
+### Gis
+
+##### Prevents accidentally changing the zoom on the map.
+
+`Feature` | [OGC-1944](https://linear.app/onegovcloud/issue/OGC-1944) | [a91c91e17b](https://github.com/onegov/onegov-cloud/commit/a91c91e17b51db7b96bd6f959c4db653bfb6b0d4)
+
+### Newsletter
+
+##### Adds option to notify admins if a user unsubscribes from the newsletter subscription list
+
+`Feature` | [OGC-2037](https://linear.app/onegovcloud/issue/OGC-2037) | [08e795f772](https://github.com/onegov/onegov-cloud/commit/08e795f772d3bb0c322fb7e1693bb412c0fcbe88)
+
+### Org
+
+##### Collect inactive email addresses daily and indicate delivery failures for newsletter recipients
+
+`Feature` | [OGC-1896](https://linear.app/onegovcloud/issue/OGC-1896) | [821ff43296](https://github.com/onegov/onegov-cloud/commit/821ff43296c1ab9ce88297a1e17cac3b647252e9)
+
+### Pay
+
+##### Adds Datatrans payment provider
+
+`Feature` | [OGC-2007](https://linear.app/onegovcloud/issue/OGC-2007) | [cdf4acbdd8](https://github.com/onegov/onegov-cloud/commit/cdf4acbdd8fe3a3b15f10929342189be13a743e7)
+
+### Town6
+
+##### Show creation date in imagesets.
+
+`Feature` | [OGC-1901](https://linear.app/onegovcloud/issue/OGC-1901) | [4507af6c4c](https://github.com/onegov/onegov-cloud/commit/4507af6c4ccf8f32fda65be79792e3f9ed369e30)
+
+##### Add text_link in homepage widget markdown file
+
+`Feature` | [cf0b91c727](https://github.com/onegov/onegov-cloud/commit/cf0b91c727bb962297278d089552ecee796002d0)
+
+##### Add option for label text
+
+`Feature` | [OGC-2040](https://linear.app/onegovcloud/issue/OGC-2040) | [e59d03389d](https://github.com/onegov/onegov-cloud/commit/e59d03389dc422d3d91abed86e9e4ee9dbd540aa)
+
+##### Make deleting a link more accessible.
+
+`Bugfix` | [OGC-739](https://linear.app/onegovcloud/issue/OGC-739) | [4d318fc9bf](https://github.com/onegov/onegov-cloud/commit/4d318fc9bf898c38fa34f747fee7698f2bb14a08)
+
 ## 2025.3
 
-`2025-01-23` | [9eabea3e30...d2c4c7dedd](https://github.com/OneGov/onegov-cloud/compare/9eabea3e30^...d2c4c7dedd)
+`2025-01-23` | [9eabea3e30...f3e1dbff9c](https://github.com/OneGov/onegov-cloud/compare/9eabea3e30^...f3e1dbff9c)
 
 ### Electionday
 
@@ -2160,28 +2234,4 @@ onegov.translator_directory.views.translator.view_mail_templates
 ## 2024.19
 
 `2024-03-28` | [aaa823d7d9...b238279400](https://github.com/OneGov/onegov-cloud/compare/aaa823d7d9^...b238279400)
-
-## 2024.18
-
-`2024-03-28` | [ed9dcdad14...8f182f3b09](https://github.com/OneGov/onegov-cloud/compare/ed9dcdad14^...8f182f3b09)
-
-### Election Day
-
-##### Cleanup unused code and increase test coverage.
-
-`Feature` | [53e2a262b3](https://github.com/onegov/onegov-cloud/commit/53e2a262b3352a1ca87820d1b9bd483507b00fbc)
-
-### Swissvotes
-
-##### Add english bfs map link and transform bfs map url when embedding the new dashboard.
-
-`Feature` | [SWI-46](https://linear.app/swissvotes/issue/SWI-46) | [17c12a396f](https://github.com/onegov/onegov-cloud/commit/17c12a396fd92b05af440acd1569ee38e0eb39cb)
-
-##### Adds missing upgrade step and resolves fixmes.
-
-`Bugfix` | [OGC-1546](https://linear.app/onegovcloud/issue/OGC-1546) | [e6401e1843](https://github.com/onegov/onegov-cloud/commit/e6401e1843ac871add5464f604c662620579be93)
-
-##### Update display of campaign finances.
-
-`Other` | [SWI-43](https://linear.app/swissvotes/issue/SWI-43) | [253d3bccfe](https://github.com/onegov/onegov-cloud/commit/253d3bccfe5f3697f030c8bf8c6a6eba91da9fb8)
 
