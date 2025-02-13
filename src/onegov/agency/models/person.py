@@ -37,7 +37,7 @@ class ExtendedPerson(Person, AccessExtension, PublicationExtension):
         'phone_es': {'type': 'text'}
     }
 
-    external_user_id : dict_property[str | None] = meta_property()
+    external_user_id: dict_property[str | None] = meta_property()
 
     @property
     def es_suggestion(self) -> tuple[str, ...]:

@@ -5,7 +5,6 @@ from functools import cached_property
 from onegov.agency.collections import ExtendedPersonCollection
 from onegov.agency.collections import PaginatedAgencyCollection
 from onegov.agency.collections import PaginatedMembershipCollection
-from onegov.agency.forms import PersonMutationForm
 from onegov.agency.forms.person import AuthenticatedPersonMutationForm
 from onegov.api import ApiEndpoint, ApiInvalidParamException
 from onegov.api.utils import authenticate
@@ -15,6 +14,7 @@ from onegov.gis import Coordinates
 from typing import Any
 from typing import TYPE_CHECKING
 if TYPE_CHECKING:
+    from onegov.agency.forms import PersonMutationForm
     from onegov.core.request import CoreRequest
     from onegov.agency.app import AgencyApp
     from onegov.agency.models import ExtendedAgency
@@ -130,7 +130,7 @@ class PersonApiEndpoint(ApiEndpoint['ExtendedPerson'], ApisMixin):
 
     @property
     def _public_item_data(self) -> tuple[str, ...]:
-        return (
+        return tuple(attribute for attribute in (
             'academic_title',
             'born',
             'email',
@@ -150,9 +150,10 @@ class PersonApiEndpoint(ApiEndpoint['ExtendedPerson'], ApisMixin):
             'salutation',
             'title',
             'website',
-        )
+        ) if attribute not in self.app.org.hidden_people_fields)
 
     def item_data(self, item: ExtendedPerson) -> dict[str, Any]:
+        public_data = self._public_item_data
         if (
             self.request
             and self.request.authorization
@@ -161,14 +162,13 @@ class PersonApiEndpoint(ApiEndpoint['ExtendedPerson'], ApisMixin):
             # Authenticated users get all fields including external_user_id
             data = {
                 attribute: getattr(item, attribute, None)
-                for attribute in (*self._public_item_data, 'external_user_id')
+                for attribute in (*public_data, 'external_user_id')
             }
         else:
             # Non-authenticated users only get non-hidden fields
             data = {
                 attribute: getattr(item, attribute, None)
-                for attribute in self._public_item_data
-                if attribute not in self.app.org.hidden_people_fields
+                for attribute in public_data
             }
 
         data['modified'] = get_modified_iso_format(item)

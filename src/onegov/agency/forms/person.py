@@ -1,5 +1,5 @@
 from __future__ import annotations
-from wtforms.fields.simple import StringField, EmailField
+from wtforms.fields.simple import StringField
 from onegov.agency.forms import PersonMutationForm
 from onegov.agency import _
 from onegov.org.forms import PersonForm
