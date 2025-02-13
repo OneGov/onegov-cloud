@@ -58,10 +58,12 @@ class TicketBoardlet(OrgBoardlet):
 
     @property
     def facts(self) -> Iterator[BoardletFact]:
+        time_30d_ago = utcnow() - timedelta(days=30)
 
         yield BoardletFact(
             text=_('Open Tickets'),
-            number=self.session.query(Ticket).filter_by(state='open').count(),
+            number=self.session.query(Ticket).filter_by(
+                state='open').count(),
             icon='fa-hourglass'
         )
 
@@ -72,39 +74,31 @@ class TicketBoardlet(OrgBoardlet):
             icon='fa-hourglass-half'
         )
 
-        time_30d_ago = utcnow() - timedelta(days=30)
-
-        new_tickets = self.session.query(Ticket).filter(
-            Ticket.created > time_30d_ago).count()
         yield BoardletFact(
             text=_('New Tickets in the Last Month'),
-            number=new_tickets,
+            number=self.session.query(Ticket).filter(
+                Ticket.created > time_30d_ago).count(),
             icon='fa-plus-circle'
         )
 
-        closed_tickets_count = (
+        closed_ticket_query = (
             self.session.query(Ticket).
             filter(Ticket.closed_on.isnot(None)).
-            filter(Ticket.closed_on >= time_30d_ago).count())
+            filter(Ticket.closed_on >= time_30d_ago))
+        closed_tickets_count = closed_ticket_query.count()
+
         yield BoardletFact(
             text=_('Closed Tickets in the Last Month'),
             number=closed_tickets_count,
             icon='fa-check-circle'
         )
 
-        query = (
-            self.session.query(Ticket).
-            filter(Ticket.closed_on.isnot(None)).
-            filter(Ticket.closed_on >= time_30d_ago))
-        closed_tickets_count = query.count()
-        closed_tickets = query.all()
-
         # average lead time from opening to closing
         average_lead_time_s: float | None = None
-        if closed_tickets:
+        if closed_tickets_count:
             total_lead_time_s = sum(
                 (t.reaction_time or 0) + (t.process_time or 0)
-                for t in closed_tickets)
+                for t in closed_ticket_query)
             average_lead_time_s = total_lead_time_s / closed_tickets_count
             average_lead_time_s = round(average_lead_time_s / 86400, 1)
 
@@ -117,9 +111,10 @@ class TicketBoardlet(OrgBoardlet):
 
         # average lead time from pending to closing
         average_lead_time_s = None
-        if closed_tickets:
-            total_lead_time_s = sum(t.process_time for t in closed_tickets)
-            average_lead_time_s = total_lead_time_s / len(closed_tickets)
+        if closed_tickets_count:
+            total_lead_time_s = sum(
+                t.process_time for t in closed_ticket_query)
+            average_lead_time_s = total_lead_time_s / closed_tickets_count
             average_lead_time_s = round(average_lead_time_s / 86400, 1)
 
         yield BoardletFact(
