@@ -31,6 +31,7 @@ class PersonForm(Form):
     parliamentary_group = StringField(_('Parliamentary Group'))
     website = StringField(_('Website'), filters=(ensure_scheme, ))
     website_2 = StringField(_('Website 2'), filters=(ensure_scheme, ))
+    lu_external_id = StringField(_('External ID'))
 
     location_address = TextAreaField(
         label=_('Location address'),

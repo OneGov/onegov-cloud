@@ -123,16 +123,16 @@ class ApiEndpointItem(Generic[_M]):
 
     """
 
-    def __init__(self, app: Framework, endpoint: str, id: str):
-        self.app = app
+    def __init__(self, request: CoreRequest, endpoint: str, id: str):
+        self.request = request
+        self.app = request.app
         self.endpoint = endpoint
         self.id = id
 
     @cached_property
     def api_endpoint(self) -> ApiEndpoint[_M] | None:
         cls = ApiEndpointCollection(self.app).endpoints.get(self.endpoint)
-        # type(cls(self.app)) == <class 'onegov.agency.api.AgencyApiEndpoint'>
-        return cls(self.app) if cls else None
+        return cls(self.request) if cls else None
 
     @cached_property
     def item(self) -> _M | None:
@@ -178,11 +178,12 @@ class ApiEndpoint(Generic[_M]):
 
     def __init__(
         self,
-        app: Framework,
+        request: CoreRequest,
         extra_parameters: dict[str, str | None] | None = None,
         page: int | None = None,
     ):
-        self.app = app
+        self.request = request
+        self.app = request.app
         self.extra_parameters = extra_parameters or {}
         self.page = int(page) if page else page
         self.batch_size = 100
@@ -193,7 +194,7 @@ class ApiEndpoint(Generic[_M]):
 
         """
 
-        return self.__class__(self.app, self.extra_parameters, page)
+        return self.__class__(self.request, self.extra_parameters, page)
 
     def for_filter(self, **filters: Any) -> Self:
         """ Return a new endpoint instance with the given filters while
@@ -201,7 +202,7 @@ class ApiEndpoint(Generic[_M]):
 
         """
 
-        return self.__class__(self.app, filters)
+        return self.__class__(self.request, filters)
 
     @overload
     def for_item(self, item: None) -> None: ...
@@ -218,7 +219,7 @@ class ApiEndpoint(Generic[_M]):
         if hasattr(item, 'id'):
             target = getattr(item.id, 'hex', str(item.id))
 
-        return ApiEndpointItem(self.app, self.endpoint, target)
+        return ApiEndpointItem(self.request, self.endpoint, target)
 
     @overload
     def get_filter(
@@ -270,7 +271,7 @@ class ApiEndpoint(Generic[_M]):
         """ Return the item with the given ID from the collection. """
 
         try:
-            return self.__class__(self.app).collection.by_id(id)
+            return self.__class__(self.request).collection.by_id(id)
         except SQLAlchemyError:
             return None
 
@@ -444,6 +445,7 @@ class ApiEndpointCollection:
 
 
 class AuthEndpoint:
+    """ This is a Dummy, because morepath requires a model for linking. """
 
     def __init__(self, app: Framework):
         self.app = app

@@ -722,6 +722,7 @@ class ModuleSettingsForm(Form):
             ('postal_address', _('Postal address')),
             ('postal_code_city', _('Postal Code and City')),
             ('notes', _('Notes')),
+            ('external_id', _('External ID'))
         ])
 
     mtan_session_duration_seconds = IntegerField(

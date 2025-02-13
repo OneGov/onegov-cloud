@@ -241,6 +241,11 @@ class PersonMutationForm(MutationForm):
         render_kw={'rows': 5}
     )
 
+    lu_external_id = StringField(
+        fieldset=_('Proposed changes'),
+        label=_('External ID')
+    )
+
 
 class ApplyMutationForm(Form):
 

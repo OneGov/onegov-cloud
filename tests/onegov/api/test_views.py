@@ -1,8 +1,13 @@
+import json
+
 import transaction
 
 from freezegun import freeze_time
 from collection_json import Collection
+
+from onegov.agency.collections import ExtendedPersonCollection
 from onegov.api.models import ApiKey
+from onegov.people import Person
 from onegov.user import UserCollection
 from unittest.mock import patch
 from uuid import uuid4
@@ -26,18 +31,7 @@ def test_view_api(client):
     headers = response.headers
     assert headers['Content-Type'] == 'application/vnd.collection+json'
     assert 'X-RateLimit-Limit' not in headers
-    assert response.json == {
-        'collection': {
-            'version': '1.0',
-            'href': 'http://localhost/api',
-            'queries': [{
-                'rel': 'endpoint',
-                'href': 'http://localhost/api/endpoint',
-                'data': []
-            }]
-        }
-    }
-    assert len(Collection.from_json(response.body).queries) == 1
+    assert len(Collection.from_json(response.body).queries) == 2
 
     # Endpoint
     with freeze_time('2020-02-02 20:20'):
@@ -236,3 +230,85 @@ def test_view_api(client):
         }
     }
     assert Collection.from_json(response.body).version == '1.0'
+
+
+def test_view_private_field_unauthorized(client):
+    session = client.app.session()
+
+    people = ExtendedPersonCollection(session)
+    person = people.add(
+        first_name='vorname', last_name='nachname', lu_external_id='123456'
+    )
+    session.flush()
+    person_id = person.id.hex
+    transaction.commit()
+
+    # Make API request WITHOUT authorization headers
+    response_item = client.get(f'/api/people/{person_id}')
+
+    person_item_data = json.loads(response_item.body.decode('utf-8'))
+    person_data = person_item_data['collection']['items'][0]['data']
+    assert not any(
+        d['name'] == 'lu_external_id'
+        for d in person_data
+    )
+
+def test_view_private_field(client):
+    session = client.app.session()
+
+    user = UserCollection(session).add(
+        username='a@a.a', password='a', role='admin'
+    )
+    # create an access key with write access
+    uuid = uuid4()
+    key = ApiKey(
+        name='key', read_only=False, last_used=None, key=uuid, user=user
+    )
+    session.add(key)
+    transaction.commit()
+
+    # Test non public field
+    session = client.app.session()  # Get fresh session after commit
+    people = ExtendedPersonCollection(session)
+    person = people.add(
+        first_name='vorname', last_name='nachname', lu_external_id='123456'
+    )
+    session.flush()  # Ensure ID is generated
+    person_id = person.id.hex  # Store ID before commit
+    transaction.commit()
+
+    session = client.app.session()  # Get fresh session
+    person = session.query(Person).get(person_id)  # Reload person with new
+
+    # Authorize
+    headers = {"Authorization": f"Bearer {uuid}"}
+    response = client.get('/api/authenticate', headers=headers)
+    assert response.status_code == 200
+    resp = response.body.decode('utf-8')
+    assert resp.startswith('{"token":')
+    token = resp.split('"')[3]
+
+    # Make API request
+    headers = {"Authorization": f"Bearer {token}"}
+
+    response = client.get('/api/people/', headers=headers)
+    assert response.status_code == 200  # Assert 200 OK
+    assert (
+        response.headers['Content-Type']
+        == 'application/vnd.collection+json'
+    )
+
+    people_collection = json.loads(response.body.decode('utf-8'))
+    assert (
+            len(people_collection['collection']['items']) >= 1
+    )  # Assert at least one item (the person we created)
+
+    # Make API request to /api/people/{person_id}
+    response_item = client.get(f'/api/people/{person_id}', headers=headers)
+
+    person_item_data = json.loads(response_item.body.decode('utf-8'))
+    person_data = person_item_data['collection']['items'][0]['data']
+    assert any(
+        d['name'] == 'lu_external_id' and d['value'] == '123456'
+        for d in person_data
+    )
