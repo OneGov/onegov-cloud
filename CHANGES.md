@@ -1,8 +1,24 @@
 # Changes
 
+## 2025.6
+
+`2025-02-13` | [4a8ed94cb1...4a8ed94cb1](https://github.com/OneGov/onegov-cloud/compare/4a8ed94cb1^...4a8ed94cb1)
+
+### Agency
+
+##### Clean up previous implementation.
+
+Uses a meta field for the external_user_id (So we don't have a specific column
+    in org for a specific feature of agency)
+    Make sure the api uses it's own mutation form such that it's seperated form
+    public facing mutations.
+    Make sure hidden_people_fields is honoured everywhere
+
+`Bugfix` | [OGC-2061](https://linear.app/onegovcloud/issue/OGC-2061) | [4a8ed94cb1](https://github.com/onegov/onegov-cloud/commit/4a8ed94cb12db893dc3de0fb73fb4b3c7d1db309)
+
 ## 2025.5
 
-`2025-02-13` | [e8c813d38e...02332a8ba7](https://github.com/OneGov/onegov-cloud/compare/e8c813d38e^...02332a8ba7)
+`2025-02-13` | [e8c813d38e...2046905863](https://github.com/OneGov/onegov-cloud/compare/e8c813d38e^...2046905863)
 
 ### Agency
 
@@ -2260,39 +2276,4 @@ This is a silly hack introduced by ZG and only available for them. All other pri
 ##### Adds missing `None` check.
 
 `Bugfix` | [OGC-1561](https://linear.app/onegovcloud/issue/OGC-1561) | [8ae422d3a6](https://github.com/onegov/onegov-cloud/commit/8ae422d3a692b46974a2159ca94b5fab68463178)
-
-## 2024.20
-
-`2024-04-08` | [ad3f49975e...240dbfcc0a](https://github.com/OneGov/onegov-cloud/compare/ad3f49975e^...240dbfcc0a)
-
-### Core
-
-##### Avoids queuing temporary files created by `safe_move`
-
-`Bugfix` | [11990566de](https://github.com/onegov/onegov-cloud/commit/11990566debe64530842269a4f0d96c89d854318)
-
-##### Add realname to default local admin user.
-
-Required if testing the feature
-onegov.translator_directory.views.translator.view_mail_templates
-
-`Other` | [OGC-1558](https://linear.app/onegovcloud/issue/OGC-1558) | [bd092e2cca](https://github.com/onegov/onegov-cloud/commit/bd092e2cca942f951d32844265c32911e0328807)
-
-### Event
-
-##### Resolve 'fixme' after code review
-
-`Bugfix` | [OGC-1536](https://linear.app/onegovcloud/issue/OGC-1536) | [d4cdc0cf11](https://github.com/onegov/onegov-cloud/commit/d4cdc0cf11e53a20f8a1fe6911a44a7e5feb310c)
-
-### Newsletter
-
-##### Show full news in email newsletter and add option to newsletter to show full content instead of tiles only
-
-`Feature` | [OGC-1492](https://linear.app/onegovcloud/issue/OGC-1492) | [04f6fd971e](https://github.com/onegov/onegov-cloud/commit/04f6fd971ea6cd433d1e93b7b42ea1f95f932a92)
-
-### Org
-
-##### Add option for adding iFrames
-
-`Feature` | [OGC-1429](https://linear.app/onegovcloud/issue/OGC-1429) | [b6f33c4a76](https://github.com/onegov/onegov-cloud/commit/b6f33c4a763b086a437b3b21eab9814377a15b2d)
 
