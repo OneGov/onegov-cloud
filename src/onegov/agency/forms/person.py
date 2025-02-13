@@ -1,13 +1,13 @@
 from __future__ import annotations
+from wtforms.fields.simple import StringField, EmailField
 from onegov.agency.forms import PersonMutationForm
-from onegov.form.parser.core import StringField
 from onegov.agency import _
 from onegov.org.forms import PersonForm
 
 
 class AgencyPersonForm(PersonForm):
 
-    external_user_id = StringField(_('External ID'), required=False)
+    external_user_id = StringField(_('External ID'))
 
 
 class AuthenticatedPersonMutationForm(PersonMutationForm):
@@ -16,5 +16,5 @@ class AuthenticatedPersonMutationForm(PersonMutationForm):
     """
 
     external_user_id = StringField(
-        fieldset=_('Proposed changes'), label=_('External ID'), required=False
+        fieldset=_('Proposed changes'), label=_('External ID')
     )
