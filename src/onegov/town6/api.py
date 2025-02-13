@@ -12,6 +12,7 @@ from onegov.org.models.page import News, NewsCollection, Topic, TopicCollection
 
 if TYPE_CHECKING:
     from onegov.town6.app import TownApp
+    from onegov.town6.request import TownRequest
     from onegov.event.models import Occurrence
     from onegov.core.orm.mixins import ContentMixin
     from onegov.core.orm.mixins import TimestampMixin
@@ -122,6 +123,7 @@ class NewsApiEndpoint(ApiEndpoint[News]):
 
 
 class TopicApiEndpoint(ApiEndpoint[Topic]):
+    request: TownRequest
     app: TownApp
     endpoint = 'topics'
     filters = set()
@@ -162,6 +164,6 @@ class TopicApiEndpoint(ApiEndpoint[Topic]):
             'html': item,
             'image': item.page_image or None,
             'parent': ApiEndpointItem(
-                self.app, self.endpoint, str(item.parent_id)
+                self.request, self.endpoint, str(item.parent_id)
             ) if item.parent_id is not None else None,
         }

@@ -157,9 +157,9 @@ class Person(Base, ContentMixin, TimestampMixin, ORMSearchable,
     notes: Column[str | None] = Column(Text, nullable=True)
 
     #: It's an external system identifier for synchronization.
-    #: Used for agency import. Is called 'Benutzer-ID' in csv import file,
-    # 'division' in api.
-    external_id: Column[str | None] = Column(Text, nullable=True)
+    #: Used to match our records of persons with external source (lu staka api)
+    #: Is called 'Benutzer-ID' in csv import file, 'division' in api.
+    lu_external_id: Column[str | None] = Column(Text, nullable=True)
 
     memberships: relationship[AppenderQuery[AgencyMembership]]
     memberships = relationship(

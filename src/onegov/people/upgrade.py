@@ -202,9 +202,9 @@ def fix_agency_address_column(context: UpgradeContext) -> None:
         ))
 
 
-@upgrade_task('Add external_id for agency import')
+@upgrade_task('Add lu_external_id for agency import')
 def add_external_id_for_agency_import(context: UpgradeContext) -> None:
-    if not context.has_column('people', 'external_id'):
+    if not context.has_column('people', 'lu_external_id'):
         context.operations.add_column('people', Column(
-            'external_id', Text, nullable=True
+            'lu_external_id', Text, nullable=True
         ))
