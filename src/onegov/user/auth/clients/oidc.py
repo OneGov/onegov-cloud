@@ -182,14 +182,13 @@ class OIDCClient:
         header = data['header']
         payload = data['payload']
 
-        if access_token:
+        if access_token and (given_at_hash := payload.get('at_hash')):
             # validate the access_token using at_hash
             alg = get_algorithm_by_name(header['alg'])
             digest = alg.compute_hash_digest(access_token.encode('utf-8'))
             at_hash = urlsafe_b64encode(digest[:len(digest) // 2])
-            given_at_hash = payload.get('at_hash', '').encode('utf-8')
-            if not compare_digest(at_hash, given_at_hash):
-                raise InvalidSignatureError('at_hash was missing or incorrect')
+            if not compare_digest(at_hash, given_at_hash.encode('utf-8')):
+                raise InvalidSignatureError('given at_hash was incorrect')
 
         return payload
 

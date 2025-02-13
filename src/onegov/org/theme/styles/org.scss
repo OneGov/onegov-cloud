@@ -1634,6 +1634,7 @@ $new-reservation-icon: '\f271';
 $new-room-icon: '\f015';
 $new-datatrans-icon: '\f09d';
 $new-stripe-connect-icon: '\f1f5';
+$new-worldline-saferpay-icon: '\f09d';
 $new-user-icon: '\f234';
 $new-text-module-icon: '\f24a';
 $paste-link-icon: '\f0ea';
@@ -1772,6 +1773,7 @@ $editbar-bg-color: $topbar-link-bg-hover;
     .new-room::before { @include icon($new-room-icon); }
     .new-datatrans::before { @include icon($new-datatrans-icon); }
     .new-stripe-connect::before { @include icon($new-stripe-connect-icon); }
+    .new-worldline-saferpay::before { @include icon($new-worldline-saferpay-icon); }
     .new-user::before { @include icon($new-user-icon); }
     .new-text-module::before { @include icon($new-text-module-icon); }
     .occupancy-link::before { @include icon($occupancy-link-icon); }
@@ -4521,6 +4523,11 @@ ul.recipients {
         @include icon('\f09d');
         margin-right: 1.5ex;
     }
+
+    .payment-provider-worldline-saferpay h2::before {
+        @include icon('\f09d');
+        margin-right: 1.5ex;
+    }
 }
 
 /*
@@ -6777,3 +6784,5 @@ a#results {
         list-style: none;
     }
 }
+
+

@@ -12,7 +12,7 @@ from onegov.org.models.extensions import (
     ContactExtension, ContactHiddenOnPageExtension,
     PeopleShownOnMainPageExtension, ImageExtension,
     NewsletterExtension, PublicationExtension, DeletableContentExtension,
-    InlinePhotoAlbumExtension
+    InlinePhotoAlbumExtension, SidebarContactLinkExtension
 )
 from onegov.org.models.extensions import AccessExtension
 from onegov.org.models.extensions import CoordinatesExtension
@@ -44,7 +44,7 @@ class Topic(Page, TraitInfo, SearchableContent, AccessExtension,
             PeopleShownOnMainPageExtension, PersonLinkExtension,
             CoordinatesExtension, ImageExtension,
             GeneralFileLinkExtension, SidebarLinksExtension,
-            InlinePhotoAlbumExtension):
+            SidebarContactLinkExtension, InlinePhotoAlbumExtension):
 
     __mapper_args__ = {'polymorphic_identity': 'topic'}
 
@@ -365,16 +365,25 @@ class TopicCollection(Pagination[Topic], AdjacencyListCollection[Topic]):
         self,
         session: Session,
         page: int = 0,
+        only_public: bool = False,
     ):
         self.session = session
         self.page = page
+        self.only_public = only_public
 
     def subset(self) -> Query[Topic]:
         topics = self.session.query(Topic)
+        if self.only_public:
+            topics = topics.filter(or_(
+                Topic.meta['access'].astext == 'public',
+                Topic.meta['access'].astext == None
+            ))
+
         topics = topics.filter(
             News.publication_started == True,
             News.publication_ended == False
         )
+
         topics = topics.order_by(desc(Topic.published_or_created))
         topics = topics.options(undefer('created'))
         topics = topics.options(undefer('content'))
@@ -405,14 +414,23 @@ class NewsCollection(Pagination[News], AdjacencyListCollection[News]):
         self,
         session: Session,
         page: int = 0,
+        only_public: bool = False,
     ):
         self.session = session
         self.page = page
+        self.only_public = only_public
 
     def subset(self) -> Query[News]:
         parent = PageCollection(self.session).by_path(
             '/news/', ensure_type='news')
         news = self.session.query(News)
+
+        if self.only_public:
+            news = news.filter(or_(
+                News.meta['access'].astext == 'public',
+                News.meta['access'].astext == None
+            ))
+
         if parent:
             news = news.filter(Page.parent_id == parent.id)
         news = news.filter(

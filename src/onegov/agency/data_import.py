@@ -3,6 +3,7 @@ from __future__ import annotations
 from collections import defaultdict
 from datetime import datetime
 
+import click
 from email_validator import validate_email, EmailNotValidError, \
     EmailUndeliverableError
 from markupsafe import Markup
@@ -285,7 +286,8 @@ def import_bs_persons(
                 )
 
             else:
-                print(f'agency id {agency_id} not found in agencies')
+                click.echo(
+                    f'agency id {agency_id} not found in agencies', err=True)
 
     for ix, line in enumerate(csvfile.lines):
         if ix % 50 == 0:
@@ -336,8 +338,10 @@ def get_web_address(internet_adresse: str) -> str | None:
     return f'http://{internet_adresse}'
 
 
-def get_email(line: DefaultRow) -> str | None:
+def get_email(line: DefaultRow, vorname: str, nachname: str) -> str | None:
     email = v_(line.e_mail_adresse)
+    vorname = vorname.lower()
+    nachname = nachname.lower()
 
     if not email:
         return None
@@ -345,16 +349,22 @@ def get_email(line: DefaultRow) -> str | None:
     # only keep valid generic email address, but not `vorname.nachname@lu.ch`
     addr = email.split(' ')
     for a in addr:
-        if a in ['vorname.name@lu.ch', '@lu.ch']:
+        # skip email address like
+        if a in ['vorname.name@lu.ch', '@lu.ch', 'vorname.name@']:
             continue
-        if '@' in a:
+
+        # Skip personal email address if it contains the first or last name
+        if vorname and nachname and vorname in a and nachname in a:
+            continue
+
+        if '@' in a:  # as it can be any word
             try:
                 validate_email(a)
             except EmailUndeliverableError:
                 continue
             except EmailNotValidError:
-                print(f'Error importing person with invalid email {a}; line '
-                      f'{line.rownumber}')
+                click.echo(f'Error importing person with invalid email {a}; '
+                           f'line {line.rownumber}')
                 continue
 
             return a
@@ -389,8 +399,6 @@ def check_skip_people(line: DefaultRow) -> bool:
         return False
 
     if kw_1 in line.nachname or kw_1 in line.vorname or kw_1 in line.funktion:
-        # print(f'Skipping person on line {line.rownumber} with keyword '
-        #       f'{kw_1} {line.nachname}, {line.vorname}, {line.funktion}')
         return True
 
     return False
@@ -426,20 +434,20 @@ def import_lu_people(
 
     def parse_person(line: DefaultRow) -> None:
         vorname = v_(line.vorname) or ''
-
         if vorname and vorname[-1].isdigit():
             # some people have a number at the end of their first name
             # indicating another membership
             vorname = ' '.join(vorname.split(' ')[:-1])
+        nachname = v_(line.nachname) or ' '
 
         function = v_(line.funktion) or ''
         person = people.add_or_get(
-            last_name=v_(line.nachname) or ' ',
+            last_name=nachname,
             first_name=vorname,
             salutation=None,
             academic_title=v_(line.akad__titel),
             function=function,
-            email=get_email(line),
+            email=get_email(line, vorname, nachname),
             phone=get_phone(line.isdn_nummer),
             phone_direct=get_phone(line.mobil),
             website=v_(get_web_address(line.internet_adresse)),
@@ -471,7 +479,7 @@ def import_lu_people(
                 agency.add_person(person.id,
                                   title=function or 'Mitglied')
             else:
-                print(f'Error agency id {agency_id} not found')
+                click.echo(f'Error agency id {agency_id} not found', err=True)
 
     for ix, line in enumerate(csvfile.lines):
         if ix % 100 == 0:
@@ -720,7 +728,6 @@ def match_person_membership_title(
 
             if not name:
                 if title:
-                    # print('No function given but title set')
                     return
                 membership.title = 'Mitglied'
                 updated_memberships.append(membership)
