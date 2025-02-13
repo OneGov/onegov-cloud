@@ -374,7 +374,6 @@ def test_person_mutation_form():
         'first_name': 'nick',
         'last_name': 'Rivera',
         'academic_title': 'Dr.',
-        'external_user_id': '123456'
     }))
     form.model = ExtendedPerson(first_name="Nick", last_name="Riviera")
     form.request = DummyRequest(None)
@@ -385,14 +384,13 @@ def test_person_mutation_form():
         'email', 'notes', 'first_name', 'last_name', 'born', 'phone',
         'parliamentary_group', 'location_address',
         'location_code_city', 'postal_address', 'postal_code_city',
-        'profession', 'phone_direct', 'academic_title', 'external_user_id'
+        'profession', 'phone_direct', 'academic_title'
     }
     assert form.first_name.description == 'Nick'
     assert form.last_name.description == 'Riviera'
     assert form.academic_title.description is None
     assert form.proposed_changes == {
-        'academic_title': 'Dr.', 'first_name': 'nick', 'last_name': 'Rivera',
-        'external_user_id': '123456'
+        'academic_title': 'Dr.', 'first_name': 'nick', 'last_name': 'Rivera'
     }
     assert form.get_useful_data() == {
         'submitter_email': 'info@hospital-springfield.org',
@@ -415,8 +413,7 @@ def test_person_mutation_form():
         'location_code_city': None,
         'postal_address': None,
         'postal_code_city': None,
-        'notes': None,
-        'external_user_id': '123456'
+        'notes': None
     }
     assert form.validate()
 
