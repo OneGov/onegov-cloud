@@ -15,6 +15,7 @@ from onegov.core.templates import render_template
 from onegov.event import Occurrence, Event
 from onegov.file import FileCollection
 from onegov.form import FormSubmission, parse_form, Form
+from onegov.newsletter.models import Recipient
 from onegov.org.mail import send_ticket_mail
 from onegov.newsletter import (Newsletter, NewsletterCollection,
                                RecipientCollection)
@@ -786,3 +787,22 @@ def update_newsletter_email_bounce_statistics(
 
         if recipient and inactive:
             recipient.mark_inactive()
+
+
+@OrgApp.cronjob(hour=4, minute=30, timezone='Europe/Zurich')
+def delete_unconfirmed_newsletter_subscriptions(request: OrgRequest) -> None:
+    """ Delete unconfirmed newsletter subscriptions older than 7 days. """
+
+    now = to_timezone(utcnow(), 'Europe/Zurich')
+    cutoff_date = now - timedelta(days=7)
+    count = 0
+
+    query = request.session.query(Recipient)
+    query = query.filter(Recipient.confirmed == False)
+    query = query.filter(Recipient.created < cutoff_date)
+    for obj in query:
+        request.session.delete(obj)
+        count += 1
+
+    if count:
+        print(f'Cron: Deleted {count} unconfirmed newsletter subscriptions')

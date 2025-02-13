@@ -1117,6 +1117,9 @@ msgstr "Destinatario"
 msgid "Do not actually import the newsletter subscribers"
 msgstr "Non importare effettivamente gli iscritti alla newsletter"
 
+msgid "Subscribed on"
+msgstr "Iscritto il"
+
 msgid "Will be used as image in the page overview on the parent page"
 msgstr ""
 "Verrà utilizzato come immagine nella panoramica della pagina sulla pagina "
