@@ -1,8 +1,73 @@
 # Changes
 
+## 2025.5
+
+`2025-02-13` | [e8c813d38e...02332a8ba7](https://github.com/OneGov/onegov-cloud/compare/e8c813d38e^...02332a8ba7)
+
+### Agency
+
+##### Staka LU Skip personal email addresses
+
+`Feature` | [OGC-1952](https://linear.app/onegovcloud/issue/OGC-1952) | [59d5e5c77a](https://github.com/onegov/onegov-cloud/commit/59d5e5c77a26313d8d6eb41a830cf99e6b37d3c8)
+
+##### Staka LU Adds function and academic title fields to pdf export
+
+`Feature` | [OGC-2071](https://linear.app/onegovcloud/issue/OGC-2071) | [02332a8ba7](https://github.com/onegov/onegov-cloud/commit/02332a8ba73b8d5de77c5134cebe7917e46f8502)
+
+### Api
+
+##### Add external_id for Person. Used in agency.
+
+Also had to refactor the Api such that request is in scope.
+
+`Feature` | [OGC-2061](https://linear.app/onegovcloud/issue/OGC-2061) | [73d7b015ae](https://github.com/onegov/onegov-cloud/commit/73d7b015aecbf8e89702d0ac6a95bbf04fe18784)
+
+### Directory
+
+##### Ensure all Directory Entry Subscribers are listed
+
+`Bugfix` | [OGC-2063](https://linear.app/onegovcloud/issue/OGC-2063) | [956bda24aa](https://github.com/onegov/onegov-cloud/commit/956bda24aab6f9d8d3f57da20aab1e5a968d278e)
+
+### Org
+
+##### Moves contact inherit functionality to base `ContactExtension`
+
+This means resources, forms and directories can now inherit their
+contact information from a topic as well.
+
+`Feature` | [OGC-2049](https://linear.app/onegovcloud/issue/OGC-2049) | [7e9659342c](https://github.com/onegov/onegov-cloud/commit/7e9659342ce8243668811990f88dcbd8fccf4855)
+
+##### Api Access
+
+`Bugfix` | [OGC-2075](https://linear.app/onegovcloud/issue/OGC-2075) | [21bff15e86](https://github.com/onegov/onegov-cloud/commit/21bff15e86b2151544c89ad4783e1da76f12d6fb)
+
+### Pay
+
+##### Adds Worldline Saferpay payment provider
+
+`Feature` | [OGC-2068](https://linear.app/onegovcloud/issue/OGC-2068) | [f841f76e6c](https://github.com/onegov/onegov-cloud/commit/f841f76e6c11155c6e62699387a2d1c910705f38)
+
+### Town6
+
+##### Adds a topics API endpoint
+
+Also includes a small extension to the existing news/events endpoint
+
+`Feature` | [OGC-2058](https://linear.app/onegovcloud/issue/OGC-2058) | [6f5f3b9b64](https://github.com/onegov/onegov-cloud/commit/6f5f3b9b6400ff7b3cde9b3f8ac9cbd2eedd4088)
+
+##### Adds an additional contact link.
+
+`Feature` | [OGC-1940](https://linear.app/onegovcloud/issue/OGC-1940) | [8b138e5965](https://github.com/onegov/onegov-cloud/commit/8b138e596506df91d8bd15fb2539b6e73848b46d)
+
+### User
+
+##### Makes `at_hash` optional in OpenID Connect provider
+
+`Bugfix` | [OGC-1767](https://linear.app/onegovcloud/issue/OGC-1767) | [5189b63bf7](https://github.com/onegov/onegov-cloud/commit/5189b63bf79c2d8569ae91aade8070f709f8911e)
+
 ## 2025.4
 
-`2025-01-31` | [c0942af43d...68aa420b48](https://github.com/OneGov/onegov-cloud/compare/c0942af43d^...68aa420b48)
+`2025-01-31` | [c0942af43d...0c5beb8230](https://github.com/OneGov/onegov-cloud/compare/c0942af43d^...0c5beb8230)
 
 ### Api
 
@@ -2230,8 +2295,4 @@ onegov.translator_directory.views.translator.view_mail_templates
 ##### Add option for adding iFrames
 
 `Feature` | [OGC-1429](https://linear.app/onegovcloud/issue/OGC-1429) | [b6f33c4a76](https://github.com/onegov/onegov-cloud/commit/b6f33c4a763b086a437b3b21eab9814377a15b2d)
-
-## 2024.19
-
-`2024-03-28` | [aaa823d7d9...b238279400](https://github.com/OneGov/onegov-cloud/compare/aaa823d7d9^...b238279400)
 
