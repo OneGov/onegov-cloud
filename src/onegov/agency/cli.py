@@ -2,6 +2,7 @@ from __future__ import annotations
 
 import click
 import transaction
+from sqlalchemy import text
 
 from onegov.agency.collections import ExtendedAgencyCollection
 from onegov.agency.data_import import (import_bs_data,
@@ -232,31 +233,20 @@ def import_lu_data_files(
         onegov-agency --select /onegov_agency/lu import-lu-data $people_file
     """
 
-    buffer = 100
-
     def execute(request: AgencyRequest, app: AgencyApp) -> None:
-
         if clean:
-            session = request.session
+            schema = app.session_manager.current_schema
+            assert schema is not None
+            request.session.execute(
+                text("""
+                    SET search_path to :schema;
+                    TRUNCATE TABLE agencies CASCADE;
+                    TRUNCATE TABLE people CASCADE;
+                """
+                ).bindparams(schema=schema)
+            )
 
-            for ix, person in enumerate(session.query(Person)):
-                session.delete(person)
-                if ix % buffer == 0:
-                    app.es_indexer.process()
-                    app.psql_indexer.bulk_process(session)
-
-            session.flush()
-            click.secho('All Persons removed', fg='green')
-
-            for ix, agency in enumerate(session.query(Agency)):
-                session.delete(agency)
-                if ix % buffer == 0:
-                    app.es_indexer.process()
-                    app.psql_indexer.bulk_process(session)
-
-            session.flush()
-            click.secho('All Agencies removed', fg='green')
-
+            click.secho('All Agencies and Persons removed', fg='green')
             click.secho('Exiting...')
             return
 
