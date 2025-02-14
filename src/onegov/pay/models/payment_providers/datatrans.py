@@ -103,7 +103,8 @@ class DatatransClient:
 
     def status(self, transaction_id: str) -> DatatransTransaction:
         res = self.session.get(
-            f'{self.base_url}/transactions/{transaction_id}'
+            f'{self.base_url}/transactions/{transaction_id}',
+            timeout=(5, 10)
         )
         self.raise_for_status(res)
         return DatatransTransaction.model_validate_json(res.content)
@@ -131,7 +132,8 @@ class DatatransClient:
 
         res = self.session.post(
             f'{self.base_url}/transactions',
-            json=payload
+            json=payload,
+            timeout=(5, 10)
         )
         self.raise_for_status(res)
         return res.json()['transactionId']
@@ -147,7 +149,8 @@ class DatatransClient:
                 'amount': tx.amount,
                 'currency': tx.currency,
                 'refno': tx.refno,
-            }
+            },
+            timeout=(5, 10)
         )
         self.raise_for_status(res)
 
@@ -161,7 +164,8 @@ class DatatransClient:
             # transaction can be cancelled
             res = self.session.post(
                 f'{self.base_url}/transactions/{tx.transaction_id}/cancel',
-                json={}
+                json={},
+                timeout=(5, 10)
             )
             self.raise_for_status(res)
             return None
@@ -173,7 +177,8 @@ class DatatransClient:
                     'currency': tx.currency,
                     'amount': tx.amount,
                     'refno': str(uuid4()),
-                }
+                },
+                timeout=(5, 10)
             )
             self.raise_for_status(res)
             return res.json()['transactionId']

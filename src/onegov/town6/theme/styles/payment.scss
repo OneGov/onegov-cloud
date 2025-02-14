@@ -36,6 +36,11 @@
         @include icon('\f09d');
         margin-right: 1.5ex;
     }
+
+    .payment-provider-worldline-saferpay h2::before {
+        @include icon('\f09d');
+        margin-right: 1.5ex;
+    }
 }
 
 /*

@@ -373,7 +373,7 @@ def test_person_mutation_form():
         'submitter_message': 'There is a typo in the name!',
         'first_name': 'nick',
         'last_name': 'Rivera',
-        'academic_title': 'Dr.'
+        'academic_title': 'Dr.',
     }))
     form.model = ExtendedPerson(first_name="Nick", last_name="Riviera")
     form.request = DummyRequest(None)

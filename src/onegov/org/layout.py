@@ -3136,6 +3136,14 @@ class PaymentProviderLayout(DefaultLayout):
                             ),
                             attrs={'class': 'new-stripe-connect'}
                         ),
+                        Link(
+                            text=_('Worldline Saferpay'),
+                            url=self.request.class_link(
+                                PaymentProviderCollection,
+                                name='new-saferpay'
+                            ),
+                            attrs={'class': 'new-worldline-saferpay'}
+                        ),
                     )
                 )
             ]

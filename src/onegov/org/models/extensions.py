@@ -1087,6 +1087,115 @@ class SidebarLinksExtension(ContentExtension):
         return SidebarLinksForm
 
 
+class SidebarContactLinkExtension(ContentExtension):
+    """ Like SidebarLinkExtension but the links are shown below the contact
+    field. We knowingly duplicate some code here .
+    """
+
+    sidepanel_contact = content_property()
+
+    def extend_form(
+        self,
+        form_class: type[FormT],
+        request: OrgRequest
+    ) -> type[FormT]:
+
+        class SidebarContactLinkForm(form_class):  # type:ignore
+
+            sidepanel_contact = StringField(
+                label=_('Contact link'),
+                fieldset=_('Sidebar contact'),
+                render_kw={'class_': 'many many-links'}
+            )
+
+            if TYPE_CHECKING:
+                contact_errors: dict[int, str]
+            else:
+                def __init__(self, *args, **kwargs) -> None:
+                    super().__init__(*args, **kwargs)
+                    self.contact_errors = {}
+
+            def on_request(self) -> None:
+                if not self.sidepanel_contact.data:
+                    self.sidepanel_contact.data = self.links_to_json(None)
+
+            def process_obj(self, obj: SidebarContactLinkExtension) -> None:
+                super().process_obj(obj)
+                if not obj.sidepanel_contact:
+                    self.sidepanel_contact.data = self.links_to_json(None)
+                else:
+                    self.sidepanel_contact.data = self.links_to_json(
+                        obj.sidepanel_contact
+                    )
+
+            def populate_obj(
+                self,
+                obj: SidebarContactLinkExtension,
+                *args: Any, **kwargs: Any
+            ) -> None:
+                super().populate_obj(obj, *args, **kwargs)
+                obj.sidepanel_contact = self.json_to_links(
+                    self.sidepanel_contact.data) or None
+
+            def validate_sidepanel_contact(self, field: StringField) -> None:
+                for text, link in self.json_to_links(
+                        self.sidepanel_contact.data
+                ):
+                    if text and not link:
+                        raise ValidationError(
+                            _('Please provide a URL if contact link text is '
+                              'set'))
+                    if link and not text:
+                        raise ValidationError(
+                            _('Please provide link text if contact URL is '
+                              'set'))
+                    if link and not re.match(r'^(http://|https://|/)',
+                                             link):
+                        raise ValidationError(
+                            _('Your URLs must start with http://,'
+                              ' https:// or /'
+                              ' (for internal links)')
+                        )
+
+            def json_to_links(
+                self,
+                text: str | None = None
+            ) -> list[tuple[str | None, str | None]]:
+
+                if not text:
+                    return []
+
+                return [
+                    (value['text'], link)
+                    for value in json.loads(text).get('values', [])
+                    if (link := value['link']) or value['text']
+                ]
+
+            def links_to_json(
+                self,
+                links: Sequence[tuple[str | None, str | None]] | None
+            ) -> str:
+                contact_links = links or []
+
+                return json.dumps({
+                    'labels': {
+                        'text': self.request.translate(_('Contact Text')),
+                        'link': self.request.translate(_('Contact URL')),
+                        'add': self.request.translate(_('Add')),
+                        'remove': self.request.translate(_('Remove')),
+                    },
+                    'values': [
+                        {
+                            'text': l[0],
+                            'link': l[1],
+                            'error': self.contact_errors.get(ix, '')
+                        } for ix, l in enumerate(contact_links)
+                    ]
+                })
+
+        return SidebarContactLinkForm
+
+
 class DeletableContentExtension(ContentExtension):
     """ Extends any class that has a meta dictionary field with the ability to
     mark the content as deletable after reaching the end date. A cronjob will

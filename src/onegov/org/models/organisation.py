@@ -99,7 +99,7 @@ class Organisation(Base, TimestampMixin):
     redirect_homepage_to: dict_property[str | None] = meta_property()
     redirect_path: dict_property[str | None] = meta_property()
     hidden_people_fields: dict_property[list[str]] = meta_property(
-        default=list
+        default=lambda: ['external_user_id']
     )
     event_locations: dict_property[list[str]] = meta_property(default=list)
     geo_provider: dict_property[str] = meta_property(default='geo-mapbox')

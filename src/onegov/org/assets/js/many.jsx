@@ -453,11 +453,17 @@ function extractType(target) {
 }
 
 jQuery.fn.many = function() {
+    // Don't forget to change this file in town6 as well.
     return this.each(function() {
 
         var target = $(this);
         var type = extractType(target);
-        var data = JSON.parse(target.val());
+        try {
+            var data = JSON.parse(target.val());
+        } catch (e) {
+            console.log('Failed to parse JSON:', e);
+            return; // Skip this iteration if JSON is invalid
+        }
         var label = target.closest('label');
         var errors = label.siblings('.error');
 
@@ -470,7 +476,9 @@ jQuery.fn.many = function() {
         label.hide();
         errors.hide();
 
-        var el = $('<div class="many-wrapper" />');
+        // Create a unique wrapper for this instance
+        let wrapperId = 'many-wrapper-' + Math.random().toString(36).substr(2, 9);
+        let el = $('<div class="many-wrapper" id="' + wrapperId + '" />');
         el.appendTo(label.parent());
 
         // transfer javascript dependencies to the wrapper

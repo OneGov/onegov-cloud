@@ -2099,12 +2099,21 @@ li.unpaid {
         font-family: $font-family-monospace;
     }
 
-    li.paid .item-amount::after {
-        @include icon('\f05d');
-        color: $green-dark;
-        font-weight: normal;
-        position: absolute;
-        right: 33px;
+    li.paid {
+        .item-amount::after {
+            @include icon('\f05d');
+            color: $green-dark;
+            font-weight: normal;
+            position: absolute;
+            right: 33px;
+        }
+
+        &.datatrans, &.stripe_connect, &.worldline_saferpay {
+            .item-amount::after {
+                content: '\f09d';
+                font-size: .875rem;
+            }
+        }
     }
 
     li.unpaid .item-amount::after {
@@ -2113,11 +2122,6 @@ li.unpaid {
         font-weight: normal;
         position: absolute;
         right: 33px;
-    }
-
-    li.paid.stripe_connect .item-amount::after {
-        content: '\f09d';
-        font-size: .875rem;
     }
 
     .item-created {

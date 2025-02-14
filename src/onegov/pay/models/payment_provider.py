@@ -205,3 +205,14 @@ class PaymentProvider(Base, TimestampMixin, ContentMixin, Generic[_P]):
         the remote payment provider.
 
         """
+
+    @property
+    def payment_via_get(self) -> bool:
+        """
+        Whether or not we're allowed to submit a payment via `GET` request.
+
+        Ideally this is always `False`, but some payment providers only
+        support a redirect via `GET`. Make sure the token retrieval is
+        sufficiently secure to make up for this shortcoming.
+        """
+        return False

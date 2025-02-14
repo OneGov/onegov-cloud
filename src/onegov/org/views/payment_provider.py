@@ -14,6 +14,7 @@ from onegov.pay import Payment, PaymentCollection
 from onegov.pay import PaymentProvider, PaymentProviderCollection
 from onegov.pay.models.payment_providers import DatatransProvider
 from onegov.pay.models.payment_providers import StripeConnect
+from onegov.pay.models.payment_providers import WorldlineSaferpay
 from purl import URL
 from sqlalchemy.orm.attributes import flag_modified
 from webob import Response
@@ -321,6 +322,33 @@ class DatatransSettingsForm(Form):
     )
 
 
+class SaferpaySettingsForm(Form):
+    customer_name = StringField(
+        label=_('Customer Name'),
+        validators=[InputRequired()],
+    )
+    customer_id = StringField(
+        label=_('Customer ID'),
+        validators=[InputRequired()],
+    )
+    terminal_id = StringField(
+        label=_('Terminal ID'),
+        validators=[InputRequired()],
+    )
+    api_username = StringField(
+        label=_('API Username'),
+    )
+    api_password = StringField(
+        label=_('API Password'),
+    )
+    charge_fee_to_customer = BooleanField(
+        label=_('Charge fees to customer')
+    )
+    sandbox = BooleanField(
+        label=_('Use sandbox environment (for testing)')
+    )
+
+
 def get_settings_form(
     model: PaymentProvider[Payment],
     request: OrgRequest
@@ -333,6 +361,8 @@ def get_settings_form(
             )
     elif model.type == 'datatrans':
         return DatatransSettingsForm
+    elif model.type == 'worldline_saferpay':
+        return SaferpaySettingsForm
     else:
         raise NotImplementedError
 
@@ -384,7 +414,7 @@ def handle_provider_settings(
 def handle_new_datatrans(
     self: PaymentProviderCollection,
     request: OrgRequest,
-    form: Form,
+    form: DatatransSettingsForm,
     layout: PaymentProviderLayout | None = None
 ) -> RenderData | Response:
 
@@ -398,6 +428,40 @@ def handle_new_datatrans(
         return request.redirect(request.class_link(PaymentProviderCollection))
 
     title = _('Add Datatrans')
+    layout = layout or PaymentProviderLayout(self, request)
+    layout.breadcrumbs.append(Link(title, '#'))
+
+    return {
+        'layout': layout,
+        'title': title,
+        'form': form
+    }
+
+
+@OrgApp.form(
+    model=PaymentProviderCollection,
+    permission=Secret,
+    form=SaferpaySettingsForm,
+    template='form.pt',
+    name='new-saferpay'
+)
+def handle_new_saferpay(
+    self: PaymentProviderCollection,
+    request: OrgRequest,
+    form: SaferpaySettingsForm,
+    layout: PaymentProviderLayout | None = None
+) -> RenderData | Response:
+
+    if form.submitted(request):
+        provider = WorldlineSaferpay()
+        form.populate_obj(provider)
+        self.session.add(provider)
+        self.session.flush()
+
+        request.success(_('Worldline Saferpay has been added'))
+        return request.redirect(request.class_link(PaymentProviderCollection))
+
+    title = _('Add Worldline Saferpay')
     layout = layout or PaymentProviderLayout(self, request)
     layout.breadcrumbs.append(Link(title, '#'))
 

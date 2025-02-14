@@ -1,12 +1,11 @@
 from __future__ import annotations
 
-from itertools import groupby
 import re
 
 import morepath
 import transaction
 
-from collections import OrderedDict, defaultdict
+from collections import defaultdict
 from onegov.core.html import html_to_text
 from onegov.core.security import Public, Private, Secret
 from onegov.core.templates import render_template
@@ -1173,11 +1172,14 @@ def view_directory_entry_update_recipients(
     warning = request.translate(_('Do you really want to unsubscribe "{}"?'))
 
     recipients = EntryRecipientCollection(request.session).query().filter_by(
-        directory_id=self.directory.id).filter_by(confirmed=True).all()
-    by_letter = OrderedDict()
+        directory_id=self.directory.id).filter_by(confirmed=True)
 
-    for key, values in groupby(recipients, key=lambda r: r.address[0].upper()):
-        by_letter[key] = list(values)
+    by_letter = defaultdict(list)
+    for recipient in recipients:
+        letter = recipient.address[0].upper()
+        by_letter[letter].append(recipient)
+    by_letter = defaultdict(list, sorted(by_letter.items()))
+
     layout = layout or DirectoryEntryCollectionLayout(self, request)
     layout.breadcrumbs.append(Link(_('Recipients of new entry updates'), '#'))
     layout.editbar_links = []

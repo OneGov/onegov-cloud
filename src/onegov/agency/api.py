@@ -5,14 +5,17 @@ from functools import cached_property
 from onegov.agency.collections import ExtendedPersonCollection
 from onegov.agency.collections import PaginatedAgencyCollection
 from onegov.agency.collections import PaginatedMembershipCollection
-from onegov.agency.forms import PersonMutationForm
+from onegov.agency.forms.person import AuthenticatedPersonMutationForm
 from onegov.api import ApiEndpoint, ApiInvalidParamException
+from onegov.api.utils import authenticate
 from onegov.gis import Coordinates
 
 
 from typing import Any
 from typing import TYPE_CHECKING
 if TYPE_CHECKING:
+    from onegov.agency.forms import PersonMutationForm
+    from onegov.core.request import CoreRequest
     from onegov.agency.app import AgencyApp
     from onegov.agency.models import ExtendedAgency
     from onegov.agency.models import ExtendedAgencyMembership
@@ -64,19 +67,19 @@ def filter_for_updated(
 
 class ApisMixin:
 
-    app: AgencyApp
+    request: CoreRequest
 
     @cached_property
     def agency_api(self) -> AgencyApiEndpoint:
-        return AgencyApiEndpoint(self.app)
+        return AgencyApiEndpoint(self.request)
 
     @cached_property
     def person_api(self) -> PersonApiEndpoint:
-        return PersonApiEndpoint(self.app)
+        return PersonApiEndpoint(self.request)
 
     @cached_property
     def membership_api(self) -> MembershipApiEndpoint:
-        return MembershipApiEndpoint(self.app)
+        return MembershipApiEndpoint(self.request)
 
 
 def get_geo_location(item: ContentMixin) -> dict[str, Any]:
@@ -95,10 +98,11 @@ def get_modified_iso_format(item: TimestampMixin) -> str:
 
 
 class PersonApiEndpoint(ApiEndpoint['ExtendedPerson'], ApisMixin):
+    request: CoreRequest
     app: AgencyApp
     endpoint = 'people'
     filters = {'first_name', 'last_name'} | UPDATE_FILTER_PARAMS
-    form_class = PersonMutationForm
+    form_class = AuthenticatedPersonMutationForm
 
     @property
     def collection(self) -> ExtendedPersonCollection:
@@ -124,32 +128,48 @@ class PersonApiEndpoint(ApiEndpoint['ExtendedPerson'], ApisMixin):
         result.batch_size = self.batch_size
         return result
 
+    @property
+    def _public_item_data(self) -> tuple[str, ...]:
+        return tuple(attribute for attribute in (
+            'academic_title',
+            'born',
+            'email',
+            'first_name',
+            'function',
+            'last_name',
+            'location_address',
+            'location_code_city',
+            'notes',
+            'parliamentary_group',
+            'phone',
+            'phone_direct',
+            'political_party',
+            'postal_address',
+            'postal_code_city',
+            'profession',
+            'salutation',
+            'title',
+            'website',
+        ) if attribute not in self.app.org.hidden_people_fields)
+
     def item_data(self, item: ExtendedPerson) -> dict[str, Any]:
-        data = {
-            attribute: getattr(item, attribute, None)
-            for attribute in (
-                'academic_title',
-                'born',
-                'email',
-                'first_name',
-                'function',
-                'last_name',
-                'location_address',
-                'location_code_city',
-                'notes',
-                'parliamentary_group',
-                'phone',
-                'phone_direct',
-                'political_party',
-                'postal_address',
-                'postal_code_city',
-                'profession',
-                'salutation',
-                'title',
-                'website',
-            )
-            if attribute not in self.app.org.hidden_people_fields
-        }
+        public_data = self._public_item_data
+        if (
+            self.request
+            and self.request.authorization
+            and authenticate(self.request)
+        ):
+            # Authenticated users get all fields including external_user_id
+            data = {
+                attribute: getattr(item, attribute, None)
+                for attribute in (*public_data, 'external_user_id')
+            }
+        else:
+            # Non-authenticated users only get non-hidden fields
+            data = {
+                attribute: getattr(item, attribute, None)
+                for attribute in public_data
+            }
 
         data['modified'] = get_modified_iso_format(item)
         return data
@@ -180,6 +200,7 @@ class PersonApiEndpoint(ApiEndpoint['ExtendedPerson'], ApisMixin):
 
 
 class AgencyApiEndpoint(ApiEndpoint['ExtendedAgency'], ApisMixin):
+    request: CoreRequest
     app: AgencyApp
     endpoint = 'agencies'
     filters = {'parent', 'title'} | UPDATE_FILTER_PARAMS
@@ -240,6 +261,7 @@ class MembershipApiEndpoint(
     ApisMixin
 ):
 
+    request: CoreRequest
     app: AgencyApp
     endpoint = 'memberships'
     filters = {'agency', 'person'} | UPDATE_FILTER_PARAMS

@@ -18,7 +18,7 @@ from onegov.core.security import Private
 from onegov.core.security import Public
 from onegov.form import Form
 from onegov.org.elements import Link
-from onegov.org.forms import PersonForm
+from onegov.agency.forms.person import AgencyPersonForm
 from onegov.org.mail import send_ticket_mail
 from onegov.org.models import AtoZ
 from onegov.org.models import TicketMessage
@@ -36,6 +36,7 @@ if TYPE_CHECKING:
     from onegov.core.types import RenderData
     from onegov.ticket import Ticket
     from webob import Response as BaseResponse
+    from onegov.agency.forms.person import AuthenticatedPersonMutationForm
 
 
 class FilterOption(NamedTuple):
@@ -47,11 +48,11 @@ class FilterOption(NamedTuple):
 def get_person_form_class(
     model: object,
     request: AgencyRequest
-) -> type[PersonForm]:
+) -> type[AgencyPersonForm]:
 
     if isinstance(model, ExtendedPerson):
-        return model.with_content_extensions(PersonForm, request)
-    return ExtendedPerson().with_content_extensions(PersonForm, request)
+        return model.with_content_extensions(AgencyPersonForm, request)
+    return ExtendedPerson().with_content_extensions(AgencyPersonForm, request)
 
 
 @AgencyApp.html(
@@ -264,7 +265,7 @@ def view_sort_person(
 def add_person(
     self: ExtendedPersonCollection,
     request: AgencyRequest,
-    form: PersonForm
+    form: AgencyPersonForm
 ) -> RenderData | BaseResponse:
 
     if form.submitted(request):
@@ -295,7 +296,7 @@ def add_person(
 def edit_person(
     self: ExtendedPerson,
     request: AgencyRequest,
-    form: PersonForm
+    form: AgencyPersonForm
 ) -> RenderData | BaseResponse:
 
     if form.submitted(request):
@@ -337,7 +338,7 @@ def handle_delete_person(
 def do_report_person_change(
     self: ExtendedPerson,
     request: AgencyRequest,
-    form: PersonMutationForm
+    form: PersonMutationForm | AuthenticatedPersonMutationForm
 ) -> Ticket:
 
     session = request.session

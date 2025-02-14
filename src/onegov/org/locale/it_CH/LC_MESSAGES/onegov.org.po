@@ -2,7 +2,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: \n"
-"POT-Creation-Date: 2025-01-30 15:51+0100\n"
+"POT-Creation-Date: 2025-02-11 15:15+0100\n"
 "PO-Revision-Date: 2022-03-15 10:52+0100\n"
 "Last-Translator: \n"
 "Language-Team: \n"
@@ -2617,6 +2617,9 @@ msgstr "Provider di servizi di pagamento"
 msgid "Datatrans"
 msgstr "Datatrans"
 
+msgid "Worldline Saferpay"
+msgstr "Worldline Saferpay"
+
 msgid "Synchronise"
 msgstr "Sincronizza"
 
@@ -2813,6 +2816,24 @@ msgstr ""
 
 msgid "Sidebar links"
 msgstr "Collegamenti della barra laterale"
+
+msgid "Contact link"
+msgstr "Link di contatto"
+
+msgid "Sidebar contact"
+msgstr "Contatto laterale"
+
+msgid "Please provide a URL if contact link text is set"
+msgstr "Si prega di fornire un URL se il testo del link di contatto è impostato"
+
+msgid "Please provide link text if contact URL is set"
+msgstr "Fornire il testo del link se l'URL di contatto è impostato"
+
+msgid "Contact Text"
+msgstr "Testo di contatto"
+
+msgid "Contact URL"
+msgstr "URL di contatto"
 
 msgid "Delete content when expired"
 msgstr "Eliminare il contenuto quando è scaduto"
@@ -5670,10 +5691,14 @@ msgid "The payment was refunded"
 msgstr "Il pagamento è stato rimborsato"
 
 msgid "The payment is already captured but is still processing"
-msgstr "Il pagamento è già stato acquisito ma è ancora in fase di elaborazione."
+msgstr ""
+"Il pagamento è già stato acquisito ma è ancora in fase di elaborazione."
 
 msgid "Could not refund the payment"
 msgstr "Impossibile rimborsare il pagamento"
+
+msgid "Could not capture the payment"
+msgstr "Impossibile acquisire il pagamento"
 
 msgid "As default"
 msgstr "Valore predefinito"
@@ -5741,11 +5766,32 @@ msgstr "Addebita commissioni al cliente"
 msgid "Use sandbox environment (for testing)"
 msgstr "Utilizzare l'ambiente sandbox (per i test)"
 
+msgid "Customer Name"
+msgstr "Nome del cliente"
+
+msgid "Customer ID"
+msgstr "ID cliente"
+
+msgid "Terminal ID"
+msgstr "ID terminali"
+
+msgid "API Username"
+msgstr "Nome utente API"
+
+msgid "API Password"
+msgstr "Password API"
+
 msgid "Datatrans has been added"
 msgstr "È stato aggiunto Datatrans"
 
 msgid "Add Datatrans"
 msgstr "Aggiungi Datatrans"
+
+msgid "Worldline Saferpay has been added"
+msgstr "È stato aggiunto Worldline Saferpay"
+
+msgid "Add Worldline Saferpay"
+msgstr "Aggiungi Worldline Saferpay"
 
 msgid "Added a new person"
 msgstr "Aggiunta una nuova persona"
@@ -6300,6 +6346,3 @@ msgstr "È stato creato un account per te"
 
 msgid "The user was created successfully"
 msgstr "Utente creato correttamente"
-
-#~ msgid "Photo album. Will be shown at the end of content."
-#~ msgstr "Album fotografico. Sarà mostrato alla fine del contenuto."

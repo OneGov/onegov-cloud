@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 from onegov.agency.utils import get_html_paragraph_with_line_breaks
+from onegov.core.orm.mixins import dict_property, meta_property
 from onegov.org.models import Organisation
 from onegov.org.models.extensions import AccessExtension
 from onegov.org.models.extensions import PublicationExtension
@@ -35,6 +36,8 @@ class ExtendedPerson(Person, AccessExtension, PublicationExtension):
         'phone_internal': {'type': 'text'},
         'phone_es': {'type': 'text'}
     }
+
+    external_user_id: dict_property[str | None] = meta_property()
 
     @property
     def es_suggestion(self) -> tuple[str, ...]:

@@ -541,6 +541,13 @@ def confirm_reservation(
     name='finish',
     permission=Public,
     template='layout.pt',
+    request_method='GET'
+)
+@OrgApp.html(
+    model=Resource,
+    name='finish',
+    permission=Public,
+    template='layout.pt',
     request_method='POST'
 )
 def finalize_reservation(self: Resource, request: OrgRequest) -> Response:
@@ -553,9 +560,15 @@ def finalize_reservation(self: Resource, request: OrgRequest) -> Response:
 
     forms = FormCollection(request.session)
     submission = forms.submissions.by_id(token)
+    provider = request.app.default_payment_provider
+    if request.method == 'GET' and (
+        provider is None or not provider.payment_via_get
+    ):
+        # TODO: A redirect back to the previous step with an error might
+        #       be better UX, if this error can occur too easily...
+        raise exc.HTTPMethodNotAllowed()
 
     try:
-        provider = request.app.default_payment_provider
         payment_token = provider.get_token(request) if provider else None
         price = request.app.adjust_price(self.price_of_reservation(
             token,
