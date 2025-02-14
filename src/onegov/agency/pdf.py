@@ -445,7 +445,20 @@ class AgencyPdfLu(AgencyPdfDefault):
 
     """
 
+    @property
+    def page_fn(self) -> Callable[[Canvas, Template], None]:
+        return page_fn_header_logo
+
     def __init__(self, *args: Any, **kwargs: Any) -> None:
+        filename = path.join(
+            module_path('onegov.agency', 'static/logos'),
+            'canton-lu.svg'
+        )
+
+        with open(filename) as file:
+            logo = file.read()
+        kwargs['logo'] = logo
+        kwargs['author'] = 'Kanton Luzern'
 
         kwargs['skip_numbering'] = True
         super(AgencyPdfDefault, self).__init__(*args, **kwargs)
