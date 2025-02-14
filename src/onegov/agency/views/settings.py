@@ -32,6 +32,7 @@ class AgencySettingsForm(Form):
             ('ar', 'Kanton Appenzell Ausserrhoden'),
             ('zg', 'Kanton Zug'),
             ('bs', 'Kanton Basel-Stadt'),
+            ('lu', 'Kanton Luzern'),
         ],
     )
 
