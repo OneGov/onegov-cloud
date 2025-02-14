@@ -6594,6 +6594,9 @@ a#results {
     margin-bottom: 1.5rem;
     overflow-x: auto;
     position: relative;
+    /* NOTE: Since we allow shift as a modifier key, text-selection would
+             become annoying, rather than helpful. */
+    user-select: none;
 
     table {
         margin-bottom: 0;

@@ -299,10 +299,7 @@ def view_find_your_spot(
         start = datetime.combine(form.start.data, start_time)
         end = datetime.combine(form.end.data, end_time)
         assert form.duration.data is not None
-        duration = timedelta(
-            hours=form.duration.data.hour,
-            minutes=form.duration.data.minute,
-        )
+        duration = form.duration.data
         step = (
             timedelta(minutes=30)
             if duration.total_seconds() < 1800
@@ -328,7 +325,8 @@ def view_find_your_spot(
             free: list[tuple[datetime, datetime]],
             target_range: timedelta,
             *,
-            adjustable: bool = False
+            adjustable: bool = False,
+            availability_threshold: float = 5.0
         ) -> Iterator[utils.FindYourSpotEventInfo]:
 
             # FIXME: The availability calculation should probably be
@@ -347,8 +345,8 @@ def view_find_your_spot(
                             slot_start, allocation.timezone),
                             sedate.to_timezone(
                                 slot_end, allocation.timezone)),
-                        availability,
-                        1 if availability >= 5.0 else 0,
+                        min(availability, 100),
+                        1 if availability >= availability_threshold else 0,
                         request,
                         adjustable=adjustable
                     )
@@ -364,8 +362,8 @@ def view_find_your_spot(
                 allocation,
                 (sedate.to_timezone(slot_start, allocation.timezone),
                  sedate.to_timezone(slot_end, allocation.timezone)),
-                availability,
-                1 if availability >= 5.0 else 0,
+                min(availability, 100.0),
+                1 if availability >= availability_threshold else 0,
                 request,
                 adjustable=adjustable
             )
@@ -426,6 +424,9 @@ def view_find_your_spot(
                     step,
                     skip_missing=True
                 ):
+                    if added_slots >= 5:
+                        break
+
                     target_slot_end = target_slot_start + duration
 
                     free = allocation.free_slots(
@@ -433,6 +434,34 @@ def view_find_your_spot(
                         target_slot_end
                     )
                     if not free:
+                        if (
+                            allocation.display_start() <= target_slot_start
+                            and allocation.display_end() >= target_slot_end
+                        ):
+                            # render an unavailable slot
+                            added_slots += 1
+                            slots.append(utils.FindYourSpotEventInfo(
+                                allocation,
+                                (
+                                    max(
+                                        sedate.to_timezone(
+                                            target_slot_start,
+                                            allocation.timezone
+                                        ),
+                                        allocation.display_start(),
+                                    ),
+                                    min(
+                                        sedate.to_timezone(
+                                            target_slot_end,
+                                            allocation.timezone
+                                        ),
+                                        allocation.display_end()
+                                    )
+                                ),
+                                0,
+                                0,
+                                request,
+                            ))
                         continue
 
                     spot_infos = list(spot_infos_for_free_slots(
@@ -440,18 +469,42 @@ def view_find_your_spot(
                         free,
                         target_slot_end - target_slot_start
                     ))
-                    # don't add any broken up slots
-                    if len(spot_infos) != 1:
-                        continue
-
-                    # don't add any partially available slots
-                    if spot_infos[0].availability < 100.0:
+                    if (
+                        len(spot_infos) != 1
+                        or spot_infos[0].availability < 100.0
+                    ):
+                        total_availability = sum(
+                            info.availability
+                            for info in spot_infos
+                        )
+                        # render a partially available slot
+                        slots.append(utils.FindYourSpotEventInfo(
+                            allocation,
+                            (
+                                max(
+                                    sedate.to_timezone(
+                                        target_slot_start,
+                                        allocation.timezone
+                                    ),
+                                    allocation.display_start(),
+                                ),
+                                min(
+                                    sedate.to_timezone(
+                                        target_slot_end,
+                                        allocation.timezone
+                                    ),
+                                    allocation.display_end()
+                                )
+                            ),
+                            total_availability,
+                            0,
+                            request,
+                        ))
+                        added_slots += 1
                         continue
 
                     slots.append(spot_infos[0])
                     added_slots += 1
-                    if added_slots >= 5:
-                        break
 
                 free = allocation.free_slots(
                     target_start,
@@ -464,7 +517,7 @@ def view_find_your_spot(
                 slots.extend(spot_infos_for_free_slots(
                     allocation,
                     free,
-                    target_end - target_start,
+                    duration,
                     adjustable=True
                 ))
 

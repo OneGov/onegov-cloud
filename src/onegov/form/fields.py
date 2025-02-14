@@ -5,6 +5,7 @@ import phonenumbers
 import sedate
 
 from cssutils.css import CSSStyleSheet  # type:ignore[import-untyped]
+from datetime import timedelta
 from itertools import zip_longest
 from email_validator import validate_email, EmailNotValidError
 from markupsafe import escape, Markup
@@ -46,7 +47,7 @@ from wtforms.utils import unset_value
 from wtforms.validators import DataRequired
 from wtforms.validators import InputRequired
 from wtforms.validators import ValidationError
-from wtforms.widgets import CheckboxInput, ColorInput
+from wtforms.widgets import CheckboxInput, ColorInput, TextInput
 
 
 from typing import Any, IO, Literal, TYPE_CHECKING
@@ -98,6 +99,39 @@ class TimeField(DefaultTimeField):
 
         valuelist = [t[:8] for t in valuelist]  # type:ignore[index]
         super().process_formdata(valuelist)
+
+
+class DurationField(Field):
+
+    widget = TextInput()
+
+    data: timedelta | None
+
+    def process_formdata(self, valuelist: list[RawFormValue]) -> None:
+        if not valuelist or not isinstance(valuelist[0], str):
+            self.data = None
+            return
+
+        hours, minutes, *maybe_seconds = map(int, valuelist[0].split(':'))
+        seconds, = maybe_seconds if maybe_seconds else [0]
+        if not (0 <= minutes <= 60):
+            raise ValueError('Invalid number of minutes')
+
+        if not (0 <= seconds <= 60):
+            raise ValueError('Invalid number of seconds')
+
+        self.data = timedelta(hours=hours, minutes=minutes, seconds=seconds)
+
+    def _value(self) -> str:
+        if self.data is None:
+            return ''
+
+        minutes, seconds = divmod(int(self.data.total_seconds()), 60)
+        hours, minutes = divmod(minutes, 60)
+
+        if not seconds:
+            return f'{hours:02d}:{minutes:02d}'
+        return f'{hours:02d}:{minutes:02d}:{seconds:02d}'
 
 
 class TranslatedSelectField(SelectField):

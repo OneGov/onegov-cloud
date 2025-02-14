@@ -10,7 +10,7 @@ from wtforms.validators import DataRequired, Email, InputRequired
 
 from onegov.core.csv import convert_list_of_list_of_dicts_to_xlsx
 from onegov.form import Form
-from onegov.form.fields import MultiCheckboxField, TimeField
+from onegov.form.fields import DurationField, MultiCheckboxField, TimeField
 from onegov.org import _
 from onegov.org.forms.util import WEEKDAYS
 
@@ -45,14 +45,12 @@ class FindYourSpotForm(Form):
     if TYPE_CHECKING:
         request: OrgRequest
 
-    # FIXME: Proper duration field
-    duration = TimeField(
-        label=_('I am looking for an appointment lasting'),
-        default=time(1),
+    duration = DurationField(
+        label=_('I am looking to make a reservation lasting'),
+        default=timedelta(hours=1),
         validators=[InputRequired()],
         render_kw={
-            'step': 300,
-            'min': '00:05',
+            'placeholder': 'HH:MM',
         }
     )
 
@@ -172,11 +170,11 @@ class FindYourSpotForm(Form):
                 return False
 
             if duration := self.duration.data:
-                max_duration = (
-                    (60*end.hour + end.minute)
-                    - (60*start.hour + end.minute)
+                max_duration = timedelta(
+                        hours=end.hour - start.hour,
+                        minutes=start.hour - end.hour
                 )
-                if (60*duration.hour + duration.minute) > max_duration:
+                if duration > max_duration:
                     assert isinstance(self.duration.errors, list)
                     self.duration.errors.append(_(
                         'Duration is longer than the range between '

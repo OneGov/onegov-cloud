@@ -698,6 +698,9 @@ a#results {
              to fix this. This is dumb, but this bug has been around for
              almost a decade and still hasn't been fixed... */
     filter: blur(0);
+    /* NOTE: Since we allow shift as a modifier key, text-selection would
+             become annoying, rather than helpful. */
+    user-select: none;
 
     table {
         margin-bottom: 0;
