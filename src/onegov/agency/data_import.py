@@ -416,8 +416,9 @@ def agency_id_person_lu(line: DefaultRow) -> str:
     Generates an agency id based on each organisation and sub organisation
     name for a person.
     """
-    words = [line.department, line.dienststelle, line.abteilung,
-             line.unterabteilung, line.unterabteilung_2]
+    words = [line.department,
+             line.dienststelle__alternativ_ or line.dienststelle,
+             line.abteilung, line.unterabteilung, line.unterabteilung_2]
     return agency_id_agency_lu(words)
 
 
@@ -522,6 +523,7 @@ def import_lu_agencies(
             None, None, None, None, None, None
         kw = 'Telefon'
         if kw in line.nachname or kw in line.vorname or kw in line.funktion:
+            # considered as a general phone number not a personal one
             phone = get_phone(line.isdn_nummer)
             if v_(line.unterabteilung_2):
                 phone_u2 = phone
@@ -529,7 +531,7 @@ def import_lu_agencies(
                 phone_u = phone
             elif v_(line.abteilung):
                 phone_a = phone
-            elif v_(line.dienststelle):
+            elif v_(line.dienststelle__alternativ_) or v_(line.dienststelle):
                 phone_ds = phone
             elif v_(line.department):
                 phone_dep = phone
@@ -549,7 +551,9 @@ def import_lu_agencies(
             if agency_id not in added_agencies:
                 added_agencies[agency_id] = department
 
-        dienststellen_name = v_(line.dienststelle)
+        # dienststelle alternativ has priority over dienststelle
+        dienststellen_name = (v_(line.dienststelle__alternativ_) or
+                              v_(line.dienststelle))
         if dienststellen_name:
             assert department, (f'Error adding agency with no department; '
                                 f'line {line.rownumber}, {line.nachname}')
