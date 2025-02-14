@@ -63,6 +63,7 @@ class Pdf(PDFDocument):
         link_color: str | None = None,
         underline_links: bool = False,
         underline_width: float | str = 0.5,
+        skip_numbering: bool = False,
         **kwargs: Any
     ):
         link_color = link_color or self.default_link_color
@@ -82,6 +83,8 @@ class Pdf(PDFDocument):
         self.link_color = link_color
         self.underline_links = underline_links
         self.underline_width = underline_width
+        # hierarchical numbering for headings
+        self.skip_numbering = skip_numbering
 
         # Use Source Sans 3 instead of Helvetica to support more special
         # characters; https://github.com/adobe-fonts/source-sans
@@ -290,12 +293,13 @@ class Pdf(PDFDocument):
             for idx in range(level + 1, max(self.toc_numbering.keys()) + 1):
                 self.toc_numbering[idx] = 0
 
-            # create and prepend the prefix
-            prefix = '.'.join(
-                str(self.toc_numbering.get(idx)) or ''
-                for idx in range(level + 1)
-            )
-            text = f'{prefix} {text}'
+            if not self.skip_numbering:
+                # create and prepend the prefix
+                prefix = '.'.join(
+                    str(self.toc_numbering.get(idx)) or ''
+                    for idx in range(level + 1)
+                )
+                text = f'{prefix} {text}'
 
             # create a link
             bookmark = uuid4().hex

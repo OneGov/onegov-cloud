@@ -437,3 +437,15 @@ class AgencyPdfBs(AgencyPdfDefault):
             margin_right=self.margin_right,
             font_size=self.font_size
         )
+
+
+class AgencyPdfLu(AgencyPdfDefault):
+    """
+    No hierarchical numbering
+
+    """
+
+    def __init__(self, *args: Any, **kwargs: Any) -> None:
+
+        kwargs['skip_numbering'] = True
+        super(AgencyPdfDefault, self).__init__(*args, **kwargs)
