@@ -288,12 +288,13 @@
     </metal:search_result_agencies>
 
     <metal:search_result_agency_memberships define-macro="search_result_agency_memberships" i18n:domain="onegov.agency">
-        <a href="${request.link(result.person)}" tal:condition="(result.person.access == 'public' and result.person.published) or request.is_logged_in">
-            ${result.person.title}
+        <a href="${request.link(result.person)}"
+                 tal:condition="result.person is not None and ((result.person.access == 'public' and result.person.published) or request.is_logged_in)">
+                ${result.person.title}
         </a>
         <p>
             <span>${result.title}</span>
-            <span tal:condition="(result.agency.access == 'public' and result.agency.published) or request.is_logged_in">${result.agency.title}</span>
+            <span tal:condition="result.agency is not None and ((result.agency.access == 'public' and result.agency.published) or request.is_logged_in)">${result.agency.title}</span>
         </p>
     </metal:search_result_agency_memberships>
 
