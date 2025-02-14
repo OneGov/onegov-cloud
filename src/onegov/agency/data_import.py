@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import re
 from collections import defaultdict
 from datetime import datetime
 
@@ -421,6 +422,29 @@ def agency_id_person_lu(line: DefaultRow) -> str:
     return agency_id_agency_lu(words)
 
 
+def parse_alliance_name(
+    alliance_name: str,
+    first_name: str = '',
+) -> (tuple[str, str] | tuple[None, None]):
+    """
+    Parse alliance name into last name and first name
+    """
+
+    match = re.match(
+        r'^\s*(\S+(-\S+)?)(\s\S+(-\S+)?)*$', alliance_name.strip())
+    if match:
+        parts = alliance_name.strip().split()
+        if first_name:
+            last_name = alliance_name.strip().replace(first_name, '').strip()
+        elif len(parts) == 2:
+            last_name, first_name = parts
+        else:
+            last_name = parts[0]
+            first_name = ' '.join(parts[1:])
+        return last_name, first_name
+    return None, None
+
+
 @with_open
 def import_lu_people(
     csvfile: CSVFile[DefaultRow],
@@ -433,14 +457,21 @@ def import_lu_people(
     persons = []
 
     def parse_person(line: DefaultRow) -> None:
+        alliance_name = v_(line.name__umlaut_)  # prio over vorname, nachname
+        function = v_(line.funktion) or ''
+        nachname = v_(line.nachname) or ' '
         vorname = v_(line.vorname) or ''
+
         if vorname and vorname[-1].isdigit():
             # some people have a number at the end of their first name
             # indicating another membership
             vorname = ' '.join(vorname.split(' ')[:-1])
-        nachname = v_(line.nachname) or ' '
 
-        function = v_(line.funktion) or ''
+        if alliance_name:
+            nname, vname = parse_alliance_name(alliance_name, vorname)
+            if nname and vname:
+                nachname, vorname = nname, vname
+
         person = people.add_or_get(
             last_name=nachname,
             first_name=vorname,
