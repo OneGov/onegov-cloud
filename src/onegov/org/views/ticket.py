@@ -78,7 +78,7 @@ def view_ticket(
     if handler.deleted:
         # NOTE: We store markup in the snapshot, but since it is JSON
         #       it will be read as a plain string, so we have to wrap
-        summary = Markup(self.snapshot.get('summary', ''))  # noqa: RUF035
+        summary = Markup(self.snapshot.get('summary', ''))  # nosec: B704
     else:
         # XXX this is very to do here, much harder when the ticket is updated
         # because there's no good link to the ticket at that point - so when

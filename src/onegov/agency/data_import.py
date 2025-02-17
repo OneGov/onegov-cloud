@@ -649,6 +649,17 @@ def import_lu_agencies(
             if agency_id not in added_agencies:
                 added_agencies[agency_id] = unterabteilung_2
 
+    # order top level agencies (no parent_id), 'Staatskanzlei' at the top,
+    # others alphabetically
+    top_level = [a for a in added_agencies.values() if not a.parent_id]
+    top_level.sort(key=lambda a: a.title)
+    for ix, agency in enumerate(top_level, start=1):
+        if agency.title == 'Staatskanzlei':
+            agency.order = 0
+        agency.order = ix
+
+    session.flush()
+
     return added_agencies
 
 

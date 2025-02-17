@@ -527,7 +527,7 @@ class MarkupField(TextAreaField):
     def process_formdata(self, valuelist: list[RawFormValue]) -> None:
         if valuelist:
             assert isinstance(valuelist[0], str)
-            self.data = Markup(valuelist[0])  # noqa: RUF035
+            self.data = Markup(valuelist[0])  # nosec: B704
         else:
             self.data = None
 
