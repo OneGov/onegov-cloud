@@ -20,6 +20,7 @@ if TYPE_CHECKING:
 
 
 class ParliamentaryGroup(Base, ContentMixin, TimestampMixin, ORMSearchable):
+    """ Fraktion """
 
     __tablename__ = 'pas_parliamentary_groups'
 

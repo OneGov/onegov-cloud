@@ -98,3 +98,10 @@ class CommissionMembership(Base, TimestampMixin):
         Parliamentarian,
         back_populates='commission_memberships'
     )
+
+    def __repr__(self) -> str:
+        return (
+            f'<CommissionMembership role={self.role}, '
+            f'p={self.parliamentarian.title}, commission'
+            f'={self.commission.name}'
+        )
