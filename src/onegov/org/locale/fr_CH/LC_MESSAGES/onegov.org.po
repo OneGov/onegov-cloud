@@ -2,7 +2,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE 1.0\n"
-"POT-Creation-Date: 2025-02-11 15:15+0100\n"
+"POT-Creation-Date: 2025-02-17 14:16+0100\n"
 "PO-Revision-Date: 2022-03-15 10:50+0100\n"
 "Last-Translator: Marc Sommerhalder <marc.sommerhalder@seantis.ch>\n"
 "Language-Team: French\n"
@@ -1674,6 +1674,9 @@ msgstr "Masquer ces champs pour les utilisateurs non connectés"
 msgid "People"
 msgstr "Personnes"
 
+msgid "External ID"
+msgstr "ID externe"
+
 msgid "Duration of mTAN session"
 msgstr "Durée de la séance mTAN"
 
@@ -3017,8 +3020,8 @@ msgstr "Refuser ${title} est irréversible."
 msgid "Reject reservation"
 msgstr "Refuser la réservation"
 
-#.
 #. Used in sentence: "${event} published."
+#.
 msgid "Event"
 msgstr "Événement"
 
@@ -3375,8 +3378,8 @@ msgid ""
 "filled-out form."
 msgstr ""
 "Veuillez vérifier vos données et appuyez sur « Compléter » pour finaliser le "
-"processus. S'il y a quelque chose que vous souhaitez modifier, cliquez sur "
-"« Modifier » pour retourner sur le formulaire complété."
+"processus. S'il y a quelque chose que vous souhaitez modifier, cliquez sur « "
+"Modifier » pour retourner sur le formulaire complété."
 
 msgid ""
 "The image shown in the list view is a square. To have your image shown fully "
@@ -5588,6 +5591,19 @@ msgstr ""
 msgid "Success! We have updated your subscribed categories to ${subscribed}."
 msgstr "Succès! Nous avons mis à jour vos catégories abonnées à ${subscribed}."
 
+msgid "Update your newsletter subscription categories:"
+msgstr "Mettre à jour vos catégories d'abonnement à la lettre d'information :"
+
+msgid "Update"
+msgstr "Mettre à jour"
+
+msgid "Sign up to our newsletter to always stay up to date:"
+msgstr ""
+"Inscrivez-vous à notre lettre d'information pour rester toujours à jour :"
+
+msgid "Sign up"
+msgstr "S'inscrire"
+
 msgid "Update Newsletter Subscription"
 msgstr "Mettre à jour l'abonnement à la lettre d'information"
 
@@ -5783,7 +5799,7 @@ msgstr "Nom du client"
 msgid "Customer ID"
 msgstr "ID du client"
 
-msgid "Terminaux ID"
+msgid "Terminal ID"
 msgstr "ID du terminal"
 
 msgid "API Username"
@@ -6357,3 +6373,6 @@ msgstr "Un compte a été créé pour vous"
 
 msgid "The user was created successfully"
 msgstr "L'utilisateur a bien été créé"
+
+#~ msgid "Terminaux ID"
+#~ msgstr "ID du terminal"
