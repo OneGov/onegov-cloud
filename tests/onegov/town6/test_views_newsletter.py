@@ -1017,4 +1017,3 @@ def test_admin_receives_email_notification_on_unsubscription(client):
     # verify admin received email notification
     assert len(os.listdir(client.app.maildir)) == 3
     assert 'two@example.org' in client.get_email(2)['TextBody']
-
