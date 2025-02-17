@@ -76,7 +76,7 @@ def test_import_commission_data(
         commission = session.query(Commission).first()
         commission: Commission
         # Name should be inferred from the filename
-        assert commission.name == 'commission_test'
+        assert commission.name == 'commission test'
         assert commission.type == 'normal'
 
         # Check parties
@@ -110,7 +110,7 @@ def test_import_commission_data(
             .filter_by(parliamentarian_id=vivianne.id)
             .one()
         )
-        assert vivianne_memmbersh.commission.name == 'commission_test'
+        assert vivianne_memmbersh.commission.name == 'commission test'
         assert vivianne_memmbersh.role == 'member'
         assert (
             vivianne_memmbersh.parliamentarian.title == 'Vivianne Gonzalez'

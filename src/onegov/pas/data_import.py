@@ -180,7 +180,7 @@ def preprocess_csv_headers(
         writer = csv.writer(temp_file)
         header_row = next(reader)
 
-        match_expected_headers_or_fail(expected, header_row)
+        match_expected_headers_or_fail(expected, header_row)  # type:
 
         header_renames = {
             '1. E-Mail': 'E_Mail_1',
@@ -216,41 +216,57 @@ def validate_headers(
         original_headers=current_headers,
     )
 
-def preprocess_excel_headers(
-    excel_path: StrOrBytesPath, expected: list[str] | None = None
-) -> StrOrBytesPath:
-    temp_file = NamedTemporaryFile(
-        suffix='.xlsx',
-        delete=False,
-    )
-    temp_file_path = temp_file.name
-    temp_file.close()
 
+def preprocess_excel_headers(
+    excel_path: StrOrBytesPath,
+    expected: list[str] | None = None
+) -> StrOrBytesPath:
+    """
+    Preprocess Excel headers using a context manager for temporary file
+    handling.
+
+    Args:
+        excel_path: Path to the input Excel file
+        expected: Optional list of expected headers to validate against
+
+    Returns:
+        Path to the processed temporary file
+
+    Raises:
+        Exception: If header processing or validation fails
+    """
     header_renames = {
         '1. E-Mail': 'E_Mail_1',
         '2. E-Mail': 'E_Mail_2',
     }
 
-    try:
-        wb = openpyxl.load_workbook(excel_path)
-        for sheet in wb.worksheets:
-            if sheet.max_row > 0:
-                header_row = [str(cell.value) for cell in sheet[1]]
+    with NamedTemporaryFile(suffix='.xlsx', delete=False) as temp_file:
+        temp_file_path = temp_file.name
 
-                match_expected_headers_or_fail(expected, header_row)
+        try:
+            wb = openpyxl.load_workbook(excel_path)
 
-                modified_headers = preprocess_headers(header_row,
-                                                      header_renames)
+            for sheet in wb.worksheets:
+                if sheet.max_row > 0:
+                    header_row = [str(cell.value) for cell in sheet[1]]
+                    match_expected_headers_or_fail(expected, header_row)
+                    modified_headers = preprocess_headers(
+                        header_row,
+                        header_renames,
+                    )
 
-                # Update headers in the first row
-                for col, header in enumerate(modified_headers, 1):
-                    sheet.cell(row=1, column=col, value=header)
+                    # Update headers in the first row
+                    for col, header in enumerate(modified_headers, 1):
+                        sheet.cell(row=1, column=col, value=header)
 
-        wb.save(temp_file_path)
-        wb.close()
-        return temp_file_path
-    except Exception as exception:
-        raise exception
+            wb.save(temp_file_path)
+            wb.close()
+            return temp_file_path
+
+        except Exception as e:
+            # Clean up the temporary file if an error occurs
+            Path(temp_file_path).unlink(missing_ok=True)
+            raise e from None  # Re-raise the exception with a clean traceback
 
 
 def match_expected_headers_or_fail(expected, header_row):
@@ -439,7 +455,10 @@ def import_commissions(
 
         # Translate the German role to English
         try:
-            role = role_translations.get(row.rolle_kommission.lower(), 'member')
+            role = role_translations.get(
+                row.rolle_kommission.lower(),
+                'member',
+            )
             # Create commission membership
             membership = CommissionMembership(
                 commission=commission,

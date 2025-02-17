@@ -46,7 +46,7 @@ def import_commission_data(
                 expected_headers=commission_expected_headers_variant_1,
             )
             click.echo('Ok.')
-        except Exception as e:
+        except Exception:
             click.echo('Trying the other variant of headers...')
             import_commissions(
                 excel_file,

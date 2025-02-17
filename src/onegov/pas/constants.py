@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 """
 These values were obtained by running the following command:
 
@@ -47,13 +49,14 @@ commission_expected_headers_variant_1 = [
     'Bemerkungen',
 ]
 
-# there is another type of commission import header row, which differs in the
-# headers diff:
-# Austritt, Eintritt, Funktion, Im Kantonsrat seit, Kantonsrat Funktion, Rolle, q
+# there is another type of commission import header row, which differs in
+# the headers diff:
+# Austritt, Eintritt, Funktion, Im Kantonsrat seit, Kantonsrat Funktion,
+# Rolle, q
 
 
 commission_expected_headers_variant_2 = [
-    'q', # +
+    'q',  # +
     'Personalnummer',
     'Vertragsnummer',
     'Geschlecht',
@@ -68,15 +71,15 @@ commission_expected_headers_variant_2 = [
     'Privat-Adresszusatz',
     'Privat-PLZ',
     'Privat-Ort',
-    'Rolle', # + Parliamenarian Role, needs more: Stv.Landschreiberin
+    'Rolle',  # + Parliamenarian Role, needs more: Stv.Landschreiberin
     'Funktion',
     'Kantonsrat Funktion',  # +
     'Im Kantonsrat seit',
     'Partei',
     'Fraktion',
     'Wahlkreis',
-    'Eintritt', # +
-    'Austritt', # +
+    'Eintritt',  # +
+    'Austritt',  # +
     'Zusatzinformationen',
     'Geburtsdatum',
     'Bürgerort',
