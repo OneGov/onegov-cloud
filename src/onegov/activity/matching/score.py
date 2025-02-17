@@ -188,7 +188,7 @@ class PreferOrganiserChildren:
         return cls(get_is_organiser_child)
 
     def __call__(self, booking: Booking) -> float:
-        return 1.0 if self.get_is_organiser_child(booking) else 0.0
+        return 1.5 if self.get_is_organiser_child(booking) else 0.0
 
 
 class PreferAdminChildren:
@@ -216,7 +216,7 @@ class PreferAdminChildren:
         return cls(get_is_association_child)
 
     def __call__(self, booking: Booking) -> float:
-        return self.get_is_association_child(booking) and 1.0 or 0.0
+        return self.get_is_association_child(booking) and 1.5 or 0.0
 
 
 class PreferGroups:
