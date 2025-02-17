@@ -180,7 +180,10 @@ def preprocess_csv_headers(
         writer = csv.writer(temp_file)
         header_row = next(reader)
 
-        match_expected_headers_or_fail(expected, header_row)  # type:
+        match_expected_headers_or_fail(
+            expected,
+            header_row
+        )
 
         header_renames = {
             '1. E-Mail': 'E_Mail_1',
@@ -244,7 +247,7 @@ def preprocess_excel_headers(
         temp_file_path = temp_file.name
 
         try:
-            wb = openpyxl.load_workbook(excel_path)
+            wb = openpyxl.load_workbook(excel_path)  # type: ignore[arg-type]
 
             for sheet in wb.worksheets:
                 if sheet.max_row > 0:
@@ -269,7 +272,10 @@ def preprocess_excel_headers(
             raise e from None  # Re-raise the exception with a clean traceback
 
 
-def match_expected_headers_or_fail(expected, header_row):
+def match_expected_headers_or_fail(
+    expected: Incomplete,
+    header_row: Incomplete
+) -> None:
     # Validate headers if expected headers are provided
     if expected is not None:
         validation_results = validate_headers(header_row, expected)
@@ -463,7 +469,7 @@ def import_commissions(
             membership = CommissionMembership(
                 commission=commission,
                 parliamentarian=parliamentarian,
-                role=role,  # Now using the translated role
+                role=role,  # type:ignore[misc]
                 start=parse_date(row.eintritt_kommission),
                 end=parse_date(row.austritt_kommission)
             )
