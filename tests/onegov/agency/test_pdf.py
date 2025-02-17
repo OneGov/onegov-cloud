@@ -12,7 +12,6 @@ from onegov.pdf.utils import extract_pdf_info
 from sedate import utcnow
 
 
-@pytest.mark.skip('Generates a 4th empty page, why?')
 def test_agency_pdf_default(session):
     people = ExtendedPersonCollection(session)
     aeschi = people.add(

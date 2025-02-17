@@ -207,7 +207,8 @@ class AgencyPdfDefault(Pdf):
             self.p(agency.opening_hours)
             has_content = True
 
-        self.spacer()
+        if has_content:
+            self.spacer(0.3 * cm)
 
         if agency.memberships.count():
             self.memberships(agency, exclude)
