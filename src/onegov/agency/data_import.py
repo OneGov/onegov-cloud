@@ -554,7 +554,7 @@ def import_lu_agencies(
             None, None, None, None, None, None
         kw = 'Telefon'
         if kw in line.nachname or kw in line.vorname or kw in line.funktion:
-            # considered as a general phone number not a personal one
+            # considered as an agency phone number not a personal one
             phone = get_phone(line.isdn_nummer)
             if v_(line.unterabteilung_2):
                 phone_u2 = phone
