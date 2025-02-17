@@ -5,15 +5,11 @@ import pytest
 from freezegun import freeze_time
 from onegov.agency.collections import ExtendedAgencyCollection
 from onegov.agency.collections import ExtendedPersonCollection
-from onegov.agency.pdf import AgencyPdfAr
+from onegov.agency.pdf import AgencyPdfAr, AgencyPdfLu
 from onegov.agency.pdf import AgencyPdfDefault
 from onegov.agency.pdf import AgencyPdfZg
 from onegov.pdf.utils import extract_pdf_info
 from sedate import utcnow
-
-
-def test_pdf_page_break_on_level(session):
-    pass
 
 
 @pytest.mark.skip('Generates a 4th empty page, why?')
