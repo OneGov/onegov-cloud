@@ -7,7 +7,7 @@ from onegov.form.core import Form
 from onegov.form.fields import (
     MultiCheckboxField, DateTimeLocalField, VideoURLField)
 from onegov.form.fields import TimeField, UploadField, UploadMultipleField
-from onegov.form.parser.core import parse_formcode
+from onegov.form.parser.core import field_identifier, parse_formcode
 from onegov.form.utils import as_internal_id
 from onegov.form.validators import LaxDataRequired
 from onegov.form.validators import ExpectedExtensions
@@ -347,6 +347,17 @@ def handle_field(
                     field.range.stop
                 )
             ],
+            description=field.field_help
+        )
+
+    elif field.type == 'chip_nr':
+        builder.add_field(
+            field_class=StringField,
+            field_id=field.id,
+            label=field.label,
+            dependency=dependency,
+            required=field.required,
+            validators=[Regexp(r'^[0-9]{15}$')],
             description=field.field_help
         )
 

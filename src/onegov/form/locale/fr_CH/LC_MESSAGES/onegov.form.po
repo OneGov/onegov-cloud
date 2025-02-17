@@ -6,7 +6,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE 1.0\n"
-"POT-Creation-Date: 2025-01-27 10:34+0100\n"
+"POT-Creation-Date: 2025-02-17 09:00+0100\n"
 "PO-Revision-Date: 2019-01-31 08:31+0100\n"
 "Last-Translator: Marc Sommerhalder <marc.sommerhalder@seantis.ch>\n"
 "Language-Team: French\n"
@@ -61,11 +61,11 @@ msgstr "Texte"
 msgid "Limited text"
 msgstr "Texte limité"
 
-msgid "Numbers-only textfield (regex)"
-msgstr "Champ de texte numérique uniquement (regex)"
-
 msgid "Multiline with optional number of rows"
 msgstr "Multiligne avec nombre de lignes optionnel"
+
+msgid "Numbers-only textfield (regex)"
+msgstr "Champ de texte numérique uniquement (regex)"
 
 msgid "Comment"
 msgstr "Commentaire"
@@ -132,6 +132,9 @@ msgstr "Identificateur suisse d'entreprise"
 
 msgid "Swiss vat number"
 msgstr "Numéro de TVA suisse"
+
+msgid "Animal identification number (Microchip-Nr.)"
+msgstr "Numéro d'identification de l'animal (Microchip-Nr.)"
 
 msgid "Password"
 msgstr "Mot de passe"
