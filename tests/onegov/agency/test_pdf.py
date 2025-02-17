@@ -1,22 +1,16 @@
 from datetime import date
 from datetime import timedelta
 
-import pytest
 from freezegun import freeze_time
 from onegov.agency.collections import ExtendedAgencyCollection
 from onegov.agency.collections import ExtendedPersonCollection
-from onegov.agency.pdf import AgencyPdfAr
+from onegov.agency.pdf import AgencyPdfAr, AgencyPdfLu
 from onegov.agency.pdf import AgencyPdfDefault
 from onegov.agency.pdf import AgencyPdfZg
 from onegov.pdf.utils import extract_pdf_info
 from sedate import utcnow
 
 
-def test_pdf_page_break_on_level(session):
-    pass
-
-
-@pytest.mark.skip('Generates a 4th empty page, why?')
 def test_agency_pdf_default(session):
     people = ExtendedPersonCollection(session)
     aeschi = people.add(
@@ -359,4 +353,70 @@ def test_agency_pdf_zg(session):
     assert 'Eder, FDP' in pdf
     assert 'Staatskalender' in pdf
     assert f'Druckdatum: {date.today():%d.%m.%Y}' in pdf
+    assert '2' in pdf
+
+
+@freeze_time("2025-02-17")
+def test_agency_pdf_lu(session):
+    people = ExtendedPersonCollection(session)
+    aeschi = people.add(
+        last_name="Sutter",
+        first_name="Thomas",
+        political_party="SVP"
+    )
+    eder = people.add(
+        last_name="Wyss",
+        first_name="Patrick",
+        political_party="FDP"
+    )
+
+    agencies = ExtendedAgencyCollection(session)
+    bund = agencies.add_root(title="Bundesbehörden")
+    nr = agencies.add(
+        parent=bund,
+        title="Nationalrat",
+        portrait="Portrait NR",
+        export_fields=[
+            'membership.title',
+            'person.title'
+        ]
+    )
+    sr = agencies.add(
+        parent=bund,
+        title="Ständerat",
+        export_fields=[
+            'person.first_name',
+            'person.last_name',
+            'person.political_party',
+        ]
+    )
+
+    nr.add_person(aeschi.id, "Mitglied von Luzern")
+    sr.add_person(eder.id, "Ständerat für Luzern")
+
+    file = AgencyPdfLu.from_agencies(
+        agencies=[bund],
+        title="Staatskalender",
+        toc=True,
+        exclude=[]
+    )
+
+    pages, pdf = extract_pdf_info(file)
+    pdf = pdf.replace('  ', ' ')
+
+    assert pages == 2
+    assert 'Staatskalender' in pdf
+    assert 'Bundesbehörden' in pdf
+    assert 'Nationalrat' in pdf
+    assert 'Ständerat' in pdf
+    assert 'Bundesbehörden' in pdf
+    assert 'Nationalrat' in pdf
+    assert 'Portrait NR' in pdf
+    assert 'Mitglied von Luzern' in pdf
+    assert 'Sutter Thomas' in pdf
+    assert 'Ständerat' in pdf
+    assert 'Patrick' in pdf
+    assert 'Wyss, FDP' in pdf
+    assert 'Staatskalender' in pdf
+    assert f'{date.today():%d.%m.%Y}' in pdf
     assert '2' in pdf

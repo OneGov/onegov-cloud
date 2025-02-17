@@ -177,6 +177,7 @@ class AgencyPdfDefault(Pdf):
             self.p(city) if city else None
             self.spacer(0.1 * cm)
             has_content = True
+            portrait_last_content = False
 
         if agency.postal_address or agency.postal_code_city:
             address = agency.postal_address
@@ -185,16 +186,19 @@ class AgencyPdfDefault(Pdf):
             self.p(city) if city else None
             self.spacer(0.1 * cm)
             has_content = True
+            portrait_last_content = False
 
         if agency.phone:
             self.p(agency.phone)
             self.spacer(0.1 * cm)
             has_content = True
+            portrait_last_content = False
 
         if agency.email:
             self.p(agency.email)
             self.spacer(0.1 * cm)
             has_content = True
+            portrait_last_content = False
 
         if agency.website:
             web = agency.website.replace('http://', '').replace(
@@ -202,12 +206,15 @@ class AgencyPdfDefault(Pdf):
             self.p(web)
             self.spacer(0.1 * cm)
             has_content = True
+            portrait_last_content = False
 
         if agency.opening_hours:
             self.p(agency.opening_hours)
             has_content = True
+            portrait_last_content = False
 
-        self.spacer()
+        if has_content:
+            self.spacer(0.3 * cm)
 
         if agency.memberships.count():
             self.memberships(agency, exclude)
