@@ -223,9 +223,8 @@ class PreferGroups:
     """ Scores group bookings higher than other bookings. Groups get a boost
     by size:
 
-    - 2 people: 1.0
-    - 3 people: 0.8
-    - 4 people: 0.6
+    - 2 people: 0.7
+    - 3 people: 0.6
     - more people: 0.5
 
     This preference gives an extra boost to unprioritised bookings, to somewhat
@@ -274,7 +273,7 @@ class PreferGroups:
 
                 group_scores = {
                     r.group_code:
-                    max(.5, 1.0 - 0.2 * (r.count - 2))
+                    max(.5, .7 - 0.1 * (r.count - 2))
                     + unique_score_modifier(r.group_code)
 
                     for r in query
