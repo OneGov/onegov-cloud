@@ -514,7 +514,7 @@ def import_lu_people(
                 click.echo(f'Error agency id {agency_id} not found', err=True)
 
     for ix, line in enumerate(csvfile.lines):
-        if ix % 100 == 0:
+        if ix % 1000 == 0:
             app.es_indexer.process()
             app.psql_indexer.bulk_process(session)
 
@@ -537,7 +537,7 @@ def import_lu_agencies(
     # Hierarchy: Hierarchie: Department, Dienststelle, Abteilung,
     # Unterabteilung, Unterabteilung 2, Unterabteilung 3
     for ix, line in enumerate(csvfile.lines):
-        if ix % 100 == 0:
+        if ix % 1000 == 0:
             app.es_indexer.process()
             app.psql_indexer.bulk_process(session)
 
