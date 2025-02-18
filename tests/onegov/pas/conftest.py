@@ -131,25 +131,11 @@ def enter_observer_scope():
     ScopedPropertyObserver.enter_class_scope(PasApp)
 
 
-@fixture(params=['csv', 'xlsx'])
-def commission_test_files(request):
-    """Yield both CSV and XLSX test files one at a time."""
-    file_type = request.param
-    filename = f'commission_test.{file_type}'
-
-    # Get the file path using module_path
-    file_path = module_path('tests.onegov.pas', f'/fixtures/{filename}')
-
-    # Read the file content based on type
-    if file_type == 'csv':
-        with open(file_path, 'r') as f:
-            content = f.read()
-    else:  # xlsx
-        with open(file_path, 'rb') as f:
-            content = f.read()
-
-    yield {
-        'path': file_path,
-        'content': content,
-        'type': file_type
+@fixture
+def commission_test_files():
+    csv = module_path('tests.onegov.pas', '/fixtures/commission_test.csv')
+    xlsx = module_path('tests.onegov.pas', '/fixtures/commission_test.xlsx')
+    return {
+        'csv': csv,
+        'xlsx': xlsx
     }

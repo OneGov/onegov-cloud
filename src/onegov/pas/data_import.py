@@ -156,7 +156,7 @@ def preprocess_headers(
 
 
 def preprocess_csv_headers(
-    csv_path_abs: StrOrBytesPath, expected: list[str] | None = None
+    csv_path_abs: StrOrBytesPath, expected: set[str] | None = None
 ) -> StrOrBytesPath:
     """
     Preprocesses a CSV file to rename specific headers to avoid issues
@@ -179,11 +179,7 @@ def preprocess_csv_headers(
         reader = csv.reader(infile)
         writer = csv.writer(temp_file)
         header_row = next(reader)
-
-        match_expected_headers_or_fail(
-            expected,
-            header_row
-        )
+        match_expected_headers_or_fail(expected, header_row)
 
         header_renames = {
             '1. E-Mail': 'E_Mail_1',
@@ -206,7 +202,7 @@ class HeaderValidationResult:
 
 
 def validate_headers(
-    current_headers: list[str], expected_headers: list[str]
+    current_headers: list[str], expected_headers: set[str]
 ) -> HeaderValidationResult:
     current_set = set(current_headers)
     expected_set = set(expected_headers)
@@ -222,7 +218,7 @@ def validate_headers(
 
 def preprocess_excel_headers(
     excel_path: StrOrBytesPath,
-    expected: list[str] | None = None
+    expected: set[str] | None = None
 ) -> StrOrBytesPath:
     """
     Preprocess Excel headers using a context manager for temporary file
@@ -267,14 +263,15 @@ def preprocess_excel_headers(
             return temp_file_path
 
         except Exception as e:
+            breakpoint()
             # Clean up the temporary file if an error occurs
             Path(temp_file_path).unlink(missing_ok=True)
             raise e from None  # Re-raise the exception with a clean traceback
 
 
 def match_expected_headers_or_fail(
-    expected: Incomplete,
-    header_row: Incomplete
+    expected: set[str],
+    header_row: list[str]
 ) -> None:
     # Validate headers if expected headers are provided
     if expected is not None:
@@ -288,8 +285,7 @@ def match_expected_headers_or_fail(
                 )
             if validation_results.unexpected_headers:
                 error_msg.append(
-                    f"Unexpected "
-                    f"headers: "
+                    f"Unexpected headers: "
                     f"{', '.join(validation_results.unexpected_headers)}"
                 )
             error_msg.append(
@@ -310,7 +306,7 @@ def with_open_excel_or_csv(
     def wrapper(
         filename: str,
         *args: tuple[Any, ...],
-        expected_headers: list[str],
+        expected_headers: set[str],
     ) -> T:
 
         if filename.lower().endswith(('.xls', '.xlsx')):
@@ -319,8 +315,7 @@ def with_open_excel_or_csv(
             )
         else:
             preprocessed_filename = preprocess_csv_headers(
-                filename,
-                expected_headers,
+                filename, expected_headers
             )
 
         with open(preprocessed_filename, 'rb') as f, ImportFile(
