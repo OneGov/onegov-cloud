@@ -3,6 +3,7 @@ from __future__ import annotations
 from datetime import date
 from io import BytesIO
 
+
 from onegov.agency.utils import handle_empty_p_tags
 from onegov.core.utils import module_path
 from onegov.pdf import page_fn_footer
@@ -168,6 +169,45 @@ class AgencyPdfDefault(Pdf):
             self.mini_html(agency.portrait_html, linkify=True)
             has_content = True
             portrait_last_content = True
+
+        if agency.location_address or agency.location_code_city:
+            address = agency.location_address
+            city = agency.location_code_city
+            self.p(address) if address else None
+            self.p(city) if city else None
+            self.spacer(0.1 * cm)
+            has_content = True
+
+        if agency.postal_address or agency.postal_code_city:
+            address = agency.postal_address
+            city = agency.postal_code_city
+            self.p(address) if address else None
+            self.p(city) if city else None
+            self.spacer(0.1 * cm)
+            has_content = True
+
+        if agency.phone:
+            self.p(agency.phone)
+            self.spacer(0.1 * cm)
+            has_content = True
+
+        if agency.email:
+            self.p(agency.email)
+            self.spacer(0.1 * cm)
+            has_content = True
+
+        if agency.website:
+            web = agency.website.replace('http://', '').replace(
+                'https://', '')
+            self.p(web)
+            self.spacer(0.1 * cm)
+            has_content = True
+
+        if agency.opening_hours:
+            self.p(agency.opening_hours)
+            has_content = True
+
+        self.spacer()
 
         if agency.memberships.count():
             self.memberships(agency, exclude)
@@ -437,3 +477,28 @@ class AgencyPdfBs(AgencyPdfDefault):
             margin_right=self.margin_right,
             font_size=self.font_size
         )
+
+
+class AgencyPdfLu(AgencyPdfDefault):
+    """
+    No hierarchical numbering
+
+    """
+
+    @property
+    def page_fn(self) -> Callable[[Canvas, Template], None]:
+        return page_fn_header_logo
+
+    def __init__(self, *args: Any, **kwargs: Any) -> None:
+        filename = path.join(
+            module_path('onegov.agency', 'static/logos'),
+            'canton-lu.svg'
+        )
+
+        with open(filename) as file:
+            logo = file.read()
+        kwargs['logo'] = logo
+        kwargs['author'] = 'Kanton Luzern'
+
+        kwargs['skip_numbering'] = True
+        super(AgencyPdfDefault, self).__init__(*args, **kwargs)

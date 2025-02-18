@@ -1,8 +1,89 @@
 # Changes
 
+## 2025.6
+
+`2025-02-13` | [4a8ed94cb1...4a8ed94cb1](https://github.com/OneGov/onegov-cloud/compare/4a8ed94cb1^...4a8ed94cb1)
+
+### Agency
+
+##### Clean up previous implementation.
+
+Uses a meta field for the external_user_id (So we don't have a specific column
+    in org for a specific feature of agency)
+    Make sure the api uses it's own mutation form such that it's seperated form
+    public facing mutations.
+    Make sure hidden_people_fields is honoured everywhere
+
+`Bugfix` | [OGC-2061](https://linear.app/onegovcloud/issue/OGC-2061) | [4a8ed94cb1](https://github.com/onegov/onegov-cloud/commit/4a8ed94cb12db893dc3de0fb73fb4b3c7d1db309)
+
+## 2025.5
+
+`2025-02-13` | [e8c813d38e...2046905863](https://github.com/OneGov/onegov-cloud/compare/e8c813d38e^...2046905863)
+
+### Agency
+
+##### Staka LU Skip personal email addresses
+
+`Feature` | [OGC-1952](https://linear.app/onegovcloud/issue/OGC-1952) | [59d5e5c77a](https://github.com/onegov/onegov-cloud/commit/59d5e5c77a26313d8d6eb41a830cf99e6b37d3c8)
+
+##### Staka LU Adds function and academic title fields to pdf export
+
+`Feature` | [OGC-2071](https://linear.app/onegovcloud/issue/OGC-2071) | [02332a8ba7](https://github.com/onegov/onegov-cloud/commit/02332a8ba73b8d5de77c5134cebe7917e46f8502)
+
+### Api
+
+##### Add external_id for Person. Used in agency.
+
+Also had to refactor the Api such that request is in scope.
+
+`Feature` | [OGC-2061](https://linear.app/onegovcloud/issue/OGC-2061) | [73d7b015ae](https://github.com/onegov/onegov-cloud/commit/73d7b015aecbf8e89702d0ac6a95bbf04fe18784)
+
+### Directory
+
+##### Ensure all Directory Entry Subscribers are listed
+
+`Bugfix` | [OGC-2063](https://linear.app/onegovcloud/issue/OGC-2063) | [956bda24aa](https://github.com/onegov/onegov-cloud/commit/956bda24aab6f9d8d3f57da20aab1e5a968d278e)
+
+### Org
+
+##### Moves contact inherit functionality to base `ContactExtension`
+
+This means resources, forms and directories can now inherit their
+contact information from a topic as well.
+
+`Feature` | [OGC-2049](https://linear.app/onegovcloud/issue/OGC-2049) | [7e9659342c](https://github.com/onegov/onegov-cloud/commit/7e9659342ce8243668811990f88dcbd8fccf4855)
+
+##### Api Access
+
+`Bugfix` | [OGC-2075](https://linear.app/onegovcloud/issue/OGC-2075) | [21bff15e86](https://github.com/onegov/onegov-cloud/commit/21bff15e86b2151544c89ad4783e1da76f12d6fb)
+
+### Pay
+
+##### Adds Worldline Saferpay payment provider
+
+`Feature` | [OGC-2068](https://linear.app/onegovcloud/issue/OGC-2068) | [f841f76e6c](https://github.com/onegov/onegov-cloud/commit/f841f76e6c11155c6e62699387a2d1c910705f38)
+
+### Town6
+
+##### Adds a topics API endpoint
+
+Also includes a small extension to the existing news/events endpoint
+
+`Feature` | [OGC-2058](https://linear.app/onegovcloud/issue/OGC-2058) | [6f5f3b9b64](https://github.com/onegov/onegov-cloud/commit/6f5f3b9b6400ff7b3cde9b3f8ac9cbd2eedd4088)
+
+##### Adds an additional contact link.
+
+`Feature` | [OGC-1940](https://linear.app/onegovcloud/issue/OGC-1940) | [8b138e5965](https://github.com/onegov/onegov-cloud/commit/8b138e596506df91d8bd15fb2539b6e73848b46d)
+
+### User
+
+##### Makes `at_hash` optional in OpenID Connect provider
+
+`Bugfix` | [OGC-1767](https://linear.app/onegovcloud/issue/OGC-1767) | [5189b63bf7](https://github.com/onegov/onegov-cloud/commit/5189b63bf79c2d8569ae91aade8070f709f8911e)
+
 ## 2025.4
 
-`2025-01-31` | [c0942af43d...68aa420b48](https://github.com/OneGov/onegov-cloud/compare/c0942af43d^...68aa420b48)
+`2025-01-31` | [c0942af43d...0c5beb8230](https://github.com/OneGov/onegov-cloud/compare/c0942af43d^...0c5beb8230)
 
 ### Api
 
@@ -2195,43 +2276,4 @@ This is a silly hack introduced by ZG and only available for them. All other pri
 ##### Adds missing `None` check.
 
 `Bugfix` | [OGC-1561](https://linear.app/onegovcloud/issue/OGC-1561) | [8ae422d3a6](https://github.com/onegov/onegov-cloud/commit/8ae422d3a692b46974a2159ca94b5fab68463178)
-
-## 2024.20
-
-`2024-04-08` | [ad3f49975e...240dbfcc0a](https://github.com/OneGov/onegov-cloud/compare/ad3f49975e^...240dbfcc0a)
-
-### Core
-
-##### Avoids queuing temporary files created by `safe_move`
-
-`Bugfix` | [11990566de](https://github.com/onegov/onegov-cloud/commit/11990566debe64530842269a4f0d96c89d854318)
-
-##### Add realname to default local admin user.
-
-Required if testing the feature
-onegov.translator_directory.views.translator.view_mail_templates
-
-`Other` | [OGC-1558](https://linear.app/onegovcloud/issue/OGC-1558) | [bd092e2cca](https://github.com/onegov/onegov-cloud/commit/bd092e2cca942f951d32844265c32911e0328807)
-
-### Event
-
-##### Resolve 'fixme' after code review
-
-`Bugfix` | [OGC-1536](https://linear.app/onegovcloud/issue/OGC-1536) | [d4cdc0cf11](https://github.com/onegov/onegov-cloud/commit/d4cdc0cf11e53a20f8a1fe6911a44a7e5feb310c)
-
-### Newsletter
-
-##### Show full news in email newsletter and add option to newsletter to show full content instead of tiles only
-
-`Feature` | [OGC-1492](https://linear.app/onegovcloud/issue/OGC-1492) | [04f6fd971e](https://github.com/onegov/onegov-cloud/commit/04f6fd971ea6cd433d1e93b7b42ea1f95f932a92)
-
-### Org
-
-##### Add option for adding iFrames
-
-`Feature` | [OGC-1429](https://linear.app/onegovcloud/issue/OGC-1429) | [b6f33c4a76](https://github.com/onegov/onegov-cloud/commit/b6f33c4a763b086a437b3b21eab9814377a15b2d)
-
-## 2024.19
-
-`2024-03-28` | [aaa823d7d9...b238279400](https://github.com/OneGov/onegov-cloud/compare/aaa823d7d9^...b238279400)
 

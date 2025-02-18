@@ -366,7 +366,7 @@ class TextAreaWithTextModules(TextArea):
             return input_html
 
         field.meta.request.include('text-module-picker')
-        return Markup(self.template.render(  # noqa: RUF035
+        return Markup(self.template.render(  # nosec: B704
             id=field.id,
             label=field.gettext(_('Text modules')),
             text_modules=text_modules,
@@ -450,7 +450,7 @@ class IconWidget(TextInput):
             'data-depends-on', False) if field.render_kw else False
         depends_on = {'data-depends-on': depends_on} if depends_on else {}
 
-        return Markup(self.template.render(  # noqa: RUF035
+        return Markup(self.template.render(  # nosec: B704
             iconfont=iconfont,
             icons=icons,
             id=field.id,
@@ -512,7 +512,7 @@ class PanelWidget:
 
     def __call__(self, field: PanelField, **kwargs: Any) -> Markup:
         text = escape(field.meta.request.translate(field.text))
-        return Markup(  # noqa: RUF035
+        return Markup(  # nosec: B704
             f'<div class="panel {{kind}}" {html_params(**kwargs)}>'
             '{text}</div>'
         ).format(
@@ -526,7 +526,7 @@ class LinkPanelWidget(PanelWidget):
 
     def __call__(self, field: PanelField, **kwargs: Any) -> Markup:
         text = escape(field.meta.request.translate(field.text))
-        return Markup(  # noqa: RUF035
+        return Markup(  # nosec: B704
             f'<div class="panel {{kind}}" {html_params(**kwargs)}>'
             '<a href="{link}">{text}</a></div>'
         ).format(
