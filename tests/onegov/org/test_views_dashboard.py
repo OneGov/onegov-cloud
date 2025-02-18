@@ -3,6 +3,7 @@ import transaction
 from onegov.org.boardlets import OrgBoardlet
 from onegov.plausible.plausible_api import PlausibleAPI
 from onegov.ticket import TicketCollection, Ticket
+from onegov.user import User
 from tests.onegov.org.conftest import EchoHandler
 
 
@@ -38,100 +39,59 @@ def test_view_dashboard_no_ticket(client):
     assert 'Zuletzt bearbeitete News' in page
 
 
-def test_view_dashboard_tickets(session, handlers, client):
+def test_view_dashboard_tickets(handlers, client, org_app):
     handlers.register('EVN', EchoHandler)
 
-    transaction.begin()
+    session = org_app.session()
 
-    # editor = User(
-    #     id=uuid.uuid4(),
-    #     username='editor',
-    #     password='editor',
-    #     role='editor',
-    # )
-
-    # collection = TicketCollection(session)
-    # collection.open_ticket(
-    #     handler_id='1',
-    #     handler_code='EVN',
-    #     title='Ticket After Work Beer',
-    #     group='Event',
-    #     state='open'
-    # )
-    # collection.open_ticket(
-    #     handler_id='2',
-    #     handler_code='EVN',
-    #     title='Ticket Petting Zoo',
-    #     group='Event',
-    #     state='pending'
-    # )
-    # collection.open_ticket(
-    #     handler_id='3',
-    #     handler_code='EVN',
-    #     title='Ticket Cheese Fondue',
-    #     group='Event',
-    #     state='closed'
-    # )
-
-    # transaction.commit()
-
-    session.add(Ticket(
-        number='EVN-0001',
-        handler_id='1',
-        handler_code='EVN',
-        title='Ticket After Work Beer',
-        group='Event',
-        state='open'
+    session.add(User(
+        username='user',
+        password='password',
+        role='admin'
     ))
-    session.add(Ticket(
-        number='EVN-0002',
-        handler_id='2',
-        handler_code='EVN',
-        title='Ticket Petting Zoo',
-        group='Event',
-        state='pending'
-    ))
-    session.add(Ticket(
-        number='EVN-0003',
-        handler_id='3',
-        handler_code='EVN',
-        title='Ticket Cheese Fondue',
-        group='Event',
-        state='closed'
-    ))
+    user = session.query(User).filter_by(username='user').first()
+
+    tickets = [
+        Ticket(
+            number='EVN-0001',
+            handler_id='1',
+            handler_code='EVN',
+            title='Ticket After Work Beer',
+            group='Event',
+            state='open'
+        ),
+        Ticket(
+            number='EVN-0002',
+            handler_id='2',
+            handler_code='EVN',
+            title='Ticket Petting Zoo',
+            group='Event',
+            state='open'
+        ),
+        Ticket(
+            number='EVN-0003',
+            handler_id='3',
+            handler_code='EVN',
+            title='Ticket Cheese Fondue',
+            group='Event',
+            state='open'
+        )
+    ]
+
+    for ticket in tickets:
+        session.add(ticket)
+
+    collection = TicketCollection(session)
+
+    collection.by_handler_id('2').accept_ticket(user)
+    collection.by_handler_id('3').accept_ticket(user)
+
+    collection.by_handler_id('3').close_ticket()
 
     transaction.commit()
-    session.flush()
-
-    # collection = TicketCollection(session)
-    # count = collection.get_count()
-    # assert count.open == 3
-    # assert count.pending == 0
-    # assert count.closed == 0
-
-    # client.login_admin()
-    # page = client.get('/dashboard')
-    # assert page.pyquery('.boardlet').length == 3
-    # assert 'Tickets' in page
-    # assert 'Zuletzt bearbeitete Seiten' in page
-    # assert 'Zuletzt bearbeitete News' in page
-    # fact_numbers = page.pyquery('.fact-number').text()
-    # fact_numbers = fact_numbers.split(' ')
-    # assert fact_numbers == ['3', '0', '3', '0', '-', '-']
-
-    # transaction.begin()
-    # collection = TicketCollection(session)
-    # # accept one ticket
-    # collection.by_handler_id('1').accept_ticket(editor)
-    # # close another ticket
-    # collection.by_handler_id('2').accept_ticket(editor)
-    # collection.by_handler_id('2').close_ticket()
-    # # the third ticket remains open
-    # transaction.commit()
 
     collection = TicketCollection(session)
     count = collection.get_count()
-    print(count)
     assert count.open == 1
     assert count.pending == 1
     assert count.closed == 1
@@ -142,16 +102,18 @@ def test_view_dashboard_tickets(session, handlers, client):
 
     client.login_admin()
     page = client.get('/dashboard')
-    assert page.pyquery('.open-tickets').attr('data-count') == '1'
-    assert page.pyquery('.pending-tickets').attr('data-count') == '1'
-    assert page.pyquery('.closed-tickets').attr('data-count') == '1'
     assert page.pyquery('.boardlet').length == 3
     assert 'Tickets' in page
     assert 'Zuletzt bearbeitete Seiten' in page
     assert 'Zuletzt bearbeitete News' in page
     fact_numbers = page.pyquery('.fact-number').text()
-    fact_numbers = fact_numbers.split(' ')
+    fact_numbers = fact_numbers.split()
     assert fact_numbers == ['1', '1', '3', '1', '-', '-']
+
+    # cross-check with ticket menu
+    assert page.pyquery('.open-tickets').attr('data-count') == '1'
+    assert page.pyquery('.pending-tickets').attr('data-count') == '1'
+    assert page.pyquery('.closed-tickets').attr('data-count') == '1'
 
 
 def test_view_dashboard_topics_news(handlers, client):
