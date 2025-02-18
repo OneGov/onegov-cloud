@@ -1,7 +1,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE 1.0\n"
-"POT-Creation-Date: 2025-02-11 15:15+0100\n"
+"POT-Creation-Date: 2025-02-17 14:16+0100\n"
 "PO-Revision-Date: 2022-03-15 10:21+0100\n"
 "Last-Translator: Marc Sommerhalder <marc.sommerhalder@seantis.ch>\n"
 "Language-Team: German\n"
@@ -1672,6 +1672,9 @@ msgstr "Diese Felder für nicht angemeldete Benutzer ausblenden"
 msgid "People"
 msgstr "Personen"
 
+msgid "External ID"
+msgstr "Externe ID"
+
 msgid "Duration of mTAN session"
 msgstr "Dauer der mTAN-Session"
 
@@ -3018,8 +3021,8 @@ msgstr "Die Absage von ${title} kann nicht rückgängig gemacht werden."
 msgid "Reject reservation"
 msgstr "Reservation absagen"
 
-#.
 #. Used in sentence: "${event} published."
+#.
 msgid "Event"
 msgstr "Veranstaltung"
 
@@ -5571,6 +5574,20 @@ msgstr ""
 msgid "Success! We have updated your subscribed categories to ${subscribed}."
 msgstr ""
 "Erfolg! Wir haben Ihre abonnierten Kategorien aktualisiert auf ${subscribed}."
+
+msgid "Update your newsletter subscription categories:"
+msgstr "Aktualisieren Sie Ihre Newsletter-Abonnement-Kategorien:"
+
+msgid "Update"
+msgstr "Aktualisieren"
+
+msgid "Sign up to our newsletter to always stay up to date:"
+msgstr ""
+"Melden Sie sich für unseren Newsletter an, um immer auf dem Laufenden zu "
+"bleiben:"
+
+msgid "Sign up"
+msgstr "Anmelden"
 
 msgid "Update Newsletter Subscription"
 msgstr "Newsletter-Abonnement aktualisieren"
