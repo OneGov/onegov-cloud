@@ -267,29 +267,32 @@ def import_lu_data_files(
                 text("""
                     TRUNCATE TABLE agencies CASCADE;
                     TRUNCATE TABLE people CASCADE;
+                    COMMIT;
                 """)
             )
+            session.flush()
+            if app.es_client is not None:
+                es_client = app.es_client
+                hostname = app.es_indexer.hostname
 
-            es_client = app.es_indexer.es_client
-            hostname = app.es_indexer.hostname
-
-            for type_name in es_type_names:
-                index_pattern = f'{hostname}-{schema}-*-{type_name}'
-                try:
-                    es_client.indices.delete(
-                        index=index_pattern, ignore_unavailable=True
-                    )
-                    click.secho(
-                        f'Elasticsearch index {index_pattern} removed',
-                        fg='green',
-                    )
-                except SearchOfflineError:
-                    click.secho(
-                        f'Warning: Elasticsearch is offline, '
-                        f'could not delete index {index_pattern}', fg='yellow',
-                    )
-                except Exception:
-                    click.secho('Unknown Error', fg='red')
+                for type_name in es_type_names:
+                    index_pattern = f'{hostname}-{schema}-*-{type_name}'
+                    try:
+                        es_client.indices.delete(
+                            index=index_pattern, ignore_unavailable=True
+                        )
+                        click.secho(
+                            f'Elasticsearch index {index_pattern}'
+                            f' removed', fg='green',
+                        )
+                    except SearchOfflineError:
+                        click.secho(
+                            f'Warning: Elasticsearch is offline, '
+                            f'could not delete index {index_pattern}',
+                            fg='yellow',
+                        )
+                    except Exception:
+                        click.secho('Unknown Error', fg='red')
 
             click.secho('Exiting...', fg='green')
             return
