@@ -7,7 +7,8 @@
             <div class=" cell" tal:repeat="boardlet group">
                 <div tal:condition="boardlet.is_available" class="boardlet boardlet-${boardlet.state} ${boardlet.name}">
                     <h2 class="h4">
-                        <span>${boardlet.number|''}</span><br tal:condition="exists:boardlet.number"><span class="title">${boardlet.title}</span></h2>
+                        <span>${boardlet.number|''}</span><br tal:condition="exists:boardlet.number"><span class="title">${boardlet.title}</span>
+                    </h2>
                     <table class="facts">
                         <tr tal:repeat="fact boardlet.facts" class="${fact.css_class} small ${'none' if not (fact.number or fact.icon) else ''}">
                             <td tal:condition="fact.icon" class="fact-icon">
