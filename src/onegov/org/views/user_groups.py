@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 from morepath import redirect
 from onegov.org import _
 from onegov.org import OrgApp
@@ -19,7 +21,7 @@ if TYPE_CHECKING:
 
 def get_usergroup_form_class(
     model: object,
-    request: 'OrgRequest'
+    request: OrgRequest
 ) -> type[ManageUserGroupForm]:
 
     return getattr(
@@ -34,9 +36,9 @@ def get_usergroup_form_class(
 )
 def view_user_groups(
     self: UserGroupCollection[UserGroup],
-    request: 'OrgRequest',
+    request: OrgRequest,
     layout: UserGroupCollectionLayout | None = None
-) -> 'RenderData':
+) -> RenderData:
 
     layout = layout or UserGroupCollectionLayout(self, request)
 
@@ -56,10 +58,10 @@ def view_user_groups(
 )
 def add_user_group(
     self: UserGroupCollection[UserGroup],
-    request: 'OrgRequest',
+    request: OrgRequest,
     form: ManageUserGroupForm,
     layout: UserGroupCollectionLayout | None = None
-) -> 'RenderData | Response':
+) -> RenderData | Response:
 
     if form.submitted(request):
         user_group = self.add(name=form.name.data)
@@ -85,9 +87,9 @@ def add_user_group(
 )
 def view_user_group(
     self: UserGroup,
-    request: 'OrgRequest',
+    request: OrgRequest,
     layout: UserGroupLayout | None = None
-) -> 'RenderData':
+) -> RenderData:
 
     layout = layout or UserGroupLayout(self, request)
 
@@ -107,10 +109,10 @@ def view_user_group(
 )
 def edit_user_group(
     self: UserGroup,
-    request: 'OrgRequest',
+    request: OrgRequest,
     form: ManageUserGroupForm,
     layout: UserGroupLayout | None = None
-) -> 'RenderData | Response':
+) -> RenderData | Response:
 
     if form.submitted(request):
         form.update_model(self)
@@ -136,6 +138,6 @@ def edit_user_group(
     request_method='DELETE',
     permission=Secret
 )
-def delete_user_group(self: UserGroup, request: 'OrgRequest') -> None:
+def delete_user_group(self: UserGroup, request: OrgRequest) -> None:
     request.assert_valid_csrf_token()
     UserGroupCollection(request.session).delete(self)

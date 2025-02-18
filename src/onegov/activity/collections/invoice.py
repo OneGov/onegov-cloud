@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 from decimal import Decimal
 from functools import cached_property
 from onegov.activity.models import Invoice, InvoiceItem
@@ -22,7 +24,7 @@ class InvoiceCollection(GenericCollection[Invoice]):
 
     def __init__(
         self,
-        session: 'Session',
+        session: Session,
         period_id: UUID | None = None,
         user_id: UUID | None = None,
         schema: str = 'feriennet-v1',
@@ -33,7 +35,7 @@ class InvoiceCollection(GenericCollection[Invoice]):
         self.period_id = period_id
 
         if schema not in KNOWN_SCHEMAS:
-            raise RuntimeError('Unknown schema: {schema}')
+            raise RuntimeError(f'Unknown schema: {schema}')
 
         self.schema_name = schema
         self.schema_config = (schema_config or {})
@@ -42,7 +44,7 @@ class InvoiceCollection(GenericCollection[Invoice]):
     def schema(self) -> Schema:
         return KNOWN_SCHEMAS[self.schema_name](**self.schema_config)
 
-    def query(self, ignore_period_id: bool = False) -> 'Query[Invoice]':
+    def query(self, ignore_period_id: bool = False) -> Query[Invoice]:
         q = super().query()
 
         if self.user_id:
@@ -53,18 +55,18 @@ class InvoiceCollection(GenericCollection[Invoice]):
 
         return q
 
-    def query_items(self) -> 'Query[InvoiceItem]':
+    def query_items(self) -> Query[InvoiceItem]:
         return self.session.query(InvoiceItem).filter(
             InvoiceItem.invoice_id.in_(
                 self.query().with_entities(Invoice.id).subquery()
             )
         )
 
-    def for_user_id(self, user_id: UUID | None) -> 'Self':
+    def for_user_id(self, user_id: UUID | None) -> Self:
         return self.__class__(self.session, self.period_id, user_id,
                               self.schema_name, self.schema_config)
 
-    def for_period_id(self, period_id: UUID | None) -> 'Self':
+    def for_period_id(self, period_id: UUID | None) -> Self:
         return self.__class__(self.session, period_id, self.user_id,
                               self.schema_name, self.schema_config)
 
@@ -72,7 +74,7 @@ class InvoiceCollection(GenericCollection[Invoice]):
         self,
         schema: str,
         schema_config: dict[str, Any] | None = None
-    ) -> 'Self':
+    ) -> Self:
         return self.__class__(self.session, self.period_id, self.user_id,
                               schema, schema_config)
 
@@ -108,10 +110,10 @@ class InvoiceCollection(GenericCollection[Invoice]):
     def model_class(self) -> type[Invoice]:
         return Invoice
 
-    def _invoice_ids(self) -> 'Query[tuple[UUID]]':
+    def _invoice_ids(self) -> Query[tuple[UUID]]:
         return self.query().with_entities(Invoice.id).subquery()
 
-    def _sum(self, condition: 'ColumnElement[bool]') -> Decimal:
+    def _sum(self, condition: ColumnElement[bool]) -> Decimal:
         q = self.session.query(func.sum(InvoiceItem.amount).label('amount'))
         q = q.filter(condition)
 
@@ -137,7 +139,7 @@ class InvoiceCollection(GenericCollection[Invoice]):
 
     def unpaid_count(
         self,
-        excluded_period_ids: 'Collection[UUID] | None' = None
+        excluded_period_ids: Collection[UUID] | None = None
     ) -> int:
 
         q = self.query().with_entities(func.count(Invoice.id))

@@ -1,7 +1,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: OneGov Cloud 1.0\n"
-"POT-Creation-Date: 2024-06-05 08:20+0200\n"
+"POT-Creation-Date: 2024-10-14 14:09+0200\n"
 "PO-Revision-Date: 2021-03-03 16:24+0100\n"
 "Language-Team: German\n"
 "Language: de_CH\n"
@@ -88,9 +88,6 @@ msgid ""
 msgstr ""
 "Automatisch berechnet anhand der Startzeit des Traktandums und der Startzeit "
 "des Livestreams der Landsgemeinde."
-
-msgid "Video timestamp"
-msgstr "Video-Zeitstempel"
 
 msgid "Manual video timestamp"
 msgstr "Manueller Video-Zeitstempel"
@@ -339,6 +336,24 @@ msgstr ""
 msgid "Copied to Clipboard!"
 msgstr "In die Zwischenablage kopiert!"
 
+msgid "Raw Data"
+msgstr "Rohdaten"
+
+msgid "Terms of use"
+msgstr "Nutzungsbedingungen"
+
+msgid "Open use. Must provide the source."
+msgstr "Freie Nutzung. Quellenangabe ist Pflicht."
+
+msgid "You may use this dataset for non-commercial purposes."
+msgstr "Sie dürfen diesen Datensatz für nicht kommerzielle Zwecke nutzen."
+
+msgid "You may use this dataset for commercial purposes."
+msgstr "Sie dürfen diesen Datensatz für kommerzielle Zwecke nutzen"
+
+msgid "You must provide the source (author, title and link to the dataset)."
+msgstr "Eine Quellenangabe ist Pflicht (Autor, Titel und Link zum Datensatz)."
+
 msgid ""
 "Shows the status of each element of an assembly. The statuses of each "
 "element are automatically adjusted when editing an element, if possible."
@@ -383,6 +398,9 @@ msgstr "Neue Wortmeldung hinzugefügt"
 
 msgid "New votum"
 msgstr "Neue Wortmeldung"
+
+#~ msgid "Video timestamp"
+#~ msgstr "Video-Zeitstempel"
 
 #~ msgid "Close"
 #~ msgstr "Schliessen"

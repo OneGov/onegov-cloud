@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 import datetime
 import json
 import re
@@ -9,13 +11,15 @@ from lxml import etree
 from onegov.core.widgets import transform_structure
 from onegov.core.widgets import XML_LINE_OFFSET
 from onegov.form import Form
-from onegov.form.fields import ChosenSelectField
+from onegov.form.fields import (ChosenSelectField, URLPanelField,
+                                ChosenSelectMultipleEmailField)
 from onegov.form.fields import ColorField
 from onegov.form.fields import CssField
 from onegov.form.fields import MarkupField
 from onegov.form.fields import MultiCheckboxField
 from onegov.form.fields import PreviewField
 from onegov.form.fields import TagsField
+from onegov.form.validators import StrictOptional
 from onegov.gever.encrypt import encrypt_symmetric
 from onegov.gis import CoordinatesField
 from onegov.org import _
@@ -142,19 +146,19 @@ class GeneralSettingsForm(Form):
             'font-family-sans-serif') or self.default_font_family
 
     @cached_property
-    def theme(self) -> 'OrgTheme':
+    def theme(self) -> OrgTheme:
         return self.request.app.settings.core.theme
 
     @property
     def default_font_family(self) -> str | None:
         return self.theme.default_options.get('font-family-sans-serif')
 
-    def populate_obj(self, model: 'Organisation') -> None:  # type:ignore
+    def populate_obj(self, model: Organisation) -> None:  # type:ignore
         super().populate_obj(model)
         model.theme_options = self.theme_options
         model.custom_css = self.custom_css.data or ''
 
-    def process_obj(self, model: 'Organisation') -> None:  # type:ignore
+    def process_obj(self, model: Organisation) -> None:  # type:ignore
         super().process_obj(model)
         self.theme_options = model.theme_options or {}
         self.custom_css.data = model.custom_css or ''
@@ -168,7 +172,7 @@ class GeneralSettingsForm(Form):
         self.populate_font_families()
 
         @self.request.after
-        def clear_locale(response: 'Response') -> None:
+        def clear_locale(response: Response) -> None:
             response.delete_cookie('locale')
 
 
@@ -581,11 +585,11 @@ class HeaderSettingsForm(Form):
             super().__init__(*args, **kwargs)
             self.link_errors = {}
 
-    def populate_obj(self, model: 'Organisation') -> None:  # type:ignore
+    def populate_obj(self, model: Organisation) -> None:  # type:ignore
         super().populate_obj(model)
         model.header_options = self.header_options
 
-    def process_obj(self, model: 'Organisation') -> None:  # type:ignore
+    def process_obj(self, model: Organisation) -> None:  # type:ignore
         super().process_obj(model)
         self.header_options = model.header_options or {}
 
@@ -603,17 +607,19 @@ class HeaderSettingsForm(Form):
         self,
         text: str | None = None
     ) -> list[tuple[str | None, str | None]]:
-        result = []
 
-        for value in json.loads(text or '{}').get('values', []):
-            if value['link'] or value['text']:
-                result.append((value['text'], value['link']))
+        if not text:
+            return []
 
-        return result
+        return [
+            (value['text'], link)
+            for value in json.loads(text).get('values', [])
+            if (link := value['link']) or value['text']
+        ]
 
     def links_to_json(
         self,
-        header_links: 'Sequence[tuple[str | None, str | None]] | None' = None
+        header_links: Sequence[tuple[str | None, str | None]] | None = None
     ) -> str:
         header_links = header_links or []
 
@@ -716,6 +722,7 @@ class ModuleSettingsForm(Form):
             ('postal_address', _('Postal address')),
             ('postal_code_city', _('Postal Code and City')),
             ('notes', _('Notes')),
+            ('external_user_id', _('External ID'))
         ])
 
     mtan_session_duration_seconds = IntegerField(
@@ -774,6 +781,36 @@ class AnalyticsSettingsForm(Form):
         label=_('Analytics Code'),
         description=_('JavaScript for web statistics support'),
         render_kw={'rows': 10, 'data-editor': 'html'})
+
+    # Points the user to the analytics url e.g. matomo or plausible
+    analytics_url = URLPanelField(
+        label=_('Analytics URL'),
+        description=_('URL pointing to the analytics page'),
+        render_kw={'readonly': True},
+        validators=[UrlRequired(), Optional()],
+        text='',
+        kind='panel',
+        hide_label=False
+    )
+
+    def derive_analytics_url(self) -> str:
+        analytics_code = self.analytics_code.data or ''
+
+        if 'analytics.seantis.ch' in analytics_code:
+            data_domain = analytics_code.split(
+                'data-domain="', 1)[1].split('"', 1)[0]
+            return f'https://analytics.seantis.ch/{data_domain}'
+        elif 'matomo' in analytics_code:
+            return 'https://stats.seantis.ch'
+        else:
+            return ''
+
+    def populate_obj(self, model: Organisation) -> None:  # type:ignore
+        super().populate_obj(model)
+
+    def process_obj(self, model: Organisation) -> None:  # type:ignore
+        super().process_obj(model)
+        self.analytics_url.text = self.derive_analytics_url()
 
 
 class HolidaySettingsForm(Form):
@@ -842,7 +879,7 @@ class HolidaySettingsForm(Form):
             if line.count('-') > 1:
                 raise ValidationError(_('Please enter one date per line'))
 
-            date, description = line.split('-')
+            date, _description = line.split('-', 1)
 
             if date.count('.') < 1:
                 raise ValidationError(_('Format: Day.Month - Description'))
@@ -850,7 +887,7 @@ class HolidaySettingsForm(Form):
                 raise ValidationError(_('Please enter only day and month'))
 
     def parse_date(self, date: str) -> datetime.date:
-        day, month, year = date.split('.')
+        day, month, year = date.split('.', 2)
         try:
             return datetime.date(int(year), int(month), int(day))
         except (ValueError, TypeError) as exception:
@@ -875,7 +912,7 @@ class HolidaySettingsForm(Form):
             if line.count('-') > 1:
                 raise ValidationError(_('Please enter one date pair per line'))
 
-            start, end = line.split('-')
+            start, end = line.split('-', 1)
             if start.count('.') != 2:
                 raise ValidationError(
                     _('Format: Day.Month.Year - Day.Month.Year')
@@ -897,7 +934,7 @@ class HolidaySettingsForm(Form):
     def holiday_settings(self) -> dict[str, Any]:
 
         def parse_other_holidays_line(line: str) -> tuple[int, int, str]:
-            date, desc = line.strip().split('-')
+            date, desc = line.strip().split('-', 1)
             day, month = date.split('.')
 
             return int(month), int(day), desc.strip()
@@ -906,9 +943,9 @@ class HolidaySettingsForm(Form):
             line: str
         ) -> tuple[int, int, int, int, int, int]:
 
-            start, end = line.strip().split('-')
-            start_day, start_month, start_year = start.split('.')
-            end_day, end_month, end_year = end.split('.')
+            start, end = line.strip().split('-', 1)
+            start_day, start_month, start_year = start.split('.', 2)
+            end_day, end_month, end_year = end.split('.', 2)
 
             return (
                 int(start_year), int(start_month), int(start_day),
@@ -951,10 +988,10 @@ class HolidaySettingsForm(Form):
         self.school_holidays.data = '\n'.join(
             format_school(d) for d in data.get('school', ()))
 
-    def populate_obj(self, model: 'Organisation') -> None:  # type:ignore
+    def populate_obj(self, model: Organisation) -> None:  # type:ignore
         model.holiday_settings = self.holiday_settings
 
-    def process_obj(self, model: 'Organisation') -> None:  # type:ignore
+    def process_obj(self, model: Organisation) -> None:  # type:ignore
         self.holiday_settings = model.holiday_settings
 
 
@@ -1101,10 +1138,6 @@ class NewsletterSettingsForm(Form):
         default=False
     )
 
-    logo_in_newsletter = BooleanField(
-        label=_('Include logo in newsletter')
-    )
-
     secret_content_allowed = BooleanField(
         label=_('Allow secret content in newsletter'),
         default=False
@@ -1131,6 +1164,14 @@ class NewsletterSettingsForm(Form):
         },
     )
 
+    notify_on_unsubscription = ChosenSelectMultipleEmailField(
+        label=_('Notify on newsletter unsubscription'),
+        description=_('Send an email notification to the following users '
+                      'when a recipient unsubscribes from the newsletter'),
+        validators=[StrictOptional()],
+        choices=[]
+    )
+
     def ensure_categories(self) -> bool | None:
         assert isinstance(self.newsletter_categories.errors, list)
 
@@ -1150,7 +1191,7 @@ class NewsletterSettingsForm(Form):
                           'with topics and subtopics according the example.')
                     )
                     return False
-                for org_name, items in data.items():
+                for items in data.values():
                     if not isinstance(items, list):
                         self.newsletter_categories.errors.append(
                             _('Invalid format. Please define topics and '
@@ -1185,14 +1226,16 @@ class NewsletterSettingsForm(Form):
 
         return None
 
-    def populate_obj(self, model: 'Organisation') -> None:  # type:ignore
+    def populate_obj(self, model: Organisation) -> None:  # type:ignore
         super().populate_obj(model)
 
         yaml_data = self.newsletter_categories.data
         data = yaml.safe_load(yaml_data) if yaml_data else {}
         model.newsletter_categories = data
 
-    def process_obj(self, model: 'Organisation') -> None:  # type:ignore
+        model.notify_on_unsubscription = self.notify_on_unsubscription.data
+
+    def process_obj(self, model: Organisation) -> None:  # type:ignore
         super().process_obj(model)
 
         categories = model.newsletter_categories or {}
@@ -1202,6 +1245,17 @@ class NewsletterSettingsForm(Form):
 
         yaml_data = yaml.safe_dump(categories, default_flow_style=False)
         self.newsletter_categories.data = yaml_data
+
+        if model.notify_on_unsubscription:
+            self.notify_on_unsubscription.data = model.notify_on_unsubscription
+
+    def on_request(self) -> None:
+        users = self.request.session.query(User).filter(
+            User.role.in_(['admin', 'editor']))
+        users = users.order_by(User.username.desc())
+        self.notify_on_unsubscription.choices = [
+            (u.username) for u in users if '@' in u.username
+        ]
 
 
 class LinkMigrationForm(Form):
@@ -1246,7 +1300,7 @@ class LinkHealthCheckForm(Form):
     )
 
 
-def validate_https(form: Form, field: 'Field') -> None:
+def validate_https(form: Form, field: Field) -> None:
     if not field.data.startswith('https'):
         raise ValidationError(_("Link must start with 'https'"))
 
@@ -1274,7 +1328,7 @@ class GeverSettingsForm(Form):
         description=_('Website address including https://'),
     )
 
-    def populate_obj(self, model: 'Organisation') -> None:  # type:ignore
+    def populate_obj(self, model: Organisation) -> None:  # type:ignore
         super().populate_obj(model)
         key_base64 = self.request.app.hashed_identity_key
         try:
@@ -1287,7 +1341,7 @@ class GeverSettingsForm(Form):
             model.gever_username = ''
             model.gever_password = ''  # nosec: B105
 
-    def process_obj(self, model: 'Organisation') -> None:  # type:ignore
+    def process_obj(self, model: Organisation) -> None:  # type:ignore
         super().process_obj(model)
 
         self.gever_username.data = model.gever_username or ''

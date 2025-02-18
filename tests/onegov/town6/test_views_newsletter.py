@@ -281,7 +281,7 @@ def test_newsletter_signup(client):
     assert confirm.split('/confirm')[0] == unsubscribe.split('/unsubscribe')[0]
 
     # unsubscribing before the opt-in does nothing, no emails are sent
-    assert "erfolgreich abgemeldet" in client.get(unsubscribe).follow()
+    assert "vom Newsletter abgemeldet" in client.get(unsubscribe).follow()
 
     # try an illegal token first
     illegal_confirm = confirm.split('/confirm')[0] + 'x/confirm'
@@ -298,7 +298,7 @@ def test_newsletter_signup(client):
     # unsubscribing does not result in an e-mail either
     illegal_unsub = unsubscribe.split('/unsubscribe')[0] + 'x/unsubscribe'
     assert "falsches Token" in client.get(illegal_unsub).follow()
-    assert "erfolgreich abgemeldet" in client.get(unsubscribe).follow()
+    assert "vom Newsletter abgemeldet" in client.get(unsubscribe).follow()
 
     # no e-mail is sent when unsubscribing
     assert len(os.listdir(client.app.maildir)) == 1
@@ -421,6 +421,39 @@ def test_newsletter_rfc8058(client):
     assert len(os.listdir(client.app.maildir)) == 2
 
 
+def test_newsletter_subscribers_and_edit_bar(client):
+    client.login_admin()
+    page = client.get('/newsletter-settings')
+    page.form['show_newsletter'] = True
+    page.form.submit().follow()
+    client.logout()
+
+    admin = client.spawn()
+    admin.login_admin()
+    editor = client.spawn()
+    editor.login_editor()
+
+    # only managers can see the subscribers and edit bar
+    for current_client in (admin, editor):
+        assert current_client.get('/subscribers').status_code == 200
+        page = current_client.get('/newsletters')
+        assert 'Abonnenten' in page
+        assert page.pyquery('a.manage-subscribers')
+        assert page.pyquery('a.new-newsletter')
+
+    member = client.spawn()
+    member.login_member()
+    anom = client.spawn()
+
+    for current_client in (member, anom):
+        assert current_client.get(
+            '/subscribers', expect_errors=True).status_code == 403
+        page = current_client.get('/newsletters')
+        assert 'Abonnenten' not in page
+        assert not page.pyquery('a.manage-subscribers')
+        assert not page.pyquery('a.new-newsletter')
+
+
 def test_newsletter_subscribers_management(client):
 
     client.login_admin()
@@ -447,7 +480,7 @@ def test_newsletter_subscribers_management(client):
 
     unsubscribe = subscribers.pyquery('a[ic-get-from]').attr('ic-get-from')
     result = client.get(unsubscribe).follow()
-    assert "info@example.org wurde erfolgreich abgemeldet" in result
+    assert "info@example.org erfolgreich vom Newsletter abgemeldet" in result
 
 
 def test_newsletter_subscribers_management_by_manager(client):
@@ -470,7 +503,7 @@ def test_newsletter_subscribers_management_by_manager(client):
 
         unsubscribe = subscribers.pyquery('a[ic-get-from]').attr('ic-get-from')
         result = client.get(unsubscribe).follow()
-        assert "info@govikon.org wurde erfolgreich abgemeldet" in result
+        assert "info@govikon.org erfolgreich vom Newsletter" in result
 
     client.login_admin()
     subscribe_by_manager(client)
@@ -479,6 +512,36 @@ def test_newsletter_subscribers_management_by_manager(client):
     client.login_editor()
     subscribe_by_manager(client)
     client.logout()
+
+
+def test_newsletter_creation_limited_to_logged_in_users(client):
+    # verify adding a new newsletter view is set to private
+
+    # enable the newsletter
+    client.login_admin()
+    page = client.get('/newsletter-settings')
+    page.form['show_newsletter'] = True
+    page.form['newsletter_categories'] = ''
+    page.form.submit().follow()
+
+    admin = client.spawn()
+    admin.login_admin()
+    editor = client.spawn()
+    editor.login_editor()
+
+    for current_client in (admin, editor):
+        page = current_client.get('/newsletters/new')
+        assert 'Neuer Newsletter' in page
+        assert page.status_code == 200
+
+    # member and anonymous users can't create newsletters
+    anom = client.spawn()
+    member = client.spawn()
+    member.login_member()
+
+    for current_client in (member, anom):
+        assert current_client.get(
+            '/newsletters/new', expect_errors=True).status_code == 403
 
 
 def test_newsletter_send(client):
@@ -855,12 +918,93 @@ def test_import_export_subscribers(client):
     page.form['dry_run'] = True
     page.form['file'] = file
     page = page.form.submit()
-    assert "2 Abonnenten werden importiert" in page
+    assert "Importvorschau: Imported: 2" in page
 
     # Import
     page = client.get('/subscribers/import-newsletter-recipients')
     page.form['dry_run'] = False
     page.form['file'] = file
     page = page.form.submit().follow()
-    assert "2 Abonnenten importiert" in page
+    assert "Import abgeschlossen: Imported: 2" in page
     assert recipients.query().count() == 4
+
+
+def test_admin_receives_email_notification_on_unsubscription(client):
+
+    def extract_unsubscription_link(client, index):
+        message = client.get_email(index)['TextBody']
+        unsubscribe = re.search(r'abzumelden.\]\(([^\)]+)', message).group(1)
+        return unsubscribe
+
+    client.login_admin()
+
+    # newsletter settings no admin notification
+    page = client.get('/newsletter-settings')
+    page.form['show_newsletter'] = True
+    page.form['notify_on_unsubscription'] = []
+    page.form.submit().follow()
+
+    # add a newsletter
+    newsletters = client.get('/newsletters')
+    new_link = find_link_by_href_end(newsletters, '/newsletters/new')
+    new = newsletters.click(href=new_link['href'])
+    new.form['title'] = "Our town is AWESOME"
+    new.form['lead'] = "Like many of you, I just love our town..."
+    new.select_checkbox("news", "Willkommen bei OneGov")
+    new.select_checkbox("occurrences", "150 Jahre Govikon")
+    new.form.submit().follow()
+
+    # add some recipients the quick way
+    recipients = RecipientCollection(client.app.session())
+    recipients.add('one@example.org', confirmed=True)
+    recipients.add('two@example.org', confirmed=True)
+
+    transaction.commit()
+
+    # send out newsletter
+    newsletter = client.get('/newsletter/our-town-is-awesome')
+    preview = newsletter.click('Senden')
+    preview.form.submit().follow()
+
+    # verify newsletter was sent
+    assert len(os.listdir(client.app.maildir)) == 1
+
+    # extract unsubscription link from email and unsubscribe
+    unsubscribe = extract_unsubscription_link(client, 0)
+    result = client.get(unsubscribe).follow()
+    assert "one@example.org erfolgreich vom Newsletter abgemeldet" in result
+
+    # verify admin received NO email notification
+    assert len(os.listdir(client.app.maildir)) == 1  # no new email
+
+    # newsletter settings enable admin notification
+    page = client.get('/newsletter-settings')
+    page.form['show_newsletter'] = True
+    page.form['notify_on_unsubscription'].select_multiple(texts=[
+        'admin@example.org'])
+    page.form.submit().follow()
+
+    # add another newsletter
+    newsletters = client.get('/newsletters')
+    new_link = find_link_by_href_end(newsletters, '/newsletters/new')
+    new = newsletters.click(href=new_link['href'])
+    new.form['title'] = "Our town is AWESOME 2"
+    new.form['lead'] = "Event reminder"
+    new.select_checkbox("occurrences", "150 Jahre Govikon")
+    new.form.submit().follow()
+
+    # send newsletter
+    newsletter = client.get('/newsletter/our-town-is-awesome-2')
+    preview = newsletter.click('Senden')
+    preview.form.submit().follow()
+
+    assert len(os.listdir(client.app.maildir)) == 2
+
+    # extract unsubscription link from email and unsubscribe
+    unsubscribe = extract_unsubscription_link(client, 1)
+    result = client.get(unsubscribe).follow()
+    assert "two@example.org erfolgreich vom Newsletter abgemeldet" in result
+
+    # verify admin received email notification
+    assert len(os.listdir(client.app.maildir)) == 3
+    assert 'two@example.org' in client.get_email(2)['TextBody']

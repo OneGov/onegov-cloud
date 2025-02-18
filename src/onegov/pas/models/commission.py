@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 from onegov.core.orm import Base
 from onegov.core.orm.mixins import dict_markup_property
 from onegov.core.orm.mixins import ContentMixin
@@ -12,6 +14,7 @@ from onegov.core.orm import observes
 from uuid import uuid4
 from sqlalchemy import Enum
 from sqlalchemy.orm import relationship
+
 
 from typing import TYPE_CHECKING
 if TYPE_CHECKING:
@@ -29,7 +32,7 @@ if TYPE_CHECKING:
     ]
 
 
-TYPES: dict['CommissionType', str] = {
+TYPES: dict[CommissionType, str] = {
     'normal': _('normal'),
     'intercantonal': _('intercantonal'),
     'official': _('official mission'),
@@ -52,32 +55,32 @@ class Commission(Base, ContentMixin, TimestampMixin, ORMSearchable):
         return self.name
 
     #: Internal ID
-    id: 'Column[uuid.UUID]' = Column(
+    id: Column[uuid.UUID] = Column(
         UUID,  # type:ignore[arg-type]
         primary_key=True,
         default=uuid4
     )
 
     #: the name
-    name: 'Column[str]' = Column(
+    name: Column[str] = Column(
         Text,
         nullable=False
     )
 
     #: The start date
-    start: 'Column[date|None]' = Column(
+    start: Column[date | None] = Column(
         Date,
         nullable=True
     )
 
     #: The end date
-    end: 'Column[date|None]' = Column(
+    end: Column[date | None] = Column(
         Date,
         nullable=True
     )
 
     #: The type value
-    type: 'Column[CommissionType]' = Column(
+    type: Column[CommissionType] = Column(
         Enum(
             *TYPES.keys(),  # type:ignore[arg-type]
             name='pas_commission_type'
@@ -95,7 +98,7 @@ class Commission(Base, ContentMixin, TimestampMixin, ORMSearchable):
     description = dict_markup_property('content')
 
     #: A commission may have n parliamentarians
-    memberships: 'relationship[list[CommissionMembership]]'
+    memberships: relationship[list[CommissionMembership]]
     memberships = relationship(
         'CommissionMembership',
         cascade='all, delete-orphan',
@@ -103,15 +106,18 @@ class Commission(Base, ContentMixin, TimestampMixin, ORMSearchable):
     )
 
     #: A commission may hold meetings
-    attendences: 'relationship[list[Attendence]]' = relationship(
+    attendences: relationship[list[Attendence]] = relationship(
         'Attendence',
         cascade='all, delete-orphan',
         back_populates='commission'
     )
 
     @observes('end')
-    def end_observer(self, end: 'date | None') -> None:
+    def end_observer(self, end: date | None) -> None:
         if end:
             for membership in self.memberships:
                 if not membership.end:
                     membership.end = end
+
+    def __repr__(self) -> str:
+        return f'<Commission {self.name}>'

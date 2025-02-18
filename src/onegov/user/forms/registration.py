@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 from onegov.form import Form
 from onegov.user import _
 from onegov.user.collections import MIN_PASSWORD_LENGTH

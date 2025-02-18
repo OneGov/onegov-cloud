@@ -24,13 +24,15 @@ def test_snippets(browser):
     assert not browser.find_by_css('.formcode-snippet')
     browser.find_by_css('.formcode-toolbar-element').click()
 
-    browser.find_by_css('.formcode-snippet-optional').click()
+    browser.find_by_css('#formcode-snippet-text .formcode-snippet-optional'
+                        ).click()
     assert '= ___' in browser.find_by_css('textarea').value
 
     assert not browser.find_by_css('.formcode-snippet')
     browser.find_by_css('.formcode-toolbar-element').click()
 
-    browser.find_by_css('.formcode-snippet-required').click()
+    browser.find_by_css('#formcode-snippet-text .formcode-snippet-required'
+                        ).click()
     assert '*= ___' in browser.find_by_css('textarea').value
 
 

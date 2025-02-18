@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 from elasticsearch_dsl.query import MultiMatch  # type:ignore[import-untyped]
 from functools import cached_property
 from itertools import islice
@@ -24,7 +26,7 @@ if TYPE_CHECKING:
     T = TypeVar('T')
 
 
-def lines(value: str | tuple[str, ...] | list[str]) -> 'Iterator[str]':
+def lines(value: str | tuple[str, ...] | list[str]) -> Iterator[str]:
     if isinstance(value, (tuple, list)):
         yield from value
 
@@ -38,8 +40,8 @@ class InlineDirectorySearch:
 
     def __init__(
         self,
-        request: 'WinterthurRequest',
-        directory: 'ExtendedDirectory',
+        request: WinterthurRequest,
+        directory: ExtendedDirectory,
         search_query: dict[str, str] | None
     ) -> None:
         self.app = request.app
@@ -56,7 +58,7 @@ class InlineDirectorySearch:
         return tuple(self.directory.configuration.searchable or ())
 
     @cached_property
-    def hits(self) -> dict[str, 'Hit'] | None:
+    def hits(self) -> dict[str, Hit] | None:
         if not self.term:
             return None
 
@@ -69,7 +71,7 @@ class InlineDirectorySearch:
 
         fields = tuple(
             f for f in DirectoryEntry.es_properties.keys()
-            if not f.startswith('es_') and not f == 'directory_id'
+            if not f.startswith('es_') and f != 'directory_id'
         )
 
         match = MultiMatch(query=self.term, fields=fields, fuzziness=1)
@@ -80,7 +82,7 @@ class InlineDirectorySearch:
 
         return {hit.meta.id: hit for hit in search[0:100].execute()}
 
-    def html(self, layout: 'DefaultLayout') -> Markup:
+    def html(self, layout: DefaultLayout) -> Markup:
         return render_macro(layout.macros['inline_search'],
                             self.request, {
             'term': self.term,
@@ -98,7 +100,7 @@ class InlineDirectorySearch:
     def fragments(
         self,
         entry: DirectoryEntry
-    ) -> 'Iterator[tuple[str, tuple[str, ...]]]':
+    ) -> Iterator[tuple[str, tuple[str, ...]]]:
 
         assert self.term is not None
 
@@ -122,7 +124,7 @@ class InlineDirectorySearch:
     #        render this with the structure keyword
     def lead(
         self,
-        layout: 'DefaultLayout',
+        layout: DefaultLayout,
         entry: DirectoryEntry
     ) -> str | None:
 
@@ -134,10 +136,10 @@ class InlineDirectorySearch:
 
         for key in hit.meta.highlight:
             for fragment in hit.meta.highlight[key]:
-                return Markup(fragment)  # noqa: MS001
+                return Markup(fragment)  # nosec: B704
         return None
 
-    def adapt(self, query: 'Query[T]') -> 'Query[T]':
+    def adapt(self, query: Query[T]) -> Query[T]:
         if not self.term:
             return query
 

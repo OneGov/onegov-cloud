@@ -31,6 +31,7 @@ For example::
         return 'en'
 
 """
+from __future__ import annotations
 
 import gettext
 import glob
@@ -101,7 +102,7 @@ def get_i18n_default_locale() -> None:
 
 
 @Framework.setting(section='i18n', name='locale_negotiator')
-def get_i18n_locale_negotiatior() -> 'LocaleNegotiator':
+def get_i18n_locale_negotiatior() -> LocaleNegotiator:
     """ Returns the language negotiator, which is a function that takes the
     current request as well as a list of available languages and returns the
     angauge that should be used based on that information.
@@ -111,8 +112,8 @@ def get_i18n_locale_negotiatior() -> 'LocaleNegotiator':
 
 
 def default_locale_negotiator(
-    locales: 'Collection[str]',
-    request: 'CoreRequest'
+    locales: Collection[str],
+    request: CoreRequest
 ) -> str | None:
     """ The default locale negotiator.
 
@@ -139,7 +140,7 @@ def default_locale_negotiator(
     return None
 
 
-def pofiles(localedir: 'StrPath') -> 'Iterator[tuple[str, str]]':
+def pofiles(localedir: StrPath) -> Iterator[tuple[str, str]]:
     """ Takes the given directory and yields the language and the path of
     all pofiles found under ``*/LC_MESSAGES/*.po``.
 
@@ -175,7 +176,7 @@ def compile_translation(pofile_path: str) -> gettext.GNUTranslations:
 
 
 def get_translations(
-    localedirs: 'Iterable[StrPath]'
+    localedirs: Iterable[StrPath]
 ) -> dict[str, gettext.GNUTranslations]:
     """ Takes the given gettext locale directories and loads the po files
     found. The first found po file is assumed to be the main
@@ -223,7 +224,7 @@ def get_translations(
 
 def wrap_translations_for_chameleon(
     translations: dict[str, gettext.GNUTranslations]
-) -> dict[str, '_ChameleonTranslate']:
+) -> dict[str, _ChameleonTranslate]:
     """ Takes the given translations and wraps them for use with Chameleon. """
 
     return {
@@ -234,7 +235,7 @@ def wrap_translations_for_chameleon(
 
 def translation_chain(
     translation: gettext.GNUTranslations
-) -> 'Iterator[gettext.GNUTranslations]':
+) -> Iterator[gettext.GNUTranslations]:
     """ Yields the translation chain with a generator. """
 
     stack = [translation]
@@ -266,7 +267,7 @@ def get_translation_bound_meta(
 
         def get_translations(
             self,
-            form: 'Form'
+            form: Form
         ) -> gettext.GNUTranslations | None:
             nonlocal translations
 
@@ -277,7 +278,7 @@ def get_translation_bound_meta(
                 # it might be worth revisiting in the future if we can
                 # enable caching here again, or introduce our own
                 wtf = super().get_translations(form)
-                if wtf is  None:
+                if wtf is None:
                     wtf = gettext.NullTranslations()
                 wtf.is_wtforms = True
 
@@ -314,9 +315,9 @@ def get_translation_bound_meta(
 
         def render_field(
             self,
-            field: 'Field',
+            field: Field,
             render_kw: dict[str, Any]
-        ) -> 'Markup':
+        ) -> Markup:
             """ Wtforms does not actually translate labels, it simply leaves
             the translations string be. If those translation strings hit our
             templates directly, they will then be picked up by our template
@@ -349,17 +350,15 @@ def get_translation_bound_form(
 ) -> type[_F]:
     """ Returns a form setup with the given translate function. """
 
-    MetaClass = get_translation_bound_meta(form_class.Meta, translate)
-
     class TranslationBoundForm(form_class):  # type:ignore
 
-        Meta = MetaClass
+        Meta = get_translation_bound_meta(form_class.Meta, translate)
 
     return TranslationBoundForm
 
 
 def merge(
-    translations: 'Sequence[gettext.GNUTranslations]'
+    translations: Sequence[gettext.GNUTranslations]
 ) -> gettext.GNUTranslations:
     """ Takes the given translations (a list) and merges them into
     each other. The translations at the end of the list are overwritten
@@ -414,7 +413,7 @@ class SiteLocale:
         cls,
         app: Framework,
         locale: str
-    ) -> 'Self | None':
+    ) -> Self | None:
 
         if locale in app.locales:
             return cls(locale)
@@ -423,10 +422,10 @@ class SiteLocale:
     def __init__(self, locale: str):
         self.locale = locale
 
-    def link(self, request: 'CoreRequest', to: str) -> str:
+    def link(self, request: CoreRequest, to: str) -> str:
         return request.return_to(request.link(self), to)
 
-    def redirect(self, request: 'CoreRequest') -> 'Response':
+    def redirect(self, request: CoreRequest) -> Response:
         response = request.redirect('')  # use return-to
         response.set_cookie(
             'locale',

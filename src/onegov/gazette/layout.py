@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 from functools import cached_property
 from markupsafe import Markup
 from onegov.core.layout import ChameleonLayout
@@ -38,13 +40,13 @@ if TYPE_CHECKING:
 
 class Layout(ChameleonLayout):
 
-    request: 'GazetteRequest'
+    request: GazetteRequest
 
     date_with_weekday_format = 'EEEE dd.MM.yyyy'
     date_long_format = 'd. MMMM yyyy'
     datetime_with_weekday_format = 'EEEE dd.MM.yyyy HH:mm'
 
-    def __init__(self, model: Any, request: 'GazetteRequest') -> None:
+    def __init__(self, model: Any, request: GazetteRequest) -> None:
         super().__init__(model, request)
         self.request.include('frameworks')
         self.request.include('chosen')
@@ -62,7 +64,7 @@ class Layout(ChameleonLayout):
         return self.request.app.principal
 
     @cached_property
-    def user(self) -> 'User | None':
+    def user(self) -> User | None:
         username = self.request.identity.userid
         if username:
             return UserCollection(
@@ -187,7 +189,7 @@ class Layout(ChameleonLayout):
         return True if self.request.app.principal.sogc_import else False
 
     @property
-    def menu(self) -> 'NestedMenu':
+    def menu(self) -> NestedMenu:
         result: NestedMenu = []
 
         if self.request.is_private(self.model):
@@ -202,31 +204,26 @@ class Layout(ChameleonLayout):
                 []
             ))
 
-            active = (
-                isinstance(self.model, IssueCollection)
-                or isinstance(self.model, OrganizationCollection)
-                or isinstance(self.model, CategoryCollection)
-                or (isinstance(self.model, UserCollection)
-                    and 'export' not in self.request.url)
-                or isinstance(self.model, UserGroupCollection)
-            )
             manage: NestedMenu = [
                 (
                     _('Issues'),
                     self.manage_issues_link,
-                    isinstance(self.model, IssueCollection),
+                    isinstance(self.model, IssueCollection)
+                    and 'export' not in self.request.url,
                     []
                 ),
                 (
                     _('Organizations'),
                     self.manage_organizations_link,
-                    isinstance(self.model, OrganizationCollection),
+                    isinstance(self.model, OrganizationCollection)
+                    and 'export' not in self.request.url,
                     []
                 ),
                 (
                     _('Categories'),
                     self.manage_categories_link,
-                    isinstance(self.model, CategoryCollection),
+                    isinstance(self.model, CategoryCollection)
+                    and 'export' not in self.request.url,
                     []
                 ),
                 (
@@ -238,11 +235,17 @@ class Layout(ChameleonLayout):
                 (
                     _('Users'),
                     self.manage_users_link,
-                    isinstance(self.model, UserCollection),
+                    isinstance(self.model, UserCollection)
+                    and 'export' not in self.request.url,
                     []
-                )
+                ),
             ]
-            result.append((_('Manage'), None, active, manage))
+            result.append((
+                _('Manage'),
+                None,
+                any(item[2] for item in manage),
+                manage
+            ))
 
             result.append((
                 _('Statistics'),
@@ -290,7 +293,7 @@ class Layout(ChameleonLayout):
             result.append((
                 _('Exports'),
                 None,
-                'export' in self.request.url,
+                any(item[2] for item in export_links),
                 export_links
             ))
 
@@ -321,7 +324,7 @@ class Layout(ChameleonLayout):
     def current_issue(self) -> Issue | None:
         return IssueCollection(self.session).current_issue
 
-    def format_date(self, dt: 'datetime | date | None', format: str) -> str:
+    def format_date(self, dt: datetime | date | None, format: str) -> str:
         """ Returns a readable version of the given date while automatically
         converting to the principals timezone if the date is timezone aware.
 
@@ -334,7 +337,7 @@ class Layout(ChameleonLayout):
         self,
         issue: Issue,
         date_format: str = 'date',
-        notice: 'GazetteNotice | None' = None
+        notice: GazetteNotice | None = None
     ) -> str:
         """ Returns the issues number and date and optionally the publication
         number of the given notice. """
@@ -371,7 +374,7 @@ class MailLayout(Layout):
     """ A special layout for creating HTML E-Mails. """
 
     @cached_property
-    def base(self) -> 'PageTemplateFile':
+    def base(self) -> PageTemplateFile:
         return self.template_loader['mail_layout.pt']
 
     @cached_property

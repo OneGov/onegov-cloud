@@ -2,6 +2,8 @@
 upgraded on the server. See :class:`onegov.core.upgrade.upgrade_task`.
 
 """
+from __future__ import annotations
+
 import itertools
 
 from onegov.core.orm.types import JSON
@@ -116,13 +118,11 @@ def add_order_within_person_column(context: UpgradeContext) -> None:
     def groupkey(result: Any) -> str:
         return result[0].person_id
 
-    agency_list = []
-    for result in session.query(
-            AgencyMembership.id,
-            AgencyMembership.agency_id,
-            AgencyMembership.person_id,
-    ):
-        agency_list.append(result)
+    agency_list = session.query(
+        AgencyMembership.id,
+        AgencyMembership.agency_id,
+        AgencyMembership.person_id,
+    ).all()
 
     title_list = []
     for result in agency_list:
@@ -200,3 +200,9 @@ def fix_agency_address_column(context: UpgradeContext) -> None:
         context.operations.add_column('agencies', Column(
             'address', Text, nullable=True
         ))
+
+
+@upgrade_task('Remove_lu_external_id ')
+def remove_external_id_for_agency_import(context: UpgradeContext) -> None:
+    if context.has_column('people', 'lu_external_id'):
+        context.operations.drop_column('people', 'lu_external_id)')

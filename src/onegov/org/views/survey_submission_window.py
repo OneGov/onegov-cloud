@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 import morepath
 
 from onegov.core.security import Private
@@ -26,9 +28,9 @@ if TYPE_CHECKING:
 
 
 def get_hints(
-    layout: 'Layout',
+    layout: Layout,
     window: SurveySubmissionWindow | None
-) -> 'Iterator[tuple[str, str]]':
+) -> Iterator[tuple[str, str]]:
 
     if not window:
         return
@@ -60,10 +62,10 @@ def get_hints(
 )
 def handle_new_submission_form(
     self: SurveyDefinition,
-    request: 'OrgRequest',
+    request: OrgRequest,
     form: SurveySubmissionWindowForm,
     layout: SurveySubmissionLayout | None = None
-) -> 'RenderData | Response':
+) -> RenderData | Response:
     title = _('New Submission Window')
 
     layout = layout or SurveySubmissionLayout(self, request)
@@ -100,9 +102,9 @@ def handle_new_submission_form(
 )
 def view_submission_window_results(
     self: SurveySubmissionWindow,
-    request: 'OrgRequest',
+    request: OrgRequest,
     layout: SurveySubmissionLayout | None = None
-) -> 'RenderData':
+) -> RenderData:
 
     layout = layout or SurveySubmissionLayout(self.survey, request)
     window_name = self.title if self.title else layout.format_date_range(
@@ -152,10 +154,10 @@ def view_submission_window_results(
 )
 def view_submission_window_survey(
     self: SurveySubmissionWindow,
-    request: 'OrgRequest',
-    form: 'Form',
+    request: OrgRequest,
+    form: Form,
     layout: SurveySubmissionWindowLayout | None = None
-) -> 'RenderData | Response':
+) -> RenderData | Response:
 
     collection = SurveyCollection(request.session)
     definition = self.survey
@@ -170,7 +172,7 @@ def view_submission_window_survey(
 
     if enabled and request.POST:
         submission = collection.submissions.add(
-            self.name, form, state='pending',
+            self.name, form,
             submission_window=self)
 
         return morepath.redirect(request.link(submission))
@@ -191,7 +193,6 @@ def view_submission_window_survey(
         'coordinates': getattr(definition, 'coordinates', Coordinates()),
         'hints': tuple(get_hints(layout, self)),
         'hints_callout': not enabled,
-        'button_text': _('Continue')
     }
 
 
@@ -204,10 +205,10 @@ def view_submission_window_survey(
 )
 def handle_edit_submission_window(
     self: SurveySubmissionWindow,
-    request: 'OrgRequest',
+    request: OrgRequest,
     form: SurveySubmissionWindowForm,
     layout: SurveySubmissionLayout | None = None
-) -> 'RenderData | Response':
+) -> RenderData | Response:
 
     title = _('Edit Submission Window')
 
@@ -238,12 +239,16 @@ def handle_edit_submission_window(
 )
 def delete_submission_window(
     self: SurveySubmissionWindow,
-    request: 'OrgRequest'
+    request: OrgRequest
 ) -> None:
 
     request.assert_valid_csrf_token()
 
-    self.disassociate()
+    submissions = request.session.query(SurveySubmission)
+    submissions = submissions.filter(
+        SurveySubmission.submission_window_id == self.id)
+    submissions.delete()
     request.session.delete(self)
 
-    request.success(_('The submission window was deleted'))
+    request.success(_('The submission window and all associated submissions '
+                        'were deleted'))

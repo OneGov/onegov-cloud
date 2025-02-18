@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 from onegov.core.elements import Link
 from onegov.core.security import Private
 from onegov.pas import _
@@ -27,8 +29,8 @@ if TYPE_CHECKING:
 )
 def view_commissions(
     self: CommissionCollection,
-    request: 'TownRequest'
-) -> 'RenderData':
+    request: TownRequest
+) -> RenderData:
 
     layout = CommissionCollectionLayout(self, request)
 
@@ -62,9 +64,9 @@ def view_commissions(
 )
 def add_commission(
     self: CommissionCollection,
-    request: 'TownRequest',
+    request: TownRequest,
     form: CommissionForm
-) -> 'RenderData | Response':
+) -> RenderData | Response:
 
     if form.submitted(request):
         commission = self.add(**form.get_useful_data())
@@ -91,8 +93,8 @@ def add_commission(
 )
 def view_commission(
     self: Commission,
-    request: 'TownRequest'
-) -> 'RenderData':
+    request: TownRequest
+) -> RenderData:
 
     layout = CommissionLayout(self, request)
 
@@ -112,9 +114,9 @@ def view_commission(
 )
 def edit_commission(
     self: Commission,
-    request: 'TownRequest',
+    request: TownRequest,
     form: CommissionForm
-) -> 'RenderData | Response':
+) -> RenderData | Response:
 
     if form.submitted(request):
         form.populate_obj(self)
@@ -143,7 +145,7 @@ def edit_commission(
 )
 def delete_commission(
     self: Commission,
-    request: 'TownRequest'
+    request: TownRequest
 ) -> None:
 
     request.assert_valid_csrf_token()
@@ -161,9 +163,9 @@ def delete_commission(
 )
 def add_commission_membership(
     self: Commission,
-    request: 'TownRequest',
+    request: TownRequest,
     form: CommissionMembershipAddForm
-) -> 'RenderData | Response':
+) -> RenderData | Response:
 
     if form.submitted(request):
         self.memberships.append(
@@ -193,9 +195,9 @@ def add_commission_membership(
 )
 def add_plenary_attendence(
     self: Commission,
-    request: 'TownRequest',
+    request: TownRequest,
     form: AttendenceAddCommissionForm
-) -> 'RenderData | Response':
+) -> RenderData | Response:
 
     if form.submitted(request):
         data = form.get_useful_data()

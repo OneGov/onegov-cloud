@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 from asyncio import run
 from more.content_security.core import content_security_policy_tween_factory
 from more.webassets import WebassetsApp
@@ -36,6 +38,7 @@ class WebsocketsApp(WebassetsApp):
         # we forward declare the attributes from Framework we need
         configuration: dict[str, Any]
         schema: str
+
         def sign(self, text: str, salt: str = ...) -> str: ...
 
     _websockets_client_url: str
@@ -65,7 +68,7 @@ class WebsocketsApp(WebassetsApp):
         )
         assert not_default, 'Do not use the default websockets token'
 
-    def websockets_client_url(self, request: 'CoreRequest') -> str:
+    def websockets_client_url(self, request: CoreRequest) -> str:
         """ Returns the public websocket endpoint that can be used with JS.
 
         Upgrades the scheme to wss if request URL is https and fills in netloc
@@ -102,7 +105,7 @@ class WebsocketsApp(WebassetsApp):
 
     def send_websocket(
         self,
-        message: 'JSON_ro',
+        message: JSON_ro,
         channel: str | None = None
     ) -> bool:
         """ Sends an application-bound broadcast message to all connected
@@ -135,10 +138,10 @@ class WebsocketsApp(WebassetsApp):
 @WebsocketsApp.tween_factory(under=content_security_policy_tween_factory)
 def websocket_csp_tween_factory(
     app: WebsocketsApp,
-    handler: 'Callable[[CoreRequest], Response]'
-) -> 'Callable[[CoreRequest], Response]':
+    handler: Callable[[CoreRequest], Response]
+) -> Callable[[CoreRequest], Response]:
 
-    def websocket_csp_tween(request: 'CoreRequest') -> 'Response':
+    def websocket_csp_tween(request: CoreRequest) -> Response:
         """
         Adds the websocket client to the connect-src content security policy.
         """
@@ -161,5 +164,5 @@ def get_js_path() -> str:
 
 
 @WebsocketsApp.webasset('websockets')
-def get_websockets_asset() -> 'Iterator[str]':
+def get_websockets_asset() -> Iterator[str]:
     yield 'websockets.js'

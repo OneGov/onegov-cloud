@@ -2,7 +2,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: \n"
-"POT-Creation-Date: 2024-08-28 15:13+0200\n"
+"POT-Creation-Date: 2024-10-08 08:58+0200\n"
 "PO-Revision-Date: 2021-01-07 09:13+0100\n"
 "Last-Translator: Marc Sommerhalder <marc.sommerhalder@seantis.ch>\n"
 "Language-Team: \n"
@@ -151,6 +151,9 @@ msgstr "eMuseum.ch"
 
 msgid "Social Archives"
 msgstr "Archives Sociales"
+
+msgid "Basel Poster Collection"
+msgstr "Lien Plakatsammlung Basel"
 
 msgid "No eMuseum API key available."
 msgstr "Aucune clé API eMuseum n’est disponible."
@@ -1545,6 +1548,9 @@ msgstr "Lien eMuseum.ch"
 msgid "Link Social Archives"
 msgstr "Lien Archives Sociales"
 
+msgid "Link Basel Poster Collection"
+msgstr "Lien Plakatsammmlung Basel"
+
 msgid "Swissvotes database"
 msgstr "Base de données Swissvotes"
 
@@ -1961,9 +1967,6 @@ msgstr "Présenter la carte"
 msgid "Full analysis of VOTO post-vote poll results"
 msgstr "Rapport d'analyse de l’enquête post-votation VOTO"
 
-msgid "Technical report"
-msgstr "Rapport technique"
-
 msgid "Cockpit with selected VOX results"
 msgstr "Cockpit avec des résultats d'analyse VOX"
 
@@ -2214,3 +2217,6 @@ msgstr "Toutes les votations ont été supprimées"
 
 msgid "Do you really want to delete all votes?!"
 msgstr "Voulez-vous vraiment supprimer l'ensemble des votations?!"
+
+#~ msgid "Technical report"
+#~ msgstr "Rapport technique"

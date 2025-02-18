@@ -55,3 +55,41 @@ th[rowspan] {
 table.changes span {
     display: block;
 }
+
+.category-container {
+    display: flex;
+    align-items: center;
+    margin: 1rem;
+}
+
+.short-hr {
+    width: 2%;
+    border: 0.5px solid #ccc;
+    margin: 0;
+}
+
+.export-category-title {
+    font-weight: bold;
+    font-size: 1rem;
+    border: 1px solid #ccc;
+    padding: 0.3rem;
+    margin: 0;
+}
+
+.long-hr {
+    flex: 1;
+    border: 0.5px solid #ccc;
+    margin: 0;
+}
+
+.link-container {
+    display: flex;
+    flex-direction: column;
+    margin-left: 1rem;
+}
+
+.link-item::before {
+    content: '•';
+    margin-right: 0.5rem;
+    color: #333;
+}

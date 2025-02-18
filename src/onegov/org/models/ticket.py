@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 from functools import cached_property
 from markupsafe import Markup
 from onegov.chat.collections import ChatCollection
@@ -52,7 +54,7 @@ class OrgTicketMixin:
         number: Column[str]
         group: Column[str]
 
-    def reference(self, request: 'OrgRequest') -> str:
+    def reference(self, request: OrgRequest) -> str:
         """ Returns the reference which should be used wherever we talk about
         a ticket, but do not show it (say in an e-mail subject).
 
@@ -64,7 +66,7 @@ class OrgTicketMixin:
         """
         return f'{self.number} / {self.reference_group(request)}'
 
-    def reference_group(self, request: 'OrgRequest') -> str:
+    def reference_group(self, request: OrgRequest) -> str:
         return request.translate(self.group)
 
     @cached_property
@@ -116,12 +118,12 @@ class EventSubmissionTicket(OrgTicketMixin, Ticket):
     es_type_name = 'event_tickets'
 
     if TYPE_CHECKING:
-        handler: 'EventSubmissionHandler'
+        handler: EventSubmissionHandler
 
-    def reference_group(self, request: 'OrgRequest') -> str:
+    def reference_group(self, request: OrgRequest) -> str:
         return self.title
 
-    def unguessable_edit_link(self, request: 'OrgRequest') -> str | None:
+    def unguessable_edit_link(self, request: OrgRequest) -> str | None:
         if (
             self.handler
             and self.handler.ticket
@@ -147,7 +149,7 @@ class DirectoryEntryTicket(OrgTicketMixin, Ticket):
 @handlers.registered_handler('FRM')
 class FormSubmissionHandler(Handler):
 
-    id: 'UUID'
+    id: UUID
 
     handler_title = _('Form Submissions')
     code_title = _('Forms')
@@ -157,11 +159,11 @@ class FormSubmissionHandler(Handler):
         return FormSubmissionCollection(self.session)
 
     @cached_property
-    def submission(self) -> 'FormSubmission | None':
+    def submission(self) -> FormSubmission | None:
         return self.collection.by_id(self.id)
 
     @cached_property
-    def form(self) -> 'Form':
+    def form(self) -> Form:
         assert self.submission is not None
         return self.submission.form_class(data=self.submission.data)
 
@@ -197,7 +199,7 @@ class FormSubmissionHandler(Handler):
         )
 
     @property
-    def payment(self) -> 'Payment | None':
+    def payment(self) -> Payment | None:
         return self.submission.payment if self.submission is not None else None
 
     @property
@@ -225,7 +227,7 @@ class FormSubmissionHandler(Handler):
 
     def get_summary(
         self,
-        request: 'OrgRequest'  # type:ignore[override]
+        request: OrgRequest  # type:ignore[override]
     ) -> Markup:
 
         layout = DefaultLayout(self.submission, request)
@@ -238,7 +240,7 @@ class FormSubmissionHandler(Handler):
 
     def get_links(  # type:ignore[override]
         self,
-        request: 'OrgRequest'  # type:ignore[override]
+        request: OrgRequest  # type:ignore[override]
     ) -> list[Link | LinkGroup]:
 
         layout = DefaultLayout(self.submission, request)
@@ -345,7 +347,7 @@ class FormSubmissionHandler(Handler):
             url_obj = URL(request.link(self.submission))
             edit_url = url_obj.query_param('edit', '').as_string()
 
-            (links if not links else extra).append(  # type:ignore
+            (links if not links else extra).append(
                 Link(
                     text=_('Edit submission'),
                     url=request.return_here(edit_url),
@@ -366,7 +368,7 @@ class FormSubmissionHandler(Handler):
 @handlers.registered_handler('RSV')
 class ReservationHandler(Handler):
 
-    id: 'UUID'
+    id: UUID
 
     handler_title = _('Reservations')
     code_title = _('Reservations')
@@ -380,7 +382,7 @@ class ReservationHandler(Handler):
 
         return query.one()
 
-    def reservations_query(self) -> 'Query[Reservation]':
+    def reservations_query(self) -> Query[Reservation]:
         # libres allows for multiple reservations with a single request (token)
         # for now we don't really have that case in onegov.org, but we
         # try to be aware of it as much as possible
@@ -410,16 +412,16 @@ class ReservationHandler(Handler):
         )
 
     @cached_property
-    def submission(self) -> 'FormSubmission | None':
+    def submission(self) -> FormSubmission | None:
         return FormSubmissionCollection(self.session).by_id(self.id)
 
     @property
-    def payment(self) -> 'Payment | None':
+    def payment(self) -> Payment | None:
         return self.reservations and self.reservations[0].payment or None
 
     @property
     def deleted(self) -> bool:
-        return False if self.reservations else True
+        return not self.reservations
 
     @property
     def extra_data(self) -> list[str]:
@@ -490,10 +492,10 @@ class ReservationHandler(Handler):
     @classmethod
     def handle_extra_parameters(
         cls,
-        session: 'Session',
-        query: '_Q',
+        session: Session,
+        query: _Q,
         extra_parameters: dict[str, Any]
-    ) -> '_Q':
+    ) -> _Q:
 
         if 'allocation_id' in extra_parameters:
             allocations = session.query(Allocation.group)
@@ -515,7 +517,7 @@ class ReservationHandler(Handler):
 
     def get_summary(
         self,
-        request: 'OrgRequest'  # type:ignore[override]
+        request: OrgRequest  # type:ignore[override]
     ) -> Markup:
 
         layout = DefaultLayout(self.resource, request)
@@ -542,7 +544,7 @@ class ReservationHandler(Handler):
 
     def get_links(  # type:ignore[override]
         self,
-        request: 'OrgRequest'  # type:ignore[override]
+        request: OrgRequest  # type:ignore[override]
     ) -> list[Link | LinkGroup]:
 
         if self.deleted:
@@ -662,7 +664,7 @@ class ReservationHandler(Handler):
 @handlers.registered_handler('EVN')
 class EventSubmissionHandler(Handler):
 
-    id: 'UUID'
+    id: UUID
     handler_title = _('Events')
     code_title = _('Events')
 
@@ -671,7 +673,7 @@ class EventSubmissionHandler(Handler):
         return EventCollection(self.session)
 
     @cached_property
-    def event(self) -> 'Event | None':
+    def event(self) -> Event | None:
         return self.collection.by_id(self.id)
 
     @property
@@ -734,7 +736,7 @@ class EventSubmissionHandler(Handler):
 
     def get_summary(
         self,
-        request: 'OrgRequest'  # type:ignore[override]
+        request: OrgRequest  # type:ignore[override]
     ) -> Markup:
         assert self.event is not None
         layout = EventLayout(self.event, request)
@@ -747,7 +749,7 @@ class EventSubmissionHandler(Handler):
 
     def get_links(  # type:ignore[override]
         self,
-        request: 'OrgRequest'  # type:ignore[override]
+        request: OrgRequest  # type:ignore[override]
     ) -> list[Link | LinkGroup]:
 
         links: list[Link | LinkGroup] = []
@@ -834,7 +836,7 @@ class EventSubmissionHandler(Handler):
 @handlers.registered_handler('DIR')
 class DirectoryEntryHandler(Handler):
 
-    id: 'UUID'
+    id: UUID
 
     handler_title = _('Directory Entry Submissions')
     code_title = _('Directory Entry Submissions')
@@ -844,11 +846,11 @@ class DirectoryEntryHandler(Handler):
         return FormSubmissionCollection(self.session)
 
     @cached_property
-    def submission(self) -> 'FormSubmission | None':
+    def submission(self) -> FormSubmission | None:
         return self.collection.by_id(self.id)
 
     @cached_property
-    def form(self) -> 'Form | None':
+    def form(self) -> Form | None:
         return (
             self.submission.form_class(data=self.submission.data)
             if self.submission is not None else None
@@ -960,7 +962,7 @@ class DirectoryEntryHandler(Handler):
         return '-'
 
     @property
-    def payment(self) -> 'Payment | None':
+    def payment(self) -> Payment | None:
         return self.submission.payment if self.submission else None
 
     @property
@@ -995,7 +997,7 @@ class DirectoryEntryHandler(Handler):
 
     def get_summary(
         self,
-        request: 'OrgRequest'  # type:ignore[override]
+        request: OrgRequest  # type:ignore[override]
     ) -> Markup:
 
         assert self.form is not None
@@ -1015,7 +1017,7 @@ class DirectoryEntryHandler(Handler):
 
     def get_links(  # type:ignore[override]
         self,
-        request: 'OrgRequest'  # type:ignore[override]
+        request: OrgRequest  # type:ignore[override]
     ) -> list[Link | LinkGroup]:
 
         links: list[Link | LinkGroup] = []
@@ -1156,7 +1158,7 @@ class ChatTicket(OrgTicketMixin, Ticket):
     __mapper_args__ = {'polymorphic_identity': 'CHT'}  # type:ignore
     es_type_name = 'chat_tickets'
 
-    def reference_group(self, request: 'OrgRequest') -> str:
+    def reference_group(self, request: OrgRequest) -> str:
         return self.handler.title
 
 
@@ -1171,7 +1173,7 @@ class ChatHandler(Handler):
         return ChatCollection(self.session)
 
     @cached_property
-    def chat(self) -> 'Chat | None':
+    def chat(self) -> Chat | None:
         return self.collection.by_id(self.id)
 
     @property
@@ -1199,7 +1201,7 @@ class ChatHandler(Handler):
 
     def get_summary(
         self,
-        request: 'OrgRequest'  # type: ignore[override]
+        request: OrgRequest  # type: ignore[override]
     ) -> Markup:
 
         layout = DefaultLayout(self.collection, request)
@@ -1212,6 +1214,6 @@ class ChatHandler(Handler):
 
     def get_links(  # type: ignore[override]
         self,
-        request: 'OrgRequest'  # type: ignore[override]
+        request: OrgRequest  # type: ignore[override]
     ) -> list[Link | LinkGroup]:
         return []

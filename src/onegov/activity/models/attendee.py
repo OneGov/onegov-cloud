@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 from datetime import date
 from onegov.activity.models.booking import Booking
 from onegov.core.orm import Base
@@ -75,55 +77,55 @@ class Attendee(Base, TimestampMixin, ORMSearchable):
         return hash(self.id)
 
     #: the public id of the attendee
-    id: 'Column[uuid.UUID]' = Column(
+    id: Column[uuid.UUID] = Column(
         UUID,  # type:ignore[arg-type]
         primary_key=True,
         default=uuid4
     )
 
     #: the user owning the attendee
-    username: 'Column[str]' = Column(
+    username: Column[str] = Column(
         Text,
         ForeignKey('users.username'),
         nullable=False
     )
 
     #: the name of the attendee (incl. first / lastname )
-    name: 'Column[str]' = Column(Text, nullable=False)
+    name: Column[str] = Column(Text, nullable=False)
 
     #: birth date of the attendee for the age calculation
-    birth_date: 'Column[date]' = Column(Date, nullable=False)
+    birth_date: Column[date] = Column(Date, nullable=False)
 
     #: we use text for possible gender fluidity in the future ;)
-    gender: 'Column[str | None]' = Column(Text, nullable=True)
+    gender: Column[str | None] = Column(Text, nullable=True)
 
     #: notes about the attendee by the parents (e.g. allergies)
-    notes: 'Column[str | None]' = Column(Text, nullable=True)
+    notes: Column[str | None] = Column(Text, nullable=True)
 
     #: if the address of the attendee differs from the user address
-    differing_address: 'Column[bool]' = Column(
+    differing_address: Column[bool] = Column(
         Boolean,
         default=False,
         nullable=False
     )
 
     #: address of the attendee (street and number)
-    address: 'Column[str | None]' = Column(Text, nullable=True)
+    address: Column[str | None] = Column(Text, nullable=True)
 
     #: zip code of the attendee
-    zip_code: 'Column[str | None]' = Column(Text, nullable=True)
+    zip_code: Column[str | None] = Column(Text, nullable=True)
 
     #: place of the attendee
-    place: 'Column[str | None]' = Column(Text, nullable=True)
+    place: Column[str | None] = Column(Text, nullable=True)
 
     #: political municipality, only if activated in settings
-    political_municipality: 'Column[str | None]' = Column(Text, nullable=True)
+    political_municipality: Column[str | None] = Column(Text, nullable=True)
 
     #: the maximum number of bookings the attendee wishes to get in each period
-    limit: 'Column[int | None]' = Column(Integer, nullable=True)
+    limit: Column[int | None] = Column(Integer, nullable=True)
 
     #: access the user linked to this booking
-    user: 'relationship[User]' = relationship('User')
+    user: relationship[User] = relationship('User')
 
     #: a secondary id used for subscriptions only - subscriptions are ical urls
     #: with public permission, by using a separate id we mitigate the risk of
@@ -132,7 +134,7 @@ class Attendee(Base, TimestampMixin, ORMSearchable):
     #:
     #: furthermore, subscription ids can be changed in the future to invalidate
     #: all existing subscription urls for one or all attendees.
-    subscription_token: 'Column[str]' = Column(
+    subscription_token: Column[str] = Column(
         Text,
         nullable=False,
         unique=True,
@@ -158,11 +160,11 @@ class Attendee(Base, TimestampMixin, ORMSearchable):
         return today.year - birth.year - extra
 
     @age.expression  # type:ignore[no-redef]
-    def age(self) -> 'ColumnElement[int]':
-        return func.extract('year', func.age(self.birth_date))
+    def age(cls) -> ColumnElement[int]:
+        return func.extract('year', func.age(cls.birth_date))
 
     @hybrid_method  # type:ignore[no-redef]
-    def happiness(self, period_id: 'uuid.UUID') -> float | None:
+    def happiness(self, period_id: uuid.UUID) -> float | None:
         """ Returns the happiness of the attende in the given period.
 
         The happiness is a value between 0.0 and 1.0, indicating how many
@@ -200,8 +202,8 @@ class Attendee(Base, TimestampMixin, ORMSearchable):
     @happiness.expression  # type:ignore[no-redef]
     def happiness(
         cls,
-        period_id: 'uuid.UUID'
-    ) -> 'ColumnElement[float | None]':
+        period_id: uuid.UUID
+    ) -> ColumnElement[float | None]:
         return select([
             # force the result to be a float instead of a decimal
             type_coerce(
@@ -221,7 +223,7 @@ class Attendee(Base, TimestampMixin, ORMSearchable):
         )).label('happiness')
 
     #: The bookings linked to this attendee
-    bookings: 'relationship[list[Booking]]' = relationship(
+    bookings: relationship[list[Booking]] = relationship(
         'Booking',
         order_by='Booking.created',
         back_populates='attendee'

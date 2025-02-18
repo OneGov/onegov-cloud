@@ -69,11 +69,11 @@ def test_view_page_attachments(swissvotes_app, page_attachments):
     assert "No attachments." in manage
 
     # Upload two attachment (en_US, de_CH)
-    manage.form['file'] = Upload(
+    manage.form['file'] = [Upload(
         '1.pdf',
         page_attachments['en_US']['CODEBOOK'].reference.file.read(),
         'application/pdf'
-    )
+    )]
     manage = manage.form.submit().maybe_follow()
     assert manage.status_code == 200
 
@@ -84,11 +84,11 @@ def test_view_page_attachments(swissvotes_app, page_attachments):
     client.get('/locale/de_CH').follow()
     manage = client.get('/page/about').click("Anhänge verwalten")
 
-    manage.form['file'] = Upload(
+    manage.form['file'] = [Upload(
         '2.pdf',
         page_attachments['de_CH']['CODEBOOK'].reference.file.read(),
         'application/pdf'
-    )
+    )]
     manage = manage.form.submit().maybe_follow()
     assert manage.status_code == 200
 
@@ -162,11 +162,11 @@ def test_view_page_slider_images(swissvotes_app, slider_images):
     assert 'No attachments.' in manage
 
     # Upload image
-    manage.form['file'] = Upload(
+    manage.form['file'] = [Upload(
         '2.1-x.png',
         slider_images['2.1-x'].reference.file.read(),
         'image/png'
-    )
+    )]
     assert manage.form.submit().maybe_follow().status_code == 200
 
     manage = client.get('/page/about').click('Manage slider images')

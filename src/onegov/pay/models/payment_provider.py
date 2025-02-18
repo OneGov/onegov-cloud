@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 from onegov.core.orm import Base
 from onegov.core.orm.mixins import ContentMixin
 from onegov.core.orm.mixins import TimestampMixin
@@ -15,18 +17,16 @@ from uuid import uuid4
 from typing import Any, Generic, TypeVar, TYPE_CHECKING
 if TYPE_CHECKING:
     import uuid
+    # we are shadowing type below
+    from builtins import type as _type
     from collections.abc import Mapping
     from decimal import Decimal
     from markupsafe import Markup
+    from onegov.core.request import CoreRequest
     from onegov.pay import Price
     from onegov.pay.types import PaymentState
-    from typing import TypeAlias
 
-# we are shadowing type in the class below, so we need to
-# create a generic TypeAlias that works as a stand-in
-_T = TypeVar('_T')
 _P = TypeVar('_P', bound=Payment)
-_type: 'TypeAlias' = type[_T]
 
 
 class PaymentProvider(Base, TimestampMixin, ContentMixin, Generic[_P]):
@@ -35,24 +35,24 @@ class PaymentProvider(Base, TimestampMixin, ContentMixin, Generic[_P]):
     __tablename__ = 'payment_providers'
 
     #: the public id of the payment provider
-    id: 'Column[uuid.UUID]' = Column(
+    id: Column[uuid.UUID] = Column(
         UUID,  # type:ignore[arg-type]
         primary_key=True,
         default=uuid4
     )
 
     #: the polymorphic type of the provider
-    type: 'Column[str]' = Column(
+    type: Column[str] = Column(
         Text,
         nullable=False,
         default=lambda: 'generic'
     )
 
     #: true if this is the default provider (can only ever be one)
-    default: 'Column[bool]' = Column(Boolean, nullable=False, default=False)
+    default: Column[bool] = Column(Boolean, nullable=False, default=False)
 
     #: true if this provider is enabled
-    enabled: 'Column[bool]' = Column(Boolean, nullable=False, default=True)
+    enabled: Column[bool] = Column(Boolean, nullable=False, default=True)
 
     __mapper_args__ = {
         'polymorphic_on': type,
@@ -66,7 +66,7 @@ class PaymentProvider(Base, TimestampMixin, ContentMixin, Generic[_P]):
         ),
     )
 
-    payments: 'relationship[list[Payment]]' = relationship(
+    payments: relationship[list[Payment]] = relationship(
         'Payment',
         order_by='Payment.created',
         back_populates='provider',
@@ -85,10 +85,10 @@ class PaymentProvider(Base, TimestampMixin, ContentMixin, Generic[_P]):
     def payment(
         self,
         *,
-        amount: 'Decimal | None' = None,
+        amount: Decimal | None = None,
         currency: str = 'CHF',
         remote_id: str | None = None,
-        state: 'PaymentState' = 'open',
+        state: PaymentState = 'open',
         # FIXME: We probably don't want to allow arbitrary kwargs
         #        but we need to make sure, we don't use any other
         #        one somewhere first
@@ -107,7 +107,7 @@ class PaymentProvider(Base, TimestampMixin, ContentMixin, Generic[_P]):
 
         return payment
 
-    def adjust_price(self, price: 'Price | None') -> 'Price | None':
+    def adjust_price(self, price: Price | None) -> Price | None:
         """ Called by client implementations this method allows to adjust the
         price by adding a fee to it.
 
@@ -117,7 +117,7 @@ class PaymentProvider(Base, TimestampMixin, ContentMixin, Generic[_P]):
 
         return price
 
-    def charge(self, amount: 'Decimal', currency: str, token: str) -> Payment:
+    def charge(self, amount: Decimal, currency: str, token: str) -> Payment:
         """ Given a payment token, charges the customer and creates a payment
         which is returned.
 
@@ -161,23 +161,20 @@ class PaymentProvider(Base, TimestampMixin, ContentMixin, Generic[_P]):
         """
         return False
 
+    def get_token(self, request: CoreRequest) -> str | None:
+        """ Extracts this provider's specific token from the request. """
+        raise NotImplementedError
+
     def checkout_button(
         self,
         label: str,
-        amount: 'Decimal | None',
+        amount: Decimal | None,
         currency: str | None,
-        action: str = 'submit',
+        complete_url: str,
+        request: CoreRequest,
         **extra: Any
-    ) -> 'Markup':
-        """ Renders a checkout button which will store the token for the
-        checkout as its own value if clicked.
-
-        The action controls what happens after the token was successfully
-        retrieved. The following actions are supported:
-
-        - 'post': Submits the form surrounding the button.
-
-        """
+    ) -> Markup:
+        """ Renders a checkout button. """
         raise NotImplementedError
 
     def prepare_oauth_request(
@@ -195,7 +192,7 @@ class PaymentProvider(Base, TimestampMixin, ContentMixin, Generic[_P]):
 
     def process_oauth_response(
         self,
-        request_params: 'Mapping[str, Any]'
+        request_params: Mapping[str, Any]
     ) -> None:
         """ Processes the oauth response using the parameters passed by
         the returning oauth request via the gateway.
@@ -208,3 +205,14 @@ class PaymentProvider(Base, TimestampMixin, ContentMixin, Generic[_P]):
         the remote payment provider.
 
         """
+
+    @property
+    def payment_via_get(self) -> bool:
+        """
+        Whether or not we're allowed to submit a payment via `GET` request.
+
+        Ideally this is always `False`, but some payment providers only
+        support a redirect via `GET`. Make sure the token retrieval is
+        sufficiently secure to make up for this shortcoming.
+        """
+        return False

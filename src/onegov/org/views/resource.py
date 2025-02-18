@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 import icalendar
 import morepath
 import sedate
@@ -87,7 +89,7 @@ class OccupancyEntry(NamedTuple):
     url: str
 
 
-RESOURCE_TYPES: dict[str, 'ResourceDict'] = {
+RESOURCE_TYPES: dict[str, ResourceDict] = {
     'daypass': {
         'success': _('Added a new daypass'),
         'title': _('New daypass'),
@@ -109,10 +111,10 @@ RESOURCE_TYPES: dict[str, 'ResourceDict'] = {
 # NOTE: This function is inherently not type safe since we modify the original
 #       items that have been passed in, but this way is more memory efficient
 def combine_grouped(
-    items: dict['KT', list['T']],
-    external_links: dict['KT', list[ExternalLink]],
-    sort: 'Callable[[T | ExternalLink], SupportsRichComparison] | None' = None
-) -> dict['KT', list['T | ExternalLink']]:
+    items: dict[KT, list[T]],
+    external_links: dict[KT, list[ExternalLink]],
+    sort: Callable[[T | ExternalLink], SupportsRichComparison] | None = None
+) -> dict[KT, list[T | ExternalLink]]:
 
     combined = cast('dict[KT, list[T | ExternalLink]]', items)
     values: list[T | ExternalLink]
@@ -129,28 +131,28 @@ def combine_grouped(
 
 def get_daypass_form(
     self: ResourceCollection,
-    request: 'OrgRequest'
+    request: OrgRequest
 ) -> type[ResourceForm]:
     return get_resource_form(self, request, 'daypass')
 
 
 def get_room_form(
     self: ResourceCollection,
-    request: 'OrgRequest'
+    request: OrgRequest
 ) -> type[ResourceForm]:
     return get_resource_form(self, request, 'room')
 
 
 def get_item_form(
     self: ResourceCollection,
-    request: 'OrgRequest'
+    request: OrgRequest
 ) -> type[ResourceForm]:
     return get_resource_form(self, request, 'daily-item')
 
 
 def get_resource_form(
     self: ResourceCollection | DaypassResource | RoomResource | ItemResource,
-    request: 'OrgRequest',
+    request: OrgRequest,
     type: str | None = None
 ) -> type[ResourceForm]:
 
@@ -170,9 +172,9 @@ def get_resource_form(
 )
 def view_resources(
     self: ResourceCollection,
-    request: 'OrgRequest',
+    request: OrgRequest,
     layout: ResourcesLayout | None = None
-) -> 'RenderData':
+) -> RenderData:
 
     if layout is None:
         layout = ResourcesLayout(self, request)
@@ -189,7 +191,7 @@ def view_resources(
     )
 
     def contains_at_least_one_room(
-        resources: 'Iterable[object]'
+        resources: Iterable[object]
     ) -> bool:
         for resource in resources:
             if isinstance(resource, Resource):
@@ -270,10 +272,10 @@ def view_resources(
 )
 def view_find_your_spot(
     self: FindYourSpotCollection,
-    request: 'OrgRequest',
+    request: OrgRequest,
     form: FindYourSpotForm,
     layout: FindYourSpotLayout | None = None
-) -> 'RenderData':
+) -> RenderData:
 
     # HACK: Focus results
     form.action += '#results'
@@ -296,13 +298,20 @@ def view_find_your_spot(
         assert end_time is not None
         start = datetime.combine(form.start.data, start_time)
         end = datetime.combine(form.end.data, end_time)
+        assert form.duration.data is not None
+        duration = form.duration.data
+        step = (
+            timedelta(minutes=10)
+            if duration.total_seconds() < 600
+            else duration
+        )
 
         if form.rooms:
             assert form.rooms.data is not None
             # filter rooms according to the form selection
             rooms = [room for room in rooms if room.id in form.rooms.data]
 
-        def included_dates() -> 'Iterator[date_t]':
+        def included_dates() -> Iterator[date_t]:
             # yields all the dates that should be part of our result set
             current = start.date()
             max_date = end.date()
@@ -310,6 +319,54 @@ def view_find_your_spot(
                 if not form.is_excluded(current):
                     yield current
                 current += timedelta(days=1)
+
+        def spot_infos_for_free_slots(
+            allocation: Allocation,
+            free: list[tuple[datetime, datetime]],
+            target_range: timedelta,
+            *,
+            adjustable: bool = False,
+            availability_threshold: float = 5.0
+        ) -> Iterator[utils.FindYourSpotEventInfo]:
+
+            # FIXME: The availability calculation should probably be
+            #        normalized when a daylight savings shift occurs
+            assert allocation.timezone is not None
+            slot_start, slot_end = free[0]
+            slot_end += time.resolution
+            for next_slot_start, next_slot_end in islice(free, 1, None):
+
+                if slot_end != next_slot_start:
+                    availability = (slot_end - slot_start) / target_range
+                    availability *= 100.0
+                    yield utils.FindYourSpotEventInfo(
+                        allocation,
+                        (sedate.to_timezone(
+                            slot_start, allocation.timezone),
+                            sedate.to_timezone(
+                                slot_end, allocation.timezone)),
+                        min(availability, 100),
+                        1 if availability >= availability_threshold else 0,
+                        request,
+                        adjustable=adjustable
+                    )
+                    slot_start = next_slot_start
+
+                # expand slot end
+                slot_end = next_slot_end + time.resolution
+
+            # add final slot
+            availability = (slot_end - slot_start) / target_range
+            availability *= 100.0
+            yield utils.FindYourSpotEventInfo(
+                allocation,
+                (sedate.to_timezone(slot_start, allocation.timezone),
+                 sedate.to_timezone(slot_end, allocation.timezone)),
+                min(availability, 100.0),
+                1 if availability >= availability_threshold else 0,
+                request,
+                adjustable=adjustable
+            )
 
         # initialize the room slots with all the included dates and rooms
         room_slots = {
@@ -350,7 +407,8 @@ def view_find_your_spot(
                         None,  # won't be displayed
                         quota_left / allocation.quota,
                         quota_left,
-                        request
+                        request,
+                        adjustable=allocation.quota > 1
                     ))
                     continue
                 elif target_start >= target_end:
@@ -358,44 +416,109 @@ def view_find_your_spot(
                     # just treat it as not available in this case
                     continue
 
-                free = allocation.free_slots(target_start, target_end)
+                # add single click slots for the correct duration
+                added_slots = 0
+                for target_slot_start in sedate.dtrange(
+                    target_start,
+                    target_end - step,
+                    step,
+                    skip_missing=True
+                ):
+                    if added_slots >= 5:
+                        break
+
+                    target_slot_end = target_slot_start + duration
+
+                    free = allocation.free_slots(
+                        target_slot_start,
+                        target_slot_end
+                    )
+                    if not free:
+                        if (
+                            allocation.display_start() <= target_slot_start
+                            and allocation.display_end() >= target_slot_end
+                        ):
+                            # render an unavailable slot
+                            added_slots += 1
+                            slots.append(utils.FindYourSpotEventInfo(
+                                allocation,
+                                (
+                                    max(
+                                        sedate.to_timezone(
+                                            target_slot_start,
+                                            allocation.timezone
+                                        ),
+                                        allocation.display_start(),
+                                    ),
+                                    min(
+                                        sedate.to_timezone(
+                                            target_slot_end,
+                                            allocation.timezone
+                                        ),
+                                        allocation.display_end()
+                                    )
+                                ),
+                                0,
+                                0,
+                                request,
+                            ))
+                        continue
+
+                    spot_infos = list(spot_infos_for_free_slots(
+                        allocation,
+                        free,
+                        target_slot_end - target_slot_start
+                    ))
+                    if (
+                        len(spot_infos) != 1
+                        or spot_infos[0].availability < 100.0
+                    ):
+                        total_availability = sum(
+                            info.availability
+                            for info in spot_infos
+                        )
+                        # render a partially available slot
+                        slots.append(utils.FindYourSpotEventInfo(
+                            allocation,
+                            (
+                                max(
+                                    sedate.to_timezone(
+                                        target_slot_start,
+                                        allocation.timezone
+                                    ),
+                                    allocation.display_start(),
+                                ),
+                                min(
+                                    sedate.to_timezone(
+                                        target_slot_end,
+                                        allocation.timezone
+                                    ),
+                                    allocation.display_end()
+                                )
+                            ),
+                            total_availability,
+                            0,
+                            request,
+                        ))
+                        added_slots += 1
+                        continue
+
+                    slots.append(spot_infos[0])
+                    added_slots += 1
+
+                free = allocation.free_slots(
+                    target_start,
+                    target_end
+                )
                 if not free:
                     continue
 
-                # FIXME: The availability calculation should probably be
-                #        normalized when a daylight savings shift occurs
-                target_range = (target_end - target_start)
-                slot_start, slot_end = free[0]
-                slot_end += time.resolution
-                for next_slot_start, next_slot_end in islice(free, 1, None):
-                    if slot_end != next_slot_start:
-                        availability = (slot_end - slot_start) / target_range
-                        availability *= 100.0
-                        slots.append(utils.FindYourSpotEventInfo(
-                            allocation,
-                            (sedate.to_timezone(
-                                slot_start, allocation.timezone),
-                                sedate.to_timezone(
-                                    slot_end, allocation.timezone)),
-                            availability,
-                            1 if availability >= 5.0 else 0,
-                            request
-                        ))
-                        slot_start = next_slot_start
-
-                    # expand slot end
-                    slot_end = next_slot_end + time.resolution
-
-                # add final slot
-                availability = (slot_end - slot_start) / target_range
-                availability *= 100.0
-                slots.append(utils.FindYourSpotEventInfo(
+                # add the actual available slots for custom adjustments
+                slots.extend(spot_infos_for_free_slots(
                     allocation,
-                    (sedate.to_timezone(slot_start, allocation.timezone),
-                     sedate.to_timezone(slot_end, allocation.timezone)),
-                    availability,
-                    1 if availability >= 5.0 else 0,
-                    request
+                    free,
+                    duration,
+                    adjustable=True
                 ))
 
     if room_slots:
@@ -417,8 +540,8 @@ def view_find_your_spot(
 )
 def get_find_your_spot_reservations(
     self: FindYourSpotCollection,
-    request: 'OrgRequest'
-) -> 'JSON_ro':
+    request: OrgRequest
+) -> JSON_ro:
 
     reservations = sorted(
         (utils.ReservationInfo(resource, reservation, request).as_dict()
@@ -440,10 +563,10 @@ def get_find_your_spot_reservations(
 @OrgApp.json(model=ResourceCollection, permission=Public, name='json')
 def view_resources_json(
     self: ResourceCollection,
-    request: 'OrgRequest'
-) -> 'JSON_ro':
+    request: OrgRequest
+) -> JSON_ro:
 
-    def transform(resource: Resource) -> 'JSON_ro':
+    def transform(resource: Resource) -> JSON_ro:
         return {
             'name': resource.name,
             'title': resource.title,
@@ -451,7 +574,7 @@ def view_resources_json(
         }
 
     @request.after
-    def cache(response: 'BaseResponse') -> None:
+    def cache(response: BaseResponse) -> None:
         # only update once every minute
         response.cache_control.max_age = 60
 
@@ -474,10 +597,10 @@ def view_resources_json(
 )
 def handle_new_room(
     self: ResourceCollection,
-    request: 'OrgRequest',
+    request: OrgRequest,
     form: ResourceForm,
     layout: ResourcesLayout | None = None
-) -> 'RenderData | BaseResponse':
+) -> RenderData | BaseResponse:
     return handle_new_resource(self, request, form, 'room', layout)
 
 
@@ -490,10 +613,10 @@ def handle_new_room(
 )
 def handle_new_daypass(
     self: ResourceCollection,
-    request: 'OrgRequest',
+    request: OrgRequest,
     form: ResourceForm,
     layout: ResourcesLayout | None = None
-) -> 'RenderData | BaseResponse':
+) -> RenderData | BaseResponse:
     return handle_new_resource(self, request, form, 'daypass', layout)
 
 
@@ -506,20 +629,20 @@ def handle_new_daypass(
 )
 def handle_new_resource_item(
     self: ResourceCollection,
-    request: 'OrgRequest',
+    request: OrgRequest,
     form: ResourceForm,
     layout: ResourcesLayout | None = None
-) -> 'RenderData | BaseResponse':
+) -> RenderData | BaseResponse:
     return handle_new_resource(self, request, form, 'daily-item', layout)
 
 
 def handle_new_resource(
     self: ResourceCollection,
-    request: 'OrgRequest',
+    request: OrgRequest,
     form: ResourceForm,
     type: str,
     layout: ResourcesLayout | None = None
-) -> 'RenderData | BaseResponse':
+) -> RenderData | BaseResponse:
 
     if form.submitted(request):
         assert form.title.data is not None
@@ -555,10 +678,10 @@ def handle_new_resource(
 )
 def handle_edit_resource(
     self: Resource,
-    request: 'OrgRequest',
+    request: OrgRequest,
     form: ResourceForm,
     layout: ResourceLayout | None = None
-) -> 'RenderData | BaseResponse':
+) -> RenderData | BaseResponse:
 
     if form.submitted(request):
         form.populate_obj(self)
@@ -586,9 +709,9 @@ def handle_edit_resource(
 @OrgApp.html(model=Resource, template='resource.pt', permission=Public)
 def view_resource(
     self: Resource,
-    request: 'OrgRequest',
+    request: OrgRequest,
     layout: ResourceLayout | None = None
-) -> 'RenderData':
+) -> RenderData:
 
     return {
         'title': self.title,
@@ -601,12 +724,12 @@ def view_resource(
 
 
 @OrgApp.view(model=Resource, request_method='DELETE', permission=Private)
-def handle_delete_resource(self: Resource, request: 'OrgRequest') -> None:
+def handle_delete_resource(self: Resource, request: OrgRequest) -> None:
 
     request.assert_valid_csrf_token()
     tickets = TicketCollection(request.session)
 
-    def handle_reservation_tickets(reservation: 'BaseReservation') -> None:
+    def handle_reservation_tickets(reservation: BaseReservation) -> None:
         ticket = tickets.by_handler_id(reservation.token.hex)
         if ticket:
             assert request.current_user is not None
@@ -631,10 +754,10 @@ def handle_delete_resource(self: Resource, request: 'OrgRequest') -> None:
              form=ResourceCleanupForm, template='resource_cleanup.pt')
 def handle_cleanup_allocations(
     self: Resource,
-    request: 'OrgRequest',
+    request: OrgRequest,
     form: ResourceCleanupForm,
     layout: ResourceLayout | None = None
-) -> 'RenderData | BaseResponse':
+) -> RenderData | BaseResponse:
     """ Removes all unused allocations between the given dates. """
 
     if form.submitted(request):
@@ -666,9 +789,9 @@ def handle_cleanup_allocations(
 
 def predict_next_reservation(
     resource: Resource,
-    request: 'OrgRequest',
-    reservations: 'Iterable[BaseReservation]'
-) -> 'RenderData | None':
+    request: OrgRequest,
+    reservations: Iterable[BaseReservation]
+) -> RenderData | None:
 
     prediction = utils.predict_next_daterange(
         tuple((r.display_start(), r.display_end()) for r in reservations)
@@ -701,7 +824,7 @@ def predict_next_reservation(
 
 
 @OrgApp.json(model=Resource, name='reservations', permission=Public)
-def get_reservations(self: Resource, request: 'OrgRequest') -> 'RenderData':
+def get_reservations(self: Resource, request: OrgRequest) -> RenderData:
 
     # FIXME: Maybe we should move bound_reservations to the base
     #        Resource class?
@@ -728,7 +851,7 @@ def get_date(text: object, default: datetime) -> datetime:
 
 def get_date_range(
     resource: Resource,
-    params: 'Mapping[str, Any]'
+    params: Mapping[str, Any]
 ) -> tuple[datetime, datetime]:
 
     # FIXME: should we move this to the base class?
@@ -758,9 +881,9 @@ def get_date_range(
 )
 def view_occupancy(
     self: Resource,
-    request: 'OrgRequest',
+    request: OrgRequest,
     layout: ResourceLayout | None = None
-) -> 'RenderData':
+) -> RenderData:
 
     # for members check if they're actually allowed to see this
     if (
@@ -784,7 +907,7 @@ def view_occupancy(
         Reservation.data, Ticket.subtitle, Ticket.id
     )
 
-    def group_key(record: 'ReservationTicketRow') -> date_t:
+    def group_key(record: ReservationTicketRow) -> date_t:
         return sedate.to_timezone(record[0], self.timezone).date()
 
     occupancy = OrderedDict()
@@ -839,9 +962,9 @@ def view_occupancy(
 )
 def view_resource_subscribe(
     self: Resource,
-    request: 'OrgRequest',
+    request: OrgRequest,
     layout: ResourceLayout | None = None
-) -> 'RenderData':
+) -> RenderData:
 
     url_obj = URL(request.link(self, 'ical'))
     url_obj = url_obj.scheme('webcal')
@@ -865,7 +988,7 @@ def view_resource_subscribe(
 
 
 @OrgApp.view(model=Resource, permission=Public, name='ical')
-def view_ical(self: Resource, request: 'OrgRequest') -> Response:
+def view_ical(self: Resource, request: OrgRequest) -> Response:
     assert self.access_token is not None
 
     if request.params.get('access-token') != self.access_token:
@@ -929,10 +1052,10 @@ def view_ical(self: Resource, request: 'OrgRequest') -> Response:
 )
 def view_export(
     self: Resource,
-    request: 'OrgRequest',
+    request: OrgRequest,
     form: ResourceExportForm,
     layout: ResourceLayout | None = None
-) -> 'RenderData | BaseResponse':
+) -> RenderData | BaseResponse:
 
     layout = layout or ResourceLayout(self, request)
     layout.breadcrumbs.append(Link(_('Occupancy'), '#'))
@@ -973,10 +1096,10 @@ def view_export(
 )
 def view_export_all(
     self: ResourceCollection,
-    request: 'OrgRequest',
+    request: OrgRequest,
     form: AllResourcesExportForm,
     layout: ResourceLayout | None = None
-) -> 'RenderData | BaseResponse':
+) -> RenderData | BaseResponse:
 
     # FIXME: Why are we using ResouceLayout and not ResourcesLayout?
     #        this is a weird hack, if you want to be able to use the
@@ -1071,11 +1194,11 @@ def view_export_all(
 
 def run_export(
     resource: Resource,
-    start: 'DateLike',
-    end: 'DateLike',
+    start: DateLike,
+    end: DateLike,
     nested: bool,
-    formatter: 'Callable[[Any], object]'
-) -> tuple['Callable[[str], tuple[int, str]]', list[dict[str, Any]]]:
+    formatter: Callable[[Any], object]
+) -> tuple[Callable[[str], tuple[int, str]], list[dict[str, Any]]]:
 
     start = sedate.replace_timezone(
         datetime(start.year, start.month, start.day),

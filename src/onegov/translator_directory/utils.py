@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 import json
 
 from babel import Locale
@@ -21,11 +23,11 @@ if TYPE_CHECKING:
     from onegov.translator_directory.models.translator import Translator
 
 
-def to_tuple(coordinate: 'RealCoordinates') -> tuple[float, float]:
+def to_tuple(coordinate: RealCoordinates) -> tuple[float, float]:
     return coordinate.lat, coordinate.lon
 
 
-def found_route(response: 'requests.Response') -> bool:
+def found_route(response: requests.Response) -> bool:
     try:
         found = response.status_code == 200 and response.json()['code'] == 'Ok'
         if not found:
@@ -64,11 +66,11 @@ def out_of_tolerance(
 
 
 def validate_geocode_result(
-    response: 'requests.Response',
+    response: requests.Response,
     zip_code: str | int | None,
     zoom: int | None = None,
-    bbox: 'Collection[RealCoordinates] | None' = None
-) -> 'RealCoordinates | None':
+    bbox: Collection[RealCoordinates] | None = None
+) -> RealCoordinates | None:
 
     if response.status_code != 200:
         return None
@@ -92,7 +94,7 @@ def validate_geocode_result(
     return None
 
 
-def parse_directions_result(response: 'requests.Response') -> float:
+def parse_directions_result(response: requests.Response) -> float:
     assert response.status_code == 200
     data = response.json()
     km = round(data['routes'][0]['distance'] / 1000, 1)
@@ -104,13 +106,13 @@ def same_coords(this: Coordinates, other: Coordinates) -> bool:
 
 
 def update_drive_distances(
-    request: 'TranslatorAppRequest',
+    request: TranslatorAppRequest,
     only_empty: bool,
     tolerance_factor: float = 0.1,
     max_tolerance: float | None = None,
     max_distance: float | None = None
-) -> (tuple[int, int, int, list['Translator'],
-      list[tuple['Translator', float]]]):
+) -> (tuple[int, int, int, list[Translator],
+      list[tuple[Translator, float]]]):
     """
     Handles updating Translator.driving_distance. Can be used in a cli or view.
 
@@ -146,9 +148,8 @@ def update_drive_distances(
             routes_found += 1
             dist = parse_directions_result(response)
             if out_of_tolerance(
-                    trs.drive_distance, dist, tolerance_factor, max_tolerance):
-                tol_failed.append((trs, dist))
-            elif max_distance and dist > max_distance:
+                trs.drive_distance, dist, tolerance_factor, max_tolerance
+            ) or (max_distance and dist > max_distance):
                 tol_failed.append((trs, dist))
             else:
                 trs.drive_distance = dist
@@ -159,10 +160,10 @@ def update_drive_distances(
 
 
 def geocode_translator_addresses(
-    request: 'TranslatorAppRequest',
+    request: TranslatorAppRequest,
     only_empty: bool,
-    bbox: 'Collection[RealCoordinates] | None' = None
-) -> tuple[int, int, int, int, list['Translator']]:
+    bbox: Collection[RealCoordinates] | None = None
+) -> tuple[int, int, int, int, list[Translator]]:
     from onegov.translator_directory.models.translator import Translator
 
     api = MapboxRequests(request.app.mapbox_token)
@@ -213,7 +214,7 @@ def geocode_translator_addresses(
     return trs_total, total, geocoded, skipped, coords_not_found
 
 
-def nationality_choices(locale: str | None) -> list['_Choice']:
+def nationality_choices(locale: str | None) -> list[_Choice]:
     assert locale
 
     country_names = country_code_to_name(locale)
@@ -248,7 +249,7 @@ def country_code_to_name(locale: str | None) -> dict[str, str]:
     return mapping
 
 
-def get_custom_text(request: 'OrgRequest', key: str) -> str:
+def get_custom_text(request: OrgRequest, key: str) -> str:
     """ Returns a custom text from the app's custom_texts dict. """
     custom_texts = request.app.custom_texts
 

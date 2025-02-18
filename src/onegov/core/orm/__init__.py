@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 import psycopg2
 
 from markupsafe import escape, Markup
@@ -47,19 +49,19 @@ class ModelBase:
 
     @overload
     @classmethod
-    def get_polymorphic_class(cls, identity_value: str) -> type['Self']: ...
+    def get_polymorphic_class(cls, identity_value: str) -> type[Self]: ...
 
     @overload
     @classmethod
     def get_polymorphic_class(cls, identity_value: str, default: _T
-                              ) -> type['Self'] | _T: ...
+                              ) -> type[Self] | _T: ...
 
     @classmethod
     def get_polymorphic_class(
         cls,
         identity_value: str,
         default: _T = MISSING  # type:ignore[assignment]
-    ) -> type['Self'] | _T:
+    ) -> type[Self] | _T:
         """ Returns the polymorphic class if it exists, given the value
         of the polymorphic identity.
 
@@ -103,8 +105,8 @@ class TranslationMarkupHybrid(TranslationHybrid):
 
     def getter_factory(
         self,
-        attr: '_TranslatableColumn'
-    ) -> 'Callable[[object], Markup | None]':
+        attr: _TranslatableColumn
+    ) -> Callable[[object], Markup | None]:
 
         original_getter = super().getter_factory(attr)
 
@@ -118,14 +120,14 @@ class TranslationMarkupHybrid(TranslationHybrid):
             #       this in the future, to guard against stored values
             #       that somehow bypassed the sanitization, but this will
             #       be expensive
-            return Markup(value)  # noqa: MS001
+            return Markup(value)  # nosec: B704
 
         return getter
 
     def setter_factory(
         self,
-        attr: '_TranslatableColumn'
-    ) -> 'Callable[[object, str | None], None]':
+        attr: _TranslatableColumn
+    ) -> Callable[[object, str | None], None]:
 
         original_setter = super().setter_factory(attr)
 
@@ -156,8 +158,8 @@ translation_markup_hybrid = TranslationMarkupHybrid(
 
 def find_models(
     base: type[_T],
-    is_match: 'Callable[[type[_T]], bool]'
-) -> 'Iterator[type[_T]]':
+    is_match: Callable[[type[_T]], bool]
+) -> Iterator[type[_T]]:
     """ Finds the ORM models in the given ORM base class that match a filter.
 
     The filter is called with each class in the instance and it is supposed
@@ -202,7 +204,7 @@ def configure_listener(
 event.listen(ModelBase, 'attribute_instrument', configure_listener)
 
 
-def share_session_manager(query: 'Query[Any]') -> None:
+def share_session_manager(query: Query[Any]) -> None:
     session_manager = SessionManager.get_active()
 
     for desc in query.column_descriptions:

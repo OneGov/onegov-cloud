@@ -1,4 +1,5 @@
 """ The settings view, defining things like the logo or color of the org. """
+from __future__ import annotations
 
 from copy import copy
 from dectate import Query
@@ -53,13 +54,13 @@ if TYPE_CHECKING:
 )
 def view_settings(
     self: Organisation,
-    request: 'OrgRequest',
+    request: OrgRequest,
     layout: SettingsLayout | None = None
-) -> 'RenderData':
+) -> RenderData:
 
     layout = layout or SettingsLayout(self, request)
 
-    def query_settings() -> 'Iterator[dict[str, Any]]':
+    def query_settings() -> Iterator[dict[str, Any]]:
         q = Query('view').filter(model=Organisation)
 
         for action, fn in q(request.app):
@@ -82,11 +83,11 @@ def view_settings(
 
 def handle_generic_settings(
     self: Organisation,
-    request: 'OrgRequest',
+    request: OrgRequest,
     form: Form,
     title: str,
     layout: SettingsLayout | None = None
-) -> 'RenderData | Response':
+) -> RenderData | Response:
 
     layout = layout or SettingsLayout(self, request, title)
     layout.edit_mode = True
@@ -114,10 +115,10 @@ def handle_generic_settings(
     icon='fa-sliders', order=-1000)
 def handle_general_settings(
     self: Organisation,
-    request: 'OrgRequest',
+    request: OrgRequest,
     form: GeneralSettingsForm,
     layout: SettingsLayout | None = None
-) -> 'RenderData | Response':
+) -> RenderData | Response:
     return handle_generic_settings(self, request, form, _('General'), layout)
 
 
@@ -127,10 +128,10 @@ def handle_general_settings(
     icon='fa-home', order=-995)
 def handle_homepage_settings(
     self: Organisation,
-    request: 'OrgRequest',
+    request: OrgRequest,
     form: HomepageSettingsForm,
     layout: SettingsLayout | None = None
-) -> 'RenderData | Response':
+) -> RenderData | Response:
     return handle_generic_settings(self, request, form, _('Homepage'), layout)
 
 
@@ -140,10 +141,10 @@ def handle_homepage_settings(
     icon=' fa-external-link-square', order=-990)
 def handle_favicon_settings(
     self: Organisation,
-    request: 'OrgRequest',
+    request: OrgRequest,
     form: FaviconSettingsForm,
     layout: SettingsLayout | None = None
-) -> 'RenderData | Response':
+) -> RenderData | Response:
     return handle_generic_settings(self, request, form, _('Favicon'), layout)
 
 
@@ -153,10 +154,10 @@ def handle_favicon_settings(
     icon=' fa fa-share-alt', order=-985)
 def handle_social_media_settings(
     self: Organisation,
-    request: 'OrgRequest',
+    request: OrgRequest,
     form: SocialMediaSettingsForm,
     layout: SettingsLayout | None = None
-) -> 'RenderData | Response':
+) -> RenderData | Response:
     return handle_generic_settings(
         self, request, form, _('Social Media'), layout)
 
@@ -167,10 +168,10 @@ def handle_social_media_settings(
     icon=' fa-link', order=-980)
 def handle_links_settings(
     self: Organisation,
-    request: 'OrgRequest',
+    request: OrgRequest,
     form: LinksSettingsForm,
     layout: SettingsLayout | None = None
-) -> 'RenderData | Response':
+) -> RenderData | Response:
     return handle_generic_settings(self, request, form, _('Links'), layout)
 
 
@@ -181,10 +182,10 @@ def handle_links_settings(
 )
 def handle_newsletter_settings(
     self: Organisation,
-    request: 'OrgRequest',
+    request: OrgRequest,
     form: NewsletterSettingsForm,
     layout: SettingsLayout | None = None
-) -> 'RenderData | Response':
+) -> RenderData | Response:
     return handle_generic_settings(
         self, request, form, _('Newsletter'), layout
     )
@@ -197,10 +198,10 @@ def handle_newsletter_settings(
 )
 def handle_ticket_settings(
     self: Organisation,
-    request: 'OrgRequest',
+    request: OrgRequest,
     form: OrgTicketSettingsForm,
     layout: SettingsLayout | None = None
-) -> 'RenderData | Response':
+) -> RenderData | Response:
     resp = handle_generic_settings(
         self, request, form, _('Tickets'), layout)
     return resp
@@ -212,10 +213,10 @@ def handle_ticket_settings(
     icon='fa-window-maximize', order=-810)
 def handle_header_settings(
     self: Organisation,
-    request: 'OrgRequest',
+    request: OrgRequest,
     form: Form,
     layout: SettingsLayout | None = None
-) -> 'RenderData | Response':
+) -> RenderData | Response:
     layout = layout or SettingsLayout(self, request, _('Header'))
     return handle_generic_settings(self, request, form, _('Header'), layout)
 
@@ -226,10 +227,10 @@ def handle_header_settings(
     icon='fa-window-minimize', order=-800)
 def handle_footer_settings(
     self: Organisation,
-    request: 'OrgRequest',
+    request: OrgRequest,
     form: FooterSettingsForm,
     layout: SettingsLayout | None = None
-) -> 'RenderData | Response':
+) -> RenderData | Response:
     return handle_generic_settings(self, request, form, _('Footer'), layout)
 
 
@@ -239,10 +240,10 @@ def handle_footer_settings(
     icon='fa-sitemap', order=-700)
 def handle_module_settings(
     self: Organisation,
-    request: 'OrgRequest',
+    request: OrgRequest,
     form: ModuleSettingsForm,
     layout: SettingsLayout | None = None
-) -> 'RenderData | Response':
+) -> RenderData | Response:
     return handle_generic_settings(
         self, request, form, _('Modules'), layout)
 
@@ -253,10 +254,10 @@ def handle_module_settings(
     icon='fa-map-marker', order=-700)
 def handle_map_settings(
     self: Organisation,
-    request: 'OrgRequest',
+    request: OrgRequest,
     form: MapSettingsForm,
     layout: SettingsLayout | None = None
-) -> 'RenderData | Response':
+) -> RenderData | Response:
     return handle_generic_settings(self, request, form, _('Map'), layout)
 
 
@@ -266,10 +267,10 @@ def handle_map_settings(
     icon='fa-line-chart ', order=-600)
 def handle_analytics_settings(
     self: Organisation,
-    request: 'OrgRequest',
+    request: OrgRequest,
     form: AnalyticsSettingsForm,
     layout: SettingsLayout | None = None
-) -> 'RenderData | Response':
+) -> RenderData | Response:
     return handle_generic_settings(self, request, form, _('Analytics'), layout)
 
 
@@ -279,10 +280,10 @@ def handle_analytics_settings(
     icon='fa-key', order=400)
 def handle_gever_settings(
     self: Organisation,
-    request: 'OrgRequest',
+    request: OrgRequest,
     form: GeverSettingsForm,
     layout: SettingsLayout | None = None
-) -> 'RenderData | Response':
+) -> RenderData | Response:
     return handle_generic_settings(self, request, form, 'Gever API', layout)
 
 
@@ -292,10 +293,10 @@ def handle_gever_settings(
     icon='fa-calendar-o', order=-500)
 def handle_holiday_settings(
     self: Organisation,
-    request: 'OrgRequest',
+    request: OrgRequest,
     form: HolidaySettingsForm,
     layout: SettingsLayout | None = None
-) -> 'RenderData | Response':
+) -> RenderData | Response:
     return handle_generic_settings(self, request, form, _('Holidays'), layout)
 
 
@@ -303,7 +304,7 @@ def handle_holiday_settings(
              permission=Secret, form=HolidaySettingsForm)
 def preview_holiday_settings(
     self: Organisation,
-    request: 'OrgRequest',
+    request: OrgRequest,
     form: HolidaySettingsForm,
     layout: DefaultLayout | None = None
 ) -> str:
@@ -341,10 +342,10 @@ def preview_holiday_settings(
     icon='fa fa-random', order=-400)
 def handle_migrate_links(
     self: Organisation,
-    request: 'OrgRequest',
+    request: OrgRequest,
     form: LinkMigrationForm,
     layout: DefaultLayout | None = None
-) -> 'RenderData | Response':
+) -> RenderData | Response:
 
     domain = request.domain
     button_text = _('Migrate')
@@ -358,7 +359,7 @@ def handle_migrate_links(
             old_uri=form.old_domain.data,
             new_uri=request.domain
         )
-        total, grouped = migration.migrate_site_collection(test_only)
+        total, _grouped = migration.migrate_site_collection(test_only)
 
         if not test_only:
             request.success(
@@ -387,10 +388,10 @@ def handle_migrate_links(
     permission=Secret, form=LinkHealthCheckForm)
 def handle_link_health_check(
     self: Organisation,
-    request: 'OrgRequest',
+    request: OrgRequest,
     form: LinkHealthCheckForm,
     layout: DefaultLayout | None = None
-) -> 'RenderData':
+) -> RenderData:
 
     healthcheck = LinkHealthCheck(request)
     check_responses = None
@@ -425,10 +426,10 @@ def handle_link_health_check(
     icon='fa-calendar', order=-700)
 def handle_event_settings(
     self: Organisation,
-    request: 'OrgRequest',
+    request: OrgRequest,
     form: EventSettingsForm,
     layout: SettingsLayout | None = None
-) -> 'RenderData | Response':
+) -> RenderData | Response:
     return handle_generic_settings(self, request, form, _('Events'), layout)
 
 
@@ -438,10 +439,10 @@ def handle_event_settings(
     icon='fa-key', order=1)
 def handle_api_keys(
     self: Organisation,
-    request: 'OrgRequest',
+    request: OrgRequest,
     form: OneGovApiSettingsForm,
     layout: SettingsLayout | None = None
-) -> 'RenderData':
+) -> RenderData:
     """Handles the generation of API access keys."""
 
     request.include('fontpreview')
@@ -465,7 +466,7 @@ def handle_api_keys(
 
     layout = layout or SettingsLayout(self, request, title)
 
-    def current_api_keys_by_user() -> 'Iterator[ApiKeyWithDeleteLink]':
+    def current_api_keys_by_user() -> Iterator[ApiKeyWithDeleteLink]:
         for api_key in user.api_keys:
             api_key_delete_link = Link(
                 text=Markup('<i class="fa fa-trash" aria-hidden="True"></i>'),
@@ -502,7 +503,7 @@ def handle_api_keys(
     permission=Secret,
     request_method='DELETE',
 )
-def delete_api_key(self: ApiKey, request: 'OrgRequest') -> None:
+def delete_api_key(self: ApiKey, request: OrgRequest) -> None:
     request.assert_valid_csrf_token()
 
     request.session.delete(self)
@@ -518,9 +519,9 @@ def delete_api_key(self: ApiKey, request: 'OrgRequest') -> None:
 )
 def handle_ticket_data_deletion_settings(
     self: Organisation,
-    request: 'OrgRequest',
+    request: OrgRequest,
     form: DataRetentionPolicyForm
-) -> 'RenderData | Response':
+) -> RenderData | Response:
     request.message(_('Proceed with caution. Tickets and the data they '
                       'contain may be irrevocable deleted.'), 'alert')
     return handle_generic_settings(
@@ -535,9 +536,9 @@ def handle_ticket_data_deletion_settings(
     icon='fa-window-maximize', order=-810)
 def handle_chat_settings(
     self: Organisation,
-    request: 'OrgRequest',
+    request: OrgRequest,
     form: Form,
     layout: SettingsLayout | None = None
-) -> 'RenderData | Response':
+) -> RenderData | Response:
     layout = layout or SettingsLayout(self, request, _('Chat'))
     return handle_generic_settings(self, request, form, _('Chat'), layout)

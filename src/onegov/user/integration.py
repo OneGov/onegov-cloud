@@ -1,19 +1,20 @@
+from __future__ import annotations
+
 import morepath
 from more.webassets import WebassetsApp
 from more.webassets.core import webassets_injector_tween
-from onegov.core.cache import instance_lru_cache
 from onegov.core.security import Public
 from onegov.user.auth.core import Auth
 from onegov.user.auth.provider import (
-    AUTHENTICATION_PROVIDERS, AzureADProvider, AuthenticationProvider,
-    SAML2Provider, Conclusion, provider_by_name)
+    AUTHENTICATION_PROVIDERS, AuthenticationProvider,
+    AzureADProvider, SAML2Provider, Conclusion)
 from webob.exc import HTTPUnauthorized
 from webob.response import Response
 
 
 from typing import Any, TYPE_CHECKING
 if TYPE_CHECKING:
-    from collections.abc import Callable, Iterator, Sequence
+    from collections.abc import Callable, Iterator, Mapping
     from functools import cached_property
     from onegov.core.cache import RedisCacheRegion
     from onegov.core.request import CoreRequest
@@ -51,6 +52,7 @@ class UserApp(WebassetsApp):
         # we forward declare the Framework attributes we depend on
         application_id: str
         namespace: str
+
         @cached_property
         def session(self) -> Callable[[], Session]: ...
         @property
@@ -59,16 +61,15 @@ class UserApp(WebassetsApp):
     auto_login_provider: AuthenticationProvider | None
 
     @property
-    def providers(self) -> 'Sequence[_AuthenticationProvider]':
-        """ Returns a tuple of availabe providers. """
+    def providers(self) -> Mapping[str, _AuthenticationProvider]:
+        """ Returns a mapping of availabe providers. """
 
-        return getattr(self, 'available_providers', ())
+        return getattr(self, 'available_providers', {})
 
-    @instance_lru_cache(maxsize=8)
     def provider(self, name: str) -> AuthenticationProvider | None:
-        return provider_by_name(self.providers, name)
+        return self.providers.get(name)
 
-    def on_login(self, request: 'CoreRequest', user: 'User') -> None:
+    def on_login(self, request: CoreRequest, user: User) -> None:
         """ Called by the auth module, whenever a successful login
         was completed.
 
@@ -77,7 +78,7 @@ class UserApp(WebassetsApp):
     def redirect_after_login(
         self,
         identity: morepath.Identity,
-        request: 'CoreRequest',
+        request: CoreRequest,
         default: str
     ) -> str | None:
         """ Returns the path to redirect after login, given the received
@@ -91,18 +92,21 @@ class UserApp(WebassetsApp):
 
     def configure_authentication_providers(self, **cfg: Any) -> None:
         providers_cfg = cfg.get('authentication_providers', {})
-        self.available_providers = tuple(
-            obj
-            for cls in AUTHENTICATION_PROVIDERS.values()
-            if (obj := cls.configure(
-                **providers_cfg.get(cls.metadata.name, {})
+        self.available_providers = {
+            name: provider
+            for name, provider_cfg in providers_cfg.items()
+            if (cls := AUTHENTICATION_PROVIDERS.get(
+                provider_cfg.get('provider', name)
             )) is not None
-        )
+            if (
+                provider := cls.configure(name=name, **provider_cfg)
+            ) is not None
+        }
 
         # enable auto login for the first provider that has it configured, and
         # only the first (others are ignored)
-        for provider in self.available_providers:
-            config = providers_cfg.get(provider.metadata.name, {})
+        for name, provider in self.available_providers.items():
+            config = providers_cfg.get(name, {})
 
             if config.get('auto_login'):
                 self.auto_login_provider = provider
@@ -139,8 +143,8 @@ def authentication_provider(
     permission=Public)
 def handle_authentication(
     # FIXME: We should ensure this is true
-    self: 'SeparateAuthenticationProvider',
-    request: 'CoreRequest'
+    self: SeparateAuthenticationProvider,
+    request: CoreRequest
 ) -> Response:
 
     response = self.authenticate_request(request)
@@ -196,8 +200,8 @@ def handle_authentication(
 )
 def handle_provider_authorisation(
     # FIXME: We should ensure this is true
-    self: 'OauthProvider',
-    request: 'CoreRequest'
+    self: OauthProvider,
+    request: CoreRequest
 ) -> Response:
 
     response = self.request_authorisation(request)
@@ -235,7 +239,7 @@ def handle_provider_authorisation(
 )
 def handle_provider_logout(
     self: AuthenticationProvider,
-    request: 'CoreRequest'
+    request: CoreRequest
 ) -> Response:
     """ We contact the provider that the user wants to log out and redirecting
     him to our main logout view. """
@@ -257,17 +261,17 @@ def get_js_path() -> str:
 
 
 @UserApp.webasset('auto-login')
-def get_preview_widget_asset() -> 'Iterator[str]':
+def get_preview_widget_asset() -> Iterator[str]:
     yield 'auto-login.js'
 
 
 @UserApp.tween_factory(over=webassets_injector_tween)
 def auto_login_tween_factory(
     app: UserApp,
-    handler: 'Callable[[CoreRequest], Response]'
-) -> 'Callable[[CoreRequest], Response]':
+    handler: Callable[[CoreRequest], Response]
+) -> Callable[[CoreRequest], Response]:
 
-    def auto_login_tween(request: 'CoreRequest') -> Response:
+    def auto_login_tween(request: CoreRequest) -> Response:
         """ Optionally injects an auto-login javascript asset.
 
         The auto-login javascript will call the auto-login provider and

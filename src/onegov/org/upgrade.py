@@ -2,6 +2,8 @@
 upgraded on the server. See :class:`onegov.core.upgrade.upgrade_task`.
 
 """
+from __future__ import annotations
+
 from itertools import chain
 from onegov.core.crypto import random_token
 from onegov.core.orm import Base, find_models
@@ -141,7 +143,7 @@ def add_content_show_property_to_people(context: UpgradeContext) -> None:
     q = q.filter(Topic.type == 'topic')
     pages = q.filter(Topic.content['people'].isnot(None))
 
-    def is_already_updated(people_item: 'Sequence[Any]') -> bool:
+    def is_already_updated(people_item: Sequence[Any]) -> bool:
         return len(people_item) == 2 and isinstance(people_item[1], bool)
 
     for page in pages:
@@ -204,7 +206,7 @@ def fix_directory_file_identity(context: UpgradeContext) -> None:
                 file_id = field_data['data'].lstrip('@')
                 file = context.session.query(File).filter_by(
                     id=file_id).first()
-                if file and not file.type == 'directory':
+                if file and file.type != 'directory':
                     new = DirectoryFile(  # type:ignore[misc]
                         id=random_token(),
                         name=file.name,
@@ -266,7 +268,7 @@ def fix_content_people_for_models_that_use_person_link_extension(
         resources = resources.filter(Resource.content['people'].isnot(None))
         iterables.append(resources)
 
-    def is_already_updated(people_item: 'Sequence[Any]') -> bool:
+    def is_already_updated(people_item: Sequence[Any]) -> bool:
         return len(people_item) == 2 and isinstance(people_item[1], bool)
 
     for obj in chain(*iterables):
@@ -296,7 +298,7 @@ def fix_nested_list_in_content_people(context: UpgradeContext) -> None:
         resources = resources.filter(Resource.content['people'].isnot(None))
         iterables.append(resources)
 
-    def is_broken(people_item: 'Sequence[Any]') -> bool:
+    def is_broken(people_item: Sequence[Any]) -> bool:
         return (
             len(people_item) == 2
             and isinstance(people_item[0], list)

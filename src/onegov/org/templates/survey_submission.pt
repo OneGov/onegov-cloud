@@ -9,26 +9,18 @@
             </div>
         </div>
         <div class="row fieldset-display" tal:condition="completable">
-            <div class="small-12 medium-12 large-12 columns">
-                <div class="panel callout" tal:condition="model.state == 'pending'">
-                    <p i18n:translate="">
-                        Please review your answers and press "Complete" to complete the survey.
-                        If there's anything you'd like to change, click on "Edit" to return
-                        to the filled-out survey.
-                    </p>
-                </div>
-                <div metal:use-macro="layout.macros['display_form']" />
+        <div class="small-12 large-8 columns">
+            <div class="alert-box callout success" i18n:translate="">
+                Thank you for filling out this survey.
+                If there's anything you'd like to change, click on the "Edit"-Button below.
             </div>
+        </div>
+        <div class="small-12 medium-12 large-12 columns">
+            <div metal:use-macro="layout.macros['display_form']" />
         </div>
         <div class="row fieldset-display-submit" tal:condition="completable">
             <div class="small-12 columns">
-                <tal:b metal:use-macro="layout.macros['checkout_form']" 
-                    tal:define="show_privacy_settings False">
-
-                    <tal:b metal:fill-slot="after-submit">
-                        <a href="${edit_link}" class="button secondary" i18n:translate="">Edit</a>
-                    </tal:b>
-                </tal:b>
+                <a href="${edit_link}" class="button secondary" i18n:translate="">Edit</a>
             </div>
         </div>
     </tal:b>

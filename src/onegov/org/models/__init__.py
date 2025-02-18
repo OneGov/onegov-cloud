@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 from onegov.org.models.atoz import AtoZ
 from onegov.org.models.clipboard import Clipboard
 from onegov.org.models.dashboard import Boardlet

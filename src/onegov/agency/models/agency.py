@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 from onegov.agency.models.membership import ExtendedAgencyMembership
 from onegov.agency.utils import get_html_paragraph_with_line_breaks
 from onegov.core.crypto import random_token
@@ -53,7 +55,7 @@ class ExtendedAgency(Agency, AccessExtension, PublicationExtension):
     #: The PDF for the agency and all its suborganizations.
     pdf = associated(AgencyPdf, 'pdf', 'one-to-one')
 
-    role_mappings: 'relationship[list[RoleMapping]]' = relationship(
+    role_mappings: relationship[list[RoleMapping]] = relationship(
         RoleMapping,
         primaryjoin=(
             "and_("
@@ -71,25 +73,29 @@ class ExtendedAgency(Agency, AccessExtension, PublicationExtension):
 
     if TYPE_CHECKING:
         # we only allow relating to other ExtendedAgency
-        parent: relationship['ExtendedAgency | None']
-        children: relationship[list['ExtendedAgency']]  # type:ignore
+        parent: relationship[ExtendedAgency | None]
+        children: relationship[list[ExtendedAgency]]  # type:ignore
+
         @property
-        def root(self) -> 'ExtendedAgency': ...
+        def root(self) -> ExtendedAgency: ...
         @property
-        def ancestors(self) -> 'Iterator[ExtendedAgency]': ...
+        def ancestors(self) -> Iterator[ExtendedAgency]: ...
         # we only allow ExtendedAgencyMembership memberships
         memberships: relationship[  # type:ignore[assignment]
             AppenderQuery[ExtendedAgencyMembership]
         ]
 
     @property
-    def pdf_file(self) -> 'StoredFile | None':
+    def pdf_file(self) -> StoredFile | None:
         """ Returns the PDF content for the agency (and all its
         suborganizations).
 
         """
 
-        return self.pdf.reference.file if self.pdf else None
+        try:
+            return self.pdf.reference.file if self.pdf else None
+        except (OSError, Exception):
+            return None
 
     # FIXME: asymmetric property
     @pdf_file.setter
@@ -107,25 +113,25 @@ class ExtendedAgency(Agency, AccessExtension, PublicationExtension):
         self.pdf = pdf
 
     @property
-    def portrait_html(self) -> 'Markup | None':
+    def portrait_html(self) -> Markup | None:
         """ Returns the portrait that is saved as HTML from the redactor js
-         plugin. """
+        plugin. """
 
         return self.portrait
 
     @property
-    def location_address_html(self) -> 'Markup':
+    def location_address_html(self) -> Markup:
         return get_html_paragraph_with_line_breaks(self.location_address)
 
     @property
-    def postal_address_html(self) -> 'Markup':
+    def postal_address_html(self) -> Markup:
         return get_html_paragraph_with_line_breaks(self.postal_address)
 
     @property
-    def opening_hours_html(self) -> 'Markup':
+    def opening_hours_html(self) -> Markup:
         return get_html_paragraph_with_line_breaks(self.opening_hours)
 
-    def proxy(self) -> 'AgencyProxy':
+    def proxy(self) -> AgencyProxy:
         """ Returns a proxy object to this agency allowing alternative linking
         paths. """
 
@@ -133,7 +139,7 @@ class ExtendedAgency(Agency, AccessExtension, PublicationExtension):
 
     def add_person(  # type:ignore[override]
         self,
-        person_id: 'UUID',
+        person_id: UUID,
         title: str,
         *,
         order_within_agency: int = 2 ** 16,
@@ -161,14 +167,17 @@ class ExtendedAgency(Agency, AccessExtension, PublicationExtension):
         )
         self.memberships.append(membership)
 
-        for order, _membership in enumerate(self.memberships):
-            _membership.order_within_agency = order
+        # re-order all memberships cannot be done here, because the order
+        # within the agency is not yet set. do be done once all memberships
+        # are added to the agency.
+        # for order, _membership in enumerate(self.memberships):
+        #     _membership.order_within_agency = order
 
         session.flush()
 
         return membership
 
-    def deletable(self, request: 'AgencyRequest') -> bool:
+    def deletable(self, request: AgencyRequest) -> bool:
         if request.is_admin:
             return True
         if self.memberships.first() or self.children:

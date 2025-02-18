@@ -309,21 +309,23 @@
             </tal:b>
         </tal:b>
         <metal:b define-slot="before-submit" />
-        <tal:b condition="cancel|nothing">
-            <a class="button secondary cancel-button" href="${cancel}" i18n:translate="" role="button">
-                <tal:b condition="not:cancel_text|nothing">
-                    Cancel
-                </tal:b>
-                <tal:b condition="cancel_text|nothing">
-                    ${cancel_text}
-                </tal:b>
-            </a>
-        </tal:b>
-        <tal:b condition="not: button_text|nothing">
-            <input type="submit" value="Submit" class="button" i18n:attributes="value">
-        </tal:b>
-        <tal:b condition="button_text|nothing">
-            <input type="submit" value="${button_text}" class="button" role="button">
+        <tal:b condition="not: layout.edit_mode|False">
+            <tal:b condition="cancel|nothing">
+                <a class="button secondary cancel-button" href="${cancel}" i18n:translate="" role="button">
+                    <tal:b condition="not:cancel_text|nothing">
+                        Cancel
+                    </tal:b>
+                    <tal:b condition="cancel_text|nothing">
+                        ${cancel_text}
+                    </tal:b>
+                </a>
+            </tal:b>
+            <tal:b condition="not: button_text|nothing">
+                <input type="submit" value="Submit" class="button" i18n:attributes="value">
+            </tal:b>
+            <tal:b condition="button_text|nothing">
+                <input type="submit" value="${button_text}" class="button" role="button">
+            </tal:b>
         </tal:b>
     </form>
 </metal:form>
@@ -565,7 +567,7 @@
                                     <span tal:condition="not western_name_order">${person.title}</span>
                                 </a>
                                 <a href="${request.link(person)}">
-                                    <p>${person.context_specific_function}</p>
+                                <p class="list-lead preview" tal:condition="person.context_specific_function" tal:content="escape(person.context_specific_function).replace('\n', Markup('<br />'))" />
                                 </a>
                             </div>
                         </li>
@@ -584,7 +586,7 @@
                 <div class="side-panel files-panel" tal:condition="files and page.show_file_links_in_sidebar|True">
                     <h2 i18n:translate>Documents</h2>
                     <ul class="panel-links">
-                        <li tal:repeat="file files">
+                        <li tal:repeat="file python: sorted(files, key=lambda f: f.name)">
                             <a title="${file.name}" href="${request.link(file)}">${file.name}</a>
                         </li>
                     </ul>
@@ -592,7 +594,7 @@
                 <div class="side-panel links-panel" tal:condition="sidepanel_links|False">
                     <h2 i18n:translate>Links</h2>
                     <ul class="panel-links">
-                        <li tal:repeat="sl sidepanel_links">
+                        <li tal:repeat="sl python: sorted(sidepanel_links, key=lambda sl: sl[0] if sl[0] else sl[1])">
                             <a class="list-link" title="${sl[0] if sl[0] else sl[1]}" href="${sl[1]}">
                                 <span class="list-title">${sl[0] if sl[0] else sl[1]}</span>
                             </a>
@@ -883,9 +885,19 @@
     <div i18n:translate tal:condition="payment.source == 'manual'">
         Manual
     </div>
+    <div tal:condition="payment.source == 'datatrans'">
+        <a href="${payment.remote_url}">
+            Datatrans
+        </a>
+    </div>
     <div tal:condition="payment.source == 'stripe_connect'">
         <a href="${payment.remote_url}">
             Stripe Connect
+        </a>
+    </div>
+    <div tal:condition="payment.source == 'worldline_saferpay'">
+        <a href="${payment.remote_url}">
+            Worldline Saferpay
         </a>
     </div>
 </metal:payment_status>
@@ -1907,7 +1919,6 @@
                 ic-on-success="
                     var info = $(elt).closest('tr');
                     info.prev().remove();
-                    info.next().remove();
                     info.remove();
                 "
                 data-confirm="Do you really want to delete this file?"
@@ -2231,7 +2242,7 @@
                 <p tal:repeat="value results.get(field.id, [])">"${value}"</p>
             </tal:b>
         </p>
-        <tal:b tal:condition="field.type in aggregated">      
+        <tal:b tal:condition="field.type in aggregated">
             <div class="chart-wrap" tal:condition="field.type == 'MultiCheckboxField'">
                 <div tal:define="maximum max(results[field.id].values())" class="grid horizontal">
                     <tal:b tal:repeat="choice field.choices">
@@ -2249,7 +2260,7 @@
                         </tal:b>
                     </tal:b>
                 </div>
-            </div> 
+            </div>
         </tal:b>
     </tal:b>
 </metal:display_results>

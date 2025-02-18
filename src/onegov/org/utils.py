@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 import colorsys
 import re
 import sedate
@@ -26,7 +28,7 @@ from sqlalchemy import nullsfirst, select  # type:ignore[attr-defined]
 from onegov.ticket import TicketCollection
 from onegov.user import User
 
-from typing import overload, Any, TYPE_CHECKING
+from typing import overload, Any, Literal, TYPE_CHECKING
 if TYPE_CHECKING:
     from _typeshed import SupportsRichComparison
     from collections.abc import Callable, Iterable, Iterator, Sequence
@@ -91,9 +93,9 @@ def get_random_color(seed: str, lightness: float, saturation: float) -> str:
     r, g, b = colorsys.hls_to_rgb(hue, lightness, saturation)
 
     return '#{:02x}{:02x}{:02x}'.format(
-        int(round(r * 255)),
-        int(round(g * 255)),
-        int(round(b * 255))
+        round(r * 255),
+        round(g * 255),
+        round(b * 255)
     )
 
 
@@ -119,7 +121,7 @@ def get_extension_color(extension: str) -> str:
     return get_random_color(extension, lightness=0.5, saturation=0.5)
 
 
-def add_class_to_node(node: '_Element', classname: str) -> None:
+def add_class_to_node(node: _Element, classname: str) -> None:
     """ Adds the given classname to the given lxml node's class list. """
 
     if 'class' in node.attrib:
@@ -131,18 +133,18 @@ def add_class_to_node(node: '_Element', classname: str) -> None:
 @overload
 def annotate_html(
     html: Markup,
-    request: 'CoreRequest | None' = None
+    request: CoreRequest | None = None
 ) -> Markup: ...
 
 
 @overload
-def annotate_html(html: None, request: 'CoreRequest | None' = None) -> None:
+def annotate_html(html: None, request: CoreRequest | None = None) -> None:
     ...
 
 
 def annotate_html(
     html: Markup | None,
-    request: 'CoreRequest | None' = None
+    request: CoreRequest | None = None
 ) -> Markup | None:
     """ Takes the given html and annotates the following elements for some
     advanced styling:
@@ -190,7 +192,7 @@ def annotate_html(
             # find the closest paragraph in the ancestrage, but don't look far
             parent = a.getparent()
 
-            for i in range(0, 3):
+            for i in range(3):
                 if parent is None:
                     break
                 if parent.tag == 'p':
@@ -212,7 +214,7 @@ def annotate_html(
     if request:
         set_image_sizes(images, request)
 
-    return Markup(  # noqa: MS001
+    return Markup(  # nosec: B704
         ''.join(tostring(e, encoding=str) for e in fragments))
 
 
@@ -226,17 +228,17 @@ def remove_empty_paragraphs(html: Markup | None) -> Markup | None:
     if not html:
         return html
 
-    return Markup(EMPTY_PARAGRAPHS.sub('', html))  # noqa: MS001
+    return Markup(EMPTY_PARAGRAPHS.sub('', html))  # nosec: B704
 
 
 def set_image_sizes(
-    images: list['_Element'],
-    request: 'CoreRequest'
+    images: list[_Element],
+    request: CoreRequest
 ) -> None:
 
     internal_src = re.compile(r'.*/storage/([a-z0-9]+)')
 
-    def get_image_id(img: '_Element') -> str | None:
+    def get_image_id(img: _Element) -> str | None:
         match = internal_src.match(img.get('src', ''))
 
         if match and match.groups():
@@ -261,7 +263,7 @@ def set_image_sizes(
 
 
 def parse_fullcalendar_request(
-    request: 'CoreRequest',
+    request: CoreRequest,
     timezone: str
 ) -> tuple[datetime, datetime] | tuple[None, None]:
     """ Parses start and end from the given fullcalendar request. It is
@@ -313,8 +315,8 @@ class ReservationInfo:
     def __init__(
         self,
         resource: Resource,
-        reservation: 'Reservation',
-        request: 'OrgRequest'
+        reservation: Reservation,
+        request: OrgRequest
     ) -> None:
 
         self.resource = resource
@@ -379,7 +381,7 @@ class ReservationInfo:
         return url.as_string()
 
     @property
-    def price(self) -> 'PriceDict | None':
+    def price(self) -> PriceDict | None:
         price = self.reservation.price(self.resource)
         return price.as_dict() if price else None
 
@@ -404,9 +406,9 @@ class AllocationEventInfo:
     def __init__(
         self,
         resource: Resource,
-        allocation: 'Allocation',
+        allocation: Allocation,
         availability: float,
-        request: 'OrgRequest'
+        request: OrgRequest
     ) -> None:
 
         self.resource = resource
@@ -418,10 +420,10 @@ class AllocationEventInfo:
     @classmethod
     def from_allocations(
         cls,
-        request: 'OrgRequest',
+        request: OrgRequest,
         resource: Resource,
-        allocations: 'Iterable[Allocation]'
-    ) -> list['Self']:
+        allocations: Iterable[Allocation]
+    ) -> list[Self]:
 
         events = []
 
@@ -440,7 +442,7 @@ class AllocationEventInfo:
 
             for allocation in grouped:
                 if allocation.is_master:
-                    events.append(
+                    events.append(  # noqa: PERF401
                         cls(
                             resource,
                             allocation,
@@ -513,7 +515,7 @@ class AllocationEventInfo:
         return '\n'.join((self.event_time + ' ', available))
 
     @property
-    def event_classes(self) -> 'Iterator[str]':
+    def event_classes(self) -> Iterator[str]:
         if self.allocation.end < sedate.utcnow():
             yield 'event-in-past'
 
@@ -545,7 +547,7 @@ class AllocationEventInfo:
         )
 
     @property
-    def event_actions(self) -> 'Iterator[Link]':
+    def event_actions(self) -> Iterator[Link]:
         if self.request.is_manager:
             yield Link(
                 _('Edit'),
@@ -625,15 +627,17 @@ class AllocationEventInfo:
 class FindYourSpotEventInfo:
 
     __slots__ = ('allocation', 'slot_time', 'availability', 'quota_left',
-                 'request', 'translate')
+                 'request', 'translate', 'adjustable')
 
     def __init__(
         self,
-        allocation: 'Allocation',
-        slot_time: 'DateRange | None',
+        allocation: Allocation,
+        slot_time: DateRange | None,
         availability: float,
         quota_left: int,
-        request: 'OrgRequest'
+        request: OrgRequest,
+        *,
+        adjustable: bool = False
     ) -> None:
 
         self.allocation = allocation
@@ -641,6 +645,7 @@ class FindYourSpotEventInfo:
         self.availability = availability
         self.quota_left = quota_left
         self.request = request
+        self.adjustable = adjustable
         self.translate = request.translate
 
     @property
@@ -712,7 +717,7 @@ class FindYourSpotEventInfo:
         return available
 
     @property
-    def event_classes(self) -> 'Iterator[str]':
+    def event_classes(self) -> Iterator[str]:
         if self.allocation.end < sedate.utcnow():
             yield 'event-in-past'
 
@@ -730,6 +735,9 @@ class FindYourSpotEventInfo:
                 yield 'event-partly-available'
             else:
                 yield 'event-unavailable'
+
+        if self.adjustable:
+            yield 'event-adjustable'
 
     @property
     def css_class(self) -> str:
@@ -794,7 +802,7 @@ libres_error_messages = {
 }
 
 
-def get_libres_error(e: Exception, request: 'OrgRequest') -> str:
+def get_libres_error(e: Exception, request: OrgRequest) -> str:
     etype = type(e)
     assert etype in libres_error_messages, f'Unknown libres error {etype}'
 
@@ -803,7 +811,7 @@ def get_libres_error(e: Exception, request: 'OrgRequest') -> str:
 
 def show_libres_error(
     e: Exception,
-    request: 'OrgRequest'
+    request: OrgRequest
 ) -> None:
     """ Shows a human readable error message for the given libres exception,
     using request.alert.
@@ -813,10 +821,10 @@ def show_libres_error(
 
 
 def predict_next_daterange(
-    dateranges: 'Sequence[DateRange]',
+    dateranges: Sequence[DateRange],
     min_probability: float = 0.8,
-    tzinfo: 'TzInfo | None' = None
-) -> 'DateRange | None':
+    tzinfo: TzInfo | None = None
+) -> DateRange | None:
     """ Takes a list of dateranges (start, end) and tries to predict the next
     daterange in the list.
 
@@ -847,9 +855,9 @@ def predict_next_daterange(
         ]
 
     def add_delta(
-        time_range: 'DateRange',
+        time_range: DateRange,
         delta: timedelta
-    ) -> 'DateRange | None':
+    ) -> DateRange | None:
 
         start, end = time_range
 
@@ -897,36 +905,36 @@ def predict_next_daterange(
 #       __add__ vs __radd__ and __sub__ vs __rsub__ makes this difficult
 @overload
 def predict_next_value(
-    values: 'Sequence[_T]',
+    values: Sequence[_T],
     min_probability: float = 0.8,
-) -> '_T | None': ...
+) -> _T | None: ...
 
 
 @overload
 def predict_next_value(
-    values: 'Sequence[_T]',
+    values: Sequence[_T],
     min_probability: float,
-    compute_delta: 'Callable[[_T, _T], _DeltaT]',
-    add_delta: 'Callable[[_T, _DeltaT], _T | None]'
-) -> '_T | None': ...
+    compute_delta: Callable[[_T, _T], _DeltaT],
+    add_delta: Callable[[_T, _DeltaT], _T | None]
+) -> _T | None: ...
 
 
 @overload
 def predict_next_value(
-    values: 'Sequence[_T]',
+    values: Sequence[_T],
     min_probability: float = 0.8,
     *,
-    compute_delta: 'Callable[[_T, _T], _DeltaT]',
-    add_delta: 'Callable[[_T, _DeltaT], _T | None]'
-) -> '_T | None': ...
+    compute_delta: Callable[[_T, _T], _DeltaT],
+    add_delta: Callable[[_T, _DeltaT], _T | None]
+) -> _T | None: ...
 
 
 def predict_next_value(
-    values: 'Sequence[_T]',
+    values: Sequence[_T],
     min_probability: float = 0.8,
-    compute_delta: 'Callable[[Any, Any], Any]' = lambda x, y: y - x,
-    add_delta: 'Callable[[Any, Any], Any | None]' = lambda x, d: x + d
-) -> '_T | None':
+    compute_delta: Callable[[Any, Any], Any] = lambda x, y: y - x,
+    add_delta: Callable[[Any, Any], Any | None] = lambda x, d: x + d
+) -> _T | None:
     """ Takes a list of values and tries to predict the next value in the
     series.
 
@@ -985,66 +993,66 @@ def predict_next_value(
 
 @overload
 def group_by_column(
-    request: 'OrgRequest',
-    query: 'Query[_T]',
-    group_column: 'Column[str] | Column[str | None]',
-    sort_column: 'Column[_SortT]',
+    request: OrgRequest,
+    query: Query[_T],
+    group_column: Column[str] | Column[str | None],
+    sort_column: Column[_SortT],
     default_group: str | None = None,
-    transform: 'Callable[[_T], _T] | None' = None
-) -> dict[str, list['_T']]: ...
+    transform: Callable[[_T], _T] | None = None
+) -> dict[str, list[_T]]: ...
 
 
 @overload
 def group_by_column(
-    request: 'OrgRequest',
-    query: 'Query[_T]',
-    group_column: 'Column[str] | Column[str | None]',
-    sort_column: 'Column[_SortT]',
+    request: OrgRequest,
+    query: Query[_T],
+    group_column: Column[str] | Column[str | None],
+    sort_column: Column[_SortT],
     default_group: str | None,
-    transform: 'Callable[[_T], _TransformedT]'
-) -> dict[str, list['_TransformedT']]: ...
+    transform: Callable[[_T], _TransformedT]
+) -> dict[str, list[_TransformedT]]: ...
 
 
 @overload
 def group_by_column(
-    request: 'OrgRequest',
-    query: 'Query[_T]',
-    group_column: 'Column[str] | Column[str | None]',
-    sort_column: 'Column[_SortT]',
+    request: OrgRequest,
+    query: Query[_T],
+    group_column: Column[str] | Column[str | None],
+    sort_column: Column[_SortT],
     default_group: str | None = None,
     *,
-    transform: 'Callable[[_T], _TransformedT]'
-) -> dict[str, list['_TransformedT']]: ...
+    transform: Callable[[_T], _TransformedT]
+) -> dict[str, list[_TransformedT]]: ...
 
 
 def group_by_column(
-    request: 'OrgRequest',
-    query: 'Query[_T]',
-    group_column: 'Column[str] | Column[str | None]',
-    sort_column: 'Column[_SortT]',
+    request: OrgRequest,
+    query: Query[_T],
+    group_column: Column[str] | Column[str | None],
+    sort_column: Column[_SortT],
     default_group: str | None = None,
-    transform: 'Callable[[Any], Any] | None' = None
+    transform: Callable[[Any], Any] | None = None
 ) -> dict[str, list[Any]]:
     """ Groups the given query by the given group.
 
-        :param request:
-            The current request used for translation and to exclude invisible
-            records.
+    :param request:
+        The current request used for translation and to exclude invisible
+        records.
 
-        :param query:
-            The query that should be grouped
+    :param query:
+        The query that should be grouped
 
-        :param group_column:
-            The column by which the grouping should happen.
+    :param group_column:
+        The column by which the grouping should happen.
 
-        :param sort_column:
-            The column by which the records should be sorted.
+    :param sort_column:
+        The column by which the records should be sorted.
 
-        :param default_group:
-            The group in use if the found group is empty (optional).
+    :param default_group:
+        The group in use if the found group is empty (optional).
 
-        :param transform:
-            Called with each record to transform the result (optional).
+    :param transform:
+        Called with each record to transform the result (optional).
 
     """
 
@@ -1055,10 +1063,10 @@ def group_by_column(
 
     grouped = OrderedDict()
 
-    def group_key(record: '_T') -> str:
+    def group_key(record: _T) -> str:
         return getattr(record, group_column.name) or default_group
 
-    def sort_key(record: '_T') -> '_SortT':
+    def sort_key(record: _T) -> _SortT:
         return getattr(record, sort_column.name)
 
     transform = transform or (lambda v: v)
@@ -1075,8 +1083,8 @@ def group_by_column(
 
 
 def keywords_first(
-    keywords: 'Sequence[str]'
-) -> 'Callable[[str], tuple[int, str]]':
+    keywords: Sequence[str]
+) -> Callable[[str], tuple[int, str]]:
     """ Returns a sort key which prefers values matching the given keywords
     before other values which are sorted alphabetically.
 
@@ -1091,7 +1099,7 @@ def keywords_first(
     return sort_key
 
 
-def hashtag_elements(request: 'OrgRequest', text: str) -> Markup:
+def hashtag_elements(request: OrgRequest, text: str) -> Markup:
     """ Takes a text and adds html around the hashtags found inside. """
 
     def replace_tag(match: re.Match[str]) -> str:
@@ -1100,12 +1108,12 @@ def hashtag_elements(request: 'OrgRequest', text: str) -> Markup:
         return f'<a class="hashtag" href="{link}">{tag}</a>'
 
     # NOTE: We need to restore Markup after re.sub call
-    return Markup(HASHTAG.sub(replace_tag, escape(text)))  # noqa: MS001
+    return Markup(HASHTAG.sub(replace_tag, escape(text)))  # nosec: B704
 
 
 def ticket_directory_groups(
-    session: 'Session'
-) -> 'Iterator[str]':
+    session: Session
+) -> Iterator[str]:
     """Yields all ticket groups.
 
     For example: ('Sportanbieter', 'Verein')
@@ -1132,9 +1140,9 @@ def ticket_directory_groups(
 
 
 def user_group_emails_for_new_ticket(
-    request: 'CoreRequest',
-    ticket: 'Ticket',
-) -> 'set[str]':
+    request: CoreRequest,
+    ticket: Ticket,
+) -> set[str]:
     """The user can be part of a UserGroup that defines directories. This
     means the users in this group are interested in a subset of tickets.
     The group is determined by the Ticket group.
@@ -1182,6 +1190,19 @@ def widest_access(*accesses: str) -> str:
     return ORDERED_ACCESS[index]
 
 
+@overload
+def extract_categories_and_subcategories(
+    categories: dict[str, list[dict[str, list[str]] | str]],
+    flattened: Literal[False] = False
+) -> tuple[list[str], list[list[str]]]: ...
+
+@overload
+def extract_categories_and_subcategories(
+    categories: dict[str, list[dict[str, list[str]] | str]],
+    flattened: Literal[True]
+) -> list[str]: ...
+
+
 def extract_categories_and_subcategories(
     categories: dict[str, list[dict[str, list[str]] | str]],
     flattened: bool = False
@@ -1208,7 +1229,10 @@ def extract_categories_and_subcategories(
     cats: list[str] = []
     subcats: list[list[str]] = []
 
-    for org_name, items in categories.items():
+    if not categories:
+        return cats, subcats
+
+    for items in categories.values():
         for item in items:
             if isinstance(item, dict):
                 for topic, subs in item.items():

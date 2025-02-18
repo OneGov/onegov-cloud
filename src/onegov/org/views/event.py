@@ -1,4 +1,6 @@
 """ The onegov org collection of images uploaded to the site. """
+from __future__ import annotations
+
 import morepath
 
 from morepath.request import Response
@@ -33,7 +35,7 @@ if TYPE_CHECKING:
     FormT = TypeVar('FormT', bound=Form)
 
 
-def get_session_id(request: 'OrgRequest') -> str:
+def get_session_id(request: OrgRequest) -> str:
     if not request.browser_session.has('event_session_id'):
         request.browser_session.event_session_id = uuid4()
 
@@ -41,7 +43,7 @@ def get_session_id(request: 'OrgRequest') -> str:
 
 
 def assert_anonymous_access_only_temporary(
-    request: 'OrgRequest',
+    request: OrgRequest,
     event: Event
 ) -> None:
     """ Raises exceptions if the current user is anonymous and no longer
@@ -77,7 +79,7 @@ def assert_anonymous_access_only_temporary(
 @overload
 def event_form(
     model: object,
-    request: 'OrgRequest',
+    request: OrgRequest,
     form: None = None
 ) -> type[EventForm]: ...
 
@@ -85,16 +87,16 @@ def event_form(
 @overload
 def event_form(
     model: object,
-    request: 'OrgRequest',
-    form: type['FormT']
-) -> type['FormT']: ...
+    request: OrgRequest,
+    form: type[FormT]
+) -> type[FormT]: ...
 
 
 def event_form(
     model: object,
-    request: 'OrgRequest',
-    form: type['Form'] | None = None
-) -> type['Form']:
+    request: OrgRequest,
+    form: type[Form] | None = None
+) -> type[Form]:
 
     if form is None:
         form = EventForm
@@ -130,8 +132,8 @@ def event_form(
 )
 def publish_event(
     self: Event,
-    request: 'OrgRequest'
-) -> 'RenderData | BaseResponse':
+    request: OrgRequest
+) -> RenderData | BaseResponse:
     """ Publish an event. """
 
     if self.state == 'initiated':
@@ -191,10 +193,10 @@ def publish_event(
 )
 def handle_new_event(
     self: OccurrenceCollection,
-    request: 'OrgRequest',
+    request: OrgRequest,
     form: EventForm,
     layout: EventLayout | None = None
-) -> 'RenderData | BaseResponse':
+) -> RenderData | BaseResponse:
     """ Add a new event.
 
     The event is created and the user is redirected to a view where he can
@@ -259,14 +261,14 @@ def handle_new_event(
 )
 def handle_new_event_without_workflow(
     self: OccurrenceCollection,
-    request: 'OrgRequest',
+    request: OrgRequest,
     form: EventForm,
     layout: EventLayout | None = None
-) -> 'RenderData | BaseResponse':
+) -> RenderData | BaseResponse:
     """ Create and submit a new event.
 
-        The event is created and ticket workflow is skipped by setting
-        the state to 'submitted'.
+    The event is created and ticket workflow is skipped by setting
+    the state to 'submitted'.
 
     """
 
@@ -319,9 +321,9 @@ def handle_new_event_without_workflow(
 )
 def view_event(
     self: Event,
-    request: 'OrgRequest',
+    request: OrgRequest,
     layout: EventLayout | None = None
-) -> 'RenderData | BaseResponse':
+) -> RenderData | BaseResponse:
     """ View an event.
 
     If the event is not already submitted, the submit form is displayed.
@@ -409,10 +411,10 @@ def view_event(
 )
 def handle_edit_event(
     self: Event,
-    request: 'OrgRequest',
+    request: OrgRequest,
     form: EventForm,
     layout: EventLayout | None = None
-) -> 'RenderData | BaseResponse':
+) -> RenderData | BaseResponse:
     """ Edit an event.
 
     An anonymous user might edit an initiated event, a logged in user can also
@@ -452,7 +454,7 @@ def handle_edit_event(
     request_method='POST',
     permission=Private
 )
-def handle_withdraw_event(self: Event, request: 'OrgRequest') -> None:
+def handle_withdraw_event(self: Event, request: OrgRequest) -> None:
     """ Withdraws an (imported) event. """
 
     request.assert_valid_csrf_token()
@@ -472,7 +474,7 @@ def handle_withdraw_event(self: Event, request: 'OrgRequest') -> None:
     request_method='DELETE',
     permission=Private
 )
-def handle_delete_event(self: Event, request: 'OrgRequest') -> None:
+def handle_delete_event(self: Event, request: OrgRequest) -> None:
     """ Delete an event. """
 
     request.assert_valid_csrf_token()
@@ -506,7 +508,7 @@ def handle_delete_event(self: Event, request: 'OrgRequest') -> None:
     name='ical',
     permission=Public
 )
-def ical_export_event(self: Event, request: 'OrgRequest') -> Response:
+def ical_export_event(self: Event, request: OrgRequest) -> Response:
     """ Returns the event with all occurrences as ics. """
 
     try:
@@ -526,7 +528,7 @@ def ical_export_event(self: Event, request: 'OrgRequest') -> Response:
     name='latest',
     permission=Public
 )
-def view_latest_event(self: Event, request: 'OrgRequest') -> 'BaseResponse':
+def view_latest_event(self: Event, request: OrgRequest) -> BaseResponse:
     """ Redirects to the latest occurrence of an event that is, either the
     next future event or the last event in the past if there are no more
     future events.

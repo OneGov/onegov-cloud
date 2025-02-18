@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 import sedate
 
 from onegov.core.orm import Base
@@ -40,14 +42,14 @@ class SurveySubmissionWindow(Base, TimestampMixin):
     __tablename__ = 'submission_windows'
 
     #: the public id of the submission window
-    id: 'Column[uuid.UUID]' = Column(
+    id: Column[uuid.UUID] = Column(
         UUID,  # type:ignore[arg-type]
         primary_key=True,
         default=uuid4
     )
 
     #: the name of the survey to which this submission window belongs
-    name: 'Column[str]' = Column(
+    name: Column[str] = Column(
         Text,
         ForeignKey('surveys.name'),
         nullable=False
@@ -57,29 +59,29 @@ class SurveySubmissionWindow(Base, TimestampMixin):
     title = Column(Text)
 
     #: the survey to which this submission window belongs
-    survey: 'relationship[SurveyDefinition]' = relationship(
+    survey: relationship[SurveyDefinition] = relationship(
         'SurveyDefinition',
         back_populates='submission_windows'
     )
 
     #: true if the submission window is enabled
-    enabled: 'Column[bool]' = Column(Boolean, nullable=False, default=True)
+    enabled: Column[bool] = Column(Boolean, nullable=False, default=True)
 
     #: the start date of the window
-    start: 'Column[date]' = Column(Date, nullable=False)
+    start: Column[date] = Column(Date, nullable=False)
 
     #: the end date of the window
-    end: 'Column[date]' = Column(Date, nullable=False)
+    end: Column[date] = Column(Date, nullable=False)
 
     #: the timezone of the window
-    timezone: 'Column[str]' = Column(
+    timezone: Column[str] = Column(
         Text,
         nullable=False,
         default='Europe/Zurich'
     )
 
     #: submissions linked to this
-    submissions: 'relationship[list[SurveySubmission]]' = relationship(
+    submissions: relationship[list[SurveySubmission]] = relationship(
         SurveySubmission,
         back_populates='submission_window'
     )
@@ -93,7 +95,7 @@ class SurveySubmissionWindow(Base, TimestampMixin):
     )
 
     @property
-    def localized_start(self) -> 'datetime':
+    def localized_start(self) -> datetime:
         return sedate.align_date_to_day(
             sedate.standardize_date(
                 sedate.as_datetime(self.start), self.timezone
@@ -101,18 +103,12 @@ class SurveySubmissionWindow(Base, TimestampMixin):
         )
 
     @property
-    def localized_end(self) -> 'datetime':
+    def localized_end(self) -> datetime:
         return sedate.align_date_to_day(
             sedate.standardize_date(
                 sedate.as_datetime(self.end), self.timezone
             ), self.timezone, 'up'
         )
-
-    def disassociate(self) -> None:
-        """ Disassociates all records linked to this window. """
-
-        for submission in self.submissions:
-            submission.submission_window_id = None
 
     @property
     def in_the_future(self) -> bool:

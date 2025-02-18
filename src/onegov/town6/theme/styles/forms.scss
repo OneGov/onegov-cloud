@@ -34,8 +34,6 @@ form {
 
     label {
 
-        min-width: 75%;
-
         &.error, .upload-widget.error {
             color: $alert-color;
         }
@@ -54,6 +52,18 @@ form {
         li input[type="checkbox"],
         li input[type="radio"] {
             margin-bottom: .25rem;
+        }
+    }
+
+    .duration-widget label {
+        display: inline-block;
+        white-space: nowrap;
+        margin-right: .5rem;
+
+        input {
+            display: inline-block;
+            width: auto;
+            margin-right: .25rem;
         }
     }
 
@@ -150,6 +160,12 @@ form {
             background-color: $input-background-focus;
             border: $input-border-focus;
             box-shadow: $input-shadow-focus;
+        }
+    }
+
+    .upload-options {
+        div input {
+            margin-bottom: 0;
         }
     }
 

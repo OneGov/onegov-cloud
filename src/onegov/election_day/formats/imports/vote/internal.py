@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 from onegov.election_day import _
 from onegov.election_day.formats.imports.common import BALLOT_TYPES
 from onegov.election_day.formats.imports.common import EXPATS
@@ -38,8 +40,8 @@ INTERNAL_VOTE_HEADERS = (
 
 
 def import_vote_internal(
-    vote: 'Vote',
-    principal: 'Canton | Municipality',
+    vote: Vote,
+    principal: Canton | Municipality,
     file: IO[bytes],
     mimetype: str
 ) -> list[FileImportError]:
@@ -103,7 +105,7 @@ def import_vote_internal(
                         'name': entity_id
                     }))
             else:
-                name, district, superregion = get_entity_and_district(
+                name, district, _superregion = get_entity_and_district(
                     entity_id, entities, vote, principal, line_errors
                 )
 
@@ -211,7 +213,7 @@ def import_vote_internal(
             remaining.add(0)
         remaining -= added_entity_ids[ballot_type]
         for entity_id in remaining:
-            name, district, superregion = get_entity_and_district(
+            name, district, _superregion = get_entity_and_district(
                 entity_id, entities, vote, principal
             )
             if vote.domain == 'none':

@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 import isodate
 import pycurl
 import sedate
@@ -15,7 +17,7 @@ from sedate import utcnow
 
 from typing import Any, TYPE_CHECKING
 if TYPE_CHECKING:
-    from collections.abc import Iterator
+    from collections.abc import Callable, Iterator
     from onegov.core.cache import RedisCacheRegion
     from typing import Self
 
@@ -59,12 +61,12 @@ class RoadworkConfig:
         self.password = password
 
     @classmethod
-    def lookup_paths(self) -> 'Iterator[Path]':
+    def lookup_paths(cls) -> Iterator[Path]:
         yield Path('~/.pdb.secret').expanduser()
         yield Path('/etc/pdb.secret')
 
     @classmethod
-    def lookup(cls) -> 'Self':
+    def lookup(cls) -> Self:
         for path in cls.lookup_paths():
             if path.exists():
                 return cls(**cls.parse(path))
@@ -119,7 +121,7 @@ class RoadworkClient:
 
     def __init__(
         self,
-        cache: 'RedisCacheRegion',
+        cache: RedisCacheRegion,
         hostname: str,
         username: str,
         password: str,
@@ -265,7 +267,7 @@ class RoadworkCollection:
 
         return sorted(letters)
 
-    def by_filter(self, filter: str) -> list['Roadwork']:
+    def by_filter(self, filter: str) -> list[Roadwork]:
 
         # note: addGisLink doesn't work here
         url = (
@@ -281,7 +283,7 @@ class RoadworkCollection:
         ), key=attrgetter('title'))
 
     @property
-    def roadwork(self) -> list['Roadwork']:
+    def roadwork(self) -> list[Roadwork]:
         date = datetime.today()
 
         roadwork = self.by_filter(filter=' and '.join((
@@ -306,7 +308,7 @@ class RoadworkCollection:
 
         return roadwork
 
-    def by_id(self, id: int) -> 'Roadwork | None':
+    def by_id(self, id: int) -> Roadwork | None:
         url = (
             URL(f'odata/Baustellen({id})')
             .query_param('addGisLink', 'True'))
@@ -326,11 +328,13 @@ class RoadworkCollection:
                     return section
         return None
 
-    def by_letter(self, letter: str | None) -> 'Self':
+    def by_letter(self, letter: str | None) -> Self:
         return self.__class__(self.client, letter=letter, query=None)
 
 
 class Roadwork:
+
+    convertors: dict[str, Callable[[str | None], Any]]
 
     def __init__(self, data: dict[str, Any]) -> None:
         self.data = data
@@ -345,7 +349,7 @@ class Roadwork:
         return self['Id']
 
     @property
-    def letters(self) -> 'Iterator[str]':
+    def letters(self) -> Iterator[str]:
         for key in ('ProjektBezeichnung', 'ProjektBereich'):
             if value := self[key]:
                 letter = value[0].lower()
@@ -361,7 +365,7 @@ class Roadwork:
         return ' '.join(parts)
 
     @property
-    def sections(self) -> list['Self']:
+    def sections(self) -> list[Self]:
         now = sedate.utcnow()
 
         sections = (

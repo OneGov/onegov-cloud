@@ -1,5 +1,8 @@
+from __future__ import annotations
+
 from functools import cached_property
 from onegov.core.utils import is_valid_yubikey_format
+from onegov.directory.models.directory import Directory
 from onegov.form import Form, merge_forms
 from onegov.form import FormDefinition
 from onegov.form.fields import ChosenSelectMultipleField
@@ -226,9 +229,13 @@ class ManageUserGroupForm(Form):
             (f'FRM-{form.title}', f'FRM: {form.title}')
             for form in self.request.session.query(FormDefinition)
         )
+        ticket_choices.extend(
+            (f'DIR-{dir.title}', f'DIR: {dir.title}')
+            for dir in self.request.session.query(Directory)
+        )
         self.ticket_permissions.choices = sorted(ticket_choices)
 
-    def update_model(self, model: 'UserGroup') -> None:
+    def update_model(self, model: UserGroup) -> None:
         session = self.request.session
 
         # Logout the new and old users
@@ -271,7 +278,7 @@ class ManageUserGroupForm(Form):
             model.meta = {}
         model.meta['directories'] = self.directories.data
 
-    def apply_model(self, model: 'UserGroup') -> None:
+    def apply_model(self, model: UserGroup) -> None:
         self.name.data = model.name
         self.users.data = [str(u.id) for u in model.users]
         # FIXME: backref across module boundaries

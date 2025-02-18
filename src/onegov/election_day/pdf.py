@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 from babel.dates import format_date
 from babel.dates import format_time
 from copy import deepcopy
@@ -24,7 +26,7 @@ class Pdf(PdfBase):
         self,
         *args: Any,
         locale: str | None = None,
-        translations: dict[str, 'GNUTranslations'] | None = None,
+        translations: dict[str, GNUTranslations] | None = None,
         toc_levels: int = 3,
         created: str = '',
         logo: str | None = None,
@@ -89,17 +91,17 @@ class Pdf(PdfBase):
                 translated = translator.gettext(text)
         return text.interpolate(translated)
 
-    def h1(self, title: str, style: 'PropertySet | None' = None) -> None:
+    def h1(self, title: str, style: PropertySet | None = None) -> None:
         """ Translated H1. """
 
         super().h1(self.translate(title), style=style)
 
-    def h2(self, title: str, style: 'PropertySet | None' = None) -> None:
+    def h2(self, title: str, style: PropertySet | None = None) -> None:
         """ Translated H2. """
 
         super().h2(self.translate(title), style=style)
 
-    def h3(self, title: str, style: 'PropertySet | None' = None) -> None:
+    def h3(self, title: str, style: PropertySet | None = None) -> None:
         """ Translated H3. """
 
         super().h3(self.translate(title), style=style)
@@ -107,13 +109,13 @@ class Pdf(PdfBase):
     def figcaption(
         self,
         text: str,
-        style: 'PropertySet | None' = None
+        style: PropertySet | None = None
     ) -> None:
         """ Translated Figcaption. """
 
         super().figcaption(self.translate(text), style=style)
 
-    def dates_line(self, date: 'date', changed: 'datetime | None') -> None:
+    def dates_line(self, date: date, changed: datetime | None) -> None:
         """ Adds the given date and timespamp. """
 
         self.table(

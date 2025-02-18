@@ -35,15 +35,12 @@ python_version = "3.11"
 follow_imports = "silent"
 namespace_packages = true
 explicit_package_bases = true
-warn_unused_ignores = true
-warn_redundant_casts = true
-warn_unused_configs = true
+strict = true
+implicit_reexport = true
 warn_unreachable = true
-disallow_any_generics = true
-disallow_incomplete_defs = true
-disallow_untyped_defs = true
-strict_equality = true
-extra_checks = true
+warn_return_any = false
+# FIXME: remove sqlalchemy when upgrading to SQlAlchemy 2.0
+untyped_calls_exclude = "sqlalchemy,pycurl,onegov.core.types"
 plugins = "sqlmypy"
 mypy_path = "$MYPY_CONFIG_FILE_DIR/src:$MYPY_CONFIG_FILE_DIR/stubs"
 
@@ -72,22 +69,10 @@ exclude_dirs = [
 skips = [
     # ignore asserts
     "B101",
-    # ignore pickle (SEA-1030)
-    "B301",
+    # ignore meta-codes, we are aware of the implications
     "B403",
-    # ignore XML (SEA-1031)
-    "B314",
-    "B320",
-    "B405",
-    "B410",
-    # ignore subprocesses (SEA-1032)
     "B404",
-    "B602",
-    "B603",
-    "B605",
-    "B607",
-    # ignore temp directory (SEA-1033)
-    "B108"
+    "B405",
 ]
 
 [tool.ruff]
@@ -134,44 +119,86 @@ target-version = "py311"
 select = [
     "B0",
     "B904",
+    "B909",
     "C4",
+    "COM818",
+    "D2",
+    "D301",
+    "D4",
     "E",
     "F",
     "FLY002",
+    "I002",
+    "ISC",
+    "N",
+    "PERF",
     "PGH004",
+    "PIE",
     "PYI",
     "Q",
     "RUF",
+    "SIM",
+    "SLOT",
     "UP",
     "W"
 ]
 ignore = [
     "B007",
+    "C420",
+    "D200",
+    "D201",
+    "D202",
+    "D204",
+    "D205",
+    "D209",
+    "D210",
+    "D211",
+    "D400",
+    "D401",
+    "D412",
+    "E226",
     "E402",
     "E711",
     "E712",
     "E741",
+    "N818",
     "PYI019",
     "PYI041",
     "RUF012",
     "RUF013",
+    "RUF021",
+    "RUF022",
+    "RUF023",
+    "RUF031",
+    "RUF035",
+    "RUF052",
+    "RUF056",
+    # TODO: We would like to enable SIM102, but it has a ton of
+    #       violations, so it's a big job to clean it up
+    "SIM102",
+    "SIM103",
+    "SIM105",
+    "SIM108",
+    "SIM110",
+    "SIM118",
+    "SIM210",
+    "SIM910",
     "UP009",
     "UP012",
     "UP032",
-    "UP037",
     "UP038",
 ]
 unfixable = []
-external = ["MS", "TC"]
+external = ["TC"]
 allowed-confusables = ["×"]
+preview = true
 
 [tool.ruff.lint.extend-per-file-ignores]
 "src/onegov/core/types.py" = ["B018"]
+"reportlab_settings.py" = ["N", "I002"]
 "*.pyi" = [
     "E501",
-    # TODO: re-enable this one, I think it is smarter in Ruff
-    "F401",
-    "F403",
+    "N",
     "Q",
     # NOTE: We would prefer to set a different target version instead
     #       but there's no per-file-target-version
@@ -180,13 +207,50 @@ allowed-confusables = ["×"]
 "tests/**/*.py" = [
     "B018",
     "C4",
+    "D",
+    "E301",
+    "E302",
+    "E303",
+    "E304",
+    "E305",
+    "E306",
+    "F841",
     "FLY002",
+    "I002",
+    "ISC",
+    "N",
     "Q",
+    "PERF",
     "PGH",
+    "PIE",
     "PYI",
     "RUF",
+    "SIM",
     "UP",
 ]
+
+[tool.ruff.lint.isort]
+required-imports = ["from __future__ import annotations"]
+
+[tool.ruff.lint.pep8-naming]
+extend-ignore-names = [
+    "afterFlowable",
+    "HSTORE",
+    "sortKey",
+    "URL",
+    "UUID"
+]
+classmethod-decorators = [
+    # NOTE: We can potentially get rid some of these with SQLAlchemy 2.0
+    #       since they should cleanly combine with classmethod
+    "declared_attr",
+    "expression",
+    "comparator",
+]
+
+[tool.ruff.lint.pydocstyle]
+convention = "pep257"
+ignore-decorators = ["typing.overload"]
 
 [tool.ruff.lint.flake8-quotes]
 avoid-escape = true
@@ -196,6 +260,9 @@ multiline-quotes = "double"
 
 [tool.ruff.lint.pyupgrade]
 keep-runtime-typing = true
+
+[tool.ruff.lint.ruff]
+extend-markup-names = ["chameleon.utils.Markup"]
 
 [tool.ruff.format]
 quote-style = "single"

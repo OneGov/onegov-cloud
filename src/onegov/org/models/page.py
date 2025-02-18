@@ -1,4 +1,7 @@
+from __future__ import annotations
+
 from datetime import datetime
+from onegov.core.collection import Pagination
 from onegov.core.orm.mixins import (
     content_property, dict_markup_property, dict_property, meta_property)
 from onegov.form import Form, move_fields
@@ -6,9 +9,10 @@ from onegov.org import _
 from onegov.org.forms import LinkForm, PageForm, IframeForm
 from onegov.org.models.atoz import AtoZ
 from onegov.org.models.extensions import (
-    InheritableContactExtension, ContactHiddenOnPageExtension,
+    ContactExtension, ContactHiddenOnPageExtension,
     PeopleShownOnMainPageExtension, ImageExtension,
-    NewsletterExtension, PublicationExtension, DeletableContentExtension
+    NewsletterExtension, PublicationExtension, DeletableContentExtension,
+    InlinePhotoAlbumExtension, SidebarContactLinkExtension
 )
 from onegov.org.models.extensions import AccessExtension
 from onegov.org.models.extensions import CoordinatesExtension
@@ -19,6 +23,7 @@ from onegov.org.models.extensions import SidebarLinksExtension
 from onegov.org.models.traitinfo import TraitInfo
 from onegov.org.observer import observes
 from onegov.page import Page
+from onegov.page.collection import AdjacencyListCollection, PageCollection
 from onegov.search import SearchableContent
 from sedate import replace_timezone
 from sqlalchemy import desc, func, or_, and_
@@ -30,14 +35,16 @@ from typing import Any, TYPE_CHECKING
 if TYPE_CHECKING:
     from onegov.org.request import OrgRequest, PageMeta
     from sqlalchemy.orm import Query, Session
+    from typing import Self
 
 
 class Topic(Page, TraitInfo, SearchableContent, AccessExtension,
             PublicationExtension, VisibleOnHomepageExtension,
-            InheritableContactExtension, ContactHiddenOnPageExtension,
+            ContactExtension, ContactHiddenOnPageExtension,
             PeopleShownOnMainPageExtension, PersonLinkExtension,
             CoordinatesExtension, ImageExtension,
-            GeneralFileLinkExtension, SidebarLinksExtension):
+            GeneralFileLinkExtension, SidebarLinksExtension,
+            SidebarContactLinkExtension, InlinePhotoAlbumExtension):
 
     __mapper_args__ = {'polymorphic_identity': 'topic'}
 
@@ -75,7 +82,7 @@ class Topic(Page, TraitInfo, SearchableContent, AccessExtension,
         return True
 
     @property
-    def paste_target(self) -> 'Topic | News':
+    def paste_target(self) -> Topic | News:
         if self.trait == 'link':
             return self.parent or self  # type:ignore[return-value]
 
@@ -104,7 +111,7 @@ class Topic(Page, TraitInfo, SearchableContent, AccessExtension,
         self,
         trait: str,
         action: str,
-        request: 'OrgRequest'
+        request: OrgRequest
     ) -> type[LinkForm | PageForm | IframeForm]:
 
         if trait == 'link':
@@ -136,10 +143,10 @@ class Topic(Page, TraitInfo, SearchableContent, AccessExtension,
 
 class News(Page, TraitInfo, SearchableContent, NewsletterExtension,
            AccessExtension, PublicationExtension, VisibleOnHomepageExtension,
-           InheritableContactExtension, ContactHiddenOnPageExtension,
+           ContactExtension, ContactHiddenOnPageExtension,
            PeopleShownOnMainPageExtension, PersonLinkExtension,
            CoordinatesExtension, ImageExtension, GeneralFileLinkExtension,
-           DeletableContentExtension):
+           DeletableContentExtension, InlinePhotoAlbumExtension):
 
     __mapper_args__ = {'polymorphic_identity': 'news'}
 
@@ -180,7 +187,7 @@ class News(Page, TraitInfo, SearchableContent, NewsletterExtension,
         return self.parent_id is not None
 
     @property
-    def paste_target(self) -> 'Topic | News':
+    def paste_target(self) -> Topic | News:
         if self.parent:
             return self.parent  # type:ignore[return-value]
         else:
@@ -197,10 +204,10 @@ class News(Page, TraitInfo, SearchableContent, NewsletterExtension,
     def is_supported_trait(self, trait: str) -> bool:
         return trait in {'news'}
 
-    def get_root_page_form_class(self, request: 'OrgRequest') -> type[Form]:
+    def get_root_page_form_class(self, request: OrgRequest) -> type[Form]:
         return self.with_content_extensions(
             Form, request, extensions=(
-                InheritableContactExtension, ContactHiddenOnPageExtension,
+                ContactExtension, ContactHiddenOnPageExtension,
                 PersonLinkExtension, AccessExtension
             )
         )
@@ -209,7 +216,7 @@ class News(Page, TraitInfo, SearchableContent, NewsletterExtension,
         self,
         trait: str,
         action: str,
-        request: 'OrgRequest'
+        request: OrgRequest
     ) -> type[Form | PageForm]:
 
         if trait == 'news':
@@ -238,7 +245,7 @@ class News(Page, TraitInfo, SearchableContent, NewsletterExtension,
 
         raise NotImplementedError
 
-    def for_year(self, year: int) -> 'News':
+    def for_year(self, year: int) -> News:
         years_ = set(self.filter_years)
         years = list(years_ - {year} if year in years_ else years_ | {year})
         return News(  # type:ignore[misc]
@@ -249,7 +256,7 @@ class News(Page, TraitInfo, SearchableContent, NewsletterExtension,
             filter_tags=sorted(self.filter_tags)
         )
 
-    def for_tag(self, tag: str) -> 'News':
+    def for_tag(self, tag: str) -> News:
         tags_ = set(self.filter_tags)
         tags = list(tags_ - {tag} if tag in tags_ else tags_ | {tag})
         return News(  # type:ignore[misc]
@@ -263,11 +270,11 @@ class News(Page, TraitInfo, SearchableContent, NewsletterExtension,
     @classmethod
     def news_query_for(
         cls,
-        self: 'News | PageMeta',
+        self: News | PageMeta,
         limit: int | None = 2,
         published_only: bool = True,
-        session: 'Session | None' = None,
-    ) -> 'Query[News]':
+        session: Session | None = None,
+    ) -> Query[News]:
 
         if session is None:
             session = object_session(self)
@@ -320,7 +327,7 @@ class News(Page, TraitInfo, SearchableContent, NewsletterExtension,
         self,
         limit: int | None = 2,
         published_only: bool = True
-    ) -> 'Query[News]':
+    ) -> Query[News]:
 
         return self.news_query_for(self, limit, published_only)
 
@@ -342,6 +349,108 @@ class News(Page, TraitInfo, SearchableContent, NewsletterExtension,
         for hashtags, in query:
             all_hashtags.update(hashtags)
         return sorted(all_hashtags)
+
+
+class TopicCollection(Pagination[Topic], AdjacencyListCollection[Topic]):
+    """
+    Use it like this:
+
+        from onegov.page import TopicCollection
+        topics = TopicCollection(session)
+    """
+
+    __listclass__ = Topic
+
+    def __init__(
+        self,
+        session: Session,
+        page: int = 0,
+        only_public: bool = False,
+    ):
+        self.session = session
+        self.page = page
+        self.only_public = only_public
+
+    def subset(self) -> Query[Topic]:
+        topics = self.session.query(Topic)
+        if self.only_public:
+            topics = topics.filter(or_(
+                Topic.meta['access'].astext == 'public',
+                Topic.meta['access'].astext == None
+            ))
+
+        topics = topics.filter(
+            News.publication_started == True,
+            News.publication_ended == False
+        )
+
+        topics = topics.order_by(desc(Topic.published_or_created))
+        topics = topics.options(undefer('created'))
+        topics = topics.options(undefer('content'))
+        return topics
+
+    @property
+    def page_index(self) -> int:
+        return self.page
+
+    def page_by_index(self, index: int) -> Self:
+        return self.__class__(
+            self.session,
+            page=index
+        )
+
+
+class NewsCollection(Pagination[News], AdjacencyListCollection[News]):
+    """
+    Use it like this:
+
+        from onegov.page import NewsCollection
+        news = NewsCollection(session)
+    """
+
+    __listclass__ = News
+
+    def __init__(
+        self,
+        session: Session,
+        page: int = 0,
+        only_public: bool = False,
+    ):
+        self.session = session
+        self.page = page
+        self.only_public = only_public
+
+    def subset(self) -> Query[News]:
+        parent = PageCollection(self.session).by_path(
+            '/news/', ensure_type='news')
+        news = self.session.query(News)
+
+        if self.only_public:
+            news = news.filter(or_(
+                News.meta['access'].astext == 'public',
+                News.meta['access'].astext == None
+            ))
+
+        if parent:
+            news = news.filter(Page.parent_id == parent.id)
+        news = news.filter(
+            News.publication_started == True,
+            News.publication_ended == False
+        )
+        news = news.order_by(desc(News.published_or_created))
+        news = news.options(undefer('created'))
+        news = news.options(undefer('content'))
+        return news
+
+    @property
+    def page_index(self) -> int:
+        return self.page
+
+    def page_by_index(self, index: int) -> Self:
+        return self.__class__(
+            self.session,
+            page=index
+        )
 
 
 class AtoZPages(AtoZ[Topic]):

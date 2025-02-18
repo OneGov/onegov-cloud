@@ -1,4 +1,5 @@
-import re
+from __future__ import annotations
+
 from html import escape
 from onegov.form import errors
 from onegov.form.core import FieldDependency
@@ -104,18 +105,9 @@ def parse_form(
     return form_class
 
 
-def normalize_label_for_dependency(label: str) -> str:
-    """ Removes all between '(' and ')' Parentheses (inclusive) """
-    if '(' in label and ')' in label:
-        label = re.sub('([(]).*?([)])', '', label)
-        return label[:-1] if label[-1] == ' ' else label
-    else:
-        return label
-
-
 def handle_field(
-    builder: 'WTFormsClassBuilder[Any]',
-    field: 'ParsedField',
+    builder: WTFormsClassBuilder[Any],
+    field: ParsedField,
     dependency: FieldDependency | None = None
 ) -> None:
     """ Takes the given parsed field and adds it to the form. """
@@ -376,8 +368,7 @@ def handle_field(
         for choice in field.choices:
             if not choice.fields:
                 continue
-            normalized_label = normalize_label_for_dependency(choice.label)
-            dependency = FieldDependency(field.id, normalized_label)
+            dependency = FieldDependency(field.id, choice.key)
             for choice_field in choice.fields:
                 handle_field(builder, choice_field, dependency)
 
@@ -409,7 +400,7 @@ class WTFormsClassBuilder(Generic[_FormT]):
 
     def validators_extend(
         self,
-        validators: list['Validator[Any, Any]'],
+        validators: list[Validator[Any, Any]],
         required: bool,
         dependency: FieldDependency | None
     ) -> None:
@@ -423,7 +414,7 @@ class WTFormsClassBuilder(Generic[_FormT]):
 
     def validators_add_required(
         self,
-        validators: list['Validator[Any, Any]']
+        validators: list[Validator[Any, Any]]
     ) -> None:
         # we use the DataRequired check instead of InputRequired, since
         # InputRequired only works if the data comes over the wire. We
@@ -435,7 +426,7 @@ class WTFormsClassBuilder(Generic[_FormT]):
 
     def validators_add_dependency(
         self,
-        validators: list['Validator[Any, Any]'],
+        validators: list[Validator[Any, Any]],
         dependency: FieldDependency
     ) -> None:
         # if the dependency is not fulfilled, the field may be empty
@@ -451,7 +442,7 @@ class WTFormsClassBuilder(Generic[_FormT]):
 
     def validators_add_optional(
         self,
-        validators: list['Validator[Any, Any]']
+        validators: list[Validator[Any, Any]]
     ) -> None:
         validators.insert(0, StrictOptional())
 
@@ -488,19 +479,19 @@ class WTFormsClassBuilder(Generic[_FormT]):
 
     def add_field(
         self,
-        field_class: type['WTField'],
+        field_class: type[WTField],
         field_id: str,
         label: str,
         required: bool,
         dependency: FieldDependency | None = None,
-        pricing: 'PricingRules | None' = None,
-        validators: list['Validator[Any, Any]'] | None = None,
+        pricing: PricingRules | None = None,
+        validators: list[Validator[Any, Any]] | None = None,
         description: str | None = None,
-        widget: 'Widget[Any] | None' = None,
+        widget: Widget[Any] | None = None,
         render_kw: dict[str, Any] | None = None,
         # for field classes that have more than just the base arguments
         **extra_field_kwargs: Any
-    ) -> 'WTField':
+    ) -> WTField:
         validators = validators or []
 
         if hasattr(self.form_class, field_id):

@@ -158,7 +158,7 @@ def test_newsletter_signup(client):
     assert confirm.split('/confirm')[0] == unsubscribe.split('/unsubscribe')[0]
 
     # unsubscribing before the opt-in does nothing, no emails are sent
-    assert "erfolgreich abgemeldet" in client.get(unsubscribe).follow()
+    assert "vom Newsletter abgemeldet" in client.get(unsubscribe).follow()
 
     # try an illegal token first
     illegal_confirm = confirm.split('/confirm')[0] + 'x/confirm'
@@ -175,7 +175,7 @@ def test_newsletter_signup(client):
     # unsubscribing does not result in an e-mail either
     illegal_unsub = unsubscribe.split('/unsubscribe')[0] + 'x/unsubscribe'
     assert "falsches Token" in client.get(illegal_unsub).follow()
-    assert "erfolgreich abgemeldet" in client.get(unsubscribe).follow()
+    assert "vom Newsletter abgemeldet" in client.get(unsubscribe).follow()
 
     # no e-mail is sent when unsubscribing
     assert len(os.listdir(client.app.maildir)) == 1
@@ -298,6 +298,39 @@ def test_newsletter_rfc8058(client):
     assert len(os.listdir(client.app.maildir)) == 2
 
 
+def test_newsletter_subscribers_and_edit_bar(client):
+    client.login_admin()
+    page = client.get('/newsletter-settings')
+    page.form['show_newsletter'] = True
+    page.form.submit().follow()
+    client.logout()
+
+    admin = client.spawn()
+    admin.login_admin()
+    editor = client.spawn()
+    editor.login_editor()
+
+    # only managers can see the subscribers and edit bar
+    for current_client in (admin, editor):
+        assert current_client.get('/subscribers').status_code == 200
+        page = current_client.get('/newsletters')
+        assert 'Abonnenten' in page
+        assert page.pyquery('a.manage-subscribers')
+        assert page.pyquery('a.new-newsletter')
+
+    member = client.spawn()
+    member.login_member()
+    anom = client.spawn()
+
+    for current_client in (member, anom):
+        assert current_client.get(
+            '/subscribers', expect_errors=True).status_code == 403
+        page = current_client.get('/newsletters')
+        assert 'Abonnenten' not in page
+        assert not page.pyquery('a.manage-subscribers')
+        assert not page.pyquery('a.new-newsletter')
+
+
 def test_newsletter_subscribers_management(client):
 
     client.login_admin()
@@ -324,7 +357,7 @@ def test_newsletter_subscribers_management(client):
 
     unsubscribe = subscribers.pyquery('a[ic-get-from]').attr('ic-get-from')
     result = client.get(unsubscribe).follow()
-    assert "info@example.org wurde erfolgreich abgemeldet" in result
+    assert "info@example.org erfolgreich vom Newsletter abgemeldet" in result
 
 
 def test_newsletter_subscribers_management_by_manager(client):
@@ -347,7 +380,7 @@ def test_newsletter_subscribers_management_by_manager(client):
 
         unsubscribe = subscribers.pyquery('a[ic-get-from]').attr('ic-get-from')
         result = client.get(unsubscribe).follow()
-        assert "info@govikon.org wurde erfolgreich abgemeldet" in result
+        assert "info@govikon.org erfolgreich vom Newsletter" in result
 
     client.login_admin()
     subscribe_by_manager(client)
@@ -356,6 +389,36 @@ def test_newsletter_subscribers_management_by_manager(client):
     client.login_editor()
     subscribe_by_manager(client)
     client.logout()
+
+
+def test_newsletter_creation_limited_to_logged_in_users(client):
+    # verify adding a new newsletter view is set to private
+
+    # enable the newsletter
+    client.login_admin()
+    page = client.get('/newsletter-settings')
+    page.form['show_newsletter'] = True
+    page.form['newsletter_categories'] = ''
+    page.form.submit().follow()
+
+    admin = client.spawn()
+    admin.login_admin()
+    editor = client.spawn()
+    editor.login_editor()
+
+    for current_client in (admin, editor):
+        page = current_client.get('/newsletters/new')
+        assert 'Neuer Newsletter' in page
+        assert page.status_code == 200
+
+    # member and anonymous users can't create newsletters
+    anom = client.spawn()
+    member = client.spawn()
+    member.login_member()
+
+    for current_client in (member, anom):
+        assert current_client.get(
+            '/newsletters/new', expect_errors=True).status_code == 403
 
 
 def test_newsletter_send(client):

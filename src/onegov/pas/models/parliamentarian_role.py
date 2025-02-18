@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 from onegov.core.orm import Base
 from onegov.core.orm.mixins import TimestampMixin
 from onegov.core.orm.types import UUID
@@ -44,7 +46,7 @@ if TYPE_CHECKING:
         'president',
     ]
 
-PARLIAMENTARIAN_ROLES: dict['Role', str] = {
+PARLIAMENTARIAN_ROLES: dict[Role, str] = {
     'none': _('none'),
     'member': _('Member'),
     'vote_counter': _('Vote counter'),
@@ -52,7 +54,7 @@ PARLIAMENTARIAN_ROLES: dict['Role', str] = {
     'president': _('President'),
 }
 
-PARTY_ROLES: dict['PartyRole', str] = {
+PARTY_ROLES: dict[PartyRole, str] = {
     'none': _('none'),
     'member': _('Member'),
     'media_manager': _('Media Manager'),
@@ -61,7 +63,7 @@ PARTY_ROLES: dict['PartyRole', str] = {
     'president': _('President'),
 }
 
-PARLIAMENTARY_GROUP_ROLES: dict['PartyRole', str] = {
+PARLIAMENTARY_GROUP_ROLES: dict[PartyRole, str] = {
     'none': _('none'),
     'member': _('Member'),
     'vote_counter': _('Vote counter'),
@@ -75,39 +77,39 @@ class ParliamentarianRole(Base, TimestampMixin):
     __tablename__ = 'pas_parliamentarian_roles'
 
     #: Internal ID
-    id: 'Column[uuid.UUID]' = Column(
+    id: Column[uuid.UUID] = Column(
         UUID,  # type:ignore[arg-type]
         primary_key=True,
         default=uuid4
     )
 
     #: The start date
-    start: 'Column[date|None]' = Column(
+    start: Column[date | None] = Column(
         Date,
         nullable=True
     )
 
     #: The end date
-    end: 'Column[date|None]' = Column(
+    end: Column[date | None] = Column(
         Date,
         nullable=True
     )
 
     #: The id of the parliamentarian
-    parliamentarian_id: 'Column[uuid.UUID]' = Column(
+    parliamentarian_id: Column[uuid.UUID] = Column(
         UUID,  # type:ignore[arg-type]
         ForeignKey('pas_parliamentarians.id'),
         nullable=False
     )
 
     #: The parliamentarian
-    parliamentarian: 'relationship[Parliamentarian]' = relationship(
+    parliamentarian: relationship[Parliamentarian] = relationship(
         Parliamentarian,
         back_populates='roles'
     )
 
     #: The role value
-    role: 'Column[Role]' = Column(
+    role: Column[Role] = Column(
         Enum(
             *PARLIAMENTARIAN_ROLES.keys(),  # type:ignore[arg-type]
             name='pas_pariliamentarian_role'
@@ -122,20 +124,20 @@ class ParliamentarianRole(Base, TimestampMixin):
         return PARLIAMENTARIAN_ROLES.get(self.role, '')
 
     #: The id of the party
-    party_id: 'Column[uuid.UUID|None]' = Column(
+    party_id: Column[uuid.UUID | None] = Column(
         UUID,  # type:ignore[arg-type]
         ForeignKey('pas_parties.id'),
         nullable=True
     )
 
     #: The party
-    party: 'relationship[Party|None]' = relationship(
+    party: relationship[Party | None] = relationship(
         Party,
         back_populates='roles'
     )
 
     #: The party role value
-    party_role: 'Column[PartyRole]' = Column(
+    party_role: Column[PartyRole] = Column(
         Enum(
             *PARTY_ROLES.keys(),  # type:ignore[arg-type]
             name='pas_party_role'
@@ -150,21 +152,21 @@ class ParliamentarianRole(Base, TimestampMixin):
         return PARTY_ROLES.get(self.party_role, '')
 
     #: The id of the parliamentary group
-    parliamentary_group_id: 'Column[uuid.UUID|None]' = Column(
+    parliamentary_group_id: Column[uuid.UUID | None] = Column(
         UUID,  # type:ignore[arg-type]
         ForeignKey('pas_parliamentary_groups.id'),
         nullable=True
     )
 
     #: The parliamentary group
-    parliamentary_group: 'relationship[ParliamentaryGroup|None]'
+    parliamentary_group: relationship[ParliamentaryGroup | None]
     parliamentary_group = relationship(
         ParliamentaryGroup,
         back_populates='roles'
     )
 
     #: The parliamentary group role value
-    parliamentary_group_role: 'Column[ParliamentaryGroupRole]' = Column(
+    parliamentary_group_role: Column[ParliamentaryGroupRole] = Column(
         Enum(
             *PARLIAMENTARY_GROUP_ROLES.keys(),  # type:ignore[arg-type]
             name='pas_parliamentary_group_role'
@@ -179,13 +181,19 @@ class ParliamentarianRole(Base, TimestampMixin):
         return PARLIAMENTARY_GROUP_ROLES.get(self.parliamentary_group_role, '')
 
     #: The district
-    district: 'Column[str|None]' = Column(
+    district: Column[str | None] = Column(
         Text,
         nullable=True
     )
 
     #: Additional information
-    additional_information: 'Column[str|None]' = Column(
+    additional_information: Column[str | None] = Column(
         Text,
         nullable=True
     )
+
+    def __repr__(self) -> str:
+        return (
+            f'<ParliamentarianRole {self.parliamentarian.first_name} '
+            f'{self.party}'
+        )

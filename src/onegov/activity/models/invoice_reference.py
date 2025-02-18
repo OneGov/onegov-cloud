@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 import re
 import secrets
 import string
@@ -20,7 +22,7 @@ if TYPE_CHECKING:
     from .invoice import Invoice
 
 
-KNOWN_SCHEMAS: dict[str, type['Schema']] = {}
+KNOWN_SCHEMAS: dict[str, type[Schema]] = {}
 
 INVALID_REFERENCE_CHARS_EX = re.compile(r'[^Q0-9A-F]+')
 REFERENCE_EX = re.compile(r'Q{1}[A-F0-9]{10}')
@@ -57,25 +59,25 @@ class InvoiceReference(Base, TimestampMixin):
     __tablename__ = 'invoice_references'
 
     #: the unique reference
-    reference: 'Column[str]' = Column(Text, primary_key=True)
+    reference: Column[str] = Column(Text, primary_key=True)
 
     #: the referenced invoice
-    invoice_id: 'Column[uuid.UUID]' = Column(
+    invoice_id: Column[uuid.UUID] = Column(
         UUID,  # type:ignore[arg-type]
         ForeignKey('invoices.id'),
         nullable=False
     )
-    invoice: 'relationship[Invoice]' = relationship(
+    invoice: relationship[Invoice] = relationship(
         'Invoice',
         back_populates='references'
     )
 
     #: the schema used to generate the invoice
-    schema: 'Column[str]' = Column(Text, nullable=False)
+    schema: Column[str] = Column(Text, nullable=False)
 
     #: groups schema name and its config to identify records created by a
     #: given schema and config
-    bucket: 'Column[str]' = Column(Text, nullable=False)
+    bucket: Column[str] = Column(Text, nullable=False)
 
     __table_args__ = (
         UniqueConstraint(
@@ -149,8 +151,8 @@ class Schema:
 
     def link(
         self,
-        session: 'Session',
-        invoice: 'Invoice',
+        session: Session,
+        invoice: Invoice,
         optimistic: bool = False,
         flush: bool = True
     ) -> InvoiceReference | None:
@@ -184,7 +186,7 @@ class Schema:
                 return None
 
         # find an unused reference
-        for i in range(0, 10):
+        for i in range(10):
             candidate = self.new()
 
             if q is not None:
@@ -282,7 +284,7 @@ class ESRSchema(Schema, name='esr-v1'):
     """
 
     def new(self) -> str:
-        number = ''.join(secrets.choice(string.digits) for _ in range(0, 26))
+        number = ''.join(secrets.choice(string.digits) for _ in range(26))
         return number + self.checksum(number)
 
     def checksum(self, number: str) -> str:
@@ -332,7 +334,7 @@ class RaiffeisenSchema(ESRSchema, name='raiffeisen-v1'):
         assert 3 <= len(ident) <= 7
 
         rest = 26 - len(ident)
-        random = ''.join(secrets.choice(string.digits) for _ in range(0, rest))
+        random = ''.join(secrets.choice(string.digits) for _ in range(rest))
         number = f'{self.esr_identification_number}{random}'
 
         return number + self.checksum(number)

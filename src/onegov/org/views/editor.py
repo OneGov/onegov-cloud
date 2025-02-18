@@ -1,4 +1,5 @@
 """ Implements the adding/editing/removing of pages. """
+from __future__ import annotations
 
 import morepath
 from webob.exc import HTTPForbidden, HTTPNotFound
@@ -26,8 +27,8 @@ if TYPE_CHECKING:
 
 def get_form_class(
     editor: Editor,
-    request: 'OrgRequest'
-) -> type['Form']:
+    request: OrgRequest
+) -> type[Form]:
 
     src = Clipboard.from_session(request).get_object()
 
@@ -52,11 +53,11 @@ def get_form_class(
              form=get_form_class)
 def handle_page_form(
     self: Editor,
-    request: 'OrgRequest',
-    form: 'Form',
+    request: OrgRequest,
+    form: Form,
     # FIXME: This is really bad, they should all use the same layout
     layout: EditorLayout | PageLayout | None = None
-) -> 'RenderData | Response':
+) -> RenderData | Response:
     if self.action == 'new':
         return handle_new_page(self, request, form, layout=layout)
     if self.action == 'new-root':
@@ -80,11 +81,11 @@ def handle_page_form(
 
 def handle_new_page(
     self: Editor,
-    request: 'OrgRequest',
-    form: 'Form',
+    request: OrgRequest,
+    form: Form,
     src: object | None = None,
     layout: EditorLayout | PageLayout | None = None
-) -> 'RenderData | Response':
+) -> RenderData | Response:
     assert self.page is not None
     page = cast('Topic | News', self.page)
     site_title = page.trait_messages[self.trait]['new_page_title']
@@ -125,10 +126,10 @@ def handle_new_page(
 
 def handle_new_root_page(
     self: Editor,
-    request: 'OrgRequest',
-    form: 'Form',
+    request: OrgRequest,
+    form: Form,
     layout: EditorLayout | PageLayout | None = None
-) -> 'RenderData | Response':
+) -> RenderData | Response:
     site_title = _('New Topic')
 
     if layout:
@@ -167,10 +168,10 @@ def handle_new_root_page(
 
 def handle_edit_page(
     self: Editor,
-    request: 'OrgRequest',
-    form: 'Form',
+    request: OrgRequest,
+    form: Form,
     layout: EditorLayout | PageLayout | None = None
-) -> 'RenderData | Response':
+) -> RenderData | Response:
     assert self.page is not None
     site_title = self.page.trait_messages[self.trait]['edit_page_title']
 
@@ -181,9 +182,10 @@ def handle_edit_page(
 
     if self.page.deletable and self.page.trait == 'link':
         edit_links = self.page.get_edit_links(request)
-        layout.editbar_links = list(filter(
+        links = layout.editmode_links + list(filter(
             lambda link: getattr(link, 'text', '') == _('Delete'), edit_links
         ))
+        layout.editmode_links = links
 
     if form.submitted(request):
         form.populate_obj(self.page)
@@ -203,10 +205,10 @@ def handle_edit_page(
 
 def handle_move_page(
     self: Editor,
-    request: 'OrgRequest',
-    form: 'Form',
+    request: OrgRequest,
+    form: Form,
     layout: EditorLayout | PageLayout | None = None
-) -> 'RenderData | Response':
+) -> RenderData | Response:
 
     assert self.page is not None
     layout = layout or PageLayout(self.page, request)
@@ -230,10 +232,10 @@ def handle_move_page(
 
 def handle_change_page_url(
     self: Editor,
-    request: 'OrgRequest',
-    form: 'Form',
+    request: OrgRequest,
+    form: Form,
     layout: EditorLayout | PageLayout | None = None
-) -> 'RenderData | Response':
+) -> RenderData | Response:
 
     if not request.is_admin:
         return HTTPForbidden()
@@ -243,7 +245,7 @@ def handle_change_page_url(
 
     subpage_count = 0
 
-    def count_page(page: 'Page') -> None:
+    def count_page(page: Page) -> None:
         nonlocal subpage_count
         subpage_count += 1
         for child in page.children:
@@ -275,7 +277,7 @@ def handle_change_page_url(
             request.success(_('Your changes were saved'))
 
             @request.after
-            def must_revalidate(response: 'Response') -> None:
+            def must_revalidate(response: Response) -> None:
                 response.headers.add('cache-control', 'must-revalidate')
                 response.headers.add('cache-control', 'max-age=0, public')
                 response.headers['expires'] = '0'
@@ -307,9 +309,9 @@ def handle_change_page_url(
 )
 def view_topics_sort(
     self: Editor,
-    request: 'OrgRequest',
+    request: OrgRequest,
     layout: EditorLayout | None = None
-) -> 'RenderData':
+) -> RenderData:
 
     if self.page is None:
         raise HTTPNotFound()

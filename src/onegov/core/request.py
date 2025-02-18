@@ -1,4 +1,7 @@
+from __future__ import annotations
+
 import morepath
+import ua_parser
 
 from datetime import timedelta
 from functools import cached_property
@@ -17,7 +20,6 @@ from morepath.authentication import NO_IDENTITY
 from morepath.request import SAME_APP
 from onegov.core import utils
 from onegov.core.crypto import random_token
-from ua_parser import user_agent_parser  # type:ignore[import-untyped]
 from webob.exc import HTTPForbidden
 from wtforms.csrf.session import SessionCSRF
 
@@ -58,7 +60,7 @@ if TYPE_CHECKING:
         @property
         def username(self) -> str | Column[str]: ...
         @property
-        def group_id(self) -> UUID | None | Column[UUID | None]: ...
+        def group_id(self) -> UUID | Column[UUID | None] | None: ...
         @property
         def role(self) -> str | Column[str]: ...
 
@@ -71,7 +73,7 @@ _F = TypeVar('_F', bound='Form')
 
 class Message(NamedTuple):
     text: str
-    type: 'MessageType'
+    type: MessageType
 
 
 class ReturnToMixin(_BaseRequest):
@@ -124,7 +126,7 @@ class ReturnToMixin(_BaseRequest):
     def return_here(self, url: str) -> str:
         return self.return_to(url, self.url)
 
-    def redirect(self, url: str) -> 'Response':
+    def redirect(self, url: str) -> Response:
         if 'return-to' in self.GET:
             try:
                 url = self.redirect_signer.loads(self.GET['return-to'])
@@ -134,7 +136,7 @@ class ReturnToMixin(_BaseRequest):
         return morepath.redirect(url)
 
 
-def is_logged_in(identity: 'Identity | NoIdentity') -> 'TypeGuard[Identity]':
+def is_logged_in(identity: Identity | NoIdentity) -> TypeGuard[Identity]:
     return identity is not NO_IDENTITY
 
 
@@ -147,19 +149,19 @@ class CoreRequest(IncludeRequest, ContentSecurityRequest, ReturnToMixin):
 
     """
 
-    app: 'Framework'
+    app: Framework
 
     @cached_property
     def identity_secret(self) -> str:
         return self.app.identity_secret
 
     @cached_property
-    def session(self) -> 'Session':
+    def session(self) -> Session:
         return self.app.session()
 
     def link_prefix(
         self,
-        app: 'Framework | None' = None  # type:ignore[override]
+        app: Framework | None = None  # type:ignore[override]
     ) -> str:
         """ Override the `link_prefix` with the application base path provided
         by onegov.server, because the default link_prefix contains the
@@ -241,8 +243,8 @@ class CoreRequest(IncludeRequest, ContentSecurityRequest, ReturnToMixin):
         obj: None,
         name: str = ...,
         default: None = ...,
-        app: 'Framework | Sentinel' = ...,
-        query_params: 'SupportsItems[str, str] | None' = ...,
+        app: Framework | Sentinel = ...,
+        query_params: SupportsItems[str, str] | None = ...,
         fragment: str | None = ...,
     ) -> None: ...
 
@@ -252,8 +254,8 @@ class CoreRequest(IncludeRequest, ContentSecurityRequest, ReturnToMixin):
         obj: None,
         name: str,
         default: _T,
-        app: 'Framework | Sentinel' = ...,
-        query_params: 'SupportsItems[str, str] | None' = ...,
+        app: Framework | Sentinel = ...,
+        query_params: SupportsItems[str, str] | None = ...,
         fragment: str | None = ...,
     ) -> _T: ...
 
@@ -263,8 +265,8 @@ class CoreRequest(IncludeRequest, ContentSecurityRequest, ReturnToMixin):
         obj: object,
         name: str = ...,
         default: Any = ...,
-        app: 'Framework | Sentinel' = ...,
-        query_params: 'SupportsItems[str, str] | None' = ...,
+        app: Framework | Sentinel = ...,
+        query_params: SupportsItems[str, str] | None = ...,
         fragment: str | None = ...,
     ) -> str: ...
 
@@ -273,8 +275,8 @@ class CoreRequest(IncludeRequest, ContentSecurityRequest, ReturnToMixin):
         obj: object,
         name: str = '',
         default: _T | None = None,
-        app: 'Framework | Sentinel' = SAME_APP,
-        query_params: 'SupportsItems[str, str] | None' = None,
+        app: Framework | Sentinel = SAME_APP,
+        query_params: SupportsItems[str, str] | None = None,
         fragment: str | None = None,
     ) -> str | _T | None:
         """ Extends the default link generating function of Morepath. """
@@ -293,7 +295,7 @@ class CoreRequest(IncludeRequest, ContentSecurityRequest, ReturnToMixin):
         model: type[Any],
         variables: dict[str, Any] | None = None,
         name: str = '',
-        app: 'Framework | Sentinel' = SAME_APP,  # type:ignore[override]
+        app: Framework | Sentinel = SAME_APP,  # type:ignore[override]
     ) -> str:
         """ Extends the default class link generating function of Morepath. """
         return self.transform(super().class_link(
@@ -348,8 +350,20 @@ class CoreRequest(IncludeRequest, ContentSecurityRequest, ReturnToMixin):
 
         return self.link(self.app.modules.theme.ThemeFile(filename))
 
+    def get_session_nonce(self) -> str:
+        """ Returns a nonce that can be passed as a POST parameter
+        to restore a session in a context where the session cookie
+        is unavailable, due to `SameSite=Lax`.
+        """
+        nonce = random_token()
+        self.app.cache.set(
+            nonce,
+            self.app.sign(self.browser_session._token, nonce),
+        )
+        return self.app.sign(nonce)
+
     @cached_property
-    def browser_session(self) -> 'BrowserSession':
+    def browser_session(self) -> BrowserSession:
         """ Returns a browser_session bound to the request. Works via cookies,
         so requests without cookies won't be able to use the browser_session.
 
@@ -375,10 +389,21 @@ class CoreRequest(IncludeRequest, ContentSecurityRequest, ReturnToMixin):
                 #       infinite CSRF errors
                 del self.cookies['session_id']
                 session_id = random_token()
+
+        elif isinstance(signed_nonce := self.POST.get('session_nonce'), str):
+            nonce = self.app.unsign(signed_nonce)
+            session_id = random_token()
+            if nonce:
+                # restore the session in a non SameSite context
+                signed_session_id = self.app.cache.get(nonce)
+                if signed_session_id:
+                    # make sure this nonce can't be reused
+                    self.app.cache.delete(nonce)
+                    session_id = self.app.unsign(signed_session_id, nonce)
         else:
             session_id = random_token()
 
-        def on_dirty(session: 'BrowserSession', token: str) -> None:
+        def on_dirty(session: BrowserSession, token: str) -> None:
 
             if 'session_id' in self.cookies:
                 return
@@ -386,7 +411,7 @@ class CoreRequest(IncludeRequest, ContentSecurityRequest, ReturnToMixin):
             self.cookies['session_id'] = self.app.sign(token)
 
             @self.after
-            def store_session(response: 'morepath.Response') -> None:
+            def store_session(response: morepath.Response) -> None:
                 response.set_cookie(
                     'session_id',
                     self.cookies['session_id'],
@@ -408,7 +433,7 @@ class CoreRequest(IncludeRequest, ContentSecurityRequest, ReturnToMixin):
         csrf_support: bool = True,
         data: dict[str, Any] | None = None,
         model: object = None,
-        formdata: 'MultiDict[str, str | _FieldStorageWithFile] | None' = None
+        formdata: MultiDict[str, str | _FieldStorageWithFile] | None = None
     ) -> _F:
         """ Returns an instance of the given form class, set up with the
         correct translator and with CSRF protection enabled (the latter
@@ -458,7 +483,7 @@ class CoreRequest(IncludeRequest, ContentSecurityRequest, ReturnToMixin):
         return form
 
     @overload
-    def translate(self, text: 'Markup | TranslationMarkup') -> 'Markup': ...
+    def translate(self, text: Markup | TranslationMarkup) -> Markup: ...
     @overload
     def translate(self, text: str) -> str: ...
 
@@ -477,7 +502,7 @@ class CoreRequest(IncludeRequest, ContentSecurityRequest, ReturnToMixin):
         return self.translator(text)
 
     @cached_property
-    def translator(self) -> 'Callable[[str], str]':
+    def translator(self) -> Callable[[str], str]:
         """ Returns the translate function for basic string translations. """
         translator = self.get_translate()
 
@@ -512,19 +537,19 @@ class CoreRequest(IncludeRequest, ContentSecurityRequest, ReturnToMixin):
     @overload
     def get_translate(
         self,
-        for_chameleon: 'Literal[False]' = False
-    ) -> 'GNUTranslations | None': ...
+        for_chameleon: Literal[False] = False
+    ) -> GNUTranslations | None: ...
 
     @overload
     def get_translate(
         self,
-        for_chameleon: 'Literal[True]'
-    ) -> '_ChameleonTranslate | None': ...
+        for_chameleon: Literal[True]
+    ) -> _ChameleonTranslate | None: ...
 
     def get_translate(
         self,
         for_chameleon: bool = False
-    ) -> 'GNUTranslations | _ChameleonTranslate | None':
+    ) -> GNUTranslations | _ChameleonTranslate | None:
         """ Returns the translate method to the given request, or None
         if no such method is availabe.
 
@@ -546,7 +571,7 @@ class CoreRequest(IncludeRequest, ContentSecurityRequest, ReturnToMixin):
         else:
             return self.app.translations.get(locale)
 
-    def message(self, text: str, type: 'MessageType') -> None:
+    def message(self, text: str, type: MessageType) -> None:
         """ Adds a message with the given type to the messages list. This
         messages list may then be displayed by an application building on
         onegov.core.
@@ -576,7 +601,7 @@ class CoreRequest(IncludeRequest, ContentSecurityRequest, ReturnToMixin):
                 Message(text, type)
             ]
 
-    def consume_messages(self) -> 'Iterator[Message]':
+    def consume_messages(self) -> Iterator[Message]:
         """ Returns the messages, removing them from the session in the
         process. Call only if you can be reasonably sure that the user
         will see the messages.
@@ -605,18 +630,16 @@ class CoreRequest(IncludeRequest, ContentSecurityRequest, ReturnToMixin):
         """ Returns True if the current request is logged in at all. """
         return self.identity is not NO_IDENTITY
 
-    # FIXME: ua_parser will add types in a future version, we should
-    #        fix this return type then.
     @cached_property
-    def agent(self) -> Any:
+    def agent(self) -> ua_parser.DefaultedResult:
         """ Returns the user agent, parsed by ua-parser. """
-        return user_agent_parser.Parse(self.user_agent or '')
+        return ua_parser.parse(self.user_agent or '').with_defaults()
 
     def has_permission(
         self,
         model: object,
-        permission: type['Intent'] | None,
-        user: 'UserLike | None' = None
+        permission: type[Intent] | None,
+        user: UserLike | None = None
     ) -> bool:
         """ Returns True if the current or given user has the given permission
         on the given model.
@@ -656,7 +679,7 @@ class CoreRequest(IncludeRequest, ContentSecurityRequest, ReturnToMixin):
         permission = self.app.permission_by_view(obj, view_name)
         return self.has_permission(obj, permission)
 
-    def exclude_invisible(self, models: 'Iterable[_T]') -> list[_T]:
+    def exclude_invisible(self, models: Iterable[_T]) -> list[_T]:
         """ Excludes models invisble to the current user from the list. """
         return [m for m in models if self.is_visible(m)]
 
@@ -821,7 +844,7 @@ class CoreRequest(IncludeRequest, ContentSecurityRequest, ReturnToMixin):
             return None
 
     @cached_property
-    def template_loader(self) -> 'TemplateLoader':
+    def template_loader(self) -> TemplateLoader:
         """ Returns the chameleon template loader. """
         registry = self.app.config.template_engine_registry
         return registry._template_loaders['.pt']

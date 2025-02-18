@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 from decimal import Decimal
 from functools import cached_property
 from onegov.activity import Activity, Attendee, Booking, Occasion
@@ -22,14 +24,14 @@ if TYPE_CHECKING:
 
 class FeriennetBoardlet(Boardlet):
 
-    request: 'FeriennetRequest'
+    request: FeriennetRequest
 
     @cached_property
-    def session(self) -> 'Session':
+    def session(self) -> Session:
         return self.request.session
 
     @cached_property
-    def period(self) -> 'PeriodMeta | None':
+    def period(self) -> PeriodMeta | None:
         return self.request.app.active_period
 
     @cached_property
@@ -62,7 +64,7 @@ class PeriodBoardlet(FeriennetBoardlet):
         return 'success'
 
     @property
-    def facts(self) -> 'Iterator[BoardletFact]':
+    def facts(self) -> Iterator[BoardletFact]:
         if not self.period:
             return
 
@@ -104,7 +106,7 @@ class PeriodBoardlet(FeriennetBoardlet):
 class ActivitiesBoardlet(FeriennetBoardlet):
 
     @cached_property
-    def occasions(self) -> 'Query[Occasion]':
+    def occasions(self) -> Query[Occasion]:
         assert self.period is not None
         return self.session.query(Occasion).filter_by(
             period_id=self.period.id).join(
@@ -131,7 +133,7 @@ class ActivitiesBoardlet(FeriennetBoardlet):
             )
         ).filter_by(state='accepted').scalar()
 
-    def occasion_states(self) -> dict['OccasionState', int]:
+    def occasion_states(self) -> dict[OccasionState, int]:
         occasion_states: dict[OccasionState, int] = {
             'overfull': 0,
             'full': 0,
@@ -174,7 +176,7 @@ class ActivitiesBoardlet(FeriennetBoardlet):
         return self.activities_count and 'success' or 'warning'
 
     @property
-    def facts(self) -> 'Iterator[BoardletFact]':
+    def facts(self) -> Iterator[BoardletFact]:
         if not self.period:
             return
 
@@ -247,7 +249,7 @@ class ActivitiesBoardlet(FeriennetBoardlet):
 class BookingsBoardlet(FeriennetBoardlet):
 
     @cached_property
-    def counts(self) -> dict['BookingState | Literal["total"]', int]:
+    def counts(self) -> dict[BookingState | Literal['total'], int]:
         counts: dict[BookingState | Literal['total'], int] = {
             'accepted': 0,
             'blocked': 0,
@@ -300,7 +302,7 @@ class BookingsBoardlet(FeriennetBoardlet):
         return self.counts['total'] and 'success' or 'warning'
 
     @property
-    def facts(self) -> 'Iterator[BoardletFact]':
+    def facts(self) -> Iterator[BoardletFact]:
         if not self.period:
             return
 
@@ -418,7 +420,7 @@ class AttendeesBoardlet(FeriennetBoardlet):
         return self.attendee_counts['total'] and 'success' or 'warning'
 
     @property
-    def facts(self) -> 'Iterator[BoardletFact]':
+    def facts(self) -> Iterator[BoardletFact]:
         if not self.period:
             return
 
@@ -480,7 +482,7 @@ class MatchingBoardlet(FeriennetBoardlet):
         return self.happiness > 75 and 'success' or 'warning'
 
     @property
-    def facts(self) -> 'Iterator[BoardletFact]':
+    def facts(self) -> Iterator[BoardletFact]:
         if not self.period:
             return
 
@@ -536,7 +538,7 @@ class BillingPortlet(FeriennetBoardlet):
         return self.amounts['outstanding'] and 'warning' or 'success'
 
     @property
-    def facts(self) -> 'Iterator[BoardletFact]':
+    def facts(self) -> Iterator[BoardletFact]:
         if not self.period:
             return
 

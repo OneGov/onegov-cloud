@@ -1,8 +1,11 @@
+from __future__ import annotations
+
 import inspect
 import phonenumbers
 import sedate
 
 from cssutils.css import CSSStyleSheet  # type:ignore[import-untyped]
+from datetime import timedelta
 from itertools import zip_longest
 from email_validator import validate_email, EmailNotValidError
 from markupsafe import escape, Markup
@@ -16,7 +19,8 @@ from onegov.file.utils import IMAGE_MIME_TYPES_AND_SVG
 from onegov.form import log, _
 from onegov.form.utils import path_to_filename
 from onegov.form.validators import ValidPhoneNumber
-from onegov.form.widgets import ChosenSelectWidget
+from onegov.form.widgets import ChosenSelectWidget, LinkPanelWidget
+from onegov.form.widgets import DurationInput
 from onegov.form.widgets import HoneyPotWidget
 from onegov.form.widgets import IconWidget
 from onegov.form.widgets import MultiCheckboxWidget
@@ -90,7 +94,7 @@ class TimeField(DefaultTimeField):
     e.g. with the arrow keys on the form.
     """
 
-    def process_formdata(self, valuelist: list['RawFormValue']) -> None:
+    def process_formdata(self, valuelist: list[RawFormValue]) -> None:
         if not valuelist:
             return
 
@@ -98,12 +102,41 @@ class TimeField(DefaultTimeField):
         super().process_formdata(valuelist)
 
 
+# NOTE: For now this is exactly what we use it for: a 5 minute-granularity
+#       input field with an hour and minute component. We can make this
+#       more flexible in the future, if we need it.
+class DurationField(Field):
+
+    widget = DurationInput()
+
+    data: timedelta | None
+
+    def process_formdata(self, valuelist: list[RawFormValue]) -> None:
+        if not (len(valuelist) == 2 and valuelist[0] and valuelist[1]):
+            self.data = None
+            return
+
+        hours, minutes = map(int, valuelist)  # type: ignore[arg-type]
+        if not (0 <= hours <= 24):
+            self.data = None
+            raise ValueError(_('Invalid number of hours'))
+        if not (0 <= minutes <= 60) or (minutes % 5 != 0):
+            self.data = None
+            raise ValueError(_('Invalid number of minutes'))
+
+        if not (hours or minutes):
+            self.data = None
+            return
+
+        self.data = timedelta(hours=hours, minutes=minutes)
+
+
 class TranslatedSelectField(SelectField):
     """ A select field which translates the option labels. """
 
     def iter_choices(
         self
-    ) -> 'Iterator[tuple[Any, str, bool, dict[str, Any]]]':
+    ) -> Iterator[tuple[Any, str, bool, dict[str, Any]]]:
         for choice in super().iter_choices():
             result = list(choice)
             result[1] = self.meta.request.translate(result[1])
@@ -135,18 +168,18 @@ class UploadField(FileField):
         def __init__(
             self,
             label: str | None = None,
-            validators: 'Validators[FormT, Self] | None' = None,
-            filters: 'Sequence[Filter]' = (),
+            validators: Validators[FormT, Self] | None = None,
+            filters: Sequence[Filter] = (),
             description: str = '',
             id: str | None = None,
-            default: 'Sequence[StrictFileDict]' = (),
-            widget: 'Widget[Self] | None' = None,
+            default: Sequence[StrictFileDict] = (),
+            widget: Widget[Self] | None = None,
             render_kw: dict[str, Any] | None = None,
             name: str | None = None,
-            _form: 'BaseForm | None' = None,
+            _form: BaseForm | None = None,
             _prefix: str = '',
-            _translations: '_SupportsGettextAndNgettext | None' = None,
-            _meta: 'DefaultMeta | None' = None,
+            _translations: _SupportsGettextAndNgettext | None = None,
+            _meta: DefaultMeta | None = None,
             # onegov specific kwargs that get popped off
             *,
             fieldset: str | None = None,
@@ -159,7 +192,7 @@ class UploadField(FileField):
     # unfortunately a union of two TypedDict will narrow to the TypedDict
     # with the fewest shared keys, which would always be an empty dictionary
     @property
-    def data(self) -> 'StrictFileDict | FileDict | None':
+    def data(self) -> StrictFileDict | FileDict | None:
         frame = inspect.currentframe()
         assert frame is not None and frame.f_back is not None
         caller = frame.f_back.f_locals.get('self')
@@ -177,7 +210,7 @@ class UploadField(FileField):
         return getattr(self, '_data', None)
 
     @data.setter
-    def data(self, value: 'FileDict') -> None:
+    def data(self, value: FileDict) -> None:
         self._data = value
 
     @property
@@ -186,7 +219,7 @@ class UploadField(FileField):
             return False
         return self.data.get('mimetype') in IMAGE_MIME_TYPES_AND_SVG
 
-    def process_formdata(self, valuelist: list['RawFormValue']) -> None:
+    def process_formdata(self, valuelist: list[RawFormValue]) -> None:
 
         if not valuelist:
             self.data = {}
@@ -223,8 +256,8 @@ class UploadField(FileField):
 
     def process_fieldstorage(
         self,
-        fs: 'RawFormValue'
-    ) -> 'StrictFileDict | FileDict':
+        fs: RawFormValue
+    ) -> StrictFileDict | FileDict:
 
         self.file = getattr(fs, 'file', getattr(fs, 'stream', None))
         self.filename = path_to_filename(getattr(fs, 'filename', None))
@@ -243,13 +276,13 @@ class UploadField(FileField):
 class UploadFileWithORMSupport(UploadField):
     """ Extends the upload field with onegov.file support. """
 
-    file_class: type['File']
+    file_class: type[File]
 
     def __init__(self, *args: Any, **kwargs: Any):
         self.file_class = kwargs.pop('file_class')
         super().__init__(*args, **kwargs)
 
-    def create(self) -> 'File | None':
+    def create(self) -> File | None:
         if not getattr(self, 'file', None):
             return None
 
@@ -278,7 +311,7 @@ class UploadFileWithORMSupport(UploadField):
         else:
             raise NotImplementedError(f'Unknown action: {self.action}')
 
-    def process_data(self, value: 'File | None') -> None:
+    def process_data(self, value: File | None) -> None:
         if value:
             try:
                 size = value.reference.file.content_length
@@ -306,38 +339,38 @@ class UploadMultipleField(UploadMultipleBase, FileField):
     """
 
     widget = UploadMultipleWidget()
-    raw_data: list['RawFormValue']
+    raw_data: list[RawFormValue]
 
     if TYPE_CHECKING:
         _separator: str
 
-        def _add_entry(self, __d: _MultiDictLikeWithGetlist) -> UploadField:
+        def _add_entry(self, d: _MultiDictLikeWithGetlist, /) -> UploadField:
             ...
 
     upload_field_class: type[UploadField] = UploadField
-    upload_widget: 'Widget[UploadField]' = UploadWidget()
+    upload_widget: Widget[UploadField] = UploadWidget()
 
     def __init__(
         self,
         label: str | None = None,
-        validators: 'Validators[FormT, UploadField] | None' = None,
-        filters: 'Sequence[Filter]' = (),
+        validators: Validators[FormT, UploadField] | None = None,
+        filters: Sequence[Filter] = (),
         description: str = '',
         id: str | None = None,
-        default: 'Sequence[FileDict]' = (),
-        widget: 'Widget[Self] | None' = None,
+        default: Sequence[FileDict] = (),
+        widget: Widget[Self] | None = None,
         render_kw: dict[str, Any] | None = None,
         name: str | None = None,
-        upload_widget: 'Widget[UploadField] | None' = None,
-        _form: 'BaseForm | None' = None,
+        upload_widget: Widget[UploadField] | None = None,
+        _form: BaseForm | None = None,
         _prefix: str = '',
-        _translations: '_SupportsGettextAndNgettext | None' = None,
-        _meta: 'DefaultMeta | None' = None,
+        _translations: _SupportsGettextAndNgettext | None = None,
+        _meta: DefaultMeta | None = None,
         # onegov specific kwargs that get popped off
         *,
         fieldset: str | None = None,
-        depends_on: 'Sequence[Any] | None' = None,
-        pricing: 'PricingRules | None' = None,
+        depends_on: Sequence[Any] | None = None,
+        pricing: PricingRules | None = None,
         # if we change the upload_field_class there may be additional
         # parameters that are allowed so we pass them through
         **extra_arguments: Any
@@ -378,9 +411,9 @@ class UploadMultipleField(UploadMultipleBase, FileField):
 
     def process(
         self,
-        formdata: '_MultiDictLikeWithGetlist | None',
+        formdata: _MultiDictLikeWithGetlist | None,
         data: object = unset_value,
-        extra_filters: 'Sequence[Filter] | None' = None
+        extra_filters: Sequence[Filter] | None = None
     ) -> None:
         self.process_errors = []
 
@@ -401,7 +434,7 @@ class UploadMultipleField(UploadMultipleBase, FileField):
 
     def append_entry_from_field_storage(
         self,
-        fs: '_FieldStorageWithFile'
+        fs: _FieldStorageWithFile
     ) -> UploadField:
         # we fake the formdata for the new field
         # we use a werkzeug MultiDict because the WebOb version
@@ -411,7 +444,7 @@ class UploadMultipleField(UploadMultipleBase, FileField):
         formdata.add(name, fs)
         return self._add_entry(formdata)
 
-    def process_formdata(self, valuelist: list['RawFormValue']) -> None:
+    def process_formdata(self, valuelist: list[RawFormValue]) -> None:
         if not valuelist:
             return
 
@@ -425,14 +458,14 @@ class UploadMultipleField(UploadMultipleBase, FileField):
 
 
 class _DummyFile:
-    file: 'File | None'
+    file: File | None
 
 
 class UploadMultipleFilesWithORMSupport(UploadMultipleField):
     """ Extends the upload multiple field with onegov.file support. """
 
-    file_class: type['File']
-    added_files: list['File']
+    file_class: type[File]
+    added_files: list[File]
     upload_field_class = UploadFileWithORMSupport
 
     def __init__(self, *args: Any, **kwargs: Any):
@@ -453,7 +486,8 @@ class UploadMultipleFilesWithORMSupport(UploadMultipleField):
             dummy = _DummyFile()
             dummy.file = file
             field.populate_obj(dummy, 'file')
-            if dummy.file is not None:
+            # avoid generating multiple links to the same file
+            if dummy.file is not None and dummy.file not in output:
                 output.append(dummy.file)
                 if (
                     dummy.file is not file
@@ -493,7 +527,7 @@ class HtmlField(TextAreaField):
 
         super().__init__(*args, **kwargs)
 
-    def pre_validate(self, form: 'BaseForm') -> None:
+    def pre_validate(self, form: BaseForm) -> None:
         self.data = sanitize_html(self.data)
 
 
@@ -502,7 +536,7 @@ class CssField(TextAreaField):
 
     def post_validate(
         self,
-        form: 'BaseForm',
+        form: BaseForm,
         validation_stopped: bool
     ) -> None:
         if self.data:
@@ -521,10 +555,10 @@ class MarkupField(TextAreaField):
 
     data: Markup | None
 
-    def process_formdata(self, valuelist: list['RawFormValue']) -> None:
+    def process_formdata(self, valuelist: list[RawFormValue]) -> None:
         if valuelist:
             assert isinstance(valuelist[0], str)
-            self.data = Markup(valuelist[0])  # noqa: MS001
+            self.data = Markup(valuelist[0])  # nosec: B704
         else:
             self.data = None
 
@@ -547,7 +581,7 @@ class TagsField(StringField):
     #        passed in by the form or the object?! This seems like a bug
     data: str | list[str]  # type:ignore[assignment]
 
-    def process_formdata(self, valuelist: list['RawFormValue']) -> None:
+    def process_formdata(self, valuelist: list[RawFormValue]) -> None:
         if not valuelist:
             self.data = []
             return
@@ -613,7 +647,7 @@ class ChosenSelectMultipleEmailField(SelectMultipleField):
 
     widget = ChosenSelectWidget(multiple=True)
 
-    def pre_validate(self, form: 'BaseForm') -> None:
+    def pre_validate(self, form: BaseForm) -> None:
         super().pre_validate(form)
         if not self.data:
             return
@@ -626,9 +660,9 @@ class ChosenSelectMultipleEmailField(SelectMultipleField):
 
 class PreviewField(Field):
 
-    fields: 'Sequence[str]'
-    events: 'Sequence[str]'
-    url: 'Callable[[DefaultMeta], str | None] | str | None'
+    fields: Sequence[str]
+    events: Sequence[str]
+    url: Callable[[DefaultMeta], str | None] | str | None
     display: str
 
     widget = PreviewWidget()
@@ -636,9 +670,9 @@ class PreviewField(Field):
     def __init__(
         self,
         *args: Any,
-        fields: 'Sequence[str]' = (),
-        url: 'Callable[[DefaultMeta], str | None] | str | None' = None,
-        events: 'Sequence[str]' = (),
+        fields: Sequence[str] = (),
+        url: Callable[[DefaultMeta], str | None] | str | None = None,
+        events: Sequence[str] = (),
         display: str = 'inline',
         **kwargs: Any
     ):
@@ -675,6 +709,11 @@ class PanelField(Field):
         pass
 
 
+class URLPanelField(PanelField):
+
+    widget = LinkPanelWidget()
+
+
 class DateTimeLocalField(DateTimeLocalFieldBase):
     """ A custom implementation of the DateTimeLocalField to fix issues with
     the format and the datetimepicker plugin.
@@ -684,7 +723,7 @@ class DateTimeLocalField(DateTimeLocalFieldBase):
     def __init__(
         self,
         label: str | None = None,
-        validators: 'Validators[FormT, Self] | None' = None,
+        validators: Validators[FormT, Self] | None = None,
         format: str = '%Y-%m-%dT%H:%M',
         **kwargs: Any
     ):
@@ -695,7 +734,7 @@ class DateTimeLocalField(DateTimeLocalFieldBase):
             **kwargs
         )
 
-    def process_formdata(self, valuelist: list['RawFormValue']) -> None:
+    def process_formdata(self, valuelist: list[RawFormValue]) -> None:
         if valuelist:
             date_str = 'T'.join(valuelist).replace(' ', 'T')  # type:ignore
             valuelist = [date_str[:16]]
@@ -710,20 +749,20 @@ class TimezoneDateTimeField(DateTimeLocalField):
 
     """
 
-    data: 'datetime | None'
+    data: datetime | None
 
     def __init__(self, *args: Any, timezone: str, **kwargs: Any):
         self.timezone = timezone
         super().__init__(*args, **kwargs)
 
-    def process_data(self, value: 'datetime | None') -> None:
+    def process_data(self, value: datetime | None) -> None:
         if value:
             value = sedate.to_timezone(value, self.timezone)
             value.replace(tzinfo=None)
 
         super().process_data(value)
 
-    def process_formdata(self, valuelist: list['RawFormValue']) -> None:
+    def process_formdata(self, valuelist: list[RawFormValue]) -> None:
         super().process_formdata(valuelist)
 
         if self.data:
@@ -757,7 +796,7 @@ class HoneyPotField(StringField):
 
     def post_validate(
         self,
-        form: 'Form',  # type:ignore[override]
+        form: Form,  # type:ignore[override]
         validation_stopped: bool
     ) -> None:
         if self.data:
@@ -789,7 +828,7 @@ class ColorField(StringField):
     def process_data(self, value: object) -> None:
         self.data = self.coerce(value)
 
-    def process_formdata(self, valuelist: list['RawFormValue']) -> None:
+    def process_formdata(self, valuelist: list[RawFormValue]) -> None:
         if not valuelist:
             self.data = None
             return
@@ -804,14 +843,14 @@ class TypeAheadField(StringField):
 
     """
 
-    url: 'Callable[[DefaultMeta], str | None] | str | None'
+    url: Callable[[DefaultMeta], str | None] | str | None
 
     widget = TypeAheadInput()
 
     def __init__(
         self,
         *args: Any,
-        url: 'Callable[[DefaultMeta], str | None] | str | None' = None,
+        url: Callable[[DefaultMeta], str | None] | str | None = None,
         **kwargs: Any
     ):
         self.url = url

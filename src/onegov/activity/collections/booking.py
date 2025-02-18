@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 from onegov.activity.models import Booking, Period
 from onegov.core.collection import GenericCollection
 from onegov.activity.matching.utils import unblockable, booking_order
@@ -25,15 +27,15 @@ class BookingCollection(GenericCollection[Booking]):
 
     def __init__(
         self,
-        session: 'Session',
-        period_id: 'UUID | None' = None,
+        session: Session,
+        period_id: UUID | None = None,
         username: str | None = None
     ) -> None:
         super().__init__(session)
         self.period_id = period_id
         self.username = username
 
-    def query(self) -> 'Query[Booking]':
+    def query(self) -> Query[Booking]:
         query = super().query()
 
         if self.username is not None:
@@ -44,10 +46,10 @@ class BookingCollection(GenericCollection[Booking]):
 
         return query.order_by(self.model_class.priority)
 
-    def for_period(self, period: Period) -> 'Self':
+    def for_period(self, period: Period) -> Self:
         return self.__class__(self.session, period.id, self.username)
 
-    def for_username(self, username: str) -> 'Self':
+    def for_username(self, username: str) -> Self:
         return self.__class__(self.session, self.period_id, username)
 
     @property
@@ -56,9 +58,9 @@ class BookingCollection(GenericCollection[Booking]):
 
     def count(
         self,
-        usernames: 'Collection[str] | Literal["*"]' = '*',
-        periods: 'Collection[UUID] | Literal["*"]' = '*',
-        states: 'Collection[str] | Literal["*"]' = '*'
+        usernames: Collection[str] | Literal['*'] = '*',
+        periods: Collection[UUID] | Literal['*'] = '*',
+        states: Collection[str] | Literal['*'] = '*'
     ) -> int:
         """ Returns the number of bookings, optionally filtered by usernames,
         periods and states.
@@ -83,7 +85,7 @@ class BookingCollection(GenericCollection[Booking]):
     def booking_count(
         self,
         username: str,
-        states: 'Collection[str] | Literal["*"]' = '*'
+        states: Collection[str] | Literal['*'] = '*'
     ) -> int:
         """ Returns the number of bookings in the active period. """
 
@@ -97,20 +99,20 @@ class BookingCollection(GenericCollection[Booking]):
             states=states
         )
 
-    def by_user(self, user: 'User') -> 'Query[Booking]':
+    def by_user(self, user: User) -> Query[Booking]:
         return self.query().filter(Booking.username == user.username)
 
-    def by_username(self, username: str) -> 'Query[Booking]':
+    def by_username(self, username: str) -> Query[Booking]:
         return self.query().filter(Booking.username == username)
 
-    def by_occasion(self, occasion: 'Occasion') -> 'Query[Booking]':
+    def by_occasion(self, occasion: Occasion) -> Query[Booking]:
         return self.query().filter(Booking.occasion_id == occasion.id)
 
     def add(  # type:ignore[override]
         self,
-        user: 'User',
-        attendee: 'Attendee',
-        occasion: 'Occasion',
+        user: User,
+        attendee: Attendee,
+        occasion: Occasion,
         priority: int | None = None,
         group_code: str | None = None
     ) -> Booking:
@@ -195,7 +197,7 @@ class BookingCollection(GenericCollection[Booking]):
     def cancel_booking(
         self,
         booking: Booking,
-        score_function: 'ScoreFunction' = booking_order,
+        score_function: ScoreFunction = booking_order,
         cascade: bool = False
     ) -> None:
         """ Cancels the given booking.
@@ -249,9 +251,7 @@ class BookingCollection(GenericCollection[Booking]):
         blocked = {b for b in bookings if b.state == 'blocked'}
         unblocked = set()
 
-        if booking.period.all_inclusive:
-            limit = booking.period.booking_limit
-        elif booking.period.booking_limit:
+        if booking.period.all_inclusive or booking.period.booking_limit:
             limit = booking.period.booking_limit
         else:
             limit = booking.attendee.limit

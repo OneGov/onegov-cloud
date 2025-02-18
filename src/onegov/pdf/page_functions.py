@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 from datetime import date
 from lxml import etree
 from textwrap import shorten
@@ -10,13 +12,11 @@ if TYPE_CHECKING:
     from reportlab.pdfgen.canvas import Canvas
 
 
-def empty_page_fn(canvas: 'Canvas', doc: 'Template') -> None:
+def empty_page_fn(canvas: Canvas, doc: Template) -> None:
     """ An empty header/footer. """
 
-    pass
 
-
-def page_fn_footer(canvas: 'Canvas', doc: 'Template') -> None:
+def page_fn_footer(canvas: Canvas, doc: Template) -> None:
     """ A standard footer including the page numbers on the right and
     optionally a copyright with the author on the left.
 
@@ -37,12 +37,12 @@ def page_fn_footer(canvas: 'Canvas', doc: 'Template') -> None:
     canvas.drawRightString(
         doc.pagesize[0] - doc.rightMargin,
         doc.bottomMargin / 2,
-        f'{canvas.getPageNumber()}'
+        f'{canvas.getPageNumber()}'  # type:ignore[no-untyped-call]
     )
     canvas.restoreState()
 
 
-def page_fn_header(canvas: 'Canvas', doc: 'Template') -> None:
+def page_fn_header(canvas: Canvas, doc: Template) -> None:
     """ A standard header consisting of a title and the creation string. The
     title is automatically wrapped and shortened.
 
@@ -75,7 +75,7 @@ def page_fn_header(canvas: 'Canvas', doc: 'Template') -> None:
     canvas.restoreState()
 
 
-def page_fn_header_logo(canvas: 'Canvas', doc: 'Template') -> None:
+def page_fn_header_logo(canvas: Canvas, doc: Template) -> None:
     """ A standard header consisting of a SVG logo.
 
     The logo is drawn in its original size placed at the bottom on the header,
@@ -111,7 +111,7 @@ def page_fn_header_logo(canvas: 'Canvas', doc: 'Template') -> None:
     canvas.restoreState()
 
 
-def page_fn_header_and_footer(canvas: 'Canvas', doc: 'Template') -> None:
+def page_fn_header_and_footer(canvas: Canvas, doc: Template) -> None:
     """ A standard header and footer.
 
     Example::
@@ -128,7 +128,7 @@ def page_fn_header_and_footer(canvas: 'Canvas', doc: 'Template') -> None:
     page_fn_footer(canvas, doc)
 
 
-def page_fn_header_logo_and_footer(canvas: 'Canvas', doc: 'Template') -> None:
+def page_fn_header_logo_and_footer(canvas: Canvas, doc: Template) -> None:
     """ A standard header logo and footer.
 
     Example::

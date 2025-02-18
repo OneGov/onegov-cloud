@@ -1,4 +1,5 @@
 """ The newsletter view. """
+from __future__ import annotations
 
 import morepath
 
@@ -52,7 +53,7 @@ if TYPE_CHECKING:
 
 def get_newsletter_form(
     model: Newsletter,
-    request: 'OrgRequest'
+    request: OrgRequest
 ) -> type[NewsletterForm]:
     form = NewsletterForm
 
@@ -84,7 +85,7 @@ def get_newsletter_form(
 
 def newsletter_news_by_access(
     newsletter: Newsletter,
-    request: 'OrgRequest',
+    request: OrgRequest,
     access: str = 'public',
 ) -> list[News] | None:
     """
@@ -126,7 +127,7 @@ def newsletter_news_by_access(
 
 def visible_news_by_newsletter(
     newsletter: Newsletter,
-    request: 'OrgRequest',
+    request: OrgRequest,
 ) -> list[News] | None:
     """
     Retrieves a list of news items associated with a specific newsletter
@@ -148,8 +149,8 @@ def visible_news_by_newsletter(
 
 def occurrences_by_newsletter(
     newsletter: Newsletter,
-    request: 'OrgRequest'
-) -> 'Query[Occurrence] | None':
+    request: OrgRequest
+) -> Query[Occurrence] | None:
     occurrence_ids = newsletter.content.get('occurrences')
 
     if not occurrence_ids:
@@ -164,8 +165,8 @@ def occurrences_by_newsletter(
 
 def publications_by_newsletter(
     newsletter: Newsletter,
-    request: 'OrgRequest'
-) -> 'Query[File] | None':
+    request: OrgRequest
+) -> Query[File] | None:
     publication_ids = newsletter.content.get('publications')
 
     if not publication_ids:
@@ -183,15 +184,17 @@ def publications_by_newsletter(
              permission=Public, form=SignupForm)
 def handle_newsletters(
     self: NewsletterCollection,
-    request: 'OrgRequest',
+    request: OrgRequest,
     form: SignupForm,
     layout: NewsletterLayout | None = None,
     mail_layout: DefaultMailLayout | None = None,
     title: str = '',
-) -> 'RenderData | Response':
+    update: bool = False,
+) -> RenderData | Response:
 
     layout = layout or NewsletterLayout(self, request)
     title = title or _('Newsletter')
+    update_link = request.link(self, 'update') if not update else None
 
     if not (request.is_manager or request.app.org.show_newsletter):
         raise HTTPNotFound()
@@ -213,7 +216,6 @@ def handle_newsletters(
             recipient.subscribed_categories = subscribed
             unsubscribe_link = (
                 request.link(recipient.subscription, 'unsubscribe'))
-            update_link = request.link(self, 'update')
 
             title = request.translate(
                 _('Welcome to the ${org} Newsletter', mapping={
@@ -225,13 +227,19 @@ def handle_newsletters(
                 # auto confirm user
                 recipient.confirmed = True
 
-                request.success(_((
-                    'Success! We have added ${address} to the list of '
-                    'recipients. Subscribed categories are ${subscribed}.'
-                ), mapping={
-                    'address': form.address.data,
-                    'subscribed': ', '.join(subscribed)
-                }))
+                if subscribed:
+                    request.success(_((
+                        'Success! We have added ${address} to the list of '
+                        'recipients. Subscribed categories are ${subscribed}.'
+                    ), mapping={
+                        'address': form.address.data,
+                        'subscribed': ', '.join(subscribed)
+                    }))
+                else:
+                    request.success(_(
+                        'Success! We have added ${address} to the list of '
+                        'recipients.', mapping={'address': form.address.data}
+                    ))
             else:
                 # send out confirmation mail
                 confirm_mail = render_template('mail_confirm.pt', request, {
@@ -299,12 +307,16 @@ def handle_newsletters(
         recipients_count = 0
 
     if request.upath_info == '/newsletters/update':
-        pre_form_text = 'Update your newsletter subscription categories:'
-        button_text = 'Update'
+        pre_form_text = request.translate(_(
+            'Update your newsletter subscription categories:'
+        ))
+        button_text = request.translate(_('Update'))
         show_archive = False
     else:
-        pre_form_text = 'Sign up to our newsletter to always stay up to date:'
-        button_text = 'Sign up'
+        pre_form_text = request.translate(_(
+            'Sign up to our newsletter to always stay up to date:'
+        ))
+        button_text = request.translate(_('Sign up'))
         show_archive = True
 
     return {
@@ -317,6 +329,7 @@ def handle_newsletters(
         'pre_form_text': pre_form_text,
         'button_text': button_text,
         'show_archive': show_archive,
+        'update_link': update_link,
     }
 
 
@@ -325,24 +338,24 @@ def handle_newsletters(
              permission=Public, name='update', form=SignupForm)
 def handle_update_newsletters_subscription(
     self: NewsletterCollection,
-    request: 'OrgRequest',
+    request: OrgRequest,
     form: SignupForm,
     layout: NewsletterLayout | None = None,
     mail_layout: DefaultMailLayout | None = None
-) -> 'RenderData | Response':
+) -> RenderData | Response:
 
     title = _('Update Newsletter Subscription')
     return handle_newsletters(
-        self, request, form, layout, mail_layout, title=title
+        self, request, form, layout, mail_layout, title=title, update=True
     )
 
 
 @OrgApp.html(model=Newsletter, template='newsletter.pt', permission=Public)
 def view_newsletter(
     self: Newsletter,
-    request: 'OrgRequest',
+    request: OrgRequest,
     layout: NewsletterLayout | None = None
-) -> 'RenderData':
+) -> RenderData:
     # link to file and thumbnail by id
     def link(f: File, name: str = '') -> str:
         return request.class_link(File, {'id': f.id}, name=name)
@@ -377,9 +390,9 @@ def view_newsletter(
              permission=Private)
 def view_subscribers(
     self: RecipientCollection,
-    request: 'OrgRequest',
+    request: OrgRequest,
     layout: RecipientLayout | None = None
-) -> 'RenderData':
+) -> RenderData:
     # i18n:attributes translations do not support variables, so we need
     # to do this ourselves
     warning = request.translate(_('Do you really want to unsubscribe "{}"?'))
@@ -396,19 +409,19 @@ def view_subscribers(
         'layout': layout or RecipientLayout(self, request),
         'title': _('Subscribers'),
         'by_letter': by_letter,
-        'count': len(by_letter),
+        'count': recipients.count(),
         'warning': warning,
     }
 
 
 @OrgApp.form(model=NewsletterCollection, name='new', template='form.pt',
-             permission=Public, form=get_newsletter_form)
+             permission=Private, form=get_newsletter_form)
 def handle_new_newsletter(
     self: NewsletterCollection,
-    request: 'OrgRequest',
+    request: OrgRequest,
     form: NewsletterForm,
     layout: NewsletterLayout | None = None
-) -> 'RenderData | Response':
+) -> RenderData | Response:
     if form.submitted(request):
         assert form.title.data is not None
         try:
@@ -436,10 +449,10 @@ def handle_new_newsletter(
              permission=Private, form=get_newsletter_form)
 def edit_newsletter(
     self: Newsletter,
-    request: 'OrgRequest',
+    request: OrgRequest,
     form: NewsletterForm,
     layout: NewsletterLayout | None = None
-) -> 'RenderData | Response':
+) -> RenderData | Response:
     if form.submitted(request):
         form.update_model(self, request)
 
@@ -461,7 +474,7 @@ def edit_newsletter(
 
 
 @OrgApp.view(model=Newsletter, request_method='DELETE', permission=Private)
-def delete_newsletter(self: Newsletter, request: 'OrgRequest') -> None:
+def delete_newsletter(self: Newsletter, request: OrgRequest) -> None:
     request.assert_valid_csrf_token()
 
     NewsletterCollection(request.session).delete(self)
@@ -469,9 +482,9 @@ def delete_newsletter(self: Newsletter, request: 'OrgRequest') -> None:
 
 
 def send_newsletter(
-    request: 'OrgRequest',
+    request: OrgRequest,
     newsletter: Newsletter,
-    recipients: 'Iterable[Recipient]',
+    recipients: Iterable[Recipient],
     is_test: bool = False,
     layout: DefaultMailLayout | None = None
 ) -> int:
@@ -501,7 +514,7 @@ def send_newsletter(
 
     # We use a generator function to submit the email batch since that is
     # significantly more memory efficient for large batches.
-    def email_iter() -> 'Iterator[EmailJsonDict]':
+    def email_iter() -> Iterator[EmailJsonDict]:
         nonlocal count
         for recipient in recipients:
             if not request.app.org.newsletter_categories:
@@ -551,16 +564,16 @@ def send_newsletter(
              permission=Private, form=NewsletterSendForm)
 def handle_send_newsletter(
     self: Newsletter,
-    request: 'OrgRequest',
+    request: OrgRequest,
     form: NewsletterSendForm,
     layout: NewsletterLayout | None = None
-) -> 'RenderData | Response':
+) -> RenderData | Response:
     layout = layout or NewsletterLayout(self, request)
 
     open_recipients = self.open_recipients
 
     if form.submitted(request):
-        if form.categories.data == []:
+        if form.categories and form.categories.data == []:
             # for backward compatibility select all categories if none has
             # been selected
             extracted = extract_categories_and_subcategories(
@@ -569,7 +582,8 @@ def handle_send_newsletter(
             self.newsletter_categories = (
                 extracted) if isinstance(extracted, list) else []
         else:
-            self.newsletter_categories = form.categories.data or []
+            self.newsletter_categories = (
+                form.categories.data) if form.categories else []
 
         if form.send.data == 'now':
             sent = send_newsletter(request, self, open_recipients)
@@ -614,10 +628,10 @@ def handle_send_newsletter(
              permission=Private, form=NewsletterTestForm)
 def handle_test_newsletter(
     self: Newsletter,
-    request: 'OrgRequest',
+    request: OrgRequest,
     form: NewsletterTestForm,
     layout: NewsletterLayout | None = None
-) -> 'RenderData | Response':
+) -> RenderData | Response:
     layout = layout or NewsletterLayout(self, request)
 
     if form.submitted(request):
@@ -644,9 +658,9 @@ def handle_test_newsletter(
              template='mail_newsletter.pt', name='preview', permission=Private)
 def handle_preview_newsletter(
     self: Newsletter,
-    request: 'OrgRequest',
+    request: OrgRequest,
     layout: DefaultMailLayout | None = None
-) -> 'RenderData':
+) -> RenderData:
     layout = layout or DefaultMailLayout(self, request)
     if request.app.org.secret_content_allowed:
         news = newsletter_news_by_access(self, request, access='secret')
@@ -675,10 +689,10 @@ def handle_preview_newsletter(
 )
 def export_newsletter_recipients(
     self: RecipientCollection,
-    request: 'OrgRequest',
+    request: OrgRequest,
     form: ExportForm,
     layout: RecipientLayout | None = None
-) -> 'RenderData | Response':
+) -> RenderData | Response:
     layout = layout or RecipientLayout(self, request)
     layout.breadcrumbs.append(Link(_('Export'), '#'))
     layout.editbar_links = None
@@ -709,39 +723,35 @@ def export_newsletter_recipients(
 )
 def import_newsletter_recipients(
     self: RecipientCollection,
-    request: 'OrgRequest',
+    request: OrgRequest,
     form: NewsletterSubscriberImportExportForm,
     layout: RecipientLayout | None = None
-) -> 'RenderData | Response':
+) -> RenderData | Response:
     layout = layout or RecipientLayout(self, request)
     layout.breadcrumbs.append(Link(_('Import'), '#'))
     layout.editbar_links = None
-
     if form.submitted(request):
-        count, errors = form.run_import()
-        if errors:
+        _unused, results = form.run_import()
+
+        if len(results) > 1:  # There were errors
             request.alert(
-                _(
-                    'The following line(s) contain invalid data: ${lines}',
-                    mapping={'lines': ', '.join(errors)},
-                )
+                _('Import completed with errors: ${results}',
+                  mapping={'results': ', '.join(results)})
             )
         elif form.dry_run.data:
             request.success(
-                _(
-                    '${count} newsletter subscribers will be imported',
-                    mapping={'count': count},
-                )
+                _('Import preview: ${result}', mapping={'result': results[0]})
             )
         else:
             request.success(
                 _(
-                    '${count} newsletter subscribers imported',
-                    mapping={'count': count},
+                    'Import completed: ${result}',
+                    mapping={
+                        'result': results[0]
+                    },
                 )
             )
             return morepath.redirect(request.link(self))
-
     return {
         'layout': layout,
         'callout': _(

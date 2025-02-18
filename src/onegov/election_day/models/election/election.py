@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 from onegov.core.orm import Base, observes
 from onegov.core.orm import translation_hybrid
 from onegov.core.orm.mixins import ContentMixin
@@ -58,14 +60,14 @@ class Election(Base, ContentMixin, LastModifiedMixin,
     __tablename__ = 'elections'
 
     @property
-    def polymorphic_base(self) -> type['Election']:
+    def polymorphic_base(self) -> type[Election]:
         return Election
 
     #: the type of the item, this can be used to create custom polymorphic
     #: subclasses of this class. See
     #: `<https://docs.sqlalchemy.org/en/improve_toc/\
     #: orm/extensions/declarative/inheritance.html>`_.
-    type: 'Column[str]' = Column(Text, nullable=False)
+    type: Column[str] = Column(Text, nullable=False)
 
     __mapper_args__ = {
         'polymorphic_on': type,
@@ -73,13 +75,13 @@ class Election(Base, ContentMixin, LastModifiedMixin,
     }
 
     #: Identifies the election, may be used in the url
-    id: 'Column[str]' = Column(Text, primary_key=True)
+    id: Column[str] = Column(Text, primary_key=True)
 
     #: external identifier
-    external_id: 'Column[str | None]' = Column(Text, nullable=True)
+    external_id: Column[str | None] = Column(Text, nullable=True)
 
     #: all translations of the title
-    title_translations: 'Column[Mapping[str, str]]' = Column(
+    title_translations: Column[Mapping[str, str]] = Column(
         HSTORE,
         nullable=False
     )
@@ -89,7 +91,7 @@ class Election(Base, ContentMixin, LastModifiedMixin,
     title = translation_hybrid(title_translations)
 
     #: all translations of the short title
-    short_title_translations: 'Column[Mapping[str, str] | None]' = Column(
+    short_title_translations: Column[Mapping[str, str] | None] = Column(
         HSTORE,
         nullable=True
     )
@@ -101,20 +103,20 @@ class Election(Base, ContentMixin, LastModifiedMixin,
     @observes('title_translations', 'short_title_translations')
     def title_observer(
         self,
-        title_translations: 'Mapping[str, str]',
-        short_title_translations: 'Mapping[str, str]'
+        title_translations: Mapping[str, str],
+        short_title_translations: Mapping[str, str]
     ) -> None:
         if not self.id:
             self.id = self.id_from_title(object_session(self))
 
     #: Shortcode for cantons that use it
-    shortcode: 'Column[str | None]' = Column(Text, nullable=True)
+    shortcode: Column[str | None] = Column(Text, nullable=True)
 
     #: The date of the election
-    date: 'Column[datetime.date]' = Column(Date, nullable=False)
+    date: Column[datetime.date] = Column(Date, nullable=False)
 
     #: Number of mandates
-    number_of_mandates: 'Column[int]' = Column(
+    number_of_mandates: Column[int] = Column(
         Integer,
         nullable=False,
         default=lambda: 0
@@ -128,13 +130,13 @@ class Election(Base, ContentMixin, LastModifiedMixin,
         if not self.completed:
             return 0
 
-        return sum([c.elected for c in self.candidates])
+        return sum(c.elected for c in self.candidates)
 
     #: Defines the type of majority (e.g. 'absolute', 'relative')
     majority_type: dict_property[str | None] = meta_property('majority_type')
 
     #: Absolute majority
-    absolute_majority: 'Column[int | None]' = Column(Integer, nullable=True)
+    absolute_majority: Column[int | None] = Column(Integer, nullable=True)
 
     if TYPE_CHECKING:
         counted: Column[bool]
@@ -149,7 +151,7 @@ class Election(Base, ContentMixin, LastModifiedMixin,
         return all(r.counted for r in self.results)
 
     @counted.expression  # type:ignore[no-redef]
-    def counted(cls) -> 'ColumnElement[bool]':
+    def counted(cls) -> ColumnElement[bool]:
         expr = select([
             func.coalesce(func.bool_and(ElectionResult.counted), False)
         ])
@@ -166,7 +168,7 @@ class Election(Base, ContentMixin, LastModifiedMixin,
 
         """
 
-        return sum([r.counted for r in self.results]), len(self.results)
+        return sum(r.counted for r in self.results), len(self.results)
 
     @property
     def counted_entities(self) -> list[str]:
@@ -188,7 +190,7 @@ class Election(Base, ContentMixin, LastModifiedMixin,
         return False
 
     #: An election contains n candidates
-    candidates: 'relationship[list[Candidate]]' = relationship(
+    candidates: relationship[list[Candidate]] = relationship(
         'Candidate',
         cascade='all, delete-orphan',
         back_populates='election',
@@ -196,7 +198,7 @@ class Election(Base, ContentMixin, LastModifiedMixin,
     )
 
     #: An election contains n results, one for each political entity
-    results: 'relationship[list[ElectionResult]]' = relationship(
+    results: relationship[list[ElectionResult]] = relationship(
         'ElectionResult',
         cascade='all, delete-orphan',
         back_populates='election',
@@ -204,7 +206,7 @@ class Election(Base, ContentMixin, LastModifiedMixin,
     )
 
     @property
-    def results_query(self) -> 'Query[ElectionResult]':
+    def results_query(self) -> Query[ElectionResult]:
         session = object_session(self)
         query = session.query(ElectionResult)
         query = query.filter(ElectionResult.election_id == self.id)
@@ -212,7 +214,7 @@ class Election(Base, ContentMixin, LastModifiedMixin,
         return query
 
     #: An election may have related elections
-    related_elections: 'relationship[AppenderQuery[ElectionRelationship]]'
+    related_elections: relationship[AppenderQuery[ElectionRelationship]]
     related_elections = relationship(
         'ElectionRelationship',
         foreign_keys='ElectionRelationship.source_id',
@@ -222,7 +224,7 @@ class Election(Base, ContentMixin, LastModifiedMixin,
     )
 
     #: An election may be related by other elections
-    referencing_elections: 'relationship[AppenderQuery[ElectionRelationship]]'
+    referencing_elections: relationship[AppenderQuery[ElectionRelationship]]
     referencing_elections = relationship(
         'ElectionRelationship',
         foreign_keys='ElectionRelationship.target_id',
@@ -232,14 +234,14 @@ class Election(Base, ContentMixin, LastModifiedMixin,
     )
 
     #: An election may be part of an election compound
-    election_compound_id: 'Column[str | None]' = Column(
+    election_compound_id: Column[str | None] = Column(
         Text,
         ForeignKey('election_compounds.id', onupdate='CASCADE'),
         nullable=True
     )
 
     #: The election compound this election belongs to
-    election_compound: 'relationship[ElectionCompound]' = relationship(
+    election_compound: relationship[ElectionCompound] = relationship(
         'ElectionCompound',
         back_populates='elections'
     )
@@ -287,7 +289,7 @@ class Election(Base, ContentMixin, LastModifiedMixin,
     def aggregate_results_expression(
         cls,
         attribute: str
-    ) -> 'ColumnElement[int]':
+    ) -> ColumnElement[int]:
         """ Gets the sum of the given attribute from the results,
         as SQL expression.
 
@@ -342,7 +344,7 @@ class Election(Base, ContentMixin, LastModifiedMixin,
     )
 
     @property
-    def votes_by_district(self) -> 'Query[VotesByDistrictRow]':
+    def votes_by_district(self) -> Query[VotesByDistrictRow]:
         query = self.results_query.order_by(None)
         results = query.with_entities(
             self.__class__.id.label('election_id'),
@@ -386,13 +388,13 @@ class Election(Base, ContentMixin, LastModifiedMixin,
         session.expire_all()
 
     #: data source items linked to this election
-    data_sources: 'relationship[list[DataSourceItem]]' = relationship(
+    data_sources: relationship[list[DataSourceItem]] = relationship(
         'DataSourceItem',
         back_populates='election'
     )
 
     #: notifcations linked to this election
-    notifications: 'relationship[AppenderQuery[Notification]]'
+    notifications: relationship[AppenderQuery[Notification]]
     notifications = relationship(  # type:ignore[misc]
         'onegov.election_day.models.notification.Notification',
         back_populates='election',
@@ -400,7 +402,7 @@ class Election(Base, ContentMixin, LastModifiedMixin,
     )
 
     #: screens linked to this election
-    screens: 'relationship[AppenderQuery[Screen]]' = relationship(
+    screens: relationship[AppenderQuery[Screen]] = relationship(
         'Screen',
         back_populates='election',
     )

@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 from functools import partial
 
 from onegov.core.security import Private
@@ -26,8 +28,8 @@ if TYPE_CHECKING:
 
 def ticket_by_link(
     tickets: TicketCollection,
-    link: 'AnyPayableBase'
-) -> 'Ticket | None':
+    link: AnyPayableBase
+) -> Ticket | None:
 
     if link.__tablename__ == 'reservations':
         return tickets.by_handler_id(link.token.hex)  # type:ignore
@@ -37,8 +39,8 @@ def ticket_by_link(
 
 
 def provider_title(
-    payment: 'Payment',
-    providers: dict['UUID', 'PaymentProvider[Any]']
+    payment: Payment,
+    providers: dict[UUID, PaymentProvider[Any]]
 ) -> str:
 
     if not payment.provider_id:
@@ -60,10 +62,10 @@ class PaymentsExport(OrgExport):
 
     def query(
         self,
-        session: 'Session',
-        start: 'datetime | None',
-        end: 'datetime | None'
-    ) -> 'Iterator[tuple[Payment, list[AnyPayableBase], Ticket | None, str]]':
+        session: Session,
+        start: datetime | None,
+        end: datetime | None
+    ) -> Iterator[tuple[Payment, list[AnyPayableBase], Ticket | None, str]]:
 
         tickets = TicketCollection(session)
         coll = PaymentCollection(session, start=start, end=end)
@@ -87,10 +89,10 @@ class PaymentsExport(OrgExport):
 
     def rows(
         self,
-        session: 'Session',
-        start: 'datetime | None',
-        end: 'datetime | None'
-    ) -> 'Iterator[Iterator[tuple[str, Any]]]':
+        session: Session,
+        start: datetime | None,
+        end: datetime | None
+    ) -> Iterator[Iterator[tuple[str, Any]]]:
         for item, link, ticket, provider in self.query(session, start, end):
             yield (
                 (k, v) for k, v in self.fields(item, link, ticket, provider)
@@ -98,20 +100,20 @@ class PaymentsExport(OrgExport):
 
     def fields(
         self,
-        item: 'Payment',
-        links: 'Iterable[AnyPayableBase]',
-        ticket: 'Ticket | None',
+        item: Payment,
+        links: Iterable[AnyPayableBase],
+        ticket: Ticket | None,
         provider: str
-    ) -> 'Iterator[tuple[str, Any]]':
+    ) -> Iterator[tuple[str, Any]]:
 
         yield from self.ticket_item_fields(ticket)
         yield from self.payment_items_fields(item, links, provider)
 
     def run(
         self,
-        form: 'Form',
-        session: 'Session'
-    ) -> 'Iterator[Iterator[tuple[str, Any]]]':
+        form: Form,
+        session: Session
+    ) -> Iterator[Iterator[tuple[str, Any]]]:
 
         timezone = DefaultLayout.timezone
         start, end = align_range_to_day(

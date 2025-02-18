@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 from functools import cached_property
 
 from onegov.core.elements import Link, Confirm, Intercooler, LinkGroup
@@ -21,7 +23,7 @@ class CourseEventCollectionLayout(DefaultLayout):
     model: CourseEventCollection
 
     @cached_property
-    def course(self) -> 'Course | None':
+    def course(self) -> Course | None:
         if self.model.course_id is None:
             return None
 
@@ -73,11 +75,11 @@ class CourseEventCollectionLayout(DefaultLayout):
 
         return links
 
-    def subscriptions_link(self, event: 'CourseEvent') -> str:
+    def subscriptions_link(self, event: CourseEvent) -> str:
         return self.request.link(SubscriptionsCollection(
             self.request.session, course_event_id=event.id))
 
-    def audit_link(self, course: 'Course | None') -> str | None:
+    def audit_link(self, course: Course | None) -> str | None:
         if not course:
             return None
         assert self.request.attendee is not None
@@ -90,7 +92,7 @@ class CourseEventCollectionLayout(DefaultLayout):
 
 class CourseEventLayout(DefaultLayout):
 
-    model: 'CourseEvent'
+    model: CourseEvent
 
     @property
     def title(self) -> str:
@@ -199,7 +201,7 @@ class CourseEventLayout(DefaultLayout):
                 _('Placeholder'),
                 self.request.link(
                     self.reservation_collection,
-                    name='add-icon'
+                    name='add-placeholder'
                 ),
                 attrs={'class': 'add-placeholder'}
             )

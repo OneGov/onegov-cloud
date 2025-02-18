@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 from onegov.core.orm import Base
 from onegov.core.orm.mixins import dict_markup_property
 from onegov.core.orm.mixins import ContentMixin
@@ -18,6 +20,7 @@ if TYPE_CHECKING:
 
 
 class ParliamentaryGroup(Base, ContentMixin, TimestampMixin, ORMSearchable):
+    """ Fraktion """
 
     __tablename__ = 'pas_parliamentary_groups'
 
@@ -33,26 +36,26 @@ class ParliamentaryGroup(Base, ContentMixin, TimestampMixin, ORMSearchable):
         return self.name
 
     #: Internal ID
-    id: 'Column[uuid.UUID]' = Column(
+    id: Column[uuid.UUID] = Column(
         UUID,  # type:ignore[arg-type]
         primary_key=True,
         default=uuid4
     )
 
     #: the name
-    name: 'Column[str]' = Column(
+    name: Column[str] = Column(
         Text,
         nullable=False
     )
 
     #: The start date
-    start: 'Column[date|None]' = Column(
+    start: Column[date | None] = Column(
         Date,
         nullable=True
     )
 
     #: The end date
-    end: 'Column[date|None]' = Column(
+    end: Column[date | None] = Column(
         Date,
         nullable=True
     )
@@ -61,9 +64,12 @@ class ParliamentaryGroup(Base, ContentMixin, TimestampMixin, ORMSearchable):
     description = dict_markup_property('content')
 
     #: A parliamentary group may have n role
-    roles: 'relationship[list[ParliamentarianRole]]'
+    roles: relationship[list[ParliamentarianRole]]
     roles = relationship(
         'ParliamentarianRole',
         cascade='all, delete-orphan',
         back_populates='parliamentary_group'
     )
+
+    def __repr__(self) -> str:
+        return f'<ParliamentaryGroup {self.name}>'

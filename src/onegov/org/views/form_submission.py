@@ -1,13 +1,12 @@
 """ Renders and handles defined forms, turning them into submissions. """
+from __future__ import annotations
 
 import morepath
 
 from onegov.core.security import Public, Private
 from onegov.form.collection import SurveyCollection
-from onegov.form.models.submission import (CompleteSurveySubmission,
-                                           PendingSurveySubmission)
+from onegov.form.models.submission import SurveySubmission
 from onegov.org.cli import close_ticket
-from onegov.org.models.organisation import Organisation
 from onegov.ticket import TicketCollection
 from onegov.form import (
     FormCollection,
@@ -21,7 +20,7 @@ from onegov.org.utils import user_group_emails_for_new_ticket
 from onegov.org.models import TicketMessage, SubmissionMessage
 from onegov.pay import PaymentError, Price
 from purl import URL
-from webob.exc import HTTPNotFound
+from webob.exc import HTTPMethodNotAllowed, HTTPNotFound
 
 
 from typing import Literal, TYPE_CHECKING
@@ -34,9 +33,9 @@ if TYPE_CHECKING:
 
 
 def copy_query(
-    request: 'OrgRequest',
+    request: OrgRequest,
     url: str,
-    fields: 'Iterable[str]'
+    fields: Iterable[str]
 ) -> str:
 
     url_obj = URL(url)
@@ -55,9 +54,9 @@ def copy_query(
 
 
 def get_price(
-    request: 'OrgRequest',
-    form: 'Form',
-    submission: 'FormSubmission'
+    request: OrgRequest,
+    form: Form,
+    submission: FormSubmission
 ) -> Price | None:
 
     total = form.total()
@@ -81,9 +80,9 @@ def get_price(
              permission=Private, request_method='POST')
 def handle_pending_submission(
     self: PendingFormSubmission | CompleteFormSubmission,
-    request: 'OrgRequest',
+    request: OrgRequest,
     layout: FormSubmissionLayout | None = None
-) -> 'RenderData | Response':
+) -> RenderData | Response:
     """ Renders a pending submission, takes it's input and allows the
     user to turn the submission into a complete submission, once all data
     is valid.
@@ -152,6 +151,15 @@ def handle_pending_submission(
             )
         )
 
+    # Avoid allowing people to pay for registrations, they no longer
+    # will be able to complete. There's still a small time window
+    # where this can happen, if they're unlucky. But it should be
+    # less likely this way.
+    window = self.registration_window
+    if window and not window.accepts_submissions(self.spots):
+        request.alert(_('Registrations are no longer possible'))
+        completable = False
+
     if completable and 'return-to' in request.GET:
 
         if 'quiet' not in request.GET:
@@ -180,13 +188,13 @@ def handle_pending_submission(
     email = self.email or self.get_email_field_data(form)
     if price:
         assert email is not None
-        assert request.locale is not None
         checkout_button = request.app.checkout_button(
             button_label=request.translate(_('Pay Online and Complete')),
             title=title,
             price=price,
             email=email,
-            locale=request.locale
+            complete_url=request.link(self, 'complete'),
+            request=request
         )
     else:
         checkout_button = None
@@ -205,13 +213,17 @@ def handle_pending_submission(
 
 
 @OrgApp.view(model=PendingFormSubmission, name='complete',
+             permission=Public, request_method='GET')
+@OrgApp.view(model=PendingFormSubmission, name='complete',
              permission=Public, request_method='POST')
+@OrgApp.view(model=CompleteFormSubmission, name='complete',
+             permission=Public, request_method='GET')
 @OrgApp.view(model=CompleteFormSubmission, name='complete',
              permission=Private, request_method='POST')
 def handle_complete_submission(
     self: PendingFormSubmission | CompleteFormSubmission,
-    request: 'OrgRequest'
-) -> 'Response':
+    request: OrgRequest
+) -> Response:
 
     form = request.get_form(self.form_class)
     form.process(data=self.data)
@@ -221,6 +233,17 @@ def handle_complete_submission(
     # button is basically just there so we can use a POST instead of a GET)
     form.validate()
     form.ignore_csrf_error()
+
+    # NOTE: we only allow GET requests for some specific payment providers
+    if request.method == 'GET' and (
+        form.errors
+        or self.state == 'complete'
+        or (provider := request.app.default_payment_provider) is None
+        or not provider.payment_via_get
+    ):
+        # TODO: A redirect back to the previous step with an error might
+        #       be better UX, if this error can occur too easily...
+        raise HTTPMethodNotAllowed()
 
     if form.errors:
         return morepath.redirect(request.link(self))
@@ -236,10 +259,7 @@ def handle_complete_submission(
             ))
         else:
             provider = request.app.default_payment_provider
-            token = request.params.get('payment_token')
-            if not isinstance(token, str):
-                token = None
-
+            token = provider.get_token(request) if provider else None
             price = get_price(request, form, self)
             payment = self.process_payment(price, provider, token)
 
@@ -350,8 +370,8 @@ def handle_complete_submission(
 @OrgApp.view(model=CompleteFormSubmission, name='ticket', permission=Private)
 def view_submission_ticket(
     self: CompleteFormSubmission,
-    request: 'OrgRequest'
-) -> 'Response':
+    request: OrgRequest
+) -> Response:
     ticket = TicketCollection(request.session).by_handler_id(self.id.hex)
     if not ticket:
         raise HTTPNotFound()
@@ -362,8 +382,8 @@ def view_submission_ticket(
              permission=Private, request_method='POST')
 def handle_accept_registration(
     self: CompleteFormSubmission,
-    request: 'OrgRequest'
-) -> 'Response | None':
+    request: OrgRequest
+) -> Response | None:
     return handle_submission_action(self, request, 'confirmed')
 
 
@@ -371,8 +391,8 @@ def handle_accept_registration(
              permission=Private, request_method='POST')
 def handle_deny_registration(
     self: CompleteFormSubmission,
-    request: 'OrgRequest'
-) -> 'Response | None':
+    request: OrgRequest
+) -> Response | None:
     return handle_submission_action(self, request, 'denied')
 
 
@@ -380,20 +400,20 @@ def handle_deny_registration(
              permission=Private, request_method='POST')
 def handle_cancel_registration(
     self: CompleteFormSubmission,
-    request: 'OrgRequest'
-) -> 'Response | None':
+    request: OrgRequest
+) -> Response | None:
     return handle_submission_action(self, request, 'cancelled')
 
 
 def handle_submission_action(
     self: CompleteFormSubmission,
-    request: 'OrgRequest',
+    request: OrgRequest,
     action: Literal['confirmed', 'denied', 'cancelled'],
     ignore_csrf: bool = False,
     raises: bool = False,
     no_messages: bool = False,
     force_email: bool = False
-) -> 'Response | None':
+) -> Response | None:
 
     if not ignore_csrf:
         request.assert_valid_csrf_token()
@@ -468,23 +488,17 @@ def handle_submission_action(
     return request.redirect(request.link(self))
 
 
-@OrgApp.html(model=PendingSurveySubmission,
+@OrgApp.html(model=SurveySubmission,
              template='survey_submission.pt',
              permission=Public, request_method='GET')
-@OrgApp.html(model=PendingSurveySubmission,
+@OrgApp.html(model=SurveySubmission,
              template='survey_submission.pt',
              permission=Public, request_method='POST')
-@OrgApp.html(model=CompleteSurveySubmission,
-             template='survey_submission.pt',
-             permission=Private, request_method='GET')
-@OrgApp.html(model=CompleteSurveySubmission,
-             template='survey_submission.pt',
-             permission=Private, request_method='POST')
-def handle_pending_survey_submission(
-    self: PendingSurveySubmission | CompleteSurveySubmission,
-    request: 'OrgRequest',
+def handle_survey_submission(
+    self: SurveySubmission,
+    request: OrgRequest,
     layout: SurveySubmissionLayout | None = None
-) -> 'RenderData | Response':
+) -> RenderData | Response:
     """ Renders a pending submission, takes it's input and allows the
     user to turn the submission into a complete submission, once all data
     is valid.
@@ -530,7 +544,8 @@ def handle_pending_survey_submission(
     edit_url_obj = edit_url_obj.query_param('edit', '')
     edit_url = edit_url_obj.as_string()
 
-    checkout_button = None
+    layout = layout or SurveySubmissionLayout(self, request, title)
+    layout.editbar_links = []
 
     return {
         'layout': layout or SurveySubmissionLayout(self, request, title),
@@ -541,46 +556,4 @@ def handle_pending_survey_submission(
         'complete_link': request.link(self, 'complete'),
         'model': self,
         'price': None,
-        'checkout_button': checkout_button
     }
-
-
-@OrgApp.view(model=PendingSurveySubmission, name='complete',
-             permission=Public, request_method='POST')
-@OrgApp.view(model=CompleteSurveySubmission, name='complete',
-             permission=Private, request_method='POST')
-def handle_complete_survey_submission(
-    self: PendingSurveySubmission | CompleteSurveySubmission,
-    request: 'OrgRequest'
-) -> 'Response':
-
-    form = request.get_form(self.form_class)
-    form.process(data=self.data)
-    form.model = self
-
-    # we're not really using a csrf protected form here (the complete form
-    # button is basically just there so we can use a POST instead of a GET)
-    form.validate()
-    form.ignore_csrf_error()
-
-    if form.errors:
-        return morepath.redirect(request.link(self))
-    else:
-        if self.state == 'complete':
-            self.data.changed()  # type:ignore[attr-defined]  # trigger updates
-            request.success(_('Your changes were saved'))
-
-            assert self.name is not None
-            return morepath.redirect(request.link(
-                SurveyCollection(request.session).scoped_submissions(
-                    self.name, ensure_existance=False)
-            ))
-        else:
-            collection = SurveyCollection(request.session)
-
-            # Expunges the submission from the session
-            collection.submissions.complete_submission(self)
-
-            request.success(_('Thank you for your submission!'))
-
-            return morepath.redirect(request.class_link(Organisation))

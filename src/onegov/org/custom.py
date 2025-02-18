@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 from onegov.chat import MessageCollection, TextModuleCollection
 from onegov.core.elements import Link, LinkGroup
 from onegov.form.collection import FormCollection, SurveyCollection
@@ -18,18 +20,18 @@ if TYPE_CHECKING:
 
 
 @OrgApp.template_variables()
-def get_template_variables(request: 'OrgRequest') -> dict[str, Any]:
+def get_template_variables(request: OrgRequest) -> dict[str, Any]:
     return {
         'global_tools': tuple(get_global_tools(request))
     }
 
 
-def logout_path(request: 'OrgRequest') -> str:
+def logout_path(request: OrgRequest) -> str:
     url = URL(request.link(request.app.org))
     return url.path() or '/'
 
 
-def get_global_tools(request: 'OrgRequest') -> 'Iterator[Link | LinkGroup]':
+def get_global_tools(request: OrgRequest) -> Iterator[Link | LinkGroup]:
 
     # Authentication / Userprofile
     if request.is_logged_in:

@@ -98,6 +98,8 @@ def test_subscriber_collection_subscribe_email(election_day_app_zg, session):
     assert subscriber.active is False
     assert subscriber.locale == 'de_CH'
     assert subscriber.address == 'hue@the.org'
+    assert subscriber.active_since is None
+    assert subscriber.inactive_since is None
 
     # Initiate again to send the email again
     collection.initiate_subscription('hue@the.org', None, None, request)
@@ -132,6 +134,9 @@ def test_subscriber_collection_subscribe_email(election_day_app_zg, session):
     assert subscriber.active is True
     assert subscriber.locale == 'de_CH'
     assert subscriber.address == 'hue@the.org'
+    assert subscriber.active_since is not None
+    assert subscriber.inactive_since is None
+    activated = subscriber.active_since
 
     # Confirm again
     assert collection.confirm_subscription('hue@the.org', None, None, 'de_CH')
@@ -139,6 +144,9 @@ def test_subscriber_collection_subscribe_email(election_day_app_zg, session):
     assert subscriber.active is True
     assert subscriber.locale == 'de_CH'
     assert subscriber.address == 'hue@the.org'
+    # should still be the same
+    assert subscriber.active_since == activated
+    assert subscriber.inactive_since is None
 
     # Confirm with wrong email
     assert not collection.confirm_subscription('h1e@z.g', None, None, 'de_CH')
@@ -158,24 +166,40 @@ def test_subscriber_collection_subscribe_email(election_day_app_zg, session):
     assert subscriber.active is True
     assert subscriber.locale == 'fr_CH'
     assert subscriber.address == 'hue@the.org'
+    # should still be the same
+    assert subscriber.active_since == activated
+    assert subscriber.inactive_since is None
 
     # Unsubscribe
     collection.initiate_unsubscription('hue@the.org', None, None, request)
     assert mock.call_count == 5
-    assert collection.query().one().active is True
+    subscriber = collection.query().one()
+    assert subscriber.active is True
+    assert subscriber.active_since == activated
+    assert subscriber.inactive_since is None
 
     # Unusbscribe again
     collection.initiate_unsubscription('hue@the.org', None, None, request)
     assert mock.call_count == 6
-    assert collection.query().one().active is True
+    subscriber = collection.query().one()
+    assert subscriber.active is True
+    assert subscriber.active_since == activated
+    assert subscriber.inactive_since is None
 
     # Cofirm unsubscription
     assert collection.confirm_unsubscription('hue@the.org', None, None)
-    assert collection.query().one().active is False
+    subscriber = collection.query().one()
+    assert subscriber.active is False
+    assert subscriber.active_since == activated
+    assert subscriber.inactive_since is not None
+    deactivated = subscriber.inactive_since
 
     # Cofirm unsubscription again
     assert collection.confirm_unsubscription('hue@the.org', None, None)
-    assert collection.query().one().active is False
+    subscriber = collection.query().one()
+    assert subscriber.active is False
+    assert subscriber.active_since == activated
+    assert subscriber.inactive_since == deactivated
 
     # Cofirm unsubscription with wrong email
     assert not collection.confirm_unsubscription('g1@1.org', None, None)
@@ -183,7 +207,10 @@ def test_subscriber_collection_subscribe_email(election_day_app_zg, session):
 
     # Confirm email again to reactivate
     assert collection.confirm_subscription('hue@the.org', None, None, 'de_CH')
-    assert collection.query().one().active is True
+    subscriber = collection.query().one()
+    assert subscriber.active is True
+    assert subscriber.active_since > activated
+    assert subscriber.inactive_since is None
 
     # Additionally subscribe only for a segment
     collection.initiate_subscription('hue@the.org', 'a', 'b', request)
@@ -230,6 +257,9 @@ def test_subscriber_collection_subscribe_sms(election_day_app_zg, session):
     assert subscriber.domain_segment is None
     assert subscriber.locale == 'de_CH'
     assert subscriber.active is True
+    assert subscriber.active_since is not None
+    assert subscriber.inactive_since is None
+    activated = subscriber.active_since
 
     # Subscribe again with different locale
     request.locale = 'fr_CH'
@@ -241,15 +271,31 @@ def test_subscriber_collection_subscribe_sms(election_day_app_zg, session):
     assert subscriber.domain_segment is None
     assert subscriber.locale == 'fr_CH'
     assert subscriber.active is True
+    assert subscriber.active_since == activated
+    assert subscriber.inactive_since is None
 
     # Unsubscribe
     collection.initiate_unsubscription('+41791112233', None, None, request)
-    assert collection.query().one().active is False
+    subscriber = collection.query().one()
+    assert subscriber.active is False
+    assert subscriber.active_since == activated
+    assert subscriber.inactive_since is not None
+    deactivated = subscriber.inactive_since
+
+    # Unsubscribe again
+    collection.initiate_unsubscription('+41791112233', None, None, request)
+    subscriber = collection.query().one()
+    assert subscriber.active is False
+    assert subscriber.active_since == activated
+    assert subscriber.inactive_since == deactivated
 
     # Subscribe again
     collection.initiate_subscription('+41791112233', None, None, request)
     assert mock.call_count == 3
-    assert collection.query().one().active is True
+    subscriber = collection.query().one()
+    assert subscriber.active is True
+    assert subscriber.active_since > activated
+    assert subscriber.inactive_since is None
 
     # Additionally subscribe only for a segment
     collection.initiate_subscription('+41791112233', 'a', 'b', request)
@@ -453,39 +499,51 @@ def test_subscriber_collection_export(session):
     data = emails.export()
     assert sorted(data, key=lambda x: x['address']) == [
         {'active': True, 'address': 'a@example.org', 'domain': None,
-         'domain_segment': None, 'locale': 'de_CH'},
+         'domain_segment': None, 'locale': 'de_CH',
+         'active_since': None, 'inactive_since': None},
         {'active': False, 'address': 'b@example.org', 'domain': 'canton',
-         'domain_segment': None, 'locale': 'de_CH'},
+         'domain_segment': None, 'locale': 'de_CH',
+         'active_since': None, 'inactive_since': None},
         {'active': True, 'address': 'c@example.org', 'domain': 'municipality',
-         'domain_segment': 'Govikon', 'locale': 'fr_CH'},
+         'domain_segment': 'Govikon', 'locale': 'fr_CH',
+         'active_since': None, 'inactive_since': None},
     ]
 
     # Test SMS export
     data = sms.export()
     assert sorted(data, key=lambda x: x['address']) == [
         {'active': True, 'address': '+41791112201', 'domain': None,
-         'domain_segment': None, 'locale': 'de_CH'},
+         'domain_segment': None, 'locale': 'de_CH',
+         'active_since': None, 'inactive_since': None},
         {'active': False, 'address': '+41791112202', 'domain': 'canton',
-         'domain_segment': None, 'locale': 'fr_CH'},
+         'domain_segment': None, 'locale': 'fr_CH',
+         'active_since': None, 'inactive_since': None},
         {'active': True, 'address': '+41791112203', 'domain': 'municipality',
-         'domain_segment': 'Govikon', 'locale': 'fr_CH'},
+         'domain_segment': 'Govikon', 'locale': 'fr_CH',
+         'active_since': None, 'inactive_since': None},
     ]
 
     # Test mixed export
     data = mixed.export()
     assert sorted(data, key=lambda x: x['address']) == [
         {'active': True, 'address': '+41791112201', 'domain': None,
-         'domain_segment': None, 'locale': 'de_CH'},
+         'domain_segment': None, 'locale': 'de_CH',
+         'active_since': None, 'inactive_since': None},
         {'active': False, 'address': '+41791112202', 'domain': 'canton',
-         'domain_segment': None, 'locale': 'fr_CH'},
+         'domain_segment': None, 'locale': 'fr_CH',
+         'active_since': None, 'inactive_since': None},
         {'active': True, 'address': '+41791112203', 'domain': 'municipality',
-         'domain_segment': 'Govikon', 'locale': 'fr_CH'},
+         'domain_segment': 'Govikon', 'locale': 'fr_CH',
+         'active_since': None, 'inactive_since': None},
         {'active': True, 'address': 'a@example.org', 'domain': None,
-         'domain_segment': None, 'locale': 'de_CH'},
+         'domain_segment': None, 'locale': 'de_CH',
+         'active_since': None, 'inactive_since': None},
         {'active': False, 'address': 'b@example.org', 'domain': 'canton',
-         'domain_segment': None, 'locale': 'de_CH'},
+         'domain_segment': None, 'locale': 'de_CH',
+         'active_since': None, 'inactive_since': None},
         {'active': True, 'address': 'c@example.org', 'domain': 'municipality',
-         'domain_segment': 'Govikon', 'locale': 'fr_CH'},
+         'domain_segment': 'Govikon', 'locale': 'fr_CH',
+         'active_since': None, 'inactive_since': None},
     ]
 
 

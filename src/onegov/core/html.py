@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 import re
 
 from bleach.sanitizer import Cleaner
@@ -87,7 +89,7 @@ def sanitize_html(html: str | None) -> Markup:
 
     """
 
-    return Markup(cleaner.clean(html or ''))  # noqa: MS001
+    return Markup(cleaner.clean(html or ''))  # nosec: B704
 
 
 def sanitize_svg(svg: _StrT) -> _StrT:

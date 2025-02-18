@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 from functools import cached_property
 from onegov.chat import Message
 from onegov.core.elements import Link, Confirm, Intercooler
@@ -37,7 +39,7 @@ class TicketMessageMixin:
         def bound_messages(cls, session: Session) -> MessageCollection[Any]:
             ...
 
-    def link(self, request: 'OrgRequest') -> str:
+    def link(self, request: OrgRequest) -> str:
         return request.class_link(Ticket, {
             'id': self.meta['id'],
             'handler_code': self.meta['handler_code'],
@@ -54,11 +56,11 @@ class TicketMessageMixin:
     def create(
         cls,
         ticket: Ticket,
-        request: 'OrgRequest',
+        request: OrgRequest,
         text: str | None = None,
         owner: str | None = None,
         **extra_meta: Any
-    ) -> 'Self':
+    ) -> Self:
 
         meta = {
             'id': ticket.id.hex,
@@ -94,21 +96,21 @@ class TicketNote(Message, TicketMessageMixin):
     def create(  # type:ignore[override]
         cls,
         ticket: Ticket,
-        request: 'OrgRequest',
+        request: OrgRequest,
         text: str,
-        file: 'File | None' = None,
+        file: File | None = None,
         owner: str | None = None
-    ) -> 'Self':
+    ) -> Self:
         note = super().create(ticket, request, text=text, owner=owner)
         note.file = file
 
         return note
 
-    def formatted_text(self, layout: 'DefaultLayout') -> str:
+    def formatted_text(self, layout: DefaultLayout) -> str:
         return hashtag_elements(
             layout.request, paragraphify(linkify(self.text)))
 
-    def links(self, layout: 'DefaultLayout') -> 'Iterator[Link]':
+    def links(self, layout: DefaultLayout) -> Iterator[Link]:
         yield Link(_('Edit'), layout.request.link(self, 'edit'))
         yield Link(
             _('Delete'), layout.csrf_protected_url(layout.request.link(self)),
@@ -151,19 +153,19 @@ class TicketChatMessage(Message, TicketMessageMixin):
     def create(  # type:ignore[override]
         cls,
         ticket: Ticket,
-        request: 'OrgRequest',
+        request: OrgRequest,
         text: str,
         owner: str,
         origin: str,
         notify: bool = False,
         recipient: str | None = None
-    ) -> 'Self':
+    ) -> Self:
 
         return super().create(
             ticket, request, text=text, owner=owner, origin=origin,
             notify=notify, recipient=recipient)
 
-    def formatted_text(self, layout: 'DefaultLayout') -> str:
+    def formatted_text(self, layout: DefaultLayout) -> str:
         return self.text and hashtag_elements(
             layout.request, paragraphify(linkify(self.text))) or ''
 
@@ -182,10 +184,10 @@ class TicketMessage(Message, TicketMessageMixin):
     def create(  # type:ignore[override]
         cls,
         ticket: Ticket,
-        request: 'OrgRequest',
+        request: OrgRequest,
         change: str,
         **extra_meta: Any
-    ) -> 'Self':
+    ) -> Self:
         return super().create(ticket, request, change=change, **extra_meta)
 
 
@@ -198,11 +200,11 @@ class ReservationMessage(Message, TicketMessageMixin):
     @classmethod
     def create(  # type:ignore[override]
         cls,
-        reservations: 'Iterable[Reservation]',
+        reservations: Iterable[Reservation],
         ticket: Ticket,
-        request: 'OrgRequest',
+        request: OrgRequest,
         change: str
-    ) -> 'Self':
+    ) -> Self:
         return super().create(ticket, request, change=change, reservations=[
             r.id for r in reservations
         ])
@@ -218,9 +220,9 @@ class SubmissionMessage(Message, TicketMessageMixin):
     def create(  # type:ignore[override]
         cls,
         ticket: Ticket,
-        request: 'OrgRequest',
+        request: OrgRequest,
         change: str
-    ) -> 'Self':
+    ) -> Self:
         return super().create(ticket, request, change=change)
 
 
@@ -235,13 +237,13 @@ class EventMessage(Message, TicketMessageMixin):
         cls,
         event: Event,
         ticket: Ticket,
-        request: 'OrgRequest',
+        request: OrgRequest,
         change: str
-    ) -> 'Self':
+    ) -> Self:
         return super().create(
             ticket, request, change=change, event_name=event.name)
 
-    def event_link(self, request: 'OrgRequest') -> str:
+    def event_link(self, request: OrgRequest) -> str:
         return request.class_link(Event, {'name': self.meta['event_name']})
 
 
@@ -254,11 +256,11 @@ class PaymentMessage(Message, TicketMessageMixin):
     @classmethod
     def create(  # type:ignore[override]
         cls,
-        payment: 'Payment',
+        payment: Payment,
         ticket: Ticket,
-        request: 'OrgRequest',
+        request: OrgRequest,
         change: str
-    ) -> 'Self':
+    ) -> Self:
         assert payment.amount is not None
         return super().create(
             ticket, request,
@@ -278,11 +280,11 @@ class DirectoryMessage(Message, TicketMessageMixin):
     @classmethod
     def create(  # type:ignore[override]
         cls,
-        directory: 'Directory',
+        directory: Directory,
         ticket: Ticket,
-        request: 'OrgRequest',
+        request: OrgRequest,
         action: str
-    ) -> 'Self':
+    ) -> Self:
         return super().create(
             ticket, request,
             directory_id=directory.id.hex,

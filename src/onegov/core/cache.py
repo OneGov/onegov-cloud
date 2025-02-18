@@ -33,6 +33,7 @@ Currently there is one cache per app that never expires (though values will
 eventually be discarded by redis if the cache is full).
 
 """
+from __future__ import annotations
 
 import dill  # type:ignore[import-untyped]
 
@@ -54,19 +55,19 @@ if TYPE_CHECKING:
 
 
 @overload
-def instance_lru_cache(*, maxsize: int | None = ...) -> 'Callable[[_F], _F]':
+def instance_lru_cache(*, maxsize: int | None = ...) -> Callable[[_F], _F]:
     ...
 
 
 @overload
-def instance_lru_cache(method: '_F', *, maxsize: int | None = ...) -> '_F': ...
+def instance_lru_cache(method: _F, *, maxsize: int | None = ...) -> _F: ...
 
 
 def instance_lru_cache(
-    method: '_F | None' = None,
+    method: _F | None = None,
     *,
     maxsize: int | None = 128
-) -> '_F | Callable[[_F], _F]':
+) -> _F | Callable[[_F], _F]:
     """ Least-recently-used cache decorator for class methods.
 
     The cache follows the lifetime of an object (it is stored on the object,
@@ -79,10 +80,10 @@ def instance_lru_cache(
 
     """
 
-    def decorator(wrapped: '_F') -> '_F':
+    def decorator(wrapped: _F) -> _F:
         def wrapper(self: Any) -> Any:
             return lru_cache(maxsize=maxsize)(
-                update_wrapper(partial(wrapped, self), wrapped)  # type:ignore
+                update_wrapper(partial(wrapped, self), wrapped)
             )
 
         # NOTE: we are doing some oddball stuff here that the type
@@ -100,10 +101,10 @@ def dill_serialize(value: Any) -> bytes:
     return dill.dumps(value, recurse=True)
 
 
-def dill_deserialize(value: 'bytes | NoValue') -> Any:
+def dill_deserialize(value: bytes | NoValue) -> Any:
     if value is NO_VALUE:
         return value
-    return dill.loads(value)
+    return dill.loads(value)  # nosec:B301
 
 
 class RedisCacheRegion(CacheRegion):
@@ -121,6 +122,7 @@ class RedisCacheRegion(CacheRegion):
         redis_url: str,
     ):
         super().__init__(
+            # FIXME: OGC-1893
             serializer=dill_serialize,
             deserializer=dill_deserialize
         )

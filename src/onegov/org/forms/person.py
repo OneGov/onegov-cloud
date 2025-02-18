@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 from onegov.core.utils import ensure_scheme
 from onegov.form import Form
 from onegov.org import _
@@ -32,13 +34,13 @@ class PersonForm(Form):
 
     location_address = TextAreaField(
         label=_('Location address'),
-        render_kw={'rows': 2}
+        render_kw={'rows': 3}
     )
     location_code_city = StringField(label=_('Location Code and City'))
 
     postal_address = TextAreaField(
         label=_('Postal address'),
-        render_kw={'rows': 2}
+        render_kw={'rows': 3}
     )
     postal_code_city = StringField(label=_('Postal Code and City'))
 
@@ -51,5 +53,5 @@ class PersonForm(Form):
     notes = TextAreaField(
         label=_('Notes'),
         description=_('Public extra information about this person'),
-        render_kw={'rows': 5}
+        render_kw={'rows': 6}
     )

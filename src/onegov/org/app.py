@@ -1,4 +1,5 @@
 """ Contains the base application used by other applications. """
+from __future__ import annotations
 
 import re
 import yaml
@@ -194,7 +195,7 @@ class OrgApp(Framework, LibresIntegration, ElasticsearchApp, MapboxApp,
             return PageTemplate('')
 
     @orm_cached(policy='on-table-change:tickets')
-    def ticket_count(self) -> 'TicketCount':
+    def ticket_count(self) -> TicketCount:
         return TicketCollection(self.session()).get_count()
 
     @orm_cached(policy='on-table-change:ticket_permissions')
@@ -218,15 +219,15 @@ class OrgApp(Framework, LibresIntegration, ElasticsearchApp, MapboxApp,
         self,
         reply_to: Address | str | None = None,
         category: Literal['marketing', 'transactional'] = 'marketing',
-        receivers: 'SequenceOrScalar[Address | str]' = (),
-        cc: 'SequenceOrScalar[Address | str]' = (),
-        bcc: 'SequenceOrScalar[Address | str]' = (),
+        receivers: SequenceOrScalar[Address | str] = (),
+        cc: SequenceOrScalar[Address | str] = (),
+        bcc: SequenceOrScalar[Address | str] = (),
         subject: str | None = None,
         content: str | None = None,
-        attachments: 'Iterable[Attachment | StrPath]' = (),
+        attachments: Iterable[Attachment | StrPath] = (),
         headers: dict[str, str] | None = None,
         plaintext: str | None = None
-    ) -> 'EmailJsonDict':
+    ) -> EmailJsonDict:
         """ Wraps :meth:`onegov.core.framework.Framework.prepare_email`,
         setting  the reply_to address by using the reply address from
         the organisation settings.
@@ -351,9 +352,10 @@ class OrgApp(Framework, LibresIntegration, ElasticsearchApp, MapboxApp,
         self,
         button_label: str,
         title: str,
-        price: 'Price | None',
+        price: Price | None,
         email: str,
-        locale: str
+        complete_url: str,
+        request: OrgRequest
     ) -> str | None:
         provider = self.default_payment_provider
 
@@ -376,16 +378,14 @@ class OrgApp(Framework, LibresIntegration, ElasticsearchApp, MapboxApp,
             email=email,
             name=self.org.name,
             description=title,
-            locale=locale.split('_')[0],
-            # FIXME: This seems Stripe specific, so it should probably be
-            #        built into that payment provider
-            allowRememberMe='false',
+            complete_url=complete_url,
+            request=request,
             **extra
         )
 
     def redirect_after_login(
         self,
-        identity: 'Identity | NoIdentity',
+        identity: Identity | NoIdentity,
         request: OrgRequest,  # type:ignore[override]
         default: str
     ) -> str | None:
@@ -442,9 +442,9 @@ def get_i18n_default_locale() -> str:
 
 @OrgApp.setting(section='i18n', name='locale_negotiator')
 def get_locale_negotiator(
-) -> 'Callable[[Sequence[str], OrgRequest], str | None]':
+) -> Callable[[Sequence[str], OrgRequest], str | None]:
     def locale_negotiator(
-        locales: 'Sequence[str]',
+        locales: Sequence[str],
         request: OrgRequest
     ) -> str | None:
 
@@ -476,7 +476,7 @@ def get_theme() -> OrgTheme:
 
 
 @OrgApp.setting(section='content_security_policy', name='default')
-def org_content_security_policy() -> 'ContentSecurityPolicy':
+def org_content_security_policy() -> ContentSecurityPolicy:
     policy = default_content_security_policy()
 
     policy.child_src.add(SELF)
@@ -484,6 +484,8 @@ def org_content_security_policy() -> 'ContentSecurityPolicy':
     policy.child_src.add('https://*.vimeo.com')
     policy.child_src.add('https://*.infomaniak.com')
     policy.child_src.add('https://checkout.stripe.com')
+    policy.child_src.add('https://pay.datatrans.com')
+    policy.child_src.add('https://pay.sandbox.datatrans.com')
 
     policy.connect_src.add(SELF)
     policy.connect_src.add('https://checkout.stripe.com')
@@ -494,6 +496,7 @@ def org_content_security_policy() -> 'ContentSecurityPolicy':
     policy.connect_src.add('https://maps.zg.ch')
     policy.connect_src.add('https://api.mapbox.com')
     policy.connect_src.add('https://stats.seantis.ch')
+    policy.connect_src.add('https://analytics.seantis.ch')
     policy.connect_src.add('https://geodesy.geo.admin.ch')
     policy.connect_src.add('https://wms.geo.admin.ch/')
 
@@ -508,17 +511,17 @@ def org_content_security_policy() -> 'ContentSecurityPolicy':
 
 @OrgApp.setting(section='org', name='create_new_organisation')
 def get_create_new_organisation_factory(
-) -> 'Callable[[OrgApp, str], Organisation]':
+) -> Callable[[OrgApp, str], Organisation]:
     return create_new_organisation
 
 
 @OrgApp.setting(section='org', name='status_mail_roles')
-def get_status_mail_roles() -> 'Collection[str]':
+def get_status_mail_roles() -> Collection[str]:
     return ('admin', 'editor')
 
 
 @OrgApp.setting(section='org', name='ticket_manager_roles')
-def get_ticket_manager_roles() -> 'Collection[str]':
+def get_ticket_manager_roles() -> Collection[str]:
     return ('admin', 'editor')
 
 
@@ -529,7 +532,7 @@ def get_require_complete_userprofile() -> bool:
 
 @OrgApp.setting(section='org', name='is_complete_userprofile')
 def get_is_complete_userprofile_handler(
-) -> 'Callable[[OrgRequest, str], bool]':
+) -> Callable[[OrgRequest, str], bool]:
 
     def is_complete_userprofile(request: OrgRequest, username: str) -> bool:
         return True
@@ -548,7 +551,7 @@ def get_default_event_search_widget() -> None:
 
 
 @OrgApp.setting(section='org', name='public_ticket_messages')
-def get_public_ticket_messages() -> 'Collection[str]':
+def get_public_ticket_messages() -> Collection[str]:
     """ Returns a list of message types which are availble on the ticket
     status page, visible to anyone that knows the unguessable url.
 
@@ -568,15 +571,15 @@ def get_public_ticket_messages() -> 'Collection[str]':
 
 
 @OrgApp.setting(section='org', name='disabled_extensions')
-def get_disabled_extensions() -> 'Collection[str]':
+def get_disabled_extensions() -> Collection[str]:
     return ()
 
 
 @OrgApp.tween_factory(under=content_security_policy_tween_factory)
 def enable_iframes_tween_factory(
     app: OrgApp,
-    handler: 'Callable[[OrgRequest], Response]'
-) -> 'Callable[[OrgRequest], Response]':
+    handler: Callable[[OrgRequest], Response]
+) -> Callable[[OrgRequest], Response]:
 
     no_iframe_paths = (
         r'/auth/.*',
@@ -597,7 +600,7 @@ def enable_iframes_tween_factory(
 
     def enable_iframes_tween(
         request: OrgRequest
-    ) -> 'Response':
+    ) -> Response:
         """ Enables iframes. """
 
         result = handler(request)
@@ -634,13 +637,13 @@ def get_webasset_output() -> str:
 
 
 @OrgApp.webasset('sortable')
-def get_sortable_asset() -> 'Iterator[str]':
+def get_sortable_asset() -> Iterator[str]:
     yield 'sortable.js'
     yield 'sortable_custom.js'
 
 
 @OrgApp.webasset('fullcalendar')
-def get_fullcalendar_asset() -> 'Iterator[str]':
+def get_fullcalendar_asset() -> Iterator[str]:
     yield 'fullcalendar.css'
     yield 'fullcalendar.js'
     yield 'fullcalendar.de.js'
@@ -650,13 +653,13 @@ def get_fullcalendar_asset() -> 'Iterator[str]':
 
 
 @OrgApp.webasset('reservationlist')
-def get_reservation_list_asset() -> 'Iterator[str]':
+def get_reservation_list_asset() -> Iterator[str]:
     yield 'reservationlist.jsx'
     yield 'reservationlist_custom.js'
 
 
 @OrgApp.webasset('code_editor')
-def get_code_editor_asset() -> 'Iterator[str]':
+def get_code_editor_asset() -> Iterator[str]:
     yield 'ace.js'
     yield 'ace-mode-form.js'
     yield 'ace-mode-markdown.js'
@@ -668,7 +671,7 @@ def get_code_editor_asset() -> 'Iterator[str]':
 
 
 @OrgApp.webasset('editor')
-def get_editor_asset() -> 'Iterator[str]':
+def get_editor_asset() -> Iterator[str]:
     yield 'bufferbuttons.js'
     yield 'definedlinks.js'
     yield 'filemanager.js'
@@ -682,35 +685,35 @@ def get_editor_asset() -> 'Iterator[str]':
 
 
 @OrgApp.webasset('timeline')
-def get_timeline_asset() -> 'Iterator[str]':
+def get_timeline_asset() -> Iterator[str]:
     yield 'timeline.jsx'
 
 
 # do NOT minify the redactor, or the copyright notice goes away, which
 # is something we are not allowed to do per our license
 @OrgApp.webasset('redactor', filters={'js': None})
-def get_redactor_asset() -> 'Iterator[str]':
+def get_redactor_asset() -> Iterator[str]:
     yield 'redactor.js'
     yield 'redactor.css'
 
 
 @OrgApp.webasset('upload')
-def get_upload_asset() -> 'Iterator[str]':
+def get_upload_asset() -> Iterator[str]:
     yield 'upload.js'
 
 
 @OrgApp.webasset('editalttext')
-def get_editalttext_asset() -> 'Iterator[str]':
+def get_editalttext_asset() -> Iterator[str]:
     yield 'editalttext.js'
 
 
 @OrgApp.webasset('prompt')
-def get_prompt() -> 'Iterator[str]':
+def get_prompt() -> Iterator[str]:
     yield 'prompt.jsx'
 
 
 @OrgApp.webasset('photoswipe')
-def get_photoswipe_asset() -> 'Iterator[str]':
+def get_photoswipe_asset() -> Iterator[str]:
     yield 'photoswipe.css'
     yield 'photoswipe-skin.css'
     yield 'photoswipe.js'
@@ -719,25 +722,25 @@ def get_photoswipe_asset() -> 'Iterator[str]':
 
 
 @OrgApp.webasset('tags-input')
-def get_tags_input() -> 'Iterator[str]':
+def get_tags_input() -> Iterator[str]:
     yield 'tags-input.js'
     yield 'tags-input-setup.js'
 
 
 @OrgApp.webasset('filedigest')
-def get_filehash() -> 'Iterator[str]':
+def get_filehash() -> Iterator[str]:
     yield 'asmcrypto-lite.js'
     yield 'filedigest.js'
 
 
 @OrgApp.webasset('monthly-view')
-def get_monthly_view() -> 'Iterator[str]':
+def get_monthly_view() -> Iterator[str]:
     yield 'daypicker.js'
     yield 'monthly-view.jsx'
 
 
 @OrgApp.webasset('common')
-def get_common_asset() -> 'Iterator[str]':
+def get_common_asset() -> Iterator[str]:
     yield 'global.js'
     yield 'polyfills.js'
     yield 'jquery.datetimepicker.css'
@@ -785,28 +788,28 @@ def get_common_asset() -> 'Iterator[str]':
 
 
 @OrgApp.webasset('fontpreview')
-def get_fontpreview_asset() -> 'Iterator[str]':
+def get_fontpreview_asset() -> Iterator[str]:
     yield 'fontpreview.js'
 
 
 @OrgApp.webasset('scroll-to-username')
-def get_scroll_to_username_asset() -> 'Iterator[str]':
+def get_scroll_to_username_asset() -> Iterator[str]:
     yield 'scroll_to_username.js'
 
 
 @OrgApp.webasset('all_blank')
-def get_all_blank_asset() -> 'Iterator[str]':
+def get_all_blank_asset() -> Iterator[str]:
     yield 'all_blank.js'
 
 
 @OrgApp.webasset('people-select')
-def people_select_asset() -> 'Iterator[str]':
+def people_select_asset() -> Iterator[str]:
     yield 'people-select.js'
 
 
 def wrap_with_mtan_hook(
-    func: 'Callable[[OrgApp, Any, OrgRequest], Any]'
-) -> 'Callable[[OrgApp, Any, OrgRequest], Any]':
+    func: Callable[[OrgApp, Any, OrgRequest], Any]
+) -> Callable[[OrgApp, Any, OrgRequest], Any]:
 
     @wraps(func)
     def wrapped(self: OrgApp, obj: Any, request: OrgRequest) -> Any:
@@ -841,13 +844,13 @@ def wrap_with_mtan_hook(
 
 
 class KeyLookupWithMTANHook:
-    def __init__(self, key_lookup: '_KeyLookup'):
+    def __init__(self, key_lookup: _KeyLookup):
         self.key_lookup = key_lookup
 
     def component(
         self,
-        key: 'Sequence[Any]'
-    ) -> 'Callable[..., Any] | None':
+        key: Sequence[Any]
+    ) -> Callable[..., Any] | None:
 
         result = self.key_lookup.component(key)
         if result is None:
@@ -856,8 +859,8 @@ class KeyLookupWithMTANHook:
 
     def fallback(
         self,
-        key: 'Sequence[Any]'
-    ) -> 'Callable[..., Any] | None':
+        key: Sequence[Any]
+    ) -> Callable[..., Any] | None:
 
         result = self.key_lookup.fallback(key)
         if result is None:
@@ -866,6 +869,6 @@ class KeyLookupWithMTANHook:
 
     def all(
         self,
-        key: 'Sequence[Any]'
-    ) -> 'Iterator[Callable[..., Any]]':
+        key: Sequence[Any]
+    ) -> Iterator[Callable[..., Any]]:
         return self.key_lookup.all(key)

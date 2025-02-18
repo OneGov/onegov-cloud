@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 from onegov.core.orm import Base
 from onegov.core.orm.mixins import TimestampMixin
 from onegov.core.orm.types import UUID
@@ -27,46 +29,46 @@ class TextModule(Base, TimestampMixin):
     __tablename__ = 'text_modules'
 
     #: the public id of the text module
-    id: 'Column[uuid.UUID]' = Column(
+    id: Column[uuid.UUID] = Column(
         UUID,  # type:ignore[arg-type]
         primary_key=True,
         default=uuid4
     )
 
     #: the name of the text module
-    name: 'Column[str]' = Column(Text, nullable=False)
+    name: Column[str] = Column(Text, nullable=False)
 
     #: the actual text module
-    text: 'Column[str]' = Column(Text, nullable=False)
+    text: Column[str] = Column(Text, nullable=False)
 
     #: the message type this text module should be available for
-    message_type: 'Column[str | None]' = Column(
+    message_type: Column[str | None] = Column(
         Text,
         nullable=True,
         index=True
     )
 
     #: the ticket handler this text module should be available for
-    handler_code: 'Column[str | None]' = Column(
+    handler_code: Column[str | None] = Column(
         Text,
         nullable=True,
         index=True
     )
 
     #: for a private text module the user it belongs to
-    user_id: 'Column[uuid.UUID | None]' = Column(
+    user_id: Column[uuid.UUID | None] = Column(
         UUID,  # type:ignore[arg-type]
         ForeignKey(User.id),
         nullable=True
     )
-    user: 'relationship[User | None]' = relationship(User)
+    user: relationship[User | None] = relationship(User)
 
     @property
     def private(self) -> bool:
         return self.user_id is not None
 
     @property
-    def formatted_text(self) -> 'Markup':
+    def formatted_text(self) -> Markup:
         return paragraphify(linkify(self.text))
 
     @property

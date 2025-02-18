@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 from onegov.election_day import _
 from onegov.election_day.formats.imports.common import EXPATS
 from onegov.election_day.formats.imports.common import FileImportError
@@ -49,9 +51,9 @@ INTERNAL_MAJORZ_HEADERS = (
 
 
 def parse_election(
-    line: 'DefaultRow',
+    line: DefaultRow,
     errors: list[str]
-) -> tuple[int | None, 'Status | None']:
+) -> tuple[int | None, Status | None]:
 
     majority = None
     status = None
@@ -72,11 +74,11 @@ def parse_election(
 
 
 def parse_election_result(
-    line: 'DefaultRow',
+    line: DefaultRow,
     errors: list[str],
     entities: dict[int, dict[str, str]],
-    election: 'Election',
-    principal: 'Canton | Municipality'
+    election: Election,
+    principal: Canton | Municipality
 ) -> dict[str, Any] | None:
 
     try:
@@ -134,7 +136,7 @@ def parse_election_result(
 
 
 def parse_candidate(
-    line: 'DefaultRow',
+    line: DefaultRow,
     errors: list[str],
     election_id: str,
     colors: dict[str, str]
@@ -173,7 +175,7 @@ def parse_candidate(
 
 
 def parse_candidate_result(
-    line: 'DefaultRow',
+    line: DefaultRow,
     errors: list[str],
     counted: bool
 ) -> dict[str, Any] | None:
@@ -191,8 +193,8 @@ def parse_candidate_result(
 
 
 def import_election_internal_majorz(
-    election: 'Election',
-    principal: 'Canton | Municipality',
+    election: Election,
+    principal: Canton | Municipality,
     file: IO[bytes],
     mimetype: str
 ) -> list[FileImportError]:

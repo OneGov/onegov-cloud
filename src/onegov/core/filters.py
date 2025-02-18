@@ -1,4 +1,6 @@
 """ Extra webasset filters. """
+from __future__ import annotations
+
 import os
 import rcssmin  # type:ignore[import-untyped]
 
@@ -12,7 +14,7 @@ from dukpy import jsx_compile  # type:ignore[import-untyped]
 from typing import Any, IO
 
 
-class JsxFilter(BabelJSX):
+class JsxFilter(BabelJSX):  # type:ignore[misc]
     """
     DukPy is a simple javascript interpreter for Python built on top of
     duktape engine without any external dependency.
@@ -32,7 +34,7 @@ class JsxFilter(BabelJSX):
         source_path: str | None = None,
         **kwargs: Any
     ) -> None:
-        """kwargs are actually babel options"""
+        """:param kwargs: are actually babel options"""
         options = self.babel_options.copy()
         if source_path:
             options['filename'] = os.path.basename(source_path)
@@ -50,7 +52,7 @@ class JsxFilter(BabelJSX):
 register_filter(JsxFilter)
 
 
-class DataUriFilter(CSSDataUri):
+class DataUriFilter(CSSDataUri):  # type:ignore[misc]
     """ Overrides the default datauri filter to work around this issue:
 
     https://github.com/miracle2k/webassets/issues/387
@@ -81,7 +83,7 @@ class DataUriFilter(CSSDataUri):
 register_filter(DataUriFilter)
 
 
-class RCSSMinFilter(Filter):
+class RCSSMinFilter(Filter):  # type:ignore[misc]
     """ Adds the rcssmin filter (not yet included in webassets) """
 
     name = 'custom-rcssmin'

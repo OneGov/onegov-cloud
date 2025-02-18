@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 from onegov.election_day import _
 from onegov.election_day.formats.imports.common import convert_ech_domain
 from onegov.election_day.formats.imports.common import EXPATS
@@ -24,10 +26,10 @@ if TYPE_CHECKING:
 
 
 def import_votes_ech(
-    principal: 'Canton | Municipality',
-    delivery: 'DeliveryV1 | DeliveryV2',
-    session: 'Session'
-) -> 'ECHImportResultType':
+    principal: Canton | Municipality,
+    delivery: DeliveryV1 | DeliveryV2,
+    session: Session
+) -> ECHImportResultType:
     """ Imports all votes in a given eCH-0252 delivery.
 
     Deletes votes on the same day not appearing in the delivery.
@@ -172,7 +174,7 @@ def import_votes_ech(
             ballot_results[entity_id] = ballot_result
 
             # name and district
-            name, district, superregion = get_entity_and_district(
+            name, district, _superregion = get_entity_and_district(
                 entity_id, entities, vote, principal
             )
             ballot_result.name = name
@@ -222,7 +224,7 @@ def import_votes_ech(
             remaining.add(0)
         remaining -= set(ballot_results.keys())
         for entity_id in remaining:
-            name, district, superregion = get_entity_and_district(
+            name, district, _superregion = get_entity_and_district(
                 entity_id, entities, vote, principal
             )
             if vote.domain == 'none':

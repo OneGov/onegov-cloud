@@ -158,15 +158,15 @@ def test_generic_ldap(client):
     assert client.get('/private', status=403)
     assert client.get('/secret', status=403)
 
-    client.app.providers[0].ldap.compare = MagicMock()
+    client.app.providers['ldap'].ldap.compare = MagicMock()
 
-    client.app.providers[0].ldap.compare.return_value = False
+    client.app.providers['ldap'].ldap.compare.return_value = False
     assert 'unauthorized' in client.post('/auth/login', {
         'username': 'editor@seantis.ch',
         'password': 'hunter2'
     })
 
-    client.app.providers[0].ldap.compare.return_value = True
+    client.app.providers['ldap'].ldap.compare.return_value = True
     assert 'success' in client.post('/auth/login', {
         'username': 'editor@seantis.ch',
         'password': 'hunter2'

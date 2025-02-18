@@ -2,6 +2,8 @@
 upgraded on the server. See :class:`onegov.core.upgrade.upgrade_task`.
 
 """
+from __future__ import annotations
+
 from collections import defaultdict
 from onegov.core.upgrade import upgrade_task
 from onegov.core.orm.types import JSON, UUID
@@ -18,14 +20,14 @@ if TYPE_CHECKING:
 
 
 @upgrade_task('Add second_factor column')
-def add_second_factor_column(context: 'UpgradeContext') -> None:
+def add_second_factor_column(context: UpgradeContext) -> None:
     context.operations.add_column(
         'users', Column('second_factor', JSON, nullable=True)
     )
 
 
 @upgrade_task('Add active column')
-def add_active_column(context: 'UpgradeContext') -> None:
+def add_active_column(context: UpgradeContext) -> None:
     context.operations.add_column(
         'users', Column('active', Boolean, nullable=True, default=True)
     )
@@ -38,7 +40,7 @@ def add_active_column(context: 'UpgradeContext') -> None:
 
 
 @upgrade_task('Add realname column')
-def add_realname_column(context: 'UpgradeContext') -> None:
+def add_realname_column(context: UpgradeContext) -> None:
     context.operations.add_column(
         'users', Column('realname', Text, nullable=True))
 
@@ -49,7 +51,7 @@ def add_realname_column(context: 'UpgradeContext') -> None:
 
 
 def change_ownership_by_name(
-    context: 'UpgradeContext',
+    context: UpgradeContext,
     old_username: str,
     new_username: str
 ) -> None:
@@ -86,9 +88,9 @@ def change_ownership_by_name(
 
 
 def change_ownership_by_id(
-    context: 'UpgradeContext',
-    old_userid: 'uuid.UUID',
-    new_userid: 'uuid.UUID'
+    context: UpgradeContext,
+    old_userid: uuid.UUID,
+    new_userid: uuid.UUID
 ) -> None:
     if context.has_table('tickets'):
         context.operations.execute("""
@@ -99,7 +101,7 @@ def change_ownership_by_id(
 
 
 @upgrade_task('Force lowercase usernames')
-def force_lowercase_usernames(context: 'UpgradeContext') -> None:
+def force_lowercase_usernames(context: UpgradeContext) -> None:
     users = defaultdict(list)
 
     for user in context.session.query(User).all():
@@ -112,7 +114,7 @@ def force_lowercase_usernames(context: 'UpgradeContext') -> None:
         role='member',
     )
 
-    for username, users_ in users.items():
+    for users_ in users.values():
 
         # simply change usernames that don't conflict with others
         if len(users_) == 1:
@@ -144,7 +146,7 @@ def force_lowercase_usernames(context: 'UpgradeContext') -> None:
         def sort_key(
             user: User,
             role_hierarchy: list[str] = role_hierarchy
-        ) -> tuple[bool, int, 'datetime']:
+        ) -> tuple[bool, int, datetime]:
             return (
                 user.active,
                 role_hierarchy.index(user.role),
@@ -199,13 +201,13 @@ def force_lowercase_usernames(context: 'UpgradeContext') -> None:
 
 
 @upgrade_task('Add singup_token column')
-def add_signup_token_column(context: 'UpgradeContext') -> None:
+def add_signup_token_column(context: UpgradeContext) -> None:
     context.operations.add_column(
         'users', Column('signup_token', Text, nullable=True))
 
 
 @upgrade_task('Add group_id column')
-def add_group_id_column(context: 'UpgradeContext') -> None:
+def add_group_id_column(context: UpgradeContext) -> None:
     if not context.has_column('users', 'group_id'):
         context.operations.add_column(
             'users',
@@ -214,7 +216,7 @@ def add_group_id_column(context: 'UpgradeContext') -> None:
 
 
 @upgrade_task('Add type column')
-def add_type_column(context: 'UpgradeContext') -> None:
+def add_type_column(context: UpgradeContext) -> None:
     if not context.has_column('users', 'type'):
         context.operations.add_column(
             'users',
@@ -223,18 +225,18 @@ def add_type_column(context: 'UpgradeContext') -> None:
 
 
 @upgrade_task('Add authentication_provider column')
-def add_authentication_provider_column(context: 'UpgradeContext') -> None:
+def add_authentication_provider_column(context: UpgradeContext) -> None:
     context.operations.add_column(
         'users', Column('authentication_provider', JSON, nullable=True))
 
 
 @upgrade_task('Drop authentication_provider column')
-def drop_authentication_provider_column(context: 'UpgradeContext') -> None:
+def drop_authentication_provider_column(context: UpgradeContext) -> None:
     context.operations.drop_column('users', 'authentication_provider')
 
 
 @upgrade_task('Add source column')
-def add_source_column(context: 'UpgradeContext') -> None:
+def add_source_column(context: UpgradeContext) -> None:
     context.operations.add_column(
         'users',
         Column('source', Text, nullable=True, default=None)
@@ -242,7 +244,7 @@ def add_source_column(context: 'UpgradeContext') -> None:
 
 
 @upgrade_task('Add source_id column')
-def add_source_id_column(context: 'UpgradeContext') -> None:
+def add_source_id_column(context: UpgradeContext) -> None:
     context.operations.add_column(
         'users', Column('source_id', Text, nullable=True, default=None))
 
@@ -252,7 +254,7 @@ def add_source_id_column(context: 'UpgradeContext') -> None:
 
 @upgrade_task('Make user models polymorphic type non-nullable')
 def make_user_models_polymorphic_type_non_nullable(
-    context: 'UpgradeContext'
+    context: UpgradeContext
 ) -> None:
     for table in ('users', 'groups', 'role_mappings'):
         if context.has_table(table):
@@ -264,7 +266,7 @@ def make_user_models_polymorphic_type_non_nullable(
 
 
 @upgrade_task('Add scope column')
-def add_scope_column(context: 'UpgradeContext') -> None:
+def add_scope_column(context: UpgradeContext) -> None:
     if not context.has_table('tans'):
         return
 

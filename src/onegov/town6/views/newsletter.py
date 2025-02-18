@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 from onegov.core.security import Public, Private
 from onegov.newsletter import Newsletter
 from onegov.newsletter import NewsletterCollection
@@ -33,9 +35,9 @@ if TYPE_CHECKING:
 )
 def town_handle_newsletters(
     self: NewsletterCollection,
-    request: 'TownRequest',
+    request: TownRequest,
     form: SignupForm
-) -> 'RenderData | Response':
+) -> RenderData | Response:
     return handle_newsletters(
         self, request, form, NewsletterLayout(self, request),
         DefaultMailLayout(self, request)
@@ -51,9 +53,9 @@ def town_handle_newsletters(
 )
 def town_handle_update_newsletters_subscription(
     self: NewsletterCollection,
-    request: 'TownRequest',
+    request: TownRequest,
     form: SignupForm
-) -> 'RenderData | Response':
+) -> RenderData | Response:
 
     return handle_update_newsletters_subscription(
         self, request, form, NewsletterLayout(self, request),
@@ -64,8 +66,8 @@ def town_handle_update_newsletters_subscription(
 @TownApp.html(model=Newsletter, template='newsletter.pt', permission=Public)
 def town_view_newsletter(
     self: Newsletter,
-    request: 'TownRequest'
-) -> 'RenderData':
+    request: TownRequest
+) -> RenderData:
     return view_newsletter(self, request, NewsletterLayout(self, request))
 
 
@@ -76,8 +78,8 @@ def town_view_newsletter(
 )
 def town_view_subscribers(
     self: RecipientCollection,
-    request: 'TownRequest'
-) -> 'RenderData':
+    request: TownRequest
+) -> RenderData:
     return view_subscribers(self, request, RecipientLayout(self, request))
 
 
@@ -85,14 +87,14 @@ def town_view_subscribers(
     model=NewsletterCollection,
     name='new',
     template='form.pt',
-    permission=Public,
+    permission=Private,
     form=get_newsletter_form
 )
 def town_handle_new_newsletter(
     self: NewsletterCollection,
-    request: 'TownRequest',
-    form: 'NewsletterForm'
-) -> 'RenderData | Response':
+    request: TownRequest,
+    form: NewsletterForm
+) -> RenderData | Response:
     return handle_new_newsletter(
         self, request, form, NewsletterLayout(self, request))
 
@@ -106,9 +108,9 @@ def town_handle_new_newsletter(
 )
 def town_edit_newsletter(
     self: Newsletter,
-    request: 'TownRequest',
-    form: 'NewsletterForm'
-) -> 'RenderData | Response':
+    request: TownRequest,
+    form: NewsletterForm
+) -> RenderData | Response:
     return edit_newsletter(
         self, request, form, NewsletterLayout(self, request))
 
@@ -122,9 +124,9 @@ def town_edit_newsletter(
 )
 def town_handle_send_newsletter(
     self: Newsletter,
-    request: 'TownRequest',
+    request: TownRequest,
     form: NewsletterSendForm
-) -> 'RenderData | Response':
+) -> RenderData | Response:
     return handle_send_newsletter(
         self, request, form, NewsletterLayout(self, request))
 
@@ -138,9 +140,9 @@ def town_handle_send_newsletter(
 )
 def town_handle_test_newsletter(
     self: Newsletter,
-    request: 'TownRequest',
+    request: TownRequest,
     form: NewsletterTestForm
-) -> 'RenderData | Response':
+) -> RenderData | Response:
     return handle_test_newsletter(
         self, request, form, NewsletterLayout(self, request))
 
@@ -153,8 +155,8 @@ def town_handle_test_newsletter(
 )
 def town_handle_preview_newsletter(
     self: Newsletter,
-    request: 'TownRequest'
-) -> 'RenderData':
+    request: TownRequest
+) -> RenderData:
     return handle_preview_newsletter(
         self, request, DefaultMailLayout(self, request))
 
@@ -168,9 +170,9 @@ def town_handle_preview_newsletter(
 )
 def town_export_newsletter_recipients(
     self: RecipientCollection,
-    request: 'TownRequest',
+    request: TownRequest,
     form: ExportForm,
-) -> 'RenderData | Response':
+) -> RenderData | Response:
     return export_newsletter_recipients(
         self, request, form, RecipientLayout(self, request))
 
@@ -184,8 +186,8 @@ def town_export_newsletter_recipients(
 )
 def town_import_newsletter_recipients(
     self: RecipientCollection,
-    request: 'TownRequest',
+    request: TownRequest,
     form: NewsletterSubscriberImportExportForm
-) -> 'RenderData | Response':
+) -> RenderData | Response:
     return import_newsletter_recipients(
         self, request, form, RecipientLayout(self, request))

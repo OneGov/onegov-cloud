@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 from onegov.core.templates import render_macro
 from onegov.landsgemeinde.layouts import DefaultLayout
 from onegov.landsgemeinde.models import AgendaItem
@@ -18,8 +20,8 @@ if TYPE_CHECKING:
 
 
 def update_ticker(
-    request: 'LandsgemeindeRequest',
-    updated: 'Collection[Assembly | AgendaItem | Votum]'
+    request: LandsgemeindeRequest,
+    updated: Collection[Assembly | AgendaItem | Votum]
 ) -> None:
     """ Updates the ticker by a set of updated assemblies, agenda items or
     vota.
@@ -97,7 +99,7 @@ def ensure_states(
 
     def set_state(
         item: Assembly | AgendaItem | Votum,
-        state: 'AssemblyState | AgendaItemState | VotumState'
+        state: AssemblyState | AgendaItemState | VotumState
     ) -> None:
         if item.state != state:
             item.state = state
@@ -105,7 +107,7 @@ def ensure_states(
 
     def set_by_children(
         parent: Assembly | AgendaItem,
-        children: 'Iterable[AgendaItem] | Iterable[Votum]'
+        children: Iterable[AgendaItem] | Iterable[Votum]
     ) -> None:
         if all(x.state == 'scheduled' for x in children):
             if parent.state != 'ongoing':
@@ -117,7 +119,7 @@ def ensure_states(
             if isinstance(parent, AgendaItem):
                 parent.start()
 
-    def set_vota(vota: 'Iterable[Votum]', state: 'VotumState') -> None:
+    def set_vota(vota: Iterable[Votum], state: VotumState) -> None:
         for votum in vota:
             set_state(votum, state)
 
@@ -132,8 +134,8 @@ def ensure_states(
             updated.add(item)
 
     def set_agenda_items(
-        agenda_items: 'Iterable[AgendaItem]',
-        state: 'AgendaItemState'
+        agenda_items: Iterable[AgendaItem],
+        state: AgendaItemState
     ) -> None:
 
         for agenda_item in agenda_items:
@@ -204,10 +206,10 @@ def ensure_states(
 def timestamp_to_seconds(timestamp: str | None) -> int | None:
     """Convert a timestamp to seconds.
 
-       Examples:
-       '1m30s' -> 90
-       '30s' -> 30
-       '1h2m30s' -> 3750
+    Examples:
+    '1m30s' -> 90
+    '30s' -> 30
+    '1h2m30s' -> 3750
     """
 
     if not timestamp:
@@ -228,10 +230,10 @@ def timestamp_to_seconds(timestamp: str | None) -> int | None:
 def seconds_to_timestamp(seconds: int | None) -> str | None:
     """Convert seconds to a timestamp.
 
-       Examples:
-       90 -> '1m30s'
-       30 -> '30s'
-       3750 -> '1h2m30s'
+    Examples:
+    90 -> '1m30s'
+    30 -> '30s'
+    3750 -> '1h2m30s'
     """
 
     if not seconds or seconds < 0:

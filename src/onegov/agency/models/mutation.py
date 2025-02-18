@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 from functools import cached_property
 from onegov.agency import _
 from onegov.ticket import TicketCollection
@@ -43,16 +45,16 @@ class Mutation(Generic[_M, _IdT_contra]):
 
     def __init__(
         self,
-        session: 'Session',
+        session: Session,
         target_id: _IdT_contra,
-        ticket_id: 'UUID'
+        ticket_id: UUID
     ) -> None:
         self.session = session
         self.target_id = target_id
         self.ticket_id = ticket_id
 
     @cached_property
-    def collection(self) -> 'SupportsById[_M, _IdT_contra]':
+    def collection(self) -> SupportsById[_M, _IdT_contra]:
         raise NotImplementedError
 
     @cached_property
@@ -60,7 +62,7 @@ class Mutation(Generic[_M, _IdT_contra]):
         return self.collection.by_id(self.target_id)
 
     @cached_property
-    def ticket(self) -> 'Ticket | None':
+    def ticket(self) -> Ticket | None:
         return TicketCollection(self.session).by_id(self.ticket_id)
 
     @cached_property
@@ -75,7 +77,7 @@ class Mutation(Generic[_M, _IdT_contra]):
     def labels(self) -> dict[str, str]:
         return {}
 
-    def apply(self, items: 'Iterable[str]') -> None:
+    def apply(self, items: Iterable[str]) -> None:
         assert self.ticket is not None
         self.ticket.handler_data['state'] = 'applied'
         for item in items:
@@ -87,7 +89,7 @@ class Mutation(Generic[_M, _IdT_contra]):
 class AgencyMutation(Mutation['ExtendedAgency', int]):
 
     @cached_property
-    def collection(self) -> 'ExtendedAgencyCollection':
+    def collection(self) -> ExtendedAgencyCollection:
         from onegov.agency.collections import ExtendedAgencyCollection
         return ExtendedAgencyCollection(self.session)
 
@@ -110,7 +112,7 @@ class AgencyMutation(Mutation['ExtendedAgency', int]):
 class PersonMutation(Mutation['ExtendedPerson', 'UUID']):
 
     @cached_property
-    def collection(self) -> 'ExtendedPersonCollection':
+    def collection(self) -> ExtendedPersonCollection:
         from onegov.agency.collections import ExtendedPersonCollection
         return ExtendedPersonCollection(self.session)
 

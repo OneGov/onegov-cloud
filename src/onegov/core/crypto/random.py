@@ -1,14 +1,15 @@
 """ Use Markov chains to generate random text that sounds Japanese.
-    This makes random pronounceable passwords that are both strong and easy
-    to memorize.
+This makes random pronounceable passwords that are both strong and easy
+to memorize.
 
-    Of course English or any other language could be used in the sample text.
+Of course English or any other language could be used in the sample text.
 
-    See more details at http://exyr.org/2011/random-pronounceable-passwords/
+See more details at http://exyr.org/2011/random-pronounceable-passwords/
 
-    Author: Simon Sapin
-    License: BSD
+Author: Simon Sapin
+License: BSD
 """
+from __future__ import annotations
 
 import string
 import secrets
@@ -115,7 +116,7 @@ class MarkovChain:
     The probabilities are built from the frequencies in the `sample` chain.
     Elements of the sample that are not a valid state are ignored.
     """
-    def __init__(self, sample: 'Iterable[str]'):
+    def __init__(self, sample: Iterable[str]):
         counts = self.counts = defaultdict(lambda: defaultdict(int))
         for current, next in pairwise(sample):
             counts[current][next] += 1
@@ -141,7 +142,7 @@ class MarkovChain:
             rand -= weight
         raise AssertionError('unreachable')
 
-    def __iter__(self) -> 'Iterator[str]':
+    def __iter__(self) -> Iterator[str]:
         """
         Return an infinite iterator of states.
         """

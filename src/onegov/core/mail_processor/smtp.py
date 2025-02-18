@@ -1,13 +1,15 @@
 """
-    Send E-Mail through SMTP
+Send E-Mail through SMTP
 
-    Adapted from repoze.sendmail: https://github.com/repoze/repoze.sendmail
+Adapted from `repoze.sendmail<https://github.com/repoze/repoze.sendmail>`_.
 
-    Usage:
-        mailer = smptlib.SMTP(host, port)
-        qp = SMTPEmailQueueProcessor(mailer, maildir1, maildir2, ..., limit=x)
-        qp.send_messages()
+Usage::
+
+    mailer = smptlib.SMTP(host, port)
+    qp = SMTPEmailQueueProcessor(mailer, maildir1, maildir2, ..., limit=x)
+    qp.send_messages()
 """
+from __future__ import annotations
 
 import json
 import smtplib

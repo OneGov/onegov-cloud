@@ -1,8 +1,10 @@
+from __future__ import annotations
+
 from bleach.linkifier import LinkifyFilter
 from bleach.sanitizer import Cleaner
 from copy import deepcopy
 from functools import partial
-from html5lib.filters.whitespace import Filter as whitespace_filter
+from html5lib.filters.whitespace import Filter as WhitespaceFilter
 from io import StringIO
 from lxml import etree
 from onegov.core.utils import module_path
@@ -61,6 +63,7 @@ class Pdf(PDFDocument):
         link_color: str | None = None,
         underline_links: bool = False,
         underline_width: float | str = 0.5,
+        skip_numbering: bool = False,
         **kwargs: Any
     ):
         link_color = link_color or self.default_link_color
@@ -80,6 +83,8 @@ class Pdf(PDFDocument):
         self.link_color = link_color
         self.underline_links = underline_links
         self.underline_width = underline_width
+        # hierarchical numbering for headings
+        self.skip_numbering = skip_numbering
 
         # Use Source Sans 3 instead of Helvetica to support more special
         # characters; https://github.com/adobe-fonts/source-sans
@@ -94,8 +99,8 @@ class Pdf(PDFDocument):
 
     def init_a4_portrait(
         self,
-        page_fn: '_PageCallback' = empty_page_fn,
-        page_fn_later: '_PageCallback | None ' = None,
+        page_fn: _PageCallback = empty_page_fn,
+        page_fn_later: _PageCallback | None = None,
         *,
         font_size: int = 10,
         margin_left: float = 2.5 * cm,
@@ -272,7 +277,7 @@ class Pdf(PDFDocument):
     def _add_toc_heading(
         self,
         text: str,
-        style: 'PropertySet',
+        style: PropertySet,
         level: int
     ) -> None:
         """ Adds a heading with automatically adding an entry to the table of
@@ -288,12 +293,13 @@ class Pdf(PDFDocument):
             for idx in range(level + 1, max(self.toc_numbering.keys()) + 1):
                 self.toc_numbering[idx] = 0
 
-            # create and prepend the prefix
-            prefix = '.'.join(
-                str(self.toc_numbering.get(idx)) or ''
-                for idx in range(level + 1)
-            )
-            text = f'{prefix} {text}'
+            if not self.skip_numbering:
+                # create and prepend the prefix
+                prefix = '.'.join(
+                    str(self.toc_numbering.get(idx)) or ''
+                    for idx in range(level + 1)
+                )
+                text = f'{prefix} {text}'
 
             # create a link
             bookmark = uuid4().hex
@@ -306,32 +312,32 @@ class Pdf(PDFDocument):
             self.story[-1].toc_level = level  # type:ignore[attr-defined]
             self.story[-1].bookmark = bookmark  # type:ignore[attr-defined]
 
-    def h1(self, title: str, style: 'PropertySet | None' = None) -> None:
+    def h1(self, title: str, style: PropertySet | None = None) -> None:
         if title:
             style = style or self.style.heading1
             self._add_toc_heading(title, style, 0)
 
-    def h2(self, title: str, style: 'PropertySet | None' = None) -> None:
+    def h2(self, title: str, style: PropertySet | None = None) -> None:
         if title:
             style = style or self.style.heading2
             self._add_toc_heading(title, style, 1)
 
-    def h3(self, title: str, style: 'PropertySet | None' = None) -> None:
+    def h3(self, title: str, style: PropertySet | None = None) -> None:
         if title:
             style = style or self.style.heading3
             self._add_toc_heading(title, style, 2)
 
-    def h4(self, title: str, style: 'PropertySet | None' = None) -> None:
+    def h4(self, title: str, style: PropertySet | None = None) -> None:
         if title:
             style = style or self.style.heading4
             self._add_toc_heading(title, style, 3)
 
-    def h5(self, title: str, style: 'PropertySet | None' = None) -> None:
+    def h5(self, title: str, style: PropertySet | None = None) -> None:
         if title:
             style = style or self.style.heading5
             self._add_toc_heading(title, style, 4)
 
-    def h6(self, title: str, style: 'PropertySet | None' = None) -> None:
+    def h6(self, title: str, style: PropertySet | None = None) -> None:
         if title:
             style = style or self.style.heading6
             self._add_toc_heading(title, style, 5)
@@ -379,7 +385,7 @@ class Pdf(PDFDocument):
         self,
         # this may be too lax, but a short look at the source suggests
         # that read might be enough for this to work...
-        filelike: 'StrOrBytesPath | SupportsRead[bytes]',
+        filelike: StrOrBytesPath | SupportsRead[bytes],
         factor: float = 1.0
     ) -> None:
         """ Adds an image and fits it to the page. """
@@ -391,7 +397,7 @@ class Pdf(PDFDocument):
 
     def pdf(
         self,
-        filelike: 'StrOrBytesPath | SupportsRead[bytes]',
+        filelike: StrOrBytesPath | SupportsRead[bytes],
         factor: float = 1.0
     ) -> None:
         """ Adds a PDF and fits it to the page. """
@@ -409,18 +415,18 @@ class Pdf(PDFDocument):
     @overload  # type:ignore[override]
     def table(
         self,
-        data: 'Sequence[Sequence[str | Paragraph]]',
-        columns: 'Literal["even"] | Sequence[float | None] | None',
-        style: 'TableStyle | Iterable[_TableCommand] | None' = None,
+        data: Sequence[Sequence[str | Paragraph]],
+        columns: Literal['even'] | Sequence[float | None] | None,
+        style: TableStyle | Iterable[_TableCommand] | None = None,
         ratios: Literal[False] = False
     ) -> None: ...
 
     @overload
     def table(
         self,
-        data: 'Sequence[Sequence[str | Paragraph]]',
+        data: Sequence[Sequence[str | Paragraph]],
         columns: Literal['even'] | list[float] | None,
-        style: 'TableStyle | Iterable[_TableCommand] | None' = None,
+        style: TableStyle | Iterable[_TableCommand] | None = None,
         *,
         ratios: Literal[True]
     ) -> None: ...
@@ -428,26 +434,26 @@ class Pdf(PDFDocument):
     @overload
     def table(
         self,
-        data: 'Sequence[Sequence[str | Paragraph]]',
+        data: Sequence[Sequence[str | Paragraph]],
         columns: Literal['even'] | list[float] | None,
-        style: 'TableStyle | Iterable[_TableCommand] | None',
+        style: TableStyle | Iterable[_TableCommand] | None,
         ratios: Literal[True]
     ) -> None: ...
 
     @overload
     def table(
         self,
-        data: 'Sequence[Sequence[str | Paragraph]]',
-        columns: 'Literal["even"] | Sequence[float | None] | None',
-        style: 'TableStyle | Iterable[_TableCommand] | None' = None,
+        data: Sequence[Sequence[str | Paragraph]],
+        columns: Literal['even'] | Sequence[float | None] | None,
+        style: TableStyle | Iterable[_TableCommand] | None = None,
         ratios: bool = False
     ) -> None: ...
 
     def table(
         self,
-        data: 'Sequence[Sequence[str | Paragraph]]',
-        columns: 'Literal["even"] | Sequence[float | None] | None',
-        style: 'TableStyle | Iterable[_TableCommand] | None' = None,
+        data: Sequence[Sequence[str | Paragraph]],
+        columns: Literal['even'] | Sequence[float | None] | None,
+        style: TableStyle | Iterable[_TableCommand] | None = None,
         ratios: bool = False
     ) -> None:
         """ Adds a table where every cell is wrapped in a paragraph so that
@@ -509,7 +515,7 @@ class Pdf(PDFDocument):
     def figcaption(
         self,
         text: str,
-        style: 'PropertySet | None' = None
+        style: PropertySet | None = None
     ) -> None:
         """ Adds a figure caption. """
 
@@ -529,7 +535,7 @@ class Pdf(PDFDocument):
         return prefix + text.strip() + postfix
 
     @staticmethod
-    def inner_html(element: 'etree._Element') -> str:
+    def inner_html(element: etree._Element) -> str:
         return '{}{}{}'.format(
             Pdf.strip(element.text or ''),
             ''.join(
@@ -556,7 +562,7 @@ class Pdf(PDFDocument):
         # Remove unwanted markup
         tags = ['p', 'br', 'strong', 'b', 'em', 'li', 'ol', 'ul', 'li']
         attributes = {}
-        filters: list[_Filter] = [whitespace_filter]
+        filters: list[_Filter] = [WhitespaceFilter]
 
         if linkify:
             link_color = self.link_color
@@ -564,9 +570,9 @@ class Pdf(PDFDocument):
             underline_width = self.underline_width
 
             def colorize(
-                attrs: '_HTMLAttrs',
+                attrs: _HTMLAttrs,
                 new: bool = False
-            ) -> '_HTMLAttrs':
+            ) -> _HTMLAttrs:
                 # phone numbers appear here but are escaped, skip...
                 if not attrs.get((None, 'href')):
                     # FIXME: bleach stubs seem to be incorrect here
@@ -603,7 +609,7 @@ class Pdf(PDFDocument):
         for element in body:
             if element.tag == 'p':
                 self.p_markup(self.inner_html(element), self.style.paragraph)
-            elif element.tag in 'ol':
+            elif element.tag == 'ol':
                 style = deepcopy(self.style.li)
                 style.leftIndent += self.style.ol.leftIndent
                 items = [

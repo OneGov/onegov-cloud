@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 import humanize
 import importlib
 import phonenumbers
@@ -38,6 +40,13 @@ if TYPE_CHECKING:
     from wtforms.form import BaseForm
 
 
+# HACK: We extend the default type map with additional entries for file endings
+#       that sometimes don't have a single agreed upon mimetype, we may need
+#       to do something more clever in the future and map single file endings
+#       to multiple mime types.
+types_map.setdefault('.mp3', 'audio/mpeg')
+
+
 class If(Generic[BaseFormT, FieldT]):
     """ Wraps a single validator or a list of validators, which will
     only be executed if the supplied condition callback returns `True`.
@@ -45,8 +54,8 @@ class If(Generic[BaseFormT, FieldT]):
     """
     def __init__(
         self,
-        condition: 'FieldCondition[BaseFormT, FieldT]',
-        *validators: 'BaseValidator[BaseFormT, FieldT]'
+        condition: FieldCondition[BaseFormT, FieldT],
+        *validators: BaseValidator[BaseFormT, FieldT]
     ):
         assert len(validators) > 0, 'Need to supply at least one validator'
         self.condition = condition
@@ -70,7 +79,7 @@ class Stdnum:
         module = '.'.join(p for p in format.split('.') if p)
         self.format = importlib.import_module('stdnum.' + module)
 
-    def __call__(self, form: 'Form', field: 'Field') -> None:
+    def __call__(self, form: Form, field: Field) -> None:
         # only do a check for filled out values, to check for the existance
         # of any value use DataRequired!
         if not field.data:
@@ -100,7 +109,7 @@ class FileSizeLimit:
     def __init__(self, max_bytes: int):
         self.max_bytes = max_bytes
 
-    def __call__(self, form: 'Form', field: 'Field') -> None:
+    def __call__(self, form: Form, field: Field) -> None:
         if not field.data:
             return
 
@@ -118,7 +127,7 @@ class WhitelistedMimeType:
     :class:`onegov.form.fields.UploadMultipleField` instance.
     """
 
-    whitelist: 'Collection[str]' = {
+    whitelist: Collection[str] = {
         'application/excel',
         'application/vnd.ms-excel',
         'application/msword',
@@ -134,11 +143,11 @@ class WhitelistedMimeType:
 
     message = _('Files of this type are not supported.')
 
-    def __init__(self, whitelist: 'Collection[str] | None' = None):
+    def __init__(self, whitelist: Collection[str] | None = None):
         if whitelist is not None:
             self.whitelist = whitelist
 
-    def __call__(self, form: 'Form', field: 'Field') -> None:
+    def __call__(self, form: Form, field: Field) -> None:
         if not field.data:
             return
 
@@ -159,7 +168,7 @@ class ExpectedExtensions(WhitelistedMimeType):
         ExpectedExtensions(['pdf'])  # makes sure the given file is a pdf
     """
 
-    def __init__(self, extensions: 'Sequence[str]'):
+    def __init__(self, extensions: Sequence[str]):
         # normalize extensions
         if len(extensions) == 1 and extensions[0] == '*':
             mimetypes = None
@@ -198,7 +207,7 @@ class ValidFormDefinition:
     def __init__(
         self,
         require_email_field: bool = True,
-        reserved_fields: 'Collection[str] | None' = None,
+        reserved_fields: Collection[str] | None = None,
         require_title_fields: bool = False,
         validate_prices: bool = True
     ):
@@ -207,7 +216,7 @@ class ValidFormDefinition:
         self.require_title_fields = require_title_fields
         self.validate_prices = validate_prices
 
-    def __call__(self, form: 'Form', field: 'Field') -> 'Form | None':
+    def __call__(self, form: Form, field: Field) -> Form | None:
         if not field.data:
             return None
 
@@ -313,9 +322,9 @@ class ValidFormDefinition:
 
     def _parse_form(
         self,
-        field: 'Field',
+        field: Field,
         enable_edit_checks: bool = True
-    ) -> 'Form':
+    ) -> Form:
         # XXX circular import
         from onegov.form import parse_form
 
@@ -328,7 +337,7 @@ class ValidFilterFormDefinition(ValidFormDefinition):
                            "filters only 'select' or 'multiple select' "
                            "fields are allowed.")
 
-    def __call__(self, form: 'Form', field: 'Field') -> 'Form | None':
+    def __call__(self, form: Form, field: Field) -> Form | None:
         from onegov.form.fields import MultiCheckboxField
 
         parsed_form = super().__call__(form, field)
@@ -356,7 +365,7 @@ class ValidFilterFormDefinition(ValidFormDefinition):
 
 class ValidSurveyDefinition(ValidFormDefinition):
     """ Makes sure the given text is a valid onegov.form definition for
-        surveys.
+    surveys.
     """
 
     def __init__(self, require_email_field: bool = False):
@@ -365,7 +374,7 @@ class ValidSurveyDefinition(ValidFormDefinition):
     invalid_field_type = _("Invalid field type for field '${label}'. Please "
                            "use the plus-icon to add allowed field types.")
 
-    def __call__(self, form: 'Form', field: 'Field') -> 'Form | None':
+    def __call__(self, form: Form, field: Field) -> Form | None:
         from onegov.form.fields import UploadField
 
         parsed_form = super().__call__(form, field)
@@ -402,7 +411,7 @@ class LaxDataRequired(DataRequired):
 
     """
 
-    def __call__(self, form: 'BaseForm', field: 'Field') -> None:
+    def __call__(self, form: BaseForm, field: Field) -> None:
         if field.data is False:
             # guard against False, False is an instance of int, since
             # bool derives from int, so we need to check this first
@@ -435,7 +444,7 @@ class StrictOptional(Optional):
 
         return False
 
-    def __call__(self, form: 'BaseForm', field: 'Field') -> None:
+    def __call__(self, form: BaseForm, field: Field) -> None:
         raw = field.raw_data and field.raw_data[0]
         val = field.data
 
@@ -462,7 +471,7 @@ class ValidPhoneNumber:
     def __init__(
         self,
         country: str = 'CH',
-        country_whitelist: 'Collection[str] | None' = None
+        country_whitelist: Collection[str] | None = None
     ):
         if country_whitelist:
             assert country in country_whitelist
@@ -470,7 +479,7 @@ class ValidPhoneNumber:
         self.country = country
         self.country_whitelist = country_whitelist
 
-    def __call__(self, form: 'Form', field: 'Field') -> None:
+    def __call__(self, form: Form, field: Field) -> None:
         if not field.data:
             return
 
@@ -504,7 +513,7 @@ class ValidSwissSocialSecurityNumber:
 
     message = _('Not a valid swiss social security number.')
 
-    def __call__(self, form: 'Form', field: 'Field') -> None:
+    def __call__(self, form: Form, field: Field) -> None:
         if not field.data:
             return
 
@@ -525,10 +534,10 @@ class UniqueColumnValue:
 
     """
 
-    def __init__(self, table: type['Base']):
+    def __init__(self, table: type[Base]):
         self.table = table
 
-    def __call__(self, form: 'Form', field: 'Field') -> None:
+    def __call__(self, form: Form, field: Field) -> None:
         if field.name not in self.table.__table__.columns:  # type:ignore
             raise RuntimeError('The field name must match a column!')
 
@@ -560,7 +569,7 @@ class InputRequiredIf(InputRequired):
         self.field_data = field_data
         self.message = message
 
-    def __call__(self, form: 'BaseForm', field: 'Field') -> None:
+    def __call__(self, form: BaseForm, field: Field) -> None:
         if self.field_name not in form:
             raise RuntimeError(f"No field named '{self.field_name}' in form")
 
@@ -586,11 +595,11 @@ class InputRequiredIf(InputRequired):
 
 class ValidDateRange:
     """
-        Makes sure the selected date is in a valid range.
+    Makes sure the selected date is in a valid range.
 
-        The default error message can be overriden and be parametrized
-        with ``min_date`` and ``max_date`` if both are supplied or just
-        with ``date`` if only one of them is specified.
+    The default error message can be overriden and be parametrized
+    with ``min_date`` and ``max_date`` if both are supplied or just
+    with ``date`` if only one of them is specified.
 
     """
 
@@ -628,7 +637,7 @@ class ValidDateRange:
             return date.today() + self.max
         return self.max
 
-    def __call__(self, form: 'Form', field: 'Field') -> None:
+    def __call__(self, form: Form, field: Field) -> None:
         if field.data is None:
             return
 

@@ -2,7 +2,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE 1.0\n"
-"POT-Creation-Date: 2024-09-18 12:11+0200\n"
+"POT-Creation-Date: 2025-02-18 09:50+0100\n"
 "PO-Revision-Date: 2022-03-15 10:50+0100\n"
 "Last-Translator: Marc Sommerhalder <marc.sommerhalder@seantis.ch>\n"
 "Language-Team: French\n"
@@ -595,6 +595,24 @@ msgstr "Une entrée avec le même nom existe"
 msgid "E-Mail"
 msgstr "E-mail"
 
+msgid "Describes briefly what this form is about"
+msgstr "Décrit brièvement ce formulaire"
+
+msgid "Detailed Explanation"
+msgstr "Explication détaillée"
+
+msgid "Describes in detail how this form is to be filled"
+msgstr "Décrit en détail comment remplir ce formulaire"
+
+msgid "Form PDF"
+msgstr "Formulaire PDF"
+
+msgid "Group"
+msgstr "Groupe"
+
+msgid "Used to group this form in the overview"
+msgstr "Utilisé pour regrouper ce formulaire dans la vue d'ensemble"
+
 msgid "Art"
 msgstr "Art"
 
@@ -846,9 +864,6 @@ msgstr "Lien"
 msgid "Url pointing to another website"
 msgstr "Url qui pointe vers une page externe"
 
-msgid "Group"
-msgstr "Groupe"
-
 msgid "Used to group this link in the overview"
 msgstr "Utilisé pour regrouper le lien dans la vue d'ensemble"
 
@@ -860,6 +875,12 @@ msgstr "Décrit le contenu de ce formulaire"
 
 msgid "Used to group the form in the overview"
 msgstr "Utilisé pour grouper la formulaire dans la vue d'ensemble"
+
+msgid "Form Definition"
+msgstr "Définition du formulaire"
+
+msgid "Link to Formcode Documentation"
+msgstr "Lien vers la documentation du formcode"
 
 msgid "Pick-Up"
 msgstr "Ramassage"
@@ -1023,6 +1044,15 @@ msgstr "Mise en page en grille"
 msgid "Show images on homepage"
 msgstr "Montrer les images sur la page d'accueil"
 
+msgid "By filename"
+msgstr "Par nom de fichier"
+
+msgid "By caption"
+msgstr "Par légende"
+
+msgid "By last change"
+msgstr "Par date de dernière modification"
+
 msgid "Used in the overview and the e-mail subject"
 msgstr "Utilisé dans l'aperçu et le sujet de l'e-mail"
 
@@ -1086,9 +1116,6 @@ msgstr "Destinataire"
 
 msgid "Do not actually import the newsletter subscribers"
 msgstr "Ne pas importer les abonnés à la newsletter"
-
-msgid ": (Address already exists)"
-msgstr ": (L'adresse existe déjà)"
 
 msgid "Will be used as image in the page overview on the parent page"
 msgstr "Sera utilisé comme image dans la vue d'ensemble de la page parent"
@@ -1211,14 +1238,28 @@ msgstr "Notes"
 msgid "Public extra information about this person"
 msgstr "Informations publiques supplémentaires à propos de cette semaine"
 
+msgid "I am looking to make a reservation lasting"
+msgstr "Je cherche à faire une réservation d'une durée de"
+
+msgid "On Weekday(s)"
+msgstr "Le(s) jour(s) de semaine"
+
+msgid "Earliest Start"
+msgstr "Début au plus tôt"
+
+msgid "Latest End"
+msgstr "Dernière fin"
+
 msgid "Rooms"
 msgstr "Espaces"
 
-msgid "Weekdays"
-msgstr "Jours de la semaine"
-
 msgid "Start date in past"
 msgstr "Date de début dans le passé"
+
+msgid "Duration is longer than the range between start and end time"
+msgstr ""
+"La durée est supérieure à l'intervalle entre l'heure de début et l'heure de "
+"fin."
 
 msgid "Describes what this reservation resource is about"
 msgstr "Décrit en quoi consiste cette ressource de réservation"
@@ -1296,6 +1337,9 @@ msgstr "Veuillez saisir au moins un code postal"
 
 msgid "Please enter one zip-code per line, without spaces or commas"
 msgstr "Veuillez saisir un code postal par ligne, sans espaces ni virgules"
+
+msgid "Weekdays"
+msgstr "Jours de la semaine"
 
 msgid "New Reservations"
 msgstr "Nouvelles réservations"
@@ -1647,6 +1691,9 @@ msgstr "Masquer ces champs pour les utilisateurs non connectés"
 msgid "People"
 msgstr "Personnes"
 
+msgid "External ID"
+msgstr "ID externe"
+
 msgid "Duration of mTAN session"
 msgstr "Durée de la séance mTAN"
 
@@ -1687,6 +1734,12 @@ msgstr "Code Analytics"
 
 msgid "JavaScript for web statistics support"
 msgstr "JavaScript pour l'assistance en matière de statistiques web"
+
+msgid "Analytics URL"
+msgstr "URL Analytics"
+
+msgid "URL pointing to the analytics page"
+msgstr "URL pointant vers la page d'analyse"
 
 msgid "Cantonal holidays"
 msgstr "Jours fériés cantonaux"
@@ -1865,9 +1918,6 @@ msgstr ""
 msgid "Enable newsletter"
 msgstr "Activer la newsletter"
 
-msgid "Include logo in newsletter"
-msgstr "Afficher le logo dans la newsletter"
-
 msgid "Allow secret content in newsletter"
 msgstr "Autoriser le contenu secret dans la newsletter"
 
@@ -1897,6 +1947,16 @@ msgstr ""
 "  - Thème 2\n"
 "  - Thème 3:\n"
 "  - Sous-thème 3.1```"
+
+msgid "Notify on newsletter unsubscription"
+msgstr "Notifier le désabonnement à la lettre d'information"
+
+msgid ""
+"Send an email notification to the following users when a recipient "
+"unsubscribes from the newsletter"
+msgstr ""
+"Envoyer une notification par e-mail aux utilisateurs suivants lorsqu'un "
+"destinataire se désabonne de la newsletter"
 
 msgid "Invalid YAML format. Please refer to the example."
 msgstr "Format YAML non valide. Veuillez vous référer à l'exemple."
@@ -2302,11 +2362,15 @@ msgstr "Formulaire externe"
 msgid "New external form"
 msgstr "Nouveau formulaire externe"
 
+msgid "Document form"
+msgstr "Formulaire de document"
+
 msgid "Do you really want to delete this submission window?"
 msgstr "Voulez-vous vraiment supprimer cette fenêtre de soumission ?"
 
-msgid "Existing submissions will be disassociated."
-msgstr "Les soumissions existantes seront dissociées."
+msgid ""
+"Submissions associated with this submission window will be deleted as well."
+msgstr "Les soumissions associées à cette fenêtre de soumission seront "
 
 msgid "Delete submission window"
 msgstr "Supprimer la fenêtre de soumission"
@@ -2518,9 +2582,6 @@ msgstr "Newsletter"
 msgid "New"
 msgstr "Nouveau"
 
-msgid "Newsletter Subscription"
-msgstr "Abonnement à la newsletter "
-
 msgid "Subscribers"
 msgstr "Abonnés"
 
@@ -2565,6 +2626,12 @@ msgstr "Exports"
 
 msgid "Payment Providers"
 msgstr "Opérateurs de paiement"
+
+msgid "Datatrans"
+msgstr "Datatrans"
+
+msgid "Worldline Saferpay"
+msgstr "Worldline Saferpay"
 
 msgid "Synchronise"
 msgstr "Synchroniser"
@@ -2764,6 +2831,24 @@ msgstr ""
 msgid "Sidebar links"
 msgstr "Liens dans la barre latérale"
 
+msgid "Contact link"
+msgstr "Lien de contact"
+
+msgid "Sidebar contact"
+msgstr "Contact dans la barre latérale"
+
+msgid "Please provide a URL if contact link text is set"
+msgstr "Veuillez fournir une URL si le texte du lien de contact est défini"
+
+msgid "Please provide link text if contact URL is set"
+msgstr "Veuillez indiquer le texte du lien si l'URL de contact est définie"
+
+msgid "Contact Text"
+msgstr "Lien de contact"
+
+msgid "Contact URL"
+msgstr "URL de contact"
+
 msgid "Delete content when expired"
 msgstr "Supprimer le contenu lorsqu'il est expiré"
 
@@ -2773,6 +2858,9 @@ msgstr ""
 
 msgid "Delete content"
 msgstr "Supprimer le contenu"
+
+msgid "Photo album"
+msgstr "Album photo"
 
 msgid "In future"
 msgstr "Dans le futur"
@@ -3290,6 +3378,9 @@ msgstr "Confirmer"
 msgid "There was an error while importing your directory!"
 msgstr "Une erreur est survenue lors de l'importation de votre dossier !"
 
+msgid "Download Form"
+msgstr "Télécharger le formulaire"
+
 msgid "Embed iFrame"
 msgstr "Intégrer l'iFrame"
 
@@ -3343,6 +3434,18 @@ msgstr "Aucun fichier téléchargé pour le moment"
 
 msgid "All dates"
 msgstr "Toutes les dates"
+
+msgid ""
+"By default we assume that you only want to select a single time slot and "
+"room per day. If you want to select more than one time slot or room on a "
+"given day, you may hold and press any one of your Shift, Alt or Ctrl keys "
+"while clicking the time slots you want to reserve."
+msgstr ""
+"Par défaut, nous supposons que vous ne souhaitez sélectionner qu'un seul "
+"créneau horaire et une seule salle par jour. Si vous souhaitez sélectionner "
+"plus d'un créneau horaire ou d'une salle pour un jour donné, vous pouvez "
+"maintenir enfoncée l'une des touches Shift, Alt ou Ctrl tout en cliquant sur "
+"les créneaux horaires que vous souhaitez réserver."
 
 msgid "Unavailable"
 msgstr "Indisponible"
@@ -4011,6 +4114,13 @@ msgstr "Cliquer ici pour voir la version internet."
 msgid "You no longer wish to receive the newsletter?"
 msgstr "Vous ne souhaitez plus recevoir la lettre d'informations ?"
 
+msgid ""
+"The user with the address ${address} just unsubscribed from the newsletter "
+"subscriber list."
+msgstr ""
+"L'utilisateur dont l'adresse est ${address} vient de se désinscrire de la "
+"liste des abonnés à la lettre d'information."
+
 msgid "Click the following link to set a new password:"
 msgstr "Cliquer sur le lien suivant pour définir un nouveau mot de passe :"
 
@@ -4272,6 +4382,9 @@ msgstr ""
 msgid "There are currently ${count} recipients registered."
 msgstr "Il y a actuellement ${count} destinataires enregistrés."
 
+msgid "To update your subscription, please use this ${Link}"
+msgstr "Pour mettre à jour votre abonnement, veuillez utiliser ce ${Link}"
+
 msgid "Archive"
 msgstr "Archiver"
 
@@ -4417,6 +4530,15 @@ msgstr "Déposez les fichiers pour les vérifier"
 
 msgid "No subscribers yet"
 msgstr "Pas encore d'abonnés"
+
+msgid ""
+"This recipient has delivery failures, including hard bounces, invalid email "
+"addresses, spam complaints, manual deactivations, or being blocked. We "
+"recommend unsubscribing it from the list."
+msgstr ""
+"Ce destinataire a des échecs de livraison, y compris des rebonds, des "
+"adresses e-mail invalides, des plaintes pour spam, des désactivations "
+"manuelles, ou est bloqué. Nous recommandons de le désinscrire de la liste."
 
 msgid "submitted"
 msgstr "soumis"
@@ -4582,13 +4704,11 @@ msgid "Fields"
 msgstr "Champs"
 
 msgid ""
-"Please review your answers and press \"Complete\" to complete the survey. If "
-"there's anything you'd like to change, click on \"Edit\" to return to the "
-"filled-out survey."
+"Thank you for filling out this survey. If there's anything you'd like to "
+"change, click on the \"Edit\"-Button below."
 msgstr ""
-"Veuillez vérifier vos réponses et appuyez sur \"Compléter\" pour terminer le "
-"sondage. Si vous souhaitez modifier quelque chose, cliquez sur \"Modifier\" "
-"pour revenir au sondage rempli."
+"Merci d'avoir rempli ce sondage. Si vous souhaitez apporter des "
+"modifications, cliquez sur le bouton \"Modifier\" ci-dessous."
 
 msgid "No surveys defined yet."
 msgstr "Aucun sondage n'est encore défini."
@@ -4862,6 +4982,20 @@ msgstr ""
 "Les règles garantissent que les allocations entre le début et la fin "
 "existent et qu'elles sont prolongées au-delà de ces dates à des intervalles "
 "donnés."
+
+#, python-format
+msgid ""
+"Rule updated. ${deleted} allocations removed, ${created} new allocations "
+"created."
+msgstr ""
+"La règle a été mise à jour. ${deleted} allocations supprimées, ${created} "
+"nouvelles allocations créées."
+
+msgid "Rule not found"
+msgstr "Règle non trouvée"
+
+msgid "Edit Rule"
+msgstr "Modifier la règle"
 
 msgid "The rule was stopped"
 msgstr "La règle a été arrêtée"
@@ -5162,11 +5296,23 @@ msgstr ""
 
 #, python-format
 msgid "${address} successfully unsubscribed"
-msgstr "${address} a bien été désinscrite"
+msgstr "${address} désinscrit avec succès"
 
 #, python-format
 msgid "${address} could not be unsubscribed, wrong token"
 msgstr "${address} n'a pas pu être désinscrite, mauvaise zone de texte"
+
+msgid "A form with this name already exists"
+msgstr "Un formulaire avec ce nom existe déjà"
+
+msgid "Added a new form"
+msgstr "A ajouté un nouveau formulaire"
+
+msgid "New Document Form"
+msgstr "Nouveau formulaire de document"
+
+msgid "Edit Document Form"
+msgstr "Modifier le formulaire de document"
 
 msgid "Moves the topic and all its sub topics to the given destination."
 msgstr "Déplace le sujet et tous ses sous-sujets vers la destination donnée."
@@ -5301,12 +5447,6 @@ msgstr "Il reste une place"
 msgid "There are ${count} spots left"
 msgstr "Il reste ${count} places"
 
-msgid "A form with this name already exists"
-msgstr "Un formulaire avec ce nom existe déjà"
-
-msgid "Added a new form"
-msgstr "A ajouté un nouveau formulaire"
-
 msgid "New Form"
 msgstr "Nouveau formulaire"
 
@@ -5363,6 +5503,9 @@ msgstr ""
 msgid "Do you really want to delete this registration window?"
 msgstr "Voulez-vous vraiment supprimer cette fenêtre d'inscription?"
 
+msgid "Existing submissions will be disassociated."
+msgstr "Les soumissions existantes seront dissociées."
+
 msgid "Delete registration window"
 msgstr "Supprimer la fenêtre d'enregistrement"
 
@@ -5395,14 +5538,14 @@ msgstr ""
 "Le montant total pour les données actuellement saisies est de ${total} mais "
 "doit être au moins ${minimum}. Veuillez ajuster vos entrées."
 
+msgid "Registrations are no longer possible"
+msgstr "Les inscriptions ne sont plus possibles"
+
 msgid "Pay Online and Complete"
 msgstr "Payer en ligne et compléter"
 
 msgid "Your payment could not be processed"
 msgstr "Votre paiement n'a pas pu être traité"
-
-msgid "Registrations are no longer possible"
-msgstr "Les inscriptions ne sont plus possibles"
 
 msgid "Your registration has been confirmed"
 msgstr "Votre inscription a été confirmée"
@@ -5460,6 +5603,10 @@ msgstr ""
 "catégories abonnées sont ${subscribed}."
 
 #, python-format
+msgid "Success! We have added ${address} to the list of recipients."
+msgstr "Succès! Nous avons ajouté ${address} à la liste des destinataires."
+
+#, python-format
 msgid ""
 "Success! We have sent a confirmation link to ${address}, if we didn't send "
 "you one already. Your subscribed categories are ${subscribed}."
@@ -5472,6 +5619,19 @@ msgstr ""
 #, python-format
 msgid "Success! We have updated your subscribed categories to ${subscribed}."
 msgstr "Succès! Nous avons mis à jour vos catégories abonnées à ${subscribed}."
+
+msgid "Update your newsletter subscription categories:"
+msgstr "Mettre à jour vos catégories d'abonnement à la lettre d'information :"
+
+msgid "Update"
+msgstr "Mettre à jour"
+
+msgid "Sign up to our newsletter to always stay up to date:"
+msgstr ""
+"Inscrivez-vous à notre lettre d'information pour rester toujours à jour :"
+
+msgid "Sign up"
+msgstr "S'inscrire"
 
 msgid "Update Newsletter Subscription"
 msgstr "Mettre à jour l'abonnement à la lettre d'information"
@@ -5516,17 +5676,16 @@ msgid "Exports all newsletter recipients."
 msgstr "Exporte tous les destinataires de la newsletter."
 
 #, python-format
-msgid "The following line(s) contain invalid data: ${lines}"
-msgstr ""
-"La ou les lignes suivantes contiennent des données invalides : ${lines}"
+msgid "Import completed with errors: ${results}"
+msgstr "Importation terminée avec des erreurs : ${results}"
 
 #, python-format
-msgid "${count} newsletter subscribers will be imported"
-msgstr "Les abonnés à la newsletter de ${count} seront importés"
+msgid "Import preview: ${result}"
+msgstr "Aperçu de l'importation : ${result}"
 
 #, python-format
-msgid "${count} newsletter subscribers imported"
-msgstr "${count} abonnés à la lettre d'information importés"
+msgid "Import completed: ${result}"
+msgstr "Importation terminée : ${result}"
 
 msgid "The same format as the export (XLSX) can be used for the import."
 msgstr ""
@@ -5549,6 +5708,11 @@ msgstr "Exporter un événement"
 
 msgid "Exports all future events."
 msgstr "Exporte tous les événements futurs."
+
+#, python-format
+msgid "The following line(s) contain invalid data: ${lines}"
+msgstr ""
+"La ou les lignes suivantes contiennent des données invalides : ${lines}"
 
 #, python-format
 msgid "${count} events will be imported"
@@ -5581,6 +5745,15 @@ msgstr "Le paiement a été saisi"
 
 msgid "The payment was refunded"
 msgstr "Le paiement a été remboursé"
+
+msgid "The payment is already captured but is still processing"
+msgstr "Le paiement a déjà été saisi mais est encore en cours de traitement"
+
+msgid "Could not refund the payment"
+msgstr "Impossible de rembourser le paiement"
+
+msgid "Could not capture the payment"
+msgstr "Le paiement n'a pas pu être saisi"
 
 msgid "As default"
 msgstr "Par défaut"
@@ -5631,8 +5804,50 @@ msgstr "Le prestataire de paiement a été supprimé."
 msgid "Successfully synchronised payments"
 msgstr "Les paiements ont été synchronisés avec succès"
 
+msgid "Merchant Name"
+msgstr "Nom du marchand"
+
+msgid "UPP Username"
+msgstr "UPP Username"
+
+msgid "UPP Password"
+msgstr "UPP Password"
+
+msgid "Webhook Signing Key"
+msgstr "Clé de signature du webhook"
+
 msgid "Charge fees to customer"
 msgstr "Facturer le client"
+
+msgid "Use sandbox environment (for testing)"
+msgstr "Utiliser l'environnement sandbox (pour les tests)"
+
+msgid "Customer Name"
+msgstr "Nom du client"
+
+msgid "Customer ID"
+msgstr "ID du client"
+
+msgid "Terminal ID"
+msgstr "ID du terminal"
+
+msgid "API Username"
+msgstr "Nom d'utilisateur API"
+
+msgid "API Password"
+msgstr "Mot de passe API"
+
+msgid "Datatrans has been added"
+msgstr "Datatrans a été ajouté"
+
+msgid "Add Datatrans"
+msgstr "Ajouter Datatrans"
+
+msgid "Worldline Saferpay has been added"
+msgstr "Worldline Saferpay a été ajouté"
+
+msgid "Add Worldline Saferpay"
+msgstr "Ajouter Worldline Saferpay"
 
 msgid "Added a new person"
 msgstr "Nouvelle personne ajoutée"
@@ -5900,6 +6115,14 @@ msgstr "Chat"
 msgid "Topics"
 msgstr "Sujets"
 
+#, python-format
+msgid "You have successfully unsubscribed from the newsletter at ${address}"
+msgstr ""
+"Vous vous êtes désabonné avec succès de la lettre d'information à ${address}."
+
+msgid "Unsubscription from newsletter"
+msgstr "Se désabonner de la lettre d'information"
+
 msgid "A survey with this name already exists"
 msgstr "Une enquête avec ce nom existe déjà"
 
@@ -5911,6 +6134,27 @@ msgstr "Nouvelle enquête"
 
 msgid "Please choose a submission window"
 msgstr "Veuillez choisir une fenêtre de soumission"
+
+msgid ""
+"This field cannot be edited because there are submissions associated with "
+"this survey. If you want to edit the definition please delete all "
+"submissions."
+msgstr ""
+"Ce champ ne peut pas être modifié car il y a des soumissions associées à "
+"cette enquête. Si vous souhaitez modifier la définition, veuillez supprimer "
+"toutes les soumissions."
+
+msgid "Delete Submissions"
+msgstr "Supprimer les soumissions"
+
+msgid "Do you really want to delete all submissions?"
+msgstr "Voulez-vous vraiment supprimer toutes les soumissions ?"
+
+msgid "All submissions associated with this survey will be deleted."
+msgstr "Toutes les soumissions associées à cette enquête seront supprimées."
+
+msgid "Delete submissions"
+msgstr "Supprimer les soumissions"
 
 msgid "Exports the submissions of the survey."
 msgstr "Exporte les soumissions de l'enquête."
@@ -5931,14 +6175,14 @@ msgstr "Nouvelle fenêtre de soumission"
 
 msgid "Submissions windows limit survey submissions to a specific time-range."
 msgstr ""
-"Les fenêtres de soumission limitent les soumissions d'enquêtes à une période "
-"spécifique."
+"Merci d'avoir rempli ce sondage. Si vous souhaitez apporter des "
+"modifications, cliquez sur \"Modifier\" ci-dessous."
 
 msgid "Edit Submission Window"
 msgstr "Modifier la fenêtre de soumission"
 
-msgid "The submission window was deleted"
-msgstr "La fenêtre de soumission a été supprimée"
+msgid "The submission window and all associated submissions were deleted"
+msgstr "La fenêtre de soumission et toutes les soumissions associées ont été "
 
 msgid "Added a new text module"
 msgstr "Ajout d'un nouveau module de texte"
@@ -6159,110 +6403,5 @@ msgstr "Un compte a été créé pour vous"
 msgid "The user was created successfully"
 msgstr "L'utilisateur a bien été créé"
 
-#~ msgid "Your directory submission has been rejected"
-#~ msgstr "Votre proposition de répertoire a été rejetée"
-
-#~ msgid "Your directory submission rejection has been withdrawn"
-#~ msgstr "Le rejet de votre soumission d'annuaire a été retiré"
-
-#~ msgid "The rejection was withdrawn"
-#~ msgstr "Le rejet a été retiré"
-
-#~ msgid "Rejection withdrawn."
-#~ msgstr "Retrait du rejet."
-
-#~ msgid "Reject"
-#~ msgstr "Rejeter"
-
-#~ msgid "Update Subscription"
-#~ msgstr "Mise à jour de l'abonnement"
-
-#~ msgid "Update your newsletter subscription categories:"
-#~ msgstr "Mettre à jour les catégories d'abonnement à la newsletter:"
-
-#~ msgid "Sign up to our newsletter to always stay up to date:"
-#~ msgstr ""
-#~ "Abonnez-vous à notre lettre d'informations pour rester au courant en "
-#~ "permanence :"
-
-#~ msgid "Signup"
-#~ msgstr "S'abonner"
-
-#, python-format
-#~ msgid ""
-#~ "The date range overlaps with an existing submission window (${range})."
-#~ msgstr ""
-#~ "La période donnée chevauche une fenêtre de soumission existante "
-#~ "(${range})."
-
-#~ msgid "Phone number"
-#~ msgstr "Numéro de téléphone"
-
-#~ msgid "A new entry has been added to the \"${directory.title}\" directory:"
-#~ msgstr ""
-#~ "Une nouvelle entrée a été ajoutée au répertoire « ${directory.title} » :"
-
-#~ msgid "New entry in directory"
-#~ msgstr "Nouvelle entrée dans le répertoire"
-
-#~ msgid "has a new entry:"
-#~ msgstr "a une nouvelle entrée :"
-
-#, python-format
-#~ msgid ""
-#~ "Registration for notifications on updates in the directory "
-#~ "\"${directory}\""
-#~ msgstr ""
-#~ "Inscription pour les notifications sur les mises à jour dans le dossier "
-#~ "\"${directory}\""
-
-#~ msgid ""
-#~ "This is a notification for the new entries in \"${organisation}\". If you "
-#~ "no longer wish to receive these notifications, please contact an "
-#~ "administrator so they can remove you from the recipients list."
-#~ msgstr ""
-#~ "Il s'agit d'une notification pour les nouvelles entrées dans "
-#~ "\"${organisation\". Si vous ne souhaitez plus recevoir ces notifications, "
-#~ "veuillez contacter un administrateur afin qu'il vous retire de la liste "
-#~ "des destinataires."
-
-#, python-format
-#~ msgid "${org} New Entry in ${directory}"
-#~ msgstr "Nouvelle entrée dans ${directory} de ${org}"
-
-#~ msgid "The email adress has been added to the recipients"
-#~ msgstr "L'adresse e-mail a été ajoutée aux destinataires"
-
-#~ msgid ""
-#~ "This content is automatically deleted when the end date has passed. If no "
-#~ "end date is set, it will be deleted one day after start date."
-#~ msgstr ""
-#~ "Ce contenu est automatiquement supprimé lorsque la date de fin est "
-#~ "dépassée. Si aucune date de fin n'est définie, il sera supprimé un jour "
-#~ "après la date de début."
-
-#~ msgid ""
-#~ "There are currently no allowed domains for iframes. To enable domains for "
-#~ "iframes, please contact info@seantis.ch."
-#~ msgstr ""
-#~ "Aucun domaine n'est actuellement autorisé pour les iframes. Pour activer "
-#~ "les domaines pour les iframes, veuillez contacter info@seantis.ch"
-
-#~ msgid ""
-#~ "The height of the iframe in pixels. If not set, the iframe will have a "
-#~ "standard height of 800px."
-#~ msgstr ""
-#~ "La hauteur de l'iframe en pixels. Si elle n'est pas définie, l'iframe "
-#~ "aura une hauteur standard de 800 pixels."
-
-#~ msgid "Display the iframe as a card with a border"
-#~ msgstr "Afficher l'iframe comme une carte avec une bordure"
-
-#~ msgid "The following domains are allowed for iframes:"
-#~ msgstr "Les domaines suivants sont autorisés pour les iframes:"
-
-#~ msgid "The domain of the URL is not allowed for iframes."
-#~ msgstr "Le domaine de l'URL n'est pas autorisé pour les iframes"
-
-#~ msgid "Chat with"
-#~ msgstr "Chat avec"
+#~ msgid "Terminaux ID"
+#~ msgstr "ID du terminal"

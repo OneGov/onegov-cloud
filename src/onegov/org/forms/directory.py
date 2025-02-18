@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 from functools import cached_property
 
 from wtforms import EmailField
@@ -368,7 +370,7 @@ class DirectoryBaseForm(Form):
             return None
 
     @cached_property
-    def known_fields(self) -> list['ParsedField'] | None:
+    def known_fields(self) -> list[ParsedField] | None:
         try:
             return list(
                 flatten_fieldsets(parse_formcode(self.structure.data))
@@ -383,7 +385,7 @@ class DirectoryBaseForm(Form):
         except FormError:
             return None
 
-    def extract_field_ids(self, field: 'Field') -> 'Iterator[str]':
+    def extract_field_ids(self, field: Field) -> Iterator[str]:
         if not self.known_field_ids:
             return
 
@@ -393,27 +395,27 @@ class DirectoryBaseForm(Form):
             if as_internal_id(line) in self.known_field_ids:
                 yield line
 
-    def validate_title_format(self, field: 'Field') -> None:
+    def validate_title_format(self, field: Field) -> None:
         if self.missing_fields and 'title' in self.missing_fields:
             raise ValidationError(
                 _('The following fields are unknown: ${fields}', mapping={
                     'fields': ', '.join(self.missing_fields['title'])
                 }))
 
-    def validate_lead_format(self, field: 'Field') -> None:
+    def validate_lead_format(self, field: Field) -> None:
         if self.missing_fields and 'lead' in self.missing_fields:
             raise ValidationError(
                 _('The following fields are unknown: ${fields}', mapping={
                     'fields': ', '.join(self.missing_fields['lead'])
                 }))
 
-    def validate_thumbnail(self, field: 'Field') -> None:
+    def validate_thumbnail(self, field: Field) -> None:
         if field.data and '\n' in field.data:
             raise ValidationError(
                 _('Please select at most one thumbnail field')
             )
 
-    def validate_numbers(self, field: 'Field') -> None:
+    def validate_numbers(self, field: Field) -> None:
         if self.numbering.data == 'custom' and (
             '\n' in field.data or field.data == ''
         ):
@@ -461,7 +463,7 @@ class DirectoryBaseForm(Form):
     def first_hidden_field(
         self,
         configuration: DirectoryConfiguration
-    ) -> 'ParsedField | None':
+    ) -> ParsedField | None:
         """ Returns the first hidden field, or None. """
 
         for field in flatten_fieldsets(parse_formcode(self.structure.data)):
@@ -624,7 +626,7 @@ class DirectoryBaseForm(Form):
             self.address_block_title_type.data = 'auto'
             self.address_block_title.data = ''
 
-    def populate_obj(self, obj: 'ExtendedDirectory') -> None:  # type:ignore
+    def populate_obj(self, obj: ExtendedDirectory) -> None:  # type:ignore
         super().populate_obj(obj, exclude={
             'configuration',
             'order',
@@ -637,7 +639,7 @@ class DirectoryBaseForm(Form):
         else:
             obj.marker_color = self.marker_color
 
-    def process_obj(self, obj: 'ExtendedDirectory') -> None:  # type:ignore
+    def process_obj(self, obj: ExtendedDirectory) -> None:  # type:ignore
         self.configuration = obj.configuration
 
         if obj.marker_color:
@@ -715,19 +717,19 @@ class DirectoryImportForm(Form):
     )
 
     @staticmethod
-    def clear_entries(session: 'Session', target: 'ExtendedDirectory') -> None:
+    def clear_entries(session: Session, target: ExtendedDirectory) -> None:
         for existing in target.entries:
             session.delete(existing)
 
         target.entries.clear()
         session.flush()
 
-    def run_import(self, target: 'ExtendedDirectory') -> int:
+    def run_import(self, target: ExtendedDirectory) -> int:
         session = object_session(target)
 
         count = 0
 
-        def count_entry(entry: 'ExtendedDirectoryEntry') -> None:
+        def count_entry(entry: ExtendedDirectoryEntry) -> None:
             nonlocal count
             count += 1
 

@@ -1,5 +1,6 @@
+from __future__ import annotations
+
 from functools import cached_property
-from chameleon.utils import Markup
 from onegov.activity import Attendee, AttendeeCollection
 from onegov.activity import Booking, BookingCollection, Occasion
 from onegov.activity import InvoiceCollection
@@ -30,7 +31,7 @@ if TYPE_CHECKING:
 
 class AttendeeBase(Form):
 
-    request: 'FeriennetRequest'
+    request: FeriennetRequest
 
     if TYPE_CHECKING:
         first_name: StringField
@@ -51,16 +52,16 @@ class AttendeeBase(Form):
         model.name = self.name
 
         # Update name changes on invoice items of current period
-        assert self.request.app.active_period is not None
-        invoice_collection = InvoiceCollection(
-            session=self.request.session,
-            period_id=self.request.app.active_period.id)
+        if self.request.app.active_period is not None:
+            invoice_collection = InvoiceCollection(
+                session=self.request.session,
+                period_id=self.request.app.active_period.id)
 
-        invoice_items = invoice_collection.query_items()
+            invoice_items = invoice_collection.query_items()
 
-        for item in invoice_items:
-            if item.attendee_id == self.model.id:
-                item.group = self.name
+            for item in invoice_items:
+                if item.attendee_id == self.model.id:
+                    item.group = self.name
 
     def process_obj(self, model: Attendee) -> None:  # type:ignore[override]
         super().process_obj(model)
@@ -121,7 +122,7 @@ class AttendeeForm(AttendeeBase):
     )
 
     notes = TextAreaField(
-        label=_('Health Information'),
+        label=_('Is there anything the course instructor should know?'),
         description=_('Allergies, Disabilities, Particulars'),
     )
 
@@ -268,7 +269,7 @@ class AttendeeSignupForm(AttendeeBase):
         return self.request.app.org.meta.get('show_political_municipality')
 
     @cached_property
-    def user(self) -> 'User | None':
+    def user(self) -> User | None:
         if not self.username:
             return None
         users = UserCollection(self.request.session)
@@ -318,8 +319,8 @@ class AttendeeSignupForm(AttendeeBase):
 
         layout = DefaultLayout(self.model, self.request)
 
-        self.accept_tos.description = Markup(render_macro(  # noqa: MS001
-            layout.macros['accept_tos'], self.request, {'url': url}))
+        self.accept_tos.description = render_macro(
+            layout.macros['accept_tos'], self.request, {'url': url})
 
     def on_request(self) -> None:
         self.populate_attendees()
@@ -444,7 +445,7 @@ class AttendeeSignupForm(AttendeeBase):
         return None
 
     def ensure_correct_activity_state(self) -> bool | None:
-        if not self.model.activity.state != 'approved':
+        if self.model.activity.state == 'approved':
             assert isinstance(self.attendee.errors, list)
             self.attendee.errors.append(_(
                 'This is an unapproved activity'

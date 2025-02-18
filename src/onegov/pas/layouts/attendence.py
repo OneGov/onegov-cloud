@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 from functools import cached_property
 from onegov.core.elements import Confirm
 from onegov.core.elements import Intercooler
@@ -33,12 +35,12 @@ class AttendenceCollectionLayout(DefaultLayout):
                     title=_('Add'),
                     links=[
                         Link(
-                            text=_('Attendence'),
+                            text=_('New Attendence'),
                             url=self.request.link(self.model, 'new'),
                             attrs={'class': 'new-attendence'}
                         ),
                         Link(
-                            text=_('Plenary session'),
+                            text=_('Plenary session (bulk)'),
                             url=self.request.link(self.model, 'new-bulk'),
                             attrs={'class': 'new-attendence'}
                         ),

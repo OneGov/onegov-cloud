@@ -1,8 +1,12 @@
+from __future__ import annotations
+
 import click
 import transaction
 
 from onegov.agency.collections import ExtendedAgencyCollection
-from onegov.agency.data_import import import_bs_data, import_membership_titles
+from onegov.agency.data_import import (import_bs_data,
+                                       import_membership_titles,
+                                       import_lu_data)
 from onegov.agency.excel_export import export_person_xlsx
 from onegov.agency.models import ExtendedAgencyMembership, ExtendedPerson
 from onegov.core.cli import command_group
@@ -31,14 +35,14 @@ def consolidate_cli(
     ignore_case: bool,
     dry_run: bool,
     verbose: bool
-) -> 'Callable[[AgencyRequest, AgencyApp], None]':
+) -> Callable[[AgencyRequest, AgencyApp], None]:
     """
     Consolidates double entries of person objects based on the property
     `based_on`. Property must be convertible to string.
     """
     buffer = 100
 
-    def find_double_entries(session: 'Session') -> tuple[
+    def find_double_entries(session: Session) -> tuple[
         dict[str, ExtendedPerson],
         dict[str, list[ExtendedPerson]]
     ]:
@@ -87,7 +91,7 @@ def consolidate_cli(
         return person
 
     def consolidate_memberships(
-        session: 'Session',
+        session: Session,
         person: ExtendedPerson,
         persons: list[ExtendedPerson]
     ) -> None:
@@ -98,7 +102,7 @@ def consolidate_cli(
                 session.flush()
             session.delete(p)
 
-    def do_consolidate(request: 'AgencyRequest', app: 'AgencyApp') -> None:
+    def do_consolidate(request: AgencyRequest, app: AgencyApp) -> None:
         session = request.session
         first_seen, to_consolidate = find_double_entries(session)
         print(f'Double entries found based on '
@@ -129,9 +133,9 @@ def import_bs_function(
     agency_file: str,
     people_file: str,
     dry_run: bool
-) -> 'Callable[[AgencyRequest, AgencyApp], None]':
+) -> Callable[[AgencyRequest, AgencyApp], None]:
 
-    def execute(request: 'AgencyRequest', app: 'AgencyApp') -> None:
+    def execute(request: AgencyRequest, app: AgencyApp) -> None:
         import_membership_titles(agency_file, people_file, request, app)
 
         total_empty_titles = 0
@@ -160,18 +164,18 @@ def import_bs_data_files(
     people_file: str,
     dry_run: bool,
     clean: bool
-) -> 'Callable[[AgencyRequest, AgencyApp], None]':
+) -> Callable[[AgencyRequest, AgencyApp], None]:
     """
+
     Usage:
 
         onegov-agency  --select /onegov_agency/bs import-bs-data \
-        $agency_file \
-        $people_file \
+        $agency_file $people_file
     """
 
     buffer = 100
 
-    def execute(request: 'AgencyRequest', app: 'AgencyApp') -> None:
+    def execute(request: AgencyRequest, app: AgencyApp) -> None:
 
         if clean:
             session = request.session
@@ -212,17 +216,72 @@ def import_bs_data_files(
     return execute
 
 
+@cli.command('import-lu-data', context_settings={'singular': True})
+@click.argument('data-file', type=click.Path(exists=True))
+@click.option('--dry-run', is_flag=True, default=False)
+@click.option('--clean', is_flag=True, default=False)
+def import_lu_data_files(
+    data_file: str,
+    dry_run: bool,
+    clean: bool
+) -> Callable[[AgencyRequest, AgencyApp], None]:
+    """
+
+    Usage:
+
+        onegov-agency --select /onegov_agency/lu import-lu-data $people_file
+    """
+
+    buffer = 100
+
+    def execute(request: AgencyRequest, app: AgencyApp) -> None:
+
+        if clean:
+            session = request.session
+
+            for ix, person in enumerate(session.query(Person)):
+                session.delete(person)
+                if ix % buffer == 0:
+                    app.es_indexer.process()
+                    app.psql_indexer.bulk_process(session)
+
+            session.flush()
+            click.secho('All Persons removed', fg='green')
+
+            for ix, agency in enumerate(session.query(Agency)):
+                session.delete(agency)
+                if ix % buffer == 0:
+                    app.es_indexer.process()
+                    app.psql_indexer.bulk_process(session)
+
+            session.flush()
+            click.secho('All Agencies removed', fg='green')
+
+            click.secho('Exiting...')
+            return
+
+        agencies, people = import_lu_data(data_file, request, app)
+        click.secho(f'Imported {len(people)} persons and '
+                    f'{len(agencies)} agencies', fg='green')
+
+        if dry_run:
+            transaction.abort()
+            click.secho('Aborting transaction', fg='yellow')
+
+    return execute
+
+
 @cli.command('create-pdf')
 @pass_group_context
 @click.option('--root/--no-root', default=True)
 @click.option('--recursive/--no-recursive', default=True)
 def create_pdf(
-    group_context: 'GroupContext',
+    group_context: GroupContext,
     root: bool,
     recursive: bool
-) -> 'Callable[[AgencyRequest, AgencyApp], None]':
+) -> Callable[[AgencyRequest, AgencyApp], None]:
 
-    def _create_pdf(request: 'AgencyRequest', app: 'AgencyApp') -> None:
+    def _create_pdf(request: AgencyRequest, app: AgencyApp) -> None:
         session = app.session()
         agencies = ExtendedAgencyCollection(session)
 
@@ -264,11 +323,11 @@ def create_pdf(
 @pass_group_context
 @click.option('--people', default=True, is_flag=True)
 def export_xlsx(
-    group_context: 'GroupContext',
+    group_context: GroupContext,
     people: bool
-) -> 'Callable[[AgencyRequest, AgencyApp], None]':
+) -> Callable[[AgencyRequest, AgencyApp], None]:
 
-    def _export_xlsx(request: 'AgencyRequest', app: 'AgencyApp') -> None:
+    def _export_xlsx(request: AgencyRequest, app: AgencyApp) -> None:
         session = app.session()
         if people:
             xlsx = export_person_xlsx(session)
@@ -281,10 +340,10 @@ def export_xlsx(
 @cli.command('enable-yubikey')
 @pass_group_context
 def enable_yubikey(
-    group_context: 'GroupContext'
-) -> 'Callable[[AgencyRequest, AgencyApp], None]':
+    group_context: GroupContext
+) -> Callable[[AgencyRequest, AgencyApp], None]:
 
-    def _enable_yubikey(request: 'AgencyRequest', app: 'AgencyApp') -> None:
+    def _enable_yubikey(request: AgencyRequest, app: AgencyApp) -> None:
         if app.org:
             app.org.meta['enable_yubikey'] = True
             click.secho('YubiKey enabled', fg='green')
@@ -295,10 +354,10 @@ def enable_yubikey(
 @cli.command('disable-yubikey')
 @pass_group_context
 def disable_yubikey(
-    group_context: 'GroupContext'
-) -> 'Callable[[AgencyRequest, AgencyApp], None]':
+    group_context: GroupContext
+) -> Callable[[AgencyRequest, AgencyApp], None]:
 
-    def _disable_yubikey(request: 'AgencyRequest', app: 'AgencyApp') -> None:
+    def _disable_yubikey(request: AgencyRequest, app: AgencyApp) -> None:
         if app.org:
             app.org.meta['enable_yubikey'] = False
             click.secho('YubiKey disabled', fg='green')

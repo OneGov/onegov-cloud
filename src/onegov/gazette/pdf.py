@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 from copy import deepcopy
 from io import BytesIO
 from onegov.gazette import _
@@ -65,7 +67,7 @@ class IndexPdf(Pdf):
         self.style.index.firstLineIndent = -2 * self.style.index.fontSize
         self.style.index.leftIndent = 2 * self.style.index.fontSize
 
-    def category_index(self, notices: 'GazetteNoticeCollection') -> None:
+    def category_index(self, notices: GazetteNoticeCollection) -> None:
         """ Adds a category index. """
 
         last_title: str | None = None
@@ -99,7 +101,7 @@ class IndexPdf(Pdf):
                     style=self.style.index
                 )
 
-    def organization_index(self, notices: 'GazetteNoticeCollection') -> None:
+    def organization_index(self, notices: GazetteNoticeCollection) -> None:
         """ Adds an organization index. """
 
         last_title: str | None = None
@@ -140,8 +142,8 @@ class IndexPdf(Pdf):
     @classmethod
     def from_notices(
         cls,
-        notices: 'GazetteNoticeCollection',
-        request: 'GazetteRequest'
+        notices: GazetteNoticeCollection,
+        request: GazetteRequest
     ) -> BytesIO:
         """ Create an index PDF from a collection of notices. """
 
@@ -226,7 +228,7 @@ class NoticesPdf(Pdf):
     def from_notice(
         cls,
         notice: GazetteNotice,
-        request: 'GazetteRequest'
+        request: GazetteRequest
     ) -> BytesIO:
         """ Create a PDF from a single notice. """
 
@@ -251,8 +253,8 @@ class NoticesPdf(Pdf):
     @classmethod
     def from_notices(
         cls,
-        notices: 'GazetteNoticeCollection',
-        request: 'GazetteRequest'
+        notices: GazetteNoticeCollection,
+        request: GazetteRequest
     ) -> BytesIO:
         """ Create a PDF from a collection of notices. """
 
@@ -320,7 +322,7 @@ class IssuePdf(NoticesPdf):
     def excluded_notices_note(
         self,
         number: int,
-        request: 'GazetteRequest'
+        request: GazetteRequest
     ) -> None:
         """ Adds a paragraph with the number of excluded (print only) notices.
 
@@ -344,7 +346,7 @@ class IssuePdf(NoticesPdf):
 
     def unfold_data(
         self,
-        session: 'Session',
+        session: Session,
         layout: Layout,
         issue: str,
         data: list[dict[str, Any]],
@@ -383,11 +385,11 @@ class IssuePdf(NoticesPdf):
 
     @staticmethod
     def query_notices(
-        session: 'Session',
+        session: Session,
         issue: str,
         organization: str,
         category: str
-    ) -> list['UUID']:
+    ) -> list[UUID]:
         """ Queries all notices with the given values, ordered by publication
         number.
 
@@ -411,8 +413,8 @@ class IssuePdf(NoticesPdf):
     @classmethod
     def query_used_categories(
         cls,
-        session: 'Session',
-        issue: 'Issue'
+        session: Session,
+        issue: Issue
     ) -> set[str]:
 
         query = session.query(GazetteNotice._categories.keys())  # type:ignore
@@ -425,8 +427,8 @@ class IssuePdf(NoticesPdf):
     @classmethod
     def query_used_organizations(
         cls,
-        session: 'Session',
-        issue: 'Issue'
+        session: Session,
+        issue: Issue
     ) -> set[str]:
 
         query = session.query(
@@ -441,8 +443,8 @@ class IssuePdf(NoticesPdf):
     @classmethod
     def query_excluded_notices_count(
         cls,
-        session: 'Session',
-        issue: 'Issue'
+        session: Session,
+        issue: Issue
     ) -> int:
         query = session.query(func.count(GazetteNotice.id))
         query = query.filter(
@@ -455,8 +457,8 @@ class IssuePdf(NoticesPdf):
     @classmethod
     def from_issue(
         cls,
-        issue: 'Issue',
-        request: 'GazetteRequest',
+        issue: Issue,
+        request: GazetteRequest,
         first_publication_number: int | None,
         links: dict[str, str] | None = None
     ) -> BytesIO:
@@ -588,7 +590,7 @@ class IssuePrintOnlyPdf(IssuePdf):
     def excluded_notices_note(
         self,
         number: int,
-        request: 'GazetteRequest'
+        request: GazetteRequest
     ) -> None:
         """ Adds a paragraph with the number of excluded (print only) notices.
 
@@ -610,11 +612,11 @@ class IssuePrintOnlyPdf(IssuePdf):
 
     @staticmethod
     def query_notices(
-        session: 'Session',
+        session: Session,
         issue: str,
         organization: str,
         category: str
-    ) -> list['UUID']:
+    ) -> list[UUID]:
         """ Queries all notices with the given values, ordered by publication
         number.
 
@@ -639,8 +641,8 @@ class IssuePrintOnlyPdf(IssuePdf):
     @classmethod
     def query_used_categories(
         cls,
-        session: 'Session',
-        issue: 'Issue'
+        session: Session,
+        issue: Issue
     ) -> set[str]:
 
         query = session.query(GazetteNotice._categories.keys())  # type:ignore
@@ -654,8 +656,8 @@ class IssuePrintOnlyPdf(IssuePdf):
     @classmethod
     def query_used_organizations(
         cls,
-        session: 'Session',
-        issue: 'Issue'
+        session: Session,
+        issue: Issue
     ) -> set[str]:
 
         query = session.query(
@@ -671,8 +673,8 @@ class IssuePrintOnlyPdf(IssuePdf):
     @classmethod
     def from_issue(  # type:ignore[override]
         cls,
-        issue: 'Issue',
-        request: 'GazetteRequest'
+        issue: Issue,
+        request: GazetteRequest
     ) -> BytesIO:
         """ Generate a PDF for one issue. """
 

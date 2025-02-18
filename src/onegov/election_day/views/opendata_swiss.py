@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 from babel.dates import format_date
 from io import BytesIO
 from onegov.core.security import Public
@@ -40,7 +42,7 @@ def sub(
     name='catalog.rdf',
     permission=Public
 )
-def view_rdf(self: Principal, request: 'ElectionDayRequest') -> bytes:
+def view_rdf(self: Principal, request: ElectionDayRequest) -> bytes:
 
     """ Returns an XML / RDF / DCAT-AP for Switzerland format for
     opendata.swiss.
@@ -54,11 +56,15 @@ def view_rdf(self: Principal, request: 'ElectionDayRequest') -> bytes:
     publisher_id = self.open_data.get('id')
     publisher_name = self.open_data.get('name')
     publisher_mail = self.open_data.get('mail')
+    publisher_uri = self.open_data.get(
+        'uri',
+        f'urn:onegov_election_day:publisher:{publisher_id}'
+    )
     if not publisher_id or not publisher_name or not publisher_mail:
         raise HTTPNotImplemented()
 
     @request.after
-    def set_headers(response: 'Response') -> None:
+    def set_headers(response: Response) -> None:
         response.headers['Content-Type'] = 'application/rdf+xml; charset=UTF-8'
 
     layout = DefaultLayout(self, request)
@@ -89,7 +95,7 @@ def view_rdf(self: Principal, request: 'ElectionDayRequest') -> bytes:
 
     translations = request.app.translations
 
-    def translate(text: 'TranslationString', locale: str) -> str:
+    def translate(text: TranslationString, locale: str) -> str:
         translator = translations.get(locale)
         if translator:
             return text.interpolate(translator.gettext(text))
@@ -251,9 +257,12 @@ def view_rdf(self: Principal, request: 'ElectionDayRequest') -> bytes:
         # Publisher
         pub = sub(ds, 'dct:publisher')
         pub = sub(pub, 'foaf:Organization', {
-            'rdf:about': f'https://{publisher_id}'
+            'rdf:about': publisher_uri
         })
         sub(pub, 'foaf:name', {}, publisher_name)
+        sub(pub, 'foaf:mbox', {
+            'rdf:resource': 'mailto:{}'.format(publisher_mail)
+        })
 
         #  Contact point
         mail = sub(ds, 'dcat:contactPoint')
@@ -322,12 +331,8 @@ def view_rdf(self: Principal, request: 'ElectionDayRequest') -> bytes:
             sub(dist, 'dcat:downloadURL', {'rdf:resource': url})
 
             # Legal
-            license = sub(
-                dist, 'dct:license',
-                {'rdf:about': 'http://dcat-ap.ch/vocabulary/licenses/terms_by'}
-            )
-            sub(license, 'rdf:type', {
-                'rdf:resource': 'http://purl.org/dc/terms/RightsStatement'
+            sub(dist, 'dct:license', {
+                'rdf:resource': 'http://dcat-ap.ch/vocabulary/licenses/terms_by'
             })
 
             # Media Type

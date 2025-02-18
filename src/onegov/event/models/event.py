@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 import warnings
 
 from datetime import datetime
@@ -76,14 +78,14 @@ class Event(Base, OccurrenceMixin, TimestampMixin, SearchableContent,
     occurrence_dates_year_limit = 2
 
     #: Internal number of the event
-    id: 'Column[uuid.UUID]' = Column(
+    id: Column[uuid.UUID] = Column(
         UUID,  # type:ignore[arg-type]
         primary_key=True,
         default=uuid4
     )
 
     #: State of the event
-    state: 'Column[EventState]' = Column(
+    state: Column[EventState] = Column(
         Enum(  # type: ignore[arg-type]
             'initiated', 'submitted', 'published', 'withdrawn',
             name='event_state'
@@ -93,39 +95,39 @@ class Event(Base, OccurrenceMixin, TimestampMixin, SearchableContent,
     )
 
     #: description of the event
-    description: 'dict_property[str | None]' = content_property()
+    description: dict_property[str | None] = content_property()
 
     #: the event organizer
-    organizer: 'dict_property[str | None]' = content_property()
+    organizer: dict_property[str | None] = content_property()
 
     #: the event organizer's public e-mail address
-    organizer_email: 'dict_property[str | None]' = content_property()
+    organizer_email: dict_property[str | None] = content_property()
 
     #: the event organizer's phone number
-    organizer_phone: 'dict_property[str | None]' = content_property()
+    organizer_phone: dict_property[str | None] = content_property()
 
     #: an external url for the event
-    external_event_url: 'dict_property[str | None]' = content_property()
+    external_event_url: dict_property[str | None] = content_property()
 
     #: an external url for the event
-    event_registration_url: 'dict_property[str | None]' = content_property()
+    event_registration_url: dict_property[str | None] = content_property()
 
     #: the price of the event (a text field, not an amount)
-    price: 'dict_property[str | None]' = content_property()
+    price: dict_property[str | None] = content_property()
 
     #: the source of the event, if imported
-    source: 'dict_property[str | None]' = meta_property()
+    source: dict_property[str | None] = meta_property()
 
     #: when the source of the event was last updated (if imported)
-    source_updated: 'dict_property[str | None]' = meta_property()
+    source_updated: dict_property[str | None] = meta_property()
 
     #: Recurrence of the event (RRULE, see RFC2445)
-    recurrence: 'Column[str | None]' = Column(Text, nullable=True)
+    recurrence: Column[str | None] = Column(Text, nullable=True)
 
     #: The access property of the event, taken from onegov.org. Not ideal to
     #: have this defined here, instead of using an AccessExtension, but that
     #: would only be possible with deeper changes to the Event model.
-    access: 'dict_property[str]' = meta_property(default='public')
+    access: dict_property[str] = meta_property(default='public')
 
     #: The associated image
     image = associated(
@@ -179,7 +181,7 @@ class Event(Base, OccurrenceMixin, TimestampMixin, SearchableContent,
                 setattr(self, blob, None)
 
     #: Occurrences of the event
-    occurrences: 'relationship[list[Occurrence]]' = relationship(
+    occurrences: relationship[list[Occurrence]] = relationship(
         'Occurrence',
         cascade='all, delete-orphan',
         back_populates='event',
@@ -202,7 +204,7 @@ class Event(Base, OccurrenceMixin, TimestampMixin, SearchableContent,
     def es_skip(self) -> bool:
         return self.state != 'published' or getattr(self, '_es_skip', False)
 
-    def source_url(self, request: 'CoreRequest') -> str | None:
+    def source_url(self, request: CoreRequest) -> str | None:
         """ Returns an url pointing to the external event if imported. """
         if not self.source or not self.source.startswith('guidle'):
             return None
@@ -221,7 +223,7 @@ class Event(Base, OccurrenceMixin, TimestampMixin, SearchableContent,
             self._update_occurrences()
 
     @property
-    def base_query(self) -> 'Query[Occurrence]':
+    def base_query(self) -> Query[Occurrence]:
         session = object_session(self)
         return session.query(Occurrence).filter_by(event_id=self.id)
 
@@ -253,7 +255,7 @@ class Event(Base, OccurrenceMixin, TimestampMixin, SearchableContent,
         self,
         offset: int = 0,
         limit: int = 10
-    ) -> 'Query[Occurrence]':
+    ) -> Query[Occurrence]:
 
         return self.base_query.filter(
             Occurrence.start >= utcnow()
@@ -423,7 +425,7 @@ class Event(Base, OccurrenceMixin, TimestampMixin, SearchableContent,
         self.occurrences = []
 
         # do not create occurrences unless the event is published
-        if not self.state == 'published':
+        if self.state != 'published':
             return
 
         # do not create occurrences unless start and end is set
@@ -460,7 +462,7 @@ class Event(Base, OccurrenceMixin, TimestampMixin, SearchableContent,
         assert self.state in ('submitted', 'published')
         self.state = 'withdrawn'
 
-    def get_ical_vevents(self, url: str | None = None) -> 'Iterator[vEvent]':
+    def get_ical_vevents(self, url: str | None = None) -> Iterator[vEvent]:
         """ Returns the event and all its occurrences as icalendar objects.
 
         If the calendar has a bunch of RDATE's instead of a proper RRULE, we

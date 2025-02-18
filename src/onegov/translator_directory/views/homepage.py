@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 from morepath import redirect
 from onegov.core.security import Public
 from onegov.org.models import Organisation
@@ -16,8 +18,8 @@ if TYPE_CHECKING:
 @TranslatorDirectoryApp.view(model=Organisation, permission=Public)
 def view_org(
     self: Organisation,
-    request: 'TranslatorAppRequest'
-) -> 'Response':
+    request: TranslatorAppRequest
+) -> Response:
     """ Renders the homepage. """
 
     if not request.is_logged_in:

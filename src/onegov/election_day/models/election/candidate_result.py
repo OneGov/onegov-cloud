@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 from onegov.core.orm import Base
 from onegov.core.orm.mixins import TimestampMixin
 from onegov.core.orm.types import UUID
@@ -21,37 +23,37 @@ class CandidateResult(Base, TimestampMixin):
     __tablename__ = 'candidate_results'
 
     #: identifies the candidate result
-    id: 'Column[uuid.UUID]' = Column(
+    id: Column[uuid.UUID] = Column(
         UUID,  # type:ignore[arg-type]
         primary_key=True,
         default=uuid4
     )
 
     # votes
-    votes: 'Column[int]' = Column(Integer, nullable=False, default=lambda: 0)
+    votes: Column[int] = Column(Integer, nullable=False, default=lambda: 0)
 
     #: the election result id this result belongs to
-    election_result_id: 'Column[uuid.UUID]' = Column(
+    election_result_id: Column[uuid.UUID] = Column(
         UUID,  # type:ignore[arg-type]
         ForeignKey('election_results.id', ondelete='CASCADE'),
         nullable=False
     )
 
     #: the election result this result belongs to
-    election_result: 'relationship[ElectionResult]' = relationship(
+    election_result: relationship[ElectionResult] = relationship(
         'ElectionResult',
         back_populates='candidate_results'
     )
 
     #: the candidate id this result belongs to
-    candidate_id: 'Column[uuid.UUID]' = Column(
+    candidate_id: Column[uuid.UUID] = Column(
         UUID,  # type:ignore[arg-type]
         ForeignKey('candidates.id', ondelete='CASCADE'),
         nullable=False
     )
 
     #: the candidate this result belongs to
-    candidate: 'relationship[Candidate]' = relationship(
+    candidate: relationship[Candidate] = relationship(
         'Candidate',
         back_populates='results'
     )

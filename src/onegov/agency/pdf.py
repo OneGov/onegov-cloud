@@ -1,5 +1,8 @@
+from __future__ import annotations
+
 from datetime import date
 from io import BytesIO
+
 
 from onegov.agency.utils import handle_empty_p_tags
 from onegov.core.utils import module_path
@@ -30,20 +33,20 @@ class AgencyPdfDefault(Pdf):
     previous_level_context: int | None = None
 
     @property
-    def page_fn(self) -> 'Callable[[Canvas, Template], None]':
+    def page_fn(self) -> Callable[[Canvas, Template], None]:
         return page_fn_footer
 
     @property
-    def page_fn_later(self) -> 'Callable[[Canvas, Template], None]':
+    def page_fn_later(self) -> Callable[[Canvas, Template], None]:
         return page_fn_header_and_footer
 
     @classmethod
     def from_agencies(
         cls,
-        agencies: 'Iterable[ExtendedAgency]',
+        agencies: Iterable[ExtendedAgency],
         title: str,
         toc: bool,
-        exclude: 'Collection[str]',
+        exclude: Collection[str],
         page_break_on_level: int = 1,
         link_color: str | None = None,
         underline_links: bool = False
@@ -82,8 +85,8 @@ class AgencyPdfDefault(Pdf):
 
     def memberships(
         self,
-        agency: 'ExtendedAgency',
-        exclude: 'Collection[str]'
+        agency: ExtendedAgency,
+        exclude: Collection[str]
     ) -> None:
         """ Adds the memberships of an agency as table. """
 
@@ -131,8 +134,8 @@ class AgencyPdfDefault(Pdf):
 
     def agency(
         self,
-        agency: 'ExtendedAgency',
-        exclude: 'Collection[str]',
+        agency: ExtendedAgency,
+        exclude: Collection[str],
         level: int = 1,
         content_so_far: bool = False,
         skip_title: bool = False,
@@ -167,6 +170,52 @@ class AgencyPdfDefault(Pdf):
             has_content = True
             portrait_last_content = True
 
+        if agency.location_address or agency.location_code_city:
+            address = agency.location_address
+            city = agency.location_code_city
+            self.p(address) if address else None
+            self.p(city) if city else None
+            self.spacer(0.1 * cm)
+            has_content = True
+            portrait_last_content = False
+
+        if agency.postal_address or agency.postal_code_city:
+            address = agency.postal_address
+            city = agency.postal_code_city
+            self.p(address) if address else None
+            self.p(city) if city else None
+            self.spacer(0.1 * cm)
+            has_content = True
+            portrait_last_content = False
+
+        if agency.phone:
+            self.p(agency.phone)
+            self.spacer(0.1 * cm)
+            has_content = True
+            portrait_last_content = False
+
+        if agency.email:
+            self.p(agency.email)
+            self.spacer(0.1 * cm)
+            has_content = True
+            portrait_last_content = False
+
+        if agency.website:
+            web = agency.website.replace('http://', '').replace(
+                'https://', '')
+            self.p(web)
+            self.spacer(0.1 * cm)
+            has_content = True
+            portrait_last_content = False
+
+        if agency.opening_hours:
+            self.p(agency.opening_hours)
+            has_content = True
+            portrait_last_content = False
+
+        if has_content:
+            self.spacer(0.3 * cm)
+
         if agency.memberships.count():
             self.memberships(agency, exclude)
             has_content = True
@@ -199,7 +248,7 @@ class AgencyPdfZg(AgencyPdfDefault):
     """ A PDF with the CI of the canton of ZG. """
 
     @staticmethod
-    def page_fn_footer(canvas: 'Canvas', doc: 'Template') -> None:
+    def page_fn_footer(canvas: Canvas, doc: Template) -> None:
         """ A footer with the title and print date on the left and the page
         numbers on the right.
 
@@ -222,16 +271,16 @@ class AgencyPdfZg(AgencyPdfDefault):
         canvas.drawRightString(
             doc.pagesize[0] - doc.rightMargin,
             doc.bottomMargin / 2,
-            f'{canvas.getPageNumber()}'
+            f'{canvas.getPageNumber()}'  # type:ignore[no-untyped-call]
         )
         canvas.restoreState()
 
     @property
-    def page_fn(self) -> 'Callable[[Canvas, Template], None]':
+    def page_fn(self) -> Callable[[Canvas, Template], None]:
         return page_fn_header_logo
 
     @property
-    def page_fn_later(self) -> 'Callable[[Canvas, Template], None]':
+    def page_fn_later(self) -> Callable[[Canvas, Template], None]:
         return self.page_fn_footer
 
     def __init__(self, *args: Any, **kwargs: Any) -> None:
@@ -250,7 +299,7 @@ class AgencyPdfAr(AgencyPdfDefault):
     """ A PDF with the CI of the canton of AR. """
 
     @staticmethod
-    def page_fn_footer(canvas: 'Canvas', doc: 'Template') -> None:
+    def page_fn_footer(canvas: Canvas, doc: Template) -> None:
         """ A footer with the print date on the left and the page numbers
         on the right.
 
@@ -267,14 +316,14 @@ class AgencyPdfAr(AgencyPdfDefault):
         canvas.drawRightString(
             doc.pagesize[0] - doc.rightMargin,
             doc.bottomMargin / 2,
-            f'{canvas.getPageNumber()}'
+            f'{canvas.getPageNumber()}'  # type:ignore[no-untyped-call]
         )
         canvas.restoreState()
 
     @staticmethod
     def page_fn_header_logo_and_footer(
-        canvas: 'Canvas',
-        doc: 'Template'
+        canvas: Canvas,
+        doc: Template
     ) -> None:
         """ A header with the logo, a footer with the print date and page
         numbers.
@@ -296,7 +345,7 @@ class AgencyPdfAr(AgencyPdfDefault):
         AgencyPdfAr.page_fn_footer(canvas, doc)
 
     @staticmethod
-    def page_fn_header_and_footer(canvas: 'Canvas', doc: 'Template') -> None:
+    def page_fn_header_and_footer(canvas: Canvas, doc: Template) -> None:
         """ A header with the title and author, a footer with the print date
         and page numbers.
 
@@ -314,11 +363,11 @@ class AgencyPdfAr(AgencyPdfDefault):
         AgencyPdfAr.page_fn_footer(canvas, doc)
 
     @property
-    def page_fn(self) -> 'Callable[[Canvas, Template], None]':
+    def page_fn(self) -> Callable[[Canvas, Template], None]:
         return self.page_fn_header_logo_and_footer
 
     @property
-    def page_fn_later(self) -> 'Callable[[Canvas, Template], None]':
+    def page_fn_later(self) -> Callable[[Canvas, Template], None]:
         return self.page_fn_header_and_footer
 
     def __init__(self, *args: Any, **kwargs: Any) -> None:
@@ -356,7 +405,7 @@ class AgencyPdfBs(AgencyPdfDefault):
     font_size = 11
 
     @staticmethod
-    def page_fn_header(canvas: 'Canvas', doc: 'Template') -> None:
+    def page_fn_header(canvas: Canvas, doc: Template) -> None:
         """ A header with the logo, a footer with the print date and page
         numbers.
 
@@ -378,7 +427,7 @@ class AgencyPdfBs(AgencyPdfDefault):
         AgencyPdfBs.page_fn_footer(canvas, doc)
 
     @staticmethod
-    def page_fn_footer(canvas: 'Canvas', doc: 'Template') -> None:
+    def page_fn_footer(canvas: Canvas, doc: Template) -> None:
         assert hasattr(doc, 'created')
         canvas.saveState()
         canvas.setFont('Helvetica', 9)
@@ -390,12 +439,12 @@ class AgencyPdfBs(AgencyPdfDefault):
         canvas.drawRightString(
             doc.pagesize[0] - doc.rightMargin,
             doc.bottomMargin / 2,
-            f'{canvas.getPageNumber()}'
+            f'{canvas.getPageNumber()}'  # type:ignore[no-untyped-call]
         )
         canvas.restoreState()
 
     @property
-    def page_fn(self) -> 'Callable[[Canvas, Template], None]':
+    def page_fn(self) -> Callable[[Canvas, Template], None]:
         return self.page_fn_header
 
     def __init__(self, *args: Any, **kwargs: Any) -> None:
@@ -422,8 +471,8 @@ class AgencyPdfBs(AgencyPdfDefault):
 
     def init_a4_portrait(
         self,
-        page_fn: '_PageCallback' = empty_page_fn,
-        page_fn_later: '_PageCallback | None ' = None,
+        page_fn: _PageCallback = empty_page_fn,
+        page_fn_later: _PageCallback | None = None,
         **_ignored: object
     ) -> None:
         super().init_a4_portrait(
@@ -435,3 +484,28 @@ class AgencyPdfBs(AgencyPdfDefault):
             margin_right=self.margin_right,
             font_size=self.font_size
         )
+
+
+class AgencyPdfLu(AgencyPdfDefault):
+    """
+    No hierarchical numbering
+
+    """
+
+    @property
+    def page_fn(self) -> Callable[[Canvas, Template], None]:
+        return page_fn_header_logo
+
+    def __init__(self, *args: Any, **kwargs: Any) -> None:
+        filename = path.join(
+            module_path('onegov.agency', 'static/logos'),
+            'canton-lu.svg'
+        )
+
+        with open(filename) as file:
+            logo = file.read()
+        kwargs['logo'] = logo
+        kwargs['author'] = 'Kanton Luzern'
+
+        kwargs['skip_numbering'] = True
+        super(AgencyPdfDefault, self).__init__(*args, **kwargs)

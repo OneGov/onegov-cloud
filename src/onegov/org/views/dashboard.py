@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 from onegov.core.security import Secret
 from onegov.org import _, OrgApp
 from onegov.org.layout import DashboardLayout
@@ -13,9 +15,9 @@ if TYPE_CHECKING:
 @OrgApp.html(model=Dashboard, template='dashboard.pt', permission=Secret)
 def dashboard(
     self: Dashboard,
-    request: 'OrgRequest',
+    request: OrgRequest,
     layout: DashboardLayout | None = None
-) -> 'RenderData':
+) -> RenderData:
 
     layout = layout or DashboardLayout(self, request)
     return {

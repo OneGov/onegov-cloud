@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 from onegov.agency.api import AgencyApiEndpoint
 from onegov.agency.api import MembershipApiEndpoint
 from onegov.agency.api import PersonApiEndpoint
@@ -5,7 +7,7 @@ from onegov.agency.custom import get_global_tools
 from onegov.agency.custom import get_top_navigation
 from onegov.agency.forms import UserGroupForm
 from onegov.agency.initial_content import create_new_organisation
-from onegov.agency.pdf import AgencyPdfAr, AgencyPdfBs
+from onegov.agency.pdf import AgencyPdfAr, AgencyPdfBs, AgencyPdfLu
 from onegov.agency.pdf import AgencyPdfDefault
 from onegov.agency.pdf import AgencyPdfZg
 from onegov.agency.request import AgencyRequest
@@ -51,13 +53,13 @@ class AgencyApp(OrgApp, ApiApp):
         return self.filestorage.exists('people.xlsx')
 
     @property
-    def root_pdf_modified(self) -> 'datetime | None':
+    def root_pdf_modified(self) -> datetime | None:
         if self.root_pdf_exists:
             return self.filestorage.getdetails('root.pdf').modified
         return None
 
     @property
-    def people_xlsx_modified(self) -> 'datetime | None':
+    def people_xlsx_modified(self) -> datetime | None:
         if self.people_xlsx:
             return self.filestorage.getdetails('people.xlsx').modified
         return None
@@ -73,7 +75,7 @@ class AgencyApp(OrgApp, ApiApp):
 
     # FIXME: asymmetric property
     @root_pdf.setter
-    def root_pdf(self, value: 'SupportsRead[bytes] | bytes') -> None:
+    def root_pdf(self, value: SupportsRead[bytes] | bytes) -> None:
         with self.filestorage.open('root.pdf', 'wb') as file:
             if hasattr(value, 'read'):
                 value = value.read()
@@ -91,7 +93,7 @@ class AgencyApp(OrgApp, ApiApp):
 
     # FIXME: asymmetric property
     @people_xlsx.setter
-    def people_xlsx(self, value: 'SupportsRead[bytes] | bytes') -> None:
+    def people_xlsx(self, value: SupportsRead[bytes] | bytes) -> None:
         with self.filestorage.open('people.xlsx', 'wb') as file:
             if hasattr(value, 'read'):
                 value = value.read()
@@ -107,6 +109,8 @@ class AgencyApp(OrgApp, ApiApp):
             return AgencyPdfZg
         if pdf_layout == 'bs':
             return AgencyPdfBs
+        if pdf_layout == 'lu':
+            return AgencyPdfLu
         return AgencyPdfDefault
 
     @property
@@ -120,7 +124,7 @@ class AgencyApp(OrgApp, ApiApp):
 
 @AgencyApp.setting(section='org', name='create_new_organisation')
 def get_create_new_organisation_factory(
-) -> 'Callable[[AgencyApp, str], Organisation]':
+) -> Callable[[AgencyApp, str], Organisation]:
     return create_new_organisation
 
 
@@ -130,7 +134,7 @@ def get_template_directory() -> str:
 
 
 @AgencyApp.template_variables()
-def get_template_variables(request: AgencyRequest) -> 'RenderData':
+def get_template_variables(request: AgencyRequest) -> RenderData:
     return {
         'global_tools': tuple(get_global_tools(request)),
         'top_navigation': tuple(get_top_navigation(request)),
@@ -174,29 +178,29 @@ def get_js_path() -> str:
 
 
 @AgencyApp.webasset('people-select')
-def get_people_select_asset() -> 'Iterator[str]':
+def get_people_select_asset() -> Iterator[str]:
     yield 'people-select.js'
 
 
 @AgencyApp.webasset('sortable-multi-checkbox')
-def get_sortable_multi_checkbox_asset() -> 'Iterator[str]':
+def get_sortable_multi_checkbox_asset() -> Iterator[str]:
     yield 'jquery.js'
     yield 'sortable.js'
     yield 'sortable-multi-checkbox.js'
 
 
 @AgencyApp.webasset('redactor', filters={'js': None})
-def get_redactor_asserts() -> 'Iterator[str]':
+def get_redactor_asserts() -> Iterator[str]:
     yield from redactor_assets()
 
 
 @AgencyApp.webasset('editor')
-def get_editor_assets() -> 'Iterator[str]':
+def get_editor_assets() -> Iterator[str]:
     yield from editor_assets()
 
 
 @AgencyApp.setting(section='api', name='endpoints')
-def get_api_endpoints() -> list[type['ApiEndpoint[Any]']]:
+def get_api_endpoints() -> list[type[ApiEndpoint[Any]]]:
     return [
         AgencyApiEndpoint,
         PersonApiEndpoint,

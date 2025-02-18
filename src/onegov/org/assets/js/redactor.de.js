@@ -46,6 +46,7 @@ $.Redactor.opts.langs['de'] = {
 	delete_head: 'Titel entfernen',
 	title: 'Title',
     subtitle: 'Untertitel',
+	subsubtitle: 'Sub-Untertitel',
 	image_view: 'Bilder',
 	image_position: 'Textumbruch',
 	none: 'Keine',

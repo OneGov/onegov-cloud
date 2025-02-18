@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 from onegov.core.security import Public
 from onegov.town6.views.auth import town_handle_login as handle_login_base
 from onegov.translator_directory import _
@@ -22,9 +24,9 @@ if TYPE_CHECKING:
 )
 def handle_login(
     self: Auth,
-    request: 'TranslatorAppRequest',
+    request: TranslatorAppRequest,
     form: LoginForm
-) -> 'RenderData | Response':
+) -> RenderData | Response:
 
     # custom username handle
     form.username.label.text = request.translate(

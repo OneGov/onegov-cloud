@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 import jwt
 
 from datetime import timedelta
@@ -14,7 +16,9 @@ if TYPE_CHECKING:
     from morepath.request import Response
 
 
-def authenticate(request: 'CoreRequest') -> ApiKey:
+# TODO: Do we allow this to update request.identity, so we can elevate
+#       privileges for what a given API token is allowed to see?
+def authenticate(request: CoreRequest) -> ApiKey:
     if request.authorization is None:
         raise HTTPUnauthorized()
 
@@ -32,7 +36,7 @@ def authenticate(request: 'CoreRequest') -> ApiKey:
     return api_key
 
 
-def check_rate_limit(request: 'CoreRequest') -> dict[str, str]:
+def check_rate_limit(request: CoreRequest) -> dict[str, str]:
     """ Checks if the rate limit for the current client.
 
     Raises an exception if the rate limit is reached. Returns response headers
@@ -74,7 +78,7 @@ def check_rate_limit(request: 'CoreRequest') -> dict[str, str]:
     }
 
     @request.after
-    def add_headers(response: 'Response') -> None:
+    def add_headers(response: Response) -> None:
         for header in headers.items():
             response.headers.add(*header)
 

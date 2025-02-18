@@ -1,3 +1,5 @@
+import os
+from tempfile import TemporaryDirectory
 import textwrap
 import transaction
 import zipfile
@@ -11,10 +13,11 @@ from onegov.file import FileCollection
 from onegov.form import (
     FormCollection, FormDefinitionCollection, as_internal_id)
 from onegov.org.models import TicketNote
+from onegov.org.models.document_form import FormDocument
 from onegov.people import Person
 from onegov.ticket import TicketCollection, Ticket
 from onegov.user import UserCollection
-from tests.shared.utils import create_image
+from tests.shared.utils import create_image, create_pdf
 from unittest.mock import patch
 from webtest import Upload
 
@@ -266,11 +269,11 @@ def test_add_custom_form_minimum_price_validation(client):
     form_page.form['definition'] = textwrap.dedent("""
         E-Mail *= @@@
 
-        Stamp A = 0..20 (1.10 CHF)
-        Stamp B = 0..20 (0.85 CHF)
+        Stamp A = 0..20 (1.20 CHF)
+        Stamp B = 0..20 (1.00 CHF)
 
         Discount *=
-            (x) First four B stamps free (-3.40 CHF)
+            (x) First four B stamps free (-4.00 CHF)
     """)
     form_page.form['minimum_price_total'] = '5.00'
     form_page = form_page.form.submit().follow()
@@ -281,14 +284,14 @@ def test_add_custom_form_minimum_price_validation(client):
     form_page = form_page.form.submit().follow()
 
     assert "Der Totalbetrag für Ihre Eingaben" in form_page
-    assert "beläuft sich auf 1.70 CHF" in form_page
+    assert "beläuft sich auf 2.00 CHF" in form_page
     assert "allerdings ist der Minimalbetrag 5.00 CHF" in form_page
 
     # now that we reached the minimum price we should succeed
     form_page.form['stamp_a'] = '3'
     form_page = form_page.form.submit()
     assert "Totalbetrag" in form_page
-    assert "5.00 CHF" in form_page
+    assert "5.60 CHF" in form_page
     assert "Minimalbetrag" not in form_page
 
 
@@ -367,7 +370,7 @@ def test_forms_explicitly_link_referenced_files(client):
     path = module_path('tests.onegov.org', 'fixtures/sample.pdf')
     with open(path, 'rb') as f:
         page = admin.get('/files')
-        page.form['file'] = Upload('Sample.pdf', f.read(), 'application/pdf')
+        page.form['file'] = [Upload('Sample.pdf', f.read(), 'application/pdf')]
         page.form.submit()
 
     pdf_url = (
@@ -1338,7 +1341,7 @@ def test_create_and_fill_survey(client):
     page = anonymous.get('/survey/event-evaluation')
     page.form['name'] = 'Nicolas Thomas'
     page.form['how_was_the_event_'] = 'Good'
-    page = page.form.submit().follow()
+    page = page.form.submit()
 
     # Check the results
     page = client.get('/survey/event-evaluation').click('Resultate')
@@ -1381,7 +1384,7 @@ def test_create_and_fill_survey(client):
     page = anonymous.get(url)
     page.form['name'] = 'Rubus Bubus'
     page.form['how_was_the_event_'] = 'Medium'
-    page = page.form.submit().follow()
+    page = page.form.submit()
 
     # Check the results
     page = client.get('/survey/event-evaluation').click('Resultate')
@@ -1397,3 +1400,45 @@ def test_create_and_fill_survey(client):
     assert 'Medium' in page
     assert '(1/1)' in page
     assert 'Nicolas Thomas' not in page
+
+
+def test_document_form(client):
+
+    session = client.app.session()
+    client.login_editor()
+
+    with TemporaryDirectory() as td:
+        first_pdf = os.path.join(td, 'first_pdf.pdf')
+        create_pdf(first_pdf, 'This is the wrong form')
+        other_pdf = os.path.join(td, 'other_pdf.pdf')
+        create_pdf(other_pdf, 'This is a deadline extension form')
+
+        page = client.get('/forms')
+        page = page.click('Dokumentenformular')
+        page.form['title'] = 'Deadline Extension'
+        page.form['lead'] = 'Request a deadline extension'
+        page.form['text'] = '''
+            Fill out the form below to request a deadline extension.
+        '''
+        page.form['pdf'] = Upload(first_pdf)
+        page = page.form.submit().follow()
+        assert 'Formular herunterladen'
+        assert 'Deadline Extension' in page
+        assert 'Request a deadline extension' in page
+        assert '''
+            Fill out the form below to request a deadline extension.
+        ''' in page
+        assert 'first_pdf.pdf' in page
+        form_document = session.query(FormDocument).one()
+        assert 'This is the wrong form' in form_document.pdf_extract
+
+        page = page.click('Bearbeiten')
+        page.form['title'] = 'Deadline Extension Request'
+
+        page.form.get('pdf', 0).select('replace')
+        page.form.get('pdf', 1).value = Upload(other_pdf)
+        page = page.form.submit().follow()
+        assert 'Deadline Extension Request' in page
+        assert 'other_pdf.pdf' in page
+        form_document = session.query(FormDocument).one()
+        assert 'This is a deadline extension form' in form_document.pdf_extract

@@ -3,6 +3,8 @@ import pytest
 from datetime import date, datetime, time, timedelta
 from dateutil.rrule import MO, WE
 from onegov.core.utils import Bunch
+from onegov.directory.collections.directory import DirectoryCollection
+from onegov.directory import DirectoryConfiguration
 from onegov.event import Event
 from onegov.form import FormDefinition
 from onegov.org.forms import DaypassAllocationForm
@@ -300,6 +302,9 @@ def test_edit_room_allocation_form_whole_day():
 
 def test_find_your_spot_form_single_room():
     request = Bunch(POST=MultiDict([
+        # 1 hour
+        ('duration', '1'),
+        ('duration', '0'),
         ('start', date.today().isoformat()),
         ('end', date.today().isoformat()),
         ('start_time', '08:00'),
@@ -316,6 +321,7 @@ def test_find_your_spot_form_single_room():
         title='Room 1'
     )])
     assert form.validate()
+    assert form.duration.data == timedelta(hours=1)
     assert form.start.data == date.today()
     assert form.end.data == date.today()
     assert form.start_time.data == time(8, 0)
@@ -342,6 +348,9 @@ def test_find_your_spot_form_multiple_rooms():
         ),
     ]
     request = Bunch(POST=MultiDict([
+        # 30 minutes
+        ('duration', '0'),
+        ('duration', '30'),
         ('start', date.today().isoformat()),
         ('end', date.today().isoformat()),
         ('start_time', '08:00'),
@@ -357,6 +366,7 @@ def test_find_your_spot_form_multiple_rooms():
     form.request = request
     form.apply_rooms(rooms)
     assert form.validate()
+    assert form.duration.data == timedelta(minutes=30)
     assert form.start.data == date.today()
     assert form.end.data == date.today()
     assert form.start_time.data == time(8, 0)
@@ -603,15 +613,25 @@ def test_user_group_form(session):
     user_b.logout_all_sessions = MagicMock()
     user_c.logout_all_sessions = MagicMock()
 
-    session.add(
-        FormDefinition(
-            title='A-1',
-            name='a',
-            definition='# A',
-            order=0,
-            checksum='x'
+    formdefinition = FormDefinition(
+        title='A-1',
+        name='a',
+        definition='# A',
+        order=0,
+        checksum='x'
+    )
+
+    directories = DirectoryCollection(session, type='extended')
+    directory = directories.add(
+        title="Trainers",
+        structure="Name *= ___",
+        configuration=DirectoryConfiguration(
+            title="[name]",
+            order=['name']
         )
     )
+
+    session.add_all((formdefinition, directory))
     session.flush()
 
     request = Bunch(
@@ -631,6 +651,8 @@ def test_user_group_form(session):
     assert ('FRM-', 'FRM') in form.ticket_permissions.choices
     assert ('FRM-A-1', 'FRM: A-1') in form.ticket_permissions.choices
     assert ('PER-', 'PER') in form.ticket_permissions.choices
+    assert ('DIR-', 'DIR') in form.ticket_permissions.choices
+    assert ('DIR-Trainers', 'DIR: Trainers') in form.ticket_permissions.choices
 
     # apply / update
     groups = UserGroupCollection(session)

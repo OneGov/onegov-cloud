@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 import json
 import transaction
 
@@ -365,7 +367,7 @@ class EventForm(Form):
 
         return None
 
-    def populate_obj(self, model: 'Event') -> None:  # type:ignore[override]
+    def populate_obj(self, model: Event) -> None:  # type:ignore[override]
         """ Stores the form values on the model. """
 
         super().populate_obj(model, exclude={
@@ -428,7 +430,7 @@ class EventForm(Form):
                 for occ in model.occurrences:
                     occ.filter_keywords = filter_keywords
 
-    def process_obj(self, model: 'Event') -> None:  # type:ignore[override]
+    def process_obj(self, model: Event) -> None:  # type:ignore[override]
         """ Stores the page values on the form. """
 
         super().process_obj(model)
@@ -473,22 +475,22 @@ class EventForm(Form):
                 if form_field is None:
                     continue
 
-                form_field.data = keywords[field.id] if (
-                    field.id in keywords) else None
+                form_field.data = keywords.get(field.id, None)
 
     @cached_property
     def parsed_dates(self) -> list[date]:
         return self.json_to_dates(self.dates.data)
 
     def json_to_dates(self, text: str | None = None) -> list[date]:
-        result = []
+        if not text:
+            return []
 
-        for value in json.loads(text or '{}').get('values', []):
-            result.append(date(*map(int, value['date'].split('-'))))
+        return [
+            date.fromisoformat(value['date'])
+            for value in json.loads(text).get('values', [])
+        ]
 
-        return result
-
-    def dates_to_json(self, dates: 'Sequence[date] | None' = None) -> str:
+    def dates_to_json(self, dates: Sequence[date] | None = None) -> str:
         dates = dates or []
 
         return json.dumps({
@@ -499,7 +501,7 @@ class EventForm(Form):
             },
             'values': [
                 {
-                    'date': d.strftime('%Y-%m-%d'),
+                    'date': d.isoformat(),
                     'error': self.date_errors.get(ix, '')
                 } for ix, d in enumerate(dates)
             ]
@@ -576,7 +578,7 @@ class EventImportForm(Form):
         occurrences = OccurrenceCollection(self.request.session)
         headers = self.headers
 
-        def get(occurrence: 'Occurrence', attribute: str) -> str:
+        def get(occurrence: Occurrence, attribute: str) -> str:
             if attribute in ('start', 'end'):
                 attribute = f'localized_{attribute}'
             result = (
@@ -594,14 +596,14 @@ class EventImportForm(Form):
             result = result.strip()
             return result
 
-        result = []
-        for occurrence in occurrences.query():
-            result.append({
+        return [
+            {
                 title: get(occurrence, attribute)
                 for attribute, title in headers.items()
-            })
+            }
+            for occurrence in occurrences.query()
 
-        return result
+        ]
 
     def run_import(self) -> tuple[int, list[str]]:
         headers = self.headers
@@ -639,7 +641,7 @@ class EventImportForm(Form):
             for key, value in headers.items()
         }
 
-        def get(line: 'DefaultRow', column: str, attribute: str) -> Any:
+        def get(line: DefaultRow, column: str, attribute: str) -> Any:
             result = getattr(line, column)
             if attribute in ('start', 'end'):
                 result = parse(result, dayfirst=True)

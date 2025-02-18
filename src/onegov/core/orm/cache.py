@@ -20,6 +20,7 @@ If there are any changes to the users table, the cache is removed. Since the
 cache is usually a shared redis instance, this works for multiple processes.
 
 """
+from __future__ import annotations
 
 import inspect
 
@@ -69,18 +70,18 @@ if TYPE_CHECKING:
         @overload
         def __call__(
             self,
-            fn: 'Creator[Query[_T]]'
-        ) -> 'OrmCacheDescriptor[tuple[_T, ...]]': ...
+            fn: Creator[Query[_T]]
+        ) -> OrmCacheDescriptor[tuple[_T, ...]]: ...
 
         @overload
         def __call__(
             self,
-            fn: 'Creator[_T]'
-        ) -> 'OrmCacheDescriptor[_T]': ...
+            fn: Creator[_T]
+        ) -> OrmCacheDescriptor[_T]: ...
 
     class _HasApp(Protocol):
         @property
-        def app(self) -> 'OrmCacheApp': ...
+        def app(self) -> OrmCacheApp: ...
 
 _T = TypeVar('_T')
 _QT = TypeVar('_QT')
@@ -101,6 +102,7 @@ class OrmCacheApp:
         # forward declare the attributes we need from Framework
         session_manager: SessionManager
         schema: str
+
         @property
         def cache(self) -> RedisCacheRegion: ...
         request_cache: dict[str, Any]
@@ -130,8 +132,8 @@ class OrmCacheApp:
 
     def descriptor_bound_orm_change_handler(
         self,
-        descriptor: 'OrmCacheDescriptor[Any]'
-    ) -> 'Callable[[str, Base], None]':
+        descriptor: OrmCacheDescriptor[Any]
+    ) -> Callable[[str, Base], None]:
         """ Listens to changes to the database and evicts the cache if the
         policy demands it. Available policies:
 
@@ -143,7 +145,7 @@ class OrmCacheApp:
 
         """
 
-        def handle_orm_change(schema: str, obj: 'Base') -> None:
+        def handle_orm_change(schema: str, obj: Base) -> None:
 
             if callable(descriptor.cache_policy):
                 dirty = descriptor.cache_policy(obj)
@@ -179,7 +181,7 @@ class OrmCacheApp:
         return handle_orm_change
 
     @property
-    def orm_cache_descriptors(self) -> 'Iterator[OrmCacheDescriptor[Any]]':
+    def orm_cache_descriptors(self) -> Iterator[OrmCacheDescriptor[Any]]:
         """ Yields all orm cache descriptors installed on the class. """
 
         for member_name, member in inspect.getmembers(self.__class__):
@@ -206,24 +208,24 @@ class OrmCacheDescriptor(Generic[_T]):
 
     @overload
     def __init__(
-        self: 'OrmCacheDescriptor[tuple[_QT, ...]]',
-        cache_policy: 'CachePolicy',
-        creator: 'Creator[Query[_QT]]',
+        self: OrmCacheDescriptor[tuple[_QT, ...]],
+        cache_policy: CachePolicy,
+        creator: Creator[Query[_QT]],
         by_role: bool = False
     ): ...
 
     @overload
     def __init__(
-        self: 'OrmCacheDescriptor[_T]',
-        cache_policy: 'CachePolicy',
-        creator: 'Creator[_T]',
+        self: OrmCacheDescriptor[_T],
+        cache_policy: CachePolicy,
+        creator: Creator[_T],
         by_role: bool = False
     ): ...
 
     def __init__(
         self,
-        cache_policy: 'CachePolicy',
-        creator: 'Creator[Query[Any]] | Creator[_T]',
+        cache_policy: CachePolicy,
+        creator: Creator[Query[Any]] | Creator[_T],
         by_role: bool = False
     ):
         self.cache_policy = cache_policy
@@ -232,7 +234,7 @@ class OrmCacheDescriptor(Generic[_T]):
         self.creator = creator
         self.by_role = by_role
 
-    def cache_key(self, obj: 'OrmCacheApp | _HasApp') -> str:
+    def cache_key(self, obj: OrmCacheApp | _HasApp) -> str:
         if not self.by_role:
             return self.cache_key_prefix
 
@@ -270,7 +272,7 @@ class OrmCacheDescriptor(Generic[_T]):
             for child in obj:
                 self.assert_no_orm_objects(obj, depth + 1)
 
-    def create(self, instance: 'OrmCacheApp | _HasApp') -> _T:
+    def create(self, instance: OrmCacheApp | _HasApp) -> _T:
         """ Uses the creator to load the object to be cached.
 
         Since the return value of the creator might not be something we want
@@ -287,8 +289,7 @@ class OrmCacheDescriptor(Generic[_T]):
         self.assert_no_orm_objects(result)
         return result
 
-
-    def load(self, instance: 'OrmCacheApp | _HasApp') -> _T:
+    def load(self, instance: OrmCacheApp | _HasApp) -> _T:
         """ Loads the object from the database or cache. """
 
         if isinstance(instance, OrmCacheApp):
@@ -361,7 +362,7 @@ class OrmCacheDescriptor(Generic[_T]):
         self,
         instance: None,
         owner: type[Any]
-    ) -> 'Self': ...
+    ) -> Self: ...
 
     @overload
     def __get__(
@@ -374,7 +375,7 @@ class OrmCacheDescriptor(Generic[_T]):
         self,
         instance: Any | None,
         owner: type[Any]
-    ) -> 'Self | _T':
+    ) -> Self | _T:
         """ Handles the object/cache access. """
 
         if instance is None:
@@ -384,9 +385,9 @@ class OrmCacheDescriptor(Generic[_T]):
 
 
 def orm_cached(
-    policy: 'CachePolicy',
+    policy: CachePolicy,
     by_role: bool = False
-) -> '_OrmCacheDecorator':
+) -> _OrmCacheDecorator:
     """ The decorator use to setup the cache descriptor.
 
     See the :mod:`onegov.core.orm.cache` docs for usage.
@@ -395,22 +396,22 @@ def orm_cached(
 
     @overload
     def orm_cache_decorator(
-        fn: 'Creator[Query[_T]]'
-    ) -> 'OrmCacheDescriptor[tuple[_T, ...]]': ...
+        fn: Creator[Query[_T]]
+    ) -> OrmCacheDescriptor[tuple[_T, ...]]: ...
 
     @overload
     def orm_cache_decorator(
-        fn: 'Creator[_T]'
-    ) -> 'OrmCacheDescriptor[_T]': ...
+        fn: Creator[_T]
+    ) -> OrmCacheDescriptor[_T]: ...
 
-    def orm_cache_decorator(fn: 'Creator[Any]') -> 'OrmCacheDescriptor[Any]':
+    def orm_cache_decorator(fn: Creator[Any]) -> OrmCacheDescriptor[Any]:
         return OrmCacheDescriptor(policy, fn, by_role)
     return orm_cache_decorator
 
 
 def request_cached(
-    appmethod: 'Callable[[_FrameworkT], _T]'
-) -> '_RequestCached[_FrameworkT, _T]':
+    appmethod: Callable[[_FrameworkT], _T]
+) -> _RequestCached[_FrameworkT, _T]:
     """ This is like a request scoped :func:`orm_cached`.
 
     This may store ORM objects in contrast to :func:`orm_cached`, which
@@ -421,7 +422,7 @@ def request_cached(
     cache_key = appmethod.__qualname__
 
     @wraps(appmethod)
-    def wrapper(self: '_FrameworkT') -> _T:
+    def wrapper(self: _FrameworkT) -> _T:
         session = self.session()
 
         # before accessing any cached values we need to make sure that all

@@ -1,4 +1,6 @@
 """ Provides commands used to initialize election day websites. """
+from __future__ import annotations
+
 import click
 import os
 
@@ -32,16 +34,18 @@ cli = command_group()
 
 @cli.command(context_settings={'creates_path': True})
 @pass_group_context
-def add(group_context: 'GroupContext') -> 'Processor':
+def add(group_context: GroupContext) -> Processor:
     """ Adds an election day instance with to the database. For example:
+
+    .. code-block:: bash
 
         onegov-election-day --select '/onegov_election_day/zg' add
 
     """
 
     def add_instance(
-        request: 'ElectionDayRequest',
-        app: 'ElectionDayApp'
+        request: ElectionDayRequest,
+        app: ElectionDayApp
     ) -> None:
         app.cache.flush()
         if not app.principal:
@@ -54,17 +58,19 @@ def add(group_context: 'GroupContext') -> 'Processor':
 
 @cli.command()
 @pass_group_context
-def fetch(group_context: 'GroupContext') -> 'Processor':
+def fetch(group_context: GroupContext) -> Processor:
     """ Fetches the results from other instances as defined in the
-        principal.yml. Only fetches results from the same namespace.
+    principal.yml. Only fetches results from the same namespace.
+
+    .. code-block:: bash
 
         onegov-election-day --select '/onegov_election_day/zg' fetch
 
     """
 
     def fetch_results(
-        request: 'ElectionDayRequest',
-        app: 'ElectionDayApp'
+        request: ElectionDayRequest,
+        app: ElectionDayApp
     ) -> None:
         if not app.principal:
             return
@@ -106,21 +112,23 @@ def fetch(group_context: 'GroupContext') -> 'Processor':
 @click.option('--originator')
 @pass_group_context
 def send_sms(
-    group_context: 'GroupContext',
+    group_context: GroupContext,
     username: str,
     password: str,
     originator: str | None
-) -> 'Processor':
-    """ Sends the SMS in the smsdir for a given instance. For example:
+) -> Processor:
+    r""" Sends the SMS in the smsdir for a given instance. For example:
 
-        onegov-election-day --select '/onegov_election_day/zg' send_sms
-            'info@seantis.ch' 'top-secret'
+    .. code-block:: bash
+
+        onegov-election-day --select '/onegov_election_day/zg' \
+            send_sms 'info@seantis.ch' 'top-secret'
 
     """
 
     def send(
-        request: 'ElectionDayRequest',
-        app: 'ElectionDayApp'
+        request: ElectionDayRequest,
+        app: ElectionDayApp
     ) -> None:
         if 'sms_directory' in app.configuration:
             path = os.path.join(app.configuration['sms_directory'], app.schema)
@@ -137,14 +145,16 @@ def send_sms(
 
 
 @cli.command('generate-media')
-def generate_media() -> 'Processor':
+def generate_media() -> Processor:
     """ Generates the PDF and/or SVGs for the selected instances. For example:
+
+    .. code-block:: bash
 
         onegov-election-day --select '/onegov_election_day/zg' generate-media
 
     """
 
-    def generate(request: 'ElectionDayRequest', app: 'ElectionDayApp') -> None:
+    def generate(request: ElectionDayRequest, app: ElectionDayApp) -> None:
         if not app.principal or not app.configuration.get('d3_renderer'):
             return
 
@@ -161,11 +171,13 @@ def generate_media() -> 'Processor':
 
 
 @cli.command('generate-archive')
-def generate_archive() -> 'Processor':
+def generate_archive() -> Processor:
     """ Generates a zipped file of the entire archive.
+
+    .. code-block:: bash
         onegov-election-day --select '/onegov_election_day/zg' generate-archive
     """
-    def generate(request: 'ElectionDayRequest', app: 'ElectionDayApp') -> None:
+    def generate(request: ElectionDayRequest, app: ElectionDayApp) -> None:
 
         click.secho('Starting archive.zip generation.')
 
@@ -191,10 +203,10 @@ def generate_archive() -> 'Processor':
 @cli.command('update-archived-results')
 @click.option('--host', default='localhost:8080')
 @click.option('--scheme', default='http')
-def update_archived_results(host: str, scheme: str) -> 'Processor':
+def update_archived_results(host: str, scheme: str) -> Processor:
     """ Update the archive results, e.g. after a database transfer. """
 
-    def generate(request: 'ElectionDayRequest', app: 'ElectionDayApp') -> None:
+    def generate(request: ElectionDayRequest, app: ElectionDayApp) -> None:
         click.secho(f'Updating {app.schema}', fg='yellow')
         request.host = host
         request.environ['wsgi.url_scheme'] = scheme
@@ -205,8 +217,8 @@ def update_archived_results(host: str, scheme: str) -> 'Processor':
 
 
 @cli.command('migrate-subscribers')
-def migrate_subscribers() -> 'Processor':
-    def migrate(request: 'ElectionDayRequest', app: 'ElectionDayApp') -> None:
+def migrate_subscribers() -> Processor:
+    def migrate(request: ElectionDayRequest, app: ElectionDayApp) -> None:
         if not app.principal or not app.principal.segmented_notifications:
             return
 

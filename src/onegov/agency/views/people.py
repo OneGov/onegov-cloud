@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 from collections import OrderedDict
 from datetime import datetime, timedelta
 from itertools import groupby
@@ -16,7 +18,7 @@ from onegov.core.security import Private
 from onegov.core.security import Public
 from onegov.form import Form
 from onegov.org.elements import Link
-from onegov.org.forms import PersonForm
+from onegov.agency.forms.person import AgencyPersonForm
 from onegov.org.mail import send_ticket_mail
 from onegov.org.models import AtoZ
 from onegov.org.models import TicketMessage
@@ -34,6 +36,7 @@ if TYPE_CHECKING:
     from onegov.core.types import RenderData
     from onegov.ticket import Ticket
     from webob import Response as BaseResponse
+    from onegov.agency.forms.person import AuthenticatedPersonMutationForm
 
 
 class FilterOption(NamedTuple):
@@ -44,12 +47,12 @@ class FilterOption(NamedTuple):
 
 def get_person_form_class(
     model: object,
-    request: 'AgencyRequest'
-) -> type[PersonForm]:
+    request: AgencyRequest
+) -> type[AgencyPersonForm]:
 
     if isinstance(model, ExtendedPerson):
-        return model.with_content_extensions(PersonForm, request)
-    return ExtendedPerson().with_content_extensions(PersonForm, request)
+        return model.with_content_extensions(AgencyPersonForm, request)
+    return ExtendedPerson().with_content_extensions(AgencyPersonForm, request)
 
 
 @AgencyApp.html(
@@ -59,8 +62,8 @@ def get_person_form_class(
 )
 def view_people(
     self: ExtendedPersonCollection,
-    request: 'AgencyRequest'
-) -> 'RenderData':
+    request: AgencyRequest
+) -> RenderData:
 
     request.include('common')
     request.include('chosen')
@@ -140,9 +143,9 @@ def view_people(
 )
 def create_people_xlsx(
     self: ExtendedPersonCollection,
-    request: 'AgencyRequest',
+    request: AgencyRequest,
     form: Form
-) -> 'RenderData | BaseResponse':
+) -> RenderData | BaseResponse:
 
     if form.submitted(request):
         request.app.people_xlsx = export_person_xlsx(
@@ -175,14 +178,14 @@ def create_people_xlsx(
 )
 def get_people_xlsx(
     self: ExtendedPersonCollection,
-    request: 'AgencyRequest'
+    request: AgencyRequest
 ) -> Response:
 
     if not request.app.people_xlsx_exists:
         return Response(status='503 Service Unavailable')
 
     @request.after
-    def cache_headers(response: 'BaseResponse') -> None:
+    def cache_headers(response: BaseResponse) -> None:
         last_modified = request.app.people_xlsx_modified
         if last_modified:
             max_age = 1 * 24 * 60 * 60
@@ -210,8 +213,8 @@ def get_people_xlsx(
 )
 def view_person(
     self: ExtendedPerson,
-    request: 'AgencyRequest'
-) -> 'RenderData':
+    request: AgencyRequest
+) -> RenderData:
 
     return {
         'title': self.title,
@@ -228,8 +231,8 @@ def view_person(
 )
 def view_sort_person(
     self: ExtendedPerson,
-    request: 'AgencyRequest'
-) -> 'RenderData':
+    request: AgencyRequest
+) -> RenderData:
 
     layout = ExtendedPersonLayout(self, request)
 
@@ -261,9 +264,9 @@ def view_sort_person(
 )
 def add_person(
     self: ExtendedPersonCollection,
-    request: 'AgencyRequest',
-    form: PersonForm
-) -> 'RenderData | BaseResponse':
+    request: AgencyRequest,
+    form: AgencyPersonForm
+) -> RenderData | BaseResponse:
 
     if form.submitted(request):
         person = self.add(**form.get_useful_data())
@@ -292,9 +295,9 @@ def add_person(
 )
 def edit_person(
     self: ExtendedPerson,
-    request: 'AgencyRequest',
-    form: PersonForm
-) -> 'RenderData | BaseResponse':
+    request: AgencyRequest,
+    form: AgencyPersonForm
+) -> RenderData | BaseResponse:
 
     if form.submitted(request):
         form.populate_obj(self)
@@ -323,7 +326,7 @@ def edit_person(
     permission=Private)
 def handle_delete_person(
     self: ExtendedPerson,
-    request: 'AgencyRequest'
+    request: AgencyRequest
 ) -> None:
 
     if not self.deletable(request):
@@ -334,9 +337,9 @@ def handle_delete_person(
 
 def do_report_person_change(
     self: ExtendedPerson,
-    request: 'AgencyRequest',
-    form: PersonMutationForm
-) -> 'Ticket':
+    request: AgencyRequest,
+    form: PersonMutationForm | AuthenticatedPersonMutationForm
+) -> Ticket:
 
     session = request.session
     with session.no_autoflush:
@@ -395,9 +398,9 @@ def do_report_person_change(
 )
 def report_person_change(
     self: ExtendedPerson,
-    request: 'AgencyRequest',
+    request: AgencyRequest,
     form: PersonMutationForm
-) -> 'RenderData | BaseResponse':
+) -> RenderData | BaseResponse:
 
     if form.submitted(request):
         ticket = do_report_person_change(self, request, form)

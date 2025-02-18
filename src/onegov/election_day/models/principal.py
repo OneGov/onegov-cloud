@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 import onegov.election_day
 
 from functools import cached_property
@@ -73,8 +75,8 @@ class Principal:
         self,
         id_: str,
         domain: str,
-        domains_election: dict[str, 'TranslationString'],
-        domains_vote: dict[str, 'TranslationString'],
+        domains_election: dict[str, TranslationString],
+        domains_vote: dict[str, TranslationString],
         entities: dict[int, dict[int, dict[str, str]]],
         name: str | None = None,
         logo: str | None = None,
@@ -102,7 +104,7 @@ class Principal:
         official_host: str | None = None,
         segmented_notifications: bool = False,
         private: bool = False,
-        **kwargs: 'Never'
+        **kwargs: Never
     ):
         assert all((id_, domain, domains_election, domains_vote, entities))
         self.id = id_
@@ -119,7 +121,7 @@ class Principal:
         #       in order for most analytics to work. Eventually this may be
         #       able to go away again or be reduced to support a few specific
         #       providers.
-        self.analytics = Markup(analytics) if analytics else None  # noqa:MS001
+        self.analytics = Markup(analytics) if analytics else None  # nosec: B704
         self.has_districts = has_districts
         self.has_regions = has_regions
         self.has_superregions = has_superregions
@@ -146,7 +148,7 @@ class Principal:
         self.private = private
 
     @classmethod
-    def from_yaml(cls, yaml_source: '_ReadStream') -> 'Canton | Municipality':
+    def from_yaml(cls, yaml_source: _ReadStream) -> Canton | Municipality:
         kwargs = safe_load(yaml_source)
         assert 'canton' in kwargs or 'municipality' in kwargs
         if 'municipality' in kwargs:
@@ -276,6 +278,12 @@ class Canton(Principal):
             year = int(path.name)
             with (path / '{}.json'.format(canton)).open('r') as f:
                 entities[year] = {int(k): v for k, v in json.load(f).items()}
+
+        # NOTE: this section may depend on static data for principle.entities.
+        # See src/onegov/election_day/static/municipalities/<year>/*.json
+        if date.today().year not in entities:
+            print(f'Warning: No entities for year {date.today().year} found '
+                  f'for {canton}')
 
         # Test if all entities have districts (use none, if ambiguous)
         districts = {
@@ -436,6 +444,12 @@ class Municipality(Principal):
                 year: {int(municipality): {'name': kwargs.get('name', '')}}
                 for year in range(2002, date.today().year + 1)
             }
+
+        # NOTE: this section may depend on static data for principle.entities.
+        # See src/onegov/election_day/static/municipalities/<year>/*.json
+        if date.today().year not in entities:
+            print(f'Warning: No entities for year {date.today().year} found '
+                  f'for {municipality}')
 
         super().__init__(
             id_=municipality,

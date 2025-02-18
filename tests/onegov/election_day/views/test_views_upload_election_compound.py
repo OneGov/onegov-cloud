@@ -115,7 +115,7 @@ def test_upload_election_compound_temporary_results(election_day_app_gr):
         (0, 1)   # compound
     ]
 
-    # Onegov internal: misssing and number of municpalities
+    # Onegov internal: missing and number of municipalities
     csv = '\n'.join((
         (
             'election_status,'

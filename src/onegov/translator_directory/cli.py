@@ -1,4 +1,4 @@
-import re
+from __future__ import annotations
 
 import click
 import transaction
@@ -7,9 +7,9 @@ from onegov.core.cli import command_group
 from onegov.translator_directory.collections.translator import (
     TranslatorCollection)
 from onegov.translator_directory import log
-from onegov.translator_directory.models.translator import Translator
+from onegov.translator_directory.models.language import Language
 from onegov.translator_directory.utils import (
-    update_drive_distances, geocode_translator_addresses, country_code_to_name)
+    update_drive_distances, geocode_translator_addresses)
 from onegov.user import User
 from onegov.user.auth.clients import LDAPClient
 from onegov.user.auth.provider import ensure_user
@@ -31,8 +31,8 @@ cli = command_group()
 
 
 def fetch_users(
-    app: 'TranslatorDirectoryApp',
-    session: 'Session',
+    app: TranslatorDirectoryApp,
+    session: Session,
     ldap_server: str,
     ldap_username: str,
     ldap_password: str,
@@ -52,7 +52,7 @@ def fetch_users(
     translator_coll = TranslatorCollection(app, user_role='admin')
     translators = {translator.email for translator in translator_coll.query()}
 
-    def users(connection: 'LDAPConnection') -> 'Iterator[dict[str, Any]]':
+    def users(connection: LDAPConnection) -> Iterator[dict[str, Any]]:
         for src in sources:
             for base, search_filter, attrs in src.bases_filters_attributes:
                 success = connection.search(
@@ -73,7 +73,7 @@ def fetch_users(
                     search_filter=search_filter
                 )
 
-    def handle_inactive(synced_ids: list['UUID']) -> None:
+    def handle_inactive(synced_ids: list[UUID]) -> None:
         inactive = session.query(User).filter(
             and_(
                 User.id.notin_(synced_ids),
@@ -161,27 +161,28 @@ def fetch_users_cli(
     verbose: bool,
     skip_deactivate: bool,
     dry_run: bool
-) -> 'Callable[[TranslatorAppRequest, TranslatorDirectoryApp], None]':
-    """ Updates the list of users by fetching matching users
+) -> Callable[[TranslatorAppRequest, TranslatorDirectoryApp], None]:
+    r""" Updates the list of users by fetching matching users
     from a remote LDAP server.
 
     This is currently highly specific for the Canton of Zug and therefore most
     values are hard-coded.
 
     Example:
+    .. code-block:: bash
 
-        onegov-translator --select /translator_directory/zug fetch-users \\
-            --ldap-server 'ldaps://1.2.3.4' \\
-            --ldap-username 'foo' \\
-            --ldap-password 'bar' \\
-            --admin-group 'ou=Admins' \\
+        onegov-translator --select /translator_directory/zug fetch-users \
+            --ldap-server 'ldaps://1.2.3.4' \
+            --ldap-username 'foo' \
+            --ldap-password 'bar' \
+            --admin-group 'ou=Admins' \
             --editor-group 'ou=Editors'
 
     """
 
     def execute(
-        request: 'TranslatorAppRequest',
-        app: 'TranslatorDirectoryApp'
+        request: TranslatorAppRequest,
+        app: TranslatorDirectoryApp
     ) -> None:
 
         fetch_users(
@@ -227,14 +228,14 @@ def drive_distances_cli(
     tolerance_factor: float,
     max_tolerance: int,
     max_distance: int
-) -> 'Callable[[TranslatorAppRequest, TranslatorDirectoryApp], None]':
+) -> Callable[[TranslatorAppRequest, TranslatorDirectoryApp], None]:
 
     def get_distances(
-        request: 'TranslatorAppRequest',
-        app: 'TranslatorDirectoryApp'
+        request: TranslatorAppRequest,
+        app: TranslatorDirectoryApp
     ) -> None:
 
-        tot, routes_found, distance_changed, no_routes, tolerance_failed = (
+        tot, routes_found, _distance_changed, no_routes, tolerance_failed = (
             update_drive_distances(
                 request,
                 only_empty,
@@ -276,11 +277,11 @@ def drive_distances_cli(
 def geocode_cli(
     dry_run: bool,
     only_empty: bool
-) -> 'Callable[[TranslatorAppRequest, TranslatorDirectoryApp], None]':
+) -> Callable[[TranslatorAppRequest, TranslatorDirectoryApp], None]:
 
     def do_geocode(
-        request: 'TranslatorAppRequest',
-        app: 'TranslatorDirectoryApp'
+        request: TranslatorAppRequest,
+        app: TranslatorDirectoryApp
     ) -> None:
 
         if not app.mapbox_token:
@@ -316,12 +317,12 @@ def geocode_cli(
 @click.option('--dry-run/-no-dry-run', default=False)
 def update_accounts_cli(
     dry_run: bool
-) -> 'Callable[[TranslatorAppRequest, TranslatorDirectoryApp], None]':
+) -> Callable[[TranslatorAppRequest, TranslatorDirectoryApp], None]:
     """ Updates user accounts for translators. """
 
     def do_update_accounts(
-        request: 'TranslatorAppRequest',
-        app: 'TranslatorDirectoryApp'
+        request: TranslatorAppRequest,
+        app: TranslatorDirectoryApp
     ) -> None:
 
         translators = TranslatorCollection(request.app, user_role='admin')
@@ -334,89 +335,231 @@ def update_accounts_cli(
     return do_update_accounts
 
 
-@cli.command(name='migrate-nationalities',
-             context_settings={'default_selector': '*'})
+LANGUAGES = (
+    'Afrikaans',
+    'Albanisch',
+    'Amharisch',
+    'Anyin',
+    'Arabisch',
+    'Arabisch (Dialekte)',
+    'Arabisch (Hocharabisch)',
+    'Arabisch (Masri)',
+    'Arabisch (Nahost)',
+    'Aramäisch',
+    'Armenisch',
+    'Aserbaidschanisch',
+    'Badini',
+    'Bangla',
+    'Bengalisch',
+    'Bilen',
+    'Bosnisch',
+    'Bulgarisch',
+    'Chinesisch',
+    'Chinesisch (Hokkien)',
+    'Chinesisch (Mandarin)',
+    'Dänisch',
+    'Dari',
+    'Dari (Afghanistan)',
+    'Deutsch',
+    'Diola',
+    'Edo',
+    'Englisch',
+    'Ewe',
+    'Farsi',
+    'Farsi (Persisch)',
+    'Farsi Persisch (Afghanistan Iran)',
+    'Flämisch',
+    'Französisch',
+    'Friesisch',
+    'Galicisch',
+    'Gebärdensprache',
+    'Georgisch',
+    'Griechisch',
+    'Gujarati',
+    'Hebräisch',
+    'Hindi',
+    'Ibo',
+    'Igbo',
+    'Ijaw',
+    'Indonesisch',
+    'Irakisch',
+    'Iranisch',
+    'Italienisch',
+    'Italienisch (Dialekte Süditalien)',
+    'Itsekiri',
+    'Japanisch',
+    'Kabyé',
+    'Kalabari',
+    'Kantonesisch',
+    'Kasachisch',
+    'Keine schriftlichen Übersetzungen',
+    'Keine Verdolmetschung',
+    'Kotokoli',
+    'Kreolisch',
+    'Kroatisch',
+    'Kurdisch',
+    'Kurdisch (Dialekte)',
+    'Kurmanci',
+    'Kyrillisch (Serbien)',
+    'Lettisch',
+    'Litauisch',
+    'Mandarin',
+    'Mandinka',
+    'Marathi',
+    'Marokkanisch',
+    'Mazedonisch',
+    'Mina',
+    'Moldauisch',
+    'Mongolisch',
+    'Montenegrinisch',
+    'Niederländisch',
+    'Oromo',
+    'Pakistanisch',
+    'Panjabi',
+    'Paschto (Afghanistan, Pakistan)',
+    'Paschtu',
+    'Patois',
+    'Persisch',
+    'Pidgin',
+    'Pidgin-Englisch',
+    'Pidgin-Französisch',
+    'Pidgin-Nigerianisch',
+    'Pilipino',
+    'Polnisch',
+    'Portugiesisch',
+    'Portugiesisch (Brasil)',
+    'Punjabi',
+    'Rumänisch',
+    'Russisch',
+    'Schwedisch',
+    'Serbisch',
+    'Serbokroatisch',
+    'Shandong-Dialekt',
+    'Shanghai-Dialekt',
+    'Singhalesisch',
+    'Slowakisch',
+    'Somali',
+    'Sorani',
+    'Spanisch',
+    'Suaheli',
+    'Tadschikisch',
+    'Tagalog',
+    'Tamil',
+    'Tamilisch',
+    'Telugu',
+    'Tem',
+    'Thailändisch',
+    'Tibetisch',
+    'Tigrinya',
+    'Tschechisch',
+    'Türkisch',
+    'Türkisch (Dialekte)',
+    'Turkmenisch',
+    'Uigurisch',
+    'Ukrainisch',
+    'Ungarisch',
+    'Urdu',
+    'Usbekisch',
+    'VG ZG',
+    'Vietnamesisch',
+    'Weissrussisch',
+    'Wolof',
+    'Yoruba',
+    'Yue-Chinesisch'
+)
+
+
+@cli.command(name='create-languages', context_settings={'singular': True})
 @click.option('--dry-run', is_flag=True, default=False)
-def migrate_nationalities(
-    dry_run: bool
-) -> 'Callable[[TranslatorAppRequest, TranslatorDirectoryApp], None]':
-    """ Migrates the nationalities column into content column.
+def create_languages(
+        dry_run: bool
+) -> Callable[[TranslatorAppRequest, TranslatorDirectoryApp], None]:
+    """
+    Create languages for the selected translator schema. Languages get
+    created if they don't exist to prevent id changes.
+
+    This command is useful when new languages were added to the LANGUAGES list.
+
+    NOTE: No language will be deleted. If a language is not in the LANGUAGES
+    list the script will print a message.
 
     Example:
-        onegov-translator
-            --select /translator_directory/zug
-                migrate-nationalities --dry-run
-
+        onegov-translator --select /translator_directory/schaffhausen
+        create-languages --dry-run
     """
 
-    def do_migrate_nationalities(
-        request: 'TranslatorAppRequest',
-        app: 'TranslatorDirectoryApp'
+    def do_create_languages(
+        request: TranslatorAppRequest,
+        app: TranslatorDirectoryApp
     ) -> None:
+        # Compare existing languages
+        existing = request.session.query(Language).all()
+        existing_lang_names = [lang.name for lang in existing]
+        for language in existing:
+            if language.name not in LANGUAGES:
+                click.secho(f"Language '{language.name}' is "
+                            f'unknown. You may delete it if not in use from '
+                            f"'/languages'", fg='yellow')
 
-        translators = request.session.query(Translator).all()
-        not_migrated = 0
-        migrated = 0
-        auto_mapping = {
-            'Grossbritannien': 'GB',
-            'Oesterreich': 'AT',
-            'Türkei': 'TR',  # babel issue #1112
-            'Tibet': 'CN',
-        }
-
-        mapping = country_code_to_name(request.locale)
-        country_codes = list(mapping.keys())
-        country_names = list(mapping.values())
-        for translator in translators:
-            new = []
-            if translator.nationality:
-                current = translator.nationality
-                if current in country_codes:
-                    new.append(current)
-                elif current in country_names:
-                    country_idx = country_names.index(current)
-                    new.append(country_codes[country_idx])
-                else:
-                    words = re.split(r'\s|,|;|-|\.|\/|\n', current)
-                    for word in words:
-                        if not word or word == 'migrated':
-                            continue
-                        if word in country_codes:
-                            new.append(word)
-                        elif word in country_names:
-                            country_idx = country_names.index(word)
-                            new.append(country_codes[country_idx])
-                        else:
-                            if word in auto_mapping:
-                                new.append(auto_mapping[word])
-                            elif 'Bosnien und Herzegowina' in current:
-                                new.append('BA')
-                            elif 'Tschechische Republik' in current:
-                                new.append('CZ')
-                            elif 'Slowakische Republik' in current:
-                                new.append('SK')
-                            else:
-                                click.secho(
-                                    f"  Unknown: '{word}'", fg='yellow')
-                                not_migrated += 1
-                                continue
-
-            else:
-                pass
-
-            translator.content['nationalities'] = list(set(new))
-            translator.nationality = 'migrated'  # type ignore[attr-defined]
-            migrated += 1
-
-        if not_migrated:
-            click.secho(f'Migration failed for {not_migrated} translator(s) '
-                        f'of {len(translators)}')
-        else:
-            click.secho(f'Migration successful for {migrated} translators')
+        # create languages if not existing (to prevent id changes)
+        add_count = 0
+        for language_name in LANGUAGES:
+            if language_name not in existing_lang_names:
+                add_count += 1
+                lang = Language(name=language_name)
+                request.session.add(lang)
+        click.secho(f'Inserted {add_count} languages of total '
+                    f'{len(LANGUAGES)}', fg='green')
 
         if dry_run:
             transaction.abort()
+            click.secho('Aborting transaction', fg='yellow')
         else:
             request.session.flush()
 
-    return do_migrate_nationalities
+    return do_create_languages
+
+
+@cli.command(name='force-delete-languages',
+             context_settings={'singular': True})
+@click.option('--dry-run', is_flag=True, default=False)
+def force_delete_languages(
+        dry_run: bool
+) -> Callable[[TranslatorAppRequest, TranslatorDirectoryApp], None]:
+    """
+    This command forcefully deletes all languages from the database and all
+    references will be lost.
+    This command is useful after the languages have changed and
+    assigned a lot for testing.
+
+    Example:
+        onegov-translator --select /translator_directory/schaffhausen
+        delete-languages --dry-run
+    """
+
+    def do_delete_languages(
+        request: TranslatorAppRequest,
+        app: TranslatorDirectoryApp
+    ) -> None:
+
+        i = input('Are you sure you want to delete all languages and losing '
+                  'all references to it? [y/N]: ')
+        if i.lower() != 'y':
+            transaction.abort()
+            click.secho('Aborting transaction', fg='yellow')
+            return
+
+        del_count = 0
+        languages = request.session.query(Language)
+        for lang in languages:
+            del_count += 1
+            request.session.delete(lang)
+        click.secho(f'Deleted {del_count} languages', fg='green')
+
+        if dry_run:
+            transaction.abort()
+            click.secho('Aborting transaction', fg='yellow')
+        else:
+            request.session.flush()
+
+    return do_delete_languages

@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 from functools import cached_property
 from sedate import utcnow, to_timezone
 
@@ -142,7 +144,7 @@ class ChangeRequestFormExtension(FormExtension[FormT], name='change-request'):
                     .first()
                 )
 
-            def is_different(self, field: 'Field') -> bool:
+            def is_different(self, field: Field) -> bool:
                 # if the target has been removed, stop
                 if not self.target:
                     return True
@@ -178,9 +180,9 @@ class ChangeRequestFormExtension(FormExtension[FormT], name='change-request'):
 
             def render_original(
                 self,
-                field: 'Field',
+                field: Field,
                 from_model: bool = False
-            ) -> 'Markup':
+            ) -> Markup:
 
                 prev = field.data
 
@@ -198,7 +200,7 @@ class ChangeRequestFormExtension(FormExtension[FormT], name='change-request'):
                 finally:
                     field.data = prev
 
-            def render_display(self, field: 'Field') -> 'Markup | None':
+            def render_display(self, field: Field) -> Markup | None:
                 if self.is_different(field):
                     proposed = super().render_display(field)
 

@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 from onegov.core.security import Public, Private
 from onegov.org.views.people import (
     view_people, view_person, handle_new_person, handle_edit_person)
@@ -18,13 +20,13 @@ if TYPE_CHECKING:
 @TownApp.html(model=PersonCollection, template='people.pt', permission=Public)
 def town_view_people(
     self: PersonCollection,
-    request: 'TownRequest'
-) -> 'RenderData':
+    request: TownRequest
+) -> RenderData:
     return view_people(self, request, PersonCollectionLayout(self, request))
 
 
 @TownApp.html(model=Person, template='person.pt', permission=Public)
-def town_view_person(self: Person, request: 'TownRequest') -> 'RenderData':
+def town_view_person(self: Person, request: TownRequest) -> RenderData:
     return view_person(self, request, PersonLayout(self, request))
 
 
@@ -37,9 +39,9 @@ def town_view_person(self: Person, request: 'TownRequest') -> 'RenderData':
 )
 def town_handle_new_person(
     self: PersonCollection,
-    request: 'TownRequest',
+    request: TownRequest,
     form: PersonForm
-) -> 'RenderData | Response':
+) -> RenderData | Response:
     return handle_new_person(
         self, request, form, PersonCollectionLayout(self, request))
 
@@ -53,7 +55,7 @@ def town_handle_new_person(
 )
 def town_handle_edit_person(
     self: Person,
-    request: 'TownRequest',
+    request: TownRequest,
     form: PersonForm
-) -> 'RenderData | Response':
+) -> RenderData | Response:
     return handle_edit_person(self, request, form, PersonLayout(self, request))

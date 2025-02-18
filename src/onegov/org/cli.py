@@ -1,4 +1,6 @@
 """ Provides commands used to initialize org websites. """
+from __future__ import annotations
+
 import click
 import html
 import isodate
@@ -70,17 +72,19 @@ cli = command_group()
 )
 @pass_group_context
 def add(
-    group_context: 'GroupContext',
+    group_context: GroupContext,
     name: str,
     locale: str
-) -> 'Callable[[OrgRequest, OrgApp], None]':
+) -> Callable[[OrgRequest, OrgApp], None]:
     """ Adds an org with the given name to the database. For example:
+
+    .. code-block:: bash
 
         onegov-org --select '/onegov_org/evilcorp' add "Evilcorp"
 
     """
 
-    def add_org(request: 'OrgRequest', app: 'OrgApp') -> None:
+    def add_org(request: OrgRequest, app: OrgApp) -> None:
 
         if app.session().query(Organisation).first():
             abort('{} already contains an organisation'.format(
@@ -103,10 +107,11 @@ def import_digirez(
     accessdb: str,
     min_date: str,
     ignore_booking_conflicts: bool
-) -> 'Callable[[OrgRequest, OrgApp], None]':
+) -> Callable[[OrgRequest, OrgApp], None]:
     """ Imports a Digirez reservation database into onegov.org.
 
     Example:
+    .. code-block:: bash
 
         onegov-org --select '/orgs/govikon' import-digirez room_booking.mdb
 
@@ -156,8 +161,8 @@ def import_digirez(
     }
 
     def get_formdata(
-        member: 'DefaultRow',
-        booking: 'DefaultRow'
+        member: DefaultRow,
+        booking: DefaultRow
     ) -> dict[str, Any]:
 
         einrichtungen = []
@@ -225,7 +230,7 @@ def import_digirez(
         (re.compile(r'@pro-vitalis$'), '@pro-vitalis.ch')
     )
 
-    def run_import(request: 'OrgRequest', app: 'OrgApp') -> None:
+    def run_import(request: OrgRequest, app: OrgApp) -> None:
 
         # create all resources first, fails if at least one exists already
         print('Creating resources')
@@ -313,7 +318,7 @@ def import_digirez(
 
             whole_day = (start_hour, end_hour) == (0, 24)
 
-            for day in range(0, days + 1):
+            for day in range(days + 1):
                 start = first_day_start + timedelta(days=day)
                 end = first_day_end + timedelta(days=day)
 
@@ -371,7 +376,6 @@ def import_digirez(
                         f'Booking conflict in {resource.title} '
                         f'at {booking.hour_start}'
                     )
-                    pass
 
             if found_conflict:
                 continue
@@ -416,23 +420,23 @@ def import_digirez(
               help='Do not write any changes into the database.')
 @pass_group_context
 def fix_tags(
-    group_context: 'GroupContext',
+    group_context: GroupContext,
     dry_run: bool
-) -> 'Callable[[OrgRequest, OrgApp], None]':
+) -> Callable[[OrgRequest, OrgApp], None]:
 
-    def fixes_german_tags_in_db(request: 'OrgRequest', app: 'OrgApp') -> None:
+    def fixes_german_tags_in_db(request: OrgRequest, app: OrgApp) -> None:
         session = request.session
 
         de_transl = app.translations.get('de_CH')
         assert de_transl is not None
 
-        DEFINED_TAGS = list(TAGS)
-        DEFINED_TAG_IDS = [str(s) for s in DEFINED_TAGS]
+        defined_tags = list(TAGS)
+        defined_tag_ids = [str(s) for s in defined_tags]
 
-        def translate(text: 'TranslationString') -> str:
+        def translate(text: TranslationString) -> str:
             return text.interpolate(de_transl.gettext(text))
 
-        form_de_to_en = {translate(text): str(text) for text in DEFINED_TAGS}
+        form_de_to_en = {translate(text): str(text) for text in defined_tags}
 
         predefined = {
             'Theater / Tanz': ('Dancing', 'Theater'),
@@ -465,7 +469,7 @@ def fix_tags(
             for tag in occurrence.tags:
                 if tag in predefined:
                     continue
-                if tag not in DEFINED_TAG_IDS:
+                if tag not in defined_tag_ids:
                     if tag in form_de_to_en:
                         tags.remove(tag)
                         tags.append(form_de_to_en[tag])
@@ -494,7 +498,7 @@ def fix_tags(
     return fixes_german_tags_in_db
 
 
-def close_ticket(ticket: 'Ticket', user: User, request: 'OrgRequest') -> None:
+def close_ticket(ticket: Ticket, user: User, request: OrgRequest) -> None:
     if ticket.state == 'open':
         ticket.accept_ticket(user)
         TicketMessage.create(
@@ -523,57 +527,60 @@ def close_ticket(ticket: 'Ticket', user: User, request: 'OrgRequest') -> None:
               help='Only add event is they are published on remote')
 @click.option('--delete-orphaned-tickets', is_flag=True)
 def fetch(
-    group_context: 'GroupContext',
-    source: 'Sequence[str]',
-    tag: 'Sequence[str]',
-    location: 'Sequence[str]',
+    group_context: GroupContext,
+    source: Sequence[str],
+    tag: Sequence[str],
+    location: Sequence[str],
     create_tickets: bool,
-    state_transfers: 'Sequence[str]',
+    state_transfers: Sequence[str],
     published_only: bool,
     delete_orphaned_tickets: bool
-) -> 'Callable[[OrgRequest, OrgApp], None]':
-    """ Fetches events from other instances.
+) -> Callable[[OrgRequest, OrgApp], None]:
+    r""" Fetches events from other instances.
 
     Only fetches events from the same namespace which have not been imported
     themselves.
 
     Example
+    .. code-block:: bash
 
         onegov-org --select '/veranstaltungen/zug' fetch \
-            --source menzingen --source steinhausen
-            --tag Sport --tag Konzert
+            --source menzingen --source steinhausen \
+            --tag Sport --tag Konzert \
             --location Zug
 
     Additional parameters:
 
-            --state-transfers published:withdrawn
+    - ``--state-transfers published:withdrawn``
 
-            Will update the local event.state from published to withdrawn
-            automatically. If there are any tickets associated with the event,
-            the will be closed automatically.
+        Will update the local event.state from published to withdrawn
+        automatically. If there are any tickets associated with the event,
+        the will be closed automatically.
 
-            --pusblished_only:
-            When passing the remote items to the EventCollection, only add
-            events if they are published.
+    - ``--pusblished-only``
 
-            --delete-orphaned-tickets
+        When passing the remote items to the EventCollection, only add
+        events if they are published.
 
-            Delete Tickets, TicketNotes and TicketMessasges if an
-            event gets deleted automatically.
+    - ``--delete-orphaned-tickets``
+
+        Delete Tickets, TicketNotes and TicketMessasges if an
+        event gets deleted automatically.
 
     The following example will close tickets automatically for
     submitted and published events that were withdrawn on the remote.
 
-    onegov-event --select '/veranstaltungen/zug' fetch \
-            --source menzingen --source steinhausen
-            --published-only
-            --create-tickets
-            --state-transfers published:withdrawn
+    .. code-block:: bash
+        onegov-event --select '/veranstaltungen/zug' fetch \
+            --source menzingen --source steinhausen \
+            --published-only \
+            --create-tickets \
+            --state-transfers published:withdrawn \
             --state-transfers submitted:withdrawm
 
     """
 
-    def vector_add(a: 'Sequence[int]', b: 'Sequence[int]') -> list[int]:
+    def vector_add(a: Sequence[int], b: Sequence[int]) -> list[int]:
         return list(map(add_op, a, b))
 
     if not len(source):
@@ -589,9 +596,9 @@ def fetch(
             assert remote in valid_choices
             valid_state_transfers[local] = remote
 
-    def _fetch(request: 'OrgRequest', app: 'OrgApp') -> None:
+    def _fetch(request: OrgRequest, app: OrgApp) -> None:
 
-        def event_file(reference: 'UploadedFile') -> BytesIO:
+        def event_file(reference: UploadedFile) -> BytesIO:
             # XXX use a proper depot manager for this
             assert app.depot_storage_path is not None
             path = Path(app.depot_storage_path) / reference['path'] / 'file'
@@ -632,9 +639,9 @@ def fetch(
                     )
 
                 def remote_events(
-                    query: 'Query[Event]' = query,
+                    query: Query[Event] = query,
                     key: str = key
-                ) -> 'Iterator[EventImportItem]':
+                ) -> Iterator[EventImportItem]:
 
                     for event_ in query:
                         event_._es_skip = True
@@ -691,9 +698,9 @@ def fetch(
                     abort('Can not create tickets, no admin is registered')
 
                 def ticket_for_event(
-                    event_id: 'UUID',
-                    local_session: 'Session' = local_session
-                ) -> 'Ticket | None':
+                    event_id: UUID,
+                    local_session: Session = local_session
+                ) -> Ticket | None:
                     return TicketCollection(local_session).by_handler_id(
                         event_id.hex)
 
@@ -770,8 +777,8 @@ def fetch(
 @cli.command('fix-directory-files')
 @pass_group_context
 def fix_directory_files(
-    group_context: 'GroupContext'
-) -> 'Callable[[OrgRequest, OrgApp], None]':
+    group_context: GroupContext
+) -> Callable[[OrgRequest, OrgApp], None]:
     """
     Not sure of this doubles the files, but actually the file
     reference remains, so it shouldn't
@@ -780,7 +787,7 @@ def fix_directory_files(
     submissions are set correctly with type 'directory'.
 
     """
-    def execute(request: 'OrgRequest', app: 'OrgApp') -> None:
+    def execute(request: OrgRequest, app: OrgApp) -> None:
         count = 0
         for entry in request.session.query(DirectoryEntry).all():
             for field in entry.directory.file_fields:
@@ -789,7 +796,7 @@ def fix_directory_files(
                     file_id = field_data['data'].lstrip('@')
                     file = request.session.query(File).filter_by(
                         id=file_id).first()
-                    if file and not file.type == 'directory':
+                    if file and file.type != 'directory':
                         new = DirectoryFile(  # type:ignore[misc]
                             id=random_token(),
                             name=file.name,
@@ -812,14 +819,14 @@ def fix_directory_files(
 @cli.command('migrate-town', context_settings={'singular': True})
 @pass_group_context
 def migrate_town(
-    group_context: 'GroupContext'
-) -> 'Callable[[OrgRequest, OrgApp], None]':
+    group_context: GroupContext
+) -> Callable[[OrgRequest, OrgApp], None]:
     """ Migrates the database from an old town to the new town like in the
     upgrades.
 
     """
 
-    def migrate_to_new_town(request: 'OrgRequest', app: 'OrgApp') -> None:
+    def migrate_to_new_town(request: OrgRequest, app: OrgApp) -> None:
         context: UpgradeContext = Bunch(session=app.session())  # type:ignore
         migrate_theme_options(context)
         migrate_homepage_structure_for_town6(context)
@@ -832,10 +839,10 @@ def migrate_town(
 @click.argument('old-uri')
 @click.option('--dry-run', is_flag=True, default=False)
 def migrate_links_cli(
-    group_context: 'GroupContext',
+    group_context: GroupContext,
     old_uri: str,
     dry_run: bool
-) -> 'Callable[[OrgRequest, OrgApp], None]':
+) -> Callable[[OrgRequest, OrgApp], None]:
     """ Migrates url's in pages. Supports domains and full urls. Most of
     the urls are located in meta and content fields.
     """
@@ -844,7 +851,7 @@ def migrate_links_cli(
         click.secho('Domain must contain a dot')
         sys.exit(1)
 
-    def execute(request: 'OrgRequest', app: 'OrgApp') -> None:
+    def execute(request: OrgRequest, app: OrgApp) -> None:
         if old_uri.startswith('http'):
             new_uri = request.host_url
         else:
@@ -870,12 +877,12 @@ def migrate_links_cli(
 @cli.command(context_settings={'default_selector': '*'})
 @pass_group_context
 def migrate_publications(
-    group_context: 'GroupContext',
+    group_context: GroupContext,
     dry_run: bool
-) -> 'Callable[[OrgRequest, OrgApp], None]':
+) -> Callable[[OrgRequest, OrgApp], None]:
     """ Marks signed files for publication. """
 
-    def mark_as_published(request: 'OrgRequest', app: 'OrgApp') -> None:
+    def mark_as_published(request: OrgRequest, app: OrgApp) -> None:
         session = request.session
         files = session.query(File).filter_by(signed=True).all()
         for file in files:
@@ -890,16 +897,17 @@ def migrate_publications(
 
 
 @cli.command(name='delete-invisible-links')
-def delete_invisible_links() -> 'Callable[[OrgRequest, OrgApp], None]':
+def delete_invisible_links() -> Callable[[OrgRequest, OrgApp], None]:
     """ Deletes all the data associated with a period, including:
 
-    Example::
+    Example:
+    .. code-block:: bash
 
         onegov-org --select /foo/bar delete-invisible-links
 
     """
 
-    def delete_invisible_links(request: 'OrgRequest', app: 'OrgApp') -> None:
+    def delete_invisible_links(request: OrgRequest, app: OrgApp) -> None:
         session = request.session
         query = QueryChain(
             (session.query(Page),

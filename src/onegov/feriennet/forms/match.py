@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 from onegov.activity.matching.score import PreferAdminChildren
 from onegov.activity.matching.score import PreferOrganiserChildren
 from onegov.activity.matching.score import PreferGroups
@@ -39,7 +41,7 @@ class MatchForm(Form):
         depends_on=('confirm', 'yes')
     )
 
-    def scoring(self, session: 'Session') -> Scoring:
+    def scoring(self, session: Session) -> Scoring:
         scoring = Scoring()
 
         # always prefer groups

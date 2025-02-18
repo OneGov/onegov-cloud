@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 from onegov.chat import Message
 from onegov.chat import MessageCollection
 from onegov.core.custom import json
@@ -25,8 +27,8 @@ if TYPE_CHECKING:
 # might have to be implemented in link_message below
 def render_message(
     message: Message,
-    request: 'OrgRequest',
-    owner: 'Owner',
+    request: OrgRequest,
+    owner: Owner,
     layout: MessageCollectionLayout
 ) -> str:
     return render_template(
@@ -42,7 +44,7 @@ def render_message(
     )
 
 
-def link_message(message: Message, request: 'OrgRequest') -> str:
+def link_message(message: Message, request: OrgRequest) -> str:
     if hasattr(message, 'link'):
         return message.link(request)
 
@@ -70,9 +72,9 @@ class Owner(NamedTuple):
 @OrgApp.json(model=MessageCollection, permission=Private, name='feed')
 def view_messages_feed(
     self: MessageCollection[Message],
-    request: 'OrgRequest',
+    request: OrgRequest,
     layout: MessageCollectionLayout | None = None
-) -> 'JSONObject_ro':
+) -> JSONObject_ro:
 
     mapper = inspect(Message).polymorphic_map
     layout = layout or MessageCollectionLayout(self, request)
@@ -134,9 +136,9 @@ def view_messages_feed(
 )
 def view_messages(
     self: MessageCollection[Message],
-    request: 'OrgRequest',
+    request: OrgRequest,
     layout: MessageCollectionLayout | None = None
-) -> 'RenderData':
+) -> RenderData:
 
     # The initial load contains only the 25 latest message (the feed will
     # return the 25 oldest messages by default)

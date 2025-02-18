@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 import sys
 
 import click
@@ -25,7 +27,7 @@ cli = command_group()
 
 @cli.command('clear')
 @click.option('--dry-run/--no-dry-run', default=False)
-def clear(dry_run: bool) -> 'Callable[[CoreRequest, Framework], None]':
+def clear(dry_run: bool) -> Callable[[CoreRequest, Framework], None]:
     """ Deletes all people.
 
     Does not support agencies and memberships at the moment.
@@ -36,7 +38,7 @@ def clear(dry_run: bool) -> 'Callable[[CoreRequest, Framework], None]':
 
     """
 
-    def _clear(request: 'CoreRequest', app: 'Framework') -> None:
+    def _clear(request: CoreRequest, app: Framework) -> None:
         if not click.confirm('Do you really want to remove all people?'):
             abort('Deletion process aborted')
 
@@ -85,7 +87,7 @@ EXPORT_FIELDS = OrderedDict((
 
 @cli.command('export')
 @click.argument('filename', type=click.Path(exists=False))
-def export_xlsx(filename: str) -> 'Callable[[CoreRequest, Framework], None]':
+def export_xlsx(filename: str) -> Callable[[CoreRequest, Framework], None]:
     """ Exports all people to an excel file.
 
     Does not support agencies and memberships at the moment.
@@ -96,7 +98,7 @@ def export_xlsx(filename: str) -> 'Callable[[CoreRequest, Framework], None]':
 
     """
 
-    def _export(request: 'CoreRequest', app: 'Framework') -> None:
+    def _export(request: CoreRequest, app: Framework) -> None:
         session = app.session()
 
         book = Workbook()
@@ -121,7 +123,7 @@ def export_xlsx(filename: str) -> 'Callable[[CoreRequest, Framework], None]':
 
 @cli.command('import')
 @click.argument('file', type=click.File('rb'))
-def import_xlsx(file: IO[bytes]) -> 'Callable[[CoreRequest, Framework], None]':
+def import_xlsx(file: IO[bytes]) -> Callable[[CoreRequest, Framework], None]:
     """ Imports people from an excel file.
 
     Does not support agencies and memberships at the moment.
@@ -132,7 +134,7 @@ def import_xlsx(file: IO[bytes]) -> 'Callable[[CoreRequest, Framework], None]':
 
     """
 
-    def _import(request: 'CoreRequest', app: 'Framework') -> None:
+    def _import(request: CoreRequest, app: Framework) -> None:
         session = app.session()
 
         book = load_workbook(file)

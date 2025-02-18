@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 import morepath
 
 from datetime import date
@@ -67,16 +69,16 @@ if TYPE_CHECKING:
 @OrgApp.html(model=Ticket, template='ticket.pt', permission=Private)
 def view_ticket(
     self: Ticket,
-    request: 'OrgRequest',
+    request: OrgRequest,
     layout: TicketLayout | None = None
-) -> 'RenderData':
+) -> RenderData:
 
     handler = self.handler
 
     if handler.deleted:
         # NOTE: We store markup in the snapshot, but since it is JSON
         #       it will be read as a plain string, so we have to wrap
-        summary = Markup(self.snapshot.get('summary', ''))  # noqa: MS001
+        summary = Markup(self.snapshot.get('summary', ''))  # nosec: B704
     else:
         # XXX this is very to do here, much harder when the ticket is updated
         # because there's no good link to the ticket at that point - so when
@@ -134,8 +136,12 @@ def view_ticket(
                 request.link(payment, name='change-net-amount')
             )
 
-    if payment and payment.source == 'stripe_connect':
-        payment_button = stripe_payment_button(payment, layout)
+    if payment and payment.source in (
+        'stripe_connect',
+        'datatrans',
+        'worldline_saferpay',
+    ):
+        payment_button = online_payment_button(payment, layout)
 
     return {
         'title': self.number,
@@ -164,10 +170,10 @@ def view_ticket(
              name='delete', form=Form)
 def delete_ticket(
     self: Ticket,
-    request: 'OrgRequest',
+    request: OrgRequest,
     form: Form,
     layout: TicketLayout | None = None
-) -> 'RenderData | BaseResponse':
+) -> RenderData | BaseResponse:
     """ Deleting a ticket means getting rid of all the data associated with it
     """
 
@@ -210,8 +216,8 @@ def delete_ticket(
 #        to CoreRequest making the original methods/attributes on the Layout a
 #        pure passthrough, then we can pass the request here
 def manual_payment_button(
-    payment: 'Payment',
-    layout: 'Layout'
+    payment: Payment,
+    layout: Layout
 ) -> Link:
 
     if payment.state == 'open':
@@ -245,9 +251,9 @@ def manual_payment_button(
 
 
 # FIXME: same here as for manual_payment_button
-def stripe_payment_button(
-    payment: 'Payment',
-    layout: 'Layout'
+def online_payment_button(
+    payment: Payment,
+    layout: Layout
 ) -> Link | None:
 
     if payment.state == 'open':
@@ -307,7 +313,7 @@ def stripe_payment_button(
 
 def send_email_if_enabled(
     ticket: Ticket,
-    request: 'OrgRequest',
+    request: OrgRequest,
     template: str,
     subject: str
 ) -> bool:
@@ -326,7 +332,7 @@ def send_email_if_enabled(
 
 
 def last_internal_message(
-    session: 'Session',
+    session: Session,
     ticket_number: str
 ) -> Message | None:
 
@@ -346,11 +352,11 @@ def last_internal_message(
 
 def send_chat_message_email_if_enabled(
     ticket: Ticket,
-    request: 'OrgRequest',
+    request: OrgRequest,
     message: TicketChatMessage,
     origin: str,
-    bcc: 'SequenceOrScalar[Address | str]' = (),
-    attachments: 'Iterable[Attachment | StrPath]' = ()
+    bcc: SequenceOrScalar[Address | str] = (),
+    attachments: Iterable[Attachment | StrPath] = ()
 ) -> None:
 
     assert origin in ('internal', 'external')
@@ -392,7 +398,7 @@ def send_chat_message_email_if_enabled(
     # of messages in succession without getting a reply)
     #
     # note that the resulting thread has to be reversed for the mail template
-    def thread() -> 'Iterator[TicketChatMessage]':
+    def thread() -> Iterator[TicketChatMessage]:
         messages.older_than = message.id
         messages.load = 'newer-first'
 
@@ -421,7 +427,7 @@ def send_chat_message_email_if_enabled(
 
 
 def send_new_note_notification(
-    request: 'OrgRequest',
+    request: OrgRequest,
     form: TicketNoteForm,
     note: TicketNote,
     template: str
@@ -438,7 +444,7 @@ def send_new_note_notification(
     if not isinstance(handler, ReservationHandler) or not handler.resource:
         return
 
-    def recipients_which_have_registered_for_mail() -> 'Iterator[str]':
+    def recipients_which_have_registered_for_mail() -> Iterator[str]:
         q = ResourceRecipientCollection(request.session).query()
         q = q.filter(ResourceRecipient.medium == 'email')
         q = q.order_by(None).order_by(ResourceRecipient.address)
@@ -477,7 +483,7 @@ def send_new_note_notification(
     )
     plaintext = html_to_text(content)
 
-    def email_iter() -> 'Iterator[EmailJsonDict]':
+    def email_iter() -> Iterator[EmailJsonDict]:
         for recipient_addr in recipients_which_have_registered_for_mail():
 
             yield request.app.prepare_email(
@@ -498,10 +504,10 @@ def send_new_note_notification(
 )
 def handle_new_note(
     self: Ticket,
-    request: 'OrgRequest',
+    request: OrgRequest,
     form: TicketNoteForm,
     layout: TicketNoteLayout | None = None
-) -> 'RenderData | BaseResponse':
+) -> RenderData | BaseResponse:
 
     if form.submitted(request):
         message = form.text.data
@@ -530,13 +536,13 @@ def handle_new_note(
 @OrgApp.view(model=TicketNote, permission=Private)
 def view_ticket_note(
     self: TicketNote,
-    request: 'OrgRequest'
-) -> 'BaseResponse':
+    request: OrgRequest
+) -> BaseResponse:
     return request.redirect(request.link(self.ticket))
 
 
 @OrgApp.view(model=TicketNote, permission=Private, request_method='DELETE')
-def delete_ticket_note(self: TicketNote, request: 'OrgRequest') -> None:
+def delete_ticket_note(self: TicketNote, request: OrgRequest) -> None:
     request.assert_valid_csrf_token()
 
     if self.ticket:
@@ -553,10 +559,10 @@ def delete_ticket_note(self: TicketNote, request: 'OrgRequest') -> None:
 )
 def handle_edit_note(
     self: TicketNote,
-    request: 'OrgRequest',
+    request: OrgRequest,
     form: TicketNoteForm,
     layout: TicketNoteLayout | None = None
-) -> 'RenderData | BaseResponse':
+) -> RenderData | BaseResponse:
 
     assert self.ticket is not None
     if form.submitted(request):
@@ -582,7 +588,7 @@ def handle_edit_note(
 
 
 @OrgApp.view(model=Ticket, name='accept', permission=Private)
-def accept_ticket(self: Ticket, request: 'OrgRequest') -> 'BaseResponse':
+def accept_ticket(self: Ticket, request: OrgRequest) -> BaseResponse:
     user = request.current_user
     assert user is not None
 
@@ -603,7 +609,7 @@ def accept_ticket(self: Ticket, request: 'OrgRequest') -> 'BaseResponse':
 
 
 @OrgApp.view(model=Ticket, name='close', permission=Private)
-def close_ticket(self: Ticket, request: 'OrgRequest') -> 'BaseResponse':
+def close_ticket(self: Ticket, request: OrgRequest) -> BaseResponse:
 
     was_pending = self.state == 'pending'
 
@@ -634,7 +640,7 @@ def close_ticket(self: Ticket, request: 'OrgRequest') -> 'BaseResponse':
 
 
 @OrgApp.view(model=Ticket, name='reopen', permission=Private)
-def reopen_ticket(self: Ticket, request: 'OrgRequest') -> 'BaseResponse':
+def reopen_ticket(self: Ticket, request: OrgRequest) -> BaseResponse:
     user = request.current_user
     assert user is not None
 
@@ -678,7 +684,7 @@ def reopen_ticket(self: Ticket, request: 'OrgRequest') -> 'BaseResponse':
 
 
 @OrgApp.view(model=Ticket, name='mute', permission=Private)
-def mute_ticket(self: Ticket, request: 'OrgRequest') -> 'BaseResponse':
+def mute_ticket(self: Ticket, request: OrgRequest) -> BaseResponse:
     self.muted = True
 
     TicketMessage.create(self, request, 'muted')
@@ -691,7 +697,7 @@ def mute_ticket(self: Ticket, request: 'OrgRequest') -> 'BaseResponse':
 
 
 @OrgApp.view(model=Ticket, name='unmute', permission=Private)
-def unmute_ticket(self: Ticket, request: 'OrgRequest') -> 'BaseResponse':
+def unmute_ticket(self: Ticket, request: OrgRequest) -> BaseResponse:
     self.muted = False
 
     TicketMessage.create(self, request, 'unmuted')
@@ -704,7 +710,7 @@ def unmute_ticket(self: Ticket, request: 'OrgRequest') -> 'BaseResponse':
 
 
 @OrgApp.view(model=Ticket, name='archive', permission=Private)
-def archive_ticket(self: Ticket, request: 'OrgRequest') -> 'BaseResponse':
+def archive_ticket(self: Ticket, request: OrgRequest) -> BaseResponse:
 
     try:
         self.archive_ticket()
@@ -721,7 +727,7 @@ def archive_ticket(self: Ticket, request: 'OrgRequest') -> 'BaseResponse':
 
 
 @OrgApp.view(model=Ticket, name='unarchive', permission=Private)
-def unarchive_ticket(self: Ticket, request: 'OrgRequest') -> 'BaseResponse':
+def unarchive_ticket(self: Ticket, request: OrgRequest) -> BaseResponse:
     user = request.current_user
     assert user is not None
 
@@ -747,10 +753,10 @@ def unarchive_ticket(self: Ticket, request: 'OrgRequest') -> 'BaseResponse':
              form=TicketAssignmentForm, template='form.pt')
 def assign_ticket(
     self: Ticket,
-    request: 'OrgRequest',
+    request: OrgRequest,
     form: TicketAssignmentForm,
     layout: TicketLayout | None = None
-) -> 'RenderData | BaseResponse':
+) -> RenderData | BaseResponse:
 
     if form.submitted(request):
         assert form.username is not None
@@ -782,10 +788,10 @@ def assign_ticket(
              form=ExtendedInternalTicketChatMessageForm, template='form.pt')
 def message_to_submitter(
     self: Ticket,
-    request: 'OrgRequest',
+    request: OrgRequest,
     form: ExtendedInternalTicketChatMessageForm,
     layout: TicketChatMessageLayout | None = None
-) -> 'RenderData | BaseResponse':
+) -> RenderData | BaseResponse:
 
     recipient = self.snapshot.get('email') or self.handler.email
 
@@ -843,8 +849,8 @@ def message_to_submitter(
 
 
 def create_attachment_from_uploaded(
-    fe: 'UploadFileWithORMSupport',
-    request: 'OrgRequest'
+    fe: UploadFileWithORMSupport,
+    request: OrgRequest
 ) -> tuple[Attachment, ...]:
 
     filename, storage_path = (
@@ -868,7 +874,7 @@ def create_attachment_from_uploaded(
 
 
 @OrgApp.view(model=Ticket, name='pdf', permission=Private)
-def view_ticket_pdf(self: Ticket, request: 'OrgRequest') -> Response:
+def view_ticket_pdf(self: Ticket, request: OrgRequest) -> Response:
     """ View the generated PDF. """
 
     content = TicketPdf.from_ticket(request, self)
@@ -884,7 +890,7 @@ def view_ticket_pdf(self: Ticket, request: 'OrgRequest') -> Response:
 
 
 @OrgApp.view(model=Ticket, name='files', permission=Private)
-def view_ticket_files(self: Ticket, request: 'OrgRequest') -> 'BaseResponse':
+def view_ticket_files(self: Ticket, request: OrgRequest) -> BaseResponse:
     """ Download the files associated with the ticket as zip. """
 
     form_submission = getattr(self.handler, 'submission', None)
@@ -929,10 +935,10 @@ def view_ticket_files(self: Ticket, request: 'OrgRequest') -> 'BaseResponse':
              permission=Public, form=TicketChatMessageForm)
 def view_ticket_status(
     self: Ticket,
-    request: 'OrgRequest',
+    request: OrgRequest,
     form: TicketChatMessageForm,
     layout: TicketChatMessageLayout | None = None
-) -> 'RenderData | BaseResponse':
+) -> RenderData | BaseResponse:
 
     title = ''
     if self.state == 'open':
@@ -1008,7 +1014,7 @@ def view_ticket_status(
 
 
 @OrgApp.view(model=Ticket, name='send-to-gever', permission=Private)
-def view_send_to_gever(self: Ticket, request: 'OrgRequest') -> 'BaseResponse':
+def view_send_to_gever(self: Ticket, request: OrgRequest) -> BaseResponse:
     org = request.app.org
     username = org.gever_username
     password = org.gever_password
@@ -1056,8 +1062,8 @@ def view_send_to_gever(self: Ticket, request: 'OrgRequest') -> 'BaseResponse':
 
 def get_filters(
     self: TicketCollection,
-    request: 'OrgRequest'
-) -> 'Iterator[Link]':
+    request: OrgRequest
+) -> Iterator[Link]:
 
     assert request.current_user is not None
     yield Link(
@@ -1088,10 +1094,10 @@ def get_filters(
 
 def get_groups(
     self: TicketCollection | ArchivedTicketCollection,
-    request: 'OrgRequest',
-    groups: 'Mapping[str, Iterable[str]]',
+    request: OrgRequest,
+    groups: Mapping[str, Iterable[str]],
     handler: str
-) -> 'Iterator[Link]':
+) -> Iterator[Link]:
 
     base = self.for_handler(handler)
 
@@ -1108,9 +1114,9 @@ def get_groups(
 
 def get_handlers(
     self: TicketCollection | ArchivedTicketCollection,
-    request: 'OrgRequest',
-    groups: 'Mapping[str, Iterable[str]]'
-) -> 'Iterator[Link]':
+    request: OrgRequest,
+    groups: Mapping[str, Iterable[str]]
+) -> Iterator[Link]:
 
     handlers = []
 
@@ -1150,8 +1156,8 @@ def get_handlers(
 
 def get_owners(
     self: TicketCollection | ArchivedTicketCollection,
-    request: 'OrgRequest'
-) -> 'Iterator[Link]':
+    request: OrgRequest
+) -> Iterator[Link]:
 
     users = UserCollection(request.session)
     query = users.by_roles(*request.app.settings.org.ticket_manager_roles)
@@ -1172,7 +1178,7 @@ def get_owners(
         )
 
 
-def groups_by_handler_code(session: 'Session') -> dict[str, list[str]]:
+def groups_by_handler_code(session: Session) -> dict[str, list[str]]:
     query = as_selectable("""
             SELECT
                 handler_code,                         -- Text
@@ -1194,9 +1200,9 @@ def groups_by_handler_code(session: 'Session') -> dict[str, list[str]]:
              permission=Private)
 def view_tickets(
     self: TicketCollection,
-    request: 'OrgRequest',
+    request: OrgRequest,
     layout: TicketsLayout | None = None
-) -> 'RenderData':
+) -> RenderData:
 
     groups = groups_by_handler_code(request.session)
     handlers = tuple(get_handlers(self, request, groups))
@@ -1230,9 +1236,9 @@ def view_tickets(
              permission=Private)
 def view_archived_tickets(
     self: ArchivedTicketCollection,
-    request: 'OrgRequest',
+    request: OrgRequest,
     layout: ArchivedTicketsLayout | None = None
-) -> 'RenderData':
+) -> RenderData:
 
     groups = groups_by_handler_code(request.session)
     handlers = tuple(get_handlers(self, request, groups))
@@ -1265,7 +1271,7 @@ def view_archived_tickets(
              request_method='DELETE', permission=Secret)
 def view_delete_all_archived_tickets(
     self: ArchivedTicketCollection,
-    request: 'OrgRequest'
+    request: OrgRequest
 ) -> None:
 
     tickets = self.query().filter_by(state='archived')
@@ -1287,7 +1293,7 @@ def view_delete_all_archived_tickets(
 
 
 def delete_tickets_and_related_data(
-    request: 'CoreRequest', tickets: 'Query[Ticket]'
+    request: CoreRequest, tickets: Query[Ticket]
 ) -> tuple[list[Ticket], list[Ticket]]:
 
     not_deletable, successfully_deleted = [], []
@@ -1312,7 +1318,7 @@ def delete_tickets_and_related_data(
     return not_deletable, successfully_deleted
 
 
-def delete_messages_from_ticket(request: 'CoreRequest', number: str) -> None:
+def delete_messages_from_ticket(request: CoreRequest, number: str) -> None:
     messages = MessageCollection(
         request.session, channel_id=number
     )
@@ -1324,9 +1330,9 @@ def delete_messages_from_ticket(request: 'CoreRequest', number: str) -> None:
              template='pending_tickets.pt', permission=Public)
 def view_pending_tickets(
     self: FindYourSpotCollection,
-    request: 'OrgRequest',
+    request: OrgRequest,
     layout: FindYourSpotLayout | None = None
-) -> 'RenderData':
+) -> RenderData:
 
     pending: dict[str, list[str]]
     pending = request.browser_session.get('reservation_tickets', {})

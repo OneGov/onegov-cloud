@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 from collections import OrderedDict
 from itertools import groupby
 from onegov.election_day.models import Candidate
@@ -21,7 +23,7 @@ if TYPE_CHECKING:
 
 def export_election_internal_proporz(
     election: Election,
-    locales: 'Collection[str]'
+    locales: Collection[str]
 ) -> list[dict[str, Any]]:
     """ Returns all data connected to this election as list with dicts.
 
@@ -39,7 +41,7 @@ def export_election_internal_proporz(
     ids = session.query(ElectionResult.id)
     ids = ids.filter(ElectionResult.election_id == election.id)
 
-    SubListConnection = aliased(ListConnection)
+    SubListConnection = aliased(ListConnection)  # noqa: N806
     results = session.query(
         CandidateResult.votes,
         ElectionResult.superregion,

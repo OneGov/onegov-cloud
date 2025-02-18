@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 from collections.abc import Iterable
 from onegov.core.crypto import random_token
 from onegov.core.utils import toggle
@@ -48,15 +50,15 @@ def as_set(value: Any) -> set[Any]:
 
 @overload
 def as_dictionary_of_sets(
-    d: 'Mapping[str, _T | Iterable[_T] | None]'
+    d: Mapping[str, _T | Iterable[_T] | None]
 ) -> dict[str, set[_T]]: ...
 
 
 @overload
-def as_dictionary_of_sets(d: 'Mapping[str, Any]') -> dict[str, set[Any]]: ...
+def as_dictionary_of_sets(d: Mapping[str, Any]) -> dict[str, set[Any]]: ...
 
 
-def as_dictionary_of_sets(d: 'Mapping[str, Any]') -> dict[str, set[Any]]:
+def as_dictionary_of_sets(d: Mapping[str, Any]) -> dict[str, set[Any]]:
     return {
         k: (set() if v is None else as_set(v))
         for k, v in d.items()
@@ -73,7 +75,7 @@ class UserCollection:
 
     """
 
-    def __init__(self, session: 'Session', **filters: Any):
+    def __init__(self, session: Session, **filters: Any):
         self.session = session
         self.filters = as_dictionary_of_sets(filters)
 
@@ -83,7 +85,7 @@ class UserCollection:
 
         return self.filters[name]
 
-    def for_filter(self, **filters: Any) -> 'Self':
+    def for_filter(self, **filters: Any) -> Self:
         toggled = {
             key: toggle(self.filters.get(key, set()), value)
             for key, value in filters.items()
@@ -95,7 +97,7 @@ class UserCollection:
 
         return self.__class__(self.session, **toggled)
 
-    def query(self) -> 'Query[User]':
+    def query(self) -> Query[User]:
         """ Returns a query using :class:`onegov.user.models.User`. With
         the current filters applied.
 
@@ -111,10 +113,10 @@ class UserCollection:
 
     def apply_filter(
         self,
-        query: 'Query[User]',
+        query: Query[User],
         key: str,
-        values: 'Collection[Any]'
-    ) -> 'Query[User]':
+        values: Collection[Any]
+    ) -> Query[User]:
 
         if '' in values:
             return query.filter(
@@ -128,10 +130,10 @@ class UserCollection:
 
     def apply_tag_filter(
         self,
-        query: 'Query[User]',
+        query: Query[User],
         key: str,
         values: Iterable[str]
-    ) -> 'Query[User]':
+    ) -> Query[User]:
         return query.filter(or_(
             *(User.data['tags'].contains((v, )) for v in values)
         ))
@@ -147,12 +149,12 @@ class UserCollection:
         realname: str | None = None,
         phone_number: str | None = None,
         signup_token: str | None = None,
-        group: 'UserGroup | None' = None
+        group: UserGroup | None = None
     ) -> User:
         """ Add a user to the collection.
 
-            The arguments given to this function are the attributes of the
-            :class:`~onegov.user.models.User` class with the same name.
+        The arguments given to this function are the attributes of the
+        :class:`~onegov.user.models.User` class with the same name.
         """
         assert username
         assert password
@@ -243,7 +245,7 @@ class UserCollection:
 
         return query.scalar()
 
-    def by_id(self, id: 'UUID') -> User | None:
+    def by_id(self, id: UUID) -> User | None:
         """ Returns the user by the internal id.
 
         Use this if you need to refer to a user by path. Usernames are not
@@ -283,19 +285,19 @@ class UserCollection:
         else:
             return None
 
-    def by_roles(self, role: str, *roles: str) -> 'Query[User]':
+    def by_roles(self, role: str, *roles: str) -> Query[User]:
         """ Queries the users by roles. """
         roles_list = [role, *list(roles)]
         return self.query().filter(User.role.in_(roles_list))
 
-    def by_signup_token(self, signup_token: str) -> 'Query[User]':
+    def by_signup_token(self, signup_token: str) -> Query[User]:
         return self.query().filter_by(signup_token=signup_token)
 
     def register(
         self,
         username: str,
         password: str,
-        request: 'CoreRequest',
+        request: CoreRequest,
         role: str = 'member',
         signup_token: str | None = None
     ) -> User:

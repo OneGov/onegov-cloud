@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 from onegov.election_day import ElectionDayApp
 from onegov.election_day.collections import ArchivedResultCollection
 from onegov.election_day.layouts import DefaultLayout
@@ -15,8 +17,8 @@ if TYPE_CHECKING:
 
 def urls(
     principal: Principal,
-    request: 'ElectionDayRequest'
-) -> 'Iterator[str]':
+    request: ElectionDayRequest
+) -> Iterator[str]:
     layout = DefaultLayout(principal, request)
 
     yield request.link(principal)
@@ -31,7 +33,7 @@ def urls(
         yield request.link(layout.archive.for_date(str(year)))
 
         archive = ArchivedResultCollection(request.session, str(year))
-        results, last_modified = archive.by_date()
+        results, _last_modified = archive.by_date()
         grouped_results = archive.group_items(results, request) or {}
         for date_, domains in grouped_results.items():
             yield request.link(layout.archive.for_date(date_.isoformat()))
@@ -49,8 +51,8 @@ def urls(
 )
 def view_sitemap_xml(
     self: Principal,
-    request: 'ElectionDayRequest'
-) -> 'RenderData':
+    request: ElectionDayRequest
+) -> RenderData:
     """ Returns a XML-sitemap.
 
     See https://www.sitemaps.org for more information.
@@ -58,7 +60,7 @@ def view_sitemap_xml(
     """
 
     @request.after
-    def add_headers(response: 'Response') -> None:
+    def add_headers(response: Response) -> None:
         response.headers['Content-Type'] = 'application/xml'
 
     return {'urls': sorted(urls(self, request))}
@@ -71,8 +73,8 @@ def view_sitemap_xml(
 )
 def view_sitemap_json(
     self: Principal,
-    request: 'ElectionDayRequest'
-) -> 'RenderData':
+    request: ElectionDayRequest
+) -> RenderData:
     """ Returns the XML-sitemap as json. """
 
     return {'urls': sorted(urls(self, request))}
@@ -86,8 +88,8 @@ def view_sitemap_json(
 )
 def view_sitemap(
     self: Principal,
-    request: 'ElectionDayRequest'
-) -> 'RenderData':
+    request: ElectionDayRequest
+) -> RenderData:
     """ Returns a site map (with hiearchy). """
 
     layout = DefaultLayout(self, request)

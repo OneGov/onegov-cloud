@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 from morepath.request import Response
 from onegov.election_day import _
 from onegov.election_day import ElectionDayApp
@@ -26,9 +28,9 @@ if TYPE_CHECKING:
 )
 def subscribe_email(
     self: Principal,
-    request: 'ElectionDayRequest',
+    request: ElectionDayRequest,
     form: EmailSubscriptionForm
-) -> 'RenderData':
+) -> RenderData:
     """ Initiate the email notification subscription. """
 
     layout = DefaultLayout(self, request)
@@ -58,7 +60,7 @@ def subscribe_email(
         'message': message,
         'cancel': layout.homepage_link,
         'callout': callout,
-        'show_form': False if callout else True
+        'show_form': not callout
     }
 
 
@@ -71,9 +73,9 @@ def subscribe_email(
 )
 def optin_email(
     self: Principal,
-    request: 'ElectionDayRequest',
+    request: ElectionDayRequest,
     form: EmailSubscriptionForm
-) -> 'RenderData':
+) -> RenderData:
     """ Confirm the email used for the subscription. """
 
     callout = _('Subscription failed, the link is invalid.')
@@ -119,9 +121,9 @@ def optin_email(
 )
 def unsubscribe_email(
     self: Principal,
-    request: 'ElectionDayRequest',
+    request: ElectionDayRequest,
     form: EmailSubscriptionForm
-) -> 'RenderData':
+) -> RenderData:
     """ Initiates the email notification unsubscription. """
 
     layout = DefaultLayout(self, request)
@@ -145,7 +147,7 @@ def unsubscribe_email(
         'title': _('Stop email subscription'),
         'cancel': layout.homepage_link,
         'callout': callout,
-        'show_form': False if callout else True
+        'show_form': not callout
     }
 
 
@@ -158,9 +160,9 @@ def unsubscribe_email(
 )
 def optout_email(
     self: Principal,
-    request: 'ElectionDayRequest',
+    request: ElectionDayRequest,
     form: EmailSubscriptionForm
-) -> 'RenderData | Response':
+) -> RenderData | Response:
     """ Deactivates the email subscription.
 
     Allows one-click unsubscription as defined by RFC-8058:
@@ -212,9 +214,9 @@ def optout_email(
 )
 def subscribe_sms(
     self: Principal,
-    request: 'ElectionDayRequest',
+    request: ElectionDayRequest,
     form: SmsSubscriptionForm
-) -> 'RenderData':
+) -> RenderData:
     """ Adds the given phone number to the SMS subscribers."""
 
     layout = DefaultLayout(self, request)
@@ -246,7 +248,7 @@ def subscribe_sms(
         ),
         'cancel': layout.homepage_link,
         'callout': callout,
-        'show_form': False if callout else True
+        'show_form': not callout
     }
 
 
@@ -259,9 +261,9 @@ def subscribe_sms(
 )
 def unsubscribe_sms(
     self: Principal,
-    request: 'ElectionDayRequest',
+    request: ElectionDayRequest,
     form: SmsSubscriptionForm
-) -> 'RenderData':
+) -> RenderData:
     """ Removes the given phone number from the SMS subscribers."""
 
     layout = DefaultLayout(self, request)
@@ -288,5 +290,5 @@ def unsubscribe_sms(
         'title': _('Stop SMS subscription'),
         'cancel': layout.homepage_link,
         'callout': callout,
-        'show_form': False if callout else True
+        'show_form': not callout
     }

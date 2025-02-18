@@ -1,4 +1,6 @@
 """ The authentication views. """
+from __future__ import annotations
+
 from morepath import redirect
 from onegov.core.security import Private
 from onegov.core.security import Public
@@ -36,9 +38,9 @@ if TYPE_CHECKING:
 )
 def handle_login(
     self: Auth,
-    request: 'ElectionDayRequest',
+    request: ElectionDayRequest,
     form: LoginForm
-) -> 'RenderData | Response':
+) -> RenderData | Response:
     """ Handles the login requests. """
 
     if form.submitted(request):
@@ -62,7 +64,7 @@ def handle_login(
     name='logout',
     permission=Private
 )
-def view_logout(self: Auth, request: 'ElectionDayRequest') -> 'Response':
+def view_logout(self: Auth, request: ElectionDayRequest) -> Response:
 
     """ Handles the logout requests. """
 
@@ -78,9 +80,9 @@ def view_logout(self: Auth, request: 'ElectionDayRequest') -> 'Response':
 )
 def handle_password_reset_request(
     self: Principal,
-    request: 'ElectionDayRequest',
+    request: ElectionDayRequest,
     form: PasswordResetForm
-) -> 'RenderData':
+) -> RenderData:
     """ Handles the password reset requests. """
 
     show_form = True
@@ -150,9 +152,9 @@ def handle_password_reset_request(
 )
 def handle_password_reset(
     self: Principal,
-    request: 'ElectionDayRequest',
+    request: ElectionDayRequest,
     form: PasswordResetForm
-) -> 'RenderData':
+) -> RenderData:
     """ Handles password reset requests. """
 
     callout = None
@@ -193,15 +195,15 @@ def handle_password_reset(
 )
 def handle_totp_second_factor(
     self: Auth,
-    request: 'ElectionDayRequest',
+    request: ElectionDayRequest,
     form: TOTPForm
-) -> 'RenderData | Response':
+) -> RenderData | Response:
 
     if not request.app.totp_enabled:
         raise exc.HTTPNotFound()
 
     @request.after
-    def respond_with_no_index(response: 'Response') -> None:
+    def respond_with_no_index(response: Response) -> None:
         response.headers['X-Robots-Tag'] = 'noindex'
 
     users = UserCollection(request.session)

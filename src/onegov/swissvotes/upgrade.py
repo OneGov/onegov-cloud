@@ -2,6 +2,8 @@
 upgraded on the server. See :class:`onegov.core.upgrade.upgrade_task`.
 
 """
+from __future__ import annotations
+
 from onegov.core.orm.types import JSON
 from onegov.core.upgrade import upgrade_task
 from onegov.core.upgrade import UpgradeContext
@@ -667,5 +669,12 @@ def add_english_bfs_map(context: UpgradeContext) -> None:
 def add_bfs_dashboard(context: UpgradeContext) -> None:
     for locale in ('de', 'en', 'fr'):
         column = f'bfs_dashboard_{locale}'
+        if not context.has_column('swissvotes', column):
+            context.operations.add_column('swissvotes', Column(column, Text))
+
+
+@upgrade_task('Add poster columns basel 2')
+def add_poster_columns_basel(context: UpgradeContext) -> None:
+    for column in ('posters_bs_yea', 'posters_bs_nay'):
         if not context.has_column('swissvotes', column):
             context.operations.add_column('swissvotes', Column(column, Text))

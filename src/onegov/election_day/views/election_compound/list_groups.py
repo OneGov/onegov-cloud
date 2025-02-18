@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 from onegov.election_day import ElectionDayApp
 from onegov.election_day.layouts import ElectionCompoundLayout
 from onegov.election_day.models import ElectionCompound
@@ -22,8 +24,8 @@ if TYPE_CHECKING:
 )
 def view_election_compound_list_groups_data(
     self: ElectionCompound,
-    request: 'ElectionDayRequest'
-) -> 'JSON_ro':
+    request: ElectionDayRequest
+) -> JSON_ro:
     """" View the list groups as JSON. Used to for the lists bar chart. """
 
     return get_list_groups_data(self)
@@ -37,12 +39,12 @@ def view_election_compound_list_groups_data(
 )
 def view_election_compound_list_groups_chart(
     self: ElectionCompound,
-    request: 'ElectionDayRequest'
-) -> 'RenderData':
+    request: ElectionDayRequest
+) -> RenderData:
     """" View the list groups as bar chart. """
 
     @request.after
-    def add_last_modified(response: 'Response') -> None:
+    def add_last_modified(response: Response) -> None:
         add_last_modified_header(response, self.last_modified)
 
     return {
@@ -60,12 +62,12 @@ def view_election_compound_list_groups_chart(
 )
 def view_election_compound_list_groups_table(
     self: ElectionCompound,
-    request: 'ElectionDayRequest'
-) -> 'RenderData':
+    request: ElectionDayRequest
+) -> RenderData:
     """" View the list groups as table. """
 
     @request.after
-    def add_last_modified(response: 'Response') -> None:
+    def add_last_modified(response: Response) -> None:
         add_last_modified_header(response, self.last_modified)
 
     return {
@@ -85,8 +87,8 @@ def view_election_compound_list_groups_table(
 )
 def view_election_compound_list_groups(
     self: ElectionCompound,
-    request: 'ElectionDayRequest'
-) -> 'RenderData':
+    request: ElectionDayRequest
+) -> RenderData:
     """" The main view. """
 
     layout = ElectionCompoundLayout(self, request, 'list-groups')
@@ -105,8 +107,8 @@ def view_election_compound_list_groups(
 )
 def view_election_compound_list_groups_svg(
     self: ElectionCompound,
-    request: 'ElectionDayRequest'
-) -> 'RenderData':
+    request: ElectionDayRequest
+) -> RenderData:
     """ View the list groups as SVG. """
 
     layout = ElectionCompoundLayout(self, request, 'list-groups')

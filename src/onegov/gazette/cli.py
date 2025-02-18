@@ -1,4 +1,5 @@
 """ Provides commands used to initialize gazette websites. """
+from __future__ import annotations
 
 import click
 import transaction
@@ -37,15 +38,17 @@ cli = command_group()
 @cli.command(context_settings={'creates_path': True})
 @pass_group_context
 def add(
-    group_context: 'GroupContext'
-) -> 'Callable[[GazetteRequest, GazetteApp], None]':
+    group_context: GroupContext
+) -> Callable[[GazetteRequest, GazetteApp], None]:
     """ Adds a gazette instance to the database. For example:
+
+    .. code-block:: bash
 
         onegov-gazette --select '/onegov_gazette/zug' add
 
     """
 
-    def add_instance(request: 'GazetteRequest', app: 'GazetteApp') -> None:
+    def add_instance(request: GazetteRequest, app: GazetteApp) -> None:
         if not app.principal:
             click.secho('principal.yml not found', fg='yellow')
         click.echo('Instance was created successfully')
@@ -60,21 +63,23 @@ def add(
 @click.option('--locale', default='de_CH')
 @pass_group_context
 def import_editors(
-    group_context: 'GroupContext',
+    group_context: GroupContext,
     file: IO[bytes],
     clear: bool,
     dry_run: bool,
     locale: str
-) -> 'Callable[[GazetteRequest, GazetteApp], None]':
+) -> Callable[[GazetteRequest, GazetteApp], None]:
     """ Imports editors and groups. For example:
+
+    .. code-block:: bash
 
         onegov-gazette --select '/onegov_gazette/zug' import-editors data.xlsx
 
     """
 
     def import_editors_and_groups(
-        request: 'GazetteRequest',
-        app: 'GazetteApp'
+        request: GazetteRequest,
+        app: GazetteApp
     ) -> None:
 
         request.locale = locale
@@ -144,13 +149,15 @@ def import_editors(
 @click.option('--locale', default='de_CH')
 @pass_group_context
 def import_organizations(
-    group_context: 'GroupContext',
+    group_context: GroupContext,
     file: IO[bytes],
     clear: bool,
     dry_run: bool,
     locale: str
-) -> 'Callable[[GazetteRequest, GazetteApp], None]':
-    """ Imports Organizations. For example:
+) -> Callable[[GazetteRequest, GazetteApp], None]:
+    r""" Imports Organizations. For example:
+
+    .. code-block:: bash
 
         onegov-gazette --select '/onegov_gazette/zug' \
             import-organizations data.xlsx
@@ -158,8 +165,8 @@ def import_organizations(
     """
 
     def _import_organizations(
-        request: 'GazetteRequest',
-        app: 'GazetteApp'
+        request: GazetteRequest,
+        app: GazetteApp
     ) -> None:
 
         request.locale = locale
@@ -227,13 +234,15 @@ def import_organizations(
 @click.option('--locale', default='de_CH')
 @pass_group_context
 def import_categories(
-    group_context: 'GroupContext',
+    group_context: GroupContext,
     file: IO[bytes],
     clear: bool,
     dry_run: bool,
     locale: str
-) -> 'Callable[[GazetteRequest, GazetteApp], None]':
-    """ Imports categories. For example:
+) -> Callable[[GazetteRequest, GazetteApp], None]:
+    r""" Imports categories. For example:
+
+    .. code-block:: bash
 
         onegov-gazette --select '/onegov_gazette/zug' \
             import-categories data.xlsx
@@ -241,8 +250,8 @@ def import_categories(
     """
 
     def _import_categories(
-        request: 'GazetteRequest',
-        app: 'GazetteApp'
+        request: GazetteRequest,
+        app: GazetteApp
     ) -> None:
 
         request.locale = locale
@@ -303,22 +312,24 @@ def import_categories(
 @click.option('--timezone', default=None)
 @pass_group_context
 def import_issues(
-    group_context: 'GroupContext',
+    group_context: GroupContext,
     file: IO[bytes],
     clear: bool,
     dry_run: bool,
     locale: str,
     timezone: str | None
-) -> 'Callable[[GazetteRequest, GazetteApp], None]':
+) -> Callable[[GazetteRequest, GazetteApp], None]:
     """ Imports issues. For example:
+
+    .. code-block:: bash
 
         onegov-gazette --select '/onegov_gazette/zug' import-issues data.xlsx
 
     """
 
     def _import_issues(
-        request: 'GazetteRequest',
-        app: 'GazetteApp'
+        request: GazetteRequest,
+        app: GazetteApp
     ) -> None:
 
         if not app.principal:
@@ -381,19 +392,21 @@ def import_issues(
 @click.option('--dry-run/--no-dry-run', default=False)
 @pass_group_context
 def import_sogc(
-    group_context: 'GroupContext',
+    group_context: GroupContext,
     clear: bool,
     dry_run: bool
-) -> 'Callable[[GazetteRequest, GazetteApp], None]':
+) -> Callable[[GazetteRequest, GazetteApp], None]:
     """ Imports from the SOGC. For example:
+
+    .. code-block:: bash
 
         onegov-gazette --select '/onegov_gazette/zug' import-sogc
 
     """
 
     def _import_sogc(
-        request: 'GazetteRequest',
-        app: 'GazetteApp'
+        request: GazetteRequest,
+        app: GazetteApp
     ) -> None:
 
         if not app.principal:

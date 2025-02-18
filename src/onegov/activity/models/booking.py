@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 from onegov.activity.models.occasion import Occasion
 from onegov.core.orm import Base
 from onegov.core.orm.mixins import TimestampMixin
@@ -63,47 +65,47 @@ class Booking(Base, TimestampMixin):
         return isinstance(other, self.__class__) and self.id == other.id
 
     #: the public id of the booking
-    id: 'Column[uuid.UUID]' = Column(
+    id: Column[uuid.UUID] = Column(
         UUID,  # type:ignore[arg-type]
         primary_key=True,
         default=uuid4
     )
 
     #: the user owning the booking
-    username: 'Column[str]' = Column(
+    username: Column[str] = Column(
         Text,
         ForeignKey('users.username'),
         nullable=False
     )
 
     #: the priority of the booking, a higher number = a higher priority
-    priority: 'Column[int]' = Column(Integer, nullable=False, default=0)
+    priority: Column[int] = Column(Integer, nullable=False, default=0)
 
     #: the group code of the booking, if missing the booking is not in a group
-    group_code: 'Column[str | None]' = Column(Text, nullable=True)
+    group_code: Column[str | None] = Column(Text, nullable=True)
 
     #: the attendee behind this booking
-    attendee_id: 'Column[uuid.UUID]' = Column(
+    attendee_id: Column[uuid.UUID] = Column(
         UUID,  # type:ignore[arg-type]
         ForeignKey('attendees.id'),
         nullable=False
     )
 
     #: the occasion this booking belongs to
-    occasion_id: 'Column[uuid.UUID]' = Column(
+    occasion_id: Column[uuid.UUID] = Column(
         UUID,  # type:ignore[arg-type]
         ForeignKey('occasions.id'),
         nullable=False
     )
 
     #: the cost of the booking
-    cost: 'Column[Decimal | None]' = Column(
+    cost: Column[Decimal | None] = Column(
         Numeric(precision=8, scale=2),
         nullable=True
     )
 
     #: the calculated score of the booking
-    score: 'Column[Decimal]' = Column(
+    score: Column[Decimal] = Column(
         Numeric(precision=14, scale=9),
         nullable=False,
         default=0
@@ -111,17 +113,17 @@ class Booking(Base, TimestampMixin):
 
     if TYPE_CHECKING:
         # FIXME: We should be able to get rid of this workaround in the future
-        period_id: 'Column[uuid.UUID]'
+        period_id: Column[uuid.UUID]
 
     #: the period this booking belongs to
     @aggregated('occasion', Column(  # type:ignore[no-redef]
         UUID, ForeignKey('periods.id'), nullable=False)
     )
-    def period_id(self) -> 'ColumnElement[uuid.UUID]':
+    def period_id(self) -> ColumnElement[uuid.UUID]:
         return func.coalesce(Occasion.period_id, None)
 
     #: the state of the booking
-    state: 'Column[BookingState]' = Column(
+    state: Column[BookingState] = Column(
         Enum(  # type:ignore[arg-type]
             'open',
             'blocked',
@@ -143,29 +145,29 @@ class Booking(Base, TimestampMixin):
     )
 
     #: access the user linked to this booking
-    user: 'relationship[User]' = relationship('User')
+    user: relationship[User] = relationship('User')
 
     #: access the attendee linked to this booking
-    attendee: 'relationship[Attendee]' = relationship(
+    attendee: relationship[Attendee] = relationship(
         'Attendee',
         back_populates='bookings'
     )
 
     #: access the occasion linked to this booking
-    occasion: 'relationship[Occasion]' = relationship(
+    occasion: relationship[Occasion] = relationship(
         Occasion,
         back_populates='bookings'
     )
 
     #: access the period linked to this booking
-    period: 'relationship[Period]' = relationship(
+    period: relationship[Period] = relationship(
         'Period',
         back_populates='bookings'
     )
 
     def group_code_count(
         self,
-        states: 'BookingStates | Literal["*"]' = ('open', 'accepted')
+        states: BookingStates | Literal['*'] = ('open', 'accepted')
     ) -> int:
         """ Returns the number of bookings with the same group code. """
         query = object_session(self).query(Booking).with_entities(
@@ -177,7 +179,7 @@ class Booking(Base, TimestampMixin):
 
         return query.scalar()
 
-    def period_bound_booking_state(self, period: 'Period') -> 'BookingState':
+    def period_bound_booking_state(self, period: Period) -> BookingState:
         """ During pre-booking we don't show the actual state of the booking,
         unless the occasion was cancelled, otherwise the user might see
         accepted bookings at a point where those states are not confirmed yet.
@@ -261,19 +263,19 @@ class Booking(Base, TimestampMixin):
         return self.priority & 1 << 0 != 0
 
     @starred.expression  # type:ignore[no-redef]
-    def starred(self) -> 'ColumnElement[bool]':
-        return self.priority.op('&')(1 << 0) != 0
+    def starred(cls) -> ColumnElement[bool]:
+        return cls.priority.op('&')(1 << 0) != 0
 
     @hybrid_property  # type:ignore[no-redef]
     def nobbled(self) -> bool:
         return self.priority & 1 << 1 != 0
 
     @nobbled.expression  # type:ignore[no-redef]
-    def nobbled(self) -> 'ColumnElement[bool]':
-        return self.priority.op('&')(1 << 1) != 0
+    def nobbled(cls) -> ColumnElement[bool]:
+        return cls.priority.op('&')(1 << 1) != 0
 
     @property
-    def dates(self) -> list['OccasionDate']:
+    def dates(self) -> list[OccasionDate]:
         return self.occasion.dates
 
     @property
@@ -282,7 +284,7 @@ class Booking(Base, TimestampMixin):
 
     def overlaps(
         self,
-        other: 'Booking',
+        other: Booking,
         with_anti_affinity_check: bool = False
     ) -> bool:
         # XXX circular import

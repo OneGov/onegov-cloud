@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 import re
 
 import json
@@ -47,6 +49,7 @@ if TYPE_CHECKING:
     from onegov.form.types import FormT
     from onegov.org.models import GeneralFile  # noqa: F401
     from onegov.org.request import OrgRequest
+    from onegov.org.models import ImageSet
     from sqlalchemy import Column
     from sqlalchemy.orm import relationship
     from typing import type_check_only, Protocol
@@ -61,7 +64,6 @@ if TYPE_CHECKING:
             form_class: type[FormT],
             request: OrgRequest
         ) -> type[FormT]: ...
-
 
     _ExtendedWithPersonLinkT = TypeVar(
         '_ExtendedWithPersonLinkT',
@@ -81,7 +83,7 @@ class ContentExtension:
         content: Column[dict[str, Any]]
 
     @property
-    def content_extensions(self) -> 'Iterator[type[ContentExtension]]':
+    def content_extensions(self) -> Iterator[type[ContentExtension]]:
         """ Returns all base classes of the current class which themselves have
         ``ContentExtension`` as baseclass.
 
@@ -92,10 +94,10 @@ class ContentExtension:
 
     def with_content_extensions(
         self,
-        form_class: type['FormT'],
-        request: 'OrgRequest',
-        extensions: 'Iterable[type[SupportsExtendForm]] | None' = None
-    ) -> type['FormT']:
+        form_class: type[FormT],
+        request: OrgRequest,
+        extensions: Iterable[type[SupportsExtendForm]] | None = None
+    ) -> type[FormT]:
         """ Takes the given form and request and extends the form with
         all content extensions in the order in which they occur in the base
         class list.
@@ -113,9 +115,9 @@ class ContentExtension:
 
     def extend_form(
         self,
-        form_class: type['FormT'],
-        request: 'OrgRequest'
-    ) -> type['FormT']:
+        form_class: type[FormT],
+        request: OrgRequest
+    ) -> type[FormT]:
         """ Must be implemented by each ContentExtension. Takes the form
         class without extension and adds the required fields to it.
 
@@ -146,9 +148,9 @@ class AccessExtension(ContentExtension):
 
     def extend_form(
         self,
-        form_class: type['FormT'],
-        request: 'OrgRequest'
-    ) -> type['FormT']:
+        form_class: type[FormT],
+        request: OrgRequest
+    ) -> type[FormT]:
 
         access_choices = [
             ('public', _('Public')),
@@ -204,9 +206,9 @@ class CoordinatesExtension(ContentExtension, CoordinatesMixin):
 
     def extend_form(
         self,
-        form_class: type['FormT'],
-        request: 'OrgRequest'
-    ) -> type['FormT']:
+        form_class: type[FormT],
+        request: OrgRequest
+    ) -> type[FormT]:
         return CoordinatesFormExtension(form_class).create()
 
 
@@ -220,9 +222,9 @@ class VisibleOnHomepageExtension(ContentExtension):
 
     def extend_form(
         self,
-        form_class: type['FormT'],
-        request: 'OrgRequest'
-    ) -> type['FormT']:
+        form_class: type[FormT],
+        request: OrgRequest
+    ) -> type[FormT]:
 
         # do not show on root pages
         if self.parent_id is None:  # type:ignore[attr-defined]
@@ -237,8 +239,9 @@ class VisibleOnHomepageExtension(ContentExtension):
         return VisibleOnHomepageForm
 
 
-class ContactExtensionBase:
-    """ Common base class for extensions that add a contact field.
+class ContactExtension(ContentExtension):
+    """ Extends any class that has a content dictionary field with a simple
+    contacts field, that can optionally be inherited from another topic.
 
     """
 
@@ -246,74 +249,60 @@ class ContactExtensionBase:
 
     @contact.setter  # type:ignore[no-redef]
     def contact(self, value: str | None) -> None:
-        self.content['contact'] = value  # type:ignore[attr-defined]
+        self.content['contact'] = value
+        if self.inherit_contact:
+            # no need to update the cache
+            return
+
         # update cache
         self.__dict__['contact_html'] = to_html_ul(
-            self.contact, convert_dashes=True, with_title=True
-        ) if self.contact is not None else None
+            value, convert_dashes=True, with_title=True
+        ) if value is not None else None
+
+    inherit_contact: dict_property[bool] = content_property(default=False)
+
+    @inherit_contact.setter  # type:ignore[no-redef]
+    def inherit_contact(self, value: bool) -> None:
+        self.content['inherit_contact'] = value
+
+        # clear cache (don't update eagerly since it involves a query)
+        if 'contact_html' in self.__dict__:
+            del self.__dict__['contact_html']
+
+    contact_inherited_from: dict_property[int | None] = content_property()
+
+    @contact_inherited_from.setter  # type:ignore[no-redef]
+    def contact_inherited_from(self, value: int | None) -> None:
+        self.content['contact_inherited_from'] = value
+        if not self.inherit_contact:
+            # no need to clear the cache
+            return
+
+        # clear cache (don't update eagerly since it involves a query)
+        if 'contact_html' in self.__dict__:
+            del self.__dict__['contact_html']
 
     @cached_property
     def contact_html(self) -> Markup | None:
-        if self.contact is None:
-            return None
-        return to_html_ul(self.contact, convert_dashes=True, with_title=True)
-
-    def get_contact_html(self, request: 'OrgRequest') -> Markup | None:
-        return self.contact_html
-
-    def extend_form(
-        self,
-        form_class: type['FormT'],
-        request: 'OrgRequest'
-    ) -> type['FormT']:
-
-        class ContactPageForm(form_class):  # type:ignore
-            contact = TextAreaField(
-                label=_('Address'),
-                fieldset=_('Contact'),
-                render_kw={'rows': 5},
-                description=_("- '-' will be converted to a bulleted list\n"
-                              "- Urls will be transformed into links\n"
-                              "- Emails and phone numbers as well")
-            )
-
-        return ContactPageForm
-
-
-class ContactExtension(ContactExtensionBase, ContentExtension):
-    """ Extends any class that has a content dictionary field with a simple
-    contacts field.
-
-    """
-
-
-class InheritableContactExtension(ContactExtensionBase, ContentExtension):
-    """ Extends any class that has a content dictionary field with a simple
-    contacts field, that can optionally be inherited from another topic.
-
-    """
-
-    inherit_contact: dict_property[bool] = content_property(default=False)
-    contact_inherited_from: dict_property[int | None] = content_property()
-
-    # TODO: If we end up calling this more than once per request
-    #       we may want to cache this
-    def get_contact_html(self, request: 'OrgRequest') -> Markup | None:
         if self.inherit_contact:
             if self.contact_inherited_from is None:
                 return None
 
-            pages = PageCollection(request.session)
+            pages = PageCollection(object_session(self))
             page = pages.by_id(self.contact_inherited_from)
-            return getattr(page, 'contact_html', None)
+            contact = getattr(page, 'contact', None)
+        else:
+            contact = self.contact
 
-        return self.contact_html
+        if contact is None:
+            return None
+        return to_html_ul(contact, convert_dashes=True, with_title=True)
 
     def extend_form(
         self,
-        form_class: type['FormT'],
-        request: 'OrgRequest'
-    ) -> type['FormT']:
+        form_class: type[FormT],
+        request: OrgRequest
+    ) -> type[FormT]:
 
         query = PageCollection(request.session).query()
         query = query.filter(Page.type == 'topic')
@@ -323,16 +312,32 @@ class InheritableContactExtension(ContactExtensionBase, ContentExtension):
             query = query.filter(Page.id != self.id)
         query = query.order_by(Page.title)
 
-        class InheritableContactPageForm(form_class):  # type:ignore
+        # Ancestor pages should appear first in the list
+        pinned = {
+            page.id: page.title
+            for page in self.ancestors
+            if page.content.get('contact')
+        } if isinstance(self, Page) else {}
 
+        choices: list[_Choice] = [
+            (page_id, title)
+            for page_id, title in query.with_entities(Page.id, Page.title)
+            if page_id not in pinned
+        ]
+
+        if pinned:
+            choices.insert(0, (-1, '-'*32, {'disabled': 'disabled'}))
+            for choice in reversed(pinned.items()):
+                choices.insert(0, choice)
+
+        class ContactPageForm(form_class):  # type:ignore
             contact = TextAreaField(
                 label=_('Address'),
                 fieldset=_('Contact'),
                 render_kw={'rows': 5},
                 description=_("- '-' will be converted to a bulleted list\n"
                               "- Urls will be transformed into links\n"
-                              "- Emails and phone numbers as well"),
-                depends_on=('inherit_contact', '!y')
+                              "- Emails and phone numbers as well")
             )
 
             inherit_contact = BooleanField(
@@ -345,12 +350,12 @@ class InheritableContactExtension(ContactExtensionBase, ContentExtension):
                 label=_('Topic to inherit from'),
                 fieldset=_('Contact'),
                 coerce=int,
-                choices=query.with_entities(Page.id, Page.title).all(),
+                choices=choices,
                 depends_on=('inherit_contact', 'y'),
                 validators=[InputRequired()]
             )
 
-        return InheritableContactPageForm
+        return ContactPageForm
 
 
 class ContactHiddenOnPageExtension(ContentExtension):
@@ -363,9 +368,9 @@ class ContactHiddenOnPageExtension(ContentExtension):
 
     def extend_form(
         self,
-        form_class: type['FormT'],
-        request: 'OrgRequest'
-    ) -> type['FormT']:
+        form_class: type[FormT],
+        request: OrgRequest
+    ) -> type[FormT]:
 
         class ContactHiddenOnPageForm(form_class):  # type:ignore
             hide_contact = BooleanField(
@@ -387,9 +392,9 @@ class PeopleShownOnMainPageExtension(ContentExtension):
 
     def extend_form(
         self,
-        form_class: type['FormT'],
-        request: 'OrgRequest'
-    ) -> type['FormT']:
+        form_class: type[FormT],
+        request: OrgRequest
+    ) -> type[FormT]:
 
         class PeopleShownOnMainPageForm(form_class):  # type:ignore
             show_people_on_main_page = BooleanField(
@@ -411,9 +416,9 @@ class NewsletterExtension(ContentExtension):
 
     def extend_form(
         self,
-        form_class: type['FormT'],
-        request: 'OrgRequest'
-    ) -> type['FormT']:
+        form_class: type[FormT],
+        request: OrgRequest
+    ) -> type[FormT]:
 
         class NewsletterSettingsForm(form_class):  # type:ignore
             text_in_newsletter = BooleanField(
@@ -441,7 +446,7 @@ class PersonLinkExtension(ContentExtension):
     western_name_order: dict_property[bool] = content_property(default=False)
 
     @property
-    def people(self) -> list['PersonWithFunction'] | None:
+    def people(self) -> list[PersonWithFunction] | None:
         """ Returns the people linked to this content or None.
 
         The context specific function is temporarily stored on the
@@ -475,7 +480,7 @@ class PersonLinkExtension(ContentExtension):
 
         return result
 
-    def get_selectable_people(self, request: 'OrgRequest') -> list[Person]:
+    def get_selectable_people(self, request: OrgRequest) -> list[Person]:
         """ Returns a list of people which may be linked. """
 
         query = PersonCollection(request.session).query()
@@ -510,7 +515,7 @@ class PersonLinkExtension(ContentExtension):
         assert subject != target
         assert self.content.get('people')
 
-        def new_order() -> 'Iterator[tuple[str, tuple[str, bool]]]':
+        def new_order() -> Iterator[tuple[str, tuple[str, bool]]]:
             subject_function, show_subject_function = (
                 self.get_person_function_by_id(subject))
 
@@ -530,20 +535,19 @@ class PersonLinkExtension(ContentExtension):
         self.content['people'] = list(new_order())
 
     def extend_form(
-        self: '_ExtendedWithPersonLinkT',
-        form_class: type['FormT'],
-        request: 'OrgRequest'
-    ) -> type['FormT']:
+        self: _ExtendedWithPersonLinkT,
+        form_class: type[FormT],
+        request: OrgRequest
+    ) -> type[FormT]:
 
         selectable_people = self.get_selectable_people(request)
         if not selectable_people:
             # no need to extend the form
             return form_class
 
-
         selected = dict((self.content or {}).get('people', []))
 
-        def choice(person: Person) -> '_Choice':
+        def choice(person: Person) -> _Choice:
             if self.western_name_order:
                 name = f'{person.first_name} {person.last_name}'
             else:
@@ -574,12 +578,12 @@ class PersonLinkExtension(ContentExtension):
                     'data-placeholder': request.translate(
                         _('Select additional person')
                     ),
-                    'data-no_results_text':request.translate(
+                    'data-no_results_text': request.translate(
                         _('No results match')
                     ),
                 }
             )
-            context_specific_function = StringField(
+            context_specific_function = TextAreaField(
                 label=_('Function'),
                 depends_on=('person', '!'),
                 render_kw={'class_': 'indent-context-specific-function'},
@@ -601,9 +605,9 @@ class PersonLinkExtension(ContentExtension):
         PersonForm.Meta = meta
 
         if TYPE_CHECKING:
-            FieldBase = FieldList[FormField[PersonForm]]
+            FieldBase = FieldList[FormField[PersonForm]]  # noqa: N806
         else:
-            FieldBase = FieldList
+            FieldBase = FieldList  # noqa: N806
 
         class PeopleField(FieldBase):
             def is_ordered_people(self, people: list[tuple[str, Any]]) -> bool:
@@ -616,9 +620,9 @@ class PersonLinkExtension(ContentExtension):
 
             def process(
                 self,
-                formdata: '_MultiDictLikeWithGetlist | None',
+                formdata: _MultiDictLikeWithGetlist | None,
                 data: Any = unset_value,
-                extra_filters: 'Sequence[_Filter] | None' = None
+                extra_filters: Sequence[_Filter] | None = None
             ) -> None:
 
                 # FIXME: I'm not quite sure why we need to do this
@@ -656,17 +660,8 @@ class PersonLinkExtension(ContentExtension):
                         if (v := people_values.get(person.id.hex)) is not None
                     ]
                 else:
-                    # if the people are not ordered we keep the order of the
-                    # existing list and add the new people at the end
-                    existing = dict(previous_people)
-                    new_people = previous_people.copy()
-
-                    for person_id, values in people_values.items():
-                        if person_id not in existing:
-                            new_people.append((person_id, values))
-
-                    obj.content['people'] = new_people
-
+                    # otherwise we just use the given order
+                    obj.content['people'] = list(people_values.items())
 
         field_macro = request.template_loader.macros['field']
         # FIXME: It is not ideal that we have to pass a dummy form along to
@@ -727,13 +722,13 @@ class ResourceValidationExtension(ContentExtension):
 
     def extend_form(
         self,
-        form_class: type['FormT'],
-        request: 'OrgRequest'
-    ) -> type['FormT']:
+        form_class: type[FormT],
+        request: OrgRequest
+    ) -> type[FormT]:
 
         class WithResourceValidation(form_class):  # type:ignore
 
-            def validate_title(self, field: 'Field') -> None:
+            def validate_title(self, field: Field) -> None:
                 existing = (
                     self.request.session.query(Resource).
                     filter_by(name=normalize_for_url(field.data)).first()
@@ -750,9 +745,9 @@ class PublicationExtension(ContentExtension):
 
     def extend_form(
         self,
-        form_class: type['FormT'],
-        request: 'OrgRequest'
-    ) -> type['FormT']:
+        form_class: type[FormT],
+        request: OrgRequest
+    ) -> type[FormT]:
         return PublicationFormExtension(form_class).create()
 
 
@@ -762,9 +757,9 @@ class HoneyPotExtension(ContentExtension):
 
     def extend_form(
         self,
-        form_class: type['FormT'],
-        request: 'OrgRequest'
-    ) -> type['FormT']:
+        form_class: type[FormT],
+        request: OrgRequest
+    ) -> type[FormT]:
 
         class HoneyPotForm(form_class):  # type:ignore
 
@@ -785,9 +780,9 @@ class ImageExtension(ContentExtension):
 
     def extend_form(
         self,
-        form_class: type['FormT'],
-        request: 'OrgRequest'
-    ) -> type['FormT']:
+        form_class: type[FormT],
+        request: OrgRequest
+    ) -> type[FormT]:
 
         class PageImageForm(form_class):  # type:ignore
             # pass label by keyword to give the News model access
@@ -821,11 +816,11 @@ FILE_URL_RE = re.compile(r'/storage/([0-9a-f]{64})$')
 
 
 def _files_observer(
-    self: 'GeneralFileLinkExtension',
+    self: GeneralFileLinkExtension,
     files: list[File],
     meta: set[str],
-    publication_start: 'datetime | None' = None,
-    publication_end: 'datetime | None' = None
+    publication_start: datetime | None = None,
+    publication_end: datetime | None = None
 ) -> None:
     # mainly we want to observe changes to the linked files
     # but when the publication or access changes we may need
@@ -852,7 +847,7 @@ def _files_observer(
 
 
 def _content_file_link_observer(
-    self: 'GeneralFileLinkExtension',
+    self: GeneralFileLinkExtension,
     content: set[str]
 ) -> None:
     # we don't automatically unlink files removed from the text to keep
@@ -953,9 +948,9 @@ class GeneralFileLinkExtension(ContentExtension):
 
     def extend_form(
         self,
-        form_class: type['FormT'],
-        request: 'OrgRequest'
-    ) -> type['FormT']:
+        form_class: type[FormT],
+        request: OrgRequest
+    ) -> type[FormT]:
 
         class GeneralFileForm(form_class):  # type:ignore
             files = UploadOrSelectExistingMultipleFilesField(
@@ -963,7 +958,7 @@ class GeneralFileLinkExtension(ContentExtension):
                 fieldset=_('Documents')
             )
 
-            def populate_obj(self, obj: 'GeneralFileLinkExtension',
+            def populate_obj(self, obj: GeneralFileLinkExtension,
                              *args: Any, **kwargs: Any) -> None:
                 super().populate_obj(obj, *args, **kwargs)
 
@@ -1000,9 +995,9 @@ class SidebarLinksExtension(ContentExtension):
 
     def extend_form(
         self,
-        form_class: type['FormT'],
-        request: 'OrgRequest'
-    ) -> type['FormT']:
+        form_class: type[FormT],
+        request: OrgRequest
+    ) -> type[FormT]:
 
         class SidebarLinksForm(form_class):  # type:ignore
 
@@ -1023,7 +1018,7 @@ class SidebarLinksExtension(ContentExtension):
                 if not self.sidepanel_links.data:
                     self.sidepanel_links.data = self.links_to_json(None)
 
-            def process_obj(self, obj: 'SidebarLinksExtension') -> None:
+            def process_obj(self, obj: SidebarLinksExtension) -> None:
                 super().process_obj(obj)
                 if not obj.sidepanel_links:
                     self.sidepanel_links.data = self.links_to_json(None)
@@ -1034,7 +1029,7 @@ class SidebarLinksExtension(ContentExtension):
 
             def populate_obj(
                 self,
-                obj: 'SidebarLinksExtension',
+                obj: SidebarLinksExtension,
                 *args: Any, **kwargs: Any
             ) -> None:
                 super().populate_obj(obj, *args, **kwargs)
@@ -1057,17 +1052,19 @@ class SidebarLinksExtension(ContentExtension):
                 self,
                 text: str | None = None
             ) -> list[tuple[str | None, str | None]]:
-                result = []
 
-                for value in json.loads(text or '{}').get('values', []):
-                    if value['link'] or value['text']:
-                        result.append((value['text'], value['link']))
+                if not text:
+                    return []
 
-                return result
+                return [
+                    (value['text'], link)
+                    for value in json.loads(text).get('values', [])
+                    if (link := value['link']) or value['text']
+                ]
 
             def links_to_json(
                 self,
-                links: 'Sequence[tuple[str | None, str | None]] | None'
+                links: Sequence[tuple[str | None, str | None]] | None
             ) -> str:
                 sidepanel_links = links or []
 
@@ -1090,6 +1087,115 @@ class SidebarLinksExtension(ContentExtension):
         return SidebarLinksForm
 
 
+class SidebarContactLinkExtension(ContentExtension):
+    """ Like SidebarLinkExtension but the links are shown below the contact
+    field. We knowingly duplicate some code here .
+    """
+
+    sidepanel_contact = content_property()
+
+    def extend_form(
+        self,
+        form_class: type[FormT],
+        request: OrgRequest
+    ) -> type[FormT]:
+
+        class SidebarContactLinkForm(form_class):  # type:ignore
+
+            sidepanel_contact = StringField(
+                label=_('Contact link'),
+                fieldset=_('Sidebar contact'),
+                render_kw={'class_': 'many many-links'}
+            )
+
+            if TYPE_CHECKING:
+                contact_errors: dict[int, str]
+            else:
+                def __init__(self, *args, **kwargs) -> None:
+                    super().__init__(*args, **kwargs)
+                    self.contact_errors = {}
+
+            def on_request(self) -> None:
+                if not self.sidepanel_contact.data:
+                    self.sidepanel_contact.data = self.links_to_json(None)
+
+            def process_obj(self, obj: SidebarContactLinkExtension) -> None:
+                super().process_obj(obj)
+                if not obj.sidepanel_contact:
+                    self.sidepanel_contact.data = self.links_to_json(None)
+                else:
+                    self.sidepanel_contact.data = self.links_to_json(
+                        obj.sidepanel_contact
+                    )
+
+            def populate_obj(
+                self,
+                obj: SidebarContactLinkExtension,
+                *args: Any, **kwargs: Any
+            ) -> None:
+                super().populate_obj(obj, *args, **kwargs)
+                obj.sidepanel_contact = self.json_to_links(
+                    self.sidepanel_contact.data) or None
+
+            def validate_sidepanel_contact(self, field: StringField) -> None:
+                for text, link in self.json_to_links(
+                        self.sidepanel_contact.data
+                ):
+                    if text and not link:
+                        raise ValidationError(
+                            _('Please provide a URL if contact link text is '
+                              'set'))
+                    if link and not text:
+                        raise ValidationError(
+                            _('Please provide link text if contact URL is '
+                              'set'))
+                    if link and not re.match(r'^(http://|https://|/)',
+                                             link):
+                        raise ValidationError(
+                            _('Your URLs must start with http://,'
+                              ' https:// or /'
+                              ' (for internal links)')
+                        )
+
+            def json_to_links(
+                self,
+                text: str | None = None
+            ) -> list[tuple[str | None, str | None]]:
+
+                if not text:
+                    return []
+
+                return [
+                    (value['text'], link)
+                    for value in json.loads(text).get('values', [])
+                    if (link := value['link']) or value['text']
+                ]
+
+            def links_to_json(
+                self,
+                links: Sequence[tuple[str | None, str | None]] | None
+            ) -> str:
+                contact_links = links or []
+
+                return json.dumps({
+                    'labels': {
+                        'text': self.request.translate(_('Contact Text')),
+                        'link': self.request.translate(_('Contact URL')),
+                        'add': self.request.translate(_('Add')),
+                        'remove': self.request.translate(_('Remove')),
+                    },
+                    'values': [
+                        {
+                            'text': l[0],
+                            'link': l[1],
+                            'error': self.contact_errors.get(ix, '')
+                        } for ix, l in enumerate(contact_links)
+                    ]
+                })
+
+        return SidebarContactLinkForm
+
+
 class DeletableContentExtension(ContentExtension):
     """ Extends any class that has a meta dictionary field with the ability to
     mark the content as deletable after reaching the end date. A cronjob will
@@ -1102,9 +1208,9 @@ class DeletableContentExtension(ContentExtension):
 
     def extend_form(
         self,
-        form_class: type['FormT'],
-        request: 'OrgRequest'
-    ) -> type['FormT']:
+        form_class: type[FormT],
+        request: OrgRequest
+    ) -> type[FormT]:
 
         class DeletableContentForm(form_class):  # type:ignore
             delete_when_expired = BooleanField(
@@ -1115,3 +1221,62 @@ class DeletableContentExtension(ContentExtension):
             )
 
         return DeletableContentForm
+
+
+class InlinePhotoAlbumExtension(ContentExtension):
+    """ Adds ability to reference photo albums (ImageSets) and show them
+    inline at the end of the content of the page.
+
+    """
+
+    photo_album_id: dict_property[str | None] = content_property(default=None)
+
+    @property
+    def photo_album(self) -> ImageSet | None:
+        from onegov.org.models import ImageSetCollection
+        if not self.photo_album_id:
+            return None
+        return ImageSetCollection(object_session(self)).by_id(
+            self.photo_album_id
+        )
+
+    def extend_form(
+        self,
+        form_class: type[FormT],
+        request: OrgRequest
+    ) -> type[FormT]:
+
+        from onegov.org.models import ImageSetCollection
+        albums: list[ImageSet] = (  # noqa: TC201
+            ImageSetCollection(request.session).query().all()
+        )
+        if not albums:
+            return form_class
+
+        class PhotoAlbumForm(form_class):  # type:ignore
+
+            choices = [('', '')] + [
+                (album.id, album.title) for album in albums
+            ]
+            photo_album_id = SelectField(
+                label=_('Photo album'),
+                fieldset=_('Photo album'),
+                choices=choices,
+                name='photo_album_id',
+            )
+
+            def process_obj(self, obj: InlinePhotoAlbumExtension) -> None:
+                super().process_obj(obj)
+                if obj.photo_album_id:
+                    self.photo_album_id.data = obj.photo_album_id
+
+            def populate_obj(
+                self,
+                obj: InlinePhotoAlbumExtension,
+                *args: Any,
+                **kwargs: Any
+            ) -> None:
+                super().populate_obj(obj, *args, **kwargs)
+                obj.photo_album_id = self.photo_album_id.data or None
+
+        return PhotoAlbumForm

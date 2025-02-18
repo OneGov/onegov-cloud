@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 import os
 import sys
 import weakref
@@ -60,15 +62,17 @@ class OneGovCloudIntegration(Integration):
         @Framework.tween_factory(over=excview_tween_factory)
         def sentry_tween_factory(
             app: Framework,
-            handler: 'Callable[[CoreRequest], Response]'
-        ) -> 'Callable[[CoreRequest], Response]':
+            handler: Callable[[CoreRequest], Response]
+        ) -> Callable[[CoreRequest], Response]:
 
-            def sentry_tween(request: 'CoreRequest') -> 'Response':
+            def sentry_tween(request: CoreRequest) -> Response:
                 """ Configures scope and starts transaction """
 
                 integration = get_client().get_integration(
                     OneGovCloudIntegration
                 )
+                if integration is None:
+                    return handler(request)
 
                 Scope.get_current_scope().set_transaction_name(
                     request.path,
@@ -108,12 +112,12 @@ class OneGovCloudIntegration(Integration):
 
 
 class CoreRequestExtractor(RequestExtractor):
-    request: 'CoreRequest'
+    request: CoreRequest
 
-    def env(self) -> 'WSGIEnvironment':
+    def env(self) -> WSGIEnvironment:
         return self.request.environ
 
-    def cookies(self) -> 'RequestCookies':
+    def cookies(self) -> RequestCookies:
         return self.request.cookies
 
     def raw_data(self) -> str:
@@ -126,14 +130,14 @@ class CoreRequestExtractor(RequestExtractor):
             if isinstance(value, str)
         }
 
-    def files(self) -> dict[str, '_FieldStorageWithFile']:
+    def files(self) -> dict[str, _FieldStorageWithFile]:
         return {
             key: value
             for key, value in self.request.POST.items()
             if not isinstance(value, str)
         }
 
-    def size_of_file(self, postdata: '_FieldStorageWithFile') -> int:
+    def size_of_file(self, postdata: _FieldStorageWithFile) -> int:
         file = postdata.file
         try:
             return os.fstat(file.fileno()).st_size
@@ -141,7 +145,7 @@ class CoreRequestExtractor(RequestExtractor):
             return 0
 
 
-def _capture_exception(exc_info: 'ExcInfo') -> None:
+def _capture_exception(exc_info: ExcInfo) -> None:
     if exc_info[0] is None or issubclass(exc_info[0], HTTPException):
         return
 
@@ -155,10 +159,10 @@ def _capture_exception(exc_info: 'ExcInfo') -> None:
 
 
 def _make_event_processor(
-    weak_request: 'Callable[[], CoreRequest | None]',
+    weak_request: Callable[[], CoreRequest | None],
     integration: OneGovCloudIntegration,
-) -> 'EventProcessor':
-    def event_processor(event: 'Event', hint: 'Hint') -> 'Event':
+) -> EventProcessor:
+    def event_processor(event: Event, hint: Hint) -> Event:
         request = weak_request()
         if request is None:
             return event

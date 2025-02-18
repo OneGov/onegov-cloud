@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 import hashlib
 
 from decimal import Decimal
@@ -21,11 +23,11 @@ class Scoring:
 
     """
 
-    criteria: list['Callable[[Booking], float]']
+    criteria: list[Callable[[Booking], float]]
 
     def __init__(
         self,
-        criteria: list['Callable[[Booking], float]'] | None = None
+        criteria: list[Callable[[Booking], float]] | None = None
     ) -> None:
         self.criteria = criteria or [PreferMotivated()]
 
@@ -36,8 +38,8 @@ class Scoring:
     def from_settings(
         cls,
         settings: dict[str, Any],
-        session: 'Session'
-    ) -> 'Self':
+        session: Session
+    ) -> Self:
 
         scoring = cls()
 
@@ -83,7 +85,7 @@ class PreferMotivated:
     """
 
     @classmethod
-    def from_session(cls, session: 'Session') -> 'Self':
+    def from_session(cls, session: Session) -> Self:
         return cls()
 
     def __call__(self, booking: Booking) -> int:
@@ -101,14 +103,14 @@ class PreferInAgeBracket:
 
     def __init__(
         self,
-        get_age_range: 'Callable[[Booking], tuple[int, int]]',
-        get_attendee_age: 'Callable[[Booking], int]'
+        get_age_range: Callable[[Booking], tuple[int, int]],
+        get_attendee_age: Callable[[Booking], int]
     ):
         self.get_age_range = get_age_range
         self.get_attendee_age = get_attendee_age
 
     @classmethod
-    def from_session(cls, session: 'Session') -> 'Self':
+    def from_session(cls, session: Session) -> Self:
         attendees = None
         occasions = None
 
@@ -160,11 +162,11 @@ class PreferOrganiserChildren:
 
     """
 
-    def __init__(self, get_is_organiser_child: 'Callable[[Booking], bool]'):
+    def __init__(self, get_is_organiser_child: Callable[[Booking], bool]):
         self.get_is_organiser_child = get_is_organiser_child
 
     @classmethod
-    def from_session(cls, session: 'Session') -> 'Self':
+    def from_session(cls, session: Session) -> Self:
         organisers = None
 
         def get_is_organiser_child(booking: Booking) -> bool:
@@ -186,17 +188,17 @@ class PreferOrganiserChildren:
         return cls(get_is_organiser_child)
 
     def __call__(self, booking: Booking) -> float:
-        return 1.0 if self.get_is_organiser_child(booking) else 0.0
+        return 1.5 if self.get_is_organiser_child(booking) else 0.0
 
 
 class PreferAdminChildren:
     """ Scores bookings of children higher if their parents are admins. """
 
-    def __init__(self, get_is_association_child: 'Callable[[Booking], bool]'):
+    def __init__(self, get_is_association_child: Callable[[Booking], bool]):
         self.get_is_association_child = get_is_association_child
 
     @classmethod
-    def from_session(cls, session: 'Session') -> 'Self':
+    def from_session(cls, session: Session) -> Self:
         members = None
 
         def get_is_association_child(booking: Booking) -> bool:
@@ -214,16 +216,15 @@ class PreferAdminChildren:
         return cls(get_is_association_child)
 
     def __call__(self, booking: Booking) -> float:
-        return self.get_is_association_child(booking) and 1.0 or 0.0
+        return self.get_is_association_child(booking) and 1.5 or 0.0
 
 
 class PreferGroups:
     """ Scores group bookings higher than other bookings. Groups get a boost
     by size:
 
-    - 2 people: 1.0
-    - 3 people: 0.8
-    - 4 people: 0.6
+    - 2 people: 0.7
+    - 3 people: 0.6
     - more people: 0.5
 
     This preference gives an extra boost to unprioritised bookings, to somewhat
@@ -237,11 +238,11 @@ class PreferGroups:
 
     """
 
-    def __init__(self, get_group_score: 'Callable[[Booking], float]'):
+    def __init__(self, get_group_score: Callable[[Booking], float]):
         self.get_group_score = get_group_score
 
     @classmethod
-    def from_session(cls, session: 'Session') -> 'Self':
+    def from_session(cls, session: Session) -> Self:
         group_scores = None
 
         def unique_score_modifier(group_code: str) -> float:
@@ -272,7 +273,7 @@ class PreferGroups:
 
                 group_scores = {
                     r.group_code:
-                    max(.5, 1.0 - 0.2 * (r.count - 2))
+                    max(.5, .7 - 0.1 * (r.count - 2))
                     + unique_score_modifier(r.group_code)
 
                     for r in query

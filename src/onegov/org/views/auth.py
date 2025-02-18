@@ -1,4 +1,5 @@
 """ The authentication views. """
+from __future__ import annotations
 
 import morepath
 
@@ -43,7 +44,7 @@ if TYPE_CHECKING:
 def redirect_to_userprofile(
     self: Auth,
     username: str | None,
-    request: 'OrgRequest'
+    request: OrgRequest
 ) -> bool:
 
     redirected_to_userprofile = False
@@ -71,10 +72,10 @@ def redirect_to_userprofile(
 )
 def handle_login(
     self: Auth,
-    request: 'OrgRequest',
+    request: OrgRequest,
     form: LoginForm,
     layout: DefaultLayout | None = None
-) -> 'RenderData | Response':
+) -> RenderData | Response:
     """ Handles the login requests. """
 
     if not request.app.enable_yubikey:
@@ -116,7 +117,7 @@ def handle_login(
         Link(_('Login'), request.link(self, name='login'))
     ]
 
-    def provider_login(provider: 'AuthenticationProvider') -> str:
+    def provider_login(provider: AuthenticationProvider) -> str:
         provider.to = self.to
         return request.link(provider)
 
@@ -126,7 +127,7 @@ def handle_login(
         'register_link': request.link(self, name='register'),
         'may_register': request.app.enable_user_registration,
         'button_text': _('Login'),
-        'providers': request.app.providers,
+        'providers': request.app.providers.values(),
         'provider_login': provider_login,
         'render_untrusted_markdown': render_untrusted_markdown,
         'title': _('Login to ${org}', mapping={
@@ -145,10 +146,10 @@ def handle_login(
 )
 def handle_registration(
     self: Auth,
-    request: 'OrgRequest',
+    request: OrgRequest,
     form: RegistrationForm,
     layout: DefaultLayout | None = None
-) -> 'RenderData | Response':
+) -> RenderData | Response:
     """ Handles the user registration. """
 
     if not request.app.enable_user_registration:
@@ -207,7 +208,7 @@ def handle_registration(
 
 
 @OrgApp.view(model=Auth, name='activate', permission=Public)
-def handle_activation(self: Auth, request: 'OrgRequest') -> 'Response':
+def handle_activation(self: Auth, request: OrgRequest) -> Response:
 
     if not request.app.enable_user_registration:
         raise exc.HTTPNotFound()
@@ -238,13 +239,13 @@ def handle_activation(self: Auth, request: 'OrgRequest') -> 'Response':
 
 def do_logout(
     self: Auth,
-    request: 'OrgRequest',
+    request: OrgRequest,
     to: str | None = None
-) -> 'Response':
+) -> Response:
     # the message has to be set after the log out code has run, since that
     # clears all existing messages from the session
     @request.after
-    def show_hint(response: 'Response') -> None:
+    def show_hint(response: Response) -> None:
         request.success(_('You have been logged out.'))
 
     return self.logout_to(request, to)
@@ -252,8 +253,8 @@ def do_logout(
 
 def do_logout_with_external_provider(
     self: Auth,
-    request: 'OrgRequest'
-) -> 'Response':
+    request: OrgRequest
+) -> Response:
     """ Use this function if you want to go the way to the external auth
     provider first and then logout on redirect. """
     from onegov.user.integration import UserApp  # circular import
@@ -263,7 +264,7 @@ def do_logout_with_external_provider(
         return do_logout(self, request)
 
     if isinstance(self.app, UserApp) and user.source:
-        for provider in self.app.providers:
+        for provider in self.app.providers.values():
             if isinstance(provider, OauthProvider):
                 response = provider.do_logout(request, user, self.to)
                 # some providers may not need to redirect, in which
@@ -276,7 +277,7 @@ def do_logout_with_external_provider(
 
 
 @OrgApp.html(model=Auth, name='logout', permission=Personal)
-def view_logout(self: Auth, request: 'OrgRequest') -> 'Response':
+def view_logout(self: Auth, request: OrgRequest) -> Response:
     """ Handles the logout requests """
     return do_logout_with_external_provider(self, request)
 
@@ -290,10 +291,10 @@ def view_logout(self: Auth, request: 'OrgRequest') -> 'Response':
 )
 def handle_password_reset_request(
     self: Auth,
-    request: 'OrgRequest',
+    request: OrgRequest,
     form: RequestPasswordResetForm,
     layout: DefaultLayout | None = None
-) -> 'RenderData | Response':
+) -> RenderData | Response:
     """ Handles the GET and POST password reset requests. """
 
     if request.app.disable_password_reset:
@@ -350,10 +351,10 @@ def handle_password_reset_request(
 )
 def handle_password_reset(
     self: Auth,
-    request: 'OrgRequest',
+    request: OrgRequest,
     form: PasswordResetForm,
     layout: DefaultLayout | None = None
-) -> 'RenderData | Response':
+) -> RenderData | Response:
 
     if request.app.disable_password_reset:
         raise exc.HTTPNotFound()
@@ -402,16 +403,16 @@ def handle_password_reset(
 )
 def handle_mtan_second_factor(
     self: Auth,
-    request: 'OrgRequest',
+    request: OrgRequest,
     form: MTANForm,
     layout: DefaultLayout | None = None
-) -> 'RenderData | Response':
+) -> RenderData | Response:
 
     if not request.app.mtan_second_factor_enabled:
         raise exc.HTTPNotFound()
 
     @request.after
-    def respond_with_no_index(response: 'Response') -> None:
+    def respond_with_no_index(response: Response) -> None:
         response.headers['X-Robots-Tag'] = 'noindex'
 
     users = UserCollection(request.session)
@@ -497,10 +498,10 @@ def handle_mtan_second_factor(
 )
 def handle_mtan_second_factor_setup(
     self: Auth,
-    request: 'OrgRequest',
+    request: OrgRequest,
     form: RequestMTANForm,
     layout: DefaultLayout | None = None
-) -> 'RenderData | Response':
+) -> RenderData | Response:
 
     if not request.app.mtan_second_factor_enabled:
         raise exc.HTTPNotFound()
@@ -509,7 +510,7 @@ def handle_mtan_second_factor_setup(
         raise exc.HTTPNotFound()
 
     @request.after
-    def respond_with_no_index(response: 'Response') -> None:
+    def respond_with_no_index(response: Response) -> None:
         response.headers['X-Robots-Tag'] = 'noindex'
 
     users = UserCollection(request.session)
@@ -559,16 +560,16 @@ def handle_mtan_second_factor_setup(
 )
 def handle_totp_second_factor(
     self: Auth,
-    request: 'OrgRequest',
+    request: OrgRequest,
     form: TOTPForm,
     layout: DefaultLayout | None = None
-) -> 'RenderData | Response':
+) -> RenderData | Response:
 
     if not request.app.totp_enabled:
         raise exc.HTTPNotFound()
 
     @request.after
-    def respond_with_no_index(response: 'Response') -> None:
+    def respond_with_no_index(response: Response) -> None:
         response.headers['X-Robots-Tag'] = 'noindex'
 
     users = UserCollection(request.session)
@@ -638,16 +639,16 @@ def handle_totp_second_factor(
 )
 def handle_request_mtan(
     self: MTANAuth,
-    request: 'OrgRequest',
+    request: OrgRequest,
     form: RequestMTANForm,
-    layout: 'Layout | None' = None
-) -> 'RenderData | Response':
+    layout: Layout | None = None
+) -> RenderData | Response:
 
     if not request.app.can_deliver_sms:
         raise exc.HTTPNotFound()
 
     @request.after
-    def respond_with_no_index(response: 'Response') -> None:
+    def respond_with_no_index(response: Response) -> None:
         response.headers['X-Robots-Tag'] = 'noindex'
 
     if form.submitted(request):
@@ -685,16 +686,16 @@ def handle_request_mtan(
 )
 def handle_authenticate_mtan(
     self: MTANAuth,
-    request: 'OrgRequest',
+    request: OrgRequest,
     form: MTANForm,
-    layout: 'Layout | None' = None
-) -> 'RenderData | Response':
+    layout: Layout | None = None
+) -> RenderData | Response:
 
     if not request.app.can_deliver_sms:
         raise exc.HTTPNotFound()
 
     @request.after
-    def respond_with_no_index(response: 'Response') -> None:
+    def respond_with_no_index(response: Response) -> None:
         response.headers['X-Robots-Tag'] = 'noindex'
 
     if form.submitted(request):

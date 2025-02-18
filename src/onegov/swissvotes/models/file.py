@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 from onegov.file import File
 from operator import attrgetter
 
@@ -58,16 +60,16 @@ class TranslatablePageFile(File):
 
 
 class FileSubCollection:
-    """ """
+    """ A subset of files prefixed by the descriptor's name. """
 
-    def __set_name__(self, owner: type['HasFiles[FileT]'], name: str) -> None:
+    def __set_name__(self, owner: type[HasFiles[FileT]], name: str) -> None:
         self.name = name
 
     def __get__(
         self,
-        instance: 'HasFiles[FileT] | None',
-        owner: type['HasFiles[FileT]']
-    ) -> list['FileT']:
+        instance: HasFiles[FileT] | None,
+        owner: type[HasFiles[FileT]]
+    ) -> list[FileT]:
 
         if instance:
             return sorted((
@@ -102,12 +104,12 @@ class LocalizedFile:
         self.label = label
         self.static_views = static_views or {}
 
-    def __set_name__(self, owner: type['HasFiles[FileT]'], name: str) -> None:
+    def __set_name__(self, owner: type[HasFiles[FileT]], name: str) -> None:
         self.name = name
 
     def __get_localized_name__(
         self,
-        instance: 'HasFilesAndSessionManager[FileT]',
+        instance: HasFilesAndSessionManager[FileT],
         locale: str | None = None
     ) -> str:
 
@@ -118,9 +120,9 @@ class LocalizedFile:
 
     def __get_by_locale__(
         self,
-        instance: 'HasFilesAndSessionManager[FileT] | None',
+        instance: HasFilesAndSessionManager[FileT] | None,
         locale: str | None = None
-    ) -> 'FileT | None':
+    ) -> FileT | None:
 
         if instance:
             name = self.__get_localized_name__(instance, locale)
@@ -131,15 +133,15 @@ class LocalizedFile:
 
     def __get__(
         self,
-        instance: 'HasFilesAndSessionManager[FileT] | None',
-        owner: type['HasFilesAndSessionManager[FileT]']
-    ) -> 'FileT | None':
+        instance: HasFilesAndSessionManager[FileT] | None,
+        owner: type[HasFilesAndSessionManager[FileT]]
+    ) -> FileT | None:
         return self.__get_by_locale__(instance)
 
     def __set_by_locale__(
         self,
-        instance: 'HasFilesAndSessionManager[FileT]',
-        value: 'FileT',
+        instance: HasFilesAndSessionManager[FileT],
+        value: FileT,
         locale: str | None = None
     ) -> None:
 
@@ -149,15 +151,15 @@ class LocalizedFile:
 
     def __set__(
         self,
-        instance: 'HasFilesAndSessionManager[FileT]',
-        value: 'FileT'
+        instance: HasFilesAndSessionManager[FileT],
+        value: FileT
     ) -> None:
 
         return self.__set_by_locale__(instance, value)
 
     def __delete_by_locale__(
         self,
-        instance: 'HasFilesAndSessionManager[FileT]',
+        instance: HasFilesAndSessionManager[FileT],
         locale: str | None = None
     ) -> None:
 
@@ -167,7 +169,7 @@ class LocalizedFile:
             if file.name == name:
                 instance.files.remove(file)
 
-    def __delete__(self, instance: 'HasFilesAndSessionManager[FileT]') -> None:
+    def __delete__(self, instance: HasFilesAndSessionManager[FileT]) -> None:
         self.__delete_by_locale__(instance)
 
 

@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 from collections import OrderedDict
 
 from onegov.core.orm.mixins import content_property, ContentMixin
@@ -28,17 +30,20 @@ class OccurrenceMixin(ContentMixin):
     """
 
     #: Title of the event
-    title: 'Column[str]' = Column(Text, nullable=False)
+    title: Column[str] = Column(Text, nullable=False)
 
     #: A nice id for the url, readable by humans
-    name: 'Column[str | None]' = Column(Text)
+    name: Column[str | None] = Column(Text)
 
     #: Description of the location of the event
-    location: 'Column[str | None]' = Column(Text, nullable=True)
+    location: Column[str | None] = Column(Text, nullable=True)
 
     #: Tags/Categories of the event
-    _tags: 'Column[dict[str, str] | None]' = Column(  # type:ignore
-        MutableDict.as_mutable(HSTORE), nullable=True, name='tags')
+    _tags: Column[dict[str, str] | None] = Column(  # type:ignore
+        MutableDict.as_mutable(HSTORE),  # type:ignore[no-untyped-call]
+        nullable=True,
+        name='tags'
+    )
 
     @property
     def tags(self) -> list[str]:
@@ -50,30 +55,30 @@ class OccurrenceMixin(ContentMixin):
     #        be able to set this with arbitrary iterables we need
     #        to define a custom descriptor
     @tags.setter
-    def tags(self, value: 'Iterable[str]') -> None:
+    def tags(self, value: Iterable[str]) -> None:
         self._tags = {key.strip(): '' for key in value}
 
     #: Filter keywords if organisation settings enabled filters
-    filter_keywords: 'dict_property[dict[str, list[str] | str]]'
+    filter_keywords: dict_property[dict[str, list[str] | str]]
     filter_keywords = content_property(default=dict)
 
     #: Timezone of the event
-    timezone: 'Column[str]' = Column(String, nullable=False)
+    timezone: Column[str] = Column(String, nullable=False)
 
     #: Start date and time of the event (of the first event if recurring)
-    start: 'Column[datetime]' = Column(UTCDateTime, nullable=False)
+    start: Column[datetime] = Column(UTCDateTime, nullable=False)
 
     @property
-    def localized_start(self) -> 'datetime':
+    def localized_start(self) -> datetime:
         """ The localized version of the start date/time. """
 
         return to_timezone(self.start, self.timezone)
 
     #: End date and time of the event (of the first event if recurring)
-    end: 'Column[datetime]' = Column(UTCDateTime, nullable=False)
+    end: Column[datetime] = Column(UTCDateTime, nullable=False)
 
     @property
-    def localized_end(self) -> 'datetime':
+    def localized_end(self) -> datetime:
         """ The localized version of the end date/time. """
 
         return to_timezone(self.end, self.timezone)

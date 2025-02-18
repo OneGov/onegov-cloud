@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 from typing import TYPE_CHECKING
 if TYPE_CHECKING:
     from decimal import Decimal
@@ -15,10 +17,11 @@ if TYPE_CHECKING:
         credit_card_payment: bool
 
     class FeePolicy(Protocol):
-        def from_amount(self, __amount: Decimal | float) -> Decimal | float:
+        def from_amount(self, amount: Decimal | float, /) -> Decimal | float:
             ...
 
-        def compensate(self, __amount: Decimal | float) -> Decimal | float: ...
+        def compensate(self, amount: Decimal | float, /) -> Decimal | float:
+            ...
 
     # NOTE: We would like to use intersections here than pseudo classes
     @type_check_only

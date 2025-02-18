@@ -32,8 +32,9 @@
                             <span class="h5">${entry.title}</span>
                         </a>
                         <div tal:attributes="id python:'panel'+str(repeat['entry'].index)" class="content">
-                            <ul tal:repeat="item entry.values.items()" style="list-style: none; margin-left: 0">
-                                <li tal:define="key item[0].capitalize(); value item[1].replace('\r\n', Markup('<br>'))" tal:content="Markup('<strong>{}</strong>: {}').format(key, value)"></li>
+                            <ul tal:repeat="field directory.fields" style="list-style: none; margin-left: 0">
+                                <li tal:condition="field.type == 'textarea'" tal:define="key field.human_id; value entry.values[field.id]" tal:content="Markup('<strong>{}</strong>: <br>{}').format(key, value)" style="white-space: pre-wrap;"></li>
+                                <li tal:condition="field.type != 'textarea'" tal:define="key field.human_id; value entry.values[field.id]" tal:content="Markup('<strong>{}</strong>: {}').format(key, value)"></li>
                             </ul>
                             <ul style="list-style: none; margin-left: 0">
                                 <li>
@@ -112,7 +113,7 @@
                 <div class="side-panel files-panel" tal:condition="files and directory.show_file_links_in_sidebar|True">
                     <h2 i18n:translate>Documents</h2>
                     <ul class="panel-links">
-                        <li tal:repeat="file files">
+                        <li tal:repeat="file python: sorted(files, key=lambda f: f.name)">
                             <a title="${file.name}" href="${request.link(file)}">${file.name}</a>
                         </li>
                     </ul>

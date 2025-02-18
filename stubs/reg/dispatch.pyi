@@ -1,6 +1,6 @@
 from collections.abc import Callable, Iterator, Sequence
 from inspect import FullArgSpec
-from typing import Any, Generic, NamedTuple, Protocol, TypeVar
+from typing import Any, Generic, NamedTuple, TypeVar
 from typing_extensions import ParamSpec, TypeAlias
 
 from reg.predicate import Predicate, PredicateRegistry

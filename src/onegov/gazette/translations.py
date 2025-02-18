@@ -2,6 +2,7 @@
 exist in external packages which provide no translations.
 
 """
+from __future__ import annotations
 
 from onegov.gazette import _
 

@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 from onegov.core.security import Private
 from onegov.org import OrgApp, _
 from onegov.org.forms import ResourceRecipientForm
@@ -24,13 +26,13 @@ if TYPE_CHECKING:
 )
 def view_resource_recipients(
     self: ResourceRecipientCollection,
-    request: 'OrgRequest',
+    request: OrgRequest,
     layout: ResourceRecipientsLayout | None = None
-) -> 'RenderData':
+) -> RenderData:
 
     layout = layout or ResourceRecipientsLayout(self, request)
 
-    def recipient_links(recipient: ResourceRecipient) -> 'Iterator[Link]':
+    def recipient_links(recipient: ResourceRecipient) -> Iterator[Link]:
         yield Link(
             text=_('Edit'),
             url=request.link(recipient, 'edit')
@@ -75,10 +77,10 @@ def view_resource_recipients(
 )
 def handle_new_resource_recipient(
     self: ResourceRecipientCollection,
-    request: 'OrgRequest',
+    request: OrgRequest,
     form: ResourceRecipientForm,
     layout: ResourceRecipientsFormLayout | None = None
-) -> 'RenderData | Response':
+) -> RenderData | Response:
 
     if form.submitted(request):
         self.add(
@@ -115,10 +117,10 @@ def handle_new_resource_recipient(
 )
 def handle_edit_resource_recipient(
     self: ResourceRecipient,
-    request: 'OrgRequest',
+    request: OrgRequest,
     form: ResourceRecipientForm,
     layout: ResourceRecipientsFormLayout | None = None
-) -> 'RenderData | Response':
+) -> RenderData | Response:
 
     if form.submitted(request):
         form.populate_obj(self)
@@ -146,12 +148,12 @@ def handle_edit_resource_recipient(
 )
 def delete_notification(
     self: ResourceRecipient,
-    request: 'OrgRequest'
+    request: OrgRequest
 ) -> None:
 
     request.assert_valid_csrf_token()
     ResourceRecipientCollection(request.session).delete(self)
 
     @request.after
-    def remove_target(response: 'Response') -> None:
+    def remove_target(response: Response) -> None:
         response.headers.add('X-IC-Remove', 'true')

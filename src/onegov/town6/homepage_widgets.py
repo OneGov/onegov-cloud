@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 import lxml.etree
 import requests
 from datetime import datetime
@@ -79,11 +81,12 @@ class AutoplayVideoWidget:
     template = """
         <xsl:template match="autoplay_video">
             <div metal:use-macro="layout.macros.autoplay_video"
-             tal:define="max_height '{@max-height}'; link_mp4 '{@link_mp4}';
-             link_mp4_low_res '{@link_mp4_low_res}';
-             link_webm '{@link_webm}';
-              link_webm_low_res '{@link_webm_low_res}'; text '{@text}'
-             "
+            tal:define="max_height '{@max-height}'; link_mp4 '{@link_mp4}';
+            link_mp4_low_res '{@link_mp4_low_res}';
+            link_webm '{@link_webm}'; button_url '{@button_url}';
+            link_webm_low_res '{@link_webm_low_res}'; text '{@text}';
+            button_text '{@button_text}';
+            "
             />
         </xsl:template>
     """
@@ -183,7 +186,7 @@ class EventsWidget:
         </xsl:template>
     """
 
-    def get_variables(self, layout: 'DefaultLayout') -> 'RenderData':
+    def get_variables(self, layout: DefaultLayout) -> RenderData:
         occurrences = OccurrenceCollection(layout.app.session()).query()
         occurrences = occurrences.limit(layout.org.event_limit_homepage)
 
@@ -255,7 +258,7 @@ class PartnerWidget:
         </xsl:template>
     """
 
-    def get_variables(self, layout: 'DefaultLayout') -> 'RenderData':
+    def get_variables(self, layout: DefaultLayout) -> RenderData:
         return {'partners': layout.partners}
 
 
@@ -286,7 +289,7 @@ class ServicesWidget:
         </xsl:template>
     """
 
-    def get_service_links(self, layout: 'DefaultLayout') -> 'Iterator[Link]':
+    def get_service_links(self, layout: DefaultLayout) -> Iterator[Link]:
         if not layout.org.hide_online_counter:
             yield Link(
                 text=_('Online Counter'),
@@ -351,7 +354,7 @@ class ServicesWidget:
                 classes=('sbb-daypass', 'h5')
             )
 
-    def get_variables(self, layout: 'DefaultLayout') -> 'RenderData':
+    def get_variables(self, layout: DefaultLayout) -> RenderData:
         return {
             'services_panel': LinkGroup(_('Services'), links=tuple(
                 self.get_service_links(layout)
@@ -373,7 +376,7 @@ class ContactsAndAlbumsWidget:
            </xsl:template>
        """
 
-    def get_variables(self, layout: 'DefaultLayout') -> 'RenderData':
+    def get_variables(self, layout: DefaultLayout) -> RenderData:
         request = layout.request
 
         return {
@@ -472,7 +475,7 @@ class FocusWidget:
     </xsl:template>
     """
 
-    def get_variables(self, layout: 'DefaultLayout') -> 'RenderData':
+    def get_variables(self, layout: DefaultLayout) -> RenderData:
         return {}
 
 
@@ -520,8 +523,8 @@ class JobsWidget:
     </xsl:template>
     """
 
-    def get_variables(self, layout: 'DefaultLayout') -> 'RenderData':
-        def rss_widget_builder(rss_feed_url: str) -> 'RSSChannel | None':
+    def get_variables(self, layout: DefaultLayout) -> RenderData:
+        def rss_widget_builder(rss_feed_url: str) -> RSSChannel | None:
             """ Builds and caches widget data from the given RSS URL.
 
             Note that this is called within the <?python> tag in the macro.
@@ -548,7 +551,7 @@ class RSSItem(NamedTuple):
     title: str
     description: str
     guid: str
-    pubDate: datetime | None
+    pubDate: datetime | None  # noqa: N815
 
 
 class RSSChannel(NamedTuple):
@@ -558,7 +561,7 @@ class RSSChannel(NamedTuple):
     description: str
     language: str
     copyright: str
-    items: 'Iterator[RSSItem]'
+    items: Iterator[RSSItem]
 
 
 def parsed_rss(rss: bytes) -> RSSChannel:
@@ -569,11 +572,11 @@ def parsed_rss(rss: bytes) -> RSSChannel:
         except ValueError:
             return None
 
-    def get_text(element: '_Element | None') -> str:
+    def get_text(element: _Element | None) -> str:
         return element.text or '' if element is not None else ''
 
     def extract_channel_info(
-        channel: '_Element',
+        channel: _Element,
     ) -> tuple[str, str, str, str, str]:
         return (  # type:ignore[return-value]
             get_text(channel.find(field))
@@ -581,7 +584,7 @@ def parsed_rss(rss: bytes) -> RSSChannel:
             if field != 'items'
         )
 
-    def extract_items(channel: '_Element') -> 'Iterator[RSSItem]':
+    def extract_items(channel: _Element) -> Iterator[RSSItem]:
         for item in channel.findall('item'):
             yield RSSItem(
                 title=get_text(item.find('title')),

@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 from onegov.core.security import Private
 from onegov.form import merge_forms
 from onegov.org.views.payment import view_payments, export_payments
@@ -23,8 +25,8 @@ if TYPE_CHECKING:
 )
 def town_view_payments(
     self: PaymentCollection,
-    request: 'TownRequest'
-) -> 'RenderData':
+    request: TownRequest
+) -> RenderData:
     return view_payments(self, request, PaymentCollectionLayout(self, request))
 
 
@@ -37,8 +39,8 @@ def town_view_payments(
 )
 def town_export_payments(
     self: PaymentCollection,
-    request: 'TownRequest',
-    form: 'PaymentExportForm'
-) -> 'RenderData | Response':
+    request: TownRequest,
+    form: PaymentExportForm
+) -> RenderData | Response:
     return export_payments(
         self, request, form, PaymentCollectionLayout(self, request))

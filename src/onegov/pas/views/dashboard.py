@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 from onegov.pas import _
 from onegov.pas import PasApp
 from onegov.pas.collections import CommissionCollection
@@ -20,8 +22,9 @@ if TYPE_CHECKING:
 )
 def view_dashboard(
     self: Organisation,
-    request: 'TownRequest'
-) -> 'RenderData':
+    request: TownRequest
+) -> RenderData:
+
     layout = DefaultLayout(self, request)
 
     shortcuts = [

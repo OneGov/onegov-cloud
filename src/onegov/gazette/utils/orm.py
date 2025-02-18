@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 from sqlalchemy import or_
 
 from typing import TYPE_CHECKING
@@ -9,9 +11,9 @@ if TYPE_CHECKING:
 #        should just get rid of this utility, unless we sometimes actually
 #        pass in a boolean value, rather than a literal
 def bool_is(
-    column: 'ColumnElement[bool | None]',
+    column: ColumnElement[bool | None],
     value: bool
-) -> 'ColumnElement[bool]':
+) -> ColumnElement[bool]:
     """ Returns a SqlAlchemyStatements checking for boolean values of JSON
     attibutes. Missing values are interpreted as False. """
 

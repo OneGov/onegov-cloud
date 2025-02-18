@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 import hashlib
 import os
 import secrets
@@ -48,7 +50,9 @@ def stored_random_token(namespace: str, name: str) -> str:
     general use!
 
     """
-    namespace_dir = os.path.join('/tmp/onegov-secrets', namespace)
+    # NOTE: Since this is only used for development:
+    #       The hardcoded path is a feature, not a bug
+    namespace_dir = os.path.join('/tmp/onegov-secrets', namespace)  # nosec:B108
     os.makedirs(namespace_dir, mode=0o700, exist_ok=True)
 
     path = os.path.join(namespace_dir, name)

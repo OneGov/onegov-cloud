@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 from collections import defaultdict
 from morepath import redirect
 from onegov.core.utils import normalize_for_url
@@ -31,11 +33,11 @@ if TYPE_CHECKING:
 )
 def view_election_compound_head(
     self: ElectionCompound,
-    request: 'ElectionDayRequest'
+    request: ElectionDayRequest
 ) -> None:
 
     @request.after
-    def add_headers(response: 'Response') -> None:
+    def add_headers(response: Response) -> None:
         add_cors_header(response)
         add_last_modified_header(response, self.last_modified)
 
@@ -46,8 +48,8 @@ def view_election_compound_head(
 )
 def view_election_compound(
     self: ElectionCompound,
-    request: 'ElectionDayRequest'
-) -> 'Response':
+    request: ElectionDayRequest
+) -> Response:
     """" The main view. """
 
     return redirect(ElectionCompoundLayout(self, request).main_view)
@@ -60,15 +62,15 @@ def view_election_compound(
 )
 def view_election_compound_json(
     self: ElectionCompound,
-    request: 'ElectionDayRequest'
-) -> 'JSON_ro':
+    request: ElectionDayRequest
+) -> JSON_ro:
     """" The main view as JSON. """
 
     last_modified = self.last_modified
     assert last_modified is not None
 
     @request.after
-    def add_headers(response: 'Response') -> None:
+    def add_headers(response: Response) -> None:
         add_cors_header(response)
         add_last_modified_header(response, last_modified)
 
@@ -127,7 +129,7 @@ def view_election_compound_json(
     for superregion in superregions.values():
         superregion['superregion'] = request.link(superregion['superregion'])
 
-    years, parties = get_party_results(self, json_serializable=True)
+    _years, parties = get_party_results(self, json_serializable=True)
 
     return {
         'completed': self.completed,
@@ -179,12 +181,12 @@ def view_election_compound_json(
 )
 def view_election_compound_summary(
     self: ElectionCompound,
-    request: 'ElectionDayRequest'
-) -> 'JSON_ro':
+    request: ElectionDayRequest
+) -> JSON_ro:
     """ View the summary of the election compound as JSON. """
 
     @request.after
-    def add_headers(response: 'Response') -> None:
+    def add_headers(response: Response) -> None:
         add_cors_header(response)
         add_last_modified_header(response, self.last_modified)
 
@@ -198,8 +200,8 @@ def view_election_compound_summary(
 )
 def view_election_compound_pdf(
     self: ElectionCompound,
-    request: 'ElectionDayRequest'
-) -> 'RenderData':
+    request: ElectionDayRequest
+) -> RenderData:
     """ View the generated PDF. """
 
     layout = ElectionCompoundLayout(self, request)

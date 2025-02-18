@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 import calendar
 import time
 
@@ -6,12 +8,15 @@ from uuid import uuid4
 
 import morepath
 from attr import attrs, attrib, validators
+from jwt.exceptions import InvalidTokenError, PyJWKClientError
+from oauthlib.oauth2 import OAuth2Error
 from sedate import utcnow
 
 from onegov.core.crypto import random_token
 from onegov.user import _, log, UserCollection
 from onegov.user.auth.clients import KerberosClient
 from onegov.user.auth.clients import LDAPClient
+from onegov.user.auth.clients.oidc import OIDCConnections
 from onegov.user.auth.clients.msal import MSALConnections
 from onegov.user.auth.clients.saml2 import SAML2Connections
 from onegov.user.auth.clients.saml2 import finish_logout
@@ -19,7 +24,7 @@ from saml2.ident import code
 from webob import Response
 
 
-from typing import Any, ClassVar, Literal, Self, TypeVar, TYPE_CHECKING
+from typing import Any, ClassVar, Literal, Self, TYPE_CHECKING
 if TYPE_CHECKING:
     from collections.abc import Collection, Mapping
     from onegov.core.request import CoreRequest
@@ -39,14 +44,7 @@ if TYPE_CHECKING:
         def namespace(self) -> str: ...
 
 
-_P = TypeVar('_P', bound='AuthenticationProvider')
-
-
 AUTHENTICATION_PROVIDERS = {}
-
-
-def provider_by_name(providers: 'Collection[_P]', name: str) -> _P | None:
-    return next((p for p in providers if p.metadata.name == name), None)
 
 
 class Conclusion:
@@ -57,8 +55,8 @@ class Conclusion:
 class Success(Conclusion):
     """ Indicates a sucessful authentication. """
 
-    user: 'User' = attrib()
-    note: 'TranslationString' = attrib()
+    user: User = attrib()
+    note: TranslationString = attrib()
 
     def __bool__(self) -> Literal[True]:
         return True
@@ -68,7 +66,7 @@ class Success(Conclusion):
 class Failure(Conclusion):
     """ Indicates a corrupt JWT """
 
-    note: 'TranslationString' = attrib()
+    note: TranslationString = attrib()
 
     def __bool__(self) -> Literal[False]:
         return False
@@ -77,7 +75,7 @@ class Failure(Conclusion):
 class InvalidJWT(Failure):
     """ Indicates a failed authentication. """
 
-    note: 'TranslationString' = attrib()
+    note: TranslationString = attrib()
 
     def __bool__(self) -> Literal[False]:
         return False
@@ -99,20 +97,16 @@ class AuthenticationProvider(metaclass=ABCMeta):
     # :class:`~onegov.user.integration.UserApp`.
     to: str | None = attrib(init=False)
     primary: bool = attrib(init=False, default=False)
+    name: str = attrib()
 
     if TYPE_CHECKING:
         # forward declare for type checking
         metadata: ClassVar[HasName]
         kind: ClassVar[Literal['separate', 'integrated']]
 
-    @property
-    def name(self) -> str:
-        """ Needs to be available for the path in the integration app. """
-        return self.metadata.name
-
     def __init_subclass__(
         cls,
-        metadata: 'HasName | None' = None,
+        metadata: HasName | None = None,
         **kwargs: Any
     ):
         if metadata:
@@ -132,7 +126,7 @@ class AuthenticationProvider(metaclass=ABCMeta):
 
     @classmethod
     @abstractmethod
-    def configure(cls, **kwargs: Any) -> Self | None:
+    def configure(cls, name: str, **kwargs: Any) -> Self | None:
         """ This function gets called with the per-provider configuration
         defined in onegov.yml. Authentication providers may optionally
         access these values.
@@ -142,14 +136,14 @@ class AuthenticationProvider(metaclass=ABCMeta):
 
         """
 
-        return cls()
+        return cls(name=name)
 
-    def is_primary(self, app: 'UserApp') -> bool:
+    def is_primary(self, app: UserApp) -> bool:
         """ Returns whether the authentication provider is intended to be
         the primary provider for this app."""
         return self.primary if self.available(app) else False
 
-    def available(self, app: 'UserApp') -> bool:
+    def available(self, app: UserApp) -> bool:
         """Returns whether the authentication provider is available for the
         current app. Since there are tenant specific connections, we want to
         tcheck, if for the tenant of the app, there is an available client."""
@@ -171,7 +165,7 @@ class SeparateAuthenticationProvider(AuthenticationProvider):
     @abstractmethod
     def authenticate_request(
         self,
-        request: 'CoreRequest'
+        request: CoreRequest
     ) -> Success | Failure | Response | None:
         """ Authenticates the given request in one or many steps.
 
@@ -193,7 +187,7 @@ class SeparateAuthenticationProvider(AuthenticationProvider):
         """
 
     @abstractmethod
-    def button_text(self, request: 'CoreRequest') -> str:
+    def button_text(self, request: CoreRequest) -> str:
         """ Returns the translatable button text for the given request.
 
         It is okay to return a static text, if the button remains the same
@@ -220,7 +214,7 @@ class IntegratedAuthenticationProvider(AuthenticationProvider):
     kind: ClassVar[Literal['integrated']] = 'integrated'
 
     @abstractmethod
-    def hint(self, request: 'CoreRequest') -> str:
+    def hint(self, request: CoreRequest) -> str:
         """ Returns the translatable hint shown above the login mask for
         the integrated provider.
 
@@ -234,10 +228,10 @@ class IntegratedAuthenticationProvider(AuthenticationProvider):
     @abstractmethod
     def authenticate_user(
         self,
-        request: 'CoreRequest',
+        request: CoreRequest,
         username: str,
         password: str
-    ) -> 'User | None':
+    ) -> User | None:
         """ Authenticates the given username/password in a single step.
 
         The function is expected to return an existing user record or None.
@@ -273,13 +267,13 @@ def spawn_ldap_client(
 def ensure_user(
     source: str | None,
     source_id: str | None,
-    session: 'Session',
+    session: Session,
     username: str,
     role: str,
     force_role: bool = True,
     realname: str | None = None,
     force_active: bool = False
-) -> 'User':
+) -> User:
     """ Creates the given user if it doesn't already exist. Ensures the
     role is set to the given role in all cases.
     """
@@ -349,7 +343,7 @@ class RolesMapping:
 
     def app_specific(
         self,
-        app: 'HasApplicationIdAndNamespace'
+        app: HasApplicationIdAndNamespace
     ) -> dict[str, str] | None:
 
         if app.application_id in self.roles:
@@ -364,8 +358,8 @@ class RolesMapping:
 
     def match(
         self,
-        roles: 'Mapping[str, str]',
-        groups: 'Collection[str]'
+        roles: Mapping[str, str],
+        groups: Collection[str]
     ) -> str | None:
         """ Takes a role mapping (the fallback, namespace, or app specific one)
         and matches it against the given LDAP groups.
@@ -457,7 +451,7 @@ class LDAPProvider(
     custom_hint: str = ''
 
     @classmethod
-    def configure(cls, **cfg: Any) -> Self | None:
+    def configure(cls, name: str, **cfg: Any) -> Self | None:
 
         # Providers have to decide themselves if they spawn or not
         if not cfg:
@@ -467,6 +461,7 @@ class LDAPProvider(
         ldap = spawn_ldap_client(**cfg)
 
         return cls(
+            name=name,
             ldap=ldap,
             auth_method=cfg.get('auth_method', 'compare'),
             attributes=LDAPAttributes.from_cfg(cfg),
@@ -480,15 +475,15 @@ class LDAPProvider(
             })),
         )
 
-    def hint(self, request: 'CoreRequest') -> str:
+    def hint(self, request: CoreRequest) -> str:
         return self.custom_hint
 
     def authenticate_user(
         self,
-        request: 'CoreRequest',
+        request: CoreRequest,
         username: str,
         password: str
-    ) -> 'User | None':
+    ) -> User | None:
 
         if self.auth_method == 'compare':
             return self.authenticate_using_compare(request, username, password)
@@ -497,10 +492,10 @@ class LDAPProvider(
 
     def authenticate_using_compare(
         self,
-        request: 'CoreRequest',
+        request: CoreRequest,
         username: str,
         password: str
-    ) -> 'User | None':
+    ) -> User | None:
 
         # since this is turned into an LDAP query, we want to make sure this
         # is not used to make broad queries
@@ -611,7 +606,7 @@ class LDAPKerberosProvider(
     suffix: str | None = None
 
     @classmethod
-    def configure(cls, **cfg: Any) -> Self | None:
+    def configure(cls, name: str, **cfg: Any) -> Self | None:
 
         # Providers have to decide themselves if they spawn or not
         if not cfg:
@@ -627,6 +622,7 @@ class LDAPKerberosProvider(
             service=cfg.get('kerberos_service', None))
 
         provider = cls(
+            name=name,
             ldap=ldap,
             kerberos=kerberos,
             attributes=LDAPAttributes.from_cfg(cfg),
@@ -643,12 +639,12 @@ class LDAPKerberosProvider(
             provider.primary = True
         return provider
 
-    def button_text(self, request: 'CoreRequest') -> str:
+    def button_text(self, request: CoreRequest) -> str:
         """ Returns the request tailored to each OS (users won't understand
         LDAP/Kerberos, but for them it's basically their local OS login).
 
         """
-        user_os = request.agent['os']['family']
+        user_os = request.agent.os.family
 
         if user_os == 'Other':
             return _('Login with operating system')
@@ -659,7 +655,7 @@ class LDAPKerberosProvider(
 
     def authenticate_request(
         self,
-        request: 'CoreRequest'
+        request: CoreRequest
     ) -> Response | Success | Failure:
 
         response = self.kerberos.authenticated_username(request)
@@ -687,9 +683,9 @@ class LDAPKerberosProvider(
 
     def request_authorization(
         self,
-        request: 'CoreRequest',
+        request: CoreRequest,
         username: str
-    ) -> 'User | None':
+    ) -> User | None:
 
         if self.suffix:
             username = username.removesuffix(self.suffix)
@@ -750,8 +746,8 @@ class OauthProvider(SeparateAuthenticationProvider):
     @abstractmethod
     def do_logout(
         self,
-        request: 'CoreRequest',
-        user: 'User',
+        request: CoreRequest,
+        user: User,
         to: str
     ) -> Response | None:
         """ May return a webob response that gets used instead of the default
@@ -766,7 +762,7 @@ class OauthProvider(SeparateAuthenticationProvider):
     @abstractmethod
     def request_authorisation(
         self,
-        request: 'CoreRequest'
+        request: CoreRequest
     ) -> Success | Failure | Response:
         """
         Takes the request from the redirect_uri view sent from the users
@@ -779,21 +775,21 @@ class OauthProvider(SeparateAuthenticationProvider):
         to redirect the user to the auth provider.
         """
 
-    def logout_redirect_uri(self, request: 'CoreRequest') -> str:
+    def logout_redirect_uri(self, request: CoreRequest) -> str:
         """This url usually has to be registered with the OAuth Provider.
         Should not contain any query parameters. """
         return request.class_link(
             AuthenticationProvider,
-            {'name': self.metadata.name},
+            {'name': self.name},
             name='logout'
         )
 
-    def redirect_uri(self, request: 'CoreRequest') -> str:
+    def redirect_uri(self, request: CoreRequest) -> str:
         """Returns the redirect uri in a consistent manner
         without query parameters."""
         return request.class_link(
             AuthenticationProvider,
-            {'name': self.metadata.name},
+            {'name': self.name},
             name='redirect'
         )
 
@@ -838,12 +834,13 @@ class AzureADProvider(
     custom_hint: str = ''
 
     @classmethod
-    def configure(cls, **cfg: Any) -> Self | None:
+    def configure(cls, name: str, **cfg: Any) -> Self | None:
 
         if not cfg:
             return None
 
         return cls(
+            name=name,
             tenants=MSALConnections.from_cfg(cfg.get('tenants', {})),
             custom_hint=cfg.get('hint', None),
             roles=RolesMapping(cfg.get('roles', {
@@ -855,21 +852,21 @@ class AzureADProvider(
             }))
         )
 
-    def button_text(self, request: 'CoreRequest') -> str:
+    def button_text(self, request: CoreRequest) -> str:
         return _('Login with Microsoft')
 
-    def do_logout(self, request: 'CoreRequest', user: 'User', to: str) -> None:
+    def do_logout(self, request: CoreRequest, user: User, to: str) -> None:
         # global logout is deactivated for AzureAD currently
         return None
 
-    def logout_url(self, request: 'CoreRequest') -> str:
+    def logout_url(self, request: CoreRequest) -> str:
         client = self.tenants.client(request.app)
         assert client is not None
         return client.logout_url(self.logout_redirect_uri(request))
 
     def authenticate_request(
         self,
-        request: 'CoreRequest'
+        request: CoreRequest
     ) -> Response | Failure:
         """
         Returns a redirect response or a Conclusion
@@ -912,7 +909,7 @@ class AzureADProvider(
 
     def validate_id_token(
         self,
-        request: 'CoreRequest',
+        request: CoreRequest,
         token: dict[str, Any]
     ) -> Failure | Literal[True]:
         """
@@ -948,7 +945,7 @@ class AzureADProvider(
 
     def request_authorisation(
         self,
-        request: 'CoreRequest'
+        request: CoreRequest
     ) -> Success | Failure:
         """
         If "Stay Logged In" on the Microsoft Login page is chosen,
@@ -1048,13 +1045,13 @@ class AzureADProvider(
             'user': user.username
         }))
 
-    def is_primary(self, app: 'UserApp') -> bool:
+    def is_primary(self, app: UserApp) -> bool:
         client = self.tenants.client(app)
         if client:
             return client.primary
         return False
 
-    def available(self, app: 'UserApp') -> bool:
+    def available(self, app: UserApp) -> bool:
         return self.tenants.client(app) and True or False
 
 
@@ -1077,12 +1074,13 @@ class SAML2Provider(
     custom_hint: str = ''
 
     @classmethod
-    def configure(cls, **cfg: Any) -> Self | None:
+    def configure(cls, name: str, **cfg: Any) -> Self | None:
 
         if not cfg:
             return None
 
         return cls(
+            name=name,
             tenants=SAML2Connections.from_cfg(cfg.get('tenants', {})),
             custom_hint=cfg.get('hint', None),
             roles=RolesMapping(cfg.get('roles', {
@@ -1094,15 +1092,15 @@ class SAML2Provider(
             }))
         )
 
-    def button_text(self, request: 'CoreRequest') -> str:
+    def button_text(self, request: CoreRequest) -> str:
         client = self.tenants.client(request.app)
         assert client is not None
         return client.button_text
 
     def do_logout(
         self,
-        request: 'CoreRequest',
-        user: 'User',
+        request: CoreRequest,
+        user: User,
         to: str
     ) -> Response | None:
 
@@ -1113,6 +1111,9 @@ class SAML2Provider(
         # if the source isn't what we expect then it doesn't apply
         client = self.tenants.client(request.app)
         assert client is not None
+        if not client.slo_enabled:
+            return None
+
         if client.treat_as_ldap:
             if user.source != 'ldap':
                 return None
@@ -1152,7 +1153,7 @@ class SAML2Provider(
 
     def authenticate_request(
         self,
-        request: 'CoreRequest'
+        request: CoreRequest
     ) -> Response | Failure:
         """
         Returns a redirect response or a Conclusion
@@ -1187,6 +1188,7 @@ class SAML2Provider(
         # remember where we need to redirect to
         redirects = client.get_redirects(app)
         redirects[session_id] = self.to
+        request.browser_session['login_to'] = self.to
 
         # since prepare_for_authenticate() needs to support other
         # bindings as well, the request_info ends up being overly
@@ -1198,7 +1200,7 @@ class SAML2Provider(
 
     def request_authorisation(
         self,
-        request: 'CoreRequest'
+        request: CoreRequest
     ) -> Success | Failure:
         """
         Returns a webob Response or a Conclusion.
@@ -1298,11 +1300,277 @@ class SAML2Provider(
             'user': user.username
         }))
 
-    def is_primary(self, app: 'UserApp') -> bool:
+    def is_primary(self, app: UserApp) -> bool:
         client = self.tenants.client(app)
         if client:
             return client.primary
         return False
 
-    def available(self, app: 'UserApp') -> bool:
+    def available(self, app: UserApp) -> bool:
+        return self.tenants.client(app) and True or False
+
+
+@attrs(auto_attribs=True)
+class OIDCProvider(
+    OauthProvider,
+    metadata=ProviderMetadata(name='oidc', title=_('OpenID Connect'))
+):
+    """
+    Authenticates and authorizes a user on SAML2 IDP
+    """
+
+    # oidc instances by tenant
+    tenants: OIDCConnections = attrib()
+
+    # Roles configuration
+    roles: RolesMapping = attrib()
+
+    # Custom hint to be shown in the login view
+    custom_hint: str = ''
+
+    @classmethod
+    def configure(cls, name: str, **cfg: Any) -> Self | None:
+
+        if not cfg:
+            return None
+
+        return cls(
+            name=name,
+            tenants=OIDCConnections.from_cfg(cfg.get('tenants', {})),
+            custom_hint=cfg.get('hint', None),
+            roles=RolesMapping(cfg.get('roles', {
+                '__default__': {
+                    'admins': 'admins',
+                    'editors': 'editors',
+                    'members': 'members'
+                }
+            }))
+        )
+
+    def button_text(self, request: CoreRequest) -> str:
+        client = self.tenants.client(request.app)
+        assert client is not None
+        return client.button_text
+
+    def do_logout(
+        self,
+        request: CoreRequest,
+        user: User,
+        to: str
+    ) -> Response | None:
+
+        # TODO: SLO/Provider logout? Revoke access token?
+        return finish_logout(request, user, to)
+
+    def authenticate_request(
+        self,
+        request: CoreRequest
+    ) -> Response | Failure:
+        """
+        Returns a redirect response or a Conclusion
+
+        Parameters of the original request are kept for when external services
+        call back.
+        """
+
+        app = request.app
+        client = self.tenants.client(app)
+        roles = self.roles.app_specific(app)
+
+        if not roles:
+            # Considered as a misconfiguration of the app
+            log.error(f'No role map for {app.application_id}')
+            return Failure(_('Authorisation failed due to an error'))
+
+        if not client:
+            # Considered as a misconfiguration of the app
+            log.error(f'No OIDC client found for '
+                      f'{app.application_id} or {app.namespace}')
+            return Failure(_('Authorisation failed due to an error'))
+
+        try:
+            metadata = client.metadata(request)
+        except Exception as error:
+            # Usually a misconfiguration, but could also be a temporary
+            # failure if the identity provider is down
+            log.error(f'Failed to retrieve/validate OIDC metadata in '
+                      f'{app.application_id}: {error}')
+            return Failure(_('Authorisation failed due to an error'))
+
+        session = client.session(self, request, with_openid_scope=True)
+        auth_url, _state = session.authorization_url(
+            metadata['authorization_endpoint'],
+            request.new_url_safe_token(
+                data={'to': self.to},
+                # NOTE: This should sufficiently prevent replay attacks
+                #       since once they succesfully manage to hijack
+                #       the original session that issued this authentication
+                #       they no longer need to or can replay authorisation
+                #       since that session is either already expired
+                #       or still logged in.
+                #       But if we want maximum robustness we can choose
+                #       to send a nonce url parameter in addition to the
+                #       state, which will be returned to us via the JWT
+                salt=request.csrf_salt
+            ),
+        )
+        request.browser_session['login_to'] = self.to
+
+        return morepath.redirect(auth_url)
+
+    def request_authorisation(
+        self,
+        request: CoreRequest
+    ) -> Success | Failure:
+        """
+        Returns a webob Response or a Conclusion.
+        """
+
+        data = request.load_url_safe_token(
+            request.GET.get('state'),
+            request.csrf_salt,
+            900  # 15 minutes should be plenty for a login
+        )
+        if data is None:
+            return Failure(_('Authorisation failed due to an error'))
+
+        app = request.app
+
+        client = self.tenants.client(app)
+        roles = self.roles.app_specific(app)
+
+        if not roles:
+            # Considered as a misconfiguration of the app
+            log.error(f'No role map for {app.application_id}')
+            return Failure(_('Authorisation failed due to an error'))
+
+        if not client:
+            # Considered as a misconfiguration of the app
+            log.error(f'No oidc client found for '
+                      f'{app.application_id} or {app.namespace}')
+            return Failure(_('Authorisation failed due to an error'))
+
+        try:
+            metadata = client.metadata(request)
+        except Exception as error:
+            # Usually a misconfiguration, but could also be a temporary
+            # failure if the identity provider is down
+            log.error(f'Failed to retrieve/validate OIDC metadata in '
+                      f'{app.application_id}: {error}')
+            return Failure(_('Authorisation failed due to an error'))
+
+        session = client.session(self, request)
+        try:
+            token = session.fetch_token(
+                metadata['token_endpoint'],
+                authorization_response=request.url,
+                client_secret=client.client_secret,
+            )
+        except OAuth2Error as error:
+            log.info(f'OAuth2 Error in {app.application_id}: {error}')
+            return Failure(_('Authorisation failed due to an error'))
+
+        try:
+            payload = client.validate_token(request, token)
+        except PyJWKClientError as error:
+            # this is either a configuration error or the JWKS
+            # endpoint is down or has recently been updated, so
+            # the old keys are still in cache
+            # FIXME: Do we want to try clearing the cache here?
+            #        We could also write our own subclass, that
+            #        automatically clears the cache, if it doesn't
+            #        contain the key that was used to sign the token.
+            #        Generally this should only be a rare temporary
+            #        issue when the signing key gets changed.
+            log.info(f'OICD JWK error in {app.application_id}: {error}')
+            return Failure(_('Authorisation failed due to an error'))
+        except InvalidTokenError as error:
+            log.info(f'Invalid OIDC token in {app.application_id}: {error}')
+            return Failure(_('Authorisation failed due to an error'))
+
+        source_id = payload.get(client.attributes.source_id, None)
+        username = payload.get(client.attributes.username, None)
+        first_name = payload.get(client.attributes.first_name, None)
+        last_name = payload.get(client.attributes.last_name, None)
+        groups = payload.get(client.attributes.group, None)
+        if first_name and last_name:
+            realname = f'{first_name} {last_name}'
+        else:
+            realname = payload.get(client.attributes.preferred_username, None)
+
+        # try to retrieve any missing claims from the userinfo endpoint
+        if not (source_id and username and groups and realname) and (
+            user_url := metadata.get('userinfo_endpoint')
+        ):
+            try:
+                response = session.get(user_url, timeout=(5, 10))
+                response.raise_for_status()
+                claims = response.json()
+                assert isinstance(claims, dict)
+                source_id = source_id or claims.get(
+                    client.attributes.source_id, None)
+                username = username or claims.get(
+                    client.attributes.username, None)
+                first_name = first_name or claims.get(
+                    client.attributes.first_name, None)
+                last_name = last_name or claims.get(
+                    client.attributes.last_name, None)
+                groups = groups or claims.get(client.attributes.group, None)
+
+                if realname:
+                    # already set
+                    pass
+                elif first_name and last_name:
+                    realname = f'{first_name} {last_name}'
+                else:
+                    realname = claims.get(
+                        client.attributes.preferred_username, None)
+
+            except Exception as error:
+                log.info(f'Failed to retrieve OIDC userinfo: {error}')
+
+        if not username:
+            log.info('No username found in authorisation step')
+            return Failure(_('Authorisation failed due to an error'))
+
+        if not source_id:
+            log.info(f'No source_id found for {username}')
+            return Failure(_('Authorisation failed due to an error'))
+
+        if not groups:
+            log.info(f'No groups found for {username}')
+            return Failure(_("Can't login because your user has no group. "
+                             "Contact your OpenID system administrator"))
+
+        role = self.roles.match(roles, groups)
+
+        if not role:
+            log.info(f'No authorized group for {username}, '
+                     f'having groups: {", ".join(groups)}')
+            return Failure(_('Authorisation failed due to an error'))
+
+        user = ensure_user(
+            source=self.name,
+            source_id=source_id,
+            session=request.session,
+            username=username,
+            role=role,
+            realname=realname
+        )
+
+        # retrieve the redirect target from the state
+        if redirect_to := data.get('to'):
+            self.to = redirect_to
+
+        return Success(user, _('Successfully logged in as «${user}»', mapping={
+            'user': user.username
+        }))
+
+    def is_primary(self, app: UserApp) -> bool:
+        client = self.tenants.client(app)
+        if client:
+            return client.primary
+        return False
+
+    def available(self, app: UserApp) -> bool:
         return self.tenants.client(app) and True or False

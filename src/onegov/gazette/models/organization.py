@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 from onegov.core.orm.abstract import AdjacencyList
 from onegov.core.orm.abstract import MoveDirection
 from onegov.core.orm.mixins import ContentMixin
@@ -34,20 +36,21 @@ class Organization(AdjacencyList, ContentMixin, TimestampMixin):
     __tablename__ = 'gazette_organizations'
 
     #: True, if this organization is still in use.
-    active: 'Column[bool | None]' = Column(Boolean, nullable=True)
+    active: Column[bool | None] = Column(Boolean, nullable=True)
 
     external_name: dict_property[str | None] = meta_property('external_name')
 
     if TYPE_CHECKING:
         # we need to override these attributes to get the correct base class
-        parent: relationship['Organization | None']
-        children: relationship[Sequence['Organization']]
-        @property
-        def root(self) -> 'Organization': ...
-        @property
-        def ancestors(self) -> Iterator['Organization']: ...
+        parent: relationship[Organization | None]
+        children: relationship[Sequence[Organization]]
 
-    def notices(self) -> 'Query[GazetteNotice]':
+        @property
+        def root(self) -> Organization: ...
+        @property
+        def ancestors(self) -> Iterator[Organization]: ...
+
+    def notices(self) -> Query[GazetteNotice]:
         """ Returns a query to get all notices related to this category. """
 
         from onegov.gazette.models.notice import GazetteNotice  # circular
@@ -86,7 +89,7 @@ class OrganizationMove:
 
     def __init__(
         self,
-        session: 'Session',
+        session: Session,
         subject_id: int,
         target_id: int,
         direction: MoveDirection

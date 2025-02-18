@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 from onegov.core.orm.abstract import associated
 from onegov.core.orm.mixins import TimestampMixin
 from onegov.core.orm.types import UTCDateTime
@@ -42,7 +44,7 @@ class DomainOfInfluenceMixin:
 
     #: scope of the election or vote
     @declared_attr  # type:ignore[no-redef]
-    def domain(cls) -> 'Column[DomainOfInfluence]':
+    def domain(cls) -> Column[DomainOfInfluence]:
         return Column(
             Enum(  # type:ignore[arg-type]
                 'federation',
@@ -65,12 +67,13 @@ class StatusMixin:
 
         # forward declare required attributes
         counted: Column[bool]
+
         @property
         def progress(self) -> tuple[int, int]: ...
 
     #: Status of the election or vote
     @declared_attr  # type:ignore[no-redef]
-    def status(cls) -> 'Column[Status | None]':
+    def status(cls) -> Column[Status | None]:
         return Column(
             Enum(  # type:ignore[arg-type]
                 'unknown',
@@ -170,7 +173,7 @@ class IdFromTitlesMixin:
             or self.get_title(locale, default_locale)
         )
 
-    def id_from_title(self, session: 'Session') -> str:
+    def id_from_title(self, session: Session) -> str:
         """ Returns a unique, user friendly id derived from the title. """
 
         session_manager = self.session_manager
@@ -187,7 +190,7 @@ class IdFromTitlesMixin:
             id = increment_name(id)
 
 
-def summarized_property(name: str) -> 'Column[int]':
+def summarized_property(name: str) -> Column[int]:
     """ Adds an attribute as hybrid_property which returns the sum of the
     underlying results if called.
 
@@ -215,7 +218,7 @@ def summarized_property(name: str) -> 'Column[int]':
     def getter(self: Any) -> int:
         return self.aggregate_results(name)
 
-    def expression(cls: type[Any]) -> 'ColumnElement[int]':
+    def expression(cls: type[Any]) -> ColumnElement[int]:
         return cls.aggregate_results_expression(name)
 
     return hybrid_property(getter, expr=expression)  # type:ignore
@@ -228,17 +231,17 @@ class LastModifiedMixin(TimestampMixin):
         last_modified: Column[datetime | None]
 
     @declared_attr  # type:ignore[no-redef]
-    def last_result_change(cls) -> 'Column[datetime | None]':
+    def last_result_change(cls) -> Column[datetime | None]:
         return Column(UTCDateTime)
 
     @hybrid_property  # type:ignore[no-redef]
-    def last_modified(self) -> 'datetime | None':
+    def last_modified(self) -> datetime | None:
         changes = [self.last_change, self.last_result_change]
         changes = [change for change in changes if change]
         return max(changes) if changes else None
 
     @last_modified.expression  # type:ignore[no-redef]
-    def last_modified(cls) -> 'ColumnElement[datetime | None]':
+    def last_modified(cls) -> ColumnElement[datetime | None]:
         return func.greatest(cls.last_change, cls.last_result_change)
 
 

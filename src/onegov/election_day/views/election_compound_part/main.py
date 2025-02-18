@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 from morepath import redirect
 from onegov.election_day import ElectionDayApp
 from onegov.election_day.layouts import ElectionCompoundPartLayout
@@ -28,11 +30,11 @@ if TYPE_CHECKING:
 )
 def view_election_compound_part_head(
     self: ElectionCompoundPart,
-    request: 'ElectionDayRequest'
+    request: ElectionDayRequest
 ) -> None:
 
     @request.after
-    def add_headers(response: 'Response') -> None:
+    def add_headers(response: Response) -> None:
         add_cors_header(response)
         add_last_modified_header(response, self.last_modified)
 
@@ -43,8 +45,8 @@ def view_election_compound_part_head(
 )
 def view_election_compound_part(
     self: ElectionCompoundPart,
-    request: 'ElectionDayRequest'
-) -> 'Response':
+    request: ElectionDayRequest
+) -> Response:
     """" The main view. """
 
     return redirect(ElectionCompoundPartLayout(self, request).main_view)
@@ -57,15 +59,15 @@ def view_election_compound_part(
 )
 def view_election_compound_part_json(
     self: ElectionCompoundPart,
-    request: 'ElectionDayRequest'
-) -> 'JSON_ro':
+    request: ElectionDayRequest
+) -> JSON_ro:
     """" The main view as JSON. """
 
     last_modified = self.last_modified
     assert last_modified is not None
 
     @request.after
-    def add_headers(response: 'Response') -> None:
+    def add_headers(response: Response) -> None:
         add_cors_header(response)
         add_last_modified_header(response, last_modified)
 
@@ -100,7 +102,7 @@ def view_election_compound_part_json(
         for election in self.elections
     }
 
-    years, parties = get_party_results(self, json_serializable=True)
+    _years, parties = get_party_results(self, json_serializable=True)
 
     return {
         'completed': self.completed,
@@ -146,12 +148,12 @@ def view_election_compound_part_json(
 )
 def view_election_compound_part_summary(
     self: ElectionCompoundPart,
-    request: 'ElectionDayRequest'
-) -> 'JSON_ro':
+    request: ElectionDayRequest
+) -> JSON_ro:
     """ View the summary of the election compound part as JSON. """
 
     @request.after
-    def add_headers(response: 'Response') -> None:
+    def add_headers(response: Response) -> None:
         add_cors_header(response)
         add_last_modified_header(response, self.last_modified)
 

@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 from onegov.core.security import Secret
 from onegov.org.views.dashboard import dashboard
 from onegov.town6 import TownApp
@@ -12,5 +14,5 @@ if TYPE_CHECKING:
 
 
 @TownApp.html(model=Dashboard, template='dashboard.pt', permission=Secret)
-def town_dashboard(self: Dashboard, request: 'TownRequest') -> 'RenderData':
+def town_dashboard(self: Dashboard, request: TownRequest) -> RenderData:
     return dashboard(self, request, DashboardLayout(self, request))

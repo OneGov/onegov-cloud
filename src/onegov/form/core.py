@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 import weakref
 
 from collections import OrderedDict
@@ -123,7 +125,7 @@ class Form(BaseForm):
             stamps = IntegerRangeField(
             'No. Stamps',
             range=range(0, 30),
-            pricing={range(0, 30): (0.85, 'CHF')}
+            pricing={range(0, 30): (1.00, 'CHF')}
         )
 
             delivery = RadioField('Delivery', choices=[
@@ -146,7 +148,7 @@ class Form(BaseForm):
 
     """
 
-    fieldsets: list['Fieldset']
+    fieldsets: list[Fieldset]
     hidden_fields: set[str]
 
     if TYPE_CHECKING:
@@ -154,7 +156,7 @@ class Form(BaseForm):
         #        meta, since that is where data like that is supposed to live
         #        but it'll be a pain to find everywhere we access request
         #        through anything other than meta.
-        request: 'CoreRequest'
+        request: CoreRequest
         model: Any
 
         # NOTE: While action isn't guaranteed to be set, it almost always will
@@ -164,13 +166,13 @@ class Form(BaseForm):
 
     def __init__(
         self,
-        formdata: 'MultiDict[str, Any] | None' = None,
+        formdata: MultiDict[str, Any] | None = None,
         obj: object | None = None,
         prefix: str = '',
         data: dict[str, Any] | None = None,
         meta: dict[str, Any] | None = None,
         *,
-        extra_filters: 'Mapping[str, Sequence[Any]] | None' = None,
+        extra_filters: Mapping[str, Sequence[Any]] | None = None,
         **kwargs: Any
     ):
 
@@ -203,7 +205,7 @@ class Form(BaseForm):
         self.hidden_fields = set()
 
     @classmethod
-    def clone(cls) -> type['Self']:
+    def clone(cls) -> type[Self]:
         """ Creates an independent copy of the form class.
 
         The fields of the so called class may be manipulated without affecting
@@ -222,7 +224,7 @@ class Form(BaseForm):
 
         return ClonedForm
 
-    def process_fieldset(self) -> 'Iterator[None]':
+    def process_fieldset(self) -> Iterator[None]:
         """ Processes the fieldset parameter on the fields, which puts
         fields into fieldsets.
 
@@ -267,7 +269,7 @@ class Form(BaseForm):
                 fields=(self._fields[field_id] for _, field_id in fields)
             ))
 
-    def process_depends_on(self) -> 'Iterator[None]':
+    def process_depends_on(self) -> Iterator[None]:
         """ Processes the depends_on parameter on the fields, which adds the
         ability to have fields depend on values of other fields.
 
@@ -340,7 +342,7 @@ class Form(BaseForm):
                 field.depends_on.html_data(self._prefix)
             )
 
-    def process_pricing(self) -> 'Iterator[None]':
+    def process_pricing(self) -> Iterator[None]:
         """ Processes the pricing parameter on the fields, which adds the
         ability to have fields associated with a price.
 
@@ -366,7 +368,7 @@ class Form(BaseForm):
         for field_id, pricing in pricings.items():
             self._fields[field_id].pricing = pricing
 
-    def render_display(self, field: 'Field') -> Markup | None:
+    def render_display(self, field: Field) -> Markup | None:
         """ Renders the given field for display (no input). May be overwritten
         by descendants to return different html, or to return None.
 
@@ -398,7 +400,7 @@ class Form(BaseForm):
             for d in depends_on.dependencies
         )
 
-    def is_hidden(self, field: 'Field') -> bool:
+    def is_hidden(self, field: Field) -> bool:
         """ True if the given field should be hidden. The effect of this is
         left to the application (it might not render the field, or add a
         class which hides the field).
@@ -406,11 +408,11 @@ class Form(BaseForm):
         """
         return field.id in self.hidden_fields
 
-    def hide(self, field: 'Field') -> None:
+    def hide(self, field: Field) -> None:
         """ Marks the given field as hidden. """
         self.hidden_fields.add(field.id)
 
-    def show(self, field: 'Field') -> None:
+    def show(self, field: Field) -> None:
         """ Marks the given field as visibile. """
         self.hidden_fields.discard(field.id)
 
@@ -453,7 +455,7 @@ class Form(BaseForm):
             )
         )
 
-    def submitted(self, request: 'CoreRequest') -> bool:
+    def submitted(self, request: CoreRequest) -> bool:
         """ Returns true if the given request is a successful post request. """
         return request.POST and self.validate() or False
 
@@ -491,8 +493,8 @@ class Form(BaseForm):
 
     def match_fields(
         self,
-        include_classes: 'Iterable[type[Field]] | None' = None,
-        exclude_classes: 'Iterable[type[Field]] | None' = None,
+        include_classes: Iterable[type[Field]] | None = None,
+        exclude_classes: Iterable[type[Field]] | None = None,
         required: bool | None = None,
         limit: int | None = None
     ) -> list[str]:
@@ -556,7 +558,7 @@ class Form(BaseForm):
 
     def get_useful_data(
         self,
-        exclude: 'Collection[str] | None' = None
+        exclude: Collection[str] | None = None
     ) -> dict[str, Any]:
         """ Returns the form data in a dictionary, by default excluding data
         that should not be stored in the db backend.
@@ -572,8 +574,8 @@ class Form(BaseForm):
     def populate_obj(
         self,
         obj: object,
-        exclude: 'Collection[str] | None' = None,
-        include: 'Collection[str] | None' = None
+        exclude: Collection[str] | None = None,
+        include: Collection[str] | None = None
     ) -> None:
         """ A reimplementation of wtforms populate_obj function with the addage
         of optional include/exclude filters.
@@ -593,10 +595,10 @@ class Form(BaseForm):
 
     def process(
         self,
-        formdata: '_MultiDictLike | None' = None,
+        formdata: _MultiDictLike | None = None,
         obj: object | None = None,
-        data: 'Mapping[str, Any] | None' = None,
-        extra_filters: 'Mapping[str, Sequence[Any]] | None' = None,
+        data: Mapping[str, Any] | None = None,
+        extra_filters: Mapping[str, Sequence[Any]] | None = None,
         **kwargs: Any
     ) -> None:
         """ Calls :meth:`process_obj` if ``process()`` was called with
@@ -624,12 +626,11 @@ class Form(BaseForm):
         call ``form.process(obj=obj)`` instead.
 
         """
-        pass
 
     def delete_field(self, fieldname: str) -> None:
         """ Removes the given field from the form and all the fieldsets. """
 
-        def fieldsets_without_field() -> 'Iterator[Fieldset]':
+        def fieldsets_without_field() -> Iterator[Fieldset]:
             for fieldset in self.fieldsets:
                 if fieldname in fieldset.fields:
                     del fieldset.fields[fieldname]
@@ -643,7 +644,7 @@ class Form(BaseForm):
 
     def validate(
         self,
-        extra_validators: 'Mapping[str, Sequence[Any]] | None' = None
+        extra_validators: Mapping[str, Sequence[Any]] | None = None
     ) -> bool:
         """ Adds support for 'ensurances' to the form. An ensurance is a
         method which is called during validation when all the fields have
@@ -671,7 +672,7 @@ class Form(BaseForm):
         return result
 
     @property
-    def ensurances(self) -> 'Iterator[Callable[[], bool]]':
+    def ensurances(self) -> Iterator[Callable[[], bool]]:
         """ Returns the ensurances that need to be checked when validating.
 
         This property may be overridden if only a subset of all ensurances
@@ -703,12 +704,12 @@ class Form(BaseForm):
 
     def additional_field_help(
         self,
-        field: 'Field',
+        field: Field,
         length_limit: int = 54
     ) -> str | None:
         """ Returns the field description in modified form if
-         the description should be rendered separately in the field macro.
-         """
+        the description should be rendered separately in the field macro.
+        """
         if hasattr(field, 'long_description'):
             return field.long_description
         if 'long_description' in (getattr(field, 'render_kw', {}) or {}):
@@ -728,9 +729,9 @@ class Form(BaseForm):
 class Fieldset:
     """ Defines a fieldset with a list of fields. """
 
-    fields: dict[str, 'CallableProxyType[Field]']
+    fields: dict[str, CallableProxyType[Field]]
 
-    def __init__(self, label: str | None, fields: 'Iterable[Field]'):
+    def __init__(self, label: str | None, fields: Iterable[Field]):
         """ Initializes the Fieldset.
 
         :label: Label of the fieldset (None if it's an invisible fieldset)
@@ -745,7 +746,7 @@ class Fieldset:
     def __len__(self) -> int:
         return len(self.fields)
 
-    def __getitem__(self, key: str) -> 'CallableProxyType[Field]':
+    def __getitem__(self, key: str) -> CallableProxyType[Field]:
         return self.fields[key]
 
     @property
@@ -753,7 +754,7 @@ class Fieldset:
         return self.label is not None
 
     @property
-    def non_empty_fields(self) -> dict[str, 'CallableProxyType[Field]']:
+    def non_empty_fields(self) -> dict[str, CallableProxyType[Field]]:
         """ Returns only the fields which are not empty. """
         return OrderedDict(
             (id, field) for id, field in self.fields.items() if field.data)
@@ -775,7 +776,7 @@ class FieldDependency:
 
     """
 
-    dependencies: list['DependencyDict']
+    dependencies: list[DependencyDict]
 
     def __init__(self, *kwargs: object):
         assert len(kwargs) and not len(kwargs) % 2
@@ -805,7 +806,7 @@ class FieldDependency:
                 'choice': choice,
             })
 
-    def fulfilled(self, form: Form, field: 'Field') -> bool:
+    def fulfilled(self, form: Form, field: Field) -> bool:
         result = True
         for dependency in self.dependencies:
             data = getattr(form, dependency['field_id']).data
@@ -818,7 +819,7 @@ class FieldDependency:
             result = result and ((data == choice) ^ invert)
         return result
 
-    def unfulfilled(self, form: Form, field: 'Field') -> bool:
+    def unfulfilled(self, form: Form, field: Field) -> bool:
         return not self.fulfilled(form, field)
 
     @property
@@ -840,7 +841,7 @@ class Pricing:
 
     """
 
-    def __init__(self, rules: 'PricingRules'):
+    def __init__(self, rules: PricingRules):
         self.rules = {
             rule: Price(
                 amount,
@@ -856,7 +857,7 @@ class Pricing:
             price.credit_card_payment for price in self.rules.values()
         )
 
-    def price(self, field: 'Field') -> Price | None:
+    def price(self, field: Field) -> Price | None:
         values = field.data
         if not isinstance(field.data, list):
             values = [values]
@@ -940,7 +941,7 @@ def merge_forms(form: type[_FormT], /, *forms: type[Form]) -> type[_FormT]:
 
 def enforce_order(
     form_class: type[_FormT],
-    fields_in_order: 'Iterable[str]'
+    fields_in_order: Iterable[str]
 ) -> type[_FormT]:
     """ Takes a list of fields used in a form_class and enforces the
     order of those fields.
@@ -971,7 +972,7 @@ def enforce_order(
 
 def move_fields(
     form_class: type[_FormT],
-    fields: 'Collection[str]',
+    fields: Collection[str],
     after: str | None
 ) -> type[_FormT]:
     """ Reorders the given fields (given by name) by inserting them directly

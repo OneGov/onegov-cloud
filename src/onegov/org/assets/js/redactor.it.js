@@ -42,6 +42,8 @@ $.Redactor.opts.langs['it'] = {
 	add_head: 'Aggiungi titolo',
 	delete_head: 'Elimina titolo',
 	title: 'Titolo',
+	subtitle: 'Sottotitolo',
+	subsubtitle: 'Sotto-Sottotitolo',
 	image_position: 'Posizione',
 	none: 'Nessuno',
 	left: 'Sinistra',

@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 from decimal import Decimal
 from onegov.activity.models import Occasion, OccasionDate
 from onegov.activity.types import BoundedIntegerRange
@@ -30,14 +32,14 @@ class OccasionCollection(GenericCollection[Occasion]):
 
     def add(  # type:ignore[override]
         self,
-        activity: 'Activity',
-        period: 'Period',
-        start: 'datetime',
-        end: 'datetime',
+        activity: Activity,
+        period: Period,
+        start: datetime,
+        end: datetime,
         timezone: str,
         meeting_point: str | None = None,
-        age: 'Sequence[int] | None' = None,
-        spots: 'Sequence[int] | None' = None,
+        age: Sequence[int] | None = None,
+        spots: Sequence[int] | None = None,
         note: str | None = None,
         cost: Decimal = Decimal(0),
         exclude_from_overlap_check: bool = False
@@ -61,8 +63,8 @@ class OccasionCollection(GenericCollection[Occasion]):
     def add_date(
         self,
         occasion: Occasion,
-        start: 'datetime',
-        end: 'datetime',
+        start: datetime,
+        end: datetime,
         timezone: str
     ) -> OccasionDate:
 
@@ -83,8 +85,8 @@ class OccasionCollection(GenericCollection[Occasion]):
     def find_date(
         self,
         occasion: Occasion,
-        start: 'datetime',
-        end: 'datetime',
+        start: datetime,
+        end: datetime,
         timezone: str
     ) -> OccasionDate | None:
 

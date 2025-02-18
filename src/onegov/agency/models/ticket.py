@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 from functools import cached_property
 from markupsafe import Markup
 from onegov.agency.collections import ExtendedAgencyCollection
@@ -31,9 +33,9 @@ class AgencyMutationTicket(OrgTicketMixin, Ticket):
 
     if TYPE_CHECKING:
         @property
-        def handler(self) -> 'AgencyMutationHandler': ...
+        def handler(self) -> AgencyMutationHandler: ...
 
-    def reference_group(self, request: 'OrgRequest') -> str:
+    def reference_group(self, request: OrgRequest) -> str:
         return self.title
 
 
@@ -43,9 +45,9 @@ class PersonMutationTicket(OrgTicketMixin, Ticket):
 
     if TYPE_CHECKING:
         @property
-        def handler(self) -> 'PersonMutationHandler': ...
+        def handler(self) -> PersonMutationHandler: ...
 
-    def reference_group(self, request: 'OrgRequest') -> str:
+    def reference_group(self, request: OrgRequest) -> str:
         return self.title
 
 
@@ -60,7 +62,7 @@ class AgencyMutationHandler(Handler):
         return ExtendedAgencyCollection(self.session)
 
     @cached_property
-    def agency(self) -> 'ExtendedAgency | None':
+    def agency(self) -> ExtendedAgency | None:
         return self.collection.by_id(self.data['handler_data']['id'])
 
     @cached_property
@@ -109,7 +111,7 @@ class AgencyMutationHandler(Handler):
 
     def get_summary(
         self,
-        request: 'AgencyRequest'  # type:ignore[override]
+        request: AgencyRequest  # type:ignore[override]
     ) -> Markup:
 
         layout = AgencyLayout(self.agency, request)
@@ -125,7 +127,7 @@ class AgencyMutationHandler(Handler):
             }
         )
 
-    def get_links(self, request: 'AgencyRequest') -> list[Link]:  # type:ignore
+    def get_links(self, request: AgencyRequest) -> list[Link]:  # type:ignore
         if self.deleted:
             return []
 
@@ -166,7 +168,7 @@ class PersonMutationHandler(Handler):
         return ExtendedPersonCollection(self.session)
 
     @cached_property
-    def person(self) -> 'ExtendedPerson | None':
+    def person(self) -> ExtendedPerson | None:
         return self.collection.by_id(self.data['handler_data']['id'])
 
     @cached_property
@@ -215,7 +217,7 @@ class PersonMutationHandler(Handler):
 
     def get_summary(
         self,
-        request: 'AgencyRequest'  # type:ignore[override]
+        request: AgencyRequest  # type:ignore[override]
     ) -> Markup:
 
         layout = ExtendedPersonLayout(self.person, request)
@@ -231,7 +233,7 @@ class PersonMutationHandler(Handler):
             }
         )
 
-    def get_links(self, request: 'AgencyRequest') -> list[Link]:  # type:ignore
+    def get_links(self, request: AgencyRequest) -> list[Link]:  # type:ignore
         if self.deleted:
             return []
 

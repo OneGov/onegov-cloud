@@ -30,6 +30,7 @@ widget variables need to be injected before rendering::
     template.render(**inject_variables(widgets, layout, structure))
 
 """
+from __future__ import annotations
 
 from lxml import etree
 from wtforms.validators import ValidationError
@@ -94,9 +95,9 @@ XML_LINE_OFFSET = 6
 
 
 def parse_structure(
-    widgets: 'Collection[Widget]',
+    widgets: Collection[Widget],
     structure: str
-) -> 'etree._Element':
+) -> etree._Element:
     """ Takes the XML structure and returns the parsed etree xml.
 
     Raises a wtforms.ValidationError if there's an element which is not
@@ -135,12 +136,13 @@ def parse_structure(
                 raise ValidationError('Namespaced attributes are not allowed')
 
         if element.tag not in valid_tags:
-            raise ValidationError("Invalid element '<{}>'".format(element.tag))
+            raise ValidationError(
+                "Invalid element '<{}>'".format(element.tag))  # type:ignore
 
     return xml_tree
 
 
-def transform_structure(widgets: 'Collection[Widget]', structure: str) -> str:
+def transform_structure(widgets: Collection[Widget], structure: str) -> str:
     """ Takes the XML structure and transforms it into a chameleon template.
 
     The app is required as it contains the available widgets.
@@ -157,8 +159,8 @@ def transform_structure(widgets: 'Collection[Widget]', structure: str) -> str:
 
 @overload
 def inject_variables(
-    widgets: 'Collection[Widget]',
-    layout: 'Layout',
+    widgets: Collection[Widget],
+    layout: Layout,
     structure: Literal[''] | None,
     variables: None = None,
     unique_variable_names: bool = True
@@ -167,41 +169,41 @@ def inject_variables(
 
 @overload
 def inject_variables(
-    widgets: 'Collection[Widget]',
-    layout: 'Layout',
+    widgets: Collection[Widget],
+    layout: Layout,
     structure: Literal[''] | None,
-    variables: 'RenderData',
+    variables: RenderData,
     unique_variable_names: bool = True
-) -> 'RenderData': ...
+) -> RenderData: ...
 
 
 @overload
 def inject_variables(
-    widgets: 'Collection[Widget]',
-    layout: 'Layout',
+    widgets: Collection[Widget],
+    layout: Layout,
     structure: str,
     variables: None = None,
     unique_variable_names: bool = True
-) -> 'RenderData | None': ...
+) -> RenderData | None: ...
 
 
 @overload
 def inject_variables(
-    widgets: 'Collection[Widget]',
-    layout: 'Layout',
+    widgets: Collection[Widget],
+    layout: Layout,
     structure: str | None,
-    variables: 'RenderData',
+    variables: RenderData,
     unique_variable_names: bool = True
-) -> 'RenderData': ...
+) -> RenderData: ...
 
 
 def inject_variables(
-    widgets: 'Collection[Widget]',
-    layout: 'Layout',
+    widgets: Collection[Widget],
+    layout: Layout,
     structure: str | None,
-    variables: 'RenderData | None' = None,
+    variables: RenderData | None = None,
     unique_variable_names: bool = True
-) -> 'RenderData | None':
+) -> RenderData | None:
     """ Takes the widgets, layout, structure and a dict of variables meant
     for the template engine and injects the variables required by the widgets,
     if the widgets are indeed in use.

@@ -1,4 +1,5 @@
 """ Renders a onegov.page. """
+from __future__ import annotations
 
 import morepath
 from markupsafe import Markup
@@ -25,7 +26,7 @@ if TYPE_CHECKING:
 
 @OrgApp.view(model=Topic, request_method='DELETE', permission=Private)
 @OrgApp.view(model=News, request_method='DELETE', permission=Private)
-def delete_page(self: Topic | News, request: 'OrgRequest') -> None:
+def delete_page(self: Topic | News, request: OrgRequest) -> None:
     request.assert_valid_csrf_token()
 
     if not self.deletable:
@@ -43,9 +44,9 @@ def delete_page(self: Topic | News, request: 'OrgRequest') -> None:
 @OrgApp.html(model=Topic, template='topic.pt', permission=Public)
 def view_topic(
     self: Topic,
-    request: 'OrgRequest',
+    request: OrgRequest,
     layout: PageLayout | None = None
-) -> 'RenderData | Response':
+) -> RenderData | Response:
 
     assert self.trait in {'link', 'page', 'iframe'}
 
@@ -58,6 +59,8 @@ def view_topic(
             return morepath.redirect(self.content['url'])
 
     layout = layout or PageLayout(self, request)
+    if self.photo_album_id:
+        request.include('photoswipe')
 
     if request.is_manager:
         layout.editbar_links = self.get_editbar_links(request)
@@ -122,9 +125,9 @@ def view_topic(
 @OrgApp.html(model=News, template='news.pt', permission=Public)
 def view_news(
     self: News,
-    request: 'OrgRequest',
+    request: OrgRequest,
     layout: NewsLayout | None = None
-) -> 'RenderData | Response':
+) -> RenderData | Response:
 
     layout = layout or NewsLayout(self, request)
 
@@ -209,6 +212,8 @@ def view_news(
 
     if request.is_manager:
         layout.editbar_links = list(self.get_editbar_links(request))
+    if self.photo_album_id:
+        request.include('photoswipe')
 
     assert self.trait is not None
     return {

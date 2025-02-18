@@ -1,6 +1,7 @@
+from __future__ import annotations
+
 from datetime import timedelta
 import transaction
-from sqlalchemy.exc import IntegrityError
 from wtforms.validators import DataRequired
 from onegov.core.csv import convert_excel_to_csv, CSVFile
 from onegov.form.fields import UploadField
@@ -53,26 +54,26 @@ class NewsletterForm(Form):
 
     # FIXME: Why are we passing the request in? It should alread be stored on
     #        the form itself.
-    def update_model(self, model: 'Newsletter', request: 'OrgRequest') -> None:
+    def update_model(self, model: Newsletter, request: OrgRequest) -> None:
         assert self.title.data is not None
         model.title = self.title.data
         model.lead = self.lead.data
         model.html = self.get_html(request)
 
-    def apply_model(self, model: 'Newsletter') -> None:
+    def apply_model(self, model: Newsletter) -> None:
         self.title.data = model.title
         self.lead.data = model.lead
 
     # FIXME: same here
-    def get_html(self, request: 'OrgRequest') -> str:
+    def get_html(self, request: OrgRequest) -> str:
         return ''
 
     @classmethod
     def with_news(
         cls,
-        request: 'OrgRequest',
-        news: 'Iterable[News]'
-    ) -> type['Self']:
+        request: OrgRequest,
+        news: Iterable[News]
+    ) -> type[Self]:
 
         # FIXME: using a layout just for format_date seems bad, we should
         #        probably extract these functions into util modules
@@ -114,8 +115,8 @@ class NewsletterForm(Form):
 
             def update_model(
                 self,
-                model: 'Newsletter',
-                request: 'OrgRequest'  # FIXME: same here
+                model: Newsletter,
+                request: OrgRequest  # FIXME: same here
             ) -> None:
 
                 super().update_model(model, request)
@@ -123,7 +124,7 @@ class NewsletterForm(Form):
                 model.content['show_news_as_tiles'] = (
                     self.show_news_as_tiles.data)
 
-            def apply_model(self, model: 'Newsletter') -> None:
+            def apply_model(self, model: Newsletter) -> None:
                 super().apply_model(model)
                 self.news.data = model.content.get('news')
                 self.show_news_as_tiles.data = model.content.get(
@@ -134,9 +135,9 @@ class NewsletterForm(Form):
     @classmethod
     def with_occurrences(
         cls,
-        request: 'OrgRequest',
-        occurrences: 'Iterable[Occurrence]'
-    ) -> type['Self']:
+        request: OrgRequest,
+        occurrences: Iterable[Occurrence]
+    ) -> type[Self]:
 
         # FIXME: another use of layout for format_date
         layout = Layout(None, request)
@@ -170,14 +171,14 @@ class NewsletterForm(Form):
 
             def update_model(
                 self,
-                model: 'Newsletter',
-                request: 'OrgRequest'  # FIXME: same here
+                model: Newsletter,
+                request: OrgRequest  # FIXME: same here
             ) -> None:
 
                 super().update_model(model, request)
                 model.content['occurrences'] = self.occurrences.data
 
-            def apply_model(self, model: 'Newsletter') -> None:
+            def apply_model(self, model: Newsletter) -> None:
                 super().apply_model(model)
                 self.occurrences.data = model.content.get('occurrences')
 
@@ -186,9 +187,9 @@ class NewsletterForm(Form):
     @classmethod
     def with_publications(
         cls,
-        request: 'OrgRequest',
-        publications: 'Iterable[File]'
-    ) -> type['Self']:
+        request: OrgRequest,
+        publications: Iterable[File]
+    ) -> type[Self]:
 
         # FIXME: another use of layout for format_date
         layout = Layout(None, request)
@@ -222,14 +223,14 @@ class NewsletterForm(Form):
 
             def update_model(
                 self,
-                model: 'Newsletter',
-                request: 'OrgRequest'  # FIXME: same here
+                model: Newsletter,
+                request: OrgRequest  # FIXME: same here
             ) -> None:
 
                 super().update_model(model, request)
                 model.content['publications'] = self.publications.data
 
-            def apply_model(self, model: 'Newsletter') -> None:
+            def apply_model(self, model: Newsletter) -> None:
                 super().apply_model(model)
                 self.publications.data = model.content.get('publications')
 
@@ -299,8 +300,11 @@ class NewsletterSendForm(Form):
 
         for cat, sub in zip(categories, subcategories):
             choices.append((cat, cat))
-            for s in sub:
-                choices.append((f'{s}', f'\xa0\xa0\xa0{s}'))
+            choices.extend((s, f'\xa0\xa0\xa0{s}') for s in sub)
+
+        if not choices:
+            self.delete_field('categories')
+            return
 
         self.categories.choices = choices
 
@@ -374,7 +378,7 @@ class NewsletterSubscriberImportExportForm(Form):
             self.request.session).ordered_by_status_address()
         headers = self.headers
 
-        def get(recipient: Recipient, attribute: str) -> str | bool:
+        def get(recipient: Recipient, attribute: str) -> Any:
             result = getattr(recipient, attribute, '')
             if isinstance(result, str):
                 return result.strip()
@@ -383,13 +387,13 @@ class NewsletterSubscriberImportExportForm(Form):
             else:
                 return result
 
-        result = []
-        for recipient in recipients.all():
-            result.append({
+        return [
+            {
                 v: get(recipient, k)
                 for k, v in headers.items()
-            })
-        return result
+            }
+            for recipient in recipients
+        ]
 
     def run_import(self) -> tuple[int, list[str]]:
         headers = self.headers
@@ -399,13 +403,12 @@ class NewsletterSubscriberImportExportForm(Form):
             assert self.file.file is not None
             csvfile = convert_excel_to_csv(self.file.file)
         except Exception:
-            return 0, ['0']
-
+            return 0, ['Error converting file']
         try:
             # dialect needs to be set, else error
             csv = CSVFile(csvfile, dialect='excel')
         except Exception:
-            return 0, ['0']
+            return 0, ['Error reading CSV file']
 
         lines = list(csv.lines)
         columns = {
@@ -413,10 +416,11 @@ class NewsletterSubscriberImportExportForm(Form):
             for key, value in headers.items()
         }
 
-        def get(line: 'DefaultRow', column: str) -> Any:
+        def get(line: DefaultRow, column: str) -> Any:
             return getattr(line, column)
 
         count = 0
+        skipped = 0
         errors = []
         for number, line in enumerate(lines, start=1):
             try:
@@ -425,17 +429,23 @@ class NewsletterSubscriberImportExportForm(Form):
                     for attribute, column in columns.items()
                 }
                 kwargs['confirmed'] = True
+                address = next(iter(kwargs.values()))
+                if recipients.by_address(address):
+                    # silently skip duplicates
+                    skipped += 1
+                    continue
                 recipients.add(**kwargs)
                 count += 1
-            except IntegrityError:
-                message = str(number) + self.request.translate(
-                    _(': (Address already exists)')
-                )
-                errors.append(message)
-            except Exception:
-                errors.append(str(number))
+            except Exception as e:
+                error_msg = f'Error on line {number}: {e!s}'
+                errors.append(error_msg)
 
-        if self.dry_run.data or errors:
+        if self.dry_run.data:
             transaction.abort()
 
-        return count, errors
+        summary = [f'Imported: {count}, Skipped duplicates: {skipped}']
+        if errors:
+            summary.append(f'Errors: {len(errors)}')
+            summary.extend(errors)
+
+        return count, summary

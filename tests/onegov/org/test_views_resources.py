@@ -156,7 +156,7 @@ def test_resources_explicitly_link_referenced_files(client):
     path = module_path('tests.onegov.org', 'fixtures/sample.pdf')
     with open(path, 'rb') as f:
         page = admin.get('/files')
-        page.form['file'] = Upload('Sample.pdf', f.read(), 'application/pdf')
+        page.form['file'] = [Upload('Sample.pdf', f.read(), 'application/pdf')]
         page.form.submit()
 
     pdf_url = (
@@ -2260,10 +2260,51 @@ def test_allocation_rules_on_rooms(client):
 
     assert count_allocations() == 7
 
-    page = client.get('/resource/room').click("Regeln")
-    page.click('Löschen')
 
-    assert count_allocations() == 1
+
+def test_allocation_rules_edit(client):
+    client.login_admin()
+
+    resources = client.get('/resources')
+
+    page = resources.click('Raum')
+    page.form['title'] = 'Room'
+    page.form.submit()
+
+    def count_allocations():
+        s = '2000-01-01'
+        e = '2050-01-31'
+
+        return len(client.get(f'/resource/room/slots?start={s}&end={e}').json)
+
+    def run_cronjob():
+        client.get('/resource/room/process-rules')
+
+    page = client.get('/resource/room').click("Regeln").click("Regel")
+    page.form['title'] = 'Täglich'
+    page.form['extend'] = 'daily'
+    page.form['start'] = '2019-01-01'
+    page.form['end'] = '2019-01-02'
+    page.form['as_whole_day'] = 'yes'
+
+    page.select_checkbox('except_for', "Sa")
+    page.select_checkbox('except_for', "So")
+
+    page = page.form.submit().follow()
+
+    assert 'Regel aktiv, 2 Einteilungen erstellt' in page
+    assert count_allocations() == 2
+
+    # Modifying the rule applies changes where possible, but
+    # existing reserved slots remain unaffected.
+    edit_page = client.get('/resource/room')
+    edit_page = edit_page.click('Regeln').click('Bearbeiten')
+    form = edit_page.form
+    form['title'] = 'Renamed room'
+
+    edit_page = form.submit().follow()
+
+    assert 'Renamed room' in edit_page
 
 
 def test_allocation_rules_on_daypasses(client):

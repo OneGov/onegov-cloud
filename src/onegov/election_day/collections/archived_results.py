@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 from collections import OrderedDict
 from datetime import date
 from itertools import groupby
@@ -54,55 +56,55 @@ if TYPE_CHECKING:
 
 @overload
 def groupbydict(
-    items: 'Iterable[_T1]',
-    keyfunc: 'Callable[[_T1], _TSupportsRichComparison]',
+    items: Iterable[_T1],
+    keyfunc: Callable[[_T1], _TSupportsRichComparison],
     sortfunc: None = None,
-    groupfunc: 'Callable[[Iterable[_T1]], list[_T1]]' = list,
-) -> dict['_TSupportsRichComparison', list['_T1']]: ...
+    groupfunc: Callable[[Iterable[_T1]], list[_T1]] = list,
+) -> dict[_TSupportsRichComparison, list[_T1]]: ...
 
 
 @overload
 def groupbydict(
-    items: 'Iterable[_T1]',
-    keyfunc: 'Callable[[_T1], _T2]',
-    sortfunc: 'Callable[[_T1], SupportsRichComparison]',
-    groupfunc: 'Callable[[Iterable[_T1]], list[_T1]]' = list,
-) -> dict['_T2', list['_T1']]: ...
+    items: Iterable[_T1],
+    keyfunc: Callable[[_T1], _T2],
+    sortfunc: Callable[[_T1], SupportsRichComparison],
+    groupfunc: Callable[[Iterable[_T1]], list[_T1]] = list,
+) -> dict[_T2, list[_T1]]: ...
 
 
 @overload
 def groupbydict(
-    items: 'Iterable[_T1]',
-    keyfunc: 'Callable[[_T1], _TSupportsRichComparison]',
+    items: Iterable[_T1],
+    keyfunc: Callable[[_T1], _TSupportsRichComparison],
     sortfunc: None = None,
     *,
-    groupfunc: 'Callable[[Iterable[_T1]], _T2]',
-) -> dict['_TSupportsRichComparison', '_T2']: ...
+    groupfunc: Callable[[Iterable[_T1]], _T2],
+) -> dict[_TSupportsRichComparison, _T2]: ...
 
 
 @overload
 def groupbydict(
-    items: 'Iterable[_T1]',
-    keyfunc: 'Callable[[_T1], _TSupportsRichComparison]',
+    items: Iterable[_T1],
+    keyfunc: Callable[[_T1], _TSupportsRichComparison],
     sortfunc: None,
-    groupfunc: 'Callable[[Iterable[_T1]], _T2]',
-) -> dict['_TSupportsRichComparison', '_T2']: ...
+    groupfunc: Callable[[Iterable[_T1]], _T2],
+) -> dict[_TSupportsRichComparison, _T2]: ...
 
 
 @overload
 def groupbydict(
-    items: 'Iterable[_T1]',
-    keyfunc: 'Callable[[_T1], _T2]',
-    sortfunc: 'Callable[[_T1], SupportsRichComparison]',
-    groupfunc: 'Callable[[Iterable[_T1]], _T3]',
-) -> dict['_T2', '_T3']: ...
+    items: Iterable[_T1],
+    keyfunc: Callable[[_T1], _T2],
+    sortfunc: Callable[[_T1], SupportsRichComparison],
+    groupfunc: Callable[[Iterable[_T1]], _T3],
+) -> dict[_T2, _T3]: ...
 
 
 def groupbydict(
-    items: 'Iterable[_T1]',
-    keyfunc: 'Callable[[_T1], Any]',
-    sortfunc: 'Callable[[_T1], Any] | None' = None,
-    groupfunc: 'Callable[[Iterable[_T1]], Any]' = list
+    items: Iterable[_T1],
+    keyfunc: Callable[[_T1], Any],
+    sortfunc: Callable[[_T1], Any] | None = None,
+    groupfunc: Callable[[Iterable[_T1]], Any] = list
 ) -> dict[Any, Any]:
 
     return OrderedDict(
@@ -116,14 +118,14 @@ def groupbydict(
 
 class ArchivedResultCollection:
 
-    def __init__(self, session: 'Session', date_: str | None = None):
+    def __init__(self, session: Session, date_: str | None = None):
         self.session = session
         self.date = date_
 
-    def for_date(self, date_: str) -> 'Self':
+    def for_date(self, date_: str) -> Self:
         return self.__class__(self.session, date_)
 
-    def query(self) -> 'Query[ArchivedResult]':
+    def query(self) -> Query[ArchivedResult]:
         return self.session.query(ArchivedResult)
 
     def get_years(self) -> list[int]:
@@ -137,8 +139,8 @@ class ArchivedResultCollection:
 
     def group_items(
         self,
-        items: 'Collection[ArchivedResult]',
-        request: 'ElectionDayRequest'
+        items: Collection[ArchivedResult],
+        request: ElectionDayRequest
     ) -> dict[date, dict[str | None, dict[str, list[ArchivedResult]]]] | None:
         """ Groups a list of archived results.
 
@@ -188,7 +190,7 @@ class ArchivedResultCollection:
             )
         )
 
-    def current(self) -> tuple[list[ArchivedResult], 'datetime | None']:
+    def current(self) -> tuple[list[ArchivedResult], datetime | None]:
         """ Returns the current results.
 
         The current results are the results from either the next election day
@@ -212,7 +214,7 @@ class ArchivedResultCollection:
     def by_year(
         self,
         year: int
-    ) -> tuple[list[ArchivedResult], 'datetime | None']:
+    ) -> tuple[list[ArchivedResult], datetime | None]:
         """ Returns the results for the given year. """
 
         query = self.query()
@@ -234,7 +236,7 @@ class ArchivedResultCollection:
     def by_date(
         self,
         date_: date | None = None
-    ) -> tuple[list[ArchivedResult], 'datetime | None']:
+    ) -> tuple[list[ArchivedResult], datetime | None]:
         """ Returns the results of a given/current date. """
 
         if date_ is None:
@@ -271,7 +273,7 @@ class ArchivedResultCollection:
     def update(
         self,
         item: Election | ElectionCompound | Vote,
-        request: 'ElectionDayRequest',
+        request: ElectionDayRequest,
         old: str | None = None
     ) -> ArchivedResult:
         """ Updates a result. """
@@ -334,7 +336,7 @@ class ArchivedResultCollection:
 
         return result
 
-    def update_all(self, request: 'ElectionDayRequest') -> None:
+    def update_all(self, request: ElectionDayRequest) -> None:
         """ Updates all (local) results. """
 
         schema = self.session.info['schema']
@@ -354,15 +356,11 @@ class ArchivedResultCollection:
     def add(
         self,
         item: Election | ElectionCompound | Vote,
-        request: 'ElectionDayRequest'
+        request: ElectionDayRequest
     ) -> None:
         """ Add a new election or vote and create a result entry.  """
 
-        assert (
-            isinstance(item, Election)
-            or isinstance(item, ElectionCompound)
-            or isinstance(item, Vote)
-        )
+        assert isinstance(item, (Election, ElectionCompound, Vote))
 
         self.session.add(item)
         self.session.flush()
@@ -373,16 +371,12 @@ class ArchivedResultCollection:
     def clear_results(
         self,
         item: Election | ElectionCompound | Vote,
-        request: 'ElectionDayRequest',
+        request: ElectionDayRequest,
         clear_all: bool = False
     ) -> None:
         """ Clears the result of an election or vote.  """
 
-        assert (
-            isinstance(item, Election)
-            or isinstance(item, ElectionCompound)
-            or isinstance(item, Vote)
-        )
+        assert isinstance(item, (Election, ElectionCompound, Vote))
 
         item.clear_results(clear_all)
         self.update(item, request)
@@ -394,15 +388,11 @@ class ArchivedResultCollection:
     def delete(
         self,
         item: Election | ElectionCompound | Vote,
-        request: 'ElectionDayRequest'
+        request: ElectionDayRequest
     ) -> None:
         """ Deletes an election or vote and the associated result entry.  """
 
-        assert (
-            isinstance(item, Election)
-            or isinstance(item, ElectionCompound)
-            or isinstance(item, Vote)
-        )
+        assert isinstance(item, (Election, ElectionCompound, Vote))
 
         url = request.link(item)
         url = replace_url(url, request.app.principal.official_host)
@@ -422,7 +412,7 @@ class SearchableArchivedResultCollection(
 
     def __init__(
             self,
-            app: 'ElectionDayApp',
+            app: ElectionDayApp,
             date_: str | None = None,
             from_date: date | None = None,
             to_date: date | None = None,
@@ -447,14 +437,14 @@ class SearchableArchivedResultCollection(
     def __eq__(self, other: object) -> bool:
         return isinstance(other, self.__class__) and self.page == other.page
 
-    def subset(self) -> 'Query[ArchivedResult]':
+    def subset(self) -> Query[ArchivedResult]:
         return self.query()
 
     @property
     def page_index(self) -> int:
         return self.page
 
-    def page_by_index(self, index: int) -> 'Self':
+    def page_by_index(self, index: int) -> Self:
         return self.__class__(
             app=self.app,
             date_=self.date,
@@ -487,22 +477,26 @@ class SearchableArchivedResultCollection(
 
     @staticmethod
     def match_term(
-        column: 'ColumnElement[Any]',
+        column: ColumnElement[Any],
         language: str,
         term: str
-    ) -> 'ColumnElement[TSVECTOR | None]':
-        """ Usage:
-         model.filter(match_term(model.col, 'german', 'my search term')) """
+    ) -> ColumnElement[TSVECTOR | None]:
+        """ Generate a clause element for a given search term.
+
+        Usage::
+
+            model.filter(match_term(model.col, 'german', 'my search term'))
+        """
         document_tsvector = func.to_tsvector(language, column)
         ts_query_object = func.to_tsquery(language, term)
         return document_tsvector.op('@@')(ts_query_object)
 
     @staticmethod
     def filter_text_by_locale(
-        column: 'ColumnElement[Any]',
+        column: ColumnElement[Any],
         term: str,
         locale: str = 'en'
-    ) -> 'ColumnElement[TSVECTOR | None]':
+    ) -> ColumnElement[TSVECTOR | None]:
         """ Returns an SQLAlchemy filter statement based on the search term.
         If no locale is provided, it will use english as language.
 
@@ -530,8 +524,8 @@ class SearchableArchivedResultCollection(
 
     @property
     def term_filter(self) -> tuple[
-        'ColumnElement[TSVECTOR | None]',
-        'ColumnElement[TSVECTOR | None]'
+        ColumnElement[TSVECTOR | None],
+        ColumnElement[TSVECTOR | None]
     ]:
         term = SearchableArchivedResultCollection.term_to_tsquery_string(
             self.term
@@ -545,7 +539,7 @@ class SearchableArchivedResultCollection(
             )
         )
 
-    def query(self) -> 'Query[ArchivedResult]':
+    def query(self) -> Query[ArchivedResult]:
         query = self.session.query(ArchivedResult)
 
         if self.item_type:
@@ -630,7 +624,7 @@ class SearchableArchivedResultCollection(
     @classmethod
     def for_item_type(
         cls,
-        app: 'ElectionDayApp',
+        app: ElectionDayApp,
         item_type: Literal['vote', 'election'],
         *,
         date_: str | None = None,
@@ -641,13 +635,13 @@ class SearchableArchivedResultCollection(
         answers: list[str] | None = None,
         locale: str = 'de_CH',
         page: int = 0
-    ) -> 'Self': ...
+    ) -> Self: ...
 
     @overload
     @classmethod
     def for_item_type(
         cls,
-        app: 'ElectionDayApp',
+        app: ElectionDayApp,
         item_type: str | None,
         *,
         date_: str | None = None,
@@ -658,12 +652,12 @@ class SearchableArchivedResultCollection(
         answers: list[str] | None = None,
         locale: str = 'de_CH',
         page: int = 0
-    ) -> 'Self | None': ...
+    ) -> Self | None: ...
 
     @classmethod
     def for_item_type(
         cls,
-        app: 'ElectionDayApp',
+        app: ElectionDayApp,
         item_type: str | None,
         *,
         date_: str | None = None,
@@ -674,7 +668,7 @@ class SearchableArchivedResultCollection(
         answers: list[str] | None = None,
         locale: str = 'de_CH',
         page: int = 0
-    ) -> 'Self | None':
+    ) -> Self | None:
         if item_type in ('vote', 'election'):
             return cls(
                 app,

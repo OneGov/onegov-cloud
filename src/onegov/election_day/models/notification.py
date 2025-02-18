@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 from email.headerregistry import Address
 from itertools import chain
 from onegov.core.custom import json
@@ -43,7 +45,7 @@ class Notification(Base, TimestampMixin):
     #: subclasses of this class. See
     #: `<https://docs.sqlalchemy.org/en/improve_toc/\
     #: orm/extensions/declarative/inheritance.html>`_.
-    type: 'Column[str]' = Column(
+    type: Column[str] = Column(
         Text,
         nullable=False,
         default=lambda: 'generic'
@@ -55,33 +57,33 @@ class Notification(Base, TimestampMixin):
     }
 
     #: Identifies the notification
-    id: 'Column[uuid.UUID]' = Column(
+    id: Column[uuid.UUID] = Column(
         UUID,  # type:ignore[arg-type]
         primary_key=True,
         default=uuid4
     )
 
     #: The last update of the corresponding election/vote
-    last_modified: 'Column[datetime | None]' = Column(
+    last_modified: Column[datetime | None] = Column(
         UTCDateTime,
         nullable=True
     )
 
     #: The corresponding election id
-    election_id: 'Column[str | None]' = Column(
+    election_id: Column[str | None] = Column(
         Text,
         ForeignKey(Election.id, onupdate='CASCADE', ondelete='CASCADE'),
         nullable=True
     )
 
     #: The corresponding election
-    election: 'relationship[Election | None]' = relationship(
+    election: relationship[Election | None] = relationship(
         'Election',
         back_populates='notifications'
     )
 
     #: The corresponding election compound id
-    election_compound_id: 'Column[str | None]' = Column(
+    election_compound_id: Column[str | None] = Column(
         Text,
         ForeignKey(
             ElectionCompound.id, onupdate='CASCADE', ondelete='CASCADE'
@@ -90,20 +92,20 @@ class Notification(Base, TimestampMixin):
     )
 
     #: The corresponding election compound
-    election_compound: 'relationship[ElectionCompound | None]' = relationship(
+    election_compound: relationship[ElectionCompound | None] = relationship(
         'ElectionCompound',
         back_populates='notifications'
     )
 
     #: The corresponding vote id
-    vote_id: 'Column[str | None]' = Column(
+    vote_id: Column[str | None] = Column(
         Text,
         ForeignKey(Vote.id, onupdate='CASCADE', ondelete='CASCADE'),
         nullable=True
     )
 
     #: The corresponding vote
-    vote: 'relationship[Vote | None]' = relationship(
+    vote: relationship[Vote | None] = relationship(
         'Vote',
         back_populates='notifications'
     )
@@ -124,7 +126,7 @@ class Notification(Base, TimestampMixin):
 
     def trigger(
         self,
-        request: 'ElectionDayRequest',
+        request: ElectionDayRequest,
         model: Election | ElectionCompound | Vote
     ) -> None:
         """ Trigger the custom actions. """
@@ -138,7 +140,7 @@ class WebhookNotification(Notification):
 
     def trigger(
         self,
-        request: 'ElectionDayRequest',
+        request: ElectionDayRequest,
         model: Election | ElectionCompound | Vote
     ) -> None:
         """ Posts the summary of the given vote or election to the webhook
@@ -176,7 +178,7 @@ class EmailNotification(Notification):
 
     def set_locale(
         self,
-        request: 'ElectionDayRequest',
+        request: ElectionDayRequest,
         locale: str | None = None
     ) -> None:
         """ Changes the locale of the request.
@@ -193,10 +195,10 @@ class EmailNotification(Notification):
 
     def send_emails(
         self,
-        request: 'ElectionDayRequest',
-        elections: 'Sequence[Election]',
-        election_compounds: 'Sequence[ElectionCompound]',
-        votes: 'Sequence[Vote]',
+        request: ElectionDayRequest,
+        elections: Sequence[Election],
+        election_compounds: Sequence[ElectionCompound],
+        votes: Sequence[Vote],
         subject: str | None = None
     ) -> None:
         """ Sends the results of the vote or election to all subscribers.
@@ -222,7 +224,7 @@ class EmailNotification(Notification):
 
         # We use a generator function to submit the email batch since that
         # is significantly more memory efficient for large batches.
-        def email_iter() -> 'Iterator[EmailJsonDict]':
+        def email_iter() -> Iterator[EmailJsonDict]:
             for locale in request.app.locales:
                 for group in groups:
                     query = request.session.query(EmailSubscriber.address)
@@ -292,7 +294,7 @@ class EmailNotification(Notification):
 
     def trigger(
         self,
-        request: 'ElectionDayRequest',
+        request: ElectionDayRequest,
         model: Election | ElectionCompound | Vote
     ) -> None:
         """ Sends the results of the vote, election or election compound to
@@ -320,11 +322,12 @@ class SmsNotification(Notification):
 
     def send_sms(
         self,
-        request: 'ElectionDayRequest',
-        elections: 'Sequence[Election]',
-        election_compounds: 'Sequence[ElectionCompound]',
-        votes: 'Sequence[Vote]',
-        content: 'TranslationString'
+        request: ElectionDayRequest,
+        elections: Sequence[Election],
+        election_compounds: Sequence[ElectionCompound],
+        votes: Sequence[Vote],
+        content: TranslationString,
+        url: str | None = None
     ) -> None:
         """ Sends the given text to all subscribers. """
 
@@ -346,13 +349,17 @@ class SmsNotification(Notification):
         for locale, addresses in query:
             translator = request.app.translations.get(locale)
             translated = translator.gettext(content) if translator else content
+            if url is not None and len(translated) + len(url) <= 154:
+                # If the given url fits into a single SMS, then prefer it
+                # over the generic one it's bound to by default
+                content = content % {'url': url}
             translated = content.interpolate(translated)
 
             request.app.send_sms(tuple(set(addresses)), translated)
 
     def trigger(
         self,
-        request: 'ElectionDayRequest',
+        request: ElectionDayRequest,
         model: Election | ElectionCompound | Vote
     ) -> None:
         """ Posts a link to the vote or election to all subscribers.
@@ -374,5 +381,8 @@ class SmsNotification(Notification):
             content=_(
                 'New results are available on ${url}',
                 mapping={'url': request.app.principal.sms_notification}
-            )
+            ),
+            # NOTE: A SiteLocale link would be nicer UX, but that will make
+            #       the URL significantly longer, so we take what we can get
+            url=request.link(model)
         )

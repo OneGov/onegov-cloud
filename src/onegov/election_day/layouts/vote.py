@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 from functools import cached_property
 from onegov.core.utils import normalize_for_url
 from onegov.election_day import _
@@ -17,12 +19,12 @@ if TYPE_CHECKING:
 
 class VoteLayout(DetailLayout):
 
-    model: 'Vote'
+    model: Vote
 
     def __init__(
         self,
-        model: 'Vote',
-        request: 'ElectionDayRequest',
+        model: Vote,
+        request: ElectionDayRequest,
         tab: str = 'entities'
     ) -> None:
         super().__init__(model, request)
@@ -188,7 +190,7 @@ class VoteLayout(DetailLayout):
         return None
 
     @cached_property
-    def ballot(self) -> 'Ballot':
+    def ballot(self) -> Ballot:
         if self.type == 'complex' and 'counter' in self.tab:
             return self.model.counter_proposal  # type:ignore[attr-defined]
         if self.type == 'complex' and 'tie-breaker' in self.tab:
@@ -275,7 +277,7 @@ class VoteLayout(DetailLayout):
         return self.model.direct
 
     @cached_property
-    def menu(self) -> 'NestedMenu':
+    def menu(self) -> NestedMenu:
         if self.type == 'complex':
             result: NestedMenu = []
 

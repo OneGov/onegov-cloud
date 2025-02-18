@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 from json import dumps
 from markupsafe import Markup
 from random import choice
@@ -28,7 +30,7 @@ class QuillInput(HiddenInput):
     def __init__(
         self,
         *,
-        tags: 'Sequence[str] | None' = None,
+        tags: Sequence[str] | None = None,
         **kwargs: Any
     ):
         if tags is None:
@@ -82,7 +84,7 @@ class QuillInput(HiddenInput):
 
     def __call__(
         self,
-        field: 'QuillField',  # type:ignore[override]
+        field: QuillField,  # type:ignore[override]
         **kwargs: Any
     ) -> Markup:
 
@@ -111,6 +113,6 @@ class QuillInput(HiddenInput):
             #        need to adjust the tests to detect the &quot; for the
             #        strings inside the JSON. (The &quot; will be turned back
             #        into `"` in javascript, so there's no harm to it)
-            formats=Markup(dumps(self.formats)),  # noqa: MS001
-            toolbar=Markup(dumps(self.toolbar)),  # noqa: MS001
+            formats=Markup(dumps(self.formats)),  # nosec: B704
+            toolbar=Markup(dumps(self.toolbar)),  # nosec: B704
         )

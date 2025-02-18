@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 from onegov.election_day import _
 from onegov.election_day.formats.imports.common import EXPATS
 from onegov.election_day.formats.imports.common import FileImportError
@@ -62,7 +64,7 @@ def parse_domain(domain: str) -> str | None:
 
 
 def line_is_relevant(
-    line: 'DefaultRow',
+    line: DefaultRow,
     domain: str,
     district: str,
     number: str
@@ -75,8 +77,8 @@ def line_is_relevant(
 
 
 def import_vote_wabstic(
-    vote: 'Vote',
-    principal: 'Canton | Municipality',
+    vote: Vote,
+    principal: Canton | Municipality,
     number: str,
     district: str,
     file_sg_geschaefte: IO[bytes],
@@ -186,7 +188,7 @@ def import_vote_wabstic(
                 line_errors.append(
                     _('${name} is unknown', mapping={'name': entity_id}))
             else:
-                entity_name, entity_district, superregion = (
+                entity_name, entity_district, _superregion = (
                     get_entity_and_district(
                         entity_id, entities, vote, principal, line_errors
                     )
@@ -199,7 +201,7 @@ def import_vote_wabstic(
         # Check if the entity is counted
         try:
             counted_num = validate_integer(line, 'sperrung')
-            counted = False if counted_num == 0 else True
+            counted = counted_num != 0
         except ValueError:
             line_errors.append(_('Invalid values'))
         else:
@@ -285,7 +287,7 @@ def import_vote_wabstic(
             remaining.add(0)
         remaining -= {r['entity_id'] for r in ballot_results[ballot_type]}
         for entity_id in remaining:
-            entity_name, entity_district, superregion = (
+            entity_name, entity_district, _superregion = (
                 get_entity_and_district(
                     entity_id, entities, vote, principal
                 )

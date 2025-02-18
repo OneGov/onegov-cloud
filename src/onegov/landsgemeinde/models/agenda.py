@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 from onegov.core.orm import Base
 from onegov.core.orm.mixins import content_property
 from onegov.core.orm.mixins import dict_markup_property
@@ -35,7 +37,7 @@ if TYPE_CHECKING:
     AgendaItemState: TypeAlias = Literal['scheduled', 'ongoing', 'completed']
 
 
-STATES: dict['AgendaItemState', 'TranslationString'] = {
+STATES: dict[AgendaItemState, TranslationString] = {
     'scheduled': _('scheduled'),
     'ongoing': _('ongoing'),
     'completed': _('completed')
@@ -58,33 +60,33 @@ class AgendaItem(
     }
 
     #: the internal id of the agenda item
-    id: 'Column[uuid.UUID]' = Column(
+    id: Column[uuid.UUID] = Column(
         UUID,  # type:ignore[arg-type]
         primary_key=True,
         default=uuid4
     )
 
     #: the external id of the agenda item
-    number: 'Column[int]' = Column(Integer, nullable=False)
+    number: Column[int] = Column(Integer, nullable=False)
 
     #: the state of the agenda item
-    state: 'Column[AgendaItemState]' = Column(
+    state: Column[AgendaItemState] = Column(
         Enum(*STATES.keys(), name='agenda_item_state'),  # type:ignore
         nullable=False
     )
 
     #: True if the item has been declared irrelevant
-    irrelevant: 'Column[bool]' = Column(Boolean, nullable=False, default=False)
+    irrelevant: Column[bool] = Column(Boolean, nullable=False, default=False)
 
     #: True if the item has been tacitly accepted
-    tacitly_accepted: 'Column[bool]' = Column(
+    tacitly_accepted: Column[bool] = Column(
         Boolean,
         nullable=False,
         default=False
     )
 
     #: the assembly this agenda item belongs to
-    assembly_id: 'Column[uuid.UUID]' = Column(
+    assembly_id: Column[uuid.UUID] = Column(
         UUID,  # type:ignore[arg-type]
         ForeignKey(
             'landsgemeinde_assemblies.id',
@@ -94,13 +96,13 @@ class AgendaItem(
         nullable=False
     )
 
-    assembly: 'relationship[Assembly]' = relationship(
+    assembly: relationship[Assembly] = relationship(
         'Assembly',
         back_populates='agenda_items',
     )
 
     #: Title of the agenda item (not translated)
-    title: 'Column[str]' = Column(Text, nullable=False, default=lambda: '')
+    title: Column[str] = Column(Text, nullable=False, default=lambda: '')
 
     #: The memorial of the assembly
     memorial_pdf = NamedFile(cls=LandsgemeindeFile)
@@ -121,7 +123,7 @@ class AgendaItem(
     resolution_tags: dict_property[list[str] | None] = content_property()
 
     #: An agenda item contains n vota
-    vota: 'relationship[list[Votum]]' = relationship(
+    vota: relationship[list[Votum]] = relationship(
         Votum,
         cascade='all, delete-orphan',
         back_populates='agenda_item',
@@ -135,7 +137,7 @@ class AgendaItem(
         self.last_modified = self.timestamp()
 
     @property
-    def date(self) -> 'date_t':
+    def date(self) -> date_t:
         return self.assembly.date
 
     @property

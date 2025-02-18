@@ -236,6 +236,79 @@ def test_browser_session_dirty(redis_url):
     assert client.cookies['session_id'] == old_session_id
 
 
+def test_session_nonce_request(redis_url):
+
+    class App(Framework):
+        pass
+
+    @App.path(path='/')
+    class Root:
+        pass
+
+    @App.view(model=Root, request_method='POST')
+    def view_root(self, request):
+        # the session id is only available if there's a change in the
+        # browser session
+        request.browser_session['foo'] = 'bar'
+        return request.cookies['session_id']
+
+    @App.view(model=Root, name='session_nonce')
+    def view_session_nonce(self, request):
+        return request.get_session_nonce()
+
+    @App.view(model=Root, name='login')
+    def view_login(self, request):
+        request.browser_session.logged_in = True
+        return 'logged in'
+
+    @App.view(model=Root, name='status')
+    def view_status(self, request):
+        if request.browser_session.has('logged_in'):
+            return 'logged in'
+        else:
+            return 'logged out'
+
+    app = App()
+    app.namespace = 'test'
+    app.configure_application(identity_secure=False, redis_url=redis_url)
+    app.set_application_id('test/foo')
+
+    app.cache_backend = 'dogpile.cache.memory'
+    app.cache_backend_arguments = {}
+
+    c1 = Client(app)
+    c2 = Client(app)
+
+    session_id1 = c1.post('/').text
+    assert c1.post('/').text == session_id1
+    assert c1.post('/').text != c2.post('/').text
+    assert c2.post('/').text == c2.post('/').text
+
+    assert c1.get('/status').text == 'logged out'
+    assert c2.get('/status').text == 'logged out'
+
+    c1.get('/login')
+
+    assert c1.get('/status').text == 'logged in'
+    assert c2.get('/status').text == 'logged out'
+
+    nonce = c1.get('/session_nonce').text
+    assert c1.get('/session_nonce').text != nonce
+
+    # session cookie gets lost
+    c1.cookiejar.clear()
+    assert c1.post('/').text != session_id1
+
+    # but the session_nonce restores it (as long as there is none)
+    c1.cookiejar.clear()
+    assert c1.post('/', {'session_nonce': nonce}).text == session_id1
+    assert c1.post('/').text == session_id1
+
+    # and it can't be reused
+    c2.cookiejar.clear()
+    assert c2.post('/', {'session_nonce': nonce}).text != session_id1
+
+
 def test_request_messages(redis_url):
 
     class App(Framework):

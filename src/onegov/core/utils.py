@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 import base64
 import bleach
 from urlextract import URLExtract, CacheFileError
@@ -96,7 +98,7 @@ ALPHABET_RE = re.compile(r'^[cbdefghijklnrtuv]{12,44}$')
 
 
 @contextmanager
-def local_lock(namespace: str, key: str) -> 'Iterator[None]':
+def local_lock(namespace: str, key: str) -> Iterator[None]:
     """ Locks the given namespace/key combination on the current system,
     automatically freeing it after the with statement has been completed or
     once the process is killed.
@@ -109,7 +111,12 @@ def local_lock(namespace: str, key: str) -> 'Iterator[None]':
     """
     name = f'{namespace}-{key}'.replace('/', '-')
 
-    with open(f'/tmp/{name}', 'w+') as f:
+    # NOTE: hardcoding /tmp is a bit piggy, but on the other hand we
+    #       don't want different processes to miss each others locks
+    #       just because one of them has a different TMPDIR, can we
+    #       come up with a more robust way of doing this, e.g. with
+    #       named semaphores?
+    with open(f'/tmp/{name}', 'w+') as f:  # nosec:B108
         try:
             fcntl.flock(f, fcntl.LOCK_EX | fcntl.LOCK_NB)
             yield
@@ -167,7 +174,7 @@ def remove_repeated_spaces(text: str) -> str:
 
 
 @contextmanager
-def profile(filename: str) -> 'Iterator[None]':
+def profile(filename: str) -> Iterator[None]:
     """ Profiles the wrapped code and stores the result in the profiles folder
     with the given filename.
 
@@ -183,7 +190,7 @@ def profile(filename: str) -> 'Iterator[None]':
 
 
 @contextmanager
-def timing(name: str | None = None) -> 'Iterator[None]':
+def timing(name: str | None = None) -> Iterator[None]:
     """ Runs the wrapped code and prints the time in ms it took to run it.
     The name is printed in front of the time, if given.
 
@@ -201,7 +208,7 @@ def timing(name: str | None = None) -> 'Iterator[None]':
 
 
 @lru_cache(maxsize=32)
-def module_path_root(module: 'ModuleType | str') -> str:
+def module_path_root(module: ModuleType | str) -> str:
     if isinstance(module, str):
         module = importlib.import_module(module)
 
@@ -210,7 +217,7 @@ def module_path_root(module: 'ModuleType | str') -> str:
     return os.path.dirname(inspect.getfile(module))
 
 
-def module_path(module: 'ModuleType | str', subpath: str) -> str:
+def module_path(module: ModuleType | str, subpath: str) -> str:
     """ Returns a subdirectory in the given python module.
 
     :mod:
@@ -284,7 +291,7 @@ class Bunch:
         return not self.__eq__(other)
 
 
-def render_file(file_path: str, request: 'CoreRequest') -> 'Response':
+def render_file(file_path: str, request: CoreRequest) -> Response:
     """ Takes the given file_path (content) and renders it to the browser.
     The file must exist on the local system and be readable by the current
     process.
@@ -342,13 +349,13 @@ def groupbylist(
 @overload
 def groupbylist(
     iterable: Iterable[_T],
-    key: 'Callable[[_T], _KT]'
+    key: Callable[[_T], _KT]
 ) -> list[tuple[_KT, list[_T]]]: ...
 
 
 def groupbylist(
     iterable: Iterable[_T],
-    key: 'Callable[[_T], Any] | None' = None
+    key: Callable[[_T], Any] | None = None
 ) -> list[tuple[Any, list[_T]]]:
     """ Works just like Python's ``itertools.groupby`` function, but instead
     of returning generators, it returns lists.
@@ -379,7 +386,7 @@ def linkify_phone(text: str) -> Markup:
             return len(number) == 12
         return False
 
-    def handle_match(match: 'Match[str]') -> str:
+    def handle_match(match: Match[str]) -> str:
         inside_html = match.group(1)
         number = f'{match.group(2)}{match.group(3)}'
         assert not number.endswith('\n')
@@ -394,7 +401,7 @@ def linkify_phone(text: str) -> Markup:
         return match.group(0)
 
     # NOTE: re.sub isn't Markup aware, so we need to re-wrap
-    return Markup(  # noqa: MS001
+    return Markup(  # nosec: B704
         _phone_ch_html_safe.sub(handle_match, escape(text)))
 
 
@@ -446,14 +453,14 @@ def linkify(text: str | None) -> Markup:
         )
         # NOTE: bleach's linkify always returns a plain string
         #       so we need to re-wrap
-        linkified = linkify_phone(Markup(  # noqa: MS001
+        linkified = linkify_phone(Markup(  # nosec: B704
             bleach_linker.linkify(escape(text)))
         )
 
     else:
         # NOTE: bleach's linkify always returns a plain string
         #       so we need to re-wrap
-        linkified = linkify_phone(Markup(  # noqa: MS001
+        linkified = linkify_phone(Markup(  # nosec: B704
             bleach.linkify(escape(text), parse_email=True))
         )
 
@@ -461,7 +468,7 @@ def linkify(text: str | None) -> Markup:
     if isinstance(text, Markup):
         return linkified
 
-    return Markup(bleach.clean(  # noqa: MS001
+    return Markup(bleach.clean(  # nosec: B704
         linkified,
         tags=['a'],
         attributes={'a': ['href', 'rel']},
@@ -492,7 +499,7 @@ def paragraphify(text: str) -> Markup:
             (
                 # NOTE: re.split returns a plain str, so we need to restore
                 #       markup based on whether it was markup before
-                Markup(p) if was_markup  # noqa: MS001
+                Markup(p) if was_markup  # nosec: B704
                 else escape(p)
             ).replace('\n', Markup('<br>'))
         )
@@ -643,16 +650,16 @@ def is_subpath(directory: str, path: str) -> bool:
 
 @overload
 def is_sorted(
-    iterable: 'Iterable[SupportsRichComparison]',
-    key: 'Callable[[SupportsRichComparison], SupportsRichComparison]' = ...,
+    iterable: Iterable[SupportsRichComparison],
+    key: Callable[[SupportsRichComparison], SupportsRichComparison] = ...,
     reverse: bool = ...
 ) -> bool: ...
 
 
 @overload
 def is_sorted(
-    iterable: 'Iterable[_T]',
-    key: 'Callable[[_T], SupportsRichComparison]',
+    iterable: Iterable[_T],
+    key: Callable[[_T], SupportsRichComparison],
     reverse: bool = ...
 ) -> bool: ...
 
@@ -662,8 +669,8 @@ def is_sorted(
 #        be infinite. This seems like it should be a Container instead,
 #        then we also don't need to use tee or list to make a copy
 def is_sorted(
-    iterable: 'Iterable[Any]',
-    key: 'Callable[[Any], SupportsRichComparison]' = lambda i: i,
+    iterable: Iterable[Any],
+    key: Callable[[Any], SupportsRichComparison] = lambda i: i,
     reverse: bool = False
 ) -> bool:
     """ Returns True if the iterable is sorted. """
@@ -680,7 +687,7 @@ def is_sorted(
     return True
 
 
-def morepath_modules(cls: type[morepath.App]) -> 'Iterator[str]':
+def morepath_modules(cls: type[morepath.App]) -> Iterator[str]:
     """ Returns all morepath modules which should be scanned for the given
     morepath application class.
 
@@ -715,8 +722,8 @@ def scan_morepath_modules(cls: type[morepath.App]) -> None:
 
 
 def get_unique_hstore_keys(
-    session: 'Session',
-    column: 'Column[dict[str, Any]]'
+    session: Session,
+    column: Column[dict[str, Any]]
 ) -> set[str]:
     """ Returns a set of keys found in an hstore column over all records
     of its table.
@@ -735,7 +742,7 @@ def get_unique_hstore_keys(
     return set(keys) if keys else set()
 
 
-def makeopendir(fs: 'FS', directory: str) -> 'SubFS[FS]':
+def makeopendir(fs: FS, directory: str) -> SubFS[FS]:
     """ Creates and opens the given directory in the given PyFilesystem. """
 
     if not fs.isdir(directory):
@@ -781,7 +788,7 @@ class PostThread(Thread):
         self,
         url: str,
         data: bytes,
-        headers: 'Collection[tuple[str, str]]',
+        headers: Collection[tuple[str, str]],
         timeout: float = 30
     ):
         Thread.__init__(self)
@@ -826,7 +833,7 @@ def toggle(collection: set[_T], item: _T | None) -> set[_T]:
 def binary_to_dictionary(
     binary: bytes,
     filename: str | None = None
-) -> 'FileDict':
+) -> FileDict:
     """ Takes raw binary filedata and stores it in a dictionary together
     with metadata information.
 
@@ -856,7 +863,7 @@ def binary_to_dictionary(
     }
 
 
-def dictionary_to_binary(dictionary: 'LaxFileDict') -> bytes:
+def dictionary_to_binary(dictionary: LaxFileDict) -> bytes:
     """ Takes a dictionary created by :func:`binary_to_dictionary` and returns
     the original binary data.
 
@@ -872,7 +879,7 @@ def safe_format(
     format: str,
     dictionary: dict[str, str | int | float],
     types: None = ...,
-    adapt: 'Callable[[str], str] | None' = ...,
+    adapt: Callable[[str], str] | None = ...,
     raise_on_missing: bool = ...
 ) -> str: ...
 
@@ -882,7 +889,7 @@ def safe_format(
     format: str,
     dictionary: dict[str, _T],
     types: set[type[_T]] = ...,
-    adapt: 'Callable[[str], str] | None' = ...,
+    adapt: Callable[[str], str] | None = ...,
     raise_on_missing: bool = ...
 ) -> str: ...
 
@@ -891,7 +898,7 @@ def safe_format(
     format: str,
     dictionary: dict[str, Any],
     types: set[type[Any]] | None = None,
-    adapt: 'Callable[[str], str] | None' = None,
+    adapt: Callable[[str], str] | None = None,
     raise_on_missing: bool = False
 ) -> str:
     """ Takes a user-supplied string with format blocks and returns a string
@@ -982,7 +989,7 @@ def safe_format(
 
 def safe_format_keys(
     format: str,
-    adapt: 'Callable[[str], str] | None' = None
+    adapt: Callable[[str], str] | None = None
 ) -> list[str]:
     """ Takes a :func:`safe_format` string and returns the found keys. """
 
@@ -1095,7 +1102,7 @@ def yubikey_otp_to_serial(otp: str) -> int | None:
     # https://docs.oracle.com/javase/specs/jls/se8/html/jls-15.html#jls-15.19
     mask_value = 0x1f
 
-    for i in range(0, 8):
+    for i in range(8):
         shift = (4 - 1 - i) * 8
         value += (bytesarray[i] & 255) << (shift & mask_value)
 
@@ -1170,16 +1177,16 @@ def safe_move(src: str, dst: str, tmp_dst: str | None = None) -> None:
 def batched(
     iterable: Iterable[_T],
     batch_size: int,
-    container_factory: 'type[tuple]' = ...  # type:ignore[type-arg]
-) -> 'Iterator[tuple[_T, ...]]': ...
+    container_factory: type[tuple] = ...  # type:ignore[type-arg]
+) -> Iterator[tuple[_T, ...]]: ...
 
 
 @overload
 def batched(
     iterable: Iterable[_T],
     batch_size: int,
-    container_factory: 'type[list]'  # type:ignore[type-arg]
-) -> 'Iterator[list[_T]]': ...
+    container_factory: type[list]  # type:ignore[type-arg]
+) -> Iterator[list[_T]]: ...
 
 
 # NOTE: If there were higher order TypeVars, we could properly infer
@@ -1189,15 +1196,15 @@ def batched(
 def batched(
     iterable: Iterable[_T],
     batch_size: int,
-    container_factory: 'Callable[[Iterator[_T]], Collection[_T]]'
-) -> 'Iterator[Collection[_T]]': ...
+    container_factory: Callable[[Iterator[_T]], Collection[_T]]
+) -> Iterator[Collection[_T]]: ...
 
 
 def batched(
     iterable: Iterable[_T],
     batch_size: int,
-    container_factory: 'Callable[[Iterator[_T]], Collection[_T]]' = tuple
-) -> 'Iterator[Collection[_T]]':
+    container_factory: Callable[[Iterator[_T]], Collection[_T]] = tuple
+) -> Iterator[Collection[_T]]:
     """ Splits an iterable into batches of batch_size and puts them
     inside a given collection (tuple by default).
 

@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 from onegov.form import Form
 from onegov.org import _
 from onegov.org.models.external_link import ExternalLinkCollection
@@ -18,7 +20,7 @@ class ExternalLinkForm(Form):
     lead = TextAreaField(
         label=_('Lead'),
         description=_('Describes briefly what this entry is about'),
-        validators=[InputRequired()],
+        validators=[],
         render_kw={'rows': 4})
 
     url = URLField(
