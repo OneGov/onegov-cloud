@@ -2,6 +2,7 @@ from __future__ import annotations
 
 import click
 import transaction
+from sqlalchemy import text
 
 from onegov.agency.collections import ExtendedAgencyCollection
 from onegov.agency.data_import import (import_bs_data,
@@ -15,6 +16,9 @@ from onegov.people import Agency, Person, AgencyMembership
 
 
 from typing import TYPE_CHECKING
+
+from onegov.search import SearchOfflineError
+
 if TYPE_CHECKING:
     from collections.abc import Callable
     from onegov.agency.app import AgencyApp
@@ -232,32 +236,65 @@ def import_lu_data_files(
         onegov-agency --select /onegov_agency/lu import-lu-data $people_file
     """
 
-    buffer = 100
+    es_type_names = frozenset(('extended_person', 'extended_agency'))
 
     def execute(request: AgencyRequest, app: AgencyApp) -> None:
-
         if clean:
+            schema = app.session_manager.current_schema
+            assert schema is not None
+
+            click.secho(f'Cleaning data in schema: {schema}', fg='yellow')
+
             session = request.session
 
-            for ix, person in enumerate(session.query(Person)):
-                session.delete(person)
-                if ix % buffer == 0:
-                    app.es_indexer.process()
-                    app.psql_indexer.bulk_process(session)
+            request.session.execute(
+                text('SET search_path TO :schema;').bindparams(schema=schema)
+            )
 
+            agency_count = session.execute(
+                text('SELECT COUNT(*) FROM agencies')
+            ).scalar()
+            people_count = session.execute(
+                text('SELECT COUNT(*) FROM people')
+            ).scalar()
+
+            click.secho(
+                f'Removing {agency_count} Agencies and {people_count} '
+                f'Persons from database',
+                fg='green'
+            )
+            request.session.execute(
+                text("""
+                    TRUNCATE TABLE agencies CASCADE;
+                    TRUNCATE TABLE people CASCADE;
+                    COMMIT;
+                """)
+            )
             session.flush()
-            click.secho('All Persons removed', fg='green')
+            if app.es_client is not None:
+                es_client = app.es_client
+                hostname = app.es_indexer.hostname
 
-            for ix, agency in enumerate(session.query(Agency)):
-                session.delete(agency)
-                if ix % buffer == 0:
-                    app.es_indexer.process()
-                    app.psql_indexer.bulk_process(session)
+                for type_name in es_type_names:
+                    index_pattern = f'{hostname}-{schema}-*-{type_name}'
+                    try:
+                        es_client.indices.delete(
+                            index=index_pattern, ignore_unavailable=True
+                        )
+                        click.secho(
+                            f'Elasticsearch index {index_pattern}'
+                            f' removed', fg='green',
+                        )
+                    except SearchOfflineError:
+                        click.secho(
+                            f'Warning: Elasticsearch is offline, '
+                            f'could not delete index {index_pattern}',
+                            fg='yellow',
+                        )
+                    except Exception:
+                        click.secho('Unknown Error', fg='red')
 
-            session.flush()
-            click.secho('All Agencies removed', fg='green')
-
-            click.secho('Exiting...')
+            click.secho('Exiting...', fg='green')
             return
 
         agencies, people = import_lu_data(data_file, request, app)
