@@ -307,12 +307,16 @@ def handle_newsletters(
         recipients_count = 0
 
     if request.upath_info == '/newsletters/update':
-        pre_form_text = 'Update your newsletter subscription categories:'
-        button_text = 'Update'
+        pre_form_text = request.translate(_(
+            'Update your newsletter subscription categories:'
+        ))
+        button_text = request.translate(_('Update'))
         show_archive = False
     else:
-        pre_form_text = 'Sign up to our newsletter to always stay up to date:'
-        button_text = 'Sign up'
+        pre_form_text = request.translate(_(
+            'Sign up to our newsletter to always stay up to date:'
+        ))
+        button_text = request.translate(_('Sign up'))
         show_archive = True
 
     return {

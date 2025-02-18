@@ -148,7 +148,7 @@ class SAML2Client:
     slo_enabled: bool = attrib(default=True)
     """ Whether or not to enable the SLO service """
 
-    _connections: dict[str, Connection] = {}
+    _connections: dict[str, Connection] = attrib(factory=dict, init=False)
 
     def get_binding(self, request: CoreRequest) -> str:
         if request.method == 'GET':

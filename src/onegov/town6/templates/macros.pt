@@ -596,7 +596,7 @@
     </div>
 </metal:newslist>
 
-<metal:newsletter define-macro="newsletter_signup">
+<metal:newsletter define-macro="newsletter_signup" i18n:domain="onegov.town6">
 
     <metal:b define-slot="pre_form"></metal:b>
 
@@ -615,7 +615,7 @@
                     </div>
                     <div class="cell small" tal:condition="form.subscribed_categories.data">
                         <label>
-                            <i18n:translate>${form.subscribed_categories.description}</i18n:translate><p>
+                            <tal:b i18n:translate>${form.subscribed_categories.description}</tal:b><p>
                             ${form.subscribed_categories}
                         </label>
                     </div>

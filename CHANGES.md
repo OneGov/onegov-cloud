@@ -1,8 +1,40 @@
 # Changes
 
+## 2025.7
+
+`2025-02-17` | [4297221960...9bafe68736](https://github.com/OneGov/onegov-cloud/compare/4297221960^...9bafe68736)
+
+### Agency
+
+##### Staka LU No hierarchical numbering in pdf
+
+`Feature` | [OGC-2071](https://linear.app/onegovcloud/issue/OGC-2071) | [4297221960](https://github.com/onegov/onegov-cloud/commit/4297221960bd639331463f584ea63829e4dd9aa0)
+
+##### Staka LU Add logo to pdf
+
+`Feature` | [OGC-2071](https://linear.app/onegovcloud/issue/OGC-2071) | [f60df0f84e](https://github.com/onegov/onegov-cloud/commit/f60df0f84e4ddf5eb2674398d3d6279b5f603be9)
+
+##### Staka LU Support alliance names in import
+
+`Feature` | [OGC-2071](https://linear.app/onegovcloud/issue/OGC-2071) | [4c79c0cf51](https://github.com/onegov/onegov-cloud/commit/4c79c0cf516473c7b00db7e264eaa2bde7485fcf)
+
+##### Staka LU Use alternative dienststelle name over dienstelle
+
+`Feature` | [OGC-2071](https://linear.app/onegovcloud/issue/OGC-2071) | [37d46a2e26](https://github.com/onegov/onegov-cloud/commit/37d46a2e26d743e4002c9d067dcb1ca5662dabdf)
+
+##### Staka LU pdf shows now organisation information
+
+`Feature` | [OGC-2071](https://linear.app/onegovcloud/issue/OGC-2071) | [e0ee4b0c7f](https://github.com/onegov/onegov-cloud/commit/e0ee4b0c7f39105e5aa30f4a640bb0ea91d70fbe)
+
+### Pas
+
+##### Adds provisional import script.
+
+`Feature` | [OGC-1878](https://linear.app/onegovcloud/issue/OGC-1878) | [9bafe68736](https://github.com/onegov/onegov-cloud/commit/9bafe687361c7160c869fd0269b656b9d82d2e16)
+
 ## 2025.6
 
-`2025-02-13` | [4a8ed94cb1...4a8ed94cb1](https://github.com/OneGov/onegov-cloud/compare/4a8ed94cb1^...4a8ed94cb1)
+`2025-02-13` | [4a8ed94cb1...952fb7d12f](https://github.com/OneGov/onegov-cloud/compare/4a8ed94cb1^...952fb7d12f)
 
 ### Agency
 
@@ -2254,26 +2286,4 @@ This is a silly hack introduced by ZG and only available for them. All other pri
 ##### Add second pagination above events
 
 `Feature` | [1545](https://github.com/onegov/onegov-cloud/issues/1545) | [7223b1a1b2](https://github.com/onegov/onegov-cloud/commit/7223b1a1b27889c02ee8a9c1ee3d906f4389c54c)
-
-## 2024.21
-
-`2024-04-09` | [a1e973a06b...4dc50e0b50](https://github.com/OneGov/onegov-cloud/compare/a1e973a06b^...4dc50e0b50)
-
-### Core
-
-##### Introducing postgres full text search (fts) columns, indexer and orm event handler as well as db upgrade
-
-`Feature` | [OGC-508](https://linear.app/onegovcloud/issue/OGC-508) | [57e10be96d](https://github.com/onegov/onegov-cloud/commit/57e10be96d66f704aa48082772474cf44b571d7a)
-
-### Directories
-
-##### Delete expired directory entries automatically if marked 'deletable'
-
-`Feature` | [OGC-1541](https://linear.app/onegovcloud/issue/OGC-1541) | [a1e973a06b](https://github.com/onegov/onegov-cloud/commit/a1e973a06b4872df2c565648188b126174a41b98)
-
-### Form
-
-##### Adds missing `None` check.
-
-`Bugfix` | [OGC-1561](https://linear.app/onegovcloud/issue/OGC-1561) | [8ae422d3a6](https://github.com/onegov/onegov-cloud/commit/8ae422d3a692b46974a2159ca94b5fab68463178)
 

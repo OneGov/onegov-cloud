@@ -755,7 +755,7 @@ class WorldlineSaferpay(PaymentProvider[SaferpayPayment]):
             '{html_params}>{label}</button>'
         ).format(
             label=label,
-            html_params=Markup(html_params(**params))  # noqa: RUF035
+            html_params=Markup(html_params(**params))  # nosec: B704
         )
 
     def sync(self) -> None:

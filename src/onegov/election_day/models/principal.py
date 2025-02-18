@@ -121,7 +121,7 @@ class Principal:
         #       in order for most analytics to work. Eventually this may be
         #       able to go away again or be reduced to support a few specific
         #       providers.
-        self.analytics = Markup(analytics) if analytics else None  # noqa: RUF035
+        self.analytics = Markup(analytics) if analytics else None  # nosec: B704
         self.has_districts = has_districts
         self.has_regions = has_regions
         self.has_superregions = has_superregions
