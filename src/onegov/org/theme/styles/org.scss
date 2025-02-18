@@ -6323,21 +6323,19 @@ h2 + div.timeline {
 /*
     Dashboard
 */
-.boardlet-group {
-    display: flex;
-    flex-wrap: wrap;
-    justify-content: space-between;
-}
+//.boardlet-group {
+//    display: flex;
+//    flex-wrap: wrap;
+//    justify-content: space-between;
+//}
 
 .boardlet {
     background: $gray-pastel;
     border-top: 10px solid $green-light;
     margin-bottom: 1.5rem;
     padding: .5rem 1rem 1rem;
-    //padding: 1rem;
-    //width: calc((100% / 3) + 1rem);
-    //max-width: calc((100% / 3) - 1rem);
-    //max-width: 60%;
+    width: calc((100% / 3) + 1rem);
+    max-width: calc((100% / 3) - 1rem);
 
     h2 {
         font-size: 1.3rem;
@@ -6358,9 +6356,8 @@ h2 + div.timeline {
         }
 
         .facts {
-            width: 100%;
-            table-layout: auto;
             border-collapse: collapse;
+            table-layout: auto;
         }
 
         .fact-number,

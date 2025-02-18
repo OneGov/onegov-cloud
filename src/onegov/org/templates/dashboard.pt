@@ -7,8 +7,7 @@
             <div tal:repeat="boardlet group">
                 <div tal:condition="boardlet.is_available" class="boardlet boardlet-${boardlet.state}">
                     <h2>${boardlet.title}</h2>
-                    <table class="dense">
-<!--?                    <table class="facts">-->
+                    <table class="facts">
                         <tr tal:repeat="fact boardlet.facts" class="${fact.css_class}">
                             <td tal:condition="fact.icon" class="fact-icon">
                                 <i class="fa fa-fw ${fact.icon}" aria-hidden="true" tal:attributes="title fact.icon_title|None"></i>

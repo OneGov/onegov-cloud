@@ -35,7 +35,7 @@ class OrgBoardlet(Boardlet):
         return DefaultLayout(None, self.request)
 
     @cached_property
-    def plausible_api(self) -> PlausibleAPI:
+    def plausible_api(self) -> PlausibleAPI | None:
         site_id = None
         analytics_code = self.request.app.org.analytics_code
 

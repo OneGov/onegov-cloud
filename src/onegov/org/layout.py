@@ -865,7 +865,7 @@ class DefaultMailLayoutMixin:
         return paragraphify(text)
 
 
-class DefaultMailLayout(Layout, DefaultMailLayoutMixin):  # type:ignore[misc]
+class DefaultMailLayout(Layout, DefaultMailLayoutMixin):
     """ A special layout for creating HTML E-Mails. """
 
     @cached_property
