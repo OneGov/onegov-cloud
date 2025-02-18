@@ -2,7 +2,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE 1.0\n"
-"POT-Creation-Date: 2025-02-17 14:16+0100\n"
+"POT-Creation-Date: 2025-02-18 09:50+0100\n"
 "PO-Revision-Date: 2022-03-15 10:50+0100\n"
 "Last-Translator: Marc Sommerhalder <marc.sommerhalder@seantis.ch>\n"
 "Language-Team: French\n"
@@ -1238,14 +1238,28 @@ msgstr "Notes"
 msgid "Public extra information about this person"
 msgstr "Informations publiques supplémentaires à propos de cette semaine"
 
+msgid "I am looking to make a reservation lasting"
+msgstr "Je cherche à faire une réservation d'une durée de"
+
+msgid "On Weekday(s)"
+msgstr "Le(s) jour(s) de semaine"
+
+msgid "Earliest Start"
+msgstr "Début au plus tôt"
+
+msgid "Latest End"
+msgstr "Dernière fin"
+
 msgid "Rooms"
 msgstr "Espaces"
 
-msgid "Weekdays"
-msgstr "Jours de la semaine"
-
 msgid "Start date in past"
 msgstr "Date de début dans le passé"
+
+msgid "Duration is longer than the range between start and end time"
+msgstr ""
+"La durée est supérieure à l'intervalle entre l'heure de début et l'heure de "
+"fin."
 
 msgid "Describes what this reservation resource is about"
 msgstr "Décrit en quoi consiste cette ressource de réservation"
@@ -1323,6 +1337,9 @@ msgstr "Veuillez saisir au moins un code postal"
 
 msgid "Please enter one zip-code per line, without spaces or commas"
 msgstr "Veuillez saisir un code postal par ligne, sans espaces ni virgules"
+
+msgid "Weekdays"
+msgstr "Jours de la semaine"
 
 msgid "New Reservations"
 msgstr "Nouvelles réservations"
@@ -3020,8 +3037,8 @@ msgstr "Refuser ${title} est irréversible."
 msgid "Reject reservation"
 msgstr "Refuser la réservation"
 
-#. Used in sentence: "${event} published."
 #.
+#. Used in sentence: "${event} published."
 msgid "Event"
 msgstr "Événement"
 
@@ -3378,8 +3395,8 @@ msgid ""
 "filled-out form."
 msgstr ""
 "Veuillez vérifier vos données et appuyez sur « Compléter » pour finaliser le "
-"processus. S'il y a quelque chose que vous souhaitez modifier, cliquez sur « "
-"Modifier » pour retourner sur le formulaire complété."
+"processus. S'il y a quelque chose que vous souhaitez modifier, cliquez sur "
+"« Modifier » pour retourner sur le formulaire complété."
 
 msgid ""
 "The image shown in the list view is a square. To have your image shown fully "
@@ -3417,6 +3434,18 @@ msgstr "Aucun fichier téléchargé pour le moment"
 
 msgid "All dates"
 msgstr "Toutes les dates"
+
+msgid ""
+"By default we assume that you only want to select a single time slot and "
+"room per day. If you want to select more than one time slot or room on a "
+"given day, you may hold and press any one of your Shift, Alt or Ctrl keys "
+"while clicking the time slots you want to reserve."
+msgstr ""
+"Par défaut, nous supposons que vous ne souhaitez sélectionner qu'un seul "
+"créneau horaire et une seule salle par jour. Si vous souhaitez sélectionner "
+"plus d'un créneau horaire ou d'une salle pour un jour donné, vous pouvez "
+"maintenir enfoncée l'une des touches Shift, Alt ou Ctrl tout en cliquant sur "
+"les créneaux horaires que vous souhaitez réserver."
 
 msgid "Unavailable"
 msgstr "Indisponible"
