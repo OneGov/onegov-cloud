@@ -47,7 +47,9 @@ $new-photo-album: '\f03e';
 $new-registration-window: '\f067';
 $new-reservation-icon: '\f271';
 $new-room-icon: '\f015';
+$new-datatrans-icon: '\f09d';
 $new-stripe-connect-icon: '\f1f5';
+$new-worldline-saferpay-icon: '\f09d';
 $new-user-icon: '\f234';
 $new-text-module-icon: '\f249';
 $paste-link-icon: '\f0ea';
@@ -545,7 +547,9 @@ $editbar-fg-color-active: $white;
     .new-registration-window::before { @include icon-bold($new-registration-window); }
     .new-reservation::before { @include icon($new-reservation-icon); }
     .new-room::before { @include icon-bold($new-room-icon); }
+    .new-datatrans::before { @include icon($new-datatrans-icon); }
     .new-stripe-connect::before { @include icon($new-stripe-connect-icon); }
+    .new-worldline-saferpay::before { @include icon($new-worldline-saferpay-icon); }
     .new-user::before { @include icon-bold($new-user-icon); }
     .new-text-module::before { @include icon($new-text-module-icon); }
     .occupancy-link::before { @include icon($occupancy-link-icon); }

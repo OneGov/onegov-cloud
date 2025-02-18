@@ -78,7 +78,7 @@ def view_ticket(
     if handler.deleted:
         # NOTE: We store markup in the snapshot, but since it is JSON
         #       it will be read as a plain string, so we have to wrap
-        summary = Markup(self.snapshot.get('summary', ''))  # noqa: RUF035
+        summary = Markup(self.snapshot.get('summary', ''))  # nosec: B704
     else:
         # XXX this is very to do here, much harder when the ticket is updated
         # because there's no good link to the ticket at that point - so when
@@ -136,8 +136,12 @@ def view_ticket(
                 request.link(payment, name='change-net-amount')
             )
 
-    if payment and payment.source == 'stripe_connect':
-        payment_button = stripe_payment_button(payment, layout)
+    if payment and payment.source in (
+        'stripe_connect',
+        'datatrans',
+        'worldline_saferpay',
+    ):
+        payment_button = online_payment_button(payment, layout)
 
     return {
         'title': self.number,
@@ -247,7 +251,7 @@ def manual_payment_button(
 
 
 # FIXME: same here as for manual_payment_button
-def stripe_payment_button(
+def online_payment_button(
     payment: Payment,
     layout: Layout
 ) -> Link | None:

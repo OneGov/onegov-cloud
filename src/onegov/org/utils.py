@@ -214,7 +214,7 @@ def annotate_html(
     if request:
         set_image_sizes(images, request)
 
-    return Markup(  # noqa: RUF035
+    return Markup(  # nosec: B704
         ''.join(tostring(e, encoding=str) for e in fragments))
 
 
@@ -228,7 +228,7 @@ def remove_empty_paragraphs(html: Markup | None) -> Markup | None:
     if not html:
         return html
 
-    return Markup(EMPTY_PARAGRAPHS.sub('', html))  # noqa: RUF035
+    return Markup(EMPTY_PARAGRAPHS.sub('', html))  # nosec: B704
 
 
 def set_image_sizes(
@@ -1102,7 +1102,7 @@ def hashtag_elements(request: OrgRequest, text: str) -> Markup:
         return f'<a class="hashtag" href="{link}">{tag}</a>'
 
     # NOTE: We need to restore Markup after re.sub call
-    return Markup(HASHTAG.sub(replace_tag, escape(text)))  # noqa: RUF035
+    return Markup(HASHTAG.sub(replace_tag, escape(text)))  # nosec: B704
 
 
 def ticket_directory_groups(
@@ -1222,6 +1222,9 @@ def extract_categories_and_subcategories(
     """
     cats: list[str] = []
     subcats: list[list[str]] = []
+
+    if not categories:
+        return cats, subcats
 
     for items in categories.values():
         for item in items:

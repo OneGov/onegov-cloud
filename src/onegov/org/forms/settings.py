@@ -11,13 +11,15 @@ from lxml import etree
 from onegov.core.widgets import transform_structure
 from onegov.core.widgets import XML_LINE_OFFSET
 from onegov.form import Form
-from onegov.form.fields import ChosenSelectField, URLPanelField
+from onegov.form.fields import (ChosenSelectField, URLPanelField,
+                                ChosenSelectMultipleEmailField)
 from onegov.form.fields import ColorField
 from onegov.form.fields import CssField
 from onegov.form.fields import MarkupField
 from onegov.form.fields import MultiCheckboxField
 from onegov.form.fields import PreviewField
 from onegov.form.fields import TagsField
+from onegov.form.validators import StrictOptional
 from onegov.gever.encrypt import encrypt_symmetric
 from onegov.gis import CoordinatesField
 from onegov.org import _
@@ -720,6 +722,7 @@ class ModuleSettingsForm(Form):
             ('postal_address', _('Postal address')),
             ('postal_code_city', _('Postal Code and City')),
             ('notes', _('Notes')),
+            ('external_user_id', _('External ID'))
         ])
 
     mtan_session_duration_seconds = IntegerField(
@@ -1161,6 +1164,14 @@ class NewsletterSettingsForm(Form):
         },
     )
 
+    notify_on_unsubscription = ChosenSelectMultipleEmailField(
+        label=_('Notify on newsletter unsubscription'),
+        description=_('Send an email notification to the following users '
+                      'when a recipient unsubscribes from the newsletter'),
+        validators=[StrictOptional()],
+        choices=[]
+    )
+
     def ensure_categories(self) -> bool | None:
         assert isinstance(self.newsletter_categories.errors, list)
 
@@ -1222,6 +1233,8 @@ class NewsletterSettingsForm(Form):
         data = yaml.safe_load(yaml_data) if yaml_data else {}
         model.newsletter_categories = data
 
+        model.notify_on_unsubscription = self.notify_on_unsubscription.data
+
     def process_obj(self, model: Organisation) -> None:  # type:ignore
         super().process_obj(model)
 
@@ -1232,6 +1245,17 @@ class NewsletterSettingsForm(Form):
 
         yaml_data = yaml.safe_dump(categories, default_flow_style=False)
         self.newsletter_categories.data = yaml_data
+
+        if model.notify_on_unsubscription:
+            self.notify_on_unsubscription.data = model.notify_on_unsubscription
+
+    def on_request(self) -> None:
+        users = self.request.session.query(User).filter(
+            User.role.in_(['admin', 'editor']))
+        users = users.order_by(User.username.desc())
+        self.notify_on_unsubscription.choices = [
+            (u.username) for u in users if '@' in u.username
+        ]
 
 
 class LinkMigrationForm(Form):

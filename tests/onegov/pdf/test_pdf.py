@@ -245,6 +245,7 @@ def test_pdf_toc():
 
     assert extract_pdf_info(file) == (
         4,
+        # table of contents
         '1a 2 '
         '1.1 a.a 2 '
         '1.2 a.b 3 '
@@ -261,6 +262,7 @@ def test_pdf_toc():
         '1.3.1.1.2 a.c.a.a.b 4 '
         '1.3.1.1.2.1 a.c.a.a.b.a 4 '
         '1.3.1.1.2.2 a.c.a.a.b.b 4 '
+        # content
         '1a '
         '1.1 a.a '
         '1.2 a.b '
@@ -277,6 +279,38 @@ def test_pdf_toc():
         '1.3.1.1.2 a.c.a.a.b '
         '1.3.1.1.2.1 a.c.a.a.b.a '
         '1.3.1.1.2.2 a.c.a.a.b.b'
+    )
+
+    # no hierarchical numbering
+    file = BytesIO()
+    pdf = Pdf(file, toc_levels=6, skip_numbering=True)
+    pdf.init_a4_portrait()
+    pdf.table_of_contents()
+    pdf.h1('Argon')
+    pdf.h2('Boron')
+    pdf.h3('Carbon')
+    pdf.h4('Dubnium')
+    pdf.h5('Europium')
+    pdf.h6('Francium')
+    pdf.pagebreak()
+
+    pdf.generate()
+    assert extract_pdf_info(file) == (
+        1,
+        # table of contents
+        'Argon 1 '
+        'Boron 1 '
+        'Carbon 1 '
+        'Dubnium 1 '
+        'Europium 1 '
+        'Francium 1 '
+        # content
+        'Argon '
+        'Boron '
+        'Carbon '
+        'Dubnium '
+        'Europium '
+        'Francium'
     )
 
 
@@ -296,14 +330,43 @@ def test_pdf_toc_levels():
     pdf.generate()
     assert extract_pdf_info(file) == (
         1,
+        # table of contents
         '1a 1 '
         '1.1 a.a 1 '
+        # content
         '1a '
         '1.1 a.a '
         '1.1.1 a.a.a '
         '1.1.1.1 a.a.a.a '
         '1.1.1.1.1 a.a.a.a.a '
         '1.1.1.1.1.1 a.a.a.a.a.a'
+    )
+
+    # no hierarchical numbering
+    file = BytesIO()
+    pdf = Pdf(file, toc_levels=2, skip_numbering=True)
+    pdf.init_a4_portrait()
+    pdf.table_of_contents()
+    pdf.h1('Argon')
+    pdf.h2('Boron')
+    pdf.h3('Carbon')
+    pdf.h4('Dubnium')
+    pdf.h5('Europium')
+    pdf.h6('Francium')
+
+    pdf.generate()
+    assert extract_pdf_info(file) == (
+        1,
+        # table of contents
+        'Argon 1 '
+        'Boron 1 '
+        # content
+        'Argon '
+        'Boron '
+        'Carbon '
+        'Dubnium '
+        'Europium '
+        'Francium'
     )
 
 

@@ -7,7 +7,7 @@ from onegov.agency.custom import get_global_tools
 from onegov.agency.custom import get_top_navigation
 from onegov.agency.forms import UserGroupForm
 from onegov.agency.initial_content import create_new_organisation
-from onegov.agency.pdf import AgencyPdfAr, AgencyPdfBs
+from onegov.agency.pdf import AgencyPdfAr, AgencyPdfBs, AgencyPdfLu
 from onegov.agency.pdf import AgencyPdfDefault
 from onegov.agency.pdf import AgencyPdfZg
 from onegov.agency.request import AgencyRequest
@@ -109,6 +109,8 @@ class AgencyApp(OrgApp, ApiApp):
             return AgencyPdfZg
         if pdf_layout == 'bs':
             return AgencyPdfBs
+        if pdf_layout == 'lu':
+            return AgencyPdfLu
         return AgencyPdfDefault
 
     @property

@@ -1,8 +1,10 @@
 from __future__ import annotations
 
+import re
 from collections import defaultdict
 from datetime import datetime
 
+import click
 from email_validator import validate_email, EmailNotValidError, \
     EmailUndeliverableError
 from markupsafe import Markup
@@ -285,7 +287,8 @@ def import_bs_persons(
                 )
 
             else:
-                print(f'agency id {agency_id} not found in agencies')
+                click.echo(
+                    f'agency id {agency_id} not found in agencies', err=True)
 
     for ix, line in enumerate(csvfile.lines):
         if ix % 50 == 0:
@@ -336,8 +339,10 @@ def get_web_address(internet_adresse: str) -> str | None:
     return f'http://{internet_adresse}'
 
 
-def get_email(line: DefaultRow) -> str | None:
+def get_email(line: DefaultRow, vorname: str, nachname: str) -> str | None:
     email = v_(line.e_mail_adresse)
+    vorname = vorname.lower()
+    nachname = nachname.lower()
 
     if not email:
         return None
@@ -345,16 +350,22 @@ def get_email(line: DefaultRow) -> str | None:
     # only keep valid generic email address, but not `vorname.nachname@lu.ch`
     addr = email.split(' ')
     for a in addr:
-        if a in ['vorname.name@lu.ch', '@lu.ch']:
+        # skip email address like
+        if a in ['vorname.name@lu.ch', '@lu.ch', 'vorname.name@']:
             continue
-        if '@' in a:
+
+        # Skip personal email address if it contains the first or last name
+        if vorname and nachname and vorname in a and nachname in a:
+            continue
+
+        if '@' in a:  # as it can be any word
             try:
                 validate_email(a)
             except EmailUndeliverableError:
                 continue
             except EmailNotValidError:
-                print(f'Error importing person with invalid email {a}; line '
-                      f'{line.rownumber}')
+                click.echo(f'Error importing person with invalid email {a}; '
+                           f'line {line.rownumber}')
                 continue
 
             return a
@@ -389,8 +400,6 @@ def check_skip_people(line: DefaultRow) -> bool:
         return False
 
     if kw_1 in line.nachname or kw_1 in line.vorname or kw_1 in line.funktion:
-        # print(f'Skipping person on line {line.rownumber} with keyword '
-        #       f'{kw_1} {line.nachname}, {line.vorname}, {line.funktion}')
         return True
 
     return False
@@ -408,9 +417,33 @@ def agency_id_person_lu(line: DefaultRow) -> str:
     Generates an agency id based on each organisation and sub organisation
     name for a person.
     """
-    words = [line.department, line.dienststelle, line.abteilung,
-             line.unterabteilung, line.unterabteilung_2]
+    words = [line.department,
+             line.dienststelle__alternativ_ or line.dienststelle,
+             line.abteilung, line.unterabteilung, line.unterabteilung_2]
     return agency_id_agency_lu(words)
+
+
+def parse_alliance_name(
+    alliance_name: str,
+    first_name: str = '',
+) -> (tuple[str, str] | tuple[None, None]):
+    """
+    Parse alliance name into last name and first name
+    """
+
+    match = re.match(
+        r'^\s*(\S+(-\S+)?)(\s\S+(-\S+)?)*$', alliance_name.strip())
+    if match:
+        parts = alliance_name.strip().split()
+        if first_name:
+            last_name = alliance_name.strip().replace(first_name, '').strip()
+        elif len(parts) == 2:
+            last_name, first_name = parts
+        else:
+            last_name = parts[0]
+            first_name = ' '.join(parts[1:])
+        return last_name, first_name
+    return None, None
 
 
 @with_open
@@ -425,6 +458,9 @@ def import_lu_people(
     persons = []
 
     def parse_person(line: DefaultRow) -> None:
+        alliance_name = v_(line.name__umlaut_)  # prio over vorname, nachname
+        function = v_(line.funktion) or ''
+        nachname = v_(line.nachname) or ' '
         vorname = v_(line.vorname) or ''
 
         if vorname and vorname[-1].isdigit():
@@ -432,21 +468,26 @@ def import_lu_people(
             # indicating another membership
             vorname = ' '.join(vorname.split(' ')[:-1])
 
-        function = v_(line.funktion) or ''
+        if alliance_name:
+            nname, vname = parse_alliance_name(alliance_name, vorname)
+            if nname and vname:
+                nachname, vorname = nname, vname
+
         person = people.add_or_get(
-            last_name=v_(line.nachname) or ' ',
+            last_name=nachname,
             first_name=vorname,
             salutation=None,
             academic_title=v_(line.akad__titel),
             function=function,
-            email=get_email(line),
+            email=get_email(line, vorname, nachname),
             phone=get_phone(line.isdn_nummer),
             phone_direct=get_phone(line.mobil),
             website=v_(get_web_address(line.internet_adresse)),
             location_address=v_(line.adresse),
             location_code_city=v_(get_plz_city(line.plz, line.ort)),
             access='public',
-            compare_names_only=True
+            compare_names_only=True,
+            external_user_id=v_(line.benutzer_id)
         )
         persons.append(person)
         parse_membership(line, person, function)
@@ -470,10 +511,10 @@ def import_lu_people(
                 agency.add_person(person.id,
                                   title=function or 'Mitglied')
             else:
-                print(f'Error agency id {agency_id} not found')
+                click.echo(f'Error agency id {agency_id} not found', err=True)
 
     for ix, line in enumerate(csvfile.lines):
-        if ix % 100 == 0:
+        if ix % 1000 == 0:
             app.es_indexer.process()
             app.psql_indexer.bulk_process(session)
 
@@ -496,7 +537,7 @@ def import_lu_agencies(
     # Hierarchy: Hierarchie: Department, Dienststelle, Abteilung,
     # Unterabteilung, Unterabteilung 2, Unterabteilung 3
     for ix, line in enumerate(csvfile.lines):
-        if ix % 100 == 0:
+        if ix % 1000 == 0:
             app.es_indexer.process()
             app.psql_indexer.bulk_process(session)
 
@@ -505,13 +546,15 @@ def import_lu_agencies(
 
         dienststelle, abteilung, unterabteilung, unterabteilung_2 = (
             None, None, None, None)
-        export_fields = ['person.title', 'person.phone']
+        export_fields = ['person.function', 'person.academic_title',
+                         'person.title', 'person.phone']
 
         adr, pc, loc = None, None, None
         phone, phone_u2, phone_u, phone_a, phone_ds, phone_dep = \
             None, None, None, None, None, None
         kw = 'Telefon'
         if kw in line.nachname or kw in line.vorname or kw in line.funktion:
+            # considered as an agency phone number not a personal one
             phone = get_phone(line.isdn_nummer)
             if v_(line.unterabteilung_2):
                 phone_u2 = phone
@@ -519,7 +562,7 @@ def import_lu_agencies(
                 phone_u = phone
             elif v_(line.abteilung):
                 phone_a = phone
-            elif v_(line.dienststelle):
+            elif v_(line.dienststelle__alternativ_) or v_(line.dienststelle):
                 phone_ds = phone
             elif v_(line.department):
                 phone_dep = phone
@@ -539,7 +582,9 @@ def import_lu_agencies(
             if agency_id not in added_agencies:
                 added_agencies[agency_id] = department
 
-        dienststellen_name = v_(line.dienststelle)
+        # dienststelle alternativ has priority over dienststelle
+        dienststellen_name = (v_(line.dienststelle__alternativ_) or
+                              v_(line.dienststelle))
         if dienststellen_name:
             assert department, (f'Error adding agency with no department; '
                                 f'line {line.rownumber}, {line.nachname}')
@@ -603,6 +648,17 @@ def import_lu_agencies(
                 unterabteilungs_name, unterabteilung_2_name])
             if agency_id not in added_agencies:
                 added_agencies[agency_id] = unterabteilung_2
+
+    # order top level agencies (no parent_id), 'Staatskanzlei' at the top,
+    # others alphabetically
+    top_level = [a for a in added_agencies.values() if not a.parent_id]
+    top_level.sort(key=lambda a: a.title)
+    for ix, agency in enumerate(top_level, start=1):
+        if agency.title == 'Staatskanzlei':
+            agency.order = 0
+        agency.order = ix
+
+    session.flush()
 
     return added_agencies
 
@@ -719,7 +775,6 @@ def match_person_membership_title(
 
             if not name:
                 if title:
-                    # print('No function given but title set')
                     return
                 membership.title = 'Mitglied'
                 updated_memberships.append(membership)

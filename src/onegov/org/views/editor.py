@@ -182,9 +182,10 @@ def handle_edit_page(
 
     if self.page.deletable and self.page.trait == 'link':
         edit_links = self.page.get_edit_links(request)
-        layout.editbar_links = list(filter(
+        links = layout.editmode_links + list(filter(
             lambda link: getattr(link, 'text', '') == _('Delete'), edit_links
         ))
+        layout.editmode_links = links
 
     if form.submitted(request):
         form.populate_obj(self.page)

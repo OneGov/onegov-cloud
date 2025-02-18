@@ -99,7 +99,7 @@ class Organisation(Base, TimestampMixin):
     redirect_homepage_to: dict_property[str | None] = meta_property()
     redirect_path: dict_property[str | None] = meta_property()
     hidden_people_fields: dict_property[list[str]] = meta_property(
-        default=list
+        default=lambda: ['external_user_id']
     )
     event_locations: dict_property[list[str]] = meta_property(default=list)
     geo_provider: dict_property[str] = meta_property(default='geo-mapbox')
@@ -214,6 +214,7 @@ class Organisation(Base, TimestampMixin):
     newsletter_categories: (
         dict_property)[dict[str, list[dict[str, list[str]] | str]]] = (
         meta_property(default=dict))
+    notify_on_unsubscription: dict_property[list[str] | None] = meta_property()
 
     # Chat Settings
     chat_staff: dict_property[list[str] | None] = meta_property()

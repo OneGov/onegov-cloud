@@ -10,6 +10,7 @@ from onegov.api.models import ApiException
 from typing import Any, TYPE_CHECKING
 if TYPE_CHECKING:
     from onegov.core import Framework
+    from onegov.core.request import CoreRequest
 
 
 @ApiApp.path(
@@ -26,6 +27,7 @@ def get_api_endpoints(app: Framework) -> ApiEndpointCollection:
     converters={'page': int}
 )
 def get_api_endpoint(
+    request: CoreRequest,
     app: Framework,
     endpoint: str,
     page: int = 0,
@@ -38,7 +40,7 @@ def get_api_endpoint(
     cls = ApiEndpointCollection(app).endpoints.get(endpoint)
     if not cls:
         raise ApiException('Not found', status_code=404)
-    return cls(app, extra_parameters=extra_parameters, page=page)
+    return cls(request, extra_parameters=extra_parameters, page=page)
 
 
 @ApiApp.path(
@@ -46,9 +48,9 @@ def get_api_endpoint(
     path='/api/{endpoint}/{id}',
 )
 def get_api_endpoint_item(
-    app: Framework, endpoint: str, id: str
+    request: CoreRequest, app: Framework, endpoint: str, id: str
 ) -> ApiEndpointItem[Any]:
-    item: ApiEndpointItem[Any] = ApiEndpointItem(app, endpoint, id)
+    item: ApiEndpointItem[Any] = ApiEndpointItem(request, endpoint, id)
     if not item.api_endpoint or not item.item:  # for ex. ExtendedAgency
         raise ApiException('Not found', status_code=404)
     return item

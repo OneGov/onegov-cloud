@@ -3121,12 +3121,28 @@ class PaymentProviderLayout(DefaultLayout):
                     title=_('Add'),
                     links=(
                         Link(
+                            text=_('Datatrans'),
+                            url=self.request.class_link(
+                                PaymentProviderCollection,
+                                name='new-datatrans'
+                            ),
+                            attrs={'class': 'new-datatrans'}
+                        ),
+                        Link(
                             text=_('Stripe Connect'),
                             url=self.request.class_link(
                                 PaymentProviderCollection,
                                 name='stripe-connect-oauth'
                             ),
                             attrs={'class': 'new-stripe-connect'}
+                        ),
+                        Link(
+                            text=_('Worldline Saferpay'),
+                            url=self.request.class_link(
+                                PaymentProviderCollection,
+                                name='new-saferpay'
+                            ),
+                            attrs={'class': 'new-worldline-saferpay'}
                         ),
                     )
                 )
