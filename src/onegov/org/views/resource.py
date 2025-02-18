@@ -298,6 +298,13 @@ def view_find_your_spot(
         assert end_time is not None
         start = datetime.combine(form.start.data, start_time)
         end = datetime.combine(form.end.data, end_time)
+        assert form.duration.data is not None
+        duration = form.duration.data
+        step = (
+            timedelta(minutes=10)
+            if duration.total_seconds() < 600
+            else duration
+        )
 
         if form.rooms:
             assert form.rooms.data is not None
@@ -312,6 +319,54 @@ def view_find_your_spot(
                 if not form.is_excluded(current):
                     yield current
                 current += timedelta(days=1)
+
+        def spot_infos_for_free_slots(
+            allocation: Allocation,
+            free: list[tuple[datetime, datetime]],
+            target_range: timedelta,
+            *,
+            adjustable: bool = False,
+            availability_threshold: float = 5.0
+        ) -> Iterator[utils.FindYourSpotEventInfo]:
+
+            # FIXME: The availability calculation should probably be
+            #        normalized when a daylight savings shift occurs
+            assert allocation.timezone is not None
+            slot_start, slot_end = free[0]
+            slot_end += time.resolution
+            for next_slot_start, next_slot_end in islice(free, 1, None):
+
+                if slot_end != next_slot_start:
+                    availability = (slot_end - slot_start) / target_range
+                    availability *= 100.0
+                    yield utils.FindYourSpotEventInfo(
+                        allocation,
+                        (sedate.to_timezone(
+                            slot_start, allocation.timezone),
+                            sedate.to_timezone(
+                                slot_end, allocation.timezone)),
+                        min(availability, 100),
+                        1 if availability >= availability_threshold else 0,
+                        request,
+                        adjustable=adjustable
+                    )
+                    slot_start = next_slot_start
+
+                # expand slot end
+                slot_end = next_slot_end + time.resolution
+
+            # add final slot
+            availability = (slot_end - slot_start) / target_range
+            availability *= 100.0
+            yield utils.FindYourSpotEventInfo(
+                allocation,
+                (sedate.to_timezone(slot_start, allocation.timezone),
+                 sedate.to_timezone(slot_end, allocation.timezone)),
+                min(availability, 100.0),
+                1 if availability >= availability_threshold else 0,
+                request,
+                adjustable=adjustable
+            )
 
         # initialize the room slots with all the included dates and rooms
         room_slots = {
@@ -352,7 +407,8 @@ def view_find_your_spot(
                         None,  # won't be displayed
                         quota_left / allocation.quota,
                         quota_left,
-                        request
+                        request,
+                        adjustable=allocation.quota > 1
                     ))
                     continue
                 elif target_start >= target_end:
@@ -360,44 +416,109 @@ def view_find_your_spot(
                     # just treat it as not available in this case
                     continue
 
-                free = allocation.free_slots(target_start, target_end)
+                # add single click slots for the correct duration
+                added_slots = 0
+                for target_slot_start in sedate.dtrange(
+                    target_start,
+                    target_end - step,
+                    step,
+                    skip_missing=True
+                ):
+                    if added_slots >= 5:
+                        break
+
+                    target_slot_end = target_slot_start + duration
+
+                    free = allocation.free_slots(
+                        target_slot_start,
+                        target_slot_end
+                    )
+                    if not free:
+                        if (
+                            allocation.display_start() <= target_slot_start
+                            and allocation.display_end() >= target_slot_end
+                        ):
+                            # render an unavailable slot
+                            added_slots += 1
+                            slots.append(utils.FindYourSpotEventInfo(
+                                allocation,
+                                (
+                                    max(
+                                        sedate.to_timezone(
+                                            target_slot_start,
+                                            allocation.timezone
+                                        ),
+                                        allocation.display_start(),
+                                    ),
+                                    min(
+                                        sedate.to_timezone(
+                                            target_slot_end,
+                                            allocation.timezone
+                                        ),
+                                        allocation.display_end()
+                                    )
+                                ),
+                                0,
+                                0,
+                                request,
+                            ))
+                        continue
+
+                    spot_infos = list(spot_infos_for_free_slots(
+                        allocation,
+                        free,
+                        target_slot_end - target_slot_start
+                    ))
+                    if (
+                        len(spot_infos) != 1
+                        or spot_infos[0].availability < 100.0
+                    ):
+                        total_availability = sum(
+                            info.availability
+                            for info in spot_infos
+                        )
+                        # render a partially available slot
+                        slots.append(utils.FindYourSpotEventInfo(
+                            allocation,
+                            (
+                                max(
+                                    sedate.to_timezone(
+                                        target_slot_start,
+                                        allocation.timezone
+                                    ),
+                                    allocation.display_start(),
+                                ),
+                                min(
+                                    sedate.to_timezone(
+                                        target_slot_end,
+                                        allocation.timezone
+                                    ),
+                                    allocation.display_end()
+                                )
+                            ),
+                            total_availability,
+                            0,
+                            request,
+                        ))
+                        added_slots += 1
+                        continue
+
+                    slots.append(spot_infos[0])
+                    added_slots += 1
+
+                free = allocation.free_slots(
+                    target_start,
+                    target_end
+                )
                 if not free:
                     continue
 
-                # FIXME: The availability calculation should probably be
-                #        normalized when a daylight savings shift occurs
-                target_range = (target_end - target_start)
-                slot_start, slot_end = free[0]
-                slot_end += time.resolution
-                for next_slot_start, next_slot_end in islice(free, 1, None):
-                    if slot_end != next_slot_start:
-                        availability = (slot_end - slot_start) / target_range
-                        availability *= 100.0
-                        slots.append(utils.FindYourSpotEventInfo(
-                            allocation,
-                            (sedate.to_timezone(
-                                slot_start, allocation.timezone),
-                                sedate.to_timezone(
-                                    slot_end, allocation.timezone)),
-                            availability,
-                            1 if availability >= 5.0 else 0,
-                            request
-                        ))
-                        slot_start = next_slot_start
-
-                    # expand slot end
-                    slot_end = next_slot_end + time.resolution
-
-                # add final slot
-                availability = (slot_end - slot_start) / target_range
-                availability *= 100.0
-                slots.append(utils.FindYourSpotEventInfo(
+                # add the actual available slots for custom adjustments
+                slots.extend(spot_infos_for_free_slots(
                     allocation,
-                    (sedate.to_timezone(slot_start, allocation.timezone),
-                     sedate.to_timezone(slot_end, allocation.timezone)),
-                    availability,
-                    1 if availability >= 5.0 else 0,
-                    request
+                    free,
+                    duration,
+                    adjustable=True
                 ))
 
     if room_slots:

@@ -698,6 +698,9 @@ a#results {
              to fix this. This is dumb, but this bug has been around for
              almost a decade and still hasn't been fixed... */
     filter: blur(0);
+    /* NOTE: Since we allow shift as a modifier key, text-selection would
+             become annoying, rather than helpful. */
+    user-select: none;
 
     table {
         margin-bottom: 0;
@@ -739,7 +742,6 @@ a#results {
             }
 
             &.selected {
-                cursor: default;
                 background-image: repeating-linear-gradient(
                     45deg,
                     rgba($steel, .25),
@@ -747,6 +749,11 @@ a#results {
                     rgba($iron, .25) 10px,
                     rgba($iron, .25) 20px
                 );
+                cursor: default;
+
+                &.event-available.event-adjustable {
+                    cursor: pointer;
+                }
             }
 
             &.not-selected:not(:hover) {
@@ -768,6 +775,13 @@ a#results {
         .event-available {
             cursor: pointer;
             background-color: $green;
+        }
+
+        .event-adjustable::before {
+            float: right;
+            color: white;
+            font-size: 1.5rem;
+            @include icon($edit-link-icon);
         }
     }
 }

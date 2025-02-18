@@ -2,7 +2,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: \n"
-"POT-Creation-Date: 2025-02-17 14:16+0100\n"
+"POT-Creation-Date: 2025-02-18 09:50+0100\n"
 "PO-Revision-Date: 2022-03-15 10:52+0100\n"
 "Last-Translator: \n"
 "Language-Team: \n"
@@ -1240,14 +1240,27 @@ msgstr "Note"
 msgid "Public extra information about this person"
 msgstr "Informazioni pubbliche aggiuntive su questa persona"
 
+msgid "I am looking to make a reservation lasting"
+msgstr "Voglio fare una prenotazione di"
+
+msgid "On Weekday(s)"
+msgstr "In giorno/i feriale/i"
+
+msgid "Earliest Start"
+msgstr "Inizio più precoce"
+
+msgid "Latest End"
+msgstr "Ultima fine"
+
 msgid "Rooms"
 msgstr "Camere"
 
-msgid "Weekdays"
-msgstr "Giorni della settimana"
-
 msgid "Start date in past"
 msgstr "Data di inizio nel passato"
+
+msgid "Duration is longer than the range between start and end time"
+msgstr ""
+"La durata è superiore all'intervallo tra l'ora di inizio e l'ora di fine"
 
 msgid "Describes what this reservation resource is about"
 msgstr "Descrive il contenuto di questa risorsa di prenotazione"
@@ -1324,6 +1337,9 @@ msgstr "Inserisci almeno un codice postale"
 
 msgid "Please enter one zip-code per line, without spaces or commas"
 msgstr "Inserisci un codice postale per riga, senza spazi o virgole"
+
+msgid "Weekdays"
+msgstr "Giorni della settimana"
 
 msgid "New Reservations"
 msgstr "Nuove prenotazioni"
@@ -3028,8 +3044,8 @@ msgstr "Il rifiuto di ${title} non può essere annullato."
 msgid "Reject reservation"
 msgstr "Rifiuta prenotazione"
 
-#. Used in sentence: "${event} published."
 #.
+#. Used in sentence: "${event} published."
 msgid "Event"
 msgstr "Evento"
 
@@ -3418,6 +3434,18 @@ msgstr "Nessun file caricato"
 
 msgid "All dates"
 msgstr "Tutte le date"
+
+msgid ""
+"By default we assume that you only want to select a single time slot and "
+"room per day. If you want to select more than one time slot or room on a "
+"given day, you may hold and press any one of your Shift, Alt or Ctrl keys "
+"while clicking the time slots you want to reserve."
+msgstr ""
+"Per impostazione predefinita, si presume che si voglia selezionare una sola "
+"fascia oraria e una sola stanza al giorno. Se si desidera selezionare più di "
+"una fascia oraria o di una stanza in un determinato giorno, è possibile "
+"tenere premuto uno dei tasti Shift, Alt o Ctrl mentre si fa clic sulle fasce "
+"orarie che si desidera prenotare."
 
 msgid "Unavailable"
 msgstr "Non disponibile"

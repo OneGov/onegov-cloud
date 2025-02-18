@@ -15,6 +15,7 @@ from wtforms.widgets import DateInput
 from wtforms.widgets import DateTimeLocalInput
 from wtforms.widgets import FileInput
 from wtforms.widgets import ListWidget
+from wtforms.widgets import NumberInput
 from wtforms.widgets import Select
 from wtforms.widgets import TextArea
 from wtforms.widgets import TextInput
@@ -26,8 +27,8 @@ if TYPE_CHECKING:
     from collections.abc import Iterator
     from onegov.chat import TextModule
     from onegov.form.fields import (
-        PanelField, PreviewField, UploadField, UploadMultipleField,
-        TypeAheadField
+        DurationField, PanelField, PreviewField, UploadField,
+        UploadMultipleField, TypeAheadField
     )
     from wtforms import Field, StringField
     from wtforms.fields.choices import SelectFieldBase
@@ -600,6 +601,37 @@ class DateTimeLocalRangeInput(DateRangeMixin, DateTimeLocalInput):
             kwargs.setdefault('max', max_date.isoformat() + 'T23:59')
 
         return super().__call__(field, **kwargs)
+
+
+class DurationInput:
+
+    minutes_widget = NumberInput(step=5, min=0, max=60)
+    hours_widget = NumberInput(step=1, min=0, max=24)
+
+    def __call__(self, field: DurationField, **kwargs: Any) -> Markup:
+        if field.data is None:
+            hours = '0'
+            minutes = '0'
+        else:
+            _minutes, _seconds = divmod(int(field.data.total_seconds()), 60)
+            _hours, _minutes = divmod(_minutes, 60)
+            hours = str(_hours)
+            minutes = str(_minutes)
+        return Markup("""
+            <div class="duration-widget">
+            <label>{hours_input} {hours_label}</label>
+            <label>{minutes_input} {minutes_label}</label>
+            </div>
+        """).format(
+            hours_label=field.gettext(_('hours')),
+            minutes_label=field.gettext(_('minutes')),
+            hours_input=self.hours_widget(
+                field, value=hours, size=2, **kwargs
+            ),
+            minutes_input=self.minutes_widget(
+                field, value=minutes, size=2, **kwargs
+            ),
+        )
 
 
 class TypeAheadInput(TextInput):

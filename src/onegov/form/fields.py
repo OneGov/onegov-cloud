@@ -5,6 +5,7 @@ import phonenumbers
 import sedate
 
 from cssutils.css import CSSStyleSheet  # type:ignore[import-untyped]
+from datetime import timedelta
 from itertools import zip_longest
 from email_validator import validate_email, EmailNotValidError
 from markupsafe import escape, Markup
@@ -19,6 +20,7 @@ from onegov.form import log, _
 from onegov.form.utils import path_to_filename
 from onegov.form.validators import ValidPhoneNumber
 from onegov.form.widgets import ChosenSelectWidget, LinkPanelWidget
+from onegov.form.widgets import DurationInput
 from onegov.form.widgets import HoneyPotWidget
 from onegov.form.widgets import IconWidget
 from onegov.form.widgets import MultiCheckboxWidget
@@ -98,6 +100,35 @@ class TimeField(DefaultTimeField):
 
         valuelist = [t[:8] for t in valuelist]  # type:ignore[index]
         super().process_formdata(valuelist)
+
+
+# NOTE: For now this is exactly what we use it for: a 5 minute-granularity
+#       input field with an hour and minute component. We can make this
+#       more flexible in the future, if we need it.
+class DurationField(Field):
+
+    widget = DurationInput()
+
+    data: timedelta | None
+
+    def process_formdata(self, valuelist: list[RawFormValue]) -> None:
+        if not (len(valuelist) == 2 and valuelist[0] and valuelist[1]):
+            self.data = None
+            return
+
+        hours, minutes = map(int, valuelist)  # type: ignore[arg-type]
+        if not (0 <= hours <= 24):
+            self.data = None
+            raise ValueError(_('Invalid number of hours'))
+        if not (0 <= minutes <= 60) or (minutes % 5 != 0):
+            self.data = None
+            raise ValueError(_('Invalid number of minutes'))
+
+        if not (hours or minutes):
+            self.data = None
+            return
+
+        self.data = timedelta(hours=hours, minutes=minutes)
 
 
 class TranslatedSelectField(SelectField):
