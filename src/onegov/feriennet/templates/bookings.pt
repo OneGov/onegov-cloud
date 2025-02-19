@@ -129,10 +129,10 @@
                                                         <tal:b>(${len(grouped_bookings[attendee][state])})</tal:b>
                                                     </h4>
                                                 </tal:b>
-                                                <i class="fa fa-chevron-down rotate down" aria-hidden="true"></i>
+                                                <i class="fa fa-chevron-down rotate ${'down' if toggled else ''}" aria-hidden="true"></i>
                                             </div>
 
-                                            <ul style="${toggled and 'display: block;' or 'display: none;'}">
+                                            <ul class="${'' if toggled else 'hidden'}">
                                                 <li tal:repeat="booking grouped_bookings[attendee][state]" id="booking-${booking.id}">
                                                     <div class="panel" tal:condition="repeat.booking.index == 0 and state in ('blocked', 'denied')">
                                                         <tal:b condition="state == 'blocked'" i18n:translate>
