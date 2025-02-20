@@ -1116,6 +1116,9 @@ msgstr "Empfänger"
 msgid "Do not actually import the newsletter subscribers"
 msgstr "Die Newsletter Abonnenten werden nicht gespeichert"
 
+msgid "Subscribed on"
+msgstr "Abonniert am"
+
 msgid "Will be used as image in the page overview on the parent page"
 msgstr ""
 "Wird als Bild in der Seitenübersicht auf der übergeordneten Seite verwendet."
