@@ -978,7 +978,10 @@
                 </tal:b>
             </tal:b>
             <tal:b condition="not (allow_downloads or allow_views) or field.type not in ('UploadField', 'UploadMultipleField')" >
-                <tal:b tal:switch="linkify_display|False">
+                <tal:b tal:condition="field.pricing|False">
+                    ${rendered} <span i18n:translate="">Item(s)</span>
+                </tal:b>
+                <tal:b tal:condition="not field.pricing|False" tal:switch="linkify_display|False">
                     <tal:b tal:case="True" replace="layout.linkify_field(field, rendered)" />
                     <tal:b tal:case="False" replace="rendered" />
                 </tal:b>
