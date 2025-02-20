@@ -27,6 +27,7 @@ from onegov.election_day.theme import ElectionDayTheme
 from onegov.file import DepotApp
 from onegov.form import FormApp
 from onegov.user import UserApp
+from webob import Response
 
 
 from typing import Any
@@ -38,7 +39,6 @@ if TYPE_CHECKING:
     from onegov.core.cache import RedisCacheRegion
     from onegov.election_day.models import Canton
     from onegov.election_day.models import Municipality
-    from webob import Response
 
 
 class ElectionDayApp(Framework, FormApp, UserApp, DepotApp):
@@ -93,12 +93,15 @@ class ElectionDayApp(Framework, FormApp, UserApp, DepotApp):
         :class:`onegov.core.filestorage.FilestorageFile`.
 
         """
-        return self.cache.get_or_create('logo', self.load_logo)
+        logo_path = self.cache.get_or_create('logo', self.load_logo)
+        if logo_path is not None:
+            return FilestorageFile(logo_path)
+        return None
 
-    def load_logo(self) -> FilestorageFile | None:
+    def load_logo(self) -> str | None:
         logo = self.principal.logo
         if logo and self.filestorage.isfile(logo):  # type:ignore[union-attr]
-            return FilestorageFile(logo)
+            return logo
         return None
 
     @property
@@ -288,10 +291,12 @@ def micro_cache_anonymous_pages_tween_factory(
     )
     cache_paths_re = re.compile(r'^({})$'.format('|'.join(cache_paths)))
 
-    def should_cache_fn(response: Response) -> bool:
-        return (
-            response.status_code == 200
-            and 'Set-Cookie' not in response.headers
+    def should_cache_fn(
+        response: tuple[str, int, list[tuple[str, str]]]
+    ) -> bool:
+        return response[1] == 200 and not any(
+            header.lower() == 'set-cookie'
+            for header, _value in response[2]
         )
 
     def micro_cache_anonymous_pages_tween(
@@ -326,11 +331,19 @@ def micro_cache_anonymous_pages_tween_factory(
                 'hl' if 'headerless' in request.browser_session else 'hf'
             ))
 
-        return app.pages_cache.get_or_create(
+        def create_response() -> tuple[str, int, list[tuple[str, str]]]:
+            response = handler(request)
+            return response.text, response.status_code, response.headerlist
+
+        # NOTE: For serialization purposes we deconstruct the response
+        #       into its text, status_code and headerlist, which should
+        #       be enough to fully reconstruct the response afterwards
+        text, status_code, headerlist = app.pages_cache.get_or_create(
             key,
-            creator=lambda: handler(request),
+            creator=create_response,
             should_cache_fn=should_cache_fn
         )
+        return Response(text, headerlist=headerlist, status=status_code)
 
     return micro_cache_anonymous_pages_tween
 

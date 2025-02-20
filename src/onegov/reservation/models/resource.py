@@ -3,10 +3,10 @@ from __future__ import annotations
 import datetime
 import secrets
 
+from functools import lru_cache
 from libres import new_scheduler
 from libres.db.models import Allocation
 from libres.db.models.base import ORMBase
-from onegov.core.cache import lru_cache
 from onegov.core.orm import ModelBase
 from onegov.core.orm.mixins import content_property, dict_property
 from onegov.core.orm.mixins import ContentMixin, TimestampMixin

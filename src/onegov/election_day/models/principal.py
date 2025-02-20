@@ -8,6 +8,7 @@ from datetime import date
 from markupsafe import Markup
 from onegov.core import utils
 from onegov.core.custom import json
+from onegov.core.custom import msgpack
 from onegov.election_day import _
 from pathlib import Path
 from urllib.parse import urlsplit
@@ -16,6 +17,7 @@ from yaml import safe_load
 
 from typing import Any
 from typing import Literal
+from typing import Self
 from typing import TYPE_CHECKING
 if TYPE_CHECKING:
     from translationstring import TranslationString
@@ -152,9 +154,9 @@ class Principal:
         kwargs = safe_load(yaml_source)
         assert 'canton' in kwargs or 'municipality' in kwargs
         if 'municipality' in kwargs:
-            return Municipality(**kwargs)
+            return Municipality.from_yaml_data(**kwargs)
         else:
-            return Canton(**kwargs)
+            return Canton.from_yaml_data(**kwargs)
 
     @cached_property
     def base_domain(self) -> str | None:
@@ -223,7 +225,37 @@ class Principal:
         raise NotImplementedError()
 
 
-class Canton(Principal):
+class Canton(Principal, msgpack.Serializable, keys=(
+    'canton',
+    'domains_election',
+    'domains_vote',
+    'entities',
+    'name',
+    'logo',
+    'logo_position',
+    'color',
+    'base',
+    'analytics',
+    'has_districts',
+    'has_regions',
+    'has_superregions',
+    'fetch',
+    'webhooks',
+    'sms_notification',
+    'email_notification',
+    'wabsti_import',
+    'open_data',
+    'hidden_elements',
+    'publish_intermediate_results',
+    'csp_script_src',
+    'csp_connect_src',
+    'cache_expiration_time',
+    'reply_to',
+    'custom_css',
+    'official_host',
+    'segmented_notifications',
+    'private',
+)):
     """ A cantonal instance. """
 
     CANTONS = {
@@ -260,10 +292,81 @@ class Canton(Principal):
     def __init__(
         self,
         canton: str,
-        **kwargs: Any
-    ):
+        domains_election: dict[str, TranslationString],
+        domains_vote: dict[str, TranslationString],
+        entities: dict[int, dict[int, dict[str, str]]],
+        name: str | None = None,
+        logo: str | None = None,
+        logo_position: str = 'left',
+        color: str = '#000',
+        base: str | None = None,
+        analytics: str | None = None,
+        has_districts: bool = True,
+        has_regions: bool = False,
+        has_superregions: bool = False,
+        fetch: dict[str, Any] | None = None,
+        webhooks: dict[str, dict[str, str]] | None = None,
+        sms_notification: bool | None = None,
+        email_notification: bool | None = None,
+        wabsti_import: bool = False,
+        open_data: dict[str, str] | None = None,
+        hidden_elements: dict[str, dict[str, dict[str, bool]]] | None = None,
+        publish_intermediate_results: dict[str, bool] | None = None,
+        csp_script_src: list[str] | None = None,
+        csp_connect_src: list[str] | None = None,
+        cache_expiration_time: int = 300,
+        reply_to: str | None = None,
+        custom_css: str | None = None,
+        official_host: str | None = None,
+        segmented_notifications: bool = False,
+        private: bool = False,
+    ) -> None:
+
         assert canton in self.CANTONS
-        self.id = canton
+        self.canton = canton
+
+        super().__init__(
+            id_=canton,
+            domain='canton',
+            domains_election=domains_election,
+            domains_vote=domains_vote,
+            entities=entities,
+            name=name,
+            logo=logo,
+            logo_position=logo_position,
+            color=color,
+            base=base,
+            analytics=analytics,
+            has_districts=has_districts,
+            has_regions=has_regions,
+            has_superregions=has_superregions,
+            use_maps=True,
+            fetch=fetch,
+            webhooks=webhooks,
+            sms_notification=sms_notification,
+            email_notification=email_notification,
+            wabsti_import=wabsti_import,
+            open_data=open_data,
+            hidden_elements=hidden_elements,
+            publish_intermediate_results=publish_intermediate_results,
+            csp_script_src=csp_script_src,
+            csp_connect_src=csp_connect_src,
+            cache_expiration_time=cache_expiration_time,
+            reply_to=reply_to,
+            custom_css=custom_css,
+            official_host=official_host,
+            segmented_notifications=segmented_notifications,
+            private=private,
+        )
+
+    @classmethod
+    def from_yaml_data(
+        cls,
+        canton: str,
+        **kwargs: Any
+    ) -> Self:
+
+        assert canton in cls.CANTONS
 
         kwargs.pop('use_maps', None)
 
@@ -312,16 +415,6 @@ class Canton(Principal):
         domains_election: dict[str, TranslationString] = OrderedDict()
         domains_election['federation'] = _('Federal')
         domains_election['canton'] = _('Cantonal')
-        if has_regions:
-            domains_election['region'] = _(
-                'Regional (${on})',
-                mapping={'on': self.label('region')}
-            )
-        if has_districts:
-            domains_election['district'] = _(
-                'Regional (${on})',
-                mapping={'on': self.label('district')}
-            )
         domains_election['none'] = _(
             'Regional (${on})',
             mapping={'on': _('Other')}
@@ -333,18 +426,27 @@ class Canton(Principal):
         domains_vote['canton'] = _('Cantonal')
         domains_vote['municipality'] = _('Communal')
 
-        super().__init__(
-            id_=canton,
-            domain='canton',
+        self = cls(
+            canton=canton,
             domains_election=domains_election,
             domains_vote=domains_vote,
             entities=entities,
             has_districts=has_districts,
             has_regions=has_regions,
             has_superregions=has_superregions,
-            use_maps=True,
             **kwargs
         )
+        if has_regions:
+            domains_election['region'] = _(
+                'Regional (${on})',
+                mapping={'on': self.label('region')}
+            )
+        if has_districts:
+            domains_election['district'] = _(
+                'Regional (${on})',
+                mapping={'on': self.label('district')}
+            )
+        return self
 
     def label(self, value: str) -> str:
         if value == 'entity':
@@ -390,7 +492,39 @@ class Canton(Principal):
         return ''
 
 
-class Municipality(Principal):
+class Municipality(Principal, msgpack.Serializable, keys=(
+    'municipality',
+    'canton',
+    'canton_name',
+    'domains_election',
+    'domains_vote',
+    'entities',
+    'name',
+    'logo',
+    'logo_position',
+    'color',
+    'base',
+    'analytics',
+    'has_districts',
+    'has_regions',
+    'has_superregions',
+    'has_quarters',
+    'fetch',
+    'webhooks',
+    'sms_notification',
+    'email_notification',
+    'wabsti_import',
+    'open_data',
+    'hidden_elements',
+    'publish_intermediate_results',
+    'csp_script_src',
+    'csp_connect_src',
+    'cache_expiration_time',
+    'reply_to',
+    'custom_css',
+    'official_host',
+    'private',
+)):
     """ A communal instance. """
 
     domain: Literal['municipality']
@@ -400,12 +534,84 @@ class Municipality(Principal):
         municipality: str,
         canton: str,
         canton_name: str,
-        **kwargs: Any
-    ):
+        domains_election: dict[str, TranslationString],
+        domains_vote: dict[str, TranslationString],
+        entities: dict[int, dict[int, dict[str, str]]],
+        name: str | None = None,
+        logo: str | None = None,
+        logo_position: str = 'left',
+        color: str = '#000',
+        base: str | None = None,
+        analytics: str | None = None,
+        has_districts: bool = True,
+        has_regions: bool = False,
+        has_superregions: bool = False,
+        has_quarters: bool = False,
+        fetch: dict[str, Any] | None = None,
+        webhooks: dict[str, dict[str, str]] | None = None,
+        sms_notification: bool | None = None,
+        email_notification: bool | None = None,
+        wabsti_import: bool = False,
+        open_data: dict[str, str] | None = None,
+        hidden_elements: dict[str, dict[str, dict[str, bool]]] | None = None,
+        publish_intermediate_results: dict[str, bool] | None = None,
+        csp_script_src: list[str] | None = None,
+        csp_connect_src: list[str] | None = None,
+        cache_expiration_time: int = 300,
+        reply_to: str | None = None,
+        custom_css: str | None = None,
+        official_host: str | None = None,
+        private: bool = False,
+    ) -> None:
         assert municipality and canton and canton_name
 
+        self.municipality = municipality
         self.canton = canton
         self.canton_name = canton_name
+        self.has_quarters = has_quarters
+
+        super().__init__(
+            id_=municipality,
+            domain='municipality',
+            domains_election=domains_election,
+            domains_vote=domains_vote,
+            entities=entities,
+            name=name,
+            logo=logo,
+            logo_position=logo_position,
+            color=color,
+            base=base,
+            analytics=analytics,
+            has_districts=has_districts,
+            has_regions=has_regions,
+            has_superregions=has_superregions,
+            use_maps=True,
+            fetch=fetch,
+            webhooks=webhooks,
+            sms_notification=sms_notification,
+            email_notification=email_notification,
+            wabsti_import=wabsti_import,
+            open_data=open_data,
+            hidden_elements=hidden_elements,
+            publish_intermediate_results=publish_intermediate_results,
+            csp_script_src=csp_script_src,
+            csp_connect_src=csp_connect_src,
+            cache_expiration_time=cache_expiration_time,
+            reply_to=reply_to,
+            custom_css=custom_css,
+            official_host=official_host,
+            private=private,
+        )
+
+    @classmethod
+    def from_yaml_data(
+        cls,
+        municipality: str,
+        canton: str,
+        canton_name: str,
+        **kwargs: Any
+    ) -> Self:
+        assert municipality and canton and canton_name
 
         kwargs.pop('segmented_notifications', None)
 
@@ -427,8 +633,9 @@ class Municipality(Principal):
                     entities[year] = {
                         int(k): v for k, v in json.load(f).items()
                     }
+        has_quarters = False
         if entities:
-            self.has_quarters = True
+            has_quarters = True
             # Test if all entities have districts (use none, if ambiguous)
             districts = {
                 entity.get('district', None)
@@ -438,7 +645,7 @@ class Municipality(Principal):
             has_districts = None not in districts
         else:
             # ... we have no static data, autogenerate it!
-            self.has_quarters = False
+            has_quarters = False
             has_districts = False
             entities = {
                 year: {int(municipality): {'name': kwargs.get('name', '')}}
@@ -451,13 +658,15 @@ class Municipality(Principal):
             print(f'Warning: No entities for year {date.today().year} found '
                   f'for {municipality}')
 
-        super().__init__(
-            id_=municipality,
-            domain='municipality',
+        return cls(
+            municipality=municipality,
+            canton=canton,
+            canton_name=canton_name,
             domains_election=domains,
             domains_vote=domains,
             entities=entities,
             has_districts=has_districts,
+            has_quarters=has_quarters,
             **kwargs
         )
 

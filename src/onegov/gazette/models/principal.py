@@ -1,15 +1,28 @@
 from __future__ import annotations
 
+from onegov.core.custom import msgpack
 from yaml import safe_load
 
 
 from typing import Any
-from typing import TYPE_CHECKING
-if TYPE_CHECKING:
-    from typing import Self
+from typing import Never
+from typing import Self
 
 
-class Principal:
+class Principal(msgpack.Serializable, keys=(
+    'name',
+    'logo',
+    'logo_for_pdf',
+    'color',
+    'canton',
+    'on_accept',
+    'time_zone',
+    'help_link',
+    'publishing',
+    'frontend',
+    'sogc_import',
+    'links',
+)):
     """ The principal is the political entity running the gazette app. """
 
     CANTONS = {
@@ -32,7 +45,7 @@ class Principal:
         frontend: bool = False,
         sogc_import: dict[str, Any] | None = None,
         links: dict[str, str] | None = None,
-        **kwargs: object
+        **kwargs: Never
     ) -> None:
 
         assert not canton or canton in self.CANTONS

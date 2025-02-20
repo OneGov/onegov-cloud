@@ -41,7 +41,7 @@ import polib
 import re
 import types
 
-from onegov.core.cache import lru_cache
+from functools import lru_cache
 from io import BytesIO
 from itertools import pairwise
 from onegov.core.framework import Framework, log

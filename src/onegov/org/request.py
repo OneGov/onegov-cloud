@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 from functools import cached_property
+from onegov.core.custom import msgpack
 from onegov.core.orm import orm_cached
 from onegov.core.request import CoreRequest
 from onegov.core.security import Private
@@ -19,6 +20,7 @@ if TYPE_CHECKING:
     from onegov.ticket import Ticket
 
 
+@msgpack.make_serializable
 class PageMeta(NamedTuple):
     id: int
     type: str
