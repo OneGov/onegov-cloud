@@ -12,7 +12,7 @@ from __future__ import annotations
 
 import datetime
 import isodate
-import json
+import orjson
 import re
 import types
 
@@ -21,11 +21,19 @@ from itertools import chain
 from onegov.core.cache import instance_lru_cache
 
 
-from typing import overload, Any, ClassVar, Generic, TypeVar, TYPE_CHECKING
+from typing import (
+    overload,
+    Any,
+    ClassVar,
+    Generic,
+    Literal,
+    TypeVar,
+    TypeAlias,
+    TYPE_CHECKING,
+)
 if TYPE_CHECKING:
     from _typeshed import SupportsRead, SupportsWrite
     from collections.abc import Callable, Collection, Iterator, Iterable
-    from typing import TypeAlias
 
     from onegov.core.types import JSON_ro, JSONObject_ro
 
@@ -217,15 +225,12 @@ class Serializers:
         return next(matches, None)
 
     def encode(self, value: object) -> JSON_ro:
-        serializer = self.serializer_for(value.__class__)
+        serializer = self.serializer_for_class(value.__class__)
 
         if serializer:
             return serializer.encode(value)
 
         if isinstance(value, types.GeneratorType):
-            # FIXME: this is a little sus, generators will only work for
-            #        types that are already JSON serializable, since we
-            #        don't try to get a serializer for each generated value
             return tuple(v for v in value)
 
         raise TypeError('{} is not JSON serializable'.format(repr(value)))
@@ -238,6 +243,9 @@ class Serializers:
         elif isinstance(value, dict):
             for k, v in value.items():
                 value[k] = self.decode(v)
+        elif isinstance(value, list):
+            for i, v in enumerate(value):
+                value[i] = self.decode(i)
 
         return value
 
@@ -309,38 +317,83 @@ class Serializable:
         ))
 
 
-# FIXME: We should probably add type annotations for the keyword
-#        parameters we care about for the functions below
-@overload
-def dumps(obj: None, **extra: Any) -> None: ...
-@overload
-def dumps(obj: Any, **extra: Any) -> str: ...
+DEFAULT_DUMPS_OPTIONS = (
+    orjson.OPT_PASSTHROUGH_DATACLASS
+    | orjson.OPT_PASSTHROUGH_DATETIME
+)
 
 
-def dumps(obj: Any | None, **extra: Any) -> str | None:
+@overload
+def dumps(
+    obj: None,
+    *,
+    sort_keys: bool = False,
+    indent: Literal[2] | None = None,
+) -> None: ...
+@overload
+def dumps(
+    obj: Any,
+    *,
+    sort_keys: bool = False,
+    indent: Literal[2] | None = None,
+) -> str: ...
+
+
+def dumps(
+    obj: Any | None,
+    *,
+    sort_keys: bool = False,
+    indent: Literal[2] | None = None,
+) -> str | None:
+
     if obj is not None:
-        return json.dumps(
+        return dumps_bytes(
             obj,
-            default=default_serializers.encode,
-            separators=(',', ':'),
-            **extra)
-
+            sort_keys=sort_keys,
+            indent=indent,
+        ).decode('utf-8')
     return None
 
 
-def loads(txt: str | bytes | bytearray | None, **extra: Any) -> Any:
+def dumps_bytes(
+    obj: Any,
+    *,
+    sort_keys: bool = False,
+    indent: Literal[2] | None = None,
+) -> bytes:
+
+    options = DEFAULT_DUMPS_OPTIONS
+
+    if sort_keys:
+        options |= orjson.OPT_SORT_KEYS
+
+    if indent:
+        assert indent == 2
+        options |= orjson.OPT_INDENT_2
+
+    return orjson.dumps(
+        obj,
+        default=default_serializers.encode,
+        option=options
+    )
+
+
+def loads(txt: str | bytes | bytearray | memoryview | None) -> Any:
     if txt is not None:
-        return json.loads(
-            txt,
-            object_hook=default_serializers.decode,
-            **extra)
+        return default_serializers.decode(orjson.loads(txt))
 
     return {}
 
 
-def dump(data: Any, fp: SupportsWrite[str], **extra: Any) -> None:
-    fp.write(dumps(data, **extra))
+def dump(
+    data: Any,
+    fp: SupportsWrite[str],
+    *,
+    sort_keys: bool = False,
+    indent: Literal[2] | None = None,
+) -> None:
+    fp.write(dumps(data, sort_keys=sort_keys, indent=indent))
 
 
-def load(fp: SupportsRead[str | bytes], **extra: Any) -> Any:
-    return loads(fp.read(), **extra)
+def load(fp: SupportsRead[str | bytes]) -> Any:
+    return loads(fp.read())
