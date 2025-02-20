@@ -73,7 +73,12 @@
     <table class="field-display" tal:condition="rendered_fields">
         <tal:b repeat="(field, rendered) rendered_fields">
             <tr><td><b>${field.label.text}</b></td></tr>
-            <tr><td>${rendered}</td></tr>
+            <tal:b tal:condition="field.pricing|False">
+                <tr><td>${rendered} <span i18n:translate="">Item(s)</span></td></tr>
+            </tal:b>
+            <tal:b tal:condition="not field.pricing|False">
+                <tr><td>${rendered}</td></tr>
+            </tal:b>
             <tr><td height="5"></td></tr>
         </tal:b>
     </table>
