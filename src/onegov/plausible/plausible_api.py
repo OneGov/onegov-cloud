@@ -81,7 +81,8 @@ class PlausibleAPI:
         figures = results[0].get('metrics', figures)
 
         # convert last figure from seconds to minutes
-        figures[-1] = round(int(figures[-1]) / 60, 1) if figures[-1] else 0
+        figures[-1] = (
+            str(round(int(figures[-1]) / 60, 1))) if figures[-1] else '0'
 
         texts = [
             'Unique Visitors in the Last Month',

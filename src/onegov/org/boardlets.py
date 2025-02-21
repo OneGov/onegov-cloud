@@ -113,7 +113,7 @@ class TicketBoardlet(OrgBoardlet):
         average_lead_time_s = None
         if closed_tickets_count:
             total_lead_time_s = sum(
-                t.process_time or 1.0 for t in closed_ticket_query)
+                t.process_time or 1 for t in closed_ticket_query)
             average_lead_time_s = total_lead_time_s / closed_tickets_count
             average_lead_time_s = round(average_lead_time_s / 86400, 1)
 
