@@ -4543,6 +4543,48 @@ msgstr ""
 "adresses e-mail invalides, des plaintes pour spam, des désactivations "
 "manuelles, ou est bloqué. Nous recommandons de le désinscrire de la liste."
 
+msgid "No data available"
+msgstr "Aucune donnée disponible"
+
+msgid "New Tickets in the Last Month"
+msgstr "Nouveaux tickets le mois dernier"
+
+msgid "Closed Tickets in the Last Month"
+msgstr "Tickets clôturés le mois dernier"
+
+msgid "Lead Time from opening to closing in Days over the Last Month"
+msgstr "Délai de traitement de l'ouverture à la clôture en jours le mois dernier"
+
+msgid "Lead Time from pending to closing in Days over the Last Month"
+msgstr "Délai de traitement de l'attente à la clôture en jours le mois dernier"
+
+msgid "Last Edited Pages"
+msgstr "Dernières pages modifiées"
+
+msgid "Last Edited News"
+msgstr "Dernières nouvelles modifiées"
+
+msgid "Web Statistics"
+msgstr "Statistiques Web"
+
+msgid "Most Popular Pages"
+msgstr "Pages les plus populaires"
+
+msgid "Unique Visitors in the Last Month"
+msgstr "Visiteurs uniques le mois dernier"
+
+msgid "Total Visits in the Last Month"
+msgstr "Total des visites le mois dernier"
+
+msgid "Total Page Views in the Last Month"
+msgstr "Total des pages vues le mois dernier"
+
+msgid "Number of Page Views per Visit"
+msgstr "Nombre de pages vues par visite"
+
+msgid "Average Visit Duration in Minutes"
+msgstr "Durée moyenne de la visite en minutes"
+
 msgid "submitted"
 msgstr "soumis"
 

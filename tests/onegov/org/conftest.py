@@ -17,7 +17,7 @@ from onegov.org.initial_content import create_new_organisation
 from onegov.org.layout import DefaultLayout
 from onegov.org.models import TicketMessage
 from onegov.org.views.ticket import delete_ticket
-from onegov.ticket import TicketCollection
+from onegov.ticket import TicketCollection, Handler
 from onegov.user import User
 from pytest_localserver.http import WSGIServer
 from sqlalchemy.orm.session import close_all_sessions
@@ -433,3 +433,73 @@ def scenario(request, client):
 def enter_observer_scope():
     """Ensures app specific observers are active"""
     ScopedPropertyObserver.enter_class_scope(OrgApp)
+
+
+class EchoHandler(Handler):
+
+    @property
+    def deleted(self):
+        return False
+
+    @property
+    def email(self):
+        return self.data.get('email')
+
+    @property
+    def title(self):
+        return self.data.get('title')
+
+    @property
+    def subtitle(self):
+        return self.data.get('subtitle')
+
+    @property
+    def group(self):
+        return self.data.get('group')
+
+    def get_summary(self, request):
+        return self.data.get('summary')
+
+    def get_links(self, request):
+        return self.data.get('links')
+
+
+class LimitingHandler(Handler):
+
+    @property
+    def deleted(self):
+        return False
+
+    @property
+    def title(self):
+        return 'Foo'
+
+    @property
+    def subtitle(self):
+        return '0xdeadbeef'
+
+    @property
+    def group(self):
+        return 'Bar'
+
+    @property
+    def handler_id(self):
+        return 1
+
+    @property
+    def handler_data(self):
+        return {}
+
+    @property
+    def email(self):
+        return 'foo@bar.com'
+
+    def get_summary(self, request):
+        return 'foobar'
+
+    @classmethod
+    def handle_extra_parameters(cls, session, query, extra_parameters):
+        if 'limit' in extra_parameters:
+            return query.limit(extra_parameters['limit'])
+        else:
+            return query

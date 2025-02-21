@@ -18,7 +18,12 @@ def dashboard(
     request: OrgRequest,
     layout: DashboardLayout | None = None
 ) -> RenderData:
+    """
+    The dashboard shows all the `Boardlet`s that are assigned to the
+    dashboard.
+    For org and town: `/org/boardlets.py`
 
+    """
     layout = layout or DashboardLayout(self, request)
     return {
         'title': _('Dashboard'),

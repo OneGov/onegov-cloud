@@ -8,6 +8,8 @@ from onegov.feriennet import FeriennetApp
 from onegov.feriennet.collections import BillingCollection, MatchCollection
 from onegov.feriennet.exports.unlucky import UnluckyExport
 from onegov.feriennet.layout import DefaultLayout
+from onegov.org.boardlets import TicketBoardlet, EditedPagesBoardlet, \
+    EditedNewsBoardlet, PlausibleStats, PlausibleTopPages
 from onegov.org.models import Boardlet, BoardletFact
 from sqlalchemy import func
 
@@ -47,6 +49,46 @@ class FeriennetBoardlet(Boardlet):
             return 'warning'
 
         return 'success'
+
+
+@FeriennetApp.boardlet(name='ticket', order=(1, 1), icon='fa-ticket-alt')
+class DisabledTicketBoardlet(TicketBoardlet):
+
+    @property
+    def is_available(self) -> bool:
+        return False
+
+
+@FeriennetApp.boardlet(name='pages', order=(1, 2), icon='fa-edit')
+class DisabledEditedPagesBoardlet(EditedPagesBoardlet):
+
+    @property
+    def is_available(self) -> bool:
+        return False
+
+
+@FeriennetApp.boardlet(name='news', order=(1, 3), icon='fa-edit')
+class DisabledEditedNewsBoardlet(EditedNewsBoardlet):
+
+    @property
+    def is_available(self) -> bool:
+        return False
+
+
+@FeriennetApp.boardlet(name='web stats', order=(2, 1))
+class DisabledPlausibleStats(PlausibleStats):
+
+    @property
+    def is_available(self) -> bool:
+        return False
+
+
+@FeriennetApp.boardlet(name='most popular pages', order=(2, 2))
+class DisabledPlausibleTopPages(PlausibleTopPages):
+
+    @property
+    def is_available(self) -> bool:
+        return False
 
 
 @FeriennetApp.boardlet(name='period', order=(1, 1))

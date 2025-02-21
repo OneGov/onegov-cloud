@@ -143,6 +143,7 @@ class TownTheme(BaseTheme):
             'print',
             'chat',
             'bar-graph',
+            'dashboard',
         ]
 
     @property
