@@ -306,7 +306,8 @@ def handle_complete_submission(
                 content={
                     'model': ticket,
                     'form': form,
-                    'show_submission': self.meta['show_submission']
+                    'show_submission': self.meta['show_submission'],
+                    'price': self.payment
                 }
             )
             directory_user_group_recipients = user_group_emails_for_new_ticket(
