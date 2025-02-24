@@ -145,7 +145,10 @@ class Link(_Base):
         for key, value in self.attributes.items():
             a.attrib[key] = request.translate(value)
 
-        return Markup(tostring(a, encoding=str))  # noqa: RUF035
+        return Markup(tostring(a, encoding=str))  # nosec: B704
+
+    def __repr__(self) -> str:
+        return f'<Link {self.text}>'
 
 
 class QrCodeLink(BaseLink):

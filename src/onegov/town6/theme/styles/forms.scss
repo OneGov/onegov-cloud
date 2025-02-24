@@ -55,6 +55,18 @@ form {
         }
     }
 
+    .duration-widget label {
+        display: inline-block;
+        white-space: nowrap;
+        margin-right: .5rem;
+
+        input {
+            display: inline-block;
+            width: auto;
+            margin-right: .25rem;
+        }
+    }
+
     .label-text,
     label > ul label {
         max-width: 90%;

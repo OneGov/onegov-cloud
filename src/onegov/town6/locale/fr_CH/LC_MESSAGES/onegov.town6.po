@@ -5,7 +5,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: OneGov Cloud 1.0\n"
-"POT-Creation-Date: 2024-11-25 19:48+0100\n"
+"POT-Creation-Date: 2025-02-17 14:11+0100\n"
 "PO-Revision-Date: 2021-03-03 14:04+0100\n"
 "Last-Translator: Lukas Burkhard <lukas.burkhard@seantis.ch>\n"
 "Language-Team: French\n"
@@ -450,6 +450,9 @@ msgstr "Confirmer"
 msgid "There was an error while importing your directory!"
 msgstr "Une erreur est survenue lors de l'importation de votre dossier !"
 
+msgid "Download Form"
+msgstr "Télécharger le formulaire"
+
 msgid "Embed iFrame"
 msgstr "Intégrer une iFrame"
 
@@ -640,6 +643,12 @@ msgstr ""
 msgid "Map"
 msgstr "Carte"
 
+msgid "Links"
+msgstr "Liens"
+
+msgid "More news"
+msgstr "Plus de nouvelles"
+
 msgid "Other Entries"
 msgstr "Autres entrées"
 
@@ -648,12 +657,6 @@ msgstr "Entrée précédente"
 
 msgid "Next Entry"
 msgstr "Entrée suivante"
-
-msgid "Links"
-msgstr "Liens"
-
-msgid "More news"
-msgstr "Plus de nouvelles"
 
 msgid "Total Amount"
 msgstr "Montant total"
@@ -835,6 +838,9 @@ msgstr "Basculer en mode plein écran"
 
 msgid "Zoom in/out"
 msgstr "Zoom avant/arrière"
+
+msgid "Show more"
+msgstr "Afficher plus"
 
 msgid ""
 "This space holds images from your photo-albums. To show photos add a few "
@@ -1286,6 +1292,13 @@ msgstr "Cliquer ici pour voir la version internet."
 msgid "You no longer wish to receive the newsletter?"
 msgstr "Vous ne souhaitez plus recevoir la lettre d'informations ?"
 
+msgid ""
+"The user with the address ${address} just unsubscribed from the newsletter "
+"subscriber list."
+msgstr ""
+"L'utilisateur dont l'adresse est ${address} vient de se désinscrire de la "
+"liste des abonnés à la lettre d'information."
+
 msgid "Click the following link to set a new password:"
 msgstr "Cliquer sur le lien suivant pour définir un nouveau mot de passe:"
 
@@ -1693,6 +1706,15 @@ msgstr "Déposez les fichiers pour les vérifier"
 
 msgid "No subscribers yet"
 msgstr "Pas encore d'abonnés"
+
+msgid ""
+"This recipient has delivery failures, including hard bounces, invalid email "
+"addresses, spam complaints, manual deactivations, or being blocked. We "
+"recommend unsubscribing it from the list."
+msgstr ""
+"Ce destinataire a des échecs de livraison, y compris des rebonds, des "
+"adresses e-mail invalides, des plaintes pour spam, des désactivations "
+"manuelles, ou est bloqué. Nous recommandons de le désinscrire de la liste."
 
 msgid "submitted"
 msgstr "soumis"
@@ -2190,8 +2212,17 @@ msgstr ""
 msgid "New Note"
 msgstr "Nouveau commentaire"
 
-msgid "This recipient has delivery failures, including hard bounces, invalid email addresses, spam complaints, manual deactivations, or being blocked. We recommend unsubscribing it from the list."
-msgstr "Ce destinataire a des échecs de livraison, y compris des rebonds, des adresses e-mail invalides, des plaintes pour spam, des désactivations manuelles, ou est bloqué. Nous recommandons de le désinscrire de la liste."
+#~ msgid "Sign up"
+#~ msgstr "S'inscrire"
+
+#~ msgid "Notify on newsletter unsubscription"
+#~ msgstr "Notifier le désabonnement à la lettre d'information"
+
+#~ msgid ""
+#~ "Send an email notification when a user unsubscribes from the newsletter"
+#~ msgstr ""
+#~ "Envoyer une notification par courrier électronique lorsqu'un utilisateur "
+#~ "se désinscrit de la lettre d'information"
 
 #~ msgid "Sign up to our newsletter to always stay up to date:"
 #~ msgstr ""

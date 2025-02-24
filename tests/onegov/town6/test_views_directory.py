@@ -129,14 +129,21 @@ def test_directory_entry_subscription(client):
 
     page = page.click('Benachrichtigungen bei neuen Einträgen erhalten')
     page.form['address'] = 'dream@gmail.com'
+    page = page.form.submit().follow()
+
+    page = page.click('Benachrichtigungen bei neuen Einträgen erhalten')
+    page.form['address'] = 'brave@gmail.com'
     page.form.submit().follow()
 
-    assert len(os.listdir(client.app.maildir)) == 2
+    assert len(os.listdir(client.app.maildir)) == 3
     message = client.get_email(0)['TextBody']
     confirm = re.search(r'Anmeldung bestätigen\]\(([^\)]+)', message).group(1)
     message_2 = client.get_email(1)['TextBody']
     confirm_2 = re.search(
         r'Anmeldung bestätigen\]\(([^\)]+)', message_2).group(1)
+    message_3 = client.get_email(2)['TextBody']
+    confirm_3 = re.search(
+        r'Anmeldung bestätigen\]\(([^\)]+)', message_3).group(1)
 
     illegal_confirm = confirm.split('/confirm')[0] + 'x/confirm'
     assert "falsches Token" in client.get(illegal_confirm).follow().follow()
@@ -148,16 +155,20 @@ def test_directory_entry_subscription(client):
     page = client.get(confirm_2).follow().follow()
     assert "dream@gmail.com wurde erfolgreich" in page
 
+    page = client.get(confirm_3).follow().follow()
+    assert "brave@gmail.com wurde erfolgreich" in page
+
     page = client.get('/directories/trainers/+recipients')
     assert 'bliss@gmail.com' in page
     assert 'dream@gmail.com' in page
+    assert 'brave@gmail.com' in page
 
     page = client.get('/directories/trainers').click("^Eintrag$")
     page.form['name'] = 'Emily Larlham'
     page.form.submit()
 
-    assert len(os.listdir(client.app.maildir)) == 3
-    message = client.get_email(2)['TextBody']
+    assert len(os.listdir(client.app.maildir)) == 4
+    message = client.get_email(3)['TextBody']
     assert 'Emily Larlham' in message
 
     unsubscribe = re.search(r'abzumelden.\]\(([^\)]+)', message).group(1)

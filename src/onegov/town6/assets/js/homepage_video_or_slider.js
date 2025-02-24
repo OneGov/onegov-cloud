@@ -13,6 +13,7 @@ header.addEventListener('onegov.header-resized', function (event) {
     var new_height = 'calc(' + current_height + ' - ' + header_height + 'px)';
 
     video_wrapper.css('max-height', new_height)
+}, {once: true})
 
     // Slider
     if ($('.orbit.slider').length) {
@@ -40,7 +41,7 @@ header.addEventListener('onegov.header-resized', function (event) {
         }
 
     }
-}, {once: true})
+
 
 // Find out if we're on desktop or mobile
 var w = window.matchMedia("(max-width: 700px)");

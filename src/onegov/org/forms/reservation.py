@@ -10,7 +10,7 @@ from wtforms.validators import DataRequired, Email, InputRequired
 
 from onegov.core.csv import convert_list_of_list_of_dicts_to_xlsx
 from onegov.form import Form
-from onegov.form.fields import MultiCheckboxField, TimeField
+from onegov.form.fields import DurationField, MultiCheckboxField, TimeField
 from onegov.org import _
 from onegov.org.forms.util import WEEKDAYS
 
@@ -45,6 +45,26 @@ class FindYourSpotForm(Form):
     if TYPE_CHECKING:
         request: OrgRequest
 
+    duration = DurationField(
+        label=_('I am looking to make a reservation lasting'),
+        default=timedelta(hours=1),
+        validators=[DataRequired()],
+        render_kw={
+            'placeholder': 'HH:MM',
+        }
+    )
+
+    weekdays = MultiCheckboxField(
+        label=_('On Weekday(s)'),
+        choices=WEEKDAYS,
+        coerce=int,
+        default=[v for v, l in WEEKDAYS[:5]],
+        validators=[InputRequired()],
+        render_kw={
+            'prefix_label': False,
+            'class_': 'oneline-checkboxes'
+        })
+
     start = DateField(
         label=_('From'),
         validators=[InputRequired()])
@@ -54,32 +74,27 @@ class FindYourSpotForm(Form):
         validators=[InputRequired()])
 
     start_time = TimeField(
-        label=_('Start'),
+        label=_('Earliest Start'),
         description=_('HH:MM'),
         default=time(7),
-        validators=[DataRequired()])
+        validators=[DataRequired()],
+        render_kw={
+            'step': 300,
+        })
 
     end_time = TimeField(
-        label=_('End'),
+        label=_('Latest End'),
         description=_('HH:MM'),
         default=time(22),
-        validators=[DataRequired()])
+        validators=[DataRequired()],
+        render_kw={
+            'step': 300,
+        })
 
     rooms = MultiCheckboxField(
         label=_('Rooms'),
         choices=(),
         coerce=lambda v: UUID(v) if isinstance(v, str) else v,
-        validators=[InputRequired()],
-        render_kw={
-            'prefix_label': False,
-            'class_': 'oneline-checkboxes'
-        })
-
-    weekdays = MultiCheckboxField(
-        label=_('Weekdays'),
-        choices=WEEKDAYS,
-        coerce=int,
-        default=[v for v, l in WEEKDAYS[:5]],
         validators=[InputRequired()],
         render_kw={
             'prefix_label': False,
@@ -139,7 +154,7 @@ class FindYourSpotForm(Form):
                 return False
         return None
 
-    def ensure_start_time_before_end_time(self) -> bool | None:
+    def ensure_start_before_end_time_and_valid_duration(self) -> bool | None:
         start = self.start_time.data
         end = self.end_time.data
         if start and end:
@@ -153,6 +168,18 @@ class FindYourSpotForm(Form):
                 assert isinstance(self.start_time.errors, list)
                 self.start_time.errors.append(_('Start time before end time'))
                 return False
+
+            if duration := self.duration.data:
+                max_duration = timedelta(
+                        hours=end.hour - start.hour,
+                        minutes=start.hour - end.hour
+                )
+                if duration > max_duration:
+                    assert isinstance(self.duration.errors, list)
+                    self.duration.errors.append(_(
+                        'Duration is longer than the range between '
+                        'start and end time'
+                    ))
         return None
 
     @cached_property

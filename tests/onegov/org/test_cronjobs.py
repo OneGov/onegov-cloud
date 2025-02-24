@@ -1288,9 +1288,14 @@ def test_delete_content_marked_deletable__events_occurrences(org_app,
         assert count_occurrences() == 0
 
 
+@pytest.mark.parametrize(
+    'access',
+    ('private', 'member', 'mtan', 'secret', 'secret_mtan', 'public')
+)
 def test_send_email_notification_for_recent_directory_entry_publications(
     es_org_app,
-    handlers
+    handlers,
+    access
 ):
     org_app = es_org_app
     register_echo_handler(handlers)
@@ -1301,8 +1306,22 @@ def test_send_email_notification_for_recent_directory_entry_publications(
     job.app = org_app
     tz = ensure_timezone('Europe/Zurich')
 
+    def planauflagen():
+        return (DirectoryCollection(org_app.session(), type='extended')
+                .by_name('offentliche-planauflage'))
+
+    def sport_clubs():
+        return (DirectoryCollection(org_app.session(), type='extended')
+                .by_name('sport-clubs'))
+
+    def count_recipients():
+        return (EntryRecipientCollection(org_app.session()).query()
+                .filter_by(directory_id=planauflagen().id)
+                .filter_by(confirmed=True).count())
+
     assert len(os.listdir(client.app.maildir)) == 0
 
+    print(f'*** Access {access} ***')
     transaction.begin()
 
     directories = DirectoryCollection(org_app.session(), type='extended')
@@ -1319,20 +1338,25 @@ def test_send_email_notification_for_recent_directory_entry_publications(
         ),
         enable_update_notifications=True,
     )
-    planauflage.add(values=dict(
+    entry = planauflage.add(values=dict(
         gesuchsteller_in='Carmine Carminio',
         grundeigentumer_in='Doris Dorinio',
         publication_start=datetime(2025, 1, 6, 2, 0, tzinfo=tz),
         publication_end=datetime(2025, 1, 30, 2, 0, tzinfo=tz),
     ))
-    planauflage.add(values=dict(
+    entry.access = access
+    assert entry.access == access
+
+    entry = planauflage.add(values=dict(
         gesuchsteller_in='Emil Emilio',
         grundeigentumer_in='Franco Francinio',
         publication_start=datetime(2025, 1, 8, 6, 1, tzinfo=tz),
         publication_end=datetime(2025, 1, 31, 2, 0, tzinfo=tz),
     ))
+    entry.access = access
+    assert entry.access == access
 
-    sport_clubs = directories.add(
+    sport_club = directories.add(
         title='Sport Clubs',
         structure="""
             Name *= ___
@@ -1345,18 +1369,23 @@ def test_send_email_notification_for_recent_directory_entry_publications(
         ),
         enable_update_notifications=False,
     )
-    sport_clubs.add(values=dict(
+    entry = sport_club.add(values=dict(
         name='Wanderfreunde',
         category='Hiking',
         publication_start=datetime(2025, 2, 1, 2, 0, tzinfo=tz),
         publication_end=datetime(2025, 2, 22, 2, 0, tzinfo=tz),
     ))
-    sport_clubs.add(values=dict(
+    entry.access = access
+    assert entry.access == access
+
+    entry = sport_club.add(values=dict(
         name='Pokerfreunde',
         category='Games',
         publication_start=datetime(2025, 2, 1, 2, 0, tzinfo=tz),
         publication_end=datetime(2025, 2, 2, 2, 0, tzinfo=tz),
     ))
+    entry.access = access
+    assert entry.access == access
 
     EntryRecipientCollection(org_app.session()).add(
         directory_id=planauflage.id,
@@ -1364,26 +1393,13 @@ def test_send_email_notification_for_recent_directory_entry_publications(
         confirmed=True
     )
     EntryRecipientCollection(org_app.session()).add(
-        directory_id=sport_clubs.id,
+        directory_id=sport_club.id,
         address='john@doe.ch',
         confirmed=True
     )
 
     transaction.commit()
     close_all_sessions()
-
-    def planauflagen():
-        return (DirectoryCollection(org_app.session(), type='extended')
-                .by_name('offentliche-planauflage'))
-
-    def sport_clubs():
-        return (DirectoryCollection(org_app.session(), type='extended')
-                .by_name('sport-clubs'))
-
-    def count_recipients():
-        return (EntryRecipientCollection(org_app.session()).query()
-                .filter_by(directory_id=planauflagen().id)
-                .filter_by(confirmed=True).count())
 
     assert count_recipients() == 1
     john = EntryRecipientCollection(org_app.session()).query().first()
@@ -1401,28 +1417,38 @@ def test_send_email_notification_for_recent_directory_entry_publications(
 
         entry_1 = planauflagen().entries[0]
 
-        assert len(os.listdir(client.app.maildir)) == 1
-        message = client.get_email(0)
-        assert message['To'] == john.address
-        assert planauflagen().title in message['Subject']
-        assert entry_1.name in message['TextBody']
+        if entry_1.access in ('mtan', 'public'):
+            assert len(os.listdir(client.app.maildir)) == 1
+            message = client.get_email(0)
+            assert message['To'] == john.address
+            assert planauflagen().title in message['Subject']
+            assert entry_1.name in message['TextBody']
+        else:
+            assert len(os.listdir(client.app.maildir)) == 0
 
     with freeze_time(datetime(2025, 1, 8, 10, 0, tzinfo=tz)):
         client.get(get_cronjob_url(job))
 
         entry_2 = planauflagen().entries[1]
 
-        assert len(os.listdir(client.app.maildir)) == 2
-        message = client.get_email(1)
-        assert message['To'] == john.address
-        assert planauflagen().title in message['Subject']
-        assert entry_2.name in message['TextBody']
+        if entry_1.access in ('mtan', 'public'):
+            assert len(os.listdir(client.app.maildir)) == 2
+            message = client.get_email(1)
+            assert message['To'] == john.address
+            assert planauflagen().title in message['Subject']
+            assert entry_2.name in message['TextBody']
+        else:
+            assert len(os.listdir(client.app.maildir)) == 0
 
     # before enabling notifications for sport clubs after publication
     with freeze_time(datetime(2025, 2, 1, 6, 0, tzinfo=tz)):
         client.get(get_cronjob_url(job))
 
-        assert len(os.listdir(client.app.maildir)) == 2  # no additional mail
+        # no additional mail
+        if entry_1.access in ('mtan', 'public'):
+            assert len(os.listdir(client.app.maildir)) == 2
+        else:
+            assert len(os.listdir(client.app.maildir)) == 0
 
     # enable notifications for sport clubs
     sport_clubs().enable_update_notifications = True
@@ -1432,19 +1458,25 @@ def test_send_email_notification_for_recent_directory_entry_publications(
         client.get(get_cronjob_url(job))
 
         # no additional mail, because the entry is not published yet
-        assert len(os.listdir(client.app.maildir)) == 2
+        if entry_1.access in ('mtan', 'public'):
+            assert len(os.listdir(client.app.maildir)) == 2
+        else:
+            assert len(os.listdir(client.app.maildir)) == 0
 
     with freeze_time(datetime(2025, 2, 3, 10, 0, tzinfo=tz)):
         client.get(get_cronjob_url(job))
 
         entry_2 = sport_clubs().entries[1]
 
-        # only for still published sports club entry 'Wanderfreunde'
-        assert len(os.listdir(client.app.maildir)) == 3
-        message = client.get_email(2)
-        assert message['To'] == john.address
-        assert sport_clubs().title in message['Subject']
-        assert entry_2.name in message['TextBody']
+        if entry_1.access in ('mtan', 'public'):
+            # only for still published sports club entry 'Wanderfreunde'
+            assert len(os.listdir(client.app.maildir)) == 3
+            message = client.get_email(2)
+            assert message['To'] == john.address
+            assert sport_clubs().title in message['Subject']
+            assert entry_2.name in message['TextBody']
+        else:
+            assert len(os.listdir(client.app.maildir)) == 0
 
 
 def test_update_newsletter_email_bounce_statistics(org_app, handlers):
@@ -1524,3 +1556,36 @@ def test_update_newsletter_email_bounce_statistics(org_app, handlers):
             # execute cronjob
             with pytest.raises(requests.exceptions.HTTPError):
                 client.get(get_cronjob_url(job))
+
+
+def test_delete_unconfirmed_subscribers(org_app, handlers):
+    register_echo_handler(handlers)
+
+    job = get_cronjob_by_name(org_app,
+                              'delete_unconfirmed_newsletter_subscriptions')
+    job.app = org_app
+
+    with freeze_time(datetime(2025, 1, 1, 4, 0)):
+        transaction.begin()
+
+        session = org_app.session()
+
+        recipients = RecipientCollection(session)
+        recipients.add('one@example.org', confirmed=False)
+        recipients.add('two@example.org', confirmed=False)
+        # Cronjob should only delete unconfirmed recipients
+        recipients.add('three@example.org', confirmed=True)
+
+    # And only unconfirmed subscribers older than 7 days
+    recipients.add('four@example.org', confirmed=False)
+    transaction.commit()
+
+    recipients = RecipientCollection(org_app.session())
+    assert recipients.query().count() == 4
+
+    client = Client(org_app)
+
+    client.get(get_cronjob_url(job))
+
+    recipients = RecipientCollection(org_app.session())
+    assert recipients.query().count() == 2

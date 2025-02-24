@@ -860,8 +860,98 @@ def test_newsletter_test_delivery(client):
 
 
 def test_import_export_subscribers(client):
-    session = client.app.session()
+    with freeze_time("2018-05-31 12:00"):
+        session = client.app.session()
+        client.login_admin()
+
+        # add a newsletter
+        newsletters = client.get('/newsletters')
+        new_link = find_link_by_href_end(newsletters, '/newsletters/new')
+        new = newsletters.click(href=new_link['href'])
+        new.form['title'] = "Our town is AWESOME"
+        new.form['lead'] = "Like many of you, I just love our town..."
+
+        new.select_checkbox("news", "Willkommen bei OneGov")
+        new.select_checkbox("occurrences", "150 Jahre Govikon")
+
+        new.form.submit().follow()
+
+        # add some recipients the quick way
+        recipients = RecipientCollection(session)
+        recipients.add('one@example.org', confirmed=True)
+        recipients.add('two@example.org', confirmed=True)
+        # this recipient will not show up because they are unconfirmed
+        recipients.add('xxx@example.org', confirmed=False)
+
+        transaction.commit()
+
+        # perform export
+        page = client.get('/subscribers/export-newsletter-recipients')
+        page.form['file_format'] = 'xlsx'
+
+        response = page.form.submit()
+
+        wb = load_workbook(BytesIO(response.body), data_only=True)
+        sheet = tuple(wb[wb.sheetnames[0]].rows)
+        assert sheet[0][0].value == 'Adresse'
+        assert sheet[1][0].value == 'one@example.org'
+        assert sheet[2][0].value == 'two@example.org'
+
+        page.form['file_format'] = 'json'
+        response = page.form.submit().json
+        assert response == [
+            {'Adresse': 'one@example.org',
+             'Abonniert am': '2018-05-31T12:00:00+00:00'},
+            {'Adresse': 'two@example.org',
+             'Abonniert am': '2018-05-31T12:00:00+00:00'},
+        ]
+
+        page.form['file_format'] = 'xlsx'
+
+        more_recipients = [
+            {'Adresse': 'three@example.org',
+             'Abonniert am': '2018-05-31T12:00:00+00:00'},
+            {'Adresse': 'four@example.org',
+             'Abonniert am': '2018-05-31T12:00:00+00:00'},
+        ]
+        file = Upload(
+            'file',
+            convert_list_of_dicts_to_xlsx(more_recipients),
+            'application/vnd.openxmlformats-'
+            'officedocument.spreadsheetml.sheet',
+        )
+
+        # Import (Dry run)
+        page = client.get('/subscribers/import-newsletter-recipients')
+        page.form['dry_run'] = True
+        page.form['file'] = file
+        page = page.form.submit()
+        assert "Importvorschau: Imported: 2" in page
+
+        # Import
+        page = client.get('/subscribers/import-newsletter-recipients')
+        page.form['dry_run'] = False
+        page.form['file'] = file
+        page = page.form.submit().follow()
+        assert "Import abgeschlossen: Imported: 2" in page
+        assert recipients.query().count() == 5
+        assert recipients.query().filter_by(confirmed=True).count() == 4
+
+
+def test_admin_receives_email_notification_on_unsubscription(client):
+
+    def extract_unsubscription_link(client, index):
+        message = client.get_email(index)['TextBody']
+        unsubscribe = re.search(r'abzumelden.\]\(([^\)]+)', message).group(1)
+        return unsubscribe
+
     client.login_admin()
+
+    # newsletter settings no admin notification
+    page = client.get('/newsletter-settings')
+    page.form['show_newsletter'] = True
+    page.form['notify_on_unsubscription'] = []
+    page.form.submit().follow()
 
     # add a newsletter
     newsletters = client.get('/newsletters')
@@ -869,61 +959,61 @@ def test_import_export_subscribers(client):
     new = newsletters.click(href=new_link['href'])
     new.form['title'] = "Our town is AWESOME"
     new.form['lead'] = "Like many of you, I just love our town..."
-
     new.select_checkbox("news", "Willkommen bei OneGov")
     new.select_checkbox("occurrences", "150 Jahre Govikon")
-
     new.form.submit().follow()
 
     # add some recipients the quick way
-    recipients = RecipientCollection(session)
+    recipients = RecipientCollection(client.app.session())
     recipients.add('one@example.org', confirmed=True)
     recipients.add('two@example.org', confirmed=True)
 
     transaction.commit()
 
-    # perform export
-    page = client.get('/subscribers/export-newsletter-recipients')
-    page.form['file_format'] = 'xlsx'
+    # send out newsletter
+    newsletter = client.get('/newsletter/our-town-is-awesome')
+    preview = newsletter.click('Senden')
+    preview.form.submit().follow()
 
-    response = page.form.submit()
+    # verify newsletter was sent
+    assert len(os.listdir(client.app.maildir)) == 1
 
-    wb = load_workbook(BytesIO(response.body), data_only=True)
-    sheet = tuple(wb[wb.sheetnames[0]].rows)
-    assert sheet[0][0].value == 'Adresse'
-    assert sheet[1][0].value == 'one@example.org'
-    assert sheet[2][0].value == 'two@example.org'
+    # extract unsubscription link from email and unsubscribe
+    unsubscribe = extract_unsubscription_link(client, 0)
+    result = client.get(unsubscribe).follow()
+    assert "one@example.org erfolgreich vom Newsletter abgemeldet" in result
 
-    page.form['file_format'] = 'json'
-    response = page.form.submit().json
-    assert response == [
-        {'Adresse': 'one@example.org', 'Bestätigt': True},
-        {'Adresse': 'two@example.org', 'Bestätigt': True},
-    ]
+    # verify admin received NO email notification
+    assert len(os.listdir(client.app.maildir)) == 1  # no new email
 
-    page.form['file_format'] = 'xlsx'
+    # newsletter settings enable admin notification
+    page = client.get('/newsletter-settings')
+    page.form['show_newsletter'] = True
+    page.form['notify_on_unsubscription'].select_multiple(texts=[
+        'admin@example.org'])
+    page.form.submit().follow()
 
-    more_recipients = [
-        {'Adresse': 'three@example.org', 'Bestätigt': True},
-        {'Adresse': 'four@example.org', 'Bestätigt': False},
-    ]
-    file = Upload(
-        'file',
-        convert_list_of_dicts_to_xlsx(more_recipients),
-        'application/vnd.openxmlformats-' 'officedocument.spreadsheetml.sheet',
-    )
+    # add another newsletter
+    newsletters = client.get('/newsletters')
+    new_link = find_link_by_href_end(newsletters, '/newsletters/new')
+    new = newsletters.click(href=new_link['href'])
+    new.form['title'] = "Our town is AWESOME 2"
+    new.form['lead'] = "Event reminder"
+    new.select_checkbox("occurrences", "150 Jahre Govikon")
+    new.form.submit().follow()
 
-    # Import (Dry run)
-    page = client.get('/subscribers/import-newsletter-recipients')
-    page.form['dry_run'] = True
-    page.form['file'] = file
-    page = page.form.submit()
-    assert "Importvorschau: Imported: 2" in page
+    # send newsletter
+    newsletter = client.get('/newsletter/our-town-is-awesome-2')
+    preview = newsletter.click('Senden')
+    preview.form.submit().follow()
 
-    # Import
-    page = client.get('/subscribers/import-newsletter-recipients')
-    page.form['dry_run'] = False
-    page.form['file'] = file
-    page = page.form.submit().follow()
-    assert "Import abgeschlossen: Imported: 2" in page
-    assert recipients.query().count() == 4
+    assert len(os.listdir(client.app.maildir)) == 2
+
+    # extract unsubscription link from email and unsubscribe
+    unsubscribe = extract_unsubscription_link(client, 1)
+    result = client.get(unsubscribe).follow()
+    assert "two@example.org erfolgreich vom Newsletter abgemeldet" in result
+
+    # verify admin received email notification
+    assert len(os.listdir(client.app.maildir)) == 3
+    assert 'two@example.org' in client.get_email(2)['TextBody']

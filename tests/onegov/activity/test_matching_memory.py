@@ -460,7 +460,7 @@ def test_prefer_organiser_children():
         get_is_organiser_child=lambda c: is_organiser_child)
 
     is_organiser_child = True
-    assert organiser_child_score(None) == 1.0
+    assert organiser_child_score(None) == 1.5
 
     is_organiser_child = False
     assert organiser_child_score(None) == 0.0
@@ -474,7 +474,7 @@ def test_prefer_association_children():
         get_is_association_child=lambda c: is_association_child)
 
     is_association_child = True
-    assert association_child_score(None) == 1.0
+    assert association_child_score(None) == 1.5
 
     is_association_child = False
     assert association_child_score(None) == 0.0

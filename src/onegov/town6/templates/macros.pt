@@ -596,7 +596,7 @@
     </div>
 </metal:newslist>
 
-<metal:newsletter define-macro="newsletter_signup">
+<metal:newsletter define-macro="newsletter_signup" i18n:domain="onegov.town6">
 
     <metal:b define-slot="pre_form"></metal:b>
 
@@ -615,7 +615,7 @@
                     </div>
                     <div class="cell small" tal:condition="form.subscribed_categories.data">
                         <label>
-                            <i18n:translate>${form.subscribed_categories.description}</i18n:translate><p>
+                            <tal:b i18n:translate>${form.subscribed_categories.description}</tal:b><p>
                             ${form.subscribed_categories}
                         </label>
                     </div>
@@ -711,13 +711,20 @@
 </metal:empty_lead_hint>
 
 <metal:page_content define-macro="page_content_sidebar" i18n:domain="onegov.town6">
-    <div class="small-12 medium-4 cell sidebar medium-offset-1 ${'filter-panel' if filter_panel else ''}" tal:condition="people or contact or coordinates or files or show_side_panel or more_entries|False or sidepanel_links|False" tal:define="files files|None; highlight_contacts highlight_contacts|True; filter_panel filter_panel|False">
+    <div class="small-12 medium-4 cell sidebar medium-offset-1 ${'filter-panel' if filter_panel else ''}" tal:condition="people or contact or coordinates or files or show_side_panel or more_entries|False or sidepanel_links|False" tal:define="files files|None; highlight_contacts highlight_contacts|True; filter_panel filter_panel|False; sidepanel_contact page.sidepanel_contact|None;">
         <div class="sidebar-wrapper">
             <tal:b metal:define-slot="before-panels"></tal:b>
             <div tal:define="hide page.hide_contact|hide_contact|False" class="side-panel contact-panel" tal:condition="not hide and contact or coordinates or location">
                 <div tal:condition="contact and not hide">
                     <h3 i18n:translate>Contact</h3>
                     <tal:b content="contact" />
+                    <div tal:condition="sidepanel_contact|False">
+                        <ul class="sidebar-links">
+                            <li tal:repeat="contact sidepanel_contact" tal:condition="contact">
+                                <a href="${contact[1]}">${contact[0]}</a>
+                            </li>
+                        </ul>
+                    </div>
                 </div>
                 <br tal:condition="coordinates and contact" />
                 <h3 i18n:translate tal:condition="not contact">Map</h3>
@@ -821,7 +828,7 @@
 </metal:page_content>
 
 <metal:page_content define-macro="page_content" i18n:domain="onegov.town6">
-    <div class="grid-x grid-padding-x wrapper" tal:define="show_side_panel show_side_panel|False; location location|False; show_page_image page.show_page_image|None; files files|None; sidepanel_links sidepanel_links|None; news page.type == 'news'|False; imageset page.photo_album|None; as_content layout.org.theme_options.get('page-image-position', 'as_content') ==  'as_content';">
+    <div class="grid-x grid-padding-x wrapper" tal:define="show_side_panel show_side_panel|False; location location|False; show_page_image page.show_page_image|None; files files|None; sidepanel_links sidepanel_links|None; news page.type == 'news'|False; imageset page.photo_album|None; as_content layout.org.theme_options.get('page-image-position', 'as_content') ==  'as_content'; sidepanel_contact page.sidepanel_contact|None;">
         <tal:b condition="not: people or files or contact or coordinates or location or show_side_panel or more_entries|False">
             <div class="small-12 cell page-content-main">
                 <img class="page-image" tal:condition="show_page_image and page.page_image and (as_content or news)" src="${page.page_image}">
@@ -851,7 +858,6 @@
                     <metal:b tal:condition="imageset" use-macro="layout.macros['render_inline_photo_album']"/>
 
                     <div metal:define-slot="after-text"></div>
-
 
                     <div class="people-panel" tal:condition="people and show_people_on_main_page" tal:define="show_people_on_main_page page.show_people_on_main_page|resource.show_people_on_main_page|False; western_name_order page.western_name_order|resource.western_name_order|False">
                         <h3 i18n:translate>People</h3>
@@ -1181,9 +1187,19 @@
     <div i18n:translate tal:condition="payment.source == 'manual'">
         Manual
     </div>
+    <div tal:condition="payment.source == 'datatrans'">
+        <a href="${payment.remote_url}">
+            Datatrans
+        </a>
+    </div>
     <div tal:condition="payment.source == 'stripe_connect'">
         <a href="${payment.remote_url}">
             Stripe Connect
+        </a>
+    </div>
+    <div tal:condition="payment.source == 'worldline_saferpay'">
+        <a href="${payment.remote_url}">
+            Worldline Saferpay
         </a>
     </div>
 </metal:payment_status>
@@ -1652,11 +1668,16 @@
             <div class="dark-overlay" tal:condition="text"></div>
             <div class="grid-container" tal:condition="text">
                 <div class="text">
-                    <tal:b tal:condition="text_link|False">
-                        <a class="button" href="${text_link}">${text}</a>
-                    </tal:b>
-                    <tal:b tal:condition="not:text_link|False">
+                    <p tal:condition="text and button_url">
+                        <tal:b >
+                            <span>${text}</span>
+                        </tal:b>
+                    </p>
+                    <tal:b tal:condition="text and not button_url">
                         <span>${text}</span>
+                    </tal:b>
+                    <tal:b tal:condition="button_url|False">
+                        <a class="button" href="${button_url}">${button_text}<tal:b condition="not: button_text" i18n:translate="">Show more</tal:b></a>
                     </tal:b>
                 </div>
             </div>

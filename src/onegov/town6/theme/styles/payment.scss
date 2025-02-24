@@ -25,12 +25,21 @@
         font-size: 1rem;
         font-weight: bold;
         margin: 0 0 .5rem;
+    }
 
-        &::before {
-            @include icon-bold('\f1f5');
-            margin-right: 1.5ex;
-            font-family: "Font Awesome 5 Brands";
-        }
+    .payment-provider-stripe-connect h2::before {
+        @include icon('\f1f5');
+        margin-right: 1.5ex;
+    }
+
+    .payment-provider-datatrans h2::before {
+        @include icon('\f09d');
+        margin-right: 1.5ex;
+    }
+
+    .payment-provider-worldline-saferpay h2::before {
+        @include icon('\f09d');
+        margin-right: 1.5ex;
     }
 }
 

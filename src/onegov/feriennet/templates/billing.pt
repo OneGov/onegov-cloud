@@ -110,11 +110,14 @@
                                                         </i>
                                                     </tal:b>
                                                 </td>
-                                                <td class="amount">
-                                                    <tal:b tal:condition="not item.paid" i18n:translate >amount unpaid</tal:b>
-                                                    <i tal:condition="item.source == 'stripe_connect'" class="fa fa-credit-card" aria-hidden="true"></i>
-                                                    <tal:b tal:condition="item.paid" i18n:translate >paid</tal:b>
-                                                    ${'{:.2f}'.format(item.amount)}
+                                                <td class="amount">${'{:.2f}'.format(item.amount)}</td>
+                                                <td class="payment-status" tal:condition="not item.paid">
+                                                    <span i18n:translate class="show-for-sr">Unpaid</span>
+                                                    <i class="fa fa-exclamation-triangle" aria-hidden="true"></i>
+                                                </td>
+                                                <td class="payment-status" tal:condition="item.paid">
+                                                    <span i18n:translate class="show-for-sr">Paid</span>
+                                                    <i class="fa ${item.source in ('datatrans', 'stripe_connect', 'worldline_saferpay') and 'fa-credit-card' or 'fa-check-circle'}" aria-hidden="true"></i>
                                                 </td>
                                                 <td class="actions">
                                                     <tal:b tal:define="actions tuple(item_links(item))" tal:condition="actions">

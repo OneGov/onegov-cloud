@@ -1980,17 +1980,25 @@ $booking-left-margin: 1.6rem;
         margin-left: .5rem;
     }
 
-    li.paid .text-amount > span:not(.item-text) {
-        color: $green-dark;
+    li.paid {
+        .item-amount::after {
+            @include icon('\f05d');
+            color: $green-dark;
+            font-weight: normal;
+            position: absolute;
+            right: 33px;
+        }
+
+        &.datatrans, &.stripe_connect, &.worldline_saferpay {
+            .item-amount::after {
+                content: '\f09d';
+                font-size: .875rem;
+            }
+        }
     }
 
     li.unpaid .text-amount > span:not(.item-text) {
         color: $red-dark;
-    }
-
-    li.paid.stripe_connect .item-amount::after {
-        content: '\f09d';
-        font-size: .875rem;
     }
 
     .item-created {

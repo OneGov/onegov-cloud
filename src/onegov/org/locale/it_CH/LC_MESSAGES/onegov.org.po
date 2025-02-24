@@ -2,7 +2,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: \n"
-"POT-Creation-Date: 2025-01-28 08:31+0100\n"
+"POT-Creation-Date: 2025-02-18 09:50+0100\n"
 "PO-Revision-Date: 2022-03-15 10:52+0100\n"
 "Last-Translator: \n"
 "Language-Team: \n"
@@ -1117,6 +1117,9 @@ msgstr "Destinatario"
 msgid "Do not actually import the newsletter subscribers"
 msgstr "Non importare effettivamente gli iscritti alla newsletter"
 
+msgid "Subscribed on"
+msgstr "Iscritto il"
+
 msgid "Will be used as image in the page overview on the parent page"
 msgstr ""
 "Verrà utilizzato come immagine nella panoramica della pagina sulla pagina "
@@ -1240,14 +1243,27 @@ msgstr "Note"
 msgid "Public extra information about this person"
 msgstr "Informazioni pubbliche aggiuntive su questa persona"
 
+msgid "I am looking to make a reservation lasting"
+msgstr "Voglio fare una prenotazione di"
+
+msgid "On Weekday(s)"
+msgstr "In giorno/i feriale/i"
+
+msgid "Earliest Start"
+msgstr "Inizio più precoce"
+
+msgid "Latest End"
+msgstr "Ultima fine"
+
 msgid "Rooms"
 msgstr "Camere"
 
-msgid "Weekdays"
-msgstr "Giorni della settimana"
-
 msgid "Start date in past"
 msgstr "Data di inizio nel passato"
+
+msgid "Duration is longer than the range between start and end time"
+msgstr ""
+"La durata è superiore all'intervallo tra l'ora di inizio e l'ora di fine"
 
 msgid "Describes what this reservation resource is about"
 msgstr "Descrive il contenuto di questa risorsa di prenotazione"
@@ -1324,6 +1340,9 @@ msgstr "Inserisci almeno un codice postale"
 
 msgid "Please enter one zip-code per line, without spaces or commas"
 msgstr "Inserisci un codice postale per riga, senza spazi o virgole"
+
+msgid "Weekdays"
+msgstr "Giorni della settimana"
 
 msgid "New Reservations"
 msgstr "Nuove prenotazioni"
@@ -1674,6 +1693,9 @@ msgstr "Nascondi questi campi per gli utenti non registrati"
 msgid "People"
 msgstr "Persone"
 
+msgid "External ID"
+msgstr "ID esterno"
+
 msgid "Duration of mTAN session"
 msgstr "Durata della sessione mTAN"
 
@@ -1931,6 +1953,16 @@ msgstr ""
 " - Argomento 3:\n"
 "   - Sottotema 3.1\n"
 "```"
+
+msgid "Notify on newsletter unsubscription"
+msgstr "Notifica di annullamento dell'iscrizione alla newsletter"
+
+msgid ""
+"Send an email notification to the following users when a recipient "
+"unsubscribes from the newsletter"
+msgstr ""
+"Inviare una notifica via e-mail ai seguenti utenti quando un destinatario si "
+"cancella dalla newsletter"
 
 msgid "Invalid YAML format. Please refer to the example."
 msgstr "Formato YAML non valido. Fare riferimento all'esempio."
@@ -2604,6 +2636,12 @@ msgstr "Esportazioni"
 msgid "Payment Providers"
 msgstr "Provider di servizi di pagamento"
 
+msgid "Datatrans"
+msgstr "Datatrans"
+
+msgid "Worldline Saferpay"
+msgstr "Worldline Saferpay"
+
 msgid "Synchronise"
 msgstr "Sincronizza"
 
@@ -2801,6 +2839,25 @@ msgstr ""
 msgid "Sidebar links"
 msgstr "Collegamenti della barra laterale"
 
+msgid "Contact link"
+msgstr "Link di contatto"
+
+msgid "Sidebar contact"
+msgstr "Contatto laterale"
+
+msgid "Please provide a URL if contact link text is set"
+msgstr ""
+"Si prega di fornire un URL se il testo del link di contatto è impostato"
+
+msgid "Please provide link text if contact URL is set"
+msgstr "Fornire il testo del link se l'URL di contatto è impostato"
+
+msgid "Contact Text"
+msgstr "Testo di contatto"
+
+msgid "Contact URL"
+msgstr "URL di contatto"
+
 msgid "Delete content when expired"
 msgstr "Eliminare il contenuto quando è scaduto"
 
@@ -2811,9 +2868,6 @@ msgstr ""
 
 msgid "Delete content"
 msgstr "Cancellare il contenuto"
-
-msgid "Photo album. Will be shown at the end of content."
-msgstr "Album fotografico. Sarà mostrato alla fine del contenuto."
 
 msgid "Photo album"
 msgstr "Album fotografico"
@@ -2993,8 +3047,8 @@ msgstr "Il rifiuto di ${title} non può essere annullato."
 msgid "Reject reservation"
 msgstr "Rifiuta prenotazione"
 
-#. Used in sentence: "${event} published."
 #.
+#. Used in sentence: "${event} published."
 msgid "Event"
 msgstr "Evento"
 
@@ -3383,6 +3437,18 @@ msgstr "Nessun file caricato"
 
 msgid "All dates"
 msgstr "Tutte le date"
+
+msgid ""
+"By default we assume that you only want to select a single time slot and "
+"room per day. If you want to select more than one time slot or room on a "
+"given day, you may hold and press any one of your Shift, Alt or Ctrl keys "
+"while clicking the time slots you want to reserve."
+msgstr ""
+"Per impostazione predefinita, si presume che si voglia selezionare una sola "
+"fascia oraria e una sola stanza al giorno. Se si desidera selezionare più di "
+"una fascia oraria o di una stanza in un determinato giorno, è possibile "
+"tenere premuto uno dei tasti Shift, Alt o Ctrl mentre si fa clic sulle fasce "
+"orarie che si desidera prenotare."
 
 msgid "Unavailable"
 msgstr "Non disponibile"
@@ -4041,6 +4107,13 @@ msgstr "Clicca qui per visualizzare la versione web."
 msgid "You no longer wish to receive the newsletter?"
 msgstr "Non desideri più ricevere la newsletter?"
 
+msgid ""
+"The user with the address ${address} just unsubscribed from the newsletter "
+"subscriber list."
+msgstr ""
+"L'utente con l'indirizzo ${indirizzo} si è appena cancellato dalla lista "
+"degli iscritti alla newsletter."
+
 msgid "Click the following link to set a new password:"
 msgstr "Clicca sul collegamento seguente per impostare una nuova password:"
 
@@ -4450,6 +4523,15 @@ msgstr "Rilascia i file per verificarli"
 
 msgid "No subscribers yet"
 msgstr "Non ci sono ancora abbonati"
+
+msgid ""
+"This recipient has delivery failures, including hard bounces, invalid email "
+"addresses, spam complaints, manual deactivations, or being blocked. We "
+"recommend unsubscribing it from the list."
+msgstr ""
+"Questo destinatario presenta errori di consegna, tra cui rimbalzi, indirizzi "
+"e-mail non validi, reclami per spam, disattivazioni manuali o blocco. Si "
+"consiglia di cancellarlo dall'elenco."
 
 msgid "submitted"
 msgstr "inviato"
@@ -5447,14 +5529,14 @@ msgstr ""
 "L'importo totale per i dati attualmente inseriti è ${total} ma deve essere "
 "almeno ${minimum}. Si prega di modificare i dati inseriti."
 
+msgid "Registrations are no longer possible"
+msgstr "Le iscrizioni non sono più possibili"
+
 msgid "Pay Online and Complete"
 msgstr "Paga online e completa"
 
 msgid "Your payment could not be processed"
 msgstr "Non è stato possibile elaborare Il tuo pagamento"
-
-msgid "Registrations are no longer possible"
-msgstr "Le iscrizioni non sono più possibili"
 
 msgid "Your registration has been confirmed"
 msgstr "La tua registrazione è stata confermata"
@@ -5512,6 +5594,10 @@ msgstr ""
 "categorie sottoscritte sono ${subscribed}."
 
 #, python-format
+msgid "Success! We have added ${address} to the list of recipients."
+msgstr "Successo! Abbiamo aggiunto ${indirizzo} alla lista dei destinatari."
+
+#, python-format
 msgid ""
 "Success! We have sent a confirmation link to ${address}, if we didn't send "
 "you one already. Your subscribed categories are ${subscribed}."
@@ -5525,6 +5611,18 @@ msgstr ""
 msgid "Success! We have updated your subscribed categories to ${subscribed}."
 msgstr ""
 "Successo! Abbiamo aggiornato le categorie sottoscritte a ${subscribed}."
+
+msgid "Update your newsletter subscription categories:"
+msgstr "Aggiorna le categorie del tuo abbonamento alla newsletter:"
+
+msgid "Update"
+msgstr "Aggiorna"
+
+msgid "Sign up to our newsletter to always stay up to date:"
+msgstr "Iscriviti alla nostra newsletter per rimanere sempre aggiornato:"
+
+msgid "Sign up"
+msgstr "Iscriviti"
 
 msgid "Update Newsletter Subscription"
 msgstr "Aggiornare l'abbonamento alla newsletter "
@@ -5639,6 +5737,16 @@ msgstr "Il pagamento è stato acquisito"
 msgid "The payment was refunded"
 msgstr "Il pagamento è stato rimborsato"
 
+msgid "The payment is already captured but is still processing"
+msgstr ""
+"Il pagamento è già stato acquisito ma è ancora in fase di elaborazione."
+
+msgid "Could not refund the payment"
+msgstr "Impossibile rimborsare il pagamento"
+
+msgid "Could not capture the payment"
+msgstr "Impossibile acquisire il pagamento"
+
 msgid "As default"
 msgstr "Valore predefinito"
 
@@ -5687,8 +5795,50 @@ msgstr "Il fornitore di servizi di pagamento è stato eliminato."
 msgid "Successfully synchronised payments"
 msgstr "Pagamenti sincronizzati correttamente"
 
+msgid "Merchant Name"
+msgstr "Nome dell'esercente"
+
+msgid "UPP Username"
+msgstr "UPP Username"
+
+msgid "UPP Password"
+msgstr "UPP Password"
+
+msgid "Webhook Signing Key"
+msgstr "Chiave di firma Webhook"
+
 msgid "Charge fees to customer"
 msgstr "Addebita commissioni al cliente"
+
+msgid "Use sandbox environment (for testing)"
+msgstr "Utilizzare l'ambiente sandbox (per i test)"
+
+msgid "Customer Name"
+msgstr "Nome del cliente"
+
+msgid "Customer ID"
+msgstr "ID cliente"
+
+msgid "Terminal ID"
+msgstr "ID terminali"
+
+msgid "API Username"
+msgstr "Nome utente API"
+
+msgid "API Password"
+msgstr "Password API"
+
+msgid "Datatrans has been added"
+msgstr "È stato aggiunto Datatrans"
+
+msgid "Add Datatrans"
+msgstr "Aggiungi Datatrans"
+
+msgid "Worldline Saferpay has been added"
+msgstr "È stato aggiunto Worldline Saferpay"
+
+msgid "Add Worldline Saferpay"
+msgstr "Aggiungi Worldline Saferpay"
 
 msgid "Added a new person"
 msgstr "Aggiunta una nuova persona"
@@ -5961,6 +6111,9 @@ msgstr "Argomenti"
 msgid "You have successfully unsubscribed from the newsletter at ${address}"
 msgstr ""
 "L'iscrizione alla newsletter di ${address} è stata annullata con successo."
+
+msgid "Unsubscription from newsletter"
+msgstr "Cancellazione dalla newsletter"
 
 msgid "A survey with this name already exists"
 msgstr "Esiste già un'indagine con questo nome"
@@ -6240,9 +6393,3 @@ msgstr "È stato creato un account per te"
 
 msgid "The user was created successfully"
 msgstr "Utente creato correttamente"
-
-msgid "This recipient has delivery failures, including hard bounces, invalid email addresses, spam complaints, manual deactivations, or being blocked. We recommend unsubscribing it from the list."
-msgstr "Questo destinatario presenta errori di consegna, tra cui rimbalzi, indirizzi e-mail non validi, reclami per spam, disattivazioni manuali o blocco. Si consiglia di cancellarlo dall'elenco."
-
-#~ msgid "Photo album. Will be shown at the end of content."
-#~ msgstr "Album fotografico. Sarà mostrato alla fine del contenuto."

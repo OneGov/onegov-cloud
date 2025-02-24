@@ -16,17 +16,21 @@ from sedate import align_range_to_day, standardize_date, as_datetime
 from onegov.pay import Payment
 from onegov.pay import PaymentCollection
 from onegov.pay import PaymentProviderCollection
+from onegov.pay.errors import DatatransApiError, SaferpayApiError
+from onegov.pay.models.payment_providers.datatrans import DatatransPayment
+from onegov.pay.models.payment_providers.stripe import StripePayment
+from onegov.pay.models.payment_providers.worldline_saferpay import (
+    SaferpayPayment)
 from onegov.ticket import Ticket, TicketCollection
 from webob import exc
 
 
-from typing import cast, Any, TYPE_CHECKING
+from typing import Any, TYPE_CHECKING
 if TYPE_CHECKING:
     from collections.abc import Callable, Sequence
     from datetime import datetime
     from onegov.core.types import JSON_ro, RenderData
     from onegov.org.request import OrgRequest
-    from onegov.pay.models.payment_providers.stripe import StripePayment
     from onegov.pay.types import AnyPayableBase
     from sqlalchemy.orm import Session
     from typing import type_check_only
@@ -274,34 +278,124 @@ def mark_as_unpaid(self: Payment, request: OrgRequest) -> None:
 
 
 @OrgApp.view(
-    model=Payment,
+    model=StripePayment,
     name='capture',
     request_method='POST',
     permission=Private
 )
-def capture(self: Payment, request: OrgRequest) -> None:
+def capture_stripe(self: StripePayment, request: OrgRequest) -> None:
     request.assert_valid_csrf_token()
     send_ticket_notifications(self, request, 'captured')
 
     request.success(_('The payment was captured'))
 
     assert self.source == 'stripe_connect'
-    self = cast('StripePayment', self)
     self.charge.capture()
 
 
 @OrgApp.view(
-    model=Payment,
+    model=StripePayment,
     name='refund',
     request_method='POST',
     permission=Private
 )
-def refund(self: Payment, request: OrgRequest) -> None:
+def refund_stripe(self: StripePayment, request: OrgRequest) -> None:
     request.assert_valid_csrf_token()
     send_ticket_notifications(self, request, 'refunded')
 
     request.success(_('The payment was refunded'))
 
     assert self.source == 'stripe_connect'
-    self = cast('StripePayment', self)
     self.refund()
+
+
+@OrgApp.view(
+    model=DatatransPayment,
+    name='capture',
+    request_method='POST',
+    permission=Private
+)
+def capture_datatrans(self: DatatransPayment, request: OrgRequest) -> None:
+    request.assert_valid_csrf_token()
+    tx = self.transaction
+    if tx.status == 'settled':
+        request.info(
+            _('The payment is already captured but is still processing')
+        )
+        return
+    send_ticket_notifications(self, request, 'captured')
+
+    request.success(_('The payment was captured'))
+
+    assert self.source == 'datatrans'
+    if tx.status == 'transmitted':
+        self.sync(tx)
+    else:
+        self.provider.client.settle(tx)
+
+
+@OrgApp.view(
+    model=DatatransPayment,
+    name='refund',
+    request_method='POST',
+    permission=Private
+)
+def refund_datatrans(self: DatatransPayment, request: OrgRequest) -> None:
+    request.assert_valid_csrf_token()
+
+    assert self.source == 'datatrans'
+    try:
+        self.refund()
+    except DatatransApiError:
+        request.alert(_('Could not refund the payment'))
+    else:
+        send_ticket_notifications(self, request, 'refunded')
+        request.success(_('The payment was refunded'))
+
+
+@OrgApp.view(
+    model=SaferpayPayment,
+    name='capture',
+    request_method='POST',
+    permission=Private
+)
+def capture_saferpay(self: SaferpayPayment, request: OrgRequest) -> None:
+    request.assert_valid_csrf_token()
+    tx = self.transaction
+    if tx.status == 'PENDING':
+        request.info(
+            _('The payment is already captured but is still processing')
+        )
+        return
+
+    if tx.status == 'CANCELED':
+        request.alert(_('Could not capture the payment'))
+    else:
+        request.success(_('The payment was captured'))
+        send_ticket_notifications(self, request, 'captured')
+
+    assert self.source == 'worldline_saferpay'
+    if tx.status != 'AUTHORIZED':
+        self.sync(tx)
+    else:
+        self.provider.client.capture(tx)
+
+
+@OrgApp.view(
+    model=SaferpayPayment,
+    name='refund',
+    request_method='POST',
+    permission=Private
+)
+def refund_saferpay(self: SaferpayPayment, request: OrgRequest) -> None:
+    request.assert_valid_csrf_token()
+
+    assert self.source == 'worldline_saferpay'
+    try:
+        new_refund = self.refund()
+    except SaferpayApiError:
+        request.alert(_('Could not refund the payment'))
+    else:
+        if new_refund:
+            send_ticket_notifications(self, request, 'refunded')
+        request.success(_('The payment was refunded'))

@@ -22,6 +22,7 @@ if TYPE_CHECKING:
     from collections.abc import Mapping
     from decimal import Decimal
     from markupsafe import Markup
+    from onegov.core.request import CoreRequest
     from onegov.pay import Price
     from onegov.pay.types import PaymentState
 
@@ -160,23 +161,20 @@ class PaymentProvider(Base, TimestampMixin, ContentMixin, Generic[_P]):
         """
         return False
 
+    def get_token(self, request: CoreRequest) -> str | None:
+        """ Extracts this provider's specific token from the request. """
+        raise NotImplementedError
+
     def checkout_button(
         self,
         label: str,
         amount: Decimal | None,
         currency: str | None,
-        action: str = 'submit',
+        complete_url: str,
+        request: CoreRequest,
         **extra: Any
     ) -> Markup:
-        """ Renders a checkout button which will store the token for the
-        checkout as its own value if clicked.
-
-        The action controls what happens after the token was successfully
-        retrieved. The following actions are supported:
-
-        - 'post': Submits the form surrounding the button.
-
-        """
+        """ Renders a checkout button. """
         raise NotImplementedError
 
     def prepare_oauth_request(
@@ -207,3 +205,14 @@ class PaymentProvider(Base, TimestampMixin, ContentMixin, Generic[_P]):
         the remote payment provider.
 
         """
+
+    @property
+    def payment_via_get(self) -> bool:
+        """
+        Whether or not we're allowed to submit a payment via `GET` request.
+
+        Ideally this is always `False`, but some payment providers only
+        support a redirect via `GET`. Make sure the token retrieval is
+        sufficiently secure to make up for this shortcoming.
+        """
+        return False

@@ -5,7 +5,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE 1.0\n"
-"POT-Creation-Date: 2025-01-27 10:34+0100\n"
+"POT-Creation-Date: 2025-02-18 09:27+0100\n"
 "PO-Revision-Date: 2017-06-28 12:03+0200\n"
 "Last-Translator: Marc Sommerhalder <marc.sommerhalder@seantis.ch>\n"
 "Language-Team: Romansh\n"
@@ -15,6 +15,12 @@ msgstr ""
 "Content-Transfer-Encoding: 8bit\n"
 "Generated-By: Lingua 3.12\n"
 "X-Generator: Poedit 2.0.2\n"
+
+msgid "Invalid number of hours"
+msgstr ""
+
+msgid "Invalid number of minutes"
+msgstr ""
 
 msgid "Not a valid email"
 msgstr ""
@@ -57,10 +63,10 @@ msgstr ""
 msgid "Limited text"
 msgstr ""
 
-msgid "Numbers-only textfield (regex)"
+msgid "Multiline with optional number of rows"
 msgstr ""
 
-msgid "Multiline with optional number of rows"
+msgid "Numbers-only textfield (regex)"
 msgstr ""
 
 msgid "Comment"
@@ -244,4 +250,10 @@ msgid "No results match"
 msgstr ""
 
 msgid "Select Some Options"
+msgstr ""
+
+msgid "hours"
+msgstr ""
+
+msgid "minutes"
 msgstr ""
