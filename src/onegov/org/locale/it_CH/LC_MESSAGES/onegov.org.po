@@ -2,7 +2,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: \n"
-"POT-Creation-Date: 2025-02-18 09:50+0100\n"
+"POT-Creation-Date: 2025-02-24 15:55+0100\n"
 "PO-Revision-Date: 2022-03-15 10:52+0100\n"
 "Last-Translator: \n"
 "Language-Team: \n"
@@ -2081,15 +2081,18 @@ msgstr "Durata dall'apertura di un ticket alla sua archiviazione automatica"
 msgid "Duration from archived state until deleted automatically"
 msgstr "Durata dello stato di archiviazione fino alla cancellazione automatica"
 
-msgid "E-Mail Address"
-msgstr "Indirizzo e-mail"
-
 msgid ""
 "Select newsletter categories your are interested in. You will receive the "
 "newsletter if it reports on at least one of the subscribed categories."
 msgstr ""
 "Selezionate le categorie di newsletter a cui siete interessati. Riceverete "
 "la newsletter se riporta almeno una delle categorie sottoscritte"
+
+msgid "E-Mail Address"
+msgstr "Indirizzo e-mail"
+
+msgid "The subscriber has given consent to receive the newsletter."
+msgstr "Il sottoscrittore ha dato il consenso a ricevere la newsletter."
 
 msgid "Submission Window"
 msgstr "Finestra di presentazione"
@@ -3047,8 +3050,8 @@ msgstr "Il rifiuto di ${title} non può essere annullato."
 msgid "Reject reservation"
 msgstr "Rifiuta prenotazione"
 
-#.
 #. Used in sentence: "${event} published."
+#.
 msgid "Event"
 msgstr "Evento"
 
