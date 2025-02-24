@@ -64,21 +64,21 @@ class TicketBoardlet(OrgBoardlet):
             text=_('Open Tickets'),
             number=self.session.query(Ticket).filter_by(
                 state='open').count(),
-            icon='fa-hourglass'
+            icon='fas fa-hourglass'
         )
 
         yield BoardletFact(
             text=_('Pending Tickets'),
             number=self.session.query(Ticket).filter_by(
                 state='pending').count(),
-            icon='fa-hourglass-half'
+            icon='fas fa-hourglass-half'
         )
 
         yield BoardletFact(
             text=_('New Tickets in the Last Month'),
             number=self.session.query(Ticket).filter(
                 Ticket.created > time_30d_ago).count(),
-            icon='fa-plus-circle'
+            icon='fas fa-plus-circle'
         )
 
         closed_ticket_query = (
@@ -90,7 +90,7 @@ class TicketBoardlet(OrgBoardlet):
         yield BoardletFact(
             text=_('Closed Tickets in the Last Month'),
             number=closed_tickets_count,
-            icon='fa-check-circle'
+            icon='fas fa-check-circle'
         )
 
         # average lead time from opening to closing
@@ -106,7 +106,7 @@ class TicketBoardlet(OrgBoardlet):
             text=_('Lead Time from opening to closing in Days '
                    'over the Last Month'),
             number=average_lead_time_s or '-',
-            icon='fa-clock'
+            icon='fas fa-clock'
         )
 
         # average lead time from pending to closing
@@ -121,16 +121,16 @@ class TicketBoardlet(OrgBoardlet):
             text=_('Lead Time from pending to closing in Days '
                    'over the Last Month'),
             number=average_lead_time_s or '-',
-            icon='fa-clock'
+            icon='fas fa-clock'
         )
 
 
 def get_icon_for_access_level(access: str) -> str:
     access_icons = {
-        'public': 'fa-eye',
-        'secret': 'fa-user-secret',
-        'private': 'fa-lock',
-        'member': 'fa-users'
+        'public': 'fas fa-eye',
+        'secret': 'fas fa-user-secret',
+        'private': 'fas fa-lock',
+        'member': 'fas fa-users'
     }
 
     if access not in access_icons:
@@ -171,7 +171,8 @@ class EditedPagesBoardlet(OrgBoardlet):
             yield BoardletFact(
                 text='',
                 link=(self.layout.request.link(p), p.title),
-                icon=get_icon_for_access_level(p.access),  # type:ignore[attr-defined]
+                icon='fas fa-file',
+                visibility_icon=get_icon_for_access_level(p.access),  # type:ignore[attr-defined]
                 icon_title=get_icon_title(self.request, p.access)  # type:ignore[attr-defined]
             )
 
@@ -192,7 +193,8 @@ class EditedNewsBoardlet(OrgBoardlet):
             yield BoardletFact(
                 text='',
                 link=(self.layout.request.link(n), n.title),
-                icon=get_icon_for_access_level(n.access),
+                icon='fas fa-newspaper',
+                visibility_icon=get_icon_for_access_level(n.access),
                 icon_title=get_icon_title(self.request, n.access)
             )
 

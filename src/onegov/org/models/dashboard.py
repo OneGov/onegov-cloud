@@ -116,6 +116,9 @@ class BoardletFact:
     # the font awesome (fa-*) icon to use, if any
     icon: str | None = None
 
+    # visibility icon right behind text/link
+    visibility_icon: str | None = None
+
     # title of the icon (hover text)
     icon_title: str | None = None
 

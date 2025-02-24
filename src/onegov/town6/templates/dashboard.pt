@@ -12,7 +12,7 @@
                     <table class="facts">
                         <tr tal:repeat="fact boardlet.facts" class="${fact.css_class} small ${'none' if not (fact.number or fact.icon) else ''}">
                             <td tal:condition="fact.icon" class="fact-icon">
-                                <i class="fas ${fact.icon}" tal:attributes="title fact.icon_title|None"></i>
+                                <i class="${fact.icon}"></i>
                             </td>
                             <td tal:condition="fact.number is not None" class="fact-number">
                                 ${layout.format_number(fact.number) or '-'}
@@ -24,6 +24,9 @@
                                 ${fact.text}
                                 <span tal:condition="fact.link">
                                     <a href="${fact.link[0]}">${fact.link[1]}</a>
+                                </span>
+                                <span tal:condition="fact.visibility_icon" class="fact-visibility-icon">
+                                    -> <i class="${fact.visibility_icon}" tal:attributes="title fact.icon_title|None"></i>
                                 </span>
                             </td>
                         </tr>
