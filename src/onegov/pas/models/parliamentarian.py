@@ -87,9 +87,13 @@ class Parliamentarian(
     )
 
     #: External ID
-    external_kub_id: Column[uuid.UUID] = Column(
+    #
+    # Note: Value can only be None if the data is imported from an Excel file.
+    # Fixme: The excel data import will not be used in the future so we will be
+    # able to make this Non-Nullable soon.
+    external_kub_id: Column[uuid.UUID | None] = Column(
         UUID,   # type:ignore[arg-type]
-        primary_key=True,
+        nullable=True,
         default=uuid4
     )
 
@@ -374,3 +378,19 @@ class Parliamentarian(
         cascade='all, delete-orphan',
         back_populates='parliamentarian'
     )
+
+    def __repr__(self) -> str:
+        info = [
+            f'id={self.id}',
+            f"last_name='{self.last_name}'",
+            f"first_name='{self.first_name}'",
+        ]
+        if self.academic_title:
+            info.append(f"title='{self.academic_title}'")
+        if self.salutation:
+            info.append(f"salutation='{self.salutation}'")
+        if self.email_primary:
+            info.append(
+                f"email='{self.email_primary}'")
+
+        return f"<Parliamentarian {', '.join(info)}>"

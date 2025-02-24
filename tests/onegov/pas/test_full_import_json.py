@@ -18,20 +18,20 @@ def test_successful_import(
      Let's solidify our understanding of how these relate.
 
      **people.json**: Contains individual person data (Parliamentarians). Key
-         fields are firstName, officialName, primaryEmail, tags, title, id. This
-         maps to the Parliamentarian model.
+         fields are firstName, officialName, primaryEmail, tags, title, id.
+         This maps to the Parliamentarian model.
 
     **organizations.json**:
         Contains organization data. The organizationTypeTitle dictates the type
         of organization.
         - "Kommission":  Maps to your Commission model.
-        - "Kantonsrat":  This is a special case. It's not a Commission.
-        It represents the Parliament itself. We link this as ParliamentarianRole
-        directly on the Parliamentarian model with role='member' and associated with
-        the Kantonsrat organization.
+        - "Kantonsrat":  This is a special case. It's not a Commission. It
+        represents the Parliament itself. We link this as ParliamentarianRole
+        directly on the Parliamentarian model with role='member' and associated
+        with the Kantonsrat organization.
         - "Fraktion":  Maps to ParliamentaryGroup.
         - "Sonstige": Could be various types. Let's see how these are intended
-           to be modeled. We need more clarity on how "Sonstige" is categorized.
+          to be modeled. We need more clarity on how "Sonstige" is categorized.
 
     **memberships.json**: Connects person and organization.
         It defines the role within that organization, start, end dates.
@@ -61,8 +61,10 @@ def test_successful_import(
         c.name == 'amtliche Kommission Test' and c.type == 'official' for c in
         commissions)
     assert any(
-        c.name == 'Interkantonale Kommission Test' and c.type == 'intercantonal'
-        for c in commissions)
+        c.name == 'Interkantonale Kommission Test'
+        and c.type == 'intercantonal'
+        for c in commissions
+    )
 
     # Verify memberships were imported
     memberships = session.query(CommissionMembership).all()

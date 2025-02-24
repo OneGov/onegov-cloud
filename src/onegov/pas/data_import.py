@@ -156,7 +156,7 @@ def preprocess_headers(
 
 
 def preprocess_csv_headers(
-    csv_path_abs: StrOrBytesPath, expected: set[str] | None = None
+    csv_path_abs: StrOrBytesPath, expected: set[str]
 ) -> StrOrBytesPath:
     """
     Preprocesses a CSV file to rename specific headers to avoid issues
@@ -218,7 +218,7 @@ def validate_headers(
 
 def preprocess_excel_headers(
     excel_path: StrOrBytesPath,
-    expected: set[str] | None = None
+    expected: set[str]
 ) -> StrOrBytesPath:
     """
     Preprocess Excel headers using a context manager for temporary file

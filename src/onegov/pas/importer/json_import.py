@@ -18,9 +18,35 @@ from typing import TextIO, TYPE_CHECKING
 if TYPE_CHECKING:
     from _typeshed import StrOrBytesPath
     from sqlalchemy.orm import Session
+    from typing import TypedDict
+    from collections.abc import Sequence
+
+    class EmailData(TypedDict):
+        id: str
+        label: str
+        email: str
+        isDefault: bool
+        thirdPartyId: str | None
+        modified: str
+        created: str
+
+    class PersonData(TypedDict):
+        id: str
+        firstName: str
+        fullName: str
+        officialName: str
+        isActive: bool
+        created: str
+        modified: str
+        personTypeTitle: str | None
+        primaryEmail: EmailData | None
+        salutation: str
+        tags: list[str]
+        thirdPartyId: str | None
+        title: str
+        username: str | None
 
 
-PersonData = dict[str, Any]
 OrganizationType = Literal[
     'Kommission', 'Kantonsrat', 'Fraktion', 'Sonstige'
 ]  # Type hint for organization type
@@ -120,9 +146,22 @@ class PeopleImporter(DataImporter):
 
     """
 
+    # key is the external name, value is the name we use for that
+    #
+    # people_data json:
+    # {'created': '2024-12-23T16:44:12.056040+01:00', 'firstName': 'Daniel',
+    # 'fullName': 'Abt Daniel', 'id': 'd9403b52-d178-454c-8ac7-abb75af14aa6',
+    # 'isActive': True, 'modified': '2024-12-23T16:44:12.056046+01:00',
+    # 'officialName': 'Abt', 'personTypeTitle': None,
+    # 'primaryEmail': {'id': 'c28dbad1-99fd-4694-8816-9c1bbd3dec72',
+    # 'label': '1. E-Mail', 'email': 'da@example.org', 'isDefault': True,
+    # 'thirdPartyId': None, 'modified': '2024-12-23T16:44:12.059162+01:00',
+    # 'created': '2024-12-23T16:44:12.059150+01:00'}, 'salutation': 'Herr',
+    # 'tags': [], 'thirdPartyId': '37', 'title': '', 'username': None}
     person_attribute_map: dict[str, str] = {
+        'id': 'external_kub_id',
         'firstName': 'first_name',
-        'officialName': 'last_name',  # Map officialName to last_name
+        'officialName': 'last_name',
         'title': 'academic_title',
         'salutation': 'salutation',
         # 'primaryEmail.email': 'email_primary' #  Handle nested email separately
@@ -142,13 +181,14 @@ class PeopleImporter(DataImporter):
                 parliamentarian = self._create_parliamentarian(person_data)
                 if parliamentarian:
                     parliamentarians.append(parliamentarian)
-                    breakpoint()
+
                     parliamentarian_map[person_data['id']] = (
                         parliamentarian  # Store in map
                     )
             except Exception as e:
                 logging.error(
-                    f'Error importing person with id {person_data.get("id")}: {e}',
+                    f'Error importing person with id '
+                    f'{person_data.get("id")}: {e}',
                     exc_info=True,
                 )
 
@@ -159,7 +199,6 @@ class PeopleImporter(DataImporter):
         self, person_data: PersonData
     ) -> Parliamentarian | None:
         """Creates a single Parliamentarian object from person data."""
-        breakpoint()
 
         if not person_data.get('id'):  # Basic validation
             logging.warning(
@@ -168,6 +207,15 @@ class PeopleImporter(DataImporter):
             )
             return None
 
+        # The parliamentarian `active` value needs to be taking into
+        # consideration. This attribute is a dynamic attribute that
+        # is computed at runtime based on the
+        # ParliamentarianRoles and it's start / end timeframe
+
+        # In the api however, this is a simple boolean value.
+        # This is of course doesn't map easily, as we track
+        # historical data while the `active` boolean is simply a
+        # representation of how it is *now*.
         parliamentarian_kwargs = {}
         for json_key, model_attr in self.person_attribute_map.items():
             parliamentarian_kwargs[model_attr] = person_data.get(json_key)
@@ -209,43 +257,43 @@ MembershipRoleType = Literal[
 MembershipData = dict[str, Any]
 
 
-def determine_membership_role(membership_data: MembershipData) -> str:
-    """Determines the membership role based on organization type and role text."""
-    role_text = membership_data.get('role', '').lower()
-    org_type_title = membership_data.get('organization', {}).get(
-        'organizationTypeTitle'
-    )
-
-    if org_type_title == 'Kommission':
-        if 'präsident' in role_text:
-            return 'president'
-        elif 'vizepräsident' in role_text or 'vize-präsident' in role_text:
-            return 'vicepresident'
-        elif 'vote counter' in role_text:  # Adjust based on actual text
-            return 'votecounter'
-        else:
-            return 'member'  # Default for Kommission is member
-    elif org_type_title == 'Fraktion':  # Parliamentary Group Roles
-        if 'präsident' in role_text:
-            return 'president_parliamentary_group'  # Use specific parliamentary group president role
-        elif 'vizepräsident' in role_text or 'vize-präsident' in role_text:
-            return 'vicepresident'
-        elif 'vote counter' in role_text:  # Adjust based on actual text
-            return 'votecounter'
-        elif 'mediamanager' in role_text or 'media manager' in role_text:
-            return 'mediamanager'
-        else:
-            return 'member'  # Default for Fraktion is member
-    elif (
-            org_type_title == 'Kantonsrat'
-    ):  # Parliamentarian Roles (for Kantonsrat "memberships")
-        #  "Kantonsrat" memberships might represent the general role of being a parliamentarian.
-        #  You might need to adjust role determination based on your specific needs.
-        return 'member'  # Default Kantonsrat role is member
-    elif org_type_title == 'Sonstige':
-        return 'member'  # Default role for "Sonstige"
-    else:
-        return 'none'  # Default to 'none' if type is unknown
+# def determine_membership_role(membership_data: MembershipData) -> str:
+#     """Determines the membership role based on organization type and role text."""
+#     role_text = membership_data.get('role', '').lower()
+#     org_type_title = membership_data.get('organization', {}).get(
+#         'organizationTypeTitle'
+#     )
+#
+#     if org_type_title == 'Kommission':
+#         if 'präsident' in role_text:
+#             return 'president'
+#         elif 'vizepräsident' in role_text or 'vize-präsident' in role_text:
+#             return 'vicepresident'
+#         elif 'vote counter' in role_text:  # Adjust based on actual text
+#             return 'votecounter'
+#         else:
+#             return 'member'  # Default for Kommission is member
+#     elif org_type_title == 'Fraktion':  # Parliamentary Group Roles
+#         if 'präsident' in role_text:
+#             return 'president_parliamentary_group'  # Use specific parliamentary group president role
+#         elif 'vizepräsident' in role_text or 'vize-präsident' in role_text:
+#             return 'vicepresident'
+#         elif 'vote counter' in role_text:  # Adjust based on actual text
+#             return 'votecounter'
+#         elif 'mediamanager' in role_text or 'media manager' in role_text:
+#             return 'mediamanager'
+#         else:
+#             return 'member'  # Default for Fraktion is member
+#     elif (
+#             org_type_title == 'Kantonsrat'
+#     ):  # Parliamentarian Roles (for Kantonsrat "memberships")
+#         #  "Kantonsrat" memberships might represent the general role of being a parliamentarian.
+#         #  You might need to adjust role determination based on your specific needs.
+#         return 'member'  # Default Kantonsrat role is member
+#     elif org_type_title == 'Sonstige':
+#         return 'member'  # Default role for "Sonstige"
+#     else:
+#         return 'none'  # Default to 'none' if type is unknown
 
 
 class MembershipImporter(DataImporter):
@@ -375,7 +423,8 @@ class OrganizationImporter(DataImporter):
         dict[str, ParliamentaryGroup],
         dict[str, Any],
     ]:  # Return maps for different org types
-        """Imports organizations from JSON and returns maps for commissions and parliamentary groups."""
+        """Imports organizations from JSON and returns maps for commissions
+        and parliamentary groups."""
         commissions = []
         parliamentary_groups = []
         other_organizations = []  # For "Sonstige" or other types
@@ -387,6 +436,7 @@ class OrganizationImporter(DataImporter):
         )  # Adjust type as needed
 
         for org_data in organizations_data:
+            breakpoint()
             try:
                 org_type_title = org_data.get('organizationTypeTitle')
 
@@ -513,7 +563,8 @@ class OrganizationImporter(DataImporter):
         logging.info(
             f"Creating 'Sonstige' organization: {org_data.get('name')}"
         )
-        # You might create a generic Organization model here, or skip "Sonstige" types if not needed.
+        # You might create a generic Organization model here, or skip
+        # "Sonstige" types if not needed.
         return None  # Placeholder - adjust based on your model
 
 

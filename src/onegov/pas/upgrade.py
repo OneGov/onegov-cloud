@@ -11,7 +11,7 @@ from onegov.core.upgrade import upgrade_task, UpgradeContext
 
 
 @upgrade_task('Add external id from api')
-def add_registration_window_columns(context: UpgradeContext) -> None:
+def add_external_id_for_api(context: UpgradeContext) -> None:
     for table in (
         'pas_parliamentarians',
         'pas_parties',

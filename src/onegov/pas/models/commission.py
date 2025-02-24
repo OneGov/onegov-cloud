@@ -62,9 +62,9 @@ class Commission(Base, ContentMixin, TimestampMixin, ORMSearchable):
     )
 
     #: External ID
-    external_kub_id: Column[uuid.UUID] = Column(
+    external_kub_id: Column[uuid.UUID | None] = Column(
         UUID,   # type:ignore[arg-type]
-        primary_key=True,
+        nullable=True,
         default=uuid4
     )
 
