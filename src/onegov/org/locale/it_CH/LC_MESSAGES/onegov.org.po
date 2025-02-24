@@ -6362,3 +6362,6 @@ msgstr "È stato creato un account per te"
 
 msgid "The user was created successfully"
 msgstr "Utente creato correttamente"
+
+msgid "Item(s)"
+msgstr "Elemento(i)"
