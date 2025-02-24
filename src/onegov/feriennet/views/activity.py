@@ -45,9 +45,7 @@ from webob import exc
 from typing import Literal, TYPE_CHECKING
 if TYPE_CHECKING:
     from collections.abc import Iterable, Iterator, Sequence
-    from decimal import Decimal
     from onegov.activity.models import OccasionDate
-    from onegov.activity.types import BoundedIntegerRange
     from onegov.core.types import JSON_ro, RenderData
     from onegov.feriennet.request import FeriennetRequest
     from onegov.ticket import Ticket
@@ -373,68 +371,6 @@ def filter_states(
     )
 
 
-def period_bound_occasions(
-    activity: Activity,
-    request: FeriennetRequest
-) -> list[Occasion]:
-
-    active_period = request.app.active_period
-
-    if not active_period:
-        return []
-
-    return [o for o in activity.occasions if o.period_id == active_period.id]
-
-
-def activity_ages(
-    activity: Activity,
-    request: FeriennetRequest
-) -> tuple[BoundedIntegerRange, ...]:
-    return tuple(o.age for o in period_bound_occasions(activity, request))
-
-
-def activity_spots(
-    activity: Activity,
-    request: FeriennetRequest
-) -> int:
-
-    if not request.app.active_period:
-        return 0
-
-    if not request.app.active_period.confirmed:
-        return sum(o.max_spots for o in period_bound_occasions(
-            activity, request))
-
-    return sum(o.available_spots for o in period_bound_occasions(
-        activity, request))
-
-
-def activity_min_cost(
-    activity: Activity,
-    request: FeriennetRequest
-) -> Decimal | None:
-
-    occasions = period_bound_occasions(activity, request)
-
-    if not occasions:
-        return None
-
-    return min(o.total_cost for o in occasions)
-
-
-def activity_max_cost(
-    activity: Activity,
-    request: FeriennetRequest
-) -> Decimal | None:
-
-    occasions = period_bound_occasions(activity, request)
-
-    if not occasions:
-        return None
-
-    return max(o.total_cost for o in occasions)
-
-
 def is_filtered(filters: dict[str, tuple[str, Sequence[Link]]]) -> bool:
     for links in filters.values():
         for link in links[1]:
@@ -556,9 +492,6 @@ def view_activities(
         'active_filter': active_filter,
         'filtered': is_filtered(filters),
         'period': active_period,
-        'activity_ages': activity_ages,
-        'activity_min_cost': activity_min_cost,
-        'activity_spots': activity_spots,
         'current_location': request.link(
             self.by_page_range((0, self.pages[-1])))
     }
@@ -623,9 +556,6 @@ def view_activity_filters(
         'active_filter': active_filter,
         'filtered': is_filtered(filters),
         'period': active_period,
-        'activity_ages': activity_ages,
-        'activity_min_cost': activity_min_cost,
-        'activity_spots': activity_spots,
     }
 
 
@@ -651,14 +581,14 @@ def view_activities_as_json(
         }
 
     def age(activity: VacationActivity) -> JSON_ro:
-        ages = activity_ages(activity, request)
+        ages = activity.activity_ages(request)
         min_age = min(age.lower for age in ages) if ages else None
         max_age = max(age.upper - 1 for age in ages) if ages else None
         return {'min': min_age, 'max': max_age}
 
     def cost(activity: VacationActivity) -> JSON_ro:
-        min_cost = activity_min_cost(activity, request)
-        max_cost = activity_max_cost(activity, request)
+        min_cost = activity.activity_min_cost(request)
+        max_cost = activity.activity_max_cost(request)
         return {
             'min': float(min_cost) if min_cost is not None else 0.0,
             'max': float(max_cost) if max_cost is not None else 0.0
@@ -722,7 +652,7 @@ def view_activities_as_json(
                     'image': image(activity),
                     'age': age(activity),
                     'cost': cost(activity),
-                    'spots': activity_spots(activity, request),
+                    'spots': activity.activity_spots(request),
                     'dates': dates(activity),
                     'location': activity.location,
                     'zip_code': zip_code(activity),
@@ -794,9 +724,6 @@ def view_activities_for_volunteers(
         'count_active': count_active,
         'filtered': is_filtered(filters),
         'period': active_period,
-        'activity_ages': activity_ages,
-        'activity_min_cost': activity_min_cost,
-        'activity_spots': activity_spots,
         'exclude_filtered_dates': exclude_filtered_dates,
         'cart_url': request.class_link(VolunteerCart),
         'cart_submit_url': request.class_link(VolunteerCart, name='submit'),

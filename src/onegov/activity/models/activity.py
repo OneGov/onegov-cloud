@@ -25,9 +25,12 @@ from typing import Any, TYPE_CHECKING
 if TYPE_CHECKING:
     import uuid
     from collections.abc import Iterable
+    from decimal import Decimal
     from onegov.activity.collections import PublicationRequestCollection
     from onegov.activity.models import PeriodMeta, PublicationRequest
     from onegov.core.orm.mixins import dict_property
+    from onegov.feriennet.request import FeriennetRequest
+    from onegov.activity.types import BoundedIntegerRange
     from typing import Literal
     from typing import Self, TypeAlias
 
@@ -239,3 +242,65 @@ class Activity(Base, ContentMixin, TimestampMixin):
         )
 
         return q.scalar()
+
+
+    def period_bound_occasions(
+        self,
+        request: FeriennetRequest
+    ) -> list[Occasion]:
+
+        active_period = request.app.active_period
+
+        if not active_period:
+            return []
+
+        return [o for o in self.occasions if o.period_id == active_period.id]
+
+
+    def activity_ages(
+        self,
+        request: FeriennetRequest
+    ) -> tuple[BoundedIntegerRange, ...]:
+        return tuple(o.age for o in self.period_bound_occasions(request))
+
+
+    def activity_spots(
+        self,
+        request: FeriennetRequest
+    ) -> int:
+
+        if not request.app.active_period:
+            return 0
+
+        if not request.app.active_period.confirmed:
+            return sum(o.max_spots for o in self.period_bound_occasions(
+                request))
+
+        return sum(o.available_spots for o in self.period_bound_occasions(
+            request))
+
+
+    def activity_min_cost(
+        self,
+        request: FeriennetRequest
+    ) -> Decimal | None:
+
+        occasions = self.period_bound_occasions(request)
+
+        if not occasions:
+            return None
+
+        return min(o.total_cost for o in occasions)
+
+
+    def activity_max_cost(
+        self,
+        request: FeriennetRequest
+    ) -> Decimal | None:
+
+        occasions = self.period_bound_occasions(request)
+
+        if not occasions:
+            return None
+
+        return max(o.total_cost for o in occasions)

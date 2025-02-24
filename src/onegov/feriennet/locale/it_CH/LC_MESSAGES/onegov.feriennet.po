@@ -2,7 +2,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: \n"
-"POT-Creation-Date: 2025-01-27 13:25+0100\n"
+"POT-Creation-Date: 2025-01-30 14:14+0100\n"
 "PO-Revision-Date: 2021-11-11 09:07+0100\n"
 "Last-Translator: Marc Sommerhalder <marc.sommerhalder@seantis.ch>\n"
 "Language-Team: \n"
@@ -1577,27 +1577,6 @@ msgstr "Nessuna attività trovata."
 msgid "Reset filter."
 msgstr "Azzerare il filtro."
 
-msgid "Age"
-msgstr "Età"
-
-msgid "${min_age} - ${max_age} years"
-msgstr "${min_age} - ${max_age} anni"
-
-msgid "starting at ${price} CHF"
-msgstr "da ${price} CHF"
-
-msgid "Free Spots"
-msgstr "Posti liberi"
-
-msgid "No free spots"
-msgstr "Nessun posto libero"
-
-msgid "1 free spot"
-msgstr "1 posto libero"
-
-msgid "${count} free spots"
-msgstr "${count} posti liberi"
-
 msgid ""
 "This is a preview. Please edit it until you are satisifed with the result "
 "and then press \"Request Publication\". An administrator will then review "
@@ -2014,6 +1993,27 @@ msgstr ""
 msgid "Ticket State"
 msgstr "Stato del biglietto"
 
+msgid "Age"
+msgstr "Età"
+
+msgid "${min_age} - ${max_age} years"
+msgstr "${min_age} - ${max_age} anni"
+
+msgid "starting at ${price} CHF"
+msgstr "da ${price} CHF"
+
+msgid "Free Spots"
+msgstr "Posti liberi"
+
+msgid "No free spots"
+msgstr "Nessun posto libero"
+
+msgid "1 free spot"
+msgstr "1 posto libero"
+
+msgid "${count} free spots"
+msgstr "${count} posti liberi"
+
 msgid "Independent of other occasions"
 msgstr "Indipendente da altri eventi"
 
@@ -2174,6 +2174,9 @@ msgstr "Restistrazione come aiutante"
 
 msgid "My List"
 msgstr "La mia lista"
+
+msgid "All activities"
+msgstr "Tutte le attività"
 
 msgid "Hello!"
 msgstr "Buongiorno"

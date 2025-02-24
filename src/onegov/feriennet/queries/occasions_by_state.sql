@@ -32,6 +32,7 @@ occasion_parameters AS (
     SELECT
         occasions.id AS occasion_id,
         activities.title,
+        activities.id as activity_id,
         first_date.start,
         first_date.end,
         occasions.cancelled,
@@ -84,6 +85,7 @@ SELECT
     "state",           -- Text
     occasion_id,       -- UUID
     title,             -- Text
+    activity_id,       -- UUID
     "start",           -- DateTime
     "end",             -- DateTime
     min_spots,         -- Integer
