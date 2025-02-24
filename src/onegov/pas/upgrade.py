@@ -2,3 +2,21 @@
 upgraded on the server. See :class:`onegov.core.upgrade.upgrade_task`.
 
 """
+
+from __future__ import annotations
+
+from sqlalchemy import Column
+from onegov.core.orm.types import UUID
+from onegov.core.upgrade import upgrade_task, UpgradeContext
+
+
+@upgrade_task('Add external id from api')
+def add_registration_window_columns(context: UpgradeContext) -> None:
+    for table in (
+        'pas_parliamentarians',
+        'pas_parties',
+        'pas_parliamentary_groups',
+    ):
+        context.operations.add_column(
+            table, Column('external_kub_id', UUID, nullable=True)
+        )

@@ -98,7 +98,7 @@ def create_pas_app(request, use_elasticsearch=False):
 @fixture
 def people_json():
     """Fixture providing sample people data as JSON string."""
-    return json.dumps({
+    return {
         "count": 2,
         "next": None,
         "previous": None,
@@ -153,7 +153,7 @@ def people_json():
             },
 
         ]
-    })
+    }
 
 @fixture
 def organization_json():
@@ -193,6 +193,7 @@ def organization_json():
             ],
         }
     )
+
 
 @fixture
 def memberships_json():

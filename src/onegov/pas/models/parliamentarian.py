@@ -86,6 +86,13 @@ class Parliamentarian(
         default=uuid4
     )
 
+    #: External ID
+    external_kub_id: Column[uuid.UUID] = Column(
+        UUID,   # type:ignore[arg-type]
+        primary_key=True,
+        default=uuid4
+    )
+
     #: The first name
     first_name: Column[str] = Column(
         Text,

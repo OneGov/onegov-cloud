@@ -178,9 +178,7 @@ def get_parliamentarians(
     app: PasApp,
     active: bool = True
 ) -> ParliamentarianCollection:
-    foo= ParliamentarianCollection(app.session(), active)
-    breakpoint()
-    return foo
+    return ParliamentarianCollection(app.session(), active)
 
 
 @PasApp.path(
