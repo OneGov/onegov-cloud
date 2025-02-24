@@ -36,15 +36,14 @@ class OrgBoardlet(Boardlet):
 
     @cached_property
     def plausible_api(self) -> PlausibleAPI | None:
-        site_id = None
         analytics_code = self.request.app.org.analytics_code
 
         if analytics_code:
             if 'analytics.seantis.ch' in analytics_code:
                 match = re.search(r'data-domain="(.+?)"', analytics_code)
-                site_id = match.group(1) if match else None
-
-            return PlausibleAPI(site_id)
+                if match:
+                    site_id = match.group(1)
+                    return PlausibleAPI(site_id)
 
         return None
 
