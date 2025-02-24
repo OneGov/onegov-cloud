@@ -801,6 +801,18 @@ form {
         }
     }
 
+    .duration-widget label {
+        display: inline-block;
+        white-space: nowrap;
+        margin-right: .5rem;
+
+        input {
+            display: inline-block;
+            width: auto;
+            margin-right: .25rem;
+        }
+    }
+
     .group-label > ul li {
         align-content: flex-start;
         align-items: flex-start;
@@ -6594,6 +6606,9 @@ a#results {
     margin-bottom: 1.5rem;
     overflow-x: auto;
     position: relative;
+    /* NOTE: Since we allow shift as a modifier key, text-selection would
+             become annoying, rather than helpful. */
+    user-select: none;
 
     table {
         margin-bottom: 0;
@@ -6642,6 +6657,10 @@ a#results {
                     rgba($iron, .25) 20px
                 );
                 cursor: default;
+
+                &.event-available.event-adjustable {
+                    cursor: pointer;
+                }
             }
 
             &.not-selected:not(:hover) {
@@ -6663,6 +6682,13 @@ a#results {
         .event-available {
             background-color: $green;
             cursor: pointer;
+        }
+
+        .event-adjustable::before {
+            float: right;
+            color: white;
+            font-size: 1.5rem;
+            @include icon($edit-link-icon);
         }
     }
 }

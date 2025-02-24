@@ -336,7 +336,7 @@ class Settings:
                 #       dict_property/dict_markup_property, we would
                 #       need to do something special for is_valid
                 #       however
-                value = Markup(value)  # noqa: RUF035
+                value = Markup(value)  # nosec: B704
             setattr(self, key, value)
 
     def is_valid(self) -> bool:
@@ -710,7 +710,7 @@ class DaycareServicesWidget:
         self.field = field
         self.services = field.services
 
-        return Markup(self.template.render(this=self))  # noqa: RUF035
+        return Markup(self.template.render(this=self))  # nosec: B704
 
     def is_selected(self, service: Service, day: int) -> bool:
         return self.services.is_selected(service.id, day)

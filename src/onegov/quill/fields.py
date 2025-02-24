@@ -50,4 +50,4 @@ class QuillField(TextAreaField):
         self.cleaner = Cleaner(tags=tags, attributes=attributes, strip=True)
 
     def pre_validate(self, form: BaseForm) -> None:
-        self.data = Markup(self.cleaner.clean(self.data or ''))  # noqa: RUF035
+        self.data = Markup(self.cleaner.clean(self.data or ''))  # nosec: B704

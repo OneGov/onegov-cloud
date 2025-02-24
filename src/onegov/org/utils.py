@@ -214,7 +214,7 @@ def annotate_html(
     if request:
         set_image_sizes(images, request)
 
-    return Markup(  # noqa: RUF035
+    return Markup(  # nosec: B704
         ''.join(tostring(e, encoding=str) for e in fragments))
 
 
@@ -228,7 +228,7 @@ def remove_empty_paragraphs(html: Markup | None) -> Markup | None:
     if not html:
         return html
 
-    return Markup(EMPTY_PARAGRAPHS.sub('', html))  # noqa: RUF035
+    return Markup(EMPTY_PARAGRAPHS.sub('', html))  # nosec: B704
 
 
 def set_image_sizes(
@@ -627,7 +627,7 @@ class AllocationEventInfo:
 class FindYourSpotEventInfo:
 
     __slots__ = ('allocation', 'slot_time', 'availability', 'quota_left',
-                 'request', 'translate')
+                 'request', 'translate', 'adjustable')
 
     def __init__(
         self,
@@ -635,7 +635,9 @@ class FindYourSpotEventInfo:
         slot_time: DateRange | None,
         availability: float,
         quota_left: int,
-        request: OrgRequest
+        request: OrgRequest,
+        *,
+        adjustable: bool = False
     ) -> None:
 
         self.allocation = allocation
@@ -643,6 +645,7 @@ class FindYourSpotEventInfo:
         self.availability = availability
         self.quota_left = quota_left
         self.request = request
+        self.adjustable = adjustable
         self.translate = request.translate
 
     @property
@@ -732,6 +735,9 @@ class FindYourSpotEventInfo:
                 yield 'event-partly-available'
             else:
                 yield 'event-unavailable'
+
+        if self.adjustable:
+            yield 'event-adjustable'
 
     @property
     def css_class(self) -> str:
@@ -1102,7 +1108,7 @@ def hashtag_elements(request: OrgRequest, text: str) -> Markup:
         return f'<a class="hashtag" href="{link}">{tag}</a>'
 
     # NOTE: We need to restore Markup after re.sub call
-    return Markup(HASHTAG.sub(replace_tag, escape(text)))  # noqa: RUF035
+    return Markup(HASHTAG.sub(replace_tag, escape(text)))  # nosec: B704
 
 
 def ticket_directory_groups(

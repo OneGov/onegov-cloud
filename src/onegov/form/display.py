@@ -96,14 +96,14 @@ class StringFieldRenderer(BaseRenderer):
 @registry.register_for('PasswordField')
 class PasswordFieldRenderer(BaseRenderer):
     def __call__(self, field: Field) -> Markup:
-        return Markup('*' * len(field.data))  # noqa: RUF035
+        return Markup('*' * len(field.data))  # nosec: B704
 
 
 @registry.register_for('EmailField')
 class EmailFieldRenderer(BaseRenderer):
     def __call__(self, field: Field) -> Markup:
         params = {'href': f'mailto:{field.data}'}
-        return Markup(  # noqa: RUF035
+        return Markup(  # nosec: B704
             f'<a {html_params(**params)}>{{email}}</a>'
         ).format(email=field.data)
 
@@ -112,7 +112,7 @@ class EmailFieldRenderer(BaseRenderer):
 class URLFieldRenderer(BaseRenderer):
     def __call__(self, field: Field) -> Markup:
         params = {'href': field.data}
-        return Markup(  # noqa: RUF035
+        return Markup(  # nosec: B704
             f'<a {html_params(**params)}>{{url}}</a>'
         ).format(url=field.data)
 
@@ -206,7 +206,7 @@ class TimezoneDateTimeFieldRenderer(DateFieldRenderer):
 @registry.register_for('TimeField')
 class TimeFieldRenderer(BaseRenderer):
     def __call__(self, field: Field) -> Markup:
-        return Markup(  # noqa: RUF035
+        return Markup(  # nosec: B704
             f'{field.data.hour:02d}:{field.data.minute:02d}'
         )
 
@@ -265,10 +265,10 @@ class NullRenderer(BaseRenderer):
 @registry.register_for('DecimalField')
 class DecimalRenderer(BaseRenderer):
     def __call__(self, field: Field) -> Markup:
-        return Markup(f'{field.data:.2f}')  # noqa: RUF035
+        return Markup(f'{field.data:.2f}')  # nosec: B704
 
 
 @registry.register_for('IntegerField')
 class IntegerRenderer(BaseRenderer):
     def __call__(self, field: Field) -> Markup:
-        return Markup(f'{int(field.data)}')  # noqa: RUF035
+        return Markup(f'{int(field.data)}')  # nosec: B704

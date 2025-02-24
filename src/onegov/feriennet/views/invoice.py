@@ -318,7 +318,7 @@ def handle_donation(
     # NOTE: We need treat this as Markup
     # TODO: It would be cleaner if we had a proxy object
     #       with all the settings as dict_property
-    description = Markup(description)  # noqa: RUF035
+    description = Markup(description)  # nosec: B704
 
     return {
         'title': title,

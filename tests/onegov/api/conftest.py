@@ -1,6 +1,7 @@
 from onegov.api import ApiApp
 from onegov.api import ApiEndpoint
 from onegov.core import Framework
+from onegov.agency.api import PersonApiEndpoint
 from onegov.core.utils import Bunch
 from onegov.form import Form
 from pytest import fixture
@@ -11,7 +12,8 @@ from wtforms.validators import InputRequired
 
 
 class App(Framework, ApiApp):
-    pass
+    def __init__(self):
+        self.org = Bunch(hidden_people_fields=[])
 
 
 class ItemForm(Form):
@@ -63,7 +65,7 @@ class Endpoint(ApiEndpoint):
 
 @App.setting(section='api', name='endpoints')
 def api_endpoints():
-    return [Endpoint]
+    return [Endpoint, PersonApiEndpoint]
 
 @App.permission_rule(model=Bunch, permission=object)
 @App.permission_rule(model=Bunch, permission=object, identity=None)

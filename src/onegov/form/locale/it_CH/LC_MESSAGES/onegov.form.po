@@ -4,7 +4,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE 1.0\n"
-"POT-Creation-Date: 2025-02-17 09:00+0100\n"
+"POT-Creation-Date: 2025-02-18 09:27+0100\n"
 "PO-Revision-Date: 2022-03-07 13:55+0100\n"
 "Last-Translator: Marc Sommerhalder <marc.sommerhalder@seantis.ch>\n"
 "Language-Team: Italian\n"
@@ -15,6 +15,12 @@ msgstr ""
 "Plural-Forms: nplurals=2; plural=(n != 1);\n"
 "Generated-By: Lingua 3.12\n"
 "X-Generator: Poedit 3.0.1\n"
+
+msgid "Invalid number of hours"
+msgstr "Numero di ore non valido"
+
+msgid "Invalid number of minutes"
+msgstr "Numero di minuti non valido"
 
 msgid "Not a valid email"
 msgstr "Non è un'email valida"
@@ -262,6 +268,12 @@ msgstr "Nessun risultato corrisponde"
 
 msgid "Select Some Options"
 msgstr "Seleziona alcune opzioni"
+
+msgid "hours"
+msgstr "ore"
+
+msgid "minutes"
+msgstr "minuti"
 
 #~ msgid "Multiline"
 #~ msgstr "Multilinea"

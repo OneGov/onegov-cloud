@@ -89,7 +89,7 @@ def sanitize_html(html: str | None) -> Markup:
 
     """
 
-    return Markup(cleaner.clean(html or ''))  # noqa: RUF035
+    return Markup(cleaner.clean(html or ''))  # nosec: B704
 
 
 def sanitize_svg(svg: _StrT) -> _StrT:

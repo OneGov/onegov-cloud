@@ -1556,3 +1556,36 @@ def test_update_newsletter_email_bounce_statistics(org_app, handlers):
             # execute cronjob
             with pytest.raises(requests.exceptions.HTTPError):
                 client.get(get_cronjob_url(job))
+
+
+def test_delete_unconfirmed_subscribers(org_app, handlers):
+    register_echo_handler(handlers)
+
+    job = get_cronjob_by_name(org_app,
+                              'delete_unconfirmed_newsletter_subscriptions')
+    job.app = org_app
+
+    with freeze_time(datetime(2025, 1, 1, 4, 0)):
+        transaction.begin()
+
+        session = org_app.session()
+
+        recipients = RecipientCollection(session)
+        recipients.add('one@example.org', confirmed=False)
+        recipients.add('two@example.org', confirmed=False)
+        # Cronjob should only delete unconfirmed recipients
+        recipients.add('three@example.org', confirmed=True)
+
+    # And only unconfirmed subscribers older than 7 days
+    recipients.add('four@example.org', confirmed=False)
+    transaction.commit()
+
+    recipients = RecipientCollection(org_app.session())
+    assert recipients.query().count() == 4
+
+    client = Client(org_app)
+
+    client.get(get_cronjob_url(job))
+
+    recipients = RecipientCollection(org_app.session())
+    assert recipients.query().count() == 2

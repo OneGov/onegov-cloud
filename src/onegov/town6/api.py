@@ -12,6 +12,7 @@ from onegov.org.models.page import News, NewsCollection, Topic, TopicCollection
 
 if TYPE_CHECKING:
     from onegov.town6.app import TownApp
+    from onegov.town6.request import TownRequest
     from onegov.event.models import Occurrence
     from onegov.core.orm.mixins import ContentMixin
     from onegov.core.orm.mixins import TimestampMixin
@@ -43,7 +44,8 @@ class EventApiEndpoint(ApiEndpoint['Occurrence']):
     def collection(self) -> Any:
         result = OccurrenceCollection(
             self.session,
-            page=self.page or 0
+            page=self.page or 0,
+            only_public=True
         )
 
         result.batch_size = self.batch_size
@@ -85,7 +87,8 @@ class NewsApiEndpoint(ApiEndpoint[News]):
     def collection(self) -> Any:
         result = NewsCollection(
             self.session,
-            page=self.page or 0
+            page=self.page or 0,
+            only_public=True
         )
         result.batch_size = 25
         return result
@@ -120,6 +123,7 @@ class NewsApiEndpoint(ApiEndpoint[News]):
 
 
 class TopicApiEndpoint(ApiEndpoint[Topic]):
+    request: TownRequest
     app: TownApp
     endpoint = 'topics'
     filters = set()
@@ -128,7 +132,8 @@ class TopicApiEndpoint(ApiEndpoint[Topic]):
     def collection(self) -> Any:
         result = TopicCollection(
             self.session,
-            page=self.page or 0
+            page=self.page or 0,
+            only_public=True
         )
         result.batch_size = 25
         return result
@@ -159,6 +164,6 @@ class TopicApiEndpoint(ApiEndpoint[Topic]):
             'html': item,
             'image': item.page_image or None,
             'parent': ApiEndpointItem(
-                self.app, self.endpoint, str(item.parent_id)
+                self.request, self.endpoint, str(item.parent_id)
             ) if item.parent_id is not None else None,
         }

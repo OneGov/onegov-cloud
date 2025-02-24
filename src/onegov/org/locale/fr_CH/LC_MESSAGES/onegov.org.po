@@ -2,7 +2,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE 1.0\n"
-"POT-Creation-Date: 2025-02-11 15:15+0100\n"
+"POT-Creation-Date: 2025-02-18 09:50+0100\n"
 "PO-Revision-Date: 2022-03-15 10:50+0100\n"
 "Last-Translator: Marc Sommerhalder <marc.sommerhalder@seantis.ch>\n"
 "Language-Team: French\n"
@@ -1117,6 +1117,9 @@ msgstr "Destinataire"
 msgid "Do not actually import the newsletter subscribers"
 msgstr "Ne pas importer les abonnés à la newsletter"
 
+msgid "Subscribed on"
+msgstr "Abonné le"
+
 msgid "Will be used as image in the page overview on the parent page"
 msgstr "Sera utilisé comme image dans la vue d'ensemble de la page parent"
 
@@ -1238,14 +1241,28 @@ msgstr "Notes"
 msgid "Public extra information about this person"
 msgstr "Informations publiques supplémentaires à propos de cette semaine"
 
+msgid "I am looking to make a reservation lasting"
+msgstr "Je cherche à faire une réservation d'une durée de"
+
+msgid "On Weekday(s)"
+msgstr "Le(s) jour(s) de semaine"
+
+msgid "Earliest Start"
+msgstr "Début au plus tôt"
+
+msgid "Latest End"
+msgstr "Dernière fin"
+
 msgid "Rooms"
 msgstr "Espaces"
 
-msgid "Weekdays"
-msgstr "Jours de la semaine"
-
 msgid "Start date in past"
 msgstr "Date de début dans le passé"
+
+msgid "Duration is longer than the range between start and end time"
+msgstr ""
+"La durée est supérieure à l'intervalle entre l'heure de début et l'heure de "
+"fin."
 
 msgid "Describes what this reservation resource is about"
 msgstr "Décrit en quoi consiste cette ressource de réservation"
@@ -1323,6 +1340,9 @@ msgstr "Veuillez saisir au moins un code postal"
 
 msgid "Please enter one zip-code per line, without spaces or commas"
 msgstr "Veuillez saisir un code postal par ligne, sans espaces ni virgules"
+
+msgid "Weekdays"
+msgstr "Jours de la semaine"
 
 msgid "New Reservations"
 msgstr "Nouvelles réservations"
@@ -1673,6 +1693,9 @@ msgstr "Masquer ces champs pour les utilisateurs non connectés"
 
 msgid "People"
 msgstr "Personnes"
+
+msgid "External ID"
+msgstr "ID externe"
 
 msgid "Duration of mTAN session"
 msgstr "Durée de la séance mTAN"
@@ -3414,6 +3437,18 @@ msgstr "Aucun fichier téléchargé pour le moment"
 
 msgid "All dates"
 msgstr "Toutes les dates"
+
+msgid ""
+"By default we assume that you only want to select a single time slot and "
+"room per day. If you want to select more than one time slot or room on a "
+"given day, you may hold and press any one of your Shift, Alt or Ctrl keys "
+"while clicking the time slots you want to reserve."
+msgstr ""
+"Par défaut, nous supposons que vous ne souhaitez sélectionner qu'un seul "
+"créneau horaire et une seule salle par jour. Si vous souhaitez sélectionner "
+"plus d'un créneau horaire ou d'une salle pour un jour donné, vous pouvez "
+"maintenir enfoncée l'une des touches Shift, Alt ou Ctrl tout en cliquant sur "
+"les créneaux horaires que vous souhaitez réserver."
 
 msgid "Unavailable"
 msgstr "Indisponible"
@@ -5588,6 +5623,19 @@ msgstr ""
 msgid "Success! We have updated your subscribed categories to ${subscribed}."
 msgstr "Succès! Nous avons mis à jour vos catégories abonnées à ${subscribed}."
 
+msgid "Update your newsletter subscription categories:"
+msgstr "Mettre à jour vos catégories d'abonnement à la lettre d'information :"
+
+msgid "Update"
+msgstr "Mettre à jour"
+
+msgid "Sign up to our newsletter to always stay up to date:"
+msgstr ""
+"Inscrivez-vous à notre lettre d'information pour rester toujours à jour :"
+
+msgid "Sign up"
+msgstr "S'inscrire"
+
 msgid "Update Newsletter Subscription"
 msgstr "Mettre à jour l'abonnement à la lettre d'information"
 
@@ -5783,7 +5831,7 @@ msgstr "Nom du client"
 msgid "Customer ID"
 msgstr "ID du client"
 
-msgid "Terminaux ID"
+msgid "Terminal ID"
 msgstr "ID du terminal"
 
 msgid "API Username"
@@ -6357,3 +6405,6 @@ msgstr "Un compte a été créé pour vous"
 
 msgid "The user was created successfully"
 msgstr "L'utilisateur a bien été créé"
+
+#~ msgid "Terminaux ID"
+#~ msgstr "ID du terminal"
