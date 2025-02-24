@@ -297,6 +297,9 @@ def handle_complete_submission(
                 TicketMessage.create(ticket, request, 'opened')
 
             assert self.email is not None
+            submission = collection.submissions.by_id(
+                submission_id, current_only=True
+            )
             send_ticket_mail(
                 request=request,
                 template='mail_ticket_opened.pt',
@@ -307,7 +310,7 @@ def handle_complete_submission(
                     'model': ticket,
                     'form': form,
                     'show_submission': self.meta['show_submission'],
-                    'price': self.payment
+                    'price': submission.payment if submission else None
                 }
             )
             directory_user_group_recipients = user_group_emails_for_new_ticket(
