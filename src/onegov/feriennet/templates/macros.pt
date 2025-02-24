@@ -1010,7 +1010,7 @@
                 <i class="fa fa-times"></i>
             </button>
         </div>
-        <div class="grid-x grid-padding-x align-center">
+        <div class="grid-x align-center">
             <h3><i class="fas fa-sliders-h"></i> <tal:b i18n:translate>Filters</tal:b></h3>
         </div>
 
@@ -1031,7 +1031,7 @@
             </div>
         </div>
 
-        <div class="grid-x grid-padding-x align-center">
+        <div class="grid-x align-center">
             <button ic-select-from-response="#activities" ic-target="#activities" ic-get-from="${request.url.replace('/filters','',1)}" class="button apply-filters" type="button" i18n:translate data-close>Apply filters</button>
         </div>
     </div>
