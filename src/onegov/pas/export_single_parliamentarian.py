@@ -19,7 +19,7 @@ from onegov.pas.utils import format_swiss_number
 
 from typing import TYPE_CHECKING, Literal, TypedDict
 if TYPE_CHECKING:
-    from onegov.pas.models import Parliamentarian
+    from onegov.pas.models import Parliamentarian, RateSet
     from onegov.pas.models.settlement_run import SettlementRun
 
 
@@ -56,10 +56,14 @@ def generate_parliamentarian_settlement_pdf(
 ) -> bytes:
     """Generate PDF for parliamentarian settlement data."""
     font_config = FontConfiguration()
-
     session = request.session
-    year = settlement_run.end.year
-    quarter = settlement_run.get_run_number_for_year(session, year)
+
+    rate_set = get_current_rate_set(session, settlement_run)
+    cola_multiplier = Decimal(
+        str(1 + (rate_set.cost_of_living_adjustment / 100))
+    )
+
+    quarter = settlement_run.get_run_number_for_year(settlement_run.end)
     css = CSS(
         string="""
 @page {
@@ -158,8 +162,8 @@ th, td {
     """
     )
 
-    data = get_parliamentarian_settlement_data(
-        settlement_run, request, parliamentarian
+    data = _get_parliamentarian_settlement_data(
+        settlement_run, request, parliamentarian, rate_set
     )
     html = f"""
         <!DOCTYPE html>
@@ -181,7 +185,7 @@ th, td {
             </div>
 
             <h2 class="title">
-                Abrechnung {quarter}. Quartal {year}
+                Abrechnung {quarter}. Quartal {settlement_run.end.year}
             </h2>
             <table class="first-table">
                 <thead>
@@ -227,6 +231,8 @@ th, td {
         <tbody>
     """
 
+    # Now, start building the second part of the report document. Notice that
+    # this one now is *with* cost of living adjustment.
     total = Decimal('0')
     type_mappings = [
         ('Total aller Plenarsitzungen inkl. Teuerungszulage',
@@ -240,7 +246,6 @@ th, td {
         ('Total Spesen inkl. Teuerungszulage',
          cast('TotalType', 'expenses')),
     ]
-
     for type_name, type_key in type_mappings:
         total_value = sum(
             entry.calculated_value
@@ -249,7 +254,9 @@ th, td {
         total_value_str = (
             format_swiss_number(total_value) if type_key != 'expenses' else '-'
         )
-        total_chf = type_totals[type_key]['total']
+        base_total = type_totals[type_key]['total']
+        # Apply cost of living adjustment
+        total_chf = base_total * cola_multiplier
         total += total_chf
         html += f"""
             <tr>
@@ -258,7 +265,6 @@ th, td {
                 <td class="numeric">{format_swiss_number(total_chf)}</td>
             </tr>
         """
-
     html += f"""
             <tr class="merge-cells">
                 <td>Auszahlung</td>
@@ -270,20 +276,19 @@ th, td {
     </body>
     </html>
     """
-
     return HTML(string=html).write_pdf(
         stylesheets=[css], font_config=font_config
     )
 
 
-def get_parliamentarian_settlement_data(
+def _get_parliamentarian_settlement_data(
     settlement_run: SettlementRun,
     request: TownRequest,
     parliamentarian: Parliamentarian,
+    rate_set: RateSet,
 ) -> dict[str, list[ParliamentarianEntry]]:
     """Get settlement data for a specific parliamentarian."""
     session = request.session
-    rate_set = get_current_rate_set(session, settlement_run)
 
     attendences = (
         AttendenceCollection(

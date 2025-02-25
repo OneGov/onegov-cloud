@@ -15,7 +15,7 @@ repos:
         exclude: .pre-commit-config.yaml
       - id: pt_structure
   - repo: https://github.com/astral-sh/ruff-pre-commit
-    rev: v0.9.6
+    rev: v0.9.7
     hooks:
       - id: ruff
         args: [ "--fix" ]
@@ -26,13 +26,13 @@ repos:
         files: '^src.*\.py'
         additional_dependencies:
         - flake8-type-checking>=3.0.0
-  - repo: https://github.com/elidupuis/mirrors-sass-lint
-    rev: '5cc45653263b423398e4af2561fae362903dd45d'
+  - repo: https://github.com/pre-commit/mirrors-scss-lint
+    rev: 'v0.60.0'
     hooks:
-    - id: sass-lint
+    - id: scss-lint
       files: '^src/.*\.scss'
   - repo: https://github.com/pre-commit/mirrors-eslint
-    rev: v9.20.1
+    rev: v9.21.0
     hooks:
     - id: eslint
       files: '^src/.*\.jsx?$'

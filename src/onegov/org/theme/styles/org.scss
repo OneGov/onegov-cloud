@@ -328,6 +328,7 @@ $globals-height: 2.5rem;
         text-align: center;
     }
 
+    .dashboard::before { @include icon('\f0e4'); }
     .login::before { @include icon('\f090'); }
     .logout::before { @include icon('\f08b'); }
     .register::before { @include icon('\f234'); }
@@ -6348,18 +6349,12 @@ h2 + div.timeline {
 /*
     Dashboard
 */
-.boardlet-group {
-    display: flex;
-    flex-wrap: wrap;
-    justify-content: space-between;
-}
 
 .boardlet {
     background: $gray-pastel;
     border-top: 10px solid $green-light;
     margin-bottom: 1.5rem;
     padding: .5rem 1rem 1rem;
-    width: calc((100% / 3) - 1rem);
 
     h2 {
         font-size: 1.3rem;
@@ -6368,11 +6363,35 @@ h2 + div.timeline {
         word-wrap: break-word;
     }
 
-    li {
+    table {
+        margin-bottom: 0;
+    }
+
+    tr {
         font-size: .9rem;
 
         &.zero {
             color: $base;
+        }
+
+        .facts {
+            border-collapse: collapse;
+            table-layout: auto;
+        }
+
+        .fact-number,
+        .fact-icon {
+            padding: 0.5rem;
+            text-align: right;
+        }
+
+        .fact-icon {
+            text-align: center;
+        }
+
+        .fact-text {
+            margin-left: .5rem;
+            width: 100%;
         }
     }
 

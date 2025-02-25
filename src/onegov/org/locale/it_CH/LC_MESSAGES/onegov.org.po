@@ -1117,6 +1117,9 @@ msgstr "Destinatario"
 msgid "Do not actually import the newsletter subscribers"
 msgstr "Non importare effettivamente gli iscritti alla newsletter"
 
+msgid "Subscribed on"
+msgstr "Iscritto il"
+
 msgid "Will be used as image in the page overview on the parent page"
 msgstr ""
 "Verrà utilizzato come immagine nella panoramica della pagina sulla pagina "
@@ -4530,6 +4533,48 @@ msgstr ""
 "e-mail non validi, reclami per spam, disattivazioni manuali o blocco. Si "
 "consiglia di cancellarlo dall'elenco."
 
+msgid "No data available"
+msgstr "Nessun dato disponibile"
+
+msgid "New Tickets in the Last Month"
+msgstr "Nuovi biglietti nell'ultimo mese"
+
+msgid "Closed Tickets in the Last Month"
+msgstr "Biglietti chiusi nell'ultimo mese"
+
+msgid "Lead Time from opening to closing in Days over the Last Month"
+msgstr "Tempo di gestione dall'apertura alla chiusura in giorni nell'ultimo mese"
+
+msgid "Lead Time from pending to closing in Days over the Last Month"
+msgstr "Tempo di gestione dall'in sospeso alla chiusura in giorni nell'ultimo mese"
+
+msgid "Last Edited Pages"
+msgstr "Ultime pagine modificate"
+
+msgid "Last Edited News"
+msgstr "Ultime notizie modificate"
+
+msgid "Web Statistics"
+msgstr "Statistiche Web"
+
+msgid "Most Popular Pages"
+msgstr "Pagine più popolari"
+
+msgid "Unique Visitors in the Last Month"
+msgstr "Visitatori unici nell'ultimo mese"
+
+msgid "Total Visits in the Last Month"
+msgstr "Visite totali nell'ultimo mese"
+
+msgid "Total Page Views in the Last Month"
+msgstr "Visualizzazioni totali di pagine nell'ultimo mese"
+
+msgid "Number of Page Views per Visit"
+msgstr "Numero di visualizzazioni di pagine per visita"
+
+msgid "Average Visit Duration in Minutes"
+msgstr "Durata media della visita in minuti"
+
 msgid "submitted"
 msgstr "inviato"
 
@@ -6390,3 +6435,6 @@ msgstr "È stato creato un account per te"
 
 msgid "The user was created successfully"
 msgstr "Utente creato correttamente"
+
+msgid "Item(s)"
+msgstr "Elemento(i)"

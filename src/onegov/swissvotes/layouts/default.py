@@ -180,7 +180,7 @@ class DefaultLayout(ChameleonLayout):
 
     def format_number(
         self,
-        number: Number | Decimal | float | None,
+        number: Number | Decimal | float | str | None,
         decimal_places: int | None = None,
         padding: str = ''
     ) -> str:

@@ -70,6 +70,7 @@ if TYPE_CHECKING:
     class BoardletConfig(TypedDict):
         cls: type[_Boardlet]
         order: tuple[int, int]
+        icon: str
 
 
 class HomepageWidgetAction(Action):
@@ -258,7 +259,13 @@ class Boardlet(Action):
         'boardlets_registry': dict
     }
 
-    def __init__(self, name: str, order: tuple[int, int]):
+    def __init__(
+        self,
+        name: str,
+        order: tuple[int, int],
+        icon: str = ''
+    ) -> None:
+
         assert isinstance(order, tuple) and len(order) == 2, """
             The order should consist of two values, a group and an order
             within the group.
@@ -266,6 +273,7 @@ class Boardlet(Action):
 
         self.name = name
         self.order = order
+        self.icon = icon
 
     def identifier(  # type:ignore[override]
         self,
@@ -280,5 +288,6 @@ class Boardlet(Action):
     ) -> None:
         boardlets_registry[self.name] = {
             'cls': func,
-            'order': self.order
+            'order': self.order,
+            'icon': self.icon,
         }

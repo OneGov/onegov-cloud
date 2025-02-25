@@ -7,7 +7,7 @@
 #
 from __future__ import annotations
 
-__version__ = '2025.7'
+__version__ = '2025.8'
 
 # The module levels used for dependency tests and to have a well defined
 # onegov core upgrade order.
@@ -41,6 +41,7 @@ LEVELS = (
         'onegov.pay',
         'onegov.pdf',
         'onegov.people',
+        'onegov.plausible',
         'onegov.quill',
         'onegov.qrcode',
         'onegov.recipient',

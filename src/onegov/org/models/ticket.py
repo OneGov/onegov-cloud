@@ -234,7 +234,8 @@ class FormSubmissionHandler(Handler):
         if self.submission is not None:
             return render_macro(layout.macros['display_form'], request, {
                 'form': self.form,
-                'layout': layout
+                'layout': layout,
+                'price': self.submission.payment,
             })
         return Markup('')
 

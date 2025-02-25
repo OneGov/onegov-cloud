@@ -87,6 +87,9 @@ class Ticket(Base, TimestampMixin, ORMSearchable):
         Column(JSON, nullable=False, default=dict)
     )
 
+    #: the time the ticket was closed
+    closed_on: Column[datetime | None] = Column(UTCDateTime, nullable=True)
+
     #: a timestamp recorded every time the state changes
     last_state_change: Column[datetime | None] = Column(
         UTCDateTime,
@@ -275,6 +278,7 @@ class Ticket(Base, TimestampMixin, ORMSearchable):
             raise InvalidStateChange()
 
         self.process_time = self.current_process_time
+        self.closed_on = self.timestamp()
         self.last_state_change = self.timestamp()
         self.state = 'closed'
 
