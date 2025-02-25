@@ -388,13 +388,15 @@ def _get_commission_totals(
 
         # Update totals
         party_totals[party_name]['Meetings'] += Decimal(str(base_rate))
+
+        # Note: Expenses will be implemented in the future
         base_total = party_totals[party_name]['Meetings']
+        expenses = party_totals[party_name]['Expenses']
         cola_amount = base_total * (cola_multiplier - 1)
 
-        expenses = party_totals[party_name]['Expenses'] + base_total
         party_totals[party_name]['Total'] = base_total + expenses
         party_totals[party_name]['Cost-of-living Allowance'] = cola_amount
-        party_totals[party_name]['Final'] = base_total + cola_amount
+        party_totals[party_name]['Final'] = base_total + expenses + cola_amount
 
     # Convert to sorted list of tuples
     result = [
@@ -490,13 +492,14 @@ def _get_party_totals_for_export_all(
             # Update totals
             party_totals[party.name]['Meetings'] += Decimal(str(base_rate))
             base_total = party_totals[party.name]['Meetings']
+            expenses = party_totals[party.name]['Expenses']
             cola_amount = base_total * (cola_multiplier - 1)
-            expenses = party_totals[party.name]['Expenses'] + base_total
+
             party_totals[party.name]['Total'] = base_total + expenses
-            party_totals[party.name][
-                'Cost-of-living Allowance'
-            ] = cola_amount
-            party_totals[party.name]['Final'] = base_total + cola_amount
+            party_totals[party.name]['Cost-of-living Allowance'] = cola_amount
+            party_totals[party.name]['Final'] = (
+                    base_total + expenses + cola_amount
+            )
 
     # Convert to sorted list of tuples
     result = [
@@ -845,12 +848,14 @@ def get_party_specific_totals(
 
         parliamentarian_totals[name]['Meetings'] += Decimal(str(base_rate))
         base_total = parliamentarian_totals[name]['Meetings']
+        expenses = parliamentarian_totals[name]['Expenses']
         cola_amount = base_total * (cola_multiplier - 1)
-        parliamentarian_totals[name]['Total'] = base_total
-        parliamentarian_totals[name][
-            'Cost-of-living Allowance'
-        ] = cola_amount
-        parliamentarian_totals[name]['Final'] = base_total + cola_amount
+
+        parliamentarian_totals[name]['Total'] = base_total + expenses
+        parliamentarian_totals[name]['Cost-of-living Allowance'] = cola_amount
+        parliamentarian_totals[name]['Final'] = (
+                base_total + expenses + cola_amount
+        )
 
     result = [
         (
