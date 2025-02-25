@@ -1,13 +1,3 @@
-""" Sigh. Here we go again, *another* json implementation with support for:
-
-- date
-- datetime
-- time
-
-Because nobody else does all of these. And if they do (like standardjson), they
-don't support decoding...
-
-"""
 from __future__ import annotations
 
 import datetime
