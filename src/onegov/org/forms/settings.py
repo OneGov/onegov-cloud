@@ -1416,3 +1416,12 @@ class DataRetentionPolicyForm(Form):
         coerce=int,
         choices=TIMESPANS
     )
+
+
+class VATSettingsForm(Form):
+
+    vat_rate = FloatField(
+        label=_('VAT Rate'),
+        description=_('The VAT rate in percent'),
+        validators=[InputRequired(), NumberRange(0, 100)]
+    )

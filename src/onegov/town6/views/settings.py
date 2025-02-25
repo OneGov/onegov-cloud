@@ -13,7 +13,7 @@ from onegov.org.forms.settings import (
     HomepageSettingsForm, NewsletterSettingsForm, LinkMigrationForm,
     LinkHealthCheckForm, SocialMediaSettingsForm,
     EventSettingsForm, GeverSettingsForm, OneGovApiSettingsForm,
-    DataRetentionPolicyForm)
+    DataRetentionPolicyForm, VATSettingsForm)
 from onegov.org.models import Organisation
 from onegov.org.views.settings import (
     handle_homepage_settings, view_settings,
@@ -448,3 +448,17 @@ def town_handle_ticket_data_deletion_settings(
         self, request, form, _('Data Retention Policy'),
         SettingsLayout(self, request),
     )
+
+
+@TownApp.form(
+    model=Organisation, name='vat-settings', template='form.pt',
+    permission=Secret, form=VATSettingsForm, setting=_('VAT'),
+    icon='fa-file-invoice-dollar', order=450)
+def handle_vat_settings(
+    self: Organisation,
+    request: TownRequest,
+    form: VATSettingsForm,
+    layout: SettingsLayout | None = None
+) -> RenderData | Response:
+    layout = layout or SettingsLayout(self, request, _('VAT'))
+    return handle_generic_settings(self, request, form, _('VAT'), layout)
