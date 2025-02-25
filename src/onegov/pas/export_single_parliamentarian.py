@@ -63,8 +63,7 @@ def generate_parliamentarian_settlement_pdf(
         str(1 + (rate_set.cost_of_living_adjustment / 100))
     )
 
-    year = settlement_run.end.year
-    quarter = settlement_run.get_run_number_for_year(session, year)
+    quarter = settlement_run.get_run_number_for_year(settlement_run.end)
     css = CSS(
         string="""
 @page {
@@ -186,7 +185,7 @@ th, td {
             </div>
 
             <h2 class="title">
-                Abrechnung {quarter}. Quartal {year}
+                Abrechnung {quarter}. Quartal {settlement_run.end.year}
             </h2>
             <table class="first-table">
                 <thead>

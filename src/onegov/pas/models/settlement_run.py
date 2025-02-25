@@ -6,14 +6,13 @@ from onegov.core.orm.mixins import ContentMixin
 from onegov.core.orm.mixins import TimestampMixin
 from onegov.core.orm.types import UUID
 from onegov.search import ORMSearchable
-from sqlalchemy import Boolean, Column, Date, Text, func
+from sqlalchemy import Boolean, Column, Date, Text
 from uuid import uuid4
 
 
 from typing import TYPE_CHECKING
 if TYPE_CHECKING:
     import uuid
-    from sqlalchemy.orm import Session
     from datetime import date
     from onegov.core.orm.mixins import dict_property
 
@@ -69,9 +68,9 @@ class SettlementRun(Base, ContentMixin, TimestampMixin, ORMSearchable):
     description: dict_property[str | None] = content_property()
 
     @classmethod
-    def get_run_number_for_year(cls, session: Session, year: int) -> int:
+    def get_run_number_for_year(cls, input_date: date) -> int:
         """
-        Computes the run number for a given year.
+        Computes the run number for a given date within a year.
 
         As per customer requirement: No rule mandates 4 payments yearly,
         but wages must be reported by the 10th.
@@ -89,18 +88,25 @@ class SettlementRun(Base, ContentMixin, TimestampMixin, ORMSearchable):
         where a settlement overlaps into two different years, which could
         cause issues due to differing cost-of-living adjustments (COLA)
         applicable to each year. Handling settlements across two fiscal years
-        would incrase complexity.
+        would increase complexity.
 
         Thus, we have 5 yearly runs.
         """
-        count = (
-            session.query(func.count(cls.id))
-            .filter(
-                func.extract('year', cls.start) == year
+        month = input_date.month
+        if 1 <= month <= 3:  # January to March
+            return 1
+        elif 4 <= month <= 6:  # April to June
+            return 2
+        elif 7 <= month <= 9:  # July to September
+            return 3
+        elif 10 <= month <= 11:  # October to November
+            return 4
+        elif month == 12:      # December
+            return 5
+        else:
+            raise ValueError(
+                f'Invalid month: {month}. Date must be within a valid year.'
             )
-            .scalar()
-        )
-        return count + 1
 
     def __repr__(self) -> str:
         return f'<SettlementRun {self.name} {self.start} {self.end} >'
