@@ -194,6 +194,6 @@ class ParliamentarianRole(Base, TimestampMixin):
 
     def __repr__(self) -> str:
         return (
-            f'<ParliamentarianRole {self.parliamentarian.first_name} '
-            f'{self.party}'
+            f'<ParliamentarianRole role={self.role} '
+            f'party={self.party}'
         )
