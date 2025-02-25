@@ -119,13 +119,13 @@ def people_json():
                     "isDefault": True,
                     "thirdPartyId": None,
                     "modified": "2024-12-23T16:44:12.059162+01:00",
-                    "created": "2024-12-23T16:44:12.059150+01:00"
+                    "created": "2024-12-23T16:44:12.059150+01:00",
                 },
                 "salutation": "Herr",
                 "tags": [],
                 "thirdPartyId": "37",
                 "title": "",
-                "username": None
+                "username": None,
             },
             {
                 "created": "2024-12-23T16:44:19.413799+01:00",
@@ -143,62 +143,63 @@ def people_json():
                     "isDefault": True,
                     "thirdPartyId": None,
                     "modified": "2024-12-23T16:44:19.416512+01:00",
-                    "created": "2024-12-23T16:44:19.416484+01:00"
+                    "created": "2024-12-23T16:44:19.416484+01:00",
                 },
                 "salutation": "Herr",
                 "tags": [],
                 "thirdPartyId": "142",
                 "title": "",
-                "username": None
+                "username": None,
             },
-
-        ]
+        ],
     }
+
 
 @fixture
 def organization_json():
-    """Fixture providing sample organizations data as JSON string."""
-    return json.dumps(
-        {
-            "count": 2,
-            "next": None,
-            "previous": None,
-            "results": [
-                {
-                    "created": "2024-12-23T16:44:24.920938+01:00",
-                    "description": "",
-                    "id": "ef39e789-10e1-4117-8507-63b6cb3ef7cc",
-                    "isActive": True,
-                    "memberCount": 17,
-                    "modified": "2025-01-06T10:19:49.765454+01:00",
-                    "name": "ad-hoc-Gastgewerbegesetz, 3699",
-                    "organizationTypeTitle": "Kommission",
-                    "primaryEmail": None,
-                    "status": 1,
-                    "thirdPartyId": None,
-                },
-                {
-                    "created": "2024-12-23T16:44:24.928269+01:00",
-                    "description": "",
-                    "id": "f124b1fe-99b8-4bc2-b40d-bc8dec4997bc",
-                    "isActive": True,
-                    "memberCount": 16,
-                    "modified": "2025-01-06T10:19:54.708568+01:00",
-                    "name": "ad-hoc-KiBe_SchulG, 3652",
-                    "organizationTypeTitle": "Kommission",
-                    "primaryEmail": None,
-                    "status": 1,
-                    "thirdPartyId": None,
-                },
-            ],
-        }
-    )
+    """Fixture providing sample organizations data as JSON string.
+    We have 4 of every type
+
+    """
+    return {
+        "count": 2,
+        "next": None,
+        "previous": None,
+        "results": [
+            {
+                "created": "2024-12-23T16:44:24.920938+01:00",
+                "description": "",
+                "id": "ef39e789-10e1-4117-8507-63b6cb3ef7cc",
+                "isActive": True,
+                "memberCount": 17,
+                "modified": "2025-01-06T10:19:49.765454+01:00",
+                "name": "ad-hoc-Gastgewerbegesetz, 3699",
+                "organizationTypeTitle": "Kommission",
+                "primaryEmail": None,
+                "status": 1,
+                "thirdPartyId": None,
+            },
+            {
+                "created": "2024-12-23T16:44:24.928269+01:00",
+                "description": "",
+                "id": "f124b1fe-99b8-4bc2-b40d-bc8dec4997bc",
+                "isActive": True,
+                "memberCount": 16,
+                "modified": "2025-01-06T10:19:54.708568+01:00",
+                "name": "ad-hoc-KiBe_SchulG, 3652",
+                "organizationTypeTitle": "Kommission",
+                "primaryEmail": None,
+                "status": 1,
+                "thirdPartyId": None,
+            },
+        ],
+    }
 
 
 @fixture
 def memberships_json():
     """Fixture providing sample memberships data as JSON string."""
-    return json.dumps({
+    return {
         "count": 2,
         "next": None,
         "previous": None,
@@ -432,7 +433,7 @@ def memberships_json():
                 "typedId": "membership:3b55570d-7613-4ece-8dd3-e36ecf6ef1b3",
             },
         ]
-    })
+    }
 
 
 @fixture(scope='function')

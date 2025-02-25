@@ -263,7 +263,6 @@ def preprocess_excel_headers(
             return temp_file_path
 
         except Exception as e:
-            breakpoint()
             # Clean up the temporary file if an error occurs
             Path(temp_file_path).unlink(missing_ok=True)
             raise e from None  # Re-raise the exception with a clean traceback

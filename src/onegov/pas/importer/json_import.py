@@ -8,13 +8,20 @@ from pathlib import Path
 from typing import Any, Self, Literal
 from collections.abc import Sequence
 
-from onegov.pas.models import Parliamentarian, ParliamentaryGroup, Commission
+from onegov.pas.models import (
+    Parliamentarian,
+    ParliamentaryGroup,
+    Commission,
+    ParliamentarianRole,
+)
 from onegov.pas.models.commission_membership import (
-    ROLES as MEMBERSHIP_ROLES, CommissionMembership,
+    ROLES as MEMBERSHIP_ROLES,
+    CommissionMembership,
 )
 
 
 from typing import TextIO, TYPE_CHECKING
+
 if TYPE_CHECKING:
     from _typeshed import StrOrBytesPath
     from sqlalchemy.orm import Session
@@ -46,15 +53,22 @@ if TYPE_CHECKING:
         title: str
         username: str | None
 
+    OrganizationType = Literal[
+        'Kommission', 'Kantonsrat', 'Fraktion', 'Sonstige'
+    ]
 
-OrganizationType = Literal[
-    'Kommission', 'Kantonsrat', 'Fraktion', 'Sonstige'
-]  # Type hint for organization type
-OrganizationData = dict[str, Any]
-
-
-class InvalidDataError(Exception):
-    pass
+    class OrganizationData(TypedDict):
+        id: str
+        name: str
+        description: str
+        organizationTypeTitle: OrganizationType
+        isActive: bool
+        memberCount: int
+        status: int
+        created: str
+        modified: str
+        thirdPartyId: None | str
+        primaryEmail: None | dict
 
 
 def determine_membership_role(membership_data: dict[str, Any]) -> str:
@@ -73,25 +87,6 @@ def _load_json(source: StrOrBytesPath) -> list[dict[str, Any]]:
         return json.load(source)['results']  # Assuming 'results' key
     else:
         raise TypeError('Invalid source type')
-
-
-def load_json_data(source: str | Path | TextIO) -> dict[str, Any]:
-    """Load JSON data from either a JSON string or a file path."""
-    try:
-        # If string starts with {, treat as JSON string
-        if isinstance(source, str) and source.lstrip().startswith('{'):
-            return json.loads(source)
-
-        # Otherwise treat as file path
-        if isinstance(source, (str, Path)):
-            with open(source, encoding='utf-8') as f:
-                return json.load(f)
-
-        # Handle file-like objects
-        return json.load(source)
-
-    except Exception as e:
-        raise InvalidDataError(f'Failed to load JSON data: {e!s}')
 
 
 class DataImporter:
@@ -127,7 +122,7 @@ class DataImporter:
 
 
 class PeopleImporter(DataImporter):
-    """ Importer for Parliamentarian data from api/v2/people endpoint
+    """Importer for Parliamentarian data from api/v2/people endpoint
         (People.json)
 
 
@@ -139,9 +134,12 @@ class PeopleImporter(DataImporter):
     at the membership level. This requires us to extract address data
     from 'memberships.json' instead of the more logical 'people.json'
     endpoint.
+
     Whatever the reasons for this, we need to be careful to avoid potential
     inconsistencies if addresses are not carefully managed across both
     endpoints in the source system
+
+    TL. DR: Some data for people is also pulled from memberships.json
 
 
     """
@@ -257,81 +255,38 @@ MembershipRoleType = Literal[
 MembershipData = dict[str, Any]
 
 
-# def determine_membership_role(membership_data: MembershipData) -> str:
-#     """Determines the membership role based on organization type and role text."""
-#     role_text = membership_data.get('role', '').lower()
-#     org_type_title = membership_data.get('organization', {}).get(
-#         'organizationTypeTitle'
-#     )
-#
-#     if org_type_title == 'Kommission':
-#         if 'präsident' in role_text:
-#             return 'president'
-#         elif 'vizepräsident' in role_text or 'vize-präsident' in role_text:
-#             return 'vicepresident'
-#         elif 'vote counter' in role_text:  # Adjust based on actual text
-#             return 'votecounter'
-#         else:
-#             return 'member'  # Default for Kommission is member
-#     elif org_type_title == 'Fraktion':  # Parliamentary Group Roles
-#         if 'präsident' in role_text:
-#             return 'president_parliamentary_group'  # Use specific parliamentary group president role
-#         elif 'vizepräsident' in role_text or 'vize-präsident' in role_text:
-#             return 'vicepresident'
-#         elif 'vote counter' in role_text:  # Adjust based on actual text
-#             return 'votecounter'
-#         elif 'mediamanager' in role_text or 'media manager' in role_text:
-#             return 'mediamanager'
-#         else:
-#             return 'member'  # Default for Fraktion is member
-#     elif (
-#             org_type_title == 'Kantonsrat'
-#     ):  # Parliamentarian Roles (for Kantonsrat "memberships")
-#         #  "Kantonsrat" memberships might represent the general role of being a parliamentarian.
-#         #  You might need to adjust role determination based on your specific needs.
-#         return 'member'  # Default Kantonsrat role is member
-#     elif org_type_title == 'Sonstige':
-#         return 'member'  # Default role for "Sonstige"
-#     else:
-#         return 'none'  # Default to 'none' if type is unknown
+class MembershipImporter:
+    """Importer for membership data from memberships.json."""
 
-
-class MembershipImporter(DataImporter):
-    """Importer for CommissionMembership data."""
-
-    membership_attribute_map: dict[str, str] = {
-        'start': 'start',
-        'end': 'end',
-        # role is handled separately
-    }
+    def __init__(self, session: Session) -> None:
+        self.session = session
+        self.parliamentarian_map = {}
+        self.commission_map = {}
+        self.parliamentary_group_map = {}
+        self.party_map = {}
+        self.other_organization_map = {}
 
     def init(
         self,
         session: Session,
         parliamentarian_map: dict[str, Parliamentarian],
         commission_map: dict[str, Commission],
-        parliamentary_group_map: dict[
-            str, ParliamentaryGroup
-        ],  # Add parliamentary group map
-        other_organization_map: dict[
-            str, Any
-        ],  # Add other org map if needed
+        parliamentary_group_map: dict[str, ParliamentaryGroup],
+        party_map: dict[str, Party] = None,
+        other_organization_map: dict[str, Any] = None,
     ) -> None:
-        super().init(session)
+        """Initialize the importer with maps of objects by their external KUB ID."""
+        self.session = session
         self.parliamentarian_map = parliamentarian_map
         self.commission_map = commission_map
-        self.parliamentary_group_map = (
-            parliamentary_group_map  # Store parliamentary group map
-        )
-        self.other_organization_map = (
-            other_organization_map  # Store other org map if needed
-        )
+        self.parliamentary_group_map = parliamentary_group_map
+        self.party_map = party_map or {}
+        self.other_organization_map = other_organization_map or {}
 
-    def bulk_import(
-        self, memberships_data: Sequence[MembershipData]
-    ) -> None:
-        """Imports commission memberships from JSON data."""
+    def bulk_import(self, memberships_data: Sequence[MembershipData]) -> None:
+        """Imports memberships from JSON data based on organization type."""
         commission_memberships = []
+        parliamentarian_roles = []
 
         for membership in memberships_data:
             try:
@@ -341,231 +296,212 @@ class MembershipImporter(DataImporter):
                 parliamentarian = self.parliamentarian_map.get(person_id)
                 if not parliamentarian:
                     logging.warning(
-                        f'Skipping membership: Parliamentarian with id {person_id} not found.'
+                        f'Skipping membership: Parliamentarian with external KUB ID {person_id} not found.'
                     )
                     continue
 
                 organization_data = membership['organization']
-                org_type_title = organization_data.get(
-                    'organizationTypeTitle'
-                )
-
-                organization = None
-                if org_type_title == 'Kommission':
-                    organization = self.commission_map.get(org_id)
-                elif org_type_title == 'Fraktion':
-                    organization = self.parliamentary_group_map.get(org_id)
-                elif (
-                        org_type_title == 'Kantonsrat'
-                        or org_type_title == 'Sonstige'
-                ):
-                    organization = self.other_organization_map.get(
-                        org_id
-                    )  # Or handle Kantonsrat differently if needed
-                else:
-                    logging.warning(
-                        f'Skipping membership: Unknown organization type {org_type_title} for org id {org_id}'
-                    )
-                    continue
-
-                if not organization:
-                    logging.warning(
-                        f'Skipping membership: Organization of type {org_type_title} with id {org_id} not found.'
-                    )
-                    continue
-
-                membership_kwargs = {}
-                membership_kwargs['parliamentarian'] = parliamentarian
-                membership_kwargs['organization'] = (
-                    organization  # Polymorphic relationship
-                )
-
-                for (
-                        json_key,
-                        model_attr,
-                ) in self.membership_attribute_map.items():
-                    membership_kwargs[model_attr] = self.parse_date(
-                        membership.get(json_key)
-                    )
-
-                membership_kwargs['role'] = determine_membership_role(
-                    membership
-                )  # Determine role dynamically
-
-                commission_membership = CommissionMembership(
-                    **membership_kwargs
-                )  # Assuming CommissionMembership is the base class for all memberships
-                commission_memberships.append(commission_membership)
-
-            except Exception as e:
-                logging.error(
-                    f'Error creating membership for person_id {membership.get("person", {}).get("id")}, org_id {membership.get("organization", {}).get("id")}: {e}',
-                    exc_info=True,
-                )
-
-        self._bulk_save(commission_memberships, 'commission memberships')
-
-
-class OrganizationImporter(DataImporter):
-    """Importer for Organization data from organizations.json."""
-
-    organization_attribute_map: dict[str, str] = {
-        'name': 'name',
-        'description': 'description',
-        'isActive': 'is_active',  # Assuming you have an is_active field in your models
-        # ... other common fields ...
-    }
-
-    def bulk_import(
-        self, organizations_data: Sequence[OrganizationData]
-    ) -> tuple[
-        dict[str, Commission],
-        dict[str, ParliamentaryGroup],
-        dict[str, Any],
-    ]:  # Return maps for different org types
-        """Imports organizations from JSON and returns maps for commissions
-        and parliamentary groups."""
-        commissions = []
-        parliamentary_groups = []
-        other_organizations = []  # For "Sonstige" or other types
-
-        commission_map: dict[str, Commission] = {}
-        parliamentary_group_map: dict[str, ParliamentaryGroup] = {}
-        other_organization_map: dict[str, Any] = (
-            {}
-        )  # Adjust type as needed
-
-        for org_data in organizations_data:
-            breakpoint()
-            try:
-                org_type_title = org_data.get('organizationTypeTitle')
+                org_type_title = organization_data.get('organizationTypeTitle')
+                role_text = membership.get('role', '')
 
                 if org_type_title == 'Kommission':
-                    commission = self._create_commission(org_data)
-                    if commission:
-                        commissions.append(commission)
-                        commission_map[org_data['id']] = commission
-                elif org_type_title == 'Fraktion':
-                    parliamentary_group = self._create_parliamentary_group(
-                        org_data
-                    )
-                    if parliamentary_group:
-                        parliamentary_groups.append(parliamentary_group)
-                        parliamentary_group_map[org_data['id']] = (
-                            parliamentary_group
+                    commission = self.commission_map.get(org_id)
+                    if not commission:
+                        logging.warning(
+                            f'Skipping commission membership: Commission with external KUB ID {org_id} not found.'
                         )
+                        continue
+
+                    membership_obj = self._create_commission_membership(
+                        parliamentarian, commission, membership
+                    )
+                    if membership_obj:
+                        commission_memberships.append(membership_obj)
+
+                elif org_type_title == 'Fraktion':
+                    group = self.parliamentary_group_map.get(org_id)
+                    if not group:
+                        logging.warning(
+                            f'Skipping parliamentary group role: Group with external KUB ID {org_id} not found.'
+                        )
+                        continue
+
+                    role_obj = self._create_parliamentarian_role(
+                        parliamentarian=parliamentarian,
+                        role='member',  # Default for being in parliament
+                        parliamentary_group=group,
+                        parliamentary_group_role=self._map_to_parliamentary_group_role(role_text),
+                        start_date=membership.get('start'),
+                        end_date=membership.get('end')
+                    )
+                    if role_obj:
+                        parliamentarian_roles.append(role_obj)
+
                 elif org_type_title == 'Kantonsrat':
-                    # Handle Kantonsrat as ParliamentarianRole
-                    kantonsrat_role = self._handle_kantonsrat(
-                        org_data
-                    )  # Example handling
-                    if kantonsrat_role:
-                        other_organizations.append(
-                            kantonsrat_role
-                        )  # Adjust list as needed
-                        other_organization_map[org_data['id']] = (
-                            kantonsrat_role  # Adjust map as needed
-                        )
+                    # Kantonsrat represents the general parliament
+                    role = self._map_to_parliamentarian_role(role_text)
+
+                    role_obj = self._create_parliamentarian_role(
+                        parliamentarian=parliamentarian,
+                        role=role,
+                        start_date=membership.get('start'),
+                        end_date=membership.get('end')
+                    )
+                    if role_obj:
+                        parliamentarian_roles.append(role_obj)
+
                 elif org_type_title == 'Sonstige':
-                    other_org = self._create_other_organization(
-                        org_data
-                    )  # Placeholder for "Sonstige"
-                    if other_org:
-                        other_organizations.append(other_org)
-                        other_organization_map[org_data['id']] = other_org
+                    # For 'Sonstige', store the role info in additional_information
+                    org_name = organization_data.get('name', 'Unknown Organization')
+                    additional_info = f"{role_text} - {org_name}"
+
+                    role_obj = self._create_parliamentarian_role(
+                        parliamentarian=parliamentarian,
+                        role='member',  # Default role
+                        additional_information=additional_info,
+                        start_date=membership.get('start'),
+                        end_date=membership.get('end')
+                    )
+                    if role_obj:
+                        parliamentarian_roles.append(role_obj)
+
                 else:
                     logging.warning(
-                        f"Unknown organization type: {org_type_title} for org id {org_data.get('id')}"
+                        f'Skipping membership: Unknown organization type {org_type_title} '
+                        f'for organization {organization_data.get("name")}'
                     )
 
             except Exception as e:
+                person_id = membership.get('person', {}).get('id', 'unknown')
                 logging.error(
-                    f'Error importing organization with id {org_data.get("id")}: {e}',
+                    f'Error creating membership for person_id {person_id}: {e}',
                     exc_info=True,
                 )
 
-        self._bulk_save(commissions, 'commissions')
-        self._bulk_save(parliamentary_groups, 'parliamentary groups')
-        self._bulk_save(
-            other_organizations, 'other organizations'
-        )  # Save other orgs if needed
+        # Save all created objects to the database
+        if commission_memberships:
+            self._bulk_save(commission_memberships, 'commission memberships')
+        if parliamentarian_roles:
+            self._bulk_save(parliamentarian_roles, 'parliamentarian roles')
 
-        return (
-            commission_map,
-            parliamentary_group_map,
-            other_organization_map,
-        )  # Return all maps
+    def _create_commission_membership(
+        self,
+        parliamentarian: Parliamentarian,
+        commission: Commission,
+        membership_data: MembershipData
+    ) -> CommissionMembership | None:
+        """Create a CommissionMembership object."""
+        try:
+            role_text = membership_data.get('role', '')
+            role = self._map_to_commission_role(role_text)
 
-    def _create_commission(
-        self, org_data: OrganizationData
-    ) -> Commission | None:
-        """Creates a Commission object."""
-        if not org_data.get('id'):
-            logging.warning(
-                f"Skipping commission due to missing ID: {org_data.get('name')}"
+            start_date = self._parse_date(membership_data.get('start'))
+            end_date = self._parse_date(membership_data.get('end'))
+
+            return CommissionMembership(
+                parliamentarian=parliamentarian,
+                commission=commission,
+                role=role,
+                start=start_date,
+                end=end_date
             )
+        except Exception as e:
+            logging.error(f'Error creating commission membership: {e}', exc_info=True)
             return None
 
-        commission_kwargs = {}
-        for (
-                json_key,
-                model_attr,
-        ) in self.organization_attribute_map.items():
-            commission_kwargs[model_attr] = org_data.get(json_key)
-
-        commission_kwargs['type'] = (
-            'official'  # Assuming "Kommission" maps to 'official' type
-        )
-        commission = Commission(**commission_kwargs)
-        return commission
-
-    def _create_parliamentary_group(
-        self, org_data: OrganizationData
-    ) -> ParliamentaryGroup | None:
-        """Creates a ParliamentaryGroup object."""
-        if not org_data.get('id'):
-            logging.warning(
-                f"Skipping parliamentary group due to missing ID: {org_data.get('name')}"
+    def _create_parliamentarian_role(
+        self,
+        parliamentarian: Parliamentarian,
+        role: str,
+        parliamentary_group: ParliamentaryGroup = None,
+        parliamentary_group_role: str = 'none',
+        party: Party = None,
+        party_role: str = 'none',
+        additional_information: str = None,
+        start_date: str = None,
+        end_date: str = None
+    ) -> ParliamentarianRole | None:
+        """Create a ParliamentarianRole object with the specified relationships."""
+        try:
+            return ParliamentarianRole(
+                parliamentarian=parliamentarian,
+                role=role,
+                parliamentary_group=parliamentary_group,
+                parliamentary_group_role=parliamentary_group_role,
+                party=party,
+                party_role=party_role,
+                additional_information=additional_information,
+                start=self._parse_date(start_date),
+                end=self._parse_date(end_date)
             )
+        except Exception as e:
+            logging.error(f'Error creating parliamentarian role: {e}', exc_info=True)
             return None
 
-        parliamentary_group_kwargs = {}
-        for (
-                json_key,
-                model_attr,
-        ) in self.organization_attribute_map.items():
-            parliamentary_group_kwargs[model_attr] = org_data.get(json_key)
+    def _map_to_commission_role(self, role_text: str) -> str:
+        """Map a role text to a CommissionMembership role enum value."""
+        role_text = role_text.lower()
 
-        parliamentary_group = ParliamentaryGroup(
-            **parliamentary_group_kwargs
-        )
-        return parliamentary_group
+        if 'präsident' in role_text:
+            return 'president'
+        elif 'erweitert' in role_text:
+            return 'extended_member'
+        elif 'gast' in role_text:
+            return 'guest'
+        else:
+            return 'member'
 
-    def _handle_kantonsrat(
-        self, org_data: OrganizationData
-    ) -> Any:  # Adjust return type as needed
-        """Handles "Kantonsrat" organization type.  This might create a ParliamentarianRole or something else."""
-        #  This is where you decide how to represent "Kantonsrat".
-        #  If it's just a ParliamentarianRole, you might create that directly.
-        #  If it's a special Organization type, create that.
+    def _map_to_parliamentarian_role(self, role_text: str) -> str:
+        """Map a role text to a parliamentarian role enum value."""
+        role_text = role_text.lower()
 
-        logging.info(f"Handling Kantonsrat: {org_data.get('name')}")
-        breakpoint()
-        # Example:  If Kantonsrat is just a role, you might not create an Organization object at all.
-        # Instead, you might use it to set a default ParliamentarianRole for members.
-        # For now, let's just return None as a placeholder.
-        return None  # Placeholder - adjust based on your model
+        # These keys must match the enum values in PARLIAMENTARIAN_ROLES
+        if 'präsident' in role_text:
+            return 'president'
+        elif any(term in role_text for term in ['vizepräsident', 'vize-präsident', 'vize präsident']):
+            return 'vice_president'
+        elif any(term in role_text for term in ['stimmenzähler', 'vote counter']):
+            return 'vote_counter'
+        else:
+            return 'member'
 
-    def _create_other_organization(
-        self, org_data: OrganizationData
-    ) -> Any:  # Adjust return type as needed
-        """Creates a placeholder for "Sonstige" organization types."""
-        logging.info(
-            f"Creating 'Sonstige' organization: {org_data.get('name')}"
-        )
-        # You might create a generic Organization model here, or skip
-        # "Sonstige" types if not needed.
-        return None  # Placeholder - adjust based on your model
+    def _map_to_parliamentary_group_role(self, role_text: str) -> str:
+        """Map a role text to a parliamentary_group_role enum value."""
+        role_text = role_text.lower()
+
+        # These keys must match the enum values in PARLIAMENTARY_GROUP_ROLES
+        if 'präsident' in role_text:
+            return 'president'
+        elif any(term in role_text for term in ['vizepräsident', 'vize-präsident', 'vize präsident']):
+            return 'vice_president'
+        elif any(term in role_text for term in ['stimmenzähler', 'vote counter']):
+            return 'vote_counter'
+        else:
+            return 'member'
+
+    def _parse_date(self, date_string: str | None) -> datetime | None:
+        """Parse a date string into a Python datetime object."""
+        if not date_string:
+            return None
+
+        if date_string == 'False':  # Handle special case in API
+            return None
+
+        try:
+            return datetime.fromisoformat(date_string.rstrip('Z'))
+        except ValueError:
+            logging.warning(f'Could not parse date string: {date_string}')
+            return None
+
+    def _bulk_save(self, objects: list[Any], object_type: str) -> None:
+        """Save a list of objects to the database."""
+        try:
+            self.session.bulk_save_objects(objects)
+            logging.info(f'Imported {len(objects)} {object_type}')
+        except Exception as e:
+            logging.error(f'Error bulk saving {object_type}: {e}', exc_info=True)
+            self.session.rollback()
+            raise
 
 
 def import_zug_kub_data(
@@ -580,20 +516,24 @@ def import_zug_kub_data(
     organization_data = _load_json(organizations_source)
     membership_data = _load_json(memberships_source)
 
+    # Import people
     people_importer = PeopleImporter(session)
     parliamentarian_map = people_importer.bulk_import(people_data)
 
+    # Import organizations
     organization_importer = OrganizationImporter(session)
-    commission_map, parliamentary_group_map, other_organization_map = (
+    commission_map, parliamentary_group_map, party_map, other_organization_map = (
         organization_importer.bulk_import(organization_data)
     )
 
+    # Import memberships
     membership_importer = MembershipImporter(session)
     membership_importer.init(
         session,
         parliamentarian_map,
         commission_map,
         parliamentary_group_map,
+        party_map,
         other_organization_map,
     )
     membership_importer.bulk_import(membership_data)

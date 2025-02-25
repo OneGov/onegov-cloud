@@ -1,5 +1,10 @@
 from __future__ import annotations
 
+import json
+import os
+import tempfile
+
+
 from onegov.pas.importer.json_import import import_zug_kub_data
 from onegov.pas.models import (
     Commission,
@@ -38,12 +43,30 @@ def test_successful_import(
         The nested person and organization blocks are crucial for establishing
         relationships.
     """
-    import_zug_kub_data(
-        session,
-        people_source=people_json,
-        organizations_source=organization_json,
-        memberships_source=memberships_json,
-    )
+    with tempfile.TemporaryDirectory() as temp_dir:
+        # Create paths
+        people_path = os.path.join(temp_dir, "people.json")
+        org_path = os.path.join(temp_dir, "organizations.json")
+        members_path = os.path.join(temp_dir, "memberships.json")
+
+        # Write JSON to temporary files
+        with open(people_path, 'w', encoding='utf-8') as f:
+            json.dump(people_json, f)
+
+        with open(org_path, 'w', encoding='utf-8') as f:
+            json.dump(organization_json, f)
+
+        with open(members_path, 'w', encoding='utf-8') as f:
+            json.dump(memberships_json, f)
+
+        # Run the import with temporary file paths
+        import_zug_kub_data(
+            session,
+            people_source=people_path,
+            organizations_source=org_path,
+            memberships_source=members_path,
+        )
+
 
     # Verify parliamentarians were imported
     parliamentarians = session.query(Parliamentarian).all()
