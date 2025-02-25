@@ -6406,5 +6406,8 @@ msgstr "Un compte a été créé pour vous"
 msgid "The user was created successfully"
 msgstr "L'utilisateur a bien été créé"
 
+msgid "Item(s)"
+msgstr "Article(s)"
+
 #~ msgid "Terminaux ID"
 #~ msgstr "ID du terminal"
