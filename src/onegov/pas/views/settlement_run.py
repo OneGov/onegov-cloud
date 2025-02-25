@@ -438,6 +438,9 @@ def _get_party_totals_for_export_all(
     """Get totals grouped by party."""
     session = request.session
     rate_set = get_current_rate_set(session, self)
+    if not rate_set:
+        return []
+
     cola_multiplier = Decimal(
         str(1 + (rate_set.cost_of_living_adjustment / 100))
     )

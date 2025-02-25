@@ -18,8 +18,12 @@ if TYPE_CHECKING:
 
 
 def format_swiss_number(value: Decimal | int) -> str:
+    if not isinstance(value, (Decimal, int)):
+        raise TypeError(f'Expected Decimal or int, got {type(value).__name__}')
+
     if isinstance(value, int):
         value = Decimal(value)
+
     return format_decimal(value, format='#,##0.00', locale='de_CH')
 
 
