@@ -6,6 +6,7 @@ import ua_parser
 from datetime import timedelta
 from functools import cached_property
 from onegov.core.cache import instance_lru_cache
+from onegov.core.custom import msgpack
 from onegov.core.utils import append_query_param
 from itsdangerous import (
     BadSignature,
@@ -71,6 +72,7 @@ _T = TypeVar('_T')
 _F = TypeVar('_F', bound='Form')
 
 
+@msgpack.make_serializable
 class Message(NamedTuple):
     text: str
     type: MessageType

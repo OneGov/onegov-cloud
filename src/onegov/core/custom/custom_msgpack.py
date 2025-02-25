@@ -124,10 +124,12 @@ class DictionarySerializer(Serializer[_T]):
         self.keys = frozenset(keys)
 
     def encode(self, obj: _T) -> bytes:
-        return packb({k: getattr(obj, k) for k in self.keys})
+        return packb([getattr(obj, k) for k in self.keys])
 
     def decode(self, value: bytes) -> _T:
-        return self.target(**unpackb(value))
+        values = unpackb(value)
+        assert isinstance(values, list)
+        return self.target(**dict(zip(self.keys, values, strict=True)))
 
 
 class Serializers:
@@ -256,10 +258,14 @@ class Serializable:
         ))
 
 
-def make_serializable(cls: _TypeT) -> _TypeT:
+def make_serializable(
+    cls: _TypeT,
+    serializers: Serializers = default_serializers
+) -> _TypeT:
+
     keys = getattr(cls, '_fields', getattr(cls, '__slots__', ()))
     assert keys, f'{cls!r} is not serializable'
-    default_serializers.register(DictionarySerializer(
+    serializers.register(DictionarySerializer(
         target=cls,
         keys=keys
     ))
