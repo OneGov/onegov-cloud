@@ -16,7 +16,7 @@ from onegov.pas.layouts import SettlementRunLayout
 from onegov.pas.models import (
     SettlementRun,
     Party,
-    Commission, ParliamentarianRole,
+    Commission,
 )
 from webob import Response
 from decimal import Decimal
@@ -26,8 +26,11 @@ from weasyprint.text.fonts import (  # type: ignore[import-untyped]
 from onegov.pas.models.attendence import TYPES, Attendence
 from onegov.pas.path import SettlementRunExport, SettlementRunAllExport
 from onegov.pas.models import Parliamentarian
-from onegov.pas.utils import format_swiss_number
-
+from onegov.pas.utils import (
+    format_swiss_number,
+    get_parliamentarians_with_settlements,
+    get_parties_with_settlements,
+)
 
 from typing import TYPE_CHECKING, Literal
 if TYPE_CHECKING:
@@ -233,30 +236,17 @@ def view_settlement_run(
     session = request.session
 
     # Get parties active during settlement run period
-    parties = session.query(Party).filter(
-        Party.id.in_(
-            session.query(ParliamentarianRole.party_id)
-            .join(Parliamentarian)
-            .join(Attendence)
-            .filter(
-                Attendence.date >= self.start,
-                Attendence.date <= self.end
-            ).distinct()
-        )
-    ).order_by(Party.name)
+    parties = get_parties_with_settlements(session, self.start, self.end)
 
     # Get commissions active during settlement run period
-    com = CommissionCollection(session)
-    commissions = com.query().order_by(Commission.name)
+    commissions = CommissionCollection(session).query().order_by(
+        Commission.name
+    )
 
-    # Get parliamentarians active during settlement run period
-    parliamentarians = [
-        p
-        for p in session.query(Parliamentarian).order_by(
-            Parliamentarian.last_name, Parliamentarian.first_name
-        )
-        if p.active_during(self.start, self.end)
-    ]
+    # Get parliamentarians active during settlement run period with settlements
+    parliamentarians = get_parliamentarians_with_settlements(
+        session, self.start, self.end
+    )
 
     categories = {
         'party': {
@@ -441,74 +431,72 @@ def _get_commission_totals(
 
 
 def _get_party_totals_for_export_all(
-    self: SettlementRun,
-    request: TownRequest
+    self: SettlementRun, request: TownRequest
 ) -> list[tuple[str, Decimal, Decimal, Decimal, Decimal, Decimal]]:
     """Get totals grouped by party."""
     session = request.session
     rate_set = get_current_rate_set(session, self)
-
-    # Get all attendences in period
-    attendences = AttendenceCollection(
-        session,
-        date_from=self.start,
-        date_to=self.end
-    )
-
     cola_multiplier = Decimal(
         str(1 + (rate_set.cost_of_living_adjustment / 100))
     )
 
+    # Get all parties with settlements during the period
+    parties = get_parties_with_settlements(session, self.start, self.end)
+
     # Initialize party totals
-    party_totals: dict[str, dict[str, Decimal]] = {}
+    party_totals: dict[str, dict[str, Decimal]] = {
+        party.name: {
+            'Meetings': Decimal('0'),
+            'Expenses': Decimal('0'),
+            'Total': Decimal('0'),
+            'Cost-of-living Allowance': Decimal('0'),
+            'Final': Decimal('0'),
+        }
+        for party in parties
+    }
 
-    # Calculate totals for each party
-    for attendence in attendences.query():
-        # Get parliamentarian's party
-        current_party = None
-        for role in attendence.parliamentarian.roles:
-            if role.party and (role.end is None or role.end >= self.start):
-                current_party = role.party
-                break
-
-        if not current_party:
-            continue
-
-        party_name = current_party.name
-
-        if party_name not in party_totals:
-            # Name Sitzungen Spesen Total Einträge Teuerungszulagen Auszahlung
-            party_totals[party_name] = {
-                'Meetings': Decimal('0'),
-                'Expenses': Decimal('0'),  # Always 0 for now (Spesen)
-                'Total': Decimal('0'),  # Expenses + Meetings
-                'Cost-of-living Allowance': Decimal('0'),  # Teuerungszulagen
-                'Final': Decimal('0')  # Auszahlung
-            }
-
-        # Calculate base rate
-        is_president = any(r.role == 'president'
-                           for r in attendence.parliamentarian.roles)
-
-        base_rate = calculate_rate(
-            rate_set=rate_set,
-            attendence_type=attendence.type,
-            duration_minutes=int(attendence.duration),
-            is_president=is_president,
-            commission_type=(
-                attendence.commission.type if attendence.commission else None
-            ),
+    # Process attendances for each party with proper temporal alignment
+    for party in parties:
+        attendances = (
+            AttendenceCollection(session)
+            .by_party(
+                party_id=str(party.id),
+                start_date=self.start,
+                end_date=self.end,
+            )
+            .query()
+            .all()
         )
 
-        # Update totals
-        party_totals[party_name]['Meetings'] += Decimal(str(base_rate))
-        base_total = party_totals[party_name]['Meetings']
-        cola_amount = base_total * (cola_multiplier - 1)
+        for attendance in attendances:
+            # Calculate base rate
+            is_president = any(
+                r.role == 'president'
+                for r in attendance.parliamentarian.roles
+            )
 
-        expenses = party_totals[party_name]['Expenses'] + base_total
-        party_totals[party_name]['Total'] = base_total + expenses
-        party_totals[party_name]['Cost-of-living Allowance'] = cola_amount
-        party_totals[party_name]['Final'] = base_total + cola_amount
+            base_rate = calculate_rate(
+                rate_set=rate_set,
+                attendence_type=attendance.type,
+                duration_minutes=int(attendance.duration),
+                is_president=is_president,
+                commission_type=(
+                    attendance.commission.type
+                    if attendance.commission
+                    else None
+                ),
+            )
+
+            # Update totals
+            party_totals[party.name]['Meetings'] += Decimal(str(base_rate))
+            base_total = party_totals[party.name]['Meetings']
+            cola_amount = base_total * (cola_multiplier - 1)
+            expenses = party_totals[party.name]['Expenses'] + base_total
+            party_totals[party.name]['Total'] = base_total + expenses
+            party_totals[party.name][
+                'Cost-of-living Allowance'
+            ] = cola_amount
+            party_totals[party.name]['Final'] = base_total + cola_amount
 
     # Convert to sorted list of tuples
     result = [
@@ -518,7 +506,7 @@ def _get_party_totals_for_export_all(
             data['Expenses'],
             data['Total'],
             data['Cost-of-living Allowance'],
-            data['Final']
+            data['Final'],
         )
         for name, data in sorted(party_totals.items())
     ]
@@ -533,7 +521,6 @@ def _get_party_totals_for_export_all(
     )
 
     result.append(('Total Parteien', *totals))
-
     return result
 
 
@@ -572,9 +559,9 @@ def generate_settlement_pdf(
         subtitle='Einträge Journal',
     )
 
-    return HTML(
-        string=html.replace(',', "'"),  # Swiss number format
-    ).write_pdf(stylesheets=[css], font_config=font_config)
+    return HTML(string=html).write_pdf(
+        stylesheets=[css], font_config=font_config
+    )
 
 
 def _get_commission_settlement_data(
@@ -900,92 +887,6 @@ def get_party_specific_totals(
     return result
 
 
-def debug_party_export(
-    settlement_run: SettlementRun,
-    request: TownRequest,
-    party: Party
-) -> None:
-    """Debug function to trace party export data retrieval"""
-    session = request.session
-
-    # 1. Check basic party info
-    print(f'Party ID: {party.id}, Name: {party.name}')
-
-    # 2. Check date range
-    print(f'Date range: {settlement_run.start} to {settlement_run.end}')
-
-    # 3. Get all attendances without party filter first
-    base_attendances = (
-        AttendenceCollection(session)
-        .query()
-        .filter(
-            Attendence.date >= settlement_run.start,
-            Attendence.date <= settlement_run.end
-        )
-        .all()
-    )
-    print(f'Total attendances in date range: {len(base_attendances)}')
-
-    # 4. Check parliamentarian roles
-    for attendance in base_attendances:
-        parl = attendance.parliamentarian
-        print(f'\nParliamentarian: {parl.first_name} {parl.last_name}')
-        print(f'Attendance date: {attendance.date}')
-
-        roles = session.query(ParliamentarianRole).filter(
-            ParliamentarianRole.parliamentarian_id == parl.id,
-            ParliamentarianRole.party_id == party.id,
-        ).all()
-
-        print('Roles:')
-        for role in roles:
-            print(f'- Start: {role.start}, End: {role.end}')
-
-        # Check if this attendance should be included
-        should_include = any(
-            (role.start is None or role.start <= attendance.date) and
-            (role.end is None or role.end >= attendance.date)
-            for role in roles
-        )
-        print(f'Should include: {should_include}')
-
-    # 5. Try the actual party filter
-    party_attendances = (
-        AttendenceCollection(session)
-        .by_party(
-            party_id=str(party.id),
-            start_date=settlement_run.start,
-            end_date=settlement_run.end
-        )
-        .query()
-        .all()
-    )
-    print(f'\nFinal filtered attendances: {len(party_attendances)}')
-
-
-def debug_party_export2(
-    settlement_run: SettlementRun,
-    request: TownRequest,
-    party: Party
-) -> None:
-    session = request.session
-    print(f'Party ID: {party.id}')
-
-    # Check roles directly
-    all_roles = session.query(ParliamentarianRole).filter(
-        ParliamentarianRole.party_id == party.id
-    ).all()
-    print(f'\nTotal roles for party: {len(all_roles)}')
-    for role in all_roles:
-        print(f'Role: {role.party_id} -> {role.parliamentarian_id}')
-
-    # Check all parties
-    all_parties = session.query(Party).all()
-    print('\nAll parties:')
-    for p in all_parties:
-        print(f'ID: {p.id}, Name: {p.name}')
-
-
 def _get_party_settlement_data(
     settlement_run: SettlementRun,
     request: TownRequest,
@@ -1010,12 +911,13 @@ def _get_party_settlement_data(
 
     result = []
     for attendence in attendences:
+
+        # Fixme: this check is likely redundant
         current_party = attendence.parliamentarian.get_party_during_period(
             settlement_run.start,
             settlement_run.end,
             session
         )
-
         if not current_party or current_party.id != party.id:
             continue
 
@@ -1104,7 +1006,7 @@ def view_settlement_run_export(
             entity_type='party',
             entity=self.entity,
         )
-        filename = f'party_{self.entity.name}'
+        filename = f'Partei_{self.entity.name}'
 
     elif self.category == 'commission':
         assert isinstance(self.entity, Commission)
@@ -1124,7 +1026,7 @@ def view_settlement_run_export(
             self.settlement_run, request, self.entity
         )
         filename = (
-            f'parliamentarian_{self.entity.last_name}_{self.entity.first_name}'
+            f'Parlamentarier_{self.entity.last_name}_{self.entity.first_name}'
         )
         return Response(
             pdf_bytes,
