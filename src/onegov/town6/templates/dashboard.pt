@@ -25,8 +25,8 @@
                                 <span tal:condition="fact.link">
                                     <a href="${fact.link[0]}">${fact.link[1]}</a>
                                 </span>
-                                <span tal:condition="fact.visibility_icon" class="fact-visibility-icon">
-                                    -> <i class="${fact.visibility_icon}" tal:attributes="title fact.icon_title|None"></i>
+                                <span tal:condition="fact.visibility_icon" class="fact-visibility-icon fa-xs">
+                                    <i class="${fact.visibility_icon}" tal:attributes="title fact.icon_title|None"></i>
                                 </span>
                             </td>
                         </tr>
