@@ -58,7 +58,7 @@ class SettlementRun(Base, ContentMixin, TimestampMixin, ORMSearchable):
         nullable=False
     )
 
-    #: The end date
+    #: Whether this settlement run is active
     active: Column[bool] = Column(
         Boolean,
         nullable=False
