@@ -289,12 +289,7 @@ class Canton(Principal, msgpack.Serializable, keys=(
 
     domain: Literal['canton']
 
-    def __init__(
-        self,
-        canton: str,
-        **kwargs: Any
-    ) -> None:
-
+    def __init__(self, canton: str, **kwargs: Any) -> None:
         assert canton in self.CANTONS
 
         self.canton = canton
@@ -346,17 +341,6 @@ class Canton(Principal, msgpack.Serializable, keys=(
         domains_election: dict[str, TranslationString] = OrderedDict()
         domains_election['federation'] = _('Federal')
         domains_election['canton'] = _('Cantonal')
-        domains_election['none'] = _(
-            'Regional (${on})',
-            mapping={'on': _('Other')}
-        )
-        domains_election['municipality'] = _('Communal')
-
-        domains_vote: dict[str, TranslationString] = OrderedDict()
-        domains_vote['federation'] = _('Federal')
-        domains_vote['canton'] = _('Cantonal')
-        domains_vote['municipality'] = _('Communal')
-
         if has_regions:
             domains_election['region'] = _(
                 'Regional (${on})',
@@ -367,6 +351,16 @@ class Canton(Principal, msgpack.Serializable, keys=(
                 'Regional (${on})',
                 mapping={'on': self.label('district')}
             )
+        domains_election['none'] = _(
+            'Regional (${on})',
+            mapping={'on': _('Other')}
+        )
+        domains_election['municipality'] = _('Communal')
+
+        domains_vote: dict[str, TranslationString] = OrderedDict()
+        domains_vote['federation'] = _('Federal')
+        domains_vote['canton'] = _('Cantonal')
+        domains_vote['municipality'] = _('Communal')
 
         super().__init__(
             id_=canton,
@@ -463,39 +457,39 @@ class Canton(Principal, msgpack.Serializable, keys=(
         if value == 'entities':
             return _('Municipalities')
         if value == 'district':
-            if self.id == 'bl':
+            if self.canton == 'bl':
                 return _('district_label_bl')
-            if self.id == 'gr':
+            if self.canton == 'gr':
                 return _('district_label_gr')
-            if self.id == 'sz':
+            if self.canton == 'sz':
                 return _('district_label_sz')
             return _('District')
         if value == 'districts':
-            if self.id == 'bl':
+            if self.canton == 'bl':
                 return _('districts_label_bl')
-            if self.id == 'gr':
+            if self.canton == 'gr':
                 return _('districts_label_gr')
-            if self.id == 'sz':
+            if self.canton == 'sz':
                 return _('districts_label_sz')
             return _('Districts')
         if value == 'region':
-            if self.id == 'gr':
+            if self.canton == 'gr':
                 return _('region_label_gr')
             return _('District')
         if value == 'regions':
-            if self.id == 'gr':
+            if self.canton == 'gr':
                 return _('regions_label_gr')
             return _('Districts')
         if value == 'superregion':
-            if self.id == 'bl':
+            if self.canton == 'bl':
                 return _('superregion_label_bl')
             return _('District')
         if value == 'superregions':
-            if self.id == 'bl':
+            if self.canton == 'bl':
                 return _('superregions_label_bl')
             return _('Districts')
         if value == 'mandates':
-            if self.id == 'gr':
+            if self.canton == 'gr':
                 return _('Seats')
             return _('Mandates')
         return ''
@@ -518,6 +512,7 @@ class Municipality(Principal, msgpack.Serializable, keys=(
     'has_regions',
     'has_superregions',
     'has_quarters',
+    'use_maps',
     'fetch',
     'webhooks',
     'sms_notification',
@@ -571,9 +566,8 @@ class Municipality(Principal, msgpack.Serializable, keys=(
                     entities[year] = {
                         int(k): v for k, v in json.load(f).items()
                     }
-        has_quarters = False
         if entities:
-            has_quarters = True
+            self.has_quarters = True
             # Test if all entities have districts (use none, if ambiguous)
             districts = {
                 entity.get('district', None)
@@ -583,7 +577,7 @@ class Municipality(Principal, msgpack.Serializable, keys=(
             has_districts = None not in districts
         else:
             # ... we have no static data, autogenerate it!
-            has_quarters = False
+            self.has_quarters = False
             has_districts = False
             entities = {
                 year: {int(municipality): {'name': kwargs.get('name', '')}}
@@ -595,8 +589,6 @@ class Municipality(Principal, msgpack.Serializable, keys=(
         if date.today().year not in entities:
             print(f'Warning: No entities for year {date.today().year} found '
                   f'for {municipality}')
-
-        self.has_quarters = has_quarters
 
         super().__init__(
             id_=municipality,
@@ -627,6 +619,7 @@ class Municipality(Principal, msgpack.Serializable, keys=(
         has_regions: bool = False,
         has_superregions: bool = False,
         has_quarters: bool = False,
+        use_maps: bool = False,
         fetch: dict[str, Any] | None = None,
         webhooks: dict[str, dict[str, str]] | None = None,
         sms_notification: bool | None = None,
@@ -669,7 +662,7 @@ class Municipality(Principal, msgpack.Serializable, keys=(
             has_districts=has_districts,
             has_regions=has_regions,
             has_superregions=has_superregions,
-            use_maps=True,
+            use_maps=use_maps,
             fetch=fetch,
             webhooks=webhooks,
             sms_notification=sms_notification,

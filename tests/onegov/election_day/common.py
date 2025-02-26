@@ -55,9 +55,9 @@ def get_tar_file_path(
 
 def create_principal(principal=None, municipality=None):
     if principal in Canton.CANTONS:
-        return Canton.from_yaml_data(canton=principal)
+        return Canton(canton=principal)
 
-    return Municipality.from_yaml_data(
+    return Municipality(
         municipality=municipality, canton='be', canton_name='Kanton Bern'
     )
 

@@ -35,7 +35,6 @@ from sqlalchemy.exc import OperationalError
 from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.ext.mutable import MutableDict
 from sqlalchemy.orm import relationship
-from sqlalchemy.orm.exc import DetachedInstanceError
 from sqlalchemy_utils import aggregated
 from threading import Thread
 from webob.exc import HTTPUnauthorized, HTTPConflict
@@ -1669,7 +1668,7 @@ def test_request_cache(postgres_dsn, redis_url):
         @request_cached
         def secret_document(self):
             q = self.session().query(Document)
-            q = q.with_entities(Document.id, Document.title)
+            q = q.with_entities(Document.id, Document.title, Document.body)
             q = q.filter(Document.title == 'Secret')
 
             return q.first()
@@ -1729,16 +1728,15 @@ def test_request_cache(postgres_dsn, redis_url):
 
     # if we change something in a cached object it is reflected
     # in the next request
-    app.secret_document.title = None
+    secret_document = (
+        app.session().query(Document)
+        .filter(Document.title == 'Secret').one()
+    )
+    secret_document.title = None
     transaction.commit()
 
-    # the object in the request cache is now detached
-    with pytest.raises(DetachedInstanceError):
-        key = 'test_request_cache.<locals>.App.secret_document'
-        assert app.request_cache[key].title
-
-    # which we transparently undo
-    assert app.secret_document.title is None
+    # this is still in cache with the old title
+    assert app.secret_document.title == 'Secret'
 
     app.clear_request_cache()
     assert app.untitled_documents[0].title is None
