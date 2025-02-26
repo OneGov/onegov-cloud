@@ -1,7 +1,7 @@
 from __future__ import annotations
 
 from itertools import groupby
-from onegov.core.cache import lru_cache
+from functools import lru_cache
 from onegov.core.security import Public, Private
 from onegov.winterthur import WinterthurApp, _
 from onegov.winterthur.collections import AddressCollection

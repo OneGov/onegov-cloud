@@ -98,6 +98,8 @@ def create_pdf(filename='simple.pdf',
 
 
 def assert_explicit_permissions(module, app_class):
+    from onegov.server.utils import patch_morepath
+    patch_morepath()
     morepath.autoscan()
     app_class.commit()
 

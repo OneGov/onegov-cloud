@@ -18,7 +18,7 @@ import types
 
 from decimal import Decimal
 from itertools import chain
-from onegov.core.cache import instance_lru_cache
+from onegov.core.cache.instance_cache import instance_lru_cache
 
 
 from typing import overload, Any, ClassVar, Generic, TypeVar, TYPE_CHECKING
@@ -238,6 +238,9 @@ class Serializers:
         elif isinstance(value, dict):
             for k, v in value.items():
                 value[k] = self.decode(v)
+        elif isinstance(value, list):
+            for idx, v in enumerate(value):
+                value[idx] = self.decode(v)
 
         return value
 

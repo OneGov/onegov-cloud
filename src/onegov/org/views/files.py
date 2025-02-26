@@ -9,8 +9,8 @@ import sedate
 from babel.core import Locale
 from babel.dates import parse_pattern
 from dateutil.parser import parse
+from functools import lru_cache
 from itertools import groupby
-from onegov.core.cache import lru_cache
 from onegov.core.filestorage import view_filestorage_file
 from onegov.core.security import Private, Public
 from onegov.core.templates import render_macro

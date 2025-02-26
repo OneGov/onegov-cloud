@@ -35,7 +35,6 @@ from sqlalchemy.exc import OperationalError
 from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.ext.mutable import MutableDict
 from sqlalchemy.orm import relationship
-from sqlalchemy.orm.exc import DetachedInstanceError
 from sqlalchemy_utils import aggregated
 from threading import Thread
 from webob.exc import HTTPUnauthorized, HTTPConflict
@@ -1669,12 +1668,10 @@ def test_request_cache(postgres_dsn, redis_url):
         @request_cached
         def secret_document(self):
             q = self.session().query(Document)
+            q = q.with_entities(Document.id, Document.title, Document.body)
             q = q.filter(Document.title == 'Secret')
 
             return q.first()
-
-    # get dill to pickle the following inline class
-    global Document
 
     class Document(Base):
         __tablename__ = 'documents'
@@ -1731,16 +1728,15 @@ def test_request_cache(postgres_dsn, redis_url):
 
     # if we change something in a cached object it is reflected
     # in the next request
-    app.secret_document.title = None
+    secret_document = (
+        app.session().query(Document)
+        .filter(Document.title == 'Secret').one()
+    )
+    secret_document.title = None
     transaction.commit()
 
-    # the object in the request cache is now detached
-    with pytest.raises(DetachedInstanceError):
-        key = 'test_request_cache.<locals>.App.secret_document'
-        assert app.request_cache[key].title
-
-    # which we transparently undo
-    assert app.secret_document.title is None
+    # this is still in cache with the old title
+    assert app.secret_document.title == 'Secret'
 
     app.clear_request_cache()
     assert app.untitled_documents[0].title is None
@@ -1754,15 +1750,10 @@ def test_request_cache_flush(postgres_dsn, redis_url):
 
         @orm_cached(policy='on-table-change:documents')
         def foo(self):
-            return self.session().query(Document).one()
-
-        @orm_cached(policy='on-table-change:documents')
-        def bar(self):
-            return self.session().query(Document)\
+            return (
+                self.session().query(Document)
                 .with_entities(Document.title).one()
-
-    # get dill to pickle the following inline class
-    global Document
+            )
 
     class Document(Base):
         __tablename__ = 'documents'
@@ -1787,18 +1778,17 @@ def test_request_cache_flush(postgres_dsn, redis_url):
     app.session().add(Document(id=1, title='Yo'))
     transaction.commit()
 
-    # both instances get cached
+    # instance gets cached
     assert app.foo.title == 'Yo'
-    assert app.bar.title == 'Yo'
 
-    # one instance changes without an explicit flush
-    app.foo.title = 'Sup'
+    # instance changes without an explicit flush
+    doc = app.session().query(Document).one()
+    doc.title = 'Sup'
 
-    # accessing the bar instance *first* fetches it from the cache which at
+    # accessing the instance *first* fetches it from the cache which at
     # this point would contain stale entries because we didn't flush explicitly
     # but thanks to our autoflush mechanism this doesn't happen
     assert app.session().dirty
-    assert app.bar.title == 'Sup'
     assert app.foo.title == 'Sup'
 
 

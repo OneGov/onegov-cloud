@@ -9,8 +9,8 @@ import sedate
 
 from datetime import datetime
 from functools import cached_property
+from functools import lru_cache
 from onegov.core import utils
-from onegov.core.cache import lru_cache
 from onegov.core.templates import PageTemplate
 from pytz import timezone
 
