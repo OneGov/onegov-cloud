@@ -67,6 +67,16 @@ def scan_onegov():
 
 
 @pytest.fixture(scope='session', autouse=True)
+def msgpack_freezegun_compat():
+    from datetime import date, datetime
+    from freezegun.api import FakeDate, FakeDatetime
+    from onegov.core.custom import msgpack
+    by_type = msgpack.default_serializers.by_type
+    by_type[FakeDate] = by_type[date]
+    by_type[FakeDatetime] = by_type[datetime]
+
+
+@pytest.fixture(scope='session', autouse=True)
 def treat_sqlalchemy_warnings_as_errors():
     """ All onegov models treat SQLAlchemy warnings as errors, because usually
     SQLAlchemy warnings are errors waiting to happen.

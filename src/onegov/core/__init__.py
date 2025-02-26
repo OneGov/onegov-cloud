@@ -41,6 +41,7 @@ LEVELS = (
         'onegov.pay',
         'onegov.pdf',
         'onegov.people',
+        'onegov.plausible',
         'onegov.quill',
         'onegov.qrcode',
         'onegov.recipient',

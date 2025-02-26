@@ -10,6 +10,7 @@ from onegov.landsgemeinde.theme import LandsgemeindeTheme
 from onegov.town6 import TownApp
 from onegov.town6.app import get_i18n_localedirs as get_i18n_localedirs_base
 from re import compile
+from webob import Response
 
 
 from typing import TYPE_CHECKING
@@ -20,7 +21,6 @@ if TYPE_CHECKING:
     from onegov.core.types import RenderData
     from onegov.landsgemeinde.request import LandsgemeindeRequest
     from onegov.org.models import Organisation
-    from webob import Response
 
 
 class LandsgemeindeApp(TownApp):
@@ -108,10 +108,12 @@ def pages_cache_tween_factory(
     )
     cache_paths_re = compile(r'^({})$'.format('|'.join(cache_paths)))
 
-    def should_cache_fn(response: Response) -> bool:
-        return (
-            response.status_code == 200
-            and 'Set-Cookie' not in response.headers
+    def should_cache_fn(
+        response: tuple[str, int, list[tuple[str, str]]]
+    ) -> bool:
+        return response[1] == 200 and not any(
+            header.lower() == 'set-cookie'
+            for header, _value in response[2]
         )
 
     def pages_cache_tween(request: LandsgemeindeRequest) -> Response:
@@ -135,10 +137,18 @@ def pages_cache_tween_factory(
             # GET requests are cached with the path and query string
             key = f'{request.method}:{request.path_qs}'
 
-        return app.pages_cache.get_or_create(
+        def create_response() -> tuple[bytes, int, list[tuple[str, str]]]:
+            response = handler(request)
+            return response.body, response.status_code, response.headerlist
+
+        # NOTE: For serialization purposes we deconstruct the response
+        #       into its body, status_code and headerlist, which should
+        #       be enough to fully reconstruct the response afterwards
+        body, status_code, headerlist = app.pages_cache.get_or_create(
             key,
-            creator=lambda: handler(request),
+            creator=create_response,
             should_cache_fn=should_cache_fn
         )
+        return Response(body, headerlist=headerlist, status=status_code)
 
     return pages_cache_tween

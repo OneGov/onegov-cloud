@@ -9,8 +9,8 @@ import sedate
 
 from datetime import datetime
 from functools import cached_property
+from functools import lru_cache
 from onegov.core import utils
-from onegov.core.cache import lru_cache
 from onegov.core.templates import PageTemplate
 from pytz import timezone
 
@@ -209,7 +209,7 @@ class Layout:
 
     def format_number(
         self,
-        number: numbers.Number | Decimal | float | None,
+        number: numbers.Number | Decimal | float | str | None,
         decimal_places: int | None = None,
         padding: str = ''
     ) -> str:
@@ -219,6 +219,9 @@ class Layout:
         otherwise 2.
 
         """
+        if isinstance(number, str):
+            return number
+
         if number is None:
             return ''
 
