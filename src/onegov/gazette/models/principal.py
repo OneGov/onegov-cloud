@@ -9,7 +9,7 @@ from typing import Never
 from typing import Self
 
 
-class Principal(msgpack.Serializable, keys=(
+class Principal(msgpack.Serializable, tag=40, keys=(
     'name',
     'logo',
     'logo_for_pdf',

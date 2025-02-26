@@ -142,7 +142,7 @@ class TicketCollectionPagination(Pagination[Ticket]):
         )
 
 
-@msgpack.make_serializable
+@msgpack.make_serializable(tag=60)
 class TicketCount(NamedTuple):
     open: int = 0
     pending: int = 0

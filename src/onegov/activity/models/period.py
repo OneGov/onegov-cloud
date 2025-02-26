@@ -243,7 +243,7 @@ class PeriodMetaBase(NamedTuple):
     age_barrier_type: str
 
 
-@msgpack.make_serializable
+@msgpack.make_serializable(tag=30)
 class PeriodMeta(PeriodMetaBase, PeriodMixin):
     # TODO: We would like to add a request scoped cache to
     #       all the properties on PeriodMixin, since they would

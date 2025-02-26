@@ -225,7 +225,7 @@ class Principal:
         raise NotImplementedError()
 
 
-class Canton(Principal, msgpack.Serializable, keys=(
+class Canton(Principal, msgpack.Serializable, tag=50, keys=(
     'canton',
     'domains_election',
     'domains_vote',
@@ -371,6 +371,7 @@ class Canton(Principal, msgpack.Serializable, keys=(
             has_districts=has_districts,
             has_regions=has_regions,
             has_superregions=has_superregions,
+            use_maps=True,
             **kwargs
         )
 
@@ -495,7 +496,7 @@ class Canton(Principal, msgpack.Serializable, keys=(
         return ''
 
 
-class Municipality(Principal, msgpack.Serializable, keys=(
+class Municipality(Principal, msgpack.Serializable, tag=51, keys=(
     'municipality',
     'canton',
     'canton_name',

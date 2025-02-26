@@ -137,18 +137,18 @@ def pages_cache_tween_factory(
             # GET requests are cached with the path and query string
             key = f'{request.method}:{request.path_qs}'
 
-        def create_response() -> tuple[str, int, list[tuple[str, str]]]:
+        def create_response() -> tuple[bytes, int, list[tuple[str, str]]]:
             response = handler(request)
-            return response.text, response.status_code, response.headerlist
+            return response.body, response.status_code, response.headerlist
 
         # NOTE: For serialization purposes we deconstruct the response
-        #       into its text, status_code and headerlist, which should
+        #       into its body, status_code and headerlist, which should
         #       be enough to fully reconstruct the response afterwards
-        text, status_code, headerlist = app.pages_cache.get_or_create(
+        body, status_code, headerlist = app.pages_cache.get_or_create(
             key,
             creator=create_response,
             should_cache_fn=should_cache_fn
         )
-        return Response(text, headerlist=headerlist, status=status_code)
+        return Response(body, headerlist=headerlist, status=status_code)
 
     return pages_cache_tween

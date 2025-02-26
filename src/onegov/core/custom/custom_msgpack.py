@@ -26,8 +26,10 @@ class Serializer(Generic[_T]):
 
     """
 
-    def __init__(self, target: type[_T]):
+    def __init__(self, tag: int, target: type[_T]):
         assert isinstance(target, type), 'expects a class'
+        assert 0 <= tag <= 127, 'needs to be between 0 and 127'
+        self.tag = tag
         self.target = target
 
     def encode(self, obj: _T) -> bytes:
@@ -42,11 +44,12 @@ class BytesSerializer(Serializer[_T]):
 
     def __init__(
         self,
+        tag: int,
         target: type[_T],
         encode: Callable[[_T], bytes],
         decode: Callable[[bytes], _T],
     ):
-        super().__init__(target)
+        super().__init__(tag, target)
 
         self._encode = encode
         self._decode = decode
@@ -63,11 +66,12 @@ class StringSerializer(Serializer[_T]):
 
     def __init__(
         self,
+        tag: int,
         target: type[_T],
         encode: Callable[[_T], str],
         decode: Callable[[str], _T],
     ):
-        super().__init__(target)
+        super().__init__(tag, target)
 
         self._encode = encode
         self._decode = decode
@@ -111,10 +115,11 @@ class DictionarySerializer(Serializer[_T]):
 
     """
 
-    def __init__(self, target: type[_T], keys: Iterable[str]):
-        super().__init__(target)
+    def __init__(self, tag: int, target: type[_T], keys: Iterable[str]):
+        super().__init__(tag, target)
 
-        self.keys = frozenset(keys)
+        self.keys = keys = tuple(keys)
+        assert len(keys) == len(set(keys)), 'duplicate keys given'
         self.constructor = getattr(target, 'from_dict', target)
 
     def encode(self, obj: _T) -> bytes:
@@ -138,7 +143,6 @@ class Serializers:
     by_type: dict[type[object], tuple[int, Serializer[Any]]]
 
     def __init__(self) -> None:
-        self._last_tag = 0
         self.by_tag = {}
         self.by_type = {}
 
@@ -147,13 +151,11 @@ class Serializers:
         serializer: Serializer[Any]
     ) -> None:
 
-        tag = self._last_tag
-        assert tag <= 127
+        tag = serializer.tag
         assert tag not in self.by_tag
         self.by_tag[tag] = serializer
         assert serializer.target not in self.by_type
         self.by_type[serializer.target] = (tag, serializer)
-        self._last_tag += 1
 
     def encode(self, value: object) -> object:
         tag_and_serializer = self.by_type.get(value.__class__)
@@ -184,30 +186,35 @@ class Serializers:
 default_serializers = Serializers()
 
 default_serializers.register(StringSerializer(
+    tag=0,
     target=datetime.datetime,
     encode=isodate.datetime_isoformat,
     decode=isodate.parse_datetime
 ))
 
 default_serializers.register(StringSerializer(
+    tag=1,
     target=datetime.time,
     encode=isodate.time_isoformat,
     decode=isodate.parse_time
 ))
 
 default_serializers.register(StringSerializer(
+    tag=2,
     target=datetime.date,
     encode=isodate.date_isoformat,
     decode=isodate.parse_date
 ))
 
 default_serializers.register(StringSerializer(
+    tag=3,
     target=Decimal,
     encode=str,
     decode=Decimal
 ))
 
 default_serializers.register(BytesSerializer(
+    tag=4,
     target=UUID,
     encode=lambda u: u.bytes,
     decode=lambda b: UUID(bytes=b)
@@ -217,6 +224,7 @@ default_serializers.register(BytesSerializer(
 #       maybe we're fine with tuples turning into lists
 #       remove `OPT_PASSTHROUGH_TUPLE` when removing this
 default_serializers.register(BytesSerializer(
+    tag=5,
     target=tuple,
     encode=lambda t: packb(list(t)),
     decode=lambda b: tuple(unpackb(b))
@@ -231,6 +239,7 @@ def load_keyed_tuple(b: bytes) -> AbstractKeyedTuple[Any]:
 
 
 default_serializers.register(BytesSerializer(
+    tag=6,
     target=AbstractKeyedTuple,
     encode=lambda t: packb([
         t.__class__.__name__,
@@ -240,6 +249,7 @@ default_serializers.register(BytesSerializer(
 ))
 
 default_serializers.register(StringSerializer(
+    tag=7,
     target=Markup,
     encode=str,
     decode=Markup
@@ -266,28 +276,34 @@ class Serializable:
     def serializers(cls) -> Serializers:
         return default_serializers  # for testing
 
-    def __init_subclass__(cls, keys: Collection[str], **kwargs: Any):
+    def __init_subclass__(cls, tag: int, keys: Collection[str], **kwargs: Any):
         super().__init_subclass__(**kwargs)
 
         cls.serialized_keys = keys
         cls.serializers().register(DictionarySerializer(
+            tag=tag,
             target=cls,
             keys=keys
         ))
 
 
 def make_serializable(
-    cls: _TypeT,
+    *,
+    tag: int,
     serializers: Serializers = default_serializers
-) -> _TypeT:
+) -> Callable[[_TypeT], _TypeT]:
 
-    keys = getattr(cls, '_fields', getattr(cls, '__slots__', ()))
-    assert keys, f'{cls!r} is not serializable'
-    serializers.register(DictionarySerializer(
-        target=cls,
-        keys=keys
-    ))
-    return cls
+    def decorator(cls: _TypeT) -> _TypeT:
+        keys = getattr(cls, '_fields', getattr(cls, '__slots__', ()))
+        assert keys, f'{cls!r} is not serializable'
+        serializers.register(DictionarySerializer(
+            tag=tag,
+            target=cls,
+            keys=keys
+        ))
+        return cls
+
+    return decorator
 
 
 PACK_OPTIONS = (

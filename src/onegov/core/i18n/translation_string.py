@@ -223,7 +223,14 @@ class TranslationStringSerializer(msgpack.Serializer[TranslationString]):
             str(obj.default),
             obj.domain,
             obj.context,
-            obj.mapping
+            {
+                # NOTE: This makes sure this is always serializable
+                #       internally this will be turned into a string
+                #       later anyways, we just have to make sure that
+                #       `Markup` is preserved for `TranslationMarkup`
+                k: str(v) if not isinstance(v, str) else v
+                for k, v in obj.mapping.items()
+            } if obj.mapping else None
         ))
 
     def decode(self, value: bytes) -> TranslationString:
@@ -238,8 +245,8 @@ class TranslationStringSerializer(msgpack.Serializer[TranslationString]):
 
 
 msgpack.default_serializers.register(
-    TranslationStringSerializer(target=TranslationString)
+    TranslationStringSerializer(tag=8, target=TranslationString)
 )
 msgpack.default_serializers.register(
-    TranslationStringSerializer(target=TranslationMarkup)
+    TranslationStringSerializer(tag=9, target=TranslationMarkup)
 )

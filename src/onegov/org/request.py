@@ -20,7 +20,7 @@ if TYPE_CHECKING:
     from onegov.ticket import Ticket
 
 
-@msgpack.make_serializable
+@msgpack.make_serializable(tag=20)
 class PageMeta(NamedTuple):
     id: int
     type: str

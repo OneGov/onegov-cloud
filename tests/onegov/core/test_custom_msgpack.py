@@ -75,6 +75,7 @@ def test_not_serializable():
 
 def test_string_serializer():
     s = msgpack.StringSerializer(
+        tag=0,
         target=str,
         encode=lambda s: s.upper(),
         decode=lambda s: s.lower()
@@ -87,6 +88,7 @@ def test_string_serializer():
 def test_dictionary_serializer():
 
     d = msgpack.DictionarySerializer(
+        tag=0,
         target=Point,
         keys=('x', 'y')
     )
@@ -97,14 +99,16 @@ def test_dictionary_serializer():
 def test_make_serializable():
     serializers = msgpack.Serializers()
 
-    msgpack.make_serializable(Point, serializers)
-    msgpack.make_serializable(PointTuple, serializers)
+    msgpack.make_serializable(tag=0, serializers=serializers)(Point)
+    msgpack.make_serializable(tag=1, serializers=serializers)(PointTuple)
 
     tag, s = serializers.by_type[Point]
+    assert tag == 0
     b = s.encode(Point(1, 2))
     assert serializers.decode(tag, b) == Point(1, 2)
 
     tag, s = serializers.by_type[PointTuple]
+    assert tag == 1
     b = s.encode(PointTuple(1, 2))
     assert serializers.decode(tag, b) == PointTuple(1, 2)
 
@@ -113,31 +117,41 @@ def test_serializers():
     serializers = msgpack.Serializers()
 
     serializers.register(msgpack.StringSerializer(
+        tag=0,
         target=str,
         encode=lambda s: s.upper(),
         decode=lambda s: s.lower()
     ))
 
     serializers.register(msgpack.DictionarySerializer(
+        tag=1,
         target=Point,
         keys=('x', 'y')
     ))
 
     tag, s = serializers.by_type[str]
+    assert tag == 0
     assert serializers.decode(tag, s.encode('asdf')) == 'asdf'
     tag, s = serializers.by_type[Point]
+    assert tag == 1
     assert serializers.decode(tag, s.encode(Point(1, 2))) == Point(1, 2)
 
 
 def test_serializable():
     serializers = msgpack.Serializers()
 
-    class SerializablePoint(Point, msgpack.Serializable, keys=('x', 'y')):
+    class SerializablePoint(
+        Point,
+        msgpack.Serializable,
+        tag=0,
+        keys=('x', 'y')
+    ):
 
         @classmethod
         def serializers(cls):
             return serializers  # for testing
 
     tag, s = serializers.by_type[SerializablePoint]
+    assert tag == 0
     b = s.encode(SerializablePoint(1, 2))
     assert serializers.decode(tag, b) == SerializablePoint(1, 2)
