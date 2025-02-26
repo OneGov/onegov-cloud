@@ -6,6 +6,9 @@ import ormsgpack
 
 from decimal import Decimal
 from markupsafe import Markup
+from sqlalchemy.util import lightweight_named_tuple
+from sqlalchemy.util._collections import AbstractKeyedTuple
+from types import GeneratorType
 from uuid import UUID
 
 
@@ -112,6 +115,7 @@ class DictionarySerializer(Serializer[_T]):
         super().__init__(target)
 
         self.keys = frozenset(keys)
+        self.constructor = getattr(target, 'from_dict', target)
 
     def encode(self, obj: _T) -> bytes:
         return packb([getattr(obj, k) for k in self.keys])
@@ -119,7 +123,7 @@ class DictionarySerializer(Serializer[_T]):
     def decode(self, value: bytes) -> _T:
         values = unpackb(value)
         assert isinstance(values, list)
-        return self.target(**dict(zip(self.keys, values, strict=True)))
+        return self.constructor(**dict(zip(self.keys, values, strict=True)))
 
 
 class Serializers:
@@ -151,11 +155,18 @@ class Serializers:
         self.by_type[serializer.target] = (tag, serializer)
         self._last_tag += 1
 
-    def encode(self, value: object) -> ormsgpack.Ext:
-        tag_and_serializer = self.by_type[value.__class__]
+    def encode(self, value: object) -> object:
+        tag_and_serializer = self.by_type.get(value.__class__)
 
         if tag_and_serializer is None:
-            raise TypeError(f'{value!r} is not MessagePack serializable')
+            if isinstance(value, dict):
+                return dict(value)
+            elif isinstance(value, AbstractKeyedTuple):
+                tag_and_serializer = self.by_type[AbstractKeyedTuple]
+            elif isinstance(value, GeneratorType):
+                tag_and_serializer = self.by_type[tuple]
+            else:
+                raise TypeError(f'{value!r} is not MessagePack serializable')
 
         tag, serializer = tag_and_serializer
         return ormsgpack.Ext(tag, serializer.encode(value))
@@ -209,6 +220,23 @@ default_serializers.register(BytesSerializer(
     target=tuple,
     encode=lambda t: packb(list(t)),
     decode=lambda b: tuple(unpackb(b))
+))
+
+
+# NOTE: SQLAlchemy result support
+def load_keyed_tuple(b: bytes) -> AbstractKeyedTuple[Any]:
+    name, items = unpackb(b)
+    cls = lightweight_named_tuple(name, items.keys())
+    return cls(**items)
+
+
+default_serializers.register(BytesSerializer(
+    target=AbstractKeyedTuple,
+    encode=lambda t: packb([
+        t.__class__.__name__,
+        {key: getattr(t, key) for key in t.keys()},
+    ]),
+    decode=load_keyed_tuple
 ))
 
 default_serializers.register(StringSerializer(

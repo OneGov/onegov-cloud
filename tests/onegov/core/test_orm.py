@@ -1669,12 +1669,10 @@ def test_request_cache(postgres_dsn, redis_url):
         @request_cached
         def secret_document(self):
             q = self.session().query(Document)
+            q = q.with_entities(Document.id, Document.title)
             q = q.filter(Document.title == 'Secret')
 
             return q.first()
-
-    # get dill to pickle the following inline class
-    global Document
 
     class Document(Base):
         __tablename__ = 'documents'
@@ -1754,15 +1752,10 @@ def test_request_cache_flush(postgres_dsn, redis_url):
 
         @orm_cached(policy='on-table-change:documents')
         def foo(self):
-            return self.session().query(Document).one()
-
-        @orm_cached(policy='on-table-change:documents')
-        def bar(self):
-            return self.session().query(Document)\
+            return (
+                self.session().query(Document)
                 .with_entities(Document.title).one()
-
-    # get dill to pickle the following inline class
-    global Document
+            )
 
     class Document(Base):
         __tablename__ = 'documents'
@@ -1787,18 +1780,17 @@ def test_request_cache_flush(postgres_dsn, redis_url):
     app.session().add(Document(id=1, title='Yo'))
     transaction.commit()
 
-    # both instances get cached
+    # instance gets cached
     assert app.foo.title == 'Yo'
-    assert app.bar.title == 'Yo'
 
-    # one instance changes without an explicit flush
-    app.foo.title = 'Sup'
+    # instance changes without an explicit flush
+    doc = app.session().query(Document).one()
+    doc.title = 'Sup'
 
-    # accessing the bar instance *first* fetches it from the cache which at
+    # accessing the instance *first* fetches it from the cache which at
     # this point would contain stale entries because we didn't flush explicitly
     # but thanks to our autoflush mechanism this doesn't happen
     assert app.session().dirty
-    assert app.bar.title == 'Sup'
     assert app.foo.title == 'Sup'
 
 

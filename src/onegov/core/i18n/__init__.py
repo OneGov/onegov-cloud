@@ -134,7 +134,10 @@ def default_locale_negotiator(
         return user_locale
 
     if request.accept_language:
-        locale = request.accept_language.lookup(locales, default='default')
+        locale = request.accept_language.lookup(
+            list(locales),
+            default='default'
+        )
         return locale if locale != 'default' else None
 
     return None
