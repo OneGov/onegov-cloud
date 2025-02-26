@@ -2,6 +2,7 @@ from datetime import date
 from datetime import datetime
 from freezegun import freeze_time
 from onegov.core.orm.abstract import MoveDirection
+from onegov.core.custom import msgpack
 from onegov.file.utils import as_fileintent
 from onegov.gazette.collections import OrganizationCollection
 from onegov.gazette.models import Category
@@ -51,6 +52,32 @@ class DummyRequest:
 
     def translate(self, text):
         return text.interpolate()
+
+
+def test_msgpack_roundtrip(gazette_app):
+    principal = gazette_app.principal
+    principal.canton = 'zg'
+    principal.sogc_import = {
+        'canton': 'ZG',
+        'endpoint': 'https://localhost',
+        'username': 'user',
+        'password': 'pass',
+        'category': 100,
+        'organization': 200
+    }
+    deserialized = msgpack.unpackb(msgpack.packb(principal))
+    assert deserialized.name == principal.name
+    assert deserialized.canton == principal.canton
+    assert deserialized.logo == principal.logo
+    assert deserialized.logo_for_pdf == principal.logo_for_pdf
+    assert deserialized.color == principal.color
+    assert deserialized.on_accept == principal.on_accept
+    assert deserialized.time_zone == principal.time_zone
+    assert deserialized.help_link == principal.help_link
+    assert deserialized.publishing == principal.publishing
+    assert deserialized.frontend == principal.frontend
+    assert deserialized.sogc_import == principal.sogc_import
+    assert deserialized.links == principal.links
 
 
 def test_category(session):

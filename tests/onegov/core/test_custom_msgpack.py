@@ -62,6 +62,7 @@ def test_custom_msgpack():
         context='bar',
         mapping={'name': 'John Doe'}
     ),
+    {'a': Decimal(1), None: Decimal(2)}
 ])
 def test_roundtrip(data):
     return msgpack.unpackb(msgpack.packb(data)) == data

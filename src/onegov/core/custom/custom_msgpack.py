@@ -263,9 +263,14 @@ def make_serializable(
 
 
 PACK_OPTIONS = (
+    # NOTE: Technically we only need this for one instance where we
+    #       want `None` as a key, but it should be fine to allow
+    #       other types as well. It only allows the basic types
+    #       anyways and no Ext types.
+    ormsgpack.OPT_NON_STR_KEYS
     # NOTE: We want serialization to be fully reversible
     #       so we use our own serialization for these
-    ormsgpack.OPT_PASSTHROUGH_SUBCLASS
+    | ormsgpack.OPT_PASSTHROUGH_SUBCLASS
     | ormsgpack.OPT_PASSTHROUGH_DATACLASS
     | ormsgpack.OPT_PASSTHROUGH_DATETIME
     | ormsgpack.OPT_PASSTHROUGH_TUPLE
@@ -285,4 +290,5 @@ def unpackb(value: bytes) -> Any:
     return ormsgpack.unpackb(
         value,
         ext_hook=default_serializers.decode,
+        option=ormsgpack.OPT_NON_STR_KEYS,
     )
