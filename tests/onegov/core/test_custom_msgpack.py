@@ -39,8 +39,9 @@ def test_custom_msgpack():
         'decimal': Decimal('3.1415926')
     }
 
-    data['generator'] = [Decimal(x) for x in range(0, 2)]
-    assert msgpack.unpackb(msgpack.packb(data)) == data
+    packed = msgpack.packb(data)
+    data['generator'] = tuple(Decimal(x) for x in range(0, 2))
+    assert msgpack.unpackb(packed) == data
 
 
 @pytest.mark.parametrize('data', [
