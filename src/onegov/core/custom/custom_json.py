@@ -230,8 +230,13 @@ class Serializers:
         if serializer:
             return serializer.encode(value)
 
-        if isinstance(value, types.GeneratorType):
-            return tuple(v for v in value)
+        # NOTE: orjson will not natively detect tuple subclasses
+        #       like namedtuple/NamedTuple, so we need to check
+        #       for it here if we want feature parity, we could
+        #       also decide to serialize NamedTuple and dataclasses
+        #       as dictionaries in the future.
+        if isinstance(value, (tuple, types.GeneratorType)):
+            return list(value)
 
         raise TypeError('{} is not JSON serializable'.format(repr(value)))
 
