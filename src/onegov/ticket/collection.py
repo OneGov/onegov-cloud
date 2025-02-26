@@ -3,6 +3,7 @@ from __future__ import annotations
 import random
 
 from onegov.core.collection import Pagination
+from onegov.core.custom import msgpack
 from onegov.ticket import handlers as global_handlers
 from onegov.ticket.model import Ticket
 from sqlalchemy import desc, distinct, func
@@ -141,6 +142,7 @@ class TicketCollectionPagination(Pagination[Ticket]):
         )
 
 
+@msgpack.make_serializable(tag=60)
 class TicketCount(NamedTuple):
     open: int = 0
     pending: int = 0

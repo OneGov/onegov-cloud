@@ -2,6 +2,7 @@ from __future__ import annotations
 
 from markupsafe import escape
 from markupsafe import Markup
+from onegov.core.custom import msgpack
 from translationstring import TranslationString
 
 
@@ -212,3 +213,40 @@ def TranslationStringFactory(factory_domain: str) -> TStrCallable:  # noqa: N802
             context=context
         )
     return create
+
+
+class TranslationStringSerializer(msgpack.Serializer[TranslationString]):
+
+    def encode(self, obj: TranslationString) -> bytes:
+        return msgpack.packb((
+            str(obj),
+            str(obj.default),
+            obj.domain,
+            obj.context,
+            {
+                # NOTE: This makes sure this is always serializable
+                #       internally this will be turned into a string
+                #       later anyways, we just have to make sure that
+                #       `Markup` is preserved for `TranslationMarkup`
+                k: str(v) if not isinstance(v, str) else v
+                for k, v in obj.mapping.items()
+            } if obj.mapping else None
+        ))
+
+    def decode(self, value: bytes) -> TranslationString:
+        msgid, default, domain, context, mapping = msgpack.unpackb(value)
+        return self.target(
+            msgid,
+            default=default,
+            domain=domain,
+            context=context,
+            mapping=mapping
+        )
+
+
+msgpack.default_serializers.register(
+    TranslationStringSerializer(tag=8, target=TranslationString)
+)
+msgpack.default_serializers.register(
+    TranslationStringSerializer(tag=9, target=TranslationMarkup)
+)

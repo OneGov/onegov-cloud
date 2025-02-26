@@ -6,7 +6,7 @@ import weakref
 import zope.sqlalchemy
 
 from blinker import Signal
-from onegov.core.cache import lru_cache
+from functools import lru_cache
 from onegov.core.custom import json
 from sqlalchemy import create_engine, event, text
 from sqlalchemy.orm import scoped_session, sessionmaker

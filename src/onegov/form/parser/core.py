@@ -392,7 +392,7 @@ import yaml
 from functools import cached_property
 from dateutil import parser as dateutil_parser
 from decimal import Decimal
-from onegov.core.cache import lru_cache
+from functools import lru_cache
 from onegov.core.utils import Bunch
 from onegov.form import errors
 from onegov.form.parser.grammar import checkbox, field_help_identifier
