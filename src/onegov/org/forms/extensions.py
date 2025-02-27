@@ -282,6 +282,10 @@ class PublicationFormExtension(FormExtension[FormT], name='publication'):
             )
 
             def on_request(self) -> None:
+                if not self.request.app.org.meta.get(
+                        'firebase_adminsdk_credential'
+                ):
+                    return None
 
                 id_topic_pairs = self.request.app.org.meta.get(
                     'selectable_push_notification_options',

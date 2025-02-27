@@ -825,6 +825,8 @@ def send_push_notifications_for_news(request: OrgRequest) -> None:
 
     Then uses Firebase to send notifications to the corresponding topics.
     """
+    print('send_push_notifications_for_news')
+
     session = request.session
     org = request.app.org
     now = utcnow()

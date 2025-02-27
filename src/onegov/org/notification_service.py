@@ -4,7 +4,7 @@ from firebase_admin import messaging  # type:ignore[import-untyped]
 from firebase_admin.exceptions import (  # type:ignore[import-untyped]
     FirebaseError
 )
-import firebase_admin  # type: ignore[import-untyped]
+import firebase_admin
 from firebase_admin import credentials as firebase_credentials
 
 import json
@@ -154,7 +154,7 @@ class TestNotificationService(NotificationService):
 
 
 # Global registry for testing
-_TEST_NOTIFICATION_SERVICE = None
+_TEST_NOTIFICATION_SERVICE: NotificationService | None = None
 
 
 def get_notification_service(

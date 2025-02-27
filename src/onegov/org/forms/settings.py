@@ -1515,7 +1515,6 @@ class FirebaseSettingsForm(Form):
                 ).format(', '.join(missing_keys))
                 raise ValidationError(error_message)
         except json.JSONDecodeError as err:
-            breakpoint()
             raise ValidationError(
                 _('Invalid JSON format in Firebase credentials')
             ) from err
