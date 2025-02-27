@@ -1,7 +1,7 @@
 from __future__ import annotations
 
 from decimal import Decimal
-from onegov.core.cache import lru_cache
+from functools import lru_cache
 from onegov.activity import Attendee
 from onegov.activity import Booking, BookingCollection, Occasion
 from onegov.activity.matching import deferred_acceptance_from_database

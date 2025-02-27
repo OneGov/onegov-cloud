@@ -931,13 +931,17 @@ def test_view_notices_importation(gazette_app):
     assert "notices/imported" not in client.get('/notices/drafted/statistics')
 
     principal = gazette_app.principal
+    # NOTE: Need to use a real canton here, since deserialization
+    #       goes through the same validation as a regular instance
+    #       for safety
+    principal.canton = 'zg'
     principal.sogc_import = {
-        'canton': 'GV',
+        'canton': 'ZG',
         'endpoint': 'https://localhost',
         'username': 'user',
         'password': 'pass',
         'category': 100,
-        'organiaztion': 200
+        'organization': 200
     }
     gazette_app.cache.set('principal', principal)
 

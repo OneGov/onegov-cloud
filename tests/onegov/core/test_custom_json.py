@@ -23,7 +23,7 @@ def test_custom_json():
         'datetime': dt,
         'date': dt.date(),
         'time': dt.time(),
-        'generator': (x for x in range(0, 4)),
+        'generator': (Decimal(x) for x in range(0, 2)),
         'decimal': Decimal('3.1415926')
     }
 
@@ -33,9 +33,9 @@ def test_custom_json():
     assert '__date__@2015-06-25' in text
     assert '__datetime__@2015-06-25T12:00:00' in text
     assert '__decimal__@3.1415926' in text
-    assert '[0,1,2,3]' in text
+    assert '["__decimal__@0","__decimal__@1"]' in text
 
-    data['generator'] = [x for x in range(0, 4)]
+    data['generator'] = [Decimal(x) for x in range(0, 2)]
     assert json.loads(text) == data
 
 

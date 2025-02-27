@@ -186,13 +186,17 @@ class OrgApp(Framework, LibresIntegration, ElasticsearchApp, MapboxApp,
         return self.session().query(Organisation).first()  # type:ignore
 
     @orm_cached(policy='on-table-change:organisations')
-    def homepage_template(self) -> PageTemplate:
+    def _homepage_template_str(self) -> str:
         structure = self.org.meta.get('homepage_structure')
         if structure:
             widgets = self.config.homepage_widget_registry.values()
-            return PageTemplate(transform_structure(widgets, structure))
+            return transform_structure(widgets, structure)
         else:
-            return PageTemplate('')
+            return ''
+
+    @property
+    def homepage_template(self) -> PageTemplate:
+        return PageTemplate(self._homepage_template_str)
 
     @orm_cached(policy='on-table-change:tickets')
     def ticket_count(self) -> TicketCount:

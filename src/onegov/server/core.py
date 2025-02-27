@@ -139,6 +139,8 @@ class Server:
         # morepath is only loaded if there's at lest one app depending on it
         if next(self.applications.morepath_applications(), None):
             import morepath
+            from onegov.server.utils import patch_morepath
+            patch_morepath()
             morepath.autoscan()
 
     def handle_request(

@@ -4,7 +4,7 @@ import os
 import pglast  # type:ignore[import-untyped]
 import re
 
-from onegov.core.cache import lru_cache
+from functools import lru_cache
 from onegov.core.orm import types as onegov_types
 from sqlalchemy import text
 from sqlalchemy import types as sqlalchemy_types

@@ -6,6 +6,7 @@ from datetime import date, datetime
 from onegov.activity.models.age_barrier import AgeBarrier
 from onegov.activity.models.booking import Booking
 from onegov.activity.models.occasion import Occasion
+from onegov.core.custom import msgpack
 from onegov.core.orm import Base
 from onegov.core.orm.mixins import TimestampMixin
 from onegov.core.orm.types import UUID, JSON
@@ -242,6 +243,7 @@ class PeriodMetaBase(NamedTuple):
     age_barrier_type: str
 
 
+@msgpack.make_serializable(tag=30)
 class PeriodMeta(PeriodMetaBase, PeriodMixin):
     # TODO: We would like to add a request scoped cache to
     #       all the properties on PeriodMixin, since they would

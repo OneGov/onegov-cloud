@@ -23,14 +23,13 @@ import urllib.request
 from collections.abc import Iterable
 from contextlib import contextmanager
 from cProfile import Profile
-from functools import reduce
+from functools import lru_cache, reduce, cache
 from importlib import import_module
 from io import BytesIO, StringIO
 from itertools import groupby, islice
 from markupsafe import escape
 from markupsafe import Markup
 from onegov.core import log
-from onegov.core.cache import lru_cache
 from onegov.core.custom import json
 from onegov.core.errors import AlreadyLockedError
 from purl import URL
@@ -405,7 +404,7 @@ def linkify_phone(text: str) -> Markup:
         _phone_ch_html_safe.sub(handle_match, escape(text)))
 
 
-@lru_cache(maxsize=None)
+@cache
 def top_level_domains() -> set[str]:
     try:
         return URLExtract()._load_cached_tlds()
