@@ -26,6 +26,7 @@ from onegov.org.models import (
 from onegov.org.models.extensions import (
     GeneralFileLinkExtension, DeletableContentExtension)
 from onegov.org.models.ticket import ReservationHandler
+from onegov.gever.encrypt import decrypt_symmetric
 from onegov.org.views.allocation import handle_rules_cronjob
 from onegov.org.views.directory import (
     send_email_notification_for_directory_entry)
@@ -41,6 +42,9 @@ from sedate import to_timezone, utcnow, align_date_to_day
 from sqlalchemy import and_, or_, func
 from sqlalchemy.orm import undefer
 from uuid import UUID
+from onegov.org.notification_service import (
+    get_notification_service,
+)
 
 
 from typing import Any, TYPE_CHECKING
@@ -806,3 +810,121 @@ def delete_unconfirmed_newsletter_subscriptions(request: OrgRequest) -> None:
 
     if count:
         print(f'Cron: Deleted {count} unconfirmed newsletter subscriptions')
+
+
+@OrgApp.cronjob(hour='*', minute='*/10', timezone='UTC')
+def send_push_notifications_for_news(request: OrgRequest) -> None:
+    """
+    Cronjob that runs every 10 minutes to send push notifications for news
+    items that were published within the last 10 minutes.
+
+    It collects all news items with:
+    - Publication start date within the last 10 minutes
+    - send_push_notifications_to_app flag enabled
+    - Defined push_notifications topics
+
+    Then uses Firebase to send notifications to the corresponding topics.
+    """
+    print('_send_push_notifications_for_news')
+
+    session = request.session
+    org = request.app.org
+    now = utcnow()
+    ten_minutes_ago = now - timedelta(minutes=10)
+
+    # Skip if no Firebase credentials are configured
+    if not org.firebase_adminsdk_credential:
+        print('No Firebase credentials configured')
+        return
+
+    # Get all news items that should trigger push notifications
+    query = session.query(News)
+    query = query.filter(News.published == True)
+    query = query.filter(
+        News.publication_start >= ten_minutes_ago,
+        News.publication_start <= now,
+    )
+    only_public_news = query.filter(or_(
+        News.meta['access'].astext == 'public',
+        News.meta['access'].astext == None
+    ))
+    only_public_with_send_push_notification = only_public_news.filter(
+        News.meta['send_push_notifications_to_app'].astext == 'true'
+    )
+
+    news_items = only_public_with_send_push_notification.all()
+    if not news_items:
+        print('No news items found with push notifications enabled')
+        return
+
+    # Get the mapping of topic IDs to hashtags
+    topic_mapping = org.meta.get('selectable_push_notification_options', [])
+    if not topic_mapping:
+        print('selectable_push_notification_options is empty')
+        return
+
+    # Decrypt the Firebase credentials
+    key_base64 = request.app.hashed_identity_key
+    encrypted_creds = org.firebase_adminsdk_credential
+    if not encrypted_creds:
+        print('No Firebase credentials found')
+        return
+
+    try:
+        firebase_creds_json = decrypt_symmetric(
+            encrypted_creds.encode('utf-8'), key_base64
+        )
+        # Get notification service
+        notification_service = get_notification_service(firebase_creds_json)
+
+        # Process each news item for notifications
+        sent_count = 0
+        for news in news_items:
+            # Get the topics to send to
+            topics = news.meta.get('push_notifications', [])
+            if not topics:
+                print(f'No topics configured for news item: {news.title}')
+                continue
+
+            print(
+                f'Sending notification for news: {news.title} to '
+                f'{len(topics)} topics'
+            )
+
+            # Send to each topic
+            for topic_id, topic_name in topics:
+                notification_title = news.title
+                notification_body = news.lead or f'New post in {topic_name}'
+
+                notification_data = {
+                    'title': news.title,
+                    'body': news.lead or news.title,
+                    'url': request.link(news)
+                }
+
+                try:
+                    response = notification_service.send_notification(
+                        topic=topic_id,
+                        title=notification_title,
+                        body=notification_body,
+                        data=notification_data
+                    )
+                    sent_count += 1
+                    print(
+                        f"Successfully sent notification to topic "
+                        f"'{topic_id}' for news '{news.title}'."
+                        f"Response: {response}"
+                    )
+                except Exception as e:
+                    print(
+                        f"Error sending notification to topic "
+                        f"'{topic_id}' for news '{news.title}': {e}"
+                    )
+
+        if sent_count:
+            print(f'Cron: Sent {sent_count} push notifications for news items')
+        else:
+            print('No notifications were sent')
+
+    except Exception as e:
+        print(f'Error sending notifications: {e}')

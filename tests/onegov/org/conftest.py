@@ -9,9 +9,12 @@ import pytest
 from onegov.chat import MessageCollection
 from onegov.core.elements import Element
 from onegov.core.orm.observer import ScopedPropertyObserver
-from onegov.core.utils import Bunch
-from onegov.form import FormDefinitionCollection, \
-    FormCollection, FormSubmission
+from onegov.core.utils import Bunch, module_path
+from onegov.form import (
+    FormDefinitionCollection,
+    FormCollection,
+    FormSubmission,
+)
 from onegov.org import OrgApp
 from onegov.org.initial_content import create_new_organisation
 from onegov.org.layout import DefaultLayout
@@ -503,3 +506,12 @@ class LimitingHandler(Handler):
             return query.limit(extra_parameters['limit'])
         else:
             return query
+
+
+@pytest.fixture(scope='session')
+def firebase_json():
+    json = 'firebase.json'
+    json_path = module_path('tests.onegov.org', '/fixtures/' + json)
+
+    with open(json_path, 'r') as f:
+        yield f.read()
