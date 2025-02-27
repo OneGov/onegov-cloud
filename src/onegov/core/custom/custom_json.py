@@ -363,6 +363,7 @@ def dumps(
             return json.dumps(
                 obj,
                 default=default_serializers.encode,
+                separators=(',', ':'),
                 ensure_ascii=True,
                 indent=indent,
                 sort_keys=sort_keys,
