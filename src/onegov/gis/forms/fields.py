@@ -87,11 +87,10 @@ class CoordinatesField(StringField):
         self.data = getattr(self, 'data', Coordinates())
 
     def _value(self) -> str:
-        text = json.dumps(self.data) or '{}'
-        text_b = b64encode(text.encode('ascii'))
-        text = text_b.decode('ascii')
+        text = b'{}' if self.data is None else json.dumps_bytes(self.data)
+        text = b64encode(text)
 
-        return text
+        return text.decode('ascii')
 
     def process_data(self, value: object) -> None:
         if isinstance(value, dict):
@@ -107,9 +106,7 @@ class CoordinatesField(StringField):
     def process_formdata(self, valuelist: list[RawFormValue]) -> None:
         if valuelist and valuelist[0]:
             assert isinstance(valuelist[0], str)
-            text_b = b64decode(valuelist[0])
-            text = text_b.decode('ascii')
-            data = json.loads(text)
+            data = json.loads(b64decode(valuelist[0]))
 
             # if the data we receive doesn't result in a coordinates value
             # for some reason, we create one

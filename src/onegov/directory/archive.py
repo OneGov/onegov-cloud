@@ -528,8 +528,8 @@ class DirectoryArchiveWriter:
                 tempfile.close()
 
     def write_json(self, path: Path, data: JSON_ro) -> None:
-        with open(str(path), 'w') as f:
-            json.dump(data, f, sort_keys=True, indent=2)
+        with open(str(path), 'wb') as f:
+            json.dump_bytes(data, f, sort_keys=True, indent=2)
 
     def write_xlsx(self, path: Path, data: Iterable[dict[str, Any]]) -> None:
         with open(str(path), 'wb') as f:

@@ -12,6 +12,7 @@ from __future__ import annotations
 
 import datetime
 import isodate
+import json
 import orjson
 import re
 import types
@@ -332,6 +333,7 @@ DEFAULT_DUMPS_OPTIONS = (
 def dumps(
     obj: None,
     *,
+    ensure_ascii: bool = False,
     sort_keys: bool = False,
     indent: Literal[2] | None = None,
 ) -> None: ...
@@ -339,6 +341,7 @@ def dumps(
 def dumps(
     obj: Any,
     *,
+    ensure_ascii: bool = False,
     sort_keys: bool = False,
     indent: Literal[2] | None = None,
 ) -> str: ...
@@ -347,11 +350,23 @@ def dumps(
 def dumps(
     obj: Any | None,
     *,
+    ensure_ascii: bool = False,
     sort_keys: bool = False,
     indent: Literal[2] | None = None,
 ) -> str | None:
 
     if obj is not None:
+        if ensure_ascii:
+            # NOTE: We sometimes dump json to headers for intercooler
+            #       in which case we need to ensure ascii, which we
+            #       can only do with stdlib's json.dumps
+            return json.dumps(
+                obj,
+                default=default_serializers.encode,
+                ensure_ascii=True,
+                indent=indent,
+                sort_keys=sort_keys,
+            )
         return dumps_bytes(
             obj,
             sort_keys=sort_keys,
@@ -398,6 +413,16 @@ def dump(
     indent: Literal[2] | None = None,
 ) -> None:
     fp.write(dumps(data, sort_keys=sort_keys, indent=indent))
+
+
+def dump_bytes(
+    data: Any,
+    fp: SupportsWrite[bytes],
+    *,
+    sort_keys: bool = False,
+    indent: Literal[2] | None = None,
+) -> None:
+    fp.write(dumps_bytes(data, sort_keys=sort_keys, indent=indent))
 
 
 def load(fp: SupportsRead[str | bytes]) -> Any:
