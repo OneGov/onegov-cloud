@@ -1,8 +1,68 @@
 # Changes
 
+## 2025.9
+
+`2025-02-27` | [b76a07b02c...b137397a09](https://github.com/OneGov/onegov-cloud/compare/b76a07b02c^...b137397a09)
+
+### Core
+
+##### Switches Redis cache serialization over to MessagePack
+
+`Feature` | [OGC-1893](https://linear.app/onegovcloud/issue/OGC-1893) | [101a9ae5dc](https://github.com/onegov/onegov-cloud/commit/101a9ae5dcf6e91047790aa5000cf9409dff6deb)
+
+##### Use orjson for JSON serialization/deserialization
+
+`Performance` | [2954d7ead4](https://github.com/onegov/onegov-cloud/commit/2954d7ead433c92adab96d424a1c2ff77d347b9d)
+
+### Org
+
+##### Remove unconfirmed subscribers
+
+Remove unconfirmed subscribers after 7 days of initial subscription. Also display date of subscription on recipients-view and export.
+
+`Feature` | [OGC-2017](https://linear.app/onegovcloud/issue/OGC-2017) | [b76a07b02c](https://github.com/onegov/onegov-cloud/commit/b76a07b02c2e6d8385b97694edd24c6f6955df71)
+
+##### Show total price in ticket and confirmation email
+
+`Feature` | [OGC-2053](https://linear.app/onegovcloud/issue/OGC-2053) | [b1a7c0afb6](https://github.com/onegov/onegov-cloud/commit/b1a7c0afb6eb906bc74273e561891e5b647b917a)
+
+### Pas
+
+##### Fix parliamentary settlement calculations and export functionality.
+
+- Only show exports that have at least one entry in table
+- Fix expense calculation to prevent double-counting of base totals
+- Implement missing cost-of-living adjustment in parliamentarian export
+- Perform the calculation for getting the Quartal with no assumptions
+- Make sure parliamentarians are correctly linked to their parties during
+ the times they attended, not just when they first joined. Indeed, party 
+changes should be expected and accounted for
+- Ensure role activity is verified at specific attendance times.
+- Replace manual HTML string formatting
+
+`Bugfix` | [OGC-1503](https://linear.app/onegovcloud/issue/OGC-1503) | [199f1a8282](https://github.com/onegov/onegov-cloud/commit/199f1a828264e7a089a9383771ce55b905307cfb)
+
+### Town6
+
+##### Adds a dashboard with basic figures
+
+`Feature` | [OGC-1528](https://linear.app/onegovcloud/issue/OGC-1528) | [48df75dc30](https://github.com/onegov/onegov-cloud/commit/48df75dc3055387bddd9f76677590ab01b040d58)
+
+##### Adding firebase push notifications.
+
+Town6: Adds firebase push notifications.
+
+`Feature` | [OGC-1951](https://linear.app/onegovcloud/issue/OGC-1951) | [b137397a09](https://github.com/onegov/onegov-cloud/commit/b137397a095f27d1854494a238a2cdb9e8f8724c)
+
+### Websockets
+
+##### Switches away from the deprecated legacy websockets
+
+`Feature` | [OGC-1735](https://linear.app/onegovcloud/issue/OGC-1735) | [61931a3714](https://github.com/onegov/onegov-cloud/commit/61931a3714f26baa84312a2a69f87250b52f4686)
+
 ## 2025.8
 
-`2025-02-20` | [7b612693f4...cc8c03ba1a](https://github.com/OneGov/onegov-cloud/compare/7b612693f4^...cc8c03ba1a)
+`2025-02-20` | [7b612693f4...d2765ca4af](https://github.com/OneGov/onegov-cloud/compare/7b612693f4^...d2765ca4af)
 
 ### Agency
 
@@ -2327,8 +2387,4 @@ This is a silly hack introduced by ZG and only available for them. All other pri
 ##### Bug Fix for hidden navigation in safari
 
 `Bugfix` | [OGC-1570](https://linear.app/onegovcloud/issue/OGC-1570) | [776a135472](https://github.com/onegov/onegov-cloud/commit/776a1354729f0ab9dec5d7447e4008edd239a914)
-
-## 2024.23
-
-`2024-04-09` | [f190133e5d...74d1f1f871](https://github.com/OneGov/onegov-cloud/compare/f190133e5d^...74d1f1f871)
 
