@@ -6435,3 +6435,12 @@ msgstr "Der Benutzer wurde erfolgreich erstellt"
 
 msgid "Item(s)"
 msgstr "Stück(e)"
+
+msgid "Value Added Tax"
+msgstr "Mehrwertsteuer"
+
+msgid "VAT Rate"
+msgstr "Mehrwertsteuersatz"
+
+msgid "VAT"
+msgstr "MwSt"
