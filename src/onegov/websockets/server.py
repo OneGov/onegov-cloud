@@ -1,8 +1,9 @@
 from __future__ import annotations
 
-import hashlib
 import http
 from asyncio import Future
+from cryptography.hazmat.primitives.hashes import SHA256
+from cryptography.hazmat.primitives.kdf.hkdf import HKDF
 from functools import cached_property, partial
 from http.cookies import SimpleCookie
 from json import dumps, loads
@@ -121,12 +122,28 @@ class WebSocketServer(ServerConnection):
         self.session.flush()
         transaction.commit()
 
-    def unsign(self, text: str) -> str | None:
+    @cached_property
+    def identity_secret(self) -> str:
+        """ The identity secret, guaranteed to only be valid for the current
+        application id.
+
+        """
+        return HKDF(
+            algorithm=SHA256(),
+            length=32,
+            # NOTE: salt should generally be left blank or use pepper
+            #       the better way to provide salt is to add it to info
+            #       see: https://soatok.blog/2021/11/17/understanding-hkdf/
+            salt=None,
+            info=self.application_id.encode('utf-8') + b'+identity'
+        ).derive(
+            self.application_config['identity_secret'].encode('utf-8')
+        ).hex()
+
+    def unsign(self, text: str, salt: str = 'generic-signer') -> str | None:
         """ Unsigns a signed text, returning None if unsuccessful. """
-        identity_secret = self.application_config[
-            'identity_secret'] + self.application_id_hash
         try:
-            signer = Signer(identity_secret, salt='generic-signer')
+            signer = Signer(self.identity_secret, salt=salt)
             return signer.unsign(text).decode('utf-8')
         except BadSignature:
             return None
@@ -141,22 +158,7 @@ class WebSocketServer(ServerConnection):
 
         return session
 
-    @property
-    def application_id_hash(self) -> str:
-        """ The application_id as hash, use this if the application_id can
-        be read by the user -> this obfuscates things slightly.
-
-        """
-        # sha-1 should be enough, because even if somebody was able to get
-        # the cleartext value I honestly couldn't tell you what it could be
-        # used for ...
-        return hashlib.new(  # nosec: B324
-            'sha1',
-            self.application_id.encode('utf-8'),
-            usedforsecurity=False
-        ).hexdigest()
-
-    @property
+    @cached_property
     def session_cache(self) -> cache.RedisCacheRegion:
         """ A cache that is kept for a long-ish time. """
         day = 60 * 60 * 24
@@ -167,15 +169,15 @@ class WebSocketServer(ServerConnection):
                                                   'redis://127.0.0.1:6379/0')
         )
 
-    @property
+    @cached_property
     def namespace(self) -> str:
         return self.schema.split('-', 1)[0]
 
-    @property
+    @cached_property
     def application_id(self) -> str:
         return '/'.join(self.schema.split('-', 1))
 
-    @property
+    @cached_property
     def application_config(self) -> dict[str, Any]:
         for c in self.config.applications:
             if c.namespace == self.namespace:
@@ -731,7 +733,7 @@ def process_request(
     try:
         cookie = SimpleCookie(request.headers.get_all('Cookie')[0])
         session_id = cookie['session_id'].value
-    except KeyError:
+    except IndexError:
         log.error(
             'No session cookie found in request. '
             'Check that you sent the request from the same origin as '
@@ -800,8 +802,8 @@ async def main(
         # origins?
         async with serve(handle_start, host, port,
                          process_request=process_request,
-                         create_server=partial(WebSocketServer, config,
-                                                 session_manager, host)):
+                         create_connection=partial(WebSocketServer, config,  # type: ignore[arg-type]
+                                                   session_manager, host)):
             await Future()
 
     else:
