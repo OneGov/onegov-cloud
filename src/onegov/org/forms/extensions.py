@@ -301,6 +301,7 @@ class PushNotificationFormExtension(FormExtension[FormT], name='publish'):
             send_push_notifications_to_app = BooleanField(
                 label=_('Send push notifications to app'),
                 fieldset=_('Publication'),
+                validators=[StrictOptional()],
                 render_kw={'disabled': 'disabled'},  # Starts as disabled
             )
             push_notifications = MultiCheckboxField(
