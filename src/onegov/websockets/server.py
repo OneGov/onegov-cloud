@@ -476,6 +476,7 @@ async def handle_customer_chat(
                     'time': escape(content['time']),
                 })
                 chat.chat_history = chat_history
+                await websocket.update_database()
 
     except Exception as e:
         if not isinstance(e, ConnectionClosed):
@@ -573,6 +574,7 @@ async def handle_staff_chat(
                         'time': escape(content['time']),
                     })
                     chat.chat_history = chat_history
+                    await websocket.update_database()
 
                 elif content['type'] == 'reconnect':
                     log.debug(f'reconnecting to channel {content["channel"]}')
@@ -596,6 +598,7 @@ async def handle_staff_chat(
                         continue
 
                     chat.active = False
+                    await websocket.update_database()
 
                 elif content['type'] == 'accepted':
                     log.debug('staff-member accepted-request')
@@ -641,6 +644,7 @@ async def handle_staff_chat(
                     #        as an UUID, since otherwise the DB update will
                     #        fail anyways
                     chat.user_id = escape(content['userId'])  # type:ignore
+                    await websocket.update_database()
 
                 elif content['type'] == 'request-chat-history':
                     open_channel = content['channel']
