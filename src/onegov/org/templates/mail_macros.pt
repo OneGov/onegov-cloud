@@ -90,6 +90,7 @@
 
 <metal:price define-macro="price" i18n:domain="onegov.org">
     ${layout.format_number(price.net_amount)} ${price.currency}
+    ${layout.format_vat(price.net_amount)}
     <tal:b condition="price.fee and show_fee|nothing">
         (+ ${layout.format_number(price.fee)} <tal:b i18n:translate>Credit Card Fee</tal:b>)
     </tal:b>

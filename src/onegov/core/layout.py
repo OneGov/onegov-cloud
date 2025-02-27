@@ -8,6 +8,7 @@ import numbers
 import sedate
 
 from datetime import datetime
+from decimal import Decimal
 from functools import cached_property
 from functools import lru_cache
 from onegov.core import utils
@@ -19,7 +20,6 @@ if TYPE_CHECKING:
     from chameleon import PageTemplateFile
     from collections.abc import Callable, Collection, Iterable, Iterator
     from datetime import date
-    from decimal import Decimal
 
     from .framework import Framework
     from .request import CoreRequest
@@ -234,6 +234,26 @@ class Layout:
         decimal, group = self.number_symbols(self.request.locale)
         result = '{{:{},.{}f}}'.format(padding, decimal_places).format(number)
         return result.translate({ord(','): group, ord('.'): decimal})
+
+    def format_vat(self, amount: numbers.Number | Decimal | float | None,
+                   currency: str = 'CHF') -> str:
+        """
+        Takes the given amount and currency returning the VAT string if the
+        VAT rate is set in the organization settings. The VAT string can be
+        placed right after a price value.
+        """
+        vat_rate = Decimal(self.app.org.vat_rate or 0.0)
+
+        if amount is not None and vat_rate:
+            if isinstance(amount, (int, float)):
+                amount = Decimal(amount)
+
+            vat = amount * vat_rate / 100
+            vat_str = (f'(MwSt. {self.format_number(vat_rate, 1)}%'
+                       f' enthalten: {self.format_number(vat)} {currency})')
+            return vat_str
+
+        return ''
 
     @property
     def view_name(self) -> str | None:

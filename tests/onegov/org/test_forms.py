@@ -744,10 +744,16 @@ def test_price_submission(client):
         '1',
         'Stück(e)',
         'Totalbetrag',
-        '99.00 CHF'
+        '99.00 CHF',
+        '(MwSt. 8.1% enthalten: 8.02 CHF)'
     ]
 
+    # set vat rate
     client.login_admin()
+    page = client.get('/vat-settings')
+    page.form['vat_rate'] = '8.1'
+    page.form.submit()
+
     page = client.get('/forms').click('Formular', index=1)
     page.form['title'] = 'Bio Teddybären'
     page.form['definition'] = """
