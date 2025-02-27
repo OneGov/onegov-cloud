@@ -53,7 +53,11 @@ $(function() {
 
         editor.getSession().setValue(textarea.val());
         editor.getSession().setMode("ace/mode/" + mode);
-        editor.setTheme("ace/theme/tomorrow");
+        if (mode === 'json') {
+            editor.setTheme('ace/theme/katzenmilch');
+        } else {
+            editor.setTheme("ace/theme/tomorrow");
+        }
 
         editor.on("focus", function() {
             inside.toggleClass('focused', true);
@@ -92,6 +96,7 @@ $(function() {
             }
             textarea.val(editor.getSession().getValue());
         });
+
 
         if (mode === 'form') {
             var fnid = 'onInsertSnippet' + Math.floor(Math.random() * 10001);

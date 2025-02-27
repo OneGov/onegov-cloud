@@ -665,7 +665,9 @@ def get_code_editor_asset() -> Iterator[str]:
     yield 'ace-mode-markdown.js'
     yield 'ace-mode-xml.js'
     yield 'ace-mode-yaml.js'
+    yield 'ace-mode-json.js'
     yield 'ace-theme-tomorrow.js'
+    yield 'ace-theme-katzenmilch.js'
     yield 'formcode'
     yield 'code_editor.js'
 

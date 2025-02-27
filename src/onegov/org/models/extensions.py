@@ -586,12 +586,12 @@ class PersonLinkExtension(ContentExtension):
             context_specific_function = TextAreaField(
                 label=_('Function'),
                 depends_on=('person', '!'),
-                render_kw={'class_': 'indent-context-specific-function'},
+                render_kw={'class_': 'indent-form-field'},
             )
             display_function_in_person_directory = BooleanField(
                 label=_('List this function in the page of this person'),
                 depends_on=('person', '!'),
-                render_kw={'class_': 'indent-context-specific-function'},
+                render_kw={'class_': 'indent-form-field'},
             )
 
         # HACK: Get translations working in FormField

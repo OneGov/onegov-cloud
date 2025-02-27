@@ -161,6 +161,13 @@ class News(Page, TraitInfo, SearchableContent, NewsletterExtension,
 
     hashtags: dict_property[list[str]] = meta_property(default=list)
 
+    push_notifications: dict_property[list[list[str]]] = (
+        meta_property(default=list)
+    )
+    send_push_notifications_to_app: dict_property[bool] = meta_property(
+        default=False
+    )
+
     @property
     def es_public(self) -> bool:
         return self.access == 'public' and self.published
