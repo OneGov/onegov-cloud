@@ -330,7 +330,14 @@ def hash_dictionary(dictionary: dict[str, Any]) -> str:
     not include data in this dictionary that is secret!
 
     """
-    dict_as_string = json.dumps(dictionary, sort_keys=True).encode('utf-8')
+    # NOTE: For backwards compatibility we use the old json encoder
+    #       otherwise our hashes change depending on whether or not
+    #       the dictionary contained non-ASCII characters
+    dict_as_string = json.dumps(
+        dictionary,
+        sort_keys=True,
+        ensure_ascii=True
+    ).encode('ascii')
     return hashlib.new(  # nosec:B324
         'sha1',
         dict_as_string,
