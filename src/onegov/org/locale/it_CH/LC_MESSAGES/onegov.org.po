@@ -6476,17 +6476,17 @@ msgstr "È stato creato un account per te"
 msgid "The user was created successfully"
 msgstr "Utente creato correttamente"
 
-#~ msgid "Unique Visitors in the Last Month"
-#~ msgstr "Visitatori unici nell'ultimo mese"
+msgid "Unique Visitors in the Last Month"
+ msgstr "Visitatori unici nell'ultimo mese"
 
-#~ msgid "Total Visits in the Last Month"
-#~ msgstr "Visite totali nell'ultimo mese"
+msgid "Total Visits in the Last Month"
+msgstr "Visite totali nell'ultimo mese"
 
-#~ msgid "Total Page Views in the Last Month"
-#~ msgstr "Visualizzazioni totali di pagine nell'ultimo mese"
+msgid "Total Page Views in the Last Month"
+msgstr "Visualizzazioni totali di pagine nell'ultimo mese"
 
-#~ msgid "Number of Page Views per Visit"
-#~ msgstr "Numero di visualizzazioni di pagine per visita"
+msgid "Number of Page Views per Visit"
+msgstr "Numero di visualizzazioni di pagine per visita"
 
-#~ msgid "Average Visit Duration in Minutes"
-#~ msgstr "Durata media della visita in minuti"
+msgid "Average Visit Duration in Minutes"
+msgstr "Durata media della visita in minuti"
