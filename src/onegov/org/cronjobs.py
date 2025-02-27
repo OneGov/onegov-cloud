@@ -4,11 +4,11 @@ from collections import OrderedDict
 import requests
 from babel.dates import get_month_names
 from datetime import datetime, timedelta
+from functools import lru_cache
 from itertools import groupby
 
 from onegov.chat.collections import ChatCollection
 from onegov.chat.models import Chat
-from onegov.core.cache import lru_cache
 from onegov.core.orm import find_models, Base
 from onegov.core.orm.mixins.publication import UTCPublicationMixin
 from onegov.core.templates import render_template

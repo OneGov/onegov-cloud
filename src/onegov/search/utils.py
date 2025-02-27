@@ -1,6 +1,5 @@
 from __future__ import annotations
 
-import hashlib
 import html
 import os
 import re
@@ -79,11 +78,6 @@ def normalize_index_segment(segment: str, allow_wildcards: bool) -> str:
         valid = valid.replace('*', '_')
 
     return valid.replace('.', '_').replace('-', '_')
-
-
-def hash_mapping(mapping: dict[str, Any]) -> str:
-    dump = json.dumps(mapping, sort_keys=True).encode('utf-8')
-    return hashlib.new('sha1', dump, usedforsecurity=False).hexdigest()
 
 
 def extract_hashtags(text: str) -> list[str]:

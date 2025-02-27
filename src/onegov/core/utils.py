@@ -23,14 +23,13 @@ import urllib.request
 from collections.abc import Iterable
 from contextlib import contextmanager
 from cProfile import Profile
-from functools import reduce
+from functools import lru_cache, reduce, cache
 from importlib import import_module
 from io import BytesIO, StringIO
 from itertools import groupby, islice
 from markupsafe import escape
 from markupsafe import Markup
 from onegov.core import log
-from onegov.core.cache import lru_cache
 from onegov.core.custom import json
 from onegov.core.errors import AlreadyLockedError
 from purl import URL
@@ -331,7 +330,14 @@ def hash_dictionary(dictionary: dict[str, Any]) -> str:
     not include data in this dictionary that is secret!
 
     """
-    dict_as_string = json.dumps(dictionary, sort_keys=True).encode('utf-8')
+    # NOTE: For backwards compatibility we use the old json encoder
+    #       otherwise our hashes change depending on whether or not
+    #       the dictionary contained non-ASCII characters
+    dict_as_string = json.dumps(
+        dictionary,
+        sort_keys=True,
+        ensure_ascii=True
+    ).encode('ascii')
     return hashlib.new(  # nosec:B324
         'sha1',
         dict_as_string,
@@ -405,7 +411,7 @@ def linkify_phone(text: str) -> Markup:
         _phone_ch_html_safe.sub(handle_match, escape(text)))
 
 
-@lru_cache(maxsize=None)
+@cache
 def top_level_domains() -> set[str]:
     try:
         return URLExtract()._load_cached_tlds()

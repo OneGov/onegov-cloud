@@ -8,13 +8,13 @@ import pytz
 from contextlib import suppress
 from collections import defaultdict, Counter, OrderedDict
 from datetime import datetime, time, timedelta
+from functools import lru_cache
 from isodate import parse_date, parse_datetime
 from itertools import groupby
 from libres.modules import errors as libres_errors
 from lxml.etree import ParserError
 from lxml.html import fragments_fromstring, tostring
 from markupsafe import escape, Markup
-from onegov.core.cache import lru_cache
 from onegov.core.layout import Layout
 from onegov.core.orm import as_selectable
 from onegov.file import File, FileCollection

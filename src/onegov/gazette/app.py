@@ -65,13 +65,16 @@ class GazetteApp(Framework, DepotApp, QuillApp, FormApp, UserApp):
         :class:`onegov.core.filestorage.FilestorageFile`.
 
         """
-        return self.cache.get_or_create('logo', self.load_logo)
+        logo_path = self.cache.get_or_create('logo', self.load_logo)
+        if logo_path is not None:
+            return FilestorageFile(logo_path)
+        return None
 
-    def load_logo(self) -> FilestorageFile | None:
+    def load_logo(self) -> str | None:
         fs = self.filestorage
         assert fs is not None
         if fs.isfile(self.principal.logo):
-            return FilestorageFile(self.principal.logo)
+            return self.principal.logo
         return None
 
     @property
