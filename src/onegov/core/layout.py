@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+
 import arrow
 import babel.dates
 import babel.numbers
@@ -242,11 +243,13 @@ class Layout:
         VAT rate is set in the organization settings. The VAT string can be
         placed right after a price value.
         """
-        vat_rate = Decimal(self.app.org.vat_rate or 0.0)
+        vat_rate = Decimal(self.app.org.vat_rate or 0.0)  # type:ignore[attr-defined]
 
         if amount is not None and vat_rate:
-            if isinstance(amount, (int, float)):
+            if isinstance(amount, (Decimal, int, float, str)):
                 amount = Decimal(amount)
+            else:
+                amount = Decimal(str(amount))
 
             vat = amount * vat_rate / 100
             vat_str = (f'(MwSt. {self.format_number(vat_rate, 1)}%'
