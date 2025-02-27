@@ -738,14 +738,59 @@ def test_ticket_assignment_form(session):
     assert form.username == 'a'
 
 
-def test_price_submission(client):
+def test_price_submission_vat_not_set(client):
+    # initially, the vat is not set on an instance. This shall not lead to vat
+    # show anywhere
+
+    expected_values = [
+        'abbafan@swisscom.ch',
+        '1',
+        'Stück(e)',
+        'Totalbetrag',
+        '128.00 CHF',
+    ]
+
+    client.login_admin()
+    page = client.get('/forms').click('Formular', index=1)
+    page.form['title'] = 'Musicaltickets Mamma Mia!'
+    page.form['definition'] = """
+    Email *= @@@
+    Betrag mit Preis = 0..8 (64 CHF)
+    """
+    page = page.form.submit().follow()
+    page.form['email'] = 'abbafan@swisscom.ch'
+    page.form['betrag_mit_preis'] = '2'
+    confirm = page.form.submit().follow()
+
+    for value in expected_values:
+        assert value in confirm
+    assert 'MwSt' not in confirm
+    confirm.form.submit().follow()
+
+    # test confirmation mail
+    assert len(os.listdir(client.app.maildir)) == 1
+    mail = client.get_email(0, 0)
+    assert ('Musicaltickets Mamma Mia!: Ihre Anfrage wurde erfasst' in
+            mail['Subject'])
+    for value in expected_values:
+        assert value in mail['TextBody']
+    assert 'MwSt' not in confirm
+
+    # test ticket
+    tickets = client.get('/tickets/ALL/open').click('FRM-')
+    for value in expected_values:
+        assert value in tickets
+    assert 'MwSt' not in confirm
+
+
+def test_price_submission_vat_set(client):
     expected_values = [
         'black@bear.ch',
         '1',
         'Stück(e)',
         'Totalbetrag',
         '99.00 CHF',
-        '(MwSt. 8.1% enthalten: 8.02 CHF)'
+        '(MwSt 8.1% enthalten: 8.02 CHF)'
     ]
 
     # set vat rate
