@@ -12,9 +12,8 @@ from urllib.parse import urlparse
 import transaction
 from itsdangerous import BadSignature, Signer
 from markupsafe import escape
+from websockets.asyncio.server import broadcast, serve, ServerConnection
 from websockets.exceptions import ConnectionClosed, InvalidOrigin
-from websockets.legacy.protocol import broadcast
-from websockets.legacy.server import WebSocketServerProtocol, serve
 
 from onegov.chat.collections import ChatCollection
 from onegov.chat.utils import param_from_path
@@ -31,26 +30,25 @@ if TYPE_CHECKING:
     from uuid import UUID
 
     from sqlalchemy.orm import Session
-    from websockets import Headers
-    from websockets.legacy.server import HTTPResponse
+    from websockets import Request, Response
 
     from onegov.chat.models import Chat
     from onegov.core.types import JSONObject, JSONObject_ro
     from onegov.server.config import Config
 
 
-CONNECTIONS: dict[str, set[WebSocketServerProtocol]] = {}
+CONNECTIONS: dict[str, set[ServerConnection]] = {}
 TOKEN = ''  # nosec: B105
 
 NOTFOUND = object()
 SESSIONS: dict[str, Session] = {}
-STAFF_CONNECTIONS: dict[str, set[WebSocketServerProtocol]] = {}
+STAFF_CONNECTIONS: dict[str, set[ServerConnection]] = {}
 STAFF: dict[str, dict[str, User]] = {}  # For Authentication of User
 ACTIVE_CHATS: dict[str, dict[UUID, Chat]] = {}  # For DB
-CHANNELS: dict[str, dict[str, set[WebSocketServerProtocol]]] = {}
+CHANNELS: dict[str, dict[str, set[ServerConnection]]] = {}
 
 
-class WebSocketServer(WebSocketServerProtocol):
+class WebSocketServer(ServerConnection):
     """ A websocket server connection.
 
     This protocol handles multiple websocket applications:
@@ -73,88 +71,14 @@ class WebSocketServer(WebSocketServerProtocol):
         self,
         config: Config,
         session_manager: SessionManager,
+        host: str,
         *args: Any,
         **kwargs: Any
     ):
         super().__init__(*args, **kwargs)
         self.config = config
         self.session_manager = session_manager
-
-    async def process_request(
-        self,
-        path: str,
-        headers: Headers
-    ) -> HTTPResponse | None:
-        """ Intercept initial HTTP request.
-
-        Before establishing a WebSocket connection, a client sends a HTTP
-        request to "upgrade" the connection to a WebSocket connection.
-
-        Chat
-        ----
-        We authenticate the user before creating the WebSocket connection. The
-        user is identified based on the session cookie. In addition to the
-        cookie, we require a one-time token that the user must have obtained
-        prior to requesting the WebSocket connection.
-        """
-        url = urlparse(path)
-
-        if '/chats' not in url.path:
-            # For non-chat requests (e.g., ticker) we'll skip the dance below
-            # and let the protocol handle authentication
-            # (handle_authentication).
-            return None
-
-        try:
-            cookie: SimpleCookie = SimpleCookie(headers['Cookie'])
-            session_id = cookie['session_id'].value
-        except KeyError:
-            log.error(
-                'No session cookie found in request. '
-                'Check that you sent the request from the same origin as '
-                f'the WebSocket server ({self.host})'
-            )
-
-            return http.HTTPStatus.BAD_REQUEST, [], b''
-
-        self.signed_session_id = session_id
-
-        try:
-            self.schema = param_from_path('schema', path)
-        except ValueError as err:
-            log.error(
-                f'Unable to retrieve schema from path: {path}',
-                exc_info=err
-            )
-            return http.HTTPStatus.BAD_REQUEST, [], b''
-
-        # browser_session requires self.schema
-        self.user_id = self.browser_session.get('userid')
-
-        try:
-            # Consume the presented token or deny the connection. The token
-            # acts like CSRF token to protect against Cross-Site WebSocket
-            # Hijacks.
-            consume_websocket_token(path, self.browser_session)
-        except WebsocketSecurityError as err:
-            log.error('Rejecting WebSocket connection.', exc_info=err)
-            return http.HTTPStatus.UNAUTHORIZED, [], b''
-
-        try:
-            # Checking the origin is done at a later stage by handshake(), this
-            # check is totally superfluous. However, rejecting clients because
-            # of a wrong origin would get unnoticed otherwise. You can safely
-            # delete this block in the future.
-            #
-            # TODO: Pass in valid origins. Is there already a list of allowed
-            # origins?
-            self.process_origin(headers, self.origins)
-        except InvalidOrigin as err:
-            log.debug('WebSocket connection will be rejected.', exc_info=err)
-
-        self.populate_staff()
-
-        return None
+        self.host = host
 
     def populate_staff(self) -> None:
         """
@@ -288,7 +212,7 @@ def get_payload(
 
 
 async def error(
-    websocket: WebSocketServerProtocol,
+    websocket: ServerConnection,
     message: str,
     close: bool = True
 ) -> None:
@@ -304,7 +228,7 @@ async def error(
         await websocket.close()
 
 
-async def acknowledge(websocket: WebSocketServerProtocol) -> None:
+async def acknowledge(websocket: ServerConnection) -> None:
     """ Sends an acknowledge. """
 
     await websocket.send(
@@ -315,7 +239,7 @@ async def acknowledge(websocket: WebSocketServerProtocol) -> None:
 
 
 async def handle_listen(
-    websocket: WebSocketServerProtocol,
+    websocket: ServerConnection,
     payload: JSONObject_ro
 ) -> None:
     """ Handles listening clients. """
@@ -347,7 +271,7 @@ async def handle_listen(
 
 
 async def handle_authentication(
-    websocket: WebSocketServerProtocol,
+    websocket: ServerConnection,
     payload: JSONObject_ro
 ) -> None:
     """ Handles authentication. """
@@ -368,7 +292,7 @@ async def handle_authentication(
 
 
 async def handle_status(
-    websocket: WebSocketServerProtocol,
+    websocket: ServerConnection,
     payload: JSONObject_ro
 ) -> None:
     """ Handles status requests. """
@@ -393,7 +317,7 @@ async def handle_status(
 
 
 async def handle_broadcast(
-    websocket: WebSocketServerProtocol,
+    websocket: ServerConnection,
     payload: JSONObject_ro
 ) -> None:
     """ Handles broadcasts. """
@@ -433,7 +357,7 @@ async def handle_broadcast(
 
 
 async def handle_manage(
-    websocket: WebSocketServerProtocol,
+    websocket: ServerConnection,
     authentication_payload: JSONObject_ro
 ) -> None:
     """ Handles managing clients. """
@@ -491,8 +415,8 @@ async def handle_customer_chat(
 
     log.debug(f'added {websocket.id} to channel-connections')
 
-    while websocket.open:
-        try:
+    try:
+        while True:
             message = await websocket.recv()
             log.debug(f'customer {websocket.id!r} got the message {message!r}')
 
@@ -553,12 +477,13 @@ async def handle_customer_chat(
                 })
                 chat.chat_history = chat_history
 
-        except Exception as e:
+    except Exception as e:
+        if not isinstance(e, ConnectionClosed):
             log.exception('The debugged error message is -', exc_info=e)
-            channel_connections.remove(websocket)
-            log.debug(f'removed {websocket.id} from channel-connections')
-        finally:
-            await websocket.update_database()
+        channel_connections.remove(websocket)
+        log.debug(f'removed {websocket.id} from channel-connections')
+    finally:
+        await websocket.update_database()
 
     return None
 
@@ -585,13 +510,13 @@ async def handle_staff_chat(
         all_channels = CHANNELS.setdefault(schema, {})
         staff_connections = STAFF_CONNECTIONS.setdefault(schema, set())
         staff_connections.add(websocket)
-        channel_connections: set[WebSocketServerProtocol] = set()
+        channel_connections: set[ServerConnection] = set()
         open_channel = ''
 
         log.debug(f'added {websocket.id} to staff-connections')
 
-        while websocket.open:
-            try:
+        try:
+            while True:
                 message = await websocket.recv()
                 content = loads(message)
                 log.debug(
@@ -744,16 +669,18 @@ async def handle_staff_chat(
                         'message': inner,
                     }))
 
-            except Exception as e:
-                log.exception('The debugged error message is -', exc_info=e)
-                if websocket in staff_connections:
-                    staff_connections.remove(websocket)
-                log.debug(f'removed {websocket.id} from staff-connections')
-            finally:
-                await websocket.update_database()
+        except Exception as e:
+            if not isinstance(e, ConnectionClosed):
+                log.exception('The debugged error message is -')
+            if websocket in staff_connections:
+                staff_connections.remove(websocket)
+            log.debug(f'removed {websocket.id} from staff-connections')
+
+        finally:
+            await websocket.update_database()
 
 
-async def handle_start(websocket: WebSocketServerProtocol) -> None:
+async def handle_start(websocket: ServerConnection) -> None:
     log.debug(f'{websocket.id} connected')
     message = await websocket.recv()
     payload = get_payload(message, ('authenticate', 'register',
@@ -770,6 +697,81 @@ async def handle_start(websocket: WebSocketServerProtocol) -> None:
         # FIXME: technically message can be bytes
         await error(websocket, f'invalid command: {message}')  # type:ignore
     log.debug(f'{websocket.id} disconnected')
+
+
+def process_request(
+    self: ServerConnection,
+    request: Request
+) -> Response | None:
+    """ Intercept initial HTTP request.
+
+    Before establishing a WebSocket connection, a client sends a HTTP
+    request to "upgrade" the connection to a WebSocket connection.
+
+    Chat
+    ----
+    We authenticate the user before creating the WebSocket connection. The
+    user is identified based on the session cookie. In addition to the
+    cookie, we require a one-time token that the user must have obtained
+    prior to requesting the WebSocket connection.
+    """
+    assert isinstance(self, WebSocketServer)
+    url = urlparse(request.path)
+
+    if '/chats' not in url.path:
+        # For non-chat requests (e.g., ticker) we'll skip the dance below
+        # and let the protocol handle authentication
+        # (handle_authentication).
+        return None
+
+    try:
+        cookie = SimpleCookie(request.headers.get_all('Cookie')[0])
+        session_id = cookie['session_id'].value
+    except KeyError:
+        log.error(
+            'No session cookie found in request. '
+            'Check that you sent the request from the same origin as '
+            f'the WebSocket server ({self.host})'
+        )
+
+        return self.respond(http.HTTPStatus.BAD_REQUEST, '')
+
+    self.signed_session_id = session_id
+
+    try:
+        self.schema = param_from_path('schema', request.path)
+    except ValueError as err:
+        log.error(
+            f'Unable to retrieve schema from path: {request.path}',
+            exc_info=err
+        )
+
+        return self.respond(http.HTTPStatus.BAD_REQUEST, '')
+
+    # browser_session requires self.schema
+    self.user_id = self.browser_session.get('userid')
+
+    try:
+        # Consume the presented token or deny the connection. The token
+        # acts like CSRF token to protect against Cross-Site WebSocket
+        # Hijacks.
+        consume_websocket_token(request.path, self.browser_session)
+    except WebsocketSecurityError as err:
+        log.error('Rejecting WebSocket connection.', exc_info=err)
+        return self.respond(http.HTTPStatus.UNAUTHORIZED, '')
+
+    try:
+        # Checking the origin is done at a later stage by handshake(), this
+        # check is totally superfluous. However, rejecting clients because
+        # of a wrong origin would get unnoticed otherwise. You can safely
+        # delete this block in the future.
+        self.protocol.process_origin(request.headers)
+    except InvalidOrigin as err:
+        log.debug('WebSocket connection will be rejected.', exc_info=err)
+
+    self.populate_staff()
+
+    return None
 
 
 async def main(
@@ -790,9 +792,12 @@ async def main(
             session_config={'autoflush': False}
         )
 
+        # TODO: Pass in valid origins. Is there already a list of allowed
+        # origins?
         async with serve(handle_start, host, port,
-                         create_protocol=partial(WebSocketServer, config,
-                                                 session_manager)):
+                         process_request=process_request,
+                         create_server=partial(WebSocketServer, config,
+                                                 session_manager, host)):
             await Future()
 
     else:
