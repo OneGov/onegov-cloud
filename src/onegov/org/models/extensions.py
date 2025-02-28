@@ -1031,7 +1031,7 @@ class SidebarLinksExtension(ContentExtension):
 
             def process_obj(self, obj: SidebarLinksExtension) -> None:
                 super().process_obj(obj)
-                if not obj.sidepanel_links:
+                if not hasattr(obj, 'sidepanel_links'):
                     self.sidepanel_links.data = self.links_to_json(None)
                 else:
                     self.sidepanel_links.data = self.links_to_json(
@@ -1044,8 +1044,9 @@ class SidebarLinksExtension(ContentExtension):
                 *args: Any, **kwargs: Any
             ) -> None:
                 super().populate_obj(obj, *args, **kwargs)
-                obj.sidepanel_links = self.json_to_links(
-                    self.sidepanel_links.data) or None
+                if hasattr(obj, 'sidepanel_links'):
+                    obj.sidepanel_links = self.json_to_links(
+                        self.sidepanel_links.data) or None
 
             def validate_sidepanel_links(self, field: StringField) -> None:
                 for text, url in self.json_to_links(self.sidepanel_links.data):
@@ -1132,7 +1133,7 @@ class SidebarContactLinkExtension(ContentExtension):
 
             def process_obj(self, obj: SidebarContactLinkExtension) -> None:
                 super().process_obj(obj)
-                if not obj.sidepanel_contact:
+                if not hasattr(obj, 'sidepanel_contact'):
                     self.sidepanel_contact.data = self.links_to_json(None)
                 else:
                     self.sidepanel_contact.data = self.links_to_json(
@@ -1145,8 +1146,9 @@ class SidebarContactLinkExtension(ContentExtension):
                 *args: Any, **kwargs: Any
             ) -> None:
                 super().populate_obj(obj, *args, **kwargs)
-                obj.sidepanel_contact = self.json_to_links(
-                    self.sidepanel_contact.data) or None
+                if hasattr(obj, 'sidepanel_links'):
+                    obj.sidepanel_contact = self.json_to_links(
+                        self.sidepanel_contact.data) or None
 
             def validate_sidepanel_contact(self, field: StringField) -> None:
                 for text, link in self.json_to_links(
