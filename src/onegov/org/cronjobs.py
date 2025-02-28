@@ -1,7 +1,9 @@
 from __future__ import annotations
+import traceback
 from collections import OrderedDict
 
 import requests
+import logging
 from babel.dates import get_month_names
 from datetime import datetime, timedelta
 from functools import lru_cache
@@ -22,7 +24,12 @@ from onegov.newsletter import (Newsletter, NewsletterCollection,
 from onegov.org import _, OrgApp
 from onegov.org.layout import DefaultMailLayout
 from onegov.org.models import (
-    ResourceRecipient, ResourceRecipientCollection, TANAccess, News)
+    ResourceRecipient,
+    ResourceRecipientCollection,
+    TANAccess,
+    News,
+    SentNotification
+)
 from onegov.org.models.extensions import (
     GeneralFileLinkExtension, DeletableContentExtension)
 from onegov.org.models.ticket import ReservationHandler
@@ -53,6 +60,9 @@ if TYPE_CHECKING:
     from onegov.core.types import RenderData
 
     from onegov.org.request import OrgRequest
+
+
+log = logging.getLogger('onegov.org.cronjobs')
 
 
 MON = 0
@@ -825,8 +835,6 @@ def send_push_notifications_for_news(request: OrgRequest) -> None:
 
     Then uses Firebase to send notifications to the corresponding topics.
     """
-    print('_send_push_notifications_for_news')
-
     session = request.session
     org = request.app.org
     now = utcnow()
@@ -840,10 +848,11 @@ def send_push_notifications_for_news(request: OrgRequest) -> None:
     # Get all news items that should trigger push notifications
     query = session.query(News)
     query = query.filter(News.published == True)
-    query = query.filter(
-        News.publication_start >= ten_minutes_ago,
-        News.publication_start <= now,
-    )
+    query = query.filter(News.publication_start <= now)
+
+    # Comment this line out for testing
+    query = query.filter(News.publication_start >= ten_minutes_ago)
+
     only_public_news = query.filter(or_(
         News.meta['access'].astext == 'public',
         News.meta['access'].astext == None
@@ -853,6 +862,7 @@ def send_push_notifications_for_news(request: OrgRequest) -> None:
     )
 
     news_items = only_public_with_send_push_notification.all()
+
     if not news_items:
         print('No news items found with push notifications enabled')
         return
@@ -879,6 +889,7 @@ def send_push_notifications_for_news(request: OrgRequest) -> None:
 
         # Process each news item for notifications
         sent_count = 0
+        duplicate_count = 0
         for news in news_items:
             # Get the topics to send to
             topics = news.meta.get('push_notifications', [])
@@ -887,14 +898,25 @@ def send_push_notifications_for_news(request: OrgRequest) -> None:
                 continue
 
             print(
-                f'Sending notification for news: {news.title} to '
+                f'Processing notification for news: {news.title} to '
                 f'{len(topics)} topics'
             )
 
             # Send to each topic
-            for topic_id, topic_name in topics:
+            for topic_id in topics:
+                # Check if notification was already sent
+                if SentNotification.was_notification_sent(
+                    session, news.id, topic_id
+                ):
+                    log.info(
+                        f"Skipping duplicate notification to topic "
+                        f"'{topic_id}' for news '{news.title}'."
+                    )
+                    duplicate_count += 1
+                    continue
+
                 notification_title = news.title
-                notification_body = news.lead or f'New post in {topic_name}'
+                notification_body = news.lead or ''
 
                 notification_data = {
                     'title': news.title,
@@ -909,22 +931,37 @@ def send_push_notifications_for_news(request: OrgRequest) -> None:
                         body=notification_body,
                         data=notification_data
                     )
+                    response_data = {
+                        'message_id': response,
+                        'timestamp': utcnow().isoformat()
+                    }
+
+                    # Record that notification was sent
+                    SentNotification.record_sent_notification(
+                        session, news.id, topic_id, response_data
+                    )
+
                     sent_count += 1
-                    print(
+                    log.debug(
                         f"Successfully sent notification to topic "
                         f"'{topic_id}' for news '{news.title}'."
                         f"Response: {response}"
                     )
                 except Exception as e:
-                    print(
+                    log.debug(
                         f"Error sending notification to topic "
                         f"'{topic_id}' for news '{news.title}': {e}"
                     )
 
         if sent_count:
             print(f'Cron: Sent {sent_count} push notifications for news items')
-        else:
+        if duplicate_count:
+            print(f'Cron: Skipped {duplicate_count} duplicate notifications')
+        if not sent_count and not duplicate_count:
             print('No notifications were sent')
 
     except Exception as e:
+        # Rollback in case of error
+        session.rollback()
+        print(traceback.format_exc())
         print(f'Error sending notifications: {e}')

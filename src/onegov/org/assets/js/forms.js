@@ -25,7 +25,6 @@ $('input[data-max-length],textarea[data-max-length]').each(function() {
 });
 
 function handle_checkbox_disabled_until_start_date_set() {
-    if (!window.location.href.includes('/edit/news/')) return;
 
     var publicationStart = $('#publication_start');
     var pushNotifications = $('#send_push_notifications_to_app');
