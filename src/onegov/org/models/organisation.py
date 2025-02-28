@@ -249,6 +249,11 @@ class Organisation(Base, TimestampMixin):
     hourly_maintenance_tasks_last_run: (
         dict_property)[UTCDateTime | None] = (meta_property(default=None))
 
+    firebase_adminsdk_credential: dict_property[str | None] = meta_property()
+    selectable_push_notification_options: dict_property[list[list[str]]] = (
+        meta_property(default=list)
+    )
+
     @property
     def mtan_access_window(self) -> timedelta:
         seconds = self.mtan_access_window_seconds

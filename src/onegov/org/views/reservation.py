@@ -99,7 +99,10 @@ def respond_with_error(request: OrgRequest, error: str) -> JSON_ro:
     @request.after
     def trigger(response: Response) -> None:
         response.headers.add('X-IC-Trigger', 'rc-reservation-error')
-        response.headers.add('X-IC-Trigger-Data', json.dumps(message))
+        response.headers.add(
+            'X-IC-Trigger-Data',
+            json.dumps(message, ensure_ascii=True)
+        )
 
     return message
 

@@ -49,6 +49,11 @@ def test_sort_keys():
     assert json.dumps(data, sort_keys=True) == '{"a":2,"c":1}'
 
 
+def test_ensure_ascii():
+    assert json.dumps('ä') == '"ä"'
+    assert json.dumps('ä', ensure_ascii=True) == '"\\u00e4"'
+
+
 def test_prefix_serializer():
     prefix = json.PrefixSerializer(
         target=str,

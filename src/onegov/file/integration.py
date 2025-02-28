@@ -457,7 +457,7 @@ def respond_with_alt_text(reference: File, request: CoreRequest) -> None:
         # HTTP headers are limited to ASCII, so we encode our result in
         # JSON before showing it
         response.headers.add('X-File-Note', json.dumps(
-            {'note': reference.note or ''},
+            {'note': reference.note or ''}, ensure_ascii=True
         ))
 
 

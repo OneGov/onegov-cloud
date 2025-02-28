@@ -8,10 +8,10 @@ from onegov.websockets import log
 from typing import TYPE_CHECKING
 if TYPE_CHECKING:
     from onegov.core.types import JSON_ro
-    from websockets.legacy.client import WebSocketClientProtocol
+    from websockets.asyncio.client import ClientConnection
 
 
-async def acknowledged(websocket: WebSocketClientProtocol) -> None:
+async def acknowledged(websocket: ClientConnection) -> None:
     """ Wait for an OK from the server. """
 
     message = await websocket.recv()
@@ -25,7 +25,7 @@ async def acknowledged(websocket: WebSocketClientProtocol) -> None:
 
 
 async def register(
-    websocket: WebSocketClientProtocol,
+    websocket: ClientConnection,
     schema: str,
     channel: str | None
 ) -> None:
@@ -42,7 +42,7 @@ async def register(
 
 
 async def authenticate(
-    websocket: WebSocketClientProtocol,
+    websocket: ClientConnection,
     token: str
 ) -> None:
     """ Authenticates with the given token. """
@@ -57,7 +57,7 @@ async def authenticate(
 
 
 async def broadcast(
-    websocket: WebSocketClientProtocol,
+    websocket: ClientConnection,
     schema: str,
     channel: str | None,
     message: JSON_ro
@@ -79,7 +79,7 @@ async def broadcast(
     await acknowledged(websocket)
 
 
-async def status(websocket: WebSocketClientProtocol) -> str | None:
+async def status(websocket: ClientConnection) -> str | None:
     """ Receives the status of the server.
 
     Assumes prior authentication.

@@ -13,7 +13,7 @@ from onegov.org.forms.settings import (
     HomepageSettingsForm, NewsletterSettingsForm, LinkMigrationForm,
     LinkHealthCheckForm, SocialMediaSettingsForm,
     EventSettingsForm, GeverSettingsForm, OneGovApiSettingsForm,
-    DataRetentionPolicyForm, VATSettingsForm)
+    DataRetentionPolicyForm, FirebaseSettingsForm, VATSettingsForm)
 from onegov.org.models import Organisation
 from onegov.org.views.settings import (
     handle_homepage_settings, view_settings,
@@ -451,15 +451,30 @@ def town_handle_ticket_data_deletion_settings(
 
 
 @TownApp.form(
+    model=Organisation, name='firebase', template='form.pt',
+    permission=Secret, form=FirebaseSettingsForm, setting='Firebase',
+    icon='fa-bell', order=400,
+)
+def town_handle_firebase_settings(
+    self: Organisation, request: TownRequest, form: FirebaseSettingsForm
+) -> RenderData | Response:
+    return handle_generic_settings(
+        self, request, form, 'Firebase', SettingsLayout(self, request)
+    )
+
+
+@TownApp.form(
     model=Organisation, name='vat-settings', template='form.pt',
     permission=Secret, form=VATSettingsForm, setting=_('Value Added Tax'),
-    icon='fa-file-invoice-dollar', order=450)
+    icon='fa-file-invoice-dollar', order=450
+)
 def handle_vat_settings(
-    self: Organisation,
-    request: TownRequest,
-    form: VATSettingsForm,
-    layout: SettingsLayout | None = None
+        self: Organisation,
+        request: TownRequest,
+        form: VATSettingsForm,
+        layout: SettingsLayout | None = None
 ) -> RenderData | Response:
     layout = layout or SettingsLayout(self, request, _('Value Added Tax'))
-    return handle_generic_settings(self, request, form, _('Value Added Tax'),
-                                   layout)
+    return handle_generic_settings(
+        self, request, form, _('Value Added Tax'), layout
+    )
