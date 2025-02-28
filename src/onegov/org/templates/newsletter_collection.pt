@@ -12,24 +12,7 @@
 
         <div class="row">
             <div class="columns small-12 medium-9 large-6">
-                <form class="signup" action="${form.action}" method="POST">
-                    <div>${form.csrf_token}</div>
-                    <div class="cell small no-list-div" style="font-size: 0.875rem" tal:condition="form.subscribed_categories.data">
-                        <i18n:translate>${form.subscribed_categories.description}</i18n:translate>
-                        ${form.subscribed_categories}
-                    </div>
-                    <div class="row collapse">
-                        <div class="columns small-8 ${form.address.errors and 'error'}">
-                            <input data-typeahead-subject type="email" name="address" placeholder="E-Mail Address" i18n:attributes="placeholder"/>
-                            <small class="error" tal:repeat="error form.address.errors">${error}</small>
-                        </div>
-                        <div class="columns small-4 ${form.address.errors and 'error'}">
-                            <button type="submit" class="button postfix" i18n:translate>
-                                ${button_text or 'Sign up'}
-                            </button>
-                        </div>
-                    </div>
-                </form>
+                <div metal:use-macro="layout.macros['form']"></div>
             </div>
         </div>
 

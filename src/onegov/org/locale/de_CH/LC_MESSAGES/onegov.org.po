@@ -1,7 +1,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE 1.0\n"
-"POT-Creation-Date: 2025-02-18 09:50+0100\n"
+"POT-Creation-Date: 2025-02-24 15:55+0100\n"
 "PO-Revision-Date: 2022-03-15 10:21+0100\n"
 "Last-Translator: Marc Sommerhalder <marc.sommerhalder@seantis.ch>\n"
 "Language-Team: German\n"
@@ -2069,9 +2069,6 @@ msgstr ""
 msgid "Duration from archived state until deleted automatically"
 msgstr "Dauer vom archivierten Zustand bis zum automatischen Löschen"
 
-msgid "E-Mail Address"
-msgstr "E-Mail Adresse"
-
 msgid ""
 "Select newsletter categories your are interested in. You will receive the "
 "newsletter if it reports on at least one of the subscribed categories."
@@ -2079,6 +2076,12 @@ msgstr ""
 "Wählen Sie die Newsletter-Kategorien aus, an denen Sie interessiert sind. "
 "Sie werden den Newsletter erhalten, wenn er über mindestens eine der "
 "abonnierten Kategorien berichtet."
+
+msgid "E-Mail Address"
+msgstr "E-Mail Adresse"
+
+msgid "The subscriber has given consent to receive the newsletter."
+msgstr "Der Abonnent hat der Zustellung des Newsletters zugestimmt."
 
 msgid "Submission Window"
 msgstr "Befragungszeitraum"
@@ -3039,8 +3042,8 @@ msgstr "Die Absage von ${title} kann nicht rückgängig gemacht werden."
 msgid "Reject reservation"
 msgstr "Reservation absagen"
 
-#.
 #. Used in sentence: "${event} published."
+#.
 msgid "Event"
 msgstr "Veranstaltung"
 
@@ -3441,10 +3444,10 @@ msgid ""
 "while clicking the time slots you want to reserve."
 msgstr ""
 "Standardmässig nehmen wir an, dass pro Tag nur ein einzelner Raum und Slot "
-"reserviert werden soll. Wenn Sie mehr als einen Raum/Termin am gleichen "
-"Tag reservieren möchten, halten Sie die Alt, Strg oder Umschalt Taste "
-"gedrückt, während Sie auf auf den gewünschten Termin klicken. Ansonsten wird "
-"der vorherig ausgewählte Termin automatisch wieder abgewählt."
+"reserviert werden soll. Wenn Sie mehr als einen Raum/Termin am gleichen Tag "
+"reservieren möchten, halten Sie die Alt, Strg oder Umschalt Taste gedrückt, "
+"während Sie auf auf den gewünschten Termin klicken. Ansonsten wird der "
+"vorherig ausgewählte Termin automatisch wieder abgewählt."
 
 msgid "Unavailable"
 msgstr "Besetzt"
