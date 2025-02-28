@@ -8,8 +8,6 @@ from onegov.form.extensions import FormExtension
 from onegov.form.fields import HoneyPotField
 from onegov.form.fields import TimezoneDateTimeField
 from onegov.form.fields import UploadField
-from wtforms.fields import BooleanField
-from onegov.form.fields import MultiCheckboxField
 from onegov.form.submissions import prepare_for_submission
 from onegov.form.validators import StrictOptional, ValidPhoneNumber
 from onegov.gis import CoordinatesField
@@ -17,7 +15,8 @@ from onegov.org import _
 from wtforms.fields import EmailField
 from wtforms.fields import StringField
 from wtforms.fields import TextAreaField
-from wtforms.validators import DataRequired, InputRequired, ValidationError
+from wtforms.validators import DataRequired, InputRequired
+
 
 from typing import TypeVar, TYPE_CHECKING
 if TYPE_CHECKING:
@@ -288,53 +287,6 @@ class PublicationFormExtension(FormExtension[FormT], name='publication'):
                             _('Publication start must be prior to end'))
                     return False
                 return None
-
-        return PublicationForm
-
-
-class PushNotificationFormExtension(FormExtension[FormT], name='publish'):
-    """ Can be used with PublicationFormExtension """
-
-    def create(self, timezone: str = 'Europe/Zurich') -> type[FormT]:
-
-        class PublicationForm(self.form_class):  # type:ignore
-            send_push_notifications_to_app = BooleanField(
-                label=_('Send push notifications to app'),
-                fieldset=_('Publication'),
-                validators=[StrictOptional()],
-                render_kw={'disabled': 'disabled'},  # Starts as disabled
-            )
-            push_notifications = MultiCheckboxField(
-                label=('Topics'),
-                choices=[],
-                fieldset=_('Publication'),
-                depends_on=('send_push_notifications_to_app', 'y'),
-                validators=[StrictOptional()],
-                render_kw={'class_': 'indent-form-field'}
-            )
-
-            def on_request(self) -> None:
-                if not self.request.app.org.meta.get(
-                        'firebase_adminsdk_credential'
-                ):
-                    return None
-
-                id_topic_pairs = self.request.app.org.meta.get(
-                    'selectable_push_notification_options',
-                    (self.request.app.schema, 'News'),
-                )
-                # Format choices to show both ID and value
-                self.push_notifications.choices = [
-                    (id, f'{id} ↔ {value}') for id, value in id_topic_pairs
-                ]
-
-            def validate_send_push_notifications_to_app(
-                self, field: BooleanField
-            ) -> None:
-                if not self.publication_start.data:
-                    raise ValidationError(
-                        _('You must set a publication start date first.')
-                    )
 
         return PublicationForm
 

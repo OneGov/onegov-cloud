@@ -139,6 +139,7 @@ class VoteLayout(DefaultLayout):
                 language = ', '.join([
                     self.request.translate(codes[lang])
                     for lang in data.get('language', [])
+                    if lang in codes
                 ])
                 protected = 'article' in data.get('doctype', ['article'])
             else:

@@ -1,4 +1,3 @@
-import json
 from os import environ, system
 import re
 import shutil
@@ -7,8 +6,6 @@ import time
 from contextlib import suppress
 from http.client import RemoteDisconnected
 from typing import Callable
-
-from selenium.webdriver import ActionChains, Keys
 
 from onegov.core.utils import module_path
 from time import sleep
@@ -99,8 +96,7 @@ class ExtendedBrowser(InjectedBrowserExtension):
         }
 
     def visit(
-            self, url, sleep_before_fail=0, expected_errors=None,
-            ignore_all_console_errors=False
+            self, url, sleep_before_fail=0, expected_errors=None
     ):
         """ Overrides the default visit method to provided baseurl support.
             halt_on_fail keeps the browser window open for some minutes
@@ -111,8 +107,7 @@ class ExtendedBrowser(InjectedBrowserExtension):
             url = self.baseurl.rstrip('/') + url
 
         page = super().visit(url)
-        if not ignore_all_console_errors:
-            self.fail_on_console_errors(sleep_before_fail, expected_errors)
+        self.fail_on_console_errors(sleep_before_fail, expected_errors)
         return page
 
     def login(self, username, password, to=None):
@@ -175,27 +170,6 @@ class ExtendedBrowser(InjectedBrowserExtension):
             time_budget -= interval
 
         raise TimeoutError("Timeout reached")
-
-    def interact_with_ace_editor(self, content):
-        # First, click on the editor to focus it
-        editor_element = self.find_by_css('.ace_editor')
-        editor_element.click()
-
-        # Clear existing content (Ctrl+A, Delete)
-        actions = ActionChains(self.driver)
-        actions.key_down(Keys.CONTROL).send_keys('a').key_up(
-            Keys.CONTROL).send_keys(Keys.DELETE).perform()
-
-        # Now input the new content
-        if isinstance(content, dict):
-            content = json.dumps(content, indent=2)
-
-        # Type the content character by character
-        actions = ActionChains(self.driver)
-        actions.send_keys(content).perform()
-
-        # Click somewhere else to ensure the editor loses focus and updates
-        self.find_by_tag('body').click()
 
     def scroll_to_css(self, css):
         """ Scrolls to the first element matching the given css expression. """

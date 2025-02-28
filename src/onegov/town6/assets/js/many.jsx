@@ -28,19 +28,13 @@ var ManyFields = React.createClass({
                             onChange={this.props.onChange}
                         />
                 }
+
                 {
                     this.props.type === "opening-hours" &&
                         <ManyOpeningHours
                             data={this.props.data}
                             onChange={this.props.onChange}
                         />
-                }
-                {
-                    this.props.type === "firebasetopics" &&
-                    <ManyFirebasetopics
-                        data={this.props.data}
-                        onChange={this.props.onChange}
-                    />
                 }
             </div>
         );
@@ -424,155 +418,6 @@ var ManyLinks = React.createClass({
     }
 });
 
-var ManyFirebasetopics = React.createClass({
-    getInitialState: function() {
-        var state = {
-            values: _.clone(this.props.data.values)
-        };
-
-        if (state.values.length === 0) {
-            state.values = [
-                {'text': '', 'link': ''}
-            ];
-        }
-
-        return state;
-    },
-    componentWillMount: function() {
-        // Generate unique IDs for datalists once at component level
-        this.textListId = _.uniqueId('topic-ids-');
-        this.linkListId = _.uniqueId('topic-names-');
-    },
-    handleAdd: function(index, e) {
-        var state = JSON.parse(JSON.stringify(this.state));
-        state.values.splice(index + 1, 0, {
-            text: '',
-            link: ''
-        });
-        this.setState(state);
-
-        e.preventDefault();
-    },
-    handleRemove: function(index, e) {
-        var state = JSON.parse(JSON.stringify(this.state));
-        state.values.splice(index, 1);
-        this.setState(state);
-
-        e.preventDefault();
-    },
-    handleInputChange: function(index, name, e) {
-        var state = JSON.parse(JSON.stringify(this.state));
-
-        state.values[index][name] = e.target.value;
-
-        this.setState(state);
-
-        e.preventDefault();
-    },
-    componentWillUpdate: function(props, state) {
-        props.onChange(state);
-    },
-    render: function() {
-        var data = this.props.data;
-        var values = this.state.values;
-        var self = this;
-
-        // Get options from the data
-        var textOptions = data.textOptions || [];
-        var linkOptions = data.linkOptions || [];
-
-        // Get placeholders or use defaults (without optional chaining)
-        var textPlaceholder = (data.placeholders && data.placeholders.text) || "Topic ID";
-        var linkPlaceholder = (data.placeholders && data.placeholders.link) || "Topic Name";
-
-        return (
-            <div>
-                {/* Create datalists once at the component level */}
-                {textOptions.length > 0 && (
-                    <datalist id={this.textListId}>
-                        {textOptions.map(function(option, i) {
-                            return <option key={i} value={option} />;
-                        })}
-                    </datalist>
-                )}
-
-                {linkOptions.length > 0 && (
-                    <datalist id={this.linkListId}>
-                        {linkOptions.map(function(option, i) {
-                            return <option key={i} value={option} />;
-                        })}
-                    </datalist>
-                )}
-
-                {_.map(values, function(value, index) {
-                    var onTextChange = self.handleInputChange.bind(self, index, 'text');
-                    var onLinkChange = self.handleInputChange.bind(self, index, 'link');
-                    var onRemove = self.handleRemove.bind(self, index);
-                    var onAdd = self.handleAdd.bind(self, index);
-
-                    return (
-                        <div key={index}>
-                            <div className={"grid-x grid-padding-x" + (value.error && 'error' || '')}>
-                                <div className="small-6 cell">
-                                    <StringField required
-                                        type="text"
-                                        label={data.labels.text}
-                                        defaultValue={value.text}
-                                        onChange={onTextChange}
-                                        extra={data.extra}
-                                        size="small"
-                                        placeholder={textPlaceholder}
-                                        options={textOptions}
-                                    />
-                                </div>
-                                <div className="small-6 cell">
-                                    <StringField required
-                                                 type="text"
-                                                 label={data.labels.link}
-                                                 defaultValue={value.link}
-                                                 onChange={onLinkChange}
-                                                 extra={data.extra}
-                                                 size="small"
-                                                 placeholder={linkPlaceholder}
-                                                 options={linkOptions}
-                                     />
-                                    </div>
-                                </div>
-                                <div className="grid-x grid-padding-x align-center">
-                                    <div>
-                                        {
-                                            index > 0 && index === (values.length - 1) &&
-                                            <a href="#" className="button round secondary field-button" onClick={onRemove}>
-                                                <i className="fa fa-minus" aria-hidden="true" />
-                                                <span className="show-for-sr">{data.labels.remove}</span>
-                                            </a>
-                                        }
-                                        {
-                                            index === (values.length - 1) &&
-                                            <a href="#" className="button round field-button" onClick={onAdd}>
-                                                <i className="fa fa-plus" aria-hidden="true" />
-                                                <span className="show-for-sr">{data.labels.add}</span>
-                                            </a>
-                                        }
-                                    </div>
-                            </div>
-                            {
-                                value.error &&
-                                <div className="row firebase-error">
-                                    <div className="small-12 columns end">
-                                        <small className="error">{value.error}</small>
-                                    </div>
-                                </div>
-                            }
-                        </div>
-                    );
-                })}
-            </div>
-        );
-    }
-});
-
-
 var ManyOpeningHours = React.createClass({
     getInitialState: function() {
         var state = {
@@ -701,10 +546,9 @@ var ManyOpeningHours = React.createClass({
     }
 });
 
-var StringField = React.createClass({
+var SelectField = React.createClass({
     componentWillMount: function() {
         this.id = _.uniqueId(this.props.type + '-');
-        this.datalistId = this.id + '-list';
     },
     componentDidMount: function() {
         this.renderStringInput();
@@ -714,18 +558,60 @@ var StringField = React.createClass({
     },
     renderStringInput: function() {
         var onChange = this.props.onChange;
+
     },
     render: function() {
-        // Check if options were provided for datalist
-        const hasOptions = this.props.options && this.props.options.length > 0;
-
+        const options = this.props.options
         return (
             <label>
                 <span className="label-text">{this.props.label}</span>
 
                 {
                     this.props.required &&
-                    <span className="label-required">*</span>
+                        <span className="label-required">*</span>
+                }
+
+                <select
+                    id={this.id}
+                    type={this.props.type}
+                    className={this.props.size}
+                    defaultValue={this.props.defaultValue}
+                    onChange={this.props.onChange}
+                >
+                    <option value="">...</option>
+                {Object.keys(options).map((key, index) => (
+                    <option key={index} value={key}>
+                        {options[key]}
+                    </option>
+                ))}
+                </select>
+            </label>
+        );
+    }
+});
+
+var StringField = React.createClass({
+    componentWillMount: function() {
+        this.id = _.uniqueId(this.props.type + '-');
+    },
+    componentDidMount: function() {
+        this.renderStringInput();
+    },
+    componentDidUpdate: function() {
+        this.renderStringInput();
+    },
+    renderStringInput: function() {
+        var onChange = this.props.onChange;
+
+    },
+    render: function() {
+        return (
+            <label>
+                <span className="label-text">{this.props.label}</span>
+
+                {
+                    this.props.required &&
+                        <span className="label-required">*</span>
                 }
 
                 <input
@@ -735,47 +621,33 @@ var StringField = React.createClass({
                     defaultValue={this.props.defaultValue}
                     onChange={this.props.onChange}
                     placeholder={this.props.placeholder}
-                    list={hasOptions ? this.datalistId : undefined}
                 />
-
-                {/* Add datalist for autocomplete if options are provided */}
-                {hasOptions && (
-                    <datalist id={this.datalistId}>
-                        {this.props.options.map((option, index) => (
-                            <option key={index} value={option} />
-                        ))}
-                    </datalist>
-                )}
             </label>
         );
     }
 });
 
-
 function extractType(target) {
     // More robust type extraction
     var classes = target.attr('class').split(' ');
-
-    // Special case for firebase topics
-    if (classes.includes('many-firebasetopics')) {
-        return 'firebasetopics';
-    }
-
     var manyClass = classes.find(function(c) {
         return c.startsWith('many-');
     });
     return manyClass ? manyClass.replace('many-', '') : 'links'; // Default to links if no type found
 }
 
-jQuery.fn.many = function () {
-    return this.each(function (index) {
+jQuery.fn.many = function() {
+
+    return this.each(function(index) {
         var target = $(this);
+
+        // Get type before any DOM modifications
         var type = extractType(target);
 
         // Safely parse data with fallback
         var rawValue = target.val();
-        var data;
 
+        var data;
         try {
             data = rawValue ? JSON.parse(rawValue) : null;
         } catch (e) {
@@ -785,41 +657,25 @@ jQuery.fn.many = function () {
 
         // Provide default data structure if needed
         if (!data) {
-            if (type === 'firebasetopics') {
-                // Default structure for Firebase topics
-                data = {
-                    labels: {
-                        text: 'Topic ID',
-                        link: 'Topic Name',
-                        add: 'Hinzufügen',
-                        remove: 'Entfernen'
-                    },
-                    placeholders: {
-                        text: 'Topic ID auswählen',
-                        link: 'Topic Name'
-                    },
-                    textOptions: [],
-                    linkOptions: [],
-                    values: []
-                };
-            } else {
-                // Default structure for other types
-                data = {
-                    labels: {
-                        text: type === 'contactlinks' ? 'Contact Text' : 'Text',
-                        link: type === 'contactlinks' ? 'Contact URL' : 'URL',
-                        add: 'Add',
-                        remove: 'Remove'
-                    },
-                    values: []
-                };
-            }
+            data = {
+                labels: {
+                    text: type === 'contactlinks' ? 'Contact Text' : 'Text',
+                    link: type === 'contactlinks' ? 'Contact URL' : 'URL',
+                    add: 'Add',
+                    remove: 'Remove'
+                },
+                values: []
+            };
         }
 
         var label = target.closest('label');
+
+        // Create a unique wrapper for this instance
         var wrapperId = 'many-wrapper-' + Math.random().toString(36).substr(2, 9);
         var el = $('<div class="many-wrapper" id="' + wrapperId + '" />');
 
+        // straight-up hiding the element prevents it from getting update
+        // with the target.val call below
         label.attr('aria-hidden', true);
         label.css({
             'position': 'absolute',
@@ -828,18 +684,21 @@ jQuery.fn.many = function () {
 
         el.appendTo(label.parent());
 
+        // Handle dependencies
         var dependency = target.attr('data-depends-on');
         if (dependency) {
             target.removeAttr('data-depends-on');
             el.attr('data-depends-on', dependency);
         }
 
-        var onChange = function (newValues) {
+        // Create scoped onChange handler
+        var onChange = function(newValues) {
             data.values = newValues.values;
             var json = JSON.stringify(data);
             target.val(json);
         };
 
+        // Render with error handling
         try {
             ReactDOM.render(
                 React.createElement(ManyFields, {
@@ -851,14 +710,16 @@ jQuery.fn.many = function () {
             );
         } catch (e) {
             console.error('Failed to render ManyFields for ' + type, e);
+            // Restore original input if render fails
             el.remove();
             label.css({
                 'position': 'static',
                 'visibility': 'visible'
             });
         }
+
     });
-}
+};
 
 // since we intercept the dependency setup we need to run before document.ready
 $('.many').many();

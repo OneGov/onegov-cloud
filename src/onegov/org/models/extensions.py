@@ -20,8 +20,7 @@ from onegov.form.fields import ChosenSelectField
 from onegov.gis import CoordinatesMixin
 from onegov.org import _
 from onegov.org.forms import ResourceForm
-from onegov.org.forms.extensions import CoordinatesFormExtension,\
-    PushNotificationFormExtension
+from onegov.org.forms.extensions import CoordinatesFormExtension
 from onegov.org.forms.extensions import PublicationFormExtension
 from onegov.org.forms.fields import UploadOrSelectExistingMultipleFilesField
 from onegov.org.observer import observes
@@ -587,12 +586,12 @@ class PersonLinkExtension(ContentExtension):
             context_specific_function = TextAreaField(
                 label=_('Function'),
                 depends_on=('person', '!'),
-                render_kw={'class_': 'indent-form-field'},
+                render_kw={'class_': 'indent-context-specific-function'},
             )
             display_function_in_person_directory = BooleanField(
                 label=_('List this function in the page of this person'),
                 depends_on=('person', '!'),
-                render_kw={'class_': 'indent-form-field'},
+                render_kw={'class_': 'indent-context-specific-function'},
             )
 
         # HACK: Get translations working in FormField
@@ -750,16 +749,6 @@ class PublicationExtension(ContentExtension):
         request: OrgRequest
     ) -> type[FormT]:
         return PublicationFormExtension(form_class).create()
-
-
-class PushNotificationExtension(ContentExtension):
-
-    def extend_form(
-        self,
-        form_class: type[FormT],
-        request: OrgRequest
-    ) -> type[FormT]:
-        return PushNotificationFormExtension(form_class).create()
 
 
 class HoneyPotExtension(ContentExtension):

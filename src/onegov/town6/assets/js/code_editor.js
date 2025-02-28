@@ -53,11 +53,7 @@ $(function() {
 
         editor.getSession().setValue(textarea.val());
         editor.getSession().setMode("ace/mode/" + mode);
-        if (mode === 'json') {
-            editor.setTheme('ace/theme/katzenmilch');
-        } else {
-            editor.setTheme("ace/theme/tomorrow");
-        }
+        editor.setTheme("ace/theme/tomorrow");
 
         editor.on("focus", function() {
             inside.toggleClass('focused', true);
