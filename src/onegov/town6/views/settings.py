@@ -13,7 +13,7 @@ from onegov.org.forms.settings import (
     HomepageSettingsForm, NewsletterSettingsForm, LinkMigrationForm,
     LinkHealthCheckForm, SocialMediaSettingsForm,
     EventSettingsForm, GeverSettingsForm, OneGovApiSettingsForm,
-    DataRetentionPolicyForm, FirebaseSettingsForm)
+    DataRetentionPolicyForm)
 from onegov.org.models import Organisation
 from onegov.org.views.settings import (
     handle_homepage_settings, view_settings,
@@ -447,17 +447,4 @@ def town_handle_ticket_data_deletion_settings(
     return handle_generic_settings(
         self, request, form, _('Data Retention Policy'),
         SettingsLayout(self, request),
-    )
-
-
-@TownApp.form(
-    model=Organisation, name='firebase', template='form.pt',
-    permission=Secret, form=FirebaseSettingsForm, setting='Firebase',
-    icon='fa-bell', order=400,
-)
-def town_handle_firebase_settings(
-    self: Organisation, request: TownRequest, form: FirebaseSettingsForm
-) -> RenderData | Response:
-    return handle_generic_settings(
-        self, request, form, 'Firebase', SettingsLayout(self, request)
     )

@@ -115,32 +115,3 @@ def test_analytics_settings(client):
 
     settings = client.get('/analytics-settings')
     assert 'https://stats.seantis.ch' in settings
-
-
-
-def test_firebase_settings(client):
-
-    client.login_admin()
-
-    # Pretend this is real data (it's completely random)
-    code = """
-    {
-  "type": "service_account",
-  "project_id": "test-project-54321",
-  "private_key_id": "a1b2c3d4e5f6g7h8i9j0k1l2m3n4o5p6q7r8s9t0",
-  "private_key": "private key",
-  "client_email": "firebase-admin@test-project-54321.iam.gserviceaccount.com",
-  "client_id": "123456789012345678901",
-  "auth_uri": "https://accounts.google.com/o/oauth2/auth",
-  "token_uri": "https://oauth2.googleapis.com/token",
-  "auth_provider_x509_cert_url": "https://www.googleapis.com/oauth2/v1/certs",
-  "client_x509_cert_url": "foobar.com",
-  "universe_domain": "googleapis.com"
-    }
-    """
-
-    settings = client.get('/settings').click('Firebase')
-    settings.form['firebase_adminsdk_credential'] = code
-
-    settings = settings.form.submit().maybe_follow()
-    assert 'Ihre Änderungen wurden gespeichert' in settings
