@@ -12,7 +12,8 @@ from onegov.org.models.extensions import (
     ContactExtension, ContactHiddenOnPageExtension,
     PeopleShownOnMainPageExtension, ImageExtension,
     NewsletterExtension, PublicationExtension, DeletableContentExtension,
-    InlinePhotoAlbumExtension, SidebarContactLinkExtension
+    InlinePhotoAlbumExtension, SidebarContactLinkExtension,
+    PushNotificationExtension
 )
 from onegov.org.models.extensions import AccessExtension
 from onegov.org.models.extensions import CoordinatesExtension
@@ -146,7 +147,8 @@ class News(Page, TraitInfo, SearchableContent, NewsletterExtension,
            ContactExtension, ContactHiddenOnPageExtension,
            PeopleShownOnMainPageExtension, PersonLinkExtension,
            CoordinatesExtension, ImageExtension, GeneralFileLinkExtension,
-           DeletableContentExtension, InlinePhotoAlbumExtension):
+           DeletableContentExtension, InlinePhotoAlbumExtension,
+           PushNotificationExtension):
 
     __mapper_args__ = {'polymorphic_identity': 'news'}
 
@@ -160,6 +162,13 @@ class News(Page, TraitInfo, SearchableContent, NewsletterExtension,
     filter_tags: list[str] = []
 
     hashtags: dict_property[list[str]] = meta_property(default=list)
+
+    push_notifications: dict_property[list[list[str]]] = (
+        meta_property(default=list)
+    )
+    send_push_notifications_to_app: dict_property[bool] = meta_property(
+        default=False
+    )
 
     @property
     def es_public(self) -> bool:
@@ -240,6 +249,16 @@ class News(Page, TraitInfo, SearchableContent, NewsletterExtension,
                 ),
                 after='title'
             )
+
+            if hasattr(form_class, 'send_push_notifications_to_app'):
+                form_class = move_fields(
+                    form_class=form_class,
+                    fields=(
+                        'send_push_notifications_to_app',
+                        'push_notifications',
+                    ),
+                    after='publication_start'
+                )
 
             return form_class
 
