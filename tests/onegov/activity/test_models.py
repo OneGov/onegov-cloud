@@ -963,20 +963,24 @@ def test_occasion_owners(session, owner, secondary_owner):
 
 
 def test_attendee_age(session, owner):
-    with freeze_time('2025-02-28'):
 
-        def age(years):
-            return date.today().replace(year=date.today().year - years)
+    def age(years):
+        today = date.today()
 
-        attendees = AttendeeCollection(session)
-        d = attendees.add(owner, "Dustin Henderson", age(13), 'male')
-        m = attendees.add(owner, "Mike Wheeler", age(14), 'male')
+        if today.month == 2 and today.day == 29:  # fix leap year
+            today.replace(day=28)
 
-        assert d.age == 13
-        assert m.age == 14
+        return today.replace(year=today.year - years)
 
-        assert attendees.query().filter(Attendee.age <= 13).count() == 1
-        assert attendees.query().filter(Attendee.age <= 14).count() == 2
+    attendees = AttendeeCollection(session)
+    d = attendees.add(owner, "Dustin Henderson", age(13), 'male')
+    m = attendees.add(owner, "Mike Wheeler", age(14), 'male')
+
+    assert d.age == 13
+    assert m.age == 14
+
+    assert attendees.query().filter(Attendee.age <= 13).count() == 1
+    assert attendees.query().filter(Attendee.age <= 14).count() == 2
 
 
 def test_booking_collection(session, owner):
