@@ -1019,11 +1019,11 @@
 </metal:directory_entry_submission>
 
 <metal:price define-macro="price">
-    ${layout.format_number(price.net_amount)} ${price.currency}<br>
-    ${layout.format_vat(price.net_amount, price.currency)}
+    ${layout.format_number(price.net_amount)} ${price.currency}
     <tal:b condition="price.fee and show_fee|nothing">
         (+ ${layout.format_number(price.fee)} <tal:b i18n:translate>Credit Card Fee</tal:b>)
     </tal:b>
+    <br>${layout.format_vat(price.net_amount, price.currency)}
 </metal:price>
 
 <metal:person_card define-macro="person_list_card" i18n:domain="onegov.town6">
