@@ -1,5 +1,6 @@
 from __future__ import annotations
 import json
+from onegov.core.security import Private
 from onegov.org import _, OrgApp
 from onegov.org.layout import DefaultLayout
 from onegov.org.models import PushNotificationCollection
@@ -12,7 +13,8 @@ if TYPE_CHECKING:
 
 
 @OrgApp.html(
-    model=PushNotificationCollection, template='push_notifications.pt'
+    model=PushNotificationCollection, template='push_notifications.pt',
+    permission=Private,
 )
 def view_sent_notifications(
     self: PushNotificationCollection,
