@@ -5,12 +5,16 @@ import re
 import sqlalchemy
 
 from copy import deepcopy
+
 from elasticsearch.exceptions import NotFoundError
 from elasticsearch.helpers import streaming_bulk
 from langdetect.lang_detect_exception import LangDetectException
-from itertools import groupby
+from itertools import groupby, chain, repeat
 from operator import itemgetter
 from queue import Queue, Empty, Full
+from sqlalchemy import func
+from sqlalchemy.dialects.postgresql import JSONB
+from unidecode import unidecode
 
 from sqlalchemy.orm.exc import ObjectDeletedError
 
@@ -364,6 +368,8 @@ class Indexer(IndexerBase):
 class PostgresIndexer(IndexerBase):
 
     TEXT_SEARCH_COLUMN_NAME = 'fts_idx'
+    TEXT_SEARCH_DATA_COLUMN_NAME = 'fts_idx_data'
+
     idx_language_mapping = {
         'de': 'german',
         'fr': 'french',
@@ -400,7 +406,8 @@ class PostgresIndexer(IndexerBase):
         :param session: Supply an active session
         :return: True if the indexing was successful, False otherwise
         """
-        content = []
+        combined_vector = None
+        params = []
 
         if not isinstance(tasks, list):
             tasks = [tasks]
@@ -410,12 +417,41 @@ class PostgresIndexer(IndexerBase):
                 language = (
                     self.idx_language_mapping.get(task['language'], 'simple'))
                 data = {
-                    k: str(v)
+                    k: unidecode(str(v))
                     for k, v in task['properties'].items()
                     if not k.startswith('es_')}
+                # the search makes use of 'es_public' and 'es_tags' fields
+                for k in ('es_public', 'es_tags', 'es_last_change'):
+                    if k in task['properties']:
+                        data[k] = task['properties'][k]
                 _id = task['id']
-                content.append(
-                    {'language': language, 'data': data, '_id': _id})
+
+                # prefix all fields with '_' to avoid conflicts with
+                # reserved names in `bindparam` function below
+                params.append(
+                    {'language': language, 'data': data, '_id': _id, **{
+                        f'_{k}': v for k, v in data.items()
+                    }})
+
+                weighted_vector = [
+                    func.setweight(
+                        func.to_tsvector(
+                            sqlalchemy.bindparam('language',
+                                                 type_=sqlalchemy.String),
+                            sqlalchemy.bindparam(f'_{field}',
+                                                 type_=sqlalchemy.String)
+                        ),
+                        weight
+                    )
+                    for field, weight in zip(
+                        task['properties'].keys(),
+                        chain('A', repeat('D')))
+                    if not field.startswith('es_')  # TODO: rename to fts_
+                ]
+
+                combined_vector = weighted_vector[0]
+                for vector in weighted_vector[1:]:
+                    combined_vector = combined_vector.op('||')(vector)
 
             schema = tasks[0]['schema']
             tablename = tasks[0]['tablename']
@@ -425,26 +461,28 @@ class PostgresIndexer(IndexerBase):
                 (id_col := sqlalchemy
                     .column(id_key)),  # type: ignore[var-annotated]
                 sqlalchemy.column(self.TEXT_SEARCH_COLUMN_NAME),
+                sqlalchemy.column(self.TEXT_SEARCH_DATA_COLUMN_NAME),
                 schema=schema  # type: ignore
             )
-            tsvector_expr = sqlalchemy.text(
-                'to_tsvector(:language, :data)').bindparams(
-                sqlalchemy.bindparam('language', type_=sqlalchemy.String),
-                sqlalchemy.bindparam('data', type_=sqlalchemy.JSON)
-            )
+
             stmt = (
                 sqlalchemy.update(table)
                 .where(id_col == sqlalchemy.bindparam('_id'))
-                .values({self.TEXT_SEARCH_COLUMN_NAME: tsvector_expr})
+                .values({
+                    self.TEXT_SEARCH_COLUMN_NAME: combined_vector,
+                    self.TEXT_SEARCH_DATA_COLUMN_NAME:
+                    sqlalchemy.bindparam('data', type_=JSONB)
+                })
             )
+
             if session is None:
                 connection = self.engine.connect()
                 with connection.begin():
-                    connection.execute(stmt, content)
+                    connection.execute(stmt, params)
             else:
                 # use a savepoint instead
                 with session.begin_nested():
-                    session.execute(stmt, content)
+                    session.execute(stmt, params)
         except Exception as ex:
             index_log.error(f"Error '{ex}' indexing schema "
                             f'{tasks[0]["schema"]} table '
@@ -904,8 +942,9 @@ class ORMEventTranslator:
     def put(self, translation: Task) -> None:
         try:
             self.es_queue.put_nowait(translation)
+
             if translation['action'] == 'index':
-                # we only need to provide index tasks for fts
+                # we only need to provide index tasks for psql fts
                 self.psql_queue.put_nowait(translation)
         except Full:
             log.error('The orm event translator queue is full!')
