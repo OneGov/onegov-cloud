@@ -319,9 +319,10 @@ class PushNotificationFormExtension(FormExtension[FormT], name='publish'):
                 ):
                     return None
 
+                default_topic = [[self.request.app.schema, 'News']]
                 id_topic_pairs = self.request.app.org.meta.get(
                     'selectable_push_notification_options',
-                    (self.request.app.schema, 'News'),
+                    default_topic
                 )
                 # Format choices to show both ID and value
                 self.push_notifications.choices = [

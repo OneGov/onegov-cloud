@@ -17,6 +17,7 @@ from onegov.event import EventCollection, OccurrenceCollection
 from onegov.event.utils import as_rdates
 from onegov.form import FormSubmissionCollection
 from onegov.gever.encrypt import encrypt_symmetric
+from onegov.org.cronjobs import get_news_for_push_notification
 from onegov.org.models import ResourceRecipientCollection, News
 from onegov.org.models.page import NewsCollection
 from onegov.org.models.resource import RoomResource
@@ -1865,3 +1866,57 @@ def test_send_push_notifications_for_news_complex(
     finally:
         # Clean up the test service
         set_test_notification_service(None)
+
+
+def test_news_query_includes_time_filter(session):
+    """
+    Tests that the publication time filter for news is properly applied.
+    This test ensures the filter isn't accidentally commented out.
+    """
+    now = utcnow()
+
+    news = PageCollection(session)
+    news_parent = news.add_root('News', type='news')
+
+    # News from 15 minutes ago (outside the 10-minute window)
+    old_news = news.add(
+        news_parent, 'Old News', 'old-news',
+        type='news', access='public',
+        publication_start=now - timedelta(minutes=15),
+        send_push_notifications_to_app='true'
+    )
+    if hasattr(old_news, 'publish'):
+        old_news.publish()
+
+    # News from 5 minutes ago (inside the 10-minute window)
+    recent_news = news.add(
+        news_parent, 'Recent News', 'recent-news',
+        type='news', access='public',
+        publication_start=now - timedelta(minutes=5),
+        send_push_notifications_to_app='true'
+    )
+    if hasattr(recent_news, 'publish'):
+        recent_news.publish()
+
+    # Future news (not published yet)
+    future_news = news.add(
+        news_parent, 'Future News', 'future-news',
+        type='news', access='public',
+        publication_start=now + timedelta(minutes=30),
+        send_push_notifications_to_app='true'
+    )
+    if hasattr(future_news, 'publish'):
+        future_news.publish()
+
+    session.flush()
+
+    result = get_news_for_push_notification(session).all()
+
+    # If the time filter is applied, we should only get recent news (
+    # within 10 minutes)
+    # If the filter is commented out, we'd get both old and recent news
+    assert len(result) == 1
+    assert result[0].title == "Recent News"
+
+    # Assuming filter commented out, should get both old and recent news
+    assert not len(result) == 2, 'Maybe you forgot to remove the time filter?'

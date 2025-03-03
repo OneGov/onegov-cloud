@@ -1439,16 +1439,8 @@ class FirebaseSettingsForm(Form):
         },
     )
 
-    # Defines the mapping of firebase topics to hashtags (News)
-    # https://firebase.google.com/docs/cloud-messaging/send-message#python_3
     selectable_push_notification_options = StringField(
         label=_('Topics'),
-        description=_(
-            'Allows to setup sending firebase notifications for '
-            'News with hashtags. Below we define the Mapping. Topic ID is '
-            'an external name we can freely choose. Topic Name is a '
-            'the name of the hashtag.'
-        ),
         fieldset=_('Defining a list of Topics from Hashtags'),
         render_kw={
             'class_': 'many many-firebasetopics',

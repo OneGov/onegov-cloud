@@ -28,12 +28,13 @@ from onegov.org.models import (
     ResourceRecipientCollection,
     TANAccess,
     News,
-    SentNotification
+    PushNotification
 )
 from onegov.org.models.extensions import (
     GeneralFileLinkExtension, DeletableContentExtension)
 from onegov.org.models.ticket import ReservationHandler
 from onegov.gever.encrypt import decrypt_symmetric
+from sqlalchemy.exc import IntegrityError
 from onegov.org.views.allocation import handle_rules_cronjob
 from onegov.org.views.directory import (
     send_email_notification_for_directory_entry)
@@ -58,6 +59,8 @@ from typing import Any, TYPE_CHECKING
 if TYPE_CHECKING:
     from collections.abc import Iterator
     from onegov.core.types import RenderData
+    from sqlalchemy.orm import Session
+    from sqlalchemy.orm import Query
 
     from onegov.org.request import OrgRequest
 
@@ -822,6 +825,29 @@ def delete_unconfirmed_newsletter_subscriptions(request: OrgRequest) -> None:
         print(f'Cron: Deleted {count} unconfirmed newsletter subscriptions')
 
 
+def get_news_for_push_notification(session: Session) -> Query[News]:
+    now = utcnow()
+    ten_minutes_ago = now - timedelta(minutes=10)
+
+    # Get all news items that should trigger push notifications
+    query = session.query(News)
+    query = query.filter(News.published == True)
+    query = query.filter(News.publication_start <= now)
+
+    # You may comment out the line below temporarily for testing
+    query = query.filter(News.publication_start >= ten_minutes_ago)
+
+    only_public_news = query.filter(or_(
+        News.meta['access'].astext == 'public',
+        News.meta['access'].astext == None
+    ))
+    only_public_with_send_push_notification = only_public_news.filter(
+        News.meta['send_push_notifications_to_app'].astext == 'true'
+    )
+
+    return only_public_with_send_push_notification
+
+
 @OrgApp.cronjob(hour='*', minute='*/10', timezone='UTC')
 def send_push_notifications_for_news(request: OrgRequest) -> None:
     """
@@ -837,32 +863,13 @@ def send_push_notifications_for_news(request: OrgRequest) -> None:
     """
     session = request.session
     org = request.app.org
-    now = utcnow()
-    ten_minutes_ago = now - timedelta(minutes=10)
 
     # Skip if no Firebase credentials are configured
     if not org.firebase_adminsdk_credential:
         print('No Firebase credentials configured')
         return
 
-    # Get all news items that should trigger push notifications
-    query = session.query(News)
-    query = query.filter(News.published == True)
-    query = query.filter(News.publication_start <= now)
-
-    # Comment this line out for testing
-    query = query.filter(News.publication_start >= ten_minutes_ago)
-
-    only_public_news = query.filter(or_(
-        News.meta['access'].astext == 'public',
-        News.meta['access'].astext == None
-    ))
-    only_public_with_send_push_notification = only_public_news.filter(
-        News.meta['send_push_notifications_to_app'].astext == 'true'
-    )
-
-    news_items = only_public_with_send_push_notification.all()
-
+    news_items = get_news_for_push_notification(session).all()
     if not news_items:
         print('No news items found with push notifications enabled')
         return
@@ -902,10 +909,9 @@ def send_push_notifications_for_news(request: OrgRequest) -> None:
                 f'{len(topics)} topics'
             )
 
-            # Send to each topic
-            for topic_id in topics:
+            for topic_id, __ in topics:
                 # Check if notification was already sent
-                if SentNotification.was_notification_sent(
+                if PushNotification.was_notification_sent(
                     session, news.id, topic_id
                 ):
                     log.info(
@@ -925,32 +931,56 @@ def send_push_notifications_for_news(request: OrgRequest) -> None:
                 }
 
                 try:
+                    # Create a "pending" notification record
+                    notification = PushNotification(
+                        news_id=news.id,
+                        topic_id=topic_id,
+                        sent_at=utcnow(),
+                        response_data={'status': 'pending'},
+                    )
+                    session.add(notification)
+                    session.flush()  # This will raise IntegrityError if record
+                    # exists
+
+                    # If we got here, we're the first process to try sending
+                    # this notification
                     response = notification_service.send_notification(
                         topic=topic_id,
                         title=notification_title,
                         body=notification_body,
-                        data=notification_data
+                        data=notification_data,
                     )
-                    response_data = {
-                        'message_id': response,
-                        'timestamp': utcnow().isoformat()
-                    }
 
-                    # Record that notification was sent
-                    SentNotification.record_sent_notification(
-                        session, news.id, topic_id, response_data
-                    )
+                    # Update the record with actual response data
+                    notification.response_data = {
+                        'message_id': response,
+                        'timestamp': utcnow().isoformat(),
+                        'status': 'sent',
+                    }
+                    session.flush()
 
                     sent_count += 1
                     log.debug(
-                        f"Successfully sent notification to topic "
-                        f"'{topic_id}' for news '{news.title}'."
-                        f"Response: {response}"
+                        f"Successfully sent notification to topic '{topic_id}'"
+                        f" for news '{news.title}'. Response: {response}"
                     )
+
+                except IntegrityError:
+                    # Another process probably already created a record for
+                    # this notification
+                    session.rollback()
+                    duplicate_count += 1
+                    log.info(
+                        f"Skipping duplicate notification to topic "
+                        f"'{topic_id}' for news '{news.title}'. "
+                    )
+
                 except Exception as e:
-                    log.debug(
-                        f"Error sending notification to topic "
-                        f"'{topic_id}' for news '{news.title}': {e}"
+                    # For other exceptions (like notification service failures)
+                    error_details = str(e)
+                    log.error(
+                        f"Error sending notification to topic '{topic_id}' "
+                        f"for news '{news.title}': {error_details}"
                     )
 
         if sent_count:

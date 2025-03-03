@@ -16,11 +16,11 @@ if TYPE_CHECKING:
     from onegov.org.models import News
 
 
-class SentNotification(Base):
+class PushNotification(Base):
     """
     Keeps track of all outbound push notifications to prevent duplicates.
     """
-    __tablename__: ClassVar[str] = 'sent_notifications'
+    __tablename__: ClassVar[str] = 'push_notification'
 
     #: The internal ID of the notification
     id: Column[uuid.UUID] = Column(
@@ -69,7 +69,7 @@ class SentNotification(Base):
         news_id: int,
         topic_id: str,
         response_data: dict[str, Any] | None
-    ) -> SentNotification:
+    ) -> PushNotification:
         """
         Record that a notification was sent for the given news item and topic.
         """
@@ -84,12 +84,12 @@ class SentNotification(Base):
         return notification
 
 
-class SentNotificationCollection(GenericCollection[SentNotification]):
+class SentNotificationCollection(GenericCollection[PushNotification]):
     """Simple collection for sent notifications."""
 
     @property
-    def model_class(self) -> type[SentNotification]:
-        return SentNotification
+    def model_class(self) -> type[PushNotification]:
+        return PushNotification
 
-    def query(self) -> Query[SentNotification]:
+    def query(self) -> Query[PushNotification]:
         return super().query()
