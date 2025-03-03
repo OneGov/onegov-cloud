@@ -293,7 +293,7 @@ class PublicationFormExtension(FormExtension[FormT], name='publication'):
 
 
 class PushNotificationFormExtension(FormExtension[FormT], name='publish'):
-    """ Can be used with PublicationFormExtension """
+    """ Assumes to be used in conjunction with PublicationFormExtension. """
 
     def create(self, timezone: str = 'Europe/Zurich') -> type[FormT]:
 
@@ -335,6 +335,12 @@ class PushNotificationFormExtension(FormExtension[FormT], name='publish'):
                 if not self.publication_start.data:
                     raise ValidationError(
                         _('You must set a publication start date first.')
+                    )
+                if field.data and not self.push_notifications.data:
+                    raise ValidationError(
+                        _('Please select at least one topic '
+                          'for push notifications.'
+                          )
                     )
 
         return PublicationForm
