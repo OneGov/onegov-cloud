@@ -1687,9 +1687,9 @@ def test_send_push_notifications_for_news_complex(
     transaction.begin()
 
     # Configure Firebase credentials for the organization
-    encrypted_creds = encrypt_symmetric(firebase_json,
-                                        org_app.hashed_identity_key).decode(
-        'utf-8')
+    encrypted_creds = encrypt_symmetric(
+        firebase_json, org_app.hashed_identity_key
+    ).decode('utf-8')
     org_app.org.firebase_adminsdk_credential = encrypted_creds
 
     # Define topic mapping for the organization
@@ -1712,7 +1712,7 @@ def test_send_push_notifications_for_news_complex(
     valid_news.publication_start = current_time - timedelta(minutes=5)
     valid_news.meta = {
         'send_push_notifications_to_app': True,
-        'push_notifications': [[f'{org_app.schema}_news', 'News']],
+        'push_notifications': [f'{org_app.schema}_news'],
         'hashtags': ['News']
     }
 
@@ -1727,7 +1727,7 @@ def test_send_push_notifications_for_news_complex(
     disabled_news.publication_start = current_time - timedelta(minutes=5)
     disabled_news.meta = {
         'send_push_notifications_to_app': False,
-        'push_notifications': [[f'{org_app.schema}_news', 'News']],
+        'push_notifications': [f'{org_app.schema}_news'],
         'hashtags': ['News']
     }
 
@@ -1742,7 +1742,7 @@ def test_send_push_notifications_for_news_complex(
     old_news.publication_start = current_time - timedelta(minutes=15)
     old_news.meta = {
         'send_push_notifications_to_app': True,
-        'push_notifications': [[f'{org_app.schema}_news', 'News']],
+        'push_notifications': [f'{org_app.schema}_news'],
         'hashtags': ['News']
     }
 
@@ -1757,7 +1757,7 @@ def test_send_push_notifications_for_news_complex(
     future_news.publication_start = current_time + timedelta(minutes=15)
     future_news.meta = {
         'send_push_notifications_to_app': True,
-        'push_notifications': [[f'{org_app.schema}_news', 'News']],
+        'push_notifications': [f'{org_app.schema}_news'],
         'hashtags': ['News']
     }
 
@@ -1790,10 +1790,9 @@ def test_send_push_notifications_for_news_complex(
     multi_topic_news.meta = {
         'send_push_notifications_to_app': True,
         'push_notifications': [
-            [f'{org_app.schema}_news', 'News'],
-            [f'{org_app.schema}_important', 'Important']
+            f'{org_app.schema}_news',
+            f'{org_app.schema}_important'
         ],
-        'hashtags': ['News', 'Important']
     }
 
     transaction.commit()
