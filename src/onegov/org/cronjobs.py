@@ -898,31 +898,18 @@ def send_push_notifications_for_news(request: OrgRequest) -> None:
         sent_count = 0
         duplicate_count = 0
         for news in news_items:
-            topics = set(news.meta.get('push_notifications', []))
+            # Get the topics to send to
+            topics = news.meta.get('push_notifications', [])
             if not topics:
                 print(f'No topics configured for news item: {news.title}')
                 continue
 
-            default_topic = [[self.request.app.schema, 'News']]
-            selectable_id_topic_pairs = self.request.app.org.meta.get(
-                'selectable_push_notification_options',
-                default_topic
+            print(
+                f'Processing notification for news: {news.title} to '
+                f'{len(topics)} topics'
             )
 
-            topics = set(topics)
-            pairs = [
-                [key, value]
-                for key, value in selectable_id_topic_pairs
-                if key in topics
-            ]
-
-            for topic_entry in pairs:
-                try:
-                    topic_id, __ = topic_entry
-                except Exception:
-                    breakpoint()
-                    continue
-
+            for topic_id, __ in topics:
                 # Check if notification was already sent
                 if PushNotification.was_notification_sent(
                     session, news.id, topic_id
