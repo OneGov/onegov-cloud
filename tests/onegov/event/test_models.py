@@ -210,8 +210,13 @@ def test_occurrence_dates(session):
 
 
 def test_latest_occurrence(session):
+    # Use a fixed reference time instead of datetime.now()
+    reference_time = datetime(
+        2023, 6, 15, 12, 0, 0
+    )
+
     def create_event(delta):
-        start = datetime.now() + delta
+        start = reference_time + delta
         end = start + timedelta(hours=6)
         session.query(Occurrence).delete()
         session.query(Event).delete()
