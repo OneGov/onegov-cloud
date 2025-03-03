@@ -3,7 +3,8 @@ from __future__ import annotations
 from uuid import uuid4
 from onegov.core.collection import GenericCollection
 from sedate import utcnow
-from sqlalchemy import Column, String, DateTime, ForeignKey, Integer
+from sqlalchemy import Column, String, DateTime, ForeignKey, Integer,\
+    UniqueConstraint
 from sqlalchemy.orm import relationship
 from onegov.core.orm.types import JSON, UUID
 from onegov.core.orm import Base
@@ -82,6 +83,11 @@ class PushNotification(Base):
         session.add(notification)
         session.flush()
         return notification
+
+    # For each topic_id inside a news, there should be only one notification
+    __table_args__ = (
+        UniqueConstraint('news_id', 'topic_id', name='uix_news_topic'),
+    )
 
 
 class SentNotificationCollection(GenericCollection[PushNotification]):
