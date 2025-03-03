@@ -18,7 +18,8 @@ from onegov.event.utils import as_rdates
 from onegov.form import FormSubmissionCollection
 from onegov.gever.encrypt import encrypt_symmetric
 from onegov.org.cronjobs import get_news_for_push_notification
-from onegov.org.models import ResourceRecipientCollection, News
+from onegov.org.models import ResourceRecipientCollection, News,\
+    PushNotification
 from onegov.org.models.page import NewsCollection
 from onegov.org.models.resource import RoomResource
 from onegov.org.models.ticket import ReservationHandler, DirectoryEntryHandler
@@ -1920,3 +1921,85 @@ def test_news_query_includes_time_filter(session):
 
     # Assuming filter commented out, should get both old and recent news
     assert not len(result) == 2, 'Maybe you forgot to remove the time filter?'
+
+
+def test_push_notification_duplicate_detection(
+    org_app, handlers, firebase_json
+):
+    """Test that validates the duplicate detection logic properly."""
+    register_echo_handler(handlers)
+    client = Client(org_app)
+    session = org_app.session()
+    job = get_cronjob_by_name(org_app, 'send_push_notifications_for_news')
+    job.app = org_app
+
+    # Set up test data
+    transaction.begin()
+    encrypted_creds = encrypt_symmetric(
+        firebase_json, org_app.hashed_identity_key
+    ).decode('utf-8')
+    org_app.org.firebase_adminsdk_credential = encrypted_creds
+    org_app.org.selectable_push_notification_options = [
+        [f'{org_app.schema}_news', 'News']
+    ]
+
+    # Create a news item
+    news = PageCollection(session)
+    news_parent = news.add_root('News', type='news')
+    test_news = news.add(
+        news_parent,
+        title='Test news for duplicate detection',
+        lead='Test content',
+        text='Test content body',
+        access='public',
+    )
+    news_id = test_news.id
+
+    # Set publication time and metadata
+    test_news.publication_start = utcnow() - timedelta(minutes=2)
+    test_news.meta = {
+        'send_push_notifications_to_app': 'true',
+        'push_notifications': [[f'{org_app.schema}_news', 'News']],
+    }
+
+    # Create a PushNotification record directly in the database
+    # to simulate a notification that was already sent
+    push_notification = PushNotification(
+        news_id=news_id,
+        topic_id=f'{org_app.schema}_news',
+        sent_at=utcnow(),
+        response_data={'status': 'sent', 'message_id': 'test-message-id'},
+    )
+    session.add(push_notification)
+
+    # Commit transaction to ensure everything is saved to the database
+    transaction.commit()
+
+    # Setup test notification service
+    test_service = TestNotificationService()
+    set_test_notification_service(test_service)
+
+    try:
+        # Run the cronjob - this should detect the existing notification and
+        # skip it
+        client.get(get_cronjob_url(job))
+        assert (
+            len(test_service.sent_messages) == 0
+        ), "No notifications should be sent for duplicates"
+
+        # Count PushNotification records - should still be just 1
+        count = (
+            session.query(PushNotification)
+            .filter(
+                PushNotification.news_id == news_id,  # Use stored ID
+                PushNotification.topic_id == f'{org_app.schema}_news',
+                )
+            .count()
+        )
+        assert (
+            count == 1
+        ), "There should be exactly one notification record"
+
+    finally:
+        # Clean up
+        set_test_notification_service(None)
