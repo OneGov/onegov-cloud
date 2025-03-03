@@ -1,8 +1,12 @@
 # Changes
 
+## 2025.11
+
+`2025-03-03` | [0c2dd4a07e...0c2dd4a07e](https://github.com/OneGov/onegov-cloud/compare/0c2dd4a07e^...0c2dd4a07e)
+
 ## 2025.10
 
-`2025-03-03` | [753d4737ed...36e970d569](https://github.com/OneGov/onegov-cloud/compare/753d4737ed^...36e970d569)
+`2025-03-03` | [753d4737ed...a33c968d71](https://github.com/OneGov/onegov-cloud/compare/753d4737ed^...a33c968d71)
 
 ### Agency
 
@@ -2316,14 +2320,4 @@ If segmented_notifications is enabled for a principal, email and SMS subscribers
 ##### Fix Bug where Documents were displayed twice on resources
 
 `Bugfix` | [OGC-1569](https://linear.app/onegovcloud/issue/OGC-1569) | [ffde31511a](https://github.com/onegov/onegov-cloud/commit/ffde31511a25d456c181400523be4e99f24911df)
-
-## 2024.28
-
-`2024-04-26` | [11cf0ad93b...e98118ace3](https://github.com/OneGov/onegov-cloud/compare/11cf0ad93b^...e98118ace3)
-
-### Core
-
-##### Avoids writing `.tmp` files to the SMS queue altogether
-
-`Bugfix` | [1d7df063e1](https://github.com/onegov/onegov-cloud/commit/1d7df063e16e1b938da0b4e61bc51fe2ef989015)
 
