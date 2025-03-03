@@ -1441,7 +1441,7 @@ class FirebaseSettingsForm(Form):
 
     selectable_push_notification_options = StringField(
         label=_('Topics'),
-        fieldset=_('Defining a list of Topics from Hashtags'),
+        fieldset=_('Defines the firebase topic id'),
         render_kw={
             'class_': 'many many-firebasetopics',
         },
@@ -1597,16 +1597,15 @@ class FirebaseSettingsForm(Form):
         return json.dumps(
             {
                 'labels': {
-                    'text': self.request.translate(_('Topic ID')),
-                    'link': self.request.translate(_('Topic')),
+                    'text': 'Key',
+                    'link': 'Label',
                     'add': self.request.translate(_('Add')),
                     'remove': self.request.translate(_('Remove')),
                 },
                 'placeholders': {
-                    'text': self.request.translate(_('Topic ID')),
-                    'link': self.request.translate(_('Topic')),
+                    'text': 'Key',
+                    'link': 'Label'
                 },
-                # Include options directly in the JSON structure
                 'textOptions': text_options,
                 'linkOptions': link_options,
                 'values': [
