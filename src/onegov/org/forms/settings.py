@@ -1554,12 +1554,12 @@ class FirebaseSettingsForm(Form):
 
         # The first topic is just the schema, includes all News
         choices_for_topics = []
-        for hashtag in all_hashtags:
-            normalized_hashtag = hashtag.lower().replace(' ', '_')
-            hashtag_id = (
+        for label in all_hashtags:
+            normalized_hashtag = label.lower().replace(' ', '_')
+            key = (
                 self.request.app.schema + '_' + normalized_hashtag
             )
-            pair = [hashtag_id, hashtag]
+            pair = [key, label]
             choices_for_topics.append(pair)
         return choices_for_topics
 
@@ -1579,14 +1579,14 @@ class FirebaseSettingsForm(Form):
         if not tags:
             # set default topic News (which is all)
             app_id = self.request.app.schema
-            id_and_hashtag_pairs = [[app_id, 'News']]
+            topic_and_label_pairs = [[app_id, 'News']]
         else:
-            id_and_hashtag_pairs = tags
+            topic_and_label_pairs = tags
 
             # Check if the default pair exists, if not add it
             app_id = self.request.app.schema
-            if not any(pair[0] == app_id for pair in id_and_hashtag_pairs):
-                id_and_hashtag_pairs.insert(
+            if not any(pair[0] == app_id for pair in topic_and_label_pairs):
+                topic_and_label_pairs.insert(
                     0, [app_id, 'News']
                 )
 
@@ -1613,7 +1613,7 @@ class FirebaseSettingsForm(Form):
                         'text': l[0],
                         'link': l[1],
                         'error': self.hashtag_errors.get(ix, '')
-                    } for ix, l in enumerate(id_and_hashtag_pairs)
+                    } for ix, l in enumerate(topic_and_label_pairs)
                 ]
             }
         )

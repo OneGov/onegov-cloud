@@ -909,7 +909,13 @@ def send_push_notifications_for_news(request: OrgRequest) -> None:
                 f'{len(topics)} topics'
             )
 
-            for topic_id, __ in topics:
+            for topic_id in topics:
+                if isinstance(topic_id, str):
+                    print(f'String entry: {topic_id}')
+                else:
+                    print('Invalid topic entry')
+                    continue
+
                 # Check if notification was already sent
                 if PushNotification.was_notification_sent(
                     session, news.id, topic_id

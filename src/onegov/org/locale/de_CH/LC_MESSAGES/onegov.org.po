@@ -2,7 +2,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE 1.0\n"
-"POT-Creation-Date: 2025-03-03 16:26+0100\n"
+"POT-Creation-Date: 2025-03-03 17:43+0100\n"
 "PO-Revision-Date: 2022-03-15 10:21+0100\n"
 "Last-Translator: Marc Sommerhalder <marc.sommerhalder@seantis.ch>\n"
 "Language-Team: German\n"
@@ -4590,6 +4590,15 @@ msgstr ""
 msgid "Drop files to verify them"
 msgstr "Dateien zur Prüfung hierhin ziehen"
 
+msgid "Sent Notifications"
+msgstr "Gesendete Benachrichtigungen"
+
+msgid "Sent At"
+msgstr "Gesendet am"
+
+msgid "No notifications"
+msgstr "Keine Benachrichtigungen"
+
 msgid "No subscribers yet"
 msgstr "Noch keine Abonnenten"
 
@@ -5941,6 +5950,9 @@ msgstr "November"
 
 msgid "December"
 msgstr "Dezember"
+
+msgid "Push Notifications"
+msgstr "Push-Benachrichtigungen"
 
 msgid ""
 "The selected time does not exist on this date due to the switch from "

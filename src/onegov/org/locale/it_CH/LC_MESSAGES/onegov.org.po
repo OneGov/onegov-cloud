@@ -2,7 +2,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: \n"
-"POT-Creation-Date: 2025-03-03 16:26+0100\n"
+"POT-Creation-Date: 2025-03-03 17:43+0100\n"
 "PO-Revision-Date: 2022-03-15 10:52+0100\n"
 "Last-Translator: \n"
 "Language-Team: \n"
@@ -4586,6 +4586,15 @@ msgstr ""
 msgid "Drop files to verify them"
 msgstr "Rilascia i file per verificarli"
 
+msgid "Sent Notifications"
+msgstr "Notifiche inviate"
+
+msgid "Sent At"
+msgstr "Inviato a"
+
+msgid "No notifications"
+msgstr "Nessuna notifica"
+
 msgid "No subscribers yet"
 msgstr "Non ci sono ancora abbonati"
 
@@ -5946,6 +5955,9 @@ msgstr "Novembre"
 
 msgid "December"
 msgstr "Dicembre"
+
+msgid "Push Notifications"
+msgstr "Notifiche push"
 
 msgid ""
 "The selected time does not exist on this date due to the switch from "

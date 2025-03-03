@@ -1597,7 +1597,9 @@ def test_delete_unconfirmed_subscribers(org_app, handlers):
     assert recipients.query().count() == 2
 
 
-def test_send_push_notifications_for_news(org_app, handlers, firebase_json):
+def test_send_push_notifications_for_news(
+    org_app, handlers, firebase_json, client
+):
     register_echo_handler(handlers)
 
     client = Client(org_app)
@@ -1638,7 +1640,7 @@ def test_send_push_notifications_for_news(org_app, handlers, firebase_json):
     # Set metadata
     recent_news.meta = {
         'send_push_notifications_to_app': True,
-        'push_notifications': [[f'{org_app.schema}_news', 'News']],
+        'push_notifications': [f'{org_app.schema}_news'],
         'hashtags': ['News']
     }
 
