@@ -209,14 +209,10 @@ def test_occurrence_dates(session):
         assert str(dates[-1].tzinfo) == 'Europe/Zurich'
 
 
+@pytest.mark.skip_night_hours
 def test_latest_occurrence(session):
-    # Use a fixed reference time instead of datetime.now()
-    reference_time = datetime(
-        2023, 6, 15, 12, 0, 0
-    )
-
     def create_event(delta):
-        start = reference_time + delta
+        start = datetime.now() + delta
         end = start + timedelta(hours=6)
         session.query(Occurrence).delete()
         session.query(Event).delete()
@@ -251,7 +247,6 @@ def test_latest_occurrence(session):
     # future
     event = create_event(timedelta(days=40))
     assert event.latest_occurrence.start == event.occurrence_dates()[0]
-
 
 def test_occurrence_dates_dst(session):
     year = datetime.today().year
