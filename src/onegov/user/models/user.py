@@ -11,7 +11,7 @@ from onegov.core.utils import yubikey_otp_to_serial
 from onegov.search import ORMSearchable
 from onegov.user.models.group import UserGroup
 from sedate import utcnow
-from sqlalchemy import Boolean, Column, Index, Text, func, ForeignKey
+from sqlalchemy import Boolean, Column, Index, Table, Text, func, ForeignKey
 from sqlalchemy import UniqueConstraint
 from sqlalchemy.ext.hybrid import hybrid_property
 from sqlalchemy.orm import deferred, relationship
@@ -31,6 +31,29 @@ if TYPE_CHECKING:
         address: str | None
         timestamp: str
         agent: str | None
+
+
+group_association_table = Table(
+    'user_group_associations',
+    Base.metadata,
+    Column(
+        'user_id',
+        UUID,
+        ForeignKey('users.id'),
+        nullable=False
+    ),
+    Column(
+        'group_id',
+        UUID,
+        ForeignKey('groups.id'),
+        nullable=False
+    ),
+    UniqueConstraint(
+        'user_id',
+        'group_id',
+        name='uq_assoc_user_group_associations'
+    )
+)
 
 
 class User(Base, TimestampMixin, ORMSearchable):
@@ -93,16 +116,10 @@ class User(Base, TimestampMixin, ORMSearchable):
     #: the role is relevant for security in onegov.core
     role: Column[str] = Column(Text, nullable=False)
 
-    #: the id of the group this user belongs to
-    group_id: Column[UUIDType | None] = Column(
-        UUID,  # type:ignore[arg-type]
-        ForeignKey(UserGroup.id),
-        nullable=True
-    )
-
     #: the group this user belongs to
-    group: relationship[UserGroup | None] = relationship(
+    groups: relationship[list[UserGroup]] = relationship(
         UserGroup,
+        secondary=group_association_table,
         back_populates='users'
     )
 

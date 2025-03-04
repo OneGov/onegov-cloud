@@ -331,9 +331,10 @@ def export_users(
             users = self.query().filter(User.role == role)
             group_ids = form.group_names.data
             if group_ids:
-                users = users.filter(User.group_id.in_(group_ids))
-
-            users = users.join(User.group, isouter=True)
+                users = users.join(User.groups)
+                users = users.filter(UserGroup.id.in_(group_ids))
+            else:
+                users = users.outerjoin(User.groups)
 
             users = users.order_by(
                 UserGroup.name,
@@ -342,7 +343,7 @@ def export_users(
             )
             for index, user in enumerate(users.all()):
                 worksheet.write_row(index + 1, 0, (
-                    user.group.name if user.group else '',
+                    '|'.join(g.name for g in user.groups if g.name),
                     user.realname or '',
                     user.username or ''
                 ))

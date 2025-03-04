@@ -9,6 +9,8 @@ from sqlalchemy import Text
 from sqlalchemy.orm import relationship
 from uuid import uuid4, UUID as UUIDType
 
+from .user import group_association_table
+
 
 from typing import TYPE_CHECKING
 if TYPE_CHECKING:
@@ -47,7 +49,8 @@ class UserGroup(Base, ContentMixin, TimestampMixin):
     #: the members of this group
     users: relationship[AppenderQuery[User]] = relationship(
         'User',
-        back_populates='group',
+        secondary=group_association_table,
+        back_populates='groups',
         lazy='dynamic'
     )
 

@@ -280,3 +280,23 @@ def add_scope_column(context: UpgradeContext) -> None:
 
     context.session.flush()
     context.operations.alter_column('tans', 'scope', nullable=False)
+
+
+@upgrade_task('Move users.group_id to association table')
+def move_group_id_to_association_table(context: UpgradeContext) -> None:
+    if not context.has_table('users'):
+        return
+
+    if not context.has_column('users', 'group_id'):
+        return
+
+    assert context.has_table('user_group_associations')
+
+    context.operations.execute("""
+        INSERT INTO user_group_associations
+        SELECT id AS user_id, group_id
+          FROM users;
+    """)
+
+    context.session.flush()
+    context.operations.drop_column('users', 'group_id')

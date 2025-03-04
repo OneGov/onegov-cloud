@@ -18,13 +18,13 @@ from onegov.user.models import User
 from onegov.user.models import UserGroup
 
 
-def create_user(name, role='anonymous', group_id=None):
+def create_user(name, role='anonymous', groups=None):
     return User(
         realname=name,
         username=f'{name}@example.org',
         password_hash='hash',
         role=role,
-        group_id=group_id
+        groups=groups or []
     )
 
 
@@ -203,7 +203,7 @@ def test_security_permissions(agency_app):
                 user = users.setdefault(username, create_user(
                     username,
                     real_role,
-                    groups[f'{name}-{role}s'].id
+                    [groups[f'{name}-{role}s']]
                 ))
                 session.add(user)
 
@@ -212,7 +212,7 @@ def test_security_permissions(agency_app):
         user = users.setdefault(username, create_user(
             username,
             role,
-            groups[f'a-b-{role}s'].id
+            [groups[f'a-b-{role}s']]
         ))
         session.add(user)
     session.flush()

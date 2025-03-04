@@ -360,31 +360,31 @@ def test_user_form(session):
     assert form.username.data == 'a@a.ai'
     assert form.role.data == 'editor'
     assert form.name.data == 'User'
-    assert form.group.data == ''
+    assert form.group_ids.data == []
     assert form.phone_number.data == '+41415554433'
 
-    user.group = group
+    user.groups = [group]
     session.flush()
 
     form.apply_model(user)
-    assert form.group.data == str(group.id)
+    assert form.group_ids.data == [str(group.id)]
 
     form.username.data = 'b@b.bi'
     form.role.data = 'publisher'
     form.name.data = 'Publisher'
-    form.group.data = ''
+    form.group_ids.data = []
     form.phone_number.data = '0415554434'
 
     form.update_model(user)
     assert user.username == 'b@b.bi'
     assert user.role == 'publisher'
     assert user.realname == 'Publisher'
-    assert user.group_id is None
+    assert user.groups == []
     assert user.phone_number == '+41415554434'
 
     session.flush()
     session.refresh(user)
-    assert user.group is None
+    assert user.groups == []
 
     # Test validation
     form = UserForm()
@@ -398,7 +398,7 @@ def test_user_form(session):
                 'role': role,
                 'name': 'User',
                 'username': 'x@y.za',
-                'group': ''
+                'group_ids': ''
             })
         )
         form.request = DummyRequest(session, private=True, secret=True)
@@ -411,7 +411,7 @@ def test_user_form(session):
             'role': 'editor',
             'name': 'User',
             'username': 'b@b.bi',
-            'group': ''
+            'group_ids': ''
         })
     )
     form.request = DummyRequest(session, private=True, secret=True)
@@ -428,7 +428,7 @@ def test_user_form_on_request(session):
     form.request = DummyRequest(session)
 
     form.on_request()
-    assert form.group.choices == [('', '- none -')]
+    assert form.group_ids.choices == []
 
     # Groups
     groups = UserGroupCollection(session)
@@ -438,7 +438,7 @@ def test_user_form_on_request(session):
 
     form.on_request()
     assert sorted([choice[1] for choice in form.group.choices]) == [
-        '- none -', 'Group A', 'Group B', 'Group C'
+        'Group A', 'Group B', 'Group C'
     ]
 
     # Roles

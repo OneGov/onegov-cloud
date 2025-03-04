@@ -277,7 +277,7 @@ class Auth:
             #        a few places after all.
             userid=user.username,
             uid=user.id.hex,
-            groupid=user.group_id.hex if user.group_id else '',
+            groupids=frozenset(group.id.hex for group in user.groups),
             role=user.role,
             application_id=self.application_id
         )
