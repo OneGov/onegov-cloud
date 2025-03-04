@@ -154,16 +154,16 @@ def add_closed_on_column_to_ticket(context: UpgradeContext) -> None:
         'tickets', Column('closed_on', UTCDateTime, nullable=True)
     )
 
-    stmt = update(Ticket).where(
+    stmt = update(Ticket.__table__).where(
         and_(
-            Ticket.state.in_(('closed', 'archived')),
-            Ticket.reaction_time.isnot(None),
-            Ticket.process_time.isnot(None)
+            Ticket.__table__.c.state.in_(('closed', 'archived')),
+            Ticket.__table__.c.reaction_time.isnot(None),
+            Ticket.__table__.c.process_time.isnot(None)
         )
     ).values(
-        closed_on=Ticket.created +
-                  func.make_interval(secs=Ticket.reaction_time) +
-                  func.make_interval(secs=Ticket.process_time)
+        closed_on=Ticket.__table__.c.created +
+                  func.make_interval(secs=Ticket.__table__.c.reaction_time) +
+                  func.make_interval(secs=Ticket.__table__.c.process_time)
     )
     context.session.execute(stmt)
     context.session.flush()
