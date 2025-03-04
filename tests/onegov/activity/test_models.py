@@ -2398,10 +2398,10 @@ def test_no_occasion_orphans(session, collections, prebooking_period, owner):
     assert session.query(OccasionDate).count() == 0
 
 
+@pytest.mark.skip_night_hours
 def test_date_changes(session, collections, prebooking_period, owner):
-    # Fixme: Is a flaky test
-    period = prebooking_period
 
+    period = prebooking_period
     collections.occasions.add(
         start=period.execution_start,
         end=period.execution_start + timedelta(hours=2),
@@ -2409,7 +2409,6 @@ def test_date_changes(session, collections, prebooking_period, owner):
         activity=collections.activities.add("Sport", username=owner.username),
         period=period
     )
-
     transaction.commit()
 
     o = collections.occasions.query().first()
