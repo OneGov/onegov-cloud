@@ -5,11 +5,12 @@ from onegov.core.orm.mixins import TimestampMixin
 from onegov.core.orm.mixins import ContentMixin
 from onegov.core.orm.types import UUID
 from sqlalchemy import Column
+from sqlalchemy import ForeignKey
+from sqlalchemy import Table
 from sqlalchemy import Text
+from sqlalchemy import UniqueConstraint
 from sqlalchemy.orm import relationship
 from uuid import uuid4, UUID as UUIDType
-
-from .user import group_association_table
 
 
 from typing import TYPE_CHECKING
@@ -17,6 +18,29 @@ if TYPE_CHECKING:
     from onegov.core.types import AppenderQuery
     from onegov.user import RoleMapping
     from onegov.user import User
+
+
+group_association_table = Table(
+    'user_group_associations',
+    Base.metadata,
+    Column(
+        'user_id',
+        UUID,
+        ForeignKey('users.id'),
+        nullable=False
+    ),
+    Column(
+        'group_id',
+        UUID,
+        ForeignKey('groups.id'),
+        nullable=False
+    ),
+    UniqueConstraint(
+        'user_id',
+        'group_id',
+        name='uq_assoc_user_group_associations'
+    )
+)
 
 
 class UserGroup(Base, ContentMixin, TimestampMixin):
