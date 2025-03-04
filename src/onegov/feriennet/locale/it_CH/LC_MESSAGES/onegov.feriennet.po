@@ -2,7 +2,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: \n"
-"POT-Creation-Date: 2025-01-30 14:14+0100\n"
+"POT-Creation-Date: 2025-03-04 13:29+0100\n"
 "PO-Revision-Date: 2021-11-11 09:07+0100\n"
 "Last-Translator: Marc Sommerhalder <marc.sommerhalder@seantis.ch>\n"
 "Language-Team: \n"
@@ -1645,14 +1645,17 @@ msgstr "Deduzioni / Supplementi"
 msgid "Organizer:"
 msgstr "Organizzatore:"
 
+msgid "Unpaid"
+msgstr "Non pagato"
+
+msgid "Total"
+msgstr "Totale"
+
 msgid "amount unpaid"
 msgstr "non pagato"
 
 msgid "paid"
 msgstr "pagato"
-
-msgid "Total"
-msgstr "Totale"
 
 msgid "Reset Billing"
 msgstr "Azzerare la fatturazione"
@@ -2611,9 +2614,6 @@ msgstr ""
 "L'account utente deve essere aperto da una persona maggiorenne con autorità "
 "parentale."
 
-msgid "Unpaid"
-msgstr "Non pagato"
-
 msgid "Add manual booking"
 msgstr "Aggiungere prenotazione manuale"
 
@@ -3049,6 +3049,9 @@ msgid ""
 msgstr ""
 "Un periodo può essere archiviato solo quando l'assegnazione è stata fatta e "
 "le fatture sono state emesse."
+
+msgid "The period can not be deleted as it is already in use"
+msgstr "Il periodo non può essere cancellato perché è già in uso"
 
 msgid "Delete Period"
 msgstr "Cancellare il periodo"

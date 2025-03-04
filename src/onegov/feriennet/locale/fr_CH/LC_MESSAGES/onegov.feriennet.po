@@ -2,7 +2,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE 1.0\n"
-"POT-Creation-Date: 2025-01-30 14:14+0100\n"
+"POT-Creation-Date: 2025-03-04 13:29+0100\n"
 "PO-Revision-Date: 2021-11-11 09:07+0100\n"
 "Last-Translator: Marc Sommerhalder <marc.sommerhalder@seantis.ch>\n"
 "Language-Team: French\n"
@@ -1653,14 +1653,17 @@ msgstr "Remises / Suppléments"
 msgid "Organizer:"
 msgstr "Organisateur:"
 
+msgid "Unpaid"
+msgstr "Non payé"
+
+msgid "Total"
+msgstr "Total"
+
 msgid "amount unpaid"
 msgstr "non payé"
 
 msgid "paid"
 msgstr "payé"
-
-msgid "Total"
-msgstr "Total"
 
 msgid "Reset Billing"
 msgstr "Réinitialiser la facturation"
@@ -2632,9 +2635,6 @@ msgstr ""
 "Le compte utilisateur·trice doit être ouvert par un parent ou une personne "
 "de référence majeure."
 
-msgid "Unpaid"
-msgstr "Non payé"
-
 msgid "Add manual booking"
 msgstr "Ajouter une remise ou un supplément"
 
@@ -3067,6 +3067,9 @@ msgid ""
 msgstr ""
 "Une période peut uniquement être archivée quand l'attribution a été "
 "confirmée et les factures ont été établies."
+
+msgid "The period can not be deleted as it is already in use"
+msgstr "La période ne peut pas être supprimée car elle est déjà en cours"
 
 msgid "Delete Period"
 msgstr "Supprimer la période"

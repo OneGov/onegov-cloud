@@ -1,7 +1,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE 1.0\n"
-"POT-Creation-Date: 2025-01-30 14:14+0100\n"
+"POT-Creation-Date: 2025-03-04 13:29+0100\n"
 "PO-Revision-Date: 2021-11-11 09:08+0100\n"
 "Last-Translator: Marc Sommerhalder <marc.sommerhalder@seantis.ch>\n"
 "Language-Team: German\n"
@@ -1645,14 +1645,17 @@ msgstr "Abzüge / Zuschläge"
 msgid "Organizer:"
 msgstr "Veranstalter:"
 
+msgid "Unpaid"
+msgstr "Unbezahlt"
+
+msgid "Total"
+msgstr "Total"
+
 msgid "amount unpaid"
 msgstr "offen"
 
 msgid "paid"
 msgstr "bezahlt"
-
-msgid "Total"
-msgstr "Total"
 
 msgid "Reset Billing"
 msgstr "Fakturierung zurücksetzen"
@@ -2617,9 +2620,6 @@ msgstr ""
 "Das Benutzerkonto muss durch eine erziehungsberechtigte, volljährige Person "
 "eröffnet werden."
 
-msgid "Unpaid"
-msgstr "Unbezahlt"
-
 msgid "Add manual booking"
 msgstr "Manuelle Buchung hinzufügen"
 
@@ -3054,6 +3054,9 @@ msgid ""
 msgstr ""
 "Ein Zeitraum kann erst archiviert werden wenn die Zuteilung gemacht und die "
 "Rechnungen erstellt wurden."
+
+msgid "The period can not be deleted as it is already in use"
+msgstr "Der Zeitraum kann nicht gelöscht werden, da er bereits verwendet wird"
 
 msgid "Delete Period"
 msgstr "Zeitraum löschen"

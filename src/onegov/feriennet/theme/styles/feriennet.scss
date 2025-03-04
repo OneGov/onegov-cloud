@@ -3242,3 +3242,8 @@ $booking-left-margin: 1.6rem;
 .page-text img {
     border-radius: .7rem;
 }
+
+.disabled {
+    opacity: .5;
+    cursor: not-allowed !important;
+}
