@@ -423,6 +423,17 @@ def stdnum() -> ParserElement:
     return parser
 
 
+def chip_nr() -> ParserElement:
+    """ Returns a chip number parser.
+
+    Example::
+
+        chip-nr
+
+    """
+    return Suppress(Regex(r'chip-nr')).setParseAction(tag(type='chip_nr'))
+
+
 def fileinput() -> ParserElement:
     """ Returns a fileinput parser.
 

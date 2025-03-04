@@ -135,6 +135,9 @@ msgstr ""
 msgid "Swiss vat number"
 msgstr ""
 
+msgid "Animal identification number (Microchip-Nr.)"
+msgstr ""
+
 msgid "Password"
 msgstr ""
 
