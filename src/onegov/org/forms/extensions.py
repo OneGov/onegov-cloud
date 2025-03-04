@@ -275,10 +275,7 @@ class PublicationFormExtension(FormExtension[FormT], name='publication'):
                 if not start.data:
                     return None
 
-                if (
-                    hasattr(self, 'request')
-                    and self.request.app.org.firebase_adminsdk_credential
-                ):
+                if self.meta.request.app.org.firebase_adminsdk_credential:
                     min_start_time = utcnow() + timedelta(minutes=5)
                     start_utc = to_timezone(start.data, 'UTC')
 
