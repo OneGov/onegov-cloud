@@ -29,9 +29,21 @@ def create_user(name, role='anonymous', groups=None):
 
 
 def test_security_get_current_role(session):
-    admin = Identity(userid='admin@example.org', role='admin')
-    editor = Identity(userid='editor@example.org', role='editor')
-    member = Identity(userid='member@example.org', role='member', groupid=None)
+    admin = Identity(
+        userid='admin@example.org',
+        role='admin',
+        groupids=frozenset()
+    )
+    editor = Identity(
+        userid='editor@example.org',
+        role='editor',
+        groupids=frozenset()
+    )
+    member = Identity(
+        userid='member@example.org',
+        role='member',
+        groupids=frozenset()
+    )
 
     assert get_current_role(session, NO_IDENTITY) is None
     assert get_current_role(session, admin) == 'admin'
@@ -51,7 +63,7 @@ def test_security_get_current_role(session):
         )
     )
     session.flush()
-    member.groupid = group.id
+    member.groupid = frozenset({group.id.hex})
     assert get_current_role(session, member) == 'member'
 
     session.add(
