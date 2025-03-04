@@ -736,6 +736,7 @@
     <tal:b condition="price.fee and show_fee|nothing">
         (+ ${layout.format_number(price.fee)} <tal:b i18n:translate>Credit Card Fee</tal:b>)
     </tal:b>
+    <br>${layout.format_vat(price.net_amount, price.currency)}
 </metal:price>
 
 <metal:person_card define-macro="person_list_card" i18n:domain="onegov.org">
