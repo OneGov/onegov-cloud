@@ -260,14 +260,14 @@ def test_notice_collection_query_deleted_user(session):
         username='a@a.a',
         password='a',
         role='admin',
-        group=group_a
+        groups=[group_a]
     )
     user_b = users.add(
         realname="User B",
         username='b@b.b',
         password='b',
         role='admin',
-        group=group_b
+        groups=[group_b]
     )
 
     notices = GazetteNoticeCollection(session)

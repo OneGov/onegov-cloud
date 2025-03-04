@@ -169,10 +169,14 @@ def test_notice_collection_users_and_groups(session):
     group_d = groups.add(name='D')
 
     users = UserCollection(session)
-    user_a = users.add('a@example.org', 'password', 'editor', group=group_ab)
-    user_b = users.add('b@example.org', 'password', 'editor', group=group_ab)
-    user_c = users.add('c@example.org', 'password', 'editor', group=group_c)
-    user_d = users.add('d@example.org', 'password', 'editor', group=group_d)
+    user_a = users.add(
+        'a@example.org', 'password', 'editor', groups=[group_ab]
+    )
+    user_b = users.add(
+        'b@example.org', 'password', 'editor', groups=[group_ab]
+    )
+    user_c = users.add('c@example.org', 'password', 'editor', groups=[group_c])
+    user_d = users.add('d@example.org', 'password', 'editor', groups=[group_d])
     user_e = users.add('e@example.org', 'password', 'editor')
 
     notices = OfficialNoticeCollection(session)
