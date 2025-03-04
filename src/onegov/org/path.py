@@ -44,7 +44,7 @@ from onegov.newsletter import Subscription
 from onegov.org.app import OrgApp
 from onegov.org.auth import MTANAuth
 from onegov.org.converters import keywords_converter
-from onegov.org.models import AtoZPages
+from onegov.org.models import AtoZPages, PushNotificationCollection
 from onegov.org.models import Clipboard
 from onegov.org.models import Dashboard
 from onegov.org.models import DirectorySubmissionAction
@@ -1108,3 +1108,10 @@ def get_qr_code(
 )
 def get_api_key_for_delete(request: OrgRequest, key: UUID) -> ApiKey | None:
     return request.session.query(ApiKey).filter_by(key=key).first()
+
+
+@OrgApp.path(model=PushNotificationCollection, path='/push-notifications')
+def get_sent_notification_collection(
+    request: OrgRequest,
+) -> PushNotificationCollection:
+    return PushNotificationCollection(request.session)
