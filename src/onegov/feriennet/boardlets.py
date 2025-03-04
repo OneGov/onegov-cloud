@@ -111,7 +111,7 @@ class PeriodBoardlet(FeriennetBoardlet):
             return
 
         def icon(checked: bool) -> str:
-            return 'fa-check-circle' if checked else 'fa-circle'
+            return 'far fa-check-circle' if checked else 'far fa-circle'
 
         yield BoardletFact(
             text=_('Prebooking: ${dates}', mapping={
