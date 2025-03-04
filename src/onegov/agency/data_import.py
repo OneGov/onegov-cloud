@@ -546,14 +546,15 @@ def import_lu_agencies(
 
         dienststelle, abteilung, unterabteilung, unterabteilung_2 = (
             None, None, None, None)
-        export_fields = ['person.function', 'person.academic_title',
+        export_fields = ['membership.title', 'person.academic_title',
                          'person.title', 'person.phone']
 
         adr, pc, loc = None, None, None
         phone, phone_u2, phone_u, phone_a, phone_ds, phone_dep = \
             None, None, None, None, None, None
-        kw = 'Telefon'
-        if kw in line.nachname or kw in line.vorname or kw in line.funktion:
+        kw1, kw2 = 'Telefon', 'Sekretariat'
+        if (kw1 in line.nachname or kw1 in line.vorname or
+                kw1 in line.funktion or kw2 in line.nachname):
             # considered as an agency phone number not a personal one
             phone = get_phone(line.isdn_nummer)
             if v_(line.unterabteilung_2):

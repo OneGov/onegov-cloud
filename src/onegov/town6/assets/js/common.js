@@ -305,7 +305,7 @@ $('.reveal[data-reveal-width]').on('open.zf.reveal', function() {
 });
 
 // Page edit form style adjustments
-[...document.getElementsByClassName('indent-context-specific-function')].forEach((formField) => {
+[...document.getElementsByClassName('indent-form-field')].forEach((formField) => {
     if (formField instanceof HTMLInputElement && formField.type === 'text') {
        formField.style.width = '90%';
     }

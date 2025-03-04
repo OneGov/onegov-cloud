@@ -3218,3 +3218,6 @@ def test_view_dashboard(client, scenario):
         ) == "1\ndurchführbar"
     assert page.pyquery('.activities .facts tr:nth-child(7)').text(
         ) == "1\nunbelegt"
+
+    # ensure only feriennet boardlets are shown
+    assert len(page.pyquery('.boardlet')) == 6

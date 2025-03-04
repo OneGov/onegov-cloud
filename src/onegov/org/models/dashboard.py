@@ -18,7 +18,7 @@ class Dashboard:
 
     @property
     def is_available(self) -> bool:
-        """ Returns true if there are boardlets to show. """
+        """ Returns true if there are `Boardlet`s to display. """
 
         return self.request.app.config.boardlets_registry and True or False
 
@@ -27,10 +27,12 @@ class Dashboard:
 
         instances = []
 
-        for name, data in self.request.app.config.boardlets_registry.items():
+        for name, data in (
+                self.request.app.config.boardlets_registry.items()):
             instances.append(data['cls'](
                 name=name,
                 order=data['order'],
+                icon=data['icon'],
                 request=self.request
             ))
 
@@ -50,7 +52,7 @@ class Boardlet:
 
         from onegov.app import App
 
-        @App.boardlet(name='foo', order=(1, 1))
+        @App.boardlet(name='foo', order=(1, 1), icon='')
         class MyBoardlet(Boardlet):
             pass
 
@@ -60,10 +62,12 @@ class Boardlet:
         self,
         name: str,
         order: tuple[int, int],
+        icon: str,
         request: OrgRequest
     ) -> None:
         self.name = name
         self.order = order
+        self.icon = icon or ''
         self.request = request
 
     @property
@@ -81,6 +85,11 @@ class Boardlet:
         raise NotImplementedError()
 
     @property
+    def is_available(self) -> bool:
+        """ Returns true if the boardlet is active/has data. """
+        return True
+
+    @property
     def state(self) -> Literal['success', 'warning', 'failure']:
         """ Yields one of three states:
 
@@ -96,11 +105,22 @@ class Boardlet:
 class BoardletFact:
     """ A single boardlet fact. """
 
-    # the text of the fact (includes the metric)
+    # the text of the fact (not including the metric)
     text: str
 
+    # the metric of the fact
     number: int | float | str | None = None
 
+    # link to be displayed as tuple of link, link text
+    link: tuple[str, str] | None = None
+
+    # the font awesome (fa-*) icon to use, if any
     icon: str | None = None
+
+    # visibility icon right behind text/link
+    visibility_icon: str | None = None
+
+    # title of the icon (hover text)
+    icon_title: str | None = None
 
     css_class: str | None = None

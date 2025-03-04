@@ -3,27 +3,72 @@
 */
 
 .boardlet {
-        background: $white-smoke;
-        margin-bottom: 1.5rem;
-        border-top: 5px solid $green-light;
-        padding: 1rem;
-        border-radius: .7rem;
+    background: $white-smoke;
+    border-top: 5px solid $primary_color;
+    margin-bottom: 1.5rem;
+    padding: 1rem;
+    border-radius: .7rem;
+    height: calc(100% - 2rem);
 
     h2.h4 {
         margin-bottom: 1rem;
         margin-top: -.2rem;
     }
 
-    li {
-        font-size: .9rem;
+    table{
+        margin-bottom: 0;
     }
 
-    &.boardlet-warning {
-        border-top-color: $yellow-light;
-    }
+    tr {
+        &.boardlet-failure {
+            border-top-color: $red-light;
+        }
 
-    &.boardlet-failure {
-        border-top-color: $red-light;
+        h2.h4 {
+            padding: .5rem;
+            background: $white;
+            text-align: center;
+            border-radius: .7rem;
+        }
+
+        .title {
+            font-weight: normal;
+        }
+
+        .facts {
+            width: 100%;
+            table-layout: auto;
+            border-collapse: collapse;
+
+            tbody {
+                background: transparent;
+            }
+
+            td:first-child {
+                white-space: nowrap;
+                width: 1%;
+            }
+        }
+
+        .fact-number,
+        .fact-icon {
+            padding: .5rem;
+            border-radius: .2rem;
+            text-align: right;
+        }
+
+        .fact-icon {
+            text-align: center;
+        }
+
+        .fact-visibility-icon {
+            padding-left: .3rem;
+            color: $primary-color;
+        }
+
+        .fact-text {
+            margin-left: .5rem;
+        }
     }
 
     h2.h4 {

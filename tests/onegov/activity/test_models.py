@@ -963,7 +963,7 @@ def test_occasion_owners(session, owner, secondary_owner):
 
 
 def test_attendee_age(session, owner):
-    with freeze_time('2024-02-28'):
+    with freeze_time('2025-02-28'):
 
         def age(years):
             return date.today().replace(year=date.today().year - years)

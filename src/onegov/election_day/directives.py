@@ -144,7 +144,7 @@ def render_json(content: dict[str, Any], request: CoreRequest) -> Response:
     data = content.get('data', {})
     name = content.get('name', 'data')
     return Response(
-        json.dumps(data, sort_keys=True, indent=2).encode('utf-8'),
+        json.dumps_bytes(data, sort_keys=True, indent=2),
         content_type='application/json; charset=utf-8',
         content_disposition=f'inline; filename={name}.json')
 

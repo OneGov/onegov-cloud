@@ -1166,23 +1166,23 @@ def test_view_translator_mutation(broadcast, authenticate, connect, client):
     page.form.get('changes', index=40).checked = False
     page = page.form.submit().follow()
     assert (
-        'Vorgeschlagene \\u00c4nderungen \\u00fcbernommen: '
+        'Vorgeschlagene Änderungen übernommen: '
         'Vorname, Nachname, Personal Nr., Zulassung, Quellensteuer, '
-        'Selbst\\u00e4ndig, Geschlecht, Geburtsdatum, Nationalit\\u00e4t(en), '
+        'Selbständig, Geschlecht, Geburtsdatum, Nationalität(en), '
         'Standort, Strasse und Hausnummer, PLZ, Ort, Fahrdistanz (km), '
         'AHV-Nr., Bank Name, Bank Adresse, Bank Konto lautend auf, IBAN, '
-        'Telefon Privat, Telefon Mobile, Telefon Gesch\\u00e4ft, '
-        'Erreich- und Verf\\u00fcgbarkeit, '
+        'Telefon Privat, Telefon Mobile, Telefon Geschäft, '
+        'Erreich- und Verfügbarkeit, '
         'Fachkenntnisse nach Dolmetscherart, '
         'Fachkenntnisse nach Berufssparte, '
         'Fachkenntnisse nach Berufssparte: andere, '
-        'Besondere Hinweise Einsatzm\\u00f6glichkeiten, '
+        'Besondere Hinweise Einsatzmöglichkeiten, '
         'Zustimmung Namensbekanntgabe, Bewerbung Datum, Entscheid Datum, '
         'Muttersprachen, Arbeitssprache - Wort, Arbeitssprache - Schrift, '
-        'Arbeitssprache - Kommunikations\\u00fcberwachung, '
+        'Arbeitssprache - Kommunikationsüberwachung, '
         'Erlernter Beruf, '
         'Aktuelle berufliche Tatigkeit, '
-        'Nachweis der Voraussetzung, Referenzen Beh\\u00f6rden, '
+        'Nachweis der Voraussetzung, Referenzen Behörden, '
         'Ausbildung Dolmetscher, Zertifikate.'
     ) in page
 
