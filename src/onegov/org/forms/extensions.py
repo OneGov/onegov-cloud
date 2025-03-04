@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+from datetime import timedelta
 from functools import cached_property
 from sedate import utcnow, to_timezone
 
@@ -19,7 +20,8 @@ from wtforms.fields import StringField
 from wtforms.fields import TextAreaField
 from wtforms.validators import DataRequired, InputRequired, ValidationError
 
-from typing import TypeVar, TYPE_CHECKING
+from typing import TypeVar, TYPE_CHECKING, Any
+
 if TYPE_CHECKING:
     from collections.abc import Collection
     from markupsafe import Markup
@@ -268,25 +270,55 @@ class PublicationFormExtension(FormExtension[FormT], name='publication'):
                 validators=[StrictOptional()]
             )
 
+            def _validate_firebase_start_time(self) -> bool | None:
+                start = self.publication_start
+                if not start.data:
+                    return None
+
+                if (
+                    hasattr(self, 'request')
+                    and self.request.app.org.firebase_adminsdk_credential
+                ):
+                    min_start_time = utcnow() + timedelta(minutes=5)
+                    start_utc = to_timezone(start.data, 'UTC')
+
+                    if start_utc <= min_start_time:
+                        assert isinstance(start.errors, list)
+                        start.errors.append(_(
+                                'When using Firebase, publication start must '
+                                'be at least 5 minutes in the future'
+                            )
+                        )
+                        return False
+                return None
+
             def ensure_publication_start_end(self) -> bool | None:
                 start = self.publication_start
                 end = self.publication_end
                 if not start or not end:
                     return None
+
+                # Check if publication end is in the future
                 if end.data and to_timezone(end.data, 'UTC') <= utcnow():
                     assert isinstance(self.publication_end.errors, list)
                     self.publication_end.errors.append(
                         _('Publication end must be in the future'))
                     return False
+
+                # Validate Firebase requirements
+                if self._validate_firebase_start_time() is False:
+                    return False
+
+                # Check if start is before end
                 if not start.data or not end.data:
                     return None
-
                 if end.data <= start.data:
                     for field_name in ('publication_start', 'publication_end'):
                         field = getattr(self, field_name)
                         field.errors.append(
                             _('Publication start must be prior to end'))
                     return False
+
                 return None
 
         return PublicationForm
@@ -298,8 +330,7 @@ class PushNotificationFormExtension(FormExtension[FormT], name='publish'):
     def create(self, timezone: str = 'Europe/Zurich') -> type[FormT]:
 
         class PublicationForm(self.form_class):  # type:ignore
-
-            def __init__(self, *args, **kwargs) -> None:
+            def __init__(self, *args: Any, **kwargs: Any) -> None:
                 super().__init__(*args, **kwargs)
                 if self.request.app.org.firebase_adminsdk_credential:
                     self._add_push_notification_fields()
