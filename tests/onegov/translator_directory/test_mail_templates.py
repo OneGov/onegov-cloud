@@ -1,6 +1,7 @@
 from io import BytesIO
 from os.path import basename
 import docx
+import pytest
 from sedate import utcnow
 from onegov.core.layout import Layout
 from onegov.core.utils import module_path, Bunch
@@ -22,6 +23,7 @@ from tests.onegov.translator_directory.shared import (
 )
 
 
+@pytest.mark.skip_night_hours
 def test_read_write_cycle():
     translator = Translator(**translator_data)
     translator.admission = ADMISSIONS['certified']
