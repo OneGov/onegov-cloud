@@ -32,10 +32,10 @@ def get_current_role(
     """
 
     if identity.userid:
-        if identity.role == 'member' and identity.groupid:
+        if identity.role == 'member' and identity.groupids:
             role = session.query(RoleMapping).filter(
                 RoleMapping.role == 'editor',
-                RoleMapping.group_id == identity.groupid
+                RoleMapping.group_id.in_(identity.groupids)
             ).first()
             if role:
                 return 'editor'
@@ -75,11 +75,11 @@ def has_model_permission(
         return True
 
     # Check the role mappings of the model
-    if identity.role == 'member' and identity.groupid:
+    if identity.role == 'member' and identity.groupids:
         if hasattr(model, 'role_mappings'):
             role = model.role_mappings.filter(
                 RoleMapping.role == 'editor',
-                RoleMapping.group_id == identity.groupid
+                RoleMapping.group_id.in_(identity.groupids)
             ).first()
             if role and permission in getattr(
                 app.settings.roles, 'editor', []

@@ -18,20 +18,32 @@ from onegov.user.models import User
 from onegov.user.models import UserGroup
 
 
-def create_user(name, role='anonymous', group_id=None):
+def create_user(name, role='anonymous', groups=None):
     return User(
         realname=name,
         username=f'{name}@example.org',
         password_hash='hash',
         role=role,
-        group_id=group_id
+        groups=groups or []
     )
 
 
 def test_security_get_current_role(session):
-    admin = Identity(userid='admin@example.org', role='admin')
-    editor = Identity(userid='editor@example.org', role='editor')
-    member = Identity(userid='member@example.org', role='member', groupid=None)
+    admin = Identity(
+        userid='admin@example.org',
+        role='admin',
+        groupids=frozenset()
+    )
+    editor = Identity(
+        userid='editor@example.org',
+        role='editor',
+        groupids=frozenset()
+    )
+    member = Identity(
+        userid='member@example.org',
+        role='member',
+        groupids=frozenset()
+    )
 
     assert get_current_role(session, NO_IDENTITY) is None
     assert get_current_role(session, admin) == 'admin'
@@ -51,7 +63,7 @@ def test_security_get_current_role(session):
         )
     )
     session.flush()
-    member.groupid = group.id
+    member.groupid = frozenset({group.id.hex})
     assert get_current_role(session, member) == 'member'
 
     session.add(
@@ -203,7 +215,7 @@ def test_security_permissions(agency_app):
                 user = users.setdefault(username, create_user(
                     username,
                     real_role,
-                    groups[f'{name}-{role}s'].id
+                    [groups[f'{name}-{role}s']]
                 ))
                 session.add(user)
 
@@ -212,7 +224,7 @@ def test_security_permissions(agency_app):
         user = users.setdefault(username, create_user(
             username,
             role,
-            groups[f'a-b-{role}s'].id
+            [groups[f'a-b-{role}s']]
         ))
         session.add(user)
     session.flush()

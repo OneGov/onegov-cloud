@@ -142,7 +142,8 @@ class TicketAssignmentForm(Form):
         self.user.choices = [
             (
                 str(user.id),
-                f'{user.title} ({user.group.name})' if user.group
+                f'{user.title} ({", ".join(str(g.name) for g in user.groups)})'
+                if user.groups
                 else user.title
             )
             for user in UserCollection(self.request.session).query()

@@ -1318,7 +1318,7 @@ class Framework(
         self,
         userid: str,
         uid: str,
-        groupid: str | None,
+        groupids: frozenset[str],
         role: str
     ) -> morepath.authentication.Identity:
         """ Returns a new morepath identity for the given userid, group and
@@ -1326,7 +1326,7 @@ class Framework(
 
         """
         return morepath.authentication.Identity(
-            userid, uid=uid, groupid=groupid, role=role,
+            userid, uid=uid, groupids=groupids, role=role,
             application_id=self.application_id_hash
         )
 

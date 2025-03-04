@@ -1157,10 +1157,11 @@ def user_group_emails_for_new_ticket(
 
     return {
         u.username
-        for user in request.session.query(User).filter(
-            User.group_id.isnot(None)
-        ) if user.group is not None
-        for u in user.group.users
+        for user in request.session.query(User).join(
+            User.groups
+        )
+        for group in user.groups
+        for u in group.users
         if user.group.meta
         and (dirs := user.group.meta.get('directories')) is not None
         and ticket.group in dirs

@@ -29,24 +29,25 @@ def test_security_ticket_permissions(org_app):
     }
 
     # ... users
-    def create_user(name, role, group_id=None):
+    def create_user(name, role, groups=None):
         result = User(
             realname=name,
             username=f'{name}@example.org',
             password_hash='hash',
             role=role,
-            group_id=group_id
+            groups=groups or []
         )
         session.add(result)
         return result
 
+    # TODO: Add a test case for multi-user-group-membership
     roles = ('admin', 'editor', 'member', 'anonymous')
     users = {}
     for role in roles:
         users[role] = create_user(role, role)
         for group in groups.values():
             name = f'{group.name}-{role}'
-            users[name] = create_user(name, role, group.id)
+            users[name] = create_user(name, role, [group])
 
     # ... permissions
     def create_permission(handler_code, group, user_group):
@@ -89,7 +90,7 @@ def test_security_ticket_permissions(org_app):
         return org_app._permits(
             Identity(
                 userid=user.username,
-                groupid=user.group_id.hex if user.group_id else '',
+                groupid=frozenset(group.id.hex for group in user.groups),
                 role=user.role,
                 application_id=org_app.application_id
             ),

@@ -162,8 +162,10 @@ def test_import_editors(temporary_directory, redis_url, session_manager):
     users = session_manager.session().execute("""
         SELECT users.username, users.realname, users.role, groups.name
         FROM "onegov_gazette-govikon".users as users
+        LEFT JOIN "onegov_gazette-govikon".user_group_associations as assoc
+          ON users.id = assoc.user_id
         LEFT JOIN "onegov_gazette-govikon".groups as groups
-          ON users.group_id = groups.id
+          ON groups.id = assoc.group_id
         ORDER BY users.username ASC
     """).fetchall()
     users = [

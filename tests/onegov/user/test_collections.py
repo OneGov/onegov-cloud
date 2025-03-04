@@ -22,7 +22,7 @@ def test_user_add(session):
     groups = UserGroupCollection(session)
     group = groups.add(name='group')
 
-    user = users.add('abc@example.org', 'p@ssw0rd', 'root', group=group)
+    user = users.add('abc@example.org', 'p@ssw0rd', 'root', groups=[group])
     assert users.by_username(user.username).group.name == 'group'
 
 

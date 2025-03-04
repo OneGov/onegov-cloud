@@ -57,10 +57,9 @@ def test_user_group(session):
     assert user.group is None
     assert group.users.all() == []
 
-    user.group = group
+    user.groups = [group]
     assert group.users.one() == user
-    assert user.group == group
-    assert user.group_id == group.id
+    assert user.groups == [group]
 
 
 def test_polymorphism_user(session):
