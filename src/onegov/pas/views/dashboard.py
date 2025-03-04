@@ -33,6 +33,12 @@ def view_dashboard(
             'title': _('Commissions'),
             'link': request.class_link(CommissionCollection),
             'icon': 'fa-user-friends'
+        },
+        {
+            'name': 'import',
+            'title': _('Data Import (JSON)'),
+            'link': request.link(request.app.org, 'import'),
+            'icon': 'fa-file-import'
         }
     ]
 

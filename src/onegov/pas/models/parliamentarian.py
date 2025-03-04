@@ -138,6 +138,7 @@ class Parliamentarian(
 
     @property
     def formal_greeting(self) -> str:
+        # fixme: Use sal
         """Returns the formal German greeting based on gender."""
         if self.gender == 'female':
             return 'Frau ' + self.first_name + ' ' + self.last_name

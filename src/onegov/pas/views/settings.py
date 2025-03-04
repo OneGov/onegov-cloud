@@ -5,7 +5,7 @@ from onegov.core.security import Secret
 from onegov.org.models import Organisation
 from onegov.pas import _
 from onegov.pas import PasApp
-from onegov.pas.collections import CommissionCollection
+from onegov.pas.collections import CommissionCollection, ChangeCollection
 from onegov.pas.collections import LegislativePeriodCollection
 from onegov.pas.collections import ParliamentarianCollection
 from onegov.pas.collections import ParliamentaryGroupCollection
@@ -78,6 +78,12 @@ def view_settings(
             'link': request.class_link(ParliamentarianCollection),
             'icon': 'fa-user-tie'
         },
+        {
+            'name': 'import',
+            'title': _('Data Import (JSON)'),
+            'link': request.link(request.app.org, 'import'),
+            'icon': 'fa-file-import'
+        },
     ]
 
     return {
@@ -85,18 +91,3 @@ def view_settings(
         'title': _('PAS settings'),
         'shortcuts': shortcuts
     }
-
-
-@PasApp.view(
-    model=Organisation,
-    name='user-settings',
-    permission=Secret,
-    setting=_('Usermanagement'),
-    icon='fa-user',
-    order=-1200
-)
-def handle_chat_settings(
-    self: Organisation,
-    request: TownRequest,
-) -> Response:
-    return request.redirect(request.class_link(UserCollection))

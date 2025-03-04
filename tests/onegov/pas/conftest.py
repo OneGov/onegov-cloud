@@ -1,4 +1,3 @@
-import json
 from onegov.core.orm.observer import ScopedPropertyObserver
 from os import path
 from yaml import dump

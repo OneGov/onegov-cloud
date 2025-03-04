@@ -12,71 +12,66 @@ from onegov.pas.models import (
     Parliamentarian
 )
 
+""" Test successful import of all data.
 
-def test_successful_import(
+*1. Understanding the Data and Models**
+
+ Let's solidify our understanding of how these relate.
+
+ **people.json**: Contains individual person data (Parliamentarians). Key
+     fields are firstName, officialName, primaryEmail, tags, title, id.
+     This maps to the Parliamentarian model.
+
+**organizations.json**:
+    Contains organization data. The organizationTypeTitle dictates the type
+    of organization.
+    - "Kommission":  Maps to your Commission model.
+    - "Kantonsrat":  This is a special case. It's not a Commission. It
+    represents the Parliament itself. We link this as ParliamentarianRole
+    directly on the Parliamentarian model with role='member' and associated
+    with the Kantonsrat organization.
+    - "Fraktion":  Maps to ParliamentaryGroup.
+    - "Sonstige": Could be various types. Let's see how these are intended
+      to be modeled. We need more clarity on how "Sonstige" is categorized.
+
+**memberships.json**: Connects person and organization.
+    It defines the role within that organization, start, end dates.
+    The nested person and organization blocks are crucial for establishing
+    relationships.
+"""
+
+
+def test_successful_import_mnaually(
     session, people_json, organization_json, memberships_json
 ):
-    """ Test successful import of all data.
 
-    *1. Understanding the Data and Models**
+    people_path = '/home/cyrill/pasimport/json/People.json'
+    org_path = '/home/cyrill/pasimport/json/organizaton.json'
+    members_path = '/home/cyrill/pasimport/json/membership.json'
 
-     Let's solidify our understanding of how these relate.
+    # Run the import with temporary file paths
+    objects = import_zug_kub_data(
+        session,
+        people_source=people_path,
+        organizations_source=org_path,
+        memberships_source=members_path,
+    )
+    session.flush()
 
-     **people.json**: Contains individual person data (Parliamentarians). Key
-         fields are firstName, officialName, primaryEmail, tags, title, id.
-         This maps to the Parliamentarian model.
-
-    **organizations.json**:
-        Contains organization data. The organizationTypeTitle dictates the type
-        of organization.
-        - "Kommission":  Maps to your Commission model.
-        - "Kantonsrat":  This is a special case. It's not a Commission. It
-        represents the Parliament itself. We link this as ParliamentarianRole
-        directly on the Parliamentarian model with role='member' and associated
-        with the Kantonsrat organization.
-        - "Fraktion":  Maps to ParliamentaryGroup.
-        - "Sonstige": Could be various types. Let's see how these are intended
-          to be modeled. We need more clarity on how "Sonstige" is categorized.
-
-    **memberships.json**: Connects person and organization.
-        It defines the role within that organization, start, end dates.
-        The nested person and organization blocks are crucial for establishing
-        relationships.
-    """
-    with tempfile.TemporaryDirectory() as temp_dir:
-        # Create paths
-        people_path = os.path.join(temp_dir, "people.json")
-        org_path = os.path.join(temp_dir, "organizations.json")
-        members_path = os.path.join(temp_dir, "memberships.json")
-
-        # Write JSON to temporary files
-        with open(people_path, 'w', encoding='utf-8') as f:
-            json.dump(people_json, f)
-
-        with open(org_path, 'w', encoding='utf-8') as f:
-            json.dump(organization_json, f)
-
-        with open(members_path, 'w', encoding='utf-8') as f:
-            json.dump(memberships_json, f)
-
-        # Run the import with temporary file paths
-        import_zug_kub_data(
-            session,
-            people_source=people_path,
-            organizations_source=org_path,
-            memberships_source=members_path,
-        )
+    parliamentarians = session.query(Parliamentarian).all()
+    assert len(parliamentarians) == 194
 
 
+
+
+def verify(session):
     # Verify parliamentarians were imported
     parliamentarians = session.query(Parliamentarian).all()
     assert len(parliamentarians) == 2
-
     assert any(p.first_name == 'Daniel' and p.last_name == 'Abt' for p in
                parliamentarians)
     assert any(p.first_name == 'Heinz' and p.last_name == 'Achermann' for p in
                parliamentarians)
-
     # Verify commissions were imported
     commissions = session.query(Commission).all()
     assert len(commissions) == 2
@@ -88,11 +83,9 @@ def test_successful_import(
         and c.type == 'intercantonal'
         for c in commissions
     )
-
     # Verify memberships were imported
     memberships = session.query(CommissionMembership).all()
     assert len(memberships) == 2
-
     # Check specific membership details
     president_membership = next(
         m for m in memberships
@@ -100,7 +93,6 @@ def test_successful_import(
     )
     assert president_membership.role == 'president'
     assert president_membership.end is None
-
     member_membership = next(
         m for m in memberships
         if m.parliamentarian.first_name == 'Heinz'
