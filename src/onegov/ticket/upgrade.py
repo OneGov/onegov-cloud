@@ -4,13 +4,10 @@ upgraded on the server. See :class:`onegov.core.upgrade.upgrade_task`.
 """
 from __future__ import annotations
 
-from datetime import timedelta
-
 from onegov.core.orm.types import JSON, UTCDateTime
 from onegov.core.upgrade import upgrade_task
 from onegov.ticket import Ticket
-from sqlalchemy import Boolean, Column, Integer, Text, Enum
-
+from sqlalchemy import Boolean, Column, Integer, Text, Enum, update, func, and_
 
 from typing import TYPE_CHECKING
 if TYPE_CHECKING:
@@ -148,7 +145,7 @@ def add_archived_state_to_ticket(context: UpgradeContext) -> None:
     tmp_type.drop(context.operations.get_bind(), checkfirst=False)
 
 
-@upgrade_task('Add closed on column to ticket 2')
+@upgrade_task('Add closed on column to ticket 3')
 def add_closed_on_column_to_ticket(context: UpgradeContext) -> None:
     if context.has_column('tickets', 'closed_on'):
         return
@@ -157,13 +154,16 @@ def add_closed_on_column_to_ticket(context: UpgradeContext) -> None:
         'tickets', Column('closed_on', UTCDateTime, nullable=True)
     )
 
-    for ticket in (context.session.query(Ticket).
-            filter(Ticket.state.in_(('closed', 'archived'))).
-            filter(Ticket.reaction_time.isnot(None)).
-            filter(Ticket.process_time.isnot(None))):
-
-        ticket.closed_on = (ticket.created +
-                            timedelta(seconds=ticket.reaction_time or 0) +
-                            timedelta(seconds=ticket.process_time or 0))
-
+    stmt = update(Ticket).where(
+        and_(
+            Ticket.state.in_(('closed', 'archived')),
+            Ticket.reaction_time.isnot(None),
+            Ticket.process_time.isnot(None)
+        )
+    ).values(
+        closed_on=Ticket.created +
+                  func.make_interval(secs=Ticket.reaction_time) +
+                  func.make_interval(secs=Ticket.process_time)
+    )
+    context.session.execute(stmt)
     context.session.flush()
