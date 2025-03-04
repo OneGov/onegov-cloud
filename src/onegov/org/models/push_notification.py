@@ -3,9 +3,15 @@ from __future__ import annotations
 from uuid import uuid4
 from onegov.core.collection import GenericCollection
 from sedate import utcnow
-from sqlalchemy import Column, String, DateTime, ForeignKey, Integer,\
-    UniqueConstraint
-from sqlalchemy.orm import relationship
+from sqlalchemy import (
+    Column,
+    String,
+    DateTime,
+    ForeignKey,
+    Integer,
+    UniqueConstraint,
+)
+from sqlalchemy.orm import relationship, backref
 from onegov.core.orm.types import JSON, UUID
 from onegov.core.orm import Base
 
@@ -34,12 +40,12 @@ class PushNotification(Base):
     #: The ID of the news item that triggered the notification
     news_id: Column[int] = Column(
         Integer,
-        ForeignKey('pages.id'),
+        ForeignKey('pages.id', ondelete='CASCADE'),
         nullable=False
     )
-
     news: relationship[News] = relationship(
-        'News', backref='sent_notifications',
+        'News',
+        backref=backref('sent_notifications', cascade='all, delete-orphan'),
         foreign_keys=[news_id]
     )
 
