@@ -16,7 +16,7 @@ class IdentityPolicy:
 
     """
 
-    required_keys = {'userid', 'groupid', 'role', 'application_id'}
+    required_keys = {'userid', 'groupids', 'role', 'application_id'}
 
     def identify(self, request: CoreRequest) -> Identity | None:
         try:

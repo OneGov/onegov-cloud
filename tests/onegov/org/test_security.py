@@ -23,19 +23,20 @@ def test_security_ticket_permissions(org_app):
         return result
 
     groups = {
-        'HR': create_group('HR'),
-        'Steueramt': create_group('Steueramt'),
-        'Sekretariat': create_group('Sekretariat')
+        'HR': [create_group('HR')],
+        'Steueramt': [create_group('Steueramt')],
+        'Sekretariat': [create_group('Sekretariat')],
     }
+    groups['HR+Steueramt'] = groups['HR'] + groups['Steueramt']
 
     # ... users
-    def create_user(name, role, group_id=None):
+    def create_user(name, role, groups=None):
         result = User(
             realname=name,
             username=f'{name}@example.org',
             password_hash='hash',
             role=role,
-            group_id=group_id
+            groups=groups or []
         )
         session.add(result)
         return result
@@ -44,9 +45,9 @@ def test_security_ticket_permissions(org_app):
     users = {}
     for role in roles:
         users[role] = create_user(role, role)
-        for group in groups.values():
-            name = f'{group.name}-{role}'
-            users[name] = create_user(name, role, group.id)
+        for prefix, group in groups.items():
+            name = f'{prefix}-{role}'
+            users[name] = create_user(name, role, group)
 
     # ... permissions
     def create_permission(handler_code, group, user_group):
@@ -58,9 +59,9 @@ def test_security_ticket_permissions(org_app):
         session.add(result)
         return result
 
-    create_permission('PER', None, groups['HR'])
-    create_permission('FRM', 'Steuererklärung', groups['Steueramt'])
-    create_permission('FRM', None, groups['Sekretariat'])
+    create_permission('PER', None, groups['HR'][0])
+    create_permission('FRM', 'Steuererklärung', groups['Steueramt'][0])
+    create_permission('FRM', None, groups['Sekretariat'][0])
 
     # ... tickets
     def create_ticket(handler_code, group=''):
@@ -89,7 +90,7 @@ def test_security_ticket_permissions(org_app):
         return org_app._permits(
             Identity(
                 userid=user.username,
-                groupid=user.group_id.hex if user.group_id else '',
+                groupids=frozenset(group.id.hex for group in user.groups),
                 role=user.role,
                 application_id=org_app.application_id
             ),
@@ -145,9 +146,13 @@ def test_security_ticket_permissions(org_app):
         assert_member(users[f'{group}-member'], ticket)
         assert_anonymous(users[f'{group}-anonymous'], ticket)
     assert_admin(users['HR-admin'], ticket)
-    assert_member(users['HR-editor'], ticket)
+    assert_editor(users['HR-editor'], ticket)
     assert_member(users['HR-member'], ticket)
     assert_anonymous(users['HR-anonymous'], ticket)
+    assert_admin(users['HR+Steueramt-admin'], ticket)
+    assert_editor(users['HR+Steueramt-editor'], ticket)
+    assert_member(users['HR+Steueramt-member'], ticket)
+    assert_anonymous(users['HR+Steueramt-anonymous'], ticket)
 
     # specifically exclude
     ticket = tickets['FRM-S']
@@ -161,21 +166,25 @@ def test_security_ticket_permissions(org_app):
         assert_member(users[f'{group}-member'], ticket)
         assert_anonymous(users[f'{group}-anonymous'], ticket)
     assert_admin(users['Steueramt-admin'], ticket)
-    assert_member(users['Steueramt-editor'], ticket)
+    assert_editor(users['Steueramt-editor'], ticket)
     assert_member(users['Steueramt-member'], ticket)
     assert_anonymous(users['Steueramt-anonymous'], ticket)
+    assert_admin(users['HR+Steueramt-admin'], ticket)
+    assert_editor(users['HR+Steueramt-editor'], ticket)
+    assert_member(users['HR+Steueramt-member'], ticket)
+    assert_anonymous(users['HR+Steueramt-anonymous'], ticket)
 
     ticket = tickets['FRM-W']
     assert_admin(users['admin'], ticket)
     assert_member(users['editor'], ticket)  # downgraded
     assert_member(users['member'], ticket)
     assert_anonymous(users['anonymous'], ticket)
-    for group in ('Steueramt', 'HR'):
+    for group in ('Steueramt', 'HR', 'HR+Steueramt'):
         assert_admin(users[f'{group}-admin'], ticket)
         assert_member(users[f'{group}-editor'], ticket)  # downgraded
         assert_member(users[f'{group}-member'], ticket)
         assert_anonymous(users[f'{group}-anonymous'], ticket)
     assert_admin(users['Sekretariat-admin'], ticket)
-    assert_member(users['Sekretariat-editor'], ticket)
+    assert_editor(users['Sekretariat-editor'], ticket)
     assert_member(users['Sekretariat-member'], ticket)
     assert_anonymous(users['Sekretariat-anonymous'], ticket)
