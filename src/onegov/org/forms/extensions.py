@@ -20,7 +20,7 @@ from wtforms.fields import StringField
 from wtforms.fields import TextAreaField
 from wtforms.validators import DataRequired, InputRequired, ValidationError
 
-from typing import TypeVar, TYPE_CHECKING, Any
+from typing import TypeVar, TYPE_CHECKING
 
 if TYPE_CHECKING:
     from collections.abc import Collection
@@ -327,29 +327,25 @@ class PushNotificationFormExtension(FormExtension[FormT], name='publish'):
     def create(self, timezone: str = 'Europe/Zurich') -> type[FormT]:
 
         class PublicationForm(self.form_class):  # type:ignore
-            def __init__(self, *args: Any, **kwargs: Any) -> None:
-                super().__init__(*args, **kwargs)
-                if self.request.app.org.firebase_adminsdk_credential:
-                    self._add_push_notification_fields()
-
-            def _add_push_notification_fields(self) -> None:
-                self.send_push_notifications_to_app = BooleanField(
-                    label=_('Send push notifications to app'),
-                    fieldset=_('Publication'),
-                    validators=[StrictOptional()],
-                    render_kw={'disabled': 'disabled'},
-                )
-                self.push_notifications = MultiCheckboxField(
-                    label=('Topics'),
-                    choices=[],
-                    fieldset=_('Publication'),
-                    depends_on=('send_push_notifications_to_app', 'y'),
-                    validators=[StrictOptional()],
-                    render_kw={'class_': 'indent-form-field'},
-                )
+            send_push_notifications_to_app = BooleanField(
+                label=_('Send push notifications to app'),
+                fieldset=_('Publication'),
+                validators=[StrictOptional()],
+                render_kw={'disabled': 'disabled'},  # Starts as disabled
+            )
+            push_notifications = MultiCheckboxField(
+                label=('Topics'),
+                choices=[],
+                fieldset=_('Publication'),
+                depends_on=('send_push_notifications_to_app', 'y'),
+                validators=[StrictOptional()],
+                render_kw={'class_': 'indent-form-field'}
+            )
 
             def on_request(self) -> None:
-                if not hasattr(self, 'send_push_notifications_to_app'):
+                if not self.request.app.org.meta.get(
+                        'firebase_adminsdk_credential'
+                ):
                     return None
 
                 default_topic = [[self.request.app.schema, 'News']]

@@ -1456,6 +1456,7 @@ class FirebaseSettingsForm(Form):
             self.hashtag_errors = {}
 
     def populate_obj(self, model: Organisation) -> None:  # type:ignore
+
         super().populate_obj(model)
         key_base64 = self.request.app.hashed_identity_key
         try:
@@ -1473,6 +1474,16 @@ class FirebaseSettingsForm(Form):
             self.json_to_links(self.selectable_push_notification_options.data)
             or []
         )
+
+        if self.firebase_adminsdk_credential.data is not None:
+            # Activate the extension by removing the disabled Extension
+            self.request.app.settings.org.disabled_extensions.remove(
+                'PushNotificationFormExtension'
+            )
+        else:
+            self.request.app.settings.org.disabled_extensions.add(
+                'PushNotificationFormExtension'
+            )
 
     def validate_firebase_adminsdk_credential(
         self, field: TextAreaField
