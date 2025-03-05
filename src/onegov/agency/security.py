@@ -33,11 +33,11 @@ def get_current_role(
 
     if identity.userid:
         if identity.role == 'member' and identity.groupids:
-            role = session.query(RoleMapping).filter(
+            roles = session.query(RoleMapping).filter(
                 RoleMapping.role == 'editor',
                 RoleMapping.group_id.in_(identity.groupids)
-            ).first()
-            if role:
+            )
+            if session.query(roles.exists()).scalar():
                 return 'editor'
 
         return identity.role

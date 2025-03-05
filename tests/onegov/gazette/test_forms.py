@@ -397,8 +397,7 @@ def test_user_form(session):
             DummyPostData({
                 'role': role,
                 'name': 'User',
-                'username': 'x@y.za',
-                'group_ids': ''
+                'username': 'x@y.za'
             })
         )
         form.request = DummyRequest(session, private=True, secret=True)
@@ -410,8 +409,7 @@ def test_user_form(session):
         DummyPostData({
             'role': 'editor',
             'name': 'User',
-            'username': 'b@b.bi',
-            'group_ids': ''
+            'username': 'b@b.bi'
         })
     )
     form.request = DummyRequest(session, private=True, secret=True)
@@ -437,7 +435,7 @@ def test_user_form_on_request(session):
     groups.add(name='Group C')
 
     form.on_request()
-    assert sorted([choice[1] for choice in form.group.choices]) == [
+    assert sorted([choice[1] for choice in form.group_ids.choices]) == [
         'Group A', 'Group B', 'Group C'
     ]
 

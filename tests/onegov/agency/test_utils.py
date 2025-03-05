@@ -48,9 +48,9 @@ def test_emails_for_new_ticket_AGN(agency_app):
     session.add_all((agency, user_1, user_2, user_3, group_1, group_2))
     session.flush()
 
-    user_1.group = group_1
-    user_2.group = group_1
-    user_3.group = group_2
+    user_1.groups = [group_1]
+    user_2.groups = [group_1]
+    user_3.groups = [group_2]
 
     request_1 = Bunch(
         app=agency_app,
@@ -167,8 +167,8 @@ def test_emails_for_new_ticket_PER(agency_app):
     group_2.meta = {'immediate_notification': 'yes'}
     agency_1.add_person(person.id, "Staff", since="2012", note="N", prefix="*")
     agency_2.add_person(person.id, "Staff", since="2012", note="N", prefix="*")
-    user_1.group = group_1
-    user_2.group = group_2
+    user_1.groups = [group_1]
+    user_2.groups = [group_2]
 
     # we don't test email_for_new_tickets deduplication here too
     # since that is in the same code path for agencies, we instead
@@ -286,9 +286,9 @@ def test_emails_for_new_ticket_parent_agency(agency_app):
     agency.parent = parent_agency
     group_1.meta = {'immediate_notification': 'yes'}
     group_2.meta = {'immediate_notification': 'yes'}
-    user_1.group = group_1
-    user_2.group = group_1
-    user_3.group = group_2
+    user_1.groups = [group_1]
+    user_2.groups = [group_1]
+    user_3.groups = [group_2]
 
     request = Bunch(
         app=agency_app,

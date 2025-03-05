@@ -196,7 +196,7 @@ def test_notice_collection_users_and_groups(session):
             title=title,
             text='text',
             user_id=user.id,
-            group_id=user.group.id if user.group else None
+            group_id=user.groups[0].id if user.groups else None
         )
 
     assert notices.query().count() == 10

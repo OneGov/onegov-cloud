@@ -63,7 +63,7 @@ def test_security_get_current_role(session):
         )
     )
     session.flush()
-    member.groupid = frozenset({group.id.hex})
+    member.groupids = frozenset({group.id.hex})
     assert get_current_role(session, member) == 'member'
 
     session.add(
@@ -233,7 +233,7 @@ def test_security_permissions(agency_app):
         return agency_app._permits(
             Identity(
                 userid=user.username,
-                groupid=user.group_id.hex if user.group_id else '',
+                groupids=frozenset(group.id.hex for group in user.groups),
                 role=user.role,
                 application_id=agency_app.application_id
             ),

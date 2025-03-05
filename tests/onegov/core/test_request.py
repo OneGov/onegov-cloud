@@ -205,7 +205,7 @@ def test_has_permission(redis_url):
         def remember_identity(response):
             request.app.remember_identity(response, request, morepath.Identity(
                 userid='foo',
-                groupid='admins',
+                groupids=frozenset({'admins'}),
                 role='admin',
                 application_id=request.app.application_id
             ))
@@ -280,7 +280,7 @@ def test_permission_by_view(redis_url):
         def remember_identity(response):
             request.app.remember_identity(response, request, morepath.Identity(
                 userid='foo',
-                groupid='',
+                groupids=frozenset(),
                 role='admin',
                 application_id=request.app.application_id,
             ))
