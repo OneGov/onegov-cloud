@@ -1,8 +1,18 @@
 # Changes
 
+## 2025.12
+
+`2025-03-04` | [aeeac42f56...f59d7a9b0f](https://github.com/OneGov/onegov-cloud/compare/aeeac42f56^...f59d7a9b0f)
+
+### Ticket
+
+##### Make db upgrade for ticket closed_on column more performant
+
+`Feature` | [NONE](#NONE) | [f59d7a9b0f](https://github.com/onegov/onegov-cloud/commit/f59d7a9b0fe658317e5dec8ba1381684d6364b09)
+
 ## 2025.11
 
-`2025-03-03` | [0c2dd4a07e...0c2dd4a07e](https://github.com/OneGov/onegov-cloud/compare/0c2dd4a07e^...0c2dd4a07e)
+`2025-03-03` | [0c2dd4a07e...c321b6c196](https://github.com/OneGov/onegov-cloud/compare/0c2dd4a07e^...c321b6c196)
 
 ## 2025.10
 
@@ -2265,59 +2275,4 @@ Agenda items, that are still "scheduled" so far had no working link. Now they ar
 ##### Automaticaly fill in start time when "ongoing" is clicked in the form
 
 `Feature` | [OGC-1626](https://linear.app/onegovcloud/issue/OGC-1626) | [db035bde73](https://github.com/onegov/onegov-cloud/commit/db035bde73c880ce114b84634c6329a6e8588b8a)
-
-## 2024.29
-
-`2024-05-14` | [7c8b77a2d0...972f8f5843](https://github.com/OneGov/onegov-cloud/compare/7c8b77a2d0^...972f8f5843)
-
-**Upgrade hints**
-- onegov-election-day --select /onegov_election_day/* migrate-subscribers
-### Core
-
-##### Ensures SMS spooler triggers on `onegov.core.utils.safe_move`
-
-Previously we still triggered because we didn't ignore `.tmp` files, so
-this bug was obscured.
-
-`Bugfix` | [2ae44dacf1](https://github.com/onegov/onegov-cloud/commit/2ae44dacf104087cd25a9b4adc08459d1b9ae965)
-
-### Election Day
-
-##### Add notification segmentation.
-
-If segmented_notifications is enabled for a principal, email and SMS subscribers can subscribe either to elections and votes of a specific municipality or everything else. Multiple subscriptions are possible.
-
-`Feature` | [OGC-1150](https://linear.app/onegovcloud/issue/OGC-1150) | [d7d8195c22](https://github.com/onegov/onegov-cloud/commit/d7d8195c22530fe176230c41811d3b45b7fb907a)
-
-##### Sort municipalities in subscription forms.
-
-`Feature` | [OGC-1150](https://linear.app/onegovcloud/issue/OGC-1150) | [4444f815c0](https://github.com/onegov/onegov-cloud/commit/4444f815c0330c80dba0fc4ba418a6a2d621fc0c)
-
-##### Add experimental support for eCH-0252 election compound import.
-
-`Feature` | [OGC-1608](https://linear.app/onegovcloud/issue/OGC-1608) | [e7cdccb855](https://github.com/onegov/onegov-cloud/commit/e7cdccb855ae0bc2337996ce5f033b02f45f2f15)
-
-### Forms
-
-##### Left align input text with help text below for town6
-
-`Bugfix` | [OGC-1593](https://linear.app/onegovcloud/issue/OGC-1593) | [a315bd300f](https://github.com/onegov/onegov-cloud/commit/a315bd300fa6c6d6a08af49163b4da7d8ee22236)
-
-### Landsgemeinde
-
-##### Links to video for vota
-
-`Feature` | [OGC-1635](https://linear.app/onegovcloud/issue/OGC-1635) | [c7aa98c92b](https://github.com/onegov/onegov-cloud/commit/c7aa98c92bf47fcc6dcd82b2957c30e919660c33)
-
-### Swissvotes
-
-##### Update campaign website info button.
-
-`Feature` | [SWI-48](https://linear.app/swissvotes/issue/SWI-48) | [0ba48e642e](https://github.com/onegov/onegov-cloud/commit/0ba48e642e41252a4eda49841dd88ce232673d13)
-
-### Town 6
-
-##### Fix Bug where Documents were displayed twice on resources
-
-`Bugfix` | [OGC-1569](https://linear.app/onegovcloud/issue/OGC-1569) | [ffde31511a](https://github.com/onegov/onegov-cloud/commit/ffde31511a25d456c181400523be4e99f24911df)
 

@@ -1,5 +1,7 @@
 from datetime import date
 
+import pytest
+
 from onegov.pay import PaymentCollection
 from tests.onegov.org.conftest import create_org_app
 
@@ -74,6 +76,7 @@ def test_exports_view(client):
     assert 'Zahlungen' in exports
 
 
+@pytest.mark.skip_night_hours
 def test_payments_export(client):
     client.login_editor()
     session = client.app.session()

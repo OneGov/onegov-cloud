@@ -332,6 +332,7 @@ def test_browse_directory_coordinates(browser, org_app):
 
 
 @pytest.mark.xdist_group(name="browser")
+@pytest.mark.skip_night_hours
 def test_publication_workflow(browser, temporary_path, org_app):
     path = temporary_path / 'foo.txt'
 
