@@ -295,7 +295,8 @@ def move_group_id_to_association_table(context: UpgradeContext) -> None:
     context.operations.execute("""
         INSERT INTO user_group_associations
         SELECT id AS user_id, group_id
-          FROM users;
+          FROM users
+         WHERE group_id IS NOT NULL;
     """)
 
     context.session.flush()
