@@ -243,7 +243,6 @@ class Activity(Base, ContentMixin, TimestampMixin):
 
         return q.scalar()
 
-
     def period_bound_occasions(
         self,
         request: FeriennetRequest
@@ -263,7 +262,6 @@ class Activity(Base, ContentMixin, TimestampMixin):
     ) -> tuple[BoundedIntegerRange, ...]:
         return tuple(o.age for o in self.period_bound_occasions(request))
 
-
     def activity_spots(
         self,
         request: FeriennetRequest
@@ -279,7 +277,6 @@ class Activity(Base, ContentMixin, TimestampMixin):
         return sum(o.available_spots for o in self.period_bound_occasions(
             request))
 
-
     def activity_min_cost(
         self,
         request: FeriennetRequest
@@ -291,7 +288,6 @@ class Activity(Base, ContentMixin, TimestampMixin):
             return None
 
         return min(o.total_cost for o in occasions)
-
 
     def activity_max_cost(
         self,

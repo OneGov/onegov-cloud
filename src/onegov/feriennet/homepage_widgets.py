@@ -61,7 +61,7 @@ class ActivitiesWidget:
             state_order = {'unoperable': 0, 'empty': 1, 'operable': 2}
             occasions = sorted(
                 occasions,
-                key=lambda o: state_order[o.state] # type: ignore
+                key=lambda o: state_order[o.state]  # type: ignore
             )
 
             activity_ids = (o.activity_id for o in occasions)
