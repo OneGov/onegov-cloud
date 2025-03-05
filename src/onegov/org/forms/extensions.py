@@ -20,7 +20,7 @@ from wtforms.fields import StringField
 from wtforms.fields import TextAreaField
 from wtforms.validators import DataRequired, InputRequired, ValidationError
 
-from typing import TypeVar, TYPE_CHECKING
+from typing import TypeVar, TYPE_CHECKING, Any
 
 if TYPE_CHECKING:
     from collections.abc import Collection
@@ -327,34 +327,10 @@ class PushNotificationFormExtension(FormExtension[FormT], name='publish'):
     def create(self, timezone: str = 'Europe/Zurich') -> type[FormT]:
 
         class PublicationForm(self.form_class):  # type:ignore
-
-            def on_request(self) -> None:
-                """ We need self.request to conditionally add the fields,
-                that's why they are defined here."""
-
-                super().on_request()
-
-                firebase_enabled = False
-                try:
-                    firebase_enabled = (
-                        self.request.app.org.firebase_adminsdk_credential
-                    )
-                except (AttributeError, TypeError):
-                    pass
-
-                # Only add fields if Firebase is enabled
-                if firebase_enabled:
+            def __init__(self, *args: Any, **kwargs: Any) -> None:
+                super().__init__(*args, **kwargs)
+                if self.request.app.org.firebase_adminsdk_credential:
                     self._add_push_notification_fields()
-
-                    # Set up choices for push notifications
-                    default_topic = [[self.request.app.schema, 'News']]
-                    id_topic_pairs = self.request.app.org.meta.get(
-                        'selectable_push_notification_options', default_topic
-                    )
-                    # Format choices to show both ID and value
-                    self.push_notifications.choices = [
-                        (id, f'{id} ↔ {value}') for id, value in id_topic_pairs
-                    ]
 
             def _add_push_notification_fields(self) -> None:
                 self.send_push_notifications_to_app = BooleanField(
@@ -371,6 +347,20 @@ class PushNotificationFormExtension(FormExtension[FormT], name='publish'):
                     validators=[StrictOptional()],
                     render_kw={'class_': 'indent-form-field'},
                 )
+
+            def on_request(self) -> None:
+                if not hasattr(self, 'send_push_notifications_to_app'):
+                    return None
+
+                default_topic = [[self.request.app.schema, 'News']]
+                id_topic_pairs = self.request.app.org.meta.get(
+                    'selectable_push_notification_options',
+                    default_topic
+                )
+                # Format choices to show both ID and value
+                self.push_notifications.choices = [
+                    (id, f'{id} ↔ {value}') for id, value in id_topic_pairs
+                ]
 
             def validate_send_push_notifications_to_app(
                 self, field: BooleanField
