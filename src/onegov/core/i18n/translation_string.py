@@ -245,8 +245,8 @@ class TranslationStringSerializer(msgpack.Serializer[TranslationString]):
 
 
 msgpack.default_serializers.register(
-    TranslationStringSerializer(tag=8, target=TranslationString)
+    TranslationStringSerializer(tag=9, target=TranslationString)
 )
 msgpack.default_serializers.register(
-    TranslationStringSerializer(tag=9, target=TranslationMarkup)
+    TranslationStringSerializer(tag=10, target=TranslationMarkup)
 )

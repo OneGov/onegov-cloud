@@ -19,6 +19,7 @@ from onegov.user import UserCollection
 from onegov.user import UserGroup
 from onegov.user.utils import password_reset_url
 from sedate import utcnow
+from sqlalchemy.orm import contains_eager
 from webob.exc import HTTPForbidden
 from xlsxwriter import Workbook  # type:ignore[import-untyped]
 
@@ -341,7 +342,8 @@ def export_users(
                 User.realname,
                 User.username
             )
-            for index, user in enumerate(users.all()):
+            users = users.options(contains_eager(User.groups))
+            for index, user in enumerate(users):
                 worksheet.write_row(index + 1, 0, (
                     '|'.join(g.name for g in user.groups if g.name),
                     user.realname or '',

@@ -81,7 +81,7 @@ _T = TypeVar('_T')
 _F = TypeVar('_F', bound='Form')
 
 
-@msgpack.make_serializable(tag=10)
+@msgpack.make_serializable(tag=11)
 class Message(NamedTuple):
     text: str
     type: MessageType

@@ -11,23 +11,18 @@ if TYPE_CHECKING:
     from ..request import CoreRequest
 
 
-# TODO: We could consider making frozenset MessagePack serializable, so we
-#       don't need to special case groupids here
 class IdentityPolicy:
     """ Stores the tokens associated with the identity on the browser session
 
     """
 
-    required_keys = {'userid', 'role', 'application_id'}
+    required_keys = {'userid', 'groupids', 'role', 'application_id'}
 
     def identify(self, request: CoreRequest) -> Identity | None:
         try:
             identifiers = {
                 key: request.browser_session[key] for key in self.required_keys
             }
-            identifiers['groupids'] = frozenset(
-                request.browser_session['groupids']
-            )
         except KeyError:
             # FIXME: According to docs this should return NO_IDENTITY
             return None
@@ -42,7 +37,6 @@ class IdentityPolicy:
     ) -> None:
         for key in self.required_keys:
             request.browser_session[key] = getattr(identity, key)
-        request.browser_session['groupids'] = tuple(identity.groupids)
 
     def forget(self, response: Response, request: CoreRequest) -> None:
         request.browser_session.flush()
