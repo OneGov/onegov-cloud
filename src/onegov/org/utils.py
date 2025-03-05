@@ -22,11 +22,12 @@ from onegov.org import _
 from onegov.org.elements import DeleteLink, Link
 from onegov.org.models.search import Search
 from onegov.reservation import Resource
+from onegov.ticket import TicketCollection
+from onegov.user import User, UserGroup
 from operator import attrgetter
 from purl import URL
 from sqlalchemy import nullsfirst, select  # type:ignore[attr-defined]
-from onegov.ticket import TicketCollection
-from onegov.user import User
+
 
 from typing import overload, Any, Literal, TYPE_CHECKING
 if TYPE_CHECKING:
@@ -1156,15 +1157,13 @@ def user_group_emails_for_new_ticket(
         return set()
 
     return {
-        u.username
-        for user in request.session.query(User).join(
-            User.groups
-        )
-        for group in user.groups
-        for u in group.users
-        if user.group.meta
-        and (dirs := user.group.meta.get('directories')) is not None
-        and ticket.group in dirs
+        username
+        for username, in request.session
+        .query(UserGroup)
+        .join(UserGroup.users)
+        .filter(UserGroup.meta['directories'].contains(ticket.group))
+        .with_entities(User.username)
+        .distinct()
     }
 
 

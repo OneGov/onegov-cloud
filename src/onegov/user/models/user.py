@@ -97,7 +97,8 @@ class User(Base, TimestampMixin, ORMSearchable):
     groups: relationship[list[UserGroup]] = relationship(
         UserGroup,
         secondary=group_association_table,
-        back_populates='users'
+        back_populates='users',
+        passive_deletes=True,
     )
 
     #: the real name of the user for display (use the :attr:`name` property

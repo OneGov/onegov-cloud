@@ -26,13 +26,13 @@ group_association_table = Table(
     Column(
         'user_id',
         UUID,
-        ForeignKey('users.id'),
+        ForeignKey('users.id', ondelete='CASCADE'),
         nullable=False
     ),
     Column(
         'group_id',
         UUID,
-        ForeignKey('groups.id'),
+        ForeignKey('groups.id', ondelete='CASCADE'),
         nullable=False
     ),
     UniqueConstraint(
@@ -75,6 +75,7 @@ class UserGroup(Base, ContentMixin, TimestampMixin):
         'User',
         secondary=group_association_table,
         back_populates='groups',
+        passive_deletes=True,
         lazy='dynamic'
     )
 

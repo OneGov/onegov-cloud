@@ -54,12 +54,12 @@ def test_user_group(session):
     user = session.query(User).one()
     group = session.query(UserGroup).one()
 
-    assert user.group is None
+    assert user.groups == []
     assert group.users.all() == []
 
     user.groups = [group]
-    assert group.users.one() == user
     assert user.groups == [group]
+    assert group.users.one() == user
 
 
 def test_polymorphism_user(session):
