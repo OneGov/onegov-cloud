@@ -6,6 +6,7 @@ import transaction
 from wtforms.validators import DataRequired
 from onegov.core.csv import convert_excel_to_csv, CSVFile
 from onegov.form.fields import UploadField
+from onegov.org.forms.fields import HtmlField
 from onegov.form.validators import FileSizeLimit
 from onegov.form.validators import WhitelistedMimeType
 from wtforms.fields import BooleanField
@@ -52,6 +53,12 @@ class NewsletterForm(Form):
         label=_('Editorial'),
         description=_('A few words about this edition of the newsletter'),
         render_kw={'rows': 6})
+    
+    closing_remark = HtmlField(
+        label=_('Closing remark'),
+        description=_('Closing remark at the end of the newsletter'),
+        render_kw={'rows': 6},
+    )
 
     # FIXME: Why are we passing the request in? It should alread be stored on
     #        the form itself.

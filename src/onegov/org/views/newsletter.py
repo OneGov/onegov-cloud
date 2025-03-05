@@ -14,6 +14,7 @@ from onegov.core.templates import render_template
 from onegov.event import Occurrence, OccurrenceCollection
 from onegov.file import File
 from onegov.file.utils import name_without_extension
+from onegov.form import move_fields
 from onegov.newsletter import Newsletter
 from onegov.newsletter import NewsletterCollection
 from onegov.newsletter import Recipient
@@ -79,6 +80,10 @@ def get_newsletter_form(
     s = s.distinct(Occurrence.event_id).subquery()
     occurrences = occurrences.filter(Occurrence.id.in_(s))
     form = form.with_occurrences(request, occurrences)
+
+    move_fields(
+        form, ("closing_remark",), None
+    )
 
     return form
 
