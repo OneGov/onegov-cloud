@@ -22,6 +22,7 @@ from onegov.user import User
 from sqlalchemy import Column, ForeignKey
 from onegov.core.orm.types import UUID
 from sqlalchemy.orm import undefer
+from sqlalchemy import text
 
 
 from typing import Any, TYPE_CHECKING
@@ -391,3 +392,41 @@ def remove_stored_contact_html_and_opening_hours_html(
 
         if 'contact_html' in obj.content:
             del obj.content['contact_html']
+
+
+@upgrade_task('Add CASCADE delete to push notification foreign key')
+def add_cascade_delete_to_push_notification(context: UpgradeContext) -> None:
+    if not context.has_table('push_notification'):
+        return
+
+    constraint_name = 'push_notification_news_id_fkey'
+
+    schema_name = context.app.schema
+    query = text("""
+        SELECT constraint_name
+        FROM information_schema.table_constraints
+        WHERE table_schema = :schema
+        AND table_name = 'push_notification'
+        AND constraint_type = 'FOREIGN KEY'
+        AND constraint_name = :constraint
+    """)
+
+    result = context.session.execute(query, {
+        'schema': schema_name,
+        'constraint': constraint_name
+    })
+
+    if result.scalar():
+        print(f'Dropping and recreating {constraint_name} in {schema_name}')
+
+        context.operations.drop_constraint(
+            constraint_name,
+            'push_notification',
+            type_='foreignkey'
+        )
+        context.operations.create_foreign_key(
+            constraint_name,
+            'push_notification', 'pages',
+            ['news_id'], ['id'],
+            ondelete='CASCADE'
+        )
