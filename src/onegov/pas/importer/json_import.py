@@ -4,11 +4,7 @@ from sqlalchemy.orm import Session
 import json
 from datetime import datetime
 from pathlib import Path
-from typing import Any, Self, Literal
-
-
 import logging
-
 from onegov.pas.constants import COMMON_PARTY_NAMES
 from onegov.pas.models.commission_membership import (
     ROLES as MEMBERSHIP_ROLES,
@@ -23,11 +19,13 @@ from onegov.pas.models import (
     ParliamentarianRole
 )
 
+
+from typing import Any, Self, Literal
 from typing import TYPE_CHECKING
+from typing import TypedDict
 if TYPE_CHECKING:
     from sqlalchemy.orm import Session
     from collections.abc import Sequence
-    from typing import TypedDict, Literal
     from _typeshed import StrOrBytesPath
 
     class EmailData(TypedDict):

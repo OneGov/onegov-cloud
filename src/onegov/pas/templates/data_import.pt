@@ -1,49 +1,91 @@
 <div metal:use-macro="layout.base" i18n:domain="onegov.pas">
-    <tal:b metal:fill-slot="title">
+    <tal:block metal:fill-slot="title">
             ${title}
-    </tal:b>
+    </tal:block>
     <tal:b metal:fill-slot="content">
-        <div class="grid-x">
-            <div class="small-12 cell">
-                <h2 i18n:translate="">Upload</h2>
-                <tal:b metal:use-macro="layout.macros.upload">
-                    <tal:b metal:fill-slot="upload-filelist">
-                        <div class="upload-filelist-header" style="display: none;">
-                            <h2 i18n:translate>Just Uploaded</h2>
+        <h1>${title}</h1>
 
-                            <table class="files">
-                                <tr>
-                                    <th i18n:translate>
-                                        Name
-                                    </th>
-                                    <th>
-                                    </th>
-                                    <th i18n:translate>
-                                        Extension
-                                    </th>
-                                    <th i18n:translate>
-                                        Upload Date
-                                    </th>
-                                </tr>
+        <form action="${upload_url}" class="upload" method="POST" enctype="multipart/form-data">
+            <div class="upload-dropzone dropzone">
+                <input type="file" id="fileElem" class="hidden" multiple accept=".json">
+                <label class="button" for="fileElem" i18n:translate>Select JSON files</label>
+                <p class="show-for-medium" i18n:translate>Drop all 3 JSON files here to upload</p>
+            </div>
 
-                                <tbody class="upload-filelist"></tbody>
-                                        </table>
+            <div class="upload-progress"></div>
+
+            <div class="upload-filelist-header">
+                <div class="grid-x grid-margin-x">
+                    <!-- People Data Section -->
+                    <div class="cell medium-4">
+                        <h2 i18n:translate="">People Data (JSON)</h2>
+                        <div id="people_source_upload_status" class="callout alert">
+                            <p class="small">Pending Upload</p>
                         </div>
-                    </tal:b>
-                </tal:b>
-            </div>
-        </div>
+                    </div>
+                    <!-- Organizations Data Section -->
+                    <div class="cell medium-4">
+                        <h2 i18n:translate="">Organizations Data (JSON)</h2>
+                        <div id="organizations_source_upload_status" class="callout alert">
+                            <p class="small">Pending Upload</p>
+                        </div>
+                    </div>
+                    <!-- Memberships Data Section -->
+                    <div class="cell medium-4">
+                        <h2 i18n:translate="">Memberships Data (JSON)</h2>
+                        <div id="memberships_source_upload_status" class="callout alert">
+                            <p class="small">Pending Upload</p>
+                        </div>
+                    </div>
+                </div>
 
-        <div class="columns small-12 medium-8">
-            <div metal:use-macro="layout.macros['form']"/>
-        </div>
-        <div class="columns small-12 medium-4">
-            <div class="panel">
-                <p i18n:translate>
-                    Your statement is required to be in "ISO-20022 format
-                </p>
+                <div class="grid-x grid-margin-x">
+                    <div class="cell medium-12">
+                        <div class="callout primary">
+                            <p i18n:translate="">
+                                The import requires exactly 3 files: People.json, Organization.json, and Membership.json.
+                                All files must be uploaded before the import can proceed.
+                            </p>
+                        </div>
+                    </div>
+                </div>
             </div>
-        </div>
 
+            <div class="upload-filelist"></div>
+
+            <!-- Results container will be shown by JavaScript -->
+            <tal:block tal:condition="results">
+                <div id="import-results" class="callout success margin-top-1">
+                    <h3 i18n:translate="">Import Results</h3>
+                    <div class="results-content">
+                        <p tal:condition="isinstance(results, str)" tal:content="results"></p>
+                        <tal:block tal:condition="not:isinstance(results, str)">
+                            <div class="grid-x grid-margin-x">
+                                <div class="cell medium-4">
+                                    <h4 i18n:translate="">People</h4>
+                                    <p i18n:translate="">Imported: <span tal:content="results.get('people_count', 0)"></span></p>
+                                </div>
+                                <div class="cell medium-4">
+                                    <h4 i18n:translate="">Organizations</h4>
+                                    <p i18n:translate="">Imported: <span tal:content="results.get('organizations_count', 0)"></span></p>
+                                </div>
+                                <div class="cell medium-4">
+                                    <h4 i18n:translate="">Memberships</h4>
+                                    <p i18n:translate="">Imported: <span tal:content="results.get('memberships_count', 0)"></span></p>
+                                </div>
+                            </div>
+                        </tal:block>
+                    </div>
+                </div>
+            </tal:block>
+
+            <!--! fallback for integration tests -->
+            <noscript>
+                <input name="people_source" type="file" accept=".json" />
+                <input name="organizations_source" type="file" accept=".json" />
+                <input name="memberships_source" type="file" accept=".json" />
+                <input type="submit" value="Import" class="button" i18n:attributes="value">
+            </noscript>
+        </form>
     </tal:b>
 </div>

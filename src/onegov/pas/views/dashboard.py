@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+from onegov.file import FileCollection
 from onegov.pas import _
 from onegov.pas import PasApp
 from onegov.pas.collections import CommissionCollection
@@ -35,10 +36,10 @@ def view_dashboard(
             'icon': 'fa-user-friends'
         },
         {
-            'name': 'import',
+            'name': 'pas-import',
             'title': _('Data Import (JSON)'),
-            'link': request.link(request.app.org, 'import'),
-            'icon': 'fa-file-import'
+            'link': request.link(self, 'pas-import'),
+            'icon': 'fa-file-import',
         }
     ]
 

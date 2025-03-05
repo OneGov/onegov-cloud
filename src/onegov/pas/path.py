@@ -1,5 +1,8 @@
 from __future__ import annotations
 
+from onegov.core.security import Private
+from onegov.file import FileCollection
+from onegov.org.models import Organisation
 from onegov.pas.collections import AttendenceCollection
 from onegov.pas.app import PasApp
 from onegov.pas.collections import ChangeCollection
@@ -398,3 +401,11 @@ def get_settlement_run_export_all(
         settlement_run=settlement_run,
         category=category
     )
+
+
+@PasApp.path(
+    model=FileCollection,
+    path='/json-import-files'
+)
+def get_file_collection(request):
+    return FileCollection(request.session)
