@@ -11,6 +11,7 @@ COMMON_PARTY_NAMES = (
     'Die Mitte',
     'FDP',
     'GLP',
+    'CVP',
     'Parteilos',
     'Piratenpartei',
     'SP',

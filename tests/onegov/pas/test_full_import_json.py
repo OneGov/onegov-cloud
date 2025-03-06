@@ -1,11 +1,19 @@
 from __future__ import annotations
 
 import json
+import json
+import tempfile
+import pytest
+from pathlib import Path
+
 import os
 import tempfile
 
 
-from onegov.pas.importer.json_import import import_zug_kub_data
+from onegov.pas.importer.json_import import (
+    import_zug_kub_data,
+    count_unique_fullnames, _load_json,
+)
 from onegov.pas.models import (
     Commission,
     CommissionMembership,
@@ -16,9 +24,7 @@ from onegov.pas.models import (
 
 *1. Understanding the Data and Models**
 
- Let's solidify our understanding of how these relate.
-
- **people.json**: Contains individual person data (Parliamentarians). Key
+**people.json**: Contains individual person data (Parliamentarians). Key
      fields are firstName, officialName, primaryEmail, tags, title, id.
      This maps to the Parliamentarian model.
 
@@ -50,19 +56,19 @@ def test_successful_import_mnaually(
     members_path = '/home/cyrill/pasimport/json/membership.json'
 
     # Run the import with temporary file paths
-    objects = import_zug_kub_data(
+    import_zug_kub_data(
         session,
         people_source=people_path,
         organizations_source=org_path,
         memberships_source=members_path,
     )
     session.flush()
-    breakpoint()
 
-    parliamentarians = session.query(Parliamentarian).all()
-    assert len(parliamentarians) == 194
-
-
+    number_of_parliamentarians = session.query(Parliamentarian).count()
+    expected_fullnames = count_unique_fullnames(
+        *map(_load_json, [people_path, org_path, members_path])
+    )
+    assert number_of_parliamentarians == len(expected_fullnames)
 
 
 def verify(session):
@@ -100,3 +106,51 @@ def verify(session):
     )
     assert member_membership.role == 'member'
     assert member_membership.end is not None
+
+
+def test_count_unique_fullnames():
+    people_data = {
+        'results': [
+            {'fullName': 'Abt Daniel', 'id': '123'},
+            {'fullName': 'Achermann Heinz', 'id': '456'}
+        ]
+    }
+
+    org_data = {
+        'results': [
+            {'name': 'Commission A', 'id': '789'}
+            # No fullNames in organizations
+        ]
+    }
+
+    membership_data = {
+        'results': [
+            {
+                'id': '111',
+                'organization': {'name': 'Org 1'},
+                'person': {'fullName': 'Werner Thomas', 'id': '222'}
+            },
+            {
+                'id': '333',
+                'organization': {'name': 'Org 2'},
+                'person': {'fullName': 'Nussbaumer Karl', 'id': '444'},
+                'nested': {
+                    'deeply': {
+                        'person': {'fullName': 'Smith John', 'id': '555'}
+                    }
+                }
+            }
+        ]
+    }
+
+    names = count_unique_fullnames(people_data, org_data, membership_data)
+    expected = {
+        'Abt Daniel',
+        'Achermann Heinz',
+        'Werner Thomas',
+        'Nussbaumer Karl',
+        'Smith John'
+    }
+
+    assert names == expected
+    assert len(names) == 5

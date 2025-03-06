@@ -27,6 +27,7 @@ if TYPE_CHECKING:
     from sqlalchemy.orm import Session
     from collections.abc import Sequence
     from _typeshed import StrOrBytesPath
+    from datetime import date
 
     class EmailData(TypedDict):
         id: str
@@ -183,26 +184,30 @@ class DataImporter:
     def parse_date(
         self: Self,
         date_string: str | None,
-    ) -> datetime | None:  # Return datetime, not date
+    ) -> date | None:  # Return datetime, not date
+        # Should convert to date if needed for model fields
         if not date_string:
             return None
         try:
             dt = datetime.fromisoformat(date_string.rstrip('Z'))
-            return dt
+            return dt.date()  # Convert to date object
         except ValueError:
             logging.warning(f'Could not parse date string: {date_string}')
             return None
 
     def _bulk_save(self, objects: list[Any], object_type: str) -> None:
-        """Generic bulk save method with error handling."""
+        """Save a batch of objects to the database."""
         try:
-            self.session.bulk_save_objects(objects)
-            logging.info(f'Imported {len(objects)} {object_type}')
+            if objects:
+                # self.session.bulk_save_objects(objects)
+                self.session.add_all(objects)
+                self.session.flush()  # Flush to get IDs
+                logging.info(f'Imported {len(objects)} {object_type}')
         except Exception as e:
             logging.error(
                 f'Error bulk saving {object_type}: {e}', exc_info=True
             )
-            self.session.rollback()  # Rollback on error during bulk save
+            self.session.rollback()
             raise
 
 
@@ -269,7 +274,7 @@ class PeopleImporter(DataImporter):
         """Creates a single Parliamentarian object from person data."""
 
         if not person_data.get('id'):  # Basic validation
-            logging.warning(
+            logging.error(
                 f"Skipping person due to missing ID: "
                 f"{person_data.get('fullName')}"
             )
@@ -297,20 +302,6 @@ class PeopleImporter(DataImporter):
 
         parliamentarian = Parliamentarian(**parliamentarian_kwargs)
         return parliamentarian
-
-    def _bulk_save(self, objects: list[Any], object_type: str) -> None:
-        """Generic bulk save method with error handling."""
-        try:
-            self.session.bulk_save_objects(objects)
-            logging.info(f'Imported {len(objects)} {object_type}')
-            self.session.flush()  # Important to flush session to get IDs for
-            # relationships
-        except Exception as e:
-            logging.error(
-                f'Error bulk saving {object_type}: {e}', exc_info=True
-            )
-            self.session.rollback()
-            raise
 
 
 class OrganizationImporter(DataImporter):
@@ -350,7 +341,7 @@ class OrganizationImporter(DataImporter):
         for org_data in organizations_data:
             org_id = org_data.get('id')
             if not org_id:
-                logging.warning(
+                logging.error(
                     f"Skipping organization without ID: {org_data.get('name')}"
                 )
                 continue
@@ -377,10 +368,10 @@ class OrganizationImporter(DataImporter):
                         name=party_name,
                     )
                     parties.append(party)
-                    assert party_name in COMMON_PARTY_NAMES
                     party_map[party_name] = (
                         party  # Map by name for easy lookup
                     )
+                    print('fraktion')
 
                 elif organization_type_title in ('Kantonsrat', 'Sonstige'):
                     # Store these for reference in membership creation
@@ -389,8 +380,9 @@ class OrganizationImporter(DataImporter):
                         'name': org_data.get('name', ''),
                         'type': organization_type_title.lower(),
                     }
-
                 else:
+                    breakpoint()
+                    # check organization_type
                     logging.warning(
                         f"Unknown organization type: {organization_type_title}"
                         f" for {org_data.get('name')}"
@@ -417,19 +409,6 @@ class OrganizationImporter(DataImporter):
             other_organizations,
         )
 
-    def _bulk_save(self, objects: list[Any], object_type: str) -> None:
-        """Save a batch of objects to the database."""
-        try:
-            if objects:
-                self.session.bulk_save_objects(objects)
-                self.session.flush()  # Flush to get IDs
-                logging.info(f'Imported {len(objects)} {object_type}')
-        except Exception as e:
-            logging.error(
-                f'Error bulk saving {object_type}: {e}', exc_info=True
-            )
-            self.session.rollback()
-            raise
 
 
 class MembershipImporter(DataImporter):
@@ -461,12 +440,79 @@ class MembershipImporter(DataImporter):
         self.party_map = party_map
         self.other_organization_map = other_organization_map
 
+    def _extract_and_create_missing_parliamentarians(
+        self, memberships_data: Sequence[MembershipData]
+    ) -> None:
+        """Extract and create parliamentarians from membership data if they don't already exist."""
+        new_parliamentarians = []
+        temp_id_map = {}  # Temporary map to track external_id -> object
+
+        for membership in memberships_data:
+            try:
+                person_data = membership['person']
+                person_id = person_data.get('id')
+
+                # Skip if already in map or missing ID
+                if not person_id or person_id in self.parliamentarian_map:
+                    continue
+
+                logging.info(f"Found parliamentarian in membership.json that "
+                             f"wasn't in people data: {person_data.get('fullName')}")
+
+                # Create minimal parliamentarian object
+                parliamentarian = Parliamentarian(
+                    external_kub_id=person_id,
+                    first_name=person_data.get('firstName', ''),
+                    last_name=person_data.get('officialName', ''),
+                    salutation=person_data.get('salutation'),
+                    academic_title=person_data.get('title'),
+                )
+
+                # Handle email if present
+                primary_email_data = person_data.get('primaryEmail')
+                if primary_email_data and primary_email_data.get('email'):
+                    parliamentarian.email_primary = primary_email_data['email']
+
+                # Handle address if present
+                address_data = membership.get('primaryAddress')
+                if address_data:
+                    parliamentarian.shipping_address = f"{address_data.get('street', '')} {address_data.get('houseNumber', '')}".strip()
+                    parliamentarian.shipping_address_zip_code = address_data.get('swissZipCode')
+                    parliamentarian.shipping_address_city = address_data.get('town')
+
+                # Add to collection and temp map
+                new_parliamentarians.append(parliamentarian)
+                temp_id_map[person_id] = parliamentarian
+
+            except Exception as e:
+                logging.error(
+                    f"Error extracting parliamentarian from membership data: {e}",
+                    exc_info=True
+                )
+
+        # Bulk save the new parliamentarians
+        if new_parliamentarians:
+            # Don't use bulk_save_objects as it doesn't update the objects with IDs
+            # Instead use add_all which maintains the object references
+            self.session.add_all(new_parliamentarians)
+            self.session.flush()  # Flush to get IDs
+
+            # Now update the parliamentarian_map with these objects that now have IDs
+            for external_id, parliamentarian in temp_id_map.items():
+                self.parliamentarian_map[external_id] = parliamentarian
+
+            logging.info(f"Created {len(new_parliamentarians)} parliamentarians from membership data")
+
+
     def bulk_import(
         self, memberships_data: Sequence[MembershipData]
     ) -> None:
         """Imports memberships from JSON data based on organization type."""
         commission_memberships = []
         parliamentarian_roles = []
+
+        # Loop over the wohle thing once, collecting only parliamentarians.
+        self._extract_and_create_missing_parliamentarians(memberships_data)
 
         for membership in memberships_data:
             try:
@@ -513,8 +559,6 @@ class MembershipImporter(DataImporter):
                         continue
 
                     party = self.party_map.get(org_name)
-
-                    #  somehow  roles are created where party is none
                     breakpoint()
 
                     role_obj = self._create_parliamentarian_role(
@@ -594,15 +638,26 @@ class MembershipImporter(DataImporter):
     ) -> CommissionMembership | None:
         """Create a CommissionMembership object."""
         try:
+            # Ensure both objects have IDs
+            if not parliamentarian.id or not commission.id:
+                logging.warning(
+                    f'Missing ID: Parliamentarian={parliamentarian.id}, Commission={commission.id}'
+                )
+                return None
+
             role_text = membership_data.get('role', '')
             role = self._map_to_commission_role(role_text)
 
             start_date = self.parse_date(membership_data.get('start'))
             end_date = self.parse_date(membership_data.get('end'))
 
+            assert parliamentarian.id is not None
+            assert commission.id is not None
             return CommissionMembership(
                 parliamentarian=parliamentarian,
+                parliamentarian_id=parliamentarian.id,
                 commission=commission,
+                commission_id=commission.id,
                 role=role,
                 start=start_date,
                 end=end_date,
@@ -625,11 +680,20 @@ class MembershipImporter(DataImporter):
         start_date: str = None,
         end_date: str = None,
     ) -> ParliamentarianRole | None:
-        """Create a ParliamentarianRole object with the specified
-        relationships."""
+        """Create a ParliamentarianRole object with the specified relationships."""
         try:
+            # Ensure parliamentarian has an ID
+            if not parliamentarian.id:
+                logging.warning(
+                    f'Skipping parliamentarian role: Parliamentarian missing '
+                    f'ID: {parliamentarian.first_name} {parliamentarian.last_name}'
+                )
+                return None
+
+            assert parliamentarian.id is not None
             return ParliamentarianRole(
                 parliamentarian=parliamentarian,
+                parliamentarian_id=parliamentarian.id,  # Explicitly set the ID
                 role=role,
                 parliamentary_group=parliamentary_group,
                 parliamentary_group_role=parliamentary_group_role,
@@ -706,28 +770,33 @@ class MembershipImporter(DataImporter):
         elif 'mitglied' in role_text:
             return 'member'
 
-        raise ValueError(f'Unknown role text: {role_text}')
+        return 'none'
 
-    def _bulk_save(
-        self,
-        objects: list[ParliamentarianRole] | list[CommissionMembership],
-        object_type: str,
-    ) -> list[Any]:
-        """Save a batch of objects to the database."""
-        try:
-            if objects:
-                breakpoint()
-                self.session.bulk_save_objects(objects)
-                self.session.flush()  # Flush to get IDs
-                logging.info(f'Imported {len(objects)} {object_type}')
-        except Exception as e:
-            logging.error(
-                f'Error bulk saving {object_type}: {e}', exc_info=True
-            )
-            self.session.rollback()
-            raise
-        finally:
-            return object_type or []
+
+def count_unique_fullnames(
+    people_data: list[Any],
+    organizations_data: list[Any],
+    memberships_data: list[Any]
+):
+    def extract_full_names(data: dict[str, Any]) -> set[str]:
+        full_names = set()
+        def traverse(obj: Any):
+            if isinstance(obj, dict):
+                if "fullName" in obj and isinstance(obj["fullName"], str):
+                    full_names.add(obj["fullName"])
+                for value in obj.values():
+                    traverse(value)
+            elif isinstance(obj, list):
+                for item in obj:
+                    traverse(item)
+        traverse(data)
+        return full_names
+
+    people_names = extract_full_names(people_data)
+    org_names = extract_full_names(organizations_data)
+    membership_names = extract_full_names(memberships_data)
+    all_names = people_names.union(org_names, membership_names)
+    return all_names
 
 
 def import_zug_kub_data(
