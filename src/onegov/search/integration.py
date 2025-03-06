@@ -436,6 +436,9 @@ class SearchApp(morepath.App):
         ixs = self.es_indexer.ixmgr.get_managed_indices_wildcard(schema)
         self.es_client.indices.delete(index=ixs)
 
+        # psql delete table search_index
+        self.psql_indexer.delete_search_index(schema)
+
         # have no queue limit for reindexing (that we're able to change
         # this here is a bit of a CPython implementation detail) - we can't
         # necessarily always rely on being able to change this property
@@ -468,12 +471,12 @@ class SearchApp(morepath.App):
             for base in self.session_manager.bases
             for model in searchable_sqlalchemy_models(base)
         }
-        base_models = filter_for_base_models(models)
+        models = filter_for_base_models(models)
 
         with ThreadPoolExecutor() as executor:
-            results = executor.map(reindex_model, base_models)
+            results = executor.map(reindex_model, models)
             if fail:
-                print(tuple(results))
+                print('Failed reindexing:', tuple(results))
 
         self.es_indexer.bulk_process()
         self.psql_indexer.bulk_process()

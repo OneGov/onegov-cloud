@@ -2,6 +2,8 @@ from __future__ import annotations
 
 import platform
 import re
+from uuid import UUID
+
 import sqlalchemy
 
 from copy import deepcopy
@@ -10,9 +12,8 @@ from elasticsearch.exceptions import NotFoundError
 from elasticsearch.helpers import streaming_bulk
 from langdetect.lang_detect_exception import LangDetectException
 from itertools import groupby, chain, repeat
-from operator import itemgetter
 from queue import Queue, Empty, Full
-from sqlalchemy import func
+from sqlalchemy import func, and_, or_
 from sqlalchemy.dialects.postgresql import JSONB
 from unidecode import unidecode
 
@@ -21,7 +22,7 @@ from sqlalchemy.orm.exc import ObjectDeletedError
 from onegov.core.utils import hash_dictionary, is_non_string_iterable
 from onegov.search import index_log, log, Searchable, utils
 from onegov.search.errors import SearchOfflineError
-
+from onegov.search.search_index import SearchIndex
 
 from typing import Any, Literal, NamedTuple, TYPE_CHECKING
 if TYPE_CHECKING:
@@ -31,7 +32,6 @@ if TYPE_CHECKING:
     from sqlalchemy.orm import Session
     from typing import TypeAlias
     from typing import TypedDict
-    from uuid import UUID
 
     class IndexTask(TypedDict):
         action: Literal['index']
@@ -364,11 +364,12 @@ class Indexer(IndexerBase):
                 except NotFoundError:
                     pass
 
+    def update(self, task: IndexTask) -> None:
+        # not needed for elasticsearch
+        pass
+
 
 class PostgresIndexer(IndexerBase):
-
-    TEXT_SEARCH_COLUMN_NAME = 'fts_idx'
-    TEXT_SEARCH_DATA_COLUMN_NAME = 'fts_idx_data'
 
     idx_language_mapping = {
         'de': 'german',
@@ -390,7 +391,8 @@ class PostgresIndexer(IndexerBase):
     def index(
         self,
         tasks: list[IndexTask] | IndexTask,
-        session: Session | None = None
+        session: Session | None = None,
+        update: bool = False
     ) -> bool:
         """ Update the 'fts_idx' column (full text search index) of the given
         object(s)/task(s).
@@ -405,6 +407,7 @@ class PostgresIndexer(IndexerBase):
         :param tasks: A list of tasks to index
         :param session: Supply an active session
         :return: True if the indexing was successful, False otherwise
+
         """
         combined_vector = None
         params = []
@@ -417,26 +420,32 @@ class PostgresIndexer(IndexerBase):
                 language = (
                     self.idx_language_mapping.get(task['language'], 'simple'))
                 data = {
-                    k: unidecode(str(v))
+                    k: unidecode(str(v)) if v else None
                     for k, v in task['properties'].items()
                     if not k.startswith('es_')}
                 # the search makes use of 'es_public' and 'es_tags' fields
                 for k in ('es_public', 'es_tags', 'es_last_change'):
                     if k in task['properties']:
                         data[k] = task['properties'][k]
-                _id = task['id']
+                _owner_id_int = (
+                    task)['id'] if isinstance(task['id'], int) else None
+                _owner_id_uuid = (
+                    task)['id'] if isinstance(task['id'], UUID) else None
+                _owner_type = task['type_name']
 
-                # prefix all fields with '_' to avoid conflicts with
-                # reserved names in `bindparam` function below
-                params.append(
-                    {'language': language, 'data': data, '_id': _id, **{
-                        f'_{k}': v for k, v in data.items()
-                    }})
+                params.append({
+                    '_language': language,
+                    '_data': data,
+                    '_owner_id_int': _owner_id_int,
+                    '_owner_id_uuid': _owner_id_uuid,
+                    '_owner_type': _owner_type,
+                    **{f'_{k}': v for k, v in data.items()}
+                })
 
                 weighted_vector = [
                     func.setweight(
                         func.to_tsvector(
-                            sqlalchemy.bindparam('language',
+                            sqlalchemy.bindparam('_language',
                                                  type_=sqlalchemy.String),
                             sqlalchemy.bindparam(f'_{field}',
                                                  type_=sqlalchemy.String)
@@ -454,39 +463,111 @@ class PostgresIndexer(IndexerBase):
                     combined_vector = combined_vector.op('||')(vector)
 
             schema = tasks[0]['schema']
-            tablename = tasks[0]['tablename']
-            id_key = tasks[0]['id_key']
-            table = sqlalchemy.table(
-                tablename,
-                (id_col := sqlalchemy
-                    .column(id_key)),  # type: ignore[var-annotated]
-                sqlalchemy.column(self.TEXT_SEARCH_COLUMN_NAME),
-                sqlalchemy.column(self.TEXT_SEARCH_DATA_COLUMN_NAME),
-                schema=schema  # type: ignore
-            )
-
-            stmt = (
-                sqlalchemy.update(table)
-                .where(id_col == sqlalchemy.bindparam('_id'))
-                .values({
-                    self.TEXT_SEARCH_COLUMN_NAME: combined_vector,
-                    self.TEXT_SEARCH_DATA_COLUMN_NAME:
-                    sqlalchemy.bindparam('data', type_=JSONB)
-                })
-            )
+            if update:
+                # this happens when an item has been edited or deleted
+                stmt = (
+                    sqlalchemy.update(SearchIndex.__table__)
+                    .where(
+                        and_(
+                            or_(
+                                SearchIndex.__table__.c.owner_id_int ==
+                                sqlalchemy.bindparam('_owner_id_int'),
+                                SearchIndex.__table__.c.owner_id_uuid ==
+                                sqlalchemy.bindparam('_owner_id_uuid'),
+                            ),
+                            SearchIndex.__table__.c.owner_type ==
+                            sqlalchemy.bindparam('_owner_type'),
+                        )
+                    )
+                    .values(
+                        {
+                            SearchIndex.__table__.c.fts_idx_data:
+                                sqlalchemy.bindparam('_data', type_=JSONB),
+                            SearchIndex.__table__.c.fts_idx: combined_vector,
+                        }
+                    )
+                )
+            else:
+                # this happens when on reindexing or adding items
+                stmt = (
+                    sqlalchemy.insert(SearchIndex.__table__)
+                    .values(
+                        {
+                            SearchIndex.__table__.c.owner_id_int:
+                                sqlalchemy.bindparam('_owner_id_int'),
+                            SearchIndex.__table__.c.owner_id_uuid:
+                                sqlalchemy.bindparam('_owner_id_uuid'),
+                            SearchIndex.__table__.c.owner_type:
+                                sqlalchemy.bindparam('_owner_type'),
+                            SearchIndex.__table__.c.fts_idx_data:
+                                sqlalchemy.bindparam('_data', type_=JSONB),
+                            SearchIndex.__table__.c.fts_idx: combined_vector,
+                        }
+                    )
+                )
 
             if session is None:
                 connection = self.engine.connect()
                 with connection.begin():
+                    connection.execute(f'SET search_path TO "{schema}"')
                     connection.execute(stmt, params)
             else:
                 # use a savepoint instead
                 with session.begin_nested():
+                    session.execute(f'SET search_path TO "{schema}"')
                     session.execute(stmt, params)
         except Exception as ex:
-            index_log.error(f"Error '{ex}' indexing schema "
-                            f'{tasks[0]["schema"]} table '
-                            f'{tasks[0]["tablename"]}')
+            index_log.error(
+                f'Error "{ex}" creating index schema {tasks[0]["schema"]} of '
+                f'type {params[0]["_owner_type"]}, tasks:',
+                [t['id'] for t in tasks],
+            )
+            return False
+
+        return True
+
+    def update(
+        self,
+        tasks: list[IndexTask] | IndexTask,
+        session: Session | None = None
+    ) -> bool:
+
+        return self.index(tasks, session, update=True)
+
+    def delete(
+            self,
+            tasks: list[IndexTask] | IndexTask,
+            session: Session | None = None
+    ) -> bool:
+
+        if not isinstance(tasks, list):
+            tasks = [tasks]
+
+        try:
+            for task in tasks:
+                _owner_id = task['id']
+                if isinstance(_owner_id, UUID):
+                    stmt = (
+                        sqlalchemy.delete(SearchIndex)
+                        .where(SearchIndex.owner_id_uuid == _owner_id)
+                    )
+                elif isinstance(_owner_id, int):
+                    stmt = (
+                        sqlalchemy.delete(SearchIndex)
+                        .where(SearchIndex.owner_id_int == _owner_id)
+                    )
+
+                if session is None:
+                    connection = self.engine.connect()
+                    with connection.begin():
+                        connection.execute(stmt)
+                else:
+                    # use a savepoint instead
+                    with session.begin_nested():
+                        session.execute(stmt)
+        except Exception as ex:
+            index_log.error(f'Error "{ex}" deleting index schema '
+                            f'{tasks[0]["schema"]} tasks {tasks}')
             return False
 
         return True
@@ -508,14 +589,30 @@ class PostgresIndexer(IndexerBase):
                 self.queue.task_done()
                 yield task
 
-        grouped_tasks = groupby(task_generator(), key=itemgetter('action',
-                                                                 'tablename'))
-        for (action, tablename), tasks in grouped_tasks:
+        grouped_tasks = groupby(
+            task_generator(),
+            key=lambda task: (task['action'], task['type_name']))
+        for (action, _), tasks in grouped_tasks:
             task_list = list(tasks)
+
             if action == 'index':
                 self.index(task_list, session)
+            elif action == 'update':
+                self.index(task_list, session, update=True)
+            elif action == 'delete':
+                self.delete(task_list, session)
             else:
-                raise NotImplementedError(f"Action '{action}' not implemented")
+                raise NotImplementedError(
+                    f"Action '{action}' not implemented for {self.__class__}")
+
+    def delete_search_index(self, schema: str) -> None:
+        """ Delete all records in search index table of the given `schema`. """
+
+        stmt = sqlalchemy.text(
+            f'DELETE FROM "{schema}".{SearchIndex.__tablename__}')
+        connection = self.engine.connect()
+        with connection.begin():
+            connection.execute(stmt)
 
 
 class TypeMapping:
@@ -931,8 +1028,7 @@ class ORMEventTranslator:
     def on_update(self, schema: str, obj: object) -> None:
         if not self.stopped:
             if isinstance(obj, Searchable):
-                self.delete(schema, obj)
-                self.index(schema, obj)
+                self.index(schema, obj, update=True)
 
     def on_delete(self, schema: str, obj: object) -> None:
         if not self.stopped:
@@ -942,14 +1038,20 @@ class ORMEventTranslator:
     def put(self, translation: Task) -> None:
         try:
             self.es_queue.put_nowait(translation)
+            self.psql_queue.put_nowait(translation)
 
-            if translation['action'] == 'index':
-                # we only need to provide index tasks for psql fts
-                self.psql_queue.put_nowait(translation)
         except Full:
             log.error('The orm event translator queue is full!')
 
-    def index(self, schema: str, obj: Searchable) -> None:
+    def index(
+        self, schema: str,
+        obj: Searchable,
+        update: bool = False
+    ) -> None:
+        """
+        Creates or updates index for the given object
+
+        """
         try:
             if obj.es_skip:
                 return
@@ -959,13 +1061,14 @@ class ORMEventTranslator:
             else:
                 language = obj.es_language
 
+            action = 'update' if update else 'index'
             translation: IndexTask = {
-                'action': 'index',
+                'action': action,
                 'id': getattr(obj, obj.es_id),
                 'id_key': obj.es_id,
                 'schema': schema,
-                'type_name': obj.es_type_name,  # FIXME: not needed for fts
-                'tablename': obj.__tablename__,  # type:ignore[attr-defined]
+                'type_name': obj.es_type_name,
+                'tablename': obj.__tablename__,  # FIXME: not needed for fts
                 'language': language,
                 'properties': {}
             }
@@ -991,17 +1094,10 @@ class ORMEventTranslator:
                 contexts = {'es_suggestion_context': ['private']}
 
             suggestion = obj.es_suggestion
-
-            if is_non_string_iterable(suggestion):
-                translation['properties']['es_suggestion'] = {
-                    'input': suggestion,
-                    'contexts': contexts
-                }
-            else:
-                translation['properties']['es_suggestion'] = {
-                    'input': [suggestion],
-                    'contexts': contexts
-                }
+            translation['properties']['es_suggestion'] = {
+                'input': suggestion,
+                'contexts': contexts
+            }
 
             self.put(translation)
         except ObjectDeletedError as ex:
@@ -1011,12 +1107,15 @@ class ORMEventTranslator:
                 log.error(f'Object {obj} was deleted before indexing: {ex}')
 
     def delete(self, schema: str, obj: Searchable) -> None:
+        """
+        Deletes index of the given object
 
+        """
         translation: DeleteTask = {
             'action': 'delete',
             'schema': schema,
             'type_name': obj.es_type_name,
-            'tablename': obj.__tablename__,  # type:ignore[attr-defined]
+            'tablename': obj.__tablename__,  # FIXME: not needed for fts
             'id': getattr(obj, obj.es_id)
         }
 

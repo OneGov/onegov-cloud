@@ -1,10 +1,5 @@
 from __future__ import annotations
 
-from sqlalchemy import Column
-from sqlalchemy.dialects.postgresql import TSVECTOR, JSONB
-from sqlalchemy.ext.declarative import declared_attr
-from sqlalchemy.orm import deferred
-
 from onegov.search.utils import classproperty
 from onegov.search.utils import extract_hashtags
 
@@ -53,40 +48,16 @@ class Searchable:
 
     """
 
-    TEXT_SEARCH_COLUMN_NAME = 'fts_idx'
-    TEXT_SEARCH_DATA_COLUMN_NAME = 'fts_idx_data'
-
     if TYPE_CHECKING:
-        # NOTE: This doesn't really have a Python representation, unless
-        #       it is converted to a `str` or `list[str]`? This may depend
-        #       on the SQLAlchemy version as well.
-        fts_idx: Column[object]
+        # # NOTE: This doesn't really have a Python representation, unless
+        # #       it is converted to a `str` or `list[str]`? This may depend
+        # #       on the SQLAlchemy version as well.
+        # fts_idx: Column[object]
         # FIXME: Gross classproperty vs. ClassVar is a mess, we should
         #        consistently use one or the other
         es_properties: ClassVar[dict[str, Any]]
         es_type_name: ClassVar[str]
         es_id: ClassVar[str]
-
-    @declared_attr  # type:ignore[no-redef]
-    def fts_idx(cls) -> Column[object]:
-        """ The column for the full text search index.
-        """
-
-        col_name = Searchable.TEXT_SEARCH_COLUMN_NAME
-        if hasattr(cls, '__table__') and hasattr(cls.__table__.c, col_name):
-            return deferred(cls.__table__.c.fts_idx)
-        return deferred(Column(col_name, TSVECTOR))
-
-    @declared_attr
-    def fts_idx_data(cls) -> Column[object]:
-        """ This column holds all the properties including its values
-        important for full text search.
-        """
-
-        col_name = Searchable.TEXT_SEARCH_DATA_COLUMN_NAME
-        if hasattr(cls, '__table__') and hasattr(cls.__table__.c, col_name):
-            return deferred(cls.__table__.c.fts_idx_data)
-        return deferred(Column(col_name, JSONB, default={}))
 
     # TODO: rename to fts_properties
     @classproperty  # type:ignore[no-redef]
