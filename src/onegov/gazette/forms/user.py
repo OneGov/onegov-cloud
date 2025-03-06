@@ -1,7 +1,7 @@
 from __future__ import annotations
 
 from onegov.form import Form
-from onegov.form.fields import ChosenSelectField, ChosenSelectMultipleField
+from onegov.form.fields import ChosenSelectMultipleField
 from onegov.form.fields import PhoneNumberField
 from onegov.form.validators import UniqueColumnValue
 from onegov.gazette import _
@@ -26,9 +26,9 @@ class UserForm(Form):
         ]
     )
 
-    group = ChosenSelectField(
+    group_ids = ChosenSelectMultipleField(
         label=_('Group'),
-        choices=[('', '')]
+        choices=[]
     )
 
     name = StringField(
@@ -60,26 +60,31 @@ class UserForm(Form):
         if self.request.is_secret(model):
             self.role.choices.append(('editor', _('Publisher')))
 
-        self.group.choices = self.request.session.query(
+        self.group_ids.choices = self.request.session.query(
             cast(UserGroup.id, String), UserGroup.name
         ).all()
-        self.group.choices.insert(
-            0, ('', self.request.translate(_('- none -')))
-        )
 
     def update_model(self, model: User) -> None:
         assert self.username.data is not None
         model.username = self.username.data
         model.role = self.role.data
         model.realname = self.name.data
-        model.group_id = self.group.data or None
+        if self.group_ids.data:
+            model.groups = (
+                UserGroupCollection(self.request.session)
+                .query()
+                .filter(UserGroup.id.in_(self.group_ids.data))
+                .all()
+            )
+        else:
+            model.groups = []
         model.phone_number = self.phone_number.formatted_data
 
     def apply_model(self, model: User) -> None:
         self.username.data = model.username
         self.role.data = model.role
         self.name.data = model.realname
-        self.group.data = str(model.group_id or '')
+        self.group_ids.data = [str(group.id) for group in model.groups]
         self.phone_number.data = model.phone_number
 
 

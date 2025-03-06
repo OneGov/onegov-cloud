@@ -9,8 +9,7 @@ from typing import TYPE_CHECKING
 
 from onegov.org import OrgApp
 from onegov.org.layout import DefaultLayout
-from onegov.org.models import Boardlet, BoardletFact, News
-from onegov.page import Page
+from onegov.org.models import Boardlet, BoardletFact, News, Topic
 from onegov.plausible.plausible_api import PlausibleAPI
 from onegov.ticket import Ticket
 from onegov.town6 import _
@@ -154,25 +153,25 @@ def get_icon_title(request: OrgRequest, access: str) -> str:
 
 
 @OrgApp.boardlet(name='pages', order=(1, 2), icon='fa-edit')
-class EditedPagesBoardlet(OrgBoardlet):
+class EditedTopicsBoardlet(OrgBoardlet):
 
     @property
     def title(self) -> str:
-        return _('Last Edited Pages')
+        return _('Last Edited Topics')
 
     @property
     def facts(self) -> Iterator[BoardletFact]:
 
-        last_edited_pages = self.session.query(Page).order_by(
-            Page.last_change.desc()).limit(8)
+        last_edited_pages = self.session.query(Topic).order_by(
+            Topic.last_change.desc()).limit(8)
 
         for p in last_edited_pages:
             yield BoardletFact(
                 text='',
                 link=(self.layout.request.link(p), p.title),
                 icon='fas fa-file',
-                visibility_icon=get_icon_for_access_level(p.access),  # type:ignore[attr-defined]
-                icon_title=get_icon_title(self.request, p.access)  # type:ignore[attr-defined]
+                visibility_icon=get_icon_for_access_level(p.access),
+                icon_title=get_icon_title(self.request, p.access)
             )
 
 
@@ -186,7 +185,7 @@ class EditedNewsBoardlet(OrgBoardlet):
     @property
     def facts(self) -> Iterator[BoardletFact]:
         last_edited_news = self.session.query(News).order_by(
-            Page.last_change.desc()).limit(8)
+            News.last_change.desc()).limit(8)
 
         for n in last_edited_news:
             yield BoardletFact(

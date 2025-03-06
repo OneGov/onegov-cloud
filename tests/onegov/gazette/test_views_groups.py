@@ -34,9 +34,9 @@ def test_view_groups(gazette_app):
     manage = client.get('/users').click("Neu")
     assert 'Gruppe YZ' in manage
     manage.form['role'] = 'editor'
-    manage.form['group'] = {
-        option[2]: option[0] for option in manage.form['group'].options
-    }['Gruppe YZ']
+    manage.form['group_ids'] = [{
+        option[2]: option[0] for option in manage.form['group_ids'].options
+    }['Gruppe YZ']]
     manage.form['name'] = 'User A'
     manage.form['username'] = 'user_a@example.com'
     manage = manage.form.submit().maybe_follow()
@@ -54,7 +54,7 @@ def test_view_groups(gazette_app):
 
     # delete user and group
     manage = client.get('/user/user_a%40example.com/edit')
-    manage.form['group'] = ''
+    manage.form['group_ids'] = []
     manage = manage.form.submit().maybe_follow()
 
     manage = client.get('/groups')

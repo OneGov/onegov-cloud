@@ -25,14 +25,10 @@ $('input[data-max-length],textarea[data-max-length]').each(function() {
 });
 
 function handle_checkbox_disabled_until_start_date_set() {
-    if (!window.location.href.includes('/edit/news/')) return;
 
     var publicationStart = $('#publication_start');
     var pushNotifications = $('#send_push_notifications_to_app');
-    var newsInstances = $('#news_instances_selectable_for_publish').closest('.form-group'); // Adjust selector based on your markup
-
-    console.log(newsInstances);
-    console.log(pushNotifications)
+    var newsInstances = $('#news_instances_selectable_for_publish').closest('.form-group');
 
     var togglePushNotification = function () {
         if (publicationStart.val()) {
@@ -64,6 +60,31 @@ function handle_checkbox_disabled_until_start_date_set() {
     pushNotifications.on('change', toggleNewsInstances);
 }
 
+function auto_select_topic_id_if_only_one_exists() {
+    var pushNotificationsCheckbox = $('#send_push_notifications_to_app');
+    var topicCheckboxes = $('input[name="push_notifications"]');
+
+    // Function to check if only one topic exists and select it
+    var autoSelectSingleTopic = function() {
+        // Only proceed if push notifications checkbox is checked
+        if (pushNotificationsCheckbox.is(':checked')) {
+            // If there's only one topic checkbox
+            if (topicCheckboxes.length === 1) {
+                topicCheckboxes.prop('checked', true);
+            }
+        }
+    };
+
+    // Run when push notifications checkbox is changed
+    pushNotificationsCheckbox.on('change', function() {
+        if ($(this).is(':checked')) {
+            autoSelectSingleTopic();
+        }
+    });
+}
+
+
 $(document).ready(function() {
     handle_checkbox_disabled_until_start_date_set();
+    auto_select_topic_id_if_only_one_exists();
 });

@@ -961,6 +961,7 @@ def test_layout_vote_campaign_material(swissvotes_app):
             'fr': 'French',
             'it': 'Italian',
             'rm': 'Rhaeto-Romanic',
+            'en': 'English',
             'mixed': 'Mixed',
             'other': 'Other'
         },
@@ -977,7 +978,7 @@ def test_layout_vote_campaign_material(swissvotes_app):
     assert layout.format_code({'language': 'de'}, 'language') == 'German'
     assert layout.format_code({'language': 'zu'}, 'language') == ''
     assert layout.format_code({'language': ['de', 'en']}, 'language') == (
-        'German'
+        'German, English'
     )
     assert layout.format_code({'language': ['de', 'fr']}, 'language') == (
         'German, French'
