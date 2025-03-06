@@ -53,7 +53,11 @@ class SignupForm(Form):
             data.extend(sub)
             choices.extend((s, f'\xa0\xa0\xa0{s}') for s in sub)
 
+        if choices:
+            self.subscribed_categories.data = data
             self.subscribed_categories.choices = choices
+        else:
+            self.delete_field('subscribed_categories')
             self.subscribed_categories.data = data
 
         if len(choices) == 0:
