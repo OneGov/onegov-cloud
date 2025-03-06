@@ -81,6 +81,14 @@ class OrgRequest(CoreRequest):
 
         return self.has_role('editor')
 
+    @cached_property
+    def is_supporter(self) -> bool:
+        """ Returns true if the current user is a supporter.
+
+        """
+
+        return self.has_role('supporter')
+
     @property
     def current_username(self) -> str | None:
         return self.identity .userid if self.identity else None

@@ -181,7 +181,7 @@ def get_global_tools(request: OrgRequest) -> Iterator[Link | LinkGroup]:
         yield LinkGroup(_('Management'), classes=('management', ), links=links)
 
     # Tickets
-    if request.is_manager:
+    if request.is_manager or request.is_supporter:
         assert request.current_user is not None
         ticket_count = request.app.ticket_count
         screen_count = ticket_count.open or ticket_count.pending

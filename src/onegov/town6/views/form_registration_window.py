@@ -4,12 +4,17 @@ from onegov.core.security import Private
 from onegov.form import FormDefinition
 from onegov.form import FormRegistrationWindow
 from onegov.org.forms.form_registration import FormRegistrationMessageForm
+from onegov.org.models.ticket import FormSubmissionTicket
 from onegov.org.views.form_registration_window import (
-    handle_new_registration_form, view_registration_window,
-    handle_edit_registration_form, view_send_form_registration_message)
+    handle_edit_registration_form,
+    handle_new_registration_form,
+    view_registration_window,
+    view_registration_window_from_ticket,
+    view_send_form_registration_message,
+)
 from onegov.town6 import TownApp
 from onegov.org.forms import FormRegistrationWindowForm
-from onegov.town6.layout import FormSubmissionLayout
+from onegov.town6.layout import FormSubmissionLayout, TicketLayout
 
 
 from typing import TYPE_CHECKING
@@ -62,6 +67,21 @@ def town_view_registration_window(
 ) -> RenderData:
     return view_registration_window(
         self, request, FormSubmissionLayout(self.form, request))
+
+
+@TownApp.html(
+    model=FormSubmissionTicket,
+    permission=Private,
+    template='registration_window.pt',
+    name='window'
+)
+def town_view_registration_window_for_ticket(
+    self: FormSubmissionTicket,
+    request: TownRequest,
+    layout: TicketLayout | None = None
+) -> RenderData:
+    return view_registration_window_from_ticket(
+        self, request, TicketLayout(self, request))
 
 
 @TownApp.form(

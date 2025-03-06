@@ -7,6 +7,8 @@ from onegov.agency.models import AgencyMembershipMoveWithinPerson
 from onegov.agency.models import AgencyMove
 from onegov.agency.models.ticket import AgencyMutationTicket
 from onegov.agency.models.ticket import PersonMutationTicket
+from onegov.core.security.roles import (
+    get_roles_setting as get_roles_setting_base)
 from onegov.core.security.rules import has_permission_logged_in
 from onegov.people import Agency
 from onegov.people import AgencyCollection
@@ -20,7 +22,14 @@ from typing import TYPE_CHECKING
 if TYPE_CHECKING:
     from morepath.authentication import Identity
     from morepath.authentication import NoIdentity
+    from onegov.core.security.roles import Intent
     from sqlalchemy.orm import Session
+
+
+@AgencyApp.replace_setting_section(section='roles')
+def get_roles_setting() -> dict[str, set[type[Intent]]]:
+    # NOTE: Without a supporter role for now
+    return get_roles_setting_base()
 
 
 def get_current_role(
