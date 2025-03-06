@@ -202,6 +202,11 @@ class DataImporter:
                 # self.session.bulk_save_objects(objects)
                 self.session.add_all(objects)
                 self.session.flush()  # Flush to get IDs
+
+                if object_type == 'parliamentarian roles':
+                    # are these really all legit
+                    breakpoint()
+
                 logging.info(f'Imported {len(objects)} {object_type}')
         except Exception as e:
             logging.error(
@@ -381,7 +386,7 @@ class OrganizationImporter(DataImporter):
                         'type': organization_type_title.lower(),
                     }
                 else:
-                    breakpoint()
+                    # breakpoint()
                     # check organization_type
                     logging.warning(
                         f"Unknown organization type: {organization_type_title}"
@@ -558,7 +563,10 @@ class MembershipImporter(DataImporter):
                         )
                         continue
 
+                    # todo (cyrill):
+                    # is org_name actually the right key for this
                     party = self.party_map.get(org_name)
+
                     breakpoint()
 
                     role_obj = self._create_parliamentarian_role(

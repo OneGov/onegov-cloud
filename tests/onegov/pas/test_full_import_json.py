@@ -47,7 +47,7 @@ from onegov.pas.models import (
 """
 
 
-def test_successful_import_mnaually(
+def test_successful_import_manually(
     session, people_json, organization_json, memberships_json
 ):
 

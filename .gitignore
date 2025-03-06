@@ -100,3 +100,5 @@ prof
 .chameleon_cache
 
 .codebuddy/
+
+.aider*
