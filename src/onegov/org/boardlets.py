@@ -157,7 +157,7 @@ class EditedTopicsBoardlet(OrgBoardlet):
 
     @property
     def title(self) -> str:
-        return _('Last Edited Pages')
+        return _('Last Edited Topics')
 
     @property
     def facts(self) -> Iterator[BoardletFact]:

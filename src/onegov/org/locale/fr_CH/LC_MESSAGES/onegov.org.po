@@ -54,8 +54,8 @@ msgstr "Délai de traitement de l'attente à la clôture en jours le mois dernie
 msgid "Access"
 msgstr "Accès"
 
-msgid "Last Edited Pages"
-msgstr "Dernières pages modifiées"
+msgid "Last Edited Topics"
+msgstr "Derniers sujets modifiés"
 
 msgid "Last Edited News"
 msgstr "Dernières nouvelles modifiées"

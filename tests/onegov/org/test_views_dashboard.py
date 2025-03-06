@@ -35,7 +35,7 @@ def test_view_dashboard_no_ticket(client):
     assert fact_numbers[5] == '-'  # lead time pending to closing
 
     # pages and news
-    assert 'Zuletzt bearbeitete Seiten' in page
+    assert 'Zuletzt bearbeitete Themen' in page
     assert 'Zuletzt bearbeitete News' in page
 
 
@@ -104,7 +104,7 @@ def test_view_dashboard_tickets(handlers, client, org_app):
     page = client.get('/dashboard')
     assert page.pyquery('.boardlet').length == 3
     assert 'Tickets' in page
-    assert 'Zuletzt bearbeitete Seiten' in page
+    assert 'Zuletzt bearbeitete Themen' in page
     assert 'Zuletzt bearbeitete News' in page
     fact_numbers = page.pyquery('.fact-number').text()
     fact_numbers = fact_numbers.split()
@@ -122,7 +122,7 @@ def test_view_dashboard_topics_news(handlers, client):
 
     assert page.pyquery('.boardlet').length == 3
     assert 'Tickets' in page
-    assert 'Zuletzt bearbeitete Seiten' in page
+    assert 'Zuletzt bearbeitete Themen' in page
     assert 'Zuletzt bearbeitete News' in page
 
     links = page.pyquery('.boardlet a')
