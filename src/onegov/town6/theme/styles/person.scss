@@ -22,10 +22,10 @@ $person-email-icon: '\f0e0';
         @include circle;
 
         background: $gainsboro;
-        height: 9rem;
+        height: 12rem;
         overflow: hidden;
         position: relative;
-        width: 9rem;
+        width: 12rem;
 
         // this would be nicer with object-position and object-fit, but IE
         // doesn't support it at all and Safari only somewhat.
@@ -132,9 +132,9 @@ $person-email-icon: '\f0e0';
 @include breakpoint(small only) {
     .person-card {
         .person-card-portrait {
-            height: 8rem;
+            height: 12rem;
             margin-bottom: 1rem;
-            width: 8rem;
+            width: 12rem;
 
             .fa-user {
                 font-size: calc(100vw - 6rem);
