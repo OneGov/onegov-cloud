@@ -29,7 +29,7 @@ if TYPE_CHECKING:
     from onegov.activity.collections import PublicationRequestCollection
     from onegov.activity.models import PeriodMeta, PublicationRequest
     from onegov.core.orm.mixins import dict_property
-    from onegov.feriennet.request import FeriennetRequest
+    from onegov.org.request import OrgRequest
     from onegov.activity.types import BoundedIntegerRange
     from typing import Literal
     from typing import Self, TypeAlias
@@ -245,9 +245,11 @@ class Activity(Base, ContentMixin, TimestampMixin):
 
     def period_bound_occasions(
         self,
-        request: FeriennetRequest
+        request: OrgRequest
     ) -> list[Occasion]:
 
+        if not hasattr(request.app, 'active_period'):
+            return []
         active_period = request.app.active_period
 
         if not active_period:
@@ -258,16 +260,17 @@ class Activity(Base, ContentMixin, TimestampMixin):
 
     def activity_ages(
         self,
-        request: FeriennetRequest
+        request: OrgRequest
     ) -> tuple[BoundedIntegerRange, ...]:
         return tuple(o.age for o in self.period_bound_occasions(request))
 
     def activity_spots(
         self,
-        request: FeriennetRequest
+        request: OrgRequest
     ) -> int:
-
-        if not request.app.active_period:
+        
+        if not hasattr(request.app, 'active_period'
+                       ) or not request.app.active_period:
             return 0
 
         if not request.app.active_period.confirmed:
@@ -279,7 +282,7 @@ class Activity(Base, ContentMixin, TimestampMixin):
 
     def activity_min_cost(
         self,
-        request: FeriennetRequest
+        request: OrgRequest
     ) -> Decimal | None:
 
         occasions = self.period_bound_occasions(request)
@@ -291,7 +294,7 @@ class Activity(Base, ContentMixin, TimestampMixin):
 
     def activity_max_cost(
         self,
-        request: FeriennetRequest
+        request: OrgRequest
     ) -> Decimal | None:
 
         occasions = self.period_bound_occasions(request)
