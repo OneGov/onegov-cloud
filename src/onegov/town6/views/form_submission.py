@@ -2,7 +2,11 @@ from __future__ import annotations
 
 from onegov.core.security import Public, Private
 from onegov.form.models.submission import SurveySubmission
-from onegov.org.models.ticket import FormSubmissionTicket, ReservationTicket
+from onegov.org.models.ticket import (
+    DirectoryEntryTicket,
+    FormSubmissionTicket,
+    ReservationTicket,
+)
 from onegov.org.views.form_submission import (
     handle_edit_submission_from_ticket,
     handle_pending_submission,
@@ -48,6 +52,10 @@ def town_handle_pending_submission(
         self, request, FormSubmissionLayout(self, request, title))
 
 
+@TownApp.html(model=DirectoryEntryTicket, template='submission.pt',
+             permission=Private, request_method='GET', name='submission')
+@TownApp.html(model=DirectoryEntryTicket, template='submission.pt',
+             permission=Private, request_method='POST', name='submission')
 @TownApp.html(model=FormSubmissionTicket, template='submission.pt',
              permission=Private, request_method='GET', name='submission')
 @TownApp.html(model=FormSubmissionTicket, template='submission.pt',
