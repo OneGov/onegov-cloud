@@ -153,7 +153,7 @@ def get_icon_title(request: OrgRequest, access: str) -> str:
 
 
 @OrgApp.boardlet(name='pages', order=(1, 2), icon='fa-edit')
-class EditedPagesBoardlet(OrgBoardlet):
+class EditedTopicsBoardlet(OrgBoardlet):
 
     @property
     def title(self) -> str:
