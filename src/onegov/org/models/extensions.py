@@ -20,7 +20,8 @@ from onegov.form.fields import ChosenSelectField
 from onegov.gis import CoordinatesMixin
 from onegov.org import _
 from onegov.org.forms import ResourceForm
-from onegov.org.forms.extensions import CoordinatesFormExtension
+from onegov.org.forms.extensions import CoordinatesFormExtension,\
+    PushNotificationFormExtension
 from onegov.org.forms.extensions import PublicationFormExtension
 from onegov.org.forms.fields import UploadOrSelectExistingMultipleFilesField
 from onegov.org.observer import observes
@@ -239,8 +240,9 @@ class VisibleOnHomepageExtension(ContentExtension):
         return VisibleOnHomepageForm
 
 
-class ContactExtensionBase:
-    """ Common base class for extensions that add a contact field.
+class ContactExtension(ContentExtension):
+    """ Extends any class that has a content dictionary field with a simple
+    contacts field, that can optionally be inherited from another topic.
 
     """
 
@@ -248,68 +250,54 @@ class ContactExtensionBase:
 
     @contact.setter  # type:ignore[no-redef]
     def contact(self, value: str | None) -> None:
-        self.content['contact'] = value  # type:ignore[attr-defined]
+        self.content['contact'] = value
+        if self.inherit_contact:
+            # no need to update the cache
+            return
+
         # update cache
         self.__dict__['contact_html'] = to_html_ul(
-            self.contact, convert_dashes=True, with_title=True
-        ) if self.contact is not None else None
+            value, convert_dashes=True, with_title=True
+        ) if value is not None else None
+
+    inherit_contact: dict_property[bool] = content_property(default=False)
+
+    @inherit_contact.setter  # type:ignore[no-redef]
+    def inherit_contact(self, value: bool) -> None:
+        self.content['inherit_contact'] = value
+
+        # clear cache (don't update eagerly since it involves a query)
+        if 'contact_html' in self.__dict__:
+            del self.__dict__['contact_html']
+
+    contact_inherited_from: dict_property[int | None] = content_property()
+
+    @contact_inherited_from.setter  # type:ignore[no-redef]
+    def contact_inherited_from(self, value: int | None) -> None:
+        self.content['contact_inherited_from'] = value
+        if not self.inherit_contact:
+            # no need to clear the cache
+            return
+
+        # clear cache (don't update eagerly since it involves a query)
+        if 'contact_html' in self.__dict__:
+            del self.__dict__['contact_html']
 
     @cached_property
     def contact_html(self) -> Markup | None:
-        if self.contact is None:
-            return None
-        return to_html_ul(self.contact, convert_dashes=True, with_title=True)
-
-    def get_contact_html(self, request: OrgRequest) -> Markup | None:
-        return self.contact_html
-
-    def extend_form(
-        self,
-        form_class: type[FormT],
-        request: OrgRequest
-    ) -> type[FormT]:
-
-        class ContactPageForm(form_class):  # type:ignore
-            contact = TextAreaField(
-                label=_('Address'),
-                fieldset=_('Contact'),
-                render_kw={'rows': 5},
-                description=_("- '-' will be converted to a bulleted list\n"
-                              "- Urls will be transformed into links\n"
-                              "- Emails and phone numbers as well")
-            )
-
-        return ContactPageForm
-
-
-class ContactExtension(ContactExtensionBase, ContentExtension):
-    """ Extends any class that has a content dictionary field with a simple
-    contacts field.
-
-    """
-
-
-class InheritableContactExtension(ContactExtensionBase, ContentExtension):
-    """ Extends any class that has a content dictionary field with a simple
-    contacts field, that can optionally be inherited from another topic.
-
-    """
-
-    inherit_contact: dict_property[bool] = content_property(default=False)
-    contact_inherited_from: dict_property[int | None] = content_property()
-
-    # TODO: If we end up calling this more than once per request
-    #       we may want to cache this
-    def get_contact_html(self, request: OrgRequest) -> Markup | None:
         if self.inherit_contact:
             if self.contact_inherited_from is None:
                 return None
 
-            pages = PageCollection(request.session)
+            pages = PageCollection(object_session(self))
             page = pages.by_id(self.contact_inherited_from)
-            return getattr(page, 'contact_html', None)
+            contact = getattr(page, 'contact', None)
+        else:
+            contact = self.contact
 
-        return self.contact_html
+        if contact is None:
+            return None
+        return to_html_ul(contact, convert_dashes=True, with_title=True)
 
     def extend_form(
         self,
@@ -343,16 +331,14 @@ class InheritableContactExtension(ContactExtensionBase, ContentExtension):
             for choice in reversed(pinned.items()):
                 choices.insert(0, choice)
 
-        class InheritableContactPageForm(form_class):  # type:ignore
-
+        class ContactPageForm(form_class):  # type:ignore
             contact = TextAreaField(
                 label=_('Address'),
                 fieldset=_('Contact'),
                 render_kw={'rows': 5},
                 description=_("- '-' will be converted to a bulleted list\n"
                               "- Urls will be transformed into links\n"
-                              "- Emails and phone numbers as well"),
-                depends_on=('inherit_contact', '!y')
+                              "- Emails and phone numbers as well")
             )
 
             inherit_contact = BooleanField(
@@ -370,7 +356,7 @@ class InheritableContactExtension(ContactExtensionBase, ContentExtension):
                 validators=[InputRequired()]
             )
 
-        return InheritableContactPageForm
+        return ContactPageForm
 
 
 class ContactHiddenOnPageExtension(ContentExtension):
@@ -601,12 +587,12 @@ class PersonLinkExtension(ContentExtension):
             context_specific_function = TextAreaField(
                 label=_('Function'),
                 depends_on=('person', '!'),
-                render_kw={'class_': 'indent-context-specific-function'},
+                render_kw={'class_': 'indent-form-field'},
             )
             display_function_in_person_directory = BooleanField(
                 label=_('List this function in the page of this person'),
                 depends_on=('person', '!'),
-                render_kw={'class_': 'indent-context-specific-function'},
+                render_kw={'class_': 'indent-form-field'},
             )
 
         # HACK: Get translations working in FormField
@@ -764,6 +750,16 @@ class PublicationExtension(ContentExtension):
         request: OrgRequest
     ) -> type[FormT]:
         return PublicationFormExtension(form_class).create()
+
+
+class PushNotificationExtension(ContentExtension):
+
+    def extend_form(
+        self,
+        form_class: type[FormT],
+        request: OrgRequest
+    ) -> type[FormT]:
+        return PushNotificationFormExtension(form_class).create()
 
 
 class HoneyPotExtension(ContentExtension):
@@ -1100,6 +1096,115 @@ class SidebarLinksExtension(ContentExtension):
                 })
 
         return SidebarLinksForm
+
+
+class SidebarContactLinkExtension(ContentExtension):
+    """ Like SidebarLinkExtension but the links are shown below the contact
+    field. We knowingly duplicate some code here .
+    """
+
+    sidepanel_contact = content_property()
+
+    def extend_form(
+        self,
+        form_class: type[FormT],
+        request: OrgRequest
+    ) -> type[FormT]:
+
+        class SidebarContactLinkForm(form_class):  # type:ignore
+
+            sidepanel_contact = StringField(
+                label=_('Contact link'),
+                fieldset=_('Sidebar contact'),
+                render_kw={'class_': 'many many-links'}
+            )
+
+            if TYPE_CHECKING:
+                contact_errors: dict[int, str]
+            else:
+                def __init__(self, *args, **kwargs) -> None:
+                    super().__init__(*args, **kwargs)
+                    self.contact_errors = {}
+
+            def on_request(self) -> None:
+                if not self.sidepanel_contact.data:
+                    self.sidepanel_contact.data = self.links_to_json(None)
+
+            def process_obj(self, obj: SidebarContactLinkExtension) -> None:
+                super().process_obj(obj)
+                if not obj.sidepanel_contact:
+                    self.sidepanel_contact.data = self.links_to_json(None)
+                else:
+                    self.sidepanel_contact.data = self.links_to_json(
+                        obj.sidepanel_contact
+                    )
+
+            def populate_obj(
+                self,
+                obj: SidebarContactLinkExtension,
+                *args: Any, **kwargs: Any
+            ) -> None:
+                super().populate_obj(obj, *args, **kwargs)
+                obj.sidepanel_contact = self.json_to_links(
+                    self.sidepanel_contact.data) or None
+
+            def validate_sidepanel_contact(self, field: StringField) -> None:
+                for text, link in self.json_to_links(
+                        self.sidepanel_contact.data
+                ):
+                    if text and not link:
+                        raise ValidationError(
+                            _('Please provide a URL if contact link text is '
+                              'set'))
+                    if link and not text:
+                        raise ValidationError(
+                            _('Please provide link text if contact URL is '
+                              'set'))
+                    if link and not re.match(r'^(http://|https://|/)',
+                                             link):
+                        raise ValidationError(
+                            _('Your URLs must start with http://,'
+                              ' https:// or /'
+                              ' (for internal links)')
+                        )
+
+            def json_to_links(
+                self,
+                text: str | None = None
+            ) -> list[tuple[str | None, str | None]]:
+
+                if not text:
+                    return []
+
+                return [
+                    (value['text'], link)
+                    for value in json.loads(text).get('values', [])
+                    if (link := value['link']) or value['text']
+                ]
+
+            def links_to_json(
+                self,
+                links: Sequence[tuple[str | None, str | None]] | None
+            ) -> str:
+                contact_links = links or []
+
+                return json.dumps({
+                    'labels': {
+                        'text': self.request.translate(_('Contact Text')),
+                        'link': self.request.translate(_('Contact URL')),
+                        'add': self.request.translate(_('Add')),
+                        'remove': self.request.translate(_('Remove')),
+                    },
+                    'values': [
+                        {
+                            'text': l[0],
+                            'link': l[1],
+                            'error': self.contact_errors.get(ix, '')
+                        } for ix, l in enumerate(contact_links)
+                    ]
+                })
+
+        return SidebarContactLinkForm
 
 
 class DeletableContentExtension(ContentExtension):

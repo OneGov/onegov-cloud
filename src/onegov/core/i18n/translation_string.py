@@ -2,6 +2,7 @@ from __future__ import annotations
 
 from markupsafe import escape
 from markupsafe import Markup
+from onegov.core.custom import msgpack
 from translationstring import TranslationString
 
 
@@ -75,7 +76,7 @@ class TranslationMarkup(TranslationString):
         if default is None:
             _default = None
         else:
-            _default = Markup(default)  # noqa: RUF035
+            _default = Markup(default)  # nosec: B704
 
         # NOTE: We prepare everything in the mapping with escape
         #       because interpolate uses re.sub, which is not
@@ -87,25 +88,25 @@ class TranslationMarkup(TranslationString):
             _mapping = {k: escape(v) for k, v in mapping.items()}
 
         if not isinstance(msgid, str) and hasattr(msgid, '__html__'):
-            msgid = Markup(msgid)  # noqa: RUF035
+            msgid = Markup(msgid)  # nosec: B704
 
         elif isinstance(msgid, TranslationString):
             domain = domain or msgid.domain and msgid.domain[:]
             context = context or msgid.context and msgid.context[:]
-            _default = _default or Markup(msgid.default)  # noqa: RUF035
+            _default = _default or Markup(msgid.default)  # nosec: B704
             if msgid.mapping:
                 if _mapping:
                     for k, v in msgid.mapping.items():
                         _mapping.setdefault(k, escape(v))
                 else:
                     _mapping = {k: escape(v) for k, v in msgid.mapping.items()}
-            msgid = Markup(msgid)  # noqa: RUF035
+            msgid = Markup(msgid)  # nosec: B704
 
         instance: Self = str.__new__(cls, msgid)
         instance.domain = domain
         instance.context = context
         if _default is None:
-            _default = Markup(msgid)  # noqa: RUF035
+            _default = Markup(msgid)  # nosec: B704
         instance.default = _default
 
         instance.mapping = _mapping
@@ -118,9 +119,9 @@ class TranslationMarkup(TranslationString):
         return type(self)(super().__mod__(options))
 
     def interpolate(self, translated: str | None = None) -> Markup:
-        return Markup(  # noqa: RUF035
+        return Markup(  # nosec: B704
             super().interpolate(
-                translated and Markup(translated)  # noqa: RUF035
+                translated and Markup(translated)  # nosec: B704
             )
         )
 
@@ -212,3 +213,40 @@ def TranslationStringFactory(factory_domain: str) -> TStrCallable:  # noqa: N802
             context=context
         )
     return create
+
+
+class TranslationStringSerializer(msgpack.Serializer[TranslationString]):
+
+    def encode(self, obj: TranslationString) -> bytes:
+        return msgpack.packb((
+            str(obj),
+            str(obj.default),
+            obj.domain,
+            obj.context,
+            {
+                # NOTE: This makes sure this is always serializable
+                #       internally this will be turned into a string
+                #       later anyways, we just have to make sure that
+                #       `Markup` is preserved for `TranslationMarkup`
+                k: str(v) if not isinstance(v, str) else v
+                for k, v in obj.mapping.items()
+            } if obj.mapping else None
+        ))
+
+    def decode(self, value: bytes) -> TranslationString:
+        msgid, default, domain, context, mapping = msgpack.unpackb(value)
+        return self.target(
+            msgid,
+            default=default,
+            domain=domain,
+            context=context,
+            mapping=mapping
+        )
+
+
+msgpack.default_serializers.register(
+    TranslationStringSerializer(tag=9, target=TranslationString)
+)
+msgpack.default_serializers.register(
+    TranslationStringSerializer(tag=10, target=TranslationMarkup)
+)

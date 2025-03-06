@@ -328,6 +328,7 @@ $globals-height: 2.5rem;
         text-align: center;
     }
 
+    .dashboard::before { @include icon('\f0e4'); }
     .login::before { @include icon('\f090'); }
     .logout::before { @include icon('\f08b'); }
     .register::before { @include icon('\f234'); }
@@ -798,6 +799,18 @@ form {
         li input[type="checkbox"],
         li input[type="radio"] {
             margin: 0;
+        }
+    }
+
+    .duration-widget label {
+        display: inline-block;
+        white-space: nowrap;
+        margin-right: .5rem;
+
+        input {
+            display: inline-block;
+            width: auto;
+            margin-right: .25rem;
         }
     }
 
@@ -1619,6 +1632,7 @@ $new-directory-icon: '\f0e8';
 $new-directory-entry-icon: '\f114';
 $new-recipient: '\f1fa';
 $new-form-icon: '\f044';
+$new-document-form-icon: '\f15b';
 $new-link-icon: '\f0c1';
 $new-iframe-icon: '\f2d0';
 $new-news-icon: '\f1ea';
@@ -1631,7 +1645,9 @@ $new-photo-album: '\f03e';
 $new-registration-window: '\f067';
 $new-reservation-icon: '\f271';
 $new-room-icon: '\f015';
+$new-datatrans-icon: '\f09d';
 $new-stripe-connect-icon: '\f1f5';
+$new-worldline-saferpay-icon: '\f09d';
 $new-user-icon: '\f234';
 $new-text-module-icon: '\f24a';
 $paste-link-icon: '\f0ea';
@@ -1754,6 +1770,7 @@ $editbar-bg-color: $topbar-link-bg-hover;
     .new-directory::before { @include icon($new-directory-icon); }
     .new-directory-entry::before { @include icon($new-directory-entry-icon); }
     .new-form::before { @include icon($new-form-icon); }
+    .new-document-form::before { @include icon($new-document-form-icon); }
     .new-link::before { @include icon($new-link-icon); }
     .new-iframe::before { @include icon($new-iframe-icon); }
     .new-news::before { @include icon($new-news-icon); }
@@ -1767,7 +1784,9 @@ $editbar-bg-color: $topbar-link-bg-hover;
     .new-registration-window::before { @include icon($new-registration-window); }
     .new-reservation::before { @include icon($new-reservation-icon); }
     .new-room::before { @include icon($new-room-icon); }
+    .new-datatrans::before { @include icon($new-datatrans-icon); }
     .new-stripe-connect::before { @include icon($new-stripe-connect-icon); }
+    .new-worldline-saferpay::before { @include icon($new-worldline-saferpay-icon); }
     .new-user::before { @include icon($new-user-icon); }
     .new-text-module::before { @include icon($new-text-module-icon); }
     .occupancy-link::before { @include icon($occupancy-link-icon); }
@@ -4506,11 +4525,21 @@ ul.recipients {
         font-size: 1rem;
         font-weight: bold;
         margin: 0 0 .5rem;
+    }
 
-        &::before {
-            @include icon('\f1f5');
-            margin-right: 1.5ex;
-        }
+    .payment-provider-stripe-connect h2::before {
+        @include icon('\f1f5');
+        margin-right: 1.5ex;
+    }
+
+    .payment-provider-datatrans h2::before {
+        @include icon('\f09d');
+        margin-right: 1.5ex;
+    }
+
+    .payment-provider-worldline-saferpay h2::before {
+        @include icon('\f09d');
+        margin-right: 1.5ex;
     }
 }
 
@@ -6320,18 +6349,12 @@ h2 + div.timeline {
 /*
     Dashboard
 */
-.boardlet-group {
-    display: flex;
-    flex-wrap: wrap;
-    justify-content: space-between;
-}
 
 .boardlet {
     background: $gray-pastel;
     border-top: 10px solid $green-light;
     margin-bottom: 1.5rem;
     padding: .5rem 1rem 1rem;
-    width: calc((100% / 3) - 1rem);
 
     h2 {
         font-size: 1.3rem;
@@ -6340,11 +6363,35 @@ h2 + div.timeline {
         word-wrap: break-word;
     }
 
-    li {
+    table {
+        margin-bottom: 0;
+    }
+
+    tr {
         font-size: .9rem;
 
         &.zero {
             color: $base;
+        }
+
+        .facts {
+            border-collapse: collapse;
+            table-layout: auto;
+        }
+
+        .fact-number,
+        .fact-icon {
+            padding: 0.5rem;
+            text-align: right;
+        }
+
+        .fact-icon {
+            text-align: center;
+        }
+
+        .fact-text {
+            margin-left: .5rem;
+            width: 100%;
         }
     }
 
@@ -6578,6 +6625,9 @@ a#results {
     margin-bottom: 1.5rem;
     overflow-x: auto;
     position: relative;
+    /* NOTE: Since we allow shift as a modifier key, text-selection would
+             become annoying, rather than helpful. */
+    user-select: none;
 
     table {
         margin-bottom: 0;
@@ -6626,6 +6676,10 @@ a#results {
                     rgba($iron, .25) 20px
                 );
                 cursor: default;
+
+                &.event-available.event-adjustable {
+                    cursor: pointer;
+                }
             }
 
             &.not-selected:not(:hover) {
@@ -6647,6 +6701,13 @@ a#results {
         .event-available {
             background-color: $green;
             cursor: pointer;
+        }
+
+        .event-adjustable::before {
+            float: right;
+            color: white;
+            font-size: 1.5rem;
+            @include icon($edit-link-icon);
         }
     }
 }
@@ -6768,3 +6829,5 @@ a#results {
         list-style: none;
     }
 }
+
+

@@ -87,17 +87,19 @@ def create_image(width=50, height=50, output=None):
     return im
 
 
-def create_pdf(filename='simple.pdf'):
+def create_pdf(filename='simple.pdf',
+               content="Hello, I am a PDF document created with Python!"):
     from reportlab.pdfgen import canvas
 
     c = canvas.Canvas(filename)
-    c.drawString(100, 750,
-                 "Hello, I am a PDF document created with Python!")
+    c.drawString(100, 750, content)
     c.save()
     return c
 
 
 def assert_explicit_permissions(module, app_class):
+    from onegov.server.utils import patch_morepath
+    patch_morepath()
     morepath.autoscan()
     app_class.commit()
 

@@ -99,7 +99,10 @@ def respond_with_error(request: OrgRequest, error: str) -> JSON_ro:
     @request.after
     def trigger(response: Response) -> None:
         response.headers.add('X-IC-Trigger', 'rc-reservation-error')
-        response.headers.add('X-IC-Trigger-Data', json.dumps(message))
+        response.headers.add(
+            'X-IC-Trigger-Data',
+            json.dumps(message, ensure_ascii=True)
+        )
 
     return message
 
@@ -530,11 +533,19 @@ def confirm_reservation(
             title=self.title,
             price=price,
             email=reservations[0].email,
-            locale=request.locale
+            complete_url=request.link(self, 'finish'),
+            request=request,
         )
     }
 
 
+@OrgApp.html(
+    model=Resource,
+    name='finish',
+    permission=Public,
+    template='layout.pt',
+    request_method='GET'
+)
 @OrgApp.html(
     model=Resource,
     name='finish',
@@ -552,13 +563,16 @@ def finalize_reservation(self: Resource, request: OrgRequest) -> Response:
 
     forms = FormCollection(request.session)
     submission = forms.submissions.by_id(token)
+    provider = request.app.default_payment_provider
+    if request.method == 'GET' and (
+        provider is None or not provider.payment_via_get
+    ):
+        # TODO: A redirect back to the previous step with an error might
+        #       be better UX, if this error can occur too easily...
+        raise exc.HTTPMethodNotAllowed()
 
     try:
-        provider = request.app.default_payment_provider
-        payment_token = request.params.get('payment_token')
-        if not isinstance(payment_token, str):
-            payment_token = None
-
+        payment_token = provider.get_token(request) if provider else None
         price = request.app.adjust_price(self.price_of_reservation(
             token,
             submission.form_obj.total() if submission else None

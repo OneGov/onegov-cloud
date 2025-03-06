@@ -75,7 +75,13 @@ def view_creditcard_payments(
 def view_my_invoices(
     self: InvoiceCollection,
     request: FeriennetRequest
-) -> RenderData:
+) -> RenderData | Response:
+
+    payment_provider = request.app.default_payment_provider
+    if payment_provider and payment_provider.payment_via_get:
+        token = payment_provider.get_token(request)
+        if token:
+            return handle_payment(self, request, token)
 
     query = PeriodCollection(request.session).query()
     query = query.filter(Period.finalized == True)
@@ -134,7 +140,6 @@ def view_my_invoices(
         account = meta.get('bank_esr_participant_number')
 
     beneficiary = meta.get('bank_beneficiary')
-    payment_provider = request.app.default_payment_provider
     qr_bill_enabled = meta.get('bank_qr_bill', False)
     layout = InvoiceLayout(self, request, title)
 
@@ -157,7 +162,8 @@ def view_my_invoices(
             title=title,
             price=price,
             email=user.username,
-            locale=request.locale
+            complete_url=request.link(self),
+            request=request,
         )
 
     def user_select_link(user: User) -> str:
@@ -192,13 +198,15 @@ def view_my_invoices(
     request_method='POST')
 def handle_payment(
     self: InvoiceCollection,
-    request: FeriennetRequest
+    request: FeriennetRequest,
+    token: str | None = None
 ) -> Response:
 
     provider = request.app.default_payment_provider
     assert provider is not None
-    token = request.params.get('payment_token')
-    assert token is None or isinstance(token, str)
+
+    if token is None:
+        token = provider.get_token(request)
     # FIXME: Can period actually be omitted, i.e. are there
     #        cases where we only get a single Invoice when we
     #        omit the period?
@@ -310,7 +318,7 @@ def handle_donation(
     # NOTE: We need treat this as Markup
     # TODO: It would be cleaner if we had a proxy object
     #       with all the settings as dict_property
-    description = Markup(description)  # noqa: RUF035
+    description = Markup(description)  # nosec: B704
 
     return {
         'title': title,

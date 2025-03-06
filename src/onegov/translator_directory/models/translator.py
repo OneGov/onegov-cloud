@@ -243,7 +243,7 @@ class Translator(Base, TimestampMixin, AssociatedFiles, ContentMixin,
     @property
     def full_name(self) -> str:
         """ Returns the full name with lastname in uppercase. """
-        return f'{self.first_name.upper()} {self.last_name}'
+        return f'{self.first_name} {self.last_name.upper()}'
 
     @property
     def unique_categories(self) -> list[str]:

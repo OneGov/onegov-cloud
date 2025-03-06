@@ -11,18 +11,23 @@ from lxml import etree
 from onegov.core.widgets import transform_structure
 from onegov.core.widgets import XML_LINE_OFFSET
 from onegov.form import Form
-from onegov.form.fields import ChosenSelectField, URLPanelField
+from onegov.form.fields import (ChosenSelectField, URLPanelField,
+                                ChosenSelectMultipleEmailField)
 from onegov.form.fields import ColorField
 from onegov.form.fields import CssField
 from onegov.form.fields import MarkupField
 from onegov.form.fields import MultiCheckboxField
 from onegov.form.fields import PreviewField
 from onegov.form.fields import TagsField
-from onegov.gever.encrypt import encrypt_symmetric
+from onegov.form.validators import StrictOptional
+from onegov.gever.encrypt import encrypt_symmetric, decrypt_symmetric
 from onegov.gis import CoordinatesField
 from onegov.org import _
-from onegov.org.forms.fields import (HtmlField,
-                                     UploadOrSelectExistingMultipleFilesField)
+
+from onegov.org.forms.fields import (
+    HtmlField,
+    UploadOrSelectExistingMultipleFilesField,
+)
 from onegov.org.forms.user import AVAILABLE_ROLES
 from onegov.org.forms.util import TIMESPANS
 from onegov.org.theme import user_options
@@ -720,6 +725,7 @@ class ModuleSettingsForm(Form):
             ('postal_address', _('Postal address')),
             ('postal_code_city', _('Postal Code and City')),
             ('notes', _('Notes')),
+            ('external_user_id', _('External ID'))
         ])
 
     mtan_session_duration_seconds = IntegerField(
@@ -1161,6 +1167,14 @@ class NewsletterSettingsForm(Form):
         },
     )
 
+    notify_on_unsubscription = ChosenSelectMultipleEmailField(
+        label=_('Notify on newsletter unsubscription'),
+        description=_('Send an email notification to the following users '
+                      'when a recipient unsubscribes from the newsletter'),
+        validators=[StrictOptional()],
+        choices=[]
+    )
+
     def ensure_categories(self) -> bool | None:
         assert isinstance(self.newsletter_categories.errors, list)
 
@@ -1222,6 +1236,8 @@ class NewsletterSettingsForm(Form):
         data = yaml.safe_load(yaml_data) if yaml_data else {}
         model.newsletter_categories = data
 
+        model.notify_on_unsubscription = self.notify_on_unsubscription.data
+
     def process_obj(self, model: Organisation) -> None:  # type:ignore
         super().process_obj(model)
 
@@ -1232,6 +1248,17 @@ class NewsletterSettingsForm(Form):
 
         yaml_data = yaml.safe_dump(categories, default_flow_style=False)
         self.newsletter_categories.data = yaml_data
+
+        if model.notify_on_unsubscription:
+            self.notify_on_unsubscription.data = model.notify_on_unsubscription
+
+    def on_request(self) -> None:
+        users = self.request.session.query(User).filter(
+            User.role.in_(['admin', 'editor']))
+        users = users.order_by(User.username.desc())
+        self.notify_on_unsubscription.choices = [
+            (u.username) for u in users if '@' in u.username
+        ]
 
 
 class LinkMigrationForm(Form):
@@ -1392,3 +1419,201 @@ class DataRetentionPolicyForm(Form):
         coerce=int,
         choices=TIMESPANS
     )
+
+
+class FirebaseSettingsForm(Form):
+    """Allows to setup sending firebase notifications for News with
+    hashtags. Used with PublicationFormExtension .
+
+    """
+
+    if TYPE_CHECKING:
+        request: OrgRequest
+
+    firebase_adminsdk_credential = TextAreaField(
+        _('Firebase adminsdk credentials (JSON)'),
+        [InputRequired()],
+        render_kw={
+            'rows': 32,
+            'data-editor': 'json'
+        },
+    )
+
+    selectable_push_notification_options = StringField(
+        label=_('Topics'),
+        fieldset=_('Defines the firebase topic id'),
+        render_kw={
+            'class_': 'many many-firebasetopics',
+        },
+    )
+
+    if TYPE_CHECKING:
+        hashtag_errors: dict[int, str]
+    else:
+
+        def __init__(self, *args, **kwargs) -> None:
+            super().__init__(*args, **kwargs)
+            self.hashtag_errors = {}
+
+    def populate_obj(self, model: Organisation) -> None:  # type:ignore
+        super().populate_obj(model)
+        key_base64 = self.request.app.hashed_identity_key
+        try:
+            assert self.firebase_adminsdk_credential.data is not None
+            encrypted = encrypt_symmetric(
+                self.firebase_adminsdk_credential.data, key_base64
+            )
+            encrypted_str = encrypted.decode('utf-8')
+            model.firebase_adminsdk_credential = encrypted_str or ''
+        except Exception:
+            model.firebase_adminsdk_credential = ''  # nosec: B105
+
+        # Save selectable_push_notification_options to the model
+        model.selectable_push_notification_options = (
+            self.json_to_links(self.selectable_push_notification_options.data)
+            or []
+        )
+
+    def validate_firebase_adminsdk_credential(
+        self, field: TextAreaField
+    ) -> None:
+        expected_keys = {
+            'auth_provider_x509_cert_url',
+            'auth_uri',
+            'client_email',
+            'client_id',
+            'client_x509_cert_url',
+            'private_key',
+            'private_key_id',
+            'project_id',
+            'token_uri',
+            'type',
+            'universe_domain',
+        }
+        # Basic sanity checks on the json
+        try:
+            data = json.loads(field.data)  # type:ignore[arg-type]
+            if not isinstance(data, dict):
+                raise ValidationError(
+                    _(
+                        'Invalid Firebase credentials format '
+                        '- must be a JSON object'
+                    )
+                )
+            missing_keys = [key for key in expected_keys if key not in data]
+            if missing_keys:
+                error_message = _(
+                    'Missing required keys in Firebase credentials: {0}'
+                ).format(', '.join(missing_keys))
+                raise ValidationError(error_message)
+        except json.JSONDecodeError as err:
+            raise ValidationError(
+                _('Invalid JSON format in Firebase credentials')
+            ) from err
+        except Exception as e:
+            raise ValidationError(
+                _('Error validating Firebase credentials: {0}').format(str(e))
+            ) from e
+
+    def process_obj(self, model: Organisation) -> None:  # type:ignore
+        super().process_obj(model)
+
+        key_base64 = self.request.app.hashed_identity_key
+        if model.firebase_adminsdk_credential:
+            self.firebase_adminsdk_credential.data = decrypt_symmetric(
+                model.firebase_adminsdk_credential.encode('utf-8'), key_base64
+            )
+
+        if (
+            not hasattr(model, 'selectable_push_notification_options')
+            or not model.selectable_push_notification_options
+        ):
+            self.selectable_push_notification_options.data = self.tags_to_json(
+               []
+            )
+        else:
+            self.selectable_push_notification_options.data = self.tags_to_json(
+                model.selectable_push_notification_options
+            )
+
+    def on_request(self) -> None:
+        # Initialize the field if it's empty
+        if not self.selectable_push_notification_options.data:
+            self.selectable_push_notification_options.data = (
+                self.tags_to_json([])
+            )
+
+    def choices_for_news_specific_firebase_topics(self) -> list[list[str]]:
+        from onegov.org.models import News
+        session = self.request.session
+        query = session.query(News.meta['hashtags'])
+        hashtag_set = set()
+        for (hashtags,) in query:
+            hashtag_set.update(hashtags)
+        all_hashtags = sorted(hashtag_set)
+
+        # The first topic is just the schema, includes all News
+        choices_for_topics = []
+        for label in all_hashtags:
+            normalized_hashtag = label.lower().replace(' ', '_')
+            key = (
+                self.request.app.schema + '_' + normalized_hashtag
+            )
+            pair = [key, label]
+            choices_for_topics.append(pair)
+        return choices_for_topics
+
+    def json_to_links(
+        self,
+        text: str | None = None
+    ) -> list[list[str]]:
+        if not text:
+            return []
+        return [
+            [value['text'], link]
+            for value in json.loads(text).get('values', [])
+            if (link := value['link']) or value['text']
+        ]
+
+    def tags_to_json(self, tags: list[list[str]]) -> str:
+        if not tags:
+            # set default topic News (which is all)
+            app_id = self.request.app.schema
+            topic_and_label_pairs = [[app_id, 'News']]
+        else:
+            topic_and_label_pairs = tags
+
+            # Check if the default pair exists, if not add it
+            app_id = self.request.app.schema
+            if not any(pair[0] == app_id for pair in topic_and_label_pairs):
+                topic_and_label_pairs.insert(
+                    0, [app_id, 'News']
+                )
+
+        choices = self.choices_for_news_specific_firebase_topics()
+        text_options = [value for value, __ in choices]
+        link_options = [label for __, label in choices]
+
+        return json.dumps(
+            {
+                'labels': {
+                    'text': 'Key',
+                    'link': 'Label',
+                    'add': self.request.translate(_('Add')),
+                    'remove': self.request.translate(_('Remove')),
+                },
+                'placeholders': {
+                    'text': 'Key',
+                    'link': 'Label'
+                },
+                'textOptions': text_options,
+                'linkOptions': link_options,
+                'values': [
+                    {
+                        'text': l[0],
+                        'link': l[1],
+                        'error': self.hashtag_errors.get(ix, '')
+                    } for ix, l in enumerate(topic_and_label_pairs)
+                ]
+            }
+        )

@@ -6,6 +6,7 @@ import ua_parser
 from datetime import timedelta
 from functools import cached_property
 from onegov.core.cache import instance_lru_cache
+from onegov.core.custom import msgpack
 from onegov.core.utils import append_query_param
 from itsdangerous import (
     BadSignature,
@@ -27,7 +28,7 @@ from wtforms.csrf.session import SessionCSRF
 from typing import overload, Any, NamedTuple, TypeVar, TYPE_CHECKING
 if TYPE_CHECKING:
     from _typeshed import SupportsItems
-    from collections.abc import Callable, Iterable, Iterator
+    from collections.abc import Callable, Iterable, Iterator, Sequence
     from dectate import Sentinel
     from gettext import GNUTranslations
     from markupsafe import Markup
@@ -38,7 +39,7 @@ if TYPE_CHECKING:
     from onegov.core.security.permissions import Intent
     from onegov.core.types import MessageType
     from sqlalchemy import Column
-    from sqlalchemy.orm import Session
+    from sqlalchemy.orm import relationship, Session
     from translationstring import _ChameleonTranslate
     from typing import Literal, Protocol, TypeGuard
     from webob import Response
@@ -54,13 +55,22 @@ if TYPE_CHECKING:
     # NOTE: To avoid a dependency between onegov.core and onegov.user
     #       we use a UserLike Protocol to define the properties we need
     #       to be present on a user.
+    class GroupLike(Protocol):
+        @property
+        def id(self) -> UUID | Column[UUID]: ...
+        @property
+        def name(self) -> str | Column[str | None] | None: ...
+
     class UserLike(Protocol):
         @property
         def id(self) -> UUID | Column[UUID]: ...
         @property
         def username(self) -> str | Column[str]: ...
         @property
-        def group_id(self) -> UUID | Column[UUID | None] | None: ...
+        def groups(self) -> (
+            Sequence[GroupLike]
+            | relationship[Sequence[GroupLike]]
+        ): ...
         @property
         def role(self) -> str | Column[str]: ...
 
@@ -71,6 +81,7 @@ _T = TypeVar('_T')
 _F = TypeVar('_F', bound='Form')
 
 
+@msgpack.make_serializable(tag=11)
 class Message(NamedTuple):
     text: str
     type: MessageType
@@ -350,6 +361,18 @@ class CoreRequest(IncludeRequest, ContentSecurityRequest, ReturnToMixin):
 
         return self.link(self.app.modules.theme.ThemeFile(filename))
 
+    def get_session_nonce(self) -> str:
+        """ Returns a nonce that can be passed as a POST parameter
+        to restore a session in a context where the session cookie
+        is unavailable, due to `SameSite=Lax`.
+        """
+        nonce = random_token()
+        self.app.cache.set(
+            nonce,
+            self.app.sign(self.browser_session._token, nonce),
+        )
+        return self.app.sign(nonce)
+
     @cached_property
     def browser_session(self) -> BrowserSession:
         """ Returns a browser_session bound to the request. Works via cookies,
@@ -377,6 +400,17 @@ class CoreRequest(IncludeRequest, ContentSecurityRequest, ReturnToMixin):
                 #       infinite CSRF errors
                 del self.cookies['session_id']
                 session_id = random_token()
+
+        elif isinstance(signed_nonce := self.POST.get('session_nonce'), str):
+            nonce = self.app.unsign(signed_nonce)
+            session_id = random_token()
+            if nonce:
+                # restore the session in a non SameSite context
+                signed_session_id = self.app.cache.get(nonce)
+                if signed_session_id:
+                    # make sure this nonce can't be reused
+                    self.app.cache.delete(nonce)
+                    session_id = self.app.unsign(signed_session_id, nonce)
         else:
             session_id = random_token()
 
@@ -628,7 +662,7 @@ class CoreRequest(IncludeRequest, ContentSecurityRequest, ReturnToMixin):
         identity = self.app.application_bound_identity(
             user.username,
             user.id.hex,
-            user.group_id.hex if user.group_id else None,
+            frozenset(group.id.hex for group in user.groups),
             user.role
         ) if user else self.identity
 

@@ -52,3 +52,18 @@ def test_header_links(client):
 
     assert '<a href="https://www.govikon-castle.ch">Castle Govikon</a>' in page
     assert '<a href="https://www.govikon-school.ch">Govikon School</a>' in page
+
+
+def test_publications_year(client):
+
+    page = client.get('/publications?year=20263', status=400)
+    assert 'Cannot decode URL parameter' in page
+
+    page = client.get('/publications?year=0', status=400)
+    assert 'Cannot decode URL parameter' in page
+
+    page = client.get('/publications?year=2020')
+    assert 'Publikationen' in page
+
+    page = client.get('/publications')
+    assert 'Publikationen' in page

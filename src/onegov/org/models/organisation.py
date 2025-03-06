@@ -8,7 +8,7 @@ from onegov.core.orm import Base
 from onegov.core.orm.abstract import associated
 from onegov.core.orm.mixins import (
     dict_markup_property, dict_property, meta_property, TimestampMixin)
-from onegov.core.orm.types import JSON, UUID
+from onegov.core.orm.types import JSON, UUID, UTCDateTime
 from onegov.core.utils import linkify, paragraphify
 from onegov.file.models.file import File
 from onegov.form import flatten_fieldsets, parse_formcode
@@ -99,7 +99,7 @@ class Organisation(Base, TimestampMixin):
     redirect_homepage_to: dict_property[str | None] = meta_property()
     redirect_path: dict_property[str | None] = meta_property()
     hidden_people_fields: dict_property[list[str]] = meta_property(
-        default=list
+        default=lambda: ['external_user_id']
     )
     event_locations: dict_property[list[str]] = meta_property(default=list)
     geo_provider: dict_property[str] = meta_property(default='geo-mapbox')
@@ -214,6 +214,7 @@ class Organisation(Base, TimestampMixin):
     newsletter_categories: (
         dict_property)[dict[str, list[dict[str, list[str]] | str]]] = (
         meta_property(default=dict))
+    notify_on_unsubscription: dict_property[list[str] | None] = meta_property()
 
     # Chat Settings
     chat_staff: dict_property[list[str] | None] = meta_property()
@@ -240,6 +241,15 @@ class Organisation(Base, TimestampMixin):
     ogd_publisher_mail: dict_property[str | None] = meta_property()
     ogd_publisher_id: dict_property[str | None] = meta_property()
     ogd_publisher_name: dict_property[str | None] = meta_property()
+
+    # cron jobs
+    hourly_maintenance_tasks_last_run: (
+        dict_property)[UTCDateTime | None] = (meta_property(default=None))
+
+    firebase_adminsdk_credential: dict_property[str | None] = meta_property()
+    selectable_push_notification_options: dict_property[list[list[str]]] = (
+        meta_property(default=list)
+    )
 
     @property
     def mtan_access_window(self) -> timedelta:

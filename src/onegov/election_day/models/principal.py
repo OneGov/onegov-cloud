@@ -8,6 +8,7 @@ from datetime import date
 from markupsafe import Markup
 from onegov.core import utils
 from onegov.core.custom import json
+from onegov.core.custom import msgpack
 from onegov.election_day import _
 from pathlib import Path
 from urllib.parse import urlsplit
@@ -16,6 +17,7 @@ from yaml import safe_load
 
 from typing import Any
 from typing import Literal
+from typing import Self
 from typing import TYPE_CHECKING
 if TYPE_CHECKING:
     from translationstring import TranslationString
@@ -121,7 +123,7 @@ class Principal:
         #       in order for most analytics to work. Eventually this may be
         #       able to go away again or be reduced to support a few specific
         #       providers.
-        self.analytics = Markup(analytics) if analytics else None  # noqa: RUF035
+        self.analytics = Markup(analytics) if analytics else None  # nosec: B704
         self.has_districts = has_districts
         self.has_regions = has_regions
         self.has_superregions = has_superregions
@@ -223,7 +225,37 @@ class Principal:
         raise NotImplementedError()
 
 
-class Canton(Principal):
+class Canton(Principal, msgpack.Serializable, tag=50, keys=(
+    'canton',
+    'domains_election',
+    'domains_vote',
+    'entities',
+    'name',
+    'logo',
+    'logo_position',
+    'color',
+    'base',
+    'analytics',
+    'has_districts',
+    'has_regions',
+    'has_superregions',
+    'fetch',
+    'webhooks',
+    'sms_notification',
+    'email_notification',
+    'wabsti_import',
+    'open_data',
+    'hidden_elements',
+    'publish_intermediate_results',
+    'csp_script_src',
+    'csp_connect_src',
+    'cache_expiration_time',
+    'reply_to',
+    'custom_css',
+    'official_host',
+    'segmented_notifications',
+    'private',
+)):
     """ A cantonal instance. """
 
     CANTONS = {
@@ -257,13 +289,10 @@ class Canton(Principal):
 
     domain: Literal['canton']
 
-    def __init__(
-        self,
-        canton: str,
-        **kwargs: Any
-    ):
+    def __init__(self, canton: str, **kwargs: Any) -> None:
         assert canton in self.CANTONS
-        self.id = canton
+
+        self.canton = canton
 
         kwargs.pop('use_maps', None)
 
@@ -346,51 +375,161 @@ class Canton(Principal):
             **kwargs
         )
 
+    @classmethod
+    def from_dict(
+        cls,
+        canton: str,
+        domains_election: dict[str, TranslationString],
+        domains_vote: dict[str, TranslationString],
+        entities: dict[int, dict[int, dict[str, str]]],
+        name: str | None = None,
+        logo: str | None = None,
+        logo_position: str = 'left',
+        color: str = '#000',
+        base: str | None = None,
+        analytics: str | None = None,
+        has_districts: bool = True,
+        has_regions: bool = False,
+        has_superregions: bool = False,
+        fetch: dict[str, Any] | None = None,
+        webhooks: dict[str, dict[str, str]] | None = None,
+        sms_notification: bool | None = None,
+        email_notification: bool | None = None,
+        wabsti_import: bool = False,
+        open_data: dict[str, str] | None = None,
+        hidden_elements: dict[str, dict[str, dict[str, bool]]] | None = None,
+        publish_intermediate_results: dict[str, bool] | None = None,
+        csp_script_src: list[str] | None = None,
+        csp_connect_src: list[str] | None = None,
+        cache_expiration_time: int = 300,
+        reply_to: str | None = None,
+        custom_css: str | None = None,
+        official_host: str | None = None,
+        segmented_notifications: bool = False,
+        private: bool = False,
+        **kwargs: Never,
+    ) -> Self:
+
+        assert canton in cls.CANTONS
+
+        self = object.__new__(cls)
+        self.canton = canton
+
+        Principal.__init__(
+            self,
+            id_=canton,
+            domain='canton',
+            domains_election=domains_election,
+            domains_vote=domains_vote,
+            entities=entities,
+            name=name,
+            logo=logo,
+            logo_position=logo_position,
+            color=color,
+            base=base,
+            analytics=analytics,
+            has_districts=has_districts,
+            has_regions=has_regions,
+            has_superregions=has_superregions,
+            use_maps=True,
+            fetch=fetch,
+            webhooks=webhooks,
+            sms_notification=sms_notification,
+            email_notification=email_notification,
+            wabsti_import=wabsti_import,
+            open_data=open_data,
+            hidden_elements=hidden_elements,
+            publish_intermediate_results=publish_intermediate_results,
+            csp_script_src=csp_script_src,
+            csp_connect_src=csp_connect_src,
+            cache_expiration_time=cache_expiration_time,
+            reply_to=reply_to,
+            custom_css=custom_css,
+            official_host=official_host,
+            segmented_notifications=segmented_notifications,
+            private=private,
+        )
+
+        return self
+
     def label(self, value: str) -> str:
         if value == 'entity':
             return _('Municipality')
         if value == 'entities':
             return _('Municipalities')
         if value == 'district':
-            if self.id == 'bl':
+            if self.canton == 'bl':
                 return _('district_label_bl')
-            if self.id == 'gr':
+            if self.canton == 'gr':
                 return _('district_label_gr')
-            if self.id == 'sz':
+            if self.canton == 'sz':
                 return _('district_label_sz')
             return _('District')
         if value == 'districts':
-            if self.id == 'bl':
+            if self.canton == 'bl':
                 return _('districts_label_bl')
-            if self.id == 'gr':
+            if self.canton == 'gr':
                 return _('districts_label_gr')
-            if self.id == 'sz':
+            if self.canton == 'sz':
                 return _('districts_label_sz')
             return _('Districts')
         if value == 'region':
-            if self.id == 'gr':
+            if self.canton == 'gr':
                 return _('region_label_gr')
             return _('District')
         if value == 'regions':
-            if self.id == 'gr':
+            if self.canton == 'gr':
                 return _('regions_label_gr')
             return _('Districts')
         if value == 'superregion':
-            if self.id == 'bl':
+            if self.canton == 'bl':
                 return _('superregion_label_bl')
             return _('District')
         if value == 'superregions':
-            if self.id == 'bl':
+            if self.canton == 'bl':
                 return _('superregions_label_bl')
             return _('Districts')
         if value == 'mandates':
-            if self.id == 'gr':
+            if self.canton == 'gr':
                 return _('Seats')
             return _('Mandates')
         return ''
 
 
-class Municipality(Principal):
+class Municipality(Principal, msgpack.Serializable, tag=51, keys=(
+    'municipality',
+    'canton',
+    'canton_name',
+    'domains_election',
+    'domains_vote',
+    'entities',
+    'name',
+    'logo',
+    'logo_position',
+    'color',
+    'base',
+    'analytics',
+    'has_districts',
+    'has_regions',
+    'has_superregions',
+    'has_quarters',
+    'use_maps',
+    'fetch',
+    'webhooks',
+    'sms_notification',
+    'email_notification',
+    'wabsti_import',
+    'open_data',
+    'hidden_elements',
+    'publish_intermediate_results',
+    'csp_script_src',
+    'csp_connect_src',
+    'cache_expiration_time',
+    'reply_to',
+    'custom_css',
+    'official_host',
+    'private',
+)):
     """ A communal instance. """
 
     domain: Literal['municipality']
@@ -401,9 +540,10 @@ class Municipality(Principal):
         canton: str,
         canton_name: str,
         **kwargs: Any
-    ):
+    ) -> None:
         assert municipality and canton and canton_name
 
+        self.municipality = municipality
         self.canton = canton
         self.canton_name = canton_name
 
@@ -460,6 +600,88 @@ class Municipality(Principal):
             has_districts=has_districts,
             **kwargs
         )
+
+    @classmethod
+    def from_dict(
+        cls,
+        municipality: str,
+        canton: str,
+        canton_name: str,
+        domains_election: dict[str, TranslationString],
+        domains_vote: dict[str, TranslationString],
+        entities: dict[int, dict[int, dict[str, str]]],
+        name: str | None = None,
+        logo: str | None = None,
+        logo_position: str = 'left',
+        color: str = '#000',
+        base: str | None = None,
+        analytics: str | None = None,
+        has_districts: bool = True,
+        has_regions: bool = False,
+        has_superregions: bool = False,
+        has_quarters: bool = False,
+        use_maps: bool = False,
+        fetch: dict[str, Any] | None = None,
+        webhooks: dict[str, dict[str, str]] | None = None,
+        sms_notification: bool | None = None,
+        email_notification: bool | None = None,
+        wabsti_import: bool = False,
+        open_data: dict[str, str] | None = None,
+        hidden_elements: dict[str, dict[str, dict[str, bool]]] | None = None,
+        publish_intermediate_results: dict[str, bool] | None = None,
+        csp_script_src: list[str] | None = None,
+        csp_connect_src: list[str] | None = None,
+        cache_expiration_time: int = 300,
+        reply_to: str | None = None,
+        custom_css: str | None = None,
+        official_host: str | None = None,
+        private: bool = False,
+        **kwargs: Never,
+    ) -> Self:
+
+        assert municipality and canton and canton_name
+        self = object.__new__(cls)
+
+        self.municipality = municipality
+        self.canton = canton
+        self.canton_name = canton_name
+        self.has_quarters = has_quarters
+
+        Principal.__init__(
+            self,
+            id_=municipality,
+            domain='municipality',
+            domains_election=domains_election,
+            domains_vote=domains_vote,
+            entities=entities,
+            name=name,
+            logo=logo,
+            logo_position=logo_position,
+            color=color,
+            base=base,
+            analytics=analytics,
+            has_districts=has_districts,
+            has_regions=has_regions,
+            has_superregions=has_superregions,
+            use_maps=use_maps,
+            fetch=fetch,
+            webhooks=webhooks,
+            sms_notification=sms_notification,
+            email_notification=email_notification,
+            wabsti_import=wabsti_import,
+            open_data=open_data,
+            hidden_elements=hidden_elements,
+            publish_intermediate_results=publish_intermediate_results,
+            csp_script_src=csp_script_src,
+            csp_connect_src=csp_connect_src,
+            cache_expiration_time=cache_expiration_time,
+            reply_to=reply_to,
+            custom_css=custom_css,
+            official_host=official_host,
+            private=private,
+        )
+
+        return self
 
     def label(self, value: str) -> str:
         if value == 'entity':

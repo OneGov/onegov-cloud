@@ -186,13 +186,17 @@ class OrgApp(Framework, LibresIntegration, SearchApp, MapboxApp,
         return self.session().query(Organisation).first()  # type:ignore
 
     @orm_cached(policy='on-table-change:organisations')
-    def homepage_template(self) -> PageTemplate:
+    def _homepage_template_str(self) -> str:
         structure = self.org.meta.get('homepage_structure')
         if structure:
             widgets = self.config.homepage_widget_registry.values()
-            return PageTemplate(transform_structure(widgets, structure))
+            return transform_structure(widgets, structure)
         else:
-            return PageTemplate('')
+            return ''
+
+    @property
+    def homepage_template(self) -> PageTemplate:
+        return PageTemplate(self._homepage_template_str)
 
     @orm_cached(policy='on-table-change:tickets')
     def ticket_count(self) -> TicketCount:
@@ -354,7 +358,8 @@ class OrgApp(Framework, LibresIntegration, SearchApp, MapboxApp,
         title: str,
         price: Price | None,
         email: str,
-        locale: str
+        complete_url: str,
+        request: OrgRequest
     ) -> str | None:
         provider = self.default_payment_provider
 
@@ -377,10 +382,8 @@ class OrgApp(Framework, LibresIntegration, SearchApp, MapboxApp,
             email=email,
             name=self.org.name,
             description=title,
-            locale=locale.split('_')[0],
-            # FIXME: This seems Stripe specific, so it should probably be
-            #        built into that payment provider
-            allowRememberMe='false',
+            complete_url=complete_url,
+            request=request,
             **extra
         )
 
@@ -485,6 +488,8 @@ def org_content_security_policy() -> ContentSecurityPolicy:
     policy.child_src.add('https://*.vimeo.com')
     policy.child_src.add('https://*.infomaniak.com')
     policy.child_src.add('https://checkout.stripe.com')
+    policy.child_src.add('https://pay.datatrans.com')
+    policy.child_src.add('https://pay.sandbox.datatrans.com')
 
     policy.connect_src.add(SELF)
     policy.connect_src.add('https://checkout.stripe.com')
@@ -664,7 +669,9 @@ def get_code_editor_asset() -> Iterator[str]:
     yield 'ace-mode-markdown.js'
     yield 'ace-mode-xml.js'
     yield 'ace-mode-yaml.js'
+    yield 'ace-mode-json.js'
     yield 'ace-theme-tomorrow.js'
+    yield 'ace-theme-katzenmilch.js'
     yield 'formcode'
     yield 'code_editor.js'
 

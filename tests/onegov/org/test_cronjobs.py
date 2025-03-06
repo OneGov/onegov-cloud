@@ -1,8 +1,10 @@
 import json
 import os
 from pathlib import Path
+from unittest.mock import patch, Mock
 
 import pytest
+import requests
 import transaction
 from datetime import datetime, timedelta
 from freezegun import freeze_time
@@ -10,12 +12,19 @@ from onegov.core.utils import Bunch
 from onegov.directory import (DirectoryEntryCollection,
                               DirectoryConfiguration,
                               DirectoryCollection)
+from onegov.directory.collections.directory import EntryRecipientCollection
 from onegov.event import EventCollection, OccurrenceCollection
 from onegov.event.utils import as_rdates
 from onegov.form import FormSubmissionCollection
-from onegov.org.models import ResourceRecipientCollection, News
+from onegov.gever.encrypt import encrypt_symmetric
+from onegov.org.cronjobs import get_news_for_push_notification
+from onegov.org.models import ResourceRecipientCollection, News,\
+    PushNotification
+from onegov.org.models.page import NewsCollection
 from onegov.org.models.resource import RoomResource
 from onegov.org.models.ticket import ReservationHandler, DirectoryEntryHandler
+from onegov.org.notification_service import TestNotificationService,\
+    set_test_notification_service
 from onegov.page import PageCollection
 from onegov.ticket import Handler, Ticket, TicketCollection
 from onegov.user import UserCollection
@@ -1283,3 +1292,715 @@ def test_delete_content_marked_deletable__events_occurrences(org_app,
         client.get(get_cronjob_url(job))
         assert count_events() == 0
         assert count_occurrences() == 0
+
+
+@pytest.mark.parametrize(
+    'access',
+    ('private', 'member', 'mtan', 'secret', 'secret_mtan', 'public')
+)
+def test_send_email_notification_for_recent_directory_entry_publications(
+    es_org_app,
+    handlers,
+    access
+):
+    org_app = es_org_app
+    register_echo_handler(handlers)
+    register_directory_handler(handlers)
+
+    client = Client(org_app)
+    job = get_cronjob_by_name(org_app, 'hourly_maintenance_tasks')
+    job.app = org_app
+    tz = ensure_timezone('Europe/Zurich')
+
+    def planauflagen():
+        return (DirectoryCollection(org_app.session(), type='extended')
+                .by_name('offentliche-planauflage'))
+
+    def sport_clubs():
+        return (DirectoryCollection(org_app.session(), type='extended')
+                .by_name('sport-clubs'))
+
+    def count_recipients():
+        return (EntryRecipientCollection(org_app.session()).query()
+                .filter_by(directory_id=planauflagen().id)
+                .filter_by(confirmed=True).count())
+
+    assert len(os.listdir(client.app.maildir)) == 0
+
+    print(f'*** Access {access} ***')
+    transaction.begin()
+
+    directories = DirectoryCollection(org_app.session(), type='extended')
+    planauflage = directories.add(
+        title='Öffentliche Planauflage',
+        structure="""
+            Gesuchsteller/in *= ___
+            Grundeigentümer/in *= ___
+        """,
+        configuration=DirectoryConfiguration(
+            title="[Gesuchsteller/in]",
+            order=('Gesuchsteller/in'),
+            searchable=['title'],
+        ),
+        enable_update_notifications=True,
+    )
+    entry = planauflage.add(values=dict(
+        gesuchsteller_in='Carmine Carminio',
+        grundeigentumer_in='Doris Dorinio',
+        publication_start=datetime(2025, 1, 6, 2, 0, tzinfo=tz),
+        publication_end=datetime(2025, 1, 30, 2, 0, tzinfo=tz),
+    ))
+    entry.access = access
+    assert entry.access == access
+
+    entry = planauflage.add(values=dict(
+        gesuchsteller_in='Emil Emilio',
+        grundeigentumer_in='Franco Francinio',
+        publication_start=datetime(2025, 1, 8, 6, 1, tzinfo=tz),
+        publication_end=datetime(2025, 1, 31, 2, 0, tzinfo=tz),
+    ))
+    entry.access = access
+    assert entry.access == access
+
+    sport_club = directories.add(
+        title='Sport Clubs',
+        structure="""
+            Name *= ___
+            Category *= ___
+        """,
+        configuration=DirectoryConfiguration(
+            title="[Name]",
+            order=('Name'),
+            searchable=['title']
+        ),
+        enable_update_notifications=False,
+    )
+    entry = sport_club.add(values=dict(
+        name='Wanderfreunde',
+        category='Hiking',
+        publication_start=datetime(2025, 2, 1, 2, 0, tzinfo=tz),
+        publication_end=datetime(2025, 2, 22, 2, 0, tzinfo=tz),
+    ))
+    entry.access = access
+    assert entry.access == access
+
+    entry = sport_club.add(values=dict(
+        name='Pokerfreunde',
+        category='Games',
+        publication_start=datetime(2025, 2, 1, 2, 0, tzinfo=tz),
+        publication_end=datetime(2025, 2, 2, 2, 0, tzinfo=tz),
+    ))
+    entry.access = access
+    assert entry.access == access
+
+    EntryRecipientCollection(org_app.session()).add(
+        directory_id=planauflage.id,
+        address='john@doe.ch',
+        confirmed=True
+    )
+    EntryRecipientCollection(org_app.session()).add(
+        directory_id=sport_club.id,
+        address='john@doe.ch',
+        confirmed=True
+    )
+
+    transaction.commit()
+    close_all_sessions()
+
+    assert count_recipients() == 1
+    john = EntryRecipientCollection(org_app.session()).query().first()
+
+    assert org_app.org.meta.get('hourly_maintenance_tasks_last_run') is None
+
+    with freeze_time(datetime(2025, 1, 1, 4, 0, tzinfo=tz)):
+        client.get(get_cronjob_url(job))
+
+        assert len(os.listdir(client.app.maildir)) == 0
+        assert org_app.org.meta.get('hourly_maintenance_tasks_last_run')
+
+    with freeze_time(datetime(2025, 1, 6, 4, 0, tzinfo=tz)):
+        client.get(get_cronjob_url(job))
+
+        entry_1 = planauflagen().entries[0]
+
+        if entry_1.access in ('mtan', 'public'):
+            assert len(os.listdir(client.app.maildir)) == 1
+            message = client.get_email(0)
+            assert message['To'] == john.address
+            assert planauflagen().title in message['Subject']
+            assert entry_1.name in message['TextBody']
+        else:
+            assert len(os.listdir(client.app.maildir)) == 0
+
+    with freeze_time(datetime(2025, 1, 8, 10, 0, tzinfo=tz)):
+        client.get(get_cronjob_url(job))
+
+        entry_2 = planauflagen().entries[1]
+
+        if entry_1.access in ('mtan', 'public'):
+            assert len(os.listdir(client.app.maildir)) == 2
+            message = client.get_email(1)
+            assert message['To'] == john.address
+            assert planauflagen().title in message['Subject']
+            assert entry_2.name in message['TextBody']
+        else:
+            assert len(os.listdir(client.app.maildir)) == 0
+
+    # before enabling notifications for sport clubs after publication
+    with freeze_time(datetime(2025, 2, 1, 6, 0, tzinfo=tz)):
+        client.get(get_cronjob_url(job))
+
+        # no additional mail
+        if entry_1.access in ('mtan', 'public'):
+            assert len(os.listdir(client.app.maildir)) == 2
+        else:
+            assert len(os.listdir(client.app.maildir)) == 0
+
+    # enable notifications for sport clubs
+    sport_clubs().enable_update_notifications = True
+    transaction.commit()
+
+    with freeze_time(datetime(2025, 2, 1, 1, 0, tzinfo=tz)):
+        client.get(get_cronjob_url(job))
+
+        # no additional mail, because the entry is not published yet
+        if entry_1.access in ('mtan', 'public'):
+            assert len(os.listdir(client.app.maildir)) == 2
+        else:
+            assert len(os.listdir(client.app.maildir)) == 0
+
+    with freeze_time(datetime(2025, 2, 3, 10, 0, tzinfo=tz)):
+        client.get(get_cronjob_url(job))
+
+        entry_2 = sport_clubs().entries[1]
+
+        if entry_1.access in ('mtan', 'public'):
+            # only for still published sports club entry 'Wanderfreunde'
+            assert len(os.listdir(client.app.maildir)) == 3
+            message = client.get_email(2)
+            assert message['To'] == john.address
+            assert sport_clubs().title in message['Subject']
+            assert entry_2.name in message['TextBody']
+        else:
+            assert len(os.listdir(client.app.maildir)) == 0
+
+
+def test_update_newsletter_email_bounce_statistics(org_app, handlers):
+    register_echo_handler(handlers)
+    register_directory_handler(handlers)
+
+    # fake postmark mailer
+    org_app.mail['marketing']['mailer'] = 'postmark'
+
+    client = Client(org_app)
+    job = get_cronjob_by_name(org_app,
+                              'update_newsletter_email_bounce_statistics')
+    job.app = org_app
+    # tz = ensure_timezone('Europe/Zurich')
+
+    transaction.begin()
+
+    # create recipients Franz and Heinz
+    recipients = RecipientCollection(org_app.session())
+    recipients.add('franz@user.ch', confirmed=True)
+    recipients.add('heinz@user.ch', confirmed=True)
+    recipients.add('trudi@user.ch', confirmed=True)
+
+    transaction.commit()
+    close_all_sessions()
+
+    with patch('requests.get') as mock_get:
+        mock_get.return_value = Bunch(
+            status_code=200,
+            json=lambda: {
+                'TotalCount': 2,
+                'Bounces': [
+                    {'RecordType': 'Bounce', 'ID': 3719297970,
+                     'Inactive': False, 'Email': 'franz@user.ch'},
+                    {'RecordType': 'Bounce', 'ID': 4739297971,
+                     'Inactive': True, 'Email': 'heinz@user.ch'}
+                ]
+            },
+            raise_for_status=Mock(return_value=None),
+        )
+
+        # execute cronjob
+        client.get(get_cronjob_url(job))
+
+        # check if the statistics are updated
+        assert mock_get.called
+        assert RecipientCollection(org_app.session()).by_address(
+            'franz@user.ch').is_inactive is False
+        assert RecipientCollection(org_app.session()).by_address(
+            'heinz@user.ch').is_inactive is True
+        assert RecipientCollection(org_app.session()).by_address(
+            'trudi@user.ch').is_inactive is False
+
+    # test raising runtime warning exception for status code 401
+    with patch('requests.get') as mock_get:
+        mock_get.return_value = Bunch(
+            status_code=401,
+            json=lambda: {},
+            raise_for_status=Mock(
+                side_effect=requests.exceptions.HTTPError('401 Unauthorized')),
+        )
+
+        # execute cronjob
+        with pytest.raises(RuntimeWarning):
+            client.get(get_cronjob_url(job))
+
+    # for other 30x and 40x status codes, the cronjob shall raise an exception
+    for status_code in [301, 302, 303, 400, 402, 403, 404, 405]:
+        with patch('requests.get') as mock_get:
+            mock_get.return_value = Bunch(
+                status_code=status_code,
+                json=lambda: {},
+                raise_for_status=Mock(
+                    side_effect=requests.exceptions.HTTPError()),
+            )
+
+            # execute cronjob
+            with pytest.raises(requests.exceptions.HTTPError):
+                client.get(get_cronjob_url(job))
+
+
+def test_delete_unconfirmed_subscribers(org_app, handlers):
+    register_echo_handler(handlers)
+
+    job = get_cronjob_by_name(org_app,
+                              'delete_unconfirmed_newsletter_subscriptions')
+    job.app = org_app
+
+    with freeze_time(datetime(2025, 1, 1, 4, 0)):
+        transaction.begin()
+
+        session = org_app.session()
+
+        recipients = RecipientCollection(session)
+        recipients.add('one@example.org', confirmed=False)
+        recipients.add('two@example.org', confirmed=False)
+        # Cronjob should only delete unconfirmed recipients
+        recipients.add('three@example.org', confirmed=True)
+
+    # And only unconfirmed subscribers older than 7 days
+    recipients.add('four@example.org', confirmed=False)
+    transaction.commit()
+
+    recipients = RecipientCollection(org_app.session())
+    assert recipients.query().count() == 4
+
+    client = Client(org_app)
+
+    client.get(get_cronjob_url(job))
+
+    recipients = RecipientCollection(org_app.session())
+    assert recipients.query().count() == 2
+
+
+def test_send_push_notifications_for_news(
+    org_app, handlers, firebase_json, client
+):
+    register_echo_handler(handlers)
+
+    client = Client(org_app)
+    job = get_cronjob_by_name(org_app, 'send_push_notifications_for_news')
+    job.app = org_app
+    tz = ensure_timezone('Europe/Zurich')
+
+    # Set up test data
+    transaction.begin()
+
+    # Configure Firebase credentials for the organization
+    encrypted_creds = encrypt_symmetric(
+        firebase_json, org_app.hashed_identity_key
+    ).decode('utf-8')
+    org_app.org.firebase_adminsdk_credential = encrypted_creds
+
+    # Define topic mapping for the organization
+    org_app.org.selectable_push_notification_options = [
+        [f'{org_app.schema}_news', 'News'],
+        [f'{org_app.schema}_important', 'Important']
+    ]
+
+    # Create a news item that should trigger notifications
+    news = NewsCollection(org_app.session())
+
+    # We need to set parent=None for news items
+    recent_news = news.add(
+        parent=None,
+        title='Recent news with notifications',
+        lead='This should trigger a notification',
+        text='Test content for recent news',
+        access='public',
+    )
+
+    # Set publication time just within the 10-minute window
+    recent_news.publication_start = utcnow() - timedelta(minutes=5)
+
+    # Set metadata
+    recent_news.meta = {
+        'send_push_notifications_to_app': True,
+        'push_notifications': [f'{org_app.schema}_news'],
+        'hashtags': ['News']
+    }
+
+    transaction.commit()
+    close_all_sessions()
+
+    # Set up test notification service
+    test_service = TestNotificationService()
+    set_test_notification_service(test_service)
+
+    try:
+        # Run the cronjob
+        client.get(get_cronjob_url(job))
+
+        # Verify the notification was sent
+        assert (
+            len(test_service.sent_messages) == 1
+        ), 'Expected exactly one notification to be sent'
+
+        # Verify the notification content
+        message = test_service.sent_messages[0]
+        assert message['topic'] == f'{org_app.schema}_news'
+        assert message['title'] == 'Recent news with notifications'
+        assert message['body'] == 'This should trigger a notification'
+        assert message['data']['url'] is not None
+
+    finally:
+        # Clean up the test service
+        set_test_notification_service(None)
+
+
+def test_send_push_notifications_for_news_complex(
+    org_app, handlers, firebase_json
+):
+    register_echo_handler(handlers)
+
+    client = Client(org_app)
+    job = get_cronjob_by_name(org_app, 'send_push_notifications_for_news')
+    job.app = org_app
+    tz = ensure_timezone('Europe/Zurich')
+    current_time = utcnow()
+
+    # Set up test data
+    transaction.begin()
+
+    # Configure Firebase credentials for the organization
+    encrypted_creds = encrypt_symmetric(
+        firebase_json, org_app.hashed_identity_key
+    ).decode('utf-8')
+    org_app.org.firebase_adminsdk_credential = encrypted_creds
+
+    # Define topic mapping for the organization
+    org_app.org.selectable_push_notification_options = [
+        [f'{org_app.schema}_news', 'News'],
+        [f'{org_app.schema}_important', 'Important']
+    ]
+
+    # Create news items collection
+    news = NewsCollection(org_app.session())
+
+    # 1. Recent news with notifications enabled (should trigger)
+    valid_news = news.add(
+        parent=None,
+        title='Valid news with notifications',
+        lead='This should trigger a notification',
+        text='Test content for valid news',
+        access='public',
+    )
+    valid_news.publication_start = current_time - timedelta(minutes=5)
+    valid_news.meta = {
+        'send_push_notifications_to_app': True,
+        'push_notifications': [f'{org_app.schema}_news'],
+        'hashtags': ['News']
+    }
+
+    # 2. Recent news WITHOUT notifications enabled (should not trigger)
+    disabled_news = news.add(
+        parent=None,
+        title='News without notifications',
+        lead='This should NOT trigger a notification',
+        text='Test content for disabled news',
+        access='public',
+    )
+    disabled_news.publication_start = current_time - timedelta(minutes=5)
+    disabled_news.meta = {
+        'send_push_notifications_to_app': False,
+        'push_notifications': [f'{org_app.schema}_news'],
+        'hashtags': ['News']
+    }
+
+    # 3. News published outside the 10-minute window (should not trigger)
+    old_news = news.add(
+        parent=None,
+        title='Old news with notifications',
+        lead='This should NOT trigger a notification',
+        text='Test content for old news',
+        access='public',
+    )
+    old_news.publication_start = current_time - timedelta(minutes=15)
+    old_news.meta = {
+        'send_push_notifications_to_app': True,
+        'push_notifications': [f'{org_app.schema}_news'],
+        'hashtags': ['News']
+    }
+
+    # 4. Future news (should not trigger)
+    future_news = news.add(
+        parent=None,
+        title='Future news with notifications',
+        lead='This should NOT trigger a notification',
+        text='Test content for future news',
+        access='public',
+    )
+    future_news.publication_start = current_time + timedelta(minutes=15)
+    future_news.meta = {
+        'send_push_notifications_to_app': True,
+        'push_notifications': [f'{org_app.schema}_news'],
+        'hashtags': ['News']
+    }
+
+    # 5. Recent news with notifications enabled but empty topics (should
+    # not trigger
+    # )
+    no_topics_news = news.add(
+        parent=None,
+        title='News with no topics',
+        lead='This should NOT trigger a notification',
+        text='Test content for no topics news',
+        access='public',
+    )
+    no_topics_news.publication_start = current_time - timedelta(minutes=5)
+    no_topics_news.meta = {
+        'send_push_notifications_to_app': True,
+        'push_notifications': [],
+        'hashtags': ['News']
+    }
+
+    # 6. News with multiple topics (should trigger multiple notifications)
+    multi_topic_news = news.add(
+        parent=None,
+        title='News with multiple topics',
+        lead='This should trigger multiple notifications',
+        text='Test content for multi-topic news',
+        access='public',
+    )
+    multi_topic_news.publication_start = current_time - timedelta(minutes=5)
+    multi_topic_news.meta = {
+        'send_push_notifications_to_app': True,
+        'push_notifications': [
+            f'{org_app.schema}_news',
+            f'{org_app.schema}_important'
+        ],
+    }
+
+    transaction.commit()
+    close_all_sessions()
+
+    # Set up test notification service
+    test_service = TestNotificationService()
+    set_test_notification_service(test_service)
+
+    try:
+        # Run the cronjob
+        client.get(get_cronjob_url(job))
+
+        # Should send notifications only for valid_news and multi_topic_news
+        # multi_topic_news should trigger 2 notifications, valid_news should
+        # trigger 1
+        assert len(test_service.sent_messages) == 3
+
+        # Get the relevant news items for verification (order may vary)
+        valid_news_msg = None
+        multi_topic_news_msgs = []
+
+        for msg in test_service.sent_messages:
+            if msg['title'] == 'Valid news with notifications':
+                valid_news_msg = msg
+            elif msg['title'] == 'News with multiple topics':
+                multi_topic_news_msgs.append(msg)
+
+        # Verify valid_news notification
+        assert valid_news_msg is not None
+        assert valid_news_msg['topic'] == f'{org_app.schema}_news'
+        assert valid_news_msg['body'] == 'This should trigger a notification'
+        assert valid_news_msg['data']['url'] is not None
+
+        # Verify multi_topic_news notifications
+        assert len(multi_topic_news_msgs) == 2
+
+        # Check that we have one notification for each topic
+        topics = [msg['topic'] for msg in multi_topic_news_msgs]
+        assert f'{org_app.schema}_news' in topics
+        assert f'{org_app.schema}_important' in topics
+
+        # Verify none of the other news items triggered notifications
+        other_titles = [
+            'News without notifications',
+            'Old news with notifications',
+            'Future news with notifications',
+            'News with no topics'
+        ]
+        for title in other_titles:
+            assert not any(
+                msg['title'] == title for msg in test_service.sent_messages),\
+                f'Notification was incorrectly sent for {title}'
+
+        # Test with no credentials (should not crash)
+        transaction.begin()
+        org_app.org.firebase_adminsdk_credential = None
+        transaction.commit()
+        test_service.sent_messages = []  # Clear previous messages
+
+        client.get(get_cronjob_url(job))
+        assert len(test_service.sent_messages) == 0
+
+        # Test with no topic mapping (should not crash)
+        transaction.begin()
+        org_app.org.firebase_adminsdk_credential = encrypted_creds
+        org_app.org.selectable_push_notification_options = None
+        transaction.commit()
+
+        client.get(get_cronjob_url(job))
+        assert len(test_service.sent_messages) == 0
+
+    finally:
+        # Clean up the test service
+        set_test_notification_service(None)
+
+
+def test_news_query_includes_time_filter(session):
+    """
+    Tests that the publication time filter for news is properly applied.
+    This test ensures the filter isn't accidentally commented out.
+    """
+    now = utcnow()
+
+    news = PageCollection(session)
+    news_parent = news.add_root('News', type='news')
+
+    # News from 15 minutes ago (outside the 10-minute window)
+    old_news = news.add(
+        news_parent, 'Old News', 'old-news',
+        type='news', access='public',
+        publication_start=now - timedelta(minutes=15),
+        send_push_notifications_to_app='true'
+    )
+    if hasattr(old_news, 'publish'):
+        old_news.publish()
+
+    # News from 5 minutes ago (inside the 10-minute window)
+    recent_news = news.add(
+        news_parent, 'Recent News', 'recent-news',
+        type='news', access='public',
+        publication_start=now - timedelta(minutes=5),
+        send_push_notifications_to_app='true'
+    )
+    if hasattr(recent_news, 'publish'):
+        recent_news.publish()
+
+    # Future news (not published yet)
+    future_news = news.add(
+        news_parent, 'Future News', 'future-news',
+        type='news', access='public',
+        publication_start=now + timedelta(minutes=30),
+        send_push_notifications_to_app='true'
+    )
+    if hasattr(future_news, 'publish'):
+        future_news.publish()
+
+    session.flush()
+
+    result = get_news_for_push_notification(session).all()
+
+    # If the time filter is applied, we should only get recent news (
+    # within 10 minutes)
+    # If the filter is commented out, we'd get both old and recent news
+    assert len(result) == 1
+    assert result[0].title == "Recent News"
+
+    # Assuming filter commented out, should get both old and recent news
+    assert not len(result) == 2, 'Maybe you forgot to remove the time filter?'
+
+
+def test_push_notification_duplicate_detection(
+    org_app, handlers, firebase_json
+):
+    """Test that validates the duplicate detection logic properly."""
+    register_echo_handler(handlers)
+    client = Client(org_app)
+    session = org_app.session()
+    job = get_cronjob_by_name(org_app, 'send_push_notifications_for_news')
+    job.app = org_app
+
+    # Set up test data
+    transaction.begin()
+    encrypted_creds = encrypt_symmetric(
+        firebase_json, org_app.hashed_identity_key
+    ).decode('utf-8')
+    org_app.org.firebase_adminsdk_credential = encrypted_creds
+    org_app.org.selectable_push_notification_options = [
+        [f'{org_app.schema}_news', 'News']
+    ]
+
+    # Create a news item
+    news = PageCollection(session)
+    news_parent = news.add_root('News', type='news')
+    test_news = news.add(
+        news_parent,
+        title='Test news for duplicate detection',
+        lead='Test content',
+        text='Test content body',
+        access='public',
+    )
+    news_id = test_news.id
+
+    # Set publication time and metadata
+    test_news.publication_start = utcnow() - timedelta(minutes=2)
+    test_news.meta = {
+        'send_push_notifications_to_app': 'true',
+        'push_notifications': [[f'{org_app.schema}_news', 'News']],
+    }
+
+    # Create a PushNotification record directly in the database
+    # to simulate a notification that was already sent
+    push_notification = PushNotification(
+        news_id=news_id,
+        topic_id=f'{org_app.schema}_news',
+        sent_at=utcnow(),
+        response_data={'status': 'sent', 'message_id': 'test-message-id'},
+    )
+    session.add(push_notification)
+
+    # Commit transaction to ensure everything is saved to the database
+    transaction.commit()
+
+    # Setup test notification service
+    test_service = TestNotificationService()
+    set_test_notification_service(test_service)
+
+    try:
+        # Run the cronjob - this should detect the existing notification and
+        # skip it
+        client.get(get_cronjob_url(job))
+        assert (
+            len(test_service.sent_messages) == 0
+        ), "No notifications should be sent for duplicates"
+
+        # Count PushNotification records - should still be just 1
+        count = (
+            session.query(PushNotification)
+            .filter(
+                PushNotification.news_id == news_id,  # Use stored ID
+                PushNotification.topic_id == f'{org_app.schema}_news',
+                )
+            .count()
+        )
+        assert (
+            count == 1
+        ), "There should be exactly one notification record"
+
+    finally:
+        # Clean up
+        set_test_notification_service(None)

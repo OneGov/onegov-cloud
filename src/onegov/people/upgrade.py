@@ -200,3 +200,9 @@ def fix_agency_address_column(context: UpgradeContext) -> None:
         context.operations.add_column('agencies', Column(
             'address', Text, nullable=True
         ))
+
+
+@upgrade_task('Remove_lu_external_id fixed')
+def remove_external_id_for_agency_import(context: UpgradeContext) -> None:
+    if context.has_column('people', 'lu_external_id'):
+        context.operations.drop_column('people', 'lu_external_id')

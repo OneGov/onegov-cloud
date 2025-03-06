@@ -18,7 +18,7 @@ from unidecode import unidecode
 
 from sqlalchemy.orm.exc import ObjectDeletedError
 
-from onegov.core.utils import is_non_string_iterable
+from onegov.core.utils import hash_dictionary, is_non_string_iterable
 from onegov.search import index_log, log, Searchable, utils
 from onegov.search.errors import SearchOfflineError
 
@@ -529,7 +529,7 @@ class TypeMapping:
     ) -> None:
         self.name = name
         self.mapping = self.add_defaults(mapping)
-        self.version = utils.hash_mapping(mapping)
+        self.version = hash_dictionary(mapping)
         self.model = model
 
     def add_defaults(self, mapping: dict[str, Any]) -> dict[str, Any]:

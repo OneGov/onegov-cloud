@@ -1,7 +1,7 @@
 # This file was generated from translations.town6.xlsx
 msgid ""
 msgstr ""
-"POT-Creation-Date: 2024-11-25 19:48+0100\n"
+"POT-Creation-Date: 2025-03-03 17:44+0100\n"
 "PO-Revision-Date: 2021-09-27 16:02+0200\n"
 "Language: it_CH\n"
 "Content-Type: text/plain; charset=UTF-8\n"
@@ -446,6 +446,9 @@ msgstr "Conferma"
 msgid "There was an error while importing your directory!"
 msgstr "Si è verificato un errore durante l'importazione della cartella!"
 
+msgid "Download Form"
+msgstr "Scarica il modulo"
+
 msgid "Embed iFrame"
 msgstr "Incorporare iFrame"
 
@@ -637,6 +640,12 @@ msgstr ""
 msgid "Map"
 msgstr "Mappa"
 
+msgid "Links"
+msgstr "Collegamenti"
+
+msgid "More news"
+msgstr "Altre notizie"
+
 msgid "Other Entries"
 msgstr "Altri elementi"
 
@@ -646,17 +655,14 @@ msgstr "Voce precedente"
 msgid "Next Entry"
 msgstr "Prossima voce"
 
-msgid "Links"
-msgstr "Collegamenti"
-
-msgid "More news"
-msgstr "Altre notizie"
-
 msgid "Total Amount"
 msgstr "Importo totale"
 
 msgid "Chat History"
 msgstr "Storia della chat"
+
+msgid "Item(s)"
+msgstr "Elemento(i)"
 
 msgid "Change request"
 msgstr "Richiesta di modifica"
@@ -835,6 +841,9 @@ msgstr "Attiva/disattiva schermo intero"
 
 msgid "Zoom in/out"
 msgstr "Ingrandisci/riduci"
+
+msgid "Show more"
+msgstr "Mostra di più"
 
 msgid ""
 "This space holds images from your photo-albums. To show photos add a few "
@@ -1281,6 +1290,13 @@ msgstr "Clicca qui per visualizzare la versione web."
 msgid "You no longer wish to receive the newsletter?"
 msgstr "Non desideri più ricevere la newsletter?"
 
+msgid ""
+"The user with the address ${address} just unsubscribed from the newsletter "
+"subscriber list."
+msgstr ""
+"L'utente con l'indirizzo ${indirizzo} si è appena cancellato dalla lista "
+"degli iscritti alla newsletter."
+
 msgid "Click the following link to set a new password:"
 msgstr "Clicca sul collegamento seguente per impostare una nuova password:"
 
@@ -1686,8 +1702,29 @@ msgstr ""
 msgid "Drop files to verify them"
 msgstr "Rilascia i file per verificarli"
 
+msgid "Sent Notifications"
+msgstr "Notifiche inviate"
+
+msgid "Sent At"
+msgstr "Inviato a"
+
+msgid "No notifications"
+msgstr "Nessuna notifica"
+
 msgid "No subscribers yet"
 msgstr "Non ci sono ancora abbonati"
+
+msgid "Subscribed on"
+msgstr "Iscritto il"
+
+msgid ""
+"This recipient has delivery failures, including hard bounces, invalid email "
+"addresses, spam complaints, manual deactivations, or being blocked. We "
+"recommend unsubscribing it from the list."
+msgstr ""
+"Questo destinatario presenta errori di consegna, tra cui rimbalzi, indirizzi "
+"e-mail non validi, reclami per spam, disattivazioni manuali o blocco. Si "
+"consiglia di cancellarlo dall'elenco."
 
 msgid "submitted"
 msgstr "inviato"
@@ -2186,6 +2223,18 @@ msgstr ""
 
 msgid "New Note"
 msgstr "Nuova nota"
+
+#~ msgid "Sign up"
+#~ msgstr "Iscriviti"
+
+#~ msgid "Notify on newsletter unsubscription"
+#~ msgstr "Notifica di annullamento dell'iscrizione alla newsletter"
+
+#~ msgid ""
+#~ "Send an email notification when a user unsubscribes from the newsletter"
+#~ msgstr ""
+#~ "Inviare una notifica via e-mail quando un utente si cancella dalla "
+#~ "newsletter"
 
 #~ msgid "Sign up to our newsletter to always stay up to date:"
 #~ msgstr "Iscriviti alla nostra newsletter per rimanere sempre aggiornato:"

@@ -181,12 +181,6 @@ class ManageUserGroupForm(Form):
     users = ChosenSelectMultipleField(
         label=_('Users'),
         choices=[],
-        description=_(
-            'Users can only be in one group. '
-            'If they already belong to another group '
-            'and get added here, they will automatically '
-            'get removed from the other group.'
-        )
     )
 
     ticket_permissions = ChosenSelectMultipleField(

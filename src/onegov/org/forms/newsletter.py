@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+from collections import OrderedDict
 from datetime import timedelta
 import transaction
 from wtforms.validators import DataRequired
@@ -30,7 +31,7 @@ from typing import Any, TYPE_CHECKING
 from onegov.org.utils import extract_categories_and_subcategories
 
 if TYPE_CHECKING:
-    from collections.abc import Iterable
+    from collections.abc import Iterable, Callable
     from onegov.core.csv import DefaultRow
     from onegov.file import File
     from onegov.event.models import Occurrence
@@ -302,6 +303,10 @@ class NewsletterSendForm(Form):
             choices.append((cat, cat))
             choices.extend((s, f'\xa0\xa0\xa0{s}') for s in sub)
 
+        if not choices:
+            self.delete_field('categories')
+            return
+
         self.categories.choices = choices
 
 
@@ -366,33 +371,33 @@ class NewsletterSubscriberImportExportForm(Form):
     def headers(self) -> dict[str, str]:
         return {
             'address': self.request.translate(_('Address')),
-            'confirmed': self.request.translate(_('Confirmed')),
+            'created': self.request.translate(_(
+                'Subscribed on')),
         }
 
-    def run_export(self) -> list[dict[str, Any]]:
+    def run_export(self,
+                   formatter: Callable[[object], Any]
+    ) -> list[OrderedDict[str, Any]]:
         recipients = RecipientCollection(
-            self.request.session).ordered_by_status_address()
+            self.request.session).ordered_by_status_address().filter_by(
+                confirmed=True
+            )
         headers = self.headers
 
-        def get(recipient: Recipient, attribute: str) -> Any:
-            result = getattr(recipient, attribute, '')
-            if isinstance(result, str):
-                return result.strip()
-            elif attribute == 'confirmed':
-                return bool(result)
-            else:
-                return result
+        data = []
+        for recipient in recipients:
+            r = OrderedDict()
 
-        return [
-            {
-                v: get(recipient, k)
-                for k, v in headers.items()
-            }
-            for recipient in recipients
-        ]
+            for k, v in headers.items():
+                r[v] = formatter(getattr(recipient, k))
+
+            data.append(r)
+
+        return data
 
     def run_import(self) -> tuple[int, list[str]]:
         headers = self.headers
+        headers.pop('created')
         session = self.request.session
         recipients = RecipientCollection(session)
         try:

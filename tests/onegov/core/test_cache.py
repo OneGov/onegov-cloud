@@ -2,37 +2,9 @@ import gc
 
 from onegov.core import cache
 from onegov.core.framework import Framework
-from onegov.core.templates import PageTemplate
-from onegov.core.utils import Bunch
 
 
 CALL_COUNT = 0
-
-
-# cannot be pickled by the builtin pickler
-class Point:
-
-    __slots__ = ('x', 'y')
-
-    def __init__(self, x, y):
-        self.x = x
-        self.y = y
-
-
-def test_lru_cache():
-    count = 0
-
-    @cache.lru_cache(maxsize=1)
-    def add(x, y):
-        nonlocal count
-        count += 1
-        return x + y
-
-    assert add(1, 2) == 3
-    assert add(1, 3) == 4
-    assert add(1, 2) == 3
-    assert add(1, 2) == 3
-    assert count == 3
 
 
 def test_instance_lru_cache():
@@ -72,32 +44,14 @@ def test_cache_key(redis_url):
     region.set('x' * 500, 'y')  # used to fail on the old memcached system
 
 
-def test_cache_page_template(redis_url):
-    region = cache.get(namespace='ns', expiration_time=60, redis_url=redis_url)
-    region.set('template', PageTemplate('<!DOCTYPE html>'))
-    region.get('template')
-
-
 def test_redis(redis_url):
     app = Framework()
     app.namespace = 'towns'
     app.set_application_id('towns/detroit')
     app.configure_application(redis_url=redis_url)
-    app.cache.set('foobar', Bunch(foo='bar'))
+    app.cache.set('foobar', dict(foo='bar'))
 
-    assert app.cache.get('foobar').foo == 'bar'
-
-
-def test_store_slots_redis(redis_url):
-    # the following fails without the usage of an advanced pickler
-    app = Framework()
-    app.namespace = 'towns'
-    app.set_application_id('towns/washington')
-
-    app.configure_application(redis_url=redis_url)
-    app.cache.set('point', Point(0, 0))
-    assert app.cache.get('point').x == 0
-    assert app.cache.get('point').y == 0
+    assert app.cache.get('foobar')['foo'] == 'bar'
 
 
 def test_cache_independence(redis_url):

@@ -34,6 +34,7 @@ from onegov.org.layout import (
     FormSubmissionLayout as OrgFormSubmissionLayout,
     SurveySubmissionLayout as OrgSurveySubmissionLayout,
     SurveySubmissionWindowLayout as OrgSurveySubmissionWindowLayout,
+    FormDocumentLayout as OrgFormDocumentLayout,
     HomepageLayout as OrgHomepageLayout,
     ImageSetCollectionLayout as OrgImageSetCollectionLayout,
     ImageSetLayout as OrgImageSetLayout,
@@ -257,7 +258,7 @@ class PageLayout(OrgPageLayout, AdjacencyListLayout):
 
     @cached_property
     def contact_html(self) -> str:
-        return self.model.get_contact_html(self.request) or to_html_ul(
+        return self.model.contact_html or to_html_ul(
             self.org.contact
         )
 
@@ -269,7 +270,7 @@ class NewsLayout(OrgNewsLayout, AdjacencyListLayout):
 
     @cached_property
     def contact_html(self) -> str:
-        return self.model.get_contact_html(self.request) or to_html_ul(
+        return self.model.contact_html or to_html_ul(
             self.org.contact, convert_dashes=False
         )
 
@@ -362,6 +363,12 @@ class SurveySubmissionLayout(
         if self.model.__class__.__name__ == 'SurveyDefinition':
             return 1
         return 2
+
+
+class FormDocumentLayout(OrgFormDocumentLayout, DefaultLayout):
+
+    app: TownApp
+    request: TownRequest
 
 
 class FormCollectionLayout(OrgFormCollectionLayout, DefaultLayout):

@@ -641,9 +641,9 @@ def test_view_notices_statistics(gazette_app):
         manage.form['role'] = 'member'
         manage.form['name'] = user
         manage.form['username'] = user
-        manage.form['group'] = dict(
-            (x[2], x[0]) for x in manage.form['group'].options
-        )[group]
+        manage.form['group_ids'] = [dict(
+            (x[2], x[0]) for x in manage.form['group_ids'].options
+        )[group]]
         with patch('onegov.gazette.views.users.random_password') as password:
             password.return_value = 'hunter2'
             manage.form.submit().maybe_follow()
@@ -931,13 +931,17 @@ def test_view_notices_importation(gazette_app):
     assert "notices/imported" not in client.get('/notices/drafted/statistics')
 
     principal = gazette_app.principal
+    # NOTE: Need to use a real canton here, since deserialization
+    #       goes through the same validation as a regular instance
+    #       for safety
+    principal.canton = 'zg'
     principal.sogc_import = {
-        'canton': 'GV',
+        'canton': 'ZG',
         'endpoint': 'https://localhost',
         'username': 'user',
         'password': 'pass',
         'category': 100,
-        'organiaztion': 200
+        'organization': 200
     }
     gazette_app.cache.set('principal', principal)
 

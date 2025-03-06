@@ -94,5 +94,5 @@ def test_sign_document(client):
     # at this point should yield another message
     pdf = FileCollection(client.app.session()).query().one()
     client.get(f'/storage/{pdf.id}/details').click("Löschen")
-    assert 'Datei mit digitalem Siegel gel\\u00f6scht' in client.get(
+    assert 'Datei mit digitalem Siegel gelöscht' in client.get(
         '/timeline').text

@@ -81,11 +81,12 @@ class AutoplayVideoWidget:
     template = """
         <xsl:template match="autoplay_video">
             <div metal:use-macro="layout.macros.autoplay_video"
-             tal:define="max_height '{@max-height}'; link_mp4 '{@link_mp4}';
-             link_mp4_low_res '{@link_mp4_low_res}';
-             link_webm '{@link_webm}';
-              link_webm_low_res '{@link_webm_low_res}'; text '{@text}'
-             "
+            tal:define="max_height '{@max-height}'; link_mp4 '{@link_mp4}';
+            link_mp4_low_res '{@link_mp4_low_res}';
+            link_webm '{@link_webm}'; button_url '{@button_url}';
+            link_webm_low_res '{@link_webm_low_res}'; text '{@text}';
+            button_text '{@button_text}';
+            "
             />
         </xsl:template>
     """
@@ -531,13 +532,26 @@ class JobsWidget:
             dependency to build the actual widget.
             """
             try:
-                response = layout.app.cache.get_or_create(
+                # FIXME: We may want to consider caching the parsed feed
+                #        rather than the raw content, although we would
+                #        either need to add a JSON serializer for RSSFeed
+                #        or change them to plain dictionaries.
+                def get_content() -> bytes | None:
+                    response = requests.get(rss_feed_url, timeout=4)
+                    if response.status_code == 200:
+                        return response.content
+                    return None
+
+                content = layout.app.cache.get_or_create(
                     'jobs_rss_feed',
-                    creator=lambda: requests.get(rss_feed_url, timeout=4),
+                    creator=get_content,
                     expiration_time=3600,
-                    should_cache_fn=lambda respon: respon.status_code == 200,
+                    should_cache_fn=bool,
                 )
-                parsed = parsed_rss(response.content)
+                if content is None:
+                    return None
+
+                parsed = parsed_rss(content)
                 return parsed
             except Exception:
                 return None

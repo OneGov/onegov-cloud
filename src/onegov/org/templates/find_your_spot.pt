@@ -11,6 +11,13 @@
         <div class="row" tal:condition="room_slots is not None">
             <a id="results"></a>
             <h2 i18n:translate>All dates</h2>
+            <div class="callout alert-box info" i18n:translate>
+                By default we assume that you only want to select a single
+                time slot and room per day. If you want to select more than
+                one time slot or room on a given day, you may hold and press
+                any one of your Shift, Alt or Ctrl keys while clicking the
+                time slots you want to reserve.
+            </div>
             <div class="reservation-list"
                 data-whole-day="false"
                 data-reservations="${request.link(layout.model, name='reservations')}"

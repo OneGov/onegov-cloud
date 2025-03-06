@@ -1,12 +1,11 @@
 from __future__ import annotations
 
-from itertools import groupby
 import re
 
 import morepath
 import transaction
 
-from collections import OrderedDict, defaultdict
+from collections import defaultdict
 from onegov.core.html import html_to_text
 from onegov.core.security import Public, Private, Secret
 from onegov.core.templates import render_template
@@ -576,6 +575,55 @@ def view_geojson(
     return tuple(as_dict(e) for e in entries)
 
 
+def send_email_notification_for_directory_entry(
+    directory: ExtendedDirectory,
+    entry: ExtendedDirectoryEntry,
+    request: OrgRequest
+) -> None:
+    title = request.translate(_(
+        '${org}: New Entry in "${directory}"',
+        mapping={'org': request.app.org.title,
+                 'directory': directory.title},
+    ))
+    entry_link = request.link(entry)
+    recipients = EntryRecipientCollection(request.session).query(
+    ).filter_by(directory_id=directory.id).filter_by(
+        confirmed=True).all()
+
+    def email_iter() -> Iterator[EmailJsonDict]:
+        for recipient in recipients:
+            unsubscribe = request.link(
+                recipient.subscription, 'unsubscribe')
+            content = render_template(
+                'mail_new_directory_entry.pt',
+                request,
+                {
+                    'layout': DefaultMailLayout(object(), request),
+                    'title': title,
+                    'directory': directory,
+                    'entry_title': entry.title,
+                    'entry_link': entry_link,
+                    'unsubscribe': unsubscribe
+                },
+            )
+            plaintext = html_to_text(content)
+            yield request.app.prepare_email(
+                receivers=(recipient.address,),
+                subject=title,
+                content=content,
+                plaintext=plaintext,
+                category='transactional',
+                attachments=(),
+                headers={
+                    'List-Unsubscribe': f'<{unsubscribe}>',
+                    'List-Unsubscribe-Post': (
+                        'List-Unsubscribe=One-Click')
+                }
+            )
+
+    request.app.send_transactional_email_batch(email_iter())
+
+
 @OrgApp.form(
     model=ExtendedDirectoryEntryCollection,
     permission=Private,
@@ -603,59 +651,12 @@ def handle_new_directory_entry(
             transaction.abort()
             return request.redirect(request.link(self))
 
-        # FIXME: if this entry is not yet published we will need to send
-        #        a notification using some kind of cronjob, but we need
-        #        to take care to only send it once, so we probably need
-        #        to add a marker to entries to indicate that notifications
-        #        have already been sent.
         if self.directory.enable_update_notifications and entry.access in (
             'public',
             'mtan'
         ) and entry.published:
-            title = request.translate(_(
-                '${org}: New Entry in "${directory}"',
-                mapping={'org': request.app.org.title,
-                         'directory': self.directory.title},
-            ))
-
-            entry_link = request.link(entry)
-
-            recipients = EntryRecipientCollection(request.session).query(
-            ).filter_by(directory_id=self.directory.id).filter_by(
-                confirmed=True).all()
-
-            def email_iter() -> Iterator[EmailJsonDict]:
-                for recipient in recipients:
-                    unsubscribe = request.link(
-                        recipient.subscription, 'unsubscribe')
-                    content = render_template(
-                        'mail_new_directory_entry.pt',
-                        request,
-                        {
-                            'layout': DefaultMailLayout(object(), request),
-                            'title': title,
-                            'directory': self.directory,
-                            'entry_title': entry.title,
-                            'entry_link': entry_link,
-                            'unsubscribe': unsubscribe
-                        },
-                    )
-                    plaintext = html_to_text(content)
-                    yield request.app.prepare_email(
-                        receivers=(recipient.address,),
-                        subject=title,
-                        content=content,
-                        plaintext=plaintext,
-                        category='transactional',
-                        attachments=(),
-                        headers={
-                            'List-Unsubscribe': f'<{unsubscribe}>',
-                            'List-Unsubscribe-Post': (
-                                'List-Unsubscribe=One-Click')
-                        }
-                    )
-
-            request.app.send_transactional_email_batch(email_iter())
+            send_email_notification_for_directory_entry(
+                self.directory, entry, request)
 
         request.success(_('Added a new directory entry'))
         return request.redirect(request.link(entry))
@@ -1171,11 +1172,14 @@ def view_directory_entry_update_recipients(
     warning = request.translate(_('Do you really want to unsubscribe "{}"?'))
 
     recipients = EntryRecipientCollection(request.session).query().filter_by(
-        directory_id=self.directory.id).filter_by(confirmed=True).all()
-    by_letter = OrderedDict()
+        directory_id=self.directory.id).filter_by(confirmed=True)
 
-    for key, values in groupby(recipients, key=lambda r: r.address[0].upper()):
-        by_letter[key] = list(values)
+    by_letter = defaultdict(list)
+    for recipient in recipients:
+        letter = recipient.address[0].upper()
+        by_letter[letter].append(recipient)
+    by_letter = defaultdict(list, sorted(by_letter.items()))
+
     layout = layout or DirectoryEntryCollectionLayout(self, request)
     layout.breadcrumbs.append(Link(_('Recipients of new entry updates'), '#'))
     layout.editbar_links = []

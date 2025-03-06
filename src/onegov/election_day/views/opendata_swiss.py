@@ -56,6 +56,10 @@ def view_rdf(self: Principal, request: ElectionDayRequest) -> bytes:
     publisher_id = self.open_data.get('id')
     publisher_name = self.open_data.get('name')
     publisher_mail = self.open_data.get('mail')
+    publisher_uri = self.open_data.get(
+        'uri',
+        f'urn:onegov_election_day:publisher:{publisher_id}'
+    )
     if not publisher_id or not publisher_name or not publisher_mail:
         raise HTTPNotImplemented()
 
@@ -253,9 +257,12 @@ def view_rdf(self: Principal, request: ElectionDayRequest) -> bytes:
         # Publisher
         pub = sub(ds, 'dct:publisher')
         pub = sub(pub, 'foaf:Organization', {
-            'rdf:about': f'https://{publisher_id}'
+            'rdf:about': publisher_uri
         })
         sub(pub, 'foaf:name', {}, publisher_name)
+        sub(pub, 'foaf:mbox', {
+            'rdf:resource': 'mailto:{}'.format(publisher_mail)
+        })
 
         #  Contact point
         mail = sub(ds, 'dcat:contactPoint')

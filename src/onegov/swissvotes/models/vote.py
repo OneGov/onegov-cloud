@@ -283,6 +283,7 @@ class SwissVote(Base, TimestampMixin, LocalizedFiles, ContentMixin):
                 ('fr', _('French')),
                 ('it', _('Italian')),
                 ('rm', _('Rhaeto-Romanic')),
+                ('en', _('English')),
                 ('mixed', _('Mixed')),
                 ('other', _('Other')),
             ))

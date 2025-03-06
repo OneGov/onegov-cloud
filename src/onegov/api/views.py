@@ -59,7 +59,7 @@ def view_api_endpoints(
             'href': request.link(self),
             'queries': [
                 {
-                    'href': request.link(endpoint(request.app)),
+                    'href': request.link(endpoint(request)),
                     'rel': endpoint.endpoint,
                     'data': [
                         {'name': name}

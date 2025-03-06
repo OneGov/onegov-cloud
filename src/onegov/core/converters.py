@@ -49,8 +49,8 @@ extended_date_converter = morepath.Converter(
 )
 
 
-@overload  # type:ignore[overload-overlap]
-def json_decode(s: Literal['']) -> None: ...
+@overload
+def json_decode(s: Literal['']) -> None: ...  # type:ignore[overload-overlap]
 @overload
 def json_decode(s: str) -> dict[str, Any]: ...
 
@@ -159,6 +159,24 @@ def datetime_encode(d: datetime | None) -> str:
 
 datetime_converter = morepath.Converter(
     decode=datetime_decode, encode=datetime_encode
+)
+
+
+def datetime_year_decode(s: str) -> int:
+    """ Decodes a year limited to the range datetime provides. """
+    year = int(s)
+    if datetime.min.year <= year <= datetime.max.year:
+        return year
+    raise ValueError('year outside valid range')
+
+
+def datetime_year_encode(y: int | None) -> str:
+    """ Encodes a year. """
+    return str(y) if y is not None else ''
+
+
+datetime_year_converter = morepath.Converter(
+    decode=datetime_year_decode, encode=datetime_year_encode
 )
 
 

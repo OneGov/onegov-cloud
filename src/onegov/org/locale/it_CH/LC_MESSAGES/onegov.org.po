@@ -2,7 +2,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: \n"
-"POT-Creation-Date: 2025-01-08 16:47+0100\n"
+"POT-Creation-Date: 2025-03-03 17:43+0100\n"
 "PO-Revision-Date: 2022-03-15 10:52+0100\n"
 "Last-Translator: \n"
 "Language-Team: \n"
@@ -27,6 +27,47 @@ msgid ""
 msgstr ""
 "Abbiamo inviato un mTAN al numero indicato. Inseritelo nello spazio "
 "sottostante o seguite le istruzioni dell'SMS."
+
+msgid "Tickets"
+msgstr "Biglietti"
+
+msgid "Open Tickets"
+msgstr "Biglietti aperti"
+
+msgid "Pending Tickets"
+msgstr "Biglietti in attesa"
+
+msgid "New Tickets in the Last Month"
+msgstr "Nuovi biglietti nell'ultimo mese"
+
+msgid "Closed Tickets in the Last Month"
+msgstr "Biglietti chiusi nell'ultimo mese"
+
+msgid "Lead Time from opening to closing in Days over the Last Month"
+msgstr ""
+"Tempo di gestione dall'apertura alla chiusura in giorni nell'ultimo mese"
+
+msgid "Lead Time from pending to closing in Days over the Last Month"
+msgstr ""
+"Tempo di gestione dall'in sospeso alla chiusura in giorni nell'ultimo mese"
+
+msgid "Access"
+msgstr "Accesso"
+
+msgid "Last Edited Topics"
+msgstr "Argomenti modificati di recente"
+
+msgid "Last Edited News"
+msgstr "Notizie modificate di recente"
+
+msgid "Web Statistics"
+msgstr "Statistiche Web"
+
+msgid "No data available"
+msgstr "Nessun dato disponibile"
+
+msgid "Most Popular Pages"
+msgstr "Pagine più popolari"
 
 msgid "Open"
 msgstr "Aperto"
@@ -87,6 +128,9 @@ msgstr "Accedi"
 msgid "Register"
 msgstr "Registrati"
 
+msgid "Dashboard"
+msgstr "Pannello di controllo"
+
 msgid "Timeline"
 msgstr "Timeline"
 
@@ -132,17 +176,8 @@ msgstr "Gestione"
 msgid "My Tickets"
 msgstr "I miei biglietti"
 
-msgid "Open Tickets"
-msgstr "Biglietti aperti"
-
-msgid "Pending Tickets"
-msgstr "Biglietti in attesa"
-
 msgid "Closed Tickets"
 msgstr "Biglietti chiusi"
-
-msgid "Tickets"
-msgstr "Biglietti"
 
 msgid "Ticket"
 msgstr "Biglietto"
@@ -248,9 +283,6 @@ msgstr "Nei giorni festivi"
 
 msgid "During school holidays"
 msgstr "Durante le vacanze scolastiche"
-
-msgid "Access"
-msgstr "Accesso"
 
 msgid "Public"
 msgstr "Pubblico"
@@ -595,6 +627,24 @@ msgstr "Esiste già un elemento con lo stesso nome"
 msgid "E-Mail"
 msgstr "E-mail"
 
+msgid "Describes briefly what this form is about"
+msgstr "Descrive brevemente il contenuto di questo modulo"
+
+msgid "Detailed Explanation"
+msgstr "Spiegazione dettagliata"
+
+msgid "Describes in detail how this form is to be filled"
+msgstr "Descrive dettagliatamente come compilare questo modulo"
+
+msgid "Form PDF"
+msgstr "Modulo PDF"
+
+msgid "Group"
+msgstr "Gruppo"
+
+msgid "Used to group this form in the overview"
+msgstr "Utilizzato per raggruppare questo modulo nella panoramica"
+
 msgid "Art"
 msgstr "Arte"
 
@@ -837,6 +887,15 @@ msgstr "La fine della pubblicazione deve essere una data futura"
 msgid "Publication start must be prior to end"
 msgstr "L'inizio della pubblicazione deve essere precedente alla fine"
 
+msgid "Send push notifications to app"
+msgstr "Invia notifiche push all'app"
+
+msgid "You must set a publication start date first."
+msgstr "Per prima cosa devi impostare una data di inizio della pubblicazione."
+
+msgid "Please select at least one topic for push notifications."
+msgstr "Seleziona almeno un argomento per le notifiche push."
+
 msgid "Describes briefly what this entry is about"
 msgstr "Descrive brevemente il contenuto di questo elemento"
 
@@ -845,9 +904,6 @@ msgstr "URL"
 
 msgid "Url pointing to another website"
 msgstr "URL che punta a un altro sito web"
-
-msgid "Group"
-msgstr "Gruppo"
 
 msgid "Used to group this link in the overview"
 msgstr "Utilizzato per raggruppare questo collegamento nella panoramica"
@@ -861,6 +917,12 @@ msgstr "Descrive il contenuto di questo modulo"
 
 msgid "Used to group the form in the overview"
 msgstr "Utilizzato per raggruppare il modulo nella panoramica"
+
+msgid "Form Definition"
+msgstr "Definizione del modulo"
+
+msgid "Link to Formcode Documentation"
+msgstr "Collegamento alla documentazione del Formcode"
 
 msgid "Pick-Up"
 msgstr "Prelievo"
@@ -1022,6 +1084,9 @@ msgstr "Immagini a grandezza naturale"
 msgid "Grid layout"
 msgstr "Disposizione a griglia"
 
+msgid "Show images on homepage"
+msgstr "Mostra le immagini sulla pagina principale"
+
 msgid "By filename"
 msgstr "Per nome del file"
 
@@ -1030,9 +1095,6 @@ msgstr "Per didascalia"
 
 msgid "By last change"
 msgstr "Per data dell'ultima modifica"
-
-msgid "Show images on homepage"
-msgstr "Mostra le immagini sulla pagina principale"
 
 msgid "Used in the overview and the e-mail subject"
 msgstr "Utilizzato nella panoramica e nell'oggetto dell'e-mail"
@@ -1095,6 +1157,9 @@ msgstr "Destinatario"
 
 msgid "Do not actually import the newsletter subscribers"
 msgstr "Non importare effettivamente gli iscritti alla newsletter"
+
+msgid "Subscribed on"
+msgstr "Iscritto il"
 
 msgid "Will be used as image in the page overview on the parent page"
 msgstr ""
@@ -1219,14 +1284,27 @@ msgstr "Note"
 msgid "Public extra information about this person"
 msgstr "Informazioni pubbliche aggiuntive su questa persona"
 
+msgid "I am looking to make a reservation lasting"
+msgstr "Voglio fare una prenotazione di"
+
+msgid "On Weekday(s)"
+msgstr "In giorno/i feriale/i"
+
+msgid "Earliest Start"
+msgstr "Inizio più precoce"
+
+msgid "Latest End"
+msgstr "Ultima fine"
+
 msgid "Rooms"
 msgstr "Camere"
 
-msgid "Weekdays"
-msgstr "Giorni della settimana"
-
 msgid "Start date in past"
 msgstr "Data di inizio nel passato"
+
+msgid "Duration is longer than the range between start and end time"
+msgstr ""
+"La durata è superiore all'intervallo tra l'ora di inizio e l'ora di fine"
 
 msgid "Describes what this reservation resource is about"
 msgstr "Descrive il contenuto di questa risorsa di prenotazione"
@@ -1303,6 +1381,9 @@ msgstr "Inserisci almeno un codice postale"
 
 msgid "Please enter one zip-code per line, without spaces or commas"
 msgstr "Inserisci un codice postale per riga, senza spazi o virgole"
+
+msgid "Weekdays"
+msgstr "Giorni della settimana"
 
 msgid "New Reservations"
 msgstr "Nuove prenotazioni"
@@ -1653,6 +1734,9 @@ msgstr "Nascondi questi campi per gli utenti non registrati"
 msgid "People"
 msgstr "Persone"
 
+msgid "External ID"
+msgstr "ID esterno"
+
 msgid "Duration of mTAN session"
 msgstr "Durata della sessione mTAN"
 
@@ -1697,10 +1781,10 @@ msgid "JavaScript for web statistics support"
 msgstr "JavaScript per il supporto delle statistiche web"
 
 msgid "Analytics URL"
-msgstr ""
+msgstr "URL Analytics"
 
 msgid "URL pointing to the analytics page"
-msgstr ""
+msgstr "URL che punta alla pagina di analisi"
 
 msgid "Cantonal holidays"
 msgstr "Festività cantonali"
@@ -1911,6 +1995,16 @@ msgstr ""
 "   - Sottotema 3.1\n"
 "```"
 
+msgid "Notify on newsletter unsubscription"
+msgstr "Notifica di annullamento dell'iscrizione alla newsletter"
+
+msgid ""
+"Send an email notification to the following users when a recipient "
+"unsubscribes from the newsletter"
+msgstr ""
+"Inviare una notifica via e-mail ai seguenti utenti quando un destinatario si "
+"cancella dalla newsletter"
+
 msgid "Invalid YAML format. Please refer to the example."
 msgstr "Formato YAML non valido. Fare riferimento all'esempio."
 
@@ -2027,6 +2121,30 @@ msgstr "Durata dall'apertura di un ticket alla sua archiviazione automatica"
 
 msgid "Duration from archived state until deleted automatically"
 msgstr "Durata dello stato di archiviazione fino alla cancellazione automatica"
+
+msgid "Firebase adminsdk credentials (JSON)"
+msgstr "Credenziali Firebase Adminsdk (JSON)"
+
+msgid "Topics"
+msgstr "Argomenti"
+
+msgid "Defines the firebase topic id"
+msgstr "Definisce l'id dell'argomento Firebase"
+
+msgid "Invalid Firebase credentials format - must be a JSON object"
+msgstr ""
+"Formato delle credenziali Firebase non valido: deve essere un oggetto JSON"
+
+#, python-format
+msgid "Missing required keys in Firebase credentials: {0}"
+msgstr "Chiavi obbligatorie mancanti nelle credenziali Firebase: {0}"
+
+msgid "Invalid JSON format in Firebase credentials"
+msgstr "Formato JSON non valido nelle credenziali Firebase"
+
+#, python-format
+msgid "Error validating Firebase credentials: {0}"
+msgstr "Errore durante la convalida delle credenziali Firebase: {0}"
 
 msgid "E-Mail Address"
 msgstr "Indirizzo e-mail"
@@ -2316,12 +2434,16 @@ msgstr "Modulo esterno"
 msgid "New external form"
 msgstr "Nuovo modulo esterno"
 
+msgid "Document form"
+msgstr "Modulo documento"
+
 msgid "Do you really want to delete this submission window?"
 msgstr "Vuoi davvero eliminare questa finestra di invio?"
 
 msgid ""
 "Submissions associated with this submission window will be deleted as well."
 msgstr ""
+"Gli invii associati a questa finestra di invio verranno eliminati anche."
 
 msgid "Delete submission window"
 msgstr "Elimina la finestra di invio"
@@ -2579,6 +2701,12 @@ msgstr "Esportazioni"
 msgid "Payment Providers"
 msgstr "Provider di servizi di pagamento"
 
+msgid "Datatrans"
+msgstr "Datatrans"
+
+msgid "Worldline Saferpay"
+msgstr "Worldline Saferpay"
+
 msgid "Synchronise"
 msgstr "Sincronizza"
 
@@ -2612,9 +2740,6 @@ msgstr "Scegli filtro"
 
 msgid "Delete entry"
 msgstr "Elimina elemento"
-
-msgid "Dashboard"
-msgstr "Pannello di controllo"
 
 msgid "Do you really want to delete this external link?"
 msgstr "Vuoi davvero eliminare questo collegamento esterno?"
@@ -2775,6 +2900,25 @@ msgstr ""
 
 msgid "Sidebar links"
 msgstr "Collegamenti della barra laterale"
+
+msgid "Contact link"
+msgstr "Link di contatto"
+
+msgid "Sidebar contact"
+msgstr "Contatto laterale"
+
+msgid "Please provide a URL if contact link text is set"
+msgstr ""
+"Si prega di fornire un URL se il testo del link di contatto è impostato"
+
+msgid "Please provide link text if contact URL is set"
+msgstr "Fornire il testo del link se l'URL di contatto è impostato"
+
+msgid "Contact Text"
+msgstr "Testo di contatto"
+
+msgid "Contact URL"
+msgstr "URL di contatto"
 
 msgid "Delete content when expired"
 msgstr "Eliminare il contenuto quando è scaduto"
@@ -2965,8 +3109,8 @@ msgstr "Il rifiuto di ${title} non può essere annullato."
 msgid "Reject reservation"
 msgstr "Rifiuta prenotazione"
 
-#.
 #. Used in sentence: "${event} published."
+#.
 msgid "Event"
 msgstr "Evento"
 
@@ -3299,6 +3443,9 @@ msgstr "Conferma"
 msgid "There was an error while importing your directory!"
 msgstr "Si è verificato un errore durante l'importazione della cartella!"
 
+msgid "Download Form"
+msgstr "Scarica modulo"
+
 msgid "Embed iFrame"
 msgstr "Incorpora iFrame"
 
@@ -3352,6 +3499,18 @@ msgstr "Nessun file caricato"
 
 msgid "All dates"
 msgstr "Tutte le date"
+
+msgid ""
+"By default we assume that you only want to select a single time slot and "
+"room per day. If you want to select more than one time slot or room on a "
+"given day, you may hold and press any one of your Shift, Alt or Ctrl keys "
+"while clicking the time slots you want to reserve."
+msgstr ""
+"Per impostazione predefinita, si presume che si voglia selezionare una sola "
+"fascia oraria e una sola stanza al giorno. Se si desidera selezionare più di "
+"una fascia oraria o di una stanza in un determinato giorno, è possibile "
+"tenere premuto uno dei tasti Shift, Alt o Ctrl mentre si fa clic sulle fasce "
+"orarie che si desidera prenotare."
 
 msgid "Unavailable"
 msgstr "Non disponibile"
@@ -3485,6 +3644,9 @@ msgstr ""
 
 msgid "Links"
 msgstr "Collegamenti"
+
+msgid "Item(s)"
+msgstr "Elemento(i)"
 
 msgid "Change request"
 msgstr "Richiesta di modifica"
@@ -4010,6 +4172,13 @@ msgstr "Clicca qui per visualizzare la versione web."
 msgid "You no longer wish to receive the newsletter?"
 msgstr "Non desideri più ricevere la newsletter?"
 
+msgid ""
+"The user with the address ${address} just unsubscribed from the newsletter "
+"subscriber list."
+msgstr ""
+"L'utente con l'indirizzo ${indirizzo} si è appena cancellato dalla lista "
+"degli iscritti alla newsletter."
+
 msgid "Click the following link to set a new password:"
 msgstr "Clicca sul collegamento seguente per impostare una nuova password:"
 
@@ -4417,8 +4586,26 @@ msgstr ""
 msgid "Drop files to verify them"
 msgstr "Rilascia i file per verificarli"
 
+msgid "Sent Notifications"
+msgstr "Notifiche inviate"
+
+msgid "Sent At"
+msgstr "Inviato a"
+
+msgid "No notifications"
+msgstr "Nessuna notifica"
+
 msgid "No subscribers yet"
 msgstr "Non ci sono ancora abbonati"
+
+msgid ""
+"This recipient has delivery failures, including hard bounces, invalid email "
+"addresses, spam complaints, manual deactivations, or being blocked. We "
+"recommend unsubscribing it from the list."
+msgstr ""
+"Questo destinatario presenta errori di consegna, tra cui rimbalzi, indirizzi "
+"e-mail non validi, reclami per spam, disattivazioni manuali o blocco. Si "
+"consiglia di cancellarlo dall'elenco."
 
 msgid "submitted"
 msgstr "inviato"
@@ -4587,6 +4774,8 @@ msgid ""
 "Thank you for filling out this survey. If there's anything you'd like to "
 "change, click on the \"Edit\"-Button below."
 msgstr ""
+"Grazie per aver compilato questo sondaggio. Se c'è qualcosa che desideri "
+"cambiare, fai clic sul pulsante \"Modifica\" qui sotto."
 
 msgid "No surveys defined yet."
 msgstr "Ancora nessun sondaggio definito."
@@ -5171,6 +5360,18 @@ msgstr "${address} disiscritto con successo"
 msgid "${address} could not be unsubscribed, wrong token"
 msgstr "Impossibile annullare l'iscrizione di ${address}, token errato"
 
+msgid "A form with this name already exists"
+msgstr "Un modulo con questo nome esiste già"
+
+msgid "Added a new form"
+msgstr "Aggiunto un nuovo modulo"
+
+msgid "New Document Form"
+msgstr "Nuovo modulo documento"
+
+msgid "Edit Document Form"
+msgstr "Modifica modulo documento"
+
 msgid "Moves the topic and all its sub topics to the given destination."
 msgstr ""
 "Sposta l'argomento e tutti i suoi sottoargomenti nella destinazione indicata."
@@ -5310,12 +5511,6 @@ msgstr "È rimasto un posto disponibile"
 msgid "There are ${count} spots left"
 msgstr "Sono rimasti ${count} posti disponibili"
 
-msgid "A form with this name already exists"
-msgstr "Un modulo con questo nome esiste già"
-
-msgid "Added a new form"
-msgstr "Aggiunto un nuovo modulo"
-
 msgid "New Form"
 msgstr "Nuovo modulo"
 
@@ -5408,14 +5603,14 @@ msgstr ""
 "L'importo totale per i dati attualmente inseriti è ${total} ma deve essere "
 "almeno ${minimum}. Si prega di modificare i dati inseriti."
 
+msgid "Registrations are no longer possible"
+msgstr "Le iscrizioni non sono più possibili"
+
 msgid "Pay Online and Complete"
 msgstr "Paga online e completa"
 
 msgid "Your payment could not be processed"
 msgstr "Non è stato possibile elaborare Il tuo pagamento"
-
-msgid "Registrations are no longer possible"
-msgstr "Le iscrizioni non sono più possibili"
 
 msgid "Your registration has been confirmed"
 msgstr "La tua registrazione è stata confermata"
@@ -5473,6 +5668,10 @@ msgstr ""
 "categorie sottoscritte sono ${subscribed}."
 
 #, python-format
+msgid "Success! We have added ${address} to the list of recipients."
+msgstr "Successo! Abbiamo aggiunto ${indirizzo} alla lista dei destinatari."
+
+#, python-format
 msgid ""
 "Success! We have sent a confirmation link to ${address}, if we didn't send "
 "you one already. Your subscribed categories are ${subscribed}."
@@ -5486,6 +5685,18 @@ msgstr ""
 msgid "Success! We have updated your subscribed categories to ${subscribed}."
 msgstr ""
 "Successo! Abbiamo aggiornato le categorie sottoscritte a ${subscribed}."
+
+msgid "Update your newsletter subscription categories:"
+msgstr "Aggiorna le categorie del tuo abbonamento alla newsletter:"
+
+msgid "Update"
+msgstr "Aggiorna"
+
+msgid "Sign up to our newsletter to always stay up to date:"
+msgstr "Iscriviti alla nostra newsletter per rimanere sempre aggiornato:"
+
+msgid "Sign up"
+msgstr "Iscriviti"
 
 msgid "Update Newsletter Subscription"
 msgstr "Aggiornare l'abbonamento alla newsletter "
@@ -5600,6 +5811,16 @@ msgstr "Il pagamento è stato acquisito"
 msgid "The payment was refunded"
 msgstr "Il pagamento è stato rimborsato"
 
+msgid "The payment is already captured but is still processing"
+msgstr ""
+"Il pagamento è già stato acquisito ma è ancora in fase di elaborazione."
+
+msgid "Could not refund the payment"
+msgstr "Impossibile rimborsare il pagamento"
+
+msgid "Could not capture the payment"
+msgstr "Impossibile acquisire il pagamento"
+
 msgid "As default"
 msgstr "Valore predefinito"
 
@@ -5648,8 +5869,50 @@ msgstr "Il fornitore di servizi di pagamento è stato eliminato."
 msgid "Successfully synchronised payments"
 msgstr "Pagamenti sincronizzati correttamente"
 
+msgid "Merchant Name"
+msgstr "Nome dell'esercente"
+
+msgid "UPP Username"
+msgstr "UPP Username"
+
+msgid "UPP Password"
+msgstr "UPP Password"
+
+msgid "Webhook Signing Key"
+msgstr "Chiave di firma Webhook"
+
 msgid "Charge fees to customer"
 msgstr "Addebita commissioni al cliente"
+
+msgid "Use sandbox environment (for testing)"
+msgstr "Utilizzare l'ambiente sandbox (per i test)"
+
+msgid "Customer Name"
+msgstr "Nome del cliente"
+
+msgid "Customer ID"
+msgstr "ID cliente"
+
+msgid "Terminal ID"
+msgstr "ID terminali"
+
+msgid "API Username"
+msgstr "Nome utente API"
+
+msgid "API Password"
+msgstr "Password API"
+
+msgid "Datatrans has been added"
+msgstr "È stato aggiunto Datatrans"
+
+msgid "Add Datatrans"
+msgstr "Aggiungi Datatrans"
+
+msgid "Worldline Saferpay has been added"
+msgstr "È stato aggiunto Worldline Saferpay"
+
+msgid "Add Worldline Saferpay"
+msgstr "Aggiungi Worldline Saferpay"
 
 msgid "Added a new person"
 msgstr "Aggiunta una nuova persona"
@@ -5692,6 +5955,9 @@ msgstr "Novembre"
 
 msgid "December"
 msgstr "Dicembre"
+
+msgid "Push Notifications"
+msgstr "Notifiche push"
 
 msgid ""
 "The selected time does not exist on this date due to the switch from "
@@ -5915,13 +6181,13 @@ msgstr ""
 msgid "Chat"
 msgstr "Chat"
 
-msgid "Topics"
-msgstr "Argomenti"
-
 #, python-format
 msgid "You have successfully unsubscribed from the newsletter at ${address}"
 msgstr ""
 "L'iscrizione alla newsletter di ${address} è stata annullata con successo."
+
+msgid "Unsubscription from newsletter"
+msgstr "Cancellazione dalla newsletter"
 
 msgid "A survey with this name already exists"
 msgstr "Esiste già un'indagine con questo nome"
@@ -5982,7 +6248,7 @@ msgid "Edit Submission Window"
 msgstr "Modifica la finestra di invio"
 
 msgid "The submission window and all associated submissions were deleted"
-msgstr ""
+msgstr "La finestra di invio e tutti gli invii associati sono stati eliminati"
 
 msgid "Added a new text module"
 msgstr "Aggiunto un nuovo modulo di testo"
@@ -6202,5 +6468,17 @@ msgstr "È stato creato un account per te"
 msgid "The user was created successfully"
 msgstr "Utente creato correttamente"
 
-#~ msgid "Photo album. Will be shown at the end of content."
-#~ msgstr "Album fotografico. Sarà mostrato alla fine del contenuto."
+msgid "Unique Visitors in the Last Month"
+msgstr "Visitatori unici nell'ultimo mese"
+
+msgid "Total Visits in the Last Month"
+msgstr "Visite totali nell'ultimo mese"
+
+msgid "Total Page Views in the Last Month"
+msgstr "Visualizzazioni totali di pagine nell'ultimo mese"
+
+msgid "Number of Page Views per Visit"
+msgstr "Numero di visualizzazioni di pagine per visita"
+
+msgid "Average Visit Duration in Minutes"
+msgstr "Durata media della visita in minuti"

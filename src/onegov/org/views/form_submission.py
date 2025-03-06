@@ -20,7 +20,7 @@ from onegov.org.utils import user_group_emails_for_new_ticket
 from onegov.org.models import TicketMessage, SubmissionMessage
 from onegov.pay import PaymentError, Price
 from purl import URL
-from webob.exc import HTTPNotFound
+from webob.exc import HTTPMethodNotAllowed, HTTPNotFound
 
 
 from typing import Literal, TYPE_CHECKING
@@ -151,6 +151,15 @@ def handle_pending_submission(
             )
         )
 
+    # Avoid allowing people to pay for registrations, they no longer
+    # will be able to complete. There's still a small time window
+    # where this can happen, if they're unlucky. But it should be
+    # less likely this way.
+    window = self.registration_window
+    if window and not window.accepts_submissions(self.spots):
+        request.alert(_('Registrations are no longer possible'))
+        completable = False
+
     if completable and 'return-to' in request.GET:
 
         if 'quiet' not in request.GET:
@@ -179,13 +188,13 @@ def handle_pending_submission(
     email = self.email or self.get_email_field_data(form)
     if price:
         assert email is not None
-        assert request.locale is not None
         checkout_button = request.app.checkout_button(
             button_label=request.translate(_('Pay Online and Complete')),
             title=title,
             price=price,
             email=email,
-            locale=request.locale
+            complete_url=request.link(self, 'complete'),
+            request=request
         )
     else:
         checkout_button = None
@@ -204,7 +213,11 @@ def handle_pending_submission(
 
 
 @OrgApp.view(model=PendingFormSubmission, name='complete',
+             permission=Public, request_method='GET')
+@OrgApp.view(model=PendingFormSubmission, name='complete',
              permission=Public, request_method='POST')
+@OrgApp.view(model=CompleteFormSubmission, name='complete',
+             permission=Public, request_method='GET')
 @OrgApp.view(model=CompleteFormSubmission, name='complete',
              permission=Private, request_method='POST')
 def handle_complete_submission(
@@ -221,6 +234,17 @@ def handle_complete_submission(
     form.validate()
     form.ignore_csrf_error()
 
+    # NOTE: we only allow GET requests for some specific payment providers
+    if request.method == 'GET' and (
+        form.errors
+        or self.state == 'complete'
+        or (provider := request.app.default_payment_provider) is None
+        or not provider.payment_via_get
+    ):
+        # TODO: A redirect back to the previous step with an error might
+        #       be better UX, if this error can occur too easily...
+        raise HTTPMethodNotAllowed()
+
     if form.errors:
         return morepath.redirect(request.link(self))
     else:
@@ -235,10 +259,7 @@ def handle_complete_submission(
             ))
         else:
             provider = request.app.default_payment_provider
-            token = request.params.get('payment_token')
-            if not isinstance(token, str):
-                token = None
-
+            token = provider.get_token(request) if provider else None
             price = get_price(request, form, self)
             payment = self.process_payment(price, provider, token)
 
@@ -276,6 +297,9 @@ def handle_complete_submission(
                 TicketMessage.create(ticket, request, 'opened')
 
             assert self.email is not None
+            submission = collection.submissions.by_id(
+                submission_id, current_only=True
+            )
             send_ticket_mail(
                 request=request,
                 template='mail_ticket_opened.pt',
@@ -285,7 +309,8 @@ def handle_complete_submission(
                 content={
                     'model': ticket,
                     'form': form,
-                    'show_submission': self.meta['show_submission']
+                    'show_submission': self.meta['show_submission'],
+                    'price': submission.payment if submission else None
                 }
             )
             directory_user_group_recipients = user_group_emails_for_new_ticket(
