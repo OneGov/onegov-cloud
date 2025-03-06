@@ -4,8 +4,8 @@ import inspect
 
 from email_validator import validate_email
 from enum import Enum
+from functools import lru_cache
 from onegov.core.cache import instance_lru_cache
-from onegov.core.cache import lru_cache
 from onegov.core.crypto import random_token
 from onegov.core.orm import Base, observes
 from onegov.core.orm.mixins import ContentMixin

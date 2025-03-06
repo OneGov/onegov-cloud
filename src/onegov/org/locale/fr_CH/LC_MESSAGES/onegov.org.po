@@ -2,7 +2,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE 1.0\n"
-"POT-Creation-Date: 2025-02-24 15:55+0100\n"
+"POT-Creation-Date: 2025-03-03 17:43+0100\n"
 "PO-Revision-Date: 2022-03-15 10:50+0100\n"
 "Last-Translator: Marc Sommerhalder <marc.sommerhalder@seantis.ch>\n"
 "Language-Team: French\n"
@@ -28,6 +28,46 @@ msgid ""
 msgstr ""
 "Nous avons envoyé un mTAN au numéro indiqué. Veuillez le saisir ci-dessous "
 "ou suivre les instructions du SMS."
+
+msgid "Tickets"
+msgstr "Tickets"
+
+msgid "Open Tickets"
+msgstr "Ouvrir les tickets"
+
+msgid "Pending Tickets"
+msgstr "Tickets en attente"
+
+msgid "New Tickets in the Last Month"
+msgstr "Nouveaux tickets le mois dernier"
+
+msgid "Closed Tickets in the Last Month"
+msgstr "Tickets clôturés le mois dernier"
+
+msgid "Lead Time from opening to closing in Days over the Last Month"
+msgstr ""
+"Délai de traitement de l'ouverture à la clôture en jours le mois dernier"
+
+msgid "Lead Time from pending to closing in Days over the Last Month"
+msgstr "Délai de traitement de l'attente à la clôture en jours le mois dernier"
+
+msgid "Access"
+msgstr "Accès"
+
+msgid "Last Edited Pages"
+msgstr "Dernières pages modifiées"
+
+msgid "Last Edited News"
+msgstr "Dernières nouvelles modifiées"
+
+msgid "Web Statistics"
+msgstr "Statistiques Web"
+
+msgid "No data available"
+msgstr "Aucune donnée disponible"
+
+msgid "Most Popular Pages"
+msgstr "Pages les plus populaires"
 
 msgid "Open"
 msgstr "Ouvert"
@@ -88,6 +128,9 @@ msgstr "Connexion"
 msgid "Register"
 msgstr "S'inscrire"
 
+msgid "Dashboard"
+msgstr "Dashboard"
+
 msgid "Timeline"
 msgstr "Chronologie"
 
@@ -133,17 +176,8 @@ msgstr "Gestion"
 msgid "My Tickets"
 msgstr "Mes tickets"
 
-msgid "Open Tickets"
-msgstr "Ouvrir les tickets"
-
-msgid "Pending Tickets"
-msgstr "Tickets en attente"
-
 msgid "Closed Tickets"
 msgstr "Tickets clôturés"
-
-msgid "Tickets"
-msgstr "Tickets"
 
 msgid "Ticket"
 msgstr "Ticket"
@@ -249,9 +283,6 @@ msgstr "En vacances"
 
 msgid "During school holidays"
 msgstr "Durant les vacances scolaires"
-
-msgid "Access"
-msgstr "Accès"
 
 msgid "Public"
 msgstr "Public"
@@ -854,6 +885,15 @@ msgstr "La fin de la publication doit être dans le futur"
 
 msgid "Publication start must be prior to end"
 msgstr "Le début de la publication doit être antérieur à la fin"
+
+msgid "Send push notifications to app"
+msgstr "Envoyer des notifications à l'application"
+
+msgid "You must set a publication start date first."
+msgstr "Vous devez d’abord définir une date de début de publication."
+
+msgid "Please select at least one topic for push notifications."
+msgstr "Veuillez sélectionner au moins un sujet pour les notifications push."
 
 msgid "Describes briefly what this entry is about"
 msgstr "Décrit brièvement cette entrée"
@@ -2078,6 +2118,41 @@ msgstr "Durée entre l'ouverture d'un ticket et son archivage automatique"
 msgid "Duration from archived state until deleted automatically"
 msgstr "Durée de l'état archivé jusqu'à la suppression automatique"
 
+msgid "Firebase adminsdk credentials (JSON)"
+msgstr "Informations d'identification du kit d'administration Firebase (JSON)"
+
+msgid "Topics"
+msgstr "Sujets"
+
+msgid "Defines the firebase topic id"
+msgstr "Définit l'identifiant du sujet Firebase"
+
+msgid "Invalid Firebase credentials format - must be a JSON object"
+msgstr ""
+"Le format des informations d'identification Firebase n'est pas valide. Il "
+"doit s'agir d'un objet JSON"
+
+#, python-format
+msgid "Missing required keys in Firebase credentials: {0}"
+msgstr ""
+"Clés requises manquantes dans les informations d'identification Firebase : "
+"{0}"
+
+msgid "Invalid JSON format in Firebase credentials"
+msgstr "Format JSON non valide dans les informations d'identification Firebase"
+
+#, python-format
+msgid "Error validating Firebase credentials: {0}"
+msgstr ""
+"Une erreur s'est produite lors de la validation des informations "
+"d'identification Firebase : {0}"
+
+msgid "E-Mail Address"
+msgstr "Adresse e-mail"
+
+msgid "The subscriber has given consent to receive the newsletter."
+msgstr "L'abonné a donné son consentement pour recevoir la newsletter."
+
 msgid ""
 "Select newsletter categories your are interested in. You will receive the "
 "newsletter if it reports on at least one of the subscribed categories."
@@ -2672,9 +2747,6 @@ msgstr "Sélectionner un filtre"
 
 msgid "Delete entry"
 msgstr "Supprimer l'entrée"
-
-msgid "Dashboard"
-msgstr "Dashboard"
 
 msgid "Do you really want to delete this external link?"
 msgstr "Voulez-vous vraiment supprimer ce lien externe?"
@@ -3588,6 +3660,9 @@ msgstr ""
 
 msgid "Links"
 msgstr "Liens"
+
+msgid "Item(s)"
+msgstr "Article(s)"
 
 msgid "Change request"
 msgstr "Demande de modification"
@@ -4533,6 +4608,15 @@ msgstr ""
 
 msgid "Drop files to verify them"
 msgstr "Déposez les fichiers pour les vérifier"
+
+msgid "Sent Notifications"
+msgstr "Notifications envoyées"
+
+msgid "Sent At"
+msgstr "Envoyé à"
+
+msgid "No notifications"
+msgstr "Pas de notifications"
 
 msgid "No subscribers yet"
 msgstr "Pas encore d'abonnés"
@@ -5897,6 +5981,9 @@ msgstr "Novembre"
 msgid "December"
 msgstr "Décembre"
 
+msgid "Push Notifications"
+msgstr "Notifications push"
+
 msgid ""
 "The selected time does not exist on this date due to the switch from "
 "standard time to daylight saving time."
@@ -6117,9 +6204,6 @@ msgstr ""
 
 msgid "Chat"
 msgstr "Chat"
-
-msgid "Topics"
-msgstr "Sujets"
 
 #, python-format
 msgid "You have successfully unsubscribed from the newsletter at ${address}"
@@ -6409,5 +6493,20 @@ msgstr "Un compte a été créé pour vous"
 msgid "The user was created successfully"
 msgstr "L'utilisateur a bien été créé"
 
-#~ msgid "Terminaux ID"
-#~ msgstr "ID du terminal"
+msgid "Unique Visitors in the Last Month"
+msgstr "Visiteurs uniques le mois dernier"
+
+msgid "Total Visits in the Last Month"
+msgstr "Total des visites le mois dernier"
+
+msgid "Total Page Views in the Last Month"
+msgstr "Total des pages vues le mois dernier"
+
+msgid "Number of Page Views per Visit"
+msgstr "Nombre de pages vues par visite"
+
+msgid "Average Visit Duration in Minutes"
+msgstr "Durée moyenne de la visite en minutes"
+
+msgid "Terminaux ID"
+msgstr "ID du terminal"

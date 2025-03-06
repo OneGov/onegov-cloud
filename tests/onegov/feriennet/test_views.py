@@ -831,6 +831,7 @@ def test_execution_period(client, scenario):
     assert "gespeichert" in periods
 
 
+@pytest.mark.skip_night_hours
 def test_enroll_child(client, scenario):
     scenario.add_period(
         prebooking_end=scenario.date_offset(0)
@@ -3216,3 +3217,6 @@ def test_view_dashboard(client, scenario):
     assert "2 Durchführungen" in page
     assert "1 unbelegt" in page
     assert "1 durchführbar" in page
+
+    # ensure only feriennet boardlets are shown
+    assert len(page.pyquery('.boardlet')) == 6

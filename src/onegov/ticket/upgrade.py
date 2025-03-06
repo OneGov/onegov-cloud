@@ -7,8 +7,7 @@ from __future__ import annotations
 from onegov.core.orm.types import JSON, UTCDateTime
 from onegov.core.upgrade import upgrade_task
 from onegov.ticket import Ticket
-from sqlalchemy import Boolean, Column, Integer, Text, Enum
-
+from sqlalchemy import Boolean, Column, Integer, Text, Enum, update, func, and_
 
 from typing import TYPE_CHECKING
 if TYPE_CHECKING:
@@ -144,3 +143,27 @@ def add_archived_state_to_ticket(context: UpgradeContext) -> None:
         USING state::text::ticket_state
     """)
     tmp_type.drop(context.operations.get_bind(), checkfirst=False)
+
+
+@upgrade_task('Add closed on column to ticket 3')
+def add_closed_on_column_to_ticket(context: UpgradeContext) -> None:
+    if context.has_column('tickets', 'closed_on'):
+        return
+
+    context.operations.add_column(
+        'tickets', Column('closed_on', UTCDateTime, nullable=True)
+    )
+
+    stmt = update(Ticket.__table__).where(
+        and_(
+            Ticket.__table__.c.state.in_(('closed', 'archived')),
+            Ticket.__table__.c.reaction_time.isnot(None),
+            Ticket.__table__.c.process_time.isnot(None)
+        )
+    ).values(
+        closed_on=Ticket.__table__.c.created +
+                  func.make_interval(secs=Ticket.__table__.c.reaction_time) +
+                  func.make_interval(secs=Ticket.__table__.c.process_time)
+    )
+    context.session.execute(stmt)
+    context.session.flush()

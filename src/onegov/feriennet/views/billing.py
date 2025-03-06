@@ -410,7 +410,7 @@ def execute_invoice_action(
             response.headers.add('X-IC-Trigger', 'reload-from')
             response.headers.add('X-IC-Trigger-Data', json.dumps({
                 'selector': f'#{self.item.invoice_id}'
-            }))
+            }, ensure_ascii=True))
 
 
 @FeriennetApp.view(

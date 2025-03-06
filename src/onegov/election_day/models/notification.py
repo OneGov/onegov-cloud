@@ -160,7 +160,7 @@ class WebhookNotification(Notification):
         webhooks = request.app.principal.webhooks
         if webhooks:
             summary = get_summary(model, request)
-            data = json.dumps(summary).encode('utf-8')
+            data = json.dumps_bytes(summary)
             for url, headers in webhooks.items():
                 headers = headers or {}
                 headers['Content-Type'] = 'application/json; charset=utf-8'

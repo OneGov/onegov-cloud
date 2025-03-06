@@ -41,7 +41,7 @@ import polib
 import re
 import types
 
-from onegov.core.cache import lru_cache
+from functools import lru_cache
 from io import BytesIO
 from itertools import pairwise
 from onegov.core.framework import Framework, log
@@ -134,7 +134,10 @@ def default_locale_negotiator(
         return user_locale
 
     if request.accept_language:
-        locale = request.accept_language.lookup(locales, default='default')
+        locale = request.accept_language.lookup(
+            list(locales),
+            default='default'
+        )
         return locale if locale != 'default' else None
 
     return None

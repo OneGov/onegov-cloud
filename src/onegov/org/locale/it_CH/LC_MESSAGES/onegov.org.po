@@ -2,7 +2,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: \n"
-"POT-Creation-Date: 2025-02-24 15:55+0100\n"
+"POT-Creation-Date: 2025-03-03 17:43+0100\n"
 "PO-Revision-Date: 2022-03-15 10:52+0100\n"
 "Last-Translator: \n"
 "Language-Team: \n"
@@ -27,6 +27,47 @@ msgid ""
 msgstr ""
 "Abbiamo inviato un mTAN al numero indicato. Inseritelo nello spazio "
 "sottostante o seguite le istruzioni dell'SMS."
+
+msgid "Tickets"
+msgstr "Biglietti"
+
+msgid "Open Tickets"
+msgstr "Biglietti aperti"
+
+msgid "Pending Tickets"
+msgstr "Biglietti in attesa"
+
+msgid "New Tickets in the Last Month"
+msgstr "Nuovi biglietti nell'ultimo mese"
+
+msgid "Closed Tickets in the Last Month"
+msgstr "Biglietti chiusi nell'ultimo mese"
+
+msgid "Lead Time from opening to closing in Days over the Last Month"
+msgstr ""
+"Tempo di gestione dall'apertura alla chiusura in giorni nell'ultimo mese"
+
+msgid "Lead Time from pending to closing in Days over the Last Month"
+msgstr ""
+"Tempo di gestione dall'in sospeso alla chiusura in giorni nell'ultimo mese"
+
+msgid "Access"
+msgstr "Accesso"
+
+msgid "Last Edited Pages"
+msgstr "Ultime pagine modificate"
+
+msgid "Last Edited News"
+msgstr "Ultime notizie modificate"
+
+msgid "Web Statistics"
+msgstr "Statistiche Web"
+
+msgid "No data available"
+msgstr "Nessun dato disponibile"
+
+msgid "Most Popular Pages"
+msgstr "Pagine più popolari"
 
 msgid "Open"
 msgstr "Aperto"
@@ -87,6 +128,9 @@ msgstr "Accedi"
 msgid "Register"
 msgstr "Registrati"
 
+msgid "Dashboard"
+msgstr "Pannello di controllo"
+
 msgid "Timeline"
 msgstr "Timeline"
 
@@ -132,17 +176,8 @@ msgstr "Gestione"
 msgid "My Tickets"
 msgstr "I miei biglietti"
 
-msgid "Open Tickets"
-msgstr "Biglietti aperti"
-
-msgid "Pending Tickets"
-msgstr "Biglietti in attesa"
-
 msgid "Closed Tickets"
 msgstr "Biglietti chiusi"
-
-msgid "Tickets"
-msgstr "Biglietti"
 
 msgid "Ticket"
 msgstr "Biglietto"
@@ -248,9 +283,6 @@ msgstr "Nei giorni festivi"
 
 msgid "During school holidays"
 msgstr "Durante le vacanze scolastiche"
-
-msgid "Access"
-msgstr "Accesso"
 
 msgid "Public"
 msgstr "Pubblico"
@@ -854,6 +886,15 @@ msgstr "La fine della pubblicazione deve essere una data futura"
 
 msgid "Publication start must be prior to end"
 msgstr "L'inizio della pubblicazione deve essere precedente alla fine"
+
+msgid "Send push notifications to app"
+msgstr "Invia notifiche push all'app"
+
+msgid "You must set a publication start date first."
+msgstr "Per prima cosa devi impostare una data di inizio della pubblicazione."
+
+msgid "Please select at least one topic for push notifications."
+msgstr "Seleziona almeno un argomento per le notifiche push."
 
 msgid "Describes briefly what this entry is about"
 msgstr "Descrive brevemente il contenuto di questo elemento"
@@ -2081,6 +2122,36 @@ msgstr "Durata dall'apertura di un ticket alla sua archiviazione automatica"
 msgid "Duration from archived state until deleted automatically"
 msgstr "Durata dello stato di archiviazione fino alla cancellazione automatica"
 
+msgid "Firebase adminsdk credentials (JSON)"
+msgstr "Credenziali Firebase Adminsdk (JSON)"
+
+msgid "Topics"
+msgstr "Argomenti"
+
+msgid "Defines the firebase topic id"
+msgstr "Definisce l'id dell'argomento Firebase"
+
+msgid "Invalid Firebase credentials format - must be a JSON object"
+msgstr ""
+"Formato delle credenziali Firebase non valido: deve essere un oggetto JSON"
+
+#, python-format
+msgid "Missing required keys in Firebase credentials: {0}"
+msgstr "Chiavi obbligatorie mancanti nelle credenziali Firebase: {0}"
+
+msgid "Invalid JSON format in Firebase credentials"
+msgstr "Formato JSON non valido nelle credenziali Firebase"
+
+#, python-format
+msgid "Error validating Firebase credentials: {0}"
+msgstr "Errore durante la convalida delle credenziali Firebase: {0}"
+
+msgid "E-Mail Address"
+msgstr "Indirizzo e-mail"
+
+msgid "The subscriber has given consent to receive the newsletter."
+msgstr "Il sottoscrittore ha dato il consenso a ricevere la newsletter."
+
 msgid ""
 "Select newsletter categories your are interested in. You will receive the "
 "newsletter if it reports on at least one of the subscribed categories."
@@ -2678,9 +2749,6 @@ msgstr "Scegli filtro"
 
 msgid "Delete entry"
 msgstr "Elimina elemento"
-
-msgid "Dashboard"
-msgstr "Pannello di controllo"
 
 msgid "Do you really want to delete this external link?"
 msgstr "Vuoi davvero eliminare questo collegamento esterno?"
@@ -3585,6 +3653,9 @@ msgstr ""
 
 msgid "Links"
 msgstr "Collegamenti"
+
+msgid "Item(s)"
+msgstr "Elemento(i)"
 
 msgid "Change request"
 msgstr "Richiesta di modifica"
@@ -4523,6 +4594,15 @@ msgstr ""
 
 msgid "Drop files to verify them"
 msgstr "Rilascia i file per verificarli"
+
+msgid "Sent Notifications"
+msgstr "Notifiche inviate"
+
+msgid "Sent At"
+msgstr "Inviato a"
+
+msgid "No notifications"
+msgstr "Nessuna notifica"
 
 msgid "No subscribers yet"
 msgstr "Non ci sono ancora abbonati"
@@ -5885,6 +5965,9 @@ msgstr "Novembre"
 msgid "December"
 msgstr "Dicembre"
 
+msgid "Push Notifications"
+msgstr "Notifiche push"
+
 msgid ""
 "The selected time does not exist on this date due to the switch from "
 "standard time to daylight saving time."
@@ -6106,9 +6189,6 @@ msgstr ""
 
 msgid "Chat"
 msgstr "Chat"
-
-msgid "Topics"
-msgstr "Argomenti"
 
 #, python-format
 msgid "You have successfully unsubscribed from the newsletter at ${address}"
@@ -6396,3 +6476,18 @@ msgstr "È stato creato un account per te"
 
 msgid "The user was created successfully"
 msgstr "Utente creato correttamente"
+
+msgid "Unique Visitors in the Last Month"
+msgstr "Visitatori unici nell'ultimo mese"
+
+msgid "Total Visits in the Last Month"
+msgstr "Visite totali nell'ultimo mese"
+
+msgid "Total Page Views in the Last Month"
+msgstr "Visualizzazioni totali di pagine nell'ultimo mese"
+
+msgid "Number of Page Views per Visit"
+msgstr "Numero di visualizzazioni di pagine per visita"
+
+msgid "Average Visit Duration in Minutes"
+msgstr "Durata media della visita in minuti"

@@ -1,8 +1,137 @@
 # Changes
 
+## 2025.12
+
+`2025-03-04` | [aeeac42f56...f59d7a9b0f](https://github.com/OneGov/onegov-cloud/compare/aeeac42f56^...f59d7a9b0f)
+
+### Ticket
+
+##### Make db upgrade for ticket closed_on column more performant
+
+`Feature` | [NONE](#NONE) | [f59d7a9b0f](https://github.com/onegov/onegov-cloud/commit/f59d7a9b0fe658317e5dec8ba1381684d6364b09)
+
+## 2025.11
+
+`2025-03-03` | [0c2dd4a07e...c321b6c196](https://github.com/OneGov/onegov-cloud/compare/0c2dd4a07e^...c321b6c196)
+
+## 2025.10
+
+`2025-03-03` | [753d4737ed...a33c968d71](https://github.com/OneGov/onegov-cloud/compare/753d4737ed^...a33c968d71)
+
+### Agency
+
+##### Staka LU: Handle Sekretariat in column lastname as agency
+
+`Feature` | [OGC-2106](https://linear.app/onegovcloud/issue/OGC-2106) | [8ad24bda89](https://github.com/onegov/onegov-cloud/commit/8ad24bda897a91dadd9891857afdaf83a75fb2ea)
+
+##### Staka LU: Use membership title as export field (instead of person function)
+
+`Feature` | [OGC-2107](https://linear.app/onegovcloud/issue/OGC-2107) | [4c6118e20a](https://github.com/onegov/onegov-cloud/commit/4c6118e20a2856746669c5386f23bb851ec63cb2)
+
+### Org
+
+##### Prevent duplicates in push notifications and other improvements.
+
+- Auto-select default topic when only one exists and checkbox is ticked
+- Preventing duplicates in push notifications
+- Fix default choices not being in nested list
+- Prevent user from being able to submit an empty list if checkbox ticked
+- Fix inconsistent UI labels (Themen-ID ...) 
+
+The implementation now uses database constraints to ensure notification
+ uniqueness even during simultaneous processing.
+
+`Feature` | [OGC-1951](https://linear.app/onegovcloud/issue/OGC-1951) | [5eac37b6e2](https://github.com/onegov/onegov-cloud/commit/5eac37b6e23c15470dc88e407c5332b0ba77fd19)
+
+### Swissvotes
+
+##### Allow English documents in vote search results
+
+`Bugfix` | [SWI-60](https://linear.app/swissvotes/issue/SWI-60) | [023147a26e](https://github.com/onegov/onegov-cloud/commit/023147a26ef0f1281909ce3638349a8e0ecb693b)
+
+##### Allow English documents in vote search results
+
+`Bugfix` | [SWI-60](https://linear.app/swissvotes/issue/SWI-60) | [cfa9246bb4](https://github.com/onegov/onegov-cloud/commit/cfa9246bb4ec9698d3d009b78b2fb713bf089fba)
+
+### Town6
+
+##### Add push notifications overview.
+
+`Feature` | [OGC-1951](https://linear.app/onegovcloud/issue/OGC-1951) | [23dbcc0a85](https://github.com/onegov/onegov-cloud/commit/23dbcc0a8583baf530842e4c6d3d80f8e5376c59)
+
+## 2025.9
+
+`2025-02-27` | [199f1a8282...46d6aba65d](https://github.com/OneGov/onegov-cloud/compare/199f1a8282^...46d6aba65d)
+
+### Core
+
+##### Switches Redis cache serialization over to MessagePack
+
+`Feature` | [OGC-1893](https://linear.app/onegovcloud/issue/OGC-1893) | [101a9ae5dc](https://github.com/onegov/onegov-cloud/commit/101a9ae5dcf6e91047790aa5000cf9409dff6deb)
+
+##### Use orjson for JSON serialization/deserialization
+
+`Performance` | [2954d7ead4](https://github.com/onegov/onegov-cloud/commit/2954d7ead433c92adab96d424a1c2ff77d347b9d)
+
+### Org
+
+##### Show total price in ticket and confirmation email
+
+`Feature` | [OGC-2053](https://linear.app/onegovcloud/issue/OGC-2053) | [b1a7c0afb6](https://github.com/onegov/onegov-cloud/commit/b1a7c0afb6eb906bc74273e561891e5b647b917a)
+
+### Pas
+
+##### Fix parliamentary settlement calculations and export functionality.
+
+- Only show exports that have at least one entry in table
+- Fix expense calculation to prevent double-counting of base totals
+- Implement missing cost-of-living adjustment in parliamentarian export
+- Perform the calculation for getting the Quartal with no assumptions
+- Make sure parliamentarians are correctly linked to their parties during
+ the times they attended, not just when they first joined. Indeed, party 
+changes should be expected and accounted for
+- Ensure role activity is verified at specific attendance times.
+- Replace manual HTML string formatting
+
+`Bugfix` | [OGC-1503](https://linear.app/onegovcloud/issue/OGC-1503) | [199f1a8282](https://github.com/onegov/onegov-cloud/commit/199f1a828264e7a089a9383771ce55b905307cfb)
+
+### Town6
+
+##### Adds a dashboard with basic figures
+
+`Feature` | [OGC-1528](https://linear.app/onegovcloud/issue/OGC-1528) | [48df75dc30](https://github.com/onegov/onegov-cloud/commit/48df75dc3055387bddd9f76677590ab01b040d58)
+
+##### Adding firebase push notifications.
+
+Town6: Adds firebase push notifications.
+
+`Feature` | [OGC-1951](https://linear.app/onegovcloud/issue/OGC-1951) | [b137397a09](https://github.com/onegov/onegov-cloud/commit/b137397a095f27d1854494a238a2cdb9e8f8724c)
+
+### Websockets
+
+##### Switches away from the deprecated legacy websockets
+
+`Feature` | [OGC-1735](https://linear.app/onegovcloud/issue/OGC-1735) | [61931a3714](https://github.com/onegov/onegov-cloud/commit/61931a3714f26baa84312a2a69f87250b52f4686)
+
+## test
+
+No changes since last release
+
+## test
+
+`2025-02-24` | [9c3aee5da3...0b99952075](https://github.com/OneGov/onegov-cloud/compare/9c3aee5da3^...0b99952075)
+
+### Org
+
+##### Remove unconfirmed subscribers
+
+Remove unconfirmed subscribers after 7 days of initial subscription. Also display date of subscription on recipients-view and export.
+
+`Feature` | [OGC-2017](https://linear.app/onegovcloud/issue/OGC-2017) | [b76a07b02c](https://github.com/onegov/onegov-cloud/commit/b76a07b02c2e6d8385b97694edd24c6f6955df71)
+
 ## 2025.8
 
-`2025-02-20` | [7b612693f4...cc8c03ba1a](https://github.com/OneGov/onegov-cloud/compare/7b612693f4^...cc8c03ba1a)
+`2025-02-20` | [7b612693f4...d2765ca4af](https://github.com/OneGov/onegov-cloud/compare/7b612693f4^...d2765ca4af)
 
 ### Agency
 
@@ -353,6 +482,10 @@ Restyle the sidebar-toggler so it is fixed to the bottom and more visible.
 ##### Adds optional ordering by filename or caption to image sets
 
 `Feature` | [OGC-2000](https://linear.app/onegovcloud/issue/OGC-2000) | [f67e97d4ed](https://github.com/onegov/onegov-cloud/commit/f67e97d4ed357dccaee3008bc58544504b22b02d)
+
+## test
+
+No changes since last release
 
 ## test
 
@@ -2142,193 +2275,4 @@ Agenda items, that are still "scheduled" so far had no working link. Now they ar
 ##### Automaticaly fill in start time when "ongoing" is clicked in the form
 
 `Feature` | [OGC-1626](https://linear.app/onegovcloud/issue/OGC-1626) | [db035bde73](https://github.com/onegov/onegov-cloud/commit/db035bde73c880ce114b84634c6329a6e8588b8a)
-
-## 2024.29
-
-`2024-05-14` | [7c8b77a2d0...972f8f5843](https://github.com/OneGov/onegov-cloud/compare/7c8b77a2d0^...972f8f5843)
-
-**Upgrade hints**
-- onegov-election-day --select /onegov_election_day/* migrate-subscribers
-### Core
-
-##### Ensures SMS spooler triggers on `onegov.core.utils.safe_move`
-
-Previously we still triggered because we didn't ignore `.tmp` files, so
-this bug was obscured.
-
-`Bugfix` | [2ae44dacf1](https://github.com/onegov/onegov-cloud/commit/2ae44dacf104087cd25a9b4adc08459d1b9ae965)
-
-### Election Day
-
-##### Add notification segmentation.
-
-If segmented_notifications is enabled for a principal, email and SMS subscribers can subscribe either to elections and votes of a specific municipality or everything else. Multiple subscriptions are possible.
-
-`Feature` | [OGC-1150](https://linear.app/onegovcloud/issue/OGC-1150) | [d7d8195c22](https://github.com/onegov/onegov-cloud/commit/d7d8195c22530fe176230c41811d3b45b7fb907a)
-
-##### Sort municipalities in subscription forms.
-
-`Feature` | [OGC-1150](https://linear.app/onegovcloud/issue/OGC-1150) | [4444f815c0](https://github.com/onegov/onegov-cloud/commit/4444f815c0330c80dba0fc4ba418a6a2d621fc0c)
-
-##### Add experimental support for eCH-0252 election compound import.
-
-`Feature` | [OGC-1608](https://linear.app/onegovcloud/issue/OGC-1608) | [e7cdccb855](https://github.com/onegov/onegov-cloud/commit/e7cdccb855ae0bc2337996ce5f033b02f45f2f15)
-
-### Forms
-
-##### Left align input text with help text below for town6
-
-`Bugfix` | [OGC-1593](https://linear.app/onegovcloud/issue/OGC-1593) | [a315bd300f](https://github.com/onegov/onegov-cloud/commit/a315bd300fa6c6d6a08af49163b4da7d8ee22236)
-
-### Landsgemeinde
-
-##### Links to video for vota
-
-`Feature` | [OGC-1635](https://linear.app/onegovcloud/issue/OGC-1635) | [c7aa98c92b](https://github.com/onegov/onegov-cloud/commit/c7aa98c92bf47fcc6dcd82b2957c30e919660c33)
-
-### Swissvotes
-
-##### Update campaign website info button.
-
-`Feature` | [SWI-48](https://linear.app/swissvotes/issue/SWI-48) | [0ba48e642e](https://github.com/onegov/onegov-cloud/commit/0ba48e642e41252a4eda49841dd88ce232673d13)
-
-### Town 6
-
-##### Fix Bug where Documents were displayed twice on resources
-
-`Bugfix` | [OGC-1569](https://linear.app/onegovcloud/issue/OGC-1569) | [ffde31511a](https://github.com/onegov/onegov-cloud/commit/ffde31511a25d456c181400523be4e99f24911df)
-
-## 2024.28
-
-`2024-04-26` | [11cf0ad93b...e98118ace3](https://github.com/OneGov/onegov-cloud/compare/11cf0ad93b^...e98118ace3)
-
-### Core
-
-##### Avoids writing `.tmp` files to the SMS queue altogether
-
-`Bugfix` | [1d7df063e1](https://github.com/onegov/onegov-cloud/commit/1d7df063e16e1b938da0b4e61bc51fe2ef989015)
-
-## 2024.27
-
-`2024-04-19` | [1dea349fd2...7fbfb3cbfe](https://github.com/OneGov/onegov-cloud/compare/1dea349fd2^...7fbfb3cbfe)
-
-**Upgrade hints**
-- onegov-election-day --select /onegov_election_day/* migrate-screens
-### Election Day
-
-##### Add JSON for screens.
-
-`Feature` | [OGC-1591](https://linear.app/onegovcloud/issue/OGC-1591) | [c84dd22331](https://github.com/onegov/onegov-cloud/commit/c84dd2233132580fcabb14f3de710dbf899d3125)
-
-##### Add type annotation for public vote json.
-
-`Feature` | [OGC-1588](https://linear.app/onegovcloud/issue/OGC-1588) | [7fc0c07494](https://github.com/onegov/onegov-cloud/commit/7fc0c07494c221c649038eb48f09ade360375674)
-
-##### Rename single word screen widgets.
-
-`Feature` | [OGC-1589](https://linear.app/onegovcloud/issue/OGC-1589) | [4ddeca856f](https://github.com/onegov/onegov-cloud/commit/4ddeca856ff7c7be40fcc05c0ffa37ec6b069464)
-
-##### Remove obsolete table and migration command.
-
-`Other` | [OGC-1478](https://linear.app/onegovcloud/issue/OGC-1478) | [1dea349fd2](https://github.com/onegov/onegov-cloud/commit/1dea349fd2e9107edb6d6d1a6f0e94d000e992c7)
-
-### Landsgemeinde
-
-##### Automatically calculate timestamps
-
-Timestamps get automatically calculated with the start time of the assembly and the start time of an agenda item. If a custom timestamp is given the calculated timestamp gets overwritten.
-
-`Feature` | [OGC-1564](https://linear.app/onegovcloud/issue/OGC-1564) | [dfec2da074](https://github.com/onegov/onegov-cloud/commit/dfec2da0740cd41f6249e25c83e918f840b75de5)
-
-##### Assembly Item displaced lines
-
-`Bugfix` | [OGC-1566](https://linear.app/onegovcloud/issue/OGC-1566) | [e89b41a84b](https://github.com/onegov/onegov-cloud/commit/e89b41a84b0bb636525ff7733cb9a0f480fad564)
-
-##### Convert Timestamp to seconds
-
-YouTube Requires the timestamp as seconds. Added a utils-method to convert timestamps into seconds.
-
-`Bugfix` | [OGC-1563](https://linear.app/onegovcloud/issue/OGC-1563) | [06e3675fd6](https://github.com/onegov/onegov-cloud/commit/06e3675fd62a2d6b97d05d19707d8e83e372b05f)
-
-### News
-
-##### News are now deletable when end date passed
-
-`Bugfix` | [OGC-1560](https://linear.app/onegovcloud/issue/OGC-1560) | [4b83acb321](https://github.com/onegov/onegov-cloud/commit/4b83acb32159613c60db6ac15bc0e8c3e8271d67)
-
-## 2024.26
-
-`2024-04-16` | [d4483dac36...ebd814e2b5](https://github.com/OneGov/onegov-cloud/compare/d4483dac36^...ebd814e2b5)
-
-### Event
-
-##### Fix filter values may be displayed as single characters
-
-`Bugfix` | [OGC-1578](https://linear.app/onegovcloud/issue/OGC-1578) | [d21a0ccfba](https://github.com/onegov/onegov-cloud/commit/d21a0ccfbab30e27ee1aebf8ac5b731095bff965)
-
-### User
-
-##### Extend cli for 'exists' with recursive flag in order to loop over schemas
-
-`Feature` | [NONE](#NONE) | [a0a79622c1](https://github.com/onegov/onegov-cloud/commit/a0a79622c199d7102e44cecc1493e85f3047069b)
-
-## 2024.25
-
-`2024-04-16` | [f1ea705b17...0eb53b50a3](https://github.com/OneGov/onegov-cloud/compare/f1ea705b17^...0eb53b50a3)
-
-### Election Day
-
-##### Change relationships of party results from dynamic to lazy select.
-
-`Feature` | [OGC-1478](https://linear.app/onegovcloud/issue/OGC-1478) | [61072947b0](https://github.com/onegov/onegov-cloud/commit/61072947b0bc09386ca0b21ced06300fad73aadb)
-
-##### Refactor election compound relationships.
-
-`Feature` | [OGC-1478](https://linear.app/onegovcloud/issue/OGC-1478) | [0d710f1490](https://github.com/onegov/onegov-cloud/commit/0d710f14906fe8a2fe0b56129ba6404784ae5f77)
-
-##### Allow votes to be displayed as tie breakers.
-
-This is a silly hack introduced by ZG and only available for them. All other principals use proper complex votes as this hack makes no sense at all.
-
-`Feature` | [OGC-1572](https://linear.app/onegovcloud/issue/OGC-1572) | [0d34957fd5](https://github.com/onegov/onegov-cloud/commit/0d34957fd5ef79ac58ddc2f827968aad58607d3a)
-
-### Org
-
-##### Fix lxml usage in html annotation.
-
-`Bugfix` | [7daa3c5347](https://github.com/onegov/onegov-cloud/commit/7daa3c53474fee24297cae3877f7e7f2e56737e9)
-
-## 2024.24
-
-`2024-04-12` | [776a135472...4f3b6f8f66](https://github.com/OneGov/onegov-cloud/compare/776a135472^...4f3b6f8f66)
-
-### Org
-
-##### Prevent negative page indexes, force to zero if necessary
-
-`Bugfix` | [OGC-1573](https://linear.app/onegovcloud/issue/OGC-1573) | [cb72bae9e3](https://github.com/onegov/onegov-cloud/commit/cb72bae9e33226632f363cb60a6658a06c84eef0)
-
-##### Fix adjusting registration window (end date) after first attendee confirmed
-
-`Bugfix` | [OGC-1557](https://linear.app/onegovcloud/issue/OGC-1557) | [e8e9a1d2b9](https://github.com/onegov/onegov-cloud/commit/e8e9a1d2b9f5780cf768786029c6adee45558985)
-
-### Swissvotes
-
-##### Update translations.
-
-`Feature` | [SWI-43](https://linear.app/swissvotes/issue/SWI-43) | [0cd82fb59b](https://github.com/onegov/onegov-cloud/commit/0cd82fb59b79dabdab02c38558a597766b8c540a)
-
-##### Use separate column for BFS dashboard.
-
-`Feature` | [SWI-46](https://linear.app/swissvotes/issue/SWI-46) | [68039c35c0](https://github.com/onegov/onegov-cloud/commit/68039c35c07d878a8dcf6ae45d634f75161ce3da)
-
-### Town6
-
-##### Bug Fix for hidden navigation in safari
-
-`Bugfix` | [OGC-1570](https://linear.app/onegovcloud/issue/OGC-1570) | [776a135472](https://github.com/onegov/onegov-cloud/commit/776a1354729f0ab9dec5d7447e4008edd239a914)
-
-## 2024.23
-
-`2024-04-09` | [f190133e5d...74d1f1f871](https://github.com/OneGov/onegov-cloud/compare/f190133e5d^...74d1f1f871)
 

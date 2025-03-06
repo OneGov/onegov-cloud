@@ -14,8 +14,8 @@ import readline
 import rlcompleter
 from collections import defaultdict
 from fnmatch import fnmatch
+from functools import cache
 from onegov.core import log
-from onegov.core.cache import lru_cache
 from onegov.core.cli.core import (
     abort, command_group, pass_group_context, run_processors)
 from onegov.core.crypto import hash_password
@@ -393,7 +393,7 @@ def transfer(
 
     # some calls to the storage transfer may be repeated as applications
     # share folders in certain configurations
-    @lru_cache(maxsize=None)
+    @cache
     def transfer_storage(remote: str, local: str, glob: str = '*') -> None:
 
         # GNUtar differs from MacOS's version somewhat and the combination
@@ -443,7 +443,7 @@ def transfer(
         # NOTE: We took extra care that this is safe with shlex.join
         subprocess.check_output(f'{send} | {recv}', shell=True)  # nosec:B602
 
-    @lru_cache(maxsize=None)
+    @cache
     def transfer_delta_storage(
         remote: str, local: str, glob: str = '*'
     ) -> None:

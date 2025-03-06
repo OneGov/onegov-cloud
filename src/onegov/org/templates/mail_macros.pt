@@ -56,6 +56,13 @@
             <metal:b use-macro="layout.macros['display_fields']" tal:define="fields fields.values()" />
         </tal:b>
     </p>
+    <p>
+        <tal:b condition="price|nothing">
+            <tr><td><b i18n:translate>Total Amount</b></td></tr>
+            <tr><td><metal:b use-macro="layout.macros['price']" /></td></tr>
+            <tr><td height="5"></td></tr>
+        </tal:b>
+    </p>
 </metal:display_form>
 
 <metal:display_field define-macro="display_fields" i18n:domain="onegov.org">
@@ -73,11 +80,20 @@
     <table class="field-display" tal:condition="rendered_fields">
         <tal:b repeat="(field, rendered) rendered_fields">
             <tr><td><b>${field.label.text}</b></td></tr>
-            <tr><td>${rendered}</td></tr>
+            <tal:b tal:define="is_value field.type in ('IntegerField', 'FloatField', 'DecimalField')">
+                <tr><td>${rendered} <span tal:condition="is_value" i18n:translate="">Item(s)</span></td></tr>
+            </tal:b>
             <tr><td height="5"></td></tr>
         </tal:b>
     </table>
 </metal:display_field>
+
+<metal:price define-macro="price" i18n:domain="onegov.org">
+    ${layout.format_number(price.net_amount)} ${price.currency}
+    <tal:b condition="price.fee and show_fee|nothing">
+        (+ ${layout.format_number(price.fee)} <tal:b i18n:translate>Credit Card Fee</tal:b>)
+    </tal:b>
+</metal:price>
 
 </body>
 </html>
