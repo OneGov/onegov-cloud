@@ -487,7 +487,6 @@ class UpgradeContext:
         table_name: str,
         constraint_name: str,
     ) -> bool:
-        schema_name = self.app.schema
         query = text(
             """
             SELECT constraint_name
@@ -498,7 +497,7 @@ class UpgradeContext:
             AND constraint_name = :constraint_name
             """
         ).bindparams(
-            bindparam('schema', schema_name),
+            bindparam('schema', self.schema),
             bindparam('table_name', table_name),
             bindparam('constraint_name', constraint_name)
         )
@@ -516,7 +515,7 @@ class UpgradeContext:
                   )
             )
         """).bindparams(
-            bindparam('schema', self.app.schema),
+            bindparam('schema', self.schema),
             bindparam('enum_name', enum_name)
         )
         result = self.session.execute(query)
