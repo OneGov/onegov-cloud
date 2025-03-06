@@ -513,6 +513,7 @@ class MembershipImporter(DataImporter):
                         continue
 
                     party = self.party_map.get(org_name)
+
                     #  somehow  roles are created where party is none
                     breakpoint()
 
@@ -707,13 +708,16 @@ class MembershipImporter(DataImporter):
 
         raise ValueError(f'Unknown role text: {role_text}')
 
-    def _bulk_save(self, objects: list[Any], object_type: str) -> list[Any]:
+    def _bulk_save(
+        self,
+        objects: list[ParliamentarianRole] | list[CommissionMembership],
+        object_type: str,
+    ) -> list[Any]:
         """Save a batch of objects to the database."""
         try:
             if objects:
                 breakpoint()
                 self.session.bulk_save_objects(objects)
-                first = objects[0]  # check role
                 self.session.flush()  # Flush to get IDs
                 logging.info(f'Imported {len(objects)} {object_type}')
         except Exception as e:

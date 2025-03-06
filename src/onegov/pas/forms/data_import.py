@@ -8,6 +8,7 @@ from onegov.pas.importer.json_import import import_zug_kub_data, _load_json
 from onegov.pas.layouts import (
     DefaultLayout,
 )
+from wtforms.validators import DataRequired, ValidationError, InputRequired
 from onegov.form import Form
 
 from typing import TYPE_CHECKING
@@ -25,12 +26,12 @@ class DataImportForm(Form):
 
     people_source = UploadField(
         label=_('People Data (JSON)'),
-        validators=[DataRequired()],
+        validators=[InputRequired()],
         description=_("JSON file containing parliamentarian data."),
     )
     organizations_source = UploadField(
         label=_('Organizations Data (JSON)'),
-        validators=[DataRequired()],
+        validators=[InputRequired()],
         description=_(
             "JSON file containing organization data (commissions, "
             "parties, etc.)."
@@ -38,30 +39,33 @@ class DataImportForm(Form):
     )
     memberships_source = UploadField(
         label=_('Memberships Data (JSON)'),
-        validators=[DataRequired()],
+        validators=[InputRequired()],
         description=_(
             "JSON file containing membership data (who is member of "
             "what organization)."
         ),
     )
 
-    def validate_people_source(self, field):
-        if field.data:
-            try:
-                _load_json(field.data)
-            except JSONDecodeError:
-                raise ValidationError(_('Invalid JSON file.'))
-
-    def validate_organizations_source(self, field):
-        if field.data:
-            try:
-                _load_json(field.data)
-            except JSONDecodeError:
-                raise ValidationError(_('Invalid JSON file.'))
-
-    def validate_memberships_source(self, field):
-        if field.data:
-            try:
-                _load_json(field.data)
-            except JSONDecodeError:
-                raise ValidationError(_('Invalid JSON file.'))
+    # def validate_people_source(self, field):
+    #     return True
+    #     if field.data:
+    #         try:
+    #             _load_json(field.data)
+    #         except JSONDecodeError:
+    #             raise ValidationError(_('Invalid JSON file.'))
+    #
+    # def validate_organizations_source(self, field):
+    #     return True
+    #     if field.data:
+    #         try:
+    #             _load_json(field.data)
+    #         except JSONDecodeError:
+    #             raise ValidationError(_('Invalid JSON file.'))
+    #
+    # def validate_memberships_source(self, field):
+    #     return True
+    #     if field.data:
+    #         try:
+    #             _load_json(field.data)
+    #         except JSONDecodeError:
+    #             raise ValidationError(_('Invalid JSON file.'))

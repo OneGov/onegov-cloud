@@ -242,3 +242,7 @@ def test_views_manage(client_with_es):
     assert 'Noch keine Fraktionen erfasst' in settings.click('Fraktionen')
     assert 'Noch keine Parlamentarier:innen erfasst' in\
            settings.click('Parlamentarier:innen')
+
+
+def test_view_uplaod(client):
+    pass

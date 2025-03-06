@@ -57,6 +57,7 @@ def test_successful_import_mnaually(
         memberships_source=members_path,
     )
     session.flush()
+    breakpoint()
 
     parliamentarians = session.query(Parliamentarian).all()
     assert len(parliamentarians) == 194

@@ -1,91 +1,42 @@
 <div metal:use-macro="layout.base" i18n:domain="onegov.pas">
-    <tal:block metal:fill-slot="title">
+    <tal:b metal:fill-slot="title">
             ${title}
-    </tal:block>
+    </tal:b>
     <tal:b metal:fill-slot="content">
-        <h1>${title}</h1>
-
-        <form action="${upload_url}" class="upload" method="POST" enctype="multipart/form-data">
-            <div class="upload-dropzone dropzone">
-                <input type="file" id="fileElem" class="hidden" multiple accept=".json">
-                <label class="button" for="fileElem" i18n:translate>Select JSON files</label>
-                <p class="show-for-medium" i18n:translate>Drop all 3 JSON files here to upload</p>
+        <form method="POST" enctype="multipart/form-data" class="block-form">
+            <!-- Access fields through form directly -->
+            <div>
+                <label class="form-label" for="${form.people_source.id}">
+                    <span>${form.people_source.label.text}</span>
+                </label>
+                    ${form.people_source()}
+                <p class="form-text text-muted">${form.people_source.description}</p>
+                <ul tal:condition="form.people_source.errors" class="form-errors">
+                    <li tal:repeat="error form.people_source.errors" tal:content="error" />
+                </ul>
             </div>
-
-            <div class="upload-progress"></div>
-
-            <div class="upload-filelist-header">
-                <div class="grid-x grid-margin-x">
-                    <!-- People Data Section -->
-                    <div class="cell medium-4">
-                        <h2 i18n:translate="">People Data (JSON)</h2>
-                        <div id="people_source_upload_status" class="callout alert">
-                            <p class="small">Pending Upload</p>
-                        </div>
-                    </div>
-                    <!-- Organizations Data Section -->
-                    <div class="cell medium-4">
-                        <h2 i18n:translate="">Organizations Data (JSON)</h2>
-                        <div id="organizations_source_upload_status" class="callout alert">
-                            <p class="small">Pending Upload</p>
-                        </div>
-                    </div>
-                    <!-- Memberships Data Section -->
-                    <div class="cell medium-4">
-                        <h2 i18n:translate="">Memberships Data (JSON)</h2>
-                        <div id="memberships_source_upload_status" class="callout alert">
-                            <p class="small">Pending Upload</p>
-                        </div>
-                    </div>
-                </div>
-
-                <div class="grid-x grid-margin-x">
-                    <div class="cell medium-12">
-                        <div class="callout primary">
-                            <p i18n:translate="">
-                                The import requires exactly 3 files: People.json, Organization.json, and Membership.json.
-                                All files must be uploaded before the import can proceed.
-                            </p>
-                        </div>
-                    </div>
-                </div>
+            <div>
+                <label class="form-label" for="${form.organizations_source.id}">
+                    <span>${form.organizations_source.label.text}</span>
+                </label>
+                    ${form.organizations_source()}
+                <p class="form-text text-muted">${form.organizations_source.description}</p>
+                <ul tal:condition="form.organizations_source.errors" class="form-errors">
+                    <li tal:repeat="error form.organizations_source.errors" tal:content="error" />
+                </ul>
             </div>
-
-            <div class="upload-filelist"></div>
-
-            <!-- Results container will be shown by JavaScript -->
-            <tal:block tal:condition="results">
-                <div id="import-results" class="callout success margin-top-1">
-                    <h3 i18n:translate="">Import Results</h3>
-                    <div class="results-content">
-                        <p tal:condition="isinstance(results, str)" tal:content="results"></p>
-                        <tal:block tal:condition="not:isinstance(results, str)">
-                            <div class="grid-x grid-margin-x">
-                                <div class="cell medium-4">
-                                    <h4 i18n:translate="">People</h4>
-                                    <p i18n:translate="">Imported: <span tal:content="results.get('people_count', 0)"></span></p>
-                                </div>
-                                <div class="cell medium-4">
-                                    <h4 i18n:translate="">Organizations</h4>
-                                    <p i18n:translate="">Imported: <span tal:content="results.get('organizations_count', 0)"></span></p>
-                                </div>
-                                <div class="cell medium-4">
-                                    <h4 i18n:translate="">Memberships</h4>
-                                    <p i18n:translate="">Imported: <span tal:content="results.get('memberships_count', 0)"></span></p>
-                                </div>
-                            </div>
-                        </tal:block>
-                    </div>
-                </div>
-            </tal:block>
-
-            <!--! fallback for integration tests -->
-            <noscript>
-                <input name="people_source" type="file" accept=".json" />
-                <input name="organizations_source" type="file" accept=".json" />
-                <input name="memberships_source" type="file" accept=".json" />
-                <input type="submit" value="Import" class="button" i18n:attributes="value">
-            </noscript>
+            <div>
+                <label class="form-label" for="${form.memberships_source.id}">
+                    <span>${form.memberships_source.label.text}</span>
+                </label>
+                    ${form.memberships_source()}
+                <p class="form-text text-muted">${form.memberships_source.description}</p>
+                <ul tal:condition="form.memberships_source.errors" class="form-errors">
+                    <li tal:repeat="error form.memberships_source.errors" tal:content="error" />
+                </ul>
+            </div>
+            <button type="submit" class="button" i18n:translate="Submit">Submit</button>
         </form>
+
     </tal:b>
 </div>

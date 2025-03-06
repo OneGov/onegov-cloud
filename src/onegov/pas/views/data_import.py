@@ -59,18 +59,11 @@ def handle_data_import(
     elif request.method == 'POST':
         request.message(_('There are errors in the form.'), 'error')
 
-    coll = FileCollection(request.session)
     return {
         'title': _('Import'),
         'layout': layout,
         'form': form,
         'results': results,
-        # 'actions_url': lambda file_id: request.class_link(
-        #     GeneralFile, name='details', variables={'id': file_id}
-        # ),
-        'upload_url': layout.csrf_protected_url(
-            request.link(coll) + '/upload-json-import-files'
-        )
     }
 
 

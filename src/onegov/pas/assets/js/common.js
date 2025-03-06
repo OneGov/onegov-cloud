@@ -1,179 +1,295 @@
-document.addEventListener('DOMContentLoaded', () => {
-    // Required file types
-    const REQUIRED_FILES = [
-        { id: 'people_source', name: 'People Data (JSON)', status: 'people_upload_status' },
-        { id: 'organizations_source', name: 'Organizations Data (JSON)', status: 'organizations_upload_status' },
-        { id: 'memberships_source', name: 'Memberships Data (JSON)', status: 'memberships_upload_status' }
-    ];
-
-    // Track uploaded files
-    const uploadedFiles = {
-        people_source: null,
-        organizations_source: null,
-        memberships_source: null
-    };
-
-    // Function to update the visual status for a file input
-    const updateUploadStatus = (inputId, file) => {
-        const statusId = REQUIRED_FILES.find(f => f.id === inputId).status;
-        const statusEl = document.getElementById(statusId);
-
-        if (statusEl) {
-            if (file) {
-                uploadedFiles[inputId] = file;
-                statusEl.classList.remove('alert');
-                statusEl.classList.add('success');
-                statusEl.innerHTML = `<p class="small">Uploaded: ${file.name}</p>`;
-            } else {
-                uploadedFiles[inputId] = null;
-                statusEl.classList.remove('success');
-                statusEl.classList.add('alert');
-                statusEl.innerHTML = '<p class="small">Pending Upload</p>';
-            }
-        }
-
-        // Check if all files are uploaded
-        checkAllFilesUploaded();
-    };
-
-    // Function to check if all required files are uploaded
-    const checkAllFilesUploaded = () => {
-        const allUploaded = Object.values(uploadedFiles).every(file => file !== null);
-        const submitBtn = document.querySelector('button[type="submit"]');
-
-        if (submitBtn) {
-            submitBtn.disabled = !allUploaded;
-            if (allUploaded) {
-                submitBtn.classList.remove('disabled');
-            } else {
-                submitBtn.classList.add('disabled');
-            }
-        }
-    };
-
-    // Handle dropped files
-    const handleFiles = (files) => {
-        // Check if we have the right number of files
-        if (files.length !== 3) {
-            alert('Please upload exactly 3 JSON files: People, Organizations, and Memberships');
-            return;
-        }
-
-        // Try to match files to expected types by name pattern
-        for (const file of files) {
-            const fileName = file.name.toLowerCase();
-
-            if (fileName.includes('people') || fileName.includes('person')) {
-                createHiddenInput('people_source', file);
-                updateUploadStatus('people_source', file);
-            } else if (fileName.includes('org')) {
-                createHiddenInput('organizations_source', file);
-                updateUploadStatus('organizations_source', file);
-            } else if (fileName.includes('member') || fileName.includes('membership')) {
-                createHiddenInput('memberships_source', file);
-                updateUploadStatus('memberships_source', file);
-            } else {
-                // If we can't determine file type by name, ask the user
-                promptForFileType(file);
-            }
-        }
-    };
-
-    // Create a file input for the form submission
-    const createHiddenInput = (name, file) => {
-        // Remove existing input if present
-        const existing = document.querySelector(`input[name="${name}"]`);
-        if (existing) {
-            existing.remove();
-        }
-
-        // Create a DataTransfer object and add our file
-        const dataTransfer = new DataTransfer();
-        dataTransfer.items.add(file);
-
-        // Create the input
-        const input = document.createElement('input');
-        input.type = 'file';
-        input.name = name;
-        input.style.display = 'none';
-        input.files = dataTransfer.files;
-
-        // Add it to the form
-        document.querySelector('form.upload').appendChild(input);
-    };
-
-    // Prompt user to identify which file is which
-    const promptForFileType = (file) => {
-        const fileType = prompt(`Unable to automatically identify file type for "${file.name}". Please specify:\n1 for People\n2 for Organizations\n3 for Memberships`);
-
-        switch (fileType) {
-            case '1':
-                createHiddenInput('people_source', file);
-                updateUploadStatus('people_source', file);
-                break;
-            case '2':
-                createHiddenInput('organizations_source', file);
-                updateUploadStatus('organizations_source', file);
-                break;
-            case '3':
-                createHiddenInput('memberships_source', file);
-                updateUploadStatus('memberships_source', file);
-                break;
-            default:
-                alert('Invalid selection. File not assigned.');
-                break;
-        }
-    };
-
-    // Set up the dropzone
-    const dropzone = document.querySelector('.upload-dropzone');
-    const fileInput = document.getElementById('fileElem');
-
-    if (dropzone && fileInput) {
-        // Handle drag events
-        ['dragenter', 'dragover', 'dragleave', 'drop'].forEach(eventName => {
-            dropzone.addEventListener(eventName, (e) => {
-                e.preventDefault();
-                e.stopPropagation();
-            });
-        });
-
-        // Add visual feedback
-        ['dragenter', 'dragover'].forEach(eventName => {
-            dropzone.addEventListener(eventName, () => {
-                dropzone.classList.add('drag-over');
-            });
-        });
-
-        ['dragleave', 'drop'].forEach(eventName => {
-            dropzone.addEventListener(eventName, () => {
-                dropzone.classList.remove('drag-over');
-            });
-        });
-
-        // Handle file drop
-        dropzone.addEventListener('drop', (e) => {
-            handleFiles(e.dataTransfer.files);
-        });
-
-        // Handle file selection through button
-        fileInput.addEventListener('change', () => {
-            handleFiles(fileInput.files);
-        });
-    }
-
-    // Add a submit button if it doesn't exist
-    if (!document.querySelector('button[type="submit"]')) {
-        const submitBtn = document.createElement('button');
-        submitBtn.type = 'submit';
-        submitBtn.className = 'button disabled';
-        submitBtn.disabled = true;
-        submitBtn.textContent = 'Import Data';
-        document.querySelector('form.upload').appendChild(submitBtn);
-    }
-
-    // Initialize status for all file inputs
-    REQUIRED_FILES.forEach(file => {
-        updateUploadStatus(file.id, null);
-    });
-});
+// /*
+//     Modified Upload function to handle specific files for data import.
+//     Using the existing upload mechanism with the correct endpoint.
+// */
+// var DataImportUpload = function(element) {
+//     // Use the specific upload endpoint for JSON imports
+//     var uploadUrl = element.data('upload-url') || element.attr('action').replace('/import', '/upload-json-import-files');
+//     var form = element;
+//     var dropzone = $(element.find('.upload-dropzone'));
+//     var drop_button = $(element.find('#fileElem'));
+//     var progress = $(element.find('.upload-progress'));
+//     var filelist = $(element.find('.upload-filelist'));
+//     var filelist_header = $(element.find('.upload-filelist-header'));
+//
+//     console.log("Upload URL: " + uploadUrl);
+//
+//     // Track required files and their upload IDs
+//     var required_files = {
+//         'people_source': { uploaded: false, name: 'People Data', fileId: null },
+//         'organizations_source': { uploaded: false, name: 'Organizations Data', fileId: null },
+//         'memberships_source': { uploaded: false, name: 'Memberships Data', fileId: null }
+//     };
+//
+//     // Function to update status indicators
+//     var updateStatus = function(file_type, file_name, success, fileId) {
+//         var status_id = file_type + '_upload_status';
+//         var status_el = $('#' + status_id);
+//
+//         if (status_el.length) {
+//             if (success) {
+//                 status_el.removeClass('alert').addClass('success');
+//                 status_el.html('<p class="small">Uploaded: ' + file_name + '</p>');
+//                 required_files[file_type].uploaded = true;
+//                 required_files[file_type].fileId = fileId;
+//             } else {
+//                 status_el.removeClass('success').addClass('alert');
+//                 status_el.html('<p class="small">Pending Upload</p>');
+//                 required_files[file_type].uploaded = false;
+//                 required_files[file_type].fileId = null;
+//             }
+//         }
+//
+//         // Check if all files are uploaded
+//         checkAllUploaded();
+//     };
+//
+//     // Function to check if all required files are uploaded
+//     var checkAllUploaded = function() {
+//         var all_uploaded = true;
+//         $.each(required_files, function(key, value) {
+//             if (!value.uploaded) {
+//                 all_uploaded = false;
+//                 return false; // break loop
+//             }
+//         });
+//
+//         // Create or update submit button
+//         var submit_btn = $('#import-submit-btn');
+//         if (submit_btn.length === 0) {
+//             submit_btn = $('<button id="import-submit-btn" class="button large">Import Data</button>')
+//                 .css({
+//                     'margin-top': '20px',
+//                     'margin-bottom': '20px',
+//                     'width': '100%',
+//                     'padding': '15px'
+//                 });
+//             filelist.after(submit_btn);
+//
+//             // Add click handler
+//             submit_btn.on('click', function() {
+//                 var importUrl = form.attr('action');
+//                 console.log("Import URL: " + importUrl);
+//
+//                 // Show processing state
+//                 var results = $('<div id="import-processing" class="callout warning">')
+//                     .html('<h3>Processing Import</h3><div class="progress"><div class="progress-meter" style="width: 100%"></div></div><p>Processing your files. This may take a few minutes. Please do not close this page.</p>')
+//                     .insertAfter(filelist);
+//
+//                 // Disable the button
+//                 submit_btn.prop('disabled', true).addClass('disabled').text('Processing...');
+//
+//                 // Create a form to submit with the file IDs
+//                 var submitForm = $('<form>')
+//                     .attr('method', 'POST')
+//                     .attr('action', importUrl)
+//                     .css('display', 'none');
+//
+//                 // Add CSRF token if it exists
+//                 var csrf = $('input[name="csrf-token"]').val();
+//                 if (csrf) {
+//                     submitForm.append($('<input>').attr({
+//                         type: 'hidden',
+//                         name: 'csrf-token',
+//                         value: csrf
+//                     }));
+//                 }
+//
+//                 // Add file IDs as hidden inputs
+//                 $.each(required_files, function(key, value) {
+//                     if (value.fileId) {
+//                         submitForm.append($('<input>').attr({
+//                             type: 'hidden',
+//                             name: key + '_id',
+//                             value: value.fileId
+//                         }));
+//                     }
+//                 });
+//
+//                 // Add form to body and submit
+//                 $('body').append(submitForm);
+//                 submitForm.submit();
+//             });
+//         }
+//
+//         // Update button state
+//         if (all_uploaded) {
+//             submit_btn.prop('disabled', false).removeClass('disabled');
+//         } else {
+//             submit_btn.prop('disabled', true).addClass('disabled');
+//         }
+//     };
+//
+//     // Determine file type from name
+//     var determineFileType = function(file_name) {
+//         var lower_name = file_name.toLowerCase();
+//
+//         if (lower_name.indexOf('people') !== -1 || lower_name.indexOf('person') !== -1) {
+//             return 'people_source';
+//         } else if (lower_name.indexOf('org') !== -1) {
+//             return 'organizations_source';
+//         } else if (lower_name.indexOf('member') !== -1) {
+//             return 'memberships_source';
+//         }
+//
+//         // Ask the user if we can't determine
+//         return promptForFileType(file_name);
+//     };
+//
+//     // Prompt user to identify file type
+//     var promptForFileType = function(file_name) {
+//         var type = prompt(
+//             'Unable to determine file type for "' + file_name + '". Please specify:\n' +
+//             '1 for People\n' +
+//             '2 for Organizations\n' +
+//             '3 for Memberships'
+//         );
+//
+//         switch (type) {
+//             case '1': return 'people_source';
+//             case '2': return 'organizations_source';
+//             case '3': return 'memberships_source';
+//             default: return null;
+//         }
+//     };
+//
+//     // Upload file using the existing mechanism
+//     var upload = function(file, bar, file_type) {
+//         // Use existing upload code
+//         var xhr = new XMLHttpRequest();
+//         xhr.open('POST', uploadUrl, true);
+//         var data = new FormData();
+//         data.append('file', file);
+//
+//         // Add CSRF token if it exists
+//         var csrf = $('input[name="csrf-token"]').val();
+//         if (csrf) {
+//             data.append('csrf-token', csrf);
+//         }
+//
+//         // Add file type as metadata
+//         data.append('file_type', file_type);
+//
+//         xhr.upload.addEventListener('progress', function(e) {
+//             bar.find('.meter').css('width', (e.loaded / e.total * 100 || 100) + '%');
+//         });
+//
+//         xhr.addEventListener('readystatechange', function() {
+//             if (xhr.readyState !== 4) {
+//                 return;
+//             }
+//
+//             pending_upload = false;
+//
+//             if (xhr.status === 200) {
+//                 bar.remove();
+//
+//                 try {
+//                     // Try to extract file ID from response
+//                     var response = JSON.parse(xhr.responseText);
+//                     var fileId = response.id || response.file_id;
+//
+//                     if (!fileId && xhr.responseText.indexOf('<') === 0) {
+//                         // If response is HTML, extract ID from it
+//                         var tempDiv = $('<div>').html(xhr.responseText);
+//                         var fileItem = tempDiv.find('.file-item');
+//                         if (fileItem.length) {
+//                             fileId = fileItem.data('id');
+//                         }
+//                     }
+//
+//                     updateStatus(file_type, file.name, true, fileId);
+//                 } catch (e) {
+//                     console.error("Error parsing response: ", e);
+//                     // Still mark as uploaded even if we can't parse the ID
+//                     updateStatus(file_type, file.name, true, 'unknown');
+//                 }
+//
+//                 // Process next file in queue
+//                 process_upload_queue();
+//             } else {
+//                 bar.find('.meter').css('width', '100%');
+//                 bar.addClass('alert').attr('data-error', xhr.statusText);
+//                 process_upload_queue();
+//             }
+//         });
+//
+//         xhr.send(data);
+//     };
+//
+//     // Queue for uploads
+//     var upload_queue = [];
+//     var pending_upload = false;
+//
+//     var process_upload_queue = function() {
+//         if (pending_upload || upload_queue.length === 0) {
+//             return;
+//         }
+//
+//         pending_upload = true;
+//         var data = upload_queue.shift();
+//         upload(data.file, data.bar, data.file_type);
+//     };
+//
+//     var queue_upload = function(file) {
+//         // Determine file type
+//         var file_type = determineFileType(file.name);
+//         if (!file_type) {
+//             console.error("Unknown file type for: " + file.name);
+//             return;
+//         }
+//
+//         var bar = $('<div class="progress"><span class="meter" style="width: 0%"></span></div>')
+//             .attr('data-filename', file.name)
+//             .attr('data-filetype', file_type)
+//             .prependTo(progress);
+//
+//         upload_queue.push({
+//             file: file,
+//             bar: bar,
+//             file_type: file_type
+//         });
+//     };
+//
+//     // Set up dropzone event handlers
+//     dropzone.on('dragenter', function() {
+//         $(this).toggleClass('drag-over', true);
+//     });
+//
+//     dropzone.on('dragleave drop', function() {
+//         $(this).toggleClass('drag-over', false);
+//     });
+//
+//     dropzone.on('dragover', function() {
+//         return false;
+//     });
+//
+//     dropzone.on('drop', function(e) {
+//         var files = e.originalEvent.dataTransfer.files;
+//         for (var i = 0; i < files.length; i++) {
+//             queue_upload(files[i]);
+//         }
+//         process_upload_queue();
+//         return false;
+//     });
+//
+//     drop_button.on('change', function() {
+//         var files = this.files;
+//         for (var i = 0; i < files.length; i++) {
+//             queue_upload(files[i]);
+//         }
+//         process_upload_queue();
+//     });
+//
+//     // Initialize status indicators
+//     $.each(required_files, function(key, value) {
+//         updateStatus(key, '', false);
+//     });
+// };
+//
+// // Initialize on document ready
+// $(document).ready(function() {
+//     $('.upload').each(function() {
+//         DataImportUpload($(this));
+//     });
+// });
