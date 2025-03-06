@@ -99,25 +99,11 @@ def has_permission_ticket(
 
 
 @OrgApp.permission_rule(model=TicketCollection, permission=object)
+@OrgApp.permission_rule(model=ArchivedTicketCollection, permission=object)
 def has_permission_ticket_collection(
     app: OrgApp,
     identity: Identity,
     model: TicketCollection,
-    permission: object
-) -> bool:
-
-    # Supporter has elevated permissions for tickets
-    if identity.role == 'supporter':
-        return permission in {Public, Private, Personal}
-
-    return permission in getattr(app.settings.roles, identity.role)
-
-
-@OrgApp.permission_rule(model=ArchivedTicketCollection, permission=object)
-def has_permission_archived_ticket_collection(
-    app: OrgApp,
-    identity: Identity,
-    model: ArchivedTicketCollection,
     permission: object
 ) -> bool:
 

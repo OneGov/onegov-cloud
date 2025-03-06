@@ -14,6 +14,8 @@ from onegov.people import Agency
 from onegov.people import AgencyCollection
 from onegov.people import AgencyMembership
 from onegov.people import Person
+from onegov.ticket.collection import ArchivedTicketCollection
+from onegov.ticket.collection import TicketCollection
 from onegov.user import RoleMapping
 from sqlalchemy.orm import object_session
 
@@ -263,3 +265,14 @@ def has_permission_person_mutation_ticket(
         if not has_permission_person(app, identity, person, permission):
             return False
     return True
+
+
+@AgencyApp.permission_rule(model=TicketCollection, permission=object)
+@AgencyApp.permission_rule(model=ArchivedTicketCollection, permission=object)
+def has_permission_ticket_collection(
+    app: AgencyApp,
+    identity: Identity,
+    model: AgencyCollection,
+    permission: object
+) -> bool:
+    return has_permission_all(app, identity, model, permission)
