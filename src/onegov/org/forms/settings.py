@@ -1459,6 +1459,12 @@ class FirebaseSettingsForm(Form):
 
         super().populate_obj(model)
         key_base64 = self.request.app.hashed_identity_key
+
+        has_credential_errors = any(
+            'firebase_adminsdk_credential' in err[0]
+            for err in self.errors.items()
+        )
+
         try:
             assert self.firebase_adminsdk_credential.data is not None
             encrypted = encrypt_symmetric(
@@ -1468,6 +1474,7 @@ class FirebaseSettingsForm(Form):
             model.firebase_adminsdk_credential = encrypted_str or ''
         except Exception:
             model.firebase_adminsdk_credential = ''  # nosec: B105
+            has_credential_errors = True
 
         # Save selectable_push_notification_options to the model
         model.selectable_push_notification_options = (
@@ -1475,14 +1482,20 @@ class FirebaseSettingsForm(Form):
             or []
         )
 
-        if self.firebase_adminsdk_credential.data is not None:
-            # Activate the extension by removing the disabled Extension
-            self.request.app.settings.org.disabled_extensions.remove(
-                'PushNotificationFormExtension'
+        # Only toggle the extension if there are no validation errors
+        self.toggle_form_extension(not has_credential_errors)
+
+    def toggle_form_extension(self, valid_credentials: bool = False) -> None:
+        if valid_credentials and self.firebase_adminsdk_credential.data:
+            self.request.app.settings.org.disabled_extensions = tuple(
+                ext for ext in
+                self.request.app.settings.org.disabled_extensions
+                if ext != 'PushNotificationFormExtension'
             )
         else:
-            self.request.app.settings.org.disabled_extensions.add(
-                'PushNotificationFormExtension'
+            self.request.app.settings.org.disabled_extensions = (
+                    (*self.request.app.settings.org.disabled_extensions,
+                     'PushNotificationFormExtension')
             )
 
     def validate_firebase_adminsdk_credential(
