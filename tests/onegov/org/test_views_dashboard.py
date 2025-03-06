@@ -131,14 +131,12 @@ def test_view_dashboard_topics_news(handlers, client):
         link_texts.append(link.text)
 
     # Topics
-    assert link_texts[0] == 'Wir haben eine neue Webseite!'
-    assert link_texts[1] == 'Aktuelles'
-    assert link_texts[2] == 'Kontakt'
-    assert link_texts[3] == 'Themen'
-    assert link_texts[4] == 'Organisation'
+    assert link_texts[0] == 'Kontakt'
+    assert link_texts[1] == 'Themen'
+    assert link_texts[2] == 'Organisation'
     # News
-    assert link_texts[5] == 'Wir haben eine neue Webseite!'
-    assert link_texts[6] == 'Aktuelles'
+    assert link_texts[3] == 'Wir haben eine neue Webseite!'
+    assert link_texts[4] == 'Aktuelles'
 
 
 def test_view_dashboard_web_stats(client, monkeypatch):
