@@ -54,11 +54,11 @@ msgstr ""
 msgid "Access"
 msgstr "Accesso"
 
-msgid "Last Edited Pages"
-msgstr "Ultime pagine modificate"
+msgid "Last Edited Topics"
+msgstr "Argomenti modificati di recente"
 
 msgid "Last Edited News"
-msgstr "Ultime notizie modificate"
+msgstr "Notizie modificate di recente"
 
 msgid "Web Statistics"
 msgstr "Statistiche Web"
