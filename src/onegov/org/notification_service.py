@@ -27,7 +27,7 @@ class NotificationService(ABC):
         topic: str,
         title: str,
         body: str,
-        data: dict[str, str] | None = None,
+        data: dict[str, Any] | None = None,
     ) -> str:
         """Send a notification to a specific topic.
 
@@ -82,7 +82,7 @@ class FirebaseNotificationService(NotificationService):
         topic: str,
         title: str,
         body: str,
-        data: dict[str, str] | None = None,
+        data: dict[str, Any] | None = None,
     ) -> str:
         """Send notification via Firebase.
 
@@ -134,7 +134,7 @@ class TestNotificationService(NotificationService):
         topic: str,
         title: str,
         body: str,
-        data: dict[str, str] | None = None,
+        data: dict[str, Any] | None = None,
     ) -> str:
         """Record the notification without sending it."""
         message_id = f'test-message-{len(self.sent_messages)}'

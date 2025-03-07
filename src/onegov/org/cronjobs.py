@@ -929,11 +929,12 @@ def send_push_notifications_for_news(request: OrgRequest) -> None:
 
                 notification_title = news.title
                 notification_body = news.lead or ''
-
                 notification_data = {
                     'title': news.title,
-                    'body': news.lead or news.title,
-                    'url': request.link(news)
+                    'body': notification_body,
+                    'data': {
+                        'id': request.link(news)
+                    }
                 }
 
                 try:
