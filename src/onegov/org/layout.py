@@ -657,7 +657,7 @@ class Layout(ChameleonLayout, OpenGraphMixin):
             else:
                 amount = Decimal(str(amount))
 
-            vat = amount * vat_rate / 100
+            vat = amount / (100 + vat_rate) * vat_rate
             vat_name = self.request.translate(_('VAT'))
             vat_str = (f'({vat_name} {self.format_number(vat_rate, 1)}%'
                        f' enthalten: {self.format_number(vat)} {currency})')
