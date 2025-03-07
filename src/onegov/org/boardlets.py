@@ -213,6 +213,14 @@ class PlausibleStats(OrgBoardlet):
         if not self.plausible_api:
             return None
 
+        texts = [
+            _('Unique Visitors in the Last Month'),
+            _('Total Visits in the Last Month'),
+            _('Total Page Views in the Last Month'),
+            _('Number of Page Views per Visit'),
+            _('Average Visit Duration in Minutes')
+        ]
+
         results = self.plausible_api.get_stats()
         if not results:
             yield BoardletFact(
@@ -220,10 +228,10 @@ class PlausibleStats(OrgBoardlet):
                 number=None
             )
 
-        for text, number in results.items():
+        for text, value in zip(texts, results):
             yield BoardletFact(
-                text=self.request.translate(_(text)),
-                number=number
+                text=text,
+                number=value
             )
 
 
