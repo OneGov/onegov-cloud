@@ -482,30 +482,23 @@ class UpgradeContext:
             table, schema=self.schema
         )}
 
-    def has_constraint(
-        self,
-        table_name: str,
-        constraint_name: str,
-    ) -> bool:
-        query = text(
-            """
-            SELECT constraint_name
-            FROM information_schema.table_constraints
-            WHERE table_schema = :schema
-            AND table_name = :table_name
-            AND constraint_type = 'FOREIGN KEY'
-            AND constraint_name = :constraint_name
-            """
-        ).bindparams(
+    def has_constraint(self, table_name: str, constraint_name: str) -> bool:
+        return self.session.execute(text("""
+            SELECT EXISTS (
+                SELECT 1 FROM information_schema.table_constraints
+                WHERE table_schema = :schema
+                  AND table_name = :table_name
+                  AND constraint_type = 'FOREIGN KEY'
+                  AND constraint_name = :constraint_name
+            )
+        """).bindparams(
             bindparam('schema', self.schema),
             bindparam('table_name', table_name),
             bindparam('constraint_name', constraint_name)
-        )
-        result = self.session.execute(query)
-        return result.scalar() is not None
+        )).scalar()
 
     def has_enum(self, enum_name: str) -> bool:
-        query = text("""
+        return self.session.execute(text("""
             SELECT EXISTS (
                 SELECT 1 FROM pg_type
                 WHERE typname = :enum_name
@@ -517,9 +510,7 @@ class UpgradeContext:
         """).bindparams(
             bindparam('schema', self.schema),
             bindparam('enum_name', enum_name)
-        )
-        result = self.session.execute(query)
-        return result.scalar() is not None
+        )).scalar()
 
     def has_table(self, table: str) -> bool:
         inspector = Inspector(self.operations_connection)
