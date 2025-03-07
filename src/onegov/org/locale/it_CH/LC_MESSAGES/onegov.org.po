@@ -3264,6 +3264,12 @@ msgstr "Copia"
 msgid "Paste"
 msgstr "Incolla"
 
+msgid "A Topic cannot be pasted as News"
+msgstr "Un argomento non può essere incollato come notizia"
+
+msgid "A News cannot be pasted as Topic"
+msgstr "Una notizia non può essere incollata come argomento"
+
 msgid "Please note that this page has subpages which will also be deleted!"
 msgstr ""
 "Nota che questa pagina contiene delle sottopagine che verranno anch'esse "

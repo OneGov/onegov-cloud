@@ -192,18 +192,25 @@ class TraitInfo:
 
         if request.browser_session.has('clipboard_url'):
             css_classes = {'paste-link', 'show-new-content-placeholder'}
+            attributes = {}
             clipboard = Clipboard.from_session(request)
             source = clipboard.get_object()
 
             # disable the paste link if the source and target traits are
-            # different
+            # different and display a tooltip
             if source and source.trait != self.trait:
+                if source.trait == 'news':
+                    title = _('A News cannot be pasted as Topic')
+                else:
+                    title = _('A Topic cannot be pasted as News')
                 css_classes.add('disabled-link')
+                attributes = {'title': title}
 
             yield Link(
                 _('Paste'),
                 request.link(Editor('paste', self.paste_target)),
                 classes=css_classes,
+                attributes=attributes,
             )
 
         if self.deletable:

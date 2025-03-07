@@ -500,7 +500,7 @@ def test_links(client):
 def test_copy_paste_with_same_trait_only(client):
     client.login_admin()
 
-    # test copy paste topic (to different location in tree)
+    # test copy and paste topic (to different location in tree)
     page = client.get('/topics/organisation')
     edit = page.click('Thema')
 

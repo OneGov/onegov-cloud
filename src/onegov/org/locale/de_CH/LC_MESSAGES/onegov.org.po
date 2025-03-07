@@ -3258,6 +3258,12 @@ msgstr "Kopieren"
 msgid "Paste"
 msgstr "Einfügen"
 
+msgid "A Topic cannot be pasted as News"
+msgstr "Ein Thema kann nicht als News eingefügt werden"
+
+msgid "A News cannot be pasted as Topic"
+msgstr "Eine Nachricht kann nicht als Thema eingefügt werden"
+
 msgid "Please note that this page has subpages which will also be deleted!"
 msgstr ""
 "Bitte beachten Sie dass die Unterthemen dieses Themas ebenfalls gelöscht "
