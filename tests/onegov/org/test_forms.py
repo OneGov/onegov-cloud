@@ -790,7 +790,7 @@ def test_price_submission_vat_set(client):
         'Stück(e)',
         'Totalbetrag',
         '99.00 CHF',
-        '(MwSt 8.1% enthalten: 8.02 CHF)'
+        '(MwSt 8.1% enthalten: 7.42 CHF)'
     ]
 
     # set vat rate
