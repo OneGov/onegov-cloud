@@ -3263,6 +3263,12 @@ msgstr "Copie"
 msgid "Paste"
 msgstr "Coller"
 
+msgid "A Topic cannot be pasted as News"
+msgstr "Un sujet ne peut pas être collé comme une nouvelle"
+
+msgid "A News cannot be pasted as Topic"
+msgstr "Une nouvelle ne peut pas être collée comme un sujet"
+
 msgid "Please note that this page has subpages which will also be deleted!"
 msgstr ""
 "Veuillez noter que cette page contient des sous-pages qui seront également "
