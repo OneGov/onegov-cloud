@@ -1291,3 +1291,10 @@ ul.recipients {
     font-size: .875rem;
     color: $dark-gray;
 }
+
+.disabled-link {
+    cursor: not-allowed;
+    pointer-events: none;
+    color: grey;
+    opacity: 0.5;
+}
