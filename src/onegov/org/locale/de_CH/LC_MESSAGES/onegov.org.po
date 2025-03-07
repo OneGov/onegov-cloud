@@ -6476,6 +6476,11 @@ msgstr "Mehrwertsteuersatz"
 msgid "VAT"
 msgstr "MwSt"
 
+msgid "This is the VAT rate in percent. The VAT rate will apply to all prices "
+"in the forms."
+msgstr "Mehrwertsteuersatz in Prozent. Der Mehrwertsteuersatz wird auf alle "
+"Preise in den Formularen angewendet."
+
 msgid "Unique Visitors in the Last Month"
 msgstr "Einzigartige Besucher im letzten Monat"
 

@@ -1623,6 +1623,7 @@ class VATSettingsForm(Form):
 
     vat_rate = FloatField(
         label=_('VAT Rate'),
-        description=_('The VAT rate in percent'),
-        validators=[InputRequired(), NumberRange(0, 100)]
+        description=_('This is the VAT rate in percent. The VAT rate will '
+                      'apply to all prices in the forms.'),
+        validators=[InputRequired(), NumberRange(0, 100)],
     )
