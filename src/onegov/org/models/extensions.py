@@ -1146,7 +1146,7 @@ class SidebarContactLinkExtension(ContentExtension):
                 *args: Any, **kwargs: Any
             ) -> None:
                 super().populate_obj(obj, *args, **kwargs)
-                if hasattr(obj, 'sidepanel_links'):
+                if hasattr(obj, 'sidepanel_contact'):
                     obj.sidepanel_contact = self.json_to_links(
                         self.sidepanel_contact.data) or None
 
