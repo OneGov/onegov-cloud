@@ -6484,6 +6484,9 @@ msgstr "Un compte a été créé pour vous"
 msgid "The user was created successfully"
 msgstr "L'utilisateur a bien été créé"
 
+msgid "Value Added Tax"
+msgstr "Taxe sur la valeur ajoutée"
+
 msgid "VAT Rate"
 msgstr "Taux de TVA"
 

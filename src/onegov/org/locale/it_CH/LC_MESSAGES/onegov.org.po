@@ -6468,6 +6468,9 @@ msgstr "È stato creato un account per te"
 msgid "The user was created successfully"
 msgstr "Utente creato correttamente"
 
+msgid "Value Added Tax"
+msgstr "Imposta sul valore aggiunto"
+
 msgid "VAT Rate"
 msgstr "Aliquota IVA"
 
