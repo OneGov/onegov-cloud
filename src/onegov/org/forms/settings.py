@@ -6,6 +6,8 @@ import re
 import yaml
 
 from functools import cached_property
+
+from cryptography.fernet import InvalidToken
 from lxml import etree
 
 from onegov.core.widgets import transform_structure
@@ -1547,9 +1549,12 @@ class FirebaseSettingsForm(Form):
 
         key_base64 = self.request.app.hashed_identity_key
         if model.firebase_adminsdk_credential:
-            self.firebase_adminsdk_credential.data = decrypt_symmetric(
+            try:
+                self.firebase_adminsdk_credential.data = decrypt_symmetric(
                 model.firebase_adminsdk_credential.encode('utf-8'), key_base64
             )
+            except InvalidToken:
+                self.firebase_adminsdk_credential.data = ''
 
         if (
             not hasattr(model, 'selectable_push_notification_options')
