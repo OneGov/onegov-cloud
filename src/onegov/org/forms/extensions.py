@@ -270,28 +270,6 @@ class PublicationFormExtension(FormExtension[FormT], name='publication'):
                 validators=[StrictOptional()]
             )
 
-            def _validate_firebase_start_time(self) -> bool | None:
-                start = self.publication_start
-                if not start.data:
-                    return None
-
-                if not hasattr(self.meta, 'request'):
-                    return None
-
-                if self.meta.request.app.org.firebase_adminsdk_credential:
-                    min_start_time = utcnow() + timedelta(minutes=5)
-                    start_utc = to_timezone(start.data, 'UTC')
-
-                    if start_utc <= min_start_time:
-                        assert isinstance(start.errors, list)
-                        start.errors.append(_(
-                                'When using Firebase, publication start must '
-                                'be at least 5 minutes in the future'
-                            )
-                        )
-                        return False
-                return None
-
             def ensure_publication_start_end(self) -> bool | None:
                 start = self.publication_start
                 end = self.publication_end
@@ -303,10 +281,6 @@ class PublicationFormExtension(FormExtension[FormT], name='publication'):
                     assert isinstance(self.publication_end.errors, list)
                     self.publication_end.errors.append(
                         _('Publication end must be in the future'))
-                    return False
-
-                # Validate Firebase requirements
-                if self._validate_firebase_start_time() is False:
                     return False
 
                 # Check if start is before end
