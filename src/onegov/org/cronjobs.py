@@ -828,7 +828,7 @@ def delete_unconfirmed_newsletter_subscriptions(request: OrgRequest) -> None:
 
 def get_news_for_push_notification(session: Session) -> Query[News]:
     now = utcnow()
-    ten_minutes_ago = now - timedelta(minutes=10)
+    last_hour = now - timedelta(minutes=60)
 
     # Get all news items that should trigger push notifications
     query = session.query(News)
@@ -840,7 +840,7 @@ def get_news_for_push_notification(session: Session) -> Query[News]:
     query = query.filter(~News.id.in_(news_with_sent_notifications))
 
     # You may comment out the line below temporarily for testing
-    query = query.filter(News.publication_start >= ten_minutes_ago)
+    query = query.filter(News.publication_start >= last_hour)
 
     only_public_news = query.filter(or_(
             News.meta['access'].astext == 'public',
