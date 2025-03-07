@@ -293,7 +293,7 @@ class PublicationFormExtension(FormExtension[FormT], name='publication'):
 
 
 class PushNotificationFormExtension(FormExtension[FormT], name='publish'):
-    """ Can be used with PublicationFormExtension """
+    """ Assumes to be used in conjunction with PublicationFormExtension. """
 
     def create(self, timezone: str = 'Europe/Zurich') -> type[FormT]:
 
@@ -319,9 +319,10 @@ class PushNotificationFormExtension(FormExtension[FormT], name='publish'):
                 ):
                     return None
 
+                default_topic = [[self.request.app.schema, 'News']]
                 id_topic_pairs = self.request.app.org.meta.get(
                     'selectable_push_notification_options',
-                    (self.request.app.schema, 'News'),
+                    default_topic
                 )
                 # Format choices to show both ID and value
                 self.push_notifications.choices = [
@@ -334,6 +335,12 @@ class PushNotificationFormExtension(FormExtension[FormT], name='publish'):
                 if not self.publication_start.data:
                     raise ValidationError(
                         _('You must set a publication start date first.')
+                    )
+                if field.data and not self.push_notifications.data:
+                    raise ValidationError(
+                        _('Please select at least one topic '
+                          'for push notifications.'
+                          )
                     )
 
         return PublicationForm

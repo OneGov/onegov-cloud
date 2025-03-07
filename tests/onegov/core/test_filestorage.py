@@ -68,7 +68,7 @@ def test_filestorage(temporary_directory, redis_url):
             request.app.remember_identity(response, request, morepath.Identity(
                 userid=request.params.get('userid'),
                 uid='1',
-                groupid='admins',
+                groupids=frozenset({'admins'}),
                 role='admin',
                 application_id=request.app.application_id,
             ))

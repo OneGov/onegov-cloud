@@ -13,6 +13,7 @@ from onegov.people import AgencyCollection
 from onegov.people import AgencyMembership
 from onegov.people import Person
 from onegov.user import RoleMapping
+from sqlalchemy.orm import object_session
 
 
 from typing import TYPE_CHECKING
@@ -32,12 +33,12 @@ def get_current_role(
     """
 
     if identity.userid:
-        if identity.role == 'member' and identity.groupid:
-            role = session.query(RoleMapping).filter(
+        if identity.role == 'member' and identity.groupids:
+            roles = session.query(RoleMapping).filter(
                 RoleMapping.role == 'editor',
-                RoleMapping.group_id == identity.groupid
-            ).first()
-            if role:
+                RoleMapping.group_id.in_(identity.groupids)
+            )
+            if session.query(roles.exists()).scalar():
                 return 'editor'
 
         return identity.role
@@ -75,16 +76,18 @@ def has_model_permission(
         return True
 
     # Check the role mappings of the model
-    if identity.role == 'member' and identity.groupid:
-        if hasattr(model, 'role_mappings'):
-            role = model.role_mappings.filter(
-                RoleMapping.role == 'editor',
-                RoleMapping.group_id == identity.groupid
-            ).first()
-            if role and permission in getattr(
-                app.settings.roles, 'editor', []
-            ):
-                return True
+    if (
+        identity.role == 'member'
+        and identity.groupids
+        and hasattr(model, 'role_mappings')
+        and permission in getattr(app.settings.roles, 'editor', [])
+    ):
+        roles = model.role_mappings.filter(
+            RoleMapping.role == 'editor',
+            RoleMapping.group_id.in_(identity.groupids)
+        )
+        if object_session(model).query(roles.exists()).scalar():
+            return True
 
     # Check the role mappings of the parent
     if parent := getattr(model, 'parent', None):

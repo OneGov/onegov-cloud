@@ -481,9 +481,8 @@ var ManyFirebasetopics = React.createClass({
         var textOptions = data.textOptions || [];
         var linkOptions = data.linkOptions || [];
 
-        // Get placeholders or use defaults (without optional chaining)
-        var textPlaceholder = (data.placeholders && data.placeholders.text) || "Topic ID";
-        var linkPlaceholder = (data.placeholders && data.placeholders.link) || "Topic Name";
+        var textPlaceholder = (data.placeholders && data.placeholders.text) || "Key";
+        var linkPlaceholder = (data.placeholders && data.placeholders.link) || "Label";
 
         return (
             <div>
@@ -789,14 +788,14 @@ jQuery.fn.many = function () {
                 // Default structure for Firebase topics
                 data = {
                     labels: {
-                        text: 'Topic ID',
-                        link: 'Topic Name',
+                        text: 'Key',
+                        link: 'Label',
                         add: 'Hinzufügen',
                         remove: 'Entfernen'
                     },
                     placeholders: {
-                        text: 'Topic ID auswählen',
-                        link: 'Topic Name'
+                        text: 'Key auswählen',
+                        link: 'Label auswählen'
                     },
                     textOptions: [],
                     linkOptions: [],

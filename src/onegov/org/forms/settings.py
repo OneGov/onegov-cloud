@@ -1439,17 +1439,9 @@ class FirebaseSettingsForm(Form):
         },
     )
 
-    # Defines the mapping of firebase topics to hashtags (News)
-    # https://firebase.google.com/docs/cloud-messaging/send-message#python_3
     selectable_push_notification_options = StringField(
         label=_('Topics'),
-        description=_(
-            'Allows to setup sending firebase notifications for '
-            'News with hashtags. Below we define the Mapping. Topic ID is '
-            'an external name we can freely choose. Topic Name is a '
-            'the name of the hashtag.'
-        ),
-        fieldset=_('Defining a list of Topics from Hashtags'),
+        fieldset=_('Defines the firebase topic id'),
         render_kw={
             'class_': 'many many-firebasetopics',
         },
@@ -1562,12 +1554,12 @@ class FirebaseSettingsForm(Form):
 
         # The first topic is just the schema, includes all News
         choices_for_topics = []
-        for hashtag in all_hashtags:
-            normalized_hashtag = hashtag.lower().replace(' ', '_')
-            hashtag_id = (
+        for label in all_hashtags:
+            normalized_hashtag = label.lower().replace(' ', '_')
+            key = (
                 self.request.app.schema + '_' + normalized_hashtag
             )
-            pair = [hashtag_id, hashtag]
+            pair = [key, label]
             choices_for_topics.append(pair)
         return choices_for_topics
 
@@ -1587,14 +1579,14 @@ class FirebaseSettingsForm(Form):
         if not tags:
             # set default topic News (which is all)
             app_id = self.request.app.schema
-            id_and_hashtag_pairs = [[app_id, 'News']]
+            topic_and_label_pairs = [[app_id, 'News']]
         else:
-            id_and_hashtag_pairs = tags
+            topic_and_label_pairs = tags
 
             # Check if the default pair exists, if not add it
             app_id = self.request.app.schema
-            if not any(pair[0] == app_id for pair in id_and_hashtag_pairs):
-                id_and_hashtag_pairs.insert(
+            if not any(pair[0] == app_id for pair in topic_and_label_pairs):
+                topic_and_label_pairs.insert(
                     0, [app_id, 'News']
                 )
 
@@ -1605,16 +1597,15 @@ class FirebaseSettingsForm(Form):
         return json.dumps(
             {
                 'labels': {
-                    'text': self.request.translate(_('Topic ID')),
-                    'link': self.request.translate(_('Topic')),
+                    'text': 'Key',
+                    'link': 'Label',
                     'add': self.request.translate(_('Add')),
                     'remove': self.request.translate(_('Remove')),
                 },
                 'placeholders': {
-                    'text': self.request.translate(_('Topic ID')),
-                    'link': self.request.translate(_('Topic')),
+                    'text': 'Key',
+                    'link': 'Label'
                 },
-                # Include options directly in the JSON structure
                 'textOptions': text_options,
                 'linkOptions': link_options,
                 'values': [
@@ -1622,7 +1613,7 @@ class FirebaseSettingsForm(Form):
                         'text': l[0],
                         'link': l[1],
                         'error': self.hashtag_errors.get(ix, '')
-                    } for ix, l in enumerate(id_and_hashtag_pairs)
+                    } for ix, l in enumerate(topic_and_label_pairs)
                 ]
             }
         )
