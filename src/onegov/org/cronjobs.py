@@ -834,18 +834,22 @@ def get_news_for_push_notification(session: Session) -> Query[News]:
     query = session.query(News)
     query = query.filter(News.published == True)
     query = query.filter(News.publication_start <= now)
+    news_with_sent_notifications = session.query(
+        PushNotification.news_id
+    ).subquery()
+    query = query.filter(~News.id.in_(news_with_sent_notifications))
 
     # You may comment out the line below temporarily for testing
     query = query.filter(News.publication_start >= ten_minutes_ago)
 
     only_public_news = query.filter(or_(
-        News.meta['access'].astext == 'public',
-        News.meta['access'].astext == None
-    ))
+            News.meta['access'].astext == 'public',
+            News.meta['access'].astext == None,
+        ))
+
     only_public_with_send_push_notification = only_public_news.filter(
         News.meta['send_push_notifications_to_app'].astext == 'true'
     )
-
     return only_public_with_send_push_notification
 
 

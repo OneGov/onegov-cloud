@@ -2,7 +2,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE 1.0\n"
-"POT-Creation-Date: 2025-03-03 17:43+0100\n"
+"POT-Creation-Date: 2025-03-07 10:07+0100\n"
 "PO-Revision-Date: 2022-03-15 10:50+0100\n"
 "Last-Translator: Marc Sommerhalder <marc.sommerhalder@seantis.ch>\n"
 "Language-Team: French\n"
@@ -879,6 +879,11 @@ msgstr "Commentaire"
 
 msgid "Please provide at least one change"
 msgstr "Veuillez apporter au moins une modification"
+
+msgid ""
+"When using Firebase, publication start must be at least 5 minutes in the "
+"future"
+msgstr "Lorsque vous utilisez Firebase, le début de la publication doit se situer au moins 5 minutes dans le futur"
 
 msgid "Publication end must be in the future"
 msgstr "La fin de la publication doit être dans le futur"
@@ -4606,6 +4611,9 @@ msgstr "Notifications envoyées"
 msgid "Sent At"
 msgstr "Envoyé à"
 
+msgid "Response Data"
+msgstr "Response Data"
+
 msgid "No notifications"
 msgstr "Pas de notifications"
 
@@ -5805,6 +5813,12 @@ msgstr "${count} événements ont été importés"
 
 msgid "Move"
 msgstr "Déplacer"
+
+msgid ""
+"Notifications have already been sent for this news item. A new notification "
+"will not be sent, even if the publication date is changed."
+msgstr "Notifications ont déjà été envoyées pour cette nouvelle. Une nouvelle "
+"notification ne sera pas envoyée, même si la date de publication est modifiée."
 
 msgid "Your payment has been received"
 msgstr "Votre paiement a été reçu"
