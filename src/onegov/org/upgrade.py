@@ -22,7 +22,6 @@ from onegov.user import User
 from sqlalchemy import Column, ForeignKey
 from onegov.core.orm.types import UUID
 from sqlalchemy.orm import undefer
-from sqlalchemy import text
 
 
 from typing import Any, TYPE_CHECKING
@@ -400,23 +399,12 @@ def add_cascade_delete_to_push_notification(context: UpgradeContext) -> None:
         return
 
     constraint_name = 'push_notification_news_id_fkey'
-
     schema_name = context.app.schema
-    query = text("""
-        SELECT constraint_name
-        FROM information_schema.table_constraints
-        WHERE table_schema = :schema
-        AND table_name = 'push_notification'
-        AND constraint_type = 'FOREIGN KEY'
-        AND constraint_name = :constraint
-    """)
 
-    result = context.session.execute(query, {
-        'schema': schema_name,
-        'constraint': constraint_name
-    })
-
-    if result.scalar():
+    if context.has_constraint('push_notification',
+            'push_notification_news_id_fkey',
+            'FOREIGN KEY'
+    ):
         print(f'Dropping and recreating {constraint_name} in {schema_name}')
 
         context.operations.drop_constraint(

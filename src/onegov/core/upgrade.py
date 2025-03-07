@@ -482,20 +482,25 @@ class UpgradeContext:
             table, schema=self.schema
         )}
 
-    def has_constraint(self, table_name: str, constraint_name: str) -> bool:
+    def has_constraint(
+        self, table_name: str, constraint_name: str, constraint_type: str
+    ) -> bool:
         return self.session.execute(text("""
             SELECT EXISTS (
                 SELECT 1 FROM information_schema.table_constraints
                 WHERE table_schema = :schema
                   AND table_name = :table_name
-                  AND constraint_type = 'FOREIGN KEY'
+                  AND constraint_type = :constraint_type
                   AND constraint_name = :constraint_name
             )
-        """).bindparams(
-            bindparam('schema', self.schema),
-            bindparam('table_name', table_name),
-            bindparam('constraint_name', constraint_name)
-        )).scalar()
+        """
+            ).bindparams(
+                bindparam('schema', self.schema),
+                bindparam('table_name', table_name),
+                bindparam('constraint_name', constraint_name),
+                bindparam('constraint_type', constraint_type),
+        )
+        ).scalar()
 
     def has_enum(self, enum_name: str) -> bool:
         return self.session.execute(text("""
