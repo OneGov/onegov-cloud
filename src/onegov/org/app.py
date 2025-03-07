@@ -526,7 +526,7 @@ def get_status_mail_roles() -> Collection[str]:
 
 @OrgApp.setting(section='org', name='ticket_manager_roles')
 def get_ticket_manager_roles() -> Collection[str]:
-    return ('admin', 'editor')
+    return ('admin', 'editor', 'supporter')
 
 
 @OrgApp.setting(section='org', name='require_complete_userprofile')

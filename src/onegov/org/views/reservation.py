@@ -25,6 +25,7 @@ from onegov.org.models import (
     TicketMessage, TicketChatMessage, ReservationMessage,
     ResourceRecipient, ResourceRecipientCollection)
 from onegov.org.models.resource import FindYourSpotCollection
+from onegov.org.models.ticket import ReservationTicket
 from onegov.pay import PaymentError
 from onegov.reservation import Allocation, Reservation, Resource
 from onegov.ticket import TicketCollection
@@ -714,7 +715,8 @@ def accept_reservation(
     self: Reservation,
     request: OrgRequest,
     text: str | None = None,
-    notify: bool = False
+    notify: bool = False,
+    view_ticket: ReservationTicket | None = None,
 ) -> Response:
 
     if not self.data or not self.data.get('accepted'):
@@ -727,6 +729,11 @@ def accept_reservation(
         tickets = TicketCollection(request.session)
         ticket = tickets.by_handler_id(token.hex)
         assert ticket is not None
+
+        # if we're accessing this view through the ticket it
+        # had better match the ticket we retrieved
+        if view_ticket is not None and view_ticket != ticket:
+            raise exc.HTTPNotFound()
 
         forms = FormCollection(request.session)
         submission = forms.submissions.by_id(token)
@@ -836,7 +843,30 @@ def accept_reservation(
     else:
         request.warning(_('The reservations have already been accepted'))
 
+    if view_ticket is not None:
+        return request.redirect(request.link(view_ticket))
+
     return request.redirect(request.link(self))
+
+
+@OrgApp.view(
+    model=ReservationTicket,
+    name='accept-reservation',
+    permission=Private
+)
+def accept_reservation_from_ticket(
+    self: ReservationTicket,
+    request: OrgRequest
+) -> Response:
+
+    if self.handler.deleted:
+        raise exc.HTTPNotFound()
+
+    return accept_reservation(
+        self.handler.reservations[0],
+        request,
+        view_ticket=self
+    )
 
 
 @OrgApp.form(
@@ -850,17 +880,25 @@ def accept_reservation_with_message(
     self: Reservation,
     request: OrgRequest,
     form: InternalTicketChatMessageForm,
-    layout: TicketChatMessageLayout | None = None
+    layout: TicketChatMessageLayout | None = None,
+    view_ticket: ReservationTicket | None = None,
 ) -> RenderData | Response:
 
     recipient = self.email
     if not recipient:
         request.alert(_('The submitter email is not available'))
+        if view_ticket is not None:
+            return request.redirect(request.link(view_ticket))
         return request.redirect(request.link(self))
 
     if form.submitted(request):
         return accept_reservation(
-            self, request, text=form.text.data, notify=form.notify.data)
+            self,
+            request,
+            text=form.text.data,
+            notify=form.notify.data,
+            view_ticket=view_ticket
+        )
 
     layout = layout or TicketChatMessageLayout(self, request)  # type:ignore
     return {
@@ -876,12 +914,38 @@ def accept_reservation_with_message(
     }
 
 
+@OrgApp.form(
+    model=ReservationTicket,
+    name='accept-reservation-with-message',
+    permission=Private,
+    form=InternalTicketChatMessageForm,
+    template='form.pt'
+)
+def accept_reservation_with_message_from_ticket(
+    self: ReservationTicket,
+    request: OrgRequest,
+    form: InternalTicketChatMessageForm,
+    layout: TicketChatMessageLayout | None = None
+) -> RenderData | Response:
+
+    if self.handler.deleted:
+        raise exc.HTTPNotFound()
+
+    return accept_reservation_with_message(
+        self.handler.reservations[0],
+        request,
+        form,
+        layout or TicketChatMessageLayout(self, request, internal=True)
+    )
+
+
 @OrgApp.view(model=Reservation, name='reject', permission=Private)
 def reject_reservation(
     self: Reservation,
     request: OrgRequest,
     text: str | None = None,
-    notify: bool = False
+    notify: bool = False,
+    view_ticket: ReservationTicket | None = None
 ) -> Response | None:
 
     token = self.token
@@ -912,7 +976,11 @@ def reject_reservation(
     ticket = tickets.by_handler_id(token.hex)
     assert ticket is not None
 
-    # if there's a acptured payment we cannot continue
+    # if we're accessing the view through a ticket it had better match
+    if view_ticket is not None and view_ticket != ticket:
+        raise exc.HTTPNotFound()
+
+    # if there's a captured payment we cannot continue
     payment = ticket.handler.payment
     if payment and payment.state == 'paid':
         request.alert(_(
@@ -921,6 +989,8 @@ def reject_reservation(
         ))
 
         if not request.headers.get('X-IC-Request'):
+            if view_ticket is not None:
+                return request.redirect(request.link(view_ticket))
             return request.redirect(request.link(self))
 
         return None
@@ -1029,8 +1099,30 @@ def reject_reservation(
 
     # return none on intercooler js requests
     if not request.headers.get('X-IC-Request'):
+        if view_ticket is not None:
+            return request.redirect(request.link(view_ticket))
         return request.redirect(request.link(self))
     return None
+
+
+@OrgApp.view(
+    model=ReservationTicket,
+    name='reject-reservation',
+    permission=Private
+)
+def reject_reservation_from_ticket(
+    self: ReservationTicket,
+    request: OrgRequest,
+) -> Response | None:
+
+    if self.handler.deleted:
+        raise exc.HTTPNotFound()
+
+    return reject_reservation(
+        self.handler.reservations[0],
+        request,
+        view_ticket=self
+    )
 
 
 @OrgApp.form(
@@ -1044,17 +1136,24 @@ def reject_reservation_with_message(
     self: Reservation,
     request: OrgRequest,
     form: InternalTicketChatMessageForm,
-    layout: TicketChatMessageLayout | None = None
+    layout: TicketChatMessageLayout | None = None,
+    view_ticket: ReservationTicket | None = None,
 ) -> RenderData | Response | None:
 
     recipient = self.email
     if not recipient:
         request.alert(_('The submitter email is not available'))
+        if view_ticket is not None:
+            return request.redirect(request.link(view_ticket))
         return request.redirect(request.link(self))
 
     if form.submitted(request):
         return reject_reservation(
-            self, request, text=form.text.data, notify=form.notify.data)
+            self, request,
+            text=form.text.data,
+            notify=form.notify.data,
+            view_ticket=view_ticket
+        )
 
     layout = layout or TicketChatMessageLayout(self, request)  # type:ignore
     return {
@@ -1068,3 +1167,28 @@ def reject_reservation_with_message(
             }
         )
     }
+
+
+@OrgApp.form(
+    model=ReservationTicket,
+    name='reject-reservation-with-message',
+    permission=Private,
+    form=InternalTicketChatMessageForm,
+    template='form.pt'
+)
+def reject_reservation_with_message_from_ticket(
+    self: ReservationTicket,
+    request: OrgRequest,
+    form: InternalTicketChatMessageForm,
+    layout: TicketChatMessageLayout | None = None
+) -> RenderData | Response | None:
+
+    if self.handler.deleted:
+        raise exc.HTTPNotFound()
+
+    return reject_reservation_with_message(
+        self.handler.reservations[0],
+        request,
+        form,
+        layout or TicketChatMessageLayout(self, request, internal=True)
+    )

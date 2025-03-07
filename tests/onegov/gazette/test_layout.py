@@ -1,6 +1,7 @@
 from datetime import date
 from datetime import datetime
 from freezegun import freeze_time
+from onegov.core.utils import append_query_param
 from onegov.gazette.layout import Layout
 from onegov.gazette.models import Issue
 from onegov.gazette.models import GazetteNotice
@@ -30,6 +31,7 @@ class DummyRequest:
         self.app = DummyApp(session, principal)
         self.locale = 'de_CH'
         self.session = session
+        self.csrf_token = 'XXX'
         self._is_secret = False
         self._is_private = False
         self._is_personal = False
@@ -63,7 +65,10 @@ class DummyRequest:
         return text.interpolate()
 
     def new_csrf_token(self):
-        return 'XXX'
+        return self.csrf_token
+
+    def csrf_protected_url(self, url):
+        return append_query_param(url, 'csrf-token', self.csrf_token)
 
 
 def test_layout_links():

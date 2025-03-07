@@ -2,6 +2,8 @@ from __future__ import annotations
 
 from onegov.activity import Activity, ActivityCollection, Booking, Occasion
 from onegov.core.security import Public, Private, Personal
+from onegov.core.security.roles import (
+    get_roles_setting as get_roles_setting_base)
 from onegov.core.security.rules import has_permission_logged_in
 from onegov.feriennet import FeriennetApp
 from onegov.feriennet.collections import NotificationTemplateCollection
@@ -15,6 +17,13 @@ from onegov.org.models import ImageFileCollection, SiteCollection
 from typing import Any, TYPE_CHECKING
 if TYPE_CHECKING:
     from morepath.authentication import Identity, NoIdentity
+    from onegov.core.security.roles import Intent
+
+
+@FeriennetApp.replace_setting_section(section='roles')
+def get_roles_setting() -> dict[str, set[type[Intent]]]:
+    # NOTE: Without a supporter role for now
+    return get_roles_setting_base()
 
 
 def is_owner(username: str, activity: Activity) -> bool:

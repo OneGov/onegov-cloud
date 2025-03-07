@@ -287,8 +287,7 @@ class UserCollection:
 
     def by_roles(self, role: str, *roles: str) -> Query[User]:
         """ Queries the users by roles. """
-        roles_list = [role, *list(roles)]
-        return self.query().filter(User.role.in_(roles_list))
+        return self.query().filter(User.role.in_([role, *roles]))
 
     def by_signup_token(self, signup_token: str) -> Query[User]:
         return self.query().filter_by(signup_token=signup_token)

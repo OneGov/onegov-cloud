@@ -2,10 +2,17 @@ from __future__ import annotations
 
 from onegov.core.security import Public, Private
 from onegov.org.forms import InternalTicketChatMessageForm
+from onegov.org.models.ticket import ReservationTicket
 from onegov.org.views.reservation import (
-    handle_reservation_form, confirm_reservation, get_reservation_form_class,
-    finalize_reservation, accept_reservation_with_message,
-    reject_reservation_with_message)
+    handle_reservation_form,
+    confirm_reservation,
+    get_reservation_form_class,
+    finalize_reservation,
+    accept_reservation_with_message,
+    accept_reservation_with_message_from_ticket,
+    reject_reservation_with_message,
+    reject_reservation_with_message_from_ticket,
+)
 from onegov.town6 import TownApp
 
 from onegov.reservation import Reservation, Resource
@@ -82,6 +89,24 @@ def town_accept_reservation_with_message(
 
 
 @TownApp.form(
+    model=ReservationTicket,
+    name='accept-reservation-with-message',
+    permission=Private,
+    form=InternalTicketChatMessageForm,
+    template='form.pt'
+)
+def town_accept_reservation_with_message_from_ticket(
+    self: ReservationTicket,
+    request: TownRequest,
+    form: InternalTicketChatMessageForm,
+    layout: TicketChatMessageLayout | None = None
+) -> RenderData | Response | None:
+    layout = TicketChatMessageLayout(self, request, internal=True)
+    return accept_reservation_with_message_from_ticket(
+        self, request, form, layout)
+
+
+@TownApp.form(
     model=Reservation,
     name='reject-with-message',
     permission=Private,
@@ -95,3 +120,21 @@ def town_reject_reservation_with_message(
 ) -> RenderData | Response | None:
     layout = TicketChatMessageLayout(self, request)  # type:ignore
     return reject_reservation_with_message(self, request, form, layout)
+
+
+@TownApp.form(
+    model=ReservationTicket,
+    name='reject-reservation-with-message',
+    permission=Private,
+    form=InternalTicketChatMessageForm,
+    template='form.pt'
+)
+def town_reject_reservation_with_message_from_ticket(
+    self: ReservationTicket,
+    request: TownRequest,
+    form: InternalTicketChatMessageForm,
+    layout: TicketChatMessageLayout | None = None
+) -> RenderData | Response | None:
+    layout = TicketChatMessageLayout(self, request, internal=True)
+    return reject_reservation_with_message_from_ticket(
+        self, request, form, layout)

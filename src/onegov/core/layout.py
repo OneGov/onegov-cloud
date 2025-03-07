@@ -140,18 +140,17 @@ class Layout:
             container_factory
         )
 
-    @cached_property
+    @property
     def csrf_token(self) -> str:
         """ Returns a csrf token for use with DELETE links (forms do their
         own thing automatically).
 
         """
-        token = self.request.new_csrf_token()
-        return token.decode('utf-8') if isinstance(token, bytes) else token
+        return self.request.csrf_token
 
     def csrf_protected_url(self, url: str) -> str:
         """ Adds a csrf token to the given url. """
-        return utils.append_query_param(url, 'csrf-token', self.csrf_token)
+        return self.request.csrf_protected_url(url)
 
     def format_date(self, dt: datetime | date | None, format: str) -> str:
         """ Takes a datetime and formats it according to local timezone and

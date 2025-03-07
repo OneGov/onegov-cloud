@@ -13,6 +13,7 @@ class DummyRequest():
     is_logged_in = False
     is_manager = False
     is_admin = False
+    is_supporter = False
     root_pages = ()
     current_user = Bunch(id=Bunch(hex='abcd'))
     path = ''

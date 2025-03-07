@@ -15,4 +15,5 @@ _('Not a valid choice')
 # Roles in plural form are not defined as translatable texts anywhere
 _('Admins')
 _('Editors')
+_('Supporters')
 _('Members')

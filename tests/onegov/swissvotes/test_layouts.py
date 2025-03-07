@@ -2,6 +2,7 @@ from datetime import date
 from decimal import Decimal
 from io import BytesIO
 from onegov.core.crypto import random_token
+from onegov.core.utils import append_query_param
 from onegov.file.utils import as_fileintent
 from onegov.swissvotes import _
 from onegov.swissvotes.collections import SwissVoteCollection
@@ -57,6 +58,7 @@ class DummyRequest:
     includes = []
     session = None
     url = ''
+    csrf_token = 'x'
 
     def has_role(self, *roles):
         return any((role in self.roles for role in roles))
@@ -83,7 +85,10 @@ class DummyRequest:
         return objects
 
     def new_csrf_token(self):
-        return 'x'
+        return self.csrf_token
+
+    def csrf_protected_url(self, url):
+        return append_query_param(url, 'csrf-token', self.csrf_token)
 
     def return_to(self, url, redirect):
         return f'{url}{redirect}'
