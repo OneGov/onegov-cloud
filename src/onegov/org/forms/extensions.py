@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+from datetime import timedelta
 from functools import cached_property
 from sedate import utcnow, to_timezone
 
@@ -20,6 +21,7 @@ from wtforms.fields import TextAreaField
 from wtforms.validators import DataRequired, InputRequired, ValidationError
 
 from typing import TypeVar, TYPE_CHECKING
+
 if TYPE_CHECKING:
     from collections.abc import Collection
     from markupsafe import Markup
@@ -273,20 +275,24 @@ class PublicationFormExtension(FormExtension[FormT], name='publication'):
                 end = self.publication_end
                 if not start or not end:
                     return None
+
+                # Check if publication end is in the future
                 if end.data and to_timezone(end.data, 'UTC') <= utcnow():
                     assert isinstance(self.publication_end.errors, list)
                     self.publication_end.errors.append(
                         _('Publication end must be in the future'))
                     return False
+
+                # Check if start is before end
                 if not start.data or not end.data:
                     return None
-
                 if end.data <= start.data:
                     for field_name in ('publication_start', 'publication_end'):
                         field = getattr(self, field_name)
                         field.errors.append(
                             _('Publication start must be prior to end'))
                     return False
+
                 return None
 
         return PublicationForm

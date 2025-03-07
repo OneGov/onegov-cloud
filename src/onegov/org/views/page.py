@@ -215,6 +215,14 @@ def view_news(
     if self.photo_album_id:
         request.include('photoswipe')
 
+    if self.push_notifications_were_sent_before():
+        request.message(_(
+                'Notifications have already been sent for this news item. '
+                'A new notification will not be sent, even if the '
+                'publication date is changed.'
+            ), 'info',
+        )
+
     assert self.trait is not None
     return {
         'layout': layout,

@@ -369,6 +369,13 @@ class News(Page, TraitInfo, SearchableContent, NewsletterExtension,
             all_hashtags.update(hashtags)
         return sorted(all_hashtags)
 
+    def push_notifications_were_sent_before(self) -> bool:
+        from onegov.org.models import PushNotification
+        session = object_session(self)
+        query = session.query(PushNotification).filter(
+            PushNotification.news_id == self.id)
+        return session.query(query.exists()).scalar()
+
 
 class TopicCollection(Pagination[Topic], AdjacencyListCollection[Topic]):
     """

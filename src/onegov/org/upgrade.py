@@ -391,3 +391,30 @@ def remove_stored_contact_html_and_opening_hours_html(
 
         if 'contact_html' in obj.content:
             del obj.content['contact_html']
+
+
+@upgrade_task('Add CASCADE delete to push notification foreign key')
+def add_cascade_delete_to_push_notification(context: UpgradeContext) -> None:
+    if not context.has_table('push_notification'):
+        return
+
+    constraint_name = 'push_notification_news_id_fkey'
+    schema_name = context.app.schema
+
+    if context.has_constraint('push_notification',
+            'push_notification_news_id_fkey',
+            'FOREIGN KEY'
+    ):
+        print(f'Dropping and recreating {constraint_name} in {schema_name}')
+
+        context.operations.drop_constraint(
+            constraint_name,
+            'push_notification',
+            type_='foreignkey'
+        )
+        context.operations.create_foreign_key(
+            constraint_name,
+            'push_notification', 'pages',
+            ['news_id'], ['id'],
+            ondelete='CASCADE'
+        )

@@ -6,7 +6,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: OneGov Cloud 1.0\n"
-"POT-Creation-Date: 2025-03-03 17:44+0100\n"
+"POT-Creation-Date: 2025-03-07 17:00+0100\n"
 "PO-Revision-Date: 2021-03-03 16:24+0100\n"
 "Last-Translator: Lukas Burkhard <lukas.burkhard@seantis.ch>\n"
 "Language-Team: German\n"
@@ -1711,8 +1711,14 @@ msgstr "Dateien zur Prüfung hierhin ziehen"
 msgid "Sent Notifications"
 msgstr "Gesendete Benachrichtigungen"
 
+msgid "News"
+msgstr "Nachricht"
+
 msgid "Sent At"
 msgstr "Gesendet am"
+
+msgid "Firebase Response Data"
+msgstr "Firebase Response Data"
 
 msgid "No notifications"
 msgstr "Keine Benachrichtigungen"
@@ -2217,6 +2223,9 @@ msgid ""
 msgstr ""
 "Gehen Sie mit Vorsicht vor. Tickets und die darin enthaltenen Daten können "
 "unwiderruflich gelöscht werden."
+
+msgid "Push Notification Overview"
+msgstr "Übersicht Push-Benachrichtigungen"
 
 msgid "New Note"
 msgstr "Neue Notiz"

@@ -5,7 +5,7 @@ from datetime import datetime, date
 from freezegun import freeze_time
 from onegov.core.request import CoreRequest
 from onegov.core.utils import module_path
-from onegov.org.models import Clipboard, ImageFileCollection
+from onegov.org.models import Clipboard, ImageFileCollection, PushNotification
 from onegov.org.models import Organisation
 from onegov.org.models import SiteCollection
 from onegov.org.models.file import GroupFilesByDateMixin
@@ -362,3 +362,28 @@ def test_holidays():
     assert date(2000, 1, 3) in o.holidays
 
     assert len(o.holidays.all(2000)) == 14
+
+
+def test_cascade_delete(session):
+    """Test that deleting a news item also deletes related notifications"""
+    collection = PageCollection(session)
+    news = collection.add_root("News", type='news')
+    news_1 = collection.add(
+        news,
+        title='One',
+        type='news',
+        lead='#some #thing',
+    )
+    session.add(news_1)
+    session.flush()
+    news_id = news_1.id
+    PushNotification.record_sent_notification(
+        session, news_id, "topic1", {"status": "sent"}
+    )
+    PushNotification.record_sent_notification(
+        session, news_id, "topic2", {"status": "sent"}
+    )
+    assert session.query(PushNotification).count() == 2
+    session.delete(news_1)
+    session.flush()
+    assert session.query(PushNotification).count() == 0
