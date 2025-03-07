@@ -34,6 +34,7 @@ from onegov.org.models.extensions import (
     GeneralFileLinkExtension, DeletableContentExtension)
 from onegov.org.models.ticket import ReservationHandler
 from onegov.gever.encrypt import decrypt_symmetric
+from cryptography.fernet import InvalidToken
 from sqlalchemy.exc import IntegrityError
 from onegov.org.views.allocation import handle_rules_cronjob
 from onegov.org.views.directory import (
@@ -884,13 +885,17 @@ def send_push_notifications_for_news(request: OrgRequest) -> None:
     key_base64 = request.app.hashed_identity_key
     encrypted_creds = org.firebase_adminsdk_credential
     if not encrypted_creds:
-        print('No Firebase credentials found')
         return
 
     try:
         firebase_creds_json = decrypt_symmetric(
             encrypted_creds.encode('utf-8'), key_base64
         )
+    except InvalidToken:
+        log.warning('Failed to decrypt Firebase credentials: InvalidToken')
+        return
+
+    try:
         # Get notification service
         notification_service = get_notification_service(firebase_creds_json)
 
