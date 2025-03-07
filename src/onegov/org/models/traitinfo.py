@@ -182,6 +182,7 @@ class TraitInfo:
                 request.link(Editor('edit', self)),
                 classes=('edit-link', )
             )
+
             assert request.path_info is not None
             yield Link(
                 _('Copy'),
