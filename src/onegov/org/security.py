@@ -44,10 +44,10 @@ def has_permission_ticket(
     if role not in ('admin', 'anonymous'):
         groups = app.ticket_permissions.get(model.handler_code, {})
         if model.group in groups:
-            if identity.groupid not in groups[model.group]:
+            if identity.groupids.isdisjoint(groups[model.group]):
                 role = 'member'
         elif None in groups:
-            if identity.groupid not in groups[None]:
+            if identity.groupids.isdisjoint(groups[None]):
                 role = 'member'
 
     if role == 'member':

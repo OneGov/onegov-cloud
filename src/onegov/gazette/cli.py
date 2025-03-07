@@ -124,11 +124,11 @@ def import_editors(
             email = getattr(line, columns['email'])
             realname = getattr(line, columns['name'])
             group_name = getattr(line, columns['group'])
-            group = added_groups[group_name] if group_name else None
+            group = [added_groups[group_name]] if group_name else []
             users.add(
                 username=email,
                 realname=realname,
-                group=group,
+                groups=group,
                 password=random_password(),
                 role='member',
             )

@@ -350,6 +350,17 @@ def handle_field(
             description=field.field_help
         )
 
+    elif field.type == 'chip_nr':
+        builder.add_field(
+            field_class=StringField,
+            field_id=field.id,
+            label=field.label,
+            dependency=dependency,
+            required=field.required,
+            validators=[Regexp(r'^[0-9]{15}$')],
+            description=field.field_help
+        )
+
     elif field.type == 'code':
         builder.add_field(
             field_class=TextAreaField,

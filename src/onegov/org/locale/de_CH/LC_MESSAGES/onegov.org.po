@@ -54,8 +54,8 @@ msgstr "Zeit von Bearbeitung bis Schliessung in Tagen im letzten Monat"
 msgid "Access"
 msgstr "Zugriff"
 
-msgid "Last Edited Pages"
-msgstr "Zuletzt bearbeitete Seiten"
+msgid "Last Edited Topics"
+msgstr "Zuletzt bearbeitete Themen"
 
 msgid "Last Edited News"
 msgstr "Zuletzt bearbeitete News"
@@ -3266,6 +3266,12 @@ msgstr "Kopieren"
 
 msgid "Paste"
 msgstr "Einfügen"
+
+msgid "A Topic cannot be pasted as News"
+msgstr "Ein Thema kann nicht als News eingefügt werden"
+
+msgid "A News cannot be pasted as Topic"
+msgstr "Eine Nachricht kann nicht als Thema eingefügt werden"
 
 msgid "Please note that this page has subpages which will also be deleted!"
 msgstr ""

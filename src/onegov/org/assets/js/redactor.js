@@ -6559,9 +6559,9 @@
 						file: String()
 						+ '<section id="redactor-modal-file-insert">'
 							+ '<div id="redactor-modal-file-upload-box">'
+								+ '<div id="redactor-modal-file-upload"></div>'
 								+ '<label>' + this.lang.get('filename') + '</label>'
 								+ '<input type="text" id="redactor-filename" aria-label="' + this.lang.get('filename') + '" /><br><br>'
-								+ '<div id="redactor-modal-file-upload"></div>'
 							+ '</div>'
 						+ '</section>',
 

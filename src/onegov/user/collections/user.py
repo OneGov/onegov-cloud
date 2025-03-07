@@ -149,7 +149,7 @@ class UserCollection:
         realname: str | None = None,
         phone_number: str | None = None,
         signup_token: str | None = None,
-        group: UserGroup | None = None
+        groups: list[UserGroup] | None = None
     ) -> User:
         """ Add a user to the collection.
 
@@ -176,7 +176,7 @@ class UserCollection:
             active=active,
             realname=realname,
             signup_token=signup_token,
-            group_id=group.id if group else None,
+            groups=groups or [],
             phone_number=phone_number
         )
 

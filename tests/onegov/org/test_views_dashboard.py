@@ -35,7 +35,7 @@ def test_view_dashboard_no_ticket(client):
     assert fact_numbers[5] == '-'  # lead time pending to closing
 
     # pages and news
-    assert 'Zuletzt bearbeitete Seiten' in page
+    assert 'Zuletzt bearbeitete Themen' in page
     assert 'Zuletzt bearbeitete News' in page
 
 
@@ -104,7 +104,7 @@ def test_view_dashboard_tickets(handlers, client, org_app):
     page = client.get('/dashboard')
     assert page.pyquery('.boardlet').length == 3
     assert 'Tickets' in page
-    assert 'Zuletzt bearbeitete Seiten' in page
+    assert 'Zuletzt bearbeitete Themen' in page
     assert 'Zuletzt bearbeitete News' in page
     fact_numbers = page.pyquery('.fact-number').text()
     fact_numbers = fact_numbers.split()
@@ -122,7 +122,7 @@ def test_view_dashboard_topics_news(handlers, client):
 
     assert page.pyquery('.boardlet').length == 3
     assert 'Tickets' in page
-    assert 'Zuletzt bearbeitete Seiten' in page
+    assert 'Zuletzt bearbeitete Themen' in page
     assert 'Zuletzt bearbeitete News' in page
 
     links = page.pyquery('.boardlet a')
@@ -131,14 +131,12 @@ def test_view_dashboard_topics_news(handlers, client):
         link_texts.append(link.text)
 
     # Topics
-    assert link_texts[0] == 'Wir haben eine neue Webseite!'
-    assert link_texts[1] == 'Aktuelles'
-    assert link_texts[2] == 'Kontakt'
-    assert link_texts[3] == 'Themen'
-    assert link_texts[4] == 'Organisation'
+    assert link_texts[0] == 'Kontakt'
+    assert link_texts[1] == 'Themen'
+    assert link_texts[2] == 'Organisation'
     # News
-    assert link_texts[5] == 'Wir haben eine neue Webseite!'
-    assert link_texts[6] == 'Aktuelles'
+    assert link_texts[3] == 'Wir haben eine neue Webseite!'
+    assert link_texts[4] == 'Aktuelles'
 
 
 def test_view_dashboard_web_stats(client, monkeypatch):

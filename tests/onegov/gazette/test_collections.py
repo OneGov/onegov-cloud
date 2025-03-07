@@ -260,14 +260,14 @@ def test_notice_collection_query_deleted_user(session):
         username='a@a.a',
         password='a',
         role='admin',
-        group=group_a
+        groups=[group_a]
     )
     user_b = users.add(
         realname="User B",
         username='b@b.b',
         password='b',
         role='admin',
-        group=group_b
+        groups=[group_b]
     )
 
     notices = GazetteNoticeCollection(session)
@@ -461,11 +461,11 @@ def test_notice_collection_count_by_group(session):
     groups.add(name='C')
 
     users = UserCollection(session)
-    user_a = users.add('a@example.org', 'pw', 'editor', group=group_a)
-    user_b = users.add('b@example.org', 'pw', 'editor', group=group_a)
+    user_a = users.add('a@example.org', 'pw', 'editor', groups=[group_a])
+    user_b = users.add('b@example.org', 'pw', 'editor', groups=[group_a])
     user_c = users.add('c@example.org', 'pw', 'admin')
     user_d = users.add('d@example.org', 'pw', 'publisher')
-    user_e = users.add('e@example.org', 'pw', 'publisher', group=group_b)
+    user_e = users.add('e@example.org', 'pw', 'publisher', groups=[group_b])
     user_f = users.add('f@example.org', 'pw', 'publisher')
     user_g = users.add('g@example.org', 'pw', 'publisher')
     user_h = users.add('h@example.org', 'pw', 'publisher')

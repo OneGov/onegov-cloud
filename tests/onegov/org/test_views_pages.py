@@ -497,6 +497,73 @@ def test_links(client):
     assert google.location == 'https://www.google.ch'
 
 
+def test_copy_paste_with_same_trait_only(client):
+    client.login_admin()
+
+    # test copy and paste topic (to different location in tree)
+    page = client.get('/topics/organisation')
+    edit = page.click('Thema')
+
+    edit.form['title'] = 'Dance Party'
+    edit.form['lead'] = '0xcafebabe'
+    party = edit.form.submit().follow()
+
+    assert '/topics/organisation/dance-party' in party.request.url
+
+    party.click('Kopieren')
+
+    edit = client.get('/topics/themen').click('Einf')
+
+    assert '0xcafebabe' in edit
+    page = edit.form.submit().follow()
+
+    assert 'Dance Party' in page
+    assert '/topics/themen/dance-party' in page.request.url
+
+    # test copy topic paste in news, fails
+    page.click('Kopieren')
+
+    news = client.get('/news')
+    assert 'Kopieren' in news
+    # paste button exists but disabled
+    assert 'Einf' in news
+    paste_link = news.pyquery('.paste-link.disabled-link')[0]
+    assert 'Einf' in paste_link.text
+    assert 'editor/paste/news' in paste_link.attrib['href']
+
+    # test copy and paste news
+    news = client.get('/news')
+    edit = news.click('Nachricht')
+
+    edit.form['title'] = 'Sink Hole'
+    edit.form['lead'] = '0xdeadbeef'
+
+    sinkhole = edit.form.submit().follow()
+
+    assert 'Sink Hole' in sinkhole
+    assert '0xdeadbeef' in sinkhole
+
+    sinkhole.click('Kopieren')
+
+    assert 'Einf' in sinkhole
+    edit = sinkhole.click('Einf')
+    edit.form['title'] = 'Sink Hole COPIED'
+
+    sinkhole_2 = edit.form.submit().follow()
+    assert 'Sink Hole COPIED' in sinkhole_2
+
+    # test copy news paste in topic, fails
+    sinkhole_2.click('Kopieren')
+    topics = client.get('/topics/themen')
+
+    assert 'Kopieren' in topics
+    # paste button exists but disabled
+    assert 'Einf' in topics
+    paste_link = topics.pyquery('.paste-link.disabled-link')[0]
+    assert 'Einf' in paste_link.text
+    assert 'editor/paste/page' in paste_link.attrib['href']
+
+
 def test_copy_pages_to_news(client):
     client.login_admin()
 

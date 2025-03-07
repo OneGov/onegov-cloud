@@ -230,6 +230,16 @@ default_serializers.register(BytesSerializer(
     decode=lambda b: tuple(unpackb(b))
 ))
 
+# NOTE: We currently only use this to serialize the groupids
+#       for the current identity, we could consider replacing
+#       this with a serializer for morepath.Identity instead
+default_serializers.register(BytesSerializer(
+    tag=6,
+    target=frozenset,
+    encode=lambda t: packb(list(t)),
+    decode=lambda b: frozenset(unpackb(b))
+))
+
 
 # NOTE: SQLAlchemy result support
 def load_keyed_tuple(b: bytes) -> AbstractKeyedTuple[Any]:
@@ -239,7 +249,7 @@ def load_keyed_tuple(b: bytes) -> AbstractKeyedTuple[Any]:
 
 
 default_serializers.register(BytesSerializer(
-    tag=6,
+    tag=7,
     target=AbstractKeyedTuple,
     encode=lambda t: packb([
         t.__class__.__name__,
@@ -249,7 +259,7 @@ default_serializers.register(BytesSerializer(
 ))
 
 default_serializers.register(StringSerializer(
-    tag=7,
+    tag=8,
     target=Markup,
     encode=str,
     decode=Markup

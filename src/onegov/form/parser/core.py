@@ -395,7 +395,7 @@ from decimal import Decimal
 from functools import lru_cache
 from onegov.core.utils import Bunch
 from onegov.form import errors
-from onegov.form.parser.grammar import checkbox, field_help_identifier
+from onegov.form.parser.grammar import checkbox, chip_nr, field_help_identifier
 from onegov.form.parser.grammar import code
 from onegov.form.parser.grammar import date
 from onegov.form.parser.grammar import datetime
@@ -430,7 +430,7 @@ if TYPE_CHECKING:
         'PasswordField | EmailField | UrlField | VideoURLField | DateField | '
         'DatetimeField | TimeField | StringField | TextAreaField | '
         'CodeField | StdnumField | IntegerRangeField | '
-        'DecimalRangeField | RadioField | CheckboxField'
+        'DecimalRangeField | RadioField | CheckboxField | ChipNrField'
     )
     FileParsedField: TypeAlias = 'FileinputField | MultipleFileinputField'
     ParsedField: TypeAlias = BasicParsedField | FileParsedField
@@ -461,6 +461,7 @@ def create_parser_elements() -> Bunch:
     elements.checkbox = checkbox()
     elements.integer_range = integer_range_field()
     elements.decimal_range = decimal_range_field()
+    elements.chip_nr = chip_nr()
     elements.boxes = elements.checkbox | elements.radio
     elements.single_line_fields = elements.identifier + pp.MatchFirst([
         elements.textfield,
@@ -477,6 +478,7 @@ def create_parser_elements() -> Bunch:
         elements.fileinput,
         elements.integer_range,
         elements.decimal_range,
+        elements.chip_nr,
     ])
 
     return elements
@@ -576,6 +578,14 @@ def construct_stdnum(
     node: ScalarNode
 ) -> pp.ParseResults:
     return ELEMENTS.stdnum.parse_string(node.value)
+
+
+@constructor('!chip_nr')
+def construct_chip_nr(
+    loader: CustomLoader,
+    node: ScalarNode
+) -> pp.ParseResults:
+    return ELEMENTS.chip_nr.parse_string(node.value)
 
 
 @constructor('!date')
@@ -995,6 +1005,11 @@ class StdnumField(Field):
             format=field.format,
             field_help=field_help
         )
+
+
+@final
+class ChipNrField(Field):
+    type: ClassVar[Literal['chip_nr']] = 'chip_nr'
 
 
 @final

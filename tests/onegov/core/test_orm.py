@@ -843,7 +843,7 @@ def test_application_retries(postgres_dsn, number_of_retries, redis_url):
         def remember(response):
             identity = morepath.Identity(
                 userid='admin',
-                groupid='admins',
+                groupids=frozenset({'admins'}),
                 role='editor',
                 application_id=request.app.application_id
             )

@@ -192,7 +192,7 @@ def test_has_permission(redis_url):
 
         user = request.params.get('user')
         if user:
-            user = Bunch(username=user, id=uuid4(), group_id=None, role=None)
+            user = Bunch(username=user, id=uuid4(), groups=[], role=None)
 
         if request.has_permission(self, permission, user):
             return 'true'
@@ -205,7 +205,7 @@ def test_has_permission(redis_url):
         def remember_identity(response):
             request.app.remember_identity(response, request, morepath.Identity(
                 userid='foo',
-                groupid='admins',
+                groupids=frozenset({'admins'}),
                 role='admin',
                 application_id=request.app.application_id
             ))
@@ -280,7 +280,7 @@ def test_permission_by_view(redis_url):
         def remember_identity(response):
             request.app.remember_identity(response, request, morepath.Identity(
                 userid='foo',
-                groupid='',
+                groupids=frozenset(),
                 role='admin',
                 application_id=request.app.application_id,
             ))
