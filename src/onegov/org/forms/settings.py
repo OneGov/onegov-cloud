@@ -1487,14 +1487,17 @@ class FirebaseSettingsForm(Form):
 
     def toggle_form_extension(self, valid_credentials: bool = False) -> None:
         if valid_credentials and self.firebase_adminsdk_credential.data:
-            self.request.app.settings.org.disabled_extensions = tuple(
-                ext for ext in
-                self.request.app.settings.org.disabled_extensions
+            (self.request.app.
+             settings.org).disabled_extensions = (  # type:ignore[attr-defined]
+                tuple(ext for ext in self.request.app.settings.org.
+                      disabled_extensions
                 if ext != 'PushNotificationFormExtension'
-            )
+            ))
         else:
-            self.request.app.settings.org.disabled_extensions = (
-                    (*self.request.app.settings.org.disabled_extensions,
+            (self.request.app.
+             settings.org).disabled_extensions = (  # type:ignore[attr-defined]
+                    (*self.request.app.settings.org.
+                     disabled_extensions,
                      'PushNotificationFormExtension')
             )
 
