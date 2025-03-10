@@ -232,6 +232,9 @@ class Organisation(Base, TimestampMixin):
     auto_archive_timespan: dict_property[int] = meta_property(default=0)
     auto_delete_timespan: dict_property[int] = meta_property(default=0)
 
+    # vat
+    vat_rate: dict_property[float | None] = meta_property(default=0.0)
+
     # MTAN Settings
     mtan_access_window_seconds: dict_property[int | None] = meta_property()
     mtan_access_window_requests: dict_property[int | None] = meta_property()
