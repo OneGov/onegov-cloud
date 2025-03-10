@@ -278,7 +278,8 @@ class GazetteNoticeCollection(OfficialNoticeCollection[GazetteNotice]):
             **kwargs
         )
         notice.user = user
-        notice.group = user.group if user else None
+        # FIXME: should the notice belong to multiple groups as well?
+        notice.group = user.groups[0] if user and user.groups else None
         notice.organization_id = organization_id
         notice.category_id = category_id
         notice.apply_meta(self.session)

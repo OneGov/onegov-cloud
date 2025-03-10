@@ -140,6 +140,9 @@ msgstr "UID Nummer"
 msgid "Swiss vat number"
 msgstr "MWST Nummer"
 
+msgid "Animal identification number (Microchip-Nr.)"
+msgstr "Tieridentifikationsnummer (Mikrochip-Nr.)"
+
 msgid "Password"
 msgstr "Passwort"
 

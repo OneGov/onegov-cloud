@@ -137,6 +137,9 @@ msgstr "Identificatore aziendale svizzero"
 msgid "Swiss vat number"
 msgstr "Partita iva svizzera"
 
+msgid "Animal identification number (Microchip-Nr.)"
+msgstr "Numero di identificazione dell'animale (Microchip-Nr.)"
+
 msgid "Password"
 msgstr "Password"
 

@@ -1665,7 +1665,7 @@ def test_send_push_notifications_for_news(
         assert message['topic'] == f'{org_app.schema}_news'
         assert message['title'] == 'Recent news with notifications'
         assert message['body'] == 'This should trigger a notification'
-        assert message['data']['url'] is not None
+        assert message['data'] is not None
 
     finally:
         # Clean up the test service
@@ -1824,8 +1824,10 @@ def test_send_push_notifications_for_news_complex(
         # Verify valid_news notification
         assert valid_news_msg is not None
         assert valid_news_msg['topic'] == f'{org_app.schema}_news'
-        assert valid_news_msg['body'] == 'This should trigger a notification'
-        assert valid_news_msg['data']['url'] is not None
+        assert valid_news_msg['title'] == 'Valid news with notifications'
+        assert (valid_news_msg['data']['lead'] ==
+                'This should trigger a notification')
+        assert valid_news_msg['data']['id'] == 'http://localhost/news'
 
         # Verify multi_topic_news notifications
         assert len(multi_topic_news_msgs) == 2

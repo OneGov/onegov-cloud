@@ -22,8 +22,10 @@ def test_user_add(session):
     groups = UserGroupCollection(session)
     group = groups.add(name='group')
 
-    user = users.add('abc@example.org', 'p@ssw0rd', 'root', group=group)
-    assert users.by_username(user.username).group.name == 'group'
+    user = users.add('abc@example.org', 'p@ssw0rd', 'root', groups=[group])
+    user_groups = users.by_username(user.username).groups
+    assert len(user_groups) == 1
+    assert user_groups[0].name == 'group'
 
 
 def test_user_add_conflict(session):

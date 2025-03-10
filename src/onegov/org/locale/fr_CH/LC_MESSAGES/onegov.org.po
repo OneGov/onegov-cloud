@@ -54,8 +54,8 @@ msgstr "Délai de traitement de l'attente à la clôture en jours le mois dernie
 msgid "Access"
 msgstr "Accès"
 
-msgid "Last Edited Pages"
-msgstr "Dernières pages modifiées"
+msgid "Last Edited Topics"
+msgstr "Derniers sujets modifiés"
 
 msgid "Last Edited News"
 msgstr "Dernières nouvelles modifiées"
@@ -3268,6 +3268,12 @@ msgstr "Copie"
 
 msgid "Paste"
 msgstr "Coller"
+
+msgid "A Topic cannot be pasted as News"
+msgstr "Un sujet ne peut pas être collé comme une nouvelle"
+
+msgid "A News cannot be pasted as Topic"
+msgstr "Une nouvelle ne peut pas être collée comme un sujet"
 
 msgid "Please note that this page has subpages which will also be deleted!"
 msgstr ""

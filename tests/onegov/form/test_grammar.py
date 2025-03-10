@@ -7,6 +7,7 @@ from decimal import Decimal
 from onegov.form.utils import decimal_range
 from onegov.form.parser.grammar import (
     checkbox,
+    chip_nr,
     code,
     currency,
     date,
@@ -447,3 +448,11 @@ def test_code():
 
     assert field.parseString('<markdown>').syntax == 'markdown'
     assert field.parseString('<markdown>').type == 'code'
+
+
+def test_chip_nr():
+    field = chip_nr()
+
+    f = field.parseString("chip-nr")
+    assert f.type == 'chip_nr'
+    assert f.asDict() == {'type': 'chip_nr'}
