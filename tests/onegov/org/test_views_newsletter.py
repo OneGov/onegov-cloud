@@ -366,6 +366,7 @@ def test_newsletter_subscribers_management_by_manager(client):
     def subscribe_by_manager(client):
         page = client.get('/newsletters')
         page.form['address'] = 'info@govikon.org'
+        page.form['confirmed'] = True
         page = page.form.submit().follow()
         assert ('Wir haben info@govikon.org zur Liste der Empfänger '
                 'hinzugefügt.' in page)
