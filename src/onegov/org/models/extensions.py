@@ -85,6 +85,7 @@ def json_to_links(
         if (link := value['link']) or value['text']
     ]
 
+
 class ContentExtension:
     """ Extends classes based on :class:`onegov.core.orm.mixins.ContentMixin`
     with custom data that is stored in either 'meta' or 'content'.
