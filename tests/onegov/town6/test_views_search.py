@@ -270,7 +270,8 @@ def test_search_publication_files(client_with_es):
     path = module_path('tests.onegov.org', 'fixtures/sample.pdf')
     with (open(path, 'rb') as f):
         page = client.get('/files')
-        page.form['file'] = [Upload('Sample.pdf', f.read(), 'application/pdf')]
+        page.form['file'] = [Upload(
+            'Sample.pdf', f.read(), 'application/pdf')]
         page.form.submit()
 
     client.app.es_indexer.process()
@@ -427,8 +428,8 @@ def test_search_future_events_are_sorted_by_occurrence_date(client_with_es):
     for current_client in (client, member, anom):
         results = current_client.get('/search?q=Concert')
         # Expect ordered by occurrence date, for all search results of 'Event'
-        assert [a.text.strip() for a in
-                results.pyquery('li.search-result-events a')] == [
+        assert [t.text.strip() for t in
+                results.pyquery('li.search-result-events a h5')] == [
             'Not sorted Concert', 'First Concert', 'Second Concert',
             'Third Concert', 'Forth Concert'
         ]
@@ -438,8 +439,8 @@ def test_search_future_events_are_sorted_by_occurrence_date(client_with_es):
         results = current_client.get('/search-postgres?q=Concert')
         # Expect future events ordered by occurrence date, far future first.
         # Past events are not sorted by occurrence date.
-        assert [a.text.strip() for a in
-                results.pyquery('li.search-result-events a')] == [
+        assert [t.text.strip() for t in
+                results.pyquery('li.search-result-events a h5')] == [
             'Forth Concert', 'Third Concert', 'Second Concert',
             'First Concert', 'Not sorted Concert'
         ]
