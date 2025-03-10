@@ -9,6 +9,7 @@ from typing import TYPE_CHECKING
 from onegov.feriennet.collections import MatchCollection
 from onegov.feriennet.collections.activity import VacationActivityCollection
 from onegov.feriennet.models.activity import VacationActivity
+from onegov.feriennet.utils import activity_ages, activity_min_cost, activity_spots
 if TYPE_CHECKING:
     from onegov.core.types import RenderData
     from onegov.feriennet.layout import DefaultLayout
@@ -90,4 +91,7 @@ class ActivitiesWidget:
             'activities': activities,
             'activities_link': layout.request.class_link(
                 VacationActivityCollection),
+            'activity_ages': activity_ages,
+            'activity_min_cost': activity_min_cost,
+            'activity_spots': activity_spots
         }

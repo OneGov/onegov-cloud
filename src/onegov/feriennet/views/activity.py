@@ -12,6 +12,7 @@ from onegov.activity import Occasion
 from onegov.activity import OccasionCollection
 from onegov.activity import Period
 from onegov.activity.models import ACTIVITY_STATES, DAYS
+
 from onegov.core.elements import Link, Confirm, Intercooler
 from onegov.core.security import Personal
 from onegov.core.security import Private
@@ -29,6 +30,8 @@ from onegov.feriennet.models import ActivityMessage
 from onegov.feriennet.models import VacationActivity
 from onegov.feriennet.models import VolunteerCart
 from onegov.feriennet.models import VolunteerCartAction
+from onegov.feriennet.utils import (activity_ages, activity_min_cost,
+                                    activity_max_cost)
 from onegov.org.mail import send_ticket_mail
 from onegov.org.models import TicketMessage
 from onegov.ticket import TicketCollection
@@ -70,7 +73,6 @@ WEEKDAYS = (
     _('Sa'),
     _('Su')
 )
-
 
 def get_activity_form_class(
     model: VacationActivity | VacationActivityCollection,
@@ -115,7 +117,6 @@ def occasions_by_period(
         (title, tuple(occasions)) for title, occasions in
         groupby(query, key=lambda o: o.period.title)
     )
-
 
 def filter_link(
     text: str,
@@ -581,14 +582,14 @@ def view_activities_as_json(
         }
 
     def age(activity: VacationActivity) -> JSON_ro:
-        ages = activity.activity_ages(request)
+        ages = activity_ages(activity, request)
         min_age = min(age.lower for age in ages) if ages else None
         max_age = max(age.upper - 1 for age in ages) if ages else None
         return {'min': min_age, 'max': max_age}
 
     def cost(activity: VacationActivity) -> JSON_ro:
-        min_cost = activity.activity_min_cost(request)
-        max_cost = activity.activity_max_cost(request)
+        min_cost = activity_min_cost(activity, request)
+        max_cost = activity_max_cost(activity, request)
         return {
             'min': float(min_cost) if min_cost is not None else 0.0,
             'max': float(max_cost) if max_cost is not None else 0.0

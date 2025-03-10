@@ -483,9 +483,9 @@
                     <span class="page-lead" tal:content="layout.paragraphify(activity.lead)"/>
 
                     <div class="row collapse" tal:define="
-                        ages activity.activity_ages(request);
-                        min_cost activity.activity_min_cost(request);
-                        available_spots activity.activity_spots(request);
+                        ages activity_ages(activity, request);
+                        min_cost activity_min_cost(activity, request);
+                        available_spots activity_spots(activity, request);
                     ">
                         <div class="small-12 columns factoids">
                             <tal:b condition="ages">
