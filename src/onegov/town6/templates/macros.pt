@@ -719,9 +719,12 @@
                     <h3 i18n:translate>Contact</h3>
                     <tal:b content="contact" />
                     <div tal:condition="sidepanel_contact|False">
-                        <ul class="sidebar-links">
+                        <ul class="sidebar-links more-list">
                             <li tal:repeat="contact sidepanel_contact" tal:condition="contact">
-                                <a href="${contact[1]}">${contact[0]}</a>
+                                <a class="list-link" href="${contact[1]}">
+                                <i class="fa fa-link" aria-hidden="true"></i>
+                                <span class="list-title">${contact[0]}</span>
+                                </a>
                             </li>
                         </ul>
                     </div>
