@@ -2,7 +2,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE 1.0\n"
-"POT-Creation-Date: 2025-03-05 11:08+0100\n"
+"POT-Creation-Date: 2025-03-10 13:54+0100\n"
 "PO-Revision-Date: 2022-03-15 10:50+0100\n"
 "Last-Translator: Marc Sommerhalder <marc.sommerhalder@seantis.ch>\n"
 "Language-Team: French\n"
@@ -62,6 +62,21 @@ msgstr "Dernières nouvelles modifiées"
 
 msgid "Web Statistics"
 msgstr "Statistiques Web"
+
+msgid "Unique Visitors in the Last Month"
+msgstr "Visiteurs uniques le mois dernier"
+
+msgid "Total Visits in the Last Month"
+msgstr "Total des visites le mois dernier"
+
+msgid "Total Page Views in the Last Month"
+msgstr "Total des pages vues le mois dernier"
+
+msgid "Number of Page Views per Visit"
+msgstr "Nombre de pages vues par visite"
+
+msgid "Average Visit Duration in Minutes"
+msgstr "Durée moyenne de la visite en minutes"
 
 msgid "No data available"
 msgstr "Aucune donnée disponible"
@@ -2260,14 +2275,6 @@ msgstr "Envoyer un e-mail d'activation avec des directives"
 msgid "A user with this e-mail address exists already"
 msgstr "Un utilisateur avec cette adresse e-mail existe déjà"
 
-msgid ""
-"Users can only be in one group. If they already belong to another group and "
-"get added here, they will automatically get removed from the other group."
-msgstr ""
-"Les utilisateurs ne peuvent faire partie que d'un seul groupe. S'ils "
-"appartiennent déjà à un autre groupe et sont ajoutés ici, ils seront "
-"automatiquement retirés de l'autre groupe. "
-
 msgid "Ticket permissions"
 msgstr "Autorisation des tickets"
 
@@ -3266,14 +3273,14 @@ msgstr "Voulez-vous vraiment supprimer l'iFrame « ${title} » ?"
 msgid "Copy"
 msgstr "Copie"
 
-msgid "Paste"
-msgstr "Coller"
+msgid "A News cannot be pasted as Topic"
+msgstr "Une nouvelle ne peut pas être collée comme un sujet"
 
 msgid "A Topic cannot be pasted as News"
 msgstr "Un sujet ne peut pas être collé comme une nouvelle"
 
-msgid "A News cannot be pasted as Topic"
-msgstr "Une nouvelle ne peut pas être collée comme un sujet"
+msgid "Paste"
+msgstr "Coller"
 
 msgid "Please note that this page has subpages which will also be deleted!"
 msgstr ""
@@ -6499,20 +6506,14 @@ msgstr "Un compte a été créé pour vous"
 msgid "The user was created successfully"
 msgstr "L'utilisateur a bien été créé"
 
-#~ msgid "Unique Visitors in the Last Month"
-#~ msgstr "Visiteurs uniques le mois dernier"
-
-#~ msgid "Total Visits in the Last Month"
-#~ msgstr "Total des visites le mois dernier"
-
-#~ msgid "Total Page Views in the Last Month"
-#~ msgstr "Total des pages vues le mois dernier"
-
-#~ msgid "Number of Page Views per Visit"
-#~ msgstr "Nombre de pages vues par visite"
-
-#~ msgid "Average Visit Duration in Minutes"
-#~ msgstr "Durée moyenne de la visite en minutes"
+#~ msgid ""
+#~ "Users can only be in one group. If they already belong to another group "
+#~ "and get added here, they will automatically get removed from the other "
+#~ "group."
+#~ msgstr ""
+#~ "Les utilisateurs ne peuvent faire partie que d'un seul groupe. S'ils "
+#~ "appartiennent déjà à un autre groupe et sont ajoutés ici, ils seront "
+#~ "automatiquement retirés de l'autre groupe. "
 
 #~ msgid "Terminaux ID"
 #~ msgstr "ID du terminal"

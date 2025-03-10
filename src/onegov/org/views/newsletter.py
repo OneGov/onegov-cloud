@@ -82,7 +82,7 @@ def get_newsletter_form(
     form = form.with_occurrences(request, occurrences)
 
     move_fields(
-        form, ("closing_remark",), None
+        form, ('closing_remark',), None
     )
 
     return form

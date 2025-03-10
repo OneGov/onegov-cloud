@@ -53,7 +53,7 @@ class NewsletterForm(Form):
         label=_('Editorial'),
         description=_('A few words about this edition of the newsletter'),
         render_kw={'rows': 6})
-    
+
     closing_remark = HtmlField(
         label=_('Closing remark'),
         description=_('Closing remark at the end of the newsletter'),
