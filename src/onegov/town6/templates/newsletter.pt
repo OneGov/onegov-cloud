@@ -42,5 +42,6 @@
                 </div>
             </tal:b>
         </div>
+        <p tal:condition="closing_remark|False" class="newsletter-closing-remark" tal:content="closing_remark" />
     </tal:b>
 </div>

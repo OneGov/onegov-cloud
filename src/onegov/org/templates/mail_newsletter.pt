@@ -44,6 +44,7 @@
                 </ul>
             </tal:b>
         </tal:b>
+        <p tal:condition="closing_remark|False" class="newsletter-closing-remark" tal:content="closing_remark" />
 
     </tal:b>
     <tal:b metal:fill-slot="above-footer">

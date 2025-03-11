@@ -388,6 +388,7 @@ def view_newsletter(
         'get_lead': get_lead,
         'show_tags': show_tags(request),
         'show_filters': show_filters(request),
+        'closing_remark': self.closing_remark,
     }
 
 
@@ -440,6 +441,7 @@ def handle_new_newsletter(
             return morepath.redirect(request.link(newsletter))
 
     layout = layout or NewsletterLayout(self, request)
+    layout.include_editor()
     layout.edit_mode = True
 
     return {
@@ -468,6 +470,7 @@ def edit_newsletter(
         form.apply_model(self)
 
     layout = layout or NewsletterLayout(self, request)
+    layout.include_editor()
     layout.edit_mode = True
 
     return {
@@ -509,7 +512,8 @@ def send_newsletter(
             'news': news,
             'occurrences': occurrences_by_newsletter(newsletter, request),
             'publications': publications_by_newsletter(newsletter, request),
-            'name_without_extension': name_without_extension
+            'name_without_extension': name_without_extension,
+            'closing_remark': newsletter.closing_remark,
         }
     )
     html = Template(_html)
@@ -681,7 +685,8 @@ def handle_preview_newsletter(
         'news': news,
         'occurrences': occurrences_by_newsletter(self, request),
         'publications': publications_by_newsletter(self, request),
-        'name_without_extension': name_without_extension
+        'name_without_extension': name_without_extension,
+        'closing_remark': self.closing_remark,
     }
 
 

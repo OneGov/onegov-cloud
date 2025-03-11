@@ -3,8 +3,9 @@ from __future__ import annotations
 from email_validator import validate_email
 from onegov.core.crypto import random_token
 from onegov.core.orm import Base
-from onegov.core.orm.mixins import (
-    ContentMixin, TimestampMixin, content_property, dict_property)
+from onegov.core.orm.mixins import (ContentMixin, TimestampMixin,
+                                    content_property, dict_markup_property,
+                                    dict_property)
 from onegov.core.orm.types import UTCDateTime, UUID
 from onegov.core.utils import normalize_for_url
 from onegov.search import SearchableContent
@@ -80,6 +81,9 @@ class Newsletter(Base, ContentMixin, TimestampMixin, SearchableContent):
     #: the content of the newsletter in html, this is not just the partial
     #: content, but the actual, fully rendered html content.
     html: Column[str] = Column(Text, nullable=False)
+
+    #: the closing remark of the newsletter
+    closing_remark = dict_markup_property('content')
 
     #: null if not sent yet, otherwise the date this newsletter was first sent
     sent: Column[datetime | None] = Column(UTCDateTime, nullable=True)

@@ -67,10 +67,12 @@ class NewsletterForm(Form):
         model.title = self.title.data
         model.lead = self.lead.data
         model.html = self.get_html(request)
+        model.closing_remark = self.closing_remark.data
 
     def apply_model(self, model: Newsletter) -> None:
         self.title.data = model.title
         self.lead.data = model.lead
+        self.closing_remark.data = model.closing_remark
 
     # FIXME: same here
     def get_html(self, request: OrgRequest) -> str:
