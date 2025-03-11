@@ -40,6 +40,8 @@ if TYPE_CHECKING:
         schema: str
         type_name: str  # FIXME: not needed for fts
         tablename: str
+        owner_type: str
+        owner_id: UUID | str | int
         language: str
         properties: dict[str, Any]
 
@@ -427,17 +429,18 @@ class PostgresIndexer(IndexerBase):
                 for k in ('es_public', 'es_tags', 'es_last_change'):
                     if k in task['properties']:
                         data[k] = task['properties'][k]
-                _owner_id_int = (
-                    task)['id'] if isinstance(task['id'], int) else None
-                _owner_id_uuid = (
-                    task)['id'] if isinstance(task['id'], UUID) else None
-                _owner_type = task['type_name']
+                _owner_id: int | UUID | str = task['owner_id']
+                _owner_type = task['owner_type']  # class name
 
                 params.append({
                     '_language': language,
                     '_data': data,
-                    '_owner_id_int': _owner_id_int,
-                    '_owner_id_uuid': _owner_id_uuid,
+                    '_owner_id_int':
+                        _owner_id if isinstance(_owner_id, int) else None,
+                    '_owner_id_uuid':
+                        _owner_id if isinstance(_owner_id, UUID) else None,
+                    '_owner_id_str':
+                        _owner_id if isinstance(_owner_id, str) else None,
                     '_owner_type': _owner_type,
                     **{f'_{k}': v for k, v in data.items()}
                 })
@@ -474,6 +477,8 @@ class PostgresIndexer(IndexerBase):
                                 sqlalchemy.bindparam('_owner_id_int'),
                                 SearchIndex.__table__.c.owner_id_uuid ==
                                 sqlalchemy.bindparam('_owner_id_uuid'),
+                                SearchIndex.__table__.c.owner_id_str ==
+                                sqlalchemy.bindparam('_owner_id_str')
                             ),
                             SearchIndex.__table__.c.owner_type ==
                             sqlalchemy.bindparam('_owner_type'),
@@ -497,6 +502,8 @@ class PostgresIndexer(IndexerBase):
                                 sqlalchemy.bindparam('_owner_id_int'),
                             SearchIndex.__table__.c.owner_id_uuid:
                                 sqlalchemy.bindparam('_owner_id_uuid'),
+                            SearchIndex.__table__.c.owner_id_str:
+                                sqlalchemy.bindparam('_owner_id_str'),
                             SearchIndex.__table__.c.owner_type:
                                 sqlalchemy.bindparam('_owner_type'),
                             SearchIndex.__table__.c.fts_idx_data:
@@ -519,7 +526,7 @@ class PostgresIndexer(IndexerBase):
         except Exception as ex:
             index_log.error(
                 f'Error "{ex}" creating index schema {tasks[0]["schema"]} of '
-                f'type {params[0]["_owner_type"]}, tasks:',
+                f'type {tasks[0]["owner_type"]}, tasks:',
                 [t['id'] for t in tasks],
             )
             return False
@@ -555,6 +562,11 @@ class PostgresIndexer(IndexerBase):
                     stmt = (
                         sqlalchemy.delete(SearchIndex)
                         .where(SearchIndex.owner_id_int == _owner_id)
+                    )
+                elif isinstance(_owner_id, str):
+                    stmt = (
+                        sqlalchemy.delete(SearchIndex)
+                        .where(SearchIndex.owner_id_str == _owner_id)
                     )
 
                 if session is None:
@@ -1069,6 +1081,8 @@ class ORMEventTranslator:
                 'schema': schema,
                 'type_name': obj.es_type_name,
                 'tablename': obj.__tablename__,  # FIXME: not needed for fts
+                'owner_type': obj.__class__.__name__,
+                'owner_id': getattr(obj, obj.es_id),
                 'language': language,
                 'properties': {}
             }

@@ -10,9 +10,13 @@ from sedate import utcnow
 from sqlalchemy import func, Numeric, cast, DateTime
 from typing import TYPE_CHECKING, Any
 
+
 from onegov.core.collection import Pagination, _M
+from onegov.core.orm import Base
 from onegov.event.models import Event
-from onegov.search.utils import searchable_sqlalchemy_models
+from onegov.search.search_index import SearchIndex
+from onegov.search.utils import searchable_sqlalchemy_models, \
+    filter_for_base_models
 
 if TYPE_CHECKING:
     from onegov.org.request import OrgRequest
@@ -192,9 +196,10 @@ class SearchPostgres(Pagination[_M]):
         self.number_of_docs = 0
         self.number_of_results = 0
 
-        self.search_models = {
+        models = {
             model for base in self.request.app.session_manager.bases
             for model in searchable_sqlalchemy_models(base)}
+        self.search_models = filter_for_base_models(models)
 
     @cached_property
     def available_documents(self) -> int:
@@ -292,42 +297,60 @@ class SearchPostgres(Pagination[_M]):
 
         return query
 
+    def get_model_by_class_name(self, class_name):
+        for cls in Base._decl_class_registry.values():
+            if not hasattr(cls, '__name__'):
+                continue
+            if cls.__name__ == class_name:
+                return cls
+        return None
+
     def generic_search(self) -> list[Searchable]:
-        doc_count = 0
         results: list[Any] = []
         language = locale_mapping(self.request.locale or 'de_CH')
         ts_query = func.websearch_to_tsquery(language,
                                              func.unaccent(self.query))
 
-        for model in self.search_models:
-            # rank results after its text search relevance multiplied by a
-            # time decay function based on the last change to prioritize
-            # more recent documents
-            decay_rank = (
-                func.ts_rank_cd(model.fts_idx, ts_query, 0) *
-                    cast(func.pow(0.9,
-                        func.extract('epoch',
-                            func.now() - func.coalesce(
-                                cast(
-                                    model.fts_idx_data[
-                                        'es_last_change'].astext,
-                                    DateTime),
-                                func.now())
-                        ) / 86400),
-                        Numeric)
-            ).label('rank')
+        # rank results after its text search relevance multiplied by a
+        # time decay function based on the last change to prioritize
+        # more recent documents
+        decay_rank = (
+            func.ts_rank_cd(SearchIndex.fts_idx, ts_query, 0) *
+                cast(func.pow(0.9,
+                    func.extract('epoch',
+                        func.now() - func.coalesce(
+                            cast(
+                                SearchIndex.fts_idx_data[
+                                    'es_last_change'].astext,
+                                DateTime),
+                            func.now())
+                    ) / 86400),
+                    Numeric)
+        ).label('rank')
 
-            query = self.request.session.query(model, decay_rank)
-            doc_count += query.count()
-            query = self.filter_user_level(model, query)
-            query = query.filter(model.fts_idx.op('@@')(ts_query))
+        query = self.request.session.query(SearchIndex, decay_rank)
+        query = self.filter_user_level(SearchIndex, query)
+        query = query.filter(SearchIndex.fts_idx.op('@@')(ts_query))
 
-            if self.request.session.query(query.exists()).scalar():
-                results.extend(query)
+        for index_entry, rank in query.all():
+            model = self.get_model_by_class_name(index_entry.owner_type)
 
-        results.sort(key=lambda x: x.rank, reverse=True)
+            if model:
+                if index_entry.owner_id_int is not None:
+                    owner_id = index_entry.owner_id_int
+                elif index_entry.owner_id_uuid is not None:
+                    owner_id = index_entry.owner_id_uuid
+                else:
+                    owner_id = index_entry.owner_id_str
 
-        self.number_of_docs = doc_count
+                q = self.request.session.query(model)
+                attr_id = model.id
+                q = q.filter(attr_id == owner_id).first()
+
+                if q:
+                    results.append((q, rank))
+
+        results.sort(key=lambda x: x[1], reverse=True)
         self.number_of_results = len(results)
 
         # only return the model instances
@@ -338,15 +361,14 @@ class SearchPostgres(Pagination[_M]):
         results: list[Any] = []
         q = self.query.lstrip('#')
 
-        for model in self.search_models:
-            query = self.request.session.query(model)
-            doc_count += query.count()
-            query = self.filter_user_level(model, query)
-            query = query.filter(
-                model.fts_idx_data['es_tags'].contains([q]))
+        query = self.request.session.query(SearchIndex)
+        doc_count += query.count()
+        query = self.filter_user_level(SearchIndex, query)
+        query = query.filter(
+            SearchIndex.fts_idx_data['es_tags'].contains([q]))
 
-            if self.request.session.query(query.exists()).scalar():
-                results.extend(query)
+        if self.request.session.query(query.exists()).scalar():
+            results.extend(query)
 
         self.number_of_docs = doc_count
         self.number_of_results = len(results)
