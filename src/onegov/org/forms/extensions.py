@@ -77,9 +77,9 @@ class SubmitterFormExtension(FormExtension[FormT], name='submitter'):
             )
 
             def on_request(self) -> None:
-                """ This is not an optimal solution defining this on a form
-                extension. However, this is the first of it's kind.
-                Don't forget to call super for the next one. =) """
+                # This is not an optimal solution defining this on a form
+                # extension. However, this is the first of it's kind.
+                # Don't forget to call super for the next one. =)
                 if hasattr(super(), 'on_request'):
                     super().on_request()
 
@@ -321,12 +321,18 @@ class PushNotificationFormExtension(FormExtension[FormT], name='publish'):
             )
 
             def on_request(self) -> None:
+                # This is not an optimal solution defining this on a form
+                # extension. However, this is the first of it's kind.
+                # Don't forget to call super for the next one. =)
+                if hasattr(super(), 'on_request'):
+                    super().on_request()
 
                 if not self.request.app.org.firebase_adminsdk_credential:
                     self.delete_field('send_push_notifications_to_app')
                     self.delete_field('push_notifications')
                     return None
 
+                # Don't show any choices for this
                 if not hasattr(self, 'send_push_notifications_to_app'):
                     return None
 
@@ -365,6 +371,11 @@ class HoneyPotFormExtension(FormExtension[FormT], name='honeypot'):
             duplicate_of = HoneyPotField()
 
             def on_request(self) -> None:
+                # This is not an optimal solution defining this on a form
+                # extension.
+                # Don't forget to call super for the next one. =)
+                if hasattr(super(), 'on_request'):
+                    super().on_request()
                 if self.model and not getattr(self.model, 'honeypot', False):
                     self.delete_field('duplicate_of')
 
