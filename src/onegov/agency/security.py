@@ -272,7 +272,7 @@ def has_permission_person_mutation_ticket(
 def has_permission_ticket_collection(
     app: AgencyApp,
     identity: Identity,
-    model: AgencyCollection,
+    model: TicketCollection | ArchivedTicketCollection,
     permission: object
 ) -> bool:
     return has_permission_all(app, identity, model, permission)

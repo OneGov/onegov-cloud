@@ -6,6 +6,7 @@ from onegov.core.security.roles import (
 from onegov.org.app import OrgApp
 from onegov.org.models import Export
 from onegov.org.views.directory import DirectorySubmissionAction
+from onegov.pay import Payment, PaymentCollection
 from onegov.ticket import Ticket, TicketCollection
 from onegov.ticket.collection import ArchivedTicketCollection
 
@@ -33,7 +34,7 @@ def get_roles_setting() -> dict[str, set[type[Intent]]]:
         Has access to most things
 
     **supporter**
-        Has access to the ticket system
+        Has access to the ticket (and payment) system
 
     **member**
         Has access their own data
@@ -103,11 +104,27 @@ def has_permission_ticket(
 def has_permission_ticket_collection(
     app: OrgApp,
     identity: Identity,
-    model: TicketCollection,
+    model: TicketCollection | ArchivedTicketCollection,
     permission: object
 ) -> bool:
 
     # Supporter has elevated permissions for tickets
+    if identity.role == 'supporter':
+        return permission in {Public, Private, Personal}
+
+    return permission in getattr(app.settings.roles, identity.role)
+
+
+@OrgApp.permission_rule(model=Payment, permission=object)
+@OrgApp.permission_rule(model=PaymentCollection, permission=object)
+def has_permission_payments(
+    app: OrgApp,
+    identity: Identity,
+    model: Payment | PaymentCollection,
+    permission: object
+) -> bool:
+
+    # Supporter has elevated permissions for payments
     if identity.role == 'supporter':
         return permission in {Public, Private, Personal}
 
