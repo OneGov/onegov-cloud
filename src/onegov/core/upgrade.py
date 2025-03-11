@@ -485,6 +485,14 @@ class UpgradeContext:
     def has_constraint(
         self, table_name: str, constraint_name: str, constraint_type: str
     ) -> bool:
+        """ Check if a specific constraint exists on a table.
+
+        When constraint names aren't known, they can be discovered:
+
+        SELECT constraint_name FROM information_schema.table_constraints
+        WHERE table_name = 'table_name'
+        AND constraint_name LIKE '%column_name%';
+        """
         return self.session.execute(text("""
             SELECT EXISTS (
                 SELECT 1 FROM information_schema.table_constraints

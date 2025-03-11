@@ -5,16 +5,20 @@ upgraded on the server. See :class:`onegov.core.upgrade.upgrade_task`.
 from __future__ import annotations
 
 from itertools import chain
+
+import pytz
+
 from onegov.core.crypto import random_token
 from onegov.core.orm import Base, find_models
-from onegov.core.orm.types import JSON
+from onegov.core.orm.types import JSON, UTCDateTime
 from onegov.core.upgrade import upgrade_task, UpgradeContext
 from onegov.core.utils import normalize_for_url
 from onegov.directory import DirectoryEntry
 from onegov.directory.models.directory import DirectoryFile
 from onegov.file import File
 from onegov.form import FormDefinition
-from onegov.org.models import Organisation, Topic, News, ExtendedDirectory
+from onegov.org.models import Organisation, Topic, News, ExtendedDirectory,\
+    PushNotification
 from onegov.org.utils import annotate_html
 from onegov.page import Page, PageCollection
 from onegov.reservation import Resource
@@ -418,3 +422,29 @@ def add_cascade_delete_to_push_notification(context: UpgradeContext) -> None:
             ['news_id'], ['id'],
             ondelete='CASCADE'
         )
+
+
+@upgrade_task('Convert push_notification.sent_at to UTCDateTime correctly')
+def convert_sent_at_to_utc_datetime(context: UpgradeContext) -> None:
+    if not context.has_column('push_notification', 'sent_at'):
+        return
+
+    notifications = context.session.query(PushNotification).all()
+    zurich = pytz.timezone('Europe/Zurich')
+
+    for notification in notifications:
+        if notification.sent_at:
+            # Check if the datetime is naive (no tzinfo)
+            if notification.sent_at.tzinfo is None:
+                # Localize naive datetime
+                localized = zurich.localize(notification.sent_at)
+            else:
+                # If it's already timezone-aware, just convert it to UTC
+                localized = notification.sent_at.astimezone(pytz.UTC)
+
+            notification.sent_at = localized
+
+    context.session.flush()
+    context.operations.alter_column(
+        'push_notification', 'sent_at', type_=UTCDateTime
+    )

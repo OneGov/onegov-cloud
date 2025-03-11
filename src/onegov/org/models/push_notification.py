@@ -1,12 +1,12 @@
 from __future__ import annotations
 
+from onegov.core.orm.types import UTCDateTime
 from uuid import uuid4
 from onegov.core.collection import GenericCollection
 from sedate import utcnow
 from sqlalchemy import (
     Column,
     String,
-    DateTime,
     ForeignKey,
     Integer,
     UniqueConstraint,
@@ -53,7 +53,7 @@ class PushNotification(Base):
     topic_id: Column[str] = Column(String, nullable=False)
 
     #: When the notification was sent
-    sent_at = Column(DateTime, nullable=False, default=utcnow)
+    sent_at = Column(UTCDateTime, nullable=False, default=utcnow)
 
     #: Response information from the notification service
     response_data: Column[dict[str, Any] | None] = Column(JSON, nullable=True)
@@ -77,9 +77,6 @@ class PushNotification(Base):
         topic_id: str,
         response_data: dict[str, Any] | None
     ) -> PushNotification:
-        """
-        Record that a notification was sent for the given news item and topic.
-        """
         notification = cls(
             news_id=news_id,
             topic_id=topic_id,
