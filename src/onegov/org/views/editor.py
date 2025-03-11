@@ -12,6 +12,7 @@ from onegov.org.layout import EditorLayout, PageLayout
 from onegov.org.management import PageNameChange
 from onegov.org.models import Clipboard, Editor
 from onegov.org.models.organisation import Organisation
+from onegov.org.models import News
 from onegov.page import PageCollection
 
 
@@ -19,7 +20,7 @@ from typing import cast, TYPE_CHECKING
 if TYPE_CHECKING:
     from onegov.core.types import RenderData
     from onegov.form import Form
-    from onegov.org.models import News, Topic
+    from onegov.org.models import Topic
     from onegov.org.request import OrgRequest
     from onegov.page import Page
     from webob import Response
@@ -194,6 +195,15 @@ def handle_edit_page(
         return morepath.redirect(request.link(self.page))
     elif not request.POST:
         form.process(obj=self.page)
+        if self.page.trait == 'news':
+            assert isinstance(self.page, News)
+            if self.page.push_notifications_were_sent_before():
+                request.message(_(
+                    'Notifications have already been sent for this news item. '
+                    'A new notification will not be sent, even if the '
+                    'publication date is changed.'
+                ), 'info',
+                )
 
     return {
         'layout': layout,

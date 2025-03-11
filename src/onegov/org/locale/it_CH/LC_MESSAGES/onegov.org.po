@@ -2,7 +2,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: \n"
-"POT-Creation-Date: 2025-03-11 16:04+0100\n"
+"POT-Creation-Date: 2025-03-11 16:35+0100\n"
 "PO-Revision-Date: 2022-03-15 10:52+0100\n"
 "Last-Translator: \n"
 "Language-Team: \n"
@@ -11,6 +11,7 @@ msgstr ""
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Generated-By: xls-to-po 1.0\n"
+"gengo-order-id: 7629694\n"
 "X-Generator: Poedit 3.0.1\n"
 
 #, python-format
@@ -2161,6 +2162,16 @@ msgstr "Formato JSON non valido nelle credenziali Firebase"
 msgid "Error validating Firebase credentials: {0}"
 msgstr "Errore durante la convalida delle credenziali Firebase: {0}"
 
+msgid "VAT Rate"
+msgstr "Aliquota IVA"
+
+msgid ""
+"This is the VAT rate in percent. The VAT rate will apply to all prices in "
+"the forms."
+msgstr ""
+"Si tratta del tasso di IVA in percentuale. Il tasso di IVA si applicherà a "
+"tutti i prezzi nei moduli."
+
 msgid ""
 "Select newsletter categories your are interested in. You will receive the "
 "newsletter if it reports on at least one of the subscribed categories."
@@ -2394,6 +2405,9 @@ msgstr "Associazione sportiva"
 
 msgid "all day"
 msgstr "tutto il giorno"
+
+msgid "VAT"
+msgstr "IVA"
 
 msgid "Homepage"
 msgstr "Pagina principale"
@@ -4620,6 +4634,9 @@ msgstr "Notifiche inviate"
 msgid "Sent At"
 msgstr "Inviato a"
 
+msgid "Response Data"
+msgstr "Response Data"
+
 msgid "No notifications"
 msgstr "Nessuna notifica"
 
@@ -5399,6 +5416,13 @@ msgstr "Nuovo modulo documento"
 
 msgid "Edit Document Form"
 msgstr "Modifica modulo documento"
+
+msgid ""
+"Notifications have already been sent for this news item. A new notification "
+"will not be sent, even if the publication date is changed."
+msgstr ""
+"Des notifications ont déjà été envoyées pour cette actualité. Une nouvelle "
+"notification ne sera pas envoyé, même si la date de publication est modifiée."
 
 msgid "Moves the topic and all its sub topics to the given destination."
 msgstr ""
@@ -6205,6 +6229,9 @@ msgid ""
 msgstr ""
 "Procedere con cautela. I biglietti e i dati in essi contenuti possono essere "
 "irrevocabilmente cancellati."
+
+msgid "Value Added Tax"
+msgstr "Imposta sul valore aggiunto"
 
 msgid "Chat"
 msgstr "Chat"

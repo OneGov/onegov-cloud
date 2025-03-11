@@ -1728,6 +1728,9 @@ msgstr "Nouvelles"
 msgid "Sent At"
 msgstr "Envoyé à"
 
+msgid "Firebase Response Data"
+msgstr "Firebase Response Data"
+
 msgid "No notifications"
 msgstr "Pas de notifications"
 
@@ -2238,6 +2241,9 @@ msgid ""
 msgstr ""
 "Procédez avec prudence. Les billets et les données qu'ils contiennent "
 "peuvent être irrévocablement supprimés."
+
+msgid "Push Notification Overview"
+msgstr "Vue d'ensemble des notifications push"
 
 msgid "New Note"
 msgstr "Nouveau commentaire"

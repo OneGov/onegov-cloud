@@ -2,7 +2,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE 1.0\n"
-"POT-Creation-Date: 2025-03-11 16:04+0100\n"
+"POT-Creation-Date: 2025-03-11 16:35+0100\n"
 "PO-Revision-Date: 2022-03-15 10:50+0100\n"
 "Last-Translator: Marc Sommerhalder <marc.sommerhalder@seantis.ch>\n"
 "Language-Team: French\n"
@@ -2162,6 +2162,16 @@ msgstr ""
 "Une erreur s'est produite lors de la validation des informations "
 "d'identification Firebase : {0}"
 
+msgid "VAT Rate"
+msgstr "Taux de TVA"
+
+msgid ""
+"This is the VAT rate in percent. The VAT rate will apply to all prices in "
+"the forms."
+msgstr ""
+"Il s'agit du taux de TVA en pourcentage. Le taux de TVA s'appliquera à tous "
+"les prix dans les formulaires."
+
 msgid ""
 "Select newsletter categories your are interested in. You will receive the "
 "newsletter if it reports on at least one of the subscribed categories."
@@ -2394,6 +2404,9 @@ msgstr "Association sportive"
 
 msgid "all day"
 msgstr "toute la journée"
+
+msgid "VAT"
+msgstr "TVA"
 
 msgid "Homepage"
 msgstr "Page d'accueil"
@@ -4634,6 +4647,9 @@ msgstr "Notifications envoyées"
 msgid "Sent At"
 msgstr "Envoyé à"
 
+msgid "Response Data"
+msgstr "Response Data"
+
 msgid "No notifications"
 msgstr "Pas de notifications"
 
@@ -5422,6 +5438,14 @@ msgstr "Nouveau formulaire de document"
 
 msgid "Edit Document Form"
 msgstr "Modifier le formulaire de document"
+
+msgid ""
+"Notifications have already been sent for this news item. A new notification "
+"will not be sent, even if the publication date is changed."
+msgstr ""
+"Notifications ont déjà été envoyées pour cette nouvelle. Une nouvelle "
+"notification ne sera pas envoyée, même si la date de publication est "
+"modifiée."
 
 msgid "Moves the topic and all its sub topics to the given destination."
 msgstr "Déplace le sujet et tous ses sous-sujets vers la destination donnée."
@@ -6221,6 +6245,9 @@ msgstr ""
 "Procédez avec prudence. Les billets et les données qu'ils contiennent "
 "peuvent être irrévocablement supprimés."
 
+msgid "Value Added Tax"
+msgstr "Taxe sur la valeur ajoutée"
+
 msgid "Chat"
 msgstr "Chat"
 
@@ -6511,6 +6538,3 @@ msgstr "Un compte a été créé pour vous"
 
 msgid "The user was created successfully"
 msgstr "L'utilisateur a bien été créé"
-
-#~ msgid "Terminaux ID"
-#~ msgstr "ID du terminal"

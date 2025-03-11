@@ -2,7 +2,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE 1.0\n"
-"POT-Creation-Date: 2025-03-11 16:04+0100\n"
+"POT-Creation-Date: 2025-03-11 16:35+0100\n"
 "PO-Revision-Date: 2022-03-15 10:21+0100\n"
 "Last-Translator: Marc Sommerhalder <marc.sommerhalder@seantis.ch>\n"
 "Language-Team: German\n"
@@ -12,6 +12,7 @@ msgstr ""
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=2; plural=(n != 1);\n"
 "Generated-By: Lingua 3.12\n"
+"gengo-order-id: 7629695\n"
 "X-Generator: Poedit 3.0.1\n"
 
 #, python-format
@@ -2148,6 +2149,16 @@ msgstr "Ungültiges JSON-Format in den Firebase- Zugangsdaten"
 msgid "Error validating Firebase credentials: {0}"
 msgstr "Fehler bei der Überprüfung der Firebase- Zugangsdaten: {0}"
 
+msgid "VAT Rate"
+msgstr "Mehrwertsteuersatz"
+
+msgid ""
+"This is the VAT rate in percent. The VAT rate will apply to all prices in "
+"the forms."
+msgstr ""
+"Mehrwertsteuersatz in Prozent. Der Mehrwertsteuersatz wird auf alle Preise "
+"in den Formularen angewendet."
+
 msgid ""
 "Select newsletter categories your are interested in. You will receive the "
 "newsletter if it reports on at least one of the subscribed categories."
@@ -2383,6 +2394,9 @@ msgstr "Sporverein"
 
 msgid "all day"
 msgstr "den ganzen Tag"
+
+msgid "VAT"
+msgstr "MwSt"
 
 msgid "Homepage"
 msgstr "Startseite"
@@ -4624,6 +4638,9 @@ msgstr "Gesendete Benachrichtigungen"
 msgid "Sent At"
 msgstr "Gesendet am"
 
+msgid "Response Data"
+msgstr "Response Data"
+
 msgid "No notifications"
 msgstr "Keine Benachrichtigungen"
 
@@ -5400,6 +5417,14 @@ msgstr "Neues Dokumentenformular"
 
 msgid "Edit Document Form"
 msgstr "Dokumentenformular bearbeiten"
+
+msgid ""
+"Notifications have already been sent for this news item. A new notification "
+"will not be sent, even if the publication date is changed."
+msgstr ""
+"Für diese News wurden bereits Benachrichtigungen gesendet. Eine neue "
+"Benachrichtigung wird nicht gesendet, auch wenn das Publikationsdatum "
+"geändert wird."
 
 msgid "Moves the topic and all its sub topics to the given destination."
 msgstr "Verschiebt das Thema mit allen Unterthemen an den gewählten Ort."
@@ -6199,6 +6224,9 @@ msgid ""
 msgstr ""
 "Gehen Sie mit Vorsicht vor. Tickets und die darin enthaltenen Daten können "
 "unwiderruflich gelöscht werden."
+
+msgid "Value Added Tax"
+msgstr "Mehrwertsteuer"
 
 msgid "Chat"
 msgstr "Chat"
