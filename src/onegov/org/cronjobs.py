@@ -827,25 +827,26 @@ def delete_unconfirmed_newsletter_subscriptions(request: OrgRequest) -> None:
 
 
 def get_news_for_push_notification(session: Session) -> Query[News]:
+    # Use UTC time for database comparisons since publication_start is stored
+    # in UTC
     now = utcnow()
-    last_hour = now - timedelta(minutes=60)
 
     # Get all news items that should trigger push notifications
     query = session.query(News)
-    query = query.filter(News.published == True)
+    query = query.filter(News.published.is_(True))
     query = query.filter(News.publication_start <= now)
+    query = query.filter(News.publication_start.isnot(None))
+
     news_with_sent_notifications = session.query(
         PushNotification.news_id
     ).subquery()
     query = query.filter(~News.id.in_(news_with_sent_notifications))
-
-    # You may comment out the line below temporarily for testing
-    query = query.filter(News.publication_start >= last_hour)
-
-    only_public_news = query.filter(or_(
+    only_public_news = query.filter(
+        or_(
             News.meta['access'].astext == 'public',
             News.meta['access'].astext == None,
-        ))
+        )
+    )
 
     only_public_with_send_push_notification = only_public_news.filter(
         News.meta['send_push_notifications_to_app'].astext == 'true'
@@ -853,7 +854,7 @@ def get_news_for_push_notification(session: Session) -> Query[News]:
     return only_public_with_send_push_notification
 
 
-@OrgApp.cronjob(hour='*', minute='*/10', timezone='UTC')
+@OrgApp.cronjob(hour='*', minute='*/10', timezone='Europe/Zurich')
 def send_push_notifications_for_news(request: OrgRequest) -> None:
     """
     Cronjob that runs every 10 minutes to send push notifications for news
@@ -879,7 +880,7 @@ def send_push_notifications_for_news(request: OrgRequest) -> None:
         print('No news items found with push notifications enabled')
         return
 
-    # Get the mapping of topic IDs to hashtags
+    # Get the mapping
     topic_mapping = org.meta.get('selectable_push_notification_options', [])
     if not topic_mapping:
         print('selectable_push_notification_options is empty')

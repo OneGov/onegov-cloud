@@ -1488,18 +1488,20 @@ class FirebaseSettingsForm(Form):
         self.toggle_form_extension(not has_credential_errors)
 
     def toggle_form_extension(self, valid_credentials: bool = False) -> None:
-        org = self.request.app.settings.org
-        current_disabled = self.request.app.settings.org.disabled_extensions
-
         if valid_credentials and self.firebase_adminsdk_credential.data:
-            org.disabled_extensions = (  # type:ignore[attr-defined]
-                tuple(ext for ext in org.disabled_extensions
-                      if ext != 'PushNotificationExtension'))
+            (self.request.app.
+             settings.org).disabled_extensions = (  # type:ignore[attr-defined]
+                tuple(ext for ext in self.request.app.settings.org.
+                      disabled_extensions
+                if ext != 'PushNotificationExtension'
+            ))
         else:
-            # Add the extension to disabled list if not already present
-            if 'PushNotificationFormExtension' not in current_disabled:
-                org.disabled_extensions = (  # type:ignore[attr-defined]
-                    (*org.disabled_extensions, 'PushNotificationExtension'))
+            (self.request.app.
+             settings.org).disabled_extensions = (  # type:ignore[attr-defined]
+                    (*self.request.app.settings.org.
+                     disabled_extensions,
+                     'PushNotificationExtension')
+            )
 
     def validate_firebase_adminsdk_credential(
         self, field: TextAreaField

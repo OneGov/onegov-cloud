@@ -3,6 +3,8 @@ import os
 from collections import OrderedDict
 from datetime import datetime, date
 from freezegun import freeze_time
+from sqlalchemy.exc import IntegrityError
+import pytest
 from onegov.core.request import CoreRequest
 from onegov.core.utils import module_path
 from onegov.org.models import Clipboard, ImageFileCollection, PushNotification
@@ -387,3 +389,24 @@ def test_cascade_delete(session):
     session.delete(news_1)
     session.flush()
     assert session.query(PushNotification).count() == 0
+
+
+def test_duplicate_prevention_push_notifications(session):
+    collection = PageCollection(session)
+    news = collection.add_root("News", type='news')
+    news_1 = collection.add(
+        news,
+        title='One',
+        type='news',
+        lead='#some #thing',
+    )
+    session.add(news_1)
+    session.flush()
+    news_id = news_1.id
+    PushNotification.record_sent_notification(
+        session, news_id, "topic1", {"status": "sent"}
+    )
+    with pytest.raises(IntegrityError):
+        PushNotification.record_sent_notification(
+            session, news_id, "topic1", {"status": "sent"}
+        )
