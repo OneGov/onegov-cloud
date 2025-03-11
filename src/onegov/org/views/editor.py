@@ -191,6 +191,8 @@ def handle_edit_page(
     if form.submitted(request):
         form.populate_obj(self.page)
         request.success(_('Your changes were saved'))
+
+        return morepath.redirect(request.link(self.page))
     elif not request.POST:
         form.process(obj=self.page)
         if self.page.trait == 'news':
