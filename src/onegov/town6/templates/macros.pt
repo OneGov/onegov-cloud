@@ -719,9 +719,12 @@
                     <h3 i18n:translate>Contact</h3>
                     <tal:b content="contact" />
                     <div tal:condition="sidepanel_contact|False">
-                        <ul class="sidebar-links">
+                        <ul class="sidebar-links more-list">
                             <li tal:repeat="contact sidepanel_contact" tal:condition="contact">
-                                <a href="${contact[1]}">${contact[0]}</a>
+                                <a class="list-link" href="${contact[1]}">
+                                <i class="fa fa-link" aria-hidden="true"></i>
+                                <span class="list-title">${contact[0]}</span>
+                                </a>
                             </li>
                         </ul>
                     </div>
@@ -1064,14 +1067,14 @@
 <metal:person_card define-macro="person_card" i18n:domain="onegov.town6">
     <div class="person-card person-single-item" tal:define="exclude request.app.org.excluded_person_fields(request)">
         <div class="grid-x" tal:define="url person.picture_url">
-            <div class="cell small-12 medium-4 large-3" tal:condition="url" >
+            <div class="cell small-12 medium-5 large-4" tal:condition="url" >
                 <div aria-hidden="true">
                     <div class="person-card-portrait">
                         <div class="cover-image" style='background-image: url("${url}");'></div>
                     </div>
                 </div>
             </div>
-            <div class="cell small-12 ${'medium-8 large-9' if url else ''}">
+            <div class="cell small-12 ${'medium-7 large-8' if url else ''}">
                 <ul>
                     <li tal:condition="person.function" class="person-card-function">
                         <em>${person.function}</em>

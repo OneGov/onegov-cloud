@@ -2157,12 +2157,21 @@ msgstr "Errore durante la convalida delle credenziali Firebase: {0}"
 msgid "E-Mail Address"
 msgstr "Indirizzo e-mail"
 
+msgid "The subscriber has given consent to receive the newsletter."
+msgstr "Il sottoscrittore ha dato il consenso a ricevere la newsletter."
+
 msgid ""
 "Select newsletter categories your are interested in. You will receive the "
 "newsletter if it reports on at least one of the subscribed categories."
 msgstr ""
 "Selezionate le categorie di newsletter a cui siete interessati. Riceverete "
 "la newsletter se riporta almeno una delle categorie sottoscritte"
+
+msgid "E-Mail Address"
+msgstr "Indirizzo e-mail"
+
+msgid "The subscriber has given consent to receive the newsletter."
+msgstr "Il sottoscrittore ha dato il consenso a ricevere la newsletter."
 
 msgid "Submission Window"
 msgstr "Finestra di presentazione"

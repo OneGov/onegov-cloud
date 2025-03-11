@@ -2146,6 +2146,9 @@ msgstr "Fehler bei der Überprüfung der Firebase- Zugangsdaten: {0}"
 msgid "E-Mail Address"
 msgstr "E-Mail Adresse"
 
+msgid "The subscriber has given consent to receive the newsletter."
+msgstr "Der Abonnent hat der Zustellung des Newsletters zugestimmt."
+
 msgid ""
 "Select newsletter categories your are interested in. You will receive the "
 "newsletter if it reports on at least one of the subscribed categories."
@@ -2153,6 +2156,12 @@ msgstr ""
 "Wählen Sie die Newsletter-Kategorien aus, an denen Sie interessiert sind. "
 "Sie werden den Newsletter erhalten, wenn er über mindestens eine der "
 "abonnierten Kategorien berichtet."
+
+msgid "E-Mail Address"
+msgstr "E-Mail Adresse"
+
+msgid "The subscriber has given consent to receive the newsletter."
+msgstr "Der Abonnent hat der Zustellung des Newsletters zugestimmt."
 
 msgid "Submission Window"
 msgstr "Befragungszeitraum"
