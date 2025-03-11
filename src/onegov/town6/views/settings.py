@@ -6,6 +6,7 @@ from wtforms.fields import StringField, BooleanField, IntegerField
 from onegov.core.security import Secret
 from onegov.form import Form, merge_forms, move_fields
 from onegov.org import _
+from onegov.org.elements import Link
 from onegov.org.forms.settings import (
     FaviconSettingsForm, LinksSettingsForm, HeaderSettingsForm,
     FooterSettingsForm, ModuleSettingsForm, MapSettingsForm,
@@ -458,8 +459,11 @@ def town_handle_ticket_data_deletion_settings(
 def town_handle_firebase_settings(
     self: Organisation, request: TownRequest, form: FirebaseSettingsForm
 ) -> RenderData | Response:
+    link_to_push_notfications = request.link(self, '/push-notifications')
     return handle_generic_settings(
-        self, request, form, 'Firebase', SettingsLayout(self, request)
+        self, request, form, 'Firebase', SettingsLayout(self, request),
+        Link(_('Push Notification Overview'),
+             url=link_to_push_notfications)(request)
     )
 
 

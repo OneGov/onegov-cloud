@@ -6,6 +6,8 @@ import re
 import yaml
 
 from functools import cached_property
+
+from cryptography.fernet import InvalidToken
 from lxml import etree
 
 from onegov.core.widgets import transform_structure
@@ -1432,7 +1434,7 @@ class FirebaseSettingsForm(Form):
 
     firebase_adminsdk_credential = TextAreaField(
         _('Firebase adminsdk credentials (JSON)'),
-        [InputRequired()],
+        [Optional()],
         render_kw={
             'rows': 32,
             'data-editor': 'json'
@@ -1458,6 +1460,7 @@ class FirebaseSettingsForm(Form):
     def populate_obj(self, model: Organisation) -> None:  # type:ignore
         super().populate_obj(model)
         key_base64 = self.request.app.hashed_identity_key
+
         try:
             assert self.firebase_adminsdk_credential.data is not None
             encrypted = encrypt_symmetric(
@@ -1520,9 +1523,12 @@ class FirebaseSettingsForm(Form):
 
         key_base64 = self.request.app.hashed_identity_key
         if model.firebase_adminsdk_credential:
-            self.firebase_adminsdk_credential.data = decrypt_symmetric(
+            try:
+                self.firebase_adminsdk_credential.data = decrypt_symmetric(
                 model.firebase_adminsdk_credential.encode('utf-8'), key_base64
             )
+            except InvalidToken:
+                self.firebase_adminsdk_credential.data = ''
 
         if (
             not hasattr(model, 'selectable_push_notification_options')
@@ -1602,19 +1608,17 @@ class FirebaseSettingsForm(Form):
                     'add': self.request.translate(_('Add')),
                     'remove': self.request.translate(_('Remove')),
                 },
-                'placeholders': {
-                    'text': 'Key',
-                    'link': 'Label'
-                },
+                'placeholders': {'text': 'Key', 'link': 'Label'},
                 'textOptions': text_options,
                 'linkOptions': link_options,
                 'values': [
                     {
                         'text': l[0],
                         'link': l[1],
-                        'error': self.hashtag_errors.get(ix, '')
-                    } for ix, l in enumerate(topic_and_label_pairs)
-                ]
+                        'error': self.hashtag_errors.get(ix, ''),
+                    }
+                    for ix, l in enumerate(topic_and_label_pairs)
+                ],
             }
         )
 

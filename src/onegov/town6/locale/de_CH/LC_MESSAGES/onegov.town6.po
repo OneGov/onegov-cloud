@@ -1723,6 +1723,9 @@ msgstr "Nachricht"
 msgid "Sent At"
 msgstr "Gesendet am"
 
+msgid "Firebase Response Data"
+msgstr "Firebase Response Data"
+
 msgid "No notifications"
 msgstr "Keine Benachrichtigungen"
 
@@ -2226,6 +2229,9 @@ msgid ""
 msgstr ""
 "Gehen Sie mit Vorsicht vor. Tickets und die darin enthaltenen Daten können "
 "unwiderruflich gelöscht werden."
+
+msgid "Push Notification Overview"
+msgstr "Übersicht Push-Benachrichtigungen"
 
 msgid "New Note"
 msgstr "Neue Notiz"

@@ -12,7 +12,7 @@ from onegov.core import LEVELS
 from onegov.core.orm import Base, find_models
 from onegov.core.orm.mixins import TimestampMixin
 from onegov.core.orm.types import JSON
-from sqlalchemy import Column, Text
+from sqlalchemy import Column, Text, text, bindparam
 from sqlalchemy import create_engine
 from sqlalchemy.engine.reflection import Inspector
 from sqlalchemy.orm import load_only
@@ -482,17 +482,48 @@ class UpgradeContext:
             table, schema=self.schema
         )}
 
-    def has_enum(self, enum: str) -> bool:
-        return self.session.execute(f"""
+    def has_constraint(
+        self, table_name: str, constraint_name: str, constraint_type: str
+    ) -> bool:
+        """ Check if a specific constraint exists on a table.
+
+        When constraint names aren't known, they can be discovered:
+
+        SELECT constraint_name FROM information_schema.table_constraints
+        WHERE table_name = 'table_name'
+        AND constraint_name LIKE '%column_name%';
+        """
+        return self.session.execute(text("""
+            SELECT EXISTS (
+                SELECT 1 FROM information_schema.table_constraints
+                WHERE table_schema = :schema
+                  AND table_name = :table_name
+                  AND constraint_type = :constraint_type
+                  AND constraint_name = :constraint_name
+            )
+        """
+            ).bindparams(
+                bindparam('schema', self.schema),
+                bindparam('table_name', table_name),
+                bindparam('constraint_name', constraint_name),
+                bindparam('constraint_type', constraint_type),
+        )
+        ).scalar()
+
+    def has_enum(self, enum_name: str) -> bool:
+        return self.session.execute(text("""
             SELECT EXISTS (
                 SELECT 1 FROM pg_type
-                WHERE typname = '{enum}'
-                  and typnamespace = (
+                WHERE typname = :enum_name
+                  AND typnamespace = (
                     SELECT oid FROM pg_namespace
-                    WHERE nspname = '{self.schema}'
+                    WHERE nspname = :schema
                   )
             )
-        """).scalar()
+        """).bindparams(
+            bindparam('schema', self.schema),
+            bindparam('enum_name', enum_name)
+        )).scalar()
 
     def has_table(self, table: str) -> bool:
         inspector = Inspector(self.operations_connection)

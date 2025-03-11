@@ -194,6 +194,11 @@ def get_public_ticket_messages() -> tuple[str, ...]:
     )
 
 
+@TownApp.setting(section='org', name='disabled_extensions')
+def get_disabled_extensions() -> tuple[str, ...]:
+    return ()
+
+
 @TownApp.setting(section='api', name='endpoints')
 def get_api_endpoints() -> list[type[ApiEndpoint[Any]]]:
     return [
