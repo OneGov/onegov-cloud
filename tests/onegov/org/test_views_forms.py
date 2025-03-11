@@ -890,7 +890,7 @@ def test_registration_ticket_workflow(client):
             return page
         return client.get('/tickets/ALL/open').click("Annehmen").follow()
 
-    client.login_editor()
+    client.login_supporter()
     page = register(client, data_in_email=True)
 
     assert "bestätigen" in page
