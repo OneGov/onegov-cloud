@@ -4,7 +4,7 @@ from onegov.core.security import Private, Public
 from onegov.file import File
 from onegov.org.views.files import (
     view_file_details, view_get_image_collection, view_upload_general_file,
-    view_upload_image_file, view_file_digest, handle_sign,
+    view_upload_image_file, view_file_digest, view_file_links, handle_sign,
     view_get_file_collection)
 
 from onegov.town6 import TownApp
@@ -36,6 +36,11 @@ def town_view_file_collection(
 @TownApp.html(model=GeneralFile, permission=Private, name='details')
 def view_town_file_details(self: GeneralFile, request: TownRequest) -> str:
     return view_file_details(self, request, DefaultLayout(self, request))
+
+
+@TownApp.html(model=GeneralFile, permission=Private, name='links')
+def view_town_file_links(self: GeneralFile, request: TownRequest) -> str:
+    return view_file_links(self, request, DefaultLayout(self, request))
 
 
 @TownApp.html(
