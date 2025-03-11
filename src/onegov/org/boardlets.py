@@ -7,13 +7,13 @@ from functools import cached_property
 from sedate import utcnow
 from typing import TYPE_CHECKING
 
+from onegov.org import _
 from onegov.org import OrgApp
 from onegov.org.layout import DefaultLayout
 from onegov.org.models import Boardlet, BoardletFact, News
 from onegov.page import Page
 from onegov.plausible.plausible_api import PlausibleAPI
 from onegov.ticket import Ticket
-from onegov.town6 import _
 
 if TYPE_CHECKING:
     from collections.abc import Iterator
