@@ -1,7 +1,7 @@
 # This file was generated from translations.town6.xlsx
 msgid ""
 msgstr ""
-"POT-Creation-Date: 2025-03-03 17:44+0100\n"
+"POT-Creation-Date: 2025-03-11 08:48+0100\n"
 "PO-Revision-Date: 2021-09-27 16:02+0200\n"
 "Language: it_CH\n"
 "Content-Type: text/plain; charset=UTF-8\n"
@@ -818,6 +818,9 @@ msgstr "Amministratore"
 msgid "Editor"
 msgstr "Redattore"
 
+msgid "Supporter"
+msgstr "Sostenitore"
+
 msgid "Member"
 msgstr "Membro"
 
@@ -826,6 +829,9 @@ msgstr "Amministratori"
 
 msgid "Editors"
 msgstr "Redattori"
+
+msgid "Supporters"
+msgstr "Sostenitori"
 
 msgid "Members"
 msgstr "Membri"
@@ -1704,6 +1710,9 @@ msgstr "Rilascia i file per verificarli"
 
 msgid "Sent Notifications"
 msgstr "Notifiche inviate"
+
+msgid "News"
+msgstr "Notizie"
 
 msgid "Sent At"
 msgstr "Inviato a"
