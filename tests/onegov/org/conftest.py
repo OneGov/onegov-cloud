@@ -174,6 +174,11 @@ def create_org_app(request, use_elasticsearch, cls=OrgApp):
         role='editor'
     ))
     session.add(User(
+        username='supporter@example.org',
+        password_hash=test_password,
+        role='supporter'
+    ))
+    session.add(User(
         username='member@example.org',
         password_hash=test_password,
         role='member'

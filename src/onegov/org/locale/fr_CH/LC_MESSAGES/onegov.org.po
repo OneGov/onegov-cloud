@@ -2,7 +2,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE 1.0\n"
-"POT-Creation-Date: 2025-03-07 10:07+0100\n"
+"POT-Creation-Date: 2025-03-11 08:43+0100\n"
 "PO-Revision-Date: 2022-03-15 10:50+0100\n"
 "Last-Translator: Marc Sommerhalder <marc.sommerhalder@seantis.ch>\n"
 "Language-Team: French\n"
@@ -2228,6 +2228,9 @@ msgstr "Admin"
 msgid "Editor"
 msgstr "Rédacteur"
 
+msgid "Supporter"
+msgstr "Supporteur"
+
 msgid "Member"
 msgstr "Membres"
 
@@ -2267,14 +2270,6 @@ msgstr "Envoyer un e-mail d'activation avec des directives"
 
 msgid "A user with this e-mail address exists already"
 msgstr "Un utilisateur avec cette adresse e-mail existe déjà"
-
-msgid ""
-"Users can only be in one group. If they already belong to another group and "
-"get added here, they will automatically get removed from the other group."
-msgstr ""
-"Les utilisateurs ne peuvent faire partie que d'un seul groupe. S'ils "
-"appartiennent déjà à un autre groupe et sont ajoutés ici, ils seront "
-"automatiquement retirés de l'autre groupe. "
 
 msgid "Ticket permissions"
 msgstr "Autorisation des tickets"
@@ -3120,8 +3115,8 @@ msgstr "Refuser ${title} est irréversible."
 msgid "Reject reservation"
 msgstr "Refuser la réservation"
 
-#. Used in sentence: "${event} published."
 #.
+#. Used in sentence: "${event} published."
 msgid "Event"
 msgstr "Événement"
 
@@ -3484,8 +3479,8 @@ msgid ""
 "filled-out form."
 msgstr ""
 "Veuillez vérifier vos données et appuyez sur « Compléter » pour finaliser le "
-"processus. S'il y a quelque chose que vous souhaitez modifier, cliquez sur « "
-"Modifier » pour retourner sur le formulaire complété."
+"processus. S'il y a quelque chose que vous souhaitez modifier, cliquez sur "
+"« Modifier » pour retourner sur le formulaire complété."
 
 msgid ""
 "The image shown in the list view is a square. To have your image shown fully "
@@ -3738,6 +3733,9 @@ msgstr "Administrateurs"
 
 msgid "Editors"
 msgstr "Éditeurs"
+
+msgid "Supporters"
+msgstr "Supporteurs"
 
 msgid "Members"
 msgstr "Membres"
@@ -6512,6 +6510,20 @@ msgstr "Un compte a été créé pour vous"
 
 msgid "The user was created successfully"
 msgstr "L'utilisateur a bien été créé"
+
+msgid "Value Added Tax"
+msgstr "Taxe sur la valeur ajoutée"
+
+msgid "VAT Rate"
+msgstr "Taux de TVA"
+
+msgid "VAT"
+msgstr "TVA"
+
+msgid "This is the VAT rate in percent. The VAT rate will apply to all prices "
+"in the forms."
+msgstr "Il s'agit du taux de TVA en pourcentage. Le taux de TVA s'appliquera "
+"à tous les prix dans les formulaires."
 
 msgid "Unique Visitors in the Last Month"
 msgstr "Visiteurs uniques le mois dernier"

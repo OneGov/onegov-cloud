@@ -2,7 +2,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE 1.0\n"
-"POT-Creation-Date: 2025-03-07 10:07+0100\n"
+"POT-Creation-Date: 2025-03-11 08:43+0100\n"
 "PO-Revision-Date: 2022-03-15 10:21+0100\n"
 "Last-Translator: Marc Sommerhalder <marc.sommerhalder@seantis.ch>\n"
 "Language-Team: German\n"
@@ -2220,6 +2220,9 @@ msgstr "Administrator"
 msgid "Editor"
 msgstr "Editor"
 
+msgid "Supporter"
+msgstr "Supporter"
+
 msgid "Member"
 msgstr "Mitglied"
 
@@ -2259,14 +2262,6 @@ msgstr "Aktivierungs-Email mit Anmelde-Anleitung senden"
 
 msgid "A user with this e-mail address exists already"
 msgstr "Ein Benutzer mit dieser E-Mail Adresse existiert bereits"
-
-msgid ""
-"Users can only be in one group. If they already belong to another group and "
-"get added here, they will automatically get removed from the other group."
-msgstr ""
-"Benutzer können nur in einer Gruppe sein. Wenn sie bereits einer anderen "
-"Gruppe angehören und hier hinzugefügt werden, werden sie automatisch aus der"
-" anderen Gruppe entfernt."
 
 msgid "Ticket permissions"
 msgstr "Ticketberechtigungen"
@@ -3119,6 +3114,7 @@ msgstr "Die Absage von ${title} kann nicht rückgängig gemacht werden."
 msgid "Reject reservation"
 msgstr "Reservation absagen"
 
+#.
 #. Used in sentence: "${event} published."
 msgid "Event"
 msgstr "Veranstaltung"
@@ -3736,6 +3732,9 @@ msgstr "Administratoren"
 
 msgid "Editors"
 msgstr "Editoren"
+
+msgid "Supporters"
+msgstr "Supporters"
 
 msgid "Members"
 msgstr "Mitglieder"
@@ -6510,6 +6509,23 @@ msgstr "Ein Konto wurde für Sie erstellt"
 
 msgid "The user was created successfully"
 msgstr "Der Benutzer wurde erfolgreich erstellt"
+
+msgid "Item(s)"
+msgstr "Stück(e)"
+
+msgid "Value Added Tax"
+msgstr "Mehrwertsteuer"
+
+msgid "VAT Rate"
+msgstr "Mehrwertsteuersatz"
+
+msgid "VAT"
+msgstr "MwSt"
+
+msgid "This is the VAT rate in percent. The VAT rate will apply to all prices "
+"in the forms."
+msgstr "Mehrwertsteuersatz in Prozent. Der Mehrwertsteuersatz wird auf alle "
+"Preise in den Formularen angewendet."
 
 msgid "Unique Visitors in the Last Month"
 msgstr "Einzigartige Besucher im letzten Monat"

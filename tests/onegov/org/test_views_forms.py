@@ -849,20 +849,25 @@ def test_registration_window_adjust_end_date(client):
 
 
 def test_registration_ticket_workflow(client):
-    collection = FormCollection(client.app.session())
-    users = UserCollection(client.app.session())
+    session = client.app.session()
+    collection = FormCollection(session)
+    users = UserCollection(session)
 
     form = collection.definitions.add('Meetup', textwrap.dedent("""
         E-Mail *= @@@
         Name *= ___
     """), 'custom')
+    session.flush()
 
-    form.add_registration_window(
+    window = form.add_registration_window(
         start=date(2018, 1, 1),
         end=date(2018, 1, 31),
         limit=10,
         overflow=False
     )
+    session.flush()
+    window_id = window.id
+    assert window_id is not None
     username = 'automaton@example.org'
     user_id = users.add(username, 'testing', 'admin').id
     transaction.commit()
@@ -885,7 +890,7 @@ def test_registration_ticket_workflow(client):
             return page
         return client.get('/tickets/ALL/open').click("Annehmen").follow()
 
-    client.login_editor()
+    client.login_supporter()
     page = register(client, data_in_email=True)
 
     assert "bestätigen" in page
@@ -1004,8 +1009,11 @@ def test_registration_ticket_workflow(client):
     session.query(Ticket).delete('fetch')
     transaction.commit()
 
-    # the link to the deleted ticket is gone from the view
-    page = client.get(window.request.url)
+    # the window is no longer accesible through the ticket
+    page = client.get(window.request.url, status=404)
+
+    # the link to the deleted ticket is gone from the window view
+    page = client.get(f'/form-registration-window/{window_id.hex}')
     assert not page.pyquery('.field-display a')
 
     client.get(ticket_url, status=404)

@@ -1026,6 +1026,7 @@
     <tal:b condition="price.fee and show_fee|nothing">
         (+ ${layout.format_number(price.fee)} <tal:b i18n:translate>Credit Card Fee</tal:b>)
     </tal:b>
+    <br>${layout.format_vat(price.net_amount, price.currency)}
 </metal:price>
 
 <metal:person_card define-macro="person_list_card" i18n:domain="onegov.town6">
@@ -1582,6 +1583,7 @@
     <tal:b switch="role">
         <tal:b case="'admin'" i18n:translate>Administrator</tal:b>
         <tal:b case="'editor'" i18n:translate>Editor</tal:b>
+        <tal:b case="'supporter'" i18n:translate>Supporter</tal:b>
         <tal:b case="'member'" i18n:translate>Member</tal:b>
     </tal:b>
 </metal:role_singular>
@@ -1590,6 +1592,7 @@
     <tal:b switch="role">
         <tal:b case="'admin'" i18n:translate>Administrators</tal:b>
         <tal:b case="'editor'" i18n:translate>Editors</tal:b>
+        <tal:b case="'supporter'" i18n:translate>Supporters</tal:b>
         <tal:b case="'member'" i18n:translate>Members</tal:b>
     </tal:b>
 </metal:role_plural>

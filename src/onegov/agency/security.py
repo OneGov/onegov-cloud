@@ -7,11 +7,15 @@ from onegov.agency.models import AgencyMembershipMoveWithinPerson
 from onegov.agency.models import AgencyMove
 from onegov.agency.models.ticket import AgencyMutationTicket
 from onegov.agency.models.ticket import PersonMutationTicket
+from onegov.core.security.roles import (
+    get_roles_setting as get_roles_setting_base)
 from onegov.core.security.rules import has_permission_logged_in
 from onegov.people import Agency
 from onegov.people import AgencyCollection
 from onegov.people import AgencyMembership
 from onegov.people import Person
+from onegov.ticket.collection import ArchivedTicketCollection
+from onegov.ticket.collection import TicketCollection
 from onegov.user import RoleMapping
 from sqlalchemy.orm import object_session
 
@@ -20,7 +24,14 @@ from typing import TYPE_CHECKING
 if TYPE_CHECKING:
     from morepath.authentication import Identity
     from morepath.authentication import NoIdentity
+    from onegov.core.security.roles import Intent
     from sqlalchemy.orm import Session
+
+
+@AgencyApp.replace_setting_section(section='roles')
+def get_roles_setting() -> dict[str, set[type[Intent]]]:
+    # NOTE: Without a supporter role for now
+    return get_roles_setting_base()
 
 
 def get_current_role(
@@ -254,3 +265,14 @@ def has_permission_person_mutation_ticket(
         if not has_permission_person(app, identity, person, permission):
             return False
     return True
+
+
+@AgencyApp.permission_rule(model=TicketCollection, permission=object)
+@AgencyApp.permission_rule(model=ArchivedTicketCollection, permission=object)
+def has_permission_ticket_collection(
+    app: AgencyApp,
+    identity: Identity,
+    model: TicketCollection | ArchivedTicketCollection,
+    permission: object
+) -> bool:
+    return has_permission_all(app, identity, model, permission)

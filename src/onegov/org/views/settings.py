@@ -21,7 +21,8 @@ from onegov.org.forms.settings import (
     OrgTicketSettingsForm, HeaderSettingsForm, FaviconSettingsForm,
     LinksSettingsForm, NewsletterSettingsForm, LinkMigrationForm,
     LinkHealthCheckForm, SocialMediaSettingsForm, EventSettingsForm,
-    GeverSettingsForm, OneGovApiSettingsForm, DataRetentionPolicyForm)
+    GeverSettingsForm, OneGovApiSettingsForm, DataRetentionPolicyForm,
+    VATSettingsForm)
 from onegov.org.management import LinkHealthCheck
 from onegov.org.layout import DefaultLayout
 from onegov.org.layout import SettingsLayout
@@ -530,6 +531,21 @@ def handle_ticket_data_deletion_settings(
         self, request, form, _('Data Retention Policy'),
         SettingsLayout(self, request),
     )
+
+
+@OrgApp.form(
+    model=Organisation, name='vat-settings', template='form.pt',
+    permission=Secret, form=VATSettingsForm, setting=_('Value Added Tax'),
+    icon='fa-file-invoice-dollar', order=450)
+def handle_vat_settings(
+        self: Organisation,
+        request: OrgRequest,
+        form: VATSettingsForm,
+        layout: SettingsLayout | None = None
+) -> RenderData | Response:
+    layout = layout or SettingsLayout(self, request, _('Value Added Tax'))
+    return handle_generic_settings(self, request, form, _('Value Added Tax'),
+                                   layout)
 
 
 @OrgApp.form(
