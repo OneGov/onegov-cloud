@@ -54,7 +54,16 @@ def view_usermanagement(
     roles = roles or {
         'admin': _('Administrator'),
         'editor': _('Editor'),
+        'supporter': _('Supporter'),
         'member': _('Member'),
+    }
+
+    # hide roles that are not configured for the current app
+    roles_setting = request.app.settings.roles
+    roles = {
+        role: label
+        for role, label in roles.items()
+        if hasattr(roles_setting, role)
     }
 
     filters = {}

@@ -26,14 +26,16 @@ The standard permission model is used and mapped as followed:
 - Anonymous users can log in.
 - Translators can view their own personal information and report changes.
 - Members can additionally view the translators and their vouchers.
-- Editors can additionally editor some informations of translators.
+- Supporters can additionally view, receive and handle tickets.
+- Editors can additionally edit some information of translators.
 - Admins can do everything.
 
 """
 
 
-@TranslatorDirectoryApp.setting_section(section='roles')
+@TranslatorDirectoryApp.replace_setting_section(section='roles')
 def get_roles_setting() -> dict[str, set[type[Intent]]]:
+    # NOTE: Without a supporter role for now
     result = get_roles_setting_base()
     result['translator'] = {Public}
     return result

@@ -2,7 +2,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: \n"
-"POT-Creation-Date: 2025-03-03 17:43+0100\n"
+"POT-Creation-Date: 2025-03-11 08:43+0100\n"
 "PO-Revision-Date: 2022-03-15 10:52+0100\n"
 "Last-Translator: \n"
 "Language-Team: \n"
@@ -2220,6 +2220,9 @@ msgstr "Amministratore"
 msgid "Editor"
 msgstr "Redattore"
 
+msgid "Supporter"
+msgstr "Sostenitore"
+
 msgid "Member"
 msgstr "Membro"
 
@@ -2262,14 +2265,6 @@ msgstr "Invia e-mail di attivazione con le istruzioni"
 
 msgid "A user with this e-mail address exists already"
 msgstr "Esiste già un utente con questo indirizzo e-mail"
-
-msgid ""
-"Users can only be in one group. If they already belong to another group and "
-"get added here, they will automatically get removed from the other group."
-msgstr ""
-"Gli utenti possono essere solo in un gruppo. Se appartengono già ad un altro "
-"gruppo e vengono aggiunti qui, verranno automaticamente rimossi dall'altro "
-"gruppo. "
 
 msgid "Ticket permissions"
 msgstr "Permessi sul biglietto"
@@ -3118,8 +3113,8 @@ msgstr "Il rifiuto di ${title} non può essere annullato."
 msgid "Reject reservation"
 msgstr "Rifiuta prenotazione"
 
-#. Used in sentence: "${event} published."
 #.
+#. Used in sentence: "${event} published."
 msgid "Event"
 msgstr "Evento"
 
@@ -3726,6 +3721,9 @@ msgstr "Amministratori"
 
 msgid "Editors"
 msgstr "Redattori"
+
+msgid "Supporters"
+msgstr "Sostenitori"
 
 msgid "Members"
 msgstr "Membri"

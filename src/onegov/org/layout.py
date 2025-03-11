@@ -1703,7 +1703,7 @@ class TicketLayout(DefaultLayout):
 
     @cached_property
     def editbar_links(self) -> list[Link | LinkGroup] | None:
-        if self.request.is_manager:
+        if self.request.is_manager_for_model(self.model):
 
             links: list[Link | LinkGroup]
 

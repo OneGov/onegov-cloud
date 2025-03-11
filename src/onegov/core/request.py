@@ -791,6 +791,18 @@ class CoreRequest(IncludeRequest, ContentSecurityRequest, ReturnToMixin):
 
         return signer.sign(random_token())
 
+    @cached_property
+    def csrf_token(self) -> str:
+        """ Returns a csrf token for use with DELETE links (forms do their
+        own thing automatically).
+
+        """
+        return self.new_csrf_token().decode('utf-8')
+
+    def csrf_protected_url(self, url: str) -> str:
+        """ Adds a csrf token to the given url. """
+        return utils.append_query_param(url, 'csrf-token', self.csrf_token)
+
     def assert_valid_csrf_token(
         self,
         signed_value: str | bytes | None = None,

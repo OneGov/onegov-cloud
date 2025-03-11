@@ -341,7 +341,7 @@ def test_resource_room_deletion_with_future_allocation_and_payment(client):
     assert 'RSV-' in ticket.text
 
     # mark it as paid
-    client.login_admin()
+    client.login_supporter()
     page = client.get('/tickets/ALL/open').click("Annehmen").follow()
 
     assert page.pyquery('.payment-state').text() == "Offen"
@@ -352,6 +352,7 @@ def test_resource_room_deletion_with_future_allocation_and_payment(client):
     assert page.pyquery('.payment-state').text() == "Bezahlt"
 
     # delete resource
+    client.login_admin()
     page = client.get('/resources').click('Tageskarte', index=1)
     delete_link = page.pyquery('a.delete-link').attr('ic-delete-from')
     assert delete_link
@@ -863,6 +864,7 @@ def test_reserve_allocation(broadcast, authenticate, connect, client):
         client.delete(client.extract_href(slots.json[0]['actions'][3]))
 
     # open the created ticket
+    client.login_supporter()
     ticket = client.get('/tickets/ALL/open').click('Annehmen').follow()
 
     assert 'Foobar' in ticket
