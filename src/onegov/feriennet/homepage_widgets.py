@@ -9,7 +9,7 @@ from typing import TYPE_CHECKING
 from onegov.feriennet.collections import MatchCollection
 from onegov.feriennet.collections.activity import VacationActivityCollection
 from onegov.feriennet.models.activity import VacationActivity
-from onegov.feriennet.utils import (activity_ages, activity_min_cost, 
+from onegov.feriennet.utils import (activity_ages, activity_min_cost,
                                     activity_spots)
 if TYPE_CHECKING:
     from onegov.core.types import RenderData

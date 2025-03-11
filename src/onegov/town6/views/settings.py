@@ -11,7 +11,7 @@ from onegov.org.forms.settings import (
     FooterSettingsForm, ModuleSettingsForm, MapSettingsForm,
     AnalyticsSettingsForm, HolidaySettingsForm, OrgTicketSettingsForm,
     HomepageSettingsForm, NewsletterSettingsForm, LinkMigrationForm,
-    LinkHealthCheckForm, PeopleSettingsForm, SocialMediaSettingsForm,
+    LinkHealthCheckForm, SocialMediaSettingsForm,
     EventSettingsForm, GeverSettingsForm, OneGovApiSettingsForm,
     DataRetentionPolicyForm, FirebaseSettingsForm)
 from onegov.org.models import Organisation
@@ -460,17 +460,4 @@ def town_handle_firebase_settings(
 ) -> RenderData | Response:
     return handle_generic_settings(
         self, request, form, 'Firebase', SettingsLayout(self, request)
-    )
-
-
-@TownApp.form(
-    model=Organisation, name='people-settings', template='form.pt',
-    permission=Secret, form=PeopleSettingsForm, setting='People',
-    icon='fa-users', order=400,
-)
-def town_handle_firebase_settings(
-    self: Organisation, request: TownRequest, form: PeopleSettingsForm
-) -> RenderData | Response:
-    return handle_generic_settings(
-        self, request, form, 'People', SettingsLayout(self, request)
     )
