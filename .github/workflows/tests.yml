@@ -203,6 +203,7 @@ jobs:
           --only-rerun "AttributeError: 'SessionManager'" \
           --only-rerun "ReferenceError: $ is not defined" \
           --only-rerun "FileNotFoundError: [Errno 2] No such file" \
+          --only-rerun "Bad response: 404 Not Found" \
           --cov \
           --cov-config=pyproject.toml \
           --codecov \
