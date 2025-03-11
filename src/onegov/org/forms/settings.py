@@ -1608,18 +1608,16 @@ class FirebaseSettingsForm(Form):
                     'add': self.request.translate(_('Add')),
                     'remove': self.request.translate(_('Remove')),
                 },
-                'placeholders': {
-                    'text': 'Key',
-                    'link': 'Label'
-                },
+                'placeholders': {'text': 'Key', 'link': 'Label'},
                 'textOptions': text_options,
                 'linkOptions': link_options,
                 'values': [
                     {
                         'text': l[0],
                         'link': l[1],
-                        'error': self.hashtag_errors.get(ix, '')
-                    } for ix, l in enumerate(topic_and_label_pairs)
-                ]
+                        'error': self.hashtag_errors.get(ix, ''),
+                    }
+                    for ix, l in enumerate(topic_and_label_pairs)
+                ],
             }
         )

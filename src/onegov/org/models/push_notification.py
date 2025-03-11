@@ -45,7 +45,7 @@ class PushNotification(Base):
     )
     news: relationship[News] = relationship(
         'News',
-        backref=backref('sent_notifications', cascade='all, delete-orphan'),
+        backref=backref('sent_notifications', passive_deletes=True),
         foreign_keys=[news_id]
     )
 

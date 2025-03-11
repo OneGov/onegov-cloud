@@ -17,7 +17,6 @@ from onegov.event import EventCollection, OccurrenceCollection
 from onegov.event.utils import as_rdates
 from onegov.form import FormSubmissionCollection
 from onegov.gever.encrypt import encrypt_symmetric
-from onegov.org.cronjobs import get_news_for_push_notification
 from onegov.org.models import ResourceRecipientCollection, News,\
     PushNotification
 from onegov.org.models.page import NewsCollection
