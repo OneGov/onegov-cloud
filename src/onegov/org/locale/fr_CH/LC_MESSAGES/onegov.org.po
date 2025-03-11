@@ -2,7 +2,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE 1.0\n"
-"POT-Creation-Date: 2025-03-11 08:43+0100\n"
+"POT-Creation-Date: 2025-03-11 16:04+0100\n"
 "PO-Revision-Date: 2022-03-15 10:50+0100\n"
 "Last-Translator: Marc Sommerhalder <marc.sommerhalder@seantis.ch>\n"
 "Language-Team: French\n"
@@ -62,6 +62,21 @@ msgstr "Dernières nouvelles modifiées"
 
 msgid "Web Statistics"
 msgstr "Statistiques Web"
+
+msgid "Unique Visitors in the Last Month"
+msgstr "Visiteurs uniques le mois dernier"
+
+msgid "Total Visits in the Last Month"
+msgstr "Total des visites le mois dernier"
+
+msgid "Total Page Views in the Last Month"
+msgstr "Total des pages vues le mois dernier"
+
+msgid "Number of Page Views per Visit"
+msgstr "Nombre de pages vues par visite"
+
+msgid "Average Visit Duration in Minutes"
+msgstr "Durée moyenne de la visite en minutes"
 
 msgid "No data available"
 msgstr "Aucune donnée disponible"
@@ -2147,12 +2162,6 @@ msgstr ""
 "Une erreur s'est produite lors de la validation des informations "
 "d'identification Firebase : {0}"
 
-msgid "E-Mail Address"
-msgstr "Adresse e-mail"
-
-msgid "The subscriber has given consent to receive the newsletter."
-msgstr "L'abonné a donné son consentement pour recevoir la newsletter."
-
 msgid ""
 "Select newsletter categories your are interested in. You will receive the "
 "newsletter if it reports on at least one of the subscribed categories."
@@ -3264,14 +3273,14 @@ msgstr "Voulez-vous vraiment supprimer l'iFrame « ${title} » ?"
 msgid "Copy"
 msgstr "Copie"
 
-msgid "Paste"
-msgstr "Coller"
+msgid "A News cannot be pasted as Topic"
+msgstr "Une nouvelle ne peut pas être collée comme un sujet"
 
 msgid "A Topic cannot be pasted as News"
 msgstr "Un sujet ne peut pas être collé comme une nouvelle"
 
-msgid "A News cannot be pasted as Topic"
-msgstr "Une nouvelle ne peut pas être collée comme un sujet"
+msgid "Paste"
+msgstr "Coller"
 
 msgid "Please note that this page has subpages which will also be deleted!"
 msgstr ""
@@ -3848,7 +3857,7 @@ msgid "${count} words"
 msgstr "${count} mots"
 
 msgid "Do you really want to delete this file?"
-msgstr "Voulez-vous vraiment supprimer ce fichier ?"
+msgstr "Voulez-vous vraiment supprimer ce fichier?"
 
 msgid "Delete File"
 msgstr "Supprimez le fichier"
@@ -3861,6 +3870,12 @@ msgstr "Renommer"
 
 msgid "Download"
 msgstr "Télécharger"
+
+msgid "Linked Pages"
+msgstr "Pages reliées"
+
+msgid "Links to ${filename}"
+msgstr "Liens vers ${filename}"
 
 msgid "Digital seal applied by ${signee} on ${date}"
 msgstr "Sceau digital appliqué par ${signee} le ${date}"
@@ -6497,20 +6512,5 @@ msgstr "Un compte a été créé pour vous"
 msgid "The user was created successfully"
 msgstr "L'utilisateur a bien été créé"
 
-msgid "Unique Visitors in the Last Month"
-msgstr "Visiteurs uniques le mois dernier"
-
-msgid "Total Visits in the Last Month"
-msgstr "Total des visites le mois dernier"
-
-msgid "Total Page Views in the Last Month"
-msgstr "Total des pages vues le mois dernier"
-
-msgid "Number of Page Views per Visit"
-msgstr "Nombre de pages vues par visite"
-
-msgid "Average Visit Duration in Minutes"
-msgstr "Durée moyenne de la visite en minutes"
-
-msgid "Terminaux ID"
-msgstr "ID du terminal"
+#~ msgid "Terminaux ID"
+#~ msgstr "ID du terminal"

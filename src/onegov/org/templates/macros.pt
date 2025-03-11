@@ -1964,9 +1964,40 @@
                 <span class="fa fa-download" aria-hidden="true"></span>
                 <span i18n:translate>Download</span>
            </a>
+            <a class="button secondary" role="button"
+               ic-get-from="${request.link(file, 'links')}"
+               ic-target="#links-${id}"
+               ic-on-success="
+                   var modal = $('#links-${id}-modal');
+                   modal.foundation('reveal', 'open');
+                   modal.focus();
+               ">
+                <span class="fa fa-link" aria-hidden="true"></span>
+                <span i18n:translate>Linked Pages</span>
+                <span class="ic-indicator fa fa-spinner fa-spin" style="display: none"></span>
+           </a>
+        </div>
+    </div>
+    <div style="display:none;">
+        <div id="links-${id}-modal" class="reveal-modal medium dialog" data-reveal role="dialog" aria-hidden="true">
+            <h2 i18n:translate>Links to <tal:b i18n:name="filename">${file.name}</tal:b></h2>
+            <ul id="links-${id}"></ul>
         </div>
     </div>
 </metal:file_details>
+
+<metal:file_links define-macro="file-links" i18n:domain="onegov.org">
+    <ul class="search-results">
+        <tal:b repeat="result file.links">
+            <li class="search-result-${result.es_type_name}" tal:condition="result">
+                <tal:b
+                    define="macro 'search_result_{}'.format(result.__tablename__); tenant_macro 'search_result_{}_{}'.format(result.__tablename__, request.app.application_id.split('/')[-1])"
+                    metal:use-macro="layout.macros[tenant_macro]|layout.macros[macro]|layout.macros['search_result_default']"
+                />
+            </li>
+        </tal:b>
+    </ul>
+</metal:file_links>
 
 <metal:sign_result define-macro="sign_result" i18n:domain="onegov.org">
     <metal:b use-macro="layout.macros['consume_messages']" />

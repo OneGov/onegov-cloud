@@ -5,7 +5,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: OneGov Cloud 1.0\n"
-"POT-Creation-Date: 2025-03-11 08:48+0100\n"
+"POT-Creation-Date: 2025-03-11 16:15+0100\n"
 "PO-Revision-Date: 2021-03-03 14:04+0100\n"
 "Last-Translator: Lukas Burkhard <lukas.burkhard@seantis.ch>\n"
 "Language-Team: French\n"
@@ -994,6 +994,12 @@ msgstr "Renommer"
 
 msgid "Download"
 msgstr "Télécharger"
+
+msgid "Linked Pages"
+msgstr "Pages reliées"
+
+msgid "Links to ${filename}"
+msgstr "Liens vers ${filename}"
 
 msgid "Digital seal applied by ${signee} on ${date}"
 msgstr "Sceau digital appliqué par ${signee} le ${date}"
