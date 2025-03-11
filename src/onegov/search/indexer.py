@@ -411,7 +411,6 @@ class PostgresIndexer(IndexerBase):
         :return: True if the indexing was successful, False otherwise
 
         """
-        combined_vector = None
         params = []
 
         if not isinstance(tasks, list):
@@ -445,25 +444,25 @@ class PostgresIndexer(IndexerBase):
                     **{f'_{k}': v for k, v in data.items()}
                 })
 
-                weighted_vector = [
-                    func.setweight(
-                        func.to_tsvector(
-                            sqlalchemy.bindparam('_language',
-                                                 type_=sqlalchemy.String),
-                            sqlalchemy.bindparam(f'_{field}',
-                                                 type_=sqlalchemy.String)
-                        ),
-                        weight
-                    )
-                    for field, weight in zip(
-                        task['properties'].keys(),
-                        chain('A', repeat('D')))
-                    if not field.startswith('es_')  # TODO: rename to fts_
-                ]
+            weighted_vector = [
+                func.setweight(
+                    func.to_tsvector(
+                        sqlalchemy.bindparam('_language',
+                                             type_=sqlalchemy.String),
+                        sqlalchemy.bindparam(f'_{field}',
+                                             type_=sqlalchemy.String)
+                    ),
+                    weight
+                )
+                for field, weight in zip(
+                    tasks[0]['properties'].keys(),
+                    chain('A', repeat('D')))
+                if not field.startswith('es_')  # TODO: rename to fts_
+            ]
 
-                combined_vector = weighted_vector[0]
-                for vector in weighted_vector[1:]:
-                    combined_vector = combined_vector.op('||')(vector)
+            combined_vector = weighted_vector[0]
+            for vector in weighted_vector[1:]:
+                combined_vector = combined_vector.op('||')(vector)
 
             schema = tasks[0]['schema']
             if update:

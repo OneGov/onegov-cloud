@@ -297,7 +297,8 @@ class SearchPostgres(Pagination[_M]):
 
         return query
 
-    def get_model_by_class_name(self, class_name):
+    @staticmethod
+    def get_model_by_class_name(class_name):
         for cls in Base._decl_class_registry.values():
             if not hasattr(cls, '__name__'):
                 continue
@@ -353,7 +354,7 @@ class SearchPostgres(Pagination[_M]):
         results.sort(key=lambda x: x[1], reverse=True)
         self.number_of_results = len(results)
 
-        # only return the model instances
+        # only return the model instances, not the rank
         return [r[0] for r in results]
 
     def hashtag_search(self) -> list[Searchable]:
