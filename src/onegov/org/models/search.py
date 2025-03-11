@@ -10,13 +10,10 @@ from sedate import utcnow
 from sqlalchemy import func, Numeric, cast, DateTime
 from typing import TYPE_CHECKING, Any
 
-
 from onegov.core.collection import Pagination, _M
 from onegov.core.orm import Base
 from onegov.event.models import Event
 from onegov.search.search_index import SearchIndex
-from onegov.search.utils import searchable_sqlalchemy_models, \
-    filter_for_base_models
 
 if TYPE_CHECKING:
     from onegov.org.request import OrgRequest
@@ -196,11 +193,6 @@ class SearchPostgres(Pagination[_M]):
         self.number_of_docs = 0
         self.number_of_results = 0
 
-        models = {
-            model for base in self.request.app.session_manager.bases
-            for model in searchable_sqlalchemy_models(base)}
-        self.search_models = filter_for_base_models(models)
-
     @cached_property
     def available_documents(self) -> int:
         if not self.number_of_docs:
@@ -330,10 +322,11 @@ class SearchPostgres(Pagination[_M]):
         ).label('rank')
 
         query = self.request.session.query(SearchIndex, decay_rank)
+        self.number_of_docs = query.count()
         query = self.filter_user_level(SearchIndex, query)
         query = query.filter(SearchIndex.fts_idx.op('@@')(ts_query))
 
-        for index_entry, rank in query.all():
+        for index_entry, rank in query:
             model = self.get_model_by_class_name(index_entry.owner_type)
 
             if model:
@@ -345,9 +338,7 @@ class SearchPostgres(Pagination[_M]):
                     owner_id = index_entry.owner_id_str
 
                 q = self.request.session.query(model)
-                attr_id = model.id
-                q = q.filter(attr_id == owner_id).first()
-
+                q = q.filter(model.id == owner_id).first()
                 if q:
                     results.append((q, rank))
 
@@ -358,20 +349,31 @@ class SearchPostgres(Pagination[_M]):
         return [r[0] for r in results]
 
     def hashtag_search(self) -> list[Searchable]:
-        doc_count = 0
         results: list[Any] = []
         q = self.query.lstrip('#')
 
         query = self.request.session.query(SearchIndex)
-        doc_count += query.count()
+        self.number_of_docs = query.count()
         query = self.filter_user_level(SearchIndex, query)
         query = query.filter(
             SearchIndex.fts_idx_data['es_tags'].contains([q]))
 
-        if self.request.session.query(query.exists()).scalar():
-            results.extend(query)
+        for index_entry in query:
+            model = self.get_model_by_class_name(index_entry.owner_type)
 
-        self.number_of_docs = doc_count
+            if model:
+                if index_entry.owner_id_int is not None:
+                    owner_id = index_entry.owner_id_int
+                elif index_entry.owner_id_uuid is not None:
+                    owner_id = index_entry.owner_id_uuid
+                else:
+                    owner_id = index_entry.owner_id_str
+
+                q = self.request.session.query(model)
+                q = q.filter(model.id == owner_id).first()
+                if q:
+                    results.append(q)
+
         self.number_of_results = len(results)
         return results
 
@@ -395,12 +397,10 @@ class SearchPostgres(Pagination[_M]):
         """ Returns all hashtags from the database in alphabetical order. """
         all_tags: set[str] = set()
 
-        for base in self.request.app.session_manager.bases:
-            for model in searchable_sqlalchemy_models(base):
-                query = self.request.session.query(
-                    model.fts_idx_data['es_tags'].distinct())
-                for tag_list in query.all():
-                    all_tags.update(tag_list[0]) if tag_list[0] else None
+        query = self.request.session.query(
+            SearchIndex.fts_idx_data['es_tags'].distinct())
+        for tag_list in query:
+            all_tags.update(tag_list[0]) if tag_list[0] else None
 
         # mark tags as hashtags; it also helps ot remain with the hashtag
         # search (url) when clicking on a suggestion
