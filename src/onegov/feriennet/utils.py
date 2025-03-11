@@ -121,5 +121,3 @@ def activity_max_cost(
         return None
 
     return max(o.total_cost for o in occasions)
-
-

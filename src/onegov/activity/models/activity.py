@@ -25,12 +25,9 @@ from typing import Any, TYPE_CHECKING
 if TYPE_CHECKING:
     import uuid
     from collections.abc import Iterable
-    from decimal import Decimal
     from onegov.activity.collections import PublicationRequestCollection
     from onegov.activity.models import PeriodMeta, PublicationRequest
     from onegov.core.orm.mixins import dict_property
-    from onegov.org.request import OrgRequest
-    from onegov.activity.types import BoundedIntegerRange
     from typing import Literal
     from typing import Self, TypeAlias
 

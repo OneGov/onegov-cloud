@@ -31,7 +31,7 @@ from onegov.feriennet.models import VacationActivity
 from onegov.feriennet.models import VolunteerCart
 from onegov.feriennet.models import VolunteerCartAction
 from onegov.feriennet.utils import (activity_ages, activity_min_cost,
-                                    activity_max_cost)
+                                    activity_max_cost, activity_spots)
 from onegov.org.mail import send_ticket_mail
 from onegov.org.models import TicketMessage
 from onegov.ticket import TicketCollection
@@ -73,6 +73,7 @@ WEEKDAYS = (
     _('Sa'),
     _('Su')
 )
+
 
 def get_activity_form_class(
     model: VacationActivity | VacationActivityCollection,
@@ -117,6 +118,7 @@ def occasions_by_period(
         (title, tuple(occasions)) for title, occasions in
         groupby(query, key=lambda o: o.period.title)
     )
+
 
 def filter_link(
     text: str,
@@ -494,8 +496,11 @@ def view_activities(
         'filtered': is_filtered(filters),
         'period': active_period,
         'current_location': request.link(
-            self.by_page_range((0, self.pages[-1])))
-    }
+            self.by_page_range((0, self.pages[-1]))),
+        'activity_ages': activity_ages,
+        'activity_min_cost': activity_min_cost,
+        'activity_spots': activity_spots
+}
 
 
 @FeriennetApp.html(
@@ -653,7 +658,7 @@ def view_activities_as_json(
                     'image': image(activity),
                     'age': age(activity),
                     'cost': cost(activity),
-                    'spots': activity.activity_spots(request),
+                    'spots': activity_spots(activity, request),
                     'dates': dates(activity),
                     'location': activity.location,
                     'zip_code': zip_code(activity),
@@ -733,7 +738,10 @@ def view_activities_for_volunteers(
             'target': 'target',
         }),
         'current_location': request.link(
-            self.by_page_range((0, self.pages[-1])), name='volunteer')
+            self.by_page_range((0, self.pages[-1])), name='volunteer'),
+        'activity_ages': activity_ages,
+        'activity_min_cost': activity_min_cost,
+        'activity_spots': activity_spots
     }
 
 

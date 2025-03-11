@@ -1617,3 +1617,98 @@ class FirebaseSettingsForm(Form):
                 ]
             }
         )
+
+
+class PeopleSettingsForm(Form):
+
+    organisation_hierarchy = TextAreaField(
+        label=_('Organisation hierarchy'),
+        description=_(
+            'Example for organisation hierarchy with subtopics in yaml '
+            'format. Note: Deeper structures are not supported.'
+            '\n'
+            '```\n'
+            'Organisation:\n'
+            '  - Sub-Organisation 1\n'
+            '  - Sub-Organisation 2\n'
+            'Organisation 2:\n'
+            '  - Sub-Organisation 1\n'
+            '  - Sub-Organisation 2\n'
+            '```'
+        ),
+        render_kw={
+            'rows': 16,
+        },
+    )
+
+    def ensure_categories(self) -> bool | None:
+        assert isinstance(self.organisation_hierarchy.errors, list)
+
+        if self.organisation_hierarchy.data:
+            try:
+                data = yaml.safe_load(self.organisation_hierarchy.data)
+            except yaml.YAMLError:
+                self.organisation_hierarchy.errors.append(
+                    _('Invalid YAML format. Please refer to the example.')
+                )
+                return False
+
+            if data:
+                if not isinstance(data, dict):
+                    self.organisation_hierarchy.errors.append(
+                        _('Invalid format. Please define an organisation name '
+                          'with topics and subtopics according the example.')
+                    )
+                    return False
+                for items in data.values():
+                    if not isinstance(items, list):
+                        self.organisation_hierarchy.errors.append(
+                            _('Invalid format. Please define topics and '
+                              'subtopics according to the example.')
+                        )
+                        return False
+                    for item in items:
+                        if not isinstance(item, (dict, str)):
+                            self.organisation_hierarchy.errors.append(
+                                _('Invalid format. Please define topics and '
+                                  'subtopics according to the example.')
+                            )
+                            return False
+
+                        if isinstance(item, dict):
+                            for topic, sub_topic in item.items():
+                                if not isinstance(sub_topic, list):
+                                    self.organisation_hierarchy.errors.append(
+                                        _(f'Invalid format. Please define '
+                                          f"subtopic(s) for '{topic}' "
+                                          f"or remove the ':'.")
+                                    )
+                                    return False
+                                if not all(isinstance(sub, str)
+                                           for sub in sub_topic):
+                                    self.organisation_hierarchy.errors.append(
+                                        _('Invalid format. Only topics '
+                                          'and subtopics are allowed - no '
+                                          'deeper structures supported.')
+                                    )
+                                    return False
+
+        return None
+
+    def populate_obj(self, model: Organisation) -> None:  # type:ignore
+        super().populate_obj(model)
+
+        yaml_data = self.organisation_hierarchy.data
+        data = yaml.safe_load(yaml_data) if yaml_data else {}
+        model.organisation_hierarchy = data
+
+    def process_obj(self, model: Organisation) -> None:  # type:ignore
+        super().process_obj(model)
+
+        categories = model.organisation_hierarchy or {}
+        if not categories:
+            self.organisation_hierarchy.data = ''
+            return
+
+        yaml_data = yaml.safe_dump(categories, default_flow_style=False)
+        self.organisation_hierarchy.data = yaml_data
