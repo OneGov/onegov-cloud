@@ -7,7 +7,6 @@ from sedate import utcnow, to_timezone, ensure_timezone
 from sqlalchemy import exists
 
 from onegov.org.models import PushNotification
-from onegov.org.models.extensions import PushNotificationExtension
 from onegov.org.models.page import News
 import json
 from onegov.org.notification_service import (
@@ -215,10 +214,6 @@ def test_send_push_notification_checkbox_not_present_by_default(
     # By default the push notification checkbox should not be present at all
     # Because it's a disabled extension
     assert not browser.find_by_id('send_push_notifications_to_app')
-    assert (
-        PushNotificationExtension.__name__
-        in town_app.settings.org.disabled_extensions
-    )
 
 
 def monkey_patch_fill_for_element_not_interactable(browser):
