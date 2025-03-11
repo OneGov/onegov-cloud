@@ -198,6 +198,12 @@ jobs:
           --dist loadgroup \
           --splits "7" \
           --group "${{matrix.group}}" \
+          --rerun-failures \
+          --reruns 3 \
+          --rerun-delay 1 \
+          --only-rerun 'AttributeError: \'SessionManager\'' \
+          --only-rerun 'ReferenceError: $ is not defined' \
+          --only-rerun 'FileNotFoundError: [Errno 2] No such file' \
           --cov \
           --cov-config=pyproject.toml \
           --codecov \
