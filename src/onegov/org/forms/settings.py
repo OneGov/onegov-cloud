@@ -1434,7 +1434,7 @@ class FirebaseSettingsForm(Form):
 
     firebase_adminsdk_credential = TextAreaField(
         _('Firebase adminsdk credentials (JSON)'),
-        [InputRequired()],
+        [Optional()],
         render_kw={
             'rows': 32,
             'data-editor': 'json'
