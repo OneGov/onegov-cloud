@@ -323,10 +323,8 @@ class PushNotificationFormExtension(FormExtension[FormT], name='publish'):
             def on_request(self) -> None:
 
                 if not self.request.app.org.firebase_adminsdk_credential:
-                    if 'send_push_notifications_to_app' in self._fields:
-                        self._fields.pop('send_push_notifications_to_app')
-                    if 'push_notifications' in self._fields:
-                        self._fields.pop('push_notifications')
+                    self.delete_field('send_push_notifications_to_app')
+                    self.delete_field('push_notifications')
                     return None
 
                 if not hasattr(self, 'send_push_notifications_to_app'):
