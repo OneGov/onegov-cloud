@@ -6481,6 +6481,20 @@ msgstr "È stato creato un account per te"
 msgid "The user was created successfully"
 msgstr "Utente creato correttamente"
 
+msgid "Value Added Tax"
+msgstr "Imposta sul valore aggiunto"
+
+msgid "VAT Rate"
+msgstr "Aliquota IVA"
+
+msgid "VAT"
+msgstr "IVA"
+
+msgid "This is the VAT rate in percent. The VAT rate will apply to all prices "
+"in the forms."
+msgstr "Si tratta del tasso di IVA in percentuale. Il tasso di IVA si "
+"applicherà a tutti i prezzi nei moduli."
+
 msgid "Unique Visitors in the Last Month"
 msgstr "Visitatori unici nell'ultimo mese"
 

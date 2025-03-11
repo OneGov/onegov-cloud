@@ -6477,6 +6477,23 @@ msgstr "Ein Konto wurde für Sie erstellt"
 msgid "The user was created successfully"
 msgstr "Der Benutzer wurde erfolgreich erstellt"
 
+msgid "Item(s)"
+msgstr "Stück(e)"
+
+msgid "Value Added Tax"
+msgstr "Mehrwertsteuer"
+
+msgid "VAT Rate"
+msgstr "Mehrwertsteuersatz"
+
+msgid "VAT"
+msgstr "MwSt"
+
+msgid "This is the VAT rate in percent. The VAT rate will apply to all prices "
+"in the forms."
+msgstr "Mehrwertsteuersatz in Prozent. Der Mehrwertsteuersatz wird auf alle "
+"Preise in den Formularen angewendet."
+
 msgid "Unique Visitors in the Last Month"
 msgstr "Einzigartige Besucher im letzten Monat"
 
