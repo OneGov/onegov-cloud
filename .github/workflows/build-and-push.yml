@@ -157,6 +157,7 @@ jobs:
           --reruns 3 \
           --reruns-delay 1 \
           --only-rerun "AttributeError: 'SessionManager'" \
+          --only-rerun "AttributeError: 'DefaultLayout'" \
           --only-rerun "ReferenceError: $ is not defined" \
           --only-rerun "FileNotFoundError: [Errno 2] No such file" \
           --only-rerun "Bad response: 404 Not Found" \
