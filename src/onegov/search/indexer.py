@@ -422,7 +422,7 @@ class PostgresIndexer(IndexerBase):
                 language = (
                     self.idx_language_mapping.get(task['language'], 'simple'))
                 data = {
-                    k: unidecode(str(v)) if v else None
+                    k: unidecode(str(v)) if v else ''
                     for k, v in task['properties'].items()
                     if not k.startswith('es_')}
                 # the search makes use of 'es_public' and 'es_tags' fields
