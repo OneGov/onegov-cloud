@@ -54,7 +54,7 @@ class PlausibleAPI:
 
         return response.json()
 
-    def get_stats(self) -> dict[str, int] | dict[str, str]:
+    def get_stats(self) -> list[str]:
         """
         Get basic stats from Plausible API
 
@@ -76,7 +76,7 @@ class PlausibleAPI:
 
         results = r.get('results', [])
         if not results:
-            return {}
+            return figures
 
         figures = results[0].get('metrics', figures)
 
@@ -84,15 +84,7 @@ class PlausibleAPI:
         figures[-1] = (
             str(round(int(figures[-1]) / 60, 1))) if figures[-1] else '0'
 
-        texts = [
-            'Unique Visitors in the Last Month',
-            'Total Visits in the Last Month',
-            'Total Page Views in the Last Month',
-            'Number of Page Views per Visit',
-            'Average Visit Duration in Minutes'
-        ]
-
-        return {text: figures[i] for i, text in enumerate(texts)}
+        return figures
 
     def get_top_pages(self, limit: int = 10) -> dict[str, int]:
         """

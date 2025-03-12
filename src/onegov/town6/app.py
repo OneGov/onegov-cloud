@@ -148,7 +148,7 @@ def get_status_mail_roles() -> tuple[str, ...]:
 
 @TownApp.setting(section='org', name='ticket_manager_roles')
 def get_ticket_manager_roles() -> tuple[str, ...]:
-    return ('admin', 'editor')
+    return ('admin', 'editor', 'supporter')
 
 
 @TownApp.setting(section='org', name='require_complete_userprofile')
@@ -192,6 +192,11 @@ def get_public_ticket_messages() -> tuple[str, ...]:
         'ticket',
         'ticket_chat',
     )
+
+
+@TownApp.setting(section='org', name='disabled_extensions')
+def get_disabled_extensions() -> tuple[str, ...]:
+    return ()
 
 
 @TownApp.setting(section='api', name='endpoints')

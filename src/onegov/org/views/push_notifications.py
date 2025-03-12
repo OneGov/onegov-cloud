@@ -16,7 +16,7 @@ if TYPE_CHECKING:
     model=PushNotificationCollection, template='push_notifications.pt',
     permission=Private,
 )
-def view_sent_notifications(
+def view_push_notifications(
     self: PushNotificationCollection,
     request: OrgRequest,
     layout: DefaultLayout | None = None,

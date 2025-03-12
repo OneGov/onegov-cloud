@@ -34,6 +34,7 @@ from onegov.org.models.extensions import (
     GeneralFileLinkExtension, DeletableContentExtension)
 from onegov.org.models.ticket import ReservationHandler
 from onegov.gever.encrypt import decrypt_symmetric
+from cryptography.fernet import InvalidToken
 from sqlalchemy.exc import IntegrityError
 from onegov.org.views.allocation import handle_rules_cronjob
 from onegov.org.views.directory import (
@@ -826,25 +827,29 @@ def delete_unconfirmed_newsletter_subscriptions(request: OrgRequest) -> None:
 
 
 def get_news_for_push_notification(session: Session) -> Query[News]:
+    # Use UTC time for database comparisons since publication_start is stored
+    # in UTC
     now = utcnow()
-    ten_minutes_ago = now - timedelta(minutes=10)
 
     # Get all news items that should trigger push notifications
     query = session.query(News)
-    query = query.filter(News.published == True)
+    query = query.filter(News.published.is_(True))
     query = query.filter(News.publication_start <= now)
 
-    # You may comment out the line below temporarily for testing
-    query = query.filter(News.publication_start >= ten_minutes_ago)
+    news_with_sent_notifications = session.query(
+        PushNotification.news_id
+    ).subquery()
+    query = query.filter(~News.id.in_(news_with_sent_notifications))
+    only_public_news = query.filter(
+        or_(
+            News.meta['access'].astext == 'public',
+            News.meta['access'].astext.is_(None)
+        )
+    )
 
-    only_public_news = query.filter(or_(
-        News.meta['access'].astext == 'public',
-        News.meta['access'].astext == None
-    ))
     only_public_with_send_push_notification = only_public_news.filter(
         News.meta['send_push_notifications_to_app'].astext == 'true'
     )
-
     return only_public_with_send_push_notification
 
 
@@ -874,7 +879,7 @@ def send_push_notifications_for_news(request: OrgRequest) -> None:
         print('No news items found with push notifications enabled')
         return
 
-    # Get the mapping of topic IDs to hashtags
+    # Get the mapping
     topic_mapping = org.meta.get('selectable_push_notification_options', [])
     if not topic_mapping:
         print('selectable_push_notification_options is empty')
@@ -884,13 +889,17 @@ def send_push_notifications_for_news(request: OrgRequest) -> None:
     key_base64 = request.app.hashed_identity_key
     encrypted_creds = org.firebase_adminsdk_credential
     if not encrypted_creds:
-        print('No Firebase credentials found')
         return
 
     try:
         firebase_creds_json = decrypt_symmetric(
             encrypted_creds.encode('utf-8'), key_base64
         )
+    except InvalidToken:
+        log.warning('Failed to decrypt Firebase credentials: InvalidToken')
+        return
+
+    try:
         # Get notification service
         notification_service = get_notification_service(firebase_creds_json)
 
@@ -929,11 +938,10 @@ def send_push_notifications_for_news(request: OrgRequest) -> None:
 
                 notification_title = news.title
                 notification_body = news.lead or ''
-
                 notification_data = {
+                    'id': str(request.link(news)),
                     'title': news.title,
-                    'body': news.lead or news.title,
-                    'url': request.link(news)
+                    'lead': notification_body,
                 }
 
                 try:

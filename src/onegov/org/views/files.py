@@ -208,6 +208,34 @@ def view_file_details(
     )
 
 
+@OrgApp.html(model=GeneralFile, permission=Private, name='links')
+def view_file_links(
+    self: GeneralFile,
+    request: OrgRequest,
+    layout: DefaultLayout | None = None
+) -> str:
+
+    layout = layout or DefaultLayout(self, request)
+
+    # IE 11 caches all ajax requests otherwise
+    @request.after
+    def must_revalidate(response: Response) -> None:
+        response.headers.add('cache-control', 'must-revalidate')
+        response.headers.add('cache-control', 'no-cache')
+        response.headers.add('cache-control', 'no-store')
+        response.headers['pragma'] = 'no-cache'
+        response.headers['expires'] = '0'
+
+    return render_macro(
+        layout.macros['file-links'],
+        request,
+        {
+            'file': self,
+            'layout': layout,
+        }
+    )
+
+
 @OrgApp.view(model=GeneralFile, permission=Private, name='publish',
              request_method='POST')
 def handle_publish(self: GeneralFile, request: OrgRequest) -> None:

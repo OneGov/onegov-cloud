@@ -2,7 +2,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE 1.0\n"
-"POT-Creation-Date: 2025-03-03 17:43+0100\n"
+"POT-Creation-Date: 2025-03-11 16:35+0100\n"
 "PO-Revision-Date: 2022-03-15 10:21+0100\n"
 "Last-Translator: Marc Sommerhalder <marc.sommerhalder@seantis.ch>\n"
 "Language-Team: German\n"
@@ -12,6 +12,7 @@ msgstr ""
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=2; plural=(n != 1);\n"
 "Generated-By: Lingua 3.12\n"
+"gengo-order-id: 7629695\n"
 "X-Generator: Poedit 3.0.1\n"
 
 #, python-format
@@ -53,14 +54,29 @@ msgstr "Zeit von Bearbeitung bis Schliessung in Tagen im letzten Monat"
 msgid "Access"
 msgstr "Zugriff"
 
-msgid "Last Edited Pages"
-msgstr "Zuletzt bearbeitete Seiten"
+msgid "Last Edited Topics"
+msgstr "Zuletzt bearbeitete Themen"
 
 msgid "Last Edited News"
 msgstr "Zuletzt bearbeitete News"
 
 msgid "Web Statistics"
 msgstr "Web-Statistik"
+
+msgid "Unique Visitors in the Last Month"
+msgstr "Einzigartige Besucher im letzten Monat"
+
+msgid "Total Visits in the Last Month"
+msgstr "Gesamtbesuche im letzten Monat"
+
+msgid "Total Page Views in the Last Month"
+msgstr "Gesamtseitenaufrufe im letzten Monat"
+
+msgid "Number of Page Views per Visit"
+msgstr "Anzahl der Seitenaufrufe pro Besuch"
+
+msgid "Average Visit Duration in Minutes"
+msgstr "Durchschnittliche Besuchsdauer in Minuten"
 
 msgid "No data available"
 msgstr "Keine Daten verfügbar"
@@ -2133,8 +2149,15 @@ msgstr "Ungültiges JSON-Format in den Firebase- Zugangsdaten"
 msgid "Error validating Firebase credentials: {0}"
 msgstr "Fehler bei der Überprüfung der Firebase- Zugangsdaten: {0}"
 
-msgid "E-Mail Address"
-msgstr "E-Mail Adresse"
+msgid "VAT Rate"
+msgstr "Mehrwertsteuersatz"
+
+msgid ""
+"This is the VAT rate in percent. The VAT rate will apply to all prices in "
+"the forms."
+msgstr ""
+"Mehrwertsteuersatz in Prozent. Der Mehrwertsteuersatz wird auf alle Preise "
+"in den Formularen angewendet."
 
 msgid ""
 "Select newsletter categories your are interested in. You will receive the "
@@ -2143,6 +2166,12 @@ msgstr ""
 "Wählen Sie die Newsletter-Kategorien aus, an denen Sie interessiert sind. "
 "Sie werden den Newsletter erhalten, wenn er über mindestens eine der "
 "abonnierten Kategorien berichtet."
+
+msgid "E-Mail Address"
+msgstr "E-Mail Adresse"
+
+msgid "The subscriber has given consent to receive the newsletter."
+msgstr "Der Abonnent hat der Zustellung des Newsletters zugestimmt."
 
 msgid "Submission Window"
 msgstr "Befragungszeitraum"
@@ -2201,6 +2230,9 @@ msgstr "Administrator"
 msgid "Editor"
 msgstr "Editor"
 
+msgid "Supporter"
+msgstr "Supporter"
+
 msgid "Member"
 msgstr "Mitglied"
 
@@ -2240,14 +2272,6 @@ msgstr "Aktivierungs-Email mit Anmelde-Anleitung senden"
 
 msgid "A user with this e-mail address exists already"
 msgstr "Ein Benutzer mit dieser E-Mail Adresse existiert bereits"
-
-msgid ""
-"Users can only be in one group. If they already belong to another group and "
-"get added here, they will automatically get removed from the other group."
-msgstr ""
-"Benutzer können nur in einer Gruppe sein. Wenn sie bereits einer anderen "
-"Gruppe angehören und hier hinzugefügt werden, werden sie automatisch aus der "
-"anderen Gruppe entfernt."
 
 msgid "Ticket permissions"
 msgstr "Ticketberechtigungen"
@@ -2370,6 +2394,9 @@ msgstr "Sporverein"
 
 msgid "all day"
 msgstr "den ganzen Tag"
+
+msgid "VAT"
+msgstr "MwSt"
 
 msgid "Homepage"
 msgstr "Startseite"
@@ -3100,8 +3127,8 @@ msgstr "Die Absage von ${title} kann nicht rückgängig gemacht werden."
 msgid "Reject reservation"
 msgstr "Reservation absagen"
 
-#. Used in sentence: "${event} published."
 #.
+#. Used in sentence: "${event} published."
 msgid "Event"
 msgstr "Veranstaltung"
 
@@ -3254,6 +3281,12 @@ msgstr "Möchten Sie wirklich das iFrame \"${title}\" löschen?"
 
 msgid "Copy"
 msgstr "Kopieren"
+
+msgid "A News cannot be pasted as Topic"
+msgstr "Eine Nachricht kann nicht als Thema eingefügt werden"
+
+msgid "A Topic cannot be pasted as News"
+msgstr "Ein Thema kann nicht als News eingefügt werden"
 
 msgid "Paste"
 msgstr "Einfügen"
@@ -3710,6 +3743,9 @@ msgstr "Administratoren"
 msgid "Editors"
 msgstr "Editoren"
 
+msgid "Supporters"
+msgstr "Supporters"
+
 msgid "Members"
 msgstr "Mitglieder"
 
@@ -3838,6 +3874,12 @@ msgstr "Umbenennen"
 
 msgid "Download"
 msgstr "Herunterladen"
+
+msgid "Linked Pages"
+msgstr "Verlinkungen"
+
+msgid "Links to ${filename}"
+msgstr "Links auf ${filename}"
 
 msgid "Digital seal applied by ${signee} on ${date}"
 msgstr "Digitales Siegel angewendet von ${signee} am ${date}"
@@ -4595,6 +4637,9 @@ msgstr "Gesendete Benachrichtigungen"
 
 msgid "Sent At"
 msgstr "Gesendet am"
+
+msgid "Response Data"
+msgstr "Response Data"
 
 msgid "No notifications"
 msgstr "Keine Benachrichtigungen"
@@ -5372,6 +5417,14 @@ msgstr "Neues Dokumentenformular"
 
 msgid "Edit Document Form"
 msgstr "Dokumentenformular bearbeiten"
+
+msgid ""
+"Notifications have already been sent for this news item. A new notification "
+"will not be sent, even if the publication date is changed."
+msgstr ""
+"Für diese News wurden bereits Benachrichtigungen gesendet. Eine neue "
+"Benachrichtigung wird nicht gesendet, auch wenn das Publikationsdatum "
+"geändert wird."
 
 msgid "Moves the topic and all its sub topics to the given destination."
 msgstr "Verschiebt das Thema mit allen Unterthemen an den gewählten Ort."
@@ -6172,6 +6225,9 @@ msgstr ""
 "Gehen Sie mit Vorsicht vor. Tickets und die darin enthaltenen Daten können "
 "unwiderruflich gelöscht werden."
 
+msgid "Value Added Tax"
+msgstr "Mehrwertsteuer"
+
 msgid "Chat"
 msgstr "Chat"
 
@@ -6463,18 +6519,3 @@ msgstr "Ein Konto wurde für Sie erstellt"
 
 msgid "The user was created successfully"
 msgstr "Der Benutzer wurde erfolgreich erstellt"
-
-msgid "Unique Visitors in the Last Month"
-msgstr "Einzigartige Besucher im letzten Monat"
-
-msgid "Total Visits in the Last Month"
-msgstr "Gesamtbesuche im letzten Monat"
-
-msgid "Total Page Views in the Last Month"
-msgstr "Gesamtseitenaufrufe im letzten Monat"
-
-msgid "Number of Page Views per Visit"
-msgstr "Anzahl der Seitenaufrufe pro Besuch"
-
-msgid "Average Visit Duration in Minutes"
-msgstr "Durchschnittliche Besuchsdauer in Minuten"

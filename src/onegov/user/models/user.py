@@ -9,9 +9,9 @@ from onegov.core.utils import is_valid_yubikey_format
 from onegov.core.utils import remove_repeated_spaces
 from onegov.core.utils import yubikey_otp_to_serial
 from onegov.search import ORMSearchable
-from onegov.user.models.group import UserGroup
+from onegov.user.models.group import UserGroup, group_association_table
 from sedate import utcnow
-from sqlalchemy import Boolean, Column, Index, Text, func, ForeignKey
+from sqlalchemy import Boolean, Column, Index, Text, func
 from sqlalchemy import UniqueConstraint
 from sqlalchemy.ext.hybrid import hybrid_property
 from sqlalchemy.orm import deferred, relationship
@@ -93,17 +93,12 @@ class User(Base, TimestampMixin, ORMSearchable):
     #: the role is relevant for security in onegov.core
     role: Column[str] = Column(Text, nullable=False)
 
-    #: the id of the group this user belongs to
-    group_id: Column[UUIDType | None] = Column(
-        UUID,  # type:ignore[arg-type]
-        ForeignKey(UserGroup.id),
-        nullable=True
-    )
-
     #: the group this user belongs to
-    group: relationship[UserGroup | None] = relationship(
+    groups: relationship[list[UserGroup]] = relationship(
         UserGroup,
-        back_populates='users'
+        secondary=group_association_table,
+        back_populates='users',
+        passive_deletes=True,
     )
 
     #: the real name of the user for display (use the :attr:`name` property

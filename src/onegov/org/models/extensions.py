@@ -72,6 +72,20 @@ if TYPE_CHECKING:
     )
 
 
+def json_to_links(
+    text: str | None = None
+) -> list[tuple[str | None, str | None]]:
+
+    if not text:
+        return []
+
+    return [
+        (value['text'], link)
+        for value in json.loads(text).get('values', [])
+        if (link := value['link']) or value['text']
+    ]
+
+
 class ContentExtension:
     """ Extends classes based on :class:`onegov.core.orm.mixins.ContentMixin`
     with custom data that is stored in either 'meta' or 'content'.
@@ -1031,7 +1045,7 @@ class SidebarLinksExtension(ContentExtension):
 
             def process_obj(self, obj: SidebarLinksExtension) -> None:
                 super().process_obj(obj)
-                if not obj.sidepanel_links:
+                if not hasattr(obj, 'sidepanel_links'):
                     self.sidepanel_links.data = self.links_to_json(None)
                 else:
                     self.sidepanel_links.data = self.links_to_json(
@@ -1044,11 +1058,12 @@ class SidebarLinksExtension(ContentExtension):
                 *args: Any, **kwargs: Any
             ) -> None:
                 super().populate_obj(obj, *args, **kwargs)
-                obj.sidepanel_links = self.json_to_links(
-                    self.sidepanel_links.data) or None
+                if hasattr(obj, 'sidepanel_links'):
+                    obj.sidepanel_links = json_to_links(
+                        self.sidepanel_links.data) or None
 
             def validate_sidepanel_links(self, field: StringField) -> None:
-                for text, url in self.json_to_links(self.sidepanel_links.data):
+                for text, url in json_to_links(self.sidepanel_links.data):
                     if text and not url:
                         raise ValidationError(
                             _('Please add an url to each link'))
@@ -1058,20 +1073,6 @@ class SidebarLinksExtension(ContentExtension):
                               ' https:// or /'
                               ' (for internal links)')
                         )
-
-            def json_to_links(
-                self,
-                text: str | None = None
-            ) -> list[tuple[str | None, str | None]]:
-
-                if not text:
-                    return []
-
-                return [
-                    (value['text'], link)
-                    for value in json.loads(text).get('values', [])
-                    if (link := value['link']) or value['text']
-                ]
 
             def links_to_json(
                 self,
@@ -1128,14 +1129,16 @@ class SidebarContactLinkExtension(ContentExtension):
 
             def on_request(self) -> None:
                 if not self.sidepanel_contact.data:
-                    self.sidepanel_contact.data = self.links_to_json(None)
+                    self.sidepanel_contact.data = self.contact_links_to_json(
+                        None)
 
             def process_obj(self, obj: SidebarContactLinkExtension) -> None:
                 super().process_obj(obj)
-                if not obj.sidepanel_contact:
-                    self.sidepanel_contact.data = self.links_to_json(None)
+                if not hasattr(obj, 'sidepanel_contact'):
+                    self.sidepanel_contact.data = self.contact_links_to_json(
+                        None)
                 else:
-                    self.sidepanel_contact.data = self.links_to_json(
+                    self.sidepanel_contact.data = self.contact_links_to_json(
                         obj.sidepanel_contact
                     )
 
@@ -1145,11 +1148,12 @@ class SidebarContactLinkExtension(ContentExtension):
                 *args: Any, **kwargs: Any
             ) -> None:
                 super().populate_obj(obj, *args, **kwargs)
-                obj.sidepanel_contact = self.json_to_links(
-                    self.sidepanel_contact.data) or None
+                if hasattr(obj, 'sidepanel_contact'):
+                    obj.sidepanel_contact = json_to_links(
+                        self.sidepanel_contact.data) or None
 
             def validate_sidepanel_contact(self, field: StringField) -> None:
-                for text, link in self.json_to_links(
+                for text, link in json_to_links(
                         self.sidepanel_contact.data
                 ):
                     if text and not link:
@@ -1168,21 +1172,7 @@ class SidebarContactLinkExtension(ContentExtension):
                               ' (for internal links)')
                         )
 
-            def json_to_links(
-                self,
-                text: str | None = None
-            ) -> list[tuple[str | None, str | None]]:
-
-                if not text:
-                    return []
-
-                return [
-                    (value['text'], link)
-                    for value in json.loads(text).get('values', [])
-                    if (link := value['link']) or value['text']
-                ]
-
-            def links_to_json(
+            def contact_links_to_json(
                 self,
                 links: Sequence[tuple[str | None, str | None]] | None
             ) -> str:

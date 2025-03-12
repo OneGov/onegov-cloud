@@ -641,9 +641,9 @@ def test_view_notices_statistics(gazette_app):
         manage.form['role'] = 'member'
         manage.form['name'] = user
         manage.form['username'] = user
-        manage.form['group'] = dict(
-            (x[2], x[0]) for x in manage.form['group'].options
-        )[group]
+        manage.form['group_ids'] = [dict(
+            (x[2], x[0]) for x in manage.form['group_ids'].options
+        )[group]]
         with patch('onegov.gazette.views.users.random_password') as password:
             password.return_value = 'hunter2'
             manage.form.submit().maybe_follow()

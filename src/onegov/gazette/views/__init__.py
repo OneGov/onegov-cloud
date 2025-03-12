@@ -25,6 +25,6 @@ def get_user_and_group(
 
     user = get_user(request)
     return (
-        [user.id] if (user and not user.group) else [],
-        [user.group.id] if (user and user.group) else []
+        [user.id] if (user and not user.groups) else [],
+        [group.id for group in user.groups] if (user and user.groups) else []
     )

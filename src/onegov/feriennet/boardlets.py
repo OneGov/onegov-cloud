@@ -8,7 +8,7 @@ from onegov.feriennet import FeriennetApp
 from onegov.feriennet.collections import BillingCollection, MatchCollection
 from onegov.feriennet.exports.unlucky import UnluckyExport
 from onegov.feriennet.layout import DefaultLayout
-from onegov.org.boardlets import TicketBoardlet, EditedPagesBoardlet, \
+from onegov.org.boardlets import TicketBoardlet, EditedTopicsBoardlet, \
     EditedNewsBoardlet, PlausibleStats, PlausibleTopPages
 from onegov.org.models import Boardlet, BoardletFact
 from sqlalchemy import func
@@ -60,7 +60,7 @@ class DisabledTicketBoardlet(TicketBoardlet):
 
 
 @FeriennetApp.boardlet(name='pages', order=(1, 2), icon='fa-edit')
-class DisabledEditedPagesBoardlet(EditedPagesBoardlet):
+class DisabledEditedPagesBoardlet(EditedTopicsBoardlet):
 
     @property
     def is_available(self) -> bool:

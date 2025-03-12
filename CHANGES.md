@@ -1,8 +1,111 @@
 # Changes
 
+## 2025.13
+
+`2025-03-11` | [2f9d78d9fb...771272f75e](https://github.com/OneGov/onegov-cloud/compare/2f9d78d9fb^...771272f75e)
+
+### Form
+
+##### Add new format to formcode
+
+New possible format for animal identification number (15 digits)
+
+`Feature` | [OGC-2052](https://linear.app/onegovcloud/issue/OGC-2052) | [809bbfd4cf](https://github.com/onegov/onegov-cloud/commit/809bbfd4cfe0b8ba3e434490d53512e42f15ac60)
+
+### Org
+
+##### Rearrange fields in upload-div
+
+`Feature` | [OGC-2078](https://linear.app/onegovcloud/issue/OGC-2078) | [f8e1511849](https://github.com/onegov/onegov-cloud/commit/f8e151184979f312786e7196661e82beeec938da)
+
+##### Don't allow to paste topic into news and vice versa
+
+`Feature` | [OGC-2105](https://linear.app/onegovcloud/issue/OGC-2105) | [08eb4146de](https://github.com/onegov/onegov-cloud/commit/08eb4146de81cf86a91745f326526db280bb71ef)
+
+##### Small adjustment in body of push notification message.
+
+`Feature` | [OGC-2123](https://linear.app/onegovcloud/issue/OGC-2123) | [90b33b586d](https://github.com/onegov/onegov-cloud/commit/90b33b586da9f8952ebf3e71f27e19c4591d8ca7)
+
+##### Checkbox for automatic newsletter subscription
+
+Add a checkbox for confirming the recipient subscribed by the admin agreed to this.
+
+`Feature` | [OGC-2065](https://linear.app/onegovcloud/issue/OGC-2065) | [6f23ad1242](https://github.com/onegov/onegov-cloud/commit/6f23ad124205991fa509bda2711dfcbee37a9ea5)
+
+##### Adds a supporter role which can only receive and process tickets
+
+Additionally this makes sure that actions on the ticket go through the
+ticket or a different proxy model which supporters have private access
+to, so supporters can apply changes relevant to the ticket.
+
+`Feature` | [OGC-1865](https://linear.app/onegovcloud/issue/OGC-1865) | [7a52db6883](https://github.com/onegov/onegov-cloud/commit/7a52db6883dc7ea8ad444dc1c546d633da9ee506)
+
+##### Show only topics in 'Edited Topics` boardlet on dashboard
+
+`Bugfix` | [OGC-2121](https://linear.app/onegovcloud/issue/OGC-2121) | [cd84b19459](https://github.com/onegov/onegov-cloud/commit/cd84b194596e57b0d6cd7f68caf3afa5437fc97e)
+
+##### Fix dashboard translations get lost
+
+Executing `do/translate onegov.town6` made dashboard translations disappear
+
+`Bugfix` | [NONE](#NONE) | [7febe10d80](https://github.com/onegov/onegov-cloud/commit/7febe10d80fa9e60e8475fc1bf419793630c11df)
+
+##### Fixes tests afer new message format.
+
+`Bugfix` | [6c99360456](https://github.com/onegov/onegov-cloud/commit/6c99360456640d1a1c8976571c62f619376a55b1)
+
+### Town6
+
+##### Sidebar name
+
+Create title of sidebar from h3 elements
+
+`Feature` | [OGC-2043](https://linear.app/onegovcloud/issue/OGC-2043) | [6d862946df](https://github.com/onegov/onegov-cloud/commit/6d862946dfa2ccd4b621dafff166c5873a688ce5)
+
+##### Display sidebar contact links like sidebar links
+
+`Feature` | [OGC-2112](https://linear.app/onegovcloud/issue/OGC-2112) | [8fe36d71b2](https://github.com/onegov/onegov-cloud/commit/8fe36d71b2cf5ffd51f206d4afc4d5e5b0e3ff31)
+
+##### Directory preview
+
+Fix display of preview text
+
+`Bugfix` | [OGC-2114](https://linear.app/onegovcloud/issue/OGC-2114) | [e35b22bb72](https://github.com/onegov/onegov-cloud/commit/e35b22bb72f8da252115bfb7708eb0fa5a309f61)
+
+##### Fix margin for plus and minus button
+
+`Bugfix` | [NONE](#NONE) | [5ad5e4e0b6](https://github.com/onegov/onegov-cloud/commit/5ad5e4e0b6581525998801bc3c39893f7074a2e7)
+
+##### Firebase bugfixes.
+
+Fixes a number of issues OGC-2122, OGC-2120, OGC-2119, OGC-2109
+
+- Fix an issue where news published only 1 min in the future was not sent
+- Link to the `/push-notifications`
+- Show hint in UI if message already sent and it won't send again
+- Make deleting News with push notifications possible
+
+`Bugfix` | [771272f75e](https://github.com/onegov/onegov-cloud/commit/771272f75e100045de2b07cae6ff55a2615e8c6d)
+
+### User
+
+##### Allows users to be part of more than one group
+
+`Feature` | [OGC-2079](https://linear.app/onegovcloud/issue/OGC-2079) | [676ffb72a0](https://github.com/onegov/onegov-cloud/commit/676ffb72a0531b5010f071641037e7e0e40d9722)
+
+## 2025.12
+
+`2025-03-04` | [aeeac42f56...1ad5188fed](https://github.com/OneGov/onegov-cloud/compare/aeeac42f56^...1ad5188fed)
+
+### Ticket
+
+##### Make db upgrade for ticket closed_on column more performant
+
+`Feature` | [NONE](#NONE) | [f59d7a9b0f](https://github.com/onegov/onegov-cloud/commit/f59d7a9b0fe658317e5dec8ba1381684d6364b09)
+
 ## 2025.11
 
-`2025-03-03` | [0c2dd4a07e...0c2dd4a07e](https://github.com/OneGov/onegov-cloud/compare/0c2dd4a07e^...0c2dd4a07e)
+`2025-03-03` | [0c2dd4a07e...c321b6c196](https://github.com/OneGov/onegov-cloud/compare/0c2dd4a07e^...c321b6c196)
 
 ## 2025.10
 
@@ -2243,81 +2346,4 @@ The format should only contain results for one ballot anyway.
 ##### Move the save button for edit forms to edit bar
 
 `Feature` | [OGC-1596](https://linear.app/onegovcloud/issue/OGC-1596) | [004cdbbac5](https://github.com/onegov/onegov-cloud/commit/004cdbbac52942e1bf45eeafc2abe72ea9837270)
-
-## 2024.30
-
-`2024-05-14` | [1ef85ef354...ca4867b42b](https://github.com/OneGov/onegov-cloud/compare/1ef85ef354^...ca4867b42b)
-
-### Landsgemdeine
-
-##### Display Timestamp for votum in ticker
-
-`Feature` | [OGC-1624](https://linear.app/onegovcloud/issue/OGC-1624) | [d43dbcf670](https://github.com/onegov/onegov-cloud/commit/d43dbcf670bb74df925bdbe35f96b0a230921d7d)
-
-### Landsgemeinde
-
-##### Link agenda items in ticker to their own subpage
-
-Agenda items, that are still "scheduled" so far had no working link. Now they are linkt to their own subpage so users can read the description even if the agenda item isn't ongoing yet.
-
-`Feature` | [OGC-1623](https://linear.app/onegovcloud/issue/OGC-1623) | [1ef85ef354](https://github.com/onegov/onegov-cloud/commit/1ef85ef3545c000aba6050fe82cf0ecdd7315948)
-
-##### Automaticaly fill in start time when "ongoing" is clicked in the form
-
-`Feature` | [OGC-1626](https://linear.app/onegovcloud/issue/OGC-1626) | [db035bde73](https://github.com/onegov/onegov-cloud/commit/db035bde73c880ce114b84634c6329a6e8588b8a)
-
-## 2024.29
-
-`2024-05-14` | [7c8b77a2d0...972f8f5843](https://github.com/OneGov/onegov-cloud/compare/7c8b77a2d0^...972f8f5843)
-
-**Upgrade hints**
-- onegov-election-day --select /onegov_election_day/* migrate-subscribers
-### Core
-
-##### Ensures SMS spooler triggers on `onegov.core.utils.safe_move`
-
-Previously we still triggered because we didn't ignore `.tmp` files, so
-this bug was obscured.
-
-`Bugfix` | [2ae44dacf1](https://github.com/onegov/onegov-cloud/commit/2ae44dacf104087cd25a9b4adc08459d1b9ae965)
-
-### Election Day
-
-##### Add notification segmentation.
-
-If segmented_notifications is enabled for a principal, email and SMS subscribers can subscribe either to elections and votes of a specific municipality or everything else. Multiple subscriptions are possible.
-
-`Feature` | [OGC-1150](https://linear.app/onegovcloud/issue/OGC-1150) | [d7d8195c22](https://github.com/onegov/onegov-cloud/commit/d7d8195c22530fe176230c41811d3b45b7fb907a)
-
-##### Sort municipalities in subscription forms.
-
-`Feature` | [OGC-1150](https://linear.app/onegovcloud/issue/OGC-1150) | [4444f815c0](https://github.com/onegov/onegov-cloud/commit/4444f815c0330c80dba0fc4ba418a6a2d621fc0c)
-
-##### Add experimental support for eCH-0252 election compound import.
-
-`Feature` | [OGC-1608](https://linear.app/onegovcloud/issue/OGC-1608) | [e7cdccb855](https://github.com/onegov/onegov-cloud/commit/e7cdccb855ae0bc2337996ce5f033b02f45f2f15)
-
-### Forms
-
-##### Left align input text with help text below for town6
-
-`Bugfix` | [OGC-1593](https://linear.app/onegovcloud/issue/OGC-1593) | [a315bd300f](https://github.com/onegov/onegov-cloud/commit/a315bd300fa6c6d6a08af49163b4da7d8ee22236)
-
-### Landsgemeinde
-
-##### Links to video for vota
-
-`Feature` | [OGC-1635](https://linear.app/onegovcloud/issue/OGC-1635) | [c7aa98c92b](https://github.com/onegov/onegov-cloud/commit/c7aa98c92bf47fcc6dcd82b2957c30e919660c33)
-
-### Swissvotes
-
-##### Update campaign website info button.
-
-`Feature` | [SWI-48](https://linear.app/swissvotes/issue/SWI-48) | [0ba48e642e](https://github.com/onegov/onegov-cloud/commit/0ba48e642e41252a4eda49841dd88ce232673d13)
-
-### Town 6
-
-##### Fix Bug where Documents were displayed twice on resources
-
-`Bugfix` | [OGC-1569](https://linear.app/onegovcloud/issue/OGC-1569) | [ffde31511a](https://github.com/onegov/onegov-cloud/commit/ffde31511a25d456c181400523be4e99f24911df)
 

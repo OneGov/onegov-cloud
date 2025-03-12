@@ -34,7 +34,8 @@ if TYPE_CHECKING:
 AVAILABLE_ROLES = [
     ('admin', _('Admin')),
     ('editor', _('Editor')),
-    ('member', _('Member'))
+    ('supporter', _('Supporter')),
+    ('member', _('Member')),
 ]
 
 
@@ -83,6 +84,13 @@ class ManageUserForm(Form):
         self.state.data = value and 'active' or 'inactive'
 
     def on_request(self) -> None:
+        # hide roles that are not configured for the current app
+        roles_setting = self.request.app.settings.roles
+        self.role.choices = [
+            (role, label)
+            for role, label in AVAILABLE_ROLES
+            if hasattr(roles_setting, role)
+        ]
         self.request.include('tags-input')
 
     def populate_obj(self, model: User) -> None:  # type:ignore
@@ -181,12 +189,6 @@ class ManageUserGroupForm(Form):
     users = ChosenSelectMultipleField(
         label=_('Users'),
         choices=[],
-        description=_(
-            'Users can only be in one group. '
-            'If they already belong to another group '
-            'and get added here, they will automatically '
-            'get removed from the other group.'
-        )
     )
 
     ticket_permissions = ChosenSelectMultipleField(
