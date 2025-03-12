@@ -1002,10 +1002,19 @@ class HolidaySettingsForm(Form):
 
 class OrgTicketSettingsForm(Form):
 
-    email_for_new_tickets = StringField(
-        label=_('Email adress for notifications '
-                'about newly opened tickets'),
-        description=('info@example.ch')
+    hide_personal_email = BooleanField(
+        label=_('Hide personal email addresses'),
+        description=_('Hide personal email addresses in the ticket system'),
+        fieldset=_('General')
+    )
+
+    general_email = EmailField(
+        label=_('General email address'),
+        description=_('Email address that is displayed instead of the '
+                      'personal email address'),
+        depends_on=('hide_personal_email', 'y'),
+        validators=[InputRequired()],
+        fieldset=_('General')
     )
 
     ticket_auto_accept_style = RadioField(
@@ -1014,6 +1023,7 @@ class OrgTicketSettingsForm(Form):
             ('category', _('Ticket category')),
             ('role', _('User role')),
         ),
+        fieldset=_('Auto-accept and auto-close'),
         default='category'
     )
 
@@ -1024,6 +1034,7 @@ class OrgTicketSettingsForm(Form):
                       "in state pending. Also note, that after the ticket is "
                       "closed, the submitter can't send any messages."),
         choices=[],
+        fieldset=_('Auto-accept and auto-close'),
         depends_on=('ticket_auto_accept_style', 'category')
     )
 
@@ -1034,12 +1045,21 @@ class OrgTicketSettingsForm(Form):
                       "in state pending. Also note, that after the ticket is "
                       "closed, the submitter can't send any messages."),
         choices=AVAILABLE_ROLES,
+        fieldset=_('Auto-accept and auto-close'),
         depends_on=('ticket_auto_accept_style', 'role')
     )
 
     auto_closing_user = ChosenSelectField(
         label=_('User used to auto-accept tickets'),
-        choices=[]
+        choices=[],
+        fieldset=_('Auto-accept and auto-close'),
+    )
+
+    email_for_new_tickets = StringField(
+        label=_('Email adress for notifications '
+                'about newly opened tickets'),
+        fieldset=_('Notifications'),
+        description=('info@example.ch')
     )
 
     tickets_skip_opening_email = MultiCheckboxField(
@@ -1047,7 +1067,8 @@ class OrgTicketSettingsForm(Form):
                 'this ticket category is opened'),
         choices=[],
         description=_('This is enabled by default for tickets that get '
-                      'accepted automatically')
+                      'accepted automatically'),
+        fieldset=_('Notifications'),
     )
 
     tickets_skip_closing_email = MultiCheckboxField(
@@ -1055,17 +1076,21 @@ class OrgTicketSettingsForm(Form):
                 'this ticket category is closed'),
         choices=[],
         description=_('This is enabled by default for tickets that get '
-                      'accepted automatically')
+                      'accepted automatically'),
+        fieldset=_('Notifications'),
     )
 
     mute_all_tickets = BooleanField(
-        label=_('Mute all tickets')
+        label=_('Mute all tickets'),
+        fieldset=_('Notifications'),
+
     )
 
     ticket_always_notify = BooleanField(
         label=_('Always send email notification '
                 'if a new ticket message is sent'),
-        default=True
+        default=True,
+        fieldset=_('Notifications'),
     )
 
     permissions = MultiCheckboxField(
