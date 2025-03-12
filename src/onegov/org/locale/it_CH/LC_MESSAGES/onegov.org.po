@@ -2,7 +2,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: \n"
-"POT-Creation-Date: 2025-03-11 16:35+0100\n"
+"POT-Creation-Date: 2025-03-12 16:30+0100\n"
 "PO-Revision-Date: 2022-03-15 10:52+0100\n"
 "Last-Translator: \n"
 "Language-Team: \n"
@@ -1914,8 +1914,19 @@ msgstr "Inserisci una coppia di date per riga"
 msgid "End date needs to be after start date"
 msgstr "La data di fine deve essere successiva alla data di inizio"
 
-msgid "Email adress for notifications about newly opened tickets"
-msgstr "Indirizzo e-mail per le notifiche dei biglietti aperti"
+msgid "Hide personal email addresses"
+msgstr "Nascondi gli indirizzi e-mail personali"
+
+msgid "Hide personal email addresses in the ticket system"
+msgstr "Nascondi gli indirizzi e-mail personali nel sistema di ticket"
+
+msgid "General email address"
+msgstr "Indirizzo e-mail generale"
+
+msgid "Email address that is displayed instead of the personal email address"
+msgstr ""
+"Indirizzo e-mail che viene visualizzato invece dell'indirizzo e-mail "
+"personale"
 
 msgid "Accept request and close ticket automatically based on:"
 msgstr "Accetta la richiesta e chiudi il ticket automaticamente in base a:"
@@ -1925,6 +1936,9 @@ msgstr "Categoria del biglietto"
 
 msgid "User role"
 msgstr "Ruolo utente"
+
+msgid "Auto-accept and auto-close"
+msgstr "Accettazione e chiusura automatica"
 
 msgid ""
 "Accept request and close ticket automatically for these ticket categories"
@@ -1947,6 +1961,9 @@ msgstr ""
 
 msgid "User used to auto-accept tickets"
 msgstr "Utente abituato ad accettare automaticamente i biglietti"
+
+msgid "Email adress for notifications about newly opened tickets"
+msgstr "Indirizzo e-mail per le notifiche dei biglietti aperti"
 
 msgid "Block email confirmation when this ticket category is opened"
 msgstr ""
@@ -3136,8 +3153,8 @@ msgstr "Il rifiuto di ${title} non può essere annullato."
 msgid "Reject reservation"
 msgstr "Rifiuta prenotazione"
 
-#.
 #. Used in sentence: "${event} published."
+#.
 msgid "Event"
 msgstr "Evento"
 
