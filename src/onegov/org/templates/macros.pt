@@ -1068,7 +1068,7 @@
 
         <tal:b condition="event.organizer_phone">
             <dt i18n:translate>Organizer phone number</dt>
-            <dd><a href="tel:${event.organizer_phone}" tal:content="event.organizer_phone" /></dd>
+            <dd><a href="tel:${layout.format_phone_number(event.organizer_phone)}" tal:content="layout.format_phone_number(event.organizer_phone)" /></dd>
         </tal:b>
 
         <tal:b condition="event.tags and show_tags">
