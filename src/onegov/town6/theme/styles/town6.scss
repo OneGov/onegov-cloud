@@ -443,8 +443,12 @@ input[type="url"] {
         }
     }
 
-    *:first-child.fa:has(+ span) {
-        margin-right: .5rem;
+    *:first-child.fa {
+        margin: 0 .5rem;
+    }
+
+    *:first-child.fa:has(+ span:not(.show-for-sr)) {
+        margin-left: 0rem;
     }
 
 }
@@ -1290,4 +1294,10 @@ ul.recipients {
 .imageset-date {
     font-size: .875rem;
     color: $dark-gray;
+}
+
+.disabled-link {
+    cursor: not-allowed;
+    color: grey;
+    opacity: 0.5;
 }

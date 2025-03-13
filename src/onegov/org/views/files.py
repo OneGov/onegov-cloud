@@ -9,8 +9,8 @@ import sedate
 from babel.core import Locale
 from babel.dates import parse_pattern
 from dateutil.parser import parse
+from functools import lru_cache
 from itertools import groupby
-from onegov.core.cache import lru_cache
 from onegov.core.filestorage import view_filestorage_file
 from onegov.core.security import Private, Public
 from onegov.core.templates import render_macro
@@ -204,6 +204,34 @@ def view_file_details(
             'layout': layout,
             'extension': extension,
             'color': color
+        }
+    )
+
+
+@OrgApp.html(model=GeneralFile, permission=Private, name='links')
+def view_file_links(
+    self: GeneralFile,
+    request: OrgRequest,
+    layout: DefaultLayout | None = None
+) -> str:
+
+    layout = layout or DefaultLayout(self, request)
+
+    # IE 11 caches all ajax requests otherwise
+    @request.after
+    def must_revalidate(response: Response) -> None:
+        response.headers.add('cache-control', 'must-revalidate')
+        response.headers.add('cache-control', 'no-cache')
+        response.headers.add('cache-control', 'no-store')
+        response.headers['pragma'] = 'no-cache'
+        response.headers['expires'] = '0'
+
+    return render_macro(
+        layout.macros['file-links'],
+        request,
+        {
+            'file': self,
+            'layout': layout,
         }
     )
 

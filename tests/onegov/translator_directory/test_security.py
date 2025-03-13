@@ -29,13 +29,13 @@ from onegov.translator_directory.models.translator import Translator
 from onegov.user.models import User
 
 
-def create_user(name, role='anonymous', group_id=None):
+def create_user(name, role='anonymous', groups=None):
     return User(
         realname=name,
         username=f'{name}@example.org',
         password_hash='hash',
         role=role,
-        group_id=group_id
+        groups=groups or [],
     )
 
 
@@ -46,13 +46,13 @@ def test_security_permissions(translator_app):
     session.query(User).delete()
 
     # Add one user per role
-    def create_user(name, role, group_id=None):
+    def create_user(name, role, groups=None):
         result = User(
             realname=name,
             username=f'{name}@example.org',
             password_hash='hash',
             role=role,
-            group_id=group_id
+            groups=groups or [],
         )
         session.add(result)
         return result
@@ -67,7 +67,7 @@ def test_security_permissions(translator_app):
         if user:
             identity = Identity(
                 userid=user.username,
-                groupid=user.group_id.hex if user.group_id else '',
+                groupids=frozenset(group.id.hex for group in user.groups),
                 role=user.role,
                 application_id=translator_app.application_id
             )

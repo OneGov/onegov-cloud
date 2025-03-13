@@ -6,6 +6,7 @@ import ua_parser
 from datetime import timedelta
 from functools import cached_property
 from onegov.core.cache import instance_lru_cache
+from onegov.core.custom import msgpack
 from onegov.core.utils import append_query_param
 from itsdangerous import (
     BadSignature,
@@ -27,7 +28,7 @@ from wtforms.csrf.session import SessionCSRF
 from typing import overload, Any, NamedTuple, TypeVar, TYPE_CHECKING
 if TYPE_CHECKING:
     from _typeshed import SupportsItems
-    from collections.abc import Callable, Iterable, Iterator
+    from collections.abc import Callable, Iterable, Iterator, Sequence
     from dectate import Sentinel
     from gettext import GNUTranslations
     from markupsafe import Markup
@@ -38,7 +39,7 @@ if TYPE_CHECKING:
     from onegov.core.security.permissions import Intent
     from onegov.core.types import MessageType
     from sqlalchemy import Column
-    from sqlalchemy.orm import Session
+    from sqlalchemy.orm import relationship, Session
     from translationstring import _ChameleonTranslate
     from typing import Literal, Protocol, TypeGuard
     from webob import Response
@@ -54,13 +55,22 @@ if TYPE_CHECKING:
     # NOTE: To avoid a dependency between onegov.core and onegov.user
     #       we use a UserLike Protocol to define the properties we need
     #       to be present on a user.
+    class GroupLike(Protocol):
+        @property
+        def id(self) -> UUID | Column[UUID]: ...
+        @property
+        def name(self) -> str | Column[str | None] | None: ...
+
     class UserLike(Protocol):
         @property
         def id(self) -> UUID | Column[UUID]: ...
         @property
         def username(self) -> str | Column[str]: ...
         @property
-        def group_id(self) -> UUID | Column[UUID | None] | None: ...
+        def groups(self) -> (
+            Sequence[GroupLike]
+            | relationship[Sequence[GroupLike]]
+        ): ...
         @property
         def role(self) -> str | Column[str]: ...
 
@@ -71,6 +81,7 @@ _T = TypeVar('_T')
 _F = TypeVar('_F', bound='Form')
 
 
+@msgpack.make_serializable(tag=11)
 class Message(NamedTuple):
     text: str
     type: MessageType
@@ -651,7 +662,7 @@ class CoreRequest(IncludeRequest, ContentSecurityRequest, ReturnToMixin):
         identity = self.app.application_bound_identity(
             user.username,
             user.id.hex,
-            user.group_id.hex if user.group_id else None,
+            frozenset(group.id.hex for group in user.groups),
             user.role
         ) if user else self.identity
 
@@ -779,6 +790,18 @@ class CoreRequest(IncludeRequest, ContentSecurityRequest, ReturnToMixin):
         signer = TimestampSigner(self.identity_secret, salt=salt)
 
         return signer.sign(random_token())
+
+    @cached_property
+    def csrf_token(self) -> str:
+        """ Returns a csrf token for use with DELETE links (forms do their
+        own thing automatically).
+
+        """
+        return self.new_csrf_token().decode('utf-8')
+
+    def csrf_protected_url(self, url: str) -> str:
+        """ Adds a csrf token to the given url. """
+        return utils.append_query_param(url, 'csrf-token', self.csrf_token)
 
     def assert_valid_csrf_token(
         self,

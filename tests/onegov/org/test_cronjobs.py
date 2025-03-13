@@ -16,9 +16,14 @@ from onegov.directory.collections.directory import EntryRecipientCollection
 from onegov.event import EventCollection, OccurrenceCollection
 from onegov.event.utils import as_rdates
 from onegov.form import FormSubmissionCollection
-from onegov.org.models import ResourceRecipientCollection, News
+from onegov.gever.encrypt import encrypt_symmetric
+from onegov.org.models import ResourceRecipientCollection, News,\
+    PushNotification
+from onegov.org.models.page import NewsCollection
 from onegov.org.models.resource import RoomResource
 from onegov.org.models.ticket import ReservationHandler, DirectoryEntryHandler
+from onegov.org.notification_service import TestNotificationService,\
+    set_test_notification_service
 from onegov.page import PageCollection
 from onegov.ticket import Handler, Ticket, TicketCollection
 from onegov.user import UserCollection
@@ -1556,3 +1561,193 @@ def test_update_newsletter_email_bounce_statistics(org_app, handlers):
             # execute cronjob
             with pytest.raises(requests.exceptions.HTTPError):
                 client.get(get_cronjob_url(job))
+
+
+def test_delete_unconfirmed_subscribers(org_app, handlers):
+    register_echo_handler(handlers)
+
+    job = get_cronjob_by_name(org_app,
+                              'delete_unconfirmed_newsletter_subscriptions')
+    job.app = org_app
+
+    with freeze_time(datetime(2025, 1, 1, 4, 0)):
+        transaction.begin()
+
+        session = org_app.session()
+
+        recipients = RecipientCollection(session)
+        recipients.add('one@example.org', confirmed=False)
+        recipients.add('two@example.org', confirmed=False)
+        # Cronjob should only delete unconfirmed recipients
+        recipients.add('three@example.org', confirmed=True)
+
+    # And only unconfirmed subscribers older than 7 days
+    recipients.add('four@example.org', confirmed=False)
+    transaction.commit()
+
+    recipients = RecipientCollection(org_app.session())
+    assert recipients.query().count() == 4
+
+    client = Client(org_app)
+
+    client.get(get_cronjob_url(job))
+
+    recipients = RecipientCollection(org_app.session())
+    assert recipients.query().count() == 2
+
+
+def test_send_push_notifications_for_news(
+    org_app, handlers, firebase_json, client
+):
+    register_echo_handler(handlers)
+
+    client = Client(org_app)
+    job = get_cronjob_by_name(org_app, 'send_push_notifications_for_news')
+    job.app = org_app
+    tz = ensure_timezone('Europe/Zurich')
+
+    # Set up test data
+    transaction.begin()
+
+    # Configure Firebase credentials for the organization
+    encrypted_creds = encrypt_symmetric(
+        firebase_json, org_app.hashed_identity_key
+    ).decode('utf-8')
+    org_app.org.firebase_adminsdk_credential = encrypted_creds
+
+    # Define topic mapping for the organization
+    org_app.org.selectable_push_notification_options = [
+        [f'{org_app.schema}_news', 'News'],
+        [f'{org_app.schema}_important', 'Important']
+    ]
+
+    # Create a news item that should trigger notifications
+    news = NewsCollection(org_app.session())
+
+    # We need to set parent=None for news items
+    recent_news = news.add(
+        parent=None,
+        title='Recent news with notifications',
+        lead='This should trigger a notification',
+        text='Test content for recent news',
+        access='public',
+    )
+
+    # Set publication time just within the 10-minute window
+    recent_news.publication_start = utcnow() - timedelta(minutes=5)
+
+    # Set metadata
+    recent_news.meta = {
+        'send_push_notifications_to_app': True,
+        'push_notifications': [f'{org_app.schema}_news'],
+        'hashtags': ['News']
+    }
+
+    transaction.commit()
+    close_all_sessions()
+
+    # Set up test notification service
+    test_service = TestNotificationService()
+    set_test_notification_service(test_service)
+
+    try:
+        # Run the cronjob
+        client.get(get_cronjob_url(job))
+
+        # Verify the notification was sent
+        assert (
+            len(test_service.sent_messages) == 1
+        ), 'Expected exactly one notification to be sent'
+
+        # Verify the notification content
+        message = test_service.sent_messages[0]
+        assert message['topic'] == f'{org_app.schema}_news'
+        assert message['title'] == 'Recent news with notifications'
+        assert message['body'] == 'This should trigger a notification'
+        assert message['data'] is not None
+
+    finally:
+        # Clean up the test service
+        set_test_notification_service(None)
+
+
+def test_push_notification_duplicate_detection(
+    org_app, handlers, firebase_json
+):
+    """Test that validates the duplicate detection logic properly."""
+    register_echo_handler(handlers)
+    client = Client(org_app)
+    session = org_app.session()
+    job = get_cronjob_by_name(org_app, 'send_push_notifications_for_news')
+    job.app = org_app
+
+    # Set up test data
+    transaction.begin()
+    encrypted_creds = encrypt_symmetric(
+        firebase_json, org_app.hashed_identity_key
+    ).decode('utf-8')
+    org_app.org.firebase_adminsdk_credential = encrypted_creds
+    org_app.org.selectable_push_notification_options = [
+        [f'{org_app.schema}_news', 'News']
+    ]
+
+    # Create a news item
+    news = PageCollection(session)
+    news_parent = news.add_root('News', type='news')
+    test_news = news.add(
+        news_parent,
+        title='Test news for duplicate detection',
+        lead='Test content',
+        text='Test content body',
+        access='public',
+    )
+    news_id = test_news.id
+
+    # Set publication time and metadata
+    test_news.publication_start = utcnow() - timedelta(minutes=2)
+    test_news.meta = {
+        'send_push_notifications_to_app': 'true',
+        'push_notifications': [[f'{org_app.schema}_news', 'News']],
+    }
+
+    # Create a PushNotification record directly in the database
+    # to simulate a notification that was already sent
+    push_notification = PushNotification(
+        news_id=news_id,
+        topic_id=f'{org_app.schema}_news',
+        sent_at=utcnow(),
+        response_data={'status': 'sent', 'message_id': 'test-message-id'},
+    )
+    session.add(push_notification)
+
+    # Commit transaction to ensure everything is saved to the database
+    transaction.commit()
+
+    # Setup test notification service
+    test_service = TestNotificationService()
+    set_test_notification_service(test_service)
+
+    try:
+        # Run the cronjob - this should detect the existing notification and
+        # skip it
+        client.get(get_cronjob_url(job))
+        assert (
+            len(test_service.sent_messages) == 0
+        ), "No notifications should be sent for duplicates"
+
+        # Count PushNotification records - should still be just 1
+        count = (
+            session.query(PushNotification)
+            .filter(
+                PushNotification.news_id == news_id,  # Use stored ID
+                PushNotification.topic_id == f'{org_app.schema}_news',
+                )
+            .count()
+        )
+        assert (
+            count == 1
+        ), "There should be exactly one notification record"
+
+    finally:
+        # Clean up
+        set_test_notification_service(None)

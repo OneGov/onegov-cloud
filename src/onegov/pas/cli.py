@@ -1,4 +1,5 @@
 from __future__ import annotations
+
 import click
 from onegov.core.cli import command_group
 from onegov.pas.excel_header_constants import (
@@ -6,6 +7,9 @@ from onegov.pas.excel_header_constants import (
     commission_expected_headers_variant_2,
 )
 from onegov.pas.excel_import_cli import import_commissions
+from onegov.pas.constants import commission_expected_headers_variant_1,\
+    commission_expected_headers_variant_2
+from onegov.pas.data_import import import_commissions
 
 
 from typing import TYPE_CHECKING

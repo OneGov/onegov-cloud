@@ -8,6 +8,8 @@ from onegov.form.extensions import FormExtension
 from onegov.form.fields import HoneyPotField
 from onegov.form.fields import TimezoneDateTimeField
 from onegov.form.fields import UploadField
+from wtforms.fields import BooleanField
+from onegov.form.fields import MultiCheckboxField
 from onegov.form.submissions import prepare_for_submission
 from onegov.form.validators import StrictOptional, ValidPhoneNumber
 from onegov.gis import CoordinatesField
@@ -15,7 +17,7 @@ from onegov.org import _
 from wtforms.fields import EmailField
 from wtforms.fields import StringField
 from wtforms.fields import TextAreaField
-from wtforms.validators import DataRequired, InputRequired
+from wtforms.validators import DataRequired, InputRequired, ValidationError
 
 
 from typing import TypeVar, TYPE_CHECKING
@@ -75,9 +77,9 @@ class SubmitterFormExtension(FormExtension[FormT], name='submitter'):
             )
 
             def on_request(self) -> None:
-                """ This is not an optimal solution defining this on a form
-                extension. However, this is the first of it's kind.
-                Don't forget to call super for the next one. =) """
+                # This is not an optimal solution defining this on a form
+                # extension. However, this is the first of it's kind.
+                # Don't forget to call super for the next one. =)
                 if hasattr(super(), 'on_request'):
                     super().on_request()
 
@@ -272,21 +274,91 @@ class PublicationFormExtension(FormExtension[FormT], name='publication'):
                 end = self.publication_end
                 if not start or not end:
                     return None
+
+                # Check if publication end is in the future
                 if end.data and to_timezone(end.data, 'UTC') <= utcnow():
                     assert isinstance(self.publication_end.errors, list)
                     self.publication_end.errors.append(
                         _('Publication end must be in the future'))
                     return False
+
+                # Check if start is before end
                 if not start.data or not end.data:
                     return None
-
                 if end.data <= start.data:
                     for field_name in ('publication_start', 'publication_end'):
                         field = getattr(self, field_name)
                         field.errors.append(
                             _('Publication start must be prior to end'))
                     return False
+
                 return None
+
+        return PublicationForm
+
+
+class PushNotificationFormExtension(FormExtension[FormT], name='publish'):
+    """ Assumes to be used in conjunction with PublicationFormExtension. """
+
+    def create(self, timezone: str = 'Europe/Zurich') -> type[FormT]:
+
+        class PublicationForm(self.form_class):  # type:ignore
+
+            send_push_notifications_to_app = BooleanField(
+                label=_('Send push notifications to app'),
+                fieldset=_('Publication'),
+                validators=[StrictOptional()],
+                render_kw={'disabled': 'disabled'},
+            )
+
+            push_notifications = MultiCheckboxField(
+                label=('Topics'),
+                choices=[],
+                fieldset=_('Publication'),
+                depends_on=('send_push_notifications_to_app', 'y'),
+                validators=[StrictOptional()],
+                render_kw={'class_': 'indent-form-field'},
+            )
+
+            def on_request(self) -> None:
+                # This is not an optimal solution defining this on a form
+                # extension. However, this is the first of it's kind.
+                # Don't forget to call super for the next one. =)
+                if hasattr(super(), 'on_request'):
+                    super().on_request()
+
+                if not self.request.app.org.firebase_adminsdk_credential:
+                    self.delete_field('send_push_notifications_to_app')
+                    self.delete_field('push_notifications')
+                    return None
+
+                # Don't show any choices for this
+                if not hasattr(self, 'send_push_notifications_to_app'):
+                    return None
+
+                default_topic = [[self.request.app.schema, 'News']]
+                id_topic_pairs = self.request.app.org.meta.get(
+                    'selectable_push_notification_options',
+                    default_topic
+                )
+                # Format choices to show both ID and value
+                self.push_notifications.choices = [
+                    (id, f'{id} ↔ {value}') for id, value in id_topic_pairs
+                ]
+
+            def validate_send_push_notifications_to_app(
+                self, field: BooleanField
+            ) -> None:
+                if not self.publication_start.data:
+                    raise ValidationError(
+                        _('You must set a publication start date first.')
+                    )
+                if field.data and not self.push_notifications.data:
+                    raise ValidationError(
+                        _('Please select at least one topic '
+                          'for push notifications.'
+                          )
+                    )
 
         return PublicationForm
 
@@ -299,6 +371,11 @@ class HoneyPotFormExtension(FormExtension[FormT], name='honeypot'):
             duplicate_of = HoneyPotField()
 
             def on_request(self) -> None:
+                # This is not an optimal solution defining this on a form
+                # extension.
+                # Don't forget to call super for the next one. =)
+                if hasattr(super(), 'on_request'):
+                    super().on_request()
                 if self.model and not getattr(self.model, 'honeypot', False):
                     self.delete_field('duplicate_of')
 

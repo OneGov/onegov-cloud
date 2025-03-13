@@ -23,14 +23,13 @@ import urllib.request
 from collections.abc import Iterable
 from contextlib import contextmanager
 from cProfile import Profile
-from functools import reduce
+from functools import lru_cache, reduce, cache
 from importlib import import_module
 from io import BytesIO, StringIO
 from itertools import groupby, islice
 from markupsafe import escape
 from markupsafe import Markup
 from onegov.core import log
-from onegov.core.cache import lru_cache
 from onegov.core.custom import json
 from onegov.core.errors import AlreadyLockedError
 from purl import URL
@@ -331,7 +330,14 @@ def hash_dictionary(dictionary: dict[str, Any]) -> str:
     not include data in this dictionary that is secret!
 
     """
-    dict_as_string = json.dumps(dictionary, sort_keys=True).encode('utf-8')
+    # NOTE: For backwards compatibility we use the old json encoder
+    #       otherwise our hashes change depending on whether or not
+    #       the dictionary contained non-ASCII characters
+    dict_as_string = json.dumps(
+        dictionary,
+        sort_keys=True,
+        ensure_ascii=True
+    ).encode('ascii')
     return hashlib.new(  # nosec:B324
         'sha1',
         dict_as_string,
@@ -401,11 +407,11 @@ def linkify_phone(text: str) -> Markup:
         return match.group(0)
 
     # NOTE: re.sub isn't Markup aware, so we need to re-wrap
-    return Markup(  # noqa: RUF035
+    return Markup(  # nosec: B704
         _phone_ch_html_safe.sub(handle_match, escape(text)))
 
 
-@lru_cache(maxsize=None)
+@cache
 def top_level_domains() -> set[str]:
     try:
         return URLExtract()._load_cached_tlds()
@@ -453,14 +459,14 @@ def linkify(text: str | None) -> Markup:
         )
         # NOTE: bleach's linkify always returns a plain string
         #       so we need to re-wrap
-        linkified = linkify_phone(Markup(  # noqa: RUF035
+        linkified = linkify_phone(Markup(  # nosec: B704
             bleach_linker.linkify(escape(text)))
         )
 
     else:
         # NOTE: bleach's linkify always returns a plain string
         #       so we need to re-wrap
-        linkified = linkify_phone(Markup(  # noqa: RUF035
+        linkified = linkify_phone(Markup(  # nosec: B704
             bleach.linkify(escape(text), parse_email=True))
         )
 
@@ -468,7 +474,7 @@ def linkify(text: str | None) -> Markup:
     if isinstance(text, Markup):
         return linkified
 
-    return Markup(bleach.clean(  # noqa: RUF035
+    return Markup(bleach.clean(  # nosec: B704
         linkified,
         tags=['a'],
         attributes={'a': ['href', 'rel']},
@@ -499,7 +505,7 @@ def paragraphify(text: str) -> Markup:
             (
                 # NOTE: re.split returns a plain str, so we need to restore
                 #       markup based on whether it was markup before
-                Markup(p) if was_markup  # noqa: RUF035
+                Markup(p) if was_markup  # nosec: B704
                 else escape(p)
             ).replace('\n', Markup('<br>'))
         )

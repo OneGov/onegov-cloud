@@ -43,10 +43,10 @@
             <div>
                 <dt i18n:translate>User group</dt>
                 <dd>
-                    <tal:block tal:condition="layout.model.group">
-                        ✔︎ <span>${layout.model.group.name}</span>
+                    <tal:block tal:condition="layout.model.groups">
+                        ✔︎ <span>${', '.join(group.name for group in layout.model.groups)}</span>
                     </tal:block>
-                    <tal:block tal:condition="not layout.model.group">
+                    <tal:block tal:condition="not layout.model.groups">
                         ✘︎ <span i18n:translate>None</span>
                     </tal:block>
                 </dd>

@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 from functools import cached_property
+from onegov.core.custom import msgpack
 from onegov.core.orm import orm_cached
 from onegov.core.request import CoreRequest
 from onegov.core.security import Private
@@ -19,6 +20,7 @@ if TYPE_CHECKING:
     from onegov.ticket import Ticket
 
 
+@msgpack.make_serializable(tag=20)
 class PageMeta(NamedTuple):
     id: int
     type: str
@@ -78,6 +80,14 @@ class OrgRequest(CoreRequest):
         """
 
         return self.has_role('editor')
+
+    @cached_property
+    def is_supporter(self) -> bool:
+        """ Returns true if the current user is a supporter.
+
+        """
+
+        return self.has_role('supporter')
 
     @property
     def current_username(self) -> str | None:

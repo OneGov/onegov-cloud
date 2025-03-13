@@ -7,7 +7,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE 1.0\n"
-"POT-Creation-Date: 2025-01-27 10:34+0100\n"
+"POT-Creation-Date: 2025-02-18 09:27+0100\n"
 "PO-Revision-Date: 2022-03-07 13:56+0100\n"
 "Last-Translator: Marc Sommerhalder <marc.sommerhalder@seantis.ch>\n"
 "Language-Team: German\n"
@@ -18,6 +18,12 @@ msgstr ""
 "Plural-Forms: nplurals=2; plural=(n != 1);\n"
 "Generated-By: Lingua 3.11\n"
 "X-Generator: Poedit 3.0.1\n"
+
+msgid "Invalid number of hours"
+msgstr "Ungültige Anzahl Stunden"
+
+msgid "Invalid number of minutes"
+msgstr "Ungültige Anzahl Minuten"
 
 msgid "Not a valid email"
 msgstr "Keine gültige Email"
@@ -62,11 +68,11 @@ msgstr "Text"
 msgid "Limited text"
 msgstr "Begrenzter Text"
 
-msgid "Numbers-only textfield (regex)"
-msgstr "Textfeld mit nur Zahlen (regex)"
-
 msgid "Multiline with optional number of rows"
 msgstr "Mehrzeilig mit optionaler Anzahl Zeilen"
+
+msgid "Numbers-only textfield (regex)"
+msgstr "Textfeld mit nur Zahlen (regex)"
 
 msgid "Comment"
 msgstr "Kommentar"
@@ -133,6 +139,9 @@ msgstr "UID Nummer"
 
 msgid "Swiss vat number"
 msgstr "MWST Nummer"
+
+msgid "Animal identification number (Microchip-Nr.)"
+msgstr "Tieridentifikationsnummer (Mikrochip-Nr.)"
 
 msgid "Password"
 msgstr "Passwort"
@@ -262,6 +271,12 @@ msgstr "Keine Ergebnisse gefunden:"
 
 msgid "Select Some Options"
 msgstr "Mehrere Optionen auswählen"
+
+msgid "hours"
+msgstr "Stunden"
+
+msgid "minutes"
+msgstr "Minuten"
 
 #~ msgid "Multiline"
 #~ msgstr "Mehrzeilig"

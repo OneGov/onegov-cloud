@@ -596,7 +596,7 @@
     </div>
 </metal:newslist>
 
-<metal:newsletter define-macro="newsletter_signup">
+<metal:newsletter define-macro="newsletter_signup" i18n:domain="onegov.town6">
 
     <metal:b define-slot="pre_form"></metal:b>
 
@@ -615,7 +615,7 @@
                     </div>
                     <div class="cell small" tal:condition="form.subscribed_categories.data">
                         <label>
-                            <i18n:translate>${form.subscribed_categories.description}</i18n:translate><p>
+                            <tal:b i18n:translate>${form.subscribed_categories.description}</tal:b><p>
                             ${form.subscribed_categories}
                         </label>
                     </div>
@@ -719,9 +719,12 @@
                     <h3 i18n:translate>Contact</h3>
                     <tal:b content="contact" />
                     <div tal:condition="sidepanel_contact|False">
-                        <ul class="sidebar-links">
+                        <ul class="sidebar-links more-list">
                             <li tal:repeat="contact sidepanel_contact" tal:condition="contact">
-                                <a href="${contact[1]}">${contact[0]}</a>
+                                <a class="list-link" href="${contact[1]}">
+                                <i class="fa fa-link" aria-hidden="true"></i>
+                                <span class="list-title">${contact[0]}</span>
+                                </a>
                             </li>
                         </ul>
                     </div>
@@ -978,7 +981,12 @@
                 </tal:b>
             </tal:b>
             <tal:b condition="not (allow_downloads or allow_views) or field.type not in ('UploadField', 'UploadMultipleField')" >
-                <tal:b tal:switch="linkify_display|False">
+                <tal:b tal:condition="field.pricing|nothing">
+                    <tal:b tal:define="is_value field.type in ('IntegerField', 'FloatField', 'DecimalField')">
+                        ${rendered} <span tal:condition="is_value" i18n:translate="">Item(s)</span>
+                    </tal:b>
+                </tal:b>
+                <tal:b tal:condition="not: field.pricing|nothing" tal:switch="linkify_display|False">
                     <tal:b tal:case="True" replace="layout.linkify_field(field, rendered)" />
                     <tal:b tal:case="False" replace="rendered" />
                 </tal:b>
@@ -1018,6 +1026,7 @@
     <tal:b condition="price.fee and show_fee|nothing">
         (+ ${layout.format_number(price.fee)} <tal:b i18n:translate>Credit Card Fee</tal:b>)
     </tal:b>
+    <br>${layout.format_vat(price.net_amount, price.currency)}
 </metal:price>
 
 <metal:person_card define-macro="person_list_card" i18n:domain="onegov.town6">
@@ -1059,14 +1068,14 @@
 <metal:person_card define-macro="person_card" i18n:domain="onegov.town6">
     <div class="person-card person-single-item" tal:define="exclude request.app.org.excluded_person_fields(request)">
         <div class="grid-x" tal:define="url person.picture_url">
-            <div class="cell small-12 medium-4 large-3" tal:condition="url" >
+            <div class="cell small-12 medium-5 large-4" tal:condition="url" >
                 <div aria-hidden="true">
                     <div class="person-card-portrait">
                         <div class="cover-image" style='background-image: url("${url}");'></div>
                     </div>
                 </div>
             </div>
-            <div class="cell small-12 ${'medium-8 large-9' if url else ''}">
+            <div class="cell small-12 ${'medium-7 large-8' if url else ''}">
                 <ul>
                     <li tal:condition="person.function" class="person-card-function">
                         <em>${person.function}</em>
@@ -1574,6 +1583,7 @@
     <tal:b switch="role">
         <tal:b case="'admin'" i18n:translate>Administrator</tal:b>
         <tal:b case="'editor'" i18n:translate>Editor</tal:b>
+        <tal:b case="'supporter'" i18n:translate>Supporter</tal:b>
         <tal:b case="'member'" i18n:translate>Member</tal:b>
     </tal:b>
 </metal:role_singular>
@@ -1582,6 +1592,7 @@
     <tal:b switch="role">
         <tal:b case="'admin'" i18n:translate>Administrators</tal:b>
         <tal:b case="'editor'" i18n:translate>Editors</tal:b>
+        <tal:b case="'supporter'" i18n:translate>Supporters</tal:b>
         <tal:b case="'member'" i18n:translate>Members</tal:b>
     </tal:b>
 </metal:role_plural>
@@ -2458,13 +2469,45 @@
             i18n:attributes="data-prompt;data-prompt-ok;data-prompt-cancel" >
            <span class="fa fa-edit" aria-hidden="true"></span>
            <span i18n:translate>Rename</span>
-      </a>
-      <a class="button secondary" role="button" href="${request.link(file)}">
-           <span class="fa fa-download" aria-hidden="true"></span>
-           <span i18n:translate>Download</span>
-     </a>
+        </a>
+        <a class="button secondary" role="button" href="${request.link(file)}">
+            <span class="fa fa-download" aria-hidden="true"></span>
+            <span i18n:translate>Download</span>
+        </a>
+        <a class="button secondary" role="button"
+           ic-get-from="${request.link(file, 'links')}"
+           ic-target="#links-${id}"
+           ic-on-success="
+               var modal = $('#links-${id}-modal');
+               modal.foundation();
+               modal.foundation('open');
+               modal.focus();
+           ">
+            <span class="fa fa-link" aria-hidden="true"></span>
+            <span i18n:translate>Linked Pages</span>
+            <span class="ic-indicator fa fa-spinner fa-spin" style="display: none"></span>
+       </a>
+    </div>
+    <div style="display:none;">
+        <div id="links-${id}-modal" class="reveal large dialog" data-reveal>
+            <h2 i18n:translate>Links to <tal:b i18n:name="filename">${file.name}</tal:b></h2>
+            <ul id="links-${id}"></ul>
+        </div>
     </div>
 </metal:file_details>
+
+<metal:file_links define-macro="file-links" i18n:domain="onegov.town6">
+    <ul class="more-list">
+        <tal:b repeat="result file.links">
+            <li class="search-result-${result.es_type_name}" tal:condition="result">
+                <tal:b
+                    define="macro 'search_result_{}'.format(result.__tablename__); tenant_macro 'search_result_{}_{}'.format(result.__tablename__, request.app.application_id.split('/')[-1])"
+                    metal:use-macro="layout.macros[tenant_macro]|layout.macros[macro]|layout.macros['search_result_default']"
+                />
+            </li>
+        </tal:b>
+    </ul>
+</metal:file_links>
 
 <metal:sign_result define-macro="sign_result" i18n:domain="onegov.town6">
     <metal:b use-macro="layout.macros['consume_messages']" />

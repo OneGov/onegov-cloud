@@ -5,7 +5,7 @@ from onegov.core.elements import Link, LinkGroup
 from onegov.form.collection import FormCollection, SurveyCollection
 from onegov.org import _, OrgApp
 from onegov.org.models import (
-    GeneralFileCollection, ImageFileCollection, Organisation)
+    GeneralFileCollection, ImageFileCollection, Organisation, Dashboard)
 from onegov.pay import PaymentProviderCollection, PaymentCollection
 from onegov.ticket import TicketCollection
 from onegov.ticket.collection import ArchivedTicketCollection
@@ -65,6 +65,13 @@ def get_global_tools(request: OrgRequest) -> Iterator[Link | LinkGroup]:
     # Management dropdown
     if request.is_manager:
         links = []
+
+        links.append(
+            Link(
+                _('Dashboard'), request.class_link(Dashboard),
+                attrs={'class': 'dashboard'}
+            )
+        )
 
         links.append(
             Link(
@@ -174,7 +181,7 @@ def get_global_tools(request: OrgRequest) -> Iterator[Link | LinkGroup]:
         yield LinkGroup(_('Management'), classes=('management', ), links=links)
 
     # Tickets
-    if request.is_manager:
+    if request.is_manager or request.is_supporter:
         assert request.current_user is not None
         ticket_count = request.app.ticket_count
         screen_count = ticket_count.open or ticket_count.pending

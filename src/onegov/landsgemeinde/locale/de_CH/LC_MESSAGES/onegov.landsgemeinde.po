@@ -1,7 +1,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: OneGov Cloud 1.0\n"
-"POT-Creation-Date: 2024-10-14 14:09+0200\n"
+"POT-Creation-Date: 2025-02-24 16:10+0100\n"
 "PO-Revision-Date: 2021-03-03 16:24+0100\n"
 "Language-Team: German\n"
 "Language: de_CH\n"
@@ -35,8 +35,8 @@ msgstr "Einstellungen"
 msgid "People"
 msgstr "Personen"
 
-msgid "Assemblies"
-msgstr "Landsgemeinden"
+msgid "Archive"
+msgstr "Archiv"
 
 msgid "Number"
 msgstr "Nummer"
@@ -224,6 +224,9 @@ msgstr "Traktanden der Landsgemeinde vom ${date}"
 msgid "Homepage"
 msgstr "Startseite"
 
+msgid "Assemblies"
+msgstr "Landsgemeinden"
+
 msgid "Agenda items"
 msgstr "Traktanden"
 
@@ -308,6 +311,9 @@ msgstr "Memorial (PDF)"
 msgid "No assemblies defined yet."
 msgstr "Noch keine Landsgemeinden erfasst."
 
+msgid "Assembly items & downloads"
+msgstr "Traktanden & Downloads"
+
 msgid "Audio"
 msgstr "Audio"
 
@@ -335,6 +341,9 @@ msgstr ""
 
 msgid "Copied to Clipboard!"
 msgstr "In die Zwischenablage kopiert!"
+
+msgid "more"
+msgstr "mehr"
 
 msgid "Raw Data"
 msgstr "Rohdaten"
@@ -382,6 +391,9 @@ msgstr "Neue Landsgemeinde hinzugefügt"
 
 msgid "New assembly"
 msgstr "Neue Landsgemeinde"
+
+msgid "Open data"
+msgstr "Open data"
 
 #, python-format
 msgid "Results from the ${title}, structured as json"

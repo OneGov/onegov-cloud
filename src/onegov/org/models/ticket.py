@@ -107,10 +107,16 @@ class FormSubmissionTicket(OrgTicketMixin, Ticket):
     __mapper_args__ = {'polymorphic_identity': 'FRM'}  # type:ignore
     es_type_name = 'submission_tickets'
 
+    if TYPE_CHECKING:
+        handler: FormSubmissionHandler
+
 
 class ReservationTicket(OrgTicketMixin, Ticket):
     __mapper_args__ = {'polymorphic_identity': 'RSV'}  # type:ignore
     es_type_name = 'reservation_tickets'
+
+    if TYPE_CHECKING:
+        handler: ReservationHandler
 
 
 class EventSubmissionTicket(OrgTicketMixin, Ticket):
@@ -144,6 +150,9 @@ class EventSubmissionTicket(OrgTicketMixin, Ticket):
 class DirectoryEntryTicket(OrgTicketMixin, Ticket):
     __mapper_args__ = {'polymorphic_identity': 'DIR'}  # type:ignore
     es_type_name = 'directory_tickets'
+
+    if TYPE_CHECKING:
+        handler: DirectoryEntryHandler
 
 
 @handlers.registered_handler('FRM')
@@ -234,7 +243,8 @@ class FormSubmissionHandler(Handler):
         if self.submission is not None:
             return render_macro(layout.macros['display_form'], request, {
                 'form': self.form,
-                'layout': layout
+                'layout': layout,
+                'price': self.submission.payment,
             })
         return Markup('')
 
@@ -242,8 +252,6 @@ class FormSubmissionHandler(Handler):
         self,
         request: OrgRequest  # type:ignore[override]
     ) -> list[Link | LinkGroup]:
-
-        layout = DefaultLayout(self.submission, request)
 
         links: list[Link | LinkGroup] = []
         extra: list[Link] = []
@@ -286,11 +294,8 @@ class FormSubmissionHandler(Handler):
                 links.append(
                     Link(
                         text=_('Confirm registration'),
-                        url=request.return_here(
-                            layout.csrf_protected_url(
-                                request.link(
-                                    self.submission, 'confirm-registration')
-                            )
+                        url=request.csrf_protected_url(
+                            request.link(self.ticket, 'confirm-registration')
                         ),
                         attrs={'class': 'accept-link'},
                         traits=confirmation_traits
@@ -299,11 +304,8 @@ class FormSubmissionHandler(Handler):
                 extra.append(
                     Link(
                         text=_('Deny registration'),
-                        url=request.return_here(
-                            layout.csrf_protected_url(
-                                request.link(
-                                    self.submission, 'deny-registration')
-                            )
+                        url=request.csrf_protected_url(
+                            request.link(self.ticket, 'deny-registration')
                         ),
                         attrs={'class': 'delete-link'},
                         traits=(
@@ -320,11 +322,8 @@ class FormSubmissionHandler(Handler):
                 links.append(
                     Link(
                         text=_('Cancel registration'),
-                        url=request.return_here(
-                            layout.csrf_protected_url(
-                                request.link(
-                                    self.submission, 'cancel-registration')
-                            )
+                        url=request.csrf_protected_url(
+                            request.link(self.ticket, 'cancel-registration')
                         ),
                         attrs={'class': 'delete-link'},
                         traits=(
@@ -338,19 +337,19 @@ class FormSubmissionHandler(Handler):
             extra.append(
                 Link(
                     text=_('Registration Window'),
-                    url=request.link(window),
+                    url=request.link(self.ticket, 'window'),
                     attrs={'class': 'edit-link'}
                 )
             )
 
         if self.submission is not None:
-            url_obj = URL(request.link(self.submission))
+            url_obj = URL(request.link(self.ticket, 'submission'))
             edit_url = url_obj.query_param('edit', '').as_string()
 
             (links if not links else extra).append(
                 Link(
                     text=_('Edit submission'),
-                    url=request.return_here(edit_url),
+                    url=edit_url,
                     attrs={'class': 'edit-link'}
                 )
             )
@@ -561,9 +560,7 @@ class ReservationHandler(Handler):
             links.append(
                 Link(
                     text=_('Accept all reservations'),
-                    url=request.return_here(
-                        request.link(self.reservations[0], 'accept')
-                    ),
+                    url=request.link(self.ticket, 'accept-reservation'),
                     attrs={'class': 'accept-link'}
                 )
             )
@@ -571,11 +568,11 @@ class ReservationHandler(Handler):
         advanced_links = []
 
         if self.submission:
-            url_obj = URL(request.link(self.submission))
+            url_obj = URL(request.link(self.ticket, 'submission'))
             url_obj = url_obj.query_param('edit', '')
             url_obj = url_obj.query_param('title', request.translate(
                 _('Details about the reservation')))
-            url = request.return_here(url_obj.as_string())
+            url = url_obj.as_string()
 
             advanced_links.append(
                 Link(
@@ -589,19 +586,15 @@ class ReservationHandler(Handler):
             advanced_links.append(
                 Link(
                     text=_('Accept all with message'),
-                    url=request.return_here(
-                        request.link(self.reservations[0],
-                                     'accept-with-message')
-                    ),
+                    url=request.link(
+                        self.ticket, 'accept-reservation-with-message'),
                     attrs={'class': 'accept-link'}
                 )
             )
 
         advanced_links.append(Link(
             text=_('Reject all'),
-            url=request.return_here(
-                request.link(self.reservations[0], 'reject')
-            ),
+            url=request.link(self.ticket, 'reject-reservation'),
             attrs={'class': 'delete-link'},
             traits=(
                 Confirm(
@@ -619,17 +612,15 @@ class ReservationHandler(Handler):
 
         advanced_links.append(Link(
             text=_('Reject all with message'),
-            url=request.return_here(
-                request.link(self.reservations[0], 'reject-with-message')
-            ),
+            url=request.link(self.ticket, 'reject-reservation-with-message'),
             attrs={'class': 'delete-link'},
         ))
 
         for reservation in self.reservations:
-            url_obj = URL(request.link(reservation, 'reject'))
+            url_obj = URL(request.link(self.ticket, 'reject-reservation'))
             url_obj = url_obj.query_param(
                 'reservation-id', str(reservation.id))
-            url = request.return_here(url_obj.as_string())
+            url = url_obj.as_string()
 
             title = self.get_reservation_title(reservation)
             advanced_links.append(Link(
@@ -752,24 +743,22 @@ class EventSubmissionHandler(Handler):
         request: OrgRequest  # type:ignore[override]
     ) -> list[Link | LinkGroup]:
 
-        links: list[Link | LinkGroup] = []
-        # FIXME: We only use EventLayout to generate a csrf_protected_url
-        #        This should probably be moved to an utils function
-        layout = EventLayout(self.event, request)  # type:ignore[arg-type]
+        if not self.event:
+            return []
 
-        if self.event and self.event.state == 'submitted':
+        links: list[Link | LinkGroup] = []
+
+        if self.event.state == 'submitted':
             links.append(Link(
                 text=_('Accept event'),
-                url=request.return_here(request.link(self.event, 'publish')),
+                url=request.link(self.ticket, 'publish-event'),
                 attrs={'class': 'accept-link'},
             ))
-        if not self.event:
-            return links
 
         advanced_links = [
             Link(
                 text=_('Edit event'),
-                url=request.return_here(request.link(self.event, 'edit')),
+                url=request.link(self.ticket, 'edit-event'),
                 attrs={'class': ('edit-link', 'border')}
             )]
 
@@ -777,8 +766,8 @@ class EventSubmissionHandler(Handler):
             advanced_links.append(
                 Link(
                     text=_('Reject event'),
-                    url=layout.csrf_protected_url(
-                        request.link(self.event)),
+                    url=request.csrf_protected_url(
+                        request.link(self.ticket, 'delete-event')),
                     attrs={'class': ('delete-link')},
                     traits=(
                         Confirm(
@@ -799,8 +788,8 @@ class EventSubmissionHandler(Handler):
             advanced_links.append(
                 Link(
                     text=_('Withdraw event'),
-                    url=layout.csrf_protected_url(request.link(
-                        self.event, name='withdraw')),
+                    url=request.csrf_protected_url(
+                        request.link(self.ticket, name='withdraw-event')),
                     attrs={'class': ('delete-link')},
                     traits=(
                         Confirm(
@@ -821,8 +810,7 @@ class EventSubmissionHandler(Handler):
             advanced_links.append(
                 Link(
                     text=_('Re-publish event'),
-                    url=request.return_here(
-                        request.link(self.event, 'publish')),
+                    url=request.link(self.ticket, 'publish-event'),
                     attrs={'class': 'accept-link'}
                 )
             )
@@ -1047,6 +1035,7 @@ class DirectoryEntryHandler(Handler):
             )
 
         if self.state == 'adopted':
+            # FIXME: A supporter may not have permission to view the entry
             links.append(
                 Link(
                     text=_('View directory entry'),
@@ -1091,11 +1080,11 @@ class DirectoryEntryHandler(Handler):
             )
 
         if self.state is None:
-            url_obj = URL(request.link(self.submission))
+            url_obj = URL(request.link(self.ticket, 'submission'))
             url_obj = url_obj.query_param('edit', '')
             url_obj = url_obj.query_param('title', request.translate(
                 _('Edit details')))
-            url = request.return_here(url_obj.as_string())
+            url = url_obj.as_string()
 
             advanced_links.append(
                 Link(

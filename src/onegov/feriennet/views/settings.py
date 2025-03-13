@@ -249,7 +249,7 @@ class FeriennetSettingsForm(Form):
                 # TODO: It would be cleaner if we had a proxy object
                 #       with all the attributes as dict_property, then
                 #       we don't need to do this `attributes` hack
-                value = Markup(value)  # noqa: RUF035
+                value = Markup(value)  # nosec: B704
 
             self[attr].data = value
 

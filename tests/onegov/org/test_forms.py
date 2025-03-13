@@ -1,3 +1,5 @@
+import os
+
 import pytest
 
 from datetime import date, datetime, time, timedelta
@@ -302,6 +304,9 @@ def test_edit_room_allocation_form_whole_day():
 
 def test_find_your_spot_form_single_room():
     request = Bunch(POST=MultiDict([
+        # 1 hour
+        ('duration', '1'),
+        ('duration', '0'),
         ('start', date.today().isoformat()),
         ('end', date.today().isoformat()),
         ('start_time', '08:00'),
@@ -318,6 +323,7 @@ def test_find_your_spot_form_single_room():
         title='Room 1'
     )])
     assert form.validate()
+    assert form.duration.data == timedelta(hours=1)
     assert form.start.data == date.today()
     assert form.end.data == date.today()
     assert form.start_time.data == time(8, 0)
@@ -344,6 +350,9 @@ def test_find_your_spot_form_multiple_rooms():
         ),
     ]
     request = Bunch(POST=MultiDict([
+        # 30 minutes
+        ('duration', '0'),
+        ('duration', '30'),
         ('start', date.today().isoformat()),
         ('end', date.today().isoformat()),
         ('start_time', '08:00'),
@@ -359,6 +368,7 @@ def test_find_your_spot_form_multiple_rooms():
     form.request = request
     form.apply_rooms(rooms)
     assert form.validate()
+    assert form.duration.data == timedelta(minutes=30)
     assert form.start.data == date.today()
     assert form.end.data == date.today()
     assert form.start_time.data == time(8, 0)
@@ -726,3 +736,92 @@ def test_ticket_assignment_form(session):
 
     assert sorted([name for id_, name in form.user.choices]) == ['a', 'e']
     assert form.username == 'a'
+
+
+def test_price_submission_vat_not_set(client):
+    # initially, the vat is not set on an instance. This shall not lead to vat
+    # show anywhere
+
+    expected_values = [
+        'abbafan@swisscom.ch',
+        '1',
+        'Stück(e)',
+        'Totalbetrag',
+        '128.00 CHF',
+    ]
+
+    client.login_admin()
+    page = client.get('/forms').click('Formular', index=1)
+    page.form['title'] = 'Musicaltickets Mamma Mia!'
+    page.form['definition'] = """
+    Email *= @@@
+    Betrag mit Preis = 0..8 (64 CHF)
+    """
+    page = page.form.submit().follow()
+    page.form['email'] = 'abbafan@swisscom.ch'
+    page.form['betrag_mit_preis'] = '2'
+    confirm = page.form.submit().follow()
+
+    for value in expected_values:
+        assert value in confirm
+    assert 'MwSt' not in confirm
+    confirm.form.submit().follow()
+
+    # test confirmation mail
+    assert len(os.listdir(client.app.maildir)) == 1
+    mail = client.get_email(0, 0)
+    assert ('Musicaltickets Mamma Mia!: Ihre Anfrage wurde erfasst' in
+            mail['Subject'])
+    for value in expected_values:
+        assert value in mail['TextBody']
+    assert 'MwSt' not in confirm
+
+    # test ticket
+    tickets = client.get('/tickets/ALL/open').click('FRM-')
+    for value in expected_values:
+        assert value in tickets
+    assert 'MwSt' not in confirm
+
+
+def test_price_submission_vat_set(client):
+    expected_values = [
+        'black@bear.ch',
+        '1',
+        'Stück(e)',
+        'Totalbetrag',
+        '99.00 CHF',
+        '(MwSt 8.1% enthalten: 7.42 CHF)'
+    ]
+
+    # set vat rate
+    client.login_admin()
+    page = client.get('/vat-settings')
+    page.form['vat_rate'] = '8.1'
+    page.form.submit()
+
+    page = client.get('/forms').click('Formular', index=1)
+    page.form['title'] = 'Bio Teddybären'
+    page.form['definition'] = """
+    Email *= @@@
+    Betrag mit Preis = 0..5 (99 CHF)
+    """
+    page = page.form.submit().follow()
+    page.form['email'] = 'black@bear.ch'
+    page.form['betrag_mit_preis'] = '1'
+    confirm = page.form.submit().follow()
+
+    for value in expected_values:
+        assert value in confirm
+    confirm.form.submit().follow()
+
+    # test confirmation mail
+    assert len(os.listdir(client.app.maildir)) == 1
+    mail = client.get_email(0, 0)
+    assert 'Bio Teddybären: Ihre Anfrage wurde erfasst' in mail['Subject']
+    for value in expected_values:
+        assert value in mail['TextBody']
+
+    # test ticket
+    tickets = client.get('/tickets/ALL/open').click('FRM-')
+    for value in expected_values:
+        assert value in tickets

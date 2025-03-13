@@ -97,7 +97,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        group: [1, 2, 3, 4, 5, 6]
+        group: [1, 2, 3, 4, 5, 6, 7]
 
     runs-on: ubuntu-24.04
 
@@ -196,8 +196,15 @@ jobs:
           -n logical \
           -o cache_dir=/tmp/pytest \
           --dist loadgroup \
-          --splits "6" \
+          --splits "7" \
           --group "${{matrix.group}}" \
+          --reruns 3 \
+          --reruns-delay 1 \
+          --only-rerun "AttributeError: 'SessionManager'" \
+          --only-rerun "AttributeError: 'DefaultLayout'" \
+          --only-rerun "ReferenceError: $ is not defined" \
+          --only-rerun "FileNotFoundError: [Errno 2] No such file" \
+          --only-rerun "Bad response: 404 Not Found" \
           --cov \
           --cov-config=pyproject.toml \
           --codecov \

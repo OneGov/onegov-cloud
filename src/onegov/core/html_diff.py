@@ -65,7 +65,7 @@ def render_html_diff(
     old_stream = parse_html(old, wrapper_element, wrapper_class)
     new_stream = parse_html(new, wrapper_element, wrapper_class)
     rv = diff_genshi_stream(old_stream, new_stream)
-    return Markup(rv.render('html', encoding=None))  # noqa: RUF035
+    return Markup(rv.render('html', encoding=None))  # nosec: B704
 
 
 def parse_html(

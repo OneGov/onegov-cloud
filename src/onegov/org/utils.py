@@ -8,13 +8,13 @@ import pytz
 from contextlib import suppress
 from collections import defaultdict, Counter, OrderedDict
 from datetime import datetime, time, timedelta
+from functools import lru_cache
 from isodate import parse_date, parse_datetime
 from itertools import groupby
 from libres.modules import errors as libres_errors
 from lxml.etree import ParserError
 from lxml.html import fragments_fromstring, tostring
 from markupsafe import escape, Markup
-from onegov.core.cache import lru_cache
 from onegov.core.layout import Layout
 from onegov.core.orm import as_selectable
 from onegov.file import File, FileCollection
@@ -22,11 +22,12 @@ from onegov.org import _
 from onegov.org.elements import DeleteLink, Link
 from onegov.org.models.search import Search
 from onegov.reservation import Resource
+from onegov.ticket import TicketCollection
+from onegov.user import User, UserGroup
 from operator import attrgetter
 from purl import URL
 from sqlalchemy import nullsfirst, select  # type:ignore[attr-defined]
-from onegov.ticket import TicketCollection
-from onegov.user import User
+
 
 from typing import overload, Any, Literal, TYPE_CHECKING
 if TYPE_CHECKING:
@@ -214,7 +215,7 @@ def annotate_html(
     if request:
         set_image_sizes(images, request)
 
-    return Markup(  # noqa: RUF035
+    return Markup(  # nosec: B704
         ''.join(tostring(e, encoding=str) for e in fragments))
 
 
@@ -228,7 +229,7 @@ def remove_empty_paragraphs(html: Markup | None) -> Markup | None:
     if not html:
         return html
 
-    return Markup(EMPTY_PARAGRAPHS.sub('', html))  # noqa: RUF035
+    return Markup(EMPTY_PARAGRAPHS.sub('', html))  # nosec: B704
 
 
 def set_image_sizes(
@@ -627,7 +628,7 @@ class AllocationEventInfo:
 class FindYourSpotEventInfo:
 
     __slots__ = ('allocation', 'slot_time', 'availability', 'quota_left',
-                 'request', 'translate')
+                 'request', 'translate', 'adjustable')
 
     def __init__(
         self,
@@ -635,7 +636,9 @@ class FindYourSpotEventInfo:
         slot_time: DateRange | None,
         availability: float,
         quota_left: int,
-        request: OrgRequest
+        request: OrgRequest,
+        *,
+        adjustable: bool = False
     ) -> None:
 
         self.allocation = allocation
@@ -643,6 +646,7 @@ class FindYourSpotEventInfo:
         self.availability = availability
         self.quota_left = quota_left
         self.request = request
+        self.adjustable = adjustable
         self.translate = request.translate
 
     @property
@@ -732,6 +736,9 @@ class FindYourSpotEventInfo:
                 yield 'event-partly-available'
             else:
                 yield 'event-unavailable'
+
+        if self.adjustable:
+            yield 'event-adjustable'
 
     @property
     def css_class(self) -> str:
@@ -1102,7 +1109,7 @@ def hashtag_elements(request: OrgRequest, text: str) -> Markup:
         return f'<a class="hashtag" href="{link}">{tag}</a>'
 
     # NOTE: We need to restore Markup after re.sub call
-    return Markup(HASHTAG.sub(replace_tag, escape(text)))  # noqa: RUF035
+    return Markup(HASHTAG.sub(replace_tag, escape(text)))  # nosec: B704
 
 
 def ticket_directory_groups(
@@ -1150,14 +1157,13 @@ def user_group_emails_for_new_ticket(
         return set()
 
     return {
-        u.username
-        for user in request.session.query(User).filter(
-            User.group_id.isnot(None)
-        ) if user.group is not None
-        for u in user.group.users
-        if user.group.meta
-        and (dirs := user.group.meta.get('directories')) is not None
-        and ticket.group in dirs
+        username
+        for username, in request.session
+        .query(UserGroup)
+        .join(UserGroup.users)
+        .filter(UserGroup.meta['directories'].contains(ticket.group))
+        .with_entities(User.username)
+        .distinct()
     }
 
 

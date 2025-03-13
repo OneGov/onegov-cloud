@@ -1,30 +1,41 @@
 from __future__ import annotations
+import traceback
 from collections import OrderedDict
 
 import requests
+import logging
 from babel.dates import get_month_names
 from datetime import datetime, timedelta
+from functools import lru_cache
 from itertools import groupby
 
 from onegov.chat.collections import ChatCollection
 from onegov.chat.models import Chat
-from onegov.core.cache import lru_cache
 from onegov.core.orm import find_models, Base
 from onegov.core.orm.mixins.publication import UTCPublicationMixin
 from onegov.core.templates import render_template
 from onegov.event import Occurrence, Event
 from onegov.file import FileCollection
 from onegov.form import FormSubmission, parse_form, Form
+from onegov.newsletter.models import Recipient
 from onegov.org.mail import send_ticket_mail
 from onegov.newsletter import (Newsletter, NewsletterCollection,
                                RecipientCollection)
 from onegov.org import _, OrgApp
 from onegov.org.layout import DefaultMailLayout
 from onegov.org.models import (
-    ResourceRecipient, ResourceRecipientCollection, TANAccess, News)
+    ResourceRecipient,
+    ResourceRecipientCollection,
+    TANAccess,
+    News,
+    PushNotification
+)
 from onegov.org.models.extensions import (
     GeneralFileLinkExtension, DeletableContentExtension)
 from onegov.org.models.ticket import ReservationHandler
+from onegov.gever.encrypt import decrypt_symmetric
+from cryptography.fernet import InvalidToken
+from sqlalchemy.exc import IntegrityError
 from onegov.org.views.allocation import handle_rules_cronjob
 from onegov.org.views.directory import (
     send_email_notification_for_directory_entry)
@@ -40,14 +51,22 @@ from sedate import to_timezone, utcnow, align_date_to_day
 from sqlalchemy import and_, or_, func
 from sqlalchemy.orm import undefer
 from uuid import UUID
+from onegov.org.notification_service import (
+    get_notification_service,
+)
 
 
 from typing import Any, TYPE_CHECKING
 if TYPE_CHECKING:
     from collections.abc import Iterator
     from onegov.core.types import RenderData
+    from sqlalchemy.orm import Session
+    from sqlalchemy.orm import Query
 
     from onegov.org.request import OrgRequest
+
+
+log = logging.getLogger('onegov.org.cronjobs')
 
 
 MON = 0
@@ -786,3 +805,207 @@ def update_newsletter_email_bounce_statistics(
 
         if recipient and inactive:
             recipient.mark_inactive()
+
+
+@OrgApp.cronjob(hour=4, minute=30, timezone='Europe/Zurich')
+def delete_unconfirmed_newsletter_subscriptions(request: OrgRequest) -> None:
+    """ Delete unconfirmed newsletter subscriptions older than 7 days. """
+
+    now = to_timezone(utcnow(), 'Europe/Zurich')
+    cutoff_date = now - timedelta(days=7)
+    count = 0
+
+    query = request.session.query(Recipient)
+    query = query.filter(Recipient.confirmed == False)
+    query = query.filter(Recipient.created < cutoff_date)
+    for obj in query:
+        request.session.delete(obj)
+        count += 1
+
+    if count:
+        print(f'Cron: Deleted {count} unconfirmed newsletter subscriptions')
+
+
+def get_news_for_push_notification(session: Session) -> Query[News]:
+    # Use UTC time for database comparisons since publication_start is stored
+    # in UTC
+    now = utcnow()
+
+    # Get all news items that should trigger push notifications
+    query = session.query(News)
+    query = query.filter(News.published.is_(True))
+    query = query.filter(News.publication_start <= now)
+
+    news_with_sent_notifications = session.query(
+        PushNotification.news_id
+    ).subquery()
+    query = query.filter(~News.id.in_(news_with_sent_notifications))
+    only_public_news = query.filter(
+        or_(
+            News.meta['access'].astext == 'public',
+            News.meta['access'].astext.is_(None)
+        )
+    )
+
+    only_public_with_send_push_notification = only_public_news.filter(
+        News.meta['send_push_notifications_to_app'].astext == 'true'
+    )
+    return only_public_with_send_push_notification
+
+
+@OrgApp.cronjob(hour='*', minute='*/10', timezone='UTC')
+def send_push_notifications_for_news(request: OrgRequest) -> None:
+    """
+    Cronjob that runs every 10 minutes to send push notifications for news
+    items that were published within the last 10 minutes.
+
+    It collects all news items with:
+    - Publication start date within the last 10 minutes
+    - send_push_notifications_to_app flag enabled
+    - Defined push_notifications topics
+
+    Then uses Firebase to send notifications to the corresponding topics.
+    """
+    session = request.session
+    org = request.app.org
+
+    # Skip if no Firebase credentials are configured
+    if not org.firebase_adminsdk_credential:
+        print('No Firebase credentials configured')
+        return
+
+    news_items = get_news_for_push_notification(session).all()
+    if not news_items:
+        print('No news items found with push notifications enabled')
+        return
+
+    # Get the mapping
+    topic_mapping = org.meta.get('selectable_push_notification_options', [])
+    if not topic_mapping:
+        print('selectable_push_notification_options is empty')
+        return
+
+    # Decrypt the Firebase credentials
+    key_base64 = request.app.hashed_identity_key
+    encrypted_creds = org.firebase_adminsdk_credential
+    if not encrypted_creds:
+        return
+
+    try:
+        firebase_creds_json = decrypt_symmetric(
+            encrypted_creds.encode('utf-8'), key_base64
+        )
+    except InvalidToken:
+        log.warning('Failed to decrypt Firebase credentials: InvalidToken')
+        return
+
+    try:
+        # Get notification service
+        notification_service = get_notification_service(firebase_creds_json)
+
+        # Process each news item for notifications
+        sent_count = 0
+        duplicate_count = 0
+        for news in news_items:
+            # Get the topics to send to
+            topics = news.meta.get('push_notifications', [])
+            if not topics:
+                print(f'No topics configured for news item: {news.title}')
+                continue
+
+            print(
+                f'Processing notification for news: {news.title} to '
+                f'{len(topics)} topics'
+            )
+
+            for topic_id in topics:
+                if isinstance(topic_id, str):
+                    print(f'String entry: {topic_id}')
+                else:
+                    print('Invalid topic entry')
+                    continue
+
+                # Check if notification was already sent
+                if PushNotification.was_notification_sent(
+                    session, news.id, topic_id
+                ):
+                    log.info(
+                        f"Skipping duplicate notification to topic "
+                        f"'{topic_id}' for news '{news.title}'."
+                    )
+                    duplicate_count += 1
+                    continue
+
+                notification_title = news.title
+                notification_body = news.lead or ''
+                notification_data = {
+                    'id': str(request.link(news)),
+                    'title': news.title,
+                    'lead': notification_body,
+                }
+
+                try:
+                    # Create a "pending" notification record
+                    notification = PushNotification(
+                        news_id=news.id,
+                        topic_id=topic_id,
+                        sent_at=utcnow(),
+                        response_data={'status': 'pending'},
+                    )
+                    session.add(notification)
+                    session.flush()  # This will raise IntegrityError if record
+                    # exists
+
+                    # If we got here, we're the first process to try sending
+                    # this notification
+                    response = notification_service.send_notification(
+                        topic=topic_id,
+                        title=notification_title,
+                        body=notification_body,
+                        data=notification_data,
+                    )
+
+                    # Update the record with actual response data
+                    notification.response_data = {
+                        'message_id': response,
+                        'timestamp': utcnow().isoformat(),
+                        'status': 'sent',
+                    }
+                    session.flush()
+
+                    sent_count += 1
+                    log.debug(
+                        f"Successfully sent notification to topic '{topic_id}'"
+                        f" for news '{news.title}'. Response: {response}"
+                    )
+
+                except IntegrityError:
+                    # Another process probably already created a record for
+                    # this notification
+                    session.rollback()
+                    duplicate_count += 1
+                    log.info(
+                        f"Skipping duplicate notification to topic "
+                        f"'{topic_id}' for news '{news.title}'. "
+                    )
+
+                except Exception as e:
+                    # For other exceptions (like notification service failures)
+                    error_details = str(e)
+                    log.error(
+                        f"Error sending notification to topic '{topic_id}' "
+                        f"for news '{news.title}': {error_details}"
+                    )
+
+        if sent_count:
+            print(f'Cron: Sent {sent_count} push notifications for news items')
+        if duplicate_count:
+            print(f'Cron: Skipped {duplicate_count} duplicate notifications')
+        if not sent_count and not duplicate_count:
+            print('No notifications were sent')
+
+    except Exception as e:
+        # Rollback in case of error
+        session.rollback()
+        print(traceback.format_exc())
+        print(f'Error sending notifications: {e}')

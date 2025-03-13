@@ -172,9 +172,9 @@ def create_gazette(request, temporary_path):
     app.filestorage.writetext('principal.yml', dedent(PRINCIPAL))
     app.filestorage.writetext('govikon-pdf.svg', LOGO)
 
-    group_id = uuid4()
+    group = UserGroup(name='TestGroup', id=uuid4())
     session = app.session()
-    session.add(UserGroup(name='TestGroup', id=group_id))
+    session.add(group)
 
     session.add(User(
         username='admin@example.org',
@@ -194,7 +194,7 @@ def create_gazette(request, temporary_path):
         username='editor1@example.org',
         password_hash=request.getfixturevalue('gazette_password'),
         role='member',
-        group_id=group_id,
+        groups=[group],
         phone_number='+41415112271'
     ))
     session.add(User(
@@ -202,7 +202,7 @@ def create_gazette(request, temporary_path):
         username='editor2@example.org',
         password_hash=request.getfixturevalue('gazette_password'),
         role='member',
-        group_id=group_id,
+        groups=[group],
         phone_number='+41415112272'
     ))
     session.add(User(

@@ -1,3 +1,4 @@
+from onegov.core.utils import append_query_param
 from onegov.agency.collections import ExtendedAgencyCollection
 from onegov.agency.collections import ExtendedPersonCollection
 from onegov.agency.layout import AgencyCollectionLayout
@@ -32,6 +33,7 @@ class DummyRequest:
     is_manager = False
     is_admin = False
     session = None
+    csrf_token = 'x'
     permissions = {}
 
     def __init__(self):
@@ -55,7 +57,10 @@ class DummyRequest:
         return objects
 
     def new_csrf_token(self):
-        return 'x'
+        return self.csrf_token
+
+    def csrf_protected_url(self, url):
+        return append_query_param(url, 'csrf-token', self.csrf_token)
 
     def has_permission(self, model, permission):
         permissions = self.permissions.get(model.__class__.__name__, [])

@@ -347,7 +347,7 @@ def show_error_on_attendee(
             'type': 'alert',
             'target': f'#alert-boxes-for-{attendee.id}',
             'message': request.translate(message)
-        }))
+        }, ensure_ascii=True))
 
 
 @FeriennetApp.html(

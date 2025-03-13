@@ -51,6 +51,8 @@ from onegov.org.models.resource import DaypassResource
 from onegov.org.models.search import Search
 from onegov.org.models.sitecollection import SiteCollection
 from onegov.org.models.swiss_holidays import SwissHolidays
+from onegov.org.models.push_notification import PushNotification
+from onegov.org.models.push_notification import PushNotificationCollection
 from onegov.org.models.tan import TANAccess
 from onegov.org.models.tan import TANAccessCollection
 from onegov.org.models.traitinfo import TraitInfo
@@ -104,6 +106,8 @@ __all__ = (
     'ResourceRecipientCollection',
     'Search',
     'SiteCollection',
+    'PushNotification',
+    'PushNotificationCollection',
     'SubmissionMessage',
     'SwissHolidays',
     'TANAccess',
@@ -113,5 +117,5 @@ __all__ = (
     'TicketNote',
     'Topic',
     'TraitInfo',
-    'VisibleOnHomepageExtension',
+    'VisibleOnHomepageExtension'
 )

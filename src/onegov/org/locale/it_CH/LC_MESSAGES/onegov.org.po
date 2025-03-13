@@ -2,7 +2,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: \n"
-"POT-Creation-Date: 2025-02-11 15:15+0100\n"
+"POT-Creation-Date: 2025-03-11 16:35+0100\n"
 "PO-Revision-Date: 2022-03-15 10:52+0100\n"
 "Last-Translator: \n"
 "Language-Team: \n"
@@ -11,6 +11,7 @@ msgstr ""
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Generated-By: xls-to-po 1.0\n"
+"gengo-order-id: 7629694\n"
 "X-Generator: Poedit 3.0.1\n"
 
 #, python-format
@@ -27,6 +28,62 @@ msgid ""
 msgstr ""
 "Abbiamo inviato un mTAN al numero indicato. Inseritelo nello spazio "
 "sottostante o seguite le istruzioni dell'SMS."
+
+msgid "Tickets"
+msgstr "Biglietti"
+
+msgid "Open Tickets"
+msgstr "Biglietti aperti"
+
+msgid "Pending Tickets"
+msgstr "Biglietti in attesa"
+
+msgid "New Tickets in the Last Month"
+msgstr "Nuovi biglietti nell'ultimo mese"
+
+msgid "Closed Tickets in the Last Month"
+msgstr "Biglietti chiusi nell'ultimo mese"
+
+msgid "Lead Time from opening to closing in Days over the Last Month"
+msgstr ""
+"Tempo di gestione dall'apertura alla chiusura in giorni nell'ultimo mese"
+
+msgid "Lead Time from pending to closing in Days over the Last Month"
+msgstr ""
+"Tempo di gestione dall'in sospeso alla chiusura in giorni nell'ultimo mese"
+
+msgid "Access"
+msgstr "Accesso"
+
+msgid "Last Edited Topics"
+msgstr "Argomenti modificati di recente"
+
+msgid "Last Edited News"
+msgstr "Notizie modificate di recente"
+
+msgid "Web Statistics"
+msgstr "Statistiche Web"
+
+msgid "Unique Visitors in the Last Month"
+msgstr "Visitatori unici nell'ultimo mese"
+
+msgid "Total Visits in the Last Month"
+msgstr "Visite totali nell'ultimo mese"
+
+msgid "Total Page Views in the Last Month"
+msgstr "Visualizzazioni totali di pagine nell'ultimo mese"
+
+msgid "Number of Page Views per Visit"
+msgstr "Numero di visualizzazioni di pagine per visita"
+
+msgid "Average Visit Duration in Minutes"
+msgstr "Durata media della visita in minuti"
+
+msgid "No data available"
+msgstr "Nessun dato disponibile"
+
+msgid "Most Popular Pages"
+msgstr "Pagine più popolari"
 
 msgid "Open"
 msgstr "Aperto"
@@ -87,6 +144,9 @@ msgstr "Accedi"
 msgid "Register"
 msgstr "Registrati"
 
+msgid "Dashboard"
+msgstr "Pannello di controllo"
+
 msgid "Timeline"
 msgstr "Timeline"
 
@@ -132,17 +192,8 @@ msgstr "Gestione"
 msgid "My Tickets"
 msgstr "I miei biglietti"
 
-msgid "Open Tickets"
-msgstr "Biglietti aperti"
-
-msgid "Pending Tickets"
-msgstr "Biglietti in attesa"
-
 msgid "Closed Tickets"
 msgstr "Biglietti chiusi"
-
-msgid "Tickets"
-msgstr "Biglietti"
 
 msgid "Ticket"
 msgstr "Biglietto"
@@ -248,9 +299,6 @@ msgstr "Nei giorni festivi"
 
 msgid "During school holidays"
 msgstr "Durante le vacanze scolastiche"
-
-msgid "Access"
-msgstr "Accesso"
 
 msgid "Public"
 msgstr "Pubblico"
@@ -855,6 +903,15 @@ msgstr "La fine della pubblicazione deve essere una data futura"
 msgid "Publication start must be prior to end"
 msgstr "L'inizio della pubblicazione deve essere precedente alla fine"
 
+msgid "Send push notifications to app"
+msgstr "Invia notifiche push all'app"
+
+msgid "You must set a publication start date first."
+msgstr "Per prima cosa devi impostare una data di inizio della pubblicazione."
+
+msgid "Please select at least one topic for push notifications."
+msgstr "Seleziona almeno un argomento per le notifiche push."
+
 msgid "Describes briefly what this entry is about"
 msgstr "Descrive brevemente il contenuto di questo elemento"
 
@@ -1117,6 +1174,9 @@ msgstr "Destinatario"
 msgid "Do not actually import the newsletter subscribers"
 msgstr "Non importare effettivamente gli iscritti alla newsletter"
 
+msgid "Subscribed on"
+msgstr "Iscritto il"
+
 msgid "Will be used as image in the page overview on the parent page"
 msgstr ""
 "Verrà utilizzato come immagine nella panoramica della pagina sulla pagina "
@@ -1240,14 +1300,27 @@ msgstr "Note"
 msgid "Public extra information about this person"
 msgstr "Informazioni pubbliche aggiuntive su questa persona"
 
+msgid "I am looking to make a reservation lasting"
+msgstr "Voglio fare una prenotazione di"
+
+msgid "On Weekday(s)"
+msgstr "In giorno/i feriale/i"
+
+msgid "Earliest Start"
+msgstr "Inizio più precoce"
+
+msgid "Latest End"
+msgstr "Ultima fine"
+
 msgid "Rooms"
 msgstr "Camere"
 
-msgid "Weekdays"
-msgstr "Giorni della settimana"
-
 msgid "Start date in past"
 msgstr "Data di inizio nel passato"
+
+msgid "Duration is longer than the range between start and end time"
+msgstr ""
+"La durata è superiore all'intervallo tra l'ora di inizio e l'ora di fine"
 
 msgid "Describes what this reservation resource is about"
 msgstr "Descrive il contenuto di questa risorsa di prenotazione"
@@ -1324,6 +1397,9 @@ msgstr "Inserisci almeno un codice postale"
 
 msgid "Please enter one zip-code per line, without spaces or commas"
 msgstr "Inserisci un codice postale per riga, senza spazi o virgole"
+
+msgid "Weekdays"
+msgstr "Giorni della settimana"
 
 msgid "New Reservations"
 msgstr "Nuove prenotazioni"
@@ -1673,6 +1749,9 @@ msgstr "Nascondi questi campi per gli utenti non registrati"
 
 msgid "People"
 msgstr "Persone"
+
+msgid "External ID"
+msgstr "ID esterno"
 
 msgid "Duration of mTAN session"
 msgstr "Durata della sessione mTAN"
@@ -2059,8 +2138,39 @@ msgstr "Durata dall'apertura di un ticket alla sua archiviazione automatica"
 msgid "Duration from archived state until deleted automatically"
 msgstr "Durata dello stato di archiviazione fino alla cancellazione automatica"
 
-msgid "E-Mail Address"
-msgstr "Indirizzo e-mail"
+msgid "Firebase adminsdk credentials (JSON)"
+msgstr "Credenziali Firebase Adminsdk (JSON)"
+
+msgid "Topics"
+msgstr "Argomenti"
+
+msgid "Defines the firebase topic id"
+msgstr "Definisce l'id dell'argomento Firebase"
+
+msgid "Invalid Firebase credentials format - must be a JSON object"
+msgstr ""
+"Formato delle credenziali Firebase non valido: deve essere un oggetto JSON"
+
+#, python-format
+msgid "Missing required keys in Firebase credentials: {0}"
+msgstr "Chiavi obbligatorie mancanti nelle credenziali Firebase: {0}"
+
+msgid "Invalid JSON format in Firebase credentials"
+msgstr "Formato JSON non valido nelle credenziali Firebase"
+
+#, python-format
+msgid "Error validating Firebase credentials: {0}"
+msgstr "Errore durante la convalida delle credenziali Firebase: {0}"
+
+msgid "VAT Rate"
+msgstr "Aliquota IVA"
+
+msgid ""
+"This is the VAT rate in percent. The VAT rate will apply to all prices in "
+"the forms."
+msgstr ""
+"Si tratta del tasso di IVA in percentuale. Il tasso di IVA si applicherà a "
+"tutti i prezzi nei moduli."
 
 msgid ""
 "Select newsletter categories your are interested in. You will receive the "
@@ -2068,6 +2178,12 @@ msgid ""
 msgstr ""
 "Selezionate le categorie di newsletter a cui siete interessati. Riceverete "
 "la newsletter se riporta almeno una delle categorie sottoscritte"
+
+msgid "E-Mail Address"
+msgstr "Indirizzo e-mail"
+
+msgid "The subscriber has given consent to receive the newsletter."
+msgstr "Il sottoscrittore ha dato il consenso a ricevere la newsletter."
 
 msgid "Submission Window"
 msgstr "Finestra di presentazione"
@@ -2124,6 +2240,9 @@ msgstr "Amministratore"
 msgid "Editor"
 msgstr "Redattore"
 
+msgid "Supporter"
+msgstr "Sostenitore"
+
 msgid "Member"
 msgstr "Membro"
 
@@ -2166,14 +2285,6 @@ msgstr "Invia e-mail di attivazione con le istruzioni"
 
 msgid "A user with this e-mail address exists already"
 msgstr "Esiste già un utente con questo indirizzo e-mail"
-
-msgid ""
-"Users can only be in one group. If they already belong to another group and "
-"get added here, they will automatically get removed from the other group."
-msgstr ""
-"Gli utenti possono essere solo in un gruppo. Se appartengono già ad un altro "
-"gruppo e vengono aggiunti qui, verranno automaticamente rimossi dall'altro "
-"gruppo. "
 
 msgid "Ticket permissions"
 msgstr "Permessi sul biglietto"
@@ -2294,6 +2405,9 @@ msgstr "Associazione sportiva"
 
 msgid "all day"
 msgstr "tutto il giorno"
+
+msgid "VAT"
+msgstr "IVA"
 
 msgid "Homepage"
 msgstr "Pagina principale"
@@ -2654,9 +2768,6 @@ msgstr "Scegli filtro"
 msgid "Delete entry"
 msgstr "Elimina elemento"
 
-msgid "Dashboard"
-msgstr "Pannello di controllo"
-
 msgid "Do you really want to delete this external link?"
 msgstr "Vuoi davvero eliminare questo collegamento esterno?"
 
@@ -2824,7 +2935,8 @@ msgid "Sidebar contact"
 msgstr "Contatto laterale"
 
 msgid "Please provide a URL if contact link text is set"
-msgstr "Si prega di fornire un URL se il testo del link di contatto è impostato"
+msgstr ""
+"Si prega di fornire un URL se il testo del link di contatto è impostato"
 
 msgid "Please provide link text if contact URL is set"
 msgstr "Fornire il testo del link se l'URL di contatto è impostato"
@@ -3176,6 +3288,12 @@ msgstr "Si vuole davvero eliminare l'iFrame \"${title}\"?"
 msgid "Copy"
 msgstr "Copia"
 
+msgid "A News cannot be pasted as Topic"
+msgstr "Una notizia non può essere incollata come argomento"
+
+msgid "A Topic cannot be pasted as News"
+msgstr "Un argomento non può essere incollato come notizia"
+
 msgid "Paste"
 msgstr "Incolla"
 
@@ -3415,6 +3533,18 @@ msgstr "Nessun file caricato"
 msgid "All dates"
 msgstr "Tutte le date"
 
+msgid ""
+"By default we assume that you only want to select a single time slot and "
+"room per day. If you want to select more than one time slot or room on a "
+"given day, you may hold and press any one of your Shift, Alt or Ctrl keys "
+"while clicking the time slots you want to reserve."
+msgstr ""
+"Per impostazione predefinita, si presume che si voglia selezionare una sola "
+"fascia oraria e una sola stanza al giorno. Se si desidera selezionare più di "
+"una fascia oraria o di una stanza in un determinato giorno, è possibile "
+"tenere premuto uno dei tasti Shift, Alt o Ctrl mentre si fa clic sulle fasce "
+"orarie che si desidera prenotare."
+
 msgid "Unavailable"
 msgstr "Non disponibile"
 
@@ -3548,6 +3678,9 @@ msgstr ""
 msgid "Links"
 msgstr "Collegamenti"
 
+msgid "Item(s)"
+msgstr "Elemento(i)"
+
 msgid "Change request"
 msgstr "Richiesta di modifica"
 
@@ -3611,6 +3744,9 @@ msgstr "Amministratori"
 
 msgid "Editors"
 msgstr "Redattori"
+
+msgid "Supporters"
+msgstr "Sostenitori"
 
 msgid "Members"
 msgstr "Membri"
@@ -3740,6 +3876,12 @@ msgstr "Rinomina"
 
 msgid "Download"
 msgstr "Scaricare"
+
+msgid "Linked Pages"
+msgstr "Collegamenti"
+
+msgid "Links to ${filename}"
+msgstr "Collegamenti a ${filename}"
 
 msgid "Digital seal applied by ${signee} on ${date}"
 msgstr "Sigillo digitale applicato da ${signee} il ${date}"
@@ -4485,6 +4627,18 @@ msgstr ""
 
 msgid "Drop files to verify them"
 msgstr "Rilascia i file per verificarli"
+
+msgid "Sent Notifications"
+msgstr "Notifiche inviate"
+
+msgid "Sent At"
+msgstr "Inviato a"
+
+msgid "Response Data"
+msgstr "Response Data"
+
+msgid "No notifications"
+msgstr "Nessuna notifica"
 
 msgid "No subscribers yet"
 msgstr "Non ci sono ancora abbonati"
@@ -5263,6 +5417,13 @@ msgstr "Nuovo modulo documento"
 msgid "Edit Document Form"
 msgstr "Modifica modulo documento"
 
+msgid ""
+"Notifications have already been sent for this news item. A new notification "
+"will not be sent, even if the publication date is changed."
+msgstr ""
+"Des notifications ont déjà été envoyées pour cette actualité. Une nouvelle "
+"notification ne sera pas envoyé, même si la date de publication est modifiée."
+
 msgid "Moves the topic and all its sub topics to the given destination."
 msgstr ""
 "Sposta l'argomento e tutti i suoi sottoargomenti nella destinazione indicata."
@@ -5577,6 +5738,18 @@ msgid "Success! We have updated your subscribed categories to ${subscribed}."
 msgstr ""
 "Successo! Abbiamo aggiornato le categorie sottoscritte a ${subscribed}."
 
+msgid "Update your newsletter subscription categories:"
+msgstr "Aggiorna le categorie del tuo abbonamento alla newsletter:"
+
+msgid "Update"
+msgstr "Aggiorna"
+
+msgid "Sign up to our newsletter to always stay up to date:"
+msgstr "Iscriviti alla nostra newsletter per rimanere sempre aggiornato:"
+
+msgid "Sign up"
+msgstr "Iscriviti"
+
 msgid "Update Newsletter Subscription"
 msgstr "Aggiornare l'abbonamento alla newsletter "
 
@@ -5835,6 +6008,9 @@ msgstr "Novembre"
 msgid "December"
 msgstr "Dicembre"
 
+msgid "Push Notifications"
+msgstr "Notifiche push"
+
 msgid ""
 "The selected time does not exist on this date due to the switch from "
 "standard time to daylight saving time."
@@ -6054,11 +6230,11 @@ msgstr ""
 "Procedere con cautela. I biglietti e i dati in essi contenuti possono essere "
 "irrevocabilmente cancellati."
 
+msgid "Value Added Tax"
+msgstr "Imposta sul valore aggiunto"
+
 msgid "Chat"
 msgstr "Chat"
-
-msgid "Topics"
-msgstr "Argomenti"
 
 #, python-format
 msgid "You have successfully unsubscribed from the newsletter at ${address}"

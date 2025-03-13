@@ -181,6 +181,7 @@ def test_current_registration_window_end_date(session):
     assert summer.current_registration_window.start == today - days(10)
 
 
+@pytest.mark.skip_night_hours
 def test_registration_window_spots(session):
     forms = FormCollection(session)
     today = date.today()

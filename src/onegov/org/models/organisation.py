@@ -232,6 +232,9 @@ class Organisation(Base, TimestampMixin):
     auto_archive_timespan: dict_property[int] = meta_property(default=0)
     auto_delete_timespan: dict_property[int] = meta_property(default=0)
 
+    # vat
+    vat_rate: dict_property[float | None] = meta_property(default=0.0)
+
     # MTAN Settings
     mtan_access_window_seconds: dict_property[int | None] = meta_property()
     mtan_access_window_requests: dict_property[int | None] = meta_property()
@@ -245,6 +248,11 @@ class Organisation(Base, TimestampMixin):
     # cron jobs
     hourly_maintenance_tasks_last_run: (
         dict_property)[UTCDateTime | None] = (meta_property(default=None))
+
+    firebase_adminsdk_credential: dict_property[str | None] = meta_property()
+    selectable_push_notification_options: dict_property[list[list[str]]] = (
+        meta_property(default=list)
+    )
 
     @property
     def mtan_access_window(self) -> timedelta:

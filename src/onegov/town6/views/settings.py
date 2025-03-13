@@ -6,6 +6,7 @@ from wtforms.fields import StringField, BooleanField, IntegerField
 from onegov.core.security import Secret
 from onegov.form import Form, merge_forms, move_fields
 from onegov.org import _
+from onegov.org.elements import Link
 from onegov.org.forms.settings import (
     FaviconSettingsForm, LinksSettingsForm, HeaderSettingsForm,
     FooterSettingsForm, ModuleSettingsForm, MapSettingsForm,
@@ -13,7 +14,7 @@ from onegov.org.forms.settings import (
     HomepageSettingsForm, NewsletterSettingsForm, LinkMigrationForm,
     LinkHealthCheckForm, SocialMediaSettingsForm,
     EventSettingsForm, GeverSettingsForm, OneGovApiSettingsForm,
-    DataRetentionPolicyForm)
+    DataRetentionPolicyForm, FirebaseSettingsForm, VATSettingsForm)
 from onegov.org.models import Organisation
 from onegov.org.views.settings import (
     handle_homepage_settings, view_settings,
@@ -447,4 +448,37 @@ def town_handle_ticket_data_deletion_settings(
     return handle_generic_settings(
         self, request, form, _('Data Retention Policy'),
         SettingsLayout(self, request),
+    )
+
+
+@TownApp.form(
+    model=Organisation, name='firebase', template='form.pt',
+    permission=Secret, form=FirebaseSettingsForm, setting='Firebase',
+    icon='fa-bell', order=400,
+)
+def town_handle_firebase_settings(
+    self: Organisation, request: TownRequest, form: FirebaseSettingsForm
+) -> RenderData | Response:
+    link_to_push_notfications = request.link(self, '/push-notifications')
+    return handle_generic_settings(
+        self, request, form, 'Firebase', SettingsLayout(self, request),
+        Link(_('Push Notification Overview'),
+             url=link_to_push_notfications)(request)
+    )
+
+
+@TownApp.form(
+    model=Organisation, name='vat-settings', template='form.pt',
+    permission=Secret, form=VATSettingsForm, setting=_('Value Added Tax'),
+    icon='fa-file-invoice-dollar', order=450
+)
+def handle_vat_settings(
+        self: Organisation,
+        request: TownRequest,
+        form: VATSettingsForm,
+        layout: SettingsLayout | None = None
+) -> RenderData | Response:
+    layout = layout or SettingsLayout(self, request, _('Value Added Tax'))
+    return handle_generic_settings(
+        self, request, form, _('Value Added Tax'), layout
     )

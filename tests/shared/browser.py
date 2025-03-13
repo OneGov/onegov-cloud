@@ -1,3 +1,4 @@
+import json
 from os import environ, system
 import re
 import shutil
@@ -6,6 +7,8 @@ import time
 from contextlib import suppress
 from http.client import RemoteDisconnected
 from typing import Callable
+
+from selenium.webdriver import ActionChains, Keys
 
 from onegov.core.utils import module_path
 from time import sleep
@@ -96,7 +99,8 @@ class ExtendedBrowser(InjectedBrowserExtension):
         }
 
     def visit(
-            self, url, sleep_before_fail=0, expected_errors=None
+            self, url, sleep_before_fail=0, expected_errors=None,
+            ignore_all_console_errors=False
     ):
         """ Overrides the default visit method to provided baseurl support.
             halt_on_fail keeps the browser window open for some minutes
@@ -107,7 +111,8 @@ class ExtendedBrowser(InjectedBrowserExtension):
             url = self.baseurl.rstrip('/') + url
 
         page = super().visit(url)
-        self.fail_on_console_errors(sleep_before_fail, expected_errors)
+        if not ignore_all_console_errors:
+            self.fail_on_console_errors(sleep_before_fail, expected_errors)
         return page
 
     def login(self, username, password, to=None):
@@ -170,6 +175,80 @@ class ExtendedBrowser(InjectedBrowserExtension):
             time_budget -= interval
 
         raise TimeoutError("Timeout reached")
+
+    def interact_with_ace_editor(self, content):
+        # I actually tried setting the value with js, (would be much simpler)
+        # while this die made text appear in the ace editor field,  it wasn't
+        # actually truly set, probably due to some intricacies of ace.
+        # So we just type it out letter by letter.
+
+        if isinstance(content, dict):
+            content = json.dumps(content, indent=2)
+
+        editor_element = self.find_by_css('.ace_editor')
+        editor_element.click()
+
+        # Clear existing content (Ctrl+A, Delete)
+        actions = ActionChains(self.driver)
+        actions.key_down(Keys.CONTROL).send_keys('a').key_up(
+            Keys.CONTROL
+        ).send_keys(Keys.DELETE).perform()
+        time.sleep(0.1)
+
+        ends_with_brace = content.rstrip().endswith('}')
+        # Type the content - but if it ends with a closing brace,
+        # omit the last character
+        typing_content = content[:-1] if ends_with_brace else content
+        actions = ActionChains(self.driver)
+        actions.send_keys(typing_content).perform()
+
+        # If we omitted the closing brace, add it now and immediately press
+        # Backspace to remove any auto-inserted closing brace
+        if ends_with_brace:
+            actions = ActionChains(self.driver)
+            actions.send_keys('}').perform()
+            time.sleep(0.1)
+
+            # Press Backspace to remove the auto-inserted second closing brace
+            actions = ActionChains(self.driver)
+            actions.send_keys(Keys.BACKSPACE).perform()
+
+        # Click somewhere else to ensure the editor loses focus and updates
+        self.find_by_tag('body').click()
+
+    def set_datetime_element(self, selector, date_time):
+        """ Sets the date and time on a datetime-local field directly by
+        setting its value.
+        """
+
+        # The way we have determined this pattern is inspecting the DOM
+        # element of the datetime picker and seeing what kind of format it
+        # expects:
+        # document.getElementById('publication_start').value;
+        date_time = date_time.strftime("%Y-%m-%dT%H:%M")
+
+        script = """
+            function setDateTimeDirect(selector, dateTimeString) {
+                const element = document.querySelector(selector);
+                if (!element) {
+                    console.error('Datetime field with selector "' + selector +
+                        '" not found.');
+                    return;
+                }
+                element.value = dateTimeString;
+                element.dispatchEvent(new Event('input', {
+                    'bubbles': true,
+                    'cancelable': true
+                }));
+                element.dispatchEvent(new Event('change', {
+                    'bubbles': true,
+                    'cancelable': true
+                }));
+            }
+            setDateTimeDirect(arguments[0], arguments[1]);
+        """
+
+        self.execute_script(script, selector, date_time)
 
     def scroll_to_css(self, css):
         """ Scrolls to the first element matching the given css expression. """

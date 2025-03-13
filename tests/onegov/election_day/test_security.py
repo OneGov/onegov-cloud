@@ -18,7 +18,7 @@ def test_security_permissions(election_day_app_zg):
             username=f'{role}@example.org',
             password_hash='hash',
             role=role,
-            group_id=None
+            groups=[]
         )
         session.add(user)
         users[role] = user
@@ -28,7 +28,7 @@ def test_security_permissions(election_day_app_zg):
         if user:
             identity = Identity(
                 userid=user.username,
-                groupid=user.group_id.hex if user.group_id else '',
+                groupid=frozenset(group.id.hex for group in user.groups),
                 role=user.role,
                 application_id=election_day_app_zg.application_id
             )

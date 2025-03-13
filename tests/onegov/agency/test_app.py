@@ -13,6 +13,7 @@ class DummyRequest():
     is_logged_in = False
     is_manager = False
     is_admin = False
+    is_supporter = False
     root_pages = ()
     current_user = Bunch(id=Bunch(hex='abcd'))
     path = ''
@@ -61,7 +62,7 @@ def test_app_custom(agency_app):
     assert as_text(get_top_navigation(request)) == ['People', 'Agencies']
     assert as_text(get_global_tools(request)) == [
         {'Account': ['User Profile', 'Logout']},
-        {'Management': ['Timeline', 'Files', 'Images', 'Payments',
+        {'Management': ['Dashboard', 'Timeline', 'Files', 'Images', 'Payments',
                         'Text modules', 'Archived Tickets', 'Forms',
                         'Surveys', 'Hidden contents']},
         {'Tickets': ['My Tickets', 'Open Tickets', 'Pending Tickets',
@@ -72,7 +73,7 @@ def test_app_custom(agency_app):
     assert as_text(get_top_navigation(request)) == ['People', 'Agencies']
     assert as_text(get_global_tools(request)) == [
         {'Account': ['User Profile', 'Logout']},
-        {'Management': ['Timeline', 'Files', 'Images', 'Payments',
+        {'Management': ['Dashboard', 'Timeline', 'Files', 'Images', 'Payments',
                         'Text modules', 'Settings', 'Users', 'User groups',
                         'Link Check', 'Archived Tickets', 'Forms',
                         'Surveys', 'Hidden contents']},

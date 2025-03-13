@@ -13,10 +13,11 @@ from onegov.org import _, OrgApp
 from onegov.org.cli import close_ticket
 from onegov.org.elements import Link
 from onegov.org.forms import EventForm
-from onegov.org.layout import EventLayout
+from onegov.org.layout import EventLayout, TicketLayout
 from onegov.org.mail import send_ticket_mail
 from onegov.org.models import TicketMessage, EventMessage
 from onegov.org.models.extensions import AccessExtension
+from onegov.org.models.ticket import EventSubmissionTicket
 from onegov.org.views.utils import show_tags, show_filters
 from onegov.ticket import TicketCollection
 from sedate import utcnow
@@ -44,7 +45,8 @@ def get_session_id(request: OrgRequest) -> str:
 
 def assert_anonymous_access_only_temporary(
     request: OrgRequest,
-    event: Event
+    event: Event,
+    view_ticket: EventSubmissionTicket | None = None
 ) -> None:
     """ Raises exceptions if the current user is anonymous and no longer
     should be given access to the event.
@@ -55,6 +57,9 @@ def assert_anonymous_access_only_temporary(
 
     """
     if request.is_manager:
+        return
+
+    if view_ticket is not None and request.is_supporter:
         return
 
     if event.state not in ('initiated', 'submitted'):
@@ -132,7 +137,8 @@ def event_form(
 )
 def publish_event(
     self: Event,
-    request: OrgRequest
+    request: OrgRequest,
+    view_ticket: EventSubmissionTicket | None = None
 ) -> RenderData | BaseResponse:
     """ Publish an event. """
 
@@ -153,6 +159,9 @@ def publish_event(
     self.publish()
 
     ticket = TicketCollection(request.session).by_handler_id(self.id.hex)
+    if view_ticket is not None and view_ticket != ticket:
+        # if we access this through the ticket it had better match
+        raise exc.HTTPNotFound()
 
     if not ticket:
         request.success(_("Successfully created the event '${title}'",
@@ -181,7 +190,31 @@ def publish_event(
 
     EventMessage.create(self, ticket, request, 'published')
 
+    if view_ticket is not None:
+        return request.redirect(request.link(view_ticket))
+
     return request.redirect(request.link(self))
+
+
+@OrgApp.view(
+    model=EventSubmissionTicket,
+    name='publish-event',
+    permission=Private
+)
+def publish_event_from_ticket(
+    self: EventSubmissionTicket,
+    request: OrgRequest
+) -> RenderData | BaseResponse:
+
+    event = self.handler.event
+    if event is None or event.state != 'submitted':
+        raise exc.HTTPNotFound()
+
+    return publish_event(
+        event,
+        request,
+        view_ticket=self
+    )
 
 
 @OrgApp.form(
@@ -413,7 +446,8 @@ def handle_edit_event(
     self: Event,
     request: OrgRequest,
     form: EventForm,
-    layout: EventLayout | None = None
+    layout: EventLayout | TicketLayout | None = None,
+    view_ticket: EventSubmissionTicket | None = None,
 ) -> RenderData | BaseResponse:
     """ Edit an event.
 
@@ -428,9 +462,15 @@ def handle_edit_event(
         form.populate_obj(self)
 
         ticket = TicketCollection(request.session).by_handler_id(self.id.hex)
+        if view_ticket is not None and view_ticket != ticket:
+            # if we're accessing through the ticket it had better be the same
+            raise exc.HTTPNotFound()
+
         if ticket:
             EventMessage.create(self, ticket, request, 'changed')
         request.success(_('Your changes were saved'))
+        if view_ticket is not None:
+            return request.redirect(request.link(view_ticket))
         return request.redirect(request.link(self))
 
     form.process(obj=self)
@@ -448,6 +488,38 @@ def handle_edit_event(
     }
 
 
+@OrgApp.form(
+    model=EventSubmissionTicket,
+    name='edit-event',
+    template='form.pt',
+    permission=Public,
+    form=event_form
+)
+def handle_edit_event_from_ticket(
+    self: EventSubmissionTicket,
+    request: OrgRequest,
+    form: EventForm,
+    layout: TicketLayout | None = None
+) -> RenderData | BaseResponse:
+
+    event = self.handler.event
+    if event is None:
+        raise exc.HTTPNotFound()
+
+    if layout is None:
+        layout = TicketLayout(self, request)
+
+    layout.breadcrumbs[-1].attrs['href'] = request.link(self)
+
+    return handle_edit_event(
+        event,
+        request,
+        form,
+        layout,
+        view_ticket=self,
+    )
+
+
 @OrgApp.view(
     model=Event,
     name='withdraw',
@@ -459,7 +531,7 @@ def handle_withdraw_event(self: Event, request: OrgRequest) -> None:
 
     request.assert_valid_csrf_token()
 
-    if not self.source:
+    if not self.source or self.state not in ('published', 'submitted'):
         raise exc.HTTPForbidden()
 
     self.withdraw()
@@ -467,6 +539,24 @@ def handle_withdraw_event(self: Event, request: OrgRequest) -> None:
     ticket = tickets.by_handler_id(self.id.hex)
     if ticket:
         EventMessage.create(self, ticket, request, 'withdrawn')
+
+
+@OrgApp.view(
+    model=EventSubmissionTicket,
+    name='withdraw-event',
+    request_method='POST',
+    permission=Private
+)
+def handle_withdraw_event_from_ticket(
+    self: EventSubmissionTicket,
+    request: OrgRequest
+) -> None:
+
+    event = self.handler.event
+    if event is None:
+        raise exc.HTTPNotFound()
+
+    handle_withdraw_event(event, request)
 
 
 @OrgApp.view(
@@ -501,6 +591,24 @@ def handle_delete_event(self: Event, request: OrgRequest) -> None:
         EventMessage.create(self, ticket, request, 'deleted')
 
     EventCollection(request.session).delete(self)
+
+
+@OrgApp.view(
+    model=EventSubmissionTicket,
+    name='delete-event',
+    request_method='DELETE',
+    permission=Private
+)
+def handle_delete_event_from_ticket(
+    self: EventSubmissionTicket,
+    request: OrgRequest
+) -> None:
+
+    event = self.handler.event
+    if event is None or event.source:
+        raise exc.HTTPNotFound()
+
+    handle_delete_event(event, request)
 
 
 @OrgApp.view(

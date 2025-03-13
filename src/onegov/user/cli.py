@@ -54,6 +54,9 @@ def add(
         if users.exists(username):
             abort('{} already exists'.format(username))
 
+        if not hasattr(app.settings.roles, role):
+            abort(f'Invalid role "{role}" specified')
+
         nonlocal password
         if not password:
             password = random_password(16)
@@ -439,6 +442,9 @@ def change_role(
     """ Changes the role of the given username. """
 
     def change(request: CoreRequest, app: Framework) -> None:
+        if not hasattr(app.settings.roles, role):
+            abort(f'Invalid role "{role}" specified')
+
         users = UserCollection(app.session())
 
         user = users.by_username(username)

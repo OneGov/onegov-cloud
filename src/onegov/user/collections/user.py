@@ -149,7 +149,7 @@ class UserCollection:
         realname: str | None = None,
         phone_number: str | None = None,
         signup_token: str | None = None,
-        group: UserGroup | None = None
+        groups: list[UserGroup] | None = None
     ) -> User:
         """ Add a user to the collection.
 
@@ -176,7 +176,7 @@ class UserCollection:
             active=active,
             realname=realname,
             signup_token=signup_token,
-            group_id=group.id if group else None,
+            groups=groups or [],
             phone_number=phone_number
         )
 
@@ -287,8 +287,7 @@ class UserCollection:
 
     def by_roles(self, role: str, *roles: str) -> Query[User]:
         """ Queries the users by roles. """
-        roles_list = [role, *list(roles)]
-        return self.query().filter(User.role.in_(roles_list))
+        return self.query().filter(User.role.in_([role, *roles]))
 
     def by_signup_token(self, signup_token: str) -> Query[User]:
         return self.query().filter_by(signup_token=signup_token)

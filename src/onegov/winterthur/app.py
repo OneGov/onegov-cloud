@@ -94,7 +94,7 @@ class WinterthurApp(OrgApp):
         if 'legend' in settings:
             # NOTE: We need to wrap this in Markup. It would be cleaner
             #       if we had a proxy settings object with dict_property
-            return Markup(settings['legend'])  # noqa: RUF035
+            return Markup(settings['legend'])  # nosec: B704
 
         return DEFAULT_LEGEND
 

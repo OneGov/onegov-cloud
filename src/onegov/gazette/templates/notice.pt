@@ -107,7 +107,7 @@
                             <tr>
                                 <td>${layout.format_date(change.created, 'datetime')}</td>
                                 <td>${change.user_name}</td>
-                                <td>${change.user.group.name|None}</td>
+                                <td>${', '.join(group.name for group in change.user.groups)|None}</td>
                                 <td>
                                     <span class="event" i18n:translate>${change.event}</span>
                                     <span class="text" tal:condition="change.text">${change.text}</span>

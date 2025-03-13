@@ -6,7 +6,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: OneGov Cloud 1.0\n"
-"POT-Creation-Date: 2024-09-30 10:20+0200\n"
+"POT-Creation-Date: 2025-03-11 16:15+0100\n"
 "PO-Revision-Date: 2021-03-03 16:24+0100\n"
 "Last-Translator: Lukas Burkhard <lukas.burkhard@seantis.ch>\n"
 "Language-Team: German\n"
@@ -448,6 +448,9 @@ msgstr "Bestätigen"
 msgid "There was an error while importing your directory!"
 msgstr "Beim Verzeichnisimport ist ein Fehler aufgetreten!"
 
+msgid "Download Form"
+msgstr "Formular herunterladen"
+
 msgid "Embed iFrame"
 msgstr "iFrame einbetten"
 
@@ -640,6 +643,12 @@ msgstr ""
 msgid "Map"
 msgstr "Karte"
 
+msgid "Links"
+msgstr "Links"
+
+msgid "More news"
+msgstr "Weitere News"
+
 msgid "Other Entries"
 msgstr "Weitere Einträge"
 
@@ -649,17 +658,14 @@ msgstr "Vorheriger Eintrag"
 msgid "Next Entry"
 msgstr "Nächster Eintrag"
 
-msgid "Links"
-msgstr "Links"
-
-msgid "More news"
-msgstr "Weitere News"
-
 msgid "Total Amount"
 msgstr "Totalbetrag"
 
 msgid "Chat History"
 msgstr "Chat-Verlauf"
+
+msgid "Item(s)"
+msgstr "Stück(e)"
 
 msgid "Change request"
 msgstr "Änderungsvorschlag"
@@ -812,6 +818,9 @@ msgstr "Administrator"
 msgid "Editor"
 msgstr "Editor"
 
+msgid "Supporter"
+msgstr "Supporter"
+
 msgid "Member"
 msgstr "Mitglied"
 
@@ -820,6 +829,9 @@ msgstr "Administratoren"
 
 msgid "Editors"
 msgstr "Editoren"
+
+msgid "Supporters"
+msgstr "Supporters"
 
 msgid "Members"
 msgstr "Mitglieder"
@@ -835,6 +847,9 @@ msgstr "Vollbild"
 
 msgid "Zoom in/out"
 msgstr "Zoom"
+
+msgid "Show more"
+msgstr "Mehr anzeigen"
 
 msgid ""
 "This space holds images from your photo-albums. To show photos add a few "
@@ -980,6 +995,12 @@ msgstr "Umbenennen"
 msgid "Download"
 msgstr "Herunterladen"
 
+msgid "Linked Pages"
+msgstr "Verlinkungen"
+
+msgid "Links to ${filename}"
+msgstr "Links auf ${filename}"
+
 msgid "Digital seal applied by ${signee} on ${date}"
 msgstr "Digitales Siegel angewendet von ${signee} am ${date}"
 
@@ -1067,15 +1088,6 @@ msgstr "Nachfolgend sehen Sie Ihre Chat-Konversation:"
 
 msgid "Have a great day!"
 msgstr "Wir wünschen Ihnen einen schönen Tag!"
-
-msgid "Notify on newsletter unsubscription"
-msgstr "Benachrichtigung bei Abmeldung vom Newsletter"
-
-msgid "Send an email notification when a user unsubscribes from the newsletter"
-msgstr "Sende eine E-Mail-Benachrichtigung, wenn sich ein Benutzer vom Newsletter abmeldet"
-
-msgid "The user with the address <strong>${address}</strong> just unsubscribed from the newsletter subscriber list."
-msgstr "Der Benutzer mit der Adresse <strong>${address}</strong> hat sich soeben von der Newsletter-Abonnentenliste abgemeldet."
 
 msgid "Hello"
 msgstr "Grüezi"
@@ -1297,6 +1309,13 @@ msgstr "Klicken Sie hier, um die Web-Version anzuzeigen."
 
 msgid "You no longer wish to receive the newsletter?"
 msgstr "Sie möchten den Newsletter nicht mehr erhalten?"
+
+msgid ""
+"The user with the address ${address} just unsubscribed from the newsletter "
+"subscriber list."
+msgstr ""
+"Der Benutzer mit der Adresse ${address} hat sich soeben von der Newsletter-"
+"Abonnentenliste abgemeldet."
 
 msgid "Click the following link to set a new password:"
 msgstr "Klicken Sie auf den folgenden Link, um ein neues Passwort zu setzen:"
@@ -1564,15 +1583,11 @@ msgstr ""
 "Der Newsletter ist deaktiviert. Sie können diese Seite nur sehen, weil Sie "
 "eingeloggt sind."
 
-msgid "Sign up to our newsletter to always stay up to date:"
-msgstr ""
-"Abonnieren Sie unseren Newsletter um immer auf dem Laufenden zu bleiben:"
+msgid "There are currently ${count} recipients registered."
+msgstr "Zur Zeit sind ${count} Abonnenten registriert."
 
 msgid "To update your subscription, please use this ${Link}"
 msgstr "Um Ihr Abonnement zu aktualisieren, verwenden Sie bitte diesen ${Link}"
-
-msgid "There are currently ${count} recipients registered."
-msgstr "Zur Zeit sind ${count} Abonnenten registriert."
 
 msgid "Archive"
 msgstr "Archiv"
@@ -1705,8 +1720,35 @@ msgstr ""
 msgid "Drop files to verify them"
 msgstr "Dateien zur Prüfung hierhin ziehen"
 
+msgid "Sent Notifications"
+msgstr "Gesendete Benachrichtigungen"
+
+msgid "News"
+msgstr "Nachricht"
+
+msgid "Sent At"
+msgstr "Gesendet am"
+
+msgid "Firebase Response Data"
+msgstr "Firebase Response Data"
+
+msgid "No notifications"
+msgstr "Keine Benachrichtigungen"
+
 msgid "No subscribers yet"
 msgstr "Noch keine Abonnenten"
+
+msgid "Subscribed on"
+msgstr "Abonniert am"
+
+msgid ""
+"This recipient has delivery failures, including hard bounces, invalid email "
+"addresses, spam complaints, manual deactivations, or being blocked. We "
+"recommend unsubscribing it from the list."
+msgstr ""
+"Dieser Empfänger hat Zustellungsfehler, einschließlich Hard Bounces, "
+"ungültige E-Mail-Adresse, Spam-Beschwerde, manuelle Deaktivierung oder wird "
+"blockiert. Wir empfehlen, ihn von der Liste abzumelden."
 
 msgid "submitted"
 msgstr "angemeldet"
@@ -2194,11 +2236,30 @@ msgstr ""
 "Gehen Sie mit Vorsicht vor. Tickets und die darin enthaltenen Daten können "
 "unwiderruflich gelöscht werden."
 
+msgid "Push Notification Overview"
+msgstr "Übersicht Push-Benachrichtigungen"
+
 msgid "New Note"
 msgstr "Neue Notiz"
 
-msgid "This recipient has delivery failures, including hard bounces, invalid email addresses, spam complaints, manual deactivations, or being blocked. We recommend unsubscribing it from the list."
-msgstr "Dieser Empfänger hat Zustellungsfehler, einschließlich Hard Bounces, ungültige E-Mail-Adresse, Spam-Beschwerde, manuelle Deaktivierung oder wird blockiert. Wir empfehlen, ihn von der Liste abzumelden."
+#~ msgid "Sign up"
+#~ msgstr "Anmelden"
+
+#~ msgid "Notify on newsletter unsubscription"
+#~ msgstr "Benachrichtigung bei Abmeldung vom Newsletter"
+
+#~ msgid ""
+#~ "Send an email notification when a user unsubscribes from the newsletter"
+#~ msgstr ""
+#~ "Sende eine E-Mail-Benachrichtigung, wenn sich ein Benutzer vom Newsletter "
+#~ "abmeldet"
+
+#~ msgid ""
+#~ "The user with the address <strong>${address}</strong> just unsubscribed "
+#~ "from the newsletter subscriber list."
+#~ msgstr ""
+#~ "Der Benutzer mit der Adresse <strong>${address}</strong> hat sich soeben "
+#~ "von der Newsletter-Abonnentenliste abgemeldet."
 
 #~ msgid "Change Request"
 #~ msgstr "Änderung vorschlagen"

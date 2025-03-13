@@ -6,6 +6,8 @@ import re
 import yaml
 
 from functools import cached_property
+
+from cryptography.fernet import InvalidToken
 from lxml import etree
 
 from onegov.core.widgets import transform_structure
@@ -20,11 +22,14 @@ from onegov.form.fields import MultiCheckboxField
 from onegov.form.fields import PreviewField
 from onegov.form.fields import TagsField
 from onegov.form.validators import StrictOptional
-from onegov.gever.encrypt import encrypt_symmetric
+from onegov.gever.encrypt import encrypt_symmetric, decrypt_symmetric
 from onegov.gis import CoordinatesField
 from onegov.org import _
-from onegov.org.forms.fields import (HtmlField,
-                                     UploadOrSelectExistingMultipleFilesField)
+
+from onegov.org.forms.fields import (
+    HtmlField,
+    UploadOrSelectExistingMultipleFilesField,
+)
 from onegov.org.forms.user import AVAILABLE_ROLES
 from onegov.org.forms.util import TIMESPANS
 from onegov.org.theme import user_options
@@ -1415,4 +1420,214 @@ class DataRetentionPolicyForm(Form):
         default=0,
         coerce=int,
         choices=TIMESPANS
+    )
+
+
+class FirebaseSettingsForm(Form):
+    """Allows to setup sending firebase notifications for News with
+    hashtags. Used with PublicationFormExtension .
+
+    """
+
+    if TYPE_CHECKING:
+        request: OrgRequest
+
+    firebase_adminsdk_credential = TextAreaField(
+        _('Firebase adminsdk credentials (JSON)'),
+        [Optional()],
+        render_kw={
+            'rows': 32,
+            'data-editor': 'json'
+        },
+    )
+
+    selectable_push_notification_options = StringField(
+        label=_('Topics'),
+        fieldset=_('Defines the firebase topic id'),
+        render_kw={
+            'class_': 'many many-firebasetopics',
+        },
+    )
+
+    if TYPE_CHECKING:
+        hashtag_errors: dict[int, str]
+    else:
+
+        def __init__(self, *args, **kwargs) -> None:
+            super().__init__(*args, **kwargs)
+            self.hashtag_errors = {}
+
+    def populate_obj(self, model: Organisation) -> None:  # type:ignore
+        super().populate_obj(model)
+        key_base64 = self.request.app.hashed_identity_key
+
+        try:
+            assert self.firebase_adminsdk_credential.data is not None
+            encrypted = encrypt_symmetric(
+                self.firebase_adminsdk_credential.data, key_base64
+            )
+            encrypted_str = encrypted.decode('utf-8')
+            model.firebase_adminsdk_credential = encrypted_str or ''
+        except Exception:
+            model.firebase_adminsdk_credential = ''  # nosec: B105
+
+        # Save selectable_push_notification_options to the model
+        model.selectable_push_notification_options = (
+            self.json_to_links(self.selectable_push_notification_options.data)
+            or []
+        )
+
+    def validate_firebase_adminsdk_credential(
+        self, field: TextAreaField
+    ) -> None:
+        expected_keys = {
+            'auth_provider_x509_cert_url',
+            'auth_uri',
+            'client_email',
+            'client_id',
+            'client_x509_cert_url',
+            'private_key',
+            'private_key_id',
+            'project_id',
+            'token_uri',
+            'type',
+            'universe_domain',
+        }
+        # Basic sanity checks on the json
+        try:
+            data = json.loads(field.data)  # type:ignore[arg-type]
+            if not isinstance(data, dict):
+                raise ValidationError(
+                    _(
+                        'Invalid Firebase credentials format '
+                        '- must be a JSON object'
+                    )
+                )
+            missing_keys = [key for key in expected_keys if key not in data]
+            if missing_keys:
+                error_message = _(
+                    'Missing required keys in Firebase credentials: {0}'
+                ).format(', '.join(missing_keys))
+                raise ValidationError(error_message)
+        except json.JSONDecodeError as err:
+            raise ValidationError(
+                _('Invalid JSON format in Firebase credentials')
+            ) from err
+        except Exception as e:
+            raise ValidationError(
+                _('Error validating Firebase credentials: {0}').format(str(e))
+            ) from e
+
+    def process_obj(self, model: Organisation) -> None:  # type:ignore
+        super().process_obj(model)
+
+        key_base64 = self.request.app.hashed_identity_key
+        if model.firebase_adminsdk_credential:
+            try:
+                self.firebase_adminsdk_credential.data = decrypt_symmetric(
+                model.firebase_adminsdk_credential.encode('utf-8'), key_base64
+            )
+            except InvalidToken:
+                self.firebase_adminsdk_credential.data = ''
+
+        if (
+            not hasattr(model, 'selectable_push_notification_options')
+            or not model.selectable_push_notification_options
+        ):
+            self.selectable_push_notification_options.data = self.tags_to_json(
+               []
+            )
+        else:
+            self.selectable_push_notification_options.data = self.tags_to_json(
+                model.selectable_push_notification_options
+            )
+
+    def on_request(self) -> None:
+        # Initialize the field if it's empty
+        if not self.selectable_push_notification_options.data:
+            self.selectable_push_notification_options.data = (
+                self.tags_to_json([])
+            )
+
+    def choices_for_news_specific_firebase_topics(self) -> list[list[str]]:
+        from onegov.org.models import News
+        session = self.request.session
+        query = session.query(News.meta['hashtags'])
+        hashtag_set = set()
+        for (hashtags,) in query:
+            hashtag_set.update(hashtags)
+        all_hashtags = sorted(hashtag_set)
+
+        # The first topic is just the schema, includes all News
+        choices_for_topics = []
+        for label in all_hashtags:
+            normalized_hashtag = label.lower().replace(' ', '_')
+            key = (
+                self.request.app.schema + '_' + normalized_hashtag
+            )
+            pair = [key, label]
+            choices_for_topics.append(pair)
+        return choices_for_topics
+
+    def json_to_links(
+        self,
+        text: str | None = None
+    ) -> list[list[str]]:
+        if not text:
+            return []
+        return [
+            [value['text'], link]
+            for value in json.loads(text).get('values', [])
+            if (link := value['link']) or value['text']
+        ]
+
+    def tags_to_json(self, tags: list[list[str]]) -> str:
+        if not tags:
+            # set default topic News (which is all)
+            app_id = self.request.app.schema
+            topic_and_label_pairs = [[app_id, 'News']]
+        else:
+            topic_and_label_pairs = tags
+
+            # Check if the default pair exists, if not add it
+            app_id = self.request.app.schema
+            if not any(pair[0] == app_id for pair in topic_and_label_pairs):
+                topic_and_label_pairs.insert(
+                    0, [app_id, 'News']
+                )
+
+        choices = self.choices_for_news_specific_firebase_topics()
+        text_options = [value for value, __ in choices]
+        link_options = [label for __, label in choices]
+
+        return json.dumps(
+            {
+                'labels': {
+                    'text': 'Key',
+                    'link': 'Label',
+                    'add': self.request.translate(_('Add')),
+                    'remove': self.request.translate(_('Remove')),
+                },
+                'placeholders': {'text': 'Key', 'link': 'Label'},
+                'textOptions': text_options,
+                'linkOptions': link_options,
+                'values': [
+                    {
+                        'text': l[0],
+                        'link': l[1],
+                        'error': self.hashtag_errors.get(ix, ''),
+                    }
+                    for ix, l in enumerate(topic_and_label_pairs)
+                ],
+            }
+        )
+
+
+class VATSettingsForm(Form):
+
+    vat_rate = FloatField(
+        label=_('VAT Rate'),
+        description=_('This is the VAT rate in percent. The VAT rate will '
+                      'apply to all prices in the forms.'),
+        validators=[InputRequired(), NumberRange(0, 100)],
     )

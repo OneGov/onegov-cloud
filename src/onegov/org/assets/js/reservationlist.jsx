@@ -43,8 +43,12 @@ $.fn.reservationList = function(options) {
         var list = $(element);
 
         // handles clicks on events
-        list.on('click', '.event:not(.event-unavailable,.selected)', function(e) {
+        list.on('click', '.event:not(.event-unavailable)', function(e) {
             var el = $(this);
+            if (!el.hasClass('event-adjustable') && el.hasClass('selected')) {
+                e.preventDefault();
+                return false;
+            }
             var event = {
                 partlyAvailable: el.data('partly-available'),
                 quota: el.data('quota'),
@@ -56,7 +60,30 @@ $.fn.reservationList = function(options) {
                 reserveurl: el.data('reserveurl')
             };
             rl.removeAllPopups();
-            rl.showActionsPopup(list, this, event);
+            var singleSelect = !e.shiftKey && !e.altKey && !e.ctrlKey;
+            if (el.hasClass('event-adjustable')) {
+                rl.showActionsPopup(list, this, event, singleSelect);
+            } else {
+                // by default we only allow one reservation per row
+                // so if we pick another one we delete the other ones
+                // selected in the same row
+                if (singleSelect) {
+                    var delete_existing = el.data('delete');
+                    if (delete_existing !== undefined) {
+                        _.each(delete_existing, function(delete_link) {
+                            rl.delete(list, delete_link);
+                        });
+                    }
+                }
+                rl.reserve(
+                    list,
+                    event.reserveurl,
+                    event.start.format('hh:mm'),
+                    event.end.format('hh:mm'),
+                    1,
+                    event.wholeDay
+                );
+            }
             e.preventDefault();
             return false;
         });
@@ -107,16 +134,21 @@ rl.reserve = function(list, url, start, end, quota, wholeDay) {
 };
 
 // popup handler implementation
-rl.showActionsPopup = function(list, element, event) {
+rl.showActionsPopup = function(list, element, event, singleSelect) {
     var wrapper = $('<div class="reservation-actions">');
     var reservation = $('<div class="reservation-form">').appendTo(wrapper);
 
     ReservationForm.render(reservation.get(0), event, rl.previousReservationState, function(state) {
-        // we only allow one reservation per row, so if we pick another one
-        // we delete the previous one
-        var delete_existing = $(element).data('delete');
-        if (delete_existing !== undefined) {
-            rl.delete(list, delete_existing);
+        // by default we only allow one reservation per row
+        // so if we pick another one we delete the other ones
+        // selected in the same row
+        if (singleSelect) {
+            var delete_existing = $(element).data('delete');
+            if (delete_existing !== undefined) {
+                _.each(delete_existing, function(delete_link) {
+                    rl.delete(list, delete_link);
+                });
+            }
         }
         rl.reserve(
             list,
@@ -256,44 +288,83 @@ rl.setupReservationSelect = function(options) {
 
                 // clear list state
                 list.find('.event').removeClass(['selected', 'not-selected'])
-                .removeAttr('data-delete');
+                    .removeAttr('data-delete');
 
-                // set list state
+                /* eslint-disable max-nested-callbacks */
+                // determine list state
+                var rows = [];
+                list.find('tbody tr').each(function(index, element) {
+                    rows[index] = {
+                        row: $(element),
+                        // which elements to mark as selected
+                        selected: [],
+                        // which reservations to delete when changing
+                        // the selection
+                        reservations: []
+                    };
+                });
                 _.each(data.reservations, function(reservation) {
                     var resource = reservation.resource;
                     var isodate = reservation.date.substring(0, 10);
-                    var column = list.find('th[data-resource="'+resource+'"]').index();
-                    var row = list.find('tr[data-date="'+isodate+'"]');
+                    var column = list.find('th[data-resource="' + resource + '"]').index();
+                    var row = list.find('tr[data-date="' + isodate + '"]');
                     var events = row.children().eq(column).find('.event');
                     var selected = null;
                     if (events.length === 1) {
                         selected = events.eq(0);
                     } else {
                         var target_start = moment(reservation.date);
-                        var min_diff = Infinity;
-                        _.each(events, function(event) {
-                            var date = moment(event.data('start'));
-                            var diff = target_start.diff(start);
-                            if (diff < min_diff) {
-                                selected = event;
-                                min_diff = diff;
+                        var target_end = moment(target_start)
+                            .set('hour', parseInt(reservation.time.substring(8, 10), 10))
+                            .set('minute', parseInt(reservation.time.substring(11), 10));
+                        events.filter(':not(.event-adjustable)').each(function() {
+                            var event = $(this);
+                            if (!target_start.isSame(event.data('start'))) {
+                                return;
                             }
-                        })
+                            if (target_end.isSame(event.data('end'))) {
+                                selected = event;
+                            }
+                        });
+
+                        if (selected === null) {
+                            events.filter('.event-adjustable').each(function() {
+                                var event = $(this);
+                                if (target_start.isBefore(event.data('start'))) {
+                                    return;
+                                }
+                                if (!target_end.isAfter(event.data('end'))) {
+                                    selected = event;
+                                }
+                            });
+                        }
                     }
-                    // visually mark selected event and set delete link
+                    // record selected event
                     if (selected !== null) {
-                        row.find('.event').removeClass('selected')
-                        .addClass('not-selected').data('delete', reservation.delete);
+                        var row_data = rows[row.index()];
+                        row_data.reservations.push(reservation.delete);
                         if (column >= 0) {
-                            // if column < 0 it means the resource is not currently
-                            // visible due to a filter, we still want to show that
-                            // this date already has a reservation pending and if
-                            // pick a different one we want to replace it, like we
-                            // usually do.
-                            selected.removeClass('not-selected').addClass('selected');
+                            row_data.selected.push(selected);
                         }
                     }
                 });
+                /* eslint-enable max-nested-callbacks */
+
+                // set list state
+                _.each(rows, function(row_data) {
+                    if (row_data.reservations.length === 0) {
+                        return;
+                    }
+                    row_data.row.find('.event')
+                        .removeClass('selected')
+                        .addClass('not-selected')
+                        .data('delete', row_data.reservations);
+
+                    _.each(row_data.selected, function(selected) {
+                        selected.removeClass('not-selected').addClass('selected');
+                    });
+                });
+                /* eslint-enable max-nested-callbacks */
 
                 rl.loadPreviousReservationState(list, data.reservations);
             });
@@ -342,8 +413,8 @@ var ReservationSelection = React.createClass({
         }
     },
     handleGotoDate: function(isodate) {
-        var row = $(this.props.list).find('tr[data-date="'+isodate+'"]');
-        if(row.length !== 0) {
+        var row = $(this.props.list).find('tr[data-date="' + isodate + '"]');
+        if (row.length !== 0) {
             row[0].scrollIntoView();
         }
     },
@@ -571,6 +642,7 @@ var ReservationForm = React.createClass({
             return this.isValidQuota(this.state.quota);
         }
     },
+    // eslint-disable-next-line complexity
     render: function() {
         var buttonEnabled = this.isValidState();
         var showWholeDay = this.props.partlyAvailable && this.props.wholeDay;
