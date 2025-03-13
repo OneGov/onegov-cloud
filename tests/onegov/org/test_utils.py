@@ -322,3 +322,8 @@ def test_format_phone_number():
     assert utils.format_phone_number('41') == '+41 41'
     assert utils.format_phone_number('') == ''
     assert utils.format_phone_number(None) == ''
+
+    # force error (too long for phone number), will return the input
+    long_text = ('You can reach me during office hours at 041 111 22 33 '
+                 'otherwise at 041 111 22 44')
+    assert utils.format_phone_number(long_text) == long_text

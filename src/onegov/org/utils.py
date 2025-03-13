@@ -1258,8 +1258,11 @@ def format_phone_number(phone_number: str) -> str:
     if not phone_number:
         return ''
 
-    parsed = phonenumbers.parse(phone_number, 'CH')
-    return phonenumbers.format_number(
-        parsed,
-        phonenumbers.PhoneNumberFormat.INTERNATIONAL
-    )
+    try:
+        parsed = phonenumbers.parse(phone_number, 'CH')
+
+        return phonenumbers.format_number(
+            parsed, phonenumbers.PhoneNumberFormat.INTERNATIONAL
+        )
+    except phonenumbers.phonenumberutil.NumberParseException:
+        return phone_number
