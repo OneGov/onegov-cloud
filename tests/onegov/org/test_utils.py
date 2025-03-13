@@ -1,4 +1,6 @@
 from datetime import date, datetime
+
+
 from onegov.core.utils import Bunch
 from onegov.org import utils
 from pytz import timezone
@@ -297,3 +299,31 @@ def test_extract_categories_and_subcategories():
     result = utils.extract_categories_and_subcategories(categories,
                                                         flattened=True)
     assert result == ['a', 'b', 'c', 'd', 'a1', 'a2', 'b1']
+
+
+def test_format_phone_number():
+    assert utils.format_phone_number('+41411112233') == '+41 41 111 22 33'
+    assert utils.format_phone_number('0041411112233') == '+41 41 111 22 33'
+    assert utils.format_phone_number('0411112233') == '+41 41 111 22 33'
+    assert utils.format_phone_number('411112233') == '+41 41 111 22 33'
+    assert utils.format_phone_number('41 111 22 33') == '+41 41 111 22 33'
+    assert utils.format_phone_number('041 111 22 33') == '+41 41 111 22 33'
+    assert utils.format_phone_number('041-111-22-33') == '+41 41 111 22 33'
+    assert utils.format_phone_number('041/111/22/33') == '+41 41 111 22 33'
+    assert utils.format_phone_number('041/111-22 33') == '+41 41 111 22 33'
+
+    # invalid phone numbers are just prefixed with the country code
+    assert utils.format_phone_number('41111223') == '+41 41111223'
+    assert utils.format_phone_number('4111122') == '+41 4111122'
+    assert utils.format_phone_number('411112') == '+41 411112'
+    assert utils.format_phone_number('41111') == '+41 41111'
+    assert utils.format_phone_number('4111') == '+41 4111'
+    assert utils.format_phone_number('411') == '+41 411'
+    assert utils.format_phone_number('41') == '+41 41'
+    assert utils.format_phone_number('') == ''
+    assert utils.format_phone_number(None) == ''
+
+    # force error (too long for phone number), will return the input
+    long_text = ('You can reach me during office hours at 041 111 22 33 '
+                 'otherwise at 041 111 22 44')
+    assert utils.format_phone_number(long_text) == long_text
