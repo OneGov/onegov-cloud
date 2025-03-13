@@ -87,7 +87,8 @@ def handle_generic_settings(
     request: OrgRequest,
     form: Form,
     title: str,
-    layout: SettingsLayout | None = None
+    layout: SettingsLayout | None = None,
+    subtitle: str | None = None
 ) -> RenderData | Response:
 
     layout = layout or SettingsLayout(self, request, title)
@@ -106,7 +107,8 @@ def handle_generic_settings(
     return {
         'layout': layout,
         'title': title,
-        'form': form
+        'form': form,
+        'subtitle': subtitle
     }
 
 

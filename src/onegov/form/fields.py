@@ -758,6 +758,8 @@ class TimezoneDateTimeField(DateTimeLocalField):
     def process_data(self, value: datetime | None) -> None:
         if value:
             value = sedate.to_timezone(value, self.timezone)
+            # FIXME: This statement has no effect. replace() returns a new
+            # datetime.
             value.replace(tzinfo=None)
 
         super().process_data(value)

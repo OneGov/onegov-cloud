@@ -2,7 +2,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: \n"
-"POT-Creation-Date: 2025-03-11 08:43+0100\n"
+"POT-Creation-Date: 2025-03-11 16:35+0100\n"
 "PO-Revision-Date: 2022-03-15 10:52+0100\n"
 "Last-Translator: \n"
 "Language-Team: \n"
@@ -11,6 +11,7 @@ msgstr ""
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Generated-By: xls-to-po 1.0\n"
+"gengo-order-id: 7629694\n"
 "X-Generator: Poedit 3.0.1\n"
 
 #, python-format
@@ -62,6 +63,21 @@ msgstr "Notizie modificate di recente"
 
 msgid "Web Statistics"
 msgstr "Statistiche Web"
+
+msgid "Unique Visitors in the Last Month"
+msgstr "Visitatori unici nell'ultimo mese"
+
+msgid "Total Visits in the Last Month"
+msgstr "Visite totali nell'ultimo mese"
+
+msgid "Total Page Views in the Last Month"
+msgstr "Visualizzazioni totali di pagine nell'ultimo mese"
+
+msgid "Number of Page Views per Visit"
+msgstr "Numero di visualizzazioni di pagine per visita"
+
+msgid "Average Visit Duration in Minutes"
+msgstr "Durata media della visita in minuti"
 
 msgid "No data available"
 msgstr "Nessun dato disponibile"
@@ -2144,11 +2160,15 @@ msgstr "Formato JSON non valido nelle credenziali Firebase"
 msgid "Error validating Firebase credentials: {0}"
 msgstr "Errore durante la convalida delle credenziali Firebase: {0}"
 
-msgid "E-Mail Address"
-msgstr "Indirizzo e-mail"
+msgid "VAT Rate"
+msgstr "Aliquota IVA"
 
-msgid "The subscriber has given consent to receive the newsletter."
-msgstr "Il sottoscrittore ha dato il consenso a ricevere la newsletter."
+msgid ""
+"This is the VAT rate in percent. The VAT rate will apply to all prices in "
+"the forms."
+msgstr ""
+"Si tratta del tasso di IVA in percentuale. Il tasso di IVA si applicherà a "
+"tutti i prezzi nei moduli."
 
 msgid ""
 "Select newsletter categories your are interested in. You will receive the "
@@ -2383,6 +2403,9 @@ msgstr "Associazione sportiva"
 
 msgid "all day"
 msgstr "tutto il giorno"
+
+msgid "VAT"
+msgstr "IVA"
 
 msgid "Homepage"
 msgstr "Pagina principale"
@@ -3263,14 +3286,14 @@ msgstr "Si vuole davvero eliminare l'iFrame \"${title}\"?"
 msgid "Copy"
 msgstr "Copia"
 
-msgid "Paste"
-msgstr "Incolla"
+msgid "A News cannot be pasted as Topic"
+msgstr "Una notizia non può essere incollata come argomento"
 
 msgid "A Topic cannot be pasted as News"
 msgstr "Un argomento non può essere incollato come notizia"
 
-msgid "A News cannot be pasted as Topic"
-msgstr "Una notizia non può essere incollata come argomento"
+msgid "Paste"
+msgstr "Incolla"
 
 msgid "Please note that this page has subpages which will also be deleted!"
 msgstr ""
@@ -3851,6 +3874,12 @@ msgstr "Rinomina"
 
 msgid "Download"
 msgstr "Scaricare"
+
+msgid "Linked Pages"
+msgstr "Collegamenti"
+
+msgid "Links to ${filename}"
+msgstr "Collegamenti a ${filename}"
 
 msgid "Digital seal applied by ${signee} on ${date}"
 msgstr "Sigillo digitale applicato da ${signee} il ${date}"
@@ -4602,6 +4631,9 @@ msgstr "Notifiche inviate"
 
 msgid "Sent At"
 msgstr "Inviato a"
+
+msgid "Response Data"
+msgstr "Response Data"
 
 msgid "No notifications"
 msgstr "Nessuna notifica"
@@ -5382,6 +5414,13 @@ msgstr "Nuovo modulo documento"
 
 msgid "Edit Document Form"
 msgstr "Modifica modulo documento"
+
+msgid ""
+"Notifications have already been sent for this news item. A new notification "
+"will not be sent, even if the publication date is changed."
+msgstr ""
+"Des notifications ont déjà été envoyées pour cette actualité. Une nouvelle "
+"notification ne sera pas envoyé, même si la date de publication est modifiée."
 
 msgid "Moves the topic and all its sub topics to the given destination."
 msgstr ""
@@ -6189,6 +6228,9 @@ msgstr ""
 "Procedere con cautela. I biglietti e i dati in essi contenuti possono essere "
 "irrevocabilmente cancellati."
 
+msgid "Value Added Tax"
+msgstr "Imposta sul valore aggiunto"
+
 msgid "Chat"
 msgstr "Chat"
 
@@ -6478,32 +6520,3 @@ msgstr "È stato creato un account per te"
 
 msgid "The user was created successfully"
 msgstr "Utente creato correttamente"
-
-msgid "Value Added Tax"
-msgstr "Imposta sul valore aggiunto"
-
-msgid "VAT Rate"
-msgstr "Aliquota IVA"
-
-msgid "VAT"
-msgstr "IVA"
-
-msgid "This is the VAT rate in percent. The VAT rate will apply to all prices "
-"in the forms."
-msgstr "Si tratta del tasso di IVA in percentuale. Il tasso di IVA si "
-"applicherà a tutti i prezzi nei moduli."
-
-msgid "Unique Visitors in the Last Month"
-msgstr "Visitatori unici nell'ultimo mese"
-
-msgid "Total Visits in the Last Month"
-msgstr "Visite totali nell'ultimo mese"
-
-msgid "Total Page Views in the Last Month"
-msgstr "Visualizzazioni totali di pagine nell'ultimo mese"
-
-msgid "Number of Page Views per Visit"
-msgstr "Numero di visualizzazioni di pagine per visita"
-
-msgid "Average Visit Duration in Minutes"
-msgstr "Durata media della visita in minuti"

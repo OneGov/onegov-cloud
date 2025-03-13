@@ -665,6 +665,9 @@ class Layout(ChameleonLayout, OpenGraphMixin):
 
         return ''
 
+    def format_phone_number(self, phone_number: str) -> str:
+        return utils.format_phone_number(phone_number)
+
     def password_reset_url(self, user: User | None) -> str | None:
         if not user:
             return None

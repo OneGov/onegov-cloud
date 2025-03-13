@@ -2,6 +2,8 @@ from __future__ import annotations
 
 import colorsys
 import re
+
+import phonenumbers
 import sedate
 import pytz
 
@@ -1246,3 +1248,20 @@ def extract_categories_and_subcategories(
         return cats
 
     return cats, sub_cats
+
+
+def format_phone_number(phone_number: str) -> str:
+    """
+    Returns phone number in the international format +41 79 123 45 67
+    """
+    if not phone_number:
+        return ''
+
+    try:
+        parsed = phonenumbers.parse(phone_number, 'CH')
+
+        return phonenumbers.format_number(
+            parsed, phonenumbers.PhoneNumberFormat.INTERNATIONAL
+        )
+    except phonenumbers.phonenumberutil.NumberParseException:
+        return phone_number

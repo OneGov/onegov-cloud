@@ -55,12 +55,11 @@
                                 </div>
                                 <div>
                                     <span i18n:translate>Phone:</span>
-                                    <span><a href="tel:${volunteer.phone}">${volunteer.phone}</a></span>
+                                    <span><a href="tel:${layout.format_phone_number(volunteer.phone)}">${layout.format_phone_number(volunteer.phone)}</a></span>
                                 </div>
                             </li>
                         </ul>
                     </tal:b>
-
 
                     <h4 i18n:translate>Attendees</h4>
                     <ul class="attendees">

@@ -160,7 +160,7 @@ def test_event_steps(broadcast, authenticate, connect, client):
 
     # Make some more corrections
     form_page = confirmation_page.click("Bearbeiten Sie diese Veranstaltung.")
-    form_page.form['organizer'] = "A carful organizer"
+    form_page.form['organizer'] = "A careful organizer"
     form_page.form['organizer_phone'] = "079 123 45 56"
     preview_page = form_page.form.submit().follow()
     assert "My event is exceptional." in preview_page
@@ -191,8 +191,8 @@ def test_event_steps(broadcast, authenticate, connect, client):
     assert "A special place" in message
     assert "Ausstellung" in message
     assert "Bibliothek" in message
-    assert "A carful organizer" in message
-    assert "079 123 45 56" in ticket_page
+    assert "A careful organizer" in message
+    assert "+41 79 123 45 56" in ticket_page
     assert "a@b.ch" in ticket_page
     assert "{} 18:00 - 22:00".format(
         start_date.strftime('%d.%m.%Y')) in message
