@@ -1192,19 +1192,19 @@ def widest_access(*accesses: str) -> str:
 
 @overload
 def extract_categories_and_subcategories(
-    categories: dict[str, list[dict[str, list[str]] | str]],
+    categories: list[dict[str, list[str]] | str],
     flattened: Literal[False] = False
 ) -> tuple[list[str], list[list[str]]]: ...
 
 @overload
 def extract_categories_and_subcategories(
-    categories: dict[str, list[dict[str, list[str]] | str]],
+    categories: list[dict[str, list[str]] | str],
     flattened: Literal[True]
 ) -> list[str]: ...
 
 
 def extract_categories_and_subcategories(
-    categories: dict[str, list[dict[str, list[str]] | str]],
+    categories: list[dict[str, list[str]] | str],
     flattened: bool = False
 ) -> tuple[list[str], list[list[str]]] | list[str]:
     """
