@@ -400,7 +400,7 @@ def test_submit_event(broadcast, authenticate, connect, client, skip):
     assert "Bibliothek" in preview_page
     assert "The Organizer" in preview_page
     assert "event@myevents.ch" in preview_page
-    assert "076 987 65 43" in preview_page
+    assert "+41 76 987 65 43" in preview_page
     assert "{} 18:00 - 22:00".format(
         babel.dates.format_date(
             start_date, format='d. MMMM yyyy', locale='de'
@@ -480,7 +480,7 @@ def test_submit_event(broadcast, authenticate, connect, client, skip):
     assert "A special place" in ticket_page
     assert "The Organizer" in ticket_page
     assert "event@myevents.ch" in preview_page
-    assert "076 987 65 43" in preview_page
+    assert "+41 76 987 65 43" in preview_page
     assert "Ausstellung" in ticket_page
     assert "Bibliothek" in ticket_page
     assert "Veranstaltung bearbeitet" in ticket_page
@@ -536,7 +536,7 @@ def test_submit_event(broadcast, authenticate, connect, client, skip):
     assert "Bibliothek" in message
     assert "A carful organizer" in message
     assert "info@myevents.ch" in preview_page
-    assert "076 111 22 33" in preview_page
+    assert "+41 76 111 22 33" in preview_page
     assert "{} 18:00 - 22:00".format(
         start_date.strftime('%d.%m.%Y')) in message
     for days in range(5):
