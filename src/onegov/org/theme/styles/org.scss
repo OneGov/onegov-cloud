@@ -503,7 +503,7 @@ del {
     @include label($bg: $white);
     border: 1px solid #cbcccc;
     font-size: .8rem;
-    margin: 0 4px 7px 0;
+    margin: 7px 4px 7px 0;
 
     &.active {
         @include primary-color-background;
