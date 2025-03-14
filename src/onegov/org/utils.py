@@ -31,7 +31,8 @@ from purl import URL
 from sqlalchemy import nullsfirst, select  # type:ignore[attr-defined]
 
 
-from typing import overload, Any, Literal, TYPE_CHECKING
+from typing import overload, Any, Literal, TYPE_CHECKING, Never
+
 if TYPE_CHECKING:
     from _typeshed import SupportsRichComparison
     from collections.abc import Callable, Iterable, Iterator, Sequence
@@ -1196,7 +1197,7 @@ def widest_access(*accesses: str) -> str:
 def extract_categories_and_subcategories(
     categories: list[dict[str, list[str]] | str],
     flattened: Literal[False] = False
-) -> tuple[list[str], list[list[str]]]: ...
+) -> tuple[list[str], list[list[str] | list[Never]]]: ...
 
 @overload
 def extract_categories_and_subcategories(
@@ -1208,7 +1209,7 @@ def extract_categories_and_subcategories(
 def extract_categories_and_subcategories(
     categories: list[dict[str, list[str]] | str],
     flattened: bool = False
-) -> tuple[list[str], list[list[str]]] | list[str]:
+) -> tuple[list[str], list[list[str] | list[Never]]] | list[str]:
     """
     Extracts categories and subcategories from the `newsletter categories`
     dictionary in `newsletter settings`.
@@ -1227,7 +1228,7 @@ def extract_categories_and_subcategories(
 
     """
     cats: list[str] = []
-    sub_cats: list[list[str]] = []
+    sub_cats: list[list[str] | list[Never]] = []
 
     if not categories:
         return cats, sub_cats
@@ -1242,10 +1243,8 @@ def extract_categories_and_subcategories(
             sub_cats.append([])
 
     if flattened:
-        cats.extend(
-            [item or [] for sublist in sub_cats if sublist for item in sublist]
-        )
-        return cats
+        return (cats +
+                [item for sublist in sub_cats if sublist for item in sublist])
 
     return cats, sub_cats
 

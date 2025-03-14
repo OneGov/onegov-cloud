@@ -1229,7 +1229,7 @@ class NewsletterSettingsForm(Form):
         super().populate_obj(model)
 
         yaml_data = self.newsletter_categories.data
-        data = yaml.safe_load(yaml_data) if yaml_data else {}
+        data = yaml.safe_load(yaml_data) if yaml_data else []
         model.newsletter_categories = data
 
         model.notify_on_unsubscription = self.notify_on_unsubscription.data
@@ -1237,7 +1237,7 @@ class NewsletterSettingsForm(Form):
     def process_obj(self, model: Organisation) -> None:  # type:ignore
         super().process_obj(model)
 
-        categories = model.newsletter_categories or {}
+        categories = model.newsletter_categories or []
         if not categories:
             self.newsletter_categories.data = ''
             return

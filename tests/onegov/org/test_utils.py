@@ -289,7 +289,6 @@ def test_extract_categories_and_subcategories():
         {'c': []},
         'd'
     ]
-
     result = utils.extract_categories_and_subcategories(categories)
     assert result == (
         ['a', 'b', 'c', 'd'],
