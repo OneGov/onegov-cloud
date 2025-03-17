@@ -53,6 +53,49 @@ else:
 CONNECTION_LIFETIME = 60 * 60
 
 
+import traceback
+from pathlib import Path
+import datetime
+from sqlalchemy.engine import Engine
+
+# Create a log file with timestamp
+log_filename = f"/tmp/sqlalchemy_stacktrace_{datetime.datetime.now().strftime('%Y%m%d_%H%M%S')}.log"
+log_path = Path(log_filename)
+
+
+@event.listens_for(Engine, 'before_cursor_execute')
+def log_query_with_stack(
+    conn, cursor, statement, parameters, context, executemany
+):
+    # Get the full stack trace
+    stack = traceback.extract_stack()
+
+    # Filter out SQLAlchemy internal calls
+    app_frames = [
+        frame for frame in stack if 'site-packages/sqlalchemy' not in frame[0]
+    ]
+
+    # Format the message
+    timestamp = datetime.datetime.now().isoformat()
+    message = f'[{timestamp}] SQL Query Origin:\n'
+
+    # Add the app stack frames (last 10 frames should be sufficient)
+    for frame in app_frames[-10:]:
+        filename, line, function, code = frame
+        message += f'  File "{filename}", line {line}, in {function}\n'
+        if code:
+            message += f'    {code}\n'
+
+    # Add the SQL query
+    message += f'\nSQL Query:\n{statement}\n'
+    message += f'Parameters: {parameters}\n'
+    message += '=' * 80 + '\n\n'
+
+    # Write to file using pathlib
+    with log_path.open('a') as f:
+        f.write(message)
+
+
 def query_schemas(
     connection: Connection | Engine,
     namespace: str | None = None

@@ -40,6 +40,10 @@ local_hostnames = {
     'localhost'
 }
 
+import logging
+logging.basicConfig()
+logging.getLogger('sqlalchemy.engine').setLevel(logging.INFO)
+
 
 class Request(BaseRequest):
 
