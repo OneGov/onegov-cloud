@@ -19,6 +19,8 @@ from fs.tempfs import TempFS
 from functools import lru_cache
 from libres.db.models import ORMBase
 from mirakuru import HTTPExecutor, TCPExecutor
+from sqlalchemy.dialects.postgresql import JSONB, TSVECTOR
+
 from onegov.core.crypto import hash_password
 from onegov.core.orm import Base, SessionManager
 from onegov.websockets.server import main
@@ -30,7 +32,8 @@ from selenium.webdriver.chrome.options import Options
 from selenium.webdriver.chrome.service import Service
 from shutil import which
 from splinter import Browser
-from sqlalchemy import create_engine, exc
+from sqlalchemy import create_engine, exc, Table, MetaData, Integer, Column, \
+    String
 from sqlalchemy.orm.session import close_all_sessions
 from tests.shared.browser import ExtendedBrowser
 from tests.shared.postgresql import Postgresql
@@ -214,6 +217,7 @@ def session_manager(postgres_dsn):
     setup with :func:`postgres_dsn`.
 
     """
+    schema_name = 'bar'
 
     # in testing we often reuse loaded values after commiting a transaction,
     # so we set expire_on_commit to False. The test applications will still
@@ -228,9 +232,68 @@ def session_manager(postgres_dsn):
             'echo': 'ECHO' in os.environ
         }
     )
+    mgr.current_schema = schema_name
+
     # we used to only add this base sometimes, but we always need it now
     # since otherwise some of our backrefs lead to nowhere
     mgr.bases.append(ORMBase)
+
+    yield mgr
+    mgr.dispose()
+
+
+@pytest.fixture(scope="function")
+def session_manager_fts(postgres_dsn):
+    """ Provides a :class:`onegov.core.orm.session_manager.SessionManager`
+    setup with :func:`postgres_dsn` and a schema `bar` as well as the
+    `search_index` table.
+
+    """
+    schema_name = 'ogc_fts'
+
+    # in testing we often reuse loaded values after commiting a transaction,
+    # so we set expire_on_commit to False. The test applications will still
+    # use the default value of True however. This only affects unit tests
+    # not working with the app.
+    mgr = SessionManager(
+        postgres_dsn, Base,
+        session_config={
+            'expire_on_commit': False
+        },
+        engine_config={
+            'echo': 'ECHO' in os.environ
+        }
+    )
+    mgr.current_schema = schema_name
+
+    # we used to only add this base sometimes, but we always need it now
+    # since otherwise some of our backrefs lead to nowhere
+    mgr.bases.append(ORMBase)
+
+    engine = create_engine(postgres_dsn)
+
+    # create schema
+    if not engine.dialect.has_schema(engine, schema_name):
+        engine.execute(f'CREATE SCHEMA {schema_name}')
+
+    # verify search index table exists
+    if not engine.has_table('search_index', schema=schema_name):
+        metadata = MetaData(schema=schema_name)
+        search_index = Table(
+            'search_index',
+            metadata,
+            Column('id', Integer, primary_key=True),
+            Column('owner_type', String, nullable=False),
+            Column('owner_id_int', Integer, nullable=True),
+            Column('owner_id_uuid', String, nullable=True),
+            Column('owner_id_str', String, nullable=True),
+            Column('fts_idx_data', JSONB, default={}),
+            Column('fts_idx', TSVECTOR),
+        )
+
+        metadata.create_all(engine)
+        assert engine.has_table('search_index', schema=schema_name)
+
     yield mgr
     mgr.dispose()
 

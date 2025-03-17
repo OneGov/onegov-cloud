@@ -541,21 +541,22 @@ def test_type_mapping_registry():
     }
 
 
-def test_indexer_process(es_client, session_manager):
+def test_indexer_process(es_client, session_manager_fts):
+    session_manager = session_manager_fts
     engine = session_manager.engine
     mappings = TypeMappingRegistry()
     mappings.register_type('page', {
         'title': {'type': 'localized'},
     })
 
-    index = "foo_bar-my_schema-en-page"
+    es_index = "foo-ogc_fts-en-page"  # hostname-schema-language-type
     es_indexer = Indexer(
-        mappings, Queue(), hostname='foo.bar', es_client=es_client)
+        mappings, Queue(), hostname='foo', es_client=es_client)
     psql_indexer = PostgresIndexer(Queue(), engine)
 
     task = {
         'action': 'index',
-        'schema': 'my-schema',
+        'schema': session_manager.current_schema,
         'tablename': 'my-pages',
         'type_name': 'page',
         'id': 1,
@@ -572,11 +573,11 @@ def test_indexer_process(es_client, session_manager):
 
     assert es_indexer.process() == 1
     assert es_indexer.process() == 0
-    es_client.indices.refresh(index=index)
+    es_client.indices.refresh(index=es_index)
     assert psql_indexer.process() == 1
     assert psql_indexer.process() == 0
 
-    search = es_client.search(index=index)
+    search = es_client.search(index=es_index)
     assert search['hits']['total']['value'] == 1
     assert search['hits']['hits'][0]['_id'] == '1'
     assert search['hits']['hits'][0]['_source'] == {
@@ -588,12 +589,12 @@ def test_indexer_process(es_client, session_manager):
 
     # check if the analyzer was applied correctly (stopword removal)
     search = es_client.search(
-        index=index, query={'match': {'title': 'and'}})
+        index=es_index, query={'match': {'title': 'and'}})
 
     assert search['hits']['total']['value'] == 0
 
     search = es_client.search(
-        index=index, query={'match': {'title': 'go jump'}})
+        index=es_index, query={'match': {'title': 'go jump'}})
 
     assert search['hits']['total']['value'] == 1
 
@@ -605,12 +606,15 @@ def test_indexer_process(es_client, session_manager):
         'id': 1
     }
     es_indexer.queue.put(task)
+    psql_indexer.queue.put(task)
 
     assert es_indexer.process() == 1
     assert es_indexer.process() == 0
-    es_client.indices.refresh(index=index)
+    es_client.indices.refresh(index=es_index)
+    assert psql_indexer.process() == 1
+    assert psql_indexer.process() == 0
 
-    es_client.search(index=index)
+    es_client.search(index=es_index)
     assert search['hits']['total']['value'] == 1
 
 
@@ -714,20 +718,22 @@ def test_extra_analyzers(es_client):
     ]
 
 
-def test_tags(es_client, session_manager):
+def test_tags(es_client, session_manager_fts):
+    session_manager = session_manager_fts
 
     mappings = TypeMappingRegistry()
     mappings.register_type('page', {
         'tags': {'type': 'text', 'analyzer': 'tags'}
     })
 
-    index = "foo-bar-en-page"
+    es_index = "foo-ogc_fts-en-page"  # hostname-schema-language-type
+    schema = session_manager.current_schema
     es_indexer = Indexer(mappings, Queue(), es_client, hostname='foo')
     psql_indexer = PostgresIndexer(Queue(), session_manager.engine)
 
     task = {
         'action': 'index',
-        'schema': 'bar',
+        'schema': schema,
         'tablename': 'my-bar',
         'type_name': 'page',
         'id': 1,
@@ -746,25 +752,25 @@ def test_tags(es_client, session_manager):
     assert es_indexer.process()
     assert psql_indexer.process()
 
-    es_client.indices.refresh(index=index)
-    psql_indexer.delete_search_index(schema=index)
-    search = es_client.search(index=index)
+    es_client.indices.refresh(index=es_index)
+    psql_indexer.delete_search_index(schema=schema)
+    search = es_client.search(index=es_index)
 
     assert search['hits']['total']['value'] == 1
     # TODO search for psql
 
     search = es_client.search(
-        index=index, query={'match': {'tags': 'foo'}})
+        index=es_index, query={'match': {'tags': 'foo'}})
 
     assert search['hits']['total']['value'] == 1
 
     search = es_client.search(
-        index=index, query={'match': {'tags': 'bar'}})
+        index=es_index, query={'match': {'tags': 'bar'}})
 
     assert search['hits']['total']['value'] == 1
 
     search = es_client.search(
-        index=index, query={'match': {'tags': 'bad'}})
+        index=es_index, query={'match': {'tags': 'bad'}})
 
     assert search['hits']['total']['value'] == 0
 
