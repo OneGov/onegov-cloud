@@ -3,6 +3,14 @@
         ${title}
     </tal:b>
     <tal:b metal:fill-slot="content">
+        <tal:b condition="not:count">
+            <p i18n:translate="">No subscribers yet</p>
+        </tal:b>
+
+        <tal:b condition="count">
+            <p i18n:translate>There are currently <tal:b i18n:name="count">${count}</tal:b> recipients registered.</p>
+        </tal:b>
+
         <tal:b tal:repeat="letter by_letter">
             <h2>${letter}</h2>
 
