@@ -1187,7 +1187,6 @@ class NewsletterSettingsForm(Form):
                 )
                 return False
 
-            print('*** tschupre data', data)
             if data:
                 if not isinstance(data, list):
                     self.newsletter_categories.errors.append(
