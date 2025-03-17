@@ -31,7 +31,7 @@ from purl import URL
 from sqlalchemy import nullsfirst, select  # type:ignore[attr-defined]
 
 
-from typing import overload, Any, Literal, TYPE_CHECKING, Never
+from typing import overload, Any, Literal, TYPE_CHECKING
 
 if TYPE_CHECKING:
     from _typeshed import SupportsRichComparison
@@ -1197,7 +1197,7 @@ def widest_access(*accesses: str) -> str:
 def extract_categories_and_subcategories(
     categories: list[dict[str, list[str]] | str],
     flattened: Literal[False] = False
-) -> tuple[list[str], list[list[str] | list[Never]]]: ...
+) -> tuple[list[str], list[list[str]]]: ...
 
 @overload
 def extract_categories_and_subcategories(
@@ -1209,7 +1209,7 @@ def extract_categories_and_subcategories(
 def extract_categories_and_subcategories(
     categories: list[dict[str, list[str]] | str],
     flattened: bool = False
-) -> tuple[list[str], list[list[str] | list[Never]]] | list[str]:
+) -> tuple[list[str], list[list[str]]] | list[str]:
     """
     Extracts categories and subcategories from the `newsletter categories`
     dictionary in `newsletter settings`.
@@ -1228,7 +1228,7 @@ def extract_categories_and_subcategories(
 
     """
     cats: list[str] = []
-    sub_cats: list[list[str] | list[Never]] = []
+    sub_cats: list[list[str]] = []
 
     if not categories:
         return cats, sub_cats
