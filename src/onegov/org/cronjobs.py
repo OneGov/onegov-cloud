@@ -14,6 +14,7 @@ from onegov.chat.models import Chat
 from onegov.core.orm import find_models, Base
 from onegov.core.orm.mixins.publication import UTCPublicationMixin
 from onegov.core.templates import render_template
+from onegov.directory.collections.directory import EntryRecipientCollection
 from onegov.event import Occurrence, Event
 from onegov.file import FileCollection
 from onegov.form import FormSubmission, parse_form, Form
@@ -774,37 +775,40 @@ def update_newsletter_email_bounce_statistics(
 
     token = get_postmark_token()
 
-    recipients = RecipientCollection(request.session)
-    yesterday = utcnow() - timedelta(days=1)
+    collections = (RecipientCollection, EntryRecipientCollection)
+    for collection in collections:
+        recipients = collection(request.session)
+        yesterday = utcnow() - timedelta(days=1)
 
-    try:
-        r = requests.get(
-            'https://api.postmarkapp.com/bounces?count=500&offset=0',
-            f'fromDate={yesterday.date()}&toDate='
-            f'{yesterday.date()}&inactive=true',
-            headers={
-                'Accept': 'application/json',
-                'X-Postmark-Server-Token': token
-        },
-            timeout=30
-        )
-        r.raise_for_status()
-        bounces = r.json().get('Bounces', [])
-    except requests.exceptions.HTTPError as http_err:
-        if r.status_code == 401:
-            raise RuntimeWarning(
-                f'Postmark API token is not set or invalid: {http_err}'
-            ) from None
-        else:
-            raise
+        try:
+            r = requests.get(
+                'https://api.postmarkapp.com/bounces?count=500&offset=0',
+                f'fromDate={yesterday.date()}&toDate='
+                f'{yesterday.date()}&inactive=true',
+                headers={
+                    'Accept': 'application/json',
+                    'X-Postmark-Server-Token': token
+            },
+                timeout=30
+            )
+            r.raise_for_status()
+            bounces = r.json().get('Bounces', [])
+        except requests.exceptions.HTTPError as http_err:
+            if r.status_code == 401:
+                raise RuntimeWarning(
+                    f'Postmark API token is not set or invalid: {http_err}'
+                ) from None
+            else:
+                raise
 
-    for bounce in bounces:
-        email = bounce.get('Email', '')
-        inactive = bounce.get('Inactive', False)
-        recipient = recipients.by_address(email)
+        for bounce in bounces:
+            email = bounce.get('Email', '')
+            inactive = bounce.get('Inactive', False)
+            recipient = recipients.by_address(email)
 
-        if recipient and inactive:
-            recipient.mark_inactive()
+            if recipient and inactive:
+                print(f'Mark recipient {recipient.address} as inactive')
+                recipient.mark_inactive()
 
 
 @OrgApp.cronjob(hour=4, minute=30, timezone='Europe/Zurich')
