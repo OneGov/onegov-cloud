@@ -1,24 +1,12 @@
 from __future__ import annotations
 
-import json
-import json
-import tempfile
-import pytest
-from pathlib import Path
-
-import os
-import tempfile
-
 
 from onegov.pas.importer.json_import import (
     import_zug_kub_data,
-    count_unique_fullnames, _load_json,
+    count_unique_fullnames,
+    _load_json,
 )
-from onegov.pas.models import (
-    Commission,
-    CommissionMembership,
-    Parliamentarian
-)
+from onegov.pas.models import Commission, CommissionMembership, Parliamentarian
 
 """ Test successful import of all data.
 
@@ -50,7 +38,6 @@ from onegov.pas.models import (
 def test_successful_import_manually(
     session, people_json, organization_json, memberships_json
 ):
-
     people_path = '/home/cyrill/pasimport/json/People.json'
     org_path = '/home/cyrill/pasimport/json/organizaton.json'
     members_path = '/home/cyrill/pasimport/json/membership.json'
@@ -75,16 +62,21 @@ def verify(session):
     # Verify parliamentarians were imported
     parliamentarians = session.query(Parliamentarian).all()
     assert len(parliamentarians) == 2
-    assert any(p.first_name == 'Daniel' and p.last_name == 'Abt' for p in
-               parliamentarians)
-    assert any(p.first_name == 'Heinz' and p.last_name == 'Achermann' for p in
-               parliamentarians)
+    assert any(
+        p.first_name == 'Daniel' and p.last_name == 'Abt'
+        for p in parliamentarians
+    )
+    assert any(
+        p.first_name == 'Heinz' and p.last_name == 'Achermann'
+        for p in parliamentarians
+    )
     # Verify commissions were imported
     commissions = session.query(Commission).all()
     assert len(commissions) == 2
     assert any(
-        c.name == 'amtliche Kommission Test' and c.type == 'official' for c in
-        commissions)
+        c.name == 'amtliche Kommission Test' and c.type == 'official'
+        for c in commissions
+    )
     assert any(
         c.name == 'Interkantonale Kommission Test'
         and c.type == 'intercantonal'
@@ -95,14 +87,12 @@ def verify(session):
     assert len(memberships) == 2
     # Check specific membership details
     president_membership = next(
-        m for m in memberships
-        if m.parliamentarian.first_name == 'Daniel'
+        m for m in memberships if m.parliamentarian.first_name == 'Daniel'
     )
     assert president_membership.role == 'president'
     assert president_membership.end is None
     member_membership = next(
-        m for m in memberships
-        if m.parliamentarian.first_name == 'Heinz'
+        m for m in memberships if m.parliamentarian.first_name == 'Heinz'
     )
     assert member_membership.role == 'member'
     assert member_membership.end is not None
@@ -112,7 +102,7 @@ def test_count_unique_fullnames():
     people_data = {
         'results': [
             {'fullName': 'Abt Daniel', 'id': '123'},
-            {'fullName': 'Achermann Heinz', 'id': '456'}
+            {'fullName': 'Achermann Heinz', 'id': '456'},
         ]
     }
 
@@ -128,7 +118,7 @@ def test_count_unique_fullnames():
             {
                 'id': '111',
                 'organization': {'name': 'Org 1'},
-                'person': {'fullName': 'Werner Thomas', 'id': '222'}
+                'person': {'fullName': 'Werner Thomas', 'id': '222'},
             },
             {
                 'id': '333',
@@ -138,8 +128,8 @@ def test_count_unique_fullnames():
                     'deeply': {
                         'person': {'fullName': 'Smith John', 'id': '555'}
                     }
-                }
-            }
+                },
+            },
         ]
     }
 
@@ -149,7 +139,7 @@ def test_count_unique_fullnames():
         'Achermann Heinz',
         'Werner Thomas',
         'Nussbaumer Karl',
-        'Smith John'
+        'Smith John',
     }
 
     assert names == expected

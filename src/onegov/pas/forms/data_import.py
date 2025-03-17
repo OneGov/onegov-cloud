@@ -1,48 +1,35 @@
 from __future__ import annotations
 
-from onegov.form.fields import UploadField
-from json import JSONDecodeError
-
-from onegov.pas import _
-from onegov.pas.importer.json_import import import_zug_kub_data, _load_json
-from onegov.pas.layouts import (
-    DefaultLayout,
-)
-from wtforms.validators import DataRequired, ValidationError, InputRequired
 from onegov.form import Form
+from onegov.pas import _
+from wtforms.fields import BooleanField
+
 
 from typing import TYPE_CHECKING
 
 if TYPE_CHECKING:
-    from onegov.town6.request import TownRequest
-    from webob import Response
-    from wtforms.validators import DataRequired, ValidationError
-
-
-from wtforms.validators import DataRequired
+    pass
 
 
 class DataImportForm(Form):
+    clean = BooleanField(label=_('Delete data before import'), default=False)
 
-    people_source = UploadField(
+    people_source = UploadMultipleField(
         label=_('People Data (JSON)'),
-        validators=[InputRequired()],
-        description=_("JSON file containing parliamentarian data."),
+        description=_('JSON file containing parliamentarian data.'),
     )
-    organizations_source = UploadField(
+    organizations_source = UploadMultipleField(
         label=_('Organizations Data (JSON)'),
-        validators=[InputRequired()],
         description=_(
-            "JSON file containing organization data (commissions, "
-            "parties, etc.)."
+            'JSON file containing organization data (commissions, '
+            'parties, etc.).'
         ),
     )
-    memberships_source = UploadField(
+    memberships_source = UploadMultipleField(
         label=_('Memberships Data (JSON)'),
-        validators=[InputRequired()],
         description=_(
-            "JSON file containing membership data (who is member of "
-            "what organization)."
+            'JSON file containing membership data (who is member of '
+            'what organization).'
         ),
     )
 

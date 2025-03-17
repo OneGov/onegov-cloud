@@ -52,6 +52,7 @@ from wtforms.widgets import CheckboxInput, ColorInput
 
 
 from typing import Any, IO, Literal, TYPE_CHECKING
+
 if TYPE_CHECKING:
     from collections.abc import Callable, Iterator, Sequence
     from datetime import datetime
@@ -59,12 +60,21 @@ if TYPE_CHECKING:
     from onegov.file import File
     from onegov.form import Form
     from onegov.form.types import (
-        FormT, Filter, PricingRules, RawFormValue, Validators, Widget)
+        FormT,
+        Filter,
+        PricingRules,
+        RawFormValue,
+        Validators,
+        Widget,
+    )
     from typing import TypedDict, Self
     from webob.request import _FieldStorageWithFile
     from wtforms.form import BaseForm
     from wtforms.meta import (
-        _MultiDictLikeWithGetlist, _SupportsGettextAndNgettext, DefaultMeta)
+        _MultiDictLikeWithGetlist,
+        _SupportsGettextAndNgettext,
+        DefaultMeta,
+    )
 
     class FileDict(TypedDict, total=False):
         data: str
@@ -80,9 +90,15 @@ else:
 
 
 FIELDS_NO_RENDERED_PLACEHOLDER = (
-    'MultiCheckboxField', 'RadioField', 'OrderedMultiCheckboxField',
-    'UploadField', 'ChosenSelectField', 'ChosenSelectMultipleField',
-    'PreviewField', 'PanelField', 'UploadFileWithORMSupport'
+    'MultiCheckboxField',
+    'RadioField',
+    'OrderedMultiCheckboxField',
+    'UploadField',
+    'ChosenSelectField',
+    'ChosenSelectMultipleField',
+    'PreviewField',
+    'PanelField',
+    'UploadFileWithORMSupport',
 )
 
 
@@ -106,7 +122,6 @@ class TimeField(DefaultTimeField):
 #       input field with an hour and minute component. We can make this
 #       more flexible in the future, if we need it.
 class DurationField(Field):
-
     widget = DurationInput()
 
     data: timedelta | None
@@ -132,11 +147,9 @@ class DurationField(Field):
 
 
 class TranslatedSelectField(SelectField):
-    """ A select field which translates the option labels. """
+    """A select field which translates the option labels."""
 
-    def iter_choices(
-        self
-    ) -> Iterator[tuple[Any, str, bool, dict[str, Any]]]:
+    def iter_choices(self) -> Iterator[tuple[Any, str, bool, dict[str, Any]]]:
         for choice in super().iter_choices():
             result = list(choice)
             result[1] = self.meta.request.translate(result[1])
@@ -154,7 +167,7 @@ class OrderedMultiCheckboxField(MultiCheckboxField):
 
 
 class UploadField(FileField):
-    """ A custom file field that turns the uploaded file into a compressed
+    """A custom file field that turns the uploaded file into a compressed
     base64 string together with the filename, size and mimetype.
 
     """
@@ -165,6 +178,7 @@ class UploadField(FileField):
     filename: str | None
 
     if TYPE_CHECKING:
+
         def __init__(
             self,
             label: str | None = None,
@@ -220,7 +234,6 @@ class UploadField(FileField):
         return self.data.get('mimetype') in IMAGE_MIME_TYPES_AND_SVG
 
     def process_formdata(self, valuelist: list[RawFormValue]) -> None:
-
         if not valuelist:
             self.data = {}
             return
@@ -233,7 +246,7 @@ class UploadField(FileField):
             fieldstorage = valuelist[1]
             self.data = binary_to_dictionary(
                 dictionary_to_binary({'data': str(valuelist[3])}),
-                str(valuelist[2])
+                str(valuelist[2]),
             )
         elif len(valuelist) == 2:
             # force_simple
@@ -255,10 +268,8 @@ class UploadField(FileField):
             raise NotImplementedError()
 
     def process_fieldstorage(
-        self,
-        fs: RawFormValue
+        self, fs: RawFormValue
     ) -> StrictFileDict | FileDict:
-
         self.file = getattr(fs, 'file', getattr(fs, 'stream', None))
         self.filename = path_to_filename(getattr(fs, 'filename', None))
 
@@ -274,7 +285,7 @@ class UploadField(FileField):
 
 
 class UploadFileWithORMSupport(UploadField):
-    """ Extends the upload field with onegov.file support. """
+    """Extends the upload field with onegov.file support."""
 
     file_class: type[File]
 
@@ -292,7 +303,7 @@ class UploadFileWithORMSupport(UploadField):
 
         return self.file_class(  # type:ignore[misc]
             name=self.filename,
-            reference=as_fileintent(self.file, self.filename)
+            reference=as_fileintent(self.file, self.filename),
         )
 
     def populate_obj(self, obj: object, name: str) -> None:
@@ -322,14 +333,14 @@ class UploadFileWithORMSupport(UploadField):
             self.data = {
                 'filename': value.name,
                 'size': size,
-                'mimetype': value.reference.content_type
+                'mimetype': value.reference.content_type,
             }
         else:
             super().process_data(value)
 
 
 class UploadMultipleField(UploadMultipleBase, FileField):
-    """ A custom file field that turns the uploaded files into a list of
+    """A custom file field that turns the uploaded files into a list of
     compressed base64 strings together with the filename, size and mimetype.
 
     This acts both like a single file field with multiple and like a list
@@ -344,8 +355,9 @@ class UploadMultipleField(UploadMultipleBase, FileField):
     if TYPE_CHECKING:
         _separator: str
 
-        def _add_entry(self, d: _MultiDictLikeWithGetlist, /) -> UploadField:
-            ...
+        def _add_entry(
+            self, d: _MultiDictLikeWithGetlist, /
+        ) -> UploadField: ...
 
     upload_field_class: type[UploadField] = UploadField
     upload_widget: Widget[UploadField] = UploadWidget()
@@ -373,7 +385,7 @@ class UploadMultipleField(UploadMultipleBase, FileField):
         pricing: PricingRules | None = None,
         # if we change the upload_field_class there may be additional
         # parameters that are allowed so we pass them through
-        **extra_arguments: Any
+        **extra_arguments: Any,
     ):
         if upload_widget is None:
             upload_widget = self.upload_widget
@@ -385,7 +397,7 @@ class UploadMultipleField(UploadMultipleBase, FileField):
             description=description,
             widget=upload_widget,
             render_kw=render_kw,
-            **extra_arguments
+            **extra_arguments,
         )
         super().__init__(
             unbound_field,
@@ -400,7 +412,7 @@ class UploadMultipleField(UploadMultipleBase, FileField):
             _form=_form,
             _prefix=_prefix,
             _translations=_translations,
-            _meta=_meta
+            _meta=_meta,
         )
 
     def __bool__(self) -> Literal[True]:
@@ -413,7 +425,7 @@ class UploadMultipleField(UploadMultipleBase, FileField):
         self,
         formdata: _MultiDictLikeWithGetlist | None,
         data: object = unset_value,
-        extra_filters: Sequence[Filter] | None = None
+        extra_filters: Sequence[Filter] | None = None,
     ) -> None:
         self.process_errors = []
 
@@ -433,8 +445,7 @@ class UploadMultipleField(UploadMultipleBase, FileField):
                 self.process_errors.append(e.args[0])
 
     def append_entry_from_field_storage(
-        self,
-        fs: _FieldStorageWithFile
+        self, fs: _FieldStorageWithFile
     ) -> UploadField:
         # we fake the formdata for the new field
         # we use a werkzeug MultiDict because the WebOb version
@@ -462,7 +473,7 @@ class _DummyFile:
 
 
 class UploadMultipleFilesWithORMSupport(UploadMultipleField):
-    """ Extends the upload multiple field with onegov.file support. """
+    """Extends the upload multiple field with onegov.file support."""
 
     file_class: type[File]
     added_files: list[File]
@@ -503,18 +514,17 @@ class UploadMultipleFilesWithORMSupport(UploadMultipleField):
 
 
 class TextAreaFieldWithTextModules(TextAreaField):
-    """ A textfield with text module selection/insertion. """
+    """A textfield with text module selection/insertion."""
 
     widget = TextAreaWithTextModules()
 
 
 class VideoURLField(URLField):
-
     pass
 
 
 class HtmlField(TextAreaField):
-    """ A textfield with html with integrated sanitation. """
+    """A textfield with html with integrated sanitation."""
 
     data: Markup | None
 
@@ -532,13 +542,9 @@ class HtmlField(TextAreaField):
 
 
 class CssField(TextAreaField):
-    """ A textfield with css validation. """
+    """A textfield with css validation."""
 
-    def post_validate(
-        self,
-        form: BaseForm,
-        validation_stopped: bool
-    ) -> None:
+    def post_validate(self, form: BaseForm, validation_stopped: bool) -> None:
         if self.data:
             try:
                 CSSStyleSheet().cssText = self.data
@@ -570,7 +576,7 @@ class MarkupField(TextAreaField):
 
 
 class TagsField(StringField):
-    """ A tags field for use in conjunction with this library:
+    """A tags field for use in conjunction with this library:
 
     https://github.com/developit/tags-input
 
@@ -599,16 +605,15 @@ class TagsField(StringField):
 
 
 class IconField(StringField):
-    """ Selects an icon out of a number of icons. """
+    """Selects an icon out of a number of icons."""
 
     widget = IconWidget()
 
 
 class PhoneNumberField(TelField):
-    """ A string field with support for phone numbers. """
+    """A string field with support for phone numbers."""
 
     def __init__(self, *args: Any, country: str = 'CH', **kwargs: Any):
-
         self.country = country
         super().__init__(*args, **kwargs)
 
@@ -625,26 +630,25 @@ class PhoneNumberField(TelField):
         try:
             return phonenumbers.format_number(
                 phonenumbers.parse(self.data or '', self.country),
-                phonenumbers.PhoneNumberFormat.E164
+                phonenumbers.PhoneNumberFormat.E164,
             )
         except Exception:
             return self.data
 
 
 class ChosenSelectField(SelectField):
-    """ A select field with chosen.js support. """
+    """A select field with chosen.js support."""
 
     widget = ChosenSelectWidget()
 
 
 class ChosenSelectMultipleField(SelectMultipleField):
-    """ A multiple select field with chosen.js support. """
+    """A multiple select field with chosen.js support."""
 
     widget = ChosenSelectWidget(multiple=True)
 
 
 class ChosenSelectMultipleEmailField(SelectMultipleField):
-
     widget = ChosenSelectWidget(multiple=True)
 
     def pre_validate(self, form: BaseForm) -> None:
@@ -659,7 +663,6 @@ class ChosenSelectMultipleEmailField(SelectMultipleField):
 
 
 class PreviewField(Field):
-
     fields: Sequence[str]
     events: Sequence[str]
     url: Callable[[DefaultMeta], str | None] | str | None
@@ -674,7 +677,7 @@ class PreviewField(Field):
         url: Callable[[DefaultMeta], str | None] | str | None = None,
         events: Sequence[str] = (),
         display: str = 'inline',
-        **kwargs: Any
+        **kwargs: Any,
     ):
         self.fields = fields
         self.url = url
@@ -688,7 +691,7 @@ class PreviewField(Field):
 
 
 class PanelField(Field):
-    """ Shows a panel as part of the form (no input, no label). """
+    """Shows a panel as part of the form (no input, no label)."""
 
     widget = PanelWidget()
 
@@ -698,7 +701,7 @@ class PanelField(Field):
         text: str,
         kind: str,
         hide_label: bool = True,
-        **kwargs: Any
+        **kwargs: Any,
     ):
         self.text = text
         self.kind = kind
@@ -710,12 +713,11 @@ class PanelField(Field):
 
 
 class URLPanelField(PanelField):
-
     widget = LinkPanelWidget()
 
 
 class DateTimeLocalField(DateTimeLocalFieldBase):
-    """ A custom implementation of the DateTimeLocalField to fix issues with
+    """A custom implementation of the DateTimeLocalField to fix issues with
     the format and the datetimepicker plugin.
 
     """
@@ -725,13 +727,10 @@ class DateTimeLocalField(DateTimeLocalFieldBase):
         label: str | None = None,
         validators: Validators[FormT, Self] | None = None,
         format: str = '%Y-%m-%dT%H:%M',
-        **kwargs: Any
+        **kwargs: Any,
     ):
         super().__init__(
-            label=label,
-            validators=validators,
-            format=format,
-            **kwargs
+            label=label, validators=validators, format=format, **kwargs
         )
 
     def process_formdata(self, valuelist: list[RawFormValue]) -> None:
@@ -742,7 +741,7 @@ class DateTimeLocalField(DateTimeLocalFieldBase):
 
 
 class TimezoneDateTimeField(DateTimeLocalField):
-    """ A datetime field data returns the date with the given timezone
+    """A datetime field data returns the date with the given timezone
     and expects dateime values with a timezone.
 
     Used together with :class:`onegov.core.orm.types.UTCDateTime`.
@@ -772,7 +771,7 @@ class TimezoneDateTimeField(DateTimeLocalField):
 
 
 class HoneyPotField(StringField):
-    """ A field to identify bots.
+    """A field to identify bots.
 
     A honey pot field is hidden using CSS and therefore not visible for users
     but bots (probably). We therefore expect this field to be empty at any
@@ -799,7 +798,7 @@ class HoneyPotField(StringField):
     def post_validate(
         self,
         form: Form,  # type:ignore[override]
-        validation_stopped: bool
+        validation_stopped: bool,
     ) -> None:
         if self.data:
             log.info(f'Honeypot used by {form.request.client_addr}')
@@ -807,7 +806,7 @@ class HoneyPotField(StringField):
 
 
 class ColorField(StringField):
-    """ A string field that renders a html5 color picker and coerces
+    """A string field that renders a html5 color picker and coerces
     to a normalized six digit hex string.
 
     It will result in a process_error for invalid colors.
@@ -839,7 +838,7 @@ class ColorField(StringField):
 
 
 class TypeAheadField(StringField):
-    """ A string field with typeahead.
+    """A string field with typeahead.
 
     Requires an url with the placeholder `%QUERY` for the search term.
 
@@ -853,7 +852,7 @@ class TypeAheadField(StringField):
         self,
         *args: Any,
         url: Callable[[DefaultMeta], str | None] | str | None = None,
-        **kwargs: Any
+        **kwargs: Any,
     ):
         self.url = url
 

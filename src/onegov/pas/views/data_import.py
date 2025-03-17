@@ -3,6 +3,7 @@ from __future__ import annotations
 import logging
 
 from aiohttp.web_exceptions import HTTPBadRequest, HTTPUnsupportedMediaType
+from sqlalchemy import text
 
 from onegov.file import FileCollection
 from onegov.file import File
@@ -19,12 +20,57 @@ from onegov.pas.layouts import (
 )
 
 from typing import TYPE_CHECKING
+
 if TYPE_CHECKING:
     from onegov.core.types import RenderData
     from onegov.town6.request import TownRequest
 
 
 log = logging.getLogger('onegov.pas.data_import')
+
+
+def clean(app) -> None:
+    schema = app.session_manager.current_schema
+    assert schema is not None
+    session = app.session_manager.session()
+    session.execute(
+        text('SET search_path TO :schema;').bindparams(schema=schema)
+    )
+
+    # Get counts from each table for logging
+    tables = [
+        'pas_commission_memberships',
+        'pas_parliamentarian_rolesi',
+        'pas_commissions',
+        'pas_parliamentarians',
+        'pas_parliamentary_groups',
+        'pas_parties',
+    ]
+
+    counts = {}
+    for table in tables:
+        count = session.execute(text(f'SELECT COUNT(*) FROM {table}')).scalar()
+        counts[table] = count
+
+    log.info(
+        f'Removing data from tables: {", ".join(f"{table}({count})" for table, count in counts.items())}',
+        fg='green',
+    )
+
+    # Truncate all tables in the correct order (respecting foreign key constraints)
+    truncate_statement = """
+        TRUNCATE TABLE 
+            pas_commission_memberships,
+            pas_parliamentarian_roles,
+            pas_commissions,
+            pas_parliamentarians,
+            pas_parliamentary_groups,
+            pas_parties,
+        CASCADE;
+        COMMIT;
+    """
+
+    session.execute(text(truncate_statement))
 
 
 @PasApp.form(
@@ -71,13 +117,11 @@ def handle_data_import(
     model=FileCollection,
     name='upload-json-import-files',
     permission=Private,
-    request_method='POST'
+    request_method='POST',
 )
 def upload_json_import_file(
-    self: FileCollection,
-    request: TownRequest
+    self: FileCollection, request: TownRequest
 ) -> None:
-
     request.assert_valid_csrf_token()
 
     fs = request.params.get('file', '')

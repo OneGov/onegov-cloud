@@ -5,7 +5,6 @@ import json
 from datetime import datetime
 from pathlib import Path
 import logging
-from onegov.pas.constants import COMMON_PARTY_NAMES
 from onegov.pas.models.commission_membership import (
     ROLES as MEMBERSHIP_ROLES,
     CommissionMembership,
@@ -16,13 +15,14 @@ from onegov.pas.models import (
     Commission,
     ParliamentaryGroup,
     Party,
-    ParliamentarianRole
+    ParliamentarianRole,
 )
 
 
 from typing import Any, Self, Literal
 from typing import TYPE_CHECKING
 from typing import TypedDict
+
 if TYPE_CHECKING:
     from sqlalchemy.orm import Session
     from collections.abc import Sequence
@@ -94,9 +94,9 @@ if TYPE_CHECKING:
         memberCount: int
         modified: str
         name: str
-        organizationTypeTitle: Literal[
-            'Kommission', 'Fraktion', 'Kantonsrat', 'Sonstige'
-        ]
+        organizationTypeTitle: (
+            Literal['Kommission', 'Fraktion', 'Kantonsrat', 'Sonstige'] | None
+        )
         primaryEmail: EmailData | None
         status: int
         thirdPartyId: str | None
@@ -152,10 +152,6 @@ if TYPE_CHECKING:
         typedId: str
         url: str
 
-    OrganizationType = Literal[
-        'Kommission', 'Kantonsrat', 'Fraktion', 'Sonstige'
-    ]
-
 
 def determine_membership_role(membership_data: dict[str, Any]) -> str:
     role = membership_data.get('role', '').lower()
@@ -203,10 +199,6 @@ class DataImporter:
                 self.session.add_all(objects)
                 self.session.flush()  # Flush to get IDs
 
-                if object_type == 'parliamentarian roles':
-                    # are these really all legit
-                    breakpoint()
-
                 logging.info(f'Imported {len(objects)} {object_type}')
         except Exception as e:
             logging.error(
@@ -251,9 +243,9 @@ class PeopleImporter(DataImporter):
         """Imports people from JSON data and returns a map of id to
         Parliamentarian."""
         parliamentarians = []
-        parliamentarian_map: dict[str, Parliamentarian] = (
-            {}
-        )  # Map to store parliamentarians by ID
+        parliamentarian_map: dict[
+            str, Parliamentarian
+        ] = {}  # Map to store parliamentarians by ID
 
         for person_data in people_data:
             try:
@@ -280,8 +272,8 @@ class PeopleImporter(DataImporter):
 
         if not person_data.get('id'):  # Basic validation
             logging.error(
-                f"Skipping person due to missing ID: "
-                f"{person_data.get('fullName')}"
+                f'Skipping person due to missing ID: '
+                f'{person_data.get("fullName")}'
             )
             return None
 
@@ -311,7 +303,6 @@ class PeopleImporter(DataImporter):
 
 class OrganizationImporter(DataImporter):
     """Importer for organization data from organizations.json."""
-
 
     def bulk_import(
         self, organizations_data: Sequence[dict[str, Any]]
@@ -347,11 +338,12 @@ class OrganizationImporter(DataImporter):
             org_id = org_data.get('id')
             if not org_id:
                 logging.error(
-                    f"Skipping organization without ID: {org_data.get('name')}"
+                    f'Skipping organization without ID: {org_data.get("name")}'
                 )
                 continue
 
             organization_type_title = org_data.get('organizationTypeTitle')
+            org_name = org_data.get('name')
 
             try:
                 if organization_type_title == 'Kommission':
@@ -385,26 +377,27 @@ class OrganizationImporter(DataImporter):
                         'name': org_data.get('name', ''),
                         'type': organization_type_title.lower(),
                     }
+                elif 'Legislatur' in org_name:
+                    pass
+                    # Can't create Legislatur objects here, as the api does
+                    # not give us # the start / end date.
                 else:
-                    # breakpoint()
                     # check organization_type
                     logging.warning(
-                        f"Unknown organization type: {organization_type_title}"
-                        f" for {org_data.get('name')}"
+                        f'Unknown organization type: {organization_type_title}'
+                        f' for {org_name}'
                     )
 
             except Exception as e:
                 logging.error(
-                    f"Error importing organization "
-                    f"{org_data.get('name')}: {e}",
+                    f'Error importing organization '
+                    f'{org_data.get("name")}: {e}',
                     exc_info=True,
                 )
 
         # Save to the database
         self._bulk_save(commissions, 'commissions')
-        self._bulk_save(
-            parliamentary_groups, 'parliamentary groups'
-        )
+        self._bulk_save(parliamentary_groups, 'parliamentary groups')
         self._bulk_save(parties, 'parties')
 
         return (
@@ -415,9 +408,39 @@ class OrganizationImporter(DataImporter):
         )
 
 
-
 class MembershipImporter(DataImporter):
-    """Importer for membership data from memberships.json."""
+    """Importer for membership data from memberships.json.
+
+    Get an overview of the possible pairs: see extract_role_org_type_pairs:
+
+    Role - Organization Type Combinations:
+    =====================================
+    Assistentin Leitung Staatskanzlei - Sonstige
+    Frau Landammann - Sonstige
+    Landammann - Sonstige
+    Landschreiber - Sonstige
+    Mitglied - Kommission
+    Mitglied des Kantonsrates - Kantonsrat
+    Nationalrat - Sonstige
+    Parlamentarier - Sonstige
+    Parlamentarierin - Sonstige
+    Protokollführerin - Sonstige
+    Präsident des Kantonsrates - Kantonsrat
+    Präsident/-in - Kommission
+    Regierungsrat - Sonstige
+    Regierungsrätin - Sonstige
+    Standesweibel - Sonstige
+    Standesweibelin - Sonstige
+    Statthalter - Sonstige
+    Stv. Landschreiberin - Sonstige
+    Stv. Protokollführer - Sonstige
+    Stv. Protokollführerin - Sonstige
+    Stv. Standesweibelin - Sonstige
+    Ständerat - Sonstige
+
+    Total unique combinations: 22
+
+    """
 
     def __init__(self, session: Session) -> None:
         self.session = session
@@ -461,8 +484,10 @@ class MembershipImporter(DataImporter):
                 if not person_id or person_id in self.parliamentarian_map:
                     continue
 
-                logging.info(f"Found parliamentarian in membership.json that "
-                             f"wasn't in people data: {person_data.get('fullName')}")
+                logging.info(
+                    f'Found parliamentarian in membership.json that '
+                    f"wasn't in people data: {person_data.get('fullName')}"
+                )
 
                 # Create minimal parliamentarian object
                 parliamentarian = Parliamentarian(
@@ -481,9 +506,13 @@ class MembershipImporter(DataImporter):
                 # Handle address if present
                 address_data = membership.get('primaryAddress')
                 if address_data:
-                    parliamentarian.shipping_address = f"{address_data.get('street', '')} {address_data.get('houseNumber', '')}".strip()
-                    parliamentarian.shipping_address_zip_code = address_data.get('swissZipCode')
-                    parliamentarian.shipping_address_city = address_data.get('town')
+                    parliamentarian.shipping_address = f'{address_data.get("street", "")} {address_data.get("houseNumber", "")}'.strip()
+                    parliamentarian.shipping_address_zip_code = (
+                        address_data.get('swissZipCode')
+                    )
+                    parliamentarian.shipping_address_city = address_data.get(
+                        'town'
+                    )
 
                 # Add to collection and temp map
                 new_parliamentarians.append(parliamentarian)
@@ -491,8 +520,8 @@ class MembershipImporter(DataImporter):
 
             except Exception as e:
                 logging.error(
-                    f"Error extracting parliamentarian from membership data: {e}",
-                    exc_info=True
+                    f'Error extracting parliamentarian from membership data: {e}',
+                    exc_info=True,
                 )
 
         # Bulk save the new parliamentarians
@@ -506,12 +535,11 @@ class MembershipImporter(DataImporter):
             for external_id, parliamentarian in temp_id_map.items():
                 self.parliamentarian_map[external_id] = parliamentarian
 
-            logging.info(f"Created {len(new_parliamentarians)} parliamentarians from membership data")
+            logging.info(
+                f'Created {len(new_parliamentarians)} parliamentarians from membership data'
+            )
 
-
-    def bulk_import(
-        self, memberships_data: Sequence[MembershipData]
-    ) -> None:
+    def bulk_import(self, memberships_data: Sequence[MembershipData]) -> None:
         """Imports memberships from JSON data based on organization type."""
         commission_memberships = []
         parliamentarian_roles = []
@@ -533,9 +561,7 @@ class MembershipImporter(DataImporter):
                     continue
 
                 organization_data = membership['organization']
-                org_type_title = organization_data.get(
-                    'organizationTypeTitle'
-                )
+                org_type_title = organization_data.get('organizationTypeTitle')
                 role_text = membership.get('role', '')
                 org_name = organization_data.get('name', '')
 
@@ -566,7 +592,6 @@ class MembershipImporter(DataImporter):
                     # todo (cyrill):
                     # is org_name actually the right key for this
                     party = self.party_map.get(org_name)
-
                     breakpoint()
 
                     role_obj = self._create_parliamentarian_role(
@@ -613,7 +638,6 @@ class MembershipImporter(DataImporter):
                     )
                     if role_obj:
                         parliamentarian_roles.append(role_obj)
-
                 else:
                     logging.warning(
                         f'Skipping membership: Unknown organization type '
@@ -622,19 +646,16 @@ class MembershipImporter(DataImporter):
                     )
 
             except Exception as e:
-                person_id = membership.get('person', {}).get(
-                    'id', 'unknown'
-                )
+                person_id = membership.get('person', {}).get('id', 'unknown')
                 logging.error(
                     f'Error creating membership for '
-                    f'person_id {person_id}: {e}', exc_info=True,
+                    f'person_id {person_id}: {e}',
+                    exc_info=True,
                 )
 
         # Save all created objects to the database
         if commission_memberships:
-            self._bulk_save(
-                commission_memberships, 'commission memberships'
-            )
+            self._bulk_save(commission_memberships, 'commission memberships')
         if parliamentarian_roles:
             self._bulk_save(parliamentarian_roles, 'parliamentarian roles')
 
@@ -649,7 +670,8 @@ class MembershipImporter(DataImporter):
             # Ensure both objects have IDs
             if not parliamentarian.id or not commission.id:
                 logging.warning(
-                    f'Missing ID: Parliamentarian={parliamentarian.id}, Commission={commission.id}'
+                    f'Missing ID: Parliamentarian={parliamentarian.id}, '
+                    'Commission={commission.id}'
                 )
                 return None
 
@@ -688,13 +710,15 @@ class MembershipImporter(DataImporter):
         start_date: str = None,
         end_date: str = None,
     ) -> ParliamentarianRole | None:
-        """Create a ParliamentarianRole object with the specified relationships."""
+        """Create a ParliamentarianRole object with the specified
+        relationships."""
         try:
             # Ensure parliamentarian has an ID
             if not parliamentarian.id:
                 logging.warning(
-                    f'Skipping parliamentarian role: Parliamentarian missing '
-                    f'ID: {parliamentarian.first_name} {parliamentarian.last_name}'
+                    'Skipping parliamentarian role: Parliamentarian missing '
+                    f'ID: {parliamentarian.first_name} '
+                    f'{parliamentarian.last_name}'
                 )
                 return None
 
@@ -780,23 +804,46 @@ class MembershipImporter(DataImporter):
 
         return 'none'
 
+    @classmethod
+    def extract_role_org_type_pairs(
+        cls, memberships_data: Sequence[MembershipData]
+    ) -> None:
+        """Extract unique combinations of role and organizationTypeTitle
+        from JSON data. Useful way to get an overview of the data."""
+        combinations = set()
+        for membership in memberships_data:
+            if (
+                membership.get('role')
+                and membership.get('organization')
+                and membership['organization'].get('organizationTypeTitle')
+            ):
+                otype = membership['organization']['organizationTypeTitle']
+                pair = f'{membership["role"]} - {otype}'
+                combinations.add(pair)
+
+        return sorted(combinations)
+
 
 def count_unique_fullnames(
     people_data: list[Any],
     organizations_data: list[Any],
-    memberships_data: list[Any]
+    memberships_data: list[Any],
 ):
+    """Just used to verify we actually get the value we expected."""
+
     def extract_full_names(data: dict[str, Any]) -> set[str]:
         full_names = set()
+
         def traverse(obj: Any):
             if isinstance(obj, dict):
-                if "fullName" in obj and isinstance(obj["fullName"], str):
-                    full_names.add(obj["fullName"])
+                if 'fullName' in obj and isinstance(obj['fullName'], str):
+                    full_names.add(obj['fullName'])
                 for value in obj.values():
                     traverse(value)
             elif isinstance(obj, list):
                 for item in obj:
                     traverse(item)
+
         traverse(data)
         return full_names
 
@@ -842,6 +889,4 @@ def import_zug_kub_data(
         party_map,
         other_organization_map,
     )
-
     return membership_importer.bulk_import(membership_data)
-
