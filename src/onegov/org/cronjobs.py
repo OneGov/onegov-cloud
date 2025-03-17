@@ -773,12 +773,10 @@ def update_newsletter_email_bounce_statistics(
 
         return ''
 
-    token = get_postmark_token()
-
-    collections = (RecipientCollection, EntryRecipientCollection)
-    for collection in collections:
-        recipients = collection(request.session)
+    def get_bounces() -> list[dict[str, Any]]:
+        token = get_postmark_token()
         yesterday = utcnow() - timedelta(days=1)
+        r = None
 
         try:
             r = requests.get(
@@ -787,21 +785,28 @@ def update_newsletter_email_bounce_statistics(
                 f'{yesterday.date()}&inactive=true',
                 headers={
                     'Accept': 'application/json',
-                    'X-Postmark-Server-Token': token
-            },
-                timeout=30
+                    'X-Postmark-Server-Token': token,
+                },
+                timeout=30,
             )
             r.raise_for_status()
             bounces = r.json().get('Bounces', [])
         except requests.exceptions.HTTPError as http_err:
-            if r.status_code == 401:
+            if r and r.status_code == 401:
                 raise RuntimeWarning(
                     f'Postmark API token is not set or invalid: {http_err}'
                 ) from None
             else:
                 raise
 
-        for bounce in bounces:
+        return bounces
+
+    postmark_bounces = get_bounces()
+    collections = (RecipientCollection, EntryRecipientCollection)
+    for collection in collections:
+        recipients = collection(request.session)
+
+        for bounce in postmark_bounces:
             email = bounce.get('Email', '')
             inactive = bounce.get('Inactive', False)
             recipient = recipients.by_address(email)
