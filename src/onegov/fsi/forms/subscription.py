@@ -158,29 +158,31 @@ class AddFsiSubscriptionForm(Form, SubscriptionFormMixin):
         return True
 
     def ensure_6_year_time_interval(self) -> bool:
-        if self.attendee_id.data and self.course_event_id.data:
-            last_subscribed_event = self.request.session.query(
-                CourseEvent).join(CourseSubscription).filter(
-                CourseSubscription.attendee_id == self.attendee_id.data
-                ).order_by(desc(CourseEvent.start)).first()
-            if last_subscribed_event and self.event_from_form and (
-                # Chosen event needs to start at least 6 years after the last
-                # subscribed event
-                self.event_from_form.start < datetime(
-                last_subscribed_event.start.year + 6, 1, 1,
-                tzinfo=pytz.utc)
-            ):
-                assert isinstance(self.course_event_id.errors, list)
-                self.course_event_id.errors.append(
-                    _('The selected course must take place at least 6 years '
-                      'after the last course for which the attendee was '
-                      'registered. The last course for this attendee was '
-                      'on ${date}.', mapping={
-                          'date': last_subscribed_event.start.strftime(
-                                '%d.%m.%Y')}
-                          )
-                )
-                return False
+        if not self.request.is_admin:
+            if self.attendee_id.data and self.course_event_id.data:
+                last_subscribed_event = self.request.session.query(
+                    CourseEvent).join(CourseSubscription).filter(
+                    CourseSubscription.attendee_id == self.attendee_id.data
+                    ).order_by(desc(CourseEvent.start)).first()
+                if last_subscribed_event and self.event_from_form and (
+                    # Chosen event needs to start at least 6 years after the
+                    # last subscribed event
+                    self.event_from_form.start < datetime(
+                    last_subscribed_event.start.year + 6, 1, 1,
+                    tzinfo=pytz.utc)
+                ):
+                    assert isinstance(self.course_event_id.errors, list)
+                    self.course_event_id.errors.append(
+                        _('The selected course must take place at least 6 '
+                        'years after the last course for which the attendee '
+                        'was registered. The last course for this attendee '
+                        'was on ${date}.', mapping={
+                            'date': last_subscribed_event.start.strftime(
+                                    '%d.%m.%Y')}
+                            )
+                    )
+                    return False
+            return True
         return True
 
     def ensure_can_book_if_locked(self) -> bool:
