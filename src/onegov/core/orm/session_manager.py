@@ -59,28 +59,64 @@ import datetime
 from sqlalchemy.engine import Engine
 
 # Create a log file with timestamp
-log_filename = f"/tmp/sqlalchemy_stacktrace_{datetime.datetime.now().strftime('%Y%m%d_%H%M%S')}.log"
+log_filename = '/tmp/_massive_sqlalchemy_stacktrace{:%Y-%m-%d %H:%M:%S}.txt'.format(datetime.datetime.now())
 log_path = Path(log_filename)
+
+# Counter for logged queries
+logged_query_count = 0
+
+# Define the query pattern to filter for
+MASSIVE_QUERY_PATTERNS = [
+    'SELECT pages.content AS pages_content',
+    'SELECT files.id AS files_id,\n         files.name AS files_name',
+]
 
 
 @event.listens_for(Engine, 'before_cursor_execute')
 def log_query_with_stack(
     conn, cursor, statement, parameters, context, executemany
 ):
+    global logged_query_count
+
+    # Check if the query matches any of the massive query patterns
+    is_massive_query = False
+    for pattern in MASSIVE_QUERY_PATTERNS:
+        if pattern.strip() in statement.strip():
+            is_massive_query = True
+            break
+
+    if not is_massive_query:
+        return
+
+    # Increment the counter
+    logged_query_count += 1
+
     # Get the full stack trace
     stack = traceback.extract_stack()
+    not_interested_in = 'log_query_with_stack'
+    interested_in = '/src/onegov/'
 
-    # Filter out SQLAlchemy internal calls
-    app_frames = [
-        frame for frame in stack if 'site-packages/sqlalchemy' not in frame[0]
-    ]
+    app_frames = []
+    try:
+        for outer in stack:  # should be enough
+            for inner in outer:
+                if not hasattr(inner, '__iter__'):
+                    continue
+
+                if interested_in in inner and not_interested_in not in inner:
+                    app_frames.append(outer)
+    except Exception:
+        pass
+
+    if not app_frames:
+        return
 
     # Format the message
     timestamp = datetime.datetime.now().isoformat()
-    message = f'[{timestamp}] SQL Query Origin:\n'
+    # message = f'[{timestamp}] SQL Query Origin (MASSIVE QUERY #{logged_query_count}):\n'
+    message = ''
 
-    # Add the app stack frames (last 10 frames should be sufficient)
-    for frame in app_frames[-10:]:
+    for frame in app_frames:
         filename, line, function, code = frame
         message += f'  File "{filename}", line {line}, in {function}\n'
         if code:
