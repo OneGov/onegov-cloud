@@ -367,8 +367,7 @@ class Indexer(IndexerBase):
                     pass
 
     def update(self, task: IndexTask) -> None:
-        # not needed for elasticsearch
-        pass
+        self.index(task)
 
 
 class PostgresIndexer(IndexerBase):
