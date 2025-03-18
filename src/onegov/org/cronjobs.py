@@ -856,8 +856,7 @@ def get_news_for_push_notification(session: Session) -> Query[News]:
 @OrgApp.cronjob(hour='*', minute='*/10', timezone='UTC')
 def send_push_notifications_for_news(request: OrgRequest) -> None:
     """
-    Cronjob that runs every 10 minutes to send push notifications for news
-    items that were published within the last 10 minutes.
+    Cronjob that runs every 10 minutes to send push notifications for news.
 
     It collects all news items with:
     - Publication start date within the last 10 minutes
@@ -871,18 +870,15 @@ def send_push_notifications_for_news(request: OrgRequest) -> None:
 
     # Skip if no Firebase credentials are configured
     if not org.firebase_adminsdk_credential:
-        print('No Firebase credentials configured')
         return
 
     news_items = get_news_for_push_notification(session).all()
     if not news_items:
-        print('No news items found with push notifications enabled')
         return
 
     # Get the mapping
     topic_mapping = org.meta.get('selectable_push_notification_options', [])
     if not topic_mapping:
-        print('selectable_push_notification_options is empty')
         return
 
     # Decrypt the Firebase credentials
@@ -919,17 +915,14 @@ def send_push_notifications_for_news(request: OrgRequest) -> None:
             )
 
             for topic_id in topics:
-                if isinstance(topic_id, str):
-                    print(f'String entry: {topic_id}')
-                else:
-                    print('Invalid topic entry')
+                if not isinstance(topic_id, str):
                     continue
 
                 # Check if notification was already sent
                 if PushNotification.was_notification_sent(
                     session, news.id, topic_id
                 ):
-                    log.info(
+                    print(
                         f"Skipping duplicate notification to topic "
                         f"'{topic_id}' for news '{news.title}'."
                     )
