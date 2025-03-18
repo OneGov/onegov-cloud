@@ -55,150 +55,45 @@ CONNECTION_LIFETIME = 60 * 60
 
 import traceback
 from pathlib import Path
-from datetime import datetime
-import json
-from collections import defaultdict
+import datetime
 from sqlalchemy.engine import Engine
-from sqlparse import format
 
-# Initialize counters and storage
-query_counts = defaultdict(int)
-query_origins = defaultdict(list)
-start_time = datetime.now()
-
-home_dir = Path.home()
-date_folder = datetime.now().strftime('%d_%m_%Y')
-log_filename = (
-    home_dir
-    / date_folder
-    / f"sql_frequency_{start_time.strftime('%Y%m%d_%H%M%S')}.log"
-)
-summary_filename = (
-    home_dir
-    / date_folder
-    / f"sql_summary_{start_time.strftime('%Y%m%d_%H%M%S')}.log"
-)
+# Create a log file with timestamp
+log_filename = f"/tmp/sqlalchemy_stacktrace_{datetime.datetime.now().strftime('%Y%m%d_%H%M%S')}.log"
 log_path = Path(log_filename)
-log_path.parent.mkdir(parents=True, exist_ok=True)
-
-summary_path = Path(summary_filename)
 
 
 @event.listens_for(Engine, 'before_cursor_execute')
-def count_and_log_query(
+def log_query_with_stack(
     conn, cursor, statement, parameters, context, executemany
 ):
-    # Normalize the query by stripping whitespace and formatting consistently
-    formatted_stmt = format(statement, strip_comments=True, reindent=True)
+    # Get the full stack trace
+    stack = traceback.extract_stack()
 
-    # Count this query
-    query_counts[formatted_stmt] += 1
+    # Filter out SQLAlchemy internal calls
+    app_frames = [
+        frame for frame in stack if 'site-packages/sqlalchemy' not in frame[0]
+    ]
 
-    # Only record the first few occurrences of each query to avoid massive logs
-    if query_counts[formatted_stmt] <= 3:
-        # Get the stack trace
-        stack = traceback.extract_stack()
+    # Format the message
+    timestamp = datetime.datetime.now().isoformat()
+    message = f'[{timestamp}] SQL Query Origin:\n'
 
-        # Filter out SQLAlchemy internal calls
-        app_frames = [
-            frame
-            for frame in stack
-            if 'site-packages/sqlalchemy' not in frame[0]
-        ]
+    # Add the app stack frames (last 10 frames should be sufficient)
+    for frame in app_frames[-10:]:
+        filename, line, function, code = frame
+        message += f'  File "{filename}", line {line}, in {function}\n'
+        if code:
+            message += f'    {code}\n'
 
-        # Store the origin info (just the last 5 frames for readability)
-        origin_info = [
-            {
-                'file': frame[0],
-                'line': frame[1],
-                'function': frame[2],
-                'code': frame[3],
-            }
-            for frame in app_frames[-5:]
-        ]
+    # Add the SQL query
+    message += f'\nSQL Query:\n{statement}\n'
+    message += f'Parameters: {parameters}\n'
+    message += '=' * 80 + '\n\n'
 
-        # Store this origin
-        if (
-            len(query_origins[formatted_stmt]) < 3
-        ):  # Limit to 3 distinct origins per query
-            if not any(
-                origin_info == existing
-                for existing in query_origins[formatted_stmt]
-            ):
-                query_origins[formatted_stmt].append(origin_info)
-
-    # If this query is getting executed a lot, log it immediately
-    if query_counts[formatted_stmt] in [10, 100, 1000]:
-        with log_path.open('a') as f:
-            f.write(
-                f'ALERT: Query executed {query_counts[formatted_stmt]} times:\n'
-            )
-            f.write(f'{formatted_stmt}\n')
-            f.write('-' * 80 + '\n\n')
-
-
-@event.listens_for(Engine, 'after_cursor_execute')
-def write_summary_periodically(conn, cursor, statement, parameters, context, executemany):
-    # Every 100 queries, write a current summary to keep track during long-running operations
-    total_queries = sum(query_counts.values())
-    if total_queries % 100 == 0:
-        write_summary()
-
-
-def write_summary():
-    """Write a summary of the most frequent queries to a file"""
-    with summary_path.open('w') as f:
-        # Calculate runtime
-        runtime = datetime.now() - start_time
-
-        # Sort queries by count (most frequent first)
-        sorted_queries = sorted(
-            [(query, count) for query, count in query_counts.items()],
-            key=lambda x: x[1],
-            reverse=True
-        )
-
-        # Write header
-        f.write(f'SQL Query Frequency Summary (Runtime: {runtime})\n')
-        f.write(f'Total unique queries: {len(query_counts)}\n')
-        f.write(f'Total query executions: {sum(query_counts.values())}\n')
-        f.write('=' * 80 + '\n\n')
-
-        # Write top 20 most frequent queries
-        f.write('TOP 20 MOST FREQUENT QUERIES:\n')
-        for i, (query, count) in enumerate(sorted_queries[:20], 1):
-            f.write(f'{i}. Executed {count} times:\n')
-            f.write(f'{query}\n')
-
-            # Add origins for this query
-            if query in query_origins:
-                f.write('   Origins:\n')
-                for origin in query_origins[query]:
-                    f.write('   - Stack trace:\n')
-                    for frame in origin:
-                        f.write(f"     {frame['file']}:{frame['line']} in {frame['function']}\n")
-                        if frame['code']:
-                            f.write(f"       {frame['code']}\n")
-
-            f.write('-' * 80 + '\n\n')
-
-
-# Register a shutdown handler to ensure the summary is written
-import atexit
-atexit.register(write_summary)
-
-# Write initial file headers
-with log_path.open('w') as f:
-    f.write(f'SQL Query Frequency Log started at {start_time.isoformat()}\n')
-    f.write('=' * 80 + '\n\n')
-
-with summary_path.open('w') as f:
-    f.write('SQL Query Frequency Summary (will update during execution)\n')
-    f.write('=' * 80 + '\n\n')
-
-print('SQL Frequency Analyzer activated. Logs will be written to:')
-print(f'- Real-time alerts: {log_path}')
-print(f'- Summary report: {summary_path}')
+    # Write to file using pathlib
+    with log_path.open('a') as f:
+        f.write(message)
 
 
 def query_schemas(
@@ -698,7 +593,6 @@ class SessionManager:
         assert self.is_valid_schema(schema)
 
         self.current_schema = schema
-        print('set_current_schema called')
         self.ensure_schema_exists(schema)
 
         self.activate()
