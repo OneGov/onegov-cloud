@@ -60,7 +60,10 @@ from sqlalchemy.engine import Engine
 
 # Create a log file with timestamp
 log_filename = '/tmp/_massive_sqlalchemy_stacktrace{:%Y-%m-%d %H:%M:%S}.txt'.format(datetime.datetime.now())
+log_filename_2 = '/tmp/foo.txt'
+
 log_path = Path(log_filename)
+log_path_2 = Path(log_filename_2)
 
 # Counter for logged queries
 logged_query_count = 0
@@ -93,30 +96,59 @@ def log_query_with_stack(
 
     # Get the full stack trace
     stack = traceback.extract_stack()
-    not_interested_in = 'log_query_with_stack'
     interested_in = '/src/onegov/'
 
     app_frames = []
+
+    start_collecting = False
+    stop_collecting = False
+    filtered_frames = []
+
     try:
-        for outer in stack:  # should be enough
-            for inner in outer:
-                if not hasattr(inner, '__iter__'):
-                    continue
 
-                if interested_in in inner and not_interested_in not in inner:
-                    app_frames.append(outer)
-    except Exception:
-        pass
+        for frame in stack:  # Process from most recent to oldest
+            filename = frame.filename
+            line = frame.line
 
-    if not app_frames:
+            with log_path_2.open('a') as f:
+                f.write(line)
+                f.write(filename)
+
+            if 'town_handle_page_form' in line:
+                breakpoint()
+                start_collecting = True
+
+            if 'venv/lib/' in line:
+                # This doesn't give helpful debug information, so we might as well
+                # prevent spamming the logs with this
+                stop_collecting = True
+
+            if start_collecting and not stop_collecting:
+                filtered_frames.append(frame)
+
+        if not filtered_frames:
+            return
+
+        # Format the message
+        timestamp = datetime.datetime.now().isoformat()
+        message = ''
+        for frame in filtered_frames:
+            filename, line, function, code = frame
+            message += f'  File "{filename}", line {line}, in {function}\n'
+            if code:
+                message += f'    {code}\n'
+    except Exception as e:
+        raise e
+
+    if not filtered_frames:
         return
 
     # Format the message
-    timestamp = datetime.datetime.now().isoformat()
     # message = f'[{timestamp}] SQL Query Origin (MASSIVE QUERY #{logged_query_count}):\n'
+
     message = ''
 
-    for frame in app_frames:
+    for frame in filtered_frames:
         filename, line, function, code = frame
         message += f'  File "{filename}", line {line}, in {function}\n'
         if code:
