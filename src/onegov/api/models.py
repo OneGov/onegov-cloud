@@ -215,10 +215,21 @@ class ApiEndpoint(Generic[_M]):
         if not item:
             return None
 
-        target = str(item)
-        if hasattr(item, 'id'):
-            target = getattr(item.id, 'hex', str(item.id))
+        assert hasattr(item, 'id')
+        return self.for_item_id(item.id)
 
+    @overload
+    def for_item_id(self, item_id: None) -> None: ...
+    @overload
+    def for_item_id(self, item_id: Any) -> ApiEndpointItem[Any]: ...
+
+    def for_item_id(self, item_id: Any | None) -> ApiEndpointItem[Any] | None:
+        """ Return a new endpoint item instance with the given item id. """
+
+        if not item_id:
+            return None
+
+        target = getattr(item_id, 'hex', str(item_id))
         return ApiEndpointItem(self.request, self.endpoint, target)
 
     @overload

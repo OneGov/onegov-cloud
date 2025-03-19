@@ -244,7 +244,7 @@ class AgencyApiEndpoint(ApiEndpoint['ExtendedAgency'], ApisMixin):
     def item_links(self, item: ExtendedAgency) -> dict[str, Any]:
         return {
             'organigram': item.organigram,
-            'parent': self.for_item(item.parent),
+            'parent': self.for_item_id(item.parent_id),
             'children': self.for_filter(parent=str(item.id)),
             'memberships': self.membership_api.for_filter(
                 agency=str(item.id)
@@ -291,6 +291,6 @@ class MembershipApiEndpoint(
 
     def item_links(self, item: ExtendedAgencyMembership) -> dict[str, Any]:
         return {
-            'agency': self.agency_api.for_item(item.agency),
-            'person': self.person_api.for_item(item.person)
+            'agency': self.agency_api.for_item_id(item.agency_id),
+            'person': self.person_api.for_item_id(item.person_id)
         }
