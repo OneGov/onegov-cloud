@@ -102,8 +102,11 @@ class ApiException(Exception):
 
         self.headers = headers or {}
 
-        # NOTE: only log unexpected exceptions
-        if not isinstance(exception, (HTTPException, ApiException)):
+        # NOTE:log unexpected exceptions
+        if not (
+            exception is None
+            or isinstance(exception, (HTTPException, ApiException))
+        ):
             log.exception(exception)
 
 
