@@ -215,13 +215,8 @@ class ApiEndpoint(Generic[_M]):
         if not item:
             return None
 
-        if hasattr(item, 'id'):
-            return self.for_item_id(item.id)
-
-        # FIXME: This branch should never really be taken, let's verify
-        #        we don't ever use it and then get rid of it.
-        target = str(item)
-        return ApiEndpointItem(self.request, self.endpoint, target)
+        assert hasattr(item, 'id')
+        return self.for_item_id(item.id)
 
     @overload
     def for_item_id(self, item_id: None) -> None: ...
