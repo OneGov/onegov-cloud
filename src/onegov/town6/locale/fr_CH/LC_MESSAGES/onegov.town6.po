@@ -5,7 +5,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: OneGov Cloud 1.0\n"
-"POT-Creation-Date: 2025-03-11 16:15+0100\n"
+"POT-Creation-Date: 2025-03-20 14:18+0100\n"
 "PO-Revision-Date: 2021-03-03 14:04+0100\n"
 "Last-Translator: Lukas Burkhard <lukas.burkhard@seantis.ch>\n"
 "Language-Team: French\n"
@@ -1528,6 +1528,13 @@ msgstr "Ticket récupéré dans les archives"
 msgid "Ticket uploaded to Gever."
 msgstr "Ticket téléchargé à Gever."
 
+msgid ""
+"You have exceeded the maximum number of unique accesses to protected "
+"resources. Please try again at a later date."
+msgstr ""
+"Vous avez dépassé le nombre maximum d'accès uniques aux ressources "
+"protégées. Veuillez réessayer ultérieurement."
+
 msgid "Your search returned no results."
 msgstr "Votre recherche n'a donné aucun résultat."
 
@@ -2244,6 +2251,9 @@ msgstr ""
 
 msgid "Push Notification Overview"
 msgstr "Vue d'ensemble des notifications push"
+
+msgid "Value Added Tax"
+msgstr "Taxe sur la valeur ajoutée"
 
 msgid "New Note"
 msgstr "Nouveau commentaire"
