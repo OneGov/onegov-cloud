@@ -2,6 +2,7 @@ from __future__ import annotations
 
 from onegov.core.security import Public
 from onegov.org import _, OrgApp
+from onegov.org.exceptions import MTANAccessLimitExceeded
 from onegov.org.layout import DefaultLayout
 from onegov.user.auth import Auth
 from webob.exc import HTTPForbidden, HTTPNotFound
@@ -54,4 +55,27 @@ def handle_notfound(
     return {
         'layout': layout or DefaultLayout(self, request),
         'title': _('Not Found'),
+    }
+
+
+@OrgApp.html(
+    model=MTANAccessLimitExceeded,
+    permission=Public,
+    template='mtan_access_limit_exceeded.pt'
+)
+def handle_mtan_access_limit_exceeded(
+    self: MTANAccessLimitExceeded,
+    request: OrgRequest,
+    layout: DefaultLayout | None = None
+) -> RenderData:
+
+    @request.after
+    def set_status_code(response: Response) -> None:
+        response.status_code = self.code  # pass along 423
+
+    layout = layout or DefaultLayout(self, request)
+
+    return {
+        'layout': layout or DefaultLayout(self, request),
+        'title': _('mTAN Access Limit Exceeded'),
     }

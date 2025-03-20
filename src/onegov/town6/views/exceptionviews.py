@@ -1,7 +1,12 @@
 from __future__ import annotations
 
 from onegov.core.security import Public
-from onegov.org.views.exceptionviews import handle_forbidden, handle_notfound
+from onegov.org.exceptions import MTANAccessLimitExceeded
+from onegov.org.views.exceptionviews import (
+    handle_forbidden,
+    handle_mtan_access_limit_exceeded,
+    handle_notfound,
+)
 from onegov.town6 import TownApp
 from webob.exc import HTTPForbidden, HTTPNotFound
 
@@ -28,3 +33,16 @@ def town_handle_notfound(
     request: TownRequest
 ) -> RenderData:
     return handle_notfound(self, request, DefaultLayout(self, request))
+
+
+@TownApp.html(
+    model=MTANAccessLimitExceeded,
+    permission=Public,
+    template='mtan_access_limit_exceeded.pt'
+)
+def town_handle_mtan_access_limit_exceeded(
+    self: MTANAccessLimitExceeded,
+    request: TownRequest
+) -> RenderData:
+    return handle_mtan_access_limit_exceeded(
+        self, request, DefaultLayout(self, request))

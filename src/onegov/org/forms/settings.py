@@ -1190,8 +1190,8 @@ class NewsletterSettingsForm(Form):
             if data:
                 if not isinstance(data, list):
                     self.newsletter_categories.errors.append(
-                        _('Invalid format. Please define a list'
-                          'with topics and subtopics according the example.')
+                        _('Invalid format. Please define topics and '
+                          'subtopics according to the example.')
                     )
                     return False
                 for item in data:
