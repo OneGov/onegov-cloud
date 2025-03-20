@@ -17,7 +17,6 @@ from onegov.town6.api import (
     EventApiEndpoint, NewsApiEndpoint, TopicApiEndpoint)
 from onegov.town6.custom import get_global_tools
 from onegov.town6.initial_content import create_new_organisation
-from onegov.town6.layout import DefaultLayout
 from onegov.town6.theme import TownTheme
 from webob import Response
 
@@ -206,6 +205,10 @@ def get_disabled_extensions() -> tuple[str, ...]:
 @TownApp.setting(section='org', name='render_mtan_access_limit_exceeded')
 def get_render_mtan_access_limit_exceeded(
 ) -> Callable[[MTANAccessLimitExceeded, TownRequest], Response]:
+
+    # circular import
+    from onegov.town6.layout import DefaultLayout
+
     def render_mtan_access_limit_exceeded(
         self: MTANAccessLimitExceeded,
         request: TownRequest

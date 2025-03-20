@@ -26,7 +26,6 @@ from onegov.org import directives
 from onegov.org.auth import MTANAuth
 from onegov.org.exceptions import MTANAccessLimitExceeded
 from onegov.org.initial_content import create_new_organisation
-from onegov.org.layout import DefaultLayout
 from onegov.org.models import Dashboard, Organisation, PublicationCollection
 from onegov.org.request import OrgRequest
 from onegov.org.theme import OrgTheme
@@ -584,6 +583,10 @@ def get_disabled_extensions() -> Collection[str]:
 @OrgApp.setting(section='org', name='render_mtan_access_limit_exceeded')
 def get_render_mtan_access_limit_exceeded(
 ) -> Callable[[MTANAccessLimitExceeded, OrgRequest], Response]:
+
+    # circular import
+    from onegov.org.layout import DefaultLayout
+
     def render_mtan_access_limit_exceeded(
         self: MTANAccessLimitExceeded,
         request: OrgRequest
