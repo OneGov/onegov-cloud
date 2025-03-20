@@ -1049,7 +1049,7 @@
             </li>
             <li tal:condition="person.organisation" class="person-card-organisation">
                 <span i18n:attributes="title" title="Organisation">${person.organisation}</span>
-                <span i18n:attributes="title" title="Sub organisation">${person.sub_organisation}</span>
+                <span tal:condition="person.sub_organisation" i18n:attributes="title" title="Sub organisation">${person.sub_organisation}</span>
             </li>
             <li tal:condition="person.email and 'email' not in exclude" class="person-card-email">
                 <a href="mailto:${person.email}">${person.email}</a>
