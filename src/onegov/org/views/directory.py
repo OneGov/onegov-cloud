@@ -1190,6 +1190,7 @@ def view_directory_entry_update_recipients(
         'recipients': recipients,
         'warning': warning,
         'by_letter': by_letter,
+        'count': recipients.count()
     }
 
 

@@ -159,6 +159,7 @@ def test_directory_entry_subscription(client):
     assert "brave@gmail.com wurde erfolgreich" in page
 
     page = client.get('/directories/trainers/+recipients')
+    assert 'Zur Zeit sind 3 Abonnenten registriert' in page
     assert 'bliss@gmail.com' in page
     assert 'dream@gmail.com' in page
     assert 'brave@gmail.com' in page

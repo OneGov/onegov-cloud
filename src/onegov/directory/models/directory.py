@@ -590,7 +590,7 @@ class Directory(Base, ContentMixin, TimestampMixin,
         return DirectoryEntryForm
 
 
-class EntryRecipient(Base, TimestampMixin):
+class EntryRecipient(Base, TimestampMixin, ContentMixin):
     """ Represents a single recipient.
     """
 
@@ -627,6 +627,28 @@ class EntryRecipient(Base, TimestampMixin):
         UUID,  # type:ignore[arg-type]
         nullable=False
     )
+
+    @property
+    def is_inactive(self) -> bool:
+        """
+        Checks if the directory entry recipient's email address is marked as
+        inactive.
+
+        Returns:
+            bool: True if the email address is marked as inactive, False
+            otherwise.
+        """
+        return self.meta.get('inactive', False)
+
+    def mark_inactive(self) -> None:
+        """
+        Marks the recipient's email address as inactive.
+
+        This method sets the 'inactive' flag in the recipient's metadata to
+        True. It is typically used when a bounce event causes the email
+        address to be deactivated by Postmark.
+        """
+        self.meta['inactive'] = True
 
 
 class EntrySubscription:

@@ -1495,7 +1495,7 @@ def test_update_newsletter_email_bounce_statistics(org_app, handlers):
     job = get_cronjob_by_name(org_app,
                               'update_newsletter_email_bounce_statistics')
     job.app = org_app
-    # tz = ensure_timezone('Europe/Zurich')
+    tz = ensure_timezone('Europe/Zurich')
 
     transaction.begin()
 
@@ -1504,6 +1504,30 @@ def test_update_newsletter_email_bounce_statistics(org_app, handlers):
     recipients.add('franz@user.ch', confirmed=True)
     recipients.add('heinz@user.ch', confirmed=True)
     recipients.add('trudi@user.ch', confirmed=True)
+
+    # create directory entry recipients
+    directories = DirectoryCollection(org_app.session(), type='extended')
+    directory_entries = directories.add(
+        title='Baugesuche (Planauflage)',
+        structure="""
+            Gesuchsteller/in *= ___
+        """,
+        configuration=DirectoryConfiguration(
+            title="[Gesuchsteller/in]",
+        )
+    )
+    directory_entries.add(values=dict(
+        gesuchsteller_in='Amon',
+        publication_start=datetime(2024, 4, 1, tzinfo=tz),
+        publication_end=datetime(2024, 4, 10, tzinfo=tz),
+    ))
+    entry_recipients = EntryRecipientCollection(org_app.session())
+    entry_recipients.add('marietta@user.ch', directory_entries.id,
+                         confirmed=True)
+    entry_recipients.add('martha@user.ch', directory_entries.id,
+                         confirmed=True)
+    entry_recipients.add('michu@user.ch', directory_entries.id,
+                         confirmed=True)
 
     transaction.commit()
     close_all_sessions()
@@ -1517,7 +1541,9 @@ def test_update_newsletter_email_bounce_statistics(org_app, handlers):
                     {'RecordType': 'Bounce', 'ID': 3719297970,
                      'Inactive': False, 'Email': 'franz@user.ch'},
                     {'RecordType': 'Bounce', 'ID': 4739297971,
-                     'Inactive': True, 'Email': 'heinz@user.ch'}
+                     'Inactive': True, 'Email': 'heinz@user.ch'},
+                    {'RecordType': 'Bounce', 'ID': 5739297972,
+                     'Inactive': True, 'Email': 'martha@user.ch'}
                 ]
             },
             raise_for_status=Mock(return_value=None),
@@ -1534,6 +1560,12 @@ def test_update_newsletter_email_bounce_statistics(org_app, handlers):
             'heinz@user.ch').is_inactive is True
         assert RecipientCollection(org_app.session()).by_address(
             'trudi@user.ch').is_inactive is False
+        assert EntryRecipientCollection(org_app.session()).by_address(
+            'marietta@user.ch').is_inactive is False
+        assert EntryRecipientCollection(org_app.session()).by_address(
+            'martha@user.ch').is_inactive is True
+        assert EntryRecipientCollection(org_app.session()).by_address(
+            'michu@user.ch').is_inactive is False
 
     # test raising runtime warning exception for status code 401
     with patch('requests.get') as mock_get:
@@ -1561,6 +1593,18 @@ def test_update_newsletter_email_bounce_statistics(org_app, handlers):
             # execute cronjob
             with pytest.raises(requests.exceptions.HTTPError):
                 client.get(get_cronjob_url(job))
+
+    recipients = RecipientCollection(org_app.session())
+    assert recipients.query().count() == 3
+    assert recipients.by_address('franz@user.ch').is_inactive is False
+    assert recipients.by_address('heinz@user.ch').is_inactive is True
+    assert recipients.by_address('trudi@user.ch').is_inactive is False
+
+    entry_recipients = EntryRecipientCollection(org_app.session())
+    assert entry_recipients.query().count() == 3
+    assert entry_recipients.by_address('marietta@user.ch').is_inactive is False
+    assert entry_recipients.by_address('martha@user.ch').is_inactive is True
+    assert entry_recipients.by_address('michu@user.ch').is_inactive is False
 
 
 def test_delete_unconfirmed_subscribers(org_app, handlers):
