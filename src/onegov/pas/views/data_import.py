@@ -59,7 +59,7 @@ def clean(app) -> None:
 
     # Truncate all tables in the correct order (respecting foreign key constraints)
     truncate_statement = """
-        TRUNCATE TABLE 
+        TRUNCATE TABLE
             pas_commission_memberships,
             pas_parliamentarian_roles,
             pas_commissions,

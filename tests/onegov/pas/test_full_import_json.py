@@ -38,7 +38,7 @@ from onegov.pas.models import Commission, CommissionMembership, Parliamentarian
 def test_successful_import_manually(
     session, people_json, organization_json, memberships_json
 ):
-    people_path = '/home/cyrill/pasimport/json/People.json'
+    people_path = '/home/cyrill/pasimport/json/people_1.json'
     org_path = '/home/cyrill/pasimport/json/organizaton.json'
     members_path = '/home/cyrill/pasimport/json/membership.json'
 
@@ -53,7 +53,7 @@ def test_successful_import_manually(
 
     number_of_parliamentarians = session.query(Parliamentarian).count()
     expected_fullnames = count_unique_fullnames(
-        *map(_load_json, [people_path, org_path, members_path])
+        *map(_load_json, (people_path, org_path, members_path))
     )
     assert number_of_parliamentarians == len(expected_fullnames)
 

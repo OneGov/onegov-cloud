@@ -172,7 +172,8 @@ def link_with_actual_uuids(test_memberships):
         'sonstige-1': sonstige_1_id,  # Add mapping for Sonstige-1
         'sonstige-2': sonstige_2_id,  # Add mapping for Sonstige-2
     }
-    # Update test_memberships with the UUID values - make sure ALL references get updated
+    # Update test_memberships with the UUID values - make sure ALL
+    # references get updated
     for membership in test_memberships:
         if 'person' in membership and 'id' in membership['person']:
             person_key = membership['person']['id']
@@ -399,5 +400,3 @@ def test_membership_importer(session, test_memberships):
     assert regierungsrat_role.parliamentarian.first_name == 'Jane'
     assert 'Regierung' in regierungsrat_role.additional_information
     assert regierungsrat_role.start.strftime('%Y-%m-%d') == '2020-01-01'
-
-

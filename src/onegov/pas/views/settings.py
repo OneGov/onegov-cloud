@@ -1,11 +1,10 @@
 from __future__ import annotations
 
 from onegov.core.security import Private
-from onegov.core.security import Secret
 from onegov.org.models import Organisation
 from onegov.pas import _
 from onegov.pas import PasApp
-from onegov.pas.collections import CommissionCollection, ChangeCollection
+from onegov.pas.collections import CommissionCollection
 from onegov.pas.collections import LegislativePeriodCollection
 from onegov.pas.collections import ParliamentarianCollection
 from onegov.pas.collections import ParliamentaryGroupCollection
@@ -13,14 +12,12 @@ from onegov.pas.collections import PartyCollection
 from onegov.pas.collections import RateSetCollection
 from onegov.pas.collections import SettlementRunCollection
 from onegov.pas.layouts import DefaultLayout
-from onegov.user import UserCollection
 
 
 from typing import TYPE_CHECKING
 if TYPE_CHECKING:
     from onegov.core.types import RenderData
     from onegov.town6.request import TownRequest
-    from webob import Response
 
 
 @PasApp.html(

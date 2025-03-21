@@ -244,5 +244,17 @@ def test_views_manage(client_with_es):
            settings.click('Parlamentarier:innen')
 
 
-def test_view_uplaod(client):
-    pass
+def test_view_upload_json(client):
+    client.login_admin()
+
+    def yield_paths():
+        membership_base_path = '/home/cyrill/pasimport/json/memberships'
+        membership_count = 7
+        yield [
+            f'{membership_base_path}_{i}.json'
+            for i in range(1, membership_count + 1)
+        ]
+        yield [f'people_{i}.json' for i in range(1, 3)]
+        yield ['organization.json']
+
+    page = client.get('/pas-import')

@@ -1,8 +1,6 @@
 from __future__ import annotations
 
-from onegov.core.security import Private
 from onegov.file import FileCollection
-from onegov.org.models import Organisation
 from onegov.pas.collections import AttendenceCollection
 from onegov.pas.app import PasApp
 from onegov.pas.collections import ChangeCollection

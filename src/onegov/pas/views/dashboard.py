@@ -1,6 +1,5 @@
 from __future__ import annotations
 
-from onegov.file import FileCollection
 from onegov.pas import _
 from onegov.pas import PasApp
 from onegov.pas.collections import CommissionCollection

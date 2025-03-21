@@ -3,10 +3,10 @@ from __future__ import annotations
 from onegov.form import Form
 from onegov.pas import _
 from wtforms.fields import BooleanField
+from onegov.form.fields import UploadMultipleField
 
 
 from typing import TYPE_CHECKING
-
 if TYPE_CHECKING:
     pass
 
