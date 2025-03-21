@@ -36,8 +36,9 @@
                         </a>
                         <div class="accordion-content" data-tab-content>
                             <ul tal:repeat="field directory.fields" style="list-style: none; margin-left: 0">
+                                <li tal:condition="field.type == 'code'" tal:define="key field.human_id; value entry.values[field.id]" tal:content="Markup('<strong>{}</strong>: {}').format(key, render_untrusted_markdown(value))"></li>
                                 <li tal:condition="field.type == 'textarea'" tal:define="key field.human_id; value entry.values[field.id]" tal:content="Markup('<strong>{}</strong>: <br>{}').format(key, value)" style="white-space: pre-wrap;"></li>
-                                <li tal:condition="field.type != 'textarea'" tal:define="key field.human_id; value entry.values[field.id]" tal:content="Markup('<strong>{}</strong>: {}').format(key, value)"></li>
+                                <li tal:condition="field.type not in ['textarea', 'code']" tal:define="key field.human_id; value entry.values[field.id]" tal:content="Markup('<strong>{}</strong>: {}').format(key, value)"></li>
                             </ul>
                             <ul style="list-style: none; margin-left: 0">
                                 <li>

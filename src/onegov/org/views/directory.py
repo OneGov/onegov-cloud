@@ -7,6 +7,7 @@ import transaction
 
 from collections import defaultdict
 from onegov.core.html import html_to_text
+from onegov.core.markdown import render_untrusted_markdown
 from onegov.core.security import Public, Private, Secret
 from onegov.core.templates import render_template
 from onegov.core.utils import render_file
@@ -493,7 +494,8 @@ def view_directory(
         'submit': request.link(self, name='+submit'),
         'show_thumbnails': layout.thumbnail_field_id and True or False,
         'thumbnail_link': layout.thumbnail_link,
-        'overview_two_columns': self.directory.overview_two_columns
+        'overview_two_columns': self.directory.overview_two_columns,
+        'render_untrusted_markdown': render_untrusted_markdown,
     }
 
 

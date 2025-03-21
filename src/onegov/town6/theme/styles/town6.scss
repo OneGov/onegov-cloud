@@ -1219,7 +1219,12 @@ ul.recipients {
 
     .accordion-content {
         border-bottom: 1px solid $gray;
+
+        li li {
+            padding-bottom: 0;
+        }
     }
+
 }
 
 .courses {
