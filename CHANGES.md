@@ -1,8 +1,73 @@
 # Changes
 
+## 2025.15
+
+`2025-03-21` | [3b0cdefbe6...b279e33037](https://github.com/OneGov/onegov-cloud/compare/3b0cdefbe6^...b279e33037)
+
+### Agency
+
+##### Fixes N+1 query in the people endpoint for the API
+
+`Performance` | [9b1a46148f](https://github.com/onegov/onegov-cloud/commit/9b1a46148fe881bed0ac73a1f12ea8b871ad0f09)
+
+##### Fixes N+1 queries in the agency/membership endpoints for the API
+
+`Performance` | [affcdc40a7](https://github.com/onegov/onegov-cloud/commit/affcdc40a797c5e456564488cb6f78eb3a051dfc)
+
+##### Fixes N+1 query in the agency view
+
+`Performance` | [8aa5b95507](https://github.com/onegov/onegov-cloud/commit/8aa5b95507fc3a0dd59613d0036fecf075d97336)
+
+### Api
+
+##### Avoids logging `None` when no exception is set
+
+`Bugfix` | [5ac460a417](https://github.com/onegov/onegov-cloud/commit/5ac460a41733624f6b7879d0029da11d90c3f22f)
+
+### Auth
+
+##### Extends test coverage for LDAPProvider
+
+`Feature` | [OGC-2137](https://linear.app/onegovcloud/issue/OGC-2137) | [b279e33037](https://github.com/onegov/onegov-cloud/commit/b279e330376bbd4be35b654ef5eaab348d81a3b9)
+
+### Newsletter
+
+##### Remove org_name from Newsletter Category Definition
+
+`Feature` | [OGC-2128](https://linear.app/onegovcloud/issue/OGC-2128) | [604e3c2ea3](https://github.com/onegov/onegov-cloud/commit/604e3c2ea36625bca09a970310f6a02daea88852)
+
+### Org
+
+##### Renders a custom error page for exceeding the mTAN access limit
+
+`Feature` | [OGC-2139](https://linear.app/onegovcloud/issue/OGC-2139) | [4a3cc04258](https://github.com/onegov/onegov-cloud/commit/4a3cc0425888951b41b4c5d116fa62f887c8ee21)
+
+##### Removes unnecessary `print()` statements.
+
+Prevent spamming `/var/log/syslog`. No credentials configured
+is the default and can safely be ignored.
+
+`Bugfix` | [NONE](#NONE) | [750dfecc8f](https://github.com/onegov/onegov-cloud/commit/750dfecc8f10dcaf18bdb18f4c5b72b179adbb9f)
+
+##### Fixes regression in `RolesMapping.match`
+
+`Bugfix` | [OGC-2137](https://linear.app/onegovcloud/issue/OGC-2137) | [007b2c904e](https://github.com/onegov/onegov-cloud/commit/007b2c904e937949cf5edd69f9af33e629e3d865)
+
+### Search
+
+##### Reduce log level for ObjectDeletedError
+
+`Feature` | [OGC-1999](https://linear.app/onegovcloud/issue/OGC-1999) | [92d5f89676](https://github.com/onegov/onegov-cloud/commit/92d5f89676efcb0ff1863fb25ea57cbab17fa036)
+
+### Swissvotes
+
+##### Avoids N+1 query for page slides
+
+`Performance` | [c88b3b5493](https://github.com/onegov/onegov-cloud/commit/c88b3b5493bf2fee8e0d73d2c9df8734f6ee7e23)
+
 ## 2025.14
 
-`2025-03-14` | [d54f9470e7...7277aa7f4d](https://github.com/OneGov/onegov-cloud/compare/d54f9470e7^...7277aa7f4d)
+`2025-03-14` | [d54f9470e7...d92404c116](https://github.com/OneGov/onegov-cloud/compare/d54f9470e7^...d92404c116)
 
 ### Org
 
@@ -2173,8 +2238,4 @@ Also adds a JSON version of the sitemap.
 ##### Use timezone aware utcnow.
 
 `Feature` | [OGC-1665](https://linear.app/onegovcloud/issue/OGC-1665) | [35f30d1d39](https://github.com/onegov/onegov-cloud/commit/35f30d1d39f0a83bd13f51bab5ab22d54073a6fa)
-
-## 2024.33
-
-`2024-06-08` | [0a0e7e6ec9...78de021837](https://github.com/OneGov/onegov-cloud/compare/0a0e7e6ec9^...78de021837)
 
