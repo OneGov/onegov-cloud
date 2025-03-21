@@ -12,7 +12,7 @@ from onegov.org.forms.settings import (
     FooterSettingsForm, ModuleSettingsForm, MapSettingsForm,
     AnalyticsSettingsForm, HolidaySettingsForm, OrgTicketSettingsForm,
     HomepageSettingsForm, NewsletterSettingsForm, LinkMigrationForm,
-    LinkHealthCheckForm, SocialMediaSettingsForm,
+    LinkHealthCheckForm, PeopleSettingsForm, SocialMediaSettingsForm,
     EventSettingsForm, GeverSettingsForm, OneGovApiSettingsForm,
     DataRetentionPolicyForm, FirebaseSettingsForm, VATSettingsForm)
 from onegov.org.models import Organisation
@@ -481,4 +481,17 @@ def handle_vat_settings(
     layout = layout or SettingsLayout(self, request, _('Value Added Tax'))
     return handle_generic_settings(
         self, request, form, _('Value Added Tax'), layout
+    )
+
+
+@TownApp.form(
+    model=Organisation, name='people-settings', template='form.pt',
+    permission=Secret, form=PeopleSettingsForm, setting='People',
+    icon='fa-users', order=400,
+)
+def town_handle_people_settings(
+    self: Organisation, request: TownRequest, form: PeopleSettingsForm
+) -> RenderData | Response:
+    return handle_generic_settings(
+        self, request, form, 'People', SettingsLayout(self, request)
     )

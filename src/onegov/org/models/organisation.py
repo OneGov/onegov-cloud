@@ -223,6 +223,11 @@ class Organisation(Base, TimestampMixin):
     opening_hours_chat: dict_property[list[list[str]] | None] = meta_property()
     chat_topics: dict_property[list[str] | None] = meta_property()
 
+    # People Settings
+    organisation_hierarchy: (
+        dict_property)[dict[str, list[dict[str, list[str]] | str]]] = (
+        meta_property(default=list))
+
     # Required information to upload documents to a Gever instance
     gever_username: dict_property[str | None] = meta_property()
     gever_password: dict_property[str | None] = meta_property()
