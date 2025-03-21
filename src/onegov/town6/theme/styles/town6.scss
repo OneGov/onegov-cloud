@@ -1223,6 +1223,9 @@ ul.recipients {
         li li {
             padding-bottom: 0;
         }
+        li p, ul {
+            margin-bottom: .5rem;
+        }
     }
 
 }
