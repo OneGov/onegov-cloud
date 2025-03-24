@@ -17,7 +17,7 @@ from onegov.org.forms.settings import (
     DataRetentionPolicyForm, FirebaseSettingsForm, VATSettingsForm)
 from onegov.org.models import Organisation
 from onegov.org.views.settings import (
-    handle_homepage_settings, view_settings,
+    handle_homepage_settings, handle_people_settings, view_settings,
     handle_ticket_settings, preview_holiday_settings, handle_general_settings,
     handle_favicon_settings, handle_links_settings, handle_header_settings,
     handle_footer_settings, handle_module_settings, handle_map_settings,
@@ -492,6 +492,6 @@ def handle_vat_settings(
 def town_handle_people_settings(
     self: Organisation, request: TownRequest, form: PeopleSettingsForm
 ) -> RenderData | Response:
-    return handle_generic_settings(
-        self, request, form, 'People', SettingsLayout(self, request)
+    return handle_people_settings(
+        self, request, form, SettingsLayout(self, request)
     )

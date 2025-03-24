@@ -224,9 +224,9 @@ class Organisation(Base, TimestampMixin):
     chat_topics: dict_property[list[str] | None] = meta_property()
 
     # People Settings
-    organisation_hierarchy: (
-        dict_property)[dict[str, list[dict[str, list[str]] | str]]] = (
-        meta_property(default=list))
+    organisation_hierarchy: dict_property[list[dict[str, list[str]] | str]] = (
+        meta_property(default=list)
+    )
 
     # Required information to upload documents to a Gever instance
     gever_username: dict_property[str | None] = meta_property()

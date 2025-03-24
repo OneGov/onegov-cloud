@@ -1190,7 +1190,7 @@ class NewsletterSettingsForm(Form):
             if data:
                 if not isinstance(data, list):
                     self.newsletter_categories.errors.append(
-                        _('Invalid format. Please define a list'
+                        _('Invalid format. Please define a list '
                           'with topics and subtopics according the example.')
                     )
                     return False
@@ -1625,10 +1625,10 @@ class PeopleSettingsForm(Form):
             'format. Note: Deeper structures are not supported.'
             '\n'
             '```\n'
-            'Organisation:\n'
+            '- Organisation:\n'
             '  - Sub-Organisation 1\n'
             '  - Sub-Organisation 2\n'
-            'Organisation 2:\n'
+            '- Organisation 2:\n'
             '  - Sub-Organisation 1\n'
             '  - Sub-Organisation 2\n'
             '```'
@@ -1653,7 +1653,7 @@ class PeopleSettingsForm(Form):
             if data:
                 if not isinstance(data, list):
                     self.organisation_hierarchy.errors.append(
-                        _('Invalid format. Please define a list'
+                        _('Invalid format. Please define a list '
                           'with topics and subtopics according the example.')
                     )
                     return False

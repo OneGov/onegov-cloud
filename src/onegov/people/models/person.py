@@ -111,7 +111,8 @@ class Person(Base, ContentMixin, TimestampMixin, ORMSearchable,
     organisation: Column[str | None] = Column(Text, nullable=True)
 
     #: multiple organisations the person belongs to
-    newsletter_categories: dict_property[list[str] | None] = content_property()
+    organisations_multiple: dict_property[list[str] | None] = content_property(
+    )
 
     # a sub organisation the person belongs to
     sub_organisation: Column[str | None] = Column(Text, nullable=True)
