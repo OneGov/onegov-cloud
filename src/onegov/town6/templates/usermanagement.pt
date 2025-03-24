@@ -6,7 +6,7 @@
         <div class="grid-x grid-padding-x">
             <div class="medium-7 cell main-content small-order-2 medium-order-1 large-order-1">
                 <table class="usermanagement stack hover table" tal:define="enable_yubikey request.app.enable_yubikey; enable_mtan request.app.mtan_second_factor_enabled">
-                    <tal:b repeat="role ('admin', 'editor', 'member')">
+                    <tal:b repeat="role roles">
                         <thead>
                             <tr>
                                 <td>

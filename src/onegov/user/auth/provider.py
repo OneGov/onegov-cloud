@@ -369,14 +369,12 @@ class RolesMapping:
         """
         groups = {g.lower() for g in groups}
 
-        if roles['admins'].lower() in groups:
-            return 'admin'
-
-        if roles['editors'].lower() in groups:
-            return 'editor'
-
-        if roles['members'].lower() in groups:
-            return 'member'
+        for role in ('admin', 'editor', 'supporter', 'member'):
+            if (
+                (group := roles.get(f'{role}s', None)) is not None
+                and group.lower() in groups
+            ):
+                return role
 
         return None
 
@@ -470,7 +468,8 @@ class LDAPProvider(
                 '__default__': {
                     'admins': 'admins',
                     'editors': 'editors',
-                    'members': 'members'
+                    'supporters': 'supporters',
+                    'members': 'members',
                 }
             })),
         )
@@ -631,7 +630,8 @@ class LDAPKerberosProvider(
                 '__default__': {
                     'admins': 'admins',
                     'editors': 'editors',
-                    'members': 'members'
+                    'supporters': 'supporters',
+                    'members': 'members',
                 }
             }))
         )
@@ -847,6 +847,7 @@ class AzureADProvider(
                 '__default__': {
                     'admins': 'admins',
                     'editors': 'editors',
+                    'supporters': 'supporters',
                     'members': 'members'
                 }
             }))
@@ -1087,7 +1088,8 @@ class SAML2Provider(
                 '__default__': {
                     'admins': 'admins',
                     'editors': 'editors',
-                    'members': 'members'
+                    'supporters': 'supporters',
+                    'members': 'members',
                 }
             }))
         )
@@ -1342,7 +1344,8 @@ class OIDCProvider(
                 '__default__': {
                     'admins': 'admins',
                     'editors': 'editors',
-                    'members': 'members'
+                    'supporters': 'supporters',
+                    'members': 'members',
                 }
             }))
         )

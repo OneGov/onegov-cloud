@@ -1,5 +1,7 @@
 from __future__ import annotations
 
+from wtforms import BooleanField
+
 from onegov.form import Form
 from onegov.form.fields import HoneyPotField, MultiCheckboxField
 from onegov.org import _
@@ -19,17 +21,22 @@ class SignupForm(Form):
 
     request: OrgRequest
 
-    address = StringField(
-        label=_('E-Mail Address'),
-        validators=[InputRequired(), Email()]
-    )
-
     subscribed_categories = MultiCheckboxField(
         label=_('Categories'),
         description=_('Select newsletter categories your are interested '
                       'in. You will receive the newsletter if it reports '
                       'on at least one of the subscribed categories.'),
         choices=[],
+    )
+
+    address = StringField(
+        label=_('E-Mail Address'),
+        validators=[InputRequired(), Email()]
+    )
+
+    confirmed = BooleanField(
+        label=_('The subscriber has given consent to receive the newsletter.'),
+        validators=[InputRequired()]
     )
 
     name = HoneyPotField()
@@ -48,3 +55,9 @@ class SignupForm(Form):
 
         self.subscribed_categories.choices = choices
         self.subscribed_categories.data = data
+
+        if len(choices) == 0:
+            self.delete_field('subscribed_categories')
+
+        if not self.request.is_manager:
+            self.delete_field('confirmed')

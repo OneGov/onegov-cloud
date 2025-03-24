@@ -228,7 +228,7 @@ def handle_newsletters(
                 })
             )
 
-            if request.is_manager:
+            if request.is_manager and form.confirmed.data:
                 # auto confirm user
                 recipient.confirmed = True
 

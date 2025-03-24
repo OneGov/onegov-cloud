@@ -211,9 +211,9 @@ class Organisation(Base, TimestampMixin):
     # Newsletter settings
     show_newsletter: dict_property[bool] = meta_property(default=False)
     secret_content_allowed: dict_property[bool] = meta_property(default=False)
-    newsletter_categories: (
-        dict_property)[dict[str, list[dict[str, list[str]] | str]]] = (
-        meta_property(default=dict))
+    newsletter_categories: dict_property[list[dict[str, list[str]] | str]] = (
+        meta_property(default=list)
+    )
     notify_on_unsubscription: dict_property[list[str] | None] = meta_property()
 
     # Chat Settings
@@ -231,6 +231,9 @@ class Organisation(Base, TimestampMixin):
     # data retention policy
     auto_archive_timespan: dict_property[int] = meta_property(default=0)
     auto_delete_timespan: dict_property[int] = meta_property(default=0)
+
+    # vat
+    vat_rate: dict_property[float | None] = meta_property(default=0.0)
 
     # MTAN Settings
     mtan_access_window_seconds: dict_property[int | None] = meta_property()

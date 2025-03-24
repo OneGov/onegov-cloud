@@ -3,6 +3,7 @@ from __future__ import annotations
 import jwt
 
 from datetime import timedelta
+from functools import lru_cache
 from onegov.api import ApiApp
 from onegov.api.models import ApiException, ApiKey
 from onegov.api.token import try_get_encoded_token, jwt_decode
@@ -30,10 +31,29 @@ def authenticate(request: CoreRequest) -> ApiKey:
     except Exception as e:
         raise ApiException(exception=e) from e
 
+    # NOTE: This leads to a new query every time we call this function
+    #       which is not ideal. But it will be fixed with SQLAlchemy 1.4+
+    #       since we then can use `session.get(ApiKey, data['id'])`
+    #       which uses a cache, so the query will only be emitted once.
     api_key = request.session.query(ApiKey).get(data['id'])
     if api_key is None:
         raise HTTPClientError()
+
     return api_key
+
+
+# NOTE: This is a workaround for the problem above, when we only care
+#       about whether or not we're authorized and not what kind of
+#       permissions are attached to our ApiKey, then we can use this
+#       function.
+@lru_cache(16)
+def is_authorized(request: CoreRequest) -> bool:
+    try:
+        authenticate(request)
+    except Exception:
+        return False
+    else:
+        return True
 
 
 def check_rate_limit(request: CoreRequest) -> dict[str, str]:

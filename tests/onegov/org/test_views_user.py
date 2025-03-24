@@ -178,7 +178,7 @@ def test_edit_user_settings(client):
     users = UserCollection(client.app.session())
     assert users.by_username('new@example.org').data
 
-    edit = client.get('/usermanagement').click('Ansicht', index=3)
+    edit = client.get('/usermanagement').click('Ansicht', index=-1)
     edit = edit.click('Bearbeiten')
     assert "new@example.org" in edit
 

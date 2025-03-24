@@ -313,11 +313,10 @@ def test_newsletter_signup_for_categories(client):
     page = client.get('/newsletter-settings')
     page.form['show_newsletter'] = True
     page.form['newsletter_categories'] = """
-    Hüpferbande:
-      - News
-      - Aktivitäten:
-        - Anlässe
-        - Sport
+    - News
+    - Aktivitäten:
+      - Anlässe
+      - Sport
     """
     page.form.submit().follow()
     client.logout()
@@ -489,6 +488,7 @@ def test_newsletter_subscribers_management_by_manager(client):
     def subscribe_by_manager(client):
         page = client.get('/newsletters')
         page.form['address'] = 'info@govikon.org'
+        page.form['confirmed'] = True
         page = page.form.submit().follow()
         assert ('Wir haben info@govikon.org zur Liste der Empfänger '
                 'hinzugefügt.' in page)
@@ -660,7 +660,6 @@ def test_newsletter_send_with_categories(client):
     page = client.get('/newsletter-settings')
     page.form['show_newsletter'] = True
     page.form['newsletter_categories'] = """
-    Hüpferbande:
       - News
       - Aktivitäten:
         - Anlässe

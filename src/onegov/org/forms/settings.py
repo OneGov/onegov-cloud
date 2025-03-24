@@ -6,6 +6,8 @@ import re
 import yaml
 
 from functools import cached_property
+
+from cryptography.fernet import InvalidToken
 from lxml import etree
 
 from onegov.core.widgets import transform_structure
@@ -1150,16 +1152,14 @@ class NewsletterSettingsForm(Form):
         label=_('Newsletter categories'),
         description=_(
             'Example for newsletter topics with subtopics in yaml format. '
-            'Note: Deeper structures are not supported.'
-            '\n'
+            'Note: Deeper structures are not supported.\n'
             '```\n'
-            'Organisation:\n'
-            '  - Topic 1:\n'
-            '    - Subtopic 1.1\n'
-            '    - Subtopic 1.2\n'
-            '  - Topic 2\n'
-            '  - Topic 3:\n'
-            '    - Subtopic 3.1\n'
+            '- Topic 1\n'
+            '- Topic 2:\n'
+            '  - Subtopic 2.1\n'
+            '- Topic 3:\n'
+            '  - Subtopic 3.1\n'
+            '  - Subtopic 3.2\n'
             '```'
         ),
         render_kw={
@@ -1188,44 +1188,39 @@ class NewsletterSettingsForm(Form):
                 return False
 
             if data:
-                if not isinstance(data, dict):
+                if not isinstance(data, list):
                     self.newsletter_categories.errors.append(
-                        _('Invalid format. Please define an organisation name '
+                        _('Invalid format. Please define a list'
                           'with topics and subtopics according the example.')
                     )
                     return False
-                for items in data.values():
-                    if not isinstance(items, list):
+                for item in data:
+                    if not isinstance(item, (str, dict)):
                         self.newsletter_categories.errors.append(
                             _('Invalid format. Please define topics and '
                               'subtopics according to the example.')
                         )
                         return False
-                    for item in items:
-                        if not isinstance(item, (dict, str)):
+
+                    if isinstance(item, str):
+                        continue
+
+                    for topic, sub_topic in item.items():
+                        if not isinstance(sub_topic, list):
                             self.newsletter_categories.errors.append(
-                                _('Invalid format. Please define topics and '
-                                  'subtopics according to the example.')
+                                _(f'Invalid format. Please define '
+                                  f"subtopic(s) for '{topic}' "
+                                  f"or remove the ':'.")
                             )
                             return False
 
-                        if isinstance(item, dict):
-                            for topic, sub_topic in item.items():
-                                if not isinstance(sub_topic, list):
-                                    self.newsletter_categories.errors.append(
-                                        _(f'Invalid format. Please define '
-                                          f"subtopic(s) for '{topic}' "
-                                          f"or remove the ':'.")
-                                    )
-                                    return False
-                                if not all(isinstance(sub, str)
-                                           for sub in sub_topic):
-                                    self.newsletter_categories.errors.append(
-                                        _('Invalid format. Only topics '
-                                          'and subtopics are allowed - no '
-                                          'deeper structures supported.')
-                                    )
-                                    return False
+                        if not all(isinstance(sub, str) for sub in sub_topic):
+                            self.newsletter_categories.errors.append(
+                                _('Invalid format. Only topics '
+                                  'and subtopics are allowed - no '
+                                  'deeper structures supported.')
+                            )
+                            return False
 
         return None
 
@@ -1233,7 +1228,7 @@ class NewsletterSettingsForm(Form):
         super().populate_obj(model)
 
         yaml_data = self.newsletter_categories.data
-        data = yaml.safe_load(yaml_data) if yaml_data else {}
+        data = yaml.safe_load(yaml_data) if yaml_data else []
         model.newsletter_categories = data
 
         model.notify_on_unsubscription = self.notify_on_unsubscription.data
@@ -1241,7 +1236,7 @@ class NewsletterSettingsForm(Form):
     def process_obj(self, model: Organisation) -> None:  # type:ignore
         super().process_obj(model)
 
-        categories = model.newsletter_categories or {}
+        categories = model.newsletter_categories or []
         if not categories:
             self.newsletter_categories.data = ''
             return
@@ -1432,7 +1427,7 @@ class FirebaseSettingsForm(Form):
 
     firebase_adminsdk_credential = TextAreaField(
         _('Firebase adminsdk credentials (JSON)'),
-        [InputRequired()],
+        [Optional()],
         render_kw={
             'rows': 32,
             'data-editor': 'json'
@@ -1458,6 +1453,7 @@ class FirebaseSettingsForm(Form):
     def populate_obj(self, model: Organisation) -> None:  # type:ignore
         super().populate_obj(model)
         key_base64 = self.request.app.hashed_identity_key
+
         try:
             assert self.firebase_adminsdk_credential.data is not None
             encrypted = encrypt_symmetric(
@@ -1520,9 +1516,12 @@ class FirebaseSettingsForm(Form):
 
         key_base64 = self.request.app.hashed_identity_key
         if model.firebase_adminsdk_credential:
-            self.firebase_adminsdk_credential.data = decrypt_symmetric(
+            try:
+                self.firebase_adminsdk_credential.data = decrypt_symmetric(
                 model.firebase_adminsdk_credential.encode('utf-8'), key_base64
             )
+            except InvalidToken:
+                self.firebase_adminsdk_credential.data = ''
 
         if (
             not hasattr(model, 'selectable_push_notification_options')
@@ -1602,18 +1601,26 @@ class FirebaseSettingsForm(Form):
                     'add': self.request.translate(_('Add')),
                     'remove': self.request.translate(_('Remove')),
                 },
-                'placeholders': {
-                    'text': 'Key',
-                    'link': 'Label'
-                },
+                'placeholders': {'text': 'Key', 'link': 'Label'},
                 'textOptions': text_options,
                 'linkOptions': link_options,
                 'values': [
                     {
                         'text': l[0],
                         'link': l[1],
-                        'error': self.hashtag_errors.get(ix, '')
-                    } for ix, l in enumerate(topic_and_label_pairs)
-                ]
+                        'error': self.hashtag_errors.get(ix, ''),
+                    }
+                    for ix, l in enumerate(topic_and_label_pairs)
+                ],
             }
         )
+
+
+class VATSettingsForm(Form):
+
+    vat_rate = FloatField(
+        label=_('VAT Rate'),
+        description=_('This is the VAT rate in percent. The VAT rate will '
+                      'apply to all prices in the forms.'),
+        validators=[InputRequired(), NumberRange(0, 100)],
+    )

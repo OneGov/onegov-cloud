@@ -1,11 +1,17 @@
 from __future__ import annotations
 
+from onegov.core.orm.types import UTCDateTime
 from uuid import uuid4
 from onegov.core.collection import GenericCollection
 from sedate import utcnow
-from sqlalchemy import Column, String, DateTime, ForeignKey, Integer,\
-    UniqueConstraint
-from sqlalchemy.orm import relationship
+from sqlalchemy import (
+    Column,
+    String,
+    ForeignKey,
+    Integer,
+    UniqueConstraint,
+)
+from sqlalchemy.orm import relationship, backref
 from onegov.core.orm.types import JSON, UUID
 from onegov.core.orm import Base
 
@@ -34,12 +40,12 @@ class PushNotification(Base):
     #: The ID of the news item that triggered the notification
     news_id: Column[int] = Column(
         Integer,
-        ForeignKey('pages.id'),
+        ForeignKey('pages.id', ondelete='CASCADE'),
         nullable=False
     )
-
     news: relationship[News] = relationship(
-        'News', backref='sent_notifications',
+        'News',
+        backref=backref('sent_notifications', passive_deletes=True),
         foreign_keys=[news_id]
     )
 
@@ -47,7 +53,7 @@ class PushNotification(Base):
     topic_id: Column[str] = Column(String, nullable=False)
 
     #: When the notification was sent
-    sent_at = Column(DateTime, nullable=False, default=utcnow)
+    sent_at = Column(UTCDateTime, nullable=False, default=utcnow)
 
     #: Response information from the notification service
     response_data: Column[dict[str, Any] | None] = Column(JSON, nullable=True)
@@ -71,9 +77,6 @@ class PushNotification(Base):
         topic_id: str,
         response_data: dict[str, Any] | None
     ) -> PushNotification:
-        """
-        Record that a notification was sent for the given news item and topic.
-        """
         notification = cls(
             news_id=news_id,
             topic_id=topic_id,
