@@ -1,4 +1,6 @@
 import pytest
+import os
+from webtest import Upload
 
 
 @pytest.mark.flaky(reruns=5)
@@ -248,13 +250,56 @@ def test_view_upload_json(client):
     client.login_admin()
 
     def yield_paths():
-        membership_base_path = '/home/cyrill/pasimport/json/memberships'
+        base_path = '/home/cyrill/pasimport/json'
+        yield [base_path + '/organization.json']
         membership_count = 7
-        yield [
-            f'{membership_base_path}_{i}.json'
+        membership_paths = [
+            f'{base_path}/memberships_{i}.json'
             for i in range(1, membership_count + 1)
         ]
-        yield [f'people_{i}.json' for i in range(1, 3)]
-        yield ['organization.json']
+        assert all(
+            os.path.exists(path) for path in membership_paths
+        ), "Some membership paths don't exist"
+        yield membership_paths
+
+        # Yield people paths after validating existence
+        people_paths = [f'{base_path}/people_{i}.json' for i in range(1, 3)]
+        assert all(
+            os.path.exists(path) for path in people_paths
+        ), "Some people paths don't exist"
+        yield people_paths
 
     page = client.get('/pas-import')
+
+    def upload_file(filepath):
+        with open(filepath, 'rb') as f:
+            content = f.read()
+            return Upload(
+                os.path.basename(filepath),
+                content,
+                'application/json'
+            )
+
+    # Get all paths
+    paths_generator = yield_paths()
+    membership_paths = next(paths_generator)
+    page.form['memberships_source'] = [
+        upload_file(path) for path in membership_paths
+    ]
+    people_paths = next(paths_generator)
+    page.form['people_source'] = [
+        upload_file(path) for path in people_paths
+    ]
+    org_paths = next(paths_generator)
+    page.form['organizations_source'] = [
+        upload_file(path) for path in org_paths
+    ]
+    assert page.form['clean']
+    return
+
+    # Submit the form
+    result = page.form.submit()
+
+    # Add assertions as needed
+    assert result.status_code == 200  # Or whatever status code you expect
+    # You might want to add more assertions to verify the import was successful
