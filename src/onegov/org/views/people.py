@@ -21,6 +21,21 @@ if TYPE_CHECKING:
     from webob import Response as BaseResponse
 
 
+def organisations_as_dict(person: Person) -> dict[str, list[str]]:
+    current_org: str = ''
+    org_dict: dict[str, list[str]] = {}
+    for org in person.content.get('organisations_multiple', []):
+        if org.startswith('-'):
+            sub_org = org.lstrip('-')
+            if current_org:
+                org_dict.setdefault(current_org, []).append(sub_org)
+        else:
+            current_org = org
+        if current_org not in org_dict:
+            org_dict[current_org] = []
+    return org_dict
+
+
 @OrgApp.html(model=PersonCollection, template='people.pt', permission=Public)
 def view_people(
     self: PersonCollection,
@@ -48,6 +63,7 @@ def view_people(
         'count': len(people),
         'people': AtoZPeople(request).get_items_by_letter().items(),
         'layout': layout or PersonCollectionLayout(self, request),
+        'organisations_as_dict': organisations_as_dict,
         'organisations': orgs,
         'sub_organisations': sub_orgs,
         'selected_organisation': selected_org,
@@ -69,7 +85,8 @@ def view_person(
         'title': self.title,
         'person': self,
         'layout': layout or PersonLayout(self, request),
-        'organization_to_function': org_to_func
+        'organization_to_function': org_to_func,
+        'organisations_as_dict': organisations_as_dict,
     }
 
 
