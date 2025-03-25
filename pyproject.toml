@@ -29,6 +29,8 @@ omit = ["*/tests/*", "**/upgrade.py"]
 
 [tool.coverage.report]
 ignore_errors = true
+skip_covered = true
+skip_empty = true
 exclude_lines = [
     "pragma: no cover",
     "pragma: unreachable",
