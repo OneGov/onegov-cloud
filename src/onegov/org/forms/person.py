@@ -37,9 +37,6 @@ class PersonForm(Form):
         choices=[],
     )
 
-    organisation = StringField(_('Organisation'))
-    sub_organisation = StringField(_('Sub organisation'))
-
     email = EmailField(_('E-Mail'))
     phone = StringField(_('Phone'))
     phone_direct = StringField(_('Direct Phone Number or Mobile'))

@@ -67,6 +67,16 @@ def view_people(
     selected_org = str(request.params.get('organisation', ''))
     selected_sub_org = str(request.params.get('sub_organisation', ''))
 
+    top_orgs = get_top_level_organisations(
+        request.app.org.organisation_hierarchy)
+    sub_orgs = get_sub_organisations(
+            request.app.org.organisation_hierarchy)
+    if selected_org:
+        index = top_orgs.index(selected_org)
+        top_org = request.app.org.organisation_hierarchy[index]
+        if isinstance(top_org, dict):
+            sub_orgs = top_org[selected_org]
+
     people = self.people_by_organisation(selected_org, selected_sub_org)
 
     class AtoZPeople(AtoZ[Person]):
@@ -83,10 +93,8 @@ def view_people(
         'people': AtoZPeople(request).get_items_by_letter().items(),
         'layout': layout or PersonCollectionLayout(self, request),
         'organisations_as_dict': organisations_as_dict,
-        'organisations': get_top_level_organisations(
-            request.app.org.organisation_hierarchy),
-        'sub_organisations': get_sub_organisations(
-            request.app.org.organisation_hierarchy),
+        'organisations': top_orgs,
+        'sub_organisations': sub_orgs,
         'selected_organisation': selected_org,
         'selected_sub_organisation': selected_sub_org
     }
