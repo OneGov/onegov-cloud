@@ -2,7 +2,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE 1.0\n"
-"POT-Creation-Date: 2025-03-11 16:35+0100\n"
+"POT-Creation-Date: 2025-03-20 14:09+0100\n"
 "PO-Revision-Date: 2022-03-15 10:21+0100\n"
 "Last-Translator: Marc Sommerhalder <marc.sommerhalder@seantis.ch>\n"
 "Language-Team: German\n"
@@ -205,6 +205,16 @@ msgstr "Diese Seite ist geheim"
 
 msgid "Cancel"
 msgstr "Abbrechen"
+
+msgid "mTAN Access Limit Exceeded"
+msgstr "mTAN Zugriffslimit Überschritten"
+
+msgid ""
+"You have exceeded the maximum number of unique accesses to protected "
+"resources. Please try again at a later date."
+msgstr ""
+"Sie haben die maximale Anzahl an Zugriffen auf geschützte Inhalte "
+"überschritten. Bitte versuchen Sie es zu einem späteren Zeitpunkt wieder."
 
 msgid "ID Payment Provider"
 msgstr "ID beim Zahlungsanbieter"
@@ -2015,13 +2025,6 @@ msgstr ""
 
 msgid "Invalid YAML format. Please refer to the example."
 msgstr "Ungültiges YAML Format. Bitte beachten Sie das Beispiel."
-
-msgid ""
-"Invalid format. Please define an organisation name with topics and subtopics "
-"according the example."
-msgstr ""
-"Ungültiges Format. Bitte definieren Sie eine Organisation mit Themen und "
-"Unterthemen wie im Beispiel."
 
 msgid ""
 "Invalid format. Please define topics and subtopics according to the example."

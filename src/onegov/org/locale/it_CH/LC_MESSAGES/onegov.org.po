@@ -2,7 +2,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: \n"
-"POT-Creation-Date: 2025-03-11 16:35+0100\n"
+"POT-Creation-Date: 2025-03-20 14:09+0100\n"
 "PO-Revision-Date: 2022-03-15 10:52+0100\n"
 "Last-Translator: \n"
 "Language-Team: \n"
@@ -206,6 +206,16 @@ msgstr "Questo sito è segreto"
 
 msgid "Cancel"
 msgstr "Annulla"
+
+msgid "mTAN Access Limit Exceeded"
+msgstr "Limite di accesso mTAN superato"
+
+msgid ""
+"You have exceeded the maximum number of unique accesses to protected "
+"resources. Please try again at a later date."
+msgstr ""
+"È stato superato il numero massimo di accessi unici alle risorse protette. "
+"Riprovare in un secondo momento."
 
 msgid "ID Payment Provider"
 msgstr "ID elaboratore dei pagamenti"
@@ -2027,13 +2037,6 @@ msgstr ""
 
 msgid "Invalid YAML format. Please refer to the example."
 msgstr "Formato YAML non valido. Fare riferimento all'esempio."
-
-msgid ""
-"Invalid format. Please define an organisation name with topics and subtopics "
-"according the example."
-msgstr ""
-"Formato non valido. Definire un nome di organizzazione con argomenti e "
-"sottoargomenti secondo l'esempio."
 
 msgid ""
 "Invalid format. Please define topics and subtopics according to the example."

@@ -57,9 +57,9 @@ def create_new_organisation(
         module_path('onegov.town6', form_locales[locale]))
 
     translator = app.translations.get(locale)
-    assert translator is not None
 
     def translate(text: TranslationString) -> str:
+        assert translator is not None
         return text.interpolate(translator.gettext(text))
 
     add_pages(session, path)
