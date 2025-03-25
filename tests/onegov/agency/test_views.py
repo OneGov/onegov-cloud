@@ -721,7 +721,7 @@ def test_excel_export_not_logged_in(client):
     assert page.status == '403 Forbidden'
 
 
-@mark.flaky(reruns=3)
+@mark.flaky(reruns=3, only_rerun=None)
 def test_basic_search(client_with_es):
     client = client_with_es
 
@@ -769,7 +769,7 @@ def test_basic_search(client_with_es):
     ).json
 
 
-@mark.flaky(reruns=3)
+@mark.flaky(reruns=3, only_rerun=None)
 def test_search_recently_published_object(client_with_es):
     client = client_with_es
     client.login_admin()
