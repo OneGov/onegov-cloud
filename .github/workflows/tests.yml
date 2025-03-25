@@ -206,6 +206,8 @@ jobs:
           --only-rerun "ReferenceError: $ is not defined" \
           --only-rerun "FileNotFoundError: [Errno 2] No such file" \
           --only-rerun "Bad response: 404 Not Found" \
+          --junit-xml=/tmp/junit.xml \
+          -o junit_family=legacy \
           --cov \
           --cov-config=pyproject.toml \
           --codecov \
