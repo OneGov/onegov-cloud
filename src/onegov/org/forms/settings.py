@@ -1241,7 +1241,11 @@ class NewsletterSettingsForm(Form):
             self.newsletter_categories.data = ''
             return
 
-        yaml_data = yaml.safe_dump(categories, default_flow_style=False)
+        yaml_data = yaml.safe_dump(
+            categories,
+            default_flow_style=False,
+            allow_unicode=True
+        )
         self.newsletter_categories.data = yaml_data
 
         if model.notify_on_unsubscription:
