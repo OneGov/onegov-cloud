@@ -5,11 +5,20 @@ build-backend = "setuptools.build_meta"
 [tool.pytest.ini_options]
 log_level = "INFO"
 testpaths = ["tests"]
+python_classes = []
+python_files = ["test_*.py"]
 timeout = 300
 asyncio_default_fixture_loop_scope = "function"
 filterwarnings = [
     "ignore:pkg_resources is deprecated as an API",
-    "ignore:Deprecated call to `pkg_resources\\.declare_namespace\\('.*'\\):DeprecationWarning"
+    "ignore:Deprecated call to `pkg_resources\\.declare_namespace\\('.*'\\):DeprecationWarning",
+    # potential issue for future upgrades
+    "ignore:invalid escape sequence:DeprecationWarning:pdfrw.*:",
+    "ignore:invalid escape sequence:DeprecationWarning:webassets.*:",
+    "ignore:'crypt':DeprecationWarning:passlib.*:",
+    # fixed upstream
+    "ignore:(tagMap|typeMap) is deprecated:DeprecationWarning:pyasn1.*:",
+    "ignore:'cgi':DeprecationWarning:webob.*:",
 ]
 
 [tool.coverage.run]
