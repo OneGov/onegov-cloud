@@ -36,6 +36,27 @@ def organisations_as_dict(person: Person) -> dict[str, list[str]]:
     return org_dict
 
 
+def get_top_level_organisations(
+        data: list[dict[str, list[str]] | str]) -> list[str]:
+    top_level_organisations: list[str] = []
+    for item in data:
+        if isinstance(item, dict):
+            top_level_organisations.extend(item.keys())
+        elif isinstance(item, str):
+            top_level_organisations.append(item)
+    return top_level_organisations
+
+
+def get_sub_organisations(
+        data: list[dict[str, list[str]] | str]) -> list[str]:
+    sub_organisations: set[str] = set()
+    for item in data:
+        if isinstance(item, dict):
+            for sub_orgs in item.values():
+                sub_organisations.update(sub_orgs)
+    return list(sub_organisations)
+
+
 @OrgApp.html(model=PersonCollection, template='people.pt', permission=Public)
 def view_people(
     self: PersonCollection,
@@ -47,8 +68,6 @@ def view_people(
     selected_sub_org = str(request.params.get('sub_organisation', ''))
 
     people = self.people_by_organisation(selected_org, selected_sub_org)
-    orgs = self.unique_organisations()
-    sub_orgs = self.unique_sub_organisations(selected_org)
 
     class AtoZPeople(AtoZ[Person]):
 
@@ -64,8 +83,10 @@ def view_people(
         'people': AtoZPeople(request).get_items_by_letter().items(),
         'layout': layout or PersonCollectionLayout(self, request),
         'organisations_as_dict': organisations_as_dict,
-        'organisations': orgs,
-        'sub_organisations': sub_orgs,
+        'organisations': get_top_level_organisations(
+            request.app.org.organisation_hierarchy),
+        'sub_organisations': get_sub_organisations(
+            request.app.org.organisation_hierarchy),
         'selected_organisation': selected_org,
         'selected_sub_organisation': selected_sub_org
     }
