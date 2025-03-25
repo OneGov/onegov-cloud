@@ -810,7 +810,7 @@ def test_serialization_failure(postgres_dsn):
     assert isinstance(rollbacks[0].orig, TransactionRollbackError)
 
 
-@pytest.mark.flaky(reruns=3)
+@pytest.mark.flaky(reruns=3, only_rerun=None)
 @pytest.mark.parametrize("number_of_retries", range(1, 10))
 def test_application_retries(postgres_dsn, number_of_retries, redis_url):
 
