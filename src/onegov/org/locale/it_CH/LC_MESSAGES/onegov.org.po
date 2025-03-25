@@ -1131,6 +1131,12 @@ msgstr "Editoriale"
 msgid "A few words about this edition of the newsletter"
 msgstr "Qualche parola su questa edizione della newsletter"
 
+msgid "Closing remark"
+msgstr "Osservazione finale"
+
+msgid "Closing remark at the end of the newsletter"
+msgstr "Osservazione finale alla fine della newsletter"
+
 msgid "Latest news"
 msgstr "Ultime notizie"
 
