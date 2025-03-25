@@ -231,10 +231,11 @@ def create_hierarchy_and_move_organisations_to_content(
         hierarchy_yaml += f'- {org}:\n'
         for sub_org in sub_orgs:
             hierarchy_yaml += f'  - {sub_org}\n'
-    data = yaml.safe_load(hierarchy_yaml)
-    organisation = session.query(Organisation).first()
-    if organisation:
-        organisation.organisation_hierarchy = data
+    if hierarchy_yaml:
+        data = yaml.safe_load(hierarchy_yaml)
+        organisation = session.query(Organisation).first()
+        if organisation:
+            organisation.organisation_hierarchy = data
 
     for person in people:
         if person.organisation:
