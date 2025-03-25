@@ -13,8 +13,8 @@ filterwarnings = [
     "ignore:pkg_resources is deprecated as an API",
     "ignore:Deprecated call to `pkg_resources\\.declare_namespace\\('.*'\\):DeprecationWarning",
     # potential issue for future upgrades
-    "ignore:invalid escape sequence:DeprecationWarning:pdfrw.*:",
-    "ignore:invalid escape sequence:DeprecationWarning:webassets.*:",
+    "ignore:invalid escape sequence '[^']+':DeprecationWarning:pdfrw.*:",
+    "ignore:invalid escape sequence '[^']+':DeprecationWarning:webassets.*:",
     "ignore:'crypt':DeprecationWarning:passlib.*:",
     # fixed upstream
     "ignore:(tagMap|typeMap) is deprecated:DeprecationWarning:pyasn1.*:",
