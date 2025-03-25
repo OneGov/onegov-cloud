@@ -573,6 +573,8 @@ def test_newsletter_send(client):
     new.select_checkbox("occurrences", "150 Jahre Govikon")
     new.select_checkbox("occurrences", "Gemeinsames Turnen")
 
+    new.form['closing_remark'] = '<p>Closing Remarks</p>'
+
     newsletter = new.form.submit().follow()
 
     # add some recipients the quick wqy
@@ -597,6 +599,7 @@ def test_newsletter_send(client):
     # send.form['categories'] = []
     newsletter = send.form.submit().follow()
     assert '"Our town is AWESOME" wurde an 2 Empfänger gesendet' in newsletter
+    assert '<p>Closing Remarks</p>' in newsletter
 
     page = anon.get('/newsletters')
     assert "gerade eben" in page
@@ -648,6 +651,7 @@ def test_newsletter_send(client):
     assert 'Testnews' in message
     assert 'My Lead Text' in message
     assert 'My Html editor text' in message
+    assert 'Closing Remarks' in message
 
 
 def test_newsletter_send_with_categories(client):
