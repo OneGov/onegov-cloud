@@ -21,6 +21,7 @@ from onegov.form.fields import MarkupField
 from onegov.form.fields import MultiCheckboxField
 from onegov.form.fields import PreviewField
 from onegov.form.fields import TagsField
+from onegov.form.fields import URLField
 from onegov.form.validators import StrictOptional
 from onegov.gever.encrypt import encrypt_symmetric, decrypt_symmetric
 from onegov.gis import CoordinatesField
@@ -45,11 +46,10 @@ from wtforms.fields import PasswordField
 from wtforms.fields import RadioField
 from wtforms.fields import StringField
 from wtforms.fields import TextAreaField
-from wtforms.fields import URLField
 from wtforms.validators import InputRequired
 from wtforms.validators import NumberRange
 from wtforms.validators import Optional
-from wtforms.validators import URL as UrlRequired
+from wtforms.validators import URL as URLValidator
 from wtforms.validators import ValidationError
 
 
@@ -215,7 +215,7 @@ class FooterSettingsForm(Form):
         description=_('URL pointing to a contact page'),
         fieldset=_('Information'),
         render_kw={'class_': 'internal-url'},
-        validators=[UrlRequired(), Optional()]
+        validators=[Optional()]
     )
 
     opening_hours = TextAreaField(
@@ -229,7 +229,7 @@ class FooterSettingsForm(Form):
         description=_('URL pointing to an opening hours page'),
         fieldset=_('Information'),
         render_kw={'class_': 'internal-url'},
-        validators=[UrlRequired(), Optional()]
+        validators=[Optional()]
     )
 
     hide_onegov_footer = BooleanField(
@@ -245,42 +245,42 @@ class FooterSettingsForm(Form):
         label=_('Facebook'),
         description=_('URL pointing to the Facebook site'),
         fieldset=_('Social Media'),
-        validators=[UrlRequired(), Optional()]
+        validators=[Optional()]
     )
 
     twitter_url = URLField(
         label=_('Twitter'),
         description=_('URL pointing to the Twitter site'),
         fieldset=_('Social Media'),
-        validators=[UrlRequired(), Optional()]
+        validators=[Optional()]
     )
 
     youtube_url = URLField(
         label=_('YouTube'),
         description=_('URL pointing to the YouTube site'),
         fieldset=_('Social Media'),
-        validators=[UrlRequired(), Optional()]
+        validators=[Optional()]
     )
 
     instagram_url = URLField(
         label=_('Instagram'),
         description=_('URL pointing to the Instagram site'),
         fieldset=_('Social Media'),
-        validators=[UrlRequired(), Optional()]
+        validators=[Optional()]
     )
 
     linkedin_url = URLField(
         label=_('Linkedin'),
         description=_('URL pointing to the LinkedIn site'),
         fieldset=_('Social Media'),
-        validators=[UrlRequired(), Optional()]
+        validators=[Optional()]
     )
 
     tiktok_url = URLField(
         label=_('TikTok'),
         description=_('URL pointing to the TikTok site'),
         fieldset=_('Social Media'),
-        validators=[UrlRequired(), Optional()]
+        validators=[Optional()]
     )
 
     custom_link_1_name = StringField(
@@ -293,7 +293,7 @@ class FooterSettingsForm(Form):
         label=_('URL'),
         description=_('URL to internal/external site'),
         fieldset=_('Custom Link 1'),
-        validators=[UrlRequired(), Optional()]
+        validators=[Optional()]
     )
 
     custom_link_2_name = StringField(
@@ -306,7 +306,7 @@ class FooterSettingsForm(Form):
         label=_('URL'),
         description=_('URL to internal/external site'),
         fieldset=_('Custom Link 2'),
-        validators=[UrlRequired(), Optional()]
+        validators=[Optional()]
     )
 
     custom_link_3_name = StringField(
@@ -319,7 +319,7 @@ class FooterSettingsForm(Form):
         label=_('URL'),
         description=_('URL to internal/external site'),
         fieldset=_('Custom Link 3'),
-        validators=[UrlRequired(), Optional()]
+        validators=[Optional()]
     )
 
     partner_1_name = StringField(
@@ -337,7 +337,7 @@ class FooterSettingsForm(Form):
         label=_('Website'),
         description=_("The partner's website"),
         fieldset=_('First Partner'),
-        validators=[UrlRequired(), Optional()]
+        validators=[Optional()]
     )
 
     partner_2_name = StringField(
@@ -355,7 +355,7 @@ class FooterSettingsForm(Form):
         label=_('Website'),
         description=_("The partner's website"),
         fieldset=_('Second Partner'),
-        validators=[UrlRequired(), Optional()]
+        validators=[Optional()]
     )
 
     partner_3_name = StringField(
@@ -373,7 +373,7 @@ class FooterSettingsForm(Form):
         label=_('Website'),
         description=_("The partner's website"),
         fieldset=_('Third Partner'),
-        validators=[UrlRequired(), Optional()]
+        validators=[Optional()]
     )
 
     partner_4_name = StringField(
@@ -391,7 +391,7 @@ class FooterSettingsForm(Form):
         label=_('Website'),
         description=_("The partner's website"),
         fieldset=_('Fourth Partner'),
-        validators=[UrlRequired(), Optional()]
+        validators=[Optional()]
     )
 
     def ensure_correct_footer_column_width(self) -> bool | None:
@@ -517,7 +517,7 @@ class HeaderSettingsForm(Form):
         label=_('URL'),
         description=_('Optional'),
         fieldset=_('Text header left side'),
-        validators=[UrlRequired(), Optional()]
+        validators=[Optional()]
     )
 
     left_header_color = ColorField(
@@ -792,7 +792,7 @@ class AnalyticsSettingsForm(Form):
         label=_('Analytics URL'),
         description=_('URL pointing to the analytics page'),
         render_kw={'readonly': True},
-        validators=[UrlRequired(), Optional()],
+        validators=[Optional()],
         text='',
         kind='panel',
         hide_label=False
@@ -1326,7 +1326,7 @@ class GeverSettingsForm(Form):
 
     gever_endpoint = URLField(
         _('Gever API Endpoint where the documents are uploaded.'),
-        [InputRequired(), UrlRequired(), validate_https],
+        [InputRequired(), URLValidator(), validate_https],
         description=_('Website address including https://'),
     )
 

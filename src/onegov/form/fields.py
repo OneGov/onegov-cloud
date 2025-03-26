@@ -9,7 +9,6 @@ from datetime import timedelta
 from itertools import zip_longest
 from email_validator import validate_email, EmailNotValidError
 from markupsafe import escape, Markup
-from wtforms.fields.simple import URLField
 
 from onegov.core.html import sanitize_html
 from onegov.core.utils import binary_to_dictionary
@@ -47,6 +46,7 @@ from wtforms.fields import TimeField as DefaultTimeField
 from wtforms.utils import unset_value
 from wtforms.validators import DataRequired
 from wtforms.validators import InputRequired
+from wtforms.validators import URL
 from wtforms.validators import ValidationError
 from wtforms.widgets import CheckboxInput, ColorInput
 
@@ -84,6 +84,81 @@ FIELDS_NO_RENDERED_PLACEHOLDER = (
     'UploadField', 'ChosenSelectField', 'ChosenSelectMultipleField',
     'PreviewField', 'PanelField', 'UploadFileWithORMSupport'
 )
+
+
+class URLField(StringField):
+    """
+    A non-native version of the URL field that uses a default text field.
+
+    It instead relies on `wtforms.validators.URL` and normalizes URLs with
+    missing scheme to use `https://` or a given scheme by default. This
+    behavior can be turned off by setting `default_scheme` to `None`.
+    """
+    def __init__(
+        self,
+        label: str | None = None,
+        validators: Validators[FormT, Self] | None = None,
+        filters: Sequence[Filter] = (),
+        description: str = '',
+        id: str | None = None,
+        default: str | None = None,
+        widget: Widget[Self] | None = None,
+        render_kw: dict[str, Any] | None = None,
+        name: str | None = None,
+        default_scheme: str | None = 'https',
+        _form: BaseForm | None = None,
+        _prefix: str = '',
+        _translations: _SupportsGettextAndNgettext | None = None,
+        _meta: DefaultMeta | None = None,
+        # onegov specific kwargs that get popped off
+        *,
+        fieldset: str | None = None,
+        depends_on: Sequence[Any] | None = None,
+        pricing: PricingRules | None = None,
+    ) -> None:
+
+        if validators is None:
+            validators = ()
+
+        if not any(isinstance(validator, URL) for validator in validators):
+            validators = [
+                *validators,
+                URL(allow_ip=False)
+            ]
+
+        self.default_scheme = default_scheme
+
+        if default_scheme:
+            if render_kw is None:
+                render_kw = {}
+
+            render_kw.setdefault('placeholder', f'{self.default_scheme}://')
+
+        super().__init__(
+            label=label,
+            validators=validators,
+            filters=filters,
+            description=description,
+            id=id,
+            default=default,
+            widget=widget,
+            render_kw=render_kw,
+            name=name,
+            _form=_form,
+            _prefix=_prefix,
+            _translations=_translations,
+            _meta=_meta,
+        )
+
+    def process_formdata(self, valuelist: list[RawFormValue]) -> None:
+        if not valuelist:
+            return
+
+        # if no scheme was given, use the default scheme
+        if self.default_scheme and '://' not in (value := valuelist[0]):
+            valuelist[0] = f'{self.default_scheme}://{value}'
+
+        super().process_formdata(valuelist)
 
 
 class TimeField(DefaultTimeField):
