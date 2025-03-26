@@ -457,17 +457,21 @@ def test_submit_event(broadcast, authenticate, connect, client, skip):
     form_page = confirmation_page.click("Bearbeiten Sie diese Veranstaltung.")
     form_page.form['description'] = "My event is exceptional."
     form_page.form['repeat'] = 'dates'
-    next = date.today() + timedelta(days=3)
-    form_page.form['dates'] = json.dumps({
-        'values': [{
-            'date': next.isoformat(),
-        }]
-    })
+    next_dates = [date.today() + timedelta(days=3),
+                  date.today() + timedelta(days=6)]
+    form_page.form['dates'] = json.dumps(
+        {
+            'values': [
+                {'date': d.isoformat()} for d in next_dates
+            ]
+        }
+    )
     preview_page = form_page.form.submit().follow()
     assert "My event is exceptional." in preview_page
     assert "Alle Termine" in preview_page
     assert start_date.strftime('%d.%m.%Y') in preview_page
-    assert next.strftime('%d.%m.%Y') in preview_page
+    for d in next_dates:
+        assert d.strftime('%d.%m.%Y') in preview_page
 
     session = client.app.session()
     event = session.query(Event).filter_by(title="My Event").one()
@@ -506,7 +510,7 @@ def test_submit_event(broadcast, authenticate, connect, client, skip):
             start_date, format='d. MMMM yyyy', locale='de'
         )
     ) in ticket_page
-    for d in [start_date, next]:
+    for d in next_dates + [start_date]:
         assert d.strftime('%d.%m.%Y') in ticket_page
 
     client.logout()
@@ -515,7 +519,7 @@ def test_submit_event(broadcast, authenticate, connect, client, skip):
     form_page = confirmation_page.click("Bearbeiten Sie diese Veranstaltung.")
     form_page.form['organizer'] = "A carful organizer"
     form_page.form['organizer_email'] = "info@myevents.ch"
-    for d in [start_date, next]:
+    for d in next_dates + [start_date]:
         assert d.isoformat() in form_page
     preview_page = form_page.form.submit().follow()
     assert "My event is exceptional." in preview_page
@@ -555,7 +559,7 @@ def test_submit_event(broadcast, authenticate, connect, client, skip):
             start_date, format='d. MMMM yyyy', locale='de'
         )
     ) in ticket_page
-    for d in [start_date, next]:
+    for d in next_dates + [start_date]:
         assert d.strftime('%d.%m.%Y') in ticket_page
     assert "Ihre Veranstaltung wurde angenommen" in message
 
