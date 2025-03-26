@@ -122,8 +122,8 @@ class URLField(StringField):
 
         if not any(isinstance(validator, URL) for validator in validators):
             validators = [
-                *validators,
-                URL(allow_ip=False)
+                URL(allow_ip=False),
+                *validators
             ]
 
         self.default_scheme = default_scheme
@@ -155,7 +155,8 @@ class URLField(StringField):
             return
 
         # if no scheme was given, use the default scheme
-        if self.default_scheme and '://' not in (value := valuelist[0]):
+        value = valuelist[0]
+        if value and self.default_scheme and '://' not in value:
             valuelist[0] = f'{self.default_scheme}://{value}'
 
         super().process_formdata(valuelist)

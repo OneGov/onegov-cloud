@@ -558,7 +558,7 @@ def test_url_field():
     assert field.validators[0].validate_hostname.allow_ip is False
 
     field.process_formdata([''])
-    assert field.data == 'https://'
+    assert field.data == ''
     assert not field.validate(form)
 
     field.process_formdata(['bogus'])
