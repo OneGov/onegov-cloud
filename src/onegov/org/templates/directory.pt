@@ -25,16 +25,21 @@
                     <p tal:case="False">${directory.configuration.empty_notice}</p>
                 </tal:b>
 
-                <!--? display in accordion mode -->
+                <!-- display content fields of each entry in accordion mode -->
                 <ul tal:condition="directory.layout == 'accordion'" class="accordion" data-accordion>
                     <li tal:repeat="entry entries" class="accordion-navigation small-12-cell" style="">
                         <a tal:attributes="href python:'#panel'+str(repeat['entry'].index)">
                             <span class="h5">${entry.title}</span>
                         </a>
                         <div tal:attributes="id python:'panel'+str(repeat['entry'].index)" class="content">
-                            <ul tal:repeat="field directory.fields" style="list-style: none; margin-left: 0">
-                                <li tal:condition="field.type == 'textarea'" tal:define="key field.human_id; value entry.values[field.id]" tal:content="Markup('<strong>{}</strong>: <br>{}').format(key, value)" style="white-space: pre-wrap;"></li>
-                                <li tal:condition="field.type != 'textarea'" tal:define="key field.human_id; value entry.values[field.id]" tal:content="Markup('<strong>{}</strong>: {}').format(key, value)"></li>
+                            <ul tal:repeat="field (field for field in directory.fields if field.id in (f.id for f in entry.content_fields))" style="list-style: none; margin-left: 0">
+                                <tal:b tal:define="value entry.values[field.id]; field_type field.type.lower(); url layout.field_download_link([f for f in entry.content_fields if f.id == field.id][0])">
+                                    <li tal:condition="field_type == 'code'" tal:content="layout.linkify(render_untrusted_markdown(value))"></li>
+                                    <li tal:condition="field_type in ('textarea', 'textareafield')" tal:content="layout.linkify(value)" style="white-space: pre-wrap;"></li>
+                                    <li tal:condition="field_type in ('fileinput') and url"><img
+                                            src="${url}" alt=""/></li>
+                                    <li tal:condition="field_type not in ('fileinput', 'textarea', 'textareafield', 'code')" tal:content="value"></li>
+                                </tal:b>
                             </ul>
                             <ul style="list-style: none; margin-left: 0">
                                 <li>
