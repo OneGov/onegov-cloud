@@ -122,8 +122,8 @@ class URLField(StringField):
 
         if not any(isinstance(validator, URL) for validator in validators):
             validators = [
-                URL(allow_ip=False),
-                *validators
+                *validators,
+                URL(allow_ip=False)
             ]
 
         self.default_scheme = default_scheme
