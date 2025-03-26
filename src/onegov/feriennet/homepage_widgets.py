@@ -70,7 +70,7 @@ class ActivitiesWidget:
             unique_activity_ids = list(set(activity_ids))[:6]
             activities = VacationActivityCollection(layout.app.session()
                                                     ).query(
-            ).filter(VacationActivity.id.in_(activity_ids)).all()
+            ).filter(VacationActivity.id.in_(unique_activity_ids)).all()
 
             if len(activities) < 6:
                 filter_obj = ActivityFilter()
