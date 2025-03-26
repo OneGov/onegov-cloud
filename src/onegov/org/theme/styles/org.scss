@@ -3566,6 +3566,14 @@ button {
 
 }
 
+.accordion .accordion-navigation .field-display {
+    margin-bottom: 1rem;
+}
+.accordion .accordion-navigation .field-display dd a {
+    padding: 0;
+    display: inline;
+}
+
 /*
     Popup Menu
 */

@@ -32,18 +32,18 @@
                             <span class="h5">${entry.title}</span>
                         </a>
                         <div tal:attributes="id python:'panel'+str(repeat['entry'].index)" class="content">
-                            <ul tal:repeat="field (field for field in directory.fields if field.id in (f.id for f in entry.content_fields))" style="list-style: none; margin-left: 0">
-                                <tal:b tal:define="value entry.values[field.id]; field_type field.type.lower(); url layout.field_download_link([f for f in entry.content_fields if f.id == field.id][0])">
-                                    <li tal:condition="field_type == 'code'" tal:content="layout.linkify(render_untrusted_markdown(value))"></li>
-                                    <li tal:condition="field_type in ('textarea', 'textareafield')" tal:content="layout.linkify(value)" style="white-space: pre-wrap;"></li>
-                                    <li tal:condition="field_type in ('fileinput') and url"><img
-                                            src="${url}" alt=""/></li>
-                                    <li tal:condition="field_type not in ('fileinput', 'textarea', 'textareafield', 'code')" tal:content="value"></li>
-                                </tal:b>
-                            </ul>
-                            <ul style="list-style: none; margin-left: 0">
+                            <metal:b use-macro="layout.macros['display_fields']"
+                                 tal:define="
+                                     fields entry.content_fields;
+                                     allow_downloads True;
+                                     allow_views True;
+                                     form entry.directory.form_obj;
+                                     linkify_display True;
+                                 "
+                            />
+                            <ul tal:condition="request.is_manager" style="list-style: none; margin-left: 0">
                                 <li>
-                                    <a tal:condition="request.is_manager" class="edit-link" tal:attributes="href request.link(entry, 'edit')">
+                                    <a class="edit-link" tal:attributes="href request.link(entry, 'edit')">
                                         <i class="fa fa-edit"></i>
                                     </a>
                                 </li>
