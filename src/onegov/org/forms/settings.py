@@ -706,30 +706,6 @@ class HomepageSettingsForm(Form):
 
 class ModuleSettingsForm(Form):
 
-    hidden_people_fields = MultiCheckboxField(
-        label=_('Hide these fields for non-logged-in users'),
-        fieldset=_('People'),
-        choices=[
-            ('salutation', _('Salutation')),
-            ('academic_title', _('Academic Title')),
-            ('born', _('Born')),
-            ('profession', _('Profession')),
-            ('political_party', _('Political Party')),
-            ('parliamentary_group', _('Parliamentary Group')),
-            ('email', _('E-Mail')),
-            ('phone', _('Phone')),
-            ('phone_direct', _('Direct Phone Number or Mobile')),
-            ('organisation', _('Organisation')),
-            ('website', _('Website')),
-            ('website_2', _('Website 2')),
-            ('location_address', _('Location address')),
-            ('location_code_city', _('Location Code and City')),
-            ('postal_address', _('Postal address')),
-            ('postal_code_city', _('Postal Code and City')),
-            ('notes', _('Notes')),
-            ('external_user_id', _('External ID'))
-        ])
-
     mtan_session_duration_seconds = IntegerField(
         label=_('Duration of mTAN session'),
         description=_('Specify in number of seconds'),
@@ -1637,6 +1613,29 @@ class PeopleSettingsForm(Form):
             'rows': 16,
         },
     )
+
+    hidden_people_fields = MultiCheckboxField(
+        label=_('Hide these fields for non-logged-in users'),
+        choices=[
+            ('salutation', _('Salutation')),
+            ('academic_title', _('Academic Title')),
+            ('born', _('Born')),
+            ('profession', _('Profession')),
+            ('political_party', _('Political Party')),
+            ('parliamentary_group', _('Parliamentary Group')),
+            ('email', _('E-Mail')),
+            ('phone', _('Phone')),
+            ('phone_direct', _('Direct Phone Number or Mobile')),
+            ('organisation', _('Organisation')),
+            ('website', _('Website')),
+            ('website_2', _('Website 2')),
+            ('location_address', _('Location address')),
+            ('location_code_city', _('Location Code and City')),
+            ('postal_address', _('Postal address')),
+            ('postal_code_city', _('Postal Code and City')),
+            ('notes', _('Notes')),
+            ('external_user_id', _('External ID'))
+        ])
 
     def ensure_categories(self) -> bool | None:
         assert isinstance(self.organisation_hierarchy.errors, list)
