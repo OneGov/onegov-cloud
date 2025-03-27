@@ -8,12 +8,12 @@ from onegov.core.orm.types import UUID
 
 
 class SearchIndex(Base):
-    """ Full Text Search Index (fts) for all searchable models and entries.
+    """Full Text Search Index (fts) for all searchable models and entries.
 
-    This table contains index information for all searchable models,
-    including the owner of the index, the type of the owner, and the
-    full-text search data. It is used to facilitate efficient searching
-    across different models and entries.
+    This table contains fullt text search (fts) index information for all
+    searchable models, including the owner of the index, the type of the
+    owner, and the full-text search data. It is used to facilitate efficient
+    searching across different models and entries.
 
     """
 
@@ -21,16 +21,22 @@ class SearchIndex(Base):
 
     id = Column(Integer, primary_key=True)
 
+    #: The class name of the original model on the index entry
     owner_type = Column(String, nullable=False)
 
+    #: The int id of the original model if it is an integer
     owner_id_int = Column(Integer, nullable=True)
 
+    #: The uuid id of the original model if it is a uuid
     owner_id_uuid = Column(UUID, nullable=True)
 
+    #: The string id of the original model if it is a string
     owner_id_str = Column(String, nullable=True)
 
+    #: The full text search index data (fts properties)
     fts_idx_data = Column(JSONB, default={})
 
+    #: The postgres full text search (fts) index
     fts_idx = Column(TSVECTOR)
 
     __mapper_args__ = {
