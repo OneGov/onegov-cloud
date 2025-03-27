@@ -411,11 +411,12 @@ def test_orm_event_translator_properties():
         published=True,
         likes=1000
     ))
-    assert translator.es_queue.qsize() == 1
-    assert translator.psql_queue.qsize() == 1
+    # queue tasks: 1 delete, 1 index
+    assert translator.es_queue.qsize() == 2
+    assert translator.psql_queue.qsize() == 2
 
     expected = {
-        'action': 'update',
+        'action': 'index',
         'schema': 'my-schema',
         'tablename': 'my-pages',
         'type_name': 'page',
@@ -441,7 +442,11 @@ def test_orm_event_translator_properties():
             }
         }
     }
+    delete_task = translator.es_queue.get()
+    assert delete_task['action'] == 'delete'
     assert translator.es_queue.get() == expected
+    delete_task = translator.psql_queue.get()
+    assert delete_task['action'] == 'delete'
     assert translator.psql_queue.get() == expected
     assert translator.es_queue.empty()
     assert translator.psql_queue.empty()
@@ -502,9 +507,9 @@ def test_orm_event_queue_overflow(capturelog):
     mappings = TypeMappingRegistry()
     mappings.register_type('tweet', {})
 
-    translator = ORMEventTranslator(mappings, max_queue_size=3)
+    translator = ORMEventTranslator(mappings, max_queue_size=4)
     translator.on_insert('foobar', Tweet(1))
-    translator.on_update('foobar', Tweet(2))
+    translator.on_update('foobar', Tweet(2))  # add two items to queue
     translator.on_delete('foobar', Tweet(3))
 
     assert len(capturelog.records(logging.ERROR)) == 0
@@ -753,8 +758,8 @@ def test_tags(es_client, session_manager_fts):
     assert psql_indexer.process()
 
     es_client.indices.refresh(index=es_index)
-    psql_indexer.delete_search_index(schema=schema)
     search = es_client.search(index=es_index)
+    psql_indexer.delete_search_index(schema=schema)
 
     assert search['hits']['total']['value'] == 1
     # TODO search for psql

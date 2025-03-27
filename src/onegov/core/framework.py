@@ -45,6 +45,9 @@ from more.transaction.main import transaction_tween_factory
 from more.webassets import WebassetsApp
 from more.webassets.core import webassets_injector_tween
 from more.webassets.tweens import METHODS, CONTENT_TYPES
+from sqlalchemy import MetaData, Table, Integer, String, Column
+from sqlalchemy.dialects.postgresql import JSONB, TSVECTOR
+
 from onegov.core import cache, log, utils
 from onegov.core import directives
 from onegov.core.crypto import stored_random_token
@@ -66,6 +69,7 @@ from webob.exc import HTTPConflict, HTTPServiceUnavailable
 
 
 from typing import overload, Any, Literal, TypeVar, TYPE_CHECKING
+
 if TYPE_CHECKING:
     from _typeshed import StrPath
     from _typeshed.wsgi import WSGIApplication, WSGIEnvironment, StartResponse
@@ -686,6 +690,7 @@ class Framework(
             ScopedPropertyObserver.enter_scope(self)
 
             self.session_manager.set_current_schema(self.schema)
+            self.create_search_index_table(self.schema)
 
             if not self.is_orm_cache_setup:
                 self.setup_orm_cache()
@@ -1499,10 +1504,37 @@ class Framework(
         except BadSignature:
             return None
 
+    def create_search_index_table(self, schema_name: str) -> None:
+        """Creates the search_index table in the given schema."""
+
+        engine = self.session_manager.engine
+
+        # create schema
+        if not engine.dialect.has_schema(engine, schema_name):
+            engine.execute(f'CREATE SCHEMA {schema_name}')
+
+        # verify search index table exists
+        if not engine.has_table('search_index', schema=schema_name):
+            metadata = MetaData(schema=schema_name)
+            search_index_table = Table(
+                'search_index',
+                metadata,
+                Column('id', Integer, primary_key=True),
+                Column('owner_type', String, nullable=False),
+                Column('owner_id_int', Integer, nullable=True),
+                Column('owner_id_uuid', String, nullable=True),
+                Column('owner_id_str', String, nullable=True),
+                Column('fts_idx_data', JSONB, default={}),
+                Column('fts_idx', TSVECTOR),
+            )
+
+            metadata.create_all(engine)
+            assert engine.has_table('search_index', schema=schema_name)
+
 
 @Framework.webasset_url()
 def get_webasset_url() -> str:
-    """ The webassets url needs to be unique so we can fix it before
+    """The webassets url needs to be unique so we can fix it before
     returning the generated html. See :func:`fix_webassets_url_factory`.
 
     """

@@ -211,7 +211,7 @@ class SearchApp(morepath.App):
 
         if self.has_database_connection:
             max_queue_size = int(cfg.get(
-                'elasticsarch_max_queue_size', '10000'))
+                'elasticsarch_max_queue_size', '20000'))
 
             self.es_mappings = TypeMappingRegistry()
 

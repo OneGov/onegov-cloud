@@ -175,7 +175,7 @@ class Search(Pagination[_M]):
 def locale_mapping(locale: str) -> str:
     mapping = {'de_CH': 'german', 'fr_CH': 'french', 'it_CH': 'italian',
                'rm_CH': 'english'}
-    return mapping.get(locale, 'english')
+    return mapping.get(locale, 'simple')
 
 
 class SearchPostgres(Pagination[_M]):
@@ -278,9 +278,9 @@ class SearchPostgres(Pagination[_M]):
                 model.fts_idx_data.contains({'es_public': True}))
 
         # as a member we only want to see public and member content
-        if self.request.is_member and hasattr(model, 'meta'):
+        if self.request.is_member:
             query = query.filter(
-                model.meta['access'].astext.in_(('public', 'member')))
+                model.fts_idx_data['access'].astext.in_(('public', 'member')))
 
         # as non-manager we only want to see public content
         elif not self.request.is_manager:
@@ -321,10 +321,12 @@ class SearchPostgres(Pagination[_M]):
                     Numeric)
         ).label('rank')
 
-        query = self.request.session.query(SearchIndex, decay_rank)
+        query = self.request.session.query(SearchIndex).filter(
+            SearchIndex.fts_idx.op('@@')(ts_query)
+        )
+        query = query.add_column(decay_rank)
         self.number_of_docs = query.count()
         query = self.filter_user_level(SearchIndex, query)
-        query = query.filter(SearchIndex.fts_idx.op('@@')(ts_query))
 
         for index_entry, rank in query:
             model = self.get_model_by_class_name(index_entry.owner_type)
@@ -339,6 +341,7 @@ class SearchPostgres(Pagination[_M]):
 
                 q = self.request.session.query(model)
                 q = q.filter(model.id == owner_id).first()
+
                 if q:
                     results.append((q, rank))
 

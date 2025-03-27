@@ -1038,7 +1038,8 @@ class ORMEventTranslator:
     def on_update(self, schema: str, obj: object) -> None:
         if not self.stopped:
             if isinstance(obj, Searchable):
-                self.index(schema, obj, update=True)
+                self.delete(schema, obj)
+                self.index(schema, obj)
 
     def on_delete(self, schema: str, obj: object) -> None:
         if not self.stopped:
@@ -1099,6 +1100,10 @@ class ORMEventTranslator:
                     translation['properties'][prop] = [convert(v) for v in raw]
                 else:
                     translation['properties'][prop] = convert(raw)
+
+            # adds access to properties if available
+            if hasattr(obj, 'access'):
+                translation['properties']['access'] = obj.access
 
             if obj.es_public:
                 contexts = {'es_suggestion_context': ['public']}

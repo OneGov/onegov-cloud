@@ -275,7 +275,6 @@ def test_search_publication_files(client_with_es):
 
     client.app.es_indexer.process()
     client.app.es_client.indices.refresh(index='_all')
-    client.app.psql_indexer.process()
 
     # elasticsearch
     assert 'Sample' in client.get('/search?q=Adobe')
@@ -292,7 +291,6 @@ def test_search_publication_files(client_with_es):
 
     client.app.es_indexer.process()
     client.app.es_client.indices.refresh(index='_all')
-    client.app.psql_indexer.process()
 
     # elasticsearch
     assert 'Sample' in client.get('/search?q=Adobe')

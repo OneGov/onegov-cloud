@@ -276,7 +276,6 @@ def test_search_publication_files(client_with_es):
 
     client.app.es_indexer.process()
     client.app.es_client.indices.refresh(index='_all')
-    client.app.psql_indexer.process()
 
     # elasticsearch
     assert 'Sample' in client.get('/search?q=Adobe')
@@ -293,7 +292,6 @@ def test_search_publication_files(client_with_es):
 
     client.app.es_indexer.process()
     client.app.es_client.indices.refresh(index='_all')
-    client.app.psql_indexer.process()
 
     # elasticsearch
     assert 'Sample' in client.get('/search?q=Adobe')
@@ -314,10 +312,7 @@ def test_search_hashtags(client_with_es):
     page.form['lead'] = "It is very good"
     page.form['text'] = "It is lots of fun #newhomepage"
 
-    page = page.form.submit().follow()
-
-    client.app.es_indexer.process()
-    client.app.es_client.indices.refresh(index='_all')
+    assert page.form.submit().follow().status_code == 200
 
     assert 'We have a new homepage' in client.get(
         '/search-postgres?q=%23newhomepage')
@@ -348,7 +343,7 @@ def test_ticket_chat_search(client_with_es):
 
     # send a message that should be findable through the search
     page.form['text'] = "I spelt my name wrong: it's deadbeef"
-    page = page.form.submit().follow()
+    assert page.form.submit().follow().status_code == 200
 
     # at this point logged in users should find the ticket by 'deadbeef'
     client.app.es_client.indices.refresh(index='_all')
@@ -422,6 +417,7 @@ def test_search_future_events_are_sorted_by_occurrence_date(client_with_es):
         events_redirect = form_page.form.submit().follow().follow()
         assert "erfolgreich erstellt" in events_redirect
 
+    client.app.es_indexer.process()
     client.app.es_client.indices.refresh(index='_all')
 
     # elasticsearch even sorts past events by occurrence date
