@@ -1,4 +1,4 @@
-<div metal:use-macro="layout.base" i18n:domain="onegov.town6">form.pt
+<div metal:use-macro="layout.base" i18n:domain="onegov.town6">
     <tal:b metal:fill-slot="title" tal:define="title title|layout.title">
         ${title}
     </tal:b>

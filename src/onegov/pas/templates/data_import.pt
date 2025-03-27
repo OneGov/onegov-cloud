@@ -3,45 +3,6 @@
             ${title}
     </tal:b>
     <tal:b metal:fill-slot="content">
-        <form method="POST" enctype="multipart/form-data" class="block-form">
-            <div class="form-check">
-              <input type="checkbox" class="form-check-input" id="${form.clean.id}" ${form.clean()}>
-              <label class="form-check-label" for="${form.clean.id}">
-                <span>${form.clean.label.text}</span>
-              </label>
-            </div>
-            <div>
-                <label class="form-label" for="${form.people_source.id}">
-                    <span>${form.people_source.label.text}</span>
-                </label>
-                    ${form.people_source()}
-                <p class="form-text text-muted">${form.people_source.description}</p>
-                <ul tal:condition="form.people_source.errors" class="form-errors">
-                    <li tal:repeat="error form.people_source.errors" tal:content="error" />
-                </ul>
-            </div>
-            <div>
-                <label class="form-label" for="${form.organizations_source.id}">
-                    <span>${form.organizations_source.label.text}</span>
-                </label>
-                    ${form.organizations_source()}
-                <p class="form-text text-muted">${form.organizations_source.description}</p>
-                <ul tal:condition="form.organizations_source.errors" class="form-errors">
-                    <li tal:repeat="error form.organizations_source.errors" tal:content="error" />
-                </ul>
-            </div>
-            <div>
-                <label class="form-label" for="${form.memberships_source.id}">
-                    <span>${form.memberships_source.label.text}</span>
-                </label>
-                    ${form.memberships_source()}
-                <p class="form-text text-muted">${form.memberships_source.description}</p>
-                <ul tal:condition="form.memberships_source.errors" class="form-errors">
-                    <li tal:repeat="error form.memberships_source.errors" tal:content="error" />
-                </ul>
-            </div>
-            <button type="submit" class="button" i18n:translate="Submit">Submit</button>
-        </form>
-
+        <div metal:use-macro="layout.macros['form']" tal:condition="form" />
     </tal:b>
 </div>

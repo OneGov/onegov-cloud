@@ -52,12 +52,6 @@ def clean(app) -> None:
         count = session.execute(text(f'SELECT COUNT(*) FROM {table}')).scalar()
         counts[table] = count
 
-    log.info(
-        f'Removing data from tables: {", ".join(f"{table}({count})" for table, count in counts.items())}',
-        fg='green',
-    )
-
-    # Truncate all tables in the correct order (respecting foreign key constraints)
     truncate_statement = """
         TRUNCATE TABLE
             pas_commission_memberships,
@@ -87,7 +81,8 @@ def handle_data_import(
     results = None
 
     if request.method == 'POST' and form.validate():
-        breakpoint()
+        if form.clean.data:
+            clean(request.app)
         try:
             results = import_zug_kub_data(
                 session=request.session,
@@ -102,8 +97,6 @@ def handle_data_import(
             log.error(f'Data import failed: {e}', exc_info=True)
             request.message(_('Data import failed.'), 'error')
             results = str(e)
-    elif request.method == 'POST':
-        request.message(_('There are errors in the form.'), 'error')
 
     return {
         'title': _('Import'),

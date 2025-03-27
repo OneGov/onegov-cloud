@@ -295,11 +295,10 @@ def test_view_upload_json(client):
         upload_file(path) for path in org_paths
     ]
     assert page.form['clean']
-    return
 
     # Submit the form
     result = page.form.submit()
+    result.showbrowser()
 
     # Add assertions as needed
-    assert result.status_code == 200  # Or whatever status code you expect
-    # You might want to add more assertions to verify the import was successful
+    assert result.status_code == 200
