@@ -12,7 +12,7 @@ from onegov.org import _, OrgApp
 from onegov.org.elements import Link
 from onegov.org.homepage_widgets import get_lead
 from onegov.org.layout import PageLayout, NewsLayout
-from onegov.org.models import News, Topic
+from onegov.org.models import News, NewsCollection, Topic
 from onegov.org.models.editor import Editor
 from onegov.page import PageCollection
 from webob import exc, Response
@@ -20,6 +20,8 @@ from webob import exc, Response
 
 from typing import TYPE_CHECKING
 if TYPE_CHECKING:
+    from collections.abc import Sequence
+
     from onegov.core.types import RenderData
     from onegov.org.request import OrgRequest
 
@@ -122,60 +124,21 @@ def view_topic(
     }
 
 
-@OrgApp.html(model=News, template='news.pt', permission=Public)
-def view_news(
-    self: News,
+@OrgApp.html(model=NewsCollection, template='news.pt', permission=Public)
+def view_news_collection(
+    self: NewsCollection,
     request: OrgRequest,
     layout: NewsLayout | None = None
 ) -> RenderData | Response:
 
-    layout = layout or NewsLayout(self, request)
+    if self.root is None:
+        raise exc.HTTPNotFound()
 
-    children = []
-    year_links = []
-    tag_links = []
-    rss_link_for_selected_tags = None
-    siblings = []
-    if not self.parent:
-        if request.is_manager:
-            query = self.news_query(limit=None, published_only=False)
-            children = query.all()
-        else:
-            query = self.news_query(limit=None)
-            children = request.exclude_invisible(query.all())
-
-        year_links = [CoreLink(
-            text=str(year),
-            active=year in self.filter_years,
-            url=request.link(self.for_year(year)),
-            rounded=True
-        ) for year in self.all_years]
-
-        tag_links = [CoreLink(
-            text=str(tag),
-            active=tag in self.filter_tags,
-            url=request.link(self.for_tag(tag)),
-            rounded=True
-        ) for tag in self.all_tags]
-
-        url = request.url
-        if 'format' in url:
-            rss_link_for_selected_tags = url
-        else:
-            rss_link_for_selected_tags = (
-                append_query_param(url, 'format', 'rss')
-            )
-    else:
-        assert isinstance(self.parent, News)
-        query = self.parent.news_query(limit=None)
-        if request.is_manager:
-            siblings = query.all()
-        else:
-            siblings = request.exclude_invisible(query.all())
-
-        if self in siblings:
-            siblings.remove(self)
-        siblings = siblings[0:3]
+    children: Sequence[News] = self.batch
+    if not request.is_manager:
+        # we should have pre-emptively excluded anything that
+        # should be hidden, but let's do it again anyway to be safe
+        children = request.exclude_invisible(self.batch)
 
     if request.params.get('format', '') == 'rss':
         def get_description(item: News) -> str:
@@ -189,6 +152,8 @@ def view_news(
                 )
             return description
 
+        next_page = self.next
+        prev_page = self.previous
         rss_str = generate_rss_feed(
             [
                 {
@@ -201,15 +166,76 @@ def view_news(
                 for news in children
             ],
             request_url=request.link(self),
+            prev_url=request.link(prev_page) if prev_page else None,
+            next_url=request.link(next_page) if next_page else None,
             feed_title=request.domain + ' News',
             language=request.app.org.meta['locales'],
         )
         return Response(
             rss_str,
             content_type='application/rss+xml ',
-            content_disposition=f'inline; filename={self.name}.rss'
+            content_disposition='inline; filename=news.rss'
         )
 
+    rss_link_for_selected_tags = (
+        append_query_param(request.url, 'format', 'rss')
+    )
+
+    year_links = [CoreLink(
+        text=str(year),
+        active=year in self.filter_years,
+        url=request.link(self.for_year(year)),
+        rounded=True
+    ) for year in self.all_years]
+
+    tag_links = [CoreLink(
+        text=str(tag),
+        active=tag in self.filter_tags,
+        url=request.link(self.for_tag(tag)),
+        rounded=True
+    ) for tag in self.all_tags]
+
+    layout = layout or NewsLayout(self.root, request)
+
+    if request.is_manager:
+        layout.editbar_links = list(self.root.get_editbar_links(request))
+    if self.root.photo_album_id:
+        request.include('photoswipe')
+
+    assert self.root.trait is not None
+    return {
+        'layout': layout,
+        'title': self.root.title,
+        'name': self.root.trait_messages[self.root.trait]['name'],
+        'page': self.root,
+        'pagination': self,
+        'children': children,
+        'rss_link': rss_link_for_selected_tags,
+        'year_links': year_links,
+        'tag_links': tag_links,
+        'get_lead': get_lead,
+        'siblings': []
+    }
+
+
+@OrgApp.html(model=News, template='news.pt', permission=Public)
+def view_news(
+    self: News,
+    request: OrgRequest,
+    layout: NewsLayout | None = None
+) -> RenderData | Response:
+
+    assert isinstance(self.parent, News)
+    news = NewsCollection(request)
+    query = news.subset().filter(News.id != self.id).limit(3)
+    if request.is_manager:
+        siblings = query.all()
+    else:
+        # we should have pre-emptively excluded anything that
+        # should be hidden, but let's do it again anyway to be safe
+        siblings = request.exclude_invisible(query)
+
+    layout = layout or NewsLayout(self, request)
     if request.is_manager:
         layout.editbar_links = list(self.get_editbar_links(request))
     if self.photo_album_id:
@@ -221,10 +247,11 @@ def view_news(
         'title': self.title,
         'name': self.trait_messages[self.trait]['name'],
         'page': self,
-        'children': children,
-        'rss_link': rss_link_for_selected_tags,
-        'year_links': year_links,
-        'tag_links': tag_links,
+        'pagination': None,
+        'children': [],
+        'rss_link': None,
+        'year_links': [],
+        'tag_links': [],
         'get_lead': get_lead,
         'siblings': siblings
     }
@@ -233,6 +260,8 @@ def view_news(
 def generate_rss_feed(
     items: list[dict[str, str | bool]],
     request_url: str,
+    prev_url: str | None,
+    next_url: str | None,
     feed_title: str,
     language: str = 'de_CH'
 ) -> str:
@@ -243,6 +272,10 @@ def generate_rss_feed(
     fg.description(feed_title)
     fg.language(language)
     fg.link(href=request_url, rel='alternate')
+    if prev_url is not None:
+        fg.link(href=prev_url, rel='prev')
+    if next_url is not None:
+        fg.link(href=next_url, rel='next')
 
     for item in items:
         feed_entry = fg.add_entry()

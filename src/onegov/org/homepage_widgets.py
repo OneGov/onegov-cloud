@@ -4,8 +4,9 @@ from onegov.directory import DirectoryCollection
 from onegov.event import OccurrenceCollection
 from onegov.org import _, OrgApp
 from onegov.org.elements import Link, LinkGroup
-from onegov.org.models import ImageSet, ImageFile, News
+from onegov.org.models import ImageSet, ImageFile, News, NewsCollection
 from onegov.file.models.fileset import file_to_set_associations
+from operator import attrgetter
 from sqlalchemy import func
 
 from onegov.org.models.directory import ExtendedDirectoryEntryCollection
@@ -13,7 +14,7 @@ from onegov.org.models.directory import ExtendedDirectoryEntryCollection
 
 from typing import NamedTuple, TYPE_CHECKING
 if TYPE_CHECKING:
-    from collections.abc import Iterable, Iterator, Sequence
+    from collections.abc import Iterator, Sequence
     from onegov.core.types import RenderData
     from onegov.org.layout import DefaultLayout
     from onegov.org.models import ExtendedDirectory
@@ -200,34 +201,26 @@ class NewsWidget:
         # FIXME: We probably don't need full fat News objects for this
         #        and could instead just use children on the root news page
         #        if we need additional attributes, we can just add them
-        #        to PageMeta, then we can also get rid of `news_query_for`
-        #        and refactor it back into a pure instance method
-
+        #        to PageMeta, although we would still need to sort the news
+        #        which can get costly if there's a lot of them. So fetching
+        #        a small number fresh migh actually be faster, unless we
+        #        separately cache the ones we need to display.
+        collection = NewsCollection(layout.request)
+        news = collection.sticky().all()
         # request more than the required amount of news to account for hidden
         # items which might be in front of the queue
-        news_limit = layout.org.news_limit_homepage
-        news = layout.request.exclude_invisible(
-            News.news_query_for(
-                root_pages[news_index],
-                session=layout.request.session,
-                limit=news_limit + 2,
-                published_only=not layout.request.is_manager
-            ).all()
+        news.extend(
+            collection.subset()
+            .filter(~News.id.in_([n.id for n in news]))
+            .limit(layout.org.news_limit_homepage)
         )
-
-        # limits the news, but doesn't count sticky news towards that limit
-        def limited(news: Iterable[News], limit: int) -> Iterator[News]:
-            count = 0
-
-            for item in news:
-                if count < limit or item.is_visible_on_homepage:
-                    yield item
-
-                if not item.is_visible_on_homepage:
-                    count += 1
+        # the ones that shouldn't be visible should already be excluded
+        # but we do this again anyways just to be safe
+        news = layout.request.exclude_invisible(news)
+        news.sort(key=attrgetter('published_or_created'), reverse=True)
 
         return {
-            'news': limited(news, limit=news_limit),
+            'news': news,
             'get_lead': get_lead
         }
 
