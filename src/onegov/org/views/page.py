@@ -4,7 +4,9 @@ from __future__ import annotations
 import morepath
 from markupsafe import Markup
 
+from feedgen.ext.base import BaseExtension  # type:ignore[import-untyped]
 from feedgen.feed import FeedGenerator  # type:ignore[import-untyped]
+from feedgen.util import xml_elem  # type:ignore[import-untyped]
 from onegov.core.elements import Link as CoreLink
 from onegov.core.security import Public, Private
 from onegov.core.utils import append_query_param
@@ -22,6 +24,7 @@ from typing import TYPE_CHECKING
 if TYPE_CHECKING:
     from collections.abc import Sequence
 
+    from lxml.etree import _Element
     from onegov.core.types import RenderData
     from onegov.org.request import OrgRequest
 
@@ -263,6 +266,25 @@ def view_news(
     }
 
 
+class AtomLinkInRSSExtension(BaseExtension):  # type: ignore[misc]
+
+    def __init__(self) -> None:
+        self.fg = FeedGenerator()
+
+    def extend_rss(self, feed: _Element) -> _Element:
+        for link in reversed(self.fg.link()):
+            # insert in the channel after the generic link element
+            feed[0].insert(2, xml_elem(
+                '{http://www.w3.org/2005/Atom}link',
+                href=link['href'],
+                rel=link['rel']
+            ))
+        return feed
+
+    def link(self, href: str, rel: str) -> None:
+        self.fg.link(href=href, rel=rel)
+
+
 def generate_rss_feed(
     items: list[dict[str, str | bool]],
     request_url: str,
@@ -273,15 +295,17 @@ def generate_rss_feed(
 ) -> str:
 
     fg = FeedGenerator()
+    fg.register_extension('atom', AtomLinkInRSSExtension, atom=False)
     fg.id(request_url)
     fg.title(feed_title)
     fg.description(feed_title)
     fg.language(language)
-    fg.link(href=request_url, rel='alternate')
+    fg.link(href=request_url)
+    fg.atom.link(href=request_url, rel='alternate')
     if prev_url is not None:
-        fg.link(href=prev_url, rel='prev')
+        fg.atom.link(href=prev_url, rel='previous')
     if next_url is not None:
-        fg.link(href=next_url, rel='next')
+        fg.atom.link(href=next_url, rel='next')
 
     for item in items:
         feed_entry = fg.add_entry()
