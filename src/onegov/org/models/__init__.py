@@ -38,7 +38,7 @@ from onegov.org.models.message import TicketChatMessage
 from onegov.org.models.message import TicketMessage
 from onegov.org.models.message import TicketNote
 from onegov.org.models.organisation import Organisation
-from onegov.org.models.page import AtoZPages, News, Topic
+from onegov.org.models.page import AtoZPages, News, NewsCollection, Topic
 from onegov.org.models.page_move import PageMove
 from onegov.org.models.person_move import FormPersonMove
 from onegov.org.models.person_move import PagePersonMove
@@ -93,6 +93,7 @@ __all__ = (
     'LegacyImage',
     'LegacyImageCollection',
     'News',
+    'NewsCollection',
     'Organisation',
     'PageMove',
     'PagePersonMove',

@@ -17,13 +17,12 @@ from onegov.event import EventCollection, OccurrenceCollection
 from onegov.event.utils import as_rdates
 from onegov.form import FormSubmissionCollection
 from onegov.gever.encrypt import encrypt_symmetric
-from onegov.org.models import ResourceRecipientCollection, News,\
-    PushNotification
-from onegov.org.models.page import NewsCollection
+from onegov.org.models import (
+    ResourceRecipientCollection, News, PushNotification)
 from onegov.org.models.resource import RoomResource
 from onegov.org.models.ticket import ReservationHandler, DirectoryEntryHandler
-from onegov.org.notification_service import TestNotificationService,\
-    set_test_notification_service
+from onegov.org.notification_service import (
+    TestNotificationService, set_test_notification_service)
 from onegov.page import PageCollection
 from onegov.ticket import Handler, Ticket, TicketCollection
 from onegov.user import UserCollection
@@ -1666,15 +1665,15 @@ def test_send_push_notifications_for_news(
     ]
 
     # Create a news item that should trigger notifications
-    news = NewsCollection(org_app.session())
-
-    # We need to set parent=None for news items
+    news = PageCollection(org_app.session())
+    news_parent = news.add_root('News', type='news')
     recent_news = news.add(
-        parent=None,
+        parent=news_parent,
         title='Recent news with notifications',
         lead='This should trigger a notification',
         text='Test content for recent news',
         access='public',
+        type='news'
     )
 
     # Set publication time just within the 10-minute window
@@ -1744,6 +1743,7 @@ def test_push_notification_duplicate_detection(
         lead='Test content',
         text='Test content body',
         access='public',
+        type='news'
     )
     news_id = test_news.id
 
