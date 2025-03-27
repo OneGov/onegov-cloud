@@ -5,7 +5,7 @@ from itertools import chain
 from lazy_object_proxy import Proxy  # type:ignore[import-untyped]
 from onegov.core.orm import Base, observes
 from onegov.core.utils import normalize_for_url, increment_name, is_sorted
-from sqlalchemy import Column, ForeignKey, Integer, Text
+from sqlalchemy import Column, ForeignKey, Integer, Text, Numeric
 from sqlalchemy.ext.declarative import declared_attr
 from sqlalchemy.ext.hybrid import hybrid_property
 from sqlalchemy.orm import (
@@ -119,7 +119,7 @@ class AdjacencyList(Base):
 
     #: the order of the items - items are added at the end by default
     # FIXME: This should probably have been nullable=False
-    order: Column[int] = Column(Integer, default=2 ** 16)
+    order = Column(Numeric(precision=30, scale=15), default=2**16)
 
     # default sort order is order, id
     @declared_attr

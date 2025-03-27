@@ -4,13 +4,16 @@ upgraded on the server. See :class:`onegov.core.upgrade.upgrade_task`.
 """
 from __future__ import annotations
 
+from inspect import isabstract
 from itertools import chain
 from libres.db.models import ORMBase
+from onegov.core.orm.abstract.adjacency_list import AdjacencyList
 from onegov.core.upgrade import upgrade_task
 from onegov.core.orm import Base, find_models
 from onegov.core.orm.abstract import Associable
 from onegov.core.orm.types import JSON
 from sqlalchemy import inspect, text
+
 from sqlalchemy.exc import NoInspectionAvailable
 
 
@@ -213,3 +216,27 @@ def unique_constraint_in_association_tables(context: UpgradeContext) -> None:
                     IF NOT EXISTS "uq_assoc_{table}"
                     ON "{table}" ("{key}", "{association_key}")
                 """)
+
+
+@upgrade_task('Change order to be Numeric to avoid having to update '
+    'on every insert')
+def change_adjacency_list_order_to_numeric(context: UpgradeContext) -> None:
+
+    def is_concrete_subclass(cls) -> bool:
+        return (issubclass(cls, AdjacencyList) and cls is not AdjacencyList and
+                not isabstract(cls))
+
+    adjacency_subclasses = set(chain(
+        find_models(Base, is_concrete_subclass),
+        find_models(ORMBase, is_concrete_subclass)
+    ))
+
+    for cls in adjacency_subclasses:
+        table_name = cls.tablename
+        if context.has_table(table_name):
+            # Alter the column type to NUMERIC
+            context.operations.execute(text("""
+                ALTER TABLE :table_name
+                ALTER COLUMN "order"
+                TYPE NUMERIC(30, 15) USING "order"::numeric
+            """).bindparams(table_name=table_name))
