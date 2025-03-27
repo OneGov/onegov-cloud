@@ -6,13 +6,11 @@ from __future__ import annotations
 
 import itertools
 
-import yaml
 
 from onegov.core.orm.types import JSON
 from onegov.core.orm.types import UTCDateTime
 from onegov.core.upgrade import upgrade_task, UpgradeContext
-from onegov.org.models.organisation import Organisation
-from onegov.people import Agency, Person
+from onegov.people import Agency
 from onegov.people import AgencyMembership
 from sqlalchemy import Column
 from sqlalchemy import Integer
@@ -209,38 +207,3 @@ def fix_agency_address_column(context: UpgradeContext) -> None:
 def remove_external_id_for_agency_import(context: UpgradeContext) -> None:
     if context.has_column('people', 'lu_external_id'):
         context.operations.drop_column('people', 'lu_external_id')
-
-
-@upgrade_task('Create hierarchy and move organisations to content')
-def create_hierarchy_and_move_organisations_to_content(
-    context: UpgradeContext
-) -> None:
-    session = context.app.session()
-    people = session.query(Person).all()
-    hierarchy: dict[str, set[str]] = {}
-    for person in people:
-        if person.organisation:
-            # Create hierarchy from existing organisation and
-            # sub_organisation of people
-            hierarchy.setdefault(person.organisation, set())
-            if person.sub_organisation:
-                hierarchy[person.organisation].add(person.sub_organisation)
-
-            # Move organisation and sub_organisation to content
-            person.content['organisations_multiple'] = [
-                    person.organisation,
-                    f'-{person.sub_organisation}'
-                ] if person.sub_organisation else [person.organisation]
-
-    hierarchy_yaml = ''
-    for org, sub_orgs in hierarchy.items():
-        hierarchy_yaml += f'- {org}:\n'
-        for sub_org in sub_orgs:
-            hierarchy_yaml += f'  - {sub_org}\n'
-    if hierarchy_yaml:
-        data = yaml.safe_load(hierarchy_yaml)
-        organisation = session.query(Organisation).first()
-        if organisation:
-            organisation.organisation_hierarchy = data
-
-    session.flush()

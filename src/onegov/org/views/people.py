@@ -77,6 +77,9 @@ def view_people(
         if isinstance(top_org, dict):
             sub_orgs = top_org[selected_org]
 
+    if selected_sub_org and selected_sub_org not in sub_orgs:
+        sub_orgs.append(selected_sub_org)
+
     people = self.people_by_organisation(selected_org, selected_sub_org)
 
     class AtoZPeople(AtoZ[Person]):
@@ -93,8 +96,8 @@ def view_people(
         'people': AtoZPeople(request).get_items_by_letter().items(),
         'layout': layout or PersonCollectionLayout(self, request),
         'organisations_as_dict': organisations_as_dict,
-        'organisations': top_orgs,
-        'sub_organisations': sub_orgs,
+        'organisations': sorted(top_orgs),
+        'sub_organisations': sorted(sub_orgs),
         'selected_organisation': selected_org,
         'selected_sub_organisation': selected_sub_org
     }

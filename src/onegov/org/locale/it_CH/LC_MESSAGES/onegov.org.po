@@ -2,7 +2,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: \n"
-"POT-Creation-Date: 2025-03-24 10:25+0100\n"
+"POT-Creation-Date: 2025-03-27 14:17+0100\n"
 "PO-Revision-Date: 2022-03-15 10:52+0100\n"
 "Last-Translator: \n"
 "Language-Team: \n"
@@ -1255,9 +1255,6 @@ msgstr "Organizzazione"
 msgid "Select the organisations this person belongs to"
 msgstr "Seleziona le organizzazioni a cui appartiene questa persona"
 
-msgid "Sub organisation"
-msgstr "Sotto organizzazione"
-
 msgid "Direct Phone Number or Mobile"
 msgstr "Numero di telefono diretto o cellulare"
 
@@ -1747,15 +1744,6 @@ msgstr "Percorso"
 msgid "Please enter a path without schema or host"
 msgstr "Inserisci un percorso senza schema o host"
 
-msgid "Hide these fields for non-logged-in users"
-msgstr "Nascondi questi campi per gli utenti non registrati"
-
-msgid "People"
-msgstr "Persone"
-
-msgid "External ID"
-msgstr "ID esterno"
-
 msgid "Duration of mTAN session"
 msgstr "Durata della sessione mTAN"
 
@@ -2189,6 +2177,12 @@ msgstr ""
 "  - Sotto-organizzazione 2\n"
 "```"
 
+msgid "Hide these fields for non-logged-in users"
+msgstr "Nascondi questi campi per gli utenti non registrati"
+
+msgid "External ID"
+msgstr "ID esterno"
+
 msgid "VAT Rate"
 msgstr "Aliquota IVA"
 
@@ -2519,6 +2513,9 @@ msgstr "Finestre di invio"
 
 msgid "Survey"
 msgstr "Sondaggio"
+
+msgid "People"
+msgstr "Persone"
 
 msgid "Person"
 msgstr "Persona"
@@ -4615,17 +4612,17 @@ msgstr ""
 msgid "Request Reference"
 msgstr "Riferimento della richiesta"
 
-msgid "No people added yet."
-msgstr "Nessuna persona aggiunta ancora."
-
-msgid "No people found for current filter selection."
-msgstr "Non sono state trovate persone per la selezione del filtro corrente."
-
 msgid "Select organisation"
 msgstr "Selezionare l'organizzazione"
 
 msgid "Select sub organisation"
 msgstr "Selezionare la sotto-organizzazione"
+
+msgid "No people found for current filter selection."
+msgstr "Non sono state trovate persone per la selezione del filtro corrente."
+
+msgid "Reset filter"
+msgstr "Ripristina filtro"
 
 msgid "Export a vCard of this person"
 msgstr "Esporta una vCard di questa persona"
@@ -6549,6 +6546,12 @@ msgstr "È stato creato un account per te"
 
 msgid "The user was created successfully"
 msgstr "Utente creato correttamente"
+
+#~ msgid "Sub organisation"
+#~ msgstr "Sotto organizzazione"
+
+#~ msgid "No people added yet."
+#~ msgstr "Nessuna persona aggiunta ancora."
 
 #~ msgid ""
 #~ "Example for organisation hierarchy with subtopics in yaml format. Note: "
