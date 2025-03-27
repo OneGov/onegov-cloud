@@ -1665,10 +1665,10 @@ def test_send_push_notifications_for_news(
     ]
 
     # Create a news item that should trigger notifications
-    pages = PageCollection(org_app.session())
-    root = PageCollection.add_root('News', type='news')
-    recent_news = pages.add(
-        parent=root,
+    news = PageCollection(org_app.session())
+    news_parent = news.add_root('News', type='news')
+    recent_news = news.add(
+        parent=news_parent,
         title='Recent news with notifications',
         lead='This should trigger a notification',
         text='Test content for recent news',
@@ -1743,6 +1743,7 @@ def test_push_notification_duplicate_detection(
         lead='Test content',
         text='Test content body',
         access='public',
+        type='news'
     )
     news_id = test_news.id
 
