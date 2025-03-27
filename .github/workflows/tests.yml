@@ -195,6 +195,7 @@ jobs:
         run-as "$(id -u test)":test /app/bin/pytest \
           -n logical \
           -o cache_dir=/tmp/pytest \
+          -r fER \
           --dist loadgroup \
           --splits "7" \
           --group "${{matrix.group}}" \
@@ -205,6 +206,8 @@ jobs:
           --only-rerun "ReferenceError: $ is not defined" \
           --only-rerun "FileNotFoundError: [Errno 2] No such file" \
           --only-rerun "Bad response: 404 Not Found" \
+          --junit-xml=/tmp/junit.xml \
+          -o junit_family=legacy \
           --cov \
           --cov-config=pyproject.toml \
           --codecov \

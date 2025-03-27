@@ -7,7 +7,7 @@
 <body>
 
     <metal:agency_card define-macro="agency_card" i18n:domain="onegov.agency">
-        <div class="agency-card agency-single-item" tal:define="memberships list(agency.memberships); children list(agency.children)">
+        <div class="agency-card agency-single-item" tal:define="memberships memberships|agency.memberships.all(); children children|agency.children">
             <tal:block tal:condition="agency.portrait">
                 <h3 i18n:translate>Portrait</h3>
                 <div tal:content="agency.portrait_html"></div>

@@ -4,7 +4,7 @@ from uuid import uuid4
 from pytest import mark
 
 
-@mark.flaky(reruns=3)
+@mark.flaky(reruns=3, only_rerun=None)
 def test_audit_for_course(client, scenario):
     """
     Story:

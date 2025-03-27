@@ -2,7 +2,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE 1.0\n"
-"POT-Creation-Date: 2025-03-27 09:03+0100\n"
+"POT-Creation-Date: 2025-03-27 09:48+0100\n"
 "PO-Revision-Date: 2022-03-15 10:50+0100\n"
 "Last-Translator: Marc Sommerhalder <marc.sommerhalder@seantis.ch>\n"
 "Language-Team: French\n"
@@ -205,6 +205,16 @@ msgstr "Ce site est secret"
 
 msgid "Cancel"
 msgstr "Annuler"
+
+msgid "mTAN Access Limit Exceeded"
+msgstr "Limite d'accès au mTAN dépassée"
+
+msgid ""
+"You have exceeded the maximum number of unique accesses to protected "
+"resources. Please try again at a later date."
+msgstr ""
+"Vous avez dépassé le nombre maximum d'accès uniques aux ressources "
+"protégées. Veuillez réessayer ultérieurement."
 
 msgid "ID Payment Provider"
 msgstr "ID Opérateurs de paiement"
@@ -1117,6 +1127,12 @@ msgstr "Éditorial"
 msgid "A few words about this edition of the newsletter"
 msgstr "Quelques mots concernant l'édition de cette lettre d'informations"
 
+msgid "Closing remark"
+msgstr "Remarque de clôture"
+
+msgid "Closing remark at the end of the newsletter"
+msgstr "Remarque de clôture à la fin de la lettre d'informations"
+
 msgid "Latest news"
 msgstr "Dernières nouvelles"
 
@@ -2017,13 +2033,6 @@ msgstr ""
 
 msgid "Invalid YAML format. Please refer to the example."
 msgstr "Format YAML non valide. Veuillez vous référer à l'exemple."
-
-msgid ""
-"Invalid format. Please define a listwith topics and subtopics according the "
-"example."
-msgstr ""
-"Format non valide. Veuillez définir une liste avec des sujets et des sous-"
-"sujets selon l'exemple."
 
 msgid ""
 "Invalid format. Please define topics and subtopics according to the example."
@@ -3412,6 +3421,12 @@ msgstr ""
 "Vous avez trouvé une erreur ? Proposez une modification à apporter à cette "
 "entrée."
 
+msgid "No subscribers yet"
+msgstr "Pas encore d'abonnés"
+
+msgid "There are currently ${count} recipients registered."
+msgstr "Il y a actuellement ${count} destinataires enregistrés."
+
 msgid ""
 "Subscribers may always unsubscribe themselves through a link shown at the "
 "bottom of the newsletter. If you unsubscribe them here, they will not be "
@@ -3426,6 +3441,15 @@ msgstr "Se désabonner"
 
 msgid "unsubscribe"
 msgstr "se désabonner"
+
+msgid ""
+"This recipient has delivery failures, including hard bounces, invalid email "
+"addresses, spam complaints, manual deactivations, or being blocked. We "
+"recommend unsubscribing it from the list."
+msgstr ""
+"Ce destinataire a des échecs de livraison, y compris des rebonds, des "
+"adresses e-mail invalides, des plaintes pour spam, des désactivations "
+"manuelles, ou est bloqué. Nous recommandons de le désinscrire de la liste."
 
 msgid ""
 "Your edit requires a migration of existing entries. Please confirm the "
@@ -4491,9 +4515,6 @@ msgstr ""
 "La newsletter est désactivée. Vous ne pouvez voir cette page que parce que "
 "vous êtes connecté."
 
-msgid "There are currently ${count} recipients registered."
-msgstr "Il y a actuellement ${count} destinataires enregistrés."
-
 msgid "To update your subscription, please use this ${Link}"
 msgstr "Pour mettre à jour votre abonnement, veuillez utiliser ce ${Link}"
 
@@ -4651,18 +4672,6 @@ msgstr "Response Data"
 
 msgid "No notifications"
 msgstr "Pas de notifications"
-
-msgid "No subscribers yet"
-msgstr "Pas encore d'abonnés"
-
-msgid ""
-"This recipient has delivery failures, including hard bounces, invalid email "
-"addresses, spam complaints, manual deactivations, or being blocked. We "
-"recommend unsubscribing it from the list."
-msgstr ""
-"Ce destinataire a des échecs de livraison, y compris des rebonds, des "
-"adresses e-mail invalides, des plaintes pour spam, des désactivations "
-"manuelles, ou est bloqué. Nous recommandons de le désinscrire de la liste."
 
 msgid "submitted"
 msgstr "soumis"
@@ -4968,9 +4977,8 @@ msgstr "Couleur non valide."
 
 msgid "CSRF failed."
 msgstr ""
-"Échec du CSRF. Actualisez la page. Si le problème persiste, "
-"déconnectez-vous, reconnectez-vous et réessayez."
-
+"Échec du CSRF. Actualisez la page. Si le problème persiste, déconnectez-"
+"vous, reconnectez-vous et réessayez."
 
 msgid "CSRF token missing."
 msgstr ""
@@ -4979,8 +4987,8 @@ msgstr ""
 
 msgid "CSRF token expired."
 msgstr ""
-"Jeton CSRF expiré. Actualisez la page. Si le problème persiste, "
-"déconnectez-vous, reconnectez-vous et réessayez."
+"Jeton CSRF expiré. Actualisez la page. Si le problème persiste, déconnectez-"
+"vous, reconnectez-vous et réessayez."
 
 msgid "Not a valid choice"
 msgstr "Choix invalide"
@@ -6553,6 +6561,13 @@ msgstr "Un compte a été créé pour vous"
 
 msgid "The user was created successfully"
 msgstr "L'utilisateur a bien été créé"
+
+#~ msgid ""
+#~ "Invalid format. Please define a listwith topics and subtopics according "
+#~ "the example."
+#~ msgstr ""
+#~ "Format non valide. Veuillez définir une liste avec des sujets et des sous-"
+#~ "sujets selon l'exemple."
 
 #~ msgid ""
 #~ "Invalid format. Please define an organisation name with topics and "

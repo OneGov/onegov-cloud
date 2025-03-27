@@ -21,26 +21,26 @@
             </tal:b>
         </div>
 
-        <div class="newsletter-block newsletter-publications-block">
-            <tal:b condition="publications">
-                <h2 i18n:translate>Publications</h2>
-                <ul tal:repeat="publication publications" class="dense">
-                    <li>
-                        <metal:newslist use-macro="layout.macros['publication']" />
-                    </li>
-                </ul>
-            </tal:b>
+        <div class="newsletter-block newsletter-publications-block" tal:condition="publications">
+            <h2 i18n:translate>Publications</h2>
+            <ul tal:repeat="publication publications" class="dense">
+                <li>
+                    <metal:newslist use-macro="layout.macros['publication']" />
+                </li>
+            </ul>
         </div>
 
-        <div class="newsletter-block">
-            <tal:b condition="occurrences">
-                <h2 i18n:translate>Events</h2>
-                <div class="row">
-                    <div class="columns small-12 medium-8 end">
-                        <metal:occurrences use-macro="layout.macros['occurrences']" />
-                    </div>
+        <div class="newsletter-block" tal:condition="occurrences">
+            <h2 i18n:translate>Events</h2>
+            <div class="row">
+                <div class="columns small-12 medium-8 end">
+                    <metal:occurrences use-macro="layout.macros['occurrences']" />
                 </div>
-            </tal:b>
+            </div>
+        </div>
+        <div class="newsletter-block" tal:condition="closing_remark|False">
+            <hr/>
+            <tal:b tal:content="closing_remark" />
         </div>
     </tal:b>
 </div>

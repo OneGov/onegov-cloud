@@ -62,10 +62,9 @@ def app(request, glauth_binary, postgres_dsn, temporary_path, redis_url,
         [[users]]
         name = "editor"
         mail = "editor@seantis.ch"
-        unixid = 1001
+        unixid = 1002
         primarygroup = 5200
         passsha256 = "{sha256(b'hunter2').hexdigest()}"
-
     """
 
     class App(Framework, UserApp):
@@ -152,7 +151,7 @@ def client(app):
     yield Client(app)
 
 
-def test_generic_ldap(client):
+def test_generic_ldap(client, caplog):
 
     assert 'login-page' in client.get('/auth/login')
     assert client.get('/private', status=403)
@@ -193,3 +192,79 @@ def test_generic_ldap(client):
         'username': 'editor',
         'password': 'hunter2'
     })
+
+    # no ldap user
+    assert 'unauthorized' in client.post('/auth/login', {
+        'username': 'tester',
+        'password': 'hunter2'
+    })
+    assert 'No LDAP user with uid ore-mail tester' in caplog.text
+
+    # wrong password
+    client.app.providers['ldap'].ldap.compare.return_value = False
+    assert 'unauthorized' in client.post('/auth/login', {
+        'username': 'editor',
+        'password': 'wrong'
+    })
+    assert 'Wrong password for editor@seantis.ch' in caplog.text
+
+    # wrong role
+    client.app.providers['ldap'].ldap.compare.return_value = True
+    client.app.providers['ldap'].ldap.search = MagicMock()
+    client.app.providers['ldap'].ldap.search.return_value = {
+        'cn=editors,ou=groups,dc=seantis,dc=ch': {
+            'memberOf': ['cn=unknown_group,ou=groups,dc=seantis,dc=ch'],
+            'mail': ['user@example.com'],
+            'uid': ['user']
+        }
+    }
+    assert 'unauthorized' in client.post('/auth/login', {
+        'username': 'onegov',
+        'password': 'hunter2'
+    })
+    assert 'Wrong role for onegov' in caplog.text
+
+    # multiple ldap entries
+    client.app.providers['ldap'].ldap.search.return_value = {
+        'cn=editors1,ou=groups,dc=seantis,dc=ch': {
+            'memberOf': ['cn=group1,ou=groups,dc=seantis,dc=ch'],
+            'mail': ['user@example.com'],
+            'uid': ['user1']
+        },
+        'cn=editors2,ou=groups,dc=seantis,dc=ch': {
+            'memberOf': ['cn=group2,ou=groups,dc=seantis,dc=ch'],
+            'mail': ['user@example.com'],
+            'uid': ['user2']
+        }
+    }
+    assert 'unauthorized' in client.post('/auth/login', {
+        'username': 'editor',
+        'password': 'hunter2'
+    })
+    assert ('Found more than one user for e-mail editor' in
+            caplog.text)
+    assert 'All but the first user will be ignored' in caplog.text
+
+    # LDAP search with missing email attribute
+    client.app.providers['ldap'].ldap.search.side_effect = [
+        {},
+        {
+            'cn=editors,ou=groups,dc=seantis,dc=ch': {
+                'memberOf': ['cn=editors,ou=groups,dc=seantis,dc=ch'],
+                'mail': [],
+                'uid': ['user'],
+            }
+        },
+        {
+            'cn=editors,ou=groups,dc=seantis,dc=ch': {
+                'memberOf': ['cn=editors,ou=groups,dc=seantis,dc=ch'],
+                'mail': [],
+                'uid': ['user'],
+            }
+        },
+    ]
+    assert 'unauthorized' in client.post('/auth/login', {
+        'username': 'editor',
+        'password': 'hunter2'
+    })
+    assert 'Email missing in LDAP for user with uid editor' in caplog.text
