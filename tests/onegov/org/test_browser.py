@@ -672,3 +672,28 @@ def test_link_hashtags(browser, org_app):
             ) not in browser.html
     assert ('<a class="hashtag" href="/search?q=%23luxury-suite">'
             '#luxury-suite</a>') not in browser.html
+
+
+@pytest.mark.flaky(reruns=3)
+def test_people_multiple_select(browser, org_app):
+    browser.login_admin()
+
+    browser.visit('/people-settings')
+    browser.fill('organisation_hierarchy', """
+    - Organisation 1
+    - Organisation 2:
+      - Sub-Organisation 2.1
+      - Sub-Organisation 2.2
+    """)
+    browser.find_by_value("Speichern").click()
+    browser.visit('/people/new')
+    browser.fill('first_name', 'John')
+    browser.fill('last_name', 'Doe')
+    browser.find_by_css("#organisations_multiple_chosen").click()
+    # Only select the sub-organisation this should select the top organisation
+    # "Organisation 2" automatically
+    browser.find_by_css(".chosen-results .active-result:nth-child(3)").click()
+    browser.find_by_value("Speichern").click()
+
+    assert browser.is_text_present("Organisation 2 - Sub-Organisation 2.1")
+    assert not browser.is_text_present("Organisation 1")

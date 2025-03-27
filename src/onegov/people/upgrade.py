@@ -215,16 +215,22 @@ def remove_external_id_for_agency_import(context: UpgradeContext) -> None:
 def create_hierarchy_and_move_organisations_to_content(
     context: UpgradeContext
 ) -> None:
-    # Create hierarchy from existing organisation and sub_organisation of
-    # people
     session = context.app.session()
     people = session.query(Person).all()
     hierarchy: dict[str, set[str]] = {}
     for person in people:
         if person.organisation:
+            # Create hierarchy from existing organisation and
+            # sub_organisation of people
             hierarchy.setdefault(person.organisation, set())
             if person.sub_organisation:
                 hierarchy[person.organisation].add(person.sub_organisation)
+
+            # Move organisation and sub_organisation to content
+            person.content['organisations_multiple'] = [
+                    person.organisation,
+                    f'-{person.sub_organisation}'
+                ] if person.sub_organisation else [person.organisation]
 
     hierarchy_yaml = ''
     for org, sub_orgs in hierarchy.items():
@@ -237,10 +243,4 @@ def create_hierarchy_and_move_organisations_to_content(
         if organisation:
             organisation.organisation_hierarchy = data
 
-    for person in people:
-        if person.organisation:
-            person.content['organisations_multiple'] = [
-                person.organisation,
-                f'-{person.sub_organisation}'
-            ] if person.sub_organisation else [person.organisation]
     session.flush()

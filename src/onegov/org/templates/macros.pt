@@ -756,10 +756,11 @@
             <li tal:condition="person.function" class="person-card-function">
                 <em>${person.function}</em>
             </li>
-            <li tal:condition="person.organisation" class="person-card-organisation">
-                <span i18n:attributes="title" title="Organisation">${person.organisation}</span>
-                <span i18n:attributes="title" title="Sub organisation">${person.sub_organisation}</span>
-            </li>
+            <tal:b define="organisations organisations_as_dict(person)" tal:condition="'organisation' not in exclude">
+                <li tal:repeat="top_organisation organisations.keys()" class="person-card-organisation">
+                    <span tal:define="sub_organisations organisations[top_organisation]" i18n:attributes="title" title="Organisation">${top_organisation}${' - ' if sub_organisations else ''}${', '.join(sub_organisations)}</span>
+                </li>
+            </tal:b>
             <li tal:condition="person.email and 'email' not in exclude" class="person-card-email">
                 <a href="mailto:${person.email}">${person.email}</a>
             </li>
@@ -787,10 +788,11 @@
                     <li tal:condition="person.function" class="person-card-function">
                         <em>${person.function}</em>
                     </li>
-                    <li tal:condition="person.organisation and 'organisation' not in exclude" class="person-card-organisation">
-                        <span i18n:attributes="title" title="Organisation">${person.organisation}</span>
-                        <span i18n:attributes="title" title="Sub organisation" tal:condition="person.sub_organisation and 'sub_organisation' not in exclude">${person.sub_organisation}</span>
-                    </li>
+                    <tal:b define="organisations organisations_as_dict(person)" tal:condition="'organisation' not in exclude">
+                        <li tal:repeat="top_organisation organisations.keys()" class="person-card-organisation">
+                            <span tal:define="sub_organisations organisations[top_organisation]" i18n:attributes="title" title="Organisation">${top_organisation}${' - ' if sub_organisations else ''}${', '.join(sub_organisations)}</span>
+                        </li>
+                    </tal:b>
                     <li class="person-card-personal">
                         <span tal:condition="person.born and 'born' not in exclude">${person.born}</span>
                         <span tal:condition="person.academic_title and 'academic_title' not in exclude">${person.academic_title}</span>
