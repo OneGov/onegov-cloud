@@ -8,6 +8,9 @@ from onegov.org import _
 
 # messages defined in wtforms-components
 _('Not a valid color.')
+_('CSRF failed.')
+_('CSRF token missing.')
+_('CSRF token expired.')
 
 # messages not translated by wtforms
 _('Not a valid choice')

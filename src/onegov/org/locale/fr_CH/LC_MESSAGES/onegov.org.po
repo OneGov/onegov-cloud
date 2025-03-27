@@ -2,7 +2,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE 1.0\n"
-"POT-Creation-Date: 2025-03-11 16:35+0100\n"
+"POT-Creation-Date: 2025-03-27 09:03+0100\n"
 "PO-Revision-Date: 2022-03-15 10:50+0100\n"
 "Last-Translator: Marc Sommerhalder <marc.sommerhalder@seantis.ch>\n"
 "Language-Team: French\n"
@@ -2019,11 +2019,11 @@ msgid "Invalid YAML format. Please refer to the example."
 msgstr "Format YAML non valide. Veuillez vous référer à l'exemple."
 
 msgid ""
-"Invalid format. Please define an organisation name with topics and subtopics "
-"according the example."
+"Invalid format. Please define a listwith topics and subtopics according the "
+"example."
 msgstr ""
-"Format non valide. Veuillez définir un nom d'organisation avec des sujets et "
-"des sous-sujets selon l'exemple."
+"Format non valide. Veuillez définir une liste avec des sujets et des sous-"
+"sujets selon l'exemple."
 
 msgid ""
 "Invalid format. Please define topics and subtopics according to the example."
@@ -3131,8 +3131,8 @@ msgstr "Refuser ${title} est irréversible."
 msgid "Reject reservation"
 msgstr "Refuser la réservation"
 
-#.
 #. Used in sentence: "${event} published."
+#.
 msgid "Event"
 msgstr "Événement"
 
@@ -3495,8 +3495,8 @@ msgid ""
 "filled-out form."
 msgstr ""
 "Veuillez vérifier vos données et appuyez sur « Compléter » pour finaliser le "
-"processus. S'il y a quelque chose que vous souhaitez modifier, cliquez sur "
-"« Modifier » pour retourner sur le formulaire complété."
+"processus. S'il y a quelque chose que vous souhaitez modifier, cliquez sur « "
+"Modifier » pour retourner sur le formulaire complété."
 
 msgid ""
 "The image shown in the list view is a square. To have your image shown fully "
@@ -4965,6 +4965,22 @@ msgstr "Identicon"
 
 msgid "Not a valid color."
 msgstr "Couleur non valide."
+
+msgid "CSRF failed."
+msgstr ""
+"Échec du CSRF. Actualisez la page. Si le problème persiste, "
+"déconnectez-vous, reconnectez-vous et réessayez."
+
+
+msgid "CSRF token missing."
+msgstr ""
+"Jeton CSRF manquant. Actualisez la page. Si le problème persiste, "
+"déconnectez-vous, reconnectez-vous et réessayez."
+
+msgid "CSRF token expired."
+msgstr ""
+"Jeton CSRF expiré. Actualisez la page. Si le problème persiste, "
+"déconnectez-vous, reconnectez-vous et réessayez."
 
 msgid "Not a valid choice"
 msgstr "Choix invalide"
@@ -6537,3 +6553,10 @@ msgstr "Un compte a été créé pour vous"
 
 msgid "The user was created successfully"
 msgstr "L'utilisateur a bien été créé"
+
+#~ msgid ""
+#~ "Invalid format. Please define an organisation name with topics and "
+#~ "subtopics according the example."
+#~ msgstr ""
+#~ "Format non valide. Veuillez définir un nom d'organisation avec des sujets "
+#~ "et des sous-sujets selon l'exemple."

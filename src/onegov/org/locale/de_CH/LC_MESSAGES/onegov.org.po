@@ -2,7 +2,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE 1.0\n"
-"POT-Creation-Date: 2025-03-11 16:35+0100\n"
+"POT-Creation-Date: 2025-03-27 09:03+0100\n"
 "PO-Revision-Date: 2022-03-15 10:21+0100\n"
 "Last-Translator: Marc Sommerhalder <marc.sommerhalder@seantis.ch>\n"
 "Language-Team: German\n"
@@ -2011,11 +2011,11 @@ msgid "Invalid YAML format. Please refer to the example."
 msgstr "Ungültiges YAML Format. Bitte beachten Sie das Beispiel."
 
 msgid ""
-"Invalid format. Please define an organisation name with topics and subtopics "
-"according the example."
+"Invalid format. Please define a listwith topics and subtopics according the "
+"example."
 msgstr ""
-"Ungültiges Format. Bitte definieren Sie eine Organisation mit Themen und "
-"Unterthemen wie im Beispiel."
+"Ungültiges Format. Bitte definieren Sie eine Liste mit Themen und "
+"Unterthemen entsprechend dem Beispiel."
 
 msgid ""
 "Invalid format. Please define topics and subtopics according to the example."
@@ -3125,8 +3125,8 @@ msgstr "Die Absage von ${title} kann nicht rückgängig gemacht werden."
 msgid "Reject reservation"
 msgstr "Reservation absagen"
 
-#.
 #. Used in sentence: "${event} published."
+#.
 msgid "Event"
 msgstr "Veranstaltung"
 
@@ -4949,6 +4949,21 @@ msgstr "Identicon"
 msgid "Not a valid color."
 msgstr "Ungültige Farbe."
 
+msgid "CSRF failed."
+msgstr ""
+"CSRF fehlgeschlagen. Aktualisieren Sie die Seite. Falls das Problem "
+"weiterhin besteht, melden Sie sich ab, wieder an und versuchen Sie es erneut."
+
+msgid "CSRF token missing."
+msgstr ""
+"CSRF Token fehlt. Aktualisieren Sie die Seite. Falls das Problem weiterhin "
+"besteht, melden Sie sich ab, wieder an und versuchen Sie es erneut."
+
+msgid "CSRF token expired."
+msgstr ""
+"CSRF Token abgelaufen. Aktualisieren Sie die Seite. Falls das Problem "
+"weiterhin besteht, melden Sie sich ab, wieder an und versuchen Sie es erneut."
+
 msgid "Not a valid choice"
 msgstr "Ungültige Auswahl"
 
@@ -6517,3 +6532,10 @@ msgstr "Ein Konto wurde für Sie erstellt"
 
 msgid "The user was created successfully"
 msgstr "Der Benutzer wurde erfolgreich erstellt"
+
+#~ msgid ""
+#~ "Invalid format. Please define an organisation name with topics and "
+#~ "subtopics according the example."
+#~ msgstr ""
+#~ "Ungültiges Format. Bitte definieren Sie eine Organisation mit Themen und "
+#~ "Unterthemen wie im Beispiel."
