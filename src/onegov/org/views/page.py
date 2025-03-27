@@ -166,8 +166,14 @@ def view_news_collection(
                 for news in children
             ],
             request_url=request.link(self),
-            prev_url=request.link(prev_page) if prev_page else None,
-            next_url=request.link(next_page) if next_page else None,
+            prev_url=request.link(
+                prev_page,
+                query_params={'format': 'rss'}
+            ) if prev_page else None,
+            next_url=request.link(
+                next_page,
+                query_params={'format': 'rss'}
+            ) if next_page else None,
             feed_title=request.domain + ' News',
             language=request.app.org.meta['locales'],
         )
