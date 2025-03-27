@@ -362,6 +362,10 @@ class NewsCollection(Pagination[News], AdjacencyListCollection[News]):
             '/aktuelles/', ensure_type='news'
         )
 
+    @property
+    def access(self) -> str:
+        return self.root.access if self.root else 'public'
+
     def subset(self) -> Query[News]:
         news = self.session.query(News)
 
@@ -474,7 +478,7 @@ class NewsCollection(Pagination[News], AdjacencyListCollection[News]):
         return self.request.class_link(
             News,
             {
-                'absorb': '',
+                'absorb': None,
                 'filter_years': self.filter_years,
                 'filter_tags': self.filter_tags,
                 'page': self.page
