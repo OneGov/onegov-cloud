@@ -33,12 +33,6 @@ class DocumentFormFile(File):
 
     __mapper_args__ = {'polymorphic_identity': 'document_form_file'}
 
-    es_type_name = 'document_form_file'
-
-    @property
-    def es_public(self) -> bool:
-        return True
-
 
 class FormDocument(Base, ContentMixin, TimestampMixin, AccessExtension,
                    SearchableContent, MultiAssociatedFiles,
