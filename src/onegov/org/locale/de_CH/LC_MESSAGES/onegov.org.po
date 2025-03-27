@@ -2,7 +2,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE 1.0\n"
-"POT-Creation-Date: 2025-03-20 14:09+0100\n"
+"POT-Creation-Date: 2025-03-27 09:48+0100\n"
 "PO-Revision-Date: 2022-03-15 10:21+0100\n"
 "Last-Translator: Marc Sommerhalder <marc.sommerhalder@seantis.ch>\n"
 "Language-Team: German\n"
@@ -3134,8 +3134,8 @@ msgstr "Die Absage von ${title} kann nicht rückgängig gemacht werden."
 msgid "Reject reservation"
 msgstr "Reservation absagen"
 
-#.
 #. Used in sentence: "${event} published."
+#.
 msgid "Event"
 msgstr "Veranstaltung"
 
@@ -3414,6 +3414,12 @@ msgstr "Änderung vorschlagen"
 msgid "Found an error? Propose a change to this entry."
 msgstr "Haben Sie einen Fehler gefunden? Schlagen Sie eine Änderung vor."
 
+msgid "No subscribers yet"
+msgstr "Noch keine Abonnenten"
+
+msgid "There are currently ${count} recipients registered."
+msgstr "Zur Zeit sind ${count} Abonnenten registriert."
+
 msgid ""
 "Subscribers may always unsubscribe themselves through a link shown at the "
 "bottom of the newsletter. If you unsubscribe them here, they will not be "
@@ -3427,6 +3433,15 @@ msgstr "Abmelden"
 
 msgid "unsubscribe"
 msgstr "abmelden"
+
+msgid ""
+"This recipient has delivery failures, including hard bounces, invalid email "
+"addresses, spam complaints, manual deactivations, or being blocked. We "
+"recommend unsubscribing it from the list."
+msgstr ""
+"Dieser Empfänger hat Zustellungsfehler, einschließlich Hard Bounces, "
+"ungültige E-Mail-Adresse, Spam-Beschwerde, manuelle Deaktivierung oder wird "
+"blockiert. Wir empfehlen, ihn von der Liste abzumelden."
 
 msgid ""
 "Your edit requires a migration of existing entries. Please confirm the "
@@ -4490,9 +4505,6 @@ msgstr ""
 "Der Newsletter ist deaktiviert. Sie können diese Seite nur sehen, weil Sie "
 "eingeloggt sind."
 
-msgid "There are currently ${count} recipients registered."
-msgstr "Zur Zeit sind ${count} Abonnenten registriert."
-
 msgid "To update your subscription, please use this ${Link}"
 msgstr "Um Ihr Abonnement zu aktualisieren, verwenden Sie bitte diesen ${Link}"
 
@@ -4650,18 +4662,6 @@ msgstr "Response Data"
 
 msgid "No notifications"
 msgstr "Keine Benachrichtigungen"
-
-msgid "No subscribers yet"
-msgstr "Noch keine Abonnenten"
-
-msgid ""
-"This recipient has delivery failures, including hard bounces, invalid email "
-"addresses, spam complaints, manual deactivations, or being blocked. We "
-"recommend unsubscribing it from the list."
-msgstr ""
-"Dieser Empfänger hat Zustellungsfehler, einschließlich Hard Bounces, "
-"ungültige E-Mail-Adresse, Spam-Beschwerde, manuelle Deaktivierung oder wird "
-"blockiert. Wir empfehlen, ihn von der Liste abzumelden."
 
 msgid "submitted"
 msgstr "gemeldet"
@@ -4957,6 +4957,21 @@ msgstr "Identicon"
 
 msgid "Not a valid color."
 msgstr "Ungültige Farbe."
+
+msgid "CSRF failed."
+msgstr ""
+"CSRF fehlgeschlagen. Aktualisieren Sie die Seite. Falls das Problem "
+"weiterhin besteht, melden Sie sich ab, wieder an und versuchen Sie es erneut."
+
+msgid "CSRF token missing."
+msgstr ""
+"CSRF Token fehlt. Aktualisieren Sie die Seite. Falls das Problem weiterhin "
+"besteht, melden Sie sich ab, wieder an und versuchen Sie es erneut."
+
+msgid "CSRF token expired."
+msgstr ""
+"CSRF Token abgelaufen. Aktualisieren Sie die Seite. Falls das Problem "
+"weiterhin besteht, melden Sie sich ab, wieder an und versuchen Sie es erneut."
 
 msgid "Not a valid choice"
 msgstr "Ungültige Auswahl"
@@ -6526,3 +6541,17 @@ msgstr "Ein Konto wurde für Sie erstellt"
 
 msgid "The user was created successfully"
 msgstr "Der Benutzer wurde erfolgreich erstellt"
+
+#~ msgid ""
+#~ "Invalid format. Please define a listwith topics and subtopics according "
+#~ "the example."
+#~ msgstr ""
+#~ "Ungültiges Format. Bitte definieren Sie eine Liste mit Themen und "
+#~ "Unterthemen entsprechend dem Beispiel."
+
+#~ msgid ""
+#~ "Invalid format. Please define an organisation name with topics and "
+#~ "subtopics according the example."
+#~ msgstr ""
+#~ "Ungültiges Format. Bitte definieren Sie eine Organisation mit Themen und "
+#~ "Unterthemen wie im Beispiel."
