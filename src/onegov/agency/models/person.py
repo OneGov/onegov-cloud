@@ -69,9 +69,11 @@ class ExtendedPerson(Person, AccessExtension, PublicationExtension):
             if number:
                 number = number.replace(' ', '')
                 result.append(number)
+                result.append(number[-4:])
                 result.append(number[-7:])
                 result.append(number[-9:])
                 result.append('0' + number[-9:])
+                result.append('+41' + number[-9:])
         return [r for r in result if r]
 
     @property
