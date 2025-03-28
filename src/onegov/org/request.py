@@ -241,24 +241,6 @@ class OrgRequest(CoreRequest):
 
         return tuple(p for p in self.pages_tree if include(p))
 
-    def visualize_page_tree(
-        self,
-        pages: Iterable[PageMeta],
-        indent: int = 0
-    ) -> str:
-        """ Returns a string visualizing the page tree structure. """
-        result = ''
-        indent_str = '  ' * indent
-        for page in pages:
-            child_count = len(page.children)
-            result += (
-                f'{indent_str}- {page.title} '
-                f'({page.type}, {child_count} children)\n'
-            )
-            if page.children:
-                result += self.visualize_page_tree(page.children, indent + 1)
-        return result
-
     @orm_cached(policy='on-table-change:pages', by_role=True)
     def homepage_pages(self) -> dict[int, list[PageMeta]]:
 
