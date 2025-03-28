@@ -13,8 +13,9 @@ from elasticsearch.helpers import streaming_bulk
 from langdetect.lang_detect_exception import LangDetectException
 from itertools import groupby, chain, repeat
 from queue import Queue, Empty, Full
-from sqlalchemy import func, and_, or_
+from sqlalchemy import func
 from sqlalchemy.dialects.postgresql import JSONB
+from sqlalchemy.sql import Delete
 from unidecode import unidecode
 
 from sqlalchemy.orm.exc import ObjectDeletedError
@@ -393,7 +394,6 @@ class PostgresIndexer(IndexerBase):
         self,
         tasks: list[IndexTask] | IndexTask,
         session: Session | None = None,
-        update: bool = False
     ) -> bool:
         """ Update the 'fts_idx' column (full text search index) of the given
         object(s)/task(s).
@@ -464,52 +464,25 @@ class PostgresIndexer(IndexerBase):
                 combined_vector = combined_vector.op('||')(vector)
 
             schema = tasks[0]['schema']
-            if update:
-                # this happens when an item has been edited or deleted
-                stmt = (
-                    sqlalchemy.update(SearchIndex.__table__)
-                    .where(
-                        and_(
-                            or_(
-                                SearchIndex.__table__.c.owner_id_int ==
-                                sqlalchemy.bindparam('_owner_id_int'),
-                                SearchIndex.__table__.c.owner_id_uuid ==
-                                sqlalchemy.bindparam('_owner_id_uuid'),
-                                SearchIndex.__table__.c.owner_id_str ==
-                                sqlalchemy.bindparam('_owner_id_str')
-                            ),
-                            SearchIndex.__table__.c.owner_type ==
+
+            stmt = (
+                sqlalchemy.insert(SearchIndex.__table__)
+                .values(
+                    {
+                        SearchIndex.__table__.c.owner_id_int:
+                            sqlalchemy.bindparam('_owner_id_int'),
+                        SearchIndex.__table__.c.owner_id_uuid:
+                            sqlalchemy.bindparam('_owner_id_uuid'),
+                        SearchIndex.__table__.c.owner_id_str:
+                            sqlalchemy.bindparam('_owner_id_str'),
+                        SearchIndex.__table__.c.owner_type:
                             sqlalchemy.bindparam('_owner_type'),
-                        )
-                    )
-                    .values(
-                        {
-                            SearchIndex.__table__.c.fts_idx_data:
-                                sqlalchemy.bindparam('_data', type_=JSONB),
-                            SearchIndex.__table__.c.fts_idx: combined_vector,
-                        }
-                    )
+                        SearchIndex.__table__.c.fts_idx_data:
+                            sqlalchemy.bindparam('_data', type_=JSONB),
+                        SearchIndex.__table__.c.fts_idx: combined_vector,
+                    }
                 )
-            else:
-                # this happens when on reindexing or adding items
-                stmt = (
-                    sqlalchemy.insert(SearchIndex.__table__)
-                    .values(
-                        {
-                            SearchIndex.__table__.c.owner_id_int:
-                                sqlalchemy.bindparam('_owner_id_int'),
-                            SearchIndex.__table__.c.owner_id_uuid:
-                                sqlalchemy.bindparam('_owner_id_uuid'),
-                            SearchIndex.__table__.c.owner_id_str:
-                                sqlalchemy.bindparam('_owner_id_str'),
-                            SearchIndex.__table__.c.owner_type:
-                                sqlalchemy.bindparam('_owner_type'),
-                            SearchIndex.__table__.c.fts_idx_data:
-                                sqlalchemy.bindparam('_data', type_=JSONB),
-                            SearchIndex.__table__.c.fts_idx: combined_vector,
-                        }
-                    )
-                )
+            )
 
             if session is None:
                 connection = self.engine.connect()
@@ -537,12 +510,12 @@ class PostgresIndexer(IndexerBase):
         session: Session | None = None
     ) -> bool:
 
-        return self.index(tasks, session, update=True)
+        return self.index(tasks, session)
 
     def delete(
-            self,
-            tasks: list[IndexTask] | IndexTask,
-            session: Session | None = None
+        self,
+        tasks: list[IndexTask] | IndexTask,
+        session: Session | None = None
     ) -> bool:
 
         if not isinstance(tasks, list):
@@ -551,19 +524,21 @@ class PostgresIndexer(IndexerBase):
         try:
             for task in tasks:
                 _owner_id = task['id']
+                stmt: Delete | None = None
+
                 if isinstance(_owner_id, UUID):
                     stmt = (
-                        sqlalchemy.delete(SearchIndex)
+                        sqlalchemy.delete(SearchIndex.__table__)
                         .where(SearchIndex.owner_id_uuid == _owner_id)
                     )
                 elif isinstance(_owner_id, int):
                     stmt = (
-                        sqlalchemy.delete(SearchIndex)
+                        sqlalchemy.delete(SearchIndex.__table__)
                         .where(SearchIndex.owner_id_int == _owner_id)
                     )
                 elif isinstance(_owner_id, str):
                     stmt = (
-                        sqlalchemy.delete(SearchIndex)
+                        sqlalchemy.delete(SearchIndex.__table__)
                         .where(SearchIndex.owner_id_str == _owner_id)
                     )
 
@@ -607,8 +582,6 @@ class PostgresIndexer(IndexerBase):
 
             if action == 'index':
                 self.index(task_list, session)
-            elif action == 'update':
-                self.index(task_list, session, update=True)
             elif action == 'delete':
                 self.delete(task_list, session)
             else:
@@ -1046,7 +1019,7 @@ class ORMEventTranslator:
             if isinstance(obj, Searchable):
                 self.delete(schema, obj)
 
-    def put(self, translation: Task) -> None:
+    def put(self, translation: IndexTask) -> None:
         try:
             self.es_queue.put_nowait(translation)
             self.psql_queue.put_nowait(translation)
@@ -1057,7 +1030,6 @@ class ORMEventTranslator:
     def index(
         self, schema: str,
         obj: Searchable,
-        update: bool = False
     ) -> None:
         """
         Creates or updates index for the given object
@@ -1072,18 +1044,18 @@ class ORMEventTranslator:
             else:
                 language = obj.es_language
 
-            action = 'update' if update else 'index'
             translation: IndexTask = {
-                'action': action,
+                'action': 'index',
                 'id': getattr(obj, obj.es_id),
                 'id_key': obj.es_id,
                 'schema': schema,
                 'type_name': obj.es_type_name,
-                'tablename': obj.__tablename__,  # FIXME: not needed for fts
+                # FIXME: tablename not needed for fts
+                'tablename': obj.__tablename__,  # type:ignore[attr-defined]
                 'owner_type': obj.__class__.__name__,
                 'owner_id': getattr(obj, obj.es_id),
                 'language': language,
-                'properties': {}
+                'properties': {},
             }
 
             mapping_ = self.mappings[obj.es_type_name].for_language(language)
@@ -1132,8 +1104,9 @@ class ORMEventTranslator:
             'action': 'delete',
             'schema': schema,
             'type_name': obj.es_type_name,
-            'tablename': obj.__tablename__,  # FIXME: not needed for fts
+            # FIXME: tablename not needed for fts
+            'tablename': obj.__tablename__,  # type:ignore[attr-defined]
             'id': getattr(obj, obj.es_id)
         }
 
-        self.put(translation)
+        self.put(translation)  # type:ignore[arg-type]

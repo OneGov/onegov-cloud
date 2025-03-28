@@ -1516,7 +1516,7 @@ class Framework(
         # verify search index table exists
         if not engine.has_table('search_index', schema=schema_name):
             metadata = MetaData(schema=schema_name)
-            search_index_table = Table(
+            Table(
                 'search_index',
                 metadata,
                 Column('id', Integer, primary_key=True),

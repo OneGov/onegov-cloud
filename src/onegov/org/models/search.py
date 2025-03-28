@@ -8,13 +8,16 @@ from elasticsearch_dsl.query import MultiMatch
 from functools import cached_property
 from sedate import utcnow
 from sqlalchemy import func, Numeric, cast, DateTime
-from typing import TYPE_CHECKING, Any
+
+from sqlalchemy.dialects.postgresql import UUID
+from sqlalchemy.orm import Query
 
 from onegov.core.collection import Pagination, _M
 from onegov.core.orm import Base
 from onegov.event.models import Event
 from onegov.search.search_index import SearchIndex
 
+from typing import TYPE_CHECKING, Any
 if TYPE_CHECKING:
     from onegov.org.request import OrgRequest
     from onegov.search import Searchable
@@ -270,28 +273,29 @@ class SearchPostgres(Pagination[_M]):
 
         return sorted_events + other
 
-    def filter_user_level(self, model: Any, query: Any) -> Any:
-        """ Filters search content according user level """
+    def filter_user_level(self, query: Any) -> Any:
+        """ Filters search content according to user level """
 
         if not self.request.is_logged_in:  # maybe not needed
             query = query.filter(
-                model.fts_idx_data.contains({'es_public': True}))
+                SearchIndex.fts_idx_data.contains({'es_public': True}))
 
         # as a member we only want to see public and member content
         if self.request.is_member:
             query = query.filter(
-                model.fts_idx_data['access'].astext.in_(('public', 'member')))
+                SearchIndex.fts_idx_data['access'].
+                astext.in_(('public', 'member')))
 
         # as non-manager we only want to see public content
         elif not self.request.is_manager:
             query = query.filter(
-                model.fts_idx_data.contains({'es_public': True}))
+                SearchIndex.fts_idx_data.contains({'es_public': True}))
 
         return query
 
     @staticmethod
-    def get_model_by_class_name(class_name):
-        for cls in Base._decl_class_registry.values():
+    def get_model_by_class_name(class_name: str) -> type[Any] | None:
+        for cls in Base._decl_class_registry.values():  # type: ignore[attr-defined]
             if not hasattr(cls, '__name__'):
                 continue
             if cls.__name__ == class_name:
@@ -321,17 +325,22 @@ class SearchPostgres(Pagination[_M]):
                     Numeric)
         ).label('rank')
 
-        query = self.request.session.query(SearchIndex).filter(
+        query: Query[Any] = self.request.session.query(
+            SearchIndex).filter(
             SearchIndex.fts_idx.op('@@')(ts_query)
         )
         query = query.add_column(decay_rank)
         self.number_of_docs = query.count()
-        query = self.filter_user_level(SearchIndex, query)
+        query = self.filter_user_level(query)
 
+        index_entry: SearchIndex
+        rank: float
         for index_entry, rank in query:
             model = self.get_model_by_class_name(index_entry.owner_type)
 
             if model:
+                owner_id: str | int | UUID | None = None
+
                 if index_entry.owner_id_int is not None:
                     owner_id = index_entry.owner_id_int
                 elif index_entry.owner_id_uuid is not None:
@@ -339,11 +348,11 @@ class SearchPostgres(Pagination[_M]):
                 else:
                     owner_id = index_entry.owner_id_str
 
-                q = self.request.session.query(model)
-                q = q.filter(model.id == owner_id).first()
+                result = (self.request.session.query(model).
+                          filter(model.id == owner_id).first())
 
-                if q:
-                    results.append((q, rank))
+                if result:
+                    results.append((result, rank))
 
         results.sort(key=lambda x: x[1], reverse=True)
         self.number_of_results = len(results)
@@ -357,7 +366,7 @@ class SearchPostgres(Pagination[_M]):
 
         query = self.request.session.query(SearchIndex)
         self.number_of_docs = query.count()
-        query = self.filter_user_level(SearchIndex, query)
+        query = self.filter_user_level(query)
         query = query.filter(
             SearchIndex.fts_idx_data['es_tags'].contains([q]))
 
@@ -365,6 +374,8 @@ class SearchPostgres(Pagination[_M]):
             model = self.get_model_by_class_name(index_entry.owner_type)
 
             if model:
+                owner_id: str | int | UUID | None = None
+
                 if index_entry.owner_id_int is not None:
                     owner_id = index_entry.owner_id_int
                 elif index_entry.owner_id_uuid is not None:
@@ -372,10 +383,11 @@ class SearchPostgres(Pagination[_M]):
                 else:
                     owner_id = index_entry.owner_id_str
 
-                q = self.request.session.query(model)
-                q = q.filter(model.id == owner_id).first()
-                if q:
-                    results.append(q)
+                result = (self.request.session.query(model).
+                          filter(model.id == owner_id).first())
+
+                if result:
+                    results.append(result)
 
         self.number_of_results = len(results)
         return results
