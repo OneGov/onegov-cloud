@@ -303,14 +303,6 @@ class Indexer(IndexerBase):
                         '_id': task['id'],
                         'doc': task['properties']
                     }
-                elif task['action'] == 'delete':
-                    # FIXME: I'm unsure about how this ever worked...
-                    yield {
-                        '_op_type': 'delete',
-                        '_index': self.ensure_index(task),  # type:ignore
-                        '_id': task['id'],
-                        'doc': task['properties']  # type:ignore
-                    }
                 else:
                     raise NotImplementedError
 

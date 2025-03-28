@@ -71,6 +71,18 @@ def test_basic_search(client_with_es):
     assert (client.get('/search-postgres/suggest?q=fulltext').json == [
         'Now supporting fulltext search'])
 
+    # delete News item
+    news.click("Löschen")
+
+    client.app.es_client.indices.refresh(index='_all')
+
+    # elasticsearch
+    assert "0 Resultate" in client.get('/search?q=fulltext')
+    assert "0 Resultate" in anom.get('/search?q=fulltext')
+    # postgres
+    assert "0 Resultate" in client.get('/search-postgres?q=fulltext')
+    assert "0 Resultate" in anom.get('/search-postgres?q=fulltext')
+
 
 @pytest.mark.flaky(reruns=3)
 def test_view_search_is_limiting(client_with_es):
