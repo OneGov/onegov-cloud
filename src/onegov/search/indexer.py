@@ -13,7 +13,7 @@ from elasticsearch.helpers import streaming_bulk
 from langdetect.lang_detect_exception import LangDetectException
 from itertools import groupby, chain, repeat
 from queue import Queue, Empty, Full
-from sqlalchemy import func
+from sqlalchemy import func, Table, delete, MetaData
 from sqlalchemy.dialects.postgresql import JSONB
 from sqlalchemy.sql import Delete
 from unidecode import unidecode
@@ -583,8 +583,10 @@ class PostgresIndexer(IndexerBase):
     def delete_search_index(self, schema: str) -> None:
         """ Delete all records in search index table of the given `schema`. """
 
-        stmt = sqlalchemy.text(
-            f'DELETE FROM "{schema}".{SearchIndex.__tablename__}')
+        metadata = MetaData(schema=schema)
+        search_index_table = Table(SearchIndex.__tablename__, metadata)
+        stmt = delete(search_index_table)
+
         connection = self.engine.connect()
         with connection.begin():
             connection.execute(stmt)
