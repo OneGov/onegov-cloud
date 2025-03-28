@@ -231,17 +231,6 @@ class OrgRequest(CoreRequest):
         return tuple(p for p in self.pages_tree if include(p))
 
     @orm_cached(policy='on-table-change:pages', by_role=True)
-    def news_root_pages(self) -> tuple[PageMeta, ...]:
-
-        def include(page: PageMeta) -> bool:
-            if page.type == 'news':
-                return True
-
-            return True if page.children else False
-
-        return tuple(p for p in self.pages_tree if include(p))
-
-    @orm_cached(policy='on-table-change:pages', by_role=True)
     def homepage_pages(self) -> dict[int, list[PageMeta]]:
 
         def visit_topics(
