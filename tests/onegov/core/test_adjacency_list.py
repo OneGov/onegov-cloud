@@ -1,3 +1,4 @@
+from decimal import Decimal
 import pytest
 
 from onegov.core.orm.abstract import (
@@ -277,6 +278,7 @@ def test_change_title(session):
 
     b.title = 'd'
 
+    # is still ['a', 'b', 'c']
     assert a.siblings.all() == [a, c, b]
 
 
@@ -307,6 +309,83 @@ def test_numeric_priority():
         'ABA',
         'Z',
     )
-    assert sorted(input, key=numeric_priority) == [
-        'A', 'AA', 'ABA', 'BA', 'Z'
-    ]
+    assert sorted(input, key=numeric_priority) == ['A', 'AA', 'ABA', 'BA', 'Z']
+
+
+def test_move_uses_binary_gap(session):
+    family = FamilyMemberCollection(session)
+    root = family.add_root("root")
+
+    # Add items - binary gap should assign initial fractional orders
+    a = family.add(parent=root, title='a')
+    b = family.add(parent=root, title='b')
+    c = family.add(parent=root, title='c')
+    session.flush()  # Calculate and save initial orders
+
+    # Capture initial orders (should be fractional and ordered)
+    order_a1 = a.order
+    order_b1 = b.order
+    order_c1 = c.order
+    assert order_a1 < order_b1 < order_c1
+    assert isinstance(order_a1, Decimal)
+
+    # Move 'a' below 'b' -> order should be b, a, c
+    family.move_below(subject=a, target=b)
+
+    assert a.siblings.all() == [b, a, c]
+
+    # Capture orders after move
+    order_a2 = a.order
+    order_b2 = b.order
+    order_c2 = c.order
+
+    # Check that 'a' got a new order, 'b' and 'c' kept theirs
+    assert order_a2 != order_a1
+    assert order_b2 == order_b1
+    assert order_c2 == order_c1
+
+    assert (Decimal(str(order_b2)) <
+        Decimal(str(order_a2)) < Decimal(str(order_c2)))
+
+    # Move 'c' above 'b' -> order should be c, b, a
+    family.move_above(subject=c, target=b)
+
+    assert a.siblings.all() == [c, b, a]
+
+    order_a3 = a.order
+    order_b3 = b.order
+    order_c3 = c.order
+
+    assert order_c3 != order_c2
+    assert order_a3 == order_a2
+    assert order_b3 == order_b2
+    assert Decimal(str(order_c3)) < Decimal(str(order_b3))
+
+
+def test_add_uses_binary_gap(session):
+    family = FamilyMemberCollection(session)
+    root = family.add_root("root")
+
+    # Add items one by one, flushing each time to see order calculation
+    b = family.add(parent=root, title='b')
+    order_b1 = b.order
+    assert order_b1 == Decimal('65536')  # Default center
+
+    a = family.add(parent=root, title='a')  # Should go before 'b'
+    order_a1 = a.order
+    order_b2 = b.order
+    assert order_a1 < order_b2  # 'a' got order less than 'b'
+    assert order_b2 == order_b1  # 'b's order didn't change
+    assert order_a1 == order_b1 / 2  # Specifically, half of 'b's original
+
+    c = family.add(parent=root, title='c')  # Should go after 'b'
+    order_a2 = a.order
+    order_b3 = b.order
+    order_c1 = c.order
+    assert order_a2 == order_a1  # 'a' didn't change
+    assert order_b3 == order_b2  # 'b' didn't change
+    assert order_c1 > order_b3  # 'c' got order greater than 'b'
+    assert order_c1 == order_b3 + Decimal('1')
+
+    # Verify final list order based on calculated numeric orders
+    assert [item.title for item in root.children] == ['a', 'b', 'c']

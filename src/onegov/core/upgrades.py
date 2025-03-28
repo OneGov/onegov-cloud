@@ -14,6 +14,7 @@ from onegov.core.orm.abstract import Associable
 from onegov.core.orm.types import JSON
 from sqlalchemy import inspect, text
 
+from sqlalchemy import Numeric
 from sqlalchemy.exc import NoInspectionAvailable
 
 
@@ -218,25 +219,30 @@ def unique_constraint_in_association_tables(context: UpgradeContext) -> None:
                 """)
 
 
-@upgrade_task('Change order to be Numeric to avoid having to update '
-    'on every insert')
+@upgrade_task(
+    'Change order to Numeric to avoid re-sorting siblings on every new item'
+)
 def change_adjacency_list_order_to_numeric(context: UpgradeContext) -> None:
+    def is_concrete_subclass(cls: type) -> bool:
+        return (
+            issubclass(cls, AdjacencyList)
+            and cls is not AdjacencyList
+            and not isabstract(cls)
+        )
 
-    def is_concrete_subclass(cls) -> bool:
-        return (issubclass(cls, AdjacencyList) and cls is not AdjacencyList and
-                not isabstract(cls))
-
-    adjacency_subclasses = set(chain(
-        find_models(Base, is_concrete_subclass),
-        find_models(ORMBase, is_concrete_subclass)
-    ))
+    adjacency_subclasses = set(
+        chain(
+            find_models(Base, is_concrete_subclass),
+            find_models(ORMBase, is_concrete_subclass),
+        )
+    )
 
     for cls in adjacency_subclasses:
-        table_name = cls.tablename
+        table_name = cls.__tablename__  # type: ignore[attr-defined]
         if context.has_table(table_name):
-            # Alter the column type to NUMERIC
-            context.operations.execute(text("""
-                ALTER TABLE :table_name
-                ALTER COLUMN "order"
-                TYPE NUMERIC(30, 15) USING "order"::numeric
-            """).bindparams(table_name=table_name))
+            context.operations.alter_column(
+                table_name,
+                'order',
+                type_=Numeric(30, 15),
+                postgresql_using='"order"::numeric'
+            )
