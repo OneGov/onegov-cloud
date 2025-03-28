@@ -217,8 +217,6 @@ def session_manager(postgres_dsn):
     setup with :func:`postgres_dsn`.
 
     """
-    schema_name = 'bar'
-
     # in testing we often reuse loaded values after commiting a transaction,
     # so we set expire_on_commit to False. The test applications will still
     # use the default value of True however. This only affects unit tests
@@ -232,7 +230,6 @@ def session_manager(postgres_dsn):
             'echo': 'ECHO' in os.environ
         }
     )
-    mgr.current_schema = schema_name
 
     # we used to only add this base sometimes, but we always need it now
     # since otherwise some of our backrefs lead to nowhere
@@ -249,7 +246,7 @@ def session_manager_fts(postgres_dsn):
     `search_index` table.
 
     """
-    schema_name = 'ogc_fts'
+    schema_name = 'fts'
 
     # in testing we often reuse loaded values after commiting a transaction,
     # so we set expire_on_commit to False. The test applications will still

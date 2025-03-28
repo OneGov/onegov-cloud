@@ -554,7 +554,7 @@ def test_indexer_process(es_client, session_manager_fts):
         'title': {'type': 'localized'},
     })
 
-    es_index = "foo-ogc_fts-en-page"  # hostname-schema-language-type
+    es_index = "foo-fts-en-page"  # hostname-schema-language-type
     es_indexer = Indexer(
         mappings, Queue(), hostname='foo', es_client=es_client)
     psql_indexer = PostgresIndexer(Queue(), engine)
@@ -731,7 +731,7 @@ def test_tags(es_client, session_manager_fts):
         'tags': {'type': 'text', 'analyzer': 'tags'}
     })
 
-    es_index = "foo-ogc_fts-en-page"  # hostname-schema-language-type
+    es_index = "foo-fts-en-page"  # hostname-schema-language-type
     schema = session_manager.current_schema
     es_indexer = Indexer(mappings, Queue(), es_client, hostname='foo')
     psql_indexer = PostgresIndexer(Queue(), session_manager.engine)
