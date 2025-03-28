@@ -70,7 +70,7 @@ def test_add_performance_large_collection(session, item_count):
     assert new_item is not None
     assert new_item.title == title_to_add
     # Fetch from DB to be sure
-    fetched_item = session.get(News, new_item.id)
+    fetched_item = session.query(News).get(new_item.id)
     assert fetched_item is not None
 
     # The crucial assertion: Adding one item should be very fast.
