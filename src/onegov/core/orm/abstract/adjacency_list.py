@@ -212,7 +212,7 @@ class AdjacencyList(Base):
 
             # Check if the list *was* sorted according to the *old* title
             if is_sorted(siblings, key=old_sort_key):
-                binary_gap_insert_inplace(siblings, self, self.sort_key)
+                calculuate_midpoint_order(siblings, self, self.sort_key)
 
         return sort_on_title_change
 
@@ -301,10 +301,10 @@ class AdjacencyList(Base):
         )
 
 
-def binary_gap_insert_inplace(
+def calculuate_midpoint_order(
     siblings: list[_L], new_item: _L, key: Callable[[_L], Any]
 ) -> None:
-    """Insert/update an item's order using binary gap based on a sort key. """
+    """Insert/update an item's order """
     # Filter out the item itself for finding neighbors based on key
     sorted_neighbors = sorted([s for s in siblings if s != new_item], key=key)
 
@@ -493,10 +493,13 @@ class AdjacencyListCollection(Generic[_L]):
         title: str,
         name: str | None = None,
         type: str | None = None,
-        **kwargs: Any
+        **kwargs: Any,
     ) -> _L:
-        """ Adds a child to the given parent. """
-
+        """Adds a child.
+        - If order is explicit, uses it.
+        - If siblings are sorted by sort_key, inserts starting form mid
+        - If siblings are NOT sorted by sort_key, append at the end
+        """
         name = name or self.get_unique_child_name(title, parent)
 
         if type is not None:
@@ -504,20 +507,50 @@ class AdjacencyListCollection(Generic[_L]):
         else:
             child_class = self.__listclass__
 
+        # Handle explicit order passed directly or via kwargs
+        explicit_order = kwargs.pop('order', None)
+        if explicit_order is not None:
+            # Ensure it's Decimal before passing to constructor
+            kwargs['order'] = Decimal(str(explicit_order))
+
         child = child_class(parent=parent, title=title, name=name, **kwargs)
         self.session.add(child)
-        self.session.flush()  # Flush to assign ID and make it queryable
+        # Flush required to get child.id for sibling query and relationship
+        # loading
+        self.session.flush()
 
-        # impose an order, unless one is given
-        # If order was NOT explicitly provided, calculate using binary gap
-        if kwargs.get('order') is None:
-            # Query siblings *including* the newly added child
+        # If order was NOT explicitly provided, decide insertion strategy
+        if explicit_order is None:
+            # Use eager loading for siblings for performance if needed,
+            # but .all() is fine here.
             siblings = child.siblings.all()
-            # Use the collection's default sort key for insertion order
-            binary_gap_insert_inplace(siblings, child, self.sort_key)
-            # The child.order is now set, will be saved on next flush/commit
+            existing_siblings = [s for s in siblings if s != child]
 
-        # Return the child; caller is responsible for final commit/flush
+            # Check if existing siblings are sorted by the title-based key
+            if not existing_siblings or is_sorted(
+                existing_siblings, key=self.sort_key
+            ):
+                # --- Strategy 1: Insert based on title key ---
+                # Pass the full list including the new child
+                calculuate_midpoint_order(siblings, child, self.sort_key)
+            else:
+                # --- Strategy 2: Append numerically at the end ---
+                # This is the case where it's not already sorted
+                if existing_siblings:
+                    # Sort by current numeric order to find the last one
+                    last_sibling_numerically = max(
+                        existing_siblings, key=lambda s: s.order
+                    )
+                    # Calculate order slightly larger than the last one
+                    child.order = Decimal(
+                        str(last_sibling_numerically.order)
+                    ) + Decimal('1')
+                else:
+                    # This is the first child, use default
+                    child.order = Decimal('65536')  # Or use the column default
+
+            # Flush again to save the calculated order before returning
+            self.session.flush()
         return child
 
     def add_root(
@@ -631,7 +664,6 @@ class AdjacencyListCollection(Generic[_L]):
                     break
                 potential_right_index += 1
 
-        # Calculate new order for subject using binary gap logic
         if left and right:
             left_order = Decimal(str(left.order))
             right_order = Decimal(str(right.order))
