@@ -1,91 +1,89 @@
+from onegov.org.models import News
+from onegov.core.utils import Bunch, normalize_for_url
+from sqlalchemy import event
+from sqlalchemy.orm.attributes import get_history
 import pytest
-import time
+import transaction
 
-from onegov.core.utils import Bunch
-from onegov.org.models import News, NewsCollection
-from onegov.core.utils import normalize_for_url
+from onegov.org.models.page import NewsCollection
 
 
 @pytest.mark.parametrize("item_count", [1000])  # Parameterize if needed later
-def test_add_performance_large_collection(session, item_count):
+def test_add_performance_large_collection(item_count, session):
     """
-    Previously we had the following issue:
-    AdjacencyList items were sorted alphabetically by sort key. When we
-    had 1200 news items (not unusual in real world scenarios) and
-    created a news item with title 'AAAAAAA', depending on the tree
-    structure, the order was adjusted for a lot of news items.
-    Everything went into the ORM update queue from the Indexer, creating
-    a delay of several seconds.
+    Previously, we encountered a performance issue with our AdjacencyList
+    implementation. When news items were sorted alphabetically by sort key,
+    adding a single new item (such as one titled 'AAAAAAA') to a large
+    NewsCollection (around a thousand items) would trigger extensive reordering
+    throughout the tree structure.
 
-    To tackle this problem, we have now a smarter insertion method, starting
-    at the midpoint.
+    Subsequently all these 'order' updates would be consumed in the update
+    queue from of `Indexer`, amplifying the problem.
+
+    To tackle this problem, we have now a smarter insertion method,
+    starting at the midpoint.
 
     So this test verifies that adding one item is fast and doesn't scale
     linearly with the number of existing items (i.e., avoids O(N) updates
     to all ordering).
     """
 
+
+    def add_news(session):
+        root_title = 'Aktuelles'
+        root_name = normalize_for_url(root_title)
+        root_item = News(title=root_title, name=root_name, type='news')
+        session.add(root_item)
+        session.flush()
+        root_item_id = root_item.id
+        for i in range(item_count):
+            title = f'News Item {i:04d}'
+            name = normalize_for_url(title)
+            item = News(title=title, name=name, type='news', parent=root_item)
+            session.add(item)
+
+        transaction.commit()
+        return root_item_id
+
+    root_item_id = add_news(session)
+
+    root_item = session.query(News).filter_by(id=root_item_id).one()
     request = Bunch(session=session)
-    news_collection = NewsCollection(request)
+    news_collection = NewsCollection(request, root=root_item)
+    new_item_data = {
+        'parent': root_item,
+        'title': 'AAAAAAA',
+        'lead': '',
+        'text': ''
+    }
 
-    start_setup = time.perf_counter()
-    for i in range(item_count):
-        # Use unique titles to ensure they spread out in initial order
-        title = f'News Item {i:04d}'
-        title = normalize_for_url(title)
-        # Add as root items for simplicity, adjust if parent is required
-        item = News(title=title, name=title, type='news')
-        session.add(item)
-        # Flush periodically to manage transaction size
-        if i % 100 == 99:
-            print(f'  Flushing at item {i + 1}...')
-            session.flush()
+    update_counter = {'count': 0}
 
-    # Final flush and commit to persist the initial items
-    session.flush()
-    end_setup = time.perf_counter()
-    print(f'Setup took {end_setup - start_setup:.4f} seconds.')
+    # Event listener function to count News.order updates
+    def count_order_updates(session, flush_context):
+        for instance in session.dirty:
+            if isinstance(instance, News):
+                # Check if 'order' attribute is changing
+                hist = get_history(instance, 'order')
+                if hist.has_changes():
+                    update_counter['count'] += 1
 
-    # --- Timed Addition Phase ---
-    title_to_add = (
-        'AAAAAA Very First News'  # Title designed to go near the start
+    event.listen(session, 'after_flush', count_order_updates)
+
+    try:
+        # Add the item using the collection's method - this triggers the logic
+        new_item = news_collection.add(**new_item_data)
+        session.flush()  # Trigger the flush and the listener
+    finally:
+        event.remove(session, 'after_flush', count_order_updates)
+
+    # The crucial assertion: Add one item should cause very few order updates
+    # The midpoint strategy might update the item and potentially one neighbor.
+    # Allow a small buffer, but it should be constant, not O(N).
+    #
+    # Note: Before the fix in OGC-2134, this created a thousand updates!
+    max_expected_updates = 5
+    assert update_counter['count'] <= max_expected_updates, (
+        f"Adding one item caused {update_counter['count']} 'order' updates, "
+        f"expected <= {max_expected_updates}. Possible O(N) update issue?"
     )
-    print(f"Timing the addition of one news item ('{title_to_add}')...")
-
-    start_add = time.perf_counter()
-
-    # Add one item using the collection method
-    new_item = news_collection.add(
-        parent=None, title=title_to_add
-    )  # Add as root
-    session.flush()  # Ensure the add operation (incl. order calc and DB write) completes
-
-    end_add = time.perf_counter()
-    duration_add = end_add - start_add
-
-    print(f'Adding one item took {duration_add:.6f} seconds.')
-
-    # --- Verification ---
-    # Check the item was added
-    assert new_item is not None
-    assert new_item.title == title_to_add
-    # Fetch from DB to be sure
-    fetched_item = session.query(News).get(new_item.id)
-    assert fetched_item is not None
-
-    # The crucial assertion: Adding one item should be very fast.
-    # Set a generous threshold (e.g., 0.5 seconds). If it takes longer,
-    # it suggests the O(N) update problem might still exist.
-    # Adjust threshold based on your system/DB performance, but it should
-    # be significantly less than the setup time or multiple seconds.
-    threshold = 0.5
-    assert duration_add < threshold, (
-        f'Adding one item took too long ({duration_add:.6f}s), '
-        f'expected less than {threshold}s. Possible O(N) update issue?'
-    )
-
-    # Optional: Clean up if session fixture doesn't handle it fully
-    # (e.g., if using a persistent test DB)
-    # print("Cleaning up...")
-    # session.query(News).delete()
-    # session.commit()
