@@ -101,4 +101,4 @@ class PushNotificationCollection(GenericCollection[PushNotification]):
         return PushNotification
 
     def query(self) -> Query[PushNotification]:
-        return super().query()
+        return super().query().order_by(PushNotification.sent_at.desc())
