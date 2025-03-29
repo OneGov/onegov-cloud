@@ -15,6 +15,7 @@ from onegov.file.utils import extension_for_content_type
 from onegov.gis import CoordinatesMixin
 from onegov.people.models.membership import AgencyMembership
 from onegov.search import ORMSearchable
+from decimal import Decimal
 from sqlalchemy import Column
 from sqlalchemy import Text
 from sqlalchemy.orm import object_session
@@ -211,7 +212,7 @@ class Agency(AdjacencyList, ContentMixin, TimestampMixin, ORMSearchable,
 
         children = sorted(self.children, key=sortkey)
         for order, child in enumerate(children):
-            child.order = order
+            child.order = Decimal(order)
 
     def sort_relationships(
         self,

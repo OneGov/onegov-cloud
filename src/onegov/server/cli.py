@@ -561,6 +561,9 @@ class WsgiServer(FileSystemEventHandler):
         if src_path.endswith('.rdb'):
             return
 
+        if src_path.endswith('.md'):
+            return
+
         if '/.testmondata' in src_path:
             return
 
