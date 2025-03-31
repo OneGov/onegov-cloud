@@ -30,7 +30,6 @@ def render_message(
     request: OrgRequest,
     owner: Owner,
     layout: MessageCollectionLayout,
-    hide_identity: bool = False,
 ) -> str:
     return render_template(
         template=f'message_{message.type}',
@@ -40,7 +39,6 @@ def render_message(
             'model': message,
             'owner': owner,
             'link': link_message(message, request),
-            'hide_identity': hide_identity
         },
         suppress_global_variables=True
     )
@@ -104,10 +102,6 @@ def view_messages_feed(
     else:
         owners = {}
 
-    hide_email = (request.app.org.hide_personal_email
-                  and not request.is_manager)
-    general = request.app.org.general_email
-
     return {
         'messages': [
             {
@@ -118,13 +112,12 @@ def view_messages_feed(
                     layout.format_date(m.created, 'weekday_long'),
                     layout.format_date(m.created, 'date_long')
                 )),
-                'owner': general if hide_email else owners[m.owner].username,
+                'owner': owners[m.owner].username,
                 'html': render_message(
                     message=m,
                     request=request,
                     owner=owners[m.owner],
-                    layout=layout,
-                    hide_identity=False
+                    layout=layout
                 ),
             }
             for m in messages
