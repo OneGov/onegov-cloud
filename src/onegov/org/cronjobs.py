@@ -1093,7 +1093,7 @@ def normalize_adjacency_list_order(request: OrgRequest) -> None:
             where "{table_name}"."{pk_column_name}" =
                 numbered_siblings."{pk_column_name}";
             COMMIT;
-        """)
+        """)  # nosec: B608
 
         try:
             session.execute(update_sql)
