@@ -278,7 +278,6 @@ def test_change_title(session):
 
     b.title = 'd'
 
-    # is still ['a', 'b', 'c']
     assert a.siblings.all() == [a, c, b]
 
 
@@ -309,7 +308,9 @@ def test_numeric_priority():
         'ABA',
         'Z',
     )
-    assert sorted(input, key=numeric_priority) == ['A', 'AA', 'ABA', 'BA', 'Z']
+    assert sorted(input, key=numeric_priority) == [
+        'A', 'AA', 'ABA', 'BA', 'Z'
+    ]
 
 
 def test_move_uses_binary_gap(session):
