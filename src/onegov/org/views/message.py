@@ -102,6 +102,10 @@ def view_messages_feed(
     else:
         owners = {}
 
+    hide_email = (request.app.org.hide_personal_email
+                  and not request.is_manager)
+    general = request.app.org.general_email
+
     return {
         'messages': [
             {
@@ -112,7 +116,7 @@ def view_messages_feed(
                     layout.format_date(m.created, 'weekday_long'),
                     layout.format_date(m.created, 'date_long')
                 )),
-                'owner': owners[m.owner].username,
+                'owner': general if hide_email else owners[m.owner].username,
                 'html': render_message(
                     message=m,
                     request=request,
