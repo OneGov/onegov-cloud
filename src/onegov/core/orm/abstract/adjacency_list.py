@@ -521,36 +521,40 @@ class AdjacencyListCollection(Generic[_L]):
 
         # If order was NOT explicitly provided, decide insertion strategy
         if explicit_order is None:
-            # Use eager loading for siblings for performance if needed,
-            # but .all() is fine here.
-            siblings = child.siblings.all()
-            existing_siblings = [s for s in siblings if s != child]
+            siblings: list[_L] = child.siblings.all()
+            existing_siblings: list[_L] = [s for s in siblings if s != child]
 
-            # Check if existing siblings are sorted by the title-based key
             if not existing_siblings or is_sorted(
                 existing_siblings, key=self.sort_key
             ):
                 # --- Strategy 1: Insert based on title key ---
-                # Pass the full list including the new child
                 calculuate_midpoint_order(siblings, child, self.sort_key)
             else:
                 # --- Strategy 2: Append numerically at the end ---
-                # This is the case where it's not already sorted
                 if existing_siblings:
-                    # Sort by current numeric order to find the last one
-                    last_sibling_numerically = max(
-                        existing_siblings, key=lambda s: s.order
-                    )
-                    # Calculate order slightly larger than the last one
-                    child.order = Decimal(
-                        str(last_sibling_numerically.order)
-                    ) + Decimal('1')
+                    # Filter out siblings with None order
+                    siblings_with_order: list[_L] = [
+                        s for s in existing_siblings if s.order is not None
+                    ]
+                    if siblings_with_order:
+                        # Find last sibling with valid order
+                        last_sibling_numerically: _L = max(
+                            siblings_with_order, key=lambda s: s.order
+                        )
+                        # Place slightly after
+                        child.order = Decimal(
+                            str(last_sibling_numerically.order)
+                        ) + Decimal('1')
+                    else:
+                        # All existing siblings have None order, use default
+                        child.order = Decimal('65536')
                 else:
-                    # This is the first child, use default
-                    child.order = Decimal('65536')  # Or use the column default
+                    # This is the very first child, use default
+                    child.order = Decimal('65536')
 
-            # Flush again to save the calculated order before returning
+            # Flush again only if order was calculated (not explicit)
             self.session.flush()
+
         return child
 
     def add_root(
