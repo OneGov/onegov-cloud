@@ -1056,7 +1056,7 @@ class OrgTicketSettingsForm(Form):
     )
 
     email_for_new_tickets = StringField(
-        label=_('Email adress for notifications '
+        label=_('Email address for notifications '
                 'about newly opened tickets'),
         fieldset=_('Notifications'),
         description=('info@example.ch')

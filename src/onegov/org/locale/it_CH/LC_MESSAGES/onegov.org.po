@@ -2,7 +2,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: \n"
-"POT-Creation-Date: 2025-03-12 16:30+0100\n"
+"POT-Creation-Date: 2025-03-31 13:22+0200\n"
 "PO-Revision-Date: 2022-03-15 10:52+0100\n"
 "Last-Translator: \n"
 "Language-Team: \n"
@@ -1962,7 +1962,7 @@ msgstr ""
 msgid "User used to auto-accept tickets"
 msgstr "Utente abituato ad accettare automaticamente i biglietti"
 
-msgid "Email adress for notifications about newly opened tickets"
+msgid "Email address for notifications about newly opened tickets"
 msgstr "Indirizzo e-mail per le notifiche dei biglietti aperti"
 
 msgid "Block email confirmation when this ticket category is opened"
@@ -6539,3 +6539,6 @@ msgstr "È stato creato un account per te"
 
 msgid "The user was created successfully"
 msgstr "Utente creato correttamente"
+
+#~ msgid "Email adress for notifications about newly opened tickets"
+#~ msgstr "Indirizzo e-mail per le notifiche dei biglietti aperti"

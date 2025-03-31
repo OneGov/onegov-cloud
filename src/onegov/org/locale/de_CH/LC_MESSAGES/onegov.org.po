@@ -2,7 +2,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE 1.0\n"
-"POT-Creation-Date: 2025-03-12 16:30+0100\n"
+"POT-Creation-Date: 2025-03-31 13:22+0200\n"
 "PO-Revision-Date: 2022-03-15 10:21+0100\n"
 "Last-Translator: Marc Sommerhalder <marc.sommerhalder@seantis.ch>\n"
 "Language-Team: German\n"
@@ -1920,8 +1920,7 @@ msgstr "Allgemeine E-Mail-Adresse"
 
 msgid "Email address that is displayed instead of the personal email address"
 msgstr ""
-"E-Mail-Adresse, die anstelle der persönlichen E-Mail-Adresse "
-"angezeigt wird"
+"E-Mail-Adresse, die anstelle der persönlichen E-Mail-Adresse angezeigt wird"
 
 msgid "Accept request and close ticket automatically based on:"
 msgstr "Akzeptiere und schliesse Tickets automatisch basierend auf:"
@@ -1953,7 +1952,7 @@ msgstr "Akzeptiere und schliesse Tickets automatisch für diese Benutzer-Rollen"
 msgid "User used to auto-accept tickets"
 msgstr "Benutzer für das automatische Akzeptieren von Tickets"
 
-msgid "Email adress for notifications about newly opened tickets"
+msgid "Email address for notifications about newly opened tickets"
 msgstr "E-Mail-Adresse für Benachrichtigungen zu geöffneten Tickets"
 
 msgid "Block email confirmation when this ticket category is opened"
@@ -6536,3 +6535,6 @@ msgstr "Ein Konto wurde für Sie erstellt"
 
 msgid "The user was created successfully"
 msgstr "Der Benutzer wurde erfolgreich erstellt"
+
+#~ msgid "Email adress for notifications about newly opened tickets"
+#~ msgstr "E-Mail-Adresse für Benachrichtigungen zu geöffneten Tickets"
