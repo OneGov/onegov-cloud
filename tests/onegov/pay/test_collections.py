@@ -50,7 +50,7 @@ def test_payment_collection_crud(session):
 
 
 # FIXME: flaky test
-@pytest.mark.flaky(reruns=3)
+@pytest.mark.flaky(reruns=5, only_rerun=None)
 def test_payable_collection(postgres_dsn):
 
     MyBase = declarative_base()

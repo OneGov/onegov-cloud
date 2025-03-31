@@ -11,11 +11,14 @@ from onegov.core.orm.mixins import (
 from onegov.core.orm.mixins.content import dict_markup_property
 from onegov.core.orm.types import UUID
 from onegov.core.utils import normalize_for_url
-from onegov.file import AssociatedFiles, File, SearchableFile
+from onegov.file import File, MultiAssociatedFiles
 from onegov.form import FormCollection
+from onegov.org.models.extensions import PersonLinkExtension
 from onegov.org.observer import observes
 from onegov.reservation import ResourceCollection
-from onegov.org.models import AccessExtension
+from onegov.org.models import (AccessExtension, ContactExtension,
+                               CoordinatesExtension, GeneralFileLinkExtension,
+                               HoneyPotExtension)
 from onegov.search import SearchableContent
 from sqlalchemy import Column, Text
 
@@ -26,25 +29,23 @@ if TYPE_CHECKING:
     from sqlalchemy.orm import Query, Session
 
 
-class DocumentFormFile(File, SearchableFile):
+class DocumentFormFile(File):
 
     __mapper_args__ = {'polymorphic_identity': 'document_form_file'}
 
-    es_type_name = 'document_form_file'
-
-    @property
-    def es_public(self) -> bool:
-        return True
-
 
 class FormDocument(Base, ContentMixin, TimestampMixin, AccessExtension,
-                   SearchableContent, AssociatedFiles):
+                   SearchableContent, MultiAssociatedFiles,
+                   ContactExtension, PersonLinkExtension,
+                   HoneyPotExtension, CoordinatesExtension,
+                   GeneralFileLinkExtension):
 
     __tablename__ = 'form_documents'
 
     es_properties = {
         'title': {'type': 'localized'},
         'lead': {'type': 'localized'},
+        'pdf_extract': {'type': 'localized'},
     }
 
     #: An internal id for references (not public)

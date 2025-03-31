@@ -2,7 +2,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE 1.0\n"
-"POT-Creation-Date: 2025-03-27 14:17+0100\n"
+"POT-Creation-Date: 2025-03-27 09:48+0100\n"
 "PO-Revision-Date: 2022-03-15 10:21+0100\n"
 "Last-Translator: Marc Sommerhalder <marc.sommerhalder@seantis.ch>\n"
 "Language-Team: German\n"
@@ -205,6 +205,16 @@ msgstr "Diese Seite ist geheim"
 
 msgid "Cancel"
 msgstr "Abbrechen"
+
+msgid "mTAN Access Limit Exceeded"
+msgstr "mTAN Zugriffslimit Überschritten"
+
+msgid ""
+"You have exceeded the maximum number of unique accesses to protected "
+"resources. Please try again at a later date."
+msgstr ""
+"Sie haben die maximale Anzahl an Zugriffen auf geschützte Inhalte "
+"überschritten. Bitte versuchen Sie es zu einem späteren Zeitpunkt wieder."
 
 msgid "ID Payment Provider"
 msgstr "ID beim Zahlungsanbieter"
@@ -1117,6 +1127,12 @@ msgstr "Editorial"
 
 msgid "A few words about this edition of the newsletter"
 msgstr "Ein paar Worte zu dieser Ausgabe des Newsletters"
+
+msgid "Closing remark"
+msgstr "Schlussbemerkung"
+
+msgid "Closing remark at the end of the newsletter"
+msgstr "Schlussbemerkung am Ende des Newsletters"
 
 msgid "Latest news"
 msgstr "Aktuelles"
@@ -3431,6 +3447,12 @@ msgstr "Änderung vorschlagen"
 msgid "Found an error? Propose a change to this entry."
 msgstr "Haben Sie einen Fehler gefunden? Schlagen Sie eine Änderung vor."
 
+msgid "No subscribers yet"
+msgstr "Noch keine Abonnenten"
+
+msgid "There are currently ${count} recipients registered."
+msgstr "Zur Zeit sind ${count} Abonnenten registriert."
+
 msgid ""
 "Subscribers may always unsubscribe themselves through a link shown at the "
 "bottom of the newsletter. If you unsubscribe them here, they will not be "
@@ -3444,6 +3466,15 @@ msgstr "Abmelden"
 
 msgid "unsubscribe"
 msgstr "abmelden"
+
+msgid ""
+"This recipient has delivery failures, including hard bounces, invalid email "
+"addresses, spam complaints, manual deactivations, or being blocked. We "
+"recommend unsubscribing it from the list."
+msgstr ""
+"Dieser Empfänger hat Zustellungsfehler, einschließlich Hard Bounces, "
+"ungültige E-Mail-Adresse, Spam-Beschwerde, manuelle Deaktivierung oder wird "
+"blockiert. Wir empfehlen, ihn von der Liste abzumelden."
 
 msgid ""
 "Your edit requires a migration of existing entries. Please confirm the "
@@ -4507,9 +4538,6 @@ msgstr ""
 "Der Newsletter ist deaktiviert. Sie können diese Seite nur sehen, weil Sie "
 "eingeloggt sind."
 
-msgid "There are currently ${count} recipients registered."
-msgstr "Zur Zeit sind ${count} Abonnenten registriert."
-
 msgid "To update your subscription, please use this ${Link}"
 msgstr "Um Ihr Abonnement zu aktualisieren, verwenden Sie bitte diesen ${Link}"
 
@@ -4667,18 +4695,6 @@ msgstr "Response Data"
 
 msgid "No notifications"
 msgstr "Keine Benachrichtigungen"
-
-msgid "No subscribers yet"
-msgstr "Noch keine Abonnenten"
-
-msgid ""
-"This recipient has delivery failures, including hard bounces, invalid email "
-"addresses, spam complaints, manual deactivations, or being blocked. We "
-"recommend unsubscribing it from the list."
-msgstr ""
-"Dieser Empfänger hat Zustellungsfehler, einschließlich Hard Bounces, "
-"ungültige E-Mail-Adresse, Spam-Beschwerde, manuelle Deaktivierung oder wird "
-"blockiert. Wir empfehlen, ihn von der Liste abzumelden."
 
 msgid "submitted"
 msgstr "gemeldet"
@@ -4974,6 +4990,21 @@ msgstr "Identicon"
 
 msgid "Not a valid color."
 msgstr "Ungültige Farbe."
+
+msgid "CSRF failed."
+msgstr ""
+"CSRF fehlgeschlagen. Aktualisieren Sie die Seite. Falls das Problem "
+"weiterhin besteht, melden Sie sich ab, wieder an und versuchen Sie es erneut."
+
+msgid "CSRF token missing."
+msgstr ""
+"CSRF Token fehlt. Aktualisieren Sie die Seite. Falls das Problem weiterhin "
+"besteht, melden Sie sich ab, wieder an und versuchen Sie es erneut."
+
+msgid "CSRF token expired."
+msgstr ""
+"CSRF Token abgelaufen. Aktualisieren Sie die Seite. Falls das Problem "
+"weiterhin besteht, melden Sie sich ab, wieder an und versuchen Sie es erneut."
 
 msgid "Not a valid choice"
 msgstr "Ungültige Auswahl"
@@ -6544,34 +6575,12 @@ msgstr "Ein Konto wurde für Sie erstellt"
 msgid "The user was created successfully"
 msgstr "Der Benutzer wurde erfolgreich erstellt"
 
-#~ msgid "Sub organisation"
-#~ msgstr "Unterorganisation"
-
-#~ msgid "No people added yet."
-#~ msgstr "Es wurden noch keine Personen hinzugefügt."
-
 #~ msgid ""
-#~ "Example for organisation hierarchy with subtopics in yaml format. Note: "
-#~ "Deeper structures are not supported.\n"
-#~ "```\n"
-#~ "Organisation:\n"
-#~ "  - Sub-Organisation 1\n"
-#~ "  - Sub-Organisation 2\n"
-#~ "Organisation 2:\n"
-#~ "  - Sub-Organisation 1\n"
-#~ "  - Sub-Organisation 2\n"
-#~ "```"
+#~ "Invalid format. Please define a listwith topics and subtopics according "
+#~ "the example."
 #~ msgstr ""
-#~ "Beispiel für Organisationshierarchie mit Unterthemen im yaml-Format. "
-#~ "Hinweis: Tiefere Strukturen werden nicht unterstützt.\n"
-#~ "```\n"
-#~ "Organisation:\n"
-#~ "  - Unterorganisation 1\n"
-#~ "  - Unterorganisation 2\n"
-#~ "Organisation 2:\n"
-#~ "  - Unterorganisation 1\n"
-#~ "  - Unterorganisation 2\n"
-#~ "```"
+#~ "Ungültiges Format. Bitte definieren Sie eine Liste mit Themen und "
+#~ "Unterthemen entsprechend dem Beispiel."
 
 #~ msgid ""
 #~ "Invalid format. Please define an organisation name with topics and "

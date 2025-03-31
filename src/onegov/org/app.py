@@ -17,13 +17,14 @@ from onegov.core import Framework, utils
 from onegov.core.framework import default_content_security_policy
 from onegov.core.i18n import default_locale_negotiator
 from onegov.core.orm.cache import orm_cached, request_cached
-from onegov.core.templates import PageTemplate
+from onegov.core.templates import PageTemplate, render_template
 from onegov.core.widgets import transform_structure
 from onegov.file import DepotApp
 from onegov.form import FormApp
 from onegov.gis import MapboxApp
 from onegov.org import directives
 from onegov.org.auth import MTANAuth
+from onegov.org.exceptions import MTANAccessLimitExceeded
 from onegov.org.initial_content import create_new_organisation
 from onegov.org.models import Dashboard, Organisation, PublicationCollection
 from onegov.org.request import OrgRequest
@@ -37,7 +38,8 @@ from onegov.user import UserApp
 from onegov.websockets import WebsocketsApp
 from purl import URL
 from types import MethodType
-from webob.exc import WSGIHTTPException, HTTPTooManyRequests
+from webob import Response
+from webob.exc import WSGIHTTPException
 
 
 from typing import Any, Literal, TYPE_CHECKING
@@ -52,7 +54,6 @@ if TYPE_CHECKING:
     from onegov.pay import Price
     from onegov.ticket.collection import TicketCount
     from reg.dispatch import _KeyLookup
-    from webob import Response
 
 
 class OrgApp(Framework, LibresIntegration, ElasticsearchApp, MapboxApp,
@@ -579,6 +580,27 @@ def get_disabled_extensions() -> Collection[str]:
     return ()
 
 
+@OrgApp.setting(section='org', name='render_mtan_access_limit_exceeded')
+def get_render_mtan_access_limit_exceeded(
+) -> Callable[[MTANAccessLimitExceeded, OrgRequest], Response]:
+
+    # circular import
+    from onegov.org.layout import DefaultLayout
+
+    def render_mtan_access_limit_exceeded(
+        self: MTANAccessLimitExceeded,
+        request: OrgRequest
+    ) -> Response:
+        return Response(
+            render_template('mtan_access_limit_exceeded.pt', request, {
+                'layout': DefaultLayout(self, request),
+                'title': self.title,
+            }),
+            status=423
+        )
+    return render_mtan_access_limit_exceeded
+
+
 @OrgApp.tween_factory(under=content_security_policy_tween_factory)
 def enable_iframes_tween_factory(
     app: OrgApp,
@@ -840,7 +862,13 @@ def wrap_with_mtan_hook(
 
             # access limit exceeded
             if request.mtan_access_limit_exceeded:
-                return HTTPTooManyRequests()
+                # NOTE: Ideally we would just be able to return the exception
+                #       as a response here, but unfortunately we would bypass
+                #       the tweens that way, so we have to manually render this
+                return self.settings.org.render_mtan_access_limit_exceeded(
+                    MTANAccessLimitExceeded(),
+                    request
+                )
 
             # record access
             request.mtan_accesses.add(url=request.path_url)

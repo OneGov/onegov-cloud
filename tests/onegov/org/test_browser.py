@@ -463,7 +463,7 @@ def test_external_map_link(browser, client):
     assert browser.is_text_present("Karte Geo-BS")
 
 
-@pytest.mark.flaky(reruns=3)
+@pytest.mark.flaky(reruns=3, only_rerun=None)
 @pytest.mark.xdist_group(name="browser")
 def test_context_specific_function_are_displayed_in_person_directory(browser,
                                                                      client):
@@ -499,7 +499,7 @@ def test_context_specific_function_are_displayed_in_person_directory(browser,
     browser.find_by_text('All About Berry: Logician')
 
 
-@pytest.mark.flaky(reruns=3)
+@pytest.mark.flaky(reruns=3, only_rerun=None)
 @pytest.mark.xdist_group(name="browser")
 def test_rejected_reservation_sends_email_to_configured_recipients(browser,
                                                                    client):

@@ -206,6 +206,16 @@ msgstr "Ce site est secret"
 msgid "Cancel"
 msgstr "Annuler"
 
+msgid "mTAN Access Limit Exceeded"
+msgstr "Limite d'accès au mTAN dépassée"
+
+msgid ""
+"You have exceeded the maximum number of unique accesses to protected "
+"resources. Please try again at a later date."
+msgstr ""
+"Vous avez dépassé le nombre maximum d'accès uniques aux ressources "
+"protégées. Veuillez réessayer ultérieurement."
+
 msgid "ID Payment Provider"
 msgstr "ID Opérateurs de paiement"
 
@@ -1116,6 +1126,12 @@ msgstr "Éditorial"
 
 msgid "A few words about this edition of the newsletter"
 msgstr "Quelques mots concernant l'édition de cette lettre d'informations"
+
+msgid "Closing remark"
+msgstr "Remarque de clôture"
+
+msgid "Closing remark at the end of the newsletter"
+msgstr "Remarque de clôture à la fin de la lettre d'informations"
 
 msgid "Latest news"
 msgstr "Dernières nouvelles"
@@ -3438,6 +3454,12 @@ msgstr ""
 "Vous avez trouvé une erreur ? Proposez une modification à apporter à cette "
 "entrée."
 
+msgid "No subscribers yet"
+msgstr "Pas encore d'abonnés"
+
+msgid "There are currently ${count} recipients registered."
+msgstr "Il y a actuellement ${count} destinataires enregistrés."
+
 msgid ""
 "Subscribers may always unsubscribe themselves through a link shown at the "
 "bottom of the newsletter. If you unsubscribe them here, they will not be "
@@ -3452,6 +3474,15 @@ msgstr "Se désabonner"
 
 msgid "unsubscribe"
 msgstr "se désabonner"
+
+msgid ""
+"This recipient has delivery failures, including hard bounces, invalid email "
+"addresses, spam complaints, manual deactivations, or being blocked. We "
+"recommend unsubscribing it from the list."
+msgstr ""
+"Ce destinataire a des échecs de livraison, y compris des rebonds, des "
+"adresses e-mail invalides, des plaintes pour spam, des désactivations "
+"manuelles, ou est bloqué. Nous recommandons de le désinscrire de la liste."
 
 msgid ""
 "Your edit requires a migration of existing entries. Please confirm the "
@@ -4517,9 +4548,6 @@ msgstr ""
 "La newsletter est désactivée. Vous ne pouvez voir cette page que parce que "
 "vous êtes connecté."
 
-msgid "There are currently ${count} recipients registered."
-msgstr "Il y a actuellement ${count} destinataires enregistrés."
-
 msgid "To update your subscription, please use this ${Link}"
 msgstr "Pour mettre à jour votre abonnement, veuillez utiliser ce ${Link}"
 
@@ -4677,18 +4705,6 @@ msgstr "Response Data"
 
 msgid "No notifications"
 msgstr "Pas de notifications"
-
-msgid "No subscribers yet"
-msgstr "Pas encore d'abonnés"
-
-msgid ""
-"This recipient has delivery failures, including hard bounces, invalid email "
-"addresses, spam complaints, manual deactivations, or being blocked. We "
-"recommend unsubscribing it from the list."
-msgstr ""
-"Ce destinataire a des échecs de livraison, y compris des rebonds, des "
-"adresses e-mail invalides, des plaintes pour spam, des désactivations "
-"manuelles, ou est bloqué. Nous recommandons de le désinscrire de la liste."
 
 msgid "submitted"
 msgstr "soumis"
@@ -4991,6 +5007,21 @@ msgstr "Identicon"
 
 msgid "Not a valid color."
 msgstr "Couleur non valide."
+
+msgid "CSRF failed."
+msgstr ""
+"Échec du CSRF. Actualisez la page. Si le problème persiste, déconnectez-"
+"vous, reconnectez-vous et réessayez."
+
+msgid "CSRF token missing."
+msgstr ""
+"Jeton CSRF manquant. Actualisez la page. Si le problème persiste, "
+"déconnectez-vous, reconnectez-vous et réessayez."
+
+msgid "CSRF token expired."
+msgstr ""
+"Jeton CSRF expiré. Actualisez la page. Si le problème persiste, déconnectez-"
+"vous, reconnectez-vous et réessayez."
 
 msgid "Not a valid choice"
 msgstr "Choix invalide"
@@ -6564,34 +6595,12 @@ msgstr "Un compte a été créé pour vous"
 msgid "The user was created successfully"
 msgstr "L'utilisateur a bien été créé"
 
-#~ msgid "Sub organisation"
-#~ msgstr "Sous-organisation"
-
-#~ msgid "No people added yet."
-#~ msgstr "Aucune personne n'a encore été ajoutée."
-
 #~ msgid ""
-#~ "Example for organisation hierarchy with subtopics in yaml format. Note: "
-#~ "Deeper structures are not supported.\n"
-#~ "```\n"
-#~ "Organisation:\n"
-#~ "  - Sub-Organisation 1\n"
-#~ "  - Sub-Organisation 2\n"
-#~ "Organisation 2:\n"
-#~ "  - Sub-Organisation 1\n"
-#~ "  - Sub-Organisation 2\n"
-#~ "```"
+#~ "Invalid format. Please define a listwith topics and subtopics according "
+#~ "the example."
 #~ msgstr ""
-#~ "Exemple de hiérarchie d'organisation avec des sous-sujets au format yaml. "
-#~ "Note : Les structures plus profondes ne sont pas prises en charge. \n"
-#~ "```\n"
-#~ "Organisation:\n"
-#~ "  - Sous-organisation 1\n"
-#~ "  - Sous-organisation 2\n"
-#~ "Organisation 2:\n"
-#~ "  - Sous-organisation 1\n"
-#~ "  - Sous-organisation 2\n"
-#~ "```"
+#~ "Format non valide. Veuillez définir une liste avec des sujets et des sous-"
+#~ "sujets selon l'exemple."
 
 #~ msgid ""
 #~ "Invalid format. Please define an organisation name with topics and "

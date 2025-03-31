@@ -45,17 +45,25 @@
    }
 }
 
-.newsletter-block > h2,
-.newsletter-block .newslist h2 {
-    @include breakpoint(small only) {
-        font-size: $h3-font-size - $h3-font-reduction;
+.newsletter-block {
+    hr {
+        margin: 1.5rem 0;
     }
-    font-size: $h3-font-size;
+
+    > h2,
+    .newslist h2 {
+        @include breakpoint(small only) {
+            font-size: $h3-font-size - $h3-font-reduction;
+        }
+        font-size: $h3-font-size;
+    }
+
+    + .newsletter-block {
+    margin-top: 2rem;
+    }
 }
 
-.newsletter-block + .newsletter-block {
-    margin-top: 2rem;
-}
+
 
 .newsletter-publications-block {
     margin-bottom: 3.5rem;

@@ -14,6 +14,7 @@ from onegov.chat.models import Chat
 from onegov.core.orm import find_models, Base
 from onegov.core.orm.mixins.publication import UTCPublicationMixin
 from onegov.core.templates import render_template
+from onegov.directory.collections.directory import EntryRecipientCollection
 from onegov.event import Occurrence, Event
 from onegov.file import FileCollection
 from onegov.form import FormSubmission, parse_form, Form
@@ -772,39 +773,47 @@ def update_newsletter_email_bounce_statistics(
 
         return ''
 
-    token = get_postmark_token()
+    def get_bounces() -> list[dict[str, Any]]:
+        token = get_postmark_token()
+        yesterday = utcnow() - timedelta(days=1)
+        r = None
 
-    recipients = RecipientCollection(request.session)
-    yesterday = utcnow() - timedelta(days=1)
+        try:
+            r = requests.get(
+                'https://api.postmarkapp.com/bounces?count=500&offset=0',
+                f'fromDate={yesterday.date()}&toDate='
+                f'{yesterday.date()}&inactive=true',
+                headers={
+                    'Accept': 'application/json',
+                    'X-Postmark-Server-Token': token,
+                },
+                timeout=30,
+            )
+            r.raise_for_status()
+            bounces = r.json().get('Bounces', [])
+        except requests.exceptions.HTTPError as http_err:
+            if r and r.status_code == 401:
+                raise RuntimeWarning(
+                    f'Postmark API token is not set or invalid: {http_err}'
+                ) from None
+            else:
+                raise
 
-    try:
-        r = requests.get(
-            'https://api.postmarkapp.com/bounces?count=500&offset=0',
-            f'fromDate={yesterday.date()}&toDate='
-            f'{yesterday.date()}&inactive=true',
-            headers={
-                'Accept': 'application/json',
-                'X-Postmark-Server-Token': token
-        },
-            timeout=30
-        )
-        r.raise_for_status()
-        bounces = r.json().get('Bounces', [])
-    except requests.exceptions.HTTPError as http_err:
-        if r.status_code == 401:
-            raise RuntimeWarning(
-                f'Postmark API token is not set or invalid: {http_err}'
-            ) from None
-        else:
-            raise
+        return bounces
 
-    for bounce in bounces:
-        email = bounce.get('Email', '')
-        inactive = bounce.get('Inactive', False)
-        recipient = recipients.by_address(email)
+    postmark_bounces = get_bounces()
+    collections = (RecipientCollection, EntryRecipientCollection)
+    for collection in collections:
+        recipients = collection(request.session)
 
-        if recipient and inactive:
-            recipient.mark_inactive()
+        for bounce in postmark_bounces:
+            email = bounce.get('Email', '')
+            inactive = bounce.get('Inactive', False)
+            recipient = recipients.by_address(email)
+
+            if recipient and inactive:
+                print(f'Mark recipient {recipient.address} as inactive')
+                recipient.mark_inactive()
 
 
 @OrgApp.cronjob(hour=4, minute=30, timezone='Europe/Zurich')
@@ -856,8 +865,7 @@ def get_news_for_push_notification(session: Session) -> Query[News]:
 @OrgApp.cronjob(hour='*', minute='*/10', timezone='UTC')
 def send_push_notifications_for_news(request: OrgRequest) -> None:
     """
-    Cronjob that runs every 10 minutes to send push notifications for news
-    items that were published within the last 10 minutes.
+    Cronjob that runs every 10 minutes to send push notifications for news.
 
     It collects all news items with:
     - Publication start date within the last 10 minutes
@@ -871,18 +879,15 @@ def send_push_notifications_for_news(request: OrgRequest) -> None:
 
     # Skip if no Firebase credentials are configured
     if not org.firebase_adminsdk_credential:
-        print('No Firebase credentials configured')
         return
 
     news_items = get_news_for_push_notification(session).all()
     if not news_items:
-        print('No news items found with push notifications enabled')
         return
 
     # Get the mapping
     topic_mapping = org.meta.get('selectable_push_notification_options', [])
     if not topic_mapping:
-        print('selectable_push_notification_options is empty')
         return
 
     # Decrypt the Firebase credentials
@@ -919,17 +924,14 @@ def send_push_notifications_for_news(request: OrgRequest) -> None:
             )
 
             for topic_id in topics:
-                if isinstance(topic_id, str):
-                    print(f'String entry: {topic_id}')
-                else:
-                    print('Invalid topic entry')
+                if not isinstance(topic_id, str):
                     continue
 
                 # Check if notification was already sent
                 if PushNotification.was_notification_sent(
                     session, news.id, topic_id
                 ):
-                    log.info(
+                    print(
                         f"Skipping duplicate notification to topic "
                         f"'{topic_id}' for news '{news.title}'."
                     )

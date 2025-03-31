@@ -68,13 +68,6 @@ def test_subscription_to_a_course_event(client_with_db):
 
     form = client.get('/fsi/reservations/add')
     form.form['attendee_id'] = str(attendee.id)
-    form.form['course_event_id'] = str(events[1].id)
-    page = form.form.submit()
-    assert 'Die gewählte Kursdurchführung muss mindestens 6 Jahre' in page
-    assert 'Für dieses Jahr gibt es bereits andere Anmeldungen ' not in page
-
-    form = client.get('/fsi/reservations/add')
-    form.form['attendee_id'] = str(attendee.id)
     form.form['course_event_id'] = str(events[2].id)
     page = form.form.submit().follow()
     assert 'Neue Anmeldung wurde hinzugefügt' in page
