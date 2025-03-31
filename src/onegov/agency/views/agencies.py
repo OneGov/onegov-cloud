@@ -588,7 +588,7 @@ def report_agency_change(
                     'proposed_changes': form.proposed_changes
                 }
             )
-            TicketMessage.create(ticket, request, 'opened')
+            TicketMessage.create(ticket, request, 'opened', 'external')
             ticket.create_snapshot(request)
 
         send_ticket_mail(

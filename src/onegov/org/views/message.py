@@ -29,7 +29,8 @@ def render_message(
     message: Message,
     request: OrgRequest,
     owner: Owner,
-    layout: MessageCollectionLayout
+    layout: MessageCollectionLayout,
+    hide_identity: bool = False,
 ) -> str:
     return render_template(
         template=f'message_{message.type}',
@@ -38,7 +39,8 @@ def render_message(
             'layout': layout,
             'model': message,
             'owner': owner,
-            'link': link_message(message, request)
+            'link': link_message(message, request),
+            'hide_identity': hide_identity
         },
         suppress_global_variables=True
     )
@@ -98,8 +100,13 @@ def view_messages_feed(
             for username in usernames
             if username not in owners
         })
+
     else:
         owners = {}
+
+    hide_email = (request.app.org.hide_personal_email
+                  and not request.is_manager)
+    general = request.app.org.general_email
 
     return {
         'messages': [
@@ -111,12 +118,13 @@ def view_messages_feed(
                     layout.format_date(m.created, 'weekday_long'),
                     layout.format_date(m.created, 'date_long')
                 )),
-                'owner': owners[m.owner].username,
+                'owner': general if hide_email else owners[m.owner].username,
                 'html': render_message(
                     message=m,
                     request=request,
                     owner=owners[m.owner],
-                    layout=layout
+                    layout=layout,
+                    hide_identity=False
                 ),
             }
             for m in messages

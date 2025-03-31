@@ -609,7 +609,7 @@ def finalize_reservation(self: Resource, request: OrgRequest) -> Response:
             ticket = TicketCollection(request.session).open_ticket(
                 handler_code='RSV', handler_id=token.hex
             )
-            TicketMessage.create(ticket, request, 'opened')
+            TicketMessage.create(ticket, request, 'opened', 'external')
 
         show_submission = request.params.get('send_by_email') == 'yes'
 
