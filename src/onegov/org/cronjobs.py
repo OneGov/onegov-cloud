@@ -12,6 +12,7 @@ from itertools import groupby
 from onegov.chat.collections import ChatCollection
 from onegov.chat.models import Chat
 from onegov.core.orm import find_models, Base
+from onegov.core.orm.abstract import AdjacencyList
 from onegov.core.orm.mixins.publication import UTCPublicationMixin
 from onegov.core.templates import render_template
 from onegov.directory.collections.directory import EntryRecipientCollection
@@ -49,8 +50,10 @@ from onegov.org.models import TicketMessage, ExtendedDirectoryEntry
 from onegov.user import User, UserCollection
 from onegov.user.models import TAN
 from sedate import to_timezone, utcnow, align_date_to_day
-from sqlalchemy import and_, or_, func
+from sqlalchemy import and_, or_, func, text
 from sqlalchemy.orm import undefer
+from sqlalchemy.schema import Table
+from sqlalchemy.inspection import inspect
 from uuid import UUID
 from onegov.org.notification_service import (
     get_notification_service,
@@ -1011,3 +1014,88 @@ def send_push_notifications_for_news(request: OrgRequest) -> None:
         session.rollback()
         print(traceback.format_exc())
         print(f'Error sending notifications: {e}')
+
+
+@OrgApp.cronjob(hour=3, minute=0, timezone='Europe/Zurich')
+def normalize_adjacency_list_order(request: OrgRequest) -> None:
+    """ Normalizes the 'order' column for all AdjacencyList subclasses.
+
+    The midpoint insertion strategy for 'order' (Decimal) can lead to
+    precision issues or very close values over time. This cronjob
+    renumbers the 'order' for each group of siblings (same parent_id)
+    sequentially starting from 1, effectively resetting the order values
+    while preserving the relative order within each sibling group.
+    """
+    session = request.session
+    processed_tables = set()
+
+    for base in request.app.session_manager.bases:
+        for model in find_models(base, lambda cls: issubclass(
+                cls, AdjacencyList) and hasattr(cls, '__tablename__')):
+
+            if not issubclass(model, AdjacencyList):
+                continue
+
+            mapper = inspect(model)
+            if mapper.local_table is None:
+                log.debug(f'Skipping model {model.__name__}: No local table.')
+                continue
+
+            table: Table = mapper.local_table
+            table_name = table.name
+
+            if not mapper.primary_key or len(mapper.primary_key) != 1:
+                 log.warning(f"Skipping table '{table_name}': No single primary key found.")
+                 continue
+            pk_column = mapper.primary_key[0].name
+
+            if 'order' not in table.c or 'parent_id' not in table.c:
+                log.debug(f"Skipping table '{table_name}': Missing 'order' or 'parent_id' column.")
+                continue
+
+            order_column = 'order'
+            parent_column = 'parent_id'
+
+            if table_name in processed_tables:
+                continue
+
+            log.info(f"Normalizing '{order_column}' column in table '{table_name}'")
+
+            # Use ROW_NUMBER() partitioned by parent_id to generate new order
+            # Need to handle NULL parent_id correctly in partitioning
+            # COALESCE(parent_id, -1) treats all NULLs as a single group
+            update_sql = text(f"""
+                WITH numbered_siblings AS (
+                    SELECT
+                        "{pk_column}",
+                        ROW_NUMBER() OVER (
+                            PARTITION BY "{parent_column}" -- Partition by actual parent_id
+                            ORDER BY "{order_column}" ASC
+                        ) as new_order
+                    FROM
+                        "{table_name}"
+                    WHERE
+                        "{parent_column}" IS NOT NULL -- Only consider rows with parents
+                )
+                UPDATE "{table_name}"
+                SET "{order_column}" = numbered_siblings.new_order
+                FROM numbered_siblings
+                WHERE "{table_name}"."{pk_column}" = numbered_siblings."{pk_column}";
+                COMMIT;
+            """)
+            # Note: The CTE 'numbered_siblings' already filters for non-null parent_id,
+            # so we only need to join by primary key here.
+
+            try:
+                session.execute(update_sql)
+                processed_tables.add(table_name)
+                log.info(f"Successfully normalized '{order_column}' in '{table_name}'")
+            except Exception as e:
+                log.error(f"Error normalizing '{order_column}' in '{table_name}': {e}")
+                session.rollback()  # Rollback changes for this table on error
+                # Continue to the next table
+
+    if processed_tables:
+        log.info(f"Finished normalizing order for tables: {', '.join(processed_tables)}")
+    else:
+        log.info('No AdjacencyList tables found or processed for order normalization.')

@@ -8,7 +8,7 @@ import requests
 import transaction
 from datetime import datetime, timedelta
 from freezegun import freeze_time
-from onegov.core.utils import Bunch
+from onegov.core.utils import Bunch, normalize_for_url
 from onegov.directory import (DirectoryEntryCollection,
                               DirectoryConfiguration,
                               DirectoryCollection)
@@ -19,6 +19,7 @@ from onegov.form import FormSubmissionCollection
 from onegov.gever.encrypt import encrypt_symmetric
 from onegov.org.models import (
     ResourceRecipientCollection, News, PushNotification)
+from onegov.org.models.page import NewsCollection
 from onegov.org.models.resource import RoomResource
 from onegov.org.models.ticket import ReservationHandler, DirectoryEntryHandler
 from onegov.org.notification_service import (
@@ -32,6 +33,7 @@ from onegov.user.collections import TANCollection
 from sedate import ensure_timezone, utcnow
 from sqlalchemy.orm import close_all_sessions
 from tests.onegov.org.common import get_cronjob_by_name, get_cronjob_url
+from decimal import Decimal
 from tests.shared import Client
 from tests.shared.utils import add_reservation
 
@@ -1795,3 +1797,60 @@ def test_push_notification_duplicate_detection(
     finally:
         # Clean up
         set_test_notification_service(None)
+
+
+
+def test_normalize_adjacency_list_order(org_app):
+    client = Client(org_app)
+    session = org_app.session()
+    job = get_cronjob_by_name(org_app, 'normalize_adjacency_list_order')
+    job.app = org_app
+
+    orders = [Decimal('1.0'), Decimal('5.0'), Decimal('10.0')]
+
+    pages = PageCollection(session)
+    number_of_news = len(orders)
+    root_title = 'Aktuelles'
+    root_name = normalize_for_url(root_title)
+    root_item = News(title=root_title, name=root_name, type='news')
+    session.add(root_item)
+    session.flush()
+    # Save because we need this later. Root item order shouldn't matter.
+    default_root_order = root_item.order
+    news_root_id = root_item.id
+    for i, order in zip(range(number_of_news), orders):
+        title = f'News {i+1}'
+        name = normalize_for_url(title)
+        item = News(
+            title=title, name=name, type='news', parent=root_item, order=order
+        )
+        session.add(item)
+    transaction.commit()
+
+    # Verify initial order
+    news_items = pages.query().filter(
+        News.parent_id == news_root_id).order_by(News.order).all()
+
+    assert [n.order for n in news_items] == [
+        Decimal('1.0'), Decimal('5.0'), Decimal('10.0')
+    ]
+    assert [n.title for n in news_items] == ["News 1", "News 2", "News 3"]
+
+    # Execute the cron job
+    client.get(get_cronjob_url(job))
+
+    # Verify normalized order
+    request = Bunch(session=session)
+    news_items_after = NewsCollection(request).query().filter(
+        News.parent_id == news_root_id).order_by(News.order).all()
+
+    # Order should now be sequential integers (represented as Decimals)
+    assert [n.order for n in news_items_after] == [
+        Decimal('1.0'), Decimal('2.0'), Decimal('3.0')
+    ]
+
+    # Relative order must be preserved
+    assert [n.title for n in news_items_after] == ["News 1", "News 2", "News 3"]
+    # Verify the root page order was not affected
+    root = pages.by_id(news_root_id)
+    assert root.order == default_root_order
