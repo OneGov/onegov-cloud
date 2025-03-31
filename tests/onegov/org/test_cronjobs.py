@@ -1845,7 +1845,7 @@ def test_normalize_adjacency_list_order(org_app):
     assert [n.order for n in news_items] == [
         Decimal('1.0'), Decimal('5.0'), Decimal('10.0')
     ]
-    assert [n.title for n in news_items] == ["News 1", "News 2", "News 3"]
+    assert [n.title for n in news_items] == ['News 1', 'News 2', 'News 3']
 
     # Execute the cron job
     client.get(get_cronjob_url(job))
@@ -1862,7 +1862,8 @@ def test_normalize_adjacency_list_order(org_app):
     ]
 
     # Relative order must be preserved
-    assert [n.title for n in news_items_after] == ["News 1", "News 2", "News 3"]
+    assert [n.title for n in news_items_after] == ['News 1',
+                                                   'News 2', 'News 3']
     # Verify the root page order was not affected
     root = pages.by_id(news_root_id)
     assert root.order == default_root_order
@@ -1878,9 +1879,9 @@ def test_normalize_adjacency_list_order_with_null_becomes_default(org_app):
     # Corresponds to default value set in AdjacencyList.order
     default_order_value = Decimal('65536')
     items_data = [
-        ("Item C", Decimal('1.0')),
-        ("Item A", Decimal('5.0')),
-        ("Item B", None),  # Pass None, expecting it to take the default value
+        ('Item C', Decimal('1.0')),
+        ('Item A', Decimal('5.0')),
+        ('Item B', None),  # Pass None, expecting it to take the default value
     ]
 
     pages = PageCollection(session)
@@ -1895,17 +1896,16 @@ def test_normalize_adjacency_list_order_with_null_becomes_default(org_app):
     _create_news_hierarchy(session, root_item, items_data)
     transaction.commit()
 
-    # Verify initial state - Check that None resulted in the default value
+    # Verify initial state
     news_items_initial = pages.query().filter(
-        News.parent_id == news_root_id).order_by(News.title).all()  # Order by title for check
+        News.parent_id == news_root_id).order_by(News.title).all()
     orders_initial = {n.title: n.order for n in news_items_initial}
     assert orders_initial == {
-        "Item A": Decimal('5.0'),
-        "Item B": default_order_value,  # Check it received the default
-        "Item C": Decimal('1.0'),
+        'Item A': Decimal('5.0'),
+        'Item B': default_order_value,  # Check it received the default
+        'Item C': Decimal('1.0'),
     }
 
-    # Execute the cron job
     client.get(get_cronjob_url(job))
     session.expire_all()  # Force reload from DB
 
@@ -1918,10 +1918,8 @@ def test_normalize_adjacency_list_order_with_null_becomes_default(org_app):
     news_items_after = NewsCollection(request).query().filter(
         News.parent_id == news_root_id).order_by(News.order).all()
 
-    # Expected normalized orders based on initial values (1.0, 5.0, 65536.0)
     expected_orders = [Decimal('1.0'), Decimal('2.0'), Decimal('3.0')]
-    # Expected titles in the new order
-    expected_titles = ["Item C", "Item A", "Item B"]
+    expected_titles = ['Item C', 'Item A', 'Item B']
 
     assert [n.order for n in news_items_after] == expected_orders
     assert [n.title for n in news_items_after] == expected_titles
