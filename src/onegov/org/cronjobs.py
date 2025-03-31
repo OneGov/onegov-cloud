@@ -1070,7 +1070,7 @@ def normalize_adjacency_list_order(request: OrgRequest) -> None:
                         "{pk_column}",
                         ROW_NUMBER() OVER (
                             PARTITION BY "{parent_column}" -- Partition by actual parent_id
-                            ORDER BY "{order_column}" ASC
+                            ORDER BY "{order_column}" ASC NULLS LAST
                         ) as new_order
                     FROM
                         "{table_name}"
@@ -1083,6 +1083,7 @@ def normalize_adjacency_list_order(request: OrgRequest) -> None:
                 WHERE "{table_name}"."{pk_column}" = numbered_siblings."{pk_column}";
                 COMMIT;
             """)
+
             # Note: The CTE 'numbered_siblings' already filters for non-null parent_id,
             # so we only need to join by primary key here.
 

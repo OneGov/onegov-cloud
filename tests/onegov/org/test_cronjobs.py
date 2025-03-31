@@ -1799,6 +1799,22 @@ def test_push_notification_duplicate_detection(
         set_test_notification_service(None)
 
 
+def _create_news_hierarchy(session, parent, items_data):
+    created_items = []
+    for title, order in items_data:
+        name = normalize_for_url(title)
+        item = News(
+            title=title,
+            name=name,
+            type='news',
+            parent=parent,
+            order=order  # Handles Decimal and None
+        )
+        session.add(item)
+        created_items.append(item)
+    session.flush()
+    return created_items
+
 
 def test_normalize_adjacency_list_order(org_app):
     client = Client(org_app)
@@ -1807,24 +1823,19 @@ def test_normalize_adjacency_list_order(org_app):
     job.app = org_app
 
     orders = [Decimal('1.0'), Decimal('5.0'), Decimal('10.0')]
+    titles = [f'News {i+1}' for i in range(len(orders))]
+    items_data = list(zip(titles, orders))
 
     pages = PageCollection(session)
-    number_of_news = len(orders)
     root_title = 'Aktuelles'
     root_name = normalize_for_url(root_title)
     root_item = News(title=root_title, name=root_name, type='news')
     session.add(root_item)
     session.flush()
-    # Save because we need this later. Root item order shouldn't matter.
     default_root_order = root_item.order
     news_root_id = root_item.id
-    for i, order in zip(range(number_of_news), orders):
-        title = f'News {i+1}'
-        name = normalize_for_url(title)
-        item = News(
-            title=title, name=name, type='news', parent=root_item, order=order
-        )
-        session.add(item)
+
+    _create_news_hierarchy(session, root_item, items_data)
     transaction.commit()
 
     # Verify initial order
@@ -1838,6 +1849,7 @@ def test_normalize_adjacency_list_order(org_app):
 
     # Execute the cron job
     client.get(get_cronjob_url(job))
+    session.expire_all()  # Force reload from DB
 
     # Verify normalized order
     request = Bunch(session=session)
@@ -1851,6 +1863,69 @@ def test_normalize_adjacency_list_order(org_app):
 
     # Relative order must be preserved
     assert [n.title for n in news_items_after] == ["News 1", "News 2", "News 3"]
+    # Verify the root page order was not affected
+    root = pages.by_id(news_root_id)
+    assert root.order == default_root_order
+
+
+def test_normalize_adjacency_list_order_with_null_becomes_default(org_app):
+    client = Client(org_app)
+    session = org_app.session()
+    job = get_cronjob_by_name(org_app, 'normalize_adjacency_list_order')
+    job.app = org_app
+
+    # Define items with one potentially becoming default order
+    # Corresponds to default value set in AdjacencyList.order
+    default_order_value = Decimal('65536')
+    items_data = [
+        ("Item C", Decimal('1.0')),
+        ("Item A", Decimal('5.0')),
+        ("Item B", None),  # Pass None, expecting it to take the default value
+    ]
+
+    pages = PageCollection(session)
+    root_title = 'Default Order Test Root'
+    root_name = normalize_for_url(root_title)
+    root_item = News(title=root_title, name=root_name, type='news')
+    session.add(root_item)
+    session.flush()
+    default_root_order = root_item.order
+    news_root_id = root_item.id
+
+    _create_news_hierarchy(session, root_item, items_data)
+    transaction.commit()
+
+    # Verify initial state - Check that None resulted in the default value
+    news_items_initial = pages.query().filter(
+        News.parent_id == news_root_id).order_by(News.title).all()  # Order by title for check
+    orders_initial = {n.title: n.order for n in news_items_initial}
+    assert orders_initial == {
+        "Item A": Decimal('5.0'),
+        "Item B": default_order_value,  # Check it received the default
+        "Item C": Decimal('1.0'),
+    }
+
+    # Execute the cron job
+    client.get(get_cronjob_url(job))
+    session.expire_all()  # Force reload from DB
+
+    # Verify normalized order
+    # The SQL uses ORDER BY "order" ASC, "pk" ASC.
+    # Initial sort order for ROW_NUMBER() would be:
+    # Item C (1.0), Item A (5.0), Item B (65536.0)
+    # Normalization should result in: Item C (1.0), Item A (2.0), Item B (3.0)
+    request = Bunch(session=session)
+    news_items_after = NewsCollection(request).query().filter(
+        News.parent_id == news_root_id).order_by(News.order).all()
+
+    # Expected normalized orders based on initial values (1.0, 5.0, 65536.0)
+    expected_orders = [Decimal('1.0'), Decimal('2.0'), Decimal('3.0')]
+    # Expected titles in the new order
+    expected_titles = ["Item C", "Item A", "Item B"]
+
+    assert [n.order for n in news_items_after] == expected_orders
+    assert [n.title for n in news_items_after] == expected_titles
+
     # Verify the root page order was not affected
     root = pages.by_id(news_root_id)
     assert root.order == default_root_order
