@@ -420,10 +420,12 @@ class TicketPermission(Base, TimestampMixin):
             TicketPermission.group.isnot_distinct_from(self.group)
         )
 
+        exclusive = True if self.exclusive is None else self.exclusive
+
         # the same permission needs to have the same exclusivity
         # amongst all the user groups
         constraint_violated = query.filter(
-            TicketPermission.exclusive.is_(not self.exclusive)
+            TicketPermission.exclusive.is_(not exclusive)
         ).exists()
 
         # the exact same permission may only exist once per user group
