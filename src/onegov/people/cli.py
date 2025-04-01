@@ -187,7 +187,9 @@ def list_people() -> Callable[[CoreRequest | Framework], None]:
             click.secho(f'{p.title}', fg='green')
             for label, *prop in properties:
                 value = ', '.join(
-                    str(getattr(p, attr)) for attr in prop if getattr(p, attr))
+                    str(getattr(p, attr))
+                    for attr in prop
+                    if hasattr(p, attr) and getattr(p, attr) != '')
                 if value:
                     click.secho(f'  {label}: {value}')
 
