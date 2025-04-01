@@ -1,6 +1,6 @@
 from __future__ import annotations
 
-from onegov.core.orm import Base
+from onegov.core.orm import observes, Base
 from onegov.core.orm.mixins import TimestampMixin
 from onegov.core.orm.types import JSON, UUID
 from onegov.core.orm.types import UTCDateTime
@@ -12,7 +12,7 @@ from onegov.user import UserGroup
 from sedate import utcnow
 from sqlalchemy import Boolean, Column, Enum, ForeignKey, Integer, Text
 from sqlalchemy.ext.declarative import declared_attr
-from sqlalchemy.orm import backref, deferred, relationship
+from sqlalchemy.orm import backref, deferred, object_session, relationship
 from uuid import uuid4
 
 
@@ -363,3 +363,63 @@ class TicketPermission(Base, TimestampMixin):
 
     #: the group this permission addresses
     group: Column[str | None] = Column(Text, nullable=True)
+
+    #: whether or not this permission is exclusive
+    #: if a permission is exclusive, the same permission may not
+    #: be given non-exclusively to another group, but multiple groups
+    #: may have the same exclusive or non-exclusive permission
+    exclusive: Column[bool] = Column(
+        Boolean,
+        nullable=False,
+        default=True,
+        index=True
+    )
+
+    #: whether or not to immediately send notifications about new tickets
+    immediate_notification: Column[bool] = Column(
+        Boolean,
+        nullable=False,
+        default=False,
+        index=True
+    )
+
+    @observes('user_group_id', 'handler_code', 'group', 'exclusive')
+    def ensure_consistency(
+        self,
+        user_group_id: uuid.UUID,
+        handler_code: str,
+        group: str | None,
+        exclusive: bool
+    ) -> None:
+
+        # these should always be set
+        assert self.user_group_id and self.handler_code
+
+        session = object_session(self)
+        query = session.query(TicketPermission)
+
+        # we can't conflict with ourselves, only with other permissions
+        if self.id is not None:
+            query = query.filter(
+                TicketPermission.id != self.id
+            )
+
+        # this defines whether or not two permissions target the same tickets
+        query = query.filter(
+            TicketPermission.handler_code == self.handler_code
+        )
+        query = query.filter(
+            TicketPermission.group.isnot_distinct_from(self.group)
+        )
+
+        # the exact same permission may only exist once per user group
+        # also the same permission needs to have the same exclusivity
+        # amongst all the user groups
+        unique = ~query.filter(
+            TicketPermission.user_group_id == self.user_group_id
+        ).exists() & ~query.filter(
+            TicketPermission.exclusive.is_(not self.exclusive)
+        ).exists()
+
+        if session.query(unique).scalar():
+            raise ValueError('Consistency violation in ticket permissions')

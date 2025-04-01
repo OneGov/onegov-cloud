@@ -167,3 +167,31 @@ def add_closed_on_column_to_ticket(context: UpgradeContext) -> None:
     )
     context.session.execute(stmt)
     context.session.flush()
+
+
+@upgrade_task('Add exclusive/notification columns to ticket permission')
+def add_exclusive_and_notification_columns_to_ticket_permission(
+    context: UpgradeContext
+) -> None:
+
+    context.operations.add_column(
+        'ticket_permissions',
+        Column(
+            'exclusive',
+            Boolean,
+            nullable=False,
+            server_default=True,
+            index=True,
+        )
+    )
+
+    context.operations.add_column(
+        'ticket_permissions',
+        Column(
+            'immediate_notification',
+            Boolean,
+            nullable=False,
+            server_default=False,
+            index=True,
+        )
+    )
