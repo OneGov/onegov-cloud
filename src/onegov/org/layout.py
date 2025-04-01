@@ -1596,10 +1596,10 @@ class PersonCollectionLayout(DefaultLayout):
         if self.request.is_manager:
             return [
                 Link(
-                    text=_('Edit'),
+                    text=_('Settings'),
                     url=self.request.link(
                         self.request.app.org, 'people-settings'),
-                    attrs={'class': 'edit-link'}
+                    attrs={'class': 'settings-link'}
                 ),
                 LinkGroup(
                     title=_('Add'),

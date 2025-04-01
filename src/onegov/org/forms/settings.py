@@ -1656,15 +1656,17 @@ class PeopleSettingsForm(Form):
             if data:
                 if not isinstance(data, list):
                     self.organisation_hierarchy.errors.append(
-                        _('Invalid format. Please define a list '
-                          'with topics and subtopics according the example.')
+                        _('Invalid format. Please define a list with '
+                          'organisations and sub-organisations according the '
+                          'example.')
                     )
                     return False
                 for item in data:
                     if not isinstance(item, (str, dict)):
                         self.organisation_hierarchy.errors.append(
-                            _('Invalid format. Please define topics and '
-                              'subtopics according to the example.')
+                            _('Invalid format. Please define organisations '
+                              'and sub-organisations according to the '
+                              'example.')
                         )
                         return False
 
@@ -1675,15 +1677,15 @@ class PeopleSettingsForm(Form):
                         if not isinstance(sub_topic, list):
                             self.organisation_hierarchy.errors.append(
                                 _(f'Invalid format. Please define '
-                                  f"subtopic(s) for '{topic}' "
+                                  f"sub-organisations(s) for '{topic}' "
                                   f"or remove the ':'.")
                             )
                             return False
 
                         if not all(isinstance(sub, str) for sub in sub_topic):
                             self.organisation_hierarchy.errors.append(
-                                _('Invalid format. Only topics '
-                                  'and subtopics are allowed - no '
+                                _('Invalid format. Only organisations '
+                                  'and sub-organisations are allowed - no '
                                   'deeper structures supported.')
                             )
                             return False

@@ -23,7 +23,6 @@ from wtforms.widgets.core import html_params
 
 
 from typing import Any, Literal, TYPE_CHECKING
-
 if TYPE_CHECKING:
     from collections.abc import Iterator
     from onegov.chat import TextModule

@@ -225,10 +225,6 @@ class MultiCheckboxField(SelectMultipleField):
     contains_labels = True
 
 
-class ChosenSelectMultipleHierarchyField(SelectMultipleField):
-    widget = MultiCheckboxWidget()
-
-
 class OrderedMultiCheckboxField(MultiCheckboxField):
     widget = OrderedMultiCheckboxWidget()
 
