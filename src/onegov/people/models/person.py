@@ -51,11 +51,26 @@ class Person(Base, ContentMixin, TimestampMixin, ORMSearchable,
         'title': {'type': 'text'},
         'function': {'type': 'localized'},
         'email': {'type': 'text'},
+        'phone_es': {'type': 'text'},
     }
 
     @property
     def es_suggestion(self) -> tuple[str, ...]:
         return (self.title, f'{self.first_name} {self.last_name}')
+
+    @property
+    def phone_es(self):
+        result = []
+        for number in (self.phone, self.phone_direct):
+            if number:
+                number = number.replace(' ', '')
+                result.append(number)
+                result.append(number[-4:])
+                result.append(number[-7:])
+                result.append(number[-9:])
+                result.append('0' + number[-9:])
+                result.append('+41' + number[-9:])
+        return [r for r in result if r]
 
     @property
     def title(self) -> str:
