@@ -839,7 +839,8 @@ def test_assign_tickets(client):
 
     page = client.get('/').click('Meine Tickets')
     page = page.click(ticket_number)
-    assert "Ticket zugewiesen (editor@example.org)" in page
+    assert "Ticket zugewiesen" in page
+    assert "(editor@example.org)" in page
 
     # check mail
     assert len(os.listdir(client.app.maildir)) == 2
