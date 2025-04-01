@@ -51,7 +51,7 @@ class Person(Base, ContentMixin, TimestampMixin, ORMSearchable,
         'title': {'type': 'text'},
         'function': {'type': 'localized'},
         'email': {'type': 'text'},
-        'phone_es': {'type': 'text'},
+        'phone_fts': {'type': 'text'},
     }
 
     @property
@@ -59,7 +59,7 @@ class Person(Base, ContentMixin, TimestampMixin, ORMSearchable,
         return (self.title, f'{self.first_name} {self.last_name}')
 
     @property
-    def phone_es(self):
+    def phone_fts(self) -> list[str]:
         result = []
         for number in (self.phone, self.phone_direct):
             if number:

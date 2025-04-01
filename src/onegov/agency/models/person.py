@@ -34,7 +34,7 @@ class ExtendedPerson(Person, AccessExtension, PublicationExtension):
         'function': {'type': 'localized'},
         'email': {'type': 'text'},
         'phone_internal': {'type': 'text'},
-        'phone_es': {'type': 'text'}
+        'phone_fts': {'type': 'text'}
     }
 
     external_user_id: dict_property[str | None] = meta_property()
@@ -63,7 +63,7 @@ class ExtendedPerson(Person, AccessExtension, PublicationExtension):
         return number.replace(' ', '')[-digits:] if number and digits else ''
 
     @property
-    def phone_es(self) -> list[str]:
+    def phone_fts(self) -> list[str]:
         result = [self.phone_internal]
         for number in (self.phone, self.phone_direct):
             if number:
