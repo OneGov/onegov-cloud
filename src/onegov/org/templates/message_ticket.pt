@@ -18,7 +18,10 @@
                     Ticket reopened.
                 </tal:b>
                 <tal:b case="'assigned'" define="old model.meta.get('old_owner')">
-                    <tal:b i18n:translate>Ticket assigned</tal:b> (<tal:b condition="old">${old} → </tal:b>${model.meta.get('new_owner')}).
+                    <tal:b i18n:translate>Ticket assigned</tal:b>
+                    <tal:b condition="not layout.org.hide_personal_email or model.meta.get('origin') == 'external' or request.is_logged_in">
+                        (<tal:b condition="old">${old} → </tal:b>${model.meta.get('new_owner')}).
+                    </tal:b>
                 </tal:b>
                 <tal:b case="'muted'" i18n:translate>
                     Ticket e-mails disabled.
