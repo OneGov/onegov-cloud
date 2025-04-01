@@ -195,3 +195,14 @@ def add_exclusive_and_notification_columns_to_ticket_permission(
             index=True,
         )
     )
+
+    if not context.operations.has_constraint(
+        'ticket_permissions',
+        'no_redundant_ticket_permissions',
+        'CHECK'
+    ):
+        context.operations.create_check_constraint(
+            'no_redundant_ticket_permissions',
+            'ticket_permissions',
+            'exclusive IS TRUE or immediate_notification IS TRUE',
+        )
