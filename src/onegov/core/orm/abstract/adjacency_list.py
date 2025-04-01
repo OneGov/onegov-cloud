@@ -305,14 +305,13 @@ def calculuate_midpoint_order(
     siblings: list[_L], new_item: _L, key: Callable[[_L], Any]
 ) -> None:
     """Insert/update an item's order """
-    # Filter out the item itself for finding neighbors based on key
-    sorted_neighbors = sorted([s for s in siblings if s != new_item], key=key)
-
     left, right = None, None
     new_item_key_val = key(new_item)
 
     # Find the logical position in the key-sorted list
-    for neighbor in sorted_neighbors:
+    for neighbor in siblings:
+        if neighbor == new_item:
+            continue
         neighbor_key_val = key(neighbor)
         if neighbor_key_val > new_item_key_val:
             # This neighbor comes after the new item
@@ -531,26 +530,10 @@ class AdjacencyListCollection(Generic[_L]):
                 calculuate_midpoint_order(siblings, child, self.sort_key)
             else:
                 # --- Strategy 2: Append numerically at the end ---
-                if existing_siblings:
-                    # Filter out siblings with None order
-                    siblings_with_order: list[_L] = [
-                        s for s in existing_siblings if s.order is not None
-                    ]
-                    if siblings_with_order:
-                        # Find last sibling with valid order
-                        last_sibling_numerically: _L = max(
-                            siblings_with_order, key=lambda s: s.order
-                        )
-                        # Place slightly after
-                        child.order = Decimal(
-                            str(last_sibling_numerically.order)
-                        ) + Decimal('1')
-                    else:
-                        # All existing siblings have None order, use default
-                        child.order = Decimal('65536')
-                else:
-                    # This is the very first child, use default
-                    child.order = Decimal('65536')
+                child.order = max(
+                    (s.order for s in existing_siblings if s.order is not None),
+                    default=Decimal('65535'),
+                ) + Decimal('1')
 
             # Flush again only if order was calculated (not explicit)
             self.session.flush()

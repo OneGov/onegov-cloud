@@ -230,15 +230,15 @@ def change_adjacency_list_order_to_numeric(context: UpgradeContext) -> None:
             and not isabstract(cls)
         )
 
-    adjacency_subclasses = set(
-        chain(
+    table_names: set[str] = {
+        cls.__tablename__  # type: ignore[attr-defined]
+        for cls in chain(
             find_models(Base, is_concrete_subclass),
             find_models(ORMBase, is_concrete_subclass),
         )
-    )
+    }
 
-    for cls in adjacency_subclasses:
-        table_name = cls.__tablename__  # type: ignore[attr-defined]
+    for table_name in table_names:
         if context.has_table(table_name):
             context.operations.alter_column(
                 table_name,

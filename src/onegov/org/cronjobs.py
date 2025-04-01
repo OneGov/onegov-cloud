@@ -1058,7 +1058,6 @@ def normalize_adjacency_list_order(request: OrgRequest) -> None:
             continue
 
         table_name = table.name
-        pk_column_name = mapper.primary_key[0].name
 
         # Check if already processed or missing required columns
         if table_name in processed_tables:
@@ -1075,23 +1074,23 @@ def normalize_adjacency_list_order(request: OrgRequest) -> None:
         # Rows with NULL parent_id (root nodes) are ignored
         update_sql = text(
             f"""
-            with numbered_siblings as (
-                select
-                    "{pk_column_name}",
-                    row_number() over (
-                        partition by "parent_id"
-                        order by "order" asc nulls last
-                    ) as new_order
-                from
+            WITH numbered_siblings AS (
+                SELECT
+                    "id",
+                    ROW_NUMBER() OVER (
+                        PARTITION BY "parent_id"
+                        ORDER BY "order" ASC NULLS LAST
+                    ) AS new_order
+                FROM
                     "{table_name}"
-                where
-                    "parent_id" is not null
+                WHERE
+                    "parent_id" IS NOT NULL
             )
-            update "{table_name}"
-            set "order" = numbered_siblings.new_order
-            from numbered_siblings
-            where "{table_name}"."{pk_column_name}" =
-                numbered_siblings."{pk_column_name}";
+            UPDATE "{table_name}"
+            SET "order" = numbered_siblings.new_order
+            FROM numbered_siblings
+            WHERE "{table_name}"."id" =
+                numbered_siblings."id";
             COMMIT;
         """)  # nosec: B608
 
@@ -1099,13 +1098,9 @@ def normalize_adjacency_list_order(request: OrgRequest) -> None:
             session.execute(update_sql)
             processed_tables.add(table_name)
             log.info(f"Successfully normalized 'order' in '{table_name}'.")
-        except Exception as e:
-            log.error(
-                f"Error normalizing 'order' in '{table_name}': {e}",
-                exc_info=True  # Log traceback for better debugging
-            )
+        except Exception:
+            log.exception(f"Error normalizing 'order' in '{table_name}'")
             try:
                 session.rollback()
             except Exception:
-                log.error(f"Error during rollback for table '{table_name}': "
-               "{rb_exc}")
+                log.exception(f"Error during rollback for table '{table_name}'")
