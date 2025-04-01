@@ -22,7 +22,7 @@ def test_people_view(client):
     client.login_editor()
 
     people = client.get('/people')
-    assert 'noch keine Personen' in people
+    assert 'Keine Personen' in people
 
     new_person = people.click('Person')
     new_person.form['academic_title'] = 'Dr.'
@@ -71,7 +71,7 @@ def test_people_view(client):
     client.delete(delete_link)
 
     people = client.get('/people')
-    assert 'noch keine Personen' in people
+    assert 'Keine Personen' in people
 
 
 def test_with_people(client):
