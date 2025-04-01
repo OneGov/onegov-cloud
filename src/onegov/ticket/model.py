@@ -386,7 +386,8 @@ class TicketPermission(Base, TimestampMixin):
 
     __table_args = (
         CheckConstraint(
-            'exclusive IS TRUE or immediate_notification IS TRUE',
+            exclusive.isnot_distinct_from(True)
+            | immediate_notification.isnot_distinct_from(True),
             name='no_redundant_ticket_permissions'
         ),
     )
