@@ -421,15 +421,15 @@ class TicketPermission(Base, TimestampMixin):
 
         # the same permission needs to have the same exclusivity
         # amongst all the user groups
-        unique = ~query.filter(
+        constraint_violated = query.filter(
             TicketPermission.exclusive.is_(not self.exclusive)
         ).exists()
 
         # the exact same permission may only exist once per user group
         if user_group_id := self.user_group_id or self.user_group.id:
-            unique &= ~query.filter(
+            constraint_violated |= query.filter(
                 TicketPermission.user_group_id == user_group_id
             ).exists()
 
-        if session.query(unique).scalar():
+        if session.query(constraint_violated).scalar():
             raise ValueError('Consistency violation in ticket permissions')
