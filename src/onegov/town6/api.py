@@ -1,7 +1,7 @@
 from __future__ import annotations
 
-from onegov.event.collections import OccurrenceCollection
 from onegov.api.models import ApiEndpoint, ApiEndpointItem
+from onegov.event.collections import OccurrenceCollection
 from onegov.gis import Coordinates
 
 
@@ -86,9 +86,8 @@ class NewsApiEndpoint(ApiEndpoint[News]):
     @property
     def collection(self) -> Any:
         result = NewsCollection(
-            self.session,
+            self.request,
             page=self.page or 0,
-            only_public=True
         )
         result.batch_size = 25
         return result

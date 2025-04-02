@@ -1,7 +1,7 @@
 import pytest
 
 
-@pytest.mark.flaky(reruns=5)
+@pytest.mark.flaky(reruns=5, only_rerun=None)
 def test_views_manage(client_with_es):
     client = client_with_es
     client.login_admin()

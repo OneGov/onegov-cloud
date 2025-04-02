@@ -589,6 +589,106 @@ def test_secret_mtan_access(org_app, client, smsdir):
     assert 'Ungültige oder abgelaufene mTAN' in verify_page
 
 
+def test_mtan_access_limit(org_app, client, smsdir):
+    with freeze_time("2020-10-10 08:00", tick=True):
+        client.login_admin()
+
+        # set a rate limit
+        settings_page = client.get('/module-settings')
+        settings_page.form['mtan_session_duration_seconds'] = '86400'
+        settings_page.form['mtan_access_window_requests'] = '1'
+        settings_page.form['mtan_access_window_seconds'] = '3600'
+        settings_page.form.submit().follow()
+
+        new_page = client.get('/topics/organisation').click('Thema')
+
+        new_page.form['title'] = "Test"
+        new_page.form['access'] = 'mtan'
+        new_page.form.submit().follow()
+        page_url = '/topics/organisation/test'
+
+        new_page = client.get('/topics/organisation').click('Thema')
+
+        new_page.form['title'] = "Test2"
+        new_page.form['access'] = 'mtan'
+        new_page.form.submit().follow()
+        page2_url = '/topics/organisation/test2'
+
+        # editors and admins should still have normal access
+        client.get(page_url, status=200)
+        client.get(page2_url, status=200)
+
+        anonymous = client.spawn()
+        mtan_page = anonymous.get(page_url, status=302).follow()
+        assert 'mTAN' in mtan_page
+        mtan_page.form['phone_number'] = '+41791112233'
+        verify_page = mtan_page.form.submit().follow()
+
+        smsdir = os.path.join(smsdir, org_app.schema)
+        files = os.listdir(smsdir)
+        assert len(files) == 1
+
+        with open(os.path.join(smsdir, files[0]), mode='r') as fp:
+            sms_content = json.loads(fp.read())
+
+        assert sms_content['receivers'] == ['+41791112233']
+        # tan should be the last url parameter in the SMS
+        _, _, tan = sms_content['content'].rpartition('=')
+
+        verify_page.form['tan'] = tan
+        page = verify_page.form.submit().follow()
+        assert 'Test' in page
+
+        # the access to the protected page should have been logged
+        accesses = TANAccessCollection(
+            org_app.session(),
+            session_id='+41791112233'
+        ).query().all()
+        assert len(accesses) == 1
+        assert accesses[0].url.endswith(page_url)
+
+        # now that we're authenticated we should be able to
+        # access the page normally on subsequent requests
+        anonymous.get(page_url, status=200)
+
+        # the second access should not create a new entry
+        accesses = TANAccessCollection(
+            org_app.session(),
+            session_id='+41791112233'
+        ).query().all()
+        assert len(accesses) == 1
+
+        # a second access will exceed the access limit
+        error_page = anonymous.get(page2_url, status=423)
+        assert 'mTAN Zugriffslimit Überschritten' in error_page
+
+        # since it didn't succeed it should not create a new entry
+        accesses = TANAccessCollection(
+            org_app.session(),
+            session_id='+41791112233'
+        ).query().all()
+        assert len(accesses) == 1
+
+        # but the original page should still be accesible
+        anonymous.get(page_url, status=200)
+
+    with freeze_time("2020-10-10 09:01", tick=True):
+        # but an hour later we get to do a new access
+        anonymous.get(page2_url, status=200)
+
+        # which creates a new access
+        accesses = TANAccessCollection(
+            org_app.session(),
+            session_id='+41791112233'
+        ).query().all()
+        assert len(accesses) == 2
+        assert accesses[1].url.endswith(page2_url)
+
+        # but now we still can't access a second page
+        # even one we had accessed before
+        anonymous.get(page_url, status=423)
+
+
 @freeze_time("2020-10-10", tick=True)
 def test_mtan_access_unauthorized_resource(org_app, client, smsdir):
     client.login_editor()

@@ -139,7 +139,9 @@ def test_firebase_settings(client):
     }
     """
 
-    settings = client.get('/settings').click('Firebase')
+    settings = client.get('/firebase')
+    assert 'Übersicht Push-Benachrichtigungen' in settings
+
     settings.form['firebase_adminsdk_credential'] = code
 
     settings = settings.form.submit().maybe_follow()

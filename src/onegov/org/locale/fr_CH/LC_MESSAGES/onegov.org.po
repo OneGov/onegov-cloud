@@ -2,7 +2,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE 1.0\n"
-"POT-Creation-Date: 2025-03-03 17:43+0100\n"
+"POT-Creation-Date: 2025-03-27 09:48+0100\n"
 "PO-Revision-Date: 2022-03-15 10:50+0100\n"
 "Last-Translator: Marc Sommerhalder <marc.sommerhalder@seantis.ch>\n"
 "Language-Team: French\n"
@@ -62,6 +62,21 @@ msgstr "Dernières nouvelles modifiées"
 
 msgid "Web Statistics"
 msgstr "Statistiques Web"
+
+msgid "Unique Visitors in the Last Month"
+msgstr "Visiteurs uniques le mois dernier"
+
+msgid "Total Visits in the Last Month"
+msgstr "Total des visites le mois dernier"
+
+msgid "Total Page Views in the Last Month"
+msgstr "Total des pages vues le mois dernier"
+
+msgid "Number of Page Views per Visit"
+msgstr "Nombre de pages vues par visite"
+
+msgid "Average Visit Duration in Minutes"
+msgstr "Durée moyenne de la visite en minutes"
 
 msgid "No data available"
 msgstr "Aucune donnée disponible"
@@ -190,6 +205,16 @@ msgstr "Ce site est secret"
 
 msgid "Cancel"
 msgstr "Annuler"
+
+msgid "mTAN Access Limit Exceeded"
+msgstr "Limite d'accès au mTAN dépassée"
+
+msgid ""
+"You have exceeded the maximum number of unique accesses to protected "
+"resources. Please try again at a later date."
+msgstr ""
+"Vous avez dépassé le nombre maximum d'accès uniques aux ressources "
+"protégées. Veuillez réessayer ultérieurement."
 
 msgid "ID Payment Provider"
 msgstr "ID Opérateurs de paiement"
@@ -1102,6 +1127,12 @@ msgstr "Éditorial"
 msgid "A few words about this edition of the newsletter"
 msgstr "Quelques mots concernant l'édition de cette lettre d'informations"
 
+msgid "Closing remark"
+msgstr "Remarque de clôture"
+
+msgid "Closing remark at the end of the newsletter"
+msgstr "Remarque de clôture à la fin de la lettre d'informations"
+
 msgid "Latest news"
 msgstr "Dernières nouvelles"
 
@@ -1971,25 +2002,24 @@ msgid ""
 "Example for newsletter topics with subtopics in yaml format. Note: Deeper "
 "structures are not supported.\n"
 "```\n"
-"Organisation:\n"
-"  - Topic 1:\n"
-"    - Subtopic 1.1\n"
-"    - Subtopic 1.2\n"
-"  - Topic 2\n"
-"  - Topic 3:\n"
-"    - Subtopic 3.1\n"
+"- Topic 1\n"
+"- Topic 2:\n"
+"  - Subtopic 2.1\n"
+"- Topic 3:\n"
+"  - Subtopic 3.1\n"
+"  - Subtopic 3.2\n"
 "```"
 msgstr ""
 "Exemple de sujets de newsletter avec des sous-sujets au format yaml. Note : "
 "Les structures plus profondes ne sont pas prises en charge. \n"
 "```\n"
-"Organisation:\n"
-"  - Thème 1:\n"
-"  - Sous-thème 1.1\n"
-"  - Sous-thème 1.2\n"
-"  - Thème 2\n"
-"  - Thème 3:\n"
-"  - Sous-thème 3.1```"
+"- Thème 1\n"
+"- Thème 2:\n"
+"  - Sous-thème 2.1\n"
+"- Thème 3:\n"
+"  - Sous-thème 3.1\n"
+"  - Sous-thème 3.2\n"
+"```"
 
 msgid "Notify on newsletter unsubscription"
 msgstr "Notifier le désabonnement à la lettre d'information"
@@ -2003,13 +2033,6 @@ msgstr ""
 
 msgid "Invalid YAML format. Please refer to the example."
 msgstr "Format YAML non valide. Veuillez vous référer à l'exemple."
-
-msgid ""
-"Invalid format. Please define an organisation name with topics and subtopics "
-"according the example."
-msgstr ""
-"Format non valide. Veuillez définir un nom d'organisation avec des sujets et "
-"des sous-sujets selon l'exemple."
 
 msgid ""
 "Invalid format. Please define topics and subtopics according to the example."
@@ -2147,8 +2170,15 @@ msgstr ""
 "Une erreur s'est produite lors de la validation des informations "
 "d'identification Firebase : {0}"
 
-msgid "E-Mail Address"
-msgstr "Adresse e-mail"
+msgid "VAT Rate"
+msgstr "Taux de TVA"
+
+msgid ""
+"This is the VAT rate in percent. The VAT rate will apply to all prices in "
+"the forms."
+msgstr ""
+"Il s'agit du taux de TVA en pourcentage. Le taux de TVA s'appliquera à tous "
+"les prix dans les formulaires."
 
 msgid ""
 "Select newsletter categories your are interested in. You will receive the "
@@ -2157,6 +2187,12 @@ msgstr ""
 "Sélectionnez les catégories de lettres d'information qui vous intéressent. "
 "Vous recevrez la newsletter si elle traite d'au moins une des catégories "
 "souscrites."
+
+msgid "E-Mail Address"
+msgstr "Adresse e-mail"
+
+msgid "The subscriber has given consent to receive the newsletter."
+msgstr "L'abonné a donné son consentement pour recevoir la newsletter."
 
 msgid "Submission Window"
 msgstr "Fenêtre de soumission"
@@ -2214,6 +2250,9 @@ msgstr "Admin"
 msgid "Editor"
 msgstr "Rédacteur"
 
+msgid "Supporter"
+msgstr "Supporteur"
+
 msgid "Member"
 msgstr "Membres"
 
@@ -2253,14 +2292,6 @@ msgstr "Envoyer un e-mail d'activation avec des directives"
 
 msgid "A user with this e-mail address exists already"
 msgstr "Un utilisateur avec cette adresse e-mail existe déjà"
-
-msgid ""
-"Users can only be in one group. If they already belong to another group and "
-"get added here, they will automatically get removed from the other group."
-msgstr ""
-"Les utilisateurs ne peuvent faire partie que d'un seul groupe. S'ils "
-"appartiennent déjà à un autre groupe et sont ajoutés ici, ils seront "
-"automatiquement retirés de l'autre groupe. "
 
 msgid "Ticket permissions"
 msgstr "Autorisation des tickets"
@@ -2381,6 +2412,9 @@ msgstr "Association sportive"
 
 msgid "all day"
 msgstr "toute la journée"
+
+msgid "VAT"
+msgstr "TVA"
 
 msgid "Homepage"
 msgstr "Page d'accueil"
@@ -3260,6 +3294,12 @@ msgstr "Voulez-vous vraiment supprimer l'iFrame « ${title} » ?"
 msgid "Copy"
 msgstr "Copie"
 
+msgid "A News cannot be pasted as Topic"
+msgstr "Une nouvelle ne peut pas être collée comme un sujet"
+
+msgid "A Topic cannot be pasted as News"
+msgstr "Un sujet ne peut pas être collé comme une nouvelle"
+
 msgid "Paste"
 msgstr "Coller"
 
@@ -3381,6 +3421,12 @@ msgstr ""
 "Vous avez trouvé une erreur ? Proposez une modification à apporter à cette "
 "entrée."
 
+msgid "No subscribers yet"
+msgstr "Pas encore d'abonnés"
+
+msgid "There are currently ${count} recipients registered."
+msgstr "Il y a actuellement ${count} destinataires enregistrés."
+
 msgid ""
 "Subscribers may always unsubscribe themselves through a link shown at the "
 "bottom of the newsletter. If you unsubscribe them here, they will not be "
@@ -3395,6 +3441,15 @@ msgstr "Se désabonner"
 
 msgid "unsubscribe"
 msgstr "se désabonner"
+
+msgid ""
+"This recipient has delivery failures, including hard bounces, invalid email "
+"addresses, spam complaints, manual deactivations, or being blocked. We "
+"recommend unsubscribing it from the list."
+msgstr ""
+"Ce destinataire a des échecs de livraison, y compris des rebonds, des "
+"adresses e-mail invalides, des plaintes pour spam, des désactivations "
+"manuelles, ou est bloqué. Nous recommandons de le désinscrire de la liste."
 
 msgid ""
 "Your edit requires a migration of existing entries. Please confirm the "
@@ -3719,6 +3774,9 @@ msgstr "Administrateurs"
 msgid "Editors"
 msgstr "Éditeurs"
 
+msgid "Supporters"
+msgstr "Supporteurs"
+
 msgid "Members"
 msgstr "Membres"
 
@@ -3835,7 +3893,7 @@ msgid "${count} words"
 msgstr "${count} mots"
 
 msgid "Do you really want to delete this file?"
-msgstr "Voulez-vous vraiment supprimer ce fichier ?"
+msgstr "Voulez-vous vraiment supprimer ce fichier?"
 
 msgid "Delete File"
 msgstr "Supprimez le fichier"
@@ -3848,6 +3906,12 @@ msgstr "Renommer"
 
 msgid "Download"
 msgstr "Télécharger"
+
+msgid "Linked Pages"
+msgstr "Pages reliées"
+
+msgid "Links to ${filename}"
+msgstr "Liens vers ${filename}"
 
 msgid "Digital seal applied by ${signee} on ${date}"
 msgstr "Sceau digital appliqué par ${signee} le ${date}"
@@ -4451,9 +4515,6 @@ msgstr ""
 "La newsletter est désactivée. Vous ne pouvez voir cette page que parce que "
 "vous êtes connecté."
 
-msgid "There are currently ${count} recipients registered."
-msgstr "Il y a actuellement ${count} destinataires enregistrés."
-
 msgid "To update your subscription, please use this ${Link}"
 msgstr "Pour mettre à jour votre abonnement, veuillez utiliser ce ${Link}"
 
@@ -4606,20 +4667,11 @@ msgstr "Notifications envoyées"
 msgid "Sent At"
 msgstr "Envoyé à"
 
+msgid "Response Data"
+msgstr "Response Data"
+
 msgid "No notifications"
 msgstr "Pas de notifications"
-
-msgid "No subscribers yet"
-msgstr "Pas encore d'abonnés"
-
-msgid ""
-"This recipient has delivery failures, including hard bounces, invalid email "
-"addresses, spam complaints, manual deactivations, or being blocked. We "
-"recommend unsubscribing it from the list."
-msgstr ""
-"Ce destinataire a des échecs de livraison, y compris des rebonds, des "
-"adresses e-mail invalides, des plaintes pour spam, des désactivations "
-"manuelles, ou est bloqué. Nous recommandons de le désinscrire de la liste."
 
 msgid "submitted"
 msgstr "soumis"
@@ -4922,6 +4974,21 @@ msgstr "Identicon"
 
 msgid "Not a valid color."
 msgstr "Couleur non valide."
+
+msgid "CSRF failed."
+msgstr ""
+"Échec du CSRF. Actualisez la page. Si le problème persiste, déconnectez-"
+"vous, reconnectez-vous et réessayez."
+
+msgid "CSRF token missing."
+msgstr ""
+"Jeton CSRF manquant. Actualisez la page. Si le problème persiste, "
+"déconnectez-vous, reconnectez-vous et réessayez."
+
+msgid "CSRF token expired."
+msgstr ""
+"Jeton CSRF expiré. Actualisez la page. Si le problème persiste, déconnectez-"
+"vous, reconnectez-vous et réessayez."
 
 msgid "Not a valid choice"
 msgstr "Choix invalide"
@@ -5394,6 +5461,14 @@ msgstr "Nouveau formulaire de document"
 
 msgid "Edit Document Form"
 msgstr "Modifier le formulaire de document"
+
+msgid ""
+"Notifications have already been sent for this news item. A new notification "
+"will not be sent, even if the publication date is changed."
+msgstr ""
+"Notifications ont déjà été envoyées pour cette nouvelle. Une nouvelle "
+"notification ne sera pas envoyée, même si la date de publication est "
+"modifiée."
 
 msgid "Moves the topic and all its sub topics to the given destination."
 msgstr "Déplace le sujet et tous ses sous-sujets vers la destination donnée."
@@ -6193,6 +6268,9 @@ msgstr ""
 "Procédez avec prudence. Les billets et les données qu'ils contiennent "
 "peuvent être irrévocablement supprimés."
 
+msgid "Value Added Tax"
+msgstr "Taxe sur la valeur ajoutée"
+
 msgid "Chat"
 msgstr "Chat"
 
@@ -6484,20 +6562,16 @@ msgstr "Un compte a été créé pour vous"
 msgid "The user was created successfully"
 msgstr "L'utilisateur a bien été créé"
 
-msgid "Unique Visitors in the Last Month"
-msgstr "Visiteurs uniques le mois dernier"
+#~ msgid ""
+#~ "Invalid format. Please define a listwith topics and subtopics according "
+#~ "the example."
+#~ msgstr ""
+#~ "Format non valide. Veuillez définir une liste avec des sujets et des sous-"
+#~ "sujets selon l'exemple."
 
-msgid "Total Visits in the Last Month"
-msgstr "Total des visites le mois dernier"
-
-msgid "Total Page Views in the Last Month"
-msgstr "Total des pages vues le mois dernier"
-
-msgid "Number of Page Views per Visit"
-msgstr "Nombre de pages vues par visite"
-
-msgid "Average Visit Duration in Minutes"
-msgstr "Durée moyenne de la visite en minutes"
-
-msgid "Terminaux ID"
-msgstr "ID du terminal"
+#~ msgid ""
+#~ "Invalid format. Please define an organisation name with topics and "
+#~ "subtopics according the example."
+#~ msgstr ""
+#~ "Format non valide. Veuillez définir un nom d'organisation avec des sujets "
+#~ "et des sous-sujets selon l'exemple."

@@ -3,6 +3,7 @@ from __future__ import annotations
 
 import morepath
 
+from onegov.core.elements import Link
 from onegov.core.security import Public, Private
 from onegov.form.collection import SurveyCollection
 from onegov.form.models.submission import SurveySubmission
@@ -14,10 +15,19 @@ from onegov.form import (
     CompleteFormSubmission
 )
 from onegov.org import _, OrgApp
-from onegov.org.layout import FormSubmissionLayout, SurveySubmissionLayout
+from onegov.org.layout import (
+    FormSubmissionLayout,
+    SurveySubmissionLayout,
+    TicketLayout,
+)
 from onegov.org.mail import send_ticket_mail
 from onegov.org.utils import user_group_emails_for_new_ticket
 from onegov.org.models import TicketMessage, SubmissionMessage
+from onegov.org.models.ticket import (
+    DirectoryEntryTicket,
+    FormSubmissionTicket,
+    ReservationTicket,
+)
 from onegov.pay import PaymentError, Price
 from purl import URL
 from webob.exc import HTTPMethodNotAllowed, HTTPNotFound
@@ -29,6 +39,7 @@ if TYPE_CHECKING:
     from onegov.core.types import RenderData
     from onegov.form import Form, FormSubmission
     from onegov.org.request import OrgRequest
+    from onegov.ticket import Ticket
     from webob import Response
 
 
@@ -79,9 +90,10 @@ def get_price(
 @OrgApp.html(model=CompleteFormSubmission, template='submission.pt',
              permission=Private, request_method='POST')
 def handle_pending_submission(
-    self: PendingFormSubmission | CompleteFormSubmission,
+    self: FormSubmission,
     request: OrgRequest,
-    layout: FormSubmissionLayout | None = None
+    layout: FormSubmissionLayout | TicketLayout | None = None,
+    ticket: Ticket | None = None,
 ) -> RenderData | Response:
     """ Renders a pending submission, takes it's input and allows the
     user to turn the submission into a complete submission, once all data
@@ -101,8 +113,13 @@ def handle_pending_submission(
     """
     collection = FormCollection(request.session)
 
+    if ticket is None:
+        self_url = request.link(self)
+    else:
+        self_url = request.link(ticket, 'submission')
+
     form = request.get_form(self.form_class, data=self.data)
-    form.action = request.link(self)
+    form.action = self_url
     form.model = self
 
     if 'edit' not in request.GET:
@@ -160,13 +177,13 @@ def handle_pending_submission(
         request.alert(_('Registrations are no longer possible'))
         completable = False
 
-    if completable and 'return-to' in request.GET:
+    if completable and (ticket is not None or 'return-to' in request.GET):
 
         if 'quiet' not in request.GET:
             request.success(_('Your changes were saved'))
 
-        # the default url should actually never be called
-        return request.redirect(request.url)
+        url = request.url if ticket is None else request.link(ticket)
+        return request.redirect(url)
 
     if 'title' in request.GET:
         title = request.GET['title']
@@ -179,11 +196,16 @@ def handle_pending_submission(
         request, form.action, ('return-to', 'title', 'quiet'))
 
     edit_url_obj = URL(copy_query(
-        request, request.link(self), ('title', )))
+        request, self_url, ('title', )))
 
     # the edit url always points to the editable state
     edit_url_obj = edit_url_obj.query_param('edit', '')
     edit_url = edit_url_obj.as_string()
+
+    complete_url = request.link(self, 'complete')
+
+    if 'return-to' in request.GET:
+        complete_url = copy_query(request, complete_url, ('return-to', ))
 
     email = self.email or self.get_email_field_data(form)
     if price:
@@ -193,7 +215,7 @@ def handle_pending_submission(
             title=title,
             price=price,
             email=email,
-            complete_url=request.link(self, 'complete'),
+            complete_url=complete_url,
             request=request
         )
     else:
@@ -205,11 +227,51 @@ def handle_pending_submission(
         'form': form,
         'completable': completable,
         'edit_link': edit_url,
-        'complete_link': request.link(self, 'complete'),
+        'complete_link': complete_url,
         'model': self,
         'price': price,
         'checkout_button': checkout_button
     }
+
+
+@OrgApp.html(model=DirectoryEntryTicket, template='submission.pt',
+             permission=Private, request_method='GET', name='submission')
+@OrgApp.html(model=DirectoryEntryTicket, template='submission.pt',
+             permission=Private, request_method='POST', name='submission')
+@OrgApp.html(model=FormSubmissionTicket, template='submission.pt',
+             permission=Private, request_method='GET', name='submission')
+@OrgApp.html(model=FormSubmissionTicket, template='submission.pt',
+             permission=Private, request_method='POST', name='submission')
+@OrgApp.html(model=ReservationTicket, template='submission.pt',
+             permission=Private, request_method='GET', name='submission')
+@OrgApp.html(model=ReservationTicket, template='submission.pt',
+             permission=Private, request_method='POST', name='submission')
+def handle_edit_submission_from_ticket(
+    self: DirectoryEntryTicket | FormSubmissionTicket | ReservationTicket,
+    request: OrgRequest,
+    layout: TicketLayout | None = None
+) -> RenderData | Response:
+
+    submission = self.handler.submission
+    if not isinstance(submission, CompleteFormSubmission):
+        raise HTTPNotFound()
+
+    if layout is None:
+        layout = TicketLayout(self, request)
+
+    layout.breadcrumbs = [
+        *layout.breadcrumbs[:-1],
+        Link(self.number, request.link(self)),
+        Link(_('Edit submission'), '#')
+    ]
+    layout.editbar_links = []
+
+    return handle_pending_submission(
+        submission,
+        request,
+        layout,
+        ticket=self,
+    )
 
 
 @OrgApp.view(model=PendingFormSubmission, name='complete',
@@ -221,7 +283,7 @@ def handle_pending_submission(
 @OrgApp.view(model=CompleteFormSubmission, name='complete',
              permission=Private, request_method='POST')
 def handle_complete_submission(
-    self: PendingFormSubmission | CompleteFormSubmission,
+    self: FormSubmission,
     request: OrgRequest
 ) -> Response:
 
@@ -391,6 +453,19 @@ def handle_accept_registration(
     return handle_submission_action(self, request, 'confirmed')
 
 
+@OrgApp.view(model=FormSubmissionTicket, name='confirm-registration',
+             permission=Private, request_method='POST')
+def handle_accept_registration_from_ticket(
+    self: FormSubmissionTicket,
+    request: OrgRequest
+) -> Response | None:
+    submission = self.handler.submission
+    if not isinstance(submission, CompleteFormSubmission):
+        raise HTTPNotFound()
+    return handle_submission_action(
+        submission, request, 'confirmed', return_url=request.link(self))
+
+
 @OrgApp.view(model=CompleteFormSubmission, name='deny-registration',
              permission=Private, request_method='POST')
 def handle_deny_registration(
@@ -398,6 +473,19 @@ def handle_deny_registration(
     request: OrgRequest
 ) -> Response | None:
     return handle_submission_action(self, request, 'denied')
+
+
+@OrgApp.view(model=FormSubmissionTicket, name='deny-registration',
+             permission=Private, request_method='POST')
+def handle_deny_registration_from_ticket(
+    self: FormSubmissionTicket,
+    request: OrgRequest
+) -> Response | None:
+    submission = self.handler.submission
+    if not isinstance(submission, CompleteFormSubmission):
+        raise HTTPNotFound()
+    return handle_submission_action(
+        submission, request, 'denied', return_url=request.link(self))
 
 
 @OrgApp.view(model=CompleteFormSubmission, name='cancel-registration',
@@ -409,6 +497,19 @@ def handle_cancel_registration(
     return handle_submission_action(self, request, 'cancelled')
 
 
+@OrgApp.view(model=FormSubmissionTicket, name='cancel-registration',
+             permission=Private, request_method='POST')
+def handle_cancel_registration_from_ticket(
+    self: FormSubmissionTicket,
+    request: OrgRequest
+) -> Response | None:
+    submission = self.handler.submission
+    if not isinstance(submission, CompleteFormSubmission):
+        raise HTTPNotFound()
+    return handle_submission_action(
+        submission, request, 'cancelled', return_url=request.link(self))
+
+
 def handle_submission_action(
     self: CompleteFormSubmission,
     request: OrgRequest,
@@ -416,7 +517,8 @@ def handle_submission_action(
     ignore_csrf: bool = False,
     raises: bool = False,
     no_messages: bool = False,
-    force_email: bool = False
+    force_email: bool = False,
+    return_url: str | None = None,
 ) -> Response | None:
 
     if not ignore_csrf:
@@ -489,7 +591,10 @@ def handle_submission_action(
             request.alert(failure)
             return None
 
-    return request.redirect(request.link(self))
+    if return_url is None:
+        return_url = request.link(self)
+
+    return request.redirect(return_url)
 
 
 @OrgApp.html(model=SurveySubmission,

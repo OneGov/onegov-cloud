@@ -84,7 +84,7 @@ def create_directory(
     return meetings
 
 
-def accecpt_latest_submission(client):
+def accept_latest_submission(client):
     page = client.get('/tickets/ALL/open').click(
         "Annehmen", index=0).follow()
     accept_url = page.pyquery('.accept-link').attr('ic-post-to')
@@ -214,7 +214,7 @@ def test_publication_with_submission(client):
     assert not submission.submitter_phone
 
     # Accept the new submission and test the ticket page
-    ticket_page = accecpt_latest_submission(client)
+    ticket_page = accept_latest_submission(client)
     assert 'User Example' in ticket_page
     assert 'Testaddress' in ticket_page
 
@@ -248,6 +248,8 @@ def test_directory_publication_change_request(client):
     entry = page.form.submit().follow()
 
     # make change requests
+    anonymous = client.spawn()
+    entry = anonymous.get(entry.request.url)
     page = entry.click('Änderung vorschlagen')
     page.form['submitter'] = 'user@example.org'
     page.form['submitter_name'] = 'User Example'
@@ -266,7 +268,10 @@ def test_directory_publication_change_request(client):
            dt_repr(standardize_date(end, 'UTC'))
 
     page = changes.form.submit().follow()
-    ticket_page = accecpt_latest_submission(client)
+
+    supporter = client.spawn()
+    supporter.login_supporter()
+    ticket_page = accept_latest_submission(supporter)
     assert 'User Example' in ticket_page
     assert 'User Address' in ticket_page
     annual_entry = dir_query(client).first()
@@ -302,7 +307,8 @@ def test_directory_change_requests(client):
     img_url = page.pyquery('.field-display img').attr('href')
 
     # ask for a change, completely empty
-    page = client.get(f'{page.request.url}/change-request')
+    anonymous = client.spawn()
+    page = anonymous.get(f'{page.request.url}/change-request')
     page.form['submitter'] = 'user@example.org'
     assert len(os.listdir(client.app.maildir)) == 0
     assert 'publication_start' not in page.form.fields
@@ -313,8 +319,10 @@ def test_directory_change_requests(client):
     page = form_preview.form.submit().form.submit().follow()
 
     # check the ticket
+    supporter = client.spawn()
+    supporter.login_supporter()
     assert len(os.listdir(client.app.maildir)) == 1
-    page = client.get('/tickets/ALL/open').click("Annehmen").follow()
+    page = supporter.get('/tickets/ALL/open').click("Annehmen").follow()
     assert '<del>Central Park</del><ins>Diana Ross Playground</ins>' in page
     assert 'This is better' in page
 
@@ -326,7 +334,7 @@ def test_directory_change_requests(client):
     page.click("Übernehmen")
     # User gets confirmation email
     assert len(os.listdir(client.app.maildir)) == 2
-    page = client.get(page.request.url)
+    page = supporter.get(page.request.url)
     assert 'Central Park' not in page
     assert 'Diana Ross Playground' in page
     assert 'This is better' in page
@@ -978,6 +986,7 @@ def test_directory_entry_subscription(client):
     assert "dream@gmail.com wurde erfolgreich" in page
 
     page = client.get('/directories/trainers/+recipients')
+    assert 'Zur Zeit sind 2 Abonnenten registriert' in page
     assert 'bliss@gmail.com' in page
     assert 'dream@gmail.com' in page
 

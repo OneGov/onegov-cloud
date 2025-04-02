@@ -1,3 +1,4 @@
+import json
 from tempfile import TemporaryDirectory
 
 import babel.dates
@@ -400,7 +401,7 @@ def test_submit_event(broadcast, authenticate, connect, client, skip):
     assert "Bibliothek" in preview_page
     assert "The Organizer" in preview_page
     assert "event@myevents.ch" in preview_page
-    assert "076 987 65 43" in preview_page
+    assert "+41 76 987 65 43" in preview_page
     assert "{} 18:00 - 22:00".format(
         babel.dates.format_date(
             start_date, format='d. MMMM yyyy', locale='de'
@@ -417,6 +418,11 @@ def test_submit_event(broadcast, authenticate, connect, client, skip):
     # Edit event
     form_page = preview_page.click("Bearbeiten", index=0)
     form_page.form['title'] = "My Event"
+
+    assert form_page.form['repeat'].value == 'weekly'
+    for i in range(7):
+        checkbox = form_page.form.fields['weekly'][i]
+        assert checkbox.checked
 
     preview_page = form_page.form.submit().follow()
 
@@ -447,11 +453,25 @@ def test_submit_event(broadcast, authenticate, connect, client, skip):
     assert broadcast.call_args[0][3]['title'] == 'Neues Ticket'
     assert broadcast.call_args[0][3]['created']
 
-    # Make corrections
+    # Make corrections, switch from weekly to dates
     form_page = confirmation_page.click("Bearbeiten Sie diese Veranstaltung.")
     form_page.form['description'] = "My event is exceptional."
+    form_page.form['repeat'] = 'dates'
+    next_dates = [date.today() + timedelta(days=3),
+                  date.today() + timedelta(days=6)]
+    form_page.form['dates'] = json.dumps(
+        {
+            'values': [
+                {'date': d.isoformat()} for d in next_dates
+            ]
+        }
+    )
     preview_page = form_page.form.submit().follow()
     assert "My event is exceptional." in preview_page
+    assert "Alle Termine" in preview_page
+    assert start_date.strftime('%d.%m.%Y') in preview_page
+    for d in next_dates:
+        assert d.strftime('%d.%m.%Y') in preview_page
 
     session = client.app.session()
     event = session.query(Event).filter_by(title="My Event").one()
@@ -465,7 +485,7 @@ def test_submit_event(broadcast, authenticate, connect, client, skip):
     assert "A special place" in preview_page
 
     # Accept ticket
-    client.login_editor()
+    client.login_supporter()
 
     page = client.get('/')
     assert page.pyquery('.open-tickets').attr('data-count') == '1'
@@ -480,7 +500,7 @@ def test_submit_event(broadcast, authenticate, connect, client, skip):
     assert "A special place" in ticket_page
     assert "The Organizer" in ticket_page
     assert "event@myevents.ch" in preview_page
-    assert "076 987 65 43" in preview_page
+    assert "+41 76 987 65 43" in preview_page
     assert "Ausstellung" in ticket_page
     assert "Bibliothek" in ticket_page
     assert "Veranstaltung bearbeitet" in ticket_page
@@ -490,13 +510,8 @@ def test_submit_event(broadcast, authenticate, connect, client, skip):
             start_date, format='d. MMMM yyyy', locale='de'
         )
     ) in ticket_page
-
-    assert "Jeden Mo, Di, Mi, Do, Fr, Sa, So bis zum {}".format(
-        end_date.strftime('%d.%m.%Y')
-    ) in ticket_page
-    for days in range(5):
-        assert (start_date + timedelta(days=days)).strftime('%d.%m.%Y') in \
-            ticket_page
+    for d in next_dates + [start_date]:
+        assert d.strftime('%d.%m.%Y') in ticket_page
 
     client.logout()
 
@@ -504,6 +519,8 @@ def test_submit_event(broadcast, authenticate, connect, client, skip):
     form_page = confirmation_page.click("Bearbeiten Sie diese Veranstaltung.")
     form_page.form['organizer'] = "A carful organizer"
     form_page.form['organizer_email'] = "info@myevents.ch"
+    for d in next_dates + [start_date]:
+        assert d.isoformat() in form_page
     preview_page = form_page.form.submit().follow()
     assert "My event is exceptional." in preview_page
 
@@ -520,7 +537,7 @@ def test_submit_event(broadcast, authenticate, connect, client, skip):
     assert "A special place" in preview_page
 
     # Publish event
-    client.login_editor()
+    client.login_supporter()
     ticket_page = ticket_page.click("Veranstaltung annehmen").follow()
 
     assert "My special event" in client.get('/events')
@@ -536,12 +553,14 @@ def test_submit_event(broadcast, authenticate, connect, client, skip):
     assert "Bibliothek" in message
     assert "A carful organizer" in message
     assert "info@myevents.ch" in preview_page
-    assert "076 111 22 33" in preview_page
+    assert "+41 76 111 22 33" in preview_page
     assert "{} 18:00 - 22:00".format(
-        start_date.strftime('%d.%m.%Y')) in message
-    for days in range(5):
-        assert (start_date + timedelta(days=days)).strftime('%d.%m.%Y') in \
-            message
+        babel.dates.format_date(
+            start_date, format='d. MMMM yyyy', locale='de'
+        )
+    ) in ticket_page
+    for d in next_dates + [start_date]:
+        assert d.strftime('%d.%m.%Y') in ticket_page
     assert "Ihre Veranstaltung wurde angenommen" in message
 
     # Close ticket
@@ -628,16 +647,18 @@ def test_delete_event(client):
     form_page.form['image'] = Upload('test.jpg', create_image().read())
     form_page.form.submit().follow().form.submit().follow()
 
-    client.login_editor()
+    client.login_supporter()
+    editor = client.spawn()
+    editor.login_editor()
 
     ticket_page = client.get('/tickets/ALL/open').click("Annehmen").follow()
     ticket_page = ticket_page.click("Veranstaltung annehmen").follow()
     ticket_nr = ticket_page.pyquery('.ticket-number').text()
 
-    assert "My Event" in client.get('/events')
+    assert "My Event" in editor.get('/events')
 
     # Try to delete a submitted event directly
-    event_page = client.get('/events').click("My Event")
+    event_page = editor.get('/events').click("My Event")
 
     assert "Diese Veranstaltung kann nicht gelöscht werden." in \
         event_page.pyquery('a.delete-link')[0].values()
@@ -661,14 +682,14 @@ def test_delete_event(client):
     assert "My Event" not in client.get('/events')
 
     # Delete a non-submitted event
-    event_page = client.get('/events').click("Generalversammlung")
+    event_page = editor.get('/events').click("Generalversammlung")
     assert "Möchten Sie die Veranstaltung wirklich löschen?" in \
         event_page.pyquery('a.delete-link')[0].values()
 
     delete_link = event_page.pyquery('a.delete-link').attr('ic-delete-from')
-    client.delete(delete_link)
+    editor.delete(delete_link)
 
-    assert "Generalversammlung" not in client.get('/events')
+    assert "Generalversammlung" not in editor.get('/events')
 
 
 def test_import_export_events(client):

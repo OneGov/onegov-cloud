@@ -5,11 +5,21 @@ build-backend = "setuptools.build_meta"
 [tool.pytest.ini_options]
 log_level = "INFO"
 testpaths = ["tests"]
+python_classes = []
+python_files = ["test_*.py"]
 timeout = 300
 asyncio_default_fixture_loop_scope = "function"
 filterwarnings = [
-    "ignore:pkg_resources is deprecated as an API",
-    "ignore:Deprecated call to `pkg_resources\\.declare_namespace\\('.*'\\):DeprecationWarning"
+    '''ignore:pkg_resources is deprecated as an API''',
+    '''ignore:Deprecated call to `pkg_resources\.declare_namespace\('.*'\):DeprecationWarning''',
+    # potential issue for future upgrades
+    # unfortunately it's not possible to filter escape sequence warnings in
+    # specific modules, but we should be covered by Ruff for our own code
+    '''ignore:invalid escape sequence '[^']+':::''',
+    '''ignore:'crypt':DeprecationWarning:passlib.*:''',
+    # fixed upstream
+    '''ignore:(tagMap|typeMap) is deprecated:DeprecationWarning:pyasn1.*:''',
+    '''ignore:'cgi':DeprecationWarning:webob.*:''',
 ]
 
 [tool.coverage.run]
@@ -19,6 +29,8 @@ omit = ["*/tests/*", "**/upgrade.py"]
 
 [tool.coverage.report]
 ignore_errors = true
+skip_covered = true
+skip_empty = true
 exclude_lines = [
     "pragma: no cover",
     "pragma: unreachable",

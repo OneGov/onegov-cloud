@@ -38,7 +38,7 @@ from onegov.org.models.message import TicketChatMessage
 from onegov.org.models.message import TicketMessage
 from onegov.org.models.message import TicketNote
 from onegov.org.models.organisation import Organisation
-from onegov.org.models.page import AtoZPages, News, Topic
+from onegov.org.models.page import AtoZPages, News, NewsCollection, Topic
 from onegov.org.models.page_move import PageMove
 from onegov.org.models.person_move import FormPersonMove
 from onegov.org.models.person_move import PagePersonMove
@@ -51,8 +51,8 @@ from onegov.org.models.resource import DaypassResource
 from onegov.org.models.search import Search, SearchPostgres
 from onegov.org.models.sitecollection import SiteCollection
 from onegov.org.models.swiss_holidays import SwissHolidays
-from onegov.org.models.sent_notification import PushNotification
-from onegov.org.models.sent_notification import PushNotificationCollection
+from onegov.org.models.push_notification import PushNotification
+from onegov.org.models.push_notification import PushNotificationCollection
 from onegov.org.models.tan import TANAccess
 from onegov.org.models.tan import TANAccessCollection
 from onegov.org.models.traitinfo import TraitInfo
@@ -93,6 +93,7 @@ __all__ = (
     'LegacyImage',
     'LegacyImageCollection',
     'News',
+    'NewsCollection',
     'Organisation',
     'PageMove',
     'PagePersonMove',

@@ -6,7 +6,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: OneGov Cloud 1.0\n"
-"POT-Creation-Date: 2025-03-03 17:44+0100\n"
+"POT-Creation-Date: 2025-03-20 14:18+0100\n"
 "PO-Revision-Date: 2021-03-03 16:24+0100\n"
 "Last-Translator: Lukas Burkhard <lukas.burkhard@seantis.ch>\n"
 "Language-Team: German\n"
@@ -818,6 +818,9 @@ msgstr "Administrator"
 msgid "Editor"
 msgstr "Editor"
 
+msgid "Supporter"
+msgstr "Supporter"
+
 msgid "Member"
 msgstr "Mitglied"
 
@@ -826,6 +829,9 @@ msgstr "Administratoren"
 
 msgid "Editors"
 msgstr "Editoren"
+
+msgid "Supporters"
+msgstr "Supporters"
 
 msgid "Members"
 msgstr "Mitglieder"
@@ -988,6 +994,12 @@ msgstr "Umbenennen"
 
 msgid "Download"
 msgstr "Herunterladen"
+
+msgid "Linked Pages"
+msgstr "Verlinkungen"
+
+msgid "Links to ${filename}"
+msgstr "Links auf ${filename}"
 
 msgid "Digital seal applied by ${signee} on ${date}"
 msgstr "Digitales Siegel angewendet von ${signee} am ${date}"
@@ -1517,6 +1529,13 @@ msgstr "Ticket aus dem Archiv geholt."
 msgid "Ticket uploaded to Gever."
 msgstr "Ticket zu Gever hochgeladen."
 
+msgid ""
+"You have exceeded the maximum number of unique accesses to protected "
+"resources. Please try again at a later date."
+msgstr ""
+"Sie haben die maximale Anzahl an Zugriffen auf geschützte Inhalte "
+"überschritten. Bitte versuchen Sie es zu einem späteren Zeitpunkt wieder."
+
 msgid "Your search returned no results."
 msgstr "Zu Ihrer Suche wurde nichts gefunden."
 
@@ -1711,8 +1730,14 @@ msgstr "Dateien zur Prüfung hierhin ziehen"
 msgid "Sent Notifications"
 msgstr "Gesendete Benachrichtigungen"
 
+msgid "News"
+msgstr "Nachricht"
+
 msgid "Sent At"
 msgstr "Gesendet am"
+
+msgid "Firebase Response Data"
+msgstr "Firebase Response Data"
 
 msgid "No notifications"
 msgstr "Keine Benachrichtigungen"
@@ -2217,6 +2242,12 @@ msgid ""
 msgstr ""
 "Gehen Sie mit Vorsicht vor. Tickets und die darin enthaltenen Daten können "
 "unwiderruflich gelöscht werden."
+
+msgid "Push Notification Overview"
+msgstr "Übersicht Push-Benachrichtigungen"
+
+msgid "Value Added Tax"
+msgstr "Mehrwertsteuer"
 
 msgid "New Note"
 msgstr "Neue Notiz"

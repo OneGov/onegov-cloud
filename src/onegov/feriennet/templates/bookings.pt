@@ -225,7 +225,7 @@
                                                                                 <i class="fa fa-envelope" aria-hidden="true"></i>
                                                                             </a>
 
-                                                                            <a href="tel:${row.phone}" tal:condition="row.phone" title="${row.phone}">
+                                                                            <a href="tel:${layout.format_phone_number(row.phone)}" tal:condition="row.phone" title="${layout.format_phone_number(row.phone)}">
                                                                                 <span class="show-for-sr" i18n:translate>
                                                                                     Call <tal:b i18n:name="name">${row.parent}</tal:b>
                                                                                 </span>

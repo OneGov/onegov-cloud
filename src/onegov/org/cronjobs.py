@@ -14,6 +14,7 @@ from onegov.chat.models import Chat
 from onegov.core.orm import find_models, Base
 from onegov.core.orm.mixins.publication import UTCPublicationMixin
 from onegov.core.templates import render_template
+from onegov.directory.collections.directory import EntryRecipientCollection
 from onegov.event import Occurrence, Event
 from onegov.file import FileCollection
 from onegov.form import FormSubmission, parse_form, Form
@@ -34,6 +35,7 @@ from onegov.org.models.extensions import (
     GeneralFileLinkExtension, DeletableContentExtension)
 from onegov.org.models.ticket import ReservationHandler
 from onegov.gever.encrypt import decrypt_symmetric
+from cryptography.fernet import InvalidToken
 from sqlalchemy.exc import IntegrityError
 from onegov.org.views.allocation import handle_rules_cronjob
 from onegov.org.views.directory import (
@@ -771,39 +773,47 @@ def update_newsletter_email_bounce_statistics(
 
         return ''
 
-    token = get_postmark_token()
+    def get_bounces() -> list[dict[str, Any]]:
+        token = get_postmark_token()
+        yesterday = utcnow() - timedelta(days=1)
+        r = None
 
-    recipients = RecipientCollection(request.session)
-    yesterday = utcnow() - timedelta(days=1)
+        try:
+            r = requests.get(
+                'https://api.postmarkapp.com/bounces?count=500&offset=0',
+                f'fromDate={yesterday.date()}&toDate='
+                f'{yesterday.date()}&inactive=true',
+                headers={
+                    'Accept': 'application/json',
+                    'X-Postmark-Server-Token': token,
+                },
+                timeout=30,
+            )
+            r.raise_for_status()
+            bounces = r.json().get('Bounces', [])
+        except requests.exceptions.HTTPError as http_err:
+            if r and r.status_code == 401:
+                raise RuntimeWarning(
+                    f'Postmark API token is not set or invalid: {http_err}'
+                ) from None
+            else:
+                raise
 
-    try:
-        r = requests.get(
-            'https://api.postmarkapp.com/bounces?count=500&offset=0',
-            f'fromDate={yesterday.date()}&toDate='
-            f'{yesterday.date()}&inactive=true',
-            headers={
-                'Accept': 'application/json',
-                'X-Postmark-Server-Token': token
-        },
-            timeout=30
-        )
-        r.raise_for_status()
-        bounces = r.json().get('Bounces', [])
-    except requests.exceptions.HTTPError as http_err:
-        if r.status_code == 401:
-            raise RuntimeWarning(
-                f'Postmark API token is not set or invalid: {http_err}'
-            ) from None
-        else:
-            raise
+        return bounces
 
-    for bounce in bounces:
-        email = bounce.get('Email', '')
-        inactive = bounce.get('Inactive', False)
-        recipient = recipients.by_address(email)
+    postmark_bounces = get_bounces()
+    collections = (RecipientCollection, EntryRecipientCollection)
+    for collection in collections:
+        recipients = collection(request.session)
 
-        if recipient and inactive:
-            recipient.mark_inactive()
+        for bounce in postmark_bounces:
+            email = bounce.get('Email', '')
+            inactive = bounce.get('Inactive', False)
+            recipient = recipients.by_address(email)
+
+            if recipient and inactive:
+                print(f'Mark recipient {recipient.address} as inactive')
+                recipient.mark_inactive()
 
 
 @OrgApp.cronjob(hour=4, minute=30, timezone='Europe/Zurich')
@@ -826,33 +836,36 @@ def delete_unconfirmed_newsletter_subscriptions(request: OrgRequest) -> None:
 
 
 def get_news_for_push_notification(session: Session) -> Query[News]:
+    # Use UTC time for database comparisons since publication_start is stored
+    # in UTC
     now = utcnow()
-    ten_minutes_ago = now - timedelta(minutes=10)
 
     # Get all news items that should trigger push notifications
     query = session.query(News)
-    query = query.filter(News.published == True)
+    query = query.filter(News.published.is_(True))
     query = query.filter(News.publication_start <= now)
 
-    # You may comment out the line below temporarily for testing
-    query = query.filter(News.publication_start >= ten_minutes_ago)
+    news_with_sent_notifications = session.query(
+        PushNotification.news_id
+    ).subquery()
+    query = query.filter(~News.id.in_(news_with_sent_notifications))
+    only_public_news = query.filter(
+        or_(
+            News.meta['access'].astext == 'public',
+            News.meta['access'].astext.is_(None)
+        )
+    )
 
-    only_public_news = query.filter(or_(
-        News.meta['access'].astext == 'public',
-        News.meta['access'].astext == None
-    ))
     only_public_with_send_push_notification = only_public_news.filter(
         News.meta['send_push_notifications_to_app'].astext == 'true'
     )
-
     return only_public_with_send_push_notification
 
 
 @OrgApp.cronjob(hour='*', minute='*/10', timezone='UTC')
 def send_push_notifications_for_news(request: OrgRequest) -> None:
     """
-    Cronjob that runs every 10 minutes to send push notifications for news
-    items that were published within the last 10 minutes.
+    Cronjob that runs every 10 minutes to send push notifications for news.
 
     It collects all news items with:
     - Publication start date within the last 10 minutes
@@ -866,31 +879,32 @@ def send_push_notifications_for_news(request: OrgRequest) -> None:
 
     # Skip if no Firebase credentials are configured
     if not org.firebase_adminsdk_credential:
-        print('No Firebase credentials configured')
         return
 
     news_items = get_news_for_push_notification(session).all()
     if not news_items:
-        print('No news items found with push notifications enabled')
         return
 
-    # Get the mapping of topic IDs to hashtags
+    # Get the mapping
     topic_mapping = org.meta.get('selectable_push_notification_options', [])
     if not topic_mapping:
-        print('selectable_push_notification_options is empty')
         return
 
     # Decrypt the Firebase credentials
     key_base64 = request.app.hashed_identity_key
     encrypted_creds = org.firebase_adminsdk_credential
     if not encrypted_creds:
-        print('No Firebase credentials found')
         return
 
     try:
         firebase_creds_json = decrypt_symmetric(
             encrypted_creds.encode('utf-8'), key_base64
         )
+    except InvalidToken:
+        log.warning('Failed to decrypt Firebase credentials: InvalidToken')
+        return
+
+    try:
         # Get notification service
         notification_service = get_notification_service(firebase_creds_json)
 
@@ -910,17 +924,14 @@ def send_push_notifications_for_news(request: OrgRequest) -> None:
             )
 
             for topic_id in topics:
-                if isinstance(topic_id, str):
-                    print(f'String entry: {topic_id}')
-                else:
-                    print('Invalid topic entry')
+                if not isinstance(topic_id, str):
                     continue
 
                 # Check if notification was already sent
                 if PushNotification.was_notification_sent(
                     session, news.id, topic_id
                 ):
-                    log.info(
+                    print(
                         f"Skipping duplicate notification to topic "
                         f"'{topic_id}' for news '{news.title}'."
                     )
@@ -929,11 +940,10 @@ def send_push_notifications_for_news(request: OrgRequest) -> None:
 
                 notification_title = news.title
                 notification_body = news.lead or ''
-
                 notification_data = {
+                    'id': str(request.link(news)),
                     'title': news.title,
-                    'body': news.lead or news.title,
-                    'url': request.link(news)
+                    'lead': notification_body,
                 }
 
                 try:

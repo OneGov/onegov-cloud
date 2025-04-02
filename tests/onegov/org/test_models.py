@@ -3,9 +3,13 @@ import os
 from collections import OrderedDict
 from datetime import datetime, date
 from freezegun import freeze_time
+from sqlalchemy.exc import IntegrityError
+import pytest
 from onegov.core.request import CoreRequest
 from onegov.core.utils import module_path
-from onegov.org.models import Clipboard, ImageFileCollection
+from onegov.core.utils import Bunch
+from onegov.org.models import Clipboard, ImageFileCollection, PushNotification
+from onegov.org.models import NewsCollection
 from onegov.org.models import Organisation
 from onegov.org.models import SiteCollection
 from onegov.org.models.file import GroupFilesByDateMixin
@@ -39,39 +43,54 @@ def test_clipboard(org_app):
 
 def test_news(session):
 
+    request = Bunch(**{
+        'session': session,
+        'identity.role': 'member'
+    })
+    manager_request = Bunch(**{
+        'session': session,
+        'identity.role': 'editor'
+    })
     collection = PageCollection(session)
-    news = collection.add_root("News", type='news')
+    root = collection.add_root("News", type='news')
     one = collection.add(
-        news,
+        root,
         title='One',
         type='news',
         lead='#one #both',
+        meta={'access': 'public'}
     )
     one.created = datetime(2016, 1, 1, tzinfo=utc)
     two = collection.add(
-        news,
+        root,
         title='Two',
         type='news',
-        text='#two #both'
+        text='#two #both',
+        meta={'access': 'secret'}
     )
     two.created = datetime(2015, 3, 1, tzinfo=utc)
     three = collection.add(
-        news,
+        root,
         title='Three',
         type='news',
-        text='#three'
+        text='#three',
+        meta={'access': 'mtan'}
     )
     three.created = datetime(2015, 2, 1, tzinfo=utc)
     three.publication_start = datetime(2015, 2, 2, tzinfo=utc)
     three.publication_end = datetime(2015, 2, 4, tzinfo=utc)
     four = collection.add(
-        news,
+        root,
         title='Four',
         type='news',
         text='#four'
     )
     four.created = datetime(2015, 1, 1, tzinfo=utc)
     four.is_visible_on_homepage = True
+
+    news = NewsCollection(request)
+    manager_news = NewsCollection(manager_request)
+    assert news.root == root
 
     assert news.all_years == [2016, 2015]
     assert news.all_tags == ['both', 'four', 'one', 'three', 'two']
@@ -93,30 +112,33 @@ def test_news(session):
 
     news.filter_years = []
     news.filter_tags = []
-    assert news.news_query(limit=None, published_only=False).count() == 4
-    assert news.news_query(limit=None, published_only=True).count() == 3
-    assert news.news_query(limit=0, published_only=True).count() == 1
-    assert news.news_query(limit=1, published_only=True).count() == 2
-    assert news.news_query(limit=2, published_only=True).count() == 3
-    assert news.news_query(limit=3, published_only=True).count() == 3
+    assert manager_news.subset().count() == 4
+    assert news.subset().count() == 2
 
-    news.filter_years = [2016]
-    assert news.news_query(limit=None, published_only=False).count() == 1
-    news.filter_years = [2015]
-    assert news.news_query(limit=None, published_only=False).count() == 3
-    news.filter_years = [2015, 2016]
-    assert news.news_query(limit=None, published_only=False).count() == 4
+    news.filter_years = manager_news.filter_years = [2016]
+    assert manager_news.subset().count() == 1
+    assert news.subset().count() == 1
+    news.filter_years = manager_news.filter_years = [2015]
+    assert manager_news.subset().count() == 3
+    assert news.subset().count() == 1
+    news.filter_years = manager_news.filter_years = [2015, 2016]
+    assert manager_news.subset().count() == 4
+    assert news.subset().count() == 2
 
-    news.filter_tags = ['one']
-    assert news.news_query(limit=None, published_only=False).count() == 1
-    news.filter_tags = ['both']
-    assert news.news_query(limit=None, published_only=False).count() == 2
-    news.filter_tags = ['both', 'three']
-    assert news.news_query(limit=None, published_only=False).count() == 3
+    news.filter_tags = manager_news.filter_tags = ['one']
+    assert manager_news.subset().count() == 1
+    assert news.subset().count() == 1
+    news.filter_tags = manager_news.filter_tags = ['both']
+    assert manager_news.subset().count() == 2
+    assert news.subset().count() == 1
+    news.filter_tags = manager_news.filter_tags = ['both', 'three']
+    assert manager_news.subset().count() == 3
+    assert news.subset().count() == 1
 
-    news.filter_years = [2015]
-    news.filter_tags = ['both']
-    assert news.news_query(limit=None, published_only=False).one() == two
+    news.filter_years = manager_news.filter_years = [2015]
+    news.filter_tags = manager_news.filter_tags = ['both']
+    assert manager_news.subset().one() == two
+    assert news.subset().one_or_none() is None
 
 
 def test_group_intervals():
@@ -362,3 +384,49 @@ def test_holidays():
     assert date(2000, 1, 3) in o.holidays
 
     assert len(o.holidays.all(2000)) == 14
+
+
+def test_cascade_delete(session):
+    """Test that deleting a news item also deletes related notifications"""
+    collection = PageCollection(session)
+    news = collection.add_root("News", type='news')
+    news_1 = collection.add(
+        news,
+        title='One',
+        type='news',
+        lead='#some #thing',
+    )
+    session.add(news_1)
+    session.flush()
+    news_id = news_1.id
+    PushNotification.record_sent_notification(
+        session, news_id, "topic1", {"status": "sent"}
+    )
+    PushNotification.record_sent_notification(
+        session, news_id, "topic2", {"status": "sent"}
+    )
+    assert session.query(PushNotification).count() == 2
+    session.delete(news_1)
+    session.flush()
+    assert session.query(PushNotification).count() == 0
+
+
+def test_duplicate_prevention_push_notifications(session):
+    collection = PageCollection(session)
+    news = collection.add_root("News", type='news')
+    news_1 = collection.add(
+        news,
+        title='One',
+        type='news',
+        lead='#some #thing',
+    )
+    session.add(news_1)
+    session.flush()
+    news_id = news_1.id
+    PushNotification.record_sent_notification(
+        session, news_id, "topic1", {"status": "sent"}
+    )
+    with pytest.raises(IntegrityError):
+        PushNotification.record_sent_notification(
+            session, news_id, "topic1", {"status": "sent"}
+        )

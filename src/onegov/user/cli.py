@@ -54,6 +54,9 @@ def add(
         if users.exists(username):
             abort('{} already exists'.format(username))
 
+        if not hasattr(app.settings.roles, role):
+            abort(f'Invalid role "{role}" specified')
+
         nonlocal password
         if not password:
             password = random_password(16)
@@ -193,7 +196,7 @@ def logout_all() -> Callable[[CoreRequest, Framework], None]:
     return logout_user
 
 
-@cli.command(context_settings={'singular': True})
+@cli.command(context_settings={'default_selector': '*'})
 @click.option('--active-only', help='Only show active users', is_flag=True)
 @click.option('--inactive-only', help='Only show inactive users', is_flag=True)
 @click.option('--sources', help='Display sources', is_flag=True, default=False)
@@ -214,6 +217,7 @@ def list(
         )
         users = users.order_by(User.username, User.role)
 
+        print(f'{app.schema}:')
         for username, role, active, source in users.all():
             if active_only and not active:
                 continue
@@ -222,7 +226,7 @@ def list(
                 continue
 
             print(
-                '{active} {username} [{role}]{source}'.format(
+                '  {active} {username} [{role}]{source}'.format(
                     active='✔︎' if active else '✘',
                     username=username,
                     role=role,
@@ -439,6 +443,9 @@ def change_role(
     """ Changes the role of the given username. """
 
     def change(request: CoreRequest, app: Framework) -> None:
+        if not hasattr(app.settings.roles, role):
+            abort(f'Invalid role "{role}" specified')
+
         users = UserCollection(app.session())
 
         user = users.by_username(username)

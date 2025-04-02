@@ -292,9 +292,12 @@ class CoreRequest(IncludeRequest, ContentSecurityRequest, ReturnToMixin):
     ) -> str | _T | None:
         """ Extends the default link generating function of Morepath. """
         query_params = query_params or {}
-        result = self.transform(
-            super().link(obj, name=name, default=default, app=app)
-        )
+        if hasattr(obj, '__link_alias__'):
+            result = obj.__link_alias__()
+        else:
+            result = self.transform(
+                super().link(obj, name=name, default=default, app=app)
+            )
         for key, value in query_params.items():
             result = append_query_param(result, key, value)
         if fragment:
@@ -790,6 +793,18 @@ class CoreRequest(IncludeRequest, ContentSecurityRequest, ReturnToMixin):
         signer = TimestampSigner(self.identity_secret, salt=salt)
 
         return signer.sign(random_token())
+
+    @cached_property
+    def csrf_token(self) -> str:
+        """ Returns a csrf token for use with DELETE links (forms do their
+        own thing automatically).
+
+        """
+        return self.new_csrf_token().decode('utf-8')
+
+    def csrf_protected_url(self, url: str) -> str:
+        """ Adds a csrf token to the given url. """
+        return utils.append_query_param(url, 'csrf-token', self.csrf_token)
 
     def assert_valid_csrf_token(
         self,

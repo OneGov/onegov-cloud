@@ -2,6 +2,7 @@ from __future__ import annotations
 
 from onegov.form import Form
 from onegov.form.fields import ChosenSelectField
+from onegov.form.fields import URLField
 from onegov.org import _
 from onegov.org.forms.fields import HtmlField
 from onegov.form.fields import PanelField
@@ -10,7 +11,6 @@ from onegov.page.collection import PageCollection
 from wtforms.fields import BooleanField
 from wtforms.fields import StringField
 from wtforms.fields import TextAreaField
-from wtforms.fields import URLField
 from wtforms.validators import InputRequired
 from wtforms.validators import URL
 from wtforms.validators import ValidationError
@@ -35,6 +35,7 @@ class LinkForm(PageBaseForm):
     """ Defines the form for pages with the 'link' trait. """
     url = URLField(
         label=_('URL'),
+        default_scheme=None,
         validators=[InputRequired(), URL(require_tld=False)],
         render_kw={'class_': 'image-url file-url internal-url'}
     )
@@ -78,6 +79,7 @@ class IframeForm(PageBaseForm):
 
     url = URLField(
         label=_('URL'),
+        default_scheme=None,
         validators=[InputRequired(), URL(require_tld=False)],
         fieldset=_('URL')
     )

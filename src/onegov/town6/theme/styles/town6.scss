@@ -443,8 +443,12 @@ input[type="url"] {
         }
     }
 
-    *:first-child.fa:has(+ span) {
-        margin-right: .5rem;
+    *:first-child.fa {
+        margin: 0 .5rem;
+    }
+
+    *:first-child.fa:has(+ span:not(.show-for-sr)) {
+        margin-left: 0rem;
     }
 
 }
@@ -1290,4 +1294,44 @@ ul.recipients {
 .imageset-date {
     font-size: .875rem;
     color: $dark-gray;
+}
+
+.disabled-link {
+    cursor: not-allowed;
+    color: grey;
+    opacity: 0.5;
+}
+
+
+/*
+    Code Block, Code Inline, Code
+
+    <pre><code>...</code></pre>
+*/
+
+$code-background: #f5f5f5;
+$code-border-radius: 4px;
+$code-padding-block: 0.5rem;
+$code-padding-inline: 0.125rem;
+$code-block-margin-bottom: 0.8rem;
+
+pre code,
+.code-block,
+.code-inline,
+code {
+    background: $code-background;
+    border-radius: $code-border-radius;
+}
+
+pre code,
+.code-block {
+    padding: $code-padding-block;
+    margin-bottom: $code-block-margin-bottom;
+    display: block;
+}
+
+.code-inline,
+code {
+    padding: $code-padding-inline;
+    display: inline;
 }

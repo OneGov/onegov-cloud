@@ -69,6 +69,7 @@ class Snippets:
         (_('Swiss social security number'), '# ch.ssn'),
         (_('Swiss business identifier'), '# ch.uid'),
         (_('Swiss vat number'), '# ch.vat'),
+        (_('Animal identification number (Microchip-Nr.)'), 'chip-nr'),
         (_('Password'), '***    '),
         (_('Markdown'), '<markdown>')
     )

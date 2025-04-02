@@ -1,6 +1,6 @@
 from functools import cached_property
 from onegov.core.templates import render_macro
-from onegov.core.utils import Bunch
+from onegov.core.utils import append_query_param, Bunch
 from onegov.form import Form
 from onegov.org.layout import DefaultLayout
 from pyquery import PyQuery as pq
@@ -12,6 +12,7 @@ class DummyRequest:
 
     is_manager = False
     is_admin = False
+    csrf_token = ''
 
     def __init__(self, app):
         self.app = app
@@ -30,7 +31,10 @@ class DummyRequest:
         return '#'
 
     def new_csrf_token(self):
-        return ''
+        return self.csrf_token
+
+    def csrf_protected_url(self, url):
+        return append_query_param(url, 'csrf-token', self.csrf_token)
 
     @cached_property
     def template_loader(self):

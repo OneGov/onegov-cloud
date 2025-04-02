@@ -5,7 +5,7 @@ from onegov.form import errors
 from onegov.form.core import FieldDependency
 from onegov.form.core import Form
 from onegov.form.fields import (
-    MultiCheckboxField, DateTimeLocalField, VideoURLField)
+    MultiCheckboxField, DateTimeLocalField, URLField, VideoURLField)
 from onegov.form.fields import TimeField, UploadField, UploadMultipleField
 from onegov.form.parser.core import parse_formcode
 from onegov.form.utils import as_internal_id
@@ -26,7 +26,6 @@ from wtforms.fields import PasswordField
 from wtforms.fields import RadioField
 from wtforms.fields import StringField
 from wtforms.fields import TextAreaField
-from wtforms.fields import URLField
 from wtforms.validators import Email
 from wtforms.validators import Length
 from wtforms.validators import NumberRange
@@ -347,6 +346,17 @@ def handle_field(
                     field.range.stop
                 )
             ],
+            description=field.field_help
+        )
+
+    elif field.type == 'chip_nr':
+        builder.add_field(
+            field_class=StringField,
+            field_id=field.id,
+            label=field.label,
+            dependency=dependency,
+            required=field.required,
+            validators=[Regexp(r'^[0-9]{15}$')],
             description=field.field_help
         )
 

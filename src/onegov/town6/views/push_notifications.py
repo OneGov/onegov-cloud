@@ -2,7 +2,7 @@ from __future__ import annotations
 
 from onegov.core.security import Private
 from onegov.org.models import PushNotificationCollection
-from onegov.org.views.push_notifications import view_sent_notifications
+from onegov.org.views.push_notifications import view_push_notifications
 from onegov.town6 import TownApp
 from onegov.town6.layout import DefaultLayout
 
@@ -21,4 +21,4 @@ if TYPE_CHECKING:
 def town_view_publications(
     self: PushNotificationCollection, request: TownRequest
 ) -> RenderData:
-    return view_sent_notifications(self, request, DefaultLayout(self, request))
+    return view_push_notifications(self, request, DefaultLayout(self, request))

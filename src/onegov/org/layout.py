@@ -1,5 +1,7 @@
 from __future__ import annotations
 
+import numbers
+
 import babel.dates
 import re
 
@@ -648,6 +650,32 @@ class Layout(ChameleonLayout, OpenGraphMixin):
 
     def format_seconds(self, seconds: float) -> str:
         return self.format_timedelta(timedelta(seconds=seconds))
+
+    def format_vat(self, amount: numbers.Number | Decimal | float | None,
+                   currency: str = 'CHF') -> str:
+        """
+        Takes the given amount and currency returning the VAT string if the
+        VAT rate is set in the organization settings. The VAT string can be
+        placed right after a price value.
+        """
+        vat_rate = Decimal(self.app.org.vat_rate or 0.0)
+
+        if amount is not None and vat_rate:
+            if isinstance(amount, (Decimal, int, float, str)):
+                amount = Decimal(amount)
+            else:
+                amount = Decimal(str(amount))
+
+            vat = amount / (100 + vat_rate) * vat_rate
+            vat_name = self.request.translate(_('VAT'))
+            vat_str = (f'({vat_name} {self.format_number(vat_rate, 1)}%'
+                       f' enthalten: {self.format_number(vat)} {currency})')
+            return vat_str
+
+        return ''
+
+    def format_phone_number(self, phone_number: str) -> str:
+        return utils.format_phone_number(phone_number)
 
     def password_reset_url(self, user: User | None) -> str | None:
         if not user:
@@ -1712,7 +1740,7 @@ class TicketLayout(DefaultLayout):
 
     @cached_property
     def editbar_links(self) -> list[Link | LinkGroup] | None:
-        if self.request.is_manager:
+        if self.request.is_manager_for_model(self.model):
 
             links: list[Link | LinkGroup]
 
