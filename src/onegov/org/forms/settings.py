@@ -1120,7 +1120,11 @@ class OrgTicketSettingsForm(Form):
                 p.id.hex,
                 ': '.join(x for x in (p.handler_code, p.group) if x)
             )
-            for p in self.request.session.query(TicketPermission)
+            for p in self.request.session.query(
+                TicketPermission.id,
+                TicketPermission.handler_code,
+                TicketPermission.group
+            ).filter(TicketPermission.exclusive.is_(True))
         ), key=lambda x: x[1])
 
         if not permissions:

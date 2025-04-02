@@ -238,18 +238,17 @@ class ManageUserGroupForm(Form):
             for key in handlers.registry.keys()
         ]
         ticket_choices.extend(
-            (f'FRM-{form.title}', f'FRM: {form.title}')
-            for form in self.request.session.query(FormDefinition)
+            (f'DIR-{title}', f'DIR: {title}')
+            for title, in self.request.session.query(Directory.title)
         )
         ticket_choices.extend(
-            (f'DIR-{dir.title}', f'DIR: {dir.title}')
-            for dir in self.request.session.query(Directory)
+            (f'FRM-{title}', f'FRM: {title}')
+            for title, in self.request.session.query(FormDefinition.title)
         )
-        self.ticket_permissions.choices = sorted(ticket_choices)
-
-        # NOTE: We override this in agency with a boolean field
-        if hasattr(self.immediate_notification, 'choices'):
-            self.immediate_notification.choices = sorted(ticket_choices)
+        ticket_choices.sort()
+        self.ticket_permissions.choices = ticket_choices
+        if isinstance(self.immediate_notification, ChosenSelectMultipleField):
+            self.immediate_notification.choices = ticket_choices[:]
 
     def ensure_exclusive_consistency(self) -> bool:
         exclusive_permissions = self.exclusive_permissions
@@ -428,9 +427,10 @@ class ManageUserGroupForm(Form):
             for permission in model.ticket_permissions
             if permission.exclusive
         ]
-        self.immediate_notification.data = [
-            f'{permission.handler_code}-{permission.group}'
-            if permission.group else permission.handler_code
-            for permission in model.ticket_permissions
-            if permission.immediate_notification
-        ]
+        if isinstance(self.immediate_notification, ChosenSelectMultipleField):
+            self.immediate_notification.data = [
+                f'{permission.handler_code}-{permission.group}'
+                if permission.group else permission.handler_code
+                for permission in model.ticket_permissions
+                if permission.immediate_notification
+            ]

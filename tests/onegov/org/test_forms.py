@@ -649,12 +649,20 @@ def test_user_group_form(session):
     assert sorted([x[1] for x in form.users.choices]) == [
         'a@example.org', 'b@example.org', 'c@example.org',
     ]
-    assert ('EVN-', 'EVN') in form.ticket_permissions.choices
-    assert ('FRM-', 'FRM') in form.ticket_permissions.choices
+    assert ('EVN', 'EVN') in form.ticket_permissions.choices
+    assert ('FRM', 'FRM') in form.ticket_permissions.choices
     assert ('FRM-A-1', 'FRM: A-1') in form.ticket_permissions.choices
-    assert ('PER-', 'PER') in form.ticket_permissions.choices
-    assert ('DIR-', 'DIR') in form.ticket_permissions.choices
+    assert ('PER', 'PER') in form.ticket_permissions.choices
+    assert ('DIR', 'DIR') in form.ticket_permissions.choices
     assert ('DIR-Trainers', 'DIR: Trainers') in form.ticket_permissions.choices
+    assert ('EVN', 'EVN') in form.immediate_notification.choices
+    assert ('FRM', 'FRM') in form.immediate_notification.choices
+    assert ('FRM-A-1', 'FRM: A-1') in form.immediate_notification.choices
+    assert ('PER', 'PER') in form.immediate_notification.choices
+    assert ('DIR', 'DIR') in form.immediate_notification.choices
+    assert (
+        'DIR-Trainers', 'DIR: Trainers'
+    ) in form.immediate_notification.choices
 
     # apply / update
     groups = UserGroupCollection(session)
@@ -667,19 +675,21 @@ def test_user_group_form(session):
 
     form.name.data = 'A/B'
     form.users.data = [str(user_a.id), str(user_b.id)]
-    form.ticket_permissions.data = ['EVN-', 'FRM-A-B']
+    form.ticket_permissions.data = ['EVN', 'FRM-A-B']
+    form.immediate_notification.data = ['EVN', 'Dir-Trainers']
 
     form.update_model(group)
     assert group.users.count() == 2
     assert user_a.logout_all_sessions.called is True
     assert user_b.logout_all_sessions.called is True
     assert user_c.logout_all_sessions.called is False
-    assert session.query(TicketPermission).count() == 2
+    assert session.query(TicketPermission).count() == 3
 
     form.apply_model(group)
     assert form.name.data == 'A/B'
     assert set(form.users.data) == {str(user_a.id), str(user_b.id)}
-    assert set(form.ticket_permissions.data) == {'EVN-', 'FRM-A-B'}
+    assert set(form.ticket_permissions.data) == {'EVN', 'FRM-A-B'}
+    assert set(form.immediate_notification.data) == {'EVN', 'Dir-Trainers'}
 
     user_a.logout_all_sessions.reset_mock()
     user_b.logout_all_sessions.reset_mock()
@@ -687,7 +697,8 @@ def test_user_group_form(session):
 
     form.name.data = 'A.1'
     form.users.data = [str(user_c.id)]
-    form.ticket_permissions.data = ['PER-']
+    form.ticket_permissions.data = ['PER']
+    form.immediate_notification.data = ['PER']
     form.update_model(group)
     assert group.users.one() == user_c
     assert user_a.logout_all_sessions.called is True
@@ -697,14 +708,24 @@ def test_user_group_form(session):
     assert permission.handler_code == 'PER'
     assert permission.group is None
     assert permission.user_group == group
+    assert permission.exclusive is True
+    assert permission.immediate_notification is True
 
 
 def test_settings_ticket_permissions(session):
     group = UserGroupCollection(session).add(name='A')
     p_1 = TicketPermission(handler_code='PER', group=None, user_group=group)
     p_2 = TicketPermission(handler_code='FRM', group='ABC', user_group=group)
+    p_3 = TicketPermission(
+        handler_code='DIR',
+        group='EFG',
+        user_group=group,
+        exclusive=False,
+        immediate_notification=True
+    )
     session.add(p_1)
     session.add(p_2)
+    session.add(p_3)
     session.flush()
 
     request = Bunch(session=session, translate=lambda x: str(x))
