@@ -639,9 +639,11 @@ def test_user_group_form(session):
     request = Bunch(
         session=session,
         app=Bunch(session=lambda: session),
-        current_user=None
+        current_user=None,
+        link=lambda *args, **kwargs: '#dummy',
     )
     form = ManageUserGroupForm()
+    form.model = None
     form.request = request
     form.on_request()
 
@@ -668,15 +670,18 @@ def test_user_group_form(session):
     groups = UserGroupCollection(session)
     group = groups.add(name='A')
 
+    form.model = group
     form.apply_model(group)
     assert form.name.data == 'A'
     assert form.users.data == []
     assert form.ticket_permissions.data == []
 
     form.name.data = 'A/B'
+    form.name.raw_data = ['A/B']
     form.users.data = [str(user_a.id), str(user_b.id)]
-    form.ticket_permissions.data = ['EVN', 'FRM-A-B']
-    form.immediate_notification.data = ['EVN', 'Dir-Trainers']
+    form.ticket_permissions.data = ['EVN', 'FRM-A-1']
+    form.immediate_notification.data = ['EVN', 'DIR-Trainers']
+    assert form.validate()
 
     form.update_model(group)
     assert group.users.count() == 2
@@ -688,17 +693,19 @@ def test_user_group_form(session):
     form.apply_model(group)
     assert form.name.data == 'A/B'
     assert set(form.users.data) == {str(user_a.id), str(user_b.id)}
-    assert set(form.ticket_permissions.data) == {'EVN', 'FRM-A-B'}
-    assert set(form.immediate_notification.data) == {'EVN', 'Dir-Trainers'}
+    assert set(form.ticket_permissions.data) == {'EVN', 'FRM-A-1'}
+    assert set(form.immediate_notification.data) == {'EVN', 'DIR-Trainers'}
 
     user_a.logout_all_sessions.reset_mock()
     user_b.logout_all_sessions.reset_mock()
     user_c.logout_all_sessions.reset_mock()
 
     form.name.data = 'A.1'
+    form.name.raw_data = ['A.1']
     form.users.data = [str(user_c.id)]
     form.ticket_permissions.data = ['PER']
     form.immediate_notification.data = ['PER']
+    assert form.validate()
     form.update_model(group)
     assert group.users.one() == user_c
     assert user_a.logout_all_sessions.called is True
@@ -710,6 +717,34 @@ def test_user_group_form(session):
     assert permission.user_group == group
     assert permission.exclusive is True
     assert permission.immediate_notification is True
+
+    # consistency checks
+    groups = UserGroupCollection(session)
+    group2 = groups.add(name='B')
+    form2 = ManageUserGroupForm()
+    form2.model = group2
+    form2.request = request
+    form2.on_request()
+
+    # we're not allowed immediate notifications for PER
+    # without permissions to PER
+    form2.apply_model(group2)
+    # for validation
+    form2.name.raw_data = ['B']
+    form2.immediate_notification.data = ['PER']
+    assert not form2.validate()
+    assert 'PER' in form2.immediate_notification.errors[0].interpolate()
+
+    # but we are allowed for one that doesn't have exclusive permissions
+    form2.immediate_notification.data = ['DIR']
+    assert form2.validate()
+    form2.update_model(group2)
+
+    # and now we're not allowed to give exclusive permissions to a different
+    # group
+    form.ticket_permissions.data = ['PER', 'DIR']
+    assert not form.validate()
+    assert 'DIR' in form.ticket_permissions.errors[0].interpolate()
 
 
 def test_settings_ticket_permissions(session):

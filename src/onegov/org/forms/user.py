@@ -262,9 +262,11 @@ class ManageUserGroupForm(Form):
         ).join(UserGroup)
         if isinstance(self.model, UserGroup):
             # we can't be inconsistent with ourselves
-            query.filter(TicketPermission.user_group != self.model)
+            query = query.filter(
+                TicketPermission.user_group_id != self.model.id
+            )
 
-        query.filter(or_(*(
+        query = query.filter(or_(*(
             and_(
                 TicketPermission.handler_code == handler_code,
                 TicketPermission.group.isnot_distinct_from(group)
@@ -288,7 +290,7 @@ class ManageUserGroupForm(Form):
                     ).format(
                         permission=f'{code}: {group}' if group else code,
                         url=self.request.link(user_group),
-                        user_group=user_group.title,
+                        user_group=user_group.name,
                     )
                     for code, group, user_group in inconsistencies
                 )},
@@ -312,9 +314,11 @@ class ManageUserGroupForm(Form):
         )
         if isinstance(self.model, UserGroup):
             # we can't be inconsistent with ourselves
-            query.filter(TicketPermission.user_group_id != self.model.id)
+            query = query.filter(
+                TicketPermission.user_group_id != self.model.id
+            )
 
-        query.filter(or_(*(
+        query = query.filter(or_(*(
             and_(
                 TicketPermission.handler_code == handler_code,
                 TicketPermission.group.isnot_distinct_from(group)
