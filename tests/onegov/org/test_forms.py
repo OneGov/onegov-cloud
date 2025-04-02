@@ -705,7 +705,7 @@ def test_user_group_form(session):
     form.name.raw_data = ['A.1']
     form.users.data = [str(user_c.id)]
     form.ticket_permissions.data = ['PER']
-    form.immediate_notification.data = ['PER']
+    form.immediate_notification.data = ['EVN', 'PER']
     assert form.validate()
     form.update_model(group)
     session.flush()
@@ -713,6 +713,12 @@ def test_user_group_form(session):
     assert user_a.logout_all_sessions.called is True
     assert user_b.logout_all_sessions.called is True
     assert user_c.logout_all_sessions.called is True
+    assert session.query(TicketPermission).count() == 2
+
+    form.immediate_notification.data = ['PER']
+    assert form.validate()
+    form.update_model(group)
+    session.flush()
     permission = session.query(TicketPermission).one()
     assert permission.handler_code == 'PER'
     assert permission.group is None
