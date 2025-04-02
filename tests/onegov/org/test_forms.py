@@ -684,6 +684,7 @@ def test_user_group_form(session):
     assert form.validate()
 
     form.update_model(group)
+    session.flush()
     assert group.users.count() == 2
     assert user_a.logout_all_sessions.called is True
     assert user_b.logout_all_sessions.called is True
@@ -707,6 +708,7 @@ def test_user_group_form(session):
     form.immediate_notification.data = ['PER']
     assert form.validate()
     form.update_model(group)
+    session.flush()
     assert group.users.one() == user_c
     assert user_a.logout_all_sessions.called is True
     assert user_b.logout_all_sessions.called is True
@@ -739,6 +741,8 @@ def test_user_group_form(session):
     form2.immediate_notification.data = ['DIR']
     assert form2.validate()
     form2.update_model(group2)
+    session.flush()
+    assert session.query(TicketPermission).count() == 2
 
     # and now we're not allowed to give exclusive permissions to a different
     # group
