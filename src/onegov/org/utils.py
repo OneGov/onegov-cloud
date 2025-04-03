@@ -10,6 +10,7 @@ import pytz
 from contextlib import suppress
 from collections import defaultdict, Counter, OrderedDict
 from datetime import datetime, time, timedelta
+from email.headerregistry import Address
 from functools import lru_cache
 from isodate import parse_date, parse_datetime
 from itertools import groupby
@@ -18,13 +19,14 @@ from lxml.etree import ParserError
 from lxml.html import fragments_fromstring, tostring
 from markupsafe import escape, Markup
 from onegov.core.layout import Layout
+from onegov.core.mail import coerce_address
 from onegov.core.orm import as_selectable
 from onegov.file import File, FileCollection
 from onegov.org import _
 from onegov.org.elements import DeleteLink, Link
 from onegov.org.models.search import Search
 from onegov.reservation import Resource
-from onegov.ticket import TicketCollection
+from onegov.ticket import TicketCollection, TicketPermission
 from onegov.user import User, UserGroup
 from operator import attrgetter
 from purl import URL
@@ -1143,31 +1145,49 @@ def ticket_directory_groups(
     )
 
 
-def user_group_emails_for_new_ticket(
-    request: CoreRequest,
+def emails_for_new_ticket(
+    request: OrgRequest,
     ticket: Ticket,
-) -> set[str]:
-    """The user can be part of a UserGroup that defines directories. This
-    means the users in this group are interested in a subset of tickets.
-    The group is determined by the Ticket group.
+) -> Iterator[Address]:
+    """ Returns a set of e-mail addressed that would like to be notified
+    about the creation of this ticket.
+
+    Users can be part of a UserGroup with ticket permissions. This means the
+    users in this group are interested in/responsible for a subset of tickets.
 
     This allows for more granular control over who gets notified.
 
     """
+    seen = set()
+    if request.email_for_new_tickets:
+        # adding this to seen ensures it does not receive two emails
+        address = coerce_address(request.email_for_new_tickets)
+        seen.add(address.addr_spec)
+        yield address
 
-    if ticket.handler_code != 'DIR':
-        # For now, we implement this special case just for 'DIR' tickets.
-        return set()
-
-    return {
-        username
-        for username, in request.session
+    for username, realname in (
+        request.session
         .query(UserGroup)
-        .join(UserGroup.users)
-        .filter(UserGroup.meta['directories'].contains(ticket.group))
-        .with_entities(User.username)
+        .join(TicketPermission)
+        .filter(TicketPermission.immediate_notification.is_(True))
+        .filter(TicketPermission.handler_code == ticket.handler_code)
+        .filter(TicketPermission.group.isnot_distinct_from(ticket.handler.group))
+        .join(User)
+        .with_entities(User.username, User.realname)
         .distinct()
-    }
+    ):
+        if username in seen:
+            continue
+
+        seen.add(username)
+        try:
+            yield Address(
+                display_name=realname or '',
+                addr_spec=username
+            )
+        except ValueError:
+            # if it's not a valid address then skip it
+            pass
 
 
 # from most narrow to widest

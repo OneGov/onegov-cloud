@@ -6,17 +6,18 @@ from morepath import redirect
 
 from onegov.chat.collections import ChatCollection
 from onegov.chat.models import Chat
-from onegov.town6.forms.chat import ChatInitiationForm, ChatActionsForm
 from onegov.core.templates import render_template
-from onegov.town6.layout import StaffChatLayout, ClientChatLayout
-from onegov.town6.layout import DefaultLayout, ArchivedChatsLayout
 from onegov.org.layout import DefaultMailLayout
 from onegov.org.mail import send_ticket_mail
-from webob.exc import HTTPForbidden
-from onegov.town6 import _
 from onegov.org.models import TicketMessage
+from onegov.org.utils import emails_for_new_ticket
 from onegov.ticket import TicketCollection
+from onegov.town6 import _
+from onegov.town6.forms.chat import ChatInitiationForm, ChatActionsForm
+from onegov.town6.layout import StaffChatLayout, ClientChatLayout
+from onegov.town6.layout import DefaultLayout, ArchivedChatsLayout
 from onegov.user import User
+from webob.exc import HTTPForbidden
 
 
 from typing import TYPE_CHECKING
@@ -90,6 +91,24 @@ def view_chats_staff(
                         'ticket': ticket,
                         'chat': chat,
                         'organisation': request.app.org.title,
+                    }
+                )
+                for email in emails_for_new_ticket(request, ticket):
+                    send_ticket_mail(
+                        request=request,
+                        template='mail_ticket_opened_info.pt',
+                        subject=_('New ticket'),
+                        ticket=ticket,
+                        receivers=(email, ),
+                        content={'model': ticket},
+                    )
+
+                request.app.send_websocket(
+                    channel=request.app.websockets_private_channel,
+                    message={
+                        'event': 'browser-notification',
+                        'title': request.translate(_('New ticket')),
+                        'created': ticket.created.isoformat()
                     }
                 )
 
