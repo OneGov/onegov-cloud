@@ -1136,17 +1136,29 @@ def emails_for_new_ticket(
         seen.add(address.addr_spec)
         yield address
 
-    for username, realname in (
-        request.session
-        .query(UserGroup)
-        .join(TicketPermission)
-        .filter(TicketPermission.immediate_notification.is_(True))
-        .filter(TicketPermission.handler_code == ticket.handler_code)
-        .filter(TicketPermission.group.isnot_distinct_from(ticket.group))
-        .join(User)
-        .with_entities(User.username, User.realname)
-        .distinct()
-    ):
+    permissions = request.app.ticket_permissions.get(ticket.handler_code, {})
+    exclusive_group_ids = permissions.get(ticket.group, [])
+
+    query = request.session .query(UserGroup).join(TicketPermission)
+    query = query.filter(TicketPermission.immediate_notification.is_(True))
+    query = query.filter(TicketPermission.handler_code == ticket.handler_code)
+
+    # if the permission applies to the whole handler_code
+    # then there can't be an exclusive permission for this
+    # specific group we're not a part of, since then we won't
+    # have permission to access this ticket
+    general_condition = TicketPermission.group.is_(None)
+    if exclusive_group_ids:
+        general_condition &= UserGroup.id.in_(exclusive_group_ids)
+    query = query.filter(
+        general_condition | (TicketPermission.group == ticket.group)
+    )
+
+    for username, realname in query.join(UserGroup.users).with_entities(
+        User.username,
+        User.realname,
+    ).distinct():
+
         if username in seen:
             continue
 

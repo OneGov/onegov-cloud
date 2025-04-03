@@ -4,9 +4,8 @@ from datetime import date, datetime
 from onegov.core.utils import Bunch
 from onegov.org import utils
 from pytz import timezone
-from onegov.org.utils import (
-    ticket_directory_groups, user_group_emails_for_new_ticket)
-from onegov.ticket import Ticket
+from onegov.org.utils import emails_for_new_ticket
+from onegov.ticket import Ticket, TicketPermission
 from onegov.user import UserGroup, User
 
 
@@ -181,38 +180,27 @@ def test_predict_next_daterange_dst_st_transitions():
     )) == (dt_ch(2022, 3, 27, 10), dt_ch(2022, 3, 27, 12))
 
 
-def test_select_ticket_groups(session):
-
-    def create_ticket(handler_code, group=''):
-        result = Ticket(
-            number=f'{handler_code}-{group}-1',
-            title=f'{handler_code}-{group}',
-            group=group,
-            handler_code=handler_code,
-            handler_id=f'{handler_code}-{group}'
-        )
-        session.add(result)
-        return result
-
-    create_ticket('EVN')
-
-    dir_groups = ticket_directory_groups(session)
-    assert tuple(dir_groups) == ()
-
-    create_ticket('DIR', 'Steuererklärung')
-    create_ticket('DIR', 'Wohnsitzbestätigung')
-    session.flush()
-
-    dir_groups = ticket_directory_groups(session)
-    assert tuple(dir_groups) == ('Steuererklärung', 'Wohnsitzbestätigung')
-
-
-def test_user_group_emails_for_new_ticket(session):
-
+def test_emails_for_new_ticket(session):
     session.query(User).delete()
     group_meta = dict(directories=['Sports', 'Music'])
 
-    group1 = UserGroup(name="somename", meta=group_meta)
+    group1 = UserGroup(name='somename')
+
+    permission1 = TicketPermission(
+        handler_code='DIR',
+        group='Sports',
+        user_group=group1,
+        exclusive=False,
+        immediate_notification=True,
+    )
+
+    permission2 = TicketPermission(
+        handler_code='DIR',
+        group='Music',
+        user_group=group1,
+        exclusive=False,
+        immediate_notification=True,
+    )
 
     user1 = User(
         username='user1@example.org',
@@ -232,17 +220,19 @@ def test_user_group_emails_for_new_ticket(session):
     session.add(group1)
     session.flush()
 
-    request = Bunch(
-        session=session,
-    )
-    ticket1 = Ticket(handler_code="DIR", group="Sports")
+    request = Bunch(**{
+        'session': session,
+        'email_for_new_tickets': 'tickets@example.org',
+        'app.ticket_permissions': {},
+    })
+    ticket1 = Ticket(handler_code='DIR', group='Sports')
 
-    result = user_group_emails_for_new_ticket(request, ticket1)
-    assert result == {"user1@example.org"}
+    result = {a.addr_spec for a in emails_for_new_ticket(request, ticket1)}
+    assert result == {'tickets@example.org', 'user1@example.org'}
 
     session.query(User).delete()
 
-    group2 = UserGroup(name="foo", meta={})  # no directories
+    group2 = UserGroup(name="foo")
     user1 = User(
         username='user2@example.org',
         password_hash='password_hash',
@@ -255,11 +245,13 @@ def test_user_group_emails_for_new_ticket(session):
     session.add(group1)
     session.flush()
 
-    request = Bunch(
-        session=session,
-    )
+    request = Bunch(**{
+        'session': session,
+        'email_for_new_tickets': None,
+        'app.ticket_permissions': {},
+    })
     ticket1 = Ticket(handler_code="DIR")
-    result = user_group_emails_for_new_ticket(request, ticket1)
+    result = {a.addr_spec for a in emails_for_new_ticket(request, ticket1)}
     assert result == set()
 
 
