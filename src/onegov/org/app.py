@@ -813,6 +813,7 @@ def get_common_asset() -> Iterator[str]:
     yield 'items_selectable.js'
     yield 'notifications.js'
     yield 'foundation.accordion.js'
+    yield 'chosen_select_hierarchy.js'
 
 
 @OrgApp.webasset('fontpreview')

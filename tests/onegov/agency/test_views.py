@@ -21,7 +21,7 @@ from unittest.mock import patch
 
 def test_views_general(client):
     client.login_admin()
-    settings = client.get('/module-settings')
+    settings = client.get('/people-settings')
     settings.form['hidden_people_fields'] = ['academic_title', 'born']
     settings.form.submit()
     client.logout()
