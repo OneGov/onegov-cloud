@@ -244,7 +244,7 @@ class User(Base, TimestampMixin, ORMSearchable):
         # part that the first and last part are the most important to get rid
         # of middlenames
         else:
-            parts = remove_repeated_spaces(realname).split(' ')
+            parts = remove_repeated_spaces(realname.strip()).split(' ')
 
             if len(parts) > 2:
                 parts = (parts[0], parts[-1])

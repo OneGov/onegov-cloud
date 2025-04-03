@@ -1916,8 +1916,18 @@ msgstr "Bitte geben Sie ein Datumspaar pro Zeile ein"
 msgid "End date needs to be after start date"
 msgstr "Das End-Datum muss vor dem Start-Datum sein"
 
-msgid "Email adress for notifications about newly opened tickets"
-msgstr "E-Mail-Adresse für Benachrichtigungen zu geöffneten Tickets"
+msgid "Hide personal email addresses"
+msgstr "Persönliche E-Mail-Adressen verstecken"
+
+msgid "Hide personal email addresses in the ticket system"
+msgstr "Persönliche E-Mail-Adressen im Ticketsystem verstecken"
+
+msgid "General email address"
+msgstr "Allgemeine E-Mail-Adresse"
+
+msgid "Email address that is displayed instead of the personal email address"
+msgstr ""
+"E-Mail-Adresse, die anstelle der persönlichen E-Mail-Adresse angezeigt wird"
 
 msgid "Accept request and close ticket automatically based on:"
 msgstr "Akzeptiere und schliesse Tickets automatisch basierend auf:"
@@ -1927,6 +1937,9 @@ msgstr "Ticket-Kategorie"
 
 msgid "User role"
 msgstr "Benutzer-Rolle"
+
+msgid "Auto-accept and auto-close"
+msgstr "Automatisches Akzeptieren und Schliessen"
 
 msgid ""
 "Accept request and close ticket automatically for these ticket categories"
@@ -1945,6 +1958,9 @@ msgstr "Akzeptiere und schliesse Tickets automatisch für diese Benutzer-Rollen"
 
 msgid "User used to auto-accept tickets"
 msgstr "Benutzer für das automatische Akzeptieren von Tickets"
+
+msgid "Email address for notifications about newly opened tickets"
+msgstr "E-Mail-Adresse für Benachrichtigungen zu geöffneten Tickets"
 
 msgid "Block email confirmation when this ticket category is opened"
 msgstr "Keine Email-Benachrichtung nach Eröffnung dieser Ticket-Kategorie"

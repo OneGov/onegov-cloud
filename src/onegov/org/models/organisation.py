@@ -152,6 +152,8 @@ class Organisation(Base, TimestampMixin):
     always_show_partners: dict_property[bool] = meta_property(default=False)
 
     # Ticket options
+    hide_personal_email: dict_property[bool] = meta_property(default=False)
+    general_email: dict_property[str | None] = meta_property()
     email_for_new_tickets: dict_property[str | None] = meta_property()
     ticket_auto_accept_style: dict_property[str | None] = meta_property()
     ticket_auto_accepts: dict_property[list[str] | None] = meta_property()

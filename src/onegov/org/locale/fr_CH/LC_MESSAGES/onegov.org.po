@@ -1918,9 +1918,18 @@ msgstr "Veuillez renseigner une paire de dates par ligne"
 msgid "End date needs to be after start date"
 msgstr "La date de fin doit être postérieure à la date de début"
 
-msgid "Email adress for notifications about newly opened tickets"
+msgid "Hide personal email addresses"
+msgstr "Masquer les adresses e-mail personnelles"
+
+msgid "Hide personal email addresses in the ticket system"
+msgstr "Masquer les adresses e-mail personnelles dans le système de ticket"
+
+msgid "General email address"
+msgstr "Adresse e-mail générale"
+
+msgid "Email address that is displayed instead of the personal email address"
 msgstr ""
-"Adresse électronique pour les notifications concernant les tickets ouverts"
+"Adresse e-mail qui est affichée à la place de l'adresse e-mail personnelle"
 
 msgid "Accept request and close ticket automatically based on:"
 msgstr ""
@@ -1931,6 +1940,9 @@ msgstr "Catégorie de billet"
 
 msgid "User role"
 msgstr "Rôle d'utilisateur"
+
+msgid "Auto-accept and auto-close"
+msgstr "Acceptation et fermeture automatiques"
 
 msgid ""
 "Accept request and close ticket automatically for these ticket categories"
@@ -1952,6 +1964,10 @@ msgstr ""
 
 msgid "User used to auto-accept tickets"
 msgstr "Utilisateur pour l'acceptation automatique des tickets"
+
+msgid "Email address for notifications about newly opened tickets"
+msgstr ""
+"Adresse électronique pour les notifications concernant les tickets ouverts"
 
 msgid "Block email confirmation when this ticket category is opened"
 msgstr "N'envoyez pas d'e-mail lorsque cette catégorie de billets est ouverte"
@@ -6609,6 +6625,7 @@ msgstr "Un compte a été créé pour vous"
 msgid "The user was created successfully"
 msgstr "L'utilisateur a bien été créé"
 
+
 #~ msgid ""
 #~ "Invalid format. Please define a list with topics and subtopics according "
 #~ "the example."
@@ -6629,3 +6646,4 @@ msgstr "L'utilisateur a bien été créé"
 #~ msgstr ""
 #~ "Format non valide. Veuillez définir un nom d'organisation avec des sujets "
 #~ "et des sous-sujets selon l'exemple."
+
