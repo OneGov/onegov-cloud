@@ -7,7 +7,7 @@ from onegov.agency.collections import PaginatedAgencyCollection
 from onegov.agency.collections import PaginatedMembershipCollection
 from onegov.agency.forms.person import AuthenticatedPersonMutationForm
 from onegov.api import ApiEndpoint, ApiInvalidParamException
-from onegov.api.utils import authenticate
+from onegov.api.utils import is_authorized
 from onegov.gis import Coordinates
 
 
@@ -154,12 +154,8 @@ class PersonApiEndpoint(ApiEndpoint['ExtendedPerson'], ApisMixin):
 
     def item_data(self, item: ExtendedPerson) -> dict[str, Any]:
         public_data = self._public_item_data
-        if (
-            self.request
-            and self.request.authorization
-            and authenticate(self.request)
-        ):
-            # Authenticated users get all fields including external_user_id
+        if self.request is not None and is_authorized(self.request):
+            # Authorized users get all fields including external_user_id
             data = {
                 attribute: getattr(item, attribute, None)
                 for attribute in (*public_data, 'external_user_id')
@@ -248,7 +244,7 @@ class AgencyApiEndpoint(ApiEndpoint['ExtendedAgency'], ApisMixin):
     def item_links(self, item: ExtendedAgency) -> dict[str, Any]:
         return {
             'organigram': item.organigram,
-            'parent': self.for_item(item.parent),
+            'parent': self.for_item_id(item.parent_id),
             'children': self.for_filter(parent=str(item.id)),
             'memberships': self.membership_api.for_filter(
                 agency=str(item.id)
@@ -295,6 +291,6 @@ class MembershipApiEndpoint(
 
     def item_links(self, item: ExtendedAgencyMembership) -> dict[str, Any]:
         return {
-            'agency': self.agency_api.for_item(item.agency),
-            'person': self.person_api.for_item(item.person)
+            'agency': self.agency_api.for_item_id(item.agency_id),
+            'person': self.person_api.for_item_id(item.person_id)
         }

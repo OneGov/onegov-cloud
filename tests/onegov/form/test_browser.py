@@ -4,7 +4,7 @@ from pytest import mark
 from time import sleep
 
 
-@mark.flaky(reruns=3)
+@mark.flaky(reruns=3, only_rerun=None)
 def test_snippets(browser):
     browser.visit('/snippets')
     browser.wait_for_js_variable('initFormSnippets')

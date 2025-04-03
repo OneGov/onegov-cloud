@@ -19,7 +19,7 @@ class PatchedSvgGenerator(SvgGenerator):
         self.renderer = PatchedD3Renderer(app)
 
 
-@mark.flaky(reruns=3)
+@mark.flaky(reruns=3, only_rerun=None)
 def test_generate_svg(election_day_app_gr, session):
 
     election_day_app_gr.filestorage.makedir('svg')

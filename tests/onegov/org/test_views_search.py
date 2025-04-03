@@ -18,7 +18,7 @@ from sedate import utcnow
 from webtest import Upload
 
 
-@pytest.mark.flaky(reruns=3)
+@pytest.mark.flaky(reruns=3, only_rerun=None)
 def test_basic_search(client_with_es):
     client = client_with_es
     client.login_admin()
@@ -57,7 +57,7 @@ def test_basic_search(client_with_es):
     assert "Now supporting" in client.get('/search?q=fulltext')
 
 
-@pytest.mark.flaky(reruns=3)
+@pytest.mark.flaky(reruns=3, only_rerun=None)
 def test_view_search_is_limiting(client_with_es):
     # ensures that the search doesn't just return all results
     # a regression that occured for anonymous uses only
@@ -92,7 +92,7 @@ def test_view_search_is_limiting(client_with_es):
     assert "1 Resultat" in search_page
 
 
-@pytest.mark.flaky(reruns=3)
+@pytest.mark.flaky(reruns=3, only_rerun=None)
 def test_search_recently_published_object(client_with_es):
     client = client_with_es
     client.login_admin()
@@ -156,7 +156,7 @@ def test_search_recently_published_object(client_with_es):
     assert 'It is pretty awesome' not in anom.get('/search?q=fulltext')
 
 
-@pytest.mark.flaky(reruns=3)
+@pytest.mark.flaky(reruns=3, only_rerun=None)
 def test_search_for_page_with_member_access(client_with_es):
     client = client_with_es
     client.login_admin()
@@ -177,7 +177,7 @@ def test_search_for_page_with_member_access(client_with_es):
     assert 'Test' not in anom.get('/search?q=Memberius')
 
 
-@pytest.mark.flaky(reruns=3)
+@pytest.mark.flaky(reruns=3, only_rerun=None)
 def test_basic_autocomplete(client_with_es):
     client = client_with_es
     client.login_editor()

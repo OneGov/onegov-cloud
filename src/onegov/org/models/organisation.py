@@ -213,9 +213,9 @@ class Organisation(Base, TimestampMixin):
     # Newsletter settings
     show_newsletter: dict_property[bool] = meta_property(default=False)
     secret_content_allowed: dict_property[bool] = meta_property(default=False)
-    newsletter_categories: (
-        dict_property)[dict[str, list[dict[str, list[str]] | str]]] = (
-        meta_property(default=dict))
+    newsletter_categories: dict_property[list[dict[str, list[str]] | str]] = (
+        meta_property(default=list)
+    )
     notify_on_unsubscription: dict_property[list[str] | None] = meta_property()
 
     # Chat Settings

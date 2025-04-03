@@ -57,6 +57,10 @@
         <tal:b metal:use-macro="layout.macros.page_content" tal:condition="page.parent"
             tal:define="lead page.content.get('lead');text page.text|None; people page.people; contact None if children else layout.contact_html; coordinates page.coordinates; files page.files; sidepanel_links page.sidepanel_links|False; imageset page.photo_album|False; sidepanel_contact page.sidepanel_contact|None; " />
 
+
+        <div metal:use-macro="layout.macros['pagination']" tal:condition="pagination" tal:define="
+            collection pagination; current_page pagination; pagination_centered True" />
+
     </tal:b>
 
     <tal:b metal:fill-slot="after-lead">

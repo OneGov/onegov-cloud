@@ -1,12 +1,12 @@
 from __future__ import annotations
 
 from onegov.form import Form
+from onegov.form.fields import URLField
 from onegov.org import _
 from onegov.org.models.external_link import ExternalLinkCollection
 from wtforms.fields import SelectField
 from wtforms.fields import StringField
 from wtforms.fields import TextAreaField
-from wtforms.fields import URLField
 from wtforms.validators import InputRequired
 from wtforms.validators import URL
 

@@ -372,7 +372,7 @@ class RolesMapping:
         for role in ('admin', 'editor', 'supporter', 'member'):
             if (
                 (group := roles.get(f'{role}s', None)) is not None
-                and group in groups
+                and group.lower() in groups
             ):
                 return role
 

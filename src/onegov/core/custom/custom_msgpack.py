@@ -185,6 +185,7 @@ class Serializers:
 # The builtin serializers
 default_serializers = Serializers()
 
+# TODO: More efficient date/time serialization/deserialization
 default_serializers.register(StringSerializer(
     tag=0,
     target=datetime.datetime,
