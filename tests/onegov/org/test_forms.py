@@ -19,7 +19,7 @@ from onegov.org.forms import RoomAllocationForm
 from onegov.org.forms import TicketAssignmentForm
 from onegov.org.forms.allocation import AllocationFormHelpers
 from onegov.org.forms.settings import OrgTicketSettingsForm
-from onegov.ticket import TicketPermission
+from onegov.ticket import Ticket, TicketPermission
 from onegov.user import UserCollection
 from onegov.user import UserGroupCollection
 from unittest.mock import MagicMock
@@ -633,7 +633,35 @@ def test_user_group_form(session):
         )
     )
 
-    session.add_all((formdefinition, directory))
+    formdefinition_ticket = Ticket(
+        number='1',
+        title='Existing FRM',
+        group='A-1',
+        handler_code='FRM',
+        handler_id='existing-id-1'
+    )
+
+    deleted_formdefinition_ticket = Ticket(
+        number='2',
+        title='Deleted FRM',
+        group='A-2',
+        handler_code='FRM',
+        handler_id='deleted-id-1'
+    )
+
+    deleted_directory_ticket = Ticket(
+        number='3',
+        title='Deleted DIR',
+        group='Deleted',
+        handler_code='DIR',
+        handler_id='deleted-id-2'
+    )
+
+
+    session.add_all((
+        formdefinition, directory, formdefinition_ticket,
+        deleted_formdefinition_ticket, deleted_directory_ticket
+    ))
     session.flush()
 
     request = Bunch(
@@ -653,17 +681,24 @@ def test_user_group_form(session):
     ]
     assert ('EVN', 'EVN') in form.ticket_permissions.choices
     assert ('FRM', 'FRM') in form.ticket_permissions.choices
-    assert ('FRM-A-1', 'FRM: A-1') in form.ticket_permissions.choices
+    # make sure distinct union query works
+    assert form.ticket_permissions.choices.count(('FRM-A-1', 'FRM: A-1')) == 1
+    assert ('FRM-A-2', 'FRM: A-2') in form.ticket_permissions.choices
     assert ('PER', 'PER') in form.ticket_permissions.choices
     assert ('DIR', 'DIR') in form.ticket_permissions.choices
     assert ('DIR-Trainers', 'DIR: Trainers') in form.ticket_permissions.choices
+    assert ('DIR-Deleted', 'DIR: Deleted') in form.ticket_permissions.choices
     assert ('EVN', 'EVN') in form.immediate_notification.choices
     assert ('FRM', 'FRM') in form.immediate_notification.choices
     assert ('FRM-A-1', 'FRM: A-1') in form.immediate_notification.choices
+    assert ('FRM-A-2', 'FRM: A-2') in form.immediate_notification.choices
     assert ('PER', 'PER') in form.immediate_notification.choices
     assert ('DIR', 'DIR') in form.immediate_notification.choices
     assert (
         'DIR-Trainers', 'DIR: Trainers'
+    ) in form.immediate_notification.choices
+    assert (
+        'DIR-Deleted', 'DIR: Deleted'
     ) in form.immediate_notification.choices
 
     # apply / update

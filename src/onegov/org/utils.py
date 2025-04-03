@@ -20,7 +20,6 @@ from lxml.html import fragments_fromstring, tostring
 from markupsafe import escape, Markup
 from onegov.core.layout import Layout
 from onegov.core.mail import coerce_address
-from onegov.core.orm import as_selectable
 from onegov.file import File, FileCollection
 from onegov.org import _
 from onegov.org.elements import DeleteLink, Link
@@ -30,7 +29,7 @@ from onegov.ticket import TicketCollection, TicketPermission
 from onegov.user import User, UserGroup
 from operator import attrgetter
 from purl import URL
-from sqlalchemy import nullsfirst, select  # type:ignore[attr-defined]
+from sqlalchemy import nullsfirst  # type:ignore[attr-defined]
 
 
 from typing import overload, Any, Literal, TYPE_CHECKING
@@ -46,7 +45,7 @@ if TYPE_CHECKING:
     from onegov.reservation import Allocation, Reservation
     from onegov.ticket import Ticket
     from pytz.tzinfo import DstTzInfo, StaticTzInfo
-    from sqlalchemy.orm import Query, Session
+    from sqlalchemy.orm import Query
     from sqlalchemy import Column
     from typing import Self, TypeAlias, TypeVar
 
@@ -1117,34 +1116,6 @@ def hashtag_elements(request: OrgRequest, text: str) -> Markup:
     return Markup(HASHTAG.sub(replace_tag, escape(text)))  # nosec: B704
 
 
-def ticket_directory_groups(
-    session: Session
-) -> Iterator[str]:
-    """Yields all ticket groups.
-
-    For example: ('Sportanbieter', 'Verein')
-
-    If no groups exist, returns an empty generator.
-    """
-    query = as_selectable(
-        """
-        SELECT
-            handler_code,                         -- Text
-            ARRAY_AGG(DISTINCT "group") AS groups -- ARRAY(Text)
-        FROM tickets
-        WHERE handler_code = 'DIR'
-        GROUP BY handler_code
-        """
-    )
-
-    return (
-        group
-        for result in session.execute(select(query.c))
-        for group in result.groups
-        if group
-    )
-
-
 def emails_for_new_ticket(
     request: OrgRequest,
     ticket: Ticket,
@@ -1171,7 +1142,7 @@ def emails_for_new_ticket(
         .join(TicketPermission)
         .filter(TicketPermission.immediate_notification.is_(True))
         .filter(TicketPermission.handler_code == ticket.handler_code)
-        .filter(TicketPermission.group.isnot_distinct_from(ticket.handler.group))
+        .filter(TicketPermission.group.isnot_distinct_from(ticket.group))
         .join(User)
         .with_entities(User.username, User.realname)
         .distinct()

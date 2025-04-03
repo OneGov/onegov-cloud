@@ -1,7 +1,6 @@
 from __future__ import annotations
 
 import re
-from functools import cached_property
 from markupsafe import Markup
 from onegov.core.utils import is_valid_yubikey_format
 from onegov.directory.models.directory import Directory
@@ -11,10 +10,9 @@ from onegov.form.fields import ChosenSelectMultipleField
 from onegov.form.fields import TagsField
 from onegov.form.filters import yubikey_identifier
 from onegov.org import _
-from onegov.org.utils import ticket_directory_groups
 from onegov.ticket import handlers
 from onegov.user import User, UserGroup
-from onegov.ticket import TicketPermission
+from onegov.ticket import Ticket, TicketPermission
 from onegov.user import UserCollection
 from sqlalchemy import and_, or_
 from wtforms.fields import BooleanField
@@ -209,26 +207,7 @@ class ManageUserGroupForm(Form):
         choices=[],
     )
 
-    directories = ChosenSelectMultipleField(
-        label=_('Directories'),
-        choices=[],
-        description=_(
-            'Directories for which this user group is responsible. '
-            'If activated, ticket notifications for this group are '
-            'only sent for these directories'
-        ),
-    )
-
-    @cached_property
-    def get_dirs(self) -> tuple[str, ...]:
-        return tuple(ticket_directory_groups(self.request.session))
-
     def on_request(self) -> None:
-        if not self.get_dirs:
-            self.hide(self.directories)
-        else:
-            self.directories.choices = [(d, d) for d in self.get_dirs]
-
         self.users.choices = [
             (str(u.id), u.title)
             for u in UserCollection(self.request.session).query()
@@ -238,12 +217,32 @@ class ManageUserGroupForm(Form):
             for key in handlers.registry.keys()
         ]
         ticket_choices.extend(
-            (f'DIR-{title}', f'DIR: {title}')
-            for title, in self.request.session.query(Directory.title)
+            (f'DIR-{group}', f'DIR: {group}')
+            for group, in self.request.session.query(
+                Directory.title.label('group')
+            # some groups may get deleted, but as long as there are tickets
+            # we need a corresponding permission
+            ).union(
+                self.request.session.query(
+                    Ticket.group.label('group')
+                )
+                .filter(Ticket.handler_code == 'DIR')
+                .filter(Ticket.group.isnot(None))
+                .distinct()
+            ).order_by('group').distinct()
         )
         ticket_choices.extend(
-            (f'FRM-{title}', f'FRM: {title}')
-            for title, in self.request.session.query(FormDefinition.title)
+            (f'FRM-{group}', f'FRM: {group}')
+            for group, in self.request.session.query(
+                FormDefinition.title.label('group')
+            # some groups may get deleted, but as long as there are tickets
+            # we need a corresponding permission
+            ).union(
+                self.request.session.query(Ticket.group.label('group'))
+                .filter(Ticket.handler_code == 'FRM')
+                .filter(Ticket.group.isnot(None))
+                .distinct()
+            ).order_by('group').distinct()
         )
         ticket_choices.sort()
         self.ticket_permissions.choices = ticket_choices
