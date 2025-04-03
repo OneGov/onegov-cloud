@@ -182,7 +182,6 @@ def test_predict_next_daterange_dst_st_transitions():
 
 def test_emails_for_new_ticket(session):
     session.query(User).delete()
-    group_meta = dict(directories=['Sports', 'Music'])
 
     group1 = UserGroup(name='somename')
 
@@ -190,12 +189,12 @@ def test_emails_for_new_ticket(session):
         handler_code='DIR',
         group='Sports',
         user_group=group1,
-        exclusive=False,
+        exclusive=True,
         immediate_notification=True,
     )
 
     permission2 = TicketPermission(
-        handler_code='DIR',
+        handler_code='FRM',
         group='Music',
         user_group=group1,
         exclusive=False,
@@ -212,47 +211,88 @@ def test_emails_for_new_ticket(session):
         password_hash='password_hash',
         role='editor'
     )
+    user_with_bogus_username = User(
+        username='admin',
+        password_hash='password_hash',
+        role='admin'
+    )
 
-    group1.users = [user1]  # user1 is in the group
+    group1.users = [user1, user_with_bogus_username]
 
     session.add(user1)
     session.add(user2)
+    session.add(permission1)
+    session.add(permission2)
     session.add(group1)
     session.flush()
 
     request = Bunch(**{
         'session': session,
         'email_for_new_tickets': 'tickets@example.org',
-        'app.ticket_permissions': {},
+        'app.ticket_permissions': {
+            'DIR': {'Sports': [group1.id.hex]},
+        },
     })
     ticket1 = Ticket(handler_code='DIR', group='Sports')
 
     result = {a.addr_spec for a in emails_for_new_ticket(request, ticket1)}
     assert result == {'tickets@example.org', 'user1@example.org'}
 
-    session.query(User).delete()
-
     group2 = UserGroup(name="foo")
-    user1 = User(
-        username='user2@example.org',
+    user3 = User(
+        username='user3@example.org',
         password_hash='password_hash',
         role='editor'
     )
 
-    group2.users = [user1]
+    permission3 = TicketPermission(
+        handler_code='DIR',
+        group=None,
+        user_group=group2,
+        exclusive=False,
+        immediate_notification=True,
+    )
 
-    session.add(user1)
-    session.add(group1)
+    permission4 = TicketPermission(
+        handler_code='FRM',
+        group=None,
+        user_group=group2,
+        exclusive=False,
+        immediate_notification=True,
+    )
+
+    group2.users = [user3]
+
+    session.add(user3)
+    session.add(group2)
     session.flush()
 
     request = Bunch(**{
         'session': session,
         'email_for_new_tickets': None,
-        'app.ticket_permissions': {},
+        'app.ticket_permissions': {
+            'DIR': {'Sports': [group1.id.hex]},
+        },
     })
-    ticket1 = Ticket(handler_code="DIR")
-    result = {a.addr_spec for a in emails_for_new_ticket(request, ticket1)}
-    assert result == set()
+    ticket2 = Ticket(handler_code='DIR', group='Sports')
+    result = {a.addr_spec for a in emails_for_new_ticket(request, ticket2)}
+    assert result == {'user1@example.org'}
+
+    ticket3 = Ticket(handler_code='FRM', group='Music')
+    result = {a.addr_spec for a in emails_for_new_ticket(request, ticket3)}
+    assert result == {'user1@example.org', 'user3@example.org'}
+
+    request = Bunch(**{
+        'session': session,
+        'email_for_new_tickets': 'user3@example.org',
+        'app.ticket_permissions': {
+            'DIR': {'Sports': [group1.id.hex]},
+        },
+    })
+    result = {a.addr_spec for a in emails_for_new_ticket(request, ticket2)}
+    assert result == {'user1@example.org', 'user3@example.org'}
+    result = {a.addr_spec for a in emails_for_new_ticket(request, ticket3)}
+    assert result == {'user1@example.org', 'user3@example.org'}
 
 
 def test_extract_categories_and_subcategories():
