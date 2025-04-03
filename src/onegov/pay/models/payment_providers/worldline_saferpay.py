@@ -651,7 +651,7 @@ class WorldlineSaferpay(PaymentProvider[SaferpayPayment]):
             )
             self.client.raise_for_status(res)
         except Exception:
-            log.exception('Saferpay connection failed')
+            log.info('Saferpay connection failed', exc_info=True)
             return False
         else:
             return True
