@@ -378,7 +378,7 @@ def view_event(
                     ticket = TicketCollection(session).open_ticket(
                         handler_code='EVN', handler_id=self.id.hex
                     )
-                    TicketMessage.create(ticket, request, 'opened')
+                    TicketMessage.create(ticket, request, 'opened', 'external')
 
                 send_ticket_mail(
                     request=request,

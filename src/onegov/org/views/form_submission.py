@@ -356,7 +356,7 @@ def handle_complete_submission(
                     handler_code=self.meta.get('handler_code', 'FRM'),
                     handler_id=self.id.hex
                 )
-                TicketMessage.create(ticket, request, 'opened')
+                TicketMessage.create(ticket, request, 'opened', 'external')
 
             assert self.email is not None
             submission = collection.submissions.by_id(
