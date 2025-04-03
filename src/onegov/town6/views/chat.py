@@ -78,7 +78,7 @@ def view_chats_staff(
                 ticket = TicketCollection(request.session).open_ticket(
                     handler_code='CHT', handler_id=chat.id.hex
                 )
-                TicketMessage.create(ticket, request, 'opened')
+                TicketMessage.create(ticket, request, 'opened', 'external')
 
                 send_ticket_mail(
                     request=request,

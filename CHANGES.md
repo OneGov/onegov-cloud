@@ -1,8 +1,63 @@
 # Changes
 
+## 2025.16
+
+`2025-03-28` | [fb3aa7cd1f...fe76277190](https://github.com/OneGov/onegov-cloud/compare/fb3aa7cd1f^...fe76277190)
+
+### Form
+
+##### Switches from native URL field to a text field with URL validation
+
+`Feature` | [OGC-2055](https://linear.app/onegovcloud/issue/OGC-2055) | [de7e75b638](https://github.com/onegov/onegov-cloud/commit/de7e75b6389e11650f7a44f29668cfbc264529f5)
+
+### Fsi
+
+##### Ignore 6 year limits for admins
+
+Admins can now register attendees without the 6 year limit.
+CSRF messages now contain instruction.
+
+`Feature` | [OGC-2102](https://linear.app/onegovcloud/issue/OGC-2102) | [a8c52f80c1](https://github.com/onegov/onegov-cloud/commit/a8c52f80c1a6cc09b50e971af78e51874dbd9e73)
+
+### Org
+
+##### Additional Field in Newsletter
+
+Add Field "closing remark" to newsletter
+
+`Feature` | [OGC-2006](https://linear.app/onegovcloud/issue/OGC-2006) | [fa483b81e4](https://github.com/onegov/onegov-cloud/commit/fa483b81e418de0af0098426220c42f6bc1218aa)
+
+##### Integrate email bounce statistics in directory entry subscriptions
+
+`Feature` | [OGC-2070](https://linear.app/onegovcloud/issue/OGC-2070) | [992f131ce6](https://github.com/onegov/onegov-cloud/commit/992f131ce6c26565776e304d09462067a35fa7bd)
+
+##### Add extensions to document form
+
+`Feature` | [OGC-2142](https://linear.app/onegovcloud/issue/OGC-2142) | [f45acf604f](https://github.com/onegov/onegov-cloud/commit/f45acf604f30cf667f49fdaa3e61c4a81b9fb9ac)
+
+##### Fixes rendering of newsletter categories
+
+`Bugfix` | [OGC-2118](https://linear.app/onegovcloud/issue/OGC-2118) | [02d2615681](https://github.com/onegov/onegov-cloud/commit/02d2615681b1f4b6caf581cd1acf9797b17a82b1)
+
+##### Fix reoccurring dates bug
+
+Fix bug where editing an event with reoccurring dates lost the dates.
+
+`Bugfix` | [OGC-2133](https://linear.app/onegovcloud/issue/OGC-2133) | [737819e1f3](https://github.com/onegov/onegov-cloud/commit/737819e1f350097ba9323ed0ded577ec2e4ad04c)
+
+##### Adds pagination for News and refactors logic into `NewsCollection`
+
+`Performance` | [OGC-2146](https://linear.app/onegovcloud/issue/OGC-2146) | [fe76277190](https://github.com/onegov/onegov-cloud/commit/fe762771908fcad427f2f6ce838206e755b1507c)
+
+### User
+
+##### Extend cli list command to run over all instances
+
+`Feature` | [NONE](#NONE) | [f770378d11](https://github.com/onegov/onegov-cloud/commit/f770378d1191fa3a7ac7cada483f24ccf763da02)
+
 ## 2025.15
 
-`2025-03-21` | [3b0cdefbe6...b279e33037](https://github.com/OneGov/onegov-cloud/compare/3b0cdefbe6^...b279e33037)
+`2025-03-21` | [3b0cdefbe6...97478cf310](https://github.com/OneGov/onegov-cloud/compare/3b0cdefbe6^...97478cf310)
 
 ### Agency
 
@@ -2172,70 +2227,4 @@ versa causing the entire request to semi-silently fail with a 409.
 This also bans further uses of said keyword within Swissvotes
 
 `Bugfix` | [OGC-1709](https://linear.app/onegovcloud/issue/OGC-1709) | [2e5a5adc7b](https://github.com/onegov/onegov-cloud/commit/2e5a5adc7b10ecba25ab281b25a4685939e5900a)
-
-## 2024.34
-
-`2024-06-14` | [0160578239...b29d754fcf](https://github.com/OneGov/onegov-cloud/compare/0160578239^...b29d754fcf)
-
-**Upgrade hints**
-- Tokens generated prior to the upgrade will become invalid
-### Core
-
-##### Removes potential timing side channel when validating yubikeys
-
-`Bugfix` | [SEA-1051](https://linear.app/seantis/issue/SEA-1051) | [eec19e4e31](https://github.com/onegov/onegov-cloud/commit/eec19e4e31d2eb9dee91b53e485cc64e026363b8)
-
-### Directory
-
-##### Enable option for getting notifications on new directory entries
-
-If option is enabled in directory settings, people can now subscribe to a directory. Whenever said directory gets a new entry, subscribers get a notification email.
-
-`Feature` | [OGC-1595](https://linear.app/onegovcloud/issue/OGC-1595) | [56de8c24aa](https://github.com/onegov/onegov-cloud/commit/56de8c24aad39479d09f7d499949a64573db04f1)
-
-### Election Day
-
-##### Add sitemap to open data documentation.
-
-Also adds a JSON version of the sitemap.
-
-`Feature` | [OGC-485](https://linear.app/onegovcloud/issue/OGC-485) | [6aae91e8d6](https://github.com/onegov/onegov-cloud/commit/6aae91e8d66e9c61dee381346235ccdbdbf9337f)
-
-##### Allow application to be private.
-
-`Feature` | [OGC-1678](https://linear.app/onegovcloud/issue/OGC-1678) | [f070906318](https://github.com/onegov/onegov-cloud/commit/f070906318a8273ca3365541804e48cda1539675)
-
-##### Hide filters for tacit elections.
-
-`Bugfix` | [82e2527da6](https://github.com/onegov/onegov-cloud/commit/82e2527da6ba4a1d0cc2e0a2b9645f2c1c5b1011)
-
-### Feriennet
-
-##### Switch to html for notification templates
-
-`Bugfix` | [PRO-1289](https://linear.app/projuventute/issue/PRO-1289) | [0f1c65d2c6](https://github.com/onegov/onegov-cloud/commit/0f1c65d2c6e37ae7e392c9ef19fdc0282d8550ee)
-
-### Server
-
-##### Spawn wsgi processes instead of forking them in tests.
-
-`Bugfix` | [OGC-1679](https://linear.app/onegovcloud/issue/OGC-1679) | [91f11b8c74](https://github.com/onegov/onegov-cloud/commit/91f11b8c741e33775a50085ec52affd1f29e46e1)
-
-### Swissvote
-
-##### Run swissvotes tests which manipulate the sessions locale serially
-
-`Bugfix` | [OGC-1681](https://linear.app/onegovcloud/issue/OGC-1681) | [d0e791819f](https://github.com/onegov/onegov-cloud/commit/d0e791819fd4f3a309422970323c19f549549a82)
-
-### User
-
-##### Uses random salt for signup token generation
-
-`Bugfix` | [SEA-1051](https://linear.app/seantis/issue/SEA-1051) | [ca4e50bb90](https://github.com/onegov/onegov-cloud/commit/ca4e50bb90d90faa38ce77b42ba7a9c55d0d68df)
-
-### Various
-
-##### Use timezone aware utcnow.
-
-`Feature` | [OGC-1665](https://linear.app/onegovcloud/issue/OGC-1665) | [35f30d1d39](https://github.com/onegov/onegov-cloud/commit/35f30d1d39f0a83bd13f51bab5ab22d54073a6fa)
 

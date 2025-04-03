@@ -73,7 +73,7 @@ def request_accreditation(
                     **form.get_ticket_data()
                 }
             )
-            TicketMessage.create(ticket, request, 'opened')
+            TicketMessage.create(ticket, request, 'opened', 'external')
             ticket.create_snapshot(request)
 
         send_ticket_mail(
