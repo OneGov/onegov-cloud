@@ -29,7 +29,7 @@ from onegov.org.initial_content import create_new_organisation
 from onegov.org.models import Dashboard, Organisation, PublicationCollection
 from onegov.org.request import OrgRequest
 from onegov.org.theme import OrgTheme
-from onegov.pay import PayApp
+from onegov.pay import PayApp, log as pay_log
 from onegov.reservation import LibresIntegration
 from onegov.search import ElasticsearchApp
 from onegov.ticket import TicketCollection
@@ -372,21 +372,28 @@ class OrgApp(Framework, LibresIntegration, ElasticsearchApp, MapboxApp,
         if self.org.square_logo_url:
             extra['image'] = self.org.square_logo_url
 
-        return provider.checkout_button(
-            label=button_label,
-            # FIXME: This is a little suspect, since StripePaymentProvider
-            #        would previously have raised an exception for a
-            #        missing price, should it really be legal to generate
-            #        a checkout button when there is no price?
-            amount=price and price.amount or None,
-            currency=price and price.currency or None,
-            email=email,
-            name=self.org.name,
-            description=title,
-            complete_url=complete_url,
-            request=request,
-            **extra
-        )
+        try:
+            return provider.checkout_button(
+                label=button_label,
+                # FIXME: This is a little suspect, since StripePaymentProvider
+                #        would previously have raised an exception for a
+                #        missing price, should it really be legal to generate
+                #        a checkout button when there is no price?
+                amount=price and price.amount or None,
+                currency=price and price.currency or None,
+                email=email,
+                name=self.org.name,
+                description=title,
+                complete_url=complete_url,
+                request=request,
+                **extra
+            )
+        except Exception:
+            pay_log.info(
+                f'Failed to generate checkout button for {provider.title}:',
+                exc_info=True
+            )
+            return None
 
     def redirect_after_login(
         self,
