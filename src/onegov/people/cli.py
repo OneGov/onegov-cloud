@@ -190,7 +190,8 @@ def list_people() -> Callable[[CoreRequest | Framework], None]:
                     value
                     for attr in prop
                     if (raw_value := getattr(p, attr, None)) is not None
-                    if (value := str(value))
+                    if (value := str(raw_value))
+                )
                 if value:
                     click.secho(f'  {label}: {value}')
 
