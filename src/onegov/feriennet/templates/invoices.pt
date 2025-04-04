@@ -11,11 +11,9 @@
                 </p>
             </tal:b>
 
-            <tal:b
-                    define="banner layout.app.banners(request)[0]"
-                    condition="banner"
-                    replace="banner"
-                />
+            <tal:b define="banner layout.app.banners(request)[0]" condition="banner">
+                <tal:b metal:use-macro="layout.macros['banner']" define="position 'rechnungen'"/>
+            </tal:b>
 
             <div class="bills" tal:condition="invoices">
                 <div class="bill ${invoice.paid and 'paid' or 'unpaid'}" id="${invoice.id}" tal:repeat="invoice invoices">

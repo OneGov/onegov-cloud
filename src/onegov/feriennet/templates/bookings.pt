@@ -51,11 +51,9 @@
                         No bookings yet.
                     </p>
 
-                    <tal:b
-                        define="banner layout.app.banners(request)[0]"
-                        condition="banner"
-                        replace="banner"
-                    />
+                    <tal:b define="banner layout.app.banners(request)[0]" condition="banner">
+                        <tal:b metal:use-macro="layout.macros['banner']" define="position 'buchungen'"/>
+                    </tal:b>
 
                     <div class="row attendee-bookings-row" tal:repeat="attendee attendees" tal:condition="has_bookings" id="attendee-${attendee.id.hex}">
                         <div class="columns small-12">
