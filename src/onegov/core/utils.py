@@ -1240,23 +1240,25 @@ def generate_fts_phonenumbers(numbers: Iterable[str | None]) -> list[str]:
     result = []
 
     for number in numbers:
-        if number:
-            try:
-                parsed = parse(number, 'CH')
-            except NumberParseException:
-                # allow invalid phone number
-                result.append(number.replace(' ', ''))
-                continue
+        if not number:
+            continue
 
-            result.append(format_number(
-                parsed, PhoneNumberFormat.E164))
+        try:
+            parsed = parse(number, 'CH')
+        except NumberParseException:
+            # allow invalid phone number
+            result.append(number.replace(' ', ''))
+            continue
 
-            national = format_number(
-                parsed, PhoneNumberFormat.NATIONAL)
-            groups = national.split()
-            for idx in range(len(groups)):
-                partial = ''.join(groups[idx:])
-                if len(partial) > 3:
-                    result.append(partial)
+        result.append(format_number(
+            parsed, PhoneNumberFormat.E164))
+
+        national = format_number(
+            parsed, PhoneNumberFormat.NATIONAL)
+        groups = national.split()
+        for idx in range(len(groups)):
+            partial = ''.join(groups[idx:])
+            if len(partial) > 3:
+                result.append(partial)
 
     return result
