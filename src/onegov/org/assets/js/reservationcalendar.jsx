@@ -278,6 +278,7 @@ rc.setupDatePicker = function(view, element) {
         height: 0,
         border: 0,
     }).datetimepicker({
+        allowBlank: true,
         timepicker: false,
         format: 'Y-m-d',
         dayOfWeekStart: 1,
@@ -286,11 +287,17 @@ rc.setupDatePicker = function(view, element) {
         onSelectDate: function(ct, $i) {
             calendar.fullCalendar('gotoDate', ct);
         },
+        onShow: function(_ct, $i) {
+            this.setOptions({value: $i.val()});
+            setTimeout(function() {
+                $('.xdsoft_datetimepicker').trigger('afterOpen.xdsoft');
+            }, 50);
+        },
     });
+    input.unbind();
     title.append(input);
     title.click(function() {
         input.val(calendar.fullCalendar('getDate').format('YYYY-MM-DD'));
-        input.datetimepicker('reset');
         input.datetimepicker('show');
     }).on('mouseenter', function() {
         title.css('cursor', 'pointer');
