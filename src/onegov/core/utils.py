@@ -1230,7 +1230,7 @@ def batched(
         yield batch
 
 
-def generate_fts_phonenumbers(numbers: Iterable) -> list[str]:
+def generate_fts_phonenumbers(numbers: Iterable[str | None]) -> list[str]:
     """
     Generates a list of phonenumbers in various formats for full text search.
     The international, the national and the local format as well as the
