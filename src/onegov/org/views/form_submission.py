@@ -21,13 +21,13 @@ from onegov.org.layout import (
     TicketLayout,
 )
 from onegov.org.mail import send_ticket_mail
-from onegov.org.utils import user_group_emails_for_new_ticket
 from onegov.org.models import TicketMessage, SubmissionMessage
 from onegov.org.models.ticket import (
     DirectoryEntryTicket,
     FormSubmissionTicket,
     ReservationTicket,
 )
+from onegov.org.utils import emails_for_new_ticket
 from onegov.pay import PaymentError, Price
 from purl import URL
 from webob.exc import HTTPMethodNotAllowed, HTTPNotFound
@@ -375,19 +375,13 @@ def handle_complete_submission(
                     'price': submission.payment if submission else None
                 }
             )
-            directory_user_group_recipients = user_group_emails_for_new_ticket(
-                request, ticket
-            )
-            if request.email_for_new_tickets:
+            for email in emails_for_new_ticket(request, ticket):
                 send_ticket_mail(
                     request=request,
                     template='mail_ticket_opened_info.pt',
                     subject=_('New ticket'),
                     ticket=ticket,
-                    receivers=(
-                        request.email_for_new_tickets,
-                        *directory_user_group_recipients,
-                    ),
+                    receivers=(email, ),
                     content={'model': ticket},
                 )
 

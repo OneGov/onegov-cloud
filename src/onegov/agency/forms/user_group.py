@@ -20,7 +20,11 @@ class UserGroupForm(ManageUserGroupForm):
         choices=[]
     )
 
-    immediate_notification = RadioField(
+    # NOTE: We use the value of agencies to determine which tickets
+    #       the immediate notifications are for, so we only need a
+    #       radio field with two values here, rather than the complex
+    #       thing we use in Org. We may need to change this in the future.
+    immediate_notification: RadioField = RadioField(  # type:ignore[assignment]
         label=_(
             'Immediate e-mail notification to members upon ticket submission'
         ),

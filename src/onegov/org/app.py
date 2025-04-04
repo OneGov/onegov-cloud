@@ -205,12 +205,13 @@ class OrgApp(Framework, LibresIntegration, ElasticsearchApp, MapboxApp,
 
     @orm_cached(policy='on-table-change:ticket_permissions')
     def ticket_permissions(self) -> dict[str, dict[str | None, list[str]]]:
+        """ Exclusive ticket permissions for authorization. """
         result: dict[str, dict[str | None, list[str]]] = {}
         for permission in self.session().query(TicketPermission).with_entities(
             TicketPermission.handler_code,
             TicketPermission.group,
             TicketPermission.user_group_id
-        ):
+        ).filter(TicketPermission.exclusive.is_(True)):
             handler = result.setdefault(permission.handler_code, {})
             group = handler.setdefault(permission.group, [])
             group.append(permission.user_group_id.hex)
