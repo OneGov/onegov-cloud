@@ -4,13 +4,17 @@ upgraded on the server. See :class:`onegov.core.upgrade.upgrade_task`.
 """
 from __future__ import annotations
 
+from inspect import isabstract
 from itertools import chain
 from libres.db.models import ORMBase
+from onegov.core.orm.abstract.adjacency_list import AdjacencyList
 from onegov.core.upgrade import upgrade_task
 from onegov.core.orm import Base, find_models
 from onegov.core.orm.abstract import Associable
 from onegov.core.orm.types import JSON
 from sqlalchemy import inspect, text
+
+from sqlalchemy import Numeric
 from sqlalchemy.exc import NoInspectionAvailable
 
 
@@ -213,3 +217,32 @@ def unique_constraint_in_association_tables(context: UpgradeContext) -> None:
                     IF NOT EXISTS "uq_assoc_{table}"
                     ON "{table}" ("{key}", "{association_key}")
                 """)
+
+
+@upgrade_task(
+    'Change order to Numeric to avoid re-sorting siblings on every new item'
+)
+def change_adjacency_list_order_to_numeric(context: UpgradeContext) -> None:
+    def is_concrete_subclass(cls: type) -> bool:
+        return (
+            issubclass(cls, AdjacencyList)
+            and cls is not AdjacencyList
+            and not isabstract(cls)
+        )
+
+    table_names: set[str] = {
+        cls.__tablename__  # type: ignore[attr-defined]
+        for cls in chain(
+            find_models(Base, is_concrete_subclass),
+            find_models(ORMBase, is_concrete_subclass),
+        )
+    }
+
+    for table_name in table_names:
+        if context.has_table(table_name):
+            context.operations.alter_column(
+                table_name,
+                'order',
+                type_=Numeric(30, 15),
+                postgresql_using='"order"::numeric'
+            )
