@@ -5,6 +5,8 @@ from copy import copy
 from dectate import Query
 from markupsafe import Markup
 from webob.exc import HTTPForbidden
+
+from onegov.agency import AgencyApp
 from onegov.core.elements import Link, Confirm, Intercooler, BackLink
 from onegov.core.security import Secret
 from onegov.core.templates import render_macro
@@ -69,6 +71,11 @@ def view_settings(
                 setting = copy(action.predicates)
                 setting['title'] = setting['setting']
                 setting['link'] = request.link(self, name=setting['name'])
+
+                # suppress vat settings for agencies
+                if (isinstance(request.app, AgencyApp) and
+                        'vat' in setting['name']):
+                    continue
 
                 yield setting
 
