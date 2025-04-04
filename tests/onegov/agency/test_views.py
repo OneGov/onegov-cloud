@@ -735,8 +735,8 @@ def test_basic_search(client_with_es):
     manage.form['function'] = 'Doctor'
     manage.form['first_name'] = 'Nick'
     manage.form['last_name'] = 'Rivera'
-    manage.form['phone'] = '+12 34 567 89 01'
-    manage.form['phone_direct'] = '+12 34 567 89 11'
+    manage.form['phone'] = '+41 23 456 78 90'
+    manage.form['phone_direct'] = '+41 23 456 78 99'
     manage.form.submit()
 
     manage = client.get('/organizations').click('Organisation', href='new')
@@ -755,17 +755,18 @@ def test_basic_search(client_with_es):
     assert 'Rivera' in client.get('/search?q=Nick')
     assert 'Nick' in client.get('/search?q=Rivera')
     assert 'Nick' in client.get('/search?q=Doctor')
-    assert 'Nick' in client.get('/search?q=+12345678901')
-    assert 'Nick' in client.get('/search?q=0345678901')
-    assert 'Nick' in client.get('/search?q=8911')
+    assert 'Nick' in client.get('/search?q=+41234567890')
+    assert 'Nick' in client.get('/search?q=0234567890')
+    assert 'Nick' in client.get('/search?q=4567890')
+    assert 'Nick' in client.get('/search?q=7890')
     assert 'Hospital Springfield' in client.get('/search?q=Hospital')
     assert 'Nick' in client.get('/search?q=Anesthetist')
 
     # Test suggestions
     assert 'Nick Rivera (Doctor)' in client.get('/search/suggest?q=Nic').json
     assert 'Rivera Nick (Doctor)' in client.get('/search/suggest?q=Riv').json
-    assert '8911 Rivera Nick (Doctor)' in client.get(
-        '/search/suggest?q=89'
+    assert '7899 Rivera Nick (Doctor)' in client.get(
+        '/search/suggest?q=78'
     ).json
 
 

@@ -6,6 +6,7 @@ from onegov.core.orm.mixins import TimestampMixin
 from onegov.core.orm.mixins import UTCPublicationMixin
 from onegov.core.orm.mixins import content_property
 from onegov.core.orm.types import UUID
+from onegov.core.utils import generate_fts_phonenumbers
 from onegov.people.models import AgencyMembership
 from onegov.search import ORMSearchable
 from sqlalchemy import Column
@@ -53,11 +54,17 @@ class Person(Base, ContentMixin, TimestampMixin, ORMSearchable,
         'title': {'type': 'text'},
         'function': {'type': 'localized'},
         'email': {'type': 'text'},
+        'phone_fts': {'type': 'text'},
     }
 
     @property
     def es_suggestion(self) -> tuple[str, ...]:
         return (self.title, f'{self.first_name} {self.last_name}')
+
+    @property
+    def phone_fts(self) -> list[str]:
+        numbers = (self.phone, self.phone_direct)
+        return generate_fts_phonenumbers(numbers)
 
     @property
     def title(self) -> str:

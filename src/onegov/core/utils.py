@@ -32,6 +32,8 @@ from markupsafe import Markup
 from onegov.core import log
 from onegov.core.custom import json
 from onegov.core.errors import AlreadyLockedError
+from phonenumbers import (PhoneNumberFormat, format_number,
+                          NumberParseException, parse)
 from purl import URL
 from threading import Thread
 from time import perf_counter
@@ -1226,3 +1228,37 @@ def batched(
             return
 
         yield batch
+
+
+def generate_fts_phonenumbers(numbers: Iterable[str | None]) -> list[str]:
+    """
+    Generates a list of phonenumbers in various formats for full text search.
+    The international, the national and the local format as well as the
+    extension.
+
+    """
+    result = []
+
+    for number in numbers:
+        if not number:
+            continue
+
+        try:
+            parsed = parse(number, 'CH')
+        except NumberParseException:
+            # allow invalid phone number
+            result.append(number.replace(' ', ''))
+            continue
+
+        result.append(format_number(
+            parsed, PhoneNumberFormat.E164))
+
+        national = format_number(
+            parsed, PhoneNumberFormat.NATIONAL)
+        groups = national.split()
+        for idx in range(len(groups)):
+            partial = ''.join(groups[idx:])
+            if len(partial) > 3:
+                result.append(partial)
+
+    return result
