@@ -269,7 +269,6 @@ rc.setupEventPopups = function(event, element, view) {
 rc.setupDatePicker = function(view, element) {
     var calendar = $(view.el.closest('.fc'));
     var title = calendar.find('.fc-header-toolbar .fc-left h2');
-    var anchor = $('<span></span>').appendTo(title);
     var input = $(
         '<input type="text" tabindex="-1" aria-hidden="true"/>'
     ).css({
