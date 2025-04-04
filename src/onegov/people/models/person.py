@@ -5,6 +5,7 @@ from onegov.core.orm.mixins import ContentMixin
 from onegov.core.orm.mixins import TimestampMixin
 from onegov.core.orm.mixins import UTCPublicationMixin
 from onegov.core.orm.types import UUID
+from onegov.core.utils import generate_fts_phonenumbers
 from onegov.people.models import AgencyMembership
 from onegov.search import ORMSearchable
 from sqlalchemy import Column
@@ -60,17 +61,8 @@ class Person(Base, ContentMixin, TimestampMixin, ORMSearchable,
 
     @property
     def phone_fts(self) -> list[str]:
-        result = []
-        for number in (self.phone, self.phone_direct):
-            if number:
-                number = number.replace(' ', '')
-                result.append(number)
-                result.append(number[-4:])
-                result.append(number[-7:])
-                result.append(number[-9:])
-                result.append('0' + number[-9:])
-                result.append('+41' + number[-9:])
-        return [r for r in result if r]
+        numbers = (self.phone, self.phone_direct)
+        return generate_fts_phonenumbers(numbers)
 
     @property
     def title(self) -> str:

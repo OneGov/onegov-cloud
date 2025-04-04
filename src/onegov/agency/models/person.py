@@ -2,6 +2,7 @@ from __future__ import annotations
 
 from onegov.agency.utils import get_html_paragraph_with_line_breaks
 from onegov.core.orm.mixins import dict_property, meta_property
+from onegov.core.utils import generate_fts_phonenumbers
 from onegov.org.models import Organisation
 from onegov.org.models.extensions import AccessExtension
 from onegov.org.models.extensions import PublicationExtension
@@ -64,17 +65,8 @@ class ExtendedPerson(Person, AccessExtension, PublicationExtension):
 
     @property
     def phone_fts(self) -> list[str]:
-        result = [self.phone_internal]
-        for number in (self.phone, self.phone_direct):
-            if number:
-                number = number.replace(' ', '')
-                result.append(number)
-                result.append(number[-4:])
-                result.append(number[-7:])
-                result.append(number[-9:])
-                result.append('0' + number[-9:])
-                result.append('+41' + number[-9:])
-        return [r for r in result if r]
+        numbers = (self.phone_internal, self.phone, self.phone_direct)
+        return generate_fts_phonenumbers(numbers)
 
     @property
     def location_address_html(self) -> Markup:
