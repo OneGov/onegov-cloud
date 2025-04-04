@@ -1956,6 +1956,10 @@
     <a href="${request.link(result)}" class="list-link">
         <h5 class="list-title">${result.title} <metal:hint use-macro="layout.macros['access_hint']" tal:define="item result" /></h5>
     </a>
+    tschupre last change: ${result.es_last_change}
+    <span tal:condition="hasattr(result, 'published_or_created')">
+        published or created: ${getattr(result, 'published_or_created', '')}
+    </span>
     <a tal:condition="result.lead|None" href="${request.link(result)}">
         <p class="search-preview">
             ${result.lead[:160]}<tal:b condition="len(result.lead) > 160">…</tal:b>
