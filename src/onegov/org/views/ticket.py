@@ -366,7 +366,7 @@ def send_chat_message_email_if_enabled(
         type='ticket_chat')
 
     receiver: str | None
-    if origin == 'internal':
+    if origin != 'external':
 
         # if the messages is sent to the outside, we always send an e-mail
         receiver = ticket.snapshot.get('email') or ticket.handler.email

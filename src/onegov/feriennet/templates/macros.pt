@@ -843,3 +843,12 @@
         data-cart-action-url="${cart_action_url}"
         i18n:attributes="data-empty-label;data-button-label;data-remove-label"></div>
 </metal:volunteer_cart>
+
+<metal:banner define-macro="banner" i18n:domain="onegov.feriennet">
+    <div class="sponsor-banner ${position}">
+        <a href="${banner.url}" class="banner-${position}">
+            <img src="${banner.src}">
+            <p class="banner-info">${banner.info}</p>
+        </a>
+    </div>
+</metal:banner>

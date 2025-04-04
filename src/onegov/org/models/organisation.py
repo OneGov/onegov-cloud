@@ -152,6 +152,8 @@ class Organisation(Base, TimestampMixin):
     always_show_partners: dict_property[bool] = meta_property(default=False)
 
     # Ticket options
+    hide_personal_email: dict_property[bool] = meta_property(default=False)
+    general_email: dict_property[str | None] = meta_property()
     email_for_new_tickets: dict_property[str | None] = meta_property()
     ticket_auto_accept_style: dict_property[str | None] = meta_property()
     ticket_auto_accepts: dict_property[list[str] | None] = meta_property()
@@ -222,6 +224,11 @@ class Organisation(Base, TimestampMixin):
     specific_opening_hours: dict_property[bool] = meta_property(default=False)
     opening_hours_chat: dict_property[list[list[str]] | None] = meta_property()
     chat_topics: dict_property[list[str] | None] = meta_property()
+
+    # People Settings
+    organisation_hierarchy: dict_property[list[dict[str, list[str]] | str]] = (
+        meta_property(default=list)
+    )
 
     # Required information to upload documents to a Gever instance
     gever_username: dict_property[str | None] = meta_property()

@@ -182,7 +182,6 @@ ignore = [
     "RUF022",
     "RUF023",
     "RUF031",
-    "RUF035",
     "RUF052",
     "RUF056",
     # TODO: We would like to enable SIM102, but it has a ton of
