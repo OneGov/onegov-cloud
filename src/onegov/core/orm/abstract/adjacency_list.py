@@ -531,7 +531,8 @@ class AdjacencyListCollection(Generic[_L]):
             else:
                 # --- Strategy 2: Append numerically at the end ---
                 child.order = max(
-                    (s.order for s in existing_siblings if s.order is not None),
+                    (s.order for s in existing_siblings if s.order
+                        is not None),
                     default=Decimal('65535'),
                 ) + Decimal('1')
 

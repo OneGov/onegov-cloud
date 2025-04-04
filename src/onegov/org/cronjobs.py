@@ -1103,4 +1103,4 @@ def normalize_adjacency_list_order(request: OrgRequest) -> None:
             try:
                 session.rollback()
             except Exception:
-                log.exception(f"Error during rollback for table '{table_name}'")
+                log.exception(f"Error during rollback for '{table_name}'")
