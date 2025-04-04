@@ -170,7 +170,7 @@ def import_xlsx(file: IO[bytes]) -> Callable[[CoreRequest, Framework], None]:
 
 
 @cli.command('list')
-def list_people() -> Callable[[CoreRequest | Framework], None]:
+def list_people() -> Callable[[CoreRequest, Framework], None]:
 
     def _list(request: CoreRequest, app: Framework) -> None:
         session = app.session()
