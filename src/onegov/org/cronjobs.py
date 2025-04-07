@@ -2,7 +2,6 @@ from __future__ import annotations
 import traceback
 from collections import OrderedDict
 
-import click
 from markupsafe import Markup
 import pytz
 import requests
@@ -119,10 +118,12 @@ def send_daily_newsletter(request: OrgRequest) -> None:
         times = [
             int(time) for time in (request.app.org.newsletter_times or [])
         ]
-        current_hour = 10
+        # The sending times will be in the local timezone (Europe/Zurich)
+        # but the current hour is in UTC and is used for the news query.
         current_hour = utcnow().hour
-        real_current_hour = to_timezone(utcnow(), 'Europe/Zurich').hour
-        if real_current_hour in times:
+        current_hour_tz = to_timezone(utcnow(), 'Europe/Zurich').hour
+
+        if current_hour_tz in times:
             end = datetime(
                 year=utcnow().year,
                 month=utcnow().month,
@@ -130,41 +131,39 @@ def send_daily_newsletter(request: OrgRequest) -> None:
                 hour=current_hour,
                 tzinfo=pytz.utc)
 
-            index = times.index(real_current_hour)
+            index = times.index(current_hour_tz)
             if index == 0:
                 start = end - timedelta(
                     hours=24 - times[-1] + times[0])
             else:
                 start = end - timedelta(
-                    hours=real_current_hour - times[index - 1])
+                    hours=current_hour_tz - times[index - 1])
             news = request.session.query(News).filter(
                 News.published.is_(True),
                 or_(
-                    News.created.between(start, utcnow()),
+                    News.created.between(start, end),
                     News.publication_start >= start,
                 )
             ).all()
 
             if news:
-                title = (f"{_('Daily Newsletter')} "
-                        f"{end.strftime('%m.%d.%Y, %H:%M')}")
+                time = to_timezone(end, 'Europe/Zurich').strftime(
+                            '%m.%d.%Y, %H:%M')
+                title = f"{_('Daily Newsletter')} {time}"
                 newsletters = NewsletterCollection(request.session)
                 newsletter = newsletters.add(title=title, html=Markup(''))
                 newsletter.lead = _('New news since the last newsletter:')
                 newsletter.content['news'] = [n.id for n in news]
 
-            click.secho('Sending daily newsletter', fg='green')
-            click.echo([n.title for n in news])
-            click.secho(f'Start {start} - End {end}', fg='yellow')
-        click.secho(f'Current hour {current_hour}', fg='yellow')
-        click.secho(f'Real current hour {real_current_hour}', fg='yellow')
+                recipients = RecipientCollection(
+                    request.session).query().filter(
+                        Recipient.confirmed.is_(True),
+                        Recipient.daily_newsletter.is_(True),
+                    ).all()
 
-        recipients = RecipientCollection(request.session).query().filter(
-            Recipient.confirmed.is_(True),
-            Recipient.daily_newsletter.is_(True),
-        ).all()
-
-        click.secho(f'Recipients {[r.address for r in recipients]}', fg='blue')
+                if recipients:
+                    send_newsletter(request=request, newsletter=newsletter,
+                                    recipients=recipients, daily=True)
 
 
 def publish_files(request: OrgRequest) -> None:
