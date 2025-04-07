@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+from decimal import Decimal
 import re
 from collections import defaultdict
 from datetime import datetime
@@ -656,8 +657,8 @@ def import_lu_agencies(
     top_level.sort(key=lambda a: a.title)
     for ix, agency in enumerate(top_level, start=1):
         if agency.title == 'Staatskanzlei':
-            agency.order = 0
-        agency.order = ix
+            agency.order = Decimal(0)
+        agency.order = Decimal(ix)
 
     session.flush()
 

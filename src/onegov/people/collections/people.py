@@ -1,5 +1,7 @@
 from __future__ import annotations
 
+from sqlalchemy import func
+
 from onegov.core import utils
 from onegov.core.collection import GenericCollection
 from onegov.people.models import Person
@@ -96,24 +98,11 @@ class PersonCollection(BasePersonCollection[Person]):
         query = self.session.query(Person).order_by(Person.last_name,
                                                     Person.first_name)
         if org:
-            query = query.filter(Person.organisation == org)
+            query = query.filter(
+                func.jsonb_contains(Person.content['organisations_multiple'],
+                                    f'["{org}"]'))
         if sub_org:
-            query = query.filter(Person.sub_organisation == sub_org)
+            query = query.filter(
+                func.jsonb_contains(Person.content['organisations_multiple'],
+                                    f'["-{sub_org}"]'))
         return query.all()
-
-    def unique_organisations(self) -> tuple[str | None, ...]:
-        query = self.session.query(Person.organisation)
-        query = query.filter(Person.organisation.isnot(None)).distinct()
-        query = query.order_by(Person.organisation)
-        return tuple(org[0] for org in query if org[0] != '')
-
-    def unique_sub_organisations(
-            self,
-            of_org: str | None = None
-    ) -> tuple[str | None, ...]:
-        query = self.session.query(Person.sub_organisation)
-        if of_org:
-            query = query.filter(Person.organisation == of_org)
-        query = query.filter(Person.sub_organisation.isnot(None)).distinct()
-        query = query.order_by(Person.sub_organisation)
-        return tuple(s_org[0] for s_org in query if s_org[0] != '')

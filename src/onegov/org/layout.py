@@ -1595,6 +1595,12 @@ class PersonCollectionLayout(DefaultLayout):
     def editbar_links(self) -> list[Link | LinkGroup] | None:
         if self.request.is_manager:
             return [
+                Link(
+                    text=_('Settings'),
+                    url=self.request.link(
+                        self.request.app.org, 'people-settings'),
+                    attrs={'class': 'settings-link'}
+                ),
                 LinkGroup(
                     title=_('Add'),
                     links=[

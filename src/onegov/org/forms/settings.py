@@ -706,30 +706,6 @@ class HomepageSettingsForm(Form):
 
 class ModuleSettingsForm(Form):
 
-    hidden_people_fields = MultiCheckboxField(
-        label=_('Hide these fields for non-logged-in users'),
-        fieldset=_('People'),
-        choices=[
-            ('salutation', _('Salutation')),
-            ('academic_title', _('Academic Title')),
-            ('born', _('Born')),
-            ('profession', _('Profession')),
-            ('political_party', _('Political Party')),
-            ('parliamentary_group', _('Parliamentary Group')),
-            ('email', _('E-Mail')),
-            ('phone', _('Phone')),
-            ('phone_direct', _('Direct Phone Number or Mobile')),
-            ('organisation', _('Organisation')),
-            ('website', _('Website')),
-            ('website_2', _('Website 2')),
-            ('location_address', _('Location address')),
-            ('location_code_city', _('Location Code and City')),
-            ('postal_address', _('Postal address')),
-            ('postal_code_city', _('Postal Code and City')),
-            ('notes', _('Notes')),
-            ('external_user_id', _('External ID'))
-        ])
-
     mtan_session_duration_seconds = IntegerField(
         label=_('Duration of mTAN session'),
         description=_('Specify in number of seconds'),
@@ -1643,6 +1619,121 @@ class FirebaseSettingsForm(Form):
                 ],
             }
         )
+
+
+class PeopleSettingsForm(Form):
+
+    organisation_hierarchy = TextAreaField(
+        label=_('Organisation hierarchy'),
+        description=_(
+            'Example for organisation hierarchy with subtopics in yaml '
+            'format. Note: Deeper structures are not supported.'
+            '\n'
+            '```\n'
+            '- Organisation:\n'
+            '  - Sub-Organisation 1\n'
+            '  - Sub-Organisation 2\n'
+            '- Organisation 2:\n'
+            '  - Sub-Organisation 1\n'
+            '  - Sub-Organisation 2\n'
+            '```'
+        ),
+        render_kw={
+            'rows': 16,
+        },
+    )
+
+    hidden_people_fields = MultiCheckboxField(
+        label=_('Hide these fields for non-logged-in users'),
+        choices=[
+            ('salutation', _('Salutation')),
+            ('academic_title', _('Academic Title')),
+            ('born', _('Born')),
+            ('profession', _('Profession')),
+            ('political_party', _('Political Party')),
+            ('parliamentary_group', _('Parliamentary Group')),
+            ('email', _('E-Mail')),
+            ('phone', _('Phone')),
+            ('phone_direct', _('Direct Phone Number or Mobile')),
+            ('organisation', _('Organisation')),
+            ('website', _('Website')),
+            ('website_2', _('Website 2')),
+            ('location_address', _('Location address')),
+            ('location_code_city', _('Location Code and City')),
+            ('postal_address', _('Postal address')),
+            ('postal_code_city', _('Postal Code and City')),
+            ('notes', _('Notes')),
+            ('external_user_id', _('External ID'))
+        ])
+
+    def ensure_categories(self) -> bool | None:
+        assert isinstance(self.organisation_hierarchy.errors, list)
+
+        if self.organisation_hierarchy.data:
+            try:
+                data = yaml.safe_load(self.organisation_hierarchy.data)
+            except yaml.YAMLError:
+                self.organisation_hierarchy.errors.append(
+                    _('Invalid YAML format. Please refer to the example.')
+                )
+                return False
+
+            if data:
+                if not isinstance(data, list):
+                    self.organisation_hierarchy.errors.append(
+                        _('Invalid format. Please define a list with '
+                          'organisations and sub-organisations according the '
+                          'example.')
+                    )
+                    return False
+                for item in data:
+                    if not isinstance(item, (str, dict)):
+                        self.organisation_hierarchy.errors.append(
+                            _('Invalid format. Please define organisations '
+                              'and sub-organisations according to the '
+                              'example.')
+                        )
+                        return False
+
+                    if isinstance(item, str):
+                        continue
+
+                    for topic, sub_topic in item.items():
+                        if not isinstance(sub_topic, list):
+                            self.organisation_hierarchy.errors.append(
+                                _(f'Invalid format. Please define '
+                                  f"sub-organisations(s) for '{topic}' "
+                                  f"or remove the ':'.")
+                            )
+                            return False
+
+                        if not all(isinstance(sub, str) for sub in sub_topic):
+                            self.organisation_hierarchy.errors.append(
+                                _('Invalid format. Only organisations '
+                                  'and sub-organisations are allowed - no '
+                                  'deeper structures supported.')
+                            )
+                            return False
+
+        return None
+
+    def populate_obj(self, model: Organisation) -> None:  # type:ignore
+        super().populate_obj(model)
+
+        yaml_data = self.organisation_hierarchy.data
+        data = yaml.safe_load(yaml_data) if yaml_data else []
+        model.organisation_hierarchy = data
+
+    def process_obj(self, model: Organisation) -> None:  # type:ignore
+        super().process_obj(model)
+
+        categories = model.organisation_hierarchy or []
+        if not categories:
+            self.organisation_hierarchy.data = ''
+            return
+
+        yaml_data = yaml.safe_dump(categories, default_flow_style=False)
+        self.organisation_hierarchy.data = yaml_data
 
 
 class VATSettingsForm(Form):

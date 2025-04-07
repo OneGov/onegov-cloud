@@ -1,4 +1,5 @@
 from __future__ import annotations
+from inspect import isabstract
 import traceback
 from collections import OrderedDict
 
@@ -7,11 +8,12 @@ import logging
 from babel.dates import get_month_names
 from datetime import datetime, timedelta
 from functools import lru_cache
-from itertools import groupby
+from itertools import groupby, chain
 
 from onegov.chat.collections import ChatCollection
 from onegov.chat.models import Chat
 from onegov.core.orm import find_models, Base
+from onegov.core.orm.abstract import AdjacencyList
 from onegov.core.orm.mixins.publication import UTCPublicationMixin
 from onegov.core.templates import render_template
 from onegov.directory.collections.directory import EntryRecipientCollection
@@ -49,8 +51,9 @@ from onegov.org.models import TicketMessage, ExtendedDirectoryEntry
 from onegov.user import User, UserCollection
 from onegov.user.models import TAN
 from sedate import to_timezone, utcnow, align_date_to_day
-from sqlalchemy import and_, or_, func
+from sqlalchemy import and_, or_, func, text
 from sqlalchemy.orm import undefer
+from sqlalchemy.inspection import inspect
 from uuid import UUID
 from onegov.org.notification_service import (
     get_notification_service,
@@ -1011,3 +1014,93 @@ def send_push_notifications_for_news(request: OrgRequest) -> None:
         session.rollback()
         print(traceback.format_exc())
         print(f'Error sending notifications: {e}')
+
+
+@OrgApp.cronjob(hour=3, minute=0, timezone='Europe/Zurich')
+def normalize_adjacency_list_order(request: OrgRequest) -> None:
+    """Normalizes the 'order' column for all AdjacencyList subclasses.
+
+    The midpoint insertion strategy for 'order' (Decimal) can lead to
+    precision issues or very close values over time. This cronjob
+    renumbers the 'order' for each group of siblings (same parent_id)
+    sequentially starting from 1, effectively resetting the order values
+    while preserving the relative order within each sibling group.
+    """
+    session = request.session
+    processed_tables = set()
+
+    def is_concrete_subclass(cls: type) -> bool:
+        """Check if a class is a non-abstract subclass of AdjacencyList."""
+        return (
+            issubclass(cls, AdjacencyList)
+            and cls is not AdjacencyList
+            and not isabstract(cls)
+        )
+
+    # Find all relevant model classes
+    adjacency_subclasses = set(
+        chain.from_iterable(
+            find_models(base, is_concrete_subclass)
+            for base in request.app.session_manager.bases
+        )
+    )
+
+    log.info(f'Found {len(adjacency_subclasses)} '
+        'potential AdjacencyList models.')
+
+    for model in adjacency_subclasses:
+        mapper = inspect(model)
+        table = mapper.local_table  # Get the mapped table
+
+        # Basic sanity checks for the model's mapping
+        if (table is None or not mapper.primary_key or
+            len(mapper.primary_key) != 1):
+            continue
+
+        table_name = table.name
+
+        # Check if already processed or missing required columns
+        if table_name in processed_tables:
+            continue
+        if 'order' not in table.columns or 'parent_id' not in table.columns:
+            log.warning(
+                f"Skipping table '{table_name}': Missing 'order' or "
+                f"'parent_id' column."
+            )
+            continue
+
+        # Use ROW_NUMBER() partitioned by parent_id to generate new order
+        # values starting from 1 for siblings under the same parent.
+        # Rows with NULL parent_id (root nodes) are ignored
+        update_sql = text(
+            f"""
+            WITH numbered_siblings AS (
+                SELECT
+                    "id",
+                    ROW_NUMBER() OVER (
+                        PARTITION BY "parent_id"
+                        ORDER BY "order" ASC NULLS LAST
+                    ) AS new_order
+                FROM
+                    "{table_name}"
+                WHERE
+                    "parent_id" IS NOT NULL
+            )
+            UPDATE "{table_name}"
+            SET "order" = numbered_siblings.new_order
+            FROM numbered_siblings
+            WHERE "{table_name}"."id" =
+                numbered_siblings."id";
+            COMMIT;
+        """)  # nosec: B608
+
+        try:
+            session.execute(update_sql)
+            processed_tables.add(table_name)
+            log.info(f"Successfully normalized 'order' in '{table_name}'.")
+        except Exception:
+            log.exception(f"Error normalizing 'order' in '{table_name}'")
+            try:
+                session.rollback()
+            except Exception:
+                log.exception(f"Error during rollback for '{table_name}'")
