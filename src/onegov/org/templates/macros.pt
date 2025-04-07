@@ -2226,7 +2226,7 @@
             ${ticket.number}
         </td>
       </tal:block>
-      <td tal:condition="archive_tickets">
+      <td tal:condition="archive_tickets" class="archive-tickets">
           <input tal:condition="has_access" type="checkbox">
       </td>
   </tr>
