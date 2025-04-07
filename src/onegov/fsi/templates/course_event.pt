@@ -11,7 +11,7 @@
             <tal:b tal:define="registered model.has_reservation(request.attendee_id)">
                 <tal:b tal:switch="registered">
                     <button tal:case="True" class="button success disabled"><i class="fa fa-check" aria-hidden="true"></i> <tal:b i18n:translate>Registered</tal:b></button>
-                    <metal:b tal:case="False" tal:condition="model.can_book(request.attendee) and model.exceeds_six_year_limit(request.attendee.id, request) and not model.locked" use-macro="layout.macros['intercooler_btn']"/>
+                    <metal:b tal:case="False" tal:condition="model.can_book(request.attendee) and not model.locked and model.exceeds_six_year_limit(request.attendee.id, request)or request.is_admin" use-macro="layout.macros['intercooler_btn']"/>
                 </tal:b>
 
                 <p><strong tal:condition="model.locked and not request.is_admin" i18n:translate="">This course event can't be booked (anymore).</strong></p>

@@ -157,6 +157,8 @@ class AddFsiSubscriptionForm(Form, SubscriptionFormMixin):
 
     def ensure_6_year_time_interval(self) -> bool:
         if self.attendee_id.data and self.event_from_form:
+            if self.request.is_admin:
+                return True
             if not self.event_from_form.exceeds_six_year_limit(
                 self.attendee_id.data,
                 self.request
