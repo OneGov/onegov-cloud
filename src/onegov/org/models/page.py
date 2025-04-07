@@ -214,7 +214,7 @@ class News(Page, TraitInfo, SearchableContent, NewsletterExtension,
             return ()
 
     @property
-    def es_last_change(self) -> datetime | None:
+    def es_last_change(self) -> datetime:
         return self.published_or_created
 
     def is_supported_trait(self, trait: str) -> bool:

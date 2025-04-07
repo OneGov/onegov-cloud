@@ -19,6 +19,7 @@ from onegov.file import MultiAssociatedFiles
 from typing import TYPE_CHECKING
 if TYPE_CHECKING:
     from collections.abc import Iterator
+    from datetime import datetime
     from sqlalchemy import Column
     from sqlalchemy.orm import relationship
 
@@ -40,12 +41,12 @@ class Page(AdjacencyList, ContentMixin, TimestampMixin,
         def ancestors(self) -> Iterator[Page]: ...
 
         # HACK: Workaround for hybrid_property not working until SQLAlchemy 2.0
-        published_or_created: Column[bool]
+        published_or_created: Column[datetime]
     else:
         @hybrid_property
-        def published_or_created(self):
+        def published_or_created(self) -> datetime:
             return self.publication_start or self.created
 
         @published_or_created.expression  # type:ignore[no-redef]
-        def published_or_created(cls):
+        def published_or_created(cls) -> datetime:
             return func.coalesce(Page.publication_start, Page.created)
