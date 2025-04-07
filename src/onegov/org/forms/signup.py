@@ -41,6 +41,12 @@ class SignupForm(Form):
 
     name = HoneyPotField()
 
+    daily_newsletter = BooleanField(
+        label=_('Receive daily newsletter for all categories (only for '
+                'news items)'),
+        default=False,
+    )
+
     def on_request(self) -> None:
         categories, subcategories = extract_categories_and_subcategories(
             self.request.app.org.newsletter_categories)
@@ -61,3 +67,17 @@ class SignupForm(Form):
 
         if not self.request.is_manager:
             self.delete_field('confirmed')
+
+        if self.request.app.org.enable_automatic_newsletters:
+            times = self.request.app.org.newsletter_times or []
+            if choices:
+                self.daily_newsletter.description = _(
+                    'If there are any new news items since the last '
+                    'sending time you will receive the newsletter at '
+                    f'the following times: {":00, ".join(times)}:00.')
+            else:
+                self.daily_newsletter.description = _(
+                    'You will receive the newsletter at the following '
+                    f'times: {":00, ".join(times)}:00.')
+        else:
+            self.delete_field('daily_newsletter')

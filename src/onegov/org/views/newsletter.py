@@ -219,6 +219,7 @@ def handle_newsletters(
         if not recipient:
             recipient = recipients.add(address=form.address.data)
             recipient.subscribed_categories = subscribed
+            recipient.daily_newsletter = form.daily_newsletter.data
             unsubscribe_link = (
                 request.link(recipient.subscription, 'unsubscribe'))
 
@@ -281,6 +282,7 @@ def handle_newsletters(
         # update subscribed categories
         else:
             recipient.subscribed_categories = subscribed
+            recipient.daily_newsletter = form.daily_newsletter.data
             request.success(
                 request.translate(_(
                     (

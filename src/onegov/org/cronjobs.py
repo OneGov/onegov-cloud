@@ -2,6 +2,9 @@ from __future__ import annotations
 import traceback
 from collections import OrderedDict
 
+import click
+from markupsafe import Markup
+import pytz
 import requests
 import logging
 from babel.dates import get_month_names
@@ -94,6 +97,7 @@ WEEKDAYS = (
 def hourly_maintenance_tasks(request: OrgRequest) -> None:
     publish_files(request)
     handle_publication_models(request)
+    send_daily_newsletter(request)
     send_scheduled_newsletter(request)
     delete_old_tans(request)
     delete_old_tan_accesses(request)
@@ -108,6 +112,59 @@ def send_scheduled_newsletter(request: OrgRequest) -> None:
     for newsletter in newsletters:
         send_newsletter(request, newsletter, newsletter.open_recipients)
         newsletter.scheduled = None
+
+
+def send_daily_newsletter(request: OrgRequest) -> None:
+    if request.app.org.enable_automatic_newsletters:
+        times = [
+            int(time) for time in (request.app.org.newsletter_times or [])
+        ]
+        current_hour = 10
+        current_hour = utcnow().hour
+        real_current_hour = to_timezone(utcnow(), 'Europe/Zurich').hour
+        if real_current_hour in times:
+            end = datetime(
+                year=utcnow().year,
+                month=utcnow().month,
+                day=utcnow().day,
+                hour=current_hour,
+                tzinfo=pytz.utc)
+
+            index = times.index(real_current_hour)
+            if index == 0:
+                start = end - timedelta(
+                    hours=24 - times[-1] + times[0])
+            else:
+                start = end - timedelta(
+                    hours=real_current_hour - times[index - 1])
+            news = request.session.query(News).filter(
+                News.published.is_(True),
+                or_(
+                    News.created.between(start, utcnow()),
+                    News.publication_start >= start,
+                )
+            ).all()
+
+            if news:
+                title = (f"{_('Daily Newsletter')} "
+                        f"{end.strftime('%m.%d.%Y, %H:%M')}")
+                newsletters = NewsletterCollection(request.session)
+                newsletter = newsletters.add(title=title, html=Markup(''))
+                newsletter.lead = _('New news since the last newsletter:')
+                newsletter.content['news'] = [n.id for n in news]
+
+            click.secho('Sending daily newsletter', fg='green')
+            click.echo([n.title for n in news])
+            click.secho(f'Start {start} - End {end}', fg='yellow')
+        click.secho(f'Current hour {current_hour}', fg='yellow')
+        click.secho(f'Real current hour {real_current_hour}', fg='yellow')
+
+        recipients = RecipientCollection(request.session).query().filter(
+            Recipient.confirmed.is_(True),
+            Recipient.daily_newsletter.is_(True),
+        ).all()
+
+        click.secho(f'Recipients {[r.address for r in recipients]}', fg='blue')
 
 
 def publish_files(request: OrgRequest) -> None:
