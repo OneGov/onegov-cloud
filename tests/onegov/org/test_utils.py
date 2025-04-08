@@ -1,7 +1,7 @@
 from datetime import date, datetime
 
 
-from onegov.core.utils import Bunch
+from onegov.core.utils import Bunch, generate_fts_phonenumbers
 from onegov.org import utils
 from pytz import timezone
 from onegov.org.utils import emails_for_new_ticket
@@ -357,3 +357,23 @@ def test_format_phone_number():
     long_text = ('You can reach me during office hours at 041 111 22 33 '
                  'otherwise at 041 111 22 44')
     assert utils.format_phone_number(long_text) == long_text
+
+
+def test_generate_fts_phonenumbers():
+    assert [] == generate_fts_phonenumbers([])
+    assert [] == generate_fts_phonenumbers(())
+    assert [] == generate_fts_phonenumbers({})
+
+    numbers = ['+41 44 567 88 99']
+    expected = ['+41445678899', '0445678899', '5678899', '8899']
+    result = generate_fts_phonenumbers(numbers)
+    assert result == expected
+
+    numbers = ['+41 44 567 88 99', '+41 41 445 31 11']
+    expected = ['+41445678899', '0445678899', '5678899', '8899',
+                '+41414453111', '0414453111', '4453111', '3111']
+    result = generate_fts_phonenumbers(numbers)
+    assert result == expected
+
+    # invalid number
+    assert ['+41'] == generate_fts_phonenumbers(['+41'])

@@ -1,8 +1,68 @@
 # Changes
 
+## 2025.17
+
+`2025-04-04` | [1615b9b227...3a749ca7b9](https://github.com/OneGov/onegov-cloud/compare/1615b9b227^...3a749ca7b9)
+
+### Core
+
+##### Make AdjacencyList use midpoint for insertion of new items.
+
+It's essentially implementing a sparse ordering system where new
+items can be inserted between existing ones. This means we can
+now insert news items without having to reorder everything.
+
+`Performance` | [OGC-2134](https://linear.app/onegovcloud/issue/OGC-2134) | [40fd71992d](https://github.com/onegov/onegov-cloud/commit/40fd71992d385daddcac12c513239c66f39cf9e3)
+
+### Feriennet
+
+##### Replace banners
+
+Replace banners, create banner macro, add position classes
+
+`Feature` | [PRO-1379](https://linear.app/projuventute/issue/PRO-1379) | [8c0c594b47](https://github.com/onegov/onegov-cloud/commit/8c0c594b470539f5d4f45e530168f2edf25d52d7)
+
+### Org
+
+##### Option to hide personal mail in tickets
+
+Option to display a defined general mail instead of the personal admin/editor-mails for external users.
+
+`Feature` | [OGC-2050](https://linear.app/onegovcloud/issue/OGC-2050) | [faa3540d13](https://github.com/onegov/onegov-cloud/commit/faa3540d138e6de4f3d024cf7615ac5d0598ca06)
+
+##### Add organization hierarchy and option to assign multiple organizations
+
+-    The organization hierarchy can be created in the people-settings
+-    People can be assigned to multiple organizations and sub-organizations
+-    The sub-organizations in the filter drop-down on the people view get reduced to possible choices according to the chosen organization
+
+`Feature` | [OGC-2096](https://linear.app/onegovcloud/issue/OGC-2096) | [7082f4d0e4](https://github.com/onegov/onegov-cloud/commit/7082f4d0e4211fe7229346e7bae16e357178b0cc)
+
+##### Adds a date picker to the reservation calendar
+
+`Feature` | [OGC-2149](https://linear.app/onegovcloud/issue/OGC-2149) | [e3fb87113b](https://github.com/onegov/onegov-cloud/commit/e3fb87113b923c08f33f7c84ca0d5bfd9f3208ac)
+
+##### Show newest PushNotifications first.
+
+`Feature` | [OGC-2134](https://linear.app/onegovcloud/issue/OGC-2134) | [3a749ca7b9](https://github.com/onegov/onegov-cloud/commit/3a749ca7b92e2705546bb4c3c242b5bda9051c69)
+
+### Pay
+
+##### Avoids crash when generating payment button fails
+
+Decreases the log level for failed payment provider connections.
+
+`Bugfix` | [883bd2bf77](https://github.com/onegov/onegov-cloud/commit/883bd2bf778e7a1faaa7c5ff43a4052c6ad5813e)
+
+### User
+
+##### Fixes crash in `User.get_initials`
+
+`Bugfix` | [5360b64cc6](https://github.com/onegov/onegov-cloud/commit/5360b64cc6461aea4298df64e76b8a1ebf9801ab)
+
 ## 2025.16
 
-`2025-03-28` | [fb3aa7cd1f...fe76277190](https://github.com/OneGov/onegov-cloud/compare/fb3aa7cd1f^...fe76277190)
+`2025-03-28` | [fb3aa7cd1f...1b2949f6c2](https://github.com/OneGov/onegov-cloud/compare/fb3aa7cd1f^...1b2949f6c2)
 
 ### Form
 
@@ -2187,44 +2247,4 @@ This also adds `MarkupText` as a new column type
 ##### Fix save-button bug
 
 `Bugfix` | [OGC-1682](https://linear.app/onegovcloud/issue/OGC-1682) | [28d404230d](https://github.com/onegov/onegov-cloud/commit/28d404230da1ebc8856e195a9e358a846e27bb51)
-
-## 2024.35
-
-`2024-06-21` | [78ad20bd65...fe1b0dc0f1](https://github.com/OneGov/onegov-cloud/compare/78ad20bd65^...fe1b0dc0f1)
-
-### Feriennet
-
-##### Remove obsolete storage link expansion (as it is html now)
-
-`Bugfix` | [PRO-1289](https://linear.app/projuventute/issue/PRO-1289) | [8ec64d4b4c](https://github.com/onegov/onegov-cloud/commit/8ec64d4b4c80f800b32e5124424d2dc0fb3099a9)
-
-### Search
-
-##### Avoids Postgres indexer causing invalid transactions
-
-This problem only manifested itself in large import jobs where a lot of
-ORM events are being generated and the indexer has to be called in the
-middle of a transaction, rather than at the end. Since we don't yet use
-the Postgres index we haven't fully fixed this yet and instead drop the
-ORM events we can't fit into our queue.
-
-This also fixes `ensure_user` failing if the new `username` is already
-taken by another user.
-
-`Bugfix` | [OGC-1400](https://linear.app/onegovcloud/issue/OGC-1400) | [1caed2b34e](https://github.com/onegov/onegov-cloud/commit/1caed2b34e7c5a12998ac631e48fec8344e137e6)
-
-##### Allows executing the `PostgresIndexer` mid-transaction
-
-Previously the indexer would've invalidated our transaction and vice
-versa causing the entire request to semi-silently fail with a 409.
-
-`Bugfix` | [OGC-1707](https://linear.app/onegovcloud/issue/OGC-1707) | [b6ea9a1148](https://github.com/onegov/onegov-cloud/commit/b6ea9a114819f7c6bd34966c34909d3e29faaaeb)
-
-### Swissvotes
-
-##### Removes uses of structure keyword in templates
-
-This also bans further uses of said keyword within Swissvotes
-
-`Bugfix` | [OGC-1709](https://linear.app/onegovcloud/issue/OGC-1709) | [2e5a5adc7b](https://github.com/onegov/onegov-cloud/commit/2e5a5adc7b10ecba25ab281b25a4685939e5900a)
 

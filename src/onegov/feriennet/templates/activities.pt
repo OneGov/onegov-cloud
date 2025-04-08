@@ -16,18 +16,12 @@
                             <div class="activity-list-item">
                                 <tal:b condition="index == 7">
                                     <div class="banner">
-                                        <tal:b
-                                            condition="main_sponsor"
-                                            replace="main_sponsor"
-                                        />
+                                        <tal:b condition="main_sponsor" metal:use-macro="layout.macros['banner']" define="position 'activities'; banner main_sponsor"/>
                                     </div>
                                 </tal:b>
                                 <tal:b condition="index == 14 and sponsors">
                                     <div class="banner" tal:define="sponsor random.choice(sponsors)">
-                                        <tal:b
-                                            condition="sponsor"
-                                            replace="sponsor"
-                                        />
+                                        <tal:b condition="sponsor" metal:use-macro="layout.macros['banner']" define="position 'activities'; banner sponsor"/>
                                     </div>
                                 </tal:b>
                                 <div class="row collapse">
