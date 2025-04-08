@@ -22,6 +22,7 @@ if TYPE_CHECKING:
     from datetime import datetime
     from sqlalchemy import Column
     from sqlalchemy.orm import relationship
+    from sqlalchemy.sql import ColumnElement
 
 
 class Page(AdjacencyList, ContentMixin, TimestampMixin,
