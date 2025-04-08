@@ -2,7 +2,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: \n"
-"POT-Creation-Date: 2025-04-08 07:30+0200\n"
+"POT-Creation-Date: 2025-04-08 13:27+0200\n"
 "PO-Revision-Date: 2022-03-15 10:52+0100\n"
 "Last-Translator: \n"
 "Language-Team: \n"
@@ -135,6 +135,9 @@ msgstr "Panoramica della prenotazione di ${org}"
 
 msgid "Your Chat has been turned into a ticket"
 msgstr "È stato creato un ticket dalla loro chat"
+
+msgid "New ticket"
+msgstr "Nuovo biglietto"
 
 msgid "Account"
 msgstr "Conto"
@@ -1275,8 +1278,8 @@ msgstr "Funzione"
 msgid "Organisation"
 msgstr "Organizzazione"
 
-msgid "Sub organisation"
-msgstr "Sotto organizzazione"
+msgid "Select the organisations this person belongs to"
+msgstr "Seleziona le organizzazioni a cui appartiene questa persona"
 
 msgid "Direct Phone Number or Mobile"
 msgstr "Numero di telefono diretto o cellulare"
@@ -1767,15 +1770,6 @@ msgstr "Percorso"
 msgid "Please enter a path without schema or host"
 msgstr "Inserisci un percorso senza schema o host"
 
-msgid "Hide these fields for non-logged-in users"
-msgstr "Nascondi questi campi per gli utenti non registrati"
-
-msgid "People"
-msgstr "Persone"
-
-msgid "External ID"
-msgstr "ID esterno"
-
 msgid "Duration of mTAN session"
 msgstr "Durata della sessione mTAN"
 
@@ -1937,8 +1931,19 @@ msgstr "Inserisci una coppia di date per riga"
 msgid "End date needs to be after start date"
 msgstr "La data di fine deve essere successiva alla data di inizio"
 
-msgid "Email address for notifications about newly opened tickets"
-msgstr "Indirizzo e-mail per le notifiche sui nuovi ticket aperti"
+msgid "Hide personal email addresses"
+msgstr "Nascondi gli indirizzi e-mail personali"
+
+msgid "Hide personal email addresses in the ticket system"
+msgstr "Nascondi gli indirizzi e-mail personali nel sistema di ticket"
+
+msgid "General email address"
+msgstr "Indirizzo e-mail generale"
+
+msgid "Email address that is displayed instead of the personal email address"
+msgstr ""
+"Indirizzo e-mail che viene visualizzato invece dell'indirizzo e-mail "
+"personale"
 
 msgid "Accept request and close ticket automatically based on:"
 msgstr "Accetta la richiesta e chiudi il ticket automaticamente in base a:"
@@ -1948,6 +1953,9 @@ msgstr "Categoria del biglietto"
 
 msgid "User role"
 msgstr "Ruolo utente"
+
+msgid "Auto-accept and auto-close"
+msgstr "Accettazione e chiusura automatica"
 
 msgid ""
 "Accept request and close ticket automatically for these ticket categories"
@@ -1970,6 +1978,9 @@ msgstr ""
 
 msgid "User used to auto-accept tickets"
 msgstr "Utente abituato ad accettare automaticamente i biglietti"
+
+msgid "Email address for notifications about newly opened tickets"
+msgstr "Indirizzo e-mail per le notifiche dei biglietti aperti"
 
 msgid "Block email confirmation when this ticket category is opened"
 msgstr ""
@@ -2211,6 +2222,59 @@ msgstr "Formato JSON non valido nelle credenziali Firebase"
 msgid "Error validating Firebase credentials: {0}"
 msgstr "Errore durante la convalida delle credenziali Firebase: {0}"
 
+msgid "Organisation hierarchy"
+msgstr "Gerarchia dell'organizzazione"
+
+msgid ""
+"Example for organisation hierarchy with subtopics in yaml format. Note: "
+"Deeper structures are not supported.\n"
+"```\n"
+"- Organisation:\n"
+"  - Sub-Organisation 1\n"
+"  - Sub-Organisation 2\n"
+"- Organisation 2:\n"
+"  - Sub-Organisation 1\n"
+"  - Sub-Organisation 2\n"
+"```"
+msgstr ""
+"Esempio di gerarchia dell'organizzazione con sottoargomenti in formato yaml. "
+"Nota: le strutture più profonde non sono supportate.\n"
+"```\n"
+"- Organizzazione:\n"
+"  - Sotto-organizzazione 1\n"
+"  - Sotto-organizzazione 2\n"
+"- Organizzazione 2:\n"
+"  - Sotto-organizzazione 1\n"
+"  - Sotto-organizzazione 2\n"
+"```"
+
+msgid "Hide these fields for non-logged-in users"
+msgstr "Nascondi questi campi per gli utenti non registrati"
+
+msgid "External ID"
+msgstr "ID esterno"
+
+msgid ""
+"Invalid format. Please define a list with organisations and sub-"
+"organisations according the example."
+msgstr ""
+"Formato non valido. Definire un elenco con organizzazioni e sotto-"
+"organizzazioni secondo l'esempio."
+
+msgid ""
+"Invalid format. Please define organisations and sub-organisations according "
+"to the example."
+msgstr ""
+"Formato non valido. Definire organizzazioni e sotto-organizzazioni secondo "
+"l'esempio."
+
+msgid ""
+"Invalid format. Only organisations and sub-organisations are allowed - no "
+"deeper structures supported."
+msgstr ""
+"Formato non valido. Sono consentite solo organizzazioni e sotto-"
+"organizzazioni, non sono supportate strutture più profonde."
+
 msgid "VAT Rate"
 msgstr "Aliquota IVA"
 
@@ -2354,16 +2418,9 @@ msgstr "Permessi sul biglietto"
 msgid "Restricts access and gives permission to these ticket categories"
 msgstr "Limita l'accesso e autorizza queste categorie di biglietti"
 
-msgid "Directories"
-msgstr "Cartelle"
-
-msgid ""
-"Directories for which this user group is responsible. If activated, ticket "
-"notifications for this group are only sent for these directories"
+msgid "Immediate e-mail notification to members upon ticket submission"
 msgstr ""
-"Directory per le quali questo gruppo di utenti è responsabile. Se attivata, "
-"le notifiche di ticket le notifiche per questo Gruppo vengono inviate solo "
-"per queste directory"
+"Notifica immediata via e-mail ai membri al momento dell'invio del ticket"
 
 msgid "Send a periodic status e-mail."
 msgstr "Invia un'e-mail di stato periodica."
@@ -2415,6 +2472,9 @@ msgstr "Collegare file aggiuntivi"
 
 msgid "All directories"
 msgstr "Tutte le cartelle"
+
+msgid "Directories"
+msgstr "Cartelle"
 
 msgid "All events"
 msgstr "Tutti gli eventi"
@@ -2554,6 +2614,9 @@ msgstr "Finestre di invio"
 
 msgid "Survey"
 msgstr "Sondaggio"
+
+msgid "People"
+msgstr "Persone"
 
 msgid "Person"
 msgstr "Persona"
@@ -3198,8 +3261,8 @@ msgstr "Il rifiuto di ${title} non può essere annullato."
 msgid "Reject reservation"
 msgstr "Rifiuta prenotazione"
 
-#. Used in sentence: "${event} published."
 #.
+#. Used in sentence: "${event} published."
 msgid "Event"
 msgstr "Evento"
 
@@ -4662,17 +4725,17 @@ msgstr ""
 msgid "Request Reference"
 msgstr "Riferimento della richiesta"
 
-msgid "No people added yet."
-msgstr "Nessuna persona aggiunta ancora."
-
-msgid "No people found for current filter selection."
-msgstr "Non sono state trovate persone per la selezione del filtro corrente."
-
 msgid "Select organisation"
 msgstr "Selezionare l'organizzazione"
 
 msgid "Select sub organisation"
 msgstr "Selezionare la sotto-organizzazione"
+
+msgid "No people found for current filter selection."
+msgstr "Non sono state trovate persone per la selezione del filtro corrente."
+
+msgid "Reset filter"
+msgstr "Ripristina filtro"
 
 msgid "Export a vCard of this person"
 msgstr "Esporta una vCard di questa persona"
@@ -5550,9 +5613,6 @@ msgstr "Aggiungi evento"
 
 msgid "Your request has been registered"
 msgstr "La tua richiesta è stata registrata"
-
-msgid "New ticket"
-msgstr "Nuovo biglietto"
 
 msgid "Your request could not be accepted automatically!"
 msgstr "La tua richiesta non può essere accettata automaticamente!"
@@ -6599,20 +6659,3 @@ msgstr "È stato creato un account per te"
 
 msgid "The user was created successfully"
 msgstr "Utente creato correttamente"
-
-#~ msgid "Email adress for notifications about newly opened tickets"
-#~ msgstr "Indirizzo e-mail per le notifiche dei biglietti aperti"
-
-#~ msgid ""
-#~ "Invalid format. Please define a listwith topics and subtopics according "
-#~ "the example."
-#~ msgstr ""
-#~ "Formato non valido. Definire una lista con argomenti e sottoargomenti "
-#~ "secondo l'esempio."
-
-#~ msgid ""
-#~ "Invalid format. Please define an organisation name with topics and "
-#~ "subtopics according the example."
-#~ msgstr ""
-#~ "Formato non valido. Definire un nome di organizzazione con argomenti e "
-#~ "sottoargomenti secondo l'esempio."

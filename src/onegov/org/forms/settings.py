@@ -706,30 +706,6 @@ class HomepageSettingsForm(Form):
 
 class ModuleSettingsForm(Form):
 
-    hidden_people_fields = MultiCheckboxField(
-        label=_('Hide these fields for non-logged-in users'),
-        fieldset=_('People'),
-        choices=[
-            ('salutation', _('Salutation')),
-            ('academic_title', _('Academic Title')),
-            ('born', _('Born')),
-            ('profession', _('Profession')),
-            ('political_party', _('Political Party')),
-            ('parliamentary_group', _('Parliamentary Group')),
-            ('email', _('E-Mail')),
-            ('phone', _('Phone')),
-            ('phone_direct', _('Direct Phone Number or Mobile')),
-            ('organisation', _('Organisation')),
-            ('website', _('Website')),
-            ('website_2', _('Website 2')),
-            ('location_address', _('Location address')),
-            ('location_code_city', _('Location Code and City')),
-            ('postal_address', _('Postal address')),
-            ('postal_code_city', _('Postal Code and City')),
-            ('notes', _('Notes')),
-            ('external_user_id', _('External ID'))
-        ])
-
     mtan_session_duration_seconds = IntegerField(
         label=_('Duration of mTAN session'),
         description=_('Specify in number of seconds'),
@@ -1002,10 +978,19 @@ class HolidaySettingsForm(Form):
 
 class OrgTicketSettingsForm(Form):
 
-    email_for_new_tickets = StringField(
-        label=_('Email address for notifications '
-                'about newly opened tickets'),
-        description=('info@example.ch')
+    hide_personal_email = BooleanField(
+        label=_('Hide personal email addresses'),
+        description=_('Hide personal email addresses in the ticket system'),
+        fieldset=_('General')
+    )
+
+    general_email = EmailField(
+        label=_('General email address'),
+        description=_('Email address that is displayed instead of the '
+                      'personal email address'),
+        depends_on=('hide_personal_email', 'y'),
+        validators=[InputRequired()],
+        fieldset=_('General')
     )
 
     ticket_auto_accept_style = RadioField(
@@ -1014,6 +999,7 @@ class OrgTicketSettingsForm(Form):
             ('category', _('Ticket category')),
             ('role', _('User role')),
         ),
+        fieldset=_('Auto-accept and auto-close'),
         default='category'
     )
 
@@ -1024,6 +1010,7 @@ class OrgTicketSettingsForm(Form):
                       "in state pending. Also note, that after the ticket is "
                       "closed, the submitter can't send any messages."),
         choices=[],
+        fieldset=_('Auto-accept and auto-close'),
         depends_on=('ticket_auto_accept_style', 'category')
     )
 
@@ -1034,12 +1021,21 @@ class OrgTicketSettingsForm(Form):
                       "in state pending. Also note, that after the ticket is "
                       "closed, the submitter can't send any messages."),
         choices=AVAILABLE_ROLES,
+        fieldset=_('Auto-accept and auto-close'),
         depends_on=('ticket_auto_accept_style', 'role')
     )
 
     auto_closing_user = ChosenSelectField(
         label=_('User used to auto-accept tickets'),
-        choices=[]
+        choices=[],
+        fieldset=_('Auto-accept and auto-close'),
+    )
+
+    email_for_new_tickets = StringField(
+        label=_('Email address for notifications '
+                'about newly opened tickets'),
+        fieldset=_('Notifications'),
+        description=('info@example.ch')
     )
 
     tickets_skip_opening_email = MultiCheckboxField(
@@ -1047,7 +1043,8 @@ class OrgTicketSettingsForm(Form):
                 'this ticket category is opened'),
         choices=[],
         description=_('This is enabled by default for tickets that get '
-                      'accepted automatically')
+                      'accepted automatically'),
+        fieldset=_('Notifications'),
     )
 
     tickets_skip_closing_email = MultiCheckboxField(
@@ -1055,17 +1052,21 @@ class OrgTicketSettingsForm(Form):
                 'this ticket category is closed'),
         choices=[],
         description=_('This is enabled by default for tickets that get '
-                      'accepted automatically')
+                      'accepted automatically'),
+        fieldset=_('Notifications'),
     )
 
     mute_all_tickets = BooleanField(
-        label=_('Mute all tickets')
+        label=_('Mute all tickets'),
+        fieldset=_('Notifications'),
+
     )
 
     ticket_always_notify = BooleanField(
         label=_('Always send email notification '
                 'if a new ticket message is sent'),
-        default=True
+        default=True,
+        fieldset=_('Notifications'),
     )
 
     permissions = MultiCheckboxField(
@@ -1120,7 +1121,11 @@ class OrgTicketSettingsForm(Form):
                 p.id.hex,
                 ': '.join(x for x in (p.handler_code, p.group) if x)
             )
-            for p in self.request.session.query(TicketPermission)
+            for p in self.request.session.query(
+                TicketPermission.id,
+                TicketPermission.handler_code,
+                TicketPermission.group
+            ).filter(TicketPermission.exclusive.is_(True))
         ), key=lambda x: x[1])
 
         if not permissions:
@@ -1670,6 +1675,121 @@ class FirebaseSettingsForm(Form):
                 ],
             }
         )
+
+
+class PeopleSettingsForm(Form):
+
+    organisation_hierarchy = TextAreaField(
+        label=_('Organisation hierarchy'),
+        description=_(
+            'Example for organisation hierarchy with subtopics in yaml '
+            'format. Note: Deeper structures are not supported.'
+            '\n'
+            '```\n'
+            '- Organisation:\n'
+            '  - Sub-Organisation 1\n'
+            '  - Sub-Organisation 2\n'
+            '- Organisation 2:\n'
+            '  - Sub-Organisation 1\n'
+            '  - Sub-Organisation 2\n'
+            '```'
+        ),
+        render_kw={
+            'rows': 16,
+        },
+    )
+
+    hidden_people_fields = MultiCheckboxField(
+        label=_('Hide these fields for non-logged-in users'),
+        choices=[
+            ('salutation', _('Salutation')),
+            ('academic_title', _('Academic Title')),
+            ('born', _('Born')),
+            ('profession', _('Profession')),
+            ('political_party', _('Political Party')),
+            ('parliamentary_group', _('Parliamentary Group')),
+            ('email', _('E-Mail')),
+            ('phone', _('Phone')),
+            ('phone_direct', _('Direct Phone Number or Mobile')),
+            ('organisation', _('Organisation')),
+            ('website', _('Website')),
+            ('website_2', _('Website 2')),
+            ('location_address', _('Location address')),
+            ('location_code_city', _('Location Code and City')),
+            ('postal_address', _('Postal address')),
+            ('postal_code_city', _('Postal Code and City')),
+            ('notes', _('Notes')),
+            ('external_user_id', _('External ID'))
+        ])
+
+    def ensure_categories(self) -> bool | None:
+        assert isinstance(self.organisation_hierarchy.errors, list)
+
+        if self.organisation_hierarchy.data:
+            try:
+                data = yaml.safe_load(self.organisation_hierarchy.data)
+            except yaml.YAMLError:
+                self.organisation_hierarchy.errors.append(
+                    _('Invalid YAML format. Please refer to the example.')
+                )
+                return False
+
+            if data:
+                if not isinstance(data, list):
+                    self.organisation_hierarchy.errors.append(
+                        _('Invalid format. Please define a list with '
+                          'organisations and sub-organisations according the '
+                          'example.')
+                    )
+                    return False
+                for item in data:
+                    if not isinstance(item, (str, dict)):
+                        self.organisation_hierarchy.errors.append(
+                            _('Invalid format. Please define organisations '
+                              'and sub-organisations according to the '
+                              'example.')
+                        )
+                        return False
+
+                    if isinstance(item, str):
+                        continue
+
+                    for topic, sub_topic in item.items():
+                        if not isinstance(sub_topic, list):
+                            self.organisation_hierarchy.errors.append(
+                                _(f'Invalid format. Please define '
+                                  f"sub-organisations(s) for '{topic}' "
+                                  f"or remove the ':'.")
+                            )
+                            return False
+
+                        if not all(isinstance(sub, str) for sub in sub_topic):
+                            self.organisation_hierarchy.errors.append(
+                                _('Invalid format. Only organisations '
+                                  'and sub-organisations are allowed - no '
+                                  'deeper structures supported.')
+                            )
+                            return False
+
+        return None
+
+    def populate_obj(self, model: Organisation) -> None:  # type:ignore
+        super().populate_obj(model)
+
+        yaml_data = self.organisation_hierarchy.data
+        data = yaml.safe_load(yaml_data) if yaml_data else []
+        model.organisation_hierarchy = data
+
+    def process_obj(self, model: Organisation) -> None:  # type:ignore
+        super().process_obj(model)
+
+        categories = model.organisation_hierarchy or []
+        if not categories:
+            self.organisation_hierarchy.data = ''
+            return
+
+        yaml_data = yaml.safe_dump(categories, default_flow_style=False)
+        self.organisation_hierarchy.data = yaml_data
 
 
 class VATSettingsForm(Form):

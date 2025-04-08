@@ -94,6 +94,7 @@ wurden berücksichtigt, sofern eine Email vorlag.
 """
 from __future__ import annotations
 
+import click
 import dateutil.parser
 from collections import OrderedDict, defaultdict
 from datetime import datetime
@@ -250,7 +251,7 @@ def import_teacher_data(
 
         matched_teacher = session.query(User).filter_by(username=email).first()
         if not matched_teacher:
-            print(f'{email} not found')
+            click.echo(f'{email} not found')
             continue
 
         assert hasattr(matched_teacher, 'attendee')
@@ -260,8 +261,8 @@ def import_teacher_data(
 
         if matched_event:
             if not confirmed:
-                print(f'{email} for {course_date!s} not confirmed')
-            # print(f'Found {email} in database and event that day')
+                click.echo(f'{email} for {course_date!s} not confirmed')
+            # click.echo(f'Found {email} in database and event that day')
             matched_count += 1
             if not clean:
                 subscriptions.add(
@@ -279,10 +280,10 @@ def import_teacher_data(
                     deleted_count += 1
                     session.delete(subs)
 
-    print(f'Total lines: {total_lines}')
-    print(f'Matched emails/events: {matched_count}')
+    click.echo(f'Total lines: {total_lines}')
+    click.echo(f'Matched emails/events: {matched_count}')
     if clean:
-        print(f'Deleted {deleted_count} subscriptions')
+        click.echo(f'Deleted {deleted_count} subscriptions')
 
 
 def parse_completed(val: str | None) -> bool:
@@ -293,7 +294,7 @@ def parse_completed(val: str | None) -> bool:
 def parse_persons(csvfile: CSVFile[DefaultRow]) -> dict[str, PersonDict]:
     """Pure extracting information"""
     persons: dict[str, PersonDict] = OrderedDict()
-    print('-- parse_persons --')
+    click.echo('-- parse_persons --')
     for line in csvfile.lines:
 
         obj_id = line.obj_id
@@ -316,7 +317,7 @@ def parse_courses(
 ) -> tuple[dict[int, str], dict[str, Course]]:
     errors = OrderedDict()
     courses = OrderedDict()
-    print('-- parse_courses --')
+    click.echo('-- parse_courses --')
 
     for line in csvfile.lines:
         try:
@@ -339,20 +340,24 @@ def parse_events(
 ) -> tuple[dict[int, str], dict[str, CourseEvent]]:
     events = OrderedDict()
     errors = OrderedDict()
-    print('-- parse_events --')
+    click.echo('-- parse_events --')
     for line in csvfile.lines:
 
         # Block accepts empty end values, but fails if the start is not set
         parent_course = courses[line.proc_id_kv]
         if not parent_course:
-            print(f'Skipping {line.rownumber}: parent id {line.proc_id_kv} '
-                  f'not found in Personen.txt')
+            click.echo(
+                f'Skipping {line.rownumber}: parent id {line.proc_id_kv} '
+                f'not found in Personen.txt'
+            )
             continue
 
         date_lacking = not line.kurs_von or not line.kurs_bis
         if line.buchungsstatus == 'Keine Buchung' and date_lacking:
-            print(f'Skipping line {line.rownumber}: '
-                  f'status: Buchungsstatus = Keine Buchung and lacking date')
+            click.echo(
+                f'Skipping line {line.rownumber}: '
+                f'status: Buchungsstatus = Keine Buchung and lacking date'
+            )
             continue
 
         try:
@@ -360,13 +365,13 @@ def parse_events(
             assert start is not None
         except Exception as e:
             errors[line.rownumber] = e.args[0]
-            print(f'Skipping {line.rownumber}: {e.args[0]}')
+            click.echo(f'Skipping {line.rownumber}: {e.args[0]}')
             continue
         try:
             # Setting end to start in case end is empty
             end = parse_date(line.kurs_bis, default=start)
         except TypeError:
-            print(f'{line.rownumber}: invalid date, setting end = start')
+            click.echo(f'{line.rownumber}: invalid date, setting end = start')
             end = start
 
         default_name = 'Unbekannter Referent'
@@ -403,7 +408,7 @@ def parse_subscriptions(
     :param events: dict of CourseEvent classes
     :return: subscriptions within persons and within maybe_external_in_ldap
     """
-    print('-- parse_subscriptions --')
+    click.echo('-- parse_subscriptions --')
 
     # The selection of valid subscriptions/subscriptions
     errors: dict[int, str] = OrderedDict()
@@ -418,7 +423,9 @@ def parse_subscriptions(
         completed = parse_completed(line.anwesend)
 
         if not course_event:
-            print(f'Skipping {line.rownumber}: drop since no course event')
+            click.echo(
+                f'Skipping {line.rownumber}: drop since no course event'
+            )
             continue
 
         email = parse_email(line.teilnehmer_email)
@@ -428,7 +435,7 @@ def parse_subscriptions(
             person_obj = persons.get(line.teilnehmer_id)
 
             if not person_obj:
-                print(f'Skipping {line.rownumber}: orphaned subscription')
+                click.echo(f'Skipping {line.rownumber}: orphaned subscription')
                 # skip orphaned subscriptions
                 continue
 
@@ -442,8 +449,10 @@ def parse_subscriptions(
 
             # skip subscriptions for persons without email and code
             if not current_email and not code:
-                print(f'Skipping {line.rownumber}: '
-                      f'person obj without email and code')
+                click.echo(
+                    f'Skipping {line.rownumber}: '
+                    f'person obj without email and code'
+                )
                 continue
 
             subscriptions = person_obj.setdefault(
@@ -473,8 +482,10 @@ def parse_subscriptions(
                 emails_by_teilnehmer_id[teilnehmer_id].append(email)
 
         elif line.teilnehmer_firma == 'Intern':
-            print(f'Skipping {line.rownumber}: '
-                  f'Firma intern but no link to Persons')
+            click.echo(
+                f'Skipping {line.rownumber}: '
+                f'Firma intern but no link to Persons'
+            )
             continue
         else:
             # no teilnehmer_id so is external from a school or elsewhere
@@ -482,9 +493,11 @@ def parse_subscriptions(
             last_name = line.teilnehmer_nachname
 
             if not (email and first_name and last_name):
-                print(f'Skipping {line.rownumber}: '
-                      'Subscription misses one of '
-                      'email, firstname or lastname')
+                click.echo(
+                    f'Skipping {line.rownumber}: '
+                    'Subscription misses one of '
+                    'email, firstname or lastname'
+                )
                 continue
 
             external = maybe_external_in_ldap.setdefault(email, {
@@ -536,7 +549,7 @@ def map_persons_to_known_ldap_user(
                     'Personen.txt',
                 )
             return user.attendee
-        print(f'LDAP CODE: {code} not found, Email {email} not searched')
+        click.echo(f'LDAP CODE: {code} not found, Email {email} not searched')
     elif email:
         user = session.query(User).filter_by(username=email).first()
         if user:
@@ -547,11 +560,11 @@ def map_persons_to_known_ldap_user(
                     'Personen.txt',
                 )
             return user.attendee
-        print(f'LDAP EMAIL: {email} not found')
+        click.echo(f'LDAP EMAIL: {email} not found')
 
     else:
         identifier = person_record.get('obj_id') or email
-        print(f'No identifier for user with OBJ_ID {identifier}')
+        click.echo(f'No identifier for user with OBJ_ID {identifier}')
     return None
 
 
@@ -600,7 +613,7 @@ def import_ims_data(
     possible_ldap_users: dict[str, UserDict]
 ) -> dict[str, int]:
 
-    print('-- Import IMS DATA to database with LDAP --')
+    click.echo('-- Import IMS DATA to database with LDAP --')
 
     statistics = {
         'LDAP_found': 0,

@@ -7,25 +7,27 @@ from __future__ import annotations
 from itertools import chain
 
 import pytz
+import yaml
 
 from onegov.core.crypto import random_token
 from onegov.core.orm import Base, find_models
-from onegov.core.orm.types import JSON, UTCDateTime
+from onegov.core.orm.types import JSON, UTCDateTime, UUID
 from onegov.core.upgrade import upgrade_task, UpgradeContext
 from onegov.core.utils import normalize_for_url
 from onegov.directory import DirectoryEntry
 from onegov.directory.models.directory import DirectoryFile
 from onegov.file import File
 from onegov.form import FormDefinition
-from onegov.org.models import Organisation, Topic, News, ExtendedDirectory,\
-    PushNotification
+from onegov.org.models import (
+    Organisation, Topic, News, ExtendedDirectory, PushNotification)
 from onegov.org.utils import annotate_html
 from onegov.page import Page, PageCollection
+from onegov.people import Person
 from onegov.reservation import Resource
-from onegov.user import User
+from onegov.ticket import TicketPermission
+from onegov.user import User, UserGroup
 from sqlalchemy import Column, ForeignKey
-from onegov.core.orm.types import UUID
-from sqlalchemy.orm import undefer
+from sqlalchemy.orm import undefer, selectinload
 
 
 from typing import Any, TYPE_CHECKING
@@ -448,3 +450,73 @@ def convert_sent_at_to_utc_datetime(context: UpgradeContext) -> None:
     context.operations.alter_column(
         'push_notification', 'sent_at', type_=UTCDateTime
     )
+
+
+@upgrade_task('Create hierarchy and move organisations to content')
+def create_hierarchy_and_move_organisations_to_content(
+    context: UpgradeContext
+) -> None:
+    session = context.app.session()
+    people = session.query(Person).all()
+    hierarchy: dict[str, set[str]] = {}
+    for person in people:
+        if person.organisation:
+            # Create hierarchy from existing organisation and
+            # sub_organisation of people
+            hierarchy.setdefault(person.organisation, set())
+            if person.sub_organisation:
+                hierarchy[person.organisation].add(person.sub_organisation)
+
+            # Move organisation and sub_organisation to content
+            person.content['organisations_multiple'] = [
+                    person.organisation,
+                    f'-{person.sub_organisation}'
+                ] if person.sub_organisation else [person.organisation]
+
+    hierarchy_yaml = ''
+    for org, sub_orgs in hierarchy.items():
+        hierarchy_yaml += f'- {org}:\n'
+        for sub_org in sub_orgs:
+            hierarchy_yaml += f'  - {sub_org}\n'
+    if hierarchy_yaml:
+        data = yaml.safe_load(hierarchy_yaml)
+        organisation = session.query(Organisation).first()
+        if organisation:
+            organisation.organisation_hierarchy = data
+
+    session.flush()
+
+
+@upgrade_task('Convert directories setting on UserGroup to ticket permissions')
+def convert_directories_to_ticket_permissions(context: UpgradeContext) -> None:
+    if not hasattr(UserGroup, 'ticket_permissions'):
+        return
+
+    permission: TicketPermission
+    for user_group in context.session.query(UserGroup).filter(
+        UserGroup.meta['directories'].isnot(None)
+    ).options(selectinload(UserGroup.ticket_permissions)):
+        directories = set(user_group.meta['directories'])
+        assert hasattr(user_group, 'ticket_permissions')
+        for permission in user_group.ticket_permissions:
+            if permission.handler_code != 'DIR':
+                continue
+
+            if permission.group is None:
+                continue
+
+            if permission.group in directories:
+                directories.discard(permission.group)
+                permission.immediate_notification = True
+
+        for group in directories:
+            permission = TicketPermission(
+                handler_code='DIR',
+                group=group,
+                user_group=user_group,
+                exclusive=False,
+                immediate_notification=True,
+            )
+            context.session.add(permission)
+
+        del user_group.meta['directories']

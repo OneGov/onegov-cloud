@@ -1,5 +1,5 @@
 from __future__ import annotations
-import traceback
+from inspect import isabstract
 from collections import OrderedDict
 
 from markupsafe import Markup
@@ -9,11 +9,12 @@ import logging
 from babel.dates import get_month_names
 from datetime import datetime, timedelta
 from functools import lru_cache
-from itertools import groupby
+from itertools import groupby, chain
 
 from onegov.chat.collections import ChatCollection
 from onegov.chat.models import Chat
 from onegov.core.orm import find_models, Base
+from onegov.core.orm.abstract import AdjacencyList
 from onegov.core.orm.mixins.publication import UTCPublicationMixin
 from onegov.core.templates import render_template
 from onegov.directory.collections.directory import EntryRecipientCollection
@@ -21,11 +22,11 @@ from onegov.event import Occurrence, Event
 from onegov.file import FileCollection
 from onegov.form import FormSubmission, parse_form, Form
 from onegov.newsletter.models import Recipient
-from onegov.org.mail import send_ticket_mail
 from onegov.newsletter import (Newsletter, NewsletterCollection,
                                RecipientCollection)
 from onegov.org import _, OrgApp
 from onegov.org.layout import DefaultMailLayout
+from onegov.org.mail import send_ticket_mail
 from onegov.org.models import (
     ResourceRecipient,
     ResourceRecipientCollection,
@@ -38,7 +39,11 @@ from onegov.org.models.extensions import (
 from onegov.org.models.ticket import ReservationHandler
 from onegov.gever.encrypt import decrypt_symmetric
 from cryptography.fernet import InvalidToken
-from sqlalchemy.exc import IntegrityError
+from onegov.org.models import TicketMessage, ExtendedDirectoryEntry
+from onegov.org.notification_service import (
+    get_notification_service,
+)
+from onegov.org.utils import emails_for_new_ticket
 from onegov.org.views.allocation import handle_rules_cronjob
 from onegov.org.views.directory import (
     send_email_notification_for_directory_entry)
@@ -47,16 +52,14 @@ from onegov.org.views.ticket import delete_tickets_and_related_data
 from onegov.reservation import Reservation, Resource, ResourceCollection
 from onegov.search import Searchable
 from onegov.ticket import Ticket, TicketCollection
-from onegov.org.models import TicketMessage, ExtendedDirectoryEntry
 from onegov.user import User, UserCollection
 from onegov.user.models import TAN
 from sedate import to_timezone, utcnow, align_date_to_day
-from sqlalchemy import and_, or_, func
+from sqlalchemy import and_, or_, func, text
+from sqlalchemy.exc import IntegrityError
+from sqlalchemy.inspection import inspect
 from sqlalchemy.orm import undefer
 from uuid import UUID
-from onegov.org.notification_service import (
-    get_notification_service,
-)
 
 
 from typing import Any, TYPE_CHECKING
@@ -664,6 +667,24 @@ def end_chats_and_create_tickets(request: OrgRequest) -> None:
                     'organisation': request.app.org.title,
                 }
             )
+            for email in emails_for_new_ticket(request, ticket):
+                send_ticket_mail(
+                    request=request,
+                    template='mail_ticket_opened_info.pt',
+                    subject=_('New ticket'),
+                    ticket=ticket,
+                    receivers=(email, ),
+                    content={'model': ticket},
+                )
+
+            request.app.send_websocket(
+                channel=request.app.websockets_private_channel,
+                message={
+                    'event': 'browser-notification',
+                    'title': request.translate(_('New ticket')),
+                    'created': ticket.created.isoformat()
+                }
+            )
 
 
 @OrgApp.cronjob(hour=4, minute=30, timezone='Europe/Zurich')
@@ -804,7 +825,7 @@ def delete_content_marked_deletable(request: OrgRequest) -> None:
                 count += 1
 
     if count:
-        print(f'Cron: Deleted {count} expired deletable objects in db')
+        log.info(f'Cron: Deleted {count} expired deletable objects in db')
 
 
 @OrgApp.cronjob(hour=7, minute=0, timezone='Europe/Zurich')
@@ -867,7 +888,7 @@ def update_newsletter_email_bounce_statistics(
             recipient = recipients.by_address(email)
 
             if recipient and inactive:
-                print(f'Mark recipient {recipient.address} as inactive')
+                log.info(f'Mark recipient {recipient.address} as inactive')
                 recipient.mark_inactive()
 
 
@@ -887,7 +908,7 @@ def delete_unconfirmed_newsletter_subscriptions(request: OrgRequest) -> None:
         count += 1
 
     if count:
-        print(f'Cron: Deleted {count} unconfirmed newsletter subscriptions')
+        log.info(f'Cron: Deleted {count} unconfirmed newsletter subscriptions')
 
 
 def get_news_for_push_notification(session: Session) -> Query[News]:
@@ -970,10 +991,10 @@ def send_push_notifications_for_news(request: OrgRequest) -> None:
             # Get the topics to send to
             topics = news.meta.get('push_notifications', [])
             if not topics:
-                print(f'No topics configured for news item: {news.title}')
+                log.info(f'No topics configured for news item: {news.title}')
                 continue
 
-            print(
+            log.info(
                 f'Processing notification for news: {news.title} to '
                 f'{len(topics)} topics'
             )
@@ -986,7 +1007,7 @@ def send_push_notifications_for_news(request: OrgRequest) -> None:
                 if PushNotification.was_notification_sent(
                     session, news.id, topic_id
                 ):
-                    print(
+                    log.info(
                         f"Skipping duplicate notification to topic "
                         f"'{topic_id}' for news '{news.title}'."
                     )
@@ -1046,23 +1067,115 @@ def send_push_notifications_for_news(request: OrgRequest) -> None:
                         f"'{topic_id}' for news '{news.title}'. "
                     )
 
-                except Exception as e:
+                except Exception:
                     # For other exceptions (like notification service failures)
-                    error_details = str(e)
-                    log.error(
+                    log.exception(
                         f"Error sending notification to topic '{topic_id}' "
-                        f"for news '{news.title}': {error_details}"
+                        f"for news '{news.title}':"
                     )
 
         if sent_count:
-            print(f'Cron: Sent {sent_count} push notifications for news items')
+            log.info(
+                f'Cron: Sent {sent_count} push notifications for news items'
+            )
         if duplicate_count:
-            print(f'Cron: Skipped {duplicate_count} duplicate notifications')
+            log.info(
+                f'Cron: Skipped {duplicate_count} duplicate notifications'
+            )
         if not sent_count and not duplicate_count:
-            print('No notifications were sent')
+            log.info('No notifications were sent')
 
-    except Exception as e:
+    except Exception:
         # Rollback in case of error
         session.rollback()
-        print(traceback.format_exc())
-        print(f'Error sending notifications: {e}')
+        log.info('Error sending notifications:', exc_info=True)
+
+
+@OrgApp.cronjob(hour=3, minute=0, timezone='Europe/Zurich')
+def normalize_adjacency_list_order(request: OrgRequest) -> None:
+    """Normalizes the 'order' column for all AdjacencyList subclasses.
+
+    The midpoint insertion strategy for 'order' (Decimal) can lead to
+    precision issues or very close values over time. This cronjob
+    renumbers the 'order' for each group of siblings (same parent_id)
+    sequentially starting from 1, effectively resetting the order values
+    while preserving the relative order within each sibling group.
+    """
+    session = request.session
+    processed_tables = set()
+
+    def is_concrete_subclass(cls: type) -> bool:
+        """Check if a class is a non-abstract subclass of AdjacencyList."""
+        return (
+            issubclass(cls, AdjacencyList)
+            and cls is not AdjacencyList
+            and not isabstract(cls)
+        )
+
+    # Find all relevant model classes
+    adjacency_subclasses = set(
+        chain.from_iterable(
+            find_models(base, is_concrete_subclass)
+            for base in request.app.session_manager.bases
+        )
+    )
+
+    log.info(f'Found {len(adjacency_subclasses)} '
+        'potential AdjacencyList models.')
+
+    for model in adjacency_subclasses:
+        mapper = inspect(model)
+        table = mapper.local_table  # Get the mapped table
+
+        # Basic sanity checks for the model's mapping
+        if (table is None or not mapper.primary_key or
+            len(mapper.primary_key) != 1):
+            continue
+
+        table_name = table.name
+
+        # Check if already processed or missing required columns
+        if table_name in processed_tables:
+            continue
+        if 'order' not in table.columns or 'parent_id' not in table.columns:
+            log.warning(
+                f"Skipping table '{table_name}': Missing 'order' or "
+                f"'parent_id' column."
+            )
+            continue
+
+        # Use ROW_NUMBER() partitioned by parent_id to generate new order
+        # values starting from 1 for siblings under the same parent.
+        # Rows with NULL parent_id (root nodes) are ignored
+        update_sql = text(
+            f"""
+            WITH numbered_siblings AS (
+                SELECT
+                    "id",
+                    ROW_NUMBER() OVER (
+                        PARTITION BY "parent_id"
+                        ORDER BY "order" ASC NULLS LAST
+                    ) AS new_order
+                FROM
+                    "{table_name}"
+                WHERE
+                    "parent_id" IS NOT NULL
+            )
+            UPDATE "{table_name}"
+            SET "order" = numbered_siblings.new_order
+            FROM numbered_siblings
+            WHERE "{table_name}"."id" =
+                numbered_siblings."id";
+            COMMIT;
+        """)  # nosec: B608
+
+        try:
+            session.execute(update_sql)
+            processed_tables.add(table_name)
+            log.info(f"Successfully normalized 'order' in '{table_name}'.")
+        except Exception:
+            log.exception(f"Error normalizing 'order' in '{table_name}'")
+            try:
+                session.rollback()
+            except Exception:
+                log.exception(f"Error during rollback for '{table_name}'")

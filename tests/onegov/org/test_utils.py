@@ -1,12 +1,11 @@
 from datetime import date, datetime
 
 
-from onegov.core.utils import Bunch
+from onegov.core.utils import Bunch, generate_fts_phonenumbers
 from onegov.org import utils
 from pytz import timezone
-from onegov.org.utils import (
-    ticket_directory_groups, user_group_emails_for_new_ticket)
-from onegov.ticket import Ticket
+from onegov.org.utils import emails_for_new_ticket
+from onegov.ticket import Ticket, TicketPermission
 from onegov.user import UserGroup, User
 
 
@@ -181,38 +180,26 @@ def test_predict_next_daterange_dst_st_transitions():
     )) == (dt_ch(2022, 3, 27, 10), dt_ch(2022, 3, 27, 12))
 
 
-def test_select_ticket_groups(session):
-
-    def create_ticket(handler_code, group=''):
-        result = Ticket(
-            number=f'{handler_code}-{group}-1',
-            title=f'{handler_code}-{group}',
-            group=group,
-            handler_code=handler_code,
-            handler_id=f'{handler_code}-{group}'
-        )
-        session.add(result)
-        return result
-
-    create_ticket('EVN')
-
-    dir_groups = ticket_directory_groups(session)
-    assert tuple(dir_groups) == ()
-
-    create_ticket('DIR', 'Steuererklärung')
-    create_ticket('DIR', 'Wohnsitzbestätigung')
-    session.flush()
-
-    dir_groups = ticket_directory_groups(session)
-    assert tuple(dir_groups) == ('Steuererklärung', 'Wohnsitzbestätigung')
-
-
-def test_user_group_emails_for_new_ticket(session):
-
+def test_emails_for_new_ticket(session):
     session.query(User).delete()
-    group_meta = dict(directories=['Sports', 'Music'])
 
-    group1 = UserGroup(name="somename", meta=group_meta)
+    group1 = UserGroup(name='somename')
+
+    permission1 = TicketPermission(
+        handler_code='DIR',
+        group='Sports',
+        user_group=group1,
+        exclusive=True,
+        immediate_notification=True,
+    )
+
+    permission2 = TicketPermission(
+        handler_code='FRM',
+        group='Music',
+        user_group=group1,
+        exclusive=False,
+        immediate_notification=True,
+    )
 
     user1 = User(
         username='user1@example.org',
@@ -224,43 +211,88 @@ def test_user_group_emails_for_new_ticket(session):
         password_hash='password_hash',
         role='editor'
     )
+    user_with_bogus_username = User(
+        username='admin',
+        password_hash='password_hash',
+        role='admin'
+    )
 
-    group1.users = [user1]  # user1 is in the group
+    group1.users = [user1, user_with_bogus_username]
 
     session.add(user1)
     session.add(user2)
+    session.add(permission1)
+    session.add(permission2)
     session.add(group1)
     session.flush()
 
-    request = Bunch(
-        session=session,
-    )
-    ticket1 = Ticket(handler_code="DIR", group="Sports")
+    request = Bunch(**{
+        'session': session,
+        'email_for_new_tickets': 'tickets@example.org',
+        'app.ticket_permissions': {
+            'DIR': {'Sports': [group1.id.hex]},
+        },
+    })
+    ticket1 = Ticket(handler_code='DIR', group='Sports')
 
-    result = user_group_emails_for_new_ticket(request, ticket1)
-    assert result == {"user1@example.org"}
+    result = {a.addr_spec for a in emails_for_new_ticket(request, ticket1)}
+    assert result == {'tickets@example.org', 'user1@example.org'}
 
-    session.query(User).delete()
-
-    group2 = UserGroup(name="foo", meta={})  # no directories
-    user1 = User(
-        username='user2@example.org',
+    group2 = UserGroup(name="foo")
+    user3 = User(
+        username='user3@example.org',
         password_hash='password_hash',
         role='editor'
     )
 
-    group2.users = [user1]
+    permission3 = TicketPermission(
+        handler_code='DIR',
+        group=None,
+        user_group=group2,
+        exclusive=False,
+        immediate_notification=True,
+    )
 
-    session.add(user1)
-    session.add(group1)
+    permission4 = TicketPermission(
+        handler_code='FRM',
+        group=None,
+        user_group=group2,
+        exclusive=False,
+        immediate_notification=True,
+    )
+
+    group2.users = [user3]
+
+    session.add(user3)
+    session.add(group2)
     session.flush()
 
-    request = Bunch(
-        session=session,
-    )
-    ticket1 = Ticket(handler_code="DIR")
-    result = user_group_emails_for_new_ticket(request, ticket1)
-    assert result == set()
+    request = Bunch(**{
+        'session': session,
+        'email_for_new_tickets': None,
+        'app.ticket_permissions': {
+            'DIR': {'Sports': [group1.id.hex]},
+        },
+    })
+    ticket2 = Ticket(handler_code='DIR', group='Sports')
+    result = {a.addr_spec for a in emails_for_new_ticket(request, ticket2)}
+    assert result == {'user1@example.org'}
+
+    ticket3 = Ticket(handler_code='FRM', group='Music')
+    result = {a.addr_spec for a in emails_for_new_ticket(request, ticket3)}
+    assert result == {'user1@example.org', 'user3@example.org'}
+
+    request = Bunch(**{
+        'session': session,
+        'email_for_new_tickets': 'user3@example.org',
+        'app.ticket_permissions': {
+            'DIR': {'Sports': [group1.id.hex]},
+        },
+    })
+    result = {a.addr_spec for a in emails_for_new_ticket(request, ticket2)}
+    assert result == {'user1@example.org', 'user3@example.org'}
+    result = {a.addr_spec for a in emails_for_new_ticket(request, ticket3)}
+    assert result == {'user1@example.org', 'user3@example.org'}
 
 
 def test_extract_categories_and_subcategories():
@@ -325,3 +357,23 @@ def test_format_phone_number():
     long_text = ('You can reach me during office hours at 041 111 22 33 '
                  'otherwise at 041 111 22 44')
     assert utils.format_phone_number(long_text) == long_text
+
+
+def test_generate_fts_phonenumbers():
+    assert [] == generate_fts_phonenumbers([])
+    assert [] == generate_fts_phonenumbers(())
+    assert [] == generate_fts_phonenumbers({})
+
+    numbers = ['+41 44 567 88 99']
+    expected = ['+41445678899', '0445678899', '5678899', '8899']
+    result = generate_fts_phonenumbers(numbers)
+    assert result == expected
+
+    numbers = ['+41 44 567 88 99', '+41 41 445 31 11']
+    expected = ['+41445678899', '0445678899', '5678899', '8899',
+                '+41414453111', '0414453111', '4453111', '3111']
+    result = generate_fts_phonenumbers(numbers)
+    assert result == expected
+
+    # invalid number
+    assert ['+41'] == generate_fts_phonenumbers(['+41'])

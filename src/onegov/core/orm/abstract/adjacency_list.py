@@ -1,11 +1,13 @@
 from __future__ import annotations
 
 from enum import Enum
+from decimal import Decimal
+from collections.abc import Callable
 from itertools import chain
 from lazy_object_proxy import Proxy  # type:ignore[import-untyped]
 from onegov.core.orm import Base, observes
-from onegov.core.utils import normalize_for_url, increment_name, is_sorted
-from sqlalchemy import Column, ForeignKey, Integer, Text
+from onegov.core.utils import is_sorted, normalize_for_url, increment_name
+from sqlalchemy import Column, ForeignKey, Integer, Text, Numeric
 from sqlalchemy.ext.declarative import declared_attr
 from sqlalchemy.ext.hybrid import hybrid_property
 from sqlalchemy.orm import (
@@ -19,7 +21,7 @@ from sqlalchemy.schema import Index
 from sqlalchemy.sql.expression import column, nullsfirst
 
 
-from typing import Any, Generic, TypeVar, TYPE_CHECKING
+from typing import Generic, TYPE_CHECKING, Any, TypeVar
 if TYPE_CHECKING:
     from collections.abc import Callable, Iterator, Sequence
     from sqlalchemy.orm.query import Query
@@ -56,7 +58,7 @@ def sort_siblings(
     new_order = sorted(siblings, key=key, reverse=reverse)
 
     for ix, sibling in enumerate(new_order):
-        sibling.order = ix
+        sibling.order = Decimal(ix)
 
 
 class AdjacencyList(Base):
@@ -119,7 +121,10 @@ class AdjacencyList(Base):
 
     #: the order of the items - items are added at the end by default
     # FIXME: This should probably have been nullable=False
-    order: Column[int] = Column(Integer, default=2 ** 16)
+    order: Column[Decimal] = Column(
+        Numeric(precision=30, scale=15),
+        default=Decimal('65536')  # Default middle value (2**16)
+    )
 
     # default sort order is order, id
     @declared_attr
@@ -205,8 +210,9 @@ class AdjacencyList(Base):
 
             siblings = self.siblings.all()
 
+            # Check if the list *was* sorted according to the *old* title
             if is_sorted(siblings, key=old_sort_key):
-                sort_siblings(siblings, key=self.sort_key)
+                calculuate_midpoint_order(siblings, self, self.sort_key)
 
         return sort_on_title_change
 
@@ -293,6 +299,58 @@ class AdjacencyList(Base):
             self.id,
             self.parent_id
         )
+
+
+def calculuate_midpoint_order(
+    siblings: list[_L], new_item: _L, key: Callable[[_L], Any]
+) -> None:
+    """Insert/update an item's order """
+    left, right = None, None
+    new_item_key_val = key(new_item)
+
+    # Find the logical position in the key-sorted list
+    for neighbor in siblings:
+        if neighbor == new_item:
+            continue
+        neighbor_key_val = key(neighbor)
+        if neighbor_key_val > new_item_key_val:
+            # This neighbor comes after the new item
+            right = neighbor
+            # The previous neighbor (if any) is the left one
+            # 'left' remains from the previous iteration
+            break
+        else:
+            # This neighbor comes before or is equal, update left
+            left = neighbor
+
+    # Calculate new order value
+    if left and right:
+        # Between two neighbors
+        left_order = Decimal(str(left.order))
+        right_order = Decimal(str(right.order))
+        # Check for potential precision issues or identical orders
+        if left_order == right_order:
+            # This indicates a problem or requires re-numbering.
+            # For now, let's place it slightly after left.
+            # A more robust solution might involve re-spacing siblings.
+            new_item.order = left_order + Decimal(
+                '0.000000000000001'
+            )  # Tiny increment
+        else:
+            new_item.order = (left_order + right_order) / 2
+    elif left:
+        # After last item (based on key)
+        new_item.order = Decimal(str(left.order)) + Decimal(
+            '1'
+        )  # Increment from left
+    elif right:
+        # Before first item (based on key)
+        new_item.order = (
+            Decimal(str(right.order)) / 2
+        )  # Half of the first item's order
+    else:
+        # Only item in the list (or all others filtered out)
+        new_item.order = Decimal('65536')  # Default middle value
 
 
 class AdjacencyListCollection(Generic[_L]):
@@ -434,10 +492,13 @@ class AdjacencyListCollection(Generic[_L]):
         title: str,
         name: str | None = None,
         type: str | None = None,
-        **kwargs: Any
+        **kwargs: Any,
     ) -> _L:
-        """ Adds a child to the given parent. """
-
+        """Adds a child.
+        - If order is explicit, uses it.
+        - If siblings are sorted by sort_key, inserts starting form mid
+        - If siblings are NOT sorted by sort_key, append at the end
+        """
         name = name or self.get_unique_child_name(title, parent)
 
         if type is not None:
@@ -445,21 +506,39 @@ class AdjacencyListCollection(Generic[_L]):
         else:
             child_class = self.__listclass__
 
+        # Handle explicit order passed directly or via kwargs
+        explicit_order = kwargs.pop('order', None)
+        if explicit_order is not None:
+            # Ensure it's Decimal before passing to constructor
+            kwargs['order'] = Decimal(str(explicit_order))
+
         child = child_class(parent=parent, title=title, name=name, **kwargs)
-
         self.session.add(child)
-
-        # impose an order, unless one is given
-        if kwargs.get('order') is not None:
-            self.session.flush()
-            return child
-
-        siblings = child.siblings.all()
-
-        if is_sorted((s for s in siblings if s != child), key=self.sort_key):
-            sort_siblings(siblings, key=self.sort_key)
-
+        # Flush required to get child.id for sibling query and relationship
+        # loading
         self.session.flush()
+
+        # If order was NOT explicitly provided, decide insertion strategy
+        if explicit_order is None:
+            siblings: list[_L] = child.siblings.all()
+            existing_siblings: list[_L] = [s for s in siblings if s != child]
+
+            if not existing_siblings or is_sorted(
+                existing_siblings, key=self.sort_key
+            ):
+                # --- Strategy 1: Insert based on title key ---
+                calculuate_midpoint_order(siblings, child, self.sort_key)
+            else:
+                # --- Strategy 2: Append numerically at the end ---
+                child.order = max(
+                    (s.order for s in existing_siblings if s.order
+                        is not None),
+                    default=Decimal('65535'),
+                ) + Decimal('1')
+
+            # Flush again only if order was calculated (not explicit)
+            self.session.flush()
+
         return child
 
     def add_root(
@@ -539,25 +618,61 @@ class AdjacencyListCollection(Generic[_L]):
 
         siblings = target.siblings.all()
 
-        def new_order() -> Iterator[_L]:
-            for sibling in siblings:
-                if sibling == subject:
-                    continue
+        try:
+            target_index = siblings.index(target)
+        except ValueError as err:
+            raise ValueError(
+                'Target not found in its own siblings list .'
+            ) from err
 
-                if sibling == target and direction == MoveDirection.above:
-                    yield subject
-                    yield target
-                    continue
+        left, right = None, None
 
-                if sibling == target and direction == MoveDirection.below:
-                    yield target
-                    yield subject
-                    continue
+        # Determine the neighbors based on the *current* order
+        if direction == MoveDirection.above:
+            # Place subject *before* target
+            right = target
+            # Find the sibling immediately before target (if any)
+            # This sibling must not be the subject itself
+            potential_left_index = target_index - 1
+            while potential_left_index >= 0:
+                if siblings[potential_left_index] != subject:
+                    left = siblings[potential_left_index]
+                    break
+                potential_left_index -= 1
 
-                yield sibling
+        elif direction == MoveDirection.below:
+            # Place subject *after* target
+            left = target
+            # Find the sibling immediately after target (if any)
+            # This sibling must not be the subject itself
+            potential_right_index = target_index + 1
+            while potential_right_index < len(siblings):
+                if siblings[potential_right_index] != subject:
+                    right = siblings[potential_right_index]
+                    break
+                potential_right_index += 1
 
-        for order, sibling in enumerate(new_order()):
-            sibling.order = order
+        if left and right:
+            left_order = Decimal(str(left.order))
+            right_order = Decimal(str(right.order))
+            # Check for duplicate orders or precision issues
+            if left_order == right_order:
+                # Handle collision - maybe re-number or place slightly offset
+                subject.order = left_order + Decimal('0.000000000000001')
+            else:
+                subject.order = (left_order + right_order) / 2
+        elif left:
+            # Place after left (target was left, or target was last)
+            subject.order = Decimal(str(left.order)) + Decimal('1')
+        elif right:
+            # Place before right (target was right, or target was first)
+            subject.order = Decimal(str(right.order)) / 2
+        else:
+            # This case (no left and no right) should only happen if the target
+            # is the only sibling (excluding subject). Place subject with
+            # default.
+            subject.order = Decimal('65536')
+        # The subject.order is now updated. Caller should flush/commit.
 
 
 ALPHABET = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ'

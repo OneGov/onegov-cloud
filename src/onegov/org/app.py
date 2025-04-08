@@ -29,7 +29,7 @@ from onegov.org.initial_content import create_new_organisation
 from onegov.org.models import Dashboard, Organisation, PublicationCollection
 from onegov.org.request import OrgRequest
 from onegov.org.theme import OrgTheme
-from onegov.pay import PayApp
+from onegov.pay import PayApp, log as pay_log
 from onegov.reservation import LibresIntegration
 from onegov.search import ElasticsearchApp
 from onegov.ticket import TicketCollection
@@ -127,6 +127,15 @@ class OrgApp(Framework, LibresIntegration, ElasticsearchApp, MapboxApp,
         self.enable_yubikey = enable_yubikey
         self.disable_password_reset = disable_password_reset
 
+    def configure_api_token(
+        self,
+        *,
+        plausible_api_token: str = '',
+        ** cfg: Any
+    ) -> None:
+
+        self.plausible_api_token = plausible_api_token
+
     def configure_mtan_hook(self, **cfg: Any) -> None:
         """
         This inserts an mtan hook by wrapping the callable we receive
@@ -205,16 +214,34 @@ class OrgApp(Framework, LibresIntegration, ElasticsearchApp, MapboxApp,
 
     @orm_cached(policy='on-table-change:ticket_permissions')
     def ticket_permissions(self) -> dict[str, dict[str | None, list[str]]]:
-        result: dict[str, dict[str | None, list[str]]] = {}
+        """ Exclusive ticket permissions for authorization. """
+        permissions: dict[str, dict[str | None, tuple[bool, list[str]]]] = {}
         for permission in self.session().query(TicketPermission).with_entities(
             TicketPermission.handler_code,
             TicketPermission.group,
-            TicketPermission.user_group_id
+            TicketPermission.user_group_id,
+            TicketPermission.exclusive,
         ):
-            handler = result.setdefault(permission.handler_code, {})
-            group = handler.setdefault(permission.group, [])
+            handler = permissions.setdefault(permission.handler_code, {})
+            has_exclusive, group = handler.setdefault(
+                permission.group,
+                (permission.exclusive, [])
+            )
             group.append(permission.user_group_id.hex)
-        return result
+            if permission.exclusive and not has_exclusive:
+                handler[permission.group] = (True, group)
+
+        return {
+            handler_code: {
+                group: group_perms
+                for group, (exclusive, group_perms) in handler_perms.items()
+                # the permission is only exclusive, if at least one user group
+                # has exclusive permissions. But user groups with non-exclusive
+                # permissions still have permission to access the ticket.
+                if exclusive
+            }
+            for handler_code, handler_perms in permissions.items()
+        }
 
     @orm_cached(policy='on-table-change:files')
     def publications_count(self) -> int:
@@ -372,21 +399,28 @@ class OrgApp(Framework, LibresIntegration, ElasticsearchApp, MapboxApp,
         if self.org.square_logo_url:
             extra['image'] = self.org.square_logo_url
 
-        return provider.checkout_button(
-            label=button_label,
-            # FIXME: This is a little suspect, since StripePaymentProvider
-            #        would previously have raised an exception for a
-            #        missing price, should it really be legal to generate
-            #        a checkout button when there is no price?
-            amount=price and price.amount or None,
-            currency=price and price.currency or None,
-            email=email,
-            name=self.org.name,
-            description=title,
-            complete_url=complete_url,
-            request=request,
-            **extra
-        )
+        try:
+            return provider.checkout_button(
+                label=button_label,
+                # FIXME: This is a little suspect, since StripePaymentProvider
+                #        would previously have raised an exception for a
+                #        missing price, should it really be legal to generate
+                #        a checkout button when there is no price?
+                amount=price and price.amount or None,
+                currency=price and price.currency or None,
+                email=email,
+                name=self.org.name,
+                description=title,
+                complete_url=complete_url,
+                request=request,
+                **extra
+            )
+        except Exception:
+            pay_log.info(
+                f'Failed to generate checkout button for {provider.title}:',
+                exc_info=True
+            )
+            return None
 
     def redirect_after_login(
         self,
@@ -813,6 +847,7 @@ def get_common_asset() -> Iterator[str]:
     yield 'items_selectable.js'
     yield 'notifications.js'
     yield 'foundation.accordion.js'
+    yield 'chosen_select_hierarchy.js'
 
 
 @OrgApp.webasset('fontpreview')

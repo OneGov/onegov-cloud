@@ -99,9 +99,11 @@ class TicketNote(Message, TicketMessageMixin):
         request: OrgRequest,
         text: str,
         file: File | None = None,
-        owner: str | None = None
+        owner: str | None = None,
+        origin: str = 'internal'
     ) -> Self:
-        note = super().create(ticket, request, text=text, owner=owner)
+        note = super().create(ticket, request, text=text, owner=owner,
+                              origin=origin)
         note.file = file
 
         return note
@@ -186,9 +188,11 @@ class TicketMessage(Message, TicketMessageMixin):
         ticket: Ticket,
         request: OrgRequest,
         change: str,
+        origin: str = 'internal',
         **extra_meta: Any
     ) -> Self:
-        return super().create(ticket, request, change=change, **extra_meta)
+        return super().create(ticket, request, change=change,
+                              origin=origin, **extra_meta)
 
 
 class ReservationMessage(Message, TicketMessageMixin):
@@ -203,9 +207,11 @@ class ReservationMessage(Message, TicketMessageMixin):
         reservations: Iterable[Reservation],
         ticket: Ticket,
         request: OrgRequest,
-        change: str
+        change: str,
+        origin: str = 'internal'
     ) -> Self:
-        return super().create(ticket, request, change=change, reservations=[
+        return super().create(ticket, request, change=change,
+                              origin=origin, reservations=[
             r.id for r in reservations
         ])
 

@@ -2,15 +2,23 @@ from __future__ import annotations
 
 from onegov.core.utils import ensure_scheme
 from onegov.form import Form
+from onegov.form.fields import ChosenSelectMultipleField
 from onegov.org import _
 from wtforms.validators import InputRequired
 from wtforms.fields import EmailField
 from wtforms.fields import StringField
 from wtforms.fields import TextAreaField
+from onegov.org.utils import extract_categories_and_subcategories
+from typing import TYPE_CHECKING
+
+if TYPE_CHECKING:
+    from onegov.org.app import OrgRequest
+    from wtforms.fields.choices import _Choice
 
 
 class PersonForm(Form):
     """ Form to edit people. """
+    request: OrgRequest
 
     salutation = StringField(_('Salutation'))
     academic_title = StringField(_('Academic Title'))
@@ -19,8 +27,12 @@ class PersonForm(Form):
     last_name = StringField(_('Last name'), [InputRequired()])
 
     function = StringField(_('Function'))
-    organisation = StringField(_('Organisation'))
-    sub_organisation = StringField(_('Sub organisation'))
+
+    organisations_multiple = ChosenSelectMultipleField(
+        label=_('Organisation'),
+        description=_('Select the organisations this person belongs to'),
+        choices=[],
+    )
 
     email = EmailField(_('E-Mail'))
     phone = StringField(_('Phone'))
@@ -55,3 +67,18 @@ class PersonForm(Form):
         description=_('Public extra information about this person'),
         render_kw={'rows': 6}
     )
+
+    def on_request(self) -> None:
+        choices: list[_Choice] = []
+        categories, subcategories = extract_categories_and_subcategories(
+            self.request.app.org.organisation_hierarchy)
+
+        for cat, sub in zip(categories, subcategories):
+            choices.append((cat, cat))
+            choices.extend((f'-{s}', f'- {s}') for s in sub)
+
+        if not choices:
+            self.delete_field('organisations_multiple')
+            return
+
+        self.organisations_multiple.choices = choices

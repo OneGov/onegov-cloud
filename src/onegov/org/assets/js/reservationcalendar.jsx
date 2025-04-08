@@ -210,6 +210,7 @@ rc.getFullcalendarOptions = function(options) {
 
     // view change rendering
     fcOptions.viewRender = function(view, element) {
+        rc.setupDatePicker(view, element);
         var renderers = view.options.viewRenderers;
         for (var i = 0; i < renderers.length; i++) {
             renderers[i](view, element);
@@ -263,6 +264,46 @@ rc.setupEventPopups = function(event, element, view) {
         return false;
     });
 };
+
+// show date picker when clicking on title
+rc.setupDatePicker = function(view, element) {
+    var calendar = $(view.el.closest('.fc'));
+    var title = calendar.find('.fc-header-toolbar .fc-left h2');
+    var input = $(
+        '<input type="text" tabindex="-1" aria-hidden="true"/>'
+    ).css({
+        visibility: 'hidden',
+        width: 0,
+        height: 0,
+        border: 0,
+    }).datetimepicker({
+        allowBlank: true,
+        timepicker: false,
+        format: 'Y-m-d',
+        dayOfWeekStart: 1,
+        lang: window.locale.language,
+        closeOnDateSelect: true,
+        onSelectDate: function(ct, $i) {
+            calendar.fullCalendar('gotoDate', ct);
+        },
+        onShow: function(_ct, $i) {
+            this.setOptions({value: $i.val()});
+            setTimeout(function() {
+                $('.xdsoft_datetimepicker').trigger('afterOpen.xdsoft');
+            }, 50);
+        },
+    });
+    input.unbind();
+    title.append(input);
+    title.click(function() {
+        input.val(calendar.fullCalendar('getDate').format('YYYY-MM-DD'));
+        input.datetimepicker('show');
+    }).on('mouseenter', function() {
+        title.css('cursor', 'pointer');
+    }).on('mouseleave', function() {
+        title.css('cursor', '');
+    });
+}
 
 // highlight events implementation
 rc.highlightEvents = function(event, element, view) {

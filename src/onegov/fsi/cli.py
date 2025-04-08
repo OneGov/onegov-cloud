@@ -160,7 +160,9 @@ def correct_ims_data_cli(path: str) -> Callable[[FsiRequest, FsiApp], None]:
                 start = event.start
                 if start.day < 13 and start.day != start.month:
                     to_change_ids.add(event.id)
-            print(f'To correct by using created date: {len(to_change_ids)}')
+            click.echo(
+                f'To correct by using created date: {len(to_change_ids)}'
+            )
             assert len(to_change_ids) == len(corrected_event_ids)
 
             return corrected_event_ids, control_messages
@@ -168,15 +170,17 @@ def correct_ims_data_cli(path: str) -> Callable[[FsiRequest, FsiApp], None]:
         # delete old course events
         total, deleted_count = delete_events_without_subscriptions(session)
         session.flush()
-        print(f'Deleted course events without subs: {deleted_count}/{total}')
+        click.echo(
+            f'Deleted course events without subs: {deleted_count}/{total}'
+        )
         corrected_ids, _ctrl_msgs = open_events_file(path, session)
         session.flush()
 
-        print(f'Corrected course events using '
+        click.echo(f'Corrected course events using '
               f'original file: {len(corrected_ids)}')
 
         with open('changed_events.log', 'w') as log_file:
-            print('\n'.join(str(i) for i in corrected_ids), file=log_file)
+            click.echo('\n'.join(str(i) for i in corrected_ids), file=log_file)
 
     return fix_original_ims_import
 
@@ -246,14 +250,14 @@ def test_ldap(
         success = client.connection.search(
             ba, search_filter, attributes=attributes)
         if not success:
-            print(f'Search not successfull in base {ba}')
+            click.echo(f'Search not successfull in base {ba}')
             continue
         for ix, entry in enumerate(
             sorted(client.connection.entries, key=sort_func)
         ):
-            print(json.dumps(entry.entry_attributes_as_dict, indent=4))
+            click.echo(json.dumps(entry.entry_attributes_as_dict, indent=4))
             count += 1
-    print(f'Found {count} entries')
+    click.echo(f'Found {count} entries')
 
 
 @cli.command(name='fetch-users', context_settings={'singular': True})
@@ -298,7 +302,7 @@ def fetch_users_cli(
 
         if dry_run and hasattr(app, 'es_orm_events'):
             # disable search indexing during operation
-            print('es_orm_events disabled')
+            click.echo('es_orm_events disabled')
             app.es_orm_events.stopped = True
 
         fetch_users(

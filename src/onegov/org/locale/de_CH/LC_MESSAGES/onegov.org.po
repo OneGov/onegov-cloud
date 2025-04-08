@@ -2,7 +2,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE 1.0\n"
-"POT-Creation-Date: 2025-04-08 07:30+0200\n"
+"POT-Creation-Date: 2025-04-08 13:27+0200\n"
 "PO-Revision-Date: 2022-03-15 10:21+0100\n"
 "Last-Translator: Marc Sommerhalder <marc.sommerhalder@seantis.ch>\n"
 "Language-Team: German\n"
@@ -134,6 +134,9 @@ msgstr "${org} Reservations-Übersicht"
 
 msgid "Your Chat has been turned into a ticket"
 msgstr "Aus ihrem Chat wurde ein Ticket erstellt"
+
+msgid "New ticket"
+msgstr "Neues Ticket"
 
 msgid "Account"
 msgstr "Konto"
@@ -1272,8 +1275,8 @@ msgstr "Funktion"
 msgid "Organisation"
 msgstr "Organisation"
 
-msgid "Sub organisation"
-msgstr "Unterorganisation"
+msgid "Select the organisations this person belongs to"
+msgstr "Wählen Sie die Organisationen, zu denen diese Person gehört"
 
 msgid "Direct Phone Number or Mobile"
 msgstr "Direktnummer oder Mobil"
@@ -1763,15 +1766,6 @@ msgstr "Pfad"
 msgid "Please enter a path without schema or host"
 msgstr "Bitte geben Sie einen Pfad ohne Schema oder Hostname an"
 
-msgid "Hide these fields for non-logged-in users"
-msgstr "Diese Felder für nicht angemeldete Benutzer ausblenden"
-
-msgid "People"
-msgstr "Personen"
-
-msgid "External ID"
-msgstr "Externe ID"
-
 msgid "Duration of mTAN session"
 msgstr "Dauer der mTAN-Session"
 
@@ -1932,8 +1926,18 @@ msgstr "Bitte geben Sie ein Datumspaar pro Zeile ein"
 msgid "End date needs to be after start date"
 msgstr "Das End-Datum muss vor dem Start-Datum sein"
 
-msgid "Email address for notifications about newly opened tickets"
-msgstr "Email-Adresse für Benachrichtigungen über neu eröffnete Tickets"
+msgid "Hide personal email addresses"
+msgstr "Persönliche E-Mail-Adressen verstecken"
+
+msgid "Hide personal email addresses in the ticket system"
+msgstr "Persönliche E-Mail-Adressen im Ticketsystem verstecken"
+
+msgid "General email address"
+msgstr "Allgemeine E-Mail-Adresse"
+
+msgid "Email address that is displayed instead of the personal email address"
+msgstr ""
+"E-Mail-Adresse, die anstelle der persönlichen E-Mail-Adresse angezeigt wird"
 
 msgid "Accept request and close ticket automatically based on:"
 msgstr "Akzeptiere und schliesse Tickets automatisch basierend auf:"
@@ -1943,6 +1947,9 @@ msgstr "Ticket-Kategorie"
 
 msgid "User role"
 msgstr "Benutzer-Rolle"
+
+msgid "Auto-accept and auto-close"
+msgstr "Automatisches Akzeptieren und Schliessen"
 
 msgid ""
 "Accept request and close ticket automatically for these ticket categories"
@@ -1961,6 +1968,9 @@ msgstr "Akzeptiere und schliesse Tickets automatisch für diese Benutzer-Rollen"
 
 msgid "User used to auto-accept tickets"
 msgstr "Benutzer für das automatische Akzeptieren von Tickets"
+
+msgid "Email address for notifications about newly opened tickets"
+msgstr "E-Mail-Adresse für Benachrichtigungen zu geöffneten Tickets"
 
 msgid "Block email confirmation when this ticket category is opened"
 msgstr "Keine Email-Benachrichtung nach Eröffnung dieser Ticket-Kategorie"
@@ -2198,6 +2208,59 @@ msgstr "Ungültiges JSON-Format in den Firebase- Zugangsdaten"
 msgid "Error validating Firebase credentials: {0}"
 msgstr "Fehler bei der Überprüfung der Firebase- Zugangsdaten: {0}"
 
+msgid "Organisation hierarchy"
+msgstr "Organisationshierarchie"
+
+msgid ""
+"Example for organisation hierarchy with subtopics in yaml format. Note: "
+"Deeper structures are not supported.\n"
+"```\n"
+"- Organisation:\n"
+"  - Sub-Organisation 1\n"
+"  - Sub-Organisation 2\n"
+"- Organisation 2:\n"
+"  - Sub-Organisation 1\n"
+"  - Sub-Organisation 2\n"
+"```"
+msgstr ""
+"Beispiel für Organisationshierarchie mit Unterorganisationen im yaml-Format. "
+"Hinweis: Tiefere Strukturen werden nicht unterstützt.\n"
+"```\n"
+"- Organisation:\n"
+"  - Unterorganisation 1\n"
+"  - Unterorganisation 2\n"
+"- Organisation 2:\n"
+"  - Unterorganisation 1\n"
+"  - Unterorganisation 2\n"
+"```"
+
+msgid "Hide these fields for non-logged-in users"
+msgstr "Diese Felder für nicht angemeldete Benutzer ausblenden"
+
+msgid "External ID"
+msgstr "Externe ID"
+
+msgid ""
+"Invalid format. Please define a list with organisations and sub-"
+"organisations according the example."
+msgstr ""
+"Ungültiges Format. Bitte definieren Sie eine Liste mit Organisationen und "
+"Unterorganisationen wie im Beispiel."
+
+msgid ""
+"Invalid format. Please define organisations and sub-organisations according "
+"to the example."
+msgstr ""
+"Ungültiges Format. Bitte definieren Sie Organisationen und "
+"Unterorganisationen wie im Beispiel."
+
+msgid ""
+"Invalid format. Only organisations and sub-organisations are allowed - no "
+"deeper structures supported."
+msgstr ""
+"Ungültiges Format. Nur Organisationen und Unterorganisationen sind erlaubt - "
+"keine tiefer verschachtelten Strukturen unterstützt."
+
 msgid "VAT Rate"
 msgstr "Mehrwertsteuersatz"
 
@@ -2341,16 +2404,8 @@ msgstr ""
 "Schränkt den Zugriff ein und erteilt Berechtigungen für diese "
 "Ticketkategorien"
 
-msgid "Directories"
-msgstr "Verzeichnisse"
-
-msgid ""
-"Directories for which this user group is responsible. If activated, ticket "
-"notifications for this group are only sent for these directories"
-msgstr ""
-"Verzeichnisse für welche diese Benutzergruppe zuständig ist. Falls "
-"aktiviert, werden Ticket Benachrichtigungen nur für diese Verzeichnisse "
-"gesendet."
+msgid "Immediate e-mail notification to members upon ticket submission"
+msgstr "Unmittelbare E-Mail-Benachrichtigung an Mitglieder bei Ticketeingang"
 
 msgid "Send a periodic status e-mail."
 msgstr "Ein periodisches Status E-Mail senden."
@@ -2402,6 +2457,9 @@ msgstr "Zusätzliche Dateien verknüpfen"
 
 msgid "All directories"
 msgstr "Alle Verzeichnisse"
+
+msgid "Directories"
+msgstr "Verzeichnisse"
 
 msgid "All events"
 msgstr "Alle Veranstaltungen"
@@ -2543,6 +2601,9 @@ msgstr "Befragungszeiträume"
 
 msgid "Survey"
 msgstr "Umfrage"
+
+msgid "People"
+msgstr "Personen"
 
 msgid "Person"
 msgstr "Person"
@@ -3187,8 +3248,8 @@ msgstr "Die Absage von ${title} kann nicht rückgängig gemacht werden."
 msgid "Reject reservation"
 msgstr "Reservation absagen"
 
-#. Used in sentence: "${event} published."
 #.
+#. Used in sentence: "${event} published."
 msgid "Event"
 msgstr "Veranstaltung"
 
@@ -4664,17 +4725,17 @@ msgstr ""
 msgid "Request Reference"
 msgstr "Referenz Anfrage"
 
-msgid "No people added yet."
-msgstr "Es wurden noch keine Personen hinzugefügt."
-
-msgid "No people found for current filter selection."
-msgstr "Keine Personen für aktuelle Filterauswahl gefunden."
-
 msgid "Select organisation"
 msgstr "Organisation wählen"
 
 msgid "Select sub organisation"
 msgstr "Unterorganisation wählen"
+
+msgid "No people found for current filter selection."
+msgstr "Keine Personen für aktuelle Filterauswahl gefunden."
+
+msgid "Reset filter"
+msgstr "Filter zurücksetzen"
 
 msgid "Export a vCard of this person"
 msgstr "Elektronische Visitenkarte (vCard)"
@@ -5549,9 +5610,6 @@ msgstr "Veranstaltung hinzufügen"
 
 msgid "Your request has been registered"
 msgstr "Ihre Anfrage wurde erfasst"
-
-msgid "New ticket"
-msgstr "Neues Ticket"
 
 msgid "Your request could not be accepted automatically!"
 msgstr "Ihre Anfrage konnte nicht automatisch verarbeitet werden!"
@@ -6594,48 +6652,3 @@ msgstr "Ein Konto wurde für Sie erstellt"
 
 msgid "The user was created successfully"
 msgstr "Der Benutzer wurde erfolgreich erstellt"
-
-#~ msgid "Daily Newsletter"
-#~ msgstr "Täglicher Newsletter"
-
-#~ msgid ""
-#~ "Automatically creates a daily newsletter containing all new news items "
-#~ "since the last sending time. It will only send a newsletter if there is "
-#~ "at least one new news item. Only subscribers who checked the \"daily "
-#~ "newsletters\" checkbox will receive it, independent of their selected "
-#~ "categories if there are any."
-#~ msgstr ""
-#~ "Erstellt automatisch einen täglichen Newsletter, der alle neuen News seit "
-#~ "der letzten Versandzeit enthält. Es wird nur ein Newsletter versendet, "
-#~ "wenn es mindestens ein einen neuen News-Eintrag gibt. Nur Abonnenten, die "
-#~ "die Checkbox \"tägliche Newsletter\" ausgewählt haben, erhalten ihn, "
-#~ "unabhängig von ihren ausgewählten Kategorien, falls vorhanden."
-
-#~ msgid ""
-#~ "Automatically creates a daily newsletter containing all new news items "
-#~ "since the last sending time. It will only send a newsletter if there is "
-#~ "at least one new news item and only subscribers of the automatically "
-#~ "created \"daily\"-category will receive it."
-#~ msgstr ""
-#~ "Erstellt automatisch einen täglichen Newsletter, der alle neuen "
-#~ "Nachrichtenelemente seit der letzten Versandzeit enthält. Es wird nur ein "
-#~ "Newsletter gesendet, wenn es mindestens ein neues Nachrichtenelement gibt "
-#~ "und nur Abonnenten der automatisch erstellten \"täglich\"-Kategorie "
-#~ "erhalten ihn."
-
-#~ msgid "Email adress for notifications about newly opened tickets"
-#~ msgstr "E-Mail-Adresse für Benachrichtigungen zu geöffneten Tickets"
-
-#~ msgid ""
-#~ "Invalid format. Please define a listwith topics and subtopics according "
-#~ "the example."
-#~ msgstr ""
-#~ "Ungültiges Format. Bitte definieren Sie eine Liste mit Themen und "
-#~ "Unterthemen entsprechend dem Beispiel."
-
-#~ msgid ""
-#~ "Invalid format. Please define an organisation name with topics and "
-#~ "subtopics according the example."
-#~ msgstr ""
-#~ "Ungültiges Format. Bitte definieren Sie eine Organisation mit Themen und "
-#~ "Unterthemen wie im Beispiel."

@@ -167,3 +167,34 @@ def import_xlsx(file: IO[bytes]) -> Callable[[CoreRequest, Framework], None]:
         click.secho(f'Imported {count} person(s)', fg='green')
 
     return _import
+
+
+@cli.command('list')
+def list_people() -> Callable[[CoreRequest, Framework], None]:
+
+    def _list(request: CoreRequest, app: Framework) -> None:
+        session = app.session()
+        properties = [
+            ('Funktion', 'function'),
+            ('Standortadresse', 'location_address', 'location_code_city'),
+            ('Postadresse', 'postal_address', 'postal_code_city'),
+            ('E-Mail', 'email'),
+            ('Telefon', 'phone'),
+            ('Telefon direkt', 'phone_direct'),
+            ('Telefon intern', 'phone_internal'),
+        ]
+        for p in session.query(Person):
+            click.secho(f'{p.title}', fg='green')
+            for label, *prop in properties:
+                value = ', '.join(
+                    value
+                    for attr in prop
+                    if (raw_value := getattr(p, attr, None)) is not None
+                    if (value := str(raw_value))
+                )
+                if value:
+                    click.secho(f'  {label}: {value}')
+
+            click.secho()
+
+    return _list

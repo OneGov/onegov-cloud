@@ -353,7 +353,7 @@ def do_report_person_change(
                 'proposed_changes': form.proposed_changes
             }
         )
-        TicketMessage.create(ticket, request, 'opened')
+        TicketMessage.create(ticket, request, 'opened', 'external')
         ticket.create_snapshot(request)
 
     assert form.submitter_email.data is not None
