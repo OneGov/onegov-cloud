@@ -98,7 +98,7 @@ async def fetch(
                 return callback(url, attr)
     except Exception as e:
         if not handle_exceptions:
-            raise e
+            raise
         return handle_exceptions(url, e)
 
 

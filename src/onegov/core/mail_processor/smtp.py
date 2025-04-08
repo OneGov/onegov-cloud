@@ -41,7 +41,7 @@ class SMTPMailQueueProcessor(MailQueueProcessor):
         try:
             items = json.loads(payload)
             if not isinstance(items, list):
-                raise ValueError('Invalid JSON payload')
+                raise ValueError('Invalid JSON payload')  # noqa: TRY004
 
             messages: list[EmailMessage] = []
             for item in items:

@@ -1047,7 +1047,7 @@ def is_valid_yubikey(
         return Yubico(client_id, secret_key).verify(yubikey)
     except StatusCodeError as e:
         if e.status_code != 'REPLAYED_OTP':
-            raise e
+            raise
 
         return False
     except SignatureVerificationError:

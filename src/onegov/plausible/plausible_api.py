@@ -40,14 +40,15 @@ class PlausibleAPI:
             response = requests.post(
                 self.url, headers=self.headers, json=payload, timeout=10)
             response.raise_for_status()
-        except HTTPError as http_err:
+        except HTTPError:
             if response.status_code == 401:
-                log.error('Unauthorized: Invalid API key or insufficient '
-                          'permissions', exc_info=http_err)
+                log.exception(
+                    'Unauthorized: Invalid API key or insufficient permissions'
+                )
             else:
-                log.error('HTTP error occurred', exc_info=http_err)
-        except Exception as err:
-            log.error('An error occurred', exc_info=err)
+                log.exception('HTTP error occurred')
+        except Exception:
+            log.exception('An error occurred')
 
         return response.json()
 

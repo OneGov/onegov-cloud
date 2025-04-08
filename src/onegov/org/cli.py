@@ -767,9 +767,9 @@ def fetch(
                 fg='green'
             )
 
-        except Exception as e:
-            log.error('Error fetching events', exc_info=True)
-            raise (e)
+        except Exception:
+            log.exception('Error fetching events')
+            raise
 
     return _fetch
 
