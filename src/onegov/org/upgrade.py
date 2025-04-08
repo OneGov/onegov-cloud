@@ -27,7 +27,8 @@ from onegov.reservation import Resource
 from onegov.ticket import TicketPermission
 from onegov.user import User, UserGroup
 from sqlalchemy import Column, ForeignKey
-from sqlalchemy.orm import undefer, selectinload
+from sqlalchemy.orm import undefer, selectinload, load_only
+from onegov.core.orm.types import UUID
 
 
 from typing import Any, TYPE_CHECKING
@@ -457,21 +458,24 @@ def create_hierarchy_and_move_organisations_to_content(
     context: UpgradeContext
 ) -> None:
     session = context.app.session()
-    people = session.query(Person).all()
+    # Use only columns that definitely exist to avoid error
+    people = session.query(Person).options(
+        load_only('id', 'content')
+    ).all()
     hierarchy: dict[str, set[str]] = {}
     for person in people:
-        if person.organisation:
+        org = person.content.get('organisation')
+        if org:
             # Create hierarchy from existing organisation and
             # sub_organisation of people
-            hierarchy.setdefault(person.organisation, set())
-            if person.sub_organisation:
-                hierarchy[person.organisation].add(person.sub_organisation)
-
+            hierarchy.setdefault(org, set())
+            sub_org = person.content.get('sub_organisation')
+            if sub_org:
+                hierarchy[org].add(sub_org)
             # Move organisation and sub_organisation to content
             person.content['organisations_multiple'] = [
-                    person.organisation,
-                    f'-{person.sub_organisation}'
-                ] if person.sub_organisation else [person.organisation]
+                org, f'-{sub_org}'
+            ] if sub_org else [org]
 
     hierarchy_yaml = ''
     for org, sub_orgs in hierarchy.items():
@@ -483,7 +487,6 @@ def create_hierarchy_and_move_organisations_to_content(
         organisation = session.query(Organisation).first()
         if organisation:
             organisation.organisation_hierarchy = data
-
     session.flush()
 
 
