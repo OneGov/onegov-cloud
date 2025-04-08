@@ -20,11 +20,11 @@ from onegov.event import Occurrence, Event
 from onegov.file import FileCollection
 from onegov.form import FormSubmission, parse_form, Form
 from onegov.newsletter.models import Recipient
-from onegov.org.mail import send_ticket_mail
 from onegov.newsletter import (Newsletter, NewsletterCollection,
                                RecipientCollection)
 from onegov.org import _, OrgApp
 from onegov.org.layout import DefaultMailLayout
+from onegov.org.mail import send_ticket_mail
 from onegov.org.models import (
     ResourceRecipient,
     ResourceRecipientCollection,
@@ -37,7 +37,11 @@ from onegov.org.models.extensions import (
 from onegov.org.models.ticket import ReservationHandler
 from onegov.gever.encrypt import decrypt_symmetric
 from cryptography.fernet import InvalidToken
-from sqlalchemy.exc import IntegrityError
+from onegov.org.models import TicketMessage, ExtendedDirectoryEntry
+from onegov.org.notification_service import (
+    get_notification_service,
+)
+from onegov.org.utils import emails_for_new_ticket
 from onegov.org.views.allocation import handle_rules_cronjob
 from onegov.org.views.directory import (
     send_email_notification_for_directory_entry)
@@ -46,17 +50,14 @@ from onegov.org.views.ticket import delete_tickets_and_related_data
 from onegov.reservation import Reservation, Resource, ResourceCollection
 from onegov.search import Searchable
 from onegov.ticket import Ticket, TicketCollection
-from onegov.org.models import TicketMessage, ExtendedDirectoryEntry
 from onegov.user import User, UserCollection
 from onegov.user.models import TAN
 from sedate import to_timezone, utcnow, align_date_to_day
 from sqlalchemy import and_, or_, func, text
-from sqlalchemy.orm import undefer
+from sqlalchemy.exc import IntegrityError
 from sqlalchemy.inspection import inspect
+from sqlalchemy.orm import undefer
 from uuid import UUID
-from onegov.org.notification_service import (
-    get_notification_service,
-)
 
 
 from typing import Any, TYPE_CHECKING
@@ -609,6 +610,24 @@ def end_chats_and_create_tickets(request: OrgRequest) -> None:
                     'ticket': ticket,
                     'chat': chat,
                     'organisation': request.app.org.title,
+                }
+            )
+            for email in emails_for_new_ticket(request, ticket):
+                send_ticket_mail(
+                    request=request,
+                    template='mail_ticket_opened_info.pt',
+                    subject=_('New ticket'),
+                    ticket=ticket,
+                    receivers=(email, ),
+                    content={'model': ticket},
+                )
+
+            request.app.send_websocket(
+                channel=request.app.websockets_private_channel,
+                message={
+                    'event': 'browser-notification',
+                    'title': request.translate(_('New ticket')),
+                    'created': ticket.created.isoformat()
                 }
             )
 

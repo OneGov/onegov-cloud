@@ -10,6 +10,7 @@ import pytz
 from contextlib import suppress
 from collections import defaultdict, Counter, OrderedDict
 from datetime import datetime, time, timedelta
+from email.headerregistry import Address
 from functools import lru_cache
 from isodate import parse_date, parse_datetime
 from itertools import groupby
@@ -18,17 +19,17 @@ from lxml.etree import ParserError
 from lxml.html import fragments_fromstring, tostring
 from markupsafe import escape, Markup
 from onegov.core.layout import Layout
-from onegov.core.orm import as_selectable
+from onegov.core.mail import coerce_address
 from onegov.file import File, FileCollection
 from onegov.org import _
 from onegov.org.elements import DeleteLink, Link
 from onegov.org.models.search import Search
 from onegov.reservation import Resource
-from onegov.ticket import TicketCollection
+from onegov.ticket import TicketCollection, TicketPermission
 from onegov.user import User, UserGroup
 from operator import attrgetter
 from purl import URL
-from sqlalchemy import nullsfirst, select  # type:ignore[attr-defined]
+from sqlalchemy import nullsfirst  # type:ignore[attr-defined]
 
 
 from typing import overload, Any, Literal, TYPE_CHECKING
@@ -44,7 +45,7 @@ if TYPE_CHECKING:
     from onegov.reservation import Allocation, Reservation
     from onegov.ticket import Ticket
     from pytz.tzinfo import DstTzInfo, StaticTzInfo
-    from sqlalchemy.orm import Query, Session
+    from sqlalchemy.orm import Query
     from sqlalchemy import Column
     from typing import Self, TypeAlias, TypeVar
 
@@ -1115,59 +1116,66 @@ def hashtag_elements(request: OrgRequest, text: str) -> Markup:
     return Markup(HASHTAG.sub(replace_tag, escape(text)))  # nosec: B704
 
 
-def ticket_directory_groups(
-    session: Session
-) -> Iterator[str]:
-    """Yields all ticket groups.
-
-    For example: ('Sportanbieter', 'Verein')
-
-    If no groups exist, returns an empty generator.
-    """
-    query = as_selectable(
-        """
-        SELECT
-            handler_code,                         -- Text
-            ARRAY_AGG(DISTINCT "group") AS groups -- ARRAY(Text)
-        FROM tickets
-        WHERE handler_code = 'DIR'
-        GROUP BY handler_code
-        """
-    )
-
-    return (
-        group
-        for result in session.execute(select(query.c))
-        for group in result.groups
-        if group
-    )
-
-
-def user_group_emails_for_new_ticket(
-    request: CoreRequest,
+def emails_for_new_ticket(
+    request: OrgRequest,
     ticket: Ticket,
-) -> set[str]:
-    """The user can be part of a UserGroup that defines directories. This
-    means the users in this group are interested in a subset of tickets.
-    The group is determined by the Ticket group.
+) -> Iterator[Address]:
+    """ Returns a set of e-mail addressed that would like to be notified
+    about the creation of this ticket.
+
+    Users can be part of a UserGroup with ticket permissions. This means the
+    users in this group are interested in/responsible for a subset of tickets.
 
     This allows for more granular control over who gets notified.
 
     """
+    seen = set()
+    if request.email_for_new_tickets:
+        # adding this to seen ensures it does not receive two emails
+        address = coerce_address(request.email_for_new_tickets)
+        seen.add(address.addr_spec)
+        yield address
 
-    if ticket.handler_code != 'DIR':
-        # For now, we implement this special case just for 'DIR' tickets.
-        return set()
+    permissions = request.app.ticket_permissions.get(ticket.handler_code, {})
+    exclusive_group_ids = permissions.get(ticket.group, [])
 
-    return {
-        username
-        for username, in request.session
-        .query(UserGroup)
-        .join(UserGroup.users)
-        .filter(UserGroup.meta['directories'].contains(ticket.group))
-        .with_entities(User.username)
-        .distinct()
-    }
+    # even if there are no exclusive permissions for this group
+    # there may still be exclusive permissions for the handler code
+    if not exclusive_group_ids and ticket.group:
+        exclusive_group_ids = permissions.get(None, [])
+
+    query = request.session .query(UserGroup).join(TicketPermission)
+    query = query.filter(TicketPermission.immediate_notification.is_(True))
+    query = query.filter(TicketPermission.handler_code == ticket.handler_code)
+
+    # if the permission applies to the whole handler_code
+    # then there can't be any exclusive permissions for any
+    # specific group we're not a part of, since then we won't
+    # have permission to access the ticket
+    general_condition = TicketPermission.group.is_(None)
+    if exclusive_group_ids:
+        general_condition &= UserGroup.id.in_(exclusive_group_ids)
+    query = query.filter(
+        general_condition | (TicketPermission.group == ticket.group)
+    )
+
+    for username, realname in query.join(UserGroup.users).with_entities(
+        User.username,
+        User.realname,
+    ).distinct():
+
+        if username in seen:
+            continue
+
+        seen.add(username)
+        try:
+            yield Address(
+                display_name=realname or '',
+                addr_spec=username
+            )
+        except ValueError:
+            # if it's not a valid address then skip it
+            pass
 
 
 # from most narrow to widest

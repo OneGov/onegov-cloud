@@ -18,6 +18,7 @@ from onegov.org.mail import send_ticket_mail
 from onegov.org.models import TicketMessage, EventMessage
 from onegov.org.models.extensions import AccessExtension
 from onegov.org.models.ticket import EventSubmissionTicket
+from onegov.org.utils import emails_for_new_ticket
 from onegov.org.views.utils import show_tags, show_filters
 from onegov.ticket import TicketCollection
 from sedate import utcnow
@@ -387,13 +388,13 @@ def view_event(
                     receivers=(self.meta['submitter_email'],),
                     ticket=ticket,
                 )
-                if request.email_for_new_tickets:
+                for email in emails_for_new_ticket(request, ticket):
                     send_ticket_mail(
                         request=request,
                         template='mail_ticket_opened_info.pt',
                         subject=_('New ticket'),
                         ticket=ticket,
-                        receivers=(request.email_for_new_tickets, ),
+                        receivers=(email, ),
                         content={
                             'model': ticket
                         }

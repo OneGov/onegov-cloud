@@ -2,7 +2,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE 1.0\n"
-"POT-Creation-Date: 2025-04-01 14:22+0200\n"
+"POT-Creation-Date: 2025-04-08 13:27+0200\n"
 "PO-Revision-Date: 2022-03-15 10:21+0100\n"
 "Last-Translator: Marc Sommerhalder <marc.sommerhalder@seantis.ch>\n"
 "Language-Team: German\n"
@@ -127,6 +127,9 @@ msgstr "${org} Reservations-Übersicht"
 
 msgid "Your Chat has been turned into a ticket"
 msgstr "Aus ihrem Chat wurde ein Ticket erstellt"
+
+msgid "New ticket"
+msgstr "Neues Ticket"
 
 msgid "Account"
 msgstr "Konto"
@@ -2213,8 +2216,8 @@ msgid ""
 "Invalid format. Only organisations and sub-organisations are allowed - no "
 "deeper structures supported."
 msgstr ""
-"Ungültiges Format. Nur Organisationen und Unterorganisationen sind "
-"erlaubt - keine tiefer verschachtelten Strukturen unterstützt."
+"Ungültiges Format. Nur Organisationen und Unterorganisationen sind erlaubt - "
+"keine tiefer verschachtelten Strukturen unterstützt."
 
 msgid "VAT Rate"
 msgstr "Mehrwertsteuersatz"
@@ -2348,16 +2351,8 @@ msgstr ""
 "Schränkt den Zugriff ein und erteilt Berechtigungen für diese "
 "Ticketkategorien"
 
-msgid "Directories"
-msgstr "Verzeichnisse"
-
-msgid ""
-"Directories for which this user group is responsible. If activated, ticket "
-"notifications for this group are only sent for these directories"
-msgstr ""
-"Verzeichnisse für welche diese Benutzergruppe zuständig ist. Falls "
-"aktiviert, werden Ticket Benachrichtigungen nur für diese Verzeichnisse "
-"gesendet."
+msgid "Immediate e-mail notification to members upon ticket submission"
+msgstr "Unmittelbare E-Mail-Benachrichtigung an Mitglieder bei Ticketeingang"
 
 msgid "Send a periodic status e-mail."
 msgstr "Ein periodisches Status E-Mail senden."
@@ -2409,6 +2404,9 @@ msgstr "Zusätzliche Dateien verknüpfen"
 
 msgid "All directories"
 msgstr "Alle Verzeichnisse"
+
+msgid "Directories"
+msgstr "Verzeichnisse"
 
 msgid "All events"
 msgstr "Alle Veranstaltungen"
@@ -3197,8 +3195,8 @@ msgstr "Die Absage von ${title} kann nicht rückgängig gemacht werden."
 msgid "Reject reservation"
 msgstr "Reservation absagen"
 
-#. Used in sentence: "${event} published."
 #.
+#. Used in sentence: "${event} published."
 msgid "Event"
 msgstr "Veranstaltung"
 
@@ -5560,9 +5558,6 @@ msgstr "Veranstaltung hinzufügen"
 msgid "Your request has been registered"
 msgstr "Ihre Anfrage wurde erfasst"
 
-msgid "New ticket"
-msgstr "Neues Ticket"
-
 msgid "Your request could not be accepted automatically!"
 msgstr "Ihre Anfrage konnte nicht automatisch verarbeitet werden!"
 
@@ -6604,24 +6599,3 @@ msgstr "Ein Konto wurde für Sie erstellt"
 
 msgid "The user was created successfully"
 msgstr "Der Benutzer wurde erfolgreich erstellt"
-
-#~ msgid ""
-#~ "Invalid format. Please define a list with topics and subtopics according "
-#~ "the example."
-#~ msgstr ""
-#~ "Ungültiges Format. Bitte definieren Sie eine Liste mit Themen und "
-#~ "Unterthemen entsprechend dem Beispiel."
-
-#~ msgid ""
-#~ "Invalid format. Please define a listwith topics and subtopics according "
-#~ "the example."
-#~ msgstr ""
-#~ "Ungültiges Format. Bitte definieren Sie eine Liste mit Themen und "
-#~ "Unterthemen entsprechend dem Beispiel."
-
-#~ msgid ""
-#~ "Invalid format. Please define an organisation name with topics and "
-#~ "subtopics according the example."
-#~ msgstr ""
-#~ "Ungültiges Format. Bitte definieren Sie eine Organisation mit Themen und "
-#~ "Unterthemen wie im Beispiel."

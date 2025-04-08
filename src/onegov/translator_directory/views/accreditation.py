@@ -12,6 +12,7 @@ from onegov.org.mail import send_ticket_mail
 from onegov.org.models import Organisation
 from onegov.org.models import TicketMessage
 from onegov.org.pdf.ticket import TicketPdf
+from onegov.org.utils import emails_for_new_ticket
 from onegov.ticket import TicketCollection
 from onegov.translator_directory import _
 from onegov.translator_directory import TranslatorDirectoryApp
@@ -82,16 +83,14 @@ def request_accreditation(
             receivers=(form.email.data, ),
             ticket=ticket
         )
-        if request.email_for_new_tickets:
+        for email in emails_for_new_ticket(request, ticket):
             send_ticket_mail(
                 request=request,
                 template='mail_ticket_opened_info.pt',
                 subject=_('New ticket'),
                 ticket=ticket,
-                receivers=(request.email_for_new_tickets, ),
-                content={
-                    'model': ticket
-                }
+                receivers=(email, ),
+                content={'model': ticket},
             )
 
         request.app.send_websocket(
