@@ -28,7 +28,6 @@ from onegov.ticket import TicketPermission
 from onegov.user import User, UserGroup
 from sqlalchemy import Column, ForeignKey
 from sqlalchemy.orm import undefer, selectinload, load_only
-from onegov.core.orm.types import UUID
 
 
 from typing import Any, TYPE_CHECKING
