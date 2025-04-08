@@ -400,18 +400,15 @@ class TicketPermission(Base, TimestampMixin):
         group: str | None
     ) -> None:
 
-        if self.user_group_id is None:
-            if self.user_group.id is None:  # type: ignore[unreachable]
-                # this is an incomplete record that should fail in
-                # a different way
-                return
-
-            user_group_id = self.user_group.id
-        else:
-            user_group_id = self.user_group_id
-
         # this should always be set
         assert self.handler_code
+        if not (user_group_id := (
+            self.user_group_id
+            or (self.user_group and self.user_group.id)
+        )):
+            # this is an incomplete record that should fail in
+            # a different way
+            return
 
         session = object_session(self)
         query = session.query(TicketPermission)
