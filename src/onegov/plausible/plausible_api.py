@@ -10,7 +10,7 @@ log = logging.getLogger('onegov.plausible')
 
 class PlausibleAPI:
 
-    def __init__(self, site_id: str | None = None) -> None:
+    def __init__(self, site_id: str | None = None, api_key: str = '') -> None:
         """
         Initialize Plausible API client
         For details about the API see https://plausible.io/docs/stats-api
@@ -19,16 +19,13 @@ class PlausibleAPI:
         # plausible url
         self.url = 'https://analytics.seantis.ch/api/v2/query'
 
-        # api key from https://analytics.seantis.ch/settings/api-keys
-        api_key = (
-            'eR9snr0RzrglMLrKqVPNQ_IYL3dD6hyOX0-2gyRMlxSSSTk5bg6NjORWtbNEMoHU')
+        self.site_id = site_id
 
+        # api key from https://analytics.seantis.ch/settings/api-keys
         self.headers = {
             'Authorization': f'Bearer {api_key}',
             'Content-Type': 'application/json'
         }
-
-        self.site_id = site_id
 
     def _send_request(self, payload: dict[str, Any]) -> dict[Any, Any]:
         """
@@ -41,7 +38,7 @@ class PlausibleAPI:
 
         try:
             response = requests.post(
-                self.url, headers=self.headers, json=payload, timeout=30)
+                self.url, headers=self.headers, json=payload, timeout=10)
             response.raise_for_status()
         except HTTPError as http_err:
             if response.status_code == 401:
