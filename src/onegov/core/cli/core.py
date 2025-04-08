@@ -696,8 +696,7 @@ def command_group() -> click.Group:
             context.obj.config.logging.setdefault('version', 1)
             logging.config.dictConfig(context.obj.config.logging)
         except DB_CONNECTION_ERRORS as e:
-            print('Could not connect to database:')
-            print(e)
+            click.echo(f'Could not connect to database:\n{e}')
             sys.exit(1)
 
     @command_group.result_callback()

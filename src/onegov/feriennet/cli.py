@@ -1,7 +1,6 @@
 from __future__ import annotations
 
 import click
-import sys
 
 from onegov.core.cli import command_group
 from onegov.activity.models import Period
@@ -50,8 +49,7 @@ def delete_period(
         period = request.session.query(Period).filter_by(title=title).first()
 
         if not period:
-            print(f'Could not find period «{title}»')
-            sys.exit(1)
+            raise click.ClickException(f'Could not find period «{title}»')
 
         request.session.execute(text("""
             DELETE FROM payments WHERE payments.id IN (

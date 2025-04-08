@@ -151,6 +151,7 @@ select = [
     "RUF",
     "SIM",
     "SLOT",
+    "T",
     "UP",
     "W"
 ]
@@ -215,6 +216,9 @@ preview = true
     #       but there's no per-file-target-version
     "UP",
 ]
+"src/onegov/*/upgrade.py" = [
+    "T2",
+]
 "tests/**/*.py" = [
     "B018",
     "C4",
@@ -237,6 +241,7 @@ preview = true
     "PYI",
     "RUF",
     "SIM",
+    "T",
     "UP",
 ]
 
