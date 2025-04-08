@@ -1139,14 +1139,19 @@ def emails_for_new_ticket(
     permissions = request.app.ticket_permissions.get(ticket.handler_code, {})
     exclusive_group_ids = permissions.get(ticket.group, [])
 
+    # even if there are no exclusive permissions for this group
+    # there may still be exclusive permissions for the handler code
+    if not exclusive_group_ids and ticket.group:
+        exclusive_group_ids = permissions.get(None, [])
+
     query = request.session .query(UserGroup).join(TicketPermission)
     query = query.filter(TicketPermission.immediate_notification.is_(True))
     query = query.filter(TicketPermission.handler_code == ticket.handler_code)
 
     # if the permission applies to the whole handler_code
-    # then there can't be an exclusive permission for this
+    # then there can't be any exclusive permissions for any
     # specific group we're not a part of, since then we won't
-    # have permission to access this ticket
+    # have permission to access the ticket
     general_condition = TicketPermission.group.is_(None)
     if exclusive_group_ids:
         general_condition &= UserGroup.id.in_(exclusive_group_ids)
