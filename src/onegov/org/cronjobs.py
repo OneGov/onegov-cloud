@@ -993,12 +993,11 @@ def send_push_notifications_for_news(request: OrgRequest) -> None:
                         f"'{topic_id}' for news '{news.title}'. "
                     )
 
-                except Exception as e:
+                except Exception:
                     # For other exceptions (like notification service failures)
-                    error_details = str(e)
-                    log.error(
+                    log.exception(
                         f"Error sending notification to topic '{topic_id}' "
-                        f"for news '{news.title}': {error_details}"
+                        f"for news '{news.title}':"
                     )
 
         if sent_count:

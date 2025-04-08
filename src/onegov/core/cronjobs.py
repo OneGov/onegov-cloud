@@ -124,15 +124,15 @@ def parse_cron(
         return (int(value), )
 
     if not isinstance(value, str):
-        raise RuntimeError(f'Unexpected type for {value}: {type(value)}')
+        raise TypeError(f'Unexpected type for {value}: {type(value)}')
 
     if not CRONJOB_FORMAT.match(value):
-        raise RuntimeError(f'{value} did not match {CRONJOB_FORMAT}')
+        raise ValueError(f'{value} did not match {CRONJOB_FORMAT}')
 
     remainder = int(value.split('/')[-1])
 
     if remainder > size:
-        raise RuntimeError(f'The remainder in {value} is too big')
+        raise ValueError(f'The remainder in {value} is too big')
 
     return (v for v in range(size) if v % remainder == 0)
 

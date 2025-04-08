@@ -148,7 +148,7 @@ def path_to_filename(path: str | None) -> str | None:
     if not path:
         return None
     if not isinstance(path, str):
-        raise ValueError
+        raise TypeError
     if '/' in path:
         return path.rsplit('/', 1)[-1]
     if '\\' in path:

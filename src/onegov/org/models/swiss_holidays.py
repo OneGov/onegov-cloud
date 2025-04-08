@@ -97,7 +97,7 @@ class SwissHolidays:
 
     def __contains__(self, dt: date | datetime) -> bool:
         if not isinstance(dt, date) or isinstance(dt, datetime):
-            raise ValueError(f'Unsupported type: {type(dt)}')
+            raise TypeError(f'Unsupported type: {type(dt)}')
 
         if (dt.month, dt.day) in self._other:
             return True
