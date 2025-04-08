@@ -1,6 +1,5 @@
 from __future__ import annotations
 from inspect import isabstract
-import traceback
 from collections import OrderedDict
 
 import requests
@@ -752,7 +751,7 @@ def delete_content_marked_deletable(request: OrgRequest) -> None:
                 count += 1
 
     if count:
-        print(f'Cron: Deleted {count} expired deletable objects in db')
+        log.info(f'Cron: Deleted {count} expired deletable objects in db')
 
 
 @OrgApp.cronjob(hour=7, minute=0, timezone='Europe/Zurich')
@@ -815,7 +814,7 @@ def update_newsletter_email_bounce_statistics(
             recipient = recipients.by_address(email)
 
             if recipient and inactive:
-                print(f'Mark recipient {recipient.address} as inactive')
+                log.info(f'Mark recipient {recipient.address} as inactive')
                 recipient.mark_inactive()
 
 
@@ -835,7 +834,7 @@ def delete_unconfirmed_newsletter_subscriptions(request: OrgRequest) -> None:
         count += 1
 
     if count:
-        print(f'Cron: Deleted {count} unconfirmed newsletter subscriptions')
+        log.info(f'Cron: Deleted {count} unconfirmed newsletter subscriptions')
 
 
 def get_news_for_push_notification(session: Session) -> Query[News]:
@@ -918,10 +917,10 @@ def send_push_notifications_for_news(request: OrgRequest) -> None:
             # Get the topics to send to
             topics = news.meta.get('push_notifications', [])
             if not topics:
-                print(f'No topics configured for news item: {news.title}')
+                log.info(f'No topics configured for news item: {news.title}')
                 continue
 
-            print(
+            log.info(
                 f'Processing notification for news: {news.title} to '
                 f'{len(topics)} topics'
             )
@@ -934,7 +933,7 @@ def send_push_notifications_for_news(request: OrgRequest) -> None:
                 if PushNotification.was_notification_sent(
                     session, news.id, topic_id
                 ):
-                    print(
+                    log.info(
                         f"Skipping duplicate notification to topic "
                         f"'{topic_id}' for news '{news.title}'."
                     )
@@ -1003,17 +1002,20 @@ def send_push_notifications_for_news(request: OrgRequest) -> None:
                     )
 
         if sent_count:
-            print(f'Cron: Sent {sent_count} push notifications for news items')
+            log.info(
+                f'Cron: Sent {sent_count} push notifications for news items'
+            )
         if duplicate_count:
-            print(f'Cron: Skipped {duplicate_count} duplicate notifications')
+            log.info(
+                f'Cron: Skipped {duplicate_count} duplicate notifications'
+            )
         if not sent_count and not duplicate_count:
-            print('No notifications were sent')
+            log.info('No notifications were sent')
 
-    except Exception as e:
+    except Exception:
         # Rollback in case of error
         session.rollback()
-        print(traceback.format_exc())
-        print(f'Error sending notifications: {e}')
+        log.info('Error sending notifications:', exc_info=True)
 
 
 @OrgApp.cronjob(hour=3, minute=0, timezone='Europe/Zurich')

@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+from onegov.pas import log
 from onegov.pas.collections import AttendenceCollection
 from onegov.pas.models.party import Party
 from onegov.pas.models.parliamentarian import Parliamentarian
@@ -52,7 +53,7 @@ def get_parliamentarians_with_settlements(
         f'{p.last_name} {p.first_name}: {p.roles}'
         for p in active_parliamentarians
     ]
-    print(f'Active parliamentarians: {roles_pretty_print}')
+    log.info(f'Active parliamentarians: {roles_pretty_print}')
 
     # Get all parliamentarians with attendances in one query
     parliamentarians_with_attendances = {
@@ -61,7 +62,7 @@ def get_parliamentarians_with_settlements(
             Attendence.date <= end_date
         ).distinct()
     }
-    print(f'Parli with attendances: {parliamentarians_with_attendances}')
+    log.info(f'Parli with attendances: {parliamentarians_with_attendances}')
 
     # Filter the active parliamentarians to only those with attendances
     return [
@@ -117,6 +118,8 @@ def get_parties_with_settlements(
     )
 
 
+# FIXME: Should these two functions be a CLI command instead? Maybe switch
+#        to `click.echo` from `print` depending on the answer.
 def debug_party_export(
     settlement_run: SettlementRun,
     request: TownRequest,
@@ -126,10 +129,10 @@ def debug_party_export(
     session = request.session
 
     # 1. Check basic party info
-    print(f'Party ID: {party.id}, Name: {party.name}')
+    print(f'Party ID: {party.id}, Name: {party.name}')  # noqa: T201
 
     # 2. Check date range
-    print(f'Date range: {settlement_run.start} to {settlement_run.end}')
+    print(f'Date range: {settlement_run.start} to {settlement_run.end}')  # noqa: T201
 
     # 3. Get all attendances without party filter first
     base_attendances = (
@@ -141,22 +144,22 @@ def debug_party_export(
         )
         .all()
     )
-    print(f'Total attendances in date range: {len(base_attendances)}')
+    print(f'Total attendances in date range: {len(base_attendances)}')  # noqa: T201
 
     # 4. Check parliamentarian roles
     for attendance in base_attendances:
         parl = attendance.parliamentarian
-        print(f'\nParliamentarian: {parl.first_name} {parl.last_name}')
-        print(f'Attendance date: {attendance.date}')
+        print(f'\nParliamentarian: {parl.first_name} {parl.last_name}')  # noqa: T201
+        print(f'Attendance date: {attendance.date}')  # noqa: T201
 
         roles = session.query(ParliamentarianRole).filter(
             ParliamentarianRole.parliamentarian_id == parl.id,
             ParliamentarianRole.party_id == party.id,
             ).all()
 
-        print('Roles:')
+        print('Roles:')  # noqa: T201
         for role in roles:
-            print(f'- Start: {role.start}, End: {role.end}')
+            print(f'- Start: {role.start}, End: {role.end}')  # noqa: T201
 
         # Check if this attendance should be included
         should_include = any(
@@ -164,7 +167,7 @@ def debug_party_export(
             (role.end is None or role.end >= attendance.date)
             for role in roles
         )
-        print(f'Should include: {should_include}')
+        print(f'Should include: {should_include}')  # noqa: T201
 
     # 5. Try the actual party filter
     party_attendances = (
@@ -177,7 +180,7 @@ def debug_party_export(
         .query()
         .all()
     )
-    print(f'\nFinal filtered attendances: {len(party_attendances)}')
+    print(f'\nFinal filtered attendances: {len(party_attendances)}')  # noqa: T201
 
 
 def debug_party_export2(
@@ -185,18 +188,18 @@ def debug_party_export2(
     party: Party
 ) -> None:
     session = request.session
-    print(f'Party ID: {party.id}')
+    print(f'Party ID: {party.id}')  # noqa: T201
 
     # Check roles directly
     all_roles = session.query(ParliamentarianRole).filter(
         ParliamentarianRole.party_id == party.id
     ).all()
-    print(f'\nTotal roles for party: {len(all_roles)}')
+    print(f'\nTotal roles for party: {len(all_roles)}')  # noqa: T201
     for role in all_roles:
-        print(f'Role: {role.party_id} -> {role.parliamentarian_id}')
+        print(f'Role: {role.party_id} -> {role.parliamentarian_id}')  # noqa: T201
 
     # Check all parties
     all_parties = session.query(Party).all()
-    print('\nAll parties:')
+    print('\nAll parties:')  # noqa: T201
     for p in all_parties:
-        print(f'ID: {p.id}, Name: {p.name}')
+        print(f'ID: {p.id}, Name: {p.name}')  # noqa: T201

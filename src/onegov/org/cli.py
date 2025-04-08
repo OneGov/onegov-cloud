@@ -233,7 +233,7 @@ def import_digirez(
     def run_import(request: OrgRequest, app: OrgApp) -> None:
 
         # create all resources first, fails if at least one exists already
-        print('Creating resources')
+        click.echo('Creating resources')
 
         resources = ResourceCollection(app.libres_context)
         floors = {f.id: f.floor_name for f in db.records.floors}
@@ -294,7 +294,7 @@ def import_digirez(
             members[member.member_id] = member
 
         # create an allocation for all days between min/max date
-        print('Creating allocations')
+        click.echo('Creating allocations')
 
         for resource in resources_by_room.values():
 
@@ -329,7 +329,7 @@ def import_digirez(
                 )
 
         # create the reservations
-        print('Creating reservations')
+        click.echo('Creating reservations')
 
         booking_conflicts = 0
 
@@ -372,7 +372,7 @@ def import_digirez(
                     booking_conflicts += 1
                     found_conflict = True
 
-                    print(
+                    click.echo(
                         f'Booking conflict in {resource.title} '
                         f'at {booking.hour_start}'
                     )
@@ -488,7 +488,7 @@ def fix_tags(
             handle_occurrence_tags(occurrence)
 
         if dry_run:
-            print('\n'.join(set(msg_log)))
+            click.echo('\n'.join(set(msg_log)))
 
         assert not undefined_msg_ids, (
             f'Define {", ".join(undefined_msg_ids)}'

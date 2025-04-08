@@ -49,7 +49,7 @@ def add(
     def add_user(request: CoreRequest, app: Framework) -> None:
         users = UserCollection(app.session())
 
-        print('Adding {} to {}'.format(username, app.application_id))
+        click.echo('Adding {} to {}'.format(username, app.application_id))
 
         if users.exists(username):
             abort('{} already exists'.format(username))
@@ -60,10 +60,10 @@ def add(
         nonlocal password
         if not password:
             password = random_password(16)
-            print()
-            print('Using the following random password:')
+            click.echo()
+            click.echo('Using the following random password:')
             click.secho(password, fg='green')
-            print()
+            click.echo()
 
         nonlocal yubikey
         if not yubikey and not no_prompt:
@@ -217,7 +217,7 @@ def list(
         )
         users = users.order_by(User.username, User.role)
 
-        print(f'{app.schema}:')
+        click.echo(f'{app.schema}:')
         for username, role, active, source in users.all():
             if active_only and not active:
                 continue
@@ -225,7 +225,7 @@ def list(
             if inactive_only and active:
                 continue
 
-            print(
+            click.echo(
                 '  {active} {username} [{role}]{source}'.format(
                     active='✔︎' if active else '✘',
                     username=username,
@@ -470,7 +470,7 @@ def list_sessions() -> Callable[[CoreRequest, Framework], None]:
                 click.secho('{}'.format(user.username), fg='yellow')
                 for session in user.sessions.values():
                     session = session or {}  # type:ignore[unreachable]
-                    print('{} [{}] "{}"'.format(
+                    click.echo('{} [{}] "{}"'.format(
                         session.get('address') or '?',
                         session.get('timestamp') or '?',
                         session.get('agent') or '?',
