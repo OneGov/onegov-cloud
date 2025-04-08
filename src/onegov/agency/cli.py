@@ -110,7 +110,7 @@ def consolidate_cli(
         session = request.session
         first_seen, to_consolidate = find_double_entries(session)
         click.echo(f'Double entries found based on '
-              f'{based_on}: {len(to_consolidate)}')
+                   f'{based_on}: {len(to_consolidate)}')
         count = session.query(ExtendedAgencyMembership).count()
         for ix, (id_, persons) in enumerate(to_consolidate.items()):
             person = first_seen[id_]
