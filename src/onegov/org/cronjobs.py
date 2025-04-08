@@ -140,17 +140,20 @@ def send_daily_newsletter(request: OrgRequest) -> None:
                     hours=current_hour_tz - times[index - 1])
             news = request.session.query(News).filter(
                 News.published.is_(True),
-                or_(
-                    News.created.between(start, end),
-                    News.publication_start >= start,
-                )
+                News.published_or_created.between(start, end),
             )
 
-            if news.count() > 0:
+            recipients = RecipientCollection(
+                request.session).query().filter(
+                    Recipient.confirmed.is_(True),
+                    Recipient.daily_newsletter.is_(True),
+                )
+
+            if news.count() > 0 and recipients.count() > 0:
                 title = request.translate(
                     _('Daily Newsletter ${time}', mapping={
                         'time': to_timezone(end, 'Europe/Zurich').strftime(
-                            '%m.%d.%Y, %H:%M')
+                            '%d.%m.%Y, %H:%M')
                     })
                 )
                 newsletters = NewsletterCollection(request.session)
@@ -158,15 +161,8 @@ def send_daily_newsletter(request: OrgRequest) -> None:
                 newsletter.lead = _('New news since the last newsletter:')
                 newsletter.content['news'] = [n.id for n in news.all()]
 
-                recipients = RecipientCollection(
-                    request.session).query().filter(
-                        Recipient.confirmed.is_(True),
-                        Recipient.daily_newsletter.is_(True),
-                    )
-
-                if recipients.count() > 0:
-                    send_newsletter(request=request, newsletter=newsletter,
-                                    recipients=recipients.all(), daily=True)
+                send_newsletter(request=request, newsletter=newsletter,
+                                recipients=recipients.all(), daily=True)
 
 
 def publish_files(request: OrgRequest) -> None:
