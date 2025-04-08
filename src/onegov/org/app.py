@@ -127,6 +127,15 @@ class OrgApp(Framework, LibresIntegration, ElasticsearchApp, MapboxApp,
         self.enable_yubikey = enable_yubikey
         self.disable_password_reset = disable_password_reset
 
+    def configure_api_token(
+        self,
+        *,
+        plausible_api_token: str = '',
+        ** cfg: Any
+    ) -> None:
+
+        self.plausible_api_token = plausible_api_token
+
     def configure_mtan_hook(self, **cfg: Any) -> None:
         """
         This inserts an mtan hook by wrapping the callable we receive
