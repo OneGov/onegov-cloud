@@ -269,7 +269,7 @@ def test_ticket_permission_uniqueness(session):
         user_group=user_group,
     )
     session.add(duplicate)
-    with pytest.raises(ValueError, match=r'Consistency violation'):
+    with pytest.raises(ValueError, match=r'Uniqueness violation'):
         session.flush()
     transaction.abort()
     transaction.begin()
