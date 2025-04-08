@@ -8,7 +8,7 @@ from onegov.core.orm.types import JSON, UTCDateTime
 from onegov.core.upgrade import upgrade_task
 from onegov.ticket import Ticket
 from sqlalchemy import Boolean, Column, Integer, Text, Enum
-from sqlalchemy import column, update, func, and_
+from sqlalchemy import column, update, func, and_, true, false
 
 from typing import TYPE_CHECKING
 if TYPE_CHECKING:
@@ -181,7 +181,7 @@ def add_exclusive_and_notification_columns_to_ticket_permission(
             'exclusive',
             Boolean,
             nullable=False,
-            server_default=True,
+            server_default=true(),
             index=True,
         )
     )
@@ -192,12 +192,12 @@ def add_exclusive_and_notification_columns_to_ticket_permission(
             'immediate_notification',
             Boolean,
             nullable=False,
-            server_default=False,
+            server_default=false(),
             index=True,
         )
     )
 
-    if not context.operations.has_constraint(
+    if not context.has_constraint(
         'ticket_permissions',
         'no_redundant_ticket_permissions',
         'CHECK'
