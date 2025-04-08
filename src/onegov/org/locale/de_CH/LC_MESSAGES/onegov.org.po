@@ -2,7 +2,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE 1.0\n"
-"POT-Creation-Date: 2025-04-08 13:27+0200\n"
+"POT-Creation-Date: 2025-04-08 15:46+0200\n"
 "PO-Revision-Date: 2022-03-15 10:21+0100\n"
 "Last-Translator: Marc Sommerhalder <marc.sommerhalder@seantis.ch>\n"
 "Language-Team: German\n"
@@ -284,6 +284,9 @@ msgstr "Regel"
 
 msgid "Extend"
 msgstr "Verlängern"
+
+msgid "Don't extend this availability period automatically"
+msgstr "Diesen Verfügbarkeitszeitraum nicht automatisch verlängern"
 
 msgid "Extend by one day at midnight"
 msgstr "Mitternachts um einen Tag verlängern"
@@ -3195,8 +3198,8 @@ msgstr "Die Absage von ${title} kann nicht rückgängig gemacht werden."
 msgid "Reject reservation"
 msgstr "Reservation absagen"
 
-#.
 #. Used in sentence: "${event} published."
+#.
 msgid "Event"
 msgstr "Veranstaltung"
 

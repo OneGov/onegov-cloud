@@ -143,8 +143,9 @@ class AllocationRuleForm(Form):
         label=_('Extend'),
         validators=[InputRequired()],
         fieldset=_('Rule'),
-        default='daily',
+        default='no',
         choices=(
+            ('no', _("Don't extend this availability period automatically")),
             ('daily', _('Extend by one day at midnight')),
             ('monthly', _('Extend by one month at the end of the month')),
             ('yearly', _('Extend by one year at the end of the year'))

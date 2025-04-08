@@ -2,7 +2,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: \n"
-"POT-Creation-Date: 2025-04-08 13:27+0200\n"
+"POT-Creation-Date: 2025-04-08 15:46+0200\n"
 "PO-Revision-Date: 2022-03-15 10:52+0100\n"
 "Last-Translator: \n"
 "Language-Team: \n"
@@ -285,6 +285,9 @@ msgstr "Regola"
 
 msgid "Extend"
 msgstr "Prolunga"
+
+msgid "Don't extend this availability period automatically"
+msgstr "Non prolungare questo periodo di disponibilità automaticamente"
 
 msgid "Extend by one day at midnight"
 msgstr "Prolunga di un giorno a mezzanotte"
@@ -3206,8 +3209,8 @@ msgstr "Il rifiuto di ${title} non può essere annullato."
 msgid "Reject reservation"
 msgstr "Rifiuta prenotazione"
 
-#.
 #. Used in sentence: "${event} published."
+#.
 msgid "Event"
 msgstr "Evento"
 
