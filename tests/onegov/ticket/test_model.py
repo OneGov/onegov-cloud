@@ -243,15 +243,12 @@ def test_ticket_permission(session):
     assert session.query(TicketPermission).count() == 0
 
 
-@pytest.mark.parametrize('exclusive', [True, False])
-def test_ticket_permission_consistency(session, exclusive):
+def test_ticket_permission_uniqueness(session):
     user_group = UserGroup(name='group')
     permission = TicketPermission(
         handler_code='PER',
         group=None,
         user_group=user_group,
-        exclusive=exclusive,
-        immediate_notification=True,
     )
     session.add(user_group)
     session.add(permission)
@@ -270,8 +267,6 @@ def test_ticket_permission_consistency(session, exclusive):
         handler_code='PER',
         group=None,
         user_group=user_group,
-        exclusive=exclusive,
-        immediate_notification=True,
     )
     session.add(duplicate)
     with pytest.raises(ValueError, match=r'Consistency violation'):
@@ -280,35 +275,6 @@ def test_ticket_permission_consistency(session, exclusive):
     transaction.begin()
 
     assert session.query(TicketPermission).count() == 1
-
-    # conflicting permission
-    user_group2 = UserGroup(name='group2')
-    conflicting = TicketPermission(
-        handler_code='PER',
-        group=None,
-        user_group=user_group2,
-        exclusive=not exclusive,
-        immediate_notification=True,
-    )
-    session.add(user_group2)
-    session.add(conflicting)
-    with pytest.raises(ValueError, match=r'Consistency violation'):
-        session.flush()
-    transaction.abort()
-    transaction.begin()
-
-    # non-conflicting permission
-    user_group2 = UserGroup(name='group2')
-    permission2 = TicketPermission(
-        handler_code='PER',
-        group=None,
-        user_group=user_group2,
-        exclusive=exclusive,
-        immediate_notification=True,
-    )
-    session.add(user_group2)
-    session.add(permission2)
-    session.flush()
 
 
 def test_invalid_ticket_permission(session):

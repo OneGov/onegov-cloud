@@ -1,7 +1,6 @@
 from __future__ import annotations
 
 import re
-from markupsafe import Markup
 from onegov.core.utils import is_valid_yubikey_format
 from onegov.directory.models.directory import Directory
 from onegov.form import Form, merge_forms
@@ -14,7 +13,6 @@ from onegov.ticket import handlers
 from onegov.user import User, UserGroup
 from onegov.ticket import Ticket, TicketPermission
 from onegov.user import UserCollection
-from sqlalchemy import and_, or_
 from wtforms.fields import BooleanField
 from wtforms.fields import EmailField
 from wtforms.fields import RadioField
@@ -248,97 +246,6 @@ class ManageUserGroupForm(Form):
         self.ticket_permissions.choices = ticket_choices
         if isinstance(self.immediate_notification, ChosenSelectMultipleField):
             self.immediate_notification.choices = ticket_choices[:]
-
-    def ensure_exclusive_consistency(self) -> bool:
-        exclusive_permissions = self.exclusive_permissions
-        if not exclusive_permissions:
-            return True
-
-        query = self.request.session.query(
-            TicketPermission.handler_code,
-            TicketPermission.group,
-            UserGroup
-        ).join(UserGroup)
-        if isinstance(self.model, UserGroup):
-            # we can't be inconsistent with ourselves
-            query = query.filter(
-                TicketPermission.user_group_id != self.model.id
-            )
-
-        query = query.filter(or_(*(
-            and_(
-                TicketPermission.handler_code == handler_code,
-                TicketPermission.group.isnot_distinct_from(group)
-            )
-            for handler_code, group in exclusive_permissions
-        )))
-
-        query = query.filter(TicketPermission.exclusive.is_(False))
-        inconsistencies = query.all()
-        if inconsistencies:
-            assert isinstance(self.ticket_permissions.errors, list)
-            self.ticket_permissions.errors.append(_(
-                'The following selected permissions are invalid '
-                'because immediate notifications are turned on '
-                'in the following groups without a matching '
-                'permission for this ticket:<ul>${inconsistencies}</ul>',
-                mapping={'inconsistencies': Markup('').join(
-                    Markup(
-                        '<li>{permission}: <a href="{url}" '
-                        'target="_blank">{user_group}</a></li>'
-                    ).format(
-                        permission=f'{code}: {group}' if group else code,
-                        url=self.request.link(user_group),
-                        user_group=user_group.name,
-                    )
-                    for code, group, user_group in inconsistencies
-                )},
-                markup=True
-            ))
-            return False
-        return True
-
-    def ensure_immediate_notification_consistency(self) -> bool:
-        immediate_notifications = self.immediate_notifications
-        if not immediate_notifications:
-            return True
-
-        non_exclusive = immediate_notifications - self.exclusive_permissions
-        if not non_exclusive:
-            return True
-
-        query = self.request.session.query(
-            TicketPermission.handler_code,
-            TicketPermission.group
-        )
-        if isinstance(self.model, UserGroup):
-            # we can't be inconsistent with ourselves
-            query = query.filter(
-                TicketPermission.user_group_id != self.model.id
-            )
-
-        query = query.filter(or_(*(
-            and_(
-                TicketPermission.handler_code == handler_code,
-                TicketPermission.group.isnot_distinct_from(group)
-            )
-            for handler_code, group in non_exclusive
-        )))
-
-        query = query.filter(TicketPermission.exclusive.is_(True))
-        inconsistencies = query.distinct().all()
-        if inconsistencies:
-            assert isinstance(self.immediate_notification.errors, list)
-            self.immediate_notification.errors.append(_(
-                'The following selected ticket types require '
-                'that ticket permissions are given as well: ${permissions}',
-                mapping={'permissions': ', '.join(
-                    f'{code}: {group}' if group else code
-                    for code, group in inconsistencies
-                )},
-            ))
-            return False
-        return True
 
     @property
     def exclusive_permissions(self) -> set[tuple[str, str | None]]:

@@ -2,7 +2,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: \n"
-"POT-Creation-Date: 2025-04-01 14:22+0200\n"
+"POT-Creation-Date: 2025-04-08 13:27+0200\n"
 "PO-Revision-Date: 2022-03-15 10:52+0100\n"
 "Last-Translator: \n"
 "Language-Team: \n"
@@ -128,6 +128,9 @@ msgstr "Panoramica della prenotazione di ${org}"
 
 msgid "Your Chat has been turned into a ticket"
 msgstr "È stato creato un ticket dalla loro chat"
+
+msgid "New ticket"
+msgstr "Nuovo biglietto"
 
 msgid "Account"
 msgstr "Conto"
@@ -2360,16 +2363,9 @@ msgstr "Permessi sul biglietto"
 msgid "Restricts access and gives permission to these ticket categories"
 msgstr "Limita l'accesso e autorizza queste categorie di biglietti"
 
-msgid "Directories"
-msgstr "Cartelle"
-
-msgid ""
-"Directories for which this user group is responsible. If activated, ticket "
-"notifications for this group are only sent for these directories"
+msgid "Immediate e-mail notification to members upon ticket submission"
 msgstr ""
-"Directory per le quali questo gruppo di utenti è responsabile. Se attivata, "
-"le notifiche di ticket le notifiche per questo Gruppo vengono inviate solo "
-"per queste directory"
+"Notifica immediata via e-mail ai membri al momento dell'invio del ticket"
 
 msgid "Send a periodic status e-mail."
 msgstr "Invia un'e-mail di stato periodica."
@@ -2421,6 +2417,9 @@ msgstr "Collegare file aggiuntivi"
 
 msgid "All directories"
 msgstr "Tutte le cartelle"
+
+msgid "Directories"
+msgstr "Cartelle"
 
 msgid "All events"
 msgstr "Tutti gli eventi"
@@ -3207,8 +3206,8 @@ msgstr "Il rifiuto di ${title} non può essere annullato."
 msgid "Reject reservation"
 msgstr "Rifiuta prenotazione"
 
-#. Used in sentence: "${event} published."
 #.
+#. Used in sentence: "${event} published."
 msgid "Event"
 msgstr "Evento"
 
@@ -5560,9 +5559,6 @@ msgstr "Aggiungi evento"
 msgid "Your request has been registered"
 msgstr "La tua richiesta è stata registrata"
 
-msgid "New ticket"
-msgstr "Nuovo biglietto"
-
 msgid "Your request could not be accepted automatically!"
 msgstr "La tua richiesta non può essere accettata automaticamente!"
 
@@ -6608,24 +6604,3 @@ msgstr "È stato creato un account per te"
 
 msgid "The user was created successfully"
 msgstr "Utente creato correttamente"
-
-#~ msgid ""
-#~ "Invalid format. Please define a list with topics and subtopics according "
-#~ "the example."
-#~ msgstr ""
-#~ "Formato non valido. Definire un elenco con argomenti e sottoargomenti "
-#~ "secondo l'esempio."
-
-#~ msgid ""
-#~ "Invalid format. Please define a listwith topics and subtopics according "
-#~ "the example."
-#~ msgstr ""
-#~ "Formato non valido. Definire una lista con argomenti e sottoargomenti "
-#~ "secondo l'esempio."
-
-#~ msgid ""
-#~ "Invalid format. Please define an organisation name with topics and "
-#~ "subtopics according the example."
-#~ msgstr ""
-#~ "Formato non valido. Definire un nome di organizzazione con argomenti e "
-#~ "sottoargomenti secondo l'esempio."

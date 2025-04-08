@@ -761,36 +761,6 @@ def test_user_group_form(session):
     assert permission.exclusive is True
     assert permission.immediate_notification is True
 
-    # consistency checks
-    groups = UserGroupCollection(session)
-    group2 = groups.add(name='B')
-    form2 = ManageUserGroupForm()
-    form2.model = group2
-    form2.request = request
-    form2.on_request()
-
-    # we're not allowed immediate notifications for PER
-    # without permissions to PER
-    form2.apply_model(group2)
-    # for validation
-    form2.name.raw_data = ['B']
-    form2.immediate_notification.data = ['PER']
-    assert not form2.validate()
-    assert 'PER' in form2.immediate_notification.errors[0].interpolate()
-
-    # but we are allowed for one that doesn't have exclusive permissions
-    form2.immediate_notification.data = ['DIR']
-    assert form2.validate()
-    form2.update_model(group2)
-    session.flush()
-    assert session.query(TicketPermission).count() == 2
-
-    # and now we're not allowed to give exclusive permissions to a different
-    # group
-    form.ticket_permissions.data = ['PER', 'DIR']
-    assert not form.validate()
-    assert 'DIR' in form.ticket_permissions.errors[0].interpolate()
-
 
 def test_settings_ticket_permissions(session):
     group = UserGroupCollection(session).add(name='A')

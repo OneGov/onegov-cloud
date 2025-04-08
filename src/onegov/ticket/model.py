@@ -392,13 +392,23 @@ class TicketPermission(Base, TimestampMixin):
         ),
     )
 
-    @observes('handler_code', 'group', 'exclusive')
-    def ensure_consistency(
+    # NOTE: A unique constraint doesn't work here, since group is nullable
+    @observes('handler_code', 'group')
+    def ensure_uniqueness(
         self,
         handler_code: str,
-        group: str | None,
-        exclusive: bool
+        group: str | None
     ) -> None:
+
+        if self.user_group_id is None:
+            if self.user_group.id is None:  # type: ignore[unreachable]
+                # this is an incomplete record that should fail in
+                # a different way
+                return
+
+            user_group_id = self.user_group.id
+        else:
+            user_group_id = self.user_group_id
 
         # this should always be set
         assert self.handler_code
@@ -420,19 +430,10 @@ class TicketPermission(Base, TimestampMixin):
             TicketPermission.group.isnot_distinct_from(self.group)
         )
 
-        exclusive = True if self.exclusive is None else self.exclusive
-
-        # the same permission needs to have the same exclusivity
-        # amongst all the user groups
+        # the exact same permission may only exist once per user group
         constraint_violated = query.filter(
-            TicketPermission.exclusive.is_(not exclusive)
+            TicketPermission.user_group_id == user_group_id
         ).exists()
 
-        # the exact same permission may only exist once per user group
-        if user_group_id := self.user_group_id or self.user_group.id:
-            constraint_violated |= query.filter(
-                TicketPermission.user_group_id == user_group_id
-            ).exists()
-
         if session.query(constraint_violated).scalar():
-            raise ValueError('Consistency violation in ticket permissions')
+            raise ValueError('Uniqueness violation in ticket permissions')
