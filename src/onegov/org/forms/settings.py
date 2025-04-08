@@ -1003,7 +1003,7 @@ class HolidaySettingsForm(Form):
 class OrgTicketSettingsForm(Form):
 
     email_for_new_tickets = StringField(
-        label=_('Email address for notifications'
+        label=_('Email address for notifications '
                 'about newly opened tickets'),
         description=('info@example.ch')
     )
@@ -1179,9 +1179,9 @@ class NewsletterSettingsForm(Form):
         label=_('Enable automatic daily newsletters'),
         description=_('Automatically creates a daily newsletter containing '
         'all new news items since the last sending time. It will only send a '
-        'newsletter if there is at least one new news item and only '
-        'subscribers of the automatically created "daily"-category will '
-        'receive it.'),
+        'newsletter if there is at least one new news item. Only subscribers '
+        'who subscribed to the daily newsletter will receive it, independent '
+        'of their selected categories if there are any.'),
         fieldset=_('Automatic newsletters'),
         default=False
     )

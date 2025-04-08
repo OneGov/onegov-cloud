@@ -48,7 +48,20 @@ def test_subscription_to_a_course_event(client_with_db):
         role='member').first().id
     assert attendee.organisation == 'ORG'
 
-    # Add a new course event
+    # Add a new course event in 2050
+    page = client.get(f'/fsi/events/add?course_id={course.id}')
+    page.form['presenter_name'] = 'Presenter'
+    page.form['presenter_company'] = 'Presenter'
+    page.form['presenter_email'] = 'presenter@example.org'
+    page.form['locked_for_subscriptions'] = True
+    page.form['start'] = '2050-10-04 10:00'
+    page.form['end'] = '2050-10-04 12:00'
+    page.form['location'] = 'location'
+    page.form['max_attendees'] = 20
+    new = page.form.submit().follow()
+    event_url_1 = page.request.path
+
+    # And another one 4 years later
     page = client.get(f'/fsi/events/add?course_id={course.id}')
     page.form['presenter_name'] = 'Presenter'
     page.form['presenter_company'] = 'Presenter'
@@ -58,19 +71,28 @@ def test_subscription_to_a_course_event(client_with_db):
     page.form['end'] = '2054-10-04 12:00'
     page.form['location'] = 'location'
     page.form['max_attendees'] = 20
+
     # goes to the event created
     new = page.form.submit().follow()
+    event_url_2 = page.request.path
     assert 'Eine neue Durchführung wurde hinzugefügt' in new
 
     coll = CourseEventCollection(session, upcoming_only=True)
     events = coll.query().all()
-    assert len(events) == 3
+    assert len(events) == 4
 
     form = client.get('/fsi/reservations/add')
     form.form['attendee_id'] = str(attendee.id)
-    form.form['course_event_id'] = str(events[2].id)
+    form.form['course_event_id'] = str(events[3].id)
     page = form.form.submit().follow()
     assert 'Neue Anmeldung wurde hinzugefügt' in page
+
+    editor = client.spawn()
+    editor.login_editor()
+    page = editor.get(event_url_1)
+    page.click('Anmelden').click('Für Kursdurchführung registrieren')
+    page = editor.get(event_url_2)
+
 
 
 def test_reservation_collection_view(client_with_db):

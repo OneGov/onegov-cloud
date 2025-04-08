@@ -144,26 +144,29 @@ def send_daily_newsletter(request: OrgRequest) -> None:
                     News.created.between(start, end),
                     News.publication_start >= start,
                 )
-            ).all()
+            )
 
-            if news:
-                time = to_timezone(end, 'Europe/Zurich').strftime(
+            if news.count() > 0:
+                title = request.translate(
+                    _('Daily Newsletter ${time}', mapping={
+                        'time': to_timezone(end, 'Europe/Zurich').strftime(
                             '%m.%d.%Y, %H:%M')
-                title = f"{_('Daily Newsletter')} {time}"
+                    })
+                )
                 newsletters = NewsletterCollection(request.session)
                 newsletter = newsletters.add(title=title, html=Markup(''))
                 newsletter.lead = _('New news since the last newsletter:')
-                newsletter.content['news'] = [n.id for n in news]
+                newsletter.content['news'] = [n.id for n in news.all()]
 
                 recipients = RecipientCollection(
                     request.session).query().filter(
                         Recipient.confirmed.is_(True),
                         Recipient.daily_newsletter.is_(True),
-                    ).all()
+                    )
 
-                if recipients:
+                if recipients.count() > 0:
                     send_newsletter(request=request, newsletter=newsletter,
-                                    recipients=recipients, daily=True)
+                                    recipients=recipients.all(), daily=True)
 
 
 def publish_files(request: OrgRequest) -> None:
