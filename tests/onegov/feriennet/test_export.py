@@ -43,6 +43,7 @@ def test_exports(client, scenario):
         address='Whatroad 12',
         zip_code='4040',
         place='Someplace',
+        swisspass='123-456-789-0',
         political_municipality='Someotherplace'
     )
 
@@ -99,6 +100,7 @@ def test_exports(client, scenario):
     data = dict(list(rows)[0])
     assert data['Activity Tags'] == "CAMP\nFamily Camp"
     assert data['Attendee Place'] == 'Someplace'
+    assert data['Attendee SwissPass ID'] == '123-456-789-0'
     assert data['Attendee Political Municipality'] == 'Someotherplace'
 
     # Create invoices
@@ -154,4 +156,5 @@ def test_exports(client, scenario):
     assert data['Attendee Zipcode'] == '4040'
     assert data['Attendee Place'] == 'Someplace'
     assert data['Attendee Political Municipality'] == 'Someotherplace'
+    assert data['Attendee SwissPass ID'] == '123-456-789-0'
     assert data['Invoice Item Payment date'] == date(2020, 3, 5)
