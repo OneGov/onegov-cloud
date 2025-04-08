@@ -126,6 +126,11 @@ class AttendeeForm(AttendeeBase):
         description=_('Allergies, Disabilities, Particulars'),
     )
 
+    swisspass = StringField(
+        label=_('Swisspass ID'),
+        description=_('XXX-XXX-XXX-X'),
+    )
+
     differing_address = BooleanField(
         label=_('The address of the attendee differs from the users address'),
         description=_("Check this box if the attendee doesn't live with you")
@@ -167,6 +172,23 @@ class AttendeeForm(AttendeeBase):
     def on_request(self) -> None:
         self.toggle_political_municipality()
 
+    def ensure_valid_swisspass_id(self) -> bool:
+        if self.swisspass.data:
+            if len(self.swisspass.data) != 13:
+                assert isinstance(self.swisspass.errors, list)
+                self.swisspass.errors.append(_(
+                    'The Swisspass ID must be 13 characters long.'
+                ))
+                return False
+
+            if not all(c.isdigit() or c == '-' for c in self.swisspass.data):
+                assert isinstance(self.swisspass.errors, list)
+                self.swisspass.errors.append(_(
+                    'The Swisspass ID must only contain digits and dashes.'
+                ))
+                return False
+        return True
+
 
 class AttendeeSignupForm(AttendeeBase):
 
@@ -203,6 +225,12 @@ class AttendeeSignupForm(AttendeeBase):
     notes = TextAreaField(
         label=_('Note'),
         description=_('Allergies, Disabilities, Particulars'),
+        depends_on=('attendee', 'other')
+    )
+
+    swisspass = StringField(
+        label=_('Swisspass ID'),
+        description=_('XXX-XXX-XXX-X'),
         depends_on=('attendee', 'other')
     )
 
@@ -550,6 +578,23 @@ class AttendeeSignupForm(AttendeeBase):
             return False
 
         return None
+
+    def ensure_valid_swisspass_id(self) -> bool:
+        if self.swisspass.data:
+            if len(self.swisspass.data) != 13:
+                assert isinstance(self.swisspass.errors, list)
+                self.swisspass.errors.append(_(
+                    'The Swisspass ID must be 13 characters long.'
+                ))
+                return False
+
+            if not all(c.isdigit() or c == '-' for c in self.swisspass.data):
+                assert isinstance(self.swisspass.errors, list)
+                self.swisspass.errors.append(_(
+                    'The Swisspass ID must only contain digits and dashes.'
+                ))
+                return False
+        return True
 
 
 class AttendeeLimitForm(Form):
