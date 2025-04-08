@@ -23,7 +23,7 @@ from webob import exc, Response
 from typing import TYPE_CHECKING
 if TYPE_CHECKING:
     from collections.abc import Sequence
-
+    from datetime import datetime
     from lxml.etree import _Element
     from onegov.core.types import RenderData
     from onegov.org.request import OrgRequest
@@ -286,7 +286,7 @@ class AtomLinkInRSSExtension(BaseExtension):  # type: ignore[misc]
 
 
 def generate_rss_feed(
-    items: list[dict[str, str | bool]],
+    items: list[dict[str, str | datetime]],
     request_url: str,
     prev_url: str | None,
     next_url: str | None,
