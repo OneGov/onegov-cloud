@@ -1,6 +1,6 @@
 var locales = {
     de: {
-        "Allocation": "Einteilung",
+        "Allocation": "Verfügbarkeit",
         "Add": "Hinzufügen",
         "Count": "Anzahl",
         "Dates": "Termine",

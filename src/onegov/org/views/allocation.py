@@ -19,7 +19,6 @@ from onegov.org.forms.allocation import (
     DailyItemAllocationForm, DailyItemAllocationEditForm)
 from onegov.org.layout import AllocationEditFormLayout
 from onegov.org.layout import AllocationRulesLayout
-from onegov.org.layout import ResourceLayout
 from onegov.core.elements import Link, Confirm, Intercooler
 from onegov.reservation import Allocation
 from onegov.reservation import Reservation
@@ -131,10 +130,10 @@ def view_allocation_rules(
                         mapping={'title': rule['title']}
                     ),
                     _(
-                        'The rule will be removed without affecting '
-                        'existing allocations.'
+                        'The availability period will be removed without '
+                        'affecting existing allocations.'
                     ),
-                    _('Stop rule'),
+                    _('Stop availability period'),
                     _('Cancel')
                 ),
                 Intercooler(
@@ -154,8 +153,8 @@ def view_allocation_rules(
                         mapping={'title': rule['title']}
                     ),
                     _(
-                        "All allocations created by the rule will be removed, "
-                        "if they haven't been reserved yet."
+                        "All allocations created by the availability period "
+                        "will be removed, if they haven't been reserved yet."
                     ),
                     _('Delete rule'),
                     _('Cancel')
@@ -186,7 +185,7 @@ def view_allocation_rules(
 
     return {
         'layout': layout,
-        'title': _('Rules'),
+        'title': _('Availability periods'),
         'rules': tuple(rules_with_actions())
     }
 
@@ -247,75 +246,6 @@ def get_allocation_rule_form_class(
     form = get_new_allocation_form_class(resource, request)
 
     return merge_forms(AllocationRuleForm, form)
-
-
-@OrgApp.form(model=Resource, template='form.pt', name='new-allocation',
-             permission=Private, form=get_new_allocation_form_class)
-def handle_new_allocation(
-    self: Resource,
-    request: OrgRequest,
-    form: AllocationForm,
-    layout: ResourceLayout | None = None
-) -> RenderData | Response:
-    """ Handles new allocations for differing form classes. """
-
-    if form.submitted(request):
-        try:
-            allocations = self.scheduler.allocate(
-                dates=form.dates,
-                whole_day=form.whole_day,
-                quota=form.quota,
-                quota_limit=form.quota_limit,
-                data=form.data,
-                partly_available=form.partly_available
-            )
-        except LibresError as e:
-            utils.show_libres_error(e, request)
-        else:
-            if not allocations:
-                request.alert(_('No allocations to add'))
-            else:
-                request.success(
-                    _('Successfully added ${n} allocations', mapping={
-                        'n': len(allocations)
-                    }))
-
-                self.highlight_allocations(allocations)
-
-                return morepath.redirect(request.link(self))
-
-    elif not request.POST:
-        start, end = utils.parse_fullcalendar_request(request, self.timezone)
-        whole_day = request.params.get('whole_day') == 'yes'
-
-        if start and end:
-            if whole_day:
-                form.start.data = start
-                form.end.data = end
-
-                if hasattr(form, 'as_whole_day'):
-                    form.as_whole_day.data = 'yes'
-            else:
-                form.start.data = start
-                form.end.data = end
-
-                if hasattr(form, 'as_whole_day'):
-                    form.as_whole_day.data = 'no'
-
-                if hasattr(form, 'start_time'):
-                    assert hasattr(form, 'end_time')
-                    form.start_time.data = start
-                    form.end_time.data = end
-
-    layout = layout or ResourceLayout(self, request)
-    layout.breadcrumbs.append(Link(_('New allocation'), '#'))
-    layout.editbar_links = None
-
-    return {
-        'layout': layout,
-        'title': _('New allocation'),
-        'form': form
-    }
 
 
 @OrgApp.form(model=Allocation, template='form.pt', name='edit',
@@ -421,19 +351,20 @@ def handle_allocation_rule(
         self.content['rules'] = rules
 
         request.success(_(
-            'New rule active, ${n} allocations created', mapping={'n': changes}
+            'New availability period active, ${n} allocations created',
+            mapping={'n': changes}
         ))
 
         return request.redirect(request.link(self, name='rules'))
 
     return {
         'layout': layout,
-        'title': _('New Rule'),
+        'title': _('New availabilty period'),
         'form': form,
         'helptext': _(
-            'Rules ensure that the allocations between start/end exist and '
-            'that they are extended beyond those dates at the given '
-            'intervals. '
+            'Availability periods ensure that the allocations between '
+            'start/end exist and that they are extended beyond those dates at '
+            'the given intervals.'
         )
     }
 
@@ -492,7 +423,7 @@ def handle_edit_rule(
 
         request.success(
             _(
-                'Rule updated. ${deleted} allocations removed, '
+                'Availability period updated. ${deleted} allocations removed, '
                 '${created} new allocations created.',
                 mapping={
                     'deleted': deleted_count,
@@ -659,7 +590,8 @@ def handle_delete_rule(self: Resource, request: OrgRequest) -> None:
     delete_rule(self, rule_id)
 
     request.success(
-        _('The rule was deleted, along with ${n} allocations', mapping={
+        _('The availability period was deleted, along with ${n} allocations',
+          mapping={
             'n': count
         })
     )

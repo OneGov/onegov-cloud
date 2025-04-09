@@ -2,7 +2,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: \n"
-"POT-Creation-Date: 2025-04-08 15:46+0200\n"
+"POT-Creation-Date: 2025-04-09 13:41+0200\n"
 "PO-Revision-Date: 2022-03-15 10:52+0100\n"
 "Last-Translator: \n"
 "Language-Team: \n"
@@ -355,14 +355,14 @@ msgstr "Ognuno fino alle"
 msgid "May be partially reserved"
 msgstr "Può essere parzialmente prenotato"
 
-msgid "Options"
-msgstr "Opzioni"
-
 msgid "Reservations per time slot"
 msgstr "Prenotazioni per fascia oraria"
 
 msgid "Available items"
 msgstr "Elementi disponibili"
+
+msgid "Options"
+msgstr "Opzioni"
 
 msgid "Reservations per time slot and person"
 msgstr "Prenotazioni per fascia oraria e persona"
@@ -2694,6 +2694,9 @@ msgstr "Occupazione"
 
 msgid "Subscribe"
 msgstr "Iscriviti"
+
+msgid "Availability Periods"
+msgstr "Periodi di disponibilità"
 
 msgid "Rules"
 msgstr "Regole"
@@ -5142,21 +5145,28 @@ msgstr "Arresta"
 msgid "Do you really want to stop \"${title}\"?"
 msgstr "Vuoi davvero fermare \"${title}\"?"
 
-msgid "The rule will be removed without affecting existing allocations."
-msgstr "La regola sarà rimossa senza influire sulle allocazioni esistenti."
+msgid ""
+"The availability period will be removed without affecting existing "
+"allocations."
+msgstr ""
+"Il periodo di disponibilità verrà rimosso senza influire sulle allocazioni "
+"esistenti."
 
-msgid "Stop rule"
-msgstr "Arresta la regola"
+msgid "Stop availability period"
+msgstr "Arresta il periodo di disponibilità"
 
 msgid ""
-"All allocations created by the rule will be removed, if they haven't been "
-"reserved yet."
+"All allocations created by the availability period will be removed, if they "
+"haven't been reserved yet."
 msgstr ""
-"Se non sono state ancora prenotate, tutte le allocazioni create dalla regola "
-"verranno rimosse."
+"Tutte le allocazioni create dal periodo di disponibilità verranno rimosse, "
+"se non sono state ancora prenotate."
 
 msgid "Delete rule"
 msgstr "Elimina la regola"
+
+msgid "Availability periods"
+msgstr "Periodi di disponibilità"
 
 msgid "No allocations to add"
 msgstr "Nessuna allocazione da aggiungere"
@@ -6607,3 +6617,16 @@ msgstr "È stato creato un account per te"
 
 msgid "The user was created successfully"
 msgstr "Utente creato correttamente"
+
+#~ msgid "The rule will be removed without affecting existing allocations."
+#~ msgstr "La regola sarà rimossa senza influire sulle allocazioni esistenti."
+
+#~ msgid "Stop rule"
+#~ msgstr "Arresta la regola"
+
+#~ msgid ""
+#~ "All allocations created by the rule will be removed, if they haven't been "
+#~ "reserved yet."
+#~ msgstr ""
+#~ "Se non sono state ancora prenotate, tutte le allocazioni create dalla "
+#~ "regola verranno rimosse."

@@ -2,7 +2,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE 1.0\n"
-"POT-Creation-Date: 2025-04-08 15:46+0200\n"
+"POT-Creation-Date: 2025-04-09 13:41+0200\n"
 "PO-Revision-Date: 2022-03-15 10:50+0100\n"
 "Last-Translator: Marc Sommerhalder <marc.sommerhalder@seantis.ch>\n"
 "Language-Team: French\n"
@@ -354,14 +354,14 @@ msgstr "Chacun finissant à"
 msgid "May be partially reserved"
 msgstr "Peut être partiellement réservé"
 
-msgid "Options"
-msgstr "Options"
-
 msgid "Reservations per time slot"
 msgstr "Maximum des reservation par unité des temps"
 
 msgid "Available items"
 msgstr "Articles disponibles"
+
+msgid "Options"
+msgstr "Options"
 
 msgid "Reservations per time slot and person"
 msgstr "Réservations par tranche horaire et par personne"
@@ -2692,6 +2692,9 @@ msgstr "Occupation"
 
 msgid "Subscribe"
 msgstr "Souscrire"
+
+msgid "Availability Periods"
+msgstr "Périodes de disponibilité"
 
 msgid "Rules"
 msgstr "Règles"
@@ -5153,21 +5156,28 @@ msgstr "Arrêter"
 msgid "Do you really want to stop \"${title}\"?"
 msgstr "Voulez-vous vraiment arrêter \"${title}\" ?"
 
-msgid "The rule will be removed without affecting existing allocations."
-msgstr "La règle sera supprimée sans affecter les allocations existantes."
+msgid ""
+"The availability period will be removed without affecting existing "
+"allocations."
+msgstr ""
+"Le délai de disponibilité sera supprimé sans affecter les allocations "
+"existantes."
 
-msgid "Stop rule"
-msgstr "Arrêter la règle"
+msgid "Stop availability period"
+msgstr "Arrêter la période de disponibilité"
 
 msgid ""
-"All allocations created by the rule will be removed, if they haven't been "
-"reserved yet."
+"All allocations created by the availability period will be removed, if they "
+"haven't been reserved yet."
 msgstr ""
-"Toutes les allocations créées par la règle seront supprimées si elles n'ont "
-"pas encore été réservées."
+"Les allocations créées par la période de disponibilité seront supprimées, "
+"si elles n'ont pas encore été réservées."
 
 msgid "Delete rule"
 msgstr "Supprimer la règle"
+
+msgid "Availability periods"
+msgstr "Périodes de disponibilité"
 
 msgid "No allocations to add"
 msgstr "Aucune allocation à ajouter"
@@ -6624,3 +6634,16 @@ msgstr "Un compte a été créé pour vous"
 
 msgid "The user was created successfully"
 msgstr "L'utilisateur a bien été créé"
+
+#~ msgid "The rule will be removed without affecting existing allocations."
+#~ msgstr "La règle sera supprimée sans affecter les allocations existantes."
+
+#~ msgid "Stop rule"
+#~ msgstr "Arrêter la règle"
+
+#~ msgid ""
+#~ "All allocations created by the rule will be removed, if they haven't been "
+#~ "reserved yet."
+#~ msgstr ""
+#~ "Toutes les allocations créées par la règle seront supprimées si elles "
+#~ "n'ont pas encore été réservées."

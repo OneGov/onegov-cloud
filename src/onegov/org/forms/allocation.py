@@ -518,7 +518,7 @@ class RoomAllocationForm(AllocationForm):
             ('yes', _('Yes')),
             ('no', _('No'))
         ],
-        default='yes',
+        default='no',
         fieldset=_('Time')
     )
 
@@ -544,8 +544,8 @@ class RoomAllocationForm(AllocationForm):
             ('yes', _('Yes')),
             ('no', _('No'))
         ],
-        default='no',
-        fieldset=_('Options'),
+        default='yes',
+        fieldset=_('Time'),
         depends_on=('as_whole_day', 'no')
     )
 
@@ -555,7 +555,7 @@ class RoomAllocationForm(AllocationForm):
             InputRequired(),
             NumberRange(1, 999)
         ],
-        fieldset=_('Options'),
+        fieldset=_('Time'),
         default=1,
         depends_on=('as_whole_day', 'no', 'is_partly_available', 'no')
     )

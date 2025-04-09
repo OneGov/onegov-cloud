@@ -465,7 +465,8 @@ def test_allocations(client):
     new.form['daypasses_limit'] = 1
     new = new.form.submit()
 
-    assert "Es besteht bereits eine Einteilung im gewünschten Zeitraum" in new
+    assert ("Es besteht bereits eine Verfügbarkeit im gewünschten Zeitraum"
+            ) in new
 
     # move the existing allocations
     slots = client.get((
@@ -2045,7 +2046,7 @@ def test_cleanup_allocations(client):
     cleanup.form['weekdays'] = [4, 6]
     resource = cleanup.form.submit().follow()
 
-    assert "1 Einteilungen wurden erfolgreich entfernt" in resource
+    assert "1 Verfügbarkeiten wurden erfolgreich entfernt" in resource
 
     allocations = scheduler.managed_allocations().order_by('id').all()
     assert len(allocations) == 2
@@ -2205,7 +2206,7 @@ def test_allocation_rules_on_rooms(client):
 
     page = page.form.submit().follow()
 
-    assert 'Regel aktiv, 2 Einteilungen erstellt' in page
+    assert 'Regel aktiv, 2 Verfügbarkeiten erstellt' in page
     assert count_allocations() == 2
 
     # running the cronjob once will add a new allocation
@@ -2294,7 +2295,7 @@ def test_allocation_rules_edit(client):
 
     page = page.form.submit().follow()
 
-    assert 'Regel aktiv, 2 Einteilungen erstellt' in page
+    assert 'Regel aktiv, 2 Verfügbarkeiten erstellt' in page
     assert count_allocations() == 2
 
     # Modifying the rule applies changes where possible, but
@@ -2342,7 +2343,7 @@ def test_allocation_rules_on_daypasses(client):
     page.form['daypasses_limit'] = '1'
     page = page.form.submit().follow()
 
-    assert 'Regel aktiv, 31 Einteilungen erstellt' in page
+    assert 'Regel aktiv, 31 Verfügbarkeiten erstellt' in page
     assert count_allocations() == 31
 
     # running the cronjob on an ordinary day will not change anything
@@ -2410,7 +2411,7 @@ def test_allocation_rules_with_holidays(client):
     page.form['on_holidays'] = 'no'
     page = page.form.submit().follow()
 
-    assert 'Regel aktiv, 352 Einteilungen erstellt' in page
+    assert 'Regel aktiv, 352 Verfügbarkeiten erstellt' in page
     assert count_allocations() == 352
 
     # running the cronjob on an ordinary day will not change anything
@@ -2461,7 +2462,7 @@ def test_allocation_rules_with_school_holidays(client):
     page.form['during_school_holidays'] = 'no'
     page = page.form.submit().follow()
 
-    assert 'Regel aktiv, 350 Einteilungen erstellt' in page
+    assert 'Regel aktiv, 350 Verfügbarkeiten erstellt' in page
     assert count_allocations() == 350
 
     # running the cronjob on an ordinary day will not change anything

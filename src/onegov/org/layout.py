@@ -2283,7 +2283,7 @@ class ResourceLayout(DefaultLayout):
                     attrs={'class': 'subscribe-link'}
                 ),
                 Link(
-                    text=_('Rules'),
+                    text=_('Availability Periods'),
                     url=self.request.link(self.model, 'rules'),
                     attrs={'class': 'rule-link'}
                 ),
@@ -2318,7 +2318,7 @@ class AllocationRulesLayout(ResourceLayout):
             Link(_('Homepage'), self.homepage_url),
             Link(_('Reservations'), self.request.link(self.collection)),
             Link(_(self.model.title), self.request.link(self.model)),
-            Link(_('Rules'), '#')
+            Link(_('Availability periods'), '#')
         ]
 
     @cached_property
