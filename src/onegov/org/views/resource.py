@@ -269,15 +269,6 @@ def view_resources(
         sort_column=ExternalLink.order
     )
 
-    def contains_at_least_one_room(
-        resources: Iterable[object]
-    ) -> bool:
-        for resource in resources:
-            if isinstance(resource, Resource):
-                if resource.type == 'room':
-                    return True
-        return False
-
     grouped = combine_grouped(
         resources, ext_resources, sort=attrgetter('title')
     )
