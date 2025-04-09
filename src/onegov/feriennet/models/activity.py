@@ -234,7 +234,6 @@ class VacationActivityHandler(Handler):
                     Confirm(
                         _('Do you really want to archive this activity?'),
                         _(
-                            'This cannot be undone. '
                             'The activity will be made private as a result.'
                         ),
                         _('Archive Activity'),

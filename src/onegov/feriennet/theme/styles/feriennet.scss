@@ -38,6 +38,13 @@ a > h6 {
 }
 
 /*
+    hide ticket achiving options
+*/
+    .archive-tickets, .ticket-archive {
+        display: none !important;
+    }
+
+/*
     registration on homepage
 */
 .homepage .register {

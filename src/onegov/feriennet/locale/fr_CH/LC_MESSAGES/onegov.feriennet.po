@@ -2,7 +2,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE 1.0\n"
-"POT-Creation-Date: 2024-11-18 10:17+0100\n"
+"POT-Creation-Date: 2025-04-07 11:14+0200\n"
 "PO-Revision-Date: 2021-11-11 09:07+0100\n"
 "Last-Translator: Marc Sommerhalder <marc.sommerhalder@seantis.ch>\n"
 "Language-Team: French\n"
@@ -1555,9 +1555,8 @@ msgstr "Archiver"
 msgid "Do you really want to archive this activity?"
 msgstr "Voulez-vous vraiment archiver cette activité ?"
 
-msgid "This cannot be undone. The activity will be made private as a result."
-msgstr ""
-"Cette action ne peut être annulée. L'activité sera par conséquent masquée."
+msgid "The activity will be made private as a result."
+msgstr "L'activité sera par conséquent masquée."
 
 msgid "Archive Activity"
 msgstr "Archiver l'activité"
@@ -3201,6 +3200,11 @@ msgstr "Réservations pour ${period}"
 #, python-format
 msgid "Billing for ${period}"
 msgstr "Facturation pour ${period}"
+
+#~ msgid ""
+#~ "This cannot be undone. The activity will be made private as a result."
+#~ msgstr ""
+#~ "Cette action ne peut être annulée. L'activité sera par conséquent masquée."
 
 #~ msgid "Health Information"
 #~ msgstr "Informations santé et autres"
