@@ -8,7 +8,7 @@
         <div class="grid-x wrapper" tal:condition="resources">
 
             <div class="cell small-12 medium-7 content">
-                <metal:b use-macro="layout.macros['group_by_column']" tal:define="grouped resources; add_pagerefs request.is_logged_in" />
+                <metal:b use-macro="layout.macros['resource_groups']" tal:define="add_pagerefs request.is_logged_in" />
             </div>
 
             <div class="cell small-12 medium-4 medium-offset-1 sidebar">
@@ -17,7 +17,7 @@
                         <h3 i18n:translate="">Categories</h3>
                         <ul class="more-list">
                             <li tal:repeat="resource resources">
-                                <a class="list-link list-title" href="#${resource}">${resource}</a>
+                                <a class="list-link list-title" href="#${resource.title}">${resource.title}</a>
                             </li>
                         </ul>
                     </div>

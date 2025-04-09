@@ -50,7 +50,8 @@ class ResourceCollection:
         meta: dict[str, Any] | None = None,
         content: dict[str, Any] | None = None,
         definition: str | None = None,
-        group: str | None = None
+        group: str | None = None,
+        subgroup: str | None = None,
     ) -> Resource:
 
         if type is None:
@@ -69,6 +70,7 @@ class ResourceCollection:
         resource.content = content or {}
         resource.definition = definition
         resource.group = group
+        resource.subgroup = subgroup
         resource.renew_access_token()
 
         self.session.add(resource)

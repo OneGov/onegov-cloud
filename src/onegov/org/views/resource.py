@@ -38,7 +38,7 @@ from sqlalchemy.orm import object_session
 from webob import exc
 
 
-from typing import cast, Any, NamedTuple, TYPE_CHECKING
+from typing import cast, Any, NamedTuple, Self, TYPE_CHECKING
 if TYPE_CHECKING:
     from _typeshed import SupportsRichComparison
     from collections.abc import Callable, Iterable, Iterator, Mapping
@@ -165,6 +165,77 @@ def get_resource_form(
     return model.with_content_extensions(ResourceForm, request)
 
 
+class ResourceGroup(NamedTuple):
+    title: str
+    entries: list[Resource | ExternalLink | ResourceSubgroup]
+    find_your_spot: FindYourSpotCollection | None
+
+    @classmethod
+    def from_grouped(
+        cls,
+        request: OrgRequest,
+        grouped: dict[str, list[Resource | ExternalLink]],
+        default_group: str,
+    ) -> list[Self]:
+
+        result: list[Self] = []
+        for group, items in grouped.items():
+            entries: dict[str, Any] = {}
+            group_has_find_your_spot = False
+            for item in items:
+                is_room = isinstance(item, Resource) and item.type == 'room'
+                if is_room:
+                    group_has_find_your_spot = True
+
+                if subgroup_name := getattr(item, 'subgroup', None):
+                    (
+                        subgroup_has_find_your_spot,
+                        subentries
+                    ) = entries.setdefault(subgroup_name, (is_room, []))
+                    if is_room and not subgroup_has_find_your_spot:
+                        entries[subgroup_name] = (True, subentries)
+
+                    subentries.append(item)
+                else:
+                    # avoid collisions
+                    title = item.title
+                    while title in entries:
+                        title = f'{title} '
+                    entries[title] = item
+
+            result.append(cls(
+                title=group,
+                entries=[
+                    ResourceSubgroup(
+                        title=subgroup,
+                        entries=sorted(entry[1], key=attrgetter('title')),
+                        find_your_spot=FindYourSpotCollection(
+                            request.app.libres_context,
+                            group=None if group == default_group else group,
+                            subgroup=subgroup
+                        ) if entry[0] else None,
+                    ) if isinstance(entry, tuple) else entry
+                    for subgroup, entry in sorted(
+                        entries.items(),
+                        key=itemgetter(0)
+                    )
+                ],
+                find_your_spot=FindYourSpotCollection(
+                    request.app.libres_context,
+                    group=None if group == default_group else group
+                ) if group_has_find_your_spot else None,
+            ))
+        return result
+
+
+class ResourceSubgroup(NamedTuple):
+    title: str
+    # NOTE: External links don't yet support subgroups, but we
+    #       may add support for it, if there is a demand
+    entries: list[Resource | ExternalLink]
+    find_your_spot: FindYourSpotCollection | None
+
+
 @OrgApp.html(
     model=ResourceCollection,
     template='resources.pt',
@@ -180,47 +251,27 @@ def view_resources(
         layout = ResourcesLayout(self, request)
 
     default_group = request.translate(_('General'))
-    # this is a bit of a white lie, we insert those later on
-    resources: dict[str, list[Resource | FindYourSpotCollection]]
     resources = group_by_column(
         request=request,
-        query=self.query(),  # type:ignore[arg-type]
+        query=self.query(),
         default_group=default_group,
         group_column=Resource.group,
         sort_column=Resource.title
     )
-
-    def contains_at_least_one_room(
-        resources: Iterable[object]
-    ) -> bool:
-        for resource in resources:
-            if isinstance(resource, Resource):
-                if resource.type == 'room':
-                    return True
-        return False
 
     ext_resources = group_by_column(
         request,
         query=ExternalLinkCollection.for_model(
             request.session, ResourceCollection
         ).query(),
+        default_group=default_group,
         group_column=ExternalLink.group,
         sort_column=ExternalLink.order
     )
 
     grouped = combine_grouped(
-        resources, ext_resources, sort=lambda x: x.title
+        resources, ext_resources, sort=attrgetter('title')
     )
-    for group, entries in grouped.items():
-        # don't include find-your-spot link for categories with
-        # no rooms
-        if not contains_at_least_one_room(entries):
-            continue
-
-        entries.insert(0, FindYourSpotCollection(
-            request.app.libres_context,
-            group=None if group == default_group else group
-        ))
 
     def link_func(
         model: Resource | FindYourSpotCollection | ExternalLink
@@ -230,10 +281,7 @@ def view_resources(
             return model.url
         return request.link(model)
 
-    def edit_link(
-        model: Resource | FindYourSpotCollection | ExternalLink
-    ) -> str | None:
-
+    def edit_link(model: Resource | ExternalLink) -> str | None:
         if isinstance(model, ExternalLink) and request.is_manager:
             title = request.translate(_('Edit resource'))
             to = request.class_link(ResourceCollection)
@@ -244,10 +292,7 @@ def view_resources(
             )
         return None
 
-    def lead_func(
-        model: Resource | FindYourSpotCollection | ExternalLink
-    ) -> str:
-
+    def lead_func(model: Resource | ExternalLink) -> str:
         lead = model.meta.get('lead')
         if not lead:
             lead = ''
@@ -256,7 +301,11 @@ def view_resources(
 
     return {
         'title': _('Reservations'),
-        'resources': grouped,
+        'resources': ResourceGroup.from_grouped(
+            request,
+            grouped,
+            default_group
+        ),
         'layout': layout,
         'link_func': link_func,
         'edit_link': edit_link,
