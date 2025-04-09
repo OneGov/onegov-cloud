@@ -156,7 +156,7 @@ def view_allocation_rules(
                         "All allocations created by the availability period "
                         "will be removed, if they haven't been reserved yet."
                     ),
-                    _('Delete rule'),
+                    _('Delete availability period'),
                     _('Cancel')
                 ),
                 Intercooler(
@@ -449,12 +449,13 @@ def handle_edit_rule(
     form.rule = existing_rule
     return {
         'layout': layout,
-        'title': _('Edit Rule'),
+        'title': _('Edit availabilty period'),
         'form': form,
         'helptext': _(
-            'Rules ensure that the allocations between start/end exist and '
-            'that they are extended beyond those dates at the given '
-            'intervals. '
+            'Availability periods create availabilities between the specified '
+            'start and end date. The availability period should ideally last '
+            'until the next time the availabilities are expected to change. '
+            'For example, a school term or a school year.'
         )
     }
 
