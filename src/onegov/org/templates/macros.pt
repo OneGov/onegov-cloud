@@ -1738,38 +1738,73 @@
 
 <metal:group_by_column define-macro="group_by_column" i18n:domain="onegov.org">
     <tal:b repeat="group grouped" tal:define="link_func link_func|request.link; add_pagerefs add_pagerefs|False">
-        <tal:b tal:define="find_your_spot grouped[group][0] if grouped[group][0].title == 'Find Your Spot' else None">
-            <h2 tal:condition="len(grouped) > 1" id="${group}">
-                ${group}
-                <metal:b tal:condition="add_pagerefs" use-macro="layout.macros['pageref']" tal:define="pageref_id group" />
-                <span tal:condition="find_your_spot" i18n:attributes="title" class="find-your-spot-link" data-tooltip aria-haspopup="true" class="has-tip" title="Find Your Spot">
-                    <a tal:attributes="href link_func(find_your_spot)"><i class="fa fa-calendar"></i></a>
-                </span>
-            </h2>
+        <h2 tal:condition="len(grouped) > 1" id="${group}">
+            ${group}
+            <metal:b tal:condition="add_pagerefs" use-macro="layout.macros['pageref']" tal:define="pageref_id group" />
+        </h2>
 
-            <ul class="with-lead">
-                <tal:block tal:repeat="record grouped[group]">
-                    <li tal:condition="record != find_your_spot">
-                        <a class="list-title" tal:attributes="href link_func(record)">
-                            ${record.title}
-                        </a>
-                        <metal:hint use-macro="layout.macros['access_hint']" tal:define="item record" />
-                        <tal:b tal:define="link edit_link(record)|nothing">
-                            <a class="edit-link" href="${link}" tal:condition="link"><i class="fa fa-pencil-square-o" aria-hidden="true"></i></a>
-                        </tal:b>
-
-                        <div class="list-lead" tal:define="lead lead_func(record)|layout.linkify(record.meta.get('lead'))"
-                            tal:content="lead">
-                        </div>
-                        <div class="list-hint hints" tal:define="hint hint(record)|False"
-                            tal:content="hint" tal:condition="hint">
-                        </div>
-                    </li>
-                </tal:block>
-            </ul>
-        </tal:b>
+        <ul class="with-lead">
+            <tal:block tal:repeat="record grouped[group]">
+                <metal:b use-macro="layout.macros['group_record']"/>
+            </tal:block>
+        </ul>
     </tal:b>
 </metal:group_by_column>
+
+<metal:group_record define-macro="group_record" i18n:domain="onegov.org">
+    <li tal:define="link edit_link(record)|nothing">
+        <a class="list-title" tal:attributes="href link_func(record)">
+            ${record.title}
+        </a>
+        <metal:hint use-macro="layout.macros['access_hint']" tal:define="item record" />
+        <a class="edit-link" href="${link}" tal:condition="link"><i class="fa fa-pencil-square-o" aria-hidden="true"></i></a>
+        <div class="list-lead" tal:define="lead lead_func(record)|layout.linkify(record.meta.get('lead'))"
+            tal:content="lead">
+        </div>
+        <div class="list-hint hints" tal:define="hint hint(record)|False"
+            tal:content="hint" tal:condition="hint">
+        </div>
+    </li>
+</metal:group_record>
+
+<metal:resource_groups define-macro="resource_groups" i18n:domain="onegov.org">
+    <tal:b repeat="group resources" tal:define="link_func link_func|request.link; add_pagerefs add_pagerefs|False">
+        <h2 tal:condition="len(resources) > 1" id="${group.title}">
+            ${group.title}
+            <metal:b tal:condition="add_pagerefs" use-macro="layout.macros['pageref']" tal:define="pageref_id group.title" />
+            <span tal:condition="group.find_your_spot" i18n:attributes="title" class="find-your-spot-link" data-tooltip aria-haspopup="true" class="has-tip" title="Find Your Spot">
+                <a tal:attributes="href link_func(group.find_your_spot)"><i class="fa fa-calendar"></i></a>
+            </span>
+        </h2>
+
+        <ul class="with-lead">
+            <tal:b tal:repeat="record group.entries" tal:switch="record.__class__.__name__">
+                <li tal:case="'ResourceSubgroup'">
+                    <metal:b tal:define="subgroup record" use-macro="layout.macros['resource_subgroup']"/>
+                </li>
+                <metal:b tal:case="default" use-macro="layout.macros['group_record']"/>
+            </tal:b>
+        </ul>
+    </tal:b>
+</metal:resource_groups>
+
+<metal:resource_subgroup define-macro="resource_subgroup" i18n:domain="onegov.org">
+    <tal:b tal:define="pageref_id f'{group.title}-{subgroup.title}'">
+        <h5 id="${pageref_id}">
+            ${subgroup.title}
+            <metal:b tal:condition="add_pagerefs" use-macro="layout.macros['pageref']" />
+            <span tal:condition="subgroup.find_your_spot" i18n:attributes="title" class="find-your-spot-link" data-tooltip aria-haspopup="true" class="has-tip" title="Find Your Spot">
+                <a tal:attributes="href link_func(subgroup.find_your_spot)"><i class="fa fa-calendar"></i></a>
+            </span>
+        </h5>
+
+        <ul class="with-lead">
+            <tal:b tal:repeat="record subgroup.entries">
+                <metal:b use-macro="layout.macros['group_record']"/>
+            </tal:b>
+        </ul>
+    </tal:b>
+</metal:resource_subgroup>
 
 <metal:file_details define-macro="file-details" i18n:domain="onegov.org">
     <div class="row">
