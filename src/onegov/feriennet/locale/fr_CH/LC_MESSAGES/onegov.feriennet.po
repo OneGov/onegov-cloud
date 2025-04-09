@@ -2,7 +2,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE 1.0\n"
-"POT-Creation-Date: 2025-04-08 10:29+0200\n"
+"POT-Creation-Date: 2025-04-09 20:44+0200\n"
 "PO-Revision-Date: 2021-11-11 09:07+0100\n"
 "Last-Translator: Marc Sommerhalder <marc.sommerhalder@seantis.ch>\n"
 "Language-Team: French\n"
@@ -710,8 +710,7 @@ msgid "Political municipality"
 msgstr "Municipalité politique"
 
 msgid "The Swisspass ID must be 13 characters long."
-msgstr ""
-"L'identifiant Swisspass doit comporter 13 caractères."
+msgstr "L'identifiant Swisspass doit comporter 13 caractères."
 
 msgid "The Swisspass ID must only contain digits and dashes."
 msgstr ""
@@ -3129,6 +3128,12 @@ msgstr "Profil d'utilisateur·trice"
 
 msgid "Require the political municipality on registration"
 msgstr "Exiger de la municipalité politique qu'elle s'inscrive"
+
+msgid "Require a SwissPass ID of attendees"
+msgstr "Exiger un ID SwissPass des participant·e·s"
+
+msgid "SwissPass ID"
+msgstr "ID SwissPass"
 
 msgid "Parents can see the contacts of other parents in the same activity"
 msgstr ""

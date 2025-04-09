@@ -1,7 +1,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE 1.0\n"
-"POT-Creation-Date: 2025-04-08 10:29+0200\n"
+"POT-Creation-Date: 2025-04-09 20:43+0200\n"
 "PO-Revision-Date: 2021-11-11 09:08+0100\n"
 "Last-Translator: Marc Sommerhalder <marc.sommerhalder@seantis.ch>\n"
 "Language-Team: German\n"
@@ -3116,6 +3116,12 @@ msgstr "Benutzerprofil"
 
 msgid "Require the political municipality on registration"
 msgstr "Politische Gemeinde bei Registrierung verlangen"
+
+msgid "Require a SwissPass ID of attendees"
+msgstr "SwissPass ID der Teilnehmenden verlangen"
+
+msgid "SwissPass ID"
+msgstr "SwissPass ID"
 
 msgid "Parents can see the contacts of other parents in the same activity"
 msgstr ""

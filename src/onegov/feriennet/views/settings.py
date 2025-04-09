@@ -89,8 +89,8 @@ class FeriennetSettingsForm(Form):
         fieldset=_('Political Municipality'))
 
     require_swisspass = BooleanField(
-        label=_('Require a swisspass for attendees'),
-        fieldset=_('swisspass'),
+        label=_('Require a SwissPass ID of attendees'),
+        fieldset=_('SwissPass ID'),
         default=False
     )
 
