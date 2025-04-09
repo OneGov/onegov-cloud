@@ -87,30 +87,59 @@ def test_resources(client):
     assert 'Beamer' in resource
     edit = resource.click('Bearbeiten')
     edit.form['title'] = 'Beamers'
-    edit.form.submit().follow()
+    edit.form.submit()
 
     new = resources.click('Raum')
-    new.form['title'] = 'Meeting Room'
+    new.form['title'] = 'Meeting Room 1'
+    new.form['group'] = 'Office'
+    new.form['subgroup'] = 'Big Meeting Room'
     resource = new.form.submit().follow()
 
     assert 'calendar' in resource
-    assert 'Meeting Room' in resource
+    assert 'Meeting Room 1' in resource
 
     edit = resource.click('Bearbeiten')
-    edit.form['title'] = 'Besprechungsraum'
+    edit.form['title'] = 'Besprechungsraum 1'
     edit.form.submit()
 
+    new = resources.click('Raum')
+    new.form['title'] = 'Meeting Room 2'
+    new.form['group'] = 'Office'
+    new.form['subgroup'] = 'Big Meeting Room'
+    resource = new.form.submit()
+
+    new = resources.click('Raum')
+    new.form['title'] = 'Meeting Room 3'
+    new.form['group'] = 'Office'
+    new.form['subgroup'] = 'Big Meeting Room'
+    resource = new.form.submit()
+
+    # name collisions between titles and subgroups are fine
+    new = resources.click('Raum')
+    new.form['title'] = 'Big Meeting Room'
+    new.form['group'] = 'Office'
+    resource = new.form.submit()
+
+    new = resources.click('Raum')
+    new.form['title'] = 'Concert Hall'
+    resource = new.form.submit()
+
     resources = client.get('/resources')
-    assert 'Besprechungsraum' in resources
+    assert 'Besprechungsraum 1' in resources
+    assert 'Meeting Room 2' in resources
+    assert 'Meeting Room 3' in resources
+    assert 'Big Meeting Room' in resources
+    assert 'Office' in resources
+    assert 'Allgemein' in resources
     assert 'Beamers' in resources
 
     # Check warning duplicate
     duplicate = resources.click('Raum')
-    duplicate.form['title'] = 'Meeting Room'
+    duplicate.form['title'] = 'Meeting Room 1'
     page = new.form.submit()
     assert "Eine Resource mit diesem Namen existiert bereits" in page
 
-    resource = client.get('/resource/meeting-room')
+    resource = client.get('/resource/meeting-room-1')
     delete_link = resource.pyquery('a.delete-link').attr('ic-delete-from')
 
     assert client.delete(delete_link, status=200)
