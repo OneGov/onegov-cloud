@@ -223,7 +223,7 @@ def book_occasion(
                 birth_date=form.birth_date.data,
                 gender=form.gender.data,
                 notes=form.notes.data,
-                swisspass=form.swisspass.data,
+                swisspass=form.swisspass.data if form.swisspass else None,
                 differing_address=form.differing_address.data,
                 address=form.address.data
                 if form.differing_address.data else None,
