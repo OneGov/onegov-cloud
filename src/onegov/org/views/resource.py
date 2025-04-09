@@ -9,6 +9,7 @@ from collections import OrderedDict
 from datetime import date as date_t, datetime, time, timedelta
 from isodate import parse_date, ISO8601Error
 from itertools import groupby, islice
+from libres.modules.errors import LibresError
 from morepath.request import Response
 from onegov.core.security import Public, Private, Personal
 from onegov.core.utils import module_path
@@ -329,6 +330,7 @@ def view_find_your_spot(
     # HACK: Focus results
     form.action += '#results'
     room_slots: dict[date_t, RoomSlots] | None = None
+    missing_dates: dict[date_t, list[Resource] | None] | None = None
     rooms = sorted(
         request.exclude_invisible(self.query()),
         key=attrgetter('title')
@@ -451,13 +453,20 @@ def view_find_your_spot(
 
                 if not allocation.partly_available:
                     quota_left = allocation.quota_left
+                    availability = (
+                        allocation.display_end() - allocation.display_start()
+                    ) / duration * 100.0
+                    if adjustable := allocation.quota > 1:
+                        if availability >= 100.0:
+                            availability = 100.0
+
                     slots.append(utils.FindYourSpotEventInfo(
                         allocation,
-                        None,  # won't be displayed
-                        quota_left / allocation.quota,
+                        None,
+                        availability if quota_left else 0.0,
                         quota_left,
                         request,
-                        adjustable=allocation.quota > 1
+                        adjustable=adjustable
                     ))
                     continue
                 elif target_start >= target_end:
@@ -570,6 +579,106 @@ def view_find_your_spot(
                     adjustable=True
                 ))
 
+        auto_reserve = form.auto_reserve_available_slots.data
+        if auto_reserve != 'no':
+            rooms_dict = {room.id: room for room in rooms}
+            reservations = {
+                room.id: room.bound_reservations(request).all()  # type: ignore[attr-defined]
+                for room in rooms
+            }
+            skipped_due_to_existing_reservation = {
+                date: {
+                    room_id
+                    for room_id, slots in date_room_slots.items()
+                    if any(
+                        reservation.display_start() == dates[0]
+                        and reservation.display_end() == dates[1]
+                        for slot in slots
+                        if slot.availability >= 5.0
+                        if (dates := slot.slot_time or (
+                            slot.allocation.display_start(),
+                            slot.allocation.display_end()
+                        ))
+                        for reservation in reservations[room_id]
+                    )
+                }
+                for date, date_room_slots in room_slots.items()
+            }
+            reserved_dates: dict[date_t, set[UUID]] = {}
+            for date, date_room_slots in room_slots.items():
+                skipped = skipped_due_to_existing_reservation[date]
+                reserved_dates[date] = skipped
+                if (
+                    (auto_reserve != 'for_every_room' and skipped)
+                    or len(skipped) == len(date_room_slots)
+                ):
+                    # already fully reserved
+                    continue
+
+                for room_id, slots in date_room_slots.items():
+                    if (
+                        auto_reserve == 'for_every_room'
+                        and room_id in skipped
+                    ):
+                        # already fully reserved
+                        continue
+
+                    for slot in slots:
+                        if slot.availability == 100.0:
+                            try:
+                                room = rooms_dict[room_id]
+                                assert hasattr(room, 'bound_session_id')
+                                room.scheduler.reserve(
+                                    email='0xdeadbeef@example.org',
+                                    dates=slot.slot_time or (
+                                        slot.allocation.display_start(),
+                                        slot.allocation.display_end()
+                                    ),
+                                    quota=1,
+                                    session_id=room.bound_session_id(request),
+                                    single_token_per_session=True
+                                )
+                            except LibresError:
+                                # could happen for overlapping existing
+                                # reservations or other violations, we treat
+                                # this as a missing reserved slot
+                                continue
+                            else:
+                                # we managed to reserve a slot
+                                break
+                    else:
+                        # no slot reserved, move on to the next room
+                        continue
+
+                    reserved_dates.setdefault(date, set()).add(room_id)
+
+                    # since we managed to reserve a slot and we're not
+                    # making a reservation for every room, we need to
+                    # skip the other rooms for this date
+                    if auto_reserve != 'for_every_room':
+                        break
+                else:
+                    # either we didn't reserve a slot or we're reserving
+                    # a slot in every room, so move on to the next date
+                    continue
+
+                # since we broke out of the room loop we must have managed
+                # to reserve a slot, so we need to stop the iteration of
+                # dates here
+                if auto_reserve == 'for_first_day':
+                    break
+
+            wanted = len(rooms) if auto_reserve == 'for_every_room' else 1
+            missing_dates = {
+                date: [
+                    room
+                    for room in rooms
+                    if room.id not in room_ids
+                ] if wanted > 1 else None
+                for date in room_slots.keys()
+                if len(room_ids := reserved_dates.get(date, set())) < wanted
+            }
+
     if room_slots:
         request.include('reservationlist')
 
@@ -578,6 +687,7 @@ def view_find_your_spot(
         'form': form,
         'rooms': rooms,
         'room_slots': room_slots,
+        'missing_dates': missing_dates,
         'layout': layout or FindYourSpotLayout(self, request)
     }
 

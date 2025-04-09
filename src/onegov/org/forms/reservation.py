@@ -117,6 +117,18 @@ class FindYourSpotForm(Form):
         ),
         default='no')
 
+    auto_reserve_available_slots = RadioField(
+        label=_('Automatically reserve the first available slot'),
+        description=_('You will be able to change individual choices'),
+        choices=(
+            ('for_every_room', _('Yes, for every selected room and day')),
+            ('for_every_day', _('Yes, for every selected day')),
+            ('for_first_day', _('Yes, for the first available selected day')),
+            ('no', _('No'))
+        ),
+        validators=[InputRequired()],
+        default='no')
+
     def on_request(self) -> None:
         if not self.request.app.org.holidays:
             self.delete_field('on_holidays')
@@ -172,7 +184,7 @@ class FindYourSpotForm(Form):
             if duration := self.duration.data:
                 max_duration = timedelta(
                         hours=end.hour - start.hour,
-                        minutes=start.hour - end.hour
+                        minutes=start.minute - end.minute
                 )
                 if duration > max_duration:
                     assert isinstance(self.duration.errors, list)

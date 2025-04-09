@@ -734,7 +734,7 @@ class FindYourSpotEventInfo:
             else:
                 yield 'event-unavailable'
         else:
-            if self.availability >= 100.0:
+            if self.availability == 100.0:
                 yield 'event-available'
             elif self.availability >= 5.0:
                 yield 'event-partly-available'
