@@ -46,7 +46,7 @@ class CustomReservation(Reservation, ModelBase, Payable):
         if resource.pricing_method == 'per_hour':
             assert self.start is not None and self.end is not None
             duration = self.end + timedelta(microseconds=1) - self.start
-            hours = duration.total_seconds() // 3600
+            hours = duration.total_seconds() / 3600
 
             assert resource.price_per_hour is not None
             return Price(hours * resource.price_per_hour, resource.currency)

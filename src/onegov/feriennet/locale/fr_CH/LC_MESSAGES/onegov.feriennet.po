@@ -1568,9 +1568,8 @@ msgstr "Archiver"
 msgid "Do you really want to archive this activity?"
 msgstr "Voulez-vous vraiment archiver cette activité ?"
 
-msgid "This cannot be undone. The activity will be made private as a result."
-msgstr ""
-"Cette action ne peut être annulée. L'activité sera par conséquent masquée."
+msgid "The activity will be made private as a result."
+msgstr "L'activité sera par conséquent masquée."
 
 msgid "Archive Activity"
 msgstr "Archiver l'activité"
@@ -3220,6 +3219,11 @@ msgstr "Réservations pour ${period}"
 #, python-format
 msgid "Billing for ${period}"
 msgstr "Facturation pour ${period}"
+
+#~ msgid ""
+#~ "This cannot be undone. The activity will be made private as a result."
+#~ msgstr ""
+#~ "Cette action ne peut être annulée. L'activité sera par conséquent masquée."
 
 #~ msgid "Health Information"
 #~ msgstr "Informations santé et autres"

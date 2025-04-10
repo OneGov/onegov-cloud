@@ -90,7 +90,7 @@ def consolidate_cli(
                 existing = getattr(person, attr)
                 if not existing and value:
                     if verbose:
-                        print(f'Setting {person.title}: {attr}={value}')
+                        click.echo(f'Setting {person.title}: {attr}={value}')
                     setattr(person, attr, value)
         return person
 
@@ -109,8 +109,8 @@ def consolidate_cli(
     def do_consolidate(request: AgencyRequest, app: AgencyApp) -> None:
         session = request.session
         first_seen, to_consolidate = find_double_entries(session)
-        print(f'Double entries found based on '
-              f'{based_on}: {len(to_consolidate)}')
+        click.echo(f'Double entries found based on '
+                   f'{based_on}: {len(to_consolidate)}')
         count = session.query(ExtendedAgencyMembership).count()
         for ix, (id_, persons) in enumerate(to_consolidate.items()):
             person = first_seen[id_]
@@ -150,7 +150,7 @@ def import_bs_function(
                 membership.title = 'Mitglied'
                 total_empty_titles += 1
 
-        print('Corrected remaining empty titles: ', total_empty_titles)
+        click.echo(f'Corrected remaining empty titles: {total_empty_titles}')
 
         if dry_run:
             transaction.abort()

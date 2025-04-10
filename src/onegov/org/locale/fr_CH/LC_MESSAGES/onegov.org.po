@@ -2,7 +2,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE 1.0\n"
-"POT-Creation-Date: 2025-04-01 14:22+0200\n"
+"POT-Creation-Date: 2025-04-09 10:41+0200\n"
 "PO-Revision-Date: 2022-03-15 10:50+0100\n"
 "Last-Translator: Marc Sommerhalder <marc.sommerhalder@seantis.ch>\n"
 "Language-Team: French\n"
@@ -127,6 +127,9 @@ msgstr "Aperçu de la ${org} réservation"
 
 msgid "Your Chat has been turned into a ticket"
 msgstr "Un ticket a été créé à partir de votre chat"
+
+msgid "New ticket"
+msgstr "Nouveau billet"
 
 msgid "Account"
 msgstr "Compte"
@@ -1341,6 +1344,9 @@ msgstr "Décrit en quoi consiste cette ressource de réservation"
 msgid "Used to group the resource in the overview"
 msgstr "Utilisé pour grouper la ressource dans la vue d'ensemble"
 
+msgid "Subgroup"
+msgstr "Sous-groupe"
+
 msgid "Extra Fields Definition"
 msgstr "Définition de champs supplémentaires"
 
@@ -2359,16 +2365,10 @@ msgstr "Autorisation des tickets"
 msgid "Restricts access and gives permission to these ticket categories"
 msgstr "Restreint l'accès et donne la permission à ces catégories de tickets"
 
-msgid "Directories"
-msgstr "Répertoires"
-
-msgid ""
-"Directories for which this user group is responsible. If activated, ticket "
-"notifications for this group are only sent for these directories"
+msgid "Immediate e-mail notification to members upon ticket submission"
 msgstr ""
-"Annuaires dont ce groupe d'utilisateurs est responsable. Si cette option est "
-"activée, les les notifications de tickets pour ce groupe ne sont envoyées "
-"que pour ces annuaires"
+"Notification immédiate par courrier électronique aux membres lors de la "
+"soumission d'un ticket"
 
 msgid "Send a periodic status e-mail."
 msgstr "Envoyer un e-mail d'état périodique."
@@ -2420,6 +2420,9 @@ msgstr "Lier des fichiers supplémentaires"
 
 msgid "All directories"
 msgstr "Tous les dossiers"
+
+msgid "Directories"
+msgstr "Répertoires"
 
 msgid "All events"
 msgstr "Tous les événements"
@@ -3055,9 +3058,6 @@ msgstr "Supprimer la note"
 msgid "Always visible on homepage"
 msgstr "Toujours visible sur la page d'accueil"
 
-msgid "Search for available dates"
-msgstr "Rechercher les dates disponibles"
-
 msgid "Neujahrestag"
 msgstr "Nouvel an"
 
@@ -3203,8 +3203,8 @@ msgstr "Refuser ${title} est irréversible."
 msgid "Reject reservation"
 msgstr "Refuser la réservation"
 
-#. Used in sentence: "${event} published."
 #.
+#. Used in sentence: "${event} published."
 msgid "Event"
 msgstr "Événement"
 
@@ -3582,8 +3582,8 @@ msgid ""
 "filled-out form."
 msgstr ""
 "Veuillez vérifier vos données et appuyez sur « Compléter » pour finaliser le "
-"processus. S'il y a quelque chose que vous souhaitez modifier, cliquez sur « "
-"Modifier » pour retourner sur le formulaire complété."
+"processus. S'il y a quelque chose que vous souhaitez modifier, cliquez sur "
+"« Modifier » pour retourner sur le formulaire complété."
 
 msgid ""
 "The image shown in the list view is a square. To have your image shown fully "
@@ -5581,9 +5581,6 @@ msgstr "Ajouter un événement"
 msgid "Your request has been registered"
 msgstr "Yotre demande a été enregistrée."
 
-msgid "New ticket"
-msgstr "Nouveau billet"
-
 msgid "Your request could not be accepted automatically!"
 msgstr "Votre demande n'a pas pu être traitée automatiquement."
 
@@ -6624,26 +6621,3 @@ msgstr "Un compte a été créé pour vous"
 
 msgid "The user was created successfully"
 msgstr "L'utilisateur a bien été créé"
-
-
-#~ msgid ""
-#~ "Invalid format. Please define a list with topics and subtopics according "
-#~ "the example."
-#~ msgstr ""
-#~ "Format non valide. Veuillez définir une liste de sujets et de sous-sujets "
-#~ "selon l'exemple."
-
-#~ msgid ""
-#~ "Invalid format. Please define a listwith topics and subtopics according "
-#~ "the example."
-#~ msgstr ""
-#~ "Format non valide. Veuillez définir une liste avec des sujets et des sous-"
-#~ "sujets selon l'exemple."
-
-#~ msgid ""
-#~ "Invalid format. Please define an organisation name with topics and "
-#~ "subtopics according the example."
-#~ msgstr ""
-#~ "Format non valide. Veuillez définir un nom d'organisation avec des sujets "
-#~ "et des sous-sujets selon l'exemple."
-

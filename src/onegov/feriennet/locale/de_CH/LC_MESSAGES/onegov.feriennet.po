@@ -1560,10 +1560,8 @@ msgstr "Archivieren"
 msgid "Do you really want to archive this activity?"
 msgstr "Möchten Sie dieses Angebot wirklich archivieren?"
 
-msgid "This cannot be undone. The activity will be made private as a result."
-msgstr ""
-"Dies kann nicht rückgängig gemacht werden. Das Angebot wird von der "
-"Öffentlichkeit versteckt."
+msgid "The activity will be made private as a result."
+msgstr "Das Angebot wird von der Öffentlichkeit versteckt."
 
 msgid "Archive Activity"
 msgstr "Angebot archivieren"
@@ -3207,6 +3205,12 @@ msgstr "Buchungen ${period}"
 #, python-format
 msgid "Billing for ${period}"
 msgstr "Fakturierung ${period}"
+
+#~ msgid ""
+#~ "This cannot be undone. The activity will be made private as a result."
+#~ msgstr ""
+#~ "Dies kann nicht rückgängig gemacht werden. Das Angebot wird von der "
+#~ "Öffentlichkeit versteckt."
 
 #~ msgid "Health Information"
 #~ msgstr "Gesundheitsangaben"

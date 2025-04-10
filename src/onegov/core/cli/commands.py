@@ -757,10 +757,10 @@ def upgrade(
     raw_tasks = tuple((id, task) for id, task in tasks if task.raw)
 
     def on_success(task: _Task[..., Any]) -> None:
-        print(click.style('* ' + str(task.task_name), fg='green'))
+        click.secho(f'* {task.task_name}', fg='green')
 
     def on_fail(task: _Task[..., Any]) -> None:
-        print(click.style('* ' + str(task.task_name), fg='red'))
+        click.secho(f'* {task.task_name}', fg='red')
 
     def run_upgrade_runner(
         runner: UpgradeRunner | RawUpgradeRunner,
@@ -769,9 +769,9 @@ def upgrade(
         executed_tasks = runner.run_upgrade(*args)
 
         if executed_tasks:
-            print('executed {} upgrade tasks'.format(executed_tasks))
+            click.echo('executed {} upgrade tasks'.format(executed_tasks))
         else:
-            print('no pending upgrade tasks found')
+            click.echo('no pending upgrade tasks found')
 
     def run_raw_upgrade(
         group_context: GroupContext,
@@ -784,7 +784,7 @@ def upgrade(
         executed_raw_upgrades.add(appcfg)
 
         title = 'Running raw upgrade for {}'.format(appcfg.path.lstrip('/'))
-        print(click.style(title, underline=True))
+        click.secho(title, underline=True)
 
         upgrade_runner = RawUpgradeRunner(
             tasks=raw_tasks,
@@ -801,7 +801,7 @@ def upgrade(
 
     def run_upgrade(request: CoreRequest, app: Framework) -> None:
         title = 'Running upgrade for {}'.format(request.app.application_id)
-        print(click.style(title, underline=True))
+        click.secho(title, underline=True)
 
         upgrade_runner = UpgradeRunner(
             modules=modules,

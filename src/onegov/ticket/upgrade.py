@@ -7,7 +7,8 @@ from __future__ import annotations
 from onegov.core.orm.types import JSON, UTCDateTime
 from onegov.core.upgrade import upgrade_task
 from onegov.ticket import Ticket
-from sqlalchemy import Boolean, Column, Integer, Text, Enum, update, func, and_
+from sqlalchemy import Boolean, Column, Integer, Text, Enum
+from sqlalchemy import column, update, func, and_, true, false
 
 from typing import TYPE_CHECKING
 if TYPE_CHECKING:
@@ -167,3 +168,43 @@ def add_closed_on_column_to_ticket(context: UpgradeContext) -> None:
     )
     context.session.execute(stmt)
     context.session.flush()
+
+
+@upgrade_task('Add exclusive/notification columns to ticket permission')
+def add_exclusive_and_notification_columns_to_ticket_permission(
+    context: UpgradeContext
+) -> None:
+
+    context.operations.add_column(
+        'ticket_permissions',
+        Column(
+            'exclusive',
+            Boolean,
+            nullable=False,
+            server_default=true(),
+            index=True,
+        )
+    )
+
+    context.operations.add_column(
+        'ticket_permissions',
+        Column(
+            'immediate_notification',
+            Boolean,
+            nullable=False,
+            server_default=false(),
+            index=True,
+        )
+    )
+
+    if not context.has_constraint(
+        'ticket_permissions',
+        'no_redundant_ticket_permissions',
+        'CHECK'
+    ):
+        context.operations.create_check_constraint(
+            'no_redundant_ticket_permissions',
+            'ticket_permissions',
+            column('exclusive').isnot_distinct_from(True)
+            | column('immediate_notification').isnot_distinct_from(True),
+        )

@@ -145,12 +145,15 @@ select = [
     "N",
     "PERF",
     "PGH004",
+    "PGH005",
     "PIE",
     "PYI",
     "Q",
     "RUF",
     "SIM",
     "SLOT",
+    "T",
+    "TRY",
     "UP",
     "W"
 ]
@@ -194,6 +197,11 @@ ignore = [
     "SIM118",
     "SIM210",
     "SIM910",
+    "TRY003",
+    "TRY300",
+    # NOTE: It probably makes sense to enable this, but the refactor
+    #       will take a bit of effort.
+    "TRY301",
     "UP009",
     "UP012",
     "UP032",
@@ -215,6 +223,9 @@ preview = true
     #       but there's no per-file-target-version
     "UP",
 ]
+"src/onegov/*/upgrade.py" = [
+    "T2",
+]
 "tests/**/*.py" = [
     "B018",
     "C4",
@@ -232,11 +243,13 @@ preview = true
     "N",
     "Q",
     "PERF",
-    "PGH",
+    "PGH004",
     "PIE",
     "PYI",
     "RUF",
     "SIM",
+    "T",
+    "TRY",
     "UP",
 ]
 

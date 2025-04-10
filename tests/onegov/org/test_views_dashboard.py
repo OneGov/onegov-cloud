@@ -174,7 +174,7 @@ def test_view_dashboard_web_stats(client, monkeypatch):
     ])
 
     monkeypatch.setattr(OrgBoardlet, 'plausible_api',
-                        PlausibleAPI('site_id'))
+                        PlausibleAPI('site_id', 'my-token'))
     monkeypatch.setattr(PlausibleAPI, '_send_request',
                         lambda x, payload: next(mock_responses))
 

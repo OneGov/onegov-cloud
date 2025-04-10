@@ -203,9 +203,9 @@ def timing(name: str | None = None) -> Iterator[None]:
     duration_ms = 1000.0 * (perf_counter() - start)
 
     if name:
-        print(f'{name}: {duration_ms:.0f} ms')
+        print(f'{name}: {duration_ms:.0f} ms')  # noqa: T201
     else:
-        print(f'{duration_ms:.0f} ms')
+        print(f'{duration_ms:.0f} ms')  # noqa: T201
 
 
 @lru_cache(maxsize=32)
@@ -1047,7 +1047,7 @@ def is_valid_yubikey(
         return Yubico(client_id, secret_key).verify(yubikey)
     except StatusCodeError as e:
         if e.status_code != 'REPLAYED_OTP':
-            raise e
+            raise
 
         return False
     except SignatureVerificationError:

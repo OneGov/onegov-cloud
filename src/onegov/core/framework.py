@@ -228,7 +228,7 @@ class Framework(
                 return fn(*args, **kwargs)
             except Exception:
                 if getattr(self, 'print_exceptions', False):
-                    print('=' * 80, file=sys.stderr)
+                    print('=' * 80, file=sys.stderr)  # noqa: T201
                     traceback.print_exc()
                 raise
 

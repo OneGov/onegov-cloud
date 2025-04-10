@@ -87,30 +87,59 @@ def test_resources(client):
     assert 'Beamer' in resource
     edit = resource.click('Bearbeiten')
     edit.form['title'] = 'Beamers'
-    edit.form.submit().follow()
+    edit.form.submit()
 
     new = resources.click('Raum')
-    new.form['title'] = 'Meeting Room'
+    new.form['title'] = 'Meeting Room 1'
+    new.form['group'] = 'Office'
+    new.form['subgroup'] = 'Big Meeting Room'
     resource = new.form.submit().follow()
 
     assert 'calendar' in resource
-    assert 'Meeting Room' in resource
+    assert 'Meeting Room 1' in resource
 
     edit = resource.click('Bearbeiten')
-    edit.form['title'] = 'Besprechungsraum'
+    edit.form['title'] = 'Besprechungsraum 1'
     edit.form.submit()
 
+    new = resources.click('Raum')
+    new.form['title'] = 'Meeting Room 2'
+    new.form['group'] = 'Office'
+    new.form['subgroup'] = 'Big Meeting Room'
+    resource = new.form.submit()
+
+    new = resources.click('Raum')
+    new.form['title'] = 'Meeting Room 3'
+    new.form['group'] = 'Office'
+    new.form['subgroup'] = 'Big Meeting Room'
+    resource = new.form.submit()
+
+    # name collisions between titles and subgroups are fine
+    new = resources.click('Raum')
+    new.form['title'] = 'Big Meeting Room'
+    new.form['group'] = 'Office'
+    resource = new.form.submit()
+
+    new = resources.click('Raum')
+    new.form['title'] = 'Concert Hall'
+    resource = new.form.submit()
+
     resources = client.get('/resources')
-    assert 'Besprechungsraum' in resources
+    assert 'Besprechungsraum 1' in resources
+    assert 'Meeting Room 2' in resources
+    assert 'Meeting Room 3' in resources
+    assert 'Big Meeting Room' in resources
+    assert 'Office' in resources
+    assert 'Allgemein' in resources
     assert 'Beamers' in resources
 
     # Check warning duplicate
     duplicate = resources.click('Raum')
-    duplicate.form['title'] = 'Meeting Room'
+    duplicate.form['title'] = 'Meeting Room 1'
     page = new.form.submit()
     assert "Eine Resource mit diesem Namen existiert bereits" in page
 
-    resource = client.get('/resource/meeting-room')
+    resource = client.get('/resource/meeting-room-1')
     delete_link = resource.pyquery('a.delete-link').attr('ic-delete-from')
 
     assert client.delete(delete_link, status=200)
@@ -2639,3 +2668,51 @@ def test_resource_recipient_overview(client):
     assert "Gymnasium" in page
     assert "Dailypass" in page
     assert "Meeting" not in page
+
+
+@freeze_time("2024-04-08", tick=True)
+def test_reserve_fractions_of_hours_total_correct_in_price(client):
+    resources = ResourceCollection(client.app.libres_context)
+    resource = resources.by_name('tageskarte')
+    assert resource
+    resource.pricing_method = 'per_hour'
+    resource.price_per_hour = 10.00
+    resource.payment_method = 'manual'
+
+    scheduler = resource.get_scheduler(client.app.libres_context)
+    allocations = scheduler.allocate(
+        dates=(
+            datetime(2024, 4, 9, 10, 0),
+            datetime(2024, 4, 9, 14, 0)  # 4-hour slot
+        ),
+        partly_available=True,
+        whole_day=False
+    )
+
+    reserve = client.bound_reserve(allocations[0])
+    transaction.commit()
+
+    # Reserve 1.5 hours (10:00 to 11:30)
+    result = reserve(start='10:00', end='11:30')
+    assert result.json == {'success': True}
+
+    # Check price on confirmation page
+    form_page = client.get('/resource/tageskarte/form')
+    form_page.form['email'] = 'tester@example.org'
+    form_page.showbrowser()
+
+    confirmation_page = form_page.form.submit().follow()
+
+    # Expected price: 1.5 hours * 10.00 CHF/hour = 15.00 CHF
+    total_amount_dt = confirmation_page.pyquery('dt:contains("Totalbetrag")')
+    assert total_amount_dt, 'Total amount dt not found'
+    total_amount_dd = total_amount_dt.next('dd')
+    assert total_amount_dd, 'Total amount dd not found'
+    assert total_amount_dd.text().strip() == '15.00'
+    assert '10:00 - 11:30' in confirmation_page
+
+    # Check price in reservations JSON
+    reservations_url = '/resource/tageskarte/reservations'
+    reservations_data = client.get(reservations_url).json['reservations']
+    assert len(reservations_data) == 1
+    assert reservations_data[0]['price']['amount'] == 15.00

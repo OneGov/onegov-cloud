@@ -127,6 +127,15 @@ class OrgApp(Framework, LibresIntegration, ElasticsearchApp, MapboxApp,
         self.enable_yubikey = enable_yubikey
         self.disable_password_reset = disable_password_reset
 
+    def configure_api_token(
+        self,
+        *,
+        plausible_api_token: str = '',
+        ** cfg: Any
+    ) -> None:
+
+        self.plausible_api_token = plausible_api_token
+
     def configure_mtan_hook(self, **cfg: Any) -> None:
         """
         This inserts an mtan hook by wrapping the callable we receive
@@ -205,16 +214,34 @@ class OrgApp(Framework, LibresIntegration, ElasticsearchApp, MapboxApp,
 
     @orm_cached(policy='on-table-change:ticket_permissions')
     def ticket_permissions(self) -> dict[str, dict[str | None, list[str]]]:
-        result: dict[str, dict[str | None, list[str]]] = {}
+        """ Exclusive ticket permissions for authorization. """
+        permissions: dict[str, dict[str | None, tuple[bool, list[str]]]] = {}
         for permission in self.session().query(TicketPermission).with_entities(
             TicketPermission.handler_code,
             TicketPermission.group,
-            TicketPermission.user_group_id
+            TicketPermission.user_group_id,
+            TicketPermission.exclusive,
         ):
-            handler = result.setdefault(permission.handler_code, {})
-            group = handler.setdefault(permission.group, [])
+            handler = permissions.setdefault(permission.handler_code, {})
+            has_exclusive, group = handler.setdefault(
+                permission.group,
+                (permission.exclusive, [])
+            )
             group.append(permission.user_group_id.hex)
-        return result
+            if permission.exclusive and not has_exclusive:
+                handler[permission.group] = (True, group)
+
+        return {
+            handler_code: {
+                group: group_perms
+                for group, (exclusive, group_perms) in handler_perms.items()
+                # the permission is only exclusive, if at least one user group
+                # has exclusive permissions. But user groups with non-exclusive
+                # permissions still have permission to access the ticket.
+                if exclusive
+            }
+            for handler_code, handler_perms in permissions.items()
+        }
 
     @orm_cached(policy='on-table-change:files')
     def publications_count(self) -> int:

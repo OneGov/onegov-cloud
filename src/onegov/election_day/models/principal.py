@@ -9,7 +9,7 @@ from markupsafe import Markup
 from onegov.core import utils
 from onegov.core.custom import json
 from onegov.core.custom import msgpack
-from onegov.election_day import _
+from onegov.election_day import _, log
 from pathlib import Path
 from urllib.parse import urlsplit
 from yaml import safe_load
@@ -311,8 +311,10 @@ class Canton(Principal, msgpack.Serializable, tag=50, keys=(
         # NOTE: this section may depend on static data for principle.entities.
         # See src/onegov/election_day/static/municipalities/<year>/*.json
         if date.today().year not in entities:
-            print(f'Warning: No entities for year {date.today().year} found '
-                  f'for {canton}')
+            log.warning(
+                f'Warning: No entities for year {date.today().year} found '
+                f'for {canton}'
+            )
 
         # Test if all entities have districts (use none, if ambiguous)
         districts = {
@@ -588,8 +590,10 @@ class Municipality(Principal, msgpack.Serializable, tag=51, keys=(
         # NOTE: this section may depend on static data for principle.entities.
         # See src/onegov/election_day/static/municipalities/<year>/*.json
         if date.today().year not in entities:
-            print(f'Warning: No entities for year {date.today().year} found '
-                  f'for {municipality}')
+            log.warning(
+                f'Warning: No entities for year {date.today().year} found '
+                f'for {municipality}'
+            )
 
         super().__init__(
             id_=municipality,

@@ -101,6 +101,9 @@ class Resource(ORMBase, ModelBase, ContentMixin,
     #: the group to which this resource belongs to (may be any kind of string)
     group: Column[str | None] = Column(Text, nullable=True)
 
+    #: the subgroup to which this resource belongs to
+    subgroup: Column[str | None] = Column(Text, nullable=True)
+
     #: the type of the resource, this can be used to create custom polymorphic
     #: subclasses. See `<https://docs.sqlalchemy.org/en/improve_toc/
     #: orm/extensions/declarative/inheritance.html>`_.
