@@ -2283,7 +2283,7 @@ class ResourceLayout(DefaultLayout):
                     attrs={'class': 'subscribe-link'}
                 ),
                 Link(
-                    text=_('Availability Periods'),
+                    text=_('Availability periods'),
                     url=self.request.link(self.model, 'rules'),
                     attrs={'class': 'rule-link'}
                 ),
@@ -2328,7 +2328,7 @@ class AllocationRulesLayout(ResourceLayout):
                 title=_('Add'),
                 links=[
                     Link(
-                        text=_('Rule'),
+                        text=_('Availability period'),
                         url=self.request.link(
                             self.model,
                             name='new-rule'

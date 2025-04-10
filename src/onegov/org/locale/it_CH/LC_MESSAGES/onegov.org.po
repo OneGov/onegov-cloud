@@ -2,7 +2,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: \n"
-"POT-Creation-Date: 2025-04-10 09:17+0200\n"
+"POT-Creation-Date: 2025-04-10 12:57+0200\n"
 "PO-Revision-Date: 2022-03-15 10:52+0100\n"
 "Last-Translator: \n"
 "Language-Team: \n"
@@ -280,8 +280,8 @@ msgstr "Titolo"
 msgid "General availability"
 msgstr "Disponibilità generale"
 
-msgid "Rule"
-msgstr "Regola"
+msgid "Period"
+msgstr "Periodo"
 
 msgid "Extend"
 msgstr "Prolunga"
@@ -2695,11 +2695,11 @@ msgstr "Occupazione"
 msgid "Subscribe"
 msgstr "Iscriviti"
 
-msgid "Availability Periods"
-msgstr "Periodi di disponibilità"
-
 msgid "Availability periods"
 msgstr "Periodi di disponibilità"
+
+msgid "Availability period"
+msgstr "Periodo di disponibilità"
 
 msgid "Edit allocation"
 msgstr "Modifica allocazione"
@@ -3427,8 +3427,8 @@ msgstr ""
 msgid "Summary"
 msgstr "Riepilogo"
 
-msgid "No rules defined."
-msgstr "Nessuna regola definita."
+msgid "No availability periods defined."
+msgstr "Nessun periodo di disponibilità definito."
 
 msgid ""
 "Api keys can be used to ensure you're not being rate limited. They are not "
@@ -5197,8 +5197,8 @@ msgstr ""
 "Periodo di disponibilità aggiornato. ${deleted} allocazioni rimosse, "
 "${created} nuove allocazioni create."
 
-msgid "Rule not found"
-msgstr "Regola non trovata"
+msgid "Availability period not found"
+msgstr "Periodo di disponibilità non trovato"
 
 msgid "Edit availabilty period"
 msgstr "Modifica il periodo di disponibilità"
@@ -5214,13 +5214,12 @@ msgstr ""
 "prossimo cambiamento delle disponibilità. Ad esempio, un semestre scolastico "
 "o un anno scolastico."
 
-msgid "The rule was stopped"
-msgstr "La regola è stata arrestata"
+msgid "The availability period was stopped"
+msgstr "Il periodo di disponibilità è stato fermato"
 
 #, python-format
 msgid "The availability period was deleted, along with ${n} allocations"
 msgstr "La disponibilità è stata eliminata, insieme a ${n} allocazioni"
-
 
 msgid "Topics A-Z"
 msgstr "Argomenti A-Z"
@@ -6623,6 +6622,18 @@ msgstr "È stato creato un account per te"
 
 msgid "The user was created successfully"
 msgstr "Utente creato correttamente"
+
+#~ msgid "Rule"
+#~ msgstr "Regola"
+
+#~ msgid "No rules defined."
+#~ msgstr "Nessuna regola definita."
+
+#~ msgid "Rule not found"
+#~ msgstr "Regola non trovata"
+
+#~ msgid "The rule was stopped"
+#~ msgstr "La regola è stata arrestata"
 
 #~ msgid "Rules"
 #~ msgstr "Regole"

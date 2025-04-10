@@ -2,7 +2,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE 1.0\n"
-"POT-Creation-Date: 2025-04-10 09:17+0200\n"
+"POT-Creation-Date: 2025-04-10 12:57+0200\n"
 "PO-Revision-Date: 2022-03-15 10:50+0100\n"
 "Last-Translator: Marc Sommerhalder <marc.sommerhalder@seantis.ch>\n"
 "Language-Team: French\n"
@@ -279,8 +279,8 @@ msgstr "Titre"
 msgid "General availability"
 msgstr "Disponibilité générale"
 
-msgid "Rule"
-msgstr "Règle"
+msgid "Period"
+msgstr "Période"
 
 msgid "Extend"
 msgstr "Prolonger"
@@ -2693,11 +2693,11 @@ msgstr "Occupation"
 msgid "Subscribe"
 msgstr "Souscrire"
 
-msgid "Availability Periods"
-msgstr "Périodes de disponibilité"
-
 msgid "Availability periods"
 msgstr "Périodes de disponibilité"
+
+msgid "Availability period"
+msgstr "Période de disponibilité"
 
 msgid "Edit allocation"
 msgstr "Modifier l'allocation"
@@ -3427,8 +3427,8 @@ msgstr ""
 msgid "Summary"
 msgstr "Sommaire"
 
-msgid "No rules defined."
-msgstr "Aucune règle définie."
+msgid "No availability periods defined."
+msgstr "Aucune période de disponibilité définie."
 
 msgid ""
 "Api keys can be used to ensure you're not being rate limited. They are not "
@@ -5208,8 +5208,8 @@ msgstr ""
 "Disponibilité mise à jour. ${deleted} allocations supprimées, ${created} "
 "nouvelles allocations créées."
 
-msgid "Rule not found"
-msgstr "Règle non trouvée"
+msgid "Availability period not found"
+msgstr "Période de disponibilité introuvable"
 
 msgid "Edit availabilty period"
 msgstr "Modifier la période de disponibilité"
@@ -5225,8 +5225,8 @@ msgstr ""
 "normalement durer jusqu'à la prochaine fois que les disponibilités sont "
 "censées changer. Par exemple, un trimestre scolaire ou une année scolaire."
 
-msgid "The rule was stopped"
-msgstr "La règle a été arrêtée"
+msgid "The availability period was stopped"
+msgstr "La période de disponibilité a été arrêtée"
 
 #, python-format
 msgid "The availability period was deleted, along with ${n} allocations"
@@ -6639,6 +6639,18 @@ msgstr "Un compte a été créé pour vous"
 
 msgid "The user was created successfully"
 msgstr "L'utilisateur a bien été créé"
+
+#~ msgid "Rule"
+#~ msgstr "Règle"
+
+#~ msgid "No rules defined."
+#~ msgstr "Aucune règle définie."
+
+#~ msgid "Rule not found"
+#~ msgstr "Règle non trouvée"
+
+#~ msgid "The rule was stopped"
+#~ msgstr "La règle a été arrêtée"
 
 #~ msgid "Rules"
 #~ msgstr "Règles"

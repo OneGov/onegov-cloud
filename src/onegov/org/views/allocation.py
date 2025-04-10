@@ -443,7 +443,7 @@ def handle_edit_rule(
         None,
     )
     if existing_rule is None:
-        request.message(_('Rule not found'), 'warning')
+        request.message(_('Availability period not found'), 'warning')
         return request.redirect(request.link(self, name='rules'))
 
     form.rule = existing_rule
@@ -551,7 +551,7 @@ def handle_stop_rule(self: Resource, request: OrgRequest) -> None:
     rule_id = rule_id_from_request(request)
     delete_rule(self, rule_id)
 
-    request.success(_('The rule was stopped'))
+    request.success(_('The availability period was stopped'))
 
 
 @OrgApp.view(model=Resource, request_method='POST', permission=Private,

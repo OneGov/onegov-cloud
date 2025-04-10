@@ -137,12 +137,12 @@ class AllocationRuleForm(Form):
         label=_('Title'),
         description=_('General availability'),
         validators=[InputRequired()],
-        fieldset=_('Rule'))
+        fieldset=_('Period'))
 
     extend = RadioField(
         label=_('Extend'),
         validators=[InputRequired()],
-        fieldset=_('Rule'),
+        fieldset=_('Period'),
         default='no',
         choices=(
             ('no', _("Don't extend this availability period automatically")),
