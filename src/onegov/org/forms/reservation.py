@@ -143,6 +143,11 @@ class FindYourSpotForm(Form):
         if len(rooms) < 2:
             # no need to filter
             self.delete_field('rooms')
+            # the first and second choice are the same
+            # when there is only one room
+            choices = self.auto_reserve_available_slots.choices
+            assert isinstance(choices, list)
+            self.auto_reserve_available_slots.choices = choices[1:]
             return
 
         self.rooms.choices = [(room.id, room.title) for room in rooms]

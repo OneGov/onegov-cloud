@@ -2,7 +2,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE 1.0\n"
-"POT-Creation-Date: 2025-04-09 10:41+0200\n"
+"POT-Creation-Date: 2025-04-10 10:33+0200\n"
 "PO-Revision-Date: 2022-03-15 10:50+0100\n"
 "Last-Translator: Marc Sommerhalder <marc.sommerhalder@seantis.ch>\n"
 "Language-Team: French\n"
@@ -1329,6 +1329,21 @@ msgstr "Dernière fin"
 
 msgid "Rooms"
 msgstr "Espaces"
+
+msgid "Automatically reserve the first available slot"
+msgstr "Réserver automatiquement le premier créneau disponible"
+
+msgid "You will be able to change individual choices"
+msgstr "Vous pourrez modifier les choix"
+
+msgid "Yes, for every selected room and day"
+msgstr "Oui, pour chaque chambre et chaque jour sélectionnés"
+
+msgid "Yes, for every selected day"
+msgstr "Oui, pour chaque jour sélectionné"
+
+msgid "Yes, for the first available selected day"
+msgstr "Oui, pour le premier jour sélectionné disponible"
 
 msgid "Start date in past"
 msgstr "Date de début dans le passé"
@@ -3633,6 +3648,26 @@ msgstr ""
 "plus d'un créneau horaire ou d'une salle pour un jour donné, vous pouvez "
 "maintenir enfoncée l'une des touches Shift, Alt ou Ctrl tout en cliquant sur "
 "les créneaux horaires que vous souhaitez réserver."
+
+#. Canonical text for ${and_rooms} is: "and rooms"
+msgid ""
+"We were unable to reserve some slots matching your criteria for the "
+"following dates${and_rooms}, please note that some of those dates may still "
+"have one or more available slots that are either shorter or longer than your "
+"selected duration. ${dates}"
+msgstr ""
+"Nous n'avons pas pu réserver certains créneaux correspondant à vos critères "
+"pour les dates${and_rooms} suivantes. Veuillez noter que certaines de ces "
+"dates peuvent encore avoir un ou plusieurs créneaux disponibles qui sont "
+"soit plus courts, soit plus longs que la durée que vous avez choisie. "
+"${dates}"
+
+#. Used in sentence: "We were unable to reserve some slots matching your
+#. criteria for the following dates${and_rooms}, please note that some of those
+#. dates may still have one or more available slots that are either shorter or
+#. longer than your selected duration. ${dates}"
+msgid "and rooms"
+msgstr " et chambres"
 
 msgid "Unavailable"
 msgstr "Indisponible"

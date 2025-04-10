@@ -2,7 +2,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE 1.0\n"
-"POT-Creation-Date: 2025-04-09 10:41+0200\n"
+"POT-Creation-Date: 2025-04-10 10:33+0200\n"
 "PO-Revision-Date: 2022-03-15 10:21+0100\n"
 "Last-Translator: Marc Sommerhalder <marc.sommerhalder@seantis.ch>\n"
 "Language-Team: German\n"
@@ -1330,6 +1330,22 @@ msgstr "Spätestes Ende"
 
 msgid "Rooms"
 msgstr "Räume"
+
+msgid "Automatically reserve the first available slot"
+msgstr "Automatisch den ersten verfügbaren Termin reservieren"
+
+msgid "You will be able to change individual choices"
+msgstr "Sie können im Anschluss ihre Auswahl bearbeiten"
+
+msgid "Yes, for every selected room and day"
+msgstr ""
+"Ja, für jeden ausgewählten Raum an jedem verfügbarem Datum (Mehrfachbelegung)"
+
+msgid "Yes, for every selected day"
+msgstr "Ja, für jedes verfügbare Datum"
+
+msgid "Yes, for the first available selected day"
+msgstr "Ja, für das erste verfügbare Datum"
 
 msgid "Start date in past"
 msgstr "Startdatum in der Vergangenheit"
@@ -3622,6 +3638,25 @@ msgstr ""
 "reservieren möchten, halten Sie die Alt, Strg oder Umschalt Taste gedrückt, "
 "während Sie auf auf den gewünschten Termin klicken. Ansonsten wird der "
 "vorherig ausgewählte Termin automatisch wieder abgewählt."
+
+#. Canonical text for ${and_rooms} is: "and rooms"
+msgid ""
+"We were unable to reserve some slots matching your criteria for the "
+"following dates${and_rooms}, please note that some of those dates may still "
+"have one or more available slots that are either shorter or longer than your "
+"selected duration. ${dates}"
+msgstr ""
+"Für die folgenden Daten${and_rooms} konnten wir leider keinen Termin finden, "
+"der Ihren Kriterien entspricht. Bitte überprüfen Sie die entsprechenden "
+"Daten in der Terminliste, da es möglich ist, dass ein kürzerer oder längerer "
+"Termin Verfügbar ist. ${dates}"
+
+#. Used in sentence: "We were unable to reserve some slots matching your
+#. criteria for the following dates${and_rooms}, please note that some of those
+#. dates may still have one or more available slots that are either shorter or
+#. longer than your selected duration. ${dates}"
+msgid "and rooms"
+msgstr " und Räume"
 
 msgid "Unavailable"
 msgstr "Besetzt"

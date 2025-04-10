@@ -396,7 +396,7 @@ def view_find_your_spot(
                             slot_start, allocation.timezone),
                             sedate.to_timezone(
                                 slot_end, allocation.timezone)),
-                        min(availability, 100),
+                        availability,
                         1 if availability >= availability_threshold else 0,
                         request,
                         adjustable=adjustable
@@ -413,7 +413,7 @@ def view_find_your_spot(
                 allocation,
                 (sedate.to_timezone(slot_start, allocation.timezone),
                  sedate.to_timezone(slot_end, allocation.timezone)),
-                min(availability, 100.0),
+                availability,
                 1 if availability >= availability_threshold else 0,
                 request,
                 adjustable=adjustable
@@ -572,17 +572,33 @@ def view_find_your_spot(
                     continue
 
                 # add the actual available slots for custom adjustments
-                slots.extend(spot_infos_for_free_slots(
-                    allocation,
-                    free,
-                    duration,
-                    adjustable=True
-                ))
+                slots.extend(
+                    slot
+                    for slot in spot_infos_for_free_slots(
+                        allocation,
+                        # we want to render the entire available time
+                        # span, as long as it overlaps with our target
+                        # so people can reserve a slot that's slightly
+                        # outside their selected range if they want
+                        allocation.free_slots(),
+                        duration,
+                        adjustable=True
+                    )
+                    # but let's exclude slots that are way smaller than
+                    # our selected duration
+                    if slot.availability >= 25.0 and sedate.overlaps(
+                        target_start,
+                        target_end,
+                        # these slots should always have a slot_time
+                        slot.slot_time[0],  # type: ignore[index]
+                        slot.slot_time[1]  # type: ignore[index]
+                    )
+                )
 
         auto_reserve = form.auto_reserve_available_slots.data
         if auto_reserve != 'no':
             rooms_dict = {room.id: room for room in rooms}
-            reservations = {
+            reservations: dict[UUID, list[Reservation]] = {
                 room.id: room.bound_reservations(request).all()  # type: ignore[attr-defined]
                 for room in rooms
             }
@@ -677,7 +693,7 @@ def view_find_your_spot(
                 ] if wanted > 1 else None
                 for date in room_slots.keys()
                 if len(room_ids := reserved_dates.get(date, set())) < wanted
-            }
+            } if auto_reserve != 'for_first_day' else {}
 
     if room_slots:
         request.include('reservationlist')
@@ -709,11 +725,61 @@ def get_find_your_spot_reservations(
             #        Resource class?
             if hasattr(resource, 'bound_reservations')
             for reservation in resource.bound_reservations(request)),
-        key=itemgetter('date')
+        key=itemgetter('date', 'title')
     )
 
     return {
         'reservations': reservations,
+        'delete_link': request.csrf_protected_url(
+            request.link(self, name='reservations')
+        ),
+        # no predictions in the list
+        'prediction': None
+    }
+
+
+@OrgApp.json(
+    model=FindYourSpotCollection,
+    name='reservations',
+    request_method='DELETE',
+    permission=Public
+)
+def delete_all_find_your_spot_reservations(
+    self: FindYourSpotCollection,
+    request: OrgRequest
+) -> JSON_ro:
+
+    # anonymous users do not get a csrf token (it's bound to the identity)
+    # therefore we can't check for it -> this is not a problem since
+    # anonymous users do not really have much to lose here
+    # FIXME: We always generate a csrf token now, so we could reconsider
+    #        this, although it would mean, that people, that have blocked
+    #        cookies, will not be able to delete reservations at all.
+    if request.is_logged_in:
+        request.assert_valid_csrf_token()
+
+    # TODO: We might be able to make this a lot more efficient by taking
+    #       advantage of the fact that we use a single shared token for
+    #       all reservations in the same session (although that might
+    #       include submitted reservations too? which would be bad)
+    for resource in request.exclude_invisible(self.query()):
+        resource.bind_to_libres_context(request.app.libres_context)
+        # FIXME: Maybe we should move bound_reservations to the base
+        #        Resource class?
+        assert hasattr(resource, 'bound_reservations')
+        for reservation in resource.bound_reservations(request):
+            # these shouldn't have a ticket yet, so we don't need
+            # to worry about it
+            resource.scheduler.remove_reservation(
+                reservation.token,
+                reservation.id
+            )
+
+    return {
+        'reservations': [],
+        'delete_link': request.csrf_protected_url(
+            request.link(self, name='reservations')
+        ),
         # no predictions in the list
         'prediction': None
     }

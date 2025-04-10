@@ -2,7 +2,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: \n"
-"POT-Creation-Date: 2025-04-09 10:41+0200\n"
+"POT-Creation-Date: 2025-04-10 10:33+0200\n"
 "PO-Revision-Date: 2022-03-15 10:52+0100\n"
 "Last-Translator: \n"
 "Language-Team: \n"
@@ -1333,6 +1333,21 @@ msgstr "Ultima fine"
 
 msgid "Rooms"
 msgstr "Camere"
+
+msgid "Automatically reserve the first available slot"
+msgstr "Riservare automaticamente il primo slot disponibile"
+
+msgid "You will be able to change individual choices"
+msgstr "Sarà possibile modificare le scelte"
+
+msgid "Yes, for every selected room and day"
+msgstr "Sì, per ogni camera e giorno selezionati"
+
+msgid "Yes, for every selected day"
+msgstr "Sì, per ogni giorno selezionato"
+
+msgid "Yes, for the first available selected day"
+msgstr "Sì, per il primo giorno disponibile selezionato"
 
 msgid "Start date in past"
 msgstr "Data di inizio nel passato"
@@ -3629,6 +3644,25 @@ msgstr ""
 "una fascia oraria o di una stanza in un determinato giorno, è possibile "
 "tenere premuto uno dei tasti Shift, Alt o Ctrl mentre si fa clic sulle fasce "
 "orarie che si desidera prenotare."
+
+#. Canonical text for ${and_rooms} is: "and rooms"
+msgid ""
+"We were unable to reserve some slots matching your criteria for the "
+"following dates${and_rooms}, please note that some of those dates may still "
+"have one or more available slots that are either shorter or longer than your "
+"selected duration. ${dates}"
+msgstr ""
+"Non siamo riusciti a prenotare alcuni slot corrispondenti ai vostri criteri "
+"per le date${and_rooms} seguenti; vi preghiamo di notare che alcune di "
+"queste date potrebbero avere ancora uno o più slot disponibili di durata "
+"inferiore o superiore a quella da voi selezionata. ${dates}"
+
+#. Used in sentence: "We were unable to reserve some slots matching your
+#. criteria for the following dates${and_rooms}, please note that some of those
+#. dates may still have one or more available slots that are either shorter or
+#. longer than your selected duration. ${dates}"
+msgid "and rooms"
+msgstr " e le camere"
 
 msgid "Unavailable"
 msgstr "Non disponibile"
