@@ -620,15 +620,23 @@ def view_find_your_spot(
                 }
                 for date, date_room_slots in room_slots.items()
             }
+
             reserved_dates: dict[date_t, set[UUID]] = {}
-            for date, date_room_slots in room_slots.items():
+            for date, date_room_slots in (
+                # skip iteration if we have existing reservations
+                # that match our criteria and we're only supposed
+                # to reserve one of them
+                () if auto_reserve == 'for_first_day' and any(
+                    skipped_due_to_existing_reservation.values()
+                ) else room_slots.items()
+            ):
                 skipped = skipped_due_to_existing_reservation[date]
                 reserved_dates[date] = skipped
-                if (
-                    (auto_reserve != 'for_every_room' and skipped)
+                if skipped and (
+                    auto_reserve != 'for_every_room'
                     or len(skipped) == len(date_room_slots)
                 ):
-                    # already fully reserved
+                    # date already fully reserved
                     continue
 
                 for room_id, slots in date_room_slots.items():
