@@ -2,7 +2,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: \n"
-"POT-Creation-Date: 2025-04-07 11:14+0200\n"
+"POT-Creation-Date: 2025-04-09 20:44+0200\n"
 "PO-Revision-Date: 2021-11-11 09:07+0100\n"
 "Last-Translator: Marc Sommerhalder <marc.sommerhalder@seantis.ch>\n"
 "Language-Team: \n"
@@ -211,6 +211,9 @@ msgstr "Sesso  partecipante"
 
 msgid "Attendee Notes"
 msgstr "Commenti partecipante"
+
+msgid "Attendee SwissPass ID"
+msgstr "ID SwissPass partecipante"
 
 msgid "Attendee Booking-Limit"
 msgstr "Limiti di prenotazione partecipante"
@@ -690,6 +693,9 @@ msgstr "C'è qualcosa che l'istruttore dovrebbe sapere?"
 msgid "Allergies, Disabilities, Particulars"
 msgstr "Allergie, disabilità, caratteristiche speciali"
 
+msgid "Swisspass ID"
+msgstr "ID Swisspass"
+
 msgid "The address of the attendee differs from the users address"
 msgstr "L'indirizzo del partecipante differisce dall'indirizzo dell'utente"
 
@@ -701,6 +707,12 @@ msgstr "CAP"
 
 msgid "Political municipality"
 msgstr "Comune politico"
+
+msgid "The Swisspass ID must be 13 characters long."
+msgstr "L'ID Swisspass deve essere lungo 13 caratteri."
+
+msgid "The Swisspass ID must only contain digits and dashes."
+msgstr "L'ID Swisspass deve contenere solo cifre e trattini."
 
 msgid "Attendee"
 msgstr "Partecipante"
@@ -3099,6 +3111,12 @@ msgstr "Profilo utente"
 
 msgid "Require the political municipality on registration"
 msgstr "Richiedere al comune politico la registrazione"
+
+msgid "Require a SwissPass ID of attendees"
+msgstr "Richiedere un ID SwissPass per i partecipanti"
+
+msgid "SwissPass ID"
+msgstr "ID SwissPass"
 
 msgid "Parents can see the contacts of other parents in the same activity"
 msgstr ""
