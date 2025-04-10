@@ -2674,7 +2674,7 @@ msgid "iFrame"
 msgstr "iFrame"
 
 msgid "Find Your Spot"
-msgstr "Cerca le date"
+msgstr "Cerca le date / Prenotazioni ricorrenti"
 
 msgid "E-Mail Recipient"
 msgstr "E-mail del destinatario"

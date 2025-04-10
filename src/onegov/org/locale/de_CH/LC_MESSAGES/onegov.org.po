@@ -2664,7 +2664,7 @@ msgid "iFrame"
 msgstr "iFrame"
 
 msgid "Find Your Spot"
-msgstr "Terminsuche"
+msgstr "Terminsuche / Serienreservation"
 
 msgid "E-Mail Recipient"
 msgstr "E-Mail Empfänger"
