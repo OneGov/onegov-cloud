@@ -179,7 +179,7 @@ class AttendeeForm(AttendeeBase):
         self.toggle_swisspass()
 
     def ensure_valid_swisspass_id(self) -> bool:
-        if self.swisspass.data:
+        if self.swisspass and self.swisspass.data:
             if len(self.swisspass.data) != 13:
                 assert isinstance(self.swisspass.errors, list)
                 self.swisspass.errors.append(_(
