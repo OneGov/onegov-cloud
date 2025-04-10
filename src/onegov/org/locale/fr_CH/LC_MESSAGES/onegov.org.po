@@ -2,7 +2,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE 1.0\n"
-"POT-Creation-Date: 2025-04-09 13:41+0200\n"
+"POT-Creation-Date: 2025-04-10 09:17+0200\n"
 "PO-Revision-Date: 2022-03-15 10:50+0100\n"
 "Last-Translator: Marc Sommerhalder <marc.sommerhalder@seantis.ch>\n"
 "Language-Team: French\n"
@@ -2696,8 +2696,8 @@ msgstr "Souscrire"
 msgid "Availability Periods"
 msgstr "Périodes de disponibilité"
 
-msgid "Rules"
-msgstr "Règles"
+msgid "Availability periods"
+msgstr "Périodes de disponibilité"
 
 msgid "Edit allocation"
 msgstr "Modifier l'allocation"
@@ -4793,10 +4793,17 @@ msgstr ""
 "Sélectionnez un intervalle de temps libre dans le calendrier ci-dessous pour "
 "créer une allocation."
 
-msgid "Removes all unreserved allocations between the start and end date."
+msgid ""
+"Removes all unreserved allocations between the start and end date. This "
+"includes allocations that were created by using an availability period. To "
+"recreate these allocations, click on \"edit\" in the availability period and "
+"then \"save\" without changing anything."
 msgstr ""
-"Supprime toutes les allocation non réservées entre la date de début et de "
-"fin."
+"Supprime toutes les allocations non réservées entre la date de début et la "
+"date de fin. Cela inclut les allocations qui ont été créées en utilisant une "
+"période de disponibilité. Pour recréer ces allocations, cliquez sur "
+"\"éditer\" dans la période de disponibilité, puis \"enregistrer\" sans rien "
+"changer."
 
 msgid "Reservation is pending approval"
 msgstr "La réservation est en attente d'approbation"
@@ -5170,63 +5177,61 @@ msgid ""
 "All allocations created by the availability period will be removed, if they "
 "haven't been reserved yet."
 msgstr ""
-"Les allocations créées par la période de disponibilité seront supprimées, "
-"si elles n'ont pas encore été réservées."
+"Les allocations créées par la période de disponibilité seront supprimées, si "
+"elles n'ont pas encore été réservées."
 
-msgid "Delete rule"
-msgstr "Supprimer la règle"
-
-msgid "Availability periods"
-msgstr "Périodes de disponibilité"
-
-msgid "No allocations to add"
-msgstr "Aucune allocation à ajouter"
-
-#, python-format
-msgid "Successfully added ${n} allocations"
-msgstr "${n} dotations ajoutées avec succès"
-
-msgid "New allocation"
-msgstr "Nouvelle allocation"
+msgid "Delete availability period"
+msgstr "Supprimer la période de disponibilité"
 
 msgid "Your changes were saved"
 msgstr "Vos modifications ont été enregistrées"
 
 #, python-format
-msgid "New rule active, ${n} allocations created"
-msgstr "Nouvelle règle active, ${n} allocations créées"
+msgid "New availability period active, ${n} allocations created"
+msgstr "Nouvelle période de disponibilité active, ${n} allocations créées"
 
-msgid "New Rule"
-msgstr "Nouvelle règle"
+msgid "New availabilty period"
+msgstr "Nouvelle période de disponibilité"
 
 msgid ""
-"Rules ensure that the allocations between start/end exist and that they are "
-"extended beyond those dates at the given intervals. "
+"Availability periods ensure that the allocations between start/end exist and "
+"that they are extended beyond those dates at the given intervals."
 msgstr ""
-"Les règles garantissent que les allocations entre le début et la fin "
-"existent et qu'elles sont prolongées au-delà de ces dates à des intervalles "
-"donnés."
+"Les périodes de disponibilité garantissent que les allocations entre le "
+"début et la fin existent et qu'elles sont prolongées au-delà de ces dates "
 
 #, python-format
 msgid ""
-"Rule updated. ${deleted} allocations removed, ${created} new allocations "
-"created."
+"Availability period updated. ${deleted} allocations removed, ${created} new "
+"allocations created."
 msgstr ""
-"La règle a été mise à jour. ${deleted} allocations supprimées, ${created} "
+"Disponibilité mise à jour. ${deleted} allocations supprimées, ${created} "
 "nouvelles allocations créées."
 
 msgid "Rule not found"
 msgstr "Règle non trouvée"
 
-msgid "Edit Rule"
-msgstr "Modifier la règle"
+msgid "Edit availabilty period"
+msgstr "Modifier la période de disponibilité"
+
+msgid ""
+"Availability periods create availabilities between the specified start and "
+"end date. The availability period should ideally last until the next time "
+"the availabilities are expected to change. For example, a school term or a "
+"school year."
+msgstr ""
+"Les périodes de disponibilité créent des disponibilités entre la date de "
+"début et la date de fin spécifiées. La période de disponibilité doit "
+"normalement durer jusqu'à la prochaine fois que les disponibilités sont "
+"censées changer. Par exemple, un trimestre scolaire ou une année scolaire."
 
 msgid "The rule was stopped"
 msgstr "La règle a été arrêtée"
 
 #, python-format
-msgid "The rule was deleted, along with ${n} allocations"
-msgstr "La règle a été supprimée, avec les allocations ${n}"
+msgid "The availability period was deleted, along with ${n} allocations"
+msgstr ""
+"La période de disponibilité a été supprimée, ainsi que ${n} allocations"
 
 msgid "Topics A-Z"
 msgstr "Sujets de A à Z"
@@ -6634,6 +6639,57 @@ msgstr "Un compte a été créé pour vous"
 
 msgid "The user was created successfully"
 msgstr "L'utilisateur a bien été créé"
+
+#~ msgid "Rules"
+#~ msgstr "Règles"
+
+#~ msgid "Removes all unreserved allocations between the start and end date."
+#~ msgstr ""
+#~ "Supprime toutes les allocation non réservées entre la date de début et de "
+#~ "fin."
+
+#~ msgid "Delete rule"
+#~ msgstr "Supprimer la règle"
+
+#~ msgid "No allocations to add"
+#~ msgstr "Aucune allocation à ajouter"
+
+#, python-format
+#~ msgid "Successfully added ${n} allocations"
+#~ msgstr "${n} dotations ajoutées avec succès"
+
+#~ msgid "New allocation"
+#~ msgstr "Nouvelle allocation"
+
+#, python-format
+#~ msgid "New rule active, ${n} allocations created"
+#~ msgstr "Nouvelle règle active, ${n} allocations créées"
+
+#~ msgid "New Rule"
+#~ msgstr "Nouvelle règle"
+
+#~ msgid ""
+#~ "Rules ensure that the allocations between start/end exist and that they "
+#~ "are extended beyond those dates at the given intervals. "
+#~ msgstr ""
+#~ "Les règles garantissent que les allocations entre le début et la fin "
+#~ "existent et qu'elles sont prolongées au-delà de ces dates à des "
+#~ "intervalles donnés."
+
+#, python-format
+#~ msgid ""
+#~ "Rule updated. ${deleted} allocations removed, ${created} new allocations "
+#~ "created."
+#~ msgstr ""
+#~ "La règle a été mise à jour. ${deleted} allocations supprimées, ${created} "
+#~ "nouvelles allocations créées."
+
+#~ msgid "Edit Rule"
+#~ msgstr "Modifier la règle"
+
+#, python-format
+#~ msgid "The rule was deleted, along with ${n} allocations"
+#~ msgstr "La règle a été supprimée, avec les allocations ${n}"
 
 #~ msgid "The rule will be removed without affecting existing allocations."
 #~ msgstr "La règle sera supprimée sans affecter les allocations existantes."

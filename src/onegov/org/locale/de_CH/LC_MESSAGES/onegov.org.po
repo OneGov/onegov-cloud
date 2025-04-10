@@ -2,7 +2,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE 1.0\n"
-"POT-Creation-Date: 2025-04-09 13:41+0200\n"
+"POT-Creation-Date: 2025-04-10 09:17+0200\n"
 "PO-Revision-Date: 2022-03-15 10:21+0100\n"
 "Last-Translator: Marc Sommerhalder <marc.sommerhalder@seantis.ch>\n"
 "Language-Team: German\n"
@@ -2688,8 +2688,8 @@ msgstr "Abonnieren"
 msgid "Availability Periods"
 msgstr "Verfügbarkeitszeiträume"
 
-msgid "Rules"
-msgstr "Regeln"
+msgid "Availability periods"
+msgstr "Verfügbarkeitszeiträume"
 
 msgid "Edit allocation"
 msgstr "Verfügbarkeit bearbeiten"
@@ -4776,9 +4776,17 @@ msgstr ""
 "Wählen Sie eine freie Zeitspanne im Kalender aus um eine Verfügbarkeit zu "
 "machen."
 
-msgid "Removes all unreserved allocations between the start and end date."
+msgid ""
+"Removes all unreserved allocations between the start and end date. This "
+"includes allocations that were created by using an availability period. To "
+"recreate these allocations, click on \"edit\" in the availability period and "
+"then \"save\" without changing anything."
 msgstr ""
-"Entfernt alle nicht-reservierten Verfügbarkeiten zwischen Start- und End-Datum"
+"Entfernt alle nicht reservierten Verfügbarkeiten zwischen dem Start- und "
+"Enddatum. Dies schliesst Verfügbarkeiten ein, die mit einer "
+"Verfügbarkeitsperiode erstellt wurden. Um diese Verfügbarkeiten wieder zu "
+"erstellen, klicken Sie auf \"Bearbeiten\" in der Verfügbarkeitsperiode und "
+"danach auf \"Speichern\" ohne etwas zu ändern."
 
 msgid "Reservation is pending approval"
 msgstr "Diese Reservation wurde noch nicht akzeptiert"
@@ -5076,8 +5084,8 @@ msgid ""
 "To delete this allocation, all existing reservations need to be cancelled "
 "first."
 msgstr ""
-"Um die Verfügbarkeit zu löschen, müssen zuerst alle bestehenden Reservationen "
-"abgesagt werden."
+"Um die Verfügbarkeit zu löschen, müssen zuerst alle bestehenden "
+"Reservationen abgesagt werden."
 
 msgid "A conflicting allocation exists for the requested time period."
 msgstr "Es besteht bereits eine Verfügbarkeit im gewünschten Zeitraum."
@@ -5155,59 +5163,59 @@ msgstr ""
 "Alle Verfügbarkeiten die durch den Verfügbarkeitszeitraum erstellt wurden "
 "werden entfernt, sofern sie noch nicht reserviert wurden."
 
-msgid "Delete rule"
-msgstr "Regel löschen"
-
-msgid "Availability periods"
-msgstr "Verfügbarkeitszeiträume"
-
-msgid "No allocations to add"
-msgstr "Keine Verfügbarkeiten die hinzugefügt werden können"
-
-#, python-format
-msgid "Successfully added ${n} allocations"
-msgstr "${n} Verfügbarkeiten wurden hinzugefügt"
-
-msgid "New allocation"
-msgstr "Neue Verfügbarkeit"
+msgid "Delete availability period"
+msgstr "Verfügbarkeitszeitraum löschen"
 
 msgid "Your changes were saved"
 msgstr "Ihre Änderungen wurden gespeichert"
 
 #, python-format
-msgid "New rule active, ${n} allocations created"
-msgstr "Regel aktiv, ${n} Verfügbarkeiten erstellt"
+msgid "New availability period active, ${n} allocations created"
+msgstr "Neue Verfügbarkeitsperiode aktiv, ${n} Verfügbarkeiten erstellt"
 
-msgid "New Rule"
-msgstr "Neue Regel"
+msgid "New availabilty period"
+msgstr "Neue Verfügbarkeitsperiode"
 
 msgid ""
-"Rules ensure that the allocations between start/end exist and that they are "
-"extended beyond those dates at the given intervals. "
+"Availability periods ensure that the allocations between start/end exist and "
+"that they are extended beyond those dates at the given intervals."
 msgstr ""
-"Regeln stellen sicher dass die Verfügbarkeiten zwischen Start und Ende bestehen "
-"und dass sie im gewählten Interval verlängert werden."
+"Verfügbarkeitsperioden stellen sicher, dass die Verfügbarkeiten zwischen "
+"Start/Ende existieren und dass sie über diese Daten hinaus in den "
+"angegebenen Intervallen verlängert werden."
 
 #, python-format
 msgid ""
-"Rule updated. ${deleted} allocations removed, ${created} new allocations "
-"created."
+"Availability period updated. ${deleted} allocations removed, ${created} new "
+"allocations created."
 msgstr ""
-"Verfügbarkeitszeitraum aktualisiert. ${deleted} Verfügbarkeiten entfernt, "
+"Verfügbarkeitsperiode aktualisiert. ${deleted} Verfügbarkeiten entfernt, "
 "${created} neue Verfügbarkeiten erstellt."
 
 msgid "Rule not found"
 msgstr "Regel nicht gefunden"
 
-msgid "Edit Rule"
-msgstr "Regel bearbeiten"
+msgid "Edit availabilty period"
+msgstr "Verfügbarkeitszeitraum bearbeiten"
+
+msgid ""
+"Availability periods create availabilities between the specified start and "
+"end date. The availability period should ideally last until the next time "
+"the availabilities are expected to change. For example, a school term or a "
+"school year."
+msgstr ""
+"Verfügbarkeitsperioden erstellen Verfügbarkeiten zwischen dem angegebenen "
+"Start- und Enddatum. Der Verfügbarkeitszeitraum sollte idealerweise bis "
+"zum nächsten Mal dauern, wenn sich die Verfügbarkeiten ändern. Zum Beispiel "
+"ein Schulsemester oder ein Schuljahr."
 
 msgid "The rule was stopped"
 msgstr "Die Regel wurde gestoppt"
 
 #, python-format
-msgid "The rule was deleted, along with ${n} allocations"
-msgstr "Die Verfügbarkeit wurde gelöscht, zusammen mit ${n} Verfügbarkeiten"
+msgid "The availability period was deleted, along with ${n} allocations"
+msgstr ""
+"Die Verfügbarkeitsperiode wurde gelöscht, zusammen mit ${n} Verfügbarkeiten"
 
 msgid "Topics A-Z"
 msgstr "Themen A-Z"
@@ -6614,6 +6622,56 @@ msgstr "Ein Konto wurde für Sie erstellt"
 
 msgid "The user was created successfully"
 msgstr "Der Benutzer wurde erfolgreich erstellt"
+
+#~ msgid "Rules"
+#~ msgstr "Regeln"
+
+#~ msgid "Removes all unreserved allocations between the start and end date."
+#~ msgstr ""
+#~ "Entfernt alle nicht-reservierten Verfügbarkeiten zwischen Start- und End-"
+#~ "Datum"
+
+#~ msgid "Delete rule"
+#~ msgstr "Regel löschen"
+
+#~ msgid "No allocations to add"
+#~ msgstr "Keine Verfügbarkeiten die hinzugefügt werden können"
+
+#, python-format
+#~ msgid "Successfully added ${n} allocations"
+#~ msgstr "${n} Verfügbarkeiten wurden hinzugefügt"
+
+#~ msgid "New allocation"
+#~ msgstr "Neue Verfügbarkeit"
+
+#, python-format
+#~ msgid "New rule active, ${n} allocations created"
+#~ msgstr "Regel aktiv, ${n} Verfügbarkeiten erstellt"
+
+#~ msgid "New Rule"
+#~ msgstr "Neue Regel"
+
+#~ msgid ""
+#~ "Rules ensure that the allocations between start/end exist and that they "
+#~ "are extended beyond those dates at the given intervals. "
+#~ msgstr ""
+#~ "Regeln stellen sicher dass die Verfügbarkeiten zwischen Start und Ende "
+#~ "bestehen und dass sie im gewählten Interval verlängert werden."
+
+#, python-format
+#~ msgid ""
+#~ "Rule updated. ${deleted} allocations removed, ${created} new allocations "
+#~ "created."
+#~ msgstr ""
+#~ "Verfügbarkeitszeitraum aktualisiert. ${deleted} Verfügbarkeiten entfernt, "
+#~ "${created} neue Verfügbarkeiten erstellt."
+
+#~ msgid "Edit Rule"
+#~ msgstr "Regel bearbeiten"
+
+#, python-format
+#~ msgid "The rule was deleted, along with ${n} allocations"
+#~ msgstr "Die Verfügbarkeit wurde gelöscht, zusammen mit ${n} Verfügbarkeiten"
 
 #~ msgid "The rule will be removed without affecting existing allocations."
 #~ msgstr "Die Regel wird entfernt, bestehende Einteilungen bleiben."

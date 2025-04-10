@@ -2,7 +2,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: \n"
-"POT-Creation-Date: 2025-04-09 13:41+0200\n"
+"POT-Creation-Date: 2025-04-10 09:17+0200\n"
 "PO-Revision-Date: 2022-03-15 10:52+0100\n"
 "Last-Translator: \n"
 "Language-Team: \n"
@@ -2698,8 +2698,8 @@ msgstr "Iscriviti"
 msgid "Availability Periods"
 msgstr "Periodi di disponibilità"
 
-msgid "Rules"
-msgstr "Regole"
+msgid "Availability periods"
+msgstr "Periodi di disponibilità"
 
 msgid "Edit allocation"
 msgstr "Modifica allocazione"
@@ -4778,9 +4778,16 @@ msgstr ""
 "Seleziona un periodo di tempo libero nel calendario sottostante per creare "
 "un'allocazione."
 
-msgid "Removes all unreserved allocations between the start and end date."
+msgid ""
+"Removes all unreserved allocations between the start and end date. This "
+"includes allocations that were created by using an availability period. To "
+"recreate these allocations, click on \"edit\" in the availability period and "
+"then \"save\" without changing anything."
 msgstr ""
-"Rimuove tutte le allocazioni non riservate tra la data di inizio e di fine."
+"Rimuove tutte le allocazioni non riservate tra la data di inizio e quella di "
+"fine. Ciò include le allocazioni create utilizzando un periodo di "
+"disponibilità. Per ricreare queste allocazioni, fare clic su \"modifica\" "
+"nel periodo di disponibilità e quindi \"salva\" senza modificare nulla."
 
 msgid "Reservation is pending approval"
 msgstr "La prenotazione è in attesa di approvazione"
@@ -5162,59 +5169,58 @@ msgstr ""
 "Tutte le allocazioni create dal periodo di disponibilità verranno rimosse, "
 "se non sono state ancora prenotate."
 
-msgid "Delete rule"
-msgstr "Elimina la regola"
-
-msgid "Availability periods"
-msgstr "Periodi di disponibilità"
-
-msgid "No allocations to add"
-msgstr "Nessuna allocazione da aggiungere"
-
-#, python-format
-msgid "Successfully added ${n} allocations"
-msgstr "${n} allocazioni aggiunte correttamente"
-
-msgid "New allocation"
-msgstr "Nuova allocazione"
+msgid "Delete availability period"
+msgstr "Elimina il periodo di disponibilità"
 
 msgid "Your changes were saved"
 msgstr "Le modifiche sono state salvate"
 
 #, python-format
-msgid "New rule active, ${n} allocations created"
-msgstr "Nuova regola attiva, ${n} allocazioni create"
+msgid "New availability period active, ${n} allocations created"
+msgstr "Nuovo periodo di disponibilità attivo, ${n} allocazioni create"
 
-msgid "New Rule"
-msgstr "Nuova regola"
+msgid "New availabilty period"
+msgstr "Nuovo periodo di disponibilità"
 
 msgid ""
-"Rules ensure that the allocations between start/end exist and that they are "
-"extended beyond those dates at the given intervals. "
+"Availability periods ensure that the allocations between start/end exist and "
+"that they are extended beyond those dates at the given intervals."
 msgstr ""
-"Le regole assicurano che le allocazioni tra inizio/fine esistano e che siano "
-"estese oltre tali date agli intervalli indicati. "
+"Le disponibilità garantiscono che le allocazioni tra inizio/fine esistano e "
+"che vengano estese oltre queste date a intervalli prestabiliti."
 
 #, python-format
 msgid ""
-"Rule updated. ${deleted} allocations removed, ${created} new allocations "
-"created."
+"Availability period updated. ${deleted} allocations removed, ${created} new "
+"allocations created."
 msgstr ""
-"La regola è stata aggiornata. ${deleted} allocazioni rimosse, ${created} "
-"nuove allocazioni create."
+"Periodo di disponibilità aggiornato. ${deleted} allocazioni rimosse, "
+"${created} nuove allocazioni create."
 
 msgid "Rule not found"
 msgstr "Regola non trovata"
 
-msgid "Edit Rule"
-msgstr "Modifica regola"
+msgid "Edit availabilty period"
+msgstr "Modifica il periodo di disponibilità"
+
+msgid ""
+"Availability periods create availabilities between the specified start and "
+"end date. The availability period should ideally last until the next time "
+"the availabilities are expected to change. For example, a school term or a "
+"school year."
+msgstr ""
+"Le disponibilità creano disponibilità tra la data di inizio e quella di fine "
+"specificate. Il periodo di disponibilità dovrebbe idealmente durare fino al "
+"prossimo cambiamento delle disponibilità. Ad esempio, un semestre scolastico "
+"o un anno scolastico."
 
 msgid "The rule was stopped"
 msgstr "La regola è stata arrestata"
 
 #, python-format
-msgid "The rule was deleted, along with ${n} allocations"
-msgstr "La regola è stata eliminata, insieme ${n} allocazioni"
+msgid "The availability period was deleted, along with ${n} allocations"
+msgstr "La disponibilità è stata eliminata, insieme a ${n} allocazioni"
+
 
 msgid "Topics A-Z"
 msgstr "Argomenti A-Z"
@@ -6617,6 +6623,56 @@ msgstr "È stato creato un account per te"
 
 msgid "The user was created successfully"
 msgstr "Utente creato correttamente"
+
+#~ msgid "Rules"
+#~ msgstr "Regole"
+
+#~ msgid "Removes all unreserved allocations between the start and end date."
+#~ msgstr ""
+#~ "Rimuove tutte le allocazioni non riservate tra la data di inizio e di "
+#~ "fine."
+
+#~ msgid "Delete rule"
+#~ msgstr "Elimina la regola"
+
+#~ msgid "No allocations to add"
+#~ msgstr "Nessuna allocazione da aggiungere"
+
+#, python-format
+#~ msgid "Successfully added ${n} allocations"
+#~ msgstr "${n} allocazioni aggiunte correttamente"
+
+#~ msgid "New allocation"
+#~ msgstr "Nuova allocazione"
+
+#, python-format
+#~ msgid "New rule active, ${n} allocations created"
+#~ msgstr "Nuova regola attiva, ${n} allocazioni create"
+
+#~ msgid "New Rule"
+#~ msgstr "Nuova regola"
+
+#~ msgid ""
+#~ "Rules ensure that the allocations between start/end exist and that they "
+#~ "are extended beyond those dates at the given intervals. "
+#~ msgstr ""
+#~ "Le regole assicurano che le allocazioni tra inizio/fine esistano e che "
+#~ "siano estese oltre tali date agli intervalli indicati. "
+
+#, python-format
+#~ msgid ""
+#~ "Rule updated. ${deleted} allocations removed, ${created} new allocations "
+#~ "created."
+#~ msgstr ""
+#~ "La regola è stata aggiornata. ${deleted} allocazioni rimosse, ${created} "
+#~ "nuove allocazioni create."
+
+#~ msgid "Edit Rule"
+#~ msgstr "Modifica regola"
+
+#, python-format
+#~ msgid "The rule was deleted, along with ${n} allocations"
+#~ msgstr "La regola è stata eliminata, insieme ${n} allocazioni"
 
 #~ msgid "The rule will be removed without affecting existing allocations."
 #~ msgstr "La regola sarà rimossa senza influire sulle allocazioni esistenti."
