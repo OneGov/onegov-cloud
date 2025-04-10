@@ -17,6 +17,7 @@ from onegov.reservation import Resource, ResourceCollection
 from onegov.ticket import TicketCollection
 from openpyxl import load_workbook
 from pathlib import Path
+from sqlalchemy.orm.session import close_all_sessions
 from unittest.mock import patch
 from webtest import Upload
 
@@ -311,6 +312,147 @@ def test_find_your_spot(client):
     assert '04.01.2020' in result
     assert '05.01.2020' in result
     assert '06.01.2020' in result
+
+    # create a blocked and an unblocked allocation
+    transaction.begin()
+
+    scheduler_1 = (
+        ResourceCollection(client.app.libres_context)
+        .by_name('meeting-1')
+        .get_scheduler(client.app.libres_context)
+    )
+    scheduler_1.allocate(
+        dates=(
+            (datetime(2020, 1, 1), datetime(2020, 1, 1)),
+            (datetime(2020, 1, 2), datetime(2020, 1, 2)),
+            (datetime(2020, 1, 3), datetime(2020, 1, 3)),
+            (datetime(2020, 1, 4), datetime(2020, 1, 4)),
+        ),
+        whole_day=True,
+        partly_available=True
+    )
+
+    scheduler_2 = (
+        ResourceCollection(client.app.libres_context)
+        .by_name('meeting-2')
+        .get_scheduler(client.app.libres_context)
+    )
+    scheduler_2.allocate(
+        dates=(
+            (datetime(2020, 1, 1), datetime(2020, 1, 1)),
+            (datetime(2020, 1, 2), datetime(2020, 1, 2)),
+            (datetime(2020, 1, 3), datetime(2020, 1, 3)),
+            (datetime(2020, 1, 5), datetime(2020, 1, 5)),
+        ),
+        whole_day=True,
+        partly_available=True
+    )
+
+    transaction.commit()
+
+    # force client to open a fresh session that includes our
+    # newly added allocations
+    close_all_sessions()
+
+    find_your_spot.form['auto_reserve_available_slots'] = 'for_first_day'
+    result = find_your_spot.form.submit()
+
+    result = client.get(
+        '/find-your-spot/reservations?group=Meeting+Rooms'
+    ).json
+    assert len(result['reservations']) == 1
+    reservation = result['reservations'][0]
+    assert reservation['resource'] == 'meeting-1'
+    assert reservation['date'].startswith('2020-01-01')
+    assert reservation['time'] == '07:00 - 08:00'
+
+    # resubmitting doesn't add a reservation or change the existing one
+    result = find_your_spot.form.submit()
+
+    result = client.get(
+        '/find-your-spot/reservations?group=Meeting+Rooms'
+    ).json
+    assert len(result['reservations']) == 1
+    reservation = result['reservations'][0]
+    assert reservation['resource'] == 'meeting-1'
+    assert reservation['date'].startswith('2020-01-01')
+    assert reservation['time'] == '07:00 - 08:00'
+
+    find_your_spot.form['auto_reserve_available_slots'] = 'for_every_day'
+    result = find_your_spot.form.submit()
+
+    result = client.get(
+        '/find-your-spot/reservations?group=Meeting+Rooms'
+    ).json
+    assert len(result['reservations']) == 5
+    for idx, reservation in enumerate(result['reservations'][:-1]):
+        assert reservation['resource'] == 'meeting-1'
+        assert reservation['date'].startswith(f'2020-01-0{idx+1}')
+        assert reservation['time'] == '07:00 - 08:00'
+    # the final reservation only works for the other room
+    reservation = result['reservations'][-1]
+    assert reservation['resource'] == 'meeting-2'
+    assert reservation['date'].startswith('2020-01-05')
+    assert reservation['time'] == '07:00 - 08:00'
+
+    # resubmitting doesn't change anything
+    result = find_your_spot.form.submit()
+
+    result = client.get(
+        '/find-your-spot/reservations?group=Meeting+Rooms'
+    ).json
+    assert len(result['reservations']) == 5
+    for idx, reservation in enumerate(result['reservations'][:-1]):
+        assert reservation['resource'] == 'meeting-1'
+        assert reservation['date'].startswith(f'2020-01-0{idx+1}')
+        assert reservation['time'] == '07:00 - 08:00'
+    # the final reservation only works for the other room
+    reservation = result['reservations'][-1]
+    assert reservation['resource'] == 'meeting-2'
+    assert reservation['date'].startswith('2020-01-05')
+    assert reservation['time'] == '07:00 - 08:00'
+
+    find_your_spot.form['auto_reserve_available_slots'] = 'for_every_room'
+    result = find_your_spot.form.submit()
+
+    result = client.get(
+        '/find-your-spot/reservations?group=Meeting+Rooms'
+    ).json
+    assert len(result['reservations']) == 8
+    for idx, reservation in enumerate(result['reservations'][::2]):
+        assert reservation['resource'] == 'meeting-1'
+        assert reservation['date'].startswith(f'2020-01-0{idx+1}')
+        assert reservation['time'] == '07:00 - 08:00'
+
+    for idx, reservation in enumerate(result['reservations'][1:-1:2]):
+        assert reservation['resource'] == 'meeting-2'
+        assert reservation['date'].startswith(f'2020-01-0{idx+1}')
+        assert reservation['time'] == '07:00 - 08:00'
+    reservation = result['reservations'][-1]
+    assert reservation['resource'] == 'meeting-2'
+    assert reservation['date'].startswith('2020-01-05')
+    assert reservation['time'] == '07:00 - 08:00'
+
+    # resubmitting also doesn't change anything here
+    result = find_your_spot.form.submit()
+
+    result = client.get(
+        '/find-your-spot/reservations?group=Meeting+Rooms'
+    ).json
+    assert len(result['reservations']) == 8
+    for idx, reservation in enumerate(result['reservations'][::2]):
+        assert reservation['resource'] == 'meeting-1'
+        assert reservation['date'].startswith(f'2020-01-0{idx+1}')
+        assert reservation['time'] == '07:00 - 08:00'
+
+    for idx, reservation in enumerate(result['reservations'][1:-1:2]):
+        assert reservation['resource'] == 'meeting-2'
+        assert reservation['date'].startswith(f'2020-01-0{idx+1}')
+        assert reservation['time'] == '07:00 - 08:00'
+    reservation = result['reservations'][-1]
+    assert reservation['resource'] == 'meeting-2'
+    assert reservation['date'].startswith('2020-01-05')
+    assert reservation['time'] == '07:00 - 08:00'
 
 
 def test_resource_room_deletion(client):
@@ -1720,13 +1862,13 @@ def test_reserve_session_separation(client):
     # check combined reservations for rooms without a group
     result = c1.get('/find-your-spot/reservations').json
     assert len(result['reservations']) == 2
-    assert result['reservations'][0]['resource'] == 'meeting-room'
-    assert result['reservations'][1]['resource'] == 'gym'
+    assert result['reservations'][0]['resource'] == 'gym'
+    assert result['reservations'][1]['resource'] == 'meeting-room'
 
     result = c2.get('/find-your-spot/reservations').json
     assert len(result['reservations']) == 2
-    assert result['reservations'][0]['resource'] == 'meeting-room'
-    assert result['reservations'][1]['resource'] == 'gym'
+    assert result['reservations'][0]['resource'] == 'gym'
+    assert result['reservations'][1]['resource'] == 'meeting-room'
 
     formular = c1.get('/resource/meeting-room/form')
     formular.form['email'] = 'info@example.org'
@@ -1754,7 +1896,7 @@ def test_reserve_session_separation(client):
     result = c2.get('/resource/gym/reservations').json
     assert len(result['reservations']) == 1
 
-    # next_formul should now be gym, since we had another pending
+    # next_form should now be gym, since we had another pending
     # reservation in the same group (no group i.e. general)
     assert 'Bitte fahren Sie fort mit Ihrer Reservation für gym' in next_form
     # but e-mail shoud be pre-filled so we can just submit twice to reserve
