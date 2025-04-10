@@ -55,7 +55,7 @@
                             </ul>
                         </div>
                     </span>
-                    <div id="action-box" tal:condition="archive_tickets" title="Archive selected" i18n:attributes="title">
+                    <div id="action-box" tal:condition="archive_tickets" title="Archive selected" i18n:attributes="title" class="action-box">
                         <a id="do-action" class="archive"></a>
                         <input id="select-all" type="checkbox">
                     </div>

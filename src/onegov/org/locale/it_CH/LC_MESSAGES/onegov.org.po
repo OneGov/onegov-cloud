@@ -2,7 +2,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: \n"
-"POT-Creation-Date: 2025-04-08 13:27+0200\n"
+"POT-Creation-Date: 2025-04-09 10:41+0200\n"
 "PO-Revision-Date: 2022-03-15 10:52+0100\n"
 "Last-Translator: \n"
 "Language-Team: \n"
@@ -1353,6 +1353,9 @@ msgstr "Descrive il contenuto di questa risorsa di prenotazione"
 
 msgid "Used to group the resource in the overview"
 msgstr "Utilizzato per raggruppare la risorsa nella panoramica"
+
+msgid "Subgroup"
+msgstr "Sottogruppo"
 
 msgid "Extra Fields Definition"
 msgstr "Definizione dei campi aggiuntivi"
@@ -3112,9 +3115,6 @@ msgstr "Elimina nota"
 
 msgid "Always visible on homepage"
 msgstr "Sempre visibile sulla pagina principale"
-
-msgid "Search for available dates"
-msgstr "Cerca le date disponibili"
 
 msgid "Neujahrestag"
 msgstr "Neujahrestag"

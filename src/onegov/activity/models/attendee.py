@@ -102,6 +102,9 @@ class Attendee(Base, TimestampMixin, ORMSearchable):
     #: notes about the attendee by the parents (e.g. allergies)
     notes: Column[str | None] = Column(Text, nullable=True)
 
+    #: SwissPass ID of the attendee
+    swisspass: Column[str | None] = Column(Text, nullable=True)
+
     #: if the address of the attendee differs from the user address
     differing_address: Column[bool] = Column(
         Boolean,

@@ -2,7 +2,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE 1.0\n"
-"POT-Creation-Date: 2025-04-08 13:27+0200\n"
+"POT-Creation-Date: 2025-04-09 10:41+0200\n"
 "PO-Revision-Date: 2022-03-15 10:21+0100\n"
 "Last-Translator: Marc Sommerhalder <marc.sommerhalder@seantis.ch>\n"
 "Language-Team: German\n"
@@ -1349,6 +1349,9 @@ msgstr "Beschreibt um was es bei dieser Reservations-Ressource geht"
 
 msgid "Used to group the resource in the overview"
 msgstr "Dient zur Gruppierung in der Übersicht"
+
+msgid "Subgroup"
+msgstr "Untergruppe"
 
 msgid "Extra Fields Definition"
 msgstr "Extra-Felder Definition"
@@ -3099,9 +3102,6 @@ msgstr "Notiz löschen"
 
 msgid "Always visible on homepage"
 msgstr "Immer auf der Startseite anzeigen"
-
-msgid "Search for available dates"
-msgstr "Nach verfügbaren Terminen suchen"
 
 msgid "Neujahrestag"
 msgstr "Neujahrestag"

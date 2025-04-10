@@ -2212,39 +2212,77 @@
 
 <metal:group_by_column define-macro="group_by_column" i18n:domain="onegov.town6">
     <tal:b repeat="group grouped" tal:define="link_func link_func|request.link; add_pagerefs add_pagerefs|False;">
-        <tal:b tal:define="find_your_spot grouped[group][0] if grouped[group][0].title == 'Find Your Spot' else None">
-            <a class="category-anchor" id="${group}"></a>
-            <div class="group-title align-justify">
-                <h2 tal:condition="len(grouped) > 1">
-                    ${group}
-                    <metal:b tal:condition="add_pagerefs" use-macro="layout.macros['pageref']" tal:define="pageref_id group" />
-                </h2>
-                <a tal:condition="find_your_spot" tal:attributes="href link_func(find_your_spot)" class="button hollow narrow find-your-spot-link"><i class="fa fa-calendar"></i> <span i18n:translate="">Find Your Spot</span></a>
-            </div>
-            <ul class="forms-list more-list">
-                <tal:b tal:repeat="record grouped[group]">
-                    <li tal:condition="record != find_your_spot">
-                    <tal:b tal:define="link edit_link(record)|nothing">
-                        <a class="list-link" tal:attributes="href link_func(record); target link">
-                                <span class="h5 list-title">${record.title}</span>
-                                <metal:hint use-macro="layout.macros['access_hint']" tal:define="item record" />
-                        </a>
-                        <a tal:attributes="href link_func(record); target link">
-                            <p class="list-lead preview" tal:define="lead lead_func(record)|layout.linkify(record.meta.get('lead'))"
-                                tal:content="lead" tal:condition="lead">
-                            </p>
-                            <div class="list-hint hints" tal:define="hint hint(record)|False"
-                                tal:content="hint" tal:condition="hint">
-                            </div>
-                        </a>
-                        <a class="edit-link" href="${link}" tal:condition="link"><i class="far fa-edit"></i></a>
-                    </tal:b>
-                    </li>
-                </tal:b>
-            </ul>
-        </tal:b>
+        <a class="category-anchor" id="${group}"></a>
+        <div class="group-title align-justify">
+            <h2 tal:condition="len(grouped) > 1">
+                ${group}
+                <metal:b tal:condition="add_pagerefs" use-macro="layout.macros['pageref']" tal:define="pageref_id group" />
+            </h2>
+        </div>
+        <ul class="forms-list more-list">
+            <tal:b tal:repeat="record grouped[group]">
+                <metal:b use-macro="layout.macros['group_record']"/>
+            </tal:b>
+        </ul>
     </tal:b>
 </metal:group_by_column>
+
+<metal:group_record define-macro="group_record" i18n:domain="onegov.town6">
+    <li tal:define="link edit_link(record)|nothing">
+        <a class="list-link" tal:attributes="href link_func(record); target link">
+                <span class="h5 list-title">${record.title}</span>
+                <metal:hint use-macro="layout.macros['access_hint']" tal:define="item record" />
+        </a>
+        <a tal:attributes="href link_func(record); target link">
+            <p class="list-lead preview" tal:define="lead lead_func(record)|layout.linkify(record.meta.get('lead'))"
+                tal:content="lead" tal:condition="lead">
+            </p>
+            <div class="list-hint hints" tal:define="hint hint(record)|False"
+                tal:content="hint" tal:condition="hint">
+            </div>
+        </a>
+        <a class="edit-link" href="${link}" tal:condition="link"><i class="far fa-edit"></i></a>
+    </li>
+</metal:group_record>
+
+<metal:resource_groups define-macro="resource_groups" i18n:domain="onegov.town6">
+    <tal:b repeat="group resources" tal:define="link_func link_func|request.link; add_pagerefs add_pagerefs|False;">
+        <a class="category-anchor" id="${group.title}"></a>
+        <div class="group-title align-justify">
+            <h2 tal:condition="len(resources) > 1">
+                ${group.title}
+                <metal:b tal:condition="add_pagerefs" use-macro="layout.macros['pageref']" tal:define="pageref_id group.title" />
+            </h2>
+            <a tal:condition="group.find_your_spot" tal:attributes="href link_func(group.find_your_spot)" class="button hollow narrow find-your-spot-link"><i class="fa fa-calendar"></i> <span i18n:translate="">Find Your Spot</span></a>
+        </div>
+        <ul class="forms-list more-list">
+            <tal:b tal:repeat="record group.entries" tal:switch="record.__class__.__name__">
+                <li tal:case="'ResourceSubgroup'" class="medium-6 more-list-level-2">
+                    <metal:b tal:define="subgroup record" use-macro="layout.macros['resource_subgroup']"/>
+                </li>
+                <metal:b tal:case="default" use-macro="layout.macros['group_record']"/>
+            </tal:b>
+        </ul>
+    </tal:b>
+</metal:resource_groups>
+
+<metal:resource_subgroup define-macro="resource_subgroup" i18n:domain="onegov.town6">
+    <tal:b tal:define="pageref_id f'{group.title}-{subgroup.title}'">
+        <a class="category-anchor" id="${pageref_id}"></a>
+        <div class="subgroup-title align-justify">
+            <h5>
+                ${subgroup.title}
+                <metal:b tal:condition="add_pagerefs" use-macro="layout.macros['pageref']" />
+            </h5>
+            <a tal:condition="subgroup.find_your_spot" tal:attributes="href link_func(subgroup.find_your_spot)" class="button hollow narrow find-your-spot-link"><i class="fa fa-calendar"></i> <span i18n:translate="">Find Your Spot</span></a>
+        </div>
+        <ul class="forms-list more-list">
+            <tal:b tal:repeat="record subgroup.entries">
+                <metal:b use-macro="layout.macros['group_record']"/>
+            </tal:b>
+        </ul>
+    </tal:b>
+</metal:resource_subgroup>
 
 <metal:file_details define-macro="file-details" i18n:domain="onegov.town6">
     <div class="file-details">
@@ -2742,7 +2780,7 @@
               ${ticket.number}
           </td>
         </tal:block>
-        <td tal:condition="archive_tickets">
+        <td tal:condition="archive_tickets" class="archive-tickets">
             <input tal:condition="has_access" type="checkbox">
        </td>
     </tr>
