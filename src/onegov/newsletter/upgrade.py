@@ -34,5 +34,5 @@ def add_daily_newsletter_column(context: UpgradeContext) -> None:
     if not context.has_column('recipients', 'daily_newsletter'):
         context.operations.add_column(
             'recipients', Column('daily_newsletter', Boolean, nullable=True,
-                                  default=True)
+                                  default=False)
         )
