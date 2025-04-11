@@ -14,7 +14,9 @@ from onegov.pas.importer.json_import import (
 )
 
 
-from typing import get_type_hints, TYPE_CHECKING
+from typing import get_type_hints, TYPE_CHECKING, Any, Union
+import typing  # Import the typing module itself
+
 if TYPE_CHECKING:
     from collections.abc import Sequence
     from onegov.core.types import LaxFileDict
@@ -72,7 +74,31 @@ class DataImportForm(Form):
         if not field.data:
             return  # No files uploaded, nothing to validate
 
-        required_keys = get_type_hints(expected_type).keys()
+        # Helper function to check if a type hint represents an optional type
+        def _is_optional(hint: Any) -> bool:
+            """Checks if a type hint is Optional[T] or T | None."""
+            # Note: get_origin might return typing.Union or types.UnionType
+            # depending on Python version and how the Union was defined.
+            # Using `is Union` might be too specific. Check origin and args.
+            origin = typing.get_origin(hint)
+            args = typing.get_args(hint)
+            return origin is Union and type(None) in args
+
+        try:
+            all_hints = get_type_hints(expected_type)
+            required_keys = {
+                key for key, hint in all_hints.items()
+                if not _is_optional(hint)
+            }
+        except Exception as e:
+            # Handle potential errors during type hint inspection
+            field.errors.append(
+                _('Internal error validating type ${type}: ${error}',
+                  mapping={'type': expected_type.__name__, 'error': str(e)})
+            )
+            return
+
+
         sources: Sequence[LaxFileDict] = field.data
 
         for file_info in sources:
