@@ -933,7 +933,7 @@ msgid "Disbursed"
 msgstr "Décaissé"
 
 msgid "Find Your Spot"
-msgstr "Rechercher les dates"
+msgstr "Rechercher les dates / Réservations récurrentes"
 
 msgid "Access"
 msgstr "Accès"

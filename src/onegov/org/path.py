@@ -492,9 +492,14 @@ def get_resources(app: OrgApp) -> ResourceCollection:
 @OrgApp.path(model=FindYourSpotCollection, path='/find-your-spot')
 def get_find_my_spot(
     app: OrgApp,
-    group: str | None = None
+    group: str | None = None,
+    subgroup: str | None = None,
 ) -> FindYourSpotCollection:
-    return FindYourSpotCollection(app.libres_context, group=group)
+    return FindYourSpotCollection(
+        app.libres_context,
+        group=group,
+        subgroup=subgroup
+    )
 
 
 @OrgApp.path(

@@ -2,6 +2,8 @@ from __future__ import annotations
 from inspect import isabstract
 from collections import OrderedDict
 
+from markupsafe import Markup
+import pytz
 import requests
 import logging
 from babel.dates import get_month_names
@@ -97,6 +99,7 @@ WEEKDAYS = (
 def hourly_maintenance_tasks(request: OrgRequest) -> None:
     publish_files(request)
     handle_publication_models(request)
+    send_daily_newsletter(request)
     send_scheduled_newsletter(request)
     delete_old_tans(request)
     delete_old_tan_accesses(request)
@@ -111,6 +114,58 @@ def send_scheduled_newsletter(request: OrgRequest) -> None:
     for newsletter in newsletters:
         send_newsletter(request, newsletter, newsletter.open_recipients)
         newsletter.scheduled = None
+
+
+def send_daily_newsletter(request: OrgRequest) -> None:
+    if request.app.org.enable_automatic_newsletters:
+        times = [
+            int(time) for time in (request.app.org.newsletter_times or [])
+        ]
+        # The sending times will be in the local timezone (Europe/Zurich)
+        # but the current hour is in UTC and is used for the news query.
+        current_hour = utcnow().hour
+        current_hour_tz = to_timezone(utcnow(), 'Europe/Zurich').hour
+
+        if current_hour_tz in times:
+            end = datetime(
+                year=utcnow().year,
+                month=utcnow().month,
+                day=utcnow().day,
+                hour=current_hour,
+                tzinfo=pytz.utc)
+
+            index = times.index(current_hour_tz)
+            if index == 0:
+                start = end - timedelta(
+                    hours=24 - times[-1] + times[0])
+            else:
+                start = end - timedelta(
+                    hours=current_hour_tz - times[index - 1])
+            news = request.session.query(News).filter(
+                News.published.is_(True),
+                News.published_or_created.between(start, end),
+            )
+
+            recipients = RecipientCollection(
+                request.session).query().filter(
+                    Recipient.confirmed.is_(True),
+                    Recipient.daily_newsletter.is_(True),
+                )
+
+            if news.count() > 0 and recipients.count() > 0:
+                title = request.translate(
+                    _('Daily Newsletter ${time}', mapping={
+                        'time': to_timezone(end, 'Europe/Zurich').strftime(
+                            '%d.%m.%Y, %H:%M')
+                    })
+                )
+                newsletters = NewsletterCollection(request.session)
+                newsletter = newsletters.add(title=title, html=Markup(''))
+                newsletter.lead = _('New news since the last newsletter:')
+                newsletter.content['news'] = [n.id for n in news.all()]
+
+                send_newsletter(request=request, newsletter=newsletter,
+                                recipients=recipients.all(), daily=True)
 
 
 def publish_files(request: OrgRequest) -> None:

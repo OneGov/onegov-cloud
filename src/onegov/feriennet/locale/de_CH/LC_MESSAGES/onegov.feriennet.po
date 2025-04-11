@@ -1,7 +1,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE 1.0\n"
-"POT-Creation-Date: 2024-11-18 10:17+0100\n"
+"POT-Creation-Date: 2025-04-09 20:43+0200\n"
 "PO-Revision-Date: 2021-11-11 09:08+0100\n"
 "Last-Translator: Marc Sommerhalder <marc.sommerhalder@seantis.ch>\n"
 "Language-Team: German\n"
@@ -211,6 +211,9 @@ msgstr "Teilnehmende Geschlecht"
 
 msgid "Attendee Notes"
 msgstr "Teilnehmende Bemerkungen"
+
+msgid "Attendee SwissPass ID"
+msgstr "Teilnehmende SwissPass ID"
 
 msgid "Attendee Booking-Limit"
 msgstr "Teilnehmende Buchungslimite"
@@ -689,6 +692,9 @@ msgstr "Gibt es etwas, das der Kursleiter wissen sollte?"
 msgid "Allergies, Disabilities, Particulars"
 msgstr "Allergien, Behinderungen, Besonderheiten"
 
+msgid "Swisspass ID"
+msgstr "Swisspass ID"
+
 msgid "The address of the attendee differs from the users address"
 msgstr ""
 "Die Adresse dieser Person unterscheidet sich von der des Benutzerkontos"
@@ -701,6 +707,12 @@ msgstr "PLZ"
 
 msgid "Political municipality"
 msgstr "Politische Gemeinde"
+
+msgid "The Swisspass ID must be 13 characters long."
+msgstr "Die Swisspass ID muss 13 Zeichen lang sein."
+
+msgid "The Swisspass ID must only contain digits and dashes."
+msgstr "Die Swisspass ID darf nur Ziffern und Bindestriche enthalten."
 
 msgid "Attendee"
 msgstr "Teilnehmende"
@@ -1548,10 +1560,8 @@ msgstr "Archivieren"
 msgid "Do you really want to archive this activity?"
 msgstr "Möchten Sie dieses Angebot wirklich archivieren?"
 
-msgid "This cannot be undone. The activity will be made private as a result."
-msgstr ""
-"Dies kann nicht rückgängig gemacht werden. Das Angebot wird von der "
-"Öffentlichkeit versteckt."
+msgid "The activity will be made private as a result."
+msgstr "Das Angebot wird von der Öffentlichkeit versteckt."
 
 msgid "Archive Activity"
 msgstr "Angebot archivieren"
@@ -3105,6 +3115,12 @@ msgstr "Benutzerprofil"
 msgid "Require the political municipality on registration"
 msgstr "Politische Gemeinde bei Registrierung verlangen"
 
+msgid "Require a SwissPass ID of attendees"
+msgstr "SwissPass ID der Teilnehmenden verlangen"
+
+msgid "SwissPass ID"
+msgstr "SwissPass ID"
+
 msgid "Parents can see the contacts of other parents in the same activity"
 msgstr ""
 "Mitglieder können die Kontaktdaten anderer Mitglieder des gleichen Angebots "
@@ -3189,6 +3205,12 @@ msgstr "Buchungen ${period}"
 #, python-format
 msgid "Billing for ${period}"
 msgstr "Fakturierung ${period}"
+
+#~ msgid ""
+#~ "This cannot be undone. The activity will be made private as a result."
+#~ msgstr ""
+#~ "Dies kann nicht rückgängig gemacht werden. Das Angebot wird von der "
+#~ "Öffentlichkeit versteckt."
 
 #~ msgid "Health Information"
 #~ msgstr "Gesundheitsangaben"

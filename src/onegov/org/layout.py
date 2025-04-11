@@ -2778,6 +2778,12 @@ class NewsletterLayout(DefaultLayout):
                     url=self.request.link(self.recipients),
                     attrs={'class': 'manage-subscribers'}
                 ),
+                Link(
+                    text=_('Settings'),
+                    url=self.request.link(
+                        self.request.app.org, 'newsletter-settings'),
+                    attrs={'class': 'settings-link'}
+                ),
                 LinkGroup(
                     title=_('Add'),
                     links=[

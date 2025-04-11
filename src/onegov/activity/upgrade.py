@@ -919,3 +919,12 @@ def fill_in_attendee_ids_1(context: UpgradeContext) -> None:
 
     for item, attendee in q.all():
         item.attendee_id = attendee.id
+
+
+@upgrade_task('Add siwsspass id column to attendee')
+def add_swisspass_id_column_to_attendee(context: UpgradeContext) -> None:
+    if not context.has_column('attendees', 'swisspass'):
+        context.operations.add_column(
+            'attendees',
+            column=Column('swisspass', Text, nullable=True)
+        )

@@ -115,6 +115,13 @@ msgid "Stripe Connect"
 msgstr "Stripe Connect"
 
 #, python-format
+msgid "Daily Newsletter ${time}"
+msgstr "Täglicher Newsletter ${time}"
+
+msgid "New news since the last newsletter:"
+msgstr "Neue Einträge seit dem letzten Newsletter:"
+
+#, python-format
 msgid "${org} OneGov Cloud Status"
 msgstr "${org} OneGov Cloud Status"
 
@@ -1334,6 +1341,22 @@ msgstr "Spätestes Ende"
 msgid "Rooms"
 msgstr "Räume"
 
+msgid "Automatically reserve the first available slot"
+msgstr "Automatisch den ersten verfügbaren Termin reservieren"
+
+msgid "You will be able to change individual choices"
+msgstr "Sie können im Anschluss ihre Auswahl bearbeiten"
+
+msgid "Yes, for every selected room and day"
+msgstr ""
+"Ja, für jeden ausgewählten Raum an jedem verfügbarem Datum (Mehrfachbelegung)"
+
+msgid "Yes, for every selected day"
+msgstr "Ja, für jedes verfügbare Datum"
+
+msgid "Yes, for the first available selected day"
+msgstr "Ja, für das erste verfügbare Datum"
+
 msgid "Start date in past"
 msgstr "Startdatum in der Vergangenheit"
 
@@ -1345,6 +1368,9 @@ msgstr "Beschreibt um was es bei dieser Reservations-Ressource geht"
 
 msgid "Used to group the resource in the overview"
 msgstr "Dient zur Gruppierung in der Übersicht"
+
+msgid "Subgroup"
+msgstr "Untergruppe"
 
 msgid "Extra Fields Definition"
 msgstr "Extra-Felder Definition"
@@ -2036,6 +2062,31 @@ msgstr ""
 "Sende eine E-Mail-Benachrichtigung an die folgenden Benutzer, wenn sich ein "
 "Empfänger vom Newsletter abmeldet"
 
+msgid "Enable automatic daily newsletters"
+msgstr "Automatische tägliche Newsletter aktivieren"
+
+msgid ""
+"Automatically creates a daily newsletter containing all new news items since "
+"the last sending time. It will only send a newsletter if there is at least "
+"one new news item. Only subscribers who subscribed to the daily newsletter "
+"will receive it, independent of their selected categories if there are any."
+msgstr ""
+"Erstellt automatisch einen täglichen Newsletter, der alle neuen News seit "
+"dem letzten Versand enthält. Es wird nur ein Newsletter versendet, wenn es "
+"mindestens einen neuen News-Eintrag gibt. Nur Abonnenten, die sich für den "
+"täglichen Newsletter angemeldet haben, erhalten diesen, unabhängig von den "
+"ausgewählten Kategorien, falls vorhanden."
+
+msgid "Automatic newsletters"
+msgstr "Automatische Newsletter"
+
+msgid "Newsletter sending times (24h format)"
+msgstr "Newsletter Versandzeiten (24h Format)"
+
+msgid "Specify times for sending newsletters. e.g., 8, 12, 18."
+msgstr ""
+"Definieren Sie die Zeiten für den Versand von Newslettern. z.B. 8, 12, 18."
+
 msgid "Invalid YAML format. Please refer to the example."
 msgstr "Ungültiges YAML Format. Bitte beachten Sie das Beispiel."
 
@@ -2051,6 +2102,16 @@ msgid ""
 msgstr ""
 "Ungültiges Format. Nur Themen und Unterthemen sind erlaubt - es werden keine "
 "tiefer verschachtelte Strukturen unterstützt."
+
+msgid "Please specify at least one time."
+msgstr "Bitte geben Sie mindestens eine Zeit an."
+
+msgid "Invalid time format. Please use a value between 0 and 24."
+msgstr ""
+"Ungültiges Zeitformat. Bitte verwenden Sie einen Wert zwischen 0 und 24."
+
+msgid "Invalid time format. Please use 24h format."
+msgstr "Ungültiges Zeitformat. Bitte verwenden Sie das 24h Format."
 
 msgid "Old domain"
 msgstr "Alte Domain"
@@ -2245,6 +2306,17 @@ msgstr "E-Mail Adresse"
 
 msgid "The subscriber has given consent to receive the newsletter."
 msgstr "Der Abonnent hat der Zustellung des Newsletters zugestimmt."
+
+msgid "Daily newsletter for all categories (only for news items)"
+msgstr "Täglicher Newsletter für alle Kategorien (nur für News-Einträge)"
+
+#, python-format
+msgid ""
+"If there are any new news items since the last sending time you will receive "
+"the newsletter at the following times: ${joined}:00."
+msgstr ""
+"Wenn es seit dem letzten Versand neue News-Einträge gibt, erhalten Sie den "
+"Newsletter zu den folgenden Zeiten: ${joined}:00."
 
 msgid "Submission Window"
 msgstr "Befragungszeitraum"
@@ -2648,7 +2720,7 @@ msgid "iFrame"
 msgstr "iFrame"
 
 msgid "Find Your Spot"
-msgstr "Terminsuche"
+msgstr "Terminsuche / Serienreservation"
 
 msgid "E-Mail Recipient"
 msgstr "E-Mail Empfänger"
@@ -3052,9 +3124,6 @@ msgstr "Notiz löschen"
 
 msgid "Always visible on homepage"
 msgstr "Immer auf der Startseite anzeigen"
-
-msgid "Search for available dates"
-msgstr "Nach verfügbaren Terminen suchen"
 
 msgid "Neujahrestag"
 msgstr "Neujahrestag"
@@ -3628,6 +3697,25 @@ msgstr ""
 "reservieren möchten, halten Sie die Alt, Strg oder Umschalt Taste gedrückt, "
 "während Sie auf auf den gewünschten Termin klicken. Ansonsten wird der "
 "vorherig ausgewählte Termin automatisch wieder abgewählt."
+
+#. Canonical text for ${and_rooms} is: "and rooms"
+msgid ""
+"We were unable to reserve some slots matching your criteria for the "
+"following dates${and_rooms}, please note that some of those dates may still "
+"have one or more available slots that are either shorter or longer than your "
+"selected duration. ${dates}"
+msgstr ""
+"Für die folgenden Daten${and_rooms} konnten wir leider keinen Termin finden, "
+"der Ihren Kriterien entspricht. Bitte überprüfen Sie die entsprechenden "
+"Daten in der Terminliste, da es möglich ist, dass ein kürzerer oder längerer "
+"Termin Verfügbar ist. ${dates}"
+
+#. Used in sentence: "We were unable to reserve some slots matching your
+#. criteria for the following dates${and_rooms}, please note that some of those
+#. dates may still have one or more available slots that are either shorter or
+#. longer than your selected duration. ${dates}"
+msgid "and rooms"
+msgstr " und Räume"
 
 msgid "Unavailable"
 msgstr "Besetzt"

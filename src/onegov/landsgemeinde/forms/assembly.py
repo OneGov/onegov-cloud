@@ -124,7 +124,8 @@ class AssemblyForm(NamedFileForm):
     )
 
     audio_zip = UploadField(
-        label=_('Audio (ZIP)'),
+        label=_('Memorial for the visually impaired and blind '
+                '(DAISY audio book)'),
         fieldset=_('Downloads'),
         validators=[
             WhitelistedMimeType({'application/zip'}),

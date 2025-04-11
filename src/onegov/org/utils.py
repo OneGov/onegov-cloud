@@ -28,7 +28,6 @@ from onegov.reservation import Resource
 from onegov.ticket import TicketCollection, TicketPermission
 from onegov.user import User, UserGroup
 from operator import attrgetter
-from purl import URL
 from sqlalchemy import nullsfirst  # type:ignore[attr-defined]
 
 
@@ -381,9 +380,9 @@ class ReservationInfo:
 
     @property
     def delete_link(self) -> str:
-        url = URL(self.request.link(self.reservation))
-        url = url.query_param('csrf-token', self.request.new_csrf_token())
-        return url.as_string()
+        return self.request.csrf_protected_url(
+            self.request.link(self.reservation)
+        )
 
     @property
     def price(self) -> PriceDict | None:
@@ -393,6 +392,7 @@ class ReservationInfo:
     def as_dict(self) -> dict[str, Any]:
         return {
             'resource': self.resource.name,
+            'title': self.resource.title,
             'date': self.date,
             'time': self.time,
             'delete': self.delete_link,
@@ -734,7 +734,9 @@ class FindYourSpotEventInfo:
             else:
                 yield 'event-unavailable'
         else:
-            if self.availability >= 100.0:
+            if self.availability == 100.0 or (
+                self.availability > 100.0 and self.adjustable
+            ):
                 yield 'event-available'
             elif self.availability >= 5.0:
                 yield 'event-partly-available'
