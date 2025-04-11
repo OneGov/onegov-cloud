@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import logging
+from typing import Any
 
 from aiohttp.web_exceptions import HTTPBadRequest, HTTPUnsupportedMediaType
 from sqlalchemy import text
@@ -18,9 +19,10 @@ from onegov.pas.importer.json_import import import_zug_kub_data
 from onegov.pas.layouts import (
     DefaultLayout,
 )
+from onegov.town6.app import TownApp
+
 
 from typing import TYPE_CHECKING
-
 if TYPE_CHECKING:
     from onegov.core.types import RenderData
     from onegov.town6.request import TownRequest
@@ -29,7 +31,7 @@ if TYPE_CHECKING:
 log = logging.getLogger('onegov.pas.data_import')
 
 
-def clean(app) -> None:
+def clean(app: TownApp) -> None:
     schema = app.session_manager.current_schema
     assert schema is not None
     session = app.session_manager.session()
@@ -84,18 +86,21 @@ def handle_data_import(
         if form.clean.data:
             clean(request.app)
         try:
-            results = import_zug_kub_data(
+            breakpoint()
+            # need to iterate over each .data of for each of these:
+            import_zug_kub_data(
                 session=request.session,
-                people_source=form.people_source.data,
-                organizations_source=form.organizations_source.data,
-                memberships_source=form.memberships_source.data,
+                people_source=str(form.people_source.data),
+                organizations_source=str(form.organizations_source.data),
+                memberships_source=str(form.memberships_source.data),
             )
             request.message(
                 _('Data import completed successfully.'), 'success'
             )
         except Exception as e:
+            breakpoint()
             log.error(f'Data import failed: {e}', exc_info=True)
-            request.message(_('Data import failed.'), 'error')
+            request.message(f'Data import failed {e}', 'warning')
             results = str(e)
 
     return {
@@ -107,13 +112,13 @@ def handle_data_import(
 
 
 @PasApp.view(
-    model=FileCollection,
+    model=FileCollection[Any],
     name='upload-json-import-files',
     permission=Private,
     request_method='POST',
 )
 def upload_json_import_file(
-    self: FileCollection, request: TownRequest
+    self: FileCollection[Any], request: TownRequest
 ) -> None:
     request.assert_valid_csrf_token()
 
@@ -129,4 +134,4 @@ def upload_json_import_file(
     if attachment.reference.content_type != 'application/json':
         raise HTTPUnsupportedMediaType()
 
-    self.files.append(attachment)
+    self.add(attachment.name, content=attachment)  # type:ignore[arg-type]

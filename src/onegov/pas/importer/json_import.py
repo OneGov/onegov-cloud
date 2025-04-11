@@ -1,15 +1,19 @@
 from __future__ import annotations
 
-from sqlalchemy.orm import Session
 import json
+import logging
 from datetime import datetime
 from pathlib import Path
-import logging
+from typing import Any, Literal, TypedDict, cast, Union
+from typing import TYPE_CHECKING
+from os import PathLike
+
+from sqlalchemy.orm import Session
+
 from onegov.pas.models.commission_membership import (
     ROLES as MEMBERSHIP_ROLES,
     CommissionMembership,
 )
-
 from onegov.pas.models import (
     Parliamentarian,
     Commission,
@@ -18,16 +22,15 @@ from onegov.pas.models import (
     ParliamentarianRole,
 )
 
-
-from typing import Any, Self, Literal
-from typing import TYPE_CHECKING
-from typing import TypedDict
-
 if TYPE_CHECKING:
+    from onegov.pas.models.parliamentarian_role import ParliamentaryGroupRole
+    from onegov.pas.models.parliamentarian_role import PartyRole
+    from onegov.pas.models.parliamentarian_role import Role
     from sqlalchemy.orm import Session
     from collections.abc import Sequence
-    from _typeshed import StrOrBytesPath
     from datetime import date
+
+    StrOrBytesPath = Union[str, bytes, PathLike[str], PathLike[bytes]]
 
     class EmailData(TypedDict):
         id: str
@@ -166,7 +169,7 @@ def _load_json(source: StrOrBytesPath) -> list[Any]:
         with open(source, encoding='utf-8') as f:
             return json.load(f)['results']  # Assuming 'results' key
     elif hasattr(source, 'read'):  # File-like object
-        return json.load(source)['results']  # Assuming 'results' key
+        return json.load(cast(Any, source))['results']  # Assuming 'results' key
     else:
         raise TypeError('Invalid source type')
 
@@ -178,9 +181,9 @@ class DataImporter:
         self.session = session
 
     def parse_date(
-        self: Self,
+        self,
         date_string: str | None,
-    ) -> date | None:  # Return datetime, not date
+    ) -> date | None:  # Return date type
         # Should convert to date if needed for model fields
         if not date_string:
             return None
@@ -324,15 +327,15 @@ class OrganizationImporter(DataImporter):
         """
 
         #  objects that will be saved
-        commissions = []
-        parliamentary_groups = []
-        parties = []
+        commissions: list[Commission] = []
+        parliamentary_groups: list[ParliamentaryGroup] = []
+        parties: list[Party] = []
 
         # Maps to return
-        other_organizations = {}
-        commission_map = {}
-        parliamentary_group_map = {}
-        party_map = {}
+        other_organizations: dict[str, Any] = {}
+        commission_map: dict[str, Commission] = {}
+        parliamentary_group_map: dict[str, ParliamentaryGroup] = {}
+        party_map: dict[str, Party] = {}
 
         for org_data in organizations_data:
             org_id = org_data.get('id')
@@ -361,7 +364,7 @@ class OrganizationImporter(DataImporter):
                     # Kub-api scheint Parteien auch als Fraktionen zu
                     # bezeichnen, jedenfalls im organization_type_title!
                     party = Party(
-                        external_kub_id=f'{org_id}',
+                        external_kub_id=org_id,  # Assuming UUID conversion happens elsewhere
                         name=party_name,
                     )
                     parties.append(party)
@@ -377,7 +380,7 @@ class OrganizationImporter(DataImporter):
                         'name': org_data.get('name', ''),
                         'type': organization_type_title.lower(),
                     }
-                elif 'Legislatur' in org_name:
+                elif org_name is not None and 'Legislatur' in org_name:
                     pass
                     # Can't create Legislatur objects here, as the api does
                     # not give us # the start / end date.
@@ -444,11 +447,11 @@ class MembershipImporter(DataImporter):
 
     def __init__(self, session: Session) -> None:
         self.session = session
-        self.parliamentarian_map = {}
-        self.commission_map = {}
-        self.parliamentary_group_map = {}
-        self.party_map = {}
-        self.other_organization_map = {}
+        self.parliamentarian_map: dict[str, Parliamentarian] = {}
+        self.commission_map: dict[str, Commission] = {}
+        self.parliamentary_group_map: dict[str, ParliamentaryGroup] = {}
+        self.party_map: dict[str, Party] = {}
+        self.other_organization_map: dict[str, Any] = {}
 
     def init(
         self,
@@ -490,13 +493,27 @@ class MembershipImporter(DataImporter):
                 )
 
                 # Create minimal parliamentarian object
-                parliamentarian = Parliamentarian(
-                    external_kub_id=person_id,
-                    first_name=person_data.get('firstName', ''),
-                    last_name=person_data.get('officialName', ''),
-                    salutation=person_data.get('salutation'),
-                    academic_title=person_data.get('title'),
-                )
+                # Note: external_kub_id expects UUID but we're passing str
+                # This should be fixed at the model level or by converting here
+                from uuid import UUID
+                try:
+                    uuid_value = UUID(person_id) if person_id else None
+                    parliamentarian = Parliamentarian(
+                        external_kub_id=uuid_value,
+                        first_name=person_data.get('firstName', ''),
+                        last_name=person_data.get('officialName', ''),
+                        salutation=person_data.get('salutation'),
+                        academic_title=person_data.get('title'),
+                    )
+                except ValueError:
+                    # Handle the case where person_id is not a valid UUID
+                    logging.warning(f'Invalid UUID format for person_id: {person_id}')
+                    parliamentarian = Parliamentarian(
+                        first_name=person_data.get('firstName', ''),
+                        last_name=person_data.get('officialName', ''),
+                        salutation=person_data.get('salutation'),
+                        academic_title=person_data.get('title'),
+                    )
 
                 # Handle email if present
                 primary_email_data = person_data.get('primaryEmail')
@@ -506,7 +523,10 @@ class MembershipImporter(DataImporter):
                 # Handle address if present
                 address_data = membership.get('primaryAddress')
                 if address_data:
-                    parliamentarian.shipping_address = f'{address_data.get("street", "")} {address_data.get("houseNumber", "")}'.strip()
+                    parliamentarian.shipping_address = (
+                        f'{address_data.get("street", "")} '
+                        f'{address_data.get("houseNumber", "")}'.strip()
+                    )
                     parliamentarian.shipping_address_zip_code = (
                         address_data.get('swissZipCode')
                     )
@@ -520,23 +540,25 @@ class MembershipImporter(DataImporter):
 
             except Exception as e:
                 logging.error(
-                    f'Error extracting parliamentarian from membership data: {e}',
+                    f'Error extracting parliamentarian from membership: {e}',
                     exc_info=True,
                 )
 
         # Bulk save the new parliamentarians
         if new_parliamentarians:
-            # Don't use bulk_save_objects as it doesn't update the objects with IDs
-            # Instead use add_all which maintains the object references
+            # Don't use bulk_save_objects as it doesn't update the objects with
+            # IDs Instead use add_all which maintains the object references
             self.session.add_all(new_parliamentarians)
             self.session.flush()  # Flush to get IDs
 
-            # Now update the parliamentarian_map with these objects that now have IDs
+            # Now update the parliamentarian_map with these objects that now
+            # have IDs
             for external_id, parliamentarian in temp_id_map.items():
                 self.parliamentarian_map[external_id] = parliamentarian
 
             logging.info(
-                f'Created {len(new_parliamentarians)} parliamentarians from membership data'
+                f'Created {len(new_parliamentarians)} parliamentarians from '
+                        'membership data'
             )
 
     def bulk_import(self, memberships_data: Sequence[MembershipData]) -> None:
@@ -593,33 +615,30 @@ class MembershipImporter(DataImporter):
                     # is org_name actually the right key for this
                     party = self.party_map.get(org_name)
                     breakpoint()
-
                     role_obj = self._create_parliamentarian_role(
                         parliamentarian=parliamentarian,
                         role='member',  # Default role for being in parliament
                         parliamentary_group=group,
-                        parliamentary_group_role=self._map_to_parliamentary_group_role(
-                            role_text
-                        ),
+                        parliamentary_group_role=self._map_to_parliamentary_group_role(role_text),
                         party=party,
                         party_role=(
                             'member' if party else 'none'
                         ),  # Default party role
-                        start_date=membership.get('start'),
-                        end_date=membership.get('end'),
+                        start_date=str(membership.get('start')) if membership.get('start') and not isinstance(membership.get('start'), bool) else None,
+                        end_date=str(membership.get('end')) if membership.get('end') and not isinstance(membership.get('end'), bool) else None,
                     )
                     if role_obj:
                         parliamentarian_roles.append(role_obj)
 
                 elif org_type_title == 'Kantonsrat':
-                    # Kantonsrat represents the general parliament membership
+                    # Important: Kantonsrat represents the general parliament membership
                     role = self._map_to_parliamentarian_role(role_text)
 
                     role_obj = self._create_parliamentarian_role(
                         parliamentarian=parliamentarian,
                         role=role,
-                        start_date=membership.get('start'),
-                        end_date=membership.get('end'),
+                        start_date=str(membership.get('start')) if membership.get('start') and not isinstance(membership.get('start'), bool) else None,
+                        end_date=str(membership.get('end')) if membership.get('end') and not isinstance(membership.get('end'), bool) else None,
                     )
                     if role_obj:
                         parliamentarian_roles.append(role_obj)
@@ -633,8 +652,8 @@ class MembershipImporter(DataImporter):
                         parliamentarian=parliamentarian,
                         role='member',  # Default role
                         additional_information=additional_info,
-                        start_date=membership.get('start'),
-                        end_date=membership.get('end'),
+                        start_date=str(membership.get('start')) if membership.get('start') and not isinstance(membership.get('start'), bool) else None,
+                        end_date=str(membership.get('end')) if membership.get('end') and not isinstance(membership.get('end'), bool) else None,
                     )
                     if role_obj:
                         parliamentarian_roles.append(role_obj)
@@ -678,8 +697,13 @@ class MembershipImporter(DataImporter):
             role_text = membership_data.get('role', '')
             role = self._map_to_commission_role(role_text)
 
-            start_date = self.parse_date(membership_data.get('start'))
-            end_date = self.parse_date(membership_data.get('end'))
+            start = membership_data.get('start')
+            end = membership_data.get('end')
+
+            start_date = self.parse_date(
+                str(start) if start and not isinstance(start, bool) else None)
+            end_date = self.parse_date(
+                str(end) if end and not isinstance(end, bool) else None)
 
             assert parliamentarian.id is not None
             assert commission.id is not None
@@ -701,17 +725,15 @@ class MembershipImporter(DataImporter):
     def _create_parliamentarian_role(
         self,
         parliamentarian: Parliamentarian,
-        role: str,
-        parliamentary_group: ParliamentaryGroup = None,
-        parliamentary_group_role: str = 'none',
-        party: Party = None,
-        party_role: str = 'none',
-        additional_information: str = None,
-        start_date: str = None,
-        end_date: str = None,
+        role: Role,
+        parliamentary_group: ParliamentaryGroup | None = None,
+        parliamentary_group_role: ParliamentaryGroupRole | None = None,
+        party: Party | None = None,
+        party_role: PartyRole | None = None,
+        additional_information: str | None = None,
+        start_date: str | None = None,
+        end_date: str | None = None,
     ) -> ParliamentarianRole | None:
-        """Create a ParliamentarianRole object with the specified
-        relationships."""
         try:
             # Ensure parliamentarian has an ID
             if not parliamentarian.id:
@@ -756,7 +778,9 @@ class MembershipImporter(DataImporter):
         else:
             return 'member'
 
-    def _map_to_parliamentarian_role(self, role_text: str) -> str:
+    def _map_to_parliamentarian_role(
+        self, role_text: str
+    ) -> Role:
         """Map a role text to a parliamentarian role enum value."""
         role_text = role_text.lower()
 
@@ -779,7 +803,9 @@ class MembershipImporter(DataImporter):
         else:
             return 'member'
 
-    def _map_to_parliamentary_group_role(self, role_text: str) -> str:
+    def _map_to_parliamentary_group_role(
+        self, role_text: str
+    ) -> Role:
         """Map a role text to a parliamentary_group_role enum value."""
         role_text = role_text.lower()
 
@@ -807,7 +833,7 @@ class MembershipImporter(DataImporter):
     @classmethod
     def extract_role_org_type_pairs(
         cls, memberships_data: Sequence[MembershipData]
-    ) -> None:
+    ) -> list[str]:
         """Extract unique combinations of role and organizationTypeTitle
         from JSON data. Useful way to get an overview of the data."""
         combinations = set()
@@ -828,13 +854,13 @@ def count_unique_fullnames(
     people_data: list[Any],
     organizations_data: list[Any],
     memberships_data: list[Any],
-):
+) -> set[str]:
     """Just used to verify we actually get the value we expected."""
 
-    def extract_full_names(data: dict[str, Any]) -> set[str]:
+    def extract_full_names(data: dict[str, Any] | list[Any]) -> set[str]:
         full_names = set()
 
-        def traverse(obj: Any):
+        def traverse(obj: Any) -> None:
             if isinstance(obj, dict):
                 if 'fullName' in obj and isinstance(obj['fullName'], str):
                     full_names.add(obj['fullName'])
@@ -859,7 +885,7 @@ def import_zug_kub_data(
     people_source: StrOrBytesPath,
     organizations_source: StrOrBytesPath,
     memberships_source: StrOrBytesPath,
-) -> list[Any]:
+) -> None:
     """Imports data from Zug KUB JSON sources."""
 
     people_data = _load_json(people_source)
@@ -889,4 +915,4 @@ def import_zug_kub_data(
         party_map,
         other_organization_map,
     )
-    return membership_importer.bulk_import(membership_data)
+    membership_importer.bulk_import(membership_data)
