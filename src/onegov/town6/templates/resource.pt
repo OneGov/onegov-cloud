@@ -45,7 +45,7 @@
             </span>
         </div>
         <div class="panel" tal:condition="request.is_manager">
-            <span i18n:translate>Select a free time span in the calendar below to create an availability period.</span>
+            <span i18n:translate>Select a free time span in the calendar to create an availability period.</span>
         </div>
 
         <tal:b
