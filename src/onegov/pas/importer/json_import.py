@@ -22,6 +22,139 @@ from onegov.pas.models import (
     ParliamentarianRole,
 )
 
+
+# Define TypedDicts for data structures used in JSON import
+# These are defined outside TYPE_CHECKING to be available at runtime
+class EmailData(TypedDict):
+    id: str
+    label: str
+    email: str
+    isDefault: bool
+    thirdPartyId: str | None
+    modified: str
+    created: str
+
+
+class AddressData(TypedDict):
+    formattedAddress: str
+    id: str
+    label: str
+    isDefault: bool
+    organisationName: str
+    organisationNameAddOn1: str
+    organisationNameAddOn2: str
+    addressLine1: str
+    addressLine2: str
+    street: str
+    houseNumber: str
+    dwellingNumber: str
+    postOfficeBox: str
+    swissZipCode: str
+    swissZipCodeAddOn: str
+    swissZipCodeId: str
+    foreignZipCode: str
+    locality: str
+    town: str
+    countryIdISO2: str
+    countryName: str
+    thirdPartyId: str | None
+    modified: str
+    created: str
+
+
+class PhoneNumberData(TypedDict):
+    id: str
+    label: str
+    phoneNumber: str
+    phoneCategory: int
+    otherPhoneCategory: str | None
+    phoneCategoryText: str
+    isDefault: bool
+    thirdPartyId: str | None
+    modified: str
+    created: str
+
+
+class UrlData(TypedDict):
+    id: str
+    label: str
+    url: str | None
+    isDefault: bool
+    thirdPartyId: str | None
+    modified: str
+    created: str
+
+
+class OrganizationData(TypedDict):
+    created: str
+    description: str
+    htmlUrl: str
+    id: str
+    isActive: bool
+    memberCount: int
+    modified: str
+    name: str
+    organizationTypeTitle: (
+        Literal['Kommission', 'Fraktion', 'Kantonsrat', 'Sonstige'] | None
+    )
+    primaryEmail: EmailData | None
+    status: int
+    thirdPartyId: str | None
+    url: str
+    organizationType: int
+    primaryAddress: AddressData | None
+    primaryPhoneNumber: PhoneNumberData | None
+    primaryUrl: UrlData | None
+    statusDisplay: str
+    tags: list[str]
+    type: str
+
+
+class PersonData(TypedDict):
+    created: str
+    firstName: str
+    fullName: str
+    htmlUrl: str
+    id: str
+    isActive: bool
+    modified: str
+    officialName: str
+    personTypeTitle: str | None
+    primaryEmail: EmailData | None
+    salutation: str
+    tags: list[str]
+    thirdPartyId: str
+    title: str
+    url: str
+    username: str | None
+
+
+class MembershipData(TypedDict):
+    department: str
+    description: str
+    emailReceptionType: str
+    end: str | bool | None
+    id: str
+    isDefault: bool
+    organization: OrganizationData
+    person: PersonData
+    primaryAddress: AddressData | None
+    primaryEmail: EmailData | None
+    primaryPhoneNumber: PhoneNumberData | None
+    primaryUrl: UrlData | None
+    email: EmailData | None
+    phoneNumber: PhoneNumberData | None
+    address: AddressData | None
+    urlField: UrlData | None
+    role: str
+    start: str | bool | None
+    text: str
+    thirdPartyId: str | None
+    type: str
+    typedId: str
+    url: str
+
+
 if TYPE_CHECKING:
     from onegov.pas.models.parliamentarian_role import ParliamentaryGroupRole
     from onegov.pas.models.parliamentarian_role import PartyRole
@@ -30,129 +163,6 @@ if TYPE_CHECKING:
     from collections.abc import Sequence, Mapping
     from datetime import date
     from io import IOBase
-
-    class EmailData(TypedDict):
-        id: str
-        label: str
-        email: str
-        isDefault: bool
-        thirdPartyId: str | None
-        modified: str
-        created: str
-
-    class AddressData(TypedDict):
-        formattedAddress: str
-        id: str
-        label: str
-        isDefault: bool
-        organisationName: str
-        organisationNameAddOn1: str
-        organisationNameAddOn2: str
-        addressLine1: str
-        addressLine2: str
-        street: str
-        houseNumber: str
-        dwellingNumber: str
-        postOfficeBox: str
-        swissZipCode: str
-        swissZipCodeAddOn: str
-        swissZipCodeId: str
-        foreignZipCode: str
-        locality: str
-        town: str
-        countryIdISO2: str
-        countryName: str
-        thirdPartyId: str | None
-        modified: str
-        created: str
-
-    class PhoneNumberData(TypedDict):
-        id: str
-        label: str
-        phoneNumber: str
-        phoneCategory: int
-        otherPhoneCategory: str | None
-        phoneCategoryText: str
-        isDefault: bool
-        thirdPartyId: str | None
-        modified: str
-        created: str
-
-    class UrlData(TypedDict):
-        id: str
-        label: str
-        url: str | None
-        isDefault: bool
-        thirdPartyId: str | None
-        modified: str
-        created: str
-
-    class OrganizationData(TypedDict):
-        created: str
-        description: str
-        htmlUrl: str
-        id: str
-        isActive: bool
-        memberCount: int
-        modified: str
-        name: str
-        organizationTypeTitle: (
-            Literal['Kommission', 'Fraktion', 'Kantonsrat', 'Sonstige'] | None
-        )
-        primaryEmail: EmailData | None
-        status: int
-        thirdPartyId: str | None
-        url: str
-        organizationType: int
-        primaryAddress: AddressData | None
-        primaryPhoneNumber: PhoneNumberData | None
-        primaryUrl: UrlData | None
-        statusDisplay: str
-        tags: list[str]
-        type: str
-
-    class PersonData(TypedDict):
-        created: str
-        firstName: str
-        fullName: str
-        htmlUrl: str
-        id: str
-        isActive: bool
-        modified: str
-        officialName: str
-        personTypeTitle: str | None
-        primaryEmail: EmailData | None
-        salutation: str
-        tags: list[str]
-        thirdPartyId: str
-        title: str
-        url: str
-        username: str | None
-
-    class MembershipData(TypedDict):
-        department: str
-        description: str
-        emailReceptionType: str
-        end: str | bool | None
-        id: str
-        isDefault: bool
-        organization: OrganizationData
-        person: PersonData
-        primaryAddress: AddressData | None
-        primaryEmail: EmailData | None
-        primaryPhoneNumber: PhoneNumberData | None
-        primaryUrl: UrlData | None
-        email: EmailData | None
-        phoneNumber: PhoneNumberData | None
-        address: AddressData | None
-        urlField: UrlData | None
-        role: str
-        start: str | bool | None
-        text: str
-        thirdPartyId: str | None
-        type: str
-        typedId: str
-        url: str
 
 
 def determine_membership_role(membership_data: dict[str, Any]) -> str:
