@@ -44,22 +44,22 @@ class DataImportForm(Form):
         ),
     )
 
-    def validate_people_source(self) -> None:
+    def validate_people_source(self, field: UploadMultipleField) -> None:
         """Validates people source JSON against expected schema."""
         self._validate_json_results_against_type(
-            self.people_source, PersonData
+            field, PersonData
         )
 
     def validate_organizations_source(self) -> None:
         """Validates organizations source JSON against expected schema."""
         self._validate_json_results_against_type(
-            self.organizations_source, OrganizationData
+            field, OrganizationData
         )
 
-    def validate_memberships_source(self) -> None:
+    def validate_memberships_source(self, field: UploadMultipleField) -> None:
         """Validates memberships source JSON against expected schema."""
         self._validate_json_results_against_type(
-            self.memberships_source, MembershipData
+            field, MembershipData
         )
 
     def _validate_json_results_against_type(
