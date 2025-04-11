@@ -11,6 +11,7 @@ from sqlalchemy import text
 
 from onegov.core.crypto import random_token
 from onegov.core.security import Private
+from onegov.core.utils import dictionary_to_binary
 from onegov.file import File, FileCollection
 from onegov.file.utils import as_fileintent
 from onegov.org.models import Organisation
