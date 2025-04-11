@@ -109,18 +109,18 @@ def load_and_concatenate_json(
             log.error(
                 f'Error decoding JSON from file {filename}.', exc_info=True
             )
-            raise  # Re-raise to inform the user in the UI
+            raise RuntimeError(f'Error decoding JSON from file {filename}.') from e
         except UnicodeDecodeError:
             log.error(
                 f'Error decoding file {filename} as UTF-8.', exc_info=True
             )
-            raise  # Re-raise
+            raise RuntimeError(f'Error decoding file {filename} as UTF-8.') from e
         except Exception as e:
             log.error(
                 f'Unexpected error processing file {filename}: {e}',
                 exc_info=True
             )
-            raise
+            raise RuntimeError(f'Unexpected error processing file {filename}') from e
 
     return all_results
 
@@ -164,12 +164,17 @@ def handle_data_import(
         except Exception as e:
             log.error(f'Data import failed: {e}', exc_info=True)
             # Provide a more user-friendly error message
+            # Provide a more user-friendly error message, preserving original
             request.message(
                 _('Data import failed: ${error}', mapping={'error': str(e)}),
                 'warning'
             )
             # Optionally keep the detailed error for display if needed
+            # Use __cause__ or __context__ if available for more detail
+            cause = e.__cause__ or e.__context__
             results = f'Error during import: {e}'
+            if cause:
+                results += f'\nCaused by: {cause}'
 
     return {
         'title': _('Import'),

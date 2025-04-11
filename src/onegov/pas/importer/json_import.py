@@ -197,7 +197,7 @@ class DataImporter:
                 f'Error bulk saving {object_type}: {e}', exc_info=True
             )
             self.session.rollback()
-            raise
+            raise RuntimeError(f'Error bulk saving {object_type}') from e
 
 
 class PeopleImporter(DataImporter):

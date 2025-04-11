@@ -100,7 +100,6 @@ class DataImportForm(Form):
             'JSON file containing membership data (who is member of '
             'what organization).'
         ),
-        validators=[validate_json_structure(expected_type=MembershipData)] # type: ignore[arg-type]
     )
 
     def validate_people_source(self, field: UploadMultipleField) -> None:
