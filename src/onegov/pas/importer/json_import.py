@@ -274,6 +274,8 @@ class PeopleImporter(DataImporter):
             if (val := person_data.get(json_key)):
                 parliamentarian_kwargs[model_attr] = val
             else:
+                # missing key indicates malformed json or it has changed. 
+                # this needs to be at the very least logged.
                 breakpoint()
 
         # Handle nested primaryEmail
