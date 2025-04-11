@@ -95,20 +95,18 @@ def handle_data_import(
         """
         all_results: list[Any] = []
         for file_info in sources:
-            file_obj = file_info.get('data')
             filename = file_info.get('filename', 'unknown file')
-            if not isinstance(file_obj, IOBase) or not hasattr(file_obj, 'read'):
+            # Ensure file_info has the expected structure for dictionary_to_binary
+            if not all(k in file_info for k in ('data', 'filename', 'mimetype', 'size')):
                 log.warning(
-                    f'Skipping invalid file data for {filename}: "data" key '
-                    f'does not contain a readable file-like object.'
+                    f'Skipping invalid file data structure for {filename}. '
+                    f'Expected keys: data, filename, mimetype, size.'
                 )
                 continue
 
             try:
-                if hasattr(file_obj, 'seek') and callable(file_obj.seek):
-                    file_obj.seek(0)
-
-                content_bytes = file_obj.read()
+                # Decode the base64/gzipped data using the utility function
+                content_bytes = dictionary_to_binary(file_info) # type: ignore[arg-type]
                 content_str = content_bytes.decode('utf-8')
                 data = json.loads(content_str)
 
@@ -136,12 +134,6 @@ def handle_data_import(
                     exc_info=True
                 )
                 raise # Re-raise
-            finally:
-                if hasattr(file_obj, 'close') and callable(file_obj.close):
-                    try:
-                        file_obj.close()
-                    except Exception:
-                        pass # Ignore close errors
 
         return all_results
 
