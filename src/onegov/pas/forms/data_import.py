@@ -68,15 +68,15 @@ def validate_json_structure(
             raise ValidationError(
                 _('Error reading file ${name}: ${error}',
                   mapping={'name': filename, 'error': str(e)})
-            )
+            ) from e
         except ValidationError:
-            raise  # Re-raise validation errors
+            raise # Re-raise validation errors without losing context
         except Exception as e:
             # Catch unexpected errors during processing
             raise ValidationError(
                 _('Unexpected error processing file ${name}: ${error}',
                   mapping={'name': filename, 'error': str(e)})
-            )
+            ) from e
 
 
 class DataImportForm(Form):
