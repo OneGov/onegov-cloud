@@ -50,7 +50,7 @@ class DataImportForm(Form):
             field, PersonData
         )
 
-    def validate_organizations_source(self) -> None:
+    def validate_organizations_source(self, field: UploadMultipleField) -> None:
         """Validates organizations source JSON against expected schema."""
         self._validate_json_results_against_type(
             field, OrganizationData
