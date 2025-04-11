@@ -31,10 +31,6 @@ if TYPE_CHECKING:
     from datetime import date
     from io import IOBase
 
-    # Type hint for the structure coming from MultipleFileField.data
-    # Each dict contains 'data' (file-like object), 'filename', 'mimetype', 'size'
-    UploadedFileData = Mapping[str, Any]
-
     class EmailData(TypedDict):
         id: str
         label: str
@@ -273,18 +269,12 @@ class PeopleImporter(DataImporter):
             )
             return None
 
-        # The parliamentarian `active` value needs to be taking into
-        # consideration. This attribute is a dynamic attribute that
-        # is computed at runtime based on the
-        # ParliamentarianRoles and it's start / end timeframe
-
-        # In the api however, this is a simple boolean value.
-        # This is of course doesn't map easily, as we track
-        # historical data while the `active` boolean is simply a
-        # representation of how it is *now*.
         parliamentarian_kwargs = {}
         for json_key, model_attr in self.person_attribute_map.items():
-            parliamentarian_kwargs[model_attr] = person_data.get(json_key)
+            if (val := person_data.get(json_key)):
+                parliamentarian_kwargs[model_attr] = val
+            else:
+                breakpoint()
 
         # Handle nested primaryEmail
         primary_email_data = person_data.get('primaryEmail')
@@ -879,20 +869,9 @@ def import_zug_kub_data(
     organization_data: Sequence[OrganizationData],
     membership_data: Sequence[MembershipData],
 ) -> None:
-    """
-    Imports pre-processed data from Zug KUB JSON sources.
-
-    Args:
-        session: The database session.
-        people_data: A list of dictionaries representing people.
-        organization_data: A list of dictionaries representing organizations.
-        membership_data: A list of dictionaries representing memberships.
-    """
-    # Import people
     people_importer = PeopleImporter(session)
     parliamentarian_map = people_importer.bulk_import(people_data)
 
-    # Import organizations
     organization_importer = OrganizationImporter(session)
     (
         commission_map,
@@ -901,7 +880,6 @@ def import_zug_kub_data(
         other_organization_map,
     ) = organization_importer.bulk_import(organization_data)
 
-    # Import memberships
     membership_importer = MembershipImporter(session)
     membership_importer.init(
         session,

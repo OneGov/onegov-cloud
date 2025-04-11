@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 from __future__ import annotations
 
 import json
@@ -23,12 +22,12 @@ from onegov.town6.app import TownApp
 
 if TYPE_CHECKING:
     from collections.abc import Sequence, Mapping
+    from onegov.core.types import LaxFileDict
     from onegov.core.types import RenderData
     from onegov.pas.importer.json_import import (
         MembershipData,
         OrganizationData,
         PersonData,
-        UploadedFileData,
     )
     from onegov.town6.request import TownRequest
 
@@ -74,6 +73,58 @@ def clean(app: TownApp) -> None:
     session.execute(text(truncate_statement))
 
 
+def load_and_concatenate_json(
+    sources: Sequence[LaxFileDict]
+) -> list[Any]:
+    """
+    Loads and concatenates the 'results' list from multiple JSON files.
+    """
+    all_results: list[Any] = []
+    for file_info in sources:
+        filename = file_info.get('filename', 'unknown file')
+        # Ensure file_info has the expected structure for dictionary_to_binary
+        if not all(k in file_info for k in (
+            'data', 'filename', 'mimetype', 'size')
+        ):
+            log.warning(
+                f'Skipping invalid file data structure for {filename}. '
+                f'Expected keys: data, filename, mimetype, size.'
+            )
+            continue
+
+        try:
+            content_bytes = dictionary_to_binary(file_info)
+            content_str = content_bytes.decode('utf-8')
+            data = json.loads(content_str)
+
+            results_list = data.get('results')
+            if isinstance(results_list, list):
+                all_results.extend(results_list)
+            else:
+                log.warning(
+                    f'Skipping file {filename}: "results" key not found '
+                    f'or is not a list in the JSON data.'
+                )
+        except json.JSONDecodeError:
+            log.error(
+                f'Error decoding JSON from file {filename}.', exc_info=True
+            )
+            raise  # Re-raise to inform the user in the UI
+        except UnicodeDecodeError:
+            log.error(
+                f'Error decoding file {filename} as UTF-8.', exc_info=True
+            )
+            raise  # Re-raise
+        except Exception as e:
+            log.error(
+                f'Unexpected error processing file {filename}: {e}',
+                exc_info=True
+            )
+            raise
+
+    return all_results
+
+
 @PasApp.form(
     model=Organisation,
     template='data_import.pt',
@@ -87,57 +138,6 @@ def handle_data_import(
     layout = DefaultLayout(self, request)
     results = None
 
-    def load_and_concatenate_json(
-        sources: Sequence[UploadedFileData]
-    ) -> list[Any]:
-        """
-        Loads and concatenates the 'results' list from multiple JSON files.
-        Moved from json_import._load_json.
-        """
-        all_results: list[Any] = []
-        for file_info in sources:
-            filename = file_info.get('filename', 'unknown file')
-            # Ensure file_info has the expected structure for dictionary_to_binary
-            if not all(k in file_info for k in ('data', 'filename', 'mimetype', 'size')):
-                log.warning(
-                    f'Skipping invalid file data structure for {filename}. '
-                    f'Expected keys: data, filename, mimetype, size.'
-                )
-                continue
-
-            try:
-                # Decode the base64/gzipped data using the utility function
-                content_bytes = dictionary_to_binary(file_info) # type: ignore[arg-type]
-                content_str = content_bytes.decode('utf-8')
-                data = json.loads(content_str)
-
-                results_list = data.get('results')
-                if isinstance(results_list, list):
-                    all_results.extend(results_list)
-                else:
-                    log.warning(
-                        f'Skipping file {filename}: "results" key not found '
-                        f'or is not a list in the JSON data.'
-                    )
-            except json.JSONDecodeError:
-                log.error(
-                    f'Error decoding JSON from file {filename}.', exc_info=True
-                )
-                raise  # Re-raise to inform the user in the UI
-            except UnicodeDecodeError:
-                log.error(
-                    f'Error decoding file {filename} as UTF-8.', exc_info=True
-                )
-                raise  # Re-raise
-            except Exception as e:
-                log.error(
-                    f'Unexpected error processing file {filename}: {e}',
-                    exc_info=True
-                )
-                raise # Re-raise
-
-        return all_results
-
     if request.method == 'POST' and form.validate():
         if form.clean.data:
             clean(request.app)
@@ -146,14 +146,12 @@ def handle_data_import(
             people_data: list[PersonData] = load_and_concatenate_json(
                 form.people_source.data
             )
-            organization_data: list[OrganizationData] = load_and_concatenate_json(
+            organization_data = load_and_concatenate_json(
                 form.organizations_source.data
             )
             membership_data: list[MembershipData] = load_and_concatenate_json(
                 form.memberships_source.data
             )
-
-            # Pass the processed data lists to the importer
             import_zug_kub_data(
                 session=request.session,
                 people_data=people_data,
