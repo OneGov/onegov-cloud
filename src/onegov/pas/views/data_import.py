@@ -1,30 +1,34 @@
+# -*- coding: utf-8 -*-
 from __future__ import annotations
 
+import json
 import logging
-from typing import Any
+from io import IOBase
+from typing import Any, TYPE_CHECKING
 
 from aiohttp.web_exceptions import HTTPBadRequest, HTTPUnsupportedMediaType
 from sqlalchemy import text
 
-from onegov.file import FileCollection
-from onegov.file import File
-from onegov.core.security import Private
 from onegov.core.crypto import random_token
+from onegov.core.security import Private
+from onegov.file import File, FileCollection
 from onegov.file.utils import as_fileintent
 from onegov.org.models import Organisation
-from onegov.pas import _
-from onegov.pas import PasApp
+from onegov.pas import _, PasApp
 from onegov.pas.forms.data_import import DataImportForm
 from onegov.pas.importer.json_import import import_zug_kub_data
-from onegov.pas.layouts import (
-    DefaultLayout,
-)
+from onegov.pas.layouts import DefaultLayout
 from onegov.town6.app import TownApp
 
-
-from typing import TYPE_CHECKING
 if TYPE_CHECKING:
+    from collections.abc import Sequence, Mapping
     from onegov.core.types import RenderData
+    from onegov.pas.importer.json_import import (
+        MembershipData,
+        OrganizationData,
+        PersonData,
+        UploadedFileData,
+    )
     from onegov.town6.request import TownRequest
 
 
@@ -82,26 +86,99 @@ def handle_data_import(
     layout = DefaultLayout(self, request)
     results = None
 
+    def load_and_concatenate_json(
+        sources: Sequence[UploadedFileData]
+    ) -> list[Any]:
+        """
+        Loads and concatenates the 'results' list from multiple JSON files.
+        Moved from json_import._load_json.
+        """
+        all_results: list[Any] = []
+        for file_info in sources:
+            file_obj = file_info.get('data')
+            filename = file_info.get('filename', 'unknown file')
+            if not isinstance(file_obj, IOBase) or not hasattr(file_obj, 'read'):
+                log.warning(
+                    f'Skipping invalid file data for {filename}: "data" key '
+                    f'does not contain a readable file-like object.'
+                )
+                continue
+
+            try:
+                if hasattr(file_obj, 'seek') and callable(file_obj.seek):
+                    file_obj.seek(0)
+
+                content_bytes = file_obj.read()
+                content_str = content_bytes.decode('utf-8')
+                data = json.loads(content_str)
+
+                results_list = data.get('results')
+                if isinstance(results_list, list):
+                    all_results.extend(results_list)
+                else:
+                    log.warning(
+                        f'Skipping file {filename}: "results" key not found '
+                        f'or is not a list in the JSON data.'
+                    )
+            except json.JSONDecodeError:
+                log.error(
+                    f'Error decoding JSON from file {filename}.', exc_info=True
+                )
+                raise  # Re-raise to inform the user in the UI
+            except UnicodeDecodeError:
+                log.error(
+                    f'Error decoding file {filename} as UTF-8.', exc_info=True
+                )
+                raise  # Re-raise
+            except Exception as e:
+                log.error(
+                    f'Unexpected error processing file {filename}: {e}',
+                    exc_info=True
+                )
+                raise # Re-raise
+            finally:
+                if hasattr(file_obj, 'close') and callable(file_obj.close):
+                    try:
+                        file_obj.close()
+                    except Exception:
+                        pass # Ignore close errors
+
+        return all_results
+
     if request.method == 'POST' and form.validate():
         if form.clean.data:
             clean(request.app)
         try:
-            breakpoint()
-            # Pass the list of file dictionaries directly
+            # Load and concatenate data from uploaded files
+            people_data: list[PersonData] = load_and_concatenate_json(
+                form.people_source.data
+            )
+            organization_data: list[OrganizationData] = load_and_concatenate_json(
+                form.organizations_source.data
+            )
+            membership_data: list[MembershipData] = load_and_concatenate_json(
+                form.memberships_source.data
+            )
+
+            # Pass the processed data lists to the importer
             import_zug_kub_data(
                 session=request.session,
-                people_source=form.people_source.data,
-                organizations_source=form.organizations_source.data,
-                memberships_source=form.memberships_source.data,
+                people_data=people_data,
+                organization_data=organization_data,
+                membership_data=membership_data,
             )
             request.message(
                 _('Data import completed successfully.'), 'success'
             )
         except Exception as e:
-            breakpoint()
             log.error(f'Data import failed: {e}', exc_info=True)
-            request.message(f'Data import failed {e}', 'warning')
-            results = str(e)
+            # Provide a more user-friendly error message
+            request.message(
+                _('Data import failed: ${error}', mapping={'error': str(e)}),
+                'warning'
+            )
+            # Optionally keep the detailed error for display if needed
+            results = f'Error during import: {e}'
 
     return {
         'title': _('Import'),
