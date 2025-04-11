@@ -1,8 +1,91 @@
 # Changes
 
+## 2025.18
+
+`2025-04-11` | [a149dc874d...1f1f981a74](https://github.com/OneGov/onegov-cloud/compare/a149dc874d^...1f1f981a74)
+
+### Agency
+
+##### Suppress VAT settings
+
+`Bugfix` | [NONE](#NONE) | [21362a6973](https://github.com/onegov/onegov-cloud/commit/21362a6973f8e1d1970e85dae70c14a590889c54)
+
+### Feriennet
+
+##### Hide ticket archive options for feriennet
+
+`Feature` | [PRO-1386](https://linear.app/projuventute/issue/PRO-1386) | [f534636992](https://github.com/onegov/onegov-cloud/commit/f534636992a82088fc6423caa1ecdf6b940ba338)
+
+##### Add field for SwissPass ID
+
+`Feature` | [PRO-1388](https://linear.app/projuventute/issue/PRO-1388) | [5949eba81c](https://github.com/onegov/onegov-cloud/commit/5949eba81c3cf40584aba9740be76fc858398da7)
+
+##### Remove Logo in Mail Header
+
+`Bugfix` | [PRO-1362](https://linear.app/projuventute/issue/PRO-1362) | [3b08b37994](https://github.com/onegov/onegov-cloud/commit/3b08b379942a6f80e710ec9f32b6e4387d4c305c)
+
+### Fsi
+
+##### Ensure the six year intervall gets checked everywhere
+
+`Bugfix` | [b05f2640a7](https://github.com/onegov/onegov-cloud/commit/b05f2640a77cf562794b7b6c5a2ce8120beda553)
+
+### Landsgemeinde
+
+##### Rename Audio ZIP
+
+`Feature` | [OGC-2194](https://linear.app/onegovcloud/issue/OGC-2194) | [293a30e2f1](https://github.com/onegov/onegov-cloud/commit/293a30e2f17d2efb00c73fd02e1542aea433c68a)
+
+### Org
+
+##### Improve dashboard configuration
+
+`Feature` | [OGC-1528](https://linear.app/onegovcloud/issue/OGC-1528) | [80cf9f7610](https://github.com/onegov/onegov-cloud/commit/80cf9f76103eb5329e5e196378897e6a60d5afc4)
+
+##### Adds optional immediate ticket notifications for all ticket types
+
+`Feature` | [OGC-2124](https://linear.app/onegovcloud/issue/OGC-2124) | [650f306032](https://github.com/onegov/onegov-cloud/commit/650f3060328a7dd8014b528f69bef2e0bb9cda39)
+
+##### Adds the ability for resources to be organized into subgroups
+
+`Feature` | [OGC-2021](https://linear.app/onegovcloud/issue/OGC-2021) | [8431ad8d0d](https://github.com/onegov/onegov-cloud/commit/8431ad8d0d7508ee214e58e90bb86b99d3671edf)
+
+##### Improves support for series-reservations using find your spot
+
+`Feature` | [OGC-2023](https://linear.app/onegovcloud/issue/OGC-2023) | [1781c0fd97](https://github.com/onegov/onegov-cloud/commit/1781c0fd970824c760b3c91240363746facb0686)
+
+##### Scheduled daily newsletter
+
+Add option for a scheduled daily newsletter.
+
+`Feature` | [OGC-2217](https://linear.app/onegovcloud/issue/OGC-2217) | [c104a256f1](https://github.com/onegov/onegov-cloud/commit/c104a256f1c95da8f11b904509280b664eda88ab)
+
+##### Rename rules and allocations
+
+`Feature` | [OGC-2168](https://linear.app/onegovcloud/issue/OGC-2168) | [1f1f981a74](https://github.com/onegov/onegov-cloud/commit/1f1f981a7455e8fa90ad4046057cddcd32cab8c9)
+
+### Reservation
+
+##### Fixes price/hour calculation dropping decimal fractions.
+
+This only occurred when the reservation duration wasn’t a whole hour
+e.g., 1.5 hours was truncated to 1.0 hour.
+
+`Bugfix` | [OGC-2152](https://linear.app/onegovcloud/issue/OGC-2152) | [cac7125206](https://github.com/onegov/onegov-cloud/commit/cac71252065e4293d790cd406e0896eb80a784fd)
+
+### Search
+
+##### Support phone number search (Agency, Org, Town6)
+
+`Feature` | [OGC-2108](https://linear.app/onegovcloud/issue/OGC-2108) | [a149dc874d](https://github.com/onegov/onegov-cloud/commit/a149dc874d74c2066f2cfe2979e04402079cc2b6)
+
+##### Returns the last change date of news items using the published_or_created attribute to lower priority of older news items (in favor for topics)
+
+`Feature` | [OGC-2180](https://linear.app/onegovcloud/issue/OGC-2180) | [f21afb58e7](https://github.com/onegov/onegov-cloud/commit/f21afb58e766a75b26c64ab21e17a06d8208f3ab)
+
 ## 2025.17
 
-`2025-04-04` | [1615b9b227...3a749ca7b9](https://github.com/OneGov/onegov-cloud/compare/1615b9b227^...3a749ca7b9)
+`2025-04-04` | [1615b9b227...bb53914fba](https://github.com/OneGov/onegov-cloud/compare/1615b9b227^...bb53914fba)
 
 ### Core
 
@@ -2219,32 +2302,4 @@ This also adds `MarkupText` as a new column type
 ##### Removes uses of structure keyword in templates
 
 `Bugfix` | [OGC-1708](https://linear.app/onegovcloud/issue/OGC-1708) | [7643722820](https://github.com/onegov/onegov-cloud/commit/7643722820567199be2b5d2e3556ad8d228bac3d)
-
-## 2024.36
-
-`2024-06-21` | [8e594d6508...b261703dcc](https://github.com/OneGov/onegov-cloud/compare/8e594d6508^...b261703dcc)
-
-### Files
-
-##### Adds 'published until' column to file view
-
-`Feature` | [OGC-1696](https://linear.app/onegovcloud/issue/OGC-1696) | [712232fdff](https://github.com/onegov/onegov-cloud/commit/712232fdffeee2de1785d86abf79ec72de0df84b)
-
-### Newsletter
-
-##### Subscribers are now auto-confirmed if a manager adds it
-
-`Feature` | [OGC-1666](https://linear.app/onegovcloud/issue/OGC-1666) | [c3845373bc](https://github.com/onegov/onegov-cloud/commit/c3845373bccfe9d85015f836ed7d6066b91a263e)
-
-### Org
-
-##### New event tag "nature"
-
-`Feature` | [OGC-1699](https://linear.app/onegovcloud/issue/OGC-1699) | [17c487854f](https://github.com/onegov/onegov-cloud/commit/17c487854fc5dd31447922217c5c23cd7b8d565a)
-
-### Town6
-
-##### Fix save-button bug
-
-`Bugfix` | [OGC-1682](https://linear.app/onegovcloud/issue/OGC-1682) | [28d404230d](https://github.com/onegov/onegov-cloud/commit/28d404230da1ebc8856e195a9e358a846e27bb51)
 
