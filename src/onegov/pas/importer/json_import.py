@@ -27,10 +27,13 @@ if TYPE_CHECKING:
     from onegov.pas.models.parliamentarian_role import PartyRole
     from onegov.pas.models.parliamentarian_role import Role
     from sqlalchemy.orm import Session
-    from collections.abc import Sequence
+    from collections.abc import Sequence, Mapping
     from datetime import date
+    from io import IOBase
 
-    StrOrBytesPath = Union[str, bytes, PathLike[str], PathLike[bytes]]
+    # Type hint for the structure coming from MultipleFileField.data
+    # Each dict contains 'data' (file-like object), 'filename', 'mimetype', 'size'
+    UploadedFileData = Mapping[str, Any]
 
     class EmailData(TypedDict):
         id: str
@@ -164,14 +167,74 @@ def determine_membership_role(membership_data: dict[str, Any]) -> str:
     return role_mappings.get(role, 'member')
 
 
-def _load_json(source: StrOrBytesPath) -> list[Any]:
-    if isinstance(source, (str, Path)):
-        with open(source, encoding='utf-8') as f:
-            return json.load(f)['results']  # Assuming 'results' key
-    elif hasattr(source, 'read'):  # File-like object
-        return json.load(cast(Any, source))['results']  # Assuming 'results' key
-    else:
-        raise TypeError('Invalid source type')
+def _load_json(sources: Sequence[UploadedFileData]) -> list[Any]:
+    """
+    Loads and concatenates the 'results' list from multiple JSON files.
+
+    Args:
+        sources: A sequence of dictionaries, where each dictionary represents
+                 an uploaded file and contains a file-like object under the
+                 'data' key. Expected structure:
+                 [{'data': file_like_object, 'filename': str, ...}, ...]
+
+    Returns:
+        A list containing all items from the 'results' arrays of the parsed
+        JSON files.
+    """
+    all_results: list[Any] = []
+    for file_info in sources:
+        file_obj = file_info.get('data')
+        filename = file_info.get('filename', 'unknown file')
+        if not isinstance(file_obj, IOBase) or not hasattr(file_obj, 'read'):
+            logging.warning(
+                f'Skipping invalid file data for {filename}: "data" key does '
+                f'not contain a readable file-like object.'
+            )
+            continue
+
+        try:
+            # Ensure reading from the beginning of the file stream
+            if hasattr(file_obj, 'seek') and callable(file_obj.seek):
+                file_obj.seek(0)
+
+            # Read content, decode assuming UTF-8, parse JSON
+            content_bytes = file_obj.read()
+            content_str = content_bytes.decode('utf-8')
+            data = json.loads(content_str)
+
+            # Extract and append results
+            results = data.get('results')
+            if isinstance(results, list):
+                all_results.extend(results)
+            else:
+                logging.warning(
+                    f'Skipping file {filename}: "results" key not found or '
+                    f'is not a list in the JSON data.'
+                )
+        except json.JSONDecodeError:
+            logging.error(
+                f'Error decoding JSON from file {filename}.', exc_info=True
+            )
+        except UnicodeDecodeError:
+            logging.error(
+                f'Error decoding file {filename} as UTF-8.', exc_info=True
+            )
+        except Exception as e:
+            logging.error(
+                f'An unexpected error occurred processing file {filename}: {e}',
+                exc_info=True
+            )
+        finally:
+            # Close the file object if it's not managed externally
+            # (cgi.FieldStorage often uses temp files that need closing)
+            if hasattr(file_obj, 'close') and callable(file_obj.close):
+                try:
+                    file_obj.close()
+                except Exception:
+                    # Ignore errors during close, log main error above
+                    pass
+
+    return all_results
 
 
 class DataImporter:
@@ -882,11 +945,13 @@ def count_unique_fullnames(
 
 def import_zug_kub_data(
     session: Session,
-    people_source: StrOrBytesPath,
-    organizations_source: StrOrBytesPath,
-    memberships_source: StrOrBytesPath,
+    people_source: Sequence[UploadedFileData],
+    organizations_source: Sequence[UploadedFileData],
+    memberships_source: Sequence[UploadedFileData],
 ) -> None:
-    """Imports data from Zug KUB JSON sources."""
+    """
+    Imports data from Zug KUB JSON sources, handling multiple files per source.
+    """
 
     people_data = _load_json(people_source)
     organization_data = _load_json(organizations_source)

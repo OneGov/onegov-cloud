@@ -87,12 +87,12 @@ def handle_data_import(
             clean(request.app)
         try:
             breakpoint()
-            # need to iterate over each .data of for each of these:
+            # Pass the list of file dictionaries directly
             import_zug_kub_data(
                 session=request.session,
-                people_source=str(form.people_source.data),
-                organizations_source=str(form.organizations_source.data),
-                memberships_source=str(form.memberships_source.data),
+                people_source=form.people_source.data,
+                organizations_source=form.organizations_source.data,
+                memberships_source=form.memberships_source.data,
             )
             request.message(
                 _('Data import completed successfully.'), 'success'
