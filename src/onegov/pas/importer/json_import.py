@@ -25,6 +25,24 @@ from onegov.pas.models import (
 
 # Define TypedDicts for data structures used in JSON import
 # These are defined outside TYPE_CHECKING to be available at runtime
+class OrganizationData(TypedDict):
+    created: str
+    description: str
+    htmlUrl: str
+    id: str
+    isActive: bool
+    memberCount: int
+    modified: str
+    name: str
+    organizationTypeTitle: (
+        Literal['Kommission', 'Fraktion', 'Kantonsrat', 'Sonstige'] | None
+    )
+    primaryEmail: None
+    status: int
+    thirdPartyId: str | None
+    url: str
+
+
 class EmailData(TypedDict):
     id: str
     label: str
@@ -85,7 +103,7 @@ class UrlData(TypedDict):
     created: str
 
 
-class OrganizationData(TypedDict):
+class OrganizationDataWithinMembership(TypedDict):
     created: str
     description: str
     htmlUrl: str
@@ -136,7 +154,7 @@ class MembershipData(TypedDict):
     end: str | bool | None
     id: str
     isDefault: bool
-    organization: OrganizationData
+    organization: OrganizationDataWithinMembership
     person: PersonData
     primaryAddress: AddressData | None
     primaryEmail: EmailData | None
