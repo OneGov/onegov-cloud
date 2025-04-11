@@ -8,6 +8,8 @@ from tempfile import NamedTemporaryFile
 from typing import (
     TypeVar,
     BinaryIO,
+    cast,
+    Literal,
     Protocol,
     ParamSpec, Self, Any,
 )
@@ -469,7 +471,10 @@ def import_commissions(
             membership = CommissionMembership(
                 commission=commission,
                 parliamentarian=parliamentarian,
-                role=role,  # type:ignore[misc]
+                role=cast(
+                    Literal['guest', 'member', 'extended_member', 'president'],
+                    role
+                ),
                 start=parse_date(row.eintritt_kommission),
                 end=parse_date(row.austritt_kommission)
             )

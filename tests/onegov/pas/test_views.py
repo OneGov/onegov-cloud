@@ -247,9 +247,11 @@ def test_views_manage(client_with_es):
 
 
 def test_view_upload_json(client):
+
     client.login_admin()
 
     def yield_paths():
+        """ Yields paths in this order: organization, membership, people """
         base_path = '/home/cyrill/pasimport/json'
         yield [base_path + '/organization.json']
         membership_count = 7

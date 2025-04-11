@@ -163,7 +163,6 @@ def handle_data_import(
             )
         except Exception as e:
             log.error(f'Data import failed: {e}', exc_info=True)
-            # Provide a more user-friendly error message
             # Provide a more user-friendly error message, preserving original
             request.message(
                 _('Data import failed: ${error}', mapping={'error': str(e)}),
@@ -176,11 +175,13 @@ def handle_data_import(
             if cause:
                 results += f'\nCaused by: {cause}'
 
+    breakpoint()
     return {
         'title': _('Import'),
         'layout': layout,
         'form': form,
         'results': results,
+        'errors': form.errors
     }
 
 

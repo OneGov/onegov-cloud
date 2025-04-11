@@ -39,7 +39,7 @@ def test_successful_import_manually(
     session, people_json, organization_json, memberships_json
 ):
     people_path = '/home/cyrill/pasimport/json/people_1.json'
-    org_path = '/home/cyrill/pasimport/json/organizaton.json'
+    org_path = '/home/cyrill/pasimport/json/organization.json'
     members_path = '/home/cyrill/pasimport/json/membership.json'
 
     # Run the import with temporary file paths

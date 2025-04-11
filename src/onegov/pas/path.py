@@ -28,7 +28,7 @@ from uuid import UUID
 from datetime import date
 
 
-from typing import TYPE_CHECKING
+from typing import TYPE_CHECKING, Any
 if TYPE_CHECKING:
     from onegov.town6.request import TownRequest
 
@@ -405,5 +405,5 @@ def get_settlement_run_export_all(
     model=FileCollection,
     path='/json-import-files'
 )
-def get_file_collection(request):
+def get_file_collection(request: TownRequest) -> FileCollection[Any]:
     return FileCollection(request.session)
