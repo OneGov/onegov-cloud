@@ -1180,6 +1180,27 @@ class NewsletterSettingsForm(Form):
         choices=[]
     )
 
+    enable_automatic_newsletters = BooleanField(
+        label=_('Enable automatic daily newsletters'),
+        description=_('Automatically creates a daily newsletter containing '
+        'all new news items since the last sending time. It will only send a '
+        'newsletter if there is at least one new news item. Only subscribers '
+        'who subscribed to the daily newsletter will receive it, independent '
+        'of their selected categories if there are any.'),
+        fieldset=_('Automatic newsletters'),
+        default=False
+    )
+
+    newsletter_times = TagsField(
+        label=_('Newsletter sending times (24h format)'),
+        fieldset=_('Automatic newsletters'),
+        validators=[InputRequired()],
+        description=_(
+            'Specify times for sending newsletters. e.g., 8, 12, 18.'
+            ),
+        depends_on=('enable_automatic_newsletters', 'y'),
+    )
+
     def ensure_categories(self) -> bool | None:
         assert isinstance(self.newsletter_categories.errors, list)
 
@@ -1229,12 +1250,43 @@ class NewsletterSettingsForm(Form):
 
         return None
 
+    def ensure_valid_times(self) -> bool | None:
+        assert isinstance(self.newsletter_times.errors, list)
+
+        if self.enable_automatic_newsletters.data:
+            if not self.newsletter_times.data:
+                self.newsletter_times.errors.append(
+                    _('Please specify at least one time.')
+                )
+                return False
+
+            for time in self.newsletter_times.data:
+                try:
+                    time_int = int(time)
+                    if time_int < 0 or time_int > 24:
+                        self.newsletter_times.errors.append(
+                            _('Invalid time format. Please use a value '
+                              'between 0 and 24.')
+                        )
+                        return False
+                except ValueError:
+                    self.newsletter_times.errors.append(
+                        _('Invalid time format. Please use 24h format.')
+                    )
+                    return False
+
+        return None
+
     def populate_obj(self, model: Organisation) -> None:  # type:ignore
         super().populate_obj(model)
 
         yaml_data = self.newsletter_categories.data
         data = yaml.safe_load(yaml_data) if yaml_data else []
         model.newsletter_categories = data
+        if isinstance(self.newsletter_times.data, list):
+            times = self.newsletter_times.data
+            times.sort(key=int)
+            model.newsletter_times = times
 
         model.notify_on_unsubscription = self.notify_on_unsubscription.data
 

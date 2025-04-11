@@ -116,6 +116,13 @@ msgid "Stripe Connect"
 msgstr "Stripe Connect"
 
 #, python-format
+msgid "Daily Newsletter ${time}"
+msgstr "Newsletter giornaliera ${time}"
+
+msgid "New news since the last newsletter:"
+msgstr "Nuove notizie dalla newsletter precedente:"
+
+#, python-format
 msgid "${org} OneGov Cloud Status"
 msgstr "${org} OneGov Cloud Status"
 
@@ -2064,6 +2071,30 @@ msgstr ""
 "Inviare una notifica via e-mail ai seguenti utenti quando un destinatario si "
 "cancella dalla newsletter"
 
+msgid "Enable automatic daily newsletters"
+msgstr "Abilita le newsletter giornaliere automatiche"
+
+msgid ""
+"Automatically creates a daily newsletter containing all new news items since "
+"the last sending time. It will only send a newsletter if there is at least "
+"one new news item. Only subscribers who subscribed to the daily newsletter "
+"will receive it, independent of their selected categories if there are any."
+msgstr ""
+"Creare automaticamente una newsletter giornaliera contenente tutte le nuove "
+"notizie dall'ultima ora di invio. Invierà una newsletter solo se c'è "
+"almeno un nuovo articolo di notizie. Solo gli abbonati che si sono "
+"registrati alla newsletter giornaliera la riceveranno, indipendentemente "
+"dalle categorie selezionate, se presenti."
+
+msgid "Automatic newsletters"
+msgstr "Newsletter automatiche"
+
+msgid "Newsletter sending times (24h format)"
+msgstr "Orari di invio della newsletter (formato 24 ore)"
+
+msgid "Specify times for sending newsletters. e.g., 8, 12, 18."
+msgstr "Specifica gli orari per l'invio delle newsletter. ad es. 8, 12, 18."
+
 msgid "Invalid YAML format. Please refer to the example."
 msgstr "Formato YAML non valido. Fare riferimento all'esempio."
 
@@ -2079,6 +2110,17 @@ msgid ""
 msgstr ""
 "Formato non valido. Sono ammessi solo argomenti e sottoargomenti, non sono "
 "supportate strutture più profonde."
+
+msgid "Please specify at least one time."
+msgstr "Si prega di specificare almeno un orario."
+
+msgid "Invalid time format. Please use a value between 0 and 24."
+msgstr ""
+"Formato orario non valido. Si prega di utilizzare un valore compreso tra 0 "
+"e 24."
+
+msgid "Invalid time format. Please use 24h format."
+msgstr "Formato orario non valido. Si prega di utilizzare il formato 24 ore."
 
 msgid "Old domain"
 msgstr "Vecchio dominio"
@@ -2273,6 +2315,19 @@ msgstr "Indirizzo e-mail"
 
 msgid "The subscriber has given consent to receive the newsletter."
 msgstr "Il sottoscrittore ha dato il consenso a ricevere la newsletter."
+
+msgid "Daily newsletter for all categories (only for news items)"
+msgstr ""
+"Newsletter giornaliera per tutte le categorie (solo per gli articoli di "
+"notizie)"
+
+#, python-format
+msgid ""
+"If there are any new news items since the last sending time you will receive "
+"the newsletter at the following times: ${joined}:00."
+msgstr ""
+"Se ci sono nuovi articoli di notizie dall'ultimo invio, riceverai la "
+"newsletter nei seguenti orari: ${joined}:00."
 
 msgid "Submission Window"
 msgstr "Finestra di presentazione"

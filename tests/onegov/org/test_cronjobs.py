@@ -27,7 +27,8 @@ from onegov.org.notification_service import (
 from onegov.page import PageCollection
 from onegov.ticket import Handler, Ticket, TicketCollection
 from onegov.user import UserCollection
-from onegov.newsletter import NewsletterCollection, RecipientCollection
+from onegov.newsletter import (Newsletter, NewsletterCollection,
+                               RecipientCollection)
 from onegov.reservation import ResourceCollection
 from onegov.user.collections import TANCollection
 from sedate import ensure_timezone, utcnow
@@ -735,6 +736,7 @@ def test_send_scheduled_newsletters(client, org_app, secret_content_allowed):
     recipient.confirmed = True
 
     org_app.org.secret_content_allowed = secret_content_allowed
+    org_app.org.enable_automatic_newsletters = True
 
     create_scheduled_newsletter()
 
@@ -768,6 +770,80 @@ def test_send_scheduled_newsletters(client, org_app, secret_content_allowed):
             if secret_content_allowed:
                 assert "Secret News" in mail['TextBody']
             assert "Private News" not in mail['TextBody']
+
+
+def test_send_daily_newsletter(es_org_app):
+    org_app = es_org_app
+    tz = ensure_timezone('Europe/Zurich')
+
+    session = org_app.session()
+    org_app.org.enable_automatic_newsletters = True
+    org_app.org.newsletter_times = '10', '11', '16'
+
+    news = PageCollection(session)
+    news_parent = news.query().filter_by(name='news').one()
+    recipients = RecipientCollection(session)
+
+    recipient = recipients.add('daily@example.org', confirmed=True)
+    recipient.daily_newsletter = True
+
+    recipient = recipients.add('info@example.org', confirmed=True)
+    recipient.daily_newsletter = False
+
+    with freeze_time(datetime(2018, 3, 2, 17, 0, tzinfo=tz)):
+        # Created three days ago, published yesterday at 17:00
+        news.add(
+            parent=news_parent, title='News1', type='news', access='public',
+            publication_start=utcnow() + timedelta(days=2))
+
+    with freeze_time(datetime(2018, 3, 4, 17, 0, tzinfo=tz)):
+        # Created yesterday at 17:00, published immediately
+        news.add(
+            parent=news_parent, title='News2', type='news', access='public')
+
+    with freeze_time(datetime(2018, 3, 5, 10, 0, tzinfo=tz)):
+        # Created today at 10:00, published immediately
+        news.add(
+            parent=news_parent, title='News3', type='news', access='public')
+        # Created today at 10:00, published today 10:01
+        news.add(
+            parent=news_parent, title='News4', type='news', access='public',
+            publication_start=utcnow() + timedelta(minutes=1))
+
+    transaction.commit()
+
+    job = get_cronjob_by_name(org_app, 'hourly_maintenance_tasks')
+    job.app = org_app
+    client = Client(org_app)
+
+    with freeze_time(datetime(2018, 3, 5, 10, 0, tzinfo=tz)):
+        client.get(get_cronjob_url(job))
+        newsletter = NewsletterCollection(session).query().one()
+        assert newsletter.title == 'Täglicher Newsletter 05.03.2018, 10:00'
+        assert len(os.listdir(client.app.maildir)) == 1
+        mail = client.get_email(0)
+        assert "News1" in mail['TextBody']
+        assert "News2" in mail['TextBody']
+        assert "News3" not in mail['TextBody']
+        assert "News4" not in mail['TextBody']
+
+    with freeze_time(datetime(2018, 3, 5, 11, 0, tzinfo=tz)):
+        client.get(get_cronjob_url(job))
+        newsletter = NewsletterCollection(session).query().filter(
+            Newsletter.title.like('%Täglicher Newsletter 05.03.2018, 11:00%'
+        )).one()
+        assert 'Täglicher Newsletter 05.03.2018, 11:00' in newsletter.title
+        assert len(os.listdir(client.app.maildir)) == 2
+        mail = client.get_email(1)
+        assert "News1" not in mail['TextBody']
+        assert "News2" not in mail['TextBody']
+        assert "News3" in mail['TextBody']
+        assert "News4" in mail['TextBody']
+
+    with freeze_time(datetime(2018, 3, 5, 16, 0, tzinfo=tz)):
+        client.get(get_cronjob_url(job))
+        assert NewsletterCollection(session).query().count() == 2
+        assert len(os.listdir(client.app.maildir)) == 2
 
 
 def test_auto_archive_tickets_and_delete(org_app, handlers):
