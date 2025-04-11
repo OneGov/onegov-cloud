@@ -2,7 +2,6 @@ from __future__ import annotations
 import json
 
 from wtforms.fields import BooleanField
-from wtforms.validators import ValidationError
 
 from onegov.core.utils import dictionary_to_binary
 from onegov.form import Form
@@ -10,19 +9,19 @@ from onegov.form.fields import UploadMultipleField
 from onegov.pas import _
 
 
-from typing import get_type_hints, TYPE_CHECKING, TypedDict
+from typing import get_type_hints, TYPE_CHECKING
 if TYPE_CHECKING:
     from collections.abc import Sequence
     from onegov.core.types import LaxFileDict
-    from onegov.pas.importer.json_import import (
-        MembershipData,
-        OrganizationData,
-        PersonData,
-    )
-    from wtforms import Field
 
 
 class DataImportForm(Form):
+
+    from onegov.pas.importer.json_import import (
+        MembershipData,
+        OrganizationData,
+        PersonData
+    )
 
     clean = BooleanField(label=_('Delete data before import'), default=False)
 
@@ -45,23 +44,23 @@ class DataImportForm(Form):
         ),
     )
 
-    def validate_people_source(self, field: UploadMultipleField) -> None:
+    def validate_people_source(self) -> None:
         """Validates people source JSON against expected schema."""
-        # Import here to avoid circular dependency at module level
-        from onegov.pas.importer.json_import import PersonData
-        self._validate_json_results_against_type(field, PersonData)
+        self._validate_json_results_against_type(
+            self.people_source, PersonData
+        )
 
-    def validate_organizations_source(self, field: UploadMultipleField) -> None:
+    def validate_organizations_source(self) -> None:
         """Validates organizations source JSON against expected schema."""
-        # Import here to avoid circular dependency at module level
-        from onegov.pas.importer.json_import import OrganizationData
-        self._validate_json_results_against_type(field, OrganizationData)
+        self._validate_json_results_against_type(
+            self.organizations_source, OrganizationData
+        )
 
-    def validate_memberships_source(self, field: UploadMultipleField) -> None:
+    def validate_memberships_source(self) -> None:
         """Validates memberships source JSON against expected schema."""
-        # Import here to avoid circular dependency at module level
-        from onegov.pas.importer.json_import import MembershipData
-        self._validate_json_results_against_type(field, MembershipData)
+        self._validate_json_results_against_type(
+            self.memberships_source, MembershipData
+        )
 
     def _validate_json_results_against_type(
         self,
@@ -71,17 +70,12 @@ class DataImportForm(Form):
         """Validates that each item in the 'results' list of the JSON files
         contains the keys expected by the TypedDict."""
         # Import here to avoid circular dependency at module level
-        from onegov.pas.importer.json_import import (
-            MembershipData,
-            OrganizationData,
-            PersonData,
-        )
         if not field.data:
             return  # No files uploaded, nothing to validate
-        
+
         required_keys = get_type_hints(expected_type).keys()
         sources: Sequence[LaxFileDict] = field.data
-        
+
         for file_info in sources:
             filename = file_info.get('filename', 'unknown file')
             try:
@@ -89,14 +83,14 @@ class DataImportForm(Form):
                 content_str = content_bytes.decode('utf-8')
                 data = json.loads(content_str)
                 results_list = data.get('results')
-                
+
                 if not isinstance(results_list, list):
                     field.errors.append(
                         _('File ${name} is missing the "results" list.',
                           mapping={'name': filename})
                     )
                     return
-                    
+
                 for index, item in enumerate(results_list):
                     if not isinstance(item, dict):
                         field.errors.append(
@@ -104,7 +98,7 @@ class DataImportForm(Form):
                               mapping={'idx': index + 1, 'name': filename})
                         )
                         return
-                        
+
                     missing_keys = required_keys - item.keys()
                     if missing_keys:
                         field.errors.append(
@@ -116,7 +110,7 @@ class DataImportForm(Form):
                               })
                         )
                         return
-                        
+
             except (json.JSONDecodeError, UnicodeDecodeError) as e:
                 field.errors.append(
                     _('Error reading file ${name}: ${error}',
