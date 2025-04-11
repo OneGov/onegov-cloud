@@ -564,10 +564,11 @@ def test_allocations(client):
 
     # create new beamer allocation
     new = client.get((
-        '/resource/beamer/new-allocation'
-        '?start=2015-08-04&end=2015-08-05'
+        '/resource/beamer/new-rule'
     ))
-
+    new.form['title'] = 'Period 1'
+    new.form['start'] = '2015-08-04'
+    new.form['end'] = '2015-08-05'
     new.form['items'] = 1
     new.form['item_limit'] = 1
     new.form.submit()
@@ -596,10 +597,11 @@ def test_allocations(client):
 
     # create a new daypass allocation
     new = client.get((
-        '/resource/tageskarte/new-allocation'
-        '?start=2015-08-04&end=2015-08-05'
+        '/resource/tageskarte/new-rule'
     ))
-
+    new.form['title'] = 'Period 2'
+    new.form['start'] = '2015-08-04'
+    new.form['end'] = '2015-08-05'
     new.form['daypasses'] = 1
     new.form['daypasses_limit'] = 1
     new.form.submit()
@@ -625,18 +627,6 @@ def test_allocations(client):
 
     assert len(slots.json) == 1
     assert slots.json[0]['title'] == "Ganztägig \n2 Verfügbar"
-
-    # try to create a new allocation over an existing one
-    new = client.get((
-        '/resource/tageskarte/new-allocation'
-        '?start=2015-08-04&end=2015-08-04'
-    ))
-
-    new.form['daypasses'] = 1
-    new.form['daypasses_limit'] = 1
-    new = new.form.submit()
-
-    assert "Es besteht bereits eine Einteilung im gewünschten Zeitraum" in new
 
     # move the existing allocations
     slots = client.get((
@@ -691,12 +681,13 @@ def test_allocation_times(client):
     new.form.submit()
 
     # 12:00 - 00:00
-    new = client.get('/resource/meeting-room/new-allocation')
+    new = client.get('/resource/meeting-room/new-rule')
+    new.form['title'] = 'Period 1'
     new.form['start'] = '2015-08-20'
     new.form['end'] = '2015-08-20'
     new.form['start_time'] = '12:00'
     new.form['end_time'] = '00:00'
-    new.form['as_whole_day'] = 'no'
+    new.form['is_partly_available'] = 'no'
     new.form.submit()
 
     slots = client.get(
@@ -708,12 +699,13 @@ def test_allocation_times(client):
     assert slots.json[0]['end'] == '2015-08-21T00:00:00+02:00'
 
     # 00:00 - 02:00
-    new = client.get('/resource/meeting-room/new-allocation')
+    new = client.get('/resource/meeting-room/new-rule')
+    new.form['title'] = 'Period 2'
     new.form['start'] = '2015-08-22'
     new.form['end'] = '2015-08-22'
     new.form['start_time'] = '00:00'
     new.form['end_time'] = '02:00'
-    new.form['as_whole_day'] = 'no'
+    new.form['is_partly_available'] = 'no'
     new.form.submit()
 
     slots = client.get(
@@ -725,12 +717,13 @@ def test_allocation_times(client):
     assert slots.json[0]['end'] == '2015-08-22T02:00:00+02:00'
 
     # 12:00 - 00:00 over two days
-    new = client.get('/resource/meeting-room/new-allocation')
+    new = client.get('/resource/meeting-room/new-rule')
+    new.form['title'] = 'Period 3'
     new.form['start'] = '2015-08-24'
     new.form['end'] = '2015-08-25'
     new.form['start_time'] = '12:00'
     new.form['end_time'] = '00:00'
-    new.form['as_whole_day'] = 'no'
+    new.form['is_partly_available'] = 'no'
     new.form.submit()
 
     slots = client.get(
@@ -752,32 +745,35 @@ def test_allocation_visibility(client):
     new.form.submit()
 
     # 12:00 - 14:00 private
-    new = client.get('/resource/meeting-room/new-allocation')
+    new = client.get('/resource/meeting-room/new-rule')
+    new.form['title'] = 'Period 1'
     new.form['start'] = '2015-08-20'
     new.form['end'] = '2015-08-20'
     new.form['start_time'] = '12:00'
     new.form['end_time'] = '14:00'
-    new.form['as_whole_day'] = 'no'
+    new.form['is_partly_available'] = 'no'
     new.form['access'] = 'private'
     new.form.submit()
 
     # 14:00 - 16:00 member
-    new = client.get('/resource/meeting-room/new-allocation')
+    new = client.get('/resource/meeting-room/new-rule')
+    new.form['title'] = 'Period 2'
     new.form['start'] = '2015-08-20'
     new.form['end'] = '2015-08-20'
     new.form['start_time'] = '14:00'
     new.form['end_time'] = '16:00'
-    new.form['as_whole_day'] = 'no'
+    new.form['is_partly_available'] = 'no'
     new.form['access'] = 'member'
     new.form.submit()
 
     # 16:00 - 18:00 public
-    new = client.get('/resource/meeting-room/new-allocation')
+    new = client.get('/resource/meeting-room/new-rule')
+    new.form['title'] = 'Period 3'
     new.form['start'] = '2015-08-20'
     new.form['end'] = '2015-08-20'
     new.form['start_time'] = '16:00'
     new.form['end_time'] = '18:00'
-    new.form['as_whole_day'] = 'no'
+    new.form['is_partly_available'] = 'no'
     new.form['access'] = 'public'
     new.form.submit()
 
@@ -829,13 +825,14 @@ def test_allocation_holidays(client):
     page.form['title'] = 'Foo'
     page.form.submit()
 
-    new = client.get('/resource/foo/new-allocation')
+    new = client.get('/resource/foo/new-rule')
+    new.form['title'] = 'Period 1'
     new.form['start'] = '2019-07-30'
     new.form['end'] = '2019-08-02'
     new.form['start_time'] = '07:00'
     new.form['end_time'] = '12:00'
     new.form['on_holidays'] = 'yes'
-    new.form['as_whole_day'] = 'no'
+    new.form['is_partly_available'] = 'no'
     new.form.submit()
 
     slots = client.get('/resource/foo/slots?start=2019-07-29&end=2019-08-03')
@@ -851,13 +848,14 @@ def test_allocation_holidays(client):
     page.form['title'] = 'Bar'
     page.form.submit()
 
-    new = client.get('/resource/bar/new-allocation')
+    new = client.get('/resource/bar/new-rule')
+    new.form['title'] = 'Period 2'
     new.form['start'] = '2019-07-30'
     new.form['end'] = '2019-08-02'
     new.form['start_time'] = '07:00'
     new.form['end_time'] = '12:00'
     new.form['on_holidays'] = 'no'
-    new.form['as_whole_day'] = 'no'
+    new.form['is_partly_available'] = 'no'
     new.form.submit()
 
     slots = client.get('/resource/bar/slots?start=2019-07-29&end=2019-08-03')
@@ -880,13 +878,14 @@ def test_allocation_school_holidays(client):
     page.form['title'] = 'Foo'
     page.form.submit()
 
-    new = client.get('/resource/foo/new-allocation')
+    new = client.get('/resource/foo/new-rule')
+    new.form['title'] = 'Period 1'
     new.form['start'] = '2019-07-30'
     new.form['end'] = '2019-08-02'
     new.form['start_time'] = '07:00'
     new.form['end_time'] = '12:00'
     new.form['during_school_holidays'] = 'yes'
-    new.form['as_whole_day'] = 'no'
+    new.form['is_partly_available'] = 'no'
     new.form.submit()
 
     slots = client.get('/resource/foo/slots?start=2019-07-29&end=2019-08-03')
@@ -902,13 +901,14 @@ def test_allocation_school_holidays(client):
     page.form['title'] = 'Bar'
     page.form.submit()
 
-    new = client.get('/resource/bar/new-allocation')
+    new = client.get('/resource/bar/new-rule')
+    new.form['title'] = 'Period 2'
     new.form['start'] = '2019-07-30'
     new.form['end'] = '2019-08-02'
     new.form['start_time'] = '07:00'
     new.form['end_time'] = '12:00'
     new.form['during_school_holidays'] = 'no'
-    new.form['as_whole_day'] = 'no'
+    new.form['is_partly_available'] = 'no'
     new.form.submit()
 
     slots = client.get('/resource/bar/slots?start=2019-07-29&end=2019-08-03')
@@ -2216,7 +2216,7 @@ def test_cleanup_allocations(client):
     cleanup.form['weekdays'] = [4, 6]
     resource = cleanup.form.submit().follow()
 
-    assert "1 Einteilungen wurden erfolgreich entfernt" in resource
+    assert "1 Verfügbarkeiten wurden erfolgreich entfernt" in resource
 
     allocations = scheduler.managed_allocations().order_by('id').all()
     assert len(allocations) == 2
@@ -2364,7 +2364,8 @@ def test_allocation_rules_on_rooms(client):
     def run_cronjob():
         client.get('/resource/room/process-rules')
 
-    page = client.get('/resource/room').click("Regeln").click("Regel")
+    page = client.get('/resource/room').click(
+        "Verfügbarkeitszeiträume").click("Verfügbarkeitszeitraum")
     page.form['title'] = 'Täglich'
     page.form['extend'] = 'daily'
     page.form['start'] = '2019-01-01'
@@ -2376,7 +2377,7 @@ def test_allocation_rules_on_rooms(client):
 
     page = page.form.submit().follow()
 
-    assert 'Regel aktiv, 2 Einteilungen erstellt' in page
+    assert 'Verfügbarkeitszeitraum aktiv, 2 Verfügbarkeiten erstellt' in page
     assert count_allocations() == 2
 
     # running the cronjob once will add a new allocation
@@ -2453,7 +2454,8 @@ def test_allocation_rules_edit(client):
     def run_cronjob():
         client.get('/resource/room/process-rules')
 
-    page = client.get('/resource/room').click("Regeln").click("Regel")
+    page = client.get('/resource/room').click(
+        "Verfügbarkeitszeiträume").click("Verfügbarkeitszeitraum")
     page.form['title'] = 'Täglich'
     page.form['extend'] = 'daily'
     page.form['start'] = '2019-01-01'
@@ -2465,13 +2467,13 @@ def test_allocation_rules_edit(client):
 
     page = page.form.submit().follow()
 
-    assert 'Regel aktiv, 2 Einteilungen erstellt' in page
+    assert 'Verfügbarkeitszeitraum aktiv, 2 Verfügbarkeiten erstellt' in page
     assert count_allocations() == 2
 
     # Modifying the rule applies changes where possible, but
     # existing reserved slots remain unaffected.
     edit_page = client.get('/resource/room')
-    edit_page = edit_page.click('Regeln').click('Bearbeiten')
+    edit_page = edit_page.click('Verfügbarkeitszeiträume').click('Bearbeiten')
     form = edit_page.form
     form['title'] = 'Renamed room'
 
@@ -2504,7 +2506,8 @@ def test_allocation_rules_on_daypasses(client):
     def run_cronjob():
         client.get('/resource/daypass/process-rules')
 
-    page = client.get('/resource/daypass').click("Regeln").click("Regel")
+    page = client.get('/resource/daypass').click(
+        "Verfügbarkeitszeiträume").click("Verfügbarkeitszeitraum")
     page.form['title'] = 'Monatlich'
     page.form['extend'] = 'monthly'
     page.form['start'] = '2019-01-01'
@@ -2513,7 +2516,7 @@ def test_allocation_rules_on_daypasses(client):
     page.form['daypasses_limit'] = '1'
     page = page.form.submit().follow()
 
-    assert 'Regel aktiv, 31 Einteilungen erstellt' in page
+    assert 'Verfügbarkeitszeitraum aktiv, 31 Verfügbarkeiten erstellt' in page
     assert count_allocations() == 31
 
     # running the cronjob on an ordinary day will not change anything
@@ -2541,11 +2544,11 @@ def test_allocation_rules_on_daypasses(client):
     assert count_allocations() == 90
 
     # let's stop the rule, which should leave existing allocations
-    page = client.get('/resource/daypass').click("Regeln")
+    page = client.get('/resource/daypass').click("Verfügbarkeitszeiträume")
     page.click('Stop')
 
-    page = client.get('/resource/daypass').click("Regeln")
-    assert "Keine Regeln" in page
+    page = client.get('/resource/daypass').click("Verfügbarkeitszeiträume")
+    assert "Keine Verfügbarkeitszeiträume" in page
     assert count_allocations() == 90
 
 
@@ -2571,7 +2574,8 @@ def test_allocation_rules_with_holidays(client):
     def run_cronjob():
         client.get('/resource/daypass/process-rules')
 
-    page = client.get('/resource/daypass').click("Regeln").click("Regel")
+    page = client.get('/resource/daypass').click(
+        "Verfügbarkeitszeiträume").click("Verfügbarkeitszeitraum")
     page.form['title'] = 'Jährlich'
     page.form['extend'] = 'yearly'
     page.form['start'] = '2019-01-01'
@@ -2581,7 +2585,7 @@ def test_allocation_rules_with_holidays(client):
     page.form['on_holidays'] = 'no'
     page = page.form.submit().follow()
 
-    assert 'Regel aktiv, 352 Einteilungen erstellt' in page
+    assert 'Verfügbarkeitszeitraum aktiv, 352 Verfügbarkeiten erstellt' in page
     assert count_allocations() == 352
 
     # running the cronjob on an ordinary day will not change anything
@@ -2622,7 +2626,8 @@ def test_allocation_rules_with_school_holidays(client):
     def run_cronjob():
         client.get('/resource/daypass/process-rules')
 
-    page = client.get('/resource/daypass').click("Regeln").click("Regel")
+    page = client.get('/resource/daypass').click(
+        "Verfügbarkeitszeiträume").click("Verfügbarkeitszeitraum")
     page.form['title'] = 'Jährlich'
     page.form['extend'] = 'yearly'
     page.form['start'] = '2019-01-01'
@@ -2632,7 +2637,7 @@ def test_allocation_rules_with_school_holidays(client):
     page.form['during_school_holidays'] = 'no'
     page = page.form.submit().follow()
 
-    assert 'Regel aktiv, 350 Einteilungen erstellt' in page
+    assert 'Verfügbarkeitszeitraum aktiv, 350 Verfügbarkeiten erstellt' in page
     assert count_allocations() == 350
 
     # running the cronjob on an ordinary day will not change anything

@@ -1800,12 +1800,12 @@ msgstr "Reservationen müssen mindestens ${n} Stunden im Voraus gemacht werden."
 
 msgid "Select a free time span in the calendar below to create an allocation."
 msgstr ""
-"Wählen Sie eine freie Zeitspanne im Kalender aus um eine Einteilung zu "
+"Wählen Sie eine freie Zeitspanne im Kalender aus um eine Verfügbarkeit zu "
 "machen."
 
 msgid "Removes all unreserved allocations between the start and end date."
 msgstr ""
-"Entfernt alle nicht-reservierten Einteilungen zwischen Start- und End-Datum"
+"Entfernt alle nicht-reservierten Verfügbarkeiten zwischen Start- und End-Datum"
 
 msgid "Reservation is pending approval"
 msgstr "Diese Reservation wurde noch nicht akzeptiert"
