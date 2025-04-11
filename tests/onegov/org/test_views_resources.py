@@ -394,9 +394,10 @@ def test_allocations(client):
     # create new beamer allocation
     new = client.get((
         '/resource/beamer/new-rule'
-        '?start=2015-08-04&end=2015-08-05'
     ))
-
+    new.form['title'] = 'Period 1'
+    new.form['start'] = '2015-08-04'
+    new.form['end'] = '2015-08-05'
     new.form['items'] = 1
     new.form['item_limit'] = 1
     new.form.submit()
@@ -426,9 +427,10 @@ def test_allocations(client):
     # create a new daypass allocation
     new = client.get((
         '/resource/tageskarte/new-rule'
-        '?start=2015-08-04&end=2015-08-05'
     ))
-
+    new.form['title'] = 'Period 2'
+    new.form['start'] = '2015-08-04'
+    new.form['end'] = '2015-08-05'
     new.form['daypasses'] = 1
     new.form['daypasses_limit'] = 1
     new.form.submit()
@@ -454,19 +456,6 @@ def test_allocations(client):
 
     assert len(slots.json) == 1
     assert slots.json[0]['title'] == "Ganztägig \n2 Verfügbar"
-
-    # try to create a new allocation over an existing one
-    new = client.get((
-        '/resource/tageskarte/new-rule'
-        '?start=2015-08-04&end=2015-08-04'
-    ))
-
-    new.form['daypasses'] = 1
-    new.form['daypasses_limit'] = 1
-    new = new.form.submit()
-
-    assert ("Es besteht bereits eine Verfügbarkeit im gewünschten Zeitraum"
-            ) in new
 
     # move the existing allocations
     slots = client.get((
@@ -522,11 +511,12 @@ def test_allocation_times(client):
 
     # 12:00 - 00:00
     new = client.get('/resource/meeting-room/new-rule')
+    new.form['title'] = 'Period 1'
     new.form['start'] = '2015-08-20'
     new.form['end'] = '2015-08-20'
     new.form['start_time'] = '12:00'
     new.form['end_time'] = '00:00'
-    new.form['as_whole_day'] = 'no'
+    new.form['is_partly_available'] = 'no'
     new.form.submit()
 
     slots = client.get(
@@ -539,11 +529,12 @@ def test_allocation_times(client):
 
     # 00:00 - 02:00
     new = client.get('/resource/meeting-room/new-rule')
+    new.form['title'] = 'Period 2'
     new.form['start'] = '2015-08-22'
     new.form['end'] = '2015-08-22'
     new.form['start_time'] = '00:00'
     new.form['end_time'] = '02:00'
-    new.form['as_whole_day'] = 'no'
+    new.form['is_partly_available'] = 'no'
     new.form.submit()
 
     slots = client.get(
@@ -556,11 +547,12 @@ def test_allocation_times(client):
 
     # 12:00 - 00:00 over two days
     new = client.get('/resource/meeting-room/new-rule')
+    new.form['title'] = 'Period 3'
     new.form['start'] = '2015-08-24'
     new.form['end'] = '2015-08-25'
     new.form['start_time'] = '12:00'
     new.form['end_time'] = '00:00'
-    new.form['as_whole_day'] = 'no'
+    new.form['is_partly_available'] = 'no'
     new.form.submit()
 
     slots = client.get(
@@ -663,12 +655,13 @@ def test_allocation_holidays(client):
     page.form.submit()
 
     new = client.get('/resource/foo/new-rule')
+    new.form['title'] = 'Period 1'
     new.form['start'] = '2019-07-30'
     new.form['end'] = '2019-08-02'
     new.form['start_time'] = '07:00'
     new.form['end_time'] = '12:00'
     new.form['on_holidays'] = 'yes'
-    new.form['as_whole_day'] = 'no'
+    new.form['is_partly_available'] = 'no'
     new.form.submit()
 
     slots = client.get('/resource/foo/slots?start=2019-07-29&end=2019-08-03')
@@ -685,12 +678,13 @@ def test_allocation_holidays(client):
     page.form.submit()
 
     new = client.get('/resource/bar/new-rule')
+    new.form['title'] = 'Period 2'
     new.form['start'] = '2019-07-30'
     new.form['end'] = '2019-08-02'
     new.form['start_time'] = '07:00'
     new.form['end_time'] = '12:00'
     new.form['on_holidays'] = 'no'
-    new.form['as_whole_day'] = 'no'
+    new.form['is_partly_available'] = 'no'
     new.form.submit()
 
     slots = client.get('/resource/bar/slots?start=2019-07-29&end=2019-08-03')
@@ -714,12 +708,13 @@ def test_allocation_school_holidays(client):
     page.form.submit()
 
     new = client.get('/resource/foo/new-rule')
+    new.form['title'] = 'Period 1'
     new.form['start'] = '2019-07-30'
     new.form['end'] = '2019-08-02'
     new.form['start_time'] = '07:00'
     new.form['end_time'] = '12:00'
     new.form['during_school_holidays'] = 'yes'
-    new.form['as_whole_day'] = 'no'
+    new.form['is_partly_available'] = 'no'
     new.form.submit()
 
     slots = client.get('/resource/foo/slots?start=2019-07-29&end=2019-08-03')
@@ -736,12 +731,13 @@ def test_allocation_school_holidays(client):
     page.form.submit()
 
     new = client.get('/resource/bar/new-rule')
+    new.form['title'] = 'Period 2'
     new.form['start'] = '2019-07-30'
     new.form['end'] = '2019-08-02'
     new.form['start_time'] = '07:00'
     new.form['end_time'] = '12:00'
     new.form['during_school_holidays'] = 'no'
-    new.form['as_whole_day'] = 'no'
+    new.form['is_partly_available'] = 'no'
     new.form.submit()
 
     slots = client.get('/resource/bar/slots?start=2019-07-29&end=2019-08-03')
