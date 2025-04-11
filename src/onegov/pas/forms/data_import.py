@@ -7,6 +7,11 @@ from onegov.core.utils import dictionary_to_binary
 from onegov.form import Form
 from onegov.form.fields import UploadMultipleField
 from onegov.pas import _
+from onegov.pas.importer.json_import import (
+    MembershipData,
+    OrganizationData,
+    PersonData
+)
 
 
 from typing import get_type_hints, TYPE_CHECKING
@@ -16,12 +21,6 @@ if TYPE_CHECKING:
 
 
 class DataImportForm(Form):
-
-    from onegov.pas.importer.json_import import (
-        MembershipData,
-        OrganizationData,
-        PersonData
-    )
 
     clean = BooleanField(label=_('Delete data before import'), default=False)
 
