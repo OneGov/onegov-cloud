@@ -315,6 +315,7 @@ def test_find_your_spot_form_single_room():
         ('weekdays', '4'),
         ('on_holidays', 'yes'),
         ('during_school_holidays', 'yes'),
+        ('auto_reserve_available_slots', 'no'),
     ]))
     form = FindYourSpotForm(request.POST)
     form.request = request
@@ -329,9 +330,14 @@ def test_find_your_spot_form_single_room():
     assert form.start_time.data == time(8, 0)
     assert form.end_time.data == time(9, 0)
     assert not form.rooms
+    assert 'for_every_room' not in (
+        value
+        for value, _label in form.auto_reserve_available_slots.choices
+    )
     assert form.weekdays.data == [1, 4]
     assert form.on_holidays.data == 'yes'
     assert form.during_school_holidays.data == 'yes'
+    assert form.auto_reserve_available_slots.data == 'no'
 
 
 def test_find_your_spot_form_multiple_rooms():
@@ -363,6 +369,7 @@ def test_find_your_spot_form_multiple_rooms():
         ('weekdays', '4'),
         ('on_holidays', 'yes'),
         ('during_school_holidays', 'yes'),
+        ('auto_reserve_available_slots', 'for_every_room'),
     ]))
     form = FindYourSpotForm(request.POST)
     form.request = request
@@ -377,6 +384,7 @@ def test_find_your_spot_form_multiple_rooms():
     assert form.weekdays.data == [1, 4]
     assert form.on_holidays.data == 'yes'
     assert form.during_school_holidays.data == 'yes'
+    assert form.auto_reserve_available_slots.data == 'for_every_room'
 
 
 def test_event_form_update_apply():

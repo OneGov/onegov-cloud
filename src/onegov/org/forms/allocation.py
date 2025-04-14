@@ -137,14 +137,15 @@ class AllocationRuleForm(Form):
         label=_('Title'),
         description=_('General availability'),
         validators=[InputRequired()],
-        fieldset=_('Rule'))
+        fieldset=_('Period'))
 
     extend = RadioField(
         label=_('Extend'),
         validators=[InputRequired()],
-        fieldset=_('Rule'),
-        default='daily',
+        fieldset=_('Period'),
+        default='no',
         choices=(
+            ('no', _("Don't extend this availability period automatically")),
             ('daily', _('Extend by one day at midnight')),
             ('monthly', _('Extend by one month at the end of the month')),
             ('yearly', _('Extend by one year at the end of the year'))
@@ -517,7 +518,7 @@ class RoomAllocationForm(AllocationForm):
             ('yes', _('Yes')),
             ('no', _('No'))
         ],
-        default='yes',
+        default='no',
         fieldset=_('Time')
     )
 
@@ -543,8 +544,8 @@ class RoomAllocationForm(AllocationForm):
             ('yes', _('Yes')),
             ('no', _('No'))
         ],
-        default='no',
-        fieldset=_('Options'),
+        default='yes',
+        fieldset=_('Time'),
         depends_on=('as_whole_day', 'no')
     )
 
@@ -554,7 +555,7 @@ class RoomAllocationForm(AllocationForm):
             InputRequired(),
             NumberRange(1, 999)
         ],
-        fieldset=_('Options'),
+        fieldset=_('Time'),
         default=1,
         depends_on=('as_whole_day', 'no', 'is_partly_available', 'no')
     )

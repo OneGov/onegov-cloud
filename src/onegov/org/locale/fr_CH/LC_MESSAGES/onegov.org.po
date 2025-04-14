@@ -2,7 +2,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE 1.0\n"
-"POT-Creation-Date: 2025-04-09 10:41+0200\n"
+"POT-Creation-Date: 2025-04-11 08:49+0200\n"
 "PO-Revision-Date: 2022-03-15 10:50+0100\n"
 "Last-Translator: Marc Sommerhalder <marc.sommerhalder@seantis.ch>\n"
 "Language-Team: French\n"
@@ -113,6 +113,13 @@ msgstr "Manuelle"
 
 msgid "Stripe Connect"
 msgstr "Stripe Connect"
+
+#, python-format
+msgid "Daily Newsletter ${time}"
+msgstr "Newsletter quotidienne ${time}"
+
+msgid "New news since the last newsletter:"
+msgstr "Nouvelles depuis la dernière newsletter :"
 
 #, python-format
 msgid "${org} OneGov Cloud Status"
@@ -279,11 +286,14 @@ msgstr "Titre"
 msgid "General availability"
 msgstr "Disponibilité générale"
 
-msgid "Rule"
-msgstr "Règle"
+msgid "Period"
+msgstr "Période"
 
 msgid "Extend"
 msgstr "Prolonger"
+
+msgid "Don't extend this availability period automatically"
+msgstr "Ne pas prolonger cette période de disponibilité automatiquement"
 
 msgid "Extend by one day at midnight"
 msgstr "Prolonger d'un jour à minuit"
@@ -351,14 +361,14 @@ msgstr "Chacun finissant à"
 msgid "May be partially reserved"
 msgstr "Peut être partiellement réservé"
 
-msgid "Options"
-msgstr "Options"
-
 msgid "Reservations per time slot"
 msgstr "Maximum des reservation par unité des temps"
 
 msgid "Available items"
 msgstr "Articles disponibles"
+
+msgid "Options"
+msgstr "Options"
 
 msgid "Reservations per time slot and person"
 msgstr "Réservations par tranche horaire et par personne"
@@ -1330,6 +1340,21 @@ msgstr "Dernière fin"
 msgid "Rooms"
 msgstr "Espaces"
 
+msgid "Automatically reserve the first available slot"
+msgstr "Réserver automatiquement le premier créneau disponible"
+
+msgid "You will be able to change individual choices"
+msgstr "Vous pourrez modifier les choix"
+
+msgid "Yes, for every selected room and day"
+msgstr "Oui, pour chaque chambre et chaque jour sélectionnés"
+
+msgid "Yes, for every selected day"
+msgstr "Oui, pour chaque jour sélectionné"
+
+msgid "Yes, for the first available selected day"
+msgstr "Oui, pour le premier jour sélectionné disponible"
+
 msgid "Start date in past"
 msgstr "Date de début dans le passé"
 
@@ -2044,6 +2069,31 @@ msgstr ""
 "Envoyer une notification par e-mail aux utilisateurs suivants lorsqu'un "
 "destinataire se désabonne de la newsletter"
 
+msgid "Enable automatic daily newsletters"
+msgstr "Activer les newsletters quotidiennes automatiques"
+
+msgid ""
+"Automatically creates a daily newsletter containing all new news items since "
+"the last sending time. It will only send a newsletter if there is at least "
+"one new news item. Only subscribers who subscribed to the daily newsletter "
+"will receive it, independent of their selected categories if there are any."
+msgstr ""
+"Crée automatiquement une lettre d'information quotidienne contenant tous les "
+"nouveaux articles d'actualités depuis la dernière heure d'envoi. Il n'enverra "
+"une lettre d'information que s'il y a au moins un nouvel article "
+"d'actualités. Seuls les abonnés qui se sont inscrits à la lettre "
+"d'information quotidienne la recevront, indépendamment de leurs catégories "
+"sélectionnées, le cas échéant."
+
+msgid "Automatic newsletters"
+msgstr "Newsletters automatiques"
+
+msgid "Newsletter sending times (24h format)"
+msgstr "Horaires d'envoi de la newsletter (format 24h)"
+
+msgid "Specify times for sending newsletters. e.g., 8, 12, 18."
+msgstr "Spécifiez les heures d'envoi de la newsletter. Par exemple, 8, 12, 18."
+
 msgid "Invalid YAML format. Please refer to the example."
 msgstr "Format YAML non valide. Veuillez vous référer à l'exemple."
 
@@ -2059,6 +2109,16 @@ msgid ""
 msgstr ""
 "Format non valide. Seuls les sujets et les sous-sujets sont autorisés - "
 "aucune structure plus profonde n'est prise en charge."
+
+msgid "Please specify at least one time."
+msgstr "Veuillez spécifier au moins une heure."
+
+msgid "Invalid time format. Please use a value between 0 and 24."
+msgstr ""
+"Format d'heure non valide. Veuillez utiliser une valeur entre 0 et 24."
+
+msgid "Invalid time format. Please use 24h format."
+msgstr "Format d'heure non valide. Veuillez utiliser le format 24h."
 
 msgid "Old domain"
 msgstr "Ancien domaine"
@@ -2259,6 +2319,19 @@ msgstr "Adresse e-mail"
 
 msgid "The subscriber has given consent to receive the newsletter."
 msgstr "L'abonné a donné son consentement pour recevoir la newsletter."
+
+msgid "Daily newsletter for all categories (only for news items)"
+msgstr ""
+"Bulletin d'information quotidien pour toutes les catégories (uniquement pour "
+"les nouvelles)"
+
+#, python-format
+msgid ""
+"If there are any new news items since the last sending time you will receive "
+"the newsletter at the following times: ${joined}:00."
+msgstr ""
+"S'il y a de nouveaux articles d'actualité depuis le dernier envoi, vous "
+"recevrez la newsletter aux heures suivantes : ${joined}:00."
 
 msgid "Submission Window"
 msgstr "Fenêtre de soumission"
@@ -2657,7 +2730,7 @@ msgid "iFrame"
 msgstr "iFrame"
 
 msgid "Find Your Spot"
-msgstr "Rechercher les dates"
+msgstr "Rechercher les dates / Réservations récurrentes"
 
 msgid "E-Mail Recipient"
 msgstr "Destinataire de l'e-mail"
@@ -2693,8 +2766,11 @@ msgstr "Occupation"
 msgid "Subscribe"
 msgstr "Souscrire"
 
-msgid "Rules"
-msgstr "Règles"
+msgid "Availability periods"
+msgstr "Périodes de disponibilité"
+
+msgid "Availability period"
+msgstr "Période de disponibilité"
 
 msgid "Edit allocation"
 msgstr "Modifier l'allocation"
@@ -3203,8 +3279,8 @@ msgstr "Refuser ${title} est irréversible."
 msgid "Reject reservation"
 msgstr "Refuser la réservation"
 
-#.
 #. Used in sentence: "${event} published."
+#.
 msgid "Event"
 msgstr "Événement"
 
@@ -3421,8 +3497,8 @@ msgstr ""
 msgid "Summary"
 msgstr "Sommaire"
 
-msgid "No rules defined."
-msgstr "Aucune règle définie."
+msgid "No availability periods defined."
+msgstr "Aucune période de disponibilité définie."
 
 msgid ""
 "Api keys can be used to ensure you're not being rate limited. They are not "
@@ -3582,8 +3658,8 @@ msgid ""
 "filled-out form."
 msgstr ""
 "Veuillez vérifier vos données et appuyez sur « Compléter » pour finaliser le "
-"processus. S'il y a quelque chose que vous souhaitez modifier, cliquez sur "
-"« Modifier » pour retourner sur le formulaire complété."
+"processus. S'il y a quelque chose que vous souhaitez modifier, cliquez sur « "
+"Modifier » pour retourner sur le formulaire complété."
 
 msgid ""
 "The image shown in the list view is a square. To have your image shown fully "
@@ -3633,6 +3709,26 @@ msgstr ""
 "plus d'un créneau horaire ou d'une salle pour un jour donné, vous pouvez "
 "maintenir enfoncée l'une des touches Shift, Alt ou Ctrl tout en cliquant sur "
 "les créneaux horaires que vous souhaitez réserver."
+
+#. Canonical text for ${and_rooms} is: "and rooms"
+msgid ""
+"We were unable to reserve some slots matching your criteria for the "
+"following dates${and_rooms}, please note that some of those dates may still "
+"have one or more available slots that are either shorter or longer than your "
+"selected duration. ${dates}"
+msgstr ""
+"Nous n'avons pas pu réserver certains créneaux correspondant à vos critères "
+"pour les dates${and_rooms} suivantes. Veuillez noter que certaines de ces "
+"dates peuvent encore avoir un ou plusieurs créneaux disponibles qui sont "
+"soit plus courts, soit plus longs que la durée que vous avez choisie. "
+"${dates}"
+
+#. Used in sentence: "We were unable to reserve some slots matching your
+#. criteria for the following dates${and_rooms}, please note that some of those
+#. dates may still have one or more available slots that are either shorter or
+#. longer than your selected duration. ${dates}"
+msgid "and rooms"
+msgstr " et chambres"
 
 msgid "Unavailable"
 msgstr "Indisponible"
@@ -4782,15 +4878,23 @@ msgid "Reservations must be made at least ${n} hours in advance."
 msgstr ""
 "Les réservations doivent être effectuées au moins ${n} heures à l'avance."
 
-msgid "Select a free time span in the calendar below to create an allocation."
+msgid ""
+"Select a free time span in the calendar to create an availability period."
 msgstr ""
-"Sélectionnez un intervalle de temps libre dans le calendrier ci-dessous pour "
-"créer une allocation."
+"Sélectionnez une période libre dans le calendrier pour créer une période de "
+"disponibilité."
 
-msgid "Removes all unreserved allocations between the start and end date."
+msgid ""
+"Removes all unreserved allocations between the start and end date. This "
+"includes allocations that were created by using an availability period. To "
+"recreate these allocations, click on \"edit\" in the availability period and "
+"then \"save\" without changing anything."
 msgstr ""
-"Supprime toutes les allocation non réservées entre la date de début et de "
-"fin."
+"Supprime toutes les allocations non réservées entre la date de début et la "
+"date de fin. Cela inclut les allocations qui ont été créées en utilisant une "
+"période de disponibilité. Pour recréer ces allocations, cliquez sur "
+"\"éditer\" dans la période de disponibilité, puis \"enregistrer\" sans rien "
+"changer."
 
 msgid "Reservation is pending approval"
 msgstr "La réservation est en attente d'approbation"
@@ -5150,70 +5254,75 @@ msgstr "Arrêter"
 msgid "Do you really want to stop \"${title}\"?"
 msgstr "Voulez-vous vraiment arrêter \"${title}\" ?"
 
-msgid "The rule will be removed without affecting existing allocations."
-msgstr "La règle sera supprimée sans affecter les allocations existantes."
+msgid ""
+"The availability period will be removed without affecting existing "
+"allocations."
+msgstr ""
+"Le délai de disponibilité sera supprimé sans affecter les allocations "
+"existantes."
 
-msgid "Stop rule"
-msgstr "Arrêter la règle"
+msgid "Stop availability period"
+msgstr "Arrêter la période de disponibilité"
 
 msgid ""
-"All allocations created by the rule will be removed, if they haven't been "
-"reserved yet."
+"All allocations created by the availability period will be removed, if they "
+"haven't been reserved yet."
 msgstr ""
-"Toutes les allocations créées par la règle seront supprimées si elles n'ont "
-"pas encore été réservées."
+"Les allocations créées par la période de disponibilité seront supprimées, si "
+"elles n'ont pas encore été réservées."
 
-msgid "Delete rule"
-msgstr "Supprimer la règle"
-
-msgid "No allocations to add"
-msgstr "Aucune allocation à ajouter"
-
-#, python-format
-msgid "Successfully added ${n} allocations"
-msgstr "${n} dotations ajoutées avec succès"
-
-msgid "New allocation"
-msgstr "Nouvelle allocation"
+msgid "Delete availability period"
+msgstr "Supprimer la période de disponibilité"
 
 msgid "Your changes were saved"
 msgstr "Vos modifications ont été enregistrées"
 
 #, python-format
-msgid "New rule active, ${n} allocations created"
-msgstr "Nouvelle règle active, ${n} allocations créées"
+msgid "New availability period active, ${n} allocations created"
+msgstr "Nouvelle période de disponibilité active, ${n} allocations créées"
 
-msgid "New Rule"
-msgstr "Nouvelle règle"
+msgid "New availabilty period"
+msgstr "Nouvelle période de disponibilité"
 
 msgid ""
-"Rules ensure that the allocations between start/end exist and that they are "
-"extended beyond those dates at the given intervals. "
+"Availability periods ensure that the allocations between start/end exist and "
+"that they are extended beyond those dates at the given intervals."
 msgstr ""
-"Les règles garantissent que les allocations entre le début et la fin "
-"existent et qu'elles sont prolongées au-delà de ces dates à des intervalles "
-"donnés."
+"Les périodes de disponibilité garantissent que les allocations entre le "
+"début et la fin existent et qu'elles sont prolongées au-delà de ces dates "
 
 #, python-format
 msgid ""
-"Rule updated. ${deleted} allocations removed, ${created} new allocations "
-"created."
+"Availability period updated. ${deleted} allocations removed, ${created} new "
+"allocations created."
 msgstr ""
-"La règle a été mise à jour. ${deleted} allocations supprimées, ${created} "
+"Disponibilité mise à jour. ${deleted} allocations supprimées, ${created} "
 "nouvelles allocations créées."
 
-msgid "Rule not found"
-msgstr "Règle non trouvée"
+msgid "Availability period not found"
+msgstr "Période de disponibilité introuvable"
 
-msgid "Edit Rule"
-msgstr "Modifier la règle"
+msgid "Edit availabilty period"
+msgstr "Modifier la période de disponibilité"
 
-msgid "The rule was stopped"
-msgstr "La règle a été arrêtée"
+msgid ""
+"Availability periods create availabilities between the specified start and "
+"end date. The availability period should ideally last until the next time "
+"the availabilities are expected to change. For example, a school term or a "
+"school year."
+msgstr ""
+"Les périodes de disponibilité créent des disponibilités entre la date de "
+"début et la date de fin spécifiées. La période de disponibilité doit "
+"normalement durer jusqu'à la prochaine fois que les disponibilités sont "
+"censées changer. Par exemple, un trimestre scolaire ou une année scolaire."
+
+msgid "The availability period was stopped"
+msgstr "La période de disponibilité a été arrêtée"
 
 #, python-format
-msgid "The rule was deleted, along with ${n} allocations"
-msgstr "La règle a été supprimée, avec les allocations ${n}"
+msgid "The availability period was deleted, along with ${n} allocations"
+msgstr ""
+"La période de disponibilité a été supprimée, ainsi que ${n} allocations"
 
 msgid "Topics A-Z"
 msgstr "Sujets de A à Z"
@@ -6621,3 +6730,85 @@ msgstr "Un compte a été créé pour vous"
 
 msgid "The user was created successfully"
 msgstr "L'utilisateur a bien été créé"
+
+#~ msgid ""
+#~ "Select a free time span in the calendar below to create an allocation."
+#~ msgstr ""
+#~ "Sélectionnez un intervalle de temps libre dans le calendrier ci-dessous "
+#~ "pour créer une allocation."
+
+#~ msgid "Rule"
+#~ msgstr "Règle"
+
+#~ msgid "No rules defined."
+#~ msgstr "Aucune règle définie."
+
+#~ msgid "Rule not found"
+#~ msgstr "Règle non trouvée"
+
+#~ msgid "The rule was stopped"
+#~ msgstr "La règle a été arrêtée"
+
+#~ msgid "Rules"
+#~ msgstr "Règles"
+
+#~ msgid "Removes all unreserved allocations between the start and end date."
+#~ msgstr ""
+#~ "Supprime toutes les allocation non réservées entre la date de début et de "
+#~ "fin."
+
+#~ msgid "Delete rule"
+#~ msgstr "Supprimer la règle"
+
+#~ msgid "No allocations to add"
+#~ msgstr "Aucune allocation à ajouter"
+
+#, python-format
+#~ msgid "Successfully added ${n} allocations"
+#~ msgstr "${n} dotations ajoutées avec succès"
+
+#~ msgid "New allocation"
+#~ msgstr "Nouvelle allocation"
+
+#, python-format
+#~ msgid "New rule active, ${n} allocations created"
+#~ msgstr "Nouvelle règle active, ${n} allocations créées"
+
+#~ msgid "New Rule"
+#~ msgstr "Nouvelle règle"
+
+#~ msgid ""
+#~ "Rules ensure that the allocations between start/end exist and that they "
+#~ "are extended beyond those dates at the given intervals. "
+#~ msgstr ""
+#~ "Les règles garantissent que les allocations entre le début et la fin "
+#~ "existent et qu'elles sont prolongées au-delà de ces dates à des "
+#~ "intervalles donnés."
+
+#, python-format
+#~ msgid ""
+#~ "Rule updated. ${deleted} allocations removed, ${created} new allocations "
+#~ "created."
+#~ msgstr ""
+#~ "La règle a été mise à jour. ${deleted} allocations supprimées, ${created} "
+#~ "nouvelles allocations créées."
+
+#~ msgid "Edit Rule"
+#~ msgstr "Modifier la règle"
+
+#, python-format
+#~ msgid "The rule was deleted, along with ${n} allocations"
+#~ msgstr "La règle a été supprimée, avec les allocations ${n}"
+
+#~ msgid "The rule will be removed without affecting existing allocations."
+#~ msgstr "La règle sera supprimée sans affecter les allocations existantes."
+
+#~ msgid "Stop rule"
+#~ msgstr "Arrêter la règle"
+
+#~ msgid ""
+#~ "All allocations created by the rule will be removed, if they haven't been "
+#~ "reserved yet."
+#~ msgstr ""
+#~ "Toutes les allocations créées par la règle seront supprimées si elles "
+#~ "n'ont pas encore été réservées."

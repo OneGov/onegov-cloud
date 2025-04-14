@@ -219,6 +219,8 @@ def handle_newsletters(
         if not recipient:
             recipient = recipients.add(address=form.address.data)
             recipient.subscribed_categories = subscribed
+            recipient.daily_newsletter = form.daily_newsletter.data if (
+                form.daily_newsletter) else False
             unsubscribe_link = (
                 request.link(recipient.subscription, 'unsubscribe'))
 
@@ -281,6 +283,8 @@ def handle_newsletters(
         # update subscribed categories
         else:
             recipient.subscribed_categories = subscribed
+            recipient.daily_newsletter = form.daily_newsletter.data if (
+            form.daily_newsletter) else False
             request.success(
                 request.translate(_(
                     (
@@ -494,6 +498,7 @@ def send_newsletter(
     newsletter: Newsletter,
     recipients: Iterable[Recipient],
     is_test: bool = False,
+    daily: bool = False,
     layout: DefaultMailLayout | None = None
 ) -> int:
     layout = layout or DefaultMailLayout(newsletter, request)
@@ -526,8 +531,9 @@ def send_newsletter(
     def email_iter() -> Iterator[EmailJsonDict]:
         nonlocal count
         for recipient in recipients:
-            if not request.app.org.newsletter_categories:
-                # no categories defined, send to all recipients
+            if not request.app.org.newsletter_categories or daily:
+                # no categories defined or automated daily newsletter, send to
+                # all recipients
                 pass
             else:
                 recipient_categories = recipient.subscribed_categories or []

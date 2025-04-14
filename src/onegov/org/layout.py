@@ -2283,7 +2283,7 @@ class ResourceLayout(DefaultLayout):
                     attrs={'class': 'subscribe-link'}
                 ),
                 Link(
-                    text=_('Rules'),
+                    text=_('Availability periods'),
                     url=self.request.link(self.model, 'rules'),
                     attrs={'class': 'rule-link'}
                 ),
@@ -2318,7 +2318,7 @@ class AllocationRulesLayout(ResourceLayout):
             Link(_('Homepage'), self.homepage_url),
             Link(_('Reservations'), self.request.link(self.collection)),
             Link(_(self.model.title), self.request.link(self.model)),
-            Link(_('Rules'), '#')
+            Link(_('Availability periods'), '#')
         ]
 
     @cached_property
@@ -2328,7 +2328,7 @@ class AllocationRulesLayout(ResourceLayout):
                 title=_('Add'),
                 links=[
                     Link(
-                        text=_('Rule'),
+                        text=_('Availability period'),
                         url=self.request.link(
                             self.model,
                             name='new-rule'
@@ -2777,6 +2777,12 @@ class NewsletterLayout(DefaultLayout):
                     text=_('Subscribers'),
                     url=self.request.link(self.recipients),
                     attrs={'class': 'manage-subscribers'}
+                ),
+                Link(
+                    text=_('Settings'),
+                    url=self.request.link(
+                        self.request.app.org, 'newsletter-settings'),
+                    attrs={'class': 'settings-link'}
                 ),
                 LinkGroup(
                     title=_('Add'),
