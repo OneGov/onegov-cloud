@@ -2,7 +2,8 @@ from __future__ import annotations
 
 from collections import OrderedDict
 
-from markupsafe import escape
+from markupsafe import Markup
+
 
 from onegov.activity import PeriodCollection
 from onegov.core.elements import BackLink
@@ -183,7 +184,7 @@ def handle_send_notification(
     variables = TemplateVariables(request, period)
     layout = NotificationTemplateLayout(self, request)
 
-    subject = variables.render(escape(self.subject))
+    subject = variables.render(Markup(self.subject))  # nosec: B704
     message = variables.render(sanitize_html(self.text))
 
     if form.submitted(request):
