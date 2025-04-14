@@ -72,6 +72,7 @@ $ticket-files-icon: '\f019';
 $qr-code-icon: '\f029';
 $results-icon: '\f682';
 $trash-restore-icon: '\f829';
+$settings-icon: '\f1de';
 
 #header {
     background: $smoke;
@@ -460,7 +461,8 @@ $editbar-fg-color-active: $white;
     margin-bottom: 2px;
     margin-top: -2px;
 
-    .is-dropdown-submenu-parent > a {
+    li.is-dropdown-submenu-parent > a {
+        padding-top: .9rem !important;
     }
 
     li {
@@ -574,6 +576,7 @@ $editbar-fg-color-active: $white;
     .qr-code-link::before { @include icon-bold($qr-code-icon); }
     .results-link::before { @include icon-bold($results-icon); }
     .undo-link::before { @include icon-bold($trash-restore-icon); }
+    .settings-link::before { @include icon-bold($settings-icon); }
 }
 
 

@@ -366,7 +366,7 @@
     </div>
     <div tal:define="phone user.data.get('phone')" tal:condition="phone">
         <dt i18n:translate>Phone</dt>
-        <dd><a href="tel:${phone}">${phone}</a></dd>
+        <dd><a href="tel:${layout.format_phone_number(phone)}">${layout.format_phone_number(phone)}</a></dd>
     </div>
 </metal:b>
 
@@ -565,7 +565,7 @@
             </tal:b>
             <tal:b condition="'phone' in public">
                 <li class="organiser-phone" tal:condition="organiser.data.phone|nothing">
-                    <a href="tel:${organiser.data.phone}">${organiser.data.phone}</a>
+                    <a href="tel:${layout.format_phone_number(organiser.data.phone)}">${layout.format_phone_number(organiser.data.phone)}</a>
                 </li>
             </tal:b>
             <tal:b condition="'website' in public">
@@ -1119,3 +1119,12 @@
         <a class="button hollow" href="${activities_link}" i18n:translate="">All activities</a>
     </div>
 </metal:activities>
+
+<metal:banner define-macro="banner" i18n:domain="onegov.feriennet">
+    <div class="sponsor-banner ${position}">
+        <a href="${banner.url}" class="banner-${position}">
+            <img src="${banner.src}">
+            <p class="banner-info">${banner.info}</p>
+        </a>
+    </div>
+</metal:banner>

@@ -1670,6 +1670,7 @@ $ticket-files-icon: '\f019';
 $qr-code-icon: '\f029';
 $envelope-icon: '\f0e0';
 $results-icon: '\f080';
+$settings-icon: '\f1de';
 $editbar-bg-color: $topbar-link-bg-hover;
 
 .edit-bar {
@@ -1811,6 +1812,7 @@ $editbar-bg-color: $topbar-link-bg-hover;
     .envelope::before { @include icon($envelope-icon); }
     .internal-link::before { @include icon($internal-link-icon); }
     .results-link::before { @include icon($results-icon); }
+    .settings-link::before { @include icon($settings-icon); }
 }
 
 .mark-as-paid::before { @include icon($mark-as-paid); }
@@ -2481,12 +2483,8 @@ $person-email-icon: '\f003';
         margin-bottom: 1em;
     }
 
-    .person-card-organisation {
+    :nth-last-child(1 of .person-card-organisation) {
         margin-bottom: 1em;
-
-        span:not(:last-child)::after {
-            content: ' -';
-        }
     }
 
     .person-card-personal {
@@ -4046,7 +4044,11 @@ ul.search-results {
     .button {
         border-radius: 3px;
         display: block;
-        margin: 0;
+        margin-left: 0;
+
+        &:last-of-type {
+            margin-bottom: 0;
+        }
     }
 
     .failed {
@@ -4095,6 +4097,7 @@ ul.search-results {
     }
 
     a,
+    .reservation-resource,
     .reservation-time,
     .reservation-price {
         display: block;
@@ -4117,6 +4120,7 @@ ul.search-results {
             width: 24px;
         }
 
+        .reservation-resource,
         .reservation-time,
         .reservation-price {
             margin-left: 2.3rem;
@@ -6831,3 +6835,35 @@ a#results {
 }
 
 
+/*
+    Code Block, Code Inline, Code
+
+    <pre><code>...</code></pre>
+*/
+
+$code-background: #f5f5f5;
+$code-border-radius: 4px;
+$code-padding-block: 0.5rem;
+$code-padding-inline: 0.125rem;
+$code-block-margin-bottom: 0.8rem;
+
+pre code,
+.code-block,
+.code-inline,
+code {
+    background: $code-background;
+    border-radius: $code-border-radius;
+}
+
+pre code,
+.code-block {
+    padding: $code-padding-block;
+    margin-bottom: $code-block-margin-bottom;
+    display: block;
+}
+
+.code-inline,
+code {
+    padding: $code-padding-inline;
+    display: inline;
+}

@@ -11,6 +11,10 @@
                 </p>
             </tal:b>
 
+            <tal:b define="banner layout.app.banners(request)[0]" condition="banner">
+                <tal:b metal:use-macro="layout.macros['banner']" define="position 'rechnungen'"/>
+            </tal:b>
+
             <div class="bills limit-line-width" tal:condition="invoices">
                 <div class="bill item-wrapper ${invoice.paid and 'item-green' or 'item-red'}" id="${invoice.id}" tal:repeat="invoice invoices">
                     <div class="bill-header show-for-print">

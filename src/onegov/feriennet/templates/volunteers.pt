@@ -12,7 +12,7 @@
 
                 <tal:b repeat="activity_group grouped(records, 'activity_id')">
                     <div class="occasion">
-                        <h2 class="title">    
+                        <h2 class="title">
                             <a href="${activity_link(activity_group[0].activity_name)}">${activity_group[0].activity_title}</a>
                         </h2>
 

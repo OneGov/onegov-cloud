@@ -1,6 +1,6 @@
 from __future__ import annotations
 
-from functools import cached_property
+import re
 from onegov.core.utils import is_valid_yubikey_format
 from onegov.directory.models.directory import Directory
 from onegov.form import Form, merge_forms
@@ -9,12 +9,10 @@ from onegov.form.fields import ChosenSelectMultipleField
 from onegov.form.fields import TagsField
 from onegov.form.filters import yubikey_identifier
 from onegov.org import _
-from onegov.org.utils import ticket_directory_groups
 from onegov.ticket import handlers
-from onegov.user import User
-from onegov.ticket import TicketPermission
+from onegov.user import User, UserGroup
+from onegov.ticket import Ticket, TicketPermission
 from onegov.user import UserCollection
-from re import match
 from wtforms.fields import BooleanField
 from wtforms.fields import EmailField
 from wtforms.fields import RadioField
@@ -27,7 +25,6 @@ from wtforms.validators import ValidationError
 from typing import TYPE_CHECKING
 if TYPE_CHECKING:
     from onegov.org.request import OrgRequest
-    from onegov.user import UserGroup
     from wtforms.fields.choices import _Choice
 
 
@@ -37,6 +34,8 @@ AVAILABLE_ROLES = [
     ('supporter', _('Supporter')),
     ('member', _('Member')),
 ]
+
+TICKET_PERMISSION_RE = re.compile(r'(?P<handler>[^-]+)(?:-(?P<group>.+))?')
 
 
 class ManageUserForm(Form):
@@ -199,43 +198,73 @@ class ManageUserGroupForm(Form):
         choices=[],
     )
 
-    directories = ChosenSelectMultipleField(
-        label=_('Directories'),
-        choices=[],
-        description=_(
-            'Directories for which this user group is responsible. '
-            'If activated, ticket notifications for this group are '
-            'only sent for these directories'
+    immediate_notification = ChosenSelectMultipleField(
+        label=_(
+            'Immediate e-mail notification to members upon ticket submission'
         ),
+        choices=[],
     )
 
-    @cached_property
-    def get_dirs(self) -> tuple[str, ...]:
-        return tuple(ticket_directory_groups(self.request.session))
-
     def on_request(self) -> None:
-        if not self.get_dirs:
-            self.hide(self.directories)
-        else:
-            self.directories.choices = [(d, d) for d in self.get_dirs]
-
         self.users.choices = [
             (str(u.id), u.title)
             for u in UserCollection(self.request.session).query()
         ]
         ticket_choices: list[_Choice] = [
-            (f'{key}-', key)
+            (key, key)
             for key in handlers.registry.keys()
         ]
         ticket_choices.extend(
-            (f'FRM-{form.title}', f'FRM: {form.title}')
-            for form in self.request.session.query(FormDefinition)
+            (f'DIR-{group}', f'DIR: {group}')
+            for group, in self.request.session.query(
+                Directory.title.label('group')
+            # some groups may get deleted, but as long as there are tickets
+            # we need a corresponding permission
+            ).union(
+                self.request.session.query(
+                    Ticket.group.label('group')
+                )
+                .filter(Ticket.handler_code == 'DIR')
+                .filter(Ticket.group.isnot(None))
+                .distinct()
+            ).order_by('group').distinct()
         )
         ticket_choices.extend(
-            (f'DIR-{dir.title}', f'DIR: {dir.title}')
-            for dir in self.request.session.query(Directory)
+            (f'FRM-{group}', f'FRM: {group}')
+            for group, in self.request.session.query(
+                FormDefinition.title.label('group')
+            # some groups may get deleted, but as long as there are tickets
+            # we need a corresponding permission
+            ).union(
+                self.request.session.query(Ticket.group.label('group'))
+                .filter(Ticket.handler_code == 'FRM')
+                .filter(Ticket.group.isnot(None))
+                .distinct()
+            ).order_by('group').distinct()
         )
-        self.ticket_permissions.choices = sorted(ticket_choices)
+        ticket_choices.sort()
+        self.ticket_permissions.choices = ticket_choices
+        if isinstance(self.immediate_notification, ChosenSelectMultipleField):
+            self.immediate_notification.choices = ticket_choices[:]
+
+    @property
+    def exclusive_permissions(self) -> set[tuple[str, str | None]]:
+        return {
+            (match.group(1), match.group(2))
+            for permission in self.ticket_permissions.data or ()
+            if (match := TICKET_PERMISSION_RE.match(permission))
+        }
+
+    @property
+    def immediate_notifications(self) -> set[tuple[str, str | None]]:
+        if not isinstance(self.immediate_notification.data, list):
+            return set()
+
+        return {
+            (match.group(1), match.group(2))
+            for permission in self.immediate_notification.data
+            if (match := TICKET_PERMISSION_RE.match(permission))
+        }
 
     def update_model(self, model: UserGroup) -> None:
         session = self.request.session
@@ -259,26 +288,43 @@ class ManageUserGroupForm(Form):
         else:
             model.users = []  # type:ignore[assignment]
 
+        exclusive_permissions = self.exclusive_permissions
+        immediate_notifications = self.immediate_notifications
+        missing = exclusive_permissions | immediate_notifications
+
         # Update ticket permissions
         # FIXME: backref across module boundaries
         assert hasattr(model, 'ticket_permissions')
+        permissions = []
+        permission: TicketPermission
         for permission in model.ticket_permissions:
-            session.delete(permission)
-        for permission in self.ticket_permissions.data or ():
-            match_ = match(r'(.[^-]*)-(.*)', permission)
-            if match_:
-                handler_code, group = match_.groups()
-                session.add(
-                    TicketPermission(
-                        handler_code=handler_code,
-                        group=group or None,
-                        user_group=model
-                    )
-                )
-        # initialize meta field with empty dict
-        if not model.meta:
-            model.meta = {}
-        model.meta['directories'] = self.directories.data
+            key = (permission.handler_code, permission.group)
+            exclusive = key in exclusive_permissions
+            notification = key in immediate_notifications
+            if not exclusive and not notification:
+                # no permission object should exist
+                session.delete(permission)
+                continue
+
+            # so we don't add this permission twice
+            missing.discard(key)
+            permission.exclusive = exclusive
+            permission.immediate_notification = notification
+            permissions.append(permission)
+
+        for key in missing:
+            handler_code, group = key
+            permission = TicketPermission(
+                handler_code=handler_code,
+                group=group or None,
+                user_group=model,
+                exclusive=key in exclusive_permissions,
+                immediate_notification=key in immediate_notifications,
+            )
+            session.add(permission)
+            permissions.append(permission)
+
+        model.ticket_permissions = permissions
 
     def apply_model(self, model: UserGroup) -> None:
         self.name.data = model.name
@@ -286,9 +332,15 @@ class ManageUserGroupForm(Form):
         # FIXME: backref across module boundaries
         assert hasattr(model, 'ticket_permissions')
         self.ticket_permissions.data = [
-            f'{permission.handler_code}-{permission.group or ""}'
+            f'{permission.handler_code}-{permission.group}'
+            if permission.group else permission.handler_code
             for permission in model.ticket_permissions
+            if permission.exclusive
         ]
-
-        if model.meta:
-            self.directories.data = model.meta.get('directories', '')
+        if isinstance(self.immediate_notification, ChosenSelectMultipleField):
+            self.immediate_notification.data = [
+                f'{permission.handler_code}-{permission.group}'
+                if permission.group else permission.handler_code
+                for permission in model.ticket_permissions
+                if permission.immediate_notification
+            ]

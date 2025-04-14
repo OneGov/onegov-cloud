@@ -36,6 +36,7 @@ a > h6 {
 .event-settings,
 .chat-settings,
 .api-keys,
+.vat-settings,
 .gever-credentials,
 .grid-x.field-geo_provider,
 .grid-x.field-about_url,
@@ -48,6 +49,13 @@ a > h6 {
 #fieldset-fourth-partner {
     display: none;
 }
+
+/*
+    hide ticket achiving options
+*/
+    .archive-tickets, .ticket-archive {
+        display: none !important;
+    }
 
 /*
     registration on homepage

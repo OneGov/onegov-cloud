@@ -6,7 +6,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: OneGov Cloud 1.0\n"
-"POT-Creation-Date: 2025-03-11 16:15+0100\n"
+"POT-Creation-Date: 2025-03-20 14:18+0100\n"
 "PO-Revision-Date: 2021-03-03 16:24+0100\n"
 "Last-Translator: Lukas Burkhard <lukas.burkhard@seantis.ch>\n"
 "Language-Team: German\n"
@@ -933,7 +933,7 @@ msgid "Disbursed"
 msgstr "Ausbezahlt"
 
 msgid "Find Your Spot"
-msgstr "Terminsuche"
+msgstr "Terminsuche / Serienreservation"
 
 msgid "Access"
 msgstr "Zugriff"
@@ -1529,6 +1529,13 @@ msgstr "Ticket aus dem Archiv geholt."
 msgid "Ticket uploaded to Gever."
 msgstr "Ticket zu Gever hochgeladen."
 
+msgid ""
+"You have exceeded the maximum number of unique accesses to protected "
+"resources. Please try again at a later date."
+msgstr ""
+"Sie haben die maximale Anzahl an Zugriffen auf geschützte Inhalte "
+"überschritten. Bitte versuchen Sie es zu einem späteren Zeitpunkt wieder."
+
 msgid "Your search returned no results."
 msgstr "Zu Ihrer Suche wurde nichts gefunden."
 
@@ -1793,12 +1800,12 @@ msgstr "Reservationen müssen mindestens ${n} Stunden im Voraus gemacht werden."
 
 msgid "Select a free time span in the calendar below to create an allocation."
 msgstr ""
-"Wählen Sie eine freie Zeitspanne im Kalender aus um eine Einteilung zu "
+"Wählen Sie eine freie Zeitspanne im Kalender aus um eine Verfügbarkeit zu "
 "machen."
 
 msgid "Removes all unreserved allocations between the start and end date."
 msgstr ""
-"Entfernt alle nicht-reservierten Einteilungen zwischen Start- und End-Datum"
+"Entfernt alle nicht-reservierten Verfügbarkeiten zwischen Start- und End-Datum"
 
 msgid "Reservation is pending approval"
 msgstr "Diese Reservation wurde noch nicht akzeptiert"
@@ -2238,6 +2245,9 @@ msgstr ""
 
 msgid "Push Notification Overview"
 msgstr "Übersicht Push-Benachrichtigungen"
+
+msgid "Value Added Tax"
+msgstr "Mehrwertsteuer"
 
 msgid "New Note"
 msgstr "Neue Notiz"

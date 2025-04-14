@@ -547,7 +547,7 @@ def test_organiser_info(client, scenario):
     contact.form['zip_code'] = '20001'
     contact.form['place'] = 'Washington'
     contact.form['email'] = 'editors-association@example.org'
-    contact.form['phone'] = '+41 23 456 789'
+    contact.form['phone'] = '+41234567890'
     contact.form['website'] = 'https://www.example.org'
     contact.form['emergency'] = '+01 234 56 78 (Peter)'
     contact.form.submit()
@@ -598,28 +598,28 @@ def test_organiser_info(client, scenario):
     assert "Admins Association" not in page
     assert "Washington" in page
     assert "editors-association@example.org" not in page
-    assert "+41 23 456 789" not in page
+    assert "+41 23 456 78 90" not in page
     assert "https://www.example.org" not in page
 
     page = with_public_organiser_data(['email'])
     assert "Admins Association" not in page
     assert "Washington" not in page
     assert "editors-association@example.org" in page
-    assert "+41 23 456 789" not in page
+    assert "+41 23 456 78 90" not in page
     assert "https://www.example.org" not in page
 
     page = with_public_organiser_data(['phone'])
     assert "Admins Association" not in page
     assert "Washington" not in page
     assert "editors-association@example.org" not in page
-    assert "+41 23 456 789" in page
+    assert "+41 23 456 78 90" in page
     assert "https://www.example.org" not in page
 
     page = with_public_organiser_data(['website'])
     assert "Admins Association" not in page
     assert "Washington" not in page
     assert "editors-association@example.org" not in page
-    assert "+41 23 456 789" not in page
+    assert "+41 23 456 78 90" not in page
     assert "https://www.example.org" in page
 
 

@@ -17,6 +17,7 @@ from onegov.reservation import Resource, ResourceCollection
 from onegov.ticket import TicketCollection
 from openpyxl import load_workbook
 from pathlib import Path
+from sqlalchemy.orm.session import close_all_sessions
 from unittest.mock import patch
 from webtest import Upload
 
@@ -87,30 +88,59 @@ def test_resources(client):
     assert 'Beamer' in resource
     edit = resource.click('Bearbeiten')
     edit.form['title'] = 'Beamers'
-    edit.form.submit().follow()
+    edit.form.submit()
 
     new = resources.click('Raum')
-    new.form['title'] = 'Meeting Room'
+    new.form['title'] = 'Meeting Room 1'
+    new.form['group'] = 'Office'
+    new.form['subgroup'] = 'Big Meeting Room'
     resource = new.form.submit().follow()
 
     assert 'calendar' in resource
-    assert 'Meeting Room' in resource
+    assert 'Meeting Room 1' in resource
 
     edit = resource.click('Bearbeiten')
-    edit.form['title'] = 'Besprechungsraum'
+    edit.form['title'] = 'Besprechungsraum 1'
     edit.form.submit()
 
+    new = resources.click('Raum')
+    new.form['title'] = 'Meeting Room 2'
+    new.form['group'] = 'Office'
+    new.form['subgroup'] = 'Big Meeting Room'
+    resource = new.form.submit()
+
+    new = resources.click('Raum')
+    new.form['title'] = 'Meeting Room 3'
+    new.form['group'] = 'Office'
+    new.form['subgroup'] = 'Big Meeting Room'
+    resource = new.form.submit()
+
+    # name collisions between titles and subgroups are fine
+    new = resources.click('Raum')
+    new.form['title'] = 'Big Meeting Room'
+    new.form['group'] = 'Office'
+    resource = new.form.submit()
+
+    new = resources.click('Raum')
+    new.form['title'] = 'Concert Hall'
+    resource = new.form.submit()
+
     resources = client.get('/resources')
-    assert 'Besprechungsraum' in resources
+    assert 'Besprechungsraum 1' in resources
+    assert 'Meeting Room 2' in resources
+    assert 'Meeting Room 3' in resources
+    assert 'Big Meeting Room' in resources
+    assert 'Office' in resources
+    assert 'Allgemein' in resources
     assert 'Beamers' in resources
 
     # Check warning duplicate
     duplicate = resources.click('Raum')
-    duplicate.form['title'] = 'Meeting Room'
+    duplicate.form['title'] = 'Meeting Room 1'
     page = new.form.submit()
     assert "Eine Resource mit diesem Namen existiert bereits" in page
 
-    resource = client.get('/resource/meeting-room')
+    resource = client.get('/resource/meeting-room-1')
     delete_link = resource.pyquery('a.delete-link').attr('ic-delete-from')
 
     assert client.delete(delete_link, status=200)
@@ -283,6 +313,147 @@ def test_find_your_spot(client):
     assert '05.01.2020' in result
     assert '06.01.2020' in result
 
+    # create a blocked and an unblocked allocation
+    transaction.begin()
+
+    scheduler_1 = (
+        ResourceCollection(client.app.libres_context)
+        .by_name('meeting-1')
+        .get_scheduler(client.app.libres_context)
+    )
+    scheduler_1.allocate(
+        dates=(
+            (datetime(2020, 1, 1), datetime(2020, 1, 1)),
+            (datetime(2020, 1, 2), datetime(2020, 1, 2)),
+            (datetime(2020, 1, 3), datetime(2020, 1, 3)),
+            (datetime(2020, 1, 4), datetime(2020, 1, 4)),
+        ),
+        whole_day=True,
+        partly_available=True
+    )
+
+    scheduler_2 = (
+        ResourceCollection(client.app.libres_context)
+        .by_name('meeting-2')
+        .get_scheduler(client.app.libres_context)
+    )
+    scheduler_2.allocate(
+        dates=(
+            (datetime(2020, 1, 1), datetime(2020, 1, 1)),
+            (datetime(2020, 1, 2), datetime(2020, 1, 2)),
+            (datetime(2020, 1, 3), datetime(2020, 1, 3)),
+            (datetime(2020, 1, 5), datetime(2020, 1, 5)),
+        ),
+        whole_day=True,
+        partly_available=True
+    )
+
+    transaction.commit()
+
+    # force client to open a fresh session that includes our
+    # newly added allocations
+    close_all_sessions()
+
+    find_your_spot.form['auto_reserve_available_slots'] = 'for_first_day'
+    result = find_your_spot.form.submit()
+
+    result = client.get(
+        '/find-your-spot/reservations?group=Meeting+Rooms'
+    ).json
+    assert len(result['reservations']) == 1
+    reservation = result['reservations'][0]
+    assert reservation['resource'] == 'meeting-1'
+    assert reservation['date'].startswith('2020-01-01')
+    assert reservation['time'] == '07:00 - 08:00'
+
+    # resubmitting doesn't add a reservation or change the existing one
+    result = find_your_spot.form.submit()
+
+    result = client.get(
+        '/find-your-spot/reservations?group=Meeting+Rooms'
+    ).json
+    assert len(result['reservations']) == 1
+    reservation = result['reservations'][0]
+    assert reservation['resource'] == 'meeting-1'
+    assert reservation['date'].startswith('2020-01-01')
+    assert reservation['time'] == '07:00 - 08:00'
+
+    find_your_spot.form['auto_reserve_available_slots'] = 'for_every_day'
+    result = find_your_spot.form.submit()
+
+    result = client.get(
+        '/find-your-spot/reservations?group=Meeting+Rooms'
+    ).json
+    assert len(result['reservations']) == 5
+    for idx, reservation in enumerate(result['reservations'][:-1]):
+        assert reservation['resource'] == 'meeting-1'
+        assert reservation['date'].startswith(f'2020-01-0{idx+1}')
+        assert reservation['time'] == '07:00 - 08:00'
+    # the final reservation only works for the other room
+    reservation = result['reservations'][-1]
+    assert reservation['resource'] == 'meeting-2'
+    assert reservation['date'].startswith('2020-01-05')
+    assert reservation['time'] == '07:00 - 08:00'
+
+    # resubmitting doesn't change anything
+    result = find_your_spot.form.submit()
+
+    result = client.get(
+        '/find-your-spot/reservations?group=Meeting+Rooms'
+    ).json
+    assert len(result['reservations']) == 5
+    for idx, reservation in enumerate(result['reservations'][:-1]):
+        assert reservation['resource'] == 'meeting-1'
+        assert reservation['date'].startswith(f'2020-01-0{idx+1}')
+        assert reservation['time'] == '07:00 - 08:00'
+    # the final reservation only works for the other room
+    reservation = result['reservations'][-1]
+    assert reservation['resource'] == 'meeting-2'
+    assert reservation['date'].startswith('2020-01-05')
+    assert reservation['time'] == '07:00 - 08:00'
+
+    find_your_spot.form['auto_reserve_available_slots'] = 'for_every_room'
+    result = find_your_spot.form.submit()
+
+    result = client.get(
+        '/find-your-spot/reservations?group=Meeting+Rooms'
+    ).json
+    assert len(result['reservations']) == 8
+    for idx, reservation in enumerate(result['reservations'][::2]):
+        assert reservation['resource'] == 'meeting-1'
+        assert reservation['date'].startswith(f'2020-01-0{idx+1}')
+        assert reservation['time'] == '07:00 - 08:00'
+
+    for idx, reservation in enumerate(result['reservations'][1:-1:2]):
+        assert reservation['resource'] == 'meeting-2'
+        assert reservation['date'].startswith(f'2020-01-0{idx+1}')
+        assert reservation['time'] == '07:00 - 08:00'
+    reservation = result['reservations'][-1]
+    assert reservation['resource'] == 'meeting-2'
+    assert reservation['date'].startswith('2020-01-05')
+    assert reservation['time'] == '07:00 - 08:00'
+
+    # resubmitting also doesn't change anything here
+    result = find_your_spot.form.submit()
+
+    result = client.get(
+        '/find-your-spot/reservations?group=Meeting+Rooms'
+    ).json
+    assert len(result['reservations']) == 8
+    for idx, reservation in enumerate(result['reservations'][::2]):
+        assert reservation['resource'] == 'meeting-1'
+        assert reservation['date'].startswith(f'2020-01-0{idx+1}')
+        assert reservation['time'] == '07:00 - 08:00'
+
+    for idx, reservation in enumerate(result['reservations'][1:-1:2]):
+        assert reservation['resource'] == 'meeting-2'
+        assert reservation['date'].startswith(f'2020-01-0{idx+1}')
+        assert reservation['time'] == '07:00 - 08:00'
+    reservation = result['reservations'][-1]
+    assert reservation['resource'] == 'meeting-2'
+    assert reservation['date'].startswith('2020-01-05')
+    assert reservation['time'] == '07:00 - 08:00'
+
 
 def test_resource_room_deletion(client):
     # TicketMessage.create(ticket, request, 'opened')
@@ -393,10 +564,11 @@ def test_allocations(client):
 
     # create new beamer allocation
     new = client.get((
-        '/resource/beamer/new-allocation'
-        '?start=2015-08-04&end=2015-08-05'
+        '/resource/beamer/new-rule'
     ))
-
+    new.form['title'] = 'Period 1'
+    new.form['start'] = '2015-08-04'
+    new.form['end'] = '2015-08-05'
     new.form['items'] = 1
     new.form['item_limit'] = 1
     new.form.submit()
@@ -425,10 +597,11 @@ def test_allocations(client):
 
     # create a new daypass allocation
     new = client.get((
-        '/resource/tageskarte/new-allocation'
-        '?start=2015-08-04&end=2015-08-05'
+        '/resource/tageskarte/new-rule'
     ))
-
+    new.form['title'] = 'Period 2'
+    new.form['start'] = '2015-08-04'
+    new.form['end'] = '2015-08-05'
     new.form['daypasses'] = 1
     new.form['daypasses_limit'] = 1
     new.form.submit()
@@ -454,18 +627,6 @@ def test_allocations(client):
 
     assert len(slots.json) == 1
     assert slots.json[0]['title'] == "Ganztägig \n2 Verfügbar"
-
-    # try to create a new allocation over an existing one
-    new = client.get((
-        '/resource/tageskarte/new-allocation'
-        '?start=2015-08-04&end=2015-08-04'
-    ))
-
-    new.form['daypasses'] = 1
-    new.form['daypasses_limit'] = 1
-    new = new.form.submit()
-
-    assert "Es besteht bereits eine Einteilung im gewünschten Zeitraum" in new
 
     # move the existing allocations
     slots = client.get((
@@ -520,12 +681,13 @@ def test_allocation_times(client):
     new.form.submit()
 
     # 12:00 - 00:00
-    new = client.get('/resource/meeting-room/new-allocation')
+    new = client.get('/resource/meeting-room/new-rule')
+    new.form['title'] = 'Period 1'
     new.form['start'] = '2015-08-20'
     new.form['end'] = '2015-08-20'
     new.form['start_time'] = '12:00'
     new.form['end_time'] = '00:00'
-    new.form['as_whole_day'] = 'no'
+    new.form['is_partly_available'] = 'no'
     new.form.submit()
 
     slots = client.get(
@@ -537,12 +699,13 @@ def test_allocation_times(client):
     assert slots.json[0]['end'] == '2015-08-21T00:00:00+02:00'
 
     # 00:00 - 02:00
-    new = client.get('/resource/meeting-room/new-allocation')
+    new = client.get('/resource/meeting-room/new-rule')
+    new.form['title'] = 'Period 2'
     new.form['start'] = '2015-08-22'
     new.form['end'] = '2015-08-22'
     new.form['start_time'] = '00:00'
     new.form['end_time'] = '02:00'
-    new.form['as_whole_day'] = 'no'
+    new.form['is_partly_available'] = 'no'
     new.form.submit()
 
     slots = client.get(
@@ -554,12 +717,13 @@ def test_allocation_times(client):
     assert slots.json[0]['end'] == '2015-08-22T02:00:00+02:00'
 
     # 12:00 - 00:00 over two days
-    new = client.get('/resource/meeting-room/new-allocation')
+    new = client.get('/resource/meeting-room/new-rule')
+    new.form['title'] = 'Period 3'
     new.form['start'] = '2015-08-24'
     new.form['end'] = '2015-08-25'
     new.form['start_time'] = '12:00'
     new.form['end_time'] = '00:00'
-    new.form['as_whole_day'] = 'no'
+    new.form['is_partly_available'] = 'no'
     new.form.submit()
 
     slots = client.get(
@@ -581,32 +745,35 @@ def test_allocation_visibility(client):
     new.form.submit()
 
     # 12:00 - 14:00 private
-    new = client.get('/resource/meeting-room/new-allocation')
+    new = client.get('/resource/meeting-room/new-rule')
+    new.form['title'] = 'Period 1'
     new.form['start'] = '2015-08-20'
     new.form['end'] = '2015-08-20'
     new.form['start_time'] = '12:00'
     new.form['end_time'] = '14:00'
-    new.form['as_whole_day'] = 'no'
+    new.form['is_partly_available'] = 'no'
     new.form['access'] = 'private'
     new.form.submit()
 
     # 14:00 - 16:00 member
-    new = client.get('/resource/meeting-room/new-allocation')
+    new = client.get('/resource/meeting-room/new-rule')
+    new.form['title'] = 'Period 2'
     new.form['start'] = '2015-08-20'
     new.form['end'] = '2015-08-20'
     new.form['start_time'] = '14:00'
     new.form['end_time'] = '16:00'
-    new.form['as_whole_day'] = 'no'
+    new.form['is_partly_available'] = 'no'
     new.form['access'] = 'member'
     new.form.submit()
 
     # 16:00 - 18:00 public
-    new = client.get('/resource/meeting-room/new-allocation')
+    new = client.get('/resource/meeting-room/new-rule')
+    new.form['title'] = 'Period 3'
     new.form['start'] = '2015-08-20'
     new.form['end'] = '2015-08-20'
     new.form['start_time'] = '16:00'
     new.form['end_time'] = '18:00'
-    new.form['as_whole_day'] = 'no'
+    new.form['is_partly_available'] = 'no'
     new.form['access'] = 'public'
     new.form.submit()
 
@@ -658,13 +825,14 @@ def test_allocation_holidays(client):
     page.form['title'] = 'Foo'
     page.form.submit()
 
-    new = client.get('/resource/foo/new-allocation')
+    new = client.get('/resource/foo/new-rule')
+    new.form['title'] = 'Period 1'
     new.form['start'] = '2019-07-30'
     new.form['end'] = '2019-08-02'
     new.form['start_time'] = '07:00'
     new.form['end_time'] = '12:00'
     new.form['on_holidays'] = 'yes'
-    new.form['as_whole_day'] = 'no'
+    new.form['is_partly_available'] = 'no'
     new.form.submit()
 
     slots = client.get('/resource/foo/slots?start=2019-07-29&end=2019-08-03')
@@ -680,13 +848,14 @@ def test_allocation_holidays(client):
     page.form['title'] = 'Bar'
     page.form.submit()
 
-    new = client.get('/resource/bar/new-allocation')
+    new = client.get('/resource/bar/new-rule')
+    new.form['title'] = 'Period 2'
     new.form['start'] = '2019-07-30'
     new.form['end'] = '2019-08-02'
     new.form['start_time'] = '07:00'
     new.form['end_time'] = '12:00'
     new.form['on_holidays'] = 'no'
-    new.form['as_whole_day'] = 'no'
+    new.form['is_partly_available'] = 'no'
     new.form.submit()
 
     slots = client.get('/resource/bar/slots?start=2019-07-29&end=2019-08-03')
@@ -709,13 +878,14 @@ def test_allocation_school_holidays(client):
     page.form['title'] = 'Foo'
     page.form.submit()
 
-    new = client.get('/resource/foo/new-allocation')
+    new = client.get('/resource/foo/new-rule')
+    new.form['title'] = 'Period 1'
     new.form['start'] = '2019-07-30'
     new.form['end'] = '2019-08-02'
     new.form['start_time'] = '07:00'
     new.form['end_time'] = '12:00'
     new.form['during_school_holidays'] = 'yes'
-    new.form['as_whole_day'] = 'no'
+    new.form['is_partly_available'] = 'no'
     new.form.submit()
 
     slots = client.get('/resource/foo/slots?start=2019-07-29&end=2019-08-03')
@@ -731,13 +901,14 @@ def test_allocation_school_holidays(client):
     page.form['title'] = 'Bar'
     page.form.submit()
 
-    new = client.get('/resource/bar/new-allocation')
+    new = client.get('/resource/bar/new-rule')
+    new.form['title'] = 'Period 2'
     new.form['start'] = '2019-07-30'
     new.form['end'] = '2019-08-02'
     new.form['start_time'] = '07:00'
     new.form['end_time'] = '12:00'
     new.form['during_school_holidays'] = 'no'
-    new.form['as_whole_day'] = 'no'
+    new.form['is_partly_available'] = 'no'
     new.form.submit()
 
     slots = client.get('/resource/bar/slots?start=2019-07-29&end=2019-08-03')
@@ -1691,13 +1862,13 @@ def test_reserve_session_separation(client):
     # check combined reservations for rooms without a group
     result = c1.get('/find-your-spot/reservations').json
     assert len(result['reservations']) == 2
-    assert result['reservations'][0]['resource'] == 'meeting-room'
-    assert result['reservations'][1]['resource'] == 'gym'
+    assert result['reservations'][0]['resource'] == 'gym'
+    assert result['reservations'][1]['resource'] == 'meeting-room'
 
     result = c2.get('/find-your-spot/reservations').json
     assert len(result['reservations']) == 2
-    assert result['reservations'][0]['resource'] == 'meeting-room'
-    assert result['reservations'][1]['resource'] == 'gym'
+    assert result['reservations'][0]['resource'] == 'gym'
+    assert result['reservations'][1]['resource'] == 'meeting-room'
 
     formular = c1.get('/resource/meeting-room/form')
     formular.form['email'] = 'info@example.org'
@@ -1725,7 +1896,7 @@ def test_reserve_session_separation(client):
     result = c2.get('/resource/gym/reservations').json
     assert len(result['reservations']) == 1
 
-    # next_formul should now be gym, since we had another pending
+    # next_form should now be gym, since we had another pending
     # reservation in the same group (no group i.e. general)
     assert 'Bitte fahren Sie fort mit Ihrer Reservation für gym' in next_form
     # but e-mail shoud be pre-filled so we can just submit twice to reserve
@@ -2045,7 +2216,7 @@ def test_cleanup_allocations(client):
     cleanup.form['weekdays'] = [4, 6]
     resource = cleanup.form.submit().follow()
 
-    assert "1 Einteilungen wurden erfolgreich entfernt" in resource
+    assert "1 Verfügbarkeiten wurden erfolgreich entfernt" in resource
 
     allocations = scheduler.managed_allocations().order_by('id').all()
     assert len(allocations) == 2
@@ -2193,7 +2364,8 @@ def test_allocation_rules_on_rooms(client):
     def run_cronjob():
         client.get('/resource/room/process-rules')
 
-    page = client.get('/resource/room').click("Regeln").click("Regel")
+    page = client.get('/resource/room').click(
+        "Verfügbarkeitszeiträume").click("Verfügbarkeitszeitraum")
     page.form['title'] = 'Täglich'
     page.form['extend'] = 'daily'
     page.form['start'] = '2019-01-01'
@@ -2205,7 +2377,7 @@ def test_allocation_rules_on_rooms(client):
 
     page = page.form.submit().follow()
 
-    assert 'Regel aktiv, 2 Einteilungen erstellt' in page
+    assert 'Verfügbarkeitszeitraum aktiv, 2 Verfügbarkeiten erstellt' in page
     assert count_allocations() == 2
 
     # running the cronjob once will add a new allocation
@@ -2282,7 +2454,8 @@ def test_allocation_rules_edit(client):
     def run_cronjob():
         client.get('/resource/room/process-rules')
 
-    page = client.get('/resource/room').click("Regeln").click("Regel")
+    page = client.get('/resource/room').click(
+        "Verfügbarkeitszeiträume").click("Verfügbarkeitszeitraum")
     page.form['title'] = 'Täglich'
     page.form['extend'] = 'daily'
     page.form['start'] = '2019-01-01'
@@ -2294,13 +2467,13 @@ def test_allocation_rules_edit(client):
 
     page = page.form.submit().follow()
 
-    assert 'Regel aktiv, 2 Einteilungen erstellt' in page
+    assert 'Verfügbarkeitszeitraum aktiv, 2 Verfügbarkeiten erstellt' in page
     assert count_allocations() == 2
 
     # Modifying the rule applies changes where possible, but
     # existing reserved slots remain unaffected.
     edit_page = client.get('/resource/room')
-    edit_page = edit_page.click('Regeln').click('Bearbeiten')
+    edit_page = edit_page.click('Verfügbarkeitszeiträume').click('Bearbeiten')
     form = edit_page.form
     form['title'] = 'Renamed room'
 
@@ -2333,7 +2506,8 @@ def test_allocation_rules_on_daypasses(client):
     def run_cronjob():
         client.get('/resource/daypass/process-rules')
 
-    page = client.get('/resource/daypass').click("Regeln").click("Regel")
+    page = client.get('/resource/daypass').click(
+        "Verfügbarkeitszeiträume").click("Verfügbarkeitszeitraum")
     page.form['title'] = 'Monatlich'
     page.form['extend'] = 'monthly'
     page.form['start'] = '2019-01-01'
@@ -2342,7 +2516,7 @@ def test_allocation_rules_on_daypasses(client):
     page.form['daypasses_limit'] = '1'
     page = page.form.submit().follow()
 
-    assert 'Regel aktiv, 31 Einteilungen erstellt' in page
+    assert 'Verfügbarkeitszeitraum aktiv, 31 Verfügbarkeiten erstellt' in page
     assert count_allocations() == 31
 
     # running the cronjob on an ordinary day will not change anything
@@ -2370,11 +2544,11 @@ def test_allocation_rules_on_daypasses(client):
     assert count_allocations() == 90
 
     # let's stop the rule, which should leave existing allocations
-    page = client.get('/resource/daypass').click("Regeln")
+    page = client.get('/resource/daypass').click("Verfügbarkeitszeiträume")
     page.click('Stop')
 
-    page = client.get('/resource/daypass').click("Regeln")
-    assert "Keine Regeln" in page
+    page = client.get('/resource/daypass').click("Verfügbarkeitszeiträume")
+    assert "Keine Verfügbarkeitszeiträume" in page
     assert count_allocations() == 90
 
 
@@ -2400,7 +2574,8 @@ def test_allocation_rules_with_holidays(client):
     def run_cronjob():
         client.get('/resource/daypass/process-rules')
 
-    page = client.get('/resource/daypass').click("Regeln").click("Regel")
+    page = client.get('/resource/daypass').click(
+        "Verfügbarkeitszeiträume").click("Verfügbarkeitszeitraum")
     page.form['title'] = 'Jährlich'
     page.form['extend'] = 'yearly'
     page.form['start'] = '2019-01-01'
@@ -2410,7 +2585,7 @@ def test_allocation_rules_with_holidays(client):
     page.form['on_holidays'] = 'no'
     page = page.form.submit().follow()
 
-    assert 'Regel aktiv, 352 Einteilungen erstellt' in page
+    assert 'Verfügbarkeitszeitraum aktiv, 352 Verfügbarkeiten erstellt' in page
     assert count_allocations() == 352
 
     # running the cronjob on an ordinary day will not change anything
@@ -2451,7 +2626,8 @@ def test_allocation_rules_with_school_holidays(client):
     def run_cronjob():
         client.get('/resource/daypass/process-rules')
 
-    page = client.get('/resource/daypass').click("Regeln").click("Regel")
+    page = client.get('/resource/daypass').click(
+        "Verfügbarkeitszeiträume").click("Verfügbarkeitszeitraum")
     page.form['title'] = 'Jährlich'
     page.form['extend'] = 'yearly'
     page.form['start'] = '2019-01-01'
@@ -2461,7 +2637,7 @@ def test_allocation_rules_with_school_holidays(client):
     page.form['during_school_holidays'] = 'no'
     page = page.form.submit().follow()
 
-    assert 'Regel aktiv, 350 Einteilungen erstellt' in page
+    assert 'Verfügbarkeitszeitraum aktiv, 350 Verfügbarkeiten erstellt' in page
     assert count_allocations() == 350
 
     # running the cronjob on an ordinary day will not change anything
@@ -2639,3 +2815,51 @@ def test_resource_recipient_overview(client):
     assert "Gymnasium" in page
     assert "Dailypass" in page
     assert "Meeting" not in page
+
+
+@freeze_time("2024-04-08", tick=True)
+def test_reserve_fractions_of_hours_total_correct_in_price(client):
+    resources = ResourceCollection(client.app.libres_context)
+    resource = resources.by_name('tageskarte')
+    assert resource
+    resource.pricing_method = 'per_hour'
+    resource.price_per_hour = 10.00
+    resource.payment_method = 'manual'
+
+    scheduler = resource.get_scheduler(client.app.libres_context)
+    allocations = scheduler.allocate(
+        dates=(
+            datetime(2024, 4, 9, 10, 0),
+            datetime(2024, 4, 9, 14, 0)  # 4-hour slot
+        ),
+        partly_available=True,
+        whole_day=False
+    )
+
+    reserve = client.bound_reserve(allocations[0])
+    transaction.commit()
+
+    # Reserve 1.5 hours (10:00 to 11:30)
+    result = reserve(start='10:00', end='11:30')
+    assert result.json == {'success': True}
+
+    # Check price on confirmation page
+    form_page = client.get('/resource/tageskarte/form')
+    form_page.form['email'] = 'tester@example.org'
+    form_page.showbrowser()
+
+    confirmation_page = form_page.form.submit().follow()
+
+    # Expected price: 1.5 hours * 10.00 CHF/hour = 15.00 CHF
+    total_amount_dt = confirmation_page.pyquery('dt:contains("Totalbetrag")')
+    assert total_amount_dt, 'Total amount dt not found'
+    total_amount_dd = total_amount_dt.next('dd')
+    assert total_amount_dd, 'Total amount dd not found'
+    assert total_amount_dd.text().strip() == '15.00'
+    assert '10:00 - 11:30' in confirmation_page
+
+    # Check price in reservations JSON
+    reservations_url = '/resource/tageskarte/reservations'
+    reservations_data = client.get(reservations_url).json['reservations']
+    assert len(reservations_data) == 1
+    assert reservations_data[0]['price']['amount'] == 15.00

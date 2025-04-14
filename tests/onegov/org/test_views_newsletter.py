@@ -190,11 +190,10 @@ def test_newsletter_signup_for_categories(client):
     page = client.get('/newsletter-settings')
     page.form['show_newsletter'] = True
     page.form['newsletter_categories'] = """
-    Hüpferbande:
-      - News
-      - Aktivitäten:
-        - Anlässe
-        - Sport
+    - News
+    - Aktivitäten:
+      - Anlässe
+      - Sport
     """
     page.form.submit().follow()
     client.logout()
@@ -533,11 +532,10 @@ def test_newsletter_send_with_categories(client):
     page = client.get('/newsletter-settings')
     page.form['show_newsletter'] = True
     page.form['newsletter_categories'] = """
-    Hüpferbande:
-      - News
-      - Aktivitäten:
-        - Anlässe
-        - Sport
+    - News
+    - Aktivitäten:
+      - Anlässe
+      - Sport
     """
     page.form.submit().follow()
     client.logout()

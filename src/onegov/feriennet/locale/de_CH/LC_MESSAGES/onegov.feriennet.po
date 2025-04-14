@@ -181,6 +181,9 @@ msgstr "Teilnehmende Geschlecht"
 msgid "Attendee Notes"
 msgstr "Teilnehmende Bemerkungen"
 
+msgid "Attendee SwissPass ID"
+msgstr "Teilnehmende SwissPass ID"
+
 msgid "Attendee Booking-Limit"
 msgstr "Teilnehmende Buchungslimite"
 
@@ -655,6 +658,9 @@ msgstr "Gibt es etwas, das der Kursleiter wissen sollte?"
 msgid "Allergies, Disabilities, Particulars"
 msgstr "Allergien, Behinderungen, Besonderheiten"
 
+msgid "Swisspass ID"
+msgstr "Swisspass ID"
+
 msgid "The address of the attendee differs from the users address"
 msgstr ""
 "Die Adresse dieser Person unterscheidet sich von der des Benutzerkontos"
@@ -667,6 +673,12 @@ msgstr "PLZ"
 
 msgid "Political municipality"
 msgstr "Politische Gemeinde"
+
+msgid "The Swisspass ID must be 13 characters long."
+msgstr "Die Swisspass ID muss 13 Zeichen lang sein."
+
+msgid "The Swisspass ID must only contain digits and dashes."
+msgstr "Die Swisspass ID darf nur Ziffern und Bindestriche enthalten."
 
 msgid "Attendee"
 msgstr "Teilnehmende"
@@ -1514,10 +1526,8 @@ msgstr "Archivieren"
 msgid "Do you really want to archive this activity?"
 msgstr "Möchten Sie dieses Angebot wirklich archivieren?"
 
-msgid "This cannot be undone. The activity will be made private as a result."
-msgstr ""
-"Dies kann nicht rückgängig gemacht werden. Das Angebot wird von der "
-"Öffentlichkeit versteckt."
+msgid "The activity will be made private as a result."
+msgstr "Das Angebot wird von der Öffentlichkeit versteckt."
 
 msgid "Archive Activity"
 msgstr "Angebot archivieren"
@@ -3119,6 +3129,12 @@ msgstr "Benutzerprofil"
 msgid "Require the political municipality on registration"
 msgstr "Politische Gemeinde bei Registrierung verlangen"
 
+msgid "Require a SwissPass ID of attendees"
+msgstr "SwissPass ID der Teilnehmenden verlangen"
+
+msgid "SwissPass ID"
+msgstr "SwissPass ID"
+
 msgid "Parents can see the contacts of other parents in the same activity"
 msgstr ""
 "Mitglieder können die Kontaktdaten anderer Mitglieder des gleichen Angebots "
@@ -3204,124 +3220,14 @@ msgstr "Buchungen ${period}"
 msgid "Billing for ${period}"
 msgstr "Fakturierung ${period}"
 
-#~ msgid " Girls"
-#~ msgstr "Weiblich"
+#~ msgid ""
+#~ "This cannot be undone. The activity will be made private as a result."
+#~ msgstr ""
+#~ "Dies kann nicht rückgängig gemacht werden. Das Angebot wird von der "
+#~ "Öffentlichkeit versteckt."
 
-#, python-format
-#~ msgid "${count} Activities"
-#~ msgstr "${count} Angebote"
-
-#, python-format
-#~ msgid "${count} Occasions"
-#~ msgstr "${count} Durchführungen"
-
-#, python-format
-#~ msgid "${count} overfull"
-#~ msgstr "${count} überbelegt"
-
-#, python-format
-#~ msgid "${count} full"
-#~ msgstr "${count} belegt"
-
-#, python-format
-#~ msgid "${count} operable"
-#~ msgstr "${count} durchführbar"
-
-#, python-format
-#~ msgid "${count} unoperable"
-#~ msgstr "${count} unterbelegt"
-
-#, python-format
-#~ msgid "${count} empty"
-#~ msgstr "${count} unbelegt"
-
-#, python-format
-#~ msgid "${count} cancelled"
-#~ msgstr "${count} abgesagt"
-
-#, python-format
-#~ msgid "${count} Wishes"
-#~ msgstr "${count} Wünsche"
-
-#, python-format
-#~ msgid "${count} Wishes per Attendee"
-#~ msgstr "${count} Wünsche pro Person"
-
-#, python-format
-#~ msgid "${count} Bookings"
-#~ msgstr "${count} Buchungen"
-
-#, python-format
-#~ msgid "${count} accepted"
-#~ msgstr "${count} angenommen"
-
-#, python-format
-#~ msgid "${count} not carried out or cancelled"
-#~ msgstr "${count} abgesagt oder storniert"
-
-#, python-format
-#~ msgid "${count} denied"
-#~ msgstr "${count} abgelehnt"
-
-#, python-format
-#~ msgid "${count} blocked"
-#~ msgstr "${count} blockiert"
-
-#, python-format
-#~ msgid "${count} Bookings per Attendee"
-#~ msgstr "${count} Buchungen pro Person"
-
-#, python-format
-#~ msgid "${count} Girls"
-#~ msgstr "${count} Weiblich"
-
-#, python-format
-#~ msgid "${count} Boys"
-#~ msgstr "${count} Männlich"
-
-#, python-format
-#~ msgid "${count} of which without accepted bookings"
-#~ msgstr "${count} davon ohne akzeptierte Buchungen"
-
-#, python-format
-#~ msgid "${amount}% Happiness"
-#~ msgstr "${amount}% Zufriedenheit"
-
-#, python-format
-#~ msgid "${count} Attendees Without Occasion"
-#~ msgstr "${count} Person(en) ohne Durchführung"
-
-#, python-format
-#~ msgid "${amount} CHF total"
-#~ msgstr "${amount} CHF total"
-
-#, python-format
-#~ msgid "${amount} CHF paid"
-#~ msgstr "${amount} CHF bezahlt"
-
-#, python-format
-#~ msgid "${amount} CHF outstanding"
-#~ msgstr "${amount} CHF offen"
-
-#~ msgid "My list"
-#~ msgstr "Meine Liste"
-
-#~ msgid "Leave Group"
-#~ msgstr "Gruppe verlassen"
-
-#, python-format
-#~ msgid "${count} Attendees"
-#~ msgstr "${count} Teilnehmer"
-
-#, python-format
-#~ msgid "Group for \"${title}\""
-#~ msgstr "Gruppe für \"${title}\""
-
-#~ msgid "States"
-#~ msgstr "Status"
-
-#~ msgid "Enroll your child now."
-#~ msgstr "Jetzt anmelden."
+#~ msgid "Health Information"
+#~ msgstr "Gesundheitsangaben"
 
 #~ msgid "Move"
 #~ msgstr "Verschieben"

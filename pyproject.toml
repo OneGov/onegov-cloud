@@ -5,11 +5,21 @@ build-backend = "setuptools.build_meta"
 [tool.pytest.ini_options]
 log_level = "INFO"
 testpaths = ["tests"]
+python_classes = []
+python_files = ["test_*.py"]
 timeout = 300
 asyncio_default_fixture_loop_scope = "function"
 filterwarnings = [
-    "ignore:pkg_resources is deprecated as an API",
-    "ignore:Deprecated call to `pkg_resources\\.declare_namespace\\('.*'\\):DeprecationWarning"
+    '''ignore:pkg_resources is deprecated as an API''',
+    '''ignore:Deprecated call to `pkg_resources\.declare_namespace\('.*'\):DeprecationWarning''',
+    # potential issue for future upgrades
+    # unfortunately it's not possible to filter escape sequence warnings in
+    # specific modules, but we should be covered by Ruff for our own code
+    '''ignore:invalid escape sequence '[^']+':::''',
+    '''ignore:'crypt':DeprecationWarning:passlib.*:''',
+    # fixed upstream
+    '''ignore:(tagMap|typeMap) is deprecated:DeprecationWarning:pyasn1.*:''',
+    '''ignore:'cgi':DeprecationWarning:webob.*:''',
 ]
 
 [tool.coverage.run]
@@ -19,6 +29,8 @@ omit = ["*/tests/*", "**/upgrade.py"]
 
 [tool.coverage.report]
 ignore_errors = true
+skip_covered = true
+skip_empty = true
 exclude_lines = [
     "pragma: no cover",
     "pragma: unreachable",
@@ -133,12 +145,15 @@ select = [
     "N",
     "PERF",
     "PGH004",
+    "PGH005",
     "PIE",
     "PYI",
     "Q",
     "RUF",
     "SIM",
     "SLOT",
+    "T",
+    "TRY",
     "UP",
     "W"
 ]
@@ -170,7 +185,6 @@ ignore = [
     "RUF022",
     "RUF023",
     "RUF031",
-    "RUF035",
     "RUF052",
     "RUF056",
     # TODO: We would like to enable SIM102, but it has a ton of
@@ -183,6 +197,11 @@ ignore = [
     "SIM118",
     "SIM210",
     "SIM910",
+    "TRY003",
+    "TRY300",
+    # NOTE: It probably makes sense to enable this, but the refactor
+    #       will take a bit of effort.
+    "TRY301",
     "UP009",
     "UP012",
     "UP032",
@@ -204,6 +223,9 @@ preview = true
     #       but there's no per-file-target-version
     "UP",
 ]
+"src/onegov/*/upgrade.py" = [
+    "T2",
+]
 "tests/**/*.py" = [
     "B018",
     "C4",
@@ -221,11 +243,13 @@ preview = true
     "N",
     "Q",
     "PERF",
-    "PGH",
+    "PGH004",
     "PIE",
     "PYI",
     "RUF",
     "SIM",
+    "T",
+    "TRY",
     "UP",
 ]
 

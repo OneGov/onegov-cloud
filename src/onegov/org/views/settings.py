@@ -20,9 +20,9 @@ from onegov.org.forms import ModuleSettingsForm
 from onegov.org.forms.settings import (
     OrgTicketSettingsForm, HeaderSettingsForm, FaviconSettingsForm,
     LinksSettingsForm, NewsletterSettingsForm, LinkMigrationForm,
-    LinkHealthCheckForm, SocialMediaSettingsForm, EventSettingsForm,
+    LinkHealthCheckForm, PeopleSettingsForm, SocialMediaSettingsForm,
     GeverSettingsForm, OneGovApiSettingsForm, DataRetentionPolicyForm,
-    VATSettingsForm)
+    VATSettingsForm, EventSettingsForm)
 from onegov.org.management import LinkHealthCheck
 from onegov.org.layout import DefaultLayout
 from onegov.org.layout import SettingsLayout
@@ -560,3 +560,20 @@ def handle_chat_settings(
 ) -> RenderData | Response:
     layout = layout or SettingsLayout(self, request, _('Chat'))
     return handle_generic_settings(self, request, form, _('Chat'), layout)
+
+
+@OrgApp.form(
+    model=Organisation, name='people-settings', template='form.pt',
+    permission=Secret, form=PeopleSettingsForm, setting=_('People'),
+    icon='fa-users', order=400,
+)
+def handle_people_settings(
+    self: Organisation,
+    request: OrgRequest,
+    form: PeopleSettingsForm,
+    layout: SettingsLayout | None = None
+) -> RenderData | Response:
+    layout = layout or SettingsLayout(self, request, 'People')
+    return handle_generic_settings(
+        self, request, form, _('People'), layout
+    )

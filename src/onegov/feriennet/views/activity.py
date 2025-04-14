@@ -1083,7 +1083,7 @@ def propose_activity(
             handler_code='FER',
             handler_id=publication_request.id.hex
         )
-        TicketMessage.create(ticket, request, 'opened')
+        TicketMessage.create(ticket, request, 'opened', 'external')
 
     send_ticket_mail(
         request=request,

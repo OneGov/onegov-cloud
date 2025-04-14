@@ -292,9 +292,12 @@ class CoreRequest(IncludeRequest, ContentSecurityRequest, ReturnToMixin):
     ) -> str | _T | None:
         """ Extends the default link generating function of Morepath. """
         query_params = query_params or {}
-        result = self.transform(
-            super().link(obj, name=name, default=default, app=app)
-        )
+        if hasattr(obj, '__link_alias__'):
+            result = obj.__link_alias__()
+        else:
+            result = self.transform(
+                super().link(obj, name=name, default=default, app=app)
+            )
         for key, value in query_params.items():
             result = append_query_param(result, key, value)
         if fragment:

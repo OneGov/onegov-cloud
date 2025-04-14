@@ -26,6 +26,7 @@ from onegov.org.models import (
     ResourceRecipient, ResourceRecipientCollection)
 from onegov.org.models.resource import FindYourSpotCollection
 from onegov.org.models.ticket import ReservationTicket
+from onegov.org.utils import emails_for_new_ticket
 from onegov.pay import PaymentError
 from onegov.reservation import Allocation, Reservation, Resource
 from onegov.ticket import TicketCollection
@@ -609,7 +610,7 @@ def finalize_reservation(self: Resource, request: OrgRequest) -> Response:
             ticket = TicketCollection(request.session).open_ticket(
                 handler_code='RSV', handler_id=token.hex
             )
-            TicketMessage.create(ticket, request, 'opened')
+            TicketMessage.create(ticket, request, 'opened', 'external')
 
         show_submission = request.params.get('send_by_email') == 'yes'
 
@@ -632,13 +633,13 @@ def finalize_reservation(self: Resource, request: OrgRequest) -> Response:
                 'show_submission': show_submission
             }
         )
-        if request.email_for_new_tickets:
+        for email in emails_for_new_ticket(request, ticket):
             send_ticket_mail(
                 request=request,
                 template='mail_ticket_opened_info.pt',
                 subject=_('New ticket'),
                 ticket=ticket,
-                receivers=(request.email_for_new_tickets, ),
+                receivers=(email, ),
                 content={
                     'model': ticket,
                     'resource': self,

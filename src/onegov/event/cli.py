@@ -549,6 +549,6 @@ def import_guidle(
         except Exception as e:
             log.error('Error importing events', exc_info=True)
             click.secho(f'Error importing events: {e}', err=True, fg='red')
-            raise (e)
+            raise
 
     return _import_guidle

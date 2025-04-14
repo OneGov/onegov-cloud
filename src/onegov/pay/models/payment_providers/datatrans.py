@@ -441,7 +441,7 @@ class DatatransProvider(PaymentProvider[DatatransPayment]):
                 }
             )
         except Exception:
-            log.exception('Datrans connection failed')
+            log.info('Datrans connection failed', exc_info=True)
             return False
         else:
             return True

@@ -454,6 +454,29 @@ class SwissVoteCollection(Pagination[SwissVote]):
         query = self.query().filter(SwissVote.bfs_number == bfs_number)
         return query.first()
 
+    def by_bfs_numbers(
+        self,
+        bfs_numbers: Iterable[Decimal | str]
+    ) -> dict[Decimal | str, SwissVote]:
+        """ Returns the votes with the given BFS numbers. """
+        real_bfs_numbers = {}
+        for bfs_number in bfs_numbers:
+            try:
+                real_bfs_numbers[Decimal(bfs_number)] = bfs_number
+            except InvalidOperation:
+                pass
+
+        if not real_bfs_numbers:
+            return {}
+
+        query = self.query().filter(
+            SwissVote.bfs_number.in_(real_bfs_numbers.keys())
+        )
+        return {
+            real_bfs_numbers[vote.bfs_number]: vote
+            for vote in query
+        }
+
     @cached_property
     def available_descriptors(self) -> list[set[Decimal]]:
         """ Returns a list of the used descriptor values (level 1-3). """

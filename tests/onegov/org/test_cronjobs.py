@@ -8,7 +8,7 @@ import requests
 import transaction
 from datetime import datetime, timedelta
 from freezegun import freeze_time
-from onegov.core.utils import Bunch
+from onegov.core.utils import Bunch, normalize_for_url
 from onegov.directory import (DirectoryEntryCollection,
                               DirectoryConfiguration,
                               DirectoryCollection)
@@ -17,22 +17,24 @@ from onegov.event import EventCollection, OccurrenceCollection
 from onegov.event.utils import as_rdates
 from onegov.form import FormSubmissionCollection
 from onegov.gever.encrypt import encrypt_symmetric
-from onegov.org.models import ResourceRecipientCollection, News,\
-    PushNotification
+from onegov.org.models import (
+    ResourceRecipientCollection, News, PushNotification)
 from onegov.org.models.page import NewsCollection
 from onegov.org.models.resource import RoomResource
 from onegov.org.models.ticket import ReservationHandler, DirectoryEntryHandler
-from onegov.org.notification_service import TestNotificationService,\
-    set_test_notification_service
+from onegov.org.notification_service import (
+    TestNotificationService, set_test_notification_service)
 from onegov.page import PageCollection
 from onegov.ticket import Handler, Ticket, TicketCollection
 from onegov.user import UserCollection
-from onegov.newsletter import NewsletterCollection, RecipientCollection
+from onegov.newsletter import (Newsletter, NewsletterCollection,
+                               RecipientCollection)
 from onegov.reservation import ResourceCollection
 from onegov.user.collections import TANCollection
 from sedate import ensure_timezone, utcnow
 from sqlalchemy.orm import close_all_sessions
 from tests.onegov.org.common import get_cronjob_by_name, get_cronjob_url
+from decimal import Decimal
 from tests.shared import Client
 from tests.shared.utils import add_reservation
 
@@ -734,6 +736,7 @@ def test_send_scheduled_newsletters(client, org_app, secret_content_allowed):
     recipient.confirmed = True
 
     org_app.org.secret_content_allowed = secret_content_allowed
+    org_app.org.enable_automatic_newsletters = True
 
     create_scheduled_newsletter()
 
@@ -767,6 +770,80 @@ def test_send_scheduled_newsletters(client, org_app, secret_content_allowed):
             if secret_content_allowed:
                 assert "Secret News" in mail['TextBody']
             assert "Private News" not in mail['TextBody']
+
+
+def test_send_daily_newsletter(es_org_app):
+    org_app = es_org_app
+    tz = ensure_timezone('Europe/Zurich')
+
+    session = org_app.session()
+    org_app.org.enable_automatic_newsletters = True
+    org_app.org.newsletter_times = '10', '11', '16'
+
+    news = PageCollection(session)
+    news_parent = news.query().filter_by(name='news').one()
+    recipients = RecipientCollection(session)
+
+    recipient = recipients.add('daily@example.org', confirmed=True)
+    recipient.daily_newsletter = True
+
+    recipient = recipients.add('info@example.org', confirmed=True)
+    recipient.daily_newsletter = False
+
+    with freeze_time(datetime(2018, 3, 2, 17, 0, tzinfo=tz)):
+        # Created three days ago, published yesterday at 17:00
+        news.add(
+            parent=news_parent, title='News1', type='news', access='public',
+            publication_start=utcnow() + timedelta(days=2))
+
+    with freeze_time(datetime(2018, 3, 4, 17, 0, tzinfo=tz)):
+        # Created yesterday at 17:00, published immediately
+        news.add(
+            parent=news_parent, title='News2', type='news', access='public')
+
+    with freeze_time(datetime(2018, 3, 5, 10, 0, tzinfo=tz)):
+        # Created today at 10:00, published immediately
+        news.add(
+            parent=news_parent, title='News3', type='news', access='public')
+        # Created today at 10:00, published today 10:01
+        news.add(
+            parent=news_parent, title='News4', type='news', access='public',
+            publication_start=utcnow() + timedelta(minutes=1))
+
+    transaction.commit()
+
+    job = get_cronjob_by_name(org_app, 'hourly_maintenance_tasks')
+    job.app = org_app
+    client = Client(org_app)
+
+    with freeze_time(datetime(2018, 3, 5, 10, 0, tzinfo=tz)):
+        client.get(get_cronjob_url(job))
+        newsletter = NewsletterCollection(session).query().one()
+        assert newsletter.title == 'Täglicher Newsletter 05.03.2018, 10:00'
+        assert len(os.listdir(client.app.maildir)) == 1
+        mail = client.get_email(0)
+        assert "News1" in mail['TextBody']
+        assert "News2" in mail['TextBody']
+        assert "News3" not in mail['TextBody']
+        assert "News4" not in mail['TextBody']
+
+    with freeze_time(datetime(2018, 3, 5, 11, 0, tzinfo=tz)):
+        client.get(get_cronjob_url(job))
+        newsletter = NewsletterCollection(session).query().filter(
+            Newsletter.title.like('%Täglicher Newsletter 05.03.2018, 11:00%'
+        )).one()
+        assert 'Täglicher Newsletter 05.03.2018, 11:00' in newsletter.title
+        assert len(os.listdir(client.app.maildir)) == 2
+        mail = client.get_email(1)
+        assert "News1" not in mail['TextBody']
+        assert "News2" not in mail['TextBody']
+        assert "News3" in mail['TextBody']
+        assert "News4" in mail['TextBody']
+
+    with freeze_time(datetime(2018, 3, 5, 16, 0, tzinfo=tz)):
+        client.get(get_cronjob_url(job))
+        assert NewsletterCollection(session).query().count() == 2
+        assert len(os.listdir(client.app.maildir)) == 2
 
 
 def test_auto_archive_tickets_and_delete(org_app, handlers):
@@ -1495,7 +1572,7 @@ def test_update_newsletter_email_bounce_statistics(org_app, handlers):
     job = get_cronjob_by_name(org_app,
                               'update_newsletter_email_bounce_statistics')
     job.app = org_app
-    # tz = ensure_timezone('Europe/Zurich')
+    tz = ensure_timezone('Europe/Zurich')
 
     transaction.begin()
 
@@ -1504,6 +1581,30 @@ def test_update_newsletter_email_bounce_statistics(org_app, handlers):
     recipients.add('franz@user.ch', confirmed=True)
     recipients.add('heinz@user.ch', confirmed=True)
     recipients.add('trudi@user.ch', confirmed=True)
+
+    # create directory entry recipients
+    directories = DirectoryCollection(org_app.session(), type='extended')
+    directory_entries = directories.add(
+        title='Baugesuche (Planauflage)',
+        structure="""
+            Gesuchsteller/in *= ___
+        """,
+        configuration=DirectoryConfiguration(
+            title="[Gesuchsteller/in]",
+        )
+    )
+    directory_entries.add(values=dict(
+        gesuchsteller_in='Amon',
+        publication_start=datetime(2024, 4, 1, tzinfo=tz),
+        publication_end=datetime(2024, 4, 10, tzinfo=tz),
+    ))
+    entry_recipients = EntryRecipientCollection(org_app.session())
+    entry_recipients.add('marietta@user.ch', directory_entries.id,
+                         confirmed=True)
+    entry_recipients.add('martha@user.ch', directory_entries.id,
+                         confirmed=True)
+    entry_recipients.add('michu@user.ch', directory_entries.id,
+                         confirmed=True)
 
     transaction.commit()
     close_all_sessions()
@@ -1517,7 +1618,9 @@ def test_update_newsletter_email_bounce_statistics(org_app, handlers):
                     {'RecordType': 'Bounce', 'ID': 3719297970,
                      'Inactive': False, 'Email': 'franz@user.ch'},
                     {'RecordType': 'Bounce', 'ID': 4739297971,
-                     'Inactive': True, 'Email': 'heinz@user.ch'}
+                     'Inactive': True, 'Email': 'heinz@user.ch'},
+                    {'RecordType': 'Bounce', 'ID': 5739297972,
+                     'Inactive': True, 'Email': 'martha@user.ch'}
                 ]
             },
             raise_for_status=Mock(return_value=None),
@@ -1534,6 +1637,12 @@ def test_update_newsletter_email_bounce_statistics(org_app, handlers):
             'heinz@user.ch').is_inactive is True
         assert RecipientCollection(org_app.session()).by_address(
             'trudi@user.ch').is_inactive is False
+        assert EntryRecipientCollection(org_app.session()).by_address(
+            'marietta@user.ch').is_inactive is False
+        assert EntryRecipientCollection(org_app.session()).by_address(
+            'martha@user.ch').is_inactive is True
+        assert EntryRecipientCollection(org_app.session()).by_address(
+            'michu@user.ch').is_inactive is False
 
     # test raising runtime warning exception for status code 401
     with patch('requests.get') as mock_get:
@@ -1561,6 +1670,18 @@ def test_update_newsletter_email_bounce_statistics(org_app, handlers):
             # execute cronjob
             with pytest.raises(requests.exceptions.HTTPError):
                 client.get(get_cronjob_url(job))
+
+    recipients = RecipientCollection(org_app.session())
+    assert recipients.query().count() == 3
+    assert recipients.by_address('franz@user.ch').is_inactive is False
+    assert recipients.by_address('heinz@user.ch').is_inactive is True
+    assert recipients.by_address('trudi@user.ch').is_inactive is False
+
+    entry_recipients = EntryRecipientCollection(org_app.session())
+    assert entry_recipients.query().count() == 3
+    assert entry_recipients.by_address('marietta@user.ch').is_inactive is False
+    assert entry_recipients.by_address('martha@user.ch').is_inactive is True
+    assert entry_recipients.by_address('michu@user.ch').is_inactive is False
 
 
 def test_delete_unconfirmed_subscribers(org_app, handlers):
@@ -1622,15 +1743,15 @@ def test_send_push_notifications_for_news(
     ]
 
     # Create a news item that should trigger notifications
-    news = NewsCollection(org_app.session())
-
-    # We need to set parent=None for news items
+    news = PageCollection(org_app.session())
+    news_parent = news.add_root('News', type='news')
     recent_news = news.add(
-        parent=None,
+        parent=news_parent,
         title='Recent news with notifications',
         lead='This should trigger a notification',
         text='Test content for recent news',
         access='public',
+        type='news'
     )
 
     # Set publication time just within the 10-minute window
@@ -1700,6 +1821,7 @@ def test_push_notification_duplicate_detection(
         lead='Test content',
         text='Test content body',
         access='public',
+        type='news'
     )
     news_id = test_news.id
 
@@ -1751,3 +1873,133 @@ def test_push_notification_duplicate_detection(
     finally:
         # Clean up
         set_test_notification_service(None)
+
+
+def _create_news_hierarchy(session, parent, items_data):
+    created_items = []
+    for title, order in items_data:
+        name = normalize_for_url(title)
+        item = News(
+            title=title,
+            name=name,
+            type='news',
+            parent=parent,
+            order=order  # Handles Decimal and None
+        )
+        session.add(item)
+        created_items.append(item)
+    session.flush()
+    return created_items
+
+
+def test_normalize_adjacency_list_order(org_app):
+    client = Client(org_app)
+    session = org_app.session()
+    job = get_cronjob_by_name(org_app, 'normalize_adjacency_list_order')
+    job.app = org_app
+
+    orders = [Decimal('1.0'), Decimal('5.0'), Decimal('10.0')]
+    titles = [f'News {i+1}' for i in range(len(orders))]
+    items_data = list(zip(titles, orders))
+
+    pages = PageCollection(session)
+    root_title = 'Aktuelles'
+    root_name = normalize_for_url(root_title)
+    root_item = News(title=root_title, name=root_name, type='news')
+    session.add(root_item)
+    session.flush()
+    default_root_order = root_item.order
+    news_root_id = root_item.id
+
+    _create_news_hierarchy(session, root_item, items_data)
+    transaction.commit()
+
+    # Verify initial order
+    news_items = pages.query().filter(
+        News.parent_id == news_root_id).order_by(News.order).all()
+
+    assert [n.order for n in news_items] == [
+        Decimal('1.0'), Decimal('5.0'), Decimal('10.0')
+    ]
+    assert [n.title for n in news_items] == ['News 1', 'News 2', 'News 3']
+
+    # Execute the cron job
+    client.get(get_cronjob_url(job))
+    session.expire_all()  # Force reload from DB
+
+    # Verify normalized order
+    request = Bunch(session=session)
+    news_items_after = NewsCollection(request).query().filter(
+        News.parent_id == news_root_id).order_by(News.order).all()
+
+    # Order should now be sequential integers (represented as Decimals)
+    assert [n.order for n in news_items_after] == [
+        Decimal('1.0'), Decimal('2.0'), Decimal('3.0')
+    ]
+
+    # Relative order must be preserved
+    assert [n.title for n in news_items_after] == ['News 1',
+                                                   'News 2', 'News 3']
+    # Verify the root page order was not affected
+    root = pages.by_id(news_root_id)
+    assert root.order == default_root_order
+
+
+def test_normalize_adjacency_list_order_with_null_becomes_default(org_app):
+    client = Client(org_app)
+    session = org_app.session()
+    job = get_cronjob_by_name(org_app, 'normalize_adjacency_list_order')
+    job.app = org_app
+
+    # Define items with one potentially becoming default order
+    # Corresponds to default value set in AdjacencyList.order
+    default_order_value = Decimal('65536')
+    items_data = [
+        ('Item C', Decimal('1.0')),
+        ('Item A', Decimal('5.0')),
+        ('Item B', None),  # Pass None, expecting it to take the default value
+    ]
+
+    pages = PageCollection(session)
+    root_title = 'Default Order Test Root'
+    root_name = normalize_for_url(root_title)
+    root_item = News(title=root_title, name=root_name, type='news')
+    session.add(root_item)
+    session.flush()
+    default_root_order = root_item.order
+    news_root_id = root_item.id
+
+    _create_news_hierarchy(session, root_item, items_data)
+    transaction.commit()
+
+    # Verify initial state
+    news_items_initial = pages.query().filter(
+        News.parent_id == news_root_id).order_by(News.title).all()
+    orders_initial = {n.title: n.order for n in news_items_initial}
+    assert orders_initial == {
+        'Item A': Decimal('5.0'),
+        'Item B': default_order_value,  # Check it received the default
+        'Item C': Decimal('1.0'),
+    }
+
+    client.get(get_cronjob_url(job))
+    session.expire_all()  # Force reload from DB
+
+    # Verify normalized order
+    # The SQL uses ORDER BY "order" ASC, "pk" ASC.
+    # Initial sort order for ROW_NUMBER() would be:
+    # Item C (1.0), Item A (5.0), Item B (65536.0)
+    # Normalization should result in: Item C (1.0), Item A (2.0), Item B (3.0)
+    request = Bunch(session=session)
+    news_items_after = NewsCollection(request).query().filter(
+        News.parent_id == news_root_id).order_by(News.order).all()
+
+    expected_orders = [Decimal('1.0'), Decimal('2.0'), Decimal('3.0')]
+    expected_titles = ['Item C', 'Item A', 'Item B']
+
+    assert [n.order for n in news_items_after] == expected_orders
+    assert [n.title for n in news_items_after] == expected_titles
+
+    # Verify the root page order was not affected
+    root = pages.by_id(news_root_id)
+    assert root.order == default_root_order

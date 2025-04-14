@@ -45,6 +45,11 @@ class ResourceBaseForm(Form):
         description=_('Used to group the resource in the overview')
     )
 
+    subgroup = StringField(
+        label=_('Subgroup'),
+        description=_('Used to group the resource in the overview')
+    )
+
     text = HtmlField(
         label=_('Text'))
 

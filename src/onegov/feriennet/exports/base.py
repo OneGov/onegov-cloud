@@ -135,6 +135,7 @@ class FeriennetExport(Export):
         yield _('Attendee Birth Date'), attendee.birth_date
         yield _('Attendee Gender'), GENDERS.get(attendee.gender, '')
         yield _('Attendee Notes'), attendee.notes
+        yield _('Attendee SwissPass ID'), attendee.swisspass or ''
         yield _('Attendee Booking-Limit'), attendee.limit or ''
 
     def occasion_fields(
@@ -238,6 +239,8 @@ class FeriennetExport(Export):
         yield _('Attendee Place'), attendee.place if attendee else ''
         yield _('Attendee Political Municipality'
                 ), attendee.political_municipality if attendee else ''
+        yield _('Attendee SwissPass ID'
+                ), attendee.swisspass if attendee else ''
 
     def organiser_fields(
         self,

@@ -14,6 +14,7 @@ from onegov.core.templates import render_template
 from onegov.event import Occurrence, OccurrenceCollection
 from onegov.file import File
 from onegov.file.utils import name_without_extension
+from onegov.form import move_fields
 from onegov.newsletter import Newsletter
 from onegov.newsletter import NewsletterCollection
 from onegov.newsletter import Recipient
@@ -79,6 +80,10 @@ def get_newsletter_form(
     s = s.distinct(Occurrence.event_id).subquery()
     occurrences = occurrences.filter(Occurrence.id.in_(s))
     form = form.with_occurrences(request, occurrences)
+
+    move_fields(
+        form, ('closing_remark',), None
+    )
 
     return form
 
@@ -214,6 +219,8 @@ def handle_newsletters(
         if not recipient:
             recipient = recipients.add(address=form.address.data)
             recipient.subscribed_categories = subscribed
+            recipient.daily_newsletter = form.daily_newsletter.data if (
+                form.daily_newsletter) else False
             unsubscribe_link = (
                 request.link(recipient.subscription, 'unsubscribe'))
 
@@ -276,6 +283,8 @@ def handle_newsletters(
         # update subscribed categories
         else:
             recipient.subscribed_categories = subscribed
+            recipient.daily_newsletter = form.daily_newsletter.data if (
+            form.daily_newsletter) else False
             request.success(
                 request.translate(_(
                     (
@@ -383,6 +392,7 @@ def view_newsletter(
         'get_lead': get_lead,
         'show_tags': show_tags(request),
         'show_filters': show_filters(request),
+        'closing_remark': self.closing_remark,
     }
 
 
@@ -435,6 +445,7 @@ def handle_new_newsletter(
             return morepath.redirect(request.link(newsletter))
 
     layout = layout or NewsletterLayout(self, request)
+    layout.include_editor()
     layout.edit_mode = True
 
     return {
@@ -463,6 +474,7 @@ def edit_newsletter(
         form.apply_model(self)
 
     layout = layout or NewsletterLayout(self, request)
+    layout.include_editor()
     layout.edit_mode = True
 
     return {
@@ -486,6 +498,7 @@ def send_newsletter(
     newsletter: Newsletter,
     recipients: Iterable[Recipient],
     is_test: bool = False,
+    daily: bool = False,
     layout: DefaultMailLayout | None = None
 ) -> int:
     layout = layout or DefaultMailLayout(newsletter, request)
@@ -504,7 +517,8 @@ def send_newsletter(
             'news': news,
             'occurrences': occurrences_by_newsletter(newsletter, request),
             'publications': publications_by_newsletter(newsletter, request),
-            'name_without_extension': name_without_extension
+            'name_without_extension': name_without_extension,
+            'closing_remark': newsletter.closing_remark,
         }
     )
     html = Template(_html)
@@ -517,8 +531,9 @@ def send_newsletter(
     def email_iter() -> Iterator[EmailJsonDict]:
         nonlocal count
         for recipient in recipients:
-            if not request.app.org.newsletter_categories:
-                # no categories defined, send to all recipients
+            if not request.app.org.newsletter_categories or daily:
+                # no categories defined or automated daily newsletter, send to
+                # all recipients
                 pass
             else:
                 recipient_categories = recipient.subscribed_categories or []
@@ -676,7 +691,8 @@ def handle_preview_newsletter(
         'news': news,
         'occurrences': occurrences_by_newsletter(self, request),
         'publications': publications_by_newsletter(self, request),
-        'name_without_extension': name_without_extension
+        'name_without_extension': name_without_extension,
+        'closing_remark': self.closing_remark,
     }
 
 

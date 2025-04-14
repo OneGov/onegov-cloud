@@ -40,7 +40,6 @@ def view_push_notifications(
         'title': _('Push Notifications'),
         'notifications': notifications,
         'formatted_responses': formatted_responses,
-        # Helper function to check if notification was successfully sent
         'is_sent': lambda notification: (
                 notification.response_data and
                 notification.response_data.get('status') == 'sent'

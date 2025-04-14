@@ -6,6 +6,7 @@ from __future__ import annotations
 
 import itertools
 
+
 from onegov.core.orm.types import JSON
 from onegov.core.orm.types import UTCDateTime
 from onegov.core.upgrade import upgrade_task, UpgradeContext

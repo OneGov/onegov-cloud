@@ -5,7 +5,7 @@
     <tal:b metal:fill-slot="content">
 
         <p tal:condition="not:rules" i18n:translate>
-            No rules defined.
+            No availability periods defined.
         </p>
 
         <ul class="allocation-rules" tal:condition="rules">

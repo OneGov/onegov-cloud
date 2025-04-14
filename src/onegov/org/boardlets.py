@@ -42,7 +42,8 @@ class OrgBoardlet(Boardlet):
                 match = re.search(r'data-domain="(.+?)"', analytics_code)
                 if match:
                     site_id = match.group(1)
-                    return PlausibleAPI(site_id)
+                    return PlausibleAPI(site_id,
+                                        self.request.app.plausible_api_token)
 
         return None
 
