@@ -1,7 +1,6 @@
 from __future__ import annotations
 
 from functools import cached_property
-from markupsafe import Markup
 from onegov.activity import (
     Period, PeriodCollection, PeriodMeta, InvoiceCollection)
 from onegov.activity.models.invoice_reference import Schema
@@ -29,18 +28,6 @@ if TYPE_CHECKING:
     from sqlalchemy.orm import Query
     from uuid import UUID
     from more.content_security import ContentSecurityPolicy
-
-
-BANNER_TEMPLATE = Markup("""
-<div class="sponsor-banner">
-    <div class="sponsor-banner-{id}">
-        <a href="{url}">
-            <img src="{src}">
-            <p class="banner-info">{info}</p>
-        </a>
-    </div>
-</div>
-""")
 
 
 class FeriennetApp(TownApp):

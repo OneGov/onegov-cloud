@@ -1109,7 +1109,7 @@ $booking-left-margin: 1.6rem;
     My Bookings Print View
 */
 @media print {
-    .sponsor-banner {
+    .banner-buchungen {
         display: none;
     }
 
@@ -2422,6 +2422,10 @@ $booking-left-margin: 1.6rem;
 /*
     Sponsoring banners
 */
+.banner-buchungen, .banner-rechnungen {
+    margin-bottom: 2rem;
+}
+
 .sponsor-banner {
     /*
         aspect ratio 16:5 (100/16*5 =31.25)
