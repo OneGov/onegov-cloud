@@ -271,7 +271,7 @@ class CourseEvent(Base, TimestampMixin, ORMSearchable):
     def available_seats(self) -> int | None:
         if self.max_attendees:
             seats = self.max_attendees - self.cached_reservation_count
-            return 0 if seats < 0 else seats
+            return max(seats, 0)
         return None
 
     @property

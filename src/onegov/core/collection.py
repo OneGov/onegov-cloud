@@ -226,7 +226,7 @@ class Pagination(Generic[_M]):
 
     def __init__(self, page: int = 0):
         assert page is not None
-        self.page = page if page >= 0 else 0
+        self.page = max(page, 0)
 
     def __eq__(self, other: object) -> bool:
         """ Returns True if the current and the other Pagination instance

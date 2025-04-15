@@ -302,10 +302,6 @@ def get_module_order_key(
 
     """
     sorted_modules = {module: ix for ix, module in enumerate(chain(*LEVELS))}
-    modules = set()
-
-    for task in tasks:
-        modules.add(task.split(':', 1)[0])
 
     def sortkey(task: str) -> SupportsRichComparison:
         module = task.split(':', 1)[0]

@@ -730,7 +730,7 @@ def avoid_duplicate_name(titles: Sequence[str], title: str) -> str:
     if match:
         titles = ','.join(titles)
         sheet_title_regex = re.compile(
-            f'(?P<title>{re.escape(title)})(?P<count>\\d*),?', re.I
+            f'(?P<title>{re.escape(title)})(?P<count>\\d*),?', re.IGNORECASE
         )
         matches = sheet_title_regex.findall(titles)
         if matches:

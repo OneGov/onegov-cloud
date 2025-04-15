@@ -21,6 +21,7 @@ from onegov.election_day.models.party_result.mixins import (
 from onegov.election_day.models.party_result.mixins import (
     PartyResultsOptionsMixin)
 from onegov.file import NamedFile
+from operator import itemgetter
 from sqlalchemy import Column, Boolean
 from sqlalchemy import Date
 from sqlalchemy import Text
@@ -201,7 +202,7 @@ class ElectionCompound(
             (e.domain_supersegment, e.completed)
             for e in self.elections
         )
-        grouped = groupbylist(pairs, lambda x: x[0])
+        grouped = groupbylist(pairs, itemgetter(0))
 
         if len(grouped) == 1 and grouped[0][0] == '':
             result = [completed for _, completed in grouped[0][1]]

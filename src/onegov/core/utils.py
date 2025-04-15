@@ -952,7 +952,7 @@ def safe_format(
     buffer = StringIO()
     opened = 0
 
-    for ix, char in enumerate(format):
+    for char in format:
         if char == '[':
             opened += 1
 
