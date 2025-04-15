@@ -124,6 +124,7 @@ class Framework(
     cronjob = directive(directives.CronjobAction)
     static_directory = directive(directives.StaticDirectoryAction)
     template_variables = directive(directives.TemplateVariablesAction)
+    replace_setting = directive(directives.ReplaceSettingAction)
     replace_setting_section = directive(directives.ReplaceSettingSectionAction)
 
     #: sets the same-site cookie directive, (may need removal inside iframes)
