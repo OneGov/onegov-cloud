@@ -140,6 +140,7 @@ select = [
     "E",
     "F",
     "FLY002",
+    "FURB",
     "I002",
     "ISC",
     "N",
@@ -176,6 +177,19 @@ ignore = [
     "E711",
     "E712",
     "E741",
+    "FURB101",
+    "FURB103",
+    "FURB110",
+    # NOTE: We should probably enable this, but we use repeated appends
+    #       as a stylistic choice in some cases, extend would add another
+    #       level of indentation.
+    "FURB113",
+    "FURB145",
+    "FURB140",
+    "FURB156",
+    "FURB157",
+    "FURB180",
+    "FURB189",
     "N818",
     "PYI019",
     "PYI041",
@@ -217,6 +231,7 @@ preview = true
 "reportlab_settings.py" = ["N", "I002"]
 "*.pyi" = [
     "E501",
+    "FURB",
     "N",
     "Q",
     # NOTE: We would prefer to set a different target version instead
@@ -238,6 +253,7 @@ preview = true
     "E306",
     "F841",
     "FLY002",
+    "FURB",
     "I002",
     "ISC",
     "N",

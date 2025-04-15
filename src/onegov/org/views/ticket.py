@@ -46,6 +46,7 @@ from onegov.ticket.collection import ArchivedTicketCollection
 from onegov.ticket.errors import InvalidStateChange
 from onegov.gever.gever_client import GeverClientCAS
 from onegov.user import User, UserCollection
+from operator import itemgetter
 from sqlalchemy import select
 from webob import exc
 from urllib.parse import urlsplit
@@ -1126,7 +1127,7 @@ def get_handlers(
             handlers.append(
                 (key, request.translate(handler.handler_title)))
 
-    handlers.sort(key=lambda item: item[1])
+    handlers.sort(key=itemgetter(1))
     handlers.insert(0, ('ALL', _('All Tickets')))
 
     for id, text in handlers:

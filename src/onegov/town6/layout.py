@@ -329,7 +329,7 @@ class FormSubmissionLayout(
 
     @property
     def step_position(self) -> int | None:
-        if self.request.view_name in ('send-message',):
+        if self.request.view_name == 'send-message':
             return None
         if self.model.__class__.__name__ == 'CustomFormDefinition':
             return 1
@@ -358,7 +358,7 @@ class SurveySubmissionLayout(
 
     @property
     def step_position(self) -> int | None:
-        if self.request.view_name in ('send-message',):
+        if self.request.view_name == 'send-message':
             return None
         if self.model.__class__.__name__ == 'SurveyDefinition':
             return 1

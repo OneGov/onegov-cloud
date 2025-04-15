@@ -61,6 +61,7 @@ from onegov.ticket import TicketCollection
 from onegov.ticket.collection import ArchivedTicketCollection
 from onegov.user import Auth, UserCollection, UserGroupCollection
 from onegov.user.utils import password_reset_url
+from operator import itemgetter
 from sedate import to_timezone
 from translationstring import TranslationString
 
@@ -486,7 +487,7 @@ class Layout(ChameleonLayout, OpenGraphMixin):
 
         return [
             (v['name'], v['url']) for k, v in sorted(
-                links.items(), key=lambda item: item[0])
+                links.items(), key=itemgetter(0))
             if v['name'] and v['url']
         ]
 

@@ -152,7 +152,7 @@ class StepSequenceRegistry:
                     f'{prev_step.position - 1} not registered'
                 )
 
-        steps = list(reversed(steps))
+        steps.reverse()
         steps.append(step)
 
         next_step = step

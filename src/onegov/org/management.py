@@ -308,16 +308,14 @@ class LinkHealthCheck(ModelsWithLinksMixin):
         not_okay_status = 0
 
         def handle_errors(check: LinkCheck, exception: Exception) -> LinkCheck:
-            nonlocal total_count
-            nonlocal error_count
+            nonlocal total_count, error_count
             check.message = str(exception)
             total_count += 1
             error_count += 1
             return check
 
         def on_success(check: LinkCheck, status: int) -> LinkCheck:
-            nonlocal total_count
-            nonlocal not_okay_status
+            nonlocal total_count, not_okay_status
             check.status = status
             check.message = f'Status {status}'
             total_count += 1

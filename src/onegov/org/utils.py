@@ -27,7 +27,7 @@ from onegov.org.models.search import Search
 from onegov.reservation import Resource
 from onegov.ticket import TicketCollection, TicketPermission
 from onegov.user import User, UserGroup
-from operator import attrgetter
+from operator import add, attrgetter
 from sqlalchemy import nullsfirst  # type:ignore[attr-defined]
 
 
@@ -940,7 +940,7 @@ def predict_next_value(
     values: Sequence[_T],
     min_probability: float = 0.8,
     compute_delta: Callable[[Any, Any], Any] = lambda x, y: y - x,
-    add_delta: Callable[[Any, Any], Any | None] = lambda x, d: x + d
+    add_delta: Callable[[Any, Any], Any | None] = add
 ) -> _T | None:
     """ Takes a list of values and tries to predict the next value in the
     series.

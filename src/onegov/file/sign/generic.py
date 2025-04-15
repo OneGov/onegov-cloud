@@ -123,8 +123,7 @@ class SigningService:
             _fd, path = mkstemp()
 
             with open(path, 'rb+') as output:
-                for chunk in iter(lambda: file.read(4096), b''):
-                    output.write(chunk)
+                output.writelines(iter(lambda: file.read(4096), b''))
 
                 output.seek(0)
 

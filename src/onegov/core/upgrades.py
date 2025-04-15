@@ -30,10 +30,10 @@ if TYPE_CHECKING:
 
 @upgrade_task('Drop primary key from associated tables')
 def drop_primary_key_from_associated_tables(context: UpgradeContext) -> None:
-    bases = set()
-
-    for cls in find_models(Base, lambda cls: issubclass(cls, Associable)):
-        bases.add(cls.association_base())  # type:ignore[attr-defined]
+    bases = {
+        cls.association_base()  # type: ignore[attr-defined]
+        for cls in find_models(Base, lambda cls: issubclass(cls, Associable))
+    }
 
     for base in bases:
         for link in base.registered_links.values():
@@ -119,10 +119,10 @@ def migrate_to_jsonb(
 
 @upgrade_task('Rename associated tables')
 def rename_associated_tables(context: UpgradeContext) -> None:
-    bases = set()
-
-    for cls in find_models(Base, lambda cls: issubclass(cls, Associable)):
-        bases.add(cls.association_base())  # type:ignore[attr-defined]
+    bases = {
+        cls.association_base()  # type:ignore[attr-defined]
+        for cls in find_models(Base, lambda cls: issubclass(cls, Associable))
+    }
 
     for base in bases:
         for link in base.registered_links.values():
@@ -196,13 +196,13 @@ def remove_redundant_page_to_general_file_links(
 
 @upgrade_task('Add unique constraint to association tables')
 def unique_constraint_in_association_tables(context: UpgradeContext) -> None:
-    bases = set()
-
-    for cls in chain(
-        find_models(Base, lambda cls: issubclass(cls, Associable)),
-        find_models(ORMBase, lambda cls: issubclass(cls, Associable))
-    ):
-        bases.add(cls.association_base())  # type:ignore[attr-defined]
+    bases = {
+        cls.association_base()  # type:ignore[attr-defined]
+        for cls in chain(
+            find_models(Base, lambda cls: issubclass(cls, Associable)),
+            find_models(ORMBase, lambda cls: issubclass(cls, Associable))
+        )
+    }
 
     link: RegisteredLink
     for base in bases:
