@@ -97,12 +97,18 @@ WEEKDAYS = (
 
 @OrgApp.cronjob(hour='*', minute=0, timezone='UTC')
 def hourly_maintenance_tasks(request: OrgRequest) -> None:
+    now = utcnow()
     publish_files(request)
-    handle_publication_models(request)
+    handle_publication_models(request, now)
     send_daily_newsletter(request)
     send_scheduled_newsletter(request)
     delete_old_tans(request)
     delete_old_tan_accesses(request)
+    request.app.org.meta['hourly_maintenance_tasks_last_run'] = now
+    # NOTE: Shouldn't be necessary, but better safe than sorry, since
+    #       `maybe_merge` in `request_cached` can fail if we try to
+    #       access `app.org` after this point without flushing.
+    request.session.flush()
 
 
 def send_scheduled_newsletter(request: OrgRequest) -> None:
@@ -172,7 +178,7 @@ def publish_files(request: OrgRequest) -> None:
     FileCollection(request.session).publish_files()
 
 
-def handle_publication_models(request: OrgRequest) -> None:
+def handle_publication_models(request: OrgRequest, now: datetime) -> None:
     """
     Reindexes all recently published/unpublished objects
     in the elasticsearch database.
@@ -197,7 +203,6 @@ def handle_publication_models(request: OrgRequest) -> None:
 
     objects = set()
     session = request.app.session()
-    now = utcnow()
     then = request.app.org.meta.get('hourly_maintenance_tasks_last_run',
                                     now - timedelta(hours=1))
     for base in request.app.session_manager.bases:
@@ -230,8 +235,6 @@ def handle_publication_models(request: OrgRequest) -> None:
                 obj.directory.enable_update_notifications):
             send_email_notification_for_directory_entry(
                 obj.directory, obj, request)
-
-    request.app.org.meta['hourly_maintenance_tasks_last_run'] = now
 
 
 def delete_old_tans(request: OrgRequest) -> None:
