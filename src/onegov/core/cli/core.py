@@ -610,7 +610,7 @@ def run_processors(
         def get_cronjobs_enabled() -> bool:
             return False
 
-        @CliApplication.setting_section(section='roles')
+        @CliApplication.replace_setting_section(section='roles')
         def get_roles_setting() -> dict[str, set[type[Intent]]]:
             # override the security settings -> we need the public
             # role to work for anonymous users, even if the base
