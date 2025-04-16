@@ -1234,6 +1234,14 @@ ul.recipients {
     footer {
         display: none;
     }
+
+    .show-in-iframe .breadcrumbs {
+        display: block;
+    }
+
+    #back-button {
+        display: block;
+    }
 }
 
 /*

@@ -145,15 +145,17 @@
 </metal:editbar>
 
 <metal:breadcrumbs define-macro="breadcrumbs">
-    <div id="breadcrumbs">
-        <nav aria-label="You are here" role="navigation" i18n:attributes="aria-label">
-            <ul class="breadcrumbs" tal:condition="layout.breadcrumbs">
-                <tal:b repeat="link layout.breadcrumbs">
-                    <li tal:content="link(layout)"></li>
-                </tal:b>
-            </ul>
-        </nav>
-    </div>
+    <tal:b tal:define="bc_level request.GET.get('bc-level', False)">
+        <div id="breadcrumbs" class="${'show-in-iframe' if bc_level else ''}">
+            <nav aria-label="You are here" role="navigation" i18n:attributes="aria-label">
+                <ul class="breadcrumbs" tal:condition="layout.breadcrumbs" >
+                    <tal:b repeat="link layout.breadcrumbs[int(bc_level or 0):]">
+                        <li tal:content="link(layout)"></li>
+                    </tal:b>
+                </ul>
+            </nav>
+        </div>
+    </tal:b>
 </metal:breadcrumbs>
 
 <metal:panel-links define-macro="panel-links">
