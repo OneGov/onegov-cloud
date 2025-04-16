@@ -1028,7 +1028,7 @@ $booking-left-margin: 1.6rem;
         padding-top: .15rem;
 
         &::before {
-            @include icon('\f06a');
+            @include icon-bold('\f06a');
             color: $orange-dark;
             margin: 0 1ex;
         }

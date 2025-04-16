@@ -33,6 +33,10 @@
       de: sponsors/concordia-banner-de.jpg
       fr: sponsors/concordia-banner-fr.jpg
       it: sponsors/concordia-banner-it.jpg
+    narrow:
+      de: sponsors/concordia-banner-narrow-de.jpg
+      fr: sponsors/concordia-banner-narrow-fr.jpg
+      it: sponsors/concordia-banner-narrow-it.jpg
     url:
       de: 'https://www.concordia.ch/de/microsites/feriennet.html?cocid=banner-fnangebotue-2023-0-projuventute-de'
       fr: 'https://www.concordia.ch/fr/microsites/feriennet.html?cocid=banner-fnangebotue-2023-0-projuventute-fr'

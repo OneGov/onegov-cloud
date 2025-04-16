@@ -110,8 +110,8 @@ class FeriennetApp(TownApp):
         ]
 
         if sponsors:
-            sponsors[0].banners['src'] = sponsors[0].url_for(
-                request, sponsors[0].banners['src'])
+            sponsors[0].banners['narrow'] = sponsors[0].url_for(
+                request, sponsors[0].banners['narrow'])
 
         return sponsors
 
