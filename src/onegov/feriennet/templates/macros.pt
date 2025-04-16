@@ -272,8 +272,8 @@
         </span>
         <span>
             <tal:b condition="request.locale.startswith('de')">
-            <a class="footer-link" href="https://www.projuventute.ch/de/nutzungsbestimmungen">
-                Nutzungsbestimmungen</a>
+            <a class="footer-link" href="https://www.projuventute.ch/de/nutzungsbedingungen">
+                Nutzungsbedingungen</a>
             </tal:b>
             <tal:b condition="request.locale.startswith('fr')">
             <a class="footer-link" href="https://www.projuventute.ch/fr/conditions-dutilisation">
