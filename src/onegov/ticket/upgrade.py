@@ -9,6 +9,7 @@ from onegov.core.upgrade import upgrade_task
 from onegov.ticket import Ticket
 from sqlalchemy import Boolean, Column, Integer, Text, Enum
 from sqlalchemy import column, update, func, and_, true, false
+from sqlalchemy.dialects.postgresql import HSTORE
 
 from typing import TYPE_CHECKING
 if TYPE_CHECKING:
@@ -208,3 +209,20 @@ def add_exclusive_and_notification_columns_to_ticket_permission(
             column('exclusive').isnot_distinct_from(True)
             | column('immediate_notification').isnot_distinct_from(True),
         )
+
+
+@upgrade_task('Add tags column and index to ticket')
+def add_tags_column_and_index_to_ticket(context: UpgradeContext) -> None:
+    if context.has_column('tickets', 'tags'):
+        return
+
+    context.operations.add_column(
+        'tickets', Column('tags', HSTORE, nullable=True)
+    )
+
+    context.operations.create_index(
+        'ix_tickets_tags',
+        'tickets',
+        ['tags'],
+        postgresql_using='gin',
+    )

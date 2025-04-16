@@ -411,6 +411,22 @@ class ReservationHandler(Handler):
         )
 
     @cached_property
+    def tag_meta(self) -> dict[str, Any]:
+        if self.deleted:
+            return self.ticket.snapshot.get('tag_meta', {})
+
+        row = (
+            self.reservations_query()
+            .filter(Reservation.data.isnot(None))
+            .with_entities(Reservation.data)
+            .first()
+        )
+        if row is None:
+            return {}
+
+        return row[0].get('ticket_tag_meta', {})
+
+    @cached_property
     def submission(self) -> FormSubmission | None:
         return FormSubmissionCollection(self.session).by_id(self.id)
 
@@ -528,6 +544,19 @@ class ReservationHandler(Handler):
                 'layout': layout
             })
         )
+
+        # render internal tag meta data
+        if (request.is_manager or request.is_supporter) and self.tag_meta:
+            parts.append(
+                Markup('').join(
+                    Markup(
+                        '<dl class="field-display">'
+                        '<dt>{}</dt><dd>{}</dd>'
+                        '</dl>'
+                    ).format(key, value)
+                    for key, value in self.tag_meta.items()
+                )
+            )
 
         if self.submission:
             form = self.submission.form_class(data=self.submission.data)

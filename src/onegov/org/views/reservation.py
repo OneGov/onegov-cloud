@@ -6,9 +6,8 @@ import sedate
 import transaction
 
 from datetime import date, time, timedelta
-from dill import pickles  # type:ignore[import-untyped]
 from libres.modules.errors import LibresError
-from onegov.core.custom import json
+from onegov.core.custom import json, msgpack
 from onegov.core.html import html_to_text
 from onegov.core.security import Public, Private
 from onegov.core.templates import render_template
@@ -279,7 +278,7 @@ def handle_reservation_form(
     reservations on a resource.
 
     """
-    reservations_query = self.bound_reservations(request)  # type:ignore
+    reservations_query = self.bound_reservations(request, with_data=True)  # type: ignore[attr-defined]
     reservations: tuple[Reservation, ...] = tuple(reservations_query)
 
     assert_access_only_if_there_are_reservations(reservations)
@@ -295,13 +294,37 @@ def handle_reservation_form(
     if request.POST:
         assert form.email.data is not None
 
-        # update the e-mail data
+        reserved_labels = {str(field.label.text) for field in form}
+
+        # update the e-mail and tag data
         for reservation in reservations:
             reservation.email = form.email.data
+            if 'ticket_tag' in form:
+                data = (reservation.data or {})
+                data['ticket_tag'] = form.ticket_tag.data
+                for item in request.app.org.ticket_tags:
+                    if not isinstance(item, dict):
+                        continue
+
+                    key, meta = next(iter(item.items()))
+                    if key != form.ticket_tag.data:
+                        continue
+
+                    # set any static data that isn't set
+                    # by the form itself
+                    if filtered_meta := {
+                        key: value
+                        for key, value in meta.items()
+                        if key not in reserved_labels
+                    }:
+                        data['ticket_tag_meta'] = filtered_meta
+                    break
+
+                reservation.data = data
 
         # while we re at it, remove all expired sessions
         # FIXME: Should this be part of the base class?
-        self.remove_expired_reservation_sessions()  # type:ignore
+        self.remove_expired_reservation_sessions()  # type: ignore[attr-defined]
 
         # add the submission if it doesn't yet exist
         if self.definition and not submission:
@@ -321,6 +344,7 @@ def handle_reservation_form(
                 submission, form, exclude=form.reserved_fields
             )
     # set defaults based on remembered submissions from session
+    # TODO: should we first apply field defaults based on the remembered tag?
     else:
         remembered: dict[str, Any]
         remembered = request.browser_session.get('remembered_submissions', {})
@@ -343,8 +367,8 @@ def handle_reservation_form(
         # but don't remember submitted csrf_token
         if 'csrf_token' in remembered:
             del remembered['csrf_token']
-        # only remember the data if we can pickle the data
-        if pickles(remembered, recurse=True, safe=True):
+        # only remember the data if we can encode the data to msgpack
+        if msgpack.packable(remembered):
             request.browser_session.remembered_submissions = remembered
         return morepath.redirect(request.link(self, 'confirmation'))
     else:
@@ -486,7 +510,7 @@ def confirm_reservation(
 ) -> RenderData:
 
     reservations: list[Reservation]
-    reservations = self.bound_reservations(request).all()  # type:ignore
+    reservations = self.bound_reservations(request).all()  # type: ignore[attr-defined]
     assert_access_only_if_there_are_reservations(reservations)
 
     token = reservations[0].token
@@ -557,7 +581,7 @@ def confirm_reservation(
 )
 def finalize_reservation(self: Resource, request: OrgRequest) -> Response:
     reservations: list[Reservation]
-    reservations = self.bound_reservations(request).all()  # type:ignore
+    reservations = self.bound_reservations(request, with_data=True).all()  # type: ignore[attr-defined]
     assert_access_only_if_there_are_reservations(reservations)
 
     session_id = self.bound_session_id(request)  # type:ignore
@@ -610,6 +634,8 @@ def finalize_reservation(self: Resource, request: OrgRequest) -> Response:
             ticket = TicketCollection(request.session).open_ticket(
                 handler_code='RSV', handler_id=token.hex
             )
+            if data := reservations[0].data:
+                ticket.tag = data.get('ticket_tag')
             TicketMessage.create(ticket, request, 'opened', 'external')
 
         show_submission = request.params.get('send_by_email') == 'yes'

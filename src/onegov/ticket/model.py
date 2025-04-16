@@ -11,8 +11,10 @@ from onegov.user import User
 from onegov.user import UserGroup
 from sedate import utcnow
 from sqlalchemy import Boolean, Column, Enum, ForeignKey, Integer, Text
-from sqlalchemy import CheckConstraint
+from sqlalchemy import CheckConstraint, Index
+from sqlalchemy.dialects.postgresql import HSTORE
 from sqlalchemy.ext.declarative import declared_attr
+from sqlalchemy.ext.mutable import MutableDict
 from sqlalchemy.orm import backref, deferred, object_session, relationship
 from uuid import uuid4
 
@@ -60,6 +62,13 @@ class Ticket(Base, TimestampMixin, ORMSearchable):
     #: the group this ticket belongs to. used to differentiate tickets
     #: belonging to one specific handler (handler -> group -> title)
     group: Column[str] = Column(Text, nullable=False)
+
+    #: Tags/Categories of the ticket
+    _tags: Column[dict[str, str] | None] = Column(  # type:ignore
+        MutableDict.as_mutable(HSTORE),  # type:ignore[no-untyped-call]
+        nullable=True,
+        name='tags'
+    )
 
     #: the name of the handler associated with this ticket, may be used to
     #: create custom polymorphic subclasses of this class. See
@@ -146,6 +155,10 @@ class Ticket(Base, TimestampMixin, ORMSearchable):
         'polymorphic_on': handler_code
     }
 
+    __table_args__ = (
+        Index('ix_tickets_tags', _tags, postgresql_using='gin'),
+    )
+
     # limit the search to the ticket number -> the rest can be found
     es_public = False
     es_properties = {
@@ -157,6 +170,18 @@ class Ticket(Base, TimestampMixin, ORMSearchable):
         'ticket_data': {'type': 'localized_html'},
         'extra_localized_text': {'type': 'localized'}
     }
+
+    # NOTE: For now we only allow setting a single tag, in order to
+    #       avoid conflicts between tag-metadata, but in the future
+    #       we may need to allow it anyways, so that's why it's a
+    #       HSTORE column
+    @property
+    def tag(self) -> str | None:
+        return next(iter(self._tags.keys())) if self._tags else None
+
+    @tag.setter
+    def tag(self, value: str | None) -> None:
+        self._tags = {value: ''} if value else None
 
     @property
     def extra_localized_text(self) -> str | None:
@@ -327,6 +352,8 @@ class Ticket(Base, TimestampMixin, ORMSearchable):
             if data:
                 self.snapshot[f'submitter_{info}'] = data
 
+        self.snapshot['tag_meta'] = self.handler.tag_meta
+
 
 class TicketPermission(Base, TimestampMixin):
     """ Defines a custom ticket permission.
@@ -384,7 +411,7 @@ class TicketPermission(Base, TimestampMixin):
         index=True
     )
 
-    __table_args = (
+    __table_args__ = (
         CheckConstraint(
             exclusive.isnot_distinct_from(True)
             | immediate_notification.isnot_distinct_from(True),
