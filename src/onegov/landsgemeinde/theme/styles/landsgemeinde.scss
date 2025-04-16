@@ -480,7 +480,7 @@ h1.main-title small {
 .memorial-link {
     @include smooth-edges;
     background: $white-smoke;
-    display: block;
+    display: flex;
     font-weight: bold;
     padding: 1rem;
     transition: background 200ms linear;
