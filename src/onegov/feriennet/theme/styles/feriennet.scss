@@ -2422,9 +2422,6 @@ $booking-left-margin: 1.6rem;
 /*
     Sponsoring banners
 */
-.banner-buchungen, .banner-rechnungen {
-    margin-bottom: 2rem;
-}
 
 .sponsor-banner {
     /*
@@ -2433,8 +2430,7 @@ $booking-left-margin: 1.6rem;
     */
     position: relative;
 
-    div > img,
-    div > a > img {
+    img{
         border-radius: .7rem;
     }
 
@@ -2467,6 +2463,11 @@ $booking-left-margin: 1.6rem;
         }
     }
 }
+
+.banner-buchungen, .banner-rechnungen, .banner-activities p.banner-info {
+    margin-bottom: 2rem;
+}
+
 
 /*
     Period messages
