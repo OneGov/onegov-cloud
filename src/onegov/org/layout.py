@@ -2324,21 +2324,42 @@ class AllocationRulesLayout(ResourceLayout):
 
     @cached_property
     def editbar_links(self) -> list[Link | LinkGroup]:
-        return [
-            LinkGroup(
-                title=_('Add'),
-                links=[
-                    Link(
-                        text=_('Availability period'),
-                        url=self.request.link(
-                            self.model,
-                            name='new-rule'
+        add_link = LinkGroup(
+            title=_('Add'),
+            links=[
+                Link(
+                    text=_('Availability period'),
+                    url=self.request.link(
+                        self.model,
+                        name='new-rule'
+                    ),
+                    attrs={'class': 'new-link'}
+                )
+            ]
+        )
+
+        if self.request.browser_session.get(  # type: ignore[call-overload]
+            'copied_allocation_rules', {}
+        ).get(self.model.type):
+            return [
+                add_link,
+                Link(
+                    text=_('Paste'),
+                    url=self.request.csrf_protected_url(
+                        self.request.link(self.model, 'paste-rule')
+                    ),
+                    attrs={'class': 'paste-link'},
+                    traits=(
+                        Intercooler(
+                            request_method='POST',
+                            redirect_after=self.request.link(
+                                self.model, 'rules'
+                            )
                         ),
-                        attrs={'class': 'new-link'}
                     )
-                ]
-            ),
-        ]
+                )
+            ]
+        return [add_link]
 
 
 class AllocationEditFormLayout(DefaultLayout):

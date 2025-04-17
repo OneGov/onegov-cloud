@@ -2,7 +2,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE 1.0\n"
-"POT-Creation-Date: 2025-04-17 10:00+0200\n"
+"POT-Creation-Date: 2025-04-17 15:17+0200\n"
 "PO-Revision-Date: 2022-03-15 10:21+0100\n"
 "Last-Translator: Marc Sommerhalder <marc.sommerhalder@seantis.ch>\n"
 "Language-Team: German\n"
@@ -2703,9 +2703,6 @@ msgstr ""
 msgid "Close ticket"
 msgstr "Ticket abschliessen"
 
-msgid "Change tag"
-msgstr "Schlagwort ändern"
-
 msgid "Reopen ticket"
 msgstr "Ticket wieder öffnen"
 
@@ -2812,6 +2809,9 @@ msgstr "Verfügbarkeitszeiträume"
 
 msgid "Availability period"
 msgstr "Verfügbarkeitszeitraum"
+
+msgid "Paste"
+msgstr "Einfügen"
 
 msgid "Edit allocation"
 msgstr "Verfügbarkeit bearbeiten"
@@ -3480,9 +3480,6 @@ msgstr "Eine Nachricht kann nicht als Thema eingefügt werden"
 
 msgid "A Topic cannot be pasted as News"
 msgstr "Ein Thema kann nicht als News eingefügt werden"
-
-msgid "Paste"
-msgstr "Einfügen"
 
 msgid "Please note that this page has subpages which will also be deleted!"
 msgstr ""
@@ -5089,6 +5086,9 @@ msgstr "${count} Notiz"
 msgid "${count} notes"
 msgstr "${count} Notizen"
 
+msgid "Change tag"
+msgstr "Schlagwort ändern"
+
 msgid ""
 "You are editing a note created by someone else. By saving your changes you "
 "will become the author of the whole note."
@@ -5347,6 +5347,12 @@ msgstr ""
 
 msgid "The availability period was stopped"
 msgstr "Der Verfügbarkeitszeitraum wurde gestoppt"
+
+msgid "The availability period was added to the clipboard"
+msgstr "Der Verfügbarkeitszeitraum wurde in die Zwischenablage kopiert"
+
+msgid "Pasted availability period from to the clipboard"
+msgstr "Der Verfügbarkeitszeitraum aus der Zwischenablage wurde eingefügt"
 
 #, python-format
 msgid "The availability period was deleted, along with ${n} allocations"

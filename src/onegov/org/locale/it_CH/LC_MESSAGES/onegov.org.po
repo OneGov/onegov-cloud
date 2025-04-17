@@ -2,7 +2,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: \n"
-"POT-Creation-Date: 2025-04-17 10:00+0200\n"
+"POT-Creation-Date: 2025-04-17 15:17+0200\n"
 "PO-Revision-Date: 2022-03-15 10:52+0100\n"
 "Last-Translator: \n"
 "Language-Team: \n"
@@ -2714,9 +2714,6 @@ msgstr ""
 msgid "Close ticket"
 msgstr "Chiudi il biglietto"
 
-msgid "Change tag"
-msgstr "Modificare il tag"
-
 msgid "Reopen ticket"
 msgstr "Riapri il biglietto"
 
@@ -2822,6 +2819,9 @@ msgstr "Periodi di disponibilità"
 
 msgid "Availability period"
 msgstr "Periodo di disponibilità"
+
+msgid "Paste"
+msgstr "Incolla"
 
 msgid "Edit allocation"
 msgstr "Modifica allocazione"
@@ -3488,9 +3488,6 @@ msgstr "Una notizia non può essere incollata come argomento"
 
 msgid "A Topic cannot be pasted as News"
 msgstr "Un argomento non può essere incollato come notizia"
-
-msgid "Paste"
-msgstr "Incolla"
 
 msgid "Please note that this page has subpages which will also be deleted!"
 msgstr ""
@@ -5090,6 +5087,9 @@ msgstr "${count} nota"
 msgid "${count} notes"
 msgstr "${count} note"
 
+msgid "Change tag"
+msgstr "Modificare il tag"
+
 msgid ""
 "You are editing a note created by someone else. By saving your changes you "
 "will become the author of the whole note."
@@ -5352,6 +5352,12 @@ msgstr ""
 
 msgid "The availability period was stopped"
 msgstr "Il periodo di disponibilità è stato fermato"
+
+msgid "The availability period was added to the clipboard"
+msgstr "Il periodo di disponibilità è stato aggiunto agli appunti"
+
+msgid "Pasted availability period from to the clipboard"
+msgstr "Incollare il periodo di disponibilità negli appunti"
 
 #, python-format
 msgid "The availability period was deleted, along with ${n} allocations"
