@@ -344,15 +344,6 @@ def handle_reservation_form(
             forms.submissions.update(
                 submission, form, exclude=form.reserved_fields
             )
-    # set defaults based on remembered submissions from session
-    # TODO: should we first apply field defaults based on the remembered tag?
-    else:
-        remembered: dict[str, Any]
-        remembered = request.browser_session.get('remembered_submissions', {})
-        for field_name in form.data:
-            if field_name not in remembered:
-                continue
-            getattr(form, field_name).default = remembered[field_name]
 
     # enforce the zip-code block if configured
     if request.POST:
@@ -363,6 +354,7 @@ def handle_reservation_form(
     # go to the next step if the submitted data is valid
     if form.submitted(request) and not blocked:
         # also remember submitted form data
+        remembered: dict[str, Any]
         remembered = request.browser_session.get('remembered_submissions', {})
         remembered.update(form.data)
         # but don't remember submitted csrf_token
@@ -379,6 +371,16 @@ def handle_reservation_form(
         # Todo: This entry created remained after a reservation
         if reservations[0].email != '0xdeadbeef@example.org':
             data['email'] = reservations[0].email
+
+        # set defaults based on remembered submissions from session
+        # TODO: should we first apply defaults based on the remembered tag?
+        if not request.POST and (remembered := {
+            key: value
+            for key, value in request.browser_session.get(
+                'remembered_submissions', {}).items()
+            if key in form
+        }):
+            data.update(remembered)
 
         if submission:
             data.update(submission.data)
