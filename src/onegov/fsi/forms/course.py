@@ -38,7 +38,7 @@ def string_to_timedelta(value: str | None) -> timedelta | None:
 
     count = g.group(1)
     unit = g.group(2)
-    normalized_unit = unit[:-1] if unit.endswith('s') else unit
+    normalized_unit = unit.removesuffix('s')
 
     if multiplier := mapping.get(normalized_unit):
         days = int(count) * multiplier

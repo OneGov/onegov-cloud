@@ -37,6 +37,7 @@ from onegov.org.theme import user_options
 from onegov.ticket import handlers
 from onegov.ticket import TicketPermission
 from onegov.user import User
+from operator import itemgetter
 from purl import URL
 from wtforms.fields import BooleanField
 from wtforms.fields import EmailField
@@ -1126,7 +1127,7 @@ class OrgTicketSettingsForm(Form):
                 TicketPermission.handler_code,
                 TicketPermission.group
             ).filter(TicketPermission.exclusive.is_(True))
-        ), key=lambda x: x[1])
+        ), key=itemgetter(1))
 
         if not permissions:
             self.delete_field('permissions')

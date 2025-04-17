@@ -297,6 +297,7 @@ def get_common_asset() -> Iterator[str]:
     yield 'apply-filters.js'
     yield 'foundation-intercooler.js'
     yield 'chosen_select_hierarchy.js'
+    yield 'iframe_request_parameters.js'
 
 
 @TownApp.webasset('editor')

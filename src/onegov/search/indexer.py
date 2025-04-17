@@ -658,8 +658,7 @@ class IndexManager:
         )
 
         for info in infos.values():
-            for alias in info['aliases']:
-                result.add(alias)
+            result.update(info['aliases'])
 
         return result
 

@@ -114,7 +114,7 @@ class AuthenticationProvider(metaclass=ABCMeta):
             assert metadata.name not in AUTHENTICATION_PROVIDERS
 
             # reserved names
-            assert metadata.name not in ('auto', )
+            assert metadata.name != 'auto'
 
             cls.metadata = metadata
             AUTHENTICATION_PROVIDERS[metadata.name] = cls

@@ -20,6 +20,7 @@ from onegov.org.forms.event import EventConfigurationForm
 from onegov.org.layout import OccurrenceLayout, OccurrencesLayout
 from onegov.org.views.utils import show_tags, show_filters
 from onegov.ticket import TicketCollection
+from operator import itemgetter
 from sedate import as_datetime, replace_timezone
 
 
@@ -138,10 +139,9 @@ def view_occurrences(
 
     layout = layout or OccurrencesLayout(self, request)
 
-    translated_tags = [
+    translated_tags = sorted((
         (tag, request.translate(_(tag))) for tag in self.used_tags
-    ]
-    translated_tags.sort(key=lambda i: i[1])
+    ), key=itemgetter(1))
 
     if (
         filter_type in ('filters', 'tags_and_filters')
