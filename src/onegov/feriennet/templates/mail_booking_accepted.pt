@@ -16,7 +16,12 @@
             <tal:b tal:content="bookings_link"></tal:b>
         </p>
         <br>
-        <p i18n:translate>Best regards</p>
-        <metal:b use-macro="layout.macros['sender']|nothing" />
+            <p i18n:translate>Best regards</p>
+            <metal:b use-macro="layout.macros['sender']|nothing" />
+            <tal:b condition="cancellation_conditions">
+                <hr>
+                <b i18n:translate>Cancellation conditions:</b>
+                <div tal:content="cancellation_conditions"></div>
+            </tal:b>
     </tal:b>
 </div>
