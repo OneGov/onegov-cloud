@@ -5,7 +5,7 @@ $(document).ready(function(){
         hierarchy.push($(this).val());
     });
 
-    $(".chosen-select[multiple]").chosen().change(function (event) {
+    $(".chosen-select[multiple]").change(function (event) {
         var new_categories = $(event.target).val();
         if (!new_categories) {
             new_categories = [];
