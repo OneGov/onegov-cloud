@@ -475,6 +475,53 @@ h1.main-title small {
     }
 }
 
+/* Previous and next buttons */
+// only for mobile
+@include breakpoint(medium down) {
+    .item-arrows {
+        position: fixed;
+        top: calc(100vh - 5rem);
+        background: $aluminum;
+        font-weight: bold;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        z-index: 100;
+        // box-shadow: 0 0 10px rgba(0, 0, 0, .1);
+        // border: 1px solid $primary-color;
+
+        a {
+            color: $white;
+            padding: .5rem .6rem;
+            padding-bottom: .4rem;
+        }
+    }
+    .prev-item {
+        left: 0;
+        border-radius: 0 0.7rem 0.7rem 0;
+        border-left: 0;
+        a {
+            padding-right: .7rem;
+            i {
+                margin-right: .3rem;
+            }
+        }
+    }
+
+    .next-item {
+        right: 0;
+        border-radius: 0.7rem 0 0 0.7rem;
+        border-right: 0;
+
+        a {
+            padding-left: .7rem;
+            i {
+                margin-left: .3rem;
+            }
+        }
+    }
+
+}
 /*Download Icons*/
 .downloads a,
 .memorial-link {
