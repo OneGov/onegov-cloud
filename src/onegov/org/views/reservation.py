@@ -294,33 +294,34 @@ def handle_reservation_form(
     if request.POST:
         assert form.email.data is not None
 
-        reserved_labels = {str(field.label.text) for field in form}
+        if 'ticket_tag' in form:
+            reserved_labels = {str(field.label.text) for field in form}
+            filtered_meta = {}
+            for item in request.app.org.ticket_tags:
+                if not isinstance(item, dict):
+                    continue
+
+                key, meta = next(iter(item.items()))
+                if key != form.ticket_tag.data:
+                    continue
+
+                # set any static data that isn't set
+                # by the form itself
+                filtered_meta = {
+                    key: value
+                    for key, value in meta.items()
+                    if key not in reserved_labels
+                }
+                break
 
         # update the e-mail and tag data
         for reservation in reservations:
             reservation.email = form.email.data
             if 'ticket_tag' in form:
-                data = (reservation.data or {})
+                data = reservation.data = (reservation.data or {})
                 data['ticket_tag'] = form.ticket_tag.data
-                for item in request.app.org.ticket_tags:
-                    if not isinstance(item, dict):
-                        continue
-
-                    key, meta = next(iter(item.items()))
-                    if key != form.ticket_tag.data:
-                        continue
-
-                    # set any static data that isn't set
-                    # by the form itself
-                    if filtered_meta := {
-                        key: value
-                        for key, value in meta.items()
-                        if key not in reserved_labels
-                    }:
-                        data['ticket_tag_meta'] = filtered_meta
-                    break
-
-                reservation.data = data
+                if filtered_meta:
+                    data['ticket_tag_meta'] = filtered_meta
 
         # while we re at it, remove all expired sessions
         # FIXME: Should this be part of the base class?
