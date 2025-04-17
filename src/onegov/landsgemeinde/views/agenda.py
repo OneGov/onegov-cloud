@@ -82,9 +82,21 @@ def view_agenda_item(
         video_url = append_query_param(video_url, 'mute', '1')
         video_url = append_query_param(video_url, 'rel', '0')
 
+    prev_item = None
+    next_item = None
+
+    if agenda_items:
+        index = agenda_items.index(self)
+        if index > 0:
+            prev_item = agenda_items[index - 1]
+        if index < len(agenda_items) - 1:
+            next_item = agenda_items[index + 1]
+
     return {
         'layout': layout,
         'agenda_item': self,
+        'prev_item': prev_item,
+        'next_item': next_item,
         'video_url': video_url,
         'agenda_items': agenda_items,
         'timestamp_to_seconds': timestamp_to_seconds,
