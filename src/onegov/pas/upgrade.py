@@ -10,7 +10,7 @@ from onegov.core.orm.types import UUID
 from onegov.core.upgrade import upgrade_task, UpgradeContext
 
 
-@upgrade_task('Add external id from api')
+@upgrade_task('Add external id from api 2')
 def add_external_id_for_api(context: UpgradeContext) -> None:
     for table in (
         'pas_parliamentarians',

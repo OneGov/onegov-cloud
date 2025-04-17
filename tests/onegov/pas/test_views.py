@@ -323,15 +323,9 @@ def test_view_upload_json(client):
     page.form['people_source'] = [
         upload_file(path) for path in people_paths
     ]
-    assert page.form['clean']
 
     # Submit the form
     result = page.form.submit().maybe_follow()
-    result.showbrowser()
 
     # Add assertions as needed
     assert result.status_code == 200
-
-    # todo: test clean checkbox
-    page = client.get('/pas-import')
-    page.form

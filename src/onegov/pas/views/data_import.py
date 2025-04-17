@@ -22,8 +22,8 @@ from typing import Any, TYPE_CHECKING
 if TYPE_CHECKING:
     from onegov.core.types import LaxFileDict
     from onegov.core.types import RenderData
-    from onegov.town6.request import TownRequest
     from collections.abc import Sequence
+    from onegov.town6.request import TownRequest
     from webob import Response
 
 
