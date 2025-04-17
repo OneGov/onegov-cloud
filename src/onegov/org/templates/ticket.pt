@@ -187,8 +187,8 @@
                         </div>
                     </div>
 
-                    <div tal:condition="request.is_manager_for_model(ticket) and ticket.handler_code == 'RSV'" class="field-display-block">
-                        <div class="field-display-label"><span i18n:translate>Tag</span> <a href="${request.link(ticket, 'change-tag')}" class="ticket-change-tag" title="Change tag" i18n:attributes="title"></a></div>
+                    <div tal:condition="request.is_manager_for_model(ticket) and ticket.handler_code == 'RSV' and request.app.org.ticket_tags" class="field-display-block">
+                        <div class="field-display-label"><span i18n:translate>Tag</span> <a href="${request.link(ticket, 'change-tag')}" class="ticket-change-tag" title="Change tag" i18n:attributes="title" tal:condition="ticket.state == 'pending'"></a></div>
                         <div class="field-display-data ticket-tag">
                             <tal:b tal:condition="ticket.tag">${ticket.tag}</tal:b>
                             <tal:b tal:condition="not:ticket.tag" i18n:translate>Without</tal:b>

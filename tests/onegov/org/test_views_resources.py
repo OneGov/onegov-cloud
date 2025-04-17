@@ -1097,6 +1097,77 @@ def test_reserve_allocation(broadcast, authenticate, connect, client):
 
 
 @freeze_time("2015-08-28", tick=True)
+@patch('onegov.websockets.integration.connect')
+@patch('onegov.websockets.integration.authenticate')
+@patch('onegov.websockets.integration.broadcast')
+def test_reserve_with_tag(broadcast, authenticate, connect, client):
+    # prepate the required data
+    resources = ResourceCollection(client.app.libres_context)
+    resource = resources.by_name('tageskarte')
+    resource.definition = 'Note = ___'
+    scheduler = resource.get_scheduler(client.app.libres_context)
+
+    allocations = scheduler.allocate(
+        dates=(datetime(2015, 8, 28), datetime(2015, 8, 28)),
+        whole_day=True,
+        quota=4,
+        quota_limit=4
+    )
+
+    reserve = client.bound_reserve(allocations[0])
+    transaction.commit()
+
+    client.login_admin()
+
+    settings = client.get('/ticket-settings')
+    settings.form['ticket_tags'] = (
+        '- Test 1:\n'
+        '    Note: Default Note\n'
+        '    Foo: Bar\n'
+        '- Test 2:\n'
+        '    Foo: Baz\n'
+    )
+    settings.form.submit().follow()
+
+    # create a reservation
+    result = reserve(quota=4, whole_day=True)
+    assert result.json == {'success': True}
+    assert result.headers['X-IC-Trigger'] == 'rc-reservations-changed'
+
+    # and fill out the form
+    formular = client.get('/resource/tageskarte/form')
+    formular.form['ticket_tag'] = 'Test 1'
+    formular.form['email'] = 'info@example.org'
+    formular.form['note'] = 'Foobar'
+    formular.form.submit().follow().form.submit().follow()
+
+    ticket = client.get('/tickets/ALL/open').click('Annehmen').follow()
+    assert 'RSV-' in ticket.text
+    assert '<dt>Foo</dt><dd>Bar</dd>' in ticket.text
+    assert '<dt>Foo</dt><dd>Baz</dd>' not in ticket.text
+    assert 'Test 1' in ticket.text
+    assert 'Test 2' not in ticket.text
+    assert 'Foobar' in ticket.text
+    assert 'Default Note' not in ticket.text
+    assert len(os.listdir(client.app.maildir)) == 1
+
+    # make sure the resulting reservation has no session_id set
+    ids = [r.session_id for r in scheduler.managed_reservations()]
+    assert not any(ids)
+
+    # change the selected tag
+    change_tag = ticket.click(href='change-tag')
+    change_tag.form['tag'] = 'Test 2'
+    ticket = change_tag.form.submit().follow()
+    assert '<dt>Foo</dt><dd>Bar</dd>' not in ticket.text
+    assert '<dt>Foo</dt><dd>Baz</dd>' in ticket.text
+    assert 'Test 1' not in ticket.text
+    assert 'Test 2' in ticket.text
+    assert 'Foobar' in ticket.text
+    assert 'Default Note' not in ticket.text
+
+
+@freeze_time("2015-08-28", tick=True)
 def test_reserve_allocation_partially(client):
     # prepate the required data
     resources = ResourceCollection(client.app.libres_context)
