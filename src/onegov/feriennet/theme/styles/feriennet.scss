@@ -3252,9 +3252,18 @@ $booking-left-margin: 1.6rem;
 
 // Images
 
-.page-text img {
-    border-radius: .7rem;
+.has-img {
+    img {
+        border-radius: .7rem;
+    }
+    img:has(+ .alt-text) {
+        border-radius: .7rem .7rem 0 0;
+    }
+    .alt-text {
+        border-radius: 0 0 .7rem .7rem;
+    }
 }
+
 
 .disabled {
     opacity: .5;
