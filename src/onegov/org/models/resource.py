@@ -140,7 +140,8 @@ class SharedMethods:
     def bound_reservations(
         self,
         request: OrgRequest,
-        status: str = 'pending'
+        status: str = 'pending',
+        with_data: bool = False
     ) -> Query[Reservation]:
         """ The reservations associated with this resource and user. """
 
@@ -155,6 +156,9 @@ class SharedMethods:
 
         # used by ReservationInfo
         res = res.options(undefer(Reservation.created))
+
+        if with_data:
+            res = res.options(undefer(Reservation.data))
 
         return res  # type:ignore[return-value]
 

@@ -173,7 +173,6 @@ class Activity(Base, ContentMixin, TimestampMixin):
     def tags(self) -> set[str]:
         return set(self._tags.keys()) if self._tags else set()
 
-    # FIXME: asymmetric property
     @tags.setter
     def tags(self, value: Iterable[str]) -> None:
         self._tags = dict.fromkeys(value, '') if value else None

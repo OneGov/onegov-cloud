@@ -1070,6 +1070,31 @@ class OrgTicketSettingsForm(Form):
         fieldset=_('Notifications'),
     )
 
+    ticket_tags = TextAreaField(
+        label=_('Tags'),
+        description=_(
+            'Each tag can be associated with arbitrary key value pairs '
+            'which will be displayed in the ticket alongside the submitted '
+            'form values. If a key exactly matches the name of a form field '
+            "that field's value will be pre-populated according to the value."
+            '\n\nExample:\n'
+            '```yaml\n'
+            '- High Priority\n'
+            '- Medium Priority\n'
+            '- Low Priority\n'
+            '- FC Govikon:\n'
+            '    E-Mail: fc@govikon.ch\n'
+            '    Postal Code / City: 1234 Govikon\n'
+            '- HC Govikon:\n'
+            '    E-Mail: hc@govikon.ch\n'
+            '    Postal Code / City: 1234 Govikon\n'
+            '```'
+        ),
+        render_kw={
+            'rows': 16,
+        },
+    )
+
     permissions = MultiCheckboxField(
         label=_('Categories restricted by user group settings'),
         choices=[],
@@ -1087,6 +1112,61 @@ class OrgTicketSettingsForm(Form):
                   'enabled.')
             )
             return False
+        return None
+
+    def ensure_valid_ticket_tags(self) -> bool | None:
+        assert isinstance(self.ticket_tags.errors, list)
+
+        if not self.ticket_tags.data:
+            return None
+
+        error_msg = _('Invalid format. Please define tags and '
+                      'their meta data according to the example.')
+
+        try:
+            items = yaml.safe_load(self.ticket_tags.data)
+        except yaml.YAMLError:
+            self.ticket_tags.errors.append(error_msg)
+            return False
+
+        if not items:
+            return None
+
+        if not isinstance(items, list):
+            self.ticket_tags.errors.append(error_msg)
+            return False
+
+        for item in items:
+
+            if isinstance(item, str) and item:
+                continue
+
+            if not isinstance(item, dict) or len(item) != 1:
+                self.ticket_tags.errors.append(error_msg)
+                return False
+
+            for tag, meta in item.items():
+                # we only allow string tags
+                if not isinstance(tag, str):
+                    self.ticket_tags.errors.append(error_msg)
+                    return False
+
+                # we allow tags without meta data
+                if not meta:
+                    continue
+
+                # the meta data needs to be a valid mapping
+                if not isinstance(meta, dict) or any(
+                    True
+                    for field, value in meta.items()
+                    # we only allow string keys
+                    if not isinstance(field, str)
+                    # we allow any value type except for containers
+                    if isinstance(value, (dict, list))
+                ):
+                    self.ticket_tags.errors.append(error_msg)
+                    return False
+
         return None
 
     def code_title(self, code: str) -> str:
@@ -1140,6 +1220,27 @@ class OrgTicketSettingsForm(Form):
         self.auto_closing_user.choices = [
             (u.username, u.title) for u in user_q
         ]
+
+    def populate_obj(self, model: Organisation) -> None:  # type:ignore
+        super().populate_obj(model, exclude={'ticket_tags'})
+
+        yaml_data = self.ticket_tags.data
+        model.ticket_tags = yaml.safe_load(yaml_data) if yaml_data else []
+
+    def process_obj(self, model: Organisation) -> None:  # type:ignore
+        super().process_obj(model)
+
+        tags = model.ticket_tags
+        if not tags:
+            self.ticket_tags.data = ''
+            return
+
+        yaml_data = yaml.safe_dump(
+            tags,
+            default_flow_style=False,
+            allow_unicode=True
+        )
+        self.ticket_tags.data = yaml_data
 
 
 class NewsletterSettingsForm(Form):
