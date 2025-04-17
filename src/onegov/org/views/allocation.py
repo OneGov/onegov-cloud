@@ -571,13 +571,19 @@ def handle_stop_rule(self: Resource, request: OrgRequest) -> None:
 def handle_copy_rule(self: Resource, request: OrgRequest) -> None:
     request.assert_valid_csrf_token()
 
+    copied_rules: dict[str, dict[str, Any]]
+    copied_rules = request.browser_session.get('copied_allocation_rules', {})
+
     rule_id = rule_id_from_request(request)
     for rule in self.content.get('rules', ()):
         if rule['id'] == rule_id:
             rule = rule.copy()
             rule['last_run'] = None
             rule['iteration'] = 0
-            request.browser_session.copied_allocation_rule = rule
+            # NOTE: You can't copy between different resource types
+            #       so we keep a separate copy per type
+            copied_rules[self.type] = rule
+            request.browser_session.copied_allocation_rules = copied_rules
             break
     else:
         raise exc.HTTPNotFound()
@@ -590,7 +596,9 @@ def handle_copy_rule(self: Resource, request: OrgRequest) -> None:
 def handle_paste_rule(self: Resource, request: OrgRequest) -> None:
     request.assert_valid_csrf_token()
 
-    rule = request.browser_session.get('copied_allocation_rule')
+    copied_rules: dict[str, dict[str, Any]]
+    copied_rules = request.browser_session.get('copied_allocation_rules', {})
+    rule = copied_rules.get(self.type)
     if rule is None:
         raise exc.HTTPNotFound()
 

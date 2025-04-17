@@ -2337,7 +2337,10 @@ class AllocationRulesLayout(ResourceLayout):
                 )
             ]
         )
-        if self.request.browser_session.get('copied_allocation_rule'):
+
+        if self.request.browser_session.get(  # type: ignore[call-overload]
+            'copied_allocation_rules', {}
+        ).get(self.model.type):
             return [
                 add_link,
                 Link(

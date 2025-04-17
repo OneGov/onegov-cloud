@@ -2,7 +2,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE 1.0\n"
-"POT-Creation-Date: 2025-04-17 10:00+0200\n"
+"POT-Creation-Date: 2025-04-17 15:17+0200\n"
 "PO-Revision-Date: 2022-03-15 10:50+0100\n"
 "Last-Translator: Marc Sommerhalder <marc.sommerhalder@seantis.ch>\n"
 "Language-Team: French\n"
@@ -2712,9 +2712,6 @@ msgstr "Ce ticket nécessite une décision, mais aucune n'a encore été prise."
 msgid "Close ticket"
 msgstr "Fermer le ticket"
 
-msgid "Change tag"
-msgstr "Changer d'étiquette"
-
 msgid "Reopen ticket"
 msgstr "Ré-ouvrir le ticket"
 
@@ -2820,6 +2817,9 @@ msgstr "Périodes de disponibilité"
 
 msgid "Availability period"
 msgstr "Période de disponibilité"
+
+msgid "Paste"
+msgstr "Coller"
 
 msgid "Edit allocation"
 msgstr "Modifier l'allocation"
@@ -3487,9 +3487,6 @@ msgstr "Une nouvelle ne peut pas être collée comme un sujet"
 
 msgid "A Topic cannot be pasted as News"
 msgstr "Un sujet ne peut pas être collé comme une nouvelle"
-
-msgid "Paste"
-msgstr "Coller"
 
 msgid "Please note that this page has subpages which will also be deleted!"
 msgstr ""
@@ -5107,6 +5104,9 @@ msgstr "${count} note"
 msgid "${count} notes"
 msgstr "${count} notes"
 
+msgid "Change tag"
+msgstr "Changer d'étiquette"
+
 msgid ""
 "You are editing a note created by someone else. By saving your changes you "
 "will become the author of the whole note."
@@ -5364,6 +5364,12 @@ msgstr ""
 
 msgid "The availability period was stopped"
 msgstr "La période de disponibilité a été arrêtée"
+
+msgid "The availability period was added to the clipboard"
+msgstr "La période de disponibilité a été ajoutée au presse-papiers"
+
+msgid "Pasted availability period from to the clipboard"
+msgstr "Collage de la période de disponibilité dans le presse-papiers"
 
 #, python-format
 msgid "The availability period was deleted, along with ${n} allocations"
