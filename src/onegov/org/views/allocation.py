@@ -29,6 +29,7 @@ from sedate import utcnow
 from sqlalchemy import not_, func
 from sqlalchemy.dialects.postgresql import JSON
 from sqlalchemy.orm import defer, defaultload
+from uuid import uuid4
 from webob import exc
 
 
@@ -168,6 +169,17 @@ def view_allocation_rules(
         yield Link(
             text=_('Edit'),
             url=link_for_rule(rule, 'edit-rule'),
+        )
+
+        yield Link(
+            text=_('Copy'),
+            url=link_for_rule(rule, 'copy-rule'),
+            traits=(
+                Intercooler(
+                    request_method='POST',
+                    redirect_after=request.link(self, 'rules')
+                ),
+            )
         )
 
     def rules_with_actions() -> Iterator[RenderData]:
@@ -552,6 +564,48 @@ def handle_stop_rule(self: Resource, request: OrgRequest) -> None:
     delete_rule(self, rule_id)
 
     request.success(_('The availability period was stopped'))
+
+
+@OrgApp.view(model=Resource, request_method='POST', permission=Private,
+             name='copy-rule')
+def handle_copy_rule(self: Resource, request: OrgRequest) -> None:
+    request.assert_valid_csrf_token()
+
+    rule_id = rule_id_from_request(request)
+    for rule in self.content.get('rules', ()):
+        if rule['id'] == rule_id:
+            rule = rule.copy()
+            rule['last_run'] = None
+            rule['iteration'] = 0
+            request.browser_session.copied_allocation_rule = rule
+            break
+    else:
+        raise exc.HTTPNotFound()
+
+    request.success(_('The availability period was added to the clipboard'))
+
+
+@OrgApp.view(model=Resource, request_method='POST', permission=Private,
+             name='paste-rule')
+def handle_paste_rule(self: Resource, request: OrgRequest) -> None:
+    request.assert_valid_csrf_token()
+
+    rule = request.browser_session.get('copied_allocation_rule')
+    if rule is None:
+        raise exc.HTTPNotFound()
+
+    form_class = get_allocation_rule_form_class(self, request)
+    form = request.get_form(form_class, csrf_support=False, model=self)
+    form.rule = rule
+    # set a new uuid for the copy
+    form.rule_id = uuid4().hex
+    form.apply(self)
+
+    rules = self.content.get('rules', [])
+    rules.append(form.rule)
+    self.content['rules'] = rules
+
+    request.success(_('Pasted availability period from to the clipboard'))
 
 
 @OrgApp.view(model=Resource, request_method='POST', permission=Private,
