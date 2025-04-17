@@ -16,7 +16,8 @@ def add_external_id_for_api(context: UpgradeContext) -> None:
         'pas_parliamentarians',
         'pas_parties',
         'pas_parliamentary_groups',
+        'pas_commissions'
     ):
         context.operations.add_column(
-            table, Column('external_kub_id', UUID, nullable=True)
+            table, Column('external_kub_id', UUID, nullable=True, unique=True)
         )

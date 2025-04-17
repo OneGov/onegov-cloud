@@ -2,11 +2,9 @@ from __future__ import annotations
 
 import json
 import logging
-from io import IOBase
-from typing import Any, TYPE_CHECKING
 
 from aiohttp.web_exceptions import HTTPBadRequest, HTTPUnsupportedMediaType
-from sqlalchemy import text
+from morepath import redirect
 
 from onegov.core.crypto import random_token
 from onegov.core.security import Private
@@ -18,59 +16,18 @@ from onegov.pas import _, PasApp
 from onegov.pas.forms.data_import import DataImportForm
 from onegov.pas.importer.json_import import import_zug_kub_data
 from onegov.pas.layouts import DefaultLayout
-from onegov.town6.app import TownApp
 
+
+from typing import Any, TYPE_CHECKING
 if TYPE_CHECKING:
-    from collections.abc import Sequence, Mapping
     from onegov.core.types import LaxFileDict
     from onegov.core.types import RenderData
-    from onegov.pas.importer.json_import import (
-        MembershipData,
-        OrganizationData,
-        PersonData,
-    )
     from onegov.town6.request import TownRequest
+    from collections.abc import Sequence
+    from webob import Response
 
 
 log = logging.getLogger('onegov.pas.data_import')
-
-
-def clean(app: TownApp) -> None:
-    schema = app.session_manager.current_schema
-    assert schema is not None
-    session = app.session_manager.session()
-    session.execute(
-        text('SET search_path TO :schema;').bindparams(schema=schema)
-    )
-
-    # Get counts from each table for logging
-    tables = [
-        'pas_commission_memberships',
-        'pas_parliamentarian_rolesi',
-        'pas_commissions',
-        'pas_parliamentarians',
-        'pas_parliamentary_groups',
-        'pas_parties',
-    ]
-
-    counts = {}
-    for table in tables:
-        count = session.execute(text(f'SELECT COUNT(*) FROM {table}')).scalar()
-        counts[table] = count
-
-    truncate_statement = """
-        TRUNCATE TABLE
-            pas_commission_memberships,
-            pas_parliamentarian_roles,
-            pas_commissions,
-            pas_parliamentarians,
-            pas_parliamentary_groups,
-            pas_parties,
-        CASCADE;
-        COMMIT;
-    """
-
-    session.execute(text(truncate_statement))
 
 
 def load_and_concatenate_json(
@@ -105,22 +62,28 @@ def load_and_concatenate_json(
                     f'Skipping file {filename}: "results" key not found '
                     f'or is not a list in the JSON data.'
                 )
-        except json.JSONDecodeError:
+        except json.JSONDecodeError as e:
             log.error(
                 f'Error decoding JSON from file {filename}.', exc_info=True
             )
-            raise RuntimeError(f'Error decoding JSON from file {filename}.') from e
-        except UnicodeDecodeError:
+            raise RuntimeError(
+                f'Error decoding JSON from file {filename}.'
+            ) from e
+        except UnicodeDecodeError as e:
             log.error(
                 f'Error decoding file {filename} as UTF-8.', exc_info=True
             )
-            raise RuntimeError(f'Error decoding file {filename} as UTF-8.') from e
+            raise RuntimeError(
+                f'Error decoding file {filename} as UTF-8.'
+            ) from e
         except Exception as e:
             log.error(
                 f'Unexpected error processing file {filename}: {e}',
                 exc_info=True
             )
-            raise RuntimeError(f'Unexpected error processing file {filename}') from e
+            raise RuntimeError(
+                f'Unexpected error processing file {filename}'
+            ) from e
 
     return all_results
 
@@ -134,22 +97,20 @@ def load_and_concatenate_json(
 )
 def handle_data_import(
     self: Organisation, request: TownRequest, form: DataImportForm
-) -> RenderData:
+) -> RenderData | Response:
     layout = DefaultLayout(self, request)
     results = None
 
     if request.method == 'POST' and form.validate():
-        if form.clean.data:
-            clean(request.app)
         try:
             # Load and concatenate data from uploaded files
-            people_data: list[PersonData] = load_and_concatenate_json(
+            people_data = load_and_concatenate_json(
                 form.people_source.data
             )
             organization_data = load_and_concatenate_json(
                 form.organizations_source.data
             )
-            membership_data: list[MembershipData] = load_and_concatenate_json(
+            membership_data = load_and_concatenate_json(
                 form.memberships_source.data
             )
             import_zug_kub_data(
@@ -159,8 +120,8 @@ def handle_data_import(
                 membership_data=membership_data,
             )
             request.message(
-                _('Data import completed successfully.'), 'success'
-            )
+                _('Data import completed successfully.'), 'success')
+            return redirect(request.class_link(Organisation, name='pas'))
         except Exception as e:
             log.error(f'Data import failed: {e}', exc_info=True)
             # Provide a more user-friendly error message, preserving original
@@ -168,14 +129,11 @@ def handle_data_import(
                 _('Data import failed: ${error}', mapping={'error': str(e)}),
                 'warning'
             )
-            # Optionally keep the detailed error for display if needed
-            # Use __cause__ or __context__ if available for more detail
             cause = e.__cause__ or e.__context__
             results = f'Error during import: {e}'
             if cause:
                 results += f'\nCaused by: {cause}'
 
-    breakpoint()
     return {
         'title': _('Import'),
         'layout': layout,

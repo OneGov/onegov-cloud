@@ -248,6 +248,31 @@ def test_views_manage(client_with_es):
 
 def test_view_upload_json(client):
 
+    """ Test successful import of all data.
+
+    *1. Understanding the Data and Models**
+
+    **people.json**: Contains individual person data (Parliamentarians). Key
+         fields are firstName, officialName, primaryEmail, tags, title, id.
+         This maps to the Parliamentarian model.
+
+    **organizations.json**:
+        The organizationTypeTitle dictates the type of organization.
+        - "Kommission":  Maps to Commission model.
+        - "Kantonsrat":  This is a special case. It's not a Commission. It
+        represents the Parliament itself. We link this as ParliamentarianRole
+        directly on the Parliamentarian model with role='member' and associated
+        with the Kantonsrat organization.
+        - "Fraktion":  Maps to ParliamentaryGroup.
+        - "Sonstige": Could be various types. Let's see how these are intended
+          to be modeled. We need more clarity on how "Sonstige" is categorized.
+
+    **memberships.json**: Connects person and organization.
+        It defines the role within that organization, start, end dates.
+        The nested person and organization blocks are crucial for establishing
+        relationships.
+    """
+
     client.login_admin()
 
     def yield_paths():
@@ -284,6 +309,12 @@ def test_view_upload_json(client):
 
     # Get all paths
     paths_generator = yield_paths()
+
+    org_paths = next(paths_generator)
+    page.form['organizations_source'] = [
+        upload_file(path) for path in org_paths
+    ]
+
     membership_paths = next(paths_generator)
     page.form['memberships_source'] = [
         upload_file(path) for path in membership_paths
@@ -292,15 +323,15 @@ def test_view_upload_json(client):
     page.form['people_source'] = [
         upload_file(path) for path in people_paths
     ]
-    org_paths = next(paths_generator)
-    page.form['organizations_source'] = [
-        upload_file(path) for path in org_paths
-    ]
     assert page.form['clean']
 
     # Submit the form
-    result = page.form.submit()
+    result = page.form.submit().maybe_follow()
     result.showbrowser()
 
     # Add assertions as needed
     assert result.status_code == 200
+
+    # todo: test clean checkbox
+    page = client.get('/pas-import')
+    page.form

@@ -123,7 +123,7 @@ def people_json():
                 'salutation': 'Herr',
                 'tags': [],
                 'thirdPartyId': '37',
-                'title': '',
+                'title': 'Dr',
                 'username': None,
             },
             {
@@ -157,7 +157,6 @@ def people_json():
 @fixture
 def organization_json():
     """Fixture providing sample organizations data as JSON string.
-    We have 4 of every type
 
     """
     return {
@@ -193,6 +192,45 @@ def organization_json():
             },
         ],
     }
+
+
+@fixture
+def organization_json_with_fraktion():
+    return {
+        'count': 2,
+        'next': None,
+        'previous': None,
+        'results': [
+            {
+                'created': '2024-12-23T16:44:24.920938+01:00',
+                'description': '',
+                'id': 'ef39e789-10e1-4117-8507-63b6cb3ef7cc',
+                'isActive': True,
+                'memberCount': 17,
+                'modified': '2025-01-06T10:19:49.765454+01:00',
+                'name': 'ad-hoc-Gastgewerbegesetz, 3699',
+                'organizationTypeTitle': 'Kommission',
+                'primaryEmail': None,
+                'status': 1,
+                'thirdPartyId': None,
+            },
+            {
+                'created': '2024-12-23T16:44:24.928269+01:00',
+                'description': '',
+                'id': 'f124b1fe-99b8-4bc2-b40d-bc8dec4997bc',
+                'isActive': True,
+                'memberCount': 16,
+                'modified': '2025-01-06T10:19:54.708568+01:00',
+                'name': 'ALG',
+                'organizationTypeTitle': 'Fraktion',
+                'primaryEmail': None,
+                'status': 1,
+                'thirdPartyId': None,
+            },
+        ],
+    }
+
+
 
 
 @fixture

@@ -45,7 +45,8 @@ class Party(Base, ContentMixin, TimestampMixin, ORMSearchable):
     external_kub_id: Column[uuid.UUID | None] = Column(
         UUID,   # type:ignore[arg-type]
         nullable=True,
-        default=uuid4
+        default=uuid4,
+        unique=True
     )
 
     #: the name
