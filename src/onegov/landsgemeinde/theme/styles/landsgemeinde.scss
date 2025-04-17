@@ -476,50 +476,66 @@ h1.main-title small {
 }
 
 /* Previous and next buttons */
-// only for mobile
-@include breakpoint(medium down) {
-    .item-arrows {
-        position: fixed;
-        top: calc(100vh - 5rem);
-        background: $aluminum;
+.item-arrows {
+    display: flex;
+    justify-content: space-between;
+    margin-top: 4rem;
+
+    a {
+        display: block;
+    }
+
+    .prev-item a i {
+        margin-right: .3rem;
+    }
+
+    .next-item a i {
+        margin-left: .3rem;
+    }
+
+    @include breakpoint(medium down) {
         font-weight: bold;
-        display: flex;
-        justify-content: center;
-        align-items: center;
-        z-index: 100;
 
-        a {
-            color: $white;
-            padding: .5rem .6rem;
-            padding-bottom: .4rem;
+        div {
+            position: fixed;
+            top: calc(100vh - 5rem);
+            background: $aluminum;
+            justify-content: center;
+            align-items: center;
+            z-index: 100;
+
+            a.button {
+                border: 0;
+                color: $white;
+                padding-top: .6rem !important;
+                padding-bottom: .5rem !important;
+                margin-bottom: 0;
+            }
         }
-    }
-    .prev-item {
-        left: 0;
-        border-radius: 0 0.7rem 0.7rem 0;
-        border-left: 0;
-        a {
-            padding-right: .7rem;
-            i {
-                margin-right: .3rem;
+        .prev-item {
+            left: 0;
+            border-radius: 0 0.7rem 0.7rem 0;
+            border-left: 0;
+
+            a {
+                padding-left: .7rem !important;
+                padding-right: .6rem !important;
+            }
+        }
+
+        .next-item {
+            right: 0;
+            border-radius: 0.7rem 0 0 0.7rem;
+            border-right: 0;
+
+            a {
+                padding-right: .7rem !important;
+                padding-left: .6rem !important;
             }
         }
     }
-
-    .next-item {
-        right: 0;
-        border-radius: 0.7rem 0 0 0.7rem;
-        border-right: 0;
-
-        a {
-            padding-left: .7rem;
-            i {
-                margin-left: .3rem;
-            }
-        }
-    }
-
 }
+
 /*Download Icons*/
 .downloads a,
 .memorial-link {
