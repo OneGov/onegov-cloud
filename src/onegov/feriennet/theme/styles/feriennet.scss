@@ -41,21 +41,17 @@ a > h6 {
 .grid-x.field-geo_provider,
 .grid-x.field-about_url,
 .grid-x.field-hide_onegov_footer,
-#fieldset-footer-division,
-#fieldset-partner-display,
-#fieldset-first-partner,
-#fieldset-second-partner,
-#fieldset-third-partner,
-#fieldset-fourth-partner {
+#fieldset-footer-division {
     display: none;
 }
 
 /*
     hide ticket achiving options
 */
-    .archive-tickets, .ticket-archive {
-        display: none !important;
-    }
+.archive-tickets,
+.ticket-archive {
+    display: none !important;
+}
 
 /*
     registration on homepage
@@ -118,10 +114,10 @@ svg {
         }
 
         a {
-            color: white;
             border-radius: 1rem;
+            color: white;
             padding: .3rem 1rem;
-            transition: all 200ms linear ;
+            transition: all 200ms linear;
         }
 
         &:hover a {
@@ -133,7 +129,7 @@ svg {
 #header_links + #feriennet-links,
 #header_text + #feriennet-links {
     border-top: 1px solid darken($primary-color, 5%);
-    box-shadow: 0 15px 10px -15px rgba(0,0,0,0.15) inset;
+    box-shadow: 0 15px 10px -15px rgba(0, 0, 0, .15) inset;
 }
 
 /*
@@ -325,6 +321,8 @@ p.tight {
 }
 
 .platform-promotion > div {
+    margin-bottom: .75rem;
+    max-width: 70ex;
 
     .fas.fa-external-link-alt.fa-xs {
         display: inline;
@@ -333,8 +331,6 @@ p.tight {
     a {
         font-weight: bold;
     }
-    margin-bottom: .75rem;
-    max-width: 70ex;
 }
 
 .sponsor-footer {
@@ -358,7 +354,7 @@ p.tight {
         background: $white;
 
         a div {
-            background: $white ;
+            background: $white;
             background-position: center;
             background-repeat: no-repeat;
             background-size: contain;
@@ -375,8 +371,8 @@ footer {
     }
 
     .footer-content > .cell.footer-links {
-        text-align: center;
         margin-top: 3rem;
+        text-align: center;
     }
 }
 
@@ -386,9 +382,9 @@ footer {
 .activity-list-item {
 
     .page-lead {
+        color: $charcoal;
         font-size: 1rem;
         margin-bottom: .5rem;
-        color: $charcoal;
     }
 
     ul.tags {
@@ -396,10 +392,10 @@ footer {
     }
 
     .factoids > span {
+        color: $charcoal;
         font-size: .875rem;
         line-height: .875rem;
         margin-right: 3ex;
-        color: $charcoal;
 
         + span {
             white-space: nowrap;
@@ -431,12 +427,13 @@ footer {
         font-size: inherit;
 
         > span {
+            display: flex;
+            flex-wrap: wrap;
+
             &::before {
                 @include arrow-hint;
                 margin-right: 1rem;
             }
-            display: flex;
-            flex-wrap: wrap;
         }
 
         b {
@@ -806,9 +803,9 @@ $booking-left-margin: 1.6rem;
         }
 
         .rega-widget {
-            display: flex;
-            border-radius: 0 !important;
             border: 0;
+            border-radius: 0 !important;
+            display: flex;
             width: 100% !important;
 
             .left {
@@ -905,7 +902,7 @@ $booking-left-margin: 1.6rem;
             border-right: 0;
             margin-bottom: 1.5rem;
             margin-top: 0;
-            padding: .75rem 1.2rem .75rem ;
+            padding: .75rem 1.2rem;
 
             .cell:last-child {
                 text-align: right;
@@ -933,10 +930,10 @@ $booking-left-margin: 1.6rem;
     }
 
     .title-section {
-        display: flex;
-        background: $gainsboro;
-        padding: .5rem 1.5rem !important;
         align-items: center;
+        background: $gainsboro;
+        display: flex;
+        padding: .5rem 1.5rem !important;
 
         .attendee-title {
             flex-grow: 1;
@@ -946,7 +943,7 @@ $booking-left-margin: 1.6rem;
             display: block;
             font-size: .9em;
 
-            a:hover:before {
+            a:hover::before {
                 background-color: $white;
             }
 
@@ -959,30 +956,30 @@ $booking-left-margin: 1.6rem;
                 margin: 0;
                 padding-left: 2px;
                 text-align: center;
-                width: 2rem;
                 transition: background linear .2s;
+                width: 2rem;
             }
         }
     }
 
     .state-title {
+        align-items: center;
         background: $white;
-        cursor: pointer;
-        margin-top: 0;
         border-bottom: 1px solid $iron;
-        margin-bottom: .5rem;
-        padding-bottom: .2rem;
+        cursor: pointer;
         display: flex;
         font-size: 1.3rem;
-        align-items: center;
+        margin-bottom: .5rem;
+        margin-top: 0;
+        padding-bottom: .2rem;
 
         h4 {
             flex-grow: 1;
         }
 
         .fa-chevron-down {
-            padding: .5rem;
             border-radius: 5rem;
+            padding: .5rem;
         }
 
         &:hover .fa-chevron-down {
@@ -1078,16 +1075,16 @@ $booking-left-margin: 1.6rem;
         }
 
         .invite-link::before {
-            margin-right: .2rem;
             @include icon('\f004');
+            margin-right: .2rem;
         }
 
 
         a {
-            margin-right: 1.5rem;
-            font-size: .875rem;
             display: block;
+            font-size: .875rem;
             margin-bottom: 0;
+            margin-right: 1.5rem;
 
             &::before {
                 display: block;
@@ -1099,9 +1096,9 @@ $booking-left-margin: 1.6rem;
 
     .all-action-buttons {
         display: flex;
+        flex-wrap: wrap;
         justify-content: space-between;
         margin-top: 1rem;
-        flex-wrap: wrap;
     }
 }
 
@@ -1258,8 +1255,8 @@ $booking-left-margin: 1.6rem;
     margin-bottom: 3rem;
 
     h3 {
-        color: $oil;
         border-top: 1px solid $gainsboro;
+        color: $oil;
         padding-top: 1rem;
     }
 
@@ -1325,8 +1322,8 @@ $booking-left-margin: 1.6rem;
         }
 
         td:first-child {
-            padding-right: 0;
             padding-left: .5rem !important;
+            padding-right: 0;
             text-align: center;
             width: 5px;
 
@@ -1382,9 +1379,9 @@ $booking-left-margin: 1.6rem;
         width: 100%;
 
         > a {
-            display: flex;
             align-items: center;
             color: $oil;
+            display: flex;
             margin-bottom: .5rem;
         }
 
@@ -1399,15 +1396,15 @@ $booking-left-margin: 1.6rem;
     Progress bar
 */
 .progress {
+    background-color: $white-smoke;
     border: 0;
+    border-radius: .7rem;
     display: inline-block;
     height: 2.5rem;
+    margin-right: .2rem;
     padding: 0;
     position: relative;
     width: calc(100% - 2.5rem);
-    background-color: $white-smoke;
-    border-radius: .7rem;
-    margin-right: .2rem;
 
     &.cancelled {
         background: repeating-linear-gradient(
@@ -1434,9 +1431,9 @@ $booking-left-margin: 1.6rem;
     }
 
     .meter {
-        width: 100%;
-        height: 100%;
         border-radius: .7rem;
+        height: 100%;
+        width: 100%;
     }
 
     &.success .meter {
@@ -1484,10 +1481,10 @@ $booking-left-margin: 1.6rem;
     width: 24px;
 
     &:hover {
-        margin: 0 !important;
         background-color: $monsoon !important;
-        padding: 5px !important;
         color: $aluminum;
+        margin: 0 !important;
+        padding: 5px !important;
     }
 
     + .f-dropdown {
@@ -1504,11 +1501,11 @@ $booking-left-margin: 1.6rem;
     Item list
 */
 
-.item-wrapper{
+.item-wrapper {
+    color: $body-font-color;
     margin-bottom: 1rem;
     padding: 0;
     position: relative;
-    color: $body-font-color;
 
     @mixin payment-state-color($pastel, $light, $dark) {
         .item-header-bar {
@@ -1532,10 +1529,10 @@ $booking-left-margin: 1.6rem;
         }
 
         .total td {
+            border-top: 1px solid $black;
             color: $dark;
             font-weight: bold;
             text-decoration: none;
-            border-top: 1px solid $black;
 
         }
     }
@@ -1562,8 +1559,8 @@ $booking-left-margin: 1.6rem;
     }
 
     .item-header {
-        display: flex;
         align-items: center;
+        display: flex;
         margin-bottom: .5rem;
 
         > button {
@@ -1582,19 +1579,19 @@ $booking-left-margin: 1.6rem;
     }
 
     .item-header-bar {
-        border-radius: .7rem;
-        flex-grow: 1;
         align-items: center;
+        border-radius: .7rem;
         display: flex;
+        flex-grow: 1;
         margin-right: .2rem;
 
         h3 {
             display: inline-block;
+            font-size: 1rem;
             font-weight: bold;
             line-height: 1rem;
             margin-bottom: 0;
             padding: .75rem;
-            font-size: 1rem;
         }
 
         span {
@@ -1607,8 +1604,8 @@ $booking-left-margin: 1.6rem;
     }
 
     .details-button {
-        padding: .75rem;
         border-radius: .7rem;
+        padding: .75rem;
 
         .fa-chevron-down {
             color: $white;
@@ -1625,7 +1622,8 @@ $booking-left-margin: 1.6rem;
             font-style: italic;
         }
 
-        &.item-red, &.item-green {
+        &.item-red,
+        &.item-green {
             border-top: 1px solid $smoke;
             font-size: .9rem;
         }
@@ -1650,31 +1648,31 @@ $booking-left-margin: 1.6rem;
         }
 
         &.amount-total {
-            font-weight: bold;
             border-top: 0;
-        }
+            font-weight: bold;
 
-        &.amount-total.item-red {
-            .item-amount,
-            .item-payment-status {
-                color: $red-dark;
+            .item-red {
+                .item-amount,
+                .item-payment-status {
+                    color: $red-dark;
+                }
             }
-        }
 
-        &.amount-total.item-green {
-            .item-amount,
-            .item-payment-status {
-                color: $green-dark;
+            .item-green {
+                .item-amount,
+                .item-payment-status {
+                    color: $green-dark;
+                }
             }
         }
 
         &.invoice-total {
-            margin-top: 3rem;
             border-top: 1px solid $oil;
+            margin-top: 3rem;
         }
     }
 
-    .item-total > *{
+    .item-total > * {
         display: flex;
     }
 
@@ -1750,8 +1748,8 @@ $booking-left-margin: 1.6rem;
 
         .total td,
         .group td:first-child {
-            font-weight: bold;
             font-size: 1rem;
+            font-weight: bold;
         }
 
         .item-red {
@@ -1939,12 +1937,12 @@ $booking-left-margin: 1.6rem;
 
 .invoice-items-list {
     background: $white;
-    padding: 2rem;
-    position: relative;
-    top: 1px;
     border: 1px solid $iron;
     border-radius: .7rem;
     margin-bottom: 2rem;
+    padding: 2rem;
+    position: relative;
+    top: 1px;
 
     ul {
         color: $body-font-color;
@@ -1970,10 +1968,10 @@ $booking-left-margin: 1.6rem;
     }
 
     .item-text {
-        -ms-flex-positive: 1 ;
-        -ms-flex-preferred-size: 0;
         flex-basis: 0;
         flex-grow: 1;
+        -ms-flex-positive: 1;
+        -ms-flex-preferred-size: 0;
     }
 
 
@@ -1997,7 +1995,9 @@ $booking-left-margin: 1.6rem;
             right: 33px;
         }
 
-        &.datatrans, &.stripe_connect, &.worldline_saferpay {
+        &.datatrans,
+        &.stripe_connect,
+        &.worldline_saferpay {
             .item-amount::after {
                 content: '\f09d';
                 font-size: .875rem;
@@ -2020,16 +2020,16 @@ $booking-left-margin: 1.6rem;
 }
 
 .invoice-items-list:has( + .invoice-items-payment) {
-    margin-bottom: 0;
     border-radius: .7rem .7rem 0 0;
+    margin-bottom: 0;
 }
 
 .invoice-items-payment {
     background-color: lighten($red-pastel, 8%);
-    padding: 1rem;
+    border: 1px solid $iron;
     border-radius: 0 0 .7rem .7rem;
     margin-bottom: 2rem;
-    border: 1px solid $iron;
+    padding: 1rem;
 
     h4 {
         font-size: 1rem;
@@ -2037,7 +2037,7 @@ $booking-left-margin: 1.6rem;
     }
 
 
-    .bank-transfer{
+    .bank-transfer {
         font-size: .9rem;
 
         .medium-4 {
@@ -2160,9 +2160,9 @@ $booking-left-margin: 1.6rem;
     Notifications view
 */
 .notifications li {
+    border-top: 1px solid $smoke;
     margin-bottom: 1rem;
     padding-top: .5rem;
-    border-top: 1px solid $smoke;
 
     .text-links {
         display: flex;
@@ -2302,8 +2302,8 @@ $booking-left-margin: 1.6rem;
         border-color: $green;
 
         > div:first-child::before {
-            color: $green;
             @include icon('\f058');
+            color: $green;
         }
     }
 }
@@ -2313,8 +2313,8 @@ $booking-left-margin: 1.6rem;
         border-color: $orange;
 
         > div:first-child::before {
-            color: $orange;
             @include icon('\f071');
+            color: $orange;
         }
     }
 }
@@ -2324,8 +2324,8 @@ $booking-left-margin: 1.6rem;
         border-color: $gray-dark;
 
         > div:first-child::before {
-            color: $gray-dark;
             @include icon('\f05d');
+            color: $gray-dark;
         }
     }
 }
@@ -2335,8 +2335,8 @@ $booking-left-margin: 1.6rem;
         border-color: $blue;
 
         > div:first-child::before {
-            color: $blue;
             @include icon('\f24d');
+            color: $blue;
         }
     }
 }
@@ -2346,8 +2346,8 @@ $booking-left-margin: 1.6rem;
         border-color: $red;
 
         > div:first-child::before {
-            color: $red;
             @include icon('\f059');
+            color: $red;
         }
 
         > div:last-child {
@@ -2401,10 +2401,10 @@ $booking-left-margin: 1.6rem;
 */
 .sponsor {
     border: 2px solid $smoke;
+    border-radius: .7rem;
     line-height: 100px;
     padding: 5px;
     text-align: center;
-    border-radius: .7rem;
 
     img {
         position: relative;
@@ -2430,7 +2430,7 @@ $booking-left-margin: 1.6rem;
     */
     position: relative;
 
-    img{
+    img {
         border-radius: .7rem;
     }
 
@@ -2450,10 +2450,10 @@ $booking-left-margin: 1.6rem;
         margin: .25rem 0;
     }
 
-    & > div {
+    div {
         display: flex;
 
-        & > img {
+        img {
             bottom: 0;
             left: 0;
             position: absolute;
@@ -2464,7 +2464,9 @@ $booking-left-margin: 1.6rem;
     }
 }
 
-.banner-buchungen, .banner-rechnungen, .banner-activities p.banner-info {
+.banner-buchungen,
+.banner-rechnungen,
+.banner-activities p.banner-info {
     margin-bottom: 2rem;
 }
 
@@ -2508,12 +2510,12 @@ $booking-left-margin: 1.6rem;
     Attendee Details in Bookings View
 */
 .attendees-toggle {
-    color: $primary-color;
     border: 1px solid;
-    border-radius: 5rem;;
+    border-radius: 5rem;
+    color: $primary-color;
     font-size: .875rem;
-    padding: .2rem .5rem;
     height: fit-content;
+    padding: .2rem .5rem;
     transition: all linear .2s;
 
     &:hover,
@@ -2558,10 +2560,10 @@ $booking-left-margin: 1.6rem;
 
     .state > div {
         background-color: $blue-pastel;
-        color: $blue-dark;
-        padding: 2px 9px;
         border-radius: .7rem;
+        color: $blue-dark;
         margin-bottom: .5rem;
+        padding: 2px 9px;
 
         &::before {
             @include icon-bold('\f05a');
@@ -2588,9 +2590,9 @@ $booking-left-margin: 1.6rem;
     }
 
     .occasion-title {
+        align-items: end;
         display: flex;
         justify-content: space-between;
-        align-items: end;
     }
 
     h2,
@@ -2624,13 +2626,16 @@ $booking-left-margin: 1.6rem;
     .occasion.occasion-card {
         .card-section {
             padding-bottom: 0 !important;
-            p, ul {
+
+            p,
+            ul {
                 margin-bottom: .5rem;
             }
 
             &.info {
-                display:flex;
+                display: flex;
                 flex-wrap: wrap;
+
                 .factoids:first-child {
                     flex-grow: 10;
                 }
@@ -2659,10 +2664,11 @@ $booking-left-margin: 1.6rem;
 
 .occasions-by-period {
     margin-bottom: .5rem;
+
     .accordion-title {
         font-size: 1rem;
-        padding-right: 2.5rem;
         line-height: 1.5;
+        padding-right: 2.5rem;
     }
 
     .panel.period-hint-panel {
@@ -2678,13 +2684,19 @@ $booking-left-margin: 1.6rem;
     margin: 1.25rem 0 1.75rem;
     position: relative;
 
-    .need-info span {
-        font-style: italic;
-    }
+    .need-info {
+        background: $smoke;
+        border-radius: .7rem;
+        padding: 1rem;
 
-    .need-info .fa {
-        margin-left: .1rem;
-        margin-right: .4rem;
+        span {
+            font-style: italic;
+        }
+
+        .fa {
+            margin-left: .1rem;
+            margin-right: .4rem;
+        }
     }
 
     .need-add {
@@ -2710,28 +2722,22 @@ $booking-left-margin: 1.6rem;
         margin: 0;
 
         li {
+            background: $smoke;
+            border-radius: .7rem;
             display: flex;
             flex-wrap: wrap;
             margin: 1rem 0 0;
-            background: $smoke;
             padding: 1rem;
-            border-radius: .7rem;
         }
-    }
-
-    .need-info {
-        background: $smoke;
-        padding: 1rem;
-        border-radius: .7rem;
     }
 
     .need-number {
         background: $monsoon;
-        color: $white;
         border-radius: .7rem;
+        color: $white;
         flex: 1 0 8ex;
-        text-align: center;
         height: fit-content;
+        text-align: center;
     }
 
     .need-name {
@@ -2749,6 +2755,10 @@ $booking-left-margin: 1.6rem;
             font-style: normal;
             margin-bottom: 0 !important;
         }
+
+        p:last-child {
+            margin-bottom: 0;
+        }
     }
 
     a {
@@ -2759,12 +2769,8 @@ $booking-left-margin: 1.6rem;
 
     .need-actions {
         flex: 1 0 30%;
-        text-align: right;
         margin-bottom: .5rem;
-    }
-
-    .need-description p:last-child {
-        margin-bottom: 0;
+        text-align: right;
     }
 
     @media #{$small-only} {
@@ -2834,9 +2840,9 @@ $booking-left-margin: 1.6rem;
 
         li {
             border-top: 1px solid $white-smoke;
-            padding: .5rem;
             display: flex;
             justify-content: space-between;
+            padding: .5rem;
 
             a {
                 white-space: nowrap;
@@ -2869,10 +2875,10 @@ $booking-left-margin: 1.6rem;
 
         li {
             font-size: .875rem;
-        }
 
-        li + li {
-            margin-top: .5rem;
+            + li {
+                margin-top: .5rem;
+            }
         }
     }
 
@@ -3018,8 +3024,8 @@ $booking-left-margin: 1.6rem;
     background: $gray-pastel;
     border: 1px solid  $gray;
     border-radius: 3px;
-    padding: 0 .75rem .75rem;
     margin-top: 1rem;
+    padding: 0 .75rem .75rem;
 
     &:first-of-type {
         margin-top: .75rem;
@@ -3028,15 +3034,15 @@ $booking-left-margin: 1.6rem;
     h3 {
         font-size: .875rem;
         font-weight: bold;
-        margin-top: .75rem;
         margin-bottom: 0;
+        margin-top: .75rem;
     }
 
     li {
         font-size: .875rem;
+        line-height: 1.2;
         margin-left: -3px;
         padding: 3px;
-        line-height: 1.2;
     }
 
 
@@ -3047,20 +3053,20 @@ $booking-left-margin: 1.6rem;
     .needs {
         li:last-child .button {
             margin-bottom: 0;
+
+            div {
+                margin-left: 3.25ex;
+            }
         }
 
         .button {
             background: $success-color;
-            font-size: .875rem;
             display: block;
-            margin-top: .5rem;
+            font-size: .875rem;
             margin-bottom: .5rem;
+            margin-top: .5rem;
             width: fit-content;
         }
-    }
-
-    .needs div {
-        margin-left: 3.25ex;
     }
 
     .alert {
@@ -3097,15 +3103,15 @@ $booking-left-margin: 1.6rem;
     }
 
     .button {
-    border-radius: .7rem !important;
-    margin: 0 !important;
-
-    &:hover {
+        border-radius: .7rem !important;
         margin: 0 !important;
-        padding: 1rem 1.5rem !important;
-    }
 
-    &.hover .fa-chevron-down {
+        &:hover {
+            margin: 0 !important;
+            padding: 1rem 1.5rem !important;
+        }
+
+        &.hover .fa-chevron-down {
             transform: rotate(180deg);
         }
     }
@@ -3114,8 +3120,6 @@ $booking-left-margin: 1.6rem;
 .volunteer-form-layout .volunteer-cart .button {
     display: none;
 }
-
-
 
 
 /*
@@ -3147,10 +3151,14 @@ $booking-left-margin: 1.6rem;
     }
 
     table {
+        background: $snow;
         border-radius: 0;
         margin-top: -.5rem;
         width: 100%;
-        background: $snow;
+
+        + h2 {
+            margin-top: 1.5rem;
+        }
 
         th:last-child {
             width: 10%;
@@ -3160,25 +3168,22 @@ $booking-left-margin: 1.6rem;
             td:first-child {
                 border-bottom-left-radius: .7rem;
             }
+
             td:last-child {
                 border-bottom-right-radius: .7rem;
             }
         }
     }
 
-    table + h2 {
-        margin-top: 1.5rem;
-    }
-
     .progress {
-        width: 100%;
         margin-bottom: .5rem;
+        width: 100%;
 
-        &:has(+ table) .meter{
+        &:has(+ table) .meter {
             border-radius: .7rem .7rem 0 0;
         }
 
-        & + .progress {
+        + .progress {
             margin-top: -1rem;
         }
     }
@@ -3229,14 +3234,14 @@ $booking-left-margin: 1.6rem;
     }
 
     div > * {
-        max-width: $max-line-width;
         display: block;
+        max-width: $max-line-width;
     }
 
     h2.title {
+        border-top: 1px solid $smoke;
         font-size: 1.2rem;
         margin-bottom: 1rem;
-        border-top: 1px solid $smoke;
         padding-top: .5rem;
 
         &:first-child {
@@ -3256,16 +3261,17 @@ $booking-left-margin: 1.6rem;
     img {
         border-radius: .7rem;
     }
+
     img:has(+ .alt-text) {
         border-radius: .7rem .7rem 0 0;
     }
+
     .alt-text {
         border-radius: 0 0 .7rem .7rem;
     }
 }
 
-
 .disabled {
-    opacity: .5;
     cursor: not-allowed !important;
+    opacity: .5;
 }
