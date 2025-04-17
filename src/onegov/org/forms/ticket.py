@@ -165,8 +165,9 @@ class TicketChangeTagForm(Form):
     )
 
     def on_request(self) -> None:
-        self.tag.choices = [
+        choices = self.tag.choices = [
             (tag, tag)
             for item in self.request.app.org.ticket_tags
             for tag in (item.keys() if isinstance(item, dict) else (item,))
         ]
+        choices.insert(0, ('', ''))

@@ -1789,12 +1789,6 @@ class TicketLayout(DefaultLayout):
                     traits=traits
                 ))
 
-                links.append(Link(
-                    text=_('Change tag'),
-                    url=self.request.link(self.model, 'change-tag'),
-                    attrs={'class': ('ticket-button', 'ticket-change-tag')},
-                ))
-
             elif self.model.state == 'closed':
                 links.append(Link(
                     text=_('Reopen ticket'),

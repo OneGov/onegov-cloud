@@ -1,6 +1,7 @@
 $(document).ready(function() {
     $('.chosen-select').chosen({
         search_contains: true,
+        allow_single_deselect: true,
         width: '100%'
     }).on('show', function() {
         $(this).hide();

@@ -64,6 +64,8 @@ class ReservationForm(Form):
         if not choices:
             self.delete_field('ticket_tag')
 
+        choices.insert(0, ('', ''))
+
         auto_fill_data = {
             tag: filtered_meta
             for item in self.request.app.org.ticket_tags
