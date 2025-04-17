@@ -32,6 +32,7 @@ from onegov.ticket import TicketCollection
 from purl import URL
 from sqlalchemy.orm.attributes import flag_modified
 from webob import exc
+from wtforms import HiddenField
 
 
 from typing import Any, TYPE_CHECKING
@@ -355,14 +356,15 @@ def handle_reservation_form(
     if form.submitted(request) and not blocked:
         # also remember submitted form data
         remembered: dict[str, Any]
-        remembered = request.browser_session.get('remembered_submissions', {})
-        remembered.update(form.data)
-        # but don't remember submitted csrf_token
-        if 'csrf_token' in remembered:
-            del remembered['csrf_token']
+        remembered = request.browser_session.get('field_submissions', {})
+        remembered.update({
+            f'{field.id}+{field.type}': field.data
+            for field in form
+            if not isinstance(field, HiddenField)
+        })
         # only remember the data if we can encode the data to msgpack
         if msgpack.packable(remembered):
-            request.browser_session.remembered_submissions = remembered
+            request.browser_session.field_submissions = remembered
         return morepath.redirect(request.link(self, 'confirmation'))
     else:
         data = {}
@@ -375,10 +377,11 @@ def handle_reservation_form(
         # set defaults based on remembered submissions from session
         # TODO: should we first apply defaults based on the remembered tag?
         if not request.POST and (remembered := {
-            key: value
+            field_id: value
             for key, value in request.browser_session.get(
-                'remembered_submissions', {}).items()
-            if key in form
+                'field_submissions', {}).items()
+            if (field_id := (pair := key.split('+', 1))[0]) in form
+            if form[field_id].type == pair[1]
         }):
             data.update(remembered)
 
