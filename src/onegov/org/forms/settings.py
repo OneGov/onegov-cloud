@@ -1225,7 +1225,7 @@ class OrgTicketSettingsForm(Form):
         super().populate_obj(model, exclude={'ticket_tags'})
 
         yaml_data = self.ticket_tags.data
-        model.ticket_tags = yaml.safe_load(yaml_data) if yaml_data else {}
+        model.ticket_tags = yaml.safe_load(yaml_data) if yaml_data else []
 
     def process_obj(self, model: Organisation) -> None:  # type:ignore
         super().process_obj(model)

@@ -102,11 +102,6 @@ class Handler:
         return None
 
     @property
-    def tag_meta(self) -> dict[str, Any]:
-        """ Returns any meta data tied to the selected tag """
-        return {}
-
-    @property
     def title(self) -> str:
         """ Returns the title of the ticket. If this title may change over
         time, the handler must call :meth:`self.refresh` when there's a change.

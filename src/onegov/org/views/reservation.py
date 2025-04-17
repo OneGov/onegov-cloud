@@ -636,6 +636,7 @@ def finalize_reservation(self: Resource, request: OrgRequest) -> Response:
             )
             if data := reservations[0].data:
                 ticket.tag = data.get('ticket_tag')
+                ticket.tag_meta = data.get('ticket_tag_meta')
             TicketMessage.create(ticket, request, 'opened', 'external')
 
         show_submission = request.params.get('send_by_email') == 'yes'

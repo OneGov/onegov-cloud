@@ -64,10 +64,18 @@ class Ticket(Base, TimestampMixin, ORMSearchable):
     group: Column[str] = Column(Text, nullable=False)
 
     #: Tags/Categories of the ticket
-    _tags: Column[dict[str, str] | None] = Column(  # type:ignore
+    _tags: Column[dict[str, str] | None] = Column(  # type: ignore[call-overload]
         MutableDict.as_mutable(HSTORE),  # type:ignore[no-untyped-call]
         nullable=True,
         name='tags'
+    )
+
+    #: the data associated with the selected tags at the time they were
+    #: selected
+    tag_meta: Column[dict[str, Any] | None] = Column(  # type: ignore[call-overload]
+        JSON,
+        nullable=True,
+        name='tags_meta'
     )
 
     #: the name of the handler associated with this ticket, may be used to
@@ -351,8 +359,6 @@ class Ticket(Base, TimestampMixin, ORMSearchable):
             data = getattr(self.handler, f'submitter_{info}')
             if data:
                 self.snapshot[f'submitter_{info}'] = data
-
-        self.snapshot['tag_meta'] = self.handler.tag_meta
 
 
 class TicketPermission(Base, TimestampMixin):

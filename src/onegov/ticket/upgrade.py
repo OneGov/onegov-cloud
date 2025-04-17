@@ -211,13 +211,17 @@ def add_exclusive_and_notification_columns_to_ticket_permission(
         )
 
 
-@upgrade_task('Add tags column and index to ticket')
-def add_tags_column_and_index_to_ticket(context: UpgradeContext) -> None:
+@upgrade_task('Add tags and tags_meta columns and index to ticket')
+def add_tags_columns_and_index_to_ticket(context: UpgradeContext) -> None:
     if context.has_column('tickets', 'tags'):
         return
 
     context.operations.add_column(
         'tickets', Column('tags', HSTORE, nullable=True)
+    )
+
+    context.operations.add_column(
+        'tickets', Column('tags_meta', JSON, nullable=True)
     )
 
     context.operations.create_index(
