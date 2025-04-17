@@ -2506,7 +2506,6 @@ def test_allocation_rules_on_rooms(client):
     assert count_allocations() == 7
 
 
-
 def test_allocation_rules_edit(client):
     client.login_admin()
 
@@ -2551,6 +2550,61 @@ def test_allocation_rules_edit(client):
     edit_page = form.submit().follow()
 
     assert 'Renamed room' in edit_page
+
+
+def test_allocation_rules_copy_paste(client):
+    client.login_admin()
+
+    resources = client.get('/resources')
+
+    page = resources.click('Raum')
+    page.form['title'] = 'Room 1'
+    page.form.submit()
+
+    page = resources.click('Raum')
+    page.form['title'] = 'Room 2'
+    page.form.submit()
+
+    def count_allocations(room):
+        return len(client.get(
+            f'/resource/room-{room}/slots?start=2000-01-01&end=2050-01-31'
+        ).json)
+
+    def run_cronjob():
+        client.get('/resource/room/process-rules')
+
+    page = client.get('/resource/room-1').click(
+        "Verfügbarkeitszeiträume").click("Verfügbarkeitszeitraum")
+    page.form['title'] = 'Täglich'
+    page.form['extend'] = 'daily'
+    page.form['start'] = '2019-01-01'
+    page.form['end'] = '2019-01-02'
+    page.form['as_whole_day'] = 'yes'
+
+    page.select_checkbox('except_for', "Sa")
+    page.select_checkbox('except_for', "So")
+
+    page = page.form.submit().follow()
+
+    assert 'Verfügbarkeitszeitraum aktiv, 2 Verfügbarkeiten erstellt' in page
+    assert count_allocations(1) == 2
+    assert count_allocations(2) == 0
+
+    # Copy the rule
+    edit_page = client.get('/resource/room-1').click('Verfügbarkeitszeiträume')
+    copy_links = edit_page.html.find_all('a', string='Kopieren')
+    client.post(copy_links[0].attrs['ic-post-to'])
+    edit_page = client.get(edit_page.request.path)
+    assert 'in die Zwischenablage kopiert' in edit_page
+
+    # Paste the rule in the other room
+    edit_page = client.get('/resource/room-2').click('Verfügbarkeitszeiträume')
+    paste_links = edit_page.html.find_all('a', string='Einfügen')
+    client.post(paste_links[0].attrs['ic-post-to'])
+    edit_page = client.get(edit_page.request.path)
+    assert 'wurde eingefügt' in edit_page
+    assert count_allocations(1) == 2
+    assert count_allocations(2) == 2
 
 
 def test_allocation_rules_on_daypasses(client):
