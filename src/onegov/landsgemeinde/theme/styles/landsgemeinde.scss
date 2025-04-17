@@ -76,9 +76,9 @@ h1.main-title small {
 .agenda-item-vota {
     .votum,
     .ticker-votum {
+        @include smooth-edges;
         background: $white-smoke;
         border-left: 2px solid $smoke;
-        @include smooth-edges;
         box-shadow: -10px 0 10px -10px rgba(0, 0, 0, .07);
         margin-bottom: 1.5rem;
         padding: 1.5rem;
@@ -105,19 +105,19 @@ h1.main-title small {
             opacity: .5;
         }
 
-          .votum-time {
-              color: $base;
-              white-space: nowrap;
-              position: absolute;
-              right: 0;
-              text-align: right;
-              top: 0;
-              padding: .5rem .6rem .2rem;
-              border: 3px solid $white;
-              border-radius: 0 0 0 1.2rem;
-              border-right: 0;
-              border-top: 0;
-          }
+        .votum-time {
+            border: 3px solid $white;
+            border-radius: 0 0 0 1.2rem;
+            border-right: 0;
+            border-top: 0;
+            color: $base;
+            padding: .5rem .6rem .2rem;
+            position: absolute;
+            right: 0;
+            text-align: right;
+            top: 0;
+            white-space: nowrap;
+        }
 
         .votum-header {
             display: flex;
@@ -146,7 +146,7 @@ h1.main-title small {
         right: 0;
         top: 0;
 
-        & *:not(.scheduled) {
+        *:not(.scheduled) {
             display: none;
         }
     }
@@ -160,7 +160,7 @@ h1.main-title small {
             @include smooth-edges;
         }
 
-        &> li > a {
+        > li > a {
             border-left: 0;
         }
     }
@@ -168,6 +168,16 @@ h1.main-title small {
 
 .agenda-item-overview {
     margin-bottom: 4rem;
+
+    .memorial-link {
+        background: transparent;
+        border: 1px solid $gainsboro;
+        padding: 1.3rem 1.5rem;
+
+        &:hover {
+            background: $vapor;
+        }
+    }
 }
 
 .side-panel .agenda-item-list {
@@ -293,15 +303,15 @@ h1.main-title small {
     padding-top: 25px;
     position: relative;
     width: 100%;
-}
 
-.videowrapper iframe {
-    height: 100%;
-    left: 0;
-    padding-bottom: 2rem;
-    position: absolute;
-    top: 0;
-    width: 100%;
+    iframe {
+        height: 100%;
+        left: 0;
+        padding-bottom: 2rem;
+        position: absolute;
+        top: 0;
+        width: 100%;
+    }
 }
 
 /*
@@ -349,16 +359,18 @@ h1.main-title small {
 
 /* Side panel*/
 
-.sidebar-toggler .text{
+.sidebar-toggler .text {
     margin-bottom: -2px;
 }
 
 .agenda-item-list.with-current {
     height: 25rem;
     overflow-y: scroll;
-    scrollbar-color: $charcoal $white-smoke;  // sass-lint:disable-line no-misspelled-properties
+    // scss-lint:disable PropertySpelling
+    scrollbar-color: $charcoal $white-smoke;
+    // scss-lint:enable PropertySpelling
 
-    &::-webkit-scrollbar-tracK {
+    &::-webkit-scrollbar-track {
         background-color: $white-smoke;
     }
 
@@ -495,17 +507,6 @@ h1.main-title small {
     }
 }
 
-.agenda-item-overview .memorial-link {
-    background: transparent;
-    border: 1px solid $gainsboro;
-    padding: 1.3rem 1.5rem;
-
-    &:hover {
-        background: $vapor;
-    }
-}
-
-
 #liveticker {
     color: $primary-color;
     display: flex;
@@ -588,9 +589,9 @@ h1.main-title small {
         padding: 0 3rem !important;
 
         .typeahead {
-            top: 1.5rem;
-            position: relative;
             left: calc(4rem - 100%);
+            position: relative;
+            top: 1.5rem;
 
             ul {
                 width: 18rem;
