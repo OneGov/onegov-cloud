@@ -304,6 +304,9 @@ class PeopleImporter(DataImporter):
                     logging.debug(
                         f'Updating existing parliamentarian: {person_id}'
                     )
+                    # Add the updated object to the result map immediately
+                    result_map[person_id] = parliamentarian
+                    # No need to add to save list, session tracks changes
                 else:
                     # Create new parliamentarian
                     parliamentarian = self._create_parliamentarian(person_data)
