@@ -262,25 +262,42 @@ class PeopleImporter(DataImporter):
             .all()
         )
         existing_map = {
-            p.external_kub_id: p for p in existing_parliamentarians
+            p.external_kub_id: p
+            for p in existing_parliamentarians if p.external_kub_id
         }
 
         for person_data in people_data:
             person_id = person_data.get('id')
-            person_id = person_data.get('id')
             if not person_id:
-                logging.error(
-                    f"Skipping person due to missing ID: "
+                logging.warning(  # Changed to warning as it might not be critical
+                    f"Skipping person entry due to missing ID: "
                     f"{person_data.get('fullName')}"
                 )
                 continue
 
             try:
-                # Ignore UUID key type error for dict.get
-                parliamentarian = existing_map.get(person_id)  # type: ignore[call-overload]
+                # Check if this person ID has already been processed in this batch
+                if person_id in result_map:
+                    logging.warning(
+                        f"Skipping duplicate person ID within import batch: "
+                        f"{person_id}"
+                    )
+                    continue
+
+                # Convert person_id string to UUID for DB lookup
+                try:
+                    person_uuid = UUID(person_id)
+                except ValueError:
+                    logging.error(
+                        f"Skipping person due to invalid UUID format: "
+                        f"{person_id} - {person_data.get('fullName')}"
+                    )
+                    continue
+
+                parliamentarian = existing_map.get(person_uuid)
 
                 if parliamentarian:
-                    # Update existing parliamentarian
+                    # Update existing parliamentarian from DB
                     self._update_parliamentarian_attributes(
                         parliamentarian, person_data
                     )
@@ -290,8 +307,8 @@ class PeopleImporter(DataImporter):
                 else:
                     # Create new parliamentarian
                     parliamentarian = self._create_parliamentarian(person_data)
-                    parliamentarian = self._create_parliamentarian(person_data)
                     if not parliamentarian:
+                        # Creation failed (likely logged in _create_parliamentarian)
                         continue
                     logging.debug(f'Creating new parliamentarian: {person_id}')
 
