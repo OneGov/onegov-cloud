@@ -56,10 +56,11 @@ def test_people_importer_existing_parliamentarian(session, people_json):
     """Test importing data for a parliamentarian that already exists."""
     importer = PeopleImporter(session)
 
+    from uuid import UUID
     # Pre-populate the database with one parliamentarian from the fixture
     existing_person_data = people_json['results'][0]
     existing_parliamentarian = Parliamentarian(
-        external_kub_id=existing_person_data['id'],
+        external_kub_id=UUID(existing_person_data['id']), # Convert to UUID
         first_name='OldFirstName',  # Use a different first name initially
         last_name=existing_person_data['officialName'],
         salutation=existing_person_data['salutation'],
@@ -77,7 +78,7 @@ def test_people_importer_existing_parliamentarian(session, people_json):
 
     # Check the updated parliamentarian
     updated_parliamentarian = session.query(Parliamentarian).filter_by(
-        external_kub_id=existing_person_data['id']
+        external_kub_id=UUID(existing_person_data['id']) # Use UUID for query
     ).one_or_none()
 
     assert updated_parliamentarian is not None
@@ -97,7 +98,7 @@ def test_people_importer_existing_parliamentarian(session, people_json):
 
     # Ensure no duplicate parliamentarian was created
     count = session.query(Parliamentarian).filter_by(
-        external_kub_id=existing_person_data['id']
+        external_kub_id=UUID(existing_person_data['id']) # Use UUID for query
     ).count()
     assert count == 1
 
@@ -110,6 +111,7 @@ def test_organization_importer_existing(session,
     organization_json = organization_json_with_fraktion
     importer = OrganizationImporter(session)
 
+    from uuid import UUID
     # Pre-populate with one of each type from the fixture
     commission_data = next(
         o
@@ -123,13 +125,13 @@ def test_organization_importer_existing(session,
     )
     # Assuming 'Fraktion' maps to Party
     existing_commission = Commission(
-        external_kub_id=commission_data['id'],
+        external_kub_id=UUID(commission_data['id']), # Convert to UUID
         name='Old Commission Name',
         type='normal',
     )
     # Fraktion maps to Party
     existing_party = Party(
-        external_kub_id=fraktion_data['id'],
+        external_kub_id=UUID(fraktion_data['id']), # Convert to UUID
         name='Old Party Name',
     )
     # Add ParliamentaryGroup if needed for testing that type
@@ -151,7 +153,7 @@ def test_organization_importer_existing(session,
     # 1. Check Commission Update
     updated_commission = (
         session.query(Commission)
-        .filter_by(external_kub_id=commission_data['id'])
+        .filter_by(external_kub_id=UUID(commission_data['id'])) # Use UUID
         .one_or_none()
     )
     assert updated_commission is not None
@@ -164,7 +166,7 @@ def test_organization_importer_existing(session,
     # Check Commission Count (ensure no duplicates)
     commission_count = (
         session.query(Commission)
-        .filter_by(external_kub_id=commission_data['id'])
+        .filter_by(external_kub_id=UUID(commission_data['id'])) # Use UUID
         .count()
     )
     assert commission_count == 1
@@ -172,7 +174,7 @@ def test_organization_importer_existing(session,
     # 2. Check Party Update (from Fraktion)
     updated_party = (
         session.query(Party)
-        .filter_by(external_kub_id=fraktion_data['id'])
+        .filter_by(external_kub_id=UUID(fraktion_data['id'])) # Use UUID
         .one_or_none()
     )
     assert updated_party is not None
@@ -183,7 +185,7 @@ def test_organization_importer_existing(session,
     # Check Party Count (ensure no duplicates)
     party_count = (
         session.query(Party)
-        .filter_by(external_kub_id=fraktion_data['id'])
+        .filter_by(external_kub_id=UUID(fraktion_data['id'])) # Use UUID
         .count()
     )
     assert party_count == 1

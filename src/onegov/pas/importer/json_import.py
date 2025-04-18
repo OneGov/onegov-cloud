@@ -251,7 +251,7 @@ class PeopleImporter(DataImporter):
     ) -> dict[str, Parliamentarian]:
         """Imports people from JSON data and returns a map of id to
         Parliamentarian."""
-        parliamentarians_to_save: list[Parliamentarian] = []
+        new_parliamentarians: list[Parliamentarian] = []
         result_map: dict[str, Parliamentarian] = {}
 
         # Fetch existing parliamentarians by external_kub_id
