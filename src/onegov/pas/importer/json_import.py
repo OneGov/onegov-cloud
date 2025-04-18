@@ -326,7 +326,8 @@ class PeopleImporter(DataImporter):
                     exc_info=True,
                 )
 
-        self._bulk_save(parliamentarians_to_save, 'parliamentarians')
+        # Only save the newly created parliamentarians
+        self._bulk_save(new_parliamentarians, 'parliamentarians')
         return result_map
 
     def _update_parliamentarian_attributes(
