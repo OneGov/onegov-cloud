@@ -314,9 +314,11 @@ class PeopleImporter(DataImporter):
                         # Creation failed (likely logged in _create_parliamentarian)
                         continue
                     logging.debug(f'Creating new parliamentarian: {person_id}')
+                    new_parliamentarians.append(parliamentarian)
+                    result_map[person_id] = parliamentarian
 
-                parliamentarians_to_save.append(parliamentarian)
-                result_map[person_id] = parliamentarian
+            except Exception as e:
+                logging.error(
 
             except Exception as e:
                 logging.error(
