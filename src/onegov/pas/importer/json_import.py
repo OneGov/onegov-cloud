@@ -1126,18 +1126,6 @@ class MembershipImporter(DataImporter):
                         else None
                     )
 
-                    existing_role = (
-                        self.session.query(ParliamentarianRole)
-                        .filter_by(
-                            parliamentarian_id=parliamentarian.id,
-                            role=role,
-                            parliamentary_group_id=None,
-                            party_id=None,
-                            additional_information=None,
-                        )
-                        .one_or_none()
-                    )
-
                     role_key = (
                         parliamentarian.id,
                         None, # party_id
@@ -1189,16 +1177,6 @@ class MembershipImporter(DataImporter):
                         str(end_val)
                         if end_val and not isinstance(end_val, bool)
                         else None
-                    )
-
-                    existing_role = (
-                        self.session.query(ParliamentarianRole)
-                        .filter_by(
-                            parliamentarian_id=parliamentarian.id,
-                            additional_information=additional_info,
-                            role='member', # Assuming 'member' for Sonstige
-                        )
-                        .one_or_none()
                     )
 
                     role_key = (
