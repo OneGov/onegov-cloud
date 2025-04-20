@@ -490,11 +490,19 @@ class OrganizationImporter(DataImporter):
                     commission = existing_commission_map.get(org_uuid)
                     if commission:
                         # Update existing commission found in initial query
+                        updated = False
                         if commission.name != org_name:
                             commission.name = org_name
-                        logging.debug(
-                            f'Updating commission (from initial query): '
-                            f'{org_id}'
+                            updated = True
+                        if updated:
+                            counts['commissions']['updated'] += 1
+                            logging.debug(
+                                f'Updating commission (from initial query): '
+                                f'{org_id}'
+                            )
+                        # No need to add to save list, session tracks changes
+                    else:
+                        # Create new commission (since not found in initial map)
                         )
                         # No need to add to save list, session tracks changes
                     else:
@@ -507,6 +515,8 @@ class OrganizationImporter(DataImporter):
                         logging.debug(f'Creating new commission: {org_id}')
                         # Only add *new* commissions to the save list
                         commissions_to_save.append(commission)
+                        # Increment created count here, _bulk_save confirms DB
+                        counts['commissions']['created'] += 1
 
                     commission_map[org_id] = commission # Add to map regardless
 
@@ -523,11 +533,19 @@ class OrganizationImporter(DataImporter):
                     party = existing_party_map.get(org_uuid)
                     if party:
                         # Update existing party found in initial query
+                        updated = False
                         if party.name != org_name:
                             party.name = org_name
-                        logging.debug(
-                            f'Updating party (from Fraktion, initial query): '
-                            f'{org_id}'
+                            updated = True
+                        if updated:
+                            counts['parties']['updated'] += 1
+                            logging.debug(
+                                f'Updating party (from Fraktion, initial query): '
+                                f'{org_id}'
+                            )
+                        # No need to add to save list, session tracks changes
+                    else:
+                        # Create new party (since not found in initial map)
                         )
                         # No need to add to save list, session tracks changes
                     else:
@@ -540,6 +558,8 @@ class OrganizationImporter(DataImporter):
                         )
                         # Only add *new* parties to the save list
                         parties_to_save.append(party)
+                        # Increment created count here
+                        counts['parties']['created'] += 1
 
                     # Use org_id for party_map key consistency
                     party_map[org_id] = party # Add to map regardless
@@ -552,10 +572,12 @@ class OrganizationImporter(DataImporter):
                         'name': org_data.get('name', ''),
                         'type': organization_type_title.lower(),
                     }
+                    counts['other']['count'] += 1
                 elif org_name is not None and 'Legislatur' in org_name:
                     # Note: Can't create Legislatur objects here, as the api
                     # does not give us the required start / end date.
-                    pass
+                    # Still count it as 'other' for reporting purposes
+                    counts['other']['count'] += 1
                 else:
                     logging.warning(
                         f'Unknown organization type: {organization_type_title}'
