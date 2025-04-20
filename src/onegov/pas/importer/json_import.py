@@ -459,28 +459,17 @@ class OrganizationImporter(DataImporter):
                             f'Updating commission (from initial query): '
                             f'{org_id}'
                         )
+                        # No need to add to save list, session tracks changes
                     else:
-                        # Check DB again before creating, in case it exists
-                        # from a previous import run
-                        commission = self.session.query(Commission).filter_by(
-                            external_kub_id=org_uuid
-                        ).one_or_none()
-
-                        if commission:
-                            # Found existing commission in DB, update it
-                            if commission.name != org_name:
-                                commission.name = org_name
-                            logging.debug(
-                                f'Updating commission (found in DB): {org_id}'
-                        # Create new commission
+                        # Create new commission (since not found in initial map)
                         commission = Commission(
                             external_kub_id=org_uuid,
                             name=org_name,
-                                type='normal',
-                            )
-                            logging.debug(f'Creating new commission: {org_id}')
-                            # Only add *new* commissions to the save list
-                            commissions_to_save.append(commission)
+                            type='normal',
+                        )
+                        logging.debug(f'Creating new commission: {org_id}')
+                        # Only add *new* commissions to the save list
+                        commissions_to_save.append(commission)
 
                     commission_map[org_id] = commission # Add to map regardless
 
@@ -503,28 +492,17 @@ class OrganizationImporter(DataImporter):
                             f'Updating party (from Fraktion, initial query): '
                             f'{org_id}'
                         )
+                        # No need to add to save list, session tracks changes
                     else:
-                        # Check DB again before creating
-                        party = self.session.query(Party).filter_by(
-                            external_kub_id=org_uuid
-                        ).one_or_none()
-
-                        if party:
-                            # Found existing party in DB, update it
-                            if party.name != org_name:
-                                party.name = org_name
-                            logging.debug(
-                                f'Updating party (from Fraktion, found in DB):'
-                                f' {org_id}'
-                        # Create new party
+                        # Create new party (since not found in initial map)
                         party = Party(
                             external_kub_id=org_uuid, name=org_name
                         )
-                            logging.debug(
-                                f'Creating party (from Fraktion): {org_id}'
-                            )
-                            # Only add *new* parties to the save list
-                            parties_to_save.append(party)
+                        logging.debug(
+                            f'Creating party (from Fraktion): {org_id}'
+                        )
+                        # Only add *new* parties to the save list
+                        parties_to_save.append(party)
 
                     # Use org_id for party_map key consistency
                     party_map[org_id] = party # Add to map regardless
