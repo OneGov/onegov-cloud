@@ -899,13 +899,15 @@ class MembershipImporter(DataImporter):
             existing_roles = (
                 self.session.query(ParliamentarianRole)
                 .filter(
-                    ParliamentarianRole.parliamentarian_id.in_(parliamentarian_ids)
+                    ParliamentarianRole.parliamentarian_id.in_(
+                        parliamentarian_ids
+                    )
                 )
                 .options(
-                    # Eager load related objects if needed often,
-                    # but be mindful of performance impact.
-                    # selectinload(ParliamentarianRole.party),
-                    # selectinload(ParliamentarianRole.parliamentary_group)
+                    # Eager load related objects to prevent N+1 queries
+                    # during updates.
+                    selectinload(ParliamentarianRole.party),
+                    selectinload(ParliamentarianRole.parliamentary_group)
                 )
                 .all()
             )
