@@ -99,8 +99,8 @@ def handle_data_import(
     self: Organisation, request: TownRequest, form: DataImportForm
 ) -> RenderData | Response:
     layout = DefaultLayout(self, request)
-    results: str | None = None
-    import_summary: dict[str, dict[str, int]] | None = None
+    import_details: dict[str, dict[str, list[Any]]] | None = None
+    error_message: str | None = None
 
     if request.method == 'POST' and form.validate():
         try:
@@ -114,7 +114,8 @@ def handle_data_import(
             membership_data = load_and_concatenate_json(
                 form.memberships_source.data
             )
-            import_summary = import_zug_kub_data(
+            # Renamed variable to import_details
+            import_details = import_zug_kub_data(
                 session=request.session,
                 people_data=people_data,
                 organization_data=organization_data,
@@ -123,19 +124,9 @@ def handle_data_import(
             request.message(
                 _('Data import completed successfully.'), 'success')
 
-            # Format summary for display
-            summary_lines = [_('Import Summary:')]
-            for key, counts in import_summary.items():
-                if isinstance(counts, dict): # Standard created/updated
-                    line = f"- {key.replace('_', ' ').title()}: "
-                    line += f"Created: {counts.get('created', 0)}, "
-                    line += f"Updated: {counts.get('updated', 0)}"
-                    summary_lines.append(line)
-                elif key == 'other' and isinstance(counts, dict): # Special case for 'other' orgs
-                     summary_lines.append(
-                         f"- Other Organizations Found: {counts.get('count', 0)}"
-                     )
-            results = '\n'.join(summary_lines)
+            # No longer formatting a simple string here.
+            # The import_details dictionary is passed directly to the template.
+
             # Don't redirect, show results on the same page
             # return redirect(request.class_link(Organisation, name='pas'))
 
@@ -146,18 +137,19 @@ def handle_data_import(
                 _('Data import failed: ${error}', mapping={'error': str(e)}),
                 'warning'
             )
-            # Display the exception as results in case of failure
+            # Display the exception message
             cause = e.__cause__ or e.__context__
-            error_details = f'Error during import: {e}'
+            error_msg = f'Error during import: {e}'
             if cause:
-                error_details += f'\nCaused by: {cause}'
-            results = error_details # Overwrite potential summary
+                error_msg += f'\nCaused by: {cause}'
+            error_message = error_msg # Store error message separately
 
     return {
         'title': _('Import'),
         'layout': layout,
         'form': form,
-        'results': results,
+        'import_details': import_details, # Pass the detailed structure
+        'error_message': error_message, # Pass error message if any
         'errors': form.errors
     }
 

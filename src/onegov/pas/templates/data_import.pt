@@ -16,9 +16,46 @@
 
         <div metal:use-macro="layout.macros['form']" tal:condition="form" />
 
-        <div tal:condition="results" class="callout secondary import-results">
-            <h4 i18n:translate="">Import Results</h4>
-            <pre tal:content="results" />
+        <div tal:condition="error_message" class="callout alert import-error">
+            <h4 i18n:translate="">Import Error</h4>
+            <pre tal:content="error_message" />
+        </div>
+
+        <div tal:condition="import_details" class="import-results">
+            <h4 i18n:translate="">Import Details</h4>
+
+            <tal:block repeat="category_name import_details.keys()">
+                <tal:block define="details import_details[category_name]">
+                    <tal:block define="created details.get('created', [])">
+                        <div tal:condition="created" class="callout success">
+                            <h5 i18n:translate=""
+                                tal:content="string:${category_name.replace('_', ' ').title()} Created (${len(created)})"
+                            />
+                            <ul>
+                                <li tal:repeat="item created">
+                                    <a tal:attributes="href request.link(item)"
+                                       tal:content="item.title if hasattr(item, 'title') else (item.name if hasattr(item, 'name') else (item.parliamentarian.title + ' in ' + item.commission.name if hasattr(item, 'parliamentarian') and hasattr(item, 'commission') else (item.parliamentarian.title + ' - ' + item.role if hasattr(item, 'parliamentarian') and hasattr(item, 'role') else 'Unknown Object')))"
+                                    />
+                                </li>
+                            </ul>
+                        </div>
+                    </tal:block>
+                    <tal:block define="updated details.get('updated', [])">
+                        <div tal:condition="updated" class="callout warning">
+                             <h5 i18n:translate=""
+                                tal:content="string:${category_name.replace('_', ' ').title()} Updated (${len(updated)})"
+                            />
+                            <ul>
+                                <li tal:repeat="item updated">
+                                     <a tal:attributes="href request.link(item)"
+                                       tal:content="item.title if hasattr(item, 'title') else (item.name if hasattr(item, 'name') else (item.parliamentarian.title + ' in ' + item.commission.name if hasattr(item, 'parliamentarian') and hasattr(item, 'commission') else (item.parliamentarian.title + ' - ' + item.role if hasattr(item, 'parliamentarian') and hasattr(item, 'role') else 'Unknown Object')))"
+                                    />
+                                </li>
+                            </ul>
+                        </div>
+                    </tal:block>
+                </tal:block>
+            </tal:block>
         </div>
     </tal:b>
 </div>
