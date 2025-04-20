@@ -463,7 +463,8 @@ class OrganizationImporter(DataImporter):
                                 f'Invalid UUID for commission ID: {org_id}'
                             )
                             continue
-                    commissions_to_save.append(commission)
+                        # Only add *new* commissions to the save list
+                        commissions_to_save.append(commission)
                     commission_map[org_id] = commission
 
                 elif organization_type_title == 'Fraktion':
@@ -492,7 +493,8 @@ class OrganizationImporter(DataImporter):
                                 f'Invalid UUID for party/Fraktion ID: {org_id}'
                             )
                             continue
-                    parties_to_save.append(party)
+                        # Only add *new* parties to the save list
+                        parties_to_save.append(party)
                     # Use org_id for party_map key consistency
                     party_map[org_id] = party
 
@@ -521,10 +523,19 @@ class OrganizationImporter(DataImporter):
                     exc_info=True,
                 )
 
-        # Save changes to the database
-        self._bulk_save(commissions_to_save, 'commissions')
-        self._bulk_save(parliamentary_groups_to_save, 'parliamentary groups')
-        self._bulk_save(parties_to_save, 'parties')
+        # Save only the newly created objects
+        # Updated objects are handled by the session flush
+        if commissions_to_save:
+            self._bulk_save(commissions_to_save, 'new commissions')
+        if parliamentary_groups_to_save:
+            self._bulk_save(
+                parliamentary_groups_to_save, 'new parliamentary groups'
+            )
+        if parties_to_save:
+            self._bulk_save(parties_to_save, 'new parties')
+
+        # Ensure updates to existing objects are flushed
+        self.session.flush()
 
         # Return maps containing both existing (updated) and new objects
         return (
