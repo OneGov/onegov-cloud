@@ -442,61 +442,98 @@ class OrganizationImporter(DataImporter):
 
                 if organization_type_title == 'Kommission':
                     # Ignore UUID key type error for dict.get
-                    commission = existing_commission_map.get(org_id)  # type: ignore[call-overload]
+                    try:
+                        org_uuid = uuid.UUID(org_id)
+                    except ValueError:
+                        logging.error(
+                            f'Invalid UUID for commission ID: {org_id}'
+                        )
+                        continue
+
+                    commission = existing_commission_map.get(org_uuid)
                     if commission:
-                        # Update existing commission
+                        # Update existing commission found in initial query
                         if commission.name != org_name:
                             commission.name = org_name
-                        logging.debug(f'Updating commission: {org_id}')
+                        logging.debug(
+                            f'Updating commission (from initial query): '
+                            f'{org_id}'
+                        )
                     else:
-                        # Create new commission
-                        try:
-                            org_uuid = uuid.UUID(org_id)
+                        # Check DB again before creating, in case it exists
+                        # from a previous import run
+                        commission = self.session.query(Commission).filter_by(
+                            external_kub_id=org_uuid
+                        ).one_or_none()
+
+                        if commission:
+                            # Found existing commission in DB, update it
+                            if commission.name != org_name:
+                                commission.name = org_name
+                            logging.debug(
+                                f'Updating commission (found in DB): {org_id}'
+                            )
+                            # Add to map, but not to save list
+                        else:
+                            # Create new commission
                             commission = Commission(
                                 external_kub_id=org_uuid,
                                 name=org_name,
                                 type='normal',
                             )
                             logging.debug(f'Creating new commission: {org_id}')
-                        except ValueError:
-                            logging.error(
-                                f'Invalid UUID for commission ID: {org_id}'
-                            )
-                            continue
-                        # Only add *new* commissions to the save list
-                        commissions_to_save.append(commission)
-                    commission_map[org_id] = commission
+                            # Only add *new* commissions to the save list
+                            commissions_to_save.append(commission)
+
+                    commission_map[org_id] = commission # Add to map regardless
 
                 elif organization_type_title == 'Fraktion':
+                    try:
+                        org_uuid = uuid.UUID(org_id)
+                    except ValueError:
+                        logging.error(
+                            f'Invalid UUID for party/Fraktion ID: {org_id}'
+                        )
+                        continue
+
                     # Treat 'Fraktion' as Party based on observation
-                    # Ignore UUID key type error for dict.get
-                    party = existing_party_map.get(org_id)  # type: ignore[call-overload]
+                    party = existing_party_map.get(org_uuid)
                     if party:
-                        # Update existing party
+                        # Update existing party found in initial query
                         if party.name != org_name:
                             party.name = org_name
                         logging.debug(
-                            f'Updating party (from Fraktion): {org_id}'
+                            f'Updating party (from Fraktion, initial query): '
+                            f'{org_id}'
                         )
                     else:
-                        # Create new party
-                        try:
-                            org_uuid = uuid.UUID(org_id)
+                        # Check DB again before creating
+                        party = self.session.query(Party).filter_by(
+                            external_kub_id=org_uuid
+                        ).one_or_none()
+
+                        if party:
+                            # Found existing party in DB, update it
+                            if party.name != org_name:
+                                party.name = org_name
+                            logging.debug(
+                                f'Updating party (from Fraktion, found in DB):'
+                                f' {org_id}'
+                            )
+                            # Add to map, but not to save list
+                        else:
+                            # Create new party
                             party = Party(
                                 external_kub_id=org_uuid, name=org_name
                             )
                             logging.debug(
                                 f'Creating party (from Fraktion): {org_id}'
                             )
-                        except ValueError:
-                            logging.error(
-                                f'Invalid UUID for party/Fraktion ID: {org_id}'
-                            )
-                            continue
-                        # Only add *new* parties to the save list
-                        parties_to_save.append(party)
+                            # Only add *new* parties to the save list
+                            parties_to_save.append(party)
+
                     # Use org_id for party_map key consistency
-                    party_map[org_id] = party
+                    party_map[org_id] = party # Add to map regardless
 
                 elif organization_type_title in ('Kantonsrat', 'Sonstige'):
                     # These are not mapped to ORM objects directly,
