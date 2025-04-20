@@ -6,6 +6,7 @@ from datetime import date, datetime
 from typing import Any, Literal, TypedDict
 from typing import TYPE_CHECKING
 
+from sqlalchemy.orm import selectinload
 from uuid import UUID
 
 from onegov.pas.models.commission_membership import (
