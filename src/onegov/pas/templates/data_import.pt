@@ -24,6 +24,11 @@
 
         <div tal:condition="import_details" class="import-results">
             <h4 i18n:translate="">Import Details</h4>
+            
+            <div tal:condition="not any(details.get('created') or details.get('updated') for details in import_details.values())" 
+                 class="callout primary">
+                <p i18n:translate="">No changes were made. All data is already up to date.</p>
+            </div>
 
             <tal:block repeat="category_name import_details.keys()">
                 <tal:block define="details import_details[category_name]">

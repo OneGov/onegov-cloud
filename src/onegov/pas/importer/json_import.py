@@ -307,13 +307,14 @@ class PeopleImporter(DataImporter):
 
                 if parliamentarian:
                     # Update existing parliamentarian from DB
-                    self._update_parliamentarian_attributes(
+                    was_updated = self._update_parliamentarian_attributes(
                         parliamentarian, person_data
                     )
                     logging.debug(
                         f'Updating existing parliamentarian: {person_id}'
                     )
-                    updated_parliamentarians.append(parliamentarian)
+                    if was_updated:
+                        updated_parliamentarians.append(parliamentarian)
                     # Add the updated object to the result map immediately
                     result_map[person_id] = parliamentarian
                     # No need to add to save list, session tracks changes
@@ -356,14 +357,17 @@ class PeopleImporter(DataImporter):
 
     def _update_parliamentarian_attributes(
         self, parliamentarian: Parliamentarian, person_data: PersonData
-    ) -> None:
-        """Updates attributes of an existing Parliamentarian object."""
+    ) -> bool:
+        """Updates attributes of an existing Parliamentarian object.
+        Returns True if any attributes were changed, False otherwise."""
+        changed = False
         for json_key, model_attr in self.person_attribute_map.items():
             if val := person_data.get(json_key):
                 # Only update if the value is different to avoid unnecessary
                 # writes
                 if getattr(parliamentarian, model_attr) != val:
                     setattr(parliamentarian, model_attr, val)
+                    changed = True
 
         # Handle nested primaryEmail
         primary_email_data = person_data.get('primaryEmail')
@@ -372,6 +376,9 @@ class PeopleImporter(DataImporter):
         )
         if new_email and parliamentarian.email_primary != new_email:
             parliamentarian.email_primary = new_email
+            changed = True
+            
+        return changed
 
     def _create_parliamentarian(
         self, person_data: PersonData
@@ -1141,7 +1148,7 @@ class MembershipImporter(DataImporter):
                                 f'Updating commission membership for '
                                 f'{parliamentarian.id} in {commission.id}'
                             )
-                            # No need to append, session flush handles updates.
+                        # No need to append, session flush handles updates.
                     else:
                         # Create new membership
                         membership_obj = self._create_commission_membership(
@@ -1213,7 +1220,7 @@ class MembershipImporter(DataImporter):
                                 f'Updating Fraktion/Party role for '
                                 f'{parliamentarian.id}'
                             )
-                            # No need to append, session flush handles updates.
+                        # No need to append, session flush handles updates.
                     else:
                         # Create new role
                         role_obj = self._create_parliamentarian_role(
@@ -1274,7 +1281,7 @@ class MembershipImporter(DataImporter):
                                 f'Updating Kantonsrat role ({role}) for '
                                 f'{parliamentarian.id}'
                             )
-                            # No need to append, session flush handles updates.
+                        # No need to append, session flush handles updates.
                     else:
                         role_obj = self._create_parliamentarian_role(
                             parliamentarian=parliamentarian,
@@ -1329,7 +1336,7 @@ class MembershipImporter(DataImporter):
                                 f'Updating Sonstige role for '
                                 f'{parliamentarian.id}: {additional_info}'
                             )
-                            # No need to append, session flush handles updates.
+                        # No need to append, session flush handles updates.
                     else:
                         role_obj = self._create_parliamentarian_role(
                             parliamentarian=parliamentarian,

@@ -121,8 +121,20 @@ def handle_data_import(
                 organization_data=organization_data,
                 membership_data=membership_data,
             )
-            request.message(
-                _('Data import completed successfully.'), 'success')
+            
+            # Check if any changes were made
+            any_changes = any(
+                details.get('created') or details.get('updated') 
+                for details in import_details.values()
+            )
+            
+            if any_changes:
+                request.message(
+                    _('Data import completed successfully with changes.'), 'success')
+            else:
+                request.message(
+                    _('Data import completed. No changes were needed - data is already up to date.'), 
+                    'info')
         except Exception as e:
             log.error(f'Data import failed: {e}', exc_info=True)
             # Provide a more user-friendly error message
