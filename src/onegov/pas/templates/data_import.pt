@@ -14,7 +14,8 @@
             </ul>
         </div>
 
-        <div metal:use-macro="layout.macros['form']" tal:condition="form" />
+        <!-- After form submit, don't show the form again but show the import details. -->
+        <div metal:use-macro="layout.macros['form']" tal:condition="form and not import_details" />
 
         <div tal:condition="error_message" class="callout alert import-error">
             <h4 i18n:translate="">Import Error</h4>

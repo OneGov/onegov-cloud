@@ -123,13 +123,6 @@ def handle_data_import(
             )
             request.message(
                 _('Data import completed successfully.'), 'success')
-
-            # No longer formatting a simple string here.
-            # The import_details dictionary is passed directly to the template.
-
-            # Don't redirect, show results on the same page
-            # return redirect(request.class_link(Organisation, name='pas'))
-
         except Exception as e:
             log.error(f'Data import failed: {e}', exc_info=True)
             # Provide a more user-friendly error message
@@ -142,14 +135,14 @@ def handle_data_import(
             error_msg = f'Error during import: {e}'
             if cause:
                 error_msg += f'\nCaused by: {cause}'
-            error_message = error_msg # Store error message separately
+            error_message = error_msg
 
     return {
         'title': _('Import'),
         'layout': layout,
         'form': form,
-        'import_details': import_details, # Pass the detailed structure
-        'error_message': error_message, # Pass error message if any
+        'import_details': import_details,
+        'error_message': error_message,
         'errors': form.errors
     }
 

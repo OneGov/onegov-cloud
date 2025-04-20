@@ -1755,17 +1755,5 @@ def import_zug_kub_data(
     import_details['parliamentarians']['updated'].extend(
         parl_from_memberships.get('updated', [])
     )
-
-    # Final flush to ensure all relationships are persisted before returning
     session.flush()
-
-    logging.info(f'Overall import details generated.')
-    # Log counts for summary overview
-    for key, actions in import_details.items():
-        logging.info(
-            f" -> {key.replace('_', ' ').title()}: "
-            f"Created: {len(actions.get('created', []))}, "
-            f"Updated: {len(actions.get('updated', []))}"
-        )
-
     return import_details
