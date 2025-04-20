@@ -15,14 +15,11 @@ from onegov.org.models import Organisation
 from onegov.pas import _, PasApp
 from onegov.pas.forms.data_import import DataImportForm
 from onegov.pas.importer.json_import import import_zug_kub_data
-import uuid
-
 from onegov.pas.layouts import DefaultLayout
 
 
 from typing import Any, TYPE_CHECKING
 if TYPE_CHECKING:
-    from uuid import UUID
     from onegov.core.types import LaxFileDict
     from onegov.core.types import RenderData
     from collections.abc import Sequence

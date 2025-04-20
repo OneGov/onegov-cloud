@@ -177,18 +177,13 @@ if TYPE_CHECKING:
     from onegov.pas.models.parliamentarian_role import Role
     from collections.abc import Sequence
     from sqlalchemy.orm import Session
-    from uuid import UUID
 
 
 class DataImporter:
     """Base class for all importers with common functionality."""
 
-    def __init__(
-        self, session: Session, import_batch_id: UUID | None = None
-    ) -> None:
+    def __init__(self, session: Session) -> None:
         self.session = session
-        # Store the batch ID for use during import
-        self.import_batch_id = import_batch_id
 
     def parse_date(
         self,
@@ -382,17 +377,15 @@ class PeopleImporter(DataImporter):
         if new_email and parliamentarian.email_primary != new_email:
             parliamentarian.email_primary = new_email
             changed = True
-
-        # TODO: Add import_batch_id when updating (requires model change)
-        # if changed and self.import_batch_id:
-        #     parliamentarian.import_batch_id = self.import_batch_id
-
+            
         return changed
 
     def _create_parliamentarian(
         self, person_data: PersonData
     ) -> Parliamentarian | None:
         """Creates a single new Parliamentarian object from person data."""
+
+        person_id = person_data.get('id')
         person_id = person_data.get('id')
         if not person_id:
             logging.error(
@@ -413,12 +406,7 @@ class PeopleImporter(DataImporter):
                 'email'
             ]
 
-        # TODO: Add import_batch_id when creating (requires model change)
-        # parliamentarian_kwargs['import_batch_id'] = self.import_batch_id
-
         parliamentarian = Parliamentarian(**parliamentarian_kwargs)
-        # If model is changed, set it here if not in kwargs:
-        # parliamentarian.import_batch_id = self.import_batch_id
         return parliamentarian
 
 
@@ -519,8 +507,6 @@ class OrganizationImporter(DataImporter):
                             commission.name = org_name
                             updated = True
                         if updated:
-                            # TODO: Add import_batch_id (requires model change)
-                            # commission.import_batch_id = self.import_batch_id
                             commissions_to_update.append(commission)
                             logging.debug(
                                 f'Updating commission (from initial query): '
@@ -533,8 +519,6 @@ class OrganizationImporter(DataImporter):
                             external_kub_id=org_uuid,
                             name=org_name,
                             type='normal',
-                            # TODO: Add import_batch_id (requires model change)
-                            # import_batch_id=self.import_batch_id
                         )
                         logging.debug(f'Creating new commission: {org_id}')
                         # Only add *new* commissions to the save list
@@ -560,8 +544,6 @@ class OrganizationImporter(DataImporter):
                             party.name = org_name
                             updated = True
                         if updated:
-                            # TODO: Add import_batch_id (requires model change)
-                            # party.import_batch_id = self.import_batch_id
                             parties_to_update.append(party)
                             logging.debug(
                                 f'Updating party (from Fraktion, initial query): '
@@ -571,10 +553,7 @@ class OrganizationImporter(DataImporter):
                     else:
                         # Create new party (since not found in initial map)
                         party = Party(
-                            external_kub_id=org_uuid,
-                            name=org_name,
-                            # TODO: Add import_batch_id (requires model change)
-                            # import_batch_id=self.import_batch_id
+                            external_kub_id=org_uuid, name=org_name
                         )
                         logging.debug(
                             f'Creating party (from Fraktion): {org_id}'
@@ -661,11 +640,9 @@ class OrganizationImporter(DataImporter):
 
 
 class MembershipImporter(DataImporter):
-    """Importer for membership data from memberships.json."""
-    # NOTE: Overview of pairs removed for brevity, still available in history
+    """Importer for membership data from memberships.json.
 
-    # Role - Organization Type Combinations:
-    # ... (combinations omitted) ...
+    Get an overview of the possible pairs: see extract_role_org_type_pairs:
 
     Role - Organization Type Combinations:
     =====================================
@@ -705,9 +682,9 @@ class MembershipImporter(DataImporter):
         self.party_map: dict[str, Party] = {}
         self.other_organization_map: dict[str, Any] = {}
 
-    def init( # Keep init signature simple, batch_id is in __init__
+    def init(
         self,
-        # session: Session, # Already set in __init__
+        session: Session,
         parliamentarian_map: dict[str, Parliamentarian],
         commission_map: dict[str, Commission],
         parliamentary_group_map: dict[str, ParliamentaryGroup],
@@ -716,7 +693,7 @@ class MembershipImporter(DataImporter):
     ) -> None:
         """Initialize the importer with maps of objects by their external KUB
         ID."""
-        # self.session = session # Already set in __init__
+        self.session = session
         self.parliamentarian_map = parliamentarian_map
         self.commission_map = commission_map
         self.parliamentary_group_map = parliamentary_group_map
@@ -928,10 +905,6 @@ class MembershipImporter(DataImporter):
                 parliamentarian.shipping_address_city = new_city
                 changed = True
 
-        # TODO: Add import_batch_id when updating (requires model change)
-        # if changed and self.import_batch_id:
-        #     parliamentarian.import_batch_id = self.import_batch_id
-
         return changed
 
     def _create_parliamentarian_from_membership(
@@ -957,8 +930,6 @@ class MembershipImporter(DataImporter):
                 last_name=person_data.get('officialName', ''),
                 salutation=person_data.get('salutation'),
                 academic_title=person_data.get('title'),
-                # TODO: Add import_batch_id (requires model change)
-                # import_batch_id=self.import_batch_id
             )
 
             # Handle email
@@ -1480,8 +1451,6 @@ class MembershipImporter(DataImporter):
                 role=role,
                 start=start_date,
                 end=end_date,
-                # TODO: Add import_batch_id (requires model change)
-                # import_batch_id=self.import_batch_id
             )
         except Exception as e:
             logging.error(
@@ -1521,10 +1490,6 @@ class MembershipImporter(DataImporter):
             membership.end = new_end
             changed = True
 
-        # TODO: Add import_batch_id when updating (requires model change)
-        # if changed and self.import_batch_id:
-        #     membership.import_batch_id = self.import_batch_id
-
         return changed
 
     def _create_parliamentarian_role(
@@ -1561,8 +1526,6 @@ class MembershipImporter(DataImporter):
                 additional_information=additional_information,
                 start=self.parse_date(start_date),
                 end=self.parse_date(end_date),
-                # TODO: Add import_batch_id (requires model change)
-                # import_batch_id=self.import_batch_id
             )
         except Exception as e:
             logging.error(
@@ -1624,10 +1587,6 @@ class MembershipImporter(DataImporter):
         if role_obj.end != new_end:
             role_obj.end = new_end
             changed = True
-
-        # TODO: Add import_batch_id when updating (requires model change)
-        # if changed and self.import_batch_id:
-        #     role_obj.import_batch_id = self.import_batch_id
 
         return changed
 
@@ -1759,20 +1718,19 @@ def import_zug_kub_data(
     people_data: Sequence[PersonData],
     organization_data: Sequence[OrganizationData],
     membership_data: Sequence[MembershipData],
-    import_batch_id: UUID | None = None, # Accept the batch ID
 ) -> dict[str, dict[str, list[Any]]]:
     """
     Imports data from KUB JSON files and returns details of changes.
     """
     import_details: dict[str, dict[str, list[Any]]] = {}
 
-    # Pass batch ID to importers
-    people_importer = PeopleImporter(session, import_batch_id)
+    people_importer = PeopleImporter(session)
     parliamentarian_map, people_details = people_importer.bulk_import(
         people_data
+    )
     import_details['parliamentarians'] = people_details
 
-    organization_importer = OrganizationImporter(session, import_batch_id)
+    organization_importer = OrganizationImporter(session)
     (
         commission_map,
         parliamentary_group_map,
@@ -1782,9 +1740,9 @@ def import_zug_kub_data(
     ) = organization_importer.bulk_import(organization_data)
     import_details.update(org_details) # Merge org details
 
-    membership_importer = MembershipImporter(session, import_batch_id)
+    membership_importer = MembershipImporter(session)
     membership_importer.init(
-        # session, # No longer needed here, set in __init__
+        session,
         parliamentarian_map,
         commission_map,
         parliamentary_group_map,
