@@ -316,10 +316,6 @@ class PeopleImporter(DataImporter):
                     logging.debug(f'Creating new parliamentarian: {person_id}')
                     new_parliamentarians.append(parliamentarian)
                     result_map[person_id] = parliamentarian
-
-            except Exception as e:
-                logging.error(
-
             except Exception as e:
                 logging.error(
                     f'Error processing person with id {person_id}: {e}',
