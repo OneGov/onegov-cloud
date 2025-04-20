@@ -503,10 +503,6 @@ class OrganizationImporter(DataImporter):
                         # No need to add to save list, session tracks changes
                     else:
                         # Create new commission (since not found in initial map)
-                        )
-                        # No need to add to save list, session tracks changes
-                    else:
-                        # Create new commission (since not found in initial map)
                         commission = Commission(
                             external_kub_id=org_uuid,
                             name=org_name,
@@ -543,10 +539,6 @@ class OrganizationImporter(DataImporter):
                                 f'Updating party (from Fraktion, initial query): '
                                 f'{org_id}'
                             )
-                        # No need to add to save list, session tracks changes
-                    else:
-                        # Create new party (since not found in initial map)
-                        )
                         # No need to add to save list, session tracks changes
                     else:
                         # Create new party (since not found in initial map)
