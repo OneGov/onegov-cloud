@@ -208,8 +208,6 @@ class DataImporter:
         try:
             if objects:
                 count = len(objects)
-                # self.session.bulk_save_objects(objects)
-                # self.session.bulk_save_objects(objects) # Consider if needed
                 self.session.add_all(objects)
                 self.session.flush()
                 logging.info(f'Saved {count} new {object_type}')
