@@ -15,5 +15,10 @@
         </div>
 
         <div metal:use-macro="layout.macros['form']" tal:condition="form" />
+
+        <div tal:condition="results" class="callout secondary import-results">
+            <h4 i18n:translate="">Import Results</h4>
+            <pre tal:content="results" />
+        </div>
     </tal:b>
 </div>
