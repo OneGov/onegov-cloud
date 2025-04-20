@@ -472,13 +472,10 @@ class OrganizationImporter(DataImporter):
                                 commission.name = org_name
                             logging.debug(
                                 f'Updating commission (found in DB): {org_id}'
-                            )
-                            # Add to map, but not to save list
-                        else:
-                            # Create new commission
-                            commission = Commission(
-                                external_kub_id=org_uuid,
-                                name=org_name,
+                        # Create new commission
+                        commission = Commission(
+                            external_kub_id=org_uuid,
+                            name=org_name,
                                 type='normal',
                             )
                             logging.debug(f'Creating new commission: {org_id}')
@@ -519,13 +516,10 @@ class OrganizationImporter(DataImporter):
                             logging.debug(
                                 f'Updating party (from Fraktion, found in DB):'
                                 f' {org_id}'
-                            )
-                            # Add to map, but not to save list
-                        else:
-                            # Create new party
-                            party = Party(
-                                external_kub_id=org_uuid, name=org_name
-                            )
+                        # Create new party
+                        party = Party(
+                            external_kub_id=org_uuid, name=org_name
+                        )
                             logging.debug(
                                 f'Creating party (from Fraktion): {org_id}'
                             )
@@ -884,6 +878,96 @@ class MembershipImporter(DataImporter):
             memberships_data
         )
 
+        # --- Pre-fetch existing memberships and roles ---
+        parliamentarian_ids = [
+            p.id for p in self.parliamentarian_map.values() if p.id
+        ]
+        commission_ids = [
+            c.id for c in self.commission_map.values() if c.id
+        ]
+        party_ids = [
+            p.id for p in self.party_map.values() if p.id
+        ]
+        group_ids = [
+            g.id for g in self.parliamentary_group_map.values() if g.id
+        ]
+
+        existing_commission_memberships_map: dict[
+            tuple[UUID | None, UUID | None], CommissionMembership
+        ] = {}
+        if parliamentarian_ids and commission_ids:
+            existing_cms = (
+                self.session.query(CommissionMembership)
+                .filter(
+                    CommissionMembership.parliamentarian_id.in_(
+                        parliamentarian_ids
+                    ),
+                    CommissionMembership.commission_id.in_(commission_ids),
+                )
+                .all()
+            )
+            existing_commission_memberships_map = {
+                (cm.parliamentarian_id, cm.commission_id): cm for cm in existing_cms
+            }
+            logging.debug(
+                f'Pre-fetched {len(existing_commission_memberships_map)} '
+                f'existing commission memberships.'
+            )
+
+        existing_roles_map: dict[tuple[Any, ...], ParliamentarianRole] = {}
+        if parliamentarian_ids:
+            # Fetch all roles for the relevant parliamentarians
+            # We'll filter/map them client-side
+            existing_roles = (
+                self.session.query(ParliamentarianRole)
+                .filter(
+                    ParliamentarianRole.parliamentarian_id.in_(parliamentarian_ids)
+                )
+                .options(
+                    # Eager load related objects if needed often,
+                    # but be mindful of performance impact.
+                    # selectinload(ParliamentarianRole.party),
+                    # selectinload(ParliamentarianRole.parliamentary_group)
+                )
+                .all()
+            )
+            for role_obj in existing_roles:
+                # Create a unique key based on the role type and relevant IDs
+                key: tuple[Any, ...]
+                if role_obj.party_id or role_obj.parliamentary_group_id:
+                    # Fraktion/Party Role (assuming role='member')
+                    key = (
+                        role_obj.parliamentarian_id,
+                        role_obj.party_id,
+                        role_obj.parliamentary_group_id,
+                        'member', # Explicitly add role type for uniqueness
+                        None # Placeholder for additional_information
+                    )
+                elif role_obj.additional_information:
+                    # Sonstige Role (assuming role='member')
+                    key = (
+                        role_obj.parliamentarian_id,
+                        None, # party_id
+                        None, # group_id
+                        'member', # Explicitly add role type
+                        role_obj.additional_information
+                    )
+                else:
+                    # Kantonsrat Role (or potentially others without party/group/add.info)
+                    key = (
+                        role_obj.parliamentarian_id,
+                        None, # party_id
+                        None, # group_id
+                        role_obj.role, # Use the actual role
+                        None # Placeholder for additional_information
+                    )
+                existing_roles_map[key] = role_obj
+            logging.debug(
+                f'Pre-fetched {len(existing_roles_map)} existing '
+                f'parliamentarian roles.'
+            )
+        # --- End Pre-fetching ---
+
         for membership in memberships_data:
             person_id = None  # Initialize
             try:
@@ -936,17 +1020,13 @@ class MembershipImporter(DataImporter):
                         )
                         continue
 
-                    existing_membership = (
-                        self.session.query(CommissionMembership)
-                        .filter_by(
-                            parliamentarian_id=parliamentarian.id,
-                            commission_id=commission.id,
-                        )
-                        .one_or_none()
+                    membership_key = (parliamentarian.id, commission.id)
+                    existing_membership = existing_commission_memberships_map.get(
+                        membership_key
                     )
 
                     if existing_membership:
-                        # Update existing membership
+                        # Update existing membership (changes tracked by session)
                         updated = self._update_commission_membership(
                             existing_membership, membership
                         )
@@ -955,11 +1035,8 @@ class MembershipImporter(DataImporter):
                                 f'Updating commission membership for '
                                 f'{parliamentarian.id} in {commission.id}'
                             )
-                            # Only add if changed to avoid unnecessary writes
-                            if updated:
-                                commission_memberships_to_save.append(
-                                    existing_membership
-                                )
+                            # No need to append, session flush handles updates.
+                            pass # Or add logging if desired
                     else:
                         # Create new membership
                         membership_obj = self._create_commission_membership(
@@ -969,6 +1046,11 @@ class MembershipImporter(DataImporter):
                             commission_memberships_to_save.append(
                                 membership_obj
                             )
+                            # Add the new membership to the map to prevent duplicates
+                            # within the same import run if data is redundant
+                            if parliamentarian.id and commission.id:
+                                new_key = (parliamentarian.id, commission.id)
+                                existing_commission_memberships_map[new_key] = membership_obj
                             logging.debug(
                                 f'Creating commission membership for '
                                 f'{parliamentarian.id} in {commission.id}'
@@ -983,17 +1065,15 @@ class MembershipImporter(DataImporter):
                         )
                         continue
                     group = self.parliamentary_group_map.get(org_id)
-                    existing_role = (
-                        self.session.query(ParliamentarianRole)
-                        .filter_by(
-                            parliamentarian_id=parliamentarian.id,
-                            party_id=party.id if party else None,
-                            parliamentary_group_id=group.id if group else None,
-                            # Assuming role 'member' for Fraktion/Party link
-                            role='member',
-                        )
-                        .one_or_none()
+
+                    role_key = (
+                        parliamentarian.id,
+                        party.id if party else None,
+                        group.id if group else None,
+                        'member', # Role type
+                        None # additional_information
                     )
+                    existing_role = existing_roles_map.get(role_key)
 
                     start_val = membership.get('start')
                     start_date_str = (
@@ -1027,7 +1107,7 @@ class MembershipImporter(DataImporter):
                                 f'Updating Fraktion/Party role for '
                                 f'{parliamentarian.id}'
                             )
-                            parliamentarian_roles_to_save.append(existing_role)
+                            # No need to append, session flush handles updates.
                     else:
                         # Create new role
                         role_obj = self._create_parliamentarian_role(
@@ -1044,6 +1124,8 @@ class MembershipImporter(DataImporter):
                         )
                         if role_obj:
                             parliamentarian_roles_to_save.append(role_obj)
+                            # Add the new role to the map
+                            existing_roles_map[role_key] = role_obj
                             logging.debug(
                                 f'Creating Fraktion/Party role for '
                                 f'{parliamentarian.id}'
@@ -1076,6 +1158,15 @@ class MembershipImporter(DataImporter):
                         .one_or_none()
                     )
 
+                    role_key = (
+                        parliamentarian.id,
+                        None, # party_id
+                        None, # group_id
+                        role, # Actual role from _map_to_parliamentarian_role
+                        None # additional_information
+                    )
+                    existing_role = existing_roles_map.get(role_key)
+
                     if existing_role:
                         updated = self._update_parliamentarian_role(
                             existing_role,
@@ -1088,7 +1179,7 @@ class MembershipImporter(DataImporter):
                                 f'Updating Kantonsrat role ({role}) for '
                                 f'{parliamentarian.id}'
                             )
-                            parliamentarian_roles_to_save.append(existing_role)
+                            # No need to append, session flush handles updates.
                     else:
                         role_obj = self._create_parliamentarian_role(
                             parliamentarian=parliamentarian,
@@ -1098,6 +1189,8 @@ class MembershipImporter(DataImporter):
                         )
                         if role_obj:
                             parliamentarian_roles_to_save.append(role_obj)
+                            # Add the new role to the map
+                            existing_roles_map[role_key] = role_obj
                             logging.debug(
                                 f'Creating Kantonsrat role ({role}) for '
                                 f'{parliamentarian.id}'
@@ -1123,10 +1216,19 @@ class MembershipImporter(DataImporter):
                         .filter_by(
                             parliamentarian_id=parliamentarian.id,
                             additional_information=additional_info,
-                            role='member',
+                            role='member', # Assuming 'member' for Sonstige
                         )
                         .one_or_none()
                     )
+
+                    role_key = (
+                        parliamentarian.id,
+                        None, # party_id
+                        None, # group_id
+                        'member', # Role type
+                        additional_info # additional_information
+                    )
+                    existing_role = existing_roles_map.get(role_key)
 
                     if existing_role:
                         updated = self._update_parliamentarian_role(
@@ -1141,7 +1243,7 @@ class MembershipImporter(DataImporter):
                                 f'Updating Sonstige role for '
                                 f'{parliamentarian.id}: {additional_info}'
                             )
-                            parliamentarian_roles_to_save.append(existing_role)
+                            # No need to append, session flush handles updates.
                     else:
                         role_obj = self._create_parliamentarian_role(
                             parliamentarian=parliamentarian,
@@ -1152,6 +1254,8 @@ class MembershipImporter(DataImporter):
                         )
                         if role_obj:
                             parliamentarian_roles_to_save.append(role_obj)
+                            # Add the new role to the map
+                            existing_roles_map[role_key] = role_obj
                             logging.debug(
                                 f'Creating Sonstige role for '
                                 f'{parliamentarian.id}: {additional_info}'
