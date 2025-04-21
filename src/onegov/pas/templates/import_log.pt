@@ -1,0 +1,22 @@
+<tal:block metal:use-macro="layout.macros['default-page']">
+
+    <tal:block metal:fill-slot="title" content="structure layout.title" />
+    <tal:block metal:fill-slot="breadcrumbs" content="structure layout.breadcrumbs" />
+
+    <tal:block metal:fill-slot="main-content">
+        <h2>${_('Import Details')}</h2>
+        <p>
+            <strong>${_('Timestamp')}:</strong> ${layout.format_date(log.created, 'datetime_long')} <br />
+            <strong>${_('User')}:</strong> ${log.user.username if log.user else _('System')} <br />
+            <strong>${_('Status')}:</strong> <span class="import-status ${log.status}" tal:content="log.status"></span>
+        </p>
+
+        <h3>${_('Summary')}</h3>
+        <pre tal:content="details_formatted"></pre>
+
+        <a href="${request.link(layout.model.__class__(request.session))}" class="button secondary">
+            ${_('Back to Import History')}
+        </a>
+    </tal:block>
+
+</tal:block>

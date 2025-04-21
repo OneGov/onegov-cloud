@@ -1,0 +1,34 @@
+<tal:block metal:use-macro="layout.macros['default-page']">
+
+    <tal:block metal:fill-slot="title" content="structure layout.title" />
+    <tal:block metal:fill-slot="breadcrumbs" content="structure layout.breadcrumbs" />
+
+    <tal:block metal:fill-slot="main-content">
+        <table class="inline-table">
+            <thead>
+                <tr>
+                    <th>${_('Timestamp')}</th>
+                    <th>${_('User')}</th>
+                    <th>${_('Status')}</th>
+                    <th>${_('Details')}</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr tal:repeat="log logs">
+                    <td>${layout.format_date(log.created, 'datetime_long')}</td>
+                    <td>${log.user.username if log.user else _('System')}</td>
+                    <td>
+                        <span class="import-status ${log.status}" tal:content="log.status"></span>
+                    </td>
+                    <td>
+                        <a href="${request.link(log)}">${_('View Details')}</a>
+                    </td>
+                </tr>
+                <tr tal:condition="not logs">
+                    <td colspan="4">${_('No import logs found.')}</td>
+                </tr>
+            </tbody>
+        </table>
+    </tal:block>
+
+</tal:block>

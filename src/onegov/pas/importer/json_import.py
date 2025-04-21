@@ -4,25 +4,23 @@ import logging
 import uuid
 from datetime import date, datetime
 from typing import Any, Literal, TypedDict
-from typing import TYPE_CHECKING
 
 from sqlalchemy.orm import selectinload
 from uuid import UUID
-
-from onegov.pas.models.commission_membership import (
-    CommissionMembership,
-)
 from onegov.pas.models import (
+    CommissionMembership,
     Parliamentarian,
     Commission,
     ParliamentaryGroup,
     Party,
     ParliamentarianRole,
+    ImportLog
 )
 
 
 # Define TypedDicts for data structures used in JSON import
 # These are defined outside TYPE_CHECKING to be available at runtime
+# Because we validate the json structure has actually these fields
 class OrganizationData(TypedDict):
     created: str
     description: str
@@ -171,6 +169,7 @@ class MembershipData(TypedDict):
     url: str
 
 
+from typing import TYPE_CHECKING
 if TYPE_CHECKING:
     from onegov.pas.models.parliamentarian_role import ParliamentaryGroupRole
     from onegov.pas.models.parliamentarian_role import PartyRole
@@ -209,7 +208,7 @@ class DataImporter:
             if objects:
                 count = len(objects)
                 self.session.add_all(objects)
-                self.session.flush()
+                # Flush is removed, commit at the end of import_zug_kub_data
                 logging.info(f'Saved {count} new {object_type}')
             return count
         except Exception as e:
@@ -335,15 +334,15 @@ class PeopleImporter(DataImporter):
                 )
 
         # Save the newly created parliamentarians
-        # Note: _bulk_save flushes, so objects in new_parliamentarians
-        # should have IDs after this call if successful.
+        # Note: _bulk_save no longer flushes.
+        # Objects will get IDs after the final commit.
         self._bulk_save(
             new_parliamentarians, 'new parliamentarians'
         )
-        # Ensure updates are also flushed
-        self.session.flush()
+        # Flush is removed, commit at the end of import_zug_kub_data
 
-        # Filter out any objects that failed to save (though _bulk_save raises)
+        # Filter out any objects that failed to save
+        # (though _bulk_save raises on DB error)
         created_list = [p for p in new_parliamentarians if p.id]
         updated_list = [p for p in updated_parliamentarians if p.id]
 
@@ -596,21 +595,13 @@ class OrganizationImporter(DataImporter):
         if parties_to_create:
             self._bulk_save(parties_to_create, 'new parties')
 
-        # Flush session to persist updates and ensure created objects have IDs
-        self.session.flush()
+        # Flush is removed, commit at the end of import_zug_kub_data
+        # IDs will be assigned after the final commit.
 
-        details['commissions']['created'] = [
-            c for c in commissions_to_create if c.id
-        ]
-        details['commissions']['updated'] = [
-            c for c in commissions_to_update if c.id
-        ]
-        details['parties']['created'] = [
-            p for p in parties_to_create if p.id
-        ]
-        details['parties']['updated'] = [
-            p for p in parties_to_update if p.id
-        ]
+        details['commissions']['created'] = list(commissions_to_create)
+        details['commissions']['updated'] = list(commissions_to_update)
+        details['parties']['created'] = list(parties_to_create)
+        details['parties']['updated'] = list(parties_to_update)
         logging.info(
             f"Organization import details: "
             f"Commissions(C:{len(details['commissions']['created'])}, "
@@ -807,9 +798,14 @@ class MembershipImporter(DataImporter):
                 'new parliamentarians from memberships'
             )
 
-        # Flush session to persist updates and ensure created objects have IDs
+        # Flush is removed, commit at the end of import_zug_kub_data
+        # IDs will be assigned after the final commit.
         try:
-            self.session.flush()
+            # We still need to add the newly created objects to the session
+            # if _bulk_save didn't run (list was empty)
+            if parliamentarians_to_create:
+                self.session.add_all(parliamentarians_to_create)
+
             created_count = len(parliamentarians_to_create)
             updated_count = len(parliamentarians_to_update)
             logging.info(
@@ -819,12 +815,13 @@ class MembershipImporter(DataImporter):
             # Update map with newly created objects (now with IDs)
             for p in parliamentarians_to_create:
                 if p.external_kub_id:  # Should have ID after flush
+                    # Map using external ID before commit assigns internal ID
                     self.parliamentarian_map[str(p.external_kub_id)] = p
 
-            # Filter lists to return only objects with IDs
-            created_list = [p for p in parliamentarians_to_create if p.id]
+            # Filter lists based on object existence, not internal ID yet
+            created_list = list(parliamentarians_to_create)
             # Convert set to list for the return value
-            updated_list = [p for p in parliamentarians_to_update if p.id]
+            updated_list = list(parliamentarians_to_update)
 
         except Exception:
             logging.error(
@@ -1378,22 +1375,14 @@ class MembershipImporter(DataImporter):
                 parliamentarian_roles_to_create, 'new parliamentarian roles'
             )
 
-        # Ensure updates and creates are flushed
+        # Flush is removed, commit at the end of import_zug_kub_data
+        # IDs will be assigned after the final commit.
         try:
-            self.session.flush()
-            # Populate details with objects having IDs
-            details['commission_memberships']['created'] = [
-                cm for cm in commission_memberships_to_create if cm.id
-            ]
-            details['commission_memberships']['updated'] = [
-                cm for cm in commission_memberships_to_update if cm.id
-            ]
-            details['parliamentarian_roles']['created'] = [
-                r for r in parliamentarian_roles_to_create if r.id
-            ]
-            details['parliamentarian_roles']['updated'] = [
-                r for r in parliamentarian_roles_to_update if r.id
-            ]
+            # Populate details based on object existence, not internal ID yet
+            details['commission_memberships']['created'] = list(commission_memberships_to_create)
+            details['commission_memberships']['updated'] = list(commission_memberships_to_update)
+            details['parliamentarian_roles']['created'] = list(parliamentarian_roles_to_create)
+            details['parliamentarian_roles']['updated'] = list(parliamentarian_roles_to_update)
         except Exception:
             logging.error(
                 'Error flushing memberships/roles', exc_info=True
@@ -1717,6 +1706,127 @@ def import_zug_kub_data(
     people_data: Sequence[PersonData],
     organization_data: Sequence[OrganizationData],
     membership_data: Sequence[MembershipData],
+    user_id: uuid.UUID | None = None,  # Pass user ID if available
+    # source_info: str | None = None # Pass source info if available
+) -> dict[str, dict[str, list[Any]]]:
+    """
+    Imports data from KUB JSON files within a single transaction,
+    logs the outcome, and returns details of changes.
+
+    Rolls back changes within this import if an internal error occurs.
+    Logs the attempt regardless of success or failure.
+    """
+    import_details: dict[str, dict[str, list[Any]]] = {}
+    log_status = 'failed'  # Default to failed unless successful
+    log_details: dict[str, Any] = {}  # Store details for logging
+    final_error: Exception | None = None
+
+    try:
+        # Use a savepoint; rollback occurs automatically on exception
+        with session.begin_nested():
+            people_importer = PeopleImporter(session)
+            (
+                parliamentarian_map, people_details
+            ) = people_importer.bulk_import(people_data)
+            import_details['parliamentarians'] = people_details
+
+            organization_importer = OrganizationImporter(session)
+            (
+                commission_map,
+                parliamentary_group_map,
+                party_map,
+                other_organization_map,
+                org_details
+            ) = organization_importer.bulk_import(organization_data)
+            import_details.update(org_details)
+
+            membership_importer = MembershipImporter(session)
+            membership_importer.init(
+                session,
+                parliamentarian_map,
+                commission_map,
+                parliamentary_group_map,
+                party_map,
+                other_organization_map,
+            )
+            membership_details = membership_importer.bulk_import(
+                membership_data
+            )
+            import_details.update(membership_details)
+
+            # Combine parliamentarians (pop modifies dict in place)
+            parl_from_memberships = import_details.pop(
+                'parliamentarians_from_memberships',
+                {'created': [], 'updated': []}
+            )
+            # Ensure 'parliamentarians' key exists before extending
+            if 'parliamentarians' not in import_details:
+                 import_details['parliamentarians'] = {
+                     'created': [], 'updated': []
+                 }
+            import_details['parliamentarians']['created'].extend(
+                parl_from_memberships.get('created', [])
+            )
+            import_details['parliamentarians']['updated'].extend(
+                parl_from_memberships.get('updated', [])
+            )
+
+            # Prepare summary details for logging
+            log_details = {
+                k: {
+                    'created_count': len(v.get('created', [])),
+                    'updated_count': len(v.get('updated', []))
+                } for k, v in import_details.items() if isinstance(v, dict)
+            }
+            log_status = 'completed'
+            logging.info(
+                'KUB data import processing successful within transaction.'
+            )
+
+        # --- End of begin_nested block ---
+        # If successful, savepoint is released (merged).
+        # If exception occurred, changes rolled back to savepoint.
+
+    except Exception as e:
+        # Capture the error, logging happens outside the nested block
+        final_error = e
+        log_status = 'failed'
+        log_details['error'] = str(e)  # Add error to log details
+        logging.error(f'KUB data import failed: {e}', exc_info=True)
+
+    finally:
+        # Always try to log the import attempt
+        try:
+            import_log = ImportLog(
+                user_id=user_id,
+                details=log_details,
+                status=log_status,
+                # source_info=source_info
+            )
+            session.add(import_log)
+            # Flush to ensure the log is added even if the outer
+            # transaction eventually rolls back due to the error.
+            # This might fail if the session is severely broken.
+            if session.is_active:
+                session.flush()
+            logging.info(f'KUB data import attempt logged with status: {log_status}')
+        except Exception as log_e:
+            logging.error(f'Failed to log import status: {log_e}', exc_info=True)
+
+        # If an error occurred during import, re-raise it
+        # so the outer transaction management handles rollback.
+        if final_error:
+            raise RuntimeError('KUB data import failed.') from final_error
+
+    # Return details only on success
+    return import_details
+
+
+def import_zug_kub_data_old(  # Keep old version for reference if needed
+    session: Session,
+    people_data: Sequence[PersonData],
+    organization_data: Sequence[OrganizationData],
+    membership_data: Sequence[MembershipData],
 ) -> dict[str, dict[str, list[Any]]]:
     """
     Imports data from KUB JSON files and returns details of changes.
@@ -1761,5 +1871,5 @@ def import_zug_kub_data(
     import_details['parliamentarians']['updated'].extend(
         parl_from_memberships.get('updated', [])
     )
-    session.flush()
+    # session.flush() # Removed, handled by transaction commit/rollback
     return import_details
