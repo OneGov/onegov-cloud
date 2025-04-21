@@ -138,6 +138,34 @@ def handle_data_import(
              return item.name  # Fallback for unexpected types with a name
         else:
             return f'Unknown Object (Type: {type(item).__name__})'
+            
+    # Extract category details for template rendering
+    def extract_category_details(
+        import_details: dict[str, dict[str, Any]]
+    ) -> dict[str, dict[str, Any]]:
+        """
+        Process import details to prepare data for template rendering.
+        Extracts and calculates values that were previously defined in TAL.
+        """
+        processed_details = {}
+        for category_name, details in import_details.items():
+            if isinstance(details, dict):
+                created = details.get('created', [])
+                updated = details.get('updated', [])
+                processed = details.get('processed', 0)
+                created_count = len(created)
+                updated_count = len(updated)
+                category_title = category_name.replace('_', ' ').title()
+                
+                processed_details[category_name] = {
+                    'created': created,
+                    'updated': updated,
+                    'processed': processed,
+                    'created_count': created_count,
+                    'updated_count': updated_count,
+                    'category_title': category_title,
+                }
+        return processed_details
 
     if request.method == 'POST' and form.validate():
         try:
@@ -170,7 +198,6 @@ def handle_data_import(
                         processed = details.get('processed', 0) # Already int
                         created_count = len(created)
                         updated_count = len(updated)
-                        category_title = category_name.replace('_', ' ').title()
 
                         total_created += created_count
                         total_updated += updated_count
@@ -178,16 +205,9 @@ def handle_data_import(
 
                         if created_count > 0 or updated_count > 0:
                             any_changes = True
-
-                        # Prepare data for the template
-                        processed_import_details[category_name] = {
-                            'created': created,
-                            'updated': updated,
-                            'processed': processed,
-                            'created_count': created_count,
-                            'updated_count': updated_count,
-                            'category_title': category_title,
-                        }
+                
+                # Use the extracted function to prepare data for the template
+                processed_import_details = extract_category_details(import_results)
 
             # Generate success/info message based on totals
             if any_changes:
