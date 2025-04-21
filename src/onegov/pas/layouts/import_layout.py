@@ -8,7 +8,6 @@ from onegov.pas.layouts.default import DefaultLayout
 
 from typing import TYPE_CHECKING
 if TYPE_CHECKING:
-    from onegov.pas.request import PasRequest
     from onegov.town6.app import TownApp
     from onegov.town6.request import TownRequest
 

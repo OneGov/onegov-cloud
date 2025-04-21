@@ -284,7 +284,8 @@ class PeopleImporter(DataImporter):
                 continue
 
             try:
-                # Check if this person ID has already been processed in this batch
+                # Check if this person ID has already been processed in this
+                # batch
                 if person_id in result_map:
                     logging.warning(
                         f'Skipping duplicate person ID within import batch: '
@@ -321,7 +322,8 @@ class PeopleImporter(DataImporter):
                     # Create new parliamentarian
                     parliamentarian = self._create_parliamentarian(person_data)
                     if not parliamentarian:
-                        # Creation failed (likely logged in _create_parliamentarian)
+                        # Creation failed (likely logged in
+                        # _create_parliamentarian)
                         continue
                     logging.debug(f'Creating new parliamentarian: {person_id}')
                     new_parliamentarians.append(parliamentarian)
@@ -419,7 +421,7 @@ class OrganizationImporter(DataImporter):
         dict[str, ParliamentaryGroup],
         dict[str, Party],
         dict[str, Any],
-        dict[str, dict[str, list[Commission | Party]]],  # Return lists of objects
+        dict[str, dict[str, list[Commission | Party]]],  # Return lists of objs
     ]:
         """
         Imports organizations from JSON data. Returns maps and details.
@@ -520,7 +522,8 @@ class OrganizationImporter(DataImporter):
                         # Only add *new* commissions to the save list
                         commissions_to_create.append(commission)
 
-                    commission_map[org_id] = commission  # Add to map regardless
+                    # Add to map regardless
+                    commission_map[org_id] = commission
 
                 elif organization_type_title == 'Fraktion':
                     try:
@@ -591,7 +594,8 @@ class OrganizationImporter(DataImporter):
         if commissions_to_create:
             self._bulk_save(commissions_to_create, 'new commissions')
         # if parliamentary_groups_to_create: # Not implemented
-        #     self._bulk_save(parliamentary_groups_to_create, 'new parliamentary groups')
+        #     self._bulk_save(parliamentary_groups_to_create, 
+        #                     'new parliamentary groups')
         if parties_to_create:
             self._bulk_save(parties_to_create, 'new parties')
 
@@ -711,7 +715,9 @@ class MembershipImporter(DataImporter):
         }
 
         if not missing_person_ids:
-            logging.debug('No missing parliamentarians found only in membership data.')
+            logging.debug(
+                'No missing parliamentarians found only in membership data.'
+            )
             return {'created': [], 'updated': []}
 
         existing_db_parliamentarians = (
@@ -964,7 +970,9 @@ class MembershipImporter(DataImporter):
         parliamentarian_roles_to_update: list[ParliamentarianRole] = []
 
         details: dict[str, dict[str, list[Any]]] = {
-            'parliamentarians_from_memberships': {'created': [], 'updated': []},
+            'parliamentarians_from_memberships': {
+                'created': [], 'updated': []
+            },
             'commission_memberships': {'created': [], 'updated': []},
             'parliamentarian_roles': {'created': [], 'updated': []},
         }
@@ -1004,7 +1012,8 @@ class MembershipImporter(DataImporter):
                 .all()
             )
             existing_commission_memberships_map = {
-                (cm.parliamentarian_id, cm.commission_id): cm for cm in existing_cms
+                (cm.parliamentarian_id, cm.commission_id): cm 
+                for cm in existing_cms
             }
             logging.debug(
                 f'Pre-fetched {len(existing_commission_memberships_map)} '
@@ -1012,8 +1021,8 @@ class MembershipImporter(DataImporter):
             )
 
         # Define the precise structure for the role key tuple
-        RoleKey = tuple[UUID, UUID | None, UUID | None, str, str | None]
-        existing_roles_map: dict[RoleKey, ParliamentarianRole] = {}
+        role_key = tuple[UUID, UUID | None, UUID | None, str, str | None]
+        existing_roles_map: dict[role_key, ParliamentarianRole] = {}
         if parliamentarian_ids:
             # Fetch all roles for the relevant parliamentarians
             # We'll filter/map them client-side
@@ -1055,7 +1064,8 @@ class MembershipImporter(DataImporter):
                         role_obj.additional_information
                     )
                 else:
-                    # Kantonsrat Role (or potentially others without party/group/add.info)
+                    # Kantonsrat Role (or potentially others without 
+                    # party/group/add.info)
                     key = (
                         role_obj.parliamentarian_id,
                         None,  # party_id
@@ -1128,7 +1138,8 @@ class MembershipImporter(DataImporter):
                     )
 
                     if existing_membership:
-                        # Update existing membership (changes tracked by session)
+                        # Update existing membership (changes tracked by 
+                        # session)
                         updated = self._update_commission_membership(
                             existing_membership, membership
                         )
@@ -1154,7 +1165,8 @@ class MembershipImporter(DataImporter):
                             # within the same import run if data is redundant
                             if parliamentarian.id and commission.id:
                                 new_key = (parliamentarian.id, commission.id)
-                                existing_commission_memberships_map[new_key] = membership_obj
+                                existing_commission_memberships_map[new_key] = \
+                                    membership_obj
                             logging.debug(
                                 f'Creating commission membership for '
                                 f'{parliamentarian.id} in {commission.id}'
@@ -1379,10 +1391,14 @@ class MembershipImporter(DataImporter):
         # IDs will be assigned after the final commit.
         try:
             # Populate details based on object existence, not internal ID yet
-            details['commission_memberships']['created'] = list(commission_memberships_to_create)
-            details['commission_memberships']['updated'] = list(commission_memberships_to_update)
-            details['parliamentarian_roles']['created'] = list(parliamentarian_roles_to_create)
-            details['parliamentarian_roles']['updated'] = list(parliamentarian_roles_to_update)
+            details['commission_memberships']['created'] = \
+                list(commission_memberships_to_create)
+            details['commission_memberships']['updated'] = \
+                list(commission_memberships_to_update)
+            details['parliamentarian_roles']['created'] = \
+                list(parliamentarian_roles_to_create)
+            details['parliamentarian_roles']['updated'] = \
+                list(parliamentarian_roles_to_update)
         except Exception:
             logging.error(
                 'Error flushing memberships/roles', exc_info=True
@@ -1761,9 +1777,9 @@ def import_zug_kub_data(
             )
             # Ensure 'parliamentarians' key exists before extending
             if 'parliamentarians' not in import_details:
-                 import_details['parliamentarians'] = {
-                     'created': [], 'updated': []
-                 }
+                import_details['parliamentarians'] = {
+                    'created': [], 'updated': []
+                }
             import_details['parliamentarians']['created'].extend(
                 parl_from_memberships.get('created', [])
             )
@@ -1809,9 +1825,13 @@ def import_zug_kub_data(
             # This might fail if the session is severely broken.
             if session.is_active:
                 session.flush()
-            logging.info(f'KUB data import attempt logged with status: {log_status}')
+            logging.info(
+                f'KUB data import attempt logged with status: {log_status}'
+            )
         except Exception as log_e:
-            logging.error(f'Failed to log import status: {log_e}', exc_info=True)
+            logging.error(
+                f'Failed to log import status: {log_e}', exc_info=True
+            )
 
         # If an error occurred during import, re-raise it
         # so the outer transaction management handles rollback.

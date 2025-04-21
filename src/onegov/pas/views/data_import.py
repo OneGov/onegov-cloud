@@ -130,10 +130,12 @@ def handle_data_import(
 
             if any_changes:
                 request.message(
-                    _('Data import completed successfully with changes.'), 'success')
+                    _('Data import completed successfully with changes.'),
+                    'success')
             else:
                 request.message(
-                    _('Data import completed. No changes were needed - data is already up to date.'),
+                    _('Data import completed. No changes were needed - '
+                      'data is already up to date.'),
                     'info')
             layout.breadcrumbs.append(Link(_('Import result'), '#'))
         except Exception as e:

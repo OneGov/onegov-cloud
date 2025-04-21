@@ -20,7 +20,7 @@ if TYPE_CHECKING:
     permission=Private  # Adjust permission as needed
 )
 def view_import_logs(
-    self: ImportLogCollection, request: TownRequest 
+    self: ImportLogCollection, request: TownRequest
 ) -> RenderData:
     """ View the list of past import attempts. """
 
