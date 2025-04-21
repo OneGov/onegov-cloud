@@ -43,7 +43,7 @@
             <!-- Detailed Breakdown per Category -->
             <tal:block repeat="category_details import_details.items()">
                 <!-- Section for Created Items -->
-                <div tal:condition="category_details['created']" class="callout success">
+                <div tal:condition="category_details[1]['created']" class="callout success">
                         <h5 i18n:translate="">
                             ${category_details[1]['category_title']} Created (${category_details[1]['created_count']}/${category_details[1]['processed']})
                         </h5>
