@@ -46,12 +46,14 @@
                                   created details.get('created', []);
                                   updated details.get('updated', []);
                                   processed details.get('processed', 0);
+                                  created_count len(created);
+                                  updated_count len(updated);
                                   category_title category_name.replace('_', ' ').title()">
 
                     <!-- Section for Created Items -->
                     <div tal:condition="created" class="callout success">
-                        <h5 i18n:translate="msg_category_created">
-                            ${category} Created (${count}/${total})
+                        <h5 i18n:translate="">
+                            ${category_title} Created (${created_count}/${processed})
                         </h5>
                         <ul>
                             <li tal:repeat="item created">
@@ -65,8 +67,8 @@
 
                     <!-- Section for Updated Items -->
                     <div tal:condition="updated" class="callout warning">
-                         <h5 i18n:translate="msg_category_updated">
-                             ${category} Updated (${count}/${total})
+                         <h5 i18n:translate="">
+                             ${category_title} Updated (${updated_count}/${processed})
                          </h5>
                         <ul>
                             <li tal:repeat="item updated">
