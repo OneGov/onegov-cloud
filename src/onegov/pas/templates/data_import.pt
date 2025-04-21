@@ -28,8 +28,7 @@
             <!-- Overall Summary -->
             <div class="callout primary"
                  tal:condition="total_processed > 0">
-                 <p i18n:translate="msg_import_summary"
-                    i18n:variables="processed total_processed; created total_created; updated total_updated">
+                 <p i18n:translate="msg_import_summary">
                     Processed ${processed} items in total: ${created} created, ${updated} updated.
                  </p>
             </div>
@@ -52,7 +51,6 @@
                     <!-- Section for Created Items -->
                     <div tal:condition="created" class="callout success">
                         <h5 i18n:translate="msg_category_created"
-                            i18n:variables="category category_title; count len(created); total processed"
                             tal:content="string:${category} Created (${count}/${total})">
                         </h5>
                         <ul>
@@ -68,7 +66,6 @@
                     <!-- Section for Updated Items -->
                     <div tal:condition="updated" class="callout warning">
                          <h5 i18n:translate="msg_category_updated"
-                             i18n:variables="category category_title; count len(updated); total processed"
                              tal:content="string:${category} Updated (${count}/${total})">
                          </h5>
                         <ul>
