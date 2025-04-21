@@ -1,9 +1,10 @@
-<tal:block metal:use-macro="layout.macros['default-page']">
 
-    <tal:block metal:fill-slot="title" content="structure layout.title" />
-    <tal:block metal:fill-slot="breadcrumbs" content="structure layout.breadcrumbs" />
+<div metal:use-macro="layout.base" i18n:domain="onegov.pas">
+    <tal:b metal:fill-slot="title">
+        ${title}
+    </tal:b>
 
-    <tal:block metal:fill-slot="main-content">
+    <tal:b metal:fill-slot="content">
         <h2>${_('Import Details')}</h2>
         <p>
             <strong>${_('Timestamp')}:</strong> ${layout.format_date(log.created, 'datetime_long')} <br />
@@ -17,6 +18,5 @@
         <a href="${request.link(layout.model.__class__(request.session))}" class="button secondary">
             ${_('Back to Import History')}
         </a>
-    </tal:block>
-
-</tal:block>
+    </tal:b>
+</div>

@@ -1,9 +1,9 @@
-<tal:block metal:use-macro="layout.macros['default-page']">
+<div metal:use-macro="layout.base" i18n:domain="onegov.pas">
+    <tal:b metal:fill-slot="title">
+        ${title}
+    </tal:b>
 
-    <tal:block metal:fill-slot="title" content="structure layout.title" />
-    <tal:block metal:fill-slot="breadcrumbs" content="structure layout.breadcrumbs" />
-
-    <tal:block metal:fill-slot="main-content">
+    <tal:b metal:fill-slot="content">
         <table class="inline-table">
             <thead>
                 <tr>
@@ -29,6 +29,6 @@
                 </tr>
             </tbody>
         </table>
-    </tal:block>
+    </tal:b>
+</div>
 
-</tal:block>
