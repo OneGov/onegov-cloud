@@ -1824,35 +1824,53 @@ def import_zug_kub_data(
                 party_map,
                 other_organization_map,
             )
-            membership_details = membership_importer.bulk_import(
-                membership_data
-            )
-            import_details.update(membership_details)
-
-            # Combine parliamentarians (pop modifies dict in place)
-            parl_from_memberships = import_details.pop(
-                'parliamentarians_from_memberships',
-                {'created': [], 'updated': []}
-            )
-            # Ensure 'parliamentarians' key exists before extending
-            if 'parliamentarians' not in import_details:
-                import_details['parliamentarians'] = {
-                    'created': [], 'updated': []
+            (
+                membership_details, membership_processed_counts
+            ) = membership_importer.bulk_import(membership_data)
+            # Merge membership details with processed counts
+            for category, details in membership_details.items():
+                 import_details[category] = {
+                    **details,
+                    'processed': membership_processed_counts.get(category, 0)
                 }
-            import_details['parliamentarians']['created'].extend(
-                parl_from_memberships.get('created', [])
-            )
-            import_details['parliamentarians']['updated'].extend(
-                parl_from_memberships.get('updated', [])
-            )
 
-            # Prepare summary details for logging
-            log_details = {
-                k: {
-                    'created_count': len(v.get('created', [])),
-                    'updated_count': len(v.get('updated', []))
-                } for k, v in import_details.items() if isinstance(v, dict)
-            }
+            # Combine parliamentarians found only in memberships
+            # Note: 'parliamentarians_from_memberships' is now a sub-category
+            # within membership_details, handled above.
+            # We still need to merge the created/updated lists into the main
+            # 'parliamentarians' category.
+            parl_from_mships_details = import_details.pop(
+                'parliamentarians_from_memberships', None
+            )
+            if parl_from_mships_details:
+                # Ensure 'parliamentarians' exists before extending
+                if 'parliamentarians' not in import_details:
+                     import_details['parliamentarians'] = {
+                         'created': [], 'updated': [], 'processed': 0
+                     }
+                # Extend lists, but don't double-count processed
+                created_from_mships = parl_from_mships_details.get('created', [])
+                updated_from_mships = parl_from_mships_details.get('updated', [])
+                if isinstance(import_details['parliamentarians']['created'], list):
+                    import_details['parliamentarians']['created'].extend(
+                        created_from_mships
+                    )
+                if isinstance(import_details['parliamentarians']['updated'], list):
+                    import_details['parliamentarians']['updated'].extend(
+                        updated_from_mships
+                    )
+                # Note: Processed count for these is already part of the
+                # main 'parliamentarians' processed count from PeopleImporter
+
+            # Prepare summary details for logging (including processed counts)
+            log_details = {}
+            for k, v in import_details.items():
+                if isinstance(v, dict):
+                    log_details[k] = {
+                        'created_count': len(v.get('created', [])),
+                        'updated_count': len(v.get('updated', [])),
+                        'processed_count': v.get('processed', 0)
+                    }
             log_status = 'completed'
             logging.info(
                 'KUB data import processing successful within transaction.'
