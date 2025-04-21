@@ -93,3 +93,46 @@ table.changes span {
     margin-right: 0.5rem;
     color: #333;
 }
+
+// Import Log Styling
+.import-status {
+    display: inline-block;
+    padding: 0.2rem 0.5rem;
+    border-radius: $global-radius;
+    font-size: 0.8rem;
+    font-weight: bold;
+    text-transform: uppercase;
+    color: $white;
+
+    &.success {
+        background-color: $success-color;
+    }
+
+    &.failed {
+        background-color: $alert-color;
+    }
+
+    &.pending {
+        background-color: $warning-color;
+        color: $black; // Warning color might be light
+    }
+
+    // Add more statuses as needed
+}
+
+// Improve table padding
+.inline-table {
+    td, th {
+        padding: 0.8rem 0.5rem; // Add more vertical padding
+    }
+}
+
+// Style the details pre block
+pre {
+    background-color: $light-gray;
+    padding: 1rem;
+    border-radius: $global-radius;
+    border: 1px solid $medium-gray;
+    white-space: pre-wrap;       // Ensure long lines wrap
+    word-wrap: break-word;       // Break words if necessary
+}
