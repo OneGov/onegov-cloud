@@ -161,28 +161,3 @@ def handle_data_import(
         'errors': form.errors
     }
 
-
-@PasApp.view(
-    model=FileCollection[Any],
-    name='upload-json-import-files',
-    permission=Private,
-    request_method='POST',
-)
-def upload_json_import_file(
-    self: FileCollection[Any], request: TownRequest
-) -> None:
-    request.assert_valid_csrf_token()
-
-    fs = request.params.get('file', '')
-    if isinstance(fs, str):
-        # malformed formdata
-        raise HTTPBadRequest()
-
-    attachment = File(id=random_token())
-    attachment.name = f'import_json-{fs.filename}'
-    attachment.reference = as_fileintent(fs.file, fs.filename)
-
-    if attachment.reference.content_type != 'application/json':
-        raise HTTPUnsupportedMediaType()
-
-    self.add(attachment.name, content=attachment)  # type:ignore[arg-type]

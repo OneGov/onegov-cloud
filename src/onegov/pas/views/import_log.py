@@ -17,39 +17,34 @@ if TYPE_CHECKING:
 @PasApp.html(
     model=ImportLogCollection,
     template='import_logs.pt',
-    permission=Private  # Adjust permission as needed
+    permission=Private
 )
 def view_import_logs(
     self: ImportLogCollection, request: TownRequest
 ) -> RenderData:
-    """ View the list of past import attempts. """
 
     layout = DefaultLayout(self, request)
 
     return {
         'layout': layout,
         'title': _('Import History'),
-        'logs': self.query().limit(50).all()  # Paginate if needed
+        'logs': self.query().limit(50).all()
     }
 
 
 @PasApp.html(
     model=ImportLog,
     template='import_log.pt',
-    permission=Private  # Adjust permission as needed
+    permission=Private
 )
 def view_import_log(
     self: ImportLog, request: TownRequest
 ) -> RenderData:
-    """ View the details of a single import log entry. """
 
     layout = DefaultLayout(self, request)
-
-    # Pretty print JSON details
     details_formatted = json.dumps(
         self.details, indent=2, sort_keys=True, ensure_ascii=False
     )
-
     return {
         'layout': layout,
         'title': _('Import Log Details'),

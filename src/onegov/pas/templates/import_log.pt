@@ -6,17 +6,6 @@
 
     <tal:b metal:fill-slot="content">
         <h2 i18n:translate="">Import Details</h2>
-        <p>
-            <strong i18n:translate="">Timestamp:</strong> ${layout.format_date(log.created, 'datetime_long')} <br />
-            <strong i18n:translate="">User:</strong> ${log.user.username if log.user else request.translate('System')} <br />
-            <strong i18n:translate="">Status:</strong> <span class="import-status ${log.status}" tal:content="log.status"></span>
-        </p>
 
-        <h3 i18n:translate="">Summary</h3>
-        <pre tal:content="details_formatted"></pre>
-
-        <a href="${request.link(layout.model.__class__(request.session))}" class="button secondary" i18n:translate="">
-            Back to Import History
-        </a>
     </tal:b>
 </div>

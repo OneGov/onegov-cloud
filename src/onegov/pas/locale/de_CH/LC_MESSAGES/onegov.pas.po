@@ -1,7 +1,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: OneGov Cloud 1.0\n"
-"POT-Creation-Date: 2025-03-04 01:32+0100\n"
+"POT-Creation-Date: 2025-04-21 22:37+0200\n"
 "PO-Revision-Date: 2021-03-03 16:24+0100\n"
 "Language-Team: German\n"
 "Language: de_CH\n"
@@ -67,6 +67,45 @@ msgstr "Beschreibung"
 
 msgid "Function"
 msgstr "Funktion"
+
+msgid "People Data (JSON)"
+msgstr ""
+
+msgid "JSON file containing parliamentarian data."
+msgstr ""
+
+msgid "Organizations Data (JSON)"
+msgstr ""
+
+msgid "JSON file containing organization data (commissions, parties, etc.)."
+msgstr ""
+
+msgid "Memberships Data (JSON)"
+msgstr ""
+
+msgid ""
+"JSON file containing membership data (who is member of what organization)."
+msgstr ""
+
+#, python-format
+msgid "File ${name} is missing the \"results\" list."
+msgstr ""
+
+#, python-format
+msgid "Item ${idx} in file ${name} is not an object."
+msgstr ""
+
+#, python-format
+msgid "Item ${idx} in ${name} is missing keys ${keys}"
+msgstr ""
+
+#, python-format
+msgid "Error reading file ${name}: ${error}"
+msgstr ""
+
+#, python-format
+msgid "Unexpected error processing file ${name}: ${error}"
+msgstr ""
 
 msgid "Personnel number"
 msgstr "Personalnummer"
@@ -314,6 +353,9 @@ msgstr "${hours} Stunden"
 msgid "${minutes} minutes"
 msgstr "${minutes} Minuten"
 
+msgid "JSON Import"
+msgstr ""
+
 msgid "Legislative periods"
 msgstr "Legislaturen"
 
@@ -476,6 +518,30 @@ msgstr "Keine aktiven Kommissionen."
 msgid "Filters"
 msgstr "Filter"
 
+msgid "Please correct the errors below:"
+msgstr "Bitte korrigieren Sie die nachstehenden Fehler:"
+
+msgid "Import Error"
+msgstr "Import Fehler"
+
+msgid "Import Details"
+msgstr "Import Details"
+
+msgid "No changes were made. All data is already up to date."
+msgstr "Es wurden keine Änderungen vorgenommen. Alle Daten sind bereits auf dem neuesten Stand."
+
+msgid "Status"
+msgstr "Status"
+
+msgid "Details"
+msgstr "Details"
+
+msgid "View Details"
+msgstr "Details anzeigen"
+
+msgid "No import logs found."
+msgstr "Keine Import Logs gefunden"
+
 msgid "Skip navigation"
 msgstr "Navigation überspringen"
 
@@ -576,8 +642,28 @@ msgstr "Import (JSON)"
 msgid "Dashboard"
 msgstr "Startseite"
 
+msgid "Data import completed successfully with changes."
+msgstr "Datenimport mit Änderungen erfolgreich abgeschlossen."
+
+msgid ""
+"Data import completed. No changes were needed - data is already up to date."
+msgstr "Datenimport abgeschlossen. Es waren keine Änderungen erforderlich - die Daten sind bereits auf dem neuesten Stand."
+
+msgid "Import result"
+msgstr "Importresultat"
+
+#, python-format
+msgid "Data import failed: ${error}"
+msgstr "Datenimport fehlgeschlagen: ${error}"
+
 msgid "Import"
 msgstr "Import"
+
+msgid "Import History"
+msgstr "Übersicht Importe"
+
+msgid "Import Log Details"
+msgstr "Details zum Importlog"
 
 msgid "Added a new legislative period"
 msgstr "Legislatur hinzugefügt"
