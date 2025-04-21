@@ -1,7 +1,6 @@
 from __future__ import annotations
+
 import json
-
-
 from onegov.core.utils import dictionary_to_binary
 from onegov.form import Form
 from onegov.form.fields import UploadMultipleField

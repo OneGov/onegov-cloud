@@ -1,4 +1,4 @@
-""" Contains upgrade tasks that are executed when the application is being
+"""Contains upgrade tasks that are executed when the application is being
 upgraded on the server. See :class:`onegov.core.upgrade.upgrade_task`.
 
 """
@@ -16,8 +16,15 @@ def add_external_id_for_api(context: UpgradeContext) -> None:
         'pas_parliamentarians',
         'pas_parties',
         'pas_parliamentary_groups',
-        'pas_commissions'
+        'pas_commissions',
     ):
-        context.operations.add_column(
-            table, Column('external_kub_id', UUID, nullable=True, unique=True)
-        )
+        if not context.has_column(table, 'external_kub_id'):
+            context.operations.add_column(
+                table,
+                Column(
+                    'external_kub_id',
+                    UUID,
+                    nullable=True,
+                    unique=True,
+                ),
+            )

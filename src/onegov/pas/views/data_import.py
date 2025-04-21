@@ -4,9 +4,9 @@ import json
 import logging
 
 from aiohttp.web_exceptions import HTTPBadRequest, HTTPUnsupportedMediaType
-from morepath import redirect
 
 from onegov.core.crypto import random_token
+from onegov.core.elements import Link
 from onegov.core.security import Private
 from onegov.core.utils import dictionary_to_binary
 from onegov.file import File, FileCollection
@@ -15,7 +15,7 @@ from onegov.org.models import Organisation
 from onegov.pas import _, PasApp
 from onegov.pas.forms.data_import import DataImportForm
 from onegov.pas.importer.json_import import import_zug_kub_data
-from onegov.pas.layouts import DefaultLayout
+from onegov.pas.layouts import ImportLayout
 
 
 from typing import Any, TYPE_CHECKING
@@ -98,7 +98,7 @@ def load_and_concatenate_json(
 def handle_data_import(
     self: Organisation, request: TownRequest, form: DataImportForm
 ) -> RenderData | Response:
-    layout = DefaultLayout(self, request)
+    layout = ImportLayout(self, request)
     import_details: dict[str, dict[str, list[Any]]] | None = None
     error_message: str | None = None
 
@@ -121,20 +121,21 @@ def handle_data_import(
                 organization_data=organization_data,
                 membership_data=membership_data,
             )
-            
+
             # Check if any changes were made
             any_changes = any(
-                details.get('created') or details.get('updated') 
+                details.get('created') or details.get('updated')
                 for details in import_details.values()
             )
-            
+
             if any_changes:
                 request.message(
                     _('Data import completed successfully with changes.'), 'success')
             else:
                 request.message(
-                    _('Data import completed. No changes were needed - data is already up to date.'), 
+                    _('Data import completed. No changes were needed - data is already up to date.'),
                     'info')
+            layout.breadcrumbs.append(Link(_('Import result'), '#'))
         except Exception as e:
             log.error(f'Data import failed: {e}', exc_info=True)
             # Provide a more user-friendly error message
