@@ -545,8 +545,8 @@ class OrganizationImporter(DataImporter):
                         if updated:
                             parties_to_update.append(party)
                             logging.debug(
-                                f'Updating party (from Fraktion, initial query): '
-                                f'{org_id}'
+                                f'Updating party (from Fraktion, initial query):'
+                                f' {org_id}'
                             )
                         # No need to add to save list, session tracks changes
                     else:
@@ -594,7 +594,7 @@ class OrganizationImporter(DataImporter):
         if commissions_to_create:
             self._bulk_save(commissions_to_create, 'new commissions')
         # if parliamentary_groups_to_create: # Not implemented
-        #     self._bulk_save(parliamentary_groups_to_create, 
+        #     self._bulk_save(parliamentary_groups_to_create,
         #                     'new parliamentary groups')
         if parties_to_create:
             self._bulk_save(parties_to_create, 'new parties')
@@ -762,8 +762,8 @@ class MembershipImporter(DataImporter):
                             existing_parliamentarian
                         )
                         logging.info(
-                            f'Updated existing parliamentarian (ID: {person_id}) '
-                            f'found via membership data.'
+                            f'Updated existing parliamentarian (ID: {person_id})'
+                            f' found via membership data.'
                         )
                     # Add to map whether updated or not
                     self.parliamentarian_map[person_id] = (
@@ -1012,7 +1012,7 @@ class MembershipImporter(DataImporter):
                 .all()
             )
             existing_commission_memberships_map = {
-                (cm.parliamentarian_id, cm.commission_id): cm 
+                (cm.parliamentarian_id, cm.commission_id): cm
                 for cm in existing_cms
             }
             logging.debug(
@@ -1064,7 +1064,7 @@ class MembershipImporter(DataImporter):
                         role_obj.additional_information
                     )
                 else:
-                    # Kantonsrat Role (or potentially others without 
+                    # Kantonsrat Role (or potentially others without
                     # party/group/add.info)
                     key = (
                         role_obj.parliamentarian_id,
@@ -1138,7 +1138,7 @@ class MembershipImporter(DataImporter):
                     )
 
                     if existing_membership:
-                        # Update existing membership (changes tracked by 
+                        # Update existing membership (changes tracked by
                         # session)
                         updated = self._update_commission_membership(
                             existing_membership, membership
@@ -1165,8 +1165,8 @@ class MembershipImporter(DataImporter):
                             # within the same import run if data is redundant
                             if parliamentarian.id and commission.id:
                                 new_key = (parliamentarian.id, commission.id)
-                                existing_commission_memberships_map[new_key] = \
-                                    membership_obj
+                                existing_commission_memberships_map[new_key] = (
+                                    membership_obj)
                             logging.debug(
                                 f'Creating commission membership for '
                                 f'{parliamentarian.id} in {commission.id}'
