@@ -296,36 +296,43 @@ def test_view_upload_json(client):
         ), "Some people paths don't exist"
         yield people_paths
 
-    page = client.get('/pas-import')
+    def do_upload_procedure():
+        page = client.get('/pas-import')
 
-    def upload_file(filepath):
-        with open(filepath, 'rb') as f:
-            content = f.read()
-            return Upload(
-                os.path.basename(filepath),
-                content,
-                'application/json'
-            )
+        def upload_file(filepath):
+            with open(filepath, 'rb') as f:
+                content = f.read()
+                return Upload(
+                    os.path.basename(filepath),
+                    content,
+                    'application/json'
+                )
 
-    # Get all paths
-    paths_generator = yield_paths()
+        # Get all paths
+        paths_generator = yield_paths()
 
-    org_paths = next(paths_generator)
-    page.form['organizations_source'] = [
-        upload_file(path) for path in org_paths
-    ]
+        org_paths = next(paths_generator)
+        page.form['organizations_source'] = [
+            upload_file(path) for path in org_paths
+        ]
 
-    membership_paths = next(paths_generator)
-    page.form['memberships_source'] = [
-        upload_file(path) for path in membership_paths
-    ]
-    people_paths = next(paths_generator)
-    page.form['people_source'] = [
-        upload_file(path) for path in people_paths
-    ]
+        membership_paths = next(paths_generator)
+        page.form['memberships_source'] = [
+            upload_file(path) for path in membership_paths
+        ]
+        people_paths = next(paths_generator)
+        page.form['people_source'] = [
+            upload_file(path) for path in people_paths
+        ]
 
-    # Submit the form
-    result = page.form.submit().maybe_follow()
+        # Submit the form
+        result = page.form.submit().maybe_follow()
 
-    # Add assertions as needed
-    assert result.status_code == 200
+        # Add assertions as needed
+        assert result.status_code == 200
+        return result
+
+    result = do_upload_procedure()
+
+    # do it gain to test that errors / duplicates are gracefully handled.
+    result = do_upload_procedure()
