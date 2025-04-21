@@ -14,17 +14,26 @@ from onegov.file.utils import as_fileintent
 from onegov.org.models import Organisation
 from onegov.pas import _, PasApp
 from onegov.pas.forms.data_import import DataImportForm
-from onegov.pas.importer.json_import import import_zug_kub_data
+from onegov.pas.importer.json_import import (
+    import_zug_kub_data,
+    Commission,
+    CommissionMembership,
+    Parliamentarian,
+    ParliamentarianRole,
+    Party
+)
 from onegov.pas.layouts import ImportLayout
 
 
 from typing import Any, TYPE_CHECKING
 if TYPE_CHECKING:
-    from onegov.core.types import LaxFileDict
-    from onegov.core.types import RenderData
+    from onegov.core.types import LaxFileDict, RenderData
     from collections.abc import Sequence
     from onegov.town6.request import TownRequest
     from webob import Response
+
+    # Define a type alias for the complex import details structure
+    ImportDetailsDict = dict[str, dict[str, list[Any] | int]]
 
 
 log = logging.getLogger('onegov.pas.data_import')
@@ -99,8 +108,42 @@ def handle_data_import(
     self: Organisation, request: TownRequest, form: DataImportForm
 ) -> RenderData | Response:
     layout = ImportLayout(self, request)
-    import_details: dict[str, dict[str, list[Any]]] | None = None
+    import_details: ImportDetailsDict | None = None
     error_message: str | None = None
+    total_processed = 0
+    total_created = 0
+    total_updated = 0
+
+    # Helper function to get display title for various imported objects
+    def get_item_display_title(item: Any) -> str:
+        if isinstance(item, Parliamentarian):
+            return item.title # Already includes first/last name etc.
+        elif isinstance(item, Commission):
+            return item.name
+        elif isinstance(item, Party):
+            return item.name
+        elif isinstance(item, CommissionMembership):
+            # Ensure related objects are loaded or handle potential errors
+            parl_title = item.parliamentarian.title if item.parliamentarian else 'Unknown Parl.'
+            comm_name = item.commission.name if item.commission else 'Unknown Comm.'
+            return f'{parl_title} in {comm_name} ({item.role})'
+        elif isinstance(item, ParliamentarianRole):
+            parl_title = item.parliamentarian.title if item.parliamentarian else 'Unknown Parl.'
+            role_details = [item.role]
+            if item.party:
+                role_details.append(f'Party: {item.party.name}')
+            if item.parliamentary_group:
+                 role_details.append(f'Group: {item.parliamentary_group.name}')
+            if item.additional_information:
+                role_details.append(f'({item.additional_information})')
+            return f'{parl_title} - {" ".join(role_details)}'
+        elif hasattr(item, 'title') and isinstance(item.title, str):
+             return item.title # Fallback for unexpected types with a title
+        elif hasattr(item, 'name') and isinstance(item.name, str):
+             return item.name # Fallback for unexpected types with a name
+        else:
+            return f'Unknown Object (Type: {type(item).__name__})'
+
 
     if request.method == 'POST' and form.validate():
         try:
@@ -120,24 +163,51 @@ def handle_data_import(
                 people_data=people_data,
                 organization_data=organization_data,
                 membership_data=membership_data,
+                user_id=request.current_user.id if request.current_user else None
             )
 
-            # Check if any changes were made
-            any_changes = any(
-                details.get('created') or details.get('updated')
-                for details in import_details.values()
-            )
+            # Calculate totals and check for changes
+            any_changes = False
+            if import_details: # Ensure import_details is not None
+                for category, details in import_details.items():
+                    if isinstance(details, dict):
+                        created_count = len(details.get('created', []))
+                        updated_count = len(details.get('updated', []))
+                        processed_count = details.get('processed', 0)
 
+                        total_created += created_count
+                        total_updated += updated_count
+                        # Ensure processed_count is int before adding
+                        if isinstance(processed_count, int):
+                            total_processed += processed_count
+
+                        if created_count > 0 or updated_count > 0:
+                            any_changes = True
+
+            # Generate success/info message based on totals
             if any_changes:
-                request.message(
-                    _('Data import completed successfully with changes.'),
-                    'success')
+                 request.message(
+                    _(
+                        'Data import completed. Processed ${processed} items: '
+                        '${created} created, ${updated} updated.',
+                        mapping={
+                            'processed': total_processed,
+                            'created': total_created,
+                            'updated': total_updated
+                        }
+                    ), 'success'
+                 )
             else:
-                request.message(
-                    _('Data import completed. No changes were needed - '
-                      'data is already up to date.'),
-                    'info')
+                 request.message(
+                    _(
+                        'Data import completed. Processed ${processed} items. '
+                        'No changes were needed - data is already up to date.',
+                         mapping={'processed': total_processed}
+                    ), 'info'
+                 )
+
             layout.breadcrumbs.append(Link(_('Import result'), '#'))
+
         except Exception as e:
             log.error(f'Data import failed: {e}', exc_info=True)
             # Provide a more user-friendly error message
@@ -158,6 +228,10 @@ def handle_data_import(
         'form': form,
         'import_details': import_details,
         'error_message': error_message,
-        'errors': form.errors
+        'get_item_display_title': get_item_display_title, # Pass helper
+        'total_processed': total_processed,
+        'total_created': total_created,
+        'total_updated': total_updated,
+        'errors': form.errors # Keep errors for debugging form issues
     }
 
