@@ -29,7 +29,7 @@
             <div class="callout primary"
                  tal:condition="total_processed > 0">
                  <p i18n:translate="msg_import_summary">
-                    Processed ${processed} items in total: ${created} created, ${updated} updated.
+                    Processed ${total_processed} items in total: ${total_created} created, ${total_updated} updated.
                  </p>
             </div>
             <div class="callout primary"
@@ -41,14 +41,14 @@
 
 
             <!-- Detailed Breakdown per Category -->
-            <tal:block repeat="category_name import_details.keys()">
-                <tal:block define="details import_details[category_name];
-                                  created details.get('created', []);
-                                  updated details.get('updated', []);
-                                  processed details.get('processed', 0);
-                                  created_count len(created);
-                                  updated_count len(updated);
-                                  category_title category_name.replace('_', ' ').title()">
+            <tal:block repeat="category_name, category_details import_details.items()">
+                <!-- Definitions moved to view -->
+                <tal:block define="created category_details['created'];
+                                  updated category_details['updated'];
+                                  processed category_details['processed'];
+                                  created_count category_details['created_count'];
+                                  updated_count category_details['updated_count'];
+                                  category_title category_details['category_title']">
 
                     <!-- Section for Created Items -->
                     <div tal:condition="created" class="callout success">
@@ -86,9 +86,8 @@
                           <h5 tal:content="string:${category_title} (${processed})"></h5>
                           <p i18n:translate="">No changes needed for this category.</p>
                      </div>
-
-                </tal:block>
-            </tal:block>
+                </tal:block> <!-- End inner define block -->
+            </tal:block> <!-- End repeat block -->
         </div>
     </tal:b>
 </div>

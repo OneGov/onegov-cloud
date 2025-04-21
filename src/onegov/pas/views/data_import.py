@@ -104,7 +104,8 @@ def handle_data_import(
     self: Organisation, request: TownRequest, form: DataImportForm
 ) -> RenderData | Response:
     layout = ImportLayout(self, request)
-    import_details: ImportDetailsDict | None = None
+    import_results: ImportDetailsDict | None = None # Renamed from import_details
+    processed_import_details: dict[str, dict[str, Any]] = {} # For template
     error_message: str | None = None
     total_processed = 0
     total_created = 0
@@ -150,8 +151,8 @@ def handle_data_import(
             membership_data = load_and_concatenate_json(
                 form.memberships_source.data
             )
-            # Renamed variable to import_details
-            import_details = import_zug_kub_data(
+            # Get raw results from the import function
+            import_results = import_zug_kub_data(
                 session=request.session,
                 people_data=people_data,
                 organization_data=organization_data,
@@ -159,23 +160,34 @@ def handle_data_import(
                 user_id=request.current_user.id if request.current_user else None
             )
 
-            # Calculate totals and check for changes
+            # Process results for template and calculate totals
             any_changes = False
-            if import_details:  # Ensure import_details is not None
-                for details in import_details.values():
+            if import_results:  # Ensure import_results is not None
+                for category_name, details in import_results.items():
                     if isinstance(details, dict):
-                        created_count = len(details.get('created', []))
-                        updated_count = len(details.get('updated', []))
-                        processed_count = details.get('processed', 0)
+                        created = details.get('created', [])
+                        updated = details.get('updated', [])
+                        processed = details.get('processed', 0) # Already int
+                        created_count = len(created)
+                        updated_count = len(updated)
+                        category_title = category_name.replace('_', ' ').title()
 
                         total_created += created_count
                         total_updated += updated_count
-                        # Ensure processed_count is int before adding
-                        if isinstance(processed_count, int):
-                            total_processed += processed_count
+                        total_processed += processed
 
                         if created_count > 0 or updated_count > 0:
                             any_changes = True
+
+                        # Prepare data for the template
+                        processed_import_details[category_name] = {
+                            'created': created,
+                            'updated': updated,
+                            'processed': processed,
+                            'created_count': created_count,
+                            'updated_count': updated_count,
+                            'category_title': category_title,
+                        }
 
             # Generate success/info message based on totals
             if any_changes:
@@ -219,10 +231,10 @@ def handle_data_import(
         'title': _('Import'),
         'layout': layout,
         'form': form,
-        'import_details': import_details,
+        'import_details': processed_import_details, # Use processed data
         'error_message': error_message,
         'get_item_display_title': get_item_display_title,  # Pass helper
-        'total_processed': total_processed,
+        'total_processed': total_processed, # Pass calculated totals
         'total_created': total_created,
         'total_updated': total_updated,
         'errors': form.errors  # Keep errors for debugging form issues
