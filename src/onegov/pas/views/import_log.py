@@ -2,9 +2,9 @@ from __future__ import annotations
 
 import json
 from onegov.core.security import Private
-from onegov.org.layout import DefaultLayout
 from onegov.pas import PasApp, _
 from onegov.pas.collections import ImportLogCollection
+from onegov.pas.layouts.default import DefaultLayout
 from onegov.pas.models import ImportLog
 from typing import TYPE_CHECKING
 

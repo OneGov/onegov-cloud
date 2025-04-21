@@ -404,14 +404,6 @@ def get_settlement_run_export_all(
 
 
 @PasApp.path(
-    model=FileCollection,
-    path='/json-import-files'
-)
-def get_file_collection(request: TownRequest) -> FileCollection[Any]:
-    return FileCollection(request.session)
-
-
-@PasApp.path(
     model=ImportLogCollection,
     path='/import-logs'
 )

@@ -3,7 +3,7 @@ from __future__ import annotations
 from functools import cached_property
 from onegov.core.elements import Link
 from onegov.pas import _
-from onegov.pas.layouts.default import DefaultLayout
+from onegov.pas.layouts import DefaultLayout
 
 
 from typing import TYPE_CHECKING
