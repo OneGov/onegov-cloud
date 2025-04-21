@@ -695,22 +695,20 @@ class MembershipImporter(DataImporter):
         self, memberships_data: Sequence[MembershipData]
     ) -> dict[str, list[Parliamentarian]]:
         """
-        Extracts/updates/creates parliamentarians found only in membership 
+        Extracts/updates/creates parliamentarians found only in membership
         data.
 
-        Returns a dictionary with lists of created and updated parliamentarians
-        found during this process.
+        Returns a dictionary with lists of created and updated
+        parliamentarians found during this process.
 
         If a parliamentarian is not already known (from people.json import),
-        check if they exist
-        in the DB. If yes, update them with potentially missing info (address,
-        email) from membership data. If no, create a new parliamentarian.
-        Updates self.parliamentarian_map accordingly.
+        check if they exist in the DB. If yes, update them with potentially
+        missing info (address, email) from membership data. If no, create a
+        new parliamentarian. Updates self.parliamentarian_map accordingly.
         """
         parliamentarians_to_create: list[Parliamentarian] = []
-        # todo: fix
-        # Use list for updates as well to maintain order if needed, though set is fine
-        parliamentarians_to_update: list[Parliamentarian] = []
+        # Use a set for updates to automatically handle duplicates
+        parliamentarians_to_update: set[Parliamentarian] = set()
 
         # 1. Identify potential missing parliamentarian IDs
         missing_person_ids = {
@@ -762,14 +760,13 @@ class MembershipImporter(DataImporter):
                         existing_parliamentarian, person_data, membership
                     )
                     if updated:
-                        # Avoid adding duplicates if person appears in multiple memberships
-                        if existing_parliamentarian not in parliamentarians_to_update:
-                            parliamentarians_to_update.append(
-                                existing_parliamentarian
-                            )
+                        # Add to set; duplicates are automatically handled
+                        parliamentarians_to_update.add(
+                            existing_parliamentarian
+                        )
                         logging.info(
-                            f'Updated existing parliamentarian '
-                            f'(ID: {person_id}) found via membership data.'
+                            f'Updated existing parliamentarian (ID: {person_id}) '
+                            f'found via membership data.'
                         )
                     # Add to map whether updated or not
                     self.parliamentarian_map[person_id] = (
@@ -778,10 +775,10 @@ class MembershipImporter(DataImporter):
 
                 else:
                     # Create new parliamentarian
+                    full_name = person_data.get('fullName', 'N/A')
                     logging.info(
-                        f"Creating new parliamentarian (ID: {person_id}) "
-                        f"found only in membership data: "
-                        f"{person_data.get('fullName')}"
+                        f'Creating new parliamentarian (ID: {person_id}) '
+                        f'found only in membership data: {full_name}'
                     )
                     new_parliamentarian = (
                         self._create_parliamentarian_from_membership(
@@ -798,8 +795,8 @@ class MembershipImporter(DataImporter):
                 # Use the initialized person_id here
                 log_person_id = person_id if person_id else 'unknown'
                 logging.error(
-                    f'Error processing potential missing parliamentarian '
-                    f'from membership (Person ID: {log_person_id}): {e}',
+                    f'Error processing potential missing parliamentarian from '
+                    f'membership (Person ID: {log_person_id}): {e}',
                     exc_info=True,
                 )
 
@@ -813,10 +810,11 @@ class MembershipImporter(DataImporter):
         # Flush session to persist updates and ensure created objects have IDs
         try:
             self.session.flush()
+            created_count = len(parliamentarians_to_create)
+            updated_count = len(parliamentarians_to_update)
             logging.info(
-                f'Created {len(parliamentarians_to_create)} and updated '
-                f'{len(parliamentarians_to_update)} parliamentarians '
-                f'based *only* on membership data.'
+                f'Created {created_count} and updated {updated_count} '
+                f'parliamentarians based *only* on membership data.'
             )
             # Update map with newly created objects (now with IDs)
             for p in parliamentarians_to_create:
@@ -825,6 +823,7 @@ class MembershipImporter(DataImporter):
 
             # Filter lists to return only objects with IDs
             created_list = [p for p in parliamentarians_to_create if p.id]
+            # Convert set to list for the return value
             updated_list = [p for p in parliamentarians_to_update if p.id]
 
         except Exception:
