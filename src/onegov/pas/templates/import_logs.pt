@@ -7,25 +7,25 @@
         <table class="inline-table">
             <thead>
                 <tr>
-                    <th>${_('Timestamp')}</th>
-                    <th>${_('User')}</th>
-                    <th>${_('Status')}</th>
-                    <th>${_('Details')}</th>
+                    <th i18n:translate="">Timestamp</th>
+                    <th i18n:translate="">User</th>
+                    <th i18n:translate="">Status</th>
+                    <th i18n:translate="">Details</th>
                 </tr>
             </thead>
             <tbody>
                 <tr tal:repeat="log logs">
                     <td>${layout.format_date(log.created, 'datetime_long')}</td>
-                    <td>${log.user.username if log.user else _('System')}</td>
+                    <td>${log.user.username if log.user else request.translate('System')}</td>
                     <td>
                         <span class="import-status ${log.status}" tal:content="log.status"></span>
                     </td>
                     <td>
-                        <a href="${request.link(log)}">${_('View Details')}</a>
+                        <a href="${request.link(log)}" i18n:translate="">View Details</a>
                     </td>
                 </tr>
                 <tr tal:condition="not logs">
-                    <td colspan="4">${_('No import logs found.')}</td>
+                    <td colspan="4" i18n:translate="">No import logs found.</td>
                 </tr>
             </tbody>
         </table>
