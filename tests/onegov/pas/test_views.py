@@ -1,6 +1,7 @@
 import pytest
 import os
 from webtest import Upload
+from onegov.pas import _
 
 
 @pytest.mark.flaky(reruns=5)
@@ -334,5 +335,23 @@ def test_view_upload_json(client):
 
     result = do_upload_procedure()
 
-    # do it gain to test that errors / duplicates are gracefully handled.
+    # Check the import logs
+    logs_page = client.get('/import-logs')
+    assert logs_page.status_code == 200
+    assert 'completed' in logs_page  # Check if the status is shown
+    log_detail_link = logs_page.click(_('View Details'), index=0)
+    log_detail_page = log_detail_link.follow()
+    assert log_detail_page.status_code == 200
+    assert 'Import Details' in log_detail_page
+    assert 'completed' in log_detail_page.pyquery('.import-status').text()
+
+    # do it again to test that errors / duplicates are gracefully handled.
     result = do_upload_procedure()
+
+    # Check logs again after second import
+    logs_page = client.get('/import-logs')
+    assert logs_page.status_code == 200
+    # Should now have two logs
+    assert len(logs_page.pyquery('tbody tr')) == 2
+    assert 'completed' in logs_page.pyquery('tbody tr:first-child .import-status').text()
+    assert 'completed' in logs_page.pyquery('tbody tr:last-child .import-status').text()
