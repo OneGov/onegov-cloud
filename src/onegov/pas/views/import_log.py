@@ -1,15 +1,17 @@
 from __future__ import annotations
+
 import json
 from onegov.core.security import Private
+from onegov.org.layout import DefaultLayout
 from onegov.pas import PasApp, _
 from onegov.pas.collections import ImportLogCollection
-from onegov.pas.layouts import ImportLogCollectionLayout, ImportLogLayout
 from onegov.pas.models import ImportLog
 from typing import TYPE_CHECKING
 
+
 if TYPE_CHECKING:
+    from onegov.town6.request import TownRequest
     from onegov.core.types import RenderData
-    from onegov.pas.request import PasRequest
 
 
 @PasApp.html(
@@ -18,11 +20,11 @@ if TYPE_CHECKING:
     permission=Private  # Adjust permission as needed
 )
 def view_import_logs(
-    self: ImportLogCollection, request: PasRequest
+    self: ImportLogCollection, request: TownRequest 
 ) -> RenderData:
     """ View the list of past import attempts. """
 
-    layout = ImportLogCollectionLayout(self, request)
+    layout = DefaultLayout(self, request)
 
     return {
         'layout': layout,
@@ -37,11 +39,11 @@ def view_import_logs(
     permission=Private  # Adjust permission as needed
 )
 def view_import_log(
-    self: ImportLog, request: PasRequest
+    self: ImportLog, request: TownRequest
 ) -> RenderData:
     """ View the details of a single import log entry. """
 
-    layout = ImportLogLayout(self, request)
+    layout = DefaultLayout(self, request)
 
     # Pretty print JSON details
     details_formatted = json.dumps(
