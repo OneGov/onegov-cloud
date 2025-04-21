@@ -1041,7 +1041,7 @@ class MembershipImporter(DataImporter):
                 key: RoleKey
                 if role_obj.party_id or role_obj.parliamentary_group_id:
                     # Fraktion/Party Role (assuming role='member')
-                    key = ( # type: ignore[assignment]
+                    key = (
                         role_obj.parliamentarian_id,
                         role_obj.party_id,
                         role_obj.parliamentary_group_id,
@@ -1050,7 +1050,7 @@ class MembershipImporter(DataImporter):
                     )
                 elif role_obj.additional_information:
                     # Sonstige Role (assuming role='member')
-                    key = ( # type: ignore[assignment]
+                    key = (
                         role_obj.parliamentarian_id,
                         None,  # party_id
                         None,  # group_id
@@ -1059,7 +1059,7 @@ class MembershipImporter(DataImporter):
                     )
                 else:
                     # Kantonsrat Role (or potentially others without party/group/add.info)
-                    key = ( # type: ignore[assignment]
+                    key = (
                         role_obj.parliamentarian_id,
                         None,  # party_id
                         None,  # group_id
@@ -1174,7 +1174,7 @@ class MembershipImporter(DataImporter):
                     group = self.parliamentary_group_map.get(org_id)
 
                     # Use RoleKey type hint
-                    role_key: RoleKey = ( # type: ignore[assignment]
+                    role_key: RoleKey = (
                         parliamentarian.id,
                         party.id if party else None,
                         group.id if group else None,
