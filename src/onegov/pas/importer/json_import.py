@@ -1043,8 +1043,8 @@ class MembershipImporter(DataImporter):
             )
             for role_obj in existing_roles:
                 # Create a unique key based on the role type and relevant IDs
-                # Use the defined RoleKey type hint for clarity
-                key: RoleKey
+                # Use the defined role_key type hint for clarity
+                key: role_key
                 if role_obj.party_id or role_obj.parliamentary_group_id:
                     # Fraktion/Party Role (assuming role='member')
                     key = (
@@ -1182,8 +1182,8 @@ class MembershipImporter(DataImporter):
                         continue
                     group = self.parliamentary_group_map.get(org_id)
 
-                    # Use RoleKey type hint
-                    role_key: RoleKey = (
+                    # Use role_key type hint
+                    role_key: role_key = (
                         parliamentarian.id,
                         party.id if party else None,
                         group.id if group else None,
