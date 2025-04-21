@@ -13,10 +13,12 @@ from onegov.pas.collections import ParliamentaryGroupCollection
 from onegov.pas.collections import PartyCollection
 from onegov.pas.collections import RateSetCollection
 from onegov.pas.collections import SettlementRunCollection
+from onegov.pas.collections import ImportLogCollection
 from onegov.pas.models import Attendence
 from onegov.pas.models import Change
 from onegov.pas.models import Commission
 from onegov.pas.models import CommissionMembership
+from onegov.pas.models import ImportLog
 from onegov.pas.models import LegislativePeriod
 from onegov.pas.models import Parliamentarian
 from onegov.pas.models import ParliamentarianRole
@@ -407,3 +409,27 @@ def get_settlement_run_export_all(
 )
 def get_file_collection(request: TownRequest) -> FileCollection[Any]:
     return FileCollection(request.session)
+
+
+@PasApp.path(
+    model=ImportLogCollection,
+    path='/import-logs'
+)
+def get_import_logs(
+    request: TownRequest
+) -> ImportLogCollection:
+    """ Returns the collection of import logs. """
+    return ImportLogCollection(request.session)
+
+
+@PasApp.path(
+    model=ImportLog,
+    path='/import-log/{id}',
+    converters={'id': UUID}
+)
+def get_import_log(
+    request: TownRequest,
+    id: UUID
+) -> ImportLog | None:
+    """ Returns a single import log by id. """
+    return ImportLogCollection(request.session).by_id(id)
