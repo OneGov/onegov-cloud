@@ -1014,7 +1014,9 @@ class MembershipImporter(DataImporter):
                 f'existing commission memberships.'
             )
 
-        existing_roles_map: dict[tuple[Any, ...], ParliamentarianRole] = {}
+        # Define the precise structure for the role key tuple
+        RoleKey = tuple[UUID, UUID | None, UUID | None, str, str | None]
+        existing_roles_map: dict[RoleKey, ParliamentarianRole] = {}
         if parliamentarian_ids:
             # Fetch all roles for the relevant parliamentarians
             # We'll filter/map them client-side
@@ -1035,10 +1037,11 @@ class MembershipImporter(DataImporter):
             )
             for role_obj in existing_roles:
                 # Create a unique key based on the role type and relevant IDs
-                key: tuple[Any, ...]
+                # Use the defined RoleKey type hint for clarity
+                key: RoleKey
                 if role_obj.party_id or role_obj.parliamentary_group_id:
                     # Fraktion/Party Role (assuming role='member')
-                    key = (
+                    key = ( # type: ignore[assignment]
                         role_obj.parliamentarian_id,
                         role_obj.party_id,
                         role_obj.parliamentary_group_id,
@@ -1047,7 +1050,7 @@ class MembershipImporter(DataImporter):
                     )
                 elif role_obj.additional_information:
                     # Sonstige Role (assuming role='member')
-                    key = (
+                    key = ( # type: ignore[assignment]
                         role_obj.parliamentarian_id,
                         None,  # party_id
                         None,  # group_id
@@ -1056,7 +1059,7 @@ class MembershipImporter(DataImporter):
                     )
                 else:
                     # Kantonsrat Role (or potentially others without party/group/add.info)
-                    key = (
+                    key = ( # type: ignore[assignment]
                         role_obj.parliamentarian_id,
                         None,  # party_id
                         None,  # group_id
@@ -1170,12 +1173,13 @@ class MembershipImporter(DataImporter):
                         continue
                     group = self.parliamentary_group_map.get(org_id)
 
-                    role_key = (
+                    # Use RoleKey type hint
+                    role_key: RoleKey = ( # type: ignore[assignment]
                         parliamentarian.id,
                         party.id if party else None,
                         group.id if group else None,
                         'member',  # Role type
-                        None  # additional_information
+                        None,  # additional_information
                     )
                     existing_role = existing_roles_map.get(role_key)
 
@@ -1230,6 +1234,7 @@ class MembershipImporter(DataImporter):
                         if role_obj:
                             parliamentarian_roles_to_create.append(role_obj)
                             # Add the new role to the map
+                            # Ensure the key matches RoleKey type
                             existing_roles_map[role_key] = role_obj
                             logging.debug(
                                 f'Creating Fraktion/Party role for '
@@ -1284,6 +1289,7 @@ class MembershipImporter(DataImporter):
                         if role_obj:
                             parliamentarian_roles_to_create.append(role_obj)
                             # Add the new role to the map
+                            # Ensure the key matches RoleKey type
                             existing_roles_map[role_key] = role_obj
                             logging.debug(
                                 f'Creating Kantonsrat role ({role}) for '
@@ -1340,6 +1346,7 @@ class MembershipImporter(DataImporter):
                         if role_obj:
                             parliamentarian_roles_to_create.append(role_obj)
                             # Add the new role to the map
+                            # Ensure the key matches RoleKey type
                             existing_roles_map[role_key] = role_obj
                             logging.debug(
                                 f'Creating Sonstige role for '
