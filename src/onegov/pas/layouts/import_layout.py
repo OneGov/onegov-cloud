@@ -31,4 +31,3 @@ class ImportLayout(DefaultLayout):
                 self.request.link(self.model, 'pas-import'),
             ),
         ]
-

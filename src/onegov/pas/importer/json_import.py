@@ -426,11 +426,11 @@ class OrganizationImporter(DataImporter):
         self, organizations_data: Sequence[OrganizationData]
     ) -> tuple[
         dict[str, Commission],
-        dict[str, ParliamentaryGroup], # Currently unused, but kept for structure
+        dict[str, ParliamentaryGroup],  # Currently unused, but kept for structure
         dict[str, Party],
-        dict[str, Any], # Other orgs
-        dict[str, dict[str, list[Commission | Party]]], # Details
-        dict[str, int] # Processed counts per type
+        dict[str, Any],  # Other orgs
+        dict[str, dict[str, list[Commission | Party]]],  # Details
+        dict[str, int]  # Processed counts per type
     ]:
         """
         Imports organizations from JSON data. Returns maps, details, and counts.
@@ -457,9 +457,9 @@ class OrganizationImporter(DataImporter):
         }
         processed_counts = {
             'commissions': 0,
-            'parliamentary_groups': 0, # Fraktion
-            'parties': 0, # Also Fraktion, mapped to Party
-            'other': 0, # Kantonsrat, Sonstige, Legislatur
+            'parliamentary_groups': 0,  # Fraktion
+            'parties': 0,  # Also Fraktion, mapped to Party
+            'other': 0,  # Kantonsrat, Sonstige, Legislatur
         }
 
         # Maps to return (will contain both existing and new objects)
@@ -490,7 +490,7 @@ class OrganizationImporter(DataImporter):
         for org_data in organizations_data:
             org_id = org_data.get('id')
             if not org_id:
-                logging.warning( # Downgrade to warning
+                logging.warning(  # Downgrade to warning
                     f"Skipping organization without ID: {org_data.get('name')}"
                 )
                 continue
@@ -628,7 +628,7 @@ class OrganizationImporter(DataImporter):
             f"P:{processed_counts['commissions']}), "
             f"Parties(C:{len(details['parties']['created'])}, "
             f"U:{len(details['parties']['updated'])}, "
-            f"P:{processed_counts['parties']}), " # Note: Parties derived from Fraktion
+            f"P:{processed_counts['parties']}), "  # Note: Parties derived from Fraktion
             f"Other Processed: {processed_counts['other']}"
         )
 
@@ -639,7 +639,7 @@ class OrganizationImporter(DataImporter):
             party_map,
             other_organizations,
             details,
-            processed_counts # Add processed counts here
+            processed_counts  # Add processed counts here
         )
 
 
@@ -977,8 +977,8 @@ class MembershipImporter(DataImporter):
     def bulk_import(
         self, memberships_data: Sequence[MembershipData]
     ) -> tuple[
-        dict[str, dict[str, list[Any]]], # Details dict
-        dict[str, int] # Processed counts dict
+        dict[str, dict[str, list[Any]]],  # Details dict
+        dict[str, int]  # Processed counts dict
     ]:
         """
         Imports memberships from JSON data based on organization type.
@@ -1001,8 +1001,8 @@ class MembershipImporter(DataImporter):
         }
         processed_counts = {
             'commission_memberships': 0,
-            'parliamentarian_roles': 0, # Covers Fraktion, Kantonsrat, Sonstige
-            'skipped': 0 # Count memberships we couldn't process
+            'parliamentarian_roles': 0,  # Covers Fraktion, Kantonsrat, Sonstige
+            'skipped': 0  # Count memberships we couldn't process
         }
 
         # Process parliamentarians found only in memberships first
@@ -1110,7 +1110,7 @@ class MembershipImporter(DataImporter):
 
         for membership in memberships_data:
             person_id = None
-            processed_membership_type = False # Flag to track if counted
+            processed_membership_type = False  # Flag to track if counted
             try:
                 # Safely access nested keys
                 person_data = membership.get('person')
@@ -1799,14 +1799,14 @@ def import_zug_kub_data(
                 **people_details, 'processed': people_processed
             }
 
-
             organization_importer = OrganizationImporter(session)
             (
                 commission_map,
+                parliamentary_group_map,  # Add missing variable here
                 party_map,
                 other_organization_map,
                 org_details,
-                org_processed_counts # Receive processed counts
+                org_processed_counts  # Receive processed counts
             ) = organization_importer.bulk_import(organization_data)
             # Merge org details with processed counts
             for category, details in org_details.items():

@@ -1,6 +1,5 @@
 from __future__ import annotations
 
-from onegov.file import FileCollection
 from onegov.pas.collections import AttendenceCollection
 from onegov.pas.app import PasApp
 from onegov.pas.collections import ChangeCollection
@@ -30,7 +29,7 @@ from uuid import UUID
 from datetime import date
 
 
-from typing import TYPE_CHECKING, Any
+from typing import TYPE_CHECKING
 if TYPE_CHECKING:
     from onegov.town6.request import TownRequest
 

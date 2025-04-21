@@ -3,14 +3,10 @@ from __future__ import annotations
 import json
 import logging
 
-from aiohttp.web_exceptions import HTTPBadRequest, HTTPUnsupportedMediaType
 
-from onegov.core.crypto import random_token
 from onegov.core.elements import Link
 from onegov.core.security import Private
 from onegov.core.utils import dictionary_to_binary
-from onegov.file import File, FileCollection
-from onegov.file.utils import as_fileintent
 from onegov.org.models import Organisation
 from onegov.pas import _, PasApp
 from onegov.pas.forms.data_import import DataImportForm
@@ -117,10 +113,8 @@ def handle_data_import(
     # Helper function to get display title for various imported objects
     def get_item_display_title(item: Any) -> str:
         if isinstance(item, Parliamentarian):
-            return item.title # Already includes first/last name etc.
-        elif isinstance(item, Commission):
-            return item.name
-        elif isinstance(item, Party):
+            return item.title  # Already includes first/last name etc.
+        elif isinstance(item, (Commission, Party)):
             return item.name
         elif isinstance(item, CommissionMembership):
             # Ensure related objects are loaded or handle potential errors
@@ -138,12 +132,11 @@ def handle_data_import(
                 role_details.append(f'({item.additional_information})')
             return f'{parl_title} - {" ".join(role_details)}'
         elif hasattr(item, 'title') and isinstance(item.title, str):
-             return item.title # Fallback for unexpected types with a title
+             return item.title  # Fallback for unexpected types with a title
         elif hasattr(item, 'name') and isinstance(item.name, str):
-             return item.name # Fallback for unexpected types with a name
+             return item.name  # Fallback for unexpected types with a name
         else:
             return f'Unknown Object (Type: {type(item).__name__})'
-
 
     if request.method == 'POST' and form.validate():
         try:
@@ -168,8 +161,8 @@ def handle_data_import(
 
             # Calculate totals and check for changes
             any_changes = False
-            if import_details: # Ensure import_details is not None
-                for category, details in import_details.items():
+            if import_details:  # Ensure import_details is not None
+                for details in import_details.values():
                     if isinstance(details, dict):
                         created_count = len(details.get('created', []))
                         updated_count = len(details.get('updated', []))
@@ -228,10 +221,9 @@ def handle_data_import(
         'form': form,
         'import_details': import_details,
         'error_message': error_message,
-        'get_item_display_title': get_item_display_title, # Pass helper
+        'get_item_display_title': get_item_display_title,  # Pass helper
         'total_processed': total_processed,
         'total_created': total_created,
         'total_updated': total_updated,
-        'errors': form.errors # Keep errors for debugging form issues
+        'errors': form.errors  # Keep errors for debugging form issues
     }
-
