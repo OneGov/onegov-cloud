@@ -8,7 +8,6 @@ from tempfile import NamedTemporaryFile
 from typing import (
     TypeVar,
     BinaryIO,
-    cast,
     Protocol,
     ParamSpec, Self, Any,
 )
@@ -32,7 +31,6 @@ P = ParamSpec('P')
 from typing import Any as Incomplete
 from typing import TYPE_CHECKING
 if TYPE_CHECKING:
-    from onegov.pas.models.commission_membership import MembershipRole
     from collections.abc import Callable
     from sqlalchemy.orm import Session
     from types import TracebackType
@@ -158,7 +156,7 @@ def preprocess_headers(
 
 
 def preprocess_csv_headers(
-    csv_path_abs: StrOrBytesPath, expected: list[str] | None = None
+    csv_path_abs: StrOrBytesPath, expected: set[str]
 ) -> StrOrBytesPath:
     """
     Preprocesses a CSV file to rename specific headers to avoid issues
@@ -181,11 +179,7 @@ def preprocess_csv_headers(
         reader = csv.reader(infile)
         writer = csv.writer(temp_file)
         header_row = next(reader)
-
-        match_expected_headers_or_fail(
-            expected,
-            header_row
-        )
+        match_expected_headers_or_fail(expected, header_row)
 
         header_renames = {
             '1. E-Mail': 'E_Mail_1',
@@ -208,7 +202,7 @@ class HeaderValidationResult:
 
 
 def validate_headers(
-    current_headers: list[str], expected_headers: list[str]
+    current_headers: list[str], expected_headers: set[str]
 ) -> HeaderValidationResult:
     current_set = set(current_headers)
     expected_set = set(expected_headers)
@@ -224,7 +218,7 @@ def validate_headers(
 
 def preprocess_excel_headers(
     excel_path: StrOrBytesPath,
-    expected: list[str] | None = None
+    expected: set[str]
 ) -> StrOrBytesPath:
     """
     Preprocess Excel headers using a context manager for temporary file
@@ -275,8 +269,8 @@ def preprocess_excel_headers(
 
 
 def match_expected_headers_or_fail(
-    expected: Incomplete,
-    header_row: Incomplete
+    expected: set[str],
+    header_row: list[str]
 ) -> None:
     # Validate headers if expected headers are provided
     if expected is not None:
@@ -290,8 +284,7 @@ def match_expected_headers_or_fail(
                 )
             if validation_results.unexpected_headers:
                 error_msg.append(
-                    f"Unexpected "
-                    f"headers: "
+                    f"Unexpected headers: "
                     f"{', '.join(validation_results.unexpected_headers)}"
                 )
             error_msg.append(
@@ -312,7 +305,7 @@ def with_open_excel_or_csv(
     def wrapper(
         filename: str,
         *args: tuple[Any, ...],
-        expected_headers: list[str],
+        expected_headers: set[str],
     ) -> T:
 
         if filename.lower().endswith(('.xls', '.xlsx')):
@@ -321,8 +314,7 @@ def with_open_excel_or_csv(
             )
         else:
             preprocessed_filename = preprocess_csv_headers(
-                filename,
-                expected_headers,
+                filename, expected_headers
             )
 
         with open(preprocessed_filename, 'rb') as f, ImportFile(
@@ -471,7 +463,7 @@ def import_commissions(
             membership = CommissionMembership(
                 commission=commission,
                 parliamentarian=parliamentarian,
-                role=cast('MembershipRole', role),
+                role=role,  # type:ignore[misc]
                 start=parse_date(row.eintritt_kommission),
                 end=parse_date(row.austritt_kommission)
             )
