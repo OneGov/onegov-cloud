@@ -12,7 +12,7 @@
                 <div class="assembly-overview" tal:content="assembly.overview"></div>
             </div>
 
-            <div class="medium-5 cell medium-offset-1 sidebar" id="right-sidebar" data-sidebar-mobile-title="Assembly items & downloads" i18n:attributes="data-sidebar-mobile-title">
+            <div class="medium-5 cell medium-offset-1 sidebar" id="right-sidebar" data-sidebar-mobile-title="Downloads, Audio & Assembly items" i18n:attributes="data-sidebar-mobile-title">
                 <div class="sidebar-wrapper">
                     <div class="side-panel downloads">
                         <h3 i18n:translate="">Downloads</h3>
