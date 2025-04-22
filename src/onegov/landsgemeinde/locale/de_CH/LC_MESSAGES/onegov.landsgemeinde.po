@@ -1,7 +1,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: OneGov Cloud 1.0\n"
-"POT-Creation-Date: 2025-04-17 10:21+0200\n"
+"POT-Creation-Date: 2025-04-22 10:49+0200\n"
 "PO-Revision-Date: 2021-03-03 16:24+0100\n"
 "Language-Team: German\n"
 "Language: de_CH\n"
@@ -317,8 +317,8 @@ msgstr "Memorial (PDF)"
 msgid "No assemblies defined yet."
 msgstr "Noch keine Landsgemeinden erfasst."
 
-msgid "Assembly items & downloads"
-msgstr "Traktanden & Downloads"
+msgid "Downloads, Audio & Assembly items"
+msgstr "Downloads, Audio & Traktanden"
 
 msgid "Audio"
 msgstr "Audio"
@@ -416,6 +416,9 @@ msgstr "Neue Wortmeldung hinzugefügt"
 
 msgid "New votum"
 msgstr "Neue Wortmeldung"
+
+#~ msgid "Assembly items & downloads"
+#~ msgstr "Traktanden & Downloads"
 
 #~ msgid "Audio (ZIP)"
 #~ msgstr "Audio (ZIP)"
