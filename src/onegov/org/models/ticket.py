@@ -529,6 +529,19 @@ class ReservationHandler(Handler):
             })
         )
 
+        # render internal tag meta data
+        if request.is_manager_for_model(self.ticket) and self.ticket.tag_meta:
+            parts.append(
+                Markup('').join(
+                    Markup(
+                        '<dl class="field-display">'
+                        '<dt>{}</dt><dd>{}</dd>'
+                        '</dl>'
+                    ).format(key, value)
+                    for key, value in self.ticket.tag_meta.items()
+                )
+            )
+
         if self.submission:
             form = self.submission.form_class(data=self.submission.data)
 

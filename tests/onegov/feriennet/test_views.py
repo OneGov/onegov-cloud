@@ -1151,6 +1151,40 @@ def test_confirmed_booking_view(scenario, client):
     assert "nicht genügend Anmeldungen" in page
 
 
+def test_booking_mail(client, scenario):
+    scenario.add_period(
+        title="2019",
+        phase='booking',
+        confirmed=True,
+    )
+    scenario.add_activity(title="Foobar", state='accepted')
+    scenario.add_occasion(spots=(0, 1))
+    scenario.add_user(username='member@example.org', role='member')
+    scenario.add_attendee(
+        name="Dustin",
+        birth_date=date(2008, 1, 1),
+        username='admin@example.org'
+    )
+    scenario.commit()
+
+    client = client.spawn()
+    client.login_admin()
+    client.fill_out_profile("Scrooge", "McDuck")
+
+    # Add cancellation conditions to the ferienpass
+    page = client.get('/feriennet-settings')
+    page.form['cancellation_conditions'] = "Do not cancel"
+    page.form.submit()
+
+    page = client.get('/activity/foobar').click('Anmelden')
+    page = page.form.submit().follow()
+
+    # Check mail
+    assert len(os.listdir(client.app.maildir)) == 1
+    message_1 = client.get_email(0, 0)
+    assert "Do not cancel" in message_1['TextBody']
+
+
 def test_direct_booking_and_storno(client, scenario):
     scenario.add_period(confirmed=True)
     scenario.add_activity(title="Foobar", state='accepted')

@@ -305,6 +305,12 @@ msgstr "laufend"
 msgid "completed"
 msgstr "abgeschlossen"
 
+msgid "Previous agenda item"
+msgstr "Vorheriges Traktandum"
+
+msgid "Next agenda item"
+msgstr "Nächstes Traktandum"
+
 msgid "Memorial (PDF)"
 msgstr "Memorial (PDF)"
 

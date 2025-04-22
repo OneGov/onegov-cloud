@@ -1097,6 +1097,77 @@ def test_reserve_allocation(broadcast, authenticate, connect, client):
 
 
 @freeze_time("2015-08-28", tick=True)
+@patch('onegov.websockets.integration.connect')
+@patch('onegov.websockets.integration.authenticate')
+@patch('onegov.websockets.integration.broadcast')
+def test_reserve_with_tag(broadcast, authenticate, connect, client):
+    # prepate the required data
+    resources = ResourceCollection(client.app.libres_context)
+    resource = resources.by_name('tageskarte')
+    resource.definition = 'Note = ___'
+    scheduler = resource.get_scheduler(client.app.libres_context)
+
+    allocations = scheduler.allocate(
+        dates=(datetime(2015, 8, 28), datetime(2015, 8, 28)),
+        whole_day=True,
+        quota=4,
+        quota_limit=4
+    )
+
+    reserve = client.bound_reserve(allocations[0])
+    transaction.commit()
+
+    client.login_admin()
+
+    settings = client.get('/ticket-settings')
+    settings.form['ticket_tags'] = (
+        '- Test 1:\n'
+        '    Note: Default Note\n'
+        '    Foo: Bar\n'
+        '- Test 2:\n'
+        '    Foo: Baz\n'
+    )
+    settings.form.submit().follow()
+
+    # create a reservation
+    result = reserve(quota=4, whole_day=True)
+    assert result.json == {'success': True}
+    assert result.headers['X-IC-Trigger'] == 'rc-reservations-changed'
+
+    # and fill out the form
+    formular = client.get('/resource/tageskarte/form')
+    formular.form['ticket_tag'] = 'Test 1'
+    formular.form['email'] = 'info@example.org'
+    formular.form['note'] = 'Foobar'
+    formular.form.submit().follow().form.submit().follow()
+
+    ticket = client.get('/tickets/ALL/open').click('Annehmen').follow()
+    assert 'RSV-' in ticket.text
+    assert '<dt>Foo</dt><dd>Bar</dd>' in ticket.text
+    assert '<dt>Foo</dt><dd>Baz</dd>' not in ticket.text
+    assert 'Test 1' in ticket.text
+    assert 'Test 2' not in ticket.text
+    assert 'Foobar' in ticket.text
+    assert 'Default Note' not in ticket.text
+    assert len(os.listdir(client.app.maildir)) == 1
+
+    # make sure the resulting reservation has no session_id set
+    ids = [r.session_id for r in scheduler.managed_reservations()]
+    assert not any(ids)
+
+    # change the selected tag
+    change_tag = ticket.click(href='change-tag')
+    change_tag.form['tag'] = 'Test 2'
+    ticket = change_tag.form.submit().follow()
+    assert '<dt>Foo</dt><dd>Bar</dd>' not in ticket.text
+    assert '<dt>Foo</dt><dd>Baz</dd>' in ticket.text
+    assert 'Test 1' not in ticket.text
+    assert 'Test 2' in ticket.text
+    assert 'Foobar' in ticket.text
+    assert 'Default Note' not in ticket.text
+
+
+@freeze_time("2015-08-28", tick=True)
 def test_reserve_allocation_partially(client):
     # prepate the required data
     resources = ResourceCollection(client.app.libres_context)
@@ -2435,7 +2506,6 @@ def test_allocation_rules_on_rooms(client):
     assert count_allocations() == 7
 
 
-
 def test_allocation_rules_edit(client):
     client.login_admin()
 
@@ -2480,6 +2550,61 @@ def test_allocation_rules_edit(client):
     edit_page = form.submit().follow()
 
     assert 'Renamed room' in edit_page
+
+
+def test_allocation_rules_copy_paste(client):
+    client.login_admin()
+
+    resources = client.get('/resources')
+
+    page = resources.click('Raum')
+    page.form['title'] = 'Room 1'
+    page.form.submit()
+
+    page = resources.click('Raum')
+    page.form['title'] = 'Room 2'
+    page.form.submit()
+
+    def count_allocations(room):
+        return len(client.get(
+            f'/resource/room-{room}/slots?start=2000-01-01&end=2050-01-31'
+        ).json)
+
+    def run_cronjob():
+        client.get('/resource/room/process-rules')
+
+    page = client.get('/resource/room-1').click(
+        "Verfügbarkeitszeiträume").click("Verfügbarkeitszeitraum")
+    page.form['title'] = 'Täglich'
+    page.form['extend'] = 'daily'
+    page.form['start'] = '2019-01-01'
+    page.form['end'] = '2019-01-02'
+    page.form['as_whole_day'] = 'yes'
+
+    page.select_checkbox('except_for', "Sa")
+    page.select_checkbox('except_for', "So")
+
+    page = page.form.submit().follow()
+
+    assert 'Verfügbarkeitszeitraum aktiv, 2 Verfügbarkeiten erstellt' in page
+    assert count_allocations(1) == 2
+    assert count_allocations(2) == 0
+
+    # Copy the rule
+    edit_page = client.get('/resource/room-1').click('Verfügbarkeitszeiträume')
+    copy_links = edit_page.html.find_all('a', string='Kopieren')
+    client.post(copy_links[0].attrs['ic-post-to'])
+    edit_page = client.get(edit_page.request.path)
+    assert 'in die Zwischenablage kopiert' in edit_page
+
+    # Paste the rule in the other room
+    edit_page = client.get('/resource/room-2').click('Verfügbarkeitszeiträume')
+    paste_links = edit_page.html.find_all('a', string='Einfügen')
+    client.post(paste_links[0].attrs['ic-post-to'])
+    edit_page = client.get(edit_page.request.path)
+    assert 'wurde eingefügt' in edit_page
+    assert count_allocations(1) == 2
+    assert count_allocations(2) == 2
 
 
 def test_allocation_rules_on_daypasses(client):

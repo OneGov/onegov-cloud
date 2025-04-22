@@ -2938,6 +2938,13 @@ tr.ticket:hover {
     }
 }
 
+.ticket-change-tag {
+    &::before {
+        @include icon($edit-link-icon);
+        margin-right: 1ex;
+    }
+}
+
 .ticket-archive {
     &::before {
         @include icon($archive-ticket-icon);

@@ -40,6 +40,7 @@ from onegov.org.forms.text_module import TextModuleForm
 from onegov.org.forms.ticket import (
     InternalTicketChatMessageForm, ExtendedInternalTicketChatMessageForm)
 from onegov.org.forms.ticket import TicketAssignmentForm
+from onegov.org.forms.ticket import TicketChangeTagForm
 from onegov.org.forms.ticket import TicketChatMessageForm
 from onegov.org.forms.ticket import TicketNoteForm
 from onegov.org.forms.user import ManageUserForm
@@ -94,6 +95,7 @@ __all__ = (
     'SurveySubmissionWindowForm',
     'TextModuleForm',
     'TicketAssignmentForm',
+    'TicketChangeTagForm',
     'TicketChatMessageForm',
     'TicketNoteForm',
     'UserProfileForm',

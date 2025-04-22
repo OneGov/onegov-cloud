@@ -152,6 +152,8 @@ class Organisation(Base, TimestampMixin):
     always_show_partners: dict_property[bool] = meta_property(default=False)
 
     # Ticket options
+    ticket_tags: dict_property[list[str | dict[str, dict[str, Any]]]]
+    ticket_tags = meta_property(default=list)
     hide_personal_email: dict_property[bool] = meta_property(default=False)
     general_email: dict_property[str | None] = meta_property()
     email_for_new_tickets: dict_property[str | None] = meta_property()
@@ -361,6 +363,8 @@ class Organisation(Base, TimestampMixin):
 
 @lru_cache(maxsize=64)
 def flatten_event_filter_fields_from_definition(
-    definition: str
+    definition: str | None
 ) -> tuple[ParsedField, ...]:
+    if not definition:
+        return ()
     return tuple(flatten_fieldsets(parse_formcode(definition)))

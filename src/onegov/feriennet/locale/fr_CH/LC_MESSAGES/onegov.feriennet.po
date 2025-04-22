@@ -2,7 +2,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE 1.0\n"
-"POT-Creation-Date: 2025-04-09 20:44+0200\n"
+"POT-Creation-Date: 2025-04-15 19:31+0200\n"
 "PO-Revision-Date: 2021-11-11 09:07+0100\n"
 "Last-Translator: Marc Sommerhalder <marc.sommerhalder@seantis.ch>\n"
 "Language-Team: French\n"
@@ -2242,6 +2242,9 @@ msgstr "Vous trouverez ici un aperçu de toutes les réservations:"
 msgid "Best regards"
 msgstr "Meilleures salutations"
 
+msgid "Cancellation conditions:"
+msgstr "Conditions d'annulation:"
+
 msgid "We have received your deregistration for ${name}."
 msgstr "Nous avons reçu votre annulation pour ${name}."
 
@@ -3133,6 +3136,19 @@ msgstr "Exiger un ID SwissPass des participant·e·s"
 
 msgid "SwissPass ID"
 msgstr "ID SwissPass"
+
+msgid "Cancellation condition text"
+msgstr "Texte des conditions d'annulation"
+
+msgid "Cancellation conditions"
+msgstr "Conditions d'annulation"
+
+msgid ""
+"The text will be shown below the confirmation text for an activity in the "
+"mail"
+msgstr ""
+"Le texte sera affiché sous le texte de confirmation d'une activité dans le "
+"mail"
 
 msgid "Parents can see the contacts of other parents in the same activity"
 msgstr ""

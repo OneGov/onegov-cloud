@@ -41,14 +41,9 @@ if TYPE_CHECKING:
 
 _FormT = TypeVar('_FormT', bound=Form)
 
-# increasing the default filesize is *strongly discouarged*, as we are not
-# storing those files in the database, so they need to fit in memory
-#
-# if this value must be higher, we need to store the files outside the
-# database
-#
+
 MEGABYTE = 1000 ** 2
-DEFAULT_UPLOAD_LIMIT = 50 * MEGABYTE
+DEFAULT_UPLOAD_LIMIT = 100 * MEGABYTE
 
 
 @overload
