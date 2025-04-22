@@ -275,11 +275,8 @@ def handle_data_import(
         'title': _('Import'),
         'layout': layout,
         'form': form,
-        'import_details': processed_import_details,  # Use processed data
+        'import_details': processed_import_details,
         'error_message': error_message,
-        'get_item_display_title': get_item_display_title,  # Pass helper
-        'total_processed': total_processed,  # Pass calculated totals
-        'total_created': total_created,
-        'total_updated': total_updated,
-        'errors': form.errors  # Keep errors for debugging form issues
+        'get_item_display_title': get_item_display_title,
+        'errors': form.errors
     }

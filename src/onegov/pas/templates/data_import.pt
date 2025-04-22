@@ -25,20 +25,6 @@
         <div tal:condition="import_details" class="import-results">
             <h4 i18n:translate="">Import Results</h4>
 
-            <!-- Overall Summary -->
-            <div class="callout primary"
-                 tal:condition="total_processed > 0">
-                 <p i18n:translate="msg_import_summary">
-                    Processed ${total_processed} items in total: ${total_created} created, ${total_updated} updated.
-                 </p>
-            </div>
-            <div class="callout primary"
-                 tal:condition="total_processed == 0 and not error_message">
-                 <p i18n:translate="">
-                    No items were processed. The uploaded files might be empty or incorrectly formatted.
-                 </p>
-            </div>
-
 
             <!-- Detailed Breakdown per Category -->
             <tal:block repeat="category_details import_details.items()">
