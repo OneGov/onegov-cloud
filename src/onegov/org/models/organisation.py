@@ -363,6 +363,8 @@ class Organisation(Base, TimestampMixin):
 
 @lru_cache(maxsize=64)
 def flatten_event_filter_fields_from_definition(
-    definition: str
+    definition: str | None
 ) -> tuple[ParsedField, ...]:
+    if not definition:
+        return ()
     return tuple(flatten_fieldsets(parse_formcode(definition)))
