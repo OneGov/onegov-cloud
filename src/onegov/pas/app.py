@@ -8,9 +8,7 @@ from onegov.pas.theme import PasTheme
 from onegov.town6 import TownApp
 from onegov.town6.app import get_i18n_localedirs as get_i18n_localedirs_base
 
-
 from typing import TYPE_CHECKING
-from collections.abc import Iterator
 if TYPE_CHECKING:
     from collections.abc import Callable
     from onegov.core.types import RenderData
@@ -46,14 +44,9 @@ def get_template_directory() -> str:
     return 'templates'
 
 
-@PasApp.webasset_path()
-def get_js_path() -> str:
-    return 'assets/js'
-
-
-@PasApp.webasset('common')
-def get_backend_agenda_items() -> Iterator[str]:
-    yield 'common.js'
+# @PasApp.webasset_path()
+# def get_js_path() -> str:
+#     return 'assets/js'
 
 
 @PasApp.setting(section='i18n', name='localedirs')
