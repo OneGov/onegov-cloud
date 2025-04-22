@@ -1,7 +1,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: OneGov Cloud 1.0\n"
-"POT-Creation-Date: 2025-04-21 22:37+0200\n"
+"POT-Creation-Date: 2025-04-21 23:39+0200\n"
 "PO-Revision-Date: 2021-03-03 16:24+0100\n"
 "Language-Team: German\n"
 "Language: de_CH\n"
@@ -69,43 +69,44 @@ msgid "Function"
 msgstr "Funktion"
 
 msgid "People Data (JSON)"
-msgstr ""
+msgstr "Personendaten (JSON)"
 
 msgid "JSON file containing parliamentarian data."
-msgstr ""
+msgstr "JSON-Datei mit Parlamentarierdaten."
 
 msgid "Organizations Data (JSON)"
-msgstr ""
+msgstr "Organisationsdaten (JSON)"
 
 msgid "JSON file containing organization data (commissions, parties, etc.)."
-msgstr ""
+msgstr "JSON-Datei mit Organisationsdaten (Kommissionen, Parteien, usw.)."
 
 msgid "Memberships Data (JSON)"
-msgstr ""
+msgstr "Mitgliedschaftsdaten (JSON)"
 
 msgid ""
 "JSON file containing membership data (who is member of what organization)."
 msgstr ""
+"JSON-Datei mit Mitgliedschaftsdaten (wer ist Mitglied welcher Organisation)."
 
 #, python-format
 msgid "File ${name} is missing the \"results\" list."
-msgstr ""
+msgstr "Datei ${name} fehlt die \"results\"-Liste."
 
 #, python-format
 msgid "Item ${idx} in file ${name} is not an object."
-msgstr ""
+msgstr "Element ${idx} in Datei ${name} ist kein Objekt."
 
 #, python-format
 msgid "Item ${idx} in ${name} is missing keys ${keys}"
-msgstr ""
+msgstr "Element ${idx} in ${name} fehlen die Schlüssel ${keys}"
 
 #, python-format
 msgid "Error reading file ${name}: ${error}"
-msgstr ""
+msgstr "Fehler beim Lesen der Datei ${name}: ${error}"
 
 #, python-format
 msgid "Unexpected error processing file ${name}: ${error}"
-msgstr ""
+msgstr "Unerwarteter Fehler bei der Verarbeitung der Datei ${name}: ${error}"
 
 msgid "Personnel number"
 msgstr "Personalnummer"
@@ -354,7 +355,7 @@ msgid "${minutes} minutes"
 msgstr "${minutes} Minuten"
 
 msgid "JSON Import"
-msgstr ""
+msgstr "JSON-Import"
 
 msgid "Legislative periods"
 msgstr "Legislaturen"
@@ -524,11 +525,49 @@ msgstr "Bitte korrigieren Sie die nachstehenden Fehler:"
 msgid "Import Error"
 msgstr "Import Fehler"
 
+msgid "Import Results"
+msgstr "Import-Ergebnisse"
+
+#. Default: Processed ${total_processed} items in total: ${total_created}
+#. created, ${total_updated} updated.
+msgid "msg_import_summary"
+msgstr "Insgesamt ${total_processed} Elemente verarbeitet: ${total_created} erstellt, ${total_updated} aktualisiert."
+
+msgid ""
+"No items were processed. The uploaded files might be empty or incorrectly "
+"formatted."
+msgstr ""
+"Es wurden keine Elemente verarbeitet. Die hochgeladenen Dateien könnten leer oder falsch formatiert sein."
+
+msgid ""
+"${category_details[1]['category_title']} Created (${category_details[1]"
+"['created_count']}/${category_details[1]['processed']})"
+msgstr ""
+"${category_details[1]['category_title']} Erstellt (${category_details[1]['created_count']}/${category_details[1]['processed']})"
+
+msgid ""
+"${category_details[1]['category_title']} Updated (${category_details[1]"
+"['updated_count']}/${category_details[1]['processed']})"
+msgstr ""
+"${category_details[1]['category_title']} Aktualisiert (${category_details[1]['updated_count']}/${category_details[1]['processed']})"
+
+msgid "No changes needed for this category."
+msgstr "Keine Änderungen für diese Kategorie erforderlich."
+
 msgid "Import Details"
 msgstr "Import Details"
 
-msgid "No changes were made. All data is already up to date."
-msgstr "Es wurden keine Änderungen vorgenommen. Alle Daten sind bereits auf dem neuesten Stand."
+msgid "Timestamp:"
+msgstr "Zeitstempel:"
+
+msgid "User:"
+msgstr "Benutzer:"
+
+msgid "Status:"
+msgstr "Status:"
+
+msgid "Summary"
+msgstr "Zusammenfassung"
 
 msgid "Status"
 msgstr "Status"
@@ -642,12 +681,21 @@ msgstr "Import (JSON)"
 msgid "Dashboard"
 msgstr "Startseite"
 
-msgid "Data import completed successfully with changes."
-msgstr "Datenimport mit Änderungen erfolgreich abgeschlossen."
-
+#, python-format
 msgid ""
-"Data import completed. No changes were needed - data is already up to date."
-msgstr "Datenimport abgeschlossen. Es waren keine Änderungen erforderlich - die Daten sind bereits auf dem neuesten Stand."
+"Data import completed. Processed ${processed} items: ${created} created, "
+"${updated} updated."
+msgstr ""
+"Datenimport abgeschlossen. ${processed} Elemente verarbeitet: ${created} erstellt, "
+"${updated} aktualisiert."
+
+#, python-format
+msgid ""
+"Data import completed. Processed ${processed} items. No changes were needed "
+"- data is already up to date."
+msgstr ""
+"Datenimport abgeschlossen. ${processed} Elemente verarbeitet. Keine Änderungen erforderlich "
+"- Daten sind bereits aktuell."
 
 msgid "Import result"
 msgstr "Importresultat"
@@ -718,6 +766,21 @@ msgstr "Abrechnungen nach Parlamentarier:in"
 
 msgid "Total all parties"
 msgstr "Total Alle Parteien"
+
+#~ msgid "No changes were made. All data is already up to date."
+#~ msgstr ""
+#~ "Es wurden keine Änderungen vorgenommen. Alle Daten sind bereits auf dem "
+#~ "neuesten Stand."
+
+#~ msgid "Data import completed successfully with changes."
+#~ msgstr "Datenimport mit Änderungen erfolgreich abgeschlossen."
+
+#~ msgid ""
+#~ "Data import completed. No changes were needed - data is already up to "
+#~ "date."
+#~ msgstr ""
+#~ "Datenimport abgeschlossen. Es waren keine Änderungen erforderlich - die "
+#~ "Daten sind bereits auf dem neuesten Stand."
 
 #~ msgid "Export All (xlsx)"
 #~ msgstr "Alle exportieren (xlsx)"

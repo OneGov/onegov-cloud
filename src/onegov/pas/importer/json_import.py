@@ -3,7 +3,7 @@ from __future__ import annotations
 import logging
 import uuid
 from datetime import date, datetime
-from typing import Any, Literal, TypedDict
+from typing import Any, Literal, TypedDict, cast
 
 from sqlalchemy.orm import selectinload
 from uuid import UUID
@@ -14,7 +14,7 @@ from onegov.pas.models import (
     ParliamentaryGroup,
     Party,
     ParliamentarianRole,
-    ImportLog
+    ImportLog,
 )
 
 
@@ -169,13 +169,18 @@ class MembershipData(TypedDict):
     url: str
 
 
-from typing import TYPE_CHECKING
+from typing import TYPE_CHECKING, TypedDict
 if TYPE_CHECKING:
     from onegov.pas.models.parliamentarian_role import ParliamentaryGroupRole
     from onegov.pas.models.parliamentarian_role import PartyRole
     from onegov.pas.models.parliamentarian_role import Role
     from collections.abc import Sequence
     from sqlalchemy.orm import Session
+
+    class ImportCategoryResult(TypedDict):
+        created: list[Any]
+        updated: list[Any]
+        processed: int
 
 
 class DataImporter:
@@ -187,8 +192,7 @@ class DataImporter:
     def parse_date(
         self,
         date_string: str | None,
-    ) -> date | None:  # Return date type
-        # Should convert to date if needed for model fields
+    ) -> date | None:
         if not date_string:
             return None
         try:
@@ -247,12 +251,10 @@ class PeopleImporter(DataImporter):
         'salutation': 'salutation',
     }
 
-    def bulk_import(
-        self, people_data: Sequence[PersonData]
-    ) -> tuple[
+    def bulk_import(self, people_data: Sequence[PersonData]) -> tuple[
         dict[str, Parliamentarian],
         dict[str, list[Parliamentarian]],
-        int  # Add processed count
+        int,  # Add processed count
     ]:
         """
         Imports people from JSON data.
@@ -277,7 +279,8 @@ class PeopleImporter(DataImporter):
         )
         existing_map = {
             p.external_kub_id: p
-            for p in existing_parliamentarians if p.external_kub_id
+            for p in existing_parliamentarians
+            if p.external_kub_id
         }
 
         for person_data in people_data:
@@ -285,8 +288,8 @@ class PeopleImporter(DataImporter):
             person_id = person_data.get('id')
             if not person_id:
                 logging.warning(
-                    f"Skipping person entry due to missing ID: "
-                    f"{person_data.get('fullName')}"
+                    f'Skipping person entry due to missing ID: '
+                    f'{person_data.get("fullName")}'
                 )
                 continue
 
@@ -305,8 +308,8 @@ class PeopleImporter(DataImporter):
                     person_uuid = UUID(person_id)
                 except ValueError:
                     logging.error(
-                        f"Skipping person due to invalid UUID format: "
-                        f"{person_id} - {person_data.get('fullName')}"
+                        f'Skipping person due to invalid UUID format: '
+                        f'{person_id} - {person_data.get("fullName")}'
                     )
                     continue
 
@@ -322,15 +325,10 @@ class PeopleImporter(DataImporter):
                     )
                     if was_updated:
                         updated_parliamentarians.append(parliamentarian)
-                    # Add the updated object to the result map immediately
                     result_map[person_id] = parliamentarian
-                    # No need to add to save list, session tracks changes
                 else:
-                    # Create new parliamentarian
                     parliamentarian = self._create_parliamentarian(person_data)
                     if not parliamentarian:
-                        # Creation failed (likely logged in
-                        # _create_parliamentarian)
                         continue
                     logging.debug(f'Creating new parliamentarian: {person_id}')
                     new_parliamentarians.append(parliamentarian)
@@ -342,13 +340,7 @@ class PeopleImporter(DataImporter):
                     exc_info=True,
                 )
 
-        # Save the newly created parliamentarians
-        # Note: _bulk_save no longer flushes.
-        # Objects will get IDs after the final commit.
-        self._bulk_save(
-            new_parliamentarians, 'new parliamentarians'
-        )
-        # Flush is removed, commit at the end of import_zug_kub_data
+        self._bulk_save(new_parliamentarians, 'new parliamentarians')
 
         # Filter out any objects that failed to save
         # (though _bulk_save raises on DB error)
@@ -357,10 +349,10 @@ class PeopleImporter(DataImporter):
 
         details = {'created': created_list, 'updated': updated_list}
         logging.info(
-            f"Parliamentarian import details: "
-            f"Created: {len(details['created'])}, "
-            f"Updated: {len(details['updated'])}, "
-            f"Processed: {processed_count}"
+            f'Parliamentarian import details: '
+            f'Created: {len(details["created"])}, '
+            f'Updated: {len(details["updated"])}, '
+            f'Processed: {processed_count}'
         )
         return result_map, details, processed_count
 
@@ -398,8 +390,8 @@ class PeopleImporter(DataImporter):
         person_id = person_data.get('id')
         if not person_id:
             logging.error(
-                f"Skipping person creation due to missing ID: "
-                f"{person_data.get('fullName')}"
+                f'Skipping person creation due to missing ID: '
+                f'{person_data.get("fullName")}'
             )
             return None
 
@@ -426,14 +418,16 @@ class OrganizationImporter(DataImporter):
         self, organizations_data: Sequence[OrganizationData]
     ) -> tuple[
         dict[str, Commission],
-        dict[str, ParliamentaryGroup],  # Currently unused, but kept for structure
+        dict[str, ParliamentaryGroup],  # Currently unused, but kept for
+        # structure
         dict[str, Party],
         dict[str, Any],  # Other orgs
         dict[str, dict[str, list[Commission | Party]]],  # Details
-        dict[str, int]  # Processed counts per type
+        dict[str, int],  # Processed counts per type
     ]:
         """
-        Imports organizations from JSON data. Returns maps, details, and counts.
+        Imports organizations from JSON data. Returns maps, details, and
+        counts.
 
         Returns:
             Tuple containing maps of external IDs to:
@@ -491,7 +485,7 @@ class OrganizationImporter(DataImporter):
             org_id = org_data.get('id')
             if not org_id:
                 logging.warning(  # Downgrade to warning
-                    f"Skipping organization without ID: {org_data.get('name')}"
+                    f'Skipping organization without ID: {org_data.get("name")}'
                 )
                 continue
 
@@ -540,7 +534,8 @@ class OrganizationImporter(DataImporter):
                     commission_map[org_id] = commission
 
                 elif organization_type_title == 'Fraktion':
-                    # Count both as parliamentary_group and party for processing
+                    # Count both as parliamentary_group and party for
+                    # processing
                     processed_counts['parliamentary_groups'] += 1
                     processed_counts['parties'] += 1
                     try:
@@ -562,15 +557,13 @@ class OrganizationImporter(DataImporter):
                         if updated:
                             parties_to_update.append(party)
                             logging.debug(
-                                f'Updating party (from Fraktion, initial query):'
-                                f' {org_id}'
+                                f'Updating party (from Fraktion, initial '
+                                f'query): {org_id}'
                             )
                         # No need to add to save list, session tracks changes
                     else:
                         # Create new party (since not found in initial map)
-                        party = Party(
-                            external_kub_id=org_uuid, name=org_name
-                        )
+                        party = Party(external_kub_id=org_uuid, name=org_name)
                         logging.debug(
                             f'Creating party (from Fraktion): {org_id}'
                         )
@@ -600,8 +593,8 @@ class OrganizationImporter(DataImporter):
 
             except Exception as e:
                 logging.error(
-                    f"Error importing organization "
-                    f"{org_data.get('name')}: {e}",
+                    f'Error importing organization '
+                    f'{org_data.get("name")}: {e}',
                     exc_info=True,
                 )
 
@@ -622,14 +615,14 @@ class OrganizationImporter(DataImporter):
         details['parties']['created'] = list(parties_to_create)
         details['parties']['updated'] = list(parties_to_update)
         logging.info(
-            f"Organization import details: "
-            f"Commissions(C:{len(details['commissions']['created'])}, "
-            f"U:{len(details['commissions']['updated'])}, "
-            f"P:{processed_counts['commissions']}), "
-            f"Parties(C:{len(details['parties']['created'])}, "
-            f"U:{len(details['parties']['updated'])}, "
-            f"P:{processed_counts['parties']}), "  # Note: Parties derived from Fraktion
-            f"Other Processed: {processed_counts['other']}"
+            f'Organization import details: '
+            f'Commissions(C:{len(details["commissions"]["created"])}, '
+            f'U:{len(details["commissions"]["updated"])}, '
+            f'P:{processed_counts["commissions"]}), '
+            f'Parties(C:{len(details["parties"]["created"])}, '
+            f'U:{len(details["parties"]["updated"])}, '
+            f'P:{processed_counts["parties"]}), '  # Note: Parties from Frakt.
+            f'Other Processed: {processed_counts["other"]}'
         )
 
         # Return maps, details, and processed counts
@@ -639,7 +632,7 @@ class OrganizationImporter(DataImporter):
             party_map,
             other_organizations,
             details,
-            processed_counts  # Add processed counts here
+            processed_counts,  # Add processed counts here
         )
 
 
@@ -780,8 +773,8 @@ class MembershipImporter(DataImporter):
                             existing_parliamentarian
                         )
                         logging.info(
-                            f'Updated existing parliamentarian (ID: {person_id})'
-                            f' found via membership data.'
+                            f'Updated existing parliamentarian '
+                            f'(ID: {person_id}) found via membership data.'
                         )
                     # Add to map whether updated or not
                     self.parliamentarian_map[person_id] = (
@@ -819,7 +812,7 @@ class MembershipImporter(DataImporter):
         if parliamentarians_to_create:
             self._bulk_save(
                 parliamentarians_to_create,
-                'new parliamentarians from memberships'
+                'new parliamentarians from memberships',
             )
 
         # Flush is removed, commit at the end of import_zug_kub_data
@@ -850,7 +843,7 @@ class MembershipImporter(DataImporter):
         except Exception:
             logging.error(
                 'Error flushing parliamentarians from membership data',
-                exc_info=True
+                exc_info=True,
             )
             self.session.rollback()
             # Return empty lists on error
@@ -977,14 +970,14 @@ class MembershipImporter(DataImporter):
     def bulk_import(
         self, memberships_data: Sequence[MembershipData]
     ) -> tuple[
-        dict[str, dict[str, list[Any]]],  # Details dict
-        dict[str, int]  # Processed counts dict
+        dict[str, ImportCategoryResult | dict[str, list[Any]]], dict[str, int]
     ]:
         """
         Imports memberships from JSON data based on organization type.
 
         Returns:
-            - A dictionary containing lists of created/updated objects.
+            - A dictionary containing lists of created/updated objects and
+              processed counts per category.
             - A dictionary containing the count of processed items per type.
         """
         commission_memberships_to_create: list[CommissionMembership] = []
@@ -992,38 +985,50 @@ class MembershipImporter(DataImporter):
         parliamentarian_roles_to_create: list[ParliamentarianRole] = []
         parliamentarian_roles_to_update: list[ParliamentarianRole] = []
 
-        details: dict[str, dict[str, list[Any]]] = {
+        # Details structure to return - Use the new TypedDict where applicable
+        details: dict[str, ImportCategoryResult | dict[str, Any]] = {
             'parliamentarians_from_memberships': {
-                'created': [], 'updated': []
+                'created': [],
+                'updated': [],
             },
-            'commission_memberships': {'created': [], 'updated': []},
-            'parliamentarian_roles': {'created': [], 'updated': []},
+            'commission_memberships': {
+                'created': [],
+                'updated': [],
+                'processed': 0,
+            },
+            'parliamentarian_roles': {
+                'created': [],
+                'updated': [],
+                'processed': 0,
+            },
         }
         processed_counts = {
             'commission_memberships': 0,
-            'parliamentarian_roles': 0,  # Covers Fraktion, Kantonsrat, Sonstige
-            'skipped': 0  # Count memberships we couldn't process
+            'parliamentarian_roles': 0,  # Covers Fraktion, Kantonsrat,
+            # Sonstige
+            'skipped': 0,  # Count memberships we couldn't process
         }
 
         # Process parliamentarians found only in memberships first
-        parl_details = self._extract_and_update_or_create_missing_parliamentarians(
-            memberships_data
+        parl_details = (
+            self._extract_and_update_or_create_missing_parliamentarians(
+                memberships_data
+            )
         )
-        details['parliamentarians_from_memberships'] = parl_details
+        details['parliamentarians_from_memberships']['created'] = parl_details[
+            'created'
+        ]
+        details['parliamentarians_from_memberships']['updated'] = parl_details[
+            'updated'
+        ]
 
         # --- Pre-fetch existing memberships and roles ---
         parliamentarian_ids = [
             p.id for p in self.parliamentarian_map.values() if p.id
         ]
-        commission_ids = [
-            c.id for c in self.commission_map.values() if c.id
-        ]
-        [
-            p.id for p in self.party_map.values() if p.id
-        ]
-        [
-            g.id for g in self.parliamentary_group_map.values() if g.id
-        ]
+        commission_ids = [c.id for c in self.commission_map.values() if c.id]
+        [p.id for p in self.party_map.values() if p.id]
+        [g.id for g in self.parliamentary_group_map.values() if g.id]
 
         existing_commission_memberships_map: dict[
             tuple[UUID | None, UUID | None], CommissionMembership
@@ -1049,8 +1054,8 @@ class MembershipImporter(DataImporter):
             )
 
         # Define the precise structure for the role key tuple
-        role_key = tuple[UUID, UUID | None, UUID | None, str, str | None]
-        existing_roles_map: dict[role_key, ParliamentarianRole] = {}
+        role_key_type = tuple[UUID, UUID | None, UUID | None, str, str | None]
+        existing_roles_map: dict[role_key_type, ParliamentarianRole] = {}
         if parliamentarian_ids:
             # Fetch all roles for the relevant parliamentarians
             # We'll filter/map them client-side
@@ -1065,43 +1070,42 @@ class MembershipImporter(DataImporter):
                     # Eager load related objects to prevent N+1 queries
                     # during updates.
                     selectinload(ParliamentarianRole.party),
-                    selectinload(ParliamentarianRole.parliamentary_group)
+                    selectinload(ParliamentarianRole.parliamentary_group),
                 )
                 .all()
             )
             for role_obj in existing_roles:
                 # Create a unique key based on the role type and relevant IDs
-                # Use the defined role_key type hint for clarity
-                key: role_key
+                # Use the defined role_key_type hint for clarity
                 if role_obj.party_id or role_obj.parliamentary_group_id:
                     # Fraktion/Party Role (assuming role='member')
-                    key = (
+                    current_role_key = (
                         role_obj.parliamentarian_id,
                         role_obj.party_id,
                         role_obj.parliamentary_group_id,
                         'member',  # Explicitly add role type for uniqueness
-                        None  # Placeholder for additional_information
+                        None,  # Placeholder for additional_information
                     )
                 elif role_obj.additional_information:
                     # Sonstige Role (assuming role='member')
-                    key = (
+                    current_role_key = (
                         role_obj.parliamentarian_id,
                         None,  # party_id
                         None,  # group_id
                         'member',  # Explicitly add role type
-                        role_obj.additional_information
+                        role_obj.additional_information,
                     )
                 else:
                     # Kantonsrat Role (or potentially others without
                     # party/group/add.info)
-                    key = (
+                    current_role_key = (
                         role_obj.parliamentarian_id,
                         None,  # party_id
                         None,  # group_id
                         role_obj.role,  # Use the actual role
-                        None  # Placeholder for additional_information
+                        None,  # Placeholder for additional_information
                     )
-                existing_roles_map[key] = role_obj
+                existing_roles_map[current_role_key] = role_obj
             logging.debug(
                 f'Pre-fetched {len(existing_roles_map)} existing '
                 f'parliamentarian roles.'
@@ -1164,8 +1168,8 @@ class MembershipImporter(DataImporter):
                         continue
 
                     membership_key = (parliamentarian.id, commission.id)
-                    existing_membership = existing_commission_memberships_map.get(
-                        membership_key
+                    existing_membership = (
+                        existing_commission_memberships_map.get(membership_key)
                     )
 
                     if existing_membership:
@@ -1192,12 +1196,14 @@ class MembershipImporter(DataImporter):
                             commission_memberships_to_create.append(
                                 membership_obj
                             )
-                            # Add the new membership to the map to prevent duplicates
-                            # within the same import run if data is redundant
+                            # Add the new membership to the map to prevent
+                            # duplicates within the same import run if data is
+                            # redundant
                             if parliamentarian.id and commission.id:
                                 new_key = (parliamentarian.id, commission.id)
-                                existing_commission_memberships_map[new_key] = (
-                                    membership_obj)
+                                existing_commission_memberships_map[
+                                    new_key
+                                ] = membership_obj
                             logging.debug(
                                 f'Creating commission membership for '
                                 f'{parliamentarian.id} in {commission.id}'
@@ -1215,15 +1221,15 @@ class MembershipImporter(DataImporter):
                         continue
                     group = self.parliamentary_group_map.get(org_id)
 
-                    # Use role_key type hint
-                    role_key: role_key = (
+                    # Use role_key_type hint for the variable
+                    current_role_key = (
                         parliamentarian.id,
                         party.id if party else None,
                         group.id if group else None,
                         'member',  # Role type
                         None,  # additional_information
                     )
-                    existing_role = existing_roles_map.get(role_key)
+                    existing_role = existing_roles_map.get(current_role_key)
 
                     start_val = membership.get('start')
                     start_date_str = (
@@ -1253,7 +1259,9 @@ class MembershipImporter(DataImporter):
                             end_date=end_date_str,
                         )
                         if updated:
-                            parliamentarian_roles_to_update.append(existing_role)
+                            parliamentarian_roles_to_update.append(
+                                existing_role
+                            )
                             logging.debug(
                                 f'Updating Fraktion/Party role for '
                                 f'{parliamentarian.id}'
@@ -1277,7 +1285,19 @@ class MembershipImporter(DataImporter):
                             parliamentarian_roles_to_create.append(role_obj)
                             # Add the new role to the map
                             # Ensure the key matches RoleKey type
-                            existing_roles_map[role_key] = role_obj
+                            if parliamentarian.id:
+                                current_role_key_after_create: (
+                                    role_key_type
+                                ) = (
+                                    parliamentarian.id,
+                                    role_obj.party_id,
+                                    role_obj.parliamentary_group_id,
+                                    role_obj.role,
+                                    role_obj.additional_information,
+                                )
+                                existing_roles_map[
+                                    current_role_key_after_create
+                                ] = role_obj
                             logging.debug(
                                 f'Creating Fraktion/Party role for '
                                 f'{parliamentarian.id}'
@@ -1300,14 +1320,14 @@ class MembershipImporter(DataImporter):
                         else None
                     )
 
-                    role_key = (
+                    current_role_key = (
                         parliamentarian.id,
                         None,  # party_id
                         None,  # group_id
                         role,  # Actual role from _map_to_parliamentarian_role
-                        None  # additional_information
+                        None,  # additional_information
                     )
-                    existing_role = existing_roles_map.get(role_key)
+                    existing_role = existing_roles_map.get(current_role_key)
 
                     if existing_role:
                         updated = self._update_parliamentarian_role(
@@ -1317,7 +1337,9 @@ class MembershipImporter(DataImporter):
                             end_date=end_date_str,
                         )
                         if updated:
-                            parliamentarian_roles_to_update.append(existing_role)
+                            parliamentarian_roles_to_update.append(
+                                existing_role
+                            )
                             logging.debug(
                                 f'Updating Kantonsrat role ({role}) for '
                                 f'{parliamentarian.id}'
@@ -1334,7 +1356,17 @@ class MembershipImporter(DataImporter):
                             parliamentarian_roles_to_create.append(role_obj)
                             # Add the new role to the map
                             # Ensure the key matches RoleKey type
-                            existing_roles_map[role_key] = role_obj
+                            if parliamentarian.id:
+                                current_role_key_after_create = (
+                                    parliamentarian.id,
+                                    role_obj.party_id,
+                                    role_obj.parliamentary_group_id,
+                                    role_obj.role,
+                                    role_obj.additional_information,
+                                )
+                                existing_roles_map[
+                                    current_role_key_after_create
+                                ] = role_obj
                             logging.debug(
                                 f'Creating Kantonsrat role ({role}) for '
                                 f'{parliamentarian.id}'
@@ -1357,14 +1389,14 @@ class MembershipImporter(DataImporter):
                         else None
                     )
 
-                    role_key = (
+                    current_role_key = (  # type: ignore[assignment]
                         parliamentarian.id,
                         None,  # party_id
                         None,  # group_id
                         'member',  # Role type
-                        additional_info  # additional_information
+                        additional_info,  # additional_information
                     )
-                    existing_role = existing_roles_map.get(role_key)
+                    existing_role = existing_roles_map.get(current_role_key)
 
                     if existing_role:
                         updated = self._update_parliamentarian_role(
@@ -1375,7 +1407,9 @@ class MembershipImporter(DataImporter):
                             end_date=end_date_str,
                         )
                         if updated:
-                            parliamentarian_roles_to_update.append(existing_role)
+                            parliamentarian_roles_to_update.append(
+                                existing_role
+                            )
                             logging.debug(
                                 f'Updating Sonstige role for '
                                 f'{parliamentarian.id}: {additional_info}'
@@ -1393,7 +1427,17 @@ class MembershipImporter(DataImporter):
                             parliamentarian_roles_to_create.append(role_obj)
                             # Add the new role to the map
                             # Ensure the key matches RoleKey type
-                            existing_roles_map[role_key] = role_obj
+                            if parliamentarian.id:
+                                current_role_key_after_create = (
+                                    parliamentarian.id,
+                                    role_obj.party_id,
+                                    role_obj.parliamentary_group_id,
+                                    role_obj.role,
+                                    role_obj.additional_information,
+                                )
+                                existing_roles_map[
+                                    current_role_key_after_create
+                                ] = role_obj
                             logging.debug(
                                 f'Creating Sonstige role for '
                                 f'{parliamentarian.id}: {additional_info}'
@@ -1434,32 +1478,51 @@ class MembershipImporter(DataImporter):
         # IDs will be assigned after the final commit.
         try:
             # Populate details based on object existence, not internal ID yet
-            details['commission_memberships']['created'] = \
-                list(commission_memberships_to_create)
-            details['commission_memberships']['updated'] = \
-                list(commission_memberships_to_update)
-            details['parliamentarian_roles']['created'] = \
-                list(parliamentarian_roles_to_create)
-            details['parliamentarian_roles']['updated'] = \
-                list(parliamentarian_roles_to_update)
-        except Exception:
-            logging.error(
-                'Error flushing memberships/roles', exc_info=True
+            details['commission_memberships']['created'] = list(
+                commission_memberships_to_create
             )
+            details['commission_memberships']['updated'] = list(
+                commission_memberships_to_update
+            )
+            details['parliamentarian_roles']['created'] = list(
+                parliamentarian_roles_to_create
+            )
+            details['parliamentarian_roles']['updated'] = list(
+                parliamentarian_roles_to_update
+            )
+
+            # Update processed counts in the details dictionary
+            details['commission_memberships']['processed'] = processed_counts[
+                'commission_memberships'
+            ]
+            details['parliamentarian_roles']['processed'] = processed_counts[
+                'parliamentarian_roles'
+            ]
+
+        except Exception:
+            logging.error('Error flushing memberships/roles', exc_info=True)
             self.session.rollback()
-            # Clear lists on error
-            details['commission_memberships'] = {'created': [], 'updated': []}
-            details['parliamentarian_roles'] = {'created': [], 'updated': []}
+            # Clear lists on error, but keep processed counts
+            details['commission_memberships'] = {
+                'created': [],
+                'updated': [],
+                'processed': processed_counts['commission_memberships'],
+            }
+            details['parliamentarian_roles'] = {
+                'created': [],
+                'updated': [],
+                'processed': processed_counts['parliamentarian_roles'],
+            }
 
         logging.info(
-            f"Membership/Role import details: "
-            f"CMs(C:{len(details['commission_memberships']['created'])}, "
-            f"U:{len(details['commission_memberships']['updated'])}, "
-            f"P:{processed_counts['commission_memberships']}), "
-            f"Roles(C:{len(details['parliamentarian_roles']['created'])}, "
-            f"U:{len(details['parliamentarian_roles']['updated'])}, "
-            f"P:{processed_counts['parliamentarian_roles']}), "
-            f"Skipped: {processed_counts['skipped']}"
+            f'Membership/Role import details: '
+            f'CMs(C:{len(details["commission_memberships"]["created"])}, '
+            f'U:{len(details["commission_memberships"]["updated"])}, '
+            f'P:{details["commission_memberships"]["processed"]}), '
+            f'Roles(C:{len(details["parliamentarian_roles"]["created"])}, '
+            f'U:{len(details["parliamentarian_roles"]["updated"])}, '
+            f'P:{details["parliamentarian_roles"]["processed"]}), '
+            f'Skipped: {processed_counts["skipped"]}'
         )
         return details, processed_counts
 
@@ -1769,10 +1832,11 @@ def import_zug_kub_data(
     organization_data: Sequence[OrganizationData],
     membership_data: Sequence[MembershipData],
     user_id: uuid.UUID | None = None,
-) -> dict[str, dict[str, list[Any] | int]]:
+) -> dict[str, ImportCategoryResult]:
     """
     Imports data from KUB JSON files within a single transaction,
-    logs the outcome, and returns details of changes including processed counts.
+    logs the outcome, and returns details of changes including processed
+    counts.
 
     Returns a dictionary where keys are categories (e.g., 'parliamentarians')
     and values are dictionaries containing 'created' (list), 'updated' (list),
@@ -1781,8 +1845,7 @@ def import_zug_kub_data(
     Rolls back changes within this import if an internal error occurs.
     Logs the attempt regardless of success or failure.
     """
-    # Adjust type hint for import_details to include int for 'processed'
-    import_details: dict[str, dict[str, list[Any] | int]] = {}
+    import_details: dict[str, ImportCategoryResult] = {}
     log_status = 'failed'
     log_details: dict[str, Any] = {}
     final_error: Exception | None = None
@@ -1791,29 +1854,43 @@ def import_zug_kub_data(
         # Use a savepoint; rollback occurs automatically on exception
         with session.begin_nested():
             people_importer = PeopleImporter(session)
-            (
-                parliamentarian_map, people_details, people_processed
-            ) = people_importer.bulk_import(people_data)
-            # Ensure 'parliamentarians' key exists and add processed count
+            (parliamentarian_map, people_details, people_processed) = (
+                people_importer.bulk_import(people_data)
+            )
             import_details['parliamentarians'] = {
-                **people_details, 'processed': people_processed
+                'created': people_details['created'],
+                'updated': people_details['updated'],
+                'processed': people_processed,
             }
 
             organization_importer = OrganizationImporter(session)
             (
                 commission_map,
-                parliamentary_group_map,  # Add missing variable here
+                parliamentary_group_map,
                 party_map,
                 other_organization_map,
                 org_details,
-                org_processed_counts  # Receive processed counts
+                org_processed_counts,
             ) = organization_importer.bulk_import(organization_data)
-            # Merge org details with processed counts
-            for category, details in org_details.items():
-                import_details[category] = {
-                    **details,
-                    'processed': org_processed_counts.get(category, 0)
-                }
+
+            for category, details_list_dict in org_details.items():
+                processed_count = org_processed_counts.get(category, 0)
+                # Only add categories that have actual ORM objects
+                # (Commissions, Parties)
+                if category in ('commissions', 'parties'):
+                    import_details[category] = {
+                        'created': details_list_dict.get('created', []),
+                        'updated': details_list_dict.get('updated', []),
+                        'processed': processed_count,
+                    }
+
+            # Add 'other' processed count to log_details separately
+            log_details['other_organizations_processed'] = (
+                org_processed_counts.get('other', 0)
+            )
+            log_details['parliamentary_groups_processed'] = (
+                org_processed_counts.get('parliamentary_groups', 0)
+            )
 
             membership_importer = MembershipImporter(session)
             membership_importer.init(
@@ -1824,82 +1901,72 @@ def import_zug_kub_data(
                 party_map,
                 other_organization_map,
             )
-            (
-                membership_details, membership_processed_counts
-            ) = membership_importer.bulk_import(membership_data)
-            # Merge membership details with processed counts
-            for category, details in membership_details.items():
-                 import_details[category] = {
-                    **details,
-                    'processed': membership_processed_counts.get(category, 0)
-                }
-
-            # Combine parliamentarians found only in memberships
-            # Note: 'parliamentarians_from_memberships' is now a sub-category
-            # within membership_details, handled above.
-            # We still need to merge the created/updated lists into the main
-            # 'parliamentarians' category.
-            parl_from_mships_details = import_details.pop(
-                'parliamentarians_from_memberships', None
+            (membership_details, membership_processed_counts) = (
+                membership_importer.bulk_import(membership_data)
             )
-            if parl_from_mships_details:
-                # Ensure 'parliamentarians' exists before extending
-                if 'parliamentarians' not in import_details:
-                     import_details['parliamentarians'] = {
-                         'created': [], 'updated': [], 'processed': 0
-                     }
-                # Extend lists, but don't double-count processed
-                created_from_mships = parl_from_mships_details.get('created', [])
-                updated_from_mships = parl_from_mships_details.get('updated', [])
-                if isinstance(import_details['parliamentarians']['created'], list):
-                    import_details['parliamentarians']['created'].extend(
-                        created_from_mships
-                    )
-                if isinstance(import_details['parliamentarians']['updated'], list):
-                    import_details['parliamentarians']['updated'].extend(
-                        updated_from_mships
-                    )
-                # Note: Processed count for these is already part of the
-                # main 'parliamentarians' processed count from PeopleImporter
 
-            # Prepare summary details for logging (including processed counts)
-            log_details = {}
+            for category, details_dict in membership_details.items():
+                if category == 'parliamentarians_from_memberships':
+                    if isinstance(
+                        details_dict, dict
+                    ):
+                        import_details['parliamentarians']['created'].extend(
+                            details_dict.get('created', [])
+                        )
+                        import_details['parliamentarians']['updated'].extend(
+                            details_dict.get('updated', [])
+                        )
+
+                elif category in (
+                    'commission_memberships',
+                    'parliamentarian_roles',
+                ):
+                    import_details[category] = cast(
+                        'ImportCategoryResult', details_dict
+                    )
+
+            log_details['skipped_memberships'] = (
+                membership_processed_counts.get('skipped', 0)
+            )
+
+            log_details['summary'] = {}
             for k, v in import_details.items():
-                if isinstance(v, dict):
-                    log_details[k] = {
-                        'created_count': len(v.get('created', [])),
-                        'updated_count': len(v.get('updated', [])),
-                        'processed_count': v.get('processed', 0)
-                    }
+                # v is now guaranteed to be ImportCategoryResult
+                log_details['summary'][k] = {
+                    'created_count': len(v['created']),
+                    'updated_count': len(v['updated']),
+                    'processed_count': v['processed'],
+                }
+            log_details['summary']['other_organizations_processed'] = (
+                log_details['other_organizations_processed']
+            )
+            log_details['summary']['parliamentary_groups_processed'] = (
+                log_details['parliamentary_groups_processed']
+            )
+            log_details['summary']['skipped_memberships'] = log_details[
+                'skipped_memberships'
+            ]
+
             log_status = 'completed'
             logging.info(
                 'KUB data import processing successful within transaction.'
             )
 
-        # --- End of begin_nested block ---
-        # If successful, savepoint is released (merged).
-        # If exception occurred, changes rolled back to savepoint.
-
     except Exception as e:
-        # Capture the error, logging happens outside the nested block
         final_error = e
         log_status = 'failed'
-        log_details['error'] = str(e)  # Add error to log details
+        log_details['error'] = str(e)
         logging.error(f'KUB data import failed: {e}', exc_info=True)
 
     finally:
-        # Always try to log the import attempt
         try:
             import_log = ImportLog(
                 user_id=user_id,
                 details=log_details,
                 status=log_status,
-                # source_info=source_info
+                # source_info is not defined, remove it
             )
             session.add(import_log)
-            # Flush to ensure the log is added even if the outer
-            # transaction eventually rolls back due to the error.
-            # This might fail if the session is severely broken.
             if session.is_active:
                 session.flush()
             logging.info(
@@ -1910,10 +1977,7 @@ def import_zug_kub_data(
                 f'Failed to log import status: {log_e}', exc_info=True
             )
 
-        # If an error occurred during import, re-raise it
-        # so the outer transaction management handles rollback.
         if final_error:
             raise RuntimeError('KUB data import failed.') from final_error
 
-    # Return details only on success
     return import_details

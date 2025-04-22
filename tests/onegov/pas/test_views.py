@@ -339,13 +339,13 @@ def test_view_upload_json(client):
     logs_page = client.get('/import-logs')
     assert logs_page.status_code == 200
     assert 'completed' in logs_page  # Check if the status is shown
-    log_detail_page = logs_page.click(_('Details anzeigen'), index=0).maybe_follow()
-    log_detail_page.showbrowser()
+    log_detail_page = logs_page.click(
+        _('Details anzeigen'), index=0
+    ).maybe_follow()
 
     assert log_detail_page.status_code == 200
     assert 'Import Details' in log_detail_page
     status = log_detail_page.pyquery('.import-status').text()
-    breakpoint()
     assert 'completed' in log_detail_page.pyquery('.import-status').text()
 
     # do it again to test that errors / duplicates are gracefully handled.
@@ -356,5 +356,9 @@ def test_view_upload_json(client):
     assert logs_page.status_code == 200
     # Should now have two logs
     assert len(logs_page.pyquery('tbody tr')) == 2
-    assert 'completed' in logs_page.pyquery('tbody tr:first-child .import-status').text()
-    assert 'completed' in logs_page.pyquery('tbody tr:last-child .import-status').text()
+    assert 'completed' in logs_page.pyquery(
+        'tbody tr:first-child .import-status'
+    ).text()
+    assert 'completed' in logs_page.pyquery(
+        'tbody tr:last-child .import-status'
+    ).text()
