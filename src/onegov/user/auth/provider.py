@@ -114,7 +114,7 @@ class AuthenticationProvider(metaclass=ABCMeta):
             assert metadata.name not in AUTHENTICATION_PROVIDERS
 
             # reserved names
-            assert metadata.name not in ('auto', )
+            assert metadata.name != 'auto'
 
             cls.metadata = metadata
             AUTHENTICATION_PROVIDERS[metadata.name] = cls
@@ -372,7 +372,7 @@ class RolesMapping:
         for role in ('admin', 'editor', 'supporter', 'member'):
             if (
                 (group := roles.get(f'{role}s', None)) is not None
-                and group in groups
+                and group.lower() in groups
             ):
                 return role
 

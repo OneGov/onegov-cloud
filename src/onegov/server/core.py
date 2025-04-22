@@ -220,6 +220,6 @@ class Server:
                 self.exception_hook(environ)
 
             if self.post_mortem:
-                import pdb; pdb.post_mortem()  # noqa: E702
+                import pdb; pdb.post_mortem()  # noqa: E702, T100
 
             raise

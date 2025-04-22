@@ -60,6 +60,15 @@ def test_news(client):
     assert "It is lots of fun" not in page.text
     assert "/news?filter_tags=fun" in page.text
 
+    # Test RSS Feed
+    page = client.get('/news?format=rss')
+    assert '<atom:link ' in page.text
+    assert 'rel="alternate"' in page.text
+    assert '/news?page=0</link>' in page.text
+    assert "We have a new homepage" in page.text
+    assert "It is very good" in page.text
+    assert "It is lots of fun" not in page.text
+
     page = client.get('/news/we-have-a-new-homepage')
     client.delete(page.pyquery('a[ic-delete-from]').attr('ic-delete-from'))
     page = client.get('/news')

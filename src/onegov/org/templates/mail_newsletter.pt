@@ -44,6 +44,10 @@
                 </ul>
             </tal:b>
         </tal:b>
+        <tal:b condition="closing_remark">
+            <hr>
+            <p tal:content="closing_remark"></p>
+        </tal:b>
 
     </tal:b>
     <tal:b metal:fill-slot="above-footer">

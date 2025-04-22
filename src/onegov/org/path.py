@@ -62,6 +62,7 @@ from onegov.org.models import LegacyFileCollection
 from onegov.org.models import LegacyImage
 from onegov.org.models import LegacyImageCollection
 from onegov.org.models import News
+from onegov.org.models import NewsCollection
 from onegov.org.models import Organisation
 from onegov.org.models import PageMove
 from onegov.org.models import PagePersonMove
@@ -184,17 +185,19 @@ def get_topic(app: OrgApp, absorb: str) -> Topic | None:
     absorb=True,
     converters={
         'filter_years': [datetime_year_converter],
-        'filter_tags': [str]
+        'filter_tags': [str],
+        'page': int
     }
 )
 def get_news(
-    app: OrgApp,
+    request: OrgRequest,
     absorb: str,
     filter_years: list[int],
-    filter_tags: list[str]
-) -> News | None:
+    filter_tags: list[str],
+    page: int = 0,
+) -> News | NewsCollection | None:
 
-    pages = PageCollection(app.session())
+    pages = PageCollection(request.session)
 
     old_path = '/aktuelles/' + absorb
     new_path = '/news/' + absorb
@@ -203,10 +206,14 @@ def get_news(
         pages.by_path(new_path, ensure_type='news')  # type:ignore[assignment]
         or pages.by_path(old_path, ensure_type='news')
     )
-    if news:
-        news.filter_years = filter_years
-        news.filter_tags = filter_tags
-
+    if news is not None and news.parent_id is None and request.method == 'GET':
+        return NewsCollection(
+            request,
+            page=page,
+            filter_years=filter_years,
+            filter_tags=filter_tags,
+            root=news,
+        )
     return news
 
 
@@ -485,9 +492,14 @@ def get_resources(app: OrgApp) -> ResourceCollection:
 @OrgApp.path(model=FindYourSpotCollection, path='/find-your-spot')
 def get_find_my_spot(
     app: OrgApp,
-    group: str | None = None
+    group: str | None = None,
+    subgroup: str | None = None,
 ) -> FindYourSpotCollection:
-    return FindYourSpotCollection(app.libres_context, group=group)
+    return FindYourSpotCollection(
+        app.libres_context,
+        group=group,
+        subgroup=subgroup
+    )
 
 
 @OrgApp.path(

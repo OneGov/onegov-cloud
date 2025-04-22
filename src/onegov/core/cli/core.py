@@ -610,14 +610,12 @@ def run_processors(
         def get_cronjobs_enabled() -> bool:
             return False
 
-        @CliApplication.setting_section(section='roles')
-        def get_roles_setting() -> dict[str, set[type[Intent]]]:
+        @CliApplication.replace_setting(section='roles', name='anonymous')
+        def get_anonymous_intents() -> set[type[Intent]]:
             # override the security settings -> we need the public
             # role to work for anonymous users, even if the base
             # application disables that
-            return {
-                'anonymous': {Public},
-            }
+            return {Public}
 
         scan_morepath_modules(CliApplication)
         CliApplication.commit()
@@ -696,8 +694,7 @@ def command_group() -> click.Group:
             context.obj.config.logging.setdefault('version', 1)
             logging.config.dictConfig(context.obj.config.logging)
         except DB_CONNECTION_ERRORS as e:
-            print('Could not connect to database:')
-            print(e)
+            click.echo(f'Could not connect to database:\n{e}')
             sys.exit(1)
 
     @command_group.result_callback()

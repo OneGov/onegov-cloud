@@ -113,11 +113,15 @@ class PageLayout(DefaultLayout):
 
     @cached_property
     def slides(self) -> list[Slide]:
-        votes = SwissVoteCollection(self.app)
+        slider_images = self.model.slider_images
+        bfs_numbers = [
+            Path(image.filename).stem.split('-', 1)[0]
+            for image in slider_images
+        ]
+        votes = SwissVoteCollection(self.app).by_bfs_numbers(bfs_numbers)
         result = []
-        for image in self.model.slider_images:
-            bfs_number = Path(image.filename).stem.split('-', 1)[0]
-            vote = votes.by_bfs_number(bfs_number)
+        for image, bfs_number in zip(slider_images, bfs_numbers, strict=True):
+            vote = votes.get(bfs_number)
             result.append(
                 Slide(
                     image=self.request.link(image),

@@ -19,8 +19,11 @@ from onegov.form.fields import PhoneNumberField
 from onegov.form.fields import TranslatedSelectField
 from onegov.form.fields import UploadField
 from onegov.form.fields import UploadMultipleField
+from onegov.form.fields import URLField
 from onegov.form.validators import ValidPhoneNumber
 from unittest.mock import patch
+from wtforms.validators import Optional
+from wtforms.validators import URL
 
 
 class DummyPostData(dict):
@@ -541,3 +544,78 @@ def test_translated_select_field():
     field.data = ''
     field.meta.request = Bunch(translate=lambda x: 'xx')
     assert '<option value="a">xx</option>' in field()
+
+
+def test_url_field():
+    form = Form()
+    field = URLField()
+    field = field.bind(form, 'url')
+    assert field.default_scheme == 'https'
+    assert field.render_kw == {'placeholder': 'https://'}
+    assert len(field.validators) == 1
+    assert isinstance(field.validators[0], URL)
+    assert field.validators[0].validate_hostname.require_tld is True
+    assert field.validators[0].validate_hostname.allow_ip is False
+
+    field.process_formdata([''])
+    assert field.data == ''
+    assert not field.validate(form)
+
+    field.process_formdata(['bogus'])
+    assert field.data == 'https://bogus'
+    assert not field.validate(form)
+
+    field.process_formdata(['1.1.1.1'])
+    assert field.data == 'https://1.1.1.1'
+    assert not field.validate(form)
+
+    field.process_formdata(['example.com'])
+    assert field.data == 'https://example.com'
+    assert field.validate(form)
+
+    field.process_formdata(['http://example.com'])
+    assert field.data == 'http://example.com'
+    assert field.validate(form)
+
+    form = Form()
+    field = URLField(
+        default_scheme=None,
+        validators=[Optional(), URL(require_tld=False)]
+    )
+    field = field.bind(form, 'url')
+    assert field.default_scheme is None
+    assert field.render_kw is None
+    assert len(field.validators) == 2
+    assert isinstance(field.validators[1], URL)
+    assert field.validators[1].validate_hostname.require_tld is False
+    assert field.validators[1].validate_hostname.allow_ip is True
+
+    # optional
+    field.raw_data = ['']
+    field.process_formdata([''])
+    assert field.data == ''
+    assert field.validate(form)
+
+    # dummy raw_data so Optional doesn't trigger
+    field.raw_data = ['set']
+    field.process_formdata(['https://bogus'])
+    assert field.data == 'https://bogus'
+    assert field.validate(form)
+
+    field.process_formdata(['https://1.1.1.1'])
+    assert field.data == 'https://1.1.1.1'
+    assert field.validate(form)
+
+    field.process_formdata(['example.com'])
+    assert field.data == 'example.com'
+    assert not field.validate(form)
+
+    field.process_formdata(['http://example.com'])
+    assert field.data == 'http://example.com'
+    assert field.validate(form)
+
+    form = Form()
+    field = URLField(render_kw={'size': 15, 'placeholder': '...'})
+    field = field.bind(form, 'url')
+    assert field.default_scheme == 'https'
+    assert field.render_kw == {'size': 15, 'placeholder': '...'}

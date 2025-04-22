@@ -70,7 +70,7 @@
                         <p tal:condition="assembly.audio_zip">
                             <a href="${request.link(assembly.audio_zip)}" class="audio-zip-link">
                                 <i class="fa fa-download" aria-hidden="true"></i>
-                                <span i18n:translate="">Audio (ZIP)</span>
+                                <span i18n:translate="">Memorial as audio for the visually impaired and blind</span>
                             </a>
                         </p>
                     </div>

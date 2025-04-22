@@ -31,6 +31,7 @@ from onegov.pas.utils import (
     get_parliamentarians_with_settlements,
     get_parties_with_settlements,
 )
+from operator import itemgetter
 
 from typing import TYPE_CHECKING, Literal
 if TYPE_CHECKING:
@@ -617,7 +618,7 @@ def _get_commission_settlement_data(
             rate_with_cola
         ))
 
-    return sorted(result, key=lambda x: x[0])
+    return sorted(result, key=itemgetter(0))
 
 
 def _generate_settlement_html(
@@ -792,7 +793,7 @@ def _get_data_export_all(
         parliamentarian_totals[parliamentarian_id] += rate_with_cola
 
     # Sort by date
-    settlement_data.sort(key=lambda x: x[0])
+    settlement_data.sort(key=itemgetter(0))
     return settlement_data
 
 
@@ -961,7 +962,7 @@ def _get_party_settlement_data(
             rate_with_cola
         ))
 
-    return sorted(result, key=lambda x: x[0])
+    return sorted(result, key=itemgetter(0))
 
 
 @PasApp.view(

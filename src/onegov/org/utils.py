@@ -2,12 +2,15 @@ from __future__ import annotations
 
 import colorsys
 import re
+
+import phonenumbers
 import sedate
 import pytz
 
 from contextlib import suppress
 from collections import defaultdict, Counter, OrderedDict
 from datetime import datetime, time, timedelta
+from email.headerregistry import Address
 from functools import lru_cache
 from isodate import parse_date, parse_datetime
 from itertools import groupby
@@ -16,20 +19,20 @@ from lxml.etree import ParserError
 from lxml.html import fragments_fromstring, tostring
 from markupsafe import escape, Markup
 from onegov.core.layout import Layout
-from onegov.core.orm import as_selectable
+from onegov.core.mail import coerce_address
 from onegov.file import File, FileCollection
 from onegov.org import _
 from onegov.org.elements import DeleteLink, Link
 from onegov.org.models.search import Search
 from onegov.reservation import Resource
-from onegov.ticket import TicketCollection
+from onegov.ticket import TicketCollection, TicketPermission
 from onegov.user import User, UserGroup
-from operator import attrgetter
-from purl import URL
-from sqlalchemy import nullsfirst, select  # type:ignore[attr-defined]
+from operator import add, attrgetter
+from sqlalchemy import nullsfirst  # type:ignore[attr-defined]
 
 
 from typing import overload, Any, Literal, TYPE_CHECKING
+
 if TYPE_CHECKING:
     from _typeshed import SupportsRichComparison
     from collections.abc import Callable, Iterable, Iterator, Sequence
@@ -41,7 +44,7 @@ if TYPE_CHECKING:
     from onegov.reservation import Allocation, Reservation
     from onegov.ticket import Ticket
     from pytz.tzinfo import DstTzInfo, StaticTzInfo
-    from sqlalchemy.orm import Query, Session
+    from sqlalchemy.orm import Query
     from sqlalchemy import Column
     from typing import Self, TypeAlias, TypeVar
 
@@ -377,9 +380,9 @@ class ReservationInfo:
 
     @property
     def delete_link(self) -> str:
-        url = URL(self.request.link(self.reservation))
-        url = url.query_param('csrf-token', self.request.new_csrf_token())
-        return url.as_string()
+        return self.request.csrf_protected_url(
+            self.request.link(self.reservation)
+        )
 
     @property
     def price(self) -> PriceDict | None:
@@ -389,6 +392,7 @@ class ReservationInfo:
     def as_dict(self) -> dict[str, Any]:
         return {
             'resource': self.resource.name,
+            'title': self.resource.title,
             'date': self.date,
             'time': self.time,
             'delete': self.delete_link,
@@ -730,7 +734,9 @@ class FindYourSpotEventInfo:
             else:
                 yield 'event-unavailable'
         else:
-            if self.availability >= 100.0:
+            if self.availability == 100.0 or (
+                self.availability > 100.0 and self.adjustable
+            ):
                 yield 'event-available'
             elif self.availability >= 5.0:
                 yield 'event-partly-available'
@@ -934,7 +940,7 @@ def predict_next_value(
     values: Sequence[_T],
     min_probability: float = 0.8,
     compute_delta: Callable[[Any, Any], Any] = lambda x, y: y - x,
-    add_delta: Callable[[Any, Any], Any | None] = lambda x, d: x + d
+    add_delta: Callable[[Any, Any], Any | None] = add
 ) -> _T | None:
     """ Takes a list of values and tries to predict the next value in the
     series.
@@ -1112,59 +1118,66 @@ def hashtag_elements(request: OrgRequest, text: str) -> Markup:
     return Markup(HASHTAG.sub(replace_tag, escape(text)))  # nosec: B704
 
 
-def ticket_directory_groups(
-    session: Session
-) -> Iterator[str]:
-    """Yields all ticket groups.
-
-    For example: ('Sportanbieter', 'Verein')
-
-    If no groups exist, returns an empty generator.
-    """
-    query = as_selectable(
-        """
-        SELECT
-            handler_code,                         -- Text
-            ARRAY_AGG(DISTINCT "group") AS groups -- ARRAY(Text)
-        FROM tickets
-        WHERE handler_code = 'DIR'
-        GROUP BY handler_code
-        """
-    )
-
-    return (
-        group
-        for result in session.execute(select(query.c))
-        for group in result.groups
-        if group
-    )
-
-
-def user_group_emails_for_new_ticket(
-    request: CoreRequest,
+def emails_for_new_ticket(
+    request: OrgRequest,
     ticket: Ticket,
-) -> set[str]:
-    """The user can be part of a UserGroup that defines directories. This
-    means the users in this group are interested in a subset of tickets.
-    The group is determined by the Ticket group.
+) -> Iterator[Address]:
+    """ Returns a set of e-mail addressed that would like to be notified
+    about the creation of this ticket.
+
+    Users can be part of a UserGroup with ticket permissions. This means the
+    users in this group are interested in/responsible for a subset of tickets.
 
     This allows for more granular control over who gets notified.
 
     """
+    seen = set()
+    if request.email_for_new_tickets:
+        # adding this to seen ensures it does not receive two emails
+        address = coerce_address(request.email_for_new_tickets)
+        seen.add(address.addr_spec)
+        yield address
 
-    if ticket.handler_code != 'DIR':
-        # For now, we implement this special case just for 'DIR' tickets.
-        return set()
+    permissions = request.app.ticket_permissions.get(ticket.handler_code, {})
+    exclusive_group_ids = permissions.get(ticket.group, [])
 
-    return {
-        username
-        for username, in request.session
-        .query(UserGroup)
-        .join(UserGroup.users)
-        .filter(UserGroup.meta['directories'].contains(ticket.group))
-        .with_entities(User.username)
-        .distinct()
-    }
+    # even if there are no exclusive permissions for this group
+    # there may still be exclusive permissions for the handler code
+    if not exclusive_group_ids and ticket.group:
+        exclusive_group_ids = permissions.get(None, [])
+
+    query = request.session .query(UserGroup).join(TicketPermission)
+    query = query.filter(TicketPermission.immediate_notification.is_(True))
+    query = query.filter(TicketPermission.handler_code == ticket.handler_code)
+
+    # if the permission applies to the whole handler_code
+    # then there can't be any exclusive permissions for any
+    # specific group we're not a part of, since then we won't
+    # have permission to access the ticket
+    general_condition = TicketPermission.group.is_(None)
+    if exclusive_group_ids:
+        general_condition &= UserGroup.id.in_(exclusive_group_ids)
+    query = query.filter(
+        general_condition | (TicketPermission.group == ticket.group)
+    )
+
+    for username, realname in query.join(UserGroup.users).with_entities(
+        User.username,
+        User.realname,
+    ).distinct():
+
+        if username in seen:
+            continue
+
+        seen.add(username)
+        try:
+            yield Address(
+                display_name=realname or '',
+                addr_spec=username
+            )
+        except ValueError:
+            # if it's not a valid address then skip it
+            pass
 
 
 # from most narrow to widest
@@ -1192,19 +1205,19 @@ def widest_access(*accesses: str) -> str:
 
 @overload
 def extract_categories_and_subcategories(
-    categories: dict[str, list[dict[str, list[str]] | str]],
+    categories: list[dict[str, list[str]] | str],
     flattened: Literal[False] = False
 ) -> tuple[list[str], list[list[str]]]: ...
 
 @overload
 def extract_categories_and_subcategories(
-    categories: dict[str, list[dict[str, list[str]] | str]],
+    categories: list[dict[str, list[str]] | str],
     flattened: Literal[True]
 ) -> list[str]: ...
 
 
 def extract_categories_and_subcategories(
-    categories: dict[str, list[dict[str, list[str]] | str]],
+    categories: list[dict[str, list[str]] | str],
     flattened: bool = False
 ) -> tuple[list[str], list[list[str]]] | list[str]:
     """
@@ -1212,12 +1225,10 @@ def extract_categories_and_subcategories(
     dictionary in `newsletter settings`.
 
     Example for categories dict:
-    {
-        'org_name': [
-            {'main_category_1'},
-            {'main_category_2': ['sub_category_21', 'sub_category_22']}
-        ]
-    }
+    [
+        {'main_category_1'},
+        {'main_category_2': ['sub_category_21', 'sub_category_22']}
+    ]
     returning a tuple of lists:
         ['main_category_1', 'main_category_2'],
         [[], ['sub_category_21', 'sub_category_22']]
@@ -1227,23 +1238,39 @@ def extract_categories_and_subcategories(
 
     """
     cats: list[str] = []
-    subcats: list[list[str]] = []
+    sub_cats: list[list[str]] = []
 
     if not categories:
-        return cats, subcats
+        return cats, sub_cats
 
-    for items in categories.values():
-        for item in items:
-            if isinstance(item, dict):
-                for topic, subs in item.items():
-                    cats.append(topic)
-                    subcats.append(subs)
-            else:
-                cats.append(item)
-                subcats.append([])
+    for item in categories:
+        if isinstance(item, dict):
+            for topic, subs in item.items():
+                cats.append(topic)
+                sub_cats.append(subs or [])
+        else:
+            cats.append(item)
+            sub_cats.append([])
 
     if flattened:
-        cats.extend([item for sublist in subcats for item in sublist])
-        return cats
+        return (cats +
+                [item for sublist in sub_cats if sublist for item in sublist])
 
-    return cats, subcats
+    return cats, sub_cats
+
+
+def format_phone_number(phone_number: str) -> str:
+    """
+    Returns phone number in the international format +41 79 123 45 67
+    """
+    if not phone_number:
+        return ''
+
+    try:
+        parsed = phonenumbers.parse(phone_number, 'CH')
+
+        return phonenumbers.format_number(
+            parsed, phonenumbers.PhoneNumberFormat.INTERNATIONAL
+        )
+    except phonenumbers.phonenumberutil.NumberParseException:
+        return phone_number

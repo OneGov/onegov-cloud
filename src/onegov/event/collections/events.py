@@ -597,7 +597,7 @@ class EventCollection(Pagination[Event]):
                 tags = e.tags
             if e.filter_keywords:
                 for k, v in e.filter_keywords.items():
-                    if k in ['kalender']:
+                    if k == 'kalender':
                         assert isinstance(v, str)
                         hr_text = v
                     else:

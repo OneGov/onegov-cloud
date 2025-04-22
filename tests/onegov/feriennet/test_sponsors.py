@@ -251,8 +251,10 @@ def test_banner_in_mail(client):
 
         img_1 = '<img src="http://localhost/static/sponsors/CompanyOne-de.jpg'
         img_2 = '<img src="http://localhost/static/sponsors/CompanyTwo-de.jpg'
-        link_1 = '<a href="https://www.company-one.ch">CompanyOne</a>'
-        link_2 = '<a href="https://www.company-two.ch">CompanyTwo</a>'
+        link_1 = ('<a href="https://www.company-one.ch" '
+                  'class="sponsor-mail">CompanyOne</a>')
+        link_2 = ('<a href="https://www.company-two.ch" '
+                  'class="sponsor-mail">CompanyTwo</a>')
 
         assert img_1 in email['HtmlBody']
         assert img_2 not in email['HtmlBody']

@@ -5,7 +5,7 @@ from onegov.form import errors
 from onegov.form.core import FieldDependency
 from onegov.form.core import Form
 from onegov.form.fields import (
-    MultiCheckboxField, DateTimeLocalField, VideoURLField)
+    MultiCheckboxField, DateTimeLocalField, URLField, VideoURLField)
 from onegov.form.fields import TimeField, UploadField, UploadMultipleField
 from onegov.form.parser.core import parse_formcode
 from onegov.form.utils import as_internal_id
@@ -26,7 +26,6 @@ from wtforms.fields import PasswordField
 from wtforms.fields import RadioField
 from wtforms.fields import StringField
 from wtforms.fields import TextAreaField
-from wtforms.fields import URLField
 from wtforms.validators import Email
 from wtforms.validators import Length
 from wtforms.validators import NumberRange
@@ -42,14 +41,9 @@ if TYPE_CHECKING:
 
 _FormT = TypeVar('_FormT', bound=Form)
 
-# increasing the default filesize is *strongly discouarged*, as we are not
-# storing those files in the database, so they need to fit in memory
-#
-# if this value must be higher, we need to store the files outside the
-# database
-#
+
 MEGABYTE = 1000 ** 2
-DEFAULT_UPLOAD_LIMIT = 50 * MEGABYTE
+DEFAULT_UPLOAD_LIMIT = 100 * MEGABYTE
 
 
 @overload

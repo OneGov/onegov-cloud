@@ -1,7 +1,5 @@
 from __future__ import annotations
 
-from datetime import datetime
-import pytz
 from sqlalchemy import desc
 from onegov.form import Form
 from onegov.form.fields import ChosenSelectField
@@ -158,18 +156,17 @@ class AddFsiSubscriptionForm(Form, SubscriptionFormMixin):
         return True
 
     def ensure_6_year_time_interval(self) -> bool:
-        if self.attendee_id.data and self.course_event_id.data:
-            last_subscribed_event = self.request.session.query(
-                CourseEvent).join(CourseSubscription).filter(
-                CourseSubscription.attendee_id == self.attendee_id.data
-                ).order_by(desc(CourseEvent.start)).first()
-            if last_subscribed_event and self.event_from_form and (
-                # Chosen event needs to start at least 6 years after the last
-                # subscribed event
-                self.event_from_form.start < datetime(
-                last_subscribed_event.start.year + 6, 1, 1,
-                tzinfo=pytz.utc)
+        if self.attendee_id.data and self.event_from_form:
+            if self.request.is_admin:
+                return True
+            if not self.event_from_form.exceeds_six_year_limit(
+                self.attendee_id.data,
+                self.request
             ):
+                last_subscribed_event = self.request.session.query(
+                    CourseEvent).join(CourseSubscription).filter(
+                    CourseSubscription.attendee_id == self.attendee_id.data
+                    ).order_by(desc(CourseEvent.start)).first()
                 assert isinstance(self.course_event_id.errors, list)
                 self.course_event_id.errors.append(
                     _('The selected course must take place at least 6 years '

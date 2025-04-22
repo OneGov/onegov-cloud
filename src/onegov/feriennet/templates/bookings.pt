@@ -51,11 +51,9 @@
                         No bookings yet.
                     </p>
 
-                    <tal:b
-                        define="banner layout.app.banners(request)[0]"
-                        condition="banner"
-                        replace="banner"
-                    />
+                    <tal:b define="banner layout.app.banners(request)[0]" condition="banner">
+                        <tal:b metal:use-macro="layout.macros['banner']" define="position 'buchungen'"/>
+                    </tal:b>
 
                     <div class="row attendee-bookings-row" tal:repeat="attendee attendees" tal:condition="has_bookings" id="attendee-${attendee.id.hex}">
                         <div class="columns small-12">
@@ -225,7 +223,7 @@
                                                                                 <i class="fa fa-envelope" aria-hidden="true"></i>
                                                                             </a>
 
-                                                                            <a href="tel:${row.phone}" tal:condition="row.phone" title="${row.phone}">
+                                                                            <a href="tel:${layout.format_phone_number(row.phone)}" tal:condition="row.phone" title="${layout.format_phone_number(row.phone)}">
                                                                                 <span class="show-for-sr" i18n:translate>
                                                                                     Call <tal:b i18n:name="name">${row.parent}</tal:b>
                                                                                 </span>

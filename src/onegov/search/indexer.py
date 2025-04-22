@@ -658,8 +658,7 @@ class IndexManager:
         )
 
         for info in infos.values():
-            for alias in info['aliases']:
-                result.add(alias)
+            result.update(info['aliases'])
 
         return result
 
@@ -967,9 +966,9 @@ class ORMEventTranslator:
             self.put(translation)
         except ObjectDeletedError as ex:
             if hasattr(obj, 'id'):
-                log.error(f'Object {obj.id} was deleted before indexing: {ex}')
+                log.info(f'Object {obj.id} was deleted before indexing: {ex}')
             else:
-                log.error(f'Object {obj} was deleted before indexing: {ex}')
+                log.info(f'Object {obj} was deleted before indexing: {ex}')
 
     def delete(self, schema: str, obj: Searchable) -> None:
 

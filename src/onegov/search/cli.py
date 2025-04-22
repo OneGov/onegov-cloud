@@ -48,13 +48,13 @@ def psql_index_status(app: Framework) -> None:
                         f'documents of model {model} is low: '
                         f'{percentage:.2f}% (Hint: has reindex step been '
                         f'executed?)')
-            success = 2 if success < 2 else success
+            success = max(success, 2)
         elif percentage < 10:
             click.secho(f'ERROR Percentage of {count} indexed '
                         f'documents of model {model} is very low: '
                         f'{percentage:.2f}% (Hint: has reindex step been '
                         f'executed?)')
-            success = 3 if success < 3 else success
+            success = max(success, 3)
         else:
             click.secho(f'Percentage of {count} indexed documents of model '
                         f'{model} is {percentage:.2f}%')

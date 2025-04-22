@@ -14,7 +14,7 @@ if TYPE_CHECKING:
     from onegov.core.security.roles import Intent
 
 
-@IntranetApp.setting_section(section='roles')
+@IntranetApp.replace_setting_section(section='roles')
 def get_roles_setting() -> dict[str, set[type[Intent]]]:
     """ Returns the default roles available to onegov.core applications.
 

@@ -549,7 +549,7 @@ def test_organiser_info(client, scenario):
     contact.form['zip_code'] = '20001'
     contact.form['place'] = 'Washington'
     contact.form['email'] = 'editors-association@example.org'
-    contact.form['phone'] = '+41 23 456 789'
+    contact.form['phone'] = '+41234567890'
     contact.form['website'] = 'https://www.example.org'
     contact.form['emergency'] = '+01 234 56 78 (Peter)'
     contact.form.submit()
@@ -600,28 +600,28 @@ def test_organiser_info(client, scenario):
     assert "Admins Association" not in page
     assert "Washington" in page
     assert "editors-association@example.org" not in page
-    assert "+41 23 456 789" not in page
+    assert "+41 23 456 78 90" not in page
     assert "https://www.example.org" not in page
 
     page = with_public_organiser_data(['email'])
     assert "Admins Association" not in page
     assert "Washington" not in page
     assert "editors-association@example.org" in page
-    assert "+41 23 456 789" not in page
+    assert "+41 23 456 78 90" not in page
     assert "https://www.example.org" not in page
 
     page = with_public_organiser_data(['phone'])
     assert "Admins Association" not in page
     assert "Washington" not in page
     assert "editors-association@example.org" not in page
-    assert "+41 23 456 789" in page
+    assert "+41 23 456 78 90" in page
     assert "https://www.example.org" not in page
 
     page = with_public_organiser_data(['website'])
     assert "Admins Association" not in page
     assert "Washington" not in page
     assert "editors-association@example.org" not in page
-    assert "+41 23 456 789" not in page
+    assert "+41 23 456 78 90" not in page
     assert "https://www.example.org" in page
 
 
@@ -1149,6 +1149,40 @@ def test_confirmed_booking_view(scenario, client):
 
     page = client.get('/my-bookings')
     assert "nicht genügend Anmeldungen" in page
+
+
+def test_booking_mail(client, scenario):
+    scenario.add_period(
+        title="2019",
+        phase='booking',
+        confirmed=True,
+    )
+    scenario.add_activity(title="Foobar", state='accepted')
+    scenario.add_occasion(spots=(0, 1))
+    scenario.add_user(username='member@example.org', role='member')
+    scenario.add_attendee(
+        name="Dustin",
+        birth_date=date(2008, 1, 1),
+        username='admin@example.org'
+    )
+    scenario.commit()
+
+    client = client.spawn()
+    client.login_admin()
+    client.fill_out_profile("Scrooge", "McDuck")
+
+    # Add cancellation conditions to the ferienpass
+    page = client.get('/feriennet-settings')
+    page.form['cancellation_conditions'] = "Do not cancel"
+    page.form.submit()
+
+    page = client.get('/activity/foobar').click('Anmelden')
+    page = page.form.submit().follow()
+
+    # Check mail
+    assert len(os.listdir(client.app.maildir)) == 1
+    message_1 = client.get_email(0, 0)
+    assert "Do not cancel" in message_1['TextBody']
 
 
 def test_direct_booking_and_storno(client, scenario):

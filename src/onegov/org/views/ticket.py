@@ -23,6 +23,7 @@ from onegov.org import _, OrgApp
 from onegov.org.constants import TICKET_STATES
 from onegov.org.forms import ExtendedInternalTicketChatMessageForm
 from onegov.org.forms import TicketAssignmentForm
+from onegov.org.forms import TicketChangeTagForm
 from onegov.org.forms import TicketChatMessageForm
 from onegov.org.forms import TicketNoteForm
 from onegov.org.layout import (
@@ -46,6 +47,7 @@ from onegov.ticket.collection import ArchivedTicketCollection
 from onegov.ticket.errors import InvalidStateChange
 from onegov.gever.gever_client import GeverClientCAS
 from onegov.user import User, UserCollection
+from operator import itemgetter
 from sqlalchemy import select
 from webob import exc
 from urllib.parse import urlsplit
@@ -366,7 +368,7 @@ def send_chat_message_email_if_enabled(
         type='ticket_chat')
 
     receiver: str | None
-    if origin == 'internal':
+    if origin != 'external':
 
         # if the messages is sent to the outside, we always send an e-mail
         receiver = ticket.snapshot.get('email') or ticket.handler.email
@@ -784,6 +786,61 @@ def assign_ticket(
     }
 
 
+@OrgApp.form(model=Ticket, name='change-tag', permission=Private,
+             form=TicketChangeTagForm, template='form.pt')
+def change_tag(
+    self: Ticket,
+    request: OrgRequest,
+    form: TicketChangeTagForm,
+    layout: TicketLayout | None = None
+) -> RenderData | BaseResponse:
+
+    if self.state != 'pending' or not request.app.org.ticket_tags:
+        raise exc.HTTPNotFound()
+
+    if form.submitted(request):
+        self.tag = form.tag.data
+        selected_meta = {}
+        for item in request.app.org.ticket_tags:
+            if not isinstance(item, dict):
+                continue
+
+            tag, meta = next(iter(item.items()))
+            if tag == form.tag.data:
+                selected_meta = meta
+                break
+
+        # NOTE: We don't modify the submission data but we exclude
+        #       any metadata that's tied to the submission
+        if selected_meta and (
+            submission := getattr(self.handler, 'submission', None)
+        ):
+            form = submission.form_class()
+            selected_meta = {
+                key: value
+                for key, value in selected_meta.items()
+                if key != 'E-Mail'
+                if not any(
+                    True
+                    for field in form
+                    if field.label.text == key
+                )
+            }
+
+        self.tag_meta = selected_meta
+
+        request.success(_('Tag changed'))
+        return morepath.redirect(request.link(self))
+    elif not request.POST:
+        form.tag.data = self.tag
+
+    return {
+        'title': _('Change tag'),
+        'layout': layout or TicketLayout(self, request),
+        'form': form,
+    }
+
+
 @OrgApp.form(model=Ticket, name='message-to-submitter', permission=Private,
              form=ExtendedInternalTicketChatMessageForm, template='form.pt')
 def message_to_submitter(
@@ -1126,7 +1183,7 @@ def get_handlers(
             handlers.append(
                 (key, request.translate(handler.handler_title)))
 
-    handlers.sort(key=lambda item: item[1])
+    handlers.sort(key=itemgetter(1))
     handlers.insert(0, ('ALL', _('All Tickets')))
 
     for id, text in handlers:

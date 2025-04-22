@@ -3,10 +3,11 @@ from __future__ import annotations
 import re
 from collections import defaultdict
 from datetime import datetime
+from decimal import Decimal
 
 import click
-from email_validator import validate_email, EmailNotValidError, \
-    EmailUndeliverableError
+from email_validator import (
+    validate_email, EmailNotValidError, EmailUndeliverableError)
 from markupsafe import Markup
 
 from onegov.agency.collections import (
@@ -180,7 +181,7 @@ def import_bs_agencies(
     roots = []
     added_count = 0
 
-    print('Treated as root agencies: ', ', '.join(treat_as_root))
+    click.echo(f'Treated as root agencies: {", ".join(treat_as_root)}')
     for line in csvfile.lines:
         parent_id = line.verzvorfahreoeid or None
         basisid = line.verzorgeinheitid
@@ -656,8 +657,8 @@ def import_lu_agencies(
     top_level.sort(key=lambda a: a.title)
     for ix, agency in enumerate(top_level, start=1):
         if agency.title == 'Staatskanzlei':
-            agency.order = 0
-        agency.order = ix
+            agency.order = Decimal(0)
+        agency.order = Decimal(ix)
 
     session.flush()
 
@@ -692,7 +693,7 @@ def parse_agencies(csvfile: CSVFile[DefaultRow]) -> dict[str, str]:
         )
     added_agencies = {}
 
-    print('Treated as root agencies: ', ', '.join(treat_as_root))
+    click.echo(f'Treated as root agencies: {", ".join(treat_as_root)}')
     for line in csvfile.lines:
         basisid = line.verzorgeinheitid
         added_agencies[basisid] = line.bezeichnung.strip()
@@ -805,14 +806,14 @@ def match_person_membership_title(
     uq_person_not_found = set(person_not_found)
     uq_agency_by_name_not_found = set(agency_by_name_not_found)
 
-    print('---- STATISTICS ----')
-    print('Total rows: ', total_entries)
-    print('Unique People not found: ', len(uq_person_not_found))
-    print(
-        'Unique Agencies by name not found: ',
-        len(uq_agency_by_name_not_found)
+    click.echo('---- STATISTICS ----')
+    click.echo(f'Total rows: {total_entries}')
+    click.echo(f'Unique People not found: {len(uq_person_not_found)}')
+    click.echo(
+        f'Unique Agencies by name not found: '
+        f'{len(uq_agency_by_name_not_found)}'
     )
-    print('Updated memberships: ', len(updated_memberships))
+    click.echo(f'Updated memberships: {len(updated_memberships)}')
 
     log_file_path = '/var/lib/onegov-cloud/staka_bs_memberships_title.log'
     with open(str(log_file_path), 'w') as f:
@@ -820,7 +821,7 @@ def match_person_membership_title(
         f.write('\n'.join(uq_person_not_found))
         f.write('\n\nAGENCIES NOT FOUND\n')
         f.write('\n'.join(uq_agency_by_name_not_found))
-    print('Find the logfile in ' + log_file_path)
+    click.echo(f'Find the logfile in {log_file_path}')
 
 
 def import_membership_titles(

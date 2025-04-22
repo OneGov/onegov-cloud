@@ -27,6 +27,7 @@ from onegov.org.forms.generic import ChangeAdjacencyListUrlForm
 from onegov.org.mail import send_ticket_mail
 from onegov.org.models import TicketMessage
 from onegov.ticket import TicketCollection
+from sqlalchemy.orm import joinedload
 from uuid import uuid4
 
 
@@ -125,6 +126,10 @@ def view_agency(
     return {
         'title': self.title,
         'agency': self,
+        # NOTE: Avoid N+1 query for rendering the person's name
+        'memberships': self.memberships.options(
+            joinedload(ExtendedAgencyMembership.person)
+        ).all(),
         'layout': AgencyLayout(self, request),
         'coordinates': self.coordinates
     }
@@ -588,7 +593,7 @@ def report_agency_change(
                     'proposed_changes': form.proposed_changes
                 }
             )
-            TicketMessage.create(ticket, request, 'opened')
+            TicketMessage.create(ticket, request, 'opened', 'external')
             ticket.create_snapshot(request)
 
         send_ticket_mail(

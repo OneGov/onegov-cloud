@@ -99,7 +99,7 @@
                                                         </a>
                                                     </li>
                                                     <li>
-                                                        <a href="tel:${record.phone}">
+                                                        <a href="tel:${layout.format_phone_number(record.phone)}">
                                                             <i class="fa fa-fw fa-phone-square" aria-hidden="true"></i>
                                                             <tal:b i18n:translate>
                                                                 Contact by phone
@@ -183,7 +183,7 @@
                                                     <div>
                                                         <dt i18n:translate>Phone</dt>
                                                         <dd>
-                                                            <a href="tel:${record.phone}">${record.phone}</a>
+                                                            <a href="tel:${layout.format_phone_number(record.phone)}">${layout.format_phone_number(record.phone)}</a>
                                                         </dd>
                                                     </div>
                                                 </dl>

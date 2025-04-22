@@ -185,6 +185,7 @@ class Serializers:
 # The builtin serializers
 default_serializers = Serializers()
 
+# TODO: More efficient date/time serialization/deserialization
 default_serializers.register(StringSerializer(
     tag=0,
     target=datetime.datetime,
@@ -346,3 +347,12 @@ def unpackb(value: bytes) -> Any:
         ext_hook=default_serializers.decode,
         option=ormsgpack.OPT_NON_STR_KEYS,
     )
+
+
+def packable(obj: Any) -> bool:
+    try:
+        packb(obj)
+    except Exception:
+        return False
+    else:
+        return True

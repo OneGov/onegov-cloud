@@ -58,6 +58,7 @@ from onegov.core.request import CoreRequest
 from onegov.core.utils import batched, PostThread
 from onegov.server import Application as ServerApplication
 from onegov.server.utils import load_class
+from operator import itemgetter
 from psycopg2.extensions import TransactionRollbackError
 from purl import URL
 from sqlalchemy.exc import OperationalError
@@ -123,6 +124,7 @@ class Framework(
     cronjob = directive(directives.CronjobAction)
     static_directory = directive(directives.StaticDirectoryAction)
     template_variables = directive(directives.TemplateVariablesAction)
+    replace_setting = directive(directives.ReplaceSettingAction)
     replace_setting_section = directive(directives.ReplaceSettingSectionAction)
 
     #: sets the same-site cookie directive, (may need removal inside iframes)
@@ -228,7 +230,7 @@ class Framework(
                 return fn(*args, **kwargs)
             except Exception:
                 if getattr(self, 'print_exceptions', False):
-                    print('=' * 80, file=sys.stderr)
+                    print('=' * 80, file=sys.stderr)  # noqa: T201
                     traceback.print_exc()
                 raise
 
@@ -430,7 +432,7 @@ class Framework(
 
         members = sorted(
             inspect.getmembers(self.__class__, callable),
-            key=lambda item: item[0]
+            key=itemgetter(0)
         )
 
         for n, method in members:
@@ -447,7 +449,7 @@ class Framework(
     ) -> None:
 
         # certain namespaces are reserved for internal use:
-        assert self.namespace not in {'global'}
+        assert self.namespace != 'global'
 
         self.dsn = dsn
 
@@ -1106,9 +1108,7 @@ class Framework(
         timestamp = datetime.now().timestamp()
 
         def finish_batch() -> None:
-            nonlocal buffer
-            nonlocal num_included
-            nonlocal batch_num
+            nonlocal buffer, num_included, batch_num
 
             buffer.write(b']')
 

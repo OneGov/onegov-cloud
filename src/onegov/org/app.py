@@ -17,18 +17,19 @@ from onegov.core import Framework, utils
 from onegov.core.framework import default_content_security_policy
 from onegov.core.i18n import default_locale_negotiator
 from onegov.core.orm.cache import orm_cached, request_cached
-from onegov.core.templates import PageTemplate
+from onegov.core.templates import PageTemplate, render_template
 from onegov.core.widgets import transform_structure
 from onegov.file import DepotApp
 from onegov.form import FormApp
 from onegov.gis import MapboxApp
 from onegov.org import directives
 from onegov.org.auth import MTANAuth
+from onegov.org.exceptions import MTANAccessLimitExceeded
 from onegov.org.initial_content import create_new_organisation
 from onegov.org.models import Dashboard, Organisation, PublicationCollection
 from onegov.org.request import OrgRequest
 from onegov.org.theme import OrgTheme
-from onegov.pay import PayApp
+from onegov.pay import PayApp, log as pay_log
 from onegov.reservation import LibresIntegration
 from onegov.search import ElasticsearchApp
 from onegov.ticket import TicketCollection
@@ -37,7 +38,8 @@ from onegov.user import UserApp
 from onegov.websockets import WebsocketsApp
 from purl import URL
 from types import MethodType
-from webob.exc import WSGIHTTPException, HTTPTooManyRequests
+from webob import Response
+from webob.exc import WSGIHTTPException
 
 
 from typing import Any, Literal, TYPE_CHECKING
@@ -52,7 +54,6 @@ if TYPE_CHECKING:
     from onegov.pay import Price
     from onegov.ticket.collection import TicketCount
     from reg.dispatch import _KeyLookup
-    from webob import Response
 
 
 class OrgApp(Framework, LibresIntegration, ElasticsearchApp, MapboxApp,
@@ -125,6 +126,15 @@ class OrgApp(Framework, LibresIntegration, ElasticsearchApp, MapboxApp,
         self.enable_user_registration = enable_user_registration
         self.enable_yubikey = enable_yubikey
         self.disable_password_reset = disable_password_reset
+
+    def configure_api_token(
+        self,
+        *,
+        plausible_api_token: str = '',
+        ** cfg: Any
+    ) -> None:
+
+        self.plausible_api_token = plausible_api_token
 
     def configure_mtan_hook(self, **cfg: Any) -> None:
         """
@@ -204,16 +214,34 @@ class OrgApp(Framework, LibresIntegration, ElasticsearchApp, MapboxApp,
 
     @orm_cached(policy='on-table-change:ticket_permissions')
     def ticket_permissions(self) -> dict[str, dict[str | None, list[str]]]:
-        result: dict[str, dict[str | None, list[str]]] = {}
+        """ Exclusive ticket permissions for authorization. """
+        permissions: dict[str, dict[str | None, tuple[bool, list[str]]]] = {}
         for permission in self.session().query(TicketPermission).with_entities(
             TicketPermission.handler_code,
             TicketPermission.group,
-            TicketPermission.user_group_id
+            TicketPermission.user_group_id,
+            TicketPermission.exclusive,
         ):
-            handler = result.setdefault(permission.handler_code, {})
-            group = handler.setdefault(permission.group, [])
+            handler = permissions.setdefault(permission.handler_code, {})
+            has_exclusive, group = handler.setdefault(
+                permission.group,
+                (permission.exclusive, [])
+            )
             group.append(permission.user_group_id.hex)
-        return result
+            if permission.exclusive and not has_exclusive:
+                handler[permission.group] = (True, group)
+
+        return {
+            handler_code: {
+                group: group_perms
+                for group, (exclusive, group_perms) in handler_perms.items()
+                # the permission is only exclusive, if at least one user group
+                # has exclusive permissions. But user groups with non-exclusive
+                # permissions still have permission to access the ticket.
+                if exclusive
+            }
+            for handler_code, handler_perms in permissions.items()
+        }
 
     @orm_cached(policy='on-table-change:files')
     def publications_count(self) -> int:
@@ -371,21 +399,28 @@ class OrgApp(Framework, LibresIntegration, ElasticsearchApp, MapboxApp,
         if self.org.square_logo_url:
             extra['image'] = self.org.square_logo_url
 
-        return provider.checkout_button(
-            label=button_label,
-            # FIXME: This is a little suspect, since StripePaymentProvider
-            #        would previously have raised an exception for a
-            #        missing price, should it really be legal to generate
-            #        a checkout button when there is no price?
-            amount=price and price.amount or None,
-            currency=price and price.currency or None,
-            email=email,
-            name=self.org.name,
-            description=title,
-            complete_url=complete_url,
-            request=request,
-            **extra
-        )
+        try:
+            return provider.checkout_button(
+                label=button_label,
+                # FIXME: This is a little suspect, since StripePaymentProvider
+                #        would previously have raised an exception for a
+                #        missing price, should it really be legal to generate
+                #        a checkout button when there is no price?
+                amount=price and price.amount or None,
+                currency=price and price.currency or None,
+                email=email,
+                name=self.org.name,
+                description=title,
+                complete_url=complete_url,
+                request=request,
+                **extra
+            )
+        except Exception:
+            pay_log.info(
+                f'Failed to generate checkout button for {provider.title}:',
+                exc_info=True
+            )
+            return None
 
     def redirect_after_login(
         self,
@@ -577,6 +612,27 @@ def get_public_ticket_messages() -> Collection[str]:
 @OrgApp.setting(section='org', name='disabled_extensions')
 def get_disabled_extensions() -> Collection[str]:
     return ()
+
+
+@OrgApp.setting(section='org', name='render_mtan_access_limit_exceeded')
+def get_render_mtan_access_limit_exceeded(
+) -> Callable[[MTANAccessLimitExceeded, OrgRequest], Response]:
+
+    # circular import
+    from onegov.org.layout import DefaultLayout
+
+    def render_mtan_access_limit_exceeded(
+        self: MTANAccessLimitExceeded,
+        request: OrgRequest
+    ) -> Response:
+        return Response(
+            render_template('mtan_access_limit_exceeded.pt', request, {
+                'layout': DefaultLayout(self, request),
+                'title': self.title,
+            }),
+            status=423
+        )
+    return render_mtan_access_limit_exceeded
 
 
 @OrgApp.tween_factory(under=content_security_policy_tween_factory)
@@ -791,6 +847,7 @@ def get_common_asset() -> Iterator[str]:
     yield 'items_selectable.js'
     yield 'notifications.js'
     yield 'foundation.accordion.js'
+    yield 'chosen_select_hierarchy.js'
 
 
 @OrgApp.webasset('fontpreview')
@@ -839,7 +896,13 @@ def wrap_with_mtan_hook(
 
             # access limit exceeded
             if request.mtan_access_limit_exceeded:
-                return HTTPTooManyRequests()
+                # NOTE: Ideally we would just be able to return the exception
+                #       as a response here, but unfortunately we would bypass
+                #       the tweens that way, so we have to manually render this
+                return self.settings.org.render_mtan_access_limit_exceeded(
+                    MTANAccessLimitExceeded(),
+                    request
+                )
 
             # record access
             request.mtan_accesses.add(url=request.path_url)

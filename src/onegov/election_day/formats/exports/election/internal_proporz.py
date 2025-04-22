@@ -11,6 +11,7 @@ from onegov.election_day.models import List
 from onegov.election_day.models import ListConnection
 from onegov.election_day.models import ListPanachageResult
 from onegov.election_day.models import ListResult
+from operator import itemgetter
 from sqlalchemy.orm import aliased
 from sqlalchemy.orm import object_session
 
@@ -103,7 +104,7 @@ def export_election_internal_proporz(
         List.list_id
     )
     list_results_grouped = {}
-    for key, group in groupby(list_results, lambda x: x[1]):
+    for key, group in groupby(list_results, itemgetter(1)):
         list_results_grouped[key] = {g[2]: g[0] for g in group}
 
     # We need to collect the panachage results per list

@@ -468,7 +468,7 @@ class ElasticsearchApp(morepath.App):
                     self.es_orm_events.index(schema, obj)
 
             except Exception as e:
-                print(f"Error psql indexing model '{model}': {e}")
+                index_log.info(f"Error psql indexing model '{model}': {e}")
             finally:
                 session.invalidate()
                 session.bind.dispose()
@@ -481,7 +481,7 @@ class ElasticsearchApp(morepath.App):
                 reindex_model, (model for model in models)
             )
             if fail:
-                print(tuple(results))
+                index_log.info(tuple(results))
 
         self.es_indexer.bulk_process()
         self.psql_indexer.bulk_process()

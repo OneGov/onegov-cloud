@@ -88,6 +88,20 @@ class FeriennetSettingsForm(Form):
         label=_('Require the political municipality on registration'),
         fieldset=_('Political Municipality'))
 
+    require_swisspass = BooleanField(
+        label=_('Require a SwissPass ID of attendees'),
+        fieldset=_('SwissPass ID'),
+        default=False
+    )
+
+    cancellation_conditions = HtmlField(
+        label=_('Cancellation condition text'),
+        fieldset=_('Cancellation conditions'),
+        description=_('The text will be shown below the '
+                'confirmation text for an activity in the mail'),
+        render_kw={'rows': 10}
+    )
+
     show_related_contacts = BooleanField(
         label=_(
             'Parents can see the contacts of other parents in '
@@ -223,6 +237,8 @@ class FeriennetSettingsForm(Form):
 
         attributes = (
             ('show_political_municipality', False),
+            ('require_swisspass', False),
+            ('cancellation_conditions', ''),
             ('require_full_age_for_registration', False),
             ('show_related_contacts', False),
             ('public_organiser_data', self.request.app.public_organiser_data),
@@ -257,6 +273,8 @@ class FeriennetSettingsForm(Form):
 
         attributes = (
             'show_political_municipality',
+            'require_swisspass',
+            'cancellation_conditions',
             'require_full_age_for_registration',
             'show_related_contacts',
             'public_organiser_data',

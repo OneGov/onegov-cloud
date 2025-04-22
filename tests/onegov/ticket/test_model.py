@@ -1,4 +1,5 @@
 import pytest
+import transaction
 
 from datetime import timedelta
 from freezegun import freeze_time
@@ -8,6 +9,7 @@ from onegov.ticket.errors import InvalidStateChange
 from onegov.user import User
 from onegov.user import UserGroup
 from sedate import utcnow
+from sqlalchemy.exc import IntegrityError
 
 
 def test_transitions(session):
@@ -239,3 +241,55 @@ def test_ticket_permission(session):
     session.delete(user_group)
     session.flush()
     assert session.query(TicketPermission).count() == 0
+
+
+def test_ticket_permission_uniqueness(session):
+    user_group = UserGroup(name='group')
+    permission = TicketPermission(
+        handler_code='PER',
+        group=None,
+        user_group=user_group,
+    )
+    session.add(user_group)
+    session.add(permission)
+    session.flush()
+    transaction.commit()
+    transaction.begin()
+
+    user_group = session.query(UserGroup).one()
+    permission = session.query(TicketPermission).one()
+    assert permission.handler_code == 'PER'
+    assert permission.group is None
+    assert permission.user_group == user_group
+
+    # duplicate permission
+    duplicate = TicketPermission(
+        handler_code='PER',
+        group=None,
+        user_group=user_group,
+    )
+    session.add(duplicate)
+    with pytest.raises(ValueError, match=r'Uniqueness violation'):
+        session.flush()
+    transaction.abort()
+    transaction.begin()
+
+    assert session.query(TicketPermission).count() == 1
+
+
+def test_invalid_ticket_permission(session):
+    user_group = UserGroup(name='group')
+    permission = TicketPermission(
+        handler_code='PER',
+        group=None,
+        user_group=user_group,
+        exclusive=False,
+        immediate_notification=False,
+    )
+    session.add(user_group)
+    session.add(permission)
+    with pytest.raises(
+        IntegrityError,
+        match=r'check constraint "no_redundant_ticket_permissions"'
+    ):
+        transaction.commit()

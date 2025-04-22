@@ -722,6 +722,18 @@ $pageref-color-hover: $iron;
                 }
             }
         }
+
+        &.more-list-level-2 {
+            padding-bottom: 0;
+            ul {
+                box-shadow: -10px 0 8px -10px rgba(0, 0, 0, .07);
+                margin-left: .25rem;
+
+                .list-link, .list-lead, .list-hint {
+                    padding-left: 1rem;
+                }
+            }
+        }
     }
 }
 
@@ -943,6 +955,23 @@ section#content th {
 
     h2 {
         margin-right: 1.5rem;
+    }
+}
+
+.subgroup-title {
+    display: flex;
+    align-items: center;
+    border-top: 1px solid #f5f5f5;
+
+    h5 {
+        margin-top: .75rem;
+        margin-bottom: .75rem;
+        margin-right: 1.5rem;
+    }
+
+    .button.hollow.find-your-spot-link {
+        margin-top: 0;
+        margin-bottom: 0;
     }
 }
 
@@ -1205,6 +1234,14 @@ ul.recipients {
     footer {
         display: none;
     }
+
+    .show-in-iframe .breadcrumbs {
+        display: block;
+    }
+
+    #back-button {
+        display: block;
+    }
 }
 
 /*
@@ -1300,4 +1337,38 @@ ul.recipients {
     cursor: not-allowed;
     color: grey;
     opacity: 0.5;
+}
+
+
+/*
+    Code Block, Code Inline, Code
+
+    <pre><code>...</code></pre>
+*/
+
+$code-background: #f5f5f5;
+$code-border-radius: 4px;
+$code-padding-block: 0.5rem;
+$code-padding-inline: 0.125rem;
+$code-block-margin-bottom: 0.8rem;
+
+pre code,
+.code-block,
+.code-inline,
+code {
+    background: $code-background;
+    border-radius: $code-border-radius;
+}
+
+pre code,
+.code-block {
+    padding: $code-padding-block;
+    margin-bottom: $code-block-margin-bottom;
+    display: block;
+}
+
+.code-inline,
+code {
+    padding: $code-padding-inline;
+    display: inline;
 }

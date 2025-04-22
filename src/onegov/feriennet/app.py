@@ -31,7 +31,6 @@ if TYPE_CHECKING:
     from more.content_security import ContentSecurityPolicy
 
 
-# FIXME: Get rid of inline JavaScript
 BANNER_TEMPLATE = Markup("""
 <div class="sponsor-banner">
     <div class="sponsor-banner-{id}">
@@ -39,15 +38,6 @@ BANNER_TEMPLATE = Markup("""
             <img src="{src}">
             <p class="banner-info">{info}</p>
         </a>
-        <img src="{tracker}"
-                border="0"
-                height="1"
-                width="1"
-                onerror="
-                this.getAttribute('src').length != 0
-                && this.parentNode.parentNode.remove()
-                "
-                alt="Advertisement">
     </div>
 </div>
 """)
@@ -168,7 +158,7 @@ class FeriennetApp(OrgApp):
         else:
             return sponsors
 
-    def banners(self, request: FeriennetRequest) -> list[Markup]:
+    def banners(self, request: FeriennetRequest) -> list[dict[str, str]]:
         sponsors = self.get_sponsors(request)
         banners = []
 
@@ -176,13 +166,11 @@ class FeriennetApp(OrgApp):
             sponsor = sponsor.compiled(request)
             info = sponsor.banners.get('info', None)
             banners.append(
-                BANNER_TEMPLATE.format(
-                    id=id,
-                    src=sponsor.url_for(request, sponsor.banners['src']),
-                    url=sponsor.banners['url'],
-                    tracker=sponsor.banners.get('tracker', ''),
-                    info=info if info else ''
-                )
+                {
+                    'src': sponsor.url_for(request, sponsor.banners['src']),
+                    'url': sponsor.banners['url'],
+                    'info': info if info else ''
+                }
             )
 
         return banners

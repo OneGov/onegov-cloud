@@ -46,7 +46,7 @@ def test_custom_msgpack():
 
 @pytest.mark.parametrize('data', [
     date(2020, 10, 10),
-    datetime(2020, 10, 10, 12, 0, 0, 14, UTC),
+    datetime(2020, 10, 10, 12, 0, 14, 0, UTC),
     time(15, 0, 15),
     uuid4(),
     (Decimal(1), Decimal(2)),
@@ -66,7 +66,7 @@ def test_custom_msgpack():
     {'a': Decimal(1), None: Decimal(2)}
 ])
 def test_roundtrip(data):
-    return msgpack.unpackb(msgpack.packb(data)) == data
+    assert msgpack.unpackb(msgpack.packb(data)) == data
 
 
 def test_not_serializable():

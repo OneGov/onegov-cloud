@@ -32,13 +32,14 @@ def import_dws_vk(request: WinterthurRequest) -> None:
                 '/public/basic.ics')
     try:
         response = requests.get(ical_url, timeout=30)
-    except Exception as e:
-        raise Exception(
-            f'Failed to retrieve DWS events from {ical_url}') from e
+    except Exception:
+        log.exception(f'Failed to retrieve DWS events from {ical_url}')
+        return
 
-    if not response.status_code == 200:
-        raise Exception(f'Failed to retrieve DWS events from {ical_url}. '
-                        f'Status code: {response.status_code}')
+    if response.status_code != 200:
+        log.exception(f'Failed to retrieve DWS events from {ical_url}. '
+                      f'Status code: {response.status_code}')
+        return
 
     icon_name = 'Veranstaltung_breit.jpg'
     icon_path = module_path('onegov.winterthur', 'static') + os.sep + icon_name

@@ -1,6 +1,6 @@
 from __future__ import annotations
 
-from onegov.core.orm import Base
+from onegov.core.orm import observes, Base
 from onegov.core.orm.mixins import TimestampMixin
 from onegov.core.orm.types import JSON, UUID
 from onegov.core.orm.types import UTCDateTime
@@ -11,8 +11,11 @@ from onegov.user import User
 from onegov.user import UserGroup
 from sedate import utcnow
 from sqlalchemy import Boolean, Column, Enum, ForeignKey, Integer, Text
+from sqlalchemy import CheckConstraint, Index
+from sqlalchemy.dialects.postgresql import HSTORE
 from sqlalchemy.ext.declarative import declared_attr
-from sqlalchemy.orm import backref, deferred, relationship
+from sqlalchemy.ext.mutable import MutableDict
+from sqlalchemy.orm import backref, deferred, object_session, relationship
 from uuid import uuid4
 
 
@@ -59,6 +62,21 @@ class Ticket(Base, TimestampMixin, ORMSearchable):
     #: the group this ticket belongs to. used to differentiate tickets
     #: belonging to one specific handler (handler -> group -> title)
     group: Column[str] = Column(Text, nullable=False)
+
+    #: Tags/Categories of the ticket
+    _tags: Column[dict[str, str] | None] = Column(  # type: ignore[call-overload]
+        MutableDict.as_mutable(HSTORE),  # type:ignore[no-untyped-call]
+        nullable=True,
+        name='tags'
+    )
+
+    #: the data associated with the selected tags at the time they were
+    #: selected
+    tag_meta: Column[dict[str, Any] | None] = Column(  # type: ignore[call-overload]
+        JSON,
+        nullable=True,
+        name='tags_meta'
+    )
 
     #: the name of the handler associated with this ticket, may be used to
     #: create custom polymorphic subclasses of this class. See
@@ -145,6 +163,10 @@ class Ticket(Base, TimestampMixin, ORMSearchable):
         'polymorphic_on': handler_code
     }
 
+    __table_args__ = (
+        Index('ix_tickets_tags', _tags, postgresql_using='gin'),
+    )
+
     # limit the search to the ticket number -> the rest can be found
     es_public = False
     es_properties = {
@@ -156,6 +178,18 @@ class Ticket(Base, TimestampMixin, ORMSearchable):
         'ticket_data': {'type': 'localized_html'},
         'extra_localized_text': {'type': 'localized'}
     }
+
+    # NOTE: For now we only allow setting a single tag, in order to
+    #       avoid conflicts between tag-metadata, but in the future
+    #       we may need to allow it anyways, so that's why it's a
+    #       HSTORE column
+    @property
+    def tag(self) -> str | None:
+        return next(iter(self._tags.keys())) if self._tags else None
+
+    @tag.setter
+    def tag(self, value: str | None) -> None:
+        self._tags = {value: ''} if value else None
 
     @property
     def extra_localized_text(self) -> str | None:
@@ -363,3 +397,73 @@ class TicketPermission(Base, TimestampMixin):
 
     #: the group this permission addresses
     group: Column[str | None] = Column(Text, nullable=True)
+
+    #: whether or not this permission is exclusive
+    #: if a permission is exclusive, the same permission may not
+    #: be given non-exclusively to another group, but multiple groups
+    #: may have the same exclusive or non-exclusive permission
+    exclusive: Column[bool] = Column(
+        Boolean,
+        nullable=False,
+        default=True,
+        index=True
+    )
+
+    #: whether or not to immediately send notifications about new tickets
+    immediate_notification: Column[bool] = Column(
+        Boolean,
+        nullable=False,
+        default=False,
+        index=True
+    )
+
+    __table_args__ = (
+        CheckConstraint(
+            exclusive.isnot_distinct_from(True)
+            | immediate_notification.isnot_distinct_from(True),
+            name='no_redundant_ticket_permissions'
+        ),
+    )
+
+    # NOTE: A unique constraint doesn't work here, since group is nullable
+    @observes('handler_code', 'group')
+    def ensure_uniqueness(
+        self,
+        handler_code: str,
+        group: str | None
+    ) -> None:
+
+        # this should always be set
+        assert self.handler_code
+        if not (user_group_id := (
+            self.user_group_id
+            or (self.user_group and self.user_group.id)
+        )):
+            # this is an incomplete record that should fail in
+            # a different way
+            return
+
+        session = object_session(self)
+        query = session.query(TicketPermission)
+
+        # we can't conflict with ourselves, only with other permissions
+        if self.id is not None:
+            query = query.filter(
+                TicketPermission.id != self.id
+            )
+
+        # this defines whether or not two permissions target the same tickets
+        query = query.filter(
+            TicketPermission.handler_code == self.handler_code
+        )
+        query = query.filter(
+            TicketPermission.group.isnot_distinct_from(self.group)
+        )
+
+        # the exact same permission may only exist once per user group
+        constraint_violated = query.filter(
+            TicketPermission.user_group_id == user_group_id
+        ).exists()
+
+        if session.query(constraint_violated).scalar():
+            raise ValueError('Uniqueness violation in ticket permissions')

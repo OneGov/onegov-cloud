@@ -15,12 +15,12 @@ repos:
         exclude: .pre-commit-config.yaml
       - id: pt_structure
   - repo: https://github.com/astral-sh/ruff-pre-commit
-    rev: v0.9.9
+    rev: v0.11.3
     hooks:
       - id: ruff
         args: [ "--fix" ]
   - repo: https://github.com/PyCQA/flake8
-    rev: 7.1.2
+    rev: 7.2.0
     hooks:
       - id: flake8
         files: '^src.*\.py'
@@ -32,7 +32,7 @@ repos:
     - id: scss-lint
       files: '^src/.*\.scss'
   - repo: https://github.com/pre-commit/mirrors-eslint
-    rev: v9.21.0
+    rev: v9.23.0
     hooks:
     - id: eslint
       files: '^src/.*\.jsx?$'

@@ -3,9 +3,10 @@ from __future__ import annotations
 import datetime
 import secrets
 
+from decimal import Decimal
 from functools import lru_cache
 from libres import new_scheduler
-from libres.db.models import Allocation
+from libres.db.models import Allocation, Reservation
 from libres.db.models.base import ORMBase
 from onegov.core.orm import ModelBase
 from onegov.core.orm.mixins import content_property, dict_property
@@ -16,7 +17,7 @@ from onegov.form import parse_form
 from onegov.pay import Price, process_payment
 from sedate import align_date_to_day, utcnow
 from sqlalchemy import Column, Text
-from sqlalchemy.orm import relationship
+from sqlalchemy.orm import relationship, undefer
 from uuid import uuid4
 
 
@@ -100,6 +101,9 @@ class Resource(ORMBase, ModelBase, ContentMixin,
 
     #: the group to which this resource belongs to (may be any kind of string)
     group: Column[str | None] = Column(Text, nullable=True)
+
+    #: the subgroup to which this resource belongs to
+    subgroup: Column[str | None] = Column(Text, nullable=True)
 
     #: the type of the resource, this can be used to create custom polymorphic
     #: subclasses. See `<https://docs.sqlalchemy.org/en/improve_toc/
@@ -260,17 +264,42 @@ class Resource(ORMBase, ModelBase, ContentMixin,
         #        for type checking. We could pretend that the Scheduler
         #        always gives us the class we bound do it, but that's
         #        not technically true...
-        _reservations = self.scheduler.reservations_by_token(token)
-        reservations = cast('Query[CustomReservation]', _reservations)
+        reservations = cast(
+            'Query[CustomReservation]',
+            self.scheduler.reservations_by_token(token)
+            .options(undefer(Reservation.data))
+        )
 
-        prices = (price for r in reservations if (price := r.price(self)))
+        reservations_iter = iter(reservations)
 
-        total = sum(prices, Price.zero())
+        reservation = next(reservations_iter, None)
+        if reservation is not None:
+            meta = (reservation.data or {}).get('ticket_tag_meta', {})
+            # HACK: This is not very robust, we should probably come up
+            #       with something better to handle price reductions for
+            #       specific tags
+            try:
+                reduced_amount = Decimal(meta.get('Price', meta.get('Preis')))
+                assert reduced_amount >= Decimal('0')
+            except Exception:
+                reduced_amount = None
+            total = reservation.price(self) or Price.zero()
+        else:
+            reduced_amount = None
+            total = Price.zero()
+
+        prices = (price for r in reservations_iter if (price := r.price(self)))
+
+        total += sum(prices, Price.zero())
 
         if extra and total:
             total += extra
         elif extra:
             total = extra
+
+        if reduced_amount is not None and reduced_amount < total.amount:
+            # return the reduced amount instead
+            return Price(reduced_amount, total.currency)
 
         return total
 

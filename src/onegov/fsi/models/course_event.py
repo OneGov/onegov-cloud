@@ -9,7 +9,8 @@ from icalendar import Calendar as vCalendar
 from icalendar import Event as vEvent
 from sedate import utcnow, to_timezone
 from sqlalchemy import (
-    Column, Boolean, SmallInteger, Enum, Text, Interval, ForeignKey, or_, and_)
+    Column, Boolean, SmallInteger, Enum, Text, Interval, ForeignKey, desc, or_,
+    and_)
 from sqlalchemy.ext.hybrid import hybrid_property
 from sqlalchemy.orm import relationship, object_session
 from uuid import uuid4
@@ -270,7 +271,7 @@ class CourseEvent(Base, TimestampMixin, ORMSearchable):
     def available_seats(self) -> int | None:
         if self.max_attendees:
             seats = self.max_attendees - self.cached_reservation_count
-            return 0 if seats < 0 else seats
+            return max(seats, 0)
         return None
 
     @property
@@ -503,4 +504,22 @@ class CourseEvent(Base, TimestampMixin, ORMSearchable):
         for entry_id, in self.excluded_subscribers(year, as_uids=True):
             if str(entry_id) == str(att_id):
                 return False
+        return True
+
+    def exceeds_six_year_limit(self, attendee_id: str | UUID,
+                               request: FsiRequest) -> bool:
+        last_subscribed_event = request.session.query(
+            CourseEvent).join(CourseSubscription).filter(
+            CourseSubscription.attendee_id == attendee_id
+            ).order_by(desc(CourseEvent.start)).first()
+
+        if last_subscribed_event is None:
+            return True
+        elif (
+            # Chosen event needs to start at least 6 years after the last
+            # subscribed event
+            self.start < datetime.datetime(
+                last_subscribed_event.start.year + 6, 1, 1, tzinfo=pytz.utc)
+        ):
+            return False
         return True
