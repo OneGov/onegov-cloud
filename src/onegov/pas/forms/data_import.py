@@ -4,6 +4,7 @@ import json
 from onegov.core.utils import dictionary_to_binary
 from onegov.form import Form
 from onegov.form.fields import UploadMultipleField
+from wtforms.fields import BooleanField
 from onegov.pas import _
 from onegov.pas.importer.json_import import (
     MembershipData,
@@ -39,22 +40,33 @@ class DataImportForm(Form):
         ),
     )
 
+    validate_schema = BooleanField(
+        label=_('Validate JSON Schema'),
+        description=_(
+            'Check if the uploaded JSON files match the expected structure.'
+        ),
+        default=True,
+    )
+
     def validate_people_source(self, field: UploadMultipleField) -> None:
-        self._validate_json_results_against_type(
-            field, PersonData
-        )
+        if self.validate_schema.data:
+            self._validate_json_results_against_type(
+                field, PersonData
+            )
 
     def validate_organizations_source(
             self, field: UploadMultipleField
     ) -> None:
-        self._validate_json_results_against_type(
-            field, OrganizationData
-        )
+        if self.validate_schema.data:
+            self._validate_json_results_against_type(
+                field, OrganizationData
+            )
 
     def validate_memberships_source(self, field: UploadMultipleField) -> None:
-        self._validate_json_results_against_type(
-            field, MembershipData
-        )
+        if self.validate_schema.data:
+            self._validate_json_results_against_type(
+                field, MembershipData
+            )
 
     def _validate_json_results_against_type(
         self,

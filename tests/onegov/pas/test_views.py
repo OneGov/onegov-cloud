@@ -1,7 +1,11 @@
 import pytest
-import os
+import json
 from webtest import Upload
 from onegov.pas import _
+from typing import TYPE_CHECKING, Any
+
+if TYPE_CHECKING:
+    pass
 
 
 @pytest.mark.flaky(reruns=5, only_rerun=None)
@@ -247,9 +251,13 @@ def test_views_manage(client_with_es):
            settings.click('Parlamentarier:innen')
 
 
-def test_view_upload_json(client):
-
-    """ Test successful import of all data.
+def test_view_upload_json(
+    client,
+    people_json,
+    organization_json,
+    memberships_json
+):
+    """ Test successful import of all data using fixtures.
 
     *1. Understanding the Data and Models**
 
@@ -276,66 +284,113 @@ def test_view_upload_json(client):
 
     client.login_admin()
 
-    def yield_paths():
-        """ Yields paths in this order: organization, membership, people """
-        base_path = '/home/cyrill/pasimport/json'
-        yield [base_path + '/organization.json']
-        membership_count = 7
-        membership_paths = [
-            f'{base_path}/memberships_{i}.json'
-            for i in range(1, membership_count + 1)
-        ]
-        assert all(
-            os.path.exists(path) for path in membership_paths
-        ), "Some membership paths don't exist"
-        yield membership_paths
+    # --- Reference: Previously used function for local file testing ---
+    # import os
+    # def yield_paths():
+    #     """ Yields paths in this order: organization, membership, people """
+    #     base_path = '/path/to/your/local/json/files' # Adjust this path
+    #     yield [base_path + '/organization.json']
+    #     membership_count = 7 # Adjust as needed
+    #     membership_paths = [
+    #         f'{base_path}/memberships_{i}.json'
+    #         for i in range(1, membership_count + 1)
+    #     ]
+    #     assert all(
+    #         os.path.exists(path) for path in membership_paths
+    #     ), "Some membership paths don't exist"
+    #     yield membership_paths
+    #
+    #     # Yield people paths after validating existence
+    #     # Adjust as needed:
+    #     people_paths = [f'{base_path}/people_{i}.json' for i in range(1, 3)]
+    #     assert all(
+    #         os.path.exists(path) for path in people_paths
+    #     ), "Some people paths don't exist"
+    #     yield people_paths
 
-        # Yield people paths after validating existence
-        people_paths = [f'{base_path}/people_{i}.json' for i in range(1, 3)]
-        assert all(
-            os.path.exists(path) for path in people_paths
-        ), "Some people paths don't exist"
-        yield people_paths
 
-    def do_upload_procedure():
+    # def upload_file(filepath):
+    #     with open(filepath, 'rb') as f:
+    #         content = f.read()
+    #         return Upload(
+    #             os.path.basename(filepath),
+    #             content,
+    #             'application/json'
+    #         )
+
+    # # Get all paths
+    # paths_generator = yield_paths()
+
+    # org_paths = next(paths_generator)
+    # page.form['organizations_source'] = [
+    #     upload_file(path) for path in org_paths
+    # ]
+
+    # membership_paths = next(paths_generator)
+    # page.form['memberships_source'] = [
+    #     upload_file(path) for path in membership_paths
+    # ]
+
+    # people_paths = next(paths_generator)
+    # page.form['people_source'] = [
+    #     upload_file(path) for path in people_paths
+    # ]
+
+
+    # --- End Reference ---
+
+    def create_upload_object(
+        filename: str, data: dict[str, list[Any]]
+    ) -> Upload:
+        """Creates a webtest Upload object from a dictionary."""
+        content_bytes = json.dumps(data).encode('utf-8')
+        return Upload(
+            filename,
+            content_bytes,
+            'application/json'
+        )
+
+    def do_upload_procedure(
+        org_data,
+        member_data,
+        ppl_data
+    ):
+        """Uploads data using Upload objects created from fixtures."""
         page = client.get('/pas-import')
 
-        def upload_file(filepath):
-            with open(filepath, 'rb') as f:
-                content = f.read()
-                return Upload(
-                    os.path.basename(filepath),
-                    content,
-                    'application/json'
-                )
+        # Create Upload objects from the fixture data
+        # We wrap the list in the expected 'results' structure if needed,
+        # matching the fixture structure.
+        org_upload = create_upload_object('organization.json', org_data)
+        # Assuming memberships_json fixture contains the 'results' list
+        memberships_upload = create_upload_object(
+            'memberships.json', member_data
+        )
+        # Assuming people_json fixture contains the 'results' list
+        people_upload = create_upload_object('people.json', ppl_data)
 
-        # Get all paths
-        paths_generator = yield_paths()
-
-        org_paths = next(paths_generator)
-        page.form['organizations_source'] = [
-            upload_file(path) for path in org_paths
-        ]
-
-        membership_paths = next(paths_generator)
-        page.form['memberships_source'] = [
-            upload_file(path) for path in membership_paths
-        ]
-        people_paths = next(paths_generator)
-        page.form['people_source'] = [
-            upload_file(path) for path in people_paths
-        ]
+        # Assign the Upload objects to the form fields
+        # Note: The form expects a list of uploads, even if there's only one.
+        page.form['validate_schema'] = False
+        page.form['organizations_source'] = [org_upload]
+        page.form['memberships_source'] = [memberships_upload]
+        page.form['people_source'] = [people_upload]
 
         # Submit the form
         result = page.form.submit().maybe_follow()
 
         # Add assertions as needed
         assert result.status_code == 200
+        assert result.status_code == 200, f"Import failed: {result.text}"
         return result
 
-    result = do_upload_procedure()
+    # --- First Import ---
+    result1 = do_upload_procedure(
+        organization_json, memberships_json, people_json
+    )
+    result1.showbrowser()
 
-    # Check the import logs
+    # Check the import logs after first import
     logs_page = client.get('/import-logs')
     assert logs_page.status_code == 200
     assert 'completed' in logs_page  # Check if the status is shown
@@ -346,14 +401,17 @@ def test_view_upload_json(client):
     assert log_detail_page.status_code == 200
     assert 'Import Details' in log_detail_page
     status = log_detail_page.pyquery('.import-status').text()
-    assert 'completed' in log_detail_page.pyquery('.import-status').text()
+    assert 'completed' in status, f"Import status not 'completed': {status}"
 
-    # do it again to test that errors / duplicates are gracefully handled.
-    result = do_upload_procedure()
+    # --- Second Import (Test idempotency) ---
+    # Run the import again with the same data, to test robustness
+    do_upload_procedure(
+        organization_json, memberships_json, people_json
+    )
 
     # Check logs again after second import
     logs_page = client.get('/import-logs')
-    assert logs_page.status_code == 200
+    assert logs_page.status_code == 200, "Could not load import logs page"
     # Should now have two logs
     assert len(logs_page.pyquery('tbody tr')) == 2
     assert 'completed' in logs_page.pyquery(

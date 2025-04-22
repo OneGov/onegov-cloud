@@ -307,7 +307,7 @@ class PeopleImporter(DataImporter):
                 try:
                     person_uuid = UUID(person_id)
                 except ValueError:
-                    logging.error(
+                    logging.exception(
                         f'Skipping person due to invalid UUID format: '
                         f'{person_id} - {person_data.get("fullName")}'
                     )
@@ -501,7 +501,7 @@ class OrganizationImporter(DataImporter):
                     try:
                         org_uuid = uuid.UUID(org_id)
                     except ValueError:
-                        logging.error(
+                        logging.exception(
                             f'Invalid UUID for commission ID: {org_id}'
                         )
                         continue
@@ -541,7 +541,7 @@ class OrganizationImporter(DataImporter):
                     try:
                         org_uuid = uuid.UUID(org_id)
                     except ValueError:
-                        logging.error(
+                        logging.exception(
                             f'Invalid UUID for party/Fraktion ID: {org_id}'
                         )
                         continue
