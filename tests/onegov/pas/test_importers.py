@@ -15,7 +15,9 @@ from onegov.pas.importer.json_import import (
 
 def test_people_importer_successful_import(session, people_json):
     importer = PeopleImporter(session)
-    parliamentarian_map = importer.bulk_import(people_json['results'])
+    parliamentarian_map, details, processed_count = importer.bulk_import(
+        people_json['results']
+    )
 
     # Get sample person for detailed attribute testing
     daniel = people_json['results'][0]
@@ -71,9 +73,11 @@ def test_people_importer_existing_parliamentarian(session, people_json):
     session.flush()
 
     # Run the import with the full data, including the existing person
-    parliamentarian_map = importer.bulk_import(people_json['results'])
+    parliamentarian_map, details, processed_count = importer.bulk_import(
+        people_json['results']
+    )
 
-    # Verify the map contains all parliamentarians
+    # Verify the map contains all parliamentarians from the input
     assert len(parliamentarian_map) == len(people_json['results'])
 
     # Check the updated parliamentarian
@@ -146,6 +150,8 @@ def test_organization_importer_existing(session,
         parliamentary_group_map,
         party_map,
         other_organization_map,
+        details,  # Unpack details
+        processed_counts,  # Unpack processed counts
     ) = importer.bulk_import(organization_json['results'])
 
     # --- Assertions ---
