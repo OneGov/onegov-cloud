@@ -471,7 +471,7 @@ def import_commissions(
             membership = CommissionMembership(
                 commission=commission,
                 parliamentarian=parliamentarian,
-                role=cast(MembershipRole, role),
+                role=cast('MembershipRole', role),
                 start=parse_date(row.eintritt_kommission),
                 end=parse_date(row.austritt_kommission)
             )

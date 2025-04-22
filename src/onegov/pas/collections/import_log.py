@@ -1,11 +1,13 @@
 from __future__ import annotations
 
-from typing import Self
-
-from sqlalchemy.orm import Query, Session
-
 from onegov.core.collection import GenericCollection
 from onegov.pas.models.import_log import ImportLog
+
+
+from typing import Self, TYPE_CHECKING
+if TYPE_CHECKING:
+    from sqlalchemy.orm import Session
+    from sqlalchemy.orm import Query
 
 
 class ImportLogCollection(GenericCollection[ImportLog]):
