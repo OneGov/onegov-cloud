@@ -17,17 +17,21 @@ from onegov.pas.importer.json_import import (
     Parliamentarian,
     ParliamentarianRole,
     Party,
-    ImportCategoryResult
 )
 from onegov.pas.layouts import ImportLayout
 
 
-from typing import Any, TYPE_CHECKING
+from typing import Any, TYPE_CHECKING, TypedDict
 if TYPE_CHECKING:
     from onegov.core.types import LaxFileDict, RenderData
     from collections.abc import Sequence
     from onegov.town6.request import TownRequest
     from webob import Response
+
+    class ImportCategoryResult(TypedDict):
+        created: list[Any]
+        updated: list[Any]
+        processed: int
 
     # Define a type alias for the complex import details structure
     # Replace with the actual type returned by the importer
