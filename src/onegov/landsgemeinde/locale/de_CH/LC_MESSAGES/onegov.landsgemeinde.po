@@ -398,8 +398,8 @@ msgstr "Neue Landsgemeinde hinzugefügt"
 msgid "New assembly"
 msgstr "Neue Landsgemeinde"
 
-msgid "Open data"
-msgstr "Open data"
+msgid "Open Data"
+msgstr "Open Data"
 
 #, python-format
 msgid "Results from the ${title}, structured as json"
