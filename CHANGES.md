@@ -1,8 +1,18 @@
 # Changes
 
+## 2025.20
+
+`2025-04-22` | [196ff526a9...196ff526a9](https://github.com/OneGov/onegov-cloud/compare/196ff526a9^...196ff526a9)
+
+### Pas
+
+##### Import data.
+
+`Feature` | [OGC-2091](https://linear.app/onegovcloud/issue/OGC-2091) | [196ff526a9](https://github.com/onegov/onegov-cloud/commit/196ff526a9e3744fa7f3a64a9e0ffacc4ac93927)
+
 ## 2025.19
 
-`2025-04-22` | [0e2daaf130...12ea543167](https://github.com/OneGov/onegov-cloud/compare/0e2daaf130^...12ea543167)
+`2025-04-22` | [0e2daaf130...0515b72f63](https://github.com/OneGov/onegov-cloud/compare/0e2daaf130^...0515b72f63)
 
 ### Feriennet
 
@@ -2137,94 +2147,4 @@ the first login of a user without a configured second factor.
 ##### Move settings for events to event settings section
 
 `Feature` | [NONE](#NONE) | [37e4cc067a](https://github.com/onegov/onegov-cloud/commit/37e4cc067a9bebe78e3c72f88de801fe496e413e)
-
-## 2024.39
-
-`2024-07-11` | [26aad8fd14...47267eebea](https://github.com/OneGov/onegov-cloud/compare/26aad8fd14^...47267eebea)
-
-### Docker
-
-##### Fix nginx cache buster.
-
-`Bugfix` | [OGC-1734](https://linear.app/onegovcloud/issue/OGC-1734) | [d11dd89666](https://github.com/onegov/onegov-cloud/commit/d11dd89666180a2b5e13c3662138ca7b9aca3aab)
-
-### Docs
-
-##### Resolve various warnings.
-
-`Bugfix` | [e45c8c878d](https://github.com/onegov/onegov-cloud/commit/e45c8c878de29612394bf1e0095f9184ad8f631e)
-
-### Election Day
-
-##### Fix search hint rendering.
-
-`Bugfix` | [53c96917ca](https://github.com/onegov/onegov-cloud/commit/53c96917cab9f61d36a2709fb6d5c91a3877e942)
-
-### Feriennet
-
-##### Replace Banners
-
-`Feature` | [PRO-1300](https://linear.app/projuventute/issue/PRO-1300) | [a0458ba8ac](https://github.com/onegov/onegov-cloud/commit/a0458ba8ac1e39da1d7b2e4eedc8fda797520b0a)
-
-##### Fix bug when there is no prebooking phase
-
-`Bugfix` | [PRO-1296](https://linear.app/projuventute/issue/PRO-1296) | [c4fe859a94](https://github.com/onegov/onegov-cloud/commit/c4fe859a94eb7b854c0804703d22a91d2b481a4c)
-
-##### Read QR-Payments
-
-Some entries have no "TxDtls" instead they have their information in "AddtlNtryInf".
-
-`Bugfix` | [OGC-1198](https://linear.app/onegovcloud/issue/OGC-1198) | [dbf8a6afc2](https://github.com/onegov/onegov-cloud/commit/dbf8a6afc225ed98807207148b8b4b59ddca528f)
-
-### Form
-
-##### Fix broken rendering
-
-`Bugfix` | [OGC-1738](https://linear.app/onegovcloud/issue/OGC-1738) | [55bbad189a](https://github.com/onegov/onegov-cloud/commit/55bbad189a2dc9faac1dd6c7bac240fcd81ba565)
-
-### Landsgemeinde
-
-##### Remove YouTube recommendations
-
-`Feature` | [OGC-1651](https://linear.app/onegovcloud/issue/OGC-1651) | [2f561e8c85](https://github.com/onegov/onegov-cloud/commit/2f561e8c85fffa2d9b15b77673b4fb3e670c898e)
-
-### Org
-
-##### Surveys
-
-Add option to create and view results of surveys
-
-`Feature` | [OGC-1612](https://linear.app/onegovcloud/issue/OGC-1612) | [15b0142f61](https://github.com/onegov/onegov-cloud/commit/15b0142f6197ad607b5174f1e1e9184748464611)
-
-### People
-
-##### Fix vcard export.
-
-`Bugfix` | [31d27201e3](https://github.com/onegov/onegov-cloud/commit/31d27201e373b67906cb91973bfb9d29855f3a3a)
-
-### Resource
-
-##### Allow deleting resources with future reservations. Deletes related payments
-
-`Feature` | [OGC-1701](https://linear.app/onegovcloud/issue/OGC-1701) | [b4a9b75838](https://github.com/onegov/onegov-cloud/commit/b4a9b75838352da1713bc4ab6ce23ce70cff7a91)
-
-### Town6
-
-##### Move tracking code into header
-
-`Feature` | [OGC-1700](https://linear.app/onegovcloud/issue/OGC-1700) | [c8b94b2202](https://github.com/onegov/onegov-cloud/commit/c8b94b2202ee5a0e1eac748e91b58e9ad02fec62)
-
-##### Allow scrolling in side-navigation
-
-`Feature` | [OGC-1703](https://linear.app/onegovcloud/issue/OGC-1703) | [ec2ee37558](https://github.com/onegov/onegov-cloud/commit/ec2ee375586d49297d1d98f4728810db53cfac08)
-
-##### Editmode People
-
-Add "save" and "cancel" to Edit-bar when editing people.
-
-`Feature` | [7412046ffb](https://github.com/onegov/onegov-cloud/commit/7412046ffb37facb8560660e5bddfc6a3632db9b)
-
-##### Rename Buttons
-
-`Feature` | [OGC-1697](https://linear.app/onegovcloud/issue/OGC-1697) | [cf1e9033cb](https://github.com/onegov/onegov-cloud/commit/cf1e9033cb1d097944ff69d9ede69def04f35d58)
 
