@@ -2971,7 +2971,6 @@ def test_reserve_fractions_of_hours_total_correct_in_price(client):
     # Check price on confirmation page
     form_page = client.get('/resource/tageskarte/form')
     form_page.form['email'] = 'tester@example.org'
-    form_page.showbrowser()
 
     confirmation_page = form_page.form.submit().follow()
 

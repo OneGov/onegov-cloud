@@ -24,7 +24,6 @@ from onegov.pas.models import (
     Party,
     Commission,
 )
-from onegov.pas.models.commission_membership import MembershipRole
 
 T = TypeVar('T')
 P = ParamSpec('P')
@@ -33,6 +32,7 @@ P = ParamSpec('P')
 from typing import Any as Incomplete
 from typing import TYPE_CHECKING
 if TYPE_CHECKING:
+    from onegov.pas.models.commission_membership import MembershipRole
     from collections.abc import Callable
     from sqlalchemy.orm import Session
     from types import TracebackType

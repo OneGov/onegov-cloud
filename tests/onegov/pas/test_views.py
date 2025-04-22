@@ -388,7 +388,6 @@ def test_view_upload_json(
     result1 = do_upload_procedure(
         organization_json, memberships_json, people_json
     )
-    result1.showbrowser()
 
     # Check the import logs after first import
     logs_page = client.get('/import-logs')

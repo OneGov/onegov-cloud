@@ -7,9 +7,12 @@ from onegov.core.orm import Base
 from onegov.core.orm.mixins import TimestampMixin
 from onegov.core.orm.types import UUID
 from onegov.core.orm.types import JSON
-from onegov.user import User
+
 
 from typing import Any
+from typing import TYPE_CHECKING
+if TYPE_CHECKING:
+    from onegov.user import User
 
 
 class ImportLog(Base, TimestampMixin):
