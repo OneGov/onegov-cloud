@@ -9,7 +9,6 @@ from typing import (
     TypeVar,
     BinaryIO,
     cast,
-    Literal,
     Protocol,
     ParamSpec, Self, Any,
 )
@@ -25,6 +24,7 @@ from onegov.pas.models import (
     Party,
     Commission,
 )
+from onegov.pas.models.commission_membership import MembershipRole
 
 T = TypeVar('T')
 P = ParamSpec('P')
@@ -471,10 +471,7 @@ def import_commissions(
             membership = CommissionMembership(
                 commission=commission,
                 parliamentarian=parliamentarian,
-                role=cast(
-                    Literal['guest', 'member', 'extended_member', 'president'],
-                    role
-                ),
+                role=cast(MembershipRole, role),
                 start=parse_date(row.eintritt_kommission),
                 end=parse_date(row.austritt_kommission)
             )
