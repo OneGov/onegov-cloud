@@ -786,6 +786,7 @@ def accept_reservation(
         show_submission = True
 
         client: KabaClient | None = None
+        code: str | None = None
         if components := getattr(resource, 'kaba_components', []):
             site_id = request.app.org.kaba_site_id
             api_key = request.app.org.kaba_api_key
@@ -814,6 +815,7 @@ def accept_reservation(
             data['accepted'] = True
 
             if client is not None:
+                assert code is not None
                 try:
                     start = reservation.display_start() - lead_delta
                     end = reservation.display_end() + lag_delta
@@ -868,7 +870,7 @@ def accept_reservation(
                 origin='internal',
             )
 
-        # FIXME: Add door code and link to mail
+        # TODO: Add link to open doors online?
         send_ticket_mail(
             request=request,
             template='mail_reservation_accepted.pt',
@@ -880,6 +882,7 @@ def accept_reservation(
                 'resource': resource,
                 'reservations': reservations,
                 'show_submission': show_submission,
+                'code': code,
                 'form': form,
                 'message': message,
             },

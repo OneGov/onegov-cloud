@@ -16,6 +16,7 @@
 
         <p><b>${resource.title}</b></p>
         <tal:b metal:use-macro="layout.macros['reservations']"></tal:b>
+        <p tal:condition="code"><b i18n:translate>Key Code:</b> ${code}</p>
 
         <p>
             <a href="${request.link(ticket, 'status')}" i18n:translate>Check request status</a>
