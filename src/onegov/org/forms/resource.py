@@ -12,10 +12,11 @@ from wtforms.validators import Optional
 from wtforms.validators import ValidationError
 
 from onegov.form import Form, merge_forms, parse_formcode
+from onegov.form.fields import ChosenSelectMultipleField
 from onegov.form.fields import MultiCheckboxField
 from onegov.form.filters import as_float
 from onegov.form.validators import ValidFormDefinition
-from onegov.org import _
+from onegov.org import _, log
 from onegov.org.forms.fields import HtmlField
 from onegov.org.forms.generic import DateRangeForm
 from onegov.org.forms.generic import ExportForm
@@ -23,15 +24,20 @@ from onegov.org.forms.generic import PaymentForm
 from onegov.org.forms.reservation import (
     RESERVED_FIELDS, ExportToExcelWorksheets)
 from onegov.org.forms.util import WEEKDAYS
+from onegov.org.kaba import KabaApiError, KabaClient
 
 
 from typing import Any, Literal, TYPE_CHECKING
 if TYPE_CHECKING:
+    from onegov.org.request import OrgRequest
     from onegov.reservation import Resource
 
 
 class ResourceBaseForm(Form):
     """ Defines the form for all resources. """
+
+    if TYPE_CHECKING:
+        request: OrgRequest
 
     title = StringField(_('Title'), [InputRequired()])
 
@@ -157,6 +163,12 @@ class ResourceBaseForm(Form):
             ('month', _('Month view')),
         ))
 
+    kaba_components = ChosenSelectMultipleField(
+        label=_('Doors'),
+        choices=(),
+        fieldset='dormakaba',
+    )
+
     pricing_method = RadioField(
         label=_('Price'),
         fieldset=_('Payments'),
@@ -197,9 +209,34 @@ class ResourceBaseForm(Form):
         if hasattr(self.model, 'type'):
             if self.model.type == 'daypass':
                 self.delete_field('default_view')
+                self.delete_field('kaba_components')
+                return
         else:
             if self.request.view_name.endswith('new-daypass'):
                 self.delete_field('default_view')
+                self.delete_field('kaba_components')
+                return
+
+        site_id = self.request.app.org.kaba_site_id
+        api_key = self.request.app.org.kaba_api_key
+        api_encrypted_secret = self.request.app.org.kaba_api_secret
+
+        if site_id and api_key and api_encrypted_secret:
+            api_secret = self.request.app.decrypt(
+                bytes.fromhex(api_encrypted_secret)
+            )
+            client = KabaClient(site_id, api_key, api_secret)
+            try:
+                self.kaba_components.choices = client.component_choices()
+            except KabaApiError:
+                log.info('Kaba API error', exc_info=True)
+                self.request.alert(_(
+                    'Failed to retrieve the doors from the dormakaba API '
+                    'please make sure your credentials are still valid.'
+                ))
+                self.delete_field('kaba_components')
+        else:
+            self.delete_field('kaba_components')
 
     @property
     def zipcodes(self) -> list[int]:

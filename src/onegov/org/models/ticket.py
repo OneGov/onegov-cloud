@@ -18,7 +18,7 @@ from onegov.search.utils import extract_hashtags
 from purl import URL
 from sqlalchemy import desc
 from sqlalchemy import func
-from sqlalchemy.orm import object_session
+from sqlalchemy.orm import object_session, undefer
 
 
 from typing import Any, TYPE_CHECKING
@@ -392,7 +392,10 @@ class ReservationHandler(Handler):
 
     @cached_property
     def reservations(self) -> tuple[Reservation, ...]:
-        return tuple(self.reservations_query())
+        return tuple(
+            self.reservations_query()
+            .options(undefer(Reservation.data))
+        )
 
     @cached_property
     def has_future_reservation(self) -> bool:
@@ -528,6 +531,18 @@ class ReservationHandler(Handler):
                 'layout': layout
             })
         )
+
+        # render key code
+        # TODO: Add a unlock URL?
+        if key_code := self.data.get('key_code'):
+            parts.append(Markup(
+                '<dl class="field-display">'
+                '<dt>{}</dt><dd>{}</dd>'
+                '</dl>'
+            ).format(
+                request.translate(_('Key Code')),
+                key_code
+            ))
 
         # render internal tag meta data
         if request.is_manager_for_model(self.ticket) and self.ticket.tag_meta:

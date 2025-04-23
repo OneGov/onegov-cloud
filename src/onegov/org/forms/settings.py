@@ -5,6 +5,7 @@ import json
 import re
 import yaml
 
+from decimal import Decimal
 from functools import cached_property
 
 from cryptography.fernet import InvalidToken
@@ -23,9 +24,8 @@ from onegov.form.fields import PreviewField
 from onegov.form.fields import TagsField
 from onegov.form.fields import URLField
 from onegov.form.validators import StrictOptional
-from onegov.gever.encrypt import encrypt_symmetric, decrypt_symmetric
 from onegov.gis import CoordinatesField
-from onegov.org import _
+from onegov.org import _, log
 
 from onegov.org.forms.fields import (
     HtmlField,
@@ -33,6 +33,7 @@ from onegov.org.forms.fields import (
 )
 from onegov.org.forms.user import AVAILABLE_ROLES
 from onegov.org.forms.util import TIMESPANS
+from onegov.org.kaba import KabaApiError, KabaClient
 from onegov.org.theme import user_options
 from onegov.ticket import handlers
 from onegov.ticket import TicketPermission
@@ -66,6 +67,7 @@ if TYPE_CHECKING:
 
 
 ERROR_LINE_RE = re.compile(r'line ([0-9]+)')
+KABA_CODE_RE = re.compile(r'^[0-9]{4,6}$')
 
 
 class GeneralSettingsForm(Form):
@@ -1162,10 +1164,33 @@ class OrgTicketSettingsForm(Form):
                     # we only allow string keys
                     if not isinstance(field, str)
                     # we allow any value type except for containers
-                    if isinstance(value, (dict, list))
+                    or isinstance(value, (dict, list))
                 ):
                     self.ticket_tags.errors.append(error_msg)
                     return False
+
+                if 'Price' in meta or 'Preis' in meta:
+                    price = meta.get('Price', meta.get('Price'))
+                    try:
+                        assert Decimal(price) >= Decimal('0')
+                    except Exception:
+                        self.ticket_tags.errors.append(_(
+                            'Invalid price, needs to be a non-negative number.'
+                        ))
+                        return False
+
+                if 'Kaba Code' in meta:
+                    code = str(meta['Kaba Code']).strip().zfill(4)
+
+                    if not KABA_CODE_RE.match(code):
+                        self.ticket_tags.errors.append(_(
+                            'Invalid Kaba code. '
+                            'Needs to be a 4 to 6 digit number code.'
+                        ))
+                        return False
+
+                    # Store normalized Kaba code
+                    meta['Kaba Code'] = code
 
         return None
 
@@ -1491,10 +1516,9 @@ class GeverSettingsForm(Form):
 
     def populate_obj(self, model: Organisation) -> None:  # type:ignore
         super().populate_obj(model)
-        key_base64 = self.request.app.hashed_identity_key
         try:
             assert self.gever_password.data is not None
-            encrypted = encrypt_symmetric(self.gever_password.data, key_base64)
+            encrypted = self.request.app.encrypt(self.gever_password.data)
             encrypted_str = encrypted.decode('utf-8')
             model.gever_username = self.gever_username.data or ''
             model.gever_password = encrypted_str or ''
@@ -1507,6 +1531,92 @@ class GeverSettingsForm(Form):
 
         self.gever_username.data = model.gever_username or ''
         self.gever_password.data = model.gever_password or ''
+
+
+class KabaSettingsForm(Form):
+
+    if TYPE_CHECKING:
+        request: OrgRequest
+
+    kaba_site_id = StringField(
+        _('Site ID'),
+        [InputRequired()],
+    )
+
+    kaba_api_key = StringField(
+        'API_KEY',
+        [InputRequired()],
+    )
+
+    kaba_api_secret = PasswordField(
+        'API_SECRET',
+    )
+
+    default_key_code_lead_time = IntegerField(
+        _('Default Lead Time'),
+        [InputRequired()],
+        description=_('In minutes'),
+    )
+
+    default_key_code_lag_time = IntegerField(
+        _('Default Lag Time'),
+        [InputRequired()],
+        description=_('In minutes'),
+    )
+
+    def populate_obj(self, model: Organisation) -> None:  # type:ignore
+        super().populate_obj(model, exclude=['kaba_api_secret'])
+        if self.kaba_api_secret.data == model.kaba_api_secret:
+            return
+
+        assert self.kaba_api_secret.data is not None
+        model.kaba_api_secret = self.request.app.encrypt(
+            self.kaba_api_secret.data
+        ).hex()
+
+    def ensure_valid_credentials(self) -> bool | None:
+        if self.kaba_api_secret.data:
+            api_secret = self.kaba_api_secret.data
+        elif self.model.kaba_api_secret is None:
+            assert isinstance(self.kaba_api_secret.errors, list)
+            self.kaba_api_secret.errors.append(_('Input required'))
+            return False
+        elif (
+            self.kaba_site_id.data == self.model.kaba_site_id
+            and self.kaba_api_key.data == self.model.kaba_api_key
+        ):
+            # no need to re-validate
+            return None
+        else:
+            # decrypt existing API secret
+            api_secret = self.request.app.decrypt(
+                bytes.fromhex(self.model.kaba_api_secret)
+            )
+
+        site_id = self.kaba_site_id.data
+        api_key = self.kaba_api_key.data
+        assert site_id is not None and api_key is not None
+
+        client = KabaClient(site_id, api_key, api_secret)
+        try:
+            client.site_name()
+        except KabaApiError:
+            assert isinstance(self.kaba_site_id.errors, list)
+            assert isinstance(self.kaba_api_key.errors, list)
+            assert isinstance(self.kaba_api_secret.errors, list)
+            error = _('Invalid credentials or site id')
+            self.kaba_site_id.errors.append(error)
+            self.kaba_api_key.errors.append(error)
+            self.kaba_api_secret.errors.append(error)
+            return False
+        except Exception:
+            self.request.alert(
+                _('Unexpected error encountered, please try again.')
+            )
+            log.exception('Unexpected error connecting to Kaba')
+            return False
+        else:
+            return True
 
 
 class OneGovApiSettingsForm(Form):
@@ -1615,12 +1725,10 @@ class FirebaseSettingsForm(Form):
 
     def populate_obj(self, model: Organisation) -> None:  # type:ignore
         super().populate_obj(model)
-        key_base64 = self.request.app.hashed_identity_key
-
         try:
             assert self.firebase_adminsdk_credential.data is not None
-            encrypted = encrypt_symmetric(
-                self.firebase_adminsdk_credential.data, key_base64
+            encrypted = self.request.app.encrypt(
+                self.firebase_adminsdk_credential.data
             )
             encrypted_str = encrypted.decode('utf-8')
             model.firebase_adminsdk_credential = encrypted_str or ''
@@ -1677,12 +1785,13 @@ class FirebaseSettingsForm(Form):
     def process_obj(self, model: Organisation) -> None:  # type:ignore
         super().process_obj(model)
 
-        key_base64 = self.request.app.hashed_identity_key
         if model.firebase_adminsdk_credential:
             try:
-                self.firebase_adminsdk_credential.data = decrypt_symmetric(
-                model.firebase_adminsdk_credential.encode('utf-8'), key_base64
-            )
+                self.firebase_adminsdk_credential.data = (
+                    self.request.app.decrypt(
+                        model.firebase_adminsdk_credential.encode('utf-8')
+                    )
+                )
             except InvalidToken:
                 self.firebase_adminsdk_credential.data = ''
 

@@ -22,7 +22,7 @@ from onegov.org.forms.settings import (
     LinksSettingsForm, NewsletterSettingsForm, LinkMigrationForm,
     LinkHealthCheckForm, PeopleSettingsForm, SocialMediaSettingsForm,
     GeverSettingsForm, OneGovApiSettingsForm, DataRetentionPolicyForm,
-    VATSettingsForm, EventSettingsForm)
+    VATSettingsForm, EventSettingsForm, KabaSettingsForm)
 from onegov.org.management import LinkHealthCheck
 from onegov.org.layout import DefaultLayout
 from onegov.org.layout import SettingsLayout
@@ -288,6 +288,20 @@ def handle_gever_settings(
     layout: SettingsLayout | None = None
 ) -> RenderData | Response:
     return handle_generic_settings(self, request, form, 'Gever API', layout)
+
+
+@OrgApp.form(
+    model=Organisation, name='kaba-settings', template='form.pt',
+    permission=Secret, form=KabaSettingsForm, setting='dormakaba API',
+    icon='fa-key', order=400)
+def handle_kaba_settings(
+    self: Organisation,
+    request: OrgRequest,
+    form: KabaSettingsForm,
+    layout: SettingsLayout | None = None
+) -> RenderData | Response:
+    return handle_generic_settings(
+        self, request, form, 'dormakaba API', layout)
 
 
 @OrgApp.form(

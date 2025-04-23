@@ -14,7 +14,8 @@ from onegov.org.forms.settings import (
     HomepageSettingsForm, NewsletterSettingsForm, LinkMigrationForm,
     LinkHealthCheckForm, PeopleSettingsForm, SocialMediaSettingsForm,
     EventSettingsForm, GeverSettingsForm, OneGovApiSettingsForm,
-    DataRetentionPolicyForm, FirebaseSettingsForm, VATSettingsForm)
+    DataRetentionPolicyForm, FirebaseSettingsForm, VATSettingsForm,
+    KabaSettingsForm)
 from onegov.org.models import Organisation
 from onegov.org.views.settings import (
     handle_homepage_settings, handle_people_settings, view_settings,
@@ -24,7 +25,8 @@ from onegov.org.views.settings import (
     handle_analytics_settings, handle_holiday_settings,
     handle_newsletter_settings, handle_generic_settings, handle_migrate_links,
     handle_link_health_check, handle_social_media_settings,
-    handle_event_settings, handle_api_keys, handle_chat_settings)
+    handle_event_settings, handle_api_keys, handle_chat_settings,
+    handle_kaba_settings)
 
 from onegov.town6.app import TownApp
 from onegov.town6.forms.settings import (
@@ -255,6 +257,18 @@ def town_handle_gever_settings(
 ) -> RenderData | Response:
     return handle_generic_settings(self, request, form, 'Gever API',
                                    SettingsLayout(self, request))
+
+
+@TownApp.form(model=Organisation, name='kaba-settings', template='form.pt',
+              permission=Secret, form=KabaSettingsForm,
+              setting='dormakaba API', icon='fa-key', order=400)
+def town_handle_kaba_settings(
+    self: Organisation,
+    request: TownRequest,
+    form: KabaSettingsForm
+) -> RenderData | Response:
+    return handle_kaba_settings(
+        self, request, form, SettingsLayout(self, request))
 
 
 @TownApp.form(

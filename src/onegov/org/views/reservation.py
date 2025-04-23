@@ -12,11 +12,12 @@ from onegov.core.html import html_to_text
 from onegov.core.security import Public, Private
 from onegov.core.templates import render_template
 from onegov.form import FormCollection, merge_forms, as_internal_id
-from onegov.org import _, OrgApp
+from onegov.org import _, log, OrgApp
 from onegov.org import utils
 from onegov.org.cli import close_ticket
 from onegov.org.elements import Link
 from onegov.org.forms import ReservationForm, InternalTicketChatMessageForm
+from onegov.org.kaba import KabaApiError, KabaClient
 from onegov.org.layout import ReservationLayout, TicketChatMessageLayout
 from onegov.org.layout import DefaultMailLayout
 from onegov.org.mail import send_ticket_mail
@@ -642,7 +643,11 @@ def finalize_reservation(self: Resource, request: OrgRequest) -> Response:
             )
             if data := reservations[0].data:
                 ticket.tag = data.get('ticket_tag')
-                ticket.tag_meta = data.get('ticket_tag_meta')
+                tag_meta = data.get('ticket_tag_meta')
+                key_code = tag_meta.pop('Kaba Code')
+                if key_code:
+                    ticket.handler_data = {'key_code': key_code}
+                ticket.tag_meta = tag_meta
             TicketMessage.create(ticket, request, 'opened', 'external')
 
         show_submission = request.params.get('send_by_email') == 'yes'
@@ -780,9 +785,65 @@ def accept_reservation(
         # Include all the forms details to be able to print it out
         show_submission = True
 
+        client: KabaClient | None = None
+        if components := getattr(resource, 'kaba_components', []):
+            site_id = request.app.org.kaba_site_id
+            api_key = request.app.org.kaba_api_key
+            api_encrypted_secret = request.app.org.kaba_api_secret
+
+            if site_id and api_key and api_encrypted_secret:
+                api_secret = request.app.decrypt(
+                    bytes.fromhex(api_encrypted_secret)
+                )
+                client = KabaClient(site_id, api_key, api_secret)
+                code = ticket.handler.data.setdefault(
+                    'key_code', client.random_code()
+                )
+                lead_delta = timedelta(minutes=ticket.handler.data.setdefault(
+                    'key_code_lead_time',
+                    request.app.org.default_key_code_lead_time
+                ))
+                lag_delta = timedelta(minutes=ticket.handler.data.setdefault(
+                    'key_code_lag_time',
+                    request.app.org.default_key_code_lag_time
+                ))
+                ticket.handler.refresh()
+
         for reservation in reservations:
-            reservation.data = reservation.data or {}
-            reservation.data['accepted'] = True
+            data = reservation.data = reservation.data or {}
+            data['accepted'] = True
+
+            if client is not None:
+                try:
+                    start = reservation.display_start() - lead_delta
+                    end = reservation.display_end() + lag_delta
+                    visit_id, link = client.create_visit(
+                        code=code,
+                        name=ticket.number,
+                        message='Managed through OneGov Cloud',
+                        start=start,
+                        end=end,
+                        components=components,
+                    )
+                except KabaApiError:
+                    log.info('Kaba API error', exc_info=True)
+                    # roll back previous changes
+                    transaction.abort()
+                    transaction.begin()
+                    request.alert(_(
+                        'Failed to create visits using the dormakaba API '
+                        'please make sure your credentials are still valid.'
+                    ))
+                    if view_ticket is not None:
+                        return request.redirect(request.link(view_ticket))
+
+                    return request.redirect(request.link(self))
+                else:
+                    data['kaba'] = {
+                        'code': code,
+                        'visit_id': visit_id,
+                        'link': link,
+                    }
 
             # libres does not automatically detect changes yet
             flag_modified(reservation, 'data')
@@ -807,6 +868,7 @@ def accept_reservation(
                 origin='internal',
             )
 
+        # FIXME: Add door code and link to mail
         send_ticket_mail(
             request=request,
             template='mail_reservation_accepted.pt',
@@ -1014,6 +1076,18 @@ def reject_reservation(
     if view_ticket is not None and view_ticket != ticket:
         raise exc.HTTPNotFound()
 
+    client: KabaClient | None = None
+    if getattr(resource, 'kaba_components', []):
+        site_id = request.app.org.kaba_site_id
+        api_key = request.app.org.kaba_api_key
+        api_encrypted_secret = request.app.org.kaba_api_secret
+
+        if site_id and api_key and api_encrypted_secret:
+            api_secret = request.app.decrypt(
+                bytes.fromhex(api_encrypted_secret)
+            )
+            client = KabaClient(site_id, api_key, api_secret)
+
     # if there's a captured payment we cannot continue
     payment = ticket.handler.payment
     if payment and payment.state == 'paid':
@@ -1120,7 +1194,14 @@ def reject_reservation(
     if len(excluded) == 0:
         ticket.create_snapshot(request)
 
+    failed_to_revoke = False
     for reservation in targeted:
+        if client and (kaba := (reservation.data or {}).get('kaba')):
+            try:
+                client.revoke_visit(kaba['visit_id'])
+            except KabaApiError:
+                log.info('Kaba API error', exc_info=True)
+                failed_to_revoke = True
         resource.scheduler.remove_reservation(token, reservation.id)
 
     if len(excluded) == 0 and submission:
@@ -1130,6 +1211,9 @@ def reject_reservation(
         request.success(_('The reservations were rejected'))
     else:
         request.success(_('The reservation was rejected'))
+
+    if failed_to_revoke:
+        request.warning(_('Failed to revoke door code in dormakaba API'))
 
     # return none on intercooler js requests
     if not request.headers.get('X-IC-Request'):

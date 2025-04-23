@@ -4,6 +4,7 @@ import transaction
 import pytest
 
 from base64 import b64encode
+from cryptography.fernet import InvalidToken
 from datetime import datetime, timedelta
 from freezegun import freeze_time
 from functools import cached_property
@@ -459,6 +460,31 @@ def test_custom_signer():
 
     with pytest.raises(BadSignature):
         Signer(framework.identity_secret).unsign(signed)
+
+
+def test_encrypt_decrypt():
+    framework = Framework()
+    framework.unsafe_identity_secret = 'test'
+    framework.application_id = 'one'
+
+    encrypted_by_one = framework.encrypt('foo')
+    assert framework.decrypt(encrypted_by_one) == 'foo'
+
+    framework.application_id = 'two'
+    with pytest.raises(InvalidToken):
+        framework.decrypt(encrypted_by_one)
+
+    framework.application_id = 'one'
+    assert framework.decrypt(encrypted_by_one) == 'foo'
+
+    encrypted = framework.encrypt('foo')
+    framework.unsafe_identity_secret = 'asdf'
+    with pytest.raises(InvalidToken):
+        assert framework.decrypt(encrypted)
+
+    encrypted = framework.encrypt('foo')
+    with pytest.raises(InvalidToken):
+        assert framework.decrypt(b'bar' + encrypted) is None
 
 
 def test_csrf_secret_key():
