@@ -16,7 +16,6 @@ from onegov.directory.collections.directory import EntryRecipientCollection
 from onegov.event import EventCollection, OccurrenceCollection
 from onegov.event.utils import as_rdates
 from onegov.form import FormSubmissionCollection
-from onegov.gever.encrypt import encrypt_symmetric
 from onegov.org.models import (
     ResourceRecipientCollection, News, PushNotification)
 from onegov.org.models.page import NewsCollection
@@ -1731,9 +1730,7 @@ def test_send_push_notifications_for_news(
     transaction.begin()
 
     # Configure Firebase credentials for the organization
-    encrypted_creds = encrypt_symmetric(
-        firebase_json, org_app.hashed_identity_key
-    ).decode('utf-8')
+    encrypted_creds = org_app.encrypt(firebase_json).decode('utf-8')
     org_app.org.firebase_adminsdk_credential = encrypted_creds
 
     # Define topic mapping for the organization
@@ -1804,9 +1801,7 @@ def test_push_notification_duplicate_detection(
 
     # Set up test data
     transaction.begin()
-    encrypted_creds = encrypt_symmetric(
-        firebase_json, org_app.hashed_identity_key
-    ).decode('utf-8')
+    encrypted_creds = org_app.encrypt(firebase_json).decode('utf-8')
     org_app.org.firebase_adminsdk_credential = encrypted_creds
     org_app.org.selectable_push_notification_options = [
         [f'{org_app.schema}_news', 'News']

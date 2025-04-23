@@ -1566,10 +1566,10 @@ class KabaSettingsForm(Form):
 
     def populate_obj(self, model: Organisation) -> None:  # type:ignore
         super().populate_obj(model, exclude=['kaba_api_secret'])
-        if self.kaba_api_secret.data == model.kaba_api_secret:
+        if not self.kaba_api_secret.data:
+            # leave existing secret intact
             return
 
-        assert self.kaba_api_secret.data is not None
         model.kaba_api_secret = self.request.app.encrypt(
             self.kaba_api_secret.data
         ).hex()
