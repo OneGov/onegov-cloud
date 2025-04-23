@@ -119,9 +119,12 @@ def make_resource_polymorphic_type_non_nullable(
         context.operations.alter_column('resources', 'type', nullable=False)
 
 
-@upgrade_task('Add resource subgroup column')
+@upgrade_task('Add resource subgroup column (fixed)')
 def add_resource_subgroup_column(context: UpgradeContext) -> None:
-    if run_upgrades(context):
+    if (
+        context.has_table('resources')
+        and not context.has_column('resources', 'subgroup')
+    ):
         context.operations.add_column(
             'resources', Column('subgroup', Text, nullable=True)
         )
