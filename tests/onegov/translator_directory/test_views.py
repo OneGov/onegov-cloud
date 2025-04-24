@@ -609,16 +609,9 @@ def test_view_export_translators_with_filters(client):
 
     # Click the export button (which now includes filters)
     response = page.click('Export')
-
-    # Verify the exported Excel file
     sheet = load_workbook(BytesIO(response.body)).worksheets[0]
-
-    # Header row + 1 data row expected
     assert sheet.max_row == 2
-
-    # Get header row to map column names to indices
     header = {cell.value: cell.column for cell in sheet[1]}
-
     # Check data of the exported translator (should be translator 1) using
     # column names from the header
     data_row = 2
@@ -634,6 +627,66 @@ def test_view_export_translators_with_filters(client):
     assert sheet.cell(
         row=data_row, column=header['Arbeitssprache - Schrift']
     ).value == 'Italian'
+
+
+def test_view_export_translators_with_filters_two_langs(client):
+    session = client.app.session()
+    languages = create_languages(session)
+    lang_ids = [str(lang.id) for lang in languages]
+    translators = TranslatorCollection(client.app)
+
+    # search two languages
+    # Create two translators, both having two languages
+    data4 = copy.deepcopy(translator_data)
+    data4['pers_id'] = 4444 
+    data4['first_name'] = 'two'
+    data4['last_name'] = 'langs'
+    data4['email'] = 'two.langs@example.com'
+    data4['spoken_languages'] = [languages[0], languages[1]]  # German, French
+    translators.add(**data4)
+
+    data5 = copy.deepcopy(translator_data)
+    data5['pers_id'] = 5555 
+    data5['first_name'] = 'alsotwo'
+    data5['last_name'] = 'alsotwo'
+    data5['email'] = 'alsotwo.alsotwo@example.com'
+    data5['spoken_languages'] = [languages[0], languages[1]]  # German, French
+    translators.add(**data5)
+    transaction.commit()
+
+    client.login_admin()
+
+    page = client.get('/translators')
+    page.form['spoken_langs'] = [lang_ids[0], lang_ids[1]]  # German, French
+    page = page.form.submit().follow()
+
+    # Check that both are found
+    results_table = page.pyquery('#search-results-table')[0].text_content()
+    assert 'two.langs@example.com' in results_table 
+    assert 'alsotwo.alsotwo@example.com' in results_table
+    # Click the export button (which now includes filters)
+    response = page.click('Export')
+    sheet = load_workbook(BytesIO(response.body)).worksheets[0]
+    assert sheet.max_row == 3
+    header = {cell.value: cell.column for cell in sheet[1]}
+
+    data_row = 2
+    # first one will be the 5555  (ordered by lastname
+    assert sheet.cell(
+        row=data_row, column=header['Personal Nr.']).value == 5555 
+    assert sheet.cell(
+        row=data_row, column=header['Vorname']).value == 'alsotwo'
+    assert sheet.cell(
+        row=data_row, column=header['Nachname']).value == 'alsotwo'
+    assert sheet.cell(
+        row=data_row, column=header['Arbeitssprache - Wort']
+    ).value == 'German|French'
+
+    data_row = 3
+    # todo: test 4444
+
+    # todo: test sortierung (ascending)
+
 
 
 def test_file_security(client):
