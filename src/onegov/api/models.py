@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+from contextlib import contextmanager
 from functools import cached_property
 from json import JSONDecodeError
 from logging import getLogger
@@ -84,38 +85,34 @@ class ApiException(Exception):
     def __init__(
         self,
         message: str = 'Internal Server Error',
-        exception: Exception | None = None,
         status_code: int = 500,
         headers: dict[str, str] | None = None,
     ):
-        self.message = (
-            exception.message
-            if exception and hasattr(exception, 'message') else
-            exception.title
-            if exception and hasattr(exception, 'title') else
-            message
-        )
-        self.status_code = (
-            exception.status_code
-            if exception and hasattr(exception, 'status_code') else status_code
-        )
-
+        super().__init__()
+        self.message = message
+        self.status_code = status_code
         self.headers = headers or {}
 
-        # NOTE:log unexpected exceptions
-        if not (
-            exception is None
-            or isinstance(exception, (HTTPException, ApiException))
-        ):
-            # FIXME: This is a little sus, since it assumes that we're only
-            #        ever being passed an exception while we're currenlty
-            #        handling that exception.
-            #        We may be better off removing the `exception` parameter
-            #        and addding a `classmethod` `contextmanager` that if an
-            #        exception occurs, swallows it, logs it and re-emits
-            #        an instance of ApiException instead. This may also
-            #        simplify and get rid of some boiler-plate code.
-            log.exception(exception)  # noqa: LOG004
+    @contextmanager
+    @classmethod
+    def capture_exceptions(
+        cls,
+        default_message: str = 'Internal Server Error',
+        default_status_code: int = 500,
+        headers: dict[str, str] | None = None,
+        exception_type: type[BaseException] = Exception,
+    ) -> Iterator[None]:
+        try:
+            yield
+        except exception_type as exc:
+            if not isinstance(exc, (HTTPException, ApiException)):
+                log.exception('Captured OneGov API Exception')
+
+            message = getattr(exc, 'message',
+                getattr(exc, 'title', default_message)
+            )
+            status_code = getattr(exc, 'status_code', default_status_code)
+            raise cls(message, status_code, headers) from exc
 
 
 class ApiInvalidParamException(ApiException):
@@ -387,10 +384,12 @@ class ApiEndpoint(Generic[_M]):
             }
 
             formdata = MultiDict()
-            try:
+            with ApiException.capture_exceptions(
+                exception_type=JSONDecodeError,
+                default_message='Malformed payload',
+                default_status_code=400,
+            ):
                 json_data = request.json
-            except JSONDecodeError as e:
-                raise ApiException('Malformed payload', status_code=400) from e
 
             if not isinstance(json_data, dict):
                 malformed_payload()
@@ -422,7 +421,9 @@ class ApiEndpoint(Generic[_M]):
                 elif isinstance(value, (str, int, float)):
                     formdata[name] = str(value)
                 else:
-                    raise ApiException(f'{name}: Unsupported value format')
+                    raise ApiException(
+                        f'{name}: Unsupported value format', status_code=400
+                    )
 
         else:
             formdata = None
