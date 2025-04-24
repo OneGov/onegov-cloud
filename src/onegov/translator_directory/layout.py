@@ -341,28 +341,22 @@ class TranslatorCollectionLayout(DefaultLayout):
         if not self.request.is_admin:
             return None
 
+        # Dynamically gather filter parameters from the collection model
         params = {}
-        if self.model.written_langs:
-            params['written_langs'] = self.model.written_langs
-        if self.model.spoken_langs:
-            params['spoken_langs'] = self.model.spoken_langs
-        if self.model.monitor_langs:
-            params['monitor_langs'] = self.model.monitor_langs
-        if self.model.search:
-            params['search'] = self.model.search
-        if self.model.guilds:
-            params['guilds'] = self.model.guilds
-        if self.model.interpret_types:
-            params['interpret_types'] = self.model.interpret_types
-        if self.model.admissions:
-            params['admissions'] = self.model.admissions
-        if self.model.genders:
-            params['genders'] = self.model.genders
-        # Add sorting parameters if needed
-        if self.model.order_by != 'last_name': # Default
+        filter_attrs = (
+            'written_langs', 'spoken_langs', 'monitor_langs', 'search',
+            'guilds', 'interpret_types', 'admissions', 'genders'
+        )
+        for attr in filter_attrs:
+            value = getattr(self.model, attr, None)
+            if value:  # Add if not None, empty list, or empty string
+                params[attr] = value
+
+        # Handle sorting parameters specifically
+        if self.model.order_by != 'last_name':  # Add if not default
             params['order_by'] = self.model.order_by
-        if self.model.order_desc:
-            params['order_desc'] = 'true'
+        if self.model.order_desc:  # Add if True
+            params['order_desc'] = 'true'  # Needs to be string for URL
 
         base_export_link = self.request.class_link(
             TranslatorCollection, name='export'
