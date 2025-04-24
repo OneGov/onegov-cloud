@@ -109,7 +109,7 @@ async def fetch_many(
     fetch_func: FetchFunc[UrlType, tuple[UrlType, Any]] = fetch,
     callback: FetchCallback[UrlType, tuple[UrlType, Any]] = default_callback,
     handle_exceptions: HandleExceptionType[UrlType] = raise_by_default,
-    timeout: ClientTimeout | None = None
+    timeout: ClientTimeout | None = None  # noqa: ASYNC109
 ) -> list[tuple[UrlType, Any]]: ...
 
 
@@ -120,7 +120,7 @@ async def fetch_many(
     fetch_func: FetchFunc[_UrlTypeT, _T],
     callback: FetchCallback[_UrlTypeT, _T],
     handle_exceptions: HandleExceptionType[_UrlTypeT] = raise_by_default,
-    timeout: ClientTimeout | None = None
+    timeout: ClientTimeout | None = None  # noqa: ASYNC109
 ) -> list[_T]: ...
 
 
@@ -132,7 +132,7 @@ async def fetch_many(
     *,
     callback: FetchCallback[_UrlTypeT, _T],
     handle_exceptions: HandleExceptionType[_UrlTypeT] = raise_by_default,
-    timeout: ClientTimeout | None = None
+    timeout: ClientTimeout | None = None  # noqa: ASYNC109
 ) -> list[_T]: ...
 
 
@@ -142,7 +142,7 @@ async def fetch_many(
     fetch_func: FetchFunc[Any, Any] = fetch,
     callback: FetchCallback[Any, Any] = default_callback,
     handle_exceptions: HandleExceptionType[Any] = raise_by_default,
-    timeout: ClientTimeout | None = None
+    timeout: ClientTimeout | None = None  # noqa: ASYNC109
 ) -> list[Any]:
     """ Registers a task per url using the coroutine fetch_func with correct
     signature. """

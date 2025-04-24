@@ -129,6 +129,8 @@ target-version = "py311"
 
 [tool.ruff.lint]
 select = [
+    "A005",
+    "ASYNC",
     "B0",
     "B904",
     "B909",
@@ -141,8 +143,11 @@ select = [
     "F",
     "FLY002",
     "FURB",
+    "G010",
+    "G2",
     "I002",
     "ISC",
+    "LOG",
     "N",
     "PERF",
     "PGH004",
@@ -190,6 +195,7 @@ ignore = [
     "FURB157",
     "FURB180",
     "FURB189",
+    "LOG002",
     "N818",
     "PYI019",
     "PYI041",
