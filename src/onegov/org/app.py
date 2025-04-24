@@ -4,8 +4,6 @@ from __future__ import annotations
 import re
 import yaml
 
-import base64
-import hashlib
 import morepath
 from dectate import directive
 from email.headerregistry import Address
@@ -355,15 +353,6 @@ class OrgApp(Framework, LibresIntegration, ElasticsearchApp, MapboxApp,
 
         with fs.open('allowed_iframe_domains.yml', 'r') as f:
             return yaml.safe_load(f).get('allowed_domains', [])
-
-    @property
-    def hashed_identity_key(self) -> bytes:
-        """ Take the sha-256 because we want a key that is 32 bytes long. """
-        hash_object = hashlib.sha256()
-        hash_object.update(self.identity_secret.encode('utf-8'))
-        short_key = hash_object.digest()
-        key_base64 = base64.b64encode(short_key)
-        return key_base64
 
     @property
     def custom_event_form_lead(self) -> str | None:

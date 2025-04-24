@@ -18,7 +18,6 @@ import os
 from io import BytesIO
 from markupsafe import Markup
 from onegov.form import Form
-from onegov.gever.encrypt import decrypt_symmetric
 from onegov.org import _, OrgApp
 from onegov.org.constants import TICKET_STATES
 from onegov.org.forms import ExtendedInternalTicketChatMessageForm
@@ -827,6 +826,12 @@ def change_tag(
                 )
             }
 
+            kaba_code = selected_meta.pop('Kaba Code', None)
+            handler_data = self.handler_data or {}
+            if kaba_code and 'key_code' not in handler_data:
+                handler_data['key_code'] = kaba_code
+                self.handler_data = handler_data
+
         self.tag_meta = selected_meta
 
         request.success(_('Tag changed'))
@@ -1082,8 +1087,7 @@ def view_send_to_gever(self: Ticket, request: OrgRequest) -> BaseResponse:
                         'in Gever API Settings.'))
         return morepath.redirect(request.link(self))
 
-    key = request.app.hashed_identity_key
-    password_dec = decrypt_symmetric(password.encode('utf-8'), key)
+    password_dec = request.app.decrypt(password.encode('utf-8'))
 
     pdf = TicketPdf.from_ticket(request, self)
     filename = '{}_{}.pdf'.format(

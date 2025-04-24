@@ -37,7 +37,6 @@ from onegov.org.models import (
 from onegov.org.models.extensions import (
     GeneralFileLinkExtension, DeletableContentExtension)
 from onegov.org.models.ticket import ReservationHandler
-from onegov.gever.encrypt import decrypt_symmetric
 from cryptography.fernet import InvalidToken
 from onegov.org.models import TicketMessage, ExtendedDirectoryEntry
 from onegov.org.notification_service import (
@@ -970,14 +969,13 @@ def send_push_notifications_for_news(request: OrgRequest) -> None:
         return
 
     # Decrypt the Firebase credentials
-    key_base64 = request.app.hashed_identity_key
     encrypted_creds = org.firebase_adminsdk_credential
     if not encrypted_creds:
         return
 
     try:
-        firebase_creds_json = decrypt_symmetric(
-            encrypted_creds.encode('utf-8'), key_base64
+        firebase_creds_json = request.app.decrypt(
+            encrypted_creds.encode('utf-8')
         )
     except InvalidToken:
         log.warning('Failed to decrypt Firebase credentials: InvalidToken')

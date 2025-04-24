@@ -240,6 +240,13 @@ class Organisation(Base, TimestampMixin):
     gever_password: dict_property[str | None] = meta_property()
     gever_endpoint: dict_property[str | None] = meta_property()
 
+    # Kaba settings
+    kaba_site_id: dict_property[str | None] = meta_property()
+    kaba_api_key: dict_property[str | None] = meta_property()
+    kaba_api_secret: dict_property[str | None] = meta_property()
+    default_key_code_lead_time: dict_property[int] = meta_property(default=30)
+    default_key_code_lag_time: dict_property[int] = meta_property(default=30)
+
     # data retention policy
     auto_archive_timespan: dict_property[int] = meta_property(default=0)
     auto_delete_timespan: dict_property[int] = meta_property(default=0)

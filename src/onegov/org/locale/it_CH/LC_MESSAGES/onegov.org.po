@@ -2,7 +2,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: \n"
-"POT-Creation-Date: 2025-04-17 15:17+0200\n"
+"POT-Creation-Date: 2025-04-24 09:19+0200\n"
 "PO-Revision-Date: 2022-03-15 10:52+0100\n"
 "Last-Translator: \n"
 "Language-Team: \n"
@@ -1427,6 +1427,9 @@ msgstr "Visualizzazione settimanale"
 msgid "Month view"
 msgstr "Visualizzazione mensile"
 
+msgid "Doors"
+msgstr "Porte"
+
 msgid "Per item"
 msgstr "Per elemento"
 
@@ -1438,6 +1441,13 @@ msgstr "Prezzo per elemento"
 
 msgid "Price per hour"
 msgstr "Tariffa oraria"
+
+msgid ""
+"Failed to retrieve the doors from the dormakaba API please make sure your "
+"credentials are still valid."
+msgstr ""
+"Impossibile recuperare le porte dall'API di dormakaba. Assicurarsi che le "
+"credenziali siano ancora valide."
 
 msgid "Please select the form field that holds the zip-code"
 msgstr "Seleziona il campo del modulo che contiene il codice postale"
@@ -2059,9 +2069,11 @@ msgstr ""
 "- FC Govikon:\n"
 "    E-Mail: fc@govikon.ch\n"
 "    Codice postale / Città: 1234 Govikon\n"
+"    Kaba Code: 123456\n"
 "- HC Govikon:\n"
 "    E-Mail: hc@govikon.ch\n"
 "    Codice postale / Città: 1234 Govikon\n"
+"    Kaba Code: 654321\n"
 "```"
 
 msgid "Categories restricted by user group settings"
@@ -2077,6 +2089,12 @@ msgid ""
 "example."
 msgstr ""
 "Formato non valido. Definire i tag e i loro meta-dati secondo l'esempio."
+
+msgid "Invalid price, needs to be a non-negative number."
+msgstr "Prezzo non valido, deve essere un numero non negativo."
+
+msgid "Invalid Kaba Code. Needs to be a 4 to 6 digit number code."
+msgstr "Kaba Code non valido. Deve essere un codice numerico a 4-6 cifre."
 
 msgid "Enable newsletter"
 msgstr "Attiva la newsletter"
@@ -2215,6 +2233,24 @@ msgstr "Endpoint API di Gever dove vengono caricati i documenti."
 
 msgid "Website address including https://"
 msgstr "Indirizzo del sito web incluso https://"
+
+msgid "Site ID"
+msgstr "ID del sito"
+
+msgid "Default Lead Time"
+msgstr "Tempi di consegna standard"
+
+msgid "In minutes"
+msgstr "In minuti"
+
+msgid "Default Lag Time"
+msgstr "Tempo di funzionamento standard"
+
+msgid "Invalid credentials or site id"
+msgstr "Credenziali o ID sito non validi"
+
+msgid "Unexpected error encountered, please try again."
+msgstr "Si è verificato un errore inatteso, riprovare."
 
 msgid "API Key"
 msgstr "Chiave API"
@@ -3289,6 +3325,9 @@ msgstr "Annulla registrazione"
 
 msgid "Edit submission"
 msgstr "Modifica iscrizione"
+
+msgid "Key Code"
+msgstr "Codice chiave"
 
 msgid "Accept all reservations"
 msgstr "Accetta tutte le prenotazioni"
@@ -6300,6 +6339,13 @@ msgstr ""
 "La tua prenotazione per ${room} è stata inviata. Continua con la tua "
 "prenotazione per ${next_room}."
 
+msgid ""
+"Failed to create visits using the dormakaba API please make sure your "
+"credentials are still valid."
+msgstr ""
+"Impossibile creare visite con l'API di dormakaba. Assicurarsi che le "
+"credenziali siano ancora valide."
+
 msgid "Your reservations were accepted"
 msgstr "Le tue prenotazioni sono state accettate"
 
@@ -6346,6 +6392,10 @@ msgstr "Le prenotazioni sono state rifiutate"
 
 msgid "The reservation was rejected"
 msgstr "La prenotazione è stata rifiutata"
+
+msgid "Failed to revoke one or more door codes in dormakaba API"
+msgstr ""
+"Non è stato possibile revocare uno o più codici porta in dormakaba API."
 
 msgid "Reject all reservations with message"
 msgstr "Rifiuta tutte le prenotazioni con messaggio"
