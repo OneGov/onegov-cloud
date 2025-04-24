@@ -341,16 +341,26 @@ class TranslatorCollectionLayout(DefaultLayout):
         if not self.request.is_admin:
             return None
 
-        params = {}
-        for attr in self.model.filter_attributes:
-            value = getattr(self.model, attr, None)
-            if value:
-                params[attr] = value
+        # Use the current request's query parameters directly
+        # These parameters were used to initialize self.model via get_translators
+        params = self.request.GET.copy()
 
+        # Remove pagination parameter if present, not needed for export
+        params.pop('page', None)
+
+        # Ensure sorting parameters in the link match the actual state of the
+        # collection model, handling defaults correctly.
         if self.model.order_by != 'last_name':
             params['order_by'] = self.model.order_by
+        else:
+            # Remove order_by from params if it's the default
+            params.pop('order_by', None)
+
         if self.model.order_desc:
             params['order_desc'] = 'true'
+        else:
+            # Remove order_desc from params if it's the default (False)
+            params.pop('order_desc', None)
 
         base_export_link = self.request.class_link(
             TranslatorCollection, name='export'
