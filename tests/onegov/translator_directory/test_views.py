@@ -683,9 +683,48 @@ def test_view_export_translators_with_filters_two_langs(client):
     ).value == 'German|French'
 
     data_row = 3
-    # todo: test 4444
+    assert sheet.cell(
+        row=data_row, column=header['Personal Nr.']).value == 4444
+    assert sheet.cell(
+        row=data_row, column=header['Vorname']).value == 'two'
+    assert sheet.cell(
+        row=data_row, column=header['Nachname']).value == 'langs'
+    assert sheet.cell(
+        row=data_row, column=header['Arbeitssprache - Wort']
+    ).value == 'German|French'
 
-    # todo: test sortierung (ascending)
+    # Test descending order
+    page = client.get('/translators')
+    page.form['spoken_langs'] = [lang_ids[0], lang_ids[1]]  # German, French
+    page.form['order_desc'] = '1'
+    page = page.form.submit().follow()
+
+    # Check that both are found and order is reversed in the table
+    results_table = page.pyquery('#search-results-table')[0].text_content()
+    assert 'two.langs@example.com' in results_table
+    assert 'alsotwo.alsotwo@example.com' in results_table
+    assert results_table.find('two.langs@example.com') < results_table.find(
+        'alsotwo.alsotwo@example.com'
+    )
+
+    # Click the export button again
+    response = page.click('Export')
+    sheet = load_workbook(BytesIO(response.body)).worksheets[0]
+    assert sheet.max_row == 3
+    header = {cell.value: cell.column for cell in sheet[1]}
+
+    # Check order is reversed in export (4444 first, then 5555)
+    data_row = 2
+    assert sheet.cell(
+        row=data_row, column=header['Personal Nr.']).value == 4444
+    assert sheet.cell(
+        row=data_row, column=header['Nachname']).value == 'langs'
+
+    data_row = 3
+    assert sheet.cell(
+        row=data_row, column=header['Personal Nr.']).value == 5555
+    assert sheet.cell(
+        row=data_row, column=header['Nachname']).value == 'alsotwo'
 
 
 
