@@ -785,30 +785,24 @@ def accept_reservation(
         # Include all the forms details to be able to print it out
         show_submission = True
 
-        client: KabaClient | None = None
-        code: str | None = None
-        if components := getattr(resource, 'kaba_components', []):
-            site_id = request.app.org.kaba_site_id
-            api_key = request.app.org.kaba_api_key
-            api_encrypted_secret = request.app.org.kaba_api_secret
-
-            if site_id and api_key and api_encrypted_secret:
-                api_secret = request.app.decrypt(
-                    bytes.fromhex(api_encrypted_secret)
-                )
-                client = KabaClient(site_id, api_key, api_secret)
-                code = ticket.handler.data.setdefault(
-                    'key_code', client.random_code()
-                )
-                lead_delta = timedelta(minutes=ticket.handler.data.setdefault(
-                    'key_code_lead_time',
-                    request.app.org.default_key_code_lead_time
-                ))
-                lag_delta = timedelta(minutes=ticket.handler.data.setdefault(
-                    'key_code_lag_time',
-                    request.app.org.default_key_code_lag_time
-                ))
-                ticket.handler.refresh()
+        client = KabaClient.from_resource(resource, request.app)
+        if client is not None:
+            # compute the things we need inside the loop once
+            components = resource.kaba_components  # type: ignore[attr-defined]
+            code = ticket.handler.data.setdefault(
+                'key_code', client.random_code()
+            )
+            lead_delta = timedelta(minutes=ticket.handler.data.setdefault(
+                'key_code_lead_time',
+                request.app.org.default_key_code_lead_time
+            ))
+            lag_delta = timedelta(minutes=ticket.handler.data.setdefault(
+                'key_code_lag_time',
+                request.app.org.default_key_code_lag_time
+            ))
+            ticket.handler.refresh()
+        else:
+            code = None
 
         for reservation in reservations:
             data = reservation.data = reservation.data or {}
@@ -829,6 +823,7 @@ def accept_reservation(
                     )
                 except KabaApiError:
                     log.info('Kaba API error', exc_info=True)
+
                     # roll back previous changes
                     transaction.abort()
                     transaction.begin()
@@ -1079,17 +1074,7 @@ def reject_reservation(
     if view_ticket is not None and view_ticket != ticket:
         raise exc.HTTPNotFound()
 
-    client: KabaClient | None = None
-    if getattr(resource, 'kaba_components', []):
-        site_id = request.app.org.kaba_site_id
-        api_key = request.app.org.kaba_api_key
-        api_encrypted_secret = request.app.org.kaba_api_secret
-
-        if site_id and api_key and api_encrypted_secret:
-            api_secret = request.app.decrypt(
-                bytes.fromhex(api_encrypted_secret)
-            )
-            client = KabaClient(site_id, api_key, api_secret)
+    client = KabaClient.from_resource(resource, request.app)
 
     # if there's a captured payment we cannot continue
     payment = ticket.handler.payment
@@ -1216,7 +1201,9 @@ def reject_reservation(
         request.success(_('The reservation was rejected'))
 
     if failed_to_revoke:
-        request.warning(_('Failed to revoke door code in dormakaba API'))
+        request.warning(_(
+            'Failed to revoke one or more door codes in dormakaba API'
+        ))
 
     # return none on intercooler js requests
     if not request.headers.get('X-IC-Request'):

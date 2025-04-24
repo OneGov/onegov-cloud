@@ -3,11 +3,14 @@ from __future__ import annotations
 import requests
 import secrets
 import string
+from cryptography.fernet import InvalidToken
 
 
-from typing import TYPE_CHECKING
+from typing import Self, TYPE_CHECKING
 if TYPE_CHECKING:
     from datetime import datetime
+    from onegov.org.app import OrgApp
+    from onegov.reservation import Resource
     from wtforms.fields.choices import _Choice
 
 
@@ -30,6 +33,34 @@ class KabaClient:
         self.session = requests.Session()
         self.session.auth = (api_key, api_secret)
         self.base_url = 'https://api.exivo.io/v1'
+
+    @classmethod
+    def from_app(cls, app: OrgApp) -> Self | None:
+        site_id = app.org.kaba_site_id
+        api_key = app.org.kaba_api_key
+        api_encrypted_secret = app.org.kaba_api_secret
+        if not (site_id and api_key and api_encrypted_secret):
+            return None
+
+        try:
+            api_secret = app.decrypt(bytes.fromhex(api_encrypted_secret))
+        except InvalidToken:
+            return None
+
+        return cls(site_id, api_key, api_secret)
+
+    @classmethod
+    def from_resource(
+        cls,
+        resource: Resource,
+        app: OrgApp
+    ) -> Self | None:
+
+        components = getattr(resource, 'kaba_components', [])
+        if not components:
+            return None
+
+        return cls.from_app(app)
 
     def raise_for_status(self, res: requests.Response) -> None:
         if res.ok:

@@ -217,25 +217,19 @@ class ResourceBaseForm(Form):
                 self.delete_field('kaba_components')
                 return
 
-        site_id = self.request.app.org.kaba_site_id
-        api_key = self.request.app.org.kaba_api_key
-        api_encrypted_secret = self.request.app.org.kaba_api_secret
+        client = KabaClient.from_app(self.request.app)
+        if client is None:
+            self.delete_field('kaba_components')
+            return
 
-        if site_id and api_key and api_encrypted_secret:
-            api_secret = self.request.app.decrypt(
-                bytes.fromhex(api_encrypted_secret)
-            )
-            client = KabaClient(site_id, api_key, api_secret)
-            try:
-                self.kaba_components.choices = client.component_choices()
-            except KabaApiError:
-                log.info('Kaba API error', exc_info=True)
-                self.request.alert(_(
-                    'Failed to retrieve the doors from the dormakaba API '
-                    'please make sure your credentials are still valid.'
-                ))
-                self.delete_field('kaba_components')
-        else:
+        try:
+            self.kaba_components.choices = client.component_choices()
+        except KabaApiError:
+            log.info('Kaba API error', exc_info=True)
+            self.request.alert(_(
+                'Failed to retrieve the doors from the dormakaba API '
+                'please make sure your credentials are still valid.'
+            ))
             self.delete_field('kaba_components')
 
     @property
