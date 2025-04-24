@@ -1,8 +1,24 @@
 # Changes
 
+## 2025.21
+
+`2025-04-24` | [6864d7cf50...8268dfadff](https://github.com/OneGov/onegov-cloud/compare/6864d7cf50^...8268dfadff)
+
+### Org
+
+##### Adds integration for dormakaba API
+
+`Feature` | [OGC-2032](https://linear.app/onegovcloud/issue/OGC-2032) | [8268dfadff](https://github.com/onegov/onegov-cloud/commit/8268dfadff4754fddd73d74da5434e9008b4b91d)
+
+### Reservation
+
+##### Fixes upgrade task not running, when it should be run
+
+`Bugfix` | [6864d7cf50](https://github.com/onegov/onegov-cloud/commit/6864d7cf50cd01fa78c71c698cfed93e8f712819)
+
 ## 2025.20
 
-`2025-04-22` | [196ff526a9...196ff526a9](https://github.com/OneGov/onegov-cloud/compare/196ff526a9^...196ff526a9)
+`2025-04-22` | [196ff526a9...3c6edf9228](https://github.com/OneGov/onegov-cloud/compare/196ff526a9^...3c6edf9228)
 
 ### Pas
 
@@ -2087,64 +2103,4 @@ the first login of a user without a configured second factor.
 ##### Adds TOTP as a second factor option
 
 `Feature` | [SEA-1413](https://linear.app/seantis/issue/SEA-1413) | [049160d61a](https://github.com/onegov/onegov-cloud/commit/049160d61a6ebd06902672e970a717d2ada07a9f)
-
-## 2024.40
-
-`2024-07-19` | [4fdef5e05c...f81d5c42cd](https://github.com/OneGov/onegov-cloud/compare/4fdef5e05c^...f81d5c42cd)
-
-### Core
-
-##### Updates Sentry integration for v2.10+
-
-`Bugfix` | [OGC-1745](https://linear.app/onegovcloud/issue/OGC-1745) | [c9ba7fa549](https://github.com/onegov/onegov-cloud/commit/c9ba7fa54993b82f15d028b32d4b5e43c7024a2d)
-
-### Docs
-
-##### Fix Election Day API docs.
-
-`Bugfix` | [b4dda4d15b](https://github.com/onegov/onegov-cloud/commit/b4dda4d15bf631344d0e2b1a0201e9d6a03db1bc)
-
-### Event
-
-##### Adds settings for general event files and shows files in sidebar of occurrences view
-
-`Feature` | [OGC-1544](https://linear.app/onegovcloud/issue/OGC-1544) | [a4f76d7ce9](https://github.com/onegov/onegov-cloud/commit/a4f76d7ce94b4a91cb067157c07b29dfd285b4f0)
-
-### Form
-
-##### Adds email as default mandatory field for new forms
-
-`Feature` | [OGC-1594](https://linear.app/onegovcloud/issue/OGC-1594) | [e22b65da60](https://github.com/onegov/onegov-cloud/commit/e22b65da603fec5047d73a0db1aaff512b656e93)
-
-##### Raise error for empty field sets
-
-`Feature` | [OGC-1160](https://linear.app/onegovcloud/issue/OGC-1160) | [11be9de24c](https://github.com/onegov/onegov-cloud/commit/11be9de24c12034b0e375968839e23929198c5d7)
-
-### Org
-
-##### Show event settings
-
-`Bugfix` | [NONE](#NONE) | [b115c262c2](https://github.com/onegov/onegov-cloud/commit/b115c262c227b2b0fcb34ae094bd99c691a62224)
-
-### Pas
-
-##### Add rate sets, settlement runs and changes.
-
-`Feature` | [OGC-1503](https://linear.app/onegovcloud/issue/OGC-1503) | [4aa7f4917d](https://github.com/onegov/onegov-cloud/commit/4aa7f4917dc415e7373dd5c23c55b4670b752866)
-
-##### Fix translation.
-
-`Bugfix` | [61ea339eca](https://github.com/onegov/onegov-cloud/commit/61ea339ecab7c09f4c53997a039dc969c667550d)
-
-### People
-
-##### CLI import command extended for organisation fields  Improved error output for incorrect header fields
-
-`Feature` | [OGC-1736](https://linear.app/onegovcloud/issue/OGC-1736) | [4fdef5e05c](https://github.com/onegov/onegov-cloud/commit/4fdef5e05c22c9586c4b627270a6fdde6878c244)
-
-### Settings
-
-##### Move settings for events to event settings section
-
-`Feature` | [NONE](#NONE) | [37e4cc067a](https://github.com/onegov/onegov-cloud/commit/37e4cc067a9bebe78e3c72f88de801fe496e413e)
 
