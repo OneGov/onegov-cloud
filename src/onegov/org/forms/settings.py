@@ -1184,7 +1184,7 @@ class OrgTicketSettingsForm(Form):
 
                     if not KABA_CODE_RE.match(code):
                         self.ticket_tags.errors.append(_(
-                            'Invalid Kaba code. '
+                            'Invalid Kaba Code. '
                             'Needs to be a 4 to 6 digit number code.'
                         ))
                         return False
@@ -1579,7 +1579,10 @@ class KabaSettingsForm(Form):
             api_secret = self.kaba_api_secret.data
         elif self.model.kaba_api_secret is None:
             assert isinstance(self.kaba_api_secret.errors, list)
-            self.kaba_api_secret.errors.append(_('Input required'))
+            self.kaba_api_secret.errors.append(
+                # translation provided by wtforms
+                self.kaba_api_secret.gettext('This field is required.')
+            )
             return False
         elif (
             self.kaba_site_id.data == self.model.kaba_site_id
