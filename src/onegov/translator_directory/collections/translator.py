@@ -33,6 +33,12 @@ class TranslatorCollection(
 
     batch_size = 10
 
+    #: The names of the filter attributes that should be persisted in URLs
+    filter_attributes: tuple[str, ...] = (
+        'written_langs', 'spoken_langs', 'monitor_langs', 'search',
+        'guilds', 'interpret_types', 'admissions', 'genders'
+    )
+
     def __init__(
         self,
         app: TranslatorDirectoryApp,

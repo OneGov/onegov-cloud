@@ -343,11 +343,8 @@ class TranslatorCollectionLayout(DefaultLayout):
 
         # Dynamically gather filter parameters from the collection model
         params = {}
-        filter_attrs = (
-            'written_langs', 'spoken_langs', 'monitor_langs', 'search',
-            'guilds', 'interpret_types', 'admissions', 'genders'
-        )
-        for attr in filter_attrs:
+        # Use the filter attributes defined on the collection model
+        for attr in self.model.filter_attributes:
             value = getattr(self.model, attr, None)
             if value:  # Add if not None, empty list, or empty string
                 params[attr] = value
