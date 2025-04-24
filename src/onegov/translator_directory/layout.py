@@ -341,28 +341,24 @@ class TranslatorCollectionLayout(DefaultLayout):
         if not self.request.is_admin:
             return None
 
-        # Dynamically gather filter parameters from the collection model
         params = {}
-        # Use the filter attributes defined on the collection model
         for attr in self.model.filter_attributes:
             value = getattr(self.model, attr, None)
-            if value:  # Add if not None, empty list, or empty string
+            if value:
                 params[attr] = value
 
-        # Handle sorting parameters specifically
-        if self.model.order_by != 'last_name':  # Add if not default
+        if self.model.order_by != 'last_name':
             params['order_by'] = self.model.order_by
-        if self.model.order_desc:  # Add if True
-            params['order_desc'] = 'true'  # Needs to be string for URL
+        if self.model.order_desc:
+            params['order_desc'] = 'true'
 
         base_export_link = self.request.class_link(
             TranslatorCollection, name='export'
         )
-        export_url = (
+        return (
             f'{base_export_link}?{urlencode(params, doseq=True)}'
             if params else base_export_link
         )
-        return export_url
 
     @cached_property
     def editbar_links(self) -> list[Link | LinkGroup] | None:
