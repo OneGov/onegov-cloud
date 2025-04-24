@@ -6,25 +6,38 @@ from tests.onegov.agency.test_app import DummyRequest
 
 
 def test_api_exceptions():
+    # small helper to reduce boiler-plate
+    def as_captured_exception(exception, default_status_code=500):
+        try:
+            with ApiException.capture_exceptions(
+                default_status_code=default_status_code
+            ):
+                raise exception
+        except ApiException as api_exception:
+            return api_exception
+
     exception = ApiException()
     assert exception.message == 'Internal Server Error'
     assert exception.status_code == 500
 
-    exception = ApiException(exception=ValueError('foo'))
+    exception = as_captured_exception(ValueError('foo'))
     assert exception.message == 'Internal Server Error'
     assert exception.status_code == 500
 
-    exception = ApiException(exception=ApiInvalidParamException('foo'))
+    exception = as_captured_exception(ApiInvalidParamException('foo'))
     assert exception.message == 'foo'
     assert exception.status_code == 400
 
-    exception = ApiException(exception=ApiInvalidParamException('foo'),
-                             status_code=299)
+    exception = as_captured_exception(
+        ApiInvalidParamException('foo'),
+        default_status_code=299
+    )
     assert exception.message == 'foo'
     assert exception.status_code == 400
 
-    exception = ApiException(
-        exception=ApiInvalidParamException('foo', status_code=300))
+    exception = as_captured_exception(
+        ApiInvalidParamException('foo', status_code=300)
+    )
     assert exception.message == 'foo'
     assert exception.status_code == 300
 

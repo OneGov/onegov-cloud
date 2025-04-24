@@ -93,8 +93,8 @@ class ApiException(Exception):
         self.status_code = status_code
         self.headers = headers or {}
 
-    @contextmanager
     @classmethod
+    @contextmanager
     def capture_exceptions(
         cls,
         default_message: str = 'Internal Server Error',
