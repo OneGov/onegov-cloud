@@ -603,7 +603,7 @@ def test_view_export_translators_with_filters(client):
 
     # Check that only translator 1 is shown in the results table
     results_table = page.pyquery('#search-results-table')[0].text_content()
-    assert 'filtered.one@example.com' in results_table 
+    assert 'filtered.one@example.com' in results_table
     assert 'filtered.two@example.com' not in results_table
     assert 'filtered.three@example.com' not in results_table
 
@@ -638,7 +638,7 @@ def test_view_export_translators_with_filters_two_langs(client):
     # search two languages
     # Create two translators, both having two languages
     data4 = copy.deepcopy(translator_data)
-    data4['pers_id'] = 4444 
+    data4['pers_id'] = 4444
     data4['first_name'] = 'two'
     data4['last_name'] = 'langs'
     data4['email'] = 'two.langs@example.com'
@@ -646,7 +646,7 @@ def test_view_export_translators_with_filters_two_langs(client):
     translators.add(**data4)
 
     data5 = copy.deepcopy(translator_data)
-    data5['pers_id'] = 5555 
+    data5['pers_id'] = 5555
     data5['first_name'] = 'alsotwo'
     data5['last_name'] = 'alsotwo'
     data5['email'] = 'alsotwo.alsotwo@example.com'
@@ -662,7 +662,7 @@ def test_view_export_translators_with_filters_two_langs(client):
 
     # Check that both are found
     results_table = page.pyquery('#search-results-table')[0].text_content()
-    assert 'two.langs@example.com' in results_table 
+    assert 'two.langs@example.com' in results_table
     assert 'alsotwo.alsotwo@example.com' in results_table
     # Click the export button (which now includes filters)
     response = page.click('Export')
@@ -673,7 +673,7 @@ def test_view_export_translators_with_filters_two_langs(client):
     data_row = 2
     # first one will be the 5555  (ordered by lastname
     assert sheet.cell(
-        row=data_row, column=header['Personal Nr.']).value == 5555 
+        row=data_row, column=header['Personal Nr.']).value == 5555
     assert sheet.cell(
         row=data_row, column=header['Vorname']).value == 'alsotwo'
     assert sheet.cell(
