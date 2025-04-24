@@ -322,6 +322,7 @@ h1.main-title small {
     color: $charcoal;
 
     .person-card-function {
+        color: $aluminum;
         font-size: 1rem;
     }
 }
@@ -493,6 +494,49 @@ h1.main-title small {
     justify-content: space-between;
     margin-top: 4rem;
 
+    @include breakpoint(medium down) {
+        font-weight: bold;
+
+        div {
+            align-items: center;
+            background: $aluminum;
+            justify-content: center;
+            position: fixed;
+            top: calc(100vh - 5rem);
+            z-index: 100;
+
+            a.button {
+                border: 0;
+                color: $white;
+                margin-bottom: 0;
+                padding-bottom: .5rem !important;
+                padding-top: .6rem !important;
+            }
+        }
+
+        .prev-item {
+            border-left: 0;
+            border-radius: 0 .7rem .7rem 0;
+            left: 0;
+
+            a {
+                padding-left: .7rem !important;
+                padding-right: .6rem !important;
+            }
+        }
+
+        .next-item {
+            border-radius: .7rem 0 0 .7rem;
+            border-right: 0;
+            right: 0;
+
+            a {
+                padding-left: .6rem !important;
+                padding-right: .7rem !important;
+            }
+        }
+    }
+
     a {
         display: block;
     }
@@ -505,47 +549,7 @@ h1.main-title small {
         margin-left: .3rem;
     }
 
-    @include breakpoint(medium down) {
-        font-weight: bold;
 
-        div {
-            position: fixed;
-            top: calc(100vh - 5rem);
-            background: $aluminum;
-            justify-content: center;
-            align-items: center;
-            z-index: 100;
-
-            a.button {
-                border: 0;
-                color: $white;
-                padding-top: .6rem !important;
-                padding-bottom: .5rem !important;
-                margin-bottom: 0;
-            }
-        }
-        .prev-item {
-            left: 0;
-            border-radius: 0 0.7rem 0.7rem 0;
-            border-left: 0;
-
-            a {
-                padding-left: .7rem !important;
-                padding-right: .6rem !important;
-            }
-        }
-
-        .next-item {
-            right: 0;
-            border-radius: 0.7rem 0 0 0.7rem;
-            border-right: 0;
-
-            a {
-                padding-right: .7rem !important;
-                padding-left: .6rem !important;
-            }
-        }
-    }
 }
 
 /*Download Icons*/
