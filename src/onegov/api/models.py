@@ -107,7 +107,15 @@ class ApiException(Exception):
             exception is None
             or isinstance(exception, (HTTPException, ApiException))
         ):
-            log.exception(exception)
+            # FIXME: This is a little sus, since it assumes that we're only
+            #        ever being passed an exception while we're currenlty
+            #        handling that exception.
+            #        We may be better off removing the `exception` parameter
+            #        and addding a `classmethod` `contextmanager` that if an
+            #        exception occurs, swallows it, logs it and re-emits
+            #        an instance of ApiException instead. This may also
+            #        simplify and get rid of some boiler-plate code.
+            log.exception(exception)  # noqa: LOG004
 
 
 class ApiInvalidParamException(ApiException):

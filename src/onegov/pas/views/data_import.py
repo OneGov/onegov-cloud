@@ -74,26 +74,16 @@ def load_and_concatenate_json(
                     f'or is not a list in the JSON data.'
                 )
         except json.JSONDecodeError as e:
-            log.error(
-                f'Error decoding JSON from file {filename}.', exc_info=True
-            )
             raise RuntimeError(
                 f'Error decoding JSON from file {filename}.'
             ) from e
         except UnicodeDecodeError as e:
-            log.error(
-                f'Error decoding file {filename} as UTF-8.', exc_info=True
-            )
             raise RuntimeError(
                 f'Error decoding file {filename} as UTF-8.'
             ) from e
         except Exception as e:
-            log.error(
-                f'Unexpected error processing file {filename}: {e}',
-                exc_info=True
-            )
             raise RuntimeError(
-                f'Unexpected error processing file {filename}'
+                f'Unexpected error processing file {filename}.'
             ) from e
 
     return all_results
@@ -258,7 +248,7 @@ def handle_data_import(
             layout.breadcrumbs.append(Link(_('Import result'), '#'))
 
         except Exception as e:
-            log.error(f'Data import failed: {e}', exc_info=True)
+            log.exception('Data import failed')
             # Provide a more user-friendly error message
             request.message(
                 _('Data import failed: ${error}', mapping={'error': str(e)}),
