@@ -100,12 +100,16 @@ class ApiException(Exception):
         default_message: str = 'Internal Server Error',
         default_status_code: int = 500,
         headers: dict[str, str] | None = None,
-        exception_type: type[BaseException] = Exception,
+        exception_type: type[Exception] = Exception,
     ) -> Iterator[None]:
         try:
             yield
         except exception_type as exc:
-            if not isinstance(exc, (HTTPException, ApiException)):
+            # NOTE: log unexpected exceptions
+            if (
+                exception_type is Exception
+                and not isinstance(exc, (HTTPException, ApiException))
+            ):
                 log.exception('Captured OneGov API Exception')
 
             message = getattr(exc, 'message',
