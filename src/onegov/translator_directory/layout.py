@@ -336,42 +336,46 @@ class TranslatorCollectionLayout(DefaultLayout):
         ]
 
     @cached_property
+    def export_link(self) -> str | None:
+        """ Returns the export link with current filters included, or None """
+        if not self.request.is_admin:
+            return None
+
+        params = {}
+        if self.model.written_langs:
+            params['written_langs'] = self.model.written_langs
+        if self.model.spoken_langs:
+            params['spoken_langs'] = self.model.spoken_langs
+        if self.model.monitor_langs:
+            params['monitor_langs'] = self.model.monitor_langs
+        if self.model.search:
+            params['search'] = self.model.search
+        if self.model.guilds:
+            params['guilds'] = self.model.guilds
+        if self.model.interpret_types:
+            params['interpret_types'] = self.model.interpret_types
+        if self.model.admissions:
+            params['admissions'] = self.model.admissions
+        if self.model.genders:
+            params['genders'] = self.model.genders
+        # Add sorting parameters if needed
+        if self.model.order_by != 'last_name': # Default
+            params['order_by'] = self.model.order_by
+        if self.model.order_desc:
+            params['order_desc'] = 'true'
+
+        base_export_link = self.request.class_link(
+            TranslatorCollection, name='export'
+        )
+        export_url = (
+            f'{base_export_link}?{urlencode(params, doseq=True)}'
+            if params else base_export_link
+        )
+        return export_url
+
+    @cached_property
     def editbar_links(self) -> list[Link | LinkGroup] | None:
         if self.request.is_admin:
-
-            # --- Create the export URL with filters ---
-            params = {}
-            if self.model.written_langs:
-                params['written_langs'] = self.model.written_langs
-            if self.model.spoken_langs:
-                params['spoken_langs'] = self.model.spoken_langs
-            if self.model.monitor_langs:
-                params['monitor_langs'] = self.model.monitor_langs
-            if self.model.search:
-                params['search'] = self.model.search
-            if self.model.guilds:
-                params['guilds'] = self.model.guilds
-            if self.model.interpret_types:
-                params['interpret_types'] = self.model.interpret_types
-            if self.model.admissions:
-                params['admissions'] = self.model.admissions
-            if self.model.genders:
-                params['genders'] = self.model.genders
-            # Add sorting parameters if needed
-            if self.model.order_by != 'last_name': # Default
-                params['order_by'] = self.model.order_by
-            if self.model.order_desc:
-                params['order_desc'] = 'true'
-
-            base_export_link = self.request.class_link(
-                TranslatorCollection, name='export'
-            )
-            export_url = (
-                f'{base_export_link}?{urlencode(params, doseq=True)}'
-                if params else base_export_link
-            )
-            # --- End export URL creation ---
-
             return [
                 LinkGroup(
                     _('Add'),
@@ -385,11 +389,7 @@ class TranslatorCollectionLayout(DefaultLayout):
                         ),
                     )
                 ),
-                Link(
-                    _('Export Excel'),
-                    url=export_url,  # Use the dynamic URL here
-                    attrs={'class': 'export-link'},
-                ),
+                # Link removed from here
                 Link(
                     _('Mail to all translators'),
                     url=self.request.app.mailto_link,

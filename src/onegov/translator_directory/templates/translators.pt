@@ -6,7 +6,14 @@
         <div class="grid-x grid-padding-x">
             <div class="cell small-12">
                 <div class="translators-filter">
-                    <div class="search"></div>
+                    <div class="search">
+                        <a tal:condition="layout.export_link"
+                           tal:attributes="href layout.export_link"
+                           class="button secondary export-button">
+                            <i class="fa fa-download" aria-hidden="true"></i>
+                            <span i18n:translate="">Export Excel</span>
+                        </a>
+                    </div>
                 </div>
                 <div class="search-results">
                     <p tal:condition="not: results" i18n:translate="">
