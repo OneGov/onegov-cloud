@@ -341,11 +341,9 @@ class TranslatorCollectionLayout(DefaultLayout):
         if not self.request.is_admin:
             return None
 
-        # Use the current request's query parameters directly
-        # These parameters were used to initialize self.model via get_translators
         params = self.request.GET.copy()
 
-        # Remove pagination parameter if present, not needed for export
+        # Remove pagination parameter, not needed for export
         params.pop('page', None)
 
         # Ensure sorting parameters in the link match the actual state of the

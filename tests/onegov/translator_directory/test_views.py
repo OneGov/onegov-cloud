@@ -555,6 +555,87 @@ def test_view_export_translators(client):
     assert sheet.cell(2, 41).value is None
 
 
+def test_view_export_translators_with_filters(client):
+    session = client.app.session()
+    languages = create_languages(session)
+    lang_ids = [str(lang.id) for lang in languages]
+    translators = TranslatorCollection(client.app)
+
+    # Add translator 1
+    data1 = copy.deepcopy(translator_data)
+    data1['pers_id'] = 1111
+    data1['first_name'] = 'Filtered'
+    data1['last_name'] = 'One'
+    data1['email'] = 'filtered.one@example.com'
+    data1['spoken_languages'] = [languages[0], languages[1]]  # German, French
+    data1['written_languages'] = [languages[2]]  # Italian
+    translators.add(**data1)
+
+    # Add translator 2
+    data2 = copy.deepcopy(translator_data)
+    data2['pers_id'] = 2222
+    data2['first_name'] = 'Filtered'
+    data2['last_name'] = 'Two'
+    data2['email'] = 'filtered.two@example.com'
+    data2['spoken_languages'] = [languages[0]]  # German
+    data2['written_languages'] = [languages[3]]  # Arabic
+    translators.add(**data2)
+
+    # Add translator 3 (should be filtered out)
+    data3 = copy.deepcopy(translator_data)
+    data3['pers_id'] = 3333
+    data3['first_name'] = 'NotFiltered'
+    data3['last_name'] = 'Three'
+    data3['email'] = 'not.filtered@example.com'
+    data3['spoken_languages'] = [languages[1]]  # French
+    data3['written_languages'] = [languages[2]]  # Italian
+    translators.add(**data3)
+
+    transaction.commit()
+
+    client.login_admin()
+    page = client.get('/translators')
+
+    # Fill the search form
+    page.form['spoken_langs'] = [lang_ids[0]]  # German
+    page.form['written_langs'] = [lang_ids[2]]  # Italian
+    page = page.form.submit().follow()
+
+    # Check that only translator 1 is shown in the results table
+    results_table = page.pyquery('#search-results-table')[0].text_content()
+    assert 'filtered.one@example.com' in results_table 
+    assert 'filtered.two@example.com' not in results_table
+    assert 'filtered.three@example.com' not in results_table
+
+    # Click the export button (which now includes filters)
+    response = page.click('Export')
+
+    # Verify the exported Excel file
+    sheet = load_workbook(BytesIO(response.body)).worksheets[0]
+
+    # Header row + 1 data row expected
+    assert sheet.max_row == 2
+
+    # Get header row to map column names to indices
+    header = {cell.value: cell.column for cell in sheet[1]}
+
+    # Check data of the exported translator (should be translator 1) using
+    # column names from the header
+    data_row = 2
+    assert sheet.cell(
+        row=data_row, column=header['Personal Nr.']).value == 1111
+    assert sheet.cell(
+        row=data_row, column=header['Vorname']).value == 'Filtered'
+    assert sheet.cell(
+        row=data_row, column=header['Nachname']).value == 'One'
+    assert sheet.cell(
+        row=data_row, column=header['Arbeitssprache - Wort']
+    ).value == 'German|French'
+    assert sheet.cell(
+        row=data_row, column=header['Arbeitssprache - Schrift']
+    ).value == 'Italian'
+
+
 def test_file_security(client):
     translators = TranslatorCollection(client.app)
     trs_id = translators.add(**translator_data).id

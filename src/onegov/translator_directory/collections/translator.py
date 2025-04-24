@@ -33,8 +33,6 @@ class TranslatorCollection(
 
     batch_size = 10
 
-    # filter_attributes removed, no longer needed here for URL generation
-
     def __init__(
         self,
         app: TranslatorDirectoryApp,
