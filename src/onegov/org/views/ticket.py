@@ -826,6 +826,12 @@ def change_tag(
                 )
             }
 
+            kaba_code = selected_meta.pop('Kaba Code', None)
+            handler_data = self.handler_data or {}
+            if kaba_code and 'key_code' not in handler_data:
+                handler_data['key_code'] = kaba_code
+                self.handler_data = handler_data
+
         self.tag_meta = selected_meta
 
         request.success(_('Tag changed'))
