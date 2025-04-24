@@ -1180,7 +1180,26 @@ class OrgTicketSettingsForm(Form):
                         return False
 
                 if 'Kaba Code' in meta:
-                    code = str(meta['Kaba Code']).strip().zfill(4)
+                    raw_code = meta['Kaba Code']
+                    if isinstance(raw_code, str):
+                        code = raw_code
+                    elif isinstance(raw_code, int):
+                        code = str(raw_code)
+                        # leading zeroes can be interpreted as octal
+                        # so we need to convert it back to its orginal
+                        # representation
+                        if code not in self.ticket_tags.data:
+                            code = f'{raw_code:o}'
+                        if len(code) < 6:
+                            # try to restore any leading zeroes YAML stripped
+                            for __ in range(6 - len(code)):
+                                prefixed = f'0{code}'
+                                if prefixed in self.ticket_tags.data:
+                                    code = prefixed
+                                else:
+                                    break
+                    else:
+                        code = str(raw_code)
 
                     if not KABA_CODE_RE.match(code):
                         self.ticket_tags.errors.append(_(
@@ -1191,6 +1210,8 @@ class OrgTicketSettingsForm(Form):
 
                     # Store normalized Kaba code
                     meta['Kaba Code'] = code
+
+        self.ticket_tags.parsed_data = items  # type: ignore[attr-defined]
 
         return None
 
@@ -1249,8 +1270,13 @@ class OrgTicketSettingsForm(Form):
     def populate_obj(self, model: Organisation) -> None:  # type:ignore
         super().populate_obj(model, exclude={'ticket_tags'})
 
-        yaml_data = self.ticket_tags.data
-        model.ticket_tags = yaml.safe_load(yaml_data) if yaml_data else []
+        if hasattr(self.ticket_tags, 'parsed_data'):
+            data = self.ticket_tags.parsed_data
+        else:
+            yaml_data = self.ticket_tags.data
+            data = yaml.safe_load(yaml_data) if yaml_data else []
+
+        model.ticket_tags = data
 
     def process_obj(self, model: Organisation) -> None:  # type:ignore
         super().process_obj(model)

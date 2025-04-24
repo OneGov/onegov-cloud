@@ -4,6 +4,7 @@ import requests
 import secrets
 import string
 from cryptography.fernet import InvalidToken
+from sedate import to_timezone
 
 
 from typing import Self, TYPE_CHECKING
@@ -15,9 +16,10 @@ if TYPE_CHECKING:
 
 
 class KabaApiError(Exception):
-    def __init__(self, code: str, message: str) -> None:
-        self.code = code
+    def __init__(self, message: str, response: requests.Response) -> None:
+        super().__init__(message)
         self.message = message
+        self.response = response
 
 
 class KabaClient:
@@ -67,10 +69,7 @@ class KabaClient:
             return
 
         error = res.json()
-        raise KabaApiError(
-            error['code'],
-            error['message'],
-        )
+        raise KabaApiError(error['message'], res)
 
     def site_name(self) -> str:
         res = self.session.get(
@@ -107,8 +106,14 @@ class KabaClient:
             f'{self.base_url}/{self.site_id}/visit',
             json={
                 'code': code,
-                'validFrom': start.isoformat(),
-                'validTo': end.isoformat(),
+                # NOTE: The API claims to support ISO 8601, but in fact it only
+                #       supports UTC times with Z postfix instead of an offset.
+                'validFrom': to_timezone(
+                    start, 'UTC'
+                ).isoformat(timespec='microseconds')[:-6] + 'Z',
+                'validTo': to_timezone(
+                    end, 'UTC'
+                ).isoformat(timespec='microseconds')[:-6] + 'Z',
                 'components': components,
                 'name': name,
                 'message': message,
