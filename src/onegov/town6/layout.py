@@ -5,10 +5,11 @@ from functools import cached_property
 
 from onegov.core.elements import Confirm, Intercooler, Link, LinkGroup
 from onegov.core.static import StaticFile
-from onegov.core.utils import to_html_ul
+from onegov.core.utils import append_query_param, to_html_ul
 from onegov.chat.collections import ChatCollection
 from onegov.chat.models import Chat
 from onegov.directory import DirectoryCollection
+from onegov.event import OccurrenceCollection
 from onegov.form import FormCollection
 from onegov.org.elements import QrCodeLink, IFrameLink
 from onegov.org.layout import (
@@ -608,6 +609,24 @@ class OccurrenceLayout(OrgOccurrenceLayout, DefaultLayout):
 
     app: TownApp
     request: TownRequest
+
+    @cached_property
+    def editbar_links(self) -> list[Link | LinkGroup]:
+        links = super().editbar_links or []
+        if self.request.is_manager:
+            copy_url = self.request.link(
+                OccurrenceCollection(self.request.session), 'enter-event')
+            copy_url = append_query_param(copy_url,
+                                          'event_id', self.model.event.id.hex)
+
+            links.append(
+                Link(
+                    text=_('Copy'),
+                    url=copy_url,
+                    attrs={'class': 'copy-link'}
+                )
+            )
+        return links
 
 
 @step_sequences.registered_step(1, _('Form'), cls_after='FormSubmissionLayout')
