@@ -1,7 +1,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE 1.0\n"
-"POT-Creation-Date: 2025-03-04 13:29+0100\n"
+"POT-Creation-Date: 2025-04-28 14:53+0200\n"
 "PO-Revision-Date: 2021-11-11 09:08+0100\n"
 "Last-Translator: Marc Sommerhalder <marc.sommerhalder@seantis.ch>\n"
 "Language-Team: German\n"
@@ -674,8 +674,8 @@ msgstr "PLZ"
 msgid "Political municipality"
 msgstr "Politische Gemeinde"
 
-msgid "The Swisspass ID must be 13 characters long."
-msgstr "Die Swisspass ID muss 13 Zeichen lang sein."
+msgid "The Swisspass ID must be 13 characters long (including dashes)."
+msgstr "Die Swisspass ID muss 13 Zeichen (inklusive Bindestriche) lang sein."
 
 msgid "The Swisspass ID must only contain digits and dashes."
 msgstr "Die Swisspass ID darf nur Ziffern und Bindestriche enthalten."
@@ -3219,6 +3219,9 @@ msgstr "Buchungen ${period}"
 #, python-format
 msgid "Billing for ${period}"
 msgstr "Fakturierung ${period}"
+
+#~ msgid "The Swisspass ID must be 13 characters long."
+#~ msgstr "Die Swisspass ID muss 13 Zeichen lang sein."
 
 #~ msgid ""
 #~ "This cannot be undone. The activity will be made private as a result."

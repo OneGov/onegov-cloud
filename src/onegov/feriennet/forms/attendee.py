@@ -183,7 +183,8 @@ class AttendeeForm(AttendeeBase):
             if len(self.swisspass.data) != 13:
                 assert isinstance(self.swisspass.errors, list)
                 self.swisspass.errors.append(_(
-                    'The Swisspass ID must be 13 characters long.'
+                    'The Swisspass ID must be 13 characters long '
+                    '(including dashes).'
                 ))
                 return False
 
@@ -596,7 +597,8 @@ class AttendeeSignupForm(AttendeeBase):
             if len(self.swisspass.data) != 13:
                 assert isinstance(self.swisspass.errors, list)
                 self.swisspass.errors.append(_(
-                    'The Swisspass ID must be 13 characters long.'
+                    'The Swisspass ID must be 13 characters long '
+                    '(including dashes).'
                 ))
                 return False
 
