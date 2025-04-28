@@ -470,12 +470,18 @@ def test_copy_event(client):
     page.form['repeat'] = 'without'
 
     page = page.form.submit().follow().follow()
+    page = page.click('Painting Cats')
+    assert 'Painting Cats' in page
+    assert 'Montag, 28. April 2025' in page
+    assert '18:00 - 22:00' in page
+    assert 'Art Gallery' in page
+    assert 'Art Club' in page
 
     page = page.click('Painting Cats').click('Kopieren')
     assert 'Veranstaltung hinzufügen' in page
     page.form['title'] = 'Painting Dogs'
     page = page.form.submit().follow().follow()
-    assert "erfolgreich erstellt" in page
+    assert 'erfolgreich erstellt' in page
 
     assert 'Painting Dogs' in page
     assert 'Painting Cats' in page
@@ -484,6 +490,7 @@ def test_copy_event(client):
     assert 'Painting Cats' not in page
 
     assert 'Painting Dogs' in page
-    assert 'Montag, 28. April 2025, 10:00 - 11:00' in page
+    assert 'Montag, 28. April 2025' in page
+    assert '18:00 - 22:00' in page
     assert 'Art Gallery' in page
     assert 'Art Club' in page
