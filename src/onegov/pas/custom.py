@@ -38,35 +38,48 @@ def get_global_tools(request: TownRequest) -> Iterator[Link | LinkGroup]:
         # Management Dropdown
         if request.is_admin:
             session = request.session
-            yield LinkGroup(
-                _('Management'), classes=('management',),
-                links=(
+            management_links = []
+            try:
+                current_run = get_current_settlement_run(session)
+                management_links.append(
                     Link(
                         _('Current Settlement Run'),
-                        request.link(get_current_settlement_run(session)),
+                        request.link(current_run),
                         attrs={'class': 'settlement-run'}
-                    ),
-                    Link(
-                        _('Attendences'),
-                        request.class_link(AttendenceCollection),
-                        attrs={'class': 'attendences'}
-                    ),
-                    Link(
-                        _('Changes'),
-                        request.class_link(ChangeCollection),
-                        attrs={'class': 'changes'}
-                    ),
-                    Link(
-                        _('PAS settings'),
-                        request.link(request.app.org, 'pas-settings'),
-                        attrs={'class': 'pas-settings'}
-                    ),
-                    Link(
-                        _('More settings'),
-                        request.link(request.app.org, 'settings'),
-                        attrs={'class': 'settings'}
-                    ),
+                    )
                 )
+            except MultipleResultsFound:
+                # If multiple active runs exist (should not happen),
+                # don't show the link.
+                pass
+
+            management_links.extend((
+                Link(
+                    _('Attendences'),
+                    request.class_link(AttendenceCollection),
+                    attrs={'class': 'attendences'}
+                ),
+                Link(
+                    _('Changes'),
+                    request.class_link(ChangeCollection),
+                    attrs={'class': 'changes'}
+                ),
+                Link(
+                    _('PAS settings'),
+                    request.link(request.app.org, 'pas-settings'),
+                    attrs={'class': 'pas-settings'}
+                ),
+                Link(
+                    _('More settings'),
+                    request.link(request.app.org, 'settings'),
+                    attrs={'class': 'settings'}
+                ),
+            ))
+
+            yield LinkGroup(
+                _('Management'),
+                classes=('management',),
+                links=tuple(management_links)
             )
 
 
