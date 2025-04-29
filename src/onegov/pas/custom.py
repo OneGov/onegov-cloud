@@ -37,9 +37,15 @@ def get_global_tools(request: TownRequest) -> Iterator[Link | LinkGroup]:
 
         # Management Dropdown
         if request.is_admin:
+            session = request.session
             yield LinkGroup(
                 _('Management'), classes=('management',),
                 links=(
+                    Link(
+                        _('Current Settlement Run'),
+                        request.link(get_current_settlement_run(session)),
+                        attrs={'class': 'settlement-run'}
+                    ),
                     Link(
                         _('Attendences'),
                         request.class_link(AttendenceCollection),
