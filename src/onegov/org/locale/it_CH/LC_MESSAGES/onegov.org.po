@@ -2,7 +2,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: \n"
-"POT-Creation-Date: 2025-04-24 09:19+0200\n"
+"POT-Creation-Date: 2025-04-29 09:56+0200\n"
 "PO-Revision-Date: 2022-03-15 10:52+0100\n"
 "Last-Translator: \n"
 "Language-Team: \n"
@@ -3370,8 +3370,8 @@ msgstr "Il rifiuto di ${title} non può essere annullato."
 msgid "Reject reservation"
 msgstr "Rifiuta prenotazione"
 
-#.
 #. Used in sentence: "${event} published."
+#.
 msgid "Event"
 msgstr "Evento"
 
@@ -5196,6 +5196,12 @@ msgstr ""
 
 msgid "local"
 msgstr "locale"
+
+msgid "Last login"
+msgstr "Ultimo accesso"
+
+msgid "Session information"
+msgstr "Session Information"
 
 msgid "No links found."
 msgstr "Nessun collegamento trovato."

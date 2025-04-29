@@ -2,7 +2,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE 1.0\n"
-"POT-Creation-Date: 2025-04-24 09:19+0200\n"
+"POT-Creation-Date: 2025-04-29 09:56+0200\n"
 "PO-Revision-Date: 2022-03-15 10:21+0100\n"
 "Last-Translator: Marc Sommerhalder <marc.sommerhalder@seantis.ch>\n"
 "Language-Team: German\n"
@@ -3360,8 +3360,8 @@ msgstr "Die Absage von ${title} kann nicht rückgängig gemacht werden."
 msgid "Reject reservation"
 msgstr "Reservation absagen"
 
-#.
 #. Used in sentence: "${event} published."
+#.
 msgid "Event"
 msgstr "Veranstaltung"
 
@@ -5193,6 +5193,12 @@ msgstr "Sie wurden erfolgreich von allen regelmässigen E-Mails abgemeldet."
 
 msgid "local"
 msgstr "lokal"
+
+msgid "Last login"
+msgstr "Zuletzt eingeloggt"
+
+msgid "Session information"
+msgstr "Session Information"
 
 msgid "No links found."
 msgstr "Keine Verknüpfungen gefunden."
