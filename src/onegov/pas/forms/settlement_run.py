@@ -90,5 +90,6 @@ class SettlementRunForm(Form):
                 return
 
             raise ValidationError(
-                _('An active settlement run already exists.')
+                _('An active settlement run already exists: ${name}',
+                  mapping={'name': active_run.name})
             )
