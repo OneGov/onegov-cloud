@@ -66,7 +66,7 @@
                                 <span aria-hidden="true">&times;</span>
                                 </button>
                             </div>
-                            <a href="#" data-open="sessionInformation">Display</a>
+                            <a href="#" data-open="sessionInformation" i18n:translate>Display information</a>
                         </dd>
                     </tal:b>
                 </dl>

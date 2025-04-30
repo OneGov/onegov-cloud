@@ -2,7 +2,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE 1.0\n"
-"POT-Creation-Date: 2025-04-29 09:56+0200\n"
+"POT-Creation-Date: 2025-04-30 07:35+0200\n"
 "PO-Revision-Date: 2022-03-15 10:50+0100\n"
 "Last-Translator: Marc Sommerhalder <marc.sommerhalder@seantis.ch>\n"
 "Language-Team: French\n"
@@ -5217,6 +5217,9 @@ msgstr "Dernière connexion"
 
 msgid "Session information"
 msgstr "Session Information"
+
+msgid "Display information"
+msgstr "Afficher les informations"
 
 msgid "No links found."
 msgstr "Aucun lien trouvé."
