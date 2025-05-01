@@ -8,6 +8,7 @@ from onegov.form.extensions import FormExtension
 from onegov.form.fields import HoneyPotField
 from onegov.form.fields import TimezoneDateTimeField
 from onegov.form.fields import UploadField
+from onegov.form.fields import UploadMultipleField
 from wtforms.fields import BooleanField
 from onegov.form.fields import MultiCheckboxField
 from onegov.form.submissions import prepare_for_submission
@@ -18,12 +19,12 @@ from wtforms.fields import EmailField
 from wtforms.fields import StringField
 from wtforms.fields import TextAreaField
 from wtforms.validators import DataRequired, InputRequired, ValidationError
+from markupsafe import Markup
 
 
 from typing import TypeVar, TYPE_CHECKING
 if TYPE_CHECKING:
     from collections.abc import Collection
-    from markupsafe import Markup
     from onegov.form import Form
     from wtforms import Field
 
@@ -163,9 +164,11 @@ class ChangeRequestFormExtension(FormExtension[FormT], name='change-request'):
                 if field.id == 'coordinates':
                     return field.data != self.target.coordinates
 
-                # upload fields differ if they are not empty
+                # upload fields differ if they are not empty (i.e., new files uploaded)
                 if isinstance(field, UploadField):
-                    return field.data and True or False
+                    return bool(field.data)
+                if isinstance(field, UploadMultipleField):
+                    return bool(field.entries) # Check if new files were added
 
                 # like coordinates, provided through extension
                 if field.id in ('publication_start', 'publication_end'):
@@ -186,20 +189,32 @@ class ChangeRequestFormExtension(FormExtension[FormT], name='change-request'):
                 from_model: bool = False
             ) -> Markup:
 
+                # Handle UploadMultipleField: Avoid data assignment, render original state if possible.
+                if isinstance(field, UploadMultipleField):
+                    # For now, return empty Markup as we don't have a simple way
+                    # to render the original list of files for diffing.
+                    # This aligns with render_display just showing the proposed files.
+                    return Markup('')
+
+                # For other fields, proceed as before
                 prev = field.data
 
                 try:
                     model = self.target
+                    original_value = None
                     if model is not None:
-                        field.data = (
+                        original_value = (
                             model.values.get(field.id)
                             if not from_model
-                            else getattr(model, field.id)
+                            else getattr(model, field.id, None) # Use getattr safely
                         )
-                    else:
-                        field.data = None
+
+                    # Temporarily set field data to original value
+                    field.data = original_value
+                    # Render the field with its original data
                     return super().render_display(field)
                 finally:
+                    # Restore field data
                     field.data = prev
 
             def render_display(self, field: Field) -> Markup | None:
