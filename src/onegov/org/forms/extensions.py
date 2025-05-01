@@ -219,7 +219,8 @@ class ChangeRequestFormExtension(FormExtension[FormT], name='change-request'):
                     if field.id not in self.target.values:
                         return proposed
 
-                    if isinstance(field, UploadField):
+                    # For both single and multiple upload fields, just show the proposed state
+                    if isinstance(field, (UploadField, UploadMultipleField)):
                         return proposed
 
                     original = self.render_original(field)
