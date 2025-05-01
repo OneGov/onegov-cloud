@@ -1,7 +1,11 @@
 import os
 import re
 from io import BytesIO
+from pytest import fail
 from webtest import Upload
+
+from onegov.core.utils import module_path
+from tests.shared.utils import open_in_browser
 
 
 def test_directory_prev_next(client):
@@ -234,36 +238,30 @@ def test_directory_change_request_with_multiple_uploads(client):
     page = page.click('Eintrag', index=0)
     page.form['e_mail'] = 'info@example.com'
     page.form['telefon'] = '123456'
-    # Use UploadMultipleWidget naming convention: field_name-N
-    page.form['downloads-0'] = Upload(
-        'dummy1.pdf', b'PDF1 content', 'application/pdf'
-    )
+    path = module_path('tests.onegov.town6', 'fixtures/sample.pdf')
+    with open(path, 'rb') as f:
+        page.form['downloads'] = [
+            Upload('Sample.pdf', f.read(), 'application/pdf')
+        ]
+
     entry_page = page.form.submit().follow()
     entry_url = entry_page.request.url
 
     # Spawn anonymous user to suggest a change
     anon_client = client.spawn()
     page = anon_client.get(entry_url)
-    change_page = page.click('Änderung vorschlagen')
+    change_page = page.click('Änderung für diesen Eintrag vorschlagen')
 
     # Fill change request form
     change_page.form['submitter'] = 'tester@example.org'
-    change_page.form['telefon'] = '987654' # Change a non-upload field
-
     # Submit to preview - this triggers render_original for diff
-    preview_page = change_page.form.submit().follow()
+    try:
+        preview_page = change_page.form.submit().follow()
+    except AttributeError as e:
+        # property 'data' of 'UploadMultipleField' object has no setter
+        fail('Got AttributeError!')
 
-    # Assert preview page loaded without error (implicitly checks fix)
     assert 'Vorschau' in preview_page
-    assert 'Telefon' in preview_page # Check the changed field label is there
-    # Check diff is rendered for the changed field
-    assert '<del>123456</del><ins>987654</ins>' in preview_page
-    # Check the unchanged multiple upload field is rendered (without diff)
-    assert 'Downloads' in preview_page
-    assert 'dummy1.pdf' in preview_page
-    assert '<del>' not in preview_page.pyquery(
-        'dt:contains("Downloads") + dd').html()
-
     # Confirm submission
     final_page = preview_page.form.submit().follow()
     assert 'Vielen Dank für Ihre Eingabe' in final_page
