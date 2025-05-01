@@ -5,6 +5,7 @@ from onegov.core.security import Private, Public
 from onegov.core.utils import normalize_for_url
 from onegov.form import FormDefinition
 from onegov.form.collection import FormCollection
+from onegov.gis import Coordinates
 from onegov.org.models.document_form import (
     FormDocumentCollection, FormDocument)
 from onegov.org import _, OrgApp
@@ -47,8 +48,12 @@ def view_document_form_page(
         'layout': layout,
         'title': self.title,
         'page': self,
-        'lead': self.lead,
         'text': self.text,
+        'people': getattr(self, 'people', None),
+        'files': getattr(self, 'files', None),
+        'contact': getattr(self, 'contact_html', None),
+        'coordinates': getattr(self, 'coordinates', Coordinates()),
+        'lead': self.lead,
         'pdf': self.pdf,
         }
 
@@ -70,7 +75,11 @@ def handle_new_document_form_page(
         if self.by_name(normalize_for_url(form.title.data)):
             request.alert(_('A form with this name already exists'))
         else:
-            document_form = self.add_by_form(form)
+            document_form = self.add(
+                name=normalize_for_url(form.title.data),
+                title=form.title.data,
+            )
+            form.populate_obj(document_form)
             request.success(_('Added a new form'))
             return morepath.redirect(request.link(document_form))
 
