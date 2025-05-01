@@ -18,6 +18,7 @@ from wtforms.fields import DateField
 from wtforms.fields import HiddenField
 from wtforms.fields import IntegerField
 from wtforms.fields import RadioField
+from wtforms.validators import Regexp
 from wtforms.fields import StringField
 from wtforms.fields import TextAreaField
 from wtforms.validators import InputRequired, NumberRange
@@ -129,7 +130,11 @@ class AttendeeForm(AttendeeBase):
     swisspass = StringField(
         label=_('Swisspass ID'),
         description='XXX-XXX-XXX-X',
-        validators=[InputRequired()],
+        validators=[InputRequired(),
+                    Regexp(r'^[0-9\-]+$')],
+        render_kw={
+            'data-max-length': 13,
+        }
     )
 
     differing_address = BooleanField(
@@ -238,8 +243,12 @@ class AttendeeSignupForm(AttendeeBase):
     swisspass = StringField(
         label=_('Swisspass ID'),
         description='XXX-XXX-XXX-X',
-        validators=[InputRequired()],
-        depends_on=('attendee', 'other')
+        validators=[InputRequired(),
+                    Regexp(r'^[0-9\-]+$')],
+        depends_on=('attendee', 'other'),
+        render_kw={
+            'data-max-length': 13,
+        }
     )
 
     differing_address = BooleanField(
