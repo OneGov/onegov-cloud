@@ -51,7 +51,10 @@ class Price(_PriceBase):
         return self.amount < other.amount
 
     def __add__(self, other: Price) -> Self:  # type:ignore[override]
-        assert self.currency is None or self.currency == other.currency
+        assert (
+            (self.currency is None or other.currency is None) or
+            self.currency == other.currency
+        )
         cc_payment = self.credit_card_payment or other.credit_card_payment
         return self.__class__(
             self.amount + other.amount,
