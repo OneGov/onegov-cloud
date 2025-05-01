@@ -1170,7 +1170,7 @@ class OrgTicketSettingsForm(Form):
                     return False
 
                 if 'Price' in meta or 'Preis' in meta:
-                    price = meta.get('Price', meta.get('Price'))
+                    price = meta.get('Price', meta.get('Preis'))
                     try:
                         assert Decimal(price) >= Decimal('0')
                     except Exception:
