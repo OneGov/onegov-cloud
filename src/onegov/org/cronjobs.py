@@ -11,6 +11,9 @@ from datetime import datetime, timedelta
 from functools import lru_cache
 from itertools import groupby, chain
 
+from requests.adapters import HTTPAdapter
+from urllib3.util import Retry
+
 from onegov.chat.collections import ChatCollection
 from onegov.chat.models import Chat
 from onegov.core.orm import find_models, Base
@@ -841,8 +844,19 @@ def update_newsletter_email_bounce_statistics(
     # Postmark uses EST in `fromdate` and `todate`, see
     # https://postmarkapp.com/developer/api/bounce-api.
 
+    def create_retry_session():
+        adapter = HTTPAdapter(max_retries=Retry(
+            total=3,
+            backoff_factor=3,
+            status_forcelist=[429, 500, 502, 503, 504],
+        ))
+        session = requests.Session()
+        session.mount('https://', adapter)
+
+        return session
+
     def get_postmark_token() -> str:
-        # read postmark token from the applications configuration
+        # read postmark token from the application's configuration
         mail_config = request.app.mail
         if mail_config:
             mailer = mail_config.get('marketing', {}).get('mailer', None)
@@ -852,15 +866,21 @@ def update_newsletter_email_bounce_statistics(
         return ''
 
     def get_bounces() -> list[dict[str, Any]]:
+        session = create_retry_session()
         token = get_postmark_token()
         yesterday = utcnow() - timedelta(days=1)
         r = None
 
         try:
-            r = requests.get(
-                'https://api.postmarkapp.com/bounces?count=500&offset=0',
-                f'fromDate={yesterday.date()}&toDate='
-                f'{yesterday.date()}&inactive=true',
+            r = session.get(
+                'https://api.postmarkapp.com/bounces',
+                params={
+                    'count': 500,
+                    'offset': 0,
+                    'fromDate': yesterday.date(),
+                    'toDate': yesterday.date(),
+                    'inactive': True,
+                },
                 headers={
                     'Accept': 'application/json',
                     'X-Postmark-Server-Token': token,
