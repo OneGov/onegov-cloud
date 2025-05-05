@@ -844,7 +844,7 @@ def update_newsletter_email_bounce_statistics(
     # Postmark uses EST in `fromdate` and `todate`, see
     # https://postmarkapp.com/developer/api/bounce-api.
 
-    def create_retry_session():
+    def create_retry_session() -> requests.Session:
         adapter = HTTPAdapter(max_retries=Retry(
             total=3,
             backoff_factor=3,
@@ -875,11 +875,11 @@ def update_newsletter_email_bounce_statistics(
             r = session.get(
                 'https://api.postmarkapp.com/bounces',
                 params={
-                    'count': 500,
-                    'offset': 0,
-                    'fromDate': yesterday.date(),
-                    'toDate': yesterday.date(),
-                    'inactive': True,
+                    'count': '500',
+                    'offset': '0',
+                    'fromDate': str(yesterday.date()),
+                    'toDate': str(yesterday.date()),
+                    'inactive': 'true',
                 },
                 headers={
                     'Accept': 'application/json',
