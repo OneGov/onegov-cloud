@@ -1608,7 +1608,7 @@ def test_update_newsletter_email_bounce_statistics(org_app, handlers):
     transaction.commit()
     close_all_sessions()
 
-    with patch('requests.get') as mock_get:
+    with patch('requests.Session.get') as mock_get:
         mock_get.return_value = Bunch(
             status_code=200,
             json=lambda: {
@@ -1644,7 +1644,7 @@ def test_update_newsletter_email_bounce_statistics(org_app, handlers):
             'michu@user.ch').is_inactive is False
 
     # test raising runtime warning exception for status code 401
-    with patch('requests.get') as mock_get:
+    with patch('requests.Session.get') as mock_get:
         mock_get.return_value = Bunch(
             status_code=401,
             json=lambda: {},
@@ -1658,7 +1658,7 @@ def test_update_newsletter_email_bounce_statistics(org_app, handlers):
 
     # for other 30x and 40x status codes, the cronjob shall raise an exception
     for status_code in [301, 302, 303, 400, 402, 403, 404, 405]:
-        with patch('requests.get') as mock_get:
+        with patch('requests.Session.get') as mock_get:
             mock_get.return_value = Bunch(
                 status_code=status_code,
                 json=lambda: {},
