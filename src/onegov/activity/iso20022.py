@@ -1,7 +1,7 @@
 from __future__ import annotations
 
 import re
-import stdnum.ch.esr as esr  # type: ignore[import-untyped]
+import stdnum.ch.esr as esr
 
 from collections import defaultdict
 from functools import cached_property
