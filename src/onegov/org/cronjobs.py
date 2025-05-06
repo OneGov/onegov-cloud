@@ -869,6 +869,7 @@ def update_newsletter_email_bounce_statistics(
         session = create_retry_session()
         token = get_postmark_token()
         yesterday = utcnow() - timedelta(days=1)
+        bounces = []
         r = None
 
         try:
@@ -890,28 +891,67 @@ def update_newsletter_email_bounce_statistics(
             r.raise_for_status()
             bounces = r.json().get('Bounces', [])
         except requests.exceptions.HTTPError as http_err:
-            if r and r.status_code == 401:
-                raise RuntimeWarning(
-                    f'Postmark API token is not set or invalid: {http_err}'
-                ) from None
-            else:
-                raise
+            handle_http_error(http_err, r)
 
         return bounces
 
+    def get_suppressions():
+        session = create_retry_session()
+        token = get_postmark_token()
+        from_ = utcnow() - timedelta(days=365)
+        suppressions = []
+        r = None
+
+        try:
+            r = session.get(
+                'https://api.postmarkapp.com/message-streams/outbound/suppressions/dump',
+                params={
+                    'fromDate': str(from_.date()),
+                },
+                headers={
+                    'Accept': 'application/json',
+                    'X-Postmark-Server-Token': token,
+                },
+                timeout=30,
+            )
+            r.raise_for_status()
+            suppressions = r.json().get('Suppressions', [])
+        except requests.exceptions.HTTPError as http_err:
+            handle_http_error(http_err, r)
+
+        return suppressions
+
+    def handle_http_error(http_err, r):
+        if r and r.status_code == 401:
+            raise RuntimeWarning(
+                f'Postmark API token is not set or invalid: {http_err}'
+            ) from None
+        else:
+            raise
+
     postmark_bounces = get_bounces()
+    postmark_suppressed_addresses = [
+        s.get("EmailAddress") for s in get_suppressions()]
     collections = (RecipientCollection, EntryRecipientCollection)
+
     for collection in collections:
         recipients = collection(request.session)
 
         for bounce in postmark_bounces:
-            email = bounce.get('Email', '')
-            inactive = bounce.get('Inactive', False)
+            email = bounce.get("Email", "")
+            inactive = bounce.get("Inactive", False)
             recipient = recipients.by_address(email)
 
-            if recipient and inactive:
-                log.info(f'Mark recipient {recipient.address} as inactive')
+            if recipient and inactive and not recipient.is_inactive:
+                log.info(f"Mark recipient {recipient.address} as inactive")
                 recipient.mark_inactive()
+
+        # if any inactive recipient is not/no longer on the suppressed
+        # list, we reactivate him/her
+        for recipient in recipients.by_inactive():
+            if recipient.address not in postmark_suppressed_addresses:
+                log.info(f"Reactivate recipient {recipient.address}")
+                recipient.reactivate()
 
 
 @OrgApp.cronjob(hour=4, minute=30, timezone='Europe/Zurich')
