@@ -895,7 +895,7 @@ def update_newsletter_email_bounce_statistics(
 
         return bounces
 
-    def get_suppressions():
+    def get_suppressions() -> list[dict[str, Any]]:
         session = create_retry_session()
         token = get_postmark_token()
         from_ = utcnow() - timedelta(days=365)
@@ -921,7 +921,11 @@ def update_newsletter_email_bounce_statistics(
 
         return suppressions
 
-    def handle_http_error(http_err, r):
+    def handle_http_error(
+        http_err: requests.exceptions.HTTPError,
+        r: requests.Response | None
+    ) -> None:
+
         if r and r.status_code == 401:
             raise RuntimeWarning(
                 f'Postmark API token is not set or invalid: {http_err}'
@@ -931,26 +935,26 @@ def update_newsletter_email_bounce_statistics(
 
     postmark_bounces = get_bounces()
     postmark_suppressed_addresses = [
-        s.get("EmailAddress") for s in get_suppressions()]
+        s.get('EmailAddress') for s in get_suppressions()]
     collections = (RecipientCollection, EntryRecipientCollection)
 
     for collection in collections:
         recipients = collection(request.session)
 
         for bounce in postmark_bounces:
-            email = bounce.get("Email", "")
-            inactive = bounce.get("Inactive", False)
+            email = bounce.get('Email', '')
+            inactive = bounce.get('Inactive', False)
             recipient = recipients.by_address(email)
 
             if recipient and inactive and not recipient.is_inactive:
-                log.info(f"Mark recipient {recipient.address} as inactive")
+                log.info(f'Mark recipient {recipient.address} as inactive')
                 recipient.mark_inactive()
 
         # if any inactive recipient is not/no longer on the suppressed
         # list, we reactivate him/her
         for recipient in recipients.by_inactive():
             if recipient.address not in postmark_suppressed_addresses:
-                log.info(f"Reactivate recipient {recipient.address}")
+                log.info(f'Reactivate recipient {recipient.address}')
                 recipient.reactivate()
 
 
