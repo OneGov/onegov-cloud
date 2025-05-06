@@ -1,6 +1,7 @@
 """ Provides commands used to initialize org websites. """
 from __future__ import annotations
 
+import json
 import click
 import html
 import isodate
@@ -13,6 +14,9 @@ from bs4 import BeautifulSoup
 from collections import defaultdict
 from datetime import date, datetime, timedelta
 from io import BytesIO
+
+from openpyxl import load_workbook
+import yaml
 from onegov.core.orm.utils import QueryChain
 from libres.modules.errors import InvalidEmailAddress, AlreadyReservedError
 from onegov.chat import MessageCollection
@@ -45,7 +49,7 @@ from sqlalchemy.dialects.postgresql import array
 from uuid import uuid4
 
 
-from typing import Any, TYPE_CHECKING
+from typing import IO, Any, TYPE_CHECKING
 if TYPE_CHECKING:
     from collections.abc import Callable, Iterator, Sequence
     from depot.fields.upload import UploadedFile
@@ -956,3 +960,211 @@ def delete_invisible_links() -> Callable[[OrgRequest, OrgApp], None]:
         )
 
     return delete_invisible_links
+
+
+@cli.command(name='import-reservations', context_settings={'singular': True})
+@click.argument('reservation_file', type=click.File('rb'))
+@click.argument('option_file', type=click.File('rb'))
+@click.argument('mapping_yaml', type=click.File('rb'))
+@click.option('--dry-run', is_flag=True, default=False)
+def import_reservations(
+    reservation_file: IO[bytes],
+    option_file: IO[bytes],
+    mapping_yaml: IO[bytes],
+    dry_run: bool
+) -> Callable[[OrgRequest, OrgApp], None]:
+    """ Imports reservations from a Excel file (needs to be .xlsx).
+    Creates no resources or allocations, so the availabilty periods need to
+    be set in the resource settings.
+    """
+
+    def import_reservations(request: OrgRequest, app: OrgApp) -> None:
+
+        # Load yaml file as a dictionary
+        yaml_file = mapping_yaml.read()
+        yaml_dict = yaml.safe_load(yaml_file)
+        shared_fields = yaml_dict.get('shared_fields', {})
+        resource_options = yaml_dict.get('resource_options', {})
+
+        # Load the reservation_file
+        book = load_workbook(reservation_file)
+        sheet = book['Reservationsdaten']
+
+        # Load the option_file
+        book_options = load_workbook(option_file)
+        sheet_options = book_options['Reservationen']
+
+        reservations: dict[
+            str, dict[str, dict[str, dict[str, Any] | list[Any]]]] = {}
+        count = 0
+        last_reservation_id = ''
+        for index, row in enumerate(sheet.rows):
+            if index <= 3:  # Skip the first 3 rows, they are headers
+                continue
+
+            reservation: dict[str, dict[str, Any] | list[Any]] = {
+                'general': {},
+                'fields': {},
+                'dates': []
+            }
+            row_empty: bool = True
+            id = ''
+            resource_name = ''
+
+            for i, cell in enumerate(row):
+                value = cell.value
+                if value is None:
+                    continue
+
+                row_empty = False
+                if i == 0:
+                    resource_name = str(value)
+                elif i == 3:
+                    id = str(value)
+                elif i == 6 or i == 8:
+                    if last_reservation_id == id:
+                        reservations[resource_name][id][
+                                'dates'].append(value)  # type:ignore
+                    else:
+                        reservation['dates'].append(value)  # type:ignore
+
+                elif i == 22:
+                    reservation['general']['email'] = value  # type:ignore
+                elif i in shared_fields:
+                    key = shared_fields[i]
+                    if reservation['fields'].get(key) is None:  # type:ignore
+                        reservation['fields'][key] = value
+                    else:
+                        reservation['fields'][key] += f' {value}'
+
+            if not row_empty:
+                count += 1
+                if resource_name not in reservations:
+                    reservations[resource_name] = {}
+
+                if id not in reservations[resource_name] and (
+                    id != last_reservation_id
+                ):
+                    reservations[resource_name][id] = reservation
+                last_reservation_id = id or ''
+
+        options_count = 0
+        options_not_found = set()
+        for index, row in enumerate(sheet_options.rows):
+            row_empty = True
+            if index <= 3:
+                continue
+            for i, cell in enumerate(row):
+                value = cell.value
+                if value is None:
+                    continue
+                row_empty = False
+                options_count += 1
+                if i == 0:
+                    resource_name = str(value)
+                elif i == 2:
+                    id = str(value)
+                elif resource_name in reservations:
+                    if id in reservations[resource_name]:
+                        if i == 13:
+                            key = resource_options[resource_name][
+                                'options'].get(value)
+                            if key is None:
+                                options_not_found.add(value)
+                        if i == 14:
+                            if key is not None:
+                                reservation = reservations[resource_name][id]
+                                if reservation['fields'  # type:ignore
+                                                ].get(key) is None:
+                                    reservation['fields'][key] = value
+        for option in options_not_found:
+            click.secho(f'Option not found in the mapping file: {option}',
+                        fg='yellow')
+
+        if dry_run:
+            res_show = json.dumps(reservations, indent=4, default=str)
+            click.secho(f'Reservations: {res_show}', fg='green')
+            click.echo(f'Found {count} rows in the resource file')
+            click.echo(f'Found {options_count} rows in the options file')
+
+        # Create reservations
+        if not dry_run:
+            resources = ResourceCollection(app.libres_context)
+            for resource_name in reservations.keys():
+
+                resource = resources.by_name(resource_name.lower())
+
+                if not resource:
+                    click.echo(
+                        f'Resource {resource} not found in the database'
+                    )
+                    continue
+
+                click.echo(
+                    f'Importing reservations for {resource.title}'
+                )
+                scheduler = resource.scheduler
+
+                for id, reservation in reservations[resource_name].items():
+                    click.secho(
+                        f'Importing reservation {id}',
+                        fg='green')
+
+                    email = reservation['general'].get('email')  # type:ignore
+                    start = reservation['dates'][0]  # type:ignore
+                    click.secho(f'Start: {start}', fg='green')
+                    end = reservation['dates'][1]  # type:ignore
+                    click.secho(f'End: {end}', fg='green')
+
+                    session_id = uuid4()
+
+                    token_uuid = scheduler.reserve(
+                        email=str(email),
+                        dates=(start, end),
+                        session_id=session_id,
+                        single_token_per_session=True,
+                        data={'accepted': True}  # accepted through ticket
+                    )
+                    token = token_uuid.hex
+
+                    assert resource.form_class is not None
+                    forms = FormCollection(app.session())
+
+                    form_data = {}
+                    for key, value in reservation['fields'
+                                                    ].items():  # type:ignore
+                        form_data[key] = str(value)
+
+                    form = resource.form_class(data=form_data)
+
+                    if not form.validate():
+                        abort(f'{form_data} failed the form check'
+                              f' with {form.errors}')
+
+                    submission = forms.submissions.add_external(
+                        form=form,
+                        state='pending',
+                        id=token_uuid
+                    )
+
+                    scheduler.queries.confirm_reservations_for_session(
+                        session_id)
+                    scheduler.approve_reservations(token_uuid)
+
+                    forms.submissions.complete_submission(submission)
+
+                    users = UserCollection(app.session())
+                    user = users.query().filter(
+                        User.username == 'info@seantis.ch').first()
+
+                    if not user:
+                        abort('info@seantis.ch not found in users')
+
+                    with forms.session.no_autoflush:
+                        ticket = TicketCollection(request.session).open_ticket(
+                            handler_code='RSV', handler_id=token
+                        )
+                        ticket.accept_ticket(user)
+                        ticket.close_ticket()
+
+    return import_reservations
