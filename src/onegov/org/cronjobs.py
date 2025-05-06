@@ -842,7 +842,9 @@ def update_newsletter_email_bounce_statistics(
     # occurs when EST is observing standard time (UTC-5) and CEST is observing
     # daylight saving time (UTC+2).
     # Postmark uses EST in `fromdate` and `todate`, see
-    # https://postmarkapp.com/developer/api/bounce-api.
+    # https://postmarkapp.com/developer/api/bounce-api and
+    # https://postmarkapp.com/developer/api/suppressions-api for the
+    # suppression api.
 
     def create_retry_session() -> requests.Session:
         adapter = HTTPAdapter(max_retries=Retry(
