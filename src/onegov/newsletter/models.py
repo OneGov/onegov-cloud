@@ -210,7 +210,7 @@ class Recipient(Base, TimestampMixin, ContentMixin):
         address to be deactivated by Postmark.
         """
         self.meta['inactive'] = True
-        
+
     def reactivate(self) -> None:
         """
         Marks a previously `inactive` recipient as active again.
