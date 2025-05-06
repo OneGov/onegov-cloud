@@ -1,3 +1,5 @@
+import pytest
+
 from decimal import Decimal
 from onegov.pay import Price
 
@@ -26,3 +28,10 @@ def test_price():
 
     assert str(Price(10, 'CHF')) == '10.00 CHF'
     assert repr(Price(10, 'CHF')) == "Price(Decimal('10'), 'CHF')"
+
+
+def test_add_price_currency():
+    assert Price(10, 'CHF') + Price(20, None) == Price(30, 'CHF')
+    assert Price(10, None) + Price(20, 'CHF') == Price(30, 'CHF')
+    with pytest.raises(AssertionError):
+        assert Price(10, None) + Price(20, None) == Price(30, 'CHF')
