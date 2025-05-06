@@ -867,73 +867,58 @@ def update_newsletter_email_bounce_statistics(
 
         return ''
 
-    def get_bounces() -> list[dict[str, Any]]:
+    def fetch_postmark_data(
+        url: str,
+        params: dict[str, Any],
+    ) -> list[dict[str, Any]]:
         session = create_retry_session()
-        token = get_postmark_token()
-        yesterday = utcnow() - timedelta(days=1)
-        bounces = []
         r = None
-
         try:
             r = session.get(
-                'https://api.postmarkapp.com/bounces',
-                params={
-                    'count': '500',
-                    'offset': '0',
-                    'fromDate': str(yesterday.date()),
-                    'toDate': str(yesterday.date()),
-                    'inactive': 'true',
-                },
+                url,
+                params=params,
                 headers={
                     'Accept': 'application/json',
-                    'X-Postmark-Server-Token': token,
+                    'X-Postmark-Server-Token': get_postmark_token(),
                 },
                 timeout=30,
             )
             r.raise_for_status()
-            bounces = r.json().get('Bounces', [])
+            return r.json()
         except requests.exceptions.HTTPError as http_err:
-            handle_http_error(http_err, r)
+            if r and r.status_code == 401:
+                raise RuntimeWarning(
+                    f'Postmark API token is not set or invalid: {http_err}'
+                ) from None
+            else:
+                raise
+        return []
 
-        return bounces
+    def get_bounces() -> list[dict[str, Any]]:
+        yesterday = utcnow() - timedelta(days=1)
+        params = {
+            'count': '500',
+            'offset': '0',
+            'fromDate': str(yesterday.date()),
+            'toDate': str(yesterday.date()),
+            'inactive': 'true',
+        }
+        data = fetch_postmark_data(
+            'https://api.postmarkapp.com/bounces',
+            params
+        )
+        return data.get('Bounces', [])
 
     def get_suppressions() -> list[dict[str, Any]]:
-        session = create_retry_session()
-        token = get_postmark_token()
         from_ = utcnow() - timedelta(days=365)
-        suppressions = []
-        r = None
-
-        try:
-            r = session.get(
-                'https://api.postmarkapp.com/message-streams/outbound/suppressions/dump',
-                params={
-                    'fromDate': str(from_.date()),
-                },
-                headers={
-                    'Accept': 'application/json',
-                    'X-Postmark-Server-Token': token,
-                },
-                timeout=30,
-            )
-            r.raise_for_status()
-            suppressions = r.json().get('Suppressions', [])
-        except requests.exceptions.HTTPError as http_err:
-            handle_http_error(http_err, r)
-
-        return suppressions
-
-    def handle_http_error(
-        http_err: requests.exceptions.HTTPError,
-        r: requests.Response | None
-    ) -> None:
-
-        if r and r.status_code == 401:
-            raise RuntimeWarning(
-                f'Postmark API token is not set or invalid: {http_err}'
-            ) from None
-        else:
-            raise
+        params = {
+            'fromDate': str(from_.date()),
+        }
+        data = fetch_postmark_data(
+            'https://api.postmarkapp.com/message-streams/outbound/suppressions/dump',
+            params,
+        )
+        return data.get('Suppressions', [])
 
     postmark_bounces = get_bounces()
     postmark_suppressed_addresses = [
