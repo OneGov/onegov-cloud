@@ -47,7 +47,8 @@ from wtforms.fields import RadioField
 from wtforms.fields import SelectField
 from wtforms.fields import StringField
 from wtforms.fields import TextAreaField
-from wtforms.widgets import HTMLString, TextInput
+from wtforms.widgets import TextInput
+from wtforms.utils import HTMLString
 from wtforms.validators import Email
 from wtforms.validators import InputRequired
 from wtforms.validators import Length
