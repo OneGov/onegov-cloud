@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+from enum import Enum
 import inspect
 import phonenumbers
 import sedate
@@ -18,7 +19,9 @@ from onegov.file.utils import IMAGE_MIME_TYPES_AND_SVG
 from onegov.form import log, _
 from onegov.form.utils import path_to_filename
 from onegov.form.validators import ValidPhoneNumber
-from onegov.form.widgets import ChosenSelectWidget, LinkPanelWidget
+from onegov.form.widgets import ChosenSelectWidget
+from onegov.form.widgets import LinkPanelWidget
+from onegov.form.widgets import MapboxAutofillWidget
 from onegov.form.widgets import DurationInput
 from onegov.form.widgets import HoneyPotWidget
 from onegov.form.widgets import IconWidget
@@ -933,4 +936,41 @@ class TypeAheadField(StringField):
     ):
         self.url = url
 
+        super().__init__(*args, **kwargs)
+
+
+class MapboxPlaceDetail(Enum):
+    """Determines the level of geographical precision of autofill. """
+
+    # Line levels (specific parts of the street address)
+    STREET_NUMBER = 'address-line1'  # Street number and name
+    APPARTMENT_OR_FLOOR = 'address-line2'  # Apartment, suite, floor, etc.
+
+    # Administrative levels (geographic areas)
+    # This often corresponds to State, Province, or Territory
+    LEAST_SPECIFIC = 'address-level1'
+    # This often corresponds to City or Municipality
+    MORE_SPECIFIC = 'address-level2'
+    # This is less commonly used, sometimes County or another district level
+    MOST_SPECIFIC = 'address-level3'
+
+
+class PlaceAutocompleteField(StringField):
+    """ Provides address completion for places. """
+
+    widget = MapboxAutofillWidget()
+
+    def __init__(self,
+                 autocomplete_attribute:
+                 MapboxPlaceDetail = MapboxPlaceDetail.MORE_SPECIFIC,
+                 *args: Any,
+                 **kwargs: Any):
+
+        form = kwargs.get('_form')
+        if form is not None:
+            form.meta.request.include('mapbox_address_autofill')
+        if 'render_kw' not in kwargs:
+            kwargs['render_kw'] = {}
+        kwargs['render_kw'].setdefault('autocomplete',
+                                       autocomplete_attribute.value)
         super().__init__(*args, **kwargs)
