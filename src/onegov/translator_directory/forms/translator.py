@@ -47,6 +47,7 @@ from wtforms.fields import RadioField
 from wtforms.fields import SelectField
 from wtforms.fields import StringField
 from wtforms.fields import TextAreaField
+from wtforms.widgets import HTMLString, TextInput
 from wtforms.validators import Email
 from wtforms.validators import InputRequired
 from wtforms.validators import Length
@@ -64,16 +65,35 @@ if TYPE_CHECKING:
     from wtforms.fields.choices import _Choice
 
 
+class MapboxAutofillWidget(TextInput):
+    """
+    Renders a string input field wrapped with the
+    <mapbox-address-autofill> custom HTML element.
+    """
+    def __call__(self, field: StringField, **kwargs: Any) -> HTMLString:
+        request = field.meta.request
+        mapbox_token = getattr(request.app, 'mapbox_token', '')
+
+        input_html = super().__call__(field, **kwargs)
+
+        return HTMLString(
+            f'<mapbox-address-autofill access-token="{mapbox_token}">'
+            f'{input_html}'
+            f'</mapbox-address-autofill>'
+        )
+
+
 # todo: move this to fields
 class AddressField(StringField):
     """ Provides address completion """
+
+    widget = MapboxAutofillWidget()
 
     def __init__(self, *args: Any, **kwargs: Any):
         form = kwargs.get('_form')
         if form is not None:
             form.meta.request.include('mapbox_address_autofill')
         super().__init__(*args, **kwargs)
-
 
 class FormChoicesMixin:
 
