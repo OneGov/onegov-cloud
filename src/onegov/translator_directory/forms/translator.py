@@ -1,14 +1,14 @@
 from __future__ import annotations
 
-from enum import Enum
 import re
 
 from functools import cached_property
 
-from markupsafe import Markup
 
 from onegov.form import Form
-from onegov.form.fields import ChosenSelectMultipleField, ChosenSelectField
+from onegov.form.fields import (
+    ChosenSelectMultipleField, ChosenSelectField, PlaceAutocompleteField
+)
 from onegov.form.fields import MultiCheckboxField
 from onegov.form.fields import TagsField
 from onegov.form.validators import Stdnum
@@ -50,7 +50,6 @@ from wtforms.fields import RadioField
 from wtforms.fields import SelectField
 from wtforms.fields import StringField
 from wtforms.fields import TextAreaField
-from wtforms.widgets import TextInput
 from wtforms.validators import Email
 from wtforms.validators import InputRequired
 from wtforms.validators import Length
@@ -66,56 +65,6 @@ if TYPE_CHECKING:
     from onegov.translator_directory.request import TranslatorAppRequest
     from sqlalchemy.orm import Query
     from wtforms.fields.choices import _Choice
-
-
-class MapboxAutofillWidget(TextInput):
-    def __call__(self, field: StringField, **kwargs: Any) -> Markup:
-        request = field.meta.request
-        mapbox_token = request.app.mapbox_token
-        input_html: Markup = super().__call__(field, **kwargs)
-
-        return Markup(
-                '<mapbox-address-autofill access-token='
-                '{mapbox_token}>{input_html}'
-                '</mapbox-address-autofill>'
-        ).format(mapbox_token=mapbox_token, input_html=input_html)
-
-
-class MapboxPlaceDetail(Enum):
-    """Determines the level of geographical precision of autofill. """
-
-    # Line levels (specific parts of the street address)
-    STREET_NUMBER = 'address-line1'  # Street number and name
-    APPARTMENT_OR_FLOOR = 'address-line2'  # Apartment, suite, floor, etc.
-
-    # Administrative levels (geographic areas)
-    # This often corresponds to State, Province, or Territory
-    LEAST_SPECIFIC = 'address-level1'
-    # This often corresponds to City or Municipality
-    MORE_SPECIFIC = 'address-level2'
-    # This is less commonly used, sometimes County or another district level
-    MOST_SPECIFIC = 'address-level3'
-
-
-class PlaceAutocompleteField(StringField):
-    """ Provides address completion for places. """
-
-    widget = MapboxAutofillWidget()
-
-    def __init__(self,
-                 autocomplete_attribute:
-                 MapboxPlaceDetail = MapboxPlaceDetail.MORE_SPECIFIC,
-                 *args: Any,
-                 **kwargs: Any):
-
-        form = kwargs.get('_form')
-        if form is not None:
-            form.meta.request.include('mapbox_address_autofill')
-        if 'render_kw' not in kwargs:
-            kwargs['render_kw'] = {}
-        kwargs['render_kw'].setdefault('autocomplete',
-                                       autocomplete_attribute.value)
-        super().__init__(*args, **kwargs)
 
 
 class FormChoicesMixin:
