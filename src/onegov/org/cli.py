@@ -1106,26 +1106,37 @@ def import_reservations(
                 scheduler = resource.scheduler
 
                 for id, reservation in reservations[resource_name].items():
-                    click.secho(
-                        f'Importing reservation {id}',
-                        fg='green')
-
-                    email = reservation['general'].get('email')  # type:ignore
-                    start = reservation['dates'][0]  # type:ignore
-                    click.secho(f'Start: {start}', fg='green')
-                    end = reservation['dates'][1]  # type:ignore
-                    click.secho(f'End: {end}', fg='green')
-
+                    found_conflict = False
                     session_id = uuid4()
+                    for n in range(int(len(reservation['dates'])/2)):
+                        click.secho(f'Importing reservation {id}')
 
-                    token_uuid = scheduler.reserve(
-                        email=str(email),
-                        dates=(start, end),
-                        session_id=session_id,
-                        single_token_per_session=True,
-                        data={'accepted': True}  # accepted through ticket
-                    )
-                    token = token_uuid.hex
+                        email = reservation['general'].get(  # type:ignore
+                            'email')
+                        start = reservation['dates'][n*2]  # type:ignore
+                        click.secho(f'Start: {start}', fg='green')
+                        end = reservation['dates'][n*2+1]  # type:ignore
+                        click.secho(f'End: {end}', fg='green')
+
+                        try:
+                            token_uuid = scheduler.reserve(
+                                email=str(email),
+                                dates=(start, end),
+                                session_id=session_id,
+                                single_token_per_session=True,
+                                data={'accepted': True}
+                            )
+                            token = token_uuid.hex
+                        except InvalidEmailAddress:
+                            abort(f'{email} is an invalid e-mail address')
+                        except AlreadyReservedError:
+                            found_conflict = True
+                            click.secho(
+                                f'Booking conflict in {resource.title} '
+                                f'at {start}', fg='red')
+
+                    if found_conflict:
+                        continue
 
                     assert resource.form_class is not None
                     forms = FormCollection(app.session())
@@ -1165,6 +1176,6 @@ def import_reservations(
                             handler_code='RSV', handler_id=token
                         )
                         ticket.accept_ticket(user)
-                        ticket.close_ticket()
+                        # ticket.close_ticket()
 
     return import_reservations
