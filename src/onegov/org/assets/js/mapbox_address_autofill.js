@@ -1,6 +1,6 @@
 (function() {
-    const getMapboxTokenForAutofill = () => document.body.dataset.mapboxToken || false;
-    mapboxsearch.config.accessToken = getMapboxTokenForAutofill();
+    const getMapboxToken = () => document.body.dataset.mapboxToken || false;
+    mapboxsearch.config.accessToken = getMapboxToken();
     mapboxsearch.autofill({
         options: {
           country: 'ch'
