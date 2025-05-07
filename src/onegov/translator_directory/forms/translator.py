@@ -89,6 +89,10 @@ class CityAutocompleteField(StringField):
         form = kwargs.get('_form')
         if form is not None:
             form.meta.request.include('mapbox_address_autofill')
+        # Set default render_kw if not provided
+        if 'render_kw' not in kwargs:
+            kwargs['render_kw'] = {}
+        kwargs['render_kw'].setdefault('autocomplete', 'address-level2')
         super().__init__(*args, **kwargs)
 
 
@@ -238,8 +242,7 @@ class TranslatorForm(Form, FormChoicesMixin, DrivingDistanceMixin):
     hometown = CityAutocompleteField(
         label=_('Hometown'),
         fieldset=_('Personal Information'),
-        validators=[Optional()],
-        render_kw={'autocomplete': 'address-level2'}
+        validators=[Optional()]
     )
 
     coordinates = CoordinatesField(
