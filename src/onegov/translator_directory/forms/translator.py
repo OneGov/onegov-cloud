@@ -64,6 +64,15 @@ if TYPE_CHECKING:
     from wtforms.fields.choices import _Choice
 
 
+class AddressField(StringField):
+    """ Provides address completion """
+
+    def __init__(self, *args: Any, country: str = 'CH', **kwargs: Any):
+        self.meta.request.include('mapbox_address_autofill')
+        self.country = country
+        super().__init__(*args, **kwargs)
+
+
 class FormChoicesMixin:
 
     request: TranslatorAppRequest

@@ -859,6 +859,11 @@ def people_select_asset() -> Iterator[str]:
     yield 'people-select.js'
 
 
+@OrgApp.webasset('mapbox_address_autofill')
+def mapbox_address_autofill() -> Iterator[str]:
+    yield 'mapbox_address_autofill.js'
+
+
 def wrap_with_mtan_hook(
     func: Callable[[OrgApp, Any, OrgRequest], Any]
 ) -> Callable[[OrgApp, Any, OrgRequest], Any]:
