@@ -4,6 +4,8 @@ import re
 
 from functools import cached_property
 
+from markupsafe import Markup
+
 from onegov.form import Form
 from onegov.form.fields import ChosenSelectMultipleField, ChosenSelectField
 from onegov.form.fields import MultiCheckboxField
@@ -48,7 +50,6 @@ from wtforms.fields import SelectField
 from wtforms.fields import StringField
 from wtforms.fields import TextAreaField
 from wtforms.widgets import TextInput
-from wtforms.utils import HTMLString
 from wtforms.validators import Email
 from wtforms.validators import InputRequired
 from wtforms.validators import Length
@@ -67,25 +68,19 @@ if TYPE_CHECKING:
 
 
 class MapboxAutofillWidget(TextInput):
-    """
-    Renders a string input field wrapped with the
-    <mapbox-address-autofill> custom HTML element.
-    """
-    def __call__(self, field: StringField, **kwargs: Any) -> HTMLString:
+    def __call__(self, field: StringField, **kwargs: Any) -> Markup:
         request = field.meta.request
-        mapbox_token = getattr(request.app, 'mapbox_token', '')
+        mapbox_token = request.app.mapbox_token
+        input_html: Markup = super().__call__(field, **kwargs)
 
-        input_html = super().__call__(field, **kwargs)
-
-        return HTMLString(
-            f'<mapbox-address-autofill access-token="{mapbox_token}">'
-            f'{input_html}'
-            f'</mapbox-address-autofill>'
-        )
+        return Markup(
+                '<mapbox-address-autofill access-token='
+                '{mapbox_token}>{input_html}'
+                '</mapbox-address-autofill>'
+        ).format(mapbox_token=mapbox_token, input_html=input_html)
 
 
-# todo: move this to fields
-class AddressField(StringField):
+class CityAutocompleteField(StringField):
     """ Provides address completion """
 
     widget = MapboxAutofillWidget()
@@ -95,6 +90,7 @@ class AddressField(StringField):
         if form is not None:
             form.meta.request.include('mapbox_address_autofill')
         super().__init__(*args, **kwargs)
+
 
 class FormChoicesMixin:
 
@@ -239,11 +235,11 @@ class TranslatorForm(Form, FormChoicesMixin, DrivingDistanceMixin):
         fieldset=_('Personal Information')
     )
 
-    hometown = AddressField(
+    hometown = CityAutocompleteField(
         label=_('Hometown'),
         fieldset=_('Personal Information'),
         validators=[Optional()],
-        render_kw={'autocomplete': 'address-level2'} 
+        render_kw={'autocomplete': 'address-level2'}
     )
 
     coordinates = CoordinatesField(
