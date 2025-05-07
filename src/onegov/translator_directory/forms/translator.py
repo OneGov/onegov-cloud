@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+from enum import Enum
 import re
 
 from functools import cached_property
@@ -80,19 +81,40 @@ class MapboxAutofillWidget(TextInput):
         ).format(mapbox_token=mapbox_token, input_html=input_html)
 
 
-class CityAutocompleteField(StringField):
-    """ Provides address completion """
+class MapboxPlaceDetail(Enum):
+    """Determines the level of geographical precision of autofill. """
+
+    # Line levels (specific parts of the street address)
+    STREET_NUMBER = 'address-line1'  # Street number and name
+    APPARTMENT_OR_FLOOR = 'address-line2'  # Apartment, suite, floor, etc.
+
+    # Administrative levels (geographic areas)
+    # This often corresponds to State, Province, or Territory
+    LEAST_SPECIFIC = 'address-level1'
+    # This often corresponds to City or Municipality
+    MORE_SPECIFIC = 'address-level2'
+    # This is less commonly used, sometimes County or another district level
+    MOST_SPECIFIC = 'address-level3'
+
+
+class PlaceAutocompleteField(StringField):
+    """ Provides address completion for places. """
 
     widget = MapboxAutofillWidget()
 
-    def __init__(self, *args: Any, **kwargs: Any):
+    def __init__(self,
+                 autocomplete_attribute:
+                 MapboxPlaceDetail = MapboxPlaceDetail.MORE_SPECIFIC,
+                 *args: Any,
+                 **kwargs: Any):
+
         form = kwargs.get('_form')
         if form is not None:
             form.meta.request.include('mapbox_address_autofill')
-        # Set default render_kw if not provided
         if 'render_kw' not in kwargs:
             kwargs['render_kw'] = {}
-        kwargs['render_kw'].setdefault('autocomplete', 'address-level2')
+        kwargs['render_kw'].setdefault('autocomplete',
+                                       autocomplete_attribute.value)
         super().__init__(*args, **kwargs)
 
 
@@ -239,7 +261,7 @@ class TranslatorForm(Form, FormChoicesMixin, DrivingDistanceMixin):
         fieldset=_('Personal Information')
     )
 
-    hometown = CityAutocompleteField(
+    hometown = PlaceAutocompleteField(
         label=_('Hometown'),
         fieldset=_('Personal Information'),
         validators=[Optional()]
