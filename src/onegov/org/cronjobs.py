@@ -21,7 +21,7 @@ from onegov.core.orm.abstract import AdjacencyList
 from onegov.core.orm.mixins.publication import UTCPublicationMixin
 from onegov.core.templates import render_template
 from onegov.directory.collections.directory import EntryRecipientCollection
-from onegov.event import Occurrence, Event
+from onegov.event import Occurrence, Event, EventCollection
 from onegov.file import FileCollection
 from onegov.form import FormSubmission, parse_form, Form
 from onegov.newsletter.models import Recipient
@@ -1230,3 +1230,54 @@ def normalize_adjacency_list_order(request: OrgRequest) -> None:
                 session.rollback()
             except Exception:
                 log.exception(f"Error during rollback for '{table_name}'")
+
+
+@OrgApp.cronjob(hour='03', minute='00', timezone='Europe/Zurich')
+def wil_daily_event_import(request: OrgRequest) -> None:
+    """
+    Daily import from Minasa (azizi data hub) for Wil
+    Minasa doc: https://minasa-demo.ch/wiki/datenhub:schema
+    Import doc: https://minasa-demo.ch/wiki/datenhub:import
+    
+    """
+    if request.app.org.name != 'Stadt Wil':
+        return
+
+    xml_url = 'https://azizi.2mp.ch/export/events/v/1'
+    # xml_url = 'https://azizi.nilkream.ch/export/events/v/1'  # test system
+    params = {
+        'zip': '9500'
+    }
+    # TODO make api key available via puppet
+    headers = {
+        'Authorization': 'apikey NGJjZWJlZTYtODM1YS00N2E1LThkYTUtYmZkMzk2ZGM4ZDUz'
+    }
+
+    # try:
+    #     response = requests.get(xml_url, params=params, headers=headers, timeout=30)
+    # except Exception:
+    #     log.exception(f'Failed to retrieve events for Wil from {xml_url}')
+    #     return
+    #
+    # if response.status_code != 200:
+    #     log.exception(f'Failed to retrieve events for Wil from {xml_url}. '
+    #                   f'Status code: {response.status_code}')
+    #     return
+
+    collection = EventCollection(request.session)
+    # added, updated, purged = collection.from_minasa(response.content)
+    # log.info(f'Wil: Events successfully imported '
+    #          f'{len(added)} added, {len(updated)} updated, '
+    #          f'{len(purged)} deleted')
+
+    # for testing read from file
+    with open('/home/reto/workspace/onegov-cloud/wil.xml', 'r') as f:
+        content = f.read()
+        # convert content to byte stream
+        content = content.encode('utf-8')
+
+        added, updated, purged = collection.from_minasa(content)
+        log.info(f'Wil: Events successfully imported '
+                 f'{len(added)} added, {len(updated)} updated, '
+                 f'{len(purged)} deleted')
+    # end for testing
