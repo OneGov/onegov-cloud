@@ -870,7 +870,7 @@ def update_newsletter_email_bounce_statistics(
     def fetch_postmark_data(
         url: str,
         params: dict[str, Any],
-    ) -> list[dict[str, Any]]:
+    ) -> dict[str, Any]:
         session = create_retry_session()
         r = None
         try:
@@ -884,7 +884,7 @@ def update_newsletter_email_bounce_statistics(
                 timeout=30,
             )
             r.raise_for_status()
-            return r.json()
+            return r.json() or {}
         except requests.exceptions.HTTPError as http_err:
             if r and r.status_code == 401:
                 raise RuntimeWarning(
@@ -892,7 +892,6 @@ def update_newsletter_email_bounce_statistics(
                 ) from None
             else:
                 raise
-        return []
 
     def get_bounces() -> list[dict[str, Any]]:
         yesterday = utcnow() - timedelta(days=1)
