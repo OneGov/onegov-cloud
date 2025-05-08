@@ -5,12 +5,16 @@ import hashlib
 from datetime import date
 from datetime import datetime
 from datetime import timedelta
+from dateutil.parser import parse
+from html import unescape
+
 from icalendar import Calendar as vCalendar
 from icalendar.prop import vCategory
 from lxml import etree
 from lxml.etree import SubElement, CDATA
 from markupsafe import escape
 from onegov.core.collection import Pagination
+from onegov.core.html import html_to_text
 from onegov.core.utils import increment_name
 from onegov.core.utils import normalize_for_url
 from onegov.event.models import Event
@@ -25,11 +29,11 @@ from sqlalchemy import and_
 from sqlalchemy import or_
 from uuid import uuid4
 
-
 from typing import Any
 from typing import IO
 from typing import NamedTuple
 from typing import TYPE_CHECKING
+
 if TYPE_CHECKING:
     from collections.abc import Iterable
     from collections.abc import Mapping
@@ -50,14 +54,13 @@ class EventImportItem(NamedTuple):
 
 
 class EventCollection(Pagination[Event]):
-
     """ Manage a list of events. """
 
     def __init__(
-        self,
-        session: Session,
-        page: int = 0,
-        state: EventState | None = None
+            self,
+            session: Session,
+            page: int = 0,
+            state: EventState | None = None
     ) -> None:
 
         super().__init__(page)
@@ -66,9 +69,9 @@ class EventCollection(Pagination[Event]):
 
     def __eq__(self, other: object) -> bool:
         return (
-            isinstance(other, self.__class__)
-            and self.state == other.state
-            and self.page == other.page
+                isinstance(other, self.__class__)
+                and self.state == other.state
+                and self.page == other.page
         )
 
     def subset(self) -> Query[Event]:
@@ -106,13 +109,13 @@ class EventCollection(Pagination[Event]):
         return name
 
     def add(
-        self,
-        title: str,
-        start: datetime,
-        end: datetime,
-        timezone: str,
-        autoclean: bool = True,
-        **optional: Any
+            self,
+            title: str,
+            start: datetime,
+            end: datetime,
+            timezone: str,
+            autoclean: bool = True,
+            **optional: Any
     ) -> Event:
         """ Add a new event.
 
@@ -186,13 +189,13 @@ class EventCollection(Pagination[Event]):
         return query.first()
 
     def from_import(
-        self,
-        items: Iterable[EventImportItem | str],
-        purge: str | None = None,
-        publish_immediately: bool = True,
-        valid_state_transfers: Mapping[str, str] | None = None,
-        published_only: bool = False,
-        future_events_only: bool = False
+            self,
+            items: Iterable[EventImportItem | str],
+            purge: str | None = None,
+            publish_immediately: bool = True,
+            valid_state_transfers: Mapping[str, str] | None = None,
+            published_only: bool = False,
+            future_events_only: bool = False
     ) -> tuple[list[Event], list[Event], list[UUID]]:
         """ Add or updates the given events.
 
@@ -273,31 +276,31 @@ class EventCollection(Pagination[Event]):
                 else:
                     # No information on provided, figure it out ourselves!
                     image_changed = (
-                        (existing.image and not item.image)
-                        or (not existing.image and item.image)
+                            (existing.image and not item.image)
+                            or (not existing.image and item.image)
                     )
                     if existing.image and item.image:
                         image_changed = (
-                            existing.image.checksum
-                            != hashlib.new(
-                                'md5',
-                                item.image.read(),
-                                usedforsecurity=False
-                            ).hexdigest()
+                                existing.image.checksum
+                                != hashlib.new(
+                            'md5',
+                            item.image.read(),
+                            usedforsecurity=False
+                        ).hexdigest()
                         )
                         item.image.seek(0)
                     changed = True if (
-                        existing.title != event.title
-                        or existing.location != event.location
-                        or set(existing.tags) != set(event.tags)
-                        or existing.filter_keywords != event.filter_keywords
-                        or existing.timezone != event.timezone
-                        or existing.start != event.start
-                        or existing.end != event.end
-                        or existing.content != event.content
-                        or existing.coordinates != event.coordinates
-                        or existing.recurrence != event.recurrence
-                        or image_changed
+                            existing.title != event.title
+                            or existing.location != event.location
+                            or set(existing.tags) != set(event.tags)
+                            or existing.filter_keywords != event.filter_keywords
+                            or existing.timezone != event.timezone
+                            or existing.start != event.start
+                            or existing.end != event.end
+                            or existing.content != event.content
+                            or existing.coordinates != event.coordinates
+                            or existing.recurrence != event.recurrence
+                            or image_changed
                     ) else False
 
                 if changed:
@@ -350,13 +353,13 @@ class EventCollection(Pagination[Event]):
         return added, updated, purged_event_ids
 
     def from_ical(
-        self,
-        ical: str,
-        future_events_only: bool = False,
-        event_image: IO[bytes] | None = None,
-        event_image_name: str | None = None,
-        default_categories: list[str] | None = None,
-        default_filter_keywords: dict[str, list[str]] | None = None
+            self,
+            ical: str,
+            future_events_only: bool = False,
+            event_image: IO[bytes] | None = None,
+            event_image_name: str | None = None,
+            default_categories: list[str] | None = None,
+            default_filter_keywords: dict[str, list[str]] | None = None
     ) -> tuple[list[Event], list[Event], list[UUID]]:
         """ Imports the events from an iCalender string.
 
@@ -435,10 +438,10 @@ class EventCollection(Pagination[Event]):
                 # categories may be in lists or they may be single values
                 # whose 'cats' member contains the texts
                 if (
-                    not hasattr(tags, '__iter__')
-                    # v6 added an __iter__ method to vCategory
-                    # but it's not what we want to ierate over
-                    or isinstance(tags, vCategory)
+                        not hasattr(tags, '__iter__')
+                        # v6 added an __iter__ method to vCategory
+                        # but it's not what we want to ierate over
+                        or isinstance(tags, vCategory)
                 ):
                     tags = [tags]
 
@@ -482,10 +485,136 @@ class EventCollection(Pagination[Event]):
         return self.from_import(items, publish_immediately=True,
                                 future_events_only=future_events_only)
 
-    def as_anthrazit_xml(
+    def rrule_from_single_dates(self, single_dates: list[datetime]) -> str | None:
+        if not single_dates:
+            return None
+
+        dates = [date.strftime('%Y%m%dT%H%M%SZ') for date in single_dates]
+        return f'RDATE:{",".join(dates)}'
+
+    def from_minasa(
         self,
-        request: CoreRequest,
-        future_events_only: bool = True
+        xml_stream,
+    ):
+
+        locations = {}
+        items = []
+        future_events_only = True
+        event_count = 0
+        h2t_config = {'ignore_emphasis': True}
+
+        root = etree.fromstring(xml_stream)
+        ns = {'ns': 'https://minasa.ch/schema/v1'}
+
+        def find_element_text(parent: etree._Element, key: str) -> str | None:
+            element = parent.find(f'ns:{key}', namespaces=ns)
+            if element is not None:
+                return unescape(element.text or '')
+
+            return None
+
+        for location in root.xpath('//ns:location', namespaces=ns):
+            uuid7 = find_element_text(location, 'uuid7')
+            address = location.find('ns:address', namespaces=ns)
+            title = find_element_text(address, 'title')
+            street = find_element_text(address, 'street')
+            zip = find_element_text(address, 'zip')
+            city = find_element_text(address, 'city')
+            url = find_element_text(address, 'url')
+            locations[uuid7] = {
+                'title': title,
+                'street': street,
+                'zip': zip,
+                'city': city,
+                'url': url,
+            }
+
+        for event in root.xpath('//ns:event', namespaces=ns):
+            uuid7 = event.find('ns:uuid7', namespaces=ns).text
+            title = find_element_text(event, 'title')
+            abstract = find_element_text(event, 'abstract')
+            description = find_element_text(event, 'description')
+            description = html_to_text(description, **h2t_config) if description else ''
+            if abstract:
+                description = f'{abstract}\n\n{description}'
+            organizer = ''
+            location_id = find_element_text(event, 'locationUuid7')
+            print('*** tschupre location id:', location_id)
+            location_data = locations.get(location_id, '')
+            location = f', '.join(location_data[i] for i in location_data.keys() if location_data[i])
+            event_image = None
+            event_image_name = None
+            single_dates = []
+            timezone = 'Europe/Zurich'
+
+            for schedule in event.find('ns:schedules', namespaces=ns) or []:
+                start = find_element_text(schedule, 'start')
+                # start = schedule.find('ns:start', namespaces=ns).text or None
+                start = parse(start) if start else None
+                end = find_element_text(schedule, 'end')
+                # end = schedule.find('ns:end', namespaces=ns)
+                end = parse(end) if end else start
+
+                for frequency in schedule.find('ns:recurrence', namespaces=ns):
+                    if frequency.text == 'single':
+                        single_dates.append(start)
+
+                    if frequency.text != 'single':
+                        print('tschupre error unhandled recurrence:', frequency.text)
+                        continue
+
+            recurrence = self.rrule_from_single_dates(single_dates)
+
+            data = {
+                'uuid7': uuid7,
+                'title': title,
+                'recurrence': recurrence,
+            }
+            print()
+            print(f'Event #{event_count + 1}')
+            for key in data.keys():
+                print('{}: {}'.format(key, data[key]))
+
+            items.append(
+                EventImportItem(
+                    event=Event(  # type:ignore[misc]
+                        state='published',
+                        title=title,
+                        start=start,
+                        end=end,
+                        timezone=timezone,
+                        recurrence=recurrence,
+                        description=description,
+                        organizer=organizer,
+                        location=location,
+                        # coordinates=coordinates,
+                        # tags=tags or [],
+                        # filter_keywords=default_filter_keywords,
+                        source=f'{uuid7}',
+                    ),
+                    image=event_image,
+                    image_filename=event_image_name,
+                    pdf=None,
+                    pdf_filename=None,
+                )
+            )
+
+            # for l in locations:
+            #     print(f'location {l}')
+            # print(f'*** tschupre found {len(locations)} locations')
+
+            # tschupre for testing
+            event_count += 1
+            if event_count >= 50:
+                break
+
+        return self.from_import(items, publish_immediately=True,
+                                future_events_only=True)
+
+    def as_anthrazit_xml(
+            self,
+            request: CoreRequest,
+            future_events_only: bool = True
     ) -> str:
         """
         Returns all published occurrences as xml for Winterthur.
