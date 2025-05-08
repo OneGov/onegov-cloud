@@ -28,8 +28,8 @@ document.addEventListener("DOMContentLoaded", function() {
                 window.location.reload();
             }
             if (message.event === 'update') {
-                const agendaItem = document.querySelector(dm + '#' + message.node);
-                const agendaListItem = document.querySelector(dm + '#list-' + message.node + ' a');
+                const agendaItem = document.querySelector('#' + message.node);
+                const agendaListItem = document.querySelector(dm + ' #list-' + message.node + ' a');
                 const currentAgendaListItem = document.querySelector(dm + '#current');
                 if (agendaItem && message.content) {
                     const content = document.createElement('div');
