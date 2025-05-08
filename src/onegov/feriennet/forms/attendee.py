@@ -128,8 +128,7 @@ class AttendeeForm(AttendeeBase):
 
     swisspass = StringField(
         label=_('Swisspass ID'),
-        description='XXX-XXX-XXX-X',
-        validators=[InputRequired()],
+        description='XXX-XXX-XXX-X'
     )
 
     differing_address = BooleanField(
@@ -237,7 +236,6 @@ class AttendeeSignupForm(AttendeeBase):
     swisspass = StringField(
         label=_('Swisspass ID'),
         description='XXX-XXX-XXX-X',
-        validators=[InputRequired()],
         depends_on=('attendee', 'other')
     )
 
