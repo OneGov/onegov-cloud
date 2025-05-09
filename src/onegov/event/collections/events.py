@@ -540,12 +540,16 @@ class EventCollection(Pagination[Event]):
             zip = find_element_text(address, 'zip')
             city = find_element_text(address, 'city')
             url = find_element_text(address, 'url')
+            lat = find_element_text(address, 'latitude')
+            lon = find_element_text(address, 'longitude')
             locations[uuid7] = {
                 'title': title,
                 'street': street,
                 'zip': zip,
                 'city': city,
                 'url': url,
+                'latitude': lat,
+                'longitude': lon,
             }
 
         for organizer in root.xpath('//ns:organizer', namespaces=ns):
@@ -568,15 +572,22 @@ class EventCollection(Pagination[Event]):
             description = html_to_text(description, **h2t_config) if description else ''
             if abstract:
                 description = f'{abstract}\n\n{description}'
+
             organizer_id = find_element_text(event, 'organizerUuid7')
+
             location_id = find_element_text(event, 'locationUuid7')
             location_data = locations.get(location_id, '')
-            location = ', '.join(location_data[i] for i in location_data.keys() if location_data[i])
-            event_image, event_image_name = get_event_image(event)
+            location = ', '.join(
+                location_data[i] for i in ['title', 'street', 'zip', 'city']
+                if location_data[i]
+            )
+            coordinates = Coordinates(
+                location_data.get('longitude', None), location_data.get('latitude'), None)
+
+
             ticket_price = find_element_text(event, 'ticketPrice')
+            event_url = find_element_text(event, 'originalEventUrl')
             single_dates = []
-
-
             timezone = 'Europe/Zurich'
 
             for schedule in event.find('ns:schedules', namespaces=ns) or []:
@@ -621,8 +632,9 @@ class EventCollection(Pagination[Event]):
                         organizer_email=organizers.get(organizer_id, {}).get('email', ''),
                         organizer_phone=organizers.get(organizer_id, {}).get('phone', ''),
                         location=location,
+                        coordinates=coordinates,
                         price=ticket_price,
-                        # coordinates=coordinates,
+                        external_event_url=event_url,
                         # tags=tags or [],
                         # filter_keywords=default_filter_keywords,
                         source=f'{uuid7}',
