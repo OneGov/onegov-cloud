@@ -498,6 +498,7 @@ class EventCollection(Pagination[Event]):
     ):
 
         locations = {}
+        organizers = {}
         items = []
         future_events_only = True
         event_count = 0
@@ -529,6 +530,18 @@ class EventCollection(Pagination[Event]):
                 'url': url,
             }
 
+        for organizer in root.xpath('//ns:organizer', namespaces=ns):
+            uuid7 = find_element_text(organizer, 'uuid7')
+            address = organizer.find('ns:address', namespaces=ns)
+            title = find_element_text(address, 'title')
+            phone = find_element_text(address, 'phone')
+            email = find_element_text(address, 'email')
+            organizers[uuid7] = {
+                'title': title,
+                'phone': phone,
+                'email': email,
+            }
+
         for event in root.xpath('//ns:event', namespaces=ns):
             uuid7 = event.find('ns:uuid7', namespaces=ns).text
             title = find_element_text(event, 'title')
@@ -537,11 +550,10 @@ class EventCollection(Pagination[Event]):
             description = html_to_text(description, **h2t_config) if description else ''
             if abstract:
                 description = f'{abstract}\n\n{description}'
-            organizer = ''
+            organizer_id = find_element_text(event, 'organizerUuid7')
             location_id = find_element_text(event, 'locationUuid7')
-            print('*** tschupre location id:', location_id)
             location_data = locations.get(location_id, '')
-            location = f', '.join(location_data[i] for i in location_data.keys() if location_data[i])
+            location = ', '.join(location_data[i] for i in location_data.keys() if location_data[i])
             event_image = None
             event_image_name = None
             single_dates = []
@@ -585,7 +597,9 @@ class EventCollection(Pagination[Event]):
                         timezone=timezone,
                         recurrence=recurrence,
                         description=description,
-                        organizer=organizer,
+                        organizer=organizers.get(organizer_id, {}).get('title', ''),
+                        organizer_email=organizers.get(organizer_id, {}).get('email', ''),
+                        organizer_phone=organizers.get(organizer_id, {}).get('phone', ''),
                         location=location,
                         # coordinates=coordinates,
                         # tags=tags or [],
@@ -602,6 +616,10 @@ class EventCollection(Pagination[Event]):
             # for l in locations:
             #     print(f'location {l}')
             # print(f'*** tschupre found {len(locations)} locations')
+
+            for o in organizers:
+                print(f'organizer {o}')
+            print(f'*** tschupre found {len(organizers)} organizers')
 
             # tschupre for testing
             event_count += 1
