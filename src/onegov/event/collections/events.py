@@ -5,11 +5,14 @@ import hashlib
 from datetime import date
 from datetime import datetime
 from datetime import timedelta
+
+import requests
 from dateutil.parser import parse
 from html import unescape
 
 from icalendar import Calendar as vCalendar
 from icalendar.prop import vCategory
+from io import BytesIO
 from lxml import etree
 from lxml.etree import SubElement, CDATA
 from markupsafe import escape
@@ -514,6 +517,21 @@ class EventCollection(Pagination[Event]):
 
             return None
 
+        def get_event_image(event: etree._Element):
+            url = find_element_text(event, 'imageUrl')
+
+            if not url:
+                return None, None
+
+            try:
+                response = requests.get(url, timeout=10)
+                response.raise_for_status()
+                image_steam = BytesIO(response.content)
+                return image_steam, url.split('/')[-1]
+            except requests.RequestException as e:
+                print(f'Failed to retrieve image: {e}')
+                return None, None
+
         for location in root.xpath('//ns:location', namespaces=ns):
             uuid7 = find_element_text(location, 'uuid7')
             address = location.find('ns:address', namespaces=ns)
@@ -554,9 +572,10 @@ class EventCollection(Pagination[Event]):
             location_id = find_element_text(event, 'locationUuid7')
             location_data = locations.get(location_id, '')
             location = ', '.join(location_data[i] for i in location_data.keys() if location_data[i])
-            event_image = None
-            event_image_name = None
+            event_image, event_image_name = get_event_image(event)
             single_dates = []
+
+
             timezone = 'Europe/Zurich'
 
             for schedule in event.find('ns:schedules', namespaces=ns) or []:
