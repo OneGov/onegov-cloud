@@ -573,6 +573,7 @@ class EventCollection(Pagination[Event]):
             location_data = locations.get(location_id, '')
             location = ', '.join(location_data[i] for i in location_data.keys() if location_data[i])
             event_image, event_image_name = get_event_image(event)
+            ticket_price = find_element_text(event, 'ticketPrice')
             single_dates = []
 
 
@@ -620,6 +621,7 @@ class EventCollection(Pagination[Event]):
                         organizer_email=organizers.get(organizer_id, {}).get('email', ''),
                         organizer_phone=organizers.get(organizer_id, {}).get('phone', ''),
                         location=location,
+                        price=ticket_price,
                         # coordinates=coordinates,
                         # tags=tags or [],
                         # filter_keywords=default_filter_keywords,
