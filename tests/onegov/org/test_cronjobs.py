@@ -1598,32 +1598,73 @@ def test_update_newsletter_email_bounce_statistics(org_app, handlers):
         publication_end=datetime(2024, 4, 10, tzinfo=tz),
     ))
     entry_recipients = EntryRecipientCollection(org_app.session())
-    entry_recipients.add('marietta@user.ch', directory_entries.id,
-                         confirmed=True)
-    entry_recipients.add('martha@user.ch', directory_entries.id,
-                         confirmed=True)
-    entry_recipients.add('michu@user.ch', directory_entries.id,
-                         confirmed=True)
+    entry_recipients.add(
+        'marietta@user.ch', directory_entries.id, confirmed=True)
+    entry_recipients.add(
+        'martha@user.ch', directory_entries.id, confirmed=True)
+    entry_recipients.add(
+        'michu@user.ch', directory_entries.id, confirmed=True)
 
     transaction.commit()
     close_all_sessions()
 
     with patch('requests.Session.get') as mock_get:
-        mock_get.return_value = Bunch(
-            status_code=200,
-            json=lambda: {
-                'TotalCount': 2,
-                'Bounces': [
-                    {'RecordType': 'Bounce', 'ID': 3719297970,
-                     'Inactive': False, 'Email': 'franz@user.ch'},
-                    {'RecordType': 'Bounce', 'ID': 4739297971,
-                     'Inactive': True, 'Email': 'heinz@user.ch'},
-                    {'RecordType': 'Bounce', 'ID': 5739297972,
-                     'Inactive': True, 'Email': 'martha@user.ch'}
-                ]
-            },
-            raise_for_status=Mock(return_value=None),
-        )
+        mock_get.side_effect = [
+            Bunch(  # answer to bounce request
+                status_code=200,
+                json=lambda: {
+                    'TotalCount': 3,
+                    'Bounces': [
+                        {
+                            'RecordType': 'Bounce',
+                            'ID': 3719297970,
+                            'Inactive': False,
+                            'Email': 'franz@user.ch',
+                        },
+                        {
+                            'Inactive': True,
+                            'Email': 'heinz@user.ch',
+                        },
+                        {
+                            'Inactive': True,
+                            'Email': 'martha@user.ch',
+                        },
+                        {
+                            'Inactive': True,
+                            'Email': 'trudi@user.ch',
+                        },
+                        {
+                            'Inactive': True,
+                            'Email': 'michu@user.ch',
+                        },
+                    ],
+                },
+                raise_for_status=Mock(return_value=None),
+            ),
+            Bunch(  # answer to the suppression request
+                status_code=200,
+                json=lambda: {
+                    'Suppressions': [
+                        {
+                            'EmailAddress': 'heinz@user.ch',
+                            'SuppressionReason': 'HardBounce',
+                            'Origin': 'Recipient',
+                            'CreatedAt': '2025-05-06T08:58:33-05:00'
+                        },
+                        {
+                            'EmailAddress': 'martha@user.ch',
+                        },
+                        {
+                            'EmailAddress': 'trudi@user.ch',
+                        },
+                        {
+                            'EmailAddress': 'michu@user.ch',
+                        },
+                    ]
+                },
+                raise_for_status=Mock(return_value=None),
+            )
+        ]
 
         # execute cronjob
         client.get(get_cronjob_url(job))
@@ -1635,13 +1676,72 @@ def test_update_newsletter_email_bounce_statistics(org_app, handlers):
         assert RecipientCollection(org_app.session()).by_address(
             'heinz@user.ch').is_inactive is True
         assert RecipientCollection(org_app.session()).by_address(
-            'trudi@user.ch').is_inactive is False
+            'trudi@user.ch').is_inactive is True
         assert EntryRecipientCollection(org_app.session()).by_address(
             'marietta@user.ch').is_inactive is False
         assert EntryRecipientCollection(org_app.session()).by_address(
             'martha@user.ch').is_inactive is True
         assert EntryRecipientCollection(org_app.session()).by_address(
-            'michu@user.ch').is_inactive is False
+            'michu@user.ch').is_inactive is True
+
+    # reactivate recipients
+    with patch('requests.Session.get') as mock_get:
+        mock_get.side_effect = [
+            Bunch(  # answer to bounce request
+                status_code=200,
+                json=lambda: {
+                    'Bounces': [
+                        {
+                            'RecordType': 'Bounce',
+                            'ID': 3719297470,
+                            'Inactive': False,
+                            'Email': 'unknown@user.ch',
+                        },
+                        {
+                            'Inactive': True,
+                            'Email': 'trudi@user.ch',
+                        },
+                        {
+                            'Inactive': True,
+                            'Email': 'michu@user.ch',
+                        },
+                    ]
+                },
+                raise_for_status=Mock(return_value=None),
+            ),
+            Bunch(  # answer to the suppression request
+                status_code=200,
+                json=lambda: {
+                    'Suppressions': [
+                        {
+                            'EmailAddress': 'trudi@user.ch',
+                        },
+                        {
+                            'EmailAddress': 'michu@user.ch',
+                        },
+                    ]
+                },
+                raise_for_status=Mock(return_value=None),
+            )
+        ]
+
+        # execute cronjob
+        client.get(get_cronjob_url(job))
+
+        # check if the statistics are updated
+        assert mock_get.called
+        assert RecipientCollection(org_app.session()).by_address(
+            'franz@user.ch').is_inactive is False
+        assert RecipientCollection(org_app.session()).by_address(
+            'heinz@user.ch').is_inactive is False
+        assert RecipientCollection(org_app.session()).by_address(
+            'trudi@user.ch').is_inactive is True
+        assert EntryRecipientCollection(org_app.session()).by_address(
+            'marietta@user.ch').is_inactive is False
+        assert EntryRecipientCollection(org_app.session()).by_address(
+            'martha@user.ch').is_inactive is False
+        assert EntryRecipientCollection(org_app.session()).by_address(
+            'michu@user.ch').is_inactive is True
 
     # test raising runtime warning exception for status code 401
     with patch('requests.Session.get') as mock_get:
@@ -1673,14 +1773,14 @@ def test_update_newsletter_email_bounce_statistics(org_app, handlers):
     recipients = RecipientCollection(org_app.session())
     assert recipients.query().count() == 3
     assert recipients.by_address('franz@user.ch').is_inactive is False
-    assert recipients.by_address('heinz@user.ch').is_inactive is True
-    assert recipients.by_address('trudi@user.ch').is_inactive is False
+    assert recipients.by_address('heinz@user.ch').is_inactive is False
+    assert recipients.by_address('trudi@user.ch').is_inactive is True
 
     entry_recipients = EntryRecipientCollection(org_app.session())
     assert entry_recipients.query().count() == 3
     assert entry_recipients.by_address('marietta@user.ch').is_inactive is False
-    assert entry_recipients.by_address('martha@user.ch').is_inactive is True
-    assert entry_recipients.by_address('michu@user.ch').is_inactive is False
+    assert entry_recipients.by_address('martha@user.ch').is_inactive is False
+    assert entry_recipients.by_address('michu@user.ch').is_inactive is True
 
 
 def test_delete_unconfirmed_subscribers(org_app, handlers):

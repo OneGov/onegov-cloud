@@ -72,6 +72,10 @@ class RecipientCollection:
             return self.query().filter(Recipient.id == id).first()
         return None
 
+    def by_inactive(self) -> Query[Recipient]:
+        return self.query().filter(
+            Recipient.meta['inactive'].as_boolean() == True)
+
     def by_address(
         self,
         address: str,
