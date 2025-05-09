@@ -211,6 +211,12 @@ class Recipient(Base, TimestampMixin, ContentMixin):
         """
         self.meta['inactive'] = True
 
+    def reactivate(self) -> None:
+        """
+        Marks a previously `inactive` recipient as active again.
+        """
+        self.meta['inactive'] = False
+
 
 class Subscription:
     """ Adds subscription management to a recipient. """
