@@ -139,7 +139,7 @@ def view_settlement_run(
         session, self.start, self.end
     )
 
-    standard_categories = {
+    pdf_categories = {
         'party': {
             'title': _('Settlements by Party'),
             'links': [
@@ -208,7 +208,7 @@ def view_settlement_run(
         },
     }
 
-    exception_categories = {
+    excel_categories = {
         'salary_export': {
             'title': _('Salary Export'),
             'links': [
@@ -226,11 +226,23 @@ def view_settlement_run(
         }
     }
 
+    export_tabs_data = {
+        'pdf': {
+            'tab_title': _('PDF Exports'),
+            'panel_id': 'panel-pdf-exports',
+            'categories': pdf_categories
+        },
+        'excel': {
+            'tab_title': _('Excel Exports'),
+            'panel_id': 'panel-excel-exports',
+            'categories': excel_categories
+        }
+    }
+
     return {
         'layout': layout,
         'settlement_run': self,
-        'standard_categories': standard_categories, # pyflakes:ignore
-        'exception_categories': exception_categories, # pyflakes:ignore
+        'export_tabs_data': export_tabs_data,
         'title': layout.title,
     }
 
