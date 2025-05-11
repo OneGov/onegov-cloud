@@ -21,7 +21,7 @@
         </dl>
 
         <!-- Tabs Start -->
-        <ul class="tabs" data-tabs="tabs" role="tablist">
+        <ul class="tabs" data-tabs id="settlement-run-main-tabs" role="tablist">
             <li class="tabs-title is-active" role="presentation">
                 <a href="#panel-standard-exports" role="tab" aria-controls="panel-standard-exports" aria-selected="true" i18n:translate="">Standard Exports</a>
             </li>
@@ -30,7 +30,7 @@
             </li>
         </ul>
 
-        <div class="tabs-content" data-tabs-content="tabs">
+        <div class="tabs-content" data-tabs-content="settlement-run-main-tabs">
             <div class="tabs-panel is-active" id="panel-standard-exports" role="tabpanel">
                 <div tal:repeat="category_key standard_categories.keys()">
                     <tal:block tal:define="category standard_categories[category_key]">
