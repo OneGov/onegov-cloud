@@ -59,22 +59,3 @@
     </tal:b>
 
 </div>
-                        <div class="category-container">
-                            <hr class="short-hr">
-                            <h3 class="export-category-title">${category.title}</h3>
-                            <hr class="long-hr">
-                        </div>
-                        <div class="link-container">
-                            <tal:b repeat="link category.links">
-                                <span class="link-item" tal:content="link(layout)"></span>
-                            </tal:b>
-                        </div>
-                    </tal:block>
-                </div>
-            </div>
-        </div>
-        <!-- Tabs End -->
-
-    </tal:b>
-
-</div>
