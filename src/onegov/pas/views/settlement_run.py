@@ -183,32 +183,6 @@ def view_settlement_run(
                             commission,
                             category='commission'
                         ),
-                        name='run-export'
-                    ),
-                ),
-                Link(
-                    _('Salary Export (XLSX)'),
-                    request.link(
-                        SettlementRunAllExport(
-                            settlement_run=self,
-                            category='salary-xlsx-export'
-                        ),
-                        name='run-export'
-                    ),
-                )
-            ],
-        },
-        'commissions': {
-            'title': _('Settlements by Commission'),
-            'links': [
-                Link(
-                    commission.title + ' Total',
-                    request.link(
-                        SettlementRunExport(
-                            self,
-                            commission,
-                            category='commission'
-                        ),
                         'run-export'
                     ),
                     )
@@ -255,8 +229,8 @@ def view_settlement_run(
     return {
         'layout': layout,
         'settlement_run': self,
-        'standard_categories': standard_categories,
-        'exception_categories': exception_categories,
+        'standard_categories': standard_categories, # pyflakes:ignore
+        'exception_categories': exception_categories, # pyflakes:ignore
         'title': layout.title,
     }
 

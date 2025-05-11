@@ -32,7 +32,44 @@
 
         <div class="tabs-content" data-tabs-content="tabs">
             <div class="tabs-panel is-active" id="panel-standard-exports" role="tabpanel">
-                <div tal:repeat="category standard_categories.values()">
+                <div tal:repeat="category_key standard_categories.keys()">
+                    <tal:block tal:define="category standard_categories[category_key]">
+                        <div class="category-container">
+                            <hr class="short-hr">
+                            <h3 class="export-category-title">${category.title}</h3>
+                            <hr class="long-hr">
+                        </div>
+                        <div class="link-container">
+                            <tal:b repeat="link category.links">
+                                <span class="link-item" tal:content="link(layout)"></span>
+                            </tal:b>
+                        </div>
+                    </tal:block>
+                </div>
+            </div>
+
+            <div class="tabs-panel" id="panel-exception-exports" role="tabpanel">
+                <div tal:repeat="category_key exception_categories.keys()">
+                    <tal:block tal:define="category exception_categories[category_key]">
+                        <div class="category-container">
+                            <hr class="short-hr">
+                            <h3 class="export-category-title">${category.title}</h3>
+                            <hr class="long-hr">
+                        </div>
+                        <div class="link-container">
+                            <tal:b repeat="link category.links">
+                                <span class="link-item" tal:content="link(layout)"></span>
+                            </tal:b>
+                        </div>
+                    </tal:block>
+                </div>
+            </div>
+        </div>
+        <!-- Tabs End -->
+
+    </tal:b>
+
+</div>
                     <div class="category-container">
                         <hr class="short-hr">
                         <h3 class="export-category-title">${category.title}</h3>
