@@ -10,11 +10,8 @@ from onegov.pas.models import (
     SettlementRun,
     Attendence,
 )
-from onegov.pas.views.settlement_run import NEW_LOHNART_MAPPING
-from onegov.pas.models.attendence import TYPES
 import io
-import xlsxwriter
-from openpyxl import load_workbook # type: ignore[import-untyped]
+from openpyxl import load_workbook  # type: ignore[import-untyped]
 
 
 def test_export_salary_xlsx(client_with_es, session):

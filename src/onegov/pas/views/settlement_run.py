@@ -210,10 +210,10 @@ def view_settlement_run(
 
     excel_categories = {
         'salary_export': {
-            'title': _('Salary Export'),
+            'title': _('Excel Report'),
             'links': [
                 Link(
-                    _('Salary Export (XLSX)'),
+                    _('Excel Report (XLSX)'),
                     request.link(
                         SettlementRunAllExport(
                             settlement_run=self,
@@ -1000,7 +1000,7 @@ def view_settlement_run_all_export(
             self.settlement_run.end
         )
         year = self.settlement_run.end.year
-        filename = f'Salärdatenexport_{year}_Q{q}.xlsx'
+        filename = f'Excel_Report_{year}_Q{q}.xlsx'
 
         output = BytesIO()
         workbook = xlsxwriter.Workbook(

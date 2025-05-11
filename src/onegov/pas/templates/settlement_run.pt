@@ -37,7 +37,7 @@
                 <div tal:attributes="class python:'tabs-panel ' + ('is-active' if repeat.tab_item.index == 0 else '');
                                    id tab_item.panel_id"
                      role="tabpanel">
-                    <div tal:repeat="category_key tab_item.categories.keys()">
+                    <div tal:repeat="category_key tab_item.categories.keys()" class="export-category">
                         <tal:block tal:define="category tab_item.categories[category_key]">
                             <div class="category-container">
                                 <hr class="short-hr">

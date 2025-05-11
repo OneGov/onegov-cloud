@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+from onegov.core.utils import module_path
 from onegov.pas.calculate_pay import calculate_rate
 from dataclasses import dataclass
 from typing import cast
@@ -14,7 +15,7 @@ from weasyprint.text.fonts import (  # type: ignore[import-untyped]
 )
 from onegov.pas.models.attendence import TYPES, Attendence
 from datetime import date  # noqa: TC003
-from onegov.pas.utils import format_swiss_number, module_path
+from onegov.pas.utils import format_swiss_number
 
 
 from typing import TYPE_CHECKING, Literal, TypedDict
