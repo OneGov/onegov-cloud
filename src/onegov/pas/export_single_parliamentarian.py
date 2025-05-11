@@ -165,6 +165,7 @@ th, td {
     data = _get_parliamentarian_settlement_data(
         settlement_run, request, parliamentarian, rate_set
     )
+    current_date = date.today().strftime('%d.%m.%Y')
     html = f"""
         <!DOCTYPE html>
         <html>
@@ -181,7 +182,7 @@ th, td {
             </div>
 
             <div class="date">
-                Zug {settlement_run.end.strftime('%d.%m.%Y')}
+                Zug {current_date}
             </div>
 
             <h2 class="title">
