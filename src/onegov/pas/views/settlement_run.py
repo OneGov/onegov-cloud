@@ -1,5 +1,6 @@
 from __future__ import annotations
-
+from io import BytesIO
+from sedate import utcnow
 from onegov.core.utils import module_path
 from onegov.core.elements import Link
 from onegov.core.security import Private
@@ -18,15 +19,16 @@ from onegov.pas.models import (
     SettlementRun,
     Party,
     Commission,
+    Attendence,
 )
 from webob import Response
 from decimal import Decimal
 from weasyprint import HTML, CSS  # type: ignore[import-untyped]
 from weasyprint.text.fonts import (  # type: ignore[import-untyped]
     FontConfiguration)
-from onegov.pas.models.attendence import TYPES, Attendence
-from onegov.pas.models.attendence import AttendenceType
-from onegov.pas.path import SettlementRunExport, SettlementRunAllExport # noqa: E501
+import xlsxwriter   # type: ignore[import-untyped]
+from onegov.pas.models.attendence import TYPES
+from onegov.pas.path import SettlementRunExport, SettlementRunAllExport
 from onegov.pas.models import Parliamentarian
 from onegov.pas.utils import (
     format_swiss_number,
@@ -35,11 +37,9 @@ from onegov.pas.utils import (
 )
 from operator import itemgetter
 
-from typing import TYPE_CHECKING, Literal
 
+from typing import TYPE_CHECKING, Literal
 if TYPE_CHECKING:
-    import io
-    import xlsxwriter
     from onegov.core.types import RenderData
     from onegov.town6.request import TownRequest
     from collections.abc import Iterator
@@ -440,7 +440,7 @@ def generate_settlement_pdf(
     """ Entry point for almost all settlement PDF generations. """
     font_config = FontConfiguration()
     css_path = module_path('onegov.pas', 'views/templates/settlement_pdf.css')
-    with open(css_path, 'r') as f:
+    with open(css_path) as f:
         css = CSS(string=f.read())
 
     if entity_type == 'commission' and isinstance(entity, Commission):
@@ -867,7 +867,7 @@ def _get_party_settlement_data(
     return sorted(result, key=itemgetter(0))
 
 
-NEW_LOHNART_MAPPING: dict[AttendenceType, dict[str, str]] = {
+NEW_LOHNART_MAPPING = {
     'plenary': {'nr': '2405', 'text': 'Sitzungsentschädigung KR'},
     'commission': {
         'nr': '2410',
@@ -912,9 +912,8 @@ def generate_xlsx_export_rows(
     cola_multiplier = Decimal(
         str(1 + (rate_set.cost_of_living_adjustment / 100))
     )
-    export_date = request.today()
     quarter = settlement_run.get_run_number_for_year(settlement_run.end)
-    year_quarter_str = f"{settlement_run.end.year} Q{quarter}"
+    year_quarter_str = f'{settlement_run.end.year} Q{quarter}'
 
     for attendance in attendences:
         parliamentarian = attendance.parliamentarian
@@ -941,11 +940,12 @@ def generate_xlsx_export_rows(
         )
         rate_with_cola = Decimal(base_rate * cola_multiplier)
 
+        # Some columns are left empty on purpose (this is what is asked)
         yield [
             parliamentarian.personnel_number or '', '', lohnart_nr,
             '', '', '', '', '', '', '', '', '', rate_with_cola,
             '', '', '', lohnart_text, '', '', '',
-            '', '', '', '', '', year_quarter_str, export_date
+            '', '', '', '', '', year_quarter_str, utcnow().strftime('%d.%m.%Y')
         ]
 
 
@@ -974,16 +974,14 @@ def view_settlement_run_all_export(
             content_disposition=f'attachment; filename={filename}.pdf'
         )
     elif self.category == 'salary-xlsx-export':
-        import io
-        import xlsxwriter
 
         q = self.settlement_run.get_run_number_for_year(
             self.settlement_run.end
         )
         year = self.settlement_run.end.year
-        filename = f"Salärdatenexport_{year}_Q{q}.xlsx"
+        filename = f'Salärdatenexport_{year}_Q{q}.xlsx'
 
-        output = io.BytesIO()
+        output = BytesIO()
         workbook = xlsxwriter.Workbook(
             output, {'default_date_format': 'dd.mm.yyyy'})
         worksheet = workbook.add_worksheet('DATA')
@@ -997,7 +995,7 @@ def view_settlement_run_all_export(
 
         return Response(
             output.read(),
-            content_type='application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',  # noqa: E501
+            content_type='application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
             content_disposition=f'attachment; filename="{filename}"')
     else:
         raise NotImplementedError()
