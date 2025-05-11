@@ -139,7 +139,7 @@ def view_settlement_run(
         session, self.start, self.end
     )
 
-    categories = {
+    standard_categories = {
         'party': {
             'title': _('Settlements by Party'),
             'links': [
@@ -158,7 +158,7 @@ def view_settlement_run(
             ],
         },
         'all': {
-            'title': _('All Settlements'),  # Gesamtabrechnung
+            'title': _('All Settlements'),
             'links': [
                 Link(
                     _('All Parties'),
@@ -166,6 +166,22 @@ def view_settlement_run(
                         SettlementRunAllExport(
                             settlement_run=self,
                             category='all-parties'
+                        ),
+                        name='run-export'
+                    ),
+                ),
+            ],
+        },
+        'commissions': {
+            'title': _('Settlements by Commission'),
+            'links': [
+                Link(
+                    commission.title + ' Total',
+                    request.link(
+                        SettlementRunExport(
+                            self,
+                            commission,
+                            category='commission'
                         ),
                         name='run-export'
                     ),
@@ -218,10 +234,29 @@ def view_settlement_run(
         },
     }
 
+    exception_categories = {
+        'salary_export': {
+            'title': _('Salary Export'),
+            'links': [
+                Link(
+                    _('Salary Export (XLSX)'),
+                    request.link(
+                        SettlementRunAllExport(
+                            settlement_run=self,
+                            category='salary-xlsx-export'
+                        ),
+                        name='run-export'
+                    ),
+                )
+            ]
+        }
+    }
+
     return {
         'layout': layout,
         'settlement_run': self,
-        'categories': categories,
+        'standard_categories': standard_categories,
+        'exception_categories': exception_categories,
         'title': layout.title,
     }
 

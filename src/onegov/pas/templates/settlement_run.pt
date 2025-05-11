@@ -20,23 +20,49 @@
             </div>
         </dl>
 
-        <h3 i18n:translate="">Exports Settlement runs</h3>
+        <!-- Tabs Start -->
+        <ul class="tabs" data-tabs="tabs" role="tablist">
+            <li class="tabs-title is-active" role="presentation">
+                <a href="#panel-standard-exports" role="tab" aria-controls="panel-standard-exports" aria-selected="true" i18n:translate="">Standard Exports</a>
+            </li>
+            <li class="tabs-title" role="presentation">
+                <a href="#panel-exception-exports" role="tab" aria-controls="panel-exception-exports" aria-selected="false" i18n:translate="">Exception Exports</a>
+            </li>
+        </ul>
 
-        <div tal:repeat="category categories.values()">
-
-            <div class="category-container">
-                <hr class="short-hr">
-                <h3 class="export-category-title">${category.title}</h3>
-                <hr class="long-hr">
+        <div class="tabs-content" data-tabs-content="tabs">
+            <div class="tabs-panel is-active" id="panel-standard-exports" role="tabpanel">
+                <div tal:repeat="category standard_categories.values()">
+                    <div class="category-container">
+                        <hr class="short-hr">
+                        <h3 class="export-category-title">${category.title}</h3>
+                        <hr class="long-hr">
+                    </div>
+                    <div class="link-container">
+                        <tal:b repeat="link category.links">
+                            <span class="link-item" tal:content="link(layout)"></span>
+                        </tal:b>
+                    </div>
+                </div>
             </div>
 
-            <div class="link-container">
-                <tal:b repeat="link category.links">
-                    <span class="link-item" tal:content="link(layout)"></span>
-                </tal:b>
+            <div class="tabs-panel" id="panel-exception-exports" role="tabpanel">
+                <div tal:repeat="category exception_categories.values()">
+                    <div class="category-container">
+                        <hr class="short-hr">
+                        <h3 class="export-category-title">${category.title}</h3>
+                        <hr class="long-hr">
+                    </div>
+                    <div class="link-container">
+                        <tal:b repeat="link category.links">
+                            <span class="link-item" tal:content="link(layout)"></span>
+                        </tal:b>
+                    </div>
+                </div>
             </div>
-
         </div>
+        <!-- Tabs End -->
+
     </tal:b>
 
 </div>
