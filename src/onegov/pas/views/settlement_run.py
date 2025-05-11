@@ -25,7 +25,8 @@ from weasyprint import HTML, CSS  # type: ignore[import-untyped]
 from weasyprint.text.fonts import (  # type: ignore[import-untyped]
     FontConfiguration)
 from onegov.pas.models.attendence import TYPES, Attendence
-from onegov.pas.path import SettlementRunExport, SettlementRunAllExport
+from onegov.pas.models.attendence import AttendenceType
+from onegov.pas.path import SettlementRunExport, SettlementRunAllExport # noqa: E501
 from onegov.pas.models import Parliamentarian
 from onegov.pas.utils import (
     format_swiss_number,
@@ -35,9 +36,13 @@ from onegov.pas.utils import (
 from operator import itemgetter
 
 from typing import TYPE_CHECKING, Literal
+
 if TYPE_CHECKING:
+    import io
+    import xlsxwriter
     from onegov.core.types import RenderData
     from onegov.town6.request import TownRequest
+    from collections.abc import Iterator
     from datetime import date
     SettlementDataRow = tuple[
         'date', Parliamentarian, str, Decimal, Decimal, Decimal
@@ -161,6 +166,16 @@ def view_settlement_run(
                         SettlementRunAllExport(
                             settlement_run=self,
                             category='all-parties'
+                        ),
+                        name='run-export'
+                    ),
+                ),
+                Link(
+                    _('Salary Export (XLSX)'),
+                    request.link(
+                        SettlementRunAllExport(
+                            settlement_run=self,
+                            category='salary-xlsx-export'
                         ),
                         name='run-export'
                     ),
@@ -852,6 +867,88 @@ def _get_party_settlement_data(
     return sorted(result, key=itemgetter(0))
 
 
+NEW_LOHNART_MAPPING: dict[AttendenceType, dict[str, str]] = {
+    'plenary': {'nr': '2405', 'text': 'Sitzungsentschädigung KR'},
+    'commission': {
+        'nr': '2410',
+        'text': 'Kommissionsentschädigung KR inkl. Kürzestsitzungen'
+    },
+    'study': {'nr': '2421', 'text': 'Aktenstudium Kantonsrat'},
+    'shortest': {
+        'nr': '2410',
+        'text': 'Kommissionsentschädigung KR inkl. Kürzestsitzungen'
+    }
+}
+
+
+def generate_xlsx_export_rows(
+    settlement_run: SettlementRun,
+    request: TownRequest
+) -> Iterator[list[str | Decimal | date]]:
+    """ Generates row data for the salary XLSX export. """
+
+    yield [
+        'Personalnummer', 'Vertragsnummer', 'Lohnart / Lohnarten Nr.',
+        '', '', '', '', '', '', '', '', '',  # D-L empty
+        'Betrag', '', '', '',  # M-P empty (M is Betrag)
+        'Bemerkung/Lohnartentext, welche auf der Lohnabrechnung erscheint', '',
+        'Fibu-Konto', 'Kostenstelle / Kostenträger',  # S-T
+        '', '', '', '', '',  # U-Y empty
+        'Angabe zum Jahr und zum Quartal', 'Exportdatum'  # Z-AA
+    ]
+
+    session = request.session
+    rate_set = get_current_rate_set(session, settlement_run)
+    if not rate_set:
+        return
+
+    # Get all attendences in period
+    attendences = AttendenceCollection(
+        session,
+        date_from=settlement_run.start,
+        date_to=settlement_run.end
+    ).query()
+
+    cola_multiplier = Decimal(
+        str(1 + (rate_set.cost_of_living_adjustment / 100))
+    )
+    export_date = request.today()
+    quarter = settlement_run.get_run_number_for_year(settlement_run.end)
+    year_quarter_str = f"{settlement_run.end.year} Q{quarter}"
+
+    for attendance in attendences:
+        parliamentarian = attendance.parliamentarian
+        lohnart_info = NEW_LOHNART_MAPPING.get(attendance.type)
+
+        if not lohnart_info:
+            lohnart_nr = ''
+            lohnart_text = request.translate(TYPES.get(
+                attendance.type, ''))
+        else:
+            lohnart_nr = lohnart_info['nr']
+            lohnart_text = lohnart_info['text']
+
+        is_president = any(r.role == 'president'
+                           for r in parliamentarian.roles)
+        base_rate = calculate_rate(
+            rate_set=rate_set,
+            attendence_type=attendance.type,
+            duration_minutes=int(attendance.duration),
+            is_president=is_president,
+            commission_type=(
+                attendance.commission.type if attendance.commission else None
+            )
+        )
+        rate_with_cola = Decimal(base_rate * cola_multiplier)
+
+        yield [
+            parliamentarian.personnel_number or '', '', lohnart_nr,
+            '', '', '', '', '', '', '', '', '', rate_with_cola,
+            '', '', '', lohnart_text, '', '', '',
+            '', '', '', '', '', year_quarter_str, export_date
+        ]
+
+
 @PasApp.view(
     model=SettlementRunAllExport,
     permission=Private,
@@ -876,6 +973,32 @@ def view_settlement_run_all_export(
             content_type='application/pdf',
             content_disposition=f'attachment; filename={filename}.pdf'
         )
+    elif self.category == 'salary-xlsx-export':
+        import io
+        import xlsxwriter
+
+        q = self.settlement_run.get_run_number_for_year(
+            self.settlement_run.end
+        )
+        year = self.settlement_run.end.year
+        filename = f"Salärdatenexport_{year}_Q{q}.xlsx"
+
+        output = io.BytesIO()
+        workbook = xlsxwriter.Workbook(
+            output, {'default_date_format': 'dd.mm.yyyy'})
+        worksheet = workbook.add_worksheet('DATA')
+
+        for row_num, row_data in enumerate(generate_xlsx_export_rows(
+                self.settlement_run, request)):
+            worksheet.write_row(row_num, 0, row_data)
+
+        workbook.close()
+        output.seek(0)
+
+        return Response(
+            output.read(),
+            content_type='application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',  # noqa: E501
+            content_disposition=f'attachment; filename="{filename}"')
     else:
         raise NotImplementedError()
 
