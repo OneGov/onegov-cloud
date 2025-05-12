@@ -842,7 +842,9 @@ def update_newsletter_email_bounce_statistics(
     # occurs when EST is observing standard time (UTC-5) and CEST is observing
     # daylight saving time (UTC+2).
     # Postmark uses EST in `fromdate` and `todate`, see
-    # https://postmarkapp.com/developer/api/bounce-api.
+    # https://postmarkapp.com/developer/api/bounce-api and
+    # https://postmarkapp.com/developer/api/suppressions-api for the
+    # suppression api.
 
     def create_retry_session() -> requests.Session:
         adapter = HTTPAdapter(max_retries=Retry(
@@ -865,30 +867,24 @@ def update_newsletter_email_bounce_statistics(
 
         return ''
 
-    def get_bounces() -> list[dict[str, Any]]:
+    def fetch_postmark_data(
+        url: str,
+        params: dict[str, Any],
+    ) -> dict[str, Any]:
         session = create_retry_session()
-        token = get_postmark_token()
-        yesterday = utcnow() - timedelta(days=1)
         r = None
-
         try:
             r = session.get(
-                'https://api.postmarkapp.com/bounces',
-                params={
-                    'count': '500',
-                    'offset': '0',
-                    'fromDate': str(yesterday.date()),
-                    'toDate': str(yesterday.date()),
-                    'inactive': 'true',
-                },
+                url,
+                params=params,
                 headers={
                     'Accept': 'application/json',
-                    'X-Postmark-Server-Token': token,
+                    'X-Postmark-Server-Token': get_postmark_token(),
                 },
                 timeout=30,
             )
             r.raise_for_status()
-            bounces = r.json().get('Bounces', [])
+            return r.json() or {}
         except requests.exceptions.HTTPError as http_err:
             if r and r.status_code == 401:
                 raise RuntimeWarning(
@@ -897,10 +893,37 @@ def update_newsletter_email_bounce_statistics(
             else:
                 raise
 
-        return bounces
+    def get_bounces() -> list[dict[str, Any]]:
+        yesterday = utcnow() - timedelta(days=1)
+        params = {
+            'count': '500',
+            'offset': '0',
+            'fromDate': str(yesterday.date()),
+            'toDate': str(yesterday.date()),
+            'inactive': 'true',
+        }
+        data = fetch_postmark_data(
+            'https://api.postmarkapp.com/bounces',
+            params
+        )
+        return data.get('Bounces', [])
+
+    def get_suppressions() -> list[dict[str, Any]]:
+        from_ = utcnow() - timedelta(days=365)
+        params = {
+            'fromDate': str(from_.date()),
+        }
+        data = fetch_postmark_data(
+            'https://api.postmarkapp.com/message-streams/outbound/suppressions/dump',
+            params,
+        )
+        return data.get('Suppressions', [])
 
     postmark_bounces = get_bounces()
+    postmark_suppressed_addresses = [
+        s.get('EmailAddress') for s in get_suppressions()]
     collections = (RecipientCollection, EntryRecipientCollection)
+
     for collection in collections:
         recipients = collection(request.session)
 
@@ -909,9 +932,16 @@ def update_newsletter_email_bounce_statistics(
             inactive = bounce.get('Inactive', False)
             recipient = recipients.by_address(email)
 
-            if recipient and inactive:
+            if recipient and inactive and not recipient.is_inactive:
                 log.info(f'Mark recipient {recipient.address} as inactive')
                 recipient.mark_inactive()
+
+        # if any inactive recipient is not/no longer on the suppressed
+        # list, we reactivate him/her
+        for recipient in recipients.by_inactive():
+            if recipient.address not in postmark_suppressed_addresses:
+                log.info(f'Reactivate recipient {recipient.address}')
+                recipient.reactivate()
 
 
 @OrgApp.cronjob(hour=4, minute=30, timezone='Europe/Zurich')
