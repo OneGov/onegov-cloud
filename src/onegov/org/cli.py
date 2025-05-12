@@ -1021,23 +1021,45 @@ def import_reservations(
                     resource_name = str(value)
                 elif i == 3:
                     id = str(value)
-                elif i == 6 or i == 8:
                     if last_reservation_id == id:
-                        reservations[resource_name][id][
-                                'dates'].append(value)  # type:ignore
-                    else:
-                        reservation['dates'].append(value)  # type:ignore
-
+                        reservation = reservations[resource_name][id]
+                elif i == 6 or i == 8:
+                    reservation['dates'].append(value)  # type:ignore
                 elif i == 22:
                     reservation['general']['email'] = value  # type:ignore
                 elif i in shared_fields:
+                    value = str(value)
                     key = shared_fields[i]
                     if reservation['fields'].get(key) is None:  # type:ignore
                         reservation['fields'][key] = value
-                    else:
+                    elif reservation['fields'][key] != value:
                         reservation['fields'][key] += f' {value}'
 
             if not row_empty:
+                # Check if the dates spread across multiple days
+                start = reservation['dates'][-2]  # type:ignore
+                end = reservation['dates'][-1]  # type:ignore
+                if start.day != end.day:
+                    # click.secho(
+                    #     f'Reservation {id} spans multiple days',
+                    #     fg='yellow')
+                    # click.secho(f'Start: {start}', fg='yellow')
+                    # click.secho(f'End: {end}', fg='yellow')
+
+                    days = (end - start).days + 1
+                    for day in range(days):
+                        reservation['dates'].insert(  # type:ignore
+                            -1, start + timedelta(days=day)
+                        ) if day != 0 else None
+                        end_of_day = datetime.combine(
+                            start, end.time()
+                        )
+                        reservation['dates'].insert(  # type:ignore
+                            -1, end_of_day + timedelta(days=day)
+                        ) if day != days - 1 else None
+                    # for date in reservation['dates']:
+                        # click.secho(date, fg='blue')
+
                 count += 1
                 if resource_name not in reservations:
                     reservations[resource_name] = {}
@@ -1066,17 +1088,23 @@ def import_reservations(
                     id = str(value)
                 elif resource_name in reservations:
                     if id in reservations[resource_name]:
-                        if i == 13:
+                        if i == 13:  # Option name
                             key = resource_options[resource_name][
                                 'options'].get(value)
                             if key is None:
-                                options_not_found.add(value)
-                        if i == 14:
+                                options_not_found.add(
+                                    f'{resource_name}: {value}')
+                        if i == 14:  # Option answer
                             if key is not None:
                                 reservation = reservations[resource_name][id]
                                 if reservation['fields'  # type:ignore
                                                 ].get(key) is None:
                                     reservation['fields'][key] = value
+                        if i == 15:  # Option price
+                            if key is not None:
+                                reservation = reservations[resource_name][id]
+                                reservation['fields'][key] += (
+                                    f' ({value} CHF)')
         for option in options_not_found:
             click.secho(f'Option not found in the mapping file: {option}',
                         fg='yellow')
@@ -1084,15 +1112,16 @@ def import_reservations(
         if dry_run:
             res_show = json.dumps(reservations, indent=4, default=str)
             click.secho(f'Reservations: {res_show}', fg='green')
-            click.echo(f'Found {count} rows in the resource file')
-            click.echo(f'Found {options_count} rows in the options file')
+            # click.echo(f'Found {count} rows in the resource file')
+            # click.echo(f'Found {options_count} rows in the options file')
 
         # Create reservations
         if not dry_run:
             resources = ResourceCollection(app.libres_context)
             for resource_name in reservations.keys():
 
-                resource = resources.by_name(resource_name.lower())
+                real_resource_name = resource_options[resource_name]['name']
+                resource = resources.by_name(real_resource_name.lower())
 
                 if not resource:
                     click.echo(
@@ -1176,6 +1205,6 @@ def import_reservations(
                             handler_code='RSV', handler_id=token
                         )
                         ticket.accept_ticket(user)
-                        # ticket.close_ticket()
+                        ticket.close_ticket()
 
     return import_reservations
