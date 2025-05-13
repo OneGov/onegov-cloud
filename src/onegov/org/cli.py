@@ -18,7 +18,8 @@ from io import BytesIO
 from openpyxl import load_workbook
 import yaml
 from onegov.core.orm.utils import QueryChain
-from libres.modules.errors import InvalidEmailAddress, AlreadyReservedError
+from libres.modules.errors import (InvalidEmailAddress, AlreadyReservedError,
+                                   TimerangeTooLong)
 from onegov.chat import MessageCollection
 from onegov.core.cli import command_group, pass_group_context, abort
 from onegov.core.crypto import random_token
@@ -1032,8 +1033,11 @@ def import_reservations(
                     key = shared_fields[i]
                     if reservation['fields'].get(key) is None:  # type:ignore
                         reservation['fields'][key] = value
-                    elif reservation['fields'][key] != value:
-                        reservation['fields'][key] += f' {value}'
+                    elif value not in reservation['fields'][key]:
+                        if i == 17 or i == 18:
+                            reservation['fields'][key] += f' {value}'
+                        else:
+                            reservation['fields'][key] += f', {value}'
 
             if not row_empty:
                 # Check if the dates spread across multiple days
@@ -1100,11 +1104,6 @@ def import_reservations(
                                 if reservation['fields'  # type:ignore
                                                 ].get(key) is None:
                                     reservation['fields'][key] = value
-                        if i == 15:  # Option price
-                            if key is not None:
-                                reservation = reservations[resource_name][id]
-                                reservation['fields'][key] += (
-                                    f' ({value} CHF)')
         for option in options_not_found:
             click.secho(f'Option not found in the mapping file: {option}',
                         fg='yellow')
@@ -1163,6 +1162,31 @@ def import_reservations(
                             click.secho(
                                 f'Booking conflict in {resource.title} '
                                 f'at {start}', fg='red')
+                        except TimerangeTooLong:
+                            rules = resource.content['rules']
+                            relevant_rules = []
+                            for rule in rules:
+                                rule = rule['options']
+                                if rule['start'] <= start.date(
+                                ) and rule['end'] >= end.date(
+                                ) and start.weekday(
+                                ) not in rule['except_for'] and start.time(
+                                ) <= rule['start_time'] and end.time(
+                                ) >= rule['end_time']:
+                                    relevant_rules.append(rule)
+                            for i, rule in enumerate(relevant_rules):
+                                start = datetime.combine(
+                                    start.date(), rule['start_time'])
+                                end = datetime.combine(
+                                    end.date(), rule['end_time'])
+                                token_uuid = scheduler.reserve(
+                                    email=str(email),
+                                    dates=(start, end),
+                                    session_id=session_id,
+                                    single_token_per_session=True,
+                                    data={'accepted': True}
+                                )
+                                token = token_uuid.hex
 
                     if found_conflict:
                         continue
@@ -1179,7 +1203,7 @@ def import_reservations(
 
                     if not form.validate():
                         abort(f'{form_data} failed the form check'
-                              f' with {form.errors}')
+                            f' with {form.errors}')
 
                     submission = forms.submissions.add_external(
                         form=form,
