@@ -961,8 +961,7 @@ class PlaceAutocompleteField(StringField):
     widget = MapboxAutofillWidget()
 
     def __init__(self,
-                 autocomplete_attribute:
-                 MapboxPlaceDetail = MapboxPlaceDetail.MORE_SPECIFIC,
+                 autocomplete_attribute: MapboxPlaceDetail | None = None,
                  *args: Any,
                  **kwargs: Any):
 
@@ -972,5 +971,8 @@ class PlaceAutocompleteField(StringField):
         if 'render_kw' not in kwargs:
             kwargs['render_kw'] = {}
 
-        kwargs['render_kw']['autocomplete'] = autocomplete_attribute.value
+        effective_autocomplete_attribute = (
+            autocomplete_attribute or MapboxPlaceDetail.MORE_SPECIFIC
+        )
+        kwargs['render_kw']['autocomplete'] = effective_autocomplete_attribute.value
         super().__init__(*args, **kwargs)
