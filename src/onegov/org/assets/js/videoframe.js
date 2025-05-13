@@ -74,7 +74,7 @@ var VideoFrame = function(link) {
 
     var wrapper = $('<div class="video-wrapper" />');
 
-    var iframe = $('<iframe class="video-frame" src="' + info.url + '">')
+    var iframe = $('<iframe class="video-frame" allowfullscreen src="' + info.url + '">')
         .attr('frameborder', '0')
         .on('load', function() {
             parent.css('min-height', '0');
