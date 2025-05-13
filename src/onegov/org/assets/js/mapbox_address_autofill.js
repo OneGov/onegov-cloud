@@ -76,11 +76,13 @@
                     return;
                 }
                 const data = await response.json();
+                console.log('Mapbox API response data:', data);
                 suggestionsContainer.innerHTML = ''; // Clear previous
 
                 if (data.suggestions && data.suggestions.length > 0) {
                     data.suggestions.forEach(suggestion => {
                         const li = document.createElement('li');
+                        console.log('Mapbox suggestion:', suggestion);
                         li.textContent = suggestion.name; // 'name' should be appropriate for 'region' type
                         li.addEventListener('click', () => {
                             input.value = suggestion.name;
