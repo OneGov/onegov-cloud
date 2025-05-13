@@ -4,10 +4,11 @@
     //
     mapboxsearch.autofill({
         accessToken: getMapboxToken(),
-        country: 'ch',
-        language: 'de',
-        types: 'place,region', // Prioritize cities and cantons
-        streets: false
+        options: {
+            country: 'ch',
+            language: 'de',
+            types: 'place,region', // Prioritize cities and cantons
+            streets: false
+        }
     });
-
 })();
