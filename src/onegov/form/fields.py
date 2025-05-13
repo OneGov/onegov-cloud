@@ -971,6 +971,6 @@ class PlaceAutocompleteField(StringField):
             form.meta.request.include('mapbox_address_autofill')
         if 'render_kw' not in kwargs:
             kwargs['render_kw'] = {}
-        kwargs['render_kw'].setdefault('autocomplete',
-                                       autocomplete_attribute.value)
+
+        kwargs['render_kw']['autocomplete'] = autocomplete_attribute.value
         super().__init__(*args, **kwargs)
