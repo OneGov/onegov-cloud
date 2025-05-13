@@ -7,7 +7,10 @@ from functools import cached_property
 
 from onegov.form import Form
 from onegov.form.fields import (
-    ChosenSelectMultipleField, ChosenSelectField, PlaceAutocompleteField
+    ChosenSelectMultipleField,
+    ChosenSelectField,
+    MapboxPlaceDetail,
+    PlaceAutocompleteField
 )
 from onegov.form.fields import MultiCheckboxField
 from onegov.form.fields import TagsField
@@ -213,7 +216,8 @@ class TranslatorForm(Form, FormChoicesMixin, DrivingDistanceMixin):
     hometown = PlaceAutocompleteField(
         label=_('Hometown'),
         fieldset=_('Personal Information'),
-        validators=[Optional()]
+        validators=[Optional()],
+        autocomplete_attribute=MapboxPlaceDetail.LEAST_SPECIFIC
     )
 
     coordinates = CoordinatesField(
