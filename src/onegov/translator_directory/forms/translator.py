@@ -217,7 +217,7 @@ class TranslatorForm(Form, FormChoicesMixin, DrivingDistanceMixin):
         label=_('Hometown'),
         fieldset=_('Personal Information'),
         validators=[Optional()],
-        autocomplete_attribute=MapboxPlaceDetail.LEAST_SPECIFIC
+        autocomplete_attribute=MapboxPlaceDetail.MORE_SPECIFIC
     )
 
     coordinates = CoordinatesField(
