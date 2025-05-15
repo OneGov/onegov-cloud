@@ -861,7 +861,7 @@ def people_select_asset() -> Iterator[str]:
 
 @OrgApp.webasset('mapbox_address_autofill')
 def mapbox_address_autofill() -> Iterator[str]:
-    # yield 'mapbox-search-web.js'  # implicit dependency
+    yield 'mapbox-search-web.js'  # implicit dependency
     yield 'mapbox_address_autofill.js'
 
 
