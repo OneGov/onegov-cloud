@@ -50,7 +50,7 @@ from sqlalchemy.dialects.postgresql import array
 from uuid import uuid4
 
 
-from typing import IO, Any, TYPE_CHECKING
+from typing import IO, Any, TYPE_CHECKING, TypedDict
 if TYPE_CHECKING:
     from collections.abc import Callable, Iterator, Sequence
     from depot.fields.upload import UploadedFile
@@ -963,6 +963,64 @@ def delete_invisible_links() -> Callable[[OrgRequest, OrgApp], None]:
     return delete_invisible_links
 
 
+@cli.command(name='get-resources-and-forms')
+@click.argument('option_file', type=click.File('rb'))
+def get_resources_and_forms(
+    option_file: IO[bytes]
+) -> Callable[[OrgRequest, OrgApp], None]:
+    """ Get the resources and forms from the option file. """
+
+    def print_resources_and_forms(request: OrgRequest, app: OrgApp) -> None:
+        book = load_workbook(option_file)
+        sheet = book['Reservationen']
+
+        class OptionDict(TypedDict):
+            options: set[str]
+            type: str
+
+        resources: dict[str, dict[str, OptionDict]] = {}
+        for index, row in enumerate(sheet.rows):
+            if index <= 3:
+                continue
+            for i, cell in enumerate(row):
+                value = str(cell.value)
+                if i == 0:
+                    resource_name = value
+                    if resource_name not in resources:
+                        resources[resource_name] = {}
+                if i == 13:  # Option name
+                    option = value
+                    if resources[resource_name].get(option) is None:
+                        resources[resource_name][option] = {
+                            'type': 'text',
+                            'options': set()
+                        }
+                if i == 14:  # Option answer
+                    answer = value
+                    resources[resource_name][option]['options'].add(answer)
+                if i == 15:  # Option price
+                    if int(value) > 0:
+                        resources[resource_name][option]['options'].remove(
+                            answer)
+                        answer = answer.replace(' (', ', ').replace(
+                            ')', '') + f' ({value} CHF)'
+                        resources[resource_name][option]['options'].add(
+                            answer)
+                        resources[resource_name][option]['type'] = 'radio'
+
+        for resource in resources.keys():
+            click.secho(resource, fg='blue')
+            for option in resources[resource]:
+                if resources[resource][option]['type'] == 'text':
+                    click.secho(f'{option} = ___', fg='cyan')
+                else:
+                    click.secho(f'{option} =', fg='cyan')
+                    for answer in resources[resource][option]['options']:
+                        click.echo(f'    ( ) {answer}',)
+
+    return print_resources_and_forms
+
+
 @cli.command(name='import-reservations', context_settings={'singular': True})
 @click.argument('reservation_file', type=click.File('rb'))
 @click.argument('option_file', type=click.File('rb'))
@@ -981,29 +1039,31 @@ def import_reservations(
 
     def import_reservations(request: OrgRequest, app: OrgApp) -> None:
 
-        # Load yaml file as a dictionary
+        class Reservation(TypedDict):
+            general: dict[str, Any]
+            fields: dict[str, Any]
+            dates: list[Any]
+
         yaml_file = mapping_yaml.read()
         yaml_dict = yaml.safe_load(yaml_file)
         shared_fields = yaml_dict.get('shared_fields', {})
         resource_options = yaml_dict.get('resource_options', {})
 
-        # Load the reservation_file
         book = load_workbook(reservation_file)
         sheet = book['Reservationsdaten']
 
-        # Load the option_file
         book_options = load_workbook(option_file)
         sheet_options = book_options['Reservationen']
 
         reservations: dict[
-            str, dict[str, dict[str, dict[str, Any] | list[Any]]]] = {}
+            str, dict[str, Reservation]] = {}
         count = 0
         last_reservation_id = ''
         for index, row in enumerate(sheet.rows):
             if index <= 3:  # Skip the first 3 rows, they are headers
                 continue
 
-            reservation: dict[str, dict[str, Any] | list[Any]] = {
+            reservation: Reservation = {
                 'general': {},
                 'fields': {},
                 'dates': []
@@ -1014,24 +1074,25 @@ def import_reservations(
 
             for i, cell in enumerate(row):
                 value = cell.value
-                if value is None:
-                    continue
-
-                row_empty = False
                 if i == 0:
+                    if value is None:
+                        continue
+                    row_empty = False
                     resource_name = str(value)
                 elif i == 3:
                     id = str(value)
                     if last_reservation_id == id:
                         reservation = reservations[resource_name][id]
                 elif i == 6 or i == 8:
-                    reservation['dates'].append(value)  # type:ignore
+                    reservation['dates'].append(value)
                 elif i == 22:
-                    reservation['general']['email'] = value  # type:ignore
+                    if value is None:
+                        value = 'info@seantis.ch'
+                    reservation['general']['email'] = value
                 elif i in shared_fields:
-                    value = str(value)
+                    value = str(value or '-')
                     key = shared_fields[i]
-                    if reservation['fields'].get(key) is None:  # type:ignore
+                    if reservation['fields'].get(key) is None:
                         reservation['fields'][key] = value
                     elif value not in reservation['fields'][key]:
                         if i == 17 or i == 18:
@@ -1041,29 +1102,20 @@ def import_reservations(
 
             if not row_empty:
                 # Check if the dates spread across multiple days
-                start = reservation['dates'][-2]  # type:ignore
-                end = reservation['dates'][-1]  # type:ignore
+                start = reservation['dates'][-2]
+                end = reservation['dates'][-1]
                 if start.day != end.day:
-                    # click.secho(
-                    #     f'Reservation {id} spans multiple days',
-                    #     fg='yellow')
-                    # click.secho(f'Start: {start}', fg='yellow')
-                    # click.secho(f'End: {end}', fg='yellow')
-
                     days = (end - start).days + 1
                     for day in range(days):
-                        reservation['dates'].insert(  # type:ignore
+                        reservation['dates'].insert(
                             -1, start + timedelta(days=day)
                         ) if day != 0 else None
                         end_of_day = datetime.combine(
                             start, end.time()
                         )
-                        reservation['dates'].insert(  # type:ignore
+                        reservation['dates'].insert(
                             -1, end_of_day + timedelta(days=day)
                         ) if day != days - 1 else None
-                    # for date in reservation['dates']:
-                        # click.secho(date, fg='blue')
-
                 count += 1
                 if resource_name not in reservations:
                     reservations[resource_name] = {}
@@ -1101,8 +1153,7 @@ def import_reservations(
                         if i == 14:  # Option answer
                             if key is not None:
                                 reservation = reservations[resource_name][id]
-                                if reservation['fields'  # type:ignore
-                                                ].get(key) is None:
+                                if reservation['fields'].get(key) is None:
                                     reservation['fields'][key] = value
         for option in options_not_found:
             click.secho(f'Option not found in the mapping file: {option}',
@@ -1111,8 +1162,6 @@ def import_reservations(
         if dry_run:
             res_show = json.dumps(reservations, indent=4, default=str)
             click.secho(f'Reservations: {res_show}', fg='green')
-            # click.echo(f'Found {count} rows in the resource file')
-            # click.echo(f'Found {options_count} rows in the options file')
 
         # Create reservations
         if not dry_run:
@@ -1137,14 +1186,9 @@ def import_reservations(
                     found_conflict = False
                     session_id = uuid4()
                     for n in range(int(len(reservation['dates'])/2)):
-                        click.secho(f'Importing reservation {id}')
-
-                        email = reservation['general'].get(  # type:ignore
-                            'email')
-                        start = reservation['dates'][n*2]  # type:ignore
-                        click.secho(f'Start: {start}', fg='green')
-                        end = reservation['dates'][n*2+1]  # type:ignore
-                        click.secho(f'End: {end}', fg='green')
+                        email = reservation['general'].get('email')
+                        start = reservation['dates'][n*2]
+                        end = reservation['dates'][n*2+1]
 
                         try:
                             token_uuid = scheduler.reserve(
@@ -1163,6 +1207,10 @@ def import_reservations(
                                 f'Booking conflict in {resource.title} '
                                 f'at {start}', fg='red')
                         except TimerangeTooLong:
+                            found_conflict = True
+                            click.secho(
+                                f'Timerange too long in {resource.title} '
+                                f'at {start} - {end}', fg='red')
                             rules = resource.content['rules']
                             relevant_rules = []
                             for rule in rules:
@@ -1187,6 +1235,10 @@ def import_reservations(
                                     data={'accepted': True}
                                 )
                                 token = token_uuid.hex
+                            if not relevant_rules:
+                                click.secho(
+                                    f'No rules found for {resource.title} '
+                                    f'at {start}', fg='red')
 
                     if found_conflict:
                         continue
@@ -1195,8 +1247,7 @@ def import_reservations(
                     forms = FormCollection(app.session())
 
                     form_data = {}
-                    for key, value in reservation['fields'
-                                                    ].items():  # type:ignore
+                    for key, value in reservation['fields'].items():
                         form_data[key] = str(value)
 
                     form = resource.form_class(data=form_data)
@@ -1230,5 +1281,8 @@ def import_reservations(
                         )
                         ticket.accept_ticket(user)
                         ticket.close_ticket()
+
+                    click.secho(f'Sucessfully imported reservation {id}',
+                                fg='green')
 
     return import_reservations
