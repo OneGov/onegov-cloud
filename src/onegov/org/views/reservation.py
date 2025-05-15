@@ -805,6 +805,8 @@ def accept_reservation(
         else:
             code = None
 
+        savepoint = transaction.savepoint()
+
         for reservation in reservations:
             data = reservation.data = reservation.data or {}
             data['accepted'] = True
@@ -826,8 +828,7 @@ def accept_reservation(
                     log.info('Kaba API error', exc_info=True)
 
                     # roll back previous changes
-                    transaction.abort()
-                    transaction.begin()
+                    savepoint.rollback()
                     request.alert(_(
                         'Failed to create visits using the dormakaba API '
                         'please make sure your credentials are still valid.'
@@ -1364,17 +1365,25 @@ def adjust_reservation(
     if not form.submitted(request):
         return show_form()
 
+    savepoint = transaction.savepoint()
     try:
         start_time = form.start_time.data
         end_time = form.end_time.data
         assert start_time is not None and end_time is not None
-        # TODO: Should we raise for invalid DST transition times?
-        #       we could also make that a validator on the form instead
-        new_start, new_end = sedate.get_date_range(
-            reservation.display_start(),
-            start_time,
-            end_time
-        )
+        try:
+            new_start, new_end = sedate.get_date_range(
+                reservation.display_start(),
+                start_time,
+                end_time,
+                raise_non_existent=True
+            )
+        except pytz.NonExistentTimeError:
+            request.alert(_(
+                'The selected time does not exist on this date due to '
+                'the switch from standard time to daylight saving time.'
+            ))
+            return show_form()
+
         new_reservation = resource.scheduler.change_reservation(
             token,
             reservation.id,
@@ -1383,8 +1392,7 @@ def adjust_reservation(
         )
     except LibresError as e:
         # rollback previous changes
-        transaction.abort()
-        transaction.begin()
+        savepoint.rollback()
         request.alert(utils.get_libres_error(e, request))
         return show_form()
 
@@ -1417,8 +1425,7 @@ def adjust_reservation(
                 log.info('Kaba API error', exc_info=True)
 
                 # roll back previous changes
-                transaction.abort()
-                transaction.begin()
+                savepoint.rollback()
                 request.alert(_(
                     'Failed to create visits using the dormakaba API '
                     'please make sure your credentials are still valid.'

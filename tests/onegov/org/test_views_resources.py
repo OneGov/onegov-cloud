@@ -1257,8 +1257,14 @@ def test_reserve_allocation_adjustment_pre_acceptance(client):
     assert "12:00" in ticket
     assert "Anpassen" in ticket
 
-    # adjust it
+    # try an invalid adjustment
     adjust = ticket.click('Anpassen', index=0)
+    adjust.form['start_time'] = '09:00'
+    adjust = adjust.form.submit()
+    assert 'Zeitraum liegt ausserhalb' in adjust
+
+    # adjust it (valid this time)
+    adjust.form['start_time'] = '10:00'
     adjust.form['end_time'] = '11:00'
     ticket = adjust.form.submit().follow()
     assert "10:00" in ticket
