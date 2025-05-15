@@ -1365,25 +1365,25 @@ def adjust_reservation(
     if not form.submitted(request):
         return show_form()
 
+    start_time = form.start_time.data
+    end_time = form.end_time.data
+    assert start_time is not None and end_time is not None
+    try:
+        new_start, new_end = sedate.get_date_range(
+            reservation.display_start(),
+            start_time,
+            end_time,
+            raise_non_existent=True
+        )
+    except pytz.NonExistentTimeError:
+        request.alert(_(
+            'The selected time does not exist on this date due to '
+            'the switch from standard time to daylight saving time.'
+        ))
+        return show_form()
+
     savepoint = transaction.savepoint()
     try:
-        start_time = form.start_time.data
-        end_time = form.end_time.data
-        assert start_time is not None and end_time is not None
-        try:
-            new_start, new_end = sedate.get_date_range(
-                reservation.display_start(),
-                start_time,
-                end_time,
-                raise_non_existent=True
-            )
-        except pytz.NonExistentTimeError:
-            request.alert(_(
-                'The selected time does not exist on this date due to '
-                'the switch from standard time to daylight saving time.'
-            ))
-            return show_form()
-
         new_reservation = resource.scheduler.change_reservation(
             token,
             reservation.id,
