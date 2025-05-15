@@ -4283,6 +4283,26 @@ ul.search-results {
         li {
             margin-bottom: .5rem;
         }
+
+        .reservation {
+            background: $white-smoke;
+            border-radius: 2px;
+            margin-bottom: 1rem;
+            margin-left: -0.5rem;
+            position: relative;
+        }
+
+        .reservation-details {
+            font-size: .8rem;
+            padding: .5rem 8rem .5rem .5rem;
+        }
+
+        .reservation-actions {
+            font-size: .8rem;
+            position: absolute;
+            right: .5rem;
+            top: .275rem;
+        }
     }
 
     .occurrence.occurrence {
@@ -4836,6 +4856,29 @@ h2 + div.timeline {
     .file {
         margin-left: 4rem;
     }
+
+    .reservation-adjustment {
+        display: flex;
+        align-items: center;
+        gap: 1rem;
+        margin: 0;
+
+        .fa {
+            font-size: 1.5rem;
+            color: rgba(0, 0, 0, .5);
+        }
+
+        .reservation-details {
+            font-size: .8rem;
+            padding: .5rem;
+            background: rgba(255, 255, 255, .7);
+            border-radius: 2px;
+            box-shadow: 3px 3px 3px rgba(220, 220, 220, .2);
+            flex: 0 0 32.66%;
+            margin: .5rem 0;
+        }
+
+    }
 }
 
 /*
@@ -4847,6 +4890,10 @@ h2 + div.timeline {
 .message-directory,
 .message-submission {
     background: lighten($green-pastel, 2.5%);
+}
+
+.message-reservation_adjusted {
+    background: lighten($yellow-pastel, 2.5%);
 }
 
 .message-ticket_note {

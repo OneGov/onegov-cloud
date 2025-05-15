@@ -130,11 +130,11 @@ class OIDCClient:
             #       to create these dummy endpoints
             endpoints = [AuthorizationEndpoint(
                 'code',
-                None,
+                None,  # type: ignore[arg-type]
                 {'code': AuthorizationCodeGrant(None)}
             ), TokenEndpoint(
                 'authorization_code',
-                None,
+                None,  # type: ignore[arg-type]
                 {'authorization_code': AuthorizationCodeGrant(None)}
             )]
             metadata = MetadataEndpoint(endpoints, claims).claims

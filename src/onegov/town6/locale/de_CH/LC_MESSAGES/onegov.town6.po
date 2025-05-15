@@ -6,7 +6,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: OneGov Cloud 1.0\n"
-"POT-Creation-Date: 2025-04-24 09:21+0200\n"
+"POT-Creation-Date: 2025-05-14 12:57+0200\n"
 "PO-Revision-Date: 2021-03-03 16:24+0100\n"
 "Last-Translator: Lukas Burkhard <lukas.burkhard@seantis.ch>\n"
 "Language-Team: German\n"
@@ -236,6 +236,9 @@ msgstr "Abbrechen"
 #. Used in sentence: "${event} published."
 msgid "Event"
 msgstr "Veranstaltung"
+
+msgid "Copy"
+msgstr "Kopieren"
 
 msgid "Export"
 msgstr "Export"
@@ -473,6 +476,18 @@ msgid "You can copy the following code to embed this page as an iFrame:"
 msgstr ""
 "Sie können den folgenden Code kopieren, um diese Seite als iFrame "
 "einzubetten:"
+
+msgid ""
+"To display the breadcrumbs you can add ${bc_level} as a parameter to the "
+"URL. The number defines where the breadcrumbs start. 1 in this case means "
+"that the first level is hidden. You can use any number as long as it is less "
+"than the number of levels in the breadcrumbs."
+msgstr ""
+"Um die Breadcrumbs anzuzeigen, können Sie ${bc_level} als Parameter zur URL "
+"hinzufügen. Die Zahl definiert, wo die Breadcrumbs beginnen. 1 in diesem "
+"Fall bedeutet, dass die erste Ebene verborgen ist. Sie können jede Zahl "
+"verwenden, solange sie kleiner ist als die Anzahl der Ebenen in den "
+"Breadcrumbs."
 
 msgid ""
 "Please review your data and press \"Complete\" to finalize the process. If "
@@ -1502,6 +1517,9 @@ msgstr "1 Reservation abgelehnt."
 msgid "${count} reservations rejected."
 msgstr "${count} Reservationen abgelehnt."
 
+msgid "1 reservation adjusted:"
+msgstr "1 Reservation angepasst:"
+
 msgid "Registration confirmed."
 msgstr "Anmeldung bestätigt."
 
@@ -2109,14 +2127,26 @@ msgstr "Inaktiv"
 msgid "Role"
 msgstr "Rolle"
 
-msgid "local"
-msgstr "lokal"
-
 msgid "User group"
 msgstr "Benutzergruppe"
 
 msgid "None"
 msgstr "Keine"
+
+msgid "local"
+msgstr "lokal"
+
+msgid "Last login"
+msgstr "Zuletzt eingeloggt"
+
+msgid "Never"
+msgstr "Nie"
+
+msgid "Session information"
+msgstr "Session Information"
+
+msgid "Display information"
+msgstr "Information anzeigen"
 
 msgid "No links found."
 msgstr "Keine Verknüpfungen gefunden."

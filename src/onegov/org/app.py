@@ -591,6 +591,7 @@ def get_public_ticket_messages() -> Collection[str]:
         'event',
         'payment',
         'reservation',
+        'reservation_adjusted',
         'submission',
         'ticket',
         'ticket_chat',
