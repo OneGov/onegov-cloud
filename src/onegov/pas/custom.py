@@ -8,6 +8,7 @@ from onegov.pas.collections import AttendenceCollection
 from onegov.pas.collections import ChangeCollection
 from onegov.user import Auth
 from onegov.pas.models import SettlementRun, RateSet
+from sqlalchemy.orm.exc import MultipleResultsFound
 
 from typing import TYPE_CHECKING
 if TYPE_CHECKING:
@@ -37,30 +38,49 @@ def get_global_tools(request: TownRequest) -> Iterator[Link | LinkGroup]:
 
         # Management Dropdown
         if request.is_admin:
-            yield LinkGroup(
-                _('Management'), classes=('management',),
-                links=(
+            session = request.session
+            management_links = []
+            try:
+                current_run = get_current_settlement_run(session)
+                management_links.append(
                     Link(
-                        _('Attendences'),
-                        request.class_link(AttendenceCollection),
-                        attrs={'class': 'attendences'}
-                    ),
-                    Link(
-                        _('Changes'),
-                        request.class_link(ChangeCollection),
-                        attrs={'class': 'changes'}
-                    ),
-                    Link(
-                        _('PAS settings'),
-                        request.link(request.app.org, 'pas-settings'),
-                        attrs={'class': 'pas-settings'}
-                    ),
-                    Link(
-                        _('More settings'),
-                        request.link(request.app.org, 'settings'),
-                        attrs={'class': 'settings'}
-                    ),
+                        _('Current Settlement Run'),
+                        request.link(current_run),
+                        attrs={'class': 'settlement-run'}
+                    )
                 )
+            except MultipleResultsFound:
+                # If multiple active runs exist (should not happen),
+                # don't show the link.
+                pass
+
+            management_links.extend((
+                Link(
+                    _('Attendences'),
+                    request.class_link(AttendenceCollection),
+                    attrs={'class': 'attendences'}
+                ),
+                Link(
+                    _('Changes'),
+                    request.class_link(ChangeCollection),
+                    attrs={'class': 'changes'}
+                ),
+                Link(
+                    _('PAS settings'),
+                    request.link(request.app.org, 'pas-settings'),
+                    attrs={'class': 'pas-settings'}
+                ),
+                Link(
+                    _('More settings'),
+                    request.link(request.app.org, 'settings'),
+                    attrs={'class': 'settings'}
+                ),
+            ))
+
+            yield LinkGroup(
+                _('Management'),
+                classes=('management',),
+                links=tuple(management_links)
             )
 
 

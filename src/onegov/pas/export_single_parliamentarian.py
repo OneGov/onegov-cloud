@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+from onegov.core.utils import module_path
 from onegov.pas.calculate_pay import calculate_rate
 from dataclasses import dataclass
 from typing import cast
@@ -59,112 +60,17 @@ def generate_parliamentarian_settlement_pdf(
     session = request.session
 
     rate_set = get_current_rate_set(session, settlement_run)
-    cola_multiplier = Decimal(
-        str(1 + (rate_set.cost_of_living_adjustment / 100))
-    )
-
     quarter = settlement_run.get_run_number_for_year(settlement_run.end)
-    css = CSS(
-        string="""
-@page {
-    size: A4;
-    margin: 2.5cm 0.75cm 2cm 0.75cm;  /* top right bottom left */
-    @top-right {
-        content: "Staatskanzlei";
-        font-family: Helvetica, Arial, sans-serif;
-        font-size: 8pt;
-    }
-}
-
-body {
-    font-family: Helvetica, Arial, sans-serif;
-    font-size: 7pt;
-    line-height: 1.0;
-}
-
-.first-line {
-    font-size: 7pt;
-    text-decoration: underline;
-    margin-left: 1.0cm;
-    margin-bottom: 0.2cm;
-}
-
-.address {
-    margin-left: 1.0cm;
-    margin-bottom: 0.5cm;
-    font-size: 8pt;
-    line-height: 1.4;
-}
-
-.date {
-    margin-left: 1.0cm;
-    margin-bottom: 2cm;
-    font-size: 8pt;
-}
-
-table {
-    border-collapse: collapse;
-    width: 100%;
-    table-layout: auto;
-    white-space: nowrap;
-}
-
-.col-types {
-    background-color: #d5d7d9;
-}
-
-.header-row td {
-    background-color: #d5d7d9;
-    font-weight: bold;
-}
-
-*/ Makes the text sit on the line of the cell.
-Workaround for `vertical-align` not working. */
-table td th {
-    padding-top: 7pt;
-    padding-bottom: 1pt;
-}
-
-th, td {
-    padding: 2pt;
-    border: 1pt solid #000;
-}
-
-/* Column widths for main table */
-.first-table td:first-child { width: 20%; }
-.first-table td:nth-child(2) { width: 50%; } /* Type  */
-.first-table td:nth-child(3) { width: 15%; }  /* Value column */
-.first-table td:last-child { width: 15%; }    /* CHF column */
-
-.parliamentarian-summary-table td:first-child { width: 70%; }
-.parliamentarian-summary-table td:nth-child(2) { width: 15%; }
-.parliamentarian-summary-table td:last-child { width: 15%; }
-
-.numeric { text-align: right; }
-
-.first-table tr:nth-child(2) td {
-    background-color: #d5d7d9;
-}
-
-.first-table tr:nth-child(even):not(.total-row) td {
-    background-color: #f3f3f3;
-}
-
-.parliamentarian-summary-table {
-    page-break-inside: avoid;
-    margin-top: 1cm;
-}
-
-.parliamentarian-summary-table td {
-    font-weight: bold;
-    background-color: #d5d7d9;
-}
-    """
+    css_path = module_path(
+        'onegov.pas', 'views/templates/parliamentarian_settlement_pdf.css'
     )
+    with open(css_path) as f:
+        css = CSS(string=f.read())
 
     data = _get_parliamentarian_settlement_data(
         settlement_run, request, parliamentarian, rate_set
     )
+    current_date = date.today().strftime('%d.%m.%Y')
     html = f"""
         <!DOCTYPE html>
         <html>
@@ -181,7 +87,7 @@ th, td {
             </div>
 
             <div class="date">
-                Zug {settlement_run.end.strftime('%d.%m.%Y')}
+                Zug {current_date}
             </div>
 
             <h2 class="title">
@@ -234,6 +140,9 @@ th, td {
     # Now, start building the second part of the report document. Notice that
     # this one now is *with* cost of living adjustment.
     total = Decimal('0')
+    cola_multiplier = Decimal(
+        str(1 + (rate_set.cost_of_living_adjustment / 100))
+    )
     type_mappings = [
         ('Total aller Plenarsitzungen inkl. Teuerungszulage',
          cast('TotalType', 'plenary')),
