@@ -192,13 +192,13 @@ class EventCollection(Pagination[Event]):
         return query.first()
 
     def from_import(
-            self,
-            items: Iterable[EventImportItem | str],
-            purge: str | None = None,
-            publish_immediately: bool = True,
-            valid_state_transfers: Mapping[str, str] | None = None,
-            published_only: bool = False,
-            future_events_only: bool = False
+        self,
+        items: Iterable[EventImportItem | str],
+        purge: str | None = None,
+        publish_immediately: bool = True,
+        valid_state_transfers: Mapping[str, str] | None = None,
+        published_only: bool = False,
+        future_events_only: bool = False
     ) -> tuple[list[Event], list[Event], list[UUID]]:
         """ Add or updates the given events.
 
