@@ -2109,8 +2109,13 @@ def test_wil_daily_event_import(org_app):
     first_date = datetime.now(tz).replace(hour=8, microsecond=0) + timedelta(days=1)
     start_dates = [
         first_date,  # event 1
-        first_date+timedelta(days=2), # event 2
+        first_date+timedelta(days=2),  # event 2
         first_date+timedelta(weeks=1),  # event 3 and 4
+    ]
+    event_status = [
+        'scheduled',  # event 1
+        'scheduled',  # event 2
+        'scheduled',  # event 3, 4
     ]
 
     # missing daily event
@@ -2128,6 +2133,7 @@ def test_wil_daily_event_import(org_app):
           <schedules>
             <schedule>
               <uuid7>S132450</uuid7>
+              <eventStatus>{event_status[0]}</eventStatus>
               <locationUuid7>S132456</locationUuid7>>
               <start>{start_dates[0].strftime('%Y-%m-%dT%H:%M:%S%z')}</start>
               <recurrence>
@@ -2142,6 +2148,7 @@ def test_wil_daily_event_import(org_app):
           <organizerUuid7>O789588</organizerUuid7>
           <category>Literatur</category>
           <title>Reading with Johanna Beehrens</title>
+          <abstract>Best book reader in town</abstract>
           <description>Reading a Book</description>
           <tags>
             <tag>Library</tag>
@@ -2150,6 +2157,7 @@ def test_wil_daily_event_import(org_app):
           <schedules>
             <schedule>
               <uuid7>S132451</uuid7>
+              <eventStatus>{event_status[1]}</eventStatus>
               <locationUuid7>S132456</locationUuid7>>
               <start>{start_dates[1].strftime('%Y-%m-%dT%H:%M:%S%z')}</start>
               <end>{(start_dates[1] + timedelta(hours=2)).strftime('%Y-%m-%dT%H:%M:%S%z')}</end>
@@ -2176,6 +2184,7 @@ def test_wil_daily_event_import(org_app):
           <schedules>
             <schedule>
               <uuid7>S999101</uuid7>
+              <eventStatus>{event_status[2]}</eventStatus>
               <locationUuid7>S132456</locationUuid7>>
               <start>{start_dates[2].strftime('%Y-%m-%dT%H:%M:%S%z')}</start>
               <end>{(start_dates[2] + timedelta(minutes=100)).strftime('%Y-%m-%dT%H:%M:%S%z')}</end>
@@ -2186,6 +2195,7 @@ def test_wil_daily_event_import(org_app):
             <schedule>
               <uuid7>S999102</uuid7>
               <locationUuid7>S132456</locationUuid7>>
+              <eventStatus>{event_status[2]}</eventStatus>
               <start>{(start_dates[2] + timedelta(days=1, hours=8)).strftime('%Y-%m-%dT%H:%M:%S%z')}</start>
               <end>{(start_dates[2] + timedelta(days=1, hours=8, minutes=100)).strftime('%Y-%m-%dT%H:%M:%S%z')}</end>
               <recurrence>
@@ -2275,8 +2285,8 @@ def test_wil_daily_event_import(org_app):
         print(e.recurrence)
         print(e.occurrence_dates())
 
-    assert len(events) == 4 # number of event schedules
-    assert len(added) == 4 # number of event schedules
+    assert len(events) == 4  # number of event schedules
+    assert len(added) == 4  # number of event schedules
     assert len(updated) == 0
     assert len(purged) == 0
 
@@ -2296,7 +2306,7 @@ def test_wil_daily_event_import(org_app):
 
     assert events[1] == added[1]
     assert events[1].title == 'Reading with Johanna Beehrens'
-    assert events[1].description == 'Reading a Book'
+    assert events[1].description == 'Best book reader in town\n\nReading a Book'
     assert events[1].tags == ['Library']
     assert events[1].start == start_dates[1]
     assert events[1].end == start_dates[1] + timedelta(hours=2)
@@ -2347,4 +2357,18 @@ def test_wil_daily_event_import(org_app):
 
     # test updated
 
-    # test purged
+    ## test purged
+    xml_2 = xml.replace(  # replace first event status with 'deleted'
+        '<eventStatus>scheduled</eventStatus>',
+        '<eventStatus>deleted</eventStatus>',
+        1
+    )
+    occurrences = EventCollection(session)
+    assert occurrences.query().count() == 4
+
+    added, updated, purged = occurrences.from_minasa(xml_2.encode('utf-8'))
+
+    assert len(added) == 0  # number of event schedules
+    assert len(updated) == 0
+    assert len(purged) == 1
+    assert occurrences.query().count() == 3
