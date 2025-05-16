@@ -6,14 +6,14 @@ from unittest.mock import patch, Mock
 import pytest
 import requests
 import transaction
-from datetime import datetime, timedelta
+from datetime import datetime, timedelta, timezone
 from freezegun import freeze_time
 from onegov.core.utils import Bunch, normalize_for_url
 from onegov.directory import (DirectoryEntryCollection,
                               DirectoryConfiguration,
                               DirectoryCollection)
 from onegov.directory.collections.directory import EntryRecipientCollection
-from onegov.event import EventCollection, OccurrenceCollection
+from onegov.event import EventCollection, OccurrenceCollection, Event
 from onegov.event.utils import as_rdates
 from onegov.form import FormSubmissionCollection
 from onegov.org.models import (
@@ -2098,3 +2098,253 @@ def test_normalize_adjacency_list_order_with_null_becomes_default(org_app):
     # Verify the root page order was not affected
     root = pages.by_id(news_root_id)
     assert root.order == default_root_order
+
+def test_wil_daily_event_import(org_app):
+    client = Client(org_app)
+    session = org_app.session()
+    job = get_cronjob_by_name(org_app, 'wil_daily_event_import')
+    job.app = org_app
+
+    tz = timezone(timedelta(hours=2))
+    first_date = datetime.now(tz).replace(hour=8, microsecond=0) + timedelta(days=1)
+    start_dates = [
+        first_date,  # event 1
+        first_date+timedelta(days=2), # event 2
+        first_date+timedelta(weeks=1),  # event 3 and 4
+    ]
+
+    # missing daily event
+    xml = f"""<?xml version="1.0" encoding="UTF-8"?>
+    <minasa xsi:schemaLocation="https://azizi.2mp.ch/schemas/minasa_xml_v1.xsd" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns="https://minasa.ch/schema/v1">
+      <events>
+        <event>
+          <uuid7>E132456</uuid7>
+          <locationUuid7>L132456</locationUuid7>
+          <organizerUuid7>O789565</organizerUuid7>
+          <category>Sport</category>
+          <title>Pole Vault Lesson</title>
+          <description>Pole Vault description</description>
+          <originalEventUrl>polevaultassociation.sport/first-lession</originalEventUrl>
+          <schedules>
+            <schedule>
+              <uuid7>S132450</uuid7>
+              <locationUuid7>S132456</locationUuid7>>
+              <start>{start_dates[0].strftime('%Y-%m-%dT%H:%M:%S%z')}</start>
+              <recurrence>
+                <frequency>single</frequency>
+              </recurrence>
+            </schedule>
+          </schedules>
+        </event>
+        <event>
+          <uuid7>E132499</uuid7>
+          <locationUuid7>L132488</locationUuid7>
+          <organizerUuid7>O789588</organizerUuid7>
+          <category>Literatur</category>
+          <title>Reading with Johanna Beehrens</title>
+          <description>Reading a Book</description>
+          <tags>
+            <tag>Library</tag>
+          </tags>
+          <originalEventUrl></originalEventUrl>
+          <schedules>
+            <schedule>
+              <uuid7>S132451</uuid7>
+              <locationUuid7>S132456</locationUuid7>>
+              <start>{start_dates[1].strftime('%Y-%m-%dT%H:%M:%S%z')}</start>
+              <end>{(start_dates[1] + timedelta(hours=2)).strftime('%Y-%m-%dT%H:%M:%S%z')}</end>
+              <recurrence>
+                <frequency>weekly</frequency>
+                  <interval>2</interval>
+                  <until>{start_dates[1] + timedelta(weeks=4)}</until>
+              </recurrence>
+            </schedule>
+          </schedules>
+        </event>
+        <event>
+          <uuid7>E132500</uuid7>
+          <locationUuid7>L132456</locationUuid7>
+          <organizerUuid7>O789565</organizerUuid7>
+          <category>Sport</category>
+          <title>100 Meter Race of the Year</title>
+          <description>Event of the year!</description>
+          <tags>
+            <tag>Sport</tag>
+            <tag>Race</tag>
+          </tags>
+          <originalEventUrl>www.100race.org</originalEventUrl>
+          <schedules>
+            <schedule>
+              <uuid7>S999101</uuid7>
+              <locationUuid7>S132456</locationUuid7>>
+              <start>{start_dates[2].strftime('%Y-%m-%dT%H:%M:%S%z')}</start>
+              <end>{(start_dates[2] + timedelta(minutes=100)).strftime('%Y-%m-%dT%H:%M:%S%z')}</end>
+              <recurrence>
+                <frequency>single</frequency>
+              </recurrence>
+            </schedule>
+            <schedule>
+              <uuid7>S999102</uuid7>
+              <locationUuid7>S132456</locationUuid7>>
+              <start>{(start_dates[2] + timedelta(days=1, hours=8)).strftime('%Y-%m-%dT%H:%M:%S%z')}</start>
+              <end>{(start_dates[2] + timedelta(days=1, hours=8, minutes=100)).strftime('%Y-%m-%dT%H:%M:%S%z')}</end>
+              <recurrence>
+                <frequency>single</frequency>
+              </recurrence>
+            </schedule>
+          </schedules>
+        </event>
+      </events>
+      <locations>
+        <location>
+          <uuid7>L132456</uuid7>
+          <address>
+            <title>Pole Vault Stadium</title>
+            <street>Stadium Road</street>
+            <number>1</number>
+            <zip>6000</zip>
+            <city>Pole Town</city>
+            <latitude>47.5</latitude>
+            <longitude>9.01</longitude>
+          </address>
+        </location>
+        <location>
+          <uuid7>L132488</uuid7>
+          <address>
+            <title>Library</title>
+            <street>Book Ct</street>
+            <number>7</number>
+            <zip>6001</zip>
+            <city>Lemington</city>
+            <latitude>47.6</latitude>
+            <longitude>8.4</longitude>
+          </address>
+        </location>
+      </locations>
+      <organizers>
+        <organizer>
+          <uuid7>O789565</uuid7>
+          <address>
+            <title>Pole Vault Association</title>
+            <street>Main Street</street>
+            <number>1</number>
+            <zip>8000</zip>
+            <city>Pole Town</city>
+            <phone>041 123 4567</phone>
+            <email>info@polevault.sport</email>
+            <url>polevaultassociation.sport</url>
+          </address>
+        </organizer>
+        <organizer>
+          <uuid7>O789588</uuid7>
+          <address>
+            <title>Culture Club</title>
+            <street>Culture Plaza</street>
+            <number>3</number>
+            <zip>6010</zip>
+            <city>Coin Town</city>
+            <phone>044 321 7744</phone>
+            <email>info@cultureclub.io</email>
+            <url>cultureclub.io</url>
+          </address>
+        </organizer>
+      </organizers>
+    </minasa>
+    """
+
+    # import xmlschema
+    # schema = xmlschema.XMLSchema('/home/reto/workspace/onegov-cloud/minasa_xml_v1.xsd')
+    # if not schema.is_valid(xml):
+    #     print(schema.validate(xml))
+
+    # client.get(get_cronjob_url(job))
+
+    # remove all existing/initial events from collection
+    occurrences = EventCollection(session)
+    for e in occurrences.query():
+        occurrences.delete(e)
+
+    added, updated, purged = occurrences.from_minasa(xml.encode('utf-8'))
+
+    events = occurrences.query().order_by(Event.start).all()
+    for e in events:
+        print('- Event -')
+        print(e.title)
+        print(e.start)
+        print(e.end)
+        print(e.recurrence)
+        print(e.occurrence_dates())
+
+    assert len(events) == 4 # number of event schedules
+    assert len(added) == 4 # number of event schedules
+    assert len(updated) == 0
+    assert len(purged) == 0
+
+    assert events[0] == added[0]
+    assert events[0].title == 'Pole Vault Lesson'
+    assert events[0].description == 'Pole Vault description'
+    assert events[0].tags == []
+    assert events[0].start == start_dates[0]
+    assert events[0].end == start_dates[0] + timedelta(hours=1)
+    assert events[0].recurrence == None
+    assert events[0].occurrence_dates() == [start_dates[0]]
+    assert events[0].location == 'Pole Vault Stadium, Stadium Road, 6000, Pole Town'
+    assert events[0].organizer == 'Pole Vault Association'
+    assert events[0].organizer_email == 'info@polevault.sport'
+    assert events[0].organizer_phone == '041 123 4567'
+    assert events[0].external_event_url == 'polevaultassociation.sport/first-lession'
+
+    assert events[1] == added[1]
+    assert events[1].title == 'Reading with Johanna Beehrens'
+    assert events[1].description == 'Reading a Book'
+    assert events[1].tags == ['Library']
+    assert events[1].start == start_dates[1]
+    assert events[1].end == start_dates[1] + timedelta(hours=2)
+    assert events[1].recurrence == '\n'.join([
+        f'RDATE:{(start_dates[1] + timedelta(weeks=2)).strftime("%Y%m%dT%H%M%SZ")}',
+        f'RDATE:{(start_dates[1] + timedelta(weeks=4)).strftime("%Y%m%dT%H%M%SZ")}'
+    ])
+    assert events[1].occurrence_dates() == [
+        start_dates[1],
+        start_dates[1] + timedelta(weeks=2),
+        start_dates[1] + timedelta(weeks=4)
+    ]
+    assert events[1].location == 'Library, Book Ct, 6001, Lemington'
+    assert events[1].organizer == 'Culture Club'
+    assert events[1].organizer_email == 'info@cultureclub.io'
+    assert events[1].organizer_phone == '044 321 7744'
+    assert events[1].external_event_url == None
+
+    # events 3 and 4 are actually the same event but different schedules
+    for i, start in zip([2, 3], [start_dates[2], start_dates[2] + timedelta(days=1, hours=8)]):
+        assert events[i] == added[i]
+        assert events[i].title == '100 Meter Race of the Year'
+        assert events[i].start == start
+        assert events[i].end == start + timedelta(minutes=100)
+        assert events[i].recurrence == None
+        assert events[i].occurrence_dates() == [start]
+        assert events[i].location == 'Pole Vault Stadium, Stadium Road, 6000, Pole Town'
+        assert events[i].organizer == 'Pole Vault Association'
+        assert events[i].organizer_email == 'info@polevault.sport'
+        assert events[i].organizer_phone == '041 123 4567'
+        assert events[i].external_event_url == 'www.100race.org'
+
+    occurrences = OccurrenceCollection(session)
+    assert occurrences.query().count() == 6
+
+    expected_titles = [  # sorted by start date
+        'Pole Vault Lesson',
+        'Reading with Johanna Beehrens',
+        '100 Meter Race of the Year',
+        '100 Meter Race of the Year',
+        'Reading with Johanna Beehrens',
+        'Reading with Johanna Beehrens',
+    ]
+    for occurrence, expected_title in zip(occurrences.query(), expected_titles):
+        print(f"-- occurrence --\n{occurrence.event.title}\n{occurrence.start}\n{occurrence.end}")
+        assert occurrence.title == expected_title
+        # verify start and end date, time
+
+    # test updated
+
+    # test purged

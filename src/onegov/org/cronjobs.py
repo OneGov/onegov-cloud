@@ -1238,13 +1238,12 @@ def wil_daily_event_import(request: OrgRequest) -> None:
     Daily import from Minasa (azizi data hub) for Wil
     Minasa doc: https://minasa-demo.ch/wiki/datenhub:schema
     Import doc: https://minasa-demo.ch/wiki/datenhub:import
-    
+
     """
     if request.app.org.name != 'Stadt Wil':
         return
 
-    xml_url = 'https://azizi.2mp.ch/export/events/v/1'
-    # xml_url = 'https://azizi.nilkream.ch/export/events/v/1'  # test system
+    minaza_url = 'https://azizi.2mp.ch/export/events/v/1'
     params = {
         'zip': '9500'
     }
@@ -1254,24 +1253,26 @@ def wil_daily_event_import(request: OrgRequest) -> None:
     }
 
     # try:
-    #     response = requests.get(xml_url, params=params, headers=headers, timeout=30)
+    #     response = requests.get(minaza_url, params=params, headers=headers, timeout=30)
     # except Exception:
-    #     log.exception(f'Failed to retrieve events for Wil from {xml_url}')
+    #     log.exception(f'Failed to retrieve events for Wil from {minaza_url}')
     #     return
     #
     # if response.status_code != 200:
-    #     log.exception(f'Failed to retrieve events for Wil from {xml_url}. '
-    #                   f'Status code: {response.status_code}')
+    #     log.exception(f'Failed to retrieve events for Wil from {minaza_url}, '
+    #                   f'status code: {response.status_code}')
     #     return
-
-    collection = EventCollection(request.session)
+    #
+    # collection = EventCollection(request.session)
     # added, updated, purged = collection.from_minasa(response.content)
     # log.info(f'Wil: Events successfully imported '
     #          f'{len(added)} added, {len(updated)} updated, '
     #          f'{len(purged)} deleted')
 
     # for testing read from file
-    with open('/home/reto/workspace/onegov-cloud/wil.xml', 'r') as f:
+    collection = EventCollection(request.session)
+    with open('/home/reto/workspace/onegov-cloud/wil.xml') as f:
+    # with open('/home/reto/workspace/onegov-cloud/test.xml') as f:
         content = f.read()
         # convert content to byte stream
         content = content.encode('utf-8')
