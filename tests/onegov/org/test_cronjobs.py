@@ -2106,7 +2106,8 @@ def test_wil_daily_event_import(org_app):
     job.app = org_app
 
     tz = timezone(timedelta(hours=2))
-    first_date = datetime.now(tz).replace(hour=8, microsecond=0) + timedelta(days=1)
+    first_date = datetime.now(tz).replace(
+        hour=8, microsecond=0) + timedelta(days=1)
     start_dates = [
         first_date,  # event 1
         first_date+timedelta(days=2),  # event 2
@@ -2120,7 +2121,8 @@ def test_wil_daily_event_import(org_app):
 
     # missing daily event
     xml = f"""<?xml version="1.0" encoding="UTF-8"?>
-    <minasa xsi:schemaLocation="https://azizi.2mp.ch/schemas/minasa_xml_v1.xsd" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns="https://minasa.ch/schema/v1">
+    <minasa xsi:schemaLocation="https://azizi.2mp.ch/schemas/minasa_xml_v1.xsd"
+     xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns="https://minasa.ch/schema/v1">
       <events>
         <event>
           <uuid7>E132456</uuid7>
@@ -2160,7 +2162,8 @@ def test_wil_daily_event_import(org_app):
               <eventStatus>{event_status[1]}</eventStatus>
               <locationUuid7>S132456</locationUuid7>>
               <start>{start_dates[1].strftime('%Y-%m-%dT%H:%M:%S%z')}</start>
-              <end>{(start_dates[1] + timedelta(hours=2)).strftime('%Y-%m-%dT%H:%M:%S%z')}</end>
+              <end>{(start_dates[1] + timedelta(
+        hours=2)).strftime('%Y-%m-%dT%H:%M:%S%z')}</end>
               <recurrence>
                 <frequency>weekly</frequency>
                   <interval>2</interval>
@@ -2187,7 +2190,8 @@ def test_wil_daily_event_import(org_app):
               <eventStatus>{event_status[2]}</eventStatus>
               <locationUuid7>S132456</locationUuid7>>
               <start>{start_dates[2].strftime('%Y-%m-%dT%H:%M:%S%z')}</start>
-              <end>{(start_dates[2] + timedelta(minutes=100)).strftime('%Y-%m-%dT%H:%M:%S%z')}</end>
+              <end>{(start_dates[2] + timedelta(
+        minutes=100)).strftime('%Y-%m-%dT%H:%M:%S%z')}</end>
               <recurrence>
                 <frequency>single</frequency>
               </recurrence>
@@ -2196,8 +2200,10 @@ def test_wil_daily_event_import(org_app):
               <uuid7>S999102</uuid7>
               <locationUuid7>S132456</locationUuid7>>
               <eventStatus>{event_status[2]}</eventStatus>
-              <start>{(start_dates[2] + timedelta(days=1, hours=8)).strftime('%Y-%m-%dT%H:%M:%S%z')}</start>
-              <end>{(start_dates[2] + timedelta(days=1, hours=8, minutes=100)).strftime('%Y-%m-%dT%H:%M:%S%z')}</end>
+              <start>{(start_dates[2] + timedelta(
+        days=1, hours=8)).strftime('%Y-%m-%dT%H:%M:%S%z')}</start>
+              <end>{(start_dates[2] + timedelta(
+        days=1, hours=8, minutes=100)).strftime('%Y-%m-%dT%H:%M:%S%z')}</end>
               <recurrence>
                 <frequency>single</frequency>
               </recurrence>
@@ -2262,13 +2268,6 @@ def test_wil_daily_event_import(org_app):
     </minasa>
     """
 
-    # import xmlschema
-    # schema = xmlschema.XMLSchema('/home/reto/workspace/onegov-cloud/minasa_xml_v1.xsd')
-    # if not schema.is_valid(xml):
-    #     print(schema.validate(xml))
-
-    # client.get(get_cronjob_url(job))
-
     # remove all existing/initial events from collection
     occurrences = EventCollection(session)
     for e in occurrences.query():
@@ -2298,21 +2297,26 @@ def test_wil_daily_event_import(org_app):
     assert events[0].end == start_dates[0] + timedelta(hours=1)
     assert events[0].recurrence == None
     assert events[0].occurrence_dates() == [start_dates[0]]
-    assert events[0].location == 'Pole Vault Stadium, Stadium Road, 6000, Pole Town'
+    assert (events[0].location ==
+            'Pole Vault Stadium, Stadium Road, 6000, Pole Town')
     assert events[0].organizer == 'Pole Vault Association'
     assert events[0].organizer_email == 'info@polevault.sport'
     assert events[0].organizer_phone == '041 123 4567'
-    assert events[0].external_event_url == 'polevaultassociation.sport/first-lession'
+    assert (events[0].external_event_url ==
+            'polevaultassociation.sport/first-lession')
 
     assert events[1] == added[1]
     assert events[1].title == 'Reading with Johanna Beehrens'
-    assert events[1].description == 'Best book reader in town\n\nReading a Book'
+    assert (events[1].description ==
+            'Best book reader in town\n\nReading a Book')
     assert events[1].tags == ['Library']
     assert events[1].start == start_dates[1]
     assert events[1].end == start_dates[1] + timedelta(hours=2)
     assert events[1].recurrence == '\n'.join([
-        f'RDATE:{(start_dates[1] + timedelta(weeks=2)).strftime("%Y%m%dT%H%M%SZ")}',
-        f'RDATE:{(start_dates[1] + timedelta(weeks=4)).strftime("%Y%m%dT%H%M%SZ")}'
+        f'RDATE:'
+        f'{(start_dates[1] + timedelta(weeks=2)).strftime("%Y%m%dT%H%M%SZ")}',
+        f'RDATE:'
+        f'{(start_dates[1] + timedelta(weeks=4)).strftime("%Y%m%dT%H%M%SZ")}'
     ])
     assert events[1].occurrence_dates() == [
         start_dates[1],
@@ -2326,14 +2330,18 @@ def test_wil_daily_event_import(org_app):
     assert events[1].external_event_url == None
 
     # events 3 and 4 are actually the same event but different schedules
-    for i, start in zip([2, 3], [start_dates[2], start_dates[2] + timedelta(days=1, hours=8)]):
+    for i, start in zip(
+        [2, 3],
+        [start_dates[2], start_dates[2] + timedelta(days=1, hours=8)]
+    ):
         assert events[i] == added[i]
         assert events[i].title == '100 Meter Race of the Year'
         assert events[i].start == start
         assert events[i].end == start + timedelta(minutes=100)
         assert events[i].recurrence == None
         assert events[i].occurrence_dates() == [start]
-        assert events[i].location == 'Pole Vault Stadium, Stadium Road, 6000, Pole Town'
+        assert (events[i].location ==
+                'Pole Vault Stadium, Stadium Road, 6000, Pole Town')
         assert events[i].organizer == 'Pole Vault Association'
         assert events[i].organizer_email == 'info@polevault.sport'
         assert events[i].organizer_phone == '041 123 4567'
@@ -2350,10 +2358,9 @@ def test_wil_daily_event_import(org_app):
         'Reading with Johanna Beehrens',
         'Reading with Johanna Beehrens',
     ]
-    for occurrence, expected_title in zip(occurrences.query(), expected_titles):
-        print(f"-- occurrence --\n{occurrence.event.title}\n{occurrence.start}\n{occurrence.end}")
+    for occurrence, expected_title in zip(
+            occurrences.query(), expected_titles):
         assert occurrence.title == expected_title
-        # verify start and end date, time
 
     # test updated
 

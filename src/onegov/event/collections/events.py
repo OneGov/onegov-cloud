@@ -6,6 +6,7 @@ from datetime import date
 from datetime import datetime
 from datetime import timedelta
 
+import logging
 import requests
 from dateutil.parser import parse
 from html import unescape
@@ -46,6 +47,9 @@ if TYPE_CHECKING:
     from sqlalchemy.orm import Session
     from typing import Self
     from uuid import UUID
+
+
+log = logging.getLogger('onegov.org.events')
 
 
 class EventImportItem(NamedTuple):
@@ -194,7 +198,7 @@ class EventCollection(Pagination[Event]):
     def from_import(
         self,
         items: Iterable[EventImportItem | str],
-        to_purge: list[str] = [],
+        to_purge: list[str] = None,
         publish_immediately: bool = True,
         valid_state_transfers: Mapping[str, str] | None = None,
         published_only: bool = False,
@@ -243,9 +247,10 @@ class EventCollection(Pagination[Event]):
         """
 
         purged = set()
-        for purge_id in to_purge:
+        for purge_id in to_purge or []:
             query = self.session.query(Event.meta['source'].label('source'))
-            query = query.filter(Event.meta['source'].astext.startswith(purge_id))
+            query = query.filter(
+                Event.meta['source'].astext.startswith(purge_id))
             purged.update([r.source for r in query])
 
         added = []
@@ -277,25 +282,25 @@ class EventCollection(Pagination[Event]):
                     changed = existing.source_updated != event.source_updated
                 else:
                     # No information on provided, figure it out ourselves!
-                    image_changed = (
-                            (existing.image and not item.image)
-                            or (not existing.image and item.image)
+                    image_changed = (existing.image and not item.image) or (
+                        not existing.image and item.image
                     )
                     if existing.image and item.image:
                         image_changed = (
-                                existing.image.checksum
-                                != hashlib.new(
-                            'md5',
-                            item.image.read(),
-                            usedforsecurity=False
-                        ).hexdigest()
+                            existing.image.checksum
+                            != hashlib.new(
+                                'md5', item.image.read(), usedforsecurity=False
+                            ).hexdigest()
                         )
                         item.image.seek(0)
-                    changed = True if (
+                    changed = (
+                        True
+                        if (
                             existing.title != event.title
                             or existing.location != event.location
                             or set(existing.tags) != set(event.tags)
-                            or existing.filter_keywords != event.filter_keywords
+                            or (existing.filter_keywords !=
+                                event.filter_keywords)
                             or existing.timezone != event.timezone
                             or existing.start != event.start
                             or existing.end != event.end
@@ -303,7 +308,9 @@ class EventCollection(Pagination[Event]):
                             or existing.coordinates != event.coordinates
                             or existing.recurrence != event.recurrence
                             or image_changed
-                    ) else False
+                        )
+                        else False
+                    )
 
                 if changed:
                     state = existing.state  # avoid updating occurrences
@@ -495,7 +502,6 @@ class EventCollection(Pagination[Event]):
         organizers = {}
         items = []
         items_to_purge = []
-        event_count = 0
         h2t_config = {'ignore_emphasis': True}
 
         root = etree.fromstring(xml_stream)
@@ -534,8 +540,9 @@ class EventCollection(Pagination[Event]):
                 response.raise_for_status()
                 image_steam = BytesIO(response.content)
                 return image_steam, url.split('/')[-1]
-            except requests.RequestException as e:
-                print(f'Failed to retrieve event image from {url}: {e}')
+            except requests.RequestException:
+                log.exception(
+                    f'Failed to retrieve event image from {url}')
                 return None, None
 
         for location in root.xpath('//ns:location', namespaces=ns):
@@ -574,7 +581,8 @@ class EventCollection(Pagination[Event]):
             title = find_element_text(event, 'title')
             abstract = find_element_text(event, 'abstract')
             description = find_element_text(event, 'description')
-            description = html_to_text(description, **h2t_config) if description else ''
+            description = (
+                html_to_text(description, **h2t_config)) if description else ''
             if abstract:
                 description = f'{abstract}\n\n{description}'
 
@@ -587,14 +595,17 @@ class EventCollection(Pagination[Event]):
                 if location_data[i]
             )
             coordinates = Coordinates(
-                location_data.get('longitude', None), location_data.get('latitude'), None)
+                location_data.get('longitude', None),
+                location_data.get('latitude', None)
+            )
 
-            event_image, event_image_name = get_event_image(event)  # time consuming
+            event_image, event_image_name = get_event_image(event)
 
             ticket_price = find_element_text(event, 'ticketPrice')
             event_url = find_element_text(event, 'originalEventUrl') or None
 
-            tags = [tag.text for tag in event.find('ns:tags', namespaces=ns) or []]
+            tags = [tag.text for tag in
+                    event.find('ns:tags', namespaces=ns) or []]
 
             timezone = 'Europe/Zurich'
             for schedule in event.find('ns:schedules', namespaces=ns):
@@ -625,16 +636,19 @@ class EventCollection(Pagination[Event]):
                     if until.tzinfo is None:
                         until = until.replace(tzinfo=start.tzinfo)
 
-                    delta = timedelta(days=interval) if frequency == 'daily' else timedelta(weeks=interval)
+                    delta = timedelta(days=interval) \
+                        if frequency == 'daily' else timedelta(weeks=interval)
                     current_start = start + delta
                     while current_start <= until:
                         recurrence_start_dates.append(current_start)
                         current_start += delta
 
                 else:
-                    print('Error unhandled recurrence type:', frequency.text)
+                    log.error(
+                        'Error unhandled recurrence type:', frequency.text)
 
-                recurrence = rdate_from_single_dates(recurrence_start_dates)  # remove dates in the past?
+                recurrence = (
+                    rdate_from_single_dates(recurrence_start_dates))
 
                 # Importing each single schedule, recurrence within a schedule
                 # will link the different occurrences using the schedule id.
@@ -649,9 +663,12 @@ class EventCollection(Pagination[Event]):
                             timezone=timezone,
                             recurrence=recurrence,
                             description=description,
-                            organizer=organizers.get(organizer_id, {}).get('title', ''),
-                            organizer_email=organizers.get(organizer_id, {}).get('email', ''),
-                            organizer_phone=organizers.get(organizer_id, {}).get('phone', ''),
+                            organizer=organizers.get(
+                                organizer_id, {}).get('title', ''),
+                            organizer_email=organizers.get(
+                                organizer_id, {}).get('email', ''),
+                            organizer_phone=organizers.get(
+                                organizer_id, {}).get('phone', ''),
                             location=location,
                             coordinates=coordinates,
                             price=ticket_price,
