@@ -2357,11 +2357,11 @@ def test_wil_daily_event_import(org_app):
 
     # test updated
 
-    ## test purged
+    # test purged
     xml_2 = xml.replace(  # replace first event status with 'deleted'
         '<eventStatus>scheduled</eventStatus>',
         '<eventStatus>deleted</eventStatus>',
-        1
+        2
     )
     occurrences = EventCollection(session)
     assert occurrences.query().count() == 4
@@ -2370,5 +2370,5 @@ def test_wil_daily_event_import(org_app):
 
     assert len(added) == 0  # number of event schedules
     assert len(updated) == 0
-    assert len(purged) == 1
-    assert occurrences.query().count() == 3
+    assert len(purged) == 2
+    assert occurrences.query().count() == 2

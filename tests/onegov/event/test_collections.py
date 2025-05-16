@@ -1063,12 +1063,12 @@ def test_from_import(session):
             pdf=None,
             pdf_filename=None,
         )
-    ], 'import-1')
+    ], ['import-1'])
     assert (len(a), len(u), len(p)) == (0, 1, 1)
     assert events.subset_count == 2
 
     # Don't purge
-    assert events.from_import(['import-1-A'], 'import-1') == ([], [], [])
+    assert events.from_import(['import-1-A'], ['import-1']) == ([], [], [])
     assert events.subset_count == 2
 
     # Withdraw
