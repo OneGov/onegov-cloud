@@ -488,27 +488,33 @@ class EventCollection(Pagination[Event]):
         return self.from_import(items, publish_immediately=True,
                                 future_events_only=future_events_only)
 
-    def rrule_from_single_dates(self, single_dates: list[datetime]) -> str | None:
-        if not single_dates:
-            return None
-
-        dates = [date.strftime('%Y%m%dT%H%M%SZ') for date in single_dates]
-        return f'RDATE:{",".join(dates)}'
-
     def from_minasa(
         self,
         xml_stream,
     ):
-
         locations = {}
         organizers = {}
         items = []
-        future_events_only = True
         event_count = 0
         h2t_config = {'ignore_emphasis': True}
 
         root = etree.fromstring(xml_stream)
         ns = {'ns': 'https://minasa.ch/schema/v1'}
+
+        def rdate_from_single_dates(dates: list[datetime]) -> str | None:
+            """
+            Transforms a list of start dates into a RDATE string.
+            Returns a string with the RDATE's for the given dates.
+
+            Example for two recurrence dates:
+                'RDATE:20250501T120000Z
+                 RDATE:20250508T120000Z'
+            """
+            if not dates:
+                return None
+
+            dates = [start.strftime('%Y%m%dT%H%M%SZ') for start in dates]
+            return '\n'.join(f'RDATE:{start}' for start in dates)
 
         def find_element_text(parent: etree._Element, key: str) -> str | None:
             element = parent.find(f'ns:{key}', namespaces=ns)
@@ -565,7 +571,6 @@ class EventCollection(Pagination[Event]):
             }
 
         for event in root.xpath('//ns:event', namespaces=ns):
-            uuid7 = event.find('ns:uuid7', namespaces=ns).text
             title = find_element_text(event, 'title')
             abstract = find_element_text(event, 'abstract')
             description = find_element_text(event, 'description')
@@ -584,83 +589,99 @@ class EventCollection(Pagination[Event]):
             coordinates = Coordinates(
                 location_data.get('longitude', None), location_data.get('latitude'), None)
 
+            event_image, event_image_name = get_event_image(event)
+            # event_image, event_image_name = None, None
 
             ticket_price = find_element_text(event, 'ticketPrice')
-            event_url = find_element_text(event, 'originalEventUrl')
-            single_dates = []
-            timezone = 'Europe/Zurich'
+            event_url = find_element_text(event, 'originalEventUrl') or None
 
-            for schedule in event.find('ns:schedules', namespaces=ns) or []:
+            tags = [tag.text for tag in event.find('ns:tags', namespaces=ns) or []]
+
+            timezone = 'Europe/Zurich'
+            for schedule in event.find('ns:schedules', namespaces=ns):
+                schedule_id = schedule.find('ns:uuid7', namespaces=ns).text
                 start = find_element_text(schedule, 'start')
-                # start = schedule.find('ns:start', namespaces=ns).text or None
                 start = parse(start) if start else None
                 end = find_element_text(schedule, 'end')
-                # end = schedule.find('ns:end', namespaces=ns)
-                end = parse(end) if end else start
+                end = parse(end) if end else start + timedelta(hours=1)
 
-                for frequency in schedule.find('ns:recurrence', namespaces=ns):
-                    if frequency.text == 'single':
-                        single_dates.append(start)
+                recurrence_start_dates: list[datetime] = []
+                recurrence = schedule.find('ns:recurrence', namespaces=ns)
+                frequency = find_element_text(recurrence, 'frequency')
 
-                    if frequency.text != 'single':
-                        print('tschupre error unhandled recurrence:', frequency.text)
-                        continue
+                if frequency == 'single':
+                    pass
 
-            recurrence = self.rrule_from_single_dates(single_dates)
+                elif frequency in ['daily', 'weekly']:
+                    interval = find_element_text(recurrence, 'interval')
+                    until = find_element_text(recurrence, 'until')
+
+                    interval = int(interval)
+                    until = parse(until)
+                    if until.tzinfo is None:
+                        until = until.replace(tzinfo=start.tzinfo)
+
+                    delta = timedelta(days=interval) if frequency == 'daily' else timedelta(weeks=interval)
+                    current_start = start + delta
+                    while current_start <= until:
+                        recurrence_start_dates.append(current_start)
+                        current_start += delta
+
+                else:
+                    print('Error unhandled recurrence type:', frequency.text)
+
+                recurrence = rdate_from_single_dates(recurrence_start_dates)  # remove dates in the past?
+
+                items.append(
+                    EventImportItem(
+                        event=Event(  # type:ignore[misc]
+                            state='published',
+                            title=title,
+                            start=start,
+                            end=end,
+                            timezone=timezone,
+                            recurrence=recurrence,
+                            description=description,
+                            organizer=organizers.get(organizer_id, {}).get('title', ''),
+                            organizer_email=organizers.get(organizer_id, {}).get('email', ''),
+                            organizer_phone=organizers.get(organizer_id, {}).get('phone', ''),
+                            location=location,
+                            coordinates=coordinates,
+                            price=ticket_price,
+                            external_event_url=event_url,
+                            tags=tags,
+                            # filter_keywords=default_filter_keywords,
+                            source=schedule_id, #event_id,
+                        ),
+                        image=event_image,
+                        image_filename=event_image_name,
+                        pdf=None,
+                        pdf_filename=None,
+                    )
+                )
 
             data = {
-                'uuid7': uuid7,
                 'title': title,
+                'tags': tags,
+                'start': start,
+                'end': end,
                 'recurrence': recurrence,
+                'schedule id': schedule_id,
             }
             print()
             print(f'Event #{event_count + 1}')
             for key in data.keys():
                 print('{}: {}'.format(key, data[key]))
 
-            items.append(
-                EventImportItem(
-                    event=Event(  # type:ignore[misc]
-                        state='published',
-                        title=title,
-                        start=start,
-                        end=end,
-                        timezone=timezone,
-                        recurrence=recurrence,
-                        description=description,
-                        organizer=organizers.get(organizer_id, {}).get('title', ''),
-                        organizer_email=organizers.get(organizer_id, {}).get('email', ''),
-                        organizer_phone=organizers.get(organizer_id, {}).get('phone', ''),
-                        location=location,
-                        coordinates=coordinates,
-                        price=ticket_price,
-                        external_event_url=event_url,
-                        # tags=tags or [],
-                        # filter_keywords=default_filter_keywords,
-                        source=f'{uuid7}',
-                    ),
-                    image=event_image,
-                    image_filename=event_image_name,
-                    pdf=None,
-                    pdf_filename=None,
-                )
-            )
-
-            # for l in locations:
-            #     print(f'location {l}')
-            # print(f'*** tschupre found {len(locations)} locations')
-
-            for o in organizers:
-                print(f'organizer {o}')
-            print(f'*** tschupre found {len(organizers)} organizers')
-
-            # tschupre for testing
             event_count += 1
-            if event_count >= 50:
-                break
+
+        print()
+        print('title of imported events:')
+        for title in [i.event.title for i in items]:
+            print(f'  {title}')
 
         return self.from_import(items, publish_immediately=True,
-                                future_events_only=True)
+                                future_events_only=False)
 
     def as_anthrazit_xml(
             self,
