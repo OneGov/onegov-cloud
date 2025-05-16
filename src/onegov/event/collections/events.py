@@ -495,6 +495,7 @@ class EventCollection(Pagination[Event]):
         locations = {}
         organizers = {}
         items = []
+        purge = ''
         event_count = 0
         h2t_config = {'ignore_emphasis': True}
 
@@ -535,7 +536,7 @@ class EventCollection(Pagination[Event]):
                 image_steam = BytesIO(response.content)
                 return image_steam, url.split('/')[-1]
             except requests.RequestException as e:
-                print(f'Failed to retrieve image: {e}')
+                print(f'Failed to retrieve event image from {url}: {e}')
                 return None, None
 
         for location in root.xpath('//ns:location', namespaces=ns):
@@ -589,7 +590,7 @@ class EventCollection(Pagination[Event]):
             coordinates = Coordinates(
                 location_data.get('longitude', None), location_data.get('latitude'), None)
 
-            event_image, event_image_name = get_event_image(event)
+            event_image, event_image_name = get_event_image(event)  # time consuming
             # event_image, event_image_name = None, None
 
             ticket_price = find_element_text(event, 'ticketPrice')
@@ -608,6 +609,11 @@ class EventCollection(Pagination[Event]):
                 recurrence_start_dates: list[datetime] = []
                 recurrence = schedule.find('ns:recurrence', namespaces=ns)
                 frequency = find_element_text(recurrence, 'frequency')
+
+                event_status = find_element_text(schedule, 'eventStatus')
+                if event_status == 'deleted':
+                    purge = schedule_id
+                    continue  # skip from importing otherwise no purge
 
                 if frequency == 'single':
                     pass
@@ -632,6 +638,9 @@ class EventCollection(Pagination[Event]):
 
                 recurrence = rdate_from_single_dates(recurrence_start_dates)  # remove dates in the past?
 
+                # Importing each single schedule, recurrence within a schedule
+                # will link the different occurrences using the schedule id.
+                # Multiple 'single' frequency schedule lead to single events.
                 items.append(
                     EventImportItem(
                         event=Event(  # type:ignore[misc]
@@ -650,8 +659,8 @@ class EventCollection(Pagination[Event]):
                             price=ticket_price,
                             external_event_url=event_url,
                             tags=tags,
-                            # filter_keywords=default_filter_keywords,
-                            source=schedule_id, #event_id,
+                            filter_keywords=None,
+                            source=schedule_id,
                         ),
                         image=event_image,
                         image_filename=event_image_name,
@@ -680,8 +689,13 @@ class EventCollection(Pagination[Event]):
         for title in [i.event.title for i in items]:
             print(f'  {title}')
 
-        return self.from_import(items, publish_immediately=True,
-                                future_events_only=False)
+        return self.from_import(
+            items,
+            purge=purge,
+            publish_immediately=True,
+            future_events_only=False
+        )
+
 
     def as_anthrazit_xml(
             self,
