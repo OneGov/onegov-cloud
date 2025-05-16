@@ -194,7 +194,7 @@ class EventCollection(Pagination[Event]):
     def from_import(
         self,
         items: Iterable[EventImportItem | str],
-        purge: str | None = None,
+        to_purge: list[str] = [],
         publish_immediately: bool = True,
         valid_state_transfers: Mapping[str, str] | None = None,
         published_only: bool = False,
@@ -212,7 +212,7 @@ class EventCollection(Pagination[Event]):
             A list of ``EventImportItem``'s or event sources to keep
             from purging.
 
-        :param purge:
+        :param to_purge:
             Optionally removes all events with the given meta-source-prefix not
             present in the given events.
 
@@ -242,12 +242,11 @@ class EventCollection(Pagination[Event]):
             If set only events in the future will be imported
         """
 
-        if purge:
+        purged = set()
+        for purge_id in to_purge:
             query = self.session.query(Event.meta['source'].label('source'))
-            query = query.filter(Event.meta['source'].astext.startswith(purge))
-            purged = {r.source for r in query}
-        else:
-            purged = set()
+            query = query.filter(Event.meta['source'].astext.startswith(purge_id))
+            purged.update([r.source for r in query])
 
         added = []
         updated = []
@@ -267,7 +266,7 @@ class EventCollection(Pagination[Event]):
                 Event.meta['source'] == event.meta['source']
             ).first()
 
-            if purge:
+            if to_purge:
                 purged -= {event.source}
 
             if existing:
@@ -495,7 +494,7 @@ class EventCollection(Pagination[Event]):
         locations = {}
         organizers = {}
         items = []
-        purge = ''
+        items_to_purge = []
         event_count = 0
         h2t_config = {'ignore_emphasis': True}
 
@@ -612,7 +611,7 @@ class EventCollection(Pagination[Event]):
 
                 event_status = find_element_text(schedule, 'eventStatus')
                 if event_status == 'deleted':
-                    purge = schedule_id
+                    items_to_purge.append(schedule_id)
                     continue  # skip from importing otherwise no purge
 
                 if frequency == 'single':
@@ -691,11 +690,10 @@ class EventCollection(Pagination[Event]):
 
         return self.from_import(
             items,
-            purge=purge,
+            to_purge=items_to_purge,
             publish_immediately=True,
             future_events_only=False
         )
-
 
     def as_anthrazit_xml(
             self,
