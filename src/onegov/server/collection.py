@@ -35,9 +35,15 @@ class CachedApplication:
 
     def get(self) -> Application:
         if self.instance is None:
-            self.instance = self.application_class()
-            self.instance.namespace = self.namespace
-            self.instance.configure_application(**self.configuration)
+            instance = self.application_class()
+            instance.namespace = self.namespace
+            instance.configure_application(**self.configuration)
+            # NOTE: Only set the attribute after we successfully configured
+            #       the application, since the server will continue operating
+            #       after exceptions, we may otherwise end up with partially
+            #       initialized application instances. It's better if we
+            #       fail the same way each request.
+            self.instance = instance
         return self.instance
 
 
