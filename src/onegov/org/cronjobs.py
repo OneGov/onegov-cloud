@@ -1243,42 +1243,34 @@ def wil_daily_event_import(request: OrgRequest) -> None:
     if request.app.org.name != 'Stadt Wil':
         return
 
+    api_token = request.app.azizi_api_token
+    if not api_token:
+        log.warning(f'Azizi API token Stadt Wil unknown - no event import possible')
+        return
+
     minaza_url = 'https://azizi.2mp.ch/export/events/v/1'
     params = {
         'zip': '9500'
     }
     # TODO make api key available via puppet
     headers = {
-        'Authorization': 'apikey NGJjZWJlZTYtODM1YS00N2E1LThkYTUtYmZkMzk2ZGM4ZDUz'
+        'Authorization': f'apikey {api_token}'
     }
 
-    # try:
-    #     response = requests.get(minaza_url, params=params, headers=headers, timeout=30)
-    # except Exception:
-    #     log.exception(f'Failed to retrieve events for Wil from {minaza_url}')
-    #     return
-    #
-    # if response.status_code != 200:
-    #     log.exception(f'Failed to retrieve events for Wil from {minaza_url}, '
-    #                   f'status code: {response.status_code}')
-    #     return
-    #
-    # collection = EventCollection(request.session)
-    # added, updated, purged = collection.from_minasa(response.content)
-    # log.info(f'Wil: Events successfully imported '
-    #          f'{len(added)} added, {len(updated)} updated, '
-    #          f'{len(purged)} deleted')
+    log.info(f'Start querying url {minaza_url}..')
+    try:
+        response = requests.get(minaza_url, params=params, headers=headers, timeout=60)
+    except Exception:
+        log.exception(f'Failed to retrieve events for Wil from {minaza_url}')
+        return
 
-    # for testing read from file
+    if response.status_code != 200:
+        log.exception(f'Failed to retrieve events for Wil from {minaza_url}, '
+                      f'with params: {params}, status code: {response.status_code}')
+        return
+
     collection = EventCollection(request.session)
-    with open('/home/reto/workspace/onegov-cloud/wil.xml') as f:
-    # with open('/home/reto/workspace/onegov-cloud/test.xml') as f:
-        content = f.read()
-        # convert content to byte stream
-        content = content.encode('utf-8')
-
-        added, updated, purged = collection.from_minasa(content)
-        log.info(f'Wil: Events successfully imported '
-                 f'{len(added)} added, {len(updated)} updated, '
-                 f'{len(purged)} deleted')
-    # end for testing
+    added, updated, purged = collection.from_minasa(response.content)
+    log.info(f'Wil: Events successfully imported '
+             f'{len(added)} added, {len(updated)} updated, '
+             f'{len(purged)} deleted')
