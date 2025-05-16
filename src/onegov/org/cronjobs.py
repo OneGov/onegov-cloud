@@ -1245,7 +1245,8 @@ def wil_daily_event_import(request: OrgRequest) -> None:
 
     api_token = request.app.azizi_api_token
     if not api_token:
-        log.warning(f'Azizi API token Stadt Wil unknown - no event import possible')
+        log.warning(
+            'Azizi API token Stadt Wil unknown - no event import possible')
         return
 
     minaza_url = 'https://azizi.2mp.ch/export/events/v/1'
@@ -1259,14 +1260,17 @@ def wil_daily_event_import(request: OrgRequest) -> None:
 
     log.info(f'Start querying url {minaza_url}..')
     try:
-        response = requests.get(minaza_url, params=params, headers=headers, timeout=60)
+        response = requests.get(
+            minaza_url, params=params, headers=headers, timeout=60)
     except Exception:
         log.exception(f'Failed to retrieve events for Wil from {minaza_url}')
         return
 
     if response.status_code != 200:
-        log.exception(f'Failed to retrieve events for Wil from {minaza_url}, '
-                      f'with params: {params}, status code: {response.status_code}')
+        log.error(
+            f'Failed to retrieve events for Wil from {minaza_url}, '
+            f'with params: {params}, '
+            f'status code: {response.status_code}')
         return
 
     collection = EventCollection(request.session)
