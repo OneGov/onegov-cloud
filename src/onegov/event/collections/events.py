@@ -590,7 +590,6 @@ class EventCollection(Pagination[Event]):
                 location_data.get('longitude', None), location_data.get('latitude'), None)
 
             event_image, event_image_name = get_event_image(event)  # time consuming
-            # event_image, event_image_name = None, None
 
             ticket_price = find_element_text(event, 'ticketPrice')
             event_url = find_element_text(event, 'originalEventUrl') or None
@@ -667,26 +666,6 @@ class EventCollection(Pagination[Event]):
                         pdf_filename=None,
                     )
                 )
-
-            data = {
-                'title': title,
-                'tags': tags,
-                'start': start,
-                'end': end,
-                'recurrence': recurrence,
-                'schedule id': schedule_id,
-            }
-            print()
-            print(f'Event #{event_count + 1}')
-            for key in data.keys():
-                print('{}: {}'.format(key, data[key]))
-
-            event_count += 1
-
-        print()
-        print('title of imported events:')
-        for title in [i.event.title for i in items]:
-            print(f'  {title}')
 
         return self.from_import(
             items,

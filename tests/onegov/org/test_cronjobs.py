@@ -2372,3 +2372,7 @@ def test_wil_daily_event_import(org_app):
     assert len(updated) == 0
     assert len(purged) == 2
     assert occurrences.query().count() == 2
+    assert [o.title for o in occurrences.query()] == [
+        '100 Meter Race of the Year',
+        '100 Meter Race of the Year'
+    ]
