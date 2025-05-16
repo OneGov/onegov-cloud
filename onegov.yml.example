@@ -162,6 +162,9 @@ configuration: &global-config
   # Web Statistics
   # plausible_api_token:
 
+  # Azizi API Stadt Wil
+  # azizi_api_token:
+
   # for org app, disable the password reset view (case the users have their own auth providers)
   # disable_password_reset: true
 
