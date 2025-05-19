@@ -7,7 +7,7 @@ from elasticsearch_dsl.query import MatchPhrase
 from elasticsearch_dsl.query import MultiMatch
 from functools import cached_property
 from sedate import utcnow
-from sqlalchemy import func, Numeric, cast, DateTime
+from sqlalchemy import func, Numeric, cast, DateTime, or_
 
 from sqlalchemy.dialects.postgresql import UUID
 from sqlalchemy.orm import Query
@@ -276,20 +276,17 @@ class SearchPostgres(Pagination[_M]):
     def filter_user_level(self, query: Any) -> Any:
         """ Filters search content according to user level """
 
-        if not self.request.is_logged_in:  # maybe not needed
-            query = query.filter(
-                SearchIndex.fts_idx_data.contains({'es_public': True}))
-
-        # as a member we only want to see public and member content
-        if self.request.is_member:
-            query = query.filter(
-                SearchIndex.fts_idx_data['access'].
-                astext.in_(('public', 'member')))
-
-        # as non-manager we only want to see public content
-        elif not self.request.is_manager:
-            query = query.filter(
-                SearchIndex.fts_idx_data.contains({'es_public': True}))
+        role = getattr(self.request.identity, 'role', 'anonymous')
+        available_accesses = {
+            'admin': (),  # can see everything
+            'editor': (),  # can see everything
+            'member': ('member', 'mtan', 'public')
+        }.get(role, ('mtan', 'public'))
+        if available_accesses:
+            query = query.filter(or_(
+                SearchIndex.fts_idx_data['es_public'].astext == 'true',
+                SearchIndex.fts_idx_data['access'].astext.in_(available_accesses)
+            ))
 
         return query
 
