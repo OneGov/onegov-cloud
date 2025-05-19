@@ -606,8 +606,10 @@ class EventCollection(Pagination[Event]):
             ticket_price = find_element_text(event, 'ticketPrice')
             event_url = find_element_text(event, 'originalEventUrl') or None
 
-            tags = [tag.text for tag in
-                    event.find('ns:tags', namespaces=ns) or []]
+            tags = []
+            if event.find('ns:tags', namespaces=ns) is not None:
+                tags = [
+                    tag.text for tag in event.find('ns:tags', namespaces=ns)]
 
             timezone = 'Europe/Zurich'
             for schedule in event.find('ns:schedules', namespaces=ns):
