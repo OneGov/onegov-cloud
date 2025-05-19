@@ -281,35 +281,33 @@ class EventCollection(Pagination[Event]):
                     changed = existing.source_updated != event.source_updated
                 else:
                     # No information on provided, figure it out ourselves!
-                    image_changed = (existing.image and not item.image) or (
-                            not existing.image and item.image
+                    image_changed = (
+                        (existing.image and not item.image)
+                        or (not existing.image and item.image)
                     )
                     if existing.image and item.image:
                         image_changed = (
-                                existing.image.checksum
-                                != hashlib.new(
-                            'md5', item.image.read(), usedforsecurity=False
-                        ).hexdigest()
+                            existing.image.checksum
+                            != hashlib.new(
+                                'md5',
+                                item.image.read(),
+                                usedforsecurity=False
+                            ).hexdigest()
                         )
                         item.image.seek(0)
-                    changed = (
-                        True
-                        if (
-                            existing.title != event.title
-                            or existing.location != event.location
-                            or set(existing.tags) != set(event.tags)
-                            or (existing.filter_keywords !=
-                                event.filter_keywords)
-                            or existing.timezone != event.timezone
-                            or existing.start != event.start
-                            or existing.end != event.end
-                            or existing.content != event.content
-                            or existing.coordinates != event.coordinates
-                            or existing.recurrence != event.recurrence
-                            or image_changed
-                        )
-                        else False
-                    )
+                    changed = True if (
+                        existing.title != event.title
+                        or existing.location != event.location
+                        or set(existing.tags) != set(event.tags)
+                        or existing.filter_keywords != event.filter_keywords
+                        or existing.timezone != event.timezone
+                        or existing.start != event.start
+                        or existing.end != event.end
+                        or existing.content != event.content
+                        or existing.coordinates != event.coordinates
+                        or existing.recurrence != event.recurrence
+                        or image_changed
+                    ) else False
 
                 if changed:
                     state = existing.state  # avoid updating occurrences
@@ -446,10 +444,10 @@ class EventCollection(Pagination[Event]):
                 # categories may be in lists or they may be single values
                 # whose 'cats' member contains the texts
                 if (
-                        not hasattr(tags, '__iter__')
-                        # v6 added an __iter__ method to vCategory
-                        # but it's not what we want to ierate over
-                        or isinstance(tags, vCategory)
+                    not hasattr(tags, '__iter__')
+                    # v6 added an __iter__ method to vCategory
+                    # but it's not what we want to ierate over
+                    or isinstance(tags, vCategory)
                 ):
                     tags = [tags]
 
