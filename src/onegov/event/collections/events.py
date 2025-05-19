@@ -63,10 +63,10 @@ class EventCollection(Pagination[Event]):
     """ Manage a list of events. """
 
     def __init__(
-            self,
-            session: Session,
-            page: int = 0,
-            state: EventState | None = None
+        self,
+        session: Session,
+        page: int = 0,
+        state: EventState | None = None
     ) -> None:
 
         super().__init__(page)
@@ -75,9 +75,9 @@ class EventCollection(Pagination[Event]):
 
     def __eq__(self, other: object) -> bool:
         return (
-                isinstance(other, self.__class__)
-                and self.state == other.state
-                and self.page == other.page
+            isinstance(other, self.__class__)
+            and self.state == other.state
+            and self.page == other.page
         )
 
     def subset(self) -> Query[Event]:
@@ -115,13 +115,13 @@ class EventCollection(Pagination[Event]):
         return name
 
     def add(
-            self,
-            title: str,
-            start: datetime,
-            end: datetime,
-            timezone: str,
-            autoclean: bool = True,
-            **optional: Any
+        self,
+        title: str,
+        start: datetime,
+        end: datetime,
+        timezone: str,
+        autoclean: bool = True,
+        **optional: Any
     ) -> Event:
         """ Add a new event.
 
@@ -295,18 +295,18 @@ class EventCollection(Pagination[Event]):
                     changed = (
                         True
                         if (
-                                existing.title != event.title
-                                or existing.location != event.location
-                                or set(existing.tags) != set(event.tags)
-                                or (existing.filter_keywords !=
-                                    event.filter_keywords)
-                                or existing.timezone != event.timezone
-                                or existing.start != event.start
-                                or existing.end != event.end
-                                or existing.content != event.content
-                                or existing.coordinates != event.coordinates
-                                or existing.recurrence != event.recurrence
-                                or image_changed
+                            existing.title != event.title
+                            or existing.location != event.location
+                            or set(existing.tags) != set(event.tags)
+                            or (existing.filter_keywords !=
+                                event.filter_keywords)
+                            or existing.timezone != event.timezone
+                            or existing.start != event.start
+                            or existing.end != event.end
+                            or existing.content != event.content
+                            or existing.coordinates != event.coordinates
+                            or existing.recurrence != event.recurrence
+                            or image_changed
                         )
                         else False
                     )
@@ -361,13 +361,13 @@ class EventCollection(Pagination[Event]):
         return added, updated, purged_event_ids
 
     def from_ical(
-            self,
-            ical: str,
-            future_events_only: bool = False,
-            event_image: IO[bytes] | None = None,
-            event_image_name: str | None = None,
-            default_categories: list[str] | None = None,
-            default_filter_keywords: dict[str, list[str]] | None = None
+        self,
+        ical: str,
+        future_events_only: bool = False,
+        event_image: IO[bytes] | None = None,
+        event_image_name: str | None = None,
+        default_categories: list[str] | None = None,
+        default_filter_keywords: dict[str, list[str]] | None = None
     ) -> tuple[list[Event], list[Event], list[UUID]]:
         """ Imports the events from an iCalender string.
 
@@ -494,8 +494,8 @@ class EventCollection(Pagination[Event]):
                                 future_events_only=future_events_only)
 
     def from_minasa(
-            self,
-            xml_stream: bytes,
+        self,
+        xml_stream: bytes,
     ) -> tuple[list[Event], list[Event], list[UUID]]:
         locations = {}
         organizers = {}
@@ -695,9 +695,9 @@ class EventCollection(Pagination[Event]):
         )
 
     def as_anthrazit_xml(
-            self,
-            request: CoreRequest,
-            future_events_only: bool = True
+        self,
+        request: CoreRequest,
+        future_events_only: bool = True
     ) -> str:
         """
         Returns all published occurrences as xml for Winterthur.
