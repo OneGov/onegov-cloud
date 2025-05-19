@@ -691,7 +691,6 @@ class Framework(
             ScopedPropertyObserver.enter_scope(self)
 
             self.session_manager.set_current_schema(self.schema)
-            self.create_search_index_table(self.schema)
 
             if not self.is_orm_cache_setup:
                 self.setup_orm_cache()
@@ -1504,34 +1503,6 @@ class Framework(
             return signer.unsign(text).decode('utf-8')
         except BadSignature:
             return None
-
-    def create_search_index_table(self, schema_name: str) -> None:
-        """Creates the search_index table in the given schema."""
-
-        engine = self.session_manager.engine
-
-        # create schema
-        if not engine.dialect.has_schema(engine, schema_name):
-            engine.execute(f'CREATE SCHEMA {schema_name}')
-
-        # verify search index table exists
-        if not engine.has_table('search_index', schema=schema_name):
-            metadata = MetaData(schema=schema_name)
-            Table(
-                'search_index',
-                metadata,
-                Column('id', Integer, primary_key=True),
-                Column('owner_type', String, nullable=False),
-                Column('owner_id_int', Integer, nullable=True),
-                Column('owner_id_uuid', String, nullable=True),
-                Column('owner_id_str', String, nullable=True),
-                Column('fts_idx_data', JSONB, default={}),
-                Column('fts_idx', TSVECTOR),
-            )
-
-            metadata.create_all(engine)
-            assert engine.has_table('search_index', schema=schema_name)
-
 
 @Framework.webasset_url()
 def get_webasset_url() -> str:
