@@ -1,4 +1,5 @@
 import json
+import logging
 import os
 from pathlib import Path
 from unittest.mock import patch, Mock
@@ -8,6 +9,7 @@ import requests
 import transaction
 from datetime import datetime, timedelta, timezone
 from freezegun import freeze_time
+
 from onegov.core.utils import Bunch, normalize_for_url
 from onegov.directory import (DirectoryEntryCollection,
                               DirectoryConfiguration,
@@ -2099,19 +2101,59 @@ def test_normalize_adjacency_list_order_with_null_becomes_default(org_app):
     root = pages.by_id(news_root_id)
     assert root.order == default_root_order
 
-def test_wil_daily_event_import(org_app):
+
+def test_wil_daily_event_import_wrong_app(org_app):
     client = Client(org_app)
     session = org_app.session()
-    job = get_cronjob_by_name(org_app, 'wil_daily_event_import')
-    job.app = org_app
+    org_job = get_cronjob_by_name(org_app, 'wil_daily_event_import')
+    org_job.app = org_app
 
+    # test not being the right organisation
+    client.get(get_cronjob_url(org_job))
+
+
+def test_wil_daily_event_import(wil_app, capturelog):
+    client = Client(wil_app)
+    session = wil_app.session()
+    wil_job = get_cronjob_by_name(wil_app, 'wil_daily_event_import')
+    wil_job.app = wil_app
+    capturelog.setLevel(logging.ERROR, logger='onegov.org.cronjobs')
+
+    # no api token
+    client.get(get_cronjob_url(wil_job))
+
+    # set api test token
+    wil_app.azizi_api_token = 'mytoken'
+
+    # connection error
+    with patch('requests.get',
+               side_effect=requests.exceptions.ConnectionError):
+        client.get(get_cronjob_url(wil_job))
+
+        assert ('Failed to retrieve events for Wil from' in
+                capturelog.records()[-1].message)
+
+    # server error
+    with patch('requests.get') as mock_get:
+        mock_response = Mock()
+        mock_response.status_code = 500
+        mock_response.text = 'Internal Server Error'
+        mock_get.return_value = mock_response
+
+        client.get(get_cronjob_url(wil_job))
+
+        assert ('Failed to retrieve events for Wil from' in
+                capturelog.records()[-1].message)
+        assert 'status code: 500' in capturelog.records()[-1].message
+
+    # test with successful response
     tz = timezone(timedelta(hours=2))
     first_date = datetime.now(tz).replace(
         hour=8, microsecond=0) + timedelta(days=1)
     start_dates = [
         first_date,  # event 1
-        first_date+timedelta(days=2),  # event 2
-        first_date+timedelta(weeks=1),  # event 3 and 4
+        first_date + timedelta(days=2),  # event 2
+        first_date + timedelta(weeks=1),  # event 3 and 4
     ]
     event_status = [
         'scheduled',  # event 1
