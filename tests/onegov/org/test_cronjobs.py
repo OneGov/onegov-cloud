@@ -2276,14 +2276,6 @@ def test_wil_daily_event_import(org_app):
     added, updated, purged = occurrences.from_minasa(xml.encode('utf-8'))
 
     events = occurrences.query().order_by(Event.start).all()
-    for e in events:
-        print('- Event -')
-        print(e.title)
-        print(e.start)
-        print(e.end)
-        print(e.recurrence)
-        print(e.occurrence_dates())
-
     assert len(events) == 4  # number of event schedules
     assert len(added) == 4  # number of event schedules
     assert len(updated) == 0

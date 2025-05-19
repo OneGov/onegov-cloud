@@ -706,7 +706,7 @@ def fetch(
 
                 added, updated, purged = local_events.from_import(
                     remote_events(),
-                    to_purge=f'fetch-{key}',
+                    to_purge=[f'fetch-{key}'],
                     publish_immediately=False,
                     valid_state_transfers=valid_state_transfers,
                     published_only=published_only

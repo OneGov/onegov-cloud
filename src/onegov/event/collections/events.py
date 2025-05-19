@@ -45,9 +45,8 @@ if TYPE_CHECKING:
     from onegov.event.models.event import EventState
     from sqlalchemy.orm import Query
     from sqlalchemy.orm import Session
-    from typing import Self
+    from typing import Self, IO
     from uuid import UUID
-
 
 log = logging.getLogger('onegov.org.events')
 
@@ -198,7 +197,7 @@ class EventCollection(Pagination[Event]):
     def from_import(
         self,
         items: Iterable[EventImportItem | str],
-        to_purge: list[str] = None,
+        to_purge: list[str] | None = None,
         publish_immediately: bool = True,
         valid_state_transfers: Mapping[str, str] | None = None,
         published_only: bool = False,
@@ -283,31 +282,31 @@ class EventCollection(Pagination[Event]):
                 else:
                     # No information on provided, figure it out ourselves!
                     image_changed = (existing.image and not item.image) or (
-                        not existing.image and item.image
+                            not existing.image and item.image
                     )
                     if existing.image and item.image:
                         image_changed = (
-                            existing.image.checksum
-                            != hashlib.new(
-                                'md5', item.image.read(), usedforsecurity=False
-                            ).hexdigest()
+                                existing.image.checksum
+                                != hashlib.new(
+                            'md5', item.image.read(), usedforsecurity=False
+                        ).hexdigest()
                         )
                         item.image.seek(0)
                     changed = (
                         True
                         if (
-                            existing.title != event.title
-                            or existing.location != event.location
-                            or set(existing.tags) != set(event.tags)
-                            or (existing.filter_keywords !=
-                                event.filter_keywords)
-                            or existing.timezone != event.timezone
-                            or existing.start != event.start
-                            or existing.end != event.end
-                            or existing.content != event.content
-                            or existing.coordinates != event.coordinates
-                            or existing.recurrence != event.recurrence
-                            or image_changed
+                                existing.title != event.title
+                                or existing.location != event.location
+                                or set(existing.tags) != set(event.tags)
+                                or (existing.filter_keywords !=
+                                    event.filter_keywords)
+                                or existing.timezone != event.timezone
+                                or existing.start != event.start
+                                or existing.end != event.end
+                                or existing.content != event.content
+                                or existing.coordinates != event.coordinates
+                                or existing.recurrence != event.recurrence
+                                or image_changed
                         )
                         else False
                     )
@@ -495,9 +494,9 @@ class EventCollection(Pagination[Event]):
                                 future_events_only=future_events_only)
 
     def from_minasa(
-        self,
-        xml_stream,
-    ):
+            self,
+            xml_stream: bytes,
+    ) -> tuple[list[Event], list[Event], list[UUID]]:
         locations = {}
         organizers = {}
         items = []
@@ -519,17 +518,19 @@ class EventCollection(Pagination[Event]):
             if not dates:
                 return None
 
-            dates = [start.strftime('%Y%m%dT%H%M%SZ') for start in dates]
-            return '\n'.join(f'RDATE:{start}' for start in dates)
+            rdates = [start.strftime('%Y%m%dT%H%M%SZ') for start in dates]
+            return '\n'.join(f'RDATE:{start}' for start in rdates)
 
-        def find_element_text(parent: etree._Element, key: str) -> str | None:
+        def find_element_text(parent: etree._Element, key: str) -> str:
             element = parent.find(f'ns:{key}', namespaces=ns)
             if element is not None:
                 return unescape(element.text or '')
 
-            return None
+            return ''
 
-        def get_event_image(event: etree._Element):
+        def get_event_image(
+                event: etree._Element
+        ) -> tuple[IO[bytes] | None, str | None]:
             url = find_element_text(event, 'imageUrl')
 
             if not url:
@@ -561,8 +562,8 @@ class EventCollection(Pagination[Event]):
                 'zip': zip,
                 'city': city,
                 'url': url,
-                'latitude': lat,
-                'longitude': lon,
+                'lat': lat,
+                'lon': lon,
             }
 
         for organizer in root.xpath('//ns:organizer', namespaces=ns):
@@ -589,16 +590,17 @@ class EventCollection(Pagination[Event]):
             organizer_id = find_element_text(event, 'organizerUuid7')
 
             location_id = find_element_text(event, 'locationUuid7')
-            location_data = locations.get(location_id, '')
+            location_data = locations.get(location_id, {})
             location = ', '.join(
                 location_data[i] for i in ['title', 'street', 'zip', 'city']
                 if location_data[i]
             )
             coordinates = Coordinates(
-                location_data.get('longitude', None),
-                location_data.get('latitude', None)
+                lat=float(
+                    location_data['lat']) if location_data.get('lat') else 0.0,
+                lon=float(
+                    location_data['lon']) if location_data.get('lon') else 0.0
             )
-
             event_image, event_image_name = get_event_image(event)
 
             ticket_price = find_element_text(event, 'ticketPrice')
@@ -609,11 +611,11 @@ class EventCollection(Pagination[Event]):
 
             timezone = 'Europe/Zurich'
             for schedule in event.find('ns:schedules', namespaces=ns):
-                schedule_id = schedule.find('ns:uuid7', namespaces=ns).text
-                start = find_element_text(schedule, 'start')
-                start = parse(start) if start else None
-                end = find_element_text(schedule, 'end')
-                end = parse(end) if end else start + timedelta(hours=1)
+                schedule_id = find_element_text(schedule, 'uuid7')
+                start = parse(find_element_text(schedule, 'start'))
+                end_text = find_element_text(schedule, 'end')
+                end = (parse(end_text) if end_text else
+                       start + timedelta(hours=1))
 
                 recurrence_start_dates: list[datetime] = []
                 recurrence = schedule.find('ns:recurrence', namespaces=ns)
@@ -628,16 +630,17 @@ class EventCollection(Pagination[Event]):
                     pass
 
                 elif frequency in ['daily', 'weekly']:
-                    interval = find_element_text(recurrence, 'interval')
-                    until = find_element_text(recurrence, 'until')
+                    interval = int(find_element_text(recurrence, 'interval'))
+                    until = parse(find_element_text(recurrence, 'until'))
 
-                    interval = int(interval)
-                    until = parse(until)
                     if until.tzinfo is None:
                         until = until.replace(tzinfo=start.tzinfo)
 
-                    delta = timedelta(days=interval) \
-                        if frequency == 'daily' else timedelta(weeks=interval)
+                    delta = (
+                        timedelta(days=interval)
+                        if frequency == 'daily'
+                        else timedelta(weeks=interval)
+                    )
                     current_start = start + delta
                     while current_start <= until:
                         recurrence_start_dates.append(current_start)
@@ -645,7 +648,7 @@ class EventCollection(Pagination[Event]):
 
                 else:
                     log.error(
-                        'Error unhandled recurrence type:', frequency.text)
+                        'Error unhandled recurrence type:', frequency)
 
                 recurrence = (
                     rdate_from_single_dates(recurrence_start_dates))
