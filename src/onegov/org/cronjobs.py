@@ -1,4 +1,5 @@
 from __future__ import annotations
+
 from inspect import isabstract
 from collections import OrderedDict
 
@@ -1258,7 +1259,7 @@ def wil_daily_event_import(request: OrgRequest) -> None:
         'Authorization': f'apikey {api_token}'
     }
 
-    log.info(f'Start querying url {minaza_url}..')
+    log.info(f'Start querying url {minaza_url}')
     try:
         response = requests.get(
             minaza_url, params=params, headers=headers, timeout=60)
