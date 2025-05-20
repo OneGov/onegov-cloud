@@ -327,7 +327,9 @@ class SearchPostgres(Pagination[_M]):
             SearchIndex.fts_idx.op('@@')(ts_query)
         )
         query = query.add_column(decay_rank)
-        self.number_of_docs = query.count()
+        self.number_of_docs = self.filter_user_level(
+            self.request.session.query(func.count(SearchIndex.id))
+        ).scalar()
         query = self.filter_user_level(query)
 
         index_entry: SearchIndex
