@@ -125,7 +125,7 @@ class OrgApp(Framework, LibresIntegration, ElasticsearchApp, MapboxApp,
         self.enable_yubikey = enable_yubikey
         self.disable_password_reset = disable_password_reset
 
-    def configure_api_token(
+    def configure_plausible_api_token(
         self,
         *,
         plausible_api_token: str = '',
@@ -133,6 +133,15 @@ class OrgApp(Framework, LibresIntegration, ElasticsearchApp, MapboxApp,
     ) -> None:
 
         self.plausible_api_token = plausible_api_token
+
+    def configure_stadt_wil_azizi_api_token(
+            self,
+            *,
+            azizi_api_token: str = '',
+            ** cfg: Any
+    ) -> None:
+
+        self.azizi_api_token = azizi_api_token
 
     def configure_mtan_hook(self, **cfg: Any) -> None:
         """
@@ -591,6 +600,7 @@ def get_public_ticket_messages() -> Collection[str]:
         'event',
         'payment',
         'reservation',
+        'reservation_adjusted',
         'submission',
         'ticket',
         'ticket_chat',

@@ -2,7 +2,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE 1.0\n"
-"POT-Creation-Date: 2025-04-30 07:35+0200\n"
+"POT-Creation-Date: 2025-05-14 12:47+0200\n"
 "PO-Revision-Date: 2022-03-15 10:21+0100\n"
 "Last-Translator: Marc Sommerhalder <marc.sommerhalder@seantis.ch>\n"
 "Language-Team: German\n"
@@ -1328,6 +1328,12 @@ msgstr "Öffentliche Extra Informationen zu dieser Person"
 
 msgid "Tag"
 msgstr "Schlagwort"
+
+msgid "Starting at"
+msgstr "Von"
+
+msgid "Ending at"
+msgstr "Bis"
 
 msgid "I am looking to make a reservation lasting"
 msgstr "Ich suche einen Termin für"
@@ -3319,6 +3325,22 @@ msgstr "Eingabe bearbeiten"
 msgid "Key Code"
 msgstr "Schlüsselcode"
 
+msgid "Reject"
+msgstr "Absagen"
+
+msgid "Do you really want to reject this reservation?"
+msgstr "Möchten Sie diese Reservation wirklich absagen?"
+
+#, python-format
+msgid "Rejecting ${title} can't be undone."
+msgstr "Die Absage von ${title} kann nicht rückgängig gemacht werden."
+
+msgid "Reject reservation"
+msgstr "Reservation absagen"
+
+msgid "Adjust"
+msgstr "Anpassen"
+
 msgid "Accept all reservations"
 msgstr "Alle Reservationen annehmen"
 
@@ -3346,22 +3368,8 @@ msgstr "Reservationen absagen"
 msgid "Reject all with message"
 msgstr "Alle absagen mit Kommentar"
 
-#, python-format
-msgid "Reject ${title}"
-msgstr "${title} absagen"
-
-msgid "Do you really want to reject this reservation?"
-msgstr "Möchten Sie diese Reservation wirklich absagen?"
-
-#, python-format
-msgid "Rejecting ${title} can't be undone."
-msgstr "Die Absage von ${title} kann nicht rückgängig gemacht werden."
-
-msgid "Reject reservation"
-msgstr "Reservation absagen"
-
-#. Used in sentence: "${event} published."
 #.
+#. Used in sentence: "${event} published."
 msgid "Event"
 msgstr "Veranstaltung"
 
@@ -3733,9 +3741,10 @@ msgid ""
 "than the number of levels in the breadcrumbs."
 msgstr ""
 "Um die Breadcrumbs anzuzeigen, können Sie ${bc_level} als Parameter zur URL "
-"hinzufügen. Die Zahl definiert, wo die Breadcrumbs beginnen. 1 in diesem Fall "
-"bedeutet, dass die erste Ebene verborgen ist. Sie können jede Zahl verwenden, "
-"solange sie kleiner ist als die Anzahl der Ebenen in den Breadcrumbs."
+"hinzufügen. Die Zahl definiert, wo die Breadcrumbs beginnen. 1 in diesem "
+"Fall bedeutet, dass die erste Ebene verborgen ist. Sie können jede Zahl "
+"verwenden, solange sie kleiner ist als die Anzahl der Ebenen in den "
+"Breadcrumbs."
 
 msgid ""
 "Please review your data and press \"Complete\" to finalize the process. If "
@@ -4688,6 +4697,9 @@ msgstr "1 Reservation abgelehnt."
 
 msgid "${count} reservations rejected."
 msgstr "${count} Reservationen abgelehnt."
+
+msgid "1 reservation adjusted:"
+msgstr "1 Reservation angepasst:"
 
 msgid "Registration confirmed."
 msgstr "Anmeldung bestätigt."
@@ -6420,6 +6432,18 @@ msgstr ""
 
 msgid "Reject all reservations with message"
 msgstr "Alle Reservationen absagen mit Kommentar"
+
+msgid "Adjust reservation"
+msgstr "Reservation Anpassen"
+
+msgid "One of your reservations was adjusted"
+msgstr "Eine von Ihren Reservationen wurde angepasst"
+
+msgid "The reservation was adjusted"
+msgstr "Die Reservation wurde angepasst"
+
+msgid "The reservation was left unchanged"
+msgstr "Die Reservation ist unverändert geblieben"
 
 msgid "Added a new daypass"
 msgstr "Eine neue Tageskarte wurde hinzugefügt"

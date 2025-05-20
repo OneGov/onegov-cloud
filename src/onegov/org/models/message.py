@@ -216,6 +216,30 @@ class ReservationMessage(Message, TicketMessageMixin):
         ])
 
 
+class ReservationAdjustedMessage(Message, TicketMessageMixin):
+
+    __mapper_args__ = {
+        'polymorphic_identity': 'reservation_adjusted'
+    }
+
+    @classmethod
+    def create(  # type:ignore[override]
+        cls,
+        old_reservation: Reservation,
+        new_reservation: Reservation,
+        ticket: Ticket,
+        request: OrgRequest,
+    ) -> Self:
+        return super().create(
+            ticket,
+            request,
+            old_start=old_reservation.display_start(),
+            old_end=old_reservation.display_end(),
+            new_start=new_reservation.display_start(),
+            new_end=new_reservation.display_end()
+        )
+
+
 class SubmissionMessage(Message, TicketMessageMixin):
 
     __mapper_args__ = {

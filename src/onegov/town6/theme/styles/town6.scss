@@ -49,7 +49,7 @@ a[href^="mailto:"] {
     @include prefix(word-break, break-all);
 
     // Non standard for WebKit
-    word-break: break-word;
+    word-break: break-word; /* stylelint-disable-line declaration-property-value-keyword-no-deprecated */
 }
 
 /*

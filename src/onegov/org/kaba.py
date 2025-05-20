@@ -101,7 +101,7 @@ class KabaClient:
         start: datetime,
         end: datetime,
         components: list[str]
-    ) -> tuple[str, str]:
+    ) -> str:
         res = self.session.post(
             f'{self.base_url}/{self.site_id}/visit',
             json={
@@ -122,7 +122,7 @@ class KabaClient:
         )
         self.raise_for_status(res)
         data = res.json()
-        return data['id'], data['link']
+        return data['id']
 
     def revoke_visit(self, visit_id: str) -> None:
         res = self.session.post(

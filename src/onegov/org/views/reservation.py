@@ -16,14 +16,15 @@ from onegov.org import _, log, OrgApp
 from onegov.org import utils
 from onegov.org.cli import close_ticket
 from onegov.org.elements import Link
-from onegov.org.forms import ReservationForm, InternalTicketChatMessageForm
+from onegov.org.forms import (
+    ReservationAdjustmentForm, ReservationForm, InternalTicketChatMessageForm)
 from onegov.org.kaba import KabaApiError, KabaClient
 from onegov.org.layout import ReservationLayout, TicketChatMessageLayout
-from onegov.org.layout import DefaultMailLayout
+from onegov.org.layout import DefaultMailLayout, TicketLayout
 from onegov.org.mail import send_ticket_mail
 from onegov.org.models import (
-    TicketMessage, TicketChatMessage, ReservationMessage,
-    ResourceRecipient, ResourceRecipientCollection)
+    TicketMessage, TicketChatMessage, ReservationAdjustedMessage,
+    ReservationMessage, ResourceRecipient, ResourceRecipientCollection)
 from onegov.org.models.resource import FindYourSpotCollection
 from onegov.org.models.ticket import ReservationTicket
 from onegov.org.utils import emails_for_new_ticket
@@ -804,6 +805,8 @@ def accept_reservation(
         else:
             code = None
 
+        savepoint = transaction.savepoint()
+
         for reservation in reservations:
             data = reservation.data = reservation.data or {}
             data['accepted'] = True
@@ -813,7 +816,7 @@ def accept_reservation(
                 try:
                     start = reservation.display_start() - lead_delta
                     end = reservation.display_end() + lag_delta
-                    visit_id, link = client.create_visit(
+                    visit_id = client.create_visit(
                         code=code,
                         name=ticket.number,
                         message='Managed through OneGov Cloud',
@@ -825,8 +828,7 @@ def accept_reservation(
                     log.info('Kaba API error', exc_info=True)
 
                     # roll back previous changes
-                    transaction.abort()
-                    transaction.begin()
+                    savepoint.rollback()
                     request.alert(_(
                         'Failed to create visits using the dormakaba API '
                         'please make sure your credentials are still valid.'
@@ -839,7 +841,6 @@ def accept_reservation(
                     data['kaba'] = {
                         'code': code,
                         'visit_id': visit_id,
-                        'link': link,
                     }
 
             # libres does not automatically detect changes yet
@@ -865,7 +866,6 @@ def accept_reservation(
                 origin='internal',
             )
 
-        # TODO: Add link to open doors online?
         send_ticket_mail(
             request=request,
             template='mail_reservation_accepted.pt',
@@ -1299,4 +1299,190 @@ def reject_reservation_with_message_from_ticket(
         request,
         form,
         layout or TicketChatMessageLayout(self, request, internal=True)
+    )
+
+
+@OrgApp.form(
+    model=Reservation,
+    name='adjust',
+    permission=Private,
+    form=ReservationAdjustmentForm,
+    template='form.pt'
+)
+def adjust_reservation(
+    self: Reservation,
+    request: OrgRequest,
+    form: ReservationAdjustmentForm,
+    view_ticket: ReservationTicket | None = None,
+    layout: ReservationLayout | TicketLayout | None = None
+) -> RenderData | Response:
+
+    token = self.token
+    resource = request.app.libres_resources.by_reservation(self)
+    assert resource is not None
+    reservation_id_str = request.params.get('reservation-id')
+    if isinstance(reservation_id_str, str) and reservation_id_str.isdigit():
+        reservation_id = int(reservation_id_str)
+    else:
+        raise exc.HTTPNotFound()
+
+    reservation: Reservation | None = (
+        resource.scheduler.reservations_by_token(token)  # type:ignore
+        .filter(Reservation.id == reservation_id)
+        .one_or_none()
+    )
+    if reservation is None or not (
+        # is this reservation adjustable?
+        reservation.target_type == 'allocation'
+        and request.session.query(
+            reservation
+            ._target_allocations()
+            .filter(Allocation.partly_available.is_(True))
+            .exists()
+        ).scalar()
+    ):
+        raise exc.HTTPNotFound()
+
+    tickets = TicketCollection(request.session)
+    ticket = tickets.by_handler_id(token.hex)
+    assert ticket is not None
+
+    # if we're accessing this view through the ticket it
+    # had better match the ticket we retrieved
+    if view_ticket is not None and view_ticket != ticket:
+        raise exc.HTTPNotFound()
+
+    def show_form() -> RenderData:
+        if not request.POST:
+            form.start_time.data = reservation.display_start().time()
+            form.end_time.data = reservation.display_end().time()
+        return {
+            'title': _('Adjust reservation'),
+            'layout': layout or ReservationLayout(resource, request),
+            'form': form,
+        }
+
+    if not form.submitted(request):
+        return show_form()
+
+    start_time = form.start_time.data
+    end_time = form.end_time.data
+    assert start_time is not None and end_time is not None
+    try:
+        new_start, new_end = sedate.get_date_range(
+            reservation.display_start(),
+            start_time,
+            end_time,
+            raise_non_existent=True
+        )
+    except pytz.NonExistentTimeError:
+        request.alert(_(
+            'The selected time does not exist on this date due to '
+            'the switch from standard time to daylight saving time.'
+        ))
+        return show_form()
+
+    savepoint = transaction.savepoint()
+    try:
+        new_reservation = resource.scheduler.change_reservation(
+            token,
+            reservation.id,
+            new_start,
+            new_end,
+        )
+    except LibresError as e:
+        # rollback previous changes
+        savepoint.rollback()
+        request.alert(utils.get_libres_error(e, request))
+        return show_form()
+
+    if new_reservation is not None:
+        client = KabaClient.from_resource(resource, request.app)
+        data = reservation.data = reservation.data or {}
+        if client and (kaba := data.get('kaba')):
+            # adjust visit
+            components = resource.kaba_components  # type: ignore[attr-defined]
+            try:
+                code = kaba['code']
+                lead_delta = timedelta(
+                    minutes=ticket.handler.data['key_code_lead_time']
+                )
+                lag_delta = timedelta(
+                    minutes=ticket.handler.data['key_code_lag_time']
+                )
+                start = new_reservation.display_start() - lead_delta
+                end = new_reservation.display_end() + lag_delta
+                client.revoke_visit(kaba['visit_id'])
+                visit_id = client.create_visit(
+                    code=code,
+                    name=ticket.number,
+                    message='Managed through OneGov Cloud',
+                    start=start,
+                    end=end,
+                    components=components,
+                )
+            except KabaApiError:
+                log.info('Kaba API error', exc_info=True)
+
+                # roll back previous changes
+                savepoint.rollback()
+                request.alert(_(
+                    'Failed to create visits using the dormakaba API '
+                    'please make sure your credentials are still valid.'
+                ))
+                return show_form()
+            else:
+                data['kaba'] = {
+                    'code': code,
+                    'visit_id': visit_id,
+                }
+
+                # libres does not automatically detect changes yet
+                flag_modified(reservation, 'data')
+
+        ReservationAdjustedMessage.create(
+            reservation,
+            new_reservation,
+            ticket,
+            request,
+        )
+        request.success(_('The reservation was adjusted'))
+    else:
+        request.warning(_('The reservation was left unchanged'))
+
+    if view_ticket is not None:
+        return request.redirect(request.link(view_ticket))
+
+    return request.redirect(request.link(self))
+
+
+@OrgApp.form(
+    model=ReservationTicket,
+    name='adjust-reservation',
+    permission=Private,
+    form=ReservationAdjustmentForm,
+    template='form.pt'
+)
+def adjust_reservation_from_ticket(
+    self: ReservationTicket,
+    request: OrgRequest,
+    form: ReservationAdjustmentForm,
+    layout: TicketLayout | None = None
+) -> RenderData | Response | None:
+
+    if self.handler.deleted:
+        raise exc.HTTPNotFound()
+
+    layout = layout or TicketLayout(self, request)
+    layout.breadcrumbs[-1].attrs['href'] = request.link(self)
+    layout.breadcrumbs.append(
+        Link(_('Adjust reservation'), '#')
+    )
+
+    return adjust_reservation(
+        self.handler.reservations[0],
+        request,
+        form,
+        self,
+        layout
     )

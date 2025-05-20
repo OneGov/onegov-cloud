@@ -1,4 +1,5 @@
 from __future__ import annotations
+
 from inspect import isabstract
 from collections import OrderedDict
 
@@ -21,7 +22,7 @@ from onegov.core.orm.abstract import AdjacencyList
 from onegov.core.orm.mixins.publication import UTCPublicationMixin
 from onegov.core.templates import render_template
 from onegov.directory.collections.directory import EntryRecipientCollection
-from onegov.event import Occurrence, Event
+from onegov.event import Occurrence, Event, EventCollection
 from onegov.file import FileCollection
 from onegov.form import FormSubmission, parse_form, Form
 from onegov.newsletter.models import Recipient
@@ -1230,3 +1231,46 @@ def normalize_adjacency_list_order(request: OrgRequest) -> None:
                 session.rollback()
             except Exception:
                 log.exception(f"Error during rollback for '{table_name}'")
+
+
+@OrgApp.cronjob(hour='03', minute='02', timezone='Europe/Zurich')
+def wil_daily_event_import(request: OrgRequest) -> None:
+    """
+    Daily import from Minasa (azizi data hub) for Wil
+    Minasa doc: https://minasa-demo.ch/wiki/datenhub:schema
+    Import doc: https://minasa-demo.ch/wiki/datenhub:import
+
+    """
+    if request.app.org.name != 'Stadt Wil':
+        return
+
+    api_token = request.app.azizi_api_token
+    if not api_token:
+        log.warning(
+            'Azizi API token Stadt Wil unknown - no event import possible')
+        return
+
+    minaza_url = 'https://azizi.2mp.ch/export/events/v/1'
+    params = {'zip': '9500'}
+    headers = {'Authorization': f'apikey {api_token}'}
+
+    log.info(f'Start querying url {minaza_url} for Wil event import')
+    try:
+        response = requests.get(
+            minaza_url, params=params, headers=headers, timeout=60)
+    except Exception:
+        log.exception(f'Failed to retrieve events for Wil from {minaza_url}')
+        return
+
+    if response.status_code != 200:
+        log.error(
+            f'Failed to retrieve events for Wil from {minaza_url}, '
+            f'with params: {params}, '
+            f'status code: {response.status_code}')
+        return
+
+    collection = EventCollection(request.session)
+    added, updated, purged = collection.from_minasa(response.content)
+    log.info(f'Wil: Events successfully imported '
+             f'{len(added)} added, {len(updated)} updated, '
+             f'{len(purged)} deleted')

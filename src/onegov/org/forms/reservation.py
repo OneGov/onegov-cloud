@@ -91,6 +91,28 @@ class ReservationForm(Form):
                 'data_auto_fill'] = json.dumps(auto_fill_data)
 
 
+class ReservationAdjustmentForm(Form):
+
+    # NOTE: Currently we don't allow adjusting a reservation
+    #       to a different allocation, so it's impossible to
+    #       change the date, but once we do support that we
+    #       may want to add a date field here
+
+    start_time = TimeField(
+        label=_('Starting at'),
+        description=_('HH:MM'),
+        validators=[InputRequired()],
+        fieldset=_('Time'),
+    )
+
+    end_time = TimeField(
+        label=_('Ending at'),
+        description=_('HH:MM'),
+        validators=[InputRequired()],
+        fieldset=_('Time'),
+    )
+
+
 class FindYourSpotForm(Form):
 
     if TYPE_CHECKING:
