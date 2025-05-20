@@ -211,3 +211,28 @@ ul.agency-nav {
 .row.field-sub_organisation {
     display: none;
 }
+
+// confirm scrollable list
+.confirm-list {
+    margin-bottom: 1rem;
+    max-height: 40vh;
+    overflow: auto;
+
+    &.requires-scroll {
+        padding: 10px;
+    }
+}
+
+.button.alert.yes.disabled {
+    cursor: not-allowed;
+    opacity: .6;
+}
+
+.scroll-hint {
+    font-style: italic;
+    margin-bottom: 1rem;
+}
+
+p.full-text-width {
+    max-width: 100% !important;
+}
