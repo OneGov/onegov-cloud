@@ -2,7 +2,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: \n"
-"POT-Creation-Date: 2025-04-30 07:35+0200\n"
+"POT-Creation-Date: 2025-05-14 12:47+0200\n"
 "PO-Revision-Date: 2022-03-15 10:52+0100\n"
 "Last-Translator: \n"
 "Language-Team: \n"
@@ -1331,6 +1331,12 @@ msgstr "Informazioni pubbliche aggiuntive su questa persona"
 
 msgid "Tag"
 msgstr "Tag"
+
+msgid "Starting at"
+msgstr "A partire da"
+
+msgid "Ending at"
+msgstr "Fine a"
 
 msgid "I am looking to make a reservation lasting"
 msgstr "Voglio fare una prenotazione di"
@@ -3329,6 +3335,22 @@ msgstr "Modifica iscrizione"
 msgid "Key Code"
 msgstr "Codice chiave"
 
+msgid "Reject"
+msgstr "Rifiutare"
+
+msgid "Do you really want to reject this reservation?"
+msgstr "Vuoi davvero rifiutare questa prenotazione?"
+
+#, python-format
+msgid "Rejecting ${title} can't be undone."
+msgstr "Il rifiuto di ${title} non può essere annullato."
+
+msgid "Reject reservation"
+msgstr "Rifiuta prenotazione"
+
+msgid "Adjust"
+msgstr "Regolare"
+
 msgid "Accept all reservations"
 msgstr "Accetta tutte le prenotazioni"
 
@@ -3356,22 +3378,8 @@ msgstr "Rifiuta le prenotazioni"
 msgid "Reject all with message"
 msgstr "Rifiuta tutto con messaggio"
 
-#, python-format
-msgid "Reject ${title}"
-msgstr "Rifiuta ${title}"
-
-msgid "Do you really want to reject this reservation?"
-msgstr "Vuoi davvero rifiutare questa prenotazione?"
-
-#, python-format
-msgid "Rejecting ${title} can't be undone."
-msgstr "Il rifiuto di ${title} non può essere annullato."
-
-msgid "Reject reservation"
-msgstr "Rifiuta prenotazione"
-
-#. Used in sentence: "${event} published."
 #.
+#. Used in sentence: "${event} published."
 msgid "Event"
 msgstr "Evento"
 
@@ -3741,8 +3749,8 @@ msgstr ""
 "Per visualizzare le briciole di pane si può aggiungere ${bc_level} come "
 "parametro all'URL. Il numero definisce l'inizio delle briciole di pane. 1 in "
 "questo caso significa che il primo livello è nascosto. È possibile "
-"utilizzare qualsiasi numero, purché sia inferiore al numero di livelli "
-"delle briciole di pane."
+"utilizzare qualsiasi numero, purché sia inferiore al numero di livelli delle "
+"briciole di pane."
 
 msgid ""
 "Please review your data and press \"Complete\" to finalize the process. If "
@@ -4685,6 +4693,9 @@ msgstr "1 prenotazione rifiutata."
 
 msgid "${count} reservations rejected."
 msgstr "${count} prenotazioni rifiutate."
+
+msgid "1 reservation adjusted:"
+msgstr "1 prenotazione regolata:"
 
 msgid "Registration confirmed."
 msgstr "Iscrizione confermata."
@@ -6420,6 +6431,18 @@ msgstr ""
 
 msgid "Reject all reservations with message"
 msgstr "Rifiuta tutte le prenotazioni con messaggio"
+
+msgid "Adjust reservation"
+msgstr "Regolare la prenotazione"
+
+msgid "One of your reservations was adjusted"
+msgstr "Una delle vostre prenotazioni è stata regolata"
+
+msgid "The reservation was adjusted"
+msgstr "La prenotazione è stata regolata"
+
+msgid "The reservation was left unchanged"
+msgstr "La prenotazione è rimasta invariata"
 
 msgid "Added a new daypass"
 msgstr "Aggiunto un nuovo biglietto giornaliero"

@@ -1,8 +1,111 @@
 # Changes
 
+## 2025.23
+
+`2025-05-19` | [cf50671551...1b0b1f61aa](https://github.com/OneGov/onegov-cloud/compare/cf50671551^...1b0b1f61aa)
+
+### Org
+
+##### Allows adjusting individual reservations within a ticket
+
+For now these adjustments are limited to the same allocation on the same
+day. Eventually we may allow moving reservations to arbitrary free
+allocations as long as the settings on the target allocation allow it.
+
+`Feature` | [OGC-2155](https://linear.app/onegovcloud/issue/OGC-2155) | [1d2870de8c](https://github.com/onegov/onegov-cloud/commit/1d2870de8cc67972c4f29ede5f236a9c2b8f62e2)
+
+### Server
+
+##### Avoids caching partially configured application instances
+
+Since `CachedApplication` was setting `self.instance` before the
+application was configured and the server will continue serving
+subsequent requests after a failed one, it was possible for a
+partially initialized application to end up in the cache, which
+leads to cryptic error messages.
+
+It's better if we fail the same way on every request, so we don't
+get distracted by red herrings.
+
+`Bugfix` | [6ae340b3d9](https://github.com/onegov/onegov-cloud/commit/6ae340b3d94c4b33c18b45dd7f41019db9b2958e)
+
+### Town6
+
+##### Reactivate recipient in cron job if no longer on postmark suppression list
+
+`Feature` | [OGC-2212](https://linear.app/onegovcloud/issue/OGC-2212) | [4688da1d6f](https://github.com/onegov/onegov-cloud/commit/4688da1d6f6924b24f622055f9c072ba7a88a2a9)
+
+## 2025.22
+
+`2025-05-09` | [b1505595a8...71b5a6d944](https://github.com/OneGov/onegov-cloud/compare/b1505595a8^...71b5a6d944)
+
+### Feriennet
+
+##### Swisspass ID is now optional
+
+`Feature` | [OGC-1388](https://linear.app/onegovcloud/issue/OGC-1388) | [49ed887c76](https://github.com/onegov/onegov-cloud/commit/49ed887c76b6b644795f256849eb4fde9d917d69)
+
+### Form
+
+##### Adds generic field for geographic autocompletion.
+
+`Feature` | [OGC-2216](https://linear.app/onegovcloud/issue/OGC-2216) | [cf5e83d511](https://github.com/onegov/onegov-cloud/commit/cf5e83d5112446cfa82e14beaf844a791fd03a06)
+
+### Landsgemeinde
+
+##### Function color
+
+`Feature` | [OGC-1892](https://linear.app/onegovcloud/issue/OGC-1892) | [b1505595a8](https://github.com/onegov/onegov-cloud/commit/b1505595a85da7fe8177237cf023936850f1983d)
+
+##### Spacing between icon and time
+
+`Bugfix` | [OGC-1620](https://linear.app/onegovcloud/issue/OGC-1620) | [aa7807ad63](https://github.com/onegov/onegov-cloud/commit/aa7807ad635a9e84b46f338f90df69d1c8ad07b0)
+
+##### Fix ticker update
+
+`Bugfix` | [OGC-2240](https://linear.app/onegovcloud/issue/OGC-2240) | [6031de92b4](https://github.com/onegov/onegov-cloud/commit/6031de92b45b906f6d3a076e6cca3ae908e522f5)
+
+### Org
+
+##### IFrame Information
+
+`Feature` | [OGC-2175](https://linear.app/onegovcloud/issue/OGC-2175) | [0a11978dbd](https://github.com/onegov/onegov-cloud/commit/0a11978dbd8c07a9ba9461cf1b8acf3be05713ce)
+
+##### User Information
+
+Show additional user information
+
+`Feature` | [OGC-2147](https://linear.app/onegovcloud/issue/OGC-2147) | [d6620b16b4](https://github.com/onegov/onegov-cloud/commit/d6620b16b4c67efd4b53311f0c6b850b03779268)
+
+##### Add retry mechanism for postmark api calls on email bounce statistics cron job
+
+`Feature` | [NONE](#NONE) | [a053a278f3](https://github.com/onegov/onegov-cloud/commit/a053a278f391d66d96da7c4a564db5bbdb263812)
+
+##### People and Documents in Sidebar
+
+`Bugfix` | [OGC-2142](https://linear.app/onegovcloud/issue/OGC-2142) | [e14af7a359](https://github.com/onegov/onegov-cloud/commit/e14af7a3597b5eb99694220f6fc97316796ea220)
+
+### Ruff
+
+##### Enables `ASYNC` and `LOG` as well as a couple of additional rules
+
+Refactors capturing of exceptions and re-emitting them as `APIException`
+
+`Other` | [e66369e960](https://github.com/onegov/onegov-cloud/commit/e66369e960e02e11da70cedd95b4feae16d21d9d)
+
+### Town6
+
+##### Skip form if there are no form fields in reservation
+
+`Feature` | [OGC-2211](https://linear.app/onegovcloud/issue/OGC-2211) | [c33ffc11c2](https://github.com/onegov/onegov-cloud/commit/c33ffc11c2ed8c7130a2a3065e020ebe77218814)
+
+##### Copy event button
+
+`Feature` | [OGC-1900](https://linear.app/onegovcloud/issue/OGC-1900) | [a7e570ede0](https://github.com/onegov/onegov-cloud/commit/a7e570ede065c6f56b7e25fa3cb3a5b867fe68d9)
+
 ## 2025.21
 
-`2025-04-24` | [6864d7cf50...8268dfadff](https://github.com/OneGov/onegov-cloud/compare/6864d7cf50^...8268dfadff)
+`2025-04-24` | [6864d7cf50...8b0cd01cc9](https://github.com/OneGov/onegov-cloud/compare/6864d7cf50^...8b0cd01cc9)
 
 ### Org
 
@@ -2046,61 +2149,4 @@ Translator's last name always in uppercase.
 ##### Adds Auth view for TOTP second factor
 
 `Feature` | [OGC-1413](https://linear.app/onegovcloud/issue/OGC-1413) | [91a94ceca0](https://github.com/onegov/onegov-cloud/commit/91a94ceca07fc8c181203c7f8939ef1e66506650)
-
-## 2024.42
-
-`2024-08-01` | [ef924060e7...b77c4e79b4](https://github.com/OneGov/onegov-cloud/compare/ef924060e7^...b77c4e79b4)
-
-### Org
-
-##### Avoids emitting a misleading warning for logged in users
-
-`Bugfix` | [715091e1c0](https://github.com/onegov/onegov-cloud/commit/715091e1c08e3efb7258a914fac3b0e315780ad5)
-
-### Translator
-
-##### Make agency references field optional
-
-`Feature` | [OGC-1753](https://linear.app/onegovcloud/issue/OGC-1753) | [ef924060e7](https://github.com/onegov/onegov-cloud/commit/ef924060e772d7d26f25518fc15ae5089941b123)
-
-##### Adjust admission course text
-
-`Feature` | [OGC-1760](https://linear.app/onegovcloud/issue/OGC-1760) | [25e2827d45](https://github.com/onegov/onegov-cloud/commit/25e2827d45ce9bde965516cae99847cbe571c355)
-
-## 2024.41
-
-`2024-07-26` | [6e7f24b857...f03c817189](https://github.com/OneGov/onegov-cloud/compare/6e7f24b857^...f03c817189)
-
-### Directories
-
-##### Adjust string field rendering to prevent many newlines
-
-`Bugfix` | [OGC-1746](https://linear.app/onegovcloud/issue/OGC-1746) | [2463c194fa](https://github.com/onegov/onegov-cloud/commit/2463c194fabbd4e80fbff1dcee88313d824747df)
-
-### Feriennet
-
-##### Import bank statements now supports 27 character reference number in booking text (POFI)
-
-Also we do not break the import if one entry fails
-
-`Bugfix` | [OGC-1295](https://linear.app/onegovcloud/issue/OGC-1295) | [bd4e30ab0f](https://github.com/onegov/onegov-cloud/commit/bd4e30ab0f3f7ca705b2b1ef53e9b3ce46f5e216)
-
-### News
-
-##### Swap interchanged links for RSS feed and newsletter subscription
-
-`Bugfix` | [OGC-1763](https://linear.app/onegovcloud/issue/OGC-1763) | [e49eeb29b2](https://github.com/onegov/onegov-cloud/commit/e49eeb29b2800ba9113182668f290b5a2dd3b459)
-
-### Org
-
-##### Adds mTAN as a second factor option
-
-This second factor can be configured to be automatically set up after
-the first login of a user without a configured second factor.
-
-`Feature` | [OGC-1030](https://linear.app/onegovcloud/issue/OGC-1030) | [b3d87a0208](https://github.com/onegov/onegov-cloud/commit/b3d87a0208c8600f1fe041091a47997344289885)
-
-##### Adds TOTP as a second factor option
-
-`Feature` | [SEA-1413](https://linear.app/seantis/issue/SEA-1413) | [049160d61a](https://github.com/onegov/onegov-cloud/commit/049160d61a6ebd06902672e970a717d2ada07a9f)
 

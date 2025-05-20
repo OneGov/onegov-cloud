@@ -837,6 +837,9 @@ msgstr "Herunterladen"
 msgid "Export Excel (from filter)"
 msgstr "Excel Export (mit Filter)"
 
+msgid "Hidden only"
+msgstr "Nur versteckte anzeigen"
+
 #~ msgid ""
 #~ "In order for your application for inclusion in the directory to be "
 #~ "processed, a complete application must be submitted. This includes the "

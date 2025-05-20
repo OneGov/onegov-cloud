@@ -528,6 +528,8 @@ class ReservationHandler(Handler):
         parts.append(
             render_macro(layout.macros['reservations'], request, {
                 'reservations': self.reservations,
+                'get_links': self.get_reservation_links
+                if self.ticket.state == 'pending' else None,
                 'layout': layout
             })
         )
@@ -568,6 +570,59 @@ class ReservationHandler(Handler):
             )
 
         return Markup('').join(parts)
+
+    def get_reservation_links(
+        self,
+        reservation: Reservation,
+        request: OrgRequest
+    ) -> list[Link]:
+
+        links: list[Link] = []
+
+        url_obj = URL(request.link(self.ticket, 'reject-reservation'))
+        url_obj = url_obj.query_param(
+            'reservation-id', str(reservation.id))
+        url = url_obj.as_string()
+
+        title = self.get_reservation_title(reservation)
+        links.append(Link(
+            text=_('Reject'),
+            url=url,
+            attrs={'class': 'delete-link'},
+            traits=(
+                Confirm(
+                    _('Do you really want to reject this reservation?'),
+                    _("Rejecting ${title} can't be undone.", mapping={
+                        'title': title
+                    }),
+                    _('Reject reservation'),
+                    _('Cancel')
+                ),
+                Intercooler(
+                    request_method='GET',
+                    redirect_after=request.url
+                )
+            )
+        ))
+
+        # is the reservation adjustable?
+        if reservation.target_type == 'allocation' and request.session.query(
+            reservation
+            ._target_allocations()
+            .filter(Allocation.partly_available.is_(True))
+            .exists()
+        ).scalar():
+            url_obj = URL(request.link(self.ticket, 'adjust-reservation'))
+            url_obj = url_obj.query_param(
+                'reservation-id', str(reservation.id))
+            url = url_obj.as_string()
+            links.append(Link(
+                text=_('Adjust'),
+                url=url,
+                attrs={'class': 'edit-link'}
+            ))
+
+        return links
 
     def get_links(  # type:ignore[override]
         self,
@@ -643,33 +698,6 @@ class ReservationHandler(Handler):
             url=request.link(self.ticket, 'reject-reservation-with-message'),
             attrs={'class': 'delete-link'},
         ))
-
-        for reservation in self.reservations:
-            url_obj = URL(request.link(self.ticket, 'reject-reservation'))
-            url_obj = url_obj.query_param(
-                'reservation-id', str(reservation.id))
-            url = url_obj.as_string()
-
-            title = self.get_reservation_title(reservation)
-            advanced_links.append(Link(
-                text=_('Reject ${title}', mapping={'title': title}),
-                url=url,
-                attrs={'class': 'delete-link'},
-                traits=(
-                    Confirm(
-                        _('Do you really want to reject this reservation?'),
-                        _("Rejecting ${title} can't be undone.", mapping={
-                            'title': title
-                        }),
-                        _('Reject reservation'),
-                        _('Cancel')
-                    ),
-                    Intercooler(
-                        request_method='GET',
-                        redirect_after=request.url
-                    )
-                )
-            ))
 
         links.append(LinkGroup(
             _('Advanced'),

@@ -40,7 +40,8 @@ def get_translator(
         'guilds': [str],
         'interpret_types': [str],
         'admissions': [str],
-        'genders': [str]
+        'genders': [str],
+        'include_hidden': bool
     }
 )
 def get_translators(
@@ -55,7 +56,8 @@ def get_translators(
     guilds: list[str] | None = None,
     interpret_types: list[str] | None = None,
     admissions: list[str] | None = None,
-    genders: list[str] | None = None
+    genders: list[str] | None = None,
+    include_hidden: bool | None = None
 ) -> TranslatorCollection:
 
     user = request.current_user
@@ -72,7 +74,8 @@ def get_translators(
         guilds=guilds,
         interpret_types=interpret_types,
         admissions=admissions,
-        genders=genders
+        genders=genders,
+        include_hidden=include_hidden if include_hidden is not None else False
     )
 
 
