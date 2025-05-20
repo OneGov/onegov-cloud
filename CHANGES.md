@@ -1,8 +1,43 @@
 # Changes
 
+## 2025.23
+
+`2025-05-19` | [cf50671551...1b0b1f61aa](https://github.com/OneGov/onegov-cloud/compare/cf50671551^...1b0b1f61aa)
+
+### Org
+
+##### Allows adjusting individual reservations within a ticket
+
+For now these adjustments are limited to the same allocation on the same
+day. Eventually we may allow moving reservations to arbitrary free
+allocations as long as the settings on the target allocation allow it.
+
+`Feature` | [OGC-2155](https://linear.app/onegovcloud/issue/OGC-2155) | [1d2870de8c](https://github.com/onegov/onegov-cloud/commit/1d2870de8cc67972c4f29ede5f236a9c2b8f62e2)
+
+### Server
+
+##### Avoids caching partially configured application instances
+
+Since `CachedApplication` was setting `self.instance` before the
+application was configured and the server will continue serving
+subsequent requests after a failed one, it was possible for a
+partially initialized application to end up in the cache, which
+leads to cryptic error messages.
+
+It's better if we fail the same way on every request, so we don't
+get distracted by red herrings.
+
+`Bugfix` | [6ae340b3d9](https://github.com/onegov/onegov-cloud/commit/6ae340b3d94c4b33c18b45dd7f41019db9b2958e)
+
+### Town6
+
+##### Reactivate recipient in cron job if no longer on postmark suppression list
+
+`Feature` | [OGC-2212](https://linear.app/onegovcloud/issue/OGC-2212) | [4688da1d6f](https://github.com/onegov/onegov-cloud/commit/4688da1d6f6924b24f622055f9c072ba7a88a2a9)
+
 ## 2025.22
 
-`2025-05-09` | [b1505595a8...2e8cbe53fc](https://github.com/OneGov/onegov-cloud/compare/b1505595a8^...2e8cbe53fc)
+`2025-05-09` | [b1505595a8...71b5a6d944](https://github.com/OneGov/onegov-cloud/compare/b1505595a8^...71b5a6d944)
 
 ### Feriennet
 
@@ -2114,24 +2149,4 @@ Translator's last name always in uppercase.
 ##### Adds Auth view for TOTP second factor
 
 `Feature` | [OGC-1413](https://linear.app/onegovcloud/issue/OGC-1413) | [91a94ceca0](https://github.com/onegov/onegov-cloud/commit/91a94ceca07fc8c181203c7f8939ef1e66506650)
-
-## 2024.42
-
-`2024-08-01` | [ef924060e7...b77c4e79b4](https://github.com/OneGov/onegov-cloud/compare/ef924060e7^...b77c4e79b4)
-
-### Org
-
-##### Avoids emitting a misleading warning for logged in users
-
-`Bugfix` | [715091e1c0](https://github.com/onegov/onegov-cloud/commit/715091e1c08e3efb7258a914fac3b0e315780ad5)
-
-### Translator
-
-##### Make agency references field optional
-
-`Feature` | [OGC-1753](https://linear.app/onegovcloud/issue/OGC-1753) | [ef924060e7](https://github.com/onegov/onegov-cloud/commit/ef924060e772d7d26f25518fc15ae5089941b123)
-
-##### Adjust admission course text
-
-`Feature` | [OGC-1760](https://linear.app/onegovcloud/issue/OGC-1760) | [25e2827d45](https://github.com/onegov/onegov-cloud/commit/25e2827d45ce9bde965516cae99847cbe571c355)
 

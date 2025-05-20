@@ -1220,6 +1220,135 @@ def test_reserve_allocation_partially(client):
 
 
 @freeze_time("2015-08-28", tick=True)
+def test_reserve_allocation_adjustment_pre_acceptance(client):
+    # prepate the required data
+    resources = ResourceCollection(client.app.libres_context)
+    resource = resources.by_name('tageskarte')
+    scheduler = resource.get_scheduler(client.app.libres_context)
+
+    allocations = scheduler.allocate(
+        dates=(datetime(2015, 8, 28, 10), datetime(2015, 8, 28, 14)),
+        whole_day=False,
+        partly_available=True
+    )
+
+    reserve = client.bound_reserve(allocations[0])
+    transaction.commit()
+
+    # create a reservation
+    assert reserve('10:00', '12:00').json == {'success': True}
+
+    # fill out the form
+    formular = client.get('/resource/tageskarte/form')
+    formular.form['email'] = 'info@example.org'
+
+    ticket = formular.form.submit().follow().form.submit().follow()
+
+    assert 'RSV-' in ticket.text
+    assert len(os.listdir(client.app.maildir)) == 1
+
+    # open the created ticket
+    client.login_admin()
+
+    ticket = client.get('/tickets/ALL/open').click('Annehmen').follow()
+
+    assert "info@example.org" in ticket
+    assert "10:00" in ticket
+    assert "12:00" in ticket
+    assert "Anpassen" in ticket
+
+    # try an invalid adjustment
+    adjust = ticket.click('Anpassen', index=0)
+    adjust.form['start_time'] = '09:00'
+    adjust = adjust.form.submit()
+    assert 'Zeitraum liegt ausserhalb' in adjust
+
+    # adjust it (valid this time)
+    adjust.form['start_time'] = '10:00'
+    adjust.form['end_time'] = '11:00'
+    ticket = adjust.form.submit().follow()
+    assert "10:00" in ticket
+    assert "11:00" in ticket
+
+    # accept it
+    ticket = ticket.click('Alle Reservationen annehmen').follow()
+
+    message = client.get_email(1)['TextBody']
+    assert "Tageskarte" in message
+    assert "28. August 2015" in message
+    assert "10:00" in message
+    assert "11:00" in message
+
+    # see if the slots are partitioned correctly
+    url = '/resource/tageskarte/slots?start=2015-08-01&end=2015-08-30'
+    slots = client.get(url).json
+    assert slots[0]['partitions'] == [[25.0, True], [75.0, False]]
+
+
+@freeze_time("2015-08-28", tick=True)
+def test_reserve_allocation_adjustment_post_acceptance(client):
+    # prepate the required data
+    resources = ResourceCollection(client.app.libres_context)
+    resource = resources.by_name('tageskarte')
+    scheduler = resource.get_scheduler(client.app.libres_context)
+
+    allocations = scheduler.allocate(
+        dates=(datetime(2015, 8, 28, 10), datetime(2015, 8, 28, 14)),
+        whole_day=False,
+        partly_available=True
+    )
+
+    reserve = client.bound_reserve(allocations[0])
+    transaction.commit()
+
+    # create a reservation
+    assert reserve('10:00', '12:00').json == {'success': True}
+
+    # fill out the form
+    formular = client.get('/resource/tageskarte/form')
+    formular.form['email'] = 'info@example.org'
+
+    ticket = formular.form.submit().follow().form.submit().follow()
+
+    assert 'RSV-' in ticket.text
+    assert len(os.listdir(client.app.maildir)) == 1
+
+    # open the created ticket
+    client.login_admin()
+
+    ticket = client.get('/tickets/ALL/open').click('Annehmen').follow()
+
+    assert "info@example.org" in ticket
+    assert "10:00" in ticket
+    assert "12:00" in ticket
+    assert "Anpassen" in ticket
+
+    # accept it
+    ticket = ticket.click('Alle Reservationen annehmen').follow()
+
+    # adjust it
+    adjust = ticket.click('Anpassen', index=0)
+    adjust.form['end_time'] = '11:00'
+    ticket = adjust.form.submit().follow()
+    assert "10:00" in ticket
+    assert "11:00" in ticket
+
+    # the mail went out before so it still shows the old time
+    # TODO: Do we send a notification in this case or do we rely
+    #       on supporters to do that?
+    message = client.get_email(1)['TextBody']
+    assert "Tageskarte" in message
+    assert "28. August 2015" in message
+    assert "10:00" in message
+    assert "12:00" in message
+
+    # see if the slots are partitioned correctly
+    url = '/resource/tageskarte/slots?start=2015-08-01&end=2015-08-30'
+    slots = client.get(url).json
+    assert slots[0]['partitions'] == [[25.0, True], [75.0, False]]
+
+
+@freeze_time("2015-08-28", tick=True)
 def test_reserve_no_definition_pick_up_hint(client):
     # prepate the required data
     resources = ResourceCollection(client.app.libres_context)

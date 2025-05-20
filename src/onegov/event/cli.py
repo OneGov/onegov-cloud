@@ -531,7 +531,7 @@ def import_guidle(
 
             added, updated, purged = collection.from_import(
                 items(unknown_tags),
-                prefix
+                [prefix]
             )
 
             if unknown_tags:
