@@ -20,6 +20,7 @@ from unidecode import unidecode
 
 from sqlalchemy.orm.exc import ObjectDeletedError
 
+from onegov.core.orm.mixins import UTCPublicationMixin
 from onegov.core.utils import hash_dictionary, is_non_string_iterable
 from onegov.search import index_log, log, Searchable, utils
 from onegov.search.errors import SearchOfflineError
@@ -432,6 +433,10 @@ class PostgresIndexer(IndexerBase):
                     '_owner_id_str':
                         _owner_id if isinstance(_owner_id, str) else None,
                     '_owner_type': _owner_type,
+                    '_publication_start':
+                        task.get('publication_start', None),
+                    '_publication_end':
+                        task.get('publication_end', None),
                     **{f'_{k}': v for k, v in data.items()}
                 })
 
@@ -469,6 +474,10 @@ class PostgresIndexer(IndexerBase):
                             sqlalchemy.bindparam('_owner_id_str'),
                         SearchIndex.__table__.c.owner_type:
                             sqlalchemy.bindparam('_owner_type'),
+                        SearchIndex.__table__.c.publication_start:
+                            sqlalchemy.bindparam('_publication_start'),
+                        SearchIndex.__table__.c.publication_end:
+                            sqlalchemy.bindparam('_publication_end'),
                         SearchIndex.__table__.c.fts_idx_data:
                             sqlalchemy.bindparam('_data', type_=JSONB),
                         SearchIndex.__table__.c.fts_idx: combined_vector,
@@ -1066,6 +1075,13 @@ class ORMEventTranslator:
                     translation['properties'][prop] = [convert(v) for v in raw]
                 else:
                     translation['properties'][prop] = convert(raw)
+
+            # adds publication dates if available
+            if hasattr(obj, 'publication_start') and obj.publication_start:
+                translation['publication_start'] = obj.publication_start
+
+            if hasattr(obj, 'publication_end') and obj.publication_end:
+                translation['publication_end'] = obj.publication_end
 
             # adds access to properties if available
             if hasattr(obj, 'access'):

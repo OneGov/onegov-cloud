@@ -4,11 +4,11 @@ from sqlalchemy import Column, Integer, String
 from sqlalchemy.dialects.postgresql import JSONB, TSVECTOR
 
 from onegov.core.orm import Base
+from onegov.core.orm.mixins import UTCPublicationMixin
 from onegov.core.orm.types import UUID
 
 
-class SearchIndex(Base):
-    """Full Text Search Index (fts) for all searchable models and entries.
+class SearchIndex(Base, UTCPublicationMixin):
 
     This table contains fullt text search (fts) index information for all
     searchable models, including the owner of the index, the type of the
