@@ -218,27 +218,32 @@ class AgencyLayout(
             if self.model.deletable(self.request):
                 def get_all_children_titles_json(
                         agency: ExtendedAgency) -> list[dict[str, Any]]:
-                    result = []
-                    for child in agency.children:
-                        result.append({
+                    return [
+                        {
                             'title': child.title,
                             'children': get_all_children_titles_json(child)
-                        })
-                    return result
+                        }
+                        for child in agency.children
+                    ]
 
                 def get_all_children_titles(agency: ExtendedAgency) -> str:
                     return json.dumps(get_all_children_titles_json(agency))
+                children = get_all_children_titles(self.model)
+                if children != '[]':
+                    confirm_text = _('This cannot be undone. Following '
+                        'agencies will be deleted as well:')
+                else:
+                    confirm_text = _('This cannot be undone.')
 
                 delete_traits: Sequence[Trait] = (
                     Confirm(
                         _('Do you really want to delete this agency?'),
-                        _('This cannot be undone. Following agencies will be '
-                            'deleted as well:'),
+                        confirm_text,
                         _('Delete agency'),
                         _('Cancel'),
                         get_all_children_titles(self.model),
                         _('Please scroll to the bottom to enable the confirm '
-                          'button')
+                          'button.')
                     ),
                     Intercooler(
                         request_method='DELETE',

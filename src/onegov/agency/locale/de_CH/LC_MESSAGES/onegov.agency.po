@@ -278,10 +278,10 @@ msgstr ""
 msgid "Delete agency"
 msgstr "Organisation löschen"
 
-msgid "Please scroll to the bottom to enable the confirm button"
+msgid "Please scroll to the bottom to enable the confirm button."
 msgstr ""
 "Bitte scrollen Sie bis zum Ende der Liste, um den Bestätigungsbutton zu "
-"aktivieren"
+"aktivieren."
 
 msgid "Agency with memberships or suborganizations can't be deleted"
 msgstr "Organisationen mit Mitgliedschaften können nicht gelöscht werden"

@@ -24,33 +24,69 @@
 var Confirmation = React.createClass({
     getInitialState: function() {
         return {
-            hasScrolledToBottom: false
+            hasScrolledToBottom: false,
+            listNeedsScrolling: false,
+            mounted: false
         };
     },
 
     componentDidMount: function() {
-        // Check if the confirm-list exists and needs scroll tracking
-        var confirmList = $(ReactDOM.findDOMNode(this)).find('.confirm-list');
-        if (confirmList.length && confirmList.prop('scrollHeight') > confirmList.height()) {
-            // Only activate scroll checking if there's enough content to scroll
-            console.log(confirmList.prop('scrollHeight'), confirmList.height());
-            confirmList.on('scroll', this.checkScrollPosition);
+        this.setState({ mounted: true });
 
-            // Set initial button state
-            this.setState({ hasScrolledToBottom: false });
+        $(document).on('opened.fndtn.reveal', '[data-reveal]', this.checkScrollableContentOnReveal);
 
-            // Apply styled class to indicate scrolling is required
-            confirmList.addClass('requires-scroll');
-        } else {
-            // If there's not enough content to scroll, enable the button immediately
-            this.setState({ hasScrolledToBottom: true });
-        }
+        setTimeout(() => {
+            if (this.isMounted()) {
+                this.checkScrollableContent();
+            }
+        }, 200);
     },
 
     componentWillUnmount: function() {
-        // Clean up scroll event listener
         var confirmList = $(ReactDOM.findDOMNode(this)).find('.confirm-list');
         confirmList.off('scroll', this.checkScrollPosition);
+        $(document).off('opened.fndtn.reveal', this.checkScrollableContentOnReveal);
+    },
+
+    checkScrollableContentOnReveal: function(event) {
+        var currentModal = $(ReactDOM.findDOMNode(this));
+        if ($(event.target).is(currentModal)) {
+            setTimeout(() => {
+                if (this.isMounted()) {
+                    this.checkScrollableContent();
+                }
+            }, 50);
+        }
+    },
+
+    checkScrollableContent: function() {
+        var confirmList = $(ReactDOM.findDOMNode(this)).find('.confirm-list');
+        if (confirmList.length) {
+            confirmList[0].getBoundingClientRect();
+
+            var scrollHeight = confirmList[0].scrollHeight;
+            var clientHeight = confirmList[0].clientHeight;
+
+            var needsScrolling = scrollHeight > clientHeight + 5;
+
+            this.setState({
+                listNeedsScrolling: needsScrolling,
+                hasScrolledToBottom: !needsScrolling
+            });
+
+            if (needsScrolling) {
+                confirmList.off('scroll').on('scroll', this.checkScrollPosition);
+                confirmList.addClass('requires-scroll');
+            } else {
+                confirmList.off('scroll');
+                confirmList.removeClass('requires-scroll');
+            }
+        } else {
+            this.setState({
+                hasScrolledToBottom: true,
+                listNeedsScrolling: false
+            });
+        }
     },
 
     checkScrollPosition: function(e) {
@@ -60,7 +96,6 @@ var Confirmation = React.createClass({
         var isAtBottom =
             Math.abs((list.scrollHeight - list.scrollTop) - list.clientHeight) < 5;
 
-        // Only update state if it changed
         if (isAtBottom !== this.state.hasScrolledToBottom) {
             this.setState({ hasScrolledToBottom: isAtBottom });
         }
@@ -72,23 +107,25 @@ var Confirmation = React.createClass({
                 <h2>{this.props.question}</h2>
                 <p className="full-text-width">{this.props.extra}</p>
                 {this.props.items &&
-                <div className="confirm-list" style={{
-                    border: this.state.hasScrolledToBottom ? '1px solid #ccc' : '1px solid #ffa500'
-                }}>
-                    {this.props.items}
-                </div>
+                    <div className="confirm-list" style={{
+                        border: (this.state.listNeedsScrolling && !this.state.hasScrolledToBottom) ?
+                            '1px solid #8e1c26' : '1px solid #ccc',
+                        display: 'block',
+                        visibility: 'visible'
+                    }}>
+                        {this.props.items}
+                    </div>
                 }
-                {!this.state.hasScrolledToBottom &&
-                    <p className="scroll-hint full-text-width" style={{ color: '#ffa500', fontSize: '0.875rem' }}>
+                {(this.state.listNeedsScrolling && !this.state.hasScrolledToBottom) &&
+                    <p className="scroll-hint full-text-width">
                         {this.props.scrollHint}
                     </p>
                 }
                 <a tabIndex="2" className="button secondary no">
                     {this.props.no}
                 </a>
-                <a tabIndex="1" className={this.state.hasScrolledToBottom ?
-                    "button alert yes" : "button alert yes disabled"}
-                   style={{ opacity: this.state.hasScrolledToBottom ? 1 : 0.6 }}>
+                <a tabIndex="1" className={!this.state.listNeedsScrolling || this.state.hasScrolledToBottom ?
+                    "button alert yes" : "button alert yes disabled"}>
                     {this.props.yes}
                 </a>
             </div>
@@ -210,12 +247,7 @@ $(document).on('opened.fndtn.reveal', '[data-reveal]', function() {
     var modal = $(this);
     _.defer(function() {
         var yesButton = modal.find('a.yes');
-        if (!yesButton.hasClass('disabled')) {
-            yesButton.focus();
-        } else {
-            // Focus on the scrollable area instead if the yes button is disabled
-            modal.find('.confirm-list').focus();
-        }
+        yesButton.focus();
     });
 });
 
