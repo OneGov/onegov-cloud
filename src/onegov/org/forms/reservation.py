@@ -5,8 +5,14 @@ from functools import cached_property
 from uuid import UUID
 from wtforms.fields import DateField
 from wtforms.fields import EmailField
+from wtforms.fields import IntegerField
 from wtforms.fields import RadioField
-from wtforms.validators import DataRequired, Email, InputRequired
+from wtforms.fields import StringField
+from wtforms.validators import DataRequired
+from wtforms.validators import Email
+from wtforms.validators import InputRequired
+from wtforms.validators import NumberRange
+from wtforms.validators import Regexp
 
 from onegov.core.csv import convert_list_of_list_of_dicts_to_xlsx
 from onegov.core.custom import json
@@ -14,6 +20,7 @@ from onegov.form import Form
 from onegov.form.fields import (
     ChosenSelectField, DurationField, MultiCheckboxField, TimeField)
 from onegov.org import _
+from onegov.org.forms.util import KABA_CODE_RE
 from onegov.org.forms.util import WEEKDAYS
 
 
@@ -110,6 +117,41 @@ class ReservationAdjustmentForm(Form):
         description=_('HH:MM'),
         validators=[InputRequired()],
         fieldset=_('Time'),
+    )
+
+
+class KabaEditForm(Form):
+
+    key_code = StringField(
+        label=_('Key Code'),
+        validators=[
+            InputRequired(),
+            Regexp(
+                KABA_CODE_RE,
+                message=_(
+                    'Invalid Kaba Code. '
+                    'Needs to be a 4 to 6 digit number code.'
+                )
+            )
+        ],
+    )
+
+    key_code_lead_time = IntegerField(
+        label=_('Lead Time'),
+        validators=[InputRequired(), NumberRange(0, 1440)],
+        render_kw={
+            'step': 5,
+            'long_description': _('In minutes'),
+        },
+    )
+
+    key_code_lag_time = IntegerField(
+        label=_('Lag Time'),
+        validators=[InputRequired(), NumberRange(0, 1440)],
+        render_kw={
+            'step': 5,
+            'long_description': _('In minutes'),
+        },
     )
 
 

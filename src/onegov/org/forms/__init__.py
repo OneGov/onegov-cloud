@@ -22,6 +22,7 @@ from onegov.org.forms.newsletter import NewsletterTestForm
 from onegov.org.forms.page import LinkForm, PageForm, IframeForm
 from onegov.org.forms.person import PersonForm
 from onegov.org.forms.reservation import FindYourSpotForm
+from onegov.org.forms.reservation import KabaEditForm
 from onegov.org.forms.reservation import ReservationAdjustmentForm
 from onegov.org.forms.reservation import ReservationForm
 from onegov.org.forms.resource import ResourceCleanupForm
@@ -72,6 +73,7 @@ __all__ = (
     'ImageSetForm',
     'InternalTicketChatMessageForm',
     'ExtendedInternalTicketChatMessageForm',
+    'KabaEditForm',
     'LinkForm',
     'ManageUserForm',
     'ManageUserGroupForm',
