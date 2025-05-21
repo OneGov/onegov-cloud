@@ -423,6 +423,40 @@ def test_parse_checkbox_with_pricing():
     assert form.extras.pricing.rules['Bacon'].credit_card_payment is True
 
 
+def test_parse_radio_with_discount():
+
+    text = dedent("""
+        Drink =
+            ( ) Coffee (5%)
+            (x) Tea (15%)
+        << beer cant be cheaper than water >>
+    """)
+
+    form = parse_form(text)()
+    assert form.drink.discount == {
+        'Coffee': Decimal('0.05'),
+        'Tea': Decimal('0.15')
+    }
+    assert form.drink.description == 'beer cant be cheaper than water'
+    assert form.total_discount() == Decimal('0.15')
+
+
+def test_parse_checkbox_with_discount():
+
+    text = dedent("""
+        Extras =
+            [x] Bacon (-25%)
+            [x] Cheese (75%)
+    """)
+
+    form = parse_form(text)()
+    assert form.extras.discount == {
+        'Bacon': Decimal('-0.25'),
+        'Cheese': Decimal('0.75')
+    }
+    assert form.total_discount() == Decimal('0.5')
+
+
 def test_dependent_validation():
 
     text = dedent("""

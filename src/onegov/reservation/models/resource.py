@@ -252,7 +252,8 @@ class Resource(ORMBase, ModelBase, ContentMixin,
     def price_of_reservation(
         self,
         token: uuid.UUID,
-        extra: Price | None = None
+        extra: Price | None = None,
+        discount: Decimal | None = None,
     ) -> Price:
 
         # FIXME: libres is very laissez faire with the polymorphic
@@ -291,6 +292,9 @@ class Resource(ORMBase, ModelBase, ContentMixin,
         prices = (price for r in reservations_iter if (price := r.price(self)))
 
         total += sum(prices, Price.zero())
+
+        if discount and total:
+            total = total.apply_discount(discount)
 
         if extra and total:
             total += extra

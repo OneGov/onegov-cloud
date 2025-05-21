@@ -183,7 +183,8 @@ class Form(BaseForm):
         preprocessors = [
             self.process_fieldset(),
             self.process_depends_on(),
-            self.process_pricing()
+            self.process_pricing(),
+            self.process_discount(),
         ]
 
         for processor in preprocessors:
@@ -368,6 +369,35 @@ class Form(BaseForm):
         for field_id, pricing in pricings.items():
             self._fields[field_id].pricing = pricing
 
+    def process_discount(self) -> Iterator[None]:
+        """ Processes the discount parameter on the fields, which adds the
+        ability to have fields associated with a proportional discount.
+
+        See :class:`Form` for more information.
+
+        """
+
+        discounts: dict[str, dict[str, Decimal]] = {}
+
+        # move the pricing rule to the field class (happens once per class)
+        for field_id, field in self._unbound_fields:
+            if not hasattr(field, 'discount'):
+                field.discount = field.kwargs.pop('discount', None)
+
+        # prepare the pricing rules
+        for field_id, field in self._unbound_fields:
+            if field.discount:
+                discounts[field_id] = {
+                    key: Decimal(value)
+                    for key, value in field.discount.items()
+                }
+
+        yield
+
+        # attach the pricing rules to the field instances
+        for field_id, discount in discounts.items():
+            self._fields[field_id].discount = discount
+
     def render_display(self, field: Field) -> Markup | None:
         """ Renders the given field for display (no input). May be overwritten
         by descendants to return different html, or to return None.
@@ -454,6 +484,46 @@ class Form(BaseForm):
                 for field_id, price in prices
             )
         )
+
+    def total_discount(self) -> Decimal | None:
+        """ Returns the discounts of all selected items.
+
+        The discount is returned as a multiplier between `-Inf` and `1`.
+        Discounts above `1` are clamped to `1`, since we can't discount
+        more than 100% of the price.
+
+        Negative discounts are allowed, but are generally discouraged.
+
+        This discount will not be automatically be applied to the price
+        of this form, since there may be external factors increasing the
+        price of your submission. Also the discount may not apply to
+        the options selected in the form.
+        """
+
+        discounts = []
+
+        for field_id, field in self._fields.items():
+            if not hasattr(field, 'discount') or not field.discount:
+                continue
+
+            if not self.is_visible_through_dependencies(field_id):
+                continue
+
+            values = field.data
+            if not isinstance(values, list):
+                values = [values]
+
+            for value in values:
+                discount = field.discount.get(value)
+
+                if discount:
+                    discounts.append(discount)
+
+        total = sum(discounts)
+        if not total:
+            return None
+
+        return min(total, Decimal('1'))
 
     def submitted(self, request: CoreRequest) -> bool:
         """ Returns true if the given request is a successful post request. """

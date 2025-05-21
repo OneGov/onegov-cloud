@@ -528,8 +528,15 @@ def confirm_reservation(
 
     if submission:
         form = request.get_form(submission.form_class, data=submission.data)
+        extra_price = form.total()
+        discount = form.total_discount()
+        # TODO: We may want to add an option for whether or not the discount
+        #       should apply to extras or not. For now the discount doesn't
+        #       apply to extras.
     else:
         form = None
+        extra_price = None
+        discount = None
 
     layout = layout or ReservationLayout(self, request)
     layout.breadcrumbs.append(Link(_('Confirm'), '#'))
@@ -546,7 +553,8 @@ def confirm_reservation(
 
     price = request.app.adjust_price(self.price_of_reservation(
         token,
-        submission.form_obj.total() if submission else None
+        extra_price,
+        discount,
     ))
 
     assert request.locale is not None
@@ -607,9 +615,21 @@ def finalize_reservation(self: Resource, request: OrgRequest) -> Response:
 
     try:
         payment_token = provider.get_token(request) if provider else None
+        # TODO: We may want to add an option for whether or not the discount
+        #       should apply to extras or not. For now the discount doesn't
+        #       apply to extras.
+        if submission:
+            _form_obj = submission.form_obj
+            extra_price = _form_obj.total()
+            discount = _form_obj.total_discount()
+        else:
+            extra_price = None
+            discount = None
+
         price = request.app.adjust_price(self.price_of_reservation(
             token,
-            submission.form_obj.total() if submission else None
+            extra_price,
+            discount,
         ))
 
         payment = self.process_payment(price, provider, payment_token)

@@ -35,3 +35,28 @@ def test_add_price_currency():
     assert Price(10, None) + Price(20, 'CHF') == Price(30, 'CHF')
     with pytest.raises(AssertionError):
         assert Price(10, None) + Price(20, None) == Price(30, 'CHF')
+
+
+def test_apply_discount():
+    price = Price(100, 'CHF')
+    assert price.apply_discount(Decimal(1)) == Price(0, 'CHF')
+    assert price.apply_discount(Decimal(.75)) == Price(25, 'CHF')
+    assert price.apply_discount(Decimal(.5)) == Price(50, 'CHF')
+    assert price.apply_discount(Decimal(.25)) == Price(75, 'CHF')
+    assert price.apply_discount(Decimal('.1')) == Price(90, 'CHF')
+    assert price.apply_discount(Decimal(-1)) == Price(200, 'CHF')
+    assert price.apply_discount(Decimal(-.5)) == Price(150, 'CHF')
+    assert price.apply_discount(Decimal(-5)) == Price(600, 'CHF')
+
+    # discounts above 100% are not allowed, since it would lead
+    # to negative prices
+    with pytest.raises(AssertionError):
+        price.apply_discount(Decimal(2))
+
+    with pytest.raises(AssertionError):
+        price.apply_discount(Decimal('1.00000001'))
+
+    # can't apply discounts to prices with fees
+    # fees need to be applied after discounts
+    with pytest.raises(AssertionError):
+        Price(100, 'CHF', 10).apply_discount(Decimal(.5))
