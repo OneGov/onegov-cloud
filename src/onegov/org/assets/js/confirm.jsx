@@ -275,7 +275,6 @@ var handle_confirmation = function(e, on_confirm) {
     var items = $(this).data('confirm-items');
     items = renderList(items);
     var scrollHint = $(this).data('scroll-hint');
-    console.log('scrollHint', scrollHint);
 
     show_confirmation(question, yes, no, extra, items, scrollHint, on_confirm);
 

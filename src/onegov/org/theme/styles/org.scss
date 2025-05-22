@@ -6926,3 +6926,30 @@ code {
     padding: $code-padding-inline;
     display: inline;
 }
+
+// confirm scrollable list
+.confirm-list {
+    margin-bottom: 1rem;
+    max-height: 40vh;
+    overflow: auto;
+    padding: 10px;
+
+    ul {
+        margin-bottom: 0;
+    }
+}
+
+.button.alert.yes.disabled {
+    cursor: not-allowed !important;
+    opacity: .6;
+}
+
+.scroll-hint {
+    color: #8e1c26;
+    font-style: italic;
+    margin-bottom: 1rem;
+}
+
+p.full-text-width {
+    max-width: 100% !important;
+}

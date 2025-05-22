@@ -2,7 +2,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE 1.0\n"
-"POT-Creation-Date: 2025-05-14 12:47+0200\n"
+"POT-Creation-Date: 2025-05-22 15:28+0200\n"
 "PO-Revision-Date: 2022-03-15 10:50+0100\n"
 "Last-Translator: Marc Sommerhalder <marc.sommerhalder@seantis.ch>\n"
 "Language-Team: French\n"
@@ -3375,8 +3375,8 @@ msgstr "Refuser les réservations"
 msgid "Reject all with message"
 msgstr "Tout refuser avec message"
 
-#.
 #. Used in sentence: "${event} published."
+#.
 msgid "Event"
 msgstr "Événement"
 
@@ -3535,10 +3535,16 @@ msgstr "Une nouvelle ne peut pas être collée comme un sujet"
 msgid "A Topic cannot be pasted as News"
 msgstr "Un sujet ne peut pas être collé comme une nouvelle"
 
-msgid "Please note that this page has subpages which will also be deleted!"
+msgid ""
+"Please note that this page has the following subpages which will also be "
+"deleted:"
 msgstr ""
-"Veuillez noter que cette page contient des sous-pages qui seront également "
-"supprimées !"
+"Veuillez noter que cette page a les sous-pages suivantes qui seront "
+"également supprimées :"
+
+msgid "Please scroll to the bottom to enable the confirm button."
+msgstr ""
+"Veuillez faire défiler vers le bas pour activer le bouton de confirmation."
 
 msgid "This page can't be deleted."
 msgstr "Cette page ne peut pas être supprimée."
@@ -3763,8 +3769,8 @@ msgid ""
 "filled-out form."
 msgstr ""
 "Veuillez vérifier vos données et appuyez sur « Compléter » pour finaliser le "
-"processus. S'il y a quelque chose que vous souhaitez modifier, cliquez sur "
-"« Modifier » pour retourner sur le formulaire complété."
+"processus. S'il y a quelque chose que vous souhaitez modifier, cliquez sur « "
+"Modifier » pour retourner sur le formulaire complété."
 
 msgid ""
 "The image shown in the list view is a square. To have your image shown fully "
@@ -6453,9 +6459,6 @@ msgstr "Refuser toutes les réservations avec le message"
 msgid "Adjust reservation"
 msgstr "Ajuster la réservation"
 
-msgid "One of your reservations was adjusted"
-msgstr "Une de vos réservations a été ajustée"
-
 msgid "The reservation was adjusted"
 msgstr "La réservation a été ajustée"
 
@@ -6879,6 +6882,14 @@ msgstr "Un compte a été créé pour vous"
 
 msgid "The user was created successfully"
 msgstr "L'utilisateur a bien été créé"
+
+#~ msgid "Please note that this page has subpages which will also be deleted!"
+#~ msgstr ""
+#~ "Veuillez noter que cette page contient des sous-pages qui seront "
+#~ "également supprimées !"
+
+#~ msgid "One of your reservations was adjusted"
+#~ msgstr "Une de vos réservations a été ajustée"
 
 #~ msgid ""
 #~ "Select a free time span in the calendar below to create an allocation."

@@ -2,7 +2,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE 1.0\n"
-"POT-Creation-Date: 2025-05-14 12:47+0200\n"
+"POT-Creation-Date: 2025-05-22 15:28+0200\n"
 "PO-Revision-Date: 2022-03-15 10:21+0100\n"
 "Last-Translator: Marc Sommerhalder <marc.sommerhalder@seantis.ch>\n"
 "Language-Team: German\n"
@@ -3368,8 +3368,8 @@ msgstr "Reservationen absagen"
 msgid "Reject all with message"
 msgstr "Alle absagen mit Kommentar"
 
-#.
 #. Used in sentence: "${event} published."
+#.
 msgid "Event"
 msgstr "Veranstaltung"
 
@@ -3529,10 +3529,17 @@ msgstr "Eine Nachricht kann nicht als Thema eingefügt werden"
 msgid "A Topic cannot be pasted as News"
 msgstr "Ein Thema kann nicht als News eingefügt werden"
 
-msgid "Please note that this page has subpages which will also be deleted!"
+msgid ""
+"Please note that this page has the following subpages which will also be "
+"deleted:"
 msgstr ""
-"Bitte beachten Sie dass die Unterthemen dieses Themas ebenfalls gelöscht "
-"werden!"
+"Bitte beachten Sie, dass dieses Thema die folgenden Unterthemen hat, welche "
+"ebenfalls gelöscht werden:"
+
+msgid "Please scroll to the bottom to enable the confirm button."
+msgstr ""
+"Bitte scrollen Sie bis zum Ende der Liste, um den Bestätigungsbutton zu "
+"aktivieren."
 
 msgid "This page can't be deleted."
 msgstr "Diese Seite kann nicht gelöscht werden."
@@ -6436,9 +6443,6 @@ msgstr "Alle Reservationen absagen mit Kommentar"
 msgid "Adjust reservation"
 msgstr "Reservation Anpassen"
 
-msgid "One of your reservations was adjusted"
-msgstr "Eine von Ihren Reservationen wurde angepasst"
-
 msgid "The reservation was adjusted"
 msgstr "Die Reservation wurde angepasst"
 
@@ -6863,6 +6867,14 @@ msgstr "Ein Konto wurde für Sie erstellt"
 
 msgid "The user was created successfully"
 msgstr "Der Benutzer wurde erfolgreich erstellt"
+
+#~ msgid "Please note that this page has subpages which will also be deleted!"
+#~ msgstr ""
+#~ "Bitte beachten Sie dass die Unterthemen dieses Themas ebenfalls gelöscht "
+#~ "werden!"
+
+#~ msgid "One of your reservations was adjusted"
+#~ msgstr "Eine von Ihren Reservationen wurde angepasst"
 
 #~ msgid ""
 #~ "Select a free time span in the calendar below to create an availability "
