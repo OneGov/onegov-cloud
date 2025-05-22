@@ -72,7 +72,7 @@ repos:
   - repo: local
     hooks:
       - id: durochog
-        name: DurocHog Secret Scanner
+        name: Duroc Hog Secret Scanner
         description: Scan staged files for secrets, https://github.com/newrelic/rusty-hog
         entry: ./durochog.sh
         language: system
@@ -81,7 +81,7 @@ repos:
       - id: choctawhog
         name: Choctaw Hog Secret Scanner
         description: Scan git HEAD for secrets, https://github.com/newrelic/rusty-hog
-        entry: choctaw_hog --since_commit HEAD .
+        entry: bash -c 'choctaw_hog --since_commit HEAD .'
         language: system
         pass_filenames: false
   - repo: local
