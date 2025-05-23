@@ -582,7 +582,7 @@ def send_daily_resource_usage_overview(request: OrgRequest) -> None:
 
     # load all approved reservations for all required resources
     all_reservations = (
-        r for r in request.session.query(Reservation)
+        request.session.query(Reservation)
         .filter(Reservation.resource.in_(resource_ids))
         .filter(Reservation.status == 'approved')
         .filter(Reservation.data['accepted'] == True)
