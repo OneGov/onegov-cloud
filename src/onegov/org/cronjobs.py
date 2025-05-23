@@ -581,15 +581,15 @@ def send_daily_resource_usage_overview(request: OrgRequest) -> None:
     end = align_date_to_day(today, 'Europe/Zurich', 'up')
 
     # load all approved reservations for all required resources
-    all_reservations = [
+    all_reservations = (
         r for r in request.session.query(Reservation)
         .filter(Reservation.resource.in_(resource_ids))
         .filter(Reservation.status == 'approved')
-        .filter(Reservation.data != None)
+        .filter(Reservation.data['accepted'] == True)
         .filter(and_(start <= Reservation.start, Reservation.start <= end))
         .order_by(Reservation.resource, Reservation.start)
-        if r.data and r.data.get('accepted')
-    ]
+        .all()
+    )
 
     # load all linked form submissions
     if all_reservations:

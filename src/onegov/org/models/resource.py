@@ -192,7 +192,7 @@ class SharedMethods:
         query = query.order_by(Ticket.subtitle)
         query = query.filter(Reservation.status == 'approved')
         if exclude_pending:
-            query = query.filter(Reservation.data != None)
+            query = query.filter(Reservation.data['accepted'] == True)
 
         return query  # type:ignore[return-value]
 
