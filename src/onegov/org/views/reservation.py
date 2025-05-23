@@ -674,7 +674,7 @@ def finalize_reservation(self: Resource, request: OrgRequest) -> Response:
                 }
             if data := reservations[0].data:
                 ticket.tag = data.get('ticket_tag')
-                tag_meta = data.get('ticket_tag_meta')
+                tag_meta = data.get('ticket_tag_meta', {})
                 key_code = tag_meta.pop('Kaba Code', None)
                 if key_code and ticket.handler_data:
                     # set associated key code
