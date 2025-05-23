@@ -7,10 +7,9 @@ from elasticsearch_dsl.query import MatchPhrase
 from elasticsearch_dsl.query import MultiMatch
 from functools import cached_property
 from sedate import utcnow
-from sqlalchemy import func, Numeric, cast, DateTime, or_
+from sqlalchemy import func, cast, or_, Text, case
 
 from sqlalchemy.dialects.postgresql import UUID
-from sqlalchemy.orm import Query
 
 from onegov.core.collection import Pagination, _M
 from onegov.core.orm import Base
@@ -284,7 +283,7 @@ class SearchPostgres(Pagination[_M]):
         }.get(role, ('mtan', 'public'))
         if available_accesses:
             query = query.filter(or_(
-                SearchIndex.fts_idx_data['es_public'].astext == 'true',
+                SearchIndex.public == 'true',
                 SearchIndex.fts_idx_data['access'].astext.in_(available_accesses)
             ))
 
@@ -300,74 +299,82 @@ class SearchPostgres(Pagination[_M]):
         return None
 
     def generic_search(self) -> list[Searchable]:
-        results: list[Any] = []
         language = locale_mapping(self.request.locale or 'de_CH')
-        ts_query = func.websearch_to_tsquery(language,
-                                             func.unaccent(self.query))
+        ts_query = func.websearch_to_tsquery(
+            language, func.unaccent(self.query))
+        now = utcnow()
+        results = []
 
-        # rank results after its text search relevance multiplied by a
-        # time decay function based on the last change to prioritize
-        # more recent documents
-        decay_rank = (
-            func.ts_rank_cd(SearchIndex.fts_idx, ts_query, 0) *
-                cast(func.pow(0.9,
-                    func.extract('epoch',
-                        func.now() - func.coalesce(
-                            cast(
-                                SearchIndex.fts_idx_data[
-                                    'es_last_change'].astext,
-                                DateTime),
-                            func.now())
-                    ) / 86400),
-                    Numeric)
-        ).label('rank')
-
-        query: Query[Any] = self.request.session.query(
-            SearchIndex).filter(
-            SearchIndex.fts_idx.op('@@')(ts_query)
-        )
-        query = query.add_column(decay_rank)
         self.number_of_docs = self.filter_user_level(
             self.request.session.query(func.count(SearchIndex.id))
         ).scalar()
+
+        query = self.request.session.query(
+            SearchIndex,
+            (
+                func.ts_rank_cd(SearchIndex.fts_idx, ts_query, 0) *
+                func.least(
+                    func.greatest(
+                        func.exp(-func.extract(
+                            'epoch', now - SearchIndex.last_change)),
+                        1e-10
+                    ),
+                    1.0
+                ) / (30 * 24 * 3600)  # 30 days decay period
+            ).label('rank')
+        ).filter(SearchIndex.fts_idx.op('@@')(ts_query))
         query = self.filter_user_level(query)
 
-        index_entry: SearchIndex
-        rank: float
-        for index_entry, rank in query:
-            model = self.get_model_by_class_name(index_entry.owner_type)
+        # Dynamically join with the appropriate model table based on owner_type
+        subquery = query.subquery()
+        for model_class in Base._decl_class_registry.values():  # type: ignore[attr-defined]
+            if (hasattr(model_class, '__tablename__') and
+                    hasattr(model_class, 'id')):
+                model_query = (
+                    self.request.session.query(
+                        model_class, subquery.c.rank.label('rank'))
+                    .join(
+                        subquery,
+                        cast(model_class.id, Text) == case(
+                            [
+                                (
+                                    subquery.c.owner_id_int.isnot(None),
+                                    cast(subquery.c.owner_id_int, Text),
+                                ),
+                                (
+                                    subquery.c.owner_id_uuid.isnot(None),
+                                    cast(subquery.c.owner_id_uuid, Text),
+                                ),
+                                (
+                                    subquery.c.owner_id_str.isnot(None),
+                                    subquery.c.owner_id_str,
+                                ),
+                            ]
+                        ),
+                    )
+                    .filter(subquery.c.owner_type == model_class.__name__)
+                )
 
-            if model:
-                owner_id: str | int | UUID | None = None
+                results.extend(model_query.all())
 
-                if index_entry.owner_id_int is not None:
-                    owner_id = index_entry.owner_id_int
-                elif index_entry.owner_id_uuid is not None:
-                    owner_id = index_entry.owner_id_uuid
-                else:
-                    owner_id = index_entry.owner_id_str
-
-                result = (self.request.session.query(model).
-                          filter(model.id == owner_id).first())
-
-                if result:
-                    results.append((result, rank))
-
-        results.sort(key=lambda x: x[1], reverse=True)
         self.number_of_results = len(results)
 
-        # only return the model instances, not the rank
+        # sort and return only the model instances from the results
+        results.sort(key=lambda x: x.rank, reverse=True)
         return [r[0] for r in results]
 
     def hashtag_search(self) -> list[Searchable]:
         results: list[Any] = []
         q = self.query.lstrip('#')
 
+        self.number_of_docs = self.filter_user_level(
+            self.request.session.query(func.count(SearchIndex.id))
+        ).scalar()
+
         query = self.request.session.query(SearchIndex)
-        self.number_of_docs = query.count()
         query = self.filter_user_level(query)
         query = query.filter(
-            SearchIndex.fts_idx_data['es_tags'].contains([q]))
+            SearchIndex.tags.contains([q]))
 
         for index_entry in query:
             model = self.get_model_by_class_name(index_entry.owner_type)
@@ -412,7 +419,7 @@ class SearchPostgres(Pagination[_M]):
         all_tags: set[str] = set()
 
         query = self.request.session.query(
-            SearchIndex.fts_idx_data['es_tags'].distinct())
+            SearchIndex.tags.distinct())
         for tag_list in query:
             all_tags.update(tag_list[0]) if tag_list[0] else None
 

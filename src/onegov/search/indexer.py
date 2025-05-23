@@ -6,6 +6,7 @@ from uuid import UUID
 
 import sqlalchemy
 
+from collections.abc import Iterable
 from copy import deepcopy
 
 from elasticsearch.exceptions import NotFoundError
@@ -20,13 +21,13 @@ from unidecode import unidecode
 
 from sqlalchemy.orm.exc import ObjectDeletedError
 
-from onegov.core.orm.mixins import UTCPublicationMixin
 from onegov.core.utils import hash_dictionary, is_non_string_iterable
 from onegov.search import index_log, log, Searchable, utils
 from onegov.search.errors import SearchOfflineError
 from onegov.search.search_index import SearchIndex
 
 from typing import Any, Literal, NamedTuple, TYPE_CHECKING
+
 if TYPE_CHECKING:
     from collections.abc import Callable, Iterable, Iterator, Sequence
     from elasticsearch import Elasticsearch
@@ -34,6 +35,7 @@ if TYPE_CHECKING:
     from sqlalchemy.orm import Session
     from typing import TypeAlias
     from typing import TypedDict
+
 
     class IndexTask(TypedDict):
         action: Literal['index']
@@ -47,6 +49,7 @@ if TYPE_CHECKING:
         language: str
         properties: dict[str, Any]
 
+
     class DeleteTask(TypedDict):  # FIXME: not needed for fts
         action: Literal['delete']
         id: UUID | str | int
@@ -54,8 +57,8 @@ if TYPE_CHECKING:
         type_name: str
         tablename: str
 
-    Task: TypeAlias = IndexTask | DeleteTask
 
+    Task: TypeAlias = IndexTask | DeleteTask
 
 ES_ANALYZER_MAP = {
     'en': 'english',
@@ -416,12 +419,7 @@ class PostgresIndexer(IndexerBase):
                     k: unidecode(str(v)) if v else ''
                     for k, v in task['properties'].items()
                     if not k.startswith('es_')}
-                # the search makes use of 'es_public' and 'es_tags' fields
-                for k in ('es_public', 'es_tags', 'es_last_change'):
-                    if k in task['properties']:
-                        data[k] = task['properties'][k]
                 _owner_id: int | UUID | str = task['owner_id']
-                _owner_type = task['owner_type']  # class name
 
                 params.append({
                     '_language': language,
@@ -432,7 +430,12 @@ class PostgresIndexer(IndexerBase):
                         _owner_id if isinstance(_owner_id, UUID) else None,
                     '_owner_id_str':
                         _owner_id if isinstance(_owner_id, str) else None,
-                    '_owner_type': _owner_type,
+                    '_owner_type': task['owner_type'],  # class name
+                    '_public': task['properties']['es_public'],
+                    '_access': task.get('access', 'public'),
+                    '_last_change': task['properties']['es_last_change'],
+                    '_tags': task['properties']['es_tags'] or [],
+                    '_suggestion': task['es_suggestion'],
                     '_publication_start':
                         task.get('publication_start', None),
                     '_publication_end':
@@ -478,6 +481,16 @@ class PostgresIndexer(IndexerBase):
                             sqlalchemy.bindparam('_publication_start'),
                         SearchIndex.__table__.c.publication_end:
                             sqlalchemy.bindparam('_publication_end'),
+                        SearchIndex.__table__.c.public:
+                            sqlalchemy.bindparam('_public'),
+                        SearchIndex.__table__.c.access:
+                            sqlalchemy.bindparam('_access'),
+                        SearchIndex.__table__.c.last_change:
+                            sqlalchemy.bindparam('_last_change'),
+                        SearchIndex.__table__.c.tags:
+                            sqlalchemy.bindparam('_tags'),
+                        SearchIndex.__table__.c.suggestion:
+                            sqlalchemy.bindparam('_suggestion'),
                         SearchIndex.__table__.c.fts_idx_data:
                             sqlalchemy.bindparam('_data', type_=JSONB),
                         SearchIndex.__table__.c.fts_idx: combined_vector,
@@ -1063,40 +1076,43 @@ class ORMEventTranslator:
 
             mapping_ = self.mappings[obj.es_type_name].for_language(language)
 
-            for prop, mapping in mapping_.items():
-
+            for prop in mapping_.keys():
                 if prop == 'es_suggestion':
                     continue
 
-                convert = self.converters.get(mapping['type'], lambda v: v)
                 raw = getattr(obj, prop)
-
                 if is_non_string_iterable(raw):
-                    translation['properties'][prop] = [convert(v) for v in raw]
+                    translation['properties'][prop] = list(raw)
                 else:
-                    translation['properties'][prop] = convert(raw)
+                    translation['properties'][prop] = raw
 
-            # adds publication dates if available
-            if hasattr(obj, 'publication_start') and obj.publication_start:
-                translation['publication_start'] = obj.publication_start
-
-            if hasattr(obj, 'publication_end') and obj.publication_end:
-                translation['publication_end'] = obj.publication_end
-
-            # adds access to properties if available
-            if hasattr(obj, 'access'):
-                translation['properties']['access'] = obj.access
+            for attr in ['access', 'publication_start', 'publication_end',
+                         'es_suggestion']:
+                if hasattr(obj, attr) and getattr(obj, attr):
+                    translation[attr] = getattr(obj, attr)
 
             if obj.es_public:
                 contexts = {'es_suggestion_context': ['public']}
             else:
                 contexts = {'es_suggestion_context': ['private']}
 
+            # FIXME: remove once es is migrated to postgres
             suggestion = obj.es_suggestion
             translation['properties']['es_suggestion'] = {
                 'input': suggestion,
                 'contexts': contexts
             }
+
+            # fts suggestion
+            if suggestion:
+                if isinstance(suggestion, str):
+                    suggestion = suggestion.split(',')
+                elif isinstance(suggestion, Iterable):
+                    suggestion = list(suggestion)
+                else:
+                    suggestion = ''
+
+                translation['es_suggestion'] = suggestion
 
             self.put(translation)
         except ObjectDeletedError as ex:
