@@ -321,7 +321,9 @@ def handle_reservation_form(
         for reservation in reservations:
             reservation.email = form.email.data
             if 'ticket_tag' in form:
-                data = reservation.data = (reservation.data or {})
+                data = reservation.data
+                if data is None:
+                    data = reservation.data = {}
                 data['ticket_tag'] = form.ticket_tag.data
                 if filtered_meta:
                     data['ticket_tag_meta'] = filtered_meta
