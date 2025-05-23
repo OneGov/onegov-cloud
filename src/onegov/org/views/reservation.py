@@ -33,7 +33,6 @@ from onegov.pay import PaymentError
 from onegov.reservation import Allocation, Reservation, Resource
 from onegov.ticket import TicketCollection
 from purl import URL
-from sqlalchemy.orm.attributes import flag_modified
 from webob import exc
 from wtforms import HiddenField
 
@@ -322,7 +321,9 @@ def handle_reservation_form(
         for reservation in reservations:
             reservation.email = form.email.data
             if 'ticket_tag' in form:
-                data = reservation.data = (reservation.data or {})
+                data = reservation.data
+                if data is None:
+                    data = reservation.data = {}
                 data['ticket_tag'] = form.ticket_tag.data
                 if filtered_meta:
                     data['ticket_tag_meta'] = filtered_meta
@@ -674,7 +675,7 @@ def finalize_reservation(self: Resource, request: OrgRequest) -> Response:
                 }
             if data := reservations[0].data:
                 ticket.tag = data.get('ticket_tag')
-                tag_meta = data.get('ticket_tag_meta')
+                tag_meta = data.get('ticket_tag_meta', {})
                 key_code = tag_meta.pop('Kaba Code', None)
                 if key_code and ticket.handler_data:
                     # set associated key code
@@ -839,7 +840,9 @@ def accept_reservation(
         savepoint = transaction.savepoint()
 
         for reservation in reservations:
-            data = reservation.data = reservation.data or {}
+            data = reservation.data
+            if data is None:
+                data = reservation.data = {}
             data['accepted'] = True
 
             if client is not None:
@@ -873,9 +876,6 @@ def accept_reservation(
                         'code': code,
                         'visit_id': visit_id,
                     }
-
-            # libres does not automatically detect changes yet
-            flag_modified(reservation, 'data')
 
         ReservationMessage.create(
             reservations,
@@ -1429,7 +1429,9 @@ def adjust_reservation(
 
     if new_reservation is not None:
         client = KabaClient.from_resource(resource, request.app)
-        data = reservation.data = reservation.data or {}
+        data = reservation.data
+        if data is None:
+            data = reservation.data = {}
         if client and (kaba := data.get('kaba')):
             # adjust visit
             components = resource.kaba_components  # type: ignore[attr-defined]
@@ -1467,9 +1469,6 @@ def adjust_reservation(
                     'code': code,
                     'visit_id': visit_id,
                 }
-
-                # libres does not automatically detect changes yet
-                flag_modified(reservation, 'data')
 
         ReservationAdjustedMessage.create(
             reservation,
@@ -1600,7 +1599,9 @@ def edit_kaba(
 
         # handle reservation changes
         for reservation in future_reservations:
-            data = reservation.data = reservation.data or {}
+            data = reservation.data
+            if data is None:
+                data = reservation.data = {}
             # if it hasn't been accepted yet, we don't need to
             # talk to the API
             if not data.get('accepted'):
@@ -1642,9 +1643,6 @@ def edit_kaba(
                     'code': code,
                     'visit_id': visit_id,
                 }
-
-                # libres does not automatically detect changes yet
-                flag_modified(reservation, 'data')
 
     request.success(_('Your changes were saved'))
 
