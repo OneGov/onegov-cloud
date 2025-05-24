@@ -1,11 +1,11 @@
 from __future__ import annotations
 
 from sqlalchemy import Column, Integer, String, Boolean
-from sqlalchemy.dialects.postgresql import JSONB, TSVECTOR
+from sqlalchemy.dialects.postgresql import ARRAY, JSONB, TSVECTOR
 
 from onegov.core.orm import Base
 from onegov.core.orm.mixins import UTCPublicationMixin
-from onegov.core.orm.types import UUID, UTCDateTime
+from sqlalchemy.ext.mutable import MutableDict
 
 
 class SearchIndex(Base, UTCPublicationMixin):
@@ -46,9 +46,8 @@ class SearchIndex(Base, UTCPublicationMixin):
     #: Tags associated with the entry (Searchable::es_tags)
     tags = Column(JSONB, default=None)
 
-    #: Comma-separated suggestions for search functionality
-    # (Searchable::es_suggestion)
-    suggestion = Column(String, nullable=True)
+    #: Suggestions for search functionality (Searchable::es_suggestion)
+    suggestion = Column(ARRAY(String), nullable=True)
 
     #: Full-text search index data (fts properties)
     fts_idx_data = Column(JSONB, default={})
