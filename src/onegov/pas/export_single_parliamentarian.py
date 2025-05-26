@@ -1,6 +1,5 @@
 from __future__ import annotations
 
-from onegov.core.utils import module_path
 from onegov.pas.calculate_pay import calculate_rate
 from dataclasses import dataclass
 from typing import cast
@@ -15,7 +14,7 @@ from weasyprint.text.fonts import (  # type: ignore[import-untyped]
 )
 from onegov.pas.models.attendence import TYPES, Attendence
 from datetime import date  # noqa: TC003
-from onegov.pas.utils import format_swiss_number
+from onegov.pas.utils import format_swiss_number, module_path
 
 
 from typing import TYPE_CHECKING, Literal, TypedDict
@@ -64,7 +63,7 @@ def generate_parliamentarian_settlement_pdf(
     css_path = module_path(
         'onegov.pas', 'views/templates/parliamentarian_settlement_pdf.css'
     )
-    with open(css_path) as f:
+    with open(css_path, 'r') as f:
         css = CSS(string=f.read())
 
     data = _get_parliamentarian_settlement_data(

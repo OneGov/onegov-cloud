@@ -8,102 +8,107 @@ from onegov.pas import _
 from onegov.pas import PasApp
 from onegov.pas.calculate_pay import calculate_rate
 from onegov.pas.collections import SettlementRunCollection,\
-    AttendenceCollection, CommissionCollection
+AttendenceCollection, CommissionCollection
 from onegov.pas.custom import get_current_rate_set
 from onegov.pas.export_single_parliamentarian import\
-    generate_parliamentarian_settlement_pdf
+generate_parliamentarian_settlement_pdf
 from onegov.pas.forms import SettlementRunForm
 from onegov.pas.layouts import SettlementRunCollectionLayout
 from onegov.pas.layouts import SettlementRunLayout
 from onegov.pas.models import (
-    SettlementRun,
-    Party,
-    Commission,
-    Attendence,
+SettlementRun,
+Party,
+Commission,
+Attendence,
 )
 from webob import Response
 from decimal import Decimal
 from weasyprint import HTML, CSS  # type: ignore[import-untyped]
 from weasyprint.text.fonts import (  # type: ignore[import-untyped]
-    FontConfiguration)
+FontConfiguration)
 import xlsxwriter   # type: ignore[import-untyped]
 from onegov.pas.models.attendence import TYPES
 from onegov.pas.path import SettlementRunExport, SettlementRunAllExport
 from onegov.pas.models import Parliamentarian
 from onegov.pas.utils import (
-    format_swiss_number,
-    get_parliamentarians_with_settlements,
-    get_parties_with_settlements,
+format_swiss_number,
+get_parliamentarians_with_settlements,
+get_parties_with_settlements,
 )
 from operator import itemgetter
 
 
 from typing import TYPE_CHECKING, Literal
 if TYPE_CHECKING:
-    from onegov.core.types import RenderData
-    from onegov.town6.request import TownRequest
-    from collections.abc import Iterator
-    from datetime import date
-    SettlementDataRow = tuple[
-        'date', Parliamentarian, str, Decimal, Decimal, Decimal
-    ]
-    TotalRow = tuple[str, Decimal, Decimal, Decimal, Decimal, Decimal]
+from onegov.core.types import RenderData
+from onegov.town6.request import TownRequest
+from collections.abc import Iterator
+from datetime import date
+SettlementDataRow = tuple[
+    'date', Parliamentarian, str, Decimal, Decimal, Decimal
+]
+TotalRow = tuple[str, Decimal, Decimal, Decimal, Decimal, Decimal]
+
+
+XLSX_MIMETYPE = (
+'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'
+)
 
 
 @PasApp.html(
-    model=SettlementRunCollection,
-    template='settlement_runs.pt',
-    permission=Private
+model=SettlementRunCollection,
+template='settlement_runs.pt',
+permission=Private
 )
 def view_settlement_runs(
-    self: SettlementRunCollection,
-    request: TownRequest
+self: SettlementRunCollection,
+request: TownRequest
 ) -> RenderData:
 
-    layout = SettlementRunCollectionLayout(self, request)
+layout = SettlementRunCollectionLayout(self, request)
 
-    filters = {}
-    filters['active'] = [
-        Link(
-            text=request.translate(title),
-            active=self.active == value,
-            url=request.link(self.for_filter(active=value))
-        ) for title, value in (
-            (_('Active'), True),
-            (_('Inactive'), False)
-        )
-    ]
+filters = {}
+filters['active'] = [
+    Link(
+        text=request.translate(title),
+        active=self.active == value,
+        url=request.link(self.for_filter(active=value))
+    ) for title, value in (
+        (_('Active'), True),
+        (_('Inactive'), False)
+    )
+]
 
-    return {
-        'add_link': request.link(self, name='new'),
-        'filters': filters,
-        'layout': layout,
-        'settlement_runs': self.query().all(),
-        'title': layout.title,
-    }
+return {
+    'add_link': request.link(self, name='new'),
+    'filters': filters,
+    'layout': layout,
+    'settlement_runs': self.query().all(),
+    'title': layout.title,
+}
 
 
 @PasApp.form(
-    model=SettlementRunCollection,
-    name='new',
-    template='form.pt',
-    permission=Private,
-    form=SettlementRunForm
+model=SettlementRunCollection,
+name='new',
+template='form.pt',
+permission=Private,
+form=SettlementRunForm
 )
 def add_settlement_run(
-    self: SettlementRunCollection,
-    request: TownRequest,
-    form: SettlementRunForm
+self: SettlementRunCollection,
+request: TownRequest,
+form: SettlementRunForm
 ) -> RenderData | Response:
 
-    if form.submitted(request):
-        settlement_run = self.add(**form.get_useful_data())
-        request.success(_('Added a new settlement run'))
+if form.submitted(request):
+    settlement_run = self.add(**form.get_useful_data())
+    request.success(_('Added a new settlement run'))
 
-        return request.redirect(request.link(settlement_run))
+    return request.redirect(request.link(settlement_run))
 
-    layout = SettlementRunCollectionLayout(self, request)
-    layout.breadcrumbs.append(Link(_('New'), '#'))
+layout = SettlementRunCollectionLayout(self, request)
+layout.breadcrumbs.append(Link(_('New'), '#'))
 
     return {
         'layout': layout,
@@ -213,11 +218,12 @@ def view_settlement_run(
             'title': _('Excel Report'),
             'links': [
                 Link(
+                    # Simple export of the basic attributes of parliamentarians
                     _('Excel Report (XLSX)'),
                     request.link(
                         SettlementRunAllExport(
                             settlement_run=self,
-                            category='salary-xlsx-export'
+                            category='plain-xlsx-export'
                         ),
                         name='run-export'
                     ),
@@ -906,7 +912,6 @@ def generate_xlsx_export_rows(
     settlement_run: SettlementRun,
     request: TownRequest
 ) -> Iterator[list[str | Decimal | date]]:
-    """ Generates row data for the salary XLSX export. """
 
     yield [
         'Personalnummer', 'Vertragsnummer', 'Lohnart / Lohnarten Nr.',
@@ -994,14 +999,27 @@ def view_settlement_run_all_export(
             content_type='application/pdf',
             content_disposition=f'attachment; filename={filename}.pdf'
         )
-    elif self.category == 'salary-xlsx-export':
-
+    elif self.category == 'plain-xlsx-export':
+        pass
         q = self.settlement_run.get_run_number_for_year(
             self.settlement_run.end
         )
         year = self.settlement_run.end.year
-        filename = f'Excel_Report_{year}_Q{q}.xlsx'
+        filename = f'Excel_Report_{year}_{q}.xlsx'
+        output = BytesIO()
+        workbook = xlsxwriter.Workbook(
+            output, {'default_date_format': 'dd.mm.yyyy'})
+        worksheet = workbook.add_worksheet('Übersicht')
 
+
+    else:
+        # todo: this needs to be csv
+        # and a new category
+        q = self.settlement_run.get_run_number_for_year(
+            self.settlement_run.end
+        )
+        year = self.settlement_run.end.year
+        filename = f'Excel_Report_{year}_{q}.xlsx'
         output = BytesIO()
         workbook = xlsxwriter.Workbook(
             output, {'default_date_format': 'dd.mm.yyyy'})
@@ -1013,13 +1031,8 @@ def view_settlement_run_all_export(
 
         workbook.close()
         output.seek(0)
-
-        return Response(
-            output.read(),
-            content_type='application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
+        return Response( output.read(), content_type=XLSX_MIMETYPE,
             content_disposition=f'attachment; filename="{filename}"')
-    else:
-        raise NotImplementedError()
 
 
 @PasApp.view(
