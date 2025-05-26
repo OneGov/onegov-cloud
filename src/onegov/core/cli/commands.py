@@ -673,9 +673,9 @@ def transfer(
         assert '"' not in schema and "'" not in schema
         query = (
             f'INSERT INTO \\"{schema}\\".users '  # nosec: B608
-            f"(type, id, username, password_hash, role, active, realname) "
+            f"(type, id, username, password_hash, role, active) "
             f"VALUES ('generic', '{id_}', 'admin@example.org', "
-            f"'{password_hash}', 'admin', true, 'John Doe');"
+            f"'{password_hash}', 'admin', true);"
         )
         local_db = local_cfg.configuration['dsn'].split('/')[-1]
         command = shlex.join([
