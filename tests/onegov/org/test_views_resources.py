@@ -3120,6 +3120,7 @@ def test_zipcode_block(client):
     ))
     page.select_radio('payment_method', "Keine Kreditkarten-Zahlungen")
     page.select_radio('pricing_method', "Kostenlos")
+    page.select_radio('extras_pricing_method', "Pro Eintrag")
     page.form['zipcode_block_use'] = True
     page.form['zipcode_days'] = 1
     page.form['zipcode_field'] = 'PLZ'
