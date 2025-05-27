@@ -318,7 +318,7 @@ class Resource(ORMBase, ModelBase, ContentMixin,
                     case 'per_item' | None:
                         extras_total += extra * reservation.quota
 
-                    case _:
+                    case _:  # pragma: unreachable
                         raise ValueError('unhandled extras pricing method')
 
         if discount and total:
