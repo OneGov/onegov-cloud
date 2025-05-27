@@ -16,6 +16,7 @@ from onegov.reservation import Allocation, Resource, Reservation
 from onegov.ticket import Ticket, Handler, handlers
 from onegov.search.utils import extract_hashtags
 from purl import URL
+from sedate import utcnow
 from sqlalchemy import desc
 from sqlalchemy import func
 from sqlalchemy.orm import object_session, undefer
@@ -535,7 +536,6 @@ class ReservationHandler(Handler):
         )
 
         # render key code
-        # TODO: Add a unlock URL?
         if key_code := self.data.get('key_code'):
             parts.append(Markup(
                 '<dl class="field-display">'
@@ -661,6 +661,20 @@ class ReservationHandler(Handler):
                 Link(
                     text=_('Edit details'),
                     url=url,
+                    attrs={'class': ('edit-link', 'border')}
+                )
+            )
+
+        now = utcnow()
+        if getattr(self.resource, 'kaba_components', None) and any(
+            True
+            for reservation in self.reservations
+            if reservation.display_end() > now
+        ):
+            advanced_links.append(
+                Link(
+                    text=_('Edit key code'),
+                    url=request.link(self.ticket, 'edit-kaba'),
                     attrs={'class': ('edit-link', 'border')}
                 )
             )

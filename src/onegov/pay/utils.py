@@ -95,6 +95,15 @@ class Price(_PriceBase):
     def net_amount(self) -> Decimal:
         return self.amount - self.fee
 
+    def apply_discount(self, discount: Decimal) -> Self:
+        assert discount <= Decimal('1')
+        assert not self.fee, 'Discounts should be applied before fees'
+        return self.__class__(
+            self.amount - self.amount*discount,
+            self.currency,
+            credit_card_payment=self.credit_card_payment
+        )
+
 
 def payments_association_table_for(cls: type[Base]) -> Table:
     return Base.metadata.tables[f'payments_for_{cls.__tablename__}_payments']

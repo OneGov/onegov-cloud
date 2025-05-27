@@ -32,6 +32,7 @@ from onegov.org.forms.fields import (
     UploadOrSelectExistingMultipleFilesField,
 )
 from onegov.org.forms.user import AVAILABLE_ROLES
+from onegov.org.forms.util import KABA_CODE_RE
 from onegov.org.forms.util import TIMESPANS
 from onegov.org.kaba import KabaApiError, KabaClient
 from onegov.org.theme import user_options
@@ -67,7 +68,6 @@ if TYPE_CHECKING:
 
 
 ERROR_LINE_RE = re.compile(r'line ([0-9]+)')
-KABA_CODE_RE = re.compile(r'^[0-9]{4,6}$')
 
 
 class GeneralSettingsForm(Form):
@@ -1565,29 +1565,35 @@ class KabaSettingsForm(Form):
         request: OrgRequest
 
     kaba_site_id = StringField(
-        _('Site ID'),
-        [InputRequired()],
+        label=_('Site ID'),
+        validators=[InputRequired()],
     )
 
     kaba_api_key = StringField(
-        'API_KEY',
-        [InputRequired()],
+        label='API_KEY',
+        validators=[InputRequired()],
     )
 
     kaba_api_secret = PasswordField(
-        'API_SECRET',
+        label='API_SECRET',
     )
 
     default_key_code_lead_time = IntegerField(
-        _('Default Lead Time'),
-        [InputRequired()],
-        description=_('In minutes'),
+        label=_('Default Lead Time'),
+        validators=[InputRequired(), NumberRange(0, 1440)],
+        render_kw={
+            'step': 5,
+            'long_description': _('In minutes'),
+        },
     )
 
     default_key_code_lag_time = IntegerField(
-        _('Default Lag Time'),
-        [InputRequired()],
-        description=_('In minutes'),
+        label=_('Default Lag Time'),
+        validators=[InputRequired(), NumberRange(0, 1440)],
+        render_kw={
+            'step': 5,
+            'long_description': _('In minutes'),
+        },
     )
 
     def populate_obj(self, model: Organisation) -> None:  # type:ignore

@@ -553,6 +553,20 @@ def pricing() -> ParserElement:
     return pricing
 
 
+def discount() -> ParserElement:
+    """ Returns a discount parser.
+
+    For example:
+        (100%)
+        (-25 %)
+        (33.3%)
+    """
+
+    return Group(
+        enclosed_in(decimal() + Suppress('%'), '()')
+    )('discount')
+
+
 def marker_box(characters: str) -> ParserElement:
     """ Returns a marker box:
 
@@ -565,14 +579,14 @@ def marker_box(characters: str) -> ParserElement:
 
     check = mark_enclosed_in(characters)('checked')
     label_text = with_whitespace_inside(text_without(characters + '()'))
-    pricing_parser = pricing()
+    pricing_or_discount_parser = pricing() | discount()
     label = MatchFirst((
-        label_text + FollowedBy(pricing_parser),
+        label_text + FollowedBy(pricing_or_discount_parser),
         Combine(label_text + with_whitespace_inside(text)),
         label_text
     )).setParseAction(as_joined_string)('label')
 
-    return check + label + Optional(pricing_parser)
+    return check + label + Optional(pricing_or_discount_parser)
 
 
 def radio() -> ParserElement:

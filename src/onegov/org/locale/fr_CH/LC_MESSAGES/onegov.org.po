@@ -2,7 +2,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE 1.0\n"
-"POT-Creation-Date: 2025-05-14 12:47+0200\n"
+"POT-Creation-Date: 2025-05-21 11:26+0200\n"
 "PO-Revision-Date: 2022-03-15 10:50+0100\n"
 "Last-Translator: Marc Sommerhalder <marc.sommerhalder@seantis.ch>\n"
 "Language-Team: French\n"
@@ -1334,6 +1334,21 @@ msgstr "Commençant à"
 msgid "Ending at"
 msgstr "Finissant à"
 
+msgid "Key Code"
+msgstr "Code clé"
+
+msgid "Invalid Kaba Code. Needs to be a 4 to 6 digit number code."
+msgstr "Kaba Code non valide. Il doit s'agir d'un code à 4 ou 6 chiffres."
+
+msgid "Lead Time"
+msgstr "Délai"
+
+msgid "In minutes"
+msgstr "En minutes"
+
+msgid "Lag Time"
+msgstr "Délai d'arrêt"
+
 msgid "I am looking to make a reservation lasting"
 msgstr "Je cherche à faire une réservation d'une durée de"
 
@@ -2095,9 +2110,6 @@ msgstr ""
 msgid "Invalid price, needs to be a non-negative number."
 msgstr "Prix non valide, doit être un nombre non négatif."
 
-msgid "Invalid Kaba Code. Needs to be a 4 to 6 digit number code."
-msgstr "Kaba Code non valide. Il doit s'agir d'un code à 4 ou 6 chiffres."
-
 msgid "Enable newsletter"
 msgstr "Activer la newsletter"
 
@@ -2240,9 +2252,6 @@ msgstr "ID du site"
 
 msgid "Default Lead Time"
 msgstr "Délai par défaut"
-
-msgid "In minutes"
-msgstr "En minutes"
 
 msgid "Default Lag Time"
 msgstr "Délai d'arrêt par défaut"
@@ -3329,9 +3338,6 @@ msgstr "Annuler l'inscription"
 msgid "Edit submission"
 msgstr "Modifier votre envoi"
 
-msgid "Key Code"
-msgstr "Code clé"
-
 msgid "Reject"
 msgstr "Refuser"
 
@@ -3356,6 +3362,9 @@ msgstr "Détails à propos de la réservation"
 
 msgid "Edit details"
 msgstr "Modifier les détails"
+
+msgid "Edit key code"
+msgstr "Modifier le code clé"
 
 msgid "Accept all with message"
 msgstr "Tout accepter avec message"
@@ -6453,14 +6462,14 @@ msgstr "Refuser toutes les réservations avec le message"
 msgid "Adjust reservation"
 msgstr "Ajuster la réservation"
 
-msgid "One of your reservations was adjusted"
-msgstr "Une de vos réservations a été ajustée"
-
 msgid "The reservation was adjusted"
 msgstr "La réservation a été ajustée"
 
 msgid "The reservation was left unchanged"
 msgstr "La réservation est restée inchangée"
+
+msgid "There are no future reservations"
+msgstr "Il n'y a pas de réservations futures"
 
 msgid "Added a new daypass"
 msgstr "Nouvel abonnement à la journée ajouté"

@@ -2,6 +2,7 @@ from __future__ import annotations
 
 from onegov.core.security import Public, Private
 from onegov.org.forms import (
+    KabaEditForm,
     InternalTicketChatMessageForm,
     ReservationAdjustmentForm,
 )
@@ -15,6 +16,8 @@ from onegov.org.views.reservation import (
     accept_reservation_with_message_from_ticket,
     adjust_reservation,
     adjust_reservation_from_ticket,
+    edit_kaba,
+    edit_kaba_from_ticket,
     reject_reservation_with_message,
     reject_reservation_with_message_from_ticket,
 )
@@ -180,4 +183,38 @@ def town_adjust_reservation_from_ticket(
 ) -> RenderData | Response | None:
     layout = TicketLayout(self, request)
     return adjust_reservation_from_ticket(
+        self, request, form, layout)
+
+
+@TownApp.form(
+    model=Reservation,
+    name='edit-kaba',
+    permission=Private,
+    form=KabaEditForm,
+    template='form.pt'
+)
+def town_edit_kaba(
+    self: Reservation,
+    request: TownRequest,
+    form: KabaEditForm
+) -> RenderData | Response | None:
+    layout = ReservationLayout(self, request)  # type:ignore
+    return edit_kaba(self, request, form, None, layout)
+
+
+@TownApp.form(
+    model=ReservationTicket,
+    name='edit-kaba',
+    permission=Private,
+    form=KabaEditForm,
+    template='form.pt'
+)
+def town_edit_kaba_from_ticket(
+    self: ReservationTicket,
+    request: TownRequest,
+    form: KabaEditForm,
+    layout: TicketLayout | None = None
+) -> RenderData | Response | None:
+    layout = TicketLayout(self, request)
+    return edit_kaba_from_ticket(
         self, request, form, layout)

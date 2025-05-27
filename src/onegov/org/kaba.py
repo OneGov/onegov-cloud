@@ -90,7 +90,8 @@ class KabaClient:
             for item in res.json()
         ]
 
-    def random_code(self) -> str:
+    @staticmethod
+    def random_code() -> str:
         return ''.join(secrets.choice(string.digits) for _ in range(6))
 
     def create_visit(
