@@ -205,6 +205,22 @@ class ResourceBaseForm(Form):
         validators=[InputRequired()],
     )
 
+    extras_pricing_method = RadioField(
+        label=_('Prices in extra fields are'),
+        description=_(
+            'If no extra fields are defined or none of the extra fields '
+            'contain pricing information, then this setting has no effect.'
+        ),
+        fieldset=_('Payments'),
+        default='per_item',
+        validators=[InputRequired()],
+        choices=(
+            ('one_off', _('One-off')),
+            ('per_item', _('Per item')),
+            ('per_hour', _('Per hour'))
+        )
+    )
+
     def on_request(self) -> None:
         if hasattr(self.model, 'type'):
             if self.model.type == 'daypass':
