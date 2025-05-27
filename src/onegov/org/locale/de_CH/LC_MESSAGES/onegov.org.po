@@ -2,7 +2,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE 1.0\n"
-"POT-Creation-Date: 2025-05-21 11:26+0200\n"
+"POT-Creation-Date: 2025-05-27 16:02+0200\n"
 "PO-Revision-Date: 2022-03-15 10:21+0100\n"
 "Last-Translator: Marc Sommerhalder <marc.sommerhalder@seantis.ch>\n"
 "Language-Team: German\n"
@@ -1458,6 +1458,19 @@ msgstr "Preis pro Eintrag"
 
 msgid "Price per hour"
 msgstr "Preis pro Stunde"
+
+msgid "Prices in extra fields are"
+msgstr "Preise in Extra-Felder gelten"
+
+msgid ""
+"If no extra fields are defined or none of the extra fields contain pricing "
+"information, then this setting has no effect."
+msgstr ""
+"Falls keine Extra-Felder definiert sind oder keine der definierten Felder "
+"mit Preisen verknüpft sind, hat diese Auswahl keine Auswirkung."
+
+msgid "One-off"
+msgstr "Einmalig"
 
 msgid ""
 "Failed to retrieve the doors from the dormakaba API please make sure your "

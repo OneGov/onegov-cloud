@@ -62,7 +62,7 @@ function main() {
     local msginit
     local msgmerge
     local msgfmt
-    local potcreate="${uvx} -q --python 3.11 --from lingua@3.12 pot-create"
+    local potcreate="${uvx} -q --python 3.11 --from lingua@3.12 --with setuptools<80 pot-create"
 
     if is-known-binary brew; then
         if brew list | grep gettext -q; then
