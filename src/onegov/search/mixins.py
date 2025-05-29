@@ -49,10 +49,6 @@ class Searchable:
     """
 
     if TYPE_CHECKING:
-        # # NOTE: This doesn't really have a Python representation, unless
-        # #       it is converted to a `str` or `list[str]`? This may depend
-        # #       on the SQLAlchemy version as well.
-        # fts_idx: Column[object]
         # FIXME: Gross classproperty vs. ClassVar is a mess, we should
         #        consistently use one or the other
         es_properties: ClassVar[dict[str, Any]]
