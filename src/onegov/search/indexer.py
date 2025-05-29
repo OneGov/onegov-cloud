@@ -501,13 +501,17 @@ class PostgresIndexer(IndexerBase):
 
             if session is None:
                 connection = self.engine.connect()
+                connection = connection.execution_options(
+                    schema_translate_map={None: schema}
+                )
                 with connection.begin():
-                    connection.execute(f'SET search_path TO "{schema}"')
                     connection.execute(stmt, params)
             else:
                 # use a savepoint instead
+                session = session.execution_options(
+                    schema_translate_map={None: schema}
+                )
                 with session.begin_nested():
-                    session.execute(f'SET search_path TO "{schema}"')
                     session.execute(stmt, params)
         except Exception as ex:
             index_log.error(
