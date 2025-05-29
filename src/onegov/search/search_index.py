@@ -1,12 +1,18 @@
 from __future__ import annotations
 
-from sqlalchemy import Column, Integer, String, Boolean
-from sqlalchemy.dialects.postgresql import ARRAY, JSONB, TSVECTOR
+from sqlalchemy import Column, Integer, String, Boolean, Index
+from sqlalchemy.dialects.postgresql import ARRAY, HSTORE, JSONB, TSVECTOR
 
 from onegov.core.orm import Base
 from onegov.core.orm.mixins import UTCPublicationMixin
+from onegov.core.orm.types import UUID, UTCDateTime
 from sqlalchemy.ext.mutable import MutableDict
 
+
+from typing import TYPE_CHECKING
+
+if TYPE_CHECKING:
+    from collections.abc import Iterable
 
 class SearchIndex(Base, UTCPublicationMixin):
     """Full-text Search Index (fts) for all searchable models and entries.
@@ -44,7 +50,7 @@ class SearchIndex(Base, UTCPublicationMixin):
     last_change = Column(UTCDateTime, nullable=False)
 
     #: Tags associated with the entry (Searchable::es_tags)
-    tags = Column(JSONB, default=None)
+    _tags = Column(MutableDict.as_mutable(HSTORE), nullable=True, name='tags')
 
     #: Suggestions for search functionality (Searchable::es_suggestion)
     suggestion = Column(ARRAY(String), nullable=True)
@@ -58,3 +64,12 @@ class SearchIndex(Base, UTCPublicationMixin):
     __mapper_args__ = {
         'polymorphic_on': owner_type
     }
+
+    @property
+    def tags(self) -> set[str]:
+        return set(self._tags.keys()) if self._tags else set()
+
+    # FIXME: asymmetric property
+    @tags.setter
+    def tags(self, value: Iterable[str]) -> None:
+        self._tags = dict.fromkeys(value, '') if value else {}

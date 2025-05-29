@@ -15,7 +15,6 @@ from langdetect.lang_detect_exception import LangDetectException
 from itertools import groupby, chain, repeat
 from queue import Queue, Empty, Full
 from sqlalchemy import func, Table, delete, MetaData
-from sqlalchemy.dialects.postgresql import JSONB
 from sqlalchemy.sql import Delete
 from unidecode import unidecode
 
@@ -420,6 +419,8 @@ class PostgresIndexer(IndexerBase):
                     for k, v in task['properties'].items()
                     if not k.startswith('es_')}
                 _owner_id: int | UUID | str = task['owner_id']
+                _tags = (
+                    dict.fromkeys(task['properties'].get('es_tags') or [], ''))
 
                 params.append({
                     '_language': language,
@@ -434,7 +435,7 @@ class PostgresIndexer(IndexerBase):
                     '_public': task['properties']['es_public'],
                     '_access': task.get('access', 'public'),
                     '_last_change': task['properties']['es_last_change'],
-                    '_tags': task['properties']['es_tags'] or [],
+                    '_tags': _tags,
                     '_suggestion': task['es_suggestion'],
                     '_publication_start':
                         task.get('publication_start', None),
@@ -492,7 +493,7 @@ class PostgresIndexer(IndexerBase):
                         SearchIndex.__table__.c.suggestion:
                             sqlalchemy.bindparam('_suggestion'),
                         SearchIndex.__table__.c.fts_idx_data:
-                            sqlalchemy.bindparam('_data', type_=JSONB),
+                            sqlalchemy.bindparam('_data'),
                         SearchIndex.__table__.c.fts_idx: combined_vector,
                     }
                 )

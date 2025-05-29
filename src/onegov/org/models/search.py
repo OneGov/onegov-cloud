@@ -373,8 +373,7 @@ class SearchPostgres(Pagination[_M]):
 
         query = self.request.session.query(SearchIndex)
         query = self.filter_user_level(query)
-        query = query.filter(
-            SearchIndex.tags.contains([q]))
+        query = query.filter(SearchIndex._tags.has_key(q))
 
         for index_entry in query:
             model = self.get_model_by_class_name(index_entry.owner_type)
@@ -415,11 +414,16 @@ class SearchPostgres(Pagination[_M]):
 
     @cached_property
     def get_all_hashtags(self) -> list[str]:
-        """ Returns all hashtags from the database in alphabetical order. """
+        """
+        Returns all hashtags from the database in alphabetical order
+        filtered by user level.
+
+        """
         all_tags: set[str] = set()
 
-        query = self.request.session.query(
-            SearchIndex.tags.distinct())
+        query = self.filter_user_level(
+            self.request.session.query(SearchIndex._tags.distinct())
+        )
         for tag_list in query:
             all_tags.update(tag_list[0]) if tag_list[0] else None
 
