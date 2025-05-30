@@ -688,8 +688,7 @@ def import_proportional_election_result(
                     panachage_result = CandidatePanachageResult()
                     panachage_result.election_result = election_result
                     panachage_result.candidate = candidate
-                    panachage_result.list = (
-                        source_list)  # type:ignore[assignment]
+                    panachage_result.list = source_list
                 panachage_results[source_id] = panachage_result
                 panachage_result.votes = (
                     source.count_of_votes_from_changed_ballots or 0)

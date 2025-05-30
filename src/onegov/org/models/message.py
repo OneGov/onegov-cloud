@@ -90,7 +90,7 @@ class TicketNote(Message, TicketMessageMixin):
 
     if TYPE_CHECKING:
         # text is not optional for TicketNote
-        text: Column[str]  # type:ignore[assignment]
+        text: Column[str]
 
     @classmethod
     def create(  # type:ignore[override]

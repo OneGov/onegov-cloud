@@ -205,9 +205,7 @@ class UserCollection:
         records = records.filter(User.source.isnot(None))
         records = records.order_by(User.source).distinct()
 
-        # NOTE: We are doing the None check in SQL. So mypy
-        #       doesn't know about it.
-        return tuple(r[0] for r in records)  # type:ignore[misc]
+        return tuple(r[0] for r in records)
 
     @property
     def usernames(self) -> tuple[tuple[str, str], ...]:
