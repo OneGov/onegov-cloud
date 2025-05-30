@@ -218,7 +218,7 @@ class SearchApp(morepath.App):
             for base in self.session_manager.bases:
                 self.es_mappings.register_orm_base(base)
 
-            self.es_orm_events = ORMEventTranslator(
+            self.fts_orm_events = ORMEventTranslator(
                 self.es_mappings,
                 max_queue_size=max_queue_size
             )
@@ -226,22 +226,22 @@ class SearchApp(morepath.App):
             assert self.es_client is not None
             self.es_indexer = Indexer(
                 self.es_mappings,
-                self.es_orm_events.es_queue,
+                self.fts_orm_events.es_queue,
                 self.es_client
             )
             self.psql_indexer = PostgresIndexer(
-                self.es_orm_events.psql_queue,
+                self.fts_orm_events.psql_queue,
                 self.session_manager.engine,
             )
 
             self.session_manager.on_insert.connect(
-                self.es_orm_events.on_insert)
+                self.fts_orm_events.on_insert)
 
             self.session_manager.on_update.connect(
-                self.es_orm_events.on_update)
+                self.fts_orm_events.on_update)
 
             self.session_manager.on_delete.connect(
-                self.es_orm_events.on_delete)
+                self.fts_orm_events.on_delete)
 
     def es_configure_client(
         self,
@@ -442,8 +442,8 @@ class SearchApp(morepath.App):
         # have no queue limit for reindexing (that we're able to change
         # this here is a bit of a CPython implementation detail) - we can't
         # necessarily always rely on being able to change this property
-        self.es_orm_events.es_queue.maxsize = 0
-        self.es_orm_events.psql_queue.maxsize = 0
+        self.fts_orm_events.es_queue.maxsize = 0
+        self.fts_orm_events.psql_queue.maxsize = 0
 
         def reindex_model(model: type[Base]) -> None:
             """ Load all database objects and index them. """
@@ -458,7 +458,7 @@ class SearchApp(morepath.App):
                         if issubclass(m.class_, Searchable)}))
 
                 for obj in q:
-                    self.es_orm_events.index(schema, obj)
+                    self.fts_orm_events.index(schema, obj)
 
             except Exception as e:
                 print(f"Error psql indexing model '{model.__name__}': {e}")

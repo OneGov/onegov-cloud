@@ -299,7 +299,7 @@ def fetch_users_cli(
         if dry_run and hasattr(app, 'es_orm_events'):
             # disable search indexing during operation
             print('es_orm_events disabled')
-            app.es_orm_events.stopped = True
+            app.fts_orm_events.stopped = True
 
         fetch_users(
             app,

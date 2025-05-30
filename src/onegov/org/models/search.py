@@ -373,7 +373,7 @@ class SearchPostgres(Pagination[_M]):
 
         query = self.request.session.query(SearchIndex)
         query = self.filter_user_level(query)
-        query = query.filter(SearchIndex._tags.has_key(q))
+        query = query.filter(SearchIndex._tags.contains({q, ''}))
 
         for index_entry in query:
             model = self.get_model_by_class_name(index_entry.owner_type)

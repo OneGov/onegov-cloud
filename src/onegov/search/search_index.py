@@ -51,7 +51,11 @@ class SearchIndex(Base, UTCPublicationMixin):
     last_change = Column(UTCDateTime, nullable=False)
 
     #: Tags associated with the entry (Searchable::es_tags)
-    _tags = Column(MutableDict.as_mutable(HSTORE), nullable=True, name='tags')
+    _tags: Column[dict[str, str] | None] = Column(  # type:ignore
+        MutableDict.as_mutable(HSTORE),  # type:ignore[no-untyped-call]
+        nullable=True,
+        name='tags'
+    )
 
     #: Suggestions for search functionality (Searchable::es_suggestion)
     suggestion = Column(ARRAY(String), nullable=True)

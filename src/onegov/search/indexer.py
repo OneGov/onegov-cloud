@@ -47,7 +47,7 @@ if TYPE_CHECKING:
         owner_id: UUID | str | int
         language: str
         access: str
-        suggestion: str
+        suggestion: str | list[str]
         publication_start: datetime | None
         publication_end: datetime | None
         properties: dict[str, Any]
@@ -512,7 +512,14 @@ class PostgresIndexer(IndexerBase):
 
         return True
 
-    def execute_statement(self, session, schema, stmt, params):
+    def execute_statement(
+        self,
+        session: Session | None,
+        schema: str,
+        stmt: sqlalchemy.sql.expression.Executable,
+        params: list[dict[str, Any]]
+    ) -> None:
+
         if session is None:
             connection = self.engine.connect()
             connection = connection.execution_options(
@@ -522,9 +529,6 @@ class PostgresIndexer(IndexerBase):
                 connection.execute(stmt, params)
         else:
             # use a savepoint instead
-            session = session.execution_options(
-                schema_translate_map={None: schema}
-            )
             with session.begin_nested():
                 session.execute(stmt, params)
 
@@ -566,7 +570,7 @@ class PostgresIndexer(IndexerBase):
                         .where(SearchIndex.owner_id_str == _owner_id)
                     )
 
-                self.execute_statement(session, tasks[0]['schema'], stmt, {})
+                self.execute_statement(session, tasks[0]['schema'], stmt, [{}])
         except Exception as ex:
             index_log.error(f'Error "{ex}" deleting index schema '
                             f'{tasks[0]["schema"]} tasks {tasks}')
@@ -1074,6 +1078,10 @@ class ORMEventTranslator:
                 'owner_type': obj.__class__.__name__,
                 'owner_id': getattr(obj, obj.es_id),
                 'language': language,
+                'access': '',
+                'suggestion': '',
+                'publication_start': None,
+                'publication_end': None,
                 'properties': {},
             }
 
@@ -1090,8 +1098,8 @@ class ORMEventTranslator:
                     translation['properties'][prop] = raw
 
             for attr in ['access', 'publication_start', 'publication_end']:
-                if hasattr(obj, attr) and getattr(obj, attr):
-                    translation[attr] = getattr(obj, attr)
+                if hasattr(obj, attr):
+                    translation[attr] = getattr(obj, attr)  # type:ignore[literal-required]
 
             # FIXME: remove once es is migrated to postgres
             if obj.es_public:
@@ -1112,8 +1120,6 @@ class ORMEventTranslator:
                     suggestion = [s.strip() for s in suggestion.split(',')]
                 elif isinstance(suggestion, Iterable):
                     suggestion = list(suggestion)
-                else:
-                    suggestion = ''
 
                 translation['suggestion'] = suggestion
 
