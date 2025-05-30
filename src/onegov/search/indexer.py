@@ -499,20 +499,7 @@ class PostgresIndexer(IndexerBase):
                 )
             )
 
-            if session is None:
-                connection = self.engine.connect()
-                connection = connection.execution_options(
-                    schema_translate_map={None: schema}
-                )
-                with connection.begin():
-                    connection.execute(stmt, params)
-            else:
-                # use a savepoint instead
-                session = session.execution_options(
-                    schema_translate_map={None: schema}
-                )
-                with session.begin_nested():
-                    session.execute(stmt, params)
+            self.execute_statement(session, schema, stmt, params)
         except Exception as ex:
             index_log.error(
                 f'Error "{ex}" creating index schema {tasks[0]["schema"]} of '
@@ -522,6 +509,22 @@ class PostgresIndexer(IndexerBase):
             return False
 
         return True
+
+    def execute_statement(self, session, schema, stmt, params):
+        if session is None:
+            connection = self.engine.connect()
+            connection = connection.execution_options(
+                schema_translate_map={None: schema}
+            )
+            with connection.begin():
+                connection.execute(stmt, params)
+        else:
+            # use a savepoint instead
+            session = session.execution_options(
+                schema_translate_map={None: schema}
+            )
+            with session.begin_nested():
+                session.execute(stmt, params)
 
     def update(
         self,
@@ -561,14 +564,7 @@ class PostgresIndexer(IndexerBase):
                         .where(SearchIndex.owner_id_str == _owner_id)
                     )
 
-                if session is None:
-                    connection = self.engine.connect()
-                    with connection.begin():
-                        connection.execute(stmt)
-                else:
-                    # use a savepoint instead
-                    with session.begin_nested():
-                        session.execute(stmt)
+                self.execute_statement(session, tasks[0]['schema'], stmt, {})
         except Exception as ex:
             index_log.error(f'Error "{ex}" deleting index schema '
                             f'{tasks[0]["schema"]} tasks {tasks}')
