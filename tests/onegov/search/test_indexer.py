@@ -3,7 +3,8 @@ import pytest
 import transaction
 
 from datetime import datetime
-from onegov.people import Person, PersonCollection
+
+from onegov.people import PersonCollection
 from onegov.search import Searchable, SearchOfflineError, utils
 from onegov.search.indexer import parse_index_name, PostgresIndexer
 from onegov.search.indexer import (
@@ -15,6 +16,8 @@ from onegov.search.indexer import (
 )
 from queue import Queue
 from unittest.mock import Mock
+
+from onegov.search.search_index import SearchIndex
 
 
 def test_index_manager_assertions(es_client):
@@ -353,12 +356,13 @@ def test_orm_event_translator_properties():
 
     translator = ORMEventTranslator(mappings)
 
+    creation_date = datetime(2015, 9, 11)
     translator.on_insert('my-schema', Page(
         id=1,
         title='About',
         body='We are Pied Piper',
         tags=['aboutus', 'company'],
-        date=datetime(2015, 9, 11),
+        date=creation_date,
         published=True,
         likes=1000
     ))
@@ -370,24 +374,33 @@ def test_orm_event_translator_properties():
         'type_name': 'page',
         'id': 1,
         'id_key': 'id',
+        'owner_id': 1,
+        'owner_type': 'Page',
         'language': 'en',
+        'access': '',
+        'suggestion': ['About'],
+        'publication_start': None,
+        'publication_end': None,
         'properties': {
             'title': 'About',
             'body': 'We are Pied Piper',
-            'date': '2015-09-11T00:00:00',
+            'date': creation_date,
             'likes': 1000,
             'published': True,
             'es_tags': ['aboutus', 'company'],
             'es_public': True,
-            'es_last_change': '2015-09-11T00:00:00',
+            'es_last_change': creation_date,
             'es_suggestion': {
-                'input': ['About'],
+                'input': 'About',
                 'contexts': {
                     'es_suggestion_context': ['public']
                 }
             }
         }
     }
+    assert translator.es_queue.qsize() == 1
+    assert translator.psql_queue.qsize() == 1
+
     assert translator.es_queue.get() == expected
     assert translator.psql_queue.get() == expected
 
@@ -403,17 +416,9 @@ def test_orm_event_translator_properties():
         published=True,
         likes=1000
     ))
+    # queue tasks: 1 delete, 1 index
     assert translator.es_queue.qsize() == 2
-    assert translator.psql_queue.qsize() == 1
-
-    expected = {
-        'action': 'delete',
-        'schema': 'my-schema',
-        'tablename': 'my-pages',
-        'type_name': 'page',
-        'id': 1
-    }
-    assert translator.es_queue.get() == expected
+    assert translator.psql_queue.qsize() == 2
 
     expected = {
         'action': 'index',
@@ -422,25 +427,35 @@ def test_orm_event_translator_properties():
         'type_name': 'page',
         'id': 1,
         'id_key': 'id',
+        'owner_id': 1,
+        'owner_type': 'Page',
         'language': 'en',
+        'access': '',
+        'suggestion': ['About'],
+        'publication_start': None,
+        'publication_end': None,
         'properties': {
             'title': 'About',
             'body': 'We are Pied Piper',
-            'date': '2015-09-11T00:00:00',
+            'date': creation_date,
             'likes': 1000,
             'published': True,
             'es_tags': ['aboutus', 'company'],
             'es_public': True,
-            'es_last_change': '2015-09-11T00:00:00',
+            'es_last_change': creation_date,
             'es_suggestion': {
-                'input': ['About'],
+                'input': 'About',
                 'contexts': {
                     'es_suggestion_context': ['public']
                 }
             }
         }
     }
+    delete_task = translator.es_queue.get()
+    assert delete_task['action'] == 'delete'
     assert translator.es_queue.get() == expected
+    delete_task = translator.psql_queue.get()
+    assert delete_task['action'] == 'delete'
     assert translator.psql_queue.get() == expected
     assert translator.es_queue.empty()
     assert translator.psql_queue.empty()
@@ -472,8 +487,9 @@ def test_orm_event_translator_delete():
         'id': 123
     }
     assert translator.es_queue.get() == expected
-    assert translator.psql_queue.empty()
+    assert translator.psql_queue.get() == expected
     assert translator.es_queue.empty()
+    assert translator.psql_queue.empty()
 
 
 def test_orm_event_queue_overflow(capturelog):
@@ -502,7 +518,7 @@ def test_orm_event_queue_overflow(capturelog):
 
     translator = ORMEventTranslator(mappings, max_queue_size=4)
     translator.on_insert('foobar', Tweet(1))
-    translator.on_update('foobar', Tweet(2))
+    translator.on_update('foobar', Tweet(2))  # add two items to queue
     translator.on_delete('foobar', Tweet(3))
 
     assert len(capturelog.records(logging.ERROR)) == 0
@@ -539,24 +555,27 @@ def test_type_mapping_registry():
     }
 
 
-def test_indexer_process(es_client, session_manager):
+def test_indexer_process(es_client, session_manager_fts):
+    session_manager = session_manager_fts
     engine = session_manager.engine
     mappings = TypeMappingRegistry()
     mappings.register_type('page', {
         'title': {'type': 'localized'},
     })
 
-    index = "foo_bar-my_schema-en-page"
+    es_index = "foo-fts-en-page"  # hostname-schema-language-type
     es_indexer = Indexer(
-        mappings, Queue(), hostname='foo.bar', es_client=es_client)
+        mappings, Queue(), hostname='foo', es_client=es_client)
     psql_indexer = PostgresIndexer(Queue(), engine)
 
     task = {
         'action': 'index',
-        'schema': 'my-schema',
+        'schema': session_manager.current_schema,
         'tablename': 'my-pages',
         'type_name': 'page',
         'id': 1,
+        'owner_id': 1,
+        'owner_type': 'Page',
         'language': 'en',
         'properties': {
             'title': 'Go ahead and jump',
@@ -568,11 +587,11 @@ def test_indexer_process(es_client, session_manager):
 
     assert es_indexer.process() == 1
     assert es_indexer.process() == 0
-    es_client.indices.refresh(index=index)
+    es_client.indices.refresh(index=es_index)
     assert psql_indexer.process() == 1
     assert psql_indexer.process() == 0
 
-    search = es_client.search(index=index)
+    search = es_client.search(index=es_index)
     assert search['hits']['total']['value'] == 1
     assert search['hits']['hits'][0]['_id'] == '1'
     assert search['hits']['hits'][0]['_source'] == {
@@ -584,12 +603,12 @@ def test_indexer_process(es_client, session_manager):
 
     # check if the analyzer was applied correctly (stopword removal)
     search = es_client.search(
-        index=index, query={'match': {'title': 'and'}})
+        index=es_index, query={'match': {'title': 'and'}})
 
     assert search['hits']['total']['value'] == 0
 
     search = es_client.search(
-        index=index, query={'match': {'title': 'go jump'}})
+        index=es_index, query={'match': {'title': 'go jump'}})
 
     assert search['hits']['total']['value'] == 1
 
@@ -601,12 +620,15 @@ def test_indexer_process(es_client, session_manager):
         'id': 1
     }
     es_indexer.queue.put(task)
+    psql_indexer.queue.put(task)
 
     assert es_indexer.process() == 1
     assert es_indexer.process() == 0
-    es_client.indices.refresh(index=index)
+    es_client.indices.refresh(index=es_index)
+    assert psql_indexer.process() == 1
+    assert psql_indexer.process() == 0
 
-    es_client.search(index=index)
+    es_client.search(index=es_index)
     assert search['hits']['total']['value'] == 1
 
 
@@ -623,10 +645,14 @@ def test_indexer_bulk_process_mid_transaction(session_manager, session):
         'type_name': 'person',
         'id': person1.id,
         'id_key': 'id',
+        'owner_id': 1,
+        'owner_type': 'Person',
         'language': 'en',
+        'suggestion': 'John Doe',
         'properties': {
             'title': person1.title,
-            'es_public': True
+            'es_public': True,
+            'es_last_change': person1.last_change
         }
     })
     person2 = people.add(first_name='Jane', last_name='Doe')
@@ -637,10 +663,14 @@ def test_indexer_bulk_process_mid_transaction(session_manager, session):
         'type_name': 'person',
         'id': person2.id,
         'id_key': 'id',
+        'owner_id': 2,
+        'owner_type': 'Person',
         'language': 'en',
+        'suggestion': 'Jane Doe',
         'properties': {
             'title': person2.title,
-            'es_public': True
+            'es_public': True,
+            'es_last_change': person2.last_change
         }
     })
     psql_indexer.bulk_process(session)
@@ -652,18 +682,24 @@ def test_indexer_bulk_process_mid_transaction(session_manager, session):
         'type_name': 'person',
         'id': person3.id,
         'id_key': 'id',
+        'owner_id': 3,
+        'owner_type': 'Person',
         'language': 'en',
+        'suggestion': ['Paul Atishon', 'Atishon Paul'],
         'properties': {
             'title': person3.title,
-            'es_public': True
+            'es_public': True,
+            'es_last_change': person3.last_change
         }
     })
     psql_indexer.bulk_process(session)
     # make sure we can commit
     transaction.commit()
     transaction.begin()
-    # make sure the people exist and have their fts_idx column set
-    assert people.query().filter(Person.fts_idx.isnot(None)).count() == 3
+    # make sure the people got indexed and therefore exist in `SearchIndex`
+    # having their fts_idx column set
+    assert (session.query(SearchIndex).
+            filter(SearchIndex.fts_idx.isnot(None)).count() == 3)
 
 
 def test_extra_analyzers(es_client):
@@ -702,23 +738,28 @@ def test_extra_analyzers(es_client):
     ]
 
 
-def test_tags(es_client, session_manager):
+def test_tags(es_client, session_manager_fts):
+    session_manager = session_manager_fts
 
     mappings = TypeMappingRegistry()
     mappings.register_type('page', {
         'tags': {'type': 'text', 'analyzer': 'tags'}
     })
 
-    index = "foo-bar-en-page"
+    es_index = "foo-fts-en-page"  # hostname-schema-language-type
+    schema = session_manager.current_schema
     es_indexer = Indexer(mappings, Queue(), es_client, hostname='foo')
     psql_indexer = PostgresIndexer(Queue(), session_manager.engine)
 
     task = {
         'action': 'index',
-        'schema': 'bar',
+        'schema': schema,
         'tablename': 'my-bar',
         'type_name': 'page',
         'id': 1,
+        'id_key': 'id',
+        'owner_id': 1,
+        'owner_type': 'Page',
         'language': 'en',
         'properties': {
             'tags': ['foo', 'BAR', 'baz'],
@@ -731,24 +772,25 @@ def test_tags(es_client, session_manager):
     assert es_indexer.process()
     assert psql_indexer.process()
 
-    es_client.indices.refresh(index=index)
-    search = es_client.search(index=index)
+    es_client.indices.refresh(index=es_index)
+    search = es_client.search(index=es_index)
+    psql_indexer.delete_search_index(schema=schema)
 
     assert search['hits']['total']['value'] == 1
     # TODO search for psql
 
     search = es_client.search(
-        index=index, query={'match': {'tags': 'foo'}})
+        index=es_index, query={'match': {'tags': 'foo'}})
 
     assert search['hits']['total']['value'] == 1
 
     search = es_client.search(
-        index=index, query={'match': {'tags': 'bar'}})
+        index=es_index, query={'match': {'tags': 'bar'}})
 
     assert search['hits']['total']['value'] == 1
 
     search = es_client.search(
-        index=index, query={'match': {'tags': 'bad'}})
+        index=es_index, query={'match': {'tags': 'bad'}})
 
     assert search['hits']['total']['value'] == 0
 
