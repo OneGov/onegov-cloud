@@ -29,12 +29,12 @@ from typing import Any, Literal, NamedTuple, TYPE_CHECKING
 
 if TYPE_CHECKING:
     from collections.abc import Callable, Iterable, Iterator, Sequence
+    from datetime import datetime
     from elasticsearch import Elasticsearch
     from sqlalchemy.engine import Engine
     from sqlalchemy.orm import Session
     from typing import TypeAlias
     from typing import TypedDict
-
 
     class IndexTask(TypedDict):
         action: Literal['index']
@@ -46,8 +46,11 @@ if TYPE_CHECKING:
         owner_type: str
         owner_id: UUID | str | int
         language: str
+        access: str
+        suggestion: str
+        publication_start: datetime | None
+        publication_end: datetime | None
         properties: dict[str, Any]
-
 
     class DeleteTask(TypedDict):  # FIXME: not needed for fts
         action: Literal['delete']
@@ -55,7 +58,6 @@ if TYPE_CHECKING:
         schema: str
         type_name: str
         tablename: str
-
 
     Task: TypeAlias = IndexTask | DeleteTask
 
@@ -436,7 +438,7 @@ class PostgresIndexer(IndexerBase):
                     '_access': task.get('access', 'public'),
                     '_last_change': task['properties']['es_last_change'],
                     '_tags': _tags,
-                    '_suggestion': task['es_suggestion'],
+                    '_suggestion': task['suggestion'],
                     '_publication_start':
                         task.get('publication_start', None),
                     '_publication_end':
@@ -1087,33 +1089,33 @@ class ORMEventTranslator:
                 else:
                     translation['properties'][prop] = raw
 
-            for attr in ['access', 'publication_start', 'publication_end',
-                         'es_suggestion']:
+            for attr in ['access', 'publication_start', 'publication_end']:
                 if hasattr(obj, attr) and getattr(obj, attr):
                     translation[attr] = getattr(obj, attr)
 
+            # FIXME: remove once es is migrated to postgres
             if obj.es_public:
                 contexts = {'es_suggestion_context': ['public']}
             else:
                 contexts = {'es_suggestion_context': ['private']}
 
-            # FIXME: remove once es is migrated to postgres
-            suggestion = obj.es_suggestion
             translation['properties']['es_suggestion'] = {
-                'input': suggestion,
+                'input': obj.es_suggestion,
                 'contexts': contexts
             }
+            # end FIXME
 
             # fts suggestion
+            suggestion = obj.es_suggestion
             if suggestion:
                 if isinstance(suggestion, str):
-                    suggestion = suggestion.split(',')
+                    suggestion = [s.strip() for s in suggestion.split(',')]
                 elif isinstance(suggestion, Iterable):
                     suggestion = list(suggestion)
                 else:
                     suggestion = ''
 
-                translation['es_suggestion'] = suggestion
+                translation['suggestion'] = suggestion
 
             self.put(translation)
         except ObjectDeletedError as ex:

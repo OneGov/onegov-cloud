@@ -45,8 +45,6 @@ from more.transaction.main import transaction_tween_factory
 from more.webassets import WebassetsApp
 from more.webassets.core import webassets_injector_tween
 from more.webassets.tweens import METHODS, CONTENT_TYPES
-from sqlalchemy import MetaData, Table, Integer, String, Column
-from sqlalchemy.dialects.postgresql import JSONB, TSVECTOR
 
 from onegov.core import cache, log, utils
 from onegov.core import directives
@@ -1503,6 +1501,7 @@ class Framework(
             return signer.unsign(text).decode('utf-8')
         except BadSignature:
             return None
+
 
 @Framework.webasset_url()
 def get_webasset_url() -> str:
