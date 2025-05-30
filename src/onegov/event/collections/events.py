@@ -775,7 +775,7 @@ class EventCollection(Pagination[Event]):
                 desc = e.description
                 if len(e.description) > 10000:
                     desc = e.description[:9995] + '..'
-                text_mobile.text = CDATA(  # type: ignore[assignment]
+                text_mobile.text = CDATA(
                     desc.replace('\r\n', '<br>'))
 
             for occ in e.occurrences:
@@ -788,7 +788,7 @@ class EventCollection(Pagination[Event]):
 
             if e.price:
                 price = SubElement(event, 'sf01')
-                price.text = CDATA(  # type: ignore[assignment]
+                price.text = CDATA(
                     e.price.replace('\r\n', '<br>'))
 
             if e.external_event_url:

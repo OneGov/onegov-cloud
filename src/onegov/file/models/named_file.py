@@ -69,7 +69,8 @@ class NamedFile:
         if instance is None:
             return None
 
-        for file in instance.files:
+        file: File
+        for file in instance.files:  # type: ignore[attr-defined]
             if file.name == self.name:
                 return file
 

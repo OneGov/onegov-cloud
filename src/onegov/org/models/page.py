@@ -182,7 +182,7 @@ class News(Page, TraitInfo, SearchableContent, NewsletterExtension,
         self.hashtags = self.es_tags or []
 
     @property
-    def absorb(self) -> str:  # type:ignore[override]
+    def absorb(self) -> str:
         return ''.join(self.path.split('/', 1)[1:])
 
     @property

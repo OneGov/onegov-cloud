@@ -2,7 +2,6 @@ from __future__ import annotations
 
 from onegov.pas.calculate_pay import calculate_rate
 from dataclasses import dataclass
-from typing import cast
 from onegov.pas.collections import (
     AttendenceCollection,
 )
@@ -201,12 +200,12 @@ th, td {
     """
 
     type_totals: dict[TotalType, TypeTotal] = {
-        cast('TotalType', 'plenary'): {'entries': [], 'total': Decimal('0')},
-        cast('TotalType', 'commission'): {'entries': [],
+        'plenary': {'entries': [], 'total': Decimal('0')},
+        'commission': {'entries': [],
                                           'total': Decimal('0')},
-        cast('TotalType', 'study'): {'entries': [], 'total': Decimal('0')},
-        cast('TotalType', 'shortest'): {'entries': [], 'total': Decimal('0')},
-        cast('TotalType', 'expenses'): {'entries': [], 'total': Decimal('0')},
+        'study': {'entries': [], 'total': Decimal('0')},
+        'shortest': {'entries': [], 'total': Decimal('0')},
+        'expenses': {'entries': [], 'total': Decimal('0')},
     }
 
     for entry in data['entries']:
@@ -234,17 +233,15 @@ th, td {
     # Now, start building the second part of the report document. Notice that
     # this one now is *with* cost of living adjustment.
     total = Decimal('0')
-    type_mappings = [
-        ('Total aller Plenarsitzungen inkl. Teuerungszulage',
-         cast('TotalType', 'plenary')),
-        ('Total aller Kommissionssitzungen inkl. Teuerungszulage',
-         cast('TotalType', 'commission')),
-        ('Total aller Aktenstudium inkl. Teuerungszulage',
-         cast('TotalType', 'study')),
-        ('Total aller Kürzestsitzungen inkl. Teuerungszulage',
-         cast('TotalType', 'shortest')),
-        ('Total Spesen inkl. Teuerungszulage',
-         cast('TotalType', 'expenses')),
+    type_mappings: list[tuple[str, TotalType]] = [
+        ('Total aller Plenarsitzungen inkl. Teuerungszulage', 'plenary'),
+        (
+            'Total aller Kommissionssitzungen inkl. Teuerungszulage',
+            'commission'
+        ),
+        ('Total aller Aktenstudium inkl. Teuerungszulage', 'study'),
+        ('Total aller Kürzestsitzungen inkl. Teuerungszulage', 'shortest'),
+        ('Total Spesen inkl. Teuerungszulage', 'expenses'),
     ]
     for type_name, type_key in type_mappings:
         total_value = sum(
