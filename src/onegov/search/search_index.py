@@ -6,6 +6,7 @@ from sqlalchemy.dialects.postgresql import ARRAY, HSTORE, JSONB, TSVECTOR
 from onegov.core.orm import Base
 from onegov.core.orm.mixins import UTCPublicationMixin
 from onegov.core.orm.types import UUID, UTCDateTime
+from sqlalchemy import text
 from sqlalchemy.ext.mutable import MutableDict
 
 
@@ -71,17 +72,56 @@ class SearchIndex(Base, UTCPublicationMixin):
     }
 
     __table_args__ = (
-        Index('ix_search_index_owner_type', 'owner_type'),
-        Index('ix_search_index_owner_id_int', 'owner_id_int'),
-        Index('ix_search_index_owner_id_uuid', 'owner_id_uuid'),
-        Index('ix_search_index_owner_id_str', 'owner_id_str'),
-        Index('ix_search_index_public', 'public'),
+        # compound indexes for owner lookups
+        Index(
+            'ix_search_index_owner_type_id_int',
+            'owner_type', 'owner_id_int',
+            postgresql_where=text('owner_id_int IS NOT NULL')
+        ),
+        Index(
+            'ix_search_index_owner_type_id_uuid',
+            'owner_type',
+            'owner_id_uuid',
+            postgresql_where=text('owner_id_uuid IS NOT NULL'),
+        ),
+        Index(
+            'ix_search_index_owner_type_id_str',
+            'owner_type',
+            'owner_id_str',
+            postgresql_where=text('owner_id_str IS NOT NULL'),
+        ),
+        # compound index for public and access lookups
+        Index(
+            'ix_search_index_public_access',
+            'public', 'access'
+        ),
+
+        # regular indexes for filtering
+        # no index for column public due to low cardinality
         Index('ix_search_index_access', 'access'),
         Index('ix_search_index_last_change', 'last_change'),
-        Index('ix_search_index_tags', 'tags'),
-        Index('ix_search_index_suggestion', 'suggestion'),
-        Index('ix_search_index_fts_idx_data', 'fts_idx_data'),
-        Index('ix_search_index_fts_idx', 'fts_idx'),
+
+        # gin indexes for complex types
+        Index(
+            'ix_search_index_tags',
+            'tags', postgresql_using='gin'
+        ),
+        Index(
+            'ix_search_index_suggestion',
+            'suggestion',
+            postgresql_using='gin'
+        ),
+        Index(
+            'ix_search_index_fts_idx_data',
+            'fts_idx_data',
+            postgresql_using='gin',
+            postgresql_ops={'fts_idx_data': 'jsonb_ops'},
+        ),
+        Index(
+            'ix_search_index_fts_idx',
+            'fts_idx',
+            postgresql_using='gin'
+        ),
     )
 
     @property
