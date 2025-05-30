@@ -1,15 +1,16 @@
 from __future__ import annotations
 
+import io
 import re
 
 from datetime import date as dateobj
 from dateutil.relativedelta import relativedelta
 from decimal import Decimal
+from functools import lru_cache
 from onegov.form.utils import decimal_range
 from pyparsing import (
     alphanums,
     Combine,
-    FollowedBy,
     Group,
     Literal,
     MatchFirst,
@@ -42,9 +43,44 @@ text = Word(printables)
 numeric = Word(nums)
 
 
+def chars_to_re_group(chars: Sequence[str]) -> str:
+    # NOTE: We don't handle edge cases like ^ being the first character
+    #       in a range or ] being one of the range bounds yet, this also
+    #       assumes at least 2 chars
+    assert len(chars) > 1
+    buffer = io.StringIO()
+    buffer.write(r'[')
+    previous: int | None = None
+    for current in sorted(ord(c) for c in chars):
+        if previous is None:
+            buffer.write(chr(current))
+        elif current - previous > 1:
+            buffer.write(r'-')
+            buffer.write(chr(previous))
+            buffer.write(chr(current))
+
+        previous = current
+
+    buffer.write(r']')
+    return buffer.getvalue()
+
+
+word_re = chars_to_re_group(printables) + '+'
+
+
+@lru_cache(maxsize=16)
+def text_without_re(characters: str) -> str:
+    """ Returns a re group for text without the given characters. """
+    return chars_to_re_group([
+        char
+        for char in printables
+        if char not in characters
+    ]) + '+'
+
+
 def text_without(characters: str) -> Word:
     """ Returns all printable text without the given characters. """
-    return Word(printables, excludeChars=characters)
+    return Word(printables, exclude_chars=characters)
 
 
 def matches(character: str) -> Callable[[ParseResults], bool]:
@@ -182,7 +218,7 @@ def number_enclosed_in(characters: str) -> ParserElement:
     """ Wraps numers in the given characters, making sure the result is an int.
 
     """
-    return enclosed_in(numeric, characters).setParseAction(as_int)
+    return enclosed_in(numeric, characters).set_parse_action(as_int)
 
 
 def choices_enclosed_in(
@@ -194,7 +230,7 @@ def choices_enclosed_in(
 
     """
     expr = Regex(f'({"|".join(re.escape(c) for c in choices)})')
-    return enclosed_in(expr, characters).setParseAction(unwrap)
+    return enclosed_in(expr, characters).set_parse_action(unwrap)
 
 
 def mark_enclosed_in(characters: str) -> MatchFirst:
@@ -208,8 +244,8 @@ def mark_enclosed_in(characters: str) -> MatchFirst:
     assert len(characters) == 2
     left, right = characters[0], characters[1]
     return MatchFirst((
-        Literal(left + 'x' + right).setParseAction(literal(True)),
-        Literal(left + ' ' + right).setParseAction(literal(False))
+        Literal(left + 'x' + right).set_parse_action(literal(True)),
+        Literal(left + ' ' + right).set_parse_action(literal(False))
     ))
 
 
@@ -229,11 +265,11 @@ def textfield() -> ParserElement:
     """
     length = number_enclosed_in('[]')('length')
 
-    regex = Word(printables).setParseAction(as_regex)('regex')
+    regex = Word(printables).set_parse_action(as_regex)('regex')
     regex = Suppress('/') + regex
 
     textfield = Suppress('___') + Optional(length) + Optional(regex)
-    textfield.setParseAction(tag(type='text'))
+    textfield.set_parse_action(tag(type='text'))
 
     return textfield
 
@@ -252,7 +288,7 @@ def textarea() -> ParserElement:
     rows = number_enclosed_in('[]')('rows')
 
     textarea = Suppress('...') + Optional(rows)
-    textarea.setParseAction(tag(type='textarea'))
+    textarea.set_parse_action(tag(type='textarea'))
 
     return textarea
 
@@ -283,7 +319,7 @@ def password() -> ParserElement:
 
     """
 
-    return Suppress('***').setParseAction(tag(type='password'))
+    return Suppress('***').set_parse_action(tag(type='password'))
 
 
 def email() -> ParserElement:
@@ -294,7 +330,7 @@ def email() -> ParserElement:
         @@@
 
     """
-    return Suppress('@@@').setParseAction(tag(type='email'))
+    return Suppress('@@@').set_parse_action(tag(type='email'))
 
 
 def url() -> ParserElement:
@@ -306,7 +342,7 @@ def url() -> ParserElement:
         https://
 
     """
-    return Suppress(Regex(r'https?://')).setParseAction(tag(type='url'))
+    return Suppress(Regex(r'https?://')).set_parse_action(tag(type='url'))
 
 
 def video_url() -> ParserElement:
@@ -317,7 +353,7 @@ def video_url() -> ParserElement:
         video-url
 
     """
-    return Suppress(Regex(r'video-url')).setParseAction(tag(
+    return Suppress(Regex(r'video-url')).set_parse_action(tag(
         type='video_url'))
 
 
@@ -329,7 +365,7 @@ def absolute_date() -> ParserElement:
         2020.10.10
     """
     date_expr = numeric + Suppress('.') + numeric + Suppress('.') + numeric
-    return date_expr.setParseAction(as_date)
+    return date_expr.set_parse_action(as_date)
 
 
 def relative_delta() -> ParserElement:
@@ -345,7 +381,9 @@ def relative_delta() -> ParserElement:
     sign = Optional(Literal('-') | Literal('+'))
     grain = (Literal('days') | Literal('weeks') | Literal('months')
              | Literal('years'))
-    return (Combine(sign + numeric) + grain).setParseAction(as_relative_delta)
+    return (
+        Combine(sign + numeric) + grain
+    ).set_parse_action(as_relative_delta)
 
 
 def valid_date_range() -> ParserElement:
@@ -359,14 +397,14 @@ def valid_date_range() -> ParserElement:
 
     """
 
-    today = Literal('today').setParseAction(
+    today = Literal('today').set_parse_action(
         literal(relativedelta()))
     value_expr = Optional(
         today | relative_delta() | absolute_date(),
         default=None
     )
     date_range = value_expr('start') + Suppress('..') + value_expr('stop')
-    date_range.setParseAction(is_valid_date_range)
+    date_range.set_parse_action(is_valid_date_range)
     return Group(enclosed_in(date_range, '()'))('valid_date_range')
 
 
@@ -379,7 +417,7 @@ def date() -> ParserElement:
 
     """
 
-    date = Suppress('YYYY.MM.DD').setParseAction(tag(type='date'))
+    date = Suppress('YYYY.MM.DD').set_parse_action(tag(type='date'))
     return date + Optional(valid_date_range())
 
 
@@ -392,7 +430,7 @@ def datetime() -> ParserElement:
 
     """
 
-    dt = Suppress('YYYY.MM.DD HH:MM').setParseAction(tag(type='datetime'))
+    dt = Suppress('YYYY.MM.DD HH:MM').set_parse_action(tag(type='datetime'))
     return dt + Optional(valid_date_range())
 
 
@@ -405,7 +443,7 @@ def time() -> ParserElement:
 
     """
 
-    return Suppress('HH:MM').setParseAction(tag(type='time'))
+    return Suppress('HH:MM').set_parse_action(tag(type='time'))
 
 
 def stdnum() -> ParserElement:
@@ -418,7 +456,7 @@ def stdnum() -> ParserElement:
     """
     prefix = Suppress('#') + Optional(White(' '))
     parser = prefix + Regex(r'[a-z\.]+')('format')
-    parser.setParseAction(tag(type='stdnum'))
+    parser.set_parse_action(tag(type='stdnum'))
 
     return parser
 
@@ -431,7 +469,7 @@ def chip_nr() -> ParserElement:
         chip-nr
 
     """
-    return Suppress(Regex(r'chip-nr')).setParseAction(tag(type='chip_nr'))
+    return Suppress(Regex(r'chip-nr')).set_parse_action(tag(type='chip_nr'))
 
 
 def fileinput() -> ParserElement:
@@ -467,7 +505,7 @@ def fileinput() -> ParserElement:
             tokens['extensions'] = [ext.lower() for ext in tokens[0].asList()]
 
     parser = extensions + Optional(multiple)
-    parser.setParseAction(extract_file_types)
+    parser.set_parse_action(extract_file_types)
 
     return parser
 
@@ -488,7 +526,7 @@ def decimal() -> ParserElement:
 
     return (
         (Optional('-') + numeric + Optional(Suppress('.') + numeric))
-        .setParseAction(as_decimal)('amount')
+        .set_parse_action(as_decimal)('amount')
     )
 
 
@@ -500,7 +538,7 @@ def range_field(
     """ Generic range field parser. """
 
     r = (value_expression + Suppress('..') + value_expression)
-    r = r.setParseAction(parse_action)
+    r = r.set_parse_action(parse_action)
     r = r.addParseAction(tag(type=type))
 
     return r
@@ -532,7 +570,7 @@ def currency() -> ParserElement:
 
     """
 
-    return Regex(r'[a-zA-Z]{3}').setParseAction(as_uppercase)('currency')
+    return Regex(r'[a-zA-Z]{3}').set_parse_action(as_uppercase)('currency')
 
 
 def pricing() -> ParserElement:
@@ -544,7 +582,7 @@ def pricing() -> ParserElement:
         (-0.50 Cny)
     """
 
-    cc_payment = Literal('!').setParseAction(matches('!'))
+    cc_payment = Literal('!').set_parse_action(matches('!'))
     cc_payment = Optional(cc_payment, default=False)('credit_card_payment')
 
     pricing = Group(
@@ -578,14 +616,24 @@ def marker_box(characters: str) -> ParserElement:
     """
 
     check = mark_enclosed_in(characters)('checked')
-    label_text = with_whitespace_inside(text_without(characters + '()'))
     pricing_or_discount_parser = pricing() | discount()
-    label = MatchFirst((
-        label_text + FollowedBy(pricing_or_discount_parser),
-        Combine(label_text + with_whitespace_inside(text)),
-        label_text
-    )).setParseAction(as_joined_string)('label')
-
+    # NOTE: This ended up being a nightmare to build with pyparsing primitives
+    #       so I just gave up and used pure Regex, they use a lot of Regex
+    #       internally anyways, so it should be fine. This required lazy
+    #       matching, which makes this probably a bit slower than it could be
+    #       but otherwise it should be equivalent to what we had before in
+    #       what kind of characters are allowed to be used in labels.
+    #       It might be possible to implement this using left recursion in
+    #       pyparsing, but it seemed just as difficult as with right recursion
+    #       since the label will still fundamentally act greedily. I couldn't
+    #       find any pyparsing native way to make it lazy instead.
+    #       If pricing wasn't optional this would be easy...
+    label = Regex(
+        # a sequence of words (that can't start with brackets)
+        rf'(?P<label>{text_without_re(characters + "()")}(?: {word_re})*?) *'
+        # followed by optional pricing or discount followed by end of line
+        r'(?=$|[(] *-?[0-9]+(?:\.[0-9]+)? *(?:%|[A-Za-z]{3}!?) *[)] *$)'
+    )
     return check + label + Optional(pricing_or_discount_parser)
 
 
@@ -596,7 +644,7 @@ def radio() -> ParserElement:
         (x) Male
         ( ) Female
     """
-    return marker_box('()').setParseAction(tag(type='radio'))
+    return marker_box('()').set_parse_action(tag(type='radio'))
 
 
 def checkbox() -> ParserElement:
@@ -606,7 +654,7 @@ def checkbox() -> ParserElement:
         [x] Male
         [ ] Female
     """
-    return marker_box('[]').setParseAction(tag(type='checkbox'))
+    return marker_box('[]').set_parse_action(tag(type='checkbox'))
 
 
 def fieldset_title() -> ParserElement:
@@ -624,7 +672,7 @@ def fieldset_title() -> ParserElement:
     label = with_whitespace_inside(text).setResultsName('label')
 
     fieldset_title = Suppress('#') + (Suppress('...') | label)
-    fieldset_title = fieldset_title.setParseAction(tag(type='fieldset'))
+    fieldset_title = fieldset_title.set_parse_action(tag(type='fieldset'))
 
     return fieldset_title
 
@@ -638,7 +686,7 @@ def field_identifier() -> ParserElement:
 
     """
 
-    required = Literal('*').setParseAction(matches('*'))
+    required = Literal('*').set_parse_action(matches('*'))
     required = Optional(required, default=False)('required')
 
     # a field name can contain any kind of character, except for a '=' and
