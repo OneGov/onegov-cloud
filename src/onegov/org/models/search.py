@@ -284,7 +284,7 @@ class SearchPostgres(Pagination[_M]):
         if available_accesses:
             query = query.filter(or_(
                 SearchIndex.public == 'true',
-                SearchIndex.fts_idx_data['access'].astext.in_(available_accesses)
+                SearchIndex.access.in_(available_accesses)
             ))
 
         return query
