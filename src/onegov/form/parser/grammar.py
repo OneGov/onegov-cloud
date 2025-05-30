@@ -1,6 +1,5 @@
 from __future__ import annotations
 
-import io
 import re
 
 from datetime import date as dateobj
@@ -25,6 +24,7 @@ from pyparsing import (
     White,
     Word,
 )
+from pyparsing.util import _collapse_string_to_ranges
 
 from typing import Any, TypeVar, TYPE_CHECKING
 if TYPE_CHECKING:
@@ -41,41 +41,14 @@ ParserElement.setDefaultWhitespaceChars(' \t')
 printables = pyparsing_unicode.Latin1.printables
 text = Word(printables)
 numeric = Word(nums)
-
-
-def chars_to_re_group(chars: Sequence[str]) -> str:
-    # NOTE: We don't handle edge cases like ^ being the first character
-    #       in a range or ] being one of the range bounds yet, this also
-    #       assumes at least 2 chars
-    assert len(chars) > 1
-    buffer = io.StringIO()
-    buffer.write(r'[')
-    previous: int | None = None
-    for current in sorted(ord(c) for c in chars):
-        if previous is None:
-            buffer.write(chr(current))
-        elif current - previous > 1:
-            buffer.write(r'-')
-            buffer.write(chr(previous))
-            buffer.write(chr(current))
-
-        previous = current
-
-    buffer.write(r']')
-    return buffer.getvalue()
-
-
-word_re = chars_to_re_group(printables) + '+'
+word_re = rf'[{_collapse_string_to_ranges(printables)}]+'
 
 
 @lru_cache(maxsize=16)
 def text_without_re(characters: str) -> str:
     """ Returns a re group for text without the given characters. """
-    return chars_to_re_group([
-        char
-        for char in printables
-        if char not in characters
-    ]) + '+'
+    chars = (c for c in printables if c not in characters)
+    return rf'[{_collapse_string_to_ranges(chars)}]+'
 
 
 def text_without(characters: str) -> Word:
