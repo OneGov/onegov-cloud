@@ -356,12 +356,13 @@ def test_orm_event_translator_properties():
 
     translator = ORMEventTranslator(mappings)
 
+    creation_date = datetime(2015, 9, 11)
     translator.on_insert('my-schema', Page(
         id=1,
         title='About',
         body='We are Pied Piper',
         tags=['aboutus', 'company'],
-        date=datetime(2015, 9, 11),
+        date=creation_date,
         published=True,
         likes=1000
     ))
@@ -376,15 +377,19 @@ def test_orm_event_translator_properties():
         'owner_id': 1,
         'owner_type': 'Page',
         'language': 'en',
+        'access': '',
+        'suggestion': ['About'],
+        'publication_start': None,
+        'publication_end': None,
         'properties': {
             'title': 'About',
             'body': 'We are Pied Piper',
-            'date': '2015-09-11T00:00:00',
+            'date': creation_date,
             'likes': 1000,
             'published': True,
             'es_tags': ['aboutus', 'company'],
             'es_public': True,
-            'es_last_change': '2015-09-11T00:00:00',
+            'es_last_change': creation_date,
             'es_suggestion': {
                 'input': 'About',
                 'contexts': {
@@ -425,15 +430,19 @@ def test_orm_event_translator_properties():
         'owner_id': 1,
         'owner_type': 'Page',
         'language': 'en',
+        'access': '',
+        'suggestion': ['About'],
+        'publication_start': None,
+        'publication_end': None,
         'properties': {
             'title': 'About',
             'body': 'We are Pied Piper',
-            'date': '2015-09-11T00:00:00',
+            'date': creation_date,
             'likes': 1000,
             'published': True,
             'es_tags': ['aboutus', 'company'],
             'es_public': True,
-            'es_last_change': '2015-09-11T00:00:00',
+            'es_last_change': creation_date,
             'es_suggestion': {
                 'input': 'About',
                 'contexts': {
@@ -639,9 +648,11 @@ def test_indexer_bulk_process_mid_transaction(session_manager, session):
         'owner_id': 1,
         'owner_type': 'Person',
         'language': 'en',
+        'suggestion': 'John Doe',
         'properties': {
             'title': person1.title,
-            'es_public': True
+            'es_public': True,
+            'es_last_change': person1.last_change
         }
     })
     person2 = people.add(first_name='Jane', last_name='Doe')
@@ -655,9 +666,11 @@ def test_indexer_bulk_process_mid_transaction(session_manager, session):
         'owner_id': 2,
         'owner_type': 'Person',
         'language': 'en',
+        'suggestion': 'Jane Doe',
         'properties': {
             'title': person2.title,
-            'es_public': True
+            'es_public': True,
+            'es_last_change': person2.last_change
         }
     })
     psql_indexer.bulk_process(session)
@@ -672,9 +685,11 @@ def test_indexer_bulk_process_mid_transaction(session_manager, session):
         'owner_id': 3,
         'owner_type': 'Person',
         'language': 'en',
+        'suggestion': ['Paul Atishon', 'Atishon Paul'],
         'properties': {
             'title': person3.title,
-            'es_public': True
+            'es_public': True,
+            'es_last_change': person3.last_change
         }
     })
     psql_indexer.bulk_process(session)
