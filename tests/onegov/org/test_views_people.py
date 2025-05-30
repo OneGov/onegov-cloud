@@ -8,26 +8,37 @@ from onegov.people import Person
 
 def test_people_view(client):
     client.login_admin()
-    settings = client.get('/module-settings')
+    settings = client.get('/people-settings')
     settings.form['hidden_people_fields'] = ['academic_title', 'profession']
+    settings.form['organisation_hierarchy'] = """
+    - Organisation 1
+    - Organisation 2:
+      - Sub-Organisation 2.1
+      - Sub-Organisation 2.2
+    """
     settings.form.submit()
     client.logout()
 
     client.login_editor()
 
     people = client.get('/people')
-    assert 'noch keine Personen' in people
+    assert 'Keine Personen' in people
 
     new_person = people.click('Person')
     new_person.form['academic_title'] = 'Dr.'
     new_person.form['first_name'] = 'Flash'
     new_person.form['last_name'] = 'Gordon'
     new_person.form['profession'] = 'Hero'
+    new_person.form['organisations_multiple'].select_multiple(
+        texts=['Organisation 1', 'Organisation 2', '- Sub-Organisation 2.1',
+               '- Sub-Organisation 2.2'])
     person = new_person.form.submit().follow()
 
     assert 'Gordon Flash' in person
     assert 'Dr.' in person
     assert 'Hero' in person
+    assert 'Organisation 1' in person
+    assert 'Organisation 2 - Sub-Organisation 2.1, Sub' in person
 
     vcard = person.click('Elektronische Visitenkarte').text
     assert 'FN;CHARSET=utf-8:Dr. Flash Gordon' in vcard
@@ -60,7 +71,7 @@ def test_people_view(client):
     client.delete(delete_link)
 
     people = client.get('/people')
-    assert 'noch keine Personen' in people
+    assert 'Keine Personen' in people
 
 
 def test_with_people(client):
@@ -110,6 +121,21 @@ def test_people_view_organisation_fiter(client):
     sub_org_21 = 'Vanguard Tech'
     sub_org_22 = 'Vanguard Capital'
 
+    client.login_admin()
+    settings = client.get('/people-settings')
+    settings.form['organisation_hierarchy'] = f"""
+    - {org_1}:
+      - {sub_org_11}
+      - {sub_org_12}
+      - {sub_org_13}
+    - {org_2}:
+      - {sub_org_21}
+      - {sub_org_22}
+    """
+    settings.form.submit()
+    client.logout()
+
+
     client.login_editor()
 
     def add_person(first_name, last_name, function, org, sub_org):
@@ -118,8 +144,8 @@ def test_people_view_organisation_fiter(client):
         new_person.form['first_name'] = first_name
         new_person.form['last_name'] = last_name
         new_person.form['function'] = function
-        new_person.form['organisation'] = org
-        new_person.form['sub_organisation'] = sub_org
+        new_person.form['organisations_multiple'].select_multiple(
+        texts=[org, f'- {sub_org}'] if sub_org else [org])
         new_person.form.submit()
 
     add_person('Aria', 'Chen',

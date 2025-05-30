@@ -24,7 +24,7 @@
 
 <metal:agenda-item-list define-macro="agenda_item_list">
     <div class="side-panel assembly-agenda-items" tal:condition="agenda_items" tal:define="agenda_item agenda_item|None">
-        <h2 i18n:translate="">Agenda items</h2>
+        <h3 i18n:translate="">Agenda items</h3>
         <ul class="more-list agenda-item-list ${'with-current' if agenda_item else ''}">
             <li tal:repeat="current_agenda_item agenda_items">
                 <a class="list-link" id="${'current' if current else ''}" tal:attributes="href request.link(current_agenda_item)" tal:define="current agenda_item == current_agenda_item">
@@ -46,7 +46,7 @@
 
 <metal:ticker-agenda-item-list define-macro="ticker_agenda_item_list">
     <div class="side-panel assembly-agenda-items" tal:condition="agenda_items" tal:define="agenda_item agenda_item|None">
-        <h2 i18n:translate="">Agenda items</h2>
+        <h3 i18n:translate="">Agenda items</h3>
         <ul class="more-list agenda-item-list with-current">
             <tal:b tal:repeat="current_agenda_item agenda_items">
                 <li id="list-agenda-item-${current_agenda_item.number}">
@@ -123,7 +123,7 @@
     <div class="ticker-item ticker-item-agenda-item ${agenda_item.state}" id="agenda-item-${agenda_item.number}">
         <div class="ticker-info">
             <h2><tal:block metal:use-macro="layout.macros['agenda-item-title']" /></h2>
-            <p tal:condition="agenda_item.start_time" class="subheader agenda-item-timestamp"><span><i class="far fa-clock"></i> ${layout.format_date(agenda_item.start_time, 'time')}</span></p>
+            <p tal:condition="agenda_item.start_time" class="subheader agenda-item-timestamp"><i class="far fa-clock"></i><span>${layout.format_date(agenda_item.start_time, 'time')}</span></p>
         </div>
 
         <div class="callout secondary agenda-item-resolution" tal:condition="agenda_item.resolution or agenda_item.tacitly_accepted">

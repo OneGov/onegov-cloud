@@ -461,7 +461,8 @@ class SearchApp(morepath.App):
                     self.fts_orm_events.index(schema, obj)
 
             except Exception as e:
-                print(f"Error psql indexing model '{model.__name__}': {e}")
+                index_log.info(
+                    f"Error psql indexing model '{model.__name__}': {e}")
             finally:
                 session.invalidate()
                 session.bind.dispose()
@@ -476,7 +477,7 @@ class SearchApp(morepath.App):
         with ThreadPoolExecutor() as executor:
             results = executor.map(reindex_model, models)
             if fail:
-                print('Failed reindexing:', tuple(results))
+                index_log.info('Failed reindexing:', tuple(results))
 
         self.es_indexer.bulk_process()
         self.psql_indexer.bulk_process()

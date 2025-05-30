@@ -197,7 +197,7 @@ def as_paragraphs(text: str) -> Iterator[Markup]:
                 yield Markup('<p>{}</p>').format(
                     Markup('<br>').join(paragraph)
                 )
-                del paragraph[:]
+                paragraph.clear()
         else:
             paragraph.append(line)
 

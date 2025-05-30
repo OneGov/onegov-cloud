@@ -18,6 +18,7 @@ if TYPE_CHECKING:
 _T = TypeVar('_T')
 
 
+# FIXME: Should we use `click.echo` or `log.info` instead of `print`?
 class UserSource:
     """ Generalized UserSource to facilitate ldap sync """
 
@@ -207,7 +208,7 @@ class ZugUserSource(UserSource):
         if mail and mail.endswith('@zg.ch'):
             return 'ldap'
         elif self.verbose:
-            print(f'No usertype for {mail}')
+            print(f'No usertype for {mail}')  # noqa: T201
         return None
 
     def user_type_default(self, entry: Entry) -> str | None:
@@ -220,7 +221,7 @@ class ZugUserSource(UserSource):
 
         if 'student' in reasons:
             if self.verbose:
-                print('Skip: no user_type for student')
+                print('Skip: no user_type for student')  # noqa: T201
             return None
 
         return 'regular'
@@ -232,22 +233,22 @@ class ZugUserSource(UserSource):
 
         if not mail or not mail[0].strip():
             if self.verbose:
-                print('Excluded: No Mail')
+                print('Excluded: No Mail')  # noqa: T201
             return True
 
         if entry.entry_dn.count(',') <= 1:
             if self.verbose:
-                print(f'Excluded entry_dn.count(",") <= 1: {mail!s}')
+                print(f'Excluded entry_dn.count(",") <= 1: {mail!s}')  # noqa: T201
             return True
 
         if 'ou=HRdeleted' in entry.entry_dn:
             if self.verbose:
-                print(f'Excluded HRdeleted: {mail!s}')
+                print(f'Excluded HRdeleted: {mail!s}')  # noqa: T201
             return True
 
         if 'ou=Other' in entry.entry_dn:
             if self.verbose:
-                print(f'Excluded ou=Other: {mail!s}')
+                print(f'Excluded ou=Other: {mail!s}')  # noqa: T201
             return True
 
         if not self.user_type(entry):
@@ -321,10 +322,10 @@ class ZugUserSource(UserSource):
 
             yield user
         if self.verbose:
-            print(f'Base: {base}\t\tFilter: {sf}')
-            print(f'- Total: {total}')
-            print(f'- Found: {count}')
-            print(f'- Excluded: {total - count}')
+            print(f'Base: {base}\t\tFilter: {sf}')  # noqa: T201
+            print(f'- Total: {total}')  # noqa: T201
+            print(f'- Found: {count}')  # noqa: T201
+            print(f'- Excluded: {total - count}')  # noqa: T201
 
     @classmethod
     def factory(cls, verbose: bool = False) -> list[ZugUserSource]:

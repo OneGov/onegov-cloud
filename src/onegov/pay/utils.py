@@ -9,7 +9,7 @@ from typing import NamedTuple, TYPE_CHECKING
 if TYPE_CHECKING:
     from onegov.pay.types import PriceDict
     from sqlalchemy import Table
-    from typing import Self
+    from typing import Self, SupportsIndex
 
 
 class _PriceBase(NamedTuple):
@@ -51,7 +51,10 @@ class Price(_PriceBase):
         return self.amount < other.amount
 
     def __add__(self, other: Price) -> Self:  # type:ignore[override]
-        assert self.currency is None or self.currency == other.currency
+        assert (
+            (self.currency is None or other.currency is None) or
+            self.currency == other.currency
+        )
         cc_payment = self.credit_card_payment or other.credit_card_payment
         return self.__class__(
             self.amount + other.amount,
@@ -67,6 +70,18 @@ class Price(_PriceBase):
             self.currency,
             credit_card_payment=cc_payment
         )
+
+    def __mul__(self, other: Decimal | float | SupportsIndex) -> Self:
+        assert not self.fee, 'Multipliers should be applied before fees'
+        if not isinstance(other, (Decimal, float, int)):
+            other = int(other)
+        return self.__class__(
+            self.amount * Decimal(other),
+            self.currency,
+            credit_card_payment=self.credit_card_payment
+        )
+
+    __rmul__ = __mul__
 
     def __str__(self) -> str:
         return f'{self.amount:.2f} {self.currency}'
@@ -89,6 +104,15 @@ class Price(_PriceBase):
     @property
     def net_amount(self) -> Decimal:
         return self.amount - self.fee
+
+    def apply_discount(self, discount: Decimal) -> Self:
+        assert discount <= Decimal('1')
+        assert not self.fee, 'Discounts should be applied before fees'
+        return self.__class__(
+            self.amount - self.amount*discount,
+            self.currency,
+            credit_card_payment=self.credit_card_payment
+        )
 
 
 def payments_association_table_for(cls: type[Base]) -> Table:

@@ -80,6 +80,7 @@ def test_ticket_pdf(org_app):
         include=lambda x: None,
         current_username=owner,
         is_manager=True,
+        is_manager_for_model=lambda model: True,
         get_translate=get_translate,
         locale='de_CH',
         host_url=host_url,

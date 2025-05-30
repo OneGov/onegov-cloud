@@ -2,7 +2,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE 1.0\n"
-"POT-Creation-Date: 2024-11-18 10:17+0100\n"
+"POT-Creation-Date: 2025-04-15 19:31+0200\n"
 "PO-Revision-Date: 2021-11-11 09:07+0100\n"
 "Last-Translator: Marc Sommerhalder <marc.sommerhalder@seantis.ch>\n"
 "Language-Team: French\n"
@@ -212,6 +212,9 @@ msgstr "Sexe participant·e"
 
 msgid "Attendee Notes"
 msgstr "Remarques participant·e"
+
+msgid "Attendee SwissPass ID"
+msgstr "Identifiant SwissPass participant·e"
 
 msgid "Attendee Booking-Limit"
 msgstr "Maximum de réservations par participant·e"
@@ -691,6 +694,9 @@ msgstr "Y a-t-il quelque chose que l'instructeur devrait savoir ?"
 msgid "Allergies, Disabilities, Particulars"
 msgstr "Allergies, handicaps, particularités"
 
+msgid "Swisspass ID"
+msgstr "Identifiant Swisspass"
+
 msgid "The address of the attendee differs from the users address"
 msgstr "L'adresse du participant diffère de l'adresse de l'utilisateur"
 
@@ -702,6 +708,13 @@ msgstr "Code postal"
 
 msgid "Political municipality"
 msgstr "Municipalité politique"
+
+msgid "The Swisspass ID must be 13 characters long."
+msgstr "L'identifiant Swisspass doit comporter 13 caractères."
+
+msgid "The Swisspass ID must only contain digits and dashes."
+msgstr ""
+"L'identifiant Swisspass ne doit contenir que des chiffres et des tirets."
 
 msgid "Attendee"
 msgstr "Participant·e·s"
@@ -1555,9 +1568,8 @@ msgstr "Archiver"
 msgid "Do you really want to archive this activity?"
 msgstr "Voulez-vous vraiment archiver cette activité ?"
 
-msgid "This cannot be undone. The activity will be made private as a result."
-msgstr ""
-"Cette action ne peut être annulée. L'activité sera par conséquent masquée."
+msgid "The activity will be made private as a result."
+msgstr "L'activité sera par conséquent masquée."
 
 msgid "Archive Activity"
 msgstr "Archiver l'activité"
@@ -2229,6 +2241,9 @@ msgstr "Vous trouverez ici un aperçu de toutes les réservations:"
 
 msgid "Best regards"
 msgstr "Meilleures salutations"
+
+msgid "Cancellation conditions:"
+msgstr "Conditions d'annulation:"
 
 msgid "We have received your deregistration for ${name}."
 msgstr "Nous avons reçu votre annulation pour ${name}."
@@ -3116,6 +3131,25 @@ msgstr "Profil d'utilisateur·trice"
 msgid "Require the political municipality on registration"
 msgstr "Exiger de la municipalité politique qu'elle s'inscrive"
 
+msgid "Require a SwissPass ID of attendees"
+msgstr "Exiger un ID SwissPass des participant·e·s"
+
+msgid "SwissPass ID"
+msgstr "ID SwissPass"
+
+msgid "Cancellation condition text"
+msgstr "Texte des conditions d'annulation"
+
+msgid "Cancellation conditions"
+msgstr "Conditions d'annulation"
+
+msgid ""
+"The text will be shown below the confirmation text for an activity in the "
+"mail"
+msgstr ""
+"Le texte sera affiché sous le texte de confirmation d'une activité dans le "
+"mail"
+
 msgid "Parents can see the contacts of other parents in the same activity"
 msgstr ""
 "Les parents peuvent voir les contacts d'autres parents pour la même activité"
@@ -3201,6 +3235,11 @@ msgstr "Réservations pour ${period}"
 #, python-format
 msgid "Billing for ${period}"
 msgstr "Facturation pour ${period}"
+
+#~ msgid ""
+#~ "This cannot be undone. The activity will be made private as a result."
+#~ msgstr ""
+#~ "Cette action ne peut être annulée. L'activité sera par conséquent masquée."
 
 #~ msgid "Health Information"
 #~ msgstr "Informations santé et autres"

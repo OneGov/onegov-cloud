@@ -2,7 +2,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: \n"
-"POT-Creation-Date: 2025-03-27 09:48+0100\n"
+"POT-Creation-Date: 2025-05-27 16:02+0200\n"
 "PO-Revision-Date: 2022-03-15 10:52+0100\n"
 "Last-Translator: \n"
 "Language-Team: \n"
@@ -116,6 +116,13 @@ msgid "Stripe Connect"
 msgstr "Stripe Connect"
 
 #, python-format
+msgid "Daily Newsletter ${time}"
+msgstr "Newsletter giornaliera ${time}"
+
+msgid "New news since the last newsletter:"
+msgstr "Nuove notizie dalla newsletter precedente:"
+
+#, python-format
 msgid "${org} OneGov Cloud Status"
 msgstr "${org} OneGov Cloud Status"
 
@@ -128,6 +135,9 @@ msgstr "Panoramica della prenotazione di ${org}"
 
 msgid "Your Chat has been turned into a ticket"
 msgstr "È stato creato un ticket dalla loro chat"
+
+msgid "New ticket"
+msgstr "Nuovo biglietto"
 
 msgid "Account"
 msgstr "Conto"
@@ -277,11 +287,14 @@ msgstr "Titolo"
 msgid "General availability"
 msgstr "Disponibilità generale"
 
-msgid "Rule"
-msgstr "Regola"
+msgid "Period"
+msgstr "Periodo"
 
 msgid "Extend"
 msgstr "Prolunga"
+
+msgid "Don't extend this availability period automatically"
+msgstr "Non prolungare questo periodo di disponibilità automaticamente"
 
 msgid "Extend by one day at midnight"
 msgstr "Prolunga di un giorno a mezzanotte"
@@ -349,14 +362,14 @@ msgstr "Ognuno fino alle"
 msgid "May be partially reserved"
 msgstr "Può essere parzialmente prenotato"
 
-msgid "Options"
-msgstr "Opzioni"
-
 msgid "Reservations per time slot"
 msgstr "Prenotazioni per fascia oraria"
 
 msgid "Available items"
 msgstr "Elementi disponibili"
+
+msgid "Options"
+msgstr "Opzioni"
 
 msgid "Reservations per time slot and person"
 msgstr "Prenotazioni per fascia oraria e persona"
@@ -1268,8 +1281,8 @@ msgstr "Funzione"
 msgid "Organisation"
 msgstr "Organizzazione"
 
-msgid "Sub organisation"
-msgstr "Sotto organizzazione"
+msgid "Select the organisations this person belongs to"
+msgstr "Seleziona le organizzazioni a cui appartiene questa persona"
 
 msgid "Direct Phone Number or Mobile"
 msgstr "Numero di telefono diretto o cellulare"
@@ -1316,6 +1329,30 @@ msgstr "Note"
 msgid "Public extra information about this person"
 msgstr "Informazioni pubbliche aggiuntive su questa persona"
 
+msgid "Tag"
+msgstr "Tag"
+
+msgid "Starting at"
+msgstr "A partire da"
+
+msgid "Ending at"
+msgstr "Fine a"
+
+msgid "Key Code"
+msgstr "Codice chiave"
+
+msgid "Invalid Kaba Code. Needs to be a 4 to 6 digit number code."
+msgstr "Kaba Code non valido. Deve essere un codice numerico a 4-6 cifre."
+
+msgid "Lead Time"
+msgstr "Tempi di consegna"
+
+msgid "In minutes"
+msgstr "In minuti"
+
+msgid "Lag Time"
+msgstr "Tempo di funzionamento"
+
 msgid "I am looking to make a reservation lasting"
 msgstr "Voglio fare una prenotazione di"
 
@@ -1331,6 +1368,21 @@ msgstr "Ultima fine"
 msgid "Rooms"
 msgstr "Camere"
 
+msgid "Automatically reserve the first available slot"
+msgstr "Riservare automaticamente il primo slot disponibile"
+
+msgid "You will be able to change individual choices"
+msgstr "Sarà possibile modificare le scelte"
+
+msgid "Yes, for every selected room and day"
+msgstr "Sì, per ogni camera e giorno selezionati"
+
+msgid "Yes, for every selected day"
+msgstr "Sì, per ogni giorno selezionato"
+
+msgid "Yes, for the first available selected day"
+msgstr "Sì, per il primo giorno disponibile selezionato"
+
 msgid "Start date in past"
 msgstr "Data di inizio nel passato"
 
@@ -1343,6 +1395,9 @@ msgstr "Descrive il contenuto di questa risorsa di prenotazione"
 
 msgid "Used to group the resource in the overview"
 msgstr "Utilizzato per raggruppare la risorsa nella panoramica"
+
+msgid "Subgroup"
+msgstr "Sottogruppo"
 
 msgid "Extra Fields Definition"
 msgstr "Definizione dei campi aggiuntivi"
@@ -1393,6 +1448,9 @@ msgstr "Visualizzazione settimanale"
 msgid "Month view"
 msgstr "Visualizzazione mensile"
 
+msgid "Doors"
+msgstr "Porte"
+
 msgid "Per item"
 msgstr "Per elemento"
 
@@ -1404,6 +1462,26 @@ msgstr "Prezzo per elemento"
 
 msgid "Price per hour"
 msgstr "Tariffa oraria"
+
+msgid "Prices in extra fields are"
+msgstr "I prezzi nei campi extra sono"
+
+msgid ""
+"If no extra fields are defined or none of the extra fields contain pricing "
+"information, then this setting has no effect."
+msgstr ""
+"Se non sono stati definiti campi extra o se nessuno dei campi extra contiene "
+"informazioni sui prezzi, questa impostazione non ha alcun effetto."
+
+msgid "One-off"
+msgstr "Una tantum"
+
+msgid ""
+"Failed to retrieve the doors from the dormakaba API please make sure your "
+"credentials are still valid."
+msgstr ""
+"Impossibile recuperare le porte dall'API di dormakaba. Assicurarsi che le "
+"credenziali siano ancora valide."
 
 msgid "Please select the form field that holds the zip-code"
 msgstr "Seleziona il campo del modulo che contiene il codice postale"
@@ -1760,15 +1838,6 @@ msgstr "Percorso"
 msgid "Please enter a path without schema or host"
 msgstr "Inserisci un percorso senza schema o host"
 
-msgid "Hide these fields for non-logged-in users"
-msgstr "Nascondi questi campi per gli utenti non registrati"
-
-msgid "People"
-msgstr "Persone"
-
-msgid "External ID"
-msgstr "ID esterno"
-
 msgid "Duration of mTAN session"
 msgstr "Durata della sessione mTAN"
 
@@ -1930,8 +1999,19 @@ msgstr "Inserisci una coppia di date per riga"
 msgid "End date needs to be after start date"
 msgstr "La data di fine deve essere successiva alla data di inizio"
 
-msgid "Email adress for notifications about newly opened tickets"
-msgstr "Indirizzo e-mail per le notifiche dei biglietti aperti"
+msgid "Hide personal email addresses"
+msgstr "Nascondi gli indirizzi e-mail personali"
+
+msgid "Hide personal email addresses in the ticket system"
+msgstr "Nascondi gli indirizzi e-mail personali nel sistema di ticket"
+
+msgid "General email address"
+msgstr "Indirizzo e-mail generale"
+
+msgid "Email address that is displayed instead of the personal email address"
+msgstr ""
+"Indirizzo e-mail che viene visualizzato invece dell'indirizzo e-mail "
+"personale"
 
 msgid "Accept request and close ticket automatically based on:"
 msgstr "Accetta la richiesta e chiudi il ticket automaticamente in base a:"
@@ -1941,6 +2021,9 @@ msgstr "Categoria del biglietto"
 
 msgid "User role"
 msgstr "Ruolo utente"
+
+msgid "Auto-accept and auto-close"
+msgstr "Accettazione e chiusura automatica"
 
 msgid ""
 "Accept request and close ticket automatically for these ticket categories"
@@ -1964,6 +2047,9 @@ msgstr ""
 msgid "User used to auto-accept tickets"
 msgstr "Utente abituato ad accettare automaticamente i biglietti"
 
+msgid "Email address for notifications about newly opened tickets"
+msgstr "Indirizzo e-mail per le notifiche dei biglietti aperti"
+
 msgid "Block email confirmation when this ticket category is opened"
 msgstr ""
 "Blocca l'e-mail di conferma all'apertura di questa categoria di biglietti"
@@ -1985,6 +2071,45 @@ msgstr ""
 "Invia sempre una notifica tramite e-mail se viene inviato un nuovo messaggio "
 "per il biglietto"
 
+msgid ""
+"Each tag can be associated with arbitrary key value pairs which will be "
+"displayed in the ticket alongside the submitted form values. If a key "
+"exactly matches the name of a form field that field's value will be pre-"
+"populated according to the value.\n"
+"\n"
+"Example:\n"
+"```yaml\n"
+"- High Priority\n"
+"- Medium Priority\n"
+"- Low Priority\n"
+"- FC Govikon:\n"
+"    E-Mail: fc@govikon.ch\n"
+"    Postal Code / City: 1234 Govikon\n"
+"- HC Govikon:\n"
+"    E-Mail: hc@govikon.ch\n"
+"    Postal Code / City: 1234 Govikon\n"
+"```"
+msgstr ""
+"Ogni tag può essere associato a coppie arbitrarie di valori-chiave che "
+"saranno visualizzate nel ticket insieme ai valori del modulo inviato. Se una "
+"chiave corrisponde esattamente al nome di un campo del modulo, il valore del "
+"campo verrà pre-popolato in base al valore.\n"
+"\n"
+"Esempio:\n"
+"```yaml\n"
+"- Alta priorità\n"
+"- Media priorità\n"
+"- Bassa priorità\n"
+"- FC Govikon:\n"
+"    E-Mail: fc@govikon.ch\n"
+"    Codice postale / Città: 1234 Govikon\n"
+"    Kaba Code: 123456\n"
+"- HC Govikon:\n"
+"    E-Mail: hc@govikon.ch\n"
+"    Codice postale / Città: 1234 Govikon\n"
+"    Kaba Code: 654321\n"
+"```"
+
 msgid "Categories restricted by user group settings"
 msgstr "Categorie limitate dalle impostazioni del gruppo di utenti"
 
@@ -1992,6 +2117,15 @@ msgid "Mute tickets individually if the auto-accept feature is enabled."
 msgstr ""
 "Disattiva i biglietti singolarmente se la funzione di accettazione "
 "automatica è abilitata."
+
+msgid ""
+"Invalid format. Please define tags and their meta data according to the "
+"example."
+msgstr ""
+"Formato non valido. Definire i tag e i loro meta-dati secondo l'esempio."
+
+msgid "Invalid price, needs to be a non-negative number."
+msgstr "Prezzo non valido, deve essere un numero non negativo."
 
 msgid "Enable newsletter"
 msgstr "Attiva la newsletter"
@@ -2035,6 +2169,30 @@ msgstr ""
 "Inviare una notifica via e-mail ai seguenti utenti quando un destinatario si "
 "cancella dalla newsletter"
 
+msgid "Enable automatic daily newsletters"
+msgstr "Abilita le newsletter giornaliere automatiche"
+
+msgid ""
+"Automatically creates a daily newsletter containing all new news items since "
+"the last sending time. It will only send a newsletter if there is at least "
+"one new news item. Only subscribers who subscribed to the daily newsletter "
+"will receive it, independent of their selected categories if there are any."
+msgstr ""
+"Creare automaticamente una newsletter giornaliera contenente tutte le nuove "
+"notizie dall'ultima ora di invio. Invierà una newsletter solo se c'è almeno "
+"un nuovo articolo di notizie. Solo gli abbonati che si sono registrati alla "
+"newsletter giornaliera la riceveranno, indipendentemente dalle categorie "
+"selezionate, se presenti."
+
+msgid "Automatic newsletters"
+msgstr "Newsletter automatiche"
+
+msgid "Newsletter sending times (24h format)"
+msgstr "Orari di invio della newsletter (formato 24 ore)"
+
+msgid "Specify times for sending newsletters. e.g., 8, 12, 18."
+msgstr "Specifica gli orari per l'invio delle newsletter. ad es. 8, 12, 18."
+
 msgid "Invalid YAML format. Please refer to the example."
 msgstr "Formato YAML non valido. Fare riferimento all'esempio."
 
@@ -2050,6 +2208,17 @@ msgid ""
 msgstr ""
 "Formato non valido. Sono ammessi solo argomenti e sottoargomenti, non sono "
 "supportate strutture più profonde."
+
+msgid "Please specify at least one time."
+msgstr "Si prega di specificare almeno un orario."
+
+msgid "Invalid time format. Please use a value between 0 and 24."
+msgstr ""
+"Formato orario non valido. Si prega di utilizzare un valore compreso tra 0 e "
+"24."
+
+msgid "Invalid time format. Please use 24h format."
+msgstr "Formato orario non valido. Si prega di utilizzare il formato 24 ore."
 
 msgid "Old domain"
 msgstr "Vecchio dominio"
@@ -2095,6 +2264,21 @@ msgstr "Endpoint API di Gever dove vengono caricati i documenti."
 
 msgid "Website address including https://"
 msgstr "Indirizzo del sito web incluso https://"
+
+msgid "Site ID"
+msgstr "ID del sito"
+
+msgid "Default Lead Time"
+msgstr "Tempi di consegna standard"
+
+msgid "Default Lag Time"
+msgstr "Tempo di funzionamento standard"
+
+msgid "Invalid credentials or site id"
+msgstr "Credenziali o ID sito non validi"
+
+msgid "Unexpected error encountered, please try again."
+msgstr "Si è verificato un errore inatteso, riprovare."
 
 msgid "API Key"
 msgstr "Chiave API"
@@ -2169,6 +2353,59 @@ msgstr "Formato JSON non valido nelle credenziali Firebase"
 msgid "Error validating Firebase credentials: {0}"
 msgstr "Errore durante la convalida delle credenziali Firebase: {0}"
 
+msgid "Organisation hierarchy"
+msgstr "Gerarchia dell'organizzazione"
+
+msgid ""
+"Example for organisation hierarchy with subtopics in yaml format. Note: "
+"Deeper structures are not supported.\n"
+"```\n"
+"- Organisation:\n"
+"  - Sub-Organisation 1\n"
+"  - Sub-Organisation 2\n"
+"- Organisation 2:\n"
+"  - Sub-Organisation 1\n"
+"  - Sub-Organisation 2\n"
+"```"
+msgstr ""
+"Esempio di gerarchia dell'organizzazione con sottoargomenti in formato yaml. "
+"Nota: le strutture più profonde non sono supportate.\n"
+"```\n"
+"- Organizzazione:\n"
+"  - Sotto-organizzazione 1\n"
+"  - Sotto-organizzazione 2\n"
+"- Organizzazione 2:\n"
+"  - Sotto-organizzazione 1\n"
+"  - Sotto-organizzazione 2\n"
+"```"
+
+msgid "Hide these fields for non-logged-in users"
+msgstr "Nascondi questi campi per gli utenti non registrati"
+
+msgid "External ID"
+msgstr "ID esterno"
+
+msgid ""
+"Invalid format. Please define a list with organisations and sub-"
+"organisations according the example."
+msgstr ""
+"Formato non valido. Definire un elenco con organizzazioni e sotto-"
+"organizzazioni secondo l'esempio."
+
+msgid ""
+"Invalid format. Please define organisations and sub-organisations according "
+"to the example."
+msgstr ""
+"Formato non valido. Definire organizzazioni e sotto-organizzazioni secondo "
+"l'esempio."
+
+msgid ""
+"Invalid format. Only organisations and sub-organisations are allowed - no "
+"deeper structures supported."
+msgstr ""
+"Formato non valido. Sono consentite solo organizzazioni e sotto-"
+"organizzazioni, non sono supportate strutture più profonde."
+
 msgid "VAT Rate"
 msgstr "Aliquota IVA"
 
@@ -2191,6 +2428,19 @@ msgstr "Indirizzo e-mail"
 
 msgid "The subscriber has given consent to receive the newsletter."
 msgstr "Il sottoscrittore ha dato il consenso a ricevere la newsletter."
+
+msgid "Daily newsletter for all categories (only for news items)"
+msgstr ""
+"Newsletter giornaliera per tutte le categorie (solo per gli articoli di "
+"notizie)"
+
+#, python-format
+msgid ""
+"If there are any new news items since the last sending time you will receive "
+"the newsletter at the following times: ${joined}:00."
+msgstr ""
+"Se ci sono nuovi articoli di notizie dall'ultimo invio, riceverai la "
+"newsletter nei seguenti orari: ${joined}:00."
 
 msgid "Submission Window"
 msgstr "Finestra di presentazione"
@@ -2299,16 +2549,9 @@ msgstr "Permessi sul biglietto"
 msgid "Restricts access and gives permission to these ticket categories"
 msgstr "Limita l'accesso e autorizza queste categorie di biglietti"
 
-msgid "Directories"
-msgstr "Cartelle"
-
-msgid ""
-"Directories for which this user group is responsible. If activated, ticket "
-"notifications for this group are only sent for these directories"
+msgid "Immediate e-mail notification to members upon ticket submission"
 msgstr ""
-"Directory per le quali questo gruppo di utenti è responsabile. Se attivata, "
-"le notifiche di ticket le notifiche per questo Gruppo vengono inviate solo "
-"per queste directory"
+"Notifica immediata via e-mail ai membri al momento dell'invio del ticket"
 
 msgid "Send a periodic status e-mail."
 msgstr "Invia un'e-mail di stato periodica."
@@ -2360,6 +2603,9 @@ msgstr "Collegare file aggiuntivi"
 
 msgid "All directories"
 msgstr "Tutte le cartelle"
+
+msgid "Directories"
+msgstr "Cartelle"
 
 msgid "All events"
 msgstr "Tutti gli eventi"
@@ -2500,6 +2746,9 @@ msgstr "Finestre di invio"
 msgid "Survey"
 msgstr "Sondaggio"
 
+msgid "People"
+msgstr "Persone"
+
 msgid "Person"
 msgstr "Persona"
 
@@ -2593,7 +2842,7 @@ msgid "iFrame"
 msgstr "iFrame"
 
 msgid "Find Your Spot"
-msgstr "Cerca le date"
+msgstr "Cerca le date / Prenotazioni ricorrenti"
 
 msgid "E-Mail Recipient"
 msgstr "E-mail del destinatario"
@@ -2629,8 +2878,14 @@ msgstr "Occupazione"
 msgid "Subscribe"
 msgstr "Iscriviti"
 
-msgid "Rules"
-msgstr "Regole"
+msgid "Availability periods"
+msgstr "Periodi di disponibilità"
+
+msgid "Availability period"
+msgstr "Periodo di disponibilità"
+
+msgid "Paste"
+msgstr "Incolla"
 
 msgid "Edit allocation"
 msgstr "Modifica allocazione"
@@ -2995,9 +3250,6 @@ msgstr "Elimina nota"
 msgid "Always visible on homepage"
 msgstr "Sempre visibile sulla pagina principale"
 
-msgid "Search for available dates"
-msgstr "Cerca le date disponibili"
-
 msgid "Neujahrestag"
 msgstr "Neujahrestag"
 
@@ -3102,6 +3354,22 @@ msgstr "Annulla registrazione"
 msgid "Edit submission"
 msgstr "Modifica iscrizione"
 
+msgid "Reject"
+msgstr "Rifiutare"
+
+msgid "Do you really want to reject this reservation?"
+msgstr "Vuoi davvero rifiutare questa prenotazione?"
+
+#, python-format
+msgid "Rejecting ${title} can't be undone."
+msgstr "Il rifiuto di ${title} non può essere annullato."
+
+msgid "Reject reservation"
+msgstr "Rifiuta prenotazione"
+
+msgid "Adjust"
+msgstr "Regolare"
+
 msgid "Accept all reservations"
 msgstr "Accetta tutte le prenotazioni"
 
@@ -3110,6 +3378,9 @@ msgstr "Dettagli sulla prenotazione"
 
 msgid "Edit details"
 msgstr "Modifica dettagli"
+
+msgid "Edit key code"
+msgstr "Modifica del codice chiave"
 
 msgid "Accept all with message"
 msgstr "Accetta tutto con messaggio"
@@ -3129,22 +3400,8 @@ msgstr "Rifiuta le prenotazioni"
 msgid "Reject all with message"
 msgstr "Rifiuta tutto con messaggio"
 
-#, python-format
-msgid "Reject ${title}"
-msgstr "Rifiuta ${title}"
-
-msgid "Do you really want to reject this reservation?"
-msgstr "Vuoi davvero rifiutare questa prenotazione?"
-
-#, python-format
-msgid "Rejecting ${title} can't be undone."
-msgstr "Il rifiuto di ${title} non può essere annullato."
-
-msgid "Reject reservation"
-msgstr "Rifiuta prenotazione"
-
-#. Used in sentence: "${event} published."
 #.
+#. Used in sentence: "${event} published."
 msgid "Event"
 msgstr "Evento"
 
@@ -3301,9 +3558,6 @@ msgstr "Una notizia non può essere incollata come argomento"
 msgid "A Topic cannot be pasted as News"
 msgstr "Un argomento non può essere incollato come notizia"
 
-msgid "Paste"
-msgstr "Incolla"
-
 msgid "Please note that this page has subpages which will also be deleted!"
 msgstr ""
 "Nota che questa pagina contiene delle sottopagine che verranno anch'esse "
@@ -3358,8 +3612,8 @@ msgstr ""
 msgid "Summary"
 msgstr "Riepilogo"
 
-msgid "No rules defined."
-msgstr "Nessuna regola definita."
+msgid "No availability periods defined."
+msgstr "Nessun periodo di disponibilità definito."
 
 msgid ""
 "Api keys can be used to ensure you're not being rate limited. They are not "
@@ -3509,6 +3763,18 @@ msgstr ""
 "Puoi copiare il seguente codice per incorporare questa pagina come iFrame:"
 
 msgid ""
+"To display the breadcrumbs you can add ${bc_level} as a parameter to the "
+"URL. The number defines where the breadcrumbs start. 1 in this case means "
+"that the first level is hidden. You can use any number as long as it is less "
+"than the number of levels in the breadcrumbs."
+msgstr ""
+"Per visualizzare le briciole di pane si può aggiungere ${bc_level} come "
+"parametro all'URL. Il numero definisce l'inizio delle briciole di pane. 1 in "
+"questo caso significa che il primo livello è nascosto. È possibile "
+"utilizzare qualsiasi numero, purché sia inferiore al numero di livelli delle "
+"briciole di pane."
+
+msgid ""
 "Please review your data and press \"Complete\" to finalize the process. If "
 "there's anything you'd like to change, click on \"Edit\" to return to the "
 "filled-out form."
@@ -3566,6 +3832,25 @@ msgstr ""
 "una fascia oraria o di una stanza in un determinato giorno, è possibile "
 "tenere premuto uno dei tasti Shift, Alt o Ctrl mentre si fa clic sulle fasce "
 "orarie che si desidera prenotare."
+
+#. Canonical text for ${and_rooms} is: "and rooms"
+msgid ""
+"We were unable to reserve some slots matching your criteria for the "
+"following dates${and_rooms}, please note that some of those dates may still "
+"have one or more available slots that are either shorter or longer than your "
+"selected duration. ${dates}"
+msgstr ""
+"Non siamo riusciti a prenotare alcuni slot corrispondenti ai vostri criteri "
+"per le date${and_rooms} seguenti; vi preghiamo di notare che alcune di "
+"queste date potrebbero avere ancora uno o più slot disponibili di durata "
+"inferiore o superiore a quella da voi selezionata. ${dates}"
+
+#. Used in sentence: "We were unable to reserve some slots matching your
+#. criteria for the following dates${and_rooms}, please note that some of those
+#. dates may still have one or more available slots that are either shorter or
+#. longer than your selected duration. ${dates}"
+msgid "and rooms"
+msgstr " e le camere"
 
 msgid "Unavailable"
 msgstr "Non disponibile"
@@ -4431,6 +4716,9 @@ msgstr "1 prenotazione rifiutata."
 msgid "${count} reservations rejected."
 msgstr "${count} prenotazioni rifiutate."
 
+msgid "1 reservation adjusted:"
+msgstr "1 prenotazione regolata:"
+
 msgid "Registration confirmed."
 msgstr "Iscrizione confermata."
 
@@ -4567,9 +4855,6 @@ msgstr "Questo è un evento importato"
 msgid "Search in Events"
 msgstr "Ricerca negli eventi"
 
-msgid "Tag"
-msgstr "Tag"
-
 msgid "Export these events"
 msgstr "Esporta questi eventi"
 
@@ -4607,17 +4892,17 @@ msgstr ""
 msgid "Request Reference"
 msgstr "Riferimento della richiesta"
 
-msgid "No people added yet."
-msgstr "Nessuna persona aggiunta ancora."
-
-msgid "No people found for current filter selection."
-msgstr "Non sono state trovate persone per la selezione del filtro corrente."
-
 msgid "Select organisation"
 msgstr "Selezionare l'organizzazione"
 
 msgid "Select sub organisation"
 msgstr "Selezionare la sotto-organizzazione"
+
+msgid "No people found for current filter selection."
+msgstr "Non sono state trovate persone per la selezione del filtro corrente."
+
+msgid "Reset filter"
+msgstr "Ripristina filtro"
 
 msgid "Export a vCard of this person"
 msgstr "Esporta una vCard di questa persona"
@@ -4704,14 +4989,22 @@ msgid "Reservations must be made at least ${n} hours in advance."
 msgstr ""
 "Le prenotazioni devono essere effettuate con almeno ${n} ore di anticipo."
 
-msgid "Select a free time span in the calendar below to create an allocation."
+msgid ""
+"Select a free time span in the calendar to create an availability period."
 msgstr ""
-"Seleziona un periodo di tempo libero nel calendario sottostante per creare "
-"un'allocazione."
+"Seleziona un intervallo di tempo libero nel calendario per creare un periodo "
+"di disponibilità."
 
-msgid "Removes all unreserved allocations between the start and end date."
+msgid ""
+"Removes all unreserved allocations between the start and end date. This "
+"includes allocations that were created by using an availability period. To "
+"recreate these allocations, click on \"edit\" in the availability period and "
+"then \"save\" without changing anything."
 msgstr ""
-"Rimuove tutte le allocazioni non riservate tra la data di inizio e di fine."
+"Rimuove tutte le allocazioni non riservate tra la data di inizio e quella di "
+"fine. Ciò include le allocazioni create utilizzando un periodo di "
+"disponibilità. Per ricreare queste allocazioni, fare clic su \"modifica\" "
+"nel periodo di disponibilità e quindi \"salva\" senza modificare nulla."
 
 msgid "Reservation is pending approval"
 msgstr "La prenotazione è in attesa di approvazione"
@@ -4878,6 +5171,9 @@ msgstr "${count} nota"
 msgid "${count} notes"
 msgstr "${count} note"
 
+msgid "Change tag"
+msgstr "Modificare il tag"
+
 msgid ""
 "You are editing a note created by someone else. By saving your changes you "
 "will become the author of the whole note."
@@ -4945,6 +5241,15 @@ msgstr ""
 
 msgid "local"
 msgstr "locale"
+
+msgid "Last login"
+msgstr "Ultimo accesso"
+
+msgid "Session information"
+msgstr "Session Information"
+
+msgid "Display information"
+msgstr "Mostra informazioni"
 
 msgid "No links found."
 msgstr "Nessun collegamento trovato."
@@ -5076,69 +5381,80 @@ msgstr "Arresta"
 msgid "Do you really want to stop \"${title}\"?"
 msgstr "Vuoi davvero fermare \"${title}\"?"
 
-msgid "The rule will be removed without affecting existing allocations."
-msgstr "La regola sarà rimossa senza influire sulle allocazioni esistenti."
+msgid ""
+"The availability period will be removed without affecting existing "
+"allocations."
+msgstr ""
+"Il periodo di disponibilità verrà rimosso senza influire sulle allocazioni "
+"esistenti."
 
-msgid "Stop rule"
-msgstr "Arresta la regola"
+msgid "Stop availability period"
+msgstr "Arresta il periodo di disponibilità"
 
 msgid ""
-"All allocations created by the rule will be removed, if they haven't been "
-"reserved yet."
+"All allocations created by the availability period will be removed, if they "
+"haven't been reserved yet."
 msgstr ""
-"Se non sono state ancora prenotate, tutte le allocazioni create dalla regola "
-"verranno rimosse."
+"Tutte le allocazioni create dal periodo di disponibilità verranno rimosse, "
+"se non sono state ancora prenotate."
 
-msgid "Delete rule"
-msgstr "Elimina la regola"
-
-msgid "No allocations to add"
-msgstr "Nessuna allocazione da aggiungere"
-
-#, python-format
-msgid "Successfully added ${n} allocations"
-msgstr "${n} allocazioni aggiunte correttamente"
-
-msgid "New allocation"
-msgstr "Nuova allocazione"
+msgid "Delete availability period"
+msgstr "Elimina il periodo di disponibilità"
 
 msgid "Your changes were saved"
 msgstr "Le modifiche sono state salvate"
 
 #, python-format
-msgid "New rule active, ${n} allocations created"
-msgstr "Nuova regola attiva, ${n} allocazioni create"
+msgid "New availability period active, ${n} allocations created"
+msgstr "Nuovo periodo di disponibilità attivo, ${n} allocazioni create"
 
-msgid "New Rule"
-msgstr "Nuova regola"
+msgid "New availabilty period"
+msgstr "Nuovo periodo di disponibilità"
 
 msgid ""
-"Rules ensure that the allocations between start/end exist and that they are "
-"extended beyond those dates at the given intervals. "
+"Availability periods ensure that the allocations between start/end exist and "
+"that they are extended beyond those dates at the given intervals."
 msgstr ""
-"Le regole assicurano che le allocazioni tra inizio/fine esistano e che siano "
-"estese oltre tali date agli intervalli indicati. "
+"Le disponibilità garantiscono che le allocazioni tra inizio/fine esistano e "
+"che vengano estese oltre queste date a intervalli prestabiliti."
 
 #, python-format
 msgid ""
-"Rule updated. ${deleted} allocations removed, ${created} new allocations "
-"created."
+"Availability period updated. ${deleted} allocations removed, ${created} new "
+"allocations created."
 msgstr ""
-"La regola è stata aggiornata. ${deleted} allocazioni rimosse, ${created} "
-"nuove allocazioni create."
+"Periodo di disponibilità aggiornato. ${deleted} allocazioni rimosse, "
+"${created} nuove allocazioni create."
 
-msgid "Rule not found"
-msgstr "Regola non trovata"
+msgid "Availability period not found"
+msgstr "Periodo di disponibilità non trovato"
 
-msgid "Edit Rule"
-msgstr "Modifica regola"
+msgid "Edit availabilty period"
+msgstr "Modifica il periodo di disponibilità"
 
-msgid "The rule was stopped"
-msgstr "La regola è stata arrestata"
+msgid ""
+"Availability periods create availabilities between the specified start and "
+"end date. The availability period should ideally last until the next time "
+"the availabilities are expected to change. For example, a school term or a "
+"school year."
+msgstr ""
+"Le disponibilità creano disponibilità tra la data di inizio e quella di fine "
+"specificate. Il periodo di disponibilità dovrebbe idealmente durare fino al "
+"prossimo cambiamento delle disponibilità. Ad esempio, un semestre scolastico "
+"o un anno scolastico."
+
+msgid "The availability period was stopped"
+msgstr "Il periodo di disponibilità è stato fermato"
+
+msgid "The availability period was added to the clipboard"
+msgstr "Il periodo di disponibilità è stato aggiunto agli appunti"
+
+msgid "Pasted availability period from to the clipboard"
+msgstr "Incollare il periodo di disponibilità negli appunti"
 
 #, python-format
-msgid "The rule was deleted, along with ${n} allocations"
-msgstr "La regola è stata eliminata, insieme ${n} allocazioni"
+msgid "The availability period was deleted, along with ${n} allocations"
+msgstr "La disponibilità è stata eliminata, insieme a ${n} allocazioni"
 
 msgid "Topics A-Z"
 msgstr "Argomenti A-Z"
@@ -5495,9 +5811,6 @@ msgstr "Aggiungi evento"
 
 msgid "Your request has been registered"
 msgstr "La tua richiesta è stata registrata"
-
-msgid "New ticket"
-msgstr "Nuovo biglietto"
 
 msgid "Your request could not be accepted automatically!"
 msgstr "La tua richiesta non può essere accettata automaticamente!"
@@ -6080,6 +6393,13 @@ msgstr ""
 "La tua prenotazione per ${room} è stata inviata. Continua con la tua "
 "prenotazione per ${next_room}."
 
+msgid ""
+"Failed to create visits using the dormakaba API please make sure your "
+"credentials are still valid."
+msgstr ""
+"Impossibile creare visite con l'API di dormakaba. Assicurarsi che le "
+"credenziali siano ancora valide."
+
 msgid "Your reservations were accepted"
 msgstr "Le tue prenotazioni sono state accettate"
 
@@ -6127,8 +6447,24 @@ msgstr "Le prenotazioni sono state rifiutate"
 msgid "The reservation was rejected"
 msgstr "La prenotazione è stata rifiutata"
 
+msgid "Failed to revoke one or more door codes in dormakaba API"
+msgstr ""
+"Non è stato possibile revocare uno o più codici porta in dormakaba API."
+
 msgid "Reject all reservations with message"
 msgstr "Rifiuta tutte le prenotazioni con messaggio"
+
+msgid "Adjust reservation"
+msgstr "Regolare la prenotazione"
+
+msgid "The reservation was adjusted"
+msgstr "La prenotazione è stata regolata"
+
+msgid "The reservation was left unchanged"
+msgstr "La prenotazione è rimasta invariata"
+
+msgid "There are no future reservations"
+msgstr "Non ci sono prenotazioni future"
 
 msgid "Added a new daypass"
 msgstr "Aggiunto un nuovo biglietto giornaliero"
@@ -6449,6 +6785,9 @@ msgstr ""
 msgid "You recovered ticket ${number} from the archive"
 msgstr "Hai recuperato il biglietto ${number} dall'archivio"
 
+msgid "Tag changed"
+msgstr "Tag modificato"
+
 msgid "The ticket has already been closed"
 msgstr "Il biglietto è già stato chiuso"
 
@@ -6546,15 +6885,82 @@ msgid "The user was created successfully"
 msgstr "Utente creato correttamente"
 
 #~ msgid ""
-#~ "Invalid format. Please define a listwith topics and subtopics according "
-#~ "the example."
+#~ "Select a free time span in the calendar below to create an allocation."
 #~ msgstr ""
-#~ "Formato non valido. Definire una lista con argomenti e sottoargomenti "
-#~ "secondo l'esempio."
+#~ "Seleziona un periodo di tempo libero nel calendario sottostante per "
+#~ "creare un'allocazione."
+
+#~ msgid "Rule"
+#~ msgstr "Regola"
+
+#~ msgid "No rules defined."
+#~ msgstr "Nessuna regola definita."
+
+#~ msgid "Rule not found"
+#~ msgstr "Regola non trovata"
+
+#~ msgid "The rule was stopped"
+#~ msgstr "La regola è stata arrestata"
+
+#~ msgid "Rules"
+#~ msgstr "Regole"
+
+#~ msgid "Removes all unreserved allocations between the start and end date."
+#~ msgstr ""
+#~ "Rimuove tutte le allocazioni non riservate tra la data di inizio e di "
+#~ "fine."
+
+#~ msgid "Delete rule"
+#~ msgstr "Elimina la regola"
+
+#~ msgid "No allocations to add"
+#~ msgstr "Nessuna allocazione da aggiungere"
+
+#, python-format
+#~ msgid "Successfully added ${n} allocations"
+#~ msgstr "${n} allocazioni aggiunte correttamente"
+
+#~ msgid "New allocation"
+#~ msgstr "Nuova allocazione"
+
+#, python-format
+#~ msgid "New rule active, ${n} allocations created"
+#~ msgstr "Nuova regola attiva, ${n} allocazioni create"
+
+#~ msgid "New Rule"
+#~ msgstr "Nuova regola"
 
 #~ msgid ""
-#~ "Invalid format. Please define an organisation name with topics and "
-#~ "subtopics according the example."
+#~ "Rules ensure that the allocations between start/end exist and that they "
+#~ "are extended beyond those dates at the given intervals. "
 #~ msgstr ""
-#~ "Formato non valido. Definire un nome di organizzazione con argomenti e "
-#~ "sottoargomenti secondo l'esempio."
+#~ "Le regole assicurano che le allocazioni tra inizio/fine esistano e che "
+#~ "siano estese oltre tali date agli intervalli indicati. "
+
+#, python-format
+#~ msgid ""
+#~ "Rule updated. ${deleted} allocations removed, ${created} new allocations "
+#~ "created."
+#~ msgstr ""
+#~ "La regola è stata aggiornata. ${deleted} allocazioni rimosse, ${created} "
+#~ "nuove allocazioni create."
+
+#~ msgid "Edit Rule"
+#~ msgstr "Modifica regola"
+
+#, python-format
+#~ msgid "The rule was deleted, along with ${n} allocations"
+#~ msgstr "La regola è stata eliminata, insieme ${n} allocazioni"
+
+#~ msgid "The rule will be removed without affecting existing allocations."
+#~ msgstr "La regola sarà rimossa senza influire sulle allocazioni esistenti."
+
+#~ msgid "Stop rule"
+#~ msgstr "Arresta la regola"
+
+#~ msgid ""
+#~ "All allocations created by the rule will be removed, if they haven't been "
+#~ "reserved yet."
+#~ msgstr ""
+#~ "Se non sono state ancora prenotate, tutte le allocazioni create dalla "
+#~ "regola verranno rimosse."

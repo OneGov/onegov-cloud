@@ -531,7 +531,7 @@ def import_guidle(
 
             added, updated, purged = collection.from_import(
                 items(unknown_tags),
-                prefix
+                [prefix]
             )
 
             if unknown_tags:
@@ -549,6 +549,6 @@ def import_guidle(
         except Exception as e:
             log.error('Error importing events', exc_info=True)
             click.secho(f'Error importing events: {e}', err=True, fg='red')
-            raise (e)
+            raise
 
     return _import_guidle

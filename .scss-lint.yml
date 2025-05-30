@@ -1,0 +1,37 @@
+# TODO: Get rid of this config file, once nobody is using it anymore
+linters:
+  Indentation:
+    width: 4
+  Comment:
+    enabled: false
+  IdSelector:
+    enabled: false
+  SelectorFormat:
+    enabled: false
+  SelectorDepth:
+    max_depth: 6
+  ImportantRule:
+    enabled: false
+  QualifyingElement:
+    enabled: false
+  TrailingZero:
+    enabled: false
+  NestingDepth:
+    enabled: false
+  StringQuotes:
+    enabled: false
+  VendorPrefix:
+    enabled: false
+  ColorVariable:
+    enabled: false
+  ColorKeyword:
+    enabled: false
+  TransitionAll:
+    enabled: false
+
+exclude:
+  - '**/font-awesome/scss/*.scss'
+  - '**/foundation/*/*.scss'
+  - '**/foundation6/foundation/**/**/*.scss'
+  - '**/font-*.scss'
+  - '**/fonts/*.scss'

@@ -12,19 +12,21 @@ from onegov.org.forms.settings import (
     FooterSettingsForm, ModuleSettingsForm, MapSettingsForm,
     AnalyticsSettingsForm, HolidaySettingsForm, OrgTicketSettingsForm,
     HomepageSettingsForm, NewsletterSettingsForm, LinkMigrationForm,
-    LinkHealthCheckForm, SocialMediaSettingsForm,
+    LinkHealthCheckForm, PeopleSettingsForm, SocialMediaSettingsForm,
     EventSettingsForm, GeverSettingsForm, OneGovApiSettingsForm,
-    DataRetentionPolicyForm, FirebaseSettingsForm, VATSettingsForm)
+    DataRetentionPolicyForm, FirebaseSettingsForm, VATSettingsForm,
+    KabaSettingsForm)
 from onegov.org.models import Organisation
 from onegov.org.views.settings import (
-    handle_homepage_settings, view_settings,
+    handle_homepage_settings, handle_people_settings, view_settings,
     handle_ticket_settings, preview_holiday_settings, handle_general_settings,
     handle_favicon_settings, handle_links_settings, handle_header_settings,
     handle_footer_settings, handle_module_settings, handle_map_settings,
     handle_analytics_settings, handle_holiday_settings,
     handle_newsletter_settings, handle_generic_settings, handle_migrate_links,
     handle_link_health_check, handle_social_media_settings,
-    handle_event_settings, handle_api_keys, handle_chat_settings)
+    handle_event_settings, handle_api_keys, handle_chat_settings,
+    handle_kaba_settings)
 
 from onegov.town6.app import TownApp
 from onegov.town6.forms.settings import (
@@ -257,6 +259,18 @@ def town_handle_gever_settings(
                                    SettingsLayout(self, request))
 
 
+@TownApp.form(model=Organisation, name='kaba-settings', template='form.pt',
+              permission=Secret, form=KabaSettingsForm,
+              setting='dormakaba API', icon='fa-key', order=400)
+def town_handle_kaba_settings(
+    self: Organisation,
+    request: TownRequest,
+    form: KabaSettingsForm
+) -> RenderData | Response:
+    return handle_kaba_settings(
+        self, request, form, SettingsLayout(self, request))
+
+
 @TownApp.form(
     model=Organisation, name='header-settings', template='form.pt',
     permission=Secret, form=HeaderSettingsForm, setting=_('Header'),
@@ -481,4 +495,17 @@ def handle_vat_settings(
     layout = layout or SettingsLayout(self, request, _('Value Added Tax'))
     return handle_generic_settings(
         self, request, form, _('Value Added Tax'), layout
+    )
+
+
+@TownApp.form(
+    model=Organisation, name='people-settings', template='form.pt',
+    permission=Secret, form=PeopleSettingsForm, setting='People',
+    icon='fa-users', order=400,
+)
+def town_handle_people_settings(
+    self: Organisation, request: TownRequest, form: PeopleSettingsForm
+) -> RenderData | Response:
+    return handle_people_settings(
+        self, request, form, SettingsLayout(self, request)
     )

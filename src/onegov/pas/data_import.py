@@ -8,6 +8,7 @@ from tempfile import NamedTemporaryFile
 from typing import (
     TypeVar,
     BinaryIO,
+    cast,
     Protocol,
     ParamSpec, Self, Any,
 )
@@ -31,6 +32,7 @@ P = ParamSpec('P')
 from typing import Any as Incomplete
 from typing import TYPE_CHECKING
 if TYPE_CHECKING:
+    from onegov.pas.models.commission_membership import MembershipRole
     from collections.abc import Callable
     from sqlalchemy.orm import Session
     from types import TracebackType
@@ -469,7 +471,7 @@ def import_commissions(
             membership = CommissionMembership(
                 commission=commission,
                 parliamentarian=parliamentarian,
-                role=role,  # type:ignore[misc]
+                role=cast('MembershipRole', role),
                 start=parse_date(row.eintritt_kommission),
                 end=parse_date(row.austritt_kommission)
             )

@@ -152,6 +152,10 @@ class Organisation(Base, TimestampMixin):
     always_show_partners: dict_property[bool] = meta_property(default=False)
 
     # Ticket options
+    ticket_tags: dict_property[list[str | dict[str, dict[str, Any]]]]
+    ticket_tags = meta_property(default=list)
+    hide_personal_email: dict_property[bool] = meta_property(default=False)
+    general_email: dict_property[str | None] = meta_property()
     email_for_new_tickets: dict_property[str | None] = meta_property()
     ticket_auto_accept_style: dict_property[str | None] = meta_property()
     ticket_auto_accepts: dict_property[list[str] | None] = meta_property()
@@ -215,6 +219,9 @@ class Organisation(Base, TimestampMixin):
         meta_property(default=list)
     )
     notify_on_unsubscription: dict_property[list[str] | None] = meta_property()
+    enable_automatic_newsletters: dict_property[bool] = meta_property(
+        default=False)
+    newsletter_times: dict_property[list[str] | None] = meta_property()
 
     # Chat Settings
     chat_staff: dict_property[list[str] | None] = meta_property()
@@ -223,10 +230,22 @@ class Organisation(Base, TimestampMixin):
     opening_hours_chat: dict_property[list[list[str]] | None] = meta_property()
     chat_topics: dict_property[list[str] | None] = meta_property()
 
+    # People Settings
+    organisation_hierarchy: dict_property[list[dict[str, list[str]] | str]] = (
+        meta_property(default=list)
+    )
+
     # Required information to upload documents to a Gever instance
     gever_username: dict_property[str | None] = meta_property()
     gever_password: dict_property[str | None] = meta_property()
     gever_endpoint: dict_property[str | None] = meta_property()
+
+    # Kaba settings
+    kaba_site_id: dict_property[str | None] = meta_property()
+    kaba_api_key: dict_property[str | None] = meta_property()
+    kaba_api_secret: dict_property[str | None] = meta_property()
+    default_key_code_lead_time: dict_property[int] = meta_property(default=30)
+    default_key_code_lag_time: dict_property[int] = meta_property(default=30)
 
     # data retention policy
     auto_archive_timespan: dict_property[int] = meta_property(default=0)
@@ -351,6 +370,8 @@ class Organisation(Base, TimestampMixin):
 
 @lru_cache(maxsize=64)
 def flatten_event_filter_fields_from_definition(
-    definition: str
+    definition: str | None
 ) -> tuple[ParsedField, ...]:
+    if not definition:
+        return ()
     return tuple(flatten_fieldsets(parse_formcode(definition)))

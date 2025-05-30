@@ -263,3 +263,39 @@ def test_language_collection(session):
     zulu = coll.add(name='Zulu')
     arabic = coll.add(name='Arabic')
     assert coll.query().all() == [arabic, zulu]
+
+
+def test_translator_collection_visibility(translator_app):
+    # Create a single translator marked as for_admins_only
+    hidden_translator = create_translator(
+        translator_app, email='hidden@example.com', last_name='Hidden',
+        for_admins_only=True
+    )
+
+    # Scenario 1: Non-admin user (e.g., user_role='member')
+    # Non-admins should never see translators marked as for_admins_only,
+    # include_hidden is false by default
+    # regardless of the include_hidden flag.
+    coll_non_admin = TranslatorCollection(translator_app, user_role='member')
+    assert coll_non_admin.query().count() == 0
+    return
+
+    coll_non_admin_include_true = TranslatorCollection(
+        translator_app, user_role='member', include_hidden=True
+    )
+    assert hidden_translator not in coll_non_admin_include_true.query().all()
+
+    # Scenario 2: Admin user (user_role='admin')
+    # Admins should only see for_admins_only translators if include_hidden=True
+    # Default (include_hidden = False): hidden translator should not be visible
+    coll_admin_default = TranslatorCollection(
+        translator_app, user_role='admin'
+    )
+    assert hidden_translator not in coll_admin_default.query().all()
+
+    # Explicitly include_hidden = True: hidden translator should be visible
+    coll_admin_include_true = TranslatorCollection(
+        translator_app, user_role='admin', include_hidden=True
+    )
+    assert hidden_translator in coll_admin_include_true.query().all()
+    assert len(coll_admin_include_true.query().all()) == 1

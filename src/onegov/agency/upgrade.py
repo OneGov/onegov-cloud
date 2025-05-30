@@ -44,10 +44,12 @@ def replace_removed_export_fields(context: UpgradeContext) -> None:
                 # replace old shared field with new split field
                 # but preserving the order
                 idx = export_fields.index('person.address')
-                export_fields = export_fields[:idx] + [
+                export_fields = [
+                    *export_fields[:idx],
                     'person.location_address',
                     'person.location_code_city',
                     'person.postal_address',
                     'person.postal_code_city',
-                ] + export_fields[idx + 1:]
+                    *export_fields[idx + 1:]
+                ]
                 agency.meta['export_fields'] = export_fields

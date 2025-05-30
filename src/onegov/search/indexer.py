@@ -6,14 +6,14 @@ from uuid import UUID
 
 import sqlalchemy
 
-from collections.abc import Iterable
 from copy import deepcopy
 
+from collections.abc import Iterable
 from elasticsearch.exceptions import NotFoundError
 from elasticsearch.helpers import streaming_bulk
-from langdetect.lang_detect_exception import LangDetectException
 from itertools import groupby, chain, repeat
 from queue import Queue, Empty, Full
+from operator import itemgetter
 from sqlalchemy import func, Table, delete, MetaData
 from sqlalchemy.sql import Delete
 from unidecode import unidecode
@@ -28,7 +28,7 @@ from onegov.search.search_index import SearchIndex
 from typing import Any, Literal, NamedTuple, TYPE_CHECKING
 
 if TYPE_CHECKING:
-    from collections.abc import Callable, Iterable, Iterator, Sequence
+    from collections.abc import Callable, Iterator, Sequence
     from datetime import datetime
     from elasticsearch import Elasticsearch
     from sqlalchemy.engine import Engine
@@ -597,7 +597,8 @@ class PostgresIndexer(IndexerBase):
 
         grouped_tasks = groupby(
             task_generator(),
-            key=lambda task: (task['action'], task['type_name']))
+            key=itemgetter('action', 'type_name')
+        )
         for (action, _), tasks in grouped_tasks:
             task_list = list(tasks)
 
@@ -799,8 +800,7 @@ class IndexManager:
         )
 
         for info in infos.values():
-            for alias in info['aliases']:
-                result.add(alias)
+            result.update(info['aliases'])
 
         return result
 
@@ -992,10 +992,7 @@ class ORMLanguageDetector(utils.LanguageDetector):
         if not text:
             return self.supported_languages[0]
 
-        try:
-            return self.detect(text)
-        except LangDetectException:
-            return self.supported_languages[0]
+        return self.detect(text)
 
 
 class ORMEventTranslator:

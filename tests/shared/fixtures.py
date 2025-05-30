@@ -428,6 +428,9 @@ def guess_java_home_or_fail():
             raise RuntimeError('/usr/libexec/java_home failed')
 
         return result.stdout.decode('utf-8').strip()
+    elif os.path.exists('/usr/lib/jvm'):
+        # Ubuntu 24.04
+        return '/usr/lib/jvm/java-11-openjdk-amd64'
 
     raise RuntimeError("Could not find JAVA_HOME, please set it manually")
 

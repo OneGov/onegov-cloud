@@ -9,6 +9,7 @@ from collections import OrderedDict
 from datetime import date as date_t, datetime, time, timedelta
 from isodate import parse_date, ISO8601Error
 from itertools import groupby, islice
+from libres.modules.errors import LibresError
 from morepath.request import Response
 from onegov.core.security import Public, Private, Personal
 from onegov.core.utils import module_path
@@ -38,7 +39,7 @@ from sqlalchemy.orm import object_session
 from webob import exc
 
 
-from typing import cast, Any, NamedTuple, TYPE_CHECKING
+from typing import cast, Any, NamedTuple, Self, TYPE_CHECKING
 if TYPE_CHECKING:
     from _typeshed import SupportsRichComparison
     from collections.abc import Callable, Iterable, Iterator, Mapping
@@ -165,6 +166,77 @@ def get_resource_form(
     return model.with_content_extensions(ResourceForm, request)
 
 
+class ResourceGroup(NamedTuple):
+    title: str
+    entries: list[Resource | ExternalLink | ResourceSubgroup]
+    find_your_spot: FindYourSpotCollection | None
+
+    @classmethod
+    def from_grouped(
+        cls,
+        request: OrgRequest,
+        grouped: dict[str, list[Resource | ExternalLink]],
+        default_group: str,
+    ) -> list[Self]:
+
+        result: list[Self] = []
+        for group, items in grouped.items():
+            entries: dict[str, Any] = {}
+            group_has_find_your_spot = False
+            for item in items:
+                is_room = isinstance(item, Resource) and item.type == 'room'
+                if is_room:
+                    group_has_find_your_spot = True
+
+                if subgroup_name := getattr(item, 'subgroup', None):
+                    (
+                        subgroup_has_find_your_spot,
+                        subentries
+                    ) = entries.setdefault(subgroup_name, (is_room, []))
+                    if is_room and not subgroup_has_find_your_spot:
+                        entries[subgroup_name] = (True, subentries)
+
+                    subentries.append(item)
+                else:
+                    # avoid collisions
+                    title = item.title
+                    while title in entries:
+                        title = f'{title} '
+                    entries[title] = item
+
+            result.append(cls(
+                title=group,
+                entries=[
+                    ResourceSubgroup(
+                        title=subgroup,
+                        entries=sorted(entry[1], key=attrgetter('title')),
+                        find_your_spot=FindYourSpotCollection(
+                            request.app.libres_context,
+                            group=None if group == default_group else group,
+                            subgroup=subgroup
+                        ) if entry[0] else None,
+                    ) if isinstance(entry, tuple) else entry
+                    for subgroup, entry in sorted(
+                        entries.items(),
+                        key=itemgetter(0)
+                    )
+                ],
+                find_your_spot=FindYourSpotCollection(
+                    request.app.libres_context,
+                    group=None if group == default_group else group
+                ) if group_has_find_your_spot else None,
+            ))
+        return result
+
+
+class ResourceSubgroup(NamedTuple):
+    title: str
+    # NOTE: External links don't yet support subgroups, but we
+    #       may add support for it, if there is a demand
+    entries: list[Resource | ExternalLink]
+    find_your_spot: FindYourSpotCollection | None
+
+
 @OrgApp.html(
     model=ResourceCollection,
     template='resources.pt',
@@ -180,47 +252,27 @@ def view_resources(
         layout = ResourcesLayout(self, request)
 
     default_group = request.translate(_('General'))
-    # this is a bit of a white lie, we insert those later on
-    resources: dict[str, list[Resource | FindYourSpotCollection]]
     resources = group_by_column(
         request=request,
-        query=self.query(),  # type:ignore[arg-type]
+        query=self.query(),
         default_group=default_group,
         group_column=Resource.group,
         sort_column=Resource.title
     )
-
-    def contains_at_least_one_room(
-        resources: Iterable[object]
-    ) -> bool:
-        for resource in resources:
-            if isinstance(resource, Resource):
-                if resource.type == 'room':
-                    return True
-        return False
 
     ext_resources = group_by_column(
         request,
         query=ExternalLinkCollection.for_model(
             request.session, ResourceCollection
         ).query(),
+        default_group=default_group,
         group_column=ExternalLink.group,
         sort_column=ExternalLink.order
     )
 
     grouped = combine_grouped(
-        resources, ext_resources, sort=lambda x: x.title
+        resources, ext_resources, sort=attrgetter('title')
     )
-    for group, entries in grouped.items():
-        # don't include find-your-spot link for categories with
-        # no rooms
-        if not contains_at_least_one_room(entries):
-            continue
-
-        entries.insert(0, FindYourSpotCollection(
-            request.app.libres_context,
-            group=None if group == default_group else group
-        ))
 
     def link_func(
         model: Resource | FindYourSpotCollection | ExternalLink
@@ -230,10 +282,7 @@ def view_resources(
             return model.url
         return request.link(model)
 
-    def edit_link(
-        model: Resource | FindYourSpotCollection | ExternalLink
-    ) -> str | None:
-
+    def edit_link(model: Resource | ExternalLink) -> str | None:
         if isinstance(model, ExternalLink) and request.is_manager:
             title = request.translate(_('Edit resource'))
             to = request.class_link(ResourceCollection)
@@ -244,10 +293,7 @@ def view_resources(
             )
         return None
 
-    def lead_func(
-        model: Resource | FindYourSpotCollection | ExternalLink
-    ) -> str:
-
+    def lead_func(model: Resource | ExternalLink) -> str:
         lead = model.meta.get('lead')
         if not lead:
             lead = ''
@@ -256,7 +302,11 @@ def view_resources(
 
     return {
         'title': _('Reservations'),
-        'resources': grouped,
+        'resources': ResourceGroup.from_grouped(
+            request,
+            grouped,
+            default_group
+        ),
         'layout': layout,
         'link_func': link_func,
         'edit_link': edit_link,
@@ -280,6 +330,7 @@ def view_find_your_spot(
     # HACK: Focus results
     form.action += '#results'
     room_slots: dict[date_t, RoomSlots] | None = None
+    missing_dates: dict[date_t, list[Resource] | None] | None = None
     rooms = sorted(
         request.exclude_invisible(self.query()),
         key=attrgetter('title')
@@ -345,7 +396,7 @@ def view_find_your_spot(
                             slot_start, allocation.timezone),
                             sedate.to_timezone(
                                 slot_end, allocation.timezone)),
-                        min(availability, 100),
+                        availability,
                         1 if availability >= availability_threshold else 0,
                         request,
                         adjustable=adjustable
@@ -362,7 +413,7 @@ def view_find_your_spot(
                 allocation,
                 (sedate.to_timezone(slot_start, allocation.timezone),
                  sedate.to_timezone(slot_end, allocation.timezone)),
-                min(availability, 100.0),
+                availability,
                 1 if availability >= availability_threshold else 0,
                 request,
                 adjustable=adjustable
@@ -402,13 +453,20 @@ def view_find_your_spot(
 
                 if not allocation.partly_available:
                     quota_left = allocation.quota_left
+                    availability = (
+                        allocation.display_end() - allocation.display_start()
+                    ) / duration * 100.0
+                    if adjustable := allocation.quota > 1:
+                        if availability >= 100.0:
+                            availability = 100.0
+
                     slots.append(utils.FindYourSpotEventInfo(
                         allocation,
-                        None,  # won't be displayed
-                        quota_left / allocation.quota,
+                        None,
+                        availability if quota_left else 0.0,
                         quota_left,
                         request,
-                        adjustable=allocation.quota > 1
+                        adjustable=adjustable
                     ))
                     continue
                 elif target_start >= target_end:
@@ -514,12 +572,136 @@ def view_find_your_spot(
                     continue
 
                 # add the actual available slots for custom adjustments
-                slots.extend(spot_infos_for_free_slots(
-                    allocation,
-                    free,
-                    duration,
-                    adjustable=True
-                ))
+                slots.extend(
+                    slot
+                    for slot in spot_infos_for_free_slots(
+                        allocation,
+                        # we want to render the entire available time
+                        # span, as long as it overlaps with our target
+                        # so people can reserve a slot that's slightly
+                        # outside their selected range if they want
+                        allocation.free_slots(),
+                        duration,
+                        adjustable=True
+                    )
+                    # but let's exclude slots that are way smaller than
+                    # our selected duration
+                    if slot.availability >= 25.0 and sedate.overlaps(
+                        target_start,
+                        target_end,
+                        # these slots should always have a slot_time
+                        slot.slot_time[0],  # type: ignore[index]
+                        slot.slot_time[1]  # type: ignore[index]
+                    )
+                )
+
+        auto_reserve = form.auto_reserve_available_slots.data
+        if auto_reserve != 'no':
+            rooms_dict = {room.id: room for room in rooms}
+            reservations: dict[UUID, list[Reservation]] = {
+                room.id: room.bound_reservations(request).all()  # type: ignore[attr-defined]
+                for room in rooms
+            }
+            skipped_due_to_existing_reservation = {
+                date: {
+                    room_id
+                    for room_id, slots in date_room_slots.items()
+                    if any(
+                        reservation.display_start() == dates[0]
+                        and reservation.display_end() == dates[1]
+                        for slot in slots
+                        if slot.availability >= 5.0
+                        if (dates := slot.slot_time or (
+                            slot.allocation.display_start(),
+                            slot.allocation.display_end()
+                        ))
+                        for reservation in reservations[room_id]
+                    )
+                }
+                for date, date_room_slots in room_slots.items()
+            }
+
+            reserved_dates: dict[date_t, set[UUID]] = {}
+            for date, date_room_slots in (
+                # skip iteration if we have existing reservations
+                # that match our criteria and we're only supposed
+                # to reserve one of them
+                () if auto_reserve == 'for_first_day' and any(
+                    skipped_due_to_existing_reservation.values()
+                ) else room_slots.items()
+            ):
+                skipped = skipped_due_to_existing_reservation[date]
+                reserved_dates[date] = skipped
+                if skipped and (
+                    auto_reserve != 'for_every_room'
+                    or len(skipped) == len(date_room_slots)
+                ):
+                    # date already fully reserved
+                    continue
+
+                for room_id, slots in date_room_slots.items():
+                    if (
+                        auto_reserve == 'for_every_room'
+                        and room_id in skipped
+                    ):
+                        # already fully reserved
+                        continue
+
+                    for slot in slots:
+                        if slot.availability == 100.0:
+                            try:
+                                room = rooms_dict[room_id]
+                                assert hasattr(room, 'bound_session_id')
+                                room.scheduler.reserve(
+                                    email='0xdeadbeef@example.org',
+                                    dates=slot.slot_time or (
+                                        slot.allocation.display_start(),
+                                        slot.allocation.display_end()
+                                    ),
+                                    quota=1,
+                                    session_id=room.bound_session_id(request),
+                                    single_token_per_session=True
+                                )
+                            except LibresError:
+                                # could happen for overlapping existing
+                                # reservations or other violations, we treat
+                                # this as a missing reserved slot
+                                continue
+                            else:
+                                # we managed to reserve a slot
+                                break
+                    else:
+                        # no slot reserved, move on to the next room
+                        continue
+
+                    reserved_dates.setdefault(date, set()).add(room_id)
+
+                    # since we managed to reserve a slot and we're not
+                    # making a reservation for every room, we need to
+                    # skip the other rooms for this date
+                    if auto_reserve != 'for_every_room':
+                        break
+                else:
+                    # either we didn't reserve a slot or we're reserving
+                    # a slot in every room, so move on to the next date
+                    continue
+
+                # since we broke out of the room loop we must have managed
+                # to reserve a slot, so we need to stop the iteration of
+                # dates here
+                if auto_reserve == 'for_first_day':
+                    break
+
+            wanted = len(rooms) if auto_reserve == 'for_every_room' else 1
+            missing_dates = {
+                date: [
+                    room
+                    for room in rooms
+                    if room.id not in room_ids
+                ] if wanted > 1 else None
+                for date in room_slots.keys()
+                if len(room_ids := reserved_dates.get(date, set())) < wanted
+            } if auto_reserve != 'for_first_day' else {}
 
     if room_slots:
         request.include('reservationlist')
@@ -529,6 +711,7 @@ def view_find_your_spot(
         'form': form,
         'rooms': rooms,
         'room_slots': room_slots,
+        'missing_dates': missing_dates,
         'layout': layout or FindYourSpotLayout(self, request)
     }
 
@@ -550,11 +733,61 @@ def get_find_your_spot_reservations(
             #        Resource class?
             if hasattr(resource, 'bound_reservations')
             for reservation in resource.bound_reservations(request)),
-        key=itemgetter('date')
+        key=itemgetter('date', 'title')
     )
 
     return {
         'reservations': reservations,
+        'delete_link': request.csrf_protected_url(
+            request.link(self, name='reservations')
+        ),
+        # no predictions in the list
+        'prediction': None
+    }
+
+
+@OrgApp.json(
+    model=FindYourSpotCollection,
+    name='reservations',
+    request_method='DELETE',
+    permission=Public
+)
+def delete_all_find_your_spot_reservations(
+    self: FindYourSpotCollection,
+    request: OrgRequest
+) -> JSON_ro:
+
+    # anonymous users do not get a csrf token (it's bound to the identity)
+    # therefore we can't check for it -> this is not a problem since
+    # anonymous users do not really have much to lose here
+    # FIXME: We always generate a csrf token now, so we could reconsider
+    #        this, although it would mean, that people, that have blocked
+    #        cookies, will not be able to delete reservations at all.
+    if request.is_logged_in:
+        request.assert_valid_csrf_token()
+
+    # TODO: We might be able to make this a lot more efficient by taking
+    #       advantage of the fact that we use a single shared token for
+    #       all reservations in the same session (although that might
+    #       include submitted reservations too? which would be bad)
+    for resource in request.exclude_invisible(self.query()):
+        resource.bind_to_libres_context(request.app.libres_context)
+        # FIXME: Maybe we should move bound_reservations to the base
+        #        Resource class?
+        assert hasattr(resource, 'bound_reservations')
+        for reservation in resource.bound_reservations(request):
+            # these shouldn't have a ticket yet, so we don't need
+            # to worry about it
+            resource.scheduler.remove_reservation(
+                reservation.token,
+                reservation.id
+            )
+
+    return {
+        'reservations': [],
+        'delete_link': request.csrf_protected_url(
+            request.link(self, name='reservations')
+        ),
         # no predictions in the list
         'prediction': None
     }

@@ -6,11 +6,11 @@ from onegov.org.views.ticket import (
     view_ticket, handle_new_note, handle_edit_note, message_to_submitter,
     view_ticket_status, view_tickets, view_archived_tickets,
     view_pending_tickets, assign_ticket, view_send_to_gever,
-    view_delete_all_archived_tickets, delete_ticket)
+    view_delete_all_archived_tickets, delete_ticket, change_tag)
 from onegov.ticket.collection import ArchivedTicketCollection
 from onegov.town6 import TownApp
 from onegov.org.forms import (
-    TicketNoteForm, TicketAssignmentForm,
+    TicketNoteForm, TicketAssignmentForm, TicketChangeTagForm,
     ExtendedInternalTicketChatMessageForm)
 from onegov.org.forms import TicketChatMessageForm
 from onegov.org.models import TicketNote
@@ -74,6 +74,20 @@ def town_assign_ticket(
     form: TicketAssignmentForm
 ) -> RenderData | Response:
     return assign_ticket(
+        self, request, form, layout=TicketLayout(self, request))
+
+
+@TownApp.form(
+    model=Ticket, name='change-tag', permission=Private,
+    form=TicketChangeTagForm, template='form.pt'
+)
+def town_change_tag(
+    self: Ticket,
+    request: TownRequest,
+    form: TicketChangeTagForm,
+    layout: TicketLayout | None = None
+) -> RenderData | Response:
+    return change_tag(
         self, request, form, layout=TicketLayout(self, request))
 
 

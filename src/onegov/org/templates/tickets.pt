@@ -69,7 +69,7 @@
                             </div>
                         </div>
                     </th>
-                    <th tal:condition="archive_tickets" >
+                    <th tal:condition="archive_tickets" class="archive-tickets">
                         <div id="action-box" title="Archive selected" i18n:attributes="title">
                             <a id="do-action" class="archive"></a>
                             <input id="select-all" type="checkbox">

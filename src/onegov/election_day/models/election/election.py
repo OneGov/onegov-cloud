@@ -18,6 +18,7 @@ from onegov.election_day.models.mixins import summarized_property
 from onegov.election_day.models.mixins import TitleTranslationsMixin
 from onegov.election_day.models.party_result.mixins import (
     PartyResultsOptionsMixin)
+from operator import itemgetter
 from sqlalchemy import Column
 from sqlalchemy import Date
 from sqlalchemy import ForeignKey
@@ -309,10 +310,11 @@ class Election(Base, ContentMixin, LastModifiedMixin,
         """ Returns the first and last names of the elected candidates. """
 
         return sorted(
-            [
+            (
                 (c.first_name, c.family_name)
                 for c in self.candidates if c.elected
-            ], key=lambda c: (c[1], c[0])
+            ),
+            key=itemgetter(1, 0)
         )
 
     #: may be used to store a link related to this election

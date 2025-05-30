@@ -17,9 +17,10 @@ from onegov.reservation import Allocation, Resource, Reservation
 from onegov.ticket import Ticket, Handler, handlers
 from onegov.search.utils import extract_hashtags
 from purl import URL
+from sedate import utcnow
 from sqlalchemy import desc
 from sqlalchemy import func
-from sqlalchemy.orm import object_session
+from sqlalchemy.orm import object_session, undefer
 
 
 from typing import Any, TYPE_CHECKING
@@ -393,7 +394,10 @@ class ReservationHandler(Handler):
 
     @cached_property
     def reservations(self) -> tuple[Reservation, ...]:
-        return tuple(self.reservations_query())
+        return tuple(
+            self.reservations_query()
+            .options(undefer(Reservation.data))
+        )
 
     @cached_property
     def has_future_reservation(self) -> bool:
@@ -526,9 +530,35 @@ class ReservationHandler(Handler):
         parts.append(
             render_macro(layout.macros['reservations'], request, {
                 'reservations': self.reservations,
+                'get_links': self.get_reservation_links
+                if self.ticket.state == 'pending' else None,
                 'layout': layout
             })
         )
+
+        # render key code
+        if key_code := self.data.get('key_code'):
+            parts.append(Markup(
+                '<dl class="field-display">'
+                '<dt>{}</dt><dd>{}</dd>'
+                '</dl>'
+            ).format(
+                request.translate(_('Key Code')),
+                key_code
+            ))
+
+        # render internal tag meta data
+        if request.is_manager_for_model(self.ticket) and self.ticket.tag_meta:
+            parts.append(
+                Markup('').join(
+                    Markup(
+                        '<dl class="field-display">'
+                        '<dt>{}</dt><dd>{}</dd>'
+                        '</dl>'
+                    ).format(key, value)
+                    for key, value in self.ticket.tag_meta.items()
+                )
+            )
 
         if self.submission:
             form = self.submission.form_class(data=self.submission.data)
@@ -541,6 +571,59 @@ class ReservationHandler(Handler):
             )
 
         return Markup('').join(parts)
+
+    def get_reservation_links(
+        self,
+        reservation: Reservation,
+        request: OrgRequest
+    ) -> list[Link]:
+
+        links: list[Link] = []
+
+        url_obj = URL(request.link(self.ticket, 'reject-reservation'))
+        url_obj = url_obj.query_param(
+            'reservation-id', str(reservation.id))
+        url = url_obj.as_string()
+
+        title = self.get_reservation_title(reservation)
+        links.append(Link(
+            text=_('Reject'),
+            url=url,
+            attrs={'class': 'delete-link'},
+            traits=(
+                Confirm(
+                    _('Do you really want to reject this reservation?'),
+                    _("Rejecting ${title} can't be undone.", mapping={
+                        'title': title
+                    }),
+                    _('Reject reservation'),
+                    _('Cancel')
+                ),
+                Intercooler(
+                    request_method='GET',
+                    redirect_after=request.url
+                )
+            )
+        ))
+
+        # is the reservation adjustable?
+        if reservation.target_type == 'allocation' and request.session.query(
+            reservation
+            ._target_allocations()
+            .filter(Allocation.partly_available.is_(True))
+            .exists()
+        ).scalar():
+            url_obj = URL(request.link(self.ticket, 'adjust-reservation'))
+            url_obj = url_obj.query_param(
+                'reservation-id', str(reservation.id))
+            url = url_obj.as_string()
+            links.append(Link(
+                text=_('Adjust'),
+                url=url,
+                attrs={'class': 'edit-link'}
+            ))
+
+        return links
 
     def get_links(  # type:ignore[override]
         self,
@@ -583,6 +666,20 @@ class ReservationHandler(Handler):
                 )
             )
 
+        now = utcnow()
+        if getattr(self.resource, 'kaba_components', None) and any(
+            True
+            for reservation in self.reservations
+            if reservation.display_end() > now
+        ):
+            advanced_links.append(
+                Link(
+                    text=_('Edit key code'),
+                    url=request.link(self.ticket, 'edit-kaba'),
+                    attrs={'class': ('edit-link', 'border')}
+                )
+            )
+
         if not all(accepted):
             advanced_links.append(
                 Link(
@@ -616,33 +713,6 @@ class ReservationHandler(Handler):
             url=request.link(self.ticket, 'reject-reservation-with-message'),
             attrs={'class': 'delete-link'},
         ))
-
-        for reservation in self.reservations:
-            url_obj = URL(request.link(self.ticket, 'reject-reservation'))
-            url_obj = url_obj.query_param(
-                'reservation-id', str(reservation.id))
-            url = url_obj.as_string()
-
-            title = self.get_reservation_title(reservation)
-            advanced_links.append(Link(
-                text=_('Reject ${title}', mapping={'title': title}),
-                url=url,
-                attrs={'class': 'delete-link'},
-                traits=(
-                    Confirm(
-                        _('Do you really want to reject this reservation?'),
-                        _("Rejecting ${title} can't be undone.", mapping={
-                            'title': title
-                        }),
-                        _('Reject reservation'),
-                        _('Cancel')
-                    ),
-                    Intercooler(
-                        request_method='GET',
-                        redirect_after=request.url
-                    )
-                )
-            ))
 
         links.append(LinkGroup(
             _('Advanced'),

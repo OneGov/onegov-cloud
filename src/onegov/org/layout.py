@@ -62,6 +62,7 @@ from onegov.ticket import TicketCollection
 from onegov.ticket.collection import ArchivedTicketCollection
 from onegov.user import Auth, UserCollection, UserGroupCollection
 from onegov.user.utils import password_reset_url
+from operator import itemgetter
 from sedate import to_timezone
 from translationstring import TranslationString
 
@@ -495,7 +496,7 @@ class Layout(ChameleonLayout, OpenGraphMixin):
 
         return [
             (v['name'], v['url']) for k, v in sorted(
-                links.items(), key=lambda item: item[0])
+                links.items(), key=itemgetter(0))
             if v['name'] and v['url']
         ]
 
@@ -1604,6 +1605,12 @@ class PersonCollectionLayout(DefaultLayout):
     def editbar_links(self) -> list[Link | LinkGroup] | None:
         if self.request.is_manager:
             return [
+                Link(
+                    text=_('Settings'),
+                    url=self.request.link(
+                        self.request.app.org, 'people-settings'),
+                    attrs={'class': 'settings-link'}
+                ),
                 LinkGroup(
                     title=_('Add'),
                     links=[
@@ -2286,7 +2293,7 @@ class ResourceLayout(DefaultLayout):
                     attrs={'class': 'subscribe-link'}
                 ),
                 Link(
-                    text=_('Rules'),
+                    text=_('Availability periods'),
                     url=self.request.link(self.model, 'rules'),
                     attrs={'class': 'rule-link'}
                 ),
@@ -2321,26 +2328,47 @@ class AllocationRulesLayout(ResourceLayout):
             Link(_('Homepage'), self.homepage_url),
             Link(_('Reservations'), self.request.link(self.collection)),
             Link(_(self.model.title), self.request.link(self.model)),
-            Link(_('Rules'), '#')
+            Link(_('Availability periods'), '#')
         ]
 
     @cached_property
     def editbar_links(self) -> list[Link | LinkGroup]:
-        return [
-            LinkGroup(
-                title=_('Add'),
-                links=[
-                    Link(
-                        text=_('Rule'),
-                        url=self.request.link(
-                            self.model,
-                            name='new-rule'
+        add_link = LinkGroup(
+            title=_('Add'),
+            links=[
+                Link(
+                    text=_('Availability period'),
+                    url=self.request.link(
+                        self.model,
+                        name='new-rule'
+                    ),
+                    attrs={'class': 'new-link'}
+                )
+            ]
+        )
+
+        if self.request.browser_session.get(  # type: ignore[call-overload]
+            'copied_allocation_rules', {}
+        ).get(self.model.type):
+            return [
+                add_link,
+                Link(
+                    text=_('Paste'),
+                    url=self.request.csrf_protected_url(
+                        self.request.link(self.model, 'paste-rule')
+                    ),
+                    attrs={'class': 'paste-link'},
+                    traits=(
+                        Intercooler(
+                            request_method='POST',
+                            redirect_after=self.request.link(
+                                self.model, 'rules'
+                            )
                         ),
-                        attrs={'class': 'new-link'}
                     )
-                ]
-            ),
-        ]
+                )
+            ]
+        return [add_link]
 
 
 class AllocationEditFormLayout(DefaultLayout):
@@ -2780,6 +2808,12 @@ class NewsletterLayout(DefaultLayout):
                     text=_('Subscribers'),
                     url=self.request.link(self.recipients),
                     attrs={'class': 'manage-subscribers'}
+                ),
+                Link(
+                    text=_('Settings'),
+                    url=self.request.link(
+                        self.request.app.org, 'newsletter-settings'),
+                    attrs={'class': 'settings-link'}
                 ),
                 LinkGroup(
                     title=_('Add'),

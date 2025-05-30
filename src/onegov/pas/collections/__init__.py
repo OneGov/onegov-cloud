@@ -5,6 +5,7 @@ from onegov.pas.collections.change import ChangeCollection
 from onegov.pas.collections.commission import CommissionCollection
 from onegov.pas.collections.commission_membership import (
     CommissionMembershipCollection)
+from onegov.pas.collections.import_log import ImportLogCollection
 from onegov.pas.collections.legislative_period import (
     LegislativePeriodCollection)
 from onegov.pas.collections.parliamentarian import ParliamentarianCollection
@@ -21,6 +22,7 @@ __all__ = (
     'ChangeCollection',
     'CommissionCollection',
     'CommissionMembershipCollection',
+    'ImportLogCollection',
     'LegislativePeriodCollection',
     'ParliamentarianCollection',
     'ParliamentarianRoleCollection',

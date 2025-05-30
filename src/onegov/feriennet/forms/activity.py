@@ -101,13 +101,12 @@ class VacationActivityForm(Form):
             .with_entities(User.username, User.title)
         )
 
-        def choice(row: tuple[str, str]) -> _Choice:
-            return row[0], row[1]
-
         def by_title(choice: _Choice) -> str:
             return normalize_for_url(choice[1])
 
-        return sorted((choice(r) for r in users), key=by_title)
+        return sorted((
+            (username, title) for username, title in users
+        ), key=by_title)
 
     def set_username_default(self, value: str) -> None:
         # we can't set self.username.default here, as that has already been

@@ -22,7 +22,7 @@ from unittest.mock import patch
 
 def test_views_general(client):
     client.login_admin()
-    settings = client.get('/module-settings')
+    settings = client.get('/people-settings')
     settings.form['hidden_people_fields'] = ['academic_title', 'born']
     settings.form.submit()
     client.logout()
@@ -748,8 +748,8 @@ def test_basic_search(client_with_es):
     manage.form['function'] = 'Doctor'
     manage.form['first_name'] = 'Nick'
     manage.form['last_name'] = 'Rivera'
-    manage.form['phone'] = '+12 34 567 89 01'
-    manage.form['phone_direct'] = '+12 34 567 89 11'
+    manage.form['phone'] = '+41 23 456 78 90'
+    manage.form['phone_direct'] = '+41 23 456 78 99'
     manage.form.submit()
 
     manage = client.get('/organizations').click('Organisation', href='new')

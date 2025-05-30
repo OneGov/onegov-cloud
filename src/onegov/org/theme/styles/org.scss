@@ -2,9 +2,9 @@
     useful mixins
 */
 
-// sass-lint:disable-all
+// stylelint-disable declaration-block-no-duplicate-properties
 @mixin grayscale {
-    filter: url("data:image/svg+xml;utf8,<svg xmlns=\'http://www.w3.org/2000/svg\'><filter id=\'grayscale\'><feColorMatrix type=\'matrix\' values=\'0.3333 0.3333 0.3333 0 0 0.3333 0.3333 0.3333 0 0 0.3333 0.3333 0.3333 0 0 0 0 0 1 0\'/></filter></svg>#grayscale");
+            filter: url("data:image/svg+xml;utf8,<svg xmlns=\'http://www.w3.org/2000/svg\'><filter id=\'grayscale\'><feColorMatrix type=\'matrix\' values=\'0.3333 0.3333 0.3333 0 0 0.3333 0.3333 0.3333 0 0 0.3333 0.3333 0.3333 0 0 0 0 0 1 0\'/></filter></svg>#grayscale");
             filter: grayscale(100%);
        -moz-filter: grayscale(100%);
         -ms-filter: grayscale(100%);
@@ -20,7 +20,7 @@
             filter: none;
     -webkit-filter: none;
 }
-// sass-lint:enable-all
+// stylelint-enable declaration-block-no-duplicate-properties
 
 @mixin hairline {
     border: 0;
@@ -127,7 +127,7 @@ a[href^="mailto:"] {
     @include prefix(word-break, break-all);
 
     // Non standard for WebKit
-    word-break: break-word;
+    word-break: break-word; /* stylelint-disable-line declaration-property-value-keyword-no-deprecated */
 }
 
 /*
@@ -619,6 +619,11 @@ $footer-border-width: 0;
     line-height: 1.5rem;
     list-style-type: none;
     margin: 0 0 1rem;
+}
+
+.tiktok {
+    margin-left: 2px;
+    margin-right: 2px;
 }
 
 /*
@@ -1670,6 +1675,7 @@ $ticket-files-icon: '\f019';
 $qr-code-icon: '\f029';
 $envelope-icon: '\f0e0';
 $results-icon: '\f080';
+$settings-icon: '\f1de';
 $editbar-bg-color: $topbar-link-bg-hover;
 
 .edit-bar {
@@ -1811,6 +1817,7 @@ $editbar-bg-color: $topbar-link-bg-hover;
     .envelope::before { @include icon($envelope-icon); }
     .internal-link::before { @include icon($internal-link-icon); }
     .results-link::before { @include icon($results-icon); }
+    .settings-link::before { @include icon($settings-icon); }
 }
 
 .mark-as-paid::before { @include icon($mark-as-paid); }
@@ -2481,12 +2488,8 @@ $person-email-icon: '\f003';
         margin-bottom: 1em;
     }
 
-    .person-card-organisation {
+    :nth-last-child(1 of .person-card-organisation) {
         margin-bottom: 1em;
-
-        span:not(:last-child)::after {
-            content: ' -';
-        }
     }
 
     .person-card-personal {
@@ -2937,6 +2940,13 @@ tr.ticket:hover {
 
     &:hover::before {
         content: $assign-ticket-icon-hover;
+    }
+}
+
+.ticket-change-tag {
+    &::before {
+        @include icon($edit-link-icon);
+        margin-right: 1ex;
     }
 }
 
@@ -4046,7 +4056,11 @@ ul.search-results {
     .button {
         border-radius: 3px;
         display: block;
-        margin: 0;
+        margin-left: 0;
+
+        &:last-of-type {
+            margin-bottom: 0;
+        }
     }
 
     .failed {
@@ -4095,6 +4109,7 @@ ul.search-results {
     }
 
     a,
+    .reservation-resource,
     .reservation-time,
     .reservation-price {
         display: block;
@@ -4117,6 +4132,7 @@ ul.search-results {
             width: 24px;
         }
 
+        .reservation-resource,
         .reservation-time,
         .reservation-price {
             margin-left: 2.3rem;
@@ -4271,6 +4287,26 @@ ul.search-results {
 
         li {
             margin-bottom: .5rem;
+        }
+
+        .reservation {
+            background: $white-smoke;
+            border-radius: 2px;
+            margin-bottom: 1rem;
+            margin-left: -0.5rem;
+            position: relative;
+        }
+
+        .reservation-details {
+            font-size: .8rem;
+            padding: .5rem 8rem .5rem .5rem;
+        }
+
+        .reservation-actions {
+            font-size: .8rem;
+            position: absolute;
+            right: .5rem;
+            top: .275rem;
         }
     }
 
@@ -4825,6 +4861,29 @@ h2 + div.timeline {
     .file {
         margin-left: 4rem;
     }
+
+    .reservation-adjustment {
+        display: flex;
+        align-items: center;
+        gap: 1rem;
+        margin: 0;
+
+        .fa {
+            font-size: 1.5rem;
+            color: rgba(0, 0, 0, .5);
+        }
+
+        .reservation-details {
+            font-size: .8rem;
+            padding: .5rem;
+            background: rgba(255, 255, 255, .7);
+            border-radius: 2px;
+            box-shadow: 3px 3px 3px rgba(220, 220, 220, .2);
+            flex: 0 0 32.66%;
+            margin: .5rem 0;
+        }
+
+    }
 }
 
 /*
@@ -4836,6 +4895,10 @@ h2 + div.timeline {
 .message-directory,
 .message-submission {
     background: lighten($green-pastel, 2.5%);
+}
+
+.message-reservation_adjusted {
+    background: lighten($yellow-pastel, 2.5%);
 }
 
 .message-ticket_note {

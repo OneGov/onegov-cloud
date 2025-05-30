@@ -42,6 +42,14 @@ class ParliamentaryGroup(Base, ContentMixin, TimestampMixin, ORMSearchable):
         default=uuid4
     )
 
+    #: External ID
+    external_kub_id: Column[uuid.UUID | None] = Column(
+        UUID,   # type:ignore[arg-type]
+        nullable=True,
+        default=uuid4,
+        unique=True
+    )
+
     #: the name
     name: Column[str] = Column(
         Text,

@@ -1,4 +1,11 @@
 import pytest
+import json
+from webtest import Upload
+from onegov.pas import _
+from typing import TYPE_CHECKING, Any
+
+if TYPE_CHECKING:
+    pass
 
 
 @pytest.mark.flaky(reruns=5, only_rerun=None)
@@ -258,3 +265,173 @@ def test_views_manage(client_with_es):
     assert 'Noch keine Fraktionen erfasst' in settings.click('Fraktionen')
     assert 'Noch keine Parlamentarier:innen erfasst' in\
            settings.click('Parlamentarier:innen')
+
+
+def test_view_upload_json(
+    client,
+    people_json,
+    organization_json,
+    memberships_json
+):
+    """ Test successful import of all data using fixtures.
+
+    *1. Understanding the Data and Models**
+
+    **people.json**: Contains individual person data (Parliamentarians). Key
+         fields are firstName, officialName, primaryEmail, tags, title, id.
+         This maps to the Parliamentarian model.
+
+    **organizations.json**:
+        The organizationTypeTitle dictates the type of organization.
+        - "Kommission":  Maps to Commission model.
+        - "Kantonsrat":  This is a special case. It's not a Commission. It
+        represents the Parliament itself. We link this as ParliamentarianRole
+        directly on the Parliamentarian model with role='member' and associated
+        with the Kantonsrat organization.
+        - "Fraktion":  Maps to ParliamentaryGroup.
+        - "Sonstige": Could be various types. Let's see how these are intended
+          to be modeled. We need more clarity on how "Sonstige" is categorized.
+
+    **memberships.json**: Connects person and organization.
+        It defines the role within that organization, start, end dates.
+        The nested person and organization blocks are crucial for establishing
+        relationships.
+    """
+
+    client.login_admin()
+
+    # --- Reference: Previously used function for local file testing ---
+    # import os
+    # def yield_paths():
+    #     """ Yields paths in this order: organization, membership, people """
+    #     base_path = '/path/to/your/local/json/files' # Adjust this path
+    #     yield [base_path + '/organization.json']
+    #     membership_count = 7 # Adjust as needed
+    #     membership_paths = [
+    #         f'{base_path}/memberships_{i}.json'
+    #         for i in range(1, membership_count + 1)
+    #     ]
+    #     assert all(
+    #         os.path.exists(path) for path in membership_paths
+    #     ), "Some membership paths don't exist"
+    #     yield membership_paths
+    #
+    #     # Yield people paths after validating existence
+    #     # Adjust as needed:
+    #     people_paths = [f'{base_path}/people_{i}.json' for i in range(1, 3)]
+    #     assert all(
+    #         os.path.exists(path) for path in people_paths
+    #     ), "Some people paths don't exist"
+    #     yield people_paths
+
+
+    # def upload_file(filepath):
+    #     with open(filepath, 'rb') as f:
+    #         content = f.read()
+    #         return Upload(
+    #             os.path.basename(filepath),
+    #             content,
+    #             'application/json'
+    #         )
+
+    # # Get all paths
+    # paths_generator = yield_paths()
+
+    # org_paths = next(paths_generator)
+    # page.form['organizations_source'] = [
+    #     upload_file(path) for path in org_paths
+    # ]
+
+    # membership_paths = next(paths_generator)
+    # page.form['memberships_source'] = [
+    #     upload_file(path) for path in membership_paths
+    # ]
+
+    # people_paths = next(paths_generator)
+    # page.form['people_source'] = [
+    #     upload_file(path) for path in people_paths
+    # ]
+
+
+    # --- End Reference ---
+
+    def create_upload_object(
+        filename: str, data: dict[str, list[Any]]
+    ) -> Upload:
+        """Creates a webtest Upload object from a dictionary."""
+        content_bytes = json.dumps(data).encode('utf-8')
+        return Upload(
+            filename,
+            content_bytes,
+            'application/json'
+        )
+
+    def do_upload_procedure(
+        org_data,
+        member_data,
+        ppl_data
+    ):
+        """Uploads data using Upload objects created from fixtures."""
+        page = client.get('/pas-import')
+
+        # Create Upload objects from the fixture data
+        # We wrap the list in the expected 'results' structure if needed,
+        # matching the fixture structure.
+        org_upload = create_upload_object('organization.json', org_data)
+        # Assuming memberships_json fixture contains the 'results' list
+        memberships_upload = create_upload_object(
+            'memberships.json', member_data
+        )
+        # Assuming people_json fixture contains the 'results' list
+        people_upload = create_upload_object('people.json', ppl_data)
+
+        # Assign the Upload objects to the form fields
+        # Note: The form expects a list of uploads, even if there's only one.
+        page.form['validate_schema'] = False
+        page.form['organizations_source'] = [org_upload]
+        page.form['memberships_source'] = [memberships_upload]
+        page.form['people_source'] = [people_upload]
+
+        # Submit the form
+        result = page.form.submit().maybe_follow()
+
+        # Add assertions as needed
+        assert result.status_code == 200
+        assert result.status_code == 200, f"Import failed: {result.text}"
+        return result
+
+    # --- First Import ---
+    result1 = do_upload_procedure(
+        organization_json, memberships_json, people_json
+    )
+
+    # Check the import logs after first import
+    logs_page = client.get('/import-logs')
+    assert logs_page.status_code == 200
+    assert 'completed' in logs_page  # Check if the status is shown
+    log_detail_page = logs_page.click(
+        _('Details anzeigen'), index=0
+    ).maybe_follow()
+
+    assert log_detail_page.status_code == 200
+    assert 'Import Details' in log_detail_page
+    status = log_detail_page.pyquery('.import-status').text()
+    assert 'completed' in status, f"Import status not 'completed': {status}"
+
+    # --- Second Import (Test idempotency) ---
+    # Run the import again with the same data, to test robustness
+    do_upload_procedure(
+        organization_json, memberships_json, people_json
+    )
+
+    # Check logs again after second import
+    logs_page = client.get('/import-logs')
+    assert logs_page.status_code == 200, "Could not load import logs page"
+    # Should now have two logs
+    assert len(logs_page.pyquery('tbody tr')) == 2
+    assert 'completed' in logs_page.pyquery(
+        'tbody tr:first-child .import-status'
+    ).text()
+    assert 'completed' in logs_page.pyquery(
+        'tbody tr:last-child .import-status'
+    ).text()

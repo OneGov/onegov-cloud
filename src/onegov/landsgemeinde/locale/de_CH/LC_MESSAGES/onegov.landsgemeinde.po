@@ -1,7 +1,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: OneGov Cloud 1.0\n"
-"POT-Creation-Date: 2025-02-24 16:10+0100\n"
+"POT-Creation-Date: 2025-04-22 10:49+0200\n"
 "PO-Revision-Date: 2021-03-03 16:24+0100\n"
 "Language-Team: German\n"
 "Language: de_CH\n"
@@ -163,8 +163,8 @@ msgstr "Protokoll (PDF)"
 msgid "Audio (MP3)"
 msgstr "Audio (MP3)"
 
-msgid "Audio (ZIP)"
-msgstr "Audio (ZIP)"
+msgid "Memorial as audio for the visually impaired and blind"
+msgstr "Memorial als Hörfassung für Sehbehinderte und Blinde"
 
 msgid "Date already used."
 msgstr "Datum wird bereits verwendet."
@@ -305,14 +305,20 @@ msgstr "laufend"
 msgid "completed"
 msgstr "abgeschlossen"
 
+msgid "Previous agenda item"
+msgstr "Vorheriges Traktandum"
+
+msgid "Next agenda item"
+msgstr "Nächstes Traktandum"
+
 msgid "Memorial (PDF)"
 msgstr "Memorial (PDF)"
 
 msgid "No assemblies defined yet."
 msgstr "Noch keine Landsgemeinden erfasst."
 
-msgid "Assembly items & downloads"
-msgstr "Traktanden & Downloads"
+msgid "Downloads, Audio & Assembly items"
+msgstr "Downloads, Audio & Traktanden"
 
 msgid "Audio"
 msgstr "Audio"
@@ -392,8 +398,8 @@ msgstr "Neue Landsgemeinde hinzugefügt"
 msgid "New assembly"
 msgstr "Neue Landsgemeinde"
 
-msgid "Open data"
-msgstr "Open data"
+msgid "Open Data"
+msgstr "Open Data"
 
 #, python-format
 msgid "Results from the ${title}, structured as json"
@@ -410,6 +416,12 @@ msgstr "Neue Wortmeldung hinzugefügt"
 
 msgid "New votum"
 msgstr "Neue Wortmeldung"
+
+#~ msgid "Assembly items & downloads"
+#~ msgstr "Traktanden & Downloads"
+
+#~ msgid "Audio (ZIP)"
+#~ msgstr "Audio (ZIP)"
 
 #~ msgid "Video timestamp"
 #~ msgstr "Video-Zeitstempel"

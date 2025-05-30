@@ -10,7 +10,6 @@ from onegov.core.orm.mixins import (
     dict_markup_property, dict_property, meta_property)
 from onegov.core.orm.types import UUID
 from onegov.form.models import FormSubmission
-from onegov.org import _
 from onegov.org.models.extensions import (
     ContactExtension, GeneralFileLinkExtension, ResourceValidationExtension)
 from onegov.org.models.extensions import CoordinatesExtension
@@ -24,7 +23,7 @@ from sqlalchemy.sql.expression import cast
 from uuid import uuid4, uuid5
 
 
-from typing import Any, ClassVar, TYPE_CHECKING
+from typing import ClassVar, TYPE_CHECKING
 if TYPE_CHECKING:
     import uuid
     from libres.context.core import Context
@@ -36,23 +35,23 @@ if TYPE_CHECKING:
 
 class FindYourSpotCollection(ResourceCollection):
 
-    def __init__(self, libres_context: Context, group: str | None) -> None:
+    def __init__(
+        self,
+        libres_context: Context,
+        group: str | None = None,
+        subgroup: str | None = None,
+    ) -> None:
         super().__init__(libres_context)
         self.group = group
-
-    @property
-    def title(self) -> str:
-        return _('Find Your Spot')
-
-    @property
-    def meta(self) -> dict[str, Any]:
-        return {'lead': _('Search for available dates')}
+        self.subgroup = subgroup
 
     def query(self) -> Query[Resource]:
         query = self.session.query(Resource)
         # we only support find-your-spot for rooms for now
         query = query.filter(Resource.type == 'room')
         query = query.filter(Resource.group == (self.group or ''))
+        if self.subgroup is not None:
+            query = query.filter(Resource.subgroup == self.subgroup)
         return query
 
 
@@ -141,7 +140,8 @@ class SharedMethods:
     def bound_reservations(
         self,
         request: OrgRequest,
-        status: str = 'pending'
+        status: str = 'pending',
+        with_data: bool = False
     ) -> Query[Reservation]:
         """ The reservations associated with this resource and user. """
 
@@ -156,6 +156,9 @@ class SharedMethods:
 
         # used by ReservationInfo
         res = res.options(undefer(Reservation.created))
+
+        if with_data:
+            res = res.options(undefer(Reservation.data))
 
         return res  # type:ignore[return-value]
 
@@ -189,7 +192,7 @@ class SharedMethods:
         query = query.order_by(Ticket.subtitle)
         query = query.filter(Reservation.status == 'approved')
         if exclude_pending:
-            query = query.filter(Reservation.data != None)
+            query = query.filter(Reservation.data['accepted'] == True)
 
         return query  # type:ignore[return-value]
 
@@ -241,6 +244,8 @@ class RoomResource(Resource, AccessExtension, SearchableContent,
     # used to render the reservation title
     title_template = '{start:%d.%m.%Y} {start:%H:%M} - {end:%H:%M}'
 
+    kaba_components: dict_property[list[str]] = meta_property(default=list)
+
     @property
     def deletable(self) -> bool:
         if self.future_managed_reserved_slots.first():
@@ -266,3 +271,5 @@ class ItemResource(Resource, AccessExtension, SearchableContent,
     show_quota = True
 
     title_template = '{start:%d.%m.%Y} {start:%H:%M} - {end:%H:%M} ({quota})'
+
+    kaba_components: dict_property[list[str]] = meta_property(default=list)

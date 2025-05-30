@@ -337,7 +337,7 @@ class PdfGenerator:
             deltas, results_dict = get_party_results_deltas(
                 election, years, parties
             )
-            results = results_dict[sorted(results_dict.keys())[-1]]
+            results = results_dict[max(results_dict.keys())]
             pdf.results(
                 head=[
                     _('Party'),
@@ -649,7 +649,7 @@ class PdfGenerator:
                 compound, years, parties
             )
             if dict_results:
-                results = dict_results[sorted(dict_results.keys())[-1]]
+                results = dict_results[max(dict_results.keys())]
                 pdf.results(
                     head=[
                         _('Party'),

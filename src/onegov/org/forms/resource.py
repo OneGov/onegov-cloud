@@ -12,10 +12,11 @@ from wtforms.validators import Optional
 from wtforms.validators import ValidationError
 
 from onegov.form import Form, merge_forms, parse_formcode
+from onegov.form.fields import ChosenSelectMultipleField
 from onegov.form.fields import MultiCheckboxField
 from onegov.form.filters import as_float
 from onegov.form.validators import ValidFormDefinition
-from onegov.org import _
+from onegov.org import _, log
 from onegov.org.forms.fields import HtmlField
 from onegov.org.forms.generic import DateRangeForm
 from onegov.org.forms.generic import ExportForm
@@ -23,15 +24,20 @@ from onegov.org.forms.generic import PaymentForm
 from onegov.org.forms.reservation import (
     RESERVED_FIELDS, ExportToExcelWorksheets)
 from onegov.org.forms.util import WEEKDAYS
+from onegov.org.kaba import KabaApiError, KabaClient
 
 
 from typing import Any, Literal, TYPE_CHECKING
 if TYPE_CHECKING:
+    from onegov.org.request import OrgRequest
     from onegov.reservation import Resource
 
 
 class ResourceBaseForm(Form):
     """ Defines the form for all resources. """
+
+    if TYPE_CHECKING:
+        request: OrgRequest
 
     title = StringField(_('Title'), [InputRequired()])
 
@@ -42,6 +48,11 @@ class ResourceBaseForm(Form):
 
     group = StringField(
         label=_('Group'),
+        description=_('Used to group the resource in the overview')
+    )
+
+    subgroup = StringField(
+        label=_('Subgroup'),
         description=_('Used to group the resource in the overview')
     )
 
@@ -152,6 +163,12 @@ class ResourceBaseForm(Form):
             ('month', _('Month view')),
         ))
 
+    kaba_components = ChosenSelectMultipleField(
+        label=_('Doors'),
+        choices=(),
+        fieldset='dormakaba',
+    )
+
     pricing_method = RadioField(
         label=_('Price'),
         fieldset=_('Payments'),
@@ -188,13 +205,48 @@ class ResourceBaseForm(Form):
         validators=[InputRequired()],
     )
 
+    extras_pricing_method = RadioField(
+        label=_('Prices in extra fields are'),
+        description=_(
+            'If no extra fields are defined or none of the extra fields '
+            'contain pricing information, then this setting has no effect.'
+        ),
+        fieldset=_('Payments'),
+        default='per_item',
+        validators=[InputRequired()],
+        choices=(
+            ('one_off', _('One-off')),
+            ('per_item', _('Per item')),
+            ('per_hour', _('Per hour'))
+        )
+    )
+
     def on_request(self) -> None:
         if hasattr(self.model, 'type'):
             if self.model.type == 'daypass':
                 self.delete_field('default_view')
+                self.delete_field('kaba_components')
+                return
         else:
             if self.request.view_name.endswith('new-daypass'):
                 self.delete_field('default_view')
+                self.delete_field('kaba_components')
+                return
+
+        client = KabaClient.from_app(self.request.app)
+        if client is None:
+            self.delete_field('kaba_components')
+            return
+
+        try:
+            self.kaba_components.choices = client.component_choices()
+        except KabaApiError:
+            log.info('Kaba API error', exc_info=True)
+            self.request.alert(_(
+                'Failed to retrieve the doors from the dormakaba API '
+                'please make sure your credentials are still valid.'
+            ))
+            self.delete_field('kaba_components')
 
     @property
     def zipcodes(self) -> list[int]:

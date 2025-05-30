@@ -110,13 +110,12 @@ class FirebaseNotificationService(NotificationService):
             log_msg += f' Response: {response}'
             logger.info(log_msg)
             return response
-        except FirebaseError as firebase_err:
-            log_msg = f"Firebase Messaging Error sending to topic '{topic}'"
-            log_msg += f': {firebase_err}'
-            logger.error(log_msg)
-            raise firebase_err  # Re-raise Firebase errors
-        except Exception as e:
-            log_msg = f"Unexpected error sending to topic '{topic}': {e}"
+        except FirebaseError:
+            log_msg = f"Firebase Messaging Error sending to topic '{topic}':"
+            logger.exception(log_msg)
+            raise  # Re-raise Firebase errors
+        except Exception:
+            log_msg = f"Unexpected error sending to topic '{topic}':"
             logger.exception(log_msg)
             raise  # Re-raise unexpected exceptions
 

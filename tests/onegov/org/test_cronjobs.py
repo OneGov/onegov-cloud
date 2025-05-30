@@ -1,4 +1,5 @@
 import json
+import logging
 import os
 from pathlib import Path
 from unittest.mock import patch, Mock
@@ -6,19 +7,20 @@ from unittest.mock import patch, Mock
 import pytest
 import requests
 import transaction
-from datetime import datetime, timedelta
+from datetime import datetime, timedelta, timezone
 from freezegun import freeze_time
-from onegov.core.utils import Bunch
+
+from onegov.core.utils import Bunch, normalize_for_url
 from onegov.directory import (DirectoryEntryCollection,
                               DirectoryConfiguration,
                               DirectoryCollection)
 from onegov.directory.collections.directory import EntryRecipientCollection
-from onegov.event import EventCollection, OccurrenceCollection
+from onegov.event import EventCollection, OccurrenceCollection, Event
 from onegov.event.utils import as_rdates
 from onegov.form import FormSubmissionCollection
-from onegov.gever.encrypt import encrypt_symmetric
 from onegov.org.models import (
     ResourceRecipientCollection, News, PushNotification)
+from onegov.org.models.page import NewsCollection
 from onegov.org.models.resource import RoomResource
 from onegov.org.models.ticket import ReservationHandler, DirectoryEntryHandler
 from onegov.org.notification_service import (
@@ -26,12 +28,14 @@ from onegov.org.notification_service import (
 from onegov.page import PageCollection
 from onegov.ticket import Handler, Ticket, TicketCollection
 from onegov.user import UserCollection
-from onegov.newsletter import NewsletterCollection, RecipientCollection
+from onegov.newsletter import (Newsletter, NewsletterCollection,
+                               RecipientCollection)
 from onegov.reservation import ResourceCollection
 from onegov.user.collections import TANCollection
 from sedate import ensure_timezone, utcnow
 from sqlalchemy.orm import close_all_sessions
 from tests.onegov.org.common import get_cronjob_by_name, get_cronjob_url
+from decimal import Decimal
 from tests.shared import Client
 from tests.shared.utils import add_reservation
 
@@ -733,6 +737,7 @@ def test_send_scheduled_newsletters(client, org_app, secret_content_allowed):
     recipient.confirmed = True
 
     org_app.org.secret_content_allowed = secret_content_allowed
+    org_app.org.enable_automatic_newsletters = True
 
     create_scheduled_newsletter()
 
@@ -766,6 +771,80 @@ def test_send_scheduled_newsletters(client, org_app, secret_content_allowed):
             if secret_content_allowed:
                 assert "Secret News" in mail['TextBody']
             assert "Private News" not in mail['TextBody']
+
+
+def test_send_daily_newsletter(es_org_app):
+    org_app = es_org_app
+    tz = ensure_timezone('Europe/Zurich')
+
+    session = org_app.session()
+    org_app.org.enable_automatic_newsletters = True
+    org_app.org.newsletter_times = '10', '11', '16'
+
+    news = PageCollection(session)
+    news_parent = news.query().filter_by(name='news').one()
+    recipients = RecipientCollection(session)
+
+    recipient = recipients.add('daily@example.org', confirmed=True)
+    recipient.daily_newsletter = True
+
+    recipient = recipients.add('info@example.org', confirmed=True)
+    recipient.daily_newsletter = False
+
+    with freeze_time(datetime(2018, 3, 2, 17, 0, tzinfo=tz)):
+        # Created three days ago, published yesterday at 17:00
+        news.add(
+            parent=news_parent, title='News1', type='news', access='public',
+            publication_start=utcnow() + timedelta(days=2))
+
+    with freeze_time(datetime(2018, 3, 4, 17, 0, tzinfo=tz)):
+        # Created yesterday at 17:00, published immediately
+        news.add(
+            parent=news_parent, title='News2', type='news', access='public')
+
+    with freeze_time(datetime(2018, 3, 5, 10, 0, tzinfo=tz)):
+        # Created today at 10:00, published immediately
+        news.add(
+            parent=news_parent, title='News3', type='news', access='public')
+        # Created today at 10:00, published today 10:01
+        news.add(
+            parent=news_parent, title='News4', type='news', access='public',
+            publication_start=utcnow() + timedelta(minutes=1))
+
+    transaction.commit()
+
+    job = get_cronjob_by_name(org_app, 'hourly_maintenance_tasks')
+    job.app = org_app
+    client = Client(org_app)
+
+    with freeze_time(datetime(2018, 3, 5, 10, 0, tzinfo=tz)):
+        client.get(get_cronjob_url(job))
+        newsletter = NewsletterCollection(session).query().one()
+        assert newsletter.title == 'Täglicher Newsletter 05.03.2018, 10:00'
+        assert len(os.listdir(client.app.maildir)) == 1
+        mail = client.get_email(0)
+        assert "News1" in mail['TextBody']
+        assert "News2" in mail['TextBody']
+        assert "News3" not in mail['TextBody']
+        assert "News4" not in mail['TextBody']
+
+    with freeze_time(datetime(2018, 3, 5, 11, 0, tzinfo=tz)):
+        client.get(get_cronjob_url(job))
+        newsletter = NewsletterCollection(session).query().filter(
+            Newsletter.title.like('%Täglicher Newsletter 05.03.2018, 11:00%'
+        )).one()
+        assert 'Täglicher Newsletter 05.03.2018, 11:00' in newsletter.title
+        assert len(os.listdir(client.app.maildir)) == 2
+        mail = client.get_email(1)
+        assert "News1" not in mail['TextBody']
+        assert "News2" not in mail['TextBody']
+        assert "News3" in mail['TextBody']
+        assert "News4" in mail['TextBody']
+
+    with freeze_time(datetime(2018, 3, 5, 16, 0, tzinfo=tz)):
+        client.get(get_cronjob_url(job))
+        assert NewsletterCollection(session).query().count() == 2
+        assert len(os.listdir(client.app.maildir)) == 2
 
 
 def test_auto_archive_tickets_and_delete(org_app, handlers):
@@ -1521,32 +1600,73 @@ def test_update_newsletter_email_bounce_statistics(org_app, handlers):
         publication_end=datetime(2024, 4, 10, tzinfo=tz),
     ))
     entry_recipients = EntryRecipientCollection(org_app.session())
-    entry_recipients.add('marietta@user.ch', directory_entries.id,
-                         confirmed=True)
-    entry_recipients.add('martha@user.ch', directory_entries.id,
-                         confirmed=True)
-    entry_recipients.add('michu@user.ch', directory_entries.id,
-                         confirmed=True)
+    entry_recipients.add(
+        'marietta@user.ch', directory_entries.id, confirmed=True)
+    entry_recipients.add(
+        'martha@user.ch', directory_entries.id, confirmed=True)
+    entry_recipients.add(
+        'michu@user.ch', directory_entries.id, confirmed=True)
 
     transaction.commit()
     close_all_sessions()
 
-    with patch('requests.get') as mock_get:
-        mock_get.return_value = Bunch(
-            status_code=200,
-            json=lambda: {
-                'TotalCount': 2,
-                'Bounces': [
-                    {'RecordType': 'Bounce', 'ID': 3719297970,
-                     'Inactive': False, 'Email': 'franz@user.ch'},
-                    {'RecordType': 'Bounce', 'ID': 4739297971,
-                     'Inactive': True, 'Email': 'heinz@user.ch'},
-                    {'RecordType': 'Bounce', 'ID': 5739297972,
-                     'Inactive': True, 'Email': 'martha@user.ch'}
-                ]
-            },
-            raise_for_status=Mock(return_value=None),
-        )
+    with patch('requests.Session.get') as mock_get:
+        mock_get.side_effect = [
+            Bunch(  # answer to bounce request
+                status_code=200,
+                json=lambda: {
+                    'TotalCount': 3,
+                    'Bounces': [
+                        {
+                            'RecordType': 'Bounce',
+                            'ID': 3719297970,
+                            'Inactive': False,
+                            'Email': 'franz@user.ch',
+                        },
+                        {
+                            'Inactive': True,
+                            'Email': 'heinz@user.ch',
+                        },
+                        {
+                            'Inactive': True,
+                            'Email': 'martha@user.ch',
+                        },
+                        {
+                            'Inactive': True,
+                            'Email': 'trudi@user.ch',
+                        },
+                        {
+                            'Inactive': True,
+                            'Email': 'michu@user.ch',
+                        },
+                    ],
+                },
+                raise_for_status=Mock(return_value=None),
+            ),
+            Bunch(  # answer to the suppression request
+                status_code=200,
+                json=lambda: {
+                    'Suppressions': [
+                        {
+                            'EmailAddress': 'heinz@user.ch',
+                            'SuppressionReason': 'HardBounce',
+                            'Origin': 'Recipient',
+                            'CreatedAt': '2025-05-06T08:58:33-05:00'
+                        },
+                        {
+                            'EmailAddress': 'martha@user.ch',
+                        },
+                        {
+                            'EmailAddress': 'trudi@user.ch',
+                        },
+                        {
+                            'EmailAddress': 'michu@user.ch',
+                        },
+                    ]
+                },
+                raise_for_status=Mock(return_value=None),
+            )
+        ]
 
         # execute cronjob
         client.get(get_cronjob_url(job))
@@ -1558,16 +1678,75 @@ def test_update_newsletter_email_bounce_statistics(org_app, handlers):
         assert RecipientCollection(org_app.session()).by_address(
             'heinz@user.ch').is_inactive is True
         assert RecipientCollection(org_app.session()).by_address(
-            'trudi@user.ch').is_inactive is False
+            'trudi@user.ch').is_inactive is True
         assert EntryRecipientCollection(org_app.session()).by_address(
             'marietta@user.ch').is_inactive is False
         assert EntryRecipientCollection(org_app.session()).by_address(
             'martha@user.ch').is_inactive is True
         assert EntryRecipientCollection(org_app.session()).by_address(
-            'michu@user.ch').is_inactive is False
+            'michu@user.ch').is_inactive is True
+
+    # reactivate recipients
+    with patch('requests.Session.get') as mock_get:
+        mock_get.side_effect = [
+            Bunch(  # answer to bounce request
+                status_code=200,
+                json=lambda: {
+                    'Bounces': [
+                        {
+                            'RecordType': 'Bounce',
+                            'ID': 3719297470,
+                            'Inactive': False,
+                            'Email': 'unknown@user.ch',
+                        },
+                        {
+                            'Inactive': True,
+                            'Email': 'trudi@user.ch',
+                        },
+                        {
+                            'Inactive': True,
+                            'Email': 'michu@user.ch',
+                        },
+                    ]
+                },
+                raise_for_status=Mock(return_value=None),
+            ),
+            Bunch(  # answer to the suppression request
+                status_code=200,
+                json=lambda: {
+                    'Suppressions': [
+                        {
+                            'EmailAddress': 'trudi@user.ch',
+                        },
+                        {
+                            'EmailAddress': 'michu@user.ch',
+                        },
+                    ]
+                },
+                raise_for_status=Mock(return_value=None),
+            )
+        ]
+
+        # execute cronjob
+        client.get(get_cronjob_url(job))
+
+        # check if the statistics are updated
+        assert mock_get.called
+        assert RecipientCollection(org_app.session()).by_address(
+            'franz@user.ch').is_inactive is False
+        assert RecipientCollection(org_app.session()).by_address(
+            'heinz@user.ch').is_inactive is False
+        assert RecipientCollection(org_app.session()).by_address(
+            'trudi@user.ch').is_inactive is True
+        assert EntryRecipientCollection(org_app.session()).by_address(
+            'marietta@user.ch').is_inactive is False
+        assert EntryRecipientCollection(org_app.session()).by_address(
+            'martha@user.ch').is_inactive is False
+        assert EntryRecipientCollection(org_app.session()).by_address(
+            'michu@user.ch').is_inactive is True
 
     # test raising runtime warning exception for status code 401
-    with patch('requests.get') as mock_get:
+    with patch('requests.Session.get') as mock_get:
         mock_get.return_value = Bunch(
             status_code=401,
             json=lambda: {},
@@ -1581,7 +1760,7 @@ def test_update_newsletter_email_bounce_statistics(org_app, handlers):
 
     # for other 30x and 40x status codes, the cronjob shall raise an exception
     for status_code in [301, 302, 303, 400, 402, 403, 404, 405]:
-        with patch('requests.get') as mock_get:
+        with patch('requests.Session.get') as mock_get:
             mock_get.return_value = Bunch(
                 status_code=status_code,
                 json=lambda: {},
@@ -1596,14 +1775,14 @@ def test_update_newsletter_email_bounce_statistics(org_app, handlers):
     recipients = RecipientCollection(org_app.session())
     assert recipients.query().count() == 3
     assert recipients.by_address('franz@user.ch').is_inactive is False
-    assert recipients.by_address('heinz@user.ch').is_inactive is True
-    assert recipients.by_address('trudi@user.ch').is_inactive is False
+    assert recipients.by_address('heinz@user.ch').is_inactive is False
+    assert recipients.by_address('trudi@user.ch').is_inactive is True
 
     entry_recipients = EntryRecipientCollection(org_app.session())
     assert entry_recipients.query().count() == 3
     assert entry_recipients.by_address('marietta@user.ch').is_inactive is False
-    assert entry_recipients.by_address('martha@user.ch').is_inactive is True
-    assert entry_recipients.by_address('michu@user.ch').is_inactive is False
+    assert entry_recipients.by_address('martha@user.ch').is_inactive is False
+    assert entry_recipients.by_address('michu@user.ch').is_inactive is True
 
 
 def test_delete_unconfirmed_subscribers(org_app, handlers):
@@ -1653,9 +1832,7 @@ def test_send_push_notifications_for_news(
     transaction.begin()
 
     # Configure Firebase credentials for the organization
-    encrypted_creds = encrypt_symmetric(
-        firebase_json, org_app.hashed_identity_key
-    ).decode('utf-8')
+    encrypted_creds = org_app.encrypt(firebase_json).decode('utf-8')
     org_app.org.firebase_adminsdk_credential = encrypted_creds
 
     # Define topic mapping for the organization
@@ -1726,9 +1903,7 @@ def test_push_notification_duplicate_detection(
 
     # Set up test data
     transaction.begin()
-    encrypted_creds = encrypt_symmetric(
-        firebase_json, org_app.hashed_identity_key
-    ).decode('utf-8')
+    encrypted_creds = org_app.encrypt(firebase_json).decode('utf-8')
     org_app.org.firebase_adminsdk_credential = encrypted_creds
     org_app.org.selectable_push_notification_options = [
         [f'{org_app.schema}_news', 'News']
@@ -1795,3 +1970,450 @@ def test_push_notification_duplicate_detection(
     finally:
         # Clean up
         set_test_notification_service(None)
+
+
+def _create_news_hierarchy(session, parent, items_data):
+    created_items = []
+    for title, order in items_data:
+        name = normalize_for_url(title)
+        item = News(
+            title=title,
+            name=name,
+            type='news',
+            parent=parent,
+            order=order  # Handles Decimal and None
+        )
+        session.add(item)
+        created_items.append(item)
+    session.flush()
+    return created_items
+
+
+def test_normalize_adjacency_list_order(org_app):
+    client = Client(org_app)
+    session = org_app.session()
+    job = get_cronjob_by_name(org_app, 'normalize_adjacency_list_order')
+    job.app = org_app
+
+    orders = [Decimal('1.0'), Decimal('5.0'), Decimal('10.0')]
+    titles = [f'News {i+1}' for i in range(len(orders))]
+    items_data = list(zip(titles, orders))
+
+    pages = PageCollection(session)
+    root_title = 'Aktuelles'
+    root_name = normalize_for_url(root_title)
+    root_item = News(title=root_title, name=root_name, type='news')
+    session.add(root_item)
+    session.flush()
+    default_root_order = root_item.order
+    news_root_id = root_item.id
+
+    _create_news_hierarchy(session, root_item, items_data)
+    transaction.commit()
+
+    # Verify initial order
+    news_items = pages.query().filter(
+        News.parent_id == news_root_id).order_by(News.order).all()
+
+    assert [n.order for n in news_items] == [
+        Decimal('1.0'), Decimal('5.0'), Decimal('10.0')
+    ]
+    assert [n.title for n in news_items] == ['News 1', 'News 2', 'News 3']
+
+    # Execute the cron job
+    client.get(get_cronjob_url(job))
+    session.expire_all()  # Force reload from DB
+
+    # Verify normalized order
+    request = Bunch(session=session)
+    news_items_after = NewsCollection(request).query().filter(
+        News.parent_id == news_root_id).order_by(News.order).all()
+
+    # Order should now be sequential integers (represented as Decimals)
+    assert [n.order for n in news_items_after] == [
+        Decimal('1.0'), Decimal('2.0'), Decimal('3.0')
+    ]
+
+    # Relative order must be preserved
+    assert [n.title for n in news_items_after] == ['News 1',
+                                                   'News 2', 'News 3']
+    # Verify the root page order was not affected
+    root = pages.by_id(news_root_id)
+    assert root.order == default_root_order
+
+
+def test_normalize_adjacency_list_order_with_null_becomes_default(org_app):
+    client = Client(org_app)
+    session = org_app.session()
+    job = get_cronjob_by_name(org_app, 'normalize_adjacency_list_order')
+    job.app = org_app
+
+    # Define items with one potentially becoming default order
+    # Corresponds to default value set in AdjacencyList.order
+    default_order_value = Decimal('65536')
+    items_data = [
+        ('Item C', Decimal('1.0')),
+        ('Item A', Decimal('5.0')),
+        ('Item B', None),  # Pass None, expecting it to take the default value
+    ]
+
+    pages = PageCollection(session)
+    root_title = 'Default Order Test Root'
+    root_name = normalize_for_url(root_title)
+    root_item = News(title=root_title, name=root_name, type='news')
+    session.add(root_item)
+    session.flush()
+    default_root_order = root_item.order
+    news_root_id = root_item.id
+
+    _create_news_hierarchy(session, root_item, items_data)
+    transaction.commit()
+
+    # Verify initial state
+    news_items_initial = pages.query().filter(
+        News.parent_id == news_root_id).order_by(News.title).all()
+    orders_initial = {n.title: n.order for n in news_items_initial}
+    assert orders_initial == {
+        'Item A': Decimal('5.0'),
+        'Item B': default_order_value,  # Check it received the default
+        'Item C': Decimal('1.0'),
+    }
+
+    client.get(get_cronjob_url(job))
+    session.expire_all()  # Force reload from DB
+
+    # Verify normalized order
+    # The SQL uses ORDER BY "order" ASC, "pk" ASC.
+    # Initial sort order for ROW_NUMBER() would be:
+    # Item C (1.0), Item A (5.0), Item B (65536.0)
+    # Normalization should result in: Item C (1.0), Item A (2.0), Item B (3.0)
+    request = Bunch(session=session)
+    news_items_after = NewsCollection(request).query().filter(
+        News.parent_id == news_root_id).order_by(News.order).all()
+
+    expected_orders = [Decimal('1.0'), Decimal('2.0'), Decimal('3.0')]
+    expected_titles = ['Item C', 'Item A', 'Item B']
+
+    assert [n.order for n in news_items_after] == expected_orders
+    assert [n.title for n in news_items_after] == expected_titles
+
+    # Verify the root page order was not affected
+    root = pages.by_id(news_root_id)
+    assert root.order == default_root_order
+
+
+def test_wil_daily_event_import_wrong_app(org_app):
+    client = Client(org_app)
+    session = org_app.session()
+    org_job = get_cronjob_by_name(org_app, 'wil_daily_event_import')
+    org_job.app = org_app
+
+    # test not being the right organisation
+    client.get(get_cronjob_url(org_job))
+
+
+def test_wil_daily_event_import(wil_app, capturelog):
+    client = Client(wil_app)
+    session = wil_app.session()
+    wil_job = get_cronjob_by_name(wil_app, 'wil_daily_event_import')
+    wil_job.app = wil_app
+    capturelog.setLevel(logging.ERROR, logger='onegov.org.cronjobs')
+
+    # no api token
+    client.get(get_cronjob_url(wil_job))
+
+    # set api test token
+    wil_app.azizi_api_token = 'mytoken'
+
+    # connection error
+    with patch('requests.get',
+               side_effect=requests.exceptions.ConnectionError):
+        client.get(get_cronjob_url(wil_job))
+
+        assert ('Failed to retrieve events for Wil from' in
+                capturelog.records()[-1].message)
+
+    # server error
+    with patch('requests.get') as mock_get:
+        mock_response = Mock()
+        mock_response.status_code = 500
+        mock_response.text = 'Internal Server Error'
+        mock_get.return_value = mock_response
+
+        client.get(get_cronjob_url(wil_job))
+
+        assert ('Failed to retrieve events for Wil from' in
+                capturelog.records()[-1].message)
+        assert 'status code: 500' in capturelog.records()[-1].message
+
+    # test with successful response
+    tz = timezone(timedelta(hours=2))
+    first_date = datetime.now(tz).replace(
+        hour=8, microsecond=0) + timedelta(days=1)
+    start_dates = [
+        first_date,  # event 1
+        first_date + timedelta(days=2),  # event 2
+        first_date + timedelta(weeks=1),  # event 3 and 4
+    ]
+    event_status = [
+        'scheduled',  # event 1
+        'scheduled',  # event 2
+        'scheduled',  # event 3, 4
+    ]
+
+    # missing daily event
+    xml = f"""<?xml version="1.0" encoding="UTF-8"?>
+    <minasa xsi:schemaLocation="https://azizi.2mp.ch/schemas/minasa_xml_v1.xsd"
+     xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns="https://minasa.ch/schema/v1">
+      <events>
+        <event>
+          <uuid7>E132456</uuid7>
+          <locationUuid7>L132456</locationUuid7>
+          <organizerUuid7>O789565</organizerUuid7>
+          <category>Sport</category>
+          <title>Pole Vault Lesson</title>
+          <description>Pole Vault description</description>
+          <originalEventUrl>polevaultassociation.sport/first-lession</originalEventUrl>
+          <schedules>
+            <schedule>
+              <uuid7>S132450</uuid7>
+              <eventStatus>{event_status[0]}</eventStatus>
+              <locationUuid7>S132456</locationUuid7>>
+              <start>{start_dates[0].strftime('%Y-%m-%dT%H:%M:%S%z')}</start>
+              <recurrence>
+                <frequency>single</frequency>
+              </recurrence>
+            </schedule>
+          </schedules>
+        </event>
+        <event>
+          <uuid7>E132499</uuid7>
+          <locationUuid7>L132488</locationUuid7>
+          <organizerUuid7>O789588</organizerUuid7>
+          <category>Literatur</category>
+          <title>Reading with Johanna Beehrens</title>
+          <abstract>Best book reader in town</abstract>
+          <description>Reading a Book</description>
+          <tags>
+            <tag>Library</tag>
+          </tags>
+          <originalEventUrl></originalEventUrl>
+          <schedules>
+            <schedule>
+              <uuid7>S132451</uuid7>
+              <eventStatus>{event_status[1]}</eventStatus>
+              <locationUuid7>S132456</locationUuid7>>
+              <start>{start_dates[1].strftime('%Y-%m-%dT%H:%M:%S%z')}</start>
+              <end>{(start_dates[1] + timedelta(
+        hours=2)).strftime('%Y-%m-%dT%H:%M:%S%z')}</end>
+              <recurrence>
+                <frequency>weekly</frequency>
+                  <interval>2</interval>
+                  <until>{start_dates[1] + timedelta(weeks=4)}</until>
+              </recurrence>
+            </schedule>
+          </schedules>
+        </event>
+        <event>
+          <uuid7>E132500</uuid7>
+          <locationUuid7>L132456</locationUuid7>
+          <organizerUuid7>O789565</organizerUuid7>
+          <category>Sport</category>
+          <title>100 Meter Race of the Year</title>
+          <description>Event of the year!</description>
+          <tags>
+            <tag>Sport</tag>
+            <tag>Race</tag>
+          </tags>
+          <originalEventUrl>www.100race.org</originalEventUrl>
+          <schedules>
+            <schedule>
+              <uuid7>S999101</uuid7>
+              <eventStatus>{event_status[2]}</eventStatus>
+              <locationUuid7>S132456</locationUuid7>>
+              <start>{start_dates[2].strftime('%Y-%m-%dT%H:%M:%S%z')}</start>
+              <end>{(start_dates[2] + timedelta(
+        minutes=100)).strftime('%Y-%m-%dT%H:%M:%S%z')}</end>
+              <recurrence>
+                <frequency>single</frequency>
+              </recurrence>
+            </schedule>
+            <schedule>
+              <uuid7>S999102</uuid7>
+              <locationUuid7>S132456</locationUuid7>>
+              <eventStatus>{event_status[2]}</eventStatus>
+              <start>{(start_dates[2] + timedelta(
+        days=1, hours=8)).strftime('%Y-%m-%dT%H:%M:%S%z')}</start>
+              <end>{(start_dates[2] + timedelta(
+        days=1, hours=8, minutes=100)).strftime('%Y-%m-%dT%H:%M:%S%z')}</end>
+              <recurrence>
+                <frequency>single</frequency>
+              </recurrence>
+            </schedule>
+          </schedules>
+        </event>
+      </events>
+      <locations>
+        <location>
+          <uuid7>L132456</uuid7>
+          <address>
+            <title>Pole Vault Stadium</title>
+            <street>Stadium Road</street>
+            <number>1</number>
+            <zip>6000</zip>
+            <city>Pole Town</city>
+            <latitude>47.5</latitude>
+            <longitude>9.01</longitude>
+          </address>
+        </location>
+        <location>
+          <uuid7>L132488</uuid7>
+          <address>
+            <title>Library</title>
+            <street>Book Ct</street>
+            <number>7</number>
+            <zip>6001</zip>
+            <city>Lemington</city>
+            <latitude>47.6</latitude>
+            <longitude>8.4</longitude>
+          </address>
+        </location>
+      </locations>
+      <organizers>
+        <organizer>
+          <uuid7>O789565</uuid7>
+          <address>
+            <title>Pole Vault Association</title>
+            <street>Main Street</street>
+            <number>1</number>
+            <zip>8000</zip>
+            <city>Pole Town</city>
+            <phone>041 123 4567</phone>
+            <email>info@polevault.sport</email>
+            <url>polevaultassociation.sport</url>
+          </address>
+        </organizer>
+        <organizer>
+          <uuid7>O789588</uuid7>
+          <address>
+            <title>Culture Club</title>
+            <street>Culture Plaza</street>
+            <number>3</number>
+            <zip>6010</zip>
+            <city>Coin Town</city>
+            <phone>044 321 7744</phone>
+            <email>info@cultureclub.io</email>
+            <url>cultureclub.io</url>
+          </address>
+        </organizer>
+      </organizers>
+    </minasa>
+    """
+
+    # remove all existing/initial events from collection
+    occurrences = EventCollection(session)
+    for e in occurrences.query():
+        occurrences.delete(e)
+
+    added, updated, purged = occurrences.from_minasa(xml.encode('utf-8'))
+
+    events = occurrences.query().order_by(Event.start).all()
+    assert len(events) == 4  # number of event schedules
+    assert len(added) == 4  # number of event schedules
+    assert len(updated) == 0
+    assert len(purged) == 0
+
+    assert events[0] == added[0]
+    assert events[0].title == 'Pole Vault Lesson'
+    assert events[0].description == 'Pole Vault description'
+    assert events[0].tags == []
+    assert events[0].start == start_dates[0]
+    assert events[0].end == start_dates[0] + timedelta(hours=1)
+    assert events[0].recurrence == None
+    assert events[0].occurrence_dates() == [start_dates[0]]
+    assert (events[0].location ==
+            'Pole Vault Stadium, Stadium Road, 6000, Pole Town')
+    assert events[0].organizer == 'Pole Vault Association'
+    assert events[0].organizer_email == 'info@polevault.sport'
+    assert events[0].organizer_phone == '041 123 4567'
+    assert (events[0].external_event_url ==
+            'polevaultassociation.sport/first-lession')
+
+    assert events[1] == added[1]
+    assert events[1].title == 'Reading with Johanna Beehrens'
+    assert (events[1].description ==
+            'Best book reader in town\n\nReading a Book')
+    assert events[1].tags == ['Library']
+    assert events[1].start == start_dates[1]
+    assert events[1].end == start_dates[1] + timedelta(hours=2)
+    assert events[1].recurrence == '\n'.join([
+        f'RDATE:'
+        f'{(start_dates[1] + timedelta(weeks=2)).strftime("%Y%m%dT%H%M%SZ")}',
+        f'RDATE:'
+        f'{(start_dates[1] + timedelta(weeks=4)).strftime("%Y%m%dT%H%M%SZ")}'
+    ])
+    assert events[1].occurrence_dates() == [
+        start_dates[1],
+        start_dates[1] + timedelta(weeks=2),
+        start_dates[1] + timedelta(weeks=4)
+    ]
+    assert events[1].location == 'Library, Book Ct, 6001, Lemington'
+    assert events[1].organizer == 'Culture Club'
+    assert events[1].organizer_email == 'info@cultureclub.io'
+    assert events[1].organizer_phone == '044 321 7744'
+    assert events[1].external_event_url == None
+
+    # events 3 and 4 are actually the same event but different schedules
+    for i, start in zip(
+        [2, 3],
+        [start_dates[2], start_dates[2] + timedelta(days=1, hours=8)]
+    ):
+        assert events[i] == added[i]
+        assert events[i].title == '100 Meter Race of the Year'
+        assert events[i].start == start
+        assert events[i].end == start + timedelta(minutes=100)
+        assert events[i].recurrence == None
+        assert events[i].occurrence_dates() == [start]
+        assert (events[i].location ==
+                'Pole Vault Stadium, Stadium Road, 6000, Pole Town')
+        assert events[i].organizer == 'Pole Vault Association'
+        assert events[i].organizer_email == 'info@polevault.sport'
+        assert events[i].organizer_phone == '041 123 4567'
+        assert events[i].external_event_url == 'www.100race.org'
+
+    occurrences = OccurrenceCollection(session)
+    assert occurrences.query().count() == 6
+
+    expected_titles = [  # sorted by start date
+        'Pole Vault Lesson',
+        'Reading with Johanna Beehrens',
+        '100 Meter Race of the Year',
+        '100 Meter Race of the Year',
+        'Reading with Johanna Beehrens',
+        'Reading with Johanna Beehrens',
+    ]
+    for occurrence, expected_title in zip(
+            occurrences.query(), expected_titles):
+        assert occurrence.title == expected_title
+
+    # test updated
+
+    # test purged
+    xml_2 = xml.replace(  # replace first event status with 'deleted'
+        '<eventStatus>scheduled</eventStatus>',
+        '<eventStatus>deleted</eventStatus>',
+        2
+    )
+    occurrences = EventCollection(session)
+    assert occurrences.query().count() == 4
+
+    added, updated, purged = occurrences.from_minasa(xml_2.encode('utf-8'))
+
+    assert len(added) == 0  # number of event schedules
+    assert len(updated) == 0
+    assert len(purged) == 2
+    assert occurrences.query().count() == 2
+    assert [o.title for o in occurrences.query()] == [
+        '100 Meter Race of the Year',
+        '100 Meter Race of the Year'
+    ]

@@ -19,7 +19,7 @@ from onegov.form.errors import FieldCompileError
 from onegov.form.errors import InvalidFormSyntax
 from onegov.form.errors import MixedTypeError
 from onegov.form.types import BaseFormT, FieldT
-from stdnum.exceptions import (  # type:ignore[import-untyped]
+from stdnum.exceptions import (
     ValidationError as StdnumValidationError)
 from wtforms import DateField, DateTimeLocalField, RadioField, TimeField
 from wtforms.fields import SelectField

@@ -3,9 +3,10 @@ from __future__ import annotations
 import datetime
 import secrets
 
+from decimal import Decimal
 from functools import lru_cache
 from libres import new_scheduler
-from libres.db.models import Allocation
+from libres.db.models import Allocation, Reservation
 from libres.db.models.base import ORMBase
 from onegov.core.orm import ModelBase
 from onegov.core.orm.mixins import content_property, dict_property
@@ -16,7 +17,7 @@ from onegov.form import parse_form
 from onegov.pay import Price, process_payment
 from sedate import align_date_to_day, utcnow
 from sqlalchemy import Column, Text
-from sqlalchemy.orm import relationship
+from sqlalchemy.orm import relationship, undefer
 from uuid import uuid4
 
 
@@ -32,7 +33,6 @@ if TYPE_CHECKING:
     from onegov.reservation.models import CustomReservation
     from onegov.pay import Payment, PaymentError, PaymentProvider
     from onegov.pay.types import PaymentMethod
-    from sqlalchemy.orm import Query
     from typing import TypeAlias
 
     DeadlineUnit: TypeAlias = Literal['d', 'h']
@@ -101,6 +101,9 @@ class Resource(ORMBase, ModelBase, ContentMixin,
     #: the group to which this resource belongs to (may be any kind of string)
     group: Column[str | None] = Column(Text, nullable=True)
 
+    #: the subgroup to which this resource belongs to
+    subgroup: Column[str | None] = Column(Text, nullable=True)
+
     #: the type of the resource, this can be used to create custom polymorphic
     #: subclasses. See `<https://docs.sqlalchemy.org/en/improve_toc/
     #: orm/extensions/declarative/inheritance.html>`_.
@@ -132,6 +135,9 @@ class Resource(ORMBase, ModelBase, ContentMixin,
     #: reservation deadline (e.g. None, (5, 'd'), (24, 'h'))
     deadline: dict_property[tuple[int, DeadlineUnit] | None]
     deadline = content_property()
+
+    #: the pricing method to use for extras defined in formcode
+    extras_pricing_method: dict_property[str | None] = content_property()
 
     #: the default view
     default_view: dict_property[str | None] = content_property()
@@ -248,7 +254,8 @@ class Resource(ORMBase, ModelBase, ContentMixin,
     def price_of_reservation(
         self,
         token: uuid.UUID,
-        extra: Price | None = None
+        extra: Price | None = None,
+        discount: Decimal | None = None,
     ) -> Price:
 
         # FIXME: libres is very laissez faire with the polymorphic
@@ -260,17 +267,71 @@ class Resource(ORMBase, ModelBase, ContentMixin,
         #        for type checking. We could pretend that the Scheduler
         #        always gives us the class we bound do it, but that's
         #        not technically true...
-        _reservations = self.scheduler.reservations_by_token(token)
-        reservations = cast('Query[CustomReservation]', _reservations)
+        reservations = cast(
+            'list[CustomReservation]',
+            self.scheduler.reservations_by_token(token)
+            .options(undefer(Reservation.data))
+            .all()
+        )
+        if reservations:
+            reservation = reservations[0]
+            meta = (reservation.data or {}).get('ticket_tag_meta', {})
+            # HACK: This is not very robust, we should probably come up
+            #       with something better to handle price reductions for
+            #       specific tags
+            try:
+                reduced_amount = Decimal(meta.get('Price', meta.get('Preis')))
+                assert reduced_amount >= Decimal('0')
+            except Exception:
+                reduced_amount = None
+        else:
+            reduced_amount = None
 
-        prices = (price for r in reservations if (price := r.price(self)))
+        total = Price.zero()
+        extras_total = Price.zero()
+        for reservation in reservations:
+            price = reservation.price(self)
+            if price:
+                total += price
 
-        total = sum(prices, Price.zero())
+            if extra:
+                match self.extras_pricing_method:
+                    case 'one_off':
+                        extras_total = extra
 
-        if extra and total:
-            total += extra
-        elif extra:
-            total = extra
+                    case 'per_hour':
+                        # FIXME: Should we assert here or instead use
+                        #        reservation.timespans()? We assert in
+                        #        CustomReservation.price().
+                        if reservation.start and reservation.end:
+                            duration = reservation.end - reservation.start
+                            # compensate for the end being offset
+                            duration += datetime.timedelta(microseconds=1)
+                        else:
+                            duration = datetime.timedelta(seconds=0)
+
+                        extras_total += extra * (
+                            Decimal(duration.total_seconds())
+                            / Decimal('3600')
+                        )
+
+                    case 'per_item' | None:
+                        extras_total += extra * reservation.quota
+
+                    case _:  # pragma: unreachable
+                        raise ValueError('unhandled extras pricing method')
+
+        if discount and total:
+            total = total.apply_discount(discount)
+
+        if extras_total and total:
+            total += extras_total
+        elif extras_total:
+            total = extras_total
+
+        if reduced_amount is not None and reduced_amount < total.amount:
+            # return the reduced amount instead
+            return Price(reduced_amount, total.currency)
 
         return total
 

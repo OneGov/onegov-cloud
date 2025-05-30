@@ -33,6 +33,7 @@ from onegov.org.models.message import DirectoryMessage
 from onegov.org.models.message import EventMessage
 from onegov.org.models.message import PaymentMessage
 from onegov.org.models.message import ReservationMessage
+from onegov.org.models.message import ReservationAdjustedMessage
 from onegov.org.models.message import SubmissionMessage
 from onegov.org.models.message import TicketChatMessage
 from onegov.org.models.message import TicketMessage
@@ -102,6 +103,7 @@ __all__ = (
     'PersonMove',
     'PublicationCollection',
     'ReservationMessage',
+    'ReservationAdjustedMessage',
     'ResourcePersonMove',
     'ResourceRecipient',
     'ResourceRecipientCollection',

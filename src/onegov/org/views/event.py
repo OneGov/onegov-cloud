@@ -18,10 +18,11 @@ from onegov.org.mail import send_ticket_mail
 from onegov.org.models import TicketMessage, EventMessage
 from onegov.org.models.extensions import AccessExtension
 from onegov.org.models.ticket import EventSubmissionTicket
+from onegov.org.utils import emails_for_new_ticket
 from onegov.org.views.utils import show_tags, show_filters
 from onegov.ticket import TicketCollection
 from sedate import utcnow
-from uuid import uuid4
+from uuid import UUID, uuid4
 from webob import exc
 
 
@@ -322,6 +323,12 @@ def handle_new_event_without_workflow(
         event.state = 'submitted'
         form.populate_obj(event)
         return morepath.redirect(request.link(event, 'publish'))
+    else:
+        event_id = request.params.get('event_id')
+        if event_id and isinstance(event_id, str):
+            event_obj = EventCollection(self.session).by_id(UUID(event_id))
+            if event_obj:
+                form.process(obj=event_obj)
 
     # FIXME: same hack as in above view, add a proper layout
     layout = layout or EventLayout(self, request)  # type:ignore
@@ -378,7 +385,7 @@ def view_event(
                     ticket = TicketCollection(session).open_ticket(
                         handler_code='EVN', handler_id=self.id.hex
                     )
-                    TicketMessage.create(ticket, request, 'opened')
+                    TicketMessage.create(ticket, request, 'opened', 'external')
 
                 send_ticket_mail(
                     request=request,
@@ -387,13 +394,13 @@ def view_event(
                     receivers=(self.meta['submitter_email'],),
                     ticket=ticket,
                 )
-                if request.email_for_new_tickets:
+                for email in emails_for_new_ticket(request, ticket):
                     send_ticket_mail(
                         request=request,
                         template='mail_ticket_opened_info.pt',
                         subject=_('New ticket'),
                         ticket=ticket,
-                        receivers=(request.email_for_new_tickets, ),
+                        receivers=(email, ),
                         content={
                             'model': ticket
                         }

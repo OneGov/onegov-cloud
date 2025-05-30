@@ -839,7 +839,8 @@ def test_assign_tickets(client):
 
     page = client.get('/').click('Meine Tickets')
     page = page.click(ticket_number)
-    assert "Ticket zugewiesen (editor@example.org)" in page
+    assert "Ticket zugewiesen" in page
+    assert "(editor@example.org)" in page
 
     # check mail
     assert len(os.listdir(client.app.maildir)) == 2
@@ -976,3 +977,58 @@ def test_email_attachment_in_ticket_message(client):
     assert 'Test.txt' in msg.values()
     decoded_content = base64.b64decode(msg['Content'])
     assert decoded_content == b'attached'
+
+
+def test_hide_personal_mail_in_tickets(client):
+    admin = client
+    client.login_admin()
+    anon = client.spawn()
+
+    page = admin.get('/ticket-settings')
+    page.form['hide_personal_email'] = True
+    page.form['general_email'] = 'info@organisation.org'
+    page.form.submit()
+
+    page = admin.get('/forms/new')
+    page.form['title'] = 'Test'
+    page.form.submit()
+
+    page = anon.get('/form/test')
+    page.form['e_mail'] = 'anon@example.org'
+    anon_ticketinfo = page.form.submit().follow().form.submit().follow()
+
+    admin_ticketinfo = admin.get('/tickets/ALL/open').click(
+        'Annehmen').follow()
+    assert 'admin@example.org' in admin_ticketinfo
+    assert 'info@organisation.org' not in admin_ticketinfo
+
+    # Admin sends message
+    page = admin_ticketinfo.click('Nachricht senden')
+    page.form['text'] = 'Admin message'
+    page.form.submit().follow()
+
+    # Anon sends message
+    anon_ticketinfo.form['text'] = 'Anon message'
+    anon_ticketinfo.form.submit().follow()
+
+    assert len(os.listdir(client.app.maildir)) == 3
+    mails = list()
+    for i in range(3):
+        mails.append(client.get_email(i))
+    mails = sorted(mails, key=lambda d: d['To'])
+
+    # Admin sees their own email
+    assert 'admin@example' in mails[0]['TextBody']
+    assert 'info@organisation' not in mails[0]['TextBody']
+    assert 'anon@example' in mails[0]['TextBody']
+
+    # Anon only sees general mail in mail and ticket status
+    messsage = mails[1]['TextBody']
+    ticket_status = re.search(r'Anfragestatus überprüfen\]\(([^\)]+)',
+                              messsage).group(1)
+    anon_ticketinfo = anon.get(ticket_status)
+    assert 'info@organisation.org' in anon_ticketinfo
+    assert 'admin@example.org' not in anon_ticketinfo
+
+    assert 'info@organisation.org' in mails[2]['TextBody']
+    assert 'admin@example' not in mails[2]['TextBody']

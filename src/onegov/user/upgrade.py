@@ -156,7 +156,7 @@ def force_lowercase_usernames(context: UpgradeContext) -> None:
         # FIXME: This never actually worked before because it was using the
         #        the dictionary instead of the list, was this maybe hotfixed
         #        and then just never merged into the codebase?
-        remaining = sorted(users_, key=sort_key)[-1]
+        remaining = max(users_, key=sort_key)
         remaining_data = remaining.data or {}
 
         others = [u for u in users_ if u.id != remaining.id]

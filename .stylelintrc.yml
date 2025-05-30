@@ -1,0 +1,47 @@
+extends: stylelint-config-standard-scss
+
+# NOTE: There's definitely some rules that we should enable, but for now
+#       the rules are reduced enough so our files don't flag hundreds of
+#       of issues
+rules:
+  at-rule-empty-line-before: null
+  at-rule-no-vendor-prefix: null
+  alpha-value-notation: null
+  color-function-alias-notation: null
+  color-function-notation: null
+  comment-empty-line-before: null
+  comment-whitespace-inside: null
+  declaration-block-no-redundant-longhand-properties: null
+  declaration-empty-line-before: null
+  font-family-name-quotes: null
+  font-family-no-missing-generic-family-keyword: null
+  length-zero-no-unit: null
+  no-descending-specificity: null
+  no-duplicate-selectors: null
+  no-empty-source: null
+  media-feature-range-notation: null
+  number-max-precision: null
+  property-no-vendor-prefix: null
+  rule-empty-line-before: null
+  scss/at-if-closing-brace-newline-after: null
+  scss/at-if-closing-brace-space-after: null
+  scss/at-mixin-parentheses-space-before: null
+  scss/double-slash-comment-empty-line-before: null
+  scss/double-slash-comment-whitespace-inside: null
+  scss/dollar-variable-colon-space-after: null
+  scss/dollar-variable-empty-line-before: null
+  scss/no-global-function-names: null
+  selector-class-pattern: null
+  selector-id-pattern: null
+  selector-no-vendor-prefix: null
+  selector-not-notation: null
+  selector-pseudo-element-no-unknown: null
+  shorthand-property-no-redundant-values: null
+  value-keyword-case: null
+
+ignoreFiles:
+  - '**/font-awesome/scss/*.scss'
+  - '**/foundation/*/*.scss'
+  - '**/foundation6/foundation/**/**/*.scss'
+  - '**/font-*.scss'
+  - '**/fonts/*.scss'

@@ -259,13 +259,11 @@ class RoadworkCollection:
 
     @property
     def letters(self) -> list[str]:
-        letters = set()
-
-        for roadwork in self.by_letter(None).roadwork:
-            for letter in roadwork.letters:
-                letters.add(letter)
-
-        return sorted(letters)
+        return sorted({
+            letter
+            for roadwork in self.by_letter(None).roadwork
+            for letter in roadwork.letters
+        })
 
     def by_filter(self, filter: str) -> list[Roadwork]:
 

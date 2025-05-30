@@ -41,14 +41,9 @@ if TYPE_CHECKING:
 
 _FormT = TypeVar('_FormT', bound=Form)
 
-# increasing the default filesize is *strongly discouarged*, as we are not
-# storing those files in the database, so they need to fit in memory
-#
-# if this value must be higher, we need to store the files outside the
-# database
-#
+
 MEGABYTE = 1000 ** 2
-DEFAULT_UPLOAD_LIMIT = 50 * MEGABYTE
+DEFAULT_UPLOAD_LIMIT = 100 * MEGABYTE
 
 
 @overload
@@ -296,6 +291,7 @@ def handle_field(
             choices=[(c.key, c.label) for c in field.choices],
             default=next((c.key for c in field.choices if c.selected), None),
             pricing=field.pricing,
+            discount=field.discount,
             # do not coerce None into 'None'
             coerce=lambda v: str(v) if v is not None else v,
             description=field.field_help
@@ -311,6 +307,7 @@ def handle_field(
             choices=[(c.key, c.label) for c in field.choices],
             default=[c.key for c in field.choices if c.selected],
             pricing=field.pricing,
+            discount=field.discount,
             # do not coerce None into 'None'
             coerce=lambda v: str(v) if v is not None else v,
             description=field.field_help

@@ -126,6 +126,11 @@ class AttendeeForm(AttendeeBase):
         description=_('Allergies, Disabilities, Particulars'),
     )
 
+    swisspass = StringField(
+        label=_('Swisspass ID'),
+        description='XXX-XXX-XXX-X'
+    )
+
     differing_address = BooleanField(
         label=_('The address of the attendee differs from the users address'),
         description=_("Check this box if the attendee doesn't live with you")
@@ -164,8 +169,30 @@ class AttendeeForm(AttendeeBase):
         if not self.show_political_municipality:
             self.delete_field('political_municipality')
 
+    def toggle_swisspass(self) -> None:
+        if not self.request.app.org.meta.get('require_swisspass'):
+            self.delete_field('swisspass')
+
     def on_request(self) -> None:
         self.toggle_political_municipality()
+        self.toggle_swisspass()
+
+    def ensure_valid_swisspass_id(self) -> bool:
+        if self.swisspass and self.swisspass.data:
+            if len(self.swisspass.data) != 13:
+                assert isinstance(self.swisspass.errors, list)
+                self.swisspass.errors.append(_(
+                    'The Swisspass ID must be 13 characters long.'
+                ))
+                return False
+
+            if not all(c.isdigit() or c == '-' for c in self.swisspass.data):
+                assert isinstance(self.swisspass.errors, list)
+                self.swisspass.errors.append(_(
+                    'The Swisspass ID must only contain digits and dashes.'
+                ))
+                return False
+        return True
 
 
 class AttendeeSignupForm(AttendeeBase):
@@ -203,6 +230,12 @@ class AttendeeSignupForm(AttendeeBase):
     notes = TextAreaField(
         label=_('Note'),
         description=_('Allergies, Disabilities, Particulars'),
+        depends_on=('attendee', 'other')
+    )
+
+    swisspass = StringField(
+        label=_('Swisspass ID'),
+        description='XXX-XXX-XXX-X',
         depends_on=('attendee', 'other')
     )
 
@@ -285,6 +318,10 @@ class AttendeeSignupForm(AttendeeBase):
         if not self.show_political_municipality:
             self.delete_field('political_municipality')
 
+    def toggle_swisspass(self) -> None:
+        if not self.request.app.org.meta.get('require_swisspass'):
+            self.delete_field('swisspass')
+
     def for_username(self, username: str) -> str:
         url = URL(self.action)
         url = url.query_param('username', username)
@@ -326,6 +363,7 @@ class AttendeeSignupForm(AttendeeBase):
         self.populate_attendees()
         self.populate_tos()
         self.toggle_political_municipality()
+        self.toggle_swisspass()
 
         if not self.request.is_admin:
             self.delete_field('ignore_age')
@@ -550,6 +588,23 @@ class AttendeeSignupForm(AttendeeBase):
             return False
 
         return None
+
+    def ensure_valid_swisspass_id(self) -> bool:
+        if self.swisspass and self.swisspass.data:
+            if len(self.swisspass.data) != 13:
+                assert isinstance(self.swisspass.errors, list)
+                self.swisspass.errors.append(_(
+                    'The Swisspass ID must be 13 characters long.'
+                ))
+                return False
+
+            if not all(c.isdigit() or c == '-' for c in self.swisspass.data):
+                assert isinstance(self.swisspass.errors, list)
+                self.swisspass.errors.append(_(
+                    'The Swisspass ID must only contain digits and dashes.'
+                ))
+                return False
+        return True
 
 
 class AttendeeLimitForm(Form):

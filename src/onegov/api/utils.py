@@ -23,13 +23,12 @@ def authenticate(request: CoreRequest) -> ApiKey:
     if request.authorization is None:
         raise HTTPUnauthorized()
 
-    try:
-        auth = try_get_encoded_token(request)
-        data = jwt_decode(request, auth)
-    except jwt.ExpiredSignatureError as exception:
-        raise HTTPUnauthorized() from exception
-    except Exception as e:
-        raise ApiException(exception=e) from e
+    with ApiException.capture_exceptions():
+        try:
+            auth = try_get_encoded_token(request)
+            data = jwt_decode(request, auth)
+        except jwt.ExpiredSignatureError as exception:
+            raise HTTPUnauthorized() from exception
 
     # NOTE: This leads to a new query every time we call this function
     #       which is not ideal. But it will be fixed with SQLAlchemy 1.4+

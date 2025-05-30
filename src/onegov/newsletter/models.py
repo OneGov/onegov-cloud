@@ -170,6 +170,9 @@ class Recipient(Base, TimestampMixin, ContentMixin):
     # means all topics are subscribed to.
     subscribed_categories: dict_property[list[str] | None] = content_property()
 
+    daily_newsletter: Column[bool] = Column(
+        Boolean, nullable=False, default=False)
+
     @declared_attr
     def __table_args__(cls) -> tuple[Index, ...]:
         return (
@@ -207,6 +210,12 @@ class Recipient(Base, TimestampMixin, ContentMixin):
         address to be deactivated by Postmark.
         """
         self.meta['inactive'] = True
+
+    def reactivate(self) -> None:
+        """
+        Marks a previously `inactive` recipient as active again.
+        """
+        self.meta['inactive'] = False
 
 
 class Subscription:

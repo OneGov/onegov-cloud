@@ -338,3 +338,13 @@ class ReplaceSettingSectionAction(Action):
 
         for setting, value in obj().items():
             setattr(section, setting, value)
+
+
+class ReplaceSettingAction(SettingAction):
+    """ A setting action that takes precedence over a replaced section.
+
+    So we can override single settings without overriding the whole
+    section.
+    """
+
+    depends = [ReplaceSettingSectionAction]

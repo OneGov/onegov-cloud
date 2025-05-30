@@ -4,8 +4,6 @@ from __future__ import annotations
 import re
 import yaml
 
-import base64
-import hashlib
 import morepath
 from dectate import directive
 from email.headerregistry import Address
@@ -29,7 +27,7 @@ from onegov.org.initial_content import create_new_organisation
 from onegov.org.models import Dashboard, Organisation, PublicationCollection
 from onegov.org.request import OrgRequest
 from onegov.org.theme import OrgTheme
-from onegov.pay import PayApp
+from onegov.pay import PayApp, log as pay_log
 from onegov.reservation import LibresIntegration
 from onegov.search import SearchApp
 from onegov.ticket import TicketCollection
@@ -127,6 +125,24 @@ class OrgApp(Framework, LibresIntegration, SearchApp, MapboxApp,
         self.enable_yubikey = enable_yubikey
         self.disable_password_reset = disable_password_reset
 
+    def configure_plausible_api_token(
+        self,
+        *,
+        plausible_api_token: str = '',
+        ** cfg: Any
+    ) -> None:
+
+        self.plausible_api_token = plausible_api_token
+
+    def configure_stadt_wil_azizi_api_token(
+            self,
+            *,
+            azizi_api_token: str = '',
+            ** cfg: Any
+    ) -> None:
+
+        self.azizi_api_token = azizi_api_token
+
     def configure_mtan_hook(self, **cfg: Any) -> None:
         """
         This inserts an mtan hook by wrapping the callable we receive
@@ -205,16 +221,34 @@ class OrgApp(Framework, LibresIntegration, SearchApp, MapboxApp,
 
     @orm_cached(policy='on-table-change:ticket_permissions')
     def ticket_permissions(self) -> dict[str, dict[str | None, list[str]]]:
-        result: dict[str, dict[str | None, list[str]]] = {}
+        """ Exclusive ticket permissions for authorization. """
+        permissions: dict[str, dict[str | None, tuple[bool, list[str]]]] = {}
         for permission in self.session().query(TicketPermission).with_entities(
             TicketPermission.handler_code,
             TicketPermission.group,
-            TicketPermission.user_group_id
+            TicketPermission.user_group_id,
+            TicketPermission.exclusive,
         ):
-            handler = result.setdefault(permission.handler_code, {})
-            group = handler.setdefault(permission.group, [])
+            handler = permissions.setdefault(permission.handler_code, {})
+            has_exclusive, group = handler.setdefault(
+                permission.group,
+                (permission.exclusive, [])
+            )
             group.append(permission.user_group_id.hex)
-        return result
+            if permission.exclusive and not has_exclusive:
+                handler[permission.group] = (True, group)
+
+        return {
+            handler_code: {
+                group: group_perms
+                for group, (exclusive, group_perms) in handler_perms.items()
+                # the permission is only exclusive, if at least one user group
+                # has exclusive permissions. But user groups with non-exclusive
+                # permissions still have permission to access the ticket.
+                if exclusive
+            }
+            for handler_code, handler_perms in permissions.items()
+        }
 
     @orm_cached(policy='on-table-change:files')
     def publications_count(self) -> int:
@@ -330,15 +364,6 @@ class OrgApp(Framework, LibresIntegration, SearchApp, MapboxApp,
             return yaml.safe_load(f).get('allowed_domains', [])
 
     @property
-    def hashed_identity_key(self) -> bytes:
-        """ Take the sha-256 because we want a key that is 32 bytes long. """
-        hash_object = hashlib.sha256()
-        hash_object.update(self.identity_secret.encode('utf-8'))
-        short_key = hash_object.digest()
-        key_base64 = base64.b64encode(short_key)
-        return key_base64
-
-    @property
     def custom_event_form_lead(self) -> str | None:
         return self.cache.get_or_create(
             'custom_event_lead', self.load_custom_event_form_lead
@@ -372,21 +397,28 @@ class OrgApp(Framework, LibresIntegration, SearchApp, MapboxApp,
         if self.org.square_logo_url:
             extra['image'] = self.org.square_logo_url
 
-        return provider.checkout_button(
-            label=button_label,
-            # FIXME: This is a little suspect, since StripePaymentProvider
-            #        would previously have raised an exception for a
-            #        missing price, should it really be legal to generate
-            #        a checkout button when there is no price?
-            amount=price and price.amount or None,
-            currency=price and price.currency or None,
-            email=email,
-            name=self.org.name,
-            description=title,
-            complete_url=complete_url,
-            request=request,
-            **extra
-        )
+        try:
+            return provider.checkout_button(
+                label=button_label,
+                # FIXME: This is a little suspect, since StripePaymentProvider
+                #        would previously have raised an exception for a
+                #        missing price, should it really be legal to generate
+                #        a checkout button when there is no price?
+                amount=price and price.amount or None,
+                currency=price and price.currency or None,
+                email=email,
+                name=self.org.name,
+                description=title,
+                complete_url=complete_url,
+                request=request,
+                **extra
+            )
+        except Exception:
+            pay_log.info(
+                f'Failed to generate checkout button for {provider.title}:',
+                exc_info=True
+            )
+            return None
 
     def redirect_after_login(
         self,
@@ -568,6 +600,7 @@ def get_public_ticket_messages() -> Collection[str]:
         'event',
         'payment',
         'reservation',
+        'reservation_adjusted',
         'submission',
         'ticket',
         'ticket_chat',
@@ -813,6 +846,7 @@ def get_common_asset() -> Iterator[str]:
     yield 'items_selectable.js'
     yield 'notifications.js'
     yield 'foundation.accordion.js'
+    yield 'chosen_select_hierarchy.js'
 
 
 @OrgApp.webasset('fontpreview')
@@ -833,6 +867,12 @@ def get_all_blank_asset() -> Iterator[str]:
 @OrgApp.webasset('people-select')
 def people_select_asset() -> Iterator[str]:
     yield 'people-select.js'
+
+
+@OrgApp.webasset('mapbox_address_autofill')
+def mapbox_address_autofill() -> Iterator[str]:
+    yield 'mapbox-search-web.js'  # implicit dependency
+    yield 'mapbox_address_autofill.js'
 
 
 def wrap_with_mtan_hook(

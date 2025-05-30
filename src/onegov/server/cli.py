@@ -374,7 +374,7 @@ class WSGIRequestMonitorMiddleware:
         usage = RESOURCE_TRACKER.memory_usage
         delta = RESOURCE_TRACKER.memory_usage_delta
 
-        print(template.format(
+        click.echo(template.format(
             status=status,
             method=method,
             path=path,
@@ -428,14 +428,14 @@ class WsgiProcess(multiprocessing.Process):
         frame: FrameType | None
     ) -> None:
 
-        print('-' * shutil.get_terminal_size((80, 20)).columns)
+        click.echo('-' * shutil.get_terminal_size((80, 20)).columns)
 
         RESOURCE_TRACKER.show_memory_usage()
 
         if tracemalloc.is_tracing():
             RESOURCE_TRACKER.show_monotonically_increasing_traces()
 
-        print('-' * shutil.get_terminal_size((80, 20)).columns)
+        click.echo('-' * shutil.get_terminal_size((80, 20)).columns)
 
     def disable_systemwide_darwin_proxies(self):  # type:ignore
         # System-wide proxy settings on darwin need to be disabled, because
@@ -474,7 +474,7 @@ class WsgiProcess(multiprocessing.Process):
             bjoern.listen(wsgi_application, self.host, self.port)
         except Exception:
             # if there's an error, print it
-            print(traceback.format_exc())
+            click.echo(traceback.format_exc())
 
             # and just never start the server (but don't stop the
             # process either). this makes this work:
@@ -485,7 +485,7 @@ class WsgiProcess(multiprocessing.Process):
 
         self._ready.value = 1
 
-        print(f'started onegov server on http://{self.host}:{self.port}')
+        click.echo(f'started onegov server on http://{self.host}:{self.port}')
         bjoern.run()
 
 
@@ -561,6 +561,9 @@ class WsgiServer(FileSystemEventHandler):
         if src_path.endswith('.rdb'):
             return
 
+        if src_path.endswith('.md'):
+            return
+
         if '/.testmondata' in src_path:
             return
 
@@ -597,6 +600,6 @@ class WsgiServer(FileSystemEventHandler):
         if src_path.endswith('~'):
             return
 
-        print(f'changed: {src_path}')
+        click.echo(f'changed: {src_path}')
 
         self.restart()

@@ -223,6 +223,7 @@ def book_occasion(
                 birth_date=form.birth_date.data,
                 gender=form.gender.data,
                 notes=form.notes.data,
+                swisspass=form.swisspass.data if form.swisspass else None,
                 differing_address=form.differing_address.data,
                 address=form.address.data
                 if form.differing_address.data else None,
@@ -320,6 +321,9 @@ def book_occasion(
                     }))
             if self.period.booking_start <= date.today():
                 assert user is not None
+                cancellation_conditions = Markup(request.app.org.meta.get(
+                    'cancellation_conditions', ''))  # nosec 704
+
                 request.app.send_transactional_email(
                     subject=subject,
                     receivers=(user.username, ),
@@ -329,6 +333,7 @@ def book_occasion(
                             'title': subject,
                             'model': self,
                             'bookings_link': bookings_link,
+                            'cancellation_conditions': cancellation_conditions,
                             'name': attendee.name,
                             'dates': self.dates
                         }

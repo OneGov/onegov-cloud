@@ -22,6 +22,8 @@ from onegov.org.forms.newsletter import NewsletterTestForm
 from onegov.org.forms.page import LinkForm, PageForm, IframeForm
 from onegov.org.forms.person import PersonForm
 from onegov.org.forms.reservation import FindYourSpotForm
+from onegov.org.forms.reservation import KabaEditForm
+from onegov.org.forms.reservation import ReservationAdjustmentForm
 from onegov.org.forms.reservation import ReservationForm
 from onegov.org.forms.resource import ResourceCleanupForm
 from onegov.org.forms.resource import ResourceExportForm
@@ -40,6 +42,7 @@ from onegov.org.forms.text_module import TextModuleForm
 from onegov.org.forms.ticket import (
     InternalTicketChatMessageForm, ExtendedInternalTicketChatMessageForm)
 from onegov.org.forms.ticket import TicketAssignmentForm
+from onegov.org.forms.ticket import TicketChangeTagForm
 from onegov.org.forms.ticket import TicketChatMessageForm
 from onegov.org.forms.ticket import TicketNoteForm
 from onegov.org.forms.user import ManageUserForm
@@ -70,6 +73,7 @@ __all__ = (
     'ImageSetForm',
     'InternalTicketChatMessageForm',
     'ExtendedInternalTicketChatMessageForm',
+    'KabaEditForm',
     'LinkForm',
     'ManageUserForm',
     'ManageUserGroupForm',
@@ -83,6 +87,7 @@ __all__ = (
     'PersonForm',
     'PublicMTANForm',
     'PublicRequestMTANForm',
+    'ReservationAdjustmentForm',
     'ReservationForm',
     'ResourceCleanupForm',
     'ResourceExportForm',
@@ -94,6 +99,7 @@ __all__ = (
     'SurveySubmissionWindowForm',
     'TextModuleForm',
     'TicketAssignmentForm',
+    'TicketChangeTagForm',
     'TicketChatMessageForm',
     'TicketNoteForm',
     'UserProfileForm',

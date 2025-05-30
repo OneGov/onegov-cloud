@@ -213,8 +213,12 @@ class News(Page, TraitInfo, SearchableContent, NewsletterExtension,
         else:
             return ()
 
+    @property
+    def es_last_change(self) -> datetime:
+        return self.published_or_created
+
     def is_supported_trait(self, trait: str) -> bool:
-        return trait in {'news'}
+        return trait == 'news'
 
     def get_root_page_form_class(self, request: OrgRequest) -> type[Form]:
         return self.with_content_extensions(

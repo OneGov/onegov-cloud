@@ -210,6 +210,7 @@ rc.getFullcalendarOptions = function(options) {
 
     // view change rendering
     fcOptions.viewRender = function(view, element) {
+        rc.setupDatePicker(view, element);
         var renderers = view.options.viewRenderers;
         for (var i = 0; i < renderers.length; i++) {
             renderers[i](view, element);
@@ -263,6 +264,46 @@ rc.setupEventPopups = function(event, element, view) {
         return false;
     });
 };
+
+// show date picker when clicking on title
+rc.setupDatePicker = function(view, element) {
+    var calendar = $(view.el.closest('.fc'));
+    var title = calendar.find('.fc-header-toolbar .fc-left h2');
+    var input = $(
+        '<input type="text" tabindex="-1" aria-hidden="true"/>'
+    ).css({
+        visibility: 'hidden',
+        width: 0,
+        height: 0,
+        border: 0,
+    }).datetimepicker({
+        allowBlank: true,
+        timepicker: false,
+        format: 'Y-m-d',
+        dayOfWeekStart: 1,
+        lang: window.locale.language,
+        closeOnDateSelect: true,
+        onSelectDate: function(ct, $i) {
+            calendar.fullCalendar('gotoDate', ct);
+        },
+        onShow: function(_ct, $i) {
+            this.setOptions({value: $i.val()});
+            setTimeout(function() {
+                $('.xdsoft_datetimepicker').trigger('afterOpen.xdsoft');
+            }, 50);
+        },
+    });
+    input.unbind();
+    title.append(input);
+    title.click(function() {
+        input.val(calendar.fullCalendar('getDate').format('YYYY-MM-DD'));
+        input.datetimepicker('show');
+    }).on('mouseenter', function() {
+        title.css('cursor', 'pointer');
+    }).on('mouseleave', function() {
+        title.css('cursor', '');
+    });
+}
 
 // highlight events implementation
 rc.highlightEvents = function(event, element, view) {
@@ -321,6 +362,26 @@ rc.reserve = function(calendar, url, start, end, quota, wholeDay) {
     rc.post(calendar, url.toString());
 };
 
+rc.shouldRenderReservationForm = function(event, previousReservationState) {
+    const showWholeDay = event.partlyAvailable && event.wholeDay;
+    const showTimeRange = event.partlyAvailable && (!event.wholeDay || !(event.state && event.state.wholeDay));
+    const hasPreviousTimeToOffer = !_.isEmpty(previousReservationState) &&
+        (
+            previousReservationState.start !== event.start.format('HH:mm') ||
+            previousReservationState.end !== event.end.format('HH:mm')
+        );
+    const showPreviousTime = (showTimeRange || showWholeDay) && hasPreviousTimeToOffer;
+    const showQuota = !event.partlyAvailable  && (event.quotaLeft > 1);
+
+    // Determine if any fields need to be rendered
+    return (
+        showWholeDay ||
+        showTimeRange ||
+        showPreviousTime ||
+        showQuota
+    );
+};
+
 // popup handler implementation
 rc.showActionsPopup = function(calendar, element, event) {
     var wrapper = $('<div class="reservation-actions">');
@@ -331,17 +392,37 @@ rc.showActionsPopup = function(calendar, element, event) {
         $(event.actions.join('')).appendTo(wrapper);
     }
 
-    ReservationForm.render(reservation.get(0), event, rc.previousReservationState, function(state) {
+    // Check if the reservation form needs to be rendered
+    if (!event.actions.length && !rc.shouldRenderReservationForm(event, rc.previousReservationState)) {
+        // Directly submit the reservation if no fields or actions are present
         rc.reserve(
             calendar,
             event.reserveurl,
-            state.start,
-            state.end,
-            state.quota,
-            state.wholeDay
+            event.start.format('HH:mm'),
+            event.end.format('HH:mm'),
+            event.quota,
+            event.wholeDay
         );
-        $(this).closest('.popup').popup('hide');
-    });
+        return;
+    }
+
+    // Render the reservation form if needed
+    ReservationForm.render(
+        reservation.get(0),
+        event,
+        rc.previousReservationState,
+        function(state) {
+            rc.reserve(
+                calendar,
+                event.reserveurl,
+                state.start,
+                state.end,
+                state.quota,
+                state.wholeDay
+            );
+            $(this).closest('.popup').popup('hide');
+        }
+    );
 
     rc.showPopup(calendar, element, wrapper);
 };
@@ -1104,6 +1185,7 @@ ReservationForm = React.createClass({
                 <button className={buttonEnabled && "button" || "button secondary"} disabled={!buttonEnabled} onClick={this.handleButton}>{locale("Add")}</button>
             </form>
         );
+
     }
 });
 

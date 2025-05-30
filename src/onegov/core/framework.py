@@ -29,6 +29,7 @@ import sys
 import traceback
 
 from base64 import b64encode
+from cryptography.fernet import Fernet
 from cryptography.hazmat.primitives.hashes import SHA256
 from cryptography.hazmat.primitives.kdf.hkdf import HKDF
 from datetime import datetime
@@ -59,6 +60,7 @@ from onegov.core.request import CoreRequest
 from onegov.core.utils import batched, PostThread
 from onegov.server import Application as ServerApplication
 from onegov.server.utils import load_class
+from operator import itemgetter
 from psycopg2.extensions import TransactionRollbackError
 from purl import URL
 from sqlalchemy.exc import OperationalError
@@ -125,6 +127,7 @@ class Framework(
     cronjob = directive(directives.CronjobAction)
     static_directory = directive(directives.StaticDirectoryAction)
     template_variables = directive(directives.TemplateVariablesAction)
+    replace_setting = directive(directives.ReplaceSettingAction)
     replace_setting_section = directive(directives.ReplaceSettingSectionAction)
 
     #: sets the same-site cookie directive, (may need removal inside iframes)
@@ -230,7 +233,7 @@ class Framework(
                 return fn(*args, **kwargs)
             except Exception:
                 if getattr(self, 'print_exceptions', False):
-                    print('=' * 80, file=sys.stderr)
+                    print('=' * 80, file=sys.stderr)  # noqa: T201
                     traceback.print_exc()
                 raise
 
@@ -432,7 +435,7 @@ class Framework(
 
         members = sorted(
             inspect.getmembers(self.__class__, callable),
-            key=lambda item: item[0]
+            key=itemgetter(0)
         )
 
         for n, method in members:
@@ -449,7 +452,7 @@ class Framework(
     ) -> None:
 
         # certain namespaces are reserved for internal use:
-        assert self.namespace not in {'global'}
+        assert self.namespace != 'global'
 
         self.dsn = dsn
 
@@ -1108,9 +1111,7 @@ class Framework(
         timestamp = datetime.now().timestamp()
 
         def finish_batch() -> None:
-            nonlocal buffer
-            nonlocal num_included
-            nonlocal batch_num
+            nonlocal buffer, num_included, batch_num
 
             buffer.write(b']')
 
@@ -1501,6 +1502,35 @@ class Framework(
             return signer.unsign(text).decode('utf-8')
         except BadSignature:
             return None
+
+    @property
+    def hashed_identity_key(self) -> bytes:
+        """ Take the sha-256 because we want a key that is 32 bytes long. """
+        hash_object = hashlib.sha256()
+        hash_object.update(self.identity_secret.encode('utf-8'))
+        return b64encode(hash_object.digest())
+
+    def encrypt(self, plaintext: str) -> bytes:
+        """ Encrypts the given text using Fernet (symmetric encryption).
+
+        plaintext (str): The data to encrypt.
+
+        Returns: the encrypted data in bytes.
+        """
+        return Fernet(
+            self.hashed_identity_key
+        ).encrypt(plaintext.encode('utf-8'))
+
+    def decrypt(self, cyphertext: bytes) -> str:
+        """ Decrypts the given text using Fernet (symmetric encryption).
+
+        cyphertext (str): The data to encrypt.
+
+        Returns: the decrypted text.
+        """
+        return Fernet(
+            self.hashed_identity_key
+        ).decrypt(cyphertext).decode('utf-8')
 
 
 @Framework.webasset_url()

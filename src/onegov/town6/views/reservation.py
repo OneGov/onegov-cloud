@@ -1,7 +1,11 @@
 from __future__ import annotations
 
 from onegov.core.security import Public, Private
-from onegov.org.forms import InternalTicketChatMessageForm
+from onegov.org.forms import (
+    KabaEditForm,
+    InternalTicketChatMessageForm,
+    ReservationAdjustmentForm,
+)
 from onegov.org.models.ticket import ReservationTicket
 from onegov.org.views.reservation import (
     handle_reservation_form,
@@ -10,13 +14,21 @@ from onegov.org.views.reservation import (
     finalize_reservation,
     accept_reservation_with_message,
     accept_reservation_with_message_from_ticket,
+    adjust_reservation,
+    adjust_reservation_from_ticket,
+    edit_kaba,
+    edit_kaba_from_ticket,
     reject_reservation_with_message,
     reject_reservation_with_message_from_ticket,
 )
 from onegov.town6 import TownApp
 
 from onegov.reservation import Reservation, Resource
-from onegov.town6.layout import ReservationLayout, TicketChatMessageLayout
+from onegov.town6.layout import (
+    ReservationLayout,
+    TicketChatMessageLayout,
+    TicketLayout,
+)
 
 
 from typing import TYPE_CHECKING
@@ -137,4 +149,72 @@ def town_reject_reservation_with_message_from_ticket(
 ) -> RenderData | Response | None:
     layout = TicketChatMessageLayout(self, request, internal=True)
     return reject_reservation_with_message_from_ticket(
+        self, request, form, layout)
+
+
+@TownApp.form(
+    model=Reservation,
+    name='adjust',
+    permission=Private,
+    form=ReservationAdjustmentForm,
+    template='form.pt'
+)
+def town_adjust_reservation(
+    self: Reservation,
+    request: TownRequest,
+    form: ReservationAdjustmentForm
+) -> RenderData | Response | None:
+    layout = ReservationLayout(self, request)  # type:ignore
+    return adjust_reservation(self, request, form, None, layout)
+
+
+@TownApp.form(
+    model=ReservationTicket,
+    name='adjust-reservation',
+    permission=Private,
+    form=ReservationAdjustmentForm,
+    template='form.pt'
+)
+def town_adjust_reservation_from_ticket(
+    self: ReservationTicket,
+    request: TownRequest,
+    form: ReservationAdjustmentForm,
+    layout: TicketLayout | None = None
+) -> RenderData | Response | None:
+    layout = TicketLayout(self, request)
+    return adjust_reservation_from_ticket(
+        self, request, form, layout)
+
+
+@TownApp.form(
+    model=Reservation,
+    name='edit-kaba',
+    permission=Private,
+    form=KabaEditForm,
+    template='form.pt'
+)
+def town_edit_kaba(
+    self: Reservation,
+    request: TownRequest,
+    form: KabaEditForm
+) -> RenderData | Response | None:
+    layout = ReservationLayout(self, request)  # type:ignore
+    return edit_kaba(self, request, form, None, layout)
+
+
+@TownApp.form(
+    model=ReservationTicket,
+    name='edit-kaba',
+    permission=Private,
+    form=KabaEditForm,
+    template='form.pt'
+)
+def town_edit_kaba_from_ticket(
+    self: ReservationTicket,
+    request: TownRequest,
+    form: KabaEditForm,
+    layout: TicketLayout | None = None
+) -> RenderData | Response | None:
+    layout = TicketLayout(self, request)
+    return edit_kaba_from_ticket(
         self, request, form, layout)

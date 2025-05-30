@@ -6,7 +6,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: OneGov Cloud 1.0\n"
-"POT-Creation-Date: 2025-03-20 14:18+0100\n"
+"POT-Creation-Date: 2025-05-14 12:57+0200\n"
 "PO-Revision-Date: 2021-03-03 16:24+0100\n"
 "Last-Translator: Lukas Burkhard <lukas.burkhard@seantis.ch>\n"
 "Language-Team: German\n"
@@ -237,6 +237,9 @@ msgstr "Abbrechen"
 msgid "Event"
 msgstr "Veranstaltung"
 
+msgid "Copy"
+msgstr "Kopieren"
+
 msgid "Export"
 msgstr "Export"
 
@@ -277,8 +280,8 @@ msgstr "Startseite"
 msgid "Chat Archive"
 msgstr "Chat-Archiv"
 
-msgid "No rules defined."
-msgstr "Keine Regeln definiert."
+msgid "No availability periods defined."
+msgstr "Keine Verfügbarkeitszeiträume definiert."
 
 msgid "State:"
 msgstr "Status:"
@@ -384,6 +387,12 @@ msgstr "Weiterführende Informationen"
 msgid "Propose a change to this entry"
 msgstr "Änderung für diesen Eintrag vorschlagen"
 
+msgid "No subscribers yet"
+msgstr "Noch keine Abonnenten"
+
+msgid "There are currently ${count} recipients registered."
+msgstr "Zur Zeit sind ${count} Abonnenten registriert."
+
 msgid ""
 "Subscribers may always unsubscribe themselves through a link shown at the "
 "bottom of the newsletter. If you unsubscribe them here, they will not be "
@@ -397,6 +406,15 @@ msgstr "Abmelden"
 
 msgid "unsubscribe"
 msgstr "abmelden"
+
+msgid ""
+"This recipient has delivery failures, including hard bounces, invalid email "
+"addresses, spam complaints, manual deactivations, or being blocked. We "
+"recommend unsubscribing it from the list."
+msgstr ""
+"Dieser Empfänger hat Zustellungsfehler, einschließlich Hard Bounces, "
+"ungültige E-Mail-Adresse, Spam-Beschwerde, manuelle Deaktivierung oder wird "
+"blockiert. Wir empfehlen, ihn von der Liste abzumelden."
 
 msgid ""
 "Your edit requires a migration of existing entries. Please confirm the "
@@ -458,6 +476,18 @@ msgid "You can copy the following code to embed this page as an iFrame:"
 msgstr ""
 "Sie können den folgenden Code kopieren, um diese Seite als iFrame "
 "einzubetten:"
+
+msgid ""
+"To display the breadcrumbs you can add ${bc_level} as a parameter to the "
+"URL. The number defines where the breadcrumbs start. 1 in this case means "
+"that the first level is hidden. You can use any number as long as it is less "
+"than the number of levels in the breadcrumbs."
+msgstr ""
+"Um die Breadcrumbs anzuzeigen, können Sie ${bc_level} als Parameter zur URL "
+"hinzufügen. Die Zahl definiert, wo die Breadcrumbs beginnen. 1 in diesem "
+"Fall bedeutet, dass die erste Ebene verborgen ist. Sie können jede Zahl "
+"verwenden, solange sie kleiner ist als die Anzahl der Ebenen in den "
+"Breadcrumbs."
 
 msgid ""
 "Please review your data and press \"Complete\" to finalize the process. If "
@@ -678,9 +708,6 @@ msgstr "Verzeichnis"
 
 msgid "Organisation"
 msgstr "Organisation"
-
-msgid "Sub organisation"
-msgstr "Unterorganisation"
 
 msgid "Functions:"
 msgstr "Funktionen:"
@@ -933,7 +960,7 @@ msgid "Disbursed"
 msgstr "Ausbezahlt"
 
 msgid "Find Your Spot"
-msgstr "Terminsuche"
+msgstr "Terminsuche / Serienreservation"
 
 msgid "Access"
 msgstr "Zugriff"
@@ -1373,6 +1400,9 @@ msgstr ""
 "möchten, kontaktieren Sie bitte einen Administrator, damit er Sie aus der "
 "Empfängerliste entfernen kann."
 
+msgid "Key Code"
+msgstr "Schlüsselcode"
+
 msgid "The following reservations have unfortunately been cancelled:"
 msgstr "Die folgenden Reservationen mussten leider abgesagt werden:"
 
@@ -1487,6 +1517,9 @@ msgstr "1 Reservation abgelehnt."
 msgid "${count} reservations rejected."
 msgstr "${count} Reservationen abgelehnt."
 
+msgid "1 reservation adjusted:"
+msgstr "1 Reservation angepasst:"
+
 msgid "Registration confirmed."
 msgstr "Anmeldung bestätigt."
 
@@ -1590,9 +1623,6 @@ msgstr ""
 "Der Newsletter ist deaktiviert. Sie können diese Seite nur sehen, weil Sie "
 "eingeloggt sind."
 
-msgid "There are currently ${count} recipients registered."
-msgstr "Zur Zeit sind ${count} Abonnenten registriert."
-
 msgid "To update your subscription, please use this ${Link}"
 msgstr "Um Ihr Abonnement zu aktualisieren, verwenden Sie bitte diesen ${Link}"
 
@@ -1687,17 +1717,17 @@ msgstr "Gebühr:"
 msgid "No payments yet."
 msgstr "Noch keine Zahlungen."
 
-msgid "No people added yet."
-msgstr "Es wurden noch keine Personen hinzugefügt."
-
-msgid "No people found for current filter selection."
-msgstr "Keine Personen für aktuelle Filterauswahl gefunden."
-
 msgid "Select organisation"
 msgstr "Organisation wählen"
 
 msgid "Select sub organisation"
 msgstr "Unterorganisation wählen"
+
+msgid "No people found for current filter selection."
+msgstr "Keine Personen für aktuelle Filterauswahl gefunden."
+
+msgid "Reset filter"
+msgstr "Filter zurücksetzen"
 
 msgid "Export a vCard of this person"
 msgstr "Elektronische Visitenkarte (vCard)"
@@ -1742,20 +1772,8 @@ msgstr "Firebase Response Data"
 msgid "No notifications"
 msgstr "Keine Benachrichtigungen"
 
-msgid "No subscribers yet"
-msgstr "Noch keine Abonnenten"
-
 msgid "Subscribed on"
 msgstr "Abonniert am"
-
-msgid ""
-"This recipient has delivery failures, including hard bounces, invalid email "
-"addresses, spam complaints, manual deactivations, or being blocked. We "
-"recommend unsubscribing it from the list."
-msgstr ""
-"Dieser Empfänger hat Zustellungsfehler, einschließlich Hard Bounces, "
-"ungültige E-Mail-Adresse, Spam-Beschwerde, manuelle Deaktivierung oder wird "
-"blockiert. Wir empfehlen, ihn von der Liste abzumelden."
 
 msgid "submitted"
 msgstr "angemeldet"
@@ -1798,14 +1816,23 @@ msgstr "Reservationen müssen mindestens ${n} Tage im Voraus gemacht werden."
 msgid "Reservations must be made at least ${n} hours in advance."
 msgstr "Reservationen müssen mindestens ${n} Stunden im Voraus gemacht werden."
 
-msgid "Select a free time span in the calendar below to create an allocation."
+msgid ""
+"Select a free time span in the calendar to create an availability period."
 msgstr ""
-"Wählen Sie eine freie Zeitspanne im Kalender aus um eine Einteilung zu "
-"machen."
+"Wählen Sie einen freien Zeitraum im Kalender, um eine Verfügbarkeitsperiode "
+"zu erstellen."
 
-msgid "Removes all unreserved allocations between the start and end date."
+msgid ""
+"Removes all unreserved allocations between the start and end date. This "
+"includes allocations that were created by using an availability period. To "
+"recreate these allocations, click on \"edit\" in the availability period and "
+"then \"save\" without changing anything."
 msgstr ""
-"Entfernt alle nicht-reservierten Einteilungen zwischen Start- und End-Datum"
+"Entfernt alle nicht reservierten Verfügbarkeiten zwischen dem Start- und "
+"Enddatum. Dies schliesst Verfügbarkeiten ein, die mit einer "
+"Verfügbarkeitszeitraum erstellt wurden. Um diese Verfügbarkeiten wieder zu "
+"erstellen, klicken Sie auf \"Bearbeiten\" in der Verfügbarkeitszeitraum und "
+"danach auf \"Speichern\" ohne etwas zu ändern."
 
 msgid "Reservation is pending approval"
 msgstr "Diese Reservation wurde noch nicht akzeptiert"
@@ -2002,6 +2029,12 @@ msgstr "Herkunft"
 msgid "Group"
 msgstr "Gruppe"
 
+msgid "Change tag"
+msgstr "Schlagwort ändern"
+
+msgid "Without"
+msgstr "Ohne"
+
 msgid "Owner"
 msgstr "Zuständig"
 
@@ -2094,14 +2127,26 @@ msgstr "Inaktiv"
 msgid "Role"
 msgstr "Rolle"
 
-msgid "local"
-msgstr "lokal"
-
 msgid "User group"
 msgstr "Benutzergruppe"
 
 msgid "None"
 msgstr "Keine"
+
+msgid "local"
+msgstr "lokal"
+
+msgid "Last login"
+msgstr "Zuletzt eingeloggt"
+
+msgid "Never"
+msgstr "Nie"
+
+msgid "Session information"
+msgstr "Session Information"
+
+msgid "Display information"
+msgstr "Information anzeigen"
 
 msgid "No links found."
 msgstr "Keine Verknüpfungen gefunden."
@@ -2139,6 +2184,9 @@ msgstr "Chat-Verlauf mit ${org}"
 
 msgid "Your Chat has been turned into a ticket"
 msgstr "Aus ihrem Chat wurde ein Ticket erstellt"
+
+msgid "New ticket"
+msgstr "Neues Ticket"
 
 msgid "Chat Customer"
 msgstr "Kundenchat  "
