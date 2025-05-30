@@ -14,6 +14,7 @@ from typing import TYPE_CHECKING
 if TYPE_CHECKING:
     from collections.abc import Iterable
 
+
 class SearchIndex(Base, UTCPublicationMixin):
     """Full-text Search Index (fts) for all searchable models and entries.
 
@@ -64,6 +65,20 @@ class SearchIndex(Base, UTCPublicationMixin):
     __mapper_args__ = {
         'polymorphic_on': owner_type
     }
+
+    __table_args__ = (
+        Index('ix_search_index_owner_type', 'owner_type'),
+        Index('ix_search_index_owner_id_int', 'owner_id_int'),
+        Index('ix_search_index_owner_id_uuid', 'owner_id_uuid'),
+        Index('ix_search_index_owner_id_str', 'owner_id_str'),
+        Index('ix_search_index_public', 'public'),
+        Index('ix_search_index_access', 'access'),
+        Index('ix_search_index_last_change', 'last_change'),
+        Index('ix_search_index_tags', 'tags'),
+        Index('ix_search_index_suggestion', 'suggestion'),
+        Index('ix_search_index_fts_idx_data', 'fts_idx_data'),
+        Index('ix_search_index_fts_idx', 'fts_idx'),
+    )
 
     @property
     def tags(self) -> set[str]:
