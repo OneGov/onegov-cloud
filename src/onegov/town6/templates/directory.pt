@@ -28,20 +28,25 @@
                     <tal:b content="text"/>
                 </div>
 
-                <!-- displaying in accordion mode -->
+                <!-- display content fields of each entry in accordion mode -->
                 <ul tal:condition="directory.layout == 'accordion'" class="accordion more-list page-links" data-accordion>
                     <li tal:repeat="entry entries" class="accordion-item small-12-cell" data-accordion-item style="">
                         <a href="#" class="accordion-title">
                             <span class="h5">${entry.title}</span>
                         </a>
                         <div class="accordion-content" data-tab-content>
-                            <ul tal:repeat="field directory.fields" style="list-style: none; margin-left: 0">
-                                <li tal:condition="field.type == 'textarea'" tal:define="key field.human_id; value entry.values[field.id]" tal:content="Markup('<strong>{}</strong>: <br>{}').format(key, value)" style="white-space: pre-wrap;"></li>
-                                <li tal:condition="field.type != 'textarea'" tal:define="key field.human_id; value entry.values[field.id]" tal:content="Markup('<strong>{}</strong>: {}').format(key, value)"></li>
-                            </ul>
-                            <ul style="list-style: none; margin-left: 0">
+                                <metal:b use-macro="layout.macros['display_fields']"
+                                    tal:define="
+                                        fields entry.content_fields;
+                                        allow_downloads True;
+                                        allow_views True;
+                                        form entry.directory.form_obj;
+                                        linkify_display True;
+                                    "
+                                />
+                                <ul tal:condition="request.is_manager" style="list-style: none; margin-left: 0">
                                 <li>
-                                    <a tal:condition="request.is_manager" class="edit-link" tal:attributes="href request.link(entry, 'edit')">
+                                    <a class="edit-link" tal:attributes="href request.link(entry, 'edit')">
                                         <i class="far fa-edit"></i>
                                     </a>
                                 </li>
