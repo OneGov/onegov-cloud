@@ -1,5 +1,11 @@
 import os
 import re
+from io import BytesIO
+from pytest import fail
+from webtest import Upload
+
+from onegov.core.utils import module_path
+from tests.shared.utils import open_in_browser
 
 
 def test_directory_prev_next(client):
@@ -210,3 +216,52 @@ def test_create_directory_accordion_layout(client):
     q2 = q2.form.submit().follow()
     assert question in q2
     assert answer not in q2
+
+
+def test_directory_change_request_with_multiple_uploads(client):
+    client.login_admin()
+
+    # Create a directory with multiple file upload field
+    page = client.get('/directories').click('Verzeichnis')
+    page.form['title'] = "Contacts"
+    page.form['structure'] = """
+        E-Mail *= @@@
+        Telefon *= ___
+        Downloads = *.pdf (multiple)
+    """
+    page.form['title_format'] = '[E-Mail]'
+    page.form['enable_change_requests'] = True
+    page.form['content_fields'] = 'E-Mail\nTelefon\nDownloads'
+    page = page.form.submit().follow()
+
+    # Create an initial entry
+    page = page.click('Eintrag', index=0)
+    page.form['e_mail'] = 'info@example.com'
+    page.form['telefon'] = '123456'
+    path = module_path('tests.onegov.town6', 'fixtures/sample.pdf')
+    with open(path, 'rb') as f:
+        page.form['downloads'] = [
+            Upload('Sample.pdf', f.read(), 'application/pdf')
+        ]
+
+    entry_page = page.form.submit().follow()
+    entry_url = entry_page.request.url
+
+    # Spawn anonymous user to suggest a change
+    anon_client = client.spawn()
+    page = anon_client.get(entry_url)
+    change_page = page.click('Änderung für diesen Eintrag vorschlagen')
+
+    # Fill change request form
+    change_page.form['submitter'] = 'tester@example.org'
+    # Submit to preview - this triggers render_original for diff
+    try:
+        preview_page = change_page.form.submit().follow()
+    except AttributeError as e:
+        # property 'data' of 'UploadMultipleField' object has no setter
+        fail('Got AttributeError!')
+
+    assert 'Vorschau' in preview_page
+    # Confirm submission
+    final_page = preview_page.form.submit().follow()
+    assert 'Vielen Dank für Ihre Eingabe' in final_page
