@@ -93,7 +93,7 @@ class NewsletterForm(Form):
                 ).format(
                     item.title,
                     format_date(item.created, 'relative', request.locale),
-                ),
+                )
             )
             for item in news
         )

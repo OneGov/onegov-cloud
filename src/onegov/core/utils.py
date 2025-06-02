@@ -52,9 +52,7 @@ from uuid import UUID, uuid4
 from webob import static
 from yubico_client import Yubico  # type:ignore[import-untyped]
 from yubico_client.yubico_exceptions import (  # type:ignore[import-untyped]
-    SignatureVerificationError,
-    StatusCodeError,
-)
+    SignatureVerificationError, StatusCodeError)
 
 from typing import overload, Any, TypeVar, TYPE_CHECKING
 
@@ -1264,9 +1262,11 @@ def generate_fts_phonenumbers(numbers: Iterable[str | None]) -> list[str]:
             result.append(number.replace(' ', ''))
             continue
 
-        result.append(format_phone_number(parsed, PhoneNumberFormat.E164))
+        result.append(format_phone_number(
+            parsed, PhoneNumberFormat.E164))
 
-        national = format_phone_number(parsed, PhoneNumberFormat.NATIONAL)
+        national = format_phone_number(
+            parsed, PhoneNumberFormat.NATIONAL)
         groups = national.split()
         for idx in range(len(groups)):
             partial = ''.join(groups[idx:])
