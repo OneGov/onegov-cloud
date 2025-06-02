@@ -12,6 +12,7 @@ from onegov.chat import TextModule
 from onegov.chat import TextModuleCollection
 from onegov.core.converters import extended_date_converter
 from onegov.core.converters import datetime_year_converter
+from onegov.core.converters import date_converter
 from onegov.core.converters import json_converter
 from onegov.core.converters import LiteralConverter
 from onegov.core.orm.abstract import MoveDirection
@@ -875,14 +876,27 @@ def get_payment(app: OrgApp, id: UUID) -> Payment | None:
 @OrgApp.path(
     model=PaymentCollection,
     path='/payments',
-    converters={'page': int}
+    converters={
+        'page': int,
+        'start_date': date_converter,
+        'end_date': date_converter,
+        'status': str,
+        'payment_type': str
+    }
 )
 def get_payments(
     app: OrgApp,
     source: str = '*',
-    page: int = 0
+    page: int = 0,
+    start_date: date | None = None,
+    end_date: date | None = None,
+    status: str | None = None,
+    payment_type: str | None = None
 ) -> PaymentCollection:
-    return PaymentCollection(app.session(), source, page)
+    return PaymentCollection(
+        app.session(), source, page, start_date, end_date, status,
+        payment_type
+    )
 
 
 @OrgApp.path(
