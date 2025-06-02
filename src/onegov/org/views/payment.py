@@ -123,7 +123,7 @@ def view_payments(
     payment_links = self.payment_links_by_batch()
 
     return {
-        'title': _('Payments'),
+        'title': _('Receivables'),
         'layout': layout or PaymentCollectionLayout(self, request),
         'payments': self.batch,
         'get_ticket': partial(ticket_by_link, tickets),

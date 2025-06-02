@@ -2,7 +2,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: \n"
-"POT-Creation-Date: 2025-05-21 11:26+0200\n"
+"POT-Creation-Date: 2025-05-28 01:50+0200\n"
 "PO-Revision-Date: 2022-03-15 10:52+0100\n"
 "Last-Translator: \n"
 "Language-Team: \n"
@@ -3387,8 +3387,8 @@ msgstr "Rifiuta le prenotazioni"
 msgid "Reject all with message"
 msgstr "Rifiuta tutto con messaggio"
 
-#.
 #. Used in sentence: "${event} published."
+#.
 msgid "Event"
 msgstr "Evento"
 
@@ -6172,6 +6172,9 @@ msgstr "Il tuo pagamento è stato ritirato"
 
 msgid "Your payment has been refunded"
 msgstr "Il tuo pagamento è stato rimborsato"
+
+msgid "Receivables"
+msgstr ""
 
 msgid "The ticket was marked as paid"
 msgstr "Il biglietto è stato contrassegnato come pagato"

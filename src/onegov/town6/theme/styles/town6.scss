@@ -230,11 +230,11 @@ footer {
         width: 100%;
 
         @include breakpoint(medium only) {
-            min-height: 300px;
+            min-height: 18.75rem; /* 300px / 16px */
         }
 
         @include breakpoint(small only) {
-            min-height: 200px;
+            min-height: 12.5rem; /* 200px / 16px */
         }
     }
 
@@ -609,7 +609,7 @@ $pageref-color-hover: $iron;
 
     &::after {
         @include icon-bold($pageref-icon);
-    };
+    }
 }
 
 /*
@@ -1295,9 +1295,7 @@ ul.recipients {
 .chosen-container-multi {
     .chosen-choices {
         background: $white !important;
-        border: {
-            radius: 0 !important;
-        }
+        border-radius: 0 !important;
         box-shadow: none !important;
         padding: ($form-spacing / 3) ($form-spacing / 2) !important;
 
@@ -1358,3 +1356,62 @@ code {
 .reveal.wide {
     max-width: 700px;
 }
+
+/* Payment Filters */
+.filter-form {
+    margin-bottom: 2rem;
+
+    .filter-form-legend {
+        font-size: 1.25rem;
+        font-weight: bold;
+        margin-bottom: 1rem;
+    }
+
+    .filter-grid {
+        display: grid;
+        gap: 1rem;
+
+        @include breakpoint(medium) {
+            grid-template-columns: repeat(2, 1fr);
+        }
+
+        @include breakpoint(large) {
+            grid-template-columns: repeat(4, 1fr);
+        }
+
+        .form-group {
+            input[type="date"],
+            select {
+                width: 100%;
+            }
+        }
+    }
+
+    .form-buttons {
+        margin-top: 1.5rem;
+        display: flex;
+        gap: 0.5rem; /* Adjust spacing between buttons as needed */
+        align-items: center; /* Align items vertically if they have different heights */
+
+        .button {
+            margin-top: 0; /* Override general form button top margin for side-by-side layout */
+        }
+    }
+}
+
+
+.payments-table {
+    th.select-all-checkbox-cell,
+    td.payment-checkbox-cell {
+        width: 1%; /* Make checkbox column as narrow as possible */
+        text-align: center;
+        padding-left: 0.5rem;
+        padding-right: 0.5rem;
+    }
+}
+
+.batch-updated-highlight {
+  background-color: #e6ffed !important; /* A light green color */
+  transition: background-color 0.5s ease;
+}
+

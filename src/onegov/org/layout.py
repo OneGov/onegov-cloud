@@ -3227,7 +3227,7 @@ class PaymentCollectionLayout(DefaultLayout):
     def editbar_links(self) -> list[Link | LinkGroup]:
         links: list[Link | LinkGroup] = []
 
-        if self.app.payment_providers_enabled:
+        if not self.app.payment_providers_enabled:
             if self.request.is_admin:
                 links.append(
                     Link(
@@ -3247,15 +3247,12 @@ class PaymentCollectionLayout(DefaultLayout):
                 )
             )
 
-            links.append(
-                Link(
-                    text=_('Export'),
-                    url=self.request.class_link(OrgExport, {'id': 'payments'}),
-                    attrs={'class': 'export-link'}
-                )
-            )
-
         return links
+
+    @cached_property
+    def payments_export_url(self) -> str:
+        """ Returns the base URL for the payments export. """
+        return self.request.class_link(ExportCollection, name='payments')
 
 
 class MessageCollectionLayout(DefaultLayout):

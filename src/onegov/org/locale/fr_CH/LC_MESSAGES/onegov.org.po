@@ -2,7 +2,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE 1.0\n"
-"POT-Creation-Date: 2025-05-21 11:26+0200\n"
+"POT-Creation-Date: 2025-05-28 01:50+0200\n"
 "PO-Revision-Date: 2022-03-15 10:50+0100\n"
 "Last-Translator: Marc Sommerhalder <marc.sommerhalder@seantis.ch>\n"
 "Language-Team: French\n"
@@ -3384,8 +3384,8 @@ msgstr "Refuser les réservations"
 msgid "Reject all with message"
 msgstr "Tout refuser avec message"
 
-#.
 #. Used in sentence: "${event} published."
+#.
 msgid "Event"
 msgstr "Événement"
 
@@ -3772,8 +3772,8 @@ msgid ""
 "filled-out form."
 msgstr ""
 "Veuillez vérifier vos données et appuyez sur « Compléter » pour finaliser le "
-"processus. S'il y a quelque chose que vous souhaitez modifier, cliquez sur "
-"« Modifier » pour retourner sur le formulaire complété."
+"processus. S'il y a quelque chose que vous souhaitez modifier, cliquez sur « "
+"Modifier » pour retourner sur le formulaire complété."
 
 msgid ""
 "The image shown in the list view is a square. To have your image shown fully "
@@ -6190,6 +6190,9 @@ msgstr "Votre paiement a été retiré"
 
 msgid "Your payment has been refunded"
 msgstr "Votre paiement a été remboursé"
+
+msgid "Receivables"
+msgstr ""
 
 msgid "The ticket was marked as paid"
 msgstr "Le ticket a été marqué comme payé"

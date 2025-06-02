@@ -3,15 +3,125 @@
         ${title}
     </tal:b>
     <tal:b metal:fill-slot="content">
+        <form class="filter-form" action="" method="get">
+            <fieldset>
+                <legend class="filter-form-legend" i18n:translate="">Filter Forderungen</legend>
+                <div class="filter-grid">
+                    <div class="form-group">
+                        <label for="date_from" i18n:translate="">Datum von</label>
+                        <input type="date" id="date_from" name="date_from" class="form-control"/>
+                    </div>
+                    <div class="form-group">
+                        <label for="date_to" i18n:translate="">Datum bis</label>
+                        <input type="date" id="date_to" name="date_to" class="form-control"/>
+                    </div>
+                    <div class="form-group">
+                        <label for="status" i18n:translate="">Status</label>
+                        <select id="status" name="status" class="form-control">
+                            <option value="" i18n:translate="">Alle</option>
+                            <option value="open" i18n:translate="">Offen</option>
+                            <option value="paid" i18n:translate="">Bezahlt</option>
+                            <option value="invoiced" i18n:translate="">Fakturiert</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label for="payment_type" i18n:translate="">Art der Zahlung</label>
+                        <select id="payment_type" name="payment_type" class="form-control">
+                            <option value="" i18n:translate="">Alle</option>
+                            <option value="manual" i18n:translate="">Manuell</option>
+                            <option value="provider" i18n:translate="">Payment Provider</option>
+                        </select>
+                    </div>
+                </div>
+                <div class="form-buttons">
+                    <button type="submit" class="button primary" i18n:translate="">Anwenden</button>
+                    <button type="button" id="exportPaymentsButton" class="button" i18n:translate="">Export Excel</button>
+                    <tal:block tal:condition="payments">
+                        <!--
+                            To enable batch actions, the payment list rendered by the
+                            layout.macros['payments'] macro needs to include checkboxes
+                            for each payment row.
+                            For example:
+                            <input type="checkbox" name="selected_payments" value="[payment_id_placeholder]"
+                                   aria-label="Select payment for batch action" />
+                            This checkbox should be in the first column of each payment row.
+                            The table header for this column could be a select-all checkbox.
+                        -->
+                        <button type="button" class="button hollow batch-action-button" i18n:translate="">Ausgewählte als fakturiert markieren</button>
+                    </tal:block>
+                </div>
+            </fieldset>
+        </form>
+
         <p i18n:translate tal:condition="not payments">
             No payments yet.
         </p>
 
         <metal:b use-macro="layout.macros['payments']" />
 
-
         <div metal:use-macro="layout.macros['pagination']" tal:define="
             collection layout.model; current_page layout.model; pagination_centered True" />
 
+        <script>
+            document.addEventListener('DOMContentLoaded', function() {
+                var exportButton = document.getElementById('exportPaymentsButton');
+                if (exportButton) {
+                    exportButton.addEventListener('click', function() {
+                        var dateFrom = document.getElementById('date_from').value;
+                        var dateTo = document.getElementById('date_to').value;
+                        var baseUrl = "${layout.payments_export_url}";
+                        var queryParams = [];
+
+                        if (dateFrom) { queryParams.push('start=' + encodeURIComponent(dateFrom)); }
+                        if (dateTo) { queryParams.push('end=' + encodeURIComponent(dateTo)); }
+                        queryParams.push('file_format=xlsx');
+
+                        window.location.href = baseUrl + '?' + queryParams.join('&');
+                    });
+                }
+
+                var batchActionButton = document.querySelector('.batch-action-button');
+                if (batchActionButton) {
+                    batchActionButton.addEventListener('click', function() {
+                        var selectedPayments = document.querySelectorAll('input[name="selected_payments"]:checked');
+                        selectedPayments.forEach(function(checkbox) {
+                            // Simulate update by changing row appearance
+                            var row = checkbox.closest('tr');
+                            if (row) {
+                                row.classList.add('batch-updated-highlight');
+                            }
+                            // Optionally, uncheck after "processing"
+                            checkbox.checked = false;
+                        });
+
+                        // Simulate a notification or further action if needed
+                        // For now, it just changes the row color
+                        // alert(selectedPayments.length + ' payment(s) marked as invoiced.');
+                        window.location.href = baseUrl + '?' + queryParams.join('&');
+                    });
+                }
+
+                var batchActionButton = document.querySelector('.batch-action-button');
+                if (batchActionButton) {
+                    batchActionButton.addEventListener('click', function() {
+                        var selectedPayments = document.querySelectorAll('input[name="selected_payments"]:checked');
+                        selectedPayments.forEach(function(checkbox) {
+                            // Simulate update by changing row appearance
+                            var row = checkbox.closest('tr');
+                            if (row) {
+                                row.classList.add('batch-updated-highlight');
+                            }
+                            // Optionally, uncheck after "processing"
+                            checkbox.checked = false;
+                        });
+
+                        // Simulate a notification or further action if needed
+                        // For now, it just changes the row color
+                        // alert(selectedPayments.length + ' payment(s) marked as invoiced.');
+                        window.location.href = baseUrl + '?' + queryParams.join('&');
+                    });
+                }
+            });
+        </script>
     </tal:b>
 </div>

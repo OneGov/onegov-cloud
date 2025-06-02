@@ -2,7 +2,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE 1.0\n"
-"POT-Creation-Date: 2025-05-21 11:26+0200\n"
+"POT-Creation-Date: 2025-05-28 01:50+0200\n"
 "PO-Revision-Date: 2022-03-15 10:21+0100\n"
 "Last-Translator: Marc Sommerhalder <marc.sommerhalder@seantis.ch>\n"
 "Language-Team: German\n"
@@ -3377,8 +3377,8 @@ msgstr "Reservationen absagen"
 msgid "Reject all with message"
 msgstr "Alle absagen mit Kommentar"
 
-#.
 #. Used in sentence: "${event} published."
+#.
 msgid "Event"
 msgstr "Veranstaltung"
 
@@ -6171,6 +6171,9 @@ msgstr "Ihre Zahlung wurde rückgängig gemacht"
 
 msgid "Your payment has been refunded"
 msgstr "Ihre Zahlung wurde rückerstattet"
+
+msgid "Receivables"
+msgstr "Forderungen"
 
 msgid "The ticket was marked as paid"
 msgstr "Das Ticket wurde als bezahlt markiert"
