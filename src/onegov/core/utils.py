@@ -1,7 +1,11 @@
 from __future__ import annotations
 
+import arrow
+import babel.dates
+import babel.numbers
 import base64
 import bleach
+import pytz
 from urlextract import URLExtract, CacheFileError
 from bleach.linkifier import TLDS
 import errno
@@ -13,6 +17,7 @@ import inspect
 import magic
 import mimetypes
 import morepath
+import numbers
 import operator
 import os.path
 import re
@@ -29,11 +34,16 @@ from io import BytesIO, StringIO
 from itertools import groupby, islice
 from markupsafe import escape
 from markupsafe import Markup
+
 from onegov.core import log
 from onegov.core.custom import json
 from onegov.core.errors import AlreadyLockedError
-from phonenumbers import (PhoneNumberFormat, format_number,
-                          NumberParseException, parse)
+from phonenumbers import (
+    PhoneNumberFormat,
+    format_number as format_phone_number,
+    NumberParseException,
+    parse,
+)
 from purl import URL
 from threading import Thread
 from time import perf_counter
@@ -42,13 +52,17 @@ from uuid import UUID, uuid4
 from webob import static
 from yubico_client import Yubico  # type:ignore[import-untyped]
 from yubico_client.yubico_exceptions import (  # type:ignore[import-untyped]
-    SignatureVerificationError, StatusCodeError)
-
+    SignatureVerificationError,
+    StatusCodeError,
+)
 
 from typing import overload, Any, TypeVar, TYPE_CHECKING
+
 if TYPE_CHECKING:
     from _typeshed import SupportsRichComparison
     from collections.abc import Callable, Collection, Iterator
+    from datetime import datetime, date
+    from decimal import Decimal
     from fs.base import FS, SubFS
     from re import Match
     from sqlalchemy import Column
@@ -1250,11 +1264,9 @@ def generate_fts_phonenumbers(numbers: Iterable[str | None]) -> list[str]:
             result.append(number.replace(' ', ''))
             continue
 
-        result.append(format_number(
-            parsed, PhoneNumberFormat.E164))
+        result.append(format_phone_number(parsed, PhoneNumberFormat.E164))
 
-        national = format_number(
-            parsed, PhoneNumberFormat.NATIONAL)
+        national = format_phone_number(parsed, PhoneNumberFormat.NATIONAL)
         groups = national.split()
         for idx in range(len(groups)):
             partial = ''.join(groups[idx:])
@@ -1262,3 +1274,84 @@ def generate_fts_phonenumbers(numbers: Iterable[str | None]) -> list[str]:
                 result.append(partial)
 
     return result
+
+
+def format_date(
+    dt: datetime | date | None,
+    format: str,
+    locale: str | None = None,
+    timezone: pytz.BaseTzInfo | None = None,
+) -> str:
+    """Takes a datetime and formats it according to locale, timezone and
+    the given format.
+
+    """
+    if dt is None:
+        return ''
+
+    locale = locale or 'de_CH'
+    timezone = timezone or pytz.timezone('Europe/Zurich')
+
+    if getattr(dt, 'tzinfo', None) is not None:
+        dt = timezone.normalize(
+            dt.astimezone(timezone)  # type:ignore[attr-defined]
+        )
+
+    if format == 'relative':
+        adt = arrow.get(dt)
+
+        try:
+            return adt.humanize(locale=locale)
+        except ValueError:
+            return adt.humanize(locale=locale.split('_')[0])
+
+    if format.startswith('skeleton:'):
+        return babel.dates.format_skeleton(
+            format.replace('skeleton:', ''),
+            datetime=dt,
+            fuzzy=False,
+            locale=locale,
+        )
+    elif hasattr(dt, 'hour'):
+        return babel.dates.format_datetime(dt, format=format, locale=locale)
+    else:
+        return babel.dates.format_date(dt, format=format, locale=locale)
+
+
+def format_number(
+    number: numbers.Number | Decimal | float | str | None,
+    decimal_places: int | None = None,
+    padding: str = '',
+    locale: str | None = 'de_CH',
+) -> str:
+    """Takes the given numer and formats it according to locale.
+
+    If the number is an integer, the default decimal places are 0,
+    otherwise 2.
+
+    """
+    if isinstance(number, str):
+        return number
+
+    if number is None:
+        return ''
+
+    if decimal_places is None:
+        if isinstance(number, numbers.Integral):
+            decimal_places = 0
+        else:
+            decimal_places = 2
+
+    decimal, group = number_symbols(locale)
+    result = '{{:{},.{}f}}'.format(padding, decimal_places).format(number)
+    return result.translate({ord(','): group, ord('.'): decimal})
+
+
+@lru_cache(maxsize=8)
+def number_symbols(locale: str) -> tuple[str, str]:
+    """Returns the locale specific number symbols."""
+
+    return (
+        babel.numbers.get_decimal_symbol(locale),
+        babel.numbers.get_group_symbol(locale),
+    )
