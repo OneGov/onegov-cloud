@@ -1172,7 +1172,7 @@ class OrgTicketSettingsForm(Form):
                 if 'Price' in meta or 'Preis' in meta:
                     price = meta.get('Price', meta.get('Preis'))
                     try:
-                        assert Decimal(price) >= Decimal('0')
+                        assert price and Decimal(price) >= Decimal('0')
                     except Exception:
                         self.ticket_tags.errors.append(_(
                             'Invalid price, needs to be a non-negative number.'

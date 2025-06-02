@@ -95,7 +95,7 @@ class BookingCollection(GenericCollection[Booking]):
 
         return self.count(
             usernames=(username, ),
-            periods=periods.subquery(),  # type:ignore[arg-type]
+            periods=periods.subquery(),
             states=states
         )
 

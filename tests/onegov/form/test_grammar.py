@@ -339,6 +339,15 @@ def test_prices():
     assert f.pricing.credit_card_payment
     assert not f.dicount
 
+    f = field.parseString("(x) Mail delivery (Local) (5 CHF!)")
+    assert f.type == 'radio'
+    assert f.label == 'Mail delivery (Local)'
+    assert f.checked
+    assert f.pricing.amount == Decimal('5.00')
+    assert f.pricing.currency == 'CHF'
+    assert f.pricing.credit_card_payment
+    assert not f.dicount
+
     field = checkbox()
 
     f = field.parseString("[x] Extra Luggage (150.50 USD)")
@@ -362,6 +371,15 @@ def test_prices():
     f = field.parseString("[ ] Discount (-5.00 USD)")
     assert f.type == 'checkbox'
     assert f.label == 'Discount'
+    assert not f.checked
+    assert f.pricing.amount == Decimal('-5.00')
+    assert f.pricing.currency == 'USD'
+    assert not f.pricing.credit_card_payment
+    assert not f.dicount
+
+    f = field.parseString("[ ] Discount (For Kids) (-5.00 USD)")
+    assert f.type == 'checkbox'
+    assert f.label == 'Discount (For Kids)'
     assert not f.checked
     assert f.pricing.amount == Decimal('-5.00')
     assert f.pricing.currency == 'USD'
@@ -422,6 +440,13 @@ def test_discount():
     assert f.discount.amount == Decimal('33.3')
     assert not f.pricing
 
+    f = field.parseString("(x) Mail delivery (Local) (33.3 %)")
+    assert f.type == 'radio'
+    assert f.label == 'Mail delivery (Local)'
+    assert f.checked
+    assert f.discount.amount == Decimal('33.3')
+    assert not f.pricing
+
     field = checkbox()
 
     f = field.parseString("[x] Extra Luggage (99.15%)")
@@ -443,6 +468,20 @@ def test_discount():
     assert f.label == 'Discount'
     assert not f.checked
     assert f.discount.amount == Decimal('50')
+    assert not f.pricing
+
+    f = field.parseString("[ ] Discount (For Kids) (50%)")
+    assert f.type == 'checkbox'
+    assert f.label == 'Discount (For Kids)'
+    assert not f.checked
+    assert f.discount.amount == Decimal('50')
+    assert not f.pricing
+
+    f = field.parseString("[ ] Discount (50%) (For Kids)")
+    assert f.type == 'checkbox'
+    assert f.label == 'Discount (50%) (For Kids)'
+    assert not f.checked
+    assert not f.discount
     assert not f.pricing
 
 

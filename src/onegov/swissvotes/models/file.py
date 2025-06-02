@@ -73,7 +73,7 @@ class FileSubCollection:
 
         if instance:
             return sorted((
-                file for file in instance.files
+                file for file in instance.files  # type: ignore[attr-defined]
                 if file.name.startswith(self.name)
             ), key=attrgetter('name'))
         return []
@@ -126,7 +126,8 @@ class LocalizedFile:
 
         if instance:
             name = self.__get_localized_name__(instance, locale)
-            for file in instance.files:
+            file: FileT
+            for file in instance.files:  # type: ignore[attr-defined]
                 if file.name == name:
                     return file
         return None

@@ -2,7 +2,11 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: \n"
+<<<<<<< HEAD
 "POT-Creation-Date: 2025-05-28 01:50+0200\n"
+=======
+"POT-Creation-Date: 2025-05-27 16:02+0200\n"
+>>>>>>> 0c095066acb4cdcf281e55af48bfbeaff0bccd6f
 "PO-Revision-Date: 2022-03-15 10:52+0100\n"
 "Last-Translator: \n"
 "Language-Team: \n"
@@ -1462,6 +1466,19 @@ msgstr "Prezzo per elemento"
 
 msgid "Price per hour"
 msgstr "Tariffa oraria"
+
+msgid "Prices in extra fields are"
+msgstr "I prezzi nei campi extra sono"
+
+msgid ""
+"If no extra fields are defined or none of the extra fields contain pricing "
+"information, then this setting has no effect."
+msgstr ""
+"Se non sono stati definiti campi extra o se nessuno dei campi extra contiene "
+"informazioni sui prezzi, questa impostazione non ha alcun effetto."
+
+msgid "One-off"
+msgstr "Una tantum"
 
 msgid ""
 "Failed to retrieve the doors from the dormakaba API please make sure your "

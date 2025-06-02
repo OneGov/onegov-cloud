@@ -2,7 +2,11 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE 1.0\n"
+<<<<<<< HEAD
 "POT-Creation-Date: 2025-05-28 01:50+0200\n"
+=======
+"POT-Creation-Date: 2025-05-27 16:02+0200\n"
+>>>>>>> 0c095066acb4cdcf281e55af48bfbeaff0bccd6f
 "PO-Revision-Date: 2022-03-15 10:50+0100\n"
 "Last-Translator: Marc Sommerhalder <marc.sommerhalder@seantis.ch>\n"
 "Language-Team: French\n"
@@ -1460,6 +1464,20 @@ msgstr "Prix par article"
 
 msgid "Price per hour"
 msgstr "Prix par heure"
+
+msgid "Prices in extra fields are"
+msgstr "Les prix indiqués dans les champs supplémentaires sont"
+
+msgid ""
+"If no extra fields are defined or none of the extra fields contain pricing "
+"information, then this setting has no effect."
+msgstr ""
+"Si aucun champ supplémentaire n'est défini ou si aucun des champs "
+"supplémentaires ne contient d'informations sur les prix, ce paramètre n'a "
+"aucun effet."
+
+msgid "One-off"
+msgstr "Unique"
 
 msgid ""
 "Failed to retrieve the doors from the dormakaba API please make sure your "

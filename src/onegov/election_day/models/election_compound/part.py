@@ -89,11 +89,11 @@ class ElectionCompoundPart(
     #       yet using a Protocol, once we can do that, this should become
     #       cleaner
     date: inherited_attribute[datetime.date] = (
-        inherited_attribute['datetime.date']())  # type:ignore[assignment]
+        inherited_attribute['datetime.date']())
     completes_manually: inherited_attribute[bool] = (
-        inherited_attribute[bool]())  # type:ignore[assignment]
+        inherited_attribute[bool]())
     manually_completed: inherited_attribute[bool] = (
-        inherited_attribute[bool]())  # type:ignore[assignment]
+        inherited_attribute[bool]())
     pukelsheim = inherited_attribute[bool]()
     last_result_change = inherited_attribute['datetime.datetime | None']()
     last_change = inherited_attribute['datetime.datetime | None']()

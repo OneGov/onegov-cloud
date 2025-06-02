@@ -46,7 +46,7 @@ class CoordinatesField(StringField):
     """
 
     data: AnyCoordinates  # type:ignore[assignment]
-    widget: _Widget[Self] = CoordinatesWidget()  # type:ignore[assignment]
+    widget: _Widget[Self] = CoordinatesWidget()
 
     def __init__(
         self,

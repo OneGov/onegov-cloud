@@ -1,6 +1,5 @@
 from collections.abc import Callable, Iterator, Sequence
 from typing import Any, TypeVar
-from typing_extensions import Self
 
 from reg.dispatch import _KeyLookup
 
@@ -14,14 +13,14 @@ class Cache(dict[_KT, _VT]):
 
 class DictCachingKeyLookup(_KeyLookup):
     key_lookup: _KeyLookup
-    component: Callable[[Self, Sequence[Any]], Callable[..., Any] | None]
-    fallback: Callable[[Self, Sequence[Any]], Callable[..., Any] | None]
-    all: Callable[[Self, Sequence[Any]], Iterator[Callable[..., Any]]]
+    component: Callable[[Sequence[Any]], Callable[..., Any] | None]
+    fallback: Callable[[Sequence[Any]], Callable[..., Any] | None]
+    all: Callable[[Sequence[Any]], Iterator[Callable[..., Any]]]
     def __init__(self, key_lookup: _KeyLookup) -> None: ...
 
 class LruCachingKeyLookup(_KeyLookup):
     key_lookup: _KeyLookup
-    component: Callable[[Self, Sequence[Any]], Callable[..., Any] | None]
-    fallback: Callable[[Self, Sequence[Any]], Callable[..., Any] | None]
-    all: Callable[[Self, Sequence[Any]], Iterator[Callable[..., Any]]]
+    component: Callable[[Sequence[Any]], Callable[..., Any] | None]
+    fallback: Callable[[Sequence[Any]], Callable[..., Any] | None]
+    all: Callable[[Sequence[Any]], Iterator[Callable[..., Any]]]
     def __init__(self, key_lookup: _KeyLookup, component_cache_size: int, all_cache_size: int, fallback_cache_size: int) -> None: ...
