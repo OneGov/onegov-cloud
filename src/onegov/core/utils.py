@@ -29,16 +29,11 @@ from io import BytesIO, StringIO
 from itertools import groupby, islice
 from markupsafe import escape
 from markupsafe import Markup
-
 from onegov.core import log
 from onegov.core.custom import json
 from onegov.core.errors import AlreadyLockedError
-from phonenumbers import (
-    PhoneNumberFormat,
-    format_number as format_phone_number,
-    NumberParseException,
-    parse,
-)
+from phonenumbers import (PhoneNumberFormat, format_number,
+                          NumberParseException, parse)
 from purl import URL
 from threading import Thread
 from time import perf_counter
@@ -49,8 +44,8 @@ from yubico_client import Yubico  # type:ignore[import-untyped]
 from yubico_client.yubico_exceptions import (  # type:ignore[import-untyped]
     SignatureVerificationError, StatusCodeError)
 
-from typing import overload, Any, TypeVar, TYPE_CHECKING
 
+from typing import overload, Any, TypeVar, TYPE_CHECKING
 if TYPE_CHECKING:
     from _typeshed import SupportsRichComparison
     from collections.abc import Callable, Collection, Iterator
@@ -1255,10 +1250,10 @@ def generate_fts_phonenumbers(numbers: Iterable[str | None]) -> list[str]:
             result.append(number.replace(' ', ''))
             continue
 
-        result.append(format_phone_number(
+        result.append(format_number(
             parsed, PhoneNumberFormat.E164))
 
-        national = format_phone_number(
+        national = format_number(
             parsed, PhoneNumberFormat.NATIONAL)
         groups = national.split()
         for idx in range(len(groups)):
