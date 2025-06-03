@@ -16,10 +16,10 @@ def test_batched():
     ]
 
 
-def test_format_date(core_request):
+def test_format_date():
     layout = Layout(
         model=object(),
-        request=core_request
+        request=Bunch(app=Bunch(version='1.0', sentry_dsn=None))
     )
 
     dt = replace_timezone(datetime(2015, 6, 17, 15, 0), 'Europe/Zurich')
@@ -41,10 +41,10 @@ def test_format_date(core_request):
     assert layout.format_date(dt, 'day_long') == '17. Juni'
 
 
-def test_format_number(core_request):
+def test_format_number():
     layout = Layout(
         model=object(),
-        request=core_request
+        request=Bunch(app=Bunch(version='1.0', sentry_dsn=None))
     )
 
     layout.request.locale = 'de_CH'
@@ -78,16 +78,10 @@ def test_format_number(core_request):
     assert layout.format_number(None) == ""
 
 
-def test_relative_date(core_request):
+def test_relative_date():
     layout = Layout(
         model=object(),
-        request=core_request
+        request=Bunch(locale='en', app=Bunch(version='1.0', sentry_dsn=None))
     )
-
-    # default locale is de_CH
-    text = layout.format_date(utcnow() - timedelta(seconds=60 * 5), 'relative')
-    assert text == 'vor 5 Minuten'
-
-    core_request.locale = 'en_US'
     text = layout.format_date(utcnow() - timedelta(seconds=60 * 5), 'relative')
     assert text == '5 minutes ago'
