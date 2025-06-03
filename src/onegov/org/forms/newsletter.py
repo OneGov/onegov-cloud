@@ -5,7 +5,6 @@ from datetime import timedelta
 import transaction
 from wtforms.validators import DataRequired
 from onegov.core.csv import convert_excel_to_csv, CSVFile
-from onegov.core.utils import format_date
 from onegov.form.fields import UploadField
 from onegov.org.forms.fields import HtmlField
 from onegov.org.utils import extract_categories_and_subcategories
@@ -92,7 +91,7 @@ class NewsletterForm(Form):
                     '<div class="date">{}</div>'
                 ).format(
                     item.title,
-                    format_date(item.created, 'relative', request.locale),
+                    request.format_date(item.created, 'relative'),
                 )
             )
             for item in news
@@ -152,11 +151,8 @@ class NewsletterForm(Form):
                     '<div class="date">{}</div>'
                 ).format(
                     item.title,
-                    format_date(
-                        item.localized_start,
-                        'dd.MM.yyyy HH:mm',
-                        request.locale
-                    )
+                    request.format_date(
+                        item.localized_start, 'dd.MM.yyyy HH:mm')
                 )
             )
             for item in occurrences
@@ -205,7 +201,7 @@ class NewsletterForm(Form):
                     '<div class="date">{}</div>'
                 ).format(
                     name_without_extension(item.name),
-                    format_date(item.created, 'dd.MM.yyyy', request.locale)
+                    request.format_date(item.created, 'dd.MM.yyyy')
                 )
             )
             for item in publications

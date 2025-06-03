@@ -7,10 +7,8 @@ import sedate
 
 from datetime import datetime
 from functools import cached_property
-from functools import lru_cache
 from onegov.core import utils
 from onegov.core.templates import PageTemplate
-from onegov.core.utils import format_date, format_number, number_symbols
 from pytz import timezone
 
 from typing import overload, Any, TypeVar, TYPE_CHECKING
@@ -154,7 +152,7 @@ class Layout:
 
     def format_date(self, dt: datetime | date | None, format: str) -> str:
         fmt = getattr(self, f'{format}_format', format)
-        return format_date(dt, fmt, self.request.locale, self.timezone)
+        return self.request.format_date(dt, fmt)
 
     def isodate(self, date: datetime) -> str:
         """ Returns the given date in the ISO 8601 format. """
@@ -164,19 +162,13 @@ class Layout:
         """ Returns the given ISO 8601 string as datetime. """
         return isodate.parse_datetime(string)
 
-    @staticmethod
-    @lru_cache(maxsize=8)
-    def number_symbols(locale: str) -> tuple[str, str]:
-        return number_symbols(locale)
-
     def format_number(
         self,
         number: numbers.Number | Decimal | float | str | None,
         decimal_places: int | None = None,
         padding: str = ''
     ) -> str:
-        return format_number(
-            number, decimal_places, padding, self.request.locale)
+        return self.request.format_number(number, decimal_places, padding)
 
     @property
     def view_name(self) -> str | None:
