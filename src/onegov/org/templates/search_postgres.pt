@@ -17,7 +17,7 @@
                         <label>${searchlabel}</label>
                         <div class="columns small-11">
                             <label for="search" class="show-for-sr" i18n:translate>Search</label>
-                            <input id="search" data-typeahead-subject type="text" name="q" value="${model.query}" autocomplete="off" autocorrect="off" required autofocus onfocus="this.select()"/> <button type="reset" class="reset-button" tabindex="-1"></button>
+                            <input id="search" data-typeahead-subject type="text" name="q" value="${model .query}" autocomplete="off" autocorrect="off" required autofocus onfocus="this.select()"/> <button type="reset" class="reset-button" tabindex="-1"></button>
                         </div>
                         <div class="columns small-1">
                             <button type="submit" class="button postfix" aria-label="Search" i18n:attributes="aria-label">
@@ -26,8 +26,8 @@
                         </div>
                     </div>
                     <div class="row typeahead">
-                      <div class="columns small-12" data-typeahead-container>
-                      </div>
+                        <div class="columns small-12" data-typeahead-container>
+                        </div>
                     </div>
                 </form>
             </div>
@@ -37,7 +37,7 @@
             <h2 i18n:translate>${resultslabel}</h2>
             <div class="row">
                 <div class="columns medium-8 small-12">
-                    <p tal:condition="not: model.batch.hits.total" i18n:translate="">Your search returned no results.</p>
+                    <p tal:condition="not: model.batch" i18n:translate="">Your search returned no results.</p>
 
                     <ul class="search-results">
                         <tal:b repeat="result model.load_batch_results">
@@ -52,7 +52,7 @@
                                         <li>Score: ${result.explanation['score']}</li>
                                         <tal:b repeat="(title, key) [('TF', 'term-frequency'), ('IDF', 'inverse-document-frequency'), ('Field Norm', 'field-norm')]">
                                             <li title="${result.explanation[key]['description']}" tal:condition="result.explanation[key]">
-                                                ${title}: ${result.explanation[key]['value']}
+                                            ${title}: ${result.explanation[key]['value']}
                                             </li>
                                         </tal:b>
                                     </ul>
@@ -63,7 +63,7 @@
 
                     <div class="pagination-centered">
                         <div metal:use-macro="layout.macros['pagination']" tal:define="
-                        collection model; current_page model;" />
+                                collection model; current_page model;" />
                     </div>
                 </div>
             </div>
