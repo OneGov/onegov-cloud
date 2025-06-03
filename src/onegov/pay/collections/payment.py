@@ -36,13 +36,17 @@ class PaymentCollection(GenericCollection[Payment], Pagination[Payment]):
         source: str = '*',
         page: int = 0,
         start: datetime | None = None,
-        end: datetime | None = None
+        end: datetime | None = None,
+        status: str | None = None,
+        payment_type: str | None = None
     ):
         GenericCollection.__init__(self, session)
         Pagination.__init__(self, page)
         self.source = source
         self.start = start
         self.end = end
+        self.status = status
+        self.payment_type = payment_type
 
     @property
     def model_class(self) -> type[Payment]:
@@ -86,6 +90,8 @@ class PaymentCollection(GenericCollection[Payment], Pagination[Payment]):
             and self.page == other.page
             and self.start == other.start
             and self.end == other.end
+            and self.status == other.status
+            and self.payment_type == other.payment_type
         )
 
     def subset(self) -> Query[Payment]:
@@ -97,6 +103,12 @@ class PaymentCollection(GenericCollection[Payment], Pagination[Payment]):
         if self.end:
             q = q.filter(Payment.created <= self.end)
 
+        if self.status:
+            q = q.filter(Payment.state == self.status)
+
+        if self.payment_type and self.payment_type != '*':
+            q = q.filter(Payment.source == self.payment_type)
+
         q = q.options(joinedload(Payment.provider))  # type:ignore[misc]
         q = q.options(undefer(Payment.created))
         return q
@@ -106,7 +118,15 @@ class PaymentCollection(GenericCollection[Payment], Pagination[Payment]):
         return self.page
 
     def page_by_index(self, index: int) -> Self:
-        return self.__class__(self.session, self.source, index)
+        return self.__class__(
+            self.session,
+            self.source,
+            index,
+            self.start,
+            self.end,
+            self.status,
+            self.payment_type
+        )
 
     def payment_links_for(
         self,
