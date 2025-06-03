@@ -602,7 +602,12 @@ class EventCollection(Pagination[Event]):
             event_image, event_image_name = get_event_image(event)
 
             ticket_price = find_element_text(event, 'ticketPrice')
-            event_url = find_element_text(event, 'originalEventUrl') or None
+            event_url = find_element_text(event, 'originalEventUrl') or ''
+
+            provider_url = ''
+            provider_ref = event.find('ns:providerReference', namespaces=ns)
+            if provider_ref:
+                provider_url = find_element_text(provider_ref, 'url')
 
             tags = []
             if event.find('ns:tags', namespaces=ns) is not None:
@@ -675,7 +680,7 @@ class EventCollection(Pagination[Event]):
                             location=location,
                             coordinates=coordinates,
                             price=ticket_price,
-                            external_event_url=event_url,
+                            external_event_url=event_url or provider_url,
                             tags=tags,
                             filter_keywords=None,
                             source=schedule_id,
