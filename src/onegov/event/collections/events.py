@@ -606,7 +606,7 @@ class EventCollection(Pagination[Event]):
 
             provider_url = ''
             provider_ref = event.find('ns:providerReference', namespaces=ns)
-            if provider_ref:
+            if provider_ref is not None:
                 provider_url = find_element_text(provider_ref, 'url')
 
             tags = []
