@@ -2,7 +2,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: \n"
-"POT-Creation-Date: 2025-05-27 16:02+0200\n"
+"POT-Creation-Date: 2025-06-04 16:17+0200\n"
 "PO-Revision-Date: 2022-03-15 10:52+0100\n"
 "Last-Translator: \n"
 "Language-Team: \n"
@@ -2124,9 +2124,20 @@ msgid ""
 msgstr ""
 "Formato non valido. Definire i tag e i loro meta-dati secondo l'esempio."
 
-msgid "Invalid price, needs to be a non-negative number."
-msgstr "Prezzo non valido, deve essere un numero non negativo."
+#, python-format
+msgid "Invalid price \"${price}\", needs to be a non-negative number."
+msgstr "Prezzo non valido \"${price}\", deve essere un numero non negativo."
 
+#, python-format
+msgid ""
+"Invalid color \"${color}\", needs to be a 3 or 6 digit hex code, e.g. "
+"\"ff9000\" for orange. If you use a \"#\" prefix, make sure to enclose the "
+"value in quotation marks."
+msgstr ""
+"Colore non valido \"{color}\", deve essere un codice esadecimale di 3 o 6 "
+"cifre, ad esempio \"ff9000\" per l'arancione. Se si usa il prefisso "
+
+# ", assicurarsi di racchiudere il valore tra virgolette."
 msgid "Enable newsletter"
 msgstr "Attiva la newsletter"
 
@@ -5006,15 +5017,6 @@ msgstr ""
 "disponibilità. Per ricreare queste allocazioni, fare clic su \"modifica\" "
 "nel periodo di disponibilità e quindi \"salva\" senza modificare nulla."
 
-msgid "Reservation is pending approval"
-msgstr "La prenotazione è in attesa di approvazione"
-
-msgid "(${num_pending} pending approval)"
-msgstr "(${num_pending} in attesa di approvazione)"
-
-msgid "Utilised"
-msgstr "Utilizzato"
-
 msgid "No recipients defined yet."
 msgstr "Nessun destinatario ancora definito."
 
@@ -5319,6 +5321,9 @@ msgid ""
 msgstr ""
 "Per eliminare questa allocazione, è necessario prima annullare tutte le "
 "prenotazioni esistenti."
+
+msgid "Pending approval"
+msgstr "In attesa di approvazione"
 
 msgid "A conflicting allocation exists for the requested time period."
 msgstr "Esiste un'allocazione in conflitto per il periodo di tempo richiesto."
@@ -6453,6 +6458,9 @@ msgstr ""
 
 msgid "Reject all reservations with message"
 msgstr "Rifiuta tutte le prenotazioni con messaggio"
+
+msgid "Reservation not adjustable"
+msgstr "Prenotazione non regolabile"
 
 msgid "Adjust reservation"
 msgstr "Regolare la prenotazione"

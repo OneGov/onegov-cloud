@@ -2,7 +2,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE 1.0\n"
-"POT-Creation-Date: 2025-05-27 16:02+0200\n"
+"POT-Creation-Date: 2025-06-04 16:17+0200\n"
 "PO-Revision-Date: 2022-03-15 10:21+0100\n"
 "Last-Translator: Marc Sommerhalder <marc.sommerhalder@seantis.ch>\n"
 "Language-Team: German\n"
@@ -2093,10 +2093,12 @@ msgstr ""
 "    E-Mail: fc@govikon.ch\n"
 "    PLZ / Ort: 1234 Govikon\n"
 "    Kaba Code: 123456\n"
+"    Color: '#ff0000'\n"
 "- HC Govikon:\n"
 "    E-Mail: hc@govikon.ch\n"
 "    PLZ / Ort: 1234 Govikon\n"
 "    Kaba Code: 654321\n"
+"    Color: '#00ff00'\n"
 "```"
 
 msgid "Categories restricted by user group settings"
@@ -2114,8 +2116,19 @@ msgstr ""
 "Ungültiges Format. Bitte definieren Sie die Schlagworte und Metadaten "
 "entsprechend dem gegebenen Beispiel."
 
-msgid "Invalid price, needs to be a non-negative number."
-msgstr "Ungültiger Preis, muss eine nicht-negative Zahl sein."
+#, python-format
+msgid "Invalid price \"${price}\", needs to be a non-negative number."
+msgstr "Ungültiger Preis \"${price}\", muss eine nicht-negative Zahl sein."
+
+#, python-format
+msgid ""
+"Invalid color \"${color}\", needs to be a 3 or 6 digit hex code, e.g. "
+"\"ff9000\" for orange. If you use a \"#\" prefix, make sure to enclose the "
+"value in quotation marks."
+msgstr ""
+"Ungültige Farbe \"${color}\", es muss eine 3- bis 6-stellige hexadezimal "
+"Zahl sein, z.B. \"ff9000\" für Orange. Wenn Sie \"#\" als Präfix verwenden, "
+"stellen Sie sicher, den Wert in Anführungszeichen einzuschliessen."
 
 msgid "Enable newsletter"
 msgstr "Newsletter aktivieren"
@@ -5006,15 +5019,6 @@ msgstr ""
 "erstellen, klicken Sie auf \"Bearbeiten\" in der Verfügbarkeitszeitraum und "
 "danach auf \"Speichern\" ohne etwas zu ändern."
 
-msgid "Reservation is pending approval"
-msgstr "Diese Reservation wurde noch nicht akzeptiert"
-
-msgid "(${num_pending} pending approval)"
-msgstr "(${num_pending} noch nicht akzeptiert)"
-
-msgid "Utilised"
-msgstr "Ausgelastet"
-
 msgid "No recipients defined yet."
 msgstr "Es wurden noch keine Empfänger definiert."
 
@@ -5316,6 +5320,9 @@ msgid ""
 msgstr ""
 "Um die Verfügbarkeit zu löschen, müssen zuerst alle bestehenden "
 "Reservationen abgesagt werden."
+
+msgid "Pending approval"
+msgstr "Noch nicht akzeptiert"
 
 msgid "A conflicting allocation exists for the requested time period."
 msgstr "Es besteht bereits eine Verfügbarkeit im gewünschten Zeitraum."
@@ -6454,6 +6461,9 @@ msgstr ""
 
 msgid "Reject all reservations with message"
 msgstr "Alle Reservationen absagen mit Kommentar"
+
+msgid "Reservation not adjustable"
+msgstr "Diese Reservation ist nicht anpassbar"
 
 msgid "Adjust reservation"
 msgstr "Reservation Anpassen"
