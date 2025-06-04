@@ -2,11 +2,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE 1.0\n"
-<<<<<<< HEAD
 "POT-Creation-Date: 2025-05-28 01:50+0200\n"
-=======
-"POT-Creation-Date: 2025-05-27 16:02+0200\n"
->>>>>>> 0c095066acb4cdcf281e55af48bfbeaff0bccd6f
 "PO-Revision-Date: 2022-03-15 10:21+0100\n"
 "Last-Translator: Marc Sommerhalder <marc.sommerhalder@seantis.ch>\n"
 "Language-Team: German\n"
