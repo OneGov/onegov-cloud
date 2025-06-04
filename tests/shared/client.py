@@ -118,12 +118,21 @@ class Client(TestApp):
 
 class GenericResponseExtension:
 
-    def select_checkbox(self, groupname, label, form=None, checked=True):
+    def select_checkbox(
+        self,
+        groupname,
+        label,
+        form=None,
+        checked=True,
+        limit=None
+    ):
         """ Selects one of many checkboxes by fuzzy searching the label next to
         it. Webtest is not good enough in this regard.
 
         Selects the checkbox from the form returned by page.form, or the given
         form if passed. In any case, the form needs to be part of the page.
+
+        A limit can be set to restrict the number of checkboxes to select.
 
         """
 
@@ -133,10 +142,14 @@ class GenericResponseExtension:
             raise KeyError(f"No input named {groupname} found")
 
         form = form or self.form
+        count = 0
 
         for ix, el in enumerate(elements):
             if label in el.label.text_content():
                 form.get(groupname, index=ix).value = checked
+                count += 1
+                if limit is not None and count >= limit:
+                    break
 
     def select_radio(self, groupname, label, form=None):
         """ Like `select_checkbox`, but with the ability to select a radio
