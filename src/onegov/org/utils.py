@@ -684,9 +684,7 @@ class AvailabilityEventInfo:
 
 
 @lru_cache(maxsize=64)
-def event_color(event_name: str | None) -> str | None:
-    if not event_name:
-        return None
+def event_color(event_name: str) -> str:
     # NOTE: We use sha256 for stability, we could also
     #       use a different stable hash, but we can't use
     #       the builtin Python hash, since it changes with
@@ -804,7 +802,7 @@ class ReservationEventInfo:
     @property
     def color(self) -> str | None:
         tag = self.ticket.tag
-        if tag is None:
+        if not tag:
             return None
 
         for tag_config in self.request.app.org.ticket_tags or ():
