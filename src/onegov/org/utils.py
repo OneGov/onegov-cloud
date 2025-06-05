@@ -678,6 +678,7 @@ class AvailabilityEventInfo:
             'id': self.allocation.id,
             'start': self.event_start,
             'end': self.event_end,
+            'editable': False,
             'rendering': 'background',
         }
 
@@ -830,12 +831,13 @@ class ReservationEventInfo:
             'wholeDay': self.whole_day,
             'quota': self.reservation.quota,
             'className': ' '.join(self.event_classes),
+            'url': self.request.link(self.ticket),
+            'editable': self.reservation.display_start() > sedate.utcnow(),
             'editurl': self.request.csrf_protected_url(self.request.link(
                 self.ticket,
                 name='adjust-reservation',
                 query_params={'reservation-id': str(self.reservation.id)}
             )),
-            'url': self.request.link(self.ticket)
         }
 
 

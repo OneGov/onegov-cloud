@@ -838,19 +838,22 @@ def accept_reservation(
             ticket.handler.refresh()
         else:
             code = None
+            lead_delta = timedelta(minutes=0)
 
         savepoint = transaction.savepoint()
 
+        now = sedate.utcnow()
         for reservation in reservations:
             data = reservation.data
             if data is None:
                 data = reservation.data = {}
             data['accepted'] = True
 
-            if client is not None:
+            # NOTE: We can only create future visits
+            start = reservation.display_start() - lead_delta
+            if client is not None and start > now:
                 assert code is not None
                 try:
-                    start = reservation.display_start() - lead_delta
                     end = reservation.display_end() + lag_delta
                     visit_id = client.create_visit(
                         code=code,
@@ -1373,7 +1376,7 @@ def adjust_reservation(
             .filter(Allocation.partly_available.is_(True))
             .exists()
         ).scalar()
-    ):
+    ) or reservation.display_start() < sedate.utcnow():
         if request.headers.get('X-IC-Request'):
             error = request.translate(_('Reservation not adjustable'))
             ic_data = {'message': error, 'success': False}
@@ -1628,11 +1631,14 @@ def edit_kaba(
 
     components = resource.kaba_components  # type: ignore[attr-defined]
 
+    old_lead_delta = timedelta(
+        minutes=ticket.handler.data.get('key_code_lead_time', 30)
+    )
     now = sedate.utcnow()
     future_reservations = [
         reservation
         for reservation in ticket.handler.reservations
-        if reservation.display_end() > now
+        if reservation.display_start() - old_lead_delta > now
     ]
 
     # if we don't have any future or ongoing reservations then
@@ -1682,11 +1688,11 @@ def edit_kaba(
             if not data.get('accepted'):
                 continue
 
-            kaba = data.get('kaba')
+            kaba = data.get('kaba') or {}
             try:
                 # if there is an old visit, revoke it
-                if kaba:
-                    client.revoke_visit(kaba['visit_id'])
+                if old_visit_id := kaba.get('visit_id'):
+                    client.revoke_visit(old_visit_id)
 
                 code = ticket.handler.data['key_code']
                 lead_delta = timedelta(
@@ -1695,11 +1701,12 @@ def edit_kaba(
                 lag_delta = timedelta(
                     minutes=ticket.handler.data['key_code_lag_time']
                 )
+                start = reservation.display_start() - lead_delta
                 visit_id = client.create_visit(
                     code=code,
                     name=ticket.number,
                     message='Managed through OneGov Cloud',
-                    start=reservation.display_start() - lead_delta,
+                    start=start,
                     end=reservation.display_end() + lag_delta,
                     components=components,
                 )

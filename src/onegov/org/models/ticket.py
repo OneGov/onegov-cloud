@@ -606,12 +606,16 @@ class ReservationHandler(Handler):
         ))
 
         # is the reservation adjustable?
-        if reservation.target_type == 'allocation' and request.session.query(
-            reservation
-            ._target_allocations()
-            .filter(Allocation.partly_available.is_(True))
-            .exists()
-        ).scalar():
+        if (
+            reservation.display_start() > utcnow()
+            and reservation.target_type == 'allocation'
+            and request.session.query(
+                reservation
+                ._target_allocations()
+                .filter(Allocation.partly_available.is_(True))
+                .exists()
+            ).scalar()
+        ):
             url_obj = URL(request.link(self.ticket, 'adjust-reservation'))
             url_obj = url_obj.query_param(
                 'reservation-id', str(reservation.id))
@@ -669,7 +673,7 @@ class ReservationHandler(Handler):
         if getattr(self.resource, 'kaba_components', None) and any(
             True
             for reservation in self.reservations
-            if reservation.display_end() > now
+            if reservation.display_start() > now
         ):
             advanced_links.append(
                 Link(
