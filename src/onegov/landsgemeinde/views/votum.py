@@ -6,7 +6,8 @@ from onegov.core.security import Private
 from onegov.core.templates import render_macro
 from onegov.landsgemeinde import _
 from onegov.landsgemeinde import LandsgemeindeApp
-from onegov.landsgemeinde.collections import AgendaItemCollection, VotumCollection
+from onegov.landsgemeinde.collections import (AgendaItemCollection,
+                                              VotumCollection)
 from onegov.landsgemeinde.forms import VotumForm
 from onegov.landsgemeinde.layouts import VotumCollectionLayout
 from onegov.landsgemeinde.layouts import VotumLayout

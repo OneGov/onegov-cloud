@@ -83,7 +83,7 @@
 <metal:states-list define-macro="states-list" i18n:domain="onegov.landsgemeinde">
     <div id="states-list-container">
         <ul id="states-list">
-            <li>
+            <li class="assembly">
                 <a href="${request.return_here(request.link(assembly, 'edit'))}">
                     <tal:b i18n:translate="">Assembly</tal:b>
                     <i class="fas fa-edit"></i>

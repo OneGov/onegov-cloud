@@ -159,6 +159,7 @@ class AssemblyForm(NamedFileForm):
                 raise ValidationError(_('Date already used.'))
 
     def populate_obj(self, obj: Assembly) -> None:  # type:ignore[override]
+        super().populate_obj(obj)
         if not obj.start_time and self.state.data == 'ongoing':
             tz = pytz.timezone('Europe/Zurich')
             now = datetime.now(tz=tz).time()
