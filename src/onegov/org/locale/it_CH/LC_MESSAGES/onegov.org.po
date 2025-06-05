@@ -2,7 +2,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: \n"
-"POT-Creation-Date: 2025-06-04 16:17+0200\n"
+"POT-Creation-Date: 2025-05-22 15:28+0200\n"
 "PO-Revision-Date: 2022-03-15 10:52+0100\n"
 "Last-Translator: \n"
 "Language-Team: \n"
@@ -3411,8 +3411,8 @@ msgstr "Rifiuta le prenotazioni"
 msgid "Reject all with message"
 msgstr "Rifiuta tutto con messaggio"
 
-#.
 #. Used in sentence: "${event} published."
+#.
 msgid "Event"
 msgstr "Evento"
 
@@ -3569,10 +3569,15 @@ msgstr "Una notizia non può essere incollata come argomento"
 msgid "A Topic cannot be pasted as News"
 msgstr "Un argomento non può essere incollato come notizia"
 
-msgid "Please note that this page has subpages which will also be deleted!"
+msgid ""
+"Please note that this page has the following subpages which will also be "
+"deleted:"
 msgstr ""
-"Nota che questa pagina contiene delle sottopagine che verranno anch'esse "
-"eliminate!"
+"Si noti che questa pagina ha le seguenti sottopagine che saranno anch'esse "
+"cancellate"
+
+msgid "Please scroll to the bottom to enable the confirm button."
+msgstr "Scorrere fino in fondo per abilitare il pulsante di conferma."
 
 msgid "This page can't be deleted."
 msgstr "Questa pagina non può essere eliminata."
@@ -6891,6 +6896,14 @@ msgstr "È stato creato un account per te"
 
 msgid "The user was created successfully"
 msgstr "Utente creato correttamente"
+
+#~ msgid "Please note that this page has subpages which will also be deleted!"
+#~ msgstr ""
+#~ "Nota che questa pagina contiene delle sottopagine che verranno anch'esse "
+#~ "eliminate!"
+
+#~ msgid "One of your reservations was adjusted"
+#~ msgstr "Una delle vostre prenotazioni è stata regolata"
 
 #~ msgid ""
 #~ "Select a free time span in the calendar below to create an allocation."
