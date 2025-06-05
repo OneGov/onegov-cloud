@@ -4,6 +4,7 @@ from onegov.core.security import Private
 from onegov.form import merge_forms
 from onegov.org.views.payment import view_payments, export_payments
 from onegov.town6 import TownApp
+from onegov.org.forms.payments_search_form import PaymentSearchForm
 from onegov.org.forms import DateRangeForm, ExportForm
 
 from onegov.pay import PaymentCollection
@@ -18,16 +19,19 @@ if TYPE_CHECKING:
     from webob import Response
 
 
-@TownApp.html(
+@TownApp.form(
     model=PaymentCollection,
     template='payments.pt',
+    form=PaymentSearchForm,
     permission=Private
 )
 def town_view_payments(
     self: PaymentCollection,
-    request: TownRequest
+    request: TownRequest,
+    form: PaymentSearchForm
 ) -> RenderData:
-    return view_payments(self, request, PaymentCollectionLayout(self, request))
+    return view_payments(self, request, form,
+                         PaymentCollectionLayout(self, request))
 
 
 @TownApp.form(

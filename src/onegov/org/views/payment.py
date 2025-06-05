@@ -8,6 +8,7 @@ from onegov.core.security import Private
 from onegov.form import merge_forms
 from onegov.org import OrgApp, _
 from onegov.org.forms import DateRangeForm, ExportForm
+from onegov.org.forms.payments_search_form import PaymentSearchForm
 from onegov.org.layout import PaymentCollectionLayout, DefaultLayout
 from onegov.org.mail import send_ticket_mail
 from onegov.org.models import PaymentMessage, TicketMessage
@@ -102,14 +103,16 @@ def send_ticket_notifications(
         )
 
 
-@OrgApp.html(
+@OrgApp.form(
     model=PaymentCollection,
     template='payments.pt',
+    form=PaymentSearchForm,
     permission=Private
 )
 def view_payments(
     self: PaymentCollection,
     request: OrgRequest,
+    form: PaymentSearchForm,
     layout: PaymentCollectionLayout | None = None
 ) -> RenderData:
 
@@ -124,6 +127,7 @@ def view_payments(
 
     return {
         'title': _('Receivables'),
+        'form': form,
         'layout': layout or PaymentCollectionLayout(self, request),
         'payments': self.batch,
         'get_ticket': partial(ticket_by_link, tickets),

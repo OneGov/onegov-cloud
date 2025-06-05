@@ -4,7 +4,7 @@ from onegov.pay import PaymentCollection
 
 def test_view_payments_as_admin(client) -> None:
     client.login_admin()
-    session = client.app().session
+    session = client.app.session()
     payments = PaymentCollection(session)
     payments.add(
         amount=Decimal('123.45'),

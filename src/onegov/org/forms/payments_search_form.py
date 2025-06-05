@@ -1,20 +1,21 @@
+from __future__ import annotations
+
+from wtforms import DateField
 from onegov.form.core import Form
-from onegov.form.fields import DateField, SelectField
+from onegov.form.fields import SelectField
 from onegov.org import _
 
 
-class PaymentsSearchForm(Form):
+class PaymentSearchForm(Form):
 
     start_date = DateField(
         label=_('From date'),
         fieldset=_('Filter Payments'),
-        required=False
     )
 
     end_date = DateField(
         label=_('To date'),
         fieldset=_('Filter Payments'),
-        required=False
     )
 
     status = SelectField(
@@ -27,7 +28,6 @@ class PaymentsSearchForm(Form):
             ('invoiced', _('Invoiced'))
         ],
         default='',
-        required=False
     )
 
     payment_type = SelectField(
@@ -39,6 +39,4 @@ class PaymentsSearchForm(Form):
             ('provider', _('Payment Provider'))
         ],
         default='',
-        required=False
     )
-    
