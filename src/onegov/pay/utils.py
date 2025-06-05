@@ -47,7 +47,9 @@ class Price(_PriceBase):
         return self.amount and True or False
 
     def __lt__(self, other: Price) -> bool:  # type:ignore[override]
-        assert self.currency is None or self.currency == other.currency
+        assert self.currency is None or self.currency == other.currency or (
+            other.currency is None and self.currency is not None
+        )
         return self.amount < other.amount
 
     def __add__(self, other: Price) -> Self:  # type:ignore[override]
