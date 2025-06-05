@@ -1683,21 +1683,12 @@ def test_occupancy_view(client):
 
     ticket = client.get('/tickets/ALL/open').click('Annehmen').follow()
 
-    # at this point, the reservation will show up, but it should be
-    # marked pending
     occupancy = client.get('/resource/tageskarte/occupancy?date=20150828')
-    assert len(occupancy.pyquery('.occupancy-block')) == 1
-    assert len(occupancy.pyquery('.occupancy-block .reservation-pending')) == 1
-    assert (len(occupancy.pyquery('.occupancy-block .reservation-pending '
-                                  '.approval-pending')) == 1)
-
-    # ..until we accept it
-    ticket.click('Alle Reservationen annehmen')
-    occupancy = client.get('/resource/tageskarte/occupancy?date=20150828')
-    assert len(occupancy.pyquery('.occupancy-block')) == 1
-    assert len(occupancy.pyquery('.occupancy-block .reservation-pending')) == 0
-    assert (len(occupancy.pyquery('.occupancy-block .reservation-pending '
-                                  '.approval-pending')) == 0)
+    assert occupancy.status_code == 200
+    occupancy = client.get(
+        '/resource/tageskarte/occupancy-json?start=2015-08-28&end=2015-08-29'
+    )
+    assert occupancy.status_code == 200
 
 
 def test_occupancy_view_member_access(client):
@@ -1724,6 +1715,9 @@ def test_occupancy_view_member_access(client):
     # now members should be able to access it
     client.login_member()
     occupancy = client.get('/resource/test/occupancy')
+    assert occupancy.status_code == 200
+
+    occupancy = client.get('/resource/test/occupancy-json')
     assert occupancy.status_code == 200
 
 

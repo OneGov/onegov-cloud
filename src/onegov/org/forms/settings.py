@@ -68,6 +68,7 @@ if TYPE_CHECKING:
 
 
 ERROR_LINE_RE = re.compile(r'line ([0-9]+)')
+COLOR_RE = re.compile(r'^#?(?:[0-9a-fA-F]{3}){1,2}$')
 
 
 class GeneralSettingsForm(Form):
@@ -1175,7 +1176,44 @@ class OrgTicketSettingsForm(Form):
                         assert price and Decimal(price) >= Decimal('0')
                     except Exception:
                         self.ticket_tags.errors.append(_(
-                            'Invalid price, needs to be a non-negative number.'
+                            'Invalid price "${price}", needs to be a '
+                            'non-negative number.',
+                            mapping={'price': price}
+                        ))
+                        return False
+
+                if 'Color' in meta:
+                    raw_color = meta['Color']
+                    if isinstance(raw_color, str):
+                        color = raw_color.strip()
+                    elif isinstance(raw_color, int):
+                        color = str(raw_color)
+                        # leading zeroes can be interpreted as octal
+                        # so we need to convert it back to its orginal
+                        # representation
+                        if color not in self.ticket_tags.data:
+                            color = f'{raw_color:o}'
+                        if len(color) < 6:
+                            # try to restore any leading zeroes YAML stripped
+                            for __ in range(6 - len(color)):
+                                prefixed = f'0{color}'
+                                if prefixed in self.ticket_tags.data:
+                                    color = prefixed
+                                else:
+                                    break
+                    else:
+                        color = str(raw_color).strip()
+
+                    if COLOR_RE.match(color):
+                        # Store normalized color
+                        meta['Color'] = '#' + color.removeprefix('#')
+                    else:
+                        self.ticket_tags.errors.append(_(
+                            'Invalid color "${color}", needs to be a 3 or 6 '
+                            'digit hex code, e.g. "ff9000" for orange. '
+                            'If you use a "#" prefix, make sure to enclose '
+                            'the value in quotation marks.',
+                            mapping={'color': color or ''}
                         ))
                         return False
 
