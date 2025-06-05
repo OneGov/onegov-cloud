@@ -1685,7 +1685,9 @@ def test_occupancy_view(client):
 
     occupancy = client.get('/resource/tageskarte/occupancy?date=20150828')
     assert occupancy.status_code == 200
-    occupancy = client.get('/resource/tageskarte/occupancy-json?date=20150828')
+    occupancy = client.get(
+        '/resource/tageskarte/occupancy-json?start=2015-08-28&end=2015-08-29'
+    )
     assert occupancy.status_code == 200
 
 
