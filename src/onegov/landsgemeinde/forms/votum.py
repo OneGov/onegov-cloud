@@ -1,4 +1,7 @@
 from __future__ import annotations
+from datetime import datetime
+
+import pytz
 
 from onegov.form.fields import ChosenSelectField
 from onegov.form.fields import TimeField
@@ -186,7 +189,6 @@ class VotumForm(NamedFileForm):
         self.request.include('redactor')
         self.request.include('editor')
         self.request.include('person_votum')
-        self.request.include('start_time')
         self.populate_person_choices()
 
     def get_useful_data(self) -> dict[str, Any]:  # type:ignore[override]
@@ -215,3 +217,7 @@ class VotumForm(NamedFileForm):
 
     def populate_obj(self, obj: Votum) -> None:  # type:ignore[override]
         super().populate_obj(obj, exclude={'calculated_timestamp'})
+        if not obj.start_time and self.state.data == 'ongoing':
+            tz = pytz.timezone('Europe/Zurich')
+            now = datetime.now(tz=tz).time()
+            obj.start_time = now

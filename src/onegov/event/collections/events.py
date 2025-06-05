@@ -602,7 +602,12 @@ class EventCollection(Pagination[Event]):
             event_image, event_image_name = get_event_image(event)
 
             ticket_price = find_element_text(event, 'ticketPrice')
-            event_url = find_element_text(event, 'originalEventUrl') or None
+            event_url = find_element_text(event, 'originalEventUrl') or ''
+
+            provider_url = ''
+            provider_ref = event.find('ns:providerReference', namespaces=ns)
+            if provider_ref is not None:
+                provider_url = find_element_text(provider_ref, 'url')
 
             tags = []
             if event.find('ns:tags', namespaces=ns) is not None:
@@ -675,7 +680,7 @@ class EventCollection(Pagination[Event]):
                             location=location,
                             coordinates=coordinates,
                             price=ticket_price,
-                            external_event_url=event_url,
+                            external_event_url=event_url or provider_url,
                             tags=tags,
                             filter_keywords=None,
                             source=schedule_id,
@@ -775,7 +780,7 @@ class EventCollection(Pagination[Event]):
                 desc = e.description
                 if len(e.description) > 10000:
                     desc = e.description[:9995] + '..'
-                text_mobile.text = CDATA(  # type: ignore[assignment]
+                text_mobile.text = CDATA(
                     desc.replace('\r\n', '<br>'))
 
             for occ in e.occurrences:
@@ -788,7 +793,7 @@ class EventCollection(Pagination[Event]):
 
             if e.price:
                 price = SubElement(event, 'sf01')
-                price.text = CDATA(  # type: ignore[assignment]
+                price.text = CDATA(
                     e.price.replace('\r\n', '<br>'))
 
             if e.external_event_url:

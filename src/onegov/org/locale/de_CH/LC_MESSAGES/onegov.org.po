@@ -1335,6 +1335,21 @@ msgstr "Von"
 msgid "Ending at"
 msgstr "Bis"
 
+msgid "Key Code"
+msgstr "Schlüsselcode"
+
+msgid "Invalid Kaba Code. Needs to be a 4 to 6 digit number code."
+msgstr "Ungültiger Kaba Code. Muss ein 4- bis 6-stelliger Zifferncode sein."
+
+msgid "Lead Time"
+msgstr "Vorlaufszeit"
+
+msgid "In minutes"
+msgstr "In Minuten"
+
+msgid "Lag Time"
+msgstr "Nachlaufszeit"
+
 msgid "I am looking to make a reservation lasting"
 msgstr "Ich suche einen Termin für"
 
@@ -1443,6 +1458,19 @@ msgstr "Preis pro Eintrag"
 
 msgid "Price per hour"
 msgstr "Preis pro Stunde"
+
+msgid "Prices in extra fields are"
+msgstr "Preise in Extra-Felder gelten"
+
+msgid ""
+"If no extra fields are defined or none of the extra fields contain pricing "
+"information, then this setting has no effect."
+msgstr ""
+"Falls keine Extra-Felder definiert sind oder keine der definierten Felder "
+"mit Preisen verknüpft sind, hat diese Auswahl keine Auswirkung."
+
+msgid "One-off"
+msgstr "Einmalig"
 
 msgid ""
 "Failed to retrieve the doors from the dormakaba API please make sure your "
@@ -2065,10 +2093,12 @@ msgstr ""
 "    E-Mail: fc@govikon.ch\n"
 "    PLZ / Ort: 1234 Govikon\n"
 "    Kaba Code: 123456\n"
+"    Color: '#ff0000'\n"
 "- HC Govikon:\n"
 "    E-Mail: hc@govikon.ch\n"
 "    PLZ / Ort: 1234 Govikon\n"
 "    Kaba Code: 654321\n"
+"    Color: '#00ff00'\n"
 "```"
 
 msgid "Categories restricted by user group settings"
@@ -2086,11 +2116,19 @@ msgstr ""
 "Ungültiges Format. Bitte definieren Sie die Schlagworte und Metadaten "
 "entsprechend dem gegebenen Beispiel."
 
-msgid "Invalid price, needs to be a non-negative number."
-msgstr "Ungültiger Preis, muss eine nicht-negative Zahl sein."
+#, python-format
+msgid "Invalid price \"${price}\", needs to be a non-negative number."
+msgstr "Ungültiger Preis \"${price}\", muss eine nicht-negative Zahl sein."
 
-msgid "Invalid Kaba Code. Needs to be a 4 to 6 digit number code."
-msgstr "Ungültiger Kaba Code. Muss ein 4- bis 6-stelliger Zifferncode sein."
+#, python-format
+msgid ""
+"Invalid color \"${color}\", needs to be a 3 or 6 digit hex code, e.g. "
+"\"ff9000\" for orange. If you use a \"#\" prefix, make sure to enclose the "
+"value in quotation marks."
+msgstr ""
+"Ungültige Farbe \"${color}\", es muss eine 3- bis 6-stellige hexadezimal "
+"Zahl sein, z.B. \"ff9000\" für Orange. Wenn Sie \"#\" als Präfix verwenden, "
+"stellen Sie sicher, den Wert in Anführungszeichen einzuschliessen."
 
 msgid "Enable newsletter"
 msgstr "Newsletter aktivieren"
@@ -2235,9 +2273,6 @@ msgstr "ID der Anlage"
 
 msgid "Default Lead Time"
 msgstr "Standard Vorlaufszeit"
-
-msgid "In minutes"
-msgstr "In Minuten"
 
 msgid "Default Lag Time"
 msgstr "Standard Nachlaufszeit"
@@ -3322,9 +3357,6 @@ msgstr "Anmeldung stornieren"
 msgid "Edit submission"
 msgstr "Eingabe bearbeiten"
 
-msgid "Key Code"
-msgstr "Schlüsselcode"
-
 msgid "Reject"
 msgstr "Absagen"
 
@@ -3349,6 +3381,9 @@ msgstr "Details zu Ihrer Reservation"
 
 msgid "Edit details"
 msgstr "Details bearbeiten"
+
+msgid "Edit key code"
+msgstr "Schlüsselcode bearbeiten"
 
 msgid "Accept all with message"
 msgstr "Alle annehmen mit Kommentar"
@@ -4991,15 +5026,6 @@ msgstr ""
 "erstellen, klicken Sie auf \"Bearbeiten\" in der Verfügbarkeitszeitraum und "
 "danach auf \"Speichern\" ohne etwas zu ändern."
 
-msgid "Reservation is pending approval"
-msgstr "Diese Reservation wurde noch nicht akzeptiert"
-
-msgid "(${num_pending} pending approval)"
-msgstr "(${num_pending} noch nicht akzeptiert)"
-
-msgid "Utilised"
-msgstr "Ausgelastet"
-
 msgid "No recipients defined yet."
 msgstr "Es wurden noch keine Empfänger definiert."
 
@@ -5301,6 +5327,9 @@ msgid ""
 msgstr ""
 "Um die Verfügbarkeit zu löschen, müssen zuerst alle bestehenden "
 "Reservationen abgesagt werden."
+
+msgid "Pending approval"
+msgstr "Noch nicht akzeptiert"
 
 msgid "A conflicting allocation exists for the requested time period."
 msgstr "Es besteht bereits eine Verfügbarkeit im gewünschten Zeitraum."
@@ -6440,6 +6469,9 @@ msgstr ""
 msgid "Reject all reservations with message"
 msgstr "Alle Reservationen absagen mit Kommentar"
 
+msgid "Reservation not adjustable"
+msgstr "Diese Reservation ist nicht anpassbar"
+
 msgid "Adjust reservation"
 msgstr "Reservation Anpassen"
 
@@ -6448,6 +6480,9 @@ msgstr "Die Reservation wurde angepasst"
 
 msgid "The reservation was left unchanged"
 msgstr "Die Reservation ist unverändert geblieben"
+
+msgid "There are no future reservations"
+msgstr "Es gibt keine zukünftige Reservationen"
 
 msgid "Added a new daypass"
 msgstr "Eine neue Tageskarte wurde hinzugefügt"

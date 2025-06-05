@@ -2198,6 +2198,9 @@ def test_wil_daily_event_import(wil_app, capturelog):
             <tag>Library</tag>
           </tags>
           <originalEventUrl></originalEventUrl>
+          <providerReference>
+            <url>https://www.lemington.ch/events/reading-johanna-beehrens</url>
+          </providerReference>
           <schedules>
             <schedule>
               <uuid7>S132451</uuid7>
@@ -2361,7 +2364,7 @@ def test_wil_daily_event_import(wil_app, capturelog):
     assert events[1].organizer == 'Culture Club'
     assert events[1].organizer_email == 'info@cultureclub.io'
     assert events[1].organizer_phone == '044 321 7744'
-    assert events[1].external_event_url == None
+    assert events[1].external_event_url == 'https://www.lemington.ch/events/reading-johanna-beehrens'
 
     # events 3 and 4 are actually the same event but different schedules
     for i, start in zip(

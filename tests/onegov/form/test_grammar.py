@@ -319,6 +319,7 @@ def test_prices():
     assert f.pricing.amount == Decimal('100.00')
     assert f.pricing.currency == 'CHF'
     assert not f.pricing.credit_card_payment
+    assert not f.dicount
 
     f = field.parseString("(x) Luxurious Choice (200 CHF)")
     assert f.type == 'radio'
@@ -327,6 +328,7 @@ def test_prices():
     assert f.pricing.amount == Decimal('200.00')
     assert f.pricing.currency == 'CHF'
     assert not f.pricing.credit_card_payment
+    assert not f.dicount
 
     f = field.parseString("(x) Mail delivery (5 CHF!)")
     assert f.type == 'radio'
@@ -335,6 +337,16 @@ def test_prices():
     assert f.pricing.amount == Decimal('5.00')
     assert f.pricing.currency == 'CHF'
     assert f.pricing.credit_card_payment
+    assert not f.dicount
+
+    f = field.parseString("(x) Mail delivery (Local) (5 CHF!)")
+    assert f.type == 'radio'
+    assert f.label == 'Mail delivery (Local)'
+    assert f.checked
+    assert f.pricing.amount == Decimal('5.00')
+    assert f.pricing.currency == 'CHF'
+    assert f.pricing.credit_card_payment
+    assert not f.dicount
 
     field = checkbox()
 
@@ -345,6 +357,7 @@ def test_prices():
     assert f.pricing.amount == Decimal('150.50')
     assert f.pricing.currency == 'USD'
     assert not f.pricing.credit_card_payment
+    assert not f.dicount
 
     f = field.parseString("[ ] Priority Boarding (15.00 USD)")
     assert f.type == 'checkbox'
@@ -353,6 +366,7 @@ def test_prices():
     assert f.pricing.amount == Decimal('15.00')
     assert f.pricing.currency == 'USD'
     assert not f.pricing.credit_card_payment
+    assert not f.dicount
 
     f = field.parseString("[ ] Discount (-5.00 USD)")
     assert f.type == 'checkbox'
@@ -361,6 +375,16 @@ def test_prices():
     assert f.pricing.amount == Decimal('-5.00')
     assert f.pricing.currency == 'USD'
     assert not f.pricing.credit_card_payment
+    assert not f.dicount
+
+    f = field.parseString("[ ] Discount (For Kids) (-5.00 USD)")
+    assert f.type == 'checkbox'
+    assert f.label == 'Discount (For Kids)'
+    assert not f.checked
+    assert f.pricing.amount == Decimal('-5.00')
+    assert f.pricing.currency == 'USD'
+    assert not f.pricing.credit_card_payment
+    assert not f.dicount
 
     f = field.parseString("[x] Mail delivery (5 CHF!)")
     assert f.type == 'checkbox'
@@ -369,6 +393,7 @@ def test_prices():
     assert f.pricing.amount == Decimal('5.00')
     assert f.pricing.currency == 'CHF'
     assert f.pricing.credit_card_payment
+    assert not f.dicount
 
     field = integer_range_field()
     f = field.parseString("0..30 (1.00 CHF)")
@@ -388,6 +413,75 @@ def test_prices():
     f = field.parseString("0..10")
     assert f.type == 'integer_range'
     assert f[0] == range(0, 10)
+    assert not f.pricing
+
+
+def test_discount():
+    field = radio()
+
+    f = field.parseString("( ) Default Choice (25%)")
+    assert f.type == 'radio'
+    assert f.label == 'Default Choice'
+    assert not f.checked
+    assert f.discount.amount == Decimal('25')
+    assert not f.pricing
+
+    f = field.parseString("(x) Luxurious Choice (-100 %)")
+    assert f.type == 'radio'
+    assert f.label == 'Luxurious Choice'
+    assert f.checked
+    assert f.discount.amount == Decimal('-100')
+    assert not f.pricing
+
+    f = field.parseString("(x) Mail delivery (33.3 %)")
+    assert f.type == 'radio'
+    assert f.label == 'Mail delivery'
+    assert f.checked
+    assert f.discount.amount == Decimal('33.3')
+    assert not f.pricing
+
+    f = field.parseString("(x) Mail delivery (Local) (33.3 %)")
+    assert f.type == 'radio'
+    assert f.label == 'Mail delivery (Local)'
+    assert f.checked
+    assert f.discount.amount == Decimal('33.3')
+    assert not f.pricing
+
+    field = checkbox()
+
+    f = field.parseString("[x] Extra Luggage (99.15%)")
+    assert f.type == 'checkbox'
+    assert f.label == 'Extra Luggage'
+    assert f.checked
+    assert f.discount.amount == Decimal('99.15')
+    assert not f.pricing
+
+    f = field.parseString("[ ] Priority Boarding (0 %)")
+    assert f.type == 'checkbox'
+    assert f.label == 'Priority Boarding'
+    assert not f.checked
+    assert f.discount.amount == Decimal('0')
+    assert not f.pricing
+
+    f = field.parseString("[ ] Discount (50%)")
+    assert f.type == 'checkbox'
+    assert f.label == 'Discount'
+    assert not f.checked
+    assert f.discount.amount == Decimal('50')
+    assert not f.pricing
+
+    f = field.parseString("[ ] Discount (For Kids) (50%)")
+    assert f.type == 'checkbox'
+    assert f.label == 'Discount (For Kids)'
+    assert not f.checked
+    assert f.discount.amount == Decimal('50')
+    assert not f.pricing
+
+    f = field.parseString("[ ] Discount (50%) (For Kids)")
+    assert f.type == 'checkbox'
+    assert f.label == 'Discount (50%) (For Kids)'
+    assert not f.checked
+    assert not f.discount
     assert not f.pricing
 
 
