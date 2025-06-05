@@ -226,9 +226,7 @@ class AgencyLayout(
                         for child in agency.children
                     ]
 
-                def get_all_children_titles(agency: ExtendedAgency) -> str:
-                    return json.dumps(get_all_children_titles_json(agency))
-                children = get_all_children_titles(self.model)
+                children = json.dumps(get_all_children_titles_json(self.model))
                 if children != '[]':
                     confirm_text = _('This cannot be undone. Following '
                         'agencies will be deleted as well:')
@@ -241,7 +239,7 @@ class AgencyLayout(
                         confirm_text,
                         _('Delete agency'),
                         _('Cancel'),
-                        get_all_children_titles(self.model),
+                        children,
                         _('Please scroll to the bottom to enable the confirm '
                           'button.')
                     ),

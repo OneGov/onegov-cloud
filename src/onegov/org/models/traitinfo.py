@@ -242,9 +242,7 @@ class TraitInfo:
                             for child in page.children  # type:ignore
                         ]
 
-                    def get_all_children_titles(page: TraitInfo) -> str:
-                        return json.dumps(get_all_children_titles_json(page))
-                    children = get_all_children_titles(self)
+                    children = json.dumps(get_all_children_titles_json(self))
 
                 items = children
 
