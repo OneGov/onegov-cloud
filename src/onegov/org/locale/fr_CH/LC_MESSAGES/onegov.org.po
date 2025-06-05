@@ -2,7 +2,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE 1.0\n"
-"POT-Creation-Date: 2025-05-21 11:26+0200\n"
+"POT-Creation-Date: 2025-06-04 16:17+0200\n"
 "PO-Revision-Date: 2022-03-15 10:50+0100\n"
 "Last-Translator: Marc Sommerhalder <marc.sommerhalder@seantis.ch>\n"
 "Language-Team: French\n"
@@ -1461,6 +1461,20 @@ msgstr "Prix par article"
 msgid "Price per hour"
 msgstr "Prix par heure"
 
+msgid "Prices in extra fields are"
+msgstr "Les prix indiqués dans les champs supplémentaires sont"
+
+msgid ""
+"If no extra fields are defined or none of the extra fields contain pricing "
+"information, then this setting has no effect."
+msgstr ""
+"Si aucun champ supplémentaire n'est défini ou si aucun des champs "
+"supplémentaires ne contient d'informations sur les prix, ce paramètre n'a "
+"aucun effet."
+
+msgid "One-off"
+msgstr "Unique"
+
 msgid ""
 "Failed to retrieve the doors from the dormakaba API please make sure your "
 "credentials are still valid."
@@ -2107,8 +2121,19 @@ msgstr ""
 "Format non valide. Veuillez définir les balises et leurs métadonnées "
 "conformément à l'exemple."
 
-msgid "Invalid price, needs to be a non-negative number."
-msgstr "Prix non valide, doit être un nombre non négatif."
+#, python-format
+msgid "Invalid price \"${price}\", needs to be a non-negative number."
+msgstr "Prix non valide \"${price}\", doit être un nombre non négatif."
+
+#, python-format
+msgid ""
+"Invalid color \"${color}\", needs to be a 3 or 6 digit hex code, e.g. "
+"\"ff9000\" for orange. If you use a \"#\" prefix, make sure to enclose the "
+"value in quotation marks."
+msgstr ""
+"Couleur non valide \"${color}\", doit être un code hexadécimal à 3 ou 6 "
+"chiffres, par exemple \"ff9000\" pour l'orange. Si vous utilisez un préfixe "
+"\"#\", veillez à mettre la valeur entre guillemets."
 
 msgid "Enable newsletter"
 msgstr "Activer la newsletter"
@@ -5010,15 +5035,6 @@ msgstr ""
 "\"éditer\" dans la période de disponibilité, puis \"enregistrer\" sans rien "
 "changer."
 
-msgid "Reservation is pending approval"
-msgstr "La réservation est en attente d'approbation"
-
-msgid "(${num_pending} pending approval)"
-msgstr "(${num_pending} en attente d'approbation)"
-
-msgid "Utilised"
-msgstr "Utilisé"
-
 msgid "No recipients defined yet."
 msgstr "Aucun destinataire défini pour le moment."
 
@@ -5321,6 +5337,9 @@ msgid ""
 msgstr ""
 "Pour supprimer cette allocation, toutes les réservations existantes doivent "
 "être annulées en premier."
+
+msgid "Pending approval"
+msgstr "En attente d'approbation"
 
 msgid "A conflicting allocation exists for the requested time period."
 msgstr "Une allocation contradictoire existe pour la période demandée."
@@ -6458,6 +6477,9 @@ msgstr ""
 
 msgid "Reject all reservations with message"
 msgstr "Refuser toutes les réservations avec le message"
+
+msgid "Reservation not adjustable"
+msgstr "Réservation non ajustable"
 
 msgid "Adjust reservation"
 msgstr "Ajuster la réservation"

@@ -9,7 +9,7 @@ from typing import NamedTuple, TYPE_CHECKING
 if TYPE_CHECKING:
     from onegov.pay.types import PriceDict
     from sqlalchemy import Table
-    from typing import Self
+    from typing import Self, SupportsIndex
 
 
 class _PriceBase(NamedTuple):
@@ -72,6 +72,18 @@ class Price(_PriceBase):
             self.currency,
             credit_card_payment=cc_payment
         )
+
+    def __mul__(self, other: Decimal | float | SupportsIndex) -> Self:
+        assert not self.fee, 'Multipliers should be applied before fees'
+        if not isinstance(other, (Decimal, float, int)):
+            other = int(other)
+        return self.__class__(
+            self.amount * Decimal(other),
+            self.currency,
+            credit_card_payment=self.credit_card_payment
+        )
+
+    __rmul__ = __mul__
 
     def __str__(self) -> str:
         return f'{self.amount:.2f} {self.currency}'

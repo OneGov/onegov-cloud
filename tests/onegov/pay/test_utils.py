@@ -37,6 +37,21 @@ def test_add_price_currency():
         assert Price(10, None) + Price(20, None) == Price(30, 'CHF')
 
 
+def test_multiply():
+    price = Price(100, 'CHF')
+    assert price * Decimal(1) == Price(100, 'CHF')
+    assert price * 0.5 == Price(50, 'CHF')
+    assert price * 2 == Price(200, 'CHF')
+    assert Decimal('.1') * price == Price(10, 'CHF')
+    assert 0.25 * price == Price(25, 'CHF')
+    assert 5 * price == Price(500, 'CHF')
+
+    # can't multiply prices with fees
+    # fees need to be applied after
+    with pytest.raises(AssertionError):
+        Price(100, 'CHF', 10) * 5
+
+
 def test_apply_discount():
     price = Price(100, 'CHF')
     assert price.apply_discount(Decimal(1)) == Price(0, 'CHF')

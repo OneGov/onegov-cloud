@@ -514,8 +514,7 @@ def create_agency_pdf(
     page_break_level = int(org.meta.get(
         'page_break_on_level_org_pdf', 1))
     if form.submitted(request):
-        # FIXME: asymmetric property
-        self.pdf_file = request.app.pdf_class.from_agencies(  # type:ignore
+        self.pdf_file = request.app.pdf_class.from_agencies(
             agencies=[self],
             title=self.title,
             toc=False,

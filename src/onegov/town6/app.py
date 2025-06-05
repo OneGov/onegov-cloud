@@ -321,6 +321,12 @@ def get_fullcalendar_asset() -> Iterator[str]:
     yield 'reservationcalendar_custom.js'
 
 
+@TownApp.webasset('occupancycalendar')
+def get_occupancycalendar_asset() -> Iterator[str]:
+    yield 'occupancycalendar.jsx'
+    yield 'occupancycalendar_custom.js'
+
+
 @TownApp.webasset('staff-chat')
 def get_staff_chat_asset() -> Iterator[str]:
     yield 'chat-shared.js'

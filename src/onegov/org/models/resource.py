@@ -160,7 +160,7 @@ class SharedMethods:
         if with_data:
             res = res.options(undefer(Reservation.data))
 
-        return res  # type:ignore[return-value]
+        return res
 
     def bound_session_id(self, request: OrgRequest) -> uuid.UUID:
         """ The session id associated with this resource and user. """
@@ -194,7 +194,7 @@ class SharedMethods:
         if exclude_pending:
             query = query.filter(Reservation.data['accepted'] == True)
 
-        return query  # type:ignore[return-value]
+        return query
 
     def reservation_title(self, reservation: Reservation) -> str:
         title = self.title_template.format(

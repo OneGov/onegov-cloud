@@ -33,7 +33,6 @@ if TYPE_CHECKING:
     from onegov.reservation.models import CustomReservation
     from onegov.pay import Payment, PaymentError, PaymentProvider
     from onegov.pay.types import PaymentMethod
-    from sqlalchemy.orm import Query
     from typing import TypeAlias
 
     DeadlineUnit: TypeAlias = Literal['d', 'h']
@@ -136,6 +135,9 @@ class Resource(ORMBase, ModelBase, ContentMixin,
     #: reservation deadline (e.g. None, (5, 'd'), (24, 'h'))
     deadline: dict_property[tuple[int, DeadlineUnit] | None]
     deadline = content_property()
+
+    #: the pricing method to use for extras defined in formcode
+    extras_pricing_method: dict_property[str | None] = content_property()
 
     #: the default view
     default_view: dict_property[str | None] = content_property()
@@ -266,15 +268,13 @@ class Resource(ORMBase, ModelBase, ContentMixin,
         #        always gives us the class we bound do it, but that's
         #        not technically true...
         reservations = cast(
-            'Query[CustomReservation]',
+            'list[CustomReservation]',
             self.scheduler.reservations_by_token(token)
             .options(undefer(Reservation.data))
+            .all()
         )
-
-        reservations_iter = iter(reservations)
-
-        reservation = next(reservations_iter, None)
-        if reservation is not None:
+        if reservations:
+            reservation = reservations[0]
             meta = (reservation.data or {}).get('ticket_tag_meta', {})
             # HACK: This is not very robust, we should probably come up
             #       with something better to handle price reductions for
@@ -284,22 +284,50 @@ class Resource(ORMBase, ModelBase, ContentMixin,
                 assert reduced_amount >= Decimal('0')
             except Exception:
                 reduced_amount = None
-            total = reservation.price(self) or Price.zero()
         else:
             reduced_amount = None
-            total = Price.zero()
 
-        prices = (price for r in reservations_iter if (price := r.price(self)))
+        total = Price.zero()
+        extras_total = Price.zero()
+        for reservation in reservations:
+            price = reservation.price(self)
+            if price:
+                total += price
 
-        total += sum(prices, Price.zero())
+            if extra:
+                match self.extras_pricing_method:
+                    case 'one_off':
+                        extras_total = extra
+
+                    case 'per_hour':
+                        # FIXME: Should we assert here or instead use
+                        #        reservation.timespans()? We assert in
+                        #        CustomReservation.price().
+                        if reservation.start and reservation.end:
+                            duration = reservation.end - reservation.start
+                            # compensate for the end being offset
+                            duration += datetime.timedelta(microseconds=1)
+                        else:
+                            duration = datetime.timedelta(seconds=0)
+
+                        extras_total += extra * (
+                            Decimal(duration.total_seconds())
+                            / Decimal('3600')
+                        )
+
+                    case 'per_item' | None:
+                        extras_total += extra * reservation.quota
+
+                    case _:  # pragma: unreachable
+                        raise ValueError('unhandled extras pricing method')
 
         if discount and total:
             total = total.apply_discount(discount)
 
-        if extra and total:
-            total += extra
-        elif extra:
-            total = extra
+        if extras_total and total:
+            total += extras_total
+        elif extras_total:
+            total = extras_total
 
         if reduced_amount is not None and reduced_amount < total.amount:
             # return the reduced amount instead

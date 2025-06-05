@@ -42,10 +42,11 @@ from onegov.reservation import ResourceCollection
 from onegov.ticket import TicketCollection
 from onegov.town6.upgrade import migrate_homepage_structure_for_town6
 from onegov.town6.upgrade import migrate_theme_options
+from onegov.user.models import TAN
 from onegov.user import UserCollection, User
 from operator import add as add_op
 from pathlib import Path
-from sqlalchemy import or_
+from sqlalchemy import func, and_, or_
 from sqlalchemy.dialects.postgresql import array
 from uuid import uuid4
 
@@ -1286,3 +1287,36 @@ def import_reservations(
                                 fg='green')
 
     return import_reservations
+
+
+@cli.command(context_settings={'default_selector': '*'})
+@click.argument('year', type=click.IntRange(1900, date.today().year))
+@click.argument('month', type=click.IntRange(1, 12))
+@pass_group_context
+def mtan_statistics(
+    group_context: GroupContext,
+    year: int,
+    month: int,
+) -> Callable[[OrgRequest, OrgApp], None]:
+    """ Generate mTAN SMS statistics for the given year and month. """
+
+    if date(year, month, 1) >= date.today().replace(day=1):
+        abort('Year and month needs to be fully in the past')
+
+    def mtan_statistics(request: OrgRequest, app: OrgApp) -> None:
+        mtan_count: int = request.session.query(
+            func.count(TAN.id)
+        ).filter(and_(
+            func.extract('year', TAN.created) == year,
+            func.extract('month', TAN.created) == month,
+            TAN.meta['mobile_number'].isnot(None)
+        )).scalar()
+        if mtan_count:
+            org_name = app.org.name if hasattr(app, 'org') else None
+            title = f'{org_name} ({app.schema})' if org_name else app.schema
+            click.echo(
+                f'{title}: '
+                f'Sent {mtan_count} mTAN SMS'
+            )
+
+    return mtan_statistics

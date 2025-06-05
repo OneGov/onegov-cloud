@@ -8,6 +8,13 @@ wtforms.fields.core.Field.__get__
 # Since DefaultMeta can contain arbitrary values we added __getattr__
 # to let mypy know that arbitrary attribute access is possible
 wtforms.meta.DefaultMeta.__getattr__
+# The API intends for these to be settable
+wtforms.Flags.__delattr__
+wtforms.Flags.__setattr__
+wtforms.fields.Flags.__delattr__
+wtforms.fields.Flags.__setattr__
+wtforms.fields.core.Flags.__delattr__
+wtforms.fields.core.Flags.__setattr__
 
 # Error: variable differs from runtime
 # ======================

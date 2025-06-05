@@ -522,3 +522,18 @@ def convert_directories_to_ticket_permissions(context: UpgradeContext) -> None:
             context.session.add(permission)
 
         del user_group.meta['directories']
+
+
+@upgrade_task('Set default extras pricing method on existing resources')
+def set_default_extras_pricing_method(context: UpgradeContext) -> None:
+    if not context.has_table('resources'):
+        return
+
+    # In order to keep the behavior of existing resources with priced
+    # extras the same we need to set them to "one_off", the new default
+    # will be "per_item"
+    for resource in (
+        context.session.query(Resource)
+        .filter(Resource.definition.isnot(None))
+    ):
+        resource.extras_pricing_method = 'one_off'
