@@ -23,7 +23,7 @@ from onegov.pay.models.payment_providers.stripe import StripePayment
 from onegov.pay.models.payment_providers.worldline_saferpay import (
     SaferpayPayment)
 from onegov.ticket import Ticket, TicketCollection
-from webob import exc
+from webob import exc, Response as WebobResponse
 
 
 from typing import Any, TYPE_CHECKING
@@ -32,7 +32,7 @@ if TYPE_CHECKING:
     from datetime import datetime
     from onegov.core.types import JSON_ro, RenderData
     from onegov.org.request import OrgRequest
-    from onegov.pay.types import AnyPayableBase
+    from onegov.pay.types import AnyPayableBase, PaymentState
     from sqlalchemy.orm import Session
     from typing import type_check_only
     from webob import Response
@@ -114,21 +114,21 @@ def view_payments(
     request: OrgRequest,
     form: PaymentSearchForm,
     layout: PaymentCollectionLayout | None = None
-) -> RenderData:
+) -> RenderData | WebobResponse:
     layout = layout or PaymentCollectionLayout(self, request)
 
     if form.submitted(request):
-        start, end = align_range_to_day(
-            standardize_date(as_datetime(form.data['start']), layout.timezone),
-            standardize_date(as_datetime(form.data['end']), layout.timezone),
-            layout.timezone)
+        form.update_model(self)
+        return request.redirect(request.link(self))
+
+    if not form.errors:
+        form.apply_model(self)
 
     tickets = TicketCollection(request.session)
     providers = {
         provider.id: provider
         for provider in PaymentProviderCollection(request.session).query()
     }
-
     payment_links = self.payment_links_by_batch()
 
     return {
@@ -136,7 +136,7 @@ def view_payments(
         'form': form,
         'layout': layout or PaymentCollectionLayout(self, request),
         'payments': self.batch,
-        'get_ticket': partial(ticket_by_link, tickets),
+        'get_ticket': partial(ticket_by_link, tickets), # type:ignore[arg-type]
         'providers': providers,
         'payment_links': payment_links
     }
