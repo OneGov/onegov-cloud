@@ -3,12 +3,8 @@ import transaction
 from onegov.pay import Payment
 from datetime import datetime
 
-from typing import TYPE_CHECKING
-if TYPE_CHECKING:
-    from onegov.town6.tests import Client
 
-
-def test_view_payments_as_admin(client: 'Client') -> None:
+def test_view_payments_as_admin(client) -> None:
     client.login_admin()
 
     session = client.app.session()
