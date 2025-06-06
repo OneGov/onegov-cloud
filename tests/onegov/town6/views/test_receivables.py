@@ -79,8 +79,6 @@ def test_view_payments_as_admin(client) -> None:
     assert "No payments found." not in filtered_page.text
 
     # Scenario 5: No date filter (clear dates). Expect P1 and P2.
-    form_data['start_date'] = ''
-    form_data['end_date'] = ''
     page = client.get(payments_url)
     form = page.form
     form['start_date'] = ''
