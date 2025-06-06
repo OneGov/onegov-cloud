@@ -132,6 +132,16 @@ def view_payments(
         dt = standardize_date(as_datetime(self.end), layout.timezone)
         __, self.end = align_range_to_day(dt, dt, layout.timezone)
 
+    # a PaymentCollection `self` that has `ticket_start` and `ticket_end`
+    if getattr(self, 'ticket_start', None):
+        dt = standardize_date(as_datetime(self.ticket_start), layout.timezone)
+        self.ticket_start, __ = align_range_to_day(dt, dt, layout.timezone)
+
+    if getattr(self, 'ticket_end', None):
+        dt = standardize_date(as_datetime(self.ticket_end), layout.timezone)
+        __, self.ticket_end = align_range_to_day(dt, dt, layout.timezone)
+
+
     tickets = TicketCollection(request.session)
     providers = {
         provider.id: provider
