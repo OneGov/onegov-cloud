@@ -1,7 +1,7 @@
 from decimal import Decimal
 import transaction
 from onegov.pay import Payment
-from datetime import datetime
+from datetime import datetime, timezone
 
 
 def test_view_payments_as_admin(client) -> None:
@@ -17,7 +17,7 @@ def test_view_payments_as_admin(client) -> None:
         currency='CHF',
         state='open'
     )
-    p1.created = datetime(2023, 1, 10, 11, 0, 0)  # Naive UTC
+    p1.created = datetime(2023, 1, 10, 11, 0, 0, tzinfo=timezone.utc)
 
     # Payment 2: Created on Jan 12, 2023 (UTC)
     p2 = Payment(
@@ -26,7 +26,7 @@ def test_view_payments_as_admin(client) -> None:
         currency='CHF',
         state='paid'
     )
-    p2.created = datetime(2023, 1, 12, 11, 0, 0)  # Naive UTC
+    p2.created = datetime(2023, 1, 12, 11, 0, 0, tzinfo=timezone.utc)
 
     session.add_all((p1, p2))
     transaction.commit()
