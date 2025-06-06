@@ -115,9 +115,15 @@ def view_payments(
     form: PaymentSearchForm,
     layout: PaymentCollectionLayout | None = None
 ) -> RenderData:
+    layout = layout or PaymentCollectionLayout(self, request)
+
+    if form.submitted(request):
+        start, end = align_range_to_day(
+            standardize_date(as_datetime(form.data['start']), layout.timezone),
+            standardize_date(as_datetime(form.data['end']), layout.timezone),
+            layout.timezone)
 
     tickets = TicketCollection(request.session)
-
     providers = {
         provider.id: provider
         for provider in PaymentProviderCollection(request.session).query()
