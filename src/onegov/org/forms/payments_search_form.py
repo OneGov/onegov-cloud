@@ -2,7 +2,8 @@ from __future__ import annotations
 
 from wtforms import DateField
 from onegov.form.core import Form
-from onegov.form.fields import SelectField
+from onegov.form.fields import SelectField, TimezoneDateTimeField
+from onegov.form.validators import StrictOptional
 from onegov.org import _
 
 
@@ -13,28 +14,38 @@ if TYPE_CHECKING:
 
 class PaymentSearchForm(Form):
 
-    start_date = DateField(
+    tz = 'Europe/Zurich'
+
+    start_date = TimezoneDateTimeField(
         label=_('From date'),
+                timezone=tz,
         fieldset=_('Filter Payments'),
+                validators=[StrictOptional()]
     )
 
-    end_date = DateField(
+    end_date = TimezoneDateTimeField(
         label=_('To date'),
+        timezone=tz,
         fieldset=_('Filter Payments'),
+                validators=[StrictOptional()]
     )
 
-    ticket_start_date = DateField(
+    ticket_start_date = TimezoneDateTimeField(
         label=_('Ticket created from date'),
+        timezone=tz,
         fieldset=_('Filter by Ticket Date'),
         description=_('Filters payments by the creation date of their '
                       'associated ticket.'),
+                validators=[StrictOptional()]
     )
 
-    ticket_end_date = DateField(
+    ticket_end_date = TimezoneDateTimeField(
         label=_('Ticket created to date'),
+        timezone=tz,
         fieldset=_('Filter by Ticket Date'),
         description=_('Filters payments by the creation date of their '
                       'associated ticket.'),
+                validators=[StrictOptional()]
     )
 
     status = SelectField(
