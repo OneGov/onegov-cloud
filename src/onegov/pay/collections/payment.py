@@ -131,7 +131,7 @@ class PaymentCollection(GenericCollection[Payment], Pagination[Payment]):
                 # Assuming 'manual' is the only non-provider type
                 q = q.filter(Payment.source != 'manual')
 
-        if self.source:
+        if self.source and self.source != '*':
             q = q.filter(Payment.source == self.source)
 
         # *** NEW FILTERING LOGIC FOR TICKET CREATION DATE ***
@@ -178,8 +178,10 @@ class PaymentCollection(GenericCollection[Payment], Pagination[Payment]):
             start=self.start,
             end=self.end,
             ticket_start=self.ticket_start,
+            ticket_end=self.ticket_end,
             payment_type=self.payment_type,
             source=self.source,
+            status=self.status
         )
 
     def payment_links_for(
