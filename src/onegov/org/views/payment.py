@@ -28,7 +28,7 @@ from webob import exc, Response as WebobResponse
 
 from typing import Any, TYPE_CHECKING
 if TYPE_CHECKING:
-    from collections.abc import Callable, Sequence
+    from collections.abc import Callable, Sequence # type: ignore[attr-defined]
     from datetime import datetime
     from onegov.core.types import JSON_ro, RenderData
     from onegov.org.request import OrgRequest
@@ -36,6 +36,8 @@ if TYPE_CHECKING:
     from sqlalchemy.orm import Session
     from typing import type_check_only
     from webob import Response
+
+    from datetime import date
 
     @type_check_only
     class PaymentExportForm(DateRangeForm, ExportForm):
@@ -124,23 +126,27 @@ def view_payments(
     if not form.errors:
         form.apply_model(self)
 
-    if self.start:
+    # Align dates to day boundaries if they are valid date objects
+    if isinstance(self.start, date):
         dt = standardize_date(as_datetime(self.start), layout.timezone)
         self.start, __ = align_range_to_day(dt, dt, layout.timezone)
 
-    if self.end:
+    if isinstance(self.end, date):
         dt = standardize_date(as_datetime(self.end), layout.timezone)
         __, self.end = align_range_to_day(dt, dt, layout.timezone)
 
-    # a PaymentCollection `self` that has `ticket_start` and `ticket_end`
-    if getattr(self, 'ticket_start', None):
-        dt = standardize_date(as_datetime(self.ticket_start), layout.timezone)
-        self.ticket_start, __ = align_range_to_day(dt, dt, layout.timezone)
+    # Align ticket_start and ticket_end if they exist and are valid date objects
+    # These attributes are expected to be on `self` (PaymentCollection)
+    # if PaymentSearchForm is used.
+    ticket_start_val = getattr(self, 'ticket_start', None)
+    if isinstance(ticket_start_val, date):
+        dt = standardize_date(as_datetime(ticket_start_val), layout.timezone)
+        self.ticket_start, __ = align_range_to_day(dt, dt, layout.timezone) # type: ignore[union-attr]
 
-    if getattr(self, 'ticket_end', None):
-        dt = standardize_date(as_datetime(self.ticket_end), layout.timezone)
-        __, self.ticket_end = align_range_to_day(dt, dt, layout.timezone)
-
+    ticket_end_val = getattr(self, 'ticket_end', None)
+    if isinstance(ticket_end_val, date):
+        dt = standardize_date(as_datetime(ticket_end_val), layout.timezone)
+        __, self.ticket_end = align_range_to_day(dt, dt, layout.timezone) # type: ignore[union-attr]
 
     tickets = TicketCollection(request.session)
     providers = {
