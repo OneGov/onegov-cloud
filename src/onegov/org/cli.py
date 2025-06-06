@@ -1320,3 +1320,50 @@ def mtan_statistics(
             )
 
     return mtan_statistics
+
+
+@cli.command(name='correct-submission-definitions')
+@pass_group_context
+def correct_definition_for_submissions(
+    group_context: GroupContext
+) -> Callable[[OrgRequest, OrgApp], None]:
+    """
+    ogc-2315 Correct definition of submissions for resource
+    `Singsaal Sunnegrund 4` for Steinhausen.
+    """
+
+    def correct_submission_definition(
+        request: OrgRequest,
+        app: OrgApp
+    ) -> None:
+
+        from onegov.form import FormSubmission
+
+        patterns = [
+            (r'\[ \] Stühle  Anzahl  Bemerkungen = ...',
+             r'[ ] Stühle Anzahl Bemerkungen'),
+            (r'\[ \] Esstische  Anzahl Bemerkungen = ...',
+             r'[ ] Esstische Anzahl Bemerkungen'),
+        ]
+
+        session = request.session
+        query = session.query(FormSubmission).filter(
+            FormSubmission.definition.like(
+                '%Stühle  Anzahl  Bemerkungen = ...%') |
+            FormSubmission.definition.like(
+                '%Esstische  Anzahl Bemerkungen = ...%')
+        )
+        count = query.count()
+
+        for submission in query.all():
+            for pattern, repl in patterns:
+                if re.search(pattern, submission.definition):
+                    submission.definition = (
+                        re.sub(pattern, repl, submission.definition))
+                    click.echo(
+                        f'Correct pattern in submission id {submission.id}')
+
+        click.echo(f'Corrected {count} submissions')
+        session.flush()
+
+    return correct_submission_definition
