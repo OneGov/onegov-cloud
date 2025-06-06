@@ -5,6 +5,7 @@ from onegov.form.core import Form
 from onegov.form.fields import SelectField
 from onegov.org import _
 
+
 from typing import TYPE_CHECKING
 if TYPE_CHECKING:
     from onegov.pay import PaymentCollection

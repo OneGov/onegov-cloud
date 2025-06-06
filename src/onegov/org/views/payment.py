@@ -124,6 +124,14 @@ def view_payments(
     if not form.errors:
         form.apply_model(self)
 
+    if self.start:
+        dt = standardize_date(as_datetime(self.start), layout.timezone)
+        self.start, __ = align_range_to_day(dt, dt, layout.timezone)
+
+    if self.end:
+        dt = standardize_date(as_datetime(self.end), layout.timezone)
+        __, self.end = align_range_to_day(dt, dt, layout.timezone)
+
     tickets = TicketCollection(request.session)
     providers = {
         provider.id: provider
@@ -136,7 +144,7 @@ def view_payments(
         'form': form,
         'layout': layout or PaymentCollectionLayout(self, request),
         'payments': self.batch,
-        'get_ticket': partial(ticket_by_link, tickets), # type:ignore[arg-type]
+        'get_ticket': partial(ticket_by_link, tickets),
         'providers': providers,
         'payment_links': payment_links
     }
