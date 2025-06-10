@@ -1367,3 +1367,48 @@ def correct_definition_for_submissions(
         session.flush()
 
     return correct_submission_definition
+
+
+@cli.command(name='correct-submission-definitions-2')
+def correct_definition_for_submissions_2(
+) -> Callable[[OrgRequest, OrgApp], None]:
+    """
+    ogc-2315 Correct definition of submissions for resource
+    `Singsaal Sunnegrund 4` for Steinhausen.
+
+    Round 2: Also `Anzahl und Bemerkungen` need to be removed.
+    """
+
+    def correct_submission_definition(
+        request: OrgRequest,
+        app: OrgApp
+    ) -> None:
+
+        from onegov.form import FormSubmission
+
+        patterns = [
+            (r'\[ \] Stühle Anzahl Bemerkungen', r'[ ] Stühle'),
+            (r'\[ \] Esstische Anzahl Bemerkungen', r'[ ] Esstische'),
+        ]
+
+        session = request.session
+        query = session.query(FormSubmission).filter(
+            FormSubmission.definition.like(
+                '%Stühle Anzahl Bemerkungen%') |
+            FormSubmission.definition.like(
+                '%Esstische Anzahl Bemerkungen%')
+        )
+        count = query.count()
+
+        for submission in query.all():
+            for pattern, repl in patterns:
+                if re.search(pattern, submission.definition):
+                    submission.definition = (
+                        re.sub(pattern, repl, submission.definition))
+                    click.echo(
+                        f'Correct pattern in submission id {submission.id}')
+
+        click.echo(f'Corrected {count} submissions')
+        session.flush()
+
+    return correct_submission_definition
