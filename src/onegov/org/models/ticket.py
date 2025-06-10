@@ -605,17 +605,7 @@ class ReservationHandler(Handler):
             )
         ))
 
-        # is the reservation adjustable?
-        if (
-            reservation.display_start() > utcnow()
-            and reservation.target_type == 'allocation'
-            and request.session.query(
-                reservation
-                ._target_allocations()
-                .filter(Allocation.partly_available.is_(True))
-                .exists()
-            ).scalar()
-        ):
+        if reservation.is_adjustable:
             url_obj = URL(request.link(self.ticket, 'adjust-reservation'))
             url_obj = url_obj.query_param(
                 'reservation-id', str(reservation.id))

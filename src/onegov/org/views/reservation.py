@@ -1129,7 +1129,10 @@ def reject_reservation(
         return None
 
     # we need to delete the payment at the same time
-    if payment:
+    # FIXME: The price may need to be adjusted, should be handled
+    #        through the introduction of an invoice system with
+    #        individual invoice items that can be cancelled
+    if payment and len(excluded) == 0:
         request.session.delete(payment)
 
     ReservationMessage.create(targeted, ticket, request, 'rejected')
@@ -1221,6 +1224,12 @@ def reject_reservation(
 
     failed_to_revoke = False
     for reservation in targeted:
+        if payment:
+            # remove the link to the payment
+            reservation.payment = None
+            # flush, just in case, otherwise `remove_reservation` may fail
+            request.session.flush()
+
         if client and (kaba := (reservation.data or {}).get('kaba')):
             try:
                 client.revoke_visit(kaba['visit_id'])
@@ -1368,16 +1377,7 @@ def adjust_reservation(
         .filter(Reservation.id == reservation_id)
         .one_or_none()
     )
-    if reservation is None or not (
-        # is this reservation adjustable?
-        reservation.target_type == 'allocation'
-        and request.session.query(
-            reservation
-            ._target_allocations()
-            .filter(Allocation.partly_available.is_(True))
-            .exists()
-        ).scalar()
-    ) or reservation.display_start() < sedate.utcnow():
+    if reservation is None or not reservation.is_adjustable:
         if request.headers.get('X-IC-Request'):
             error = request.translate(_('Reservation not adjustable'))
             ic_data = {'message': error, 'success': False}
@@ -1451,6 +1451,9 @@ def adjust_reservation(
         if payment is None:
             pass
         elif new_reservation is not None:
+            # FIXME: The price may need to be adjusted, should be handled
+            #        through the introduction of an invoice system with
+            #        individual invoice items that can be cancelled
             new_reservation.payment = payment  # type: ignore[attr-defined]
         else:
             # restore the payment link
