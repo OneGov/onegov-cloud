@@ -683,40 +683,35 @@ class ReservationHandler(Handler):
                 )
             )
 
-        if not any(accepted):
-            advanced_links.append(Link(
-                text=_('Reject all'),
-                url=request.link(self.ticket, 'reject-reservation'),
-                attrs={'class': 'delete-link'},
-                traits=(
-                    Confirm(
-                        _('Do you really want to reject all reservations?'),
-                        _("Rejecting these reservations can't be undone."),
-                        _('Reject reservations'),
-                        _('Cancel')
-                    ),
-                    Intercooler(
-                        request_method='GET',
-                        redirect_after=request.url
-                    )
-                )
-            ))
-
-            advanced_links.append(Link(
-                text=_('Reject all with message'),
-                url=request.link(
-                    self.ticket,
-                    'reject-reservation-with-message'
+        advanced_links.append(Link(
+            text=_('Reject all'),
+            url=request.link(self.ticket, 'reject-reservation'),
+            attrs={'class': 'delete-link'},
+            traits=(
+                Confirm(
+                    _('Do you really want to reject all reservations?'),
+                    _("Rejecting these reservations can't be undone."),
+                    _('Reject reservations'),
+                    _('Cancel')
                 ),
-                attrs={'class': 'delete-link'},
-            ))
+                Intercooler(
+                    request_method='GET',
+                    redirect_after=request.url
+                )
+            )
+        ))
 
-        if advanced_links:
-            links.append(LinkGroup(
-                _('Advanced'),
-                links=advanced_links,
-                right_side=False
-            ))
+        advanced_links.append(Link(
+            text=_('Reject all with message'),
+            url=request.link(self.ticket, 'reject-reservation-with-message'),
+            attrs={'class': 'delete-link'},
+        ))
+
+        links.append(LinkGroup(
+            _('Advanced'),
+            links=advanced_links,
+            right_side=False
+        ))
 
         return links
 
