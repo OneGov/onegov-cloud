@@ -30,7 +30,7 @@ class CustomReservation(Reservation, ModelBase, Payable):
         partly available.
 
         """
-        if self.display_start() >= utcnow():
+        if self.display_start() < utcnow():
             return False
 
         if self.data and self.data.get('accepted'):
