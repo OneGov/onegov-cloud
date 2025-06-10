@@ -579,43 +579,34 @@ class ReservationHandler(Handler):
 
         links: list[Link] = []
 
-        url_obj = URL(request.link(self.ticket, 'reject-reservation'))
-        url_obj = url_obj.query_param(
-            'reservation-id', str(reservation.id))
-        url = url_obj.as_string()
+        if not (reservation.data and reservation.data.get('accepted')):
+            url_obj = URL(request.link(self.ticket, 'reject-reservation'))
+            url_obj = url_obj.query_param(
+                'reservation-id', str(reservation.id))
+            url = url_obj.as_string()
 
-        title = self.get_reservation_title(reservation)
-        links.append(Link(
-            text=_('Reject'),
-            url=url,
-            attrs={'class': 'delete-link'},
-            traits=(
-                Confirm(
-                    _('Do you really want to reject this reservation?'),
-                    _("Rejecting ${title} can't be undone.", mapping={
-                        'title': title
-                    }),
-                    _('Reject reservation'),
-                    _('Cancel')
-                ),
-                Intercooler(
-                    request_method='GET',
-                    redirect_after=request.url
+            title = self.get_reservation_title(reservation)
+            links.append(Link(
+                text=_('Reject'),
+                url=url,
+                attrs={'class': 'delete-link'},
+                traits=(
+                    Confirm(
+                        _('Do you really want to reject this reservation?'),
+                        _("Rejecting ${title} can't be undone.", mapping={
+                            'title': title
+                        }),
+                        _('Reject reservation'),
+                        _('Cancel')
+                    ),
+                    Intercooler(
+                        request_method='GET',
+                        redirect_after=request.url
+                    )
                 )
-            )
-        ))
+            ))
 
-        # is the reservation adjustable?
-        if (
-            reservation.display_start() > utcnow()
-            and reservation.target_type == 'allocation'
-            and request.session.query(
-                reservation
-                ._target_allocations()
-                .filter(Allocation.partly_available.is_(True))
-                .exists()
-            ).scalar()
-        ):
+        if reservation.is_adjustable:
             url_obj = URL(request.link(self.ticket, 'adjust-reservation'))
             url_obj = url_obj.query_param(
                 'reservation-id', str(reservation.id))
@@ -693,35 +684,40 @@ class ReservationHandler(Handler):
                 )
             )
 
-        advanced_links.append(Link(
-            text=_('Reject all'),
-            url=request.link(self.ticket, 'reject-reservation'),
-            attrs={'class': 'delete-link'},
-            traits=(
-                Confirm(
-                    _('Do you really want to reject all reservations?'),
-                    _("Rejecting these reservations can't be undone."),
-                    _('Reject reservations'),
-                    _('Cancel')
-                ),
-                Intercooler(
-                    request_method='GET',
-                    redirect_after=request.url
+        if not any(accepted):
+            advanced_links.append(Link(
+                text=_('Reject all'),
+                url=request.link(self.ticket, 'reject-reservation'),
+                attrs={'class': 'delete-link'},
+                traits=(
+                    Confirm(
+                        _('Do you really want to reject all reservations?'),
+                        _("Rejecting these reservations can't be undone."),
+                        _('Reject reservations'),
+                        _('Cancel')
+                    ),
+                    Intercooler(
+                        request_method='GET',
+                        redirect_after=request.url
+                    )
                 )
-            )
-        ))
+            ))
 
-        advanced_links.append(Link(
-            text=_('Reject all with message'),
-            url=request.link(self.ticket, 'reject-reservation-with-message'),
-            attrs={'class': 'delete-link'},
-        ))
+            advanced_links.append(Link(
+                text=_('Reject all with message'),
+                url=request.link(
+                    self.ticket,
+                    'reject-reservation-with-message'
+                ),
+                attrs={'class': 'delete-link'},
+            ))
 
-        links.append(LinkGroup(
-            _('Advanced'),
-            links=advanced_links,
-            right_side=False
-        ))
+        if advanced_links:
+            links.append(LinkGroup(
+                _('Advanced'),
+                links=advanced_links,
+                right_side=False
+            ))
 
         return links
 

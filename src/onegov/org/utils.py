@@ -819,6 +819,12 @@ class ReservationEventInfo:
             return color
         return event_color(tag)
 
+    @property
+    def editable(self) -> bool:
+        if self.reservation.display_start() >= sedate.utcnow():
+            return False
+        return not self.accepted
+
     def as_dict(self) -> dict[str, Any]:
         return {
             'id': self.reservation.id,
@@ -830,7 +836,7 @@ class ReservationEventInfo:
             'quota': self.reservation.quota,
             'className': ' '.join(self.event_classes),
             'url': self.request.link(self.ticket),
-            'editable': self.reservation.display_start() > sedate.utcnow(),
+            'editable': self.editable,
             'editurl': self.request.csrf_protected_url(self.request.link(
                 self.ticket,
                 name='adjust-reservation',

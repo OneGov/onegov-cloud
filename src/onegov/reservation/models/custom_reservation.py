@@ -1,10 +1,11 @@
 from __future__ import annotations
 
 from datetime import timedelta
-from libres.db.models import Reservation
+from libres.db.models import Allocation, Reservation
 from onegov.core.orm import ModelBase
 from onegov.pay import Payable, Price
 from onegov.reservation.models.resource import Resource
+from sedate import utcnow
 from sqlalchemy.orm import object_session
 
 
@@ -19,6 +20,28 @@ class CustomReservation(Reservation, ModelBase, Payable):
     @property
     def payable_reference(self) -> str:
         return f'{self.resource.hex}/{self.email}x{self.quota}'
+
+    @property
+    def is_adjustable(self) -> bool:
+        """ Returns whether or not the reservation is adjustable.
+
+        A reservation is adjustable when it's not yet been accepted,
+        its start date is in the future and its target allocation is
+        partly available.
+
+        """
+        if self.display_start() >= utcnow():
+            return False
+
+        if self.data and self.data.get('accepted'):
+            return False
+
+        return object_session(self).query(
+            self
+            ._target_allocations()
+            .filter(Allocation.partly_available.is_(True))
+            .exists()
+        ).scalar()
 
     def price(self, resource: Resource | None = None) -> Price | None:
         """ Returns the price of the reservation.
