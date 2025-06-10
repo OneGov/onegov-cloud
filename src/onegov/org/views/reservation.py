@@ -1111,16 +1111,6 @@ def reject_reservation(
     if view_ticket is not None and view_ticket != ticket:
         raise exc.HTTPNotFound()
 
-    if any(r.data and r.data.get('accepted') for r in targeted):
-        request.alert(_('Cannot reject accepted reservations'))
-
-        if not request.headers.get('X-IC-Request'):
-            if view_ticket is not None:
-                return request.redirect(request.link(view_ticket))
-            return request.redirect(request.link(self))
-
-        return None
-
     client = KabaClient.from_resource(resource, request.app)
 
     # if there's a captured payment we cannot continue

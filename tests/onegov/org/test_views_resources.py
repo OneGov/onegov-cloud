@@ -1326,26 +1326,8 @@ def test_reserve_allocation_adjustment_post_acceptance(client):
     # accept it
     ticket = ticket.click('Alle Reservationen annehmen').follow()
 
-    # adjust it
-    adjust = ticket.click('Anpassen', index=0)
-    adjust.form['end_time'] = '11:00'
-    ticket = adjust.form.submit().follow()
-    assert "10:00" in ticket
-    assert "11:00" in ticket
-
-    # the mail went out before so it still shows the old time
-    # TODO: Do we send a notification in this case or do we rely
-    #       on supporters to do that?
-    message = client.get_email(1)['TextBody']
-    assert "Tageskarte" in message
-    assert "28. August 2015" in message
-    assert "10:00" in message
-    assert "12:00" in message
-
-    # see if the slots are partitioned correctly
-    url = '/resource/tageskarte/slots?start=2015-08-01&end=2015-08-30'
-    slots = client.get(url).json
-    assert slots[0]['partitions'] == [[25.0, True], [75.0, False]]
+    # it can't be adjusted
+    assert 'Anpassen' not in ticket
 
 
 @freeze_time("2015-08-28", tick=True)

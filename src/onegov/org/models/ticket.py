@@ -579,32 +579,31 @@ class ReservationHandler(Handler):
 
         links: list[Link] = []
 
-        if not (reservation.data and reservation.data.get('accepted')):
-            url_obj = URL(request.link(self.ticket, 'reject-reservation'))
-            url_obj = url_obj.query_param(
-                'reservation-id', str(reservation.id))
-            url = url_obj.as_string()
+        url_obj = URL(request.link(self.ticket, 'reject-reservation'))
+        url_obj = url_obj.query_param(
+            'reservation-id', str(reservation.id))
+        url = url_obj.as_string()
 
-            title = self.get_reservation_title(reservation)
-            links.append(Link(
-                text=_('Reject'),
-                url=url,
-                attrs={'class': 'delete-link'},
-                traits=(
-                    Confirm(
-                        _('Do you really want to reject this reservation?'),
-                        _("Rejecting ${title} can't be undone.", mapping={
-                            'title': title
-                        }),
-                        _('Reject reservation'),
-                        _('Cancel')
-                    ),
-                    Intercooler(
-                        request_method='GET',
-                        redirect_after=request.url
-                    )
+        title = self.get_reservation_title(reservation)
+        links.append(Link(
+            text=_('Reject'),
+            url=url,
+            attrs={'class': 'delete-link'},
+            traits=(
+                Confirm(
+                    _('Do you really want to reject this reservation?'),
+                    _("Rejecting ${title} can't be undone.", mapping={
+                        'title': title
+                    }),
+                    _('Reject reservation'),
+                    _('Cancel')
+                ),
+                Intercooler(
+                    request_method='GET',
+                    redirect_after=request.url
                 )
-            ))
+            )
+        ))
 
         if reservation.is_adjustable:
             url_obj = URL(request.link(self.ticket, 'adjust-reservation'))
