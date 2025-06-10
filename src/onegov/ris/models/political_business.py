@@ -156,7 +156,7 @@ class RISPoliticalBusiness(Base, MultiAssociatedFiles, ContentMixin,
                 f'{self.title}, {self.political_business_type}>')
 
 
-class RISPoliticalBusinessParticipation(Base, ContentMixin, ORMSearchable):
+class RISPoliticalBusinessParticipation(Base, ContentMixin):
     """ A participant of a political business, e.g. a parliamentarian. """
 
     __tablename__ = 'ris_political_business_participants'
