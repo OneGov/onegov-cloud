@@ -9,7 +9,7 @@ from sqlalchemy.orm import relationship
 from uuid import uuid4
 
 from onegov.core.orm import Base
-from onegov.core.orm.mixins import TimestampMixin
+from onegov.core.orm.mixins import TimestampMixin, ContentMixin
 from onegov.core.orm.types import UUID
 from onegov.ris import _
 
@@ -83,7 +83,7 @@ PARLIAMENTARY_GROUP_ROLES: dict[ParliamentaryGroupRole, str] = {
 }
 
 
-class RISParliamentarianRole(Base, TimestampMixin):
+class RISParliamentarianRole(Base, ContentMixin, TimestampMixin):
 
     __tablename__ = 'ris_parliamentarian_roles'
 

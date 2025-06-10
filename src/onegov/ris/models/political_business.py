@@ -5,6 +5,7 @@ from sqlalchemy.orm import RelationshipProperty, relationship
 from uuid import uuid4
 
 from onegov.core.orm import Base
+from onegov.core.orm.mixins import ContentMixin
 from onegov.core.orm.types import UUID
 from onegov.file import MultiAssociatedFiles
 from onegov.ris import _
@@ -78,7 +79,8 @@ POLITICAL_BUSINESS_STATUS: dict[PoliticalBusinessStatus, str] = {
 }
 
 
-class RISPoliticalBusiness(Base, MultiAssociatedFiles, ORMSearchable):
+class RISPoliticalBusiness(Base, MultiAssociatedFiles, ContentMixin,
+                           ORMSearchable):
     # Politisches Geschäft
 
     __tablename__ = 'ris_political_businesses'
@@ -154,7 +156,7 @@ class RISPoliticalBusiness(Base, MultiAssociatedFiles, ORMSearchable):
                 f'{self.title}, {self.political_business_type}>')
 
 
-class RISPoliticalBusinessParticipation(Base):
+class RISPoliticalBusinessParticipation(Base, ContentMixin, ORMSearchable):
     """ A participant of a political business, e.g. a parliamentarian. """
 
     __tablename__ = 'ris_political_business_participants'

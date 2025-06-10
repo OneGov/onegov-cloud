@@ -5,7 +5,7 @@ from sqlalchemy.orm import relationship
 from uuid import uuid4
 
 from onegov.core.orm import Base, observes
-from onegov.core.orm.mixins import dict_markup_property
+from onegov.core.orm.mixins import dict_markup_property, ContentMixin
 from onegov.core.orm.mixins import TimestampMixin
 from onegov.core.orm.types import UUID
 from onegov.ris import _
@@ -35,7 +35,7 @@ TYPES: dict[CommissionType, str] = {
 }
 
 
-class RISCommission(Base, TimestampMixin, ORMSearchable):
+class RISCommission(Base, TimestampMixin, ContentMixin, ORMSearchable):
 
     __tablename__ = 'ris_commissions'
 

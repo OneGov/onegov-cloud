@@ -6,6 +6,7 @@ from sqlalchemy import Column, Text, ForeignKey
 from sqlalchemy.orm import RelationshipProperty, relationship
 
 from onegov.core.orm import Base
+from onegov.core.orm.mixins import ContentMixin
 from onegov.core.orm.types import UUID, MarkupText, UTCDateTime
 from onegov.search import ORMSearchable
 
@@ -20,7 +21,7 @@ if TYPE_CHECKING:
     from onegov.ris.models.political_business import RISPoliticalBusiness
 
 
-class RISMeeting(Base, ORMSearchable):
+class RISMeeting(Base, ContentMixin, ORMSearchable):
     __tablename__ = 'ris_meetings'
 
     es_public = True

@@ -9,6 +9,7 @@ from sqlalchemy.orm import relationship
 from uuid import uuid4
 
 from onegov.core.orm import Base
+from onegov.core.orm.mixins import ContentMixin
 from onegov.core.orm.types import UUID
 from onegov.file import AssociatedFiles
 from onegov.file import NamedFile
@@ -43,7 +44,7 @@ GENDERS: dict[Gender, str] = {
 }
 
 
-class RISParliamentarian(Base, AssociatedFiles, ORMSearchable):
+class RISParliamentarian(Base, AssociatedFiles, ContentMixin, ORMSearchable):
     __tablename__ = 'ris_parliamentarians'
 
     es_public = False
