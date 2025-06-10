@@ -479,9 +479,9 @@ def test_discount():
 
     f = field.parseString("[ ] Discount (50%) (For Kids)")
     assert f.type == 'checkbox'
-    assert f.label == 'Discount (50%) (For Kids)'
+    assert f.label == 'Discount'
     assert not f.checked
-    assert not f.discount
+    assert f.discount.amount == Decimal('50')
     assert not f.pricing
 
 
