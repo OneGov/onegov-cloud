@@ -1112,7 +1112,7 @@ def reject_reservation(
         raise exc.HTTPNotFound()
 
     if any(r.data and r.data.get('accepted') for r in targeted):
-        request.alert(_('Cannot cancel accepted reservations'))
+        request.alert(_('Cannot reject accepted reservations'))
 
         if not request.headers.get('X-IC-Request'):
             if view_ticket is not None:
