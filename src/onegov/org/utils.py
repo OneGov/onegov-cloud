@@ -821,7 +821,7 @@ class ReservationEventInfo:
 
     @property
     def editable(self) -> bool:
-        if self.reservation.display_start() >= sedate.utcnow():
+        if self.reservation.display_start() < sedate.utcnow():
             return False
         return not self.accepted
 
