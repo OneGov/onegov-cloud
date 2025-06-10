@@ -603,9 +603,9 @@ def marker_box(characters: str) -> ParserElement:
     #       If pricing wasn't optional this would be easy...
     label = Regex(
         # a sequence of words (that can't start with brackets)
-        rf'(?P<label>{text_without_re(characters + "()")}(?: *{word_re})*?) *'
-        # followed by optional pricing or discount followed by end of line
-        r'(?=$|[(] *-?[0-9]+(?:\.[0-9]+)? *(?:%|[A-Za-z]{3}!?) *[)] *$)'
+        rf'(?P<label>{text_without_re(characters + "()")}(?: {word_re})*?)'
+        # followed by optional pricing or discount followed by end of line or multiple spaces
+        r'(?= *$| *[(] *-?[0-9]+(?:\.[0-9]+)? *(?:%|[A-Za-z]{3}!?) *[)]|  )'
     )
     return check + label + Optional(pricing_or_discount_parser)
 
