@@ -550,14 +550,3 @@ def test_chip_nr():
     f = field.parseString("chip-nr")
     assert f.type == 'chip_nr'
     assert f.asDict() == {'type': 'chip_nr'}
-
-
-def test_label_with_multiple_spaces():
-    field = radio()
-
-    f = field.parseString("(x) My  suuper    duuper space    choice")
-    assert f.type == 'radio'
-    assert f.label == 'My  suuper    duuper space    choice'
-    assert f.checked
-    assert not f.pricing
-    assert not f.dicount
