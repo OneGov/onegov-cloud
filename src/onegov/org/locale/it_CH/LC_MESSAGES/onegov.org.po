@@ -2,7 +2,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: \n"
-"POT-Creation-Date: 2025-06-10 14:16+0200\n"
+"POT-Creation-Date: 2025-06-11 13:31+0200\n"
 "PO-Revision-Date: 2022-03-15 10:52+0100\n"
 "Last-Translator: \n"
 "Language-Team: \n"
@@ -3384,6 +3384,22 @@ msgstr "Regolare"
 msgid "Accept all reservations"
 msgstr "Accetta tutte le prenotazioni"
 
+msgid "Send reservation summary"
+msgstr "Invia il riepilogo della prenotazione"
+
+msgid "Do you really want to send a reservation summary?"
+msgstr "Volete davvero inviare un riepilogo della prenotazione?"
+
+msgid ""
+"This will always be sent via e-mail, even when ticket updates have been "
+"disabled. Make sure to only use this to inform customers, when significant "
+"changes have been made to the reservations, they need to be aware of."
+msgstr ""
+"Questo verrà sempre inviato via e-mail, anche quando gli aggiornamenti dei "
+"biglietti sono stati disattivati. Assicuratevi di usarlo solo per informare "
+"i clienti quando sono state apportate modifiche significative alle "
+"prenotazioni, di cui devono essere a conoscenza."
+
 msgid "Details about the reservation"
 msgstr "Dettagli sulla prenotazione"
 
@@ -4470,6 +4486,9 @@ msgstr ""
 "elettronica si prega di contattare un amministratore in modo che possa "
 "rimuovervi dall'elenco dei destinatari lista"
 
+msgid "Pending approval"
+msgstr "In attesa di approvazione"
+
 msgid "This is what happend on the ${org} website over the past month:"
 msgstr "Questo è quello che è successo sul sito web ${org} nell'ultimo mese:"
 
@@ -4596,6 +4615,15 @@ msgstr ""
 
 msgid "The following reservations have unfortunately been cancelled:"
 msgstr "Purtroppo le seguenti prenotazioni sono state annullate:"
+
+msgid "Here's a summary of your reservations:"
+msgstr "Ecco un riepilogo delle vostre prenotazioni:"
+
+msgid "Changes to your submitted reservations:"
+msgstr "Modifiche alle prenotazioni inviate:"
+
+msgid "Rejected"
+msgstr "Rifiutata"
 
 msgid "You have a new ticket"
 msgstr "Hai un nuovo biglietto"
@@ -5326,9 +5354,6 @@ msgid ""
 msgstr ""
 "Per eliminare questa allocazione, è necessario prima annullare tutte le "
 "prenotazioni esistenti."
-
-msgid "Pending approval"
-msgstr "In attesa di approvazione"
 
 msgid "A conflicting allocation exists for the requested time period."
 msgstr "Esiste un'allocazione in conflitto per il periodo di tempo richiesto."
@@ -6463,6 +6488,9 @@ msgstr ""
 
 msgid "Reject all reservations with message"
 msgstr "Rifiuta tutte le prenotazioni con messaggio"
+
+msgid "Reservation summary"
+msgstr "Riepilogo della prenotazione"
 
 msgid "Reservation not adjustable"
 msgstr "Prenotazione non regolabile"

@@ -210,10 +210,24 @@ class ReservationMessage(Message, TicketMessageMixin):
         change: str,
         origin: str = 'internal'
     ) -> Self:
-        return super().create(ticket, request, change=change,
-                              origin=origin, reservations=[
-            r.id for r in reservations
-        ])
+        return super().create(
+            ticket,
+            request,
+            change=change,
+            origin=origin,
+            reservations=[
+                # NOTE: we record more than just the id, since if the
+                #       change is, that we deleted the reservations,
+                #       then we no longer will know when those reservations
+                #       were.
+                {
+                    'id': reservation.id,
+                    'start': reservation.display_start(),
+                    'end': reservation.display_end(),
+                }
+                for reservation in reservations
+            ]
+        )
 
 
 class ReservationAdjustedMessage(Message, TicketMessageMixin):

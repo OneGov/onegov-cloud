@@ -1,8 +1,12 @@
 from __future__ import annotations
 
 import morepath
+import os
+import zipfile
 
 from datetime import date
+from io import BytesIO
+from markupsafe import Markup
 from morepath import Response
 from onegov.chat import Message, MessageCollection
 from onegov.core.custom import json
@@ -13,10 +17,6 @@ from onegov.core.orm import as_selectable
 from onegov.core.security import Public, Private, Secret
 from onegov.core.templates import render_template
 from onegov.core.utils import normalize_for_url
-import zipfile
-import os
-from io import BytesIO
-from markupsafe import Markup
 from onegov.form import Form
 from onegov.org import _, OrgApp
 from onegov.org.constants import TICKET_STATES

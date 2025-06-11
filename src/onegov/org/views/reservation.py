@@ -1348,6 +1348,57 @@ def reject_reservation_with_message_from_ticket(
     )
 
 
+@OrgApp.view(
+    model=ReservationTicket,
+    name='send-reservation-summary',
+    permission=Private
+)
+def send_reservation_summary(
+    self: ReservationTicket,
+    request: OrgRequest
+) -> Response | None:
+
+    if self.handler.deleted or not self.handler.reservations:
+        raise exc.HTTPNotFound()
+
+    recipient = self.handler.email
+    if recipient:
+        assert request.current_username
+        TicketChatMessage.create(
+            self,
+            request,
+            text=request.translate(_('Reservation summary')),
+            owner=request.current_username,
+            recipient=recipient,
+            notify=False,
+            origin='internal'
+        )
+        send_ticket_mail(
+            request=request,
+            template='mail_reservation_summary.pt',
+            subject=_('Reservation summary'),
+            receivers=(recipient, ),
+            ticket=self,
+            force=True,
+            content={
+                'model': self,
+                'resource': self.handler.resource,
+                'reservations': self.handler.reservations,
+                'changes': self.handler.get_changes(request),
+            }
+        )
+        request.success(_(
+            'Successfully sent ${count} emails',
+            mapping={'count': 1}
+        ))
+    else:
+        request.alert(_('The submitter email is not available'))
+
+    if request.headers.get('X-IC-Request'):
+        return None
+    return request.redirect(request.link(self))
+
+
 @OrgApp.form(
     model=Reservation,
     name='adjust',
